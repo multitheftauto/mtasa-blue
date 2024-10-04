@@ -281,5 +281,12 @@ enum eElementRPCFunctions
 
     SET_PLAYER_SCRIPT_DEBUG_LEVEL,
 
+    SET_MARKER_TARGET_ARROW_PROPERTIES,
+
+    RESPAWN_OBJECT,
+    TOGGLE_OBJECT_RESPAWN,
+
+    RESET_WORLD_PROPERTIES,
+  
     NUM_RPC_FUNCS            // Add above this line
 };

@@ -523,3 +523,8 @@ CSphere CClientMarker::GetWorldBoundingSphere()
     sphere.fRadius = GetSize();
     return sphere;
 }
+
+void CClientMarker::SetIgnoreAlphaLimits(bool ignore)
+{
+    m_pMarker->SetIgnoreAlphaLimits(ignore);
+}

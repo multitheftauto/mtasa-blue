@@ -2,10 +2,10 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Scripting function processing
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1247,47 +1247,44 @@ bool CStaticFunctionDefinitions::SetElementAngularVelocity(CClientEntity& Entity
 
 bool CStaticFunctionDefinitions::SetElementParent(CClientEntity& Entity, CClientEntity& Parent, CLuaMain* pLuaMain)
 {
-    if (&Entity != &Parent && !Entity.IsMyChild(&Parent, true))
+    if (&Entity == &Parent || Entity.IsMyChild(&Parent, true))
+        return false;
+
+    if (Entity.GetType() == CCLIENTCAMERA || Parent.GetType() == CCLIENTCAMERA)
+        return false;
+
+    if (Entity.GetType() == CCLIENTGUI)
     {
-        if (Entity.GetType() == CCLIENTCAMERA || Parent.GetType() == CCLIENTCAMERA)
-        {
+        if (Parent.GetType() != CCLIENTGUI && &Parent != pLuaMain->GetResource()->GetResourceGUIEntity())
             return false;
-        }
-        else if (Entity.GetType() == CCLIENTGUI)
+
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        GUIElement.SetParent(&Parent);
+        return true;
+    }
+
+    CClientEntity* pTemp = &Parent;
+    CClientEntity* pRoot = m_pRootEntity;
+    bool           bValidParent = false;
+    while (pTemp != pRoot && pTemp != NULL)
+    {
+        const char* szTypeName = pTemp->GetTypeName();
+        if (szTypeName && strcmp(szTypeName, "map") == 0)
         {
-            if (Parent.GetType() == CCLIENTGUI || &Parent == pLuaMain->GetResource()->GetResourceGUIEntity())
-            {
-                CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-                GUIElement.SetParent(&Parent);
-                return true;
-            }
+            bValidParent = true;            // parents must be a map
+            break;
         }
-        else
-        {
-            CClientEntity* pTemp = &Parent;
-            CClientEntity* pRoot = m_pRootEntity;
-            bool           bValidParent = false;
-            while (pTemp != pRoot && pTemp != NULL)
-            {
-                const char* szTypeName = pTemp->GetTypeName();
-                if (szTypeName && strcmp(szTypeName, "map") == 0)
-                {
-                    bValidParent = true;            // parents must be a map
-                    break;
-                }
 
-                pTemp = pTemp->GetParent();
-            }
+        pTemp = pTemp->GetParent();
+    }
 
-            // Make sure the entity we move is a client entity or we get a problem
-            if (bValidParent && Entity.IsLocalEntity())
-            {
-                // Set the new parent
-                Entity.SetParent(&Parent);
-                return true;
-            }
-        }
+    // Make sure the entity we move is a client entity or we get a problem
+    if (bValidParent && Entity.IsLocalEntity())
+    {
+        // Set the new parent
+        Entity.SetParent(&Parent);
+        return true;
     }
 
     return false;
@@ -1465,13 +1462,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
 
-            // Limit to max health
-            float fMaxHealth = Ped.GetMaxHealth();
-            if (fHealth > fMaxHealth)
-                fHealth = fMaxHealth;
-
             // Set the new health
-            Ped.SetHealth(fHealth);
+            Ped.SetHealth(Clamp(0.0f, fHealth, Ped.GetMaxHealth()));
             return true;
             break;
         }
@@ -2153,7 +2145,8 @@ bool CStaticFunctionDefinitions::KillPed(CClientEntity& Entity, CClientEntity* p
     else
         Arguments.PushBoolean(false);
     Arguments.PushBoolean(bStealth);
-
+    Arguments.PushBoolean(false);
+    Arguments.PushBoolean(false);
     pPed.CallEvent("onClientPedWasted", Arguments, false);
     pPed.RemoveAllWeapons();
 
@@ -2242,15 +2235,15 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                 if (pIFP)
                 {
                     // Play the gateway animation
-                    const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
-                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
+                    const char*                 szGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(szGateWayBlockName);
                     auto                        pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
 
-                        const SString& strGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
-                        Ped.RunNamedAnimation(pBlock, strGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                        const char* szGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
+                        Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
                         return true;
                     }
                 }
@@ -4773,7 +4766,7 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance(CClientEntity& Entity, u
     return false;
 }
 
-CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color)
+CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, bool ignoreAlphaLimits)
 {
     assert(szType);
 
@@ -4787,6 +4780,10 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
         // Set its parent and its properties
         pMarker->SetParent(Resource.GetResourceDynamicEntity());
         pMarker->SetPosition(vecPosition);
+
+        if (ucType == CClientMarker::MARKER_ARROW || ucType == CClientMarker::MARKER_CHECKPOINT)
+            pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
+
         pMarker->SetColor(color);
         pMarker->SetSize(fSize);
 
@@ -4923,6 +4920,25 @@ bool CStaticFunctionDefinitions::SetMarkerIcon(CClientEntity& Entity, const char
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(CClientEntity& Entity, const SColor color, float size)
+{
+    RUN_CHILDREN(SetMarkerTargetArrowProperties(**iter, color, size))
+
+    if (!IS_MARKER(&Entity))
+        return false;
+
+    CClientMarker& marker = static_cast<CClientMarker&>(Entity);
+    CClientCheckpoint* checkpoint = marker.GetCheckpoint();
+    if (!checkpoint)
+        return false;
+
+    if (checkpoint->GetIcon() != CClientCheckpoint::ICON_ARROW)
+        return false;
+
+    checkpoint->SetTargetArrowProperties(color, size);
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV)
@@ -7291,6 +7307,7 @@ CClientProjectile* CStaticFunctionDefinitions::CreateProjectile(CResource& Resou
                 case WEAPONTYPE_ROCKET_HS:
                 case WEAPONTYPE_FREEFALL_BOMB:
                 case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
+                case WEAPONTYPE_FLARE:
                 {
                     // Valid model ID? (0 means projectile will use default model)
                     if (usModel == 0 || CClientObjectManager::IsValidModel(usModel))

@@ -1,20 +1,22 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CHandlingManagerSA.cpp
+ *  FILE:        Client/game_sa/CHandlingManagerSA.cpp
  *  PURPOSE:     Vehicle handling manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
+#include "CHandlingManagerSA.h"
 #include <core/CCoreInterface.h>
 #include <multiplayer/CMultiplayer.h>
-#include "CHandlingManagerSA.h"
 
 extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
@@ -22,26 +24,27 @@ extern CCoreInterface* g_pCore;
 #define Var_fTurnMassMultiplier     0x858B8C
 #define Var_fBasicDragCoeff         0x858C58
 
-DWORD CHandlingManagerSA::m_dwStore_LoadHandlingCfg = 0;
+#define DUMP_HANDLING_DATA 0
 
-tHandlingDataSA   CHandlingManagerSA::m_OriginalHandlingData[HT_MAX];
-CHandlingEntrySA* CHandlingManagerSA::m_pOriginalEntries[HT_MAX];
+// Original handling data unaffected by handling.cfg changes
+tHandlingDataSA   m_OriginalHandlingData[HT_MAX];
+CHandlingEntrySA* m_pOriginalEntries[HT_MAX];
 
-tFlyingHandlingDataSA   CHandlingManagerSA::m_OriginalFlyingHandlingData[24];
-CFlyingHandlingEntrySA* CHandlingManagerSA::m_pOriginalFlyingEntries[24];
+tFlyingHandlingDataSA   m_OriginalFlyingHandlingData[24];
+CFlyingHandlingEntrySA* m_pOriginalFlyingEntries[24];
 
-tBoatHandlingDataSA   CHandlingManagerSA::m_OriginalBoatHandlingData[12];
-CBoatHandlingEntrySA* CHandlingManagerSA::m_pOriginalBoatEntries[12];
+tBoatHandlingDataSA   m_OriginalBoatHandlingData[12];
+CBoatHandlingEntrySA* m_pOriginalBoatEntries[12];
 
-tBikeHandlingDataSA   CHandlingManagerSA::m_OriginalBikeHandlingData[14];
-CBikeHandlingEntrySA* CHandlingManagerSA::m_pOriginalBikeEntries[14];
+tBikeHandlingDataSA   m_OriginalBikeHandlingData[14];
+CBikeHandlingEntrySA* m_pOriginalBikeEntries[14];
+
+std::map<std::string, eHandlingProperty> m_HandlingNames;
 
 // TODO We need install a hook in 0x6F52D0 to make some stuff work corrently
 
 // Use the following code to dump handling data unrecalculated on GTA load.
 // NB: You need to disable the other hook in the constructor of the manager and uncomment the other
-
-DWORD m_dwStore_Calculate = 0;
 
 __declspec(noinline) void DumpHandlingData(tHandlingDataSA* pData)
 {
@@ -98,17 +101,17 @@ __declspec(noinline) void DumpHandlingData(tHandlingDataSA* pData)
     fclose(pFile);
 }
 
-__declspec(naked) void Hook_Calculate()
+static __declspec(naked) void Hook_Calculate()
 {
     tHandlingDataSA* pData;
-    DWORD            dwHandlingData;
+    DWORD dwHandlingData;
     _asm
     {
         mov         eax, [esp+4]
         mov         dwHandlingData, eax
     }
 
-    pData = (tHandlingDataSA*)(dwHandlingData);
+    pData = reinterpret_cast<tHandlingDataSA*>(dwHandlingData);
     DumpHandlingData(pData);
 
     _asm
@@ -117,34 +120,42 @@ __declspec(naked) void Hook_Calculate()
     }
 }
 
+static bool IsVehicleModel(eVehicleTypes eModel)
+{
+    const auto pModelInfo = pGame->GetModelInfo(eModel);
+    return pModelInfo && pModelInfo->IsVehicle();
+}
+
 CHandlingManagerSA::CHandlingManagerSA()
 {
     // Initialize all default handlings
     InitializeDefaultHandlings();
 
     // Create a handling entry for every original handling data.
-    for (int i = 0; i < HT_MAX; i++)
+    for (std::size_t i = 0; i < HT_MAX; i++)
     {
         m_pOriginalEntries[i] = new CHandlingEntrySA(&m_OriginalHandlingData[i]);
     }
 
-    for (int i = 0; i < 24; i++)
+    for (std::size_t i = 0; i < 24; i++)
     {
         m_pOriginalFlyingEntries[i] = new CFlyingHandlingEntrySA(&m_OriginalFlyingHandlingData[i]);
     }
 
-    for (int i = 0; i < 12; i++)
+    for (std::size_t i = 0; i < 12; i++)
     {
         m_pOriginalBoatEntries[i] = new CBoatHandlingEntrySA(&m_OriginalBoatHandlingData[i]);
     }
 
-    for (int i = 0; i < 14; i++)
+    for (std::size_t i = 0; i < 14; i++)
     {
         m_pOriginalBikeEntries[i] = new CBikeHandlingEntrySA(&m_OriginalBikeHandlingData[i]);
     }
 
-    // Uncomment this to dump
-    // HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
+#if DUMP_HANDLING_DATA
+    HookInstall(Func_Calculate, (DWORD)Hook_Calculate, 11);
+#endif
+
     m_HandlingNames["mass"] = HANDLING_MASS;                                                             // works (mass > 0)
     m_HandlingNames["turnMass"] = HANDLING_TURNMASS;                                                     // works
     m_HandlingNames["dragCoeff"] = HANDLING_DRAGCOEFF;                                                   // works
@@ -178,136 +189,118 @@ CHandlingManagerSA::CHandlingManagerSA()
     m_HandlingNames["headLight"] = HANDLING_HEADLIGHT;                    // doesn't work
     m_HandlingNames["tailLight"] = HANDLING_TAILLIGHT;                    // doesn't seem to work*
     m_HandlingNames["animGroup"] = HANDLING_ANIMGROUP;                    // works model based
-
-    iChangedVehicles = 0;
 }
 
 CHandlingManagerSA::~CHandlingManagerSA()
 {
     // Destroy all original handling entries
-    for (int i = 0; i < HT_MAX; i++)
+    for (std::size_t i = 0; i < HT_MAX; i++)
     {
         delete m_pOriginalEntries[i];
     }
 
-    for (int i = 0; i < 24; i++)
+    for (std::size_t i = 0; i < 24; i++)
     {
         delete m_pOriginalFlyingEntries[i];
     }
 
-    for (int i = 0; i < 12; i++)
+    for (std::size_t i = 0; i < 12; i++)
     {
         delete m_pOriginalBoatEntries[i];
     }
 
-    for (int i = 0; i < 14; i++)
+    for (std::size_t i = 0; i < 14; i++)
     {
         delete m_pOriginalBikeEntries[i];
     }
 }
 
-eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(std::string strName)
+eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(const std::string& strName) const
 {
-    std::map<std::string, eHandlingProperty>::iterator it;
-    it = m_HandlingNames.find(strName);
-
-    if (it != m_HandlingNames.end())
-    {
-        return it->second;
-    }
-    return HANDLING_MAX;
+    const auto it = m_HandlingNames.find(strName);
+    return it != m_HandlingNames.end() ? it->second : HANDLING_MAX;
 }
 
 CHandlingEntry* CHandlingManagerSA::CreateHandlingData()
 {
-    CHandlingEntrySA* pHandlingEntry = new CHandlingEntrySA();
-    return pHandlingEntry;
+    return new CHandlingEntrySA;
 }
 
 CFlyingHandlingEntry* CHandlingManagerSA::CreateFlyingHandlingData()
 {
-    CFlyingHandlingEntrySA* pFlyingHandlingEntry = new CFlyingHandlingEntrySA();
-    return pFlyingHandlingEntry;
+    return new CFlyingHandlingEntrySA;
 }
 
 CBoatHandlingEntry* CHandlingManagerSA::CreateBoatHandlingData()
 {
-    CBoatHandlingEntrySA* pBoatHandlingEntry = new CBoatHandlingEntrySA();
-    return pBoatHandlingEntry;
+    return new CBoatHandlingEntrySA;
 }
 
 CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData()
 {
-    CBikeHandlingEntrySA* pBikeHandlingEntry = new CBikeHandlingEntrySA();
-    return pBikeHandlingEntry;
+    return new CBikeHandlingEntrySA;
 }
 
-const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel)
+const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel) const
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return it
-        return m_pOriginalEntries[eHandling];
-    }
+    // Vehicle?
+    if (!IsVehicleModel(eModel))
+        return nullptr;
 
-    return NULL;
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Return it
+    return m_pOriginalEntries[eHandling];
 }
 
-const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel)
+const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel) const
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Original GTA:SA behavior
-        if (eHandling < 186 || eHandling > 209)
-            return m_pOriginalFlyingEntries[0];
-        else
-            return m_pOriginalFlyingEntries[eHandling - 186];
-    }
+    // Vehicle?
+    if (!IsVehicleModel(eModel))
+        return nullptr;
 
-    return NULL;
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Original GTA:SA behavior
+    if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
+        return m_pOriginalFlyingEntries[0];
+    else
+        return m_pOriginalFlyingEntries[eHandling - HT_SEAPLANE];
 }
 
-const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel)
+const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel) const
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Original GTA:SA behavior
-        if (eHandling < 175 || eHandling > 186)
-            return m_pOriginalBoatEntries[0];
-        else
-            return m_pOriginalBoatEntries[eHandling - 175];
-    }
+    // Vehicle?
+    if (!IsVehicleModel(eModel))
+        return nullptr;
 
-    return NULL;
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Original GTA:SA behavior
+    if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
+        return m_pOriginalBoatEntries[0];
+    else
+        return m_pOriginalBoatEntries[eHandling - HT_PREDATOR];
 }
 
-const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel)
+const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel) const
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
-            return m_pOriginalBikeEntries[eHandling - HT_BIKE];
-        else if (eHandling == HT_FAGGIO)
-            return m_pOriginalBikeEntries[13];
-    }
+    // Vehicle?
+    if (!IsVehicleModel(eModel))
+        return nullptr;
 
-    return NULL;
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const eHandlingTypes eHandling = GetHandlingID(eModel);
+    if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
+        return m_pOriginalBikeEntries[eHandling - HT_BIKE];
+    else if (eHandling == HT_FAGGIO)
+        return m_pOriginalBikeEntries[13];
+    else
+        return nullptr;
 }
 
 // Return the handling manager id
-eHandlingTypes CHandlingManagerSA::GetHandlingID(eVehicleTypes eModel)
+eHandlingTypes CHandlingManagerSA::GetHandlingID(eVehicleTypes eModel) const
 {
     switch (eModel)
     {
@@ -9161,17 +9154,29 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
-void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)
+void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry) noexcept
 {
+    // Valid?
+    if (!pEntry)
+        return;
+
     // Grab us a multiplayer_sa pointer
-    CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
-    eVehicleTypes eModel = pEntry->GetModel();
-    // Find our original data
-    const CHandlingEntry* pOriginal = m_pOriginalEntries[eModel];
+    CMultiplayer* const pMultiplayer = g_pCore->GetMultiplayer();
+    if (!pMultiplayer)
+        return;
+
+    // Get Handling ID
+    const eHandlingTypes eHandling = static_cast<eHandlingTypes>(pEntry->GetVehicleID());
+    if (eHandling >= HT_MAX)
+        return;
+
+    const CHandlingEntrySA* pOriginal = m_pOriginalEntries[eHandling];
+    if (!pOriginal)
+        return;
+
     // Default bChanged to false
     bool bChanged = false;
 
-    // loads of if statements because I'm pro like that... na j/k
     // Set bChanged to true if we find ANY change.
     if (pEntry->GetSuspensionAntiDiveMultiplier() != pOriginal->GetSuspensionAntiDiveMultiplier())
         bChanged = true;
@@ -9194,33 +9199,8 @@ void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)
     if (pEntry->GetSuspensionUpperLimit() != pOriginal->GetSuspensionUpperLimit())
         bChanged = true;
 
-    // Is bChanged true and the suspension flag changed marker false
-    if (bChanged == true && pEntry->HasSuspensionChanged() == false)
-    {
-        // Is our hook uninstalled?
-        if (pMultiplayer->IsSuspensionEnabled() == false)
-            // Install the hook
-            pMultiplayer->SetSuspensionEnabled(true);
+    if (!bChanged)
+        return;
 
-        // Increment iChangedVehicles
-        iChangedVehicles++;
-        // Set our Suspension Changed flag
-        pEntry->SetSuspensionChanged(true);
-    }
-    // is bChanged false and is this model supposed to contain non-default info? (i.e. they just reverted)
-    else if (bChanged == false && pEntry->HasSuspensionChanged() == true)
-    {
-        // Decrement iChangedVehicles
-        iChangedVehicles--;
-        // Set the suspension Changed flag to false
-        pEntry->SetSuspensionChanged(false);
-    }
-    // if we hit 0 vehicles installed and it's installed uninstall the hook
-    if (iChangedVehicles == 0 && pMultiplayer->IsSuspensionEnabled() == true)
-        pMultiplayer->SetSuspensionEnabled(false);
-}
-void CHandlingManagerSA::RemoveChangedVehicle()
-{
-    // Decrement the count
-    iChangedVehicles--;
+    pMultiplayer->UpdateVehicleSuspension();
 }

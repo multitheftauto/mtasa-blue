@@ -33,6 +33,8 @@ public:
     constexpr bool        IsWarning() const noexcept { return m_bWarning; }
 };
 
+using LuaVarArgs = std::optional<CLuaArguments>;
+
 struct CLuaFunctionParserBase
 {
     // iIndex is passed around by reference
@@ -74,6 +76,8 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CLuaArgument>)
             return "value";
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
+            return "values";
         else if constexpr (is_2specialization<T, std::vector>::value)
             return "table";
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
@@ -217,6 +221,9 @@ struct CLuaFunctionParserBase
 
         // CLuaArgument can hold any value
         else if constexpr (std::is_same_v<T, CLuaArgument>)
+            return iArgument != LUA_TNONE;
+
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
             return iArgument != LUA_TNONE;
 
         // All color classes are read as a single tocolor number
@@ -649,6 +656,12 @@ struct CLuaFunctionParserBase
         {
             CLuaArgument argument;
             argument.Read(L, index++);
+            return argument;
+        }
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
+        {
+            CLuaArguments argument;
+            argument.ReadArguments(L, index);
             return argument;
         }
         else if constexpr (std::is_same_v<T, std::monostate>)

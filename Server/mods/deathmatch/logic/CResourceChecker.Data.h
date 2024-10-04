@@ -168,7 +168,9 @@ namespace
 
         // Base Encoding & Decoding
         {false, "base64Encode", "encodeString"},
-        {false, "base64Decode", "decodeString"}
+        {false, "base64Decode", "decodeString"},
+
+        {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"}
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
