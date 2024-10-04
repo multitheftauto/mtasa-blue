@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/Common.h
+ *  FILE:        Client/sdk/game/Common.h
  *  PURPOSE:     Grand Theft Auto: San Andreas game definitions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -27,6 +27,7 @@
 #define MAX_PEDS                            ( MAX_PEDS_MTA + 30 )                   // 140
 #define MAX_OBJECTS                         ( MAX_OBJECTS_MTA + 200 )               // 1200
 #define MAX_BUILDINGS                       13000
+#define MAX_DUMMIES                         2500
 #define MAX_ENTRY_INFO_NODES                ( MAX_ENTRY_INFO_NODES_MTA + 600 )      // 72600
 #define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 90000
 #define MAX_POINTER_DOUBLE_LINKS            ( MAX_POINTER_DOUBLE_LINKS_MTA + 800 )  // 74800
@@ -1598,3 +1599,48 @@ namespace eSoundEffectParams
         HIGH_FREQ_RT_RATIO,
     };
 }            // namespace eSoundEffectParams
+
+enum class eFxParticleSystems
+{
+    PRT_BLOOD,
+    PRT_BOATSPLASH,
+    PRT_BUBBLE,
+    PRT_DEBRIS,
+    PRT_SMOKE,
+    PRT_GUNSHELL,
+    PRT_SAND,
+    PRT_SAND2,
+    PRT_SMOKEHUGE,
+    PRT_SMOKE2,
+    PRT_SPARK,
+    PRT_SPARK2,
+    PRT_SPLASH,
+    PRT_WAKE,
+    PRT_WATERSPLASH,
+    PRT_WHEELDIRT,
+    PRT_GLASS,
+};
+
+enum eWorldProperty
+{
+    AMBIENT_COLOR,
+    AMBIENT_OBJ_COLOR,
+    DIRECTIONAL_COLOR,
+    SPRITE_SIZE,
+    SPRITE_BRIGHTNESS,
+    POLE_SHADOW_STRENGTH,
+    SHADOW_STRENGTH,
+    SHADOWS_OFFSET,
+    LIGHTS_ON_GROUND,
+    LOW_CLOUDS_COLOR,
+    BOTTOM_CLOUDS_COLOR,
+    CLOUDS_ALPHA1,
+    ILLUMINATION,
+    WEATHER_WET_ROADS,
+    WEATHER_FOGGYNESS,
+    WEATHER_FOG,
+    WEATHER_RAIN_FOG,
+    WEATHER_WATER_FOG,
+    WEATHER_SANDSTORM,
+    WEATHER_RAINBOW,
+};

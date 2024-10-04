@@ -363,6 +363,18 @@ void CSettings::CreateGUI()
     m_pEditNick->SetMaxLength(MAX_PLAYER_NICK_LENGTH);
     m_pEditNick->SetTextAcceptedHandler(GUI_CALLBACK(&CSettings::OnOKButtonClick, this));
 
+    m_pButtonGenerateNick = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabMultiplayer));
+    m_pButtonGenerateNick->SetPosition(CVector2D(vecSize.fX + vecTemp.fX + 50.0f + 178.0f + 5.0f, vecTemp.fY - 1.0f), false);
+    m_pButtonGenerateNick->SetSize(CVector2D(26.0f, 26.0f), false);
+    m_pButtonGenerateNick->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickButtonClick, this));
+    m_pButtonGenerateNick->SetZOrderingEnabled(false);
+
+    m_pButtonGenerateNickIcon = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pButtonGenerateNick));
+    m_pButtonGenerateNickIcon->SetSize(CVector2D(1, 1), true);
+    m_pButtonGenerateNickIcon->LoadFromFile("cgui\\images\\serverbrowser\\refresh.png");
+    m_pButtonGenerateNickIcon->SetProperty("MousePassThroughEnabled", "True");
+    m_pButtonGenerateNickIcon->SetProperty("DistributeCapturedInputs", "True");
+
     m_pSavePasswords = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save server passwords"), true));
     m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 50.0f));
     m_pSavePasswords->GetPosition(vecTemp, false);
@@ -2937,6 +2949,12 @@ bool CSettings::OnOKButtonClick(CGUIElement* pElement)
     m_pWindow->SetVisible(false);
     pMainMenu->m_bIsInSubWindow = false;
 
+    return true;
+}
+
+bool CSettings::OnNickButtonClick(CGUIElement* pElement)
+{
+    m_pEditNick->SetText(CNickGen::GetRandomNickname());
     return true;
 }
 

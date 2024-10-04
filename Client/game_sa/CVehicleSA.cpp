@@ -1,16 +1,17 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CVehicleSA.cpp
+ *  FILE:        Client/game_sa/CVehicleSA.cpp
  *  PURPOSE:     Vehicle base entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "CAutomobileSA.h"
+#include "CBikeSA.h"
 #include "CCameraSA.h"
 #include "CColModelSA.h"
 #include "CFxManagerSA.h"
@@ -185,12 +186,6 @@ void CVehicleSA::Init()
     }
 
     CopyGlobalSuspensionLinesToPrivate();
-
-    // clear our rw frames list
-    m_ExtraFrames.clear();
-    // dump the frames
-    VehicleDump(this);
-    FinalizeFramesList();
 }
 
 CVehicleSA::~CVehicleSA()
@@ -494,6 +489,37 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
     pInterface->m_fPropSpeed = fSpeed;
 }
 
+bool CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
+{ 
+    VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleSubClass);
+    switch (m_eVehicleType)
+    {
+        case VehicleClass::AUTOMOBILE:
+        case VehicleClass::MONSTER_TRUCK:
+        case VehicleClass::QUAD:
+        case VehicleClass::TRAILER:
+        {
+            auto pInterface = static_cast<CAutomobileSAInterface*>(GetInterface());
+            pInterface->m_wheelRotation[0] = fWheelRot1;
+            pInterface->m_wheelRotation[1] = fWheelRot2;
+            pInterface->m_wheelRotation[2] = fWheelRot3;
+            pInterface->m_wheelRotation[3] = fWheelRot4;
+            return true;
+        }
+        case VehicleClass::BIKE:
+        case VehicleClass::BMX:
+        {
+            auto pInterface = static_cast<CBikeSAInterface*>(GetInterface());
+            pInterface->m_afWheelRotationX[0] = fWheelRot1;
+            pInterface->m_afWheelRotationX[1] = fWheelRot2;
+            return true;
+        }
+        default:
+            return false;
+    }
+    return false;
+}
+
 float CVehicleSA::GetPlaneRotorSpeed() 
 {
     auto pInterface = static_cast<CPlaneSAInterface*>(GetInterface());
@@ -657,6 +683,17 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
         mov     ecx, dwThis
         push    dwModelID
         call    dwFunc
+    }
+
+    // GTA SA only does this when CVehicle::ClearVehicleUpgradeFlags returns false.
+    // In the case of hydraulics and nitro, this function does not return false and the upgrade is never removed from the array
+    for (std::int16_t& upgrade : GetVehicleInterface()->m_upgrades)
+    {
+        if (upgrade == dwModelID)
+        {
+            upgrade = -1;
+            break;
+        }
     }
 }
 
@@ -1288,7 +1325,7 @@ void CVehicleSA::RecalculateHandling()
     if (!m_pHandlingData)
         return;
 
-    m_pHandlingData->Recalculate(GetModelIndex());
+    m_pHandlingData->Recalculate();
 
     // Recalculate the suspension lines
     RecalculateSuspensionLines();
@@ -1296,49 +1333,41 @@ void CVehicleSA::RecalculateHandling()
     // Put it in our interface
     CVehicleSAInterface* pInt = GetVehicleInterface();
     unsigned int         uiHandlingFlags = m_pHandlingData->GetInterface()->uiHandlingFlags;
-    // user error correction - NOS_INST = NOS Installed t/f
-    // if nos is installed we need the flag set
-    if (pInt->m_upgrades[0] && pInt->m_upgrades[0] >= 1008 && pInt->m_upgrades[0] <= 1010)
+    bool                 hydralicsInstalled = false, nitroInstalled = false;
+
+    // We check whether the user has not set incorrect flags via handlingFlags in the case of nitro and hydraulics
+    // If this happened, we need to correct it
+    for (const std::int16_t& upgradeID : pInt->m_upgrades)
     {
-        // Flag not enabled?
-        if (uiHandlingFlags | HANDLING_NOS_Flag)
+        // Empty upgrades value is -1
+        if (upgradeID < 0)
+            continue;
+
+        // If NOS is installed we need set the flag
+        if ((upgradeID >= 1008 && upgradeID <= 1010) && !(uiHandlingFlags & HANDLING_NOS_Flag))
         {
-            // Set zee flag
             uiHandlingFlags |= HANDLING_NOS_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
+            nitroInstalled = true;
         }
-    }
-    else
-    {
-        // Flag Enabled?
-        if (uiHandlingFlags & HANDLING_NOS_Flag)
+
+        // If hydraulics is installed we need set the flag
+        if ((upgradeID == 1087) && !(uiHandlingFlags & HANDLING_Hydraulics_Flag))
         {
-            // Unset the flag
-            uiHandlingFlags &= ~HANDLING_NOS_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
-        }
-    }
-    // Hydraulics Flag fixing
-    if (pInt->m_upgrades[1] && pInt->m_upgrades[1] == 1087)
-    {
-        // Flag not enabled?
-        if (uiHandlingFlags | HANDLING_Hydraulics_Flag)
-        {
-            // Set zee flag
             uiHandlingFlags |= HANDLING_Hydraulics_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
+            hydralicsInstalled = true;
         }
     }
-    else
-    {
-        // Flag Enabled?
-        if (uiHandlingFlags & HANDLING_Hydraulics_Flag)
-        {
-            // Unset the flag
-            uiHandlingFlags &= ~HANDLING_Hydraulics_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
-        }
-    }
+
+    // If hydraulics isn't installed we need unset the flag
+    if ((!hydralicsInstalled) && (uiHandlingFlags & HANDLING_Hydraulics_Flag))
+        uiHandlingFlags &= ~HANDLING_Hydraulics_Flag;
+
+    // If NOS isn't installed we need unset the flag
+    if ((!nitroInstalled) && (uiHandlingFlags & HANDLING_NOS_Flag))
+        uiHandlingFlags &= ~HANDLING_NOS_Flag;
+
+    m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
+
     pInt->dwHandlingFlags = uiHandlingFlags;
     pInt->m_fMass = m_pHandlingData->GetInterface()->fMass;
     pInt->m_fTurnMass = m_pHandlingData->GetInterface()->fTurnMass;            // * pGame->GetHandlingManager()->GetTurnMassMultiplier();
@@ -1667,11 +1696,6 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
-    // if suspension is master disabled or suspension hasn't changed return.
-    // if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
-    //{
-    //    return;
-    //}
 
     DWORD       dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
@@ -1922,6 +1946,7 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
     // if the frame is invalid we don't want to be here
     if (!pFrame)
         return;
+
     // if the frame already exists ignore it
     if (IsComponentPresent(pFrame->szName) || pFrame->szName == "")
         return;
@@ -1930,23 +1955,22 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
     // variants have no name field.
     if (strName == "")
     {
+        // In MTA variant 255 means no variant
+        if ((m_ucVariantCount == 0 && m_ucVariant == 255) || (m_ucVariantCount == 1 && m_ucVariant2 == 255))
+            return;
+
         // name starts with extra
         strName = "extra_";
-        if (m_ucVariantCount == 0)
-        {
-            // variants are extra_a, extra_b and so on
-            strName += ('a' - 1) + m_ucVariant;
-        }
-        if (m_ucVariantCount == 1)
-        {
-            // variants are extra_a, extra_b and so on
-            strName += ('a' - 1) + m_ucVariant2;
-        }
+
+        // variants are extra_a - extra_f
+        strName += 'a' + (m_ucVariantCount == 0 ? m_ucVariant : m_ucVariant2);
+
         // increment the variant count ( we assume that the first variant created is variant1 and the second is variant2 )
         m_ucVariantCount++;
     }
-    SVehicleFrame frame = SVehicleFrame(pFrame, bReadOnly);
+
     // insert our new frame
+    SVehicleFrame frame = SVehicleFrame(pFrame, bReadOnly);
     m_ExtraFrames.insert(std::pair<SString, SVehicleFrame>(strName, frame));
 }
 
@@ -1972,6 +1996,16 @@ void CVehicleSA::FinalizeFramesList()
             }
         }
     }
+}
+
+void CVehicleSA::DumpVehicleFrames()
+{
+    // clear our rw frames list
+    m_ExtraFrames.clear();
+
+    // dump the frames
+    VehicleDump(this);
+    FinalizeFramesList();
 }
 
 bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequestVisible)

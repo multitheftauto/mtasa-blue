@@ -40,7 +40,8 @@ enum json_tokener_error
 	json_tokener_error_parse_string,
 	json_tokener_error_parse_comment,
 	json_tokener_error_parse_utf8_string,
-	json_tokener_error_size
+	json_tokener_error_size,   /* A string longer than INT32_MAX was passed as input */
+	json_tokener_error_memory  /* Failed to allocate memory */
 };
 
 /**
@@ -229,7 +230,7 @@ JSON_EXPORT void json_tokener_reset(struct json_tokener *tok);
 JSON_EXPORT struct json_object *json_tokener_parse(const char *str);
 
 /**
- * Parser a json_object out of the string `str`, but if it fails
+ * Parse a json_object out of the string `str`, but if it fails
  * return the error in `*error`.
  * @see json_tokener_parse()
  * @see json_tokener_parse_ex()

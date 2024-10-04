@@ -14,6 +14,7 @@
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
+#include "CLuaEngineDefs.h"
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
@@ -135,9 +136,16 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
         {"engineStreamingRestoreBufferSize", ArgumentParser<EngineStreamingRestoreBufferSize>},
-        
+        {"engineStreamingRequestModel", ArgumentParser<EngineStreamingRequestModel>},
+        {"engineStreamingReleaseModel", ArgumentParser<EngineStreamingReleaseModel>},
+        {"engineStreamingGetModelLoadState", ArgumentParser<EngineStreamingGetModelLoadState>},
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
+        {"engineGetPoolCapacity", ArgumentParser<EngineGetPoolCapacity>},
+        {"engineGetPoolDefaultCapacity", ArgumentParser<EngineGetPoolDefaultCapacity>},
+        {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
+        {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
+        {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1043,12 +1051,14 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 {
-    // bool engineSetModelLODDistance ( int/string modelID, float distance )
+    // bool engineSetModelLODDistance ( int/string modelID, float distance [, bool extendedLod = false ])
     SString          strModelId;
     float            fDistance;
+    bool             extendedLod;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModelId);
     argStream.ReadNumber(fDistance);
+    argStream.ReadBool(extendedLod, false);
 
     if (!argStream.HasErrors())
     {
@@ -1059,7 +1069,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
             if (pModelInfo && fDistance > 0.0f)
             {
-                pModelInfo->SetLODDistance(fDistance);
+                pModelInfo->SetLODDistance(fDistance, extendedLod);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
@@ -1944,7 +1954,8 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
-            lua_pushnumber(luaVM, pModelInfo->GetObjectPropertiesGroup());
+            uint16_t groupId = pModelInfo->GetObjectPropertiesGroup();
+            lua_pushnumber(luaVM, groupId == 0xFFFF ? -1 : groupId);
             return 1;
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
@@ -1956,8 +1967,8 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
-    int          iModelID;
-    unsigned int iNewGroup;
+    int iModelID;
+    int iNewGroup;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(iModelID);
@@ -1971,9 +1982,9 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
-        if (iNewGroup < 0 || iNewGroup > 159)
+        if (iNewGroup < -1 || iNewGroup > 159)
         {
-            argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+            argStream.SetCustomError("Expected group ID in range [0-159] or -1 at argument 1");
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
@@ -2424,14 +2435,9 @@ bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
     return false;
 }
 
-bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
+bool CLuaEngineDefs::EngineRestreamWorld()
 {
-    bool restreamLODs{};
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(restreamLODs, false);
-
-    g_pClientGame->RestreamWorld(restreamLODs);
+    g_pClientGame->RestreamWorld();
     return true;
 }
 
@@ -2457,4 +2463,100 @@ bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
     std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(MAX_MODEL_DFF_ID + txdID);
     return pModel && pModel->Deallocate();
+}
+
+size_t CLuaEngineDefs::EngineGetPoolCapacity(ePools pool)
+{
+    return g_pGame->GetPools()->GetPoolCapacity(pool);
+}
+
+size_t CLuaEngineDefs::EngineGetPoolDefaultCapacity(ePools pool)
+{
+    return g_pGame->GetPools()->GetPoolDefaultModdedCapacity(pool);
+}
+
+size_t CLuaEngineDefs::EngineGetPoolUsedCapacity(ePools pool)
+{
+    return g_pGame->GetPools()->GetNumberOfUsedSpaces(pool);
+}
+
+bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t newSize)
+{
+    size_t minSize = g_pGame->GetPools()->GetPoolDefaultModdedCapacity(pool);
+    if (newSize < minSize)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot set the pool capacity to less than the default capacity.");
+        return false;
+    }
+
+    minSize = g_pGame->GetPools()->GetNumberOfUsedSpaces(pool);
+    if (newSize < minSize)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot set the pool capacity to less than the used capacity.");
+        return false;
+    }
+
+    switch (pool)
+    {
+        case ePools::BUILDING_POOL:
+        {
+            return m_pBuildingManager->SetPoolCapacity(newSize);
+        }
+        default:
+            throw std::invalid_argument("Can not change this pool capacity");
+    }
+    return true;
+}
+
+bool CLuaEngineDefs::EngineStreamingRequestModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking)
+{
+    // Grab the lua main and the resource belonging to this script
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+
+    if (modelId >= g_pGame->GetBaseIDforCOL() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    // Get the resource we belong to
+    CResource* pResource = pLuaMain->GetResource();
+
+    return pResource->GetResourceModelStreamer()->RequestModel(modelId, addReference.value_or(false), blocking.value_or(false));
+}
+
+bool CLuaEngineDefs::EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference)
+{
+    // Grab the lua main and the resource belonging to this script
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+
+    if (modelId >= g_pGame->GetBaseIDforCOL() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    // Get the resource we belong to
+    CResource* pResource = pLuaMain->GetResource();
+
+    return pResource->GetResourceModelStreamer()->ReleaseModel(modelId, removeReference.value_or(false));
+}
+
+eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t modelId)
+{
+    const auto allCount = g_pGame->GetCountOfAllFileIDs();
+    if (modelId >= g_pGame->GetCountOfAllFileIDs())
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    return g_pGame->GetStreaming()->GetStreamingInfo(modelId)->loadState;
+}
+
+void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option)
+{
+    if (!option.has_value())
+        option = PreloadAreaOption::ALL;
+
+    if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::MODELS)
+        g_pGame->GetStreaming()->LoadScene(&position);
+
+    if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
+        g_pGame->GetStreaming()->LoadSceneCollision(&position);
 }

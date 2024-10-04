@@ -28,6 +28,7 @@ public:
     void GetTag(char* szInfoTag, int iInfoTag);
     void HandleInput(char* szCommand);
 
+    bool IsReadyToAcceptConnections() const noexcept override;
     bool IsFinished();
     bool PendingWorkToDo();
     bool GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit);

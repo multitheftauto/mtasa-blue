@@ -32,6 +32,8 @@
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
 #include <game/Task.h>
+#include <game/CBuildingRemoval.h>
+#include "game/CClock.h"
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -249,6 +251,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
+    // 3D model renderer
+    m_pModelRenderer = std::make_unique<CModelRenderer>();
+
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
@@ -265,11 +270,13 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetRender3DStuffHandler(CClientGame::StaticRender3DStuffHandler);
     g_pMultiplayer->SetPreRenderSkyHandler(CClientGame::StaticPreRenderSkyHandler);
     g_pMultiplayer->SetRenderHeliLightHandler(CClientGame::StaticRenderHeliLightHandler);
+    g_pMultiplayer->SetRenderEverythingBarRoadsHandler(CClientGame::StaticRenderEverythingBarRoadsHandler);
     g_pMultiplayer->SetChokingHandler(CClientGame::StaticChokingHandler);
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
+    g_pMultiplayer->SetPostColorFilterRenderHandler(CClientGame::StaticPostColorFilterRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(CClientGame::StaticCAnimBlendAssocDestructorHandler);
@@ -347,9 +354,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Add our lua events
     AddBuiltInEvents();
-
-    // Init debugger class
-    m_Foo.Init(this);
 
     // Load some stuff from the core config
     float fScale;
@@ -470,11 +474,13 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetRender3DStuffHandler(NULL);
     g_pMultiplayer->SetPreRenderSkyHandler(NULL);
     g_pMultiplayer->SetRenderHeliLightHandler(nullptr);
+    g_pMultiplayer->SetRenderEverythingBarRoadsHandler(nullptr);
     g_pMultiplayer->SetChokingHandler(NULL);
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
+    g_pMultiplayer->SetPostColorFilterRenderHandler(nullptr);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(NULL);
@@ -752,7 +758,7 @@ bool CClientGame::StartLocalGame(eServerType Type, const char* szPassword)
         {
             m_bWaitingForLocalConnect = true;
             m_bErrorStartingLocal = true;
-            g_pCore->ShowMessageBox(_("Error") + _E("CD04"), _("The server is not installed"), MB_ICON_ERROR | MB_BUTTON_OK);
+            g_pCore->ShowMessageBox(_("Error") + _E("CD60"), _("Could not start the local server. See console for details."), MB_BUTTON_OK | MB_ICON_ERROR);
             g_pCore->GetModManager()->RequestUnload();
             return false;
         }
@@ -1119,11 +1125,8 @@ void CClientGame::DoPulses()
         m_bFirstPlaybackFrame = false;
     }
 
-    // Call debug code if debug mode
-    m_Foo.DoPulse();
-
-    // Output stuff from our internal server eventually
-    m_Server.DoPulse();
+    // Output stuff from our server eventually
+    m_Server.Pulse();
 
     if (m_pManager->IsGameLoaded() && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_() - m_llLastTransgressionTime > 60000)
     {
@@ -1618,12 +1621,6 @@ void CClientGame::ShowNetstat(int iCmd)
     m_bShowNetstat = bShow;
 }
 
-void CClientGame::ShowEaeg(bool)
-{
-    if (m_pLocalPlayer)
-        m_pLocalPlayer->SetStat(0x2329, 1.0f);
-}
-
 #ifdef MTA_WEPSYNCDBG
 void CClientGame::ShowWepdata(const char* szNick)
 {
@@ -2041,13 +2038,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastCarTwoWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetCarTwoWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("2wheeler");
         Arguments.PushNumber(ulLastCarTwoWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastCarTwoWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastCarTwoWheelCounter = ulTemp;
@@ -2068,13 +2063,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastBikeRearWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetBikeRearWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("wheelie");
         Arguments.PushNumber(ulLastBikeRearWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastBikeRearWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastBikeRearWheelCounter = ulTemp;
@@ -2095,13 +2088,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastBikeFrontWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetBikeFrontWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("stoppie");
         Arguments.PushNumber(ulLastBikeFrontWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastBikeFrontWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastBikeFrontWheelCounter = ulTemp;
@@ -2653,7 +2644,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientPlayerRadioSwitch", "", NULL, false);
     m_Events.AddEvent("onClientPlayerDamage", "attacker, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false);
-    m_Events.AddEvent("onClientPlayerWasted", "", NULL, false);
+    m_Events.AddEvent("onClientPlayerWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onClientPlayerChoke", "", NULL, false);
     m_Events.AddEvent("onClientPlayerVoiceStart", "", NULL, false);
     m_Events.AddEvent("onClientPlayerVoiceStop", "", NULL, false);
@@ -2720,6 +2711,7 @@ void CClientGame::AddBuiltInEvents()
 
     // Console events
     m_Events.AddEvent("onClientConsole", "text", NULL, false);
+    m_Events.AddEvent("onClientCoreCommand", "command", NULL, false);
 
     // Chat events
     m_Events.AddEvent("onClientChatMessage", "text, r, g, b, messageType", NULL, false);
@@ -2932,8 +2924,8 @@ void CClientGame::DrawPlayerDetails(CClientPlayer* pPlayer)
     const CVector&       vecAimTarget = pPlayer->GetAimTarget();
     eVehicleAimDirection ucDrivebyAim = pPlayer->GetVehicleAimAnim();
 
-    g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x10DE1212, true);
-    g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x90DE1212, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x10DE1212, eRenderStage::POST_GUI);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x90DE1212, eRenderStage::POST_FX);
 
     CTask* pPrimaryTask = pPlayer->GetCurrentPrimaryTask();
     int    iPrimaryTask = pPrimaryTask ? pPrimaryTask->GetTaskType() : -1;
@@ -2991,8 +2983,8 @@ void CClientGame::DrawWeaponsyncData(CClientPlayer* pPlayer)
 
         // red line: Draw their synced aim line
         pPlayer->GetShotData(&vecSource, &vecTarget);
-        g_pCore->GetGraphics()->DrawLine3DQueued(vecSource, vecTarget, 2.0f, 0x10DE1212, true);
-        g_pCore->GetGraphics()->DrawLine3DQueued(vecSource, vecTarget, 2.0f, 0x90DE1212, false);
+        g_pCore->GetGraphics()->DrawLine3DQueued(vecSource, vecTarget, 2.0f, 0x10DE1212, eRenderStage::POST_GUI);
+        g_pCore->GetGraphics()->DrawLine3DQueued(vecSource, vecTarget, 2.0f, 0x90DE1212, eRenderStage::POST_FX);
 
         // green line: Set muzzle as origin and perform a collision test for the target
         CColPoint* pCollision;
@@ -3005,8 +2997,8 @@ void CClientGame::DrawWeaponsyncData(CClientPlayer* pPlayer)
                 CVector vecBullet = pCollision->GetPosition() - vecSource;
                 vecBullet.Normalize();
                 CVector vecTarget = vecSource + (vecBullet * 200);
-                g_pCore->GetGraphics()->DrawLine3DQueued(vecSource, vecTarget, 0.5f, 0x1012DE12, true);
-                g_pCore->GetGraphics()->DrawLine3DQueued(vecSource, vecTarget, 0.5f, 0x9012DE12, false);
+                g_pCore->GetGraphics()->DrawLine3DQueued(vecSource, vecTarget, 0.5f, 0x1012DE12, eRenderStage::POST_GUI);
+                g_pCore->GetGraphics()->DrawLine3DQueued(vecSource, vecTarget, 0.5f, 0x9012DE12, eRenderStage::POST_FX);
             }
             pCollision->Destroy();
         }
@@ -3431,7 +3423,7 @@ void CClientGame::Event_OnIngame()
 
     g_pMultiplayer->DeleteAndDisableGangTags();
 
-    g_pGame->GetWorld()->ClearRemovedBuildingLists();
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
 
     g_pGame->ResetModelLodDistances();
@@ -3559,6 +3551,11 @@ void CClientGame::StaticRenderHeliLightHandler()
     g_pClientGame->GetManager()->GetPointLightsManager()->RenderHeliLightHandler();
 }
 
+void CClientGame::StaticRenderEverythingBarRoadsHandler()
+{
+    g_pClientGame->GetModelRenderer()->Render();
+}
+
 bool CClientGame::StaticChokingHandler(unsigned char ucWeaponType)
 {
     return g_pClientGame->ChokingHandler(ucWeaponType);
@@ -3612,6 +3609,11 @@ void CClientGame::StaticPreFxRenderHandler()
     g_pCore->OnPreFxRender();
 }
 
+void CClientGame::StaticPostColorFilterRenderHandler()
+{
+    g_pCore->OnPostColorFilterRender();
+}
+
 void CClientGame::StaticPreHudRenderHandler()
 {
     g_pCore->OnPreHUDRender();
@@ -3624,10 +3626,10 @@ bool CClientGame::StaticProcessCollisionHandler(CEntitySAInterface* pThisInterfa
 
 bool CClientGame::StaticVehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                                 float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
-                                                CVector vecCollisionVelocity)
+                                                CVector vecCollisionVelocity, bool isProjectile)
 {
     return g_pClientGame->VehicleCollisionHandler(pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, usPieceType,
-                                                  vecCollisionPos, vecCollisionVelocity);
+                                                  vecCollisionPos, vecCollisionVelocity, isProjectile);
 }
 
 bool CClientGame::StaticVehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
@@ -3861,6 +3863,8 @@ void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
+
+    g_pClientGame->GetModelRenderer()->Update();
 }
 
 void CClientGame::IdleHandler()
@@ -4551,7 +4555,7 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
 }
 
 bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag,
-                                          float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity)
+                                          float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity, bool isProjectile)
 {
     if (pCollidingVehicle && pCollidedWith)
     {
@@ -4566,7 +4570,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
             }
 
             CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
-            CClientEntity*  pCollidedWithClientEntity = pPools->GetClientEntity((DWORD*)pCollidedWith);
+            CClientEntity*  pCollidedWithClientEntity = !isProjectile ? pPools->GetClientEntity((DWORD*)pCollidedWith) : m_pManager->GetProjectileManager()->Get(pCollidedWith);
 
             CLuaArguments Arguments;
             if (pCollidedWithClientEntity)
@@ -5417,22 +5421,21 @@ void CClientGame::ResetMapInfo()
 
     // Hud
     g_pGame->GetHud()->SetComponentVisible(HUD_ALL, true);
+
     // Disable area names as they are on load until camera unfades
     g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     g_pGame->GetHud()->SetComponentVisible(HUD_VITAL_STATS, false);
 
     m_bHudAreaNameDisabled = false;
 
-    // Gravity
-    g_pMultiplayer->SetLocalPlayerGravity(DEFAULT_GRAVITY);
-    g_pMultiplayer->SetGlobalGravity(DEFAULT_GRAVITY);
-    g_pGame->SetGravity(DEFAULT_GRAVITY);
-
-    // Gamespeed
-    SetGameSpeed(DEFAULT_GAME_SPEED);
-
-    // Game minute duration
-    SetMinuteDuration(DEFAULT_MINUTE_DURATION);
+    // Reset world special properties, world properties, weather properties etc
+    ResetWorldPropsInfo desc;
+    desc.resetSpecialProperties = true;
+    desc.resetWorldProperties = true;
+    desc.resetWeatherProperties = true;
+    desc.resetLODs = true;
+    desc.resetSounds = true;
+    ResetWorldProperties(desc);
 
     // Wanted-level
     SetWanted(0);
@@ -5443,76 +5446,9 @@ void CClientGame::ResetMapInfo()
     // Weather
     m_pBlendedWeather->SetWeather(0);
 
-    // Rain
-    g_pGame->GetWeather()->ResetAmountOfRain();
-
-    // Wind
-    g_pMultiplayer->RestoreWindVelocity();
-
-    // Far clip distance
-    g_pMultiplayer->RestoreFarClipDistance();
-
-    // Near clip distance
-    g_pMultiplayer->RestoreNearClipDistance();
-
-    // Fog distance
-    g_pMultiplayer->RestoreFogDistance();
-
-    // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
-
-    // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistance(true);
-
-    // Blur
-    g_pGame->GetSettings()->SetBlurControlledByScript(false);
-    g_pGame->GetSettings()->ResetBlurEnabled();
-
-    // Corona rain reflections
-    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
-    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
-
-    // Sun color
-    g_pMultiplayer->ResetSunColor();
-
-    // Sun size
-    g_pMultiplayer->ResetSunSize();
-
-    // Sky-gradient
-    g_pMultiplayer->ResetSky();
-
-    // Heat haze
-    g_pMultiplayer->ResetHeatHaze();
-
-    // Water-colour
-    g_pMultiplayer->ResetWater();
-    g_pMultiplayer->ResetColorFilter();
-
     // Grain effect
     g_pMultiplayer->SetGrainMultiplier(eGrainMultiplierType::ALL, 1.0f);
     g_pMultiplayer->SetGrainLevel(0);
-
-    // Water
-    GetManager()->GetWaterManager()->ResetWorldWaterLevel();
-
-    // Re-enable interior sounds and furniture
-    g_pMultiplayer->SetInteriorSoundsEnabled(true);
-    for (int i = 0; i <= 4; ++i)
-        g_pMultiplayer->SetInteriorFurnitureEnabled(i, true);
-
-    // Clouds
-    g_pMultiplayer->SetCloudsEnabled(true);
-    g_pClientGame->SetCloudsEnabled(true);
-
-    // Birds
-    g_pMultiplayer->DisableBirds(false);
-    g_pClientGame->SetBirdsEnabled(true);
-
-    // Ambient sounds
-    g_pGame->GetAudioEngine()->ResetAmbientSounds();
-
-    // World sounds
-    g_pGame->GetAudioEngine()->ResetWorldSounds();
 
     // Cheats
     g_pGame->ResetCheats();
@@ -5520,17 +5456,9 @@ void CClientGame::ResetMapInfo()
     // Players
     m_pPlayerManager->ResetAll();
 
-    // Jetpack max height
-    g_pGame->GetWorld()->SetJetpackMaxHeight(DEFAULT_JETPACK_MAXHEIGHT);
-
-    // Aircraft max height
-    g_pGame->GetWorld()->SetAircraftMaxHeight(DEFAULT_AIRCRAFT_MAXHEIGHT);
-
-    // Aircraft max velocity
-    g_pGame->GetWorld()->SetAircraftMaxVelocity(DEFAULT_AIRCRAFT_MAXVELOCITY);
-
-    // Moon size
-    g_pMultiplayer->ResetMoonSize();
+    // Reset Frozen Time
+    g_pGame->GetClock()->ResetTimeFrozen();
+    g_pGame->GetSettings()->ResetVolumetricShadows();
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
@@ -5577,7 +5505,7 @@ void CClientGame::ResetMapInfo()
     if (pPlayerInfo)
         pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
-    RestreamWorld(true);
+    RestreamWorld();
 
     ReinitMarkers();
 }
@@ -5653,6 +5581,8 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             else
                 Arguments.PushBoolean(false);
             Arguments.PushBoolean(false);
+            Arguments.PushNumber(animGroup);
+            Arguments.PushNumber(animID);
             m_pLocalPlayer->CallEvent("onClientPlayerWasted", Arguments, true);
 
             // Write some death info
@@ -6091,6 +6021,14 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::FIREBALLDESTRUCT:
             g_pGame->SetFireballDestructEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::EXTENDEDWATERCANNONS:
+            g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
+        case WorldSpecialProperty::ROADSIGNSTEXT:
+            g_pGame->SetRoadSignsTextEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::TUNNELWEATHERBLEND:
+            g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -6122,6 +6060,12 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsBurnFlippedCarsEnabled();
         case WorldSpecialProperty::FIREBALLDESTRUCT:
             return g_pGame->IsFireballDestructEnabled();
+        case WorldSpecialProperty::EXTENDEDWATERCANNONS:
+            return g_pGame->IsExtendedWaterCannonsEnabled();
+        case WorldSpecialProperty::ROADSIGNSTEXT:
+            return g_pGame->IsRoadSignsTextEnabled();
+        case WorldSpecialProperty::TUNNELWEATHERBLEND:
+            return g_pGame->IsTunnelWeatherBlendEnabled();
     }
     return false;
 }
@@ -6784,7 +6728,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
             m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
-void CClientGame::RestreamWorld(bool removeBigBuildings)
+void CClientGame::RestreamWorld()
 {
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
@@ -6797,15 +6741,152 @@ void CClientGame::RestreamWorld(bool removeBigBuildings)
     m_pManager->GetPedManager()->RestreamAllPeds();
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
-    if (removeBigBuildings)
-        g_pGame->GetStreaming()->RemoveBigBuildings();
-
+    g_pGame->GetStreaming()->RemoveBigBuildings();
     g_pGame->GetStreaming()->ReinitStreaming();
 }
 
 void CClientGame::ReinitMarkers()
 {
     g_pGame->Get3DMarkers()->ReinitMarkers();
+}
+
+void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
+{
+    // Reset all setWorldSpecialPropertyEnabled to default
+    if (resetPropsInfo.resetSpecialProperties)
+    {
+        g_pGame->SetCheatEnabled("hovercars", false);
+        g_pGame->SetCheatEnabled("aircars", false);
+        g_pGame->SetCheatEnabled("extrabunny", false);
+        g_pGame->SetCheatEnabled("extrajump", false);
+
+        g_pGame->SetRandomFoliageEnabled(true);
+        g_pGame->SetMoonEasterEggEnabled(false);
+        g_pGame->SetExtraAirResistanceEnabled(true);
+        g_pGame->SetUnderWorldWarpEnabled(true);
+        g_pGame->SetVehicleSunGlareEnabled(false);
+        g_pGame->SetCoronaZTestEnabled(true);
+        g_pGame->SetWaterCreaturesEnabled(true);
+        g_pGame->SetBurnFlippedCarsEnabled(true);
+        g_pGame->SetFireballDestructEnabled(true);
+        g_pGame->SetRoadSignsTextEnabled(true);
+        g_pGame->SetExtendedWaterCannonsEnabled(true);
+        g_pGame->SetTunnelWeatherBlendEnabled(true);
+    }
+
+    // Reset all setWorldProperty to default
+    if (resetPropsInfo.resetWorldProperties)
+    {
+        g_pMultiplayer->ResetAmbientColor();
+        g_pMultiplayer->ResetAmbientObjectColor();
+        g_pMultiplayer->ResetDirectionalColor();
+        g_pMultiplayer->ResetSpriteSize();
+        g_pMultiplayer->ResetSpriteBrightness();
+        g_pMultiplayer->ResetPoleShadowStrength();
+        g_pMultiplayer->ResetShadowStrength();
+        g_pMultiplayer->ResetShadowsOffset();
+        g_pMultiplayer->ResetLightsOnGroundBrightness();
+        g_pMultiplayer->ResetLowCloudsColor();
+        g_pMultiplayer->ResetBottomCloudsColor();
+        g_pMultiplayer->ResetCloudsAlpha1();
+        g_pMultiplayer->ResetIllumination();
+
+        CWeather* weather = g_pGame->GetWeather();
+        weather->ResetWetRoads();
+        weather->ResetFoggyness();
+        weather->ResetFog();
+        weather->ResetRainFog();
+        weather->ResetWaterFog();
+        weather->ResetSandstorm();
+        weather->ResetRainbow();
+    }
+
+    // Reset all weather stuff like heat haze, wind velocity etc
+    if (resetPropsInfo.resetWeatherProperties)
+    {
+        g_pMultiplayer->ResetHeatHaze();
+        g_pMultiplayer->RestoreFogDistance();
+        g_pMultiplayer->ResetMoonSize();
+        g_pMultiplayer->ResetSky();
+        g_pMultiplayer->ResetSunColor();
+        g_pMultiplayer->ResetSunSize();
+        g_pMultiplayer->RestoreWindVelocity();
+        g_pMultiplayer->ResetColorFilter();
+
+        g_pGame->GetWeather()->ResetAmountOfRain();
+    }
+
+    // Reset LODs
+    if (resetPropsInfo.resetLODs)
+    {
+        g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
+        g_pGame->GetSettings()->ResetPedsLODDistance(true);
+    }
+
+    // Reset & restore sounds
+    if (resetPropsInfo.resetSounds)
+    {
+        g_pMultiplayer->SetInteriorSoundsEnabled(true);
+        g_pGame->GetAudioEngine()->ResetAmbientSounds();
+        g_pGame->GetAudioEngine()->ResetWorldSounds();
+    }
+
+    // Reset all other world stuff
+    // Reset clip distances
+    g_pMultiplayer->RestoreFarClipDistance();
+    g_pMultiplayer->RestoreNearClipDistance();
+
+    // Reset clouds
+    g_pMultiplayer->SetCloudsEnabled(true);
+    SetCloudsEnabled(true);
+
+    // Reset birds
+    g_pMultiplayer->DisableBirds(false);
+    SetBirdsEnabled(true);
+
+    // Reset occlusions
+    g_pGame->GetWorld()->SetOcclusionsEnabled(true);
+
+    // Reset gravity
+    g_pMultiplayer->SetGlobalGravity(DEFAULT_GRAVITY);
+    g_pCore->GetMultiplayer()->SetLocalPlayerGravity(DEFAULT_GRAVITY);
+    g_pGame->SetGravity(DEFAULT_GRAVITY);
+
+    // Reset game speed
+    g_pGame->SetGameSpeed(DEFAULT_GAME_SPEED);
+
+    // Reset aircraft max velocity & height
+    g_pMultiplayer->SetAircraftMaxHeight(DEFAULT_AIRCRAFT_MAXHEIGHT);
+    g_pMultiplayer->SetAircraftMaxVelocity(DEFAULT_AIRCRAFT_MAXVELOCITY);
+
+    // Reset jetpack max height
+    g_pGame->GetWorld()->SetJetpackMaxHeight(DEFAULT_JETPACK_MAXHEIGHT);
+
+    // Restore furnitures in the interiors
+    for (std::uint8_t i = 0; i <= 4; ++i)
+        g_pMultiplayer->SetInteriorFurnitureEnabled(i, true);
+
+    // Reset minute duration
+    SetMinuteDuration(DEFAULT_MINUTE_DURATION);
+
+    // Reset blur level
+    g_pGame->GetSettings()->SetBlurControlledByScript(false);
+    g_pGame->GetSettings()->ResetBlurEnabled();
+
+    // Reset corona reflections
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
+
+    // Reset traffic lights
+    g_pMultiplayer->SetTrafficLightsLocked(false);
+
+    // Reset water color, water level & wave height
+    g_pMultiplayer->ResetWater();
+    GetManager()->GetWaterManager()->ResetWorldWaterLevel();
+    GetManager()->GetWaterManager()->SetWaveLevel(0.0f);
+
+    // Reset volumetric shadows
+    g_pGame->GetSettings()->ResetVolumetricShadows();
 }
 
 void CClientGame::OnWindowFocusChange(bool state)

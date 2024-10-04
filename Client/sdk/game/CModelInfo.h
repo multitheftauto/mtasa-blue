@@ -60,6 +60,7 @@ enum class eModelInfoType : unsigned char
     VEHICLE = 6,
     PED = 7,
     LOD_ATOMIC = 8,
+    UNKNOWN = 9
 };
 
 enum eVehicleUpgradePosn
@@ -179,6 +180,7 @@ public:
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
     virtual int  GetRefCount() = 0;
     virtual bool ForceUnload() = 0;
+    virtual bool UnloadUnused() = 0;
     virtual void DeallocateModel() = 0;
 
     virtual float GetDistanceFromCentreOfMassToBaseOfModel() = 0;
@@ -246,4 +248,5 @@ public:
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 
     virtual unsigned int GetParentID() = 0;
+    virtual bool         IsDynamic() = 0;
 };

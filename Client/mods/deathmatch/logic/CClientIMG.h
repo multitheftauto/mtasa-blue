@@ -50,7 +50,7 @@ public:
     CClientIMG(class CClientManager* pManager, ElementID ID);
     ~CClientIMG();
 
-    void Unlink(){};
+    void Unlink();
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 

@@ -36,6 +36,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
         {"dxDrawMaterialPrimitive3D", DxDrawMaterialPrimitive3D},
         {"dxDrawWiredSphere", ArgumentParser<DxDrawWiredSphere>},
+        {"dxDrawModel3D", ArgumentParser<DxDrawModel3D>},
         {"dxGetTextWidth", DxGetTextWidth},
         {"dxGetTextSize", ArgumentParser<DxGetTextSize>},
         {"dxGetFontHeight", DxGetFontHeight},
@@ -192,18 +193,21 @@ int CLuaDrawingDefs::DxDrawLine3D(lua_State* luaVM)
     CVector vecEnd;
     SColor  color;
     float   fWidth;
-    bool    bPostGUI;
+    eRenderStage renderStage{eRenderStage::POST_FX};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecBegin);
     argStream.ReadVector3D(vecEnd);
     argStream.ReadColor(color, 0xFFFFFFFF);
     argStream.ReadNumber(fWidth, 1);
-    argStream.ReadBool(bPostGUI, false);
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    else
+        argStream.ReadIfNextIsEnumString(renderStage, eRenderStage::POST_FX);
 
     if (!argStream.HasErrors())
     {
-        g_pCore->GetGraphics()->DrawLine3DQueued(vecBegin, vecEnd, fWidth, color, bPostGUI);
+        g_pCore->GetGraphics()->DrawLine3DQueued(vecBegin, vecEnd, fWidth, color, renderStage);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -226,9 +230,9 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     CClientMaterial* pMaterial;
     float            fWidth;
     SColor           color;
-    bool             bPostGUI;
     CVector          vecFaceToward;
     bool             bUseFaceToward = false;
+    eRenderStage renderStage{eRenderStage::POST_FX};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecBegin);
@@ -237,7 +241,11 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
-    argStream.ReadIfNextIsBool(bPostGUI, false);
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    else
+        argStream.ReadIfNextIsEnumString(renderStage, eRenderStage::POST_FX);
+
     if (argStream.NextIsVector3D())
     {
         argStream.ReadVector3D(vecFaceToward);
@@ -247,7 +255,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bFlipUV,
-                                                         bUseFaceToward, vecFaceToward, bPostGUI);
+                                                         bUseFaceToward, vecFaceToward, renderStage);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -272,9 +280,9 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     CClientMaterial* pMaterial;
     float            fWidth;
     SColor           color;
-    bool             bPostGUI;
     CVector          vecFaceToward;
     bool             bUseFaceToward = false;
+    eRenderStage renderStage{eRenderStage::POST_FX};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecBegin);
@@ -285,7 +293,11 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
-    argStream.ReadIfNextIsBool(bPostGUI, false);
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    else
+        argStream.ReadIfNextIsEnumString(renderStage, eRenderStage::POST_FX);
+
     if (argStream.NextIsVector3D())
     {
         argStream.ReadVector3D(vecFaceToward);
@@ -295,7 +307,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), vecSectionPos.fX, vecSectionPos.fY,
-                                                         vecSectionSize.fX, vecSectionSize.fY, false, bFlipUV, bUseFaceToward, vecFaceToward, bPostGUI);
+                                                         vecSectionSize.fX, vecSectionSize.fY, false, bFlipUV, bUseFaceToward, vecFaceToward, renderStage);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -586,10 +598,13 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     // bool DxDrawPrimitive3D (string primitiveType, bool postGUI, table vertice1, ...)
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveVertice>();
-    bool             bPostGUI;
+    eRenderStage renderStage{eRenderStage::POST_FX};
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
-    argStream.ReadBool(bPostGUI, false);
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    else
+        argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
 
     std::vector<double> vecTableContent;
 
@@ -619,7 +634,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
-        g_pCore->GetGraphics()->DrawPrimitive3DQueued(pVecVertices, ePrimitiveType, bPostGUI);
+        g_pCore->GetGraphics()->DrawPrimitive3DQueued(pVecVertices, ePrimitiveType, renderStage);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -636,12 +651,15 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
     CClientMaterial* pMaterialElement;
-    bool             bPostGUI;
+    eRenderStage renderStage{eRenderStage::POST_FX};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
     MixedReadMaterialString(argStream, pMaterialElement);
-    argStream.ReadBool(bPostGUI, false);
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    else
+        argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
 
     std::vector<double> vecTableContent;
 
@@ -674,7 +692,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
-        g_pCore->GetGraphics()->DrawMaterialPrimitive3DQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+        g_pCore->GetGraphics()->DrawMaterialPrimitive3DQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), renderStage);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -2103,4 +2121,22 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
 
     g_pCore->GetGraphics()->DrawWiredSphere(position, radius, color.value(), lineWidth.value_or(1), iterations.value_or(1));
     return true;
+}
+
+bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelID);
+    if (!pModelInfo)
+        throw std::invalid_argument("Invalid model ID");
+
+    if (auto modelType = pModelInfo->GetModelType();
+        modelType == eModelInfoType::UNKNOWN || modelType == eModelInfoType::VEHICLE || modelType == eModelInfoType::PED)
+    {
+        throw std::invalid_argument("Invalid model type");
+    }
+
+    ConvertDegreesToRadians(rotation);
+
+    return g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo,
+        CMatrix{position, rotation, scale.value_or(CVector{1.0f, 1.0f, 1.0f})});
 }

@@ -55,7 +55,7 @@
 #undef NEED_REENTRANT
 
 /* Define if you want to enable IPv6 support */
-#undef ENABLE_IPV6
+#undef USE_IPV6
 
 /* Define if struct sockaddr_in6 has the sin6_scope_id member */
 #define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
@@ -65,9 +65,6 @@
 
 /* Define this as a suitable file to read random data from */
 #undef RANDOM_FILE
-
-/* Define if you want to enable IPv6 support */
-#undef ENABLE_IPV6
 
 /* Define if you have the alarm function. */
 #define HAVE_ALARM
@@ -108,9 +105,6 @@
 /* Define if you have the `timeval' struct. */
 #define HAVE_STRUCT_TIMEVAL
 
-/* Define if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H
-
 /* Define if you have the <io.h> header file. */
 #undef HAVE_IO_H
 
@@ -143,9 +137,6 @@
 
 /* Define if you have the `socket' function. */
 #define HAVE_SOCKET
-
-/* Define if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H
 
 /* Define if you have the `strcasecmp' function. */
 #undef HAVE_STRCASECMP

@@ -36,8 +36,8 @@ Unpack::Unpack(ComprDataIO *DataIO)
   MaxWinMask=0;
 
   // Perform initialization, which should be done only once for all files.
-  // It prevents crash if first DoUnpack call is later made with wrong
-  // (true) 'Solid' value.
+  // It prevents crash if first unpacked file has the wrong "true" Solid flag,
+  // so first DoUnpack call is made with the wrong "true" Solid value later.
   UnpInitData(false);
 #ifndef SFX_MODULE
   // RAR 1.5 decompression initialization

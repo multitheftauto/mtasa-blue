@@ -9,7 +9,7 @@ jobs:
   sync-master-to-maetro:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.SYNC_CI_PAT }}
@@ -35,6 +35,10 @@ jobs:
           # Discard d3dcompiler_47.dll conflicts (Due to old CEF version on maetro)
           git checkout --ours -- "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
           git add --verbose "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
+
+          # Discard cefweb conflicts
+          git checkout --ours -- Client/cefweb/CWebView.cpp
+          git add --verbose Client/cefweb/CWebView.cpp
 
           git checkout --ours -- "Client/loader/MainFunctions.cpp"
           git add --verbose "Client/loader/MainFunctions.cpp"

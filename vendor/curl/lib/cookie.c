@@ -330,7 +330,7 @@ static char *sanitize_cookie_path(const char *cookie_path)
  */
 void Curl_cookie_loadfiles(struct Curl_easy *data)
 {
-  struct curl_slist *list = data->set.cookielist;
+  struct curl_slist *list = data->state.cookielist;
   if(list) {
     Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
     while(list) {
@@ -365,9 +365,7 @@ static void strstore(char **str, const char *newstr, size_t len)
   DEBUGASSERT(newstr);
   DEBUGASSERT(str);
   free(*str);
-  *str = Curl_memdup(newstr, len + 1);
-  if(*str)
-    (*str)[len] = 0;
+  *str = Curl_memdup0(newstr, len);
 }
 
 /*
@@ -428,6 +426,7 @@ static void remove_expired(struct CookieInfo *cookies)
   }
 }
 
+#ifndef USE_LIBPSL
 /* Make sure domain contains a dot or is localhost. */
 static bool bad_domain(const char *domain, size_t len)
 {
@@ -445,6 +444,7 @@ static bool bad_domain(const char *domain, size_t len)
   }
   return TRUE;
 }
+#endif
 
 /*
   RFC 6265 section 4.1.1 says a server should accept this range:
@@ -823,10 +823,8 @@ Curl_cookie_add(struct Curl_easy *data,
         endslash = memrchr(path, '/', (queryp - path));
       if(endslash) {
         size_t pathlen = (endslash-path + 1); /* include end slash */
-        co->path = malloc(pathlen + 1); /* one extra for the zero byte */
+        co->path = Curl_memdup0(path, pathlen);
         if(co->path) {
-          memcpy(co->path, path, pathlen);
-          co->path[pathlen] = 0; /* null-terminate */
           co->spath = sanitize_cookie_path(co->path);
           if(!co->spath)
             badcookie = TRUE; /* out of memory bad */
@@ -888,7 +886,8 @@ Curl_cookie_add(struct Curl_easy *data,
      * Now loop through the fields and init the struct we already have
      * allocated
      */
-    for(ptr = firstptr, fields = 0; ptr && !badcookie;
+    fields = 0;
+    for(ptr = firstptr; ptr && !badcookie;
         ptr = strtok_r(NULL, "\t", &tok_buf), fields++) {
       switch(fields) {
       case 0:
@@ -929,7 +928,7 @@ Curl_cookie_add(struct Curl_easy *data,
         if(!co->spath)
           badcookie = TRUE;
         fields++; /* add a field and fall down to secure */
-        /* FALLTHROUGH */
+        FALLTHROUGH();
       case 3:
         co->secure = FALSE;
         if(strcasecompare(ptr, "TRUE")) {
@@ -1029,15 +1028,23 @@ Curl_cookie_add(struct Curl_easy *data,
    * dereference it.
    */
   if(data && (domain && co->domain && !Curl_host_is_ipnum(co->domain))) {
-    const psl_ctx_t *psl = Curl_psl_use(data);
-    int acceptable;
-
-    if(psl) {
-      acceptable = psl_is_cookie_domain_acceptable(psl, domain, co->domain);
-      Curl_psl_release(data);
+    bool acceptable = FALSE;
+    char lcase[256];
+    char lcookie[256];
+    size_t dlen = strlen(domain);
+    size_t clen = strlen(co->domain);
+    if((dlen < sizeof(lcase)) && (clen < sizeof(lcookie))) {
+      const psl_ctx_t *psl = Curl_psl_use(data);
+      if(psl) {
+        /* the PSL check requires lowercase domain name and pattern */
+        Curl_strntolower(lcase, domain, dlen + 1);
+        Curl_strntolower(lcookie, co->domain, clen + 1);
+        acceptable = psl_is_cookie_domain_acceptable(psl, lcase, lcookie);
+        Curl_psl_release(data);
+      }
+      else
+        infof(data, "libpsl problem, rejecting cookie for satety");
     }
-    else
-      acceptable = !bad_domain(domain, strlen(domain));
 
     if(!acceptable) {
       infof(data, "cookie '%s' dropped, domain '%s' must not "
@@ -1201,7 +1208,6 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
                                     bool newsession)
 {
   struct CookieInfo *c;
-  char *line = NULL;
   FILE *handle = NULL;
 
   if(!inc) {
@@ -1223,7 +1229,7 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
 
   if(data) {
     FILE *fp = NULL;
-    if(file) {
+    if(file && *file) {
       if(!strcmp(file, "-"))
         fp = stdin;
       else {
@@ -1237,16 +1243,14 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
 
     c->running = FALSE; /* this is not running, this is init */
     if(fp) {
-
-      line = malloc(MAX_COOKIE_LINE);
-      if(!line)
-        goto fail;
-      while(Curl_get_line(line, MAX_COOKIE_LINE, fp)) {
-        char *lineptr = line;
+      struct dynbuf buf;
+      Curl_dyn_init(&buf, MAX_COOKIE_LINE);
+      while(Curl_get_line(&buf, fp)) {
+        char *lineptr = Curl_dyn_ptr(&buf);
         bool headerline = FALSE;
-        if(checkprefix("Set-Cookie:", line)) {
+        if(checkprefix("Set-Cookie:", lineptr)) {
           /* This is a cookie line, get it! */
-          lineptr = &line[11];
+          lineptr += 11;
           headerline = TRUE;
           while(*lineptr && ISBLANK(*lineptr))
             lineptr++;
@@ -1254,7 +1258,7 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
 
         Curl_cookie_add(data, c, headerline, TRUE, lineptr, NULL, NULL, TRUE);
       }
-      free(line); /* free the line buffer */
+      Curl_dyn_free(&buf); /* free the line buffer */
 
       /*
        * Remove expired cookies from the hash. We must make sure to run this
@@ -1270,18 +1274,6 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
   c->running = TRUE;          /* now, we're running */
 
   return c;
-
-fail:
-  free(line);
-  /*
-   * Only clean up if we allocated it here, as the original could still be in
-   * use by a share handle.
-   */
-  if(!inc)
-    Curl_cookie_cleanup(c);
-  if(handle)
-    fclose(handle);
-  return NULL; /* out of memory */
 }
 
 /*
@@ -1347,7 +1339,7 @@ static int cookie_sort_ct(const void *p1, const void *p2)
 
 static struct Cookie *dup_cookie(struct Cookie *src)
 {
-  struct Cookie *d = calloc(sizeof(struct Cookie), 1);
+  struct Cookie *d = calloc(1, sizeof(struct Cookie));
   if(d) {
     CLONE(domain);
     CLONE(path);

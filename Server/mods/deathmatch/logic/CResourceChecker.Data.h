@@ -43,6 +43,16 @@ namespace
         {"fileGetContents", "1.6.0-9.21938"},
         {"engineStreamingSetModelCacheLimits", "1.6.0-9.21946"},
         {"engineStreamingRestoreBufferSize", "1.6.0-9.22195"},
+        {"createBuilding", "1.6.0-9.22410"},
+        {"restoreAllGameBuildings", "1.6.0-9.22420"},
+        {"removeAllGameBuildings", "1.6.0-9.22420"},
+        {"pathListDir", "1.6.0-9.22470"},
+        {"pathIsFile", "1.6.0-9.22470"},
+        {"pathIsDirectory", "1.6.0-9.22470"},
+        {"engineGetPoolCapacity", "1.6.0-9.22471"},
+        {"engineGetPoolDefaultCapacity", "1.6.0-9.22471"},
+        {"engineGetPoolUsedCapacity", "1.6.0-9.22471"},
+        {"engineSetPoolCapacity", "1.6.0-9.22471"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -52,6 +62,15 @@ namespace
         {"fileGetContents", "1.6.0-9.21938"},
         {"isWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
         {"setWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
+        {"onResourceStateChange", "1.6.0-9.22430"},
+        {"isObjectMoving", "1.6.0-9.22457"},
+        {"onPlayerTriggerInvalidEvent", "1.6.0-9.22459"},
+        {"pathListDir", "1.6.0-9.22470"},
+        {"pathIsFile", "1.6.0-9.22470"},
+        {"pathIsDirectory", "1.6.0-9.22470"},
+        {"onAccountCreate", "1.6.0-9.22470"},
+        {"onAccountRemove", "1.6.0-9.22470"},
+        {"getAccountType", "1.6.0-9.22470"},
     };
 
     //
@@ -146,6 +165,12 @@ namespace
 
         // Ped jetpacks
         //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+
+        // Base Encoding & Decoding
+        {false, "base64Encode", "encodeString"},
+        {false, "base64Decode", "decodeString"},
+
+        {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"}
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -244,5 +269,9 @@ namespace
 
         // Old Discord implementation (see #2499)
         {true, "setPlayerDiscordJoinParams", "See GitHub PR #2499 for more details"},
+
+        // Base Encoding & Decoding
+        {false, "base64Encode", "encodeString"},
+        {false, "base64Decode", "decodeString"}
     };
 }            // namespace

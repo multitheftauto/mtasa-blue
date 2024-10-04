@@ -111,6 +111,9 @@ DWORD RETURN_CProjectile_FixTearGasCrash_Cont = 0x4C0409;
 #define HOOKPOS_CProjectile_FixExplosionLocation            0x738A77
 DWORD RETURN_CProjectile_FixExplosionLocation = 0x738A86;
 
+#define HOOKPOS_CPed_RemoveWeaponWhenEnteringVehicle 0x5E6370
+DWORD RETURN_CPed_RemoveWeaponWhenEnteringVehicle = 0x5E6379;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle();
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle();
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual();
@@ -137,6 +140,7 @@ void HOOK_CVehicleModelInterface_SetClump();
 void HOOK_CBoat_ApplyDamage();
 void HOOK_CProjectile_FixTearGasCrash();
 void HOOK_CProjectile_FixExplosionLocation();
+void HOOK_CPed_RemoveWeaponWhenEnteringVehicle();
 
 void CMultiplayerSA::Init_13()
 {
@@ -191,6 +195,9 @@ void CMultiplayerSA::InitHooks_13()
     HookInstall(HOOKPOS_CProjectile_FixTearGasCrash, (DWORD)HOOK_CProjectile_FixTearGasCrash, 6);
 
     HookInstall(HOOKPOS_CProjectile_FixExplosionLocation, (DWORD)HOOK_CProjectile_FixExplosionLocation, 12);
+
+    // Fix invisible weapons during jetpack task
+    HookInstall(HOOKPOS_CPed_RemoveWeaponWhenEnteringVehicle, (DWORD)HOOK_CPed_RemoveWeaponWhenEnteringVehicle, 9);
 
     InitHooks_ClothesSpeedUp();
     EnableHooks_ClothesMemFix(true);
@@ -1666,5 +1673,44 @@ void _declspec(naked) HOOK_CProjectile_FixExplosionLocation()
 skip:
         lea eax, [esi+4]
         jmp RETURN_CProjectile_FixExplosionLocation
+    }
+}
+
+DWORD CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom = 0;
+void _declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
+{
+    _asm
+    {
+        push eax
+        mov eax, [esp+4]
+        mov CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom, eax
+        pop eax
+
+        push esi
+        mov esi, ecx
+        mov eax, [esi+480h]
+    }
+
+    // Called from CTaskSimpleJetPack::ProcessPed
+    if (CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom == 0x68025F)
+    {
+        _asm
+        {
+            mov pPedUsingJetpack, esi
+        }
+
+        if (AllowJetPack())
+        {
+            _asm
+            {
+                pop esi
+                retn 4
+            }
+        }
+    }
+
+    _asm
+    {
+        jmp RETURN_CPed_RemoveWeaponWhenEnteringVehicle
     }
 }

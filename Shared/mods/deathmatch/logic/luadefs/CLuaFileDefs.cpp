@@ -38,10 +38,22 @@ static auto getResourceFilePath(CResource* thisResource, CResource* fileResource
 void CLuaFileDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"fileOpen", fileOpen},       {"fileCreate", fileCreate}, {"fileExists", fileExists}, {"fileCopy", fileCopy},
-        {"fileRename", fileRename},   {"fileDelete", fileDelete}, {"fileClose", fileClose},   {"fileFlush", fileFlush},
-        {"fileRead", fileRead},       {"fileWrite", fileWrite},   {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize},
-        {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},   {"fileSetPos", fileSetPos}, {"fileGetContents", ArgumentParser<fileGetContents>},
+        {"fileOpen", fileOpen},
+        {"fileCreate", fileCreate},
+        {"fileExists", fileExists},
+        {"fileCopy", fileCopy},
+        {"fileRename", fileRename},
+        {"fileDelete", fileDelete},
+        {"fileClose", fileClose},
+        {"fileFlush", fileFlush},
+        {"fileRead", fileRead},
+        {"fileWrite", fileWrite},
+        {"fileGetPos", fileGetPos},
+        {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath},
+        {"fileIsEOF", fileIsEOF},
+        {"fileSetPos", fileSetPos},
+        {"fileGetContents", ArgumentParser<fileGetContents>},
     };
 
     // Add functions
@@ -109,8 +121,8 @@ int CLuaFileDefs::File(lua_State* luaVM)
 
             if (CResourceManager::ParseResourcePathInput(strInputPath, pResource, &strAbsPath, &strMetaPath))
             {
-                CheckCanModifyOtherResource(argStream, pResource, pResource);
-                CheckCanAccessOtherResourceFile(argStream, pResource, pResource, strAbsPath);
+                CheckCanModifyOtherResource(argStream, pThisResource, pResource);
+                CheckCanAccessOtherResourceFile(argStream, pThisResource, pResource, strAbsPath);
 
                 if (!argStream.HasErrors())
                 {
@@ -388,8 +400,6 @@ int CLuaFileDefs::fileExists(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (CResourceManager::ParseResourcePathInput(strInputPath, pResource, &strAbsPath))
             {
-                SString strFilePath;
-
                 // Does file exist?
                 bool bResult = FileExists(strAbsPath);
                 lua_pushboolean(luaVM, bResult);

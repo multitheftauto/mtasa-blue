@@ -13,6 +13,7 @@
 #include <game/CAudioEngine.h>
 #include <game/CRenderWare.h>
 #include <game/CHud.h>
+#include <game/CStreaming.h>
 #include <type_traits>
 
 enum eLuaType
@@ -81,6 +82,12 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
+DECLARE_ENUM_CLASS(eRenderStage);
+DECLARE_ENUM_CLASS(eFxParticleSystems);
+DECLARE_ENUM(ePools);
+DECLARE_ENUM(eWorldProperty);
+DECLARE_ENUM_CLASS(eModelLoadState);
+DECLARE_ENUM_CLASS(PreloadAreaOption);
 
 class CRemoteCall;
 
@@ -271,6 +278,10 @@ inline SString GetClassTypeName(CClientTXD*)
 inline SString GetClassTypeName(CClientIMG*)
 {
     return "img";
+}
+inline SString GetClassTypeName(CClientBuilding*)
+{
+    return "building";
 }
 inline SString GetClassTypeName(CClientSound*)
 {
@@ -490,6 +501,10 @@ inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
 {
     return "soundeffect-params-reverb";
 }
+inline SString GetClassTypeName(eWorldProperty*)
+{
+    return "world-property";
+}
 
 inline SString GetClassTypeName(CClientVectorGraphic*)
 {
@@ -570,6 +585,7 @@ void MixedReadDxFontString(CScriptArgReader& argStream, eFontType& outFontType, 
 void MixedReadGuiFontString(CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& poutGuiFontElement);
 void MixedReadMaterialString(CScriptArgReader& argStream, CClientMaterial*& pMaterialElement);
 bool ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix);
+void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* szReason);
 bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason = nullptr);
 void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
 

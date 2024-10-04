@@ -205,7 +205,7 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
 
                     CVector vecBegin(vecPointBegin.fX, vecPointBegin.fY, fZ);
                     CVector vecEnd(vecPointEnd.fX, vecPointEnd.fY, fZ);
-                    pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+                    pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
                 }
             }
         }
@@ -219,7 +219,7 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
 
             CVector vecBegin(vecPoint.fX, vecPoint.fY, std::max(vecPosition.fZ - fDrawRadius, m_fFloor));
             CVector vecEnd(vecPoint.fX, vecPoint.fY, std::min(vecPosition.fZ + fDrawRadius, m_fCeil));
-            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
         }
     }
 
@@ -231,10 +231,10 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
 
         CVector vecFloorBegin(vecPointBegin.fX, vecPointBegin.fY, m_fFloor);
         CVector vecFloorEnd(vecPointEnd.fX, vecPointEnd.fY, m_fFloor);
-        pGraphics->DrawLine3DQueued(vecFloorBegin, vecFloorEnd, fLineWidth, color, false);
+        pGraphics->DrawLine3DQueued(vecFloorBegin, vecFloorEnd, fLineWidth, color, eRenderStage::POST_FX);
 
         CVector vecCeilBegin(vecPointBegin.fX, vecPointBegin.fY, m_fCeil);
         CVector vecCeilEnd(vecPointEnd.fX, vecPointEnd.fY, m_fCeil);
-        pGraphics->DrawLine3DQueued(vecCeilBegin, vecCeilEnd, fLineWidth, color, false);
+        pGraphics->DrawLine3DQueued(vecCeilBegin, vecCeilEnd, fLineWidth, color, eRenderStage::POST_FX);
     }
 }

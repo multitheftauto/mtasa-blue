@@ -13,6 +13,7 @@
 #include "CBikeSA.h"
 #include "CBmxSA.h"
 #include "CBoatSA.h"
+#include "CBuildingSA.h"
 #include "CGameSA.h"
 #include "CHeliSA.h"
 #include "CMonsterTruckSA.h"
@@ -24,6 +25,8 @@
 #include "CTrainSA.h"
 #include "CWorldSA.h"
 #include "CKeyGenSA.h"
+#include "CFileLoaderSA.h"
+#include "CPtrNodeSingleListSA.h"
 
 extern CGameSA* pGame;
 
@@ -125,6 +128,8 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
         {
             pVehicle->m_ucVariant = ucVariation;
             pVehicle->m_ucVariant2 = ucVariation2;
+
+            pVehicle->DumpVehicleFrames();
         }
         else
         {
@@ -676,7 +681,7 @@ DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
     {
         return MAX_PEDS;
     }
-    return ((pInterface - pTheObjects) / dwAlignedSize);
+    return ((pInterface - pTheObjects) / dwAlignedSize); 
 }
 
 DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
@@ -806,6 +811,54 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
     return 0;
 }
 
+int CPoolsSA::GetPoolDefaultModdedCapacity(ePools pool)
+{
+    switch (pool)
+    {
+        case BUILDING_POOL:
+            return MAX_BUILDINGS;
+        case PED_POOL:
+            return 140;
+        case OBJECT_POOL:
+            return MAX_OBJECTS;
+        case DUMMY_POOL:
+            return 2500;
+        case VEHICLE_POOL:
+            return 110;
+        case COL_MODEL_POOL:
+            return 12000;
+        case TASK_POOL:
+            return 5000;
+        case EVENT_POOL:
+            return 5000;
+        case TASK_ALLOCATOR_POOL:
+            return 16;
+        case PED_INTELLIGENCE_POOL:
+            return 140;
+        case PED_ATTRACTOR_POOL:
+            return 64;
+        case ENTRY_INFO_NODE_POOL:
+            return MAX_ENTRY_INFO_NODES;
+        case NODE_ROUTE_POOL:
+            return 64;
+        case PATROL_ROUTE_POOL:
+            return 32;
+        case POINT_ROUTE_POOL:
+            return 64;
+        case POINTER_DOUBLE_LINK_POOL:
+            return MAX_POINTER_DOUBLE_LINKS;
+        case POINTER_SINGLE_LINK_POOL:
+            return MAX_POINTER_SINGLE_LINKS;
+        case ENV_MAP_MATERIAL_POOL:
+            return 16000;
+        case ENV_MAP_ATOMIC_POOL:
+            return 4000;
+        case SPEC_MAP_MATERIAL_POOL:
+            return 16000;
+    }
+    return 0;
+}
+
 int CPoolsSA::GetPoolCapacity(ePools pool)
 {
     DWORD iPtr = NULL;
@@ -813,8 +866,7 @@ int CPoolsSA::GetPoolCapacity(ePools pool)
     switch (pool)
     {
         case BUILDING_POOL:
-            iPtr = 0x55105F;
-            break;
+            return GetBuildingsPool().GetSize();
         case PED_POOL:
             iPtr = 0x550FF2;
             break;

@@ -189,6 +189,9 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         wsProps.data.watercreatures = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::WATERCREATURES);
         wsProps.data.burnflippedcars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::BURNFLIPPEDCARS);
         wsProps.data2.fireballdestruct = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT);
+        wsProps.data3.roadsignstext = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT);
+        wsProps.data4.extendedwatercannons = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS);
+        wsProps.data5.tunnelweatherblend = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND);
         BitStream.Write(&wsProps);
     }
 

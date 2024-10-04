@@ -53,6 +53,16 @@
 #define CERT_ALT_NAME_IP_ADDRESS 8
 #endif
 
+#if defined(_MSC_VER) && (_MSC_VER <= 1600)
+/* Workaround for warning:
+   'type cast' : conversion from 'int' to 'LPCSTR' of greater size */
+#undef CERT_STORE_PROV_MEMORY
+#undef CERT_STORE_PROV_SYSTEM_A
+#undef CERT_STORE_PROV_SYSTEM_W
+#define CERT_STORE_PROV_MEMORY    ((LPCSTR)(size_t)2)
+#define CERT_STORE_PROV_SYSTEM_A  ((LPCSTR)(size_t)9)
+#define CERT_STORE_PROV_SYSTEM_W  ((LPCSTR)(size_t)10)
+#endif
 
 #ifndef SCH_CREDENTIALS_VERSION
 
@@ -148,6 +158,23 @@ struct schannel_ssl_backend_data {
   bool use_manual_cred_validation; /* true if manual cred validation is used */
 #endif
 };
+
+struct schannel_multi_ssl_backend_data {
+  unsigned char *CAinfo_blob_digest; /* CA info blob digest */
+  size_t CAinfo_blob_size;           /* CA info blob size */
+  char *CAfile;                      /* CAfile path used to generate
+                                        certificate store */
+  HCERTSTORE cert_store;             /* cached certificate store or
+                                        NULL if none */
+  struct curltime time;              /* when the cached store was created */
+};
+
+HCERTSTORE Curl_schannel_get_cached_cert_store(struct Curl_cfilter *cf,
+                                               const struct Curl_easy *data);
+
+bool Curl_schannel_set_cached_cert_store(struct Curl_cfilter *cf,
+                                         const struct Curl_easy *data,
+                                         HCERTSTORE cert_store);
 
 #endif /* USE_SCHANNEL */
 #endif /* HEADER_CURL_SCHANNEL_INT_H */

@@ -362,6 +362,7 @@ public:
     BYTE           GetVehicleType();
     void           Request(EModelRequestType requestType, const char* szTag);
     void           Remove();
+    bool           UnloadUnused();
     bool           IsLoaded();
     bool           DoIsLoaded();
     unsigned short GetFlags();
@@ -464,6 +465,8 @@ public:
 
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;
+
+    bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != 0xffff : false; };
 
 private:
     void CopyStreamingInfoFromModel(ushort usCopyFromModelID);

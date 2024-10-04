@@ -101,7 +101,11 @@ static bool ExtractUnixLink30(CommandData *Cmd,ComprDataIO &DataIO,Archive &Arc,
     // confuse IsRelativeSymlinkSafe algorithm.
     if (!Cmd->AbsoluteLinks && (IsFullPath(TargetW) ||
         !IsRelativeSymlinkSafe(Cmd,Arc.FileHead.FileName.c_str(),LinkName,TargetW.c_str())))
+    {
+      uiMsg(UIERROR_SKIPUNSAFELINK,Arc.FileHead.FileName,TargetW);
+      ErrHandler.SetErrorCode(RARX_WARNING);
       return false;
+    }
     UpLink=Target.find("..")!=std::string::npos;
     return UnixSymlink(Cmd,Target,LinkName,&Arc.FileHead.mtime,&Arc.FileHead.atime);
   }
@@ -121,7 +125,11 @@ static bool ExtractUnixLink50(CommandData *Cmd,const wchar *Name,FileHeader *hd)
     // We escape ? as \? to avoid "trigraph" warning
     if (Target.rfind("\\??\\",0)!=std::string::npos || 
         Target.rfind("/\?\?/",0)!=std::string::npos)
+    {
+      uiMsg(UIERROR_SLINKCREATE,nullptr,L"\"" + hd->FileName + L"\" -> \"" + hd->RedirName + L"\"");
+      ErrHandler.SetErrorCode(RARX_WARNING);
       return false;
+    }
     DosSlashToUnix(Target,Target);
   }
 
@@ -133,6 +141,10 @@ static bool ExtractUnixLink50(CommandData *Cmd,const wchar *Name,FileHeader *hd)
   // IsRelativeSymlinkSafe algorithm.
   if (!Cmd->AbsoluteLinks && (IsFullPath(TargetW) ||
       !IsRelativeSymlinkSafe(Cmd,hd->FileName.c_str(),Name,TargetW.c_str())))
+  {
+    uiMsg(UIERROR_SKIPUNSAFELINK,hd->FileName,TargetW);
+    ErrHandler.SetErrorCode(RARX_WARNING);
     return false;
+  }
   return UnixSymlink(Cmd,Target,Name,&hd->mtime,&hd->atime);
 }

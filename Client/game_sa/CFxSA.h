@@ -14,6 +14,7 @@
 #include <game/CFx.h>
 
 struct RwColor;
+class FxSystem_c;
 
 #define FUNC_CFx_AddBlood                  0x49eb00
 #define FUNC_CFx_AddWood                   0x49ee10
@@ -29,10 +30,30 @@ struct RwColor;
 #define FUNC_CFx_TriggerWaterSplash        0x4a1070
 #define FUNC_CFx_TriggerBulletSplash       0x4a10e0
 #define FUNC_CFx_TriggerFootSplash         0x4a1150
+#define FUNC_FXSystem_c_AddParticle        0x4AA440
 
 class CFxSAInterface
 {
 public:
+    FxSystem_c* m_fxSysBlood;
+    FxSystem_c* m_fxSysBoatSplash;
+    FxSystem_c* m_fxSysBubble;
+    FxSystem_c* m_fxSysDebris;
+    FxSystem_c* m_fxSysSmoke;
+    FxSystem_c* m_fxSysGunshell;
+    FxSystem_c* m_fxSysSand;
+    FxSystem_c* m_fxSysSand2;
+    FxSystem_c* m_fxSysSmokeHuge;
+    FxSystem_c* m_fxSysSmoke2;
+    FxSystem_c* m_fxSysSpark;
+    FxSystem_c* m_fxSysSpark2;
+    FxSystem_c* m_fxSysSplash;
+    FxSystem_c* m_fxSysWake;
+    FxSystem_c* m_fxSysWaterSplash;
+    FxSystem_c* m_fxSysWheelDirt;
+    FxSystem_c* m_fxSysGlass;
+
+private:
 };
 
 class CFxSA : public CFx
@@ -55,7 +76,23 @@ public:
     void TriggerWaterSplash(CVector& vecPosition);
     void TriggerBulletSplash(CVector& vecPosition);
     void TriggerFootSplash(CVector& vecPosition);
+    void AddParticle(eFxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife);
 
 private:
     CFxSAInterface* m_pInterface;
+
+    struct FxPrtMult_c
+    {
+        struct
+        {
+            float red;
+            float green;
+            float blue;
+            float alpha;
+        } m_color;
+
+        float m_fSize;
+        float unk;
+        float m_fLife;
+    };
 };

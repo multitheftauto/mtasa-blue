@@ -59,7 +59,7 @@ public:
 
     void ResetInstructionCount();
 
-    class CResource* GetResource() { return m_pResource; }
+    class CResource* GetResource() const { return m_pResource; }
 
     CXMLFile*     CreateXML(const char* szFilename, bool bUseIDs = true, bool bReadOnly = false);
     CXMLNode*     ParseString(const char* strXmlContent);

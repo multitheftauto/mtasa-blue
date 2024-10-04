@@ -19,6 +19,22 @@ class CLuaArgument;
 #include "lua/LuaBasic.h"
 #include <lua/CLuaMultiReturn.h>
 
+class LuaFunctionError
+{
+protected:
+    const char* m_message;
+    bool        m_bWarning;
+
+public:
+    constexpr LuaFunctionError(const char* what, bool throwWarning = true) noexcept
+        : m_message(what), m_bWarning(throwWarning) {}
+
+    constexpr const char* what() const noexcept { return m_message; }
+    constexpr bool        IsWarning() const noexcept { return m_bWarning; }
+};
+
+using LuaVarArgs = std::optional<CLuaArguments>;
+
 struct CLuaFunctionParserBase
 {
     // iIndex is passed around by reference
@@ -33,7 +49,7 @@ struct CLuaFunctionParserBase
     void TypeToNameVariant(SString& accumulator)
     {
         using param = typename is_variant<T>::param1_t;
-        if (accumulator.length() == 0)
+        if (accumulator.empty())
             accumulator = TypeToName<param>();
         else
             accumulator += "/" + TypeToName<param>();
@@ -45,7 +61,7 @@ struct CLuaFunctionParserBase
     template <typename T>
     SString TypeToName()
     {
-        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+        if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_same_v<T, SString>)
             return "string";
         else if constexpr (std::is_same_v<T, bool>)
             return "boolean";
@@ -60,6 +76,8 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CLuaArgument>)
             return "value";
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
+            return "values";
         else if constexpr (is_2specialization<T, std::vector>::value)
             return "table";
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
@@ -90,6 +108,8 @@ struct CLuaFunctionParserBase
             return "";
         else if constexpr (std::is_same_v<T, std::monostate>)
             return "";
+        else
+            static_assert(sizeof(T) == 0, "Invalid parameter type provided to CLuaFunctionParser!");
     }
 
     // Reads the parameter type (& value in some cases) at a given index
@@ -116,10 +136,8 @@ struct CLuaFunctionParserBase
                 // Avoid printing binary data
                 if (std::find_if(strValue.begin(), strValue.end(), [](char ch) { return !(std::isprint(ch)); }) != strValue.end())
                     return "string";
-                else
-                {
-                    return SString("string (\"%s\")", strValue.c_str());
-                }
+
+                return SString("string (\"%s\")", strValue.c_str());
             }
             case LUA_TBOOLEAN:
                 return SString("boolean (%s)", lua_toboolean(L, index) == 1 ? "true" : "false");
@@ -145,14 +163,13 @@ struct CLuaFunctionParserBase
     template <typename T>
     T Pop(lua_State* L, int& index)
     {
-        if (!TypeMatch<T>(L, index))
-        {
-            SString strReceived = ReadParameterAsString(L, index);
-            SString strExpected = TypeToName<T>();
-            SetBadArgumentError(L, strExpected, index, strReceived);
-            return T{};
-        }
-        return PopUnsafe<T>(L, index);
+        if (TypeMatch<T>(L, index))
+            return PopUnsafe<T>(L, index);
+
+        SString strReceived = ReadParameterAsString(L, index);
+        SString strExpected = TypeToName<T>();
+        SetBadArgumentError(L, strExpected, index, strReceived);
+        return T{};
     }
 
     // Special type matcher for variants. Returns -1 if the type does not match
@@ -192,56 +209,59 @@ struct CLuaFunctionParserBase
         // primitive types
         if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER);
-        if constexpr (std::is_same_v<T, bool>)
+        else if constexpr (std::is_same_v<T, bool>)
             return (iArgument == LUA_TBOOLEAN);
-        if constexpr (std::is_arithmetic_v<T>)
+        else if constexpr (std::is_arithmetic_v<T>)
             return lua_isnumber(L, index);
 
         // Advanced types
         // Enums are represented as strings to Lua
-        if constexpr (std::is_enum_v<T>)
+        else if constexpr (std::is_enum_v<T>)
             return iArgument == LUA_TSTRING;
 
         // CLuaArgument can hold any value
-        if constexpr (std::is_same_v<T, CLuaArgument>)
+        else if constexpr (std::is_same_v<T, CLuaArgument>)
+            return iArgument != LUA_TNONE;
+
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
             return iArgument != LUA_TNONE;
 
         // All color classes are read as a single tocolor number
         // Do not be tempted to change this to is_base_of<SColor, T>
         // SColorARGB etc are only **constructors** for SColor!
-        if constexpr (std::is_same_v<SColor, T>)
+        else if constexpr (std::is_same_v<SColor, T>)
             return lua_isnumber(L, index);
 
         // std::optional is used for optional parameters
         // which may also be in the middle of a parameter list
         // therefore it is always valid to attempt to read an
         // optional
-        if constexpr (is_specialization<T, std::optional>::value)
+        else if constexpr (is_specialization<T, std::optional>::value)
             return true;
 
         // std::vector is used for arrays built from tables
-        if constexpr (is_2specialization<T, std::vector>::value)
+        else if constexpr (is_2specialization<T, std::vector>::value)
             return iArgument == LUA_TTABLE;
 
         // std::unordered_map<k,v> is used for maps built from tables
-        if constexpr (is_5specialization<T, std::unordered_map>::value)
+        else if constexpr (is_5specialization<T, std::unordered_map>::value)
             return iArgument == LUA_TTABLE;
 
         // CLuaFunctionRef is used for functions
-        if constexpr (std::is_same_v<T, CLuaFunctionRef>)
+        else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
             return iArgument == LUA_TFUNCTION;
 
         // lua_State* can be taken as first argument of any function
-        if constexpr (std::is_same_v<T, lua_State*>)
+        else if constexpr (std::is_same_v<T, lua_State*>)
             return index == 1;
 
         // variants can be used by any of the underlying types
         // thus recursively use this function
-        if constexpr (is_variant<T>::value)
+        else if constexpr (is_variant<T>::value)
             return TypeMatchVariant<T>(L, index) != -1;
 
         // Vector2 may either be represented by CLuaVector or by two numbers
-        if constexpr (std::is_same_v<T, CVector2D>)
+        else if constexpr (std::is_same_v<T, CVector2D>)
         {
             if (lua_isnumber(L, index) && lua_isnumber(L, index + 1))
                 return true;
@@ -249,7 +269,7 @@ struct CLuaFunctionParserBase
         }
 
         // Vector3 may either be represented by CLuaVector or by three numbers
-        if constexpr (std::is_same_v<T, CVector>)
+        else if constexpr (std::is_same_v<T, CVector>)
         {
             if (lua_isnumber(L, index) && lua_isnumber(L, index + 1) && lua_isnumber(L, index + 2))
                 return true;
@@ -257,14 +277,14 @@ struct CLuaFunctionParserBase
         }
 
         // Vector4 may either be represented by CLuaVector or by three numbers
-        if constexpr (std::is_same_v<T, CVector4D>)
+        else if constexpr (std::is_same_v<T, CVector4D>)
         {
             if (lua_isnumber(L, index) && lua_isnumber(L, index + 1) && lua_isnumber(L, index + 2) && lua_isnumber(L, index + 3))
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
         }
         // CMatrix may either be represented by 3 CLuaVector or by 12 numbers
-        if constexpr (std::is_same_v<T, CMatrix>)
+        else if constexpr (std::is_same_v<T, CMatrix>)
         {
             for (int i = 0; i < sizeof(CMatrix) / sizeof(float); i++)
             {
@@ -275,16 +295,16 @@ struct CLuaFunctionParserBase
         }
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
-        if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
+        else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
 
         // dummy type is used as overload extension if one overload has fewer arguments
         // thus it is only allowed if there are no further args on the Lua side
-        if constexpr (std::is_same_v<T, dummy_type>)
+        else if constexpr (std::is_same_v<T, dummy_type>)
             return iArgument == LUA_TNONE;
 
         // no value
-        if constexpr (std::is_same_v<T, std::monostate>)
+        else if constexpr (std::is_same_v<T, std::monostate>)
             return iArgument == LUA_TNONE;
     }
 
@@ -356,11 +376,12 @@ struct CLuaFunctionParserBase
             return lua::PopPrimitive<T>(L, index);
         else if constexpr (std::is_same_v<T, bool>)
             return lua::PopPrimitive<T>(L, index);
-        else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) // bool is an integral type, so must pop it before ^^
+        else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>)            // bool is an integral type, so must pop it before ^^
         {
             const auto number = lua::PopPrimitive<lua_Number>(L, index);
 
-            const auto SetError = [&](const char* expected, const char* got) {
+            const auto SetError = [&](const char* expected, const char* got)
+            {
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
                 SetBadArgumentError(L, expected, index - 1, got);
@@ -372,7 +393,8 @@ struct CLuaFunctionParserBase
                 return static_cast<T>(number);
             }
 
-            if (std::isinf(number)) {
+            if (std::isinf(number))
+            {
                 SetError("number", "inf");
                 return static_cast<T>(number);
             }
@@ -381,7 +403,8 @@ struct CLuaFunctionParserBase
             // For now this doesn't do all the safety checks, but this should be "good enough" [until we switch to C++20]
             if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
             {
-                if (number < 0) {
+                if (number < 0)
+                {
                     SetError("positive number", "negative");
                     return static_cast<T>(number);
                 }
@@ -396,15 +419,13 @@ struct CLuaFunctionParserBase
             T           eValue;
             if (StringToEnum(strValue, eValue))
                 return eValue;
-            else
-            {
-                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
-                // underlying element is of a wrong type
-                SString strReceived = ReadParameterAsString(L, index - 1);
-                SString strExpected = GetEnumTypeName((T)0);
-                SetBadArgumentError(L, strExpected, index - 1, strReceived);
-                return static_cast<T>(0);
-            }
+
+            // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+            // underlying element is of a wrong type
+            SString strReceived = ReadParameterAsString(L, index - 1);
+            SString strExpected = GetEnumTypeName((T)0);
+            SetBadArgumentError(L, strExpected, index - 1, strReceived);
+            return static_cast<T>(0);
         }
         else if constexpr (is_specialization<T, std::optional>::value)
         {
@@ -462,7 +483,7 @@ struct CLuaFunctionParserBase
                     continue;
                 }
 
-                int  i = -2;
+                int i = -2;
 
                 // When key_t is a string and the actual type of a key is number Lua will conduct an implicit value change
                 // that can confuse lua_next and lead to a crash. To fix it we can copy a key in order to save an original key
@@ -470,7 +491,7 @@ struct CLuaFunctionParserBase
                 lua_pushvalue(L, i);
 
                 auto v = PopUnsafe<value_t>(L, i);
-                auto k = PopUnsafe<key_t>(L, i);                
+                auto k = PopUnsafe<key_t>(L, i);
                 map.emplace(std::move(k), std::move(v));
                 lua_pop(L, 2);            // drop values(key copy and value), keep original key for lua_next
             }
@@ -481,27 +502,26 @@ struct CLuaFunctionParserBase
         {
             CLuaMain&   luaMain = lua_getownercluamain(L);
             const void* pFuncPtr = lua_topointer(L, index);
+            CRefInfo*   pInfo = MapFind(luaMain.m_CallbackTable, pFuncPtr);
 
-            if (CRefInfo* pInfo = MapFind(luaMain.m_CallbackTable, pFuncPtr))
+            if (pInfo)
             {
                 // Re-use the lua ref we already have to this function
                 pInfo->ulUseCount++;
                 ++index;
                 return CLuaFunctionRef(L, pInfo->iFunction, pFuncPtr);
             }
-            else
-            {
-                // Get a lua ref to this function
-                lua_pushvalue(L, index);
-                int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
-                // Save ref info
-                CRefInfo info{1, ref};
-                MapSet(luaMain.m_CallbackTable, pFuncPtr, info);
+            // Get a lua ref to this function
+            lua_pushvalue(L, index);
+            int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
-                ++index;
-                return CLuaFunctionRef(L, ref, pFuncPtr);
-            }
+            // Save ref info
+            CRefInfo info{1, ref};
+            MapSet(luaMain.m_CallbackTable, pFuncPtr, info);
+
+            ++index;
+            return CLuaFunctionRef(L, ref, pFuncPtr);
         }
         else if constexpr (std::is_same_v<T, lua_State*>)
             return L;
@@ -516,95 +536,78 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector2D>)
         {
             if (lua_isnumber(L, index))
-            {
-                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
-            }
-            else
-            {
-                int   iType = lua_type(L, index);
-                bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
-                void* pValue = lua::PopPrimitive<void*>(L, index);
-                auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
-                };
-                // A vector2 may also be filled from a vector3/vector4
-                if (CLuaVector2D* pVec2D = cast((CLuaVector2D*)0); pVec2D != nullptr)
-                    return *pVec2D;
-                if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
-                    return *pVec3D;
-                if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
-                    return *pVec4D;
+                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
 
-                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
-                // underlying element is of a wrong type
-                SetBadArgumentError(L, "vector2", index - 1, pValue, isLightUserData);
-                return T{};
-            }
+            int   iType = lua_type(L, index);
+            bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            void* pValue = lua::PopPrimitive<void*>(L, index);
+            auto  cast = [isLightUserData, pValue, L](auto null) {
+                return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                        : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+            };
+            // A vector2 may also be filled from a vector3/vector4
+            if (CLuaVector2D* pVec2D = cast((CLuaVector2D*)0); pVec2D != nullptr)
+                return *pVec2D;
+            if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
+                return *pVec3D;
+            if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
+                return *pVec4D;
+
+            // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+            // underlying element is of a wrong type
+            SetBadArgumentError(L, "vector2", index - 1, pValue, isLightUserData);
+            return T{};
         }
         else if constexpr (std::is_same_v<T, CVector>)
         {
             if (lua_isnumber(L, index))
-            {
-                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
-            }
-            else
-            {
-                int   iType = lua_type(L, index);
-                bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
-                void* pValue = lua::PopPrimitive<void*>(L, index);
-                auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
-                };
-                // A vector3 may also be filled from a vector4
-                if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
-                    return *pVec3D;
-                if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
-                    return *pVec4D;
+                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
 
-                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
-                // underlying element is of a wrong type
-                SetBadArgumentError(L, "vector3", index - 1, pValue, isLightUserData);
-                return T{};
-            }
+            int   iType = lua_type(L, index);
+            bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            void* pValue = lua::PopPrimitive<void*>(L, index);
+            auto  cast = [isLightUserData, pValue, L](auto null) {
+                return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                        : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+            };
+            // A vector3 may also be filled from a vector4
+            if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
+                return *pVec3D;
+            if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
+                return *pVec4D;
+
+            // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+            // underlying element is of a wrong type
+            SetBadArgumentError(L, "vector3", index - 1, pValue, isLightUserData);
+            return T{};
         }
         else if constexpr (std::is_same_v<T, CVector4D>)
         {
             if (lua_isnumber(L, index))
-            {
-                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index),
-                         PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
-            }
-            else
-            {
-                int   iType = lua_type(L, index);
-                bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
-                void* pValue = lua::PopPrimitive<void*>(L, index);
-                auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
-                };
-                // A vector3 may also be filled from a vector4
-                if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
-                    return *pVec4D;
-                if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
-                    return *pMatrix;
+                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
 
-                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
-                // underlying element is of a wrong type
-                SetBadArgumentError(L, "vector4", index - 1, pValue, isLightUserData);
-                return T{};
-            }
+            int   iType = lua_type(L, index);
+            bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            void* pValue = lua::PopPrimitive<void*>(L, index);
+            auto  cast = [isLightUserData, pValue, L](auto null) {
+                return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                        : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+            };
+            // A vector3 may also be filled from a vector4
+            if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
+                return *pVec4D;
+
+            // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+            // underlying element is of a wrong type
+            SetBadArgumentError(L, "vector4", index - 1, pValue, isLightUserData);
+            return T{};
         }
         else if constexpr (std::is_same_v<T, CMatrix>)
         {
             if (lua_isnumber(L, index))
             {
-                const auto ReadVector = [&] {
-                    return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index));
-                };
-                
+                const auto ReadVector = [&] { return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)); };
+
                 CMatrix matrix;
 
                 matrix.vRight = ReadVector();
@@ -614,24 +617,22 @@ struct CLuaFunctionParserBase
 
                 return matrix;
             }
-            else
-            {
-                int   iType = lua_type(L, index);
-                bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
-                void* pValue = lua::PopPrimitive<void*>(L, index);
-                auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
-                };
-                // A vector4 may also be filled from a CLuaMatrix
-                if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
-                    return *pMatrix;
 
-                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
-                // underlying element is of a wrong type
-                SetBadArgumentError(L, "matrix", index - 1, pValue, isLightUserData);
-                return T{};
-            }
+            int   iType = lua_type(L, index);
+            bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            void* pValue = lua::PopPrimitive<void*>(L, index);
+            auto  cast = [isLightUserData, pValue, L](auto null) {
+                return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                        : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+            };
+            // A vector4 may also be filled from a CLuaMatrix
+            if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
+                return *pMatrix;
+
+            // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+            // underlying element is of a wrong type
+            SetBadArgumentError(L, "matrix", index - 1, pValue, isLightUserData);
+            return T{};
         }
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
@@ -641,14 +642,13 @@ struct CLuaFunctionParserBase
             void* pValue = lua::PopPrimitive<void*>(L, index);
             using class_t = std::remove_pointer_t<T>;
             auto result = isLightUserData ? UserDataCast((class_t*)pValue, L) : UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
-            if (result == nullptr)
-            {
-                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
-                // underlying element is of a wrong type
-                SetBadArgumentError<T>(L, index - 1, pValue, isLightUserData);
-                return nullptr;
-            }
-            return static_cast<T>(result);
+            if (result)
+                return static_cast<T>(result);
+
+            // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+            // underlying element is of a wrong type
+            SetBadArgumentError<T>(L, index - 1, pValue, isLightUserData);
+            return nullptr;
         }
         else if constexpr (std::is_same_v<T, SColor>)
             return static_cast<unsigned long>(static_cast<int64_t>(lua::PopPrimitive<lua_Number>(L, index)));
@@ -656,6 +656,12 @@ struct CLuaFunctionParserBase
         {
             CLuaArgument argument;
             argument.Read(L, index++);
+            return argument;
+        }
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
+        {
+            CLuaArguments argument;
+            argument.ReadArguments(L, index);
             return argument;
         }
         else if constexpr (std::is_same_v<T, std::monostate>)
@@ -676,10 +682,9 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
     template <typename... Params>
     auto Call(lua_State* L, Params&&... ps)
     {
-        if (strError.length() != 0)
-        {
+        if (!strError.empty())
             return -1;
-        }
+
         if constexpr (sizeof...(Params) == sizeof...(Args))
         {
             if constexpr (std::is_same_v<Ret, void>)
@@ -724,31 +729,35 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
 
     int operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
     {
-        int iResult = 0;
+        int  iResult = 0;
+        bool bIsWarning = false;
         try
         {
             iResult = Call(L);
         }
-        catch (std::invalid_argument& e)
+        catch (std::logic_error& e)
         {
             // This exception can be thrown from the called function
             // as an additional way to provide further argument errors
             strError = e.what();
         }
-        if (strError.length() != 0)
+        catch (LuaFunctionError& e)
         {
-            if constexpr (ErrorOnFailure)
-            {
-                luaL_error(L, strError.c_str());
-            }
-            else
-            {
-                pScriptDebugging->LogCustom(L, strError.c_str());
-                lua::Push(L, ReturnOnFailure);
-            }
+            strError = e.what();
+            bIsWarning = e.IsWarning();
+        }
+        if (strError.empty())
+            return iResult;
+
+        if (ErrorOnFailure && !bIsWarning)
+        {
+            luaL_error(L, strError.c_str());
             return 1;
         }
-        return iResult;
+
+        pScriptDebugging->LogCustom(L, strError.c_str());
+        lua::Push(L, ReturnOnFailure);
+        return 1;
     }
 };
 
@@ -759,10 +768,7 @@ template <bool ErrorOnFailure, auto ReturnOnFailure, typename T, typename R, typ
 struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, F>
 {
     // Remove constness here, because we must be able to std::move
-    static R Call(T* o, std::remove_const_t<Args>... args)
-    {
-        return (o->*F)(std::move(args)...);
-    }
+    static R Call(T* o, std::remove_const_t<Args>... args) { return (o->*F)(std::move(args)...); }
 
     auto operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
     {

@@ -524,6 +524,7 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSelectedCount", "guiGridListGetSelectedCount");
     lua_classfunction(luaVM, "getSelectedItems", "guiGridListGetSelectedItems");
     lua_classfunction(luaVM, "getColumnCount", "guiGridListGetColumnCount");
+    lua_classfunction(luaVM, "getColumnWidth", "guiGridListGetColumnWidth");
 
     lua_classfunction(luaVM, "setItemData", "guiGridListSetItemData");
     lua_classfunction(luaVM, "setItemText", "guiGridListSetItemText");
@@ -2359,13 +2360,11 @@ int CLuaGUIDefs::GUIGridListAddRow(lua_State* luaVM)
         else
         {
             // Vector containing our string arguments.  We add a bool to store whether it was originally a number.
-            std::vector<std::pair<SString, bool> >     m_items;
-            std::vector<CLuaArgument*>::const_iterator it = Arguments.IterBegin();
-            for (it; it != Arguments.IterEnd(); it++)
+            std::vector<std::pair<SString, bool>> m_items;
+            for (CLuaArgument* pArgument : Arguments)
             {
-                CLuaArgument* pArgument = *it;
-                SString       strItemText;
-                bool          bNumber = false;
+                SString strItemText;
+                bool    bNumber = false;
 
                 // Check the type of the argument and convert it to a string we can process
                 uint type = pArgument->GetType();
@@ -2426,12 +2425,10 @@ int CLuaGUIDefs::GUIGridListInsertRowAfter(lua_State* luaVM)
         {
             // Vector containing our string arguments.  We add a bool to store whether it was originally a number.
             std::vector<std::pair<SString, bool> >     m_items;
-            std::vector<CLuaArgument*>::const_iterator it = Arguments.IterBegin();
-            for (it; it != Arguments.IterEnd(); it++)
+            for (CLuaArgument* pArgument : Arguments)
             {
-                CLuaArgument* pArgument = *it;
-                SString       strItemText;
-                bool          bNumber = false;
+                SString strItemText;
+                bool    bNumber = false;
 
                 // Check the type of the argument and convert it to a string we can process
                 uint type = pArgument->GetType();

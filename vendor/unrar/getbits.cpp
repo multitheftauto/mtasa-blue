@@ -30,14 +30,14 @@ BitInput::~BitInput()
 
 void BitInput::faddbits(uint Bits)
 {
-  // Function wrapped version of inline addbits to save code size.
+  // Function wrapped version of inline addbits to reduce the code size.
   addbits(Bits);
 }
 
 
 uint BitInput::fgetbits()
 {
-  // Function wrapped version of inline getbits to save code size.
+  // Function wrapped version of inline getbits to reduce the code size.
   return getbits();
 }
 

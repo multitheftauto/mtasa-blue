@@ -1,330 +1,287 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CServer.cpp
  *  PURPOSE:     Local server instancing class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include <StdInc.h>
-
-static volatile bool           g_bIsStarted = false;
-extern CCoreInterface*         g_pCore;
-extern CLocalizationInterface* g_pLocalization;
-CCriticalSection               CServer::m_OutputCC;
-std::list<std::string>         CServer::m_OutputQueue;
+#include <array>
+#include <string_view>
 
 #ifdef MTA_DEBUG
-    #define SERVER_DLL_PATH "core_d.dll"
+    #define SERVER_EXE_PATH "MTA Server_d.exe"
 #else
-    #define SERVER_DLL_PATH "core.dll"
+    #define SERVER_EXE_PATH "MTA Server.exe"
 #endif
 
-#define ERROR_NO_ERROR 0
-#define ERROR_NO_NETWORK_LIBRARY 1
-#define ERROR_NETWORK_LIBRARY_FAILED 2
-#define ERROR_LOADING_MOD 3
+constexpr UINT PROCESS_FORCEFULLY_TERMINATED = 0x90804050u;
 
 static const SFixedArray<const char*, 4> szServerErrors = {"Server stopped", "Could not load network library", "Loading network library failed",
                                                            "Error loading mod"};
 
-CServer::CServer()
+static bool IsProcessRunning(HANDLE process)
 {
-    assert(!g_bIsStarted);
-
-    // Initialize
-    m_bIsReady = false;
-    m_pLibrary = NULL;
-    m_hThread = INVALID_HANDLE_VALUE;
-    m_iLastError = ERROR_NO_ERROR;
-
-    m_strServerRoot = CalcMTASAPath("server");
-    m_strDLLFile = PathJoin(m_strServerRoot, SERVER_DLL_PATH);
+    return WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
 }
 
-CServer::~CServer()
+struct PipeHandlePair
 {
-    // Make sure the server is stopped
-    Stop();
+    bool   AutoClose{};
+    HANDLE Read{};
+    HANDLE Write{};
 
-    // Make sure the thread handle is closed
-    if (m_hThread != INVALID_HANDLE_VALUE)
+    ~PipeHandlePair()
     {
-        CloseHandle(m_hThread);
+        if (AutoClose)
+        {
+            CloseHandle(Read);
+            CloseHandle(Write);
+        }
     }
-}
+};
 
-void CServer::DoPulse()
+bool CServer::Start(const char* configFileName)
 {
-    if (IsRunning())
+    if (m_isRunning)
+        return false;
+
+    // Create and use an optional job object to kill the server process automatically when we close the job object.
+    // This is pretty handy in case the game process unexpectedly crashes and we miss terminating the server process.
+    HANDLE job = CreateJobObjectW(nullptr, nullptr);
+
+    if (job != nullptr)
     {
-        // Make sure the server doesn't happen to be adding anything right now
-        m_OutputCC.Lock();
+        JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
+        limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 
-        // Anything to output to console?
-        if (m_OutputQueue.size() > 0)
+        if (!SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
         {
-            // Loop through our output queue and echo it to console
-            std::list<std::string>::const_iterator iter = m_OutputQueue.begin();
-            for (; iter != m_OutputQueue.end(); ++iter)
-            {
-                // Echo it
-                const char* szString = iter->c_str();
-                g_pCore->GetConsole()->Echo(szString);
+            g_pCore->GetConsole()->Printf("Server process warning [error: %08x]: failed to setup job object\n", GetLastError());
 
-                // Does the message end with "Server started and is ready to accept connections!\n"?
-                size_t sizeString = iter->length();
-                if (sizeString >= 51 && stricmp(szString + sizeString - 51, "Server started and is ready to accept connections!\n") == 0)
-                {
-                    m_bIsReady = true;
-                }
-            }
-
-            // Clear the list
-            m_OutputQueue.clear();
-        }
-        // Unlock again
-        m_OutputCC.Unlock();
-    }
-    else
-    {
-        // not running, errored?
-        if (GetLastError() != ERROR_NO_ERROR)
-        {
-            Stop();
+            CloseHandle(job);
+            job = nullptr;
         }
     }
-}
 
-bool CServer::Start(const char* szConfig)
-{
-    // Not already started?
-    if (!g_bIsStarted)
+    SECURITY_ATTRIBUTES securityAttributes{};
+    securityAttributes.nLength = sizeof(securityAttributes);
+    securityAttributes.bInheritHandle = TRUE;
+
+    // Create the input pipe for the server process.
+    PipeHandlePair in;
+
+    if (!CreatePipe(&in.Read, &in.Write, &securityAttributes, 0))
     {
-        m_strConfig = szConfig;
-
-        // Check that the DLL exists
-        if (!FileExists(m_strDLLFile))
-        {
-            g_pCore->GetConsole()->Printf("Unable to find: '%s'", m_strDLLFile.c_str());
-            return false;
-        }
-
-        // We're now started, but not ready
-        g_bIsStarted = true;
-        m_bIsReady = false;
-
-        // Close the previous thread?
-        if (m_hThread != INVALID_HANDLE_VALUE)
-        {
-            CloseHandle(m_hThread);
-        }
-
-        // Create a thread to run the server
-        DWORD dwTemp;
-        m_hThread = CreateThread(NULL, 0, Thread_EntryPoint, this, 0, &dwTemp);
-        return m_hThread != NULL;
+        g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to create input pipe\n", GetLastError());
+        return false;
     }
 
-    return false;
-}
+    in.AutoClose = true;
 
-bool CServer::IsStarted()
-{
-    return g_bIsStarted;
-}
-
-bool CServer::Stop()
-{
-    // Started?
-    if (g_bIsStarted)
+    // Only inherit the read handle to the input pipe.
+    if (!SetHandleInformation(in.Write, HANDLE_FLAG_INHERIT, 0))
     {
-        // Wait for the library to come true or is started to go false
-        // This is so a call to Start then fast call to Stop will work. Otherwize it might not
-        // get time to start the server thread before we terminate it and we will end up
-        // starting it after this call to Stop.
-        while (g_bIsStarted && !m_pLibrary)
-        {
-            Sleep(1);
-        }
-
-        // Lock
-        m_CriticalSection.Lock();
-
-        // Is the server running?
-        if (m_pLibrary)
-        {
-            // Send the exit message
-            Send("exit");
-        }
-
-        // Unlock it so we won't deadlock
-        m_CriticalSection.Unlock();
+        g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to modify input pipe\n", GetLastError());
+        return false;
     }
 
-    // If we have a thread, wait for it to finish
-    if (m_hThread != INVALID_HANDLE_VALUE)
+    // Create the output pipe for the server process.
+    PipeHandlePair out;
+
+    if (!CreatePipe(&out.Read, &out.Write, &securityAttributes, 0))
     {
-        // Let the thread finish
-        WaitForSingleObject(m_hThread, INFINITE);
-
-        // If we can get an exit code, see if it's non-zero
-        DWORD dwExitCode = 0;
-        if (GetExitCodeThread(m_hThread, &dwExitCode))
-        {
-            // Handle non-zero exit codes
-            if (dwExitCode != ERROR_NO_ERROR)
-            {
-                g_pCore->ShowMessageBox(_("Error") + _E("CD60"), _("Could not start the local server. See console for details."), MB_BUTTON_OK | MB_ICON_ERROR);
-                g_pCore->GetConsole()->Printf(_("Error: Could not start local server. [%s]"), szServerErrors[GetLastError()]);
-            }
-        }
-
-        // Close it
-        CloseHandle(m_hThread);
-        m_hThread = INVALID_HANDLE_VALUE;
+        g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to create output pipe\n", GetLastError());
+        return false;
     }
 
-    m_iLastError = ERROR_NO_ERROR;
+    out.AutoClose = true;
 
+    // Only inherit the write handle to the output pipe.
+    if (!SetHandleInformation(out.Read, HANDLE_FLAG_INHERIT, 0))
+    {
+        g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to modify output pipe\n", GetLastError());
+        return false;
+    }
+
+    // Create an anonymous event to signal the readyness of the server to accept connections.
+    HANDLE readyEvent = CreateEventA(&securityAttributes, FALSE, FALSE, nullptr);
+
+    if (readyEvent == nullptr)
+    {
+        g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to create ready event\n", GetLastError());
+        return false;
+    }
+
+    // We write the event handle to standard input, which we then extract in CServerImpl::Run (Server Core).
+    DWORD bytesWritten{};
+
+    if (!WriteFile(in.Write, &readyEvent, sizeof(readyEvent), &bytesWritten, nullptr) || bytesWritten != sizeof(readyEvent))
+    {
+        g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to write ready event\n", GetLastError());
+        CloseHandle(readyEvent);
+        return false;
+    }
+
+    // Create the server process now.
+    const SString serverRoot = CalcMTASAPath("server");
+    const SString serverExePath = PathJoin(serverRoot, SERVER_EXE_PATH);
+    const SString commandLine("\"%s\" --child-process --config \"%s\"", SERVER_EXE_PATH, configFileName);
+
+    STARTUPINFOW startupInfo{};
+    startupInfo.cb = sizeof(STARTUPINFOW);
+    startupInfo.hStdError = out.Write;
+    startupInfo.hStdOutput = out.Write;
+    startupInfo.hStdInput = in.Read;
+    startupInfo.dwFlags = STARTF_USESTDHANDLES;
+
+    PROCESS_INFORMATION processInfo{};
+
+    if (!CreateProcessW(*FromUTF8(serverExePath), const_cast<wchar_t*>(*FromUTF8(commandLine)), nullptr, nullptr, TRUE,
+                        CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT, nullptr, nullptr, &startupInfo, &processInfo))
+    {
+        g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to create process\n", GetLastError());
+        CloseHandle(readyEvent);
+        return false;
+    }
+
+    // Try to assign the project to our job object, if we have one.
+    if (job != nullptr && !AssignProcessToJobObject(job, processInfo.hProcess))
+    {
+        CloseHandle(job);
+        job = nullptr;
+    }
+
+    // Close the handles managed by the server process.
+    CloseHandle(in.Read);
+    CloseHandle(out.Write);
+
+    // Close the thread handle, because we don't need it.
+    CloseHandle(processInfo.hThread);
+
+    in.AutoClose = false;
+    out.AutoClose = false;
+
+    m_stdin = in.Write;
+    m_stdout = out.Read;
+    m_isAcceptingConnections = false;
+    m_isRunning = true;
+    m_job = job;
+    m_readyEvent = readyEvent;
+    m_process = processInfo.hProcess;
+    m_processId = processInfo.dwProcessId;
+
+    g_pCore->GetConsole()->Printf("Server process has started [pid: %lu]\n", m_processId);
     return true;
 }
 
-bool CServer::Send(const char* szString)
+void CServer::Stop(bool graceful)
 {
-    // Server running?
-    bool bReturn = false;
-    if (g_bIsStarted)
+    if (!m_isRunning)
+        return;
+
+    bool isRunning = IsProcessRunning(m_process);
+
+    if (graceful && isRunning)
     {
-        // Wait for the library to come true or is started to go false
-        while (g_bIsStarted && !m_pLibrary)
+        DWORD bytesWritten{};
+
+        // Try to write a normal "exit" command to the server process.
+        if (WriteFile(m_stdin, "exit\n", 5, &bytesWritten, nullptr) && bytesWritten == 5)
         {
-            Sleep(1);
+            g_pCore->GetConsole()->Printf("Sent 'exit' command to the server to shut it down\n");
+            WaitForSingleObject(m_process, 8000);
+        }
+        // Try to send a CTRl+C event to the process console.
+        else if (AttachConsole(m_processId))
+        {
+            SetConsoleCtrlHandler(nullptr, true);
+            GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
+            FreeConsole();
+            g_pCore->GetConsole()->Printf("Sent 'CTRL+C' event to the server to shut it down\n");
+            WaitForSingleObject(m_process, 8000);
+            SetConsoleCtrlHandler(nullptr, false);
         }
 
-        // Lock
-        m_CriticalSection.Lock();
-
-        // Are we running the server
-        if (m_pLibrary)
-        {
-            // Grab the SendServerCommand function pointer
-            typedef bool(SendServerCommand_t)(const char*);
-            SendServerCommand_t* pfnSendServerCommand = reinterpret_cast<SendServerCommand_t*>(m_pLibrary->GetProcedureAddress("SendServerCommand"));
-            if (pfnSendServerCommand)
-            {
-                // Call it with the command
-                bReturn = pfnSendServerCommand(szString);
-            }
-        }
-
-        // Unlock
-        m_CriticalSection.Unlock();
+        isRunning = IsProcessRunning(m_process);
     }
 
-    // Return
-    return bReturn;
-}
-
-DWORD WINAPI CServer::Thread_EntryPoint(LPVOID pThis)
-{
-    return reinterpret_cast<CServer*>(pThis)->Thread_Run();
-}
-
-unsigned long CServer::Thread_Run()
-{
-    // Enter critical section
-    m_CriticalSection.Lock();
-
-    // Already loaded? Just return or we get a memory leak.
-    if (m_pLibrary)
+    // We either forcefully terminating the server, or the graceful shutdown failed.
+    if (isRunning)
     {
-        m_CriticalSection.Unlock();
-        return 0;
-    }
+        g_pCore->GetConsole()->Printf("Terminating the server forcefully now\n");
 
-    // Load the DLL
-    m_pLibrary = new CDynamicLibrary;
-    if (m_pLibrary->Load(m_strDLLFile))
-    {
-        // Grab the entrypoint
-        typedef int(Main_t)(int, char*[]);
-        Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>(m_pLibrary->GetProcedureAddress("Run"));
-        if (pfnEntryPoint)
+        TerminateProcess(m_process, PROCESS_FORCEFULLY_TERMINATED);
+        WaitForSingleObject(m_process, 3000);
+
+        if (m_job != nullptr)
         {
-            // Populate the arguments array
-            char szArgument1[8];
-            strcpy(szArgument1, "-D");
-
-            char szArgument2[256];
-            strncpy(szArgument2, m_strServerRoot, 256);
-            szArgument2[255] = 0;
-
-            char szArgument3[16];
-            strcpy(szArgument3, "--config");
-
-            char szArgument4[64];
-            strcpy(szArgument4, m_strConfig);
-
-            char szArgument5[8];
-            strcpy(szArgument5, "-s");
-
-            char* szArguments[7];
-            szArguments[0] = szArgument1;
-            szArguments[1] = szArgument2;
-            szArguments[2] = szArgument3;
-            szArguments[3] = szArgument4;
-            szArguments[4] = szArgument5;
-
-            // Give the server our function to output stuff to the console
-            char szArgument6[32];
-            strcpy(szArgument6, "--clientfeedback");
-            szArguments[5] = szArgument6;
-            szArguments[6] = reinterpret_cast<char*>(CServer::AddServerOutput);
-
-            // We're now running the server
-            m_CriticalSection.Unlock();
-
-            // Call it and grab what it returned
-            int iReturn = pfnEntryPoint(7, szArguments);
-
-            m_iLastError = iReturn;
-
-            // Lock again
-            m_CriticalSection.Lock();
-
-            // Delete the library
-            delete m_pLibrary;
-            m_pLibrary = NULL;
-
-            // Return what the server returned
-            m_CriticalSection.Unlock();
-            g_bIsStarted = false;
-            return iReturn;
+            CloseHandle(m_job);
+            m_job = nullptr;
         }
     }
 
-    // Delete the library again
-    delete m_pLibrary;
-    m_pLibrary = NULL;
+    if (DWORD exitCode{}; GetExitCodeProcess(m_process, &exitCode))
+    {
+        const char* errorText = "Unknown exit code";
 
-    // Unlock the critialsection and return failed
-    m_CriticalSection.Unlock();
-    g_bIsStarted = false;
-    return 1;
+        if (exitCode == PROCESS_FORCEFULLY_TERMINATED)
+            errorText = "Process was forcefully terminated";
+        else if (exitCode < (sizeof(szServerErrors) / sizeof(const char*)))
+            errorText = szServerErrors[exitCode];
+
+        g_pCore->GetConsole()->Printf("Server process has been terminated [%08X]: %s\n", exitCode, errorText);
+    }
+
+    CloseHandle(m_readyEvent);
+    CloseHandle(m_stdin);
+    CloseHandle(m_stdout);
+    CloseHandle(m_process);
+
+    if (m_job != nullptr)
+    {
+        CloseHandle(m_job);
+        m_job = nullptr;
+    }
+
+    m_isRunning = false;
 }
 
-void CServer::AddServerOutput(const char* szOutput)
+void CServer::Pulse()
 {
-    // Make sure the client doesn't process the queue right now
-    m_OutputCC.Lock();
+    if (!m_isRunning)
+        return;
 
-    // Add the string to the queue
-    m_OutputQueue.push_back(szOutput);
+    // Try to read the process standard output and then write it to the console window.
+    if (DWORD numBytes{}; PeekNamedPipe(m_stdout, nullptr, 0, nullptr, &numBytes, nullptr) && numBytes > 0)
+    {
+        std::array<char, 4096> buffer{};
 
-    // Unlock again
-    m_OutputCC.Unlock();
+        if (ReadFile(m_stdout, buffer.data(), std::min<DWORD>(buffer.size(), numBytes), &numBytes, nullptr) && numBytes > 0)
+        {
+            g_pCore->GetConsole()->Printf("%.*s", numBytes, buffer.data());
+        }
+    }
+
+    // Check if the server process was terminated externally.
+    if (!IsProcessRunning(m_process))
+    {
+        Stop();
+        return;
+    }
+
+    // Check if the server process signalised readyness to accept connections.
+    if (m_readyEvent != nullptr)
+    {
+        if (WaitForSingleObject(m_readyEvent, 0) != WAIT_TIMEOUT)
+        {
+            CloseHandle(m_readyEvent);
+            m_readyEvent = nullptr;
+            m_isAcceptingConnections = true;
+        }
+    }
 }

@@ -25,7 +25,11 @@
 
 #define  MAXCMTSIZE        0x40000
 
+#ifdef _WIN_32
+#define  DefSFXName        L"default32.sfx"
+#else
 #define  DefSFXName        L"default.sfx"
+#endif
 #define  DefSortListName   L"rarfiles.lst"
 
 // Maximum dictionary allowed by compression. Can be less than

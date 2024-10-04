@@ -53,6 +53,8 @@ enum host_lookup_state {
 #define NETRC_FAILED -1
 #define NETRC_SUCCESS 0
 
+#define MAX_NETRC_LINE 4096
+
 /*
  * Returns zero on success.
  */
@@ -80,13 +82,14 @@ static int parsenetrc(const char *host,
   file = fopen(netrcfile, FOPEN_READTEXT);
   if(file) {
     bool done = FALSE;
-    char netrcbuffer[4096];
-    int  netrcbuffsize = (int)sizeof(netrcbuffer);
+    struct dynbuf buf;
+    Curl_dyn_init(&buf, MAX_NETRC_LINE);
 
-    while(!done && Curl_get_line(netrcbuffer, netrcbuffsize, file)) {
+    while(!done && Curl_get_line(&buf, file)) {
       char *tok;
       char *tok_end;
       bool quoted;
+      char *netrcbuffer = Curl_dyn_ptr(&buf);
       if(state == MACDEF) {
         if((netrcbuffer[0] == '\n') || (netrcbuffer[0] == '\r'))
           state = NOTHING;
@@ -245,6 +248,7 @@ static int parsenetrc(const char *host,
     } /* while Curl_get_line() */
 
 out:
+    Curl_dyn_free(&buf);
     if(!retcode) {
       /* success */
       if(login_alloc) {
@@ -327,7 +331,7 @@ int Curl_parsenetrc(const char *host, char **loginp, char **passwordp,
     }
     retcode = parsenetrc(host, loginp, passwordp, filealloc);
     free(filealloc);
-#ifdef WIN32
+#ifdef _WIN32
     if(retcode == NETRC_FILE_MISSING) {
       /* fallback to the old-style "_netrc" file */
       filealloc = curl_maprintf("%s%s_netrc", home, DIR_CHAR);

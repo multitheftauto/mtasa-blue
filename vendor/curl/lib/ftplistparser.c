@@ -55,9 +55,6 @@
 /* The last #include file should be: */
 #include "memdebug.h"
 
-/* allocs buffer which will contain one line of LIST command response */
-#define FTP_BUFFER_ALLOCSIZE 160
-
 typedef enum {
   PL_UNIX_TOTALSIZE = 0,
   PL_UNIX_FILETYPE,
@@ -352,7 +349,7 @@ static CURLcode ftp_pl_insert_finfo(struct Curl_easy *data,
   Curl_set_in_callback(data, false);
 
   if(add) {
-    Curl_llist_insert_next(llist, llist->tail, finfo, &infop->list);
+    Curl_llist_append(llist, finfo, &infop->list);
   }
   else {
     Curl_fileinfo_cleanup(infop);

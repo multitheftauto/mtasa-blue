@@ -27,14 +27,8 @@ extern CGameSA* pGame;
 
 int g_bOnlyUpdateRotations = false;
 
-CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL),
-m_pDefaultPedSound(NULL), m_iCustomMoveAnim(0)
-{
-    MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
-}
-
-CPedSA::CPedSA(CPedSAInterface* pPedInterface) : m_pPedIntelligence(NULL), m_pPedInterface(pPedInterface),
-m_pPedSound(NULL), m_pDefaultPedSound(NULL), m_iCustomMoveAnim(0)
+CPedSA::CPedSA(CPedSAInterface* pPedInterface) noexcept
+    : m_pPedInterface(pPedInterface)
 {
     MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
@@ -50,8 +44,6 @@ CPedSA::~CPedSA()
         delete m_pPedIntelligence;
     if (m_pPedSound)
         delete m_pPedSound;
-    if (m_pDefaultPedSound)
-        delete m_pDefaultPedSound;
 
     for (int i = 0; i < WEAPONSLOT_MAX; i++)
     {
@@ -94,7 +86,9 @@ void CPedSA::Init()
     CPedIntelligenceSAInterface* m_pPedIntelligenceInterface = (CPedIntelligenceSAInterface*)(dwPedIntelligence);
     m_pPedIntelligence = new CPedIntelligenceSA(m_pPedIntelligenceInterface, this);
     m_pPedSound = new CPedSoundSA(&pedInterface->pedSound);
-    m_pDefaultPedSound = new CPedSoundSA(&pedInterface->pedSound);
+
+    m_sDefaultVoiceType = m_pPedSound->GetVoiceTypeID();
+    m_sDefaultVoiceID = m_pPedSound->GetVoiceID();
 
     for (int i = 0; i < WEAPONSLOT_MAX; i++)
         m_pWeapons[i] = new CWeaponSA(&(pedInterface->Weapons[i]), this, (eWeaponSlot)i);
@@ -104,8 +98,12 @@ void CPedSA::Init()
 
 void CPedSA::SetModelIndex(DWORD dwModelIndex)
 {
-    DWORD dwFunction = FUNC_SetModelIndex;
+    // Delete any existing RwObject first
+    GetPedInterface()->DeleteRwObject();
+
+    // Set new model
     DWORD dwThis = (DWORD)GetInterface();
+    DWORD dwFunction = FUNC_SetModelIndex;
     _asm
     {
         mov     ecx, dwThis
@@ -120,16 +118,6 @@ void CPedSA::SetModelIndex(DWORD dwModelIndex)
         DWORD dwType = pModelInfo->pedType;
         GetPedInterface()->pedSound.m_bIsFemale = (dwType == 5 || dwType == 22);
     }
-}
-
-// Hacky thing done for the local player when changing model
-void CPedSA::RemoveGeometryRef()
-{
-    RpClump*    pClump = (RpClump*)GetInterface()->m_pRwObject;
-    RpAtomic*   pAtomic = (RpAtomic*)((pClump->atomics.root.next) - 0x8);
-    RpGeometry* pGeometry = pAtomic->geometry;
-    if (pGeometry->refs > 1)
-        pGeometry->refs--;
 }
 
 bool CPedSA::IsInWater()
@@ -197,7 +185,7 @@ CVehicle* CPedSA::GetVehicle()
 {
     if (((CPedSAInterface*)GetInterface())->pedFlags.bInVehicle)
     {
-        CVehicleSAInterface* vehicle = (CVehicleSAInterface*)(((CPedSAInterface*)GetInterface())->CurrentObjective);
+        CVehicleSAInterface* vehicle = (CVehicleSAInterface*)(((CPedSAInterface*)GetInterface())->pVehicle);
         if (vehicle)
         {
             SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)vehicle);
@@ -953,7 +941,7 @@ void CPedSA::SetVoice(const char* szVoiceType, const char* szVoice)
 
 void CPedSA::ResetVoice()
 {
-    SetVoice(m_pDefaultPedSound->GetVoiceTypeID(), m_pDefaultPedSound->GetVoiceID());
+    SetVoice(m_sDefaultVoiceType, m_sDefaultVoiceID);
 }
 
 // GetCurrentWeaponStat will only work if the game ped context is currently set to this ped
@@ -1113,4 +1101,35 @@ void CPedSA::StaticSetHooks()
 {
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
+}
+
+void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
+{
+    // Array of projectiles objects
+    CProjectileSAInterface** projectilesArray = (CProjectileSAInterface**)ARRAY_CProjectile;
+    CProjectileSAInterface*  pProjectileInterface;
+
+    // Array of projectiles infos
+    CProjectileInfoSAInterface* projectilesInfoArray = (CProjectileInfoSAInterface*)ARRAY_CProjectileInfo;
+    CProjectileInfoSAInterface* pProjectileInfoInterface;
+
+    // Loop through all projectiles
+    for (size_t i = 0; i < PROJECTILE_COUNT; i++)
+    {
+        pProjectileInterface = projectilesArray[i];
+
+        // is attached to our ped?
+        if (!pProjectileInterface || pProjectileInterface->m_pAttachedEntity != m_pInterface)
+            continue;
+
+        // index is always the same for both arrays
+        pProjectileInfoInterface = &projectilesInfoArray[i];
+
+        // We are only interested in satchels
+        if (!pProjectileInfoInterface || pProjectileInfoInterface->dwProjectileType != eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
+            continue;
+
+        // Push satchel into the array. There is no need to check the counter because for satchels it restarts until the player detonates the charges
+        satchelsList.push_back({pProjectileInterface, &pProjectileInterface->m_vecAttachedOffset, &pProjectileInterface->m_vecAttachedRotation});
+    }
 }

@@ -440,6 +440,16 @@ void CModelInfoSA::Remove()
     }
 }
 
+bool CModelInfoSA::UnloadUnused()
+{
+    if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
+    {
+        pGame->GetStreaming()->RemoveModel(m_dwModelID);
+        return true;
+    }
+    return false;
+}
+
 bool CModelInfoSA::IsLoaded()
 {
     if (DoIsLoaded())
@@ -1035,7 +1045,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = 0;
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 
@@ -1992,11 +2002,7 @@ void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
 
 unsigned short CModelInfoSA::GetObjectPropertiesGroup()
 {
-    unsigned short usGroup = GetInterface()->usDynamicIndex;
-    if (usGroup == 0xFFFF)
-        usGroup = 0;
-
-    return usGroup;
+    return GetInterface()->usDynamicIndex;
 }
 
 void CModelInfoSA::RestoreObjectPropertiesGroup()
@@ -2022,7 +2028,10 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 
 eModelInfoType CModelInfoSA::GetModelType()
 {
-    return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+    if (auto pInterface = GetInterface())
+        return ((eModelInfoType(*)())pInterface->VFTBL->GetModelType)();
+
+    return eModelInfoType::UNKNOWN;
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)

@@ -117,7 +117,7 @@ static Curl_recv oldap_recv;
  */
 
 const struct Curl_handler Curl_handler_ldap = {
-  "LDAP",                               /* scheme */
+  "ldap",                               /* scheme */
   oldap_setup_connection,               /* setup_connection */
   oldap_do,                             /* do_it */
   oldap_done,                           /* done */
@@ -130,7 +130,8 @@ const struct Curl_handler Curl_handler_ldap = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   oldap_disconnect,                     /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_LDAP,                            /* defport */
@@ -145,7 +146,7 @@ const struct Curl_handler Curl_handler_ldap = {
  */
 
 const struct Curl_handler Curl_handler_ldaps = {
-  "LDAPS",                              /* scheme */
+  "ldaps",                              /* scheme */
   oldap_setup_connection,               /* setup_connection */
   oldap_do,                             /* do_it */
   oldap_done,                           /* done */
@@ -158,7 +159,8 @@ const struct Curl_handler Curl_handler_ldaps = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   oldap_disconnect,                     /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_LDAPS,                           /* defport */
@@ -319,30 +321,11 @@ static CURLcode oldap_setup_connection(struct Curl_easy *data,
 {
   CURLcode result;
   LDAPURLDesc *lud;
-  struct ldapconninfo *li;
+  (void)conn;
 
   /* Early URL syntax check. */
   result = oldap_url_parse(data, &lud);
   ldap_free_urldesc(lud);
-
-  if(!result) {
-    li = calloc(1, sizeof(struct ldapconninfo));
-    if(!li)
-      result = CURLE_OUT_OF_MEMORY;
-    else {
-      li->proto = ldap_pvt_url_scheme2proto(data->state.up.scheme);
-      conn->proto.ldapc = li;
-      connkeep(conn, "OpenLDAP default");
-
-      /* Initialize the SASL storage */
-      Curl_sasl_init(&li->sasl, data, &saslldap);
-
-      /* Clear the TLS upgraded flag */
-      conn->bits.tls_upgraded = FALSE;
-
-      result = oldap_parse_login_options(conn);
-    }
-  }
 
   return result;
 }
@@ -537,7 +520,7 @@ static CURLcode oldap_perform_starttls(struct Curl_easy *data)
 static CURLcode oldap_connect(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
-  struct ldapconninfo *li = conn->proto.ldapc;
+  struct ldapconninfo *li;
   static const int version = LDAP_VERSION3;
   int rc;
   char *hosturl;
@@ -547,9 +530,32 @@ static CURLcode oldap_connect(struct Curl_easy *data, bool *done)
 
   (void)done;
 
-  hosturl = aprintf("ldap%s://%s:%d",
-                    conn->handler->flags & PROTOPT_SSL? "s": "",
-                    conn->host.name, conn->remote_port);
+  DEBUGASSERT(!conn->proto.ldapc);
+  li = calloc(1, sizeof(struct ldapconninfo));
+  if(!li)
+    return CURLE_OUT_OF_MEMORY;
+  else {
+    CURLcode result;
+    li->proto = ldap_pvt_url_scheme2proto(data->state.up.scheme);
+    conn->proto.ldapc = li;
+
+    /* Initialize the SASL storage */
+    Curl_sasl_init(&li->sasl, data, &saslldap);
+
+    /* Clear the TLS upgraded flag */
+    conn->bits.tls_upgraded = FALSE;
+
+    result = oldap_parse_login_options(conn);
+    if(result)
+      return result;
+  }
+
+  hosturl = aprintf("%s://%s%s%s:%d",
+                    conn->handler->scheme,
+                    conn->bits.ipv6_ip? "[": "",
+                    conn->host.name,
+                    conn->bits.ipv6_ip? "]": "",
+                    conn->remote_port);
   if(!hosturl)
     return CURLE_OUT_OF_MEMORY;
 
@@ -644,7 +650,7 @@ static CURLcode oldap_state_mechs_resp(struct Curl_easy *data,
     switch(code) {
     case LDAP_SIZELIMIT_EXCEEDED:
       infof(data, "Too many authentication mechanisms\n");
-      /* FALLTHROUGH */
+      FALLTHROUGH();
     case LDAP_SUCCESS:
     case LDAP_NO_RESULTS_RETURNED:
       if(Curl_sasl_can_authenticate(&li->sasl, data))
@@ -792,10 +798,13 @@ static CURLcode oldap_connecting(struct Curl_easy *data, bool *done)
         result = oldap_perform_bind(data, OLDAP_BIND);
       break;
     }
-    /* FALLTHROUGH */
+    result = Curl_ssl_cfilter_add(data, conn, FIRSTSOCKET);
+    if(result)
+      break;
+    FALLTHROUGH();
   case OLDAP_TLS:
     result = oldap_ssl_connect(data, OLDAP_TLS);
-    if(result && data->set.use_ssl != CURLUSESSL_TRY)
+    if(result)
       result = oldap_map_error(code, CURLE_USE_SSL_FAILED);
     else if(ssl_installed(conn)) {
       conn->bits.tls_upgraded = TRUE;
@@ -886,6 +895,15 @@ static CURLcode oldap_do(struct Curl_easy *data, bool *done)
 
   result = oldap_url_parse(data, &lud);
   if(!result) {
+#ifdef USE_SSL
+    if(ssl_installed(conn)) {
+      Sockbuf *sb;
+      /* re-install the libcurl SSL handlers into the sockbuf. */
+      ldap_get_option(li->ld, LDAP_OPT_SOCKBUF, &sb);
+      ber_sockbuf_add_io(sb, &ldapsb_tls, LBER_SBIOD_LEVEL_TRANSPORT, data);
+    }
+#endif
+
     rc = ldap_search_ext(li->ld, lud->lud_dn, lud->lud_scope,
                          lud->lud_filter, lud->lud_attrs, 0,
                          NULL, NULL, NULL, 0, &msgid);
@@ -903,7 +921,7 @@ static CURLcode oldap_do(struct Curl_easy *data, bool *done)
       else {
         lr->msgid = msgid;
         data->req.p.ldap = lr;
-        Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
+        Curl_xfer_setup(data, FIRSTSOCKET, -1, FALSE, -1);
         *done = TRUE;
       }
     }
@@ -947,18 +965,12 @@ static CURLcode client_write(struct Curl_easy *data,
     if(!len && plen && prefix[plen - 1] == ' ')
       plen--;
     result = Curl_client_write(data, CLIENTWRITE_BODY, (char *) prefix, plen);
-    if(!result)
-      data->req.bytecount += plen;
   }
   if(!result && value) {
     result = Curl_client_write(data, CLIENTWRITE_BODY, (char *) value, len);
-    if(!result)
-      data->req.bytecount += len;
   }
   if(!result && suffix) {
     result = Curl_client_write(data, CLIENTWRITE_BODY, (char *) suffix, slen);
-    if(!result)
-      data->req.bytecount += slen;
   }
   return result;
 }
@@ -1014,7 +1026,7 @@ static ssize_t oldap_recv(struct Curl_easy *data, int sockindex, char *buf,
     switch(code) {
     case LDAP_SIZELIMIT_EXCEEDED:
       infof(data, "There are more than %d entries", lr->nument);
-      /* FALLTHROUGH */
+      FALLTHROUGH();
     case LDAP_SUCCESS:
       data->req.size = data->req.bytecount;
       break;

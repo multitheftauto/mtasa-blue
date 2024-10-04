@@ -38,7 +38,6 @@ project "freetype"
 		"src/cache/ftcache.c",
 		"src/cff/cff.c",
 		"src/cid/type1cid.c",
-		"src/dlg/dlg.c",
 		"src/gxvalid/gxvalid.c",
 		"src/gzip/ftgzip.c",
 		"src/lzw/ftlzw.c",

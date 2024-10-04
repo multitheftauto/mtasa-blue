@@ -78,7 +78,7 @@ UNITTEST bool Curl_cidr6_match(const char *ipv6,
                                const char *network,
                                unsigned int bits)
 {
-#ifdef ENABLE_IPV6
+#ifdef USE_IPV6
   int bytes;
   int rest;
   unsigned char address[16];
@@ -216,7 +216,6 @@ bool Curl_check_noproxy(const char *name, const char *no_proxy,
           /* case C passes through, not a match */
           break;
         case TYPE_IPV4:
-          /* FALLTHROUGH */
         case TYPE_IPV6: {
           const char *check = token;
           char *slash;

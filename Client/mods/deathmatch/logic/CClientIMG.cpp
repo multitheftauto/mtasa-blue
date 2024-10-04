@@ -28,6 +28,11 @@ CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID)
 CClientIMG::~CClientIMG()
 {
     m_pImgManager->RemoveFromList(this);
+    Unlink();
+}
+
+void CClientIMG::Unlink()
+{
     if (IsStreamed())
         StreamDisable();
 
@@ -186,7 +191,7 @@ bool CClientIMG::StreamDisable()
 
     m_pImgManager->UpdateStreamerBufferSize();
 
-    g_pClientGame->RestreamWorld(true);
+    g_pClientGame->RestreamWorld();
     return true;
 }
 

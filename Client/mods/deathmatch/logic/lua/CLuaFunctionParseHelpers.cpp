@@ -824,6 +824,92 @@ ADD_ENUM(_D3DFORMAT::D3DFMT_G32R32F, "g32r32f")
 ADD_ENUM(_D3DFORMAT::D3DFMT_A32B32G32R32F, "a32b32g32r32f")
 IMPLEMENT_ENUM_CLASS_END("surface-format")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eRenderStage)
+ADD_ENUM(eRenderStage::PRE_FX, "prefx")
+ADD_ENUM(eRenderStage::POST_FX, "postfx")
+ADD_ENUM(eRenderStage::POST_GUI, "postgui")
+IMPLEMENT_ENUM_CLASS_END("render-stage")
+
+IMPLEMENT_ENUM_BEGIN(ePools)
+ADD_ENUM(ePools::BUILDING_POOL, "building")
+ADD_ENUM(ePools::PED_POOL, "ped")
+ADD_ENUM(ePools::OBJECT_POOL, "object")
+ADD_ENUM(ePools::DUMMY_POOL, "dummy")
+ADD_ENUM(ePools::VEHICLE_POOL, "vehicle")
+ADD_ENUM(ePools::COL_MODEL_POOL, "col-model")
+ADD_ENUM(ePools::TASK_POOL, "task")
+ADD_ENUM(ePools::EVENT_POOL, "event")
+ADD_ENUM(ePools::TASK_ALLOCATOR_POOL, "task-allocator")
+ADD_ENUM(ePools::PED_INTELLIGENCE_POOL, "ped-intelligence")
+ADD_ENUM(ePools::PED_ATTRACTOR_POOL, "ped-attractor")
+ADD_ENUM(ePools::ENTRY_INFO_NODE_POOL, "entry-info-node")
+ADD_ENUM(ePools::NODE_ROUTE_POOL, "node-route")
+ADD_ENUM(ePools::PATROL_ROUTE_POOL, "patrol-route")
+ADD_ENUM(ePools::POINT_ROUTE_POOL, "point-route")
+ADD_ENUM(ePools::POINTER_DOUBLE_LINK_POOL, "pointer-double-link-pool")
+ADD_ENUM(ePools::POINTER_SINGLE_LINK_POOL, "pointer-single-link-pool")
+ADD_ENUM(ePools::ENV_MAP_MATERIAL_POOL, "env-map-material")
+ADD_ENUM(ePools::ENV_MAP_ATOMIC_POOL, "env-map-atomic")
+ADD_ENUM(ePools::SPEC_MAP_MATERIAL_POOL, "spec-map-material")
+IMPLEMENT_ENUM_END("gta-pool")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eFxParticleSystems)
+ADD_ENUM(eFxParticleSystems::PRT_BLOOD, "blood")
+ADD_ENUM(eFxParticleSystems::PRT_BOATSPLASH, "boat_splash")
+ADD_ENUM(eFxParticleSystems::PRT_BUBBLE, "bubble")
+ADD_ENUM(eFxParticleSystems::PRT_DEBRIS, "car_debris")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKE, "collision_smoke")
+ADD_ENUM(eFxParticleSystems::PRT_GUNSHELL, "gunshell")
+ADD_ENUM(eFxParticleSystems::PRT_SAND, "sand")
+ADD_ENUM(eFxParticleSystems::PRT_SAND2, "sand2")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKEHUGE, "huge_smoke")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKE2, "smoke")
+ADD_ENUM(eFxParticleSystems::PRT_SPARK, "spark")
+ADD_ENUM(eFxParticleSystems::PRT_SPARK2, "spark2")
+ADD_ENUM(eFxParticleSystems::PRT_SPLASH, "splash")
+ADD_ENUM(eFxParticleSystems::PRT_WAKE, "wake")
+ADD_ENUM(eFxParticleSystems::PRT_WATERSPLASH, "water_splash")
+ADD_ENUM(eFxParticleSystems::PRT_WHEELDIRT, "wheel_dirt")
+ADD_ENUM(eFxParticleSystems::PRT_GLASS, "glass")
+IMPLEMENT_ENUM_CLASS_END("particle-system")
+
+IMPLEMENT_ENUM_BEGIN(eWorldProperty)
+ADD_ENUM(AMBIENT_COLOR, "AmbientColor")
+ADD_ENUM(AMBIENT_OBJ_COLOR, "AmbientObjColor")
+ADD_ENUM(DIRECTIONAL_COLOR, "DirectionalColor")
+ADD_ENUM(SPRITE_SIZE, "SpriteSize")
+ADD_ENUM(SPRITE_BRIGHTNESS, "SpriteBrightness")
+ADD_ENUM(POLE_SHADOW_STRENGTH, "PoleShadowStrength")
+ADD_ENUM(SHADOW_STRENGTH, "ShadowStrength")
+ADD_ENUM(SHADOWS_OFFSET, "ShadowsOffset")
+ADD_ENUM(LIGHTS_ON_GROUND, "LightsOnGround")
+ADD_ENUM(LOW_CLOUDS_COLOR, "LowCloudsColor")
+ADD_ENUM(BOTTOM_CLOUDS_COLOR, "BottomCloudsColor")
+ADD_ENUM(CLOUDS_ALPHA1, "CloudsAlpha")
+ADD_ENUM(ILLUMINATION, "Illumination")
+ADD_ENUM(WEATHER_WET_ROADS, "WetRoads")
+ADD_ENUM(WEATHER_FOGGYNESS, "Foggyness")
+ADD_ENUM(WEATHER_FOG, "Fog")
+ADD_ENUM(WEATHER_RAIN_FOG, "RainFog")
+ADD_ENUM(WEATHER_WATER_FOG, "WaterFog")
+ADD_ENUM(WEATHER_SANDSTORM, "Sandstorm")
+ADD_ENUM(WEATHER_RAINBOW, "Rainbow")
+IMPLEMENT_ENUM_END("world-property")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eModelLoadState)
+ADD_ENUM(eModelLoadState::LOADSTATE_NOT_LOADED, "unloaded")
+ADD_ENUM(eModelLoadState::LOADSTATE_LOADED, "loaded")
+ADD_ENUM(eModelLoadState::LOADSTATE_REQUESTED, "requested")
+ADD_ENUM(eModelLoadState::LOADSTATE_READING, "reading")
+ADD_ENUM(eModelLoadState::LOADSTATE_FINISHING, "finishing")
+IMPLEMENT_ENUM_CLASS_END("model-load-state")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(PreloadAreaOption)
+ADD_ENUM(PreloadAreaOption::MODELS, "models")
+ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
+ADD_ENUM(PreloadAreaOption::ALL, "all")
+IMPLEMENT_ENUM_CLASS_END("preload-area-option")
+
 //
 // CResource from userdata
 //
@@ -1091,6 +1177,31 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         }
     }
     return true;
+}
+
+//
+// Check min client is correct
+// Thrown a error if below required
+//
+void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* szReason)
+{
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return;
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return;
+    
+    if (pResource->GetMinClientReq() < szVersionReq)
+    {
+        #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+        SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client %s because %s)",
+                                szVersionReq, szReason);
+        throw std::invalid_argument(err);
+        #endif
+    }
+    
 }
 
 //

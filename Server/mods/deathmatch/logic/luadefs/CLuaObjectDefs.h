@@ -20,12 +20,15 @@ public:
 
     // Object create/destroy functions
     LUA_DECLARE(CreateObject);
+    static bool RespawnObject(CObject* const pObject) noexcept;
 
     // Object get functions
     LUA_DECLARE(GetObjectName);
     LUA_DECLARE(GetObjectRotation);
     LUA_DECLARE(GetObjectScale);
     static bool IsObjectBreakable(CObject* const pObject);
+    static bool IsObjectMoving(CObject* const pObject);
+    static bool IsObjectRespawnable(CObject* const pObject) noexcept;
 
     // Object set functions
     LUA_DECLARE(SetObjectName);
@@ -34,4 +37,6 @@ public:
     static bool SetObjectBreakable(CObject* const pObject, const bool bBreakable);
     LUA_DECLARE(MoveObject);
     LUA_DECLARE(StopObject);
+    static bool BreakObject(CObject* const pObject);
+    static bool ToggleObjectRespawn(CObject* const pObject, const bool bRespawn) noexcept;
 };

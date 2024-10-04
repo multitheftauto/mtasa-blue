@@ -13,6 +13,7 @@
 #include "CLuaVehicleDefs.h"
 #include "CLuaPedDefs.h"
 #include "CLuaPlayerDefs.h"
+#include "luadefs/CLuaCryptDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
 #include <lua/CLuaFunctionParser.h>
 

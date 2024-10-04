@@ -97,7 +97,7 @@ static struct altsvc *altsvc_createid(const char *srchost,
                                       unsigned int srcport,
                                       unsigned int dstport)
 {
-  struct altsvc *as = calloc(sizeof(struct altsvc), 1);
+  struct altsvc *as = calloc(1, sizeof(struct altsvc));
   size_t hlen;
   size_t dlen;
   if(!as)
@@ -106,9 +106,11 @@ static struct altsvc *altsvc_createid(const char *srchost,
   dlen = strlen(dsthost);
   DEBUGASSERT(hlen);
   DEBUGASSERT(dlen);
-  if(!hlen || !dlen)
+  if(!hlen || !dlen) {
     /* bad input */
+    free(as);
     return NULL;
+  }
   if((hlen > 2) && srchost[0] == '[') {
     /* IPv6 address, strip off brackets */
     srchost++;
@@ -123,15 +125,13 @@ static struct altsvc *altsvc_createid(const char *srchost,
     dlen -= 2;
   }
 
-  as->src.host = Curl_memdup(srchost, hlen + 1);
+  as->src.host = Curl_memdup0(srchost, hlen);
   if(!as->src.host)
     goto error;
-  as->src.host[hlen] = 0;
 
-  as->dst.host = Curl_memdup(dsthost, dlen + 1);
+  as->dst.host = Curl_memdup0(dsthost, dlen);
   if(!as->dst.host)
     goto error;
-  as->dst.host[dlen] = 0;
 
   as->src.alpnid = srcalpnid;
   as->dst.alpnid = dstalpnid;
@@ -191,7 +191,7 @@ static CURLcode altsvc_add(struct altsvcinfo *asi, char *line)
       as->expires = expires;
       as->prio = prio;
       as->persist = persist ? 1 : 0;
-      Curl_llist_insert_next(&asi->list, asi->list.tail, as, &as->node);
+      Curl_llist_append(&asi->list, as, &as->node);
     }
   }
 
@@ -209,7 +209,6 @@ static CURLcode altsvc_add(struct altsvcinfo *asi, char *line)
 static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
 {
   CURLcode result = CURLE_OK;
-  char *line = NULL;
   FILE *fp;
 
   /* we need a private copy of the file name so that the altsvc cache file
@@ -221,11 +220,10 @@ static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
 
   fp = fopen(file, FOPEN_READTEXT);
   if(fp) {
-    line = malloc(MAX_ALTSVC_LINE);
-    if(!line)
-      goto fail;
-    while(Curl_get_line(line, MAX_ALTSVC_LINE, fp)) {
-      char *lineptr = line;
+    struct dynbuf buf;
+    Curl_dyn_init(&buf, MAX_ALTSVC_LINE);
+    while(Curl_get_line(&buf, fp)) {
+      char *lineptr = Curl_dyn_ptr(&buf);
       while(*lineptr && ISBLANK(*lineptr))
         lineptr++;
       if(*lineptr == '#')
@@ -234,16 +232,10 @@ static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
 
       altsvc_add(asi, lineptr);
     }
-    free(line); /* free the line buffer */
+    Curl_dyn_free(&buf); /* free the line buffer */
     fclose(fp);
   }
   return result;
-
-fail:
-  Curl_safefree(asi->filename);
-  free(line);
-  fclose(fp);
-  return CURLE_OUT_OF_MEMORY;
 }
 
 /*
@@ -260,7 +252,7 @@ static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
   CURLcode result = Curl_gmtime(as->expires, &stamp);
   if(result)
     return result;
-#ifdef ENABLE_IPV6
+#ifdef USE_IPV6
   else {
     char ipv6_unused[16];
     if(1 == Curl_inet_pton(AF_INET6, as->dst.host, ipv6_unused)) {
@@ -301,7 +293,7 @@ static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
  */
 struct altsvcinfo *Curl_altsvc_init(void)
 {
-  struct altsvcinfo *asi = calloc(sizeof(struct altsvcinfo), 1);
+  struct altsvcinfo *asi = calloc(1, sizeof(struct altsvcinfo));
   if(!asi)
     return NULL;
   Curl_llist_init(&asi->list, NULL);
@@ -311,7 +303,7 @@ struct altsvcinfo *Curl_altsvc_init(void)
 #ifdef USE_HTTP2
     | CURLALTSVC_H2
 #endif
-#ifdef ENABLE_QUIC
+#ifdef USE_HTTP3
     | CURLALTSVC_H3
 #endif
     ;
@@ -335,9 +327,6 @@ CURLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file)
 CURLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl)
 {
   DEBUGASSERT(asi);
-  if(!ctrl)
-    /* unexpected */
-    return CURLE_BAD_FUNCTION_ARGUMENT;
   asi->flags = ctrl;
   return CURLE_OK;
 }
@@ -654,7 +643,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
                account. [See RFC 7838 section 3.1] */
             as->expires = maxage + time(NULL);
             as->persist = persist;
-            Curl_llist_insert_next(&asi->list, asi->list.tail, as, &as->node);
+            Curl_llist_append(&asi->list, as, &as->node);
             infof(data, "Added alt-svc: %s:%d over %s", dsthost, dstport,
                   Curl_alpnid2str(dstalpnid));
           }

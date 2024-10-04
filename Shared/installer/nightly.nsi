@@ -369,6 +369,9 @@ Function .onInstSuccess
 
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
+
+    # Add 'MaxLoaderThreads' DWORD value for gta_sa.exe to disable multi-threaded loading of DLLs.
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads" 1
 	
 	# Initilize variables holding paths and names
 	Call MTAInitFileNamesAndPaths
@@ -685,9 +688,12 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
 
 	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
-        File "${FILES_ROOT}\mta\CEF\chrome_100_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\chrome_200_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\resources.pak"
+	# Not currently using \mta\cef\ due to https://github.com/chromiumembedded/cef/issues/3749#issuecomment-2278568964 (it's already crashing and likely won't remain supported)
+        SetOutPath "$INSTDIR\MTA"
+
+        File "${FILES_ROOT}\mta\chrome_100_percent.pak"
+        File "${FILES_ROOT}\mta\chrome_200_percent.pak"
+        File "${FILES_ROOT}\mta\resources.pak"
 
 	# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
         #File "${FILES_ROOT}\mta\CEF\cef.pak"
@@ -849,6 +855,8 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
+            File "${SERVER_FILES_ROOT}\mods\deathmatch\libcrypto-3.dll"
+            File "${SERVER_FILES_ROOT}\mods\deathmatch\libssl-3.dll"
         !endif
 
         ;Only overwrite the following files if previous versions were bugged and explicitly need replacing
@@ -1083,6 +1091,8 @@ Section Uninstall
         Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
         Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
         Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\libcrypto-3.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\libssl-3.dll"
         Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
         Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
 
@@ -1097,6 +1107,8 @@ Section Uninstall
         Delete "$INSTDIR\server\x64\dbconmy.dll"
         Delete "$INSTDIR\server\x64\deathmatch.dll"
         Delete "$INSTDIR\server\x64\libmysql.dll"
+        Delete "$INSTDIR\server\x64\libcrypto-3-x64.dll"
+        Delete "$INSTDIR\server\x64\libssl-3-x64.dll"
         Delete "$INSTDIR\server\x64\lua5.1.dll"
         Delete "$INSTDIR\server\x64\pcre3.dll"
         RmDir "$INSTDIR\server\x64"
@@ -1135,6 +1147,10 @@ Section Uninstall
         ${If} $0 == "$INSTDIR\Multi Theft Auto.exe"
             DeleteRegKey HKCR "mtasa"
         ${EndIf}
+
+        # Remove 'MaxLoaderThreads' DWORD value for gta_sa.exe.
+        DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads"
+        DeleteRegKey /ifempty HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe"
 
         ${GameExplorer_RemoveGame} ${GUID}
 

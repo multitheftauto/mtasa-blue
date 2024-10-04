@@ -35,20 +35,28 @@ bool CommandData::CheckArgs(StringList *Args,bool Dir,const std::wstring &CheckN
       }
       else
       {
+        // This code doesn't allow to apply -n and -x wildcard masks without
+        // trailing slash to folders unless these masks are * and *.*.
+        // See the changes history below.
         // 2023.03.26: Previously we removed this code completely to let
-        // -npath\* include empty folders in 'path' too. But then we received
-        // an email from user not willing -x*.avi to exclude folders like
-        // dir.avi with non-avi files. Also rar.txt mentions that masks like
-        // *.avi exclude only files. Initially we wanted masks like -npath\*
-        // or -xpath\* to match the entire contents of path including empty
-        // folders and added the special check for "*" and "*.*".
-        // But this is not very straightforward, when *.* and *.avi are
-        // processed differently, especially taking into account that
-        // we can specify the exact folder name without wildcards to process
-        // it and masks like 'dir*\' can be used to exclude folders.
-        // So we decided to skip all usual wildcard masks for folders.
+        // 'rar a arc dir -ndir\path\*' include empty folders in 'path' too.
+        // But then we received an email from user not willing -x*.avi to
+        // exclude folders like dir.avi with non-avi files. Also rar.txt
+        // mentions that masks like *.avi exclude only files. Initially
+        // we wanted masks like -npath\* or -xpath\* to match the entire
+        // contents of path including empty folders and added the special
+        // check for "*" and "*.*". But this is not very straightforward,
+        // when *.* and *.avi are processed differently, especially taking
+        // into account that we can specify the exact folder name without
+        // wildcards to process it and masks like 'dir*\' can be used to
+        // exclude folders. So we decided to skip all usual wildcard masks
+        // for folders.
+        // 2023.11.22: We returned the special check for "*" and "*.*",
+        // because users expected 'rar a arc dir -xdir\*' to exclude
+        // everything including subfolders in 'dir'. For now we returned it
+        // both for -n and -x, but we can limit it to -x only if needed.
         std::wstring Name=PointToName(CurMask);
-        if (IsWildcard(Name)/* && wcscmp(Name,L"*")!=0 && wcscmp(Name,L"*.*")!=0*/)
+        if (IsWildcard(Name) && Name!=L"*" && Name!=L"*.*")
          continue;
       }
     }

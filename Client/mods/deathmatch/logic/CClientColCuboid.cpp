@@ -70,7 +70,7 @@ void CClientColCuboid::DebugRender(const CVector& vecPosition, float fDrawRadius
             {
                 const CVector& vecBegin = cornerPoints[i] * vecMult + vecAdd;
                 const CVector& vecEnd = cornerPoints[(i + 1) % 4] * vecMult + vecAdd;
-                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
             }
         }
     }
@@ -89,7 +89,7 @@ void CClientColCuboid::DebugRender(const CVector& vecPosition, float fDrawRadius
             {
                 const CVector& vecBegin = cornerPoints[i] * vecMult + vecAdd;
                 const CVector& vecEnd = cornerPoints[(i + 1) % 4] * vecMult + vecAdd;
-                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
             }
         }
     }
@@ -108,7 +108,7 @@ void CClientColCuboid::DebugRender(const CVector& vecPosition, float fDrawRadius
             {
                 const CVector& vecBegin = cornerPoints[i] * vecMult + vecAdd;
                 const CVector& vecEnd = cornerPoints[(i + 1) % 4] * vecMult + vecAdd;
-                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
             }
         }
     }

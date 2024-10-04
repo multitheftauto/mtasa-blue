@@ -20,19 +20,21 @@ UIASKREP_RESULT uiAskReplaceEx(CommandData *Cmd,std::wstring &Name,int64 FileSiz
     return UIASKREP_R_REPLACE;
 #endif
 
-  // This check must be after OVERWRITE_AUTORENAME processing or -y switch
-  // would override -or.
-  if (Cmd->AllYes || Cmd->Overwrite==OVERWRITE_ALL)
-  {
-    PrepareToDelete(Name);
-    return UIASKREP_R_REPLACE;
-  }
-
   std::wstring NewName=Name;
-  UIASKREP_RESULT Choice=uiAskReplace(NewName,FileSize,FileTime,Flags);
+  UIASKREP_RESULT Choice=Cmd->AllYes || Cmd->Overwrite==OVERWRITE_ALL ? 
+                  UIASKREP_R_REPLACE : uiAskReplace(NewName,FileSize,FileTime,Flags);
 
   if (Choice==UIASKREP_R_REPLACE || Choice==UIASKREP_R_REPLACEALL)
+  {
     PrepareToDelete(Name);
+
+    // Overwrite the link itself instead of its target.
+    // For normal files we prefer to inherit file attributes, permissions
+    // and hard links.
+    FindData FD;
+    if (FindFile::FastFind(Name,&FD,true) && FD.IsLink)
+      DelFile(Name);
+  }
 
   if (Choice==UIASKREP_R_REPLACEALL)
   {

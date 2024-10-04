@@ -69,31 +69,24 @@ curl_socket_t curlx_sitosk(int i);
 
 #endif /* USE_WINSOCK */
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 ssize_t curlx_read(int fd, void *buf, size_t count);
 
 ssize_t curlx_write(int fd, const void *buf, size_t count);
 
+#endif /* _WIN32 */
+
+#endif /* HEADER_CURL_WARNLESS_H */
+
+#ifndef HEADER_CURL_WARNLESS_H_REDEFS
+#define HEADER_CURL_WARNLESS_H_REDEFS
+
+#if defined(_WIN32)
 #undef  read
 #define read(fd, buf, count)  curlx_read(fd, buf, count)
 #undef  write
 #define write(fd, buf, count) curlx_write(fd, buf, count)
+#endif
 
-#endif /* WIN32 */
-
-#if defined(__INTEL_COMPILER) && defined(__unix__)
-
-int curlx_FD_ISSET(int fd, fd_set *fdset);
-
-void curlx_FD_SET(int fd, fd_set *fdset);
-
-void curlx_FD_ZERO(fd_set *fdset);
-
-unsigned short curlx_htons(unsigned short usnum);
-
-unsigned short curlx_ntohs(unsigned short usnum);
-
-#endif /* __INTEL_COMPILER && __unix__ */
-
-#endif /* HEADER_CURL_WARNLESS_H */
+#endif /* HEADER_CURL_WARNLESS_H_REDEFS */

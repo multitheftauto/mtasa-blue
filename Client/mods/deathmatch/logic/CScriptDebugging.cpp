@@ -123,7 +123,9 @@ void CScriptDebugging::UpdateLogOutput()
     while (m_DuplicateLineFilter.PopOutputLine(line))
     {
         // Log it to the file if enough level
-        if (m_uiLogFileLevel >= line.uiMinimumDebugLevel)
+        bool sufficientDebugLevel = CheckForSufficientDebugLevel(m_uiLogFileLevel, line.uiMinimumDebugLevel);
+
+        if (sufficientDebugLevel)
         {
             PrintLog(line.strText);
         }

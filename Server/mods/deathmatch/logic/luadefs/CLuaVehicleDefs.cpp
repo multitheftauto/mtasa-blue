@@ -94,6 +94,9 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleRespawnRotation", SetVehicleRespawnRotation},
         {"getVehicleRespawnPosition", GetVehicleRespawnPosition},
         {"getVehicleRespawnRotation", GetVehicleRespawnRotation},
+        {"isVehicleRespawnable", ArgumentParser<IsVehicleRespawnable>},
+        {"getVehicleRespawnDelay", ArgumentParser<GetVehicleRespawnDelay>},
+        {"getVehicleIdleRespawnDelay", ArgumentParser<GetVehicleIdleRespawnDelay>},
         {"respawnVehicle", RespawnVehicle},
         {"resetVehicleExplosionTime", ResetVehicleExplosionTime},
         {"resetVehicleIdleTime", ResetVehicleIdleTime},
@@ -201,6 +204,9 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getHandling", "getVehicleHandling");
     lua_classfunction(luaVM, "getRespawnPosition", "getVehicleRespawnPosition");
     lua_classfunction(luaVM, "getRespawnRotation", "getVehicleRespawnRotation");
+    lua_classfunction(luaVM, "isRespawnable", "isVehicleRespawnable");
+    lua_classfunction(luaVM, "getRespawnDelay", "getVehicleRespawnDelay");
+    lua_classfunction(luaVM, "getIdleRespawnDelay", "getVehicleIdleRespawnDelay");
 
     lua_classfunction(luaVM, "setColor", "setVehicleColor");
     lua_classfunction(luaVM, "setDamageProof", "setVehicleDamageProof");
@@ -264,8 +270,9 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "turretPosition", "setVehicleTurretPosition", "getVehicleTurretPosition");
     lua_classvariable(luaVM, "turnVelocity", "setVehicleTurnVelocity", "getVehicleTurnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
     lua_classvariable(luaVM, "overrideLights", "setVehicleOverrideLights", "getVehicleOverrideLights");
-    lua_classvariable(luaVM, "idleRespawnDelay", "setVehicleIdleRespawnDelay", NULL);
-    lua_classvariable(luaVM, "respawnDelay", "setVehicleRespawnDelay", NULL);
+    lua_classvariable(luaVM, "idleRespawnDelay", "setVehicleIdleRespawnDelay", "getVehicleIdleRespawnDelay");
+    lua_classvariable(luaVM, "respawnable", "toggleVehicleRespawn", "isVehicleRespawnable");
+    lua_classvariable(luaVM, "respawnDelay", "setVehicleRespawnDelay", "getVehicleRespawnDelay");
     lua_classvariable(luaVM, "respawnPosition", "setVehicleRespawnPosition", "getVehicleRespawnPosition", SetVehicleRespawnPosition,
                       OOP_GetVehicleRespawnPosition);
     lua_classvariable(luaVM, "respawnRotation", "setVehicleRespawnRotation", "getVehicleRespawnRotation", SetVehicleRespawnRotation,
@@ -290,6 +297,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
     SString strNumberPlate;
     uchar   ucVariant;
     uchar   ucVariant2;
+    bool    bSynced;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -303,6 +311,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
     }
     argStream.ReadNumber(ucVariant, 254);
     argStream.ReadNumber(ucVariant2, 254);
+    argStream.ReadBool(bSynced, true);
 
     if (!argStream.HasErrors())
     {
@@ -316,7 +325,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
                 {
                     // Create the vehicle and return its handle
                     CVehicle* pVehicle =
-                        CStaticFunctionDefinitions::CreateVehicle(pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2);
+                        CStaticFunctionDefinitions::CreateVehicle(pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2, bSynced);
                     if (pVehicle)
                     {
                         CElementGroup* pGroup = pResource->GetElementGroup();
@@ -2347,6 +2356,21 @@ int CLuaVehicleDefs::SetVehicleRespawnRotation(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaVehicleDefs::IsVehicleRespawnable(CVehicle* vehicle) noexcept
+{
+    return vehicle->GetRespawnEnabled();
+}
+
+uint32_t CLuaVehicleDefs::GetVehicleRespawnDelay(CVehicle* vehicle) noexcept
+{
+    return vehicle->GetBlowRespawnInterval();
+}
+
+uint32_t CLuaVehicleDefs::GetVehicleIdleRespawnDelay(CVehicle* vehicle) noexcept
+{
+    return vehicle->GetIdleRespawnInterval();
 }
 
 int CLuaVehicleDefs::SetVehicleIdleRespawnDelay(lua_State* luaVM)

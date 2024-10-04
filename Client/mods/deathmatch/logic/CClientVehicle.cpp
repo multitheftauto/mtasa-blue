@@ -13,6 +13,7 @@
 #include <game/CBikeHandlingEntry.h>
 #include <game/CBoat.h>
 #include <game/CBoatHandlingEntry.h>
+#include <game/CCarEnterExit.h>
 #include <game/CDoor.h>
 #include <game/CFlyingHandlingEntry.h>
 #include <game/CHandlingEntry.h>
@@ -1464,12 +1465,33 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus);
 
                 // Update the wheel's visibility
-                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING));
+                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, ucStatus != DT_WHEEL_MISSING &&
+                    (m_ComponentData.empty() || m_ComponentData[GetComponentNameForWheel(ucWheel)].m_bVisible));
             }
             else if (m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2)
                 m_pVehicle->SetBikeWheelStatus(ucWheel, ucGTAStatus);
         }
         m_ucWheelStates[ucWheel] = ucStatus;
+    }
+}
+
+//
+// Returns component name for eWheelPosition enum
+//
+SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) const noexcept
+{
+    switch (ucWheel)
+    {
+        case FRONT_LEFT_WHEEL:
+            return "wheel_lf_dummy";
+        case FRONT_RIGHT_WHEEL:
+            return "wheel_rf_dummy";
+        case REAR_LEFT_WHEEL:
+            return "wheel_lb_dummy";
+        case REAR_RIGHT_WHEEL:
+            return "wheel_rb_dummy";
+        default:
+            return "";
     }
 }
 
@@ -1593,6 +1615,14 @@ bool CClientVehicle::SetRotorSpeed(float fSpeed)
     }
 }
 
+bool CClientVehicle::SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept
+{
+    if (!m_pVehicle)
+        return false;
+
+    return m_pVehicle->SetVehicleWheelRotation(fRot1, fRot2, fRot3, fRot4);
+}
+
 bool CClientVehicle::IsHeliSearchLightVisible()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
@@ -1613,6 +1643,10 @@ void CClientVehicle::SetCollisionEnabled(bool bCollisionEnabled)
 {
     if (m_pVehicle && m_bHasAdjustableProperty)
         m_pVehicle->SetUsesCollision(bCollisionEnabled);
+
+    // Remove all contacts
+    for (const auto& ped : m_Contacts)
+        RemoveContact(ped);
 
     m_bIsCollisionEnabled = bCollisionEnabled;
 }
@@ -5001,4 +5035,18 @@ void CClientVehicle::ResetWheelScale()
         m_fWheelScale = 1.0f;
 
     m_bWheelScaleChanged = false;
+}
+
+CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
+{
+    static const uint32_t lookup[4] = {10, 8, 11, 9};
+    assert(entryPointIndex < 4);
+    const std::uint32_t saDoorIndex = lookup[entryPointIndex];
+
+    CVector      entryPoint;
+    CVehicle*    gameVehicle = GetGameVehicle();
+
+    g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(entryPoint, gameVehicle, saDoorIndex);
+
+    return entryPoint;
 }

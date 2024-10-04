@@ -74,7 +74,7 @@ bool uiDictLimit(CommandData *Cmd,const std::wstring &FileName,uint64 DictSize,u
 
 
 #ifndef SFX_MODULE
-const wchar *uiGetMonthName(int Month)
+const wchar *uiGetMonthName(uint Month)
 {
   return L"";
 }
