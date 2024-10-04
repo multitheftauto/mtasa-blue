@@ -249,41 +249,35 @@ bool CMainConfig::Load()
     // Handle the <client_file> nodes
     currentNode = nullptr;
     currentIndex = 0;
-    do
+    while (currentNode = m_pRootNode->FindSubNode("client_file", currentIndex++))
     {
-        // Grab the current script node
-        currentNode = m_pRootNode->FindSubNode("client_file", currentIndex++);
-        if (currentNode)
+        // Grab its "name" attribute
+        CXMLAttribute* attribute = currentNode->GetAttributes().Find("name");
+        SString name = attribute ? attribute->GetValue() : SString{};
+        name = name.Replace("\\", "/").ToLower();
+
+        // Grab its "verify" attribute
+        attribute = currentNode->GetAttributes().Find("verify");
+        SString verify = attribute ? attribute->GetValue() : SString{};
+        bool shouldVerify = verify == "true" || verify == "yes" || verify == "1";
+
+        // Find bitnumber
+        bool found = false;
+        for (uint i = 0; i < NUMELMS(gtaDataFiles); i++)
         {
-            // Grab its "name" attribute
-            CXMLAttribute* pAttribute = currentNode->GetAttributes().Find("name");
-            SString        strName = pAttribute ? pAttribute->GetValue() : "";
-            strName = strName.Replace("\\", "/").ToLower();
-
-            // Grab its "verify" attribute
-            pAttribute = currentNode->GetAttributes().Find("verify");
-            SString strVerify = pAttribute ? pAttribute->GetValue() : "";
-            bool    bVerify = strVerify == "true" || strVerify == "yes" || strVerify == "1";
-
-            // Find bitnumber
-            bool bFound = false;
-            for (uint i = 0; i < NUMELMS(gtaDataFiles); i++)
+            if (name == gtaDataFiles[i].szRealFilename)
             {
-                if (strName == gtaDataFiles[i].szRealFilename)
-                {
-                    if (bVerify)
-                        m_iEnableClientChecks |= 1 << gtaDataFiles[i].iBitNumber;
-                    else
-                        m_iEnableClientChecks &= ~(1 << gtaDataFiles[i].iBitNumber);
-                    bFound = true;
-                    break;
-                }
+                if (shouldVerify)
+                    m_iEnableClientChecks |= 1 << gtaDataFiles[i].iBitNumber;
+                else
+                    m_iEnableClientChecks &= ~(1 << gtaDataFiles[i].iBitNumber);
+                found = true;
+                break;
             }
-
-            if (!bFound)
-                CLogger::ErrorPrintf("Unknown client_file '%s'\n", *strName);
         }
-    } while (currentNode);
+        if (!found)
+            CLogger::ErrorPrintf("Unknown client_file '%s'\n", *name);
+    }
 
     // allow_gta3_img_mods
     SString strImgMods;
