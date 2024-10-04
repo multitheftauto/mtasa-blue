@@ -358,10 +358,6 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
 // Replaces a vehicle/weapon/ped model
 bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction)
 {
-    auto CVehicleModelInfo_CVehicleStructure_Destructor = (void(__thiscall*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C7410;
-    auto CVehicleModelInfo_CVehicleStructure_release = (void(__cdecl*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C9580;
-    auto CBaseModelInfo_SetClump = (void(__thiscall*)(CBaseModelInfoSAInterface * pThis, RpClump * clump)) dwSetClumpFunction;
-
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
     if (pModelInfo)
     {
@@ -387,14 +383,22 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
                 if (pVehicleModelInfoInterface->pVisualInfo)
                 {
                     auto pVisualInfo = pVehicleModelInfoInterface->pVisualInfo;
-                    CVehicleModelInfo_CVehicleStructure_Destructor(pVisualInfo);
-                    CVehicleModelInfo_CVehicleStructure_release(pVisualInfo);
+
+                    auto args = PrepareSignature(pVisualInfo);
+                    // Call CVehicleModelInfo_CVehicleStructure_Destructor
+                    CallGTAFunction<void, __THISCALL>(0x4C7410, args);
+
+                    // Call CVehicleModelInfo_CVehicleStructure_release
+                    CallGTAFunction<void, __CDECL>(0x4C9580, args);
+
                     pVehicleModelInfoInterface->pVisualInfo = nullptr;
                 }
             }
 
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
-            CBaseModelInfo_SetClump(pModelInfoInterface, pNewClone);
+
+            // Call CBaseModelInfo_SetClump 
+            CallGTAFunction<void, __THISCALL>(dwSetClumpFunction, PrepareSignature(pModelInfoInterface, pNewClone));
             RpClumpDestroy(pOldClump);
         }
     }
@@ -769,7 +773,7 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
     }
 
     if (bLoadedModel)
-        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+        CallGTAFunction<void, __CDECL>(FUNC_RemoveModel, PrepareSignature(usModelId));
 }
 
 ////////////////////////////////////////////////////////////////
@@ -838,7 +842,7 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     }
 
     if (bLoadedModel)
-        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+        CallGTAFunction<void, __CDECL>(FUNC_RemoveModel, PrepareSignature(usModelId));
 
     return true;
 }

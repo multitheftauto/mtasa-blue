@@ -108,7 +108,8 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
 
     // Call virtual destructor
-    ((void*(__thiscall*)(void*, char))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 0);
+    auto args = PrepareSignature(pInterface, 0);
+    CallGTAFunction<void*, __THISCALL>(pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR, args);
 
     // Remove col reference
     auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
@@ -137,8 +138,7 @@ void CBuildingsPoolSA::RemoveAllBuildings()
     pGame->GetPlantManager()->RemoveAllPlants();
 
     // Remove all shadows
-    using CStencilShadowObjects_dtorAll = void* (*)();
-    ((CStencilShadowObjects_dtorAll)0x711390)();
+    CallGTAFunction<void*, __CDECL>(0x711390, PrepareSignature());
 
     m_pOriginalBuildingsBackup = std::make_unique<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>>();
 

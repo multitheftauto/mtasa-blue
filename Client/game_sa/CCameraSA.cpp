@@ -358,7 +358,8 @@ float CCameraSA::GetCameraRotation()
 RwMatrix* CCameraSA::GetLTM()
 {
     // RwFrameGetLTM
-    return ((RwMatrix*(_cdecl*)(void*))0x7F0990)(GetInterface()->m_pRwCamera->object.object.parent);
+    auto args = PrepareSignature(GetInterface()->m_pRwCamera->object.object.parent);
+    return CallGTAFunction<RwMatrix*, __CDECL>(0x7F0990, args);
 }
 
 CEntity* CCameraSA::GetTargetEntity()
@@ -450,8 +451,8 @@ void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
     if (radius <= 0.0f)
         return ResetShakeCamera();
 
-    using ShakeCamera_t = void(__thiscall*)(CCameraSAInterface*, float radius, float x, float y, float z);
-    ((ShakeCamera_t)FUNC_ShakeCam)(cameraInterface, radius, x, y, z);
+    auto args = PrepareSignature(cameraInterface, radius, x, y, z);
+    CallGTAFunction<void, __THISCALL>(FUNC_ShakeCam, args);
 }
 
 void CCameraSA::ResetShakeCamera() noexcept

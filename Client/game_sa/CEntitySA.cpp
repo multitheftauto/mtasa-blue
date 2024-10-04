@@ -25,22 +25,24 @@ extern CGameSA* pGame;
 
 void CEntitySAInterface::TransformFromObjectSpace(CVector& outPosn, CVector const& offset)
 {
-    ((void(__thiscall*)(CEntitySAInterface*, CVector&, CVector const&))0x533560)(this, outPosn, offset);
+    auto args = PrepareSignature(this, &outPosn, &offset);
+    CallGTAFunction<void, __THISCALL>(0x533560, args);
 }
 
 CVector* CEntitySAInterface::GetBoundCentre(CVector* pOutCentre)
 {
-    return ((CVector * (__thiscall*)(CEntitySAInterface*, CVector*))0x534250)(this, pOutCentre);
+    auto args = PrepareSignature(this, pOutCentre);
+    return CallGTAFunction<CVector*, __THISCALL>(0x534250, args);
 }
 
 void CEntitySAInterface::UpdateRW()
 {
-    ((void(__thiscall*)(CEntitySAInterface*))0x446F90)(this);
+    CallGTAFunction<void, __THISCALL>(0x446F90, PrepareSignature(this));
 }
 
 void CEntitySAInterface::UpdateRpHAnim()
 {
-    ((void(__thiscall*)(CEntitySAInterface*))0x532B20)(this);
+    CallGTAFunction<void, __THISCALL>(0x532B20, PrepareSignature(this));
 }
 
 CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
@@ -69,6 +71,26 @@ CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
 void CEntitySAInterface::StaticSetHooks()
 {
     HookInstall(0x534120, &CEntitySAInterface::GetBoundRect_);
+}
+
+void CEntitySAInterface::ResolveReferences()
+{
+    CallGTAFunction<void*, __THISCALL>(0x571A40, PrepareSignature(this)); 
+}
+
+void CEntitySAInterface::RemoveShadows()
+{
+    CallGTAFunction<void*, __CDECL>(0x711730, PrepareSignature(this));
+}
+
+void CEntitySAInterface::DeleteRwObject()
+{
+    CallGTAFunction<void, __THISCALL>(this->vtbl->DeleteRwObject, PrepareSignature(this));
+}
+
+void CEntitySAInterface::RemoveMatrix()
+{
+    CallGTAFunction<void, __THISCALL>(0x54F3B0, PrepareSignature(this));
 }
 
 CEntitySA::CEntitySA()
@@ -437,7 +459,8 @@ eEntityStatus CEntitySA::GetEntityStatus()
 RwFrame* CEntitySA::GetFrameFromId(int id)
 {
     // CClumpModelInfo::GetFrameFromId
-    return ((RwFrame*(_cdecl*)(RpClump*, int))0x4C53C0)(m_pInterface->m_pRwObject, id);
+    auto args = PrepareSignature(m_pInterface->m_pRwObject, id);
+    return CallGTAFunction<RwFrame*, __CDECL>(0x4C53C0, args);
 }
 
 RpClump* CEntitySA::GetRpClump()
@@ -448,7 +471,7 @@ RpClump* CEntitySA::GetRpClump()
 RwMatrix* CEntitySA::GetLTMFromId(int id)
 {
     // RwFrameGetLTM
-    return ((RwMatrix*(_cdecl*)(RwFrame*))0x7F0990)(GetFrameFromId(id));
+    return CallGTAFunction<RwMatrix*, __CDECL>(0x7F0990, PrepareSignature(GetFrameFromId(id)));
 }
 
 void CEntitySA::SetAlpha(DWORD dwAlpha)

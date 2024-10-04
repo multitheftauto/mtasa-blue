@@ -104,3 +104,62 @@ void MemOrFast(U ptr, const T value)
 
 bool GetDebugIdEnabled(uint uiDebugId);
 void LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
+
+struct __THISCALL{};
+struct __CDECL{};
+struct __STDCALL{};
+struct __FASTCALL{};
+struct __VECTORCALL{};
+
+template <typename... Args>
+struct GTAFuncSignature
+{
+    std::tuple<Args...> args;
+    GTAFuncSignature(Args... a) : args(std::forward<Args>(a)...) {}
+};
+
+template <typename... Args>
+GTAFuncSignature<Args...> PrepareSignature(Args... args)
+{
+    return GTAFuncSignature<Args...>(std::forward<Args>(args)...);
+}
+
+template <typename ReturnType, typename Func, typename Tuple, std::size_t... I>
+ReturnType apply_helper(Func&& f, Tuple&& t, std::index_sequence<I...>)
+{
+    return f(std::get<I>(std::forward<Tuple>(t))...);
+}
+
+template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
+ReturnType CallGTAFunction(Func function, GTAFuncSignature<Args...>& sig)
+{
+    if constexpr (std::is_same_v<CallingConvention, __THISCALL>)
+    {
+        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__thiscall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+    }
+    else if constexpr (std::is_same_v<CallingConvention, __CDECL>)
+    {
+        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__cdecl*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+    }
+    else if constexpr (std::is_same_v<CallingConvention, __STDCALL>)
+    {
+        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__stdcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+    }
+    else if constexpr (std::is_same_v<CallingConvention, __FASTCALL>)
+    {
+        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__fastcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+    }
+    else if constexpr (std::is_same_v<CallingConvention, __VECTORCALL>)
+    {
+        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__vectorcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+    }
+
+    static_assert(
+        std::is_same_v<CallingConvention, __THISCALL> ||
+        std::is_same_v<CallingConvention, __CDECL> ||
+        std::is_same_v<CallingConvention, __STDCALL> ||
+        std::is_same_v<CallingConvention, __FASTCALL> ||
+        std::is_same_v<CallingConvention, __VECTORCALL>,
+        "Invalid calling onvention specified in CallGTAFunction"
+    );
+}

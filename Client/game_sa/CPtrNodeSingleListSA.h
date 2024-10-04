@@ -31,8 +31,8 @@ private:
 template <class T>
 void CPtrNodeSingleListSAInterface<T>::RemoveItem(T* item)
 {
-    using CPtrNodeSingleList_RemoveItem_t = void(__thiscall*)(CPtrNodeSingleListSAInterface<T> * pLinkList, void* item);
-    ((CPtrNodeSingleList_RemoveItem_t)0x533610)(this, item);
+    auto args = PrepareSignature(this, item);
+    CallGTAFunction<void, __THISCALL>(0x533610, args);
 }
 
 template <class T>

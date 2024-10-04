@@ -326,6 +326,7 @@ void CFxSA::AddParticle(eFxParticleSystems eFxParticle, const CVector& vecPositi
         newDirection.fZ = (rand() % 10000) * 0.0001f * 4 - 2 + newDirection.fZ;
 
         // Call FxSystem_c::AddParticle
-        ((int(__thiscall*)(FxSystem_c*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
+        auto args = PrepareSignature(fxParticleSystem, &vecPosition, &newDirection, 0.0f, &fxPrt, -1.0f, fBrightness, 0.0f, 0);
+        CallGTAFunction<int, __THISCALL>(FUNC_FXSystem_c_AddParticle, args);
     }
 }

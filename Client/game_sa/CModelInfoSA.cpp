@@ -77,16 +77,14 @@ static constexpr size_t    RESOURCE_ID_COL = 25000;
 
 static void CBaseModelInfo_SetColModel(CBaseModelInfoSAInterface* self, CColModelSAInterface* colModel, bool applyToPairedModel)
 {
-    using Signature = void(__thiscall*)(CBaseModelInfoSAInterface*, CColModelSAInterface*, bool);
-    auto function = reinterpret_cast<Signature>(0x4C4BC0);
-    function(self, colModel, applyToPairedModel);
+    auto args = PrepareSignature(self, colModel, applyToPairedModel);
+    CallGTAFunction<void, __THISCALL>(0x4C4BC0, args);
 }
 
 static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
 {
-    using Signature = void(__cdecl*)(int, const CColModelSAInterface*);
-    auto function = reinterpret_cast<Signature>(0x5B2C20);
-    function(idx, colModel);
+    auto args = PrepareSignature(idx, colModel);
+    CallGTAFunction<void, __CDECL>(0x5B2C20, args);
 }
 
 CModelInfoSA::CModelInfoSA()
@@ -1566,7 +1564,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         m_pInterface->bIsColLoaded = false;
 
         // Fix random foliage on custom collisions by calling CPlantMgr::SetPlantFriendlyFlagInAtomicMI
-        (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(m_pInterface);
+        CallGTAFunction<void, __CDECL>(0x5DB650, PrepareSignature(m_pInterface));
 
         // Set some lighting for this collision if not already present
         CColDataSA* pColData = pColModelInterface->m_data;

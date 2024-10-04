@@ -51,6 +51,6 @@ void CQuadTreeNodesSAInterface<T>::RemoveAllItems()
 template <class T>
 char CQuadTreeNodesSAInterface<T>::AddItem(T* item, CRect* boudingBox)
 {
-    typedef char(__thiscall * CQuadTreeNode_AddItem_t)(CQuadTreeNodesSAInterface*, void*, CRect*);
-    return ((CQuadTreeNode_AddItem_t)(0x552CD0))(this, item, boudingBox);
+    auto args = PrepareSignature(this, item, boudingBox);
+    return CallGTAFunction<char, __THISCALL>(0x552CD0, args);
 };

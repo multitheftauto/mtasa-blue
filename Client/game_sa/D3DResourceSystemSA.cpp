@@ -30,13 +30,14 @@ void D3DResourceSystemSA::StaticSetHooks()
 
 void D3DResourceSystem_Init()
 {
-    auto D3DTextureBuffer_Setup = (void(__thiscall*)(D3DTextureBuffer * pThis, int format, int width, int bOneLevel, int capacity))0x72FE80;
-    auto D3DIndexDataBuffer_Setup = (void(__thiscall*)(D3DIndexDataBuffer * pThis, int format, int a3, int capacity))0x730190;
+    auto args_textureBufferSetup = PrepareSignature(&D3DResourceSystem_TextureBuffer, 0, 0, -1, 16);
+    auto args_dataBufferSetup = PrepareSignature(&D3DResourceSystem_IndexDataBuffer, D3DFMT_INDEX16, 0, 16);
 
     D3DResourceSystem_UseD3DResourceBuffering = false;
     D3DResourceSystem_FreeTextureBufferIndex = 0;
-    D3DTextureBuffer_Setup(&D3DResourceSystem_TextureBuffer, 0, 0, -1, 16);
-    D3DIndexDataBuffer_Setup(&D3DResourceSystem_IndexDataBuffer, D3DFMT_INDEX16, 0, 16);
+
+    CallGTAFunction<void, __THISCALL>(0x72FE80, args_textureBufferSetup);
+    CallGTAFunction<void, __THISCALL>(0x730190, args_dataBufferSetup);
 }
 
 void D3DResourceSystem_SetUseD3DResourceBuffering(char bUse)

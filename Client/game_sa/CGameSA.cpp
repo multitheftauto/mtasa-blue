@@ -675,15 +675,9 @@ void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
 
     const auto manager = reinterpret_cast<class WaterCreatureManager_c*>(0xC1DF30);
     if (isEnabled)
-    {
-        unsigned char(__thiscall * Init)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Init)>(0x6E3F90);
-        Init(manager);
-    }
+        CallGTAFunction<unsigned char, __THISCALL>(0x6E3F90, PrepareSignature(manager));
     else
-    {
-        void(__thiscall * Exit)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Exit)>(0x6E3FD0);
-        Exit(manager);
-    }
+        CallGTAFunction<void, __THISCALL>(0x6E3FD0, PrepareSignature(manager));
 
     m_areWaterCreaturesEnabled = isEnabled;
 }
@@ -785,17 +779,17 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     {
         char* currentCannon = (char*)currentACannons + i * SIZE_CWaterCannon;
 
-        ((void(__thiscall*)(int, void*, bool))FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity)(STRUCT_CAESoundManager, currentCannon + NUM_CWaterCannon_Audio_Offset, true); // CAESoundManager::CancelSoundsOwnedByAudioEntity to prevent random crashes from CAESound::UpdateParameters
-        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Destructor)(currentCannon); // CWaterCannon::~CWaterCannon
+        CallGTAFunction<void, __THISCALL>(FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity, PrepareSignature(STRUCT_CAESoundManager, static_cast<void*>(currentCannon + NUM_CWaterCannon_Audio_Offset), true)); // CAESoundManager::CancelSoundsOwnedByAudioEntity to prevent random crashes from CAESound::UpdateParameters
+        CallGTAFunction<void, __THISCALL>(FUNC_CWaterCannon_Destructor, PrepareSignature(static_cast<void*>(currentCannon))); // CWaterCannon::~CWaterCannon
     }
 
     // Call CWaterCannon constructor & CWaterCannon::Init
     for (int i = 0; i < newLimit; ++i)
     {
-        char* currentCannon = (char*)aCannons + i * SIZE_CWaterCannon;
+        void* currentCannon = (char*)aCannons + i * SIZE_CWaterCannon;
 
-        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Constructor)(currentCannon); // CWaterCannon::CWaterCannon
-        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Init)(currentCannon); // CWaterCannon::Init
+        CallGTAFunction<void, __THISCALL>(FUNC_CWaterCannon_Constructor, PrepareSignature(currentCannon)); // CWaterCannon::CWaterCannon
+        CallGTAFunction<void, __THISCALL>(FUNC_CWaterCannon_Init, PrepareSignature(currentCannon)); // CWaterCannon::Init
     }
 
     // Patch references to array
@@ -831,7 +825,7 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     MemPut<BYTE>(0x856BF6, newLimit);
 
     // Free previous allocated memory
-    if (!isEnabled && currentACannons != nullptr)
+    if (!isEnabled && currentACannons)
         free(currentACannons);
 
     m_isExtendedWaterCannonsEnabled = isEnabled;

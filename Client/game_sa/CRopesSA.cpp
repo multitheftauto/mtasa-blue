@@ -49,8 +49,5 @@ void CRopesSA::RemoveEntityRope(CEntitySAInterface* pEntity)
     }
 
     if (pRope)
-    {
-        auto CRope_Remove = (void(__thiscall*)(CRopesSAInterface*))0x556780;
-        CRope_Remove(pRope);
-    }
+        CallGTAFunction<void, __THISCALL>(FUNC_CRope_Remove, PrepareSignature(pRope));
 }

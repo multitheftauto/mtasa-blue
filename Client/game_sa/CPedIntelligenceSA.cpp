@@ -53,8 +53,8 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
 
 CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengthOfDuck)
 {
-    auto SetTaskDuckSecondary = (CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230;
-    return SetTaskDuckSecondary(internalInterface, nLengthOfDuck);
+    auto args = PrepareSignature(internalInterface, nLengthOfDuck);
+    return CallGTAFunction<CTaskSAInterface*, __THISCALL>(0x601230, args);
 }
 
 CTaskSimpleUseGun* CPedIntelligenceSA::GetTaskUseGun()

@@ -71,9 +71,8 @@ void CFxManagerSA::OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSyste
 
 CFxSystemBPSAInterface* CFxManagerSA::GetFxSystemBlueprintByName(SString sName)
 {
-    using func_t = CFxSystemBPSAInterface*(__thiscall*)(CFxManagerSAInterface * pInterface, const char* pChars);
-    auto func = reinterpret_cast<func_t>(FUNC_FxManager_c__GetSystemByName);
-    return func(m_pInterface, sName);
+    auto args = PrepareSignature(m_pInterface, static_cast<const char*>(sName));
+    return CallGTAFunction<CFxSystemBPSAInterface*, __THISCALL>(FUNC_FxManager_c__GetSystemByName, args);
 }
 
 bool CFxManagerSA::IsValidFxSystemBlueprintName(SString sName)

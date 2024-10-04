@@ -513,9 +513,8 @@ CVector* CPedSA::GetBonePosition(eBone bone, CVector* vecPosition)
     if (entity->m_pRwObject != nullptr)
     {
         // void __thiscall CPed::GetBonePosition(struct RwV3d &, unsigned int, bool)
-        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, unsigned int, bool);
-        const auto GameFunction = reinterpret_cast<Signature>(FUNC_GetBonePosition);
-        GameFunction(entity, vecPosition, bone, true);
+        auto args = PrepareSignature(entity, vecPosition, bone, true);
+        CallGTAFunction<void, __THISCALL>(FUNC_GetBonePosition, args);
     }
 
     // Clamp to a sane range as this function can occasionally return massive values,
@@ -538,9 +537,8 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* vecPosition)
     if (entity->m_pRwObject != nullptr)
     {
         // void __thiscall CPed::GetTransformedBonePosition(struct RwV3d &, unsigned int, bool)
-        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, unsigned int, bool);
-        const auto GameFunction = reinterpret_cast<Signature>(FUNC_GetTransformedBonePosition);
-        GameFunction(entity, vecPosition, bone, true);
+        auto args = PrepareSignature(entity, vecPosition, bone, true);
+        CallGTAFunction<void, __THISCALL>(FUNC_GetTransformedBonePosition, args);
     }
 
     // Clamp to a sane range as this function can occasionally return massive values,

@@ -23,7 +23,6 @@ CAESoundManagerSA::CAESoundManagerSA(CAESoundManagerSAInterface* pInterface) : m
 
 void CAESoundManagerSA::CancelSoundsInBankSlot(uint uiGroup, uint uiIndex)
 {
-    using CAESoundManager__CancelSoundsInBankSlot = CAESound*(__thiscall*)(CAESoundManagerSAInterface*, uint, uint);
-    static auto pCancelSoundsInBankSlot = reinterpret_cast<CAESoundManager__CancelSoundsInBankSlot>(FUNC_CAESoundManager__CancelSoundsInBankSlot);
-    pCancelSoundsInBankSlot(m_pInterface, uiGroup, uiIndex);
+    auto args = PrepareSignature(m_pInterface, uiGroup, uiIndex);
+    CallGTAFunction<CAESound*, __THISCALL>(FUNC_CAESoundManager__CancelSoundsInBankSlot, args);
 }

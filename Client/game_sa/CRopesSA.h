@@ -17,6 +17,7 @@
 #define ROPES_COUNT    8
 
 #define FUNC_CRopes_CreateRopeForSwatPed    0x558d10
+#define FUNC_CRope_Remove                   0x556780
 
 class CRopesSAInterface
 {

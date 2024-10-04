@@ -27,8 +27,8 @@ public:
 
     void RemoveItem(T* pItem)
     {
-        using CPtrListDoubleLinkSAInterface_RemoveItem = void(__thiscall*)(CPtrNodeDoubleListSAInterface<T> * pLinkList, void* item);
-        ((CPtrListDoubleLinkSAInterface_RemoveItem)0x5336B0)(this, pItem);
+        auto args = PrepareSignature(this, pItem);
+        CallGTAFunction<void, __THISCALL>(0x5336B0, args);
     };
 
     void RemoveAllItems()

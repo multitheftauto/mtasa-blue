@@ -225,27 +225,15 @@ public:
         return -1;
     }
 
-    void ResolveReferences()
-    {
-        using CEntity_ResolveReferences = void*(__thiscall*)(CEntitySAInterface*);
-        ((CEntity_ResolveReferences)0x571A40)(this);
-    };
+    void ResolveReferences();
 
-    void RemoveShadows()
-    {
-        using CStencilShadow_dtorByOwner = void*(__cdecl*)(CEntitySAInterface * pEntity);
-        ((CStencilShadow_dtorByOwner)0x711730)(this);
-    };
+    void RemoveShadows();
 
-    void DeleteRwObject()
-    {
-        using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
-        ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
-    };
+    void DeleteRwObject();
 
     bool HasMatrix() const noexcept { return Placeable.matrix != nullptr; }
 
-    void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
+    void RemoveMatrix();
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
