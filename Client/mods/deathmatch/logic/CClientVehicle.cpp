@@ -1576,6 +1576,19 @@ void CClientVehicle::SetHeliRotorSpeed(float fSpeed)
     m_fHeliRotorSpeed = fSpeed;
 }
 
+bool CClientVehicle::GetVehicleRotorState() const noexcept
+{
+    return m_pVehicle && (m_eVehicleType == CLIENTVEHICLE_HELI || m_eVehicleType == CLIENTVEHICLE_PLANE) ? m_pVehicle->GetVehicleRotorState() : m_rotorState;
+}
+
+void CClientVehicle::SetVehicleRotorState(bool state, bool stopRotor) noexcept
+{
+    if (m_pVehicle && (m_eVehicleType == CLIENTVEHICLE_HELI || m_eVehicleType == CLIENTVEHICLE_PLANE))
+        m_pVehicle->SetVehicleRotorState(state, stopRotor, GetVehicleType() == CLIENTVEHICLE_HELI);
+
+    m_rotorState = state;
+}
+
 void CClientVehicle::SetPlaneRotorSpeed(float fSpeed)
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
