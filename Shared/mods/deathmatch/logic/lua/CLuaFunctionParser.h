@@ -108,6 +108,8 @@ struct CLuaFunctionParserBase
             return "";
         else if constexpr (std::is_same_v<T, std::monostate>)
             return "";
+        else if constexpr (is_multireturn<T>::value)
+            return "yes";
         else
             static_assert(sizeof(T) == 0, "Invalid parameter type provided to CLuaFunctionParser!");
     }
@@ -192,6 +194,26 @@ struct CLuaFunctionParserBase
 
             // Else try the remaining types of the variant
             int iResult = TypeMatchVariant<next_t>(L, index);
+            if (iResult == -1)
+                return -1;
+            return 1 + iResult;
+        }
+    }
+
+    template <typename T>
+    int TypeMatchTuple(lua_State* L, int index)
+    {
+        if constexpr (std::is_same_v<T, std::tuple<>>)
+            return -1;
+        else
+        {
+            using first_t = typename is_tuple<T>::param1_t;
+            using next_t = typename is_tuple<T>::rest_t;
+            if (TypeMatch<first_t>(L, index))
+                return 0;
+
+            // Else try the remaining types of the variant
+            int iResult = TypeMatchTuple<next_t>(L, index + 1);
             if (iResult == -1)
                 return -1;
             return 1 + iResult;
@@ -306,6 +328,12 @@ struct CLuaFunctionParserBase
         // no value
         else if constexpr (std::is_same_v<T, std::monostate>)
             return iArgument == LUA_TNONE;
+
+        else if constexpr (is_tuple<T>::value)
+            return TypeMatchTuple<T>(L, index) != -1;
+
+        else if constexpr (is_multireturn<T>::value)
+            return TypeMatchTuple<is_multireturn<T>::tupleType_t>(L, index) != -1;
     }
 
     // Special PopUnsafe for variants
@@ -666,6 +694,21 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, std::monostate>)
         {
+            return T{};
+        }
+        else if constexpr (is_tuple<T>::value)
+        {
+            using tupleData_t = is_tuple<T>;
+
+            for (auto i = 0; i < tupleData_t::count; i++)
+            {
+                if (!TypeMatch<tupleData_t::param1_t>(L, index + i))
+                {
+                    lua_pop(L, 1);
+                    continue;
+                }
+            }
+            // temp
             return T{};
         }
     }

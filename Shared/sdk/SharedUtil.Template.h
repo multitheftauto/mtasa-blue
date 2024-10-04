@@ -87,6 +87,19 @@ struct is_variant<std::variant<Arg1, Args...>> : std::true_type
     static constexpr auto count = sizeof...(Args) + 1;
 };
 
+template <class>
+struct is_tuple : std::false_type
+{
+};
+
+template <typename Arg1, typename... Args>
+struct is_tuple<std::tuple<Arg1, Args...>> : std::true_type
+{
+    using param1_t = Arg1;
+    using rest_t = std::tuple<Args...>;
+    static constexpr auto count = sizeof...(Args) + 1;
+};
+
 /**
     nth_element
 
