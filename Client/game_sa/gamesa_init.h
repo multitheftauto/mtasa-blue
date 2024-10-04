@@ -134,32 +134,15 @@ template <typename ReturnType, typename CallingConvention, typename Func, typena
 ReturnType CallGTAFunction(Func function, GTAFuncSignature<Args...>& sig)
 {
     if constexpr (std::is_same_v<CallingConvention, __THISCALL>)
-    {
         return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__thiscall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    }
     else if constexpr (std::is_same_v<CallingConvention, __CDECL>)
-    {
         return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__cdecl*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    }
     else if constexpr (std::is_same_v<CallingConvention, __STDCALL>)
-    {
         return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__stdcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    }
     else if constexpr (std::is_same_v<CallingConvention, __FASTCALL>)
-    {
         return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__fastcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    }
     else if constexpr (std::is_same_v<CallingConvention, __VECTORCALL>)
-    {
         return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__vectorcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    }
-
-    static_assert(
-        std::is_same_v<CallingConvention, __THISCALL> ||
-        std::is_same_v<CallingConvention, __CDECL> ||
-        std::is_same_v<CallingConvention, __STDCALL> ||
-        std::is_same_v<CallingConvention, __FASTCALL> ||
-        std::is_same_v<CallingConvention, __VECTORCALL>,
-        "Invalid calling onvention specified in CallGTAFunction"
-    );
+    else
+        static_assert(sizeof(char) == 0, "Invalid calling convention specified in CallGTAFunction");
 }
