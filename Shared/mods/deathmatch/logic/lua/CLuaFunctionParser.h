@@ -43,73 +43,120 @@ struct CLuaFunctionParserBase
     std::string strError = "";
     std::string strErrorFoundType = "";
 
-    // Translates a variant type to a list of names separated by slashes
-    // std::variant<bool, int, float> => bool/int/float
-    template <typename T>
-    void TypeToNameVariant(SString& accumulator)
+    template <typename T, std::enable_if_t<is_string_v<T>, bool> = true>
+    std::string TypeToName()
     {
-        using param = typename is_variant<T>::param1_t;
-        if (accumulator.empty())
-            accumulator = TypeToName<param>();
-        else
-            accumulator += "/" + TypeToName<param>();
-
-        if constexpr (is_variant<T>::count != 1)
-            return TypeToNameVariant<typename is_variant<T>::rest_t>(accumulator);
+        return "string";
     }
 
-    template <typename T>
-    SString TypeToName()
+    template <typename T, std::enable_if_t<std::is_same_v<T, bool>, bool> = true>
+    std::string TypeToName()
     {
-        if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_same_v<T, SString>)
-            return "string";
-        else if constexpr (std::is_same_v<T, bool>)
-            return "boolean";
-        else if constexpr (std::is_arithmetic_v<T>)
-            return "number";
-        else if constexpr (std::is_enum_v<T>)
-            return "enum";
-        else if constexpr (is_specialization<T, std::optional>::value)
-        {
-            using param_t = typename is_specialization<T, std::optional>::param_t;
-            return TypeToName<param_t>();
-        }
-        else if constexpr (std::is_same_v<T, CLuaArgument>)
-            return "value";
-        else if constexpr (std::is_same_v<T, CLuaArguments>)
-            return "values";
-        else if constexpr (is_2specialization<T, std::vector>::value)
-            return "table";
-        else if constexpr (is_5specialization<T, std::unordered_map>::value)
-            return "table";
-        else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
-            return "function";
-        else if constexpr (std::is_same_v<T, CVector2D>)
-            return "vector2";
-        else if constexpr (std::is_same_v<T, CVector>)
-            return "vector3";
-        else if constexpr (std::is_same_v<T, CVector4D>)
-            return "vector4";
-        else if constexpr (std::is_same_v<T, CMatrix>)
-            return "matrix";
-        else if constexpr (std::is_same_v<T, SColor>)
-            return "colour";
-        else if constexpr (std::is_same_v<T, lua_State*>)
-            return "";            // not reachable
-        else if constexpr (is_variant<T>::value)
-        {
-            SString strTypes;
-            TypeToNameVariant<T>(strTypes);
-            return strTypes;
-        }
-        else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
-            return GetClassTypeName((T)0);
-        else if constexpr (std::is_same_v<T, dummy_type>)
-            return "";
-        else if constexpr (std::is_same_v<T, std::monostate>)
-            return "";
+        return "boolean";
+    }
+
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, bool> = true>
+    std::string TypeToName()
+    {
+        return "number";
+    }
+
+    template <typename T, std::enable_if_t<std::is_enum_v<T>, bool> = true>
+    std::string TypeToName()
+    {
+        return "enum";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, CLuaArgument>, bool> = true>
+    std::string TypeToName()
+    {
+        return "value";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, CLuaArguments>, bool> = true>
+    std::string TypeToName()
+    {
+        return "values";
+    }
+
+    template <typename T, std::enable_if_t<is_vector_v<T> || is_map_v<T>, bool> = true>
+    std::string TypeToName()
+    {
+        return "table";
+    }
+
+    template <typename T, std::enable_if_t<is_optional_v<T>, bool> = true>
+    std::string TypeToName()
+    {
+        return TypeToName<typename is_optional<T>::param_t>();
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, CLuaFunctionRef>, bool> = true>
+    std::string TypeToName()
+    {
+        return "function";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, CVector2D>, bool> = true>
+    std::string TypeToName()
+    {
+        return "vector2";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, CVector3D>, bool> = true>
+    std::string TypeToName()
+    {
+        return "vector3";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, CVector4D>, bool> = true>
+    std::string TypeToName()
+    {
+        return "vector4";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, CMatrix>, bool> = true>
+    std::string TypeToName()
+    {
+        return "matrix";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, SColor>, bool> = true>
+    std::string TypeToName()
+    {
+        return "colour";
+    }
+
+    template <typename T, std::enable_if_t<std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>, bool> = true>
+    std::string TypeToName()
+    {
+        return "pointer";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, lua_State*>, bool> = true>
+    std::string TypeToName()
+    {
+        return "lua_State";
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<T, std::monostate*>, bool> = true>
+    std::string TypeToName()
+    {
+        return "monostate";
+    }
+
+    template <typename T, std::enable_if_t<is_variant<T>::value, bool> = true>
+    std::string TypeToName()
+    {
+        using variant_t = is_variant<T>;
+        using param1_t = typename variant_t::param1_t;
+        using rest_t = typename variant_t::rest_t;
+
+        std::string out = TypeToName<param1_t>();
+        if constexpr (variant_t::count == 1)
+            return out;
         else
-            static_assert(sizeof(T) == 0, "Invalid parameter type provided to CLuaFunctionParser!");
+            return out + "/" + TypeToName<rest_t>();
     }
 
     // Reads the parameter type (& value in some cases) at a given index
@@ -187,14 +234,17 @@ struct CLuaFunctionParserBase
             // If it matches, we've found our index
             using first_t = typename is_variant<T>::param1_t;
             using next_t = typename is_variant<T>::rest_t;
-            if (TypeMatch<first_t>(L, index))
+            if constexpr (TypeMatch<first_t>(L, index))
                 return 0;
-
-            // Else try the remaining types of the variant
-            int iResult = TypeMatchVariant<next_t>(L, index);
-            if (iResult == -1)
-                return -1;
-            return 1 + iResult;
+            else
+            {
+                // Else try the remaining types of the variant
+                int iResult = TypeMatchVariant<next_t>(L, index);
+                if constexpr (iResult == -1)
+                    return -1;
+                else
+                    return 1 + iResult;
+            }
         }
     }
 
@@ -207,8 +257,8 @@ struct CLuaFunctionParserBase
     {
         int iArgument = lua_type(L, index);
         // primitive types
-        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
-            return (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER);
+        if constexpr (is_string_v<T>)
+            return iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER;
         else if constexpr (std::is_same_v<T, bool>)
             return (iArgument == LUA_TBOOLEAN);
         else if constexpr (std::is_arithmetic_v<T>)
@@ -220,10 +270,7 @@ struct CLuaFunctionParserBase
             return iArgument == LUA_TSTRING;
 
         // CLuaArgument can hold any value
-        else if constexpr (std::is_same_v<T, CLuaArgument>)
-            return iArgument != LUA_TNONE;
-
-        else if constexpr (std::is_same_v<T, CLuaArguments>)
+        else if constexpr (std::is_same_v<T, CLuaArgument> || std::is_same_v<T, CLuaArguments>)
             return iArgument != LUA_TNONE;
 
         // All color classes are read as a single tocolor number
@@ -239,12 +286,8 @@ struct CLuaFunctionParserBase
         else if constexpr (is_specialization<T, std::optional>::value)
             return true;
 
-        // std::vector is used for arrays built from tables
-        else if constexpr (is_2specialization<T, std::vector>::value)
-            return iArgument == LUA_TTABLE;
-
-        // std::unordered_map<k,v> is used for maps built from tables
-        else if constexpr (is_5specialization<T, std::unordered_map>::value)
+        // std::vector and std::unordered_map are used for arrays built from tables
+        else if constexpr (is_vector_v<T> || is_map_v<T>)
             return iArgument == LUA_TTABLE;
 
         // CLuaFunctionRef is used for functions
@@ -298,12 +341,8 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
 
-        // dummy type is used as overload extension if one overload has fewer arguments
+        // monostate type is used as overload extension if one overload has fewer arguments
         // thus it is only allowed if there are no further args on the Lua side
-        else if constexpr (std::is_same_v<T, dummy_type>)
-            return iArgument == LUA_TNONE;
-
-        // no value
         else if constexpr (std::is_same_v<T, std::monostate>)
             return iArgument == LUA_TNONE;
     }
@@ -323,12 +362,14 @@ struct CLuaFunctionParserBase
         else
         {
             // If we haven't reached the target index go to the next type
-            if (vindex != currIndex)
+            if constexpr (vindex != currIndex)
                 return PopUnsafeVariant<T, currIndex + 1>(L, index, vindex);
-
-            // Pop the actual type
-            using type_t = std::remove_reference_t<decltype(std::get<currIndex>(T{}))>;
-            return PopUnsafe<type_t>(L, index);
+            else
+            {
+                // Pop the actual type
+                using type_t = std::remove_reference_t<decltype(std::get<currIndex>(T{}))>;
+                return PopUnsafe<type_t>(L, index);
+            }
         }
     }
 
@@ -369,8 +410,8 @@ struct CLuaFunctionParserBase
         // Expect no change in stack size
         LUA_STACK_EXPECT(0);
         // the dummy type is not read from Lua
-        if constexpr (std::is_same_v<T, dummy_type>)
-            return dummy_type{};
+        if constexpr (std::is_same_v<T, std::monostate>)
+            return std::monostate{};
         // primitive types are directly popped
         else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return lua::PopPrimitive<T>(L, index);

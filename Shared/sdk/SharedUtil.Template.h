@@ -3,6 +3,104 @@
 #include <type_traits>
 #include <variant>
 
+template <typename T>
+struct is_string : std::false_type
+{
+};
+template <>
+struct is_string<const char*> : std::true_type
+{
+};
+template <>
+struct is_string<std::string> : std::true_type
+{
+};
+template <>
+struct is_string<std::string_view> : std::true_type
+{
+};
+template <>
+struct is_string<SString> : std::true_type
+{
+};
+
+template <typename T>
+constexpr bool is_string_v = is_string<T>::value;
+
+// Get it ready for C++20
+#if __cplusplus >= 202002L
+template <typename T>
+concept string_concept_t = is_string_v<T>;
+#endif
+
+template <typename T>
+struct is_vector : std::false_type
+{
+};
+
+template <typename T>
+struct is_vector<std::vector<T>> : std::true_type
+{
+	using param_t = T;
+};
+
+template <typename T>
+constexpr bool is_vector_v = is_vector<T>::value;
+
+// Get it ready for C++20
+#if __cplusplus >= 202002L
+template <typename T>
+concept vector_concept_t = is_vector_v<T>;
+#endif
+
+template <typename T>
+struct is_map : std::false_type
+{
+};
+
+template <typename Key, typename Value>
+struct is_map<std::map<Key, Value>> : std::true_type
+{
+    using key_t = Key;
+    using value_t = Value;
+};
+
+template <typename Key, typename Value>
+struct is_map<std::unordered_map<Key, Value>> : std::true_type
+{
+    using key_t = Key;
+    using value_t = Value;
+};
+
+template <typename T>
+constexpr bool is_map_v = is_map<T>::value;
+
+// Get it ready for C++20
+#if __cplusplus >= 202002L
+template <typename T>
+concept map_concept_t = is_map_v<T>;
+#endif
+
+template <typename T>
+struct is_optional : std::false_type
+{
+};
+
+template <typename T>
+struct is_optional<std::optional<T>> : std::true_type
+{
+    using param_t = T;
+};
+
+template <typename T>
+constexpr bool is_optional_v = is_optional<T>::value;
+
+// Get it ready for C++20
+#if __cplusplus >= 202002L
+template <typename T>
+concept optional_concept_t = is_optional_v<T>;
+#endif
+
 /**
     is_Nspecialization
 
@@ -86,6 +184,15 @@ struct is_variant<std::variant<Arg1, Args...>> : std::true_type
     using rest_t = std::variant<Args...>;
     static constexpr auto count = sizeof...(Args) + 1;
 };
+
+template <typename T>
+constexpr bool is_variant_v = is_variant<T>::value;
+
+// Get it ready for C++20
+#if __cplusplus >= 202002L
+template <typename T>
+concept variant_concept_t = is_variant_v<T>;
+#endif
 
 /**
     nth_element
@@ -187,12 +294,6 @@ struct common_variant<std::variant<T, Ts...>, std::variant<Us...>>
     using type = typename common_variant<std::variant<Ts...>, typename common_variant<T, std::variant<Us...>>::type>::type;
 };
 
-// dummy_type
-// generic dummy type
-struct dummy_type
-{
-};
-
 // n_tuple: Constructs a tuple of size N (with dummy_type as parameter types)
 //  n_tuple<2>::type == std::tuple<dummy_type, dummy_type>
 template <std::size_t, bool HasEnough = false, typename... Args>
@@ -210,7 +311,7 @@ struct n_tuple<N, true, Args...>
 template <std::size_t N, typename... Args>
 struct n_tuple<N, false, Args...>
 {
-    using type = typename n_tuple<N, sizeof...(Args) + 1 >= N, Args..., dummy_type>::type;
+    using type = typename n_tuple<N, sizeof...(Args) + 1 >= N, Args..., std::monostate>::type;
 };
 
 // pad_func_with_func
