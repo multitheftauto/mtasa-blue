@@ -16,14 +16,10 @@ public:
 
 public:
     void               ReleaseEntry() {
-        CallGTAFunction<void*, __THISCALL>(FUNC_CPlantColEntEntry_ReleaseEntry, PrepareSignature(this));
+        using CPlantColEntEntry_ReleaseEntry = void* ( __thiscall *)(CPlantColEntEntry*);
+        ((CPlantColEntEntry_ReleaseEntry)0x5DB8A0)(this);
     };
 };
-
-void CPlantManagerSA::RemovePlant(CEntitySAInterface* enity)
-{
-    CallGTAFunction<CEntitySAInterface*, __CDECL>(FUNC_CPlantColEntEntry_Remove, PrepareSignature(enity));
-}
 
 void CPlantManagerSA::RemoveAllPlants()
 {

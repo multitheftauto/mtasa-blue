@@ -31,26 +31,26 @@ void CFileLoaderSA::StaticSetHooks()
 CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(SFileObjectInstance* obj)
 {
     // Second argument is model name. It's unused in the function
-    return CallGTAFunction<CEntitySAInterface*, __CDECL>(0x538090, PrepareSignature(obj, static_cast<const char*>(nullptr)));
+    return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*, const char*))0x538090)(obj, nullptr);
 }
 
 class CAtomicModelInfo
 {
 public:
-    void CAtomicModelInfo::DeleteRwObject() { CallGTAFunction<void, __THISCALL>((*(void***)this)[8], PrepareSignature(this)); }
+    void CAtomicModelInfo::DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfo*))(*(void***)this)[8])(this); }
 
-    void CAtomicModelInfo::SetAtomic(RpAtomic* atomic) { CallGTAFunction<void, __THISCALL>((*(void***)this)[15], PrepareSignature(this, atomic)); }
+    void CAtomicModelInfo::SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfo*, RpAtomic*))(*(void***)this)[15])(this, atomic); }
 };
 
 class CDamagableModelInfo
 {
 public:
-    void CDamagableModelInfo::SetDamagedAtomic(RpAtomic* atomic) { CallGTAFunction<void, __THISCALL>(0x4C48D0, PrepareSignature(this, atomic)); }
+    void CDamagableModelInfo::SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CDamagableModelInfo*, RpAtomic*))0x4C48D0)(this, atomic); }
 };
 
 static char* GetFrameNodeName(RwFrame* frame)
 {
-    return CallGTAFunction<char*, __CDECL>(0x72FB30, PrepareSignature(frame));
+    return ((char*(__cdecl*)(RwFrame*))0x72FB30)(frame);
 }
 
 // Originally there was a possibility for this function to cause buffer overflow
@@ -97,22 +97,22 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
 
 static void CVisibilityPlugins_SetAtomicRenderCallback(RpAtomic* pRpAtomic, RpAtomic* (*renderCB)(RpAtomic*))
 {
-    CallGTAFunction<void, __CDECL>(0x7328A0, PrepareSignature(pRpAtomic, renderCB));
+    return ((void(__cdecl*)(RpAtomic*, RpAtomic * (*renderCB)(RpAtomic*)))0x7328A0)(pRpAtomic, renderCB);
 }
 
 static void CVisibilityPlugins_SetAtomicId(RpAtomic* pRpAtomic, int id)
 {
-    CallGTAFunction<void, __CDECL>(0x732230, PrepareSignature(pRpAtomic, id));
+    return ((void(__cdecl*)(RpAtomic*, int))0x732230)(pRpAtomic, id);
 }
 
 static void CVehicleModelInfo_UseCommonVehicleTexDicationary()
 {
-    CallGTAFunction<void, __CDECL>(0x4C75A0, PrepareSignature());
+    ((void(__cdecl*)())0x4C75A0)();
 }
 
 static void CVehicleModelInfo_StopUsingCommonVehicleTexDicationary()
 {
-    CallGTAFunction<void, __CDECL>(0x4C75C0, PrepareSignature());
+    ((void(__cdecl*)())0x4C75C0)();
 }
 
 static auto          CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
@@ -223,5 +223,5 @@ CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
     if (fLenSq > 0.0f && std::fabs(fLenSq - 1.0f) > std::numeric_limits<float>::epsilon())
         inst.rotation /= std::sqrt(fLenSq);
 
-    return CallGTAFunction<CEntitySAInterface*, __CDECL>(0x538090, PrepareSignature(&inst));
+    return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*))0x538090)(&inst);
 }

@@ -13,8 +13,6 @@
 
 #include <game/CPedIK.h>
 
-#define CPedIK__RotateTorso 0x5FDDB0
-
 class CPedSAInterface;
 struct RwV3d;
 

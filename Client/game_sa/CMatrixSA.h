@@ -2,13 +2,6 @@
 #include "CVector.h"
 #include "CRenderWareSA.h"
 
-#define CMatrix_Constructor 0x59BCF0
-#define CMatrix_Constructor2 0x59C050
-#define CMatrix_Destructor 0x59ACD0
-#define FUNC_CMatrix_ConvertToEulerAngles 0x59A840
-#define FUNC_CMatrix_ConvertFromEulerAngles 0x59AA40
-#define FUNC_CMatrix_UpdateRW               0x59BBB0
-
 class CMatrixSAInterface
 {
 private:

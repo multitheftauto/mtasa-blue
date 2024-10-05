@@ -18,5 +18,6 @@ RwV3d& CPedIKSAInterface::ZaxisIK = *(RwV3d*)0x8D2344;
 
 void CPedIKSA::RotateTorso(void* bone, LimbOrientation* orientation, bool flag)
 {
-    CallGTAFunction<void, __THISCALL>(CPedIK__RotateTorso, PrepareSignature(internalInterface, bone, orientation, flag));
+    auto CPedIKSA_RotateTorso = (void(__thiscall*)(CPedIKSAInterface*, void*, LimbOrientation*, bool))0x5FDDB0;
+    CPedIKSA_RotateTorso(internalInterface, bone, orientation, flag);
 }

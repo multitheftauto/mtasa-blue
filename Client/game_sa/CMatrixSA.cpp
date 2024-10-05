@@ -3,34 +3,30 @@
 
 CMatrixSAInterface::CMatrixSAInterface(CMatrixSAInterface const& matrix)
 {
-    auto args = PrepareSignature(this, &matrix);
-    CallGTAFunction<void, __THISCALL>(CMatrix_Constructor, args);
+    ((void(__thiscall*)(CMatrixSAInterface*, CMatrixSAInterface const&))0x59BCF0)(this, matrix);
 }
 
 CMatrixSAInterface::CMatrixSAInterface(RwMatrix* matrix, bool temporary)
 {
-    auto args = PrepareSignature(this, matrix, temporary);
-    CallGTAFunction<void, __THISCALL>(CMatrix_Constructor2, args);
+    ((void(__thiscall*)(CMatrixSAInterface*, RwMatrix*, bool))0x59C050)(this, matrix, temporary);
 }
 
 // destructor detaches matrix if attached
 CMatrixSAInterface::~CMatrixSAInterface()
 {
-    CallGTAFunction<void, __THISCALL>(CMatrix_Destructor, PrepareSignature(this));
+    ((void(__thiscall*)(CMatrixSAInterface*))0x59ACD0)(this);
 }
 
 void CMatrixSAInterface::ConvertToEulerAngles(float& x, float& y, float& z, std::int32_t flags)
 {
-    auto args = PrepareSignature(this, &x, &y, &z, flags);
-    CallGTAFunction<void, __THISCALL>(FUNC_CMatrix_ConvertToEulerAngles, args);
+    ((void(__thiscall*)(CMatrixSAInterface*, float&, float&, float&, std::int32_t))0x59A840)(this, x, y, z, flags);
 }
 void CMatrixSAInterface::ConvertFromEulerAngles(float x, float y, float z, std::int32_t flags)
 {
-    auto args = PrepareSignature(this, x, y, z, flags);
-    CallGTAFunction<void, __THISCALL>(FUNC_CMatrix_ConvertFromEulerAngles, args);
+    ((void(__thiscall*)(CMatrixSAInterface*, float, float, float, std::int32_t))0x59AA40)(this, x, y, z, flags);
 }
 
 void CMatrixSAInterface::UpdateRW()
 {
-    CallGTAFunction<void, __THISCALL>(FUNC_CMatrix_UpdateRW, PrepareSignature(this));
+    ((void(__thiscall*)(CMatrixSAInterface*))0x59BBB0)(this);
 }
