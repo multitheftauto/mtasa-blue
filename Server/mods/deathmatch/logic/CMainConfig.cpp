@@ -883,27 +883,31 @@ bool CMainConfig::AddMissingSettings()
         for (auto it2 = m_pRootNode->ChildrenBegin(); it2 != m_pRootNode->ChildrenEnd(); ++it2)
         {
             CXMLNode* tempNode = *it2;
-            if (tempNode->GetTagName() == templateNodeTagName)
+            if (tempNode->GetTagName() != templateNodeTagName)
             {
-                bool bAttributesMatch = true;
-                CXMLAttributes& attributes = tempNode->GetAttributes();
-                for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
+                continue;
+            }
+            CXMLAttributes& attributes = tempNode->GetAttributes();
+            bool            attributesMatch = true;
+
+            for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
+            {
+                CXMLAttribute* templateAttribute = *it3;
+                const SString& strKey = templateAttribute->GetName();
+                const SString& strValue = templateAttribute->GetValue();
+
+                CXMLAttribute* foundAttribute = attributes.Find(strKey);
+                if (!foundAttribute || foundAttribute->GetValue() != strValue)
                 {
-                    CXMLAttribute* templateAttribute = *it3;
-                    const SString& strKey = templateAttribute->GetName();
-                    const SString& strValue = templateAttribute->GetValue();
-                    CXMLAttribute* foundAttribute = attributes.Find(strKey);
-                    if (!foundAttribute || foundAttribute->GetValue() != strValue)
-                    {
-                        bAttributesMatch = false;
-                        break;
-                    }
-                }
-                if (bAttributesMatch)
-                {
-                    foundNode = tempNode;
+                    attributesMatch = false;
                     break;
                 }
+            }
+
+            if (attributesMatch)
+            {
+                foundNode = tempNode;
+                break;
             }
         }
         // Create missing node if not found
