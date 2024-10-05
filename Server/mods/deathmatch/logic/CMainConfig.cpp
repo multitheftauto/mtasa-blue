@@ -263,7 +263,7 @@ bool CMainConfig::Load()
 
         // Find bitnumber
         bool found = false;
-        for (uint i = 0; i < NUMELMS(gtaDataFiles); i++)
+        for (std::uint8_t i = 0; i < NUMELMS(gtaDataFiles); i++)
         {
             if (name == gtaDataFiles[i].szRealFilename)
             {
@@ -856,44 +856,87 @@ bool CMainConfig::AddMissingSettings()
     if (!g_pGame->IsUsingMtaServerConf())
         return false;
 
-    SString strTemplateFilename = PathJoin(g_pServerInterface->GetServerModPath(), "mtaserver.conf.template");
+    const SString& templateFileName = PathJoin(g_pServerInterface->GetServerModPath(), "mtaserver.conf.template");
 
-    if (!FileExists(strTemplateFilename))
+    if (!FileExists(templateFileName))
         return false;
 
-    CXMLFile* pFileTemplate = g_pServerInterface->GetXML()->CreateXML(strTemplateFilename);
-    CXMLNode* pRootNodeTemplate = pFileTemplate && pFileTemplate->Parse() ? pFileTemplate->GetRootNode() : nullptr;
-    if (!pRootNodeTemplate)
+    CXMLFile* templateFile = g_pServerInterface->GetXML()->CreateXML(templateFileName);
+    CXMLNode* templateRootNode = templateFile && templateFile->Parse() ? templateFile->GetRootNode() : nullptr;
+    if (!templateRootNode)
     {
-        CLogger::ErrorPrintf("Can't parse '%s'\n", *strTemplateFilename);
+        CLogger::ErrorPrintf("Can't parse '%s'\n", *templateFileName);
         return false;
     }
 
     // Check that each item in the template also exists in the server config
-    bool      bChanged = false;
-    CXMLNode* pPrevNode = nullptr;
-    for (auto it = pRootNodeTemplate->ChildrenBegin(); it != pRootNodeTemplate->ChildrenEnd(); ++it)
+    bool      hasConfigChanged = false;
+    CXMLNode* previousNode = nullptr;
+    for (auto it = templateRootNode->ChildrenBegin(); it != templateRootNode->ChildrenEnd(); ++it)
     {
-        CXMLNode* pNodeTemplate = *it;
-        SString   strNodeName = pNodeTemplate->GetTagName();
-        CXMLNode* pNode = m_pRootNode->FindSubNode(strNodeName);
-        if (!pNode)
+        CXMLNode* templateNode = *it;
+        SString   templateNodeTagName = templateNode->GetTagName();
+
+        // Find node with exact same attributes
+        CXMLAttributes& templateAttributes = templateNode->GetAttributes();
+        CXMLNode*       foundNode = nullptr;
+        for (auto it2 = m_pRootNode->ChildrenBegin(); it2 != m_pRootNode->ChildrenEnd(); ++it2)
         {
-            CLogger::LogPrintf("Adding missing '%s' to mtaserver.conf\n", *strNodeName);
-            SString strNodeValue = pNodeTemplate->GetTagContent();
-            SString strNodeComment = pNodeTemplate->GetCommentText();
-            pNode = m_pRootNode->CreateSubNode(strNodeName, pPrevNode);
-            pNode->SetTagContent(strNodeValue);
-            pNode->SetCommentText(strNodeComment, true);
-            bChanged = true;
+            CXMLNode* tempNode = *it2;
+            if (tempNode->GetTagName() == templateNodeTagName)
+            {
+                bool bAttributesMatch = true;
+                CXMLAttributes& attributes = tempNode->GetAttributes();
+                for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
+                {
+                    CXMLAttribute* templateAttribute = *it3;
+                    const SString& strKey = templateAttribute->GetName();
+                    const SString& strValue = templateAttribute->GetValue();
+                    CXMLAttribute* foundAttribute = attributes.Find(strKey);
+                    if (!foundAttribute || foundAttribute->GetValue() != strValue)
+                    {
+                        bAttributesMatch = false;
+                        break;
+                    }
+                }
+                if (bAttributesMatch)
+                {
+                    foundNode = tempNode;
+                    break;
+                }
+            }
         }
-        pPrevNode = pNode;
+        // Create missing node if not found
+        if (!foundNode)
+        {
+            CLogger::LogPrintf("Adding missing '%s' to mtaserver.conf\n", *templateNodeTagName);
+            SString value = templateNode->GetTagContent();
+            SString commentText = templateNode->GetCommentText();
+            foundNode = m_pRootNode->CreateSubNode(templateNodeTagName, previousNode);
+            foundNode->SetTagContent(value);
+            foundNode->SetCommentText(commentText, true);
+
+            // Copy attributes from template node
+            CXMLAttributes& templateAttributes = templateNode->GetAttributes();
+            for (auto it = templateAttributes.ListBegin(); it != templateAttributes.ListEnd(); ++it)
+            {
+                CXMLAttribute* templateAttribute = *it;
+                const SString& attributeName = templateAttribute->GetName();
+                const SString& attributeValue = templateAttribute->GetValue();
+
+                CXMLAttribute* newAttribute = foundNode->GetAttributes().Create(attributeName);
+                if (newAttribute)
+                    newAttribute->SetValue(attributeValue);
+            }
+            hasConfigChanged = true;
+        }
+        previousNode = foundNode;
     }
 
     // Clean up
-    g_pServerInterface->GetXML()->DeleteXML(pFileTemplate);
-    FileDelete(strTemplateFilename);
-    return bChanged;
+    g_pServerInterface->GetXML()->DeleteXML(templateFile);
+    FileDelete(templateFileName);
+    return hasConfigChanged;
 }
 
 bool CMainConfig::IsValidPassword(const char* szPassword)
