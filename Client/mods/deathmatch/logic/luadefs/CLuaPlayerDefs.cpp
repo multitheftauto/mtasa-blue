@@ -29,6 +29,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"getPlayerMoney", GetPlayerMoney},
         {"getPlayerWantedLevel", GetPlayerWantedLevel},
         {"getPlayerScriptDebugLevel", ArgumentParser<GetPlayerScriptDebugLevel>},
+        {"isPlayerCrosshairVisible", ArgumentParser<IsPlayerCrosshairVisible>},
 
         // Player set funcs
         {"showPlayerHudComponent", ShowPlayerHudComponent},
@@ -91,6 +92,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getScriptDebugLevel", "getPlayerScriptDebugLevel");
 
     lua_classfunction(luaVM, "isNametagShowing", "isPlayerNametagShowing");
+    lua_classfunction(luaVM, "isCrosshairVisible", "isPlayerCrosshairVisible");
 
     lua_classvariable(luaVM, "ping", NULL, "getPlayerPing");
     lua_classvariable(luaVM, "name", NULL, "getPlayerName");
@@ -98,6 +100,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "scriptDebugLevel", nullptr, "getPlayerScriptDebugLevel");
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
+    lua_classvariable(luaVM, "crosshairVisible", nullptr, "isPlayerCrosshairVisible");
 
     lua_registerclass(luaVM, "Player", "Ped");
 }
@@ -635,4 +638,9 @@ unsigned char CLuaPlayerDefs::GetPlayerMapOpacity()
 {
     int iMapOpacity = g_pCore->GetCVars()->GetValue<int>("mapalpha");
     return static_cast<unsigned char>(Clamp(0, iMapOpacity, 255));
+}
+
+bool CLuaPlayerDefs::IsPlayerCrosshairVisible()
+{
+    return g_pGame->GetHud()->IsCrosshairVisible();
 }
