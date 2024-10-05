@@ -115,13 +115,13 @@ template <typename... Args>
 struct GTAFuncSignature
 {
     std::tuple<Args...> args;
-    GTAFuncSignature(Args... a) : args(std::forward<Args>(a)...) {}
+    GTAFuncSignature(Args... a) : args(std::move(a)...) {}
 };
 
 template <typename... Args>
 GTAFuncSignature<Args...> PrepareSignature(Args... args)
 {
-    return GTAFuncSignature<Args...>(std::forward<Args>(args)...);
+    return GTAFuncSignature<Args...>(std::move(args)...);
 }
 
 template <typename ReturnType, typename Func, typename Tuple, std::size_t... I>
@@ -131,18 +131,31 @@ ReturnType apply_helper(Func&& f, Tuple&& t, std::index_sequence<I...>)
 }
 
 template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
-ReturnType CallGTAFunction(Func function, GTAFuncSignature<Args...>& sig)
+typename std::enable_if<std::is_same<CallingConvention, __THISCALL>::value, ReturnType>::type CallGTAFunction(Func function, GTAFuncSignature<Args...>& sig)
 {
-    if constexpr (std::is_same_v<CallingConvention, __THISCALL>)
-        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__thiscall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    else if constexpr (std::is_same_v<CallingConvention, __CDECL>)
-        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__cdecl*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    else if constexpr (std::is_same_v<CallingConvention, __STDCALL>)
-        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__stdcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    else if constexpr (std::is_same_v<CallingConvention, __FASTCALL>)
-        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__fastcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    else if constexpr (std::is_same_v<CallingConvention, __VECTORCALL>)
-        return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__vectorcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
-    else
-        static_assert(sizeof(char) == 0, "Invalid calling convention specified in CallGTAFunction");
+    return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__thiscall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+}
+
+template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
+typename std::enable_if<std::is_same<CallingConvention, __CDECL>::value, ReturnType>::type CallGTAFunction(Func function, GTAFuncSignature<Args...>& sig)
+{
+    return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__cdecl*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+}
+
+template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
+typename std::enable_if<std::is_same<CallingConvention, __STDCALL>::value, ReturnType>::type CallGTAFunction(Func function, GTAFuncSignature<Args...>& sig)
+{
+    return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__stdcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+}
+
+template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
+typename std::enable_if<std::is_same<CallingConvention, __FASTCALL>::value, ReturnType>::type CallGTAFunction(Func function, GTAFuncSignature<Args...>& sig)
+{
+    return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__fastcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
+}
+
+template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
+typename std::enable_if<std::is_same<CallingConvention, __VECTORCALL>::value, ReturnType>::type CallGTAFunction(Func function, GTAFuncSignature<Args...>& sig)
+{
+    return apply_helper<ReturnType>(reinterpret_cast<ReturnType(__vectorcall*)(Args...)>(function), sig.args, std::index_sequence_for<Args...>{});
 }
