@@ -98,8 +98,12 @@ void CPedSA::Init()
 
 void CPedSA::SetModelIndex(DWORD dwModelIndex)
 {
-    DWORD dwFunction = FUNC_SetModelIndex;
+    // Delete any existing RwObject first
+    GetPedInterface()->DeleteRwObject();
+
+    // Set new model
     DWORD dwThis = (DWORD)GetInterface();
+    DWORD dwFunction = FUNC_SetModelIndex;
     _asm
     {
         mov     ecx, dwThis
@@ -114,16 +118,6 @@ void CPedSA::SetModelIndex(DWORD dwModelIndex)
         DWORD dwType = pModelInfo->pedType;
         GetPedInterface()->pedSound.m_bIsFemale = (dwType == 5 || dwType == 22);
     }
-}
-
-// Hacky thing done for the local player when changing model
-void CPedSA::RemoveGeometryRef()
-{
-    RpClump*    pClump = (RpClump*)GetInterface()->m_pRwObject;
-    RpAtomic*   pAtomic = (RpAtomic*)((pClump->atomics.root.next) - 0x8);
-    RpGeometry* pGeometry = pAtomic->geometry;
-    if (pGeometry->refs > 1)
-        pGeometry->refs--;
 }
 
 bool CPedSA::IsInWater()

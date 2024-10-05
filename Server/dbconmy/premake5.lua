@@ -41,11 +41,16 @@ project "Dbconmy"
 		includedirs {
 			os.findheader("mysql.h", {
 				"/usr/local/opt/mysql/include/mysql",
+				"/opt/homebrew/include/mysql",
 				"/opt/osxcross/macports/pkgs/opt/local/include/mysql8/mysql",
 			})
 		}
 		libdirs {
-			os.findlib("libmysqlclient.a", "/opt/osxcross/macports/pkgs/opt/local/lib/mysql8/mysql")
+			os.findlib("libmysqlclient.a", {
+				"/usr/local/opt/mysql/lib",
+				"/opt/homebrew/lib",
+				"/opt/osxcross/macports/pkgs/opt/local/lib/mysql8/mysql",
+			})
 		}
 
 	if GLIBC_COMPAT then
