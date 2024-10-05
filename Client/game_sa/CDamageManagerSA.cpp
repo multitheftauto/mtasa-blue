@@ -140,18 +140,7 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
             else
             {
                 // Call CAutomobile::SetPanelDamage to update the vehicle
-                dwFunction = 0x6B1480;
-                dwThis = (DWORD)internalEntityInterface;
-                bool windscreenShatter = bPanel == ePanels::WINDSCREEN_PANEL && breakGlass;
-                bool quiet = !spawnFlyingComponent;
-                _asm
-                {
-                    mov     ecx, dwThis
-                    push    quiet
-                    push    windscreenShatter
-                    push    dwPanel
-                    call    dwFunction
-                }
+                ((void(__thiscall*)(CEntitySAInterface*, int, bool, bool))0x6B1480)(internalEntityInterface, dwPanel, bPanel == ePanels::WINDSCREEN_PANEL && breakGlass, !spawnFlyingComponent);
             }
         }
     }
