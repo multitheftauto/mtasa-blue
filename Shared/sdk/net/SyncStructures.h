@@ -2169,7 +2169,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data3.roadsignstext = true;
         data4.extendedwatercannons = true;
         data5.tunnelweatherblend = true;
-        data6.flyingcomponents = true;
+        data6.flyingcomponents = false;
     }
 };
 
