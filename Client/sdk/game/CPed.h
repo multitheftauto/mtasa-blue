@@ -285,5 +285,8 @@ public:
     virtual void*                   GetPedNodeInterface(std::int32_t nodeId) = 0;
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
 
+    virtual CEntitySAInterface* GetTargetedObject() = 0;
+    virtual ePedState           GetPedState() = 0;
+
     virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
 };
