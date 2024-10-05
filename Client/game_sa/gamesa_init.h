@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #pragma once
+#include "gamesa_function_caller.h"
 
 //
 // Use MemSet/Cpy/Put for non Mem*Fast memory regions
@@ -104,42 +105,3 @@ void MemOrFast(U ptr, const T value)
 
 bool GetDebugIdEnabled(uint uiDebugId);
 void LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
-
-namespace CallingConventions
-{
-    struct thiscall{};
-    struct ___cdecl{};
-    struct stdcall{};
-    struct fastcall{};
-    struct vectorcall{};
-} // namespace CallingConventions
-
-template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
-typename std::enable_if<std::is_same<CallingConvention, CallingConventions::thiscall>::value, ReturnType>::type CallGTAFunction(Func function, Args... params)
-{
-    return reinterpret_cast<ReturnType(__thiscall*)(Args...)>(function)(params...);
-}
-
-template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
-typename std::enable_if<std::is_same<CallingConvention, CallingConventions::___cdecl>::value, ReturnType>::type CallGTAFunction(Func function, Args... params)
-{
-    return reinterpret_cast<ReturnType(__cdecl*)(Args...)>(function)(params...);
-}
-
-template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
-typename std::enable_if<std::is_same<CallingConvention, CallingConventions::stdcall>::value, ReturnType>::type CallGTAFunction(Func function, Args... params)
-{
-    return reinterpret_cast<ReturnType(__stdcall*)(Args...)>(function)(params...);
-}
-
-template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
-typename std::enable_if<std::is_same<CallingConvention, CallingConventions::fastcall>::value, ReturnType>::type CallGTAFunction(Func function, Args... params)
-{
-    return reinterpret_cast<ReturnType(__fastcall*)(Args...)>(function)(params...);
-}
-
-template <typename ReturnType, typename CallingConvention, typename Func, typename... Args>
-typename std::enable_if<std::is_same<CallingConvention, CallingConventions::vectorcall>::value, ReturnType>::type CallGTAFunction(Func function, Args... params)
-{
-    return reinterpret_cast<ReturnType(__vectorcall*)(Args...)>(function)(params...);
-}
