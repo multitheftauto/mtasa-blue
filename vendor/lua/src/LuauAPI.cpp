@@ -351,6 +351,8 @@ int Vluau_getinfo (lua_State *L, const char *what, Vlua_Debug *ar)
         }
     }
 
+    buffer[i] = 0;
+
     VluaDebugCtor(ar);
 
     lua_Debug ldebug;
