@@ -3859,25 +3859,22 @@ void CClientVehicle::UpdateUnderFloorFix(const CVector& vecTargetPosition, bool 
     }
 }
 
-bool CClientVehicle::IsEnterable()
+bool CClientVehicle::IsEnterable(bool localEntity)
 {
-    if (m_pVehicle)
-    {
-        // Server vehicle?
-        if (!IsLocalEntity())
-        {
-            if (GetHealth() > 0.0f)
-            {
-                if (!IsInWater() || (GetVehicleType() == CLIENTVEHICLE_BOAT || m_usModel == 447 /* sea sparrow */
-                                     || m_usModel == 417                                        /* levithan */
-                                     || m_usModel == 460 /* skimmer */))
-                {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
+    if (!m_pVehicle)
+        return false;
+        
+    // Server vehicle?
+    if (IsLocalEntity() != localEntity)
+        return false;
+        
+    if (GetHealth() <= 0.0f)
+        return false;
+        
+    return !IsInWater() || (GetVehicleType() == CLIENTVEHICLE_BOAT
+        || m_usModel == 447 /* sea sparrow */
+        || m_usModel == 417                                        /* levithan */
+        || m_usModel == 460 /* skimmer */);
 }
 
 bool CClientVehicle::HasRadio()
