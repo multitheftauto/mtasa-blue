@@ -31,19 +31,19 @@ public:
     SString(const char* szText) : std::string(szText ? szText : "") {}
 
     template <int=0>
-    explicit SString(const char* szFormat, ...) : std::string()
+    explicit SString(const char* format, ...) : std::string()
     {
-        if (szFormat)
-        {
-            va_list vl;
+        if (!format)
+            return;
 
-            va_start(vl, szFormat);
-            vFormat(szFormat, vl);
-            va_end(vl);
-        }
+        va_list vl;
+
+        va_start(vl, format);
+        vFormat(format, vl);
+        va_end(vl);
     }
 
-    SString(const std::string& strText) : std::string(strText) {}
+    SString(const std::string& text) : std::string(text) {}
 
     SString& Format(const char* szFormat, ...)
     {
