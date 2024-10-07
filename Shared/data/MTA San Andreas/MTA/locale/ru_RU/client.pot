@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-09-27 04:28+0000\n"
-"PO-Revision-Date: 2024-09-27 04:31\n"
+"PO-Revision-Date: 2024-10-07 21:59\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1690,7 +1690,9 @@ msgstr "ВНЕШНИЕ ЗВУКИ"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr ""
+msgstr "Кажется, вы включили параметр Rich Presence.\n"
+"Желаете разрешить серверам передавать данные с их стороны?\n\n"
+"Данные могут включать ваш уникальный идентификатор."
 
 #: Client/core/CSettings.cpp:4560
 msgid "CONSENT TO ALLOW DATA SHARING"
@@ -2329,7 +2331,8 @@ msgstr "Сервер предлагает обновить клиент, но э
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr ""
+msgstr "Обновление временно недоступно.\n\n"
+"Пожалуйста, посетите www.mtasa.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
