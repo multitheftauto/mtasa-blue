@@ -30,6 +30,8 @@ public:
 
     SString(const char* szText) : std::string(szText ? szText : "") {}
 
+    // A hacky way to force the compiler
+    // into properly recognizing varargs vs const char* constructor
     template <int=0>
     explicit SString(const char* format, ...) : std::string()
     {
@@ -44,6 +46,7 @@ public:
     }
 
     SString(const std::string& text) : std::string(text) {}
+    SString(std::string&& text) : std::string(std::move(text)) {}
 
     SString& Format(const char* szFormat, ...)
     {
