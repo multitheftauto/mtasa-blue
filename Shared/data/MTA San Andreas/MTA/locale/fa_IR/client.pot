@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-09-27 04:28+0000\n"
-"PO-Revision-Date: 2024-09-27 05:30\n"
+"PO-Revision-Date: 2024-10-07 06:10\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -2320,7 +2320,8 @@ msgstr "سرور: بروزرسانی MTA پیشنهاد می شود اما اج�
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr ""
+msgstr "بروزرسانی در حال حاضر موجود نمی باشد.\n\n"
+"لطفا www.mtasa.com را بررسی نمایید"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
