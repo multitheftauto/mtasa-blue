@@ -41,4 +41,5 @@ public:
     virtual bool IsComponentVisible(eHudComponent component) = 0;
     virtual void AdjustComponents(float fAspectRatio) = 0;
     virtual void ResetComponentAdjustment() = 0;
+    virtual bool IsCrosshairVisible() = 0;
 };
