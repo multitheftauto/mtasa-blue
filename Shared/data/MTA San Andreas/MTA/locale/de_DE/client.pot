@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-09-27 04:28+0000\n"
-"PO-Revision-Date: 2024-09-27 04:30\n"
+"PO-Revision-Date: 2024-10-07 02:50\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1681,13 +1681,13 @@ msgstr "Externe Sounds"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr "Es scheint, dass Sie die Verbindungsoption Rich Presence aktiviert haben.\n"
-"Möchten Sie den Servern erlauben, ihre Daten auszutauschen?\n\n"
-"Dazu gehört auch Ihre eindeutige ID-Kennung."
+msgstr "Es scheint, dass die Rich Presence-Verbindungsoption aktiviert ist.\n"
+"Möchten Sie erlauben, dass Server Ihre Daten teilen?\n\n"
+"Dazu gehört auch Ihre eindeutige ID."
 
 #: Client/core/CSettings.cpp:4560
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr "EINWILLIGUNG IN DIE GEMEINSAME NUTZUNG VON DATEN"
+msgstr "ZUSTIMMUNG ZUR DATENFREIGABE"
 
 #: Client/core/CSettings.cpp:4584
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -2322,7 +2322,8 @@ msgstr "Der Server empfiehlt eine Aktualisierung durchzuführen, die aber nicht 
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr ""
+msgstr "Aktualisierung derzeit nicht verfügbar.\n\n"
+"Bitte überprüfen Sie www.mtasa.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
