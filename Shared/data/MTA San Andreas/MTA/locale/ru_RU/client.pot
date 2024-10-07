@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-09-27 04:28+0000\n"
-"PO-Revision-Date: 2024-10-07 21:59\n"
+"PO-Revision-Date: 2024-10-07 23:11\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -674,7 +674,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5624
 msgid "Wasted"
-msgstr ""
+msgstr "Потрачено"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
@@ -3191,7 +3191,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Пожалуйста, проверьте антивирус на предмет ложного обнаружения, попробуйте добавить gta_sa.exe в исключения и перезапустить MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
