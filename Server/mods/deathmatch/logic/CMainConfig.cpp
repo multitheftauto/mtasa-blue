@@ -263,7 +263,7 @@ bool CMainConfig::Load()
 
         // Find bitnumber
         bool found = false;
-        for (std::uint8_t i = 0; i < NUMELMS(gtaDataFiles); i++)
+        for (std::size_t i = 0; i < std::size(gtaDataFiles); i++)
         {
             if (name == gtaDataFiles[i].szRealFilename)
             {
