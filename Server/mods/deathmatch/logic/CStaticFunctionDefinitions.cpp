@@ -938,10 +938,11 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled(CElement* pEle
 
 bool CStaticFunctionDefinitions::SetElementOnFire(CElement* pElement, bool onFire)
 {
+    assert(pElement);
+
     if (!IS_PED(pElement) && !IS_VEHICLE(pElement) && !IS_OBJECT(pElement) && !IS_WEAPON(pElement))
         return false;
 
-    assert(pElement);
     RUN_CHILDREN(SetElementOnFire(*iter, onFire));
 
     CBitStream bitStream;
