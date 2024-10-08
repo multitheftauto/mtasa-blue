@@ -153,6 +153,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setLowLOD", "setLowLODElement");
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
+    lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
 
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getChild", "getElementChild");
@@ -191,6 +192,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isVisibleTo", "isElementVisibleTo");
     lua_classfunction(luaVM, "isLowLOD", "isElementLowLOD");
     lua_classfunction(luaVM, "isAttached", "isElementAttached");
+    lua_classfunction(luaVM, "isOnFire", "isElementOnFire");
 
     lua_classvariable(luaVM, "id", "setElementID", "getElementID");
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
@@ -219,6 +221,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, OOP_getElementVelocity);
     lua_classvariable(luaVM, "angularVelocity", "setElementAngularVelocity", "getElementAngularVelocity", setElementTurnVelocity, OOP_getElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
+    lua_classvariable(luaVM, "onFire", "setElementOnFire", "isElementOnFire");
 
     lua_registerclass(luaVM, "Element");
 }
