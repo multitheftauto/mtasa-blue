@@ -12488,3 +12488,14 @@ bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, f
 
     return false;
 }
+
+bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::uint8_t collisionType, std::int32_t removalTime)
+{
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(nodeIndex);
+    bitStream.pBitStream->Write(collisionType);
+    bitStream.pBitStream->Write(removalTime);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SPAWN_VEHICLE_FLYING_COMPONENT, *bitStream.pBitStream));
+
+    return true;
+}
