@@ -153,8 +153,8 @@ public:
     CVector* GetScale();
     void     ResetScale();
 
-    bool IsOnFire() { return GetObjectInterface()->pFire != nullptr; }
-    void SetOnFire(bool onFire);
+    bool IsOnFire() override { return GetObjectInterface()->pFire != nullptr; }
+    void SetOnFire(bool onFire) override;
 
 private:
     void CheckForGangTag();

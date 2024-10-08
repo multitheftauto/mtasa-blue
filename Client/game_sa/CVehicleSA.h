@@ -690,8 +690,8 @@ public:
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
 
-    bool IsOnFire() { return GetVehicleInterface()->m_pFire != nullptr; }
-    void SetOnFire(bool onFire);
+    bool IsOnFire() override { return GetVehicleInterface()->m_pFire != nullptr; }
+    void SetOnFire(bool onFire) override;
 
     static void StaticSetHooks();
     static void SetVehiclesSunGlareEnabled(bool bEnabled);
