@@ -289,6 +289,8 @@ enum eElementRPCFunctions
     RESET_WORLD_PROPERTIES,
   
     SPAWN_VEHICLE_FLYING_COMPONENT,
-  
+
+    SET_ELEMENT_ON_FIRE,
+
     NUM_RPC_FUNCS            // Add above this line
 };

@@ -61,6 +61,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementSyncer", getElementSyncer},
         {"getElementCollisionsEnabled", getElementCollisionsEnabled},
         {"getLowLODElement", getLowLODElement},
+        {"isElementOnFire", ArgumentParser<IsElementOnFire>},
 
         // Attachement
         {"attachElements", attachElements},
@@ -102,6 +103,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementCollisionsEnabled", setElementCollisionsEnabled},
         {"setElementFrozen", setElementFrozen},
         {"setLowLODElement", setLowLODElement},
+        {"setElementOnFire", ArgumentParser<SetElementOnFire>},
     };
 
     // Add functions
@@ -2436,4 +2438,26 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaElementDefs::IsElementOnFire(CElement* element)
+{
+    switch (element->GetType())
+    {
+        case EElementType::PLAYER:
+        case EElementType::PED:
+            return static_cast<CPed*>(element)->IsOnFire();
+        case EElementType::VEHICLE:
+            return static_cast<CVehicle*>(element)->IsOnFire();
+        case EElementType::OBJECT:
+        case EElementType::WEAPON:
+            break; // wait for objects sync
+    }
+
+    return false;
+}
+
+bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire)
+{
+    return CStaticFunctionDefinitions::SetElementOnFire(element, onFire);
 }

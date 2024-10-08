@@ -15,6 +15,7 @@
 #include "CPoolsSA.h"
 #include "CRopesSA.h"
 #include "CWorldSA.h"
+#include "CFireManagerSA.h"
 
 extern CGameSA* pGame;
 
@@ -303,4 +304,33 @@ CVector* CObjectSA::GetScale()
 void CObjectSA::ResetScale()
 {
     SetScale(1.0f, 1.0f, 1.0f);
+}
+
+void CObjectSA::SetOnFire(bool onFire)
+{
+    CObjectSAInterface* objectInterface = GetObjectInterface();
+    if ((onFire && objectInterface->pFire) || (!onFire && !objectInterface->pFire))
+        return;
+
+    auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
+
+    if (onFire)
+    {
+        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        if (!fire)
+            return;
+
+        fire->SetTarget(this);
+        fire->SetStrength(1.0f);
+        fire->Ignite();
+        fire->SetNumGenerationsAllowed(0);
+
+        objectInterface->pFire = fire->GetInterface();
+    }
+    else
+    {
+        CFire* fire = fireManager->GetFire(objectInterface->pFire);
+        if (fire)
+            fire->Extinguish();
+    }
 }

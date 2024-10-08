@@ -397,6 +397,9 @@ public:
     void             SetBlowState(VehicleBlowState state);
     VehicleBlowState GetBlowState() const noexcept { return m_blowState; }
 
+    bool IsOnFire() const noexcept { return m_onFire; }
+    void SetOnFire(bool onFire) noexcept { m_onFire = onFire; }
+
     void StopIdleTimer();
     void RestartIdleTimer();
     bool IsIdleTimerRunning();
@@ -490,6 +493,8 @@ private:
 
     unsigned char m_ucVariant;
     unsigned char m_ucVariant2;
+
+    bool m_onFire;
 
     CTickCount m_LastPushedTime;
     CVector    m_vecStationaryCheckPosition;

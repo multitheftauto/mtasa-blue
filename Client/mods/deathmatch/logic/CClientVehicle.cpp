@@ -5058,3 +5058,17 @@ CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
 
     return entryPoint;
 }
+
+bool CClientVehicle::IsOnFire() const noexcept
+{
+    if (!m_pVehicle)
+        return false;
+
+    return m_pVehicle->IsOnFire();
+}
+
+void CClientVehicle::SetOnFire(bool onFire) noexcept
+{
+    if (m_pVehicle)
+        m_pVehicle->SetOnFire(onFire);
+}

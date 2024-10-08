@@ -325,4 +325,8 @@ public:
     virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;
 
     virtual const CVector* GetDummyPositions() const = 0;
+
+    virtual bool IsOnFire() = 0;
+    virtual void SetOnFire(bool onFire) = 0;
+
 };

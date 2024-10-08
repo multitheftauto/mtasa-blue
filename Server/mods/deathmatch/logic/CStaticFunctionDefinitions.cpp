@@ -936,6 +936,39 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled(CElement* pEle
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetElementOnFire(CElement* pElement, bool onFire)
+{
+    if (!IS_PED(pElement) && !IS_VEHICLE(pElement) && !IS_OBJECT(pElement) && !IS_WEAPON(pElement))
+        return false;
+
+    assert(pElement);
+    RUN_CHILDREN(SetElementOnFire(*iter, onFire));
+
+    CBitStream bitStream;
+    bitStream.pBitStream->WriteBit(onFire);
+
+    switch (pElement->GetType())
+    {
+        case CElement::PLAYER:
+        case CElement::PED:
+        {
+            static_cast<CPed*>(pElement)->SetOnFire(onFire);
+            break;
+        }
+        case CElement::VEHICLE:
+        {
+            static_cast<CVehicle*>(pElement)->SetOnFire(onFire);
+            break;
+        }
+        case CElement::OBJECT:
+        case CElement::WEAPON:
+            break; // wait for objects sync
+    }
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_ON_FIRE, *bitStream.pBitStream));
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* szID)
 {
     assert(pElement);

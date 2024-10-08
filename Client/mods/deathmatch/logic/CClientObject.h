@@ -119,6 +119,9 @@ public:
     bool IsBeingRespawned() { return m_bBeingRespawned; };
     void SetBeingRespawned(bool bBeingRespawned) { m_bBeingRespawned = bBeingRespawned; };
 
+    bool IsOnFire() const noexcept;
+    void SetOnFire(bool onFire) noexcept;
+
 protected:
     void StreamIn(bool bInstantly);
     void StreamOut();

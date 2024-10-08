@@ -71,6 +71,7 @@ public:
     LUA_DECLARE(IsElementLowLod);
     LUA_DECLARE(IsElementCallPropagationEnabled);
     LUA_DECLARE(IsElementWaitingForGroundToLoad);
+    static bool IsElementOnFire(CClientEntity* entity);
 
     // Element set funcs
     LUA_DECLARE(CreateElement);
@@ -99,4 +100,5 @@ public:
     LUA_DECLARE(SetElementFrozen);
     static bool SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity, std::optional<CClientEntity*> pLowLodEntity);
     LUA_DECLARE(SetElementCallPropagationEnabled);
+    static bool SetElementOnFire(CClientEntity* entity, bool onFire);
 };
