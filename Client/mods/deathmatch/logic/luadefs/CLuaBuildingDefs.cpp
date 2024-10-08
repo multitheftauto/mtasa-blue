@@ -49,7 +49,8 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::u
         throw std::invalid_argument("Position is outside of game world");
 
     CVector rot{rotX.value_or(0), rotY.value_or(0), rotZ.value_or(0)};
-    if (rot.fX != 0 || rot.fY != 0 || rot.fZ != 0)
+    float   epsilon = std::numeric_limits<float>::epsilon();
+    if (std::abs(rot.fX) < epsilon || std::abs(rot.fY) < epsilon || std::abs(rot.fZ) < epsilon)
         ConvertDegreesToRadians(rot);
 
     m_pBuildingManager->ResizePoolIfNeeds();
