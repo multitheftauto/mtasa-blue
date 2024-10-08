@@ -856,7 +856,7 @@ bool CMainConfig::AddMissingSettings()
     if (!g_pGame->IsUsingMtaServerConf())
         return false;
 
-    const SString& templateFileName = PathJoin(g_pServerInterface->GetServerModPath(), "mtaserver.conf.template");
+    const SString templateFileName = PathJoin(g_pServerInterface->GetServerModPath(), "mtaserver.conf.template");
 
     if (!FileExists(templateFileName))
         return false;
