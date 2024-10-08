@@ -28,10 +28,6 @@ void CWebApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
     command_line->AppendSwitch("disable-gpu-compositing");
-    
-    // "disable-gpu" disables hardware acceleration and then WebGL is not working
-    // command_line->AppendSwitch("disable-gpu");
-     
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
 
