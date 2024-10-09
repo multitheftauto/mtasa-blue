@@ -1834,11 +1834,11 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
     }
 }
 
-void CVehicleSA::SetOnFire(bool onFire)
+bool CVehicleSA::SetOnFire(bool onFire)
 {
     CVehicleSAInterface* vehicleInterface = GetVehicleInterface();
-    if ((onFire && vehicleInterface->m_pFire) || (!onFire && !vehicleInterface->m_pFire))
-        return;
+    if (onFire == !!vehicleInterface->m_pFire)
+        return false;
 
     auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
 
@@ -1846,7 +1846,7 @@ void CVehicleSA::SetOnFire(bool onFire)
     {
         CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
         if (!fire)
-            return;
+            return false;
 
         fire->SetTarget(this);
         fire->SetStrength(1.0f);
@@ -1858,9 +1858,13 @@ void CVehicleSA::SetOnFire(bool onFire)
     else
     {
         CFire* fire = fireManager->GetFire(vehicleInterface->m_pFire);
-        if (fire)
-            fire->Extinguish();
+        if (!fire)
+            return false;
+
+        fire->Extinguish();
     }
+
+    return true;
 }
 
 void CVehicleSA::StaticSetHooks()

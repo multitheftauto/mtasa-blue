@@ -763,24 +763,5 @@ void CElementRPCs::SetColPolygonHeight(CClientEntity* pSource, NetBitStreamInter
 
 void CElementRPCs::SetElementOnFire(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    switch (pSource->GetType())
-    {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
-        {
-            static_cast<CClientPed*>(pSource)->SetOnFire(bitStream.ReadBit());
-            break;
-        }
-        case CCLIENTVEHICLE:
-        {
-            static_cast<CClientVehicle*>(pSource)->SetOnFire(bitStream.ReadBit());
-            break;
-        }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
-        {
-            static_cast<CClientObject*>(pSource)->SetOnFire(bitStream.ReadBit());
-            break;
-        }
-    }
+    pSource->SetOnFire(bitStream.ReadBit());
 }

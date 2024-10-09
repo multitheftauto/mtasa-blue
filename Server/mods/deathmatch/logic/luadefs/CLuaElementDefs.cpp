@@ -2443,24 +2443,12 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaElementDefs::IsElementOnFire(CElement* element)
+bool CLuaElementDefs::IsElementOnFire(CElement* element) noexcept
 {
-    switch (element->GetType())
-    {
-        case EElementType::PLAYER:
-        case EElementType::PED:
-            return static_cast<CPed*>(element)->IsOnFire();
-        case EElementType::VEHICLE:
-            return static_cast<CVehicle*>(element)->IsOnFire();
-        case EElementType::OBJECT:
-        case EElementType::WEAPON:
-            break; // wait for objects sync
-    }
-
-    return false;
+    return element->IsOnFire();
 }
 
-bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire)
+bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire) noexcept
 {
     return CStaticFunctionDefinitions::SetElementOnFire(element, onFire);
 }

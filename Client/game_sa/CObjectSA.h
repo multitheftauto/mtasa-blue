@@ -154,7 +154,7 @@ public:
     void     ResetScale();
 
     bool IsOnFire() override { return GetObjectInterface()->pFire != nullptr; }
-    void SetOnFire(bool onFire) override;
+    bool SetOnFire(bool onFire) override;
 
 private:
     void CheckForGangTag();

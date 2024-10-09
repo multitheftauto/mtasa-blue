@@ -2514,30 +2514,9 @@ bool CLuaElementDefs::SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity,
     return CStaticFunctionDefinitions::SetLowLodElement(*pEntity, pLowLodEntity.value_or(nullptr));
 }
 
-bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire)
+bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexcept
 {
-    switch (entity->GetType())
-    {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
-        {
-            static_cast<CClientPed*>(entity)->SetOnFire(onFire);
-            return true;
-        }
-        case CCLIENTVEHICLE:
-        {
-            static_cast<CClientVehicle*>(entity)->SetOnFire(onFire);
-            return true;
-        }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
-        {
-            static_cast<CClientObject*>(entity)->SetOnFire(onFire);
-            return true;
-        }
-    }
-
-    return false;
+    return entity->SetOnFire(onFire);
 }
 
 int CLuaElementDefs::IsElementLowLod(lua_State* luaVM)
@@ -2636,17 +2615,7 @@ int CLuaElementDefs::IsElementWaitingForGroundToLoad(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaElementDefs::IsElementOnFire(CClientEntity* entity)
+bool CLuaElementDefs::IsElementOnFire(CClientEntity* entity) noexcept
 {
-    switch (entity->GetType())
-    {
-        case CCLIENTPED:
-            return static_cast<CClientPed*>(entity)->IsOnFire();
-        case CCLIENTVEHICLE:
-            return static_cast<CClientVehicle*>(entity)->IsOnFire();
-        case CCLIENTOBJECT:
-            return static_cast<CClientObject*>(entity)->IsOnFire();
-    }
-
-    return false;
+    return entity->IsOnFire();
 }

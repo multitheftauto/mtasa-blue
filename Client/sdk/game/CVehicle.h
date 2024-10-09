@@ -326,7 +326,4 @@ public:
 
     virtual const CVector* GetDummyPositions() const = 0;
 
-    virtual bool IsOnFire() = 0;
-    virtual void SetOnFire(bool onFire) = 0;
-
 };

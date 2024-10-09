@@ -306,11 +306,11 @@ void CObjectSA::ResetScale()
     SetScale(1.0f, 1.0f, 1.0f);
 }
 
-void CObjectSA::SetOnFire(bool onFire)
+bool CObjectSA::SetOnFire(bool onFire)
 {
     CObjectSAInterface* objectInterface = GetObjectInterface();
-    if ((onFire && objectInterface->pFire) || (!onFire && !objectInterface->pFire))
-        return;
+    if (onFire == !!objectInterface->pFire)
+        return false;
 
     auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
 
@@ -318,7 +318,7 @@ void CObjectSA::SetOnFire(bool onFire)
     {
         CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
         if (!fire)
-            return;
+            return false;
 
         fire->SetTarget(this);
         fire->SetStrength(1.0f);
@@ -330,7 +330,11 @@ void CObjectSA::SetOnFire(bool onFire)
     else
     {
         CFire* fire = fireManager->GetFire(objectInterface->pFire);
-        if (fire)
-            fire->Extinguish();
+        if (!fire)
+            return false;
+
+        fire->Extinguish();
     }
+
+    return true;
 }

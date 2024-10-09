@@ -104,6 +104,6 @@ private:
 
         SFixedArray<float, 4> fDoorOpenRatio;
 
-        bool isOnFire;
+        bool isOnFire{false};
     } m_Cache;
 };

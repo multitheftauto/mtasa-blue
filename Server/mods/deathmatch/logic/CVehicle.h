@@ -397,8 +397,8 @@ public:
     void             SetBlowState(VehicleBlowState state);
     VehicleBlowState GetBlowState() const noexcept { return m_blowState; }
 
-    bool IsOnFire() const noexcept { return m_onFire; }
-    void SetOnFire(bool onFire) noexcept { m_onFire = onFire; }
+    bool IsOnFire() const noexcept override { return m_onFire; }
+    void SetOnFire(bool onFire) noexcept override { m_onFire = onFire; }
 
     void StopIdleTimer();
     void RestartIdleTimer();

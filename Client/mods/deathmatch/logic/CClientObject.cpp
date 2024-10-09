@@ -429,20 +429,6 @@ void CClientObject::SetHealth(float fHealth)
     m_fHealth = fHealth;
 }
 
-bool CClientObject::IsOnFire() const noexcept
-{
-    if (!m_pObject)
-        return false;
-
-    return m_pObject->IsOnFire();
-}
-
-void CClientObject::SetOnFire(bool onFire) noexcept
-{
-    if (m_pObject)
-        m_pObject->SetOnFire(onFire);
-}
-
 void CClientObject::StreamIn(bool bInstantly)
 {
     // Don't stream the object in, if respawn is disabled and the object is broken

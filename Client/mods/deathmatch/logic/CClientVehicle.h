@@ -547,8 +547,8 @@ public:
 
     CVector GetEntryPoint(std::uint32_t entryPointIndex);
 
-    bool IsOnFire() const noexcept;
-    void SetOnFire(bool onFire) noexcept;
+    bool IsOnFire() override { return m_pVehicle ? m_pVehicle->IsOnFire() : false; }
+    bool SetOnFire(bool onFire) override { return m_pVehicle ? m_pVehicle->SetOnFire(onFire) : false; }
 
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);
