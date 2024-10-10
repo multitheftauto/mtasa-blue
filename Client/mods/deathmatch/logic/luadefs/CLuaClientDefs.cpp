@@ -23,7 +23,9 @@ void CLuaClientDefs::LoadFunctions()
                                                                              {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
                                                                              {"clearDebugBox", ArgumentParser<ClearDebug>},
                                                                              {"isMTAWindowFocused", ArgumentParser<IsMTAWindowFocused>},
-                                                                             {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>}};
+                                                                             {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>},
+                                                                             {"setCursorColor", ArgumentParser<SetCursorColor>},
+                                                                             {"getCursorColor", ArgumentParser<GetCursorColor>}};
 
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
@@ -79,4 +81,21 @@ bool CLuaClientDefs::IsMTAWindowFocused()
 bool CLuaClientDefs::IsCapsLockEnabled()
 {
     return ((::GetKeyState(VK_CAPITAL) & 0x0001) != 0);
+}
+
+bool CLuaClientDefs::SetCursorColor(float r, float g, float b, float alpha) noexcept
+{
+    if (!g_pCore->IsMenuVisible())
+        g_pCore->GetGUI()->SetCursorColor(r, g, b, alpha);
+    else
+        g_pCore->GetGUI()->ResetCursorColor(r, g, b, alpha); // Force values to be updated
+
+    return true;
+}
+
+CLuaMultiReturn<float, float, float, float> CLuaClientDefs::GetCursorColor() noexcept
+{
+    float r, g, b, alpha;
+    g_pCore->GetGUI()->GetCursorColor(r, g, b, alpha);
+    return {r, g, b, alpha};
 }
