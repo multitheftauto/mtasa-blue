@@ -213,7 +213,15 @@ SQueryInfo CQueryReceiver::GetServerResponse()
                 return info;
             }
         }
+
         InvalidateSocket();
+
+        if (info.players > info.playerSlot)
+        {
+            info.players = info.playerSlot;
+            info.isStatusVerified = false;
+        }
+
         info.containingInfo = true;
     }
 
