@@ -77,16 +77,17 @@ bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
     return false;
 }
 
-CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, bool& collisionDetectedOut)
+CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result)
 {
     auto entity = ((CEntitySAInterface*(__cdecl*)(CVector, float, CEntitySAInterface*, bool, bool, bool, bool, bool, bool))FUNC_CWorld_TestSphereAgainstWorld)(sphereCenter, radius, ignoredEntity ? ignoredEntity->GetInterface() : nullptr, checkBuildings, checkVehicles, checkPeds, checkObjects, checkDummies, cameraIgnore);
     if (!entity)
-    {
-        collisionDetectedOut = false;
         return nullptr;
-    }
+    
+    result.collisionDetected = true;
+    result.modelID = entity->m_nModelIndex;
+    result.type = entity->nType;
+    result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
 
-    collisionDetectedOut = true;
     return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(entity));
 }
 

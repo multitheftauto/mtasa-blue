@@ -75,7 +75,7 @@ public:
     void          ResetAllSurfaceInfo() override;
     bool          ResetSurfaceInfo(short sSurfaceID) override;
 
-    CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, bool& collisionDetectedOut) override;
+    CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) override;
 
 private:
     float                                                     m_fAircraftMaxHeight;

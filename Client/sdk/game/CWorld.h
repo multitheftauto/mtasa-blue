@@ -61,6 +61,14 @@ struct SProcessLineOfSightMaterialInfoResult {
     bool        valid{};       //< Data found in this struct is only valid if this is `true`!
 };
 
+struct STestSphereAgainstWorldResult
+{
+    bool           collisionDetected{false};
+    std::uint32_t  modelID{0};
+    std::uint32_t  lodID{0};
+    std::uint8_t   type{0};
+};
+
 enum eDebugCaller
 {
     CEntity_SetMatrix,
@@ -275,5 +283,5 @@ public:
     virtual void          ResetAllSurfaceInfo() = 0;
     virtual bool          ResetSurfaceInfo(short sSurfaceID) = 0;
 
-    virtual CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, bool& collisionDetectedOut) = 0;
+    virtual CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) = 0;
 };
