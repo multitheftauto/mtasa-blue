@@ -139,7 +139,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
                                                                              {"isGarageOpen", IsGarageOpen},
                                                                              {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
-                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>}};
+                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
+                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -2277,4 +2278,16 @@ bool CLuaWorldDefs::ResetVolumetricShadows() noexcept
 void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept
 {
     g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true)});
+}
+
+CLuaMultiReturn<bool, std::variant<CClientEntity*, std::nullptr_t>> CLuaWorldDefs::TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore)
+{
+    bool collisionDetected = false;
+    CClientEntity* collidedEntity = nullptr;
+
+    CEntity* entity = g_pGame->GetWorld()->TestSphereAgainstWorld(sphereCenter, radius, ignoredEntity.has_value() ? ignoredEntity.value()->GetGameEntity() : nullptr, checkBuildings.value_or(true), checkVehicles.value_or(true), checkPeds.value_or(true), checkObjects.value_or(true), checkDummies.value_or(true), cameraIgnore.value_or(false), collisionDetected);
+    if (entity)
+        collidedEntity = reinterpret_cast<CClientEntity*>(entity->GetStoredPointer());
+
+    return {collisionDetected, collidedEntity};
 }

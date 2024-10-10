@@ -274,4 +274,6 @@ public:
     virtual CSurfaceType* GetSurfaceInfo() = 0;
     virtual void          ResetAllSurfaceInfo() = 0;
     virtual bool          ResetSurfaceInfo(short sSurfaceID) = 0;
+
+    virtual CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, bool& collisionDetectedOut) = 0;
 };
