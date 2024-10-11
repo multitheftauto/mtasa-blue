@@ -152,6 +152,9 @@ public:
     static std::variant<bool, CVector>                              OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
     static bool                                                     ResetVehicleDummyPositions(CClientVehicle* vehicle);
 
+    static std::variant<bool, std::array<std::array<float, 3>, 4>>    GetVehicleEntryPoints(CClientVehicle* vehicle);
+    static std::variant<bool, std::array<CVector, 4>>                 OOP_GetVehicleEntryPoints(CClientVehicle* vehicle);
+
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
@@ -176,4 +179,6 @@ public:
     LUA_DECLARE(SetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponents);
+
+    static bool SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime);
 };

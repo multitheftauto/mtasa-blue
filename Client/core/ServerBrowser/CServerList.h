@@ -139,6 +139,7 @@ public:
         bScanned = false;
         bSkipped = false;
         bSerials = false;
+        isStatusVerified = true;
         bPassworded = false;
         bKeepFlag = false;
         iRowIndex = -1;
@@ -182,6 +183,7 @@ public:
     unsigned short nPlayers;               // Current players
     unsigned short nMaxPlayers;            // Maximum players
     unsigned short nPing;                  // Ping time
+    bool           isStatusVerified;       // Ping status verified
     bool           bPassworded;            // Password protected
     bool           bSerials;               // Serial verification on
     bool           bScanned;

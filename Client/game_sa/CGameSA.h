@@ -17,6 +17,7 @@
 #include "CStreamingSA.h"
 #include "CCoverManagerSA.h"
 #include "CPlantManagerSA.h"
+#include "CRendererSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -172,7 +173,8 @@ public:
     CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
-
+    CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
+    
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
@@ -303,7 +305,7 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
-    void RemoveAllBuildings(bool clearBuildingRemoval = true);
+    void RemoveAllBuildings();
     void RestoreGameBuildings();
 
     bool SetBuildingPoolSize(size_t size);
@@ -345,6 +347,8 @@ private:
     CCoverManagerSA*                m_pCoverManager;
     CPlantManagerSA*                m_pPlantManager;
     CBuildingRemoval*               m_pBuildingRemoval;
+
+    std::unique_ptr<CRendererSA>    m_pRenderer;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;

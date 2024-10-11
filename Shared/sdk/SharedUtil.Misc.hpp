@@ -36,8 +36,8 @@
     #endif
 #endif
 
-#ifdef __APPLE__
-    #include "cpuid.h"
+#if defined(__APPLE__) && !defined(__aarch64__)
+    #include <cpuid.h>
 #endif
 
 CCriticalSection     CRefCountable::ms_CS;
@@ -1834,6 +1834,8 @@ namespace SharedUtil
             return FnGetCurrentProcessorNumber();
 
         return _GetCurrentProcessorNumberXP();
+#elif defined(__APPLE__) && defined(__aarch64__)
+        return -1;
 #elif defined(__APPLE__)
         // Hacked from https://stackoverflow.com/a/40398183/1517394
         unsigned long cpu;

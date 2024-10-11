@@ -91,6 +91,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
+        {"getVehicleEntryPoints", ArgumentParser<GetVehicleEntryPoints>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -154,6 +155,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
+        {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
     };
 
     // Add functions
@@ -241,6 +243,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getWheelScale", "getVehicleWheelScale");
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
     lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
+    lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<OOP_GetVehicleEntryPoints>);
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -298,6 +301,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "detachTrailer", "detachTrailerFromVehicle");
     lua_classfunction(luaVM, "addUpgrade", "addVehicleUpgrade");
     lua_classfunction(luaVM, "removeUpgrade", "removeVehicleUpgrade");
+
+    lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
 
     lua_classvariable(luaVM, "locked", "setVehicleLocked", "isVehicleLocked");
     lua_classvariable(luaVM, "controller", NULL, "getVehicleController");
@@ -2647,12 +2652,69 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
 
 int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
 {
+    // table getVehicleHandling ( element theVehicle, [ string property ] )
     CClientVehicle*  pVehicle = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
 
     if (!argStream.HasErrors())
     {
+        if (argStream.NextIsString())
+        {
+            SString strProperty;
+            argStream.ReadString(strProperty);
+
+            eHandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+            if (eProperty == HANDLING_MAX)
+            {
+                argStream.SetCustomError("Invalid property");
+                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+
+            float         fValue = 0.0f;
+            CVector       vecValue = CVector(0.0f, 0.0f, 0.0f);
+            SString       strValue = "";
+            unsigned int  uiValue = 0;
+            unsigned char ucValue = 0;
+            if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, fValue))
+            {
+                lua_pushnumber(luaVM, fValue);
+            }
+            else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, uiValue))
+            {
+                lua_pushnumber(luaVM, uiValue);
+            }
+            else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, ucValue))
+            {
+                lua_pushnumber(luaVM, ucValue);
+            }
+            else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, strValue))
+            {
+                lua_pushstring(luaVM, strValue);
+            }
+            else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, vecValue))
+            {
+                lua_createtable(luaVM, 3, 0);
+                lua_pushnumber(luaVM, 1);
+                lua_pushnumber(luaVM, vecValue.fX);
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 2);
+                lua_pushnumber(luaVM, vecValue.fY);
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 3);
+                lua_pushnumber(luaVM, vecValue.fZ);
+                lua_settable(luaVM, -3);
+            }
+            else
+            {
+                argStream.SetCustomError("Invalid property");
+                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                lua_pushboolean(luaVM, false);
+            }
+            return 1;
+        }
         CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
         lua_newtable(luaVM);
@@ -4173,4 +4235,108 @@ bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)
 bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion)
 {
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
+}
+ 
+std::variant<bool, std::array<std::array<float, 3>, 4>> CLuaVehicleDefs::GetVehicleEntryPoints(CClientVehicle* vehicle)
+{
+    auto entryPointVectors = OOP_GetVehicleEntryPoints(vehicle);
+
+    if (std::holds_alternative<bool>(entryPointVectors))
+    {
+        return false;
+    }
+
+    std::array<std::array<float, 3>, 4> entryPoints;
+    std::array<CVector, 4>              vectorArray = std::get<std::array<CVector, 4>>(entryPointVectors);
+
+    std::uint32_t i = 0;
+    for (auto& entryPoint : entryPoints)
+    {
+        entryPoints[i] = {vectorArray[i].fX, vectorArray[i].fY, vectorArray[i].fZ};
+        i++;
+    }
+
+    return entryPoints;
+}
+
+std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryPoints(CClientVehicle* vehicle)
+{
+    if (CClientVehicleManager::GetMaxPassengerCount(vehicle->GetModel()) == 255)
+    {
+        return false;
+    }
+
+    std::array<CVector, 4> entryPoints;
+
+    std::uint32_t i = 0;
+    for (auto& entryPoint : entryPoints)
+    {
+        entryPoint = vehicle->GetEntryPoint(i++);
+    }
+
+    return entryPoints;
+}
+
+bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType,
+                                                  std::optional<std::uint32_t> removalTime)
+{
+    auto partNodeIndex = static_cast<eCarNodes>(nodeIndex);
+    auto collisionType = componentCollisionType.has_value() ? static_cast<eCarComponentCollisionTypes>(componentCollisionType.value())
+                                                            : eCarComponentCollisionTypes::COL_NODE_PANEL;
+
+    if (nodeIndex < 1 || partNodeIndex >= eCarNodes::NUM_NODES)
+        throw std::invalid_argument("Invalid component index");
+
+    if (collisionType >= eCarComponentCollisionTypes::COL_NODES_NUM)
+        throw std::invalid_argument("Invalid collision type index");
+
+    if (!componentCollisionType.has_value())
+    {
+        switch (partNodeIndex)
+        {
+            case eCarNodes::WHEEL_RF:
+            case eCarNodes::WHEEL_RB:
+            case eCarNodes::WHEEL_LF:
+            case eCarNodes::WHEEL_LB:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_WHEEL;
+                break;
+            }
+            case eCarNodes::DOOR_RF:
+            case eCarNodes::DOOR_RR:
+            case eCarNodes::DOOR_LF:
+            case eCarNodes::DOOR_LR:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_DOOR;
+                break;
+            }
+            case eCarNodes::BUMP_FRONT:
+            case eCarNodes::BUMP_REAR:
+            case eCarNodes::WHEEL_LM:
+            case eCarNodes::WHEEL_RM:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_BUMPER;
+                break;
+            }
+            case eCarNodes::BOOT:
+            case eCarNodes::CHASSIS:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_BOOT;
+                break;
+            }
+            case eCarNodes::BONNET:
+            case eCarNodes::WINDSCREEN:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_BONNET;
+                break;
+            }
+            default:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_PANEL;
+                break;
+            }
+        }
+    }
+
+    return vehicle->SpawnFlyingComponent(partNodeIndex, collisionType, removalTime.value_or(-1));
 }
