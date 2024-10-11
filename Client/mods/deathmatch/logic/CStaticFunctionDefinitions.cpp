@@ -3194,9 +3194,9 @@ bool CStaticFunctionDefinitions::SetVehicleLightState(CClientEntity& Entity, uns
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent, bool breakGlass)
 {
-    RUN_CHILDREN(SetVehiclePanelState(**iter, ucPanel, ucState))
+    RUN_CHILDREN(SetVehiclePanelState(**iter, ucPanel, ucState, spawnFlyingComponent, breakGlass))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -3204,7 +3204,7 @@ bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, uns
 
         if (ucPanel < 7)
         {
-            Vehicle.SetPanelStatus(ucPanel, ucState);
+            Vehicle.SetPanelStatus(ucPanel, ucState, spawnFlyingComponent, breakGlass);
             return true;
         }
     }

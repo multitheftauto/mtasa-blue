@@ -51,8 +51,8 @@ public:
     void          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
     BYTE          GetPanelStatus(BYTE bPanel);
     unsigned long GetPanelStatus();
-    void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);
-    void          SetPanelStatus(unsigned long ulStatus);
+    void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawnFlyingComponent = true, bool breakGlass = false);
+    void          SetPanelStatus(unsigned long ulStatus, bool spawnFlyingComponent = true, bool breakGlass = false);
     BYTE          GetLightStatus(BYTE bLight);
     unsigned char GetLightStatus();
     void          SetLightStatus(BYTE bLight, BYTE bLightStatus);
