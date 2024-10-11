@@ -64,6 +64,7 @@ struct SProcessLineOfSightMaterialInfoResult {
 struct STestSphereAgainstWorldResult
 {
     bool           collisionDetected{false};
+    CVector        hitPosition{};
     std::uint32_t  modelID{0};
     std::uint32_t  lodID{0};
     std::uint8_t   type{0};

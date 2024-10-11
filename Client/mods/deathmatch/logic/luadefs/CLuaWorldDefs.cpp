@@ -2280,7 +2280,7 @@ void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldPr
     g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true)});
 }
 
-CLuaMultiReturn<bool, CClientEntity*, int, int, int> CLuaWorldDefs::TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore)
+CLuaMultiReturn<bool, CClientEntity*, float, float, float, int, int, int> CLuaWorldDefs::TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore)
 {
     STestSphereAgainstWorldResult result;
     CClientEntity* collidedEntity = nullptr;
@@ -2289,5 +2289,5 @@ CLuaMultiReturn<bool, CClientEntity*, int, int, int> CLuaWorldDefs::TestSphereAg
     if (entity)
         collidedEntity = reinterpret_cast<CClientEntity*>(entity->GetStoredPointer());
 
-    return {result.collisionDetected, collidedEntity, result.modelID, result.lodID, result.type};
+    return {result.collisionDetected, collidedEntity, result.hitPosition.fX, result.hitPosition.fY, result.hitPosition.fZ, result.modelID, result.lodID, result.type};
 }

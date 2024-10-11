@@ -84,6 +84,7 @@ CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float rad
         return nullptr;
     
     result.collisionDetected = true;
+    result.hitPosition = entity->Placeable.matrix->vPos;
     result.modelID = entity->m_nModelIndex;
     result.type = entity->nType;
     result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
