@@ -286,8 +286,9 @@ enum eElementRPCFunctions
     RESPAWN_OBJECT,
     TOGGLE_OBJECT_RESPAWN,
     RESET_WORLD_PROPERTIES,
-  
+
+    SPAWN_VEHICLE_FLYING_COMPONENT,
     SET_VEHICLE_NITRO_ACTIVATED,
-  
+
     NUM_RPC_FUNCS            // Add above this line
 };

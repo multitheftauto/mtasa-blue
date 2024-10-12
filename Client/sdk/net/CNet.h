@@ -115,7 +115,7 @@ public:
 
     virtual const char* GetNextBuffer() = 0;
     virtual const char* GetDiagnosticStatus() = 0;
-    virtual void        UpdatePingStatus(const char* szStatus, ushort& usDataRef) = 0;
+    virtual void        UpdatePingStatus(const char* szStatus, ushort& usDataRef, bool& isVerified) = 0;
 
     virtual bool VerifySignature(const char* pData, unsigned long ulSize) = 0;
 

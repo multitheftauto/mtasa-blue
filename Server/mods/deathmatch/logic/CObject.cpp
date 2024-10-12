@@ -33,7 +33,7 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
     m_bIsFrozen = false;
     m_bDoubleSided = false;
     m_bBreakable = false;
-    m_bRespawnable = false;
+    m_bRespawnable = true;
 
     m_bCollisionsEnabled = true;
 
