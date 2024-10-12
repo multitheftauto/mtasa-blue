@@ -179,7 +179,7 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             unsigned char ucFlags = 0;
             BitStream.Read(ucFlags);
 
-            CVector vecPosition{}, vecMoveSpeed{};
+            CVector vecPosition{ CVector::NoInit{} }, vecMoveSpeed{ CVector::NoInit{} };
             float   fRotation, fHealth, fArmor;
             bool    bOnFire;
             bool    bIsInWater;

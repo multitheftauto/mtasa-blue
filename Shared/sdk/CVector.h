@@ -30,9 +30,12 @@ public:
     float fY;
     float fZ;
 
-    constexpr CVector() : fX(0.0f), fY(0.0f), fZ(0.0f) {}
+    struct NoInit {};
+    constexpr CVector(NoInit) noexcept {}
 
-    constexpr CVector(float x, float y = 0, float z = 0) : fX(x), fY(y), fZ(z) {}
+    constexpr CVector() noexcept : fX(0.0f), fY(0.0f), fZ(0.0f) {}
+    
+    constexpr explicit CVector(float x, float y = 0.0f, float z = 0.0f) noexcept : fX(x), fY(y), fZ(z) {}
 
     constexpr CVector(const CVector4D& vec) noexcept : fX(vec.fX), fY(vec.fY), fZ(vec.fZ) {}
 
