@@ -1869,6 +1869,13 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
 
+    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
+    if (m_uiFrameRateLimit == 0)
+    {
+        m_bQueuedFrameRateValid = false;
+        GetGraphStats()->RemoveTimingPoint("Limiter");
+    }
+
     // Print new limits to the console
     if (bLogToConsole)
     {

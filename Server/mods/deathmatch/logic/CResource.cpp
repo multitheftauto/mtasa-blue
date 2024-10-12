@@ -1371,6 +1371,9 @@ std::vector<std::string> CResource::GetFilePaths(const char* szFilename)
         std::string strPath = std::filesystem::relative(path, strDirectory).string();
         ReplaceSlashes(strPath);
 
+        if (strPath == "meta.xml")
+            continue;
+
         vecFiles.push_back(std::move(strPath));
     }
 
@@ -3011,7 +3014,7 @@ HttpStatusCode CResource::HandleRequestRouter(HttpRequest* request, HttpResponse
         luaRequest.PushString("path");
         luaRequest.PushString(path);
 
-        luaRequest.PushString("absolute_path");
+        luaRequest.PushString("absolutePath");
         luaRequest.PushString(request->sOriginalUri);
 
         luaRequest.PushString("hostname");
