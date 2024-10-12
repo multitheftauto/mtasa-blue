@@ -264,7 +264,7 @@ public:
     virtual SColor GetHeadLightColor() = 0;
     virtual void   SetHeadLightColor(const SColor color) = 0;
 
-    virtual CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2) = 0;
+    virtual bool     SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1) = 0;
     virtual void     SetWheelVisibility(eWheelPosition wheel, bool bVisible) = 0;
     virtual CVector  GetWheelPosition(eWheelPosition wheel) = 0;
 
