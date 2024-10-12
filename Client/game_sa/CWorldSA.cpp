@@ -77,21 +77,6 @@ bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
     return false;
 }
 
-CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result)
-{
-    auto entity = ((CEntitySAInterface*(__cdecl*)(CVector, float, CEntitySAInterface*, bool, bool, bool, bool, bool, bool))FUNC_CWorld_TestSphereAgainstWorld)(sphereCenter, radius, ignoredEntity ? ignoredEntity->GetInterface() : nullptr, checkBuildings, checkVehicles, checkPeds, checkObjects, checkDummies, cameraIgnore);
-    if (!entity)
-        return nullptr;
-    
-    result.collisionDetected = true;
-    result.hitPosition = entity->Placeable.matrix->vPos;
-    result.modelID = entity->m_nModelIndex;
-    result.type = entity->nType;
-    result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
-
-    return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(entity));
-}
-
 void HOOK_FallenPeds();
 void HOOK_FallenCars();
 
@@ -541,6 +526,23 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         pColPointSA->Destroy();
 
     return bReturn;
+}
+
+CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result)
+{
+    auto entity = ((CEntitySAInterface*(__cdecl*)(CVector, float, CEntitySAInterface*, bool, bool, bool, bool, bool, bool))FUNC_CWorld_TestSphereAgainstWorld)(sphereCenter, radius, ignoredEntity ? ignoredEntity->GetInterface() : nullptr, checkBuildings, checkVehicles, checkPeds, checkObjects, checkDummies, cameraIgnore);
+    if (!entity)
+        return nullptr;
+    
+    result.collisionDetected = true;
+    result.modelID = entity->m_nModelIndex;
+    result.entityPosition = entity->Placeable.matrix->vPos;
+    ConvertMatrixToEulerAngles(*entity->Placeable.matrix, result.entityRotation.fX, result.entityRotation.fY, result.entityRotation.fZ);
+    result.entityRotation = -result.entityRotation;
+    result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
+    result.type = entity->nType;
+
+    return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(entity));
 }
 
 void CWorldSA::IgnoreEntity(CEntity* pEntity)
