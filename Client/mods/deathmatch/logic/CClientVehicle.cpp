@@ -5034,6 +5034,14 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
+bool CClientVehicle::SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime)
+{
+    if (!m_pVehicle)
+        return false;
+
+    return m_pVehicle->SpawnFlyingComponent(nodeID, collisionType, removalTime);
+}
+ 
 CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
 {
     static const uint32_t lookup[4] = {10, 8, 11, 9};

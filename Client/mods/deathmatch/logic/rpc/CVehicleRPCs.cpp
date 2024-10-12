@@ -52,6 +52,7 @@ void CVehicleRPCs::LoadFunctions()
     AddHandler(REMOVE_VEHICLE_SIRENS, RemoveVehicleSirens, "removeVehicleSirens");
     AddHandler(SET_VEHICLE_SIRENS, SetVehicleSirens, "setVehicleSirens");
     AddHandler(SET_VEHICLE_PLATE_TEXT, SetVehiclePlateText, "setVehiclePlateText");
+    AddHandler(SPAWN_VEHICLE_FLYING_COMPONENT, SpawnVehicleFlyingComponent, "spawnVehicleFlyingComponent");
 }
 
 void CVehicleRPCs::DestroyAllVehicles(NetBitStreamInterface& bitStream)
@@ -652,4 +653,17 @@ void CVehicleRPCs::SetVehiclePlateText(CClientEntity* pSourceEntity, NetBitStrea
             pVehicle->SetRegPlate(strText);
         }
     }
+}
+
+void CVehicleRPCs::SpawnVehicleFlyingComponent(CClientEntity* const sourceEntity, NetBitStreamInterface& bitStream)
+{
+    CClientVehicle* vehicle = m_pVehicleManager->Get(sourceEntity->GetID());
+    if (!vehicle)
+        return;
+
+    std::uint8_t nodeIndex, collisionType;
+    std::int32_t removalTime;
+
+    if (bitStream.Read(nodeIndex) && bitStream.Read(collisionType) && bitStream.Read(removalTime))
+        vehicle->SpawnFlyingComponent(static_cast<eCarNodes>(nodeIndex), static_cast<eCarComponentCollisionTypes>(collisionType), removalTime);
 }
