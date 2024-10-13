@@ -21,6 +21,15 @@ RUN apt-get update && \
 VOLUME /build
 WORKDIR /build
 
+RUN mkdir -p Client Server Shared utils vendor
+
+COPY Client Client
+COPY Server Server
+COPY Shared Shared
+COPY utils utils
+COPY vendor vendor
+COPY ./* .
+
 # Copy entrypoint script
 COPY utils/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh

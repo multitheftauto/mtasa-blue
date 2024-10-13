@@ -21,11 +21,6 @@ if [[ $AS_BUILDAGENT = "1" ]]; then
 fi
 
 # Manually invoke build process
-# So, first make a shallow clone of the repository if it not exists
-umask 000
-if [ ! -f ./premake5.lua ]; then
-    git clone --depth=1 https://github.com/multitheftauto/mtasa-blue.git .
-fi
 
 # Start manual building
 export GLIBC_COMPAT=true
