@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #pragma once
+#include "CEntity.h"
 
 class CEntitySAInterface;
 class CVector;
@@ -68,7 +69,7 @@ struct STestSphereAgainstWorldResult
     CVector        entityPosition{};
     CVector        entityRotation{};
     std::uint32_t  lodID{0};
-    std::uint8_t   type{0};
+    eEntityType    type{ENTITY_TYPE_NOTHING};
 };
 
 enum eDebugCaller

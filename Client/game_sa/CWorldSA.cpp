@@ -540,7 +540,7 @@ CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float rad
     ConvertMatrixToEulerAngles(*entity->Placeable.matrix, result.entityRotation.fX, result.entityRotation.fY, result.entityRotation.fZ);
     result.entityRotation = -result.entityRotation;
     result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
-    result.type = entity->nType;
+    result.type = static_cast<eEntityType>(entity->nType);
 
     return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(entity));
 }
