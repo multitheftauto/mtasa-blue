@@ -31,7 +31,7 @@ public:
     float fZ;
 
     struct NoInit {};
-    constexpr CVector(NoInit) noexcept {}
+    CVector(NoInit) noexcept {}
 
     constexpr CVector() noexcept : fX(0.0f), fY(0.0f), fZ(0.0f) {}
     
