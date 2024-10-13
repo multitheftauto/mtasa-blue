@@ -1394,6 +1394,10 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
         }
     }
 
+    // Wrong seat or undefined passengers count?
+    if ((uiSeat > 0 && uiSeat > pVehicle->m_ucMaxPassengers) || (uiSeat > 0 && pVehicle->m_ucMaxPassengers == 255))
+        return;
+
     // Transfer WaitingForGroundToLoad state to vehicle
     if (m_bIsLocalPlayer)
     {
