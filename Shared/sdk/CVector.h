@@ -186,7 +186,7 @@ public:
         {
             *outVec = *this + vecRay * t;
             if (outHitBary) { // Calculate all barycentric coords if necessary
-                *outHitBary = { 1.f - u - v, u, v }; // For vertices A, B, C [I assume?]
+                *outHitBary = CVector( 1.f - u - v, u, v ); // For vertices A, B, C [I assume?]
             }
             return true;
         }
