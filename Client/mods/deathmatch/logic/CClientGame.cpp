@@ -2778,6 +2778,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientBrowserTooltip", "text", NULL, false);
     m_Events.AddEvent("onClientBrowserInputFocusChanged", "gainedfocus", NULL, false);
     m_Events.AddEvent("onClientBrowserResourceBlocked", "url, domain, reason", NULL, false);
+    m_Events.AddEvent("onClientBrowserConsoleMessage", "message, source, line, level", nullptr, false);
 
     // Misc events
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);

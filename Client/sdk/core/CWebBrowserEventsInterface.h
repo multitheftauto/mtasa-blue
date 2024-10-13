@@ -28,4 +28,5 @@ public:
     virtual bool Events_OnResourceFileCheck(const SString& strURL, CBuffer& outFileData) = 0;
     virtual void Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, unsigned char reason) = 0;
     virtual void Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHandler, const SString& strURL) = 0;
+    virtual void Events_OnConsoleMessage(const std::string& message, const std::string& source, int line, std::int16_t level) = 0;
 };
