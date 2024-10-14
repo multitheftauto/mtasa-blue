@@ -16,7 +16,7 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadBool(includeCustom, true);
 
-    auto modelManager = g_pClientGame->GetManager()->GetModelManager();
+    auto* modelManager = g_pClientGame->GetManager()->GetModelManager();
 
     std::size_t index = 0;
     lua_newtable(luaVM);
