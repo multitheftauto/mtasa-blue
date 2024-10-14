@@ -12,7 +12,7 @@
 
 int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
-    bool includeCustom = true;
+    bool includeCustom;
     CScriptArgReader argStream(luaVM);
     argStream.ReadBool(includeCustom, true);
 
