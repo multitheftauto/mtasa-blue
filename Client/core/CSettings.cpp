@@ -1183,6 +1183,12 @@ void CSettings::CreateGUI()
     m_pCachePathValue->AutoSize();
     vecTemp.fY += fLineHeight;
 
+    // Enable camera photos getting saved to documents folder
+    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
+    m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
+    vecTemp.fY += fLineHeight;
+
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Auto updater")));
     m_pAdvancedUpdaterLabel->SetPosition(CVector2D(vecTemp.fX - 10.0f, vecTemp.fY));
@@ -3193,6 +3199,10 @@ void CSettings::LoadData()
     iVar = GetApplicationSettingInt("Win8MouseFix");
     m_pWin8MouseCheckBox->SetSelected(iVar != 0);
 
+    // Save camera photos inside user documents folder
+    CVARS_GET("photosaving", bVar);
+    m_pPhotoSavingCheckbox->SetSelected(bVar);
+
     // Update build type
     CVARS_GET("update_build_type", iVar);
     if (iVar == 0 || iVar == 1)
@@ -3581,6 +3591,11 @@ void CSettings::SaveData()
 
     // Windows 8 mouse fix
     SetApplicationSettingInt("Win8MouseFix", m_pWin8MouseCheckBox->GetSelected());
+
+    // Save photos in documents folder
+    bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
+    CVARS_SET("photosaving", photoSaving);
+    CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
 
     // Debug setting
     if (CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem())
