@@ -66,6 +66,11 @@ public:
 
     unsigned short GetLatency() { return m_usLatency; }
     void           SetLatency(unsigned short usLatency) { m_usLatency = (m_usLatency + usLatency) / 2; }
+    
+    // This function spawns/respawns this ped in any location. This will force a recreation
+    // and restoration of initial state. This will also remove all weapons, unfreeze,
+    // remove jetpack, etc...
+    void Spawn(const CVector& vecPosition, float fRotation, std::uint16_t usModel, std::uint8_t ucInterior);
 
     unsigned long  GetLastPuresyncTime() { return m_ulLastPuresyncTime; }
     void           SetLastPuresyncTime(unsigned long ulLastPuresyncTime) { m_ulLastPuresyncTime = ulLastPuresyncTime; }

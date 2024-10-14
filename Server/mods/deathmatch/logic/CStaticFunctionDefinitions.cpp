@@ -1470,7 +1470,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
         for (; iter != pTeam->PlayersEnd(); iter++)
         {
-            if ((*iter)->IsSpawned())
+            if (!(*iter)->IsDead())
             {
                 (*iter)->SetDimension(usDimension);
             }
@@ -1497,7 +1497,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
-            if (!pPed->IsSpawned())
+            if (pPed->IsDead())
             {
                 return false;
             }
@@ -2127,8 +2127,8 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
             }
 
             pPed->SetPosition(vecPosition);
-            pPed->SetIsDead(false);
             pPed->SetSpawned(true);
+            pPed->SetIsDead(false);
             pPed->SetHealth(100.0f);
             pPed->SetSyncable(bSynced);
 
@@ -2168,7 +2168,7 @@ bool CStaticFunctionDefinitions::SetPlayerAmmo(CElement* pElement, unsigned char
         unsigned char ucWeaponID = pWeapon->ucType;
         if (ucWeaponID)
         {
-            if (pPlayer->IsSpawned())
+            if (!pPlayer->IsDead())
             {
                 CBitStream BitStream;
 
@@ -3663,7 +3663,7 @@ bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float fArmor)
         if (IS_PED(pElement))
         {
             CPed* pPed = static_cast<CPed*>(pElement);
-            if (pPed->IsSpawned())
+            if (!pPed->IsDead())
             {
                 // Limit it to 100.0
                 if (fArmor > 100.0f)
@@ -3696,7 +3696,7 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
         CPed* pPed = static_cast<CPed*>(pElement);
 
         // Is the ped alive?
-        if (!pPed->IsDead() && pPed->IsSpawned())
+        if (!pPed->IsDead())
         {
             // Reset his vehicle action, but only if not jacking
             // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
@@ -3713,7 +3713,6 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             }
 
             // Update the ped
-            pPed->SetSpawned(false);
             pPed->SetIsDead(true);
             pPed->SetHealth(0.0f);
             pPed->SetArmor(0.0f);
@@ -3781,7 +3780,7 @@ bool CStaticFunctionDefinitions::SetPedRotation(CElement* pElement, float fRotat
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned())
+        if (!pPed->IsDead())
         {
             // Set his new rotation
             float fRadians = ConvertDegreesToRadians(fRotation);
@@ -3945,7 +3944,7 @@ bool CStaticFunctionDefinitions::GivePedJetPack(CElement* pElement)
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned() && !pPed->GetOccupiedVehicle() && !pPed->HasJetPack())
+        if (!pPed->IsDead() && !pPed->GetOccupiedVehicle() && !pPed->HasJetPack())
         {
             // Remove choking state
             if (pPed->IsChoking())
@@ -3972,7 +3971,7 @@ bool CStaticFunctionDefinitions::RemovePedJetPack(CElement* pElement)
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned() && pPed->HasJetPack())
+        if (!pPed->IsDead() && pPed->HasJetPack())
         {
             pPed->SetHasJetPack(false);
 
@@ -3994,7 +3993,7 @@ bool CStaticFunctionDefinitions::SetPedWearingJetpack(CElement* pElement, bool b
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned() && bJetPack != pPed->HasJetPack())
+        if (!pPed->IsDead() && bJetPack != pPed->HasJetPack())
         {
             pPed->SetHasJetPack(bJetPack);
 
@@ -4094,7 +4093,7 @@ bool CStaticFunctionDefinitions::SetPedChoking(CElement* pElement, bool bChoking
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned())
+        if (!pPed->IsDead())
         {
             // On foot?
             if (!pPed->GetOccupiedVehicle() && pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
@@ -4129,7 +4128,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot(CElement* pElement, unsigned c
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned())
+        if (!pPed->IsDead())
         {
             pPed->SetWeaponSlot(ucWeaponSlot);
 
@@ -4298,7 +4297,7 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CElement* pElement, bool
     {
         CPed* pPed = static_cast<CPed*>(pElement);
         // Are they spawned and stationary in a vehicle?
-        if (pPed->IsSpawned() && pPed->GetOccupiedVehicle() && pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
+        if (!pPed->IsDead() && pPed->GetOccupiedVehicle() && pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
         {
             if (pPed->IsDoingGangDriveby() != bGangDriveby)
             {
@@ -4327,7 +4326,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned())
+        if (!pPed->IsDead())
         {
             // TODO: save their animation?
 
@@ -4374,7 +4373,7 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned())
+        if (!pPed->IsDead())
         {
             CBitStream BitStream;
             if (!animName.empty())
@@ -4403,7 +4402,7 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const 
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned() && !animName.empty())
+        if (!pPed->IsDead() && !animName.empty())
         {
             CBitStream BitStream;
             BitStream.pBitStream->WriteString<unsigned char>(animName);
@@ -4683,7 +4682,7 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
         if (IS_PED(pElement))
         {
             CPed* pPed = static_cast<CPed*>(pElement);
-            if (pPed->IsSpawned())
+            if (!pPed->IsDead())
             {
                 unsigned char ucCurrentWeapon = pPed->GetWeaponType();
                 if (ucCurrentWeapon != ucWeaponID && bSetAsCurrent)
@@ -4755,7 +4754,7 @@ bool CStaticFunctionDefinitions::TakeWeapon(CElement* pElement, unsigned char uc
             CPed*         pPed = static_cast<CPed*>(pElement);
             unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon(ucWeaponID);
             // Just because it's the same slot doesn't mean it's the same weapon -_- - Caz
-            if (pPed->IsSpawned() && pPed->GetWeapon(ucWeaponSlot) && pPed->GetWeaponType(ucWeaponSlot) == ucWeaponID)
+            if (!pPed->IsDead() && pPed->GetWeapon(ucWeaponSlot) && pPed->GetWeaponType(ucWeaponSlot) == ucWeaponID)
             {
                 CBitStream BitStream;
 
@@ -4807,7 +4806,7 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned())
+        if (!pPed->IsDead())
         {
             CBitStream BitStream;
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, TAKE_ALL_WEAPONS, *BitStream.pBitStream));
@@ -4835,7 +4834,7 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
     {
         CPed*    pPed = static_cast<CPed*>(pElement);
         CWeapon* pWeapon = pPed->GetWeapon(CWeaponNames::GetSlotFromWeapon(ucWeaponID));
-        if (pPed->IsSpawned() && pWeapon)            // Check We have that weapon
+        if (!pPed->IsDead() && pWeapon)            // Check We have that weapon
         {
             unsigned char ucWeaponID = pWeapon->ucType;
             if (ucWeaponID)

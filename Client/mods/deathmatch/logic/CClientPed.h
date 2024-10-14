@@ -200,11 +200,6 @@ public:
 
     void Teleport(const CVector& vecPosition);
 
-    // This function spawns/respawns this ped in any location. This will force a recreation
-    // and restoration of initial state. This will also remove all weapons, unfreeze,
-    // remove jetpack, etc...
-    void Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior);
-
     void ResetInterpolation();
 
     float GetCurrentRotation();
@@ -292,8 +287,8 @@ public:
     void StealthKill(CClientPed* pPed);
     void BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
-    int  GetRespawnState() const noexcept { return m_pRespawnState; };
-    void SetRespawnState(int iRespawnState) noexcept { m_pRespawnState = iRespawnState; };
+    bool IsSpawned() const noexcept { return m_bIsSpawned; }
+    void SetSpawned(const bool bSpawned) noexcept { m_bIsSpawned = bSpawned; }
 
     CWeapon*    GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent = false);
     bool        SetCurrentWeaponSlot(eWeaponSlot weaponSlot);
@@ -614,7 +609,7 @@ public:
     CTaskManager*               m_pTaskManager;
     CPad*                       m_pPad;
     bool                        m_bIsLocalPlayer;
-    int                         m_pRespawnState;
+    bool                        m_bIsSpawned;
     unsigned long               m_ulModel;
     CMatrix                     m_matFrozen;
     bool                        m_bRadioOn;

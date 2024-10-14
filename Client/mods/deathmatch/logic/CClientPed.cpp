@@ -720,60 +720,6 @@ void CClientPed::SetCurrentRotationNew(float fRotation)
     SetRotationRadiansNew(CVector(0, 0, fRotation));
 }
 
-void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
-{
-    // Remove us from our car
-    RemoveFromVehicle();
-    SetVehicleInOutState(VEHICLE_INOUT_NONE);
-
-    // Wait for ground
-    if (m_bIsLocalPlayer)
-    {
-        SetFrozenWaitingForGroundToLoad(true);
-        m_iLoadAllModelsCounter = 10;
-    }
-
-    // Remove any animation
-    KillAnimation();
-
-    // Give him the correct model
-    SetModel(usModel);
-
-    // Detach from any entities
-    AttachTo(NULL);
-
-    // Restore our health before any resurrection calls (::SetHealth/SetInitialState)
-    // So we don't get recreated more than once
-    if (m_pPlayerPed)
-    {
-        m_pPlayerPed->SetInitialState();
-        m_fHealth = GetMaxHealth();
-        m_pPlayerPed->SetHealth(m_fHealth);
-        m_bUsesCollision = true;
-        m_pPlayerPed->SetLanding(false);
-    }
-    else
-    {
-        // Remote ped health/armor was locked during Kill, so make sure it's unlocked
-        UnlockHealth();
-        UnlockArmor();
-    }
-
-    // Set some states
-    SetFrozen(false);
-    Teleport(vecPosition);
-    SetCurrentRotationNew(fRotation);
-    SetHealth(GetMaxHealth());
-    RemoveAllWeapons();
-    SetArmor(0);
-    ResetInterpolation();
-    SetHasJetPack(false);
-    SetMoveSpeed(CVector());
-    SetInterior(ucInterior);
-    SetFootBloodEnabled(false);
-    SetIsDead(false);
-}
-
 void CClientPed::ResetInterpolation()
 {
     m_ulBeginRotationTime = 0;

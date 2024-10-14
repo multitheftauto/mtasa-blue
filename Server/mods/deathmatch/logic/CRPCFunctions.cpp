@@ -151,7 +151,7 @@ void CRPCFunctions::PlayerTarget(NetBitStreamInterface& bitStream)
 void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
 {
     CLOCK("NetServerPulse::RPC", "PlayerWeapon");
-    if (m_pSourcePlayer->IsJoined() && m_pSourcePlayer->IsSpawned())
+    if (m_pSourcePlayer->IsJoined() && !m_pSourcePlayer->IsDead())
     {
         unsigned char ucPrevSlot = m_pSourcePlayer->GetWeaponSlot();
 

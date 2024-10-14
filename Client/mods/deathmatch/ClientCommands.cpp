@@ -504,7 +504,7 @@ void DumpPlayer(CClientPlayer* pPlayer, FILE* pFile)
     fprintf(pFile, "Armor: %f\n", pPlayer->GetArmor());
     fprintf(pFile, "On screen: %u\n", pPlayer->IsOnScreen());
     fprintf(pFile, "Frozen: %u\n", pPlayer->IsFrozen());
-    fprintf(pFile, "Respawn state: %i\n", pPlayer->GetRespawnState());
+    fprintf(pFile, "Respawn state: %u\n", pPlayer->IsSpawned());
 
     fprintf(pFile, "Cur weapon slot: %i\n", static_cast<int>(pPlayer->GetCurrentWeaponSlot()));
     fprintf(pFile, "Cur weapon type: %i\n", static_cast<int>(pPlayer->GetCurrentWeaponType()));
