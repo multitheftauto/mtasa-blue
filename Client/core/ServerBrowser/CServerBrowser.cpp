@@ -1081,7 +1081,8 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
         const SString strVersion = !bIncludeOtherVersions ? "" : pServer->strVersion;
         const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
-        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d", pServer->nPlayers, pServer->nMaxPlayers);
+        const SString strVerified = pServer->isStatusVerified ? "" : "*";
+        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
         const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
 
         const SString strPing = pServer->nPing == 9999 ? "" : SString("%d", pServer->nPing);
@@ -1124,6 +1125,12 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
         m_pServerList[Type]->SetItemColor(iIndex, m_hPlayers[Type], color.R, color.G, color.B, color.A);
         m_pServerList[Type]->SetItemColor(iIndex, m_hPing[Type], color.R, color.G, color.B, color.A);
         m_pServerList[Type]->SetItemColor(iIndex, m_hGame[Type], color.R, color.G, color.B, color.A);
+
+        if (!pServer->isStatusVerified)
+        {
+            SColor orange = SColorRGBA(230, 200, 180, color.A);
+            m_pServerList[Type]->SetItemColor(iIndex, m_hPlayers[Type], orange.R, orange.G, orange.B, orange.A);
+        }
 
         // If the index was modified from the original, then update all indexes because it means there was some sort
         if (pServer->iRowIndex != iIndex)
