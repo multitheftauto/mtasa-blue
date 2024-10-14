@@ -14,7 +14,7 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
     bool includeCustom = true;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(includeCustom);
+    argStream.ReadBool(includeCustom, true);
 
     auto modelManager = g_pClientGame->GetManager()->GetModelManager();
 
