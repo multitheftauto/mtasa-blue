@@ -7364,7 +7364,7 @@ void PostCWorld_ProcessPedsAfterPreRender()
 const DWORD CWorld_ProcessPedsAfterPreRender = 0x563430;
 void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
 {
-    __asm
+    _asm
     {
        call CWorld_ProcessPedsAfterPreRender
        call PostCWorld_ProcessPedsAfterPreRender
