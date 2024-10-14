@@ -84,11 +84,7 @@ bool CCommands::Execute(const char* szCommandLine)
 bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool bHandleRemotely, bool bIsScriptedBind)
 {
     // Copy szParametersIn so the contents can be changed
-    std::string strParameters;
-    if (szParametersIn)
-    {
-        strParameters = std::string(szParametersIn, strlen(szParametersIn));
-    }
+    std::string strParameters = szParametersIn ? std::string(szParametersIn, strlen(szParametersIn)) : "";
 
     // HACK: if its a 'chatboxsay' command, use the next parameter
     // Is the command "say" and the arguments start with /? (command comes from the chatbox)
@@ -101,15 +97,15 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             {
                 // Copy the characters after the slash to the 0 terminator to a seperate buffer
                 std::array<char, 256> szBuffer = {};
-                strncpy(szBuffer.data(), strParameters.c_str() + 1, szBuffer.size() - 1);
+                std::strncpy(szBuffer.data(), strParameters.c_str() + 1, szBuffer.size() - 1);
                 szBuffer.back() = '\0';
 
                 // Split it into command and arguments
-                szCommand = strtok(szBuffer.data(), " ");
+                szCommand = std::strtok(szBuffer.data(), " ");
                 if (!szCommand)
                     return false;
 
-                if (char* szNewParameters = strtok(nullptr, "\0"))
+                if (char* szNewParameters = std::strtok(nullptr, "\0"))
                 {
                     strParameters = std::string(szNewParameters, strlen(szNewParameters));
                 }
@@ -126,21 +122,19 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     // Grab the command
     tagCOMMANDENTRY* pEntry = Get(szCommand);
     bool             wasHandled = false;
-    if (pEntry)
+
+    // If its a core command, or if its enabled
+    if (pEntry && (!pEntry->bModCommand || pEntry->bEnabled))
     {
-        // If its a core command, or if its enabled
-        if (!pEntry->bModCommand || pEntry->bEnabled)
-        {
-            // Execute it
-            if (!bIsScriptedBind || pEntry->bAllowScriptedBind)
-                ExecuteHandler(pEntry->pfnCmdFunc, strParameters.c_str());
-          
-            wasHandled = true;
-        }
+        // Execute it
+        if (!bIsScriptedBind || pEntry->bAllowScriptedBind)
+            ExecuteHandler(pEntry->pfnCmdFunc, strParameters.c_str());
+
+        wasHandled = true;
     }
 
     // Recompose the original command text
-    std::string val = std::string(szCommand) + " " + std::string(!strParameters.empty() ? strParameters : "");
+    std::string val = std::string(szCommand) + " " + strParameters;
 
     // Is it a cvar? (syntax: cvar[ = value])
     if (!wasHandled)
@@ -221,8 +215,9 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 
     // Unknown command
     val = _("Unknown command or cvar: ") + szCommand;
-    if (!bIsScriptedBind && !bIsNickCommand && pEntry == nullptr)
+    if (!bIsScriptedBind && !bIsNickCommand && !pEntry)
         CCore::GetSingleton().GetConsole()->Print(val.c_str());
+
     return false;
 }
 
