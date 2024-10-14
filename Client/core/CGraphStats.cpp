@@ -39,6 +39,7 @@ public:
     virtual void SetEnabled(bool bEnabled);
     virtual bool IsEnabled();
     virtual void AddTimingPoint(const char* szName);
+    virtual void RemoveTimingPoint(const char* szName);
 
 protected:
     bool                              m_bEnabled;
@@ -187,6 +188,21 @@ void CGraphStats::AddTimingPoint(const char* szName)
 
     // Insert data point
     pLine->dataHistory[pLine->iDataPos] = AvgData;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CGraphStats::RemoveTimingPoint
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CGraphStats::RemoveTimingPoint(const char* szName)
+{
+    if (!IsEnabled() || szName[0] == 0)
+        return;
+
+    MapRemove(m_LineList, szName);
 }
 
 ///////////////////////////////////////////////////////////////

@@ -94,6 +94,18 @@ struct RwTexture;
 #define FUNC_CAutomobile_OnVehiclePreRender 0x6ABCFD
 #define FUNC_CVehicle_DoSunGlare            0x6DD6F0
 
+// CClumpModelInfo::GetFrameFromName
+#define FUNC_CClumpModelInfo_GetFrameFromName 0x4C5400
+
+// CAutomobile::m_aCarNodes
+// CTrain::m_aTrainNodes
+// CBike::m_apModelNodes
+// CBoat::pBoatParts
+#define OFFSET_CAutomobile_Nodes 0x648
+#define OFFSET_CTrain_Nodes 0x668
+#define OFFSET_CBike_Nodes 0x5A0
+#define OFFSET_CBoat_Nodes 0x5B0
+
 struct SRailNodeSA
 {
     short sX;                       // x coordinate times 8
@@ -604,7 +616,7 @@ public:
     SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
     void               SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
 
-    CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2);
+    bool     SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1);
     void     SetWheelVisibility(eWheelPosition wheel, bool bVisible);
     CVector  GetWheelPosition(eWheelPosition wheel);
 
