@@ -292,8 +292,8 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats(CPerfStatResult* pResult, const s
 
         // Some extra 'all VM' things
         c += 6;
-        row[c++] = !g_pStats->iDbJobDataCount ? "-" : SString("%d", g_pStats->iDbJobDataCount);
-        row[c++] = g_pStats->iDbConnectionCount - 2 == 0 ? "-" : SString("%d", g_pStats->iDbConnectionCount - 2);
+        row[c++] = !g_pStats->iDbJobDataCount ? "-" : std::to_string(g_pStats->iDbJobDataCount);
+        row[c++] = g_pStats->iDbConnectionCount - 2 == 0 ? "-" : std::to_string(g_pStats->iDbConnectionCount - 2);
     }
 
     // For each VM
@@ -321,12 +321,12 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats(CPerfStatResult* pResult, const s
 
         row[c++] = SString("%d KB", LuaMainMemory.Current);
         row[c++] = SString("%d KB", LuaMainMemory.Max);
-        row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : SString("%d", LuaMainMemory.OpenXMLFiles);
-        row[c++] = !LuaMainMemory.OpenFiles ? "-" : SString("%d", LuaMainMemory.OpenFiles);
-        row[c++] = !LuaMainMemory.Refs ? "-" : SString("%d", LuaMainMemory.Refs);
-        row[c++] = !LuaMainMemory.TimerCount ? "-" : SString("%d", LuaMainMemory.TimerCount);
-        row[c++] = !LuaMainMemory.ElementCount ? "-" : SString("%d", LuaMainMemory.ElementCount);
-        row[c++] = !LuaMainMemory.TextDisplayCount ? "-" : SString("%d", LuaMainMemory.TextDisplayCount);
-        row[c++] = !LuaMainMemory.TextItemCount ? "-" : SString("%d", LuaMainMemory.TextItemCount);
+        row[c++] = !LuaMainMemory.OpenXMLFiles ? SString("-") : SString("%d", LuaMainMemory.OpenXMLFiles);
+        row[c++] = !LuaMainMemory.OpenFiles ? SString("-") : SString("%d", LuaMainMemory.OpenFiles);
+        row[c++] = !LuaMainMemory.Refs ? SString("-") : SString("%d", LuaMainMemory.Refs);
+        row[c++] = !LuaMainMemory.TimerCount ? SString("-") : SString("%d", LuaMainMemory.TimerCount);
+        row[c++] = !LuaMainMemory.ElementCount ? SString("-") : SString("%d", LuaMainMemory.ElementCount);
+        row[c++] = !LuaMainMemory.TextDisplayCount ? SString("-") : SString("%d", LuaMainMemory.TextDisplayCount);
+        row[c++] = !LuaMainMemory.TextItemCount ? SString("-") : SString("%d", LuaMainMemory.TextItemCount);
     }
 }

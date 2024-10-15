@@ -74,9 +74,9 @@ void CFunctionUseLogger::OnFunctionUse(lua_State* luaVM, const char* szFunctionN
         return;
 
     CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromLuaState(luaVM);
-    SString    strResourceName = pResource ? pResource->GetName() : "Unknown";
+    SString strResourceName = pResource ? pResource->GetName() : SString("Unknown");
 
-    SString strKey("%s-%s", szFunctionName, *strResourceName);
+    SString strKey("%s-%s", szFunctionName, strResourceName.c_str());
 
     SFuncCallRecord* pItem = MapFind(m_FuncCallRecordMap, strKey);
     if (!pItem)
