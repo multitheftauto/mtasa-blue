@@ -13,6 +13,27 @@
 #include "TaskBasicSA.h"
 #include "CPedSA.h"
 
+
+CTaskSimpleRunNamedAnimSAInterface* CTaskSimpleRunNamedAnimSA::GetAnimationInterface() noexcept
+{
+    return reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(this->GetInterface());
+}
+
+const CTaskSimpleRunNamedAnimSAInterface* CTaskSimpleRunNamedAnimSA::GetAnimationInterface() const noexcept
+{
+    return reinterpret_cast<const CTaskSimpleRunNamedAnimSAInterface*>(this->GetInterface());
+}
+
+const char* CTaskSimpleRunNamedAnimSA::GetAnimName() const noexcept
+{
+    return GetAnimationInterface()->m_animName;
+}
+
+const char* CTaskSimpleRunNamedAnimSA::GetGroupName() const noexcept
+{
+    return GetAnimationInterface()->m_animGroupName;
+}
+
 CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA(const int iDuration)
 {
     CreateTaskInterface(sizeof(CTaskComplexUseMobilePhoneSAInterface));
