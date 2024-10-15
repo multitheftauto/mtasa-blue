@@ -1592,9 +1592,10 @@ bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComp
     if (removalTime <= -1 || !componentObject)
         return true;
 
-    std::uint32_t CTimer_ms = *reinterpret_cast<std::uint32_t*>(VAR_CTimer_snTimeInMilliseconds);
-    componentObject->uiObjectRemovalTime = CTimer_ms + static_cast<std::uint32_t>(removalTime);
+    // Set double-sided
+    componentObject->bBackfaceCulled = true;
 
+    componentObject->uiObjectRemovalTime = pGame->GetSystemTime() + static_cast<std::uint32_t>(removalTime);
     return true;
 }
 
