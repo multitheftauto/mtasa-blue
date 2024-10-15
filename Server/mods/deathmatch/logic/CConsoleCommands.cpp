@@ -24,6 +24,7 @@
 #include "CDatabaseManager.h"
 #include "CGame.h"
 #include "CMainConfig.h"
+#include "CMapManager.h"
 
 extern CGame* g_pGame;
 
@@ -1111,6 +1112,9 @@ bool CConsoleCommands::Shutdown(CConsole* pConsole, const char* szArguments, CCl
 {
     // shutdown <reason>
 
+    CLuaArguments arguments;
+    arguments.PushNil();
+
     if (szArguments && strlen(szArguments) > 0)
     {
         // Copy to a buffer and strip it for bad characters
@@ -1118,12 +1122,17 @@ bool CConsoleCommands::Shutdown(CConsole* pConsole, const char* szArguments, CCl
 
         // Output the action + reason to the console
         CLogger::LogPrintf("SHUTDOWN: Got shutdown command from %s (Reason: %s)\n", GetAdminNameForLog(pClient).c_str(), szBuffer);
+        arguments.PushString(szBuffer);
     }
     else
     {
         // Output the action to the console
         CLogger::LogPrintf("SHUTDOWN: Got shutdown command from %s (No reason specified)\n", GetAdminNameForLog(pClient).c_str());
+        arguments.PushString("No reason specified");
     }
+
+    // Call event
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onShutdown", arguments);
 
     // Shut the server down asap
     g_pGame->SetIsFinished(true);

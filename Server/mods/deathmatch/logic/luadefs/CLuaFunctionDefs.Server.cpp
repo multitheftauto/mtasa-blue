@@ -16,6 +16,7 @@
 #include "ASE.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CPerfStatManager.h"
+#include "CMapManager.h"
 
 #define MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
@@ -348,6 +349,12 @@ bool CLuaFunctionDefs::Shutdown(lua_State* luaVM, std::optional<std::string_view
 
     if (maybeExitCode.has_value())
         g_pServerInterface->GetModManager()->SetExitCode(maybeExitCode.value());
+
+    // Call event
+    CLuaArguments arguments;
+    arguments.PushResource(&resource);
+    arguments.PushString(reason.data());
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onShutdown", arguments);
 
     g_pGame->SetIsFinished(true);
     return true;
