@@ -679,7 +679,7 @@ bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
         return false;
 
     const RwV3d& pos = rwBoneMatrix->pos;
-    position = {pos.x, pos.y, pos.z};
+    position = CVector(pos.x, pos.y, pos.z);
     return true;
 }
 
