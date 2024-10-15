@@ -104,6 +104,14 @@ public:
         return &m_pObjects[uiSlot];
     }
 
+    B* AllocateAtNoInit(std::uint32_t uiSlot)
+    {
+        m_byteMap[uiSlot].bEmpty = false;
+        m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
+
+        return &m_pObjects[uiSlot];
+    }
+
     void Release(uint index)
     {
         m_byteMap[index].bEmpty = true;

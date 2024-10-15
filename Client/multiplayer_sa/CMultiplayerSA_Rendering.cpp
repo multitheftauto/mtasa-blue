@@ -77,7 +77,7 @@ void _declspec(naked) HOOK_CallIdle()
 //////////////////////////////////////////////////////////////////////////////////////////
 bool IsEntityRenderable(CEntitySAInterface* pEntity)
 {
-    bool bIsPlaceable = ((DWORD)(pEntity->vtbl) == VTBL_CPlaceable);
+    bool bIsPlaceable = pEntity->IsPlaceableVTBL();
     bool bHasRwObject = (pEntity->m_pRwObject != nullptr);
     if (bIsPlaceable || !bHasRwObject)
     {

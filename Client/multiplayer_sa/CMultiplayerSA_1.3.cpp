@@ -876,7 +876,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
 }
 bool DisableVehicleSiren()
 {
-    if (pVehicleWithTheSiren && pVehicleWithTheSiren->vtbl != NULL)
+    if (pVehicleWithTheSiren && pVehicleWithTheSiren->HasVTBL())
     {
         SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
         CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
@@ -1635,20 +1635,20 @@ void UpdateExplosionLocation()
     if (pExplosionEntity)
     {
         // project backwards 20% of our velocity just to catch us going too far
-        CVector vecStart = pExplosionEntity->Placeable.matrix->vPos + (pExplosionEntity->m_vecLinearVelocity * 0.20f);
+        CVector vecStart = pExplosionEntity->matrix->vPos + (pExplosionEntity->m_vecLinearVelocity * 0.20f);
         // project forwards 120% to look for collisions forwards
         CVector vecEnd = vecStart - (pExplosionEntity->m_vecLinearVelocity * 1.20f);
         // calculate our actual impact position
         if (pGameInterface->GetWorld()->CalculateImpactPosition(vecStart, vecEnd))
         {
             // Apply it
-            if (pExplosionEntity->Placeable.matrix)
+            if (pExplosionEntity->matrix)
             {
-                pExplosionEntity->Placeable.matrix->vPos = vecEnd;
+                pExplosionEntity->matrix->vPos = vecEnd;
             }
             else
             {
-                pExplosionEntity->Placeable.m_transform.m_translate = vecEnd;
+                pExplosionEntity->m_transform.m_translate = vecEnd;
             }
         }
     }

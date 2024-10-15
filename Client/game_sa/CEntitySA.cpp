@@ -101,14 +101,14 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
 {
     // Remove & add to world?
     CVector* vecPos;
-    if (m_pInterface->Placeable.matrix)
+    if (m_pInterface->matrix)
     {
         OnChangingPosition(CVector(fX, fY, fZ));
-        vecPos = &m_pInterface->Placeable.matrix->vPos;
+        vecPos = &m_pInterface->matrix->vPos;
     }
     else
     {
-        vecPos = &m_pInterface->Placeable.m_transform.m_translate;
+        vecPos = &m_pInterface->m_transform.m_translate;
     }
 
     if (vecPos)
@@ -139,21 +139,10 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
 
 void CEntitySA::Teleport(float fX, float fY, float fZ)
 {
-    if (m_pInterface->Placeable.matrix)
+    if (m_pInterface->matrix)
     {
         SetPosition(fX, fY, fZ);
-
-        DWORD dwFunc = m_pInterface->vtbl->Teleport;
-        DWORD dwThis = (DWORD)m_pInterface;
-        _asm
-        {
-            mov     ecx, dwThis
-            push    1
-            push    fZ
-            push    fY
-            push    fX
-            call    dwFunc
-        }
+        m_pInterface->Teleport(CVector(fX, fY, fZ), true);
     }
     else
     {
@@ -163,34 +152,18 @@ void CEntitySA::Teleport(float fX, float fY, float fZ)
 
 void CEntitySA::ProcessControl()
 {
-    DWORD dwFunc = m_pInterface->vtbl->ProcessControl;
-    DWORD dwThis = (DWORD)m_pInterface;
-    if (dwFunc)
-    {
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
-    }
+    m_pInterface->ProcessControl();
 }
 
 void CEntitySA::SetupLighting()
 {
-    DWORD dwFunc = m_pInterface->vtbl->SetupLighting;
-    DWORD dwThis = (DWORD)m_pInterface;
-    if (dwFunc)
-    {
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
-    }
+    m_pInterface->SetupLighting();
 }
 
+// Remove this function?
 void CEntitySA::Render()
 {
+    // This function may use m_pInterface->Render()
     DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
@@ -198,16 +171,6 @@ void CEntitySA::Render()
         mov     ecx, dwThis
         call    dwFunc
     }
-
-    /*  DWORD dwFunc = 0x553260;
-        DWORD dwThis = (DWORD) m_pInterface;
-
-        _asm
-        {
-            push    dwThis
-            call    dwFunc
-            add     esp, 4
-        }*/
 }
 
 void CEntitySA::SetOrientation(float fX, float fY, float fZ)
@@ -305,10 +268,10 @@ CVector* CEntitySA::GetPosition()
 
 CVector* CEntitySA::GetPositionInternal()
 {
-    if (m_pInterface->Placeable.matrix)
-        return &m_pInterface->Placeable.matrix->vPos;
+    if (m_pInterface->matrix)
+        return &m_pInterface->matrix->vPos;
     else
-        return &m_pInterface->Placeable.m_transform.m_translate;
+        return &m_pInterface->m_transform.m_translate;
 }
 
 //
@@ -331,12 +294,12 @@ CMatrix* CEntitySA::GetMatrix(CMatrix* matrix)
 
 CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
 {
-    if (m_pInterface->Placeable.matrix && matrix)
+    if (m_pInterface->matrix && matrix)
     {
-        MemCpyFast(&matrix->vFront, &m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
-        MemCpyFast(&matrix->vPos, &m_pInterface->Placeable.matrix->vPos, sizeof(CVector));
-        MemCpyFast(&matrix->vUp, &m_pInterface->Placeable.matrix->vUp, sizeof(CVector));
-        MemCpyFast(&matrix->vRight, &m_pInterface->Placeable.matrix->vRight, sizeof(CVector));
+        MemCpyFast(&matrix->vFront, &m_pInterface->matrix->vFront, sizeof(CVector));
+        MemCpyFast(&matrix->vPos, &m_pInterface->matrix->vPos, sizeof(CVector));
+        MemCpyFast(&matrix->vUp, &m_pInterface->matrix->vUp, sizeof(CVector));
+        MemCpyFast(&matrix->vRight, &m_pInterface->matrix->vRight, sizeof(CVector));
         return matrix;
     }
     else
@@ -347,16 +310,16 @@ CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
 
 void CEntitySA::SetMatrix(CMatrix* matrix)
 {
-    if (m_pInterface->Placeable.matrix && matrix)
+    if (m_pInterface->matrix && matrix)
     {
         OnChangingPosition(matrix->vPos);
 
-        MemCpyFast(&m_pInterface->Placeable.matrix->vFront, &matrix->vFront, sizeof(CVector));
-        MemCpyFast(&m_pInterface->Placeable.matrix->vPos, &matrix->vPos, sizeof(CVector));
-        MemCpyFast(&m_pInterface->Placeable.matrix->vUp, &matrix->vUp, sizeof(CVector));
-        MemCpyFast(&m_pInterface->Placeable.matrix->vRight, &matrix->vRight, sizeof(CVector));
+        MemCpyFast(&m_pInterface->matrix->vFront, &matrix->vFront, sizeof(CVector));
+        MemCpyFast(&m_pInterface->matrix->vPos, &matrix->vPos, sizeof(CVector));
+        MemCpyFast(&m_pInterface->matrix->vUp, &matrix->vUp, sizeof(CVector));
+        MemCpyFast(&m_pInterface->matrix->vRight, &matrix->vRight, sizeof(CVector));
 
-        m_pInterface->Placeable.m_transform.m_translate = matrix->vPos;
+        m_pInterface->m_transform.m_translate = matrix->vPos;
         m_LastGoodPosition = matrix->vPos;
 
         /*
@@ -500,7 +463,7 @@ void CEntitySA::SetVisible(bool bVisible)
 
 void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown)
 {
-    CMatrix_Padded* matrixPadded = m_pInterface->Placeable.matrix;
+    CMatrix_Padded* matrixPadded = m_pInterface->matrix;
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
@@ -518,7 +481,7 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
 
 void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int iUnknown)
 {
-    CMatrix_Padded* matrixPadded = m_pInterface->Placeable.matrix;
+    CMatrix_Padded* matrixPadded = m_pInterface->matrix;
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;

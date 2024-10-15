@@ -138,7 +138,7 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
     if (pEntitySA)
     {
         CEntitySAInterface* pInterface = pEntitySA->GetInterface();
-        if ((DWORD)pInterface->vtbl == VTBL_CPlaceable)
+        if (pInterface->IsPlaceableVTBL())
         {
             SString strMessage("Caller: %i ", CallerId);
             LogEvent(506, "CWorld::Add ( CEntity * ) Crash", "", strMessage);
@@ -157,7 +157,7 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
 void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
 {
     DWORD dwFunction = FUNC_Add;
-    if ((DWORD)entityInterface->vtbl == VTBL_CPlaceable)
+    if (entityInterface->IsPlaceableVTBL())
     {
         SString strMessage("Caller: %i ", CallerId);
         LogEvent(506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage);
@@ -177,7 +177,7 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
     if (pEntitySA)
     {
         CEntitySAInterface* pInterface = pEntitySA->GetInterface();
-        if ((DWORD)pInterface->vtbl == VTBL_CPlaceable)
+        if (pInterface->IsPlaceableVTBL())
         {
             SString strMessage("Caller: %i ", CallerId);
             LogEvent(507, "CWorld::Remove ( CEntity * ) Crash", "", strMessage);
@@ -195,7 +195,7 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
 
 void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
 {
-    if ((DWORD)entityInterface->vtbl == VTBL_CPlaceable)
+    if (entityInterface->IsPlaceableVTBL())
     {
         SString strMessage("Caller: %i ", CallerId);
         LogEvent(507, "CWorld::Remove ( CEntitySAInterface * ) Crash", "", strMessage);
@@ -277,7 +277,7 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
     }
 
     // Get matrix, and it's inverse
-    c.entity->Placeable.matrix->ConvertToMatrix(c.entMat);
+    c.entity->matrix->ConvertToMatrix(c.entMat);
     c.entInvMat = c.entMat.Inverse();
 
     // ...to transform the line origin and end into object space
@@ -465,11 +465,11 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
                     pBuildingResult->usLODModelID = 0;
 
                 pBuildingResult->pInterface = targetEntity;
-                pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
-                if (targetEntity->Placeable.matrix)
+                pBuildingResult->vecPosition = targetEntity->m_transform.m_translate;
+                if (targetEntity->matrix)
                 {
                     CVector& vecRotation = pBuildingResult->vecRotation;
-                    ConvertMatrixToEulerAngles(*targetEntity->Placeable.matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
+                    ConvertMatrixToEulerAngles(*targetEntity->matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
                     vecRotation = -vecRotation;
                 }
             }
@@ -483,15 +483,15 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
                     pBuildingResult->usLODModelID = 0;
 
                 pBuildingResult->pInterface = targetEntity;
-                if (targetEntity->Placeable.matrix)
+                if (targetEntity->matrix)
                 {
-                    pBuildingResult->vecPosition = targetEntity->Placeable.matrix->vPos;
+                    pBuildingResult->vecPosition = targetEntity->matrix->vPos;
                     CVector& vecRotation = pBuildingResult->vecRotation;
-                    ConvertMatrixToEulerAngles(*targetEntity->Placeable.matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
+                    ConvertMatrixToEulerAngles(*targetEntity->matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
                     vecRotation = -vecRotation;
                 }
                 else
-                    pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
+                    pBuildingResult->vecPosition = targetEntity->m_transform.m_translate;
             }
         }
     }
