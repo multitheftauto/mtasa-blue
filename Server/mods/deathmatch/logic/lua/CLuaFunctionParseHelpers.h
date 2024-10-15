@@ -14,6 +14,8 @@
 #include "CAccount.h"
 #include "CEasingCurve.h"
 #include "CAccessControlListRight.h"
+#include "CDiscord.h"
+
 #include <type_traits>
 
 class CLuaVector2D;
@@ -38,6 +40,7 @@ DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
 DECLARE_ENUM_CLASS(ESyncType);
+DECLARE_ENUM_CLASS(IDiscord::DiscordEvent);
 
 enum eHudComponent
 {
@@ -255,6 +258,10 @@ inline SString GetClassTypeName(CLuaMatrix*)
 {
     return "matrix";
 }
+inline SString GetClassTypeName(const dpp::guild*)
+{
+    return "discord-guild";
+}
 
 //
 // CResource from userdata
@@ -357,6 +364,11 @@ CPlayer* UserDataCast(CPlayer* ptr, lua_State* luaState);
 // CClient from CConsoleClient or a CPlayer
 //
 CClient* UserDataCast(CClient* ptr, lua_State* luaState);
+
+//
+// Discord guild
+//
+CDiscordGuild* UserDataCast(CDiscordGuild* ptr, lua_State* luaState);
 
 //
 // CElement ( something )

@@ -151,7 +151,7 @@ void sighandler(int sig)
 }
 #endif
 
-CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connections per 30 seconds, then 30 second ignore
+CGame::CGame() : m_FloodProtect(4, 30000, 30000) // Max of 4 connections per 30 seconds, then 30 second ignore
 {
     // Set our global pointer
     g_pGame = this;

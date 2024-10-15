@@ -309,6 +309,11 @@ const char* CLuaClassDefs::GetQueryClass(CDbJobData* pJobData)
     return "QueryHandle";
 }
 
+const char* CLuaClassDefs::GetDiscordGuildClass() noexcept
+{
+    return "DiscordGuild";
+}
+
 // absolutely ugly, need a better way
 const char* CLuaClassDefs::GetElementClass(CElement* pElement)
 {

@@ -42,6 +42,7 @@
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 #include "luadefs/CLuaCompatibilityDefs.h"
+#include <luadefs/CLuaDiscordDefs.h>
 
 extern CGame* g_pGame;
 
@@ -194,6 +195,7 @@ void CLuaManager::LoadCFunctions()
     CLuaCameraDefs::LoadFunctions();
     CLuaColShapeDefs::LoadFunctions();
     CLuaDatabaseDefs::LoadFunctions();
+    CLuaDiscordDefs::LoadFunctions();
     CLuaElementDefs::LoadFunctions();
     CLuaHandlingDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();

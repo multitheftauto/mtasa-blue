@@ -460,6 +460,14 @@ CLuaArgument* CLuaArguments::PushDbQuery(CDbJobData* pJobData)
     return pArgument;
 }
 
+CLuaArgument* CLuaArguments::PushDiscordGuild(dpp::guild* guild)
+{
+    CLuaArgument* arg = new CLuaArgument;
+    arg->ReadScriptID(guild->id);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
 void CLuaArguments::DeleteArguments()
 {
     // Delete each item

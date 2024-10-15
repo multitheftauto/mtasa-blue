@@ -1,0 +1,33 @@
+# IDEs
+.vs
+.idea
+
+# doxygen generated files
+docs
+docs/doxygen_sqlite3.db
+
+# build files
+build
+buildtools/composer.phar
+src/build
+cmake-build-debug
+docpages/example_code/build
+
+# tests
+test
+testdata/maxpower.pcm
+testdata/onandon.pcm
+
+# general folders
+/main
+tags
+core
+*.autosave
+.cache
+
+# general files
+config.json
+.misspell-fixer.ignore
+compile_commands.json
+src/dpp/dpp.rc
+.DS_STORE

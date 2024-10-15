@@ -1,0 +1,51 @@
+name: Test compile documentation examples
+on:
+  push:
+    branches:
+      - 'dev'
+    files:
+      - '**Doxyfile'
+      - '**docpages/example_code/**'
+  pull_request:
+    files:
+      - '**Doxyfile'
+      - '**docpages/example_code/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+    
+jobs:
+  test_docs_examples:
+    name: Test build examples
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+  
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout D++
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+        with:
+          submodules: recursive
+  
+      - name: Install apt packages
+        run: sudo sed -i 's/azure\.//' /etc/apt/sources.list && sudo apt-get update && sudo apt-get install -y g++-12 libsodium-dev libopus-dev zlib1g-dev libmpg123-dev liboggz-dev cmake libfmt-dev libopusfile-dev
+  
+      - name: Generate CMake
+        run: mkdir build && cd build && cmake -DDPP_NO_VCPKG=ON -DAVX_TYPE=T_fallback -DDPP_CORO=ON -DCMAKE_BUILD_TYPE=Debug ..
+        env:
+          CXX: g++-12
+  
+      - name: Build Project
+        run: cd build && make -j2 && sudo make install
+  
+      - name: Test compile examples
+        run: cd docpages/example_code && mkdir build && cd build && cmake .. && make -j2
+        env:
+          CXX: g++-12

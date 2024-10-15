@@ -21,6 +21,7 @@ extern "C"
 #include "../common/CBitStream.h"
 #include "json.h"
 #include "CLuaFunctionRef.h"
+#include <CDiscord.h>
 
 inline void LUA_CHECKSTACK(lua_State* L, int size)
 {
@@ -80,6 +81,7 @@ public:
     CLuaArgument* PushTextItem(CTextItem* pTextItem);
     CLuaArgument* PushTimer(CLuaTimer* pLuaTimer);
     CLuaArgument* PushDbQuery(CDbJobData* pJobData);
+    CLuaArgument* PushDiscordGuild(dpp::guild* guild);
 
     CLuaArgument* PushArgument(const CLuaArgument& argument);
     CLuaArgument* PushTable(CLuaArguments* table);

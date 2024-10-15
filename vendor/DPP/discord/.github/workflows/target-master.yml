@@ -1,0 +1,26 @@
+name: Close master-targeted PRs
+on:
+  pull_request_target:
+    types: [opened]
+    branches:
+      - 'master'
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    permissions:
+      pull-requests: write # Needs to be able to close a PR.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        with:
+          egress-policy: audit
+
+      - name: Close PRs
+        uses: superbrothers/close-pull-request@9c18513d320d7b2c7185fb93396d0c664d5d8448 # v3.1.2
+        with:
+          comment: "Thank you for your contribution, but PRs must be raised against the `dev` branch. Please log your pull request against the `dev` branch not `master`. You can also retarget this pull request, then reopen it."
+

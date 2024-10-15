@@ -1,0 +1,52 @@
+documentation:
+- changed-files:
+  - any-glob-to-any-file:
+    - '**Doxyfile'
+    - '**docpages/**'
+    - '**/*.h'
+    - '**/documentation.yml'
+    - '**.cspell.json'
+    - '**README.md'
+    - '**SECURITY.md'
+    - '**CONTRIBUTING.md'
+    - '**CODE_OF_CONDUCT.md'
+
+build:
+- changed-files:
+  - any-glob-to-any-file:
+    - '**buildtools/**'
+    - '**cmake/**'
+    - '**library-vcpkg/**'
+    - '**library/**'
+    - '**win32/**'
+    - '**CMakeLists.txt'
+    - '**CMakeSettings.json'
+    - '**settings.json'
+    - '**dpp.pc.in'
+
+packaging:
+- changed-files:
+  - any-glob-to-any-file:
+    - '**vcpkg/**'
+    - '**makerelease.sh'
+    - '**sign.sh'
+    - '**Dockerfile'
+
+submodules:
+- changed-files:
+  - any-glob-to-any-file:
+    - '**.gitmodules'
+    - '**doxygen-awesome-css/**' # Ideally, nobody should be touching this, but it's here just in-case.
+
+github_actions:
+- changed-files:
+  - any-glob-to-any-file:
+    - '**.github/labeler.yml'
+    - '**.github/dependabot.yml'
+    - '**.github/workflows/**'
+
+code:
+- changed-files:
+  - any-glob-to-any-file:
+    - '**src/**'
+    - '**include/**'

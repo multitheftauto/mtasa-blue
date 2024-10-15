@@ -58,6 +58,7 @@ class CGame;
 
 #include "CLightsyncManager.h"
 #include "CBanManager.h"
+#include <CDiscord.h>
 
 // Forward declarations
 class ASE;
