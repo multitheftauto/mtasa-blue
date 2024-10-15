@@ -101,7 +101,6 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setFPSLimit", SetFPSLimit},
                                                                              {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
                                                                              {"setWorldProperty", ArgumentParser<SetWorldProperty>},
-                                                                             {"setTimeFrozen", ArgumentParser<SetTimeFrozen>},
 
                                                                              // World remove/restore functions 
                                                                              {"removeWorldModel", RemoveWorldBuilding},
