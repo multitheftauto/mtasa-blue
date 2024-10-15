@@ -113,6 +113,12 @@ public:
     CTaskSimpleRunNamedAnimSA(const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta, const int iTime = -1,
                               const bool bDontInterrupt = false, const bool bRunInSequence = false, const bool bOffsetPed = false,
                               const bool bHoldLastFrame = false);
+
+    CTaskSimpleRunNamedAnimSAInterface*       GetAnimationInterface() noexcept;
+    const CTaskSimpleRunNamedAnimSAInterface* GetAnimationInterface() const noexcept;
+
+    const char* GetAnimName() const noexcept override;
+    const char* GetGroupName() const noexcept override;
 };
 
 class CTaskComplexDieSAInterface : public CTaskComplexSAInterface

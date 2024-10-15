@@ -12,7 +12,9 @@
 #include "StdInc.h"
 #include <game/CWeapon.h>
 #include "lua/CLuaFunctionParser.h"
-#include "CMatrix_Pad.h"
+#include <game/CTasks.h>
+#include <game/TaskBasic.h>
+#include <game/CAnimManager.h>
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
@@ -23,70 +25,26 @@ void CLuaPedDefs::LoadFunctions()
         {"createPed", CreatePed},
         {"detonateSatchels", DetonateSatchels},
         {"killPed", KillPed},
-
         {"resetPedVoice", ArgumentParser<ResetPedVoice>},
-        {"getPedVoice", GetPedVoice},
+        {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
+        {"addPedClothes", AddPedClothes},
+        {"removePedClothes", RemovePedClothes},
+        {"warpPedIntoVehicle", WarpPedIntoVehicle},
+        {"removePedFromVehicle", RemovePedFromVehicle},
+        {"givePedWeapon", GivePedWeapon},
+
         {"setPedVoice", SetPedVoice},
-        {"getPedRotation", GetPedRotation},
-        {"canPedBeKnockedOffBike", CanPedBeKnockedOffBike},
-        {"getPedContactElement", GetPedContactElement},
-        {"isPedInVehicle", IsPedInVehicle},
-        {"doesPedHaveJetPack", DoesPedHaveJetPack},
-        {"isPedWearingJetpack", DoesPedHaveJetPack},            // introduced in 1.5.5-9.13846
-        {"isPedOnGround", IsPedOnGround},
-        {"getPedTask", GetPedTask},
-        {"getPedSimplestTask", GetPedSimplestTask},
-        {"isPedDoingTask", IsPedDoingTask},
-        {"getPedTarget", GetPedTarget},
-        {"getPedTargetStart", GetPedTargetStart},
-        {"getPedTargetEnd", GetPedTargetEnd},
-        {"getPedTargetCollision", GetPedTargetCollision},
-        {"getPedWeaponSlot", GetPedWeaponSlot},
-        {"getPedWeapon", GetPedWeapon},
-        {"getPedAmmoInClip", GetPedAmmoInClip},
-        {"getPedTotalAmmo", GetPedTotalAmmo},
-        {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
-        {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
-        {"getPedArmor", GetPedArmor},
-        {"isPedChoking", IsPedChoking},
-        {"isPedDucked", IsPedDucked},
-        {"getPedStat", GetPedStat},
-        {"getPedBonePosition", GetPedBonePosition},
         {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
         {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
         {"setElementBoneQuaternion", ArgumentParser<SetElementBoneQuaternion>},
-        {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
-        {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
-        {"getElementBoneQuaternion", ArgumentParser<GetElementBoneQuaternion>},
         {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
-        {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
-        {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
-        {"getPedClothes", GetPedClothes},
-        {"getPedControlState", GetPedControlState},
-        {"getPedAnalogControlState", GetPedAnalogControlState},
-        {"isPedDead", IsPedDead},
-
-        {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
-        {"getPedFightingStyle", GetPedFightingStyle},
-        {"getPedAnimation", GetPedAnimation},
-        {"getPedMoveState", GetPedMoveState},
-        {"getPedWalkingStyle", GetPedMoveAnim},
-        {"isPedHeadless", IsPedHeadless},
-        {"isPedFrozen", IsPedFrozen},
-        {"isPedFootBloodEnabled", IsPedFootBloodEnabled},
-        {"getPedCameraRotation", GetPedCameraRotation},
-        {"getPedOxygenLevel", GetPedOxygenLevel},
-        {"isPedBleeding", ArgumentParser<IsPedBleeding>},
-
-        {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedRotation", SetPedRotation},
+        {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedCanBeKnockedOffBike", SetPedCanBeKnockedOffBike},
         {"setPedAnimation", SetPedAnimation},
         {"setPedAnimationProgress", SetPedAnimationProgress},
         {"setPedAnimationSpeed", SetPedAnimationSpeed},
         {"setPedWalkingStyle", SetPedMoveAnim},
-        {"addPedClothes", AddPedClothes},
-        {"removePedClothes", RemovePedClothes},
         {"setPedControlState", SetPedControlState},
         {"setPedAnalogControlState", SetPedAnalogControlState},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
@@ -98,15 +56,65 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedCameraRotation", SetPedCameraRotation},
         {"setPedAimTarget", SetPedAimTarget},
         {"setPedStat", SetPedStat},
-        {"warpPedIntoVehicle", WarpPedIntoVehicle},
-        {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedOxygenLevel", SetPedOxygenLevel},
         {"setPedArmor", ArgumentParser<SetPedArmor>},
-        {"givePedWeapon", GivePedWeapon},
-        {"isPedReloadingWeapon", IsPedReloadingWeapon},
         {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
         {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
         {"setPedBleeding", ArgumentParser<SetPedBleeding>},
+
+        {"getPedVoice", GetPedVoice},
+        {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
+        {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
+        {"getElementBoneQuaternion", ArgumentParser<GetElementBoneQuaternion>},
+        {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
+        {"getPedRotation", GetPedRotation},
+        {"getPedWeaponSlot", GetPedWeaponSlot},
+        {"canPedBeKnockedOffBike", CanPedBeKnockedOffBike},
+        {"getPedAnimation", GetPedAnimation},
+        {"getPedAnimationProgress", ArgumentParser<GetPedAnimationProgress>},
+        {"getPedAnimationSpeed", ArgumentParser<GetPedAnimationSpeed>},
+        {"getPedAnimationLength", ArgumentParser<GetPedAnimationLength>},        
+        {"getPedWalkingStyle", GetPedMoveAnim},
+        {"getPedControlState", GetPedControlState},
+        {"getPedAnalogControlState", GetPedAnalogControlState},
+        {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
+        {"getPedFightingStyle", GetPedFightingStyle},
+
+        {"isPedHeadless", IsPedHeadless},
+        {"isPedFrozen", IsPedFrozen},
+        {"isPedFootBloodEnabled", IsPedFootBloodEnabled},
+        {"getPedCameraRotation", GetPedCameraRotation},
+
+        {"getPedStat", GetPedStat},
+        {"getPedOxygenLevel", GetPedOxygenLevel},
+        {"getPedArmor", GetPedArmor},
+        {"isPedBleeding", ArgumentParser<IsPedBleeding>},
+
+        {"getPedContactElement", GetPedContactElement},
+        {"getPedTask", GetPedTask},
+        {"getPedSimplestTask", GetPedSimplestTask},
+        {"getPedTarget", GetPedTarget},
+        {"getPedTargetStart", GetPedTargetStart},
+        {"getPedTargetEnd", GetPedTargetEnd},
+        {"getPedTargetCollision", GetPedTargetCollision},
+        {"getPedWeapon", GetPedWeapon},
+        {"getPedAmmoInClip", GetPedAmmoInClip},
+        {"getPedTotalAmmo", GetPedTotalAmmo},
+        {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
+        {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
+        {"getPedBonePosition", GetPedBonePosition},
+        {"getPedClothes", GetPedClothes},
+        {"getPedMoveState", GetPedMoveState},
+
+        {"doesPedHaveJetPack", DoesPedHaveJetPack},
+        {"isPedInVehicle", IsPedInVehicle},
+        {"isPedWearingJetpack", DoesPedHaveJetPack},
+        {"isPedOnGround", IsPedOnGround},
+        {"isPedDoingTask", IsPedDoingTask},
+        {"isPedChoking", IsPedChoking},
+        {"isPedDucked", IsPedDucked},
+        {"isPedDead", IsPedDead},
+        {"isPedReloadingWeapon", IsPedReloadingWeapon},
     };
 
     // Add functions
@@ -2277,6 +2285,66 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
+{
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetCurrentProgress() / animAssociation->GetLength();
+}
+
+float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
+{
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetCurrentSpeed();
+}
+
+float CLuaPedDefs::GetPedAnimationLength(CClientPed* ped)
+{
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetLength();
 }
 
 int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
