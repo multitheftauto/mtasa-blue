@@ -68,6 +68,7 @@ class CWeather;
 class CWorld;
 class CIplStore;
 class CBuildingRemoval;
+class CRenderer;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -149,6 +150,7 @@ public:
     virtual CPointLights*             GetPointLights() = 0;
     virtual CColStore*                GetCollisionStore() = 0;
     virtual CBuildingRemoval*         GetBuildingRemoval() = 0;
+    virtual CRenderer*                GetRenderer() const noexcept = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;

@@ -145,6 +145,8 @@ CGameSA::CGameSA()
     m_pPlantManager = new CPlantManagerSA();
     m_pBuildingRemoval = new CBuildingRemovalSA();
 
+    m_pRenderer = std::make_unique<CRendererSA>();
+
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
     {

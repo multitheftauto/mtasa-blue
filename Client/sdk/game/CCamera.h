@@ -146,4 +146,6 @@ public:
 
     virtual void ShakeCamera(float radius, float x, float y, float z) noexcept = 0;
     virtual void ResetShakeCamera() noexcept = 0;
+
+    virtual std::uint8_t GetTransitionState() = 0;
 };
