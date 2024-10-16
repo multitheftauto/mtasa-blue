@@ -2497,14 +2497,12 @@ bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
 
 bool CLuaPedDefs::killPedTask(CClientPed* ped, std::string taskType, uint8_t taskNumber, bool gracefully)
 {
-
     if (taskType == "primary")            // PRIMARY 
     {
         return ped->KillTask(taskNumber, gracefully);
     }
-    else if (taskType == "secondary")            // SECONDARY 
+    else if (taskType == "secondary")     // SECONDARY 
     {
         return ped->KillTaskSecondary(taskNumber, gracefully);
     }
- 
 }
