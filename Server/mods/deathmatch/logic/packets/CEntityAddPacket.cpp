@@ -978,6 +978,42 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.Write(currentWeaponSlot);
                     }
 
+                    // Animation
+                    if (BitStream.Can(eBitStreamVersion::AnimationsSync))
+                    {
+                        const SPlayerAnimData& animData = pPed->GetAnimationData();
+
+                        // Contains animation data?
+                        bool animRunning = !animData.blockName.empty() && !animData.animName.empty();
+
+                        // Is animation still running?
+                        float deltaTime = GetTickCount64_() - animData.startedTick;
+                        if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
+                        {
+                            animRunning = false;
+                            pPed->SetAnimationData({});
+                        }
+
+                        BitStream.WriteBit(animRunning);
+
+                        if (animRunning)
+                        {
+                            BitStream.WriteString(animData.blockName);
+                            BitStream.WriteString(animData.animName);
+                            BitStream.Write(animData.time);
+                            BitStream.WriteBit(animData.loop);
+                            BitStream.WriteBit(animData.updatePosition);
+                            BitStream.WriteBit(animData.interruptable);
+                            BitStream.WriteBit(animData.freezeLastFrame);
+                            BitStream.Write(animData.blendTime);
+                            BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
+
+                            // Write progress & speed
+                            BitStream.Write((deltaTime / animData.time) * animData.speed);
+                            BitStream.Write(animData.speed);
+                        }
+                    }
+
                     break;
                 }
 

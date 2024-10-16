@@ -3990,6 +3990,39 @@ retry:
                     // Collisions
                     pPed->SetUsesCollision(bCollisonsEnabled);
 
+                    // Animation
+                    if (bitStream.Can(eBitStreamVersion::AnimationsSync))
+                    {
+                        // Contains animation data?
+                        if (bitStream.ReadBit())
+                        {
+                            std::string blockName, animName;
+                            int time, blendTime;
+                            bool looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
+                            float progress, speed;
+
+                            // Read data
+                            bitStream.ReadString(blockName);
+                            bitStream.ReadString(animName);
+                            bitStream.Read(time);
+                            bitStream.ReadBit(looped);
+                            bitStream.ReadBit(updatePosition);
+                            bitStream.ReadBit(interruptable);
+                            bitStream.ReadBit(freezeLastFrame);
+                            bitStream.Read(blendTime);
+                            bitStream.ReadBit(taskRestore);
+                            bitStream.Read(progress);
+                            bitStream.Read(speed);
+
+                            // Run anim
+                            CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable, freezeLastFrame);
+                            CStaticFunctionDefinitions::SetPedAnimationProgress(*pPed, animName, progress);
+                            CStaticFunctionDefinitions::SetPedAnimationSpeed(*pPed, animName, speed);
+
+                            pPed->SetHasSyncedAnim(true);
+                        }
+                    }
+
                     break;
                 }
 
