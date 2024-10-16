@@ -129,12 +129,8 @@ void CLocalGUI::ChangeLocale(const char* szName)
     if (guiWasLoaded)
     {
         CreateWindows(guiWasLoaded);
-
-        if (m_pConsole != nullptr)
-        {
-            m_pConsole->SetPosition(consolePos);
-            m_pConsole->SetSize(consoleSize);
-        }
+        m_pConsole->SetPosition(consolePos);
+        m_pConsole->SetSize(consoleSize);
     }
 }
 
