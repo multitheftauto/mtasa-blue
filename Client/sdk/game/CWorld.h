@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #pragma once
+#include "CEntity.h"
 
 class CEntitySAInterface;
 class CVector;
@@ -59,6 +60,16 @@ struct SProcessLineOfSightMaterialInfoResult {
     const char* frameName;     //< The name of the frame the hit geometry belongs to
     CVector     hitPos;        //< Precise hit position on the clump [World space]
     bool        valid{};       //< Data found in this struct is only valid if this is `true`!
+};
+
+struct STestSphereAgainstWorldResult
+{
+    bool           collisionDetected{false};
+    std::uint32_t  modelID{0};
+    CVector        entityPosition{};
+    CVector        entityRotation{};
+    std::uint32_t  lodID{0};
+    eEntityType    type{ENTITY_TYPE_NOTHING};
 };
 
 enum eDebugCaller
@@ -274,4 +285,6 @@ public:
     virtual CSurfaceType* GetSurfaceInfo() = 0;
     virtual void          ResetAllSurfaceInfo() = 0;
     virtual bool          ResetSurfaceInfo(short sSurfaceID) = 0;
+
+    virtual CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) = 0;
 };
