@@ -1793,7 +1793,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             CLogger::LogPrintf("CONNECT: %s failed to connect (Invalid serial) (%s)\n", szNick, strIPAndSerial.c_str());
 
             // Tell the player the problem
-            DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::INVALID_SERIAL);
+            DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_VERIFICATION);
             return;
         }
 

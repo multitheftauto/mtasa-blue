@@ -601,10 +601,6 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
             strReason = _("Disconnected: Server shutdown or restarting");
             strErrorCode = _E("CD49");
             break;
-        case ePlayerDisconnectType::INVALID_SERIAL:
-            strReason = _("Disconnected: Invalid serial");
-            strErrorCode = _E("CD50");
-            break;
         default:
             break;
     }
