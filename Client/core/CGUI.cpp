@@ -56,9 +56,15 @@ CLocalGUI::~CLocalGUI()
 
 void CLocalGUI::SetSkin(const char* szName)
 {
+    CVector2D consolePos, consoleSize;
+
     bool guiWasLoaded = m_pMainMenu != NULL;
     if (guiWasLoaded)
+    {
+        consolePos = m_pConsole->GetPosition();
+        consoleSize = m_pConsole->GetSize();
         DestroyWindows();
+    }
 
     std::string error;
 
@@ -93,7 +99,11 @@ void CLocalGUI::SetSkin(const char* szName)
     m_LastSettingsRevision = cvars->GetRevision();
 
     if (guiWasLoaded)
+    {
         CreateWindows(guiWasLoaded);
+        m_pConsole->SetPosition(consolePos);
+        m_pConsole->SetSize(consoleSize);
+    }
 
     if (CCore::GetSingleton().GetConsole() && !error.empty())
         CCore::GetSingleton().GetConsole()->Echo(error.c_str());
@@ -104,8 +114,8 @@ void CLocalGUI::ChangeLocale(const char* szName)
     bool guiWasLoaded = m_pMainMenu != NULL;
     assert(guiWasLoaded);
 
-    CVector2D vPos = m_pConsole->GetPosition();
-    CVector2D vSize = m_pConsole->GetSize();
+    CVector2D consolePos = m_pConsole->GetPosition();
+    CVector2D consoleSize = m_pConsole->GetSize();
 
     if (guiWasLoaded)
         DestroyWindows();
@@ -119,12 +129,8 @@ void CLocalGUI::ChangeLocale(const char* szName)
     if (guiWasLoaded)
     {
         CreateWindows(guiWasLoaded);
-
-        if (m_pConsole != nullptr)
-        {
-            m_pConsole->SetPosition(vPos);
-            m_pConsole->SetSize(vSize);
-        }
+        m_pConsole->SetPosition(consolePos);
+        m_pConsole->SetSize(consoleSize);
     }
 }
 
