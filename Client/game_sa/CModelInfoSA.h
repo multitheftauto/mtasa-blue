@@ -12,8 +12,10 @@
 #pragma once
 
 #include <game/Common.h>
+#include "C2DEffectSAInterface.h"
 #include <game/CModelInfo.h>
 #include "CRenderWareSA.h"
+#include "C2DEffectSA.h"
 
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
@@ -62,6 +64,8 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
 
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
+
+#define     FUNC_CBaseModelInfo_Get2dEffect 0x4C4C70
 
 class CBaseModelInfoSAInterface;
 class CModelInfoSAInterface
@@ -158,7 +162,7 @@ public:
     unsigned char  ucAlpha : 8;                         // +12
 
     unsigned char  ucNumOf2DEffects : 8;            // +13
-    unsigned short usUnknown : 16;                  // +14     Something with 2d effects
+    short          s2DEffectIndex : 16;            // +14 
 
     unsigned short usDynamicIndex : 16;            // +16
 
@@ -329,6 +333,11 @@ protected:
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     static std::map<unsigned short, int>                                         ms_DefaultTxdIDMap;
+
+    static std::unordered_map<std::uint32_t, std::uint8_t>                                                     ms_DefaultNumOf2DFXEffects;
+    static std::unordered_map<std::uint32_t, std::unordered_map<C2DEffectSAInterface*, C2DEffectSAInterface*>> ms_DefaultEffectsMap;
+    static std::unordered_map<std::uint32_t, std::vector<C2DEffectSAInterface*>>                               ms_TempCopiesOfDefault2DFXEffects;
+
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
 public:
@@ -440,7 +449,7 @@ public:
     // Decreases the collision slot reference counter for the original collision model
     void RemoveColRef() override;
 
-    void SetModelID(DWORD dwModelID) { m_dwModelID = dwModelID; }
+    void SetModelID(DWORD dwModelID);
 
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
@@ -466,6 +475,26 @@ public:
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;
 
+    // 2DFX functions
+    C2DEffectSAInterface* Add2DFXEffect(const CVector& position, const e2dEffectType& type);
+    bool                  Remove2DFX(C2DEffectSAInterface* effect, bool includeDefault);
+    bool                  Remove2DFXEffectAtIndex(std::uint32_t index, bool includeDefault = false);
+    bool                  RemoveAll2DFXEffects(bool includeDefault);
+    C2DEffectSA*          Get2DFXFromIndex(std::uint32_t index);
+    std::uint32_t         Get2DFXCount() const { return m_pInterface ? m_pInterface->ucNumOf2DEffects : 0; }
+    void                  Update2DFXEffect(C2DEffectSA* effect);
+    void                  Update2DFXEffect(C2DEffect* effect) { Update2DFXEffect(dynamic_cast<C2DEffectSA*>(effect)); }
+
+    static auto GetEntitiesFromFx(std::uint32_t modelID);
+
+    void        StoreDefault2DFXEffect(C2DEffectSA* effect) { StoreDefault2DFXEffect(effect->GetInterface()); }
+    void        StoreDefault2DFXEffect(C2DEffectSAInterface* effect);
+    bool        Reset2DFXEffects();
+    static void StaticReset2DFXEffects();
+
+    void CopyModified2DFXEffects();
+    void RestoreModified2DFXEffects();
+
     bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != 0xffff : false; };
 
 private:
@@ -473,3 +502,5 @@ private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
     void SetModelSpecialType(eModelSpecialType eType, bool bState);
 };
+
+void HOOK_NodeNameStreamRead();

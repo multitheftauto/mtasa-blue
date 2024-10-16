@@ -79,6 +79,7 @@ public:
     CClientEntity*       GetResourceTXDRoot() { return m_pResourceTXDRoot; };
     CClientEntity*       GetResourceIFPRoot() { return m_pResourceIFPRoot; };
     CClientEntity*       GetResourceIMGRoot() { return m_pResourceIMGRoot; };
+    CClientEntity*       GetResource2DFXRoot() { return m_pResource2DFXRoot; };
 
     CResourceModelStreamer* GetResourceModelStreamer() { return &m_modelStreamer; };
 
@@ -128,6 +129,7 @@ private:
     class CClientEntity* m_pResourceTXDRoot;
     class CClientEntity* m_pResourceIFPRoot;
     class CClientEntity* m_pResourceIMGRoot;
+    class CClientEntity* m_pResource2DFXRoot;
     unsigned short       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
     CMtaVersion          m_strMinServerReq;

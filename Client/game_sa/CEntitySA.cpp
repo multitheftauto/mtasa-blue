@@ -66,11 +66,6 @@ CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
     return pRect;
 }
 
-void CEntitySAInterface::StaticSetHooks()
-{
-    HookInstall(0x534120, &CEntitySAInterface::GetBoundRect_);
-}
-
 CEntitySA::CEntitySA()
 {
     // Set these variables to a constant state
@@ -714,4 +709,78 @@ void CEntitySA::SetUnderwater(bool bUnderwater)
 bool CEntitySA::GetUnderwater()
 {
     return m_pInterface->bUnderwater;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook for CEntity::CreateEffects & CEntity::DestroyEffects
+//
+// Handle modified 2dfx effects during streaming
+// This is necessary because once the object is streamed in, the 2dfx effects are loaded from RwStream
+// and the default effects are restored even though they have been modified.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static void Keep2DFXEffectsBeforeRemove(std::uint32_t modelID)
+{
+    CModelInfo* modelInfo = pGame->GetModelInfo(modelID);
+    if (!modelInfo)
+        return;
+
+    modelInfo->CopyModified2DFXEffects();
+}
+
+#define HOOKPOS_CEntity_DestroyEffects 0x533C01
+#define HOOKSIZE_CEntity_DestroyEffects 5
+static constexpr DWORD CONTINUE_CEntity_DestroyEffects = 0x533C06;
+static void _declspec(naked) HOOK_CEntity_DestroyEffects()
+{
+    _asm
+    {
+        pushad
+        push eax
+        call Keep2DFXEffectsBeforeRemove
+        add esp, 4
+        popad
+
+        movzx eax, byte ptr [ecx+0Dh]
+        push ebp
+        jmp CONTINUE_CEntity_DestroyEffects
+    }
+}
+
+static void Restore2DFXEffects(std::uint32_t modelID)
+{
+    CModelInfo* modelInfo = pGame->GetModelInfo(modelID);
+    if (!modelInfo)
+        return;
+
+    modelInfo->RestoreModified2DFXEffects();
+}
+
+#define HOOKPOS_CEntity_CreateEffects 0x533BAE
+#define HOOKSIZE_CEntity_CreateEffects 9
+static constexpr DWORD RETURN_CEntity_CreateEffects = 0x533BB7;
+static void _declspec(naked) HOOK_CEntity_CreateEffects()
+{
+    _asm
+    {
+        pushad
+        push [ebp+22h]
+        call Restore2DFXEffects
+        add esp, 4
+        popad
+
+        pop edi
+        pop ebp
+        pop ebx
+        add esp, 0C0h
+        jmp RETURN_CEntity_CreateEffects
+    }
+}
+
+void CEntitySAInterface::StaticSetHooks()
+{
+    HookInstall(0x534120, &CEntitySAInterface::GetBoundRect_);
+    EZHookInstall(CEntity_DestroyEffects);
+    EZHookInstall(CEntity_CreateEffects);
 }

@@ -69,6 +69,7 @@ class CWorld;
 class CIplStore;
 class CBuildingRemoval;
 class CRenderer;
+class C2DEffects;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -151,6 +152,7 @@ public:
     virtual CColStore*                GetCollisionStore() = 0;
     virtual CBuildingRemoval*         GetBuildingRemoval() = 0;
     virtual CRenderer*                GetRenderer() const noexcept = 0;
+    virtual C2DEffects*               Get2DEffects() const noexcept = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
@@ -246,6 +248,7 @@ public:
     virtual void ResetModelLodDistances() = 0;
     virtual void ResetModelFlags() = 0;
     virtual void ResetAlphaTransparencies() = 0;
+    virtual void ResetModel2DFXEffects() = 0;
     virtual void DisableVSync() = 0;
     virtual void ResetModelTimes() = 0;
 

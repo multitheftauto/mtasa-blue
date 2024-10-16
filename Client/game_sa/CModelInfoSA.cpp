@@ -19,6 +19,8 @@
 #include "CPedSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include "CFxSA.h"
+#include "C2DEffectSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -35,6 +37,15 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+
+std::unordered_map<std::uint32_t, std::uint8_t>                                                     CModelInfoSA::ms_DefaultNumOf2DFXEffects;
+std::unordered_map<std::uint32_t, std::unordered_map<C2DEffectSAInterface*, C2DEffectSAInterface*>> CModelInfoSA::ms_DefaultEffectsMap;
+static std::unordered_map<CBaseModelInfoSAInterface*, std::uint32_t>                                       ms_NumOfCustom2DFXEffects;
+static std::vector<C2DEffectSAInterface*>                                                                  ms_Custom2DFXEffects;
+std::unordered_map<std::uint32_t, std::vector<C2DEffectSAInterface*>>                               CModelInfoSA::ms_TempCopiesOfDefault2DFXEffects;
+
+int C2DEffectSA::effect2dPluginOffset = *(int*)0xC3A1E0; // g2dEffectPluginOffset
+static auto* fx = reinterpret_cast<CFxSAInterface*>(VAR_G_Fx);
 
 union tIdeFlags
 {
@@ -103,6 +114,12 @@ CModelInfoSA::CModelInfoSA()
 CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
 {
     return m_pInterface = ppModelInfo[m_dwModelID];
+}
+
+void CModelInfoSA::SetModelID(DWORD dwModelID)
+{
+    m_dwModelID = dwModelID;
+    MapSet(ms_NumOfCustom2DFXEffects, ppModelInfo[dwModelID], 0);
 }
 
 bool CModelInfoSA::IsBoat()
@@ -1169,6 +1186,39 @@ void CModelInfoSA::ResetAlphaTransparency()
     }
 }
 
+void CModelInfoSA::StaticReset2DFXEffects()
+{
+    for (auto& iter = ms_DefaultEffectsMap.begin(); iter != ms_DefaultEffectsMap.end(); iter++)
+    {
+        CBaseModelInfoSAInterface* modelInfoInterface = ppModelInfo[iter->first];
+        if (!modelInfoInterface)
+            continue;
+
+        for (auto innerIter = iter->second.begin(); innerIter != iter->second.end();)
+        {
+            // Copy default effect
+            MemCpy(innerIter->first, innerIter->second, sizeof(C2DEffectSAInterface));
+
+            // Delete copy of the default effect
+            C2DEffectSA::SafeDelete2DFXEffect(innerIter->second);
+            innerIter = iter->second.erase(innerIter);
+        }
+
+        // Restore counter
+        modelInfoInterface->ucNumOf2DEffects = MapGet(ms_DefaultNumOf2DFXEffects, iter->first);
+
+        // Destroy copies
+        auto& copies = MapGet(ms_TempCopiesOfDefault2DFXEffects, iter->first);
+        for (auto& copy : copies)
+            C2DEffectSA::SafeDelete2DFXEffect(copy);
+    }
+
+    // Clear maps & vectors
+    ms_DefaultEffectsMap.clear();
+    ms_Custom2DFXEffects.clear();
+    ms_TempCopiesOfDefault2DFXEffects.clear();
+}
+
 short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
 {
     short sreturn = -1;
@@ -1735,7 +1785,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->s2DEffectIndex = -1;
     m_pInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
@@ -1752,7 +1802,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CTimeModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->s2DEffectIndex = -1;
     m_pInterface->usDynamicIndex = 65535;
     m_pInterface->timeInfo.m_wOtherTimeModel = 0;
 
@@ -1769,7 +1819,7 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
     MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     pNewInterface->usNumberOfRefs = 0;
     pNewInterface->pRwObject = nullptr;
-    pNewInterface->usUnknown = 65535;
+    pNewInterface->s2DEffectIndex = -1;
     pNewInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = pNewInterface;
@@ -1787,7 +1837,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->pVisualInfo = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->s2DEffectIndex = -1;
     m_pInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
@@ -1823,58 +1873,6 @@ void CModelInfoSA::DeallocateModel(void)
 
     ppModelInfo[m_dwModelID] = nullptr;
     *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
-}
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// Hook for NodeNameStreamRead
-//
-// Ignore extra characters in dff frame name
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest, uint uiSize)
-{
-    // Calc sizes
-    const uint uiMaxBufferSize = 24;
-    uint       uiAmountToRead = std::min(uiMaxBufferSize - 1, uiSize);
-    uint       uiAmountToSkip = uiSize - uiAmountToRead;
-
-    // Read good bit
-    RwStreamRead(stream, pDest, uiAmountToRead);
-    pDest[uiAmountToRead] = 0;
-
-    // Skip bad bit (this might not be required)
-    if (uiAmountToSkip > 0)
-        RwStreamSkip(stream, uiAmountToSkip);
-}
-
-// Hook info
-#define HOOKPOS_NodeNameStreamRead                         0x072FA68
-#define HOOKSIZE_NodeNameStreamRead                        15
-DWORD RETURN_NodeNameStreamRead = 0x072FA77;
-void _declspec(naked) HOOK_NodeNameStreamRead()
-{
-    _asm
-    {
-        pushad
-        push    edi
-        push    esi
-        push    ebx
-        call    OnMY_NodeNameStreamRead
-        add     esp, 4*3
-        popad
-
-        jmp     RETURN_NodeNameStreamRead
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// Setup hooks
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void CModelInfoSA::StaticSetHooks()
-{
-    EZHookInstall(NodeNameStreamRead);
 }
 
 // Recursive RwFrame children searching function
@@ -2108,4 +2106,470 @@ bool CModelInfoSA::ForceUnload()
         pGame->GetRenderWare()->TxdForceUnload(usTxdId, true);
 
     return true;
+}
+
+auto CModelInfoSA::GetEntitiesFromFx(std::uint32_t modelID)
+{
+    auto vec = std::vector<CEntitySAInterface*>();
+    void* lastParticle = fx->m_lastParticleEntity;
+
+    while (lastParticle)
+    {
+        auto** entity = reinterpret_cast<CEntitySAInterface**>(reinterpret_cast<std::uint8_t*>(lastParticle) + OFFSET_FxSystem_Entities);
+        auto*  prevParticle = *reinterpret_cast<CFxSAInterface**>(reinterpret_cast<std::uint8_t*>(lastParticle) + OFFSET_FxSystem_Link_Prev);
+
+        if (entity && *entity && static_cast<DWORD>((*entity)->m_nModelIndex) == modelID)
+            vec.push_back(*entity);
+
+        lastParticle = prevParticle;
+    }
+
+    return vec;
+}
+
+void CModelInfoSA::Update2DFXEffect(C2DEffectSA* effect)
+{
+    if (!effect)
+        return;
+
+    C2DEffectSAInterface* effectInterface = effect->GetInterface();
+    if (!effectInterface)
+        return;
+
+    // This function aims to keep 2dfx effects updated to avoid restreaming
+    switch (effectInterface->type)
+    {
+        case e2dEffectType::PARTICLE:
+        {
+            auto entities = GetEntitiesFromFx(m_dwModelID);
+            for (auto entity : entities)
+            {
+                // Call Fx_c::DestroyEntityFx
+                ((void(__thiscall*)(CFxSAInterface*, CEntitySAInterface*))FUNC_Fx_c_DestroyEntityFx)(fx, entity);
+
+                RwMatrix* matrixTransform = nullptr;
+                if (auto* object = reinterpret_cast<RwObject*>(entity->m_pRwObject))
+                {
+                    if (auto* frame = static_cast<RwFrame*>(object->parent))
+                        matrixTransform = &frame->modelling;
+                }
+
+                // Call Fx_c::CreateEntityFx
+                ((void(__thiscall*)(CFxSAInterface*, CEntitySAInterface*, const char*, RwV3d*, RwMatrix*))FUNC_Fx_c_CreateEntityFx)(fx, entity, effectInterface->effect.particle.szName, &effectInterface->position, matrixTransform);
+            }
+
+            break;
+        }
+        case e2dEffectType::ROADSIGN:
+        {
+            t2dEffectRoadsign& roadsign = effectInterface->effect.roadsign;
+            C2DEffectSA::Roadsign_DestroyAtomic(effectInterface);
+
+            std::uint32_t numLines = C2DEffectSA::Roadsign_GetNumLinesFromFlags(roadsign.flags);
+            std::uint32_t numLetters = C2DEffectSA::Roadsign_GetNumLettersFromFlags(roadsign.flags);
+            std::uint8_t  palleteID = C2DEffectSA::Roadsign_GetPalleteIDFromFlags(roadsign.flags);
+            roadsign.atomic = C2DEffectSA::Roadsign_CreateAtomic(effectInterface->position, roadsign.rotation, roadsign.size.x, roadsign.size.y, numLines, &roadsign.text[0], &roadsign.text[16], &roadsign.text[32], &roadsign.text[48], numLetters, palleteID);
+
+            break;
+        }
+    }
+}
+
+void CModelInfoSA::StoreDefault2DFXEffect(C2DEffectSAInterface* effect)
+{
+    // Is custom effect?
+    if (std::find(ms_Custom2DFXEffects.begin(), ms_Custom2DFXEffects.end(), effect) != ms_Custom2DFXEffects.end())
+        return;
+
+    // Is effect stored already?
+    if (MapContains(ms_DefaultEffectsMap, m_dwModelID) && MapContains(MapGet(ms_DefaultEffectsMap, m_dwModelID), effect))
+        return;
+
+    // Copy an existing default effect
+    C2DEffectSAInterface* copy = C2DEffectSA::CreateCopy(effect);
+
+    // Store copy in the map
+    MapSet(ms_DefaultEffectsMap, m_dwModelID, std::unordered_map<C2DEffectSAInterface*, C2DEffectSAInterface*>{{effect, copy}});
+}
+
+bool CModelInfoSA::Reset2DFXEffects()
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    if (!MapContains(ms_DefaultEffectsMap, m_dwModelID))
+        return false;
+
+    // Restore default effects
+    auto& map = MapGet(ms_DefaultEffectsMap, m_dwModelID);
+    auto* effects = pGame->Get2DEffects();
+    for (auto& it = map.begin(); it != map.end();)
+    {
+        // Copy data from copied effect to the default
+        MemCpyFast(it->first, it->second, sizeof(C2DEffectSAInterface));
+
+        // We no longer need a copy
+        // So delete it
+        C2DEffectSA::SafeDelete2DFXEffect(it->second);
+        it = map.erase(it);
+
+        // Update effect
+        Update2DFXEffect(effects->Get(it->first));
+    }
+
+    // Restore counter
+    m_pInterface->ucNumOf2DEffects = MapGet(ms_DefaultNumOf2DFXEffects, m_dwModelID);
+
+    // Delete temp copies
+    auto& copies = MapGet(ms_TempCopiesOfDefault2DFXEffects, m_dwModelID);
+    for (auto* copy : copies)
+        C2DEffectSA::SafeDelete2DFXEffect(copy);
+
+    // Clear maps
+    map.clear();
+    ms_DefaultEffectsMap.erase(m_dwModelID);
+    ms_TempCopiesOfDefault2DFXEffects.erase(m_dwModelID);
+    return true;
+}
+
+C2DEffectSAInterface* CModelInfoSA::Add2DFXEffect(const CVector& position, const e2dEffectType& type)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return nullptr;
+
+    // Init new effect
+    C2DEffectSAInterface* effectInterface = new C2DEffectSAInterface();
+    effectInterface->position = RwV3d{position.fX, position.fY, position.fZ};
+    effectInterface->type = type;
+
+    // Update counters
+    m_pInterface->ucNumOf2DEffects = m_pInterface->ucNumOf2DEffects ? m_pInterface->ucNumOf2DEffects + 1 : 1;
+    MapGet(ms_NumOfCustom2DFXEffects, m_pInterface)++;
+
+    // Save our effect
+    ms_Custom2DFXEffects.push_back(effectInterface);
+    return effectInterface;
+}
+
+bool CModelInfoSA::Remove2DFX(C2DEffectSAInterface* effect, bool includeDefault)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    if (!effect)
+        return false;
+
+    auto& it = std::find(ms_Custom2DFXEffects.begin(), ms_Custom2DFXEffects.end(), effect);
+    bool  isCustomEffect = it != ms_Custom2DFXEffects.end();
+
+    if (!includeDefault && !isCustomEffect)
+        return false;
+
+    if (!isCustomEffect)
+        StoreDefault2DFXEffect(effect);
+
+    m_pInterface->ucNumOf2DEffects--;
+
+    switch (effect->type)
+    {
+        case e2dEffectType::ROADSIGN:
+        case e2dEffectType::LIGHT:
+        {
+            C2DEffectSA::Shutdown(effect);
+            
+            // Prevent creation when stream in but keep in memory so we can restore it later
+            effect->type = e2dEffectType::NONE;
+            break;
+        }
+        case e2dEffectType::PARTICLE:
+        {
+            auto& entities = GetEntitiesFromFx(m_dwModelID);
+            for (auto* entity : entities)
+                // Call Fx_c::DestroyEntityFx
+                ((void(__thiscall*)(CFxSAInterface*, CEntitySAInterface*))FUNC_Fx_c_DestroyEntityFx)(fx, entity);
+
+            entities.clear();
+
+            // Prevent creation when stream in but keep in memory so we can restore it later
+            effect->type = e2dEffectType::NONE;
+            break;
+        }
+        case e2dEffectType::ESCALATOR:
+        {
+            auto* escalators = reinterpret_cast<CEscalatorSAInterface*>(ARRAY_CEscalators);
+            for (std::uint8_t i = 0; i < NUM_MAX_ESCALATORS; i++)
+            {
+                if (!escalators[i].exist || !escalators[i].entity)
+                    continue;
+
+                if (static_cast<DWORD>(escalators[i].entity->m_nModelIndex) != m_dwModelID)
+                    continue;
+
+                // Call CEscalator::SwitchOff
+                ((void(__thiscall*)(CEscalatorSAInterface*))FUNC_CEscalator_SwitchOff)(&escalators[i]);
+                escalators[i].exist = false;
+            }
+
+            // Prevent creation when stream in but keep in memory so we can restore it later
+            effect->type = e2dEffectType::NONE;
+            break;
+        }
+        case e2dEffectType::SUN_GLARE:
+        {
+            // Prevent from rendering but keep in memory so we can restore it later
+            effect->type = e2dEffectType::NONE;
+            break;
+        }
+        default:
+            return false;
+    }
+
+    // If it's custom effect then delete it
+    if (isCustomEffect)
+    {
+        MapGet(ms_NumOfCustom2DFXEffects, m_pInterface)--;
+        ms_Custom2DFXEffects.erase(it);
+
+        if (effect)
+        {
+            delete effect;
+            effect = nullptr;
+        }
+    }
+}
+
+bool CModelInfoSA::Remove2DFXEffectAtIndex(std::uint32_t index, bool includeDefault)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    C2DEffectSA* effect = Get2DFXFromIndex(index);
+    if (!effect)
+        return false;
+
+    return Remove2DFX(effect->GetInterface(), includeDefault);
+}
+
+bool CModelInfoSA::RemoveAll2DFXEffects(bool includeDefault)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    std::uint32_t numEffects = m_pInterface->ucNumOf2DEffects;
+    for (std::uint32_t i = 0; i < numEffects; i++)
+    {
+        C2DEffectSA* effect = Get2DFXFromIndex(i);
+        if (!effect)
+            continue;
+
+        Remove2DFX(effect->GetInterface(), includeDefault);
+    }
+
+    return true;
+}
+
+C2DEffectSA* CModelInfoSA::Get2DFXFromIndex(std::uint32_t index)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return nullptr;
+
+    // Call CBaseModelInfo::Get2dEffect
+    auto* effectInterface = ((C2DEffectSAInterface * (__thiscall*)(CBaseModelInfoSAInterface*, std::uint32_t index))FUNC_CBaseModelInfo_Get2dEffect)(m_pInterface, index);
+    if (!effectInterface)
+        return nullptr;
+
+    return pGame->Get2DEffects()->Get(effectInterface);
+}
+
+void CModelInfoSA::CopyModified2DFXEffects()
+{
+    CBaseModelInfoSAInterface* modelInfo = ppModelInfo[m_dwModelID];
+    if (!modelInfo || modelInfo->ucNumOf2DEffects == 0)
+        return;
+
+    bool          hasModifiedEffects = MapContains(ms_DefaultEffectsMap, m_dwModelID);
+    auto          tempVec = std::vector<C2DEffectSAInterface*>();
+    std::uint32_t numEffects = MapGet(ms_DefaultNumOf2DFXEffects, m_dwModelID);
+    auto*         effects = pGame->Get2DEffects();
+    for (std::uint32_t i = 0; i < numEffects; i++)
+    {
+        auto effectInterface = ((C2DEffectSAInterface * (__thiscall*)(CBaseModelInfoSAInterface*, std::uint32_t index)) FUNC_CBaseModelInfo_Get2dEffect)(modelInfo, i);
+        if (!effectInterface)
+            continue;
+
+        // Delete our 2dfx object
+        C2DEffectSA* effect = effects->Get(effectInterface);
+        if (effect)
+        {
+            effects->RemoveFromList(effect);
+            delete effect;
+        }
+
+        if (hasModifiedEffects)
+        {
+            // Copy effect
+            auto* copy = C2DEffectSA::CreateCopy(effectInterface);
+            tempVec.push_back(copy);
+        }
+    }
+
+    if (hasModifiedEffects)
+        MapSet(ms_TempCopiesOfDefault2DFXEffects, m_dwModelID, tempVec);
+}
+
+void CModelInfoSA::RestoreModified2DFXEffects()
+{
+    CBaseModelInfoSAInterface* modelInfo = ppModelInfo[m_dwModelID];
+    if (!modelInfo)
+        return;
+
+    // Set default num of 2dfx effects
+    if (!MapContains(ms_DefaultNumOf2DFXEffects, m_dwModelID))
+        MapSet(ms_DefaultNumOf2DFXEffects, m_dwModelID, modelInfo->ucNumOf2DEffects);
+
+    // Create C2DEffectSA instance for each default effect interface
+    std::uint32_t numEffects = MapGet(ms_DefaultNumOf2DFXEffects, m_dwModelID);
+    auto*         tempVec = MapFind(ms_TempCopiesOfDefault2DFXEffects, m_dwModelID);
+    for (std::uint32_t i = 0; i < numEffects; i++)
+    {
+        auto* effectInterface = ((C2DEffectSAInterface*(__thiscall*)(CBaseModelInfoSAInterface*, std::uint32_t))FUNC_CBaseModelInfo_Get2dEffect)(modelInfo, i);
+        if (!effectInterface)
+            continue;
+
+        // Create our 2dfx object instance
+        C2DEffectSA* effect = new C2DEffectSA(effectInterface, m_dwModelID);
+        if (!effect)
+            continue;
+
+        if (tempVec && (*tempVec)[i])
+        {
+            MemCpyFast(effectInterface, (*tempVec)[i], sizeof(C2DEffectSAInterface));
+            effectInterface->effect.roadsign.text = static_cast<char*>(std::malloc(64));
+            if (effectInterface->effect.roadsign.text)
+            {
+                MemSetFast(effectInterface->effect.roadsign.text, 0, 64);
+                MemCpyFast(effectInterface->effect.roadsign.text, (*tempVec)[i]->effect.roadsign.text, 64);
+            }
+
+            C2DEffectSA::SafeDelete2DFXEffect((*tempVec)[i]);
+            Update2DFXEffect(effect);
+        }
+    }
+
+    if (tempVec)
+    {
+        tempVec->clear();
+        ms_TempCopiesOfDefault2DFXEffects.erase(m_dwModelID);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook for NodeNameStreamRead
+//
+// Ignore extra characters in dff frame name
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest, uint uiSize)
+{
+    // Calc sizes
+    const uint uiMaxBufferSize = 24;
+    uint       uiAmountToRead = std::min(uiMaxBufferSize - 1, uiSize);
+    uint       uiAmountToSkip = uiSize - uiAmountToRead;
+
+    // Read good bit
+    RwStreamRead(stream, pDest, uiAmountToRead);
+    pDest[uiAmountToRead] = 0;
+
+    // Skip bad bit (this might not be required)
+    if (uiAmountToSkip > 0)
+        RwStreamSkip(stream, uiAmountToSkip);
+}
+
+// Hook info
+#define HOOKPOS_NodeNameStreamRead  0x072FA68
+#define HOOKSIZE_NodeNameStreamRead 15
+DWORD RETURN_NodeNameStreamRead = 0x072FA77;
+static void _declspec(naked) HOOK_NodeNameStreamRead()
+{
+    _asm
+    {
+        pushad
+        push    edi
+        push    esi
+        push    ebx
+        call    OnMY_NodeNameStreamRead
+        add     esp, 4*3
+        popad
+
+        jmp     RETURN_NodeNameStreamRead
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook for CBaseModelInfo:Get2dEffect
+//
+// Handle custom 2dfx's
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static C2DEffectSAInterface* Get2dEffect(CBaseModelInfoSAInterface* modelInfo, RpGeometry* geometry, std::uint32_t numPluginEffects, std::uint32_t index)
+{
+    if (!geometry)
+        numPluginEffects = 0;
+
+    static auto* storedEffects = reinterpret_cast<C2DEffectInfoStoreSAInterface*>(ARRAY_2DFXInfoStore);
+
+    std::uint32_t numCustomEffects = ms_NumOfCustom2DFXEffects[modelInfo];
+    std::uint32_t numStoredEffects = modelInfo->ucNumOf2DEffects - numPluginEffects - numCustomEffects;
+
+    if (index < numStoredEffects)
+        return &storedEffects->objects[index + modelInfo->s2DEffectIndex];
+    else if (index < numStoredEffects + numPluginEffects)
+    {
+        auto* pluginEffectData = *RWPLUGINOFFSET(C2DEffectPluginDataSAInterface*, geometry, C2DEffectSA::effect2dPluginOffset);
+        return &pluginEffectData->objects[index - numStoredEffects];
+    }
+    else
+        return ms_Custom2DFXEffects[index - numPluginEffects - numStoredEffects];
+
+    return nullptr;
+}
+
+#define HOOKPOS_Get2dEffect  0x4C4CDC
+#define HOOKSIZE_Get2dEffect 10
+static void _declspec(naked) HOOK_Get2dEffect()
+{
+    _asm
+    {
+        push esi
+        push eax
+        push edi
+        push ebx
+        call Get2dEffect
+        add esp, 16
+
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        retn 4
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CModelInfoSA::StaticSetHooks()
+{
+    EZHookInstall(NodeNameStreamRead);
+    EZHookInstall(Get2dEffect);
 }

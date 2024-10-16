@@ -18,6 +18,7 @@
 #include "CCoverManagerSA.h"
 #include "CPlantManagerSA.h"
 #include "CRendererSA.h"
+#include "C2DEffectSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -174,7 +175,8 @@ public:
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
-    
+    C2DEffects*               Get2DEffects() const noexcept override { return m_p2DEffects.get(); }
+
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
@@ -288,6 +290,7 @@ public:
     void         ResetModelLodDistances();
     void         ResetModelFlags();
     void         ResetAlphaTransparencies();
+    void         ResetModel2DFXEffects();
     void         DisableVSync();
     void         ResetModelTimes();
 
@@ -349,6 +352,7 @@ private:
     CBuildingRemoval*               m_pBuildingRemoval;
 
     std::unique_ptr<CRendererSA>    m_pRenderer;
+    std::unique_ptr<C2DEffects>     m_p2DEffects;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;

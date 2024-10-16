@@ -88,6 +88,49 @@ DECLARE_ENUM(ePools);
 DECLARE_ENUM(eWorldProperty);
 DECLARE_ENUM_CLASS(eModelLoadState);
 DECLARE_ENUM_CLASS(PreloadAreaOption);
+DECLARE_ENUM_CLASS(e2dEffectType);
+DECLARE_ENUM_CLASS(e2dCoronaFlashType);
+DECLARE_ENUM_CLASS(e2dEffectProperty);
+
+// For corona name & shadow name
+enum class e2dEffectTextureName
+{
+    CORONA_STAR,
+    SHAD_HELI,
+    SHAD_EXP,
+    SHAD_CAR,
+    SHAD_BIKE,
+    SEABD32,
+    ROADSIGNFONT,
+    PARTICLESKID,
+    LUNAR,
+    LOCKONFIRE,
+    LOCKON,
+    LAMP_SHAD_64,
+    HEADLIGHT1,
+    HEADLIGHT,
+    HANDMAN,
+    FINISHFLAG,
+    CORONARINGB,
+    CORONAREFLECT,
+    CORONAMOON,
+    CORONAHEADLIGHTLINE,
+    CLOUDMASKED,
+    CLOUDHIGH,
+    CLOUD1,
+    CARFX1,
+    BLOODPOOL_64,
+    WINCRACK_32,
+    WHITE,
+    WATERWAKE,
+    WATERCLEAR256,
+    TXGRASSBIG1,
+    TXGRASSBIG0,
+    TARGET256,
+    SHAD_RCBARON,
+    SHAD_PED,
+};
+DECLARE_ENUM_CLASS(e2dEffectTextureName)
 
 class CRemoteCall;
 
@@ -509,6 +552,11 @@ inline SString GetClassTypeName(eWorldProperty*)
 inline SString GetClassTypeName(CClientVectorGraphic*)
 {
     return "svg";
+}
+
+inline SString GetClassTypeName(CClient2DFX*) noexcept
+{
+    return "2dfx";
 }
 
 //

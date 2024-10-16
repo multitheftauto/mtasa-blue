@@ -3430,6 +3430,7 @@ void CClientGame::Event_OnIngame()
     g_pGame->ResetModelFlags();
     g_pGame->ResetAlphaTransparencies();
     g_pGame->ResetModelTimes();
+    g_pGame->ResetModel2DFXEffects();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);

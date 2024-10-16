@@ -32,6 +32,7 @@ CClientColModelManager*    CLuaDefs::m_pColModelManager = NULL;
 CRegisteredCommands*       CLuaDefs::m_pRegisteredCommands = NULL;
 CClientIMGManager*         CLuaDefs::m_pImgManager = NULL;
 CClientBuildingManager*    CLuaDefs::m_pBuildingManager = nullptr;
+CClient2DFXManager*        CLuaDefs::m_p2DFXManager = nullptr;
 bool                       ms_bRegisterdPostCallHook = false;
 
 void CLuaDefs::Initialize(CClientGame* pClientGame, CLuaManager* pLuaManager, CScriptDebugging* pScriptDebugging)
@@ -58,6 +59,7 @@ void CLuaDefs::Initialize(CClientGame* pClientGame, CLuaManager* pLuaManager, CS
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands();
     m_pImgManager = m_pManager->GetIMGManager();
     m_pBuildingManager = m_pManager->GetBuildingManager();
+    m_p2DFXManager = m_pManager->Get2DFXManager();
 }
 
 int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)

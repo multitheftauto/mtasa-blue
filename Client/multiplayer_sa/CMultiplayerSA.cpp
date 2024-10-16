@@ -3022,8 +3022,10 @@ void _declspec(naked) HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic()
         cmp     esi, 0
         jz      no_render
 
-        // original code
+        // original code with our null check
         mov     eax, dword ptr[esi+4]
+        test    eax, eax
+        jz      no_render
         fsub    [eax+64]
         mov     edx, HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic
         add     edx, 6

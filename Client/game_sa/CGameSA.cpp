@@ -59,6 +59,7 @@
 #include "CIplStoreSA.h"
 #include "CBuildingRemovalSA.h"
 #include "CCheckpointSA.h"
+#include "C2DEffectsSA.h"
 
 extern CGameSA* pGame;
 
@@ -146,6 +147,7 @@ CGameSA::CGameSA()
     m_pBuildingRemoval = new CBuildingRemovalSA();
 
     m_pRenderer = std::make_unique<CRendererSA>();
+    m_p2DEffects = std::make_unique<C2DEffectsSA>();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -1070,6 +1072,11 @@ void CGameSA::ResetModelTimes()
 void CGameSA::ResetAlphaTransparencies()
 {
     CModelInfoSA::StaticResetAlphaTransparencies();
+}
+
+void CGameSA::ResetModel2DFXEffects()
+{
+    CModelInfoSA::StaticReset2DFXEffects();
 }
 
 // Disable VSync by forcing what normally happends at the end of the loading screens

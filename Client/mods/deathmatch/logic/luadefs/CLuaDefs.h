@@ -66,6 +66,7 @@ public:
     static CRegisteredCommands*       m_pRegisteredCommands;
     static CClientIMGManager*         m_pImgManager;
     static CClientBuildingManager*    m_pBuildingManager;
+    static CClient2DFXManager*        m_p2DFXManager;
 
 protected:
     // Old style: Only warn on failure. This should
