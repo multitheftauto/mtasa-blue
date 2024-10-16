@@ -11,14 +11,16 @@
 
 #include "StdInc.h"
 #include "CHTTPD.h"
+#include "CAPI.h"
 #include "CGame.h"
 #include "CAccountManager.h"
 #include "CMainConfig.h"
 #include <cryptopp/rsa.h>
 #include <cryptopp/osrng.h>
 #include <SharedUtil.Crypto.h>
+#include <SharedUtil.String.h>
 
-#ifndef WIN32
+#ifndef _WIN32
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
@@ -91,6 +93,24 @@ bool CHTTPD::StartHTTPD(const char* szIP, unsigned int port)
     return bResult;
 }
 
+void CHTTPD::StartAPI() noexcept
+{
+    m_apiEHS = new CAPI;
+
+    this->RegisterEHS(m_apiEHS, "api");
+}
+
+void CHTTPD::StopAPI() noexcept
+{
+    if (!m_apiEHS)
+        return;
+
+    this->UnregisterEHS("api");
+
+    delete m_apiEHS;
+    m_apiEHS = nullptr;
+}
+
 // Called from worker thread. Careful now.
 // Do some stuff before allowing EHS to do the proper routing
 HttpResponse* CHTTPD::RouteRequest(HttpRequest* ipoHttpRequest)
@@ -112,6 +132,8 @@ HttpResponse* CHTTPD::RouteRequest(HttpRequest* ipoHttpRequest)
 
     return poHttpResponse;
 }
+
+
 
 // Called from worker thread. g_pGame->Lock() has already been called.
 // creates a page based on user input -- either displays data from

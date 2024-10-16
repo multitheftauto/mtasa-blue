@@ -19,6 +19,7 @@
 #include <ehs/ehs.h>
 
 class CResource;
+class CAPI;
 
 class CHTTPD : public EHS
 {
@@ -40,9 +41,13 @@ public:
     void            SetDefaultResource(const char* szResourceName) { m_strDefaultResourceName = szResourceName ? szResourceName : ""; }
     HttpStatusCode  RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
+    void StartAPI() noexcept;
+    void StopAPI() noexcept;
+
 private:
     CResource*  m_resource{};
     CHTTPD*     m_server{};
+    
     std::string m_strDefaultResourceName;            // default resource name
 
     EHSServerParameters m_Parameters;
@@ -58,4 +63,6 @@ private:
     std::mutex                  m_mutexLoggedInMap;
     SString                     m_strWarnMessageForIp;
     CElapsedTime                m_WarnMessageTimer;
+
+    CAPI* m_apiEHS;
 };

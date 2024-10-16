@@ -717,6 +717,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         }
     }
 
+    m_pHTTPD->StartAPI();
+
     m_pFunctionUseLogger = new CFunctionUseLogger(m_pMainConfig->GetLoadstringLogFilename());
 
     // Setup server id
