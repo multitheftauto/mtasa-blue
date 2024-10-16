@@ -233,6 +233,7 @@ public:
     virtual RwObject* GetRwObject() = 0;
     virtual void      MakePedModel(char* szTexture) = 0;
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
+    virtual void      MakeObjectDamageableModel(std::uint16_t baseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
     virtual void      MakeTimedObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeClumpModel(unsigned short usBaseID) = 0;
@@ -249,4 +250,5 @@ public:
 
     virtual unsigned int GetParentID() = 0;
     virtual bool         IsDynamic() = 0;
+    virtual bool         IsDamageableAtomic() = 0;
 };

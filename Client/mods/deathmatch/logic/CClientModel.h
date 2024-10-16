@@ -18,6 +18,7 @@ enum class eClientModelType
 {
     PED,
     OBJECT,
+    OBJECT_DAMAGEABLE,
     VEHICLE,
     TIMED_OBJECT,
     CLUMP,
