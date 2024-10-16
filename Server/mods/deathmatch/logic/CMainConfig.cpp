@@ -134,10 +134,10 @@ bool CMainConfig::Load()
     }
 
     // Strip spaces from beginning and end of server name
-    size_t snameStart = m_strServerName.find_first_not_of(" ");
+    const size_t snameStart = m_strServerName.find_first_not_of(" ");
     if (snameStart != std::string::npos)
     {
-        size_t snameEnd = m_strServerName.find_last_not_of(" ");
+        const size_t snameEnd = m_strServerName.find_last_not_of(" ");
         m_strServerName = m_strServerName.substr(snameStart, snameEnd - snameStart + 1);
     }
     else
