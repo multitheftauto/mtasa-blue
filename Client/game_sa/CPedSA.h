@@ -389,8 +389,8 @@ public:
     bool IsBleeding();
     void SetBleeding(bool bBleeding);
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() override { return GetPedInterface()->pFireOnPed != nullptr; }
+    bool SetOnFire(bool onFire) override;
 
     bool GetStayInSamePlace() { return GetPedInterface()->pedFlags.bStayInSamePlace; }
     void SetStayInSamePlace(bool bStay);

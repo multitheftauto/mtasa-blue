@@ -103,5 +103,7 @@ private:
         float fRailSpeed;
 
         SFixedArray<float, 4> fDoorOpenRatio;
+
+        bool isOnFire{false};
     } m_Cache;
 };

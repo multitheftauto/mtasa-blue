@@ -851,52 +851,39 @@ void CPedSA::SetBleeding(bool bBleeding)
     GetPedInterface()->pedFlags.bPedIsBleeding = bBleeding;
 }
 
-bool CPedSA::IsOnFire()
-{
-    if (GetPedInterface()->pFireOnPed != NULL)
-        return true;
-    return false;
-}
-
-void CPedSA::SetOnFire(bool bOnFire)
+bool CPedSA::SetOnFire(bool onFire)
 {
     CPedSAInterface* pInterface = GetPedInterface();
+    if (onFire == !!pInterface->pFireOnPed)
+        return false;
 
-    if (bOnFire)
+    auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
+
+    if (onFire)
     {
-        // If we are already on fire, don't apply a new fire
-        if (pInterface->pFireOnPed == NULL)
-        {
-            CFireManagerSA* pFireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
-            CFire*          pFire = pFireManager->StartFire(this, NULL, (float)DEFAULT_FIRE_PARTICLE_SIZE);
+        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        if (!fire)
+            return false;
 
-            if (pFire)
-            {
-                // Start the fire
-                pFire->SetTarget(this);
-                pFire->Ignite();
-                pFire->SetStrength(1.0f);
-                // Attach the fire only to the player, do not let it
-                // create child fires when moving.
-                pFire->SetNumGenerationsAllowed(0);
-                pInterface->pFireOnPed = pFire->GetInterface();
-            }
-        }
+        // Start the fire
+        fire->SetTarget(this);
+        fire->Ignite();
+        fire->SetStrength(1.0f);
+        // Attach the fire only to the player, do not let it
+        // create child fires when moving.
+        fire->SetNumGenerationsAllowed(0);
+        pInterface->pFireOnPed = fire->GetInterface();
     }
     else
     {
-        // Make sure that we have some attached fire
-        if (pInterface->pFireOnPed != NULL)
-        {
-            CFireManagerSA* pFireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
-            CFire*          pFire = pFireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
+        CFire* fire = fireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
+        if (!fire)
+            return false;
 
-            if (pFire)
-            {
-                pFire->Extinguish();
-            }
-        }
+        fire->Extinguish();
     }
+
+    return true;
 }
 
 void CPedSA::SetStayInSamePlace(bool bStay)

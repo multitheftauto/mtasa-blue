@@ -260,9 +260,6 @@ public:
     virtual void         SetFootBlood(unsigned int uiFootBlood) = 0;
     virtual unsigned int GetFootBlood() = 0;
 
-    virtual bool IsOnFire() = 0;
-    virtual void SetOnFire(bool bOnFire) = 0;
-
     virtual bool GetStayInSamePlace() = 0;
     virtual void SetStayInSamePlace(bool bStay) = 0;
 
