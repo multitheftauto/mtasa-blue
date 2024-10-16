@@ -570,7 +570,7 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
             break;
         case ePlayerDisconnectType::SERIAL_VERIFICATION:
             strReason = _("Disconnected: Serial verification failed");
-            strErrorCode = _E("CD50");
+            strErrorCode = _E("CD44");
             break;
         case ePlayerDisconnectType::CONNECTION_DESYNC:
             strReason = _("Disconnected: Connection desync %s");
