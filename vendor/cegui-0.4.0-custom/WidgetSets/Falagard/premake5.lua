@@ -2,6 +2,8 @@ project "Falagard"
 	language "C++"
 	kind "StaticLib"
 	targetname "Falagard"
+
+	cppdialect "C++20"
 	
 	pchheader "StdInc.h"
 	pchsource "src/StdInc.cpp"

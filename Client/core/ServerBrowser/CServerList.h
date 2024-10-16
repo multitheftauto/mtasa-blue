@@ -198,26 +198,26 @@ public:
     bool           bKeepFlag;
     int            iRowIndex;
 
-    SString strGameName;                  // Game name. Always 'mta'
-    SString strVersion;                   // Game version
-    SString strName;                      // Server name
-    SString strSearchableName;            // Server name to use for searches
-    SString strHost;                      // Server host as IP
-    SString strHostName;                  // Server host as name
-    SString strGameMode;                  // Gamemode
-    SString strMap;                       // Map name
-    SString strEndpoint;                  // IP:port as a string
+    std::string strGameName;                  // Game name. Always 'mta'
+    std::string strVersion;                   // Game version
+    std::string strName;                      // Server name
+    std::string strSearchableName;            // Server name to use for searches
+    std::string strHost;                      // Server host as IP
+    std::string strHostName;                  // Server host as name
+    std::string strGameMode;                  // Gamemode
+    std::string strMap;                       // Map name
+    std::string strEndpoint;                  // IP:port as a string
 
     int    m_iBuildType;              // 9=release
     int    m_iBuildNumber;            // 00000 and up
     ushort m_usHttpPort;
     uchar  m_ucSpecialFlags;
 
-    SString strNameSortKey;                // Server name as a sortable string
-    SString strVersionSortKey;             // Game version as a sortable string
-    SString strEndpointSortKey;            // IP:port as a sortable string
-    uint    uiTieBreakPosition;
-    SString strTieBreakSortKey;
+    SString     strNameSortKey;                // Server name as a sortable string
+    SString     strVersionSortKey;             // Game version as a sortable string
+    SString     strEndpointSortKey;            // IP:port as a sortable string
+    uint        uiTieBreakPosition;
+    std::string strTieBreakSortKey;
 
     CQueryReceiver queryReceiver;
 
@@ -236,7 +236,7 @@ public:
     void PostChange()
     {
         // Update tie break sort key
-        strTieBreakSortKey = SString("%04d", uiTieBreakPosition);
+        strTieBreakSortKey = std::format("{:04d}", uiTieBreakPosition);
 
         // Update version sort key
         strVersionSortKey = strVersion;

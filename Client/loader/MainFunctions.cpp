@@ -1046,8 +1046,8 @@ BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandL
 {
     STARTUPINFOW startupInfo{};
     startupInfo.cb = sizeof(startupInfo);
-    BOOL wasProcessCreated = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
-                                            *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
+    BOOL wasProcessCreated = CreateProcessW(FromUTF8(lpApplicationName).c_str(), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
+                                            FromUTF8(lpCurrentDirectory).c_str(), &startupInfo, lpProcessInformation);
 
     if (wasProcessCreated)
         return true;
@@ -1115,7 +1115,7 @@ int LaunchGame(SString strCmdLine)
     const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     SString       strMtaDir = PathJoin(strMTASAPath, "mta");
-    SString       strGTAEXEPath = GetGameExecutablePath().u8string();
+    SString       strGTAEXEPath = PathToUtf8(GetGameExecutablePath());
 
     SetDllDirectory(strMtaDir);
     if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
