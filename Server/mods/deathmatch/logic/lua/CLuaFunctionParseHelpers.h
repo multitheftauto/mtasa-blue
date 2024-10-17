@@ -402,8 +402,10 @@ enum class eResourceModifyScope
 };
 
 eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource* pOtherResource);
-void                 CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
-void                 CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
+void                     CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
+std::pair<bool, SString> CheckCanModifyOtherResource(CResource* thisResource, CResource* otherResource);
+
+void                     CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
 void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
                                      bool* pbReadOnly = nullptr);
 

@@ -16,11 +16,12 @@
 #include "CPerfStatManager.h"
 #include "lua/CLuaCallback.h"
 #include "Utils.h"
+#include <lua/CLuaShared.h>
 
 void CLuaDatabaseDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"dbConnect", DbConnect},
+        {"dbConnect", ArgumentParser<DbConnect>},
         {"dbExec", DbExec},
         {"dbQuery", DbQuery},
         {"dbFree", DbFree},
@@ -225,106 +226,122 @@ void CLuaDatabaseDefs::DbFreeCallback(CDbJobData* pJobData, void* pContext)
     }
 }
 
-int CLuaDatabaseDefs::DbConnect(lua_State* luaVM)
+std::variant<CDatabaseConnectionElement*, bool> CLuaDatabaseDefs::DbConnect(lua_State* luaVM, std::string type, std::string host,
+                                                                            std::optional<std::string> username, std::optional<std::string> password,
+                                                                            std::optional<std::string> options, std::optional<CLuaFunctionRef> callback)
 {
-    //  element dbConnect ( string type, string host, string username, string password, string options )
-    SString strType;
-    SString strHost;
-    SString strUsername;
-    SString strPassword;
-    SString strOptions;
+    if (!username.has_value())
+        username = "";
+    if (!password.has_value())
+        password = "";
+    if (!options.has_value())
+        options = "";
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strType);
-    argStream.ReadString(strHost);
-    argStream.ReadString(strUsername, "");
-    argStream.ReadString(strPassword, "");
-    argStream.ReadString(strOptions, "");
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
+    if (type == "sqlite" && !host.empty())
     {
-        CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
-        if (pThisResource)
+        // If path starts with :/ then use global database directory
+        if (!host.rfind(":/", 0))
         {
-            // If type is sqlite, and has a host, try to resolve path
-            if (strType == "sqlite" && !strHost.empty())
+            host = host.substr(1);
+            if (!IsValidFilePath(host.c_str()))
             {
-                // If path starts with :/ then use global database directory
-                if (strHost.BeginsWith(":/"))
-                {
-                    strHost = strHost.SubStr(1);
-                    if (!IsValidFilePath(strHost))
-                    {
-                        argStream.SetCustomError(SString("host path %s not valid", *strHost));
-                    }
-                    else
-                    {
-                        strHost = PathJoin(g_pGame->GetConfig()->GetGlobalDatabasesPath(), strHost);
-                    }
-                }
-                else
-                {
-                    std::string strAbsPath;
-
-                    // Parse path
-                    CResource* pPathResource = pThisResource;
-                    if (CResourceManager::ParseResourcePathInput(strHost, pPathResource, &strAbsPath))
-                    {
-                        strHost = strAbsPath;
-                        CheckCanModifyOtherResource(argStream, pThisResource, pPathResource);
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("host path %s not found", *strHost));
-                    }
-                }
+                SString err("host path %s not valid", host.c_str());
+                throw LuaFunctionError(err.c_str(), false);
             }
 
-            if (!argStream.HasErrors())
+            host = PathJoin(g_pGame->GetConfig()->GetGlobalDatabasesPath(), host);
+        }
+        else
+        {
+            std::string absPath;
+
+            // Parse path
+            CResource* pathResource = resource;
+            if (!CResourceManager::ParseResourcePathInput(host, pathResource, &absPath))
             {
-                if (strType == "mysql")
-                    pThisResource->SetUsingDbConnectMysql(true);
-
-                // Add logging options
-                bool    bLoggingEnabled;
-                SString strLogTag;
-                SString strQueueName;
-                // Set default values if required
-                GetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled, 1);
-                GetOption<CDbOptionsMap>(strOptions, "tag", strLogTag, "script");
-                GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : DB_SQLITE_QUEUE_NAME_DEFAULT);
-                SetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled);
-                SetOption<CDbOptionsMap>(strOptions, "tag", strLogTag);
-                SetOption<CDbOptionsMap>(strOptions, "queue", strQueueName);
-                // Do connect
-                SConnectionHandle connection = g_pGame->GetDatabaseManager()->Connect(strType, strHost, strUsername, strPassword, strOptions);
-                if (connection == INVALID_DB_HANDLE)
-                {
-                    argStream.SetCustomError(g_pGame->GetDatabaseManager()->GetLastErrorMessage());
-                }
-                else
-                {
-                    // Use an element to wrap the connection for auto disconnected when the resource stops
-                    // Don't set a parent because the element should not be accessible from other resources
-                    CDatabaseConnectionElement* pElement = new CDatabaseConnectionElement(NULL, connection);
-                    CElementGroup*              pGroup = pThisResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pElement);
-                    }
-
-                    lua_pushelement(luaVM, pElement);
-                    return 1;
-                }
+                SString err("host path %s not found", host.c_str());
+                throw LuaFunctionError(err.c_str(), false);
             }
+
+            host = absPath;
+            auto [status, err] = CheckCanModifyOtherResource(resource, pathResource);
+            if (!status)
+                throw LuaFunctionError(err.c_str(), false);
         }
     }
+    
+    if (type == "mysql")
+        resource->SetUsingDbConnectMysql(true);
 
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    // Add logging options
+    bool    loggingEnabled;
+    std::string logTag;
+    std::string queueName;
+    // Set default values if required
+    GetOption<CDbOptionsMap>(*options, "log", loggingEnabled, 1);
+    GetOption<CDbOptionsMap>(*options, "tag", logTag, "script");
+    GetOption<CDbOptionsMap>(*options, "queue", queueName, (type == "mysql") ? host.c_str() : DB_SQLITE_QUEUE_NAME_DEFAULT);
+    SetOption<CDbOptionsMap>(*options, "log", loggingEnabled);
+    SetOption<CDbOptionsMap>(*options, "tag", logTag);
+    SetOption<CDbOptionsMap>(*options, "queue", queueName);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    const auto CreateConnection = [](CResource* resource, const SConnectionHandle& handle)
+        -> CDatabaseConnectionElement*
+    {
+        // Use an element to wrap the connection for auto disconnected when the resource stops
+        // Don't set a parent because the element should not be accessible from other resources
+        auto*          element = new CDatabaseConnectionElement(nullptr, handle);
+        CElementGroup* group = resource->GetElementGroup();
+        if (group)
+            group->Add(element);
+        return element;
+    };
+
+    if (callback.has_value())
+    {
+        const auto taskFunc = [type = type, host, username = username.value(), password = password.value(), options = options.value()]
+        {
+            return g_pGame->GetDatabaseManager()->Connect(
+                type,
+                host,
+                username,
+                password,
+                options
+            );
+        };
+        const auto readyFunc = [CreateConnection = CreateConnection, resource = resource, luaFunctionRef = callback.value()](const SConnectionHandle& handle)
+        {
+            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+            if (!luaMain)
+                return;
+
+            CLuaArguments arguments;
+
+            if (handle == INVALID_DB_HANDLE)
+            {
+                auto lastError = g_pGame->GetDatabaseManager()->GetLastErrorMessage();
+                m_pScriptDebugging->LogCustom(luaMain->GetVM(), lastError.c_str());
+                arguments.PushBoolean(false);
+            }
+
+            arguments.PushElement(CreateConnection(resource, handle));
+            arguments.Call(luaMain, luaFunctionRef);
+        };
+
+        CLuaShared::GetAsyncTaskScheduler()->PushTask(taskFunc, readyFunc);
+        return true;
+    }
+
+    // Do connect
+    SConnectionHandle connection = g_pGame->GetDatabaseManager()->Connect(
+        type, host, *username, *password, *options
+    );
+    if (connection == INVALID_DB_HANDLE)
+        throw LuaFunctionError(g_pGame->GetDatabaseManager()->GetLastErrorMessage().c_str(), false);
+
+    return CreateConnection(resource, connection);
 }
 
 // This method has an OOP counterpart - don't forget to update the OOP code too!

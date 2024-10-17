@@ -728,6 +728,8 @@ namespace SharedUtil
         CArgMap(const SString& strArgSep = "=", const SString& strPartsSep = "&", const SString& strExtraDisallowedChars = "");
         void    SetEscapeCharacter(char cEscapeCharacter);
         void    Merge(const CArgMap& other, bool bAllowMultiValues = false);
+        void    SetFromString(const char* line, bool allowMultiValues = false);
+        void    SetFromString(const std::string& line, bool allowMultiValues = false);
         void    SetFromString(const SString& strLine, bool bAllowMultiValues = false);
         void    MergeFromString(const SString& strLine, bool bAllowMultiValues = false);
         SString ToString() const;
@@ -740,6 +742,17 @@ namespace SharedUtil
         void    Insert(const SString& strInCmd, int iValue);                                                // Insert a key int value
         void    Insert(const SString& strInCmd, const SString& strInValue);                                 // Insert a key string value
         bool    Contains(const SString& strInCmd) const;                                                    // Test if key exists
+
+        std::string Get(const char*& inCmd) const noexcept;
+        bool        Get(const char*& inCmd, std::string& out, const char* defaultValue = "") const noexcept;
+        bool        Get(const char*& inCmd, std::vector<std::string>& outList) const;
+        bool        Get(const char*& inCmd, int& value, int defaultValue = 0) const noexcept;
+
+        std::string Get(const std::string& inCmd) const noexcept;
+        bool Get(const std::string& inCmd, std::string& out, const char* defaultValue = "") const noexcept;
+        bool Get(const std::string& inCmd, std::vector<std::string>& outList) const;
+        bool Get(const std::string& inCmd, int& value, int defaultValue = 0) const noexcept;
+
         bool    Get(const SString& strInCmd, SString& strOut, const char* szDefault = "") const;            // First result as string
         SString Get(const SString& strInCmd) const;                                                         // First result as string
         bool    Get(const SString& strInCmd, std::vector<SString>& outList) const;                          // All results as strings
@@ -757,6 +770,15 @@ namespace SharedUtil
         strText = temp.ToString();
     }
 
+    template <class T, class U>
+    void SetOption(std::string& text, const std::string& key, const U& value)
+    {
+        T temp;
+        temp.SetFromString(text);
+        temp.Set(key, value);
+        text = temp.ToString();
+    }
+
     template <class T>
     void GetOption(const SString& strText, const SString& strKey, SString& strOutValue, const char* szDefault = "")
     {
@@ -766,11 +788,27 @@ namespace SharedUtil
     }
 
     template <class T>
+    void GetOption(const std::string& text, const std::string& key, std::string& outValue, const char* defaultStr = "")
+    {
+        T temp;
+        temp.SetFromString(text);
+        temp.Get(key, outValue, defaultStr);
+    }
+
+    template <class T>
     void GetOption(const SString& strText, const SString& strKey, int& iOutValue, int iDefault = 0)
     {
         T temp;
         temp.SetFromString(strText);
         temp.Get(strKey, iOutValue, iDefault);
+    }
+
+    template <class T>
+    void GetOption(const std::string& text, const std::string& key, int& outValue, int defaultStr = 0)
+    {
+        T temp;
+        temp.SetFromString(text);
+        temp.Get(key, outValue, defaultStr);
     }
 
     // Coerce to a bool from an int
@@ -784,6 +822,16 @@ namespace SharedUtil
         bOutValue = (iOutValue != 0);
     }
 
+    template <class T>
+    void GetOption(const std::string& text, const std::string& key, bool& outValue, int defaultStr = 0)
+    {
+        T temp;
+        temp.SetFromString(text);
+        int outInt;
+        temp.Get(key, outInt, defaultStr);
+        outValue = outInt != 0;
+    }
+
     // Coerce to other types from an int
     template <class T, class U>
     void GetOption(const SString& strText, const SString& strKey, U& outValue, int iDefault = 0)
@@ -793,6 +841,16 @@ namespace SharedUtil
         int iOutValue;
         temp.Get(strKey, iOutValue, iDefault);
         outValue = static_cast<U>(iOutValue);
+    }
+
+    template <class T, class U>
+    void GetOption(const std::string& text, const std::string& key, U& outValue, int defaultStr = 0)
+    {
+        T temp;
+        temp.SetFromString(text);
+        int outInt;
+        temp.Get(key, outInt, defaultStr);
+        outValue = static_cast<U>(outInt);
     }
 
     // Comma separated set of numbers
@@ -806,6 +864,25 @@ namespace SharedUtil
         for (uint i = 0; i < numberList.size(); i++)
             if (!numberList[i].empty())
                 MapInsert(outValues, static_cast<U>(atoi(numberList[i])));
+    }
+
+    template <class T, class U>
+    void GetOption(const std::string& text, const std::string& key, const char* separator, std::set<U>& outValues)
+    {
+        SString     numbers;
+        {
+            std::string temp;
+            GetOption<T>(text, key, temp);
+            numbers = std::move(temp);
+        }
+        std::vector<SString> numberList;
+        numbers.Split(separator, numberList);
+        for (const auto& number : numberList)
+        {
+            if (number.empty())
+                continue;
+            MapInsert(outValues, static_cast<U>(atoi(number.c_str())));
+        }
     }
 
     ///////////////////////////////////////////////////////////////

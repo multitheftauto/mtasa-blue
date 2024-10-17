@@ -746,6 +746,14 @@ void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisRe
             "Access denied");
 }
 
+std::pair<bool, SString> CheckCanModifyOtherResource(CResource* thisResource, CResource* otherResource)
+{
+    if (GetResourceModifyScope(thisResource, otherResource) != eResourceModifyScope::NONE)
+        return {true, ""};
+
+    return {false, SString("ModifyOtherObjects in ACL denied resource %s to access %s", thisResource->GetName().c_str(), otherResource->GetName().c_str())};
+}
+
 //
 // Set error if pThisResource does not have permission to modify every resource in resourceList
 //

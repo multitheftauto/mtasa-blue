@@ -22,7 +22,9 @@ public:
     static void DbFreeCallback(CDbJobData* pJobData, void* pContext);
     static void DbExecCallback(CDbJobData* pJobData, void* pContext);
 
-    LUA_DECLARE(DbConnect);
+    static std::variant<CDatabaseConnectionElement*, bool> DbConnect(lua_State* luaVM, std::string type, std::string host, std::optional<std::string> username,
+                                                                     std::optional<std::string> password, std::optional<std::string> options,
+                                                                     std::optional<CLuaFunctionRef> callback);
     LUA_DECLARE(DbExec);
     LUA_DECLARE_OOP(DbQuery);
     LUA_DECLARE(DbFree);
