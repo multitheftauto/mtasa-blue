@@ -1245,11 +1245,11 @@ SString CInstallManager::_ProcessAppCompatChecks()
         // Break into words
         std::vector<WString> entryList;
         strValue.Split(" ", entryList);
-        ListRemove(entryList, WString());
+        ListRemoveAll(entryList, WString());
 
         // Apply removals
         for (uint a = 0; a < removeList.size(); a++)
-            ListRemove(entryList, removeList[a]);
+            ListRemoveAll(entryList, removeList[a]);
 
         // Apply adds
         for (uint a = 0; a < addList.size(); a++)

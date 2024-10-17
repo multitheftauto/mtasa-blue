@@ -207,7 +207,7 @@ void CColManager::RemoveFromList(CColShape* pShape)
         }
         else
         {
-            ListRemove(m_List, pShape);
+            ListRemoveAll(m_List, pShape);
         }
     }
 }
@@ -217,7 +217,7 @@ void CColManager::TakeOutTheTrash()
     std::vector<CColShape*>::const_iterator iter = m_TrashCan.begin();
     for (; iter != m_TrashCan.end(); iter++)
     {
-        ListRemove(m_List, *iter);
+        ListRemoveAll(m_List, *iter);
     }
 
     m_TrashCan.clear();

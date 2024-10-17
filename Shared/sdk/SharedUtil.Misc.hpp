@@ -16,7 +16,13 @@
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
 #include "version.h"
-#ifdef WIN32
+#ifdef _WIN32
+    #ifndef WIN32_LEAN_AND_MEAN
+        #define WIN32_LEAN_AND_MEAN
+    #endif
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
     #include <ctime>
     #include <windows.h>
     #include <direct.h>
@@ -41,7 +47,7 @@
 #endif
 
 CCriticalSection     CRefCountable::ms_CS;
-std::map<uint, uint> ms_ReportAmountMap;
+std::map<std::uint32_t, std::uint32_t> ms_ReportAmountMap;
 SString              ms_strProductRegistryPath;
 SString              ms_strProductCommonDataDir;
 SString              ms_strProductVersion;
@@ -49,9 +55,9 @@ SString              ms_strProductVersion;
 struct SReportLine
 {
     SString strText;
-    uint    uiId;
+    std::uint32_t    uiId;
     void    operator+=(const char* szAppend) { strText += szAppend; }
-    bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
+    bool    operator==(const SReportLine& other) const noexcept { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 
@@ -87,30 +93,32 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
 {
     HANDLE          hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
-    if (Process32FirstW(hSnapshot, &pe))
+    if (!Process32FirstW(hSnapshot, &pe))
     {
-        do
-        {
-            if (pe.th32ProcessID == pid)
-            {
-                HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe.th32ParentProcessID);
-                if (hProcess)
-                {
-                    WCHAR szModuleName[MAX_PATH * 2] = {0};
-                    GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName));
-                    CloseHandle(hProcess);
-                    SString strModuleName = ToUTF8(szModuleName);
-                    if (FileExists(strModuleName))
-                    {
-                        CloseHandle(hSnapshot);
-                        if (IsShortPathName(strModuleName))
-                            return GetSystemLongPathName(strModuleName);
-                        return strModuleName;
-                    }
-                }
-            }
-        } while (Process32NextW(hSnapshot, &pe));
+        CloseHandle(hSnapshot);
+        return "";
     }
+    do
+    {
+        if (pe.th32ProcessID != pid)
+            continue;
+            
+        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe.th32ParentProcessID);
+        if (!hProcess)
+            continue;
+            
+        WCHAR szModuleName[MAX_PATH * 2] = {0};
+        GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName));
+        CloseHandle(hProcess);
+        SString strModuleName = ToUTF8(szModuleName);
+        if (!FileExists(strModuleName))
+            continue;
+            
+        CloseHandle(hSnapshot);
+        if (IsShortPathName(strModuleName))
+            return GetSystemLongPathName(strModuleName);
+        return strModuleName;
+    } while (Process32NextW(hSnapshot, &pe));
     CloseHandle(hSnapshot);
     return "";
 }
@@ -122,24 +130,24 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
 SString SharedUtil::GetMTASABaseDir()
 {
     static SString strInstallRoot;
-    if (strInstallRoot.empty())
+    if (!strInstallRoot.empty())
+        return strInstallRoot;
+        
+    if (IsGTAProcess())
     {
-        if (IsGTAProcess())
-        {
-            // Try to get base dir from parent process
-            strInstallRoot = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
-        }
-        if (strInstallRoot.empty())
-        {
-            strInstallRoot = GetRegistryValue("", "Last Run Location");
-            if (strInstallRoot.empty())
-            {
-                MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
-                               MB_OK | MB_ICONERROR | MB_TOPMOST);
-                TerminateProcess(GetCurrentProcess(), 9);
-            }
-        }
+        // Try to get base dir from parent process
+        strInstallRoot = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
     }
+    if (!strInstallRoot.empty())
+        return strInstallRoot;
+        
+    strInstallRoot = GetRegistryValue("", "Last Run Location");
+    if (!strInstallRoot.empty())
+        return strInstallRoot;
+        
+    MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
+                    MB_OK | MB_ICONERROR | MB_TOPMOST);
+    TerminateProcess(GetCurrentProcess(), 9);
     return strInstallRoot;
 }
 
@@ -170,17 +178,17 @@ static void WriteRegistryStringValue(HKEY hkRoot, const char* szSubKey, const ch
     WString wstrSubKey = FromUTF8(szSubKey);
     WString wstrValue = FromUTF8(szValue);
     WString wstrBuffer = FromUTF8(strBuffer);
-    RegCreateKeyExW(hkRoot, wstrSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL);
-    if (hkTemp)
+    RegCreateKeyExW(hkRoot, wstrSubKey, 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &hkTemp, nullptr);
+    if (!hkTemp)
+        return;
+        
+    RegSetValueExW(hkTemp, wstrValue, 0, REG_SZ, (LPBYTE)wstrBuffer.c_str(), (wstrBuffer.length() + 1) * sizeof(wchar_t));
+    if (bFlush)
     {
-        RegSetValueExW(hkTemp, wstrValue, NULL, REG_SZ, (LPBYTE)wstrBuffer.c_str(), (wstrBuffer.length() + 1) * sizeof(wchar_t));
-        if (bFlush)
-        {
-            // Very slow. Only needed if there is a risk of BSOD soon afterwards.
-            RegFlushKey(hkTemp);
-        }
-        RegCloseKey(hkTemp);
+        // Very slow. Only needed if there is a risk of BSOD soon afterwards.
+        RegFlushKey(hkTemp);
     }
+    RegCloseKey(hkTemp);
 }
 
 //
@@ -192,24 +200,28 @@ static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const 
     SString strOutResult = "";
 
     bool    bResult = false;
-    HKEY    hkTemp = NULL;
+    HKEY    hkTemp = nullptr;
     WString wstrSubKey = FromUTF8(szSubKey);
     WString wstrValue = FromUTF8(szValue);
-    if (RegOpenKeyExW(hkRoot, wstrSubKey, 0, KEY_READ, &hkTemp) == ERROR_SUCCESS)
-    {
-        DWORD dwBufferSize;
-        if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS)
-        {
-            CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
-            if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
-            {
-                szBuffer[dwBufferSize / sizeof(wchar_t)] = 0;
-                strOutResult = ToUTF8((wchar_t*)szBuffer);
-                bResult = true;
-            }
-        }
-        RegCloseKey(hkTemp);
+    if (RegOpenKeyExW(hkRoot, wstrSubKey, 0, KEY_READ, &hkTemp) != ERROR_SUCCESS) {
+        if (iResult)
+            *iResult = bResult;
+        return strOutResult;
     }
+    
+    DWORD dwBufferSize;
+    if (RegQueryValueExW(hkTemp, wstrValue, nullptr, nullptr, nullptr, &dwBufferSize) == ERROR_SUCCESS)
+    {
+        CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
+        if (RegQueryValueExW(hkTemp, wstrValue, nullptr, nullptr, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
+        {
+            szBuffer[dwBufferSize / sizeof(wchar_t)] = 0;
+            strOutResult = ToUTF8((wchar_t*)szBuffer);
+            bResult = true;
+        }
+    }
+    RegCloseKey(hkTemp);
+    
     if (iResult)
         *iResult = bResult;
     return strOutResult;
@@ -234,9 +246,9 @@ SString SharedUtil::GetMajorVersionString()
 //
 // GetSystemRegistryValue
 //
-SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName)
+SString SharedUtil::GetSystemRegistryValue(std::uint32_t hKey, const SString& strPath, const SString& strName)
 {
-    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, NULL);
+    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, nullptr);
 }
 
 //
@@ -262,7 +274,7 @@ void SharedUtil::SetRegistryValue(const SString& strPath, const SString& strName
 
 SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, nullptr);
 }
 
 bool SharedUtil::RemoveRegistryKey(const SString& strPath)
@@ -278,7 +290,7 @@ void SharedUtil::SetVersionRegistryValue(const SString& strVersion, const SStrin
 
 SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, nullptr);
 }
 
 // Get/set registry values for all versions (common)
@@ -289,7 +301,7 @@ void SharedUtil::SetCommonRegistryValue(const SString& strPath, const SString& s
 
 SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, nullptr);
 }
 
 //
@@ -326,20 +338,20 @@ bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SS
 
     std::vector<SString> vecParts;
     strOnRestartCommand.Split("\t", vecParts);
-    if (vecParts.size() > 5 && vecParts[0].length())
+    if (vecParts.size() <= 5 || vecParts[0].empty())
+        return false;
+        
+    SString strVersion("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
+    if (vecParts[5] == strVersion)
     {
-        SString strVersion("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
-        if (vecParts[5] == strVersion)
-        {
-            strOperation = vecParts[0];
-            strFile = vecParts[1];
-            strParameters = vecParts[2];
-            strDirectory = vecParts[3];
-            strShowCmd = vecParts[4];
-            return true;
-        }
-        AddReportLog(4000, SString("OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str(), strVersion.c_str()));
+        strOperation = vecParts[0];
+        strFile = vecParts[1];
+        strParameters = vecParts[2];
+        strDirectory = vecParts[3];
+        strShowCmd = vecParts[4];
+        return true;
     }
+    AddReportLog(4000, SString("OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str(), strVersion.c_str()));
     return false;
 }
 
@@ -368,7 +380,7 @@ SString SharedUtil::GetPostUpdateConnect()
     time_t  timeThen = (time_t)std::atoll(argMap.Get("time"));
 
     // Expire after 5 mins
-    double seconds = difftime(time(NULL), timeThen);
+    double seconds = difftime(time(nullptr), timeThen);
     if ((seconds < 0 || seconds > 60 * 5) && timeThen != 0)
         strHost = "";
 
@@ -497,11 +509,11 @@ static bool bWatchDogWasUncleanStopValue = false;
 
 bool SharedUtil::WatchDogWasUncleanStop()
 {
-    if (!bWatchDogWasUncleanStopCached)
-    {
-        bWatchDogWasUncleanStopValue = GetApplicationSettingInt("watchdog", "uncleanstop") != 0;
-        bWatchDogWasUncleanStopCached = true;
-    }
+    if (bWatchDogWasUncleanStopCached)
+        return bWatchDogWasUncleanStopValue;
+        
+    bWatchDogWasUncleanStopValue = GetApplicationSettingInt("watchdog", "uncleanstop") != 0;
+    bWatchDogWasUncleanStopCached = true;
     return bWatchDogWasUncleanStopValue;
 }
 
@@ -520,11 +532,11 @@ static bool bWatchDogWasLastRunCrashValue = false;
 
 bool SharedUtil::WatchDogWasLastRunCrash()
 {
-    if (!bWatchDogWasLastRunCrashCached)
-    {
-        bWatchDogWasLastRunCrashValue = GetApplicationSettingInt("watchdog", "lastruncrash") != 0;
-        bWatchDogWasLastRunCrashCached = true;
-    }
+    if (bWatchDogWasLastRunCrashCached)
+        return bWatchDogWasLastRunCrashValue;
+        
+    bWatchDogWasLastRunCrashValue = GetApplicationSettingInt("watchdog", "lastruncrash") != 0;
+    bWatchDogWasLastRunCrashCached = true;
     return bWatchDogWasLastRunCrashValue;
 }
 
@@ -579,52 +591,51 @@ void SharedUtil::SetProductVersion(const SString& strVersion)
 const SString& SharedUtil::GetProductVersion()
 {
     if (ms_strProductVersion.empty())
-        ms_strProductVersion =
-            SString("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
+        ms_strProductVersion = SString("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
     return ms_strProductVersion;
 }
 
 void SharedUtil::SetClipboardText(const SString& strText)
 {
     // If we got something to copy
-    if (!strText.empty())
-    {
-        // Convert it to Unicode
-        WString strUTF = MbUTF8ToUTF16(strText);
+    if (strText.empty())
+        return;
+        
+    // Convert it to Unicode
+    WString strUTF = MbUTF8ToUTF16(strText);
 
-        // Open and empty the clipboard
-        OpenClipboard(NULL);
-        EmptyClipboard();
+    // Open and empty the clipboard
+    OpenClipboard(nullptr);
+    EmptyClipboard();
 
-        // Allocate the clipboard buffer and copy the data
-        HGLOBAL  hBuf = GlobalAlloc(GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t));
-        wchar_t* buf = reinterpret_cast<wchar_t*>(GlobalLock(hBuf));
-        wcscpy(buf, strUTF);
-        GlobalUnlock(hBuf);
+    // Allocate the clipboard buffer and copy the data
+    HGLOBAL  hBuf = GlobalAlloc(GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t));
+    wchar_t* buf = reinterpret_cast<wchar_t*>(GlobalLock(hBuf));
+    wcscpy(buf, strUTF);
+    GlobalUnlock(hBuf);
 
-        // Copy the data into the clipboard
-        SetClipboardData(CF_UNICODETEXT, hBuf);
+    // Copy the data into the clipboard
+    SetClipboardData(CF_UNICODETEXT, hBuf);
 
-        // Close the clipboard
-        CloseClipboard();
-    }
+    // Close the clipboard
+    CloseClipboard();
 }
 
 SString SharedUtil::GetClipboardText()
 {
     SString data;
 
-    if (OpenClipboard(NULL))
-    {
-        // Get the clipboard's data
-        HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
-        void*  lockedData = GlobalLock(clipboardData);
-        if (lockedData)
-            data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
+    if (!OpenClipboard(nullptr))
+        return data;
+        
+    // Get the clipboard's data
+    HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
+    void*  lockedData = GlobalLock(clipboardData);
+    if (lockedData)
+        data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
 
-        GlobalUnlock(clipboardData);
-        CloseClipboard();
-    }
+    GlobalUnlock(clipboardData);
+    CloseClipboard();
 
     return data;
 }
@@ -686,19 +697,19 @@ bool SharedUtil::ProcessPendingBrowseToSolution()
         if (!strMessageBoxMessage.empty())
             strMessageBoxMessage += "\n\n\n";
         strMessageBoxMessage += _("Do you want to see some on-line help about this problem ?");
-        if (IDYES != MessageBoxUTF8(NULL, strMessageBoxMessage, strTitle, MB_YESNO | MB_TOPMOST | (iFlags & ICON_MASK_VALUE)))
+        if (IDYES != MessageBoxUTF8(nullptr, strMessageBoxMessage, strTitle, MB_YESNO | MB_TOPMOST | (iFlags & ICON_MASK_VALUE)))
             return false;
     }
     else
     {
         if (!strMessageBoxMessage.empty())
-            MessageBoxUTF8(NULL, strMessageBoxMessage, strTitle, MB_OK | MB_TOPMOST | (iFlags & ICON_MASK_VALUE));
+            MessageBoxUTF8(nullptr, strMessageBoxMessage, strTitle, MB_OK | MB_TOPMOST | (iFlags & ICON_MASK_VALUE));
         if (iFlags & SHOW_MESSAGE_ONLY)
             return true;
     }
 
     MessageBoxUTF8(
-        NULL,
+        nullptr,
         _("Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)"),
         "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
 
@@ -749,11 +760,11 @@ static SString GetReportLogHeaderText()
     return strResult.TrimEnd(" ") + "]";
 }
 
-void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLimit)
+void SharedUtil::AddReportLog(std::uint32_t uiId, const SString& strText, std::uint32_t uiAmountLimit)
 {
     if (uiAmountLimit)
     {
-        uint& uiAmount = MapGet(ms_ReportAmountMap, uiId);
+        std::uint32_t& uiAmount = MapGet(ms_ReportAmountMap, uiId);
         if (uiAmount++ >= uiAmountLimit)
             return;
     }
@@ -764,7 +775,7 @@ void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLi
     while (ms_ReportLineFilter.PopOutputLine(line))
     {
         const SString& strText = line.strText;
-        uint           uiId = line.uiId;
+        std::uint32_t           uiId = line.uiId;
 
         SString strPathFilename = PathJoin(GetMTADataPath(), "report.log");
         MakeSureDirExists(strPathFilename);
@@ -780,12 +791,12 @@ void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLi
 // Track results of new features by avoiding heap memory allocations
 // Avoid using this function if you have plenty of memory available
 //
-void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, const char* szExceptionText)
+void SharedUtil::AddExceptionReportLog(std::uint32_t uiId, const char* szExceptionName, const char* szExceptionText)
 {
-    constexpr size_t BOILERPLATE_SIZE = 46;
-    constexpr size_t MAX_EXCEPTION_NAME_SIZE = 64;
-    constexpr size_t MAX_EXCEPTION_TEXT_SIZE = 256;
-    static char      szOutput[BOILERPLATE_SIZE + MAX_EXCEPTION_NAME_SIZE + MAX_EXCEPTION_TEXT_SIZE] = {0};
+    constexpr std::size_t BOILERPLATE_SIZE = 46;
+    constexpr std::size_t MAX_EXCEPTION_NAME_SIZE = 64;
+    constexpr std::size_t MAX_EXCEPTION_TEXT_SIZE = 256;
+    static char           szOutput[BOILERPLATE_SIZE + MAX_EXCEPTION_NAME_SIZE + MAX_EXCEPTION_TEXT_SIZE] = {0};
 
     SYSTEMTIME s = {0};
     GetSystemTime(&s);
@@ -807,6 +818,7 @@ void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, c
     {
         // At the time of writing this function, it is only called from other 'try-catch' blocks
         // so we can assume we literally ran out of all available memory here and ignore the exception
+        // 🤔
     }
 }
 
@@ -814,7 +826,7 @@ void SharedUtil::SetReportLogContents(const SString& strText)
 {
     SString strPathFilename = PathJoin(GetMTADataPath(), "report.log");
     MakeSureDirExists(strPathFilename);
-    FileSave(strPathFilename, strText.length() ? &strText.at(0) : NULL, strText.length());
+    FileSave(strPathFilename, strText.length() ? &strText.at(0) : nullptr, strText.length());
 }
 
 SString SharedUtil::GetReportLogContents()
@@ -830,36 +842,35 @@ SString SharedUtil::GetReportLogContents()
 SString SharedUtil::GetReportLogProcessTag()
 {
     static SString strResult;
-    if (strResult.empty())
+    if (!strResult.empty())
+        return strResult;
+        
+    int pid = GetCurrentProcessId();
+    if (!IsGTAProcess())
     {
-        int pid = GetCurrentProcessId();
-        if (!IsGTAProcess())
-        {
-            // Use pid only for launcher
-            strResult = SString("%05d", pid);
-        }
-        else
-        {
-            // Use pid & parent pid for game
-            int             parentPid = 0;
-            HANDLE          h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-            PROCESSENTRY32W pe = {0};
-            pe.dwSize = sizeof(PROCESSENTRY32W);
-            if (Process32FirstW(h, &pe))
-            {
-                do
-                {
-                    if (pe.th32ProcessID == pid)
-                    {
-                        parentPid = pe.th32ParentProcessID;
-                        break;
-                    }
-                } while (Process32NextW(h, &pe));
-            }
-            CloseHandle(h);
-            strResult = SString("%05d-%05d", parentPid, pid);
-        }
+        // Use pid only for launcher
+        strResult = SString("%05d", pid);
+        return strResult;
     }
+    
+    // Use pid & parent pid for game
+    int             parentPid = 0;
+    HANDLE          h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32W pe = {0};
+    pe.dwSize = sizeof(PROCESSENTRY32W);
+    if (Process32FirstW(h, &pe))
+    {
+        do
+        {
+            if (pe.th32ProcessID == pid)
+            {
+                parentPid = pe.th32ParentProcessID;
+                break;
+            }
+        } while (Process32NextW(h, &pe));
+    }
+    CloseHandle(h);
+    strResult = SString("%05d-%05d", parentPid, pid);
     return strResult;
 }
 
@@ -871,8 +882,8 @@ void WriteEvent(const char* szType, const SString& strText)
     {
         std::vector<SString> lineList;
         strText.Split("\n", lineList);
-        for (uint i = 0; i < lineList.size(); i++)
-            WriteEvent(szType, lineList[i]);
+        for (const auto& value : lineList)
+            WriteEvent(szType, value);
         return;
     }
     SString strPathFilename = CalcMTASAPath(PathJoin("mta", "logs", "logfile.txt"));
@@ -917,19 +928,19 @@ void SharedUtil::CycleEventLog()
 // Get Windows error message text from a last error code.
 //
 ///////////////////////////////////////////////////////////////////////////
-SString SharedUtil::GetSystemErrorMessage(uint uiError, bool bRemoveNewlines, bool bPrependCode)
+SString SharedUtil::GetSystemErrorMessage(std::uint32_t uiError, bool bRemoveNewlines, bool bPrependCode)
 {
     SString strResult;
 
-    LPWSTR szErrorText = NULL;
-    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, uiError,
-                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&szErrorText, 0, NULL);
+    LPWSTR szErrorText = nullptr;
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, uiError,
+                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&szErrorText, 0, nullptr);
 
     if (szErrorText)
     {
         strResult = UTF16ToMbUTF8(szErrorText);
         LocalFree(szErrorText);
-        szErrorText = NULL;
+        szErrorText = nullptr;
     }
 
     if (bRemoveNewlines)
@@ -977,34 +988,31 @@ static bool MyShellExecute(bool bBlocking, const SString& strAction, const SStri
         strFile = "rundll32.exe";
     }
 
-    if (bBlocking)
+    if (!bBlocking)
     {
-        WString           wstrAction = FromUTF8(strAction);
-        WString           wstrFile = FromUTF8(strFile);
-        WString           wstrParameters = FromUTF8(strParameters);
-        WString           wstrDirectory = FromUTF8(strDirectory);
-        SHELLEXECUTEINFOW info;
-        memset(&info, 0, sizeof(info));
-        info.cbSize = sizeof(info);
-        info.fMask = SEE_MASK_NOCLOSEPROCESS;
-        info.lpVerb = wstrAction;
-        info.lpFile = wstrFile;
-        info.lpParameters = wstrParameters;
-        info.lpDirectory = wstrDirectory;
-        info.nShow = nShowCmd;
-        bool bResult = ShellExecuteExW(&info) != FALSE;
-        if (info.hProcess)
-        {
-            WaitForSingleObject(info.hProcess, INFINITE);
-            CloseHandle(info.hProcess);
-        }
-        return bResult;
-    }
-    else
-    {
-        int iResult = (int)ShellExecute(NULL, strAction, strFile, strParameters, strDirectory, nShowCmd);
+        int iResult = (int)ShellExecute(nullptr, strAction, strFile, strParameters, strDirectory, nShowCmd);
         return iResult > 32;
     }
+    WString           wstrAction = FromUTF8(strAction);
+    WString           wstrFile = FromUTF8(strFile);
+    WString           wstrParameters = FromUTF8(strParameters);
+    WString           wstrDirectory = FromUTF8(strDirectory);
+    SHELLEXECUTEINFOW info;
+    memset(&info, 0, sizeof(info));
+    info.cbSize = sizeof(info);
+    info.fMask = SEE_MASK_NOCLOSEPROCESS;
+    info.lpVerb = wstrAction;
+    info.lpFile = wstrFile;
+    info.lpParameters = wstrParameters;
+    info.lpDirectory = wstrDirectory;
+    info.nShow = nShowCmd;
+    bool bResult = ShellExecuteExW(&info) != FALSE;
+    if (info.hProcess)
+    {
+        WaitForSingleObject(info.hProcess, INFINITE);
+        CloseHandle(info.hProcess);
+    }
+    return bResult;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -1034,7 +1042,7 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 
 #endif  // MTA_CLIENT
 
-#ifdef WIN32
+#ifdef _WIN32
 #define _WIN32_WINNT_WIN8                   0x0602
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1079,23 +1087,23 @@ bool SharedUtil::IsWindows8OrGreater()
 }
 #endif  // WIN32
 
-static uchar ToHexChar(uchar c)
+static std::uint8_t ToHexChar(std::uint8_t c) noexcept
 {
     return c > 9 ? c - 10 + 'A' : c + '0';
 }
 
-static uchar FromHexChar(uchar c)
+static std::uint8_t FromHexChar(std::uint8_t c) noexcept
 {
     return c > '9' ? c - 'A' + 10 : c - '0';
 }
 
-SString SharedUtil::EscapeString(const SString& strText, const SString& strDisallowedChars, char cSpecialChar, uchar ucLowerLimit, uchar ucUpperLimit)
+SString SharedUtil::EscapeString(const SString& strText, const SString& strDisallowedChars, char cSpecialChar, std::uint8_t ucLowerLimit, std::uint8_t ucUpperLimit)
 {
     // Replace each disallowed char with #FF
     SString strResult;
-    for (uint i = 0; i < strText.length(); i++)
+    for (std::uint32_t i = 0; i < strText.length(); i++)
     {
-        uchar c = strText[i];
+        std::uint8_t c = strText[i];
         if (strDisallowedChars.find(c) == std::string::npos && c != cSpecialChar && c >= ucLowerLimit && c <= ucUpperLimit)
             strResult += c;
         else
@@ -1112,13 +1120,13 @@ SString SharedUtil::UnescapeString(const SString& strText, char cSpecialChar)
 {
     SString strResult;
     // Replace #FF with char
-    for (uint i = 0; i < strText.length(); i++)
+    for (std::size_t i = 0; i < strText.length(); i++)
     {
-        uchar c = strText[i];
+        std::uint8_t c = strText[i];
         if (c == cSpecialChar && i < strText.length() - 2)
         {
-            uchar c0 = FromHexChar(strText[++i]);
-            uchar c1 = FromHexChar(strText[++i]);
+            std::uint8_t c0 = FromHexChar(strText[++i]);
+            std::uint8_t c1 = FromHexChar(strText[++i]);
             c = (c0 << 4) | c1;
         }
         strResult += c;
@@ -1138,7 +1146,7 @@ SString SharedUtil::EscapeURLArgument(const SString& strArg)
 //
 // Cross platform critical section
 //
-#ifdef WIN32
+#ifdef _WIN32
 
 SharedUtil::CCriticalSection::CCriticalSection()
 {
@@ -1170,7 +1178,7 @@ void SharedUtil::CCriticalSection::Unlock()
 SharedUtil::CCriticalSection::CCriticalSection()
 {
     m_pCriticalSection = new pthread_mutex_t;
-    pthread_mutex_init((pthread_mutex_t*)m_pCriticalSection, NULL);
+    pthread_mutex_init((pthread_mutex_t*)m_pCriticalSection, nullptr);
 }
 
 SharedUtil::CCriticalSection::~CCriticalSection()
@@ -1199,7 +1207,7 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformationClass, PVOID ThreadInformation, ULONG ThreadInformationLength,
                                          PULONG ReturnLength)
 {
@@ -1240,78 +1248,78 @@ DWORD SharedUtil::GetMainThreadId()
 {
     static DWORD dwMainThreadID = 0;
 
-    if (dwMainThreadID == 0)
+    if (dwMainThreadID)
+        return dwMainThreadID;
+        
+    // Get the module information for the currently running process
+    DWORD      processEntryPointAddress = 0;
+    MODULEINFO moduleInfo = {};
+
+    if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)))
     {
-        // Get the module information for the currently running process
-        DWORD      processEntryPointAddress = 0;
-        MODULEINFO moduleInfo = {};
+        processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
+    }
 
-        if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)) != 0)
+    // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
+    HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+
+    if (hThreadSnap == INVALID_HANDLE_VALUE)
+        return GetCurrentThreadId();
+        
+    ULONGLONG ullMinCreateTime = ULLONG_MAX;
+
+    DWORD currentProcessID = GetCurrentProcessId();
+
+    THREADENTRY32 th32 = {};
+    th32.dwSize = sizeof(THREADENTRY32);
+
+    for (BOOL bOK = Thread32First(hThreadSnap, &th32); bOK; bOK = Thread32Next(hThreadSnap, &th32))
+    {
+        if (th32.th32OwnerProcessID != currentProcessID)
+            continue;
+            
+        HANDLE hThread = OpenThread(THREAD_QUERY_INFORMATION, TRUE, th32.th32ThreadID);
+
+        if (!hThread)
+            continue;
+            
+        // Check the thread by entry point first
+        if (processEntryPointAddress != 0)
         {
-            processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
-        }
+            DWORD entryPointAddress = 0;
 
-        // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
-        HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-
-        if (hThreadSnap != INVALID_HANDLE_VALUE)
-        {
-            ULONGLONG ullMinCreateTime = ULLONG_MAX;
-
-            DWORD currentProcessID = GetCurrentProcessId();
-
-            THREADENTRY32 th32 = {};
-            th32.dwSize = sizeof(THREADENTRY32);
-
-            for (BOOL bOK = Thread32First(hThreadSnap, &th32); bOK; bOK = Thread32Next(hThreadSnap, &th32))
+            if (QueryThreadEntryPointAddress(hThread, &entryPointAddress) && entryPointAddress == processEntryPointAddress)
             {
-                if (th32.th32OwnerProcessID == currentProcessID)
-                {
-                    HANDLE hThread = OpenThread(THREAD_QUERY_INFORMATION, TRUE, th32.th32ThreadID);
-
-                    if (hThread)
-                    {
-                        // Check the thread by entry point first
-                        if (processEntryPointAddress != 0)
-                        {
-                            DWORD entryPointAddress = 0;
-
-                            if (QueryThreadEntryPointAddress(hThread, &entryPointAddress) && entryPointAddress == processEntryPointAddress)
-                            {
-                                dwMainThreadID = th32.th32ThreadID;
-                                CloseHandle(hThread);
-                                CloseHandle(hThreadSnap);
-                                return dwMainThreadID;
-                            }
-                        }
-
-                        // If entry point check failed, find the oldest thread in the system
-                        FILETIME afTimes[4] = {};
-
-                        if (GetThreadTimes(hThread, &afTimes[0], &afTimes[1], &afTimes[2], &afTimes[3]))
-                        {
-                            ULONGLONG ullTest = (ULONGLONG(afTimes[0].dwHighDateTime) << 32) + afTimes[0].dwLowDateTime;
-
-                            if (ullTest && ullTest < ullMinCreateTime)
-                            {
-                                ullMinCreateTime = ullTest;
-                                dwMainThreadID = th32.th32ThreadID;
-                            }
-                        }
-
-                        CloseHandle(hThread);
-                    }
-                }
+                dwMainThreadID = th32.th32ThreadID;
+                CloseHandle(hThread);
+                CloseHandle(hThreadSnap);
+                return dwMainThreadID;
             }
-
-            CloseHandle(hThreadSnap);
         }
 
-        // Fallback
-        if (dwMainThreadID == 0)
+        // If entry point check failed, find the oldest thread in the system
+        FILETIME afTimes[4] = {};
+
+        if (GetThreadTimes(hThread, &afTimes[0], &afTimes[1], &afTimes[2], &afTimes[3]))
         {
-            dwMainThreadID = GetCurrentThreadId();
+            ULONGLONG ullTest = (ULONGLONG(afTimes[0].dwHighDateTime) << 32) + afTimes[0].dwLowDateTime;
+
+            if (ullTest && ullTest < ullMinCreateTime)
+            {
+                ullMinCreateTime = ullTest;
+                dwMainThreadID = th32.th32ThreadID;
+            }
         }
+
+        CloseHandle(hThread);
+    }
+
+    CloseHandle(hThreadSnap);
+
+    // Fallback
+    if (!dwMainThreadID)
+    {
+        dwMainThreadID = GetCurrentThreadId();
     }
 
     return dwMainThreadID;
@@ -1324,7 +1332,7 @@ DWORD SharedUtil::GetMainThreadId()
 //
 bool SharedUtil::IsMainThread()
 {
-#ifdef WIN32
+#ifdef _WIN32
     DWORD mainThreadID = GetMainThreadId();
     DWORD currentThreadID = GetCurrentThreadId();
     return mainThreadID == currentThreadID;
@@ -1337,7 +1345,7 @@ bool SharedUtil::IsMainThread()
 //
 // Expiry stuff
 //
-#ifdef WIN32
+#ifdef _WIN32
     #include <time.h>
 
 int SharedUtil::GetBuildAge()
@@ -1347,7 +1355,7 @@ int SharedUtil::GetBuildAge()
     when.tm_year = BUILD_YEAR - 1900;
     when.tm_mon = BUILD_MONTH;
     when.tm_mday = BUILD_DAY;
-    return (int)(time(NULL) - mktime(&when)) / (60 * 60 * 24);
+    return (int)(time(nullptr) - mktime(&when)) / (60 * 60 * 24);
 }
 
 #if defined(MTA_DM_EXPIRE_DAYS)
@@ -1358,7 +1366,7 @@ int SharedUtil::GetDaysUntilExpire()
     when.tm_year = BUILD_YEAR - 1900;
     when.tm_mon = BUILD_MONTH;
     when.tm_mday = BUILD_DAY + MTA_DM_EXPIRE_DAYS;
-    return (int)(mktime(&when) - time(NULL)) / (60 * 60 * 24);
+    return (int)(mktime(&when) - time(nullptr)) / (60 * 60 * 24);
 }
 
 #endif
@@ -1400,7 +1408,7 @@ SString SharedUtil::RemoveColorCodes(const char* szString)
 //
 void SharedUtil::RemoveColorCodesInPlaceW(WString& strText)
 {
-    uint uiSearchPos = 0;
+    std::uint32_t uiSearchPos = 0;
     while (true)
     {
         std::wstring::size_type uiFoundPos = strText.find(L'#', uiSearchPos);
@@ -1427,10 +1435,12 @@ bool SharedUtil::IsColorCode(const char* szColorCode)
         return false;
 
     bool bValid = true;
-    for (int i = 0; i < 6; i++)
+    for (auto i = 0; i < 6; i++)
     {
-        char c = szColorCode[1 + i];
-        if (!isdigit((unsigned char)c) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f'))
+        std::uint8_t c = szColorCode[1 + i];
+        if (isdigit(c))
+            continue;
+        if ((c < 'A' || c > 'F') && (c < 'a' || c > 'f'))
         {
             bValid = false;
             break;
@@ -1447,13 +1457,13 @@ bool SharedUtil::IsColorCodeW(const wchar_t* wszColorCode)
     if (*wszColorCode != L'#')
         return false;
 
-    for (uint i = 0; i < 6; i++)
+    for (std::uint32_t i = 0; i < 6; i++)
     {
         wchar_t c = wszColorCode[i + 1];
-        if (!iswdigit(c) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f'))
-        {
+        if (iswdigit(c))
+            continue;
+        if ((c < 'A' || c > 'F') && (c < 'a' || c > 'f'))
             return false;
-        }
     }
     return true;
 }
@@ -1463,7 +1473,7 @@ char* SharedUtil::Trim(char* szText)
     char*  szOriginal = szText;
     size_t uiLen = 0;
 
-    while (isspace((unsigned char)*szText))
+    while (isspace((std::uint8_t)*szText))
         szText++;
 
     if (*szText)
@@ -1471,7 +1481,7 @@ char* SharedUtil::Trim(char* szText)
         char* p = szText;
         while (*p)
             p++;
-        while (isspace((unsigned char)*(--p)))
+        while (isspace((std::uint8_t)*(--p)))
             ;
         p[1] = '\0';
         uiLen = (size_t)(p - szText + 1);
@@ -1508,7 +1518,7 @@ std::string SharedUtil::UTF16ToMbUTF8(const char16_t* input)
 }
 
 // Get UTF8 confidence
-int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
+int SharedUtil::GetUTF8Confidence(const std::uint8_t* input, int len)
 {
     return icu_getUTF8Confidence(input, len);
 }
@@ -1516,8 +1526,8 @@ int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 // Translate a true ANSI string to the UTF-16 equivalent (reencode+convert)
 std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
-    size_t len = mbstowcs(NULL, input.c_str(), input.length());
-    if (len == (size_t)-1)
+    std::size_t len = mbstowcs(nullptr, input.c_str(), input.length());
+    if (len == (std::size_t)-1)
         return L"?";
     wchar_t* wcsOutput = new wchar_t[len + 1];
     mbstowcs(wcsOutput, input.c_str(), input.length());
@@ -1528,16 +1538,16 @@ std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 }
 
 // Check for BOM bytes
-bool SharedUtil::IsUTF8BOM(const void* pData, uint uiLength)
+bool SharedUtil::IsUTF8BOM(const void* pData, std::uint32_t uiLength)
 {
-    const uchar* pCharData = (const uchar*)pData;
+    const std::uint8_t* pCharData = static_cast<const std::uint8_t*>(pData);
     return (uiLength > 2 && pCharData[0] == 0xEF && pCharData[1] == 0xBB && pCharData[2] == 0xBF);
 }
 
 // Check for UTF8/ANSI compiled script
-bool SharedUtil::IsLuaCompiledScript(const void* pData, uint uiLength)
+bool SharedUtil::IsLuaCompiledScript(const void* pData, std::uint32_t uiLength)
 {
-    const uchar* pCharData = (const uchar*)pData;
+    const std::uint8_t* pCharData = static_cast<const std::uint8_t*>(pData);
     if (IsUTF8BOM(pCharData, uiLength))
     {
         pCharData += 3;
@@ -1547,9 +1557,9 @@ bool SharedUtil::IsLuaCompiledScript(const void* pData, uint uiLength)
 }
 
 // Check for obfuscated script
-bool SharedUtil::IsLuaObfuscatedScript(const void* pData, uint uiLength)
+bool SharedUtil::IsLuaObfuscatedScript(const void* pData, std::uint32_t uiLength)
 {
-    const uchar* pCharData = (const uchar*)pData;
+    const std::uint8_t* pCharData = static_cast<const std::uint8_t*>(pData);
     return (uiLength > 0 && pCharData[0] == 0x1C);            // Look for our special marker
 }
 
@@ -1559,14 +1569,16 @@ bool SharedUtil::IsLuaObfuscatedScript(const void* pData, uint uiLength)
 bool SharedUtil::IsValidVersionString(const SString& strVersion)
 {
     const SString strCheck = "0.0.0-0.00000.0.000";
-    uint          uiLength = std::min(strCheck.length(), strVersion.length());
-    for (unsigned int i = 0; i < uiLength; i++)
+    std::size_t uiLength = std::min(strCheck.length(), strVersion.length());
+    
+    for (std::size_t i = 0; i < uiLength; i++)
     {
-        uchar c = strVersion[i];
-        uchar d = strCheck[i];
-        if (!isdigit(c) || !isdigit(d))
-            if (c != d)
-                return false;
+        std::uint8_t c = strVersion[i];
+        std::uint8_t d = strCheck[i];
+        if (isdigit(c) && isdigit(d))
+            continue;
+        if (c != d)
+            return false;
     }
     return true;
 }
@@ -1602,7 +1614,7 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
     if (!bConvertToUnixPathSep)
     {
         cPathSep = '\\';
-        for (unsigned int i = 0; i < NUMELMS(strDelimList); i++)
+        for (auto i = 0; i < NUMELMS(strDelimList); i++)
             strDelimList[i] = strDelimList[i].Replace("/", "\\");
         strText = strText.Replace("/", "\\");
     }
@@ -1610,12 +1622,12 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
 #endif
     {
         cPathSep = '/';
-        for (unsigned int i = 0; i < NUMELMS(strDelimList); i++)
+        for (auto i = 0; i < NUMELMS(strDelimList); i++)
             strDelimList[i] = strDelimList[i].Replace("\\", "/");
         strText = strText.Replace("\\", "/");
     }
 
-    for (unsigned int i = 0; i < NUMELMS(strDelimList); i++)
+    for (auto i = 0; i < NUMELMS(strDelimList); i++)
     {
         // Remove up to first occurrence
         int iPos = strText.find(strDelimList[i]);
@@ -1636,14 +1648,14 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
 
 namespace SharedUtil
 {
-    CArgMap::CArgMap(const SString& strArgSep, const SString& strPartsSep, const SString& strExtraDisallowedChars)
+    CArgMap::CArgMap(const SString& strArgSep, const SString& strPartsSep, const SString& strExtraDisallowedChars) noexcept
         : m_strArgSep(strArgSep), m_strPartsSep(strPartsSep)
     {
         m_strDisallowedChars = strExtraDisallowedChars + m_strArgSep + m_strPartsSep;
         m_cEscapeCharacter = '#';
     }
 
-    void CArgMap::SetEscapeCharacter(char cEscapeCharacter) { m_cEscapeCharacter = cEscapeCharacter; }
+    void CArgMap::SetEscapeCharacter(char cEscapeCharacter) noexcept { m_cEscapeCharacter = cEscapeCharacter; }
 
     void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues) { MergeFromString(other.ToString(), bAllowMultiValues); }
 
@@ -1657,10 +1669,10 @@ namespace SharedUtil
     {
         std::vector<SString> parts;
         strLine.Split(m_strPartsSep, parts);
-        for (uint i = 0; i < parts.size(); i++)
+        for (const auto& value : parts)
         {
             SString strCmd, strArg;
-            parts[i].Split(m_strArgSep, &strCmd, &strArg);
+            value.Split(m_strArgSep, &strCmd, &strArg);
             if (!bAllowMultiValues)
                 m_Map.erase(strCmd);
             if (strCmd.length())            // Key can not be empty
@@ -1671,21 +1683,25 @@ namespace SharedUtil
     SString CArgMap::ToString() const
     {
         SString strResult;
-        for (std::multimap<SString, SString>::const_iterator iter = m_Map.begin(); iter != m_Map.end(); ++iter)
+        // cant use structurized binding because
+        // game_sa is C++14 (C++17 required)
+        for(auto it = m_Map.begin(); it != m_Map.end(); ++it)
         {
-            if (strResult.length())
+            if (!strResult.empty())
                 strResult += m_strPartsSep;
-            strResult += iter->first + m_strArgSep + iter->second;
+            strResult += it->first + m_strArgSep + it->second;
         }
         return strResult;
     }
 
     bool CArgMap::HasMultiValues() const
     {
-        for (std::multimap<SString, SString>::const_iterator iter = m_Map.begin(); iter != m_Map.end(); ++iter)
+        // cant use structurized binding because
+        // game_sa is C++14 (C++17 required)
+        for(auto it = m_Map.begin(); it != m_Map.end(); ++it)
         {
             std::vector<SString> newItems;
-            MultiFind(m_Map, iter->first, &newItems);
+            MultiFind(m_Map, it->first, &newItems);
             if (newItems.size() > 1)
                 return true;
         }
@@ -1727,7 +1743,7 @@ namespace SharedUtil
     }
 
     // Test if key exists
-    bool CArgMap::Contains(const SString& strCmd) const { return MapFind(m_Map, Escape(strCmd)) != NULL; }
+    bool CArgMap::Contains(const SString& strCmd) const { return MapFind(m_Map, Escape(strCmd)) != nullptr; }
 
     // First result as string
     bool CArgMap::Get(const SString& strCmd, SString& strOut, const char* szDefault) const
@@ -1755,10 +1771,10 @@ namespace SharedUtil
     {
         std::vector<SString> newItems;
         MultiFind(m_Map, Escape(strCmd), &newItems);
-        for (uint i = 0; i < newItems.size(); i++)
-            newItems[i] = Unescape(newItems[i]);
+        for (auto& value : newItems)
+            value = Unescape(value);
         ListAppend(outList, newItems);
-        return newItems.size() > 0;
+        return !newItems.empty();
     }
 
     // First result as int
@@ -1777,11 +1793,13 @@ namespace SharedUtil
     // All keys
     void CArgMap::GetKeys(std::vector<SString>& outList) const
     {
-        for (std::multimap<SString, SString>::const_iterator iter = m_Map.begin(); iter != m_Map.end(); ++iter)
-            outList.push_back(iter->first);
+        // cant use structurized binding because
+        // game_sa is C++14 (C++17 required)
+        for (auto it = m_Map.begin(); it != m_Map.end(); ++it)
+            outList.push_back(it->first);
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     ///////////////////////////////////////////////////////////////////////////
     //
     // GetCurrentProcessorNumberXP for the current thread, especially for Windows XP
@@ -1817,17 +1835,16 @@ namespace SharedUtil
     ///////////////////////////////////////////////////////////////////////////
     DWORD _GetCurrentProcessorNumber()
     {
-#ifdef WIN32
+#ifdef _WIN32
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
         using GetCurrentProcessorNumber_t = DWORD(WINAPI*)();
 
         static auto FnGetCurrentProcessorNumber = ([]() -> GetCurrentProcessorNumber_t {
             HMODULE kernel32 = LoadLibraryA("kernel32");
 
-            if (kernel32)
-                return static_cast<GetCurrentProcessorNumber_t>(static_cast<void*>(GetProcAddress(kernel32, "GetCurrentProcessorNumber")));
-
-            return nullptr;
+            if (!kernel32)
+                return nullptr;
+            return static_cast<GetCurrentProcessorNumber_t>(static_cast<void*>(GetProcAddress(kernel32, "GetCurrentProcessorNumber")));
         })();
 
         if (FnGetCurrentProcessorNumber)
@@ -1866,11 +1883,11 @@ namespace SharedUtil
     // Returns time in microseconds used by this thread
     //
     ///////////////////////////////////////////////////////////////////////////
-    void GetThreadCPUTimes(uint64& outUserTime, uint64& outKernelTime)
+    void GetThreadCPUTimes(std::uint64_t& outUserTime, std::uint64_t& outKernelTime)
     {
         outUserTime = 0;
         outKernelTime = 0;
-#ifdef WIN32
+#ifdef _WIN32
         FILETIME CreationTime, ExitTime, KernelTime, UserTime;
         if (GetThreadTimes(GetCurrentThread(), &CreationTime, &ExitTime, &KernelTime, &UserTime))
         {
@@ -1885,8 +1902,8 @@ namespace SharedUtil
         rusage usage;
         if (getrusage(RUSAGE_THREAD, &usage) == 0)
         {
-            outUserTime = (uint64)usage.ru_utime.tv_sec * 1000000ULL + (uint64)usage.ru_utime.tv_usec;
-            outKernelTime = (uint64)usage.ru_stime.tv_sec * 1000000ULL + (uint64)usage.ru_stime.tv_usec;
+            outUserTime = (std::uint64_t)usage.ru_utime.tv_sec * 1000000ULL + (std::uint64_t)usage.ru_utime.tv_usec;
+            outKernelTime = (std::uint64_t)usage.ru_stime.tv_sec * 1000000ULL + (std::uint64_t)usage.ru_stime.tv_usec;
         }
 #endif
     }
@@ -1901,44 +1918,44 @@ namespace SharedUtil
     void UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount)
     {
         // Use supplied tick count if present
-        uint64 ullCPUMeasureTimeMs;
+        std::uint64_t ullCPUMeasureTimeMs;
         if (pllTickCount)
             ullCPUMeasureTimeMs = *pllTickCount;
         else
             ullCPUMeasureTimeMs = GetTickCount64_();
 
-        if (ullCPUMeasureTimeMs - store.ullPrevCPUMeasureTimeMs > 1000)
+        if (ullCPUMeasureTimeMs - store.ullPrevCPUMeasureTimeMs <= 1000)
+            return;
+            
+        store.uiProcessorNumber = SharedUtil::_GetCurrentProcessorNumber();
+        std::uint64_t ullUserTimeUs, ullKernelTimeUs;
+        GetThreadCPUTimes(ullUserTimeUs, ullKernelTimeUs);
+
+        float fCPUMeasureTimeDeltaMs = static_cast<float>(ullCPUMeasureTimeMs - store.ullPrevCPUMeasureTimeMs);
+        float fUserTimeDeltaUs = static_cast<float>(ullUserTimeUs - store.ullPrevUserTimeUs);
+        float fKernelTimeDeltaUs = static_cast<float>(ullKernelTimeUs - store.ullPrevKernelTimeUs);
+        if (fCPUMeasureTimeDeltaMs > 0)
         {
-            store.uiProcessorNumber = SharedUtil::_GetCurrentProcessorNumber();
-            uint64 ullUserTimeUs, ullKernelTimeUs;
-            GetThreadCPUTimes(ullUserTimeUs, ullKernelTimeUs);
-
-            float fCPUMeasureTimeDeltaMs = (float)(ullCPUMeasureTimeMs - store.ullPrevCPUMeasureTimeMs);
-            float fUserTimeDeltaUs = (float)(ullUserTimeUs - store.ullPrevUserTimeUs);
-            float fKernelTimeDeltaUs = (float)(ullKernelTimeUs - store.ullPrevKernelTimeUs);
-            if (fCPUMeasureTimeDeltaMs > 0)
-            {
-                float fPercentScaler = 0.1f / fCPUMeasureTimeDeltaMs;
-                store.fUserPercent = fUserTimeDeltaUs * fPercentScaler;
-                store.fKernelPercent = fKernelTimeDeltaUs * fPercentScaler;
-                store.fTotalCPUPercent = (fUserTimeDeltaUs + fKernelTimeDeltaUs) * fPercentScaler;
-            }
-            else
-            {
-                store.fUserPercent = 0;
-                store.fKernelPercent = 0;
-                store.fTotalCPUPercent = 0;
-            }
-            store.ullPrevUserTimeUs = ullUserTimeUs;
-            store.ullPrevKernelTimeUs = ullKernelTimeUs;
-            store.ullPrevCPUMeasureTimeMs = ullCPUMeasureTimeMs;
-
-            // Updated smoothed values
-            float fAlpha = 1.f / store.fAvgTimeSeconds;
-            store.fUserPercentAvg = Lerp(store.fUserPercentAvg, fAlpha, store.fUserPercent);
-            store.fKernelPercentAvg = Lerp(store.fKernelPercentAvg, fAlpha, store.fKernelPercent);
-            store.fTotalCPUPercentAvg = Lerp(store.fTotalCPUPercentAvg, fAlpha, store.fTotalCPUPercent);
+            float fPercentScaler = 0.1f / fCPUMeasureTimeDeltaMs;
+            store.fUserPercent = fUserTimeDeltaUs * fPercentScaler;
+            store.fKernelPercent = fKernelTimeDeltaUs * fPercentScaler;
+            store.fTotalCPUPercent = (fUserTimeDeltaUs + fKernelTimeDeltaUs) * fPercentScaler;
         }
+        else
+        {
+            store.fUserPercent = 0;
+            store.fKernelPercent = 0;
+            store.fTotalCPUPercent = 0;
+        }
+        store.ullPrevUserTimeUs = ullUserTimeUs;
+        store.ullPrevKernelTimeUs = ullKernelTimeUs;
+        store.ullPrevCPUMeasureTimeMs = ullCPUMeasureTimeMs;
+
+        // Updated smoothed values
+        float fAlpha = 1.0f / store.fAvgTimeSeconds;
+        store.fUserPercentAvg = Lerp(store.fUserPercentAvg, fAlpha, store.fUserPercent);
+        store.fKernelPercentAvg = Lerp(store.fKernelPercentAvg, fAlpha, store.fKernelPercent);
+        store.fTotalCPUPercentAvg = Lerp(store.fTotalCPUPercentAvg, fAlpha, store.fTotalCPUPercent);
     }
 
     //
@@ -1946,11 +1963,12 @@ namespace SharedUtil
     //
     //  Ranges of numbers. i.e.   100-4000, 5000-6999, 7000-7010
     //
-    void CRanges::SetRange(uint uiStart, uint uiLength)
+    void CRanges::SetRange(std::uint32_t uiStart, std::uint32_t uiLength)
     {
         if (uiLength < 1)
             return;
-        uint uiLast = uiStart + uiLength - 1;
+
+        std::uint32_t uiLast = uiStart + uiLength - 1;
 
         // Make a hole
         UnsetRange(uiStart, uiLength);
@@ -1961,27 +1979,27 @@ namespace SharedUtil
         // Maybe join adjacent ranges one day
     }
 
-    void CRanges::UnsetRange(uint uiStart, uint uiLength)
+    void CRanges::UnsetRange(std::uint32_t uiStart, std::uint32_t uiLength)
     {
         if (uiLength < 1)
             return;
-        uint uiLast = uiStart + uiLength - 1;
+        std::uint32_t uiLast = uiStart + uiLength - 1;
 
         RemoveObscuredRanges(uiStart, uiLast);
 
         IterType iterOverlap;
         if (GetRangeOverlappingPoint(uiStart, iterOverlap))
         {
-            uint uiOverlapPrevLast = iterOverlap->second;
+            std::uint32_t uiOverlapPrevLast = iterOverlap->second;
 
             // Modify overlapping range last point
-            uint uiNewLast = uiStart - 1;
+            std::uint32_t uiNewLast = uiStart - 1;
             iterOverlap->second = uiNewLast;
 
             if (uiOverlapPrevLast > uiLast)
             {
                 // Need to add range after hole
-                uint uiNewStart = uiLast + 1;
+                std::uint32_t uiNewStart = uiLast + 1;
                 m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
             }
         }
@@ -1989,19 +2007,19 @@ namespace SharedUtil
         if (GetRangeOverlappingPoint(uiLast, iterOverlap))
         {
             // Modify overlapping range start point
-            uint uiNewStart = uiLast + 1;
-            uint uiOldLast = iterOverlap->second;
+            std::uint32_t uiNewStart = uiLast + 1;
+            std::uint32_t uiOldLast = iterOverlap->second;
             m_StartLastMap.erase(iterOverlap);
             m_StartLastMap[uiNewStart] = uiOldLast;
         }
     }
 
     // Returns true if any part of the range already exists in the map
-    bool CRanges::IsRangeSet(uint uiStart, uint uiLength)
+    bool CRanges::IsRangeSet(std::uint32_t uiStart, std::uint32_t uiLength)
     {
         if (uiLength < 1)
             return false;
-        uint uiLast = uiStart + uiLength - 1;
+        std::uint32_t uiLast = uiStart + uiLength - 1;
 
         IterType iter = m_StartLastMap.lower_bound(uiStart);
         // iter is on or after start
@@ -2026,7 +2044,7 @@ namespace SharedUtil
         return false;
     }
 
-    void CRanges::RemoveObscuredRanges(uint uiStart, uint uiLast)
+    void CRanges::RemoveObscuredRanges(std::uint32_t uiStart, std::uint32_t uiLast)
     {
         while (true)
         {
@@ -2045,22 +2063,22 @@ namespace SharedUtil
         }
     }
 
-    bool CRanges::GetRangeOverlappingPoint(uint uiPoint, IterType& result)
+    bool CRanges::GetRangeOverlappingPoint(std::uint32_t uiPoint, IterType& result)
     {
         IterType iter = m_StartLastMap.lower_bound(uiPoint);
         // iter is on or after point - So it can't overlap the point
 
-        if (iter != m_StartLastMap.begin())
-        {
-            iter--;
-            // iter is now before point
+        if (iter == m_StartLastMap.begin())
+            return false;
+            
+        iter--;
+        // iter is now before point
 
-            // If last of found range is after or at query point, then range is overlapping
-            if (iter->second >= uiPoint)
-            {
-                result = iter;
-                return true;
-            }
+        // If last of found range is after or at query point, then range is overlapping
+        if (iter->second >= uiPoint)
+        {
+            result = iter;
+            return true;
         }
         return false;
     }
@@ -2070,18 +2088,19 @@ namespace SharedUtil
 //
 // For checking MTA library module versions
 //
-MTAEXPORT void GetLibMtaVersion(char* pBuffer, uint uiMaxSize)
+MTAEXPORT void GetLibMtaVersion(char* pBuffer, std::uint32_t uiMaxSize)
 {
     SString strVersion("%d.%d.%d-%d.%05d.%d"
 #ifdef MTASA_VERSION_MAJOR
-                       ,
-                       MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD
+        ,
+        MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD
 #else
-                       ,
-                       0, 0, 0, 0, 0
+        ,
+        0, 0, 0, 0, 0
 #endif
-                       ,
-                       0);
-    uint uiLengthInclTerm = strVersion.length() + 1;
+        ,
+        0
+    );
+    std::uint32_t uiLengthInclTerm = strVersion.length() + 1;
     STRNCPY(pBuffer, *strVersion, std::max(uiLengthInclTerm, uiMaxSize));
 }

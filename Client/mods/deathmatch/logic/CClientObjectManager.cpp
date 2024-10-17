@@ -222,7 +222,7 @@ void CClientObjectManager::OnDestruction(CClientObject* pObject)
             m_uiLowLodStreamedInCount--;
         else
             m_uiStreamedInCount--;
-        ListRemove(m_StreamedIn, pObject);
+        ListRemoveAll(m_StreamedIn, pObject);
     }
     UpdateLimitInfo();
 }
@@ -334,7 +334,7 @@ void CClientObjectManager::RemoveFromLists(CClientObject* pObject)
 {
     if (m_bCanRemoveFromList)
     {
-        ListRemove(m_Objects, pObject);
+        ListRemoveAll(m_Objects, pObject);
     }
     if (ListContains(m_StreamedIn, pObject))
     {
@@ -342,7 +342,7 @@ void CClientObjectManager::RemoveFromLists(CClientObject* pObject)
             m_uiLowLodStreamedInCount--;
         else
             m_uiStreamedInCount--;
-        ListRemove(m_StreamedIn, pObject);
+        ListRemoveAll(m_StreamedIn, pObject);
     }
 }
 
