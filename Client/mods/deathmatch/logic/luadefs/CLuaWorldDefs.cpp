@@ -106,6 +106,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
                                                                              {"setTimeFrozen", ArgumentParser<SetTimeFrozen>},
                                                                              {"setVolumetricShadowsEnabled", ArgumentParser<SetVolumetricShadowsEnabled>},
+                                                                             {"setDynamicPedShadowsEnabled", ArgumentParser<SetDynamicPedShadowsEnabled>}, 
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -131,6 +132,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
                                                                              {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
                                                                              {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
+                                                                             {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},    
       
                                                                              // World check funcs
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
@@ -139,7 +141,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
                                                                              {"isGarageOpen", IsGarageOpen},
                                                                              {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
-                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>}};
+                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
+                                                                             {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -2278,3 +2281,21 @@ void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldPr
 {
     g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true)});
 }
+
+bool CLuaWorldDefs::SetDynamicPedShadowsEnabled(bool enable)
+{
+    g_pGame->GetSettings()->SetDynamicPedShadowsEnabled(enable);
+    return true;
+}
+
+bool CLuaWorldDefs::IsDynamicPedShadowsEnabled() noexcept
+{
+    return g_pGame->GetSettings()->IsDynamicPedShadowsEnabled();
+}
+
+bool CLuaWorldDefs::ResetDynamicPedShadows() noexcept
+{
+    return g_pGame->GetSettings()->ResetDynamicPedShadows();
+}
+
+

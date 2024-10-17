@@ -5459,6 +5459,7 @@ void CClientGame::ResetMapInfo()
     // Reset Frozen Time
     g_pGame->GetClock()->ResetTimeFrozen();
     g_pGame->GetSettings()->ResetVolumetricShadows();
+    g_pGame->GetSettings()->ResetDynamicPedShadows();
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);

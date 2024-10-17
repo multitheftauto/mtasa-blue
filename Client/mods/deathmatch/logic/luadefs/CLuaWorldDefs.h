@@ -140,6 +140,9 @@ public:
     static bool ResetVolumetricShadows() noexcept;
     
     static void ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept;
-    
+
+    static bool SetDynamicPedShadowsEnabled(bool enable);
+    static bool IsDynamicPedShadowsEnabled() noexcept;
+    static bool ResetDynamicPedShadows() noexcept;
 };
 
