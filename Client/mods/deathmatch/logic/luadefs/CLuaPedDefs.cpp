@@ -115,6 +115,7 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedDucked", IsPedDucked},
         {"isPedDead", IsPedDead},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
+        {"killPedTask", ArgumentParser<killPedTask>},
     };
 
     // Add functions
@@ -2492,4 +2493,18 @@ bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehi
 bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
 {
     return pPed->ExitVehicle();
+}
+
+bool CLuaPedDefs::killPedTask(CClientPed* ped, std::string taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept
+{
+    if (taskType == "primary")            // PRIMARY 
+    {
+        return ped->KillTask(taskNumber, gracefully.value_or(true));
+    }
+    else if (taskType == "secondary")     // SECONDARY 
+    {
+        return ped->KillTaskSecondary(taskNumber, gracefully.value_or(true));
+    }
+ 
+    return false; 
 }
