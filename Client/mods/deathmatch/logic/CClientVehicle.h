@@ -543,6 +543,8 @@ public:
     bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
     bool ResetDummyPositions();
 
+    bool SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);
+
     CVector GetEntryPoint(std::uint32_t entryPointIndex);
 
 protected:
