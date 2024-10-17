@@ -1615,9 +1615,14 @@ bool CStaticFunctionDefinitions::SetRadioChannel(unsigned char& ucChannel)
     return m_pPlayerManager->GetLocalPlayer()->SetCurrentRadioChannel(ucChannel);
 }
 
+std::uint8_t CStaticFunctionDefinitions::GetRadioChannel() noexcept
+{
+    return m_pPlayerManager->GetLocalPlayer()->GetCurrentRadioChannel();
+}
+
 bool CStaticFunctionDefinitions::GetRadioChannel(unsigned char& ucChannel)
 {
-    ucChannel = m_pPlayerManager->GetLocalPlayer()->GetCurrentRadioChannel();
+    ucChannel = GetRadioChannel();
     return true;
 }
 
@@ -4580,9 +4585,14 @@ bool CStaticFunctionDefinitions::SetAmbientSoundEnabled(eAmbientSoundType eType,
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsAmbientSoundEnabled(eAmbientSoundType eType, bool& bOutMute)
+bool CStaticFunctionDefinitions::IsAmbientSoundEnabled(eAmbientSoundType eType) noexcept
 {
-    bOutMute = g_pGame->GetAudioEngine()->IsAmbientSoundEnabled(eType);
+    return g_pGame->GetAudioEngine()->IsAmbientSoundEnabled(eType);
+}
+
+bool CStaticFunctionDefinitions::IsAmbientSoundEnabled(eAmbientSoundType eType, bool& bOutMute) noexcept
+{
+    bOutMute = IsAmbientSoundEnabled(eType);
     return true;
 }
 
@@ -4598,9 +4608,14 @@ bool CStaticFunctionDefinitions::SetWorldSoundEnabled(uint uiGroup, uint uiIndex
     return true;
 }
 
+bool CStaticFunctionDefinitions::IsWorldSoundEnabled(std::uint32_t uiGroup, std::uint32_t uiIndex) noexcept
+{
+    return g_pGame->GetAudioEngine()->IsWorldSoundEnabled(uiGroup, uiIndex);
+}
+
 bool CStaticFunctionDefinitions::IsWorldSoundEnabled(uint uiGroup, uint uiIndex, bool& bOutMute)
 {
-    bOutMute = g_pGame->GetAudioEngine()->IsWorldSoundEnabled(uiGroup, uiIndex);
+    bOutMute = IsWorldSoundEnabled(uiGroup, uiIndex);
     return true;
 }
 
@@ -4610,37 +4625,60 @@ bool CStaticFunctionDefinitions::ResetWorldSounds()
     return true;
 }
 
-bool CStaticFunctionDefinitions::PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop,
-                                         CClientSound*& outSound)
+CClientSound* CStaticFunctionDefinitions::PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop) noexcept
 {
     CClientSound* pSound = m_pSoundManager->PlayGTASFX(containerIndex, iBankIndex, iAudioIndex, bLoop);
-    if (pSound)
-    {
-        pSound->SetParent(pResource->GetResourceDynamicEntity());
+    if (!pSound)
+        return nullptr;
 
-        outSound = pSound;
-        return true;
-    }
-    return false;
+    pSound->SetParent(pResource->GetResourceDynamicEntity());
+    return pSound;
+}
+
+bool CStaticFunctionDefinitions::PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop,
+                                         CClientSound*& outSound) noexcept
+{
+    CClientSound* pSound = PlaySFX(pResource, containerIndex, iBankIndex, iAudioIndex, bLoop);
+    if (!pSound)
+        return false;
+
+    outSound = pSound;
+    return true;
+}
+
+CClientSound* CStaticFunctionDefinitions::PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex,
+                                                    const CVector& vecPosition, bool bLoop) noexcept
+{
+    CClientSound* pSound = m_pSoundManager->PlayGTASFX3D(containerIndex, iBankIndex,
+        iAudioIndex, vecPosition, bLoop
+    );
+    if (!pSound)
+        return nullptr;
+
+    pSound->SetParent(pResource->GetResourceDynamicEntity());
+    return pSound;
 }
 
 bool CStaticFunctionDefinitions::PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition,
-                                           bool bLoop, CClientSound*& outSound)
+                                           bool bLoop, CClientSound*& outSound) noexcept
 {
-    CClientSound* pSound = m_pSoundManager->PlayGTASFX3D(containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop);
-    if (pSound)
-    {
-        pSound->SetParent(pResource->GetResourceDynamicEntity());
+    CClientSound* pSound = PlaySFX3D(pResource, containerIndex, iBankIndex, iAudioIndex,
+        vecPosition, bLoop
+    );
+    if (!pSound)
+        return false;
 
-        outSound = pSound;
-        return true;
-    }
-    return false;
+    outSound = pSound;
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetSFXStatus(eAudioLookupIndex containerIndex) noexcept {
+    return m_pSoundManager->GetSFXStatus(containerIndex);
 }
 
 bool CStaticFunctionDefinitions::GetSFXStatus(eAudioLookupIndex containerIndex, bool& bOutNotCut)
 {
-    bOutNotCut = m_pSoundManager->GetSFXStatus(containerIndex);
+    bOutNotCut = GetSFXStatus(containerIndex);
     return true;
 }
 
@@ -8007,50 +8045,96 @@ bool CStaticFunctionDefinitions::SetSoundPosition(CClientPlayer& Player, double 
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetSoundPosition(std::variant<CClientSound*, CClientPlayer*>& element, double dPosition) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return SetSoundPosition(*std::get<CClientSound*>(element), dPosition);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return SetSoundPosition(*std::get<CClientPlayer*>(element), dPosition);
+}
+
+double CStaticFunctionDefinitions::GetSoundPosition(CClientSound& Sound) noexcept
+{
+    return Sound.GetPlayPosition();
+}
+
 bool CStaticFunctionDefinitions::GetSoundPosition(CClientSound& Sound, double& dPosition)
 {
-    dPosition = Sound.GetPlayPosition();
+    dPosition = GetSoundPosition(Sound);
     return true;
+}
+
+std::optional<double> CStaticFunctionDefinitions::GetSoundPosition(CClientPlayer& Player) noexcept
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice();
+    if (!pVoice)
+        return std::nullopt;
+
+    return pVoice->GetPlayPosition();
 }
 
 bool CStaticFunctionDefinitions::GetSoundPosition(CClientPlayer& Player, double& dPosition)
 {
-    dPosition = 0.0;
-    CClientPlayerVoice* pVoice = Player.GetVoice();
-    if (pVoice != NULL)
-    {
-        dPosition = pVoice->GetPlayPosition();
-        return true;
-    }
-    return false;
+    std::optional<double> pos = GetSoundPosition(Player);
+    dPosition = pos.value_or(0.0);
+    return pos.has_value();
+}
+
+double CStaticFunctionDefinitions::GetSoundPosition(std::variant<CClientSound*, CClientPlayer*>& element) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundPosition(*std::get<CClientSound*>(element));
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundPosition(*std::get<CClientPlayer*>(element)).value_or(0.0);
+}
+
+double CStaticFunctionDefinitions::GetSoundLength(CClientSound& Sound) noexcept {
+    return Sound.GetLength();
 }
 
 bool CStaticFunctionDefinitions::GetSoundLength(CClientSound& Sound, double& dLength)
 {
-    dLength = Sound.GetLength();
+    dLength = GetSoundLength(Sound);
     return true;
+}
+
+std::optional<double> CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player) noexcept
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice();
+    if (!pVoice)
+        return std::nullopt;
+
+    return pVoice->GetLength();
 }
 
 bool CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player, double& dLength)
 {
-    dLength = 0.0;
-    CClientPlayerVoice* pVoice = Player.GetVoice();
-    if (pVoice != NULL)
-    {
-        dLength = pVoice->GetLength();
-        return true;
-    }
-    return false;
+    auto pos = GetSoundLength(Player);
+    dLength = pos.value_or(0.0);
+    return pos.has_value();
+}
+
+double CStaticFunctionDefinitions::GetSoundLength(std::variant<CClientSound*, CClientPlayer*>& element) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundLength(*std::get<CClientSound*>(element));
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundLength(*std::get<CClientPlayer*>(element)).value_or(0.0);
+}
+
+std::optional<double> CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound) noexcept
+{
+    if (!Sound.IsSoundStream())
+        return std::nullopt;
+
+    return Sound.GetBufferLength();
 }
 
 bool CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound, double& dBufferLength)
 {
-    if (Sound.IsSoundStream())
-    {
-        dBufferLength = Sound.GetBufferLength();
-        return true;
-    }
-    return false;
+    auto length = GetSoundBufferLength(Sound);
+    dBufferLength = length.value_or(0.0);
+    return length.has_value();
 }
 
 bool CStaticFunctionDefinitions::SetSoundPaused(CClientSound& Sound, bool bPaused)
@@ -8070,21 +8154,50 @@ bool CStaticFunctionDefinitions::SetSoundPaused(CClientPlayer& Player, bool bPau
     return false;
 }
 
-bool CStaticFunctionDefinitions::IsSoundPaused(CClientSound& Sound, bool& bPaused)
+bool CStaticFunctionDefinitions::SetSoundPaused(std::variant<CClientSound*, CClientPlayer*>& element, bool bPaused) noexcept
 {
-    bPaused = Sound.IsPaused();
+    if (std::holds_alternative<CClientSound*>(element)) {
+        return SetSoundPaused(*std::get<CClientSound*>(element), bPaused);
+    }
+    else if (std::holds_alternative<CClientPlayer*>(element))
+    {
+        return SetSoundPaused(*std::get<CClientPlayer*>(element), bPaused);
+    }
+}
+
+bool CStaticFunctionDefinitions::IsSoundPaused(CClientSound& Sound) noexcept
+{
+    return Sound.IsPaused();
+}
+
+bool CStaticFunctionDefinitions::IsSoundPaused(CClientSound& Sound, bool& bPaused) noexcept
+{
+    bPaused = IsSoundPaused(Sound);
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsSoundPaused(CClientPlayer& Player, bool& bPaused)
+std::optional<bool> CStaticFunctionDefinitions::IsSoundPaused(CClientPlayer& Player) noexcept
 {
     CClientPlayerVoice* pVoice = Player.GetVoice();
-    if (pVoice != NULL)
-    {
-        bPaused = pVoice->IsPaused();
-        return true;
-    }
-    return false;
+    if (!pVoice)
+        return std::nullopt;
+
+    return pVoice->IsPaused();
+}
+
+bool CStaticFunctionDefinitions::IsSoundPaused(CClientPlayer& Player, bool& bPaused) noexcept
+{
+    auto pVoice = IsSoundPaused(Player);
+    bPaused = pVoice.value_or(false);
+    return pVoice.has_value();
+}
+
+bool CStaticFunctionDefinitions::IsSoundPaused(std::variant<CClientSound*, CClientPlayer*>& element) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return IsSoundPaused(*std::get<CClientSound*>(element));
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return IsSoundPaused(*std::get<CClientPlayer*>(element)).value_or(false);
 }
 
 bool CStaticFunctionDefinitions::SetSoundVolume(CClientSound& Sound, float fVolume)
@@ -8104,22 +8217,46 @@ bool CStaticFunctionDefinitions::SetSoundVolume(CClientPlayer& Player, float fVo
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetSoundVolume(CClientSound& Sound, float& fVolume)
+bool CStaticFunctionDefinitions::SetSoundVolume(std::variant<CClientSound*, CClientPlayer*>& element, float fVolume) noexcept
 {
-    fVolume = Sound.GetVolume();
+    if (std::holds_alternative<CClientSound*>(element))
+        return SetSoundVolume(*std::get<CClientSound*>(element), fVolume);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return SetSoundVolume(*std::get<CClientPlayer*>(element), fVolume);
+}
+
+float CStaticFunctionDefinitions::GetSoundVolume(CClientSound& Sound) noexcept
+{
+    return Sound.GetVolume();
+}
+
+bool CStaticFunctionDefinitions::GetSoundVolume(CClientSound& Sound, float& fVolume) noexcept
+{
+    fVolume = GetSoundVolume(Sound);
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetSoundVolume(CClientPlayer& Player, float& fVolume)
-{
-    fVolume = 0.0f;
+std::optional<float> CStaticFunctionDefinitions::GetSoundVolume(CClientPlayer& Player) noexcept {
     CClientPlayerVoice* pVoice = Player.GetVoice();
-    if (pVoice != NULL)
-    {
-        fVolume = pVoice->GetVolume();
-        return true;
-    }
-    return false;
+    if (!pVoice)
+        return std::nullopt;
+
+    return pVoice->GetVolume();
+}
+
+bool CStaticFunctionDefinitions::GetSoundVolume(CClientPlayer& Player, float& fVolume) noexcept
+{
+    auto volume = GetSoundVolume(Player);
+    fVolume = volume.value_or(0.0);
+    return volume.has_value();
+}
+
+float CStaticFunctionDefinitions::GetSoundVolume(std::variant<CClientSound*, CClientPlayer*>& element) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundVolume(*std::get<CClientSound*>(element));
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundVolume(*std::get<CClientPlayer*>(element)).value_or(0.0);
 }
 
 bool CStaticFunctionDefinitions::SetSoundSpeed(CClientSound& Sound, float fSpeed)
@@ -8137,6 +8274,14 @@ bool CStaticFunctionDefinitions::SetSoundSpeed(CClientPlayer& Player, float fSpe
         return true;
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*>& element, float fSpeed) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return SetSoundSpeed(*std::get<CClientSound*>(element), fSpeed);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return SetSoundSpeed(*std::get<CClientPlayer*>(element), fSpeed);
 }
 
 bool CStaticFunctionDefinitions::SetSoundProperties(CClientSound& Sound, float fSampleRate, float fTempo, float fPitch, bool bReversed)
@@ -8270,6 +8415,15 @@ float* CStaticFunctionDefinitions::GetSoundFFTData(CClientPlayer& Player, int iL
     }
     return NULL;
 }
+
+float* CStaticFunctionDefinitions::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*>& element, int iLength, int iBands) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundFFTData(*std::get<CClientSound*>(element), iLength, iBands);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundFFTData(*std::get<CClientPlayer*>(element), iLength, iBands);
+}
+
 float* CStaticFunctionDefinitions::GetSoundWaveData(CClientSound& Sound, int iLength)
 {
     return Sound.GetWaveData(iLength);
@@ -8283,6 +8437,14 @@ float* CStaticFunctionDefinitions::GetSoundWaveData(CClientPlayer& Player, int i
         return pVoice->GetWaveData(iLength);
     }
     return NULL;
+}
+
+float* CStaticFunctionDefinitions::GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*>& element, int iLength) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundWaveData(*std::get<CClientSound*>(element), iLength);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundWaveData(*std::get<CClientPlayer*>(element), iLength);
 }
 
 bool CStaticFunctionDefinitions::IsSoundPanEnabled(CClientSound& Sound)
@@ -8316,27 +8478,55 @@ bool CStaticFunctionDefinitions::GetSoundLevelData(CClientPlayer& Player, DWORD&
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*>& element, DWORD& dwLeft, DWORD& dwRight) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundLevelData(*std::get<CClientSound*>(element), dwLeft, dwRight);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundLevelData(*std::get<CClientPlayer*>(element), dwLeft, dwRight);
+}
+
+float CStaticFunctionDefinitions::GetSoundBPM(CClientSound& Sound) noexcept {
+    return Sound.GetSoundBPM();
+}
+
 bool CStaticFunctionDefinitions::GetSoundBPM(CClientSound& Sound, float& fBPM)
 {
-    fBPM = Sound.GetSoundBPM();
+    fBPM = GetSoundBPM(Sound);
     return fBPM != 0.0f;
 }
 
-bool CStaticFunctionDefinitions::GetSoundSpeed(CClientSound& Sound, float& fSpeed)
+float CStaticFunctionDefinitions::GetSoundSpeed(CClientSound& Sound) noexcept {
+    return Sound.GetPlaybackSpeed();
+}
+
+bool CStaticFunctionDefinitions::GetSoundSpeed(CClientSound& Sound, float& fSpeed) noexcept
 {
-    fSpeed = Sound.GetPlaybackSpeed();
+    fSpeed = GetSoundSpeed(Sound);
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetSoundSpeed(CClientPlayer& Player, float& fSpeed)
+std::optional<float> CStaticFunctionDefinitions::GetSoundSpeed(CClientPlayer& Player) noexcept
 {
     CClientPlayerVoice* pVoice = Player.GetVoice();
-    if (pVoice != NULL)
-    {
-        fSpeed = pVoice->GetPlaybackSpeed();
-        return true;
-    }
-    return false;
+    if (!pVoice)
+        return std::nullopt;
+    return pVoice->GetPlaybackSpeed();
+}
+
+bool CStaticFunctionDefinitions::GetSoundSpeed(CClientPlayer& Player, float& fSpeed) noexcept
+{
+    auto speed = GetSoundSpeed(Player);
+    fSpeed = speed.value_or(0.0);
+    return speed.has_value();
+}
+
+float CStaticFunctionDefinitions::GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*>& element) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundSpeed(*std::get<CClientSound*>(element));
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundSpeed(*std::get<CClientPlayer*>(element)).value_or(0.0);
 }
 
 bool CStaticFunctionDefinitions::SetSoundMinDistance(CClientSound& Sound, float fDistance)
@@ -8345,9 +8535,14 @@ bool CStaticFunctionDefinitions::SetSoundMinDistance(CClientSound& Sound, float 
     return true;
 }
 
+float CStaticFunctionDefinitions::GetSoundMinDistance(CClientSound& Sound) noexcept
+{
+    return Sound.GetMinDistance();
+}
+
 bool CStaticFunctionDefinitions::GetSoundMinDistance(CClientSound& Sound, float& fDistance)
 {
-    fDistance = Sound.GetMinDistance();
+    fDistance = GetSoundMinDistance(Sound);
     return true;
 }
 
@@ -8357,9 +8552,13 @@ bool CStaticFunctionDefinitions::SetSoundMaxDistance(CClientSound& Sound, float 
     return true;
 }
 
+float CStaticFunctionDefinitions::GetSoundMaxDistance(CClientSound& Sound) noexcept {
+    return Sound.GetMaxDistance();
+}
+
 bool CStaticFunctionDefinitions::GetSoundMaxDistance(CClientSound& Sound, float& fDistance)
 {
-    fDistance = Sound.GetMaxDistance();
+    fDistance = GetSoundMaxDistance(Sound);
     return true;
 }
 
@@ -8394,6 +8593,15 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled(CClientPlayer& Player, co
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetSoundEffectEnabled(std::variant<CClientSound*, CClientPlayer*>& element, const SString& strEffectName,
+                                                       bool bEnable) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return SetSoundEffectEnabled(*std::get<CClientSound*>(element), strEffectName, bEnable);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return SetSoundEffectEnabled(*std::get<CClientPlayer*>(element), strEffectName, bEnable);
+}
+
 bool CStaticFunctionDefinitions::SetSoundPan(CClientPlayer& Player, float fPan)
 {
     CClientPlayerVoice* pVoice = Player.GetVoice();
@@ -8403,6 +8611,25 @@ bool CStaticFunctionDefinitions::SetSoundPan(CClientPlayer& Player, float fPan)
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetSoundPan(std::variant<CClientSound*, CClientPlayer*>& element, float fPan) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return SetSoundPan(*std::get<CClientSound*>(element), fPan);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return SetSoundPan(*std::get<CClientPlayer*>(element), fPan);
+}
+
+std::optional<float> CStaticFunctionDefinitions::GetSoundPan(CClientPlayer& Player) noexcept
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice();
+    if (!pVoice)
+        return std::nullopt;
+
+    float fPan;
+    pVoice->GetPan(fPan);
+    return fPan;
+}
+
 bool CStaticFunctionDefinitions::GetSoundPan(CClientPlayer& Player, float& fPan)
 {
     CClientPlayerVoice* pVoice = Player.GetVoice();
@@ -8410,6 +8637,14 @@ bool CStaticFunctionDefinitions::GetSoundPan(CClientPlayer& Player, float& fPan)
         return pVoice->GetPan(fPan);
 
     return false;
+}
+
+float CStaticFunctionDefinitions::GetSoundPan(std::variant<CClientSound*, CClientPlayer*>& element) noexcept
+{
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundPan(*std::get<CClientSound*>(element));
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundPan(*std::get<CClientPlayer*>(element)).value_or(0.0);
 }
 
 /** Version functions **/
@@ -9964,6 +10199,15 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CClientPed* pPed)
 bool CStaticFunctionDefinitions::SetSoundPan(CClientSound& pSound, float fPan)
 {
     return pSound.SetPan(fPan);
+}
+
+float CStaticFunctionDefinitions::GetSoundPan(CClientSound& pSound) noexcept
+{
+    // TODO: Refactor .GetPad method so it will return a float instead of
+    // taking a lvalue parameter
+    float fPan;
+    pSound.GetPan(fPan);
+    return fPan;
 }
 
 bool CStaticFunctionDefinitions::GetSoundPan(CClientSound& pSound, float& fPan)
