@@ -114,8 +114,9 @@ public:
 
     void Delete(uint index) { Release(index); }
 
-    bool IsEmpty(std::int32_t objectIndex) { return m_byteMap[objectIndex].bEmpty; }
-    bool IsContains(uint index)
+    std::int32_t Size() const noexcept { return m_nSize; };
+    bool IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
+    bool IsContains(uint index) const
     {
         if (m_nSize <= index)
             return false;

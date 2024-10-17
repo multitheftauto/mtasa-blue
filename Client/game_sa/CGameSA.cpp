@@ -441,7 +441,7 @@ void CGameSA::Reset()
         CModelInfoSA::StaticResetTextureDictionaries();
 
         // Restore default world state
-        RestoreGameBuildings();
+        RestoreGameWorld();
     }
 }
 
@@ -1007,46 +1007,45 @@ void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
     m_pRenderWare->GetShaderReplacementStats(outStats);
 }
 
-void CGameSA::RemoveAllBuildings()
+void CGameSA::RemoveGameWorld()
 {
     m_pIplStore->SetDynamicIplStreamingEnabled(false);
 
-    m_pPools->GetDummyPool().RemoveAllBuildingLods();
-    m_pPools->GetBuildingsPool().RemoveAllBuildings();
+    m_pCoverManager->RemoveAllCovers();
+    m_pPlantManager->RemoveAllPlants();
 
-    auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
-    pBuildingRemoval->DropCaches();
+    // Remove all shadows in CStencilShadowObjects::dtorAll
+    ((void* (*)())0x711390)();
 
-    m_isBuildingsRemoved = true;
+    m_pPools->GetDummyPool().RemoveAllWithBackup();
+    m_pPools->GetBuildingsPool().RemoveAllWithBackup();
+
+    static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
+
+    m_isGameWorldRemoved = true;
 }
 
-void CGameSA::RestoreGameBuildings()
+void CGameSA::RestoreGameWorld()
 {
-    m_pPools->GetBuildingsPool().RestoreAllBuildings();
-    m_pPools->GetDummyPool().RestoreAllBuildingsLods();
+    m_pPools->GetBuildingsPool().RestoreBackup();
+    m_pPools->GetDummyPool().RestoreBackup();
 
     m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
-    m_isBuildingsRemoved = false;
+    m_isGameWorldRemoved = false;
 }
 
 bool CGameSA::SetBuildingPoolSize(size_t size)
 {
-    const bool shouldRemoveBuilding = !m_isBuildingsRemoved;
-    if (shouldRemoveBuilding)
-    {
-        RemoveAllBuildings();
-    }
+    const bool shouldRemoveWorld = !m_isGameWorldRemoved;
+    if (shouldRemoveWorld)
+        RemoveGameWorld();
     else
-    {
         static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
-    }
 
     bool status = m_pPools->GetBuildingsPool().Resize(size);
 
-    if (shouldRemoveBuilding)
-    {
-        RestoreGameBuildings();
-    }
+    if (shouldRemoveWorld)
+        RestoreGameWorld();
 
     return status;
 }

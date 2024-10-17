@@ -202,6 +202,9 @@ public:
     // Functions to hide member variable misuse
     //
 
+    void SetLod(CEntitySAInterface* pLod) noexcept { m_pLod = pLod; };
+    CEntitySAInterface* GetLod() const noexcept { return m_pLod; };
+
     // Sets
     void SetIsLowLodEntity() { numLodChildrenRendered = 0x40; }
 
@@ -243,9 +246,16 @@ public:
         ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
     };
 
+    void RemoveRWObjectWithReferencesCleanup() {
+        DeleteRwObject();
+        ResolveReferences();
+        RemoveShadows();
+    }
+
     bool HasMatrix() const noexcept { return Placeable.matrix != nullptr; }
 
     void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
+
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
