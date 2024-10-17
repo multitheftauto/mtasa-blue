@@ -692,6 +692,8 @@ public:
     static void SetVehiclesSunGlareEnabled(bool bEnabled);
     static bool GetVehiclesSunGlareEnabled();
 
+    bool  SetSmoke(bool state);
+
 private:
     static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
 

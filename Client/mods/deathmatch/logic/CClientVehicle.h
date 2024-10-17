@@ -547,6 +547,8 @@ public:
 
     CVector GetEntryPoint(std::uint32_t entryPointIndex);
 
+    bool SetPlaneSmoke(bool state);
+
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);
     void ConvertComponentPositionBase(const SString& vehicleComponent, CVector& vecInOutPosition, EComponentBaseType inputBase, EComponentBaseType outputBase);
