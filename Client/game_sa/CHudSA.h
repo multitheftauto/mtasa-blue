@@ -38,6 +38,8 @@
 
 #define CODE_ShowMoney              0x58F47D
 
+#define VAR_CTheScripts_bDrawCrossHair 0xA44490
+
 struct SHudComponent
 {
     bool          bIsPartOfAll;
@@ -59,6 +61,7 @@ public:
     bool IsComponentVisible(eHudComponent component);
     void AdjustComponents(float fAspectRatio);
     void ResetComponentAdjustment();
+    bool IsCrosshairVisible();
 
 protected:
     void InitComponentList();

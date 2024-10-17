@@ -111,6 +111,49 @@ enum eVehicleType
     VEHICLE_TRAILER
 };
 
+enum class eCarNodes
+{
+    NONE = 0,
+    CHASSIS,
+    WHEEL_RF,
+    WHEEL_RM,
+    WHEEL_RB,
+    WHEEL_LF,
+    WHEEL_LM,
+    WHEEL_LB,
+    DOOR_RF,
+    DOOR_RR,
+    DOOR_LF,
+    DOOR_LR,
+    BUMP_FRONT,
+    BUMP_REAR,
+    WING_RF,
+    WING_LF,
+    BONNET,
+    BOOT,
+    WINDSCREEN,
+    EXHAUST,
+    MISC_A,
+    MISC_B,
+    MISC_C,
+    MISC_D,
+    MISC_E,
+
+    NUM_NODES
+};
+
+enum class eCarComponentCollisionTypes
+{
+    COL_NODE_BUMPER = 0,
+    COL_NODE_WHEEL,
+    COL_NODE_DOOR,
+    COL_NODE_BONNET,
+    COL_NODE_BOOT,
+    COL_NODE_PANEL,
+
+    COL_NODES_NUM
+};
+
 #define SIREN_TYPE_FIRST 1
 #define SIREN_TYPE_LAST 6
 #define SIREN_ID_MAX 7

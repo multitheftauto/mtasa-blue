@@ -230,7 +230,12 @@ public:
     int                              iMoveAnimGroup;            // 1236
     BYTE                             bPad4b[52];
     CPedIKSAInterface                pedIK;            // 1292 (length 32 bytes)
-    int                              bPad5[5];
+
+    std::uint32_t                    field_52C;
+    ePedState                        pedState;
+    eMoveState                       moveState;
+    eMoveState                       swimmingMoveState;
+    std::uint32_t                    field_53C;
 
     float fHealth;
     int   iUnknown121;
@@ -258,7 +263,9 @@ public:
     // weapons at +1440 ends at +1804
     BYTE                bPad4[12];
     BYTE                bCurrentWeaponSlot;            // is actually here
-    BYTE                bPad6[20];
+    BYTE                bPad6[3];
+    CEntitySAInterface* pTargetedObject;
+    BYTE                tempPad[13];
     BYTE                bFightingStyle;            // 1837
     BYTE                bFightingStyleExtra;
     BYTE                bPad7[1];
@@ -407,6 +414,9 @@ public:
     void*                   GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
     std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
     static void             StaticSetHooks();
+
+    CEntitySAInterface* GetTargetedObject() { return GetPedInterface()->pTargetedObject; }
+    ePedState           GetPedState() { return GetPedInterface()->pedState; }
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 };

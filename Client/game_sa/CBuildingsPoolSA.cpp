@@ -151,6 +151,9 @@ void CBuildingsPoolSA::RemoveAllBuildings()
 
             RemoveBuildingFromWorld(building);
 
+            if (building->HasMatrix())
+                building->RemoveMatrix();
+
             pBuildsingsPool->Release(i);
 
             (*m_pOriginalBuildingsBackup)[i].first = true;
