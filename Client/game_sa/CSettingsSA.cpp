@@ -323,7 +323,7 @@ bool CSettingsSA::GetDynamicPedShadowsEnabledByVideoSetting() const noexcept
     return volumetricShadow;
 }
 
-bool CSettingsSA::ResetDynamicPedShadows() const noexcept
+bool CSettingsSA::ResetDynamicPedShadows() noexcept
 {
     pGame->GetSettings()->SetDynamicPedShadowsEnabled(pGame->GetSettings()->GetDynamicPedShadowsEnabledByVideoSetting());
     return true;
