@@ -90,6 +90,8 @@ public:
 
     const auto& GetExportedFunctions() const noexcept { return m_exportedFunctions; }
 
+    std::list<CResourceFile*>&          GetResourceFiles() noexcept { return m_ResourceFiles; }
+    const std::list<CResourceFile*>&    GetResourceFiles() const noexcept { return m_ResourceFiles; }
     std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
 

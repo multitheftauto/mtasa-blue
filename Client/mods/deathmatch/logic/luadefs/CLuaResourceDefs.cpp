@@ -16,7 +16,8 @@ using std::list;
 
 void CLuaResourceDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         {"call", Call},
         {"getThisResource", GetThisResource},
         {"getResourceConfig", GetResourceConfig},
@@ -29,6 +30,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceState", GetResourceState},
         {"loadstring", LoadString},
         {"load", Load},
+        {"getResourceFiles", ArgumentParser<GetResourceFiles>},
     };
 
     // Add functions
@@ -52,6 +54,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot");
     lua_classfunction(luaVM, "getExportedFunctions", "getResourceExportedFunctions");
     lua_classfunction(luaVM, "getState", "getResourceState");
+    lua_classfunction(luaVM, "getFiles", "getResourceFiles");
 
     lua_classvariable(luaVM, "config", NULL, "getResourceConfig");
     lua_classvariable(luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot");
@@ -60,6 +63,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "state", NULL, "getResourceState");
     lua_classvariable(luaVM, "name", NULL, "getResourceName");
     lua_classvariable(luaVM, "rootElement", NULL, "getResourceRootElement");
+    lua_classvariable(luaVM, "files", nullptr, "getResourceFiles");
 
     lua_registerclass(luaVM, "Resource");
 }
@@ -544,4 +548,33 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::vector<std::string> CLuaResourceDefs::GetResourceFiles(lua_State* luaVM, std::optional<CResourceFile::eResourceCategory> type,
+                                                            std::optional<CResource*> resource) noexcept
+{
+    using eResourceCategory = CResourceFile::eResourceCategory;
+
+    if (!type)
+        type = eResourceCategory::ALL;
+
+    if (!resource)
+        resource = &lua_getownerresource(luaVM);
+
+    const auto resourceFiles = (*resource)->GetResourceFiles();
+
+    std::unordered_set<std::string> files;
+    for (const auto& file : resourceFiles)
+    {
+        if (file->GetResourceCategoryType() != type.value() && type.value() != eResourceCategory::ALL)
+            continue;
+        files.insert(file->GetName());
+    }
+
+    // TODO: Upgrade ArgumentParser so it would accept
+    // std::set and std::unordered_set as return values
+    return std::vector<std::string>(
+        std::make_move_iterator(files.begin()),
+        std::make_move_iterator(files.end())
+    );
 }

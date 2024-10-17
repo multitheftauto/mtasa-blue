@@ -45,6 +45,7 @@ CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName
     m_pElementGroup = nullptr;
     m_iDimension = iDimension;
     m_type = RESOURCE_FILE_TYPE_MAP;
+    m_resourceCategoryType = eResourceCategory::MAPS;
     m_pMapElement = nullptr;
 }
 

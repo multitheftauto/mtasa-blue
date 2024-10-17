@@ -285,6 +285,14 @@ ADD_ENUM(ESyncType::LOCAL, "local")
 ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
 IMPLEMENT_ENUM_CLASS_END("sync-mode")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(CResourceFile::eResourceCategory)
+ADD_ENUM(CResourceFile::eResourceCategory::ALL, "all")
+ADD_ENUM(CResourceFile::eResourceCategory::CONFIGS, "config")
+ADD_ENUM(CResourceFile::eResourceCategory::FILES, "file")
+ADD_ENUM(CResourceFile::eResourceCategory::MAPS, "map")
+ADD_ENUM(CResourceFile::eResourceCategory::SCRIPTS, "script")
+IMPLEMENT_ENUM_CLASS_END("resource-category-type")
+
 //
 // CResource from userdata
 //

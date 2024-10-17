@@ -22,6 +22,7 @@ CResourceClientFileItem::CResourceClientFileItem(CResource* resource, const char
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)
 {
     m_type = RESOURCE_FILE_TYPE_CLIENT_FILE;
+    m_resourceCategoryType = eResourceCategory::FILES;
     m_bClientAutoDownload = bClientAutoDownload;
 }
 

@@ -69,4 +69,7 @@ public:
 
     LUA_DECLARE(LoadString);
     LUA_DECLARE(Load);
+
+    static std::vector<std::string> GetResourceFiles(lua_State* luaVM, std::optional<CResourceFile::eResourceCategory> type,
+                                                     std::optional<CResource*> resource) noexcept;
 };

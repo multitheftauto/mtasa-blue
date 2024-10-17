@@ -25,6 +25,7 @@ CResourceClientScriptItem::CResourceClientScriptItem(CResource* resource, const 
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)
 {
     m_type = RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+    m_resourceCategoryType = eResourceCategory::SCRIPTS;
 
     // Check if this file should be cached by the client
     if (MapGet(m_attributeMap, "protected") == "true" || MapGet(m_attributeMap, "cache") == "false")
