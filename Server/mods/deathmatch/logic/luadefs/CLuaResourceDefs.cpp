@@ -56,7 +56,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceLoadTime", getResourceLoadTime},
         {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceRootElement", getResourceRootElement},
-        {"getResourceDynamicElementRoot", getResourceDynamicElementRoot},
+        {"getResourceDynamicElementRoot", ArgumentParser<GetResourceDynamicElementRoot>},
         {"getResourceMapRootElement", getResourceMapRootElement},
         {"getResourceExportedFunctions", getResourceExportedFunctions},
         {"getResourceOrganizationalPath", getResourceOrganizationalPath},
@@ -954,49 +954,16 @@ int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::getResourceDynamicElementRoot(lua_State* luaVM)
+CElement* CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM, std::optional<CResource*> resource)
 {
-    CResource* pResource;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource, NULL);
-
-    if (!argStream.HasErrors())
+    CResource* targetResource = resource.value_or(&lua_getownerresource(luaVM));
+    if (!targetResource->IsActive())
     {
-        if (!pResource)
-        {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                pResource = pLuaMain->GetResource();
-            }
-
-            // No Lua VM or no assigned resource?
-            if (!pResource)
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-        }
-
-        if (pResource->IsActive())
-        {
-            CElement* pElement = pResource->GetDynamicElementRoot();
-            if (pElement)
-            {
-                lua_pushelement(luaVM, pElement);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogError(luaVM, "%s: Resource %s is not currently running", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                         pResource->GetName().c_str());
+        SString err("Resource \"%s\" is not currently running!", targetResource->GetName().c_str());
+        throw LuaFunctionError(err, false);
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return targetResource->GetDynamicElementRoot();
 }
 
 int CLuaResourceDefs::getResourceMapRootElement(lua_State* luaVM)

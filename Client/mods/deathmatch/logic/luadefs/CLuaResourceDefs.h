@@ -24,7 +24,7 @@ public:
     LUA_DECLARE(GetResourceFromName);
     LUA_DECLARE(GetResourceRootElement);
     LUA_DECLARE(GetResourceGUIElement);
-    LUA_DECLARE(GetResourceDynamicElementRoot);
+    static CClientEntity* GetResourceDynamicElementRoot(lua_State* luaVM, std::optional<CResource*> resource);
     LUA_DECLARE(GetResourceExportedFunctions);
     LUA_DECLARE(GetResourceState);
     LUA_DECLARE(LoadString);
