@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas Installer 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-26 02:25\n"
+"POT-Creation-Date: 2024-09-17 02:47\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -244,29 +244,29 @@ msgid "Editor"
 msgstr ""
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:983
+#: Shared/installer/nightly.nsi:986
 msgid "Development"
 msgstr ""
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1031
+#: Shared/installer/nightly.nsi:1034
 msgid "$(^Name) was successfully removed from your computer."
 msgstr ""
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1038
+#: Shared/installer/nightly.nsi:1041
 msgid "Uninstallation has failed!"
 msgstr ""
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1046
+#: Shared/installer/nightly.nsi:1049
 msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
 msgstr ""
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1047
+#: Shared/installer/nightly.nsi:1050
 msgid ""
 "Uninstalling before update?$\r"
 "$\n"
@@ -276,7 +276,7 @@ msgid ""
 msgstr ""
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1060
+#: Shared/installer/nightly.nsi:1063
 msgid ""
 "Would you like to keep your data files (such as resources, screenshots and "
 "server configuration)? If you click no, any resources, configurations or "
@@ -284,27 +284,27 @@ msgid ""
 msgstr ""
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1243
+#: Shared/installer/nightly.nsi:1246
 msgid "This installer requires admin access, try again"
 msgstr ""
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1244
+#: Shared/installer/nightly.nsi:1247
 msgid "This uninstaller requires admin access, try again"
 msgstr ""
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1245
+#: Shared/installer/nightly.nsi:1248
 msgid "Logon service not running, aborting!"
 msgstr ""
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1246
+#: Shared/installer/nightly.nsi:1249
 msgid "Unable to elevate"
 msgstr ""
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1842
+#: Shared/installer/nightly.nsi:1845
 msgid ""
 "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
@@ -313,7 +313,7 @@ msgid ""
 msgstr ""
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1846
+#: Shared/installer/nightly.nsi:1849
 msgid ""
 "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
@@ -322,7 +322,7 @@ msgid ""
 msgstr ""
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1849
+#: Shared/installer/nightly.nsi:1852
 msgid ""
 "The selected directory does not exist.$\n"
 "$\n"
@@ -330,7 +330,7 @@ msgid ""
 msgstr ""
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1851
+#: Shared/installer/nightly.nsi:1854
 msgid ""
 "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
@@ -338,19 +338,19 @@ msgid ""
 msgstr ""
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1969
+#: Shared/installer/nightly.nsi:1972
 msgid "Choose Install Location"
 msgstr ""
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1970
+#: Shared/installer/nightly.nsi:1973
 msgid ""
 "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} "
 "${PRODUCT_VERSION}"
 msgstr ""
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1971
+#: Shared/installer/nightly.nsi:1974
 msgid ""
 "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
@@ -359,63 +359,63 @@ msgid ""
 msgstr ""
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1973
+#: Shared/installer/nightly.nsi:1976
 msgid "Destination Folder"
 msgstr ""
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1974
+#: Shared/installer/nightly.nsi:1977
 msgid "Browse..."
 msgstr ""
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1975
+#: Shared/installer/nightly.nsi:1978
 msgid "Default"
 msgstr ""
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1976
+#: Shared/installer/nightly.nsi:1979
 msgid "Last used"
 msgstr ""
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1977
+#: Shared/installer/nightly.nsi:1980
 msgid "Custom"
 msgstr ""
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2155
+#: Shared/installer/nightly.nsi:2158
 msgid ""
 "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr ""
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2173
+#: Shared/installer/nightly.nsi:2176
 msgid ""
 "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr ""
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2174
+#: Shared/installer/nightly.nsi:2177
 msgid "Installation type:  Upgrade"
 msgstr ""
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2408
+#: Shared/installer/nightly.nsi:2411
 msgid "Online update"
 msgstr ""
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2409
+#: Shared/installer/nightly.nsi:2412
 msgid "Checking for update information"
 msgstr ""
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2410
+#: Shared/installer/nightly.nsi:2413
 msgid "Checking for installer update information..."
 msgstr ""
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2411
+#: Shared/installer/nightly.nsi:2414
 msgid "Please ensure your firewall is not blocking"
 msgstr ""

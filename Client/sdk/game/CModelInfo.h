@@ -60,6 +60,7 @@ enum class eModelInfoType : unsigned char
     VEHICLE = 6,
     PED = 7,
     LOD_ATOMIC = 8,
+    UNKNOWN = 9
 };
 
 enum eVehicleUpgradePosn
