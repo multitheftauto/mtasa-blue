@@ -1615,12 +1615,6 @@ bool CClientVehicle::SetRotorSpeed(float fSpeed)
     }
 }
 
-bool CClientVehicle::SetPlaneSmoke(bool state)
-{
-    if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
-       return m_pVehicle->SetSmoke(state);
-}
-
 bool CClientVehicle::SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept
 {
     if (!m_pVehicle)

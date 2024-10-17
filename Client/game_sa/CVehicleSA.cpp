@@ -2343,14 +2343,3 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     }
     return bReturn;
 }
-
-
-bool CVehicleSA::SetSmoke(bool state)
-{
-    auto pInterface = static_cast<CPlaneSAInterface*>(GetInterface());
-
-    pInterface->m_bSmokeEjectorEnabled = state;
-
-    return true;
-}
-

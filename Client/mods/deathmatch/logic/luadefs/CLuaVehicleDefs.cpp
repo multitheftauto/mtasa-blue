@@ -156,7 +156,6 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
         {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
-        {"setPlaneTrailEnabled", ArgumentParser<SetPlaneSmoke>},
     };
 
     // Add functions
@@ -4340,14 +4339,4 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
     }
 
     return vehicle->SpawnFlyingComponent(partNodeIndex, collisionType, removalTime.value_or(-1));
-}
-
-bool CLuaVehicleDefs::SetPlaneSmoke(CClientVehicle* vehicle, bool state)
-{
-
-    if (vehicle->GetModel() == 512 || vehicle->GetModel() == 513) // Support Cropduster and Stuntplane
-    {
-        return vehicle->SetPlaneSmoke(state); 
-    }
-        return false;
 }
