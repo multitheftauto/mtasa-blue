@@ -19,4 +19,5 @@ public:
     virtual bool          IsFreeTextureDictonarySlot(std::uint32_t uiTxdID) = 0;
 
     virtual std::uint16_t GetFreeTextureDictonarySlot() = 0;
+    virtual std::uint16_t GetRefsCount(std::uint16_t slot) const = 0;
 };

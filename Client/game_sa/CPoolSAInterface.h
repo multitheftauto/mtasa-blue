@@ -122,7 +122,7 @@ public:
         return !IsEmpty(index);
     }
 
-    B* GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
+    B* GetObject(std::int32_t objectIndex) const { return &m_pObjects[objectIndex]; }
 
     uint GetObjectIndex(B* pObject) { return ((DWORD)pObject - (DWORD)m_pObjects) / sizeof(B); }
 
