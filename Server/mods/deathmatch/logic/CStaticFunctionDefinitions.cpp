@@ -4685,6 +4685,16 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
             CPed* pPed = static_cast<CPed*>(pElement);
             if (pPed->IsSpawned())
             {
+                bool          bIsPlayer = IS_PLAYER(pPed);
+                if (bIsPlayer)
+                {
+                    // Tell our scripts a weapon was given
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(ucWeaponID);
+                    if (!pPed->CallEvent("onPlayerWeaponGiven", Arguments))
+                        return false;
+                }
+
                 unsigned char ucCurrentWeapon = pPed->GetWeaponType();
                 if (ucCurrentWeapon != ucWeaponID && bSetAsCurrent)
                 {
@@ -4693,7 +4703,7 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
                     Arguments.PushNumber(ucCurrentWeapon);
                     Arguments.PushNumber(ucWeaponID);
                     bool bEventRet;
-                    if (IS_PLAYER(pElement))
+                    if (bIsPlayer)
                         bEventRet = pPed->CallEvent("onPlayerWeaponSwitch", Arguments);
                     else
                         bEventRet = pPed->CallEvent("onPedWeaponSwitch", Arguments);
@@ -4757,6 +4767,15 @@ bool CStaticFunctionDefinitions::TakeWeapon(CElement* pElement, unsigned char uc
             // Just because it's the same slot doesn't mean it's the same weapon -_- - Caz
             if (pPed->IsSpawned() && pPed->GetWeapon(ucWeaponSlot) && pPed->GetWeaponType(ucWeaponSlot) == ucWeaponID)
             {
+                if (IS_PLAYER(pPed))
+                {
+                    // Tell our scripts a weapon was taken
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(ucWeaponID);
+                    if (!pPed->CallEvent("onPlayerWeaponTaken", Arguments))
+                        return false;
+                }
+
                 CBitStream BitStream;
 
                 SWeaponTypeSync weaponType;
@@ -4809,6 +4828,10 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            CLuaArguments Arguments;
+            if (IS_PLAYER(pPed) && !pPed->CallEvent("onPlayerWeaponsTaken", Arguments))
+                return false;
+
             CBitStream BitStream;
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, TAKE_ALL_WEAPONS, *BitStream.pBitStream));
 
