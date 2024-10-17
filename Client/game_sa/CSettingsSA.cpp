@@ -316,6 +316,20 @@ void CSettingsSA::SetDynamicPedShadowsEnabled(bool bEnable)
     m_bDynamicPedShadowsEnabled = bEnable;
 }
 
+bool CSettingsSA::GetDynamicPedShadowsEnabledByVideoSetting() const noexcept
+{
+    bool volumetricShadow;
+    g_pCore->GetCVars()->Get("dynamic_ped_shadows", volumetricShadow);
+    return volumetricShadow;
+}
+
+bool CSettingsSA::ResetDynamicPedShadows() const noexcept
+{
+    pGame->GetSettings()->SetDynamicPedShadowsEnabled(pGame->GetSettings()->GetDynamicPedShadowsEnabledByVideoSetting());
+    return true;
+}
+
+
 //
 // Volumetric shadow hooks
 //
