@@ -92,6 +92,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
         {"getVehicleEntryPoints", ArgumentParser<GetVehicleEntryPoints>},
+        {"isPlaneTrailEnabled", ArgumentParser<IsSmokeTrailEnabled>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -157,7 +158,6 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
         {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
         {"setPlaneTrailEnabled", ArgumentParser<SetSmokeTrailEnabled>},
-        {"IsPlaneTrailEnabled", ArgumentParser<IsSmokeTrailEnabled>},
     };
 
     // Add functions
