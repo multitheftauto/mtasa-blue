@@ -46,7 +46,11 @@ project "Dbconmy"
 			})
 		}
 		libdirs {
-			os.findlib("libmysqlclient.a", "/opt/osxcross/macports/pkgs/opt/local/lib/mysql8/mysql")
+			os.findlib("libmysqlclient.a", {
+				"/usr/local/opt/mysql/lib",
+				"/opt/homebrew/lib",
+				"/opt/osxcross/macports/pkgs/opt/local/lib/mysql8/mysql",
+			})
 		}
 
 	if GLIBC_COMPAT then
