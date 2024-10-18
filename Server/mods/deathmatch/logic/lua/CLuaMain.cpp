@@ -61,6 +61,14 @@ extern CNetServer* g_pRealNetServer;
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
 
+#include "luascripts/constants_main.lua.h"
+#include "luascripts/constants_elements.lua.h"
+#include "luascripts/constants_vehicles.lua.h"
+#include "luascripts/constants_weapons.lua.h"
+#include "luascripts/constants_peds.lua.h"
+#include "luascripts/constants_ui.lua.h"
+#include "luascripts/constants_other.lua.h"
+
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
                    CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP)
 {
@@ -244,6 +252,20 @@ void CLuaMain::LoadEmbeddedScripts()
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
+    
+    LoadScript(EmbeddedLuaCode::constantsMain);
+    LoadScript(EmbeddedLuaCode::constantsElements);
+    LoadScript(EmbeddedLuaCode::constantsVehicles);
+    LoadScript(EmbeddedLuaCode::constantsWeapons);
+    LoadScript(EmbeddedLuaCode::constantsPeds);
+    LoadScript(EmbeddedLuaCode::constantsUI);
+    LoadScript(EmbeddedLuaCode::constantsOther);
+
+    // To make `constants` table read-only;
+    LoadScript(R"~LUA~(
+        setmetatable(constants, __readonly_table_meta__)
+        __readonly_table_meta__ = nil
+    )~LUA~");
 }
 
 void CLuaMain::RegisterModuleFunctions()
