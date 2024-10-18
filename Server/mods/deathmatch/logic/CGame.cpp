@@ -961,10 +961,16 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         }
     }
 
-    // If ASE is enabled
+    // Init ASE
     m_pASE = new ASE(m_pMainConfig, m_pPlayerManager, static_cast<int>(usServerPort), strServerIPList);
     if (m_pMainConfig->GetSerialVerificationEnabled())
         m_pASE->SetRuleValue("SerialVerification", "yes");
+
+    // Set the Rules loaded from config
+    std::map<SString, SString> rulesMap = m_pMainConfig->GetRulesForASE();
+    for (const auto& [key, value] : rulesMap)
+        m_pASE->SetRuleValue(key, value);
+
     ApplyAseSetting();
     m_pMasterServerAnnouncer = new CMasterServerAnnouncer();
     m_pMasterServerAnnouncer->Pulse();
