@@ -4345,7 +4345,7 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
 
 bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state) noexcept
 {
-    auto model = vehicle->GetModel();
+    std::uint16_t model = vehicle->GetModel();
     if (model != 512 && model != 513)
         return false;
 
