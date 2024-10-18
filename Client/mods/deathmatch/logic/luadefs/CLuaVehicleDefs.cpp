@@ -4345,12 +4345,11 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
 
 bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state) noexcept
 {
-    if (vehicle->GetModel() == 512 || vehicle->GetModel() == 513) // Support Cropduster and Stuntplane
-    {
-         vehicle->SetSmokeTrailEnabled(state);
-        return true;
-    }
+    auto model = vehicle->GetModel();
+    if (model != 512 && model != 513)
         return false;
+    vehicle->SetSmokeTrailEnabled(state);
+    return true;
 }
 
 bool CLuaVehicleDefs::IsSmokeTrailEnabled(CClientVehicle* vehicle) noexcept
