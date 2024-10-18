@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-10 20:57+0000\n"
+"POT-Creation-Date: 2024-10-18 20:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -298,7 +298,7 @@ msgstr ""
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1275
+#: Client/core/CGUI.cpp:93 Client/core/CCore.cpp:1275
 #: Client/core/CCore.cpp:1288 Client/core/CSettings.cpp:2941
 #: Client/core/CSettings.cpp:4166 Client/core/CSettings.cpp:4194
 #: Client/core/CSettings.cpp:4764 Client/core/CConnectManager.cpp:80
@@ -1818,7 +1818,7 @@ msgid "English"
 msgstr ""
 
 #. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
+#: Client/core/CGUI.cpp:92
 msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
