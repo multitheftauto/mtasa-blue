@@ -17,6 +17,9 @@
 
 class CVector2D;
 
+class CVector;
+using CVector3D = CVector;
+
 /**
  * CVector Structure used to store a 3D vertex.
  */
