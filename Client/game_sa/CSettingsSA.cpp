@@ -318,9 +318,9 @@ void CSettingsSA::SetDynamicPedShadowsEnabled(bool bEnable)
 
 bool CSettingsSA::GetDynamicPedShadowsEnabledByVideoSetting() const noexcept
 {
-    bool volumetricShadow;
-    g_pCore->GetCVars()->Get("dynamic_ped_shadows", volumetricShadow);
-    return volumetricShadow;
+    bool pedDynamicShadows;
+    g_pCore->GetCVars()->Get("dynamic_ped_shadows", pedDynamicShadows);
+    return pedDynamicShadows;
 }
 
 bool CSettingsSA::ResetDynamicPedShadows() noexcept
