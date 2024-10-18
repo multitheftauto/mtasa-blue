@@ -147,7 +147,7 @@ public:
 
     bool IsDynamicPedShadowsEnabled();
     void SetDynamicPedShadowsEnabled(bool bEnable);
-    bool GetDynamicPedShadowsEnabledByVideoSetting() const noexcept;
+    bool IsDynamicPedShadowsEnabledByVideoSetting() const noexcept;
     bool ResetDynamicPedShadows() noexcept;
 
     float        GetAspectRatioValue();

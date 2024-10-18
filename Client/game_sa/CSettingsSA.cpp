@@ -316,7 +316,7 @@ void CSettingsSA::SetDynamicPedShadowsEnabled(bool bEnable)
     m_bDynamicPedShadowsEnabled = bEnable;
 }
 
-bool CSettingsSA::GetDynamicPedShadowsEnabledByVideoSetting() const noexcept
+bool CSettingsSA::IsDynamicPedShadowsEnabledByVideoSetting() const noexcept
 {
     bool pedDynamicShadows;
     g_pCore->GetCVars()->Get("dynamic_ped_shadows", pedDynamicShadows);
@@ -325,7 +325,7 @@ bool CSettingsSA::GetDynamicPedShadowsEnabledByVideoSetting() const noexcept
 
 bool CSettingsSA::ResetDynamicPedShadows() noexcept
 {
-    pGame->GetSettings()->SetDynamicPedShadowsEnabled(pGame->GetSettings()->GetDynamicPedShadowsEnabledByVideoSetting());
+    pGame->GetSettings()->SetDynamicPedShadowsEnabled(pGame->GetSettings()->IsDynamicPedShadowsEnabledByVideoSetting());
     return true;
 }
 
