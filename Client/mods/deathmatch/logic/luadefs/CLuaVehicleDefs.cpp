@@ -246,6 +246,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
     lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
     lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<OOP_GetVehicleEntryPoints>);
+    lua_classfunction(luaVM, "isTrailEnabled", "isPlaneTrailEnabled");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -294,6 +295,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setVariant", "setVehicleVariant");
     lua_classfunction(luaVM, "setWheelScale", "setVehicleWheelScale");
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
+    lua_classfunction(luaVM, "setTrailEnabled", "setPlaneTrailEnabled");
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
@@ -352,6 +354,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "gravity", SetVehicleGravity, OOP_GetVehicleGravity);
     lua_classvariable(luaVM, "turnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
     lua_classvariable(luaVM, "wheelScale", "setVehicleWheelScale", "getVehicleWheelScale");
+
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
@@ -4343,12 +4346,12 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
     return vehicle->SpawnFlyingComponent(partNodeIndex, collisionType, removalTime.value_or(-1));
 }
 
-bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state) noexcept
+bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state)
 {
     std::uint16_t model = vehicle->GetModel();
     if (model != 512 && model != 513)
-        return false;
-
+        throw LuaFunctionError("Invaild model ID");
+     
     vehicle->SetSmokeTrailEnabled(state);
     return true;
 }
