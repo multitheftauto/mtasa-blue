@@ -2297,5 +2297,3 @@ bool CLuaWorldDefs::ResetDynamicPedShadows() noexcept
 {
     return g_pGame->GetSettings()->ResetDynamicPedShadows();
 }
-
-
