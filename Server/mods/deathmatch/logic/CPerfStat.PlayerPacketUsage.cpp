@@ -408,11 +408,11 @@ void CPerfStatPlayerPacketUsageImpl::OutputTimeSpanBlock(CPerfStatResult* pResul
             const CTimeSpan* p = timeSpanList[i];
             const CTopValue& value = (p->prev.data[0].uiPktsPerSec > p->acc.data[0].uiPktsPerSec) ? p->prev.data[iTopPos] : p->acc.data[iTopPos];
 
-            row[c++] = value.uiPktsPerSec ? SString("%d", value.uiPktsPerSec) : "-";
+            row[c++] = value.uiPktsPerSec ? std::to_string(value.uiPktsPerSec) : "-";
             if (bDetail)
             {
-                row[c++] = value.uiBytesInPerSec ? SString("%d", value.uiBytesInPerSec) : "-";
-                row[c++] = value.uiBytesOutPerSec ? SString("%d", value.uiBytesOutPerSec) : "-";
+                row[c++] = value.uiBytesInPerSec ? std::to_string(value.uiBytesInPerSec) : "-";
+                row[c++] = value.uiBytesOutPerSec ? std::to_string(value.uiBytesOutPerSec) : "-";
                 row[c++] = value.strSerial;
             }
             row[c++] = value.strName;
