@@ -60,6 +60,7 @@ extern CNetServer* g_pRealNetServer;
 #include "luascripts/coroutine_debug.lua.h"
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
+#include "luascripts/color.lua.h"
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
                    CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP)
@@ -244,6 +245,7 @@ void CLuaMain::LoadEmbeddedScripts()
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
+    LoadScript(EmbeddedLuaCode::tocolor);
 }
 
 void CLuaMain::RegisterModuleFunctions()
