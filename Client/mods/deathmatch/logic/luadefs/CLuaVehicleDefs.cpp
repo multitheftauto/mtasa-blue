@@ -4348,6 +4348,7 @@ bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state) 
     auto model = vehicle->GetModel();
     if (model != 512 && model != 513)
         return false;
+
     vehicle->SetSmokeTrailEnabled(state);
     return true;
 }
