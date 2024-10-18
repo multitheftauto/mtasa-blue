@@ -92,7 +92,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
         {"getVehicleEntryPoints", ArgumentParser<GetVehicleEntryPoints>},
-        {"isPlaneTrailEnabled", ArgumentParser<IsSmokeTrailEnabled>},
+        {"isVehicleSmokeTrailEnabled", ArgumentParser<IsSmokeTrailEnabled>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -157,7 +157,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
         {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
-        {"setPlaneTrailEnabled", ArgumentParser<SetSmokeTrailEnabled>},
+        {"setVehicleSmokeTrailEnabled", ArgumentParser<SetSmokeTrailEnabled>},
     };
 
     // Add functions
@@ -246,7 +246,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
     lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
     lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<OOP_GetVehicleEntryPoints>);
-    lua_classfunction(luaVM, "isTrailEnabled", "isPlaneTrailEnabled");
+    lua_classfunction(luaVM, "isSmokeTrailEnabled", "isVehicleSmokeTrailEnabled");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -295,7 +295,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setVariant", "setVehicleVariant");
     lua_classfunction(luaVM, "setWheelScale", "setVehicleWheelScale");
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
-    lua_classfunction(luaVM, "setTrailEnabled", "setPlaneTrailEnabled");
+    lua_classfunction(luaVM, "setSmokeTrailEnabled", "setVehicleSmokeTrailEnabled");
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
