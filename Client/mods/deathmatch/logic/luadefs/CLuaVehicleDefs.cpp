@@ -92,6 +92,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
         {"getVehicleEntryPoints", ArgumentParser<GetVehicleEntryPoints>},
+        {"isPlaneTrailEnabled", ArgumentParser<IsSmokeTrailEnabled>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -156,6 +157,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
         {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
+        {"setPlaneTrailEnabled", ArgumentParser<SetSmokeTrailEnabled>},
     };
 
     // Add functions
@@ -4340,3 +4342,19 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
 
     return vehicle->SpawnFlyingComponent(partNodeIndex, collisionType, removalTime.value_or(-1));
 }
+
+bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state) noexcept
+{
+    if (vehicle->GetModel() == 512 || vehicle->GetModel() == 513) // Support Cropduster and Stuntplane
+    {
+         vehicle->SetSmokeTrailEnabled(state);
+        return true;
+    }
+        return false;
+}
+
+bool CLuaVehicleDefs::IsSmokeTrailEnabled(CClientVehicle* vehicle) noexcept
+{
+    return vehicle->IsSmokeTrailEnabled();
+}
+
