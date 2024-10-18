@@ -2495,7 +2495,7 @@ bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
     return pPed->ExitVehicle();
 }
 
-bool CLuaPedDefs::killPedTask(CClientPed* ped, std::string taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept
+bool CLuaPedDefs::killPedTask(CClientPed* ped, std::string_view taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept
 {
     if (taskType == "primary")            // PRIMARY 
         return ped->KillTask(taskNumber, gracefully.value_or(true));

@@ -116,5 +116,5 @@ public:
     static bool IsPedBleeding(CClientPed* ped);
     static bool SetPedBleeding(CClientPed* ped, bool bleeding);
 
-    static bool killPedTask(CClientPed* ped, std::string taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept;
+    static bool killPedTask(CClientPed* ped, std::string_view taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept;
 };
