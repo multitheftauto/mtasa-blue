@@ -5456,10 +5456,6 @@ void CClientGame::ResetMapInfo()
     // Players
     m_pPlayerManager->ResetAll();
 
-    // Reset Frozen Time
-    g_pGame->GetClock()->ResetTimeFrozen();
-    g_pGame->GetSettings()->ResetVolumetricShadows();
-
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
 
@@ -6887,6 +6883,12 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
 
     // Reset volumetric shadows
     g_pGame->GetSettings()->ResetVolumetricShadows();
+
+    // Reset Frozen Time
+    g_pGame->GetClock()->ResetTimeFrozen();
+
+    // Reset DynamicPedShadows
+    g_pGame->GetSettings()->ResetDynamicPedShadows();
 }
 
 void CClientGame::OnWindowFocusChange(bool state)
