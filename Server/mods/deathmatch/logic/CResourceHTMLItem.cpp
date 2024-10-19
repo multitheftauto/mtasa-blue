@@ -29,6 +29,7 @@ CResourceHTMLItem::CResourceHTMLItem(CResource* resource, const char* szShortNam
 {
     m_bIsRaw = bIsRaw;
     m_type = RESOURCE_FILE_TYPE_HTML;
+    m_resourceCategoryType = eResourceCategory::FILES;
     m_bDefault = bIsDefault;
     m_pVM = NULL;
     m_bIsBeingRequested = false;
