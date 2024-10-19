@@ -58,4 +58,5 @@ public:
     DECLARE_ELEMENT_RPC(SetVehicleSirens);
     DECLARE_ELEMENT_RPC(SetVehiclePlateText);
     DECLARE_ELEMENT_RPC(SpawnVehicleFlyingComponent);
+    DECLARE_ELEMENT_RPC(SetVehicleNitroActivated);
 };
