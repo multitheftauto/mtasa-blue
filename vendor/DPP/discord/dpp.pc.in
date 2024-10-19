@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libdpp
+Description: An incredibly lightweight C++ Discord library
+Version: @PROJECT_VERSION@
+URL: https://dpp.brainbox.cc/
+Libs: -L${libdir} -ldpp
+Cflags: -I${includedir}

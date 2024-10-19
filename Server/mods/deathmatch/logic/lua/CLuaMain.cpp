@@ -60,6 +60,7 @@ extern CNetServer* g_pRealNetServer;
 #include "luascripts/coroutine_debug.lua.h"
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
+#include <luadefs/CLuaDiscordDefs.h>
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
                    CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP)
@@ -178,6 +179,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaBlipDefs ::AddClass(luaVM);
     CLuaColShapeDefs ::AddClass(luaVM);
     CLuaDatabaseDefs ::AddClass(luaVM);
+    CLuaDiscordDefs::AddClass(luaVM);
     CLuaMarkerDefs ::AddClass(luaVM);
     CLuaObjectDefs ::AddClass(luaVM);
     CLuaPedDefs ::AddClass(luaVM);

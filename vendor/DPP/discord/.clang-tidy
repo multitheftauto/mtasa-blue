@@ -1,0 +1,2 @@
+# TODO: Discuss about -readability-identifier-length, -readability-avoid-const-params-in-decls
+Checks: "-*,bugprone-*,cert-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,llvm-namespace-comment,modernize-*,performance-*,portability-*,readability-*,-bugprone-implicit-widening-of-multiplication-result, -bugprone-easily-swappable-parameters,-readability-identifier-length,-portability-restrict-system-includes,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-readability-avoid-const-params-in-decls"

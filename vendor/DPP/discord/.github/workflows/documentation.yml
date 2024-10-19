@@ -1,0 +1,47 @@
+name: Docs Build (dpp.dev)
+on:
+  push:
+    branches:
+      - 'dev'
+    files:
+      - '**Doxyfile'
+      - '**docpages/**'
+      - '**/*.h'
+      - '**/documentation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    permissions:
+      contents: write # Needs to be able to write to the repo.
+    name: Build Documentation
+    runs-on: ubuntu-20.04
+
+    concurrency: 
+      group: docs-deployment
+      cancel-in-progress: true
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        with:
+          egress-policy: audit
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@c665c7a15b5295c2488ac8a87af9cb806cd72198 # v2
+        with:
+          php-version: '8.0'
+
+      - name: Checkout D++
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+        with:
+          submodules: recursive
+
+      - name: Generate Docs
+        run: cd docpages && php makedocs-gh.php
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+

@@ -203,6 +203,8 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushtextitem(luaVM, pTextItem);
     else if (CDbJobData* pQuery = UserDataCast((CDbJobData*)pData, luaVM))
         return lua_pushquery(luaVM, pQuery);
+    else if (CDiscordGuild* pGuild = UserDataCast((CDiscordGuild*)pData, luaVM))
+        return lua_pushdiscordguild(luaVM, pGuild);
 
     lua_pushobject(luaVM, NULL, pData);
 }
@@ -278,6 +280,13 @@ void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
 {
     CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
     lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()), true);
+    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
+}
+
+void lua_pushdiscordguild(lua_State* luaVM, const CDiscordGuild* guild)
+{
+    std::uint32_t id = guild ? guild->GetScriptID() : -1;
+    lua_pushobject(luaVM, CLuaClassDefs::GetDiscordGuildClass(), static_cast<void*>(reinterpret_cast<std::uint32_t*>(id)), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 

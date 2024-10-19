@@ -1,0 +1,33 @@
+name: Docs PR Spellcheck
+on:
+  pull_request:
+    branches:
+      - 'dev'
+    files:
+      - '**Doxyfile'
+      - '**docpages/**'
+      - '**/*.h'
+      - '**/documentation-check.yml'
+  push:
+    files:
+      - '**/documentation-check.yml'
+
+permissions:
+  contents: read # This only needs to read the contents of a PR.
+
+jobs:
+  docs:
+    name: Check Documentation Spelling
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout D++
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+
+      - name: Check docs spelling
+        run: npx -y cspell lint --language-id=cpp --no-progress --no-summary --show-context --show-suggestions --relative --color docpages/*.md include/dpp/*.h

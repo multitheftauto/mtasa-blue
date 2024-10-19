@@ -330,6 +330,9 @@ public:
      */
     CResourceFile* GetResourceFile(const SString& relativePath) const;
 
+    
+    const CDiscord* GetDiscordManager() const noexcept { return m_discord.get(); }
+    CDiscord*       GetDiscordManager() noexcept { return m_discord.get(); }
 public:
     static std::list<CResource*> m_StartedResources;
 
@@ -365,6 +368,8 @@ private:
     bool           IsHttpAccessAllowed(CAccount* pAccount);
 
 private:
+    std::unique_ptr<CDiscord> m_discord;
+
     EResourceState m_eState = EResourceState::None;
     bool           m_bClientSync = false;
 

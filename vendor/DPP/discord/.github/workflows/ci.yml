@@ -1,0 +1,263 @@
+name: D++ CI
+on:
+  push:
+    paths:
+      - '**Dockerfile'
+      - '**.cxx'
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - '**.cmake'
+      - '**ci.yml'
+      - '**CMakeLists.txt'
+      - '!**/docpages/**' # Never allow docpages to build CI from doc PRs.
+  pull_request:
+    paths:
+      - '**Dockerfile'
+      - '**.cxx'
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - '**.cmake'
+      - '**ci.yml'
+      - '**CMakeLists.txt'
+      - '!**/docpages/**'
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.cfg.arch }}-(${{ matrix.cfg.cpp-version }})
+      cancel-in-progress: true
+    name: Linux ${{matrix.cfg.arch}} (${{matrix.cfg.cpp-version}})
+    runs-on: ${{matrix.cfg.os}}
+    strategy:
+      fail-fast: false # Don't fail everything if one fails. We want to test each OS/Compiler individually
+      matrix:
+        # GitHub hosted runners on Azure
+        # arm7hf is a self-hosted docker-based runner at Brainbox.cc. Raspberry Pi 4, 8gb 4-core with NEON
+        cfg:
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-20.04, package: clang-10, cpp-version: clang++-10, cmake-flags: '', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-22.04, package: clang-11, cpp-version: clang++-11, cmake-flags: '', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-22.04, package: clang-12, cpp-version: clang++-12, cmake-flags: '', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-22.04, package: clang-13, cpp-version: clang++-13, cmake-flags: '', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-22.04, package: clang-14, cpp-version: clang++-14, cmake-flags: '', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-22.04, package: clang-15, cpp-version: clang++-15, cmake-flags: '-DDPP_CORO=ON', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-22.04, package: g++-12, cpp-version: g++-12, cmake-flags: '-DDPP_CORO=ON', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-22.04, package: g++-11, cpp-version: g++-11, cmake-flags: '-DDPP_CORO=ON', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-22.04, package: g++-10, cpp-version: g++-10, cmake-flags: '', cpack: 'yes', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-20.04, package: g++-9, cpp-version: g++-9, cmake-flags: '', cpack: 'no', ctest: 'no' }
+          - { arch: 'amd64', concurrency: 2, os: ubuntu-20.04, package: g++-8, cpp-version: g++-8, cmake-flags: '', cpack: 'no', ctest: 'yes' }
+          - { arch: 'arm7hf', concurrency: 4, os: [self-hosted, linux, ARM], package: g++-12, cpp-version: g++-12, cmake-flags: '', cpack: 'yes', ctest: 'no' }
+          - { arch: 'arm64', concurrency: 4, os: [self-hosted, linux, ARM64], package: g++-12, cpp-version: g++-12, cmake-flags: '', cpack: 'yes', ctest: 'no' }
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout D++
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+
+      - name: Install apt packages
+        run: sudo sed -i 's/azure\.//' /etc/apt/sources.list && sudo apt update && sudo apt-get install -y ${{ matrix.cfg.package }} pkg-config libsodium-dev libopus-dev zlib1g-dev rpm
+
+      - name: Generate CMake
+        run: mkdir build && cd build && cmake -DDPP_NO_VCPKG=ON -DAVX_TYPE=AVX0 -DCMAKE_BUILD_TYPE=Release ${{matrix.cfg.cmake-flags}} ..
+        env:
+          CXX: ${{matrix.cfg.cpp-version}}
+
+      - name: Build Project
+        run: cd build && make -j${{ matrix.cfg.concurrency }}
+
+      - name: Run unit tests
+        if: ${{ matrix.cfg.ctest == 'yes' }}
+        run: cd build && ctest -VV
+        env:
+          DPP_UNIT_TEST_TOKEN: ${{secrets.DPP_UNIT_TEST_TOKEN}}
+          TEST_GUILD_ID: ${{secrets.TEST_GUILD_ID}}
+          TEST_TEXT_CHANNEL_ID: ${{secrets.TEST_TEXT_CHANNEL_ID}}
+          TEST_VC_ID: ${{secrets.TEST_VC_ID}}
+          TEST_USER_ID: ${{secrets.TEST_USER_ID}}
+          TEST_EVENT_ID: ${{secrets.TEST_EVENT_ID}}
+
+      - name: Package distributable
+        if: ${{ matrix.cfg.cpack == 'yes' }}
+        run: cd build && cpack --verbose
+
+      - name: Upload Binary (DEB)
+        if: ${{ matrix.cfg.cpack == 'yes' }}
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: "libdpp - Debian Package ${{matrix.cfg.arch}}"
+          path: '${{github.workspace}}/build/*.deb'
+
+      - name: Upload Binary (RPM)
+        if: ${{ matrix.cfg.cpack == 'yes' }}
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: "libdpp - RPM Package ${{matrix.cfg.arch}}"
+          path: '${{github.workspace}}/build/*.rpm'
+
+  macos:
+    permissions:
+      contents: write
+    name: macOS ${{matrix.cfg.arch}} (${{matrix.cfg.cpp-version}})
+    runs-on: ${{matrix.cfg.os}}
+    strategy:
+      fail-fast: false # Don't fail everything if one fails. We want to test each OS/Compiler individually
+      matrix:
+        # arm64 is a self-hosted runner on a Mac M2 Mini, ran inside a virtual machine by Archie Jaskowicz. NOTE: This runner no longer exists. It may come back in a few months.
+        cfg:
+          - { arch: 'x64', concurrency: 3, os: macos-latest, cpp-version: clang++-14, cmake-flags: ''}
+#          - { arch: 'arm64', concurrency: 2, os: [self-hosted, ARM64, macOS], cpp-version: clang++-15, cmake-flags: ''}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout D++
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+
+      - name: Install homebrew packages
+        run: brew install cmake make libsodium opus openssl pkg-config
+
+      - name: Generate CMake
+        run: mkdir build && cd build && cmake -DDPP_NO_VCPKG=ON -DCMAKE_BUILD_TYPE=Release -DDPP_CORO=ON -DAVX_TYPE=AVX0 ..
+        env:
+          DONT_RUN_VCPKG: true
+
+      - name: Build Project
+        run: cd build && make -j${{ matrix.cfg.concurrency }}
+        env:
+          DONT_RUN_VCPKG: true
+
+      - name: Run offline unit tests
+        run: cd build && ctest -VV
+
+  windows: # Windows x64 and x86 build matrix
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false # Don't cancel other matrix jobs if one fails
+      matrix:
+        cfg:
+        - { name: 'x64',            arch: x64, config: Release, vs: '2019', os: 'windows-2019', vsv: '16', upload: true,  options: '' }
+        - { name: 'x64',            arch: x64, config: Debug,   vs: '2019', os: 'windows-2019', vsv: '16', upload: true,  options: '' }
+        - { name: 'x86',            arch: x86, config: Release, vs: '2019', os: 'windows-2019', vsv: '16', upload: true,  options: '-T host=x86 ' }
+        - { name: 'x86',            arch: x86, config: Debug,   vs: '2019', os: 'windows-2019', vsv: '16', upload: true,  options: '-T host=x86 ' }
+        - { name: 'x64',            arch: x64, config: Release, vs: '2022', os: 'windows-2022', vsv: '17', upload: true,  options: '' }
+        - { name: 'x64',            arch: x64, config: Debug,   vs: '2022', os: 'windows-2022', vsv: '17', upload: true,  options: '' }
+        - { name: 'x86',            arch: x86, config: Release, vs: '2022', os: 'windows-2022', vsv: '17', upload: true,  options: '-T host=x86' }
+        - { name: 'x86',            arch: x86, config: Debug,   vs: '2022', os: 'windows-2022', vsv: '17', upload: true,  options: '-T host=x86' }
+        - { name: 'x64-Coro',       arch: x64, config: Release, vs: '2022', os: 'windows-2022', vsv: '17', upload: true,  options: '-DDPP_CORO=on' }
+        - { name: 'x64-Coro',       arch: x64, config: Debug,   vs: '2022', os: 'windows-2022', vsv: '17', upload: true,  options: '-DDPP_CORO=on' }
+        - { name: 'x86-Coro',       arch: x86, config: Release, vs: '2022', os: 'windows-2022', vsv: '17', upload: true,  options: '-T host=x86 -DDPP_CORO=on' }
+        - { name: 'x86-Coro',       arch: x86, config: Debug,   vs: '2022', os: 'windows-2022', vsv: '17', upload: true,  options: '-T host=x86 -DDPP_CORO=on' }
+        - { name: 'x64-Clang',      arch: x64, config: Debug,   vs: '2022', os: 'windows-2022', vsv: '17', upload: false, options: '-T ClangCL' }
+        - { name: 'x64-Clang-Coro', arch: x64, config: Debug,   vs: '2022', os: 'windows-2022', vsv: '17', upload: false, options: '-T ClangCL -DDPP_CORO=on' }
+
+    name: "Windows ${{matrix.cfg.name}}-${{matrix.cfg.config}}-vs${{matrix.cfg.vs}}"
+    runs-on: ${{matrix.cfg.os}}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout D++
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+        with:
+          path: main
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2.0.0
+
+      - name: Install chocolatey packages ${{ matrix.cfg.arch}}
+        uses: seanmiddleditch/gha-setup-ninja@8b297075da4cd2a5f1fd21fe011b499edf06e9d2 # master
+
+      - name: Generate CMake (x64)
+        if: ${{ matrix.cfg.arch == 'x64' }}
+        run: mkdir main/build && cd main/build && cmake -G "Visual Studio ${{matrix.cfg.vsv}} ${{matrix.cfg.vs}}" -DDPP_NO_VCPKG=ON -DAVX_TYPE=AVX0 -DDPP_USE_PCH=on ${{matrix.cfg.options}} ..
+        env:
+          DONT_RUN_VCPKG: true
+
+      - name: Generate CMake (x86)
+        if: ${{ matrix.cfg.arch == 'x86' }}
+        run: mkdir main/build && cd main/build && cmake -DCMAKE_TOOLCHAIN_FILE="cmake\Win32Toolchain.cmake" -DDPP_NO_VCPKG=ON -DAVX_TYPE=AVX0 -DDPP_USE_PCH=on -G "Visual Studio ${{matrix.cfg.vsv}} ${{matrix.cfg.vs}}" -A Win32 ${{matrix.cfg.options}} ..
+        env:
+          DONT_RUN_VCPKG: true
+
+      - name: Build Project
+        run: cmake --build main/build --target dpp --config ${{matrix.cfg.config}} --parallel 2
+        env:
+          DONT_RUN_VCPKG: true
+
+      - name: Move debug files for packaging
+        if: ${{ matrix.cfg.config == 'Debug' }}
+        run: xcopy main\build\library\Debug\* main\build\library\Release\ /s /q
+
+      - name: Package distributable
+        run: cd main/build && cpack --verbose
+        env:
+          DONT_RUN_VCPKG: true
+
+      - name: Upload Binary
+        if: ${{ matrix.cfg.upload }}
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: "libdpp - Windows ${{matrix.cfg.name}}-${{matrix.cfg.config}}-vs${{matrix.cfg.vs}}"
+          path: '${{github.workspace}}/main/build/*.zip'
+
+  cross-compiles:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg:
+          # Replaced with self-hosted runner
+          # - {name: "ARM64", os: ubuntu-20.04, cmake-options: -DCMAKE_TOOLCHAIN_FILE=cmake/ARM64ToolChain.cmake}
+          # - {name: "ARMv7 HF", os: ubuntu-20.04, cmake-options: -DCMAKE_TOOLCHAIN_FILE=cmake/ARMv7ToolChain.cmake}
+          - {name: "Linux x86", os: ubuntu-20.04, cmake-options: -DCMAKE_TOOLCHAIN_FILE=cmake/LINUXx86ToolChain.cmake -DBUILD_VOICE_SUPPORT=OFF}
+          - {name: "ARMv6", os: ubuntu-20.04, cmake-options: -DCMAKE_TOOLCHAIN_FILE=cmake/ARMv6ToolChain.cmake}
+
+    name: ${{matrix.cfg.name}}
+    runs-on: ${{matrix.cfg.os}}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout D++
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+
+      - name: Install Packages
+        run: sudo sed -i 's/azure\.//' /etc/apt/sources.list && sudo apt update && sudo apt-get install -y cmake rpm
+
+      - name: Generate CMakeFiles
+        run: mkdir build && cd build && sudo cmake ${{matrix.cfg.cmake-options}} -DDPP_NO_VCPKG=ON -DCMAKE_BUILD_TYPE=Release -DAVX_TYPE=AVX0 ..
+
+      - name: Compile Source
+        run: cd build && sudo make -j2
+
+      - name: Package Distributable
+        run: cd build && sudo cpack --verbose || cat /home/runner/work/DPP/DPP/build/_CPack_Packages/Linux/DEB/PreinstallOutput.log
+
+      - name: Upload Binaries (DEB)
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: "libdpp - Debian Package ${{matrix.cfg.name}}"
+          path: "${{github.workspace}}/build/*.deb"
+
+      - name: Upload Binaries (RPM)
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: "libdpp - RPM Package ${{matrix.cfg.name}}"
+          path: "${{github.workspace}}/build/*.rpm"

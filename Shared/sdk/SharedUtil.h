@@ -29,7 +29,7 @@
 
 // Vendor
 #ifndef _
-#define _ //Use a dummy localisation define for modules that don't need it
+#define _(x) x //Use a dummy localisation define for modules that don't need it
 #endif
 
 #include "SString.h"
@@ -67,7 +67,7 @@
 #include "CDuplicateLineFilter.h"
 
 #ifdef _MSC_VER
-#define snprintf _snprintf
+//#define snprintf _snprintf
 #endif
 
 #ifndef stricmp
