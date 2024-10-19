@@ -106,8 +106,6 @@ struct RwTexture;
 #define OFFSET_CBike_Nodes 0x5A0
 #define OFFSET_CBoat_Nodes 0x5B0
 
-#define VAR_CTimer_snTimeInMilliseconds 0xB7CB84
-
 struct SRailNodeSA
 {
     short sX;                       // x coordinate times 8

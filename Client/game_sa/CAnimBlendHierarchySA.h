@@ -53,6 +53,7 @@ public:
     void                            RemoveFromUncompressedCache();
     void                            RemoveQuaternionFlips();
     void                            CalculateTotalTime();
+    float                           GetTotalTime() const noexcept { return m_pInterface->fTotalTime; }
     CAnimBlendSequenceSAInterface*  GetSequence(DWORD dwIndex);
     CAnimBlendSequenceSAInterface*  GetSequences() { return m_pInterface->pSequences; }
     unsigned short                  GetNumSequences() { return m_pInterface->usNumSequences; }
