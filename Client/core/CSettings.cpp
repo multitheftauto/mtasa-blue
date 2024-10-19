@@ -920,9 +920,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxBrowserGPUEnabled = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable GPU rendering"), true));
     m_pCheckBoxBrowserGPUEnabled->SetPosition(CVector2D(vecTemp.fX + 300.0f, vecTemp.fY - 20.0f));
     m_pCheckBoxBrowserGPUEnabled->AutoSize(NULL, 20.0f);
+    m_pCheckBoxBrowserGPUEnabled->SetClickHandler(GUI_CALLBACK(&CSettings::OnGPUSettingChanged, this));
 
     m_pCheckBoxBrowserGPUCompositingEnabled =
-        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable GPU compositing (GPU required)"), true));
+        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable GPU compositing"), true));
     m_pCheckBoxBrowserGPUCompositingEnabled->SetPosition(CVector2D(vecTemp.fX + 300.0f, vecTemp.fY));
     m_pCheckBoxBrowserGPUCompositingEnabled->AutoSize(NULL, 20.0f);
 
@@ -3298,6 +3299,10 @@ void CSettings::LoadData()
     m_pCheckBoxRemoteJavascript->SetSelected(bVar);
     CVARS_GET("browser_enable_gpu", bVar);
     m_pCheckBoxBrowserGPUEnabled->SetSelected(bVar);
+
+    if (!bVar)
+        m_pCheckBoxBrowserGPUCompositingEnabled->SetEnabled(false);
+
     CVARS_GET("browser_enable_gpu_compositing", bVar);
     m_pCheckBoxBrowserGPUCompositingEnabled->SetSelected(bVar);
 
@@ -4900,4 +4905,10 @@ void CSettings::TabSkip(bool bBackwards)
 bool CSettings::IsActive()
 {
     return m_pWindow->IsActive();
+}
+
+bool CSettings::OnGPUSettingChanged(CGUIElement* pElement)
+{
+    m_pCheckBoxBrowserGPUCompositingEnabled->SetEnabled(m_pCheckBoxBrowserGPUEnabled->GetSelected());
+    return true;
 }

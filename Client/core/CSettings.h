@@ -384,6 +384,7 @@ protected:
     bool OnBrowserWhitelistRemove(CGUIElement* pElement);
     bool OnBrowserWhitelistDomainAddFocused(CGUIElement* pElement);
     bool OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement);
+    bool OnGPUSettingChanged(CGUIElement* pElement);
 
     bool OnMouseDoubleClick(CGUIMouseEventArgs Args);
 
