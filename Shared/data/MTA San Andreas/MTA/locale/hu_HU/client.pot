@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-20 07:42+0000\n"
-"PO-Revision-Date: 2024-10-20 07:43\n"
+"PO-Revision-Date: 2024-10-20 08:43\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -2347,11 +2347,11 @@ msgstr "Javascript engedélyezése távoli weboldalakon"
 
 #: Client/core/CSettings.cpp:920
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "GPU renderelés engedélyezése"
 
 #: Client/core/CSettings.cpp:926
 msgid "Enable GPU compositing"
-msgstr ""
+msgstr "GPU kompozitálás engedélyezése"
 
 #: Client/core/CSettings.cpp:930
 msgid "Custom blacklist"
