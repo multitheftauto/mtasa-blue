@@ -108,8 +108,8 @@ public:
     static void StaticFetchWhitelistFinished(const SHttpDownloadResult& result);
     static void StaticFetchBlacklistFinished(const SHttpDownloadResult& result);
 
-    bool GetGPUEnabled();
-    bool GetGPUCompositingEnabled();
+    bool GetGPUEnabled() const noexcept;
+    bool GetGPUCompositingEnabled() const noexcept;
 
 private:
     typedef std::pair<bool, eWebFilterType> WebFilterPair;

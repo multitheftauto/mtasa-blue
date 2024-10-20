@@ -91,6 +91,6 @@ public:
     virtual void GetFilterEntriesByType(std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType,
                                         eWebFilterState state = eWebFilterState::WEBFILTER_ALL) = 0;
 
-    virtual bool GetGPUEnabled() = 0;
-    virtual bool GetGPUCompositingEnabled() = 0;
+    virtual bool GetGPUEnabled() const noexcept = 0;
+    virtual bool GetGPUCompositingEnabled() const noexcept = 0;
 };

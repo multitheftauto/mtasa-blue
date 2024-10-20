@@ -874,12 +874,12 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
 #endif
 }
 
-bool CWebCore::GetGPUEnabled()
+bool CWebCore::GetGPUEnabled() const noexcept
 {
     return m_bGPUEnabled;
 }
 
-bool CWebCore::GetGPUCompositingEnabled()
+bool CWebCore::GetGPUCompositingEnabled()  const noexcept
 {
     return m_bGPUCompositingEnabled;
 }

@@ -1057,7 +1057,7 @@ int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaBrowserDefs::IsBrowserGPUEnabled()
+bool CLuaBrowserDefs::IsBrowserGPUEnabled() noexcept
 {
     return g_pCore->GetWebCore()->GetGPUEnabled();
 }
