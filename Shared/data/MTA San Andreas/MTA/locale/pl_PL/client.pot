@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-20 07:42+0000\n"
-"PO-Revision-Date: 2024-10-20 07:43\n"
+"PO-Revision-Date: 2024-10-20 11:40\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -1439,7 +1439,8 @@ msgstr "Serwer zaleca zaktualizowanie MTA, ale nie jest to niezbędne.\n\n"
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr ""
+msgstr "Aktualizacja jest obecnie niedostępna.\n\n"
+"Proszę sprawdzić www.mtasa.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -2351,11 +2352,11 @@ msgstr "Zezwalaj na Javascript na stronach zewnętznych"
 
 #: Client/core/CSettings.cpp:920
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "Włącz renderowanie z użyciem GPU"
 
 #: Client/core/CSettings.cpp:926
 msgid "Enable GPU compositing"
-msgstr ""
+msgstr "Włącz kompozycję z użyciem GPU"
 
 #: Client/core/CSettings.cpp:930
 msgid "Custom blacklist"
