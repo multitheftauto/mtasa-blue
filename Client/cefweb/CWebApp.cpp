@@ -21,6 +21,16 @@ CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsi
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
+    CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
+
+    if (!pWebCore->GetGPUEnabled()) // if GPU is disabled...
+    {
+        command_line->AppendSwitch("disable-gpu-compositing");
+        command_line->AppendSwitch("disable-gpu");
+    }  
+    else if (!pWebCore->GetGPUCompositingEnabled()) // if GPU is enabled, but compositing is disabled...
+        command_line->AppendSwitch("disable-gpu-compositing");
+
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
 
