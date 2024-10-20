@@ -879,7 +879,7 @@ bool CWebCore::GetGPUEnabled() const noexcept
     return m_bGPUEnabled;
 }
 
-bool CWebCore::GetGPUCompositingEnabled()  const noexcept
+bool CWebCore::GetGPUCompositingEnabled() const noexcept
 {
     return m_bGPUCompositingEnabled;
 }
