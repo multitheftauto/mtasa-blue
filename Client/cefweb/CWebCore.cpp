@@ -49,10 +49,14 @@ CWebCore::~CWebCore()
     delete m_pXmlConfig;
 }
 
-bool CWebCore::Initialise()
+bool CWebCore::Initialise(bool gpuEnabled, bool gpuCompositingEnabled)
 {
     CefMainArgs        mainArgs;
     void*              sandboxInfo = nullptr;
+
+    m_bGPUEnabled = gpuEnabled;
+    m_bGPUCompositingEnabled = gpuCompositingEnabled;
+
     CefRefPtr<CWebApp> app(new CWebApp);
 
 #ifdef CEF_ENABLE_SANDBOX
@@ -71,7 +75,6 @@ bool CWebCore::Initialise()
 #else
     CefString(&settings.browser_subprocess_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\CEFLauncher_d.exe")));
 #endif
-    CefString(&settings.resources_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF")));
     CefString(&settings.cache_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cache")));
     CefString(&settings.locales_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\locales")));
     CefString(&settings.log_file).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cefdebug.txt")));
@@ -869,4 +872,14 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
 #ifdef MTA_DEBUG
     OutputDebugLine("Updated browser blacklist!");
 #endif
+}
+
+bool CWebCore::GetGPUEnabled() const noexcept
+{
+    return m_bGPUEnabled;
+}
+
+bool CWebCore::GetGPUCompositingEnabled() const noexcept
+{
+    return m_bGPUCompositingEnabled;
 }

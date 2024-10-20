@@ -123,7 +123,7 @@ public:
 class CEntitySAInterface
 {
 public:
-    CEntitySAInterfaceVTBL* vtbl;            // the virtual table
+    CEntitySAInterfaceVTBL* vtbl;            // the virtual table it should be in the CPlaceableSAInterface
 
     CPlaceableSAInterface Placeable;            // 4
 
@@ -242,6 +242,10 @@ public:
         using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
         ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
     };
+
+    bool HasMatrix() const noexcept { return Placeable.matrix != nullptr; }
+
+    void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
@@ -324,7 +328,9 @@ public:
     bool      SetBoneMatrix(eBone boneId, const CMatrix& matrix);
 
     bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll);
+    bool GetBoneRotationQuat(eBone boneId, float& x, float& y, float& z, float& w);
     bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll);
+    bool SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w);
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
 

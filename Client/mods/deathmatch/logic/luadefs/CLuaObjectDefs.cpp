@@ -25,6 +25,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
         {"isObjectMoving", ArgumentParser<IsObjectMoving>},
+        {"isObjectRespawnable", ArgumentParser<IsObjectRespawnable>},
 
         // Object set funcs
         {"moveObject", MoveObject},
@@ -61,6 +62,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
     lua_classfunction(luaVM, "isMoving", "isObjectMoving");
+    lua_classfunction(luaVM, "isRespawnable", "isObjectRespawnable");
 
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
@@ -272,7 +274,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
                 lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_TURNMASS));
 
                 lua_pushnumber(luaVM, pObject->GetAirResistance());
-                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_TURNMASS));
+                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_AIRRESISTANCE));
 
                 lua_pushnumber(luaVM, pObject->GetElasticity());
                 lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_ELASTICITY));
@@ -706,4 +708,16 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaObjectDefs::IsObjectRespawnable(CClientEntity* const pEntity) noexcept
+{
+    if (!IS_OBJECT(pEntity))
+        return false;
+
+    auto* pObject = static_cast<CDeathmatchObject*>(pEntity);
+    if (!pObject)
+        return false;
+
+    return pObject->IsRespawnEnabled();
 }
