@@ -321,12 +321,12 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats(CPerfStatResult* pResult, const s
 
         row[c++] = SString("%d KB", LuaMainMemory.Current);
         row[c++] = SString("%d KB", LuaMainMemory.Max);
-        row[c++] = !LuaMainMemory.OpenXMLFiles ? SString("-") : SString("%d", LuaMainMemory.OpenXMLFiles);
-        row[c++] = !LuaMainMemory.OpenFiles ? SString("-") : SString("%d", LuaMainMemory.OpenFiles);
-        row[c++] = !LuaMainMemory.Refs ? SString("-") : SString("%d", LuaMainMemory.Refs);
-        row[c++] = !LuaMainMemory.TimerCount ? SString("-") : SString("%d", LuaMainMemory.TimerCount);
-        row[c++] = !LuaMainMemory.ElementCount ? SString("-") : SString("%d", LuaMainMemory.ElementCount);
-        row[c++] = !LuaMainMemory.TextDisplayCount ? SString("-") : SString("%d", LuaMainMemory.TextDisplayCount);
-        row[c++] = !LuaMainMemory.TextItemCount ? SString("-") : SString("%d", LuaMainMemory.TextItemCount);
+        row[c++] = !LuaMainMemory.OpenXMLFiles ? SString{"-"} : SString("%d", LuaMainMemory.OpenXMLFiles);
+        row[c++] = !LuaMainMemory.OpenFiles ? SString{"-"} : SString("%d", LuaMainMemory.OpenFiles);
+        row[c++] = !LuaMainMemory.Refs ? SString{"-"} : SString("%d", LuaMainMemory.Refs);
+        row[c++] = !LuaMainMemory.TimerCount ? SString{"-"} : SString("%d", LuaMainMemory.TimerCount);
+        row[c++] = !LuaMainMemory.ElementCount ? SString{"-"} : SString("%d", LuaMainMemory.ElementCount);
+        row[c++] = !LuaMainMemory.TextDisplayCount ? SString{"-"} : SString("%d", LuaMainMemory.TextDisplayCount);
+        row[c++] = !LuaMainMemory.TextItemCount ? SString{"-"} : SString("%d", LuaMainMemory.TextItemCount);
     }
 }

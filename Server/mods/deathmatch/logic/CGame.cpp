@@ -709,7 +709,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     if (m_pMainConfig->IsHTTPEnabled())
     {
         // Slight hack for internal HTTPD: Listen on all IPs if multiple IPs declared
-        SString strUseIP = strServerIP == strServerIPList ? strServerIP : SString("");
+        SString strUseIP = strServerIP == strServerIPList ? strServerIP : SString{};
         if (!m_pHTTPD->StartHTTPD(strUseIP, m_pMainConfig->GetHTTPPort()))
         {
             CLogger::ErrorPrintf("Could not start HTTP server on interface '%s' and port '%u'!\n", strUseIP.c_str(), m_pMainConfig->GetHTTPPort());

@@ -1587,9 +1587,9 @@ bool DoAclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient,
 
     std::vector<SString> parts;
     SStringX(szArguments).Split(" ", parts);
-    const SString& strAction = parts.size() > 0 ? parts[0] : SString();
-    const SString& strResourceName = parts.size() > 1 ? parts[1] : SString();
-    const SString& strRightName = parts.size() > 2 ? parts[2] : SString();
+    const SString& strAction = parts.size() > 0 ? parts[0] : SString{};
+    const SString& strResourceName = parts.size() > 1 ? parts[1] : SString{};
+    const SString& strRightName = parts.size() > 2 ? parts[2] : SString{};
 
     bool bList = strAction == "list";
     bool bAllow = strAction == "allow";
@@ -1635,8 +1635,6 @@ bool DoAclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient,
     return false;
 }
 
-#include <filesystem>
-
 bool CConsoleCommands::AclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
     BeginConsoleOutputCapture(pEchoClient);
@@ -1659,8 +1657,8 @@ bool CConsoleCommands::AuthorizeSerial(CConsole* pConsole, const char* szArgumen
 
     std::vector<SString> parts;
     SStringX(szArguments).Split(" ", parts);
-    const SString& strAccountName = parts.size() > 0 ? parts[0] : SString();
-    const SString& strAction = parts.size() > 1 ? parts[1] : SString();
+    const SString& strAccountName = parts.size() > 0 ? parts[0] : SString{};
+    const SString& strAction = parts.size() > 1 ? parts[1] : SString{};
 
     bool bList = strAction == "list";
     bool bAllow = strAction == "";

@@ -231,7 +231,7 @@ void CLuaDefs::DidUseFunction(lua_CFunction f, lua_State* luaVM)
                 {
                     CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromLuaState(info.luaVM);
                     CPerfStatFunctionTiming::GetSingleton()->UpdateTiming(
-                        pResource ? pResource->GetName() : SString("unknown"),
+                        pResource ? pResource->GetName() : SString{"unknown"},
                         pFunction->GetName().c_str(), elapsedTime, uiDeltaBytes);
                 }
             }
