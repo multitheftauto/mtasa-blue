@@ -1345,16 +1345,20 @@ void CVehicleSA::RecalculateHandling()
             continue;
 
         // If NOS is installed we need set the flag
-        if ((upgradeID >= 1008 && upgradeID <= 1010) && !(uiHandlingFlags & HANDLING_NOS_Flag))
+        if ((upgradeID >= 1008 && upgradeID <= 1010))
         {
-            uiHandlingFlags |= HANDLING_NOS_Flag;
+            if (!(uiHandlingFlags & HANDLING_NOS_Flag))
+                uiHandlingFlags |= HANDLING_NOS_Flag;
+
             nitroInstalled = true;
         }
 
         // If hydraulics is installed we need set the flag
-        if ((upgradeID == 1087) && !(uiHandlingFlags & HANDLING_Hydraulics_Flag))
+        if ((upgradeID == 1087))
         {
-            uiHandlingFlags |= HANDLING_Hydraulics_Flag;
+            if (!(uiHandlingFlags & HANDLING_Hydraulics_Flag))
+                uiHandlingFlags |= HANDLING_Hydraulics_Flag;
+
             hydralicsInstalled = true;
         }
     }
