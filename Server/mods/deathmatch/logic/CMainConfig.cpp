@@ -133,17 +133,8 @@ bool CMainConfig::Load()
         return false;
     }
 
-    // Cancel if the server name only contains spaces
-    const std::size_t snameStart = m_strServerName.find_first_not_of(" ");
-    if (snameStart == std::string::npos)
-    {
-        CLogger::ErrorPrintf("Server name must contain at least one character other than a space\n");
-        return false;
-    }
-
     // Strip spaces from beginning and end of server name
-    const std::size_t snameEnd = m_strServerName.find_last_not_of(" ");
-    m_strServerName = m_strServerName.substr(snameStart, snameEnd - snameStart + 1);
+    m_strServerName = SString(m_strServerName).TrimStart(" ").TrimEnd(" ");
 
     // Grab the forced server ip(s)
     GetString(m_pRootNode, "serverip", m_strServerIP);
