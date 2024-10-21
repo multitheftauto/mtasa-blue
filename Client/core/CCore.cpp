@@ -1156,13 +1156,11 @@ CWebCoreInterface* CCore::GetWebCore()
     if (m_pWebCore == nullptr)
     {
         bool gpuEnabled;
-        bool gpuCompositingEnabled;
         auto cvars = g_pCore->GetCVars();
         cvars->Get("browser_enable_gpu", gpuEnabled);
-        cvars->Get("browser_enable_gpu_compositing", gpuCompositingEnabled);
 
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise(gpuEnabled, gpuCompositingEnabled);
+        m_pWebCore->Initialise(gpuEnabled);
     }
     return m_pWebCore;
 }
