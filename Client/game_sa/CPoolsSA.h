@@ -22,6 +22,8 @@
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
 class CClientEntity;
+class CClientVehicle;
+class CClientObject;
 
 class CPoolsSA : public CPools
 {

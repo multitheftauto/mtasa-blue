@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CDummyPoolSA.h
  *  PURPOSE:     Dummy pool class
@@ -16,18 +16,25 @@
 #include "CPoolSAInterface.h"
 #include <memory>
 
-class CDummyPoolSA : public CDummyPool
+constexpr std::size_t MAX_DUMMIES_DEFAULT = 2500;
+
+class CDummyPoolSA final : public CDummyPool
 {
 public:
     CDummyPoolSA();
     ~CDummyPoolSA() = default;
 
-    void RemoveAllBuildingLods();
-    void RestoreAllBuildingsLods();
-    void UpdateBuildingLods(void* oldPool, void* newPool);
+    void RemoveAllWithBackup() override;
+    void RestoreBackup() override;
+    void UpdateBuildingLods(const std::uint32_t offset);
+
+private:
+    void UpdateBackupLodOffset(const std::uint32_t offest);
+    void UpdateLodsOffestInPool(const std::uint32_t offset);
 
 private:
     CPoolSAInterface<CEntitySAInterface>**  m_ppDummyPoolInterface;
 
-    std::unique_ptr<std::array<CEntitySAInterface*, MAX_DUMMIES>> m_pLodBackup;
+    using pool_backup_t = std::array<std::pair<bool, CEntitySAInterface>, MAX_DUMMIES_DEFAULT>;
+    std::unique_ptr<pool_backup_t> m_pOriginalElementsBackup;
 };
