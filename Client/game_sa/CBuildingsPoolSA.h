@@ -43,5 +43,8 @@ private:
     SVectorPoolData<CBuildingSA> m_buildingPool{MAX_BUILDINGS};
     CPoolSAInterface<CBuildingSAInterface>**           m_ppBuildingPoolInterface;
 
-    std::unique_ptr<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>> m_pOriginalBuildingsBackup;
+    typedef std::uint8_t building_buffer_t[sizeof(CBuildingSAInterface)];
+    typedef std::array<std::pair<bool, building_buffer_t>, MAX_BUILDINGS> backup_array_t;
+
+    std::unique_ptr<backup_array_t> m_pOriginalBuildingsBackup;
 };
