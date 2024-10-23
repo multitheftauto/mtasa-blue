@@ -73,6 +73,11 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_pResourceIMGRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "imgroot");
     m_pResourceIMGRoot->MakeSystemEntity();
 
+    // Create our 2DFX root element. We set its parent when we're loaded.
+    // Make it a system entity so nothing but us can delete it.
+    m_pResource2DFXRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "2dfxroot");
+    m_pResource2DFXRoot->MakeSystemEntity();
+
     m_strResourceDirectoryPath = SString("%s/resources/%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName);
     m_strResourcePrivateDirectoryPath = PathJoin(CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(), m_strResourceName);
 
@@ -139,6 +144,10 @@ CResource::~CResource()
     // Destroy the gui root so all gui elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceGUIEntity);
     m_pResourceGUIEntity = NULL;
+
+    // Destroy the 2dfx root so all 2dfx elements are deleted except those moved out
+    g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResource2DFXRoot);
+    m_pResource2DFXRoot = nullptr;
 
     // Undo all changes to water
     g_pGame->GetWaterManager()->UndoChanges(this);
@@ -256,6 +265,7 @@ void CResource::Load()
         m_pResourceDFFEntity->SetParent(m_pResourceEntity);
         m_pResourceGUIEntity->SetParent(m_pResourceEntity);
         m_pResourceTXDRoot->SetParent(m_pResourceEntity);
+        m_pResource2DFXRoot->SetParent(m_pResourceEntity);
     }
 
     CLogger::LogPrintf("> Starting resource '%s'", *m_strResourceName);

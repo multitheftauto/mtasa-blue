@@ -14,6 +14,7 @@
 #include <CVector.h>
 #include "CAnimBlock.h"
 #include "Common.h"
+#include "C2DEffect.h"
 
 class CBaseModelInfoSAInterface;
 class CColModel;
@@ -246,6 +247,25 @@ public:
 
     // Vehicle towing functions
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
+
+    // 2dfx functions
+    virtual C2DEffectSAInterface* Add2DFXEffect(const CVector& position, const e2dEffectType& type) = 0;
+    virtual bool                  Remove2DFX(C2DEffectSAInterface* effect, bool includeDefault) = 0;
+    virtual bool                  Remove2DFXEffectAtIndex(std::uint32_t index, bool includeDefault = false) = 0;
+    virtual bool                  RemoveAll2DFXEffects(bool includeDefault = false) = 0;
+
+    virtual C2DEffectSA* Get2DFXFromIndex(std::uint32_t index) = 0;
+    virtual std::uint32_t         Get2DFXCount() const = 0;
+
+    virtual void Update2DFXEffect(C2DEffectSA* effect) = 0;
+    virtual void Update2DFXEffect(C2DEffect* effect) = 0;
+
+    virtual void StoreDefault2DFXEffect(C2DEffectSA* effect) = 0;
+    virtual void StoreDefault2DFXEffect(C2DEffectSAInterface* effect) = 0;
+    virtual bool Reset2DFXEffects() = 0;
+
+    virtual void CopyModified2DFXEffects() = 0;
+    virtual void RestoreModified2DFXEffects() = 0;
 
     virtual unsigned int GetParentID() = 0;
     virtual bool         IsDynamic() = 0;
