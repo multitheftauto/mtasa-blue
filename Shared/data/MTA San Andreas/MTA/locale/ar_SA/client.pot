@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-21 22:24+0000\n"
-"PO-Revision-Date: 2024-10-21 23:21\n"
+"PO-Revision-Date: 2024-10-23 02:50\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1445,7 +1445,8 @@ msgstr "الخادم يوصي بالتحديث، ولكنه ليس إجباري.
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr ""
+msgstr "التحديث غير متوفر حاليًا.\n\n"
+"يرجى التحقق من www.mtasa.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -2357,7 +2358,7 @@ msgstr "تمكين Javascript في المواقع الخارجية"
 
 #: Client/core/CSettings.cpp:920
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "تمكين وظيفة بطاقة العرض"
 
 #: Client/core/CSettings.cpp:924
 msgid "Custom blacklist"
