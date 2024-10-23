@@ -126,7 +126,7 @@ public:
     const std::vector<SString>& GetOwnerEmailAddressList() const { return m_OwnerEmailAddressList; }
     bool                        IsDatabaseCredentialsProtectionEnabled() const { return m_bDatabaseCredentialsProtectionEnabled != 0; }
     bool                        IsFakeLagCommandEnabled() const { return m_bFakeLagCommandEnabled != 0; }
-    bool                        IsCheckResourceClientFilesEnabled() const { return m_bCheckResourceClientFilesEnabled != 0; }
+    bool                        IsCheckResourceClientFilesEnabled() const noexcept { return m_checkResourceClientFiles != 0; }
 
     SString GetSetting(const SString& configSetting);
     bool    GetSetting(const SString& configSetting, SString& strValue);
@@ -228,5 +228,5 @@ private:
     int                        m_bFakeLagCommandEnabled;
     int                        m_iPlayerTriggeredEventIntervalMs;
     int                        m_iMaxPlayerTriggeredEventsPerInterval;
-    int                        m_bCheckResourceClientFilesEnabled;
+    int                        m_checkResourceClientFiles;
 };
