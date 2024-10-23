@@ -109,6 +109,7 @@ public:
     static bool SetElementFrozen(CElement* pElement, bool bFrozen);
     static bool SetLowLodElement(CElement* pElement, CElement* pLowLodElement);
     static bool SetElementCallPropagationEnabled(CElement* pElement, bool bEnable);
+    static bool SetElementOnFire(CElement* pElement, bool onFire);
 
     // Player get funcs
     static unsigned int       GetPlayerCount();

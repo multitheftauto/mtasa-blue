@@ -154,8 +154,8 @@ public:
     bool IsWearingGoggles() { return m_bWearingGoggles; };
     void SetWearingGoggles(bool bWearingGoggles) { m_bWearingGoggles = bWearingGoggles; };
 
-    bool IsOnFire() { return m_bIsOnFire; }
-    void SetOnFire(bool bOnFire) { m_bIsOnFire = bOnFire; }
+    bool IsOnFire() const noexcept override { return m_bIsOnFire; }
+    void SetOnFire(bool bOnFire) noexcept override { m_bIsOnFire = bOnFire; }
 
     CWeapon*       GetWeapon(unsigned char ucSlot = 0xFF);
     unsigned char  GetWeaponSlot() { return m_ucWeaponSlot; }

@@ -170,7 +170,10 @@ namespace
         {false, "base64Encode", "encodeString"},
         {false, "base64Decode", "decodeString"},
 
-        {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"}
+        {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"},
+
+        {false, "setPedOnFire", "setElementOnFire"},
+        {false, "isPedOnFire", "isElementOnFire"}
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -272,6 +275,9 @@ namespace
 
         // Base Encoding & Decoding
         {false, "base64Encode", "encodeString"},
-        {false, "base64Decode", "decodeString"}
+        {false, "base64Decode", "decodeString"},
+
+        {false, "setPedOnFire", "setElementOnFire"},
+        {false, "isPedOnFire", "isElementOnFire"}
     };
 }            // namespace
