@@ -9,8 +9,10 @@
  *
  *****************************************************************************/
 #pragma once
+
 #include <map>
 #include <vector>
+#include <list>
 #include "SharedUtil.IntTypes.h"
 
 ////////////////////////////////////////////////////////////////
@@ -33,136 +35,134 @@
 //    4. ITEMS CAN ONLY APPEAR IN THE LIST ONCE
 //
 ////////////////////////////////////////////////////////////////
-template <class T>
+template <class Value>
 class CFastList
 {
 public:
-    typedef typename std::map<uint, T>  MapType;
-    typedef typename std::pair<uint, T> MapTypePair;
-    typedef typename std::map<T, uint>  InfoType;
+    using value_type = Value;
+
+    using MapType = typename std::map<std::uint32_t, value_type>;
+    using MapTypePair = typename std::pair<std::uint32_t, value_type>;
+    using InfoType = typename std::map<value_type, std::uint32_t>;
+
     enum class EOperation
     {
         PushBack,
         PushFront,
         Remove,
     };
+
     struct SSuspendedOperation
     {
         EOperation operation;
-        T          item;
+        value_type item;
     };
 
-    uint                             uiRevision;                  // Incremented every time the ordered map changes
-    uint                             uiNextFrontIndex;            // Next (decrementing) index to use as a map key for items added to the front
-    uint                             uiNextBackIndex;             // Next (incrementing) index to use as a map key for items added to the back
-    MapType                          orderedMap;                  // Ordered map of items
-    InfoType                         infoMap;                     // info for each item
-    bool                             m_bSuspendingModifyOperations;
-    std::vector<SSuspendedOperation> m_SuspendedOperationList;
+    std::uint32_t                    m_revision;                  // Incremented every time the ordered map changes
+    std::uint32_t                    m_nextFrontIndex;            // Next (decrementing) index to use as a map key for items added to the front
+    std::uint32_t                    m_nextBackIndex;             // Next (incrementing) index to use as a map key for items added to the back
+    MapType                          m_orderedMap;                  // Ordered map of items
+    InfoType                         m_infoMap;                     // info for each item
+    bool                             m_suspendingModifyOperations;
+    std::vector<SSuspendedOperation> m_suspendedOperationList;
 
-    CFastList() : uiRevision(1), uiNextFrontIndex(UINT_MAX / 2 - 1), uiNextBackIndex(UINT_MAX / 2), m_bSuspendingModifyOperations(false)
-    {
-        #ifdef MTA_DEBUG
-        // T must be a pointer
-        void* ptr = (T)NULL;
-        ptr = NULL;
-        #endif
-    }
+    CFastList() noexcept : m_revision(1), m_nextFrontIndex(UINT_MAX / 2 - 1), m_nextBackIndex(UINT_MAX / 2), m_suspendingModifyOperations(false)
+    {}
 
-    const T& front() const { return orderedMap.begin()->second; }
+    const value_type& front() const noexcept { return m_orderedMap.begin()->second; }
 
     void pop_front()
     {
-        dassert(!m_bSuspendingModifyOperations);
-        T item = front();
-        remove(item);
+        dassert(!m_suspendingModifyOperations);
+        remove(front());
     }
 
-    void push_front(const T& item)
+    void push_front(const value_type& item)
     {
-        if (m_bSuspendingModifyOperations)
+        if (m_suspendingModifyOperations)
         {
-            m_SuspendedOperationList.push_back({EOperation::PushFront, item});
+            m_suspendedOperationList.push_back({EOperation::PushFront, item});
             return;
         }
         // Check if indexing will wrap (and so destroy map order)
-        if (uiNextFrontIndex < 5000)
+        if (m_nextFrontIndex < 5000)
             Reindex();
-        dassert(orderedMap.find(uiNextFrontIndex) == orderedMap.end());
+        dassert(m_orderedMap.find(m_nextFrontIndex) == m_orderedMap.end());
         // Optimized insert at the map beginning
-        orderedMap.insert(orderedMap.begin(), MapTypePair(uiNextFrontIndex, item));
-        uiRevision++;
-        SetItemIndex(item, uiNextFrontIndex);
-        uiNextFrontIndex--;
+        m_orderedMap.insert(m_orderedMap.begin(), MapTypePair(m_nextFrontIndex, item));
+        m_revision++;
+        SetItemIndex(item, m_nextFrontIndex);
+        m_nextFrontIndex--;
     }
 
-    void push_back(const T& item)
+    void push_back(const value_type& item)
     {
-        if (m_bSuspendingModifyOperations)
+        if (m_suspendingModifyOperations)
         {
-            m_SuspendedOperationList.push_back({EOperation::PushBack, item});
+            m_suspendedOperationList.push_back({EOperation::PushBack, item});
             return;
         }
         // Check if indexing will wrap (and so destroy map order)
-        if (uiNextBackIndex > UINT_MAX - 5000)
+        if (m_nextBackIndex > UINT_MAX - 5000)
             Reindex();
-        dassert(orderedMap.find(uiNextBackIndex) == orderedMap.end());
+        dassert(m_orderedMap.find(m_nextBackIndex) == m_orderedMap.end());
         // Optimized insert at the map end
-        orderedMap.insert(orderedMap.end(), MapTypePair(uiNextBackIndex, item));
-        uiRevision++;
-        SetItemIndex(item, uiNextBackIndex);
-        uiNextBackIndex++;
+        m_orderedMap.insert(m_orderedMap.end(), MapTypePair(m_nextBackIndex, item));
+        m_revision++;
+        SetItemIndex(item, m_nextBackIndex);
+        m_nextBackIndex++;
     }
 
-    bool contains(const T& item) const { return (infoMap.find(item) != infoMap.end()); }
-
-    size_t size() const { return orderedMap.size(); }
-
-    bool empty() const { return orderedMap.empty(); }
+    bool        contains(const value_type& item) const noexcept {
+        return m_infoMap.find(item) != m_infoMap.end();
+    }
+    std::size_t size() const noexcept { return m_orderedMap.size(); }
+    bool        empty() const noexcept { return m_orderedMap.empty(); }
 
     void clear()
     {
-        dassert(!m_bSuspendingModifyOperations);
-        orderedMap.clear();
-        uiRevision++;
-        infoMap.clear();
-        uiNextFrontIndex = UINT_MAX / 2 - 1;
-        uiNextBackIndex = UINT_MAX / 2;
+        dassert(!m_suspendingModifyOperations);
+        m_orderedMap.clear();
+        m_revision++;
+        m_infoMap.clear();
+        m_nextBackIndex = UINT_MAX / 2;
+        m_nextFrontIndex = m_nextFrontIndex - 1;
     }
 
-    void remove(const T& item)
+    void remove(const value_type& item)
     {
-        if (m_bSuspendingModifyOperations)
+        if (m_suspendingModifyOperations)
         {
-            m_SuspendedOperationList.push_back({EOperation::Remove, item});
+            m_suspendedOperationList.push_back({EOperation::Remove, item});
             return;
         }
-        if (uint uiIndex = GetItemIndex(item))
-        {
-            typename MapType::iterator it = orderedMap.find(uiIndex);
-            dassert(it != orderedMap.end());
-            dassert(it->second == item);
-            orderedMap.erase(it);
-            uiRevision++;
-            RemoveItemIndex(item);
-        }
+        auto i = GetItemIndex(item);
+        if (!i)
+            return;
+
+        auto it = m_orderedMap.find(i);
+        dassert(it != m_orderedMap.end());
+        dassert(it->second == item);
+        m_orderedMap.erase(it);
+        m_revision++;
+        RemoveItemIndex(item);
     }
 
-    uint GetRevision() const { return uiRevision; }
+    std::uint32_t GetRevision() const noexcept { return m_revision; }
 
     // Queue remove/push_back/push_front operations until ResumeModifyOperations is called
     void SuspendModifyOperations()
     {
-        dassert(!m_bSuspendingModifyOperations);
-        m_bSuspendingModifyOperations = true;
+        dassert(!m_suspendingModifyOperations);
+        m_suspendingModifyOperations = true;
     }
 
     // Replay queued operations
     void ResumeModifyOperations()
     {
-        dassert(m_bSuspendingModifyOperations);
-        m_bSuspendingModifyOperations = false;
-        for (const auto& suspendedOperation : m_SuspendedOperationList)
+        dassert(m_suspendingModifyOperations);
+        m_suspendingModifyOperations = false;
+        for (const auto& suspendedOperation : m_suspendedOperationList)
         {
             if (suspendedOperation.operation == EOperation::PushBack)
                 push_back(suspendedOperation.item);
@@ -171,50 +171,49 @@ public:
             else if (suspendedOperation.operation == EOperation::Remove)
                 remove(suspendedOperation.item);
         }
-        m_SuspendedOperationList.clear();
+        m_suspendedOperationList.clear();
     }
 
 protected:
     // Reset indexing
     void Reindex()
     {
-        uiNextFrontIndex = UINT_MAX / 2 - 1;
-        uiNextBackIndex = UINT_MAX / 2;
+        m_nextBackIndex = UINT_MAX / 2;
+        m_nextFrontIndex = m_nextBackIndex - 1;
         MapType newMap;
-        for (typename MapType::iterator iter = orderedMap.begin(); iter != orderedMap.end(); ++iter)
+        for (const auto& [__, item] : m_orderedMap)
         {
-            T item = iter->second;
-            newMap[uiNextBackIndex] = item;
+            newMap[m_nextBackIndex] = item;
             RemoveItemIndex(item);
-            SetItemIndex(item, uiNextBackIndex);
-            uiNextBackIndex++;
+            SetItemIndex(item, m_nextBackIndex);
+            m_nextBackIndex++;
         }
-        orderedMap = newMap;
+        m_orderedMap = newMap;
     }
 
     // Handle storage of the item index
-    uint GetItemIndex(const T& item) const
+    std::uint32_t GetItemIndex(const value_type& item) const noexcept
     {
-        typename InfoType::const_iterator it = infoMap.find(item);
-        if (it == infoMap.end())
+        auto it = m_infoMap.find(item);
+        if (it == m_infoMap.end())
             return 0;
         return it->second;
     }
 
     // Item must not exist in the infoMap
-    void SetItemIndex(const T& item, uint uiIndex)
+    void SetItemIndex(const value_type& item, std::uint32_t index)
     {
-        typename InfoType::const_iterator it = infoMap.find(item);
-        assert(it == infoMap.end() && uiIndex);
-        infoMap[item] = uiIndex;
+        auto it = m_infoMap.find(item);
+        assert(it == m_infoMap.end() && index);
+        m_infoMap[item] = index;
     }
 
     // Item must exist in the infoMap
-    void RemoveItemIndex(const T& item)
+    void RemoveItemIndex(const value_type& item)
     {
-        typename InfoType::iterator it = infoMap.find(item);
-        assert(it != infoMap.end());
-        infoMap.erase(it);
+        auto it = m_infoMap.find(item);
+        assert(it != m_infoMap.end());
+        m_infoMap.erase(it);
     }
 
 public:
@@ -226,12 +225,12 @@ public:
     public:
         typename MapType::const_iterator iter;
 
-        ConstIterator(typename MapType::const_iterator initer) : iter(initer) {}
-        bool     operator==(const ConstIterator& other) const { return iter == other.iter; }
-        bool     operator!=(const ConstIterator& other) const { return iter != other.iter; }
-        void     operator++() { ++iter; }
-        void     operator++(int) { iter++; }
-        const T& operator*() const { return iter->second; }
+        ConstIterator(typename MapType::const_iterator initer) noexcept : iter(initer){}
+        bool              operator==(const ConstIterator& other) const noexcept { return iter == other.iter; }
+        bool              operator!=(const ConstIterator& other) const noexcept { return iter != other.iter; }
+        void              operator++() noexcept { ++iter; }
+        void              operator++(int) noexcept { iter++; }
+        const value_type& operator*() const noexcept { return iter->second; }
     };
 
     class Iterator
@@ -239,13 +238,13 @@ public:
     public:
         typename MapType::iterator iter;
 
-        Iterator(typename MapType::iterator initer) : iter(initer) {}
-        bool     operator==(const Iterator& other) const { return iter == other.iter; }
-        bool     operator!=(const Iterator& other) const { return iter != other.iter; }
-        void     operator++() { ++iter; }
-        void     operator++(int) { iter++; }
-        const T& operator*() const { return iter->second; }
-                 operator ConstIterator() const { return ConstIterator(iter); }
+        Iterator(typename MapType::iterator initer) noexcept : iter(initer){}
+        bool              operator==(const Iterator& other) const noexcept { return iter == other.iter; }
+        bool              operator!=(const Iterator& other) const noexcept { return iter != other.iter; }
+        void              operator++() noexcept { ++iter; }
+        void              operator++(int) noexcept { iter++; }
+        const value_type& operator*() const noexcept { return iter->second; }
+        operator ConstIterator() const noexcept { return ConstIterator(iter); }
     };
 
     //
@@ -256,12 +255,12 @@ public:
     public:
         typename MapType::const_reverse_iterator iter;
 
-        ConstReverseIterator(typename MapType::const_reverse_iterator initer) : iter(initer) {}
-        bool     operator==(const ConstReverseIterator& other) const { return iter == other.iter; }
-        bool     operator!=(const ConstReverseIterator& other) const { return iter != other.iter; }
-        void     operator++() { ++iter; }
-        void     operator++(int) { iter++; }
-        const T& operator*() const { return iter->second; }
+        ConstReverseIterator(typename MapType::const_reverse_iterator initer) noexcept : iter(initer){}
+        bool              operator==(const ConstReverseIterator& other) const noexcept { return iter == other.iter; }
+        bool              operator!=(const ConstReverseIterator& other) const noexcept { return iter != other.iter; }
+        void              operator++() noexcept { ++iter; }
+        void              operator++(int) noexcept { iter++; }
+        const value_type& operator*() const noexcept { return iter->second; }
     };
 
     class ReverseIterator
@@ -269,52 +268,60 @@ public:
     public:
         typename MapType::reverse_iterator iter;
 
-        ReverseIterator(typename MapType::reverse_iterator initer) : iter(initer) {}
-        bool     operator==(const ReverseIterator& other) const { return iter == other.iter; }
-        bool     operator!=(const ReverseIterator& other) const { return iter != other.iter; }
-        void     operator++() { ++iter; }
-        void     operator++(int) { iter++; }
-        const T& operator*() const { return iter->second; }
-                 operator ConstReverseIterator() const { return ConstReverseIterator(iter); }
+        ReverseIterator(typename MapType::reverse_iterator initer) noexcept : iter(initer){}
+        bool              operator==(const ReverseIterator& other) const noexcept { return iter == other.iter; }
+        bool              operator!=(const ReverseIterator& other) const noexcept { return iter != other.iter; }
+        void              operator++() noexcept { ++iter; }
+        void              operator++(int) noexcept { iter++; }
+        const value_type& operator*() const noexcept { return iter->second; }
+        operator ConstReverseIterator() const noexcept { return ConstReverseIterator(iter); }
     };
 
-    ConstIterator begin() const { return ConstIterator(orderedMap.begin()); }
-    ConstIterator end() const { return ConstIterator(orderedMap.end()); }
-    Iterator      begin() { return Iterator(orderedMap.begin()); }
-    Iterator      end() { return Iterator(orderedMap.end()); }
+    ConstIterator begin() const noexcept { return ConstIterator(m_orderedMap.begin()); }
+    ConstIterator end() const noexcept { return ConstIterator(m_orderedMap.end()); }
+    Iterator      begin() noexcept { return Iterator(m_orderedMap.begin()); }
+    Iterator      end() noexcept { return Iterator(m_orderedMap.end()); }
 
-    ConstReverseIterator rbegin() const { return ConstReverseIterator(orderedMap.rbegin()); }
-    ConstReverseIterator rend() const { return ConstReverseIterator(orderedMap.rend()); }
-    ReverseIterator      rbegin() { return ReverseIterator(orderedMap.rbegin()); }
-    ReverseIterator      rend() { return ReverseIterator(orderedMap.rend()); }
+    ConstReverseIterator rbegin() const noexcept { return ConstReverseIterator(m_orderedMap.rbegin()); }
+    ConstReverseIterator rend() const noexcept { return ConstReverseIterator(m_orderedMap.rend()); }
+    ReverseIterator      rbegin() noexcept { return ReverseIterator(m_orderedMap.rbegin()); }
+    ReverseIterator      rend() noexcept { return ReverseIterator(m_orderedMap.rend()); }
 
     // Allow use of std iterator names
-    typedef Iterator             iterator;
-    typedef ConstIterator        const_iterator;
-    typedef ReverseIterator      reverse_iterator;
-    typedef ConstReverseIterator const_reverse_iterator;
+    using iterator = Iterator;
+    using const_iterator = ConstIterator;
+    using reverse_iterator = ReverseIterator;
+    using const_reverse_iterator = ConstReverseIterator;
 
-    Iterator erase(Iterator iter)
+    Iterator erase(Iterator pos) noexcept
     {
-        RemoveItemIndex(*iter);
-        orderedMap.erase(iter.iter++);
-        uiRevision++;
-        return iter;
+        RemoveItemIndex(*pos);
+        m_orderedMap.erase(pos.iter++);
+        m_revision++;
+        return pos;
+    }
+
+    Iterator erase(Iterator first, Iterator last) noexcept {
+        Iterator outIter;
+        for (auto it = first; it != last; it++)
+        {
+            erase(it);
+            outIter = it;
+        }
+        return outIter;
     }
 };
 
 // Returns true if the item is in the itemList
 template <class T, class U>
-bool ListContains(const CFastList<T*>& itemList, const U& item)
+constexpr bool ListContains(const CFastList<T*>& list, const U& item) noexcept
 {
-    if (itemList.empty())
-        return false;
-    return itemList.contains(item);
+    return list.contains(item);
 }
 
 // Remove all occurrences of item from itemList (There should never be more than one anyway)
 template <class T, class U>
-void ListRemove(CFastList<T*>& itemList, const U& item)
+constexpr void ListRemoveAll(CFastList<T*>& list, const U& item) noexcept
 {
-    itemList.remove(item);
+    list.remove(item);
 }

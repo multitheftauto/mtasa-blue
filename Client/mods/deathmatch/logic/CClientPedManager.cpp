@@ -82,7 +82,7 @@ void CClientPedManager::RemoveFromList(CClientPed* pPed)
 {
     if (m_bRemoveFromList)
     {
-        ListRemove(m_List, pPed);
+        ListRemoveAll(m_List, pPed);
     }
 }
 
@@ -95,7 +95,7 @@ void CClientPedManager::OnCreation(CClientPed* pPed)
 
 void CClientPedManager::OnDestruction(CClientPed* pPed)
 {
-    ListRemove(m_StreamedIn, pPed);
+    ListRemoveAll(m_StreamedIn, pPed);
 }
 
 void CClientPedManager::RestreamPeds(unsigned short usModel)

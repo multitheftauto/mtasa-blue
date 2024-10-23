@@ -90,7 +90,7 @@ void CSimPlayerManager::RemoveSimPlayer(CPlayer* pPlayer)
     for (std::set<CSimPlayer*>::const_iterator iter = m_AllSimPlayerMap.begin(); iter != m_AllSimPlayerMap.end(); ++iter)
     {
         CSimPlayer* pOtherSim = *iter;
-        ListRemove(pOtherSim->m_PuresyncSendListFlat, pSim);
+        ListRemoveAll(pOtherSim->m_PuresyncSendListFlat, pSim);
         pOtherSim->m_bSendListChanged = true;
     }
 

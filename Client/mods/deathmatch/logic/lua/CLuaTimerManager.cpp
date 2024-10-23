@@ -82,8 +82,8 @@ void CLuaTimerManager::RemoveTimer(CLuaTimer* pLuaTimer)
         return;
 
     // Remove all references
-    ListRemove(m_TimerList, pLuaTimer);
-    ListRemove(m_ProcessQueue, pLuaTimer);
+    ListRemoveAll(m_TimerList, pLuaTimer);
+    ListRemoveAll(m_ProcessQueue, pLuaTimer);
 
     if (m_pProcessingTimer == pLuaTimer)
     {

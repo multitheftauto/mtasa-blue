@@ -649,7 +649,7 @@ void CClientEntity::AttachTo(CClientEntity* pEntity)
     if (m_pAttachedToEntity)
     {
         assert(ListContains(m_pAttachedToEntity->m_AttachedEntities, this));
-        ListRemove(m_pAttachedToEntity->m_AttachedEntities, this);
+        ListRemoveAll(m_pAttachedToEntity->m_AttachedEntities, this);
     }
 
     m_pAttachedToEntity = pEntity;

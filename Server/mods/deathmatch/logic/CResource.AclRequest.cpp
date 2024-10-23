@@ -169,7 +169,7 @@ void CResource::RefreshAutoPermissions(CXMLNode* pNodeAclRequest)
         }
 
         // This right is used
-        ListRemove(unusedRightNameMap, request.rightName);
+        ListRemoveAll(unusedRightNameMap, request.rightName);
 
         // Update flag
         bHasPending |= request.bPending;

@@ -302,7 +302,7 @@ bool CClientObject::SetLowLodObject(CClientObject* pNewLowLodObject)
         assert(ListContains(m_pLowLodObject->m_HighLodObjectList, this));
 
         // Clear there and here
-        ListRemove(m_pLowLodObject->m_HighLodObjectList, this);
+        ListRemoveAll(m_pLowLodObject->m_HighLodObjectList, this);
         m_pLowLodObject = NULL;
         return true;
     }
