@@ -13,6 +13,8 @@
 #include "CResourceChecker.h"
 #include "CResourceChecker.Data.h"
 #include "CResource.h"
+#include "CMainConfig.h"
+#include "CGame.h"
 #include "CLogger.h"
 #include "CStaticFunctionDefinitions.h"
 #include <core/CServerInterface.h>
@@ -28,6 +30,7 @@
 
 extern CNetServer*       g_pRealNetServer;
 extern CServerInterface* g_pServerInterface;
+extern CGame*            g_pGame;
 
 ///////////////////////////////////////////////////////////////
 //
@@ -47,6 +50,9 @@ void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string
 
     m_ulDeprecatedWarningCount = 0;
     m_upgradedFullPathList.clear();
+
+    // Checking certain resource client files is optional
+    bool checkResourceClientFiles = g_pGame->GetConfig()->IsCheckResourceClientFilesEnabled();
 
     // Check each file in the resource
     std::list<CResourceFile*>::iterator iterf = pResource->IterBegin();
@@ -73,7 +79,7 @@ void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string
                     bScript = true;
                     bClient = true;
                 }
-                else if (type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
+                else if (type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE && checkResourceClientFiles)
                 {
                     bScript = false;
                     bClient = true;
