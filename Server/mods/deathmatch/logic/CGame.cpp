@@ -2086,7 +2086,6 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && !pPlayer->IsDead())
     {
-        pPlayer->SetSpawned(false);
         pPlayer->SetIsDead(true);
         pPlayer->SetHealth(0.0f);
         pPlayer->SetArmor(0.0f);
@@ -3024,8 +3023,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 FAIL_TRAILER,
                             } failReason = FAIL_INVALID;
 
-                            // Is he spawned? (Fix for #2335)
-                            if (!pPed->IsSpawned())
+                            // Is he dead? (Fix for #2335)
+                            if (pPed->IsDead())
                             {
                                 CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
                                 pPlayer->Send(Reply);
@@ -3788,8 +3787,8 @@ void CGame::Packet_VehicleTrailer(CVehicleTrailerPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
-        // Spawned?
-        if (pPlayer->IsSpawned())
+        // Alive?
+        if (!pPlayer->IsDead())
         {
             // Grab the vehicle with the chosen ID
             ElementID ID = Packet.GetVehicle();
@@ -4349,9 +4348,6 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
 
     // Send him the join details
     pPlayer->Send(CPlayerConnectCompletePacket());
-
-    // The player is spawned when he's connected, just the Camera is not faded in/not targetting
-    pPlayer->SetSpawned(true);
 }
 
 void CGame::Lock()
