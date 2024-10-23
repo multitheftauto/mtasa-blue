@@ -16,6 +16,7 @@
 #include <CVector.h>
 #include <game/RenderWare.h>
 #include <game/CAnimBlendAssociation.h>
+#include <game/CAnimBlendHierarchy.h>
 #include "CAnimBlendNodeSA.h"
 
 class CAnimBlendAssocGroupSA;
@@ -159,12 +160,15 @@ public:
     eAnimGroup                           GetAnimGroup() { return static_cast<eAnimGroup>(m_pInterface->sAnimGroup); }
     eAnimID                              GetAnimID() { return static_cast<eAnimID>(m_pInterface->sAnimID); }
     std::unique_ptr<CAnimBlendHierarchy> GetAnimHierarchy();
+    const std::unique_ptr<CAnimBlendHierarchy> GetAnimHierarchy() const noexcept;
 
     float GetBlendAmount() { return m_pInterface->fBlendAmount; }
     void  SetBlendAmount(float fAmount) { m_pInterface->fBlendAmount = fAmount; }
     void  SetCurrentProgress(float fProgress);
-    float GetCurrentSpeed() { return m_pInterface->fSpeed; }
+    float GetCurrentProgress() const noexcept { return m_pInterface->fCurrentTime; }
+    float GetCurrentSpeed() const noexcept { return m_pInterface->fSpeed; }
     void  SetCurrentSpeed(float fSpeed) { m_pInterface->fSpeed = fSpeed; }
+    float GetLength() const noexcept { return GetAnimHierarchy()->GetTotalTime(); }
     void  SetAnimID(short sAnimID) { m_pInterface->sAnimID = sAnimID; }
     void  SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
     void  SetFlags(short sFlags) { m_pInterface->m_nFlags = sFlags; }
