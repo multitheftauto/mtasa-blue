@@ -49,7 +49,7 @@ class CWebCoreInterface
 {
 public:
     virtual ~CWebCoreInterface() {}
-    virtual bool Initialise(bool gpuEnabled, bool gpuCompositingEnabled) = 0;
+    virtual bool Initialise(bool gpuEnabled) = 0;
 
     virtual CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
                                              bool bTransparent) = 0;
@@ -92,5 +92,4 @@ public:
                                         eWebFilterState state = eWebFilterState::WEBFILTER_ALL) = 0;
 
     virtual bool GetGPUEnabled() const noexcept = 0;
-    virtual bool GetGPUCompositingEnabled() const noexcept = 0;
 };

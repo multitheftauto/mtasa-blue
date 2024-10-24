@@ -49,13 +49,12 @@ CWebCore::~CWebCore()
     delete m_pXmlConfig;
 }
 
-bool CWebCore::Initialise(bool gpuEnabled, bool gpuCompositingEnabled)
+bool CWebCore::Initialise(bool gpuEnabled)
 {
     CefMainArgs        mainArgs;
     void*              sandboxInfo = nullptr;
 
     m_bGPUEnabled = gpuEnabled;
-    m_bGPUCompositingEnabled = gpuCompositingEnabled;
 
     CefRefPtr<CWebApp> app(new CWebApp);
 
@@ -877,9 +876,4 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
 bool CWebCore::GetGPUEnabled() const noexcept
 {
     return m_bGPUEnabled;
-}
-
-bool CWebCore::GetGPUCompositingEnabled() const noexcept
-{
-    return m_bGPUCompositingEnabled;
 }
