@@ -51,5 +51,4 @@ public:
 
     // Utility functions
     LUA_DECLARE(GetTok);
-    LUA_DECLARE(tocolor);
 };
