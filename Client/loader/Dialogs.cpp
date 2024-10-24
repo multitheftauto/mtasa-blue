@@ -239,7 +239,7 @@ void InitDialogStrings(HWND hwndDialog, const SDialogItemInfo* dialogItems)
                     SString("Possible text mismatch for dialog item (idx:%d id:%d) '%s' (orig:'%s')", i, item.iItemId, item.szItemText, szPrevText));
             }
 #endif
-            SetWindowTextW(hwndItem, FromUTF8(strItemText));
+            SetWindowTextW(hwndItem, FromUTF8(strItemText).c_str());
         }
         else
             OutputDebugLine(SString("No dialog item for (idx:%d id:%d) '%s' ", i, item.iItemId, item.szItemText));
@@ -409,7 +409,7 @@ void ShowProgressDialog(HINSTANCE hInstance, const SString& strTitle, bool bAllo
         hwndProgressDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_PROGRESS_DIALOG), 0, DialogProc);
         dassert((GetWindowLong(hwndProgressDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
         InitDialogStrings(hwndProgressDialog, g_ProgressDialogItems);
-        SetWindowTextW(hwndProgressDialog, FromUTF8(strTitle));
+        SetWindowTextW(hwndProgressDialog, FromUTF8(strTitle).c_str());
         ShowWindow(GetDlgItem(hwndProgressDialog, IDCANCEL), bAllowCancel ? SW_SHOW : SW_HIDE);
         ulProgressStartTime = GetTickCount32();
     }
@@ -443,7 +443,7 @@ bool UpdateProgress(int iPos, int iMax, const SString& strMsg)
         char buffer[1024] = "";
         GetWindowText(hwndText, buffer, NUMELMS(buffer));
         if (strMsg.length() > 0 && strMsg != buffer)
-            SetWindowTextW(hwndText, FromUTF8(strMsg));
+            SetWindowTextW(hwndText, FromUTF8(strMsg).c_str());
         HWND hwndBar = GetDlgItem(hwndProgressDialog, IDC_PROGRESS_BAR);
         PostMessage(hwndBar, PBM_SETPOS, iPos * 100 / std::max(1, iMax), 0);
         MSG msg;
@@ -506,7 +506,7 @@ SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage)
         hwndCrashedDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_CRASHED_DIALOG), 0, DialogProc);
         dassert((GetWindowLong(hwndCrashedDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
         InitDialogStrings(hwndCrashedDialog, g_CrashedDialogItems);
-        SetWindowTextW(GetDlgItem(hwndCrashedDialog, IDC_CRASH_INFO_EDIT), FromUTF8(strMessage));
+        SetWindowTextW(GetDlgItem(hwndCrashedDialog, IDC_CRASH_INFO_EDIT), FromUTF8(strMessage).c_str());
         SendDlgItemMessage(hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK,
                            GetApplicationSetting("diagnostics", "send-dumps") != "no" ? BST_CHECKED : BST_UNCHECKED, 0);
     }
@@ -634,7 +634,7 @@ void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrar
     {
         // We grab the first offender's absolute file path to retrieve GTA's install directory
         SString      gtaDirectory = ExtractPath(offenders.front().absoluteFilePath);
-        LPITEMIDLIST gtaDirectoryItem = ILCreateFromPathW(FromUTF8(gtaDirectory));
+        LPITEMIDLIST gtaDirectoryItem = ILCreateFromPathW(FromUTF8(gtaDirectory).c_str());
 
         std::vector<LPITEMIDLIST> selectedItems;
 
@@ -642,7 +642,7 @@ void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrar
         {
             for (const GraphicsLibrary& library : offenders)
             {
-                if (LPITEMIDLIST item = ILCreateFromPathW(FromUTF8(library.absoluteFilePath)); item != nullptr)
+                if (LPITEMIDLIST item = ILCreateFromPathW(FromUTF8(library.absoluteFilePath).c_str()); item != nullptr)
                 {
                     selectedItems.emplace_back(item);
                 }

@@ -231,7 +231,7 @@ public:
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
-    virtual void      MakePedModel(char* szTexture) = 0;
+    virtual void      MakePedModel(const char* szTexture) = 0;
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
     virtual void      MakeTimedObjectModel(unsigned short usBaseID) = 0;

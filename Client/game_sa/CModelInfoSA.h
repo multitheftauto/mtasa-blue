@@ -445,7 +445,7 @@ public:
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
-    void         MakePedModel(char* szTexture);
+    void         MakePedModel(const char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);

@@ -3,6 +3,8 @@ project "discord-rpc"
 	language "C++"
 	kind "StaticLib"
 
+	cppdialect "C++20"
+
 	includedirs { 
 		"discord/include",
 		"discord/thirdparty/rapidjson/include"
