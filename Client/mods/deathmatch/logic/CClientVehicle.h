@@ -456,7 +456,7 @@ public:
 
     int GetCurrentGear();
 
-    bool IsEnterable();
+    bool IsEnterable(bool localEntity = false);
     bool HasRadio();
     bool HasPoliceRadio();
 
