@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CTrayIcon.cpp
  *  PURPOSE:     Create and destroy tray icon for MTA
@@ -16,7 +16,7 @@
 #define TRAY_DUMMY_WINDOW_NAME  L"NotificationsDummy"
 #define TRAY_BALLOON_TITLE      L"Notification from MTA:SA server"
 #define TRAY_ICON_TOOLTIP_TEXT  L"Multi Theft Auto: San Andreas"
-#define TRAY_BALLOON_INTERVAL   30000L // ms
+static constexpr std::uint16_t TRAY_BALLOON_INTERVAL = 500; // ms
 
 extern HINSTANCE g_hModule;
 
