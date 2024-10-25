@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-21 22:24+0000\n"
-"PO-Revision-Date: 2024-10-21 23:20\n"
+"POT-Creation-Date: 2024-10-23 16:33+0000\n"
+"PO-Revision-Date: 2024-10-25 21:30\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -429,23 +429,23 @@ msgstr "Verbindung getrennt: Verbindung verweigert"
 msgid "MTA Client verification failed!"
 msgstr "Verifikation des MTA Clients fehlgeschlagen!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "In a ditch"
 msgstr "In einem Graben"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "En-route to hospital"
 msgstr "Auf dem Weg ins Krankenhaus"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "Meeting their maker"
 msgstr "Begegnung mit ihrem Schöpfer"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
 msgid "Regretting their decisions"
 msgstr "Bedauern über ihre Entscheidungen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
 msgid "Wasted"
 msgstr "Vergeudet"
 
@@ -740,16 +740,16 @@ msgstr "Abbrechen"
 msgid "Download error: %s"
 msgstr "Downloadfehler: %s"
 
-#: Client/game_sa/CSettingsSA.cpp:767
+#: Client/game_sa/CSettingsSA.cpp:781
 msgid "Can't find valid screen resolution."
 msgstr "Konnte keine gültigen Bildschirmauflösungen finden."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:843
+#: Client/game_sa/CSettingsSA.cpp:857
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Bist du dir sicher, dass du diese Bildschirmauflösungen verwenden willst?"
 
-#: Client/game_sa/CSettingsSA.cpp:845 Client/loader/Dialogs.cpp:194
+#: Client/game_sa/CSettingsSA.cpp:859 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -2343,7 +2343,7 @@ msgstr "Javascript auf externen Webseiten"
 
 #: Client/core/CSettings.cpp:920
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "GPU-Rendering aktivieren"
 
 #: Client/core/CSettings.cpp:924
 msgid "Custom blacklist"
