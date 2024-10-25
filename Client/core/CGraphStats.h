@@ -23,6 +23,7 @@ public:
     virtual void SetEnabled(bool bEnabled) = 0;
     virtual bool IsEnabled() = 0;
     virtual void AddTimingPoint(const char* szName) = 0;
+    virtual void RemoveTimingPoint(const char* szName) = 0;
 };
 
 CGraphStatsInterface* GetGraphStats();

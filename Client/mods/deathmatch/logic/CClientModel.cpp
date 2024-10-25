@@ -84,9 +84,6 @@ bool CClientModel::Deallocate()
     if (!m_bAllocatedByUs)
         return false;
 
-    if (m_pParentResource)
-        m_pParentResource->GetResourceModelStreamer()->FullyReleaseModel(m_iModelID);
-
     SetParentResource(nullptr);
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
@@ -216,7 +213,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 
 bool CClientModel::AllocateTXD(std::string &strTxdName)
 {
-    uint uiSlotID = g_pGame->GetPools()->AllocateTextureDictonarySlot(m_iModelID - MAX_MODEL_DFF_ID, strTxdName);
+    std::uint32_t uiSlotID = g_pGame->GetPools()->GetTxdPool().AllocateTextureDictonarySlot(m_iModelID - MAX_MODEL_DFF_ID, strTxdName);
     if (uiSlotID != -1)
     {
         m_bAllocatedByUs = true;
@@ -237,6 +234,6 @@ void CClientModel::RestoreTXD(CModelInfo* pModelInfo)
             pModelInfo->SetTextureDictionaryID(0);
     }
 
-    g_pGame->GetPools()->RemoveTextureDictonarySlot(uiTextureDictonarySlotID);
+    g_pGame->GetPools()->GetTxdPool().RemoveTextureDictonarySlot(uiTextureDictonarySlotID);
     g_pGame->GetStreaming()->SetStreamingInfo(pModelInfo->GetModel(), 0, 0, 0, -1);
 }

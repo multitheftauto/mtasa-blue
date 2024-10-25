@@ -133,6 +133,9 @@ bool CMainConfig::Load()
         return false;
     }
 
+    // Strip spaces from beginning and end of server name
+    m_strServerName = SString(m_strServerName).TrimStart(" ").TrimEnd(" ");
+
     // Grab the forced server ip(s)
     GetString(m_pRootNode, "serverip", m_strServerIP);
     m_strServerIP = SString(m_strServerIP).Replace(" ", "");
