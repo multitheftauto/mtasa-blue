@@ -51,4 +51,5 @@ public:
     LUA_DECLARE(ResizeBrowser);
     LUA_DECLARE(GUICreateBrowser);
     LUA_DECLARE(GUIGetBrowser);
+    static bool IsBrowserGPUEnabled() noexcept;
 };
