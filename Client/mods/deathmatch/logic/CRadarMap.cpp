@@ -54,10 +54,14 @@ CRadarMap::CRadarMap(CClientManager* pManager)
     m_iVerticalMovement = 0;
     SetupMapVariables();
 
-    // Create the radar and local player blip images
-    m_pRadarImage =
-        g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), NULL, false, 2048, 2048, RFORMAT_DXT1);
+    // Create the local player blip image
     m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
+
+    // Create the radar map image
+    int radarImagePreset = 0; // TEMP
+    auto [radarImgFileName, radarImgWidth, radarImgHeight] = GetRadarImagePreset(radarImagePreset);
+    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\" + radarImgFileName), NULL, false,
+                                                                                  radarImgWidth, radarImgHeight, RFORMAT_DXT1);
 
     // Create the marker textures
     CreateMarkerTextures();

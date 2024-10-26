@@ -64,6 +64,13 @@ public:
 
     SString GetBoundKeyName(const SString& strCommand);
 
+    std::tuple<std::string, int, int> GetRadarImagePreset(int index) const
+    {
+        if (index < 0 || index >= m_radarImagePresets.size())
+            index = 0;
+        return m_radarImagePresets[index];
+    }
+
 private:
     bool CalculateEntityOnScreenPosition(class CClientEntity* pEntity, CVector2D& vecLocalPos);
     bool CalculateEntityOnScreenPosition(CVector vecPosition, CVector2D& vecLocalPos);
@@ -82,6 +89,11 @@ private:
     CTextureItem*              m_pRadarImage;
     CTextureItem*              m_pLocalPlayerBlip;
     std::vector<CTextureItem*> m_MarkerTextureList;
+
+    std::vector<std::tuple<std::string, int, int>> m_radarImagePresets = {
+        {"radar_1024.png", 1024, 1024},
+        {"radar_2048.png", 2048, 2048},
+    };
 
     unsigned int m_uiHeight;
     unsigned int m_uiWidth;
