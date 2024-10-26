@@ -910,6 +910,11 @@ ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
 ADD_ENUM(PreloadAreaOption::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("preload-area-option")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(taskType)
+ADD_ENUM(taskType::PRIMARY_TASK, "primary")
+ADD_ENUM(taskType::SECONDARY_TASK, "secondary")
+IMPLEMENT_ENUM_CLASS_END("tasks-types")
+
 //
 // CResource from userdata
 //
