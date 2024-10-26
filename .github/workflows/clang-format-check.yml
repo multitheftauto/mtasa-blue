@@ -1,5 +1,5 @@
 name: clang-format Check
-on: [push]
+on: [push, pull_request]
 jobs:
   clang-format-checking:
     runs-on: ubuntu-latest
