@@ -14,8 +14,6 @@ class CClientVectorGraphicDisplay;
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
 
-
-
 class CClientVectorGraphicDisplay final : public CClientDisplay
 {
     friend class CClientDisplayManager;
