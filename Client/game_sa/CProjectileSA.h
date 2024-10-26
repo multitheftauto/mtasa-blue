@@ -17,7 +17,7 @@
 class CProjectileSAInterface : public CObjectSAInterface            // entirely inherited from CObject
 {
 public:
-    bool IsProjectableVTBL() const { return *reinterpret_cast<const std::uint32_t*>(this) == 0x867030; };
+    bool IsProjectableVTBL() const { return GetVTBL() == (void*)0x867030; };
 };
 
 class CProjectileSA : public virtual CProjectile, public virtual CObjectSA

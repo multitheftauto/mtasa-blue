@@ -22,8 +22,10 @@ class CPlaceableSAInterface
 public:
     virtual void* Destructor(bool free) = 0;
 
-    bool IsPlaceableVTBL() const { return *reinterpret_cast<const void* const*>(this) == (void*)0x863C40; }
-    bool HasVTBL() const { return *reinterpret_cast<const void* const*>(this) != nullptr; }
+    void* GetVTBL() const { return *reinterpret_cast<void* const*>(this); }
+    bool  HasVTBL() const { return GetVTBL() != nullptr; }
+    bool  IsPlaceableVTBL() const { return GetVTBL() == (void*)0x863C40; }
+
     bool HasMatrix() const noexcept { return matrix != nullptr; }
     void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
 
