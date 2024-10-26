@@ -70,17 +70,17 @@ CRadarMap::CRadarMap(CClientManager* pManager)
         float   fScale;
         SString strMessage;
     } messageList[] = {
-        {SColorRGBA(255, 255, 255, 200), 0.92f, 1.5f, "Current Mode: Kill all humans"},
-        {SColorRGBA(255, 255, 255, 255), 0.95f, 1.0f, SString("Press %s to change mode.", *GetBoundKeyName("radar_attach"))},
+        {SColorRGBA(255, 255, 255, 200), 0.92f, 1.5f, "Mode: xxx"},
+        {SColorRGBA(255, 255, 255, 255), 0.95f, 1.0f, SString(_("Press %s to change mode."), *GetBoundKeyName("radar_attach"))},
         {SColorRGBA(255, 255, 255, 255), 0.05f, 1.0f,
-         SString("Press %s/%s to zoom in/out.", *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"))},
+         SString(_("Press %s/%s to zoom in/out."), *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"))},
         {SColorRGBA(255, 255, 255, 255), 0.08f, 1.0f,
-         SString("Press %s, %s, %s, %s to navigate the map.", *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"),
+         SString(_("Press %s, %s, %s, %s to navigate the map."), *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"),
                  *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"))},
         {SColorRGBA(255, 255, 255, 255), 0.11f, 1.0f,
-         SString("Press %s/%s to change opacity.", *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
-        {SColorRGBA(255, 255, 255, 255), 0.14f, 1.0f, SString("Press %s to hide the map.", *GetBoundKeyName("radar"))},
-        {SColorRGBA(255, 255, 255, 255), 0.17f, 1.0f, SString("Press %s to hide this help text.", *GetBoundKeyName("radar_help"))},
+         SString(_("Press %s/%s to change opacity."), *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
+        {SColorRGBA(255, 255, 255, 255), 0.14f, 1.0f, SString(_("Press %s to hide the map."), *GetBoundKeyName("radar"))},
+        {SColorRGBA(255, 255, 255, 255), 0.17f, 1.0f, SString(_("Press %s to hide this help text."), *GetBoundKeyName("radar_help"))},
     };
 
     for (uint i = 0; i < NUMELMS(messageList); i++)
@@ -646,11 +646,11 @@ void CRadarMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
 
     if (m_bIsAttachedToLocal)
     {
-        m_HelpTextList[0]->SetCaption("Current Mode: Attached to local player");
+        m_HelpTextList[0]->SetCaption(_("Mode: Following player"));
     }
     else
     {
-        m_HelpTextList[0]->SetCaption("Current Mode: Free Move");
+        m_HelpTextList[0]->SetCaption(_("Mode: Free movement"));
     }
 }
 
