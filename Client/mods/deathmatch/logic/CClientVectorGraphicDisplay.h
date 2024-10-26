@@ -14,6 +14,8 @@ class CClientVectorGraphicDisplay;
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
 
+
+
 class CClientVectorGraphicDisplay final : public CClientDisplay
 {
     friend class CClientDisplayManager;
@@ -33,6 +35,15 @@ public:
     bool HasUpdated() const { return m_bHasUpdated; }
 
     void Update();
+
+    // Color indexes as per lunasvg::Bitmap
+    static enum ColorIndex
+    {
+        R = 0,
+        G = 1,
+        B = 2,
+        A = 3
+    };
 
 private:
     CClientVectorGraphic* m_pVectorGraphic;
