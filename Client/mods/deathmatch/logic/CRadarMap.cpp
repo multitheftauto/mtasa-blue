@@ -52,16 +52,12 @@ CRadarMap::CRadarMap(CClientManager* pManager)
     m_fZoom = 1;
     m_iHorizontalMovement = 0;
     m_iVerticalMovement = 0;
-    SetupMapVariables();
 
     // Create the local player blip image
     m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
 
     // Create the radar map image
-    int radarImagePreset = 0; // TEMP
-    auto [radarImgFileName, radarImgWidth, radarImgHeight] = GetRadarImagePreset(radarImagePreset);
-    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\" + radarImgFileName), NULL, false,
-                                                                                  radarImgWidth, radarImgHeight, RFORMAT_DXT1);
+    SetMapImage(g_pCore->GetCVars()->GetValue<int>("radar_map_image", 0));
 
     // Create the marker textures
     CreateMarkerTextures();
@@ -116,6 +112,20 @@ CRadarMap::~CRadarMap()
     m_MarkerTextureList.clear();
 
     // Don't need to delete the help texts as those are destroyed by the display manager
+}
+
+// If invalid presetIndex is passed, it will use the first preset
+void CRadarMap::SetMapImage(const int presetIndex)
+{
+    if (m_pRadarImage)
+        delete m_pRadarImage;
+
+    auto [fileName, width, height] = GetRadarImagePreset(presetIndex);
+    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\" + fileName), NULL, false, width, height,
+                                                                                  RFORMAT_DXT1);
+    g_pCore->GetConsole()->Printf("Radar map image preset id %d loaded (%d x %d)", presetIndex, width, height);
+
+    SetupMapVariables();
 }
 
 void CRadarMap::DoPulse()

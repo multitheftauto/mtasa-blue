@@ -62,9 +62,11 @@ public:
     void ZoomIn();
     void ZoomOut();
 
+    void SetMapImage(const int presetIndex);
+
     SString GetBoundKeyName(const SString& strCommand);
 
-    std::tuple<std::string, int, int> GetRadarImagePreset(int index) const
+    std::tuple<std::string, int, int> GetRadarImagePreset(int index) const noexcept
     {
         if (index < 0 || index >= m_radarImagePresets.size())
             index = 0;

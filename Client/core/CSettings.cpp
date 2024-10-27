@@ -1004,12 +1004,26 @@ void CSettings::CreateGUI()
     m_pAdvancedMiscLabel->AutoSize();
     vecTemp.fY += fHeaderHeight;
 
-    fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Fast CJ clothes loading:"), _("Browser speed:"), _("Single connection:"), _("Packet tag:"),
+    fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Radar map image:"), _("Fast CJ clothes loading:"), _("Browser speed:"), _("Single connection:"), _("Packet tag:"),
                                                _("Progress animation:"), _("Fullscreen mode:"), _("Process priority:"), _("Debug setting:"),
                                                _("Streaming memory:"), _("Update build type:"), _("Install important updates:")) +
                5.0f;
 
     vecTemp.fX += 10.0f;
+
+    // Radar map image
+    m_pRadarMapImageLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Radar map image:")));
+    m_pRadarMapImageLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pRadarMapImageLabel->AutoSize();
+
+    m_pRadarMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
+    m_pRadarMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+    m_pRadarMapImageCombo->SetSize(CVector2D(fComboWidth, 95.0f));
+    m_pRadarMapImageCombo->AddItem(_("1024 x 1024 (Default)"))->SetData((void*)0);
+    m_pRadarMapImageCombo->AddItem(_("2048 x 2048"))->SetData((void*)1);
+    m_pRadarMapImageCombo->SetReadOnly(true);
+    vecTemp.fY += fLineHeight;
+
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
     m_pFastClothesLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
@@ -1238,7 +1252,7 @@ void CSettings::CreateGUI()
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY = 354 + 10;
+    vecTemp.fY += 10;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
@@ -1296,6 +1310,9 @@ void CSettings::CreateGUI()
 
     m_pFastClothesLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pFastClothesLabel->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
+
+    m_pRadarMapImageCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
+    m_pRadarMapImageCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
     m_pFastClothesCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pFastClothesCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
@@ -3150,6 +3167,13 @@ void CSettings::LoadData()
     int PriorityClassList[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
     SetPriorityClass(GetCurrentProcess(), PriorityClassList[CVARS_GET_VALUE<int>("process_priority") % 3]);
 
+    // Radar map image
+    CVARS_GET("radar_map_image", iVar);
+    if (iVar == 0)
+        m_pRadarMapImageCombo->SetText(_("1024 x 1024 (Default)"));
+    else if (iVar == 1)
+        m_pRadarMapImageCombo->SetText(_("2048 x 2048"));
+
     // Fast clothes loading
     CVARS_GET("fast_clothes_loading", iVar);
     if (iVar == CMultiplayer::FAST_CLOTHES_OFF)
@@ -3535,6 +3559,14 @@ void CSettings::SaveData()
     bool bDynamicPedShadows = m_pCheckBoxDynamicPedShadows->GetSelected();
     CVARS_SET("dynamic_ped_shadows", bDynamicPedShadows);
     gameSettings->SetDynamicPedShadowsEnabled(bDynamicPedShadows);
+
+    // Radar map image
+    if (CGUIListItem* pSelected = m_pRadarMapImageCombo->GetSelectedItem())
+    {
+        int iSelected = (int)pSelected->GetData();
+        CVARS_SET("radar_map_image", iSelected);
+        // TODO Update the map image if radar map exists
+    }
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
@@ -4812,6 +4844,8 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
 
     if (pLabel && pLabel == m_pPriorityLabel || pComboBox && pComboBox == m_pPriorityCombo)
         strText = std::string(_("Process priority:")) + " " + std::string(_("Very experimental feature."));
+    else if (pLabel && pLabel == m_pRadarMapImageLabel || pComboBox && pComboBox == m_pRadarMapImageCombo)
+        strText = std::string(_("Radar map image:")) + " " + std::string(_("Select the San Andreas radar map image size."));
     else if (pLabel && pLabel == m_pFastClothesLabel || pComboBox && pComboBox == m_pFastClothesCombo)
         strText = std::string(_("Fast CJ clothes loading:")) + " " + std::string(_("Stops stalls with CJ variations (Uses 65MB more RAM)"));
     else if (pLabel && pLabel == m_pBrowserSpeedLabel || pComboBox && pComboBox == m_pBrowserSpeedCombo)
