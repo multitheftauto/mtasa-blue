@@ -90,7 +90,7 @@ private:
     CTextureItem*              m_pLocalPlayerBlip;
     std::vector<CTextureItem*> m_MarkerTextureList;
 
-    std::vector<std::tuple<std::string, int, int>> m_radarImagePresets = {
+    std::vector<std::tuple<std::string, int, int>> const m_radarImagePresets = {
         {"radar_1024.png", 1024, 1024},
         {"radar_2048.png", 2048, 2048},
     };
