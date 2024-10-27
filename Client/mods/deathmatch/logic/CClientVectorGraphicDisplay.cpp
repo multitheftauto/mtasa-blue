@@ -67,7 +67,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
         return;
 
     // convert to BGRA unpremultiplied
-    bitmap.convert(B, G, R, A, true);
+    bitmap.convert(eColorIndex::B, eColorIndex::G, eColorIndex::R, eColorIndex::A, true);
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;

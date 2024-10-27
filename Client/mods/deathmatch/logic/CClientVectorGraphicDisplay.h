@@ -35,7 +35,7 @@ public:
     void Update();
 
     // Color indexes as per lunasvg::Bitmap
-    static enum ColorIndex
+    static enum eColorIndex : int
     {
         R = 0,
         G = 1,
