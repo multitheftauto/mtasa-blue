@@ -1019,8 +1019,8 @@ void CSettings::CreateGUI()
     m_pRadarMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
     m_pRadarMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
     m_pRadarMapImageCombo->SetSize(CVector2D(fComboWidth, 95.0f));
-    m_pRadarMapImageCombo->AddItem(_("1024 x 1024 (Default)"))->SetData((void*)0);
-    m_pRadarMapImageCombo->AddItem(_("2048 x 2048"))->SetData((void*)1);
+    m_pRadarMapImageCombo->AddItem(_("1024 x 1024 (Default)"));
+    m_pRadarMapImageCombo->AddItem(_("2048 x 2048"));
     m_pRadarMapImageCombo->SetReadOnly(true);
     vecTemp.fY += fLineHeight;
 
@@ -3565,7 +3565,7 @@ void CSettings::SaveData()
     {
         int iSelected = (int)pSelected->GetData();
         CVARS_SET("radar_map_image", iSelected);
-        // TODO Update the map image if radar map exists
+        // TODO: Update the map image if radar map exists
     }
 
     // Fast clothes loading

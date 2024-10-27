@@ -62,14 +62,15 @@ public:
     void ZoomIn();
     void ZoomOut();
 
-    void SetMapImage(const int presetIndex);
+    void SetMapImage(const std::uint32_t presetIndex);
 
     SString GetBoundKeyName(const SString& strCommand);
 
-    std::tuple<std::string, int, int> GetRadarImagePreset(int index) const noexcept
+    std::tuple<std::string, std::uint32_t, std::uint32_t> GetRadarImagePreset(std::uint32_t index) const
     {
         if (index < 0 || index >= m_radarImagePresets.size())
             index = 0;
+        assert(index < m_radarImagePresets.size()); // Vector should never be empty
         return m_radarImagePresets[index];
     }
 
@@ -92,7 +93,7 @@ private:
     CTextureItem*              m_pLocalPlayerBlip;
     std::vector<CTextureItem*> m_MarkerTextureList;
 
-    std::vector<std::tuple<std::string, int, int>> const m_radarImagePresets = {
+    const std::vector<std::tuple<std::string, std::uint32_t, std::uint32_t>> m_radarImagePresets = {
         {"radar_1024.png", 1024, 1024},
         {"radar_2048.png", 2048, 2048},
     };
