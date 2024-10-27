@@ -256,6 +256,7 @@ void CClientVariables::ValidateValues()
     ClampValue("mtavolume", 0.0f, 1.0f);
     ClampValue("voicevolume", 0.0f, 1.0f);
     ClampValue("mapalpha", 0, 255);
+    ClampValue("radar_map_image", 0, 1);
 }
 
 void CClientVariables::LoadDefaults()
@@ -314,6 +315,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("mtavolume", 1.0f);                                                       // custom sound's volume
     DEFAULT("voicevolume", 1.0f);                                                     // voice chat output volume
     DEFAULT("mapalpha", 155);                                                         // map alpha
+    DEFAULT("radar_map_image", 0);                                                    // map image
     DEFAULT("browser_speed", 1);                                                      // Browser speed
     DEFAULT("single_download", 0);                                                    // Single connection for downloads
     DEFAULT("packet_tag", 0);                                                         // Tag network packets
