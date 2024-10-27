@@ -57,6 +57,7 @@ CRadarMap::CRadarMap(CClientManager* pManager)
     m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
 
     // Create the radar map image
+    m_pRadarImage = nullptr;
     SetMapImage(g_pCore->GetCVars()->GetValue<int>("radar_map_image", 0));
 
     // Create the marker textures
@@ -117,11 +118,11 @@ CRadarMap::~CRadarMap()
 // If invalid presetIndex is passed, it will use the first preset
 void CRadarMap::SetMapImage(const int presetIndex)
 {
-    if (m_pRadarImage)
-        delete m_pRadarImage;
+    if (m_pRadarImage != nullptr)
+        SAFE_RELEASE(m_pRadarImage);
 
     auto [fileName, width, height] = GetRadarImagePreset(presetIndex);
-    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\" + fileName), NULL, false, width, height,
+    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\" + fileName), nullptr, false, width, height,
                                                                                   RFORMAT_DXT1);
     g_pCore->GetConsole()->Printf("Radar map image preset id %d loaded (%d x %d)", presetIndex, width, height);
 
