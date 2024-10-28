@@ -3169,7 +3169,7 @@ void CSettings::LoadData()
 
     // Radar map image
     CVARS_GET("radar_map_image", iVar);
-    if (iVar >= 0 && iVar <= 1)
+    if (iVar == 0 || iVar == 1)
         m_pRadarMapImageCombo->SetSelectedItemByIndex(iVar);
 
     // Fast clothes loading
@@ -3561,9 +3561,7 @@ void CSettings::SaveData()
     // Radar map image
     int selectedComboIndex = m_pRadarMapImageCombo->GetSelectedItemIndex();
     if (selectedComboIndex != -1)
-    {
         CVARS_SET("radar_map_image", selectedComboIndex);
-    }
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())

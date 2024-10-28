@@ -679,13 +679,9 @@ void CRadarMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
     SetupMapVariables();
 
     if (m_bIsAttachedToLocal)
-    {
         m_HelpTextList[0]->SetCaption(_("Following Player"));
-    }
     else
-    {
         m_HelpTextList[0]->SetCaption(_("Free Movement"));
-    }
 }
 
 bool CRadarMap::IsRadarShowing()
