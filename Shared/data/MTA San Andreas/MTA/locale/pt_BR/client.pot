@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-21 22:24+0000\n"
-"PO-Revision-Date: 2024-10-22 00:21\n"
+"POT-Creation-Date: 2024-10-23 16:33+0000\n"
+"PO-Revision-Date: 2024-10-28 17:51\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -160,15 +160,15 @@ msgstr "(Modo de desenvolvimento) mostra o ID dos sons do ambiente no painel de 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1089 Client/core/CCore.cpp:674
 #: Client/core/CSettings.cpp:3489
 msgid "In-game"
-msgstr "In-game"
+msgstr "No jogo"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:374
 msgid "Flying a UFO around"
-msgstr "Voando um OVNI por"
+msgstr "Voando em um OVNI"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:374
 msgid "Cruising around"
-msgstr "Passando por"
+msgstr "Passeando por aí"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:374
 msgid "Riding the waves of"
@@ -196,7 +196,7 @@ msgstr "Rolê por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Bunny hopping around"
-msgstr "Bunando por"
+msgstr "Pulando por aí"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Doing weird stuff in"
@@ -213,7 +213,7 @@ msgstr "Atirando de um veículo em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Blub blub..."
-msgstr "Blub blub..."
+msgstr "Blá Blá..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Breathing water"
@@ -354,7 +354,7 @@ msgstr "Área 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1028
 msgid "Walking around "
-msgstr "Andando por "
+msgstr "Andando por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1174
 #, c-format
@@ -429,23 +429,23 @@ msgstr "Desconectado: conexão foi recusada"
 msgid "MTA Client verification failed!"
 msgstr "Verificação ao cliente do MTA falhou!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "In a ditch"
 msgstr "Ta na vala"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "En-route to hospital"
-msgstr "À caminho do hospital"
+msgstr "Indo para o hospital"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "Meeting their maker"
 msgstr "Se encontrando com seu criador"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
 msgid "Regretting their decisions"
 msgstr "Arrependendo de suas decisões"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
 msgid "Wasted"
 msgstr "Morreu"
 
@@ -740,16 +740,16 @@ msgstr "Cancelar"
 msgid "Download error: %s"
 msgstr "Erro de download: %s"
 
-#: Client/game_sa/CSettingsSA.cpp:767
+#: Client/game_sa/CSettingsSA.cpp:781
 msgid "Can't find valid screen resolution."
 msgstr "Não foi possível encontrar uma resolução válida."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:843
+#: Client/game_sa/CSettingsSA.cpp:857
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Você tem certeza que deseja usar essa resolução?"
 
-#: Client/game_sa/CSettingsSA.cpp:845 Client/loader/Dialogs.cpp:194
+#: Client/game_sa/CSettingsSA.cpp:859 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -2075,7 +2075,7 @@ msgstr "Sempre mostrar a janela de download"
 
 #: Client/core/CSettings.cpp:403
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "Permitir conexão com o Status de Atividade do Discord"
+msgstr "Permitir conexão com a bio de Atividade do Discord"
 
 #: Client/core/CSettings.cpp:408
 msgid "Use customized GTA:SA files"
@@ -2343,7 +2343,7 @@ msgstr "Permitir o uso de Javascript em websites remotos"
 
 #: Client/core/CSettings.cpp:920
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "Renderizar com GPU"
 
 #: Client/core/CSettings.cpp:924
 msgid "Custom blacklist"
@@ -2786,8 +2786,8 @@ msgstr "SONS EXTERNOS"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr "Parece que você tem a opção de conexão Rich Presence habilitada.\n"
-"Deseja permitir que os servidores compartilhem seus dados?\n\n"
+msgstr "Você tem a opção de conexão \"Rich Presence\" ativada.\n"
+"Quer permitir que os servidores mostrem seus dados?\n"
 "Isso inclui o seu identificador de ID exclusivo."
 
 #: Client/core/CSettings.cpp:4573
