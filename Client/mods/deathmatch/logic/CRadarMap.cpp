@@ -67,6 +67,8 @@ CRadarMap::CRadarMap(CClientManager* pManager)
     CreateMarkerTextures();
 
     // Create the text displays for the help text
+    SColorRGBA colorWhiteTransparent = SColorRGBA(255, 255, 255, 200);
+    SColorRGBA colorWhite = SColorRGBA(255, 255, 255, 255);
     struct
     {
         SColor  color;
@@ -74,13 +76,17 @@ CRadarMap::CRadarMap(CClientManager* pManager)
         float   fScale;
         SString strMessage;
     } messageList[] = {
-        {SColorRGBA(255, 255, 255, 200), 0.92f, 1.5f, ""},
-        {SColorRGBA(255, 255, 255, 255), 0.95f, 1.0f, SString(_("Change mode: %s"), *GetBoundKeyName("radar_attach"))},
-        {SColorRGBA(255, 255, 255, 255), 0.05f, 1.0f, SString(_("Zoom in/out: %s/%s"), *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"))},
-        {SColorRGBA(255, 255, 255, 255), 0.07f, 1.0f, SString(_("Movement: %s, %s, %s, %s"), *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"), *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"))},
-        {SColorRGBA(255, 255, 255, 255), 0.09f, 1.0f, SString(_("Decrease/increase opacity: %s/%s"), *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
-        {SColorRGBA(255, 255, 255, 255), 0.11f, 1.0f, SString(_("Toggle map: %s"), *GetBoundKeyName("radar"))},
-        {SColorRGBA(255, 255, 255, 255), 0.13f, 1.0f, SString(_("Toggle this help text: %s"), *GetBoundKeyName("radar_help"))},
+        {colorWhiteTransparent, 0.92f, 1.5f, ""},
+        {colorWhite, 0.95f, 1.0f, SString(_("Change mode: %s"), *GetBoundKeyName("radar_attach"))},
+
+        {colorWhite, 0.05f, 1.0f,
+         SString(_("Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"),
+                 *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"), *GetBoundKeyName("radar_move_north"),
+                 *GetBoundKeyName("radar_move_east"), *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"),
+                 *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
+        {colorWhite, 0.07f, 1.0f,
+         SString(_("Toggle map: %s     Toggle help text: %s"),
+                 *GetBoundKeyName("radar"), *GetBoundKeyName("radar_help"))},
     };
 
     for (uint i = 0; i < NUMELMS(messageList); i++)
@@ -126,7 +132,7 @@ void CRadarMap::SetMapImage(std::uint32_t imageIndex)
 
     SString fileName("MTA\\cgui\\images\\radar_%d.png", width);
 
-    if (m_pRadarImage != nullptr)
+    if (m_pRadarImage)
         SAFE_RELEASE(m_pRadarImage);
 
     m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, width, height, RFORMAT_DXT1);
