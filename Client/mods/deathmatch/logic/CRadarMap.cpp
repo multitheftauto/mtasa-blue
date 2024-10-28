@@ -23,6 +23,8 @@ enum
     MARKER_LAST_SPRITE_INDEX = MARKER_FIRST_SPRITE_INDEX + RADAR_MARKER_LIMIT - 1,
 };
 
+constexpr std::array<std::uint32_t, 2> RADAR_IMAGE_SIZES = {1024, 2048};
+
 CRadarMap::CRadarMap(CClientManager* pManager)
 {
     // Setup our managers
@@ -58,7 +60,7 @@ CRadarMap::CRadarMap(CClientManager* pManager)
 
     // Create the radar map image
     m_pRadarImage = nullptr;
-    g_pCore->GetCVars()->Get("radar_map_image", m_radarImageIndex);
+    m_radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("radar_map_image");
     SetMapImage(m_radarImageIndex);
 
     // Create the marker textures
@@ -72,17 +74,13 @@ CRadarMap::CRadarMap(CClientManager* pManager)
         float   fScale;
         SString strMessage;
     } messageList[] = {
-        {SColorRGBA(255, 255, 255, 200), 0.92f, 1.5f, "Mode: xxx"},
-        {SColorRGBA(255, 255, 255, 255), 0.95f, 1.0f, SString(_("Press %s to change mode."), *GetBoundKeyName("radar_attach"))},
-        {SColorRGBA(255, 255, 255, 255), 0.05f, 1.0f,
-         SString(_("Press %s/%s to zoom in/out."), *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"))},
-        {SColorRGBA(255, 255, 255, 255), 0.08f, 1.0f,
-         SString(_("Press %s, %s, %s, %s to navigate the map."), *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"),
-                 *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"))},
-        {SColorRGBA(255, 255, 255, 255), 0.11f, 1.0f,
-         SString(_("Press %s/%s to change opacity."), *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
-        {SColorRGBA(255, 255, 255, 255), 0.14f, 1.0f, SString(_("Press %s to hide the map."), *GetBoundKeyName("radar"))},
-        {SColorRGBA(255, 255, 255, 255), 0.17f, 1.0f, SString(_("Press %s to hide this help text."), *GetBoundKeyName("radar_help"))},
+        {SColorRGBA(255, 255, 255, 200), 0.92f, 1.0f, ""},
+        {SColorRGBA(255, 255, 255, 255), 0.95f, 1.0f, SString(_("Change mode: %s"), *GetBoundKeyName("radar_attach"))},
+        {SColorRGBA(255, 255, 255, 255), 0.05f, 1.0f, SString(_("Zoom in/out: %s/%s"), *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"))},
+        {SColorRGBA(255, 255, 255, 255), 0.08f, 1.0f, SString(_("Movement: %s, %s, %s, %s"), *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"), *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"))},
+        {SColorRGBA(255, 255, 255, 255), 0.11f, 1.0f, SString(_("Change opacity: %s/%s"), *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
+        {SColorRGBA(255, 255, 255, 255), 0.14f, 1.0f, SString(_("Toggle map: %s"), *GetBoundKeyName("radar"))},
+        {SColorRGBA(255, 255, 255, 255), 0.17f, 1.0f, SString(_("Hide this help text: %s"), *GetBoundKeyName("radar_help"))},
     };
 
     for (uint i = 0; i < NUMELMS(messageList); i++)
@@ -120,22 +118,13 @@ CRadarMap::~CRadarMap()
 
 void CRadarMap::SetMapImage(std::uint32_t imageIndex)
 {
-    if (imageIndex < 0 || imageIndex > 1)
-        imageIndex = 0;
-
-    SString       fileName;
     std::uint32_t width, height;
-    if (imageIndex == 0)
-    {
-        width = 1024;
-        height = 1024;
-    }
+    if (imageIndex < RADAR_IMAGE_SIZES.size())
+        width = height = RADAR_IMAGE_SIZES[imageIndex];
     else
-    {
-        width = 2048;
-        height = 2048;
-    }
-    fileName.Format("MTA\\cgui\\images\\radar_%d.png", width);
+        width = height = RADAR_IMAGE_SIZES[0];
+
+    SString fileName("MTA\\cgui\\images\\radar_%d.png", width);
 
     if (m_pRadarImage != nullptr)
         SAFE_RELEASE(m_pRadarImage);
@@ -269,8 +258,7 @@ void CRadarMap::DoRender()
         g_pCore->GetCVars()->Get("mapalpha", iRadarAlpha);
 
         // Update the image if the user changed it via a setting
-        std::uint32_t radarImageIndex;
-        g_pCore->GetCVars()->Get("radar_map_image", radarImageIndex);
+        auto radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("radar_map_image");
         if (radarImageIndex != m_radarImageIndex)
         {
             m_radarImageIndex = radarImageIndex;
@@ -686,11 +674,11 @@ void CRadarMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
 
     if (m_bIsAttachedToLocal)
     {
-        m_HelpTextList[0]->SetCaption(_("Mode: Following player"));
+        m_HelpTextList[0]->SetCaption(_("* Following player *"));
     }
     else
     {
-        m_HelpTextList[0]->SetCaption(_("Mode: Free movement"));
+        m_HelpTextList[0]->SetCaption(_("* Free movement *"));
     }
 }
 
