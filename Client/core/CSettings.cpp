@@ -376,7 +376,7 @@ void CSettings::CreateGUI()
     m_pButtonGenerateNickIcon->SetProperty("DistributeCapturedInputs", "True");
 
     m_pSavePasswords = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save server passwords"), true));
-    m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 50.0f));
+    m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 35.0f));
     m_pSavePasswords->GetPosition(vecTemp, false);
     m_pSavePasswords->AutoSize(NULL, 20.0f);
 
@@ -411,10 +411,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
 
     m_pMapRenderingLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Map rendering options")));
-    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30));
     m_pMapRenderingLabel->GetPosition(vecTemp, false);
     m_pMapRenderingLabel->SetFont("default-bold-small");
     m_pMapRenderingLabel->AutoSize();
+
+    vecTemp.fX += 5.0f;
 
     m_pMapAlphaLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Opacity:")));
     m_pMapAlphaLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 24.0f));
@@ -432,6 +434,20 @@ void CSettings::CreateGUI()
     m_pMapAlphaValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pMapAlphaValueLabel->GetPosition(vecTemp, false);
     m_pMapAlphaValueLabel->AutoSize("100%");
+
+    m_pMapAlphaLabel->GetPosition(vecTemp, false);
+    vecTemp.fY += 24.0f;
+
+    m_pRadarMapImageLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Image resolution:")));
+    m_pRadarMapImageLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 2.0f));
+    m_pRadarMapImageLabel->AutoSize();
+
+    m_pRadarMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabMultiplayer, ""));
+    m_pRadarMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
+    m_pRadarMapImageCombo->SetSize(CVector2D(170.f, 95.0f));
+    m_pRadarMapImageCombo->AddItem(_("1024 x 1024 (Default)"));            // index 0
+    m_pRadarMapImageCombo->AddItem(_("2048 x 2048"));                      // index 1
+    m_pRadarMapImageCombo->SetReadOnly(true);
 
     /**
      *  Audio tab
@@ -625,16 +641,13 @@ void CSettings::CreateGUI()
      *  Video tab
      **/
     fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Resolution:"), _("FOV:"), _("Draw Distance:"), _("Brightness:"), _("FX Quality:"),
-                                               _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"), _("Opacity:"));
+                                               _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"));
 
-    m_pVideoGeneralLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("General")));
-    m_pVideoGeneralLabel->SetPosition(CVector2D(11, 13));
-    m_pVideoGeneralLabel->GetPosition(vecTemp, false);
-    m_pVideoGeneralLabel->AutoSize(NULL, 3.0f);
-    m_pVideoGeneralLabel->SetFont("default-bold-small");
+    vecTemp.fX = 11;
+    vecTemp.fY = 13;
 
     m_pVideoResolutionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Resolution:")));
-    m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
+    m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pVideoResolutionLabel->GetPosition(vecTemp, false);
     m_pVideoResolutionLabel->AutoSize();
 
@@ -833,6 +846,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
     m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 150.0f));
+    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
+
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
     m_pCheckBoxMinimize->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 30.0f));
@@ -877,10 +894,6 @@ void CSettings::CreateGUI()
     m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
     m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
     m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
-
-    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
-    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
-    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
 
     vecTemp.fY += 10;
 
@@ -1004,25 +1017,12 @@ void CSettings::CreateGUI()
     m_pAdvancedMiscLabel->AutoSize();
     vecTemp.fY += fHeaderHeight;
 
-    fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Radar map image:"), _("Fast CJ clothes loading:"), _("Browser speed:"), _("Single connection:"), _("Packet tag:"),
+    fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Fast CJ clothes loading:"), _("Browser speed:"), _("Single connection:"), _("Packet tag:"),
                                                _("Progress animation:"), _("Fullscreen mode:"), _("Process priority:"), _("Debug setting:"),
                                                _("Streaming memory:"), _("Update build type:"), _("Install important updates:")) +
                5.0f;
 
     vecTemp.fX += 10.0f;
-
-    // Radar map image
-    m_pRadarMapImageLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Radar map image:")));
-    m_pRadarMapImageLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
-    m_pRadarMapImageLabel->AutoSize();
-
-    m_pRadarMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
-    m_pRadarMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
-    m_pRadarMapImageCombo->SetSize(CVector2D(fComboWidth, 95.0f));
-    m_pRadarMapImageCombo->AddItem(_("1024 x 1024 (Default)")); // index 0
-    m_pRadarMapImageCombo->AddItem(_("2048 x 2048")); // index 1
-    m_pRadarMapImageCombo->SetReadOnly(true);
-    vecTemp.fY += fLineHeight;
 
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
@@ -1252,7 +1252,7 @@ void CSettings::CreateGUI()
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY += 10;
+    vecTemp.fY += 15;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
@@ -1310,9 +1310,6 @@ void CSettings::CreateGUI()
 
     m_pFastClothesLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pFastClothesLabel->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
-
-    m_pRadarMapImageCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
-    m_pRadarMapImageCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
     m_pFastClothesCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pFastClothesCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
@@ -1646,12 +1643,18 @@ void CSettings::UpdateVideoTab()
     float fPos = SharedUtil::Unlerp(g_pCore->GetMinStreamingMemory(), uiStreamingMemory, g_pCore->GetMaxStreamingMemory());
     m_pStreamingMemory->SetScrollPosition(fPos);
 
+    // Radar map alpha
     int iVar = 0;
     CVARS_GET("mapalpha", iVar);
     int iAlphaPercent = ceil(((float)Clamp(0, iVar, 255) / 255) * 100);
     m_pMapAlphaValueLabel->SetText(SString("%i%%", iAlphaPercent).c_str());
     float sbPos = (float)iAlphaPercent / 100.0f;
     m_pMapAlpha->SetScrollPosition(sbPos);
+
+    // Radar map image
+    CVARS_GET("radar_map_image", iVar);
+    if (iVar == 0 || iVar == 1)
+        m_pRadarMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
 //
@@ -1868,7 +1871,9 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 
     CVARS_SET("streaming_memory", g_pCore->GetMaxStreamingMemory());
 
+    // Radar map defaults
     CVARS_SET("mapalpha", 155);
+    CVARS_SET("radar_map_image", 0);
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing() != m_pComboAntiAliasing->GetSelectedItemIndex();
@@ -3167,11 +3172,6 @@ void CSettings::LoadData()
     int PriorityClassList[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
     SetPriorityClass(GetCurrentProcess(), PriorityClassList[CVARS_GET_VALUE<int>("process_priority") % 3]);
 
-    // Radar map image
-    CVARS_GET("radar_map_image", iVar);
-    if (iVar == 0 || iVar == 1)
-        m_pRadarMapImageCombo->SetSelectedItemByIndex(iVar);
-
     // Fast clothes loading
     CVARS_GET("fast_clothes_loading", iVar);
     if (iVar == CMultiplayer::FAST_CLOTHES_OFF)
@@ -3558,11 +3558,6 @@ void CSettings::SaveData()
     CVARS_SET("dynamic_ped_shadows", bDynamicPedShadows);
     gameSettings->SetDynamicPedShadowsEnabled(bDynamicPedShadows);
 
-    // Radar map image
-    int selectedComboIndex = m_pRadarMapImageCombo->GetSelectedItemIndex();
-    if (selectedComboIndex != -1)
-        CVARS_SET("radar_map_image", selectedComboIndex);
-
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
     {
@@ -3636,11 +3631,15 @@ void CSettings::SaveData()
         CVARS_SET("update_auto_install", iSelected);
     }
 
-    // Map alpha
+    // Radar map alpha
     SString sText = m_pMapAlphaValueLabel->GetText();
-
     float fMapAlpha = ((atof(sText.substr(0, sText.length() - 1).c_str())) / 100) * 255;
     CVARS_SET("mapalpha", fMapAlpha);
+
+    // Radar map image
+    int selectedComboIndex = m_pRadarMapImageCombo->GetSelectedItemIndex();
+    if (selectedComboIndex != -1)
+        CVARS_SET("radar_map_image", selectedComboIndex);
 
     // Language
     CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem();
@@ -4839,8 +4838,6 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
 
     if (pLabel && pLabel == m_pPriorityLabel || pComboBox && pComboBox == m_pPriorityCombo)
         strText = std::string(_("Process priority:")) + " " + std::string(_("Very experimental feature."));
-    else if (pLabel && pLabel == m_pRadarMapImageLabel || pComboBox && pComboBox == m_pRadarMapImageCombo)
-        strText = std::string(_("Radar map image:")) + " " + std::string(_("Select the size of the full San Andreas map."));
     else if (pLabel && pLabel == m_pFastClothesLabel || pComboBox && pComboBox == m_pFastClothesCombo)
         strText = std::string(_("Fast CJ clothes loading:")) + " " + std::string(_("Stops stalls with CJ variations (Uses 65MB more RAM)"));
     else if (pLabel && pLabel == m_pBrowserSpeedLabel || pComboBox && pComboBox == m_pBrowserSpeedCombo)
