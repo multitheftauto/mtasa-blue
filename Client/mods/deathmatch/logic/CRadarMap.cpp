@@ -74,13 +74,13 @@ CRadarMap::CRadarMap(CClientManager* pManager)
         float   fScale;
         SString strMessage;
     } messageList[] = {
-        {SColorRGBA(255, 255, 255, 200), 0.92f, 1.0f, ""},
+        {SColorRGBA(255, 255, 255, 200), 0.92f, 1.5f, ""},
         {SColorRGBA(255, 255, 255, 255), 0.95f, 1.0f, SString(_("Change mode: %s"), *GetBoundKeyName("radar_attach"))},
         {SColorRGBA(255, 255, 255, 255), 0.05f, 1.0f, SString(_("Zoom in/out: %s/%s"), *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"))},
-        {SColorRGBA(255, 255, 255, 255), 0.08f, 1.0f, SString(_("Movement: %s, %s, %s, %s"), *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"), *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"))},
-        {SColorRGBA(255, 255, 255, 255), 0.11f, 1.0f, SString(_("Change opacity: %s/%s"), *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
-        {SColorRGBA(255, 255, 255, 255), 0.14f, 1.0f, SString(_("Toggle map: %s"), *GetBoundKeyName("radar"))},
-        {SColorRGBA(255, 255, 255, 255), 0.17f, 1.0f, SString(_("Hide this help text: %s"), *GetBoundKeyName("radar_help"))},
+        {SColorRGBA(255, 255, 255, 255), 0.07f, 1.0f, SString(_("Movement: %s, %s, %s, %s"), *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"), *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"))},
+        {SColorRGBA(255, 255, 255, 255), 0.09f, 1.0f, SString(_("Decrease/increase opacity: %s/%s"), *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
+        {SColorRGBA(255, 255, 255, 255), 0.11f, 1.0f, SString(_("Toggle map: %s"), *GetBoundKeyName("radar"))},
+        {SColorRGBA(255, 255, 255, 255), 0.13f, 1.0f, SString(_("Toggle this help text: %s"), *GetBoundKeyName("radar_help"))},
     };
 
     for (uint i = 0; i < NUMELMS(messageList); i++)
@@ -674,11 +674,11 @@ void CRadarMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
 
     if (m_bIsAttachedToLocal)
     {
-        m_HelpTextList[0]->SetCaption(_("* Following player *"));
+        m_HelpTextList[0]->SetCaption(_("Following Player"));
     }
     else
     {
-        m_HelpTextList[0]->SetCaption(_("* Free movement *"));
+        m_HelpTextList[0]->SetCaption(_("Free Movement"));
     }
 }
 
