@@ -62,17 +62,9 @@ public:
     void ZoomIn();
     void ZoomOut();
 
-    void SetMapImage(const std::uint32_t presetIndex);
+    void SetMapImage(std::uint32_t imageIndex);
 
     SString GetBoundKeyName(const SString& strCommand);
-
-    std::tuple<std::string, std::uint32_t, std::uint32_t> GetRadarImagePreset(std::uint32_t index) const
-    {
-        if (index < 0 || index >= m_radarImagePresets.size())
-            index = 0;
-        assert(index < m_radarImagePresets.size()); // Vector should never be empty
-        return m_radarImagePresets[index];
-    }
 
 private:
     bool CalculateEntityOnScreenPosition(class CClientEntity* pEntity, CVector2D& vecLocalPos);
@@ -89,14 +81,11 @@ private:
     class CClientRadarMarkerManager* m_pRadarMarkerManager;
     class CClientRadarAreaManager*   m_pRadarAreaManager;
 
+    std::uint32_t m_radarImageIndex;
+
     CTextureItem*              m_pRadarImage;
     CTextureItem*              m_pLocalPlayerBlip;
     std::vector<CTextureItem*> m_MarkerTextureList;
-
-    const std::vector<std::tuple<std::string, std::uint32_t, std::uint32_t>> m_radarImagePresets = {
-        {"radar_1024.png", 1024, 1024},
-        {"radar_2048.png", 2048, 2048},
-    };
 
     unsigned int m_uiHeight;
     unsigned int m_uiWidth;

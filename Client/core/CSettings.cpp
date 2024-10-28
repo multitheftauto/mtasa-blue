@@ -1019,8 +1019,8 @@ void CSettings::CreateGUI()
     m_pRadarMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
     m_pRadarMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
     m_pRadarMapImageCombo->SetSize(CVector2D(fComboWidth, 95.0f));
-    m_pRadarMapImageCombo->AddItem(_("1024 x 1024 (Default)"));
-    m_pRadarMapImageCombo->AddItem(_("2048 x 2048"));
+    m_pRadarMapImageCombo->AddItem(_("1024 x 1024 (Default)")); // index 0
+    m_pRadarMapImageCombo->AddItem(_("2048 x 2048")); // index 1
     m_pRadarMapImageCombo->SetReadOnly(true);
     vecTemp.fY += fLineHeight;
 
@@ -3169,10 +3169,8 @@ void CSettings::LoadData()
 
     // Radar map image
     CVARS_GET("radar_map_image", iVar);
-    if (iVar == 0)
-        m_pRadarMapImageCombo->SetText(_("1024 x 1024 (Default)"));
-    else if (iVar == 1)
-        m_pRadarMapImageCombo->SetText(_("2048 x 2048"));
+    if (iVar >= 0 && iVar <= 1)
+        m_pRadarMapImageCombo->SetSelectedItemByIndex(iVar);
 
     // Fast clothes loading
     CVARS_GET("fast_clothes_loading", iVar);
@@ -3561,11 +3559,10 @@ void CSettings::SaveData()
     gameSettings->SetDynamicPedShadowsEnabled(bDynamicPedShadows);
 
     // Radar map image
-    if (CGUIListItem* pSelected = m_pRadarMapImageCombo->GetSelectedItem())
+    int selectedComboIndex = m_pRadarMapImageCombo->GetSelectedItemIndex();
+    if (selectedComboIndex != -1)
     {
-        int iSelected = (int)pSelected->GetData();
-        CVARS_SET("radar_map_image", iSelected);
-        // TODO: Update the map image if radar map exists
+        CVARS_SET("radar_map_image", selectedComboIndex);
     }
 
     // Fast clothes loading
@@ -4845,7 +4842,7 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
     if (pLabel && pLabel == m_pPriorityLabel || pComboBox && pComboBox == m_pPriorityCombo)
         strText = std::string(_("Process priority:")) + " " + std::string(_("Very experimental feature."));
     else if (pLabel && pLabel == m_pRadarMapImageLabel || pComboBox && pComboBox == m_pRadarMapImageCombo)
-        strText = std::string(_("Radar map image:")) + " " + std::string(_("Select the San Andreas radar map image size."));
+        strText = std::string(_("Radar map image:")) + " " + std::string(_("Select the size of the full San Andreas map."));
     else if (pLabel && pLabel == m_pFastClothesLabel || pComboBox && pComboBox == m_pFastClothesCombo)
         strText = std::string(_("Fast CJ clothes loading:")) + " " + std::string(_("Stops stalls with CJ variations (Uses 65MB more RAM)"));
     else if (pLabel && pLabel == m_pBrowserSpeedLabel || pComboBox && pComboBox == m_pBrowserSpeedCombo)

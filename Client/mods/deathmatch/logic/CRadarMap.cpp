@@ -58,7 +58,8 @@ CRadarMap::CRadarMap(CClientManager* pManager)
 
     // Create the radar map image
     m_pRadarImage = nullptr;
-    SetMapImage(g_pCore->GetCVars()->GetValue<std::uint32_t>("radar_map_image", 0));
+    g_pCore->GetCVars()->Get("radar_map_image", m_radarImageIndex);
+    SetMapImage(m_radarImageIndex);
 
     // Create the marker textures
     CreateMarkerTextures();
@@ -99,6 +100,8 @@ CRadarMap::CRadarMap(CClientManager* pManager)
 
     // Default to attached to player
     SetAttachedToLocalPlayer(true);
+
+    SetupMapVariables();
 }
 
 CRadarMap::~CRadarMap()
@@ -115,17 +118,31 @@ CRadarMap::~CRadarMap()
     // Don't need to delete the help texts as those are destroyed by the display manager
 }
 
-// If invalid presetIndex is passed, it will use the first preset
-void CRadarMap::SetMapImage(const std::uint32_t presetIndex)
+void CRadarMap::SetMapImage(std::uint32_t imageIndex)
 {
+    if (imageIndex < 0 || imageIndex > 1)
+        imageIndex = 0;
+
+    SString       fileName;
+    std::uint32_t width, height;
+    if (imageIndex == 0)
+    {
+        width = 1024;
+        height = 1024;
+    }
+    else
+    {
+        width = 2048;
+        height = 2048;
+    }
+    fileName.Format("MTA\\cgui\\images\\radar_%d.png", width);
+
     if (m_pRadarImage != nullptr)
         SAFE_RELEASE(m_pRadarImage);
 
-    auto [fileName, width, height] = GetRadarImagePreset(presetIndex);
-    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\" + fileName), nullptr, false, width, height,
-                                                                                  RFORMAT_DXT1);
-    g_pCore->GetConsole()->Printf("Radar map image preset id loaded: [%d] %d x %d", presetIndex, width, height);
-    SetupMapVariables();
+    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, width, height, RFORMAT_DXT1);
+
+    g_pCore->GetConsole()->Printf("Radar map image id %d loaded: %s", imageIndex, fileName);
 }
 
 void CRadarMap::DoPulse()
@@ -250,6 +267,15 @@ void CRadarMap::DoRender()
         // Get the alpha value from the settings
         int iRadarAlpha;
         g_pCore->GetCVars()->Get("mapalpha", iRadarAlpha);
+
+        // Update the image if the user changed it via a setting
+        std::uint32_t radarImageIndex;
+        g_pCore->GetCVars()->Get("radar_map_image", radarImageIndex);
+        if (radarImageIndex != m_radarImageIndex)
+        {
+            m_radarImageIndex = radarImageIndex;
+            SetMapImage(m_radarImageIndex);
+        }
 
         g_pCore->GetGraphics()->DrawTexture(m_pRadarImage, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
                                             m_fMapSize / m_pRadarImage->m_uiSizeX, m_fMapSize / m_pRadarImage->m_uiSizeY, 0.0f, 0.0f, 0.0f,
