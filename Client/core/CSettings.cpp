@@ -643,8 +643,8 @@ void CSettings::CreateGUI()
     fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Resolution:"), _("FOV:"), _("Draw Distance:"), _("Brightness:"), _("FX Quality:"),
                                                _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"));
 
-    vecTemp.fX = 11;
-    vecTemp.fY = 13;
+    vecTemp.fX = 11.0f;
+    vecTemp.fY = 13.0f;
 
     m_pVideoResolutionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Resolution:")));
     m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
