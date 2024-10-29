@@ -16,12 +16,35 @@
 #include "ASE.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CPerfStatManager.h"
+#include "CLodModels.h"
 
 #define MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
 #define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11342"
 #define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_FORMFIELDS        "1.5.4-9.11413"
+
+int CLuaFunctionDefs::GetObjectLODModel(lua_State* luaVM)
+{
+    std::uint32_t    objectID;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(objectID);
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+    }
+    else
+    {
+        std::uint32_t lodModel = CLodModels::GetObjectLODModel(objectID);
+        if (lodModel == 0)            // LOD Model not found for Object Model provided
+            lua_pushnil(luaVM);
+        else
+            lua_pushnumber(luaVM, lodModel);
+    }
+    return 1;
+}
 
 int CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM)
 {

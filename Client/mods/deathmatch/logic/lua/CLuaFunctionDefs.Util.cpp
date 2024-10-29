@@ -9,6 +9,29 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLodModels.h"
+
+int CLuaFunctionDefs::GetObjectLODModel(lua_State* luaVM)
+{
+    std::uint32_t    objectID;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(objectID);
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+    }
+    else
+    {
+        std::uint32_t lodModel = CLodModels::GetObjectLODModel(objectID);
+        if (lodModel == 0) // LOD Model not found for Object Model provided
+            lua_pushnil(luaVM);
+        else
+            lua_pushnumber(luaVM, lodModel);
+    }
+    return 1;
+}
 
 int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {

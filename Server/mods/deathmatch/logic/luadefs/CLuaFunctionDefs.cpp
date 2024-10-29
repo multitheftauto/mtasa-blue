@@ -76,7 +76,7 @@ void CLuaFunctionDefs::LoadFunctions()
             // Utility
             {"getVersion", CLuaFunctionDefs::GetVersion}, {"getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData},
             {"getNetworkStats", CLuaFunctionDefs::GetNetworkStats}, {"getLoadedModules", CLuaFunctionDefs::GetModules},
-            {"getModuleInfo", CLuaFunctionDefs::GetModuleInfo},
+            {"getModuleInfo", CLuaFunctionDefs::GetModuleInfo}, {"getObjectLODModel", CLuaFunctionDefs::GetObjectLODModel},
 
             {"setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode}, {"getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode},
     };
