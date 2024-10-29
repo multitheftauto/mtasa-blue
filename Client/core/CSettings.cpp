@@ -411,7 +411,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
 
     m_pMapRenderingLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Map rendering options")));
-    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30));
+    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pMapRenderingLabel->GetPosition(vecTemp, false);
     m_pMapRenderingLabel->SetFont("default-bold-small");
     m_pMapRenderingLabel->AutoSize();
