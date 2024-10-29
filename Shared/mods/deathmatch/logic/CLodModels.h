@@ -15,15 +15,8 @@
 class CLodModels
 {
 public:
-    static std::uint32_t GetObjectLODModel(std::uint32_t objectID)
-    {
-        const auto it = LOD_MODELS->find(objectID);
-        if (it != LOD_MODELS->end())
-        {
-            return it->second;
-        }
-        return 0;
-    };
+    static std::uint32_t GetObjectLODModel(std::uint32_t objectID);
+    static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodModelID);
 
 private:
     // Static pointer to a map that is initialized in the .cpp file
