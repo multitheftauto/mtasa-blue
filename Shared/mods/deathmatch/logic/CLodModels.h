@@ -19,6 +19,5 @@ public:
     static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodID) noexcept;
 
 private:
-    // Static pointer to a map that is initialized in the .cpp file
     static std::unique_ptr<const std::map<std::uint32_t, std::uint32_t>> LOD_MODELS;
 };
