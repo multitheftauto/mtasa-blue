@@ -9,8 +9,8 @@
 
 #pragma once
 
-#define NICKGEN_NUM_ADJECTIVES      1048
-#define NICKGEN_NUM_NOUNS           934
+#define NICKGEN_NUM_ADJECTIVES      1040
+#define NICKGEN_NUM_NOUNS           921
 
 class CNickGen
 {
