@@ -196,8 +196,8 @@ protected:
     CGUIComboBox*  m_pFullscreenStyleCombo;
     CGUILabel*     m_pPriorityLabel;
     CGUIComboBox*  m_pPriorityCombo;
-    CGUILabel*     m_pRadarMapImageLabel;
-    CGUIComboBox*  m_pRadarMapImageCombo;
+    CGUILabel*     m_pPlayerMapImageLabel;
+    CGUIComboBox*  m_pPlayerMapImageCombo;
     CGUILabel*     m_pFastClothesLabel;
     CGUIComboBox*  m_pFastClothesCombo;
     CGUILabel*     m_pAudioGeneralLabel;

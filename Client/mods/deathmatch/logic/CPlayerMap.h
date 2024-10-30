@@ -2,8 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CRadarMap.h
- *  PURPOSE:     Header for radar map class
+ *  FILE:        mods/deathmatch/logic/CPlayerMap.h
+ *  PURPOSE:     Header for player map class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -16,19 +16,19 @@
 #include <CClientTextDisplay.h>
 #include <gui/CGUI.h>
 
-class CRadarMap
+class CPlayerMap
 {
 public:
-    CRadarMap(class CClientManager* pManager);
-    virtual ~CRadarMap();
+    CPlayerMap(class CClientManager* pManager);
+    virtual ~CPlayerMap();
 
     void DoPulse();
     void DoRender();
 
     bool IsRadarShowing();
 
-    bool GetRadarEnabled() const { return m_bIsRadarEnabled; };
-    void SetRadarEnabled(bool bIsRadarEnabled);
+    bool GetPlayerMapEnabled() const { return m_bIsRadarEnabled; };
+    void SetPlayerMapEnabled(bool bIsRadarEnabled);
 
     bool GetForcedState() const { return m_bForcedState; }
     void SetForcedState(bool bState);

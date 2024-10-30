@@ -2,8 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CRadarMap.cpp
- *  PURPOSE:     Full screen radar map renderer
+ *  FILE:        mods/deathmatch/logic/CPlayerMap.cpp
+ *  PURPOSE:     Full screen player map renderer
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -25,7 +25,7 @@ enum
 
 constexpr std::array<std::uint32_t, 2> RADAR_IMAGE_SIZES = {1024, 2048};
 
-CRadarMap::CRadarMap(CClientManager* pManager)
+CPlayerMap::CPlayerMap(CClientManager* pManager)
 {
     // Setup our managers
     m_pManager = pManager;
@@ -58,7 +58,7 @@ CRadarMap::CRadarMap(CClientManager* pManager)
     // Create the local player blip image
     m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
 
-    // Create the radar map image
+    // Create the map image
     m_pRadarImage = nullptr;
     m_radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("radar_map_image");
     SetMapImage(m_radarImageIndex);
@@ -67,8 +67,8 @@ CRadarMap::CRadarMap(CClientManager* pManager)
     CreateMarkerTextures();
 
     // Create the text displays for the help text
-    SColorRGBA colorWhiteTransparent = SColorRGBA(255, 255, 255, 200);
-    SColorRGBA colorWhite = SColorRGBA(255, 255, 255, 255);
+    const SColorRGBA colorWhiteTransparent(255, 255, 255, 200);
+    const SColorRGBA colorWhite(255, 255, 255, 255);
     struct
     {
         SColor  color;
@@ -108,7 +108,7 @@ CRadarMap::CRadarMap(CClientManager* pManager)
     SetupMapVariables();
 }
 
-CRadarMap::~CRadarMap()
+CPlayerMap::~CPlayerMap()
 {
     // Delete our images
     SAFE_RELEASE(m_pRadarImage);
@@ -122,12 +122,12 @@ CRadarMap::~CRadarMap()
     // Don't need to delete the help texts as those are destroyed by the display manager
 }
 
-void CRadarMap::SetMapImage(std::uint32_t imageIndex)
+void CPlayerMap::SetMapImage(std::uint32_t imageIndex)
 {
     std::uint32_t width, height;
     if (imageIndex < RADAR_IMAGE_SIZES.size())
         width = height = RADAR_IMAGE_SIZES[imageIndex];
-    else
+    else // Fail safe, ideally client settings system should not allow this case
         width = height = RADAR_IMAGE_SIZES[0];
 
     SString fileName("MTA\\cgui\\images\\radar_%d.png", width);
@@ -137,10 +137,10 @@ void CRadarMap::SetMapImage(std::uint32_t imageIndex)
 
     m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, width, height, RFORMAT_DXT1);
 
-    g_pCore->GetConsole()->Printf("Radar map image id %d loaded: %s", imageIndex, fileName);
+    g_pCore->GetConsole()->Printf("Player map image loaded: %s", fileName);
 }
 
-void CRadarMap::DoPulse()
+void CPlayerMap::DoPulse()
 {
     // If our radar image exists
     if (IsRadarShowing())
@@ -180,9 +180,9 @@ void CRadarMap::DoPulse()
 }
 
 //
-// Precreate all the textures for the radar map markers
+// Precreate all the textures for the player map markers
 //
-void CRadarMap::CreateMarkerTextures()
+void CPlayerMap::CreateMarkerTextures()
 {
     assert(m_MarkerTextureList.empty());
     SString strRadarSetDirectory = CalcMTASAPath("MTA\\cgui\\images\\radarset\\");
@@ -210,7 +210,7 @@ void CRadarMap::CreateMarkerTextures()
 //
 // Get a texture for a marker, including scale and color
 //
-CTextureItem* CRadarMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor)
+CTextureItem* CPlayerMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor)
 {
     float  fScale = pMarker->GetScale();
     ulong  ulSprite = pMarker->GetSprite();
@@ -252,7 +252,7 @@ CTextureItem* CRadarMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fLo
     return m_MarkerTextureList[uiListIndex];
 }
 
-void CRadarMap::DoRender()
+void CPlayerMap::DoRender()
 {
     bool bIsRadarShowing = IsRadarShowing();
 
@@ -365,7 +365,7 @@ void CRadarMap::DoRender()
     }
 }
 
-void CRadarMap::SetRadarEnabled(bool bIsRadarEnabled)
+void CPlayerMap::SetPlayerMapEnabled(bool bIsRadarEnabled)
 {
     bool bAlreadyEnabled = (m_bIsRadarEnabled || m_bForcedState);
     bool bWillShow = (bIsRadarEnabled || m_bForcedState);
@@ -376,7 +376,7 @@ void CRadarMap::SetRadarEnabled(bool bIsRadarEnabled)
     m_bIsRadarEnabled = bIsRadarEnabled;
 }
 
-void CRadarMap::SetForcedState(bool bState)
+void CPlayerMap::SetForcedState(bool bState)
 {
     bool bAlreadyShowing = (m_bIsRadarEnabled || m_bForcedState);
     bool bWillShow = (m_bIsRadarEnabled || bState);
@@ -387,7 +387,7 @@ void CRadarMap::SetForcedState(bool bState)
     m_bForcedState = bState;
 }
 
-void CRadarMap::InternalSetRadarEnabled(bool bEnabled)
+void CPlayerMap::InternalSetRadarEnabled(bool bEnabled)
 {
     if (bEnabled)
     {
@@ -409,7 +409,7 @@ void CRadarMap::InternalSetRadarEnabled(bool bEnabled)
     }
 }
 
-bool CRadarMap::CalculateEntityOnScreenPosition(CClientEntity* pEntity, CVector2D& vecLocalPos)
+bool CPlayerMap::CalculateEntityOnScreenPosition(CClientEntity* pEntity, CVector2D& vecLocalPos)
 {
     // If the entity exists
     if (pEntity)
@@ -440,7 +440,7 @@ bool CRadarMap::CalculateEntityOnScreenPosition(CClientEntity* pEntity, CVector2
     return false;
 }
 
-bool CRadarMap::CalculateEntityOnScreenPosition(CVector vecPosition, CVector2D& vecLocalPos)
+bool CPlayerMap::CalculateEntityOnScreenPosition(CVector vecPosition, CVector2D& vecLocalPos)
 {
     // Adjust to the map variables and create the map ratio
     float fX = vecPosition.fX + 3000.0f;
@@ -462,7 +462,7 @@ bool CRadarMap::CalculateEntityOnScreenPosition(CVector vecPosition, CVector2D& 
     return false;
 }
 
-void CRadarMap::SetupMapVariables()
+void CPlayerMap::SetupMapVariables()
 {
     // Calculate the map size and the middle of the screen coords
     m_fMapSize = static_cast<float>(m_uiHeight * m_fZoom);
@@ -558,7 +558,7 @@ void CRadarMap::SetupMapVariables()
     }
 }
 
-void CRadarMap::ZoomIn()
+void CPlayerMap::ZoomIn()
 {
     if (m_fZoom <= 4)
     {
@@ -567,7 +567,7 @@ void CRadarMap::ZoomIn()
     }
 }
 
-void CRadarMap::ZoomOut()
+void CPlayerMap::ZoomOut()
 {
     if (m_fZoom >= 1)
     {
@@ -593,7 +593,7 @@ void CRadarMap::ZoomOut()
     }
 }
 
-void CRadarMap::MoveNorth()
+void CPlayerMap::MoveNorth()
 {
     if (!m_bIsAttachedToLocal)
     {
@@ -613,7 +613,7 @@ void CRadarMap::MoveNorth()
     }
 }
 
-void CRadarMap::MoveSouth()
+void CPlayerMap::MoveSouth()
 {
     if (!m_bIsAttachedToLocal)
     {
@@ -633,7 +633,7 @@ void CRadarMap::MoveSouth()
     }
 }
 
-void CRadarMap::MoveEast()
+void CPlayerMap::MoveEast()
 {
     if (!m_bIsAttachedToLocal)
     {
@@ -653,7 +653,7 @@ void CRadarMap::MoveEast()
     }
 }
 
-void CRadarMap::MoveWest()
+void CPlayerMap::MoveWest()
 {
     if (!m_bIsAttachedToLocal)
     {
@@ -673,7 +673,7 @@ void CRadarMap::MoveWest()
     }
 }
 
-void CRadarMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
+void CPlayerMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
 {
     m_bIsAttachedToLocal = bIsAttachedToLocal;
     SetupMapVariables();
@@ -684,12 +684,12 @@ void CRadarMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
         m_HelpTextList[0]->SetCaption(_("Free Movement"));
 }
 
-bool CRadarMap::IsRadarShowing()
+bool CPlayerMap::IsRadarShowing()
 {
     return ((m_bIsRadarEnabled || m_bForcedState) && m_pRadarImage && m_pLocalPlayerBlip && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
 }
 
-bool CRadarMap::GetBoundingBox(CVector& vecMin, CVector& vecMax)
+bool CPlayerMap::GetBoundingBox(CVector& vecMin, CVector& vecMax)
 {
     // If our radar image exists (Values are not calculated unless map is showing)
     if (IsRadarShowing())
@@ -708,12 +708,12 @@ bool CRadarMap::GetBoundingBox(CVector& vecMin, CVector& vecMax)
     }
 }
 
-void CRadarMap::ToggleHelpText()
+void CPlayerMap::ToggleHelpText()
 {
     m_bHideHelpText = !m_bHideHelpText;
 }
 
-SString CRadarMap::GetBoundKeyName(const SString& strCommand)
+SString CPlayerMap::GetBoundKeyName(const SString& strCommand)
 {
     CCommandBind* pCommandBind = g_pCore->GetKeyBinds()->GetBindFromCommand(strCommand, 0, 0, 0, false, 0);
     if (!pCommandBind)

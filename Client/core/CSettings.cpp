@@ -438,16 +438,16 @@ void CSettings::CreateGUI()
     m_pMapAlphaLabel->GetPosition(vecTemp, false);
     vecTemp.fY += 24.0f;
 
-    m_pRadarMapImageLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Image resolution:")));
-    m_pRadarMapImageLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 2.0f));
-    m_pRadarMapImageLabel->AutoSize();
+    m_pPlayerMapImageLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Image resolution:")));
+    m_pPlayerMapImageLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 2.0f));
+    m_pPlayerMapImageLabel->AutoSize();
 
-    m_pRadarMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabMultiplayer, ""));
-    m_pRadarMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
-    m_pRadarMapImageCombo->SetSize(CVector2D(170.f, 95.0f));
-    m_pRadarMapImageCombo->AddItem(_("1024 x 1024 (Default)"));            // index 0
-    m_pRadarMapImageCombo->AddItem(_("2048 x 2048"));                      // index 1
-    m_pRadarMapImageCombo->SetReadOnly(true);
+    m_pPlayerMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabMultiplayer, ""));
+    m_pPlayerMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
+    m_pPlayerMapImageCombo->SetSize(CVector2D(170.f, 95.0f));
+    m_pPlayerMapImageCombo->AddItem(_("1024 x 1024 (Default)"));            // index 0
+    m_pPlayerMapImageCombo->AddItem(_("2048 x 2048"));                      // index 1
+    m_pPlayerMapImageCombo->SetReadOnly(true);
 
     /**
      *  Audio tab
@@ -848,7 +848,7 @@ void CSettings::CreateGUI()
 
     m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
     m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 150.0f));
-    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
+    m_pCheckBoxCoronaReflections->AutoSize(nullptr, 20.0f);
 
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
@@ -1643,7 +1643,7 @@ void CSettings::UpdateVideoTab()
     float fPos = SharedUtil::Unlerp(g_pCore->GetMinStreamingMemory(), uiStreamingMemory, g_pCore->GetMaxStreamingMemory());
     m_pStreamingMemory->SetScrollPosition(fPos);
 
-    // Radar map alpha
+    // Player map alpha
     int iVar = 0;
     CVARS_GET("mapalpha", iVar);
     int iAlphaPercent = ceil(((float)Clamp(0, iVar, 255) / 255) * 100);
@@ -1651,10 +1651,10 @@ void CSettings::UpdateVideoTab()
     float sbPos = (float)iAlphaPercent / 100.0f;
     m_pMapAlpha->SetScrollPosition(sbPos);
 
-    // Radar map image
+    // Player map image
     CVARS_GET("radar_map_image", iVar);
     if (iVar == 0 || iVar == 1)
-        m_pRadarMapImageCombo->SetSelectedItemByIndex(iVar);
+        m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
 //
@@ -1871,7 +1871,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 
     CVARS_SET("streaming_memory", g_pCore->GetMaxStreamingMemory());
 
-    // Radar map defaults
+    // Player map defaults
     CVARS_SET("mapalpha", 155);
     CVARS_SET("radar_map_image", 0);
 
@@ -3631,13 +3631,13 @@ void CSettings::SaveData()
         CVARS_SET("update_auto_install", iSelected);
     }
 
-    // Radar map alpha
+    // Player map alpha
     SString sText = m_pMapAlphaValueLabel->GetText();
     float fMapAlpha = ((atof(sText.substr(0, sText.length() - 1).c_str())) / 100) * 255;
     CVARS_SET("mapalpha", fMapAlpha);
 
-    // Radar map image
-    int selectedComboIndex = m_pRadarMapImageCombo->GetSelectedItemIndex();
+    // Player map image
+    int selectedComboIndex = m_pPlayerMapImageCombo->GetSelectedItemIndex();
     if (selectedComboIndex != -1)
         CVARS_SET("radar_map_image", selectedComboIndex);
 
