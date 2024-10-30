@@ -62,7 +62,7 @@ public:
     void ZoomIn();
     void ZoomOut();
 
-    void SetMapImage(std::uint32_t imageIndex);
+    void SetMapImage(std::size_t imageIndex);
 
     SString GetBoundKeyName(const SString& strCommand);
 
@@ -81,7 +81,7 @@ private:
     class CClientRadarMarkerManager* m_pRadarMarkerManager;
     class CClientRadarAreaManager*   m_pRadarAreaManager;
 
-    std::uint32_t m_radarImageIndex;
+    std::size_t m_radarImageIndex;
 
     CTextureItem*              m_pRadarImage;
     CTextureItem*              m_pLocalPlayerBlip;

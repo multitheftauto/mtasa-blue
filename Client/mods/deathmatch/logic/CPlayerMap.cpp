@@ -60,7 +60,7 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
 
     // Create the map image
     m_pRadarImage = nullptr;
-    m_radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("mapimage");
+    m_radarImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
     SetMapImage(m_radarImageIndex);
 
     // Create the marker textures
@@ -122,7 +122,7 @@ CPlayerMap::~CPlayerMap()
     // Don't need to delete the help texts as those are destroyed by the display manager
 }
 
-void CPlayerMap::SetMapImage(std::uint32_t imageIndex)
+void CPlayerMap::SetMapImage(std::size_t imageIndex)
 {
     std::uint32_t width, height;
     if (imageIndex < RADAR_IMAGE_SIZES.size())
@@ -264,7 +264,7 @@ void CPlayerMap::DoRender()
         g_pCore->GetCVars()->Get("mapalpha", iRadarAlpha);
 
         // Update the image if the user changed it via a setting
-        auto radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("mapimage");
+        auto radarImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
         if (radarImageIndex != m_radarImageIndex)
         {
             m_radarImageIndex = radarImageIndex;
