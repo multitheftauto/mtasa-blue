@@ -40,6 +40,7 @@ void CLuaObjectDefs::LoadFunctions()
 
         // Object util functions
         {"getObjectLODOfModel", ArgumentParser<GetObjectLODOfModel>},
+        {"getObjectModelOfLOD", ArgumentParser<GetObjectModelOfLOD>},
     };
 
     // Add functions
@@ -344,4 +345,12 @@ std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLODOfModel(lua_State*
     if (lodModel == 0)            // LOD Model not found for Object Model provided
         return false;
     return lodModel;
+}
+
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectModelOfLOD(lua_State* const luaVM, std::uint32_t lodID)
+{
+    std::uint32_t objModel = CLodModels::GetObjectModelOfLOD(lodID);
+    if (objModel == 0)            // Object Model not found for LOD Model provided
+        return false;
+    return objModel;
 }

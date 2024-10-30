@@ -501,11 +501,11 @@ std::uint32_t CLodModels::GetObjectLODOfModel(std::uint32_t objectID)
     return 0;
 }
 
-std::uint32_t CLodModels::GetObjectModelOfLOD(std::uint32_t lodModelID)
+std::uint32_t CLodModels::GetObjectModelOfLOD(std::uint32_t lodID)
 {
     for (const auto& [objectID, lodModel] : *LOD_MODELS)
     {
-        if (lodModel == lodModelID)
+        if (lodModel == lodID)
             return objectID;
     }
     return 0;

@@ -16,7 +16,7 @@ class CLodModels
 {
 public:
     static std::uint32_t GetObjectLODOfModel(std::uint32_t objectID);
-    static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodModelID);
+    static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodID);
 
 private:
     // Static pointer to a map that is initialized in the .cpp file
