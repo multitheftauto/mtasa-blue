@@ -196,14 +196,18 @@ const char* const szNouns[] = {
     "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat",
 };
 
+const int numAdjectives = std::size(szAdjectives);
+const int numNouns = std::size(szNouns);
+const int maxNum = static_cast<int>(RAND_MAX);
+
 SString CNickGen::GetRandomNickname()
 {
     std::random_device rd;
     std::mt19937       gen(rd());
 
-    std::uniform_int_distribution<int> adjectiveDist(0, std::size(szAdjectives) - 1);
-    std::uniform_int_distribution<int> nounDist(0, std::size(szNouns) - 1);
-    std::uniform_int_distribution<int> numDist(0, static_cast<int>(RAND_MAX));
+    std::uniform_int_distribution<int> adjectiveDist(0, numAdjectives - 1);
+    std::uniform_int_distribution<int> nounDist(0, numNouns - 1);
+    std::uniform_int_distribution<int> numDist(0, maxNum);
 
     return SString("%s%s%i", szAdjectives[adjectiveDist(gen)], szNouns[nounDist(gen)], numDist(gen));
 }
