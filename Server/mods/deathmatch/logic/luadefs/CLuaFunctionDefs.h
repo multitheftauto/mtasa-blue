@@ -117,7 +117,6 @@ public:
     LUA_DECLARE(GetVersion);
     LUA_DECLARE(GetModules);
     LUA_DECLARE(GetModuleInfo);
-    LUA_DECLARE(GetObjectLODModel);
 
     LUA_DECLARE(SetDevelopmentMode);
     LUA_DECLARE(GetDevelopmentMode);

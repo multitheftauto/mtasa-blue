@@ -39,4 +39,7 @@ public:
     LUA_DECLARE(StopObject);
     static bool BreakObject(CObject* const pObject);
     static bool ToggleObjectRespawn(CObject* const pObject, const bool bRespawn) noexcept;
+
+    // Object util funcs
+    static std::variant<bool, std::uint32_t> GetObjectLODModel(lua_State* const luaVM, std::uint32_t objectID);
 };

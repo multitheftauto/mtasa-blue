@@ -13,6 +13,7 @@
 #include "../luadefs/CLuaFireDefs.h"
 #include "../luadefs/CLuaClientDefs.h"
 #include "../luadefs/CLuaVectorGraphicDefs.h"
+#include "../luadefs/CLuaDefs.h"
 
 using std::list;
 
@@ -196,7 +197,6 @@ void CLuaManager::LoadCFunctions()
 
         // Util functions
         {"getValidPedModels", CLuaFunctionDefs::GetValidPedModels},
-        {"getObjectLODModel", CLuaFunctionDefs::GetObjectLODModel},
         {"downloadFile", CLuaFunctionDefs::DownloadFile},
 
         // Input functions

@@ -43,4 +43,7 @@ public:
     LUA_DECLARE(ToggleObjectRespawn);
     LUA_DECLARE(SetObjectMass);
     LUA_DECLARE(SetObjectProperty);
+
+    // Object util funcs
+    static std::variant<bool, std::uint32_t> GetObjectLODModel(lua_State* const luaVM, std::uint32_t objectID);
 };

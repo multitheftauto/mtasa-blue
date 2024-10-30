@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
+#include "CLodModels.h"
 
 void CLuaObjectDefs::LoadFunctions()
 {
@@ -38,6 +39,9 @@ void CLuaObjectDefs::LoadFunctions()
         {"toggleObjectRespawn", ToggleObjectRespawn},
         {"setObjectMass", SetObjectMass},
         {"setObjectProperty", SetObjectProperty},
+
+        // Object util functions
+        {"getObjectLODModel", ArgumentParser<GetObjectLODModel>},
     };
 
     // Add functions
@@ -720,4 +724,12 @@ bool CLuaObjectDefs::IsObjectRespawnable(CClientEntity* const pEntity) noexcept
         return false;
 
     return pObject->IsRespawnEnabled();
+}
+
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLODModel(lua_State* const luaVM, std::uint32_t objectID)
+{
+    std::uint32_t lodModel = CLodModels::GetObjectLODModel(objectID);
+    if (lodModel == 0) // LOD Model not found for Object Model provided
+        return false;
+    return lodModel;
 }
