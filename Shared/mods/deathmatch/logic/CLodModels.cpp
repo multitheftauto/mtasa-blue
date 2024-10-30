@@ -10,6 +10,24 @@
 #include "StdInc.h"
 #include "CLodModels.h"
 
+std::uint32_t CLodModels::GetObjectLODOfModel(std::uint32_t objectID) noexcept
+{
+    const auto it = LOD_MODELS->find(objectID);
+    if (it != LOD_MODELS->end())
+        return it->second;
+    return 0;
+}
+
+std::uint32_t CLodModels::GetObjectModelOfLOD(std::uint32_t lodID) noexcept
+{
+    for (const auto& [objectID, lodModel] : *LOD_MODELS)
+    {
+        if (lodModel == lodID)
+            return objectID;
+    }
+    return 0;
+}
+
 // This associates Object Model ID to its Object-LOD Model ID, according to the game's IPL files (including the binary ones).
 
 std::unique_ptr<const std::map<std::uint32_t, std::uint32_t>> CLodModels::LOD_MODELS =
@@ -491,22 +509,3 @@ std::unique_ptr<const std::map<std::uint32_t, std::uint32_t>> CLodModels::LOD_MO
         {8255, 8159},   {8253, 8252},   {8249, 8248},   {8245, 8025},   {8219, 8222},   {8217, 8223},   {8215, 8226},   {7450, 7814},   {7482, 7771},
         {7514, 7680},   {7546, 7732},   {8213, 8224},   {8201, 8239},   {5511, 5557},   {5503, 5534}
 });
-
-
-std::uint32_t CLodModels::GetObjectLODOfModel(std::uint32_t objectID)
-{
-    const auto it = LOD_MODELS->find(objectID);
-    if (it != LOD_MODELS->end())
-        return it->second;
-    return 0;
-}
-
-std::uint32_t CLodModels::GetObjectModelOfLOD(std::uint32_t lodID)
-{
-    for (const auto& [objectID, lodModel] : *LOD_MODELS)
-    {
-        if (lodModel == lodID)
-            return objectID;
-    }
-    return 0;
-}

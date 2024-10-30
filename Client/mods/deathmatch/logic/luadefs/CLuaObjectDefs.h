@@ -45,6 +45,6 @@ public:
     LUA_DECLARE(SetObjectProperty);
 
     // Object util funcs
-    static std::variant<bool, std::uint32_t> GetObjectLODOfModel(lua_State* const luaVM, std::uint32_t objectID);
-    static std::variant<bool, std::uint32_t> GetObjectModelOfLOD(lua_State* const luaVM, std::uint32_t lodID);
+    static std::variant<bool, std::uint32_t> GetObjectLODOfModel(std::uint32_t objectID) noexcept;
+    static std::variant<bool, std::uint32_t> GetObjectModelOfLOD(std::uint32_t lodID) noexcept;
 };

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CLodModels.h
@@ -15,8 +15,8 @@
 class CLodModels
 {
 public:
-    static std::uint32_t GetObjectLODOfModel(std::uint32_t objectID);
-    static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodID);
+    static std::uint32_t GetObjectLODOfModel(std::uint32_t objectID) noexcept;
+    static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodID) noexcept;
 
 private:
     // Static pointer to a map that is initialized in the .cpp file

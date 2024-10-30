@@ -13,7 +13,6 @@
 #include "../luadefs/CLuaFireDefs.h"
 #include "../luadefs/CLuaClientDefs.h"
 #include "../luadefs/CLuaVectorGraphicDefs.h"
-#include "../luadefs/CLuaDefs.h"
 
 using std::list;
 

@@ -727,7 +727,7 @@ bool CLuaObjectDefs::IsObjectRespawnable(CClientEntity* const pEntity) noexcept
     return pObject->IsRespawnEnabled();
 }
 
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLODOfModel(lua_State* const luaVM, std::uint32_t objectID)
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLODOfModel(std::uint32_t objectID) noexcept
 {
     std::uint32_t lodModel = CLodModels::GetObjectLODOfModel(objectID);
     if (lodModel == 0) // LOD Model not found for Object Model provided
@@ -735,7 +735,7 @@ std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLODOfModel(lua_State*
     return lodModel;
 }
 
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectModelOfLOD(lua_State* const luaVM, std::uint32_t lodID)
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectModelOfLOD(std::uint32_t lodID) noexcept
 {
     std::uint32_t objModel = CLodModels::GetObjectModelOfLOD(lodID);
     if (objModel == 0)            // Object Model not found for LOD Model provided
