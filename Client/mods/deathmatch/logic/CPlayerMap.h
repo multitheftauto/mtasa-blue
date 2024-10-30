@@ -25,9 +25,9 @@ public:
     void DoPulse();
     void DoRender();
 
-    bool IsRadarShowing();
+    bool IsPlayerMapShowing();
 
-    bool GetPlayerMapEnabled() const { return m_bIsRadarEnabled; };
+    bool GetPlayerMapEnabled() const { return m_bIsPlayerMapEnabled; };
     void SetPlayerMapEnabled(bool bIsRadarEnabled);
 
     bool GetForcedState() const { return m_bForcedState; }
@@ -38,7 +38,7 @@ public:
     void ToggleHelpText();
 
 protected:
-    void InternalSetRadarEnabled(bool bEnabled);
+    void InternalSetPlayerMapEnabled(bool bEnabled);
 
     void          CreateMarkerTextures();
     CTextureItem* GetMarkerTexture(CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor);
@@ -81,9 +81,9 @@ private:
     class CClientRadarMarkerManager* m_pRadarMarkerManager;
     class CClientRadarAreaManager*   m_pRadarAreaManager;
 
-    std::size_t m_radarImageIndex;
+    std::size_t m_playerMapImageIndex;
 
-    CTextureItem*              m_pRadarImage;
+    CTextureItem*              m_pPlayerMapImage;
     CTextureItem*              m_pLocalPlayerBlip;
     std::vector<CTextureItem*> m_MarkerTextureList;
 
@@ -101,7 +101,7 @@ private:
 
     float m_fZoom;
 
-    bool m_bIsRadarEnabled;
+    bool m_bIsPlayerMapEnabled;
     bool m_bForcedState;
     bool m_bIsAttachedToLocal;
 

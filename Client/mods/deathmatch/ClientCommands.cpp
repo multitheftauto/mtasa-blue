@@ -245,21 +245,21 @@ void COMMAND_PlayerMap(const char* szCmdLine)
 void COMMAND_PlayerMapZoomIn(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (playerMap->IsRadarShowing())
+    if (playerMap->IsPlayerMapShowing())
         playerMap->ZoomIn();
 }
 
 void COMMAND_PlayerMapZoomOut(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (playerMap->IsRadarShowing())
+    if (playerMap->IsPlayerMapShowing())
         playerMap->ZoomOut();
 }
 
 void COMMAND_PlayerMapMoveNorth(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsRadarShowing())
+    if (!playerMap->IsPlayerMapShowing())
         return;
 
     if (playerMap->IsMovingNorth())
@@ -278,7 +278,7 @@ void COMMAND_PlayerMapMoveNorth(const char* szCmdLine)
 void COMMAND_PlayerMapMoveSouth(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsRadarShowing())
+    if (!playerMap->IsPlayerMapShowing())
         return;
 
     if (playerMap->IsMovingSouth())
@@ -297,7 +297,7 @@ void COMMAND_PlayerMapMoveSouth(const char* szCmdLine)
 void COMMAND_PlayerMapMoveEast(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsRadarShowing())
+    if (!playerMap->IsPlayerMapShowing())
         return;
 
     if (playerMap->IsMovingEast())
@@ -316,7 +316,7 @@ void COMMAND_PlayerMapMoveEast(const char* szCmdLine)
 void COMMAND_PlayerMapMoveWest(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsRadarShowing())
+    if (!playerMap->IsPlayerMapShowing())
         return;
 
     if (playerMap->IsMovingWest())
@@ -335,14 +335,14 @@ void COMMAND_PlayerMapMoveWest(const char* szCmdLine)
 void COMMAND_PlayerMapAttach(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (playerMap->IsRadarShowing())
+    if (playerMap->IsPlayerMapShowing())
         playerMap->SetAttachedToLocalPlayer(!g_pClientGame->GetPlayerMap()->IsAttachedToLocalPlayer());
 }
 
 void COMMAND_PlayerMapOpacityDown(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsRadarShowing())
+    if (!playerMap->IsPlayerMapShowing())
         return;
 
     int mapAlpha;
@@ -354,7 +354,7 @@ void COMMAND_PlayerMapOpacityDown(const char* szCmdLine)
 void COMMAND_PlayerMapOpacityUp(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsRadarShowing())
+    if (!playerMap->IsPlayerMapShowing())
         return;
 
     int mapAlpha;

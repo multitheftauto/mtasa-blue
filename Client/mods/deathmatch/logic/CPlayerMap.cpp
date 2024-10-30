@@ -23,7 +23,7 @@ enum
     MARKER_LAST_SPRITE_INDEX = MARKER_FIRST_SPRITE_INDEX + RADAR_MARKER_LIMIT - 1,
 };
 
-constexpr std::array<std::uint32_t, 2> RADAR_IMAGE_SIZES = {1024, 2048};
+constexpr std::array<std::uint32_t, 2> MAP_IMAGE_SIZES = {1024, 2048};
 
 CPlayerMap::CPlayerMap(CClientManager* pManager)
 {
@@ -32,8 +32,8 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_pRadarMarkerManager = pManager->GetRadarMarkerManager();
     m_pRadarAreaManager = m_pManager->GetRadarAreaManager();
 
-    // Set the radar bools
-    m_bIsRadarEnabled = false;
+    // Set the map bools
+    m_bIsPlayerMapEnabled = false;
     m_bForcedState = false;
     m_bIsAttachedToLocal = false;
     m_bHideHelpText = false;
@@ -59,9 +59,9 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
 
     // Create the map image
-    m_pRadarImage = nullptr;
-    m_radarImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
-    SetMapImage(m_radarImageIndex);
+    m_pPlayerMapImage = nullptr;
+    m_playerMapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
+    SetMapImage(m_playerMapImageIndex);
 
     // Create the marker textures
     CreateMarkerTextures();
@@ -79,13 +79,11 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
         {colorWhiteTransparent, 0.92f, 1.5f, ""},
         {colorWhite, 0.95f, 1.0f, SString(_("Change mode: %s"), *GetBoundKeyName("radar_attach"))},
 
-        {colorWhite, 0.05f, 1.0f,
-         SString(_("Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"),
+        {colorWhite, 0.05f, 1.0f, SString(_("Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"),
                  *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"), *GetBoundKeyName("radar_move_north"),
                  *GetBoundKeyName("radar_move_east"), *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"),
                  *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
-        {colorWhite, 0.07f, 1.0f,
-         SString(_("Toggle map: %s     Toggle help text: %s"),
+        {colorWhite, 0.07f, 1.0f, SString(_("Toggle map: %s     Toggle help text: %s"),
                  *GetBoundKeyName("radar"), *GetBoundKeyName("radar_help"))},
     };
 
@@ -111,7 +109,7 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
 CPlayerMap::~CPlayerMap()
 {
     // Delete our images
-    SAFE_RELEASE(m_pRadarImage);
+    SAFE_RELEASE(m_pPlayerMapImage);
     SAFE_RELEASE(m_pLocalPlayerBlip);
 
     for (uint i = 0; i < m_MarkerTextureList.size(); i++)
@@ -125,25 +123,25 @@ CPlayerMap::~CPlayerMap()
 void CPlayerMap::SetMapImage(std::size_t imageIndex)
 {
     std::uint32_t width, height;
-    if (imageIndex < RADAR_IMAGE_SIZES.size())
-        width = height = RADAR_IMAGE_SIZES[imageIndex];
+    if (imageIndex < MAP_IMAGE_SIZES.size())
+        width = height = MAP_IMAGE_SIZES[imageIndex];
     else // Fail safe, ideally client settings system should not allow this case
-        width = height = RADAR_IMAGE_SIZES[0];
+        width = height = MAP_IMAGE_SIZES[0];
 
-    SString fileName("MTA\\cgui\\images\\radar_%d.png", width);
+    SString fileName("MTA\\cgui\\images\\map_%d.png", width);
 
-    if (m_pRadarImage)
-        SAFE_RELEASE(m_pRadarImage);
+    if (m_pPlayerMapImage)
+        SAFE_RELEASE(m_pPlayerMapImage);
 
-    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, width, height, RFORMAT_DXT1);
+    m_pPlayerMapImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, width, height, RFORMAT_DXT1);
 
     g_pCore->GetConsole()->Printf("Player map image loaded: %s", fileName);
 }
 
 void CPlayerMap::DoPulse()
 {
-    // If our radar image exists
-    if (IsRadarShowing())
+    // If our map image exists
+    if (IsPlayerMapShowing())
     {
         // If we are following the local player blip
         if (m_bIsAttachedToLocal)
@@ -254,26 +252,26 @@ CTextureItem* CPlayerMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fL
 
 void CPlayerMap::DoRender()
 {
-    bool bIsRadarShowing = IsRadarShowing();
+    bool isMapShowing = IsPlayerMapShowing();
 
     // Render if showing
-    if (bIsRadarShowing)
+    if (isMapShowing)
     {
         // Get the alpha value from the settings
-        int iRadarAlpha;
-        g_pCore->GetCVars()->Get("mapalpha", iRadarAlpha);
+        int mapAlpha;
+        g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
+        const SColorARGB mapColor(mapAlpha, 255, 255, 255);
 
         // Update the image if the user changed it via a setting
-        auto radarImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
-        if (radarImageIndex != m_radarImageIndex)
+        auto mapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
+        if (mapImageIndex != m_playerMapImageIndex)
         {
-            m_radarImageIndex = radarImageIndex;
-            SetMapImage(m_radarImageIndex);
+            m_playerMapImageIndex = mapImageIndex;
+            SetMapImage(m_playerMapImageIndex);
         }
 
-        g_pCore->GetGraphics()->DrawTexture(m_pRadarImage, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
-                                            m_fMapSize / m_pRadarImage->m_uiSizeX, m_fMapSize / m_pRadarImage->m_uiSizeY, 0.0f, 0.0f, 0.0f,
-                                            SColorARGB(iRadarAlpha, 255, 255, 255));
+        g_pCore->GetGraphics()->DrawTexture(m_pPlayerMapImage, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
+                                            m_fMapSize / m_pPlayerMapImage->m_uiSizeX, m_fMapSize / m_pPlayerMapImage->m_uiSizeY, 0.0f, 0.0f, 0.0f, mapColor);
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
@@ -354,7 +352,7 @@ void CPlayerMap::DoRender()
     }
 
     // Update visibility of help text
-    bool bRequiredTextVisible = bIsRadarShowing && !m_bHideHelpText;
+    bool bRequiredTextVisible = isMapShowing && !m_bHideHelpText;
     if (bRequiredTextVisible != m_bTextVisible)
     {
         m_bTextVisible = bRequiredTextVisible;
@@ -365,31 +363,31 @@ void CPlayerMap::DoRender()
     }
 }
 
-void CPlayerMap::SetPlayerMapEnabled(bool bIsRadarEnabled)
+void CPlayerMap::SetPlayerMapEnabled(bool show)
 {
-    bool bAlreadyEnabled = (m_bIsRadarEnabled || m_bForcedState);
-    bool bWillShow = (bIsRadarEnabled || m_bForcedState);
-    if (bAlreadyEnabled != bWillShow)
+    bool alreadyEnabled = (m_bIsPlayerMapEnabled || m_bForcedState);
+    bool definitiveShow = (show || m_bForcedState);
+    if (alreadyEnabled != definitiveShow)
     {
-        InternalSetRadarEnabled(bWillShow);
+        InternalSetPlayerMapEnabled(definitiveShow);
     }
-    m_bIsRadarEnabled = bIsRadarEnabled;
+    m_bIsPlayerMapEnabled = show;
 }
 
-void CPlayerMap::SetForcedState(bool bState)
+void CPlayerMap::SetForcedState(bool state)
 {
-    bool bAlreadyShowing = (m_bIsRadarEnabled || m_bForcedState);
-    bool bWillShow = (m_bIsRadarEnabled || bState);
-    if (bAlreadyShowing != bWillShow)
+    bool currState = (m_bIsPlayerMapEnabled || m_bForcedState);
+    bool definitiveState = (m_bIsPlayerMapEnabled || state);
+    if (currState != definitiveState)
     {
-        InternalSetRadarEnabled(bWillShow);
+        InternalSetPlayerMapEnabled(definitiveState);
     }
-    m_bForcedState = bState;
+    m_bForcedState = state;
 }
 
-void CPlayerMap::InternalSetRadarEnabled(bool bEnabled)
+void CPlayerMap::InternalSetPlayerMapEnabled(bool enable)
 {
-    if (bEnabled)
+    if (enable)
     {
         m_bChatVisible = g_pCore->IsChatVisible();
         m_bChatInputBlocked = g_pCore->IsChatInputBlocked();
@@ -684,15 +682,15 @@ void CPlayerMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
         m_HelpTextList[0]->SetCaption(_("Free Movement"));
 }
 
-bool CPlayerMap::IsRadarShowing()
+bool CPlayerMap::IsPlayerMapShowing()
 {
-    return ((m_bIsRadarEnabled || m_bForcedState) && m_pRadarImage && m_pLocalPlayerBlip && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
+    return ((m_bIsPlayerMapEnabled || m_bForcedState) && m_pPlayerMapImage && m_pLocalPlayerBlip && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
 }
 
 bool CPlayerMap::GetBoundingBox(CVector& vecMin, CVector& vecMax)
 {
-    // If our radar image exists (Values are not calculated unless map is showing)
-    if (IsRadarShowing())
+    // If our map image exists (Values are not calculated unless map is showing)
+    if (IsPlayerMapShowing())
     {
         vecMin.fX = static_cast<float>(m_iMapMinX);
         vecMin.fY = static_cast<float>(m_iMapMinY);
