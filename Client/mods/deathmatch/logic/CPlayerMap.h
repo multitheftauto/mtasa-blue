@@ -83,9 +83,9 @@ private:
 
     std::size_t m_playerMapImageIndex;
 
-    CTextureItem*              m_pPlayerMapImage;
-    CTextureItem*              m_pLocalPlayerBlip;
-    std::vector<CTextureItem*> m_MarkerTextureList;
+    CTextureItem*              m_mapImageTexture;
+    CTextureItem*              m_playerMarkerTexture;
+    std::vector<CTextureItem*> m_markerTextureList;
 
     unsigned int m_uiHeight;
     unsigned int m_uiWidth;

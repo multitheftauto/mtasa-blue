@@ -56,10 +56,10 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_iVerticalMovement = 0;
 
     // Create the local player blip image
-    m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
+    m_playerMarkerTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
 
     // Create the map image
-    m_pPlayerMapImage = nullptr;
+    m_mapImageTexture = nullptr;
     m_playerMapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
     SetMapImage(m_playerMapImageIndex);
 
@@ -109,13 +109,13 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
 CPlayerMap::~CPlayerMap()
 {
     // Delete our images
-    SAFE_RELEASE(m_pPlayerMapImage);
-    SAFE_RELEASE(m_pLocalPlayerBlip);
+    SAFE_RELEASE(m_mapImageTexture);
+    SAFE_RELEASE(m_playerMarkerTexture);
 
-    for (uint i = 0; i < m_MarkerTextureList.size(); i++)
-        SAFE_RELEASE(m_MarkerTextureList[i]);
+    for (uint i = 0; i < m_markerTextureList.size(); i++)
+        SAFE_RELEASE(m_markerTextureList[i]);
 
-    m_MarkerTextureList.clear();
+    m_markerTextureList.clear();
 
     // Don't need to delete the help texts as those are destroyed by the display manager
 }
@@ -130,10 +130,8 @@ void CPlayerMap::SetMapImage(std::size_t imageIndex)
 
     SString fileName("MTA\\cgui\\images\\map_%d.png", width);
 
-    if (m_pPlayerMapImage)
-        SAFE_RELEASE(m_pPlayerMapImage);
-
-    m_pPlayerMapImage = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, width, height, RFORMAT_DXT1);
+    SAFE_RELEASE(m_mapImageTexture);
+    m_mapImageTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, width, height, RFORMAT_DXT1);
 
     g_pCore->GetConsole()->Printf("Player map image loaded: %s", fileName);
 }
@@ -182,7 +180,7 @@ void CPlayerMap::DoPulse()
 //
 void CPlayerMap::CreateMarkerTextures()
 {
-    assert(m_MarkerTextureList.empty());
+    assert(m_markerTextureList.empty());
     SString strRadarSetDirectory = CalcMTASAPath("MTA\\cgui\\images\\radarset\\");
 
     // Load the 3 shapes
@@ -190,19 +188,19 @@ void CPlayerMap::CreateMarkerTextures()
     for (uint i = 0; i < NUMELMS(shapeFileNames); i++)
     {
         CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(PathJoin(strRadarSetDirectory, shapeFileNames[i]));
-        m_MarkerTextureList.push_back(pTextureItem);
+        m_markerTextureList.push_back(pTextureItem);
     }
 
-    assert(m_MarkerTextureList.size() == MARKER_FIRST_SPRITE_INDEX);
+    assert(m_markerTextureList.size() == MARKER_FIRST_SPRITE_INDEX);
 
     // Load the icons
     for (uint i = 0; i < RADAR_MARKER_LIMIT; i++)
     {
         CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(PathJoin(strRadarSetDirectory, SString("%02u.png", i + 1)));
-        m_MarkerTextureList.push_back(pTextureItem);
+        m_markerTextureList.push_back(pTextureItem);
     }
 
-    assert(m_MarkerTextureList.size() == MARKER_LAST_SPRITE_INDEX + 1);
+    assert(m_markerTextureList.size() == MARKER_LAST_SPRITE_INDEX + 1);
 }
 
 //
@@ -244,10 +242,10 @@ CTextureItem* CPlayerMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fL
     *pfScale = fScale;
     *pColor = color;
 
-    if (uiListIndex >= m_MarkerTextureList.size())
+    if (uiListIndex >= m_markerTextureList.size())
         return NULL;
 
-    return m_MarkerTextureList[uiListIndex];
+    return m_markerTextureList[uiListIndex];
 }
 
 void CPlayerMap::DoRender()
@@ -270,8 +268,8 @@ void CPlayerMap::DoRender()
             SetMapImage(m_playerMapImageIndex);
         }
 
-        g_pCore->GetGraphics()->DrawTexture(m_pPlayerMapImage, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
-                                            m_fMapSize / m_pPlayerMapImage->m_uiSizeX, m_fMapSize / m_pPlayerMapImage->m_uiSizeY, 0.0f, 0.0f, 0.0f, mapColor);
+        g_pCore->GetGraphics()->DrawTexture(m_mapImageTexture, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
+                                            m_fMapSize / m_mapImageTexture->m_uiSizeX, m_fMapSize / m_mapImageTexture->m_uiSizeY, 0.0f, 0.0f, 0.0f, mapColor);
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
@@ -348,7 +346,7 @@ void CPlayerMap::DoRender()
             }
         }
 
-        g_pCore->GetGraphics()->DrawTexture(m_pLocalPlayerBlip, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f);
+        g_pCore->GetGraphics()->DrawTexture(m_playerMarkerTexture, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f);
     }
 
     // Update visibility of help text
@@ -684,7 +682,7 @@ void CPlayerMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
 
 bool CPlayerMap::IsPlayerMapShowing()
 {
-    return ((m_bIsPlayerMapEnabled || m_bForcedState) && m_pPlayerMapImage && m_pLocalPlayerBlip && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
+    return ((m_bIsPlayerMapEnabled || m_bForcedState) && m_mapImageTexture && m_playerMarkerTexture && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
 }
 
 bool CPlayerMap::GetBoundingBox(CVector& vecMin, CVector& vecMax)
