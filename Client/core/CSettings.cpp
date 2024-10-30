@@ -1652,7 +1652,7 @@ void CSettings::UpdateVideoTab()
     m_pMapAlpha->SetScrollPosition(sbPos);
 
     // Player map image
-    CVARS_GET("radar_map_image", iVar);
+    CVARS_GET("mapimage", iVar);
     if (iVar == 0 || iVar == 1)
         m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
@@ -1873,7 +1873,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 
     // Player map defaults
     CVARS_SET("mapalpha", 155);
-    CVARS_SET("radar_map_image", 0);
+    CVARS_SET("mapimage", 0);
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing() != m_pComboAntiAliasing->GetSelectedItemIndex();
@@ -3639,7 +3639,7 @@ void CSettings::SaveData()
     // Player map image
     int selectedComboIndex = m_pPlayerMapImageCombo->GetSelectedItemIndex();
     if (selectedComboIndex != -1)
-        CVARS_SET("radar_map_image", selectedComboIndex);
+        CVARS_SET("mapimage", selectedComboIndex);
 
     // Language
     CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem();

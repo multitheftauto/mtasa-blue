@@ -60,7 +60,7 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
 
     // Create the map image
     m_pRadarImage = nullptr;
-    m_radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("radar_map_image");
+    m_radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("mapimage");
     SetMapImage(m_radarImageIndex);
 
     // Create the marker textures
@@ -264,7 +264,7 @@ void CPlayerMap::DoRender()
         g_pCore->GetCVars()->Get("mapalpha", iRadarAlpha);
 
         // Update the image if the user changed it via a setting
-        auto radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("radar_map_image");
+        auto radarImageIndex = g_pCore->GetCVars()->GetValue<std::uint32_t>("mapimage");
         if (radarImageIndex != m_radarImageIndex)
         {
             m_radarImageIndex = radarImageIndex;
