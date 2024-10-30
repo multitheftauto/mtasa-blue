@@ -39,7 +39,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"toggleObjectRespawn", ArgumentParser<ToggleObjectRespawn>},
 
         // Object util functions
-        {"getObjectLODModel", ArgumentParser<GetObjectLODModel>},
+        {"getObjectLODOfModel", ArgumentParser<GetObjectLODOfModel>},
     };
 
     // Add functions
@@ -338,9 +338,9 @@ bool CLuaObjectDefs::IsObjectRespawnable(CObject* const pObject) noexcept
     return pObject->IsRespawnEnabled();
 }
 
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLODModel(lua_State* const luaVM, std::uint32_t objectID)
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLODOfModel(lua_State* const luaVM, std::uint32_t objectID)
 {
-    std::uint32_t lodModel = CLodModels::GetObjectLODModel(objectID);
+    std::uint32_t lodModel = CLodModels::GetObjectLODOfModel(objectID);
     if (lodModel == 0)            // LOD Model not found for Object Model provided
         return false;
     return lodModel;

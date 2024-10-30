@@ -15,7 +15,7 @@
 class CLodModels
 {
 public:
-    static std::uint32_t GetObjectLODModel(std::uint32_t objectID);
+    static std::uint32_t GetObjectLODOfModel(std::uint32_t objectID);
     static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodModelID);
 
 private:

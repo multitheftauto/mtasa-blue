@@ -493,7 +493,7 @@ std::unique_ptr<const std::map<std::uint32_t, std::uint32_t>> CLodModels::LOD_MO
 });
 
 
-std::uint32_t CLodModels::GetObjectLODModel(std::uint32_t objectID)
+std::uint32_t CLodModels::GetObjectLODOfModel(std::uint32_t objectID)
 {
     const auto it = LOD_MODELS->find(objectID);
     if (it != LOD_MODELS->end())
