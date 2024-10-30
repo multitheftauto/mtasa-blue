@@ -19,5 +19,6 @@ public:
     static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodID) noexcept;
 
 private:
-    static std::unique_ptr<const std::map<std::uint32_t, std::uint32_t>> LOD_MODELS;
+    using lod_type_t = std::unordered_map<std::uint32_t, std::uint32_t>;
+    static const std::unique_ptr<lod_type_t> LOD_MODELS;
 };
