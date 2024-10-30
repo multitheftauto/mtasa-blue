@@ -11,7 +11,7 @@
 #include "time.h"
 
 // These words are of a maximum length of 10 characters, capitalized, and stripped of whitespace
-const char* const CNickGen::m_szAdjectives[] = {
+const std::array<const char*, NICKGEN_NUM_ADJECTIVES> m_szAdjectives = {
     "Aback",      "Abaft",      "Abandoned",  "Abashed",    "Aberrant",   "Abhorrent",  "Abiding",    "Abject",     "Ablaze",     "Able",       "Abnormal",
     "Aboard",     "Aboriginal", "Abortive",   "Abounding",  "Abrasive",   "Abrupt",     "Absent",     "Absorbed",   "Absorbing",  "Abstracted", "Absurd",
     "Abundant",   "Abusive",    "Acceptable", "Accessible", "Accidental", "Accurate",   "Acid",       "Acidic",     "Acoustic",   "Acrid",      "Actually",
@@ -106,10 +106,10 @@ const char* const CNickGen::m_szAdjectives[] = {
     "Warm",       "Wary",       "Wasteful",   "Watery",     "Weak",       "Wealthy",    "Weary",      "Well-made",  "Well-off",   "Well-to-do", "Wet",
     "Whimsical",  "Whispering", "White",      "Whole",      "Wholesale",  "Wicked",     "Wide",       "Wide-eyed",  "Wiggly",     "Wild",       "Willing",
     "Windy",      "Wiry",       "Wise",       "Wistful",    "Witty",      "Woebegone",  "Womanly",    "Wonderful",  "Wooden",     "Woozy",      "Workable",
-    "Worried",    "Worthless",  "Wrathful",   "Wretched",   "Wrong",      "Wry"
+    "Worried",    "Worthless",  "Wrathful",   "Wretched",   "Wrong",      "Wry",
 };
 
-const char* const CNickGen::m_szNouns[] = {
+const std::array<const char*, NICKGEN_NUM_NOUNS> m_szNouns = {
     "Aardvark",   "Buffalo",    "Alligator",  "Ant",        "Anteater",   "Antelope",   "Ape",        "Armadillo",  "Donkey",      "Baboon",     "Badger",
     "Barracuda",  "Bat",        "Bear",       "Beaver",     "Bee",        "Bison",      "Boar",       "Bush",       "Butterfly",   "Camel",      "Calf",
     "Cat",        "Kitten",     "Cattle",     "Chamois",    "Cheetah",    "Chicken",    "Chick",      "Chimpanzee", "Infant",      "Empress",    "Troop",
@@ -193,7 +193,7 @@ const char* const CNickGen::m_szNouns[] = {
     "Crook",      "Hijacker",   "Carjacker",  "Villain",    "Convict",    "Fugitive",   "Mug",        "Outlaw",     "Ruffian",     "Cutthroat",  "Devil",
     "Murderer",   "Psycho",     "Punk",       "ASBO",       "Offender",   "Drifter",    "Rioter",     "Goon",       "Roughneck",   "Brute",      "Hacker",
     "Cabbie",     "Wheeler",    "Driver",     "Rider",      "Cyclist",    "Cowboy",     "Operative",  "Carrier",    "Transporter", "Trucker",    "Wheelman",
-    "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat"
+    "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat",
 };
 
 SString CNickGen::GetRandomNickname()

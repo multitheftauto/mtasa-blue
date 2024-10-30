@@ -15,7 +15,7 @@
 class CNickGen
 {
 public:
-    static const char* const m_szAdjectives[NICKGEN_NUM_ADJECTIVES];
-    static const char* const m_szNouns[NICKGEN_NUM_NOUNS];
+    static const std::array<const char*, NICKGEN_NUM_ADJECTIVES> m_szAdjectives;
+    static const std::array<const char*, NICKGEN_NUM_NOUNS> m_szNouns;
     static SString           GetRandomNickname();
 };
