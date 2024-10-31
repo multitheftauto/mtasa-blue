@@ -12,7 +12,7 @@
 
  // This associates Object Model ID to its Object-LOD Model ID, according to the game's IPL files (plaintext + binary).
 
-static const std::size_t OBJ_LOD_MODELS_COUNT = 4282;
+static constexpr std::size_t OBJ_LOD_MODELS_COUNT = 4282;
 
 static constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, OBJ_LOD_MODELS_COUNT> OBJ_LOD_MODELS = {
     {
