@@ -11,7 +11,7 @@
 #include "time.h"
 
 // These words are of a maximum length of 10 characters, capitalized, and stripped of whitespace
-const std::array<const char*, NICKGEN_NUM_ADJECTIVES> m_szAdjectives = {
+const std::array<const char*, NICKGEN_NUM_ADJECTIVES> CNickGen::m_szAdjectives = {
     "Aback",      "Abaft",      "Abandoned",  "Abashed",    "Aberrant",   "Abhorrent",  "Abiding",    "Abject",     "Ablaze",     "Able",       "Abnormal",
     "Aboard",     "Aboriginal", "Abortive",   "Abounding",  "Abrasive",   "Abrupt",     "Absent",     "Absorbed",   "Absorbing",  "Abstracted", "Absurd",
     "Abundant",   "Abusive",    "Acceptable", "Accessible", "Accidental", "Accurate",   "Acid",       "Acidic",     "Acoustic",   "Acrid",      "Actually",
@@ -109,7 +109,7 @@ const std::array<const char*, NICKGEN_NUM_ADJECTIVES> m_szAdjectives = {
     "Worried",    "Worthless",  "Wrathful",   "Wretched",   "Wrong",      "Wry",
 };
 
-const std::array<const char*, NICKGEN_NUM_NOUNS> m_szNouns = {
+const std::array<const char*, NICKGEN_NUM_NOUNS> CNickGen::m_szNouns = {
     "Aardvark",   "Buffalo",    "Alligator",  "Ant",        "Anteater",   "Antelope",   "Ape",        "Armadillo",  "Donkey",      "Baboon",     "Badger",
     "Barracuda",  "Bat",        "Bear",       "Beaver",     "Bee",        "Bison",      "Boar",       "Bush",       "Butterfly",   "Camel",      "Calf",
     "Cat",        "Kitten",     "Cattle",     "Chamois",    "Cheetah",    "Chicken",    "Chick",      "Chimpanzee", "Infant",      "Empress",    "Troop",

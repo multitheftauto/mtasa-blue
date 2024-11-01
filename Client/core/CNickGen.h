@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #pragma once
+#include <array>
 
 #define NICKGEN_NUM_ADJECTIVES      1040
 #define NICKGEN_NUM_NOUNS           921
