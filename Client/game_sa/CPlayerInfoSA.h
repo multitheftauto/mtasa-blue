@@ -268,4 +268,6 @@ public:
     float GetBikeRearWheelDist() { return internalInterface->fBikeRearWheelDist; }
     DWORD GetBikeFrontWheelCounter() { return internalInterface->nBikeFrontWheelCounter; }
     float GetBikeFrontWheelDist() { return internalInterface->fBikeFrontWheelDist; }
+    std::uint8_t GetMaxHealth() { return internalInterface->MaxHealth; }
+    std::uint8_t GetMaxArmor() { return internalInterface->MaxArmour; }
 };

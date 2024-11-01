@@ -156,6 +156,7 @@ public:
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
+    virtual int          GetSystemFrameCounter() = 0;
     virtual bool         IsAtMenu() = 0;
     virtual void         StartGame() = 0;
     virtual void         SetSystemState(eSystemState State) = 0;

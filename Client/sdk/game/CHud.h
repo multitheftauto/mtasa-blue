@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #pragma once
+#include "CVector2D.h"
 
 enum eHudComponent
 {
@@ -32,6 +33,16 @@ enum eHudComponent
     HUD_HELP_TEXT,
 };
 
+enum class eHudComponentProperty
+{
+    FILL_COLOR,
+    DRAW_BLACK_BORDER,
+    DRAW_PERCENTAGE,
+    BLINKING_HP_VALUE,
+    POSITION,
+    SIZE,
+};
+
 class CHud
 {
 public:
@@ -42,4 +53,13 @@ public:
     virtual void AdjustComponents(float fAspectRatio) = 0;
     virtual void ResetComponentAdjustment() = 0;
     virtual bool IsCrosshairVisible() = 0;
+
+    // Hud properties
+    virtual void SetComponentBarColor(const eHudComponent& component, float color) noexcept = 0;
+    virtual void SetComponentDrawBlackBorder(const eHudComponent& component, bool draw) noexcept = 0;
+    virtual void SetComponentDrawPercentage(const eHudComponent& component, bool draw) noexcept = 0;
+    virtual void SetHealthBarBlinkingValue(float minHealth) noexcept = 0;
+    virtual void SetComponentPosition(const eHudComponent& component, const CVector2D& position) noexcept = 0;
+    virtual void SetComponentSize(const eHudComponent& component, const CVector2D& size) noexcept = 0;
+    virtual void ResetComponentPlacement(const eHudComponent& component, bool resetSize) noexcept = 0;
 };

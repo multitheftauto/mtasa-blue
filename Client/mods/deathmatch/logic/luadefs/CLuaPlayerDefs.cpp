@@ -40,6 +40,8 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerNametagText", SetPlayerNametagText},
         {"setPlayerNametagColor", SetPlayerNametagColor},
         {"setPlayerNametagShowing", SetPlayerNametagShowing},
+        {"setPlayerHudComponentProperty", ArgumentParser<SetPlayerHudComponentProperty>},
+        {"resetPlayerHudComponentProperty", ArgumentParser<ResetPlayerHudComponentProperty>},
 
         // Community funcs
         {"getPlayerUserName", GetPlayerUserName},
@@ -77,6 +79,8 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isMapVisible", "isPlayerMapVisible");
     lua_classfunction(luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible");
     lua_classfunction(luaVM, "toggleControl", "toggleControl");
+    lua_classfunction(luaVM, "setHudComponentProperty", "setPlayerHudComponentProperty");
+    lua_classfunction(luaVM, "resetHudComponentProperty", "resetPlayerHudComponentProperty");
 
     lua_classfunction(luaVM, "create", "getPlayerFromName");
 
@@ -643,4 +647,169 @@ unsigned char CLuaPlayerDefs::GetPlayerMapOpacity()
 bool CLuaPlayerDefs::IsPlayerCrosshairVisible()
 {
     return g_pGame->GetHud()->IsCrosshairVisible();
+}
+
+bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property, std::variant<CVector2D, float, bool> value)
+{
+    switch (property)
+    {
+        case eHudComponentProperty::POSITION:
+        {
+            if (!std::holds_alternative<CVector2D>(value))
+                return false;
+
+            g_pGame->GetHud()->SetComponentPosition(component, std::get<CVector2D>(value));
+            return true;
+        }
+        case eHudComponentProperty::SIZE:
+        {
+            if (!std::holds_alternative<CVector2D>(value))
+                return false;
+
+            g_pGame->GetHud()->SetComponentSize(component, std::get<CVector2D>(value));
+            return true;
+        }
+        case eHudComponentProperty::FILL_COLOR:
+        {
+            switch (component)
+            {
+                case HUD_HEALTH:
+                case HUD_ARMOUR:
+                case HUD_BREATH:
+                {
+                    if (!std::holds_alternative<float>(value))
+                        return false;
+
+                    g_pGame->GetHud()->SetComponentBarColor(component, std::get<float>(value));
+                    return true;
+                }
+            }
+
+            break;
+        }
+        case eHudComponentProperty::DRAW_BLACK_BORDER:
+        {
+            switch (component)
+            {
+                case HUD_HEALTH:
+                case HUD_ARMOUR:
+                case HUD_BREATH:
+                {
+                    if (!std::holds_alternative<bool>(value))
+                        return false;
+
+                    g_pGame->GetHud()->SetComponentDrawBlackBorder(component, std::get<bool>(value));
+                    return true;
+                }
+            }
+
+            break;
+        }
+        case eHudComponentProperty::DRAW_PERCENTAGE:
+        {
+            switch (component)
+            {
+                case HUD_HEALTH:
+                case HUD_ARMOUR:
+                case HUD_BREATH:
+                {
+                    if (!std::holds_alternative<bool>(value))
+                        return false;
+
+                    g_pGame->GetHud()->SetComponentDrawPercentage(component, std::get<bool>(value));
+                    return true;
+                }
+            }
+
+            break;
+        }
+        case eHudComponentProperty::BLINKING_HP_VALUE:
+        {
+            if (component != HUD_HEALTH)
+                return false;
+
+            if (!std::holds_alternative<float>(value))
+                return false;
+
+            g_pGame->GetHud()->SetHealthBarBlinkingValue(std::get<float>(value));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property)
+{
+    switch (property)
+    {
+        case eHudComponentProperty::POSITION:
+        {
+            g_pGame->GetHud()->ResetComponentPlacement(component, false);
+            return true;
+        }
+        case eHudComponentProperty::SIZE:
+        {
+            g_pGame->GetHud()->ResetComponentPlacement(component, true);
+            return true;
+        }
+        case eHudComponentProperty::FILL_COLOR:
+        {
+            switch (component)
+            {
+                case HUD_HEALTH:
+                    // eHudColour::RED
+                    g_pGame->GetHud()->SetComponentBarColor(component, COLOR_RGBA(180, 25, 29, 255));
+                    return true;
+                case HUD_BREATH:
+                    // eHudColour::LIGHT_BLUE
+                    g_pGame->GetHud()->SetComponentBarColor(component, COLOR_RGBA(172, 203, 241, 255));
+                    return true;
+                case HUD_ARMOUR:
+                    // eHudColour::LIGHT_GRAY
+                    g_pGame->GetHud()->SetComponentBarColor(component, COLOR_RGBA(225, 225, 225, 255));
+                    return true;
+            }
+
+            break;
+        }
+        case eHudComponentProperty::DRAW_BLACK_BORDER:
+        {
+            switch (component)
+            {
+                case HUD_HEALTH:
+                case HUD_BREATH:
+                case HUD_ARMOUR:
+                    g_pGame->GetHud()->SetComponentDrawBlackBorder(component, true);
+                    return true;
+            }
+
+            break;
+        }
+        case eHudComponentProperty::DRAW_PERCENTAGE:
+        {
+            switch (component)
+            {
+                case HUD_HEALTH:
+                case HUD_BREATH:
+                case HUD_ARMOUR:
+                    g_pGame->GetHud()->SetComponentDrawPercentage(component, false);
+                    return true;
+            }
+
+            break;
+        }
+        case eHudComponentProperty::BLINKING_HP_VALUE:
+        {
+            if (component == HUD_HEALTH)
+            {
+                g_pGame->GetHud()->SetHealthBarBlinkingValue(10.0f);
+                return true;
+            }
+
+            break;
+        }
+    }
+
+    return false;
 }

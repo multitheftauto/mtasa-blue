@@ -41,6 +41,8 @@ public:
     LUA_DECLARE(SetPlayerNametagText);
     LUA_DECLARE(SetPlayerNametagColor);
     LUA_DECLARE(SetPlayerNametagShowing);
+    static bool SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property, std::variant<CVector2D, float, bool> value);
+    static bool ResetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property);
 
     // Community funcs
     LUA_DECLARE(GetPlayerUserName);
