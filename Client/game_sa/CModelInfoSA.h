@@ -302,7 +302,6 @@ public:
     float                               fSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
     char                                pad3[464];
-    //RpMaterial*                         pDirtMaterial[32];
 
     union
     {

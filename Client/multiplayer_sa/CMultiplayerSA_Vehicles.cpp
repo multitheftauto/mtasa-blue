@@ -12,7 +12,10 @@
 #include "..\game_sa\gamesa_renderware.h"
 
 #define FUNC_CVehicleModelInfo_ResetColors 0x4C8490
-static RwTexture** ms_aDirtTextures = (RwTexture**)0xC02BD0;
+#define FUNC_CBaseModelInfo_Shutdown       0x4C4D50
+#define IN_PLACE_BUFFER_DIRT_SIZE          30
+
+static RwTexture** const ms_aDirtTextures = (RwTexture**)0xC02BD0;
 
 static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 {
@@ -122,8 +125,7 @@ static void CVehicleModelInfo_Shutdown()
     if (!mi)
         return;
 
-    // Call CBaseModelInfo::Shutdown
-    ((void(__cdecl*)(void*))0x4C4D50)(mi);
+    ((void(__cdecl*)(void*))FUNC_CBaseModelInfo_Shutdown)(mi);
 
     delete[] mi->m_dirtMaterials;
     mi->m_dirtMaterials = nullptr;
@@ -131,7 +133,7 @@ static void CVehicleModelInfo_Shutdown()
 
 static void SetDirtTextures(CVehicleModelInfoSAInterface* mi, std::uint32_t level)
 {
-    RpMaterial** materials = mi->m_numDirtMaterials > 30 ? mi->m_dirtMaterials : mi->m_staticDirtMaterials;
+    RpMaterial** materials = mi->m_numDirtMaterials > IN_PLACE_BUFFER_DIRT_SIZE ? mi->m_dirtMaterials : mi->m_staticDirtMaterials;
     for (std::uint32_t i = 0; i < mi->m_numDirtMaterials; i++)
         RpMaterialSetTexture(materials[i], ms_aDirtTextures[level]);
 }
@@ -182,7 +184,7 @@ static void __fastcall FindEditableMaterialList(CVehicleModelInfoSAInterface* mi
         GetEditableMaterialListCB(mi->pVisualInfo->m_pExtra[i], &list);
 
     mi->m_numDirtMaterials = list.size();
-    if (mi->m_numDirtMaterials > 30)
+    if (mi->m_numDirtMaterials > IN_PLACE_BUFFER_DIRT_SIZE)
     {
         mi->m_dirtMaterials = new RpMaterial*[mi->m_numDirtMaterials];
         std::copy(list.begin(), list.end(), mi->m_dirtMaterials);
