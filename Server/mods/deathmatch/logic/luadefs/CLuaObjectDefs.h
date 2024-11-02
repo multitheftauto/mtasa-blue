@@ -41,6 +41,6 @@ public:
     static bool ToggleObjectRespawn(CObject* const pObject, const bool bRespawn) noexcept;
 
     // Object util funcs
-    static std::variant<bool, std::uint32_t> GetObjectLODOfModel(std::uint32_t objectID) noexcept;
-    static std::variant<bool, std::uint32_t> GetObjectModelOfLOD(std::uint32_t objectID) noexcept;
+    static std::variant<bool, std::uint32_t> GetObjectLowLODOfModel(std::uint32_t objectModel) noexcept;
+    static std::variant<bool, std::uint32_t> GetObjectHighLODOfModel(std::uint32_t objectModel) noexcept;
 };

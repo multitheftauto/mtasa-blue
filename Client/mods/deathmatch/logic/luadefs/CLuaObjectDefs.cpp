@@ -41,8 +41,8 @@ void CLuaObjectDefs::LoadFunctions()
         {"setObjectProperty", SetObjectProperty},
 
         // Object util functions
-        {"getObjectLODOfModel", ArgumentParser<GetObjectLODOfModel>},
-        {"getObjectModelOfLOD", ArgumentParser<GetObjectModelOfLOD>},
+        {"getObjectLowLODOfModel", ArgumentParser<GetObjectLowLODOfModel>},
+        {"getObjectHighLODOfModel", ArgumentParser<GetObjectHighLODOfModel>},
     };
 
     // Add functions
@@ -727,18 +727,18 @@ bool CLuaObjectDefs::IsObjectRespawnable(CClientEntity* const pEntity) noexcept
     return pObject->IsRespawnEnabled();
 }
 
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLODOfModel(std::uint32_t objectID) noexcept
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLowLODOfModel(std::uint32_t objectModel) noexcept
 {
-    std::uint32_t lodModel = CLodModels::GetObjectLODOfModel(objectID);
-    if (lodModel == 0) // LOD Model not found for Object Model provided
+    std::uint32_t lodModel = CLodModels::GetObjectLowLODOfModel(objectModel);
+    if (lodModel == 0) // LLOD Model not found for HLOD Model provided
         return false;
     return lodModel;
 }
 
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectModelOfLOD(std::uint32_t lodID) noexcept
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectHighLODOfModel(std::uint32_t objectModel) noexcept
 {
-    std::uint32_t objModel = CLodModels::GetObjectModelOfLOD(lodID);
-    if (objModel == 0)            // Object Model not found for LOD Model provided
+    std::uint32_t objModel = CLodModels::GetObjectHighLODOfModel(objectModel);
+    if (objModel == 0)            // HLOD Model not found for LLOD Model provided
         return false;
     return objModel;
 }

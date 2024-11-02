@@ -15,6 +15,6 @@
 class CLodModels
 {
 public:
-    static std::uint32_t GetObjectLODOfModel(std::uint32_t objectID) noexcept;
-    static std::uint32_t GetObjectModelOfLOD(std::uint32_t lodID) noexcept;
+    static std::uint32_t GetObjectLowLODOfModel(std::uint32_t objectModel) noexcept;
+    static std::uint32_t GetObjectHighLODOfModel(std::uint32_t objectModel) noexcept;
 };

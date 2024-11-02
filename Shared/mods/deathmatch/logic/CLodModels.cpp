@@ -12,9 +12,9 @@
 
  // This associates Object Model ID to its Object-LOD Model ID, according to the game's IPL files (plaintext + binary).
 
-static constexpr std::size_t OBJ_LOD_MODELS_COUNT = 4282;
+constexpr std::size_t OBJ_LOD_MODELS_COUNT = 4282;
 
-static constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, OBJ_LOD_MODELS_COUNT> OBJ_LOD_MODELS = {
+constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, OBJ_LOD_MODELS_COUNT> OBJ_LOD_MODELS = {
     {
      {7834, 7833},   {7866, 7872},   {7994, 8297},   {8058, 8157},   {16179, 16468}, {16243, 16547}, {8154, 8279},   {8186, 8191},   {8244, 8024},
      {8308, 8309},   {8436, 8922},   {8500, 8923},   {8564, 8803},   {8628, 8799},   {17638, 17705}, {8884, 8960},   {17894, 17896}, {9076, 9077},
@@ -495,21 +495,21 @@ static constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, OBJ_LOD_MOD
     }
 };
 
-std::uint32_t CLodModels::GetObjectLODOfModel(std::uint32_t objectID) noexcept
+std::uint32_t CLodModels::GetObjectLowLODOfModel(std::uint32_t objectModel) noexcept
 {
     for (const auto& entry : OBJ_LOD_MODELS)
     {
-        if (entry.first == objectID)
+        if (entry.first == objectModel)
             return entry.second;
     }
     return 0;
 }
 
-std::uint32_t CLodModels::GetObjectModelOfLOD(std::uint32_t lodID) noexcept
+std::uint32_t CLodModels::GetObjectHighLODOfModel(std::uint32_t objectModel) noexcept
 {
     for (const auto& entry : OBJ_LOD_MODELS)
     {
-        if (entry.second == lodID)
+        if (entry.second == objectModel)
             return entry.first;
     }
     return 0;
