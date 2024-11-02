@@ -140,6 +140,8 @@ public:
 
     virtual bool IsDynamicPedShadowsEnabled() = 0;
     virtual void SetDynamicPedShadowsEnabled(bool bEnable) = 0;
+    virtual bool IsDynamicPedShadowsEnabledByVideoSetting() const noexcept = 0;
+    virtual bool ResetDynamicPedShadows()  noexcept = 0;
 
     virtual float        GetAspectRatioValue() = 0;
     virtual eAspectRatio GetAspectRatio() = 0;
