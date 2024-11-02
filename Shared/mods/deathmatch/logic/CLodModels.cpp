@@ -10,7 +10,8 @@
 #include "StdInc.h"
 #include "CLodModels.h"
 
- // This associates Object Model ID to its Object-LOD Model ID, according to the game's IPL files (plaintext + binary).
+ // This array associates HLOD Object Model ID -> LLOD Object Model ID for all objects that have LLOD models.
+ // Data was taken to the game's IPL files (plaintext + binary).
 
 constexpr std::size_t OBJ_LOD_MODELS_COUNT = 4282;
 
