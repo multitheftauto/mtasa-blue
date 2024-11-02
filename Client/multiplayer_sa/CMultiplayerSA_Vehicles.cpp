@@ -9,6 +9,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "..\game_sa\gamesa_renderware.h"
+
+#define FUNC_CVehicleModelInfo_ResetColors 0x4C8490
+static RwTexture** ms_aDirtTextures = (RwTexture**)0xC02BD0;
 
 static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 {
@@ -107,6 +111,106 @@ static void _declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise()
     }
 }
 
+static void CVehicleModelInfo_Shutdown()
+{
+    CVehicleModelInfoSAInterface* mi = nullptr;
+    _asm
+    {
+        mov mi, ecx
+    }
+
+    if (!mi)
+        return;
+
+    // Call CBaseModelInfo::Shutdown
+    ((void(__cdecl*)(void*))0x4C4D50)(mi);
+
+    delete[] mi->m_dirtMaterials;
+    mi->m_dirtMaterials = nullptr;
+}
+
+static void SetDirtTextures(CVehicleModelInfoSAInterface* mi, std::uint32_t level)
+{
+    RpMaterial** materials = mi->m_numDirtMaterials > 30 ? mi->m_dirtMaterials : mi->m_staticDirtMaterials;
+    for (std::uint32_t i = 0; i < mi->m_numDirtMaterials; i++)
+        RpMaterialSetTexture(materials[i], ms_aDirtTextures[level]);
+}
+
+#define HOOKPOS_CVehicleModelInfo_SetDirtTextures 0x5D5DBB
+#define HOOKSIZE_CVehicleModelInfo_SetDirtTextures 6
+static constexpr DWORD CONTINUE_CVehicleModelInfo_SetDirtTextures = 0x5D5DE3;
+static void _declspec(naked) HOOK_CVehicleModelInfo_SetDirtTextures()
+{
+    _asm
+    {
+        pushad
+        push ebx
+        push esi
+        call SetDirtTextures
+        add esp, 8
+        popad
+
+        jmp CONTINUE_CVehicleModelInfo_SetDirtTextures
+    }
+}
+
+static RpMaterial* GetAtomicGeometryMaterialsCB(RpMaterial* material, void* data)
+{
+    RwTexture* texture = material->texture;
+    if (!texture)
+        return nullptr;
+
+    auto cbData = static_cast<std::vector<RpMaterial*>*>(data);
+    if (texture->name && std::strcmp(texture->name, "vehiclegrunge256") == 0)
+        cbData->push_back(material);
+
+    return material;
+}
+
+static bool GetEditableMaterialListCB(RpAtomic* atomic, void* data)
+{
+    RpGeometryForAllMaterials(atomic->geometry, &GetAtomicGeometryMaterialsCB, data);
+    return true;
+}
+
+static void __fastcall FindEditableMaterialList(CVehicleModelInfoSAInterface* mi)
+{
+    std::vector<RpMaterial*> list;
+    RpClumpForAllAtomics(reinterpret_cast<RpClump*>(mi->pRwObject), &GetEditableMaterialListCB, &list);
+
+    for (std::uint32_t i = 0; i < mi->pVisualInfo->m_numExtras; i++)
+        GetEditableMaterialListCB(mi->pVisualInfo->m_pExtra[i], &list);
+
+    mi->m_numDirtMaterials = list.size();
+    if (mi->m_numDirtMaterials > 30)
+    {
+        mi->m_dirtMaterials = new RpMaterial*[mi->m_numDirtMaterials];
+        std::copy(list.begin(), list.end(), mi->m_dirtMaterials);
+    }
+    else
+    {
+        mi->m_dirtMaterials = nullptr;
+        std::copy(list.begin(), list.end(), mi->m_staticDirtMaterials);
+    }
+
+    ((void(__thiscall*)(CVehicleModelInfoSAInterface*))FUNC_CVehicleModelInfo_ResetColors)(mi);
+}
+
+#define HOOKPOS_CVehicleModelInfo_SetClump 0x4C9648
+#define HOOKSIZE_CVehicleModelInfo_SetClump 24
+static constexpr DWORD CONTINUE_CVehicleModelInfo_SetClump = 0x4C9660;
+static void _declspec(naked) HOOK_CVehicleModelInfo_SetClump()
+{
+    _asm
+    {
+        pushad
+        call FindEditableMaterialList
+        popad
+
+        jmp CONTINUE_CVehicleModelInfo_SetClump
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Vehicles
@@ -118,4 +222,9 @@ void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
     EZHookInstall(CAEVehicleAudioEntity__Initialise);
+
+    // Fix vehicle dirt level
+    EZHookInstall(CVehicleModelInfo_SetClump);
+    EZHookInstall(CVehicleModelInfo_SetDirtTextures);
+    MemCpy((void*)0x85C5E4, &CVehicleModelInfo_Shutdown, 4);
 }

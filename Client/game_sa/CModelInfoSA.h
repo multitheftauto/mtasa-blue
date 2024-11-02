@@ -14,6 +14,7 @@
 #include <game/Common.h>
 #include <game/CModelInfo.h>
 #include "CRenderWareSA.h"
+#include "game/RenderWare.h"
 
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
@@ -259,11 +260,22 @@ public:
     CTimeInfoSAInterface timeInfo;
 };
 
+class CVehicleModelUpgradePosnDesc
+{
+    CVector m_vPosition;
+    RtQuat  m_vRotation;
+    int     m_iParentId;
+};
+
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
 public:
-    CVector vecDummies[15];
-    char    m_sUpgrade[18];
+    CVector                      vecDummies[15];
+    CVehicleModelUpgradePosnDesc m_sUpgrade[18];
+    RpAtomic*                    m_pExtra[6];
+    std::uint8_t                 m_numExtras;
+    std::uint8_t                 _pad[3];
+    int                          m_maskComponentDamagable;
 };
 
 class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -290,7 +302,19 @@ public:
     float                               fSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
     char                                pad3[464];
-    char                                pDirtMaterial[64];            // *RwMaterial
+    //RpMaterial*                         pDirtMaterial[32];
+
+    union
+    {
+        struct
+        {
+            RpMaterial** m_dirtMaterials;
+            size_t       m_numDirtMaterials;
+            RpMaterial*  m_staticDirtMaterials[30];
+        };
+        RpMaterial* pDirtMaterial[32];
+    };
+
     char                                pad4[64];
     char                                primColors[8];
     char                                secondColors[8];
