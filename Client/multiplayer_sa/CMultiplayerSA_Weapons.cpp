@@ -220,10 +220,8 @@ static void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
         mov eax, 5533B0h
         mov ecx, ebx
 
-        pushad
         push 0
         call eax // call CPed::RemoveLighting
-        popad
 
         jmp CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC
     }
