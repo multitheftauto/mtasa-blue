@@ -2653,11 +2653,13 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
             }
 
             ESyncType lastSyncType = ESyncType::BROADCAST;
-            bool      clientChangesAllowed = true;
+            ECustomDataClientTrust clientChangesMode{};
 
-            pElement->GetCustomData(szName, false, &lastSyncType, &clientChangesAllowed);
+            pElement->GetCustomData(szName, false, &lastSyncType, &clientChangesMode);
 
-            if (!clientChangesAllowed)
+            const bool changesAllowed = clientChangesMode == ECustomDataClientTrust::UNSET ? pElement->GetCustomDataManager().IsClientChangesAllowed()
+                                                                                           : clientChangesMode == ECustomDataClientTrust::ALLOW;
+            if (!changesAllowed)
             {
                 CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)", Packet.GetSourcePlayer()->GetNick(),
                                      szName);

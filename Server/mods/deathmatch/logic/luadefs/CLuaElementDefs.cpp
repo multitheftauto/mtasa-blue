@@ -80,8 +80,9 @@ void CLuaElementDefs::LoadFunctions()
         {"addElementDataSubscriber", addElementDataSubscriber},
         {"removeElementDataSubscriber", removeElementDataSubscriber},
         {"hasElementDataSubscriber", hasElementDataSubscriber},
-        {"setElementDataClientTrustEnabled", ArgumentParser<SetElementDataClientTrustEnabled>},
-        {"isElementDataClientTrustEnabled", ArgumentParser<IsElementDataClientTrustEnabled>},
+        {"setElementDataClientTrust", ArgumentParser<SetElementDataClientTrust>},
+        {"isElementDataClientTrusted", ArgumentParser<IsElementDataClientTrusted>},
+        {"resetElementDataClientTrust", ArgumentParser<ResetElementDataClientTrust>},
 
         // Set
         {"setElementID", setElementID},
@@ -131,6 +132,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "addDataSubscriber", "addElementDataSubscriber");
     lua_classfunction(luaVM, "removeDataSubscriber", "removeElementDataSubscriber");
     lua_classfunction(luaVM, "hasDataSubscriber", "hasElementDataSubscriber");
+    lua_classfunction(luaVM, "resetDataClientTrust", "resetElementDataClientTrust");
 
     lua_classfunction(luaVM, "setParent", "setElementParent");
     lua_classfunction(luaVM, "setFrozen", "setElementFrozen");
@@ -153,7 +155,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setLowLOD", "setLowLODElement");
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
-    lua_classfunction(luaVM, "setDataClientTrustEnabled", "setElementDataClientTrustEnabled");
+    lua_classfunction(luaVM, "setDataClientTrust", "setElementDataClientTrust");
 
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getChild", "getElementChild");
@@ -192,7 +194,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isVisibleTo", "isElementVisibleTo");
     lua_classfunction(luaVM, "isLowLOD", "isElementLowLOD");
     lua_classfunction(luaVM, "isAttached", "isElementAttached");
-    lua_classfunction(luaVM, "isDataClientTrustEnabled", "isElementDataClientTrustEnabled");
+    lua_classfunction(luaVM, "isDataClientTrusted", "isElementDataClientTrusted");
 
     lua_classvariable(luaVM, "id", "setElementID", "getElementID");
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
@@ -2442,12 +2444,26 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
     return 1;
 }
 
-void CLuaElementDefs::SetElementDataClientTrustEnabled(CElement* pElement, std::string_view key, bool enabled)
+void CLuaElementDefs::SetElementDataClientTrust(CElement* pElement, bool enabled, std::optional<std::string_view> key)
 {
-    pElement->GetCustomDataManager().SetClientChangesAllowed(key.data(), enabled);
+    if (key.has_value())
+        pElement->GetCustomDataManager().SetClientChangesMode(key.value().data(), enabled ? ECustomDataClientTrust::ALLOW : ECustomDataClientTrust::DENY);
+    else
+        pElement->GetCustomDataManager().SetClientChangesAllowed(enabled);
 }
 
-bool CLuaElementDefs::IsElementDataClientTrustEnabled(CElement* pElement, std::string_view key)
+bool CLuaElementDefs::IsElementDataClientTrusted(CElement* pElement, std::optional<std::string_view> key)
 {
-    return pElement->GetCustomDataManager().IsClientChangesAllowed(key.data());
+    if (key.has_value())
+        return pElement->GetCustomDataManager().IsClientChangesAllowed(key.value().data());
+    else
+        return pElement->GetCustomDataManager().IsClientChangesAllowed();
+}
+
+void CLuaElementDefs::ResetElementDataClientTrust(CElement* pElement, std::optional<std::string_view> key)
+{
+    if (key.has_value())
+        pElement->GetCustomDataManager().SetClientChangesMode(key.value().data(), ECustomDataClientTrust::UNSET);
+    else
+        pElement->GetCustomDataManager().SetClientChangesAllowed(true);
 }

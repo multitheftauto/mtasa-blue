@@ -25,11 +25,18 @@ enum class ESyncType
     SUBSCRIBE,
 };
 
+enum class ECustomDataClientTrust : std::uint8_t
+{
+    UNSET,
+    ALLOW,
+    DENY,
+};
+
 struct SCustomData
 {
-    CLuaArgument Variable;
-    ESyncType    syncType;
-    bool         allowClientChanges;
+    CLuaArgument           Variable;
+    ESyncType              syncType;
+    ECustomDataClientTrust clientChangesMode;
 };
 
 class CCustomData
@@ -42,8 +49,12 @@ public:
     void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
     bool Delete(const char* szName);
+
     bool IsClientChangesAllowed(const char* szName) const;
-    void SetClientChangesAllowed(const char* szName, bool enabled);
+    void SetClientChangesMode(const char* szName, ECustomDataClientTrust mode);
+
+    bool IsClientChangesAllowed() const noexcept { return m_clientChangesAllowed; };
+    void SetClientChangesAllowed(bool enabled) noexcept { m_clientChangesAllowed = enabled; };
 
     unsigned short CountOnlySynchronized();
 
@@ -61,4 +72,5 @@ private:
 
     std::map<std::string, SCustomData> m_Data;
     std::map<std::string, SCustomData> m_SyncedData;
+    bool                               m_clientChangesAllowed{true};
 };

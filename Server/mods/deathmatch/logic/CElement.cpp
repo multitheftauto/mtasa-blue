@@ -508,7 +508,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType, bool* clientChangesAllowed)
+CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType, ECustomDataClientTrust* clientChangesMode)
 {
     assert(szName);
 
@@ -519,8 +519,8 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESy
         if (pSyncType)
             *pSyncType = pData->syncType;
 
-        if (clientChangesAllowed)
-            *clientChangesAllowed = pData->allowClientChanges;
+        if (clientChangesMode)
+            *clientChangesMode = pData->clientChangesMode;
 
         return &pData->Variable;
     }
@@ -528,7 +528,7 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESy
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pSyncType, clientChangesAllowed);
+        return m_pParent->GetCustomData(szName, true, pSyncType, clientChangesMode);
     }
 
     // None available

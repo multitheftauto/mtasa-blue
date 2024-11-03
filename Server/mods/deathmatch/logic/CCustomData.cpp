@@ -100,7 +100,7 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncTyp
         SCustomData newData;
         newData.Variable = Variable;
         newData.syncType = syncType;
-        newData.allowClientChanges = true;
+        newData.clientChangesMode = ECustomDataClientTrust::UNSET;
         m_Data[szName] = newData;
         UpdateSynced(szName, Variable, syncType);
     }
@@ -124,13 +124,16 @@ bool CCustomData::Delete(const char* szName)
 bool CCustomData::IsClientChangesAllowed(const char* szName) const
 {
     SCustomData* pData = Get(szName);
-    return pData ? pData->allowClientChanges : true;
+    if (!pData || pData->clientChangesMode == ECustomDataClientTrust::UNSET)
+        return IsClientChangesAllowed();
+
+    return pData->clientChangesMode == ECustomDataClientTrust::ALLOW;
 }
 
-void CCustomData::SetClientChangesAllowed(const char* szName, bool enabled)
+void CCustomData::SetClientChangesMode(const char* szName, ECustomDataClientTrust mode)
 {
     SCustomData& pData = m_Data[szName];
-    pData.allowClientChanges = enabled;
+    pData.clientChangesMode = mode;
 }
 
 CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
