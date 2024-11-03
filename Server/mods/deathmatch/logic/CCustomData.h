@@ -29,6 +29,7 @@ struct SCustomData
 {
     CLuaArgument Variable;
     ESyncType    syncType;
+    bool         allowClientChanges;
 };
 
 class CCustomData
@@ -36,11 +37,13 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(const char* szName);
+    SCustomData* Get(const char* szName) const;
     SCustomData* GetSynced(const char* szName);
     void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
     bool Delete(const char* szName);
+    bool IsClientChangesAllowed(const char* szName) const;
+    void SetClientChangesAllowed(const char* szName, bool enabled);
 
     unsigned short CountOnlySynchronized();
 

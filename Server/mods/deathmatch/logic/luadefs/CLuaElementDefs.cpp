@@ -80,6 +80,8 @@ void CLuaElementDefs::LoadFunctions()
         {"addElementDataSubscriber", addElementDataSubscriber},
         {"removeElementDataSubscriber", removeElementDataSubscriber},
         {"hasElementDataSubscriber", hasElementDataSubscriber},
+        {"setElementDataClientTrustEnabled", ArgumentParser<SetElementDataClientTrustEnabled>},
+        {"isElementDataClientTrustEnabled", ArgumentParser<IsElementDataClientTrustEnabled>},
 
         // Set
         {"setElementID", setElementID},
@@ -151,6 +153,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setLowLOD", "setLowLODElement");
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
+    lua_classfunction(luaVM, "setDataClientTrustEnabled", "setElementDataClientTrustEnabled");
 
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getChild", "getElementChild");
@@ -189,6 +192,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isVisibleTo", "isElementVisibleTo");
     lua_classfunction(luaVM, "isLowLOD", "isElementLowLOD");
     lua_classfunction(luaVM, "isAttached", "isElementAttached");
+    lua_classfunction(luaVM, "isDataClientTrustEnabled", "isElementDataClientTrustEnabled");
 
     lua_classvariable(luaVM, "id", "setElementID", "getElementID");
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
@@ -2436,4 +2440,14 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+void CLuaElementDefs::SetElementDataClientTrustEnabled(CElement* pElement, std::string_view key, bool enabled)
+{
+    pElement->GetCustomDataManager().SetClientChangesAllowed(key.data(), enabled);
+}
+
+bool CLuaElementDefs::IsElementDataClientTrustEnabled(CElement* pElement, std::string_view key)
+{
+    return pElement->GetCustomDataManager().IsClientChangesAllowed(key.data());
 }
