@@ -13,7 +13,6 @@
 #include "CLuaObjectDefs.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
-#include "CLodModels.h"
 
 void CLuaObjectDefs::LoadFunctions()
 {
