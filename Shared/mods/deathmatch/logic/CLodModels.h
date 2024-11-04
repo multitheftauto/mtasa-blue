@@ -15,6 +15,14 @@
 class CLodModels
 {
 public:
-    static std::uint32_t GetObjectLowLODOfModel(std::uint32_t objectModel) noexcept;
-    static std::uint32_t GetObjectHighLODOfModel(std::uint32_t objectModel) noexcept;
+    static std::uint32_t GetObjectLowLODModel(std::uint32_t hLODModel) noexcept;
+    static std::uint32_t GetObjectHighLODModel(std::uint32_t lLODModel) noexcept;
+
+    static void SetObjectCustomLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept;
+    static std::uint32_t GetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept;
+    static void          ResetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept;
+    static void          ResetAllObjectCustomLowLODModels() noexcept;
+
+protected:
+    static std::unordered_map<std::uint32_t, std::uint32_t> m_customLODModels;
 };

@@ -37,10 +37,6 @@ void CLuaObjectDefs::LoadFunctions()
         {"stopObject", StopObject},
         {"breakObject", ArgumentParser<BreakObject>},
         {"toggleObjectRespawn", ArgumentParser<ToggleObjectRespawn>},
-
-        // Object util functions
-        {"getObjectLowLODOfModel", ArgumentParser<GetObjectLowLODOfModel>},
-        {"getObjectHighLODOfModel", ArgumentParser<GetObjectHighLODOfModel>},
     };
 
     // Add functions
@@ -337,20 +333,4 @@ bool CLuaObjectDefs::ToggleObjectRespawn(CObject* const pObject, const bool bRes
 bool CLuaObjectDefs::IsObjectRespawnable(CObject* const pObject) noexcept
 {
     return pObject->IsRespawnEnabled();
-}
-
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLowLODOfModel(std::uint32_t objectModel) noexcept
-{
-    std::uint32_t lodModel = CLodModels::GetObjectLowLODOfModel(objectModel);
-    if (lodModel == 0)            // LLOD Model not found for HLOD Model provided
-        return false;
-    return lodModel;
-}
-
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectHighLODOfModel(std::uint32_t objectModel) noexcept
-{
-    std::uint32_t objModel = CLodModels::GetObjectHighLODOfModel(objectModel);
-    if (objModel == 0)            // HLOD Model not found for LLOD Model provided
-        return false;
-    return objModel;
 }

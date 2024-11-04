@@ -41,8 +41,12 @@ void CLuaObjectDefs::LoadFunctions()
         {"setObjectProperty", SetObjectProperty},
 
         // Object util functions
-        {"getObjectLowLODOfModel", ArgumentParser<GetObjectLowLODOfModel>},
-        {"getObjectHighLODOfModel", ArgumentParser<GetObjectHighLODOfModel>},
+        {"getObjectLowLODModel", ArgumentParser<GetObjectLowLODModel>},
+        {"getObjectHighLODModel", ArgumentParser<GetObjectHighLODModel>},
+        {"setObjectCustomLowLODModel", ArgumentParser<SetObjectCustomLowLODModel>},
+        {"getObjectCustomLowLODModel", ArgumentParser<GetObjectCustomLowLODModel>},
+        {"resetObjectCustomLowLODModel", ArgumentParser<ResetObjectCustomLowLODModel>},
+        {"resetAllObjectCustomLowLODModels", ArgumentParser<ResetAllObjectCustomLowLODModels>},
     };
 
     // Add functions
@@ -727,18 +731,41 @@ bool CLuaObjectDefs::IsObjectRespawnable(CClientEntity* const pEntity) noexcept
     return pObject->IsRespawnEnabled();
 }
 
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLowLODOfModel(std::uint32_t objectModel) noexcept
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectLowLODModel(std::uint32_t hLODModel) noexcept
 {
-    std::uint32_t lodModel = CLodModels::GetObjectLowLODOfModel(objectModel);
+    std::uint32_t lodModel = CLodModels::GetObjectLowLODModel(hLODModel);
     if (lodModel == 0) // LLOD Model not found for HLOD Model provided
         return false;
     return lodModel;
 }
 
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectHighLODOfModel(std::uint32_t objectModel) noexcept
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectHighLODModel(std::uint32_t lLODModel) noexcept
 {
-    std::uint32_t objModel = CLodModels::GetObjectHighLODOfModel(objectModel);
+    std::uint32_t objModel = CLodModels::GetObjectHighLODModel(lLODModel);
     if (objModel == 0)            // HLOD Model not found for LLOD Model provided
         return false;
     return objModel;
+}
+
+void CLuaObjectDefs::SetObjectCustomLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept
+{
+    CLodModels::SetObjectCustomLowLODModel(hLODModel, lLODModel);
+}
+
+std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
+{
+    std::uint32_t lLODModel = CLodModels::GetObjectCustomLowLODModel(hLODModel);
+    if (lLODModel == 0)            // Custom LLOD Model not found for HLOD Model provided
+        return false;
+    return lLODModel;
+}
+
+void CLuaObjectDefs::ResetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
+{
+    CLodModels::ResetObjectCustomLowLODModel(hLODModel);
+}
+
+void CLuaObjectDefs::ResetAllObjectCustomLowLODModels() noexcept
+{
+    CLodModels::ResetAllObjectCustomLowLODModels();
 }

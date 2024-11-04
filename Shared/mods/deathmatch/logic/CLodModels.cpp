@@ -10,11 +10,8 @@
 #include "StdInc.h"
 #include "CLodModels.h"
 
- // This array associates HLOD Object Model ID -> LLOD Object Model ID for all objects that have LLOD models.
- // Data was taken to the game's IPL files (plaintext + binary).
-
+// This array contains all HLOD Object Model ID -> LLOD Object Model ID associations according to the game's IPL files (plaintext + binary).
 constexpr std::size_t OBJ_LOD_MODELS_COUNT = 4289;
-
 constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, OBJ_LOD_MODELS_COUNT> OBJ_LOD_MODELS = {{
     {694, 784},                // sm_redwoodgrp => lod_redwoodgrp (countryS)
     {791, 785},                // vbg_fir_copse => lod_vbg_fir_co (countrye)
@@ -4307,22 +4304,58 @@ constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, OBJ_LOD_MODELS_COU
     {18563, 18564},            // cs_bsupport => cs_bsupportlod (countryS)
 }};
 
-std::uint32_t CLodModels::GetObjectLowLODOfModel(std::uint32_t objectModel) noexcept
+// This map is for custom definitions of LLOD models for HLOD models.
+std::unordered_map<std::uint32_t, std::uint32_t> CLodModels::m_customLODModels;
+
+std::uint32_t CLodModels::GetObjectLowLODModel(std::uint32_t hLODModel) noexcept
 {
+    auto it = CLodModels::m_customLODModels.find(hLODModel);
+    if (it != CLodModels::m_customLODModels.end())
+        return it->second;
+
     for (const auto& entry : OBJ_LOD_MODELS)
     {
-        if (entry.first == objectModel)
+        if (entry.first == hLODModel)
             return entry.second;
     }
+
     return 0;
 }
 
-std::uint32_t CLodModels::GetObjectHighLODOfModel(std::uint32_t objectModel) noexcept
+std::uint32_t CLodModels::GetObjectHighLODModel(std::uint32_t lLODModel) noexcept
 {
-    for (const auto& entry : OBJ_LOD_MODELS)
+    for (const auto& entry : CLodModels::m_customLODModels)
     {
-        if (entry.second == objectModel)
+        if (entry.second == lLODModel)
             return entry.first;
     }
+
+    for (const auto& entry : OBJ_LOD_MODELS)
+    {
+        if (entry.second == lLODModel)
+            return entry.first;
+    }
+
     return 0;
+}
+
+void CLodModels::SetObjectCustomLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept
+{
+    CLodModels::m_customLODModels[hLODModel] = lLODModel;
+}
+
+std::uint32_t CLodModels::GetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
+{
+    auto it = CLodModels::m_customLODModels.find(hLODModel);
+    return (it != CLodModels::m_customLODModels.end()) ? it->second : 0;
+}
+
+void CLodModels::ResetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
+{
+    CLodModels::m_customLODModels.erase(hLODModel);
+}
+
+void CLodModels::ResetAllObjectCustomLowLODModels() noexcept
+{
+    CLodModels::m_customLODModels.clear();
 }
