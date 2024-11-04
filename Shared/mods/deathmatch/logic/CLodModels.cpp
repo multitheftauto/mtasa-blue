@@ -4344,12 +4344,6 @@ void CLodModels::SetObjectCustomLowLODModel(std::uint32_t hLODModel, std::uint32
     CLodModels::m_customLODModels[hLODModel] = lLODModel;
 }
 
-std::uint32_t CLodModels::GetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
-{
-    auto it = CLodModels::m_customLODModels.find(hLODModel);
-    return (it != CLodModels::m_customLODModels.end()) ? it->second : 0;
-}
-
 void CLodModels::ResetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
 {
     CLodModels::m_customLODModels.erase(hLODModel);

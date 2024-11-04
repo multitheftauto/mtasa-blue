@@ -44,7 +44,6 @@ void CLuaObjectDefs::LoadFunctions()
         {"getObjectLowLODModel", ArgumentParser<GetObjectLowLODModel>},
         {"getObjectHighLODModel", ArgumentParser<GetObjectHighLODModel>},
         {"setObjectCustomLowLODModel", ArgumentParser<SetObjectCustomLowLODModel>},
-        {"getObjectCustomLowLODModel", ArgumentParser<GetObjectCustomLowLODModel>},
         {"resetObjectCustomLowLODModel", ArgumentParser<ResetObjectCustomLowLODModel>},
         {"resetAllObjectCustomLowLODModels", ArgumentParser<ResetAllObjectCustomLowLODModels>},
     };
@@ -750,14 +749,6 @@ std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectHighLODModel(std::uin
 void CLuaObjectDefs::SetObjectCustomLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept
 {
     CLodModels::SetObjectCustomLowLODModel(hLODModel, lLODModel);
-}
-
-std::variant<bool, std::uint32_t> CLuaObjectDefs::GetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
-{
-    std::uint32_t lLODModel = CLodModels::GetObjectCustomLowLODModel(hLODModel);
-    if (lLODModel == 0)            // Custom LLOD Model not found for HLOD Model provided
-        return false;
-    return lLODModel;
 }
 
 void CLuaObjectDefs::ResetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
