@@ -71,6 +71,7 @@
 #include "version.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
+#include <regex>
 
 #define MAX_BULLETSYNC_DISTANCE      400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE  400.0f
@@ -1789,7 +1790,21 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
 
         SString strIP = pPlayer->GetSourceIP();
         SString strIPAndSerial("IP: %s  Serial: %s  Version: %s", strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
-        if (!CheckNickProvided(szNick))            // check the nick is valid
+
+        // Prevent player from connecting if serial is invalid
+        const std::regex serialRegex("^[A-F0-9]{32}$");
+        if (!std::regex_match(strSerial, serialRegex))
+        {
+            // Tell the console
+            CLogger::LogPrintf("CONNECT: %s failed to connect (Invalid serial) (%s)\n", szNick, strIPAndSerial.c_str());
+
+            // Tell the player the problem
+            DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_VERIFICATION);
+            return;
+        }
+
+        // Check the nick is valid
+        if (!CheckNickProvided(szNick))
         {
             // Tell the console
             CLogger::LogPrintf("CONNECT: %s failed to connect (Invalid nickname) (%s)\n", szNick, strIPAndSerial.c_str());
