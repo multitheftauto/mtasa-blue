@@ -296,7 +296,7 @@ public:
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };
     CNetAPI*               GetNetAPI() { return m_pNetAPI; };
-    CPlayerMap*             GetPlayerMap() { return m_pPlayerMap; };
+    CPlayerMap*            GetPlayerMap() { return m_pPlayerMap; };
     CMovingObjectsManager* GetMovingObjectsManager() { return m_pMovingObjectsManager; }
 
     CClientPlayer*       GetLocalPlayer() { return m_pLocalPlayer; }
@@ -694,7 +694,7 @@ private:
     CNetworkStats*         m_pNetworkStats;
     CSyncDebug*            m_pSyncDebug;
     // CScreenshot*                          m_pScreenshot;
-    CPlayerMap*                    m_pPlayerMap;
+    CPlayerMap*                   m_pPlayerMap;
     CTransferBox*                 m_pTransferBox;
     CResourceManager*             m_pResourceManager;
     CScriptKeyBinds*              m_pScriptKeyBinds;
