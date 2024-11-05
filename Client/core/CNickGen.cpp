@@ -8,10 +8,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "time.h"
+#include <random>
 
 // These words are of a maximum length of 10 characters, capitalized, and stripped of whitespace
-const char* const CNickGen::m_szAdjectives[] = {
+const char* const szAdjectives[] = {
     "Aback",      "Abaft",      "Abandoned",  "Abashed",    "Aberrant",   "Abhorrent",  "Abiding",    "Abject",     "Ablaze",     "Able",       "Abnormal",
     "Aboard",     "Aboriginal", "Abortive",   "Abounding",  "Abrasive",   "Abrupt",     "Absent",     "Absorbed",   "Absorbing",  "Abstracted", "Absurd",
     "Abundant",   "Abusive",    "Acceptable", "Accessible", "Accidental", "Accurate",   "Acid",       "Acidic",     "Acoustic",   "Acrid",      "Actually",
@@ -109,7 +109,7 @@ const char* const CNickGen::m_szAdjectives[] = {
     "Worried",    "Worthless",  "Wrathful",   "Wretched",   "Wrong",      "Wry",
 };
 
-const char* const CNickGen::m_szNouns[] = {
+const char* const szNouns[] = {
     "Aardvark",   "Buffalo",    "Alligator",  "Ant",        "Anteater",   "Antelope",   "Ape",        "Armadillo",  "Donkey",      "Baboon",     "Badger",
     "Barracuda",  "Bat",        "Bear",       "Beaver",     "Bee",        "Bison",      "Boar",       "Bush",       "Butterfly",   "Camel",      "Calf",
     "Cat",        "Kitten",     "Cattle",     "Chamois",    "Cheetah",    "Chicken",    "Chick",      "Chimpanzee", "Infant",      "Empress",    "Troop",
@@ -196,10 +196,18 @@ const char* const CNickGen::m_szNouns[] = {
     "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat",
 };
 
+constexpr auto numAdjectives = std::size(szAdjectives);
+constexpr auto numNouns = std::size(szNouns);
+constexpr auto maxNum = 100;
+
 SString CNickGen::GetRandomNickname()
 {
-    srand((unsigned int)time(NULL));
-    int iAdjective = rand() % NICKGEN_NUM_ADJECTIVES;
-    int iNoun = rand() % NICKGEN_NUM_NOUNS;
-    return SString("%s%s%i", m_szAdjectives[iAdjective], m_szNouns[iNoun], rand() % 100);
+    std::random_device rd;
+    std::mt19937       gen(rd());
+
+    std::uniform_int_distribution<int> adjectiveDist(0, numAdjectives - 1);
+    std::uniform_int_distribution<int> nounDist(0, numNouns - 1);
+    std::uniform_int_distribution<int> numDist(0, maxNum);
+
+    return SString("%s%s%i", szAdjectives[adjectiveDist(gen)], szNouns[nounDist(gen)], numDist(gen));
 }
