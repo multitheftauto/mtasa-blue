@@ -196,9 +196,9 @@ const char* const szNouns[] = {
     "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat",
 };
 
-const int numAdjectives = std::size(szAdjectives);
-const int numNouns = std::size(szNouns);
-const int maxNum = static_cast<int>(RAND_MAX);
+constexpr auto numAdjectives = std::size(szAdjectives);
+constexpr auto numNouns = std::size(szNouns);
+constexpr auto maxNum = 100;
 
 SString CNickGen::GetRandomNickname()
 {
