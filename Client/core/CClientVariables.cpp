@@ -273,9 +273,6 @@ void CClientVariables::LoadDefaults()
     DEFAULT("host", _S("127.0.0.1"));                                    // hostname
     DEFAULT("port", 22003);                                              // port
     DEFAULT("password", _S(""));                                         // password
-    DEFAULT("qc_host", _S("127.0.0.1"));                                 // quick connect hostname
-    DEFAULT("qc_port", 22003);                                           // quick connect port
-    DEFAULT("qc_password", _S(""));                                      // quick connect password
     DEFAULT("debugfile", _S(""));                                        // debug filename
     DEFAULT("console_pos", CVector2D(0, 0));                             // console position
     DEFAULT("console_size", CVector2D(200, 200));                        // console size
