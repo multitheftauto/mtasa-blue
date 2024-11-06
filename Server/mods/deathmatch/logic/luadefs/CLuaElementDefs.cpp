@@ -1538,7 +1538,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     SString      strKey;
     CLuaArgument value;
     ESyncType    syncType = ESyncType::BROADCAST;
-    std::optional<ECustomDataClientTrust> clientTrust{};
+    std::optional<eCustomDataClientTrust> clientTrust{};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1557,7 +1557,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
 
     if (!argStream.NextIsNone())
     {
-        ECustomDataClientTrust trustReaded;
+        eCustomDataClientTrust trustReaded;
         argStream.ReadEnumString(trustReaded);
         clientTrust = trustReaded;
     }

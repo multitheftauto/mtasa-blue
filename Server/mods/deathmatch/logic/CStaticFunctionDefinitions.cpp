@@ -955,14 +955,14 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
 }
 
 bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType,
-                                                std::optional<ECustomDataClientTrust> clientTrust)
+                                                std::optional<eCustomDataClientTrust> clientTrust)
 {
     assert(pElement);
     assert(szName);
     assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
 
     ESyncType              lastSyncType = ESyncType::BROADCAST;
-    ECustomDataClientTrust lastClientTrust{};
+    eCustomDataClientTrust lastClientTrust{};
     CLuaArgument*          pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType, &lastClientTrust);
 
     if (clientTrust.has_value() && lastClientTrust != clientTrust.value())

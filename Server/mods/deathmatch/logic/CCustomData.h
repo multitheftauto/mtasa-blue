@@ -25,7 +25,7 @@ enum class ESyncType
     SUBSCRIBE,
 };
 
-enum class ECustomDataClientTrust : std::uint8_t
+enum class eCustomDataClientTrust : std::uint8_t
 {
     UNSET,
     ALLOW,
@@ -36,7 +36,7 @@ struct SCustomData
 {
     CLuaArgument           Variable;
     ESyncType              syncType;
-    ECustomDataClientTrust clientChangesMode;
+    eCustomDataClientTrust clientChangesMode;
 };
 
 class CCustomData
@@ -50,7 +50,7 @@ public:
 
     bool Delete(const char* szName);
 
-    void SetClientChangesMode(const char* szName, ECustomDataClientTrust mode);
+    void SetClientChangesMode(const char* szName, eCustomDataClientTrust mode);
 
     unsigned short CountOnlySynchronized();
 
