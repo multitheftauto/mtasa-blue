@@ -44,6 +44,8 @@ public:
     virtual bool ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand) = 0;
     virtual bool ControlGunMove(CVector2D* pMoveVec) = 0;
     virtual void Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1) = 0;
+
+    virtual bool GetSkipAim() = 0;
 };
 
 class CTaskSimpleFight : public virtual CTaskSimple

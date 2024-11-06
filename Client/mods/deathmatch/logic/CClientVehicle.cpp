@@ -1644,6 +1644,10 @@ void CClientVehicle::SetCollisionEnabled(bool bCollisionEnabled)
     if (m_pVehicle && m_bHasAdjustableProperty)
         m_pVehicle->SetUsesCollision(bCollisionEnabled);
 
+    // Remove all contacts
+    for (const auto& ped : m_Contacts)
+        RemoveContact(ped);
+
     m_bIsCollisionEnabled = bCollisionEnabled;
 }
 
@@ -2652,7 +2656,12 @@ void CClientVehicle::Create()
         {
             if (m_pPassengers[i])
             {
-                m_pPassengers[i]->WarpIntoVehicle(this, i + 1);
+                // Undefined passengers count?
+                if (m_ucMaxPassengers != 255)
+                    m_pPassengers[i]->WarpIntoVehicle(this, i + 1);
+                else
+                    m_pPassengers[i]->SetWarpInToVehicleRequired(false);
+
                 if (m_pPassengers[i])
                     m_pPassengers[i]->StreamIn(true);
             }
@@ -5033,6 +5042,14 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
+bool CClientVehicle::SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime)
+{
+    if (!m_pVehicle)
+        return false;
+
+    return m_pVehicle->SpawnFlyingComponent(nodeID, collisionType, removalTime);
+}
+ 
 CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
 {
     static const uint32_t lookup[4] = {10, 8, 11, 9};

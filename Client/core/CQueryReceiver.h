@@ -16,6 +16,7 @@ struct SQueryInfo
     {
         containingInfo = false;
         port = 0;
+        isStatusVerified = true;
         isPassworded = false;
         serials = false;
         players = 0;
@@ -33,6 +34,7 @@ struct SQueryInfo
     SString gameType;
     SString mapName;
     SString versionText;
+    bool    isStatusVerified;
     bool    isPassworded;
     bool    serials;
     ushort  players;
