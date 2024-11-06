@@ -1653,8 +1653,7 @@ void CSettings::UpdateVideoTab()
 
     // Player map image
     CVARS_GET("mapimage", iVar);
-    if (iVar == 0 || iVar == 1)
-        m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
+    m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
 //

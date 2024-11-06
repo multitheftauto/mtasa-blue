@@ -122,18 +122,11 @@ CPlayerMap::~CPlayerMap()
 
 void CPlayerMap::SetMapImage(std::size_t imageIndex)
 {
-    std::uint32_t width, height;
-    if (imageIndex < MAP_IMAGE_SIZES.size())
-        width = height = MAP_IMAGE_SIZES[imageIndex];
-    else // Fail safe, ideally client settings system should not allow this case
-        width = height = MAP_IMAGE_SIZES[0];
-
-    SString fileName("MTA\\cgui\\images\\map_%d.png", width);
+    std::uint32_t mapSize = MAP_IMAGE_SIZES[imageIndex];
+    SString       fileName("MTA\\cgui\\images\\map_%d.png", mapSize);
 
     SAFE_RELEASE(m_mapImageTexture);
-    m_mapImageTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, width, height, RFORMAT_DXT1);
-
-    g_pCore->GetConsole()->Printf("Player map image loaded: %s", fileName);
+    m_mapImageTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, mapSize, mapSize, RFORMAT_DXT1);
 }
 
 void CPlayerMap::DoPulse()
