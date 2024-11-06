@@ -989,6 +989,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
         // Unsubscribe all the players
         if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
             m_pPlayerManager->ClearElementData(pElement, szName);
+
         // Set its custom data
         pElement->SetCustomData(szName, Variable, syncType);
         return true;
