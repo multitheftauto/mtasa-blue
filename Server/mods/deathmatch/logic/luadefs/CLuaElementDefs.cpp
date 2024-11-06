@@ -80,9 +80,6 @@ void CLuaElementDefs::LoadFunctions()
         {"addElementDataSubscriber", addElementDataSubscriber},
         {"removeElementDataSubscriber", removeElementDataSubscriber},
         {"hasElementDataSubscriber", hasElementDataSubscriber},
-        {"setElementDataClientTrust", ArgumentParser<SetElementDataClientTrust>},
-        {"isElementDataClientTrusted", ArgumentParser<IsElementDataClientTrusted>},
-        {"resetElementDataClientTrust", ArgumentParser<ResetElementDataClientTrust>},
 
         // Set
         {"setElementID", setElementID},
@@ -132,7 +129,6 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "addDataSubscriber", "addElementDataSubscriber");
     lua_classfunction(luaVM, "removeDataSubscriber", "removeElementDataSubscriber");
     lua_classfunction(luaVM, "hasDataSubscriber", "hasElementDataSubscriber");
-    lua_classfunction(luaVM, "resetDataClientTrust", "resetElementDataClientTrust");
 
     lua_classfunction(luaVM, "setParent", "setElementParent");
     lua_classfunction(luaVM, "setFrozen", "setElementFrozen");
@@ -155,7 +151,6 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setLowLOD", "setLowLODElement");
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
-    lua_classfunction(luaVM, "setDataClientTrust", "setElementDataClientTrust");
 
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getChild", "getElementChild");
@@ -194,7 +189,6 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isVisibleTo", "isElementVisibleTo");
     lua_classfunction(luaVM, "isLowLOD", "isElementLowLOD");
     lua_classfunction(luaVM, "isAttached", "isElementAttached");
-    lua_classfunction(luaVM, "isDataClientTrusted", "isElementDataClientTrusted");
 
     lua_classvariable(luaVM, "id", "setElementID", "getElementID");
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
@@ -1544,6 +1538,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     SString      strKey;
     CLuaArgument value;
     ESyncType    syncType = ESyncType::BROADCAST;
+    std::optional<ECustomDataClientTrust> clientTrust{};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1560,6 +1555,13 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     else
         argStream.ReadEnumString(syncType, ESyncType::BROADCAST);
 
+    if (!argStream.NextIsNone())
+    {
+        ECustomDataClientTrust trustReaded;
+        argStream.ReadEnumString(trustReaded);
+        clientTrust = trustReaded;
+    }
+
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
@@ -1572,7 +1574,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
-        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType))
+        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType, clientTrust))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -2442,28 +2444,4 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
-}
-
-void CLuaElementDefs::SetElementDataClientTrust(CElement* pElement, bool enabled, std::optional<std::string_view> key)
-{
-    if (key.has_value())
-        pElement->GetCustomDataManager().SetClientChangesMode(key.value().data(), enabled ? ECustomDataClientTrust::ALLOW : ECustomDataClientTrust::DENY);
-    else
-        pElement->GetCustomDataManager().SetClientChangesAllowed(enabled);
-}
-
-bool CLuaElementDefs::IsElementDataClientTrusted(CElement* pElement, std::optional<std::string_view> key)
-{
-    if (key.has_value())
-        return pElement->GetCustomDataManager().IsClientChangesAllowed(key.value().data());
-    else
-        return pElement->GetCustomDataManager().IsClientChangesAllowed();
-}
-
-void CLuaElementDefs::ResetElementDataClientTrust(CElement* pElement, std::optional<std::string_view> key)
-{
-    if (key.has_value())
-        pElement->GetCustomDataManager().SetClientChangesMode(key.value().data(), ECustomDataClientTrust::UNSET);
-    else
-        pElement->GetCustomDataManager().SetClientChangesAllowed(true);
 }

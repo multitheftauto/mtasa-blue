@@ -77,9 +77,6 @@ public:
     LUA_DECLARE(addElementDataSubscriber);
     LUA_DECLARE(removeElementDataSubscriber);
     LUA_DECLARE(hasElementDataSubscriber);
-    static void SetElementDataClientTrust(CElement* pElement, bool enabled, std::optional<std::string_view> key);
-    static void ResetElementDataClientTrust(CElement* pElement, std::optional<std::string_view> key);
-    static bool IsElementDataClientTrusted(CElement* pElement, std::optional<std::string_view> key);
 
     // Attachement
     LUA_DECLARE(attachElements);

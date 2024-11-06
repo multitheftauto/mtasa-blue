@@ -50,11 +50,7 @@ public:
 
     bool Delete(const char* szName);
 
-    bool IsClientChangesAllowed(const char* szName) const;
     void SetClientChangesMode(const char* szName, ECustomDataClientTrust mode);
-
-    bool IsClientChangesAllowed() const noexcept { return m_clientChangesAllowed; };
-    void SetClientChangesAllowed(bool enabled) noexcept { m_clientChangesAllowed = enabled; };
 
     unsigned short CountOnlySynchronized();
 
@@ -72,5 +68,4 @@ private:
 
     std::map<std::string, SCustomData> m_Data;
     std::map<std::string, SCustomData> m_SyncedData;
-    bool                               m_clientChangesAllowed{true};
 };

@@ -2657,7 +2657,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
 
             pElement->GetCustomData(szName, false, &lastSyncType, &clientChangesMode);
 
-            const bool changesAllowed = clientChangesMode == ECustomDataClientTrust::UNSET ? pElement->GetCustomDataManager().IsClientChangesAllowed()
+            const bool changesAllowed = clientChangesMode == ECustomDataClientTrust::UNSET ? !m_pMainConfig->IsElementDataWhitelisted()
                                                                                            : clientChangesMode == ECustomDataClientTrust::ALLOW;
             if (!changesAllowed)
             {

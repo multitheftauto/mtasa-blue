@@ -285,6 +285,12 @@ ADD_ENUM(ESyncType::LOCAL, "local")
 ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
 IMPLEMENT_ENUM_CLASS_END("sync-mode")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(ECustomDataClientTrust)
+ADD_ENUM(ECustomDataClientTrust::UNSET, "default")
+ADD_ENUM(ECustomDataClientTrust::ALLOW, "allow")
+ADD_ENUM(ECustomDataClientTrust::DENY, "deny")
+IMPLEMENT_ENUM_CLASS_END("client-trust-mode")
+
 //
 // CResource from userdata
 //

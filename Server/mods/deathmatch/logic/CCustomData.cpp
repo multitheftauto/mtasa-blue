@@ -121,15 +121,6 @@ bool CCustomData::Delete(const char* szName)
     return false;
 }
 
-bool CCustomData::IsClientChangesAllowed(const char* szName) const
-{
-    SCustomData* pData = Get(szName);
-    if (!pData || pData->clientChangesMode == ECustomDataClientTrust::UNSET)
-        return IsClientChangesAllowed();
-
-    return pData->clientChangesMode == ECustomDataClientTrust::ALLOW;
-}
-
 void CCustomData::SetClientChangesMode(const char* szName, ECustomDataClientTrust mode)
 {
     SCustomData& pData = m_Data[szName];
