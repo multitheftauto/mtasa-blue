@@ -688,9 +688,12 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
 
 	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
-        File "${FILES_ROOT}\mta\CEF\chrome_100_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\chrome_200_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\resources.pak"
+	# Not currently using \mta\cef\ due to https://github.com/chromiumembedded/cef/issues/3749#issuecomment-2278568964 (it's already crashing and likely won't remain supported)
+        SetOutPath "$INSTDIR\MTA"
+
+        File "${FILES_ROOT}\mta\chrome_100_percent.pak"
+        File "${FILES_ROOT}\mta\chrome_200_percent.pak"
+        File "${FILES_ROOT}\mta\resources.pak"
 
 	# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
         #File "${FILES_ROOT}\mta\CEF\cef.pak"
