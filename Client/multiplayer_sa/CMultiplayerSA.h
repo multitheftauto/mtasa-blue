@@ -99,6 +99,7 @@ public:
     void DisableQuickReload(bool bDisable);
     void DisableCloseRangeDamage(bool bDisable);
     void DisableBadDrivebyHitboxes(bool bDisable) { m_bBadDrivebyHitboxesDisabled = bDisable; }
+    void SetIgnoreFireState(bool ignore) override;
 
     bool GetExplosionsDisabled();
     void DisableExplosions(bool bDisabled);

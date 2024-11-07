@@ -135,6 +135,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+    m_Glitches[GLITCH_IGNOREFIRESTATE] = false;
+    g_pMultiplayer->SetIgnoreFireState(false);
+
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
@@ -5971,6 +5974,9 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
             g_pMultiplayer->DisableQuickReload(!bEnabled);
         if (ucGlitch == GLITCH_CLOSEDAMAGE)
             g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
+        if (ucGlitch == GLITCH_IGNOREFIRESTATE)
+            g_pMultiplayer->SetIgnoreFireState(bEnabled);
+
         return true;
     }
     return false;
@@ -6475,7 +6481,7 @@ void CClientGame::OutputServerInfo()
     {
         SString     strEnabledGlitches;
         const char* szGlitchNames[] = {"Quick reload",         "Fast fire",  "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint",
-                                       "Bad driveby hitboxes", "Quick stand"};
+                                       "Bad driveby hitboxes", "Quick stand", "Kickout of vehicle on model replace", "Ignore fire state"};
         for (uint i = 0; i < NUM_GLITCHES; i++)
         {
             if (IsGlitchEnabled(i))
