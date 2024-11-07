@@ -49,7 +49,7 @@ class CWebCoreInterface
 {
 public:
     virtual ~CWebCoreInterface() {}
-    virtual bool Initialise() = 0;
+    virtual bool Initialise(bool gpuEnabled) = 0;
 
     virtual CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
                                              bool bTransparent) = 0;
@@ -90,4 +90,6 @@ public:
     virtual void WriteCustomList(const SString& strListName, const std::vector<SString>& customList, bool bReset = true) = 0;
     virtual void GetFilterEntriesByType(std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType,
                                         eWebFilterState state = eWebFilterState::WEBFILTER_ALL) = 0;
+
+    virtual bool GetGPUEnabled() const noexcept = 0;
 };
