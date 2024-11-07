@@ -58,7 +58,7 @@ public:
     static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId);
     static std::variant<bool, CLuaMultiReturn<float, float, float, float>> GetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId);
 
-    static bool SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CMatrix boneMatrix);
+    static bool SetElementBoneMatrix(lua_State* const luaVM);
 
     static std::variant<bool, std::array<std::array<float, 4>, 4>> GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId);
 

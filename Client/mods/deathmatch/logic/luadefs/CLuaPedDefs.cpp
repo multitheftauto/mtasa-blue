@@ -1072,10 +1072,43 @@ std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::Get
     return std::make_tuple(x, y, z, w);
 }
 
-bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CMatrix boneMatrix)
+bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM)
 {
-    CEntity* theEntity = entity->GetGameEntity();
-    return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
+    CClientEntity*     entity = NULL;
+    std::uint32_t      boneId;
+    CMatrix            boneMatrix;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(entity);
+    argStream.ReadNumber(boneId);
+
+    if (argStream.NextIsTable())
+    {
+        if (!ReadMatrix(luaVM, argStream.m_iIndex, boneMatrix))
+        {
+            argStream.SetCustomError("Matrix is not 4 x 4");
+        }
+    }
+    else
+    {
+        argStream.ReadMatrix(boneMatrix);
+    }
+
+    if (!argStream.HasErrors())
+    {
+        CEntity* theEntity = entity->GetGameEntity();
+
+        if (theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix))
+        {
+            lua_pushboolean(luaVM, true);
+            return true;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return false;
 }
 
 std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
