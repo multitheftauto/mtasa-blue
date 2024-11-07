@@ -37,7 +37,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
         {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
         {"setElementBoneQuaternion", ArgumentParser<SetElementBoneQuaternion>},
-        {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
+        {"setElementBoneMatrix", SetElementBoneMatrix},
         {"setPedRotation", SetPedRotation},
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedCanBeKnockedOffBike", SetPedCanBeKnockedOffBike},
@@ -1072,7 +1072,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::Get
     return std::make_tuple(x, y, z, w);
 }
 
-bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM)
+int CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM)
 {
     CClientEntity*     entity = NULL;
     std::uint32_t      boneId;
@@ -1101,14 +1101,14 @@ bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM)
         if (theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix))
         {
             lua_pushboolean(luaVM, true);
-            return true;
+            return 1;
         }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
-    return false;
+    return 0;
 }
 
 std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
