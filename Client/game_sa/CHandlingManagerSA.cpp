@@ -120,10 +120,17 @@ static __declspec(naked) void Hook_Calculate()
     }
 }
 
-static bool IsVehicleModel(eVehicleTypes eModel)
+static bool IsVehicleModel(std::uint32_t uiModel)
 {
-    const auto pModelInfo = pGame->GetModelInfo(eModel);
-    return pModelInfo && pModelInfo->IsVehicle();
+    try
+    {
+        const CModelInfo* pModelInfo = pGame->GetModelInfo(uiModel);
+        return pModelInfo && pModelInfo->IsVehicle();
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
 
 CHandlingManagerSA::CHandlingManagerSA()
@@ -215,94 +222,122 @@ CHandlingManagerSA::~CHandlingManagerSA()
     }
 }
 
-eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(const std::string& strName) const
+eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(const std::string& strName) const noexcept
 {
     const auto it = m_HandlingNames.find(strName);
     return it != m_HandlingNames.end() ? it->second : HANDLING_MAX;
 }
 
-CHandlingEntry* CHandlingManagerSA::CreateHandlingData()
+CHandlingEntry* CHandlingManagerSA::CreateHandlingData() const noexcept
 {
-    return new CHandlingEntrySA;
+    return new (std::nothrow) CHandlingEntrySA;
 }
 
-CFlyingHandlingEntry* CHandlingManagerSA::CreateFlyingHandlingData()
+CFlyingHandlingEntry* CHandlingManagerSA::CreateFlyingHandlingData() const noexcept
 {
-    return new CFlyingHandlingEntrySA;
+    return new (std::nothrow) CFlyingHandlingEntrySA;
 }
 
-CBoatHandlingEntry* CHandlingManagerSA::CreateBoatHandlingData()
+CBoatHandlingEntry* CHandlingManagerSA::CreateBoatHandlingData() const noexcept
 {
-    return new CBoatHandlingEntrySA;
+    return new (std::nothrow) CBoatHandlingEntrySA;
 }
 
-CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData()
+CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData() const noexcept
 {
-    return new CBikeHandlingEntrySA;
+    return new (std::nothrow) CBikeHandlingEntrySA;
 }
 
-const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel) const
+const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(std::uint32_t uiModel) const noexcept
 {
     // Vehicle?
-    if (!IsVehicleModel(eModel))
+    if (!IsVehicleModel(uiModel))
         return nullptr;
 
-    // Get our Handling ID, the default value will be HT_LANDSTAL
-    const eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Return it
-    return m_pOriginalEntries[eHandling];
+    try
+    {
+        // Get our Handling ID, the default value will be HT_LANDSTAL
+        const eHandlingTypes eHandling = GetHandlingID(uiModel);
+        // Return it
+        return m_pOriginalEntries[eHandling];
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
 }
 
-const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel) const
+const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(std::uint32_t uiModel) const noexcept
 {
     // Vehicle?
-    if (!IsVehicleModel(eModel))
+    if (!IsVehicleModel(uiModel))
         return nullptr;
 
-    // Get our Handling ID, the default value will be HT_LANDSTAL
-    const eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Original GTA:SA behavior
-    if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
-        return m_pOriginalFlyingEntries[0];
-    else
-        return m_pOriginalFlyingEntries[eHandling - HT_SEAPLANE];
+    try
+    {
+        // Get our Handling ID, the default value will be HT_LANDSTAL
+        const eHandlingTypes eHandling = GetHandlingID(uiModel);
+        // Original GTA:SA behavior
+        if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
+            return m_pOriginalFlyingEntries[0];
+        else
+            return m_pOriginalFlyingEntries[eHandling - HT_SEAPLANE];
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
 }
 
-const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel) const
+const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::uint32_t uiModel) const noexcept
 {
     // Vehicle?
-    if (!IsVehicleModel(eModel))
+    if (!IsVehicleModel(uiModel))
         return nullptr;
 
-    // Get our Handling ID, the default value will be HT_LANDSTAL
-    const eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Original GTA:SA behavior
-    if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
-        return m_pOriginalBoatEntries[0];
-    else
-        return m_pOriginalBoatEntries[eHandling - HT_PREDATOR];
+    try
+    {
+        // Get our Handling ID, the default value will be HT_LANDSTAL
+        const eHandlingTypes eHandling = GetHandlingID(uiModel);
+        // Original GTA:SA behavior
+        if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
+            return m_pOriginalBoatEntries[0];
+        else
+            return m_pOriginalBoatEntries[eHandling - HT_PREDATOR];
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
 }
 
-const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel) const
+const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::uint32_t uiModel) const noexcept
 {
     // Vehicle?
-    if (!IsVehicleModel(eModel))
+    if (!IsVehicleModel(uiModel))
         return nullptr;
 
-    // Get our Handling ID, the default value will be HT_LANDSTAL
-    const eHandlingTypes eHandling = GetHandlingID(eModel);
-    if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
-        return m_pOriginalBikeEntries[eHandling - HT_BIKE];
-    else if (eHandling == HT_FAGGIO)
-        return m_pOriginalBikeEntries[13];
-    else
+    try
+    {
+        // Get our Handling ID, the default value will be HT_LANDSTAL
+        const eHandlingTypes eHandling = GetHandlingID(uiModel);
+        if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
+            return m_pOriginalBikeEntries[eHandling - HT_BIKE];
+        else if (eHandling == HT_FAGGIO)
+            return m_pOriginalBikeEntries[13];
+        else
+            return nullptr;
+    }
+    catch (...)
+    {
         return nullptr;
+    }
 }
 
 // Return the handling manager id
-eHandlingTypes CHandlingManagerSA::GetHandlingID(eVehicleTypes eModel) const
+eHandlingTypes CHandlingManagerSA::GetHandlingID(std::uint32_t uiModel) const noexcept
 {
-    switch (eModel)
+    switch (uiModel)
     {
         case VT_LANDSTAL:
             return HT_LANDSTAL;
@@ -732,7 +767,7 @@ eHandlingTypes CHandlingManagerSA::GetHandlingID(eVehicleTypes eModel) const
     return HT_LANDSTAL;
 }
 
-void CHandlingManagerSA::InitializeDefaultHandlings()
+void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
 {
     // Reset
     MemSetFast(m_OriginalHandlingData, 0, sizeof(m_OriginalHandlingData));
@@ -9154,53 +9189,53 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
-void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry) noexcept
+void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry) const noexcept
 {
-    // Valid?
-    if (!pEntry)
-        return;
+    try
+    {
+        // Valid?
+        if (!pEntry)
+            return;
 
-    // Grab us a multiplayer_sa pointer
-    CMultiplayer* const pMultiplayer = g_pCore->GetMultiplayer();
-    if (!pMultiplayer)
-        return;
+        // Grab us a multiplayer_sa pointer
+        CMultiplayer* const pMultiplayer = g_pCore->GetMultiplayer();
+        if (!pMultiplayer)
+            return;
 
-    // Get Handling ID
-    const eHandlingTypes eHandling = static_cast<eHandlingTypes>(pEntry->GetVehicleID());
-    if (eHandling >= HT_MAX)
-        return;
+        // Get Handling ID
+        const eHandlingTypes eHandling = pEntry->GetHandlingID();
+        if (eHandling >= HT_MAX)
+            return;
 
-    const CHandlingEntrySA* pOriginal = m_pOriginalEntries[eHandling];
-    if (!pOriginal)
-        return;
+        const CHandlingEntrySA* pOriginal = m_pOriginalEntries[eHandling];
+        if (!pOriginal)
+            return;
 
-    // Default bChanged to false
-    bool bChanged = false;
+        // Default bChanged to false
+        bool bChanged = false;
 
-    // Set bChanged to true if we find ANY change.
-    if (pEntry->GetSuspensionAntiDiveMultiplier() != pOriginal->GetSuspensionAntiDiveMultiplier())
-        bChanged = true;
+        // Set bChanged to true if we find ANY change.
+        if (pEntry->GetSuspensionAntiDiveMultiplier() != pOriginal->GetSuspensionAntiDiveMultiplier())
+            bChanged = true;
+        else if (pEntry->GetSuspensionDamping() != pOriginal->GetSuspensionDamping())
+            bChanged = true;
+        else if (pEntry->GetSuspensionForceLevel() != pOriginal->GetSuspensionForceLevel())
+            bChanged = true;
+        else if (pEntry->GetSuspensionFrontRearBias() != pOriginal->GetSuspensionFrontRearBias())
+            bChanged = true;
+        else if (pEntry->GetSuspensionHighSpeedDamping() != pOriginal->GetSuspensionHighSpeedDamping())
+            bChanged = true;
+        else if (pEntry->GetSuspensionLowerLimit() != pOriginal->GetSuspensionLowerLimit())
+            bChanged = true;
+        else if (pEntry->GetSuspensionUpperLimit() != pOriginal->GetSuspensionUpperLimit())
+            bChanged = true;
 
-    if (pEntry->GetSuspensionDamping() != pOriginal->GetSuspensionDamping())
-        bChanged = true;
+        if (!bChanged)
+            return;
 
-    if (pEntry->GetSuspensionForceLevel() != pOriginal->GetSuspensionForceLevel())
-        bChanged = true;
-
-    if (pEntry->GetSuspensionFrontRearBias() != pOriginal->GetSuspensionFrontRearBias())
-        bChanged = true;
-
-    if (pEntry->GetSuspensionHighSpeedDamping() != pOriginal->GetSuspensionHighSpeedDamping())
-        bChanged = true;
-
-    if (pEntry->GetSuspensionLowerLimit() != pOriginal->GetSuspensionLowerLimit())
-        bChanged = true;
-
-    if (pEntry->GetSuspensionUpperLimit() != pOriginal->GetSuspensionUpperLimit())
-        bChanged = true;
-
-    if (!bChanged)
-        return;
-
-    pMultiplayer->UpdateVehicleSuspension();
+        pMultiplayer->UpdateVehicleSuspension();
+    }
+    catch (...)
+    {
+    }
 }

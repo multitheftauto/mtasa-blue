@@ -142,7 +142,7 @@ public:
     eLightType    GetTailLight() const { return static_cast<eLightType>(m_Handling.ucTailLight); }
     unsigned char GetAnimGroup() const { return m_Handling.ucAnimGroup; }
 
-    std::uint16_t GetVehicleID() const { return static_cast<std::uint16_t>(m_Handling.iVehicleID); }
+    eHandlingTypes GetHandlingID() const { return static_cast<eHandlingTypes>(m_Handling.iVehicleID); }
 
     // Set functions
     void SetMass(float fMass) { m_Handling.fMass = fMass; }

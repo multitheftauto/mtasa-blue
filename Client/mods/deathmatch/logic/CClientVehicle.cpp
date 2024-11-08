@@ -55,26 +55,26 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_pModelInfo = g_pGame->GetModelInfo(usModel);
 
     // Apply handling
-    ushort usHandlingModelID = m_usModel;
+    std::uint16_t usHandlingModelID = m_usModel;
     if (m_usModel < 400 || m_usModel > 611)
         usHandlingModelID = m_pModelInfo->GetParentID();
 
-    m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
     m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
     m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
 
-    m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData(usHandlingModelID);
     m_pFlyingHandlingEntry = g_pGame->GetHandlingManager()->CreateFlyingHandlingData();
     m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
 
-    m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData(usHandlingModelID);
     if (m_pOriginalBoatHandlingEntry)
     {
         m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
         m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
     }
 
-    m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData(static_cast<eVehicleTypes>(usHandlingModelID));
+    m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData(usHandlingModelID);
     if (m_pOriginalBikeHandlingEntry)
     {
         m_pBikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
@@ -1055,17 +1055,17 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Reset handling to fit the vehicle
         if (IsLocalEntity() || !(usModel < 400 || usModel > 611))
         {
-            ushort usHandlingModelID = usModel;
+            std::uint16_t usHandlingModelID = usModel;
             if (usHandlingModelID < 400 || usHandlingModelID > 611)
                 usHandlingModelID = m_pModelInfo->GetParentID();
 
-            m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData((eVehicleTypes)usHandlingModelID);
+            m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
             m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
 
-            m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData((eVehicleTypes)usHandlingModelID);
+            m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData(usHandlingModelID);
             m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
 
-            m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData((eVehicleTypes)usHandlingModelID);
+            m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData(usHandlingModelID);
             if (m_pOriginalBoatHandlingEntry)
             {
                 if (!m_pBoatHandlingEntry)
@@ -1074,7 +1074,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
                 m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
             }
 
-            m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData((eVehicleTypes)usHandlingModelID);
+            m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData(usHandlingModelID);
             if (m_pOriginalBikeHandlingEntry)
             {
                 if (!m_pBikeHandlingEntry)
@@ -2486,7 +2486,7 @@ void CClientVehicle::Create()
         }
         else
         {
-            m_pVehicle = g_pGame->GetPools()->AddVehicle(this, static_cast<eVehicleTypes>(m_usModel), m_ucVariation, m_ucVariation2);
+            m_pVehicle = g_pGame->GetPools()->AddVehicle(this, m_usModel, m_ucVariation, m_ucVariation2);
         }
 
         // Failed. Remove our reference to the vehicle model and return

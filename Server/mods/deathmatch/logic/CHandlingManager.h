@@ -22,24 +22,24 @@ public:
     CHandlingManager();
     ~CHandlingManager();
 
-    CHandlingEntry* CreateHandlingData();
+    CHandlingEntry* CreateHandlingData() const noexcept;
 
-    bool ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry);
+    bool ApplyHandlingData(std::uint32_t uiModel, CHandlingEntry* pEntry) const noexcept;
 
-    const CHandlingEntry* GetModelHandlingData(eVehicleTypes eModel);
-    const CHandlingEntry* GetOriginalHandlingData(eVehicleTypes eModel);
+    const CHandlingEntry* GetModelHandlingData(std::uint32_t uiModel) const noexcept;
+    const CHandlingEntry* GetOriginalHandlingData(std::uint32_t uiModel) const noexcept;
 
-    eHandlingTypes GetHandlingID(eVehicleTypes eModel);
+    eHandlingTypes GetHandlingID(std::uint32_t uiModel) const noexcept;
 
     // Helper functions
-    eHandlingProperty GetPropertyEnumFromName(const std::string& strName);
-    bool              HasModelHandlingChanged(eVehicleTypes eModel);
-    void              SetModelHandlingHasChanged(eVehicleTypes eModel, bool bChanged);
+    eHandlingProperty GetPropertyEnumFromName(const std::string& strName) const noexcept;
+    bool              HasModelHandlingChanged(std::uint32_t uiModel) const noexcept;
+    void              SetModelHandlingHasChanged(std::uint32_t uiModel, bool bChanged) noexcept;
 
     std::map<std::string, eHandlingProperty> m_HandlingNames;
 
 private:
-    void InitializeDefaultHandlings();
+    void InitializeDefaultHandlings() noexcept;
 
     // Original handling data unaffected by handling.cfg changes
     static SFixedArray<tHandlingData, HT_MAX> m_OriginalHandlingData;

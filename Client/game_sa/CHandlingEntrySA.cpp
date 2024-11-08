@@ -19,8 +19,11 @@ extern CGameSA* pGame;
 CHandlingEntrySA::CHandlingEntrySA()
 {
     // Create a new interface and zero it
-    m_pHandlingSA = new tHandlingDataSA;
-    memset(m_pHandlingSA, 0, sizeof(tHandlingDataSA));
+    m_pHandlingSA = new (std::nothrow) tHandlingDataSA;
+    if (m_pHandlingSA)
+    {
+        memset(m_pHandlingSA, 0, sizeof(tHandlingDataSA));
+    }
     m_bDeleteInterface = true;
 }
 
@@ -29,7 +32,11 @@ CHandlingEntrySA::CHandlingEntrySA(tHandlingDataSA* pOriginal)
     // Store gta's pointer
     m_pHandlingSA = nullptr;
     m_bDeleteInterface = false;
-    memcpy(&m_Handling, pOriginal, sizeof(tHandlingDataSA));
+
+    if (pOriginal)
+    {
+        memcpy(&m_Handling, pOriginal, sizeof(tHandlingDataSA));
+    }
 }
 
 CHandlingEntrySA::~CHandlingEntrySA()

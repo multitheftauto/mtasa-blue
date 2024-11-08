@@ -25,7 +25,7 @@ CHandlingManager::CHandlingManager()
     InitializeDefaultHandlings();
 
     // Create a handling entry
-    for (int i = 0; i < HT_MAX; i++)
+    for (std::size_t i = 0; i < HT_MAX; i++)
     {
         // For every original handling data
         m_pOriginalEntries[i] = new CHandlingEntry(&m_OriginalHandlingData[i]);
@@ -77,7 +77,7 @@ CHandlingManager::CHandlingManager()
 CHandlingManager::~CHandlingManager()
 {
     // Destroy
-    for (int i = 0; i < HT_MAX; i++)
+    for (std::size_t i = 0; i < HT_MAX; i++)
     {
         // All original handling entries
         delete m_pOriginalEntries[i];
@@ -87,82 +87,116 @@ CHandlingManager::~CHandlingManager()
     }
 }
 
-CHandlingEntry* CHandlingManager::CreateHandlingData()
+CHandlingEntry* CHandlingManager::CreateHandlingData() const noexcept
 {
-    return new CHandlingEntry;
+    return new (std::nothrow) CHandlingEntry;
 }
 
-bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry)
+bool CHandlingManager::ApplyHandlingData(std::uint32_t uiModel, CHandlingEntry* pEntry) const noexcept
 {
-    // Within range?
-    if (!CVehicleManager::IsValidModel(eModel))
+    try
+    {
+        // Within range?
+        if (!CVehicleManager::IsValidModel(uiModel))
+            return false;
+
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID(uiModel);
+        // Apply the data and return success
+        m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
+        return true;
+    }
+    catch (...)
+    {
         return false;
-
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Apply the data and return success
-    m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
-    return true;
+    }
 }
 
-const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eModel)
+const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(std::uint32_t uiModel) const noexcept
 {
-    // Within range?
-    if (!CVehicleManager::IsValidModel(eModel))
-        return nullptr;
+    try
+    {
+        // Within range?
+        if (!CVehicleManager::IsValidModel(uiModel))
+            return nullptr;
 
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Return it
-    return m_pOriginalEntries[eHandling];
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID(uiModel);
+        // Return it
+        return m_pOriginalEntries[eHandling];
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
 }
 
-const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eModel)
+const CHandlingEntry* CHandlingManager::GetModelHandlingData(std::uint32_t uiModel) const noexcept
 {
-    // Within range?
-    if (!CVehicleManager::IsValidModel(eModel))
-        return nullptr;
+    try
+    {
+        // Within range?
+        if (!CVehicleManager::IsValidModel(uiModel))
+            return nullptr;
 
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Return it
-    return m_pModelEntries[eHandling];
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID(uiModel);
+        // Return it
+        return m_pModelEntries[eHandling];
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
 }
 
-eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& strName)
+eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& strName) const noexcept
 {
     const auto it = m_HandlingNames.find(strName);
     return it != m_HandlingNames.end() ? it->second : HANDLING_MAX;
 }
 
-bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
+bool CHandlingManager::HasModelHandlingChanged(std::uint32_t uiModel) const noexcept
 {
-    // Within range?
-    if (!CVehicleManager::IsValidModel(eModel))
-        return false;
+    try
+    {
+        // Within range?
+        if (!CVehicleManager::IsValidModel(uiModel))
+            return false;
 
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Return if we have changed
-    return m_bModelHandlingChanged[eHandling];
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID(uiModel);
+        // Return if we have changed
+        return m_bModelHandlingChanged[eHandling];
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
 
-void CHandlingManager::SetModelHandlingHasChanged(eVehicleTypes eModel, bool bChanged)
+void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t uiModel, bool bChanged) noexcept
 {
-    // Within range?
-    if (!CVehicleManager::IsValidModel(eModel))
-        return;
+    try
+    {
+        // Within range?
+        if (!CVehicleManager::IsValidModel(uiModel))
+            return;
 
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Return if we have changed.
-    m_bModelHandlingChanged[eHandling] = bChanged;
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID(uiModel);
+        // Return if we have changed.
+        m_bModelHandlingChanged[eHandling] = bChanged;
+    }
+    catch (...)
+    {
+    }
 }
 
 // Return the handling manager id
-eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
+eHandlingTypes CHandlingManager::GetHandlingID(std::uint32_t uiModel) const noexcept
 {
-    switch (eModel)
+    switch (uiModel)
     {
         case VT_LANDSTAL:
             return HT_LANDSTAL;
@@ -594,7 +628,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
     return HT_LANDSTAL;
 }
 
-void CHandlingManager::InitializeDefaultHandlings()
+void CHandlingManager::InitializeDefaultHandlings() noexcept
 {
     // Reset
     memset(&m_OriginalHandlingData[0], 0, sizeof(m_OriginalHandlingData));

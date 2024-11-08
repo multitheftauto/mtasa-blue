@@ -66,7 +66,7 @@ class CPools
 {
 public:
     // Vehicles pool
-    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2) = 0;
+    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, std::uint16_t uiModel, std::uint8_t ucVariation, std::uint8_t ucVariation2) noexcept = 0;
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;

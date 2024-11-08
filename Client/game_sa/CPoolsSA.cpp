@@ -71,70 +71,77 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
     return true;
 }
 
-CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2)
+CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t uiModel, std::uint8_t ucVariation, std::uint8_t ucVariation2) noexcept
 {
-    CVehicleSA* pVehicle = nullptr;
-
-    if (m_vehiclePool.ulCount < MAX_VEHICLES)
+    try
     {
-        MemSetFast((void*)VAR_CVehicle_Variation1, ucVariation, 1);
-        MemSetFast((void*)VAR_CVehicle_Variation2, ucVariation2, 1);
+        CVehicleSA* pVehicle = nullptr;
 
-        // CCarCtrl::CreateCarForScript
-        CVehicleSAInterface* pInterface =
-            ((CVehicleSAInterface * (__cdecl*)(int, CVector, unsigned char)) FUNC_CCarCtrlCreateCarForScript)(eVehicleType, CVector(0, 0, 0), 0);
-
-        auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
-
-        switch (vehicleClass)
+        if (m_vehiclePool.ulCount < MAX_VEHICLES)
         {
-            case VehicleClass::MONSTER_TRUCK:
-                pVehicle = new CMonsterTruckSA(reinterpret_cast<CMonsterTruckSAInterface*>(pInterface));
-                break;
-            case VehicleClass::QUAD:
-                pVehicle = new CQuadBikeSA(reinterpret_cast<CQuadBikeSAInterface*>(pInterface));
-                break;
-            case VehicleClass::HELI:
-                pVehicle = new CHeliSA(reinterpret_cast<CHeliSAInterface*>(pInterface));
-                break;
-            case VehicleClass::PLANE:
-                pVehicle = new CPlaneSA(reinterpret_cast<CPlaneSAInterface*>(pInterface));
-                break;
-            case VehicleClass::BOAT:
-                pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
-                break;
-            case VehicleClass::TRAIN:
-                pVehicle = new CTrainSA(reinterpret_cast<CTrainSAInterface*>(pInterface));
-                break;
-            case VehicleClass::BIKE:
-                pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
-                break;
-            case VehicleClass::BMX:
-                pVehicle = new CBmxSA(reinterpret_cast<CBmxSAInterface*>(pInterface));
-                break;
-            case VehicleClass::TRAILER:
-                pVehicle = new CTrailerSA(reinterpret_cast<CTrailerSAInterface*>(pInterface));
-                break;
-            default:
-                pVehicle = new CAutomobileSA(reinterpret_cast<CAutomobileSAInterface*>(pInterface));
-                break;
+            MemSetFast((void*)VAR_CVehicle_Variation1, ucVariation, 1);
+            MemSetFast((void*)VAR_CVehicle_Variation2, ucVariation2, 1);
+
+            // CCarCtrl::CreateCarForScript
+            CVehicleSAInterface* pInterface =
+                ((CVehicleSAInterface * (__cdecl*)(int, CVector, unsigned char)) FUNC_CCarCtrlCreateCarForScript)(uiModel, CVector(0, 0, 0), 0);
+
+            auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(uiModel)->GetVehicleType());
+
+            switch (vehicleClass)
+            {
+                case VehicleClass::MONSTER_TRUCK:
+                    pVehicle = new CMonsterTruckSA(reinterpret_cast<CMonsterTruckSAInterface*>(pInterface));
+                    break;
+                case VehicleClass::QUAD:
+                    pVehicle = new CQuadBikeSA(reinterpret_cast<CQuadBikeSAInterface*>(pInterface));
+                    break;
+                case VehicleClass::HELI:
+                    pVehicle = new CHeliSA(reinterpret_cast<CHeliSAInterface*>(pInterface));
+                    break;
+                case VehicleClass::PLANE:
+                    pVehicle = new CPlaneSA(reinterpret_cast<CPlaneSAInterface*>(pInterface));
+                    break;
+                case VehicleClass::BOAT:
+                    pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
+                    break;
+                case VehicleClass::TRAIN:
+                    pVehicle = new CTrainSA(reinterpret_cast<CTrainSAInterface*>(pInterface));
+                    break;
+                case VehicleClass::BIKE:
+                    pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
+                    break;
+                case VehicleClass::BMX:
+                    pVehicle = new CBmxSA(reinterpret_cast<CBmxSAInterface*>(pInterface));
+                    break;
+                case VehicleClass::TRAILER:
+                    pVehicle = new CTrailerSA(reinterpret_cast<CTrailerSAInterface*>(pInterface));
+                    break;
+                default:
+                    pVehicle = new CAutomobileSA(reinterpret_cast<CAutomobileSAInterface*>(pInterface));
+                    break;
+            }
+
+            if (pVehicle && AddVehicleToPool(pClientVehicle, pVehicle))
+            {
+                pVehicle->m_ucVariant = ucVariation;
+                pVehicle->m_ucVariant2 = ucVariation2;
+
+                pVehicle->DumpVehicleFrames();
+            }
+            else
+            {
+                delete pVehicle;
+                pVehicle = nullptr;
+            }
         }
 
-        if (pVehicle && AddVehicleToPool(pClientVehicle, pVehicle))
-        {
-            pVehicle->m_ucVariant = ucVariation;
-            pVehicle->m_ucVariant2 = ucVariation2;
-
-            pVehicle->DumpVehicleFrames();
-        }
-        else
-        {
-            delete pVehicle;
-            pVehicle = nullptr;
-        }
+        return pVehicle;
     }
-
-    return pVehicle;
+    catch (...)
+    {
+        return nullptr;
+    }
 }
 
 void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)

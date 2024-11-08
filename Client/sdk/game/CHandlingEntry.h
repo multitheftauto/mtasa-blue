@@ -137,7 +137,7 @@ public:
     virtual eLightType    GetTailLight() const = 0;
     virtual unsigned char GetAnimGroup() const = 0;
 
-    virtual std::uint16_t GetVehicleID() const = 0;
+    virtual eHandlingTypes GetHandlingID() const = 0;
 
     // Set functions
     virtual void SetMass(float fMass) = 0;
