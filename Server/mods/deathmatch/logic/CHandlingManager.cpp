@@ -94,60 +94,39 @@ CHandlingEntry* CHandlingManager::CreateHandlingData() const noexcept
 
 bool CHandlingManager::ApplyHandlingData(std::uint32_t uiModel, CHandlingEntry* pEntry) const noexcept
 {
-    try
-    {
-        // Within range?
-        if (!CVehicleManager::IsValidModel(uiModel))
-            return false;
-
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(uiModel);
-        // Apply the data and return success
-        m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
-        return true;
-    }
-    catch (...)
-    {
+    // Within range?
+    if (!CVehicleManager::IsValidModel(uiModel))
         return false;
-    }
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(uiModel);
+    // Apply the data and return success
+    m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
+    return true;
 }
 
 const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(std::uint32_t uiModel) const noexcept
 {
-    try
-    {
-        // Within range?
-        if (!CVehicleManager::IsValidModel(uiModel))
-            return nullptr;
-
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(uiModel);
-        // Return it
-        return m_pOriginalEntries[eHandling];
-    }
-    catch (...)
-    {
+    // Within range?
+    if (!CVehicleManager::IsValidModel(uiModel))
         return nullptr;
-    }
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(uiModel);
+    // Return it
+    return m_pOriginalEntries[eHandling];
 }
 
 const CHandlingEntry* CHandlingManager::GetModelHandlingData(std::uint32_t uiModel) const noexcept
 {
-    try
-    {
-        // Within range?
-        if (!CVehicleManager::IsValidModel(uiModel))
-            return nullptr;
-
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(uiModel);
-        // Return it
-        return m_pModelEntries[eHandling];
-    }
-    catch (...)
-    {
+    // Within range?
+    if (!CVehicleManager::IsValidModel(uiModel))
         return nullptr;
-    }
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(uiModel);
+    // Return it
+    return m_pModelEntries[eHandling];
 }
 
 eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& strName) const noexcept
@@ -158,39 +137,26 @@ eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& s
 
 bool CHandlingManager::HasModelHandlingChanged(std::uint32_t uiModel) const noexcept
 {
-    try
-    {
-        // Within range?
-        if (!CVehicleManager::IsValidModel(uiModel))
-            return false;
-
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(uiModel);
-        // Return if we have changed
-        return m_bModelHandlingChanged[eHandling];
-    }
-    catch (...)
-    {
+    // Within range?
+    if (!CVehicleManager::IsValidModel(uiModel))
         return false;
-    }
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(uiModel);
+    // Return if we have changed
+    return m_bModelHandlingChanged[eHandling];
 }
 
 void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t uiModel, bool bChanged) noexcept
 {
-    try
-    {
-        // Within range?
-        if (!CVehicleManager::IsValidModel(uiModel))
-            return;
+    // Within range?
+    if (!CVehicleManager::IsValidModel(uiModel))
+        return;
 
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(uiModel);
-        // Return if we have changed.
-        m_bModelHandlingChanged[eHandling] = bChanged;
-    }
-    catch (...)
-    {
-    }
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(uiModel);
+    // Return if we have changed.
+    m_bModelHandlingChanged[eHandling] = bChanged;
 }
 
 // Return the handling manager id

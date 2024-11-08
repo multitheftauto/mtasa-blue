@@ -254,17 +254,10 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(std::uint32_t 
     if (!IsVehicleModel(uiModel))
         return nullptr;
 
-    try
-    {
-        // Get our Handling ID, the default value will be HT_LANDSTAL
-        const eHandlingTypes eHandling = GetHandlingID(uiModel);
-        // Return it
-        return m_pOriginalEntries[eHandling];
-    }
-    catch (...)
-    {
-        return nullptr;
-    }
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const eHandlingTypes eHandling = GetHandlingID(uiModel);
+    // Return it
+    return m_pOriginalEntries[eHandling];
 }
 
 const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(std::uint32_t uiModel) const noexcept
@@ -273,20 +266,13 @@ const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(st
     if (!IsVehicleModel(uiModel))
         return nullptr;
 
-    try
-    {
-        // Get our Handling ID, the default value will be HT_LANDSTAL
-        const eHandlingTypes eHandling = GetHandlingID(uiModel);
-        // Original GTA:SA behavior
-        if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
-            return m_pOriginalFlyingEntries[0];
-        else
-            return m_pOriginalFlyingEntries[eHandling - HT_SEAPLANE];
-    }
-    catch (...)
-    {
-        return nullptr;
-    }
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const eHandlingTypes eHandling = GetHandlingID(uiModel);
+    // Original GTA:SA behavior
+    if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
+        return m_pOriginalFlyingEntries[0];
+    else
+        return m_pOriginalFlyingEntries[eHandling - HT_SEAPLANE];
 }
 
 const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::uint32_t uiModel) const noexcept
@@ -295,20 +281,13 @@ const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::u
     if (!IsVehicleModel(uiModel))
         return nullptr;
 
-    try
-    {
-        // Get our Handling ID, the default value will be HT_LANDSTAL
-        const eHandlingTypes eHandling = GetHandlingID(uiModel);
-        // Original GTA:SA behavior
-        if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
-            return m_pOriginalBoatEntries[0];
-        else
-            return m_pOriginalBoatEntries[eHandling - HT_PREDATOR];
-    }
-    catch (...)
-    {
-        return nullptr;
-    }
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const eHandlingTypes eHandling = GetHandlingID(uiModel);
+    // Original GTA:SA behavior
+    if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
+        return m_pOriginalBoatEntries[0];
+    else
+        return m_pOriginalBoatEntries[eHandling - HT_PREDATOR];
 }
 
 const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::uint32_t uiModel) const noexcept
@@ -317,21 +296,14 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::u
     if (!IsVehicleModel(uiModel))
         return nullptr;
 
-    try
-    {
-        // Get our Handling ID, the default value will be HT_LANDSTAL
-        const eHandlingTypes eHandling = GetHandlingID(uiModel);
-        if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
-            return m_pOriginalBikeEntries[eHandling - HT_BIKE];
-        else if (eHandling == HT_FAGGIO)
-            return m_pOriginalBikeEntries[13];
-        else
-            return nullptr;
-    }
-    catch (...)
-    {
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const eHandlingTypes eHandling = GetHandlingID(uiModel);
+    if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
+        return m_pOriginalBikeEntries[eHandling - HT_BIKE];
+    else if (eHandling == HT_FAGGIO)
+        return m_pOriginalBikeEntries[13];
+    else
         return nullptr;
-    }
 }
 
 // Return the handling manager id
