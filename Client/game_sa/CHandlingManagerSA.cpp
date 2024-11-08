@@ -9189,7 +9189,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
     m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
-void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry) const noexcept
+void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* pEntry) const noexcept
 {
     try
     {

@@ -48,25 +48,37 @@ CHandlingEntrySA::~CHandlingEntrySA()
 }
 
 // Apply the handlingdata from another data
-void CHandlingEntrySA::Assign(const CHandlingEntry* pEntry)
+void CHandlingEntrySA::Assign(const CHandlingEntry* pEntry) noexcept
 {
     if (!pEntry)
         return;
 
-    // Copy the data
-    const CHandlingEntrySA* pEntrySA = static_cast<const CHandlingEntrySA*>(pEntry);
-    m_Handling = pEntrySA->m_Handling;
+    try
+    {
+        // Copy the data
+        const CHandlingEntrySA* pEntrySA = static_cast<const CHandlingEntrySA*>(pEntry);
+        m_Handling = pEntrySA->m_Handling;
+    }
+    catch (...)
+    {
+    }
 }
 
-void CHandlingEntrySA::Recalculate()
+void CHandlingEntrySA::Recalculate() noexcept
 {
     // Real GTA class?
     if (!m_pHandlingSA)
         return;
 
-    // Copy our stored field to GTA's
-    memcpy(m_pHandlingSA, &m_Handling, sizeof(m_Handling));
-    ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_pHandlingSA);
+    try
+    {
+        // Copy our stored field to GTA's
+        memcpy(m_pHandlingSA, &m_Handling, sizeof(m_Handling));
+        ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_pHandlingSA);
+    }
+    catch (...)
+    {
+    }
 }
 
 void CHandlingEntrySA::SetSuspensionForceLevel(float fForce) noexcept
@@ -111,7 +123,7 @@ void CHandlingEntrySA::SetSuspensionAntiDiveMultiplier(float fAntidive) noexcept
     m_Handling.fSuspensionAntiDiveMultiplier = fAntidive;
 }
 
-void CHandlingEntrySA::CheckSuspensionChanges() noexcept
+void CHandlingEntrySA::CheckSuspensionChanges() const noexcept
 {
     pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }

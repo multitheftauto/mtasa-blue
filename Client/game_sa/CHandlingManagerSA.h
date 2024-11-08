@@ -35,7 +35,7 @@ public:
 
     eHandlingProperty GetPropertyEnumFromName(const std::string& strName) const noexcept;
 
-    void CheckSuspensionChanges(CHandlingEntry* pEntry) const noexcept;
+    void CheckSuspensionChanges(const CHandlingEntry* pEntry) const noexcept;
 
 private:
     void InitializeDefaultHandlings() noexcept;
