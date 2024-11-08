@@ -30,7 +30,7 @@ public:
     ~CPoolsSA();
 
     // Vehicles pool
-    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t uiModel, std::uint8_t ucVariation, std::uint8_t ucVariation2) noexcept;
+    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t model, std::uint8_t variation, std::uint8_t variation2) noexcept;
 
 private:
     bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);

@@ -137,7 +137,7 @@ public:
     virtual eLightType    GetTailLight() const noexcept = 0;
     virtual unsigned char GetAnimGroup() const noexcept = 0;
 
-    virtual eHandlingTypes GetHandlingID() const noexcept = 0;
+    virtual eHandlingTypes GetVehicleID() const noexcept = 0;
 
     // Set functions
     virtual void SetMass(float fMass) noexcept = 0;

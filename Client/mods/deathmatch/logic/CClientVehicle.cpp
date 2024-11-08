@@ -60,25 +60,25 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
         usHandlingModelID = m_pModelInfo->GetParentID();
 
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
-    m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
-    m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
+    m_HandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
+    m_HandlingEntry->Assign(m_pOriginalHandlingEntry);
 
     m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData(usHandlingModelID);
-    m_pFlyingHandlingEntry = g_pGame->GetHandlingManager()->CreateFlyingHandlingData();
-    m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
+    m_FlyingHandlingEntry = g_pGame->GetHandlingManager()->CreateFlyingHandlingData();
+    m_FlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
 
     m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData(usHandlingModelID);
     if (m_pOriginalBoatHandlingEntry)
     {
-        m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
-        m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
+        m_BoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
+        m_BoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
     }
 
     m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData(usHandlingModelID);
     if (m_pOriginalBikeHandlingEntry)
     {
-        m_pBikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
-        m_pBikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
+        m_BikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
+        m_BikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
     }
 
     SetTypeName("vehicle");
@@ -277,10 +277,6 @@ CClientVehicle::~CClientVehicle()
     Unlink();
 
     delete m_pUpgrades;
-    delete m_pHandlingEntry;
-    delete m_pFlyingHandlingEntry;
-    delete m_pBoatHandlingEntry;
-    delete m_pBikeHandlingEntry;
     delete m_LastSyncedData;
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle,
                                               &m_pPickedUpWinchEntity, NULL);
@@ -1060,27 +1056,27 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
                 usHandlingModelID = m_pModelInfo->GetParentID();
 
             m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
-            m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
+            m_HandlingEntry->Assign(m_pOriginalHandlingEntry);
 
             m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData(usHandlingModelID);
-            m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
+            m_FlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
 
             m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData(usHandlingModelID);
             if (m_pOriginalBoatHandlingEntry)
             {
-                if (!m_pBoatHandlingEntry)
-                    m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
+                if (!m_BoatHandlingEntry)
+                    m_BoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
 
-                m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
+                m_BoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
             }
 
             m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData(usHandlingModelID);
             if (m_pOriginalBikeHandlingEntry)
             {
-                if (!m_pBikeHandlingEntry)
-                    m_pBikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
+                if (!m_BikeHandlingEntry)
+                    m_BikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
 
-                m_pBikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
+                m_BikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
             }
         }
 
@@ -2742,19 +2738,19 @@ void CClientVehicle::Create()
             SetWindowOpen(i, m_bWindowOpen[i]);
 
         // Re-apply handling entry
-        if (m_pHandlingEntry)
+        if (m_HandlingEntry)
         {
-            m_pVehicle->SetHandlingData(m_pHandlingEntry);
-            m_pVehicle->SetFlyingHandlingData(m_pFlyingHandlingEntry);
+            m_pVehicle->SetHandlingData(m_HandlingEntry.get());
+            m_pVehicle->SetFlyingHandlingData(m_FlyingHandlingEntry.get());
 
             switch (m_eVehicleType)
             {
                 case CLIENTVEHICLE_BOAT:
-                    dynamic_cast<CBoat*>(m_pVehicle)->SetBoatHandlingData(m_pBoatHandlingEntry);
+                    dynamic_cast<CBoat*>(m_pVehicle)->SetBoatHandlingData(m_BoatHandlingEntry.get());
                     break;
                 case CLIENTVEHICLE_BIKE:
                 case CLIENTVEHICLE_BMX:
-                    dynamic_cast<CBike*>(m_pVehicle)->SetBikeHandlingData(m_pBikeHandlingEntry);
+                    dynamic_cast<CBike*>(m_pVehicle)->SetBikeHandlingData(m_BikeHandlingEntry.get());
                     break;
             }
 
@@ -2919,17 +2915,17 @@ void CClientVehicle::Destroy()
         m_bIsOnGround = IsOnGround();
         m_fHeliRotorSpeed = GetHeliRotorSpeed();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible();
-        m_pHandlingEntry = m_pVehicle->GetHandlingData();
-        m_pFlyingHandlingEntry = m_pVehicle->GetFlyingHandlingData();
+        m_HandlingEntry.reset(m_pVehicle->GetHandlingData());
+        m_FlyingHandlingEntry.reset(m_pVehicle->GetFlyingHandlingData());
 
         switch (m_eVehicleType)
         {
             case CLIENTVEHICLE_BOAT:
-                m_pBoatHandlingEntry = dynamic_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData();
+                m_BoatHandlingEntry.reset(dynamic_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData());
                 break;
             case CLIENTVEHICLE_BIKE:
             case CLIENTVEHICLE_BMX:
-                m_pBikeHandlingEntry = dynamic_cast<CBike*>(m_pVehicle)->GetBikeHandlingData();
+                m_BikeHandlingEntry.reset(dynamic_cast<CBike*>(m_pVehicle)->GetBikeHandlingData());
                 break;
             default:
                 break;
@@ -4252,8 +4248,8 @@ CHandlingEntry* CClientVehicle::GetHandlingData()
 {
     if (m_pVehicle)
         return m_pVehicle->GetHandlingData();
-    else if (m_pHandlingEntry)
-        return m_pHandlingEntry;
+    else if (m_HandlingEntry)
+        return m_HandlingEntry.get();
 
     return nullptr;
 }
@@ -4262,8 +4258,8 @@ CFlyingHandlingEntry* CClientVehicle::GetFlyingHandlingData()
 {
     if (m_pVehicle)
         return m_pVehicle->GetFlyingHandlingData();
-    else if (m_pFlyingHandlingEntry)
-        return m_pFlyingHandlingEntry;
+    else if (m_FlyingHandlingEntry)
+        return m_FlyingHandlingEntry.get();
 
     return nullptr;
 }
@@ -4275,8 +4271,8 @@ CBoatHandlingEntry* CClientVehicle::GetBoatHandlingData()
 
     if (m_pVehicle)
         return reinterpret_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData();
-    else if (m_pBoatHandlingEntry)
-        return m_pBoatHandlingEntry;
+    else if (m_BoatHandlingEntry)
+        return m_BoatHandlingEntry.get();
 
     return nullptr;
 }
@@ -4288,8 +4284,8 @@ CBikeHandlingEntry* CClientVehicle::GetBikeHandlingData()
 
     if (m_pVehicle)
         return reinterpret_cast<CBike*>(m_pVehicle)->GetBikeHandlingData();
-    else if (m_pBikeHandlingEntry)
-        return m_pBikeHandlingEntry;
+    else if (m_BikeHandlingEntry)
+        return m_BikeHandlingEntry.get();
 
     return nullptr;
 }

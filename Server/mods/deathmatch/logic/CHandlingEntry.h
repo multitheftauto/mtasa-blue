@@ -104,7 +104,7 @@ public:
     ~CHandlingEntry(){};
 
     // Use this to copy data from an another handling class to this
-    void ApplyHandlingData(const CHandlingEntry* pData) noexcept;
+    void ApplyHandlingData(const CHandlingEntry* const pData) noexcept;
 
     // Get functions
     tHandlingData  GetHandlingData() const noexcept { return m_Handling; }

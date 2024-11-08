@@ -22,19 +22,19 @@ public:
     CHandlingManager();
     ~CHandlingManager();
 
-    CHandlingEntry* CreateHandlingData() const noexcept;
+    std::unique_ptr<CHandlingEntry> CreateHandlingData() const noexcept;
 
-    bool ApplyHandlingData(std::uint32_t uiModel, CHandlingEntry* pEntry) const noexcept;
+    bool ApplyHandlingData(std::uint32_t model, CHandlingEntry* pEntry) const noexcept;
 
-    const CHandlingEntry* GetModelHandlingData(std::uint32_t uiModel) const noexcept;
-    const CHandlingEntry* GetOriginalHandlingData(std::uint32_t uiModel) const noexcept;
+    const CHandlingEntry* GetOriginalHandlingData(std::uint32_t model) const noexcept;
+    CHandlingEntry*       GetModelHandlingData(std::uint32_t model) const noexcept;
 
-    eHandlingTypes GetHandlingID(std::uint32_t uiModel) const noexcept;
+    eHandlingTypes GetHandlingID(std::uint32_t model) const noexcept;
 
     // Helper functions
-    eHandlingProperty GetPropertyEnumFromName(const std::string& strName) const noexcept;
-    bool              HasModelHandlingChanged(std::uint32_t uiModel) const noexcept;
-    void              SetModelHandlingHasChanged(std::uint32_t uiModel, bool bChanged) noexcept;
+    eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept;
+    bool              HasModelHandlingChanged(std::uint32_t model) const noexcept;
+    void              SetModelHandlingHasChanged(std::uint32_t model, bool bChanged) noexcept;
 
     std::map<std::string, eHandlingProperty> m_HandlingNames;
 
@@ -45,10 +45,10 @@ private:
     static SFixedArray<tHandlingData, HT_MAX> m_OriginalHandlingData;
 
     // Array with the original handling entries
-    static SFixedArray<CHandlingEntry*, HT_MAX> m_pOriginalEntries;
+    static SFixedArray<std::unique_ptr<CHandlingEntry>, HT_MAX> m_OriginalEntries;
 
     // Array with the model handling entries
-    static SFixedArray<CHandlingEntry*, HT_MAX> m_pModelEntries;
+    static SFixedArray<std::unique_ptr<CHandlingEntry>, HT_MAX> m_ModelEntries;
 
     SFixedArray<bool, HT_MAX> m_bModelHandlingChanged;
 };

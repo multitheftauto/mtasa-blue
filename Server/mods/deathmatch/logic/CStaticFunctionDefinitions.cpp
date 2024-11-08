@@ -5480,16 +5480,16 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CVehicle* pVehicle, eHandlin
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, CVector& vecValue, bool bOriginal)
+bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, CVector& vecValue, bool bOriginal)
 {
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5504,16 +5504,16 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandli
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, float& fValue, bool bOriginal)
+bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, float& fValue, bool bOriginal)
 {
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5522,16 +5522,16 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandli
     return GetEntryHandling(pEntry, eProperty, fValue);
 }
 
-bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, unsigned int& uiValue, bool bOriginal)
+bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned int& uiValue, bool bOriginal)
 {
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5540,16 +5540,16 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandli
     return GetEntryHandling(pEntry, eProperty, uiValue);
 }
 
-bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, unsigned char& ucValue, bool bOriginal)
+bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned char& ucValue, bool bOriginal)
 {
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5558,16 +5558,16 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandli
     return GetEntryHandling(pEntry, eProperty, ucValue);
 }
 
-bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, std::string& strValue, bool bOriginal)
+bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, std::string& strValue, bool bOriginal)
 {
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel);
+        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5576,68 +5576,68 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t uiModel, eHandli
     return GetEntryHandling(pEntry, eProperty, strValue);
 }
 
-bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, float fValue)
+bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, float fValue)
 {
-    auto pEntry = const_cast<CHandlingEntry*>(g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel));
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (SetEntryHandling(pEntry, eProperty, fValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(uiModel, true);
+    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, CVector vecValue)
+bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, CVector vecValue)
 {
-    auto pEntry = const_cast<CHandlingEntry*>(g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel));
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, vecValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(uiModel, true);
+    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, std::string strValue)
+bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, std::string strValue)
 {
-    auto pEntry = const_cast<CHandlingEntry*>(g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel));
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, strValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(uiModel, true);
+    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, unsigned char ucValue)
+bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned char ucValue)
 {
-    auto pEntry = const_cast<CHandlingEntry*>(g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel));
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, ucValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(uiModel, true);
+    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, unsigned int uiValue)
+bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned int uiValue)
 {
-    auto pEntry = const_cast<CHandlingEntry*>(g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel));
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, uiValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(uiModel, true);
+    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
@@ -7392,14 +7392,14 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
 {
     try
     {
-        const std::uint16_t   uiModel = pVehicle->GetModel();
+        const std::uint16_t   model = pVehicle->GetModel();
         CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
         const CHandlingEntry* pNewEntry = nullptr;
         CBitStream            BitStream;
 
         if (bUseOriginal)
         {
-            pNewEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(uiModel);
+            pNewEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
             if (!pNewEntry)
                 return false;
 
@@ -7407,7 +7407,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
         }
         else
         {
-            pNewEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel);
+            pNewEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
             if (!pNewEntry)
                 return false;
 
@@ -7478,14 +7478,14 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
 
         CBitStream BitStream;
 
-        const std::uint16_t uiModel = pVehicle->GetModel();
+        const std::uint32_t model = pVehicle->GetModel();
 
         float         fValue;
         CVector       vecValue;
         std::string   strValue;
         std::uint32_t uiValue;
         std::uint32_t ucValue;
-        if (GetModelHandling(uiModel, eProperty, fValue, bUseOriginal))
+        if (GetModelHandling(model, eProperty, fValue, bUseOriginal))
         {
             BitStream.pBitStream->Write(static_cast<unsigned char>(eProperty));
 
@@ -7493,7 +7493,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
 
             BitStream.pBitStream->Write(fValue);
         }
-        else if (GetModelHandling(uiModel, eProperty, uiValue, bUseOriginal))
+        else if (GetModelHandling(model, eProperty, uiValue, bUseOriginal))
         {
             BitStream.pBitStream->Write(static_cast<unsigned char>(eProperty));
 
@@ -7501,7 +7501,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
 
             BitStream.pBitStream->Write(uiValue);
         }
-        else if (GetModelHandling(uiModel, eProperty, ucValue, bUseOriginal))
+        else if (GetModelHandling(model, eProperty, ucValue, bUseOriginal))
         {
             BitStream.pBitStream->Write(static_cast<unsigned char>(eProperty));
 
@@ -7509,7 +7509,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
 
             BitStream.pBitStream->Write(ucValue);
         }
-        else if (GetModelHandling(uiModel, eProperty, strValue, bUseOriginal))
+        else if (GetModelHandling(model, eProperty, strValue, bUseOriginal))
         {
             unsigned char ucValue = 0;
             BitStream.pBitStream->Write(static_cast<unsigned char>(eProperty));
@@ -7519,7 +7519,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
 
             BitStream.pBitStream->Write(ucValue);
         }
-        else if (GetModelHandling(uiModel, eProperty, vecValue, bUseOriginal))
+        else if (GetModelHandling(model, eProperty, vecValue, bUseOriginal))
         {
             BitStream.pBitStream->Write(static_cast<unsigned char>(eProperty));
 
@@ -7543,13 +7543,13 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
     }
 }
 
-bool CStaticFunctionDefinitions::ResetModelHandling(std::uint32_t uiModel)
+bool CStaticFunctionDefinitions::ResetModelHandling(std::uint32_t model)
 {
-    CHandlingEntry* pEntry = const_cast<CHandlingEntry*>(g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel));
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
-    const CHandlingEntry* pHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(uiModel);
+    const CHandlingEntry* pHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
     if (!pHandlingEntry)
         return false;
 
@@ -7557,9 +7557,9 @@ bool CStaticFunctionDefinitions::ResetModelHandling(std::uint32_t uiModel)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetModelHandlingProperty(std::uint32_t uiModel, eHandlingProperty eProperty)
+bool CStaticFunctionDefinitions::ResetModelHandlingProperty(std::uint32_t model, eHandlingProperty eProperty)
 {
-    CHandlingEntry* pEntry = const_cast<CHandlingEntry*>(g_pGame->GetHandlingManager()->GetModelHandlingData(uiModel));
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
 
     float         fValue;
     CVector       vecValue;
@@ -7567,23 +7567,23 @@ bool CStaticFunctionDefinitions::ResetModelHandlingProperty(std::uint32_t uiMode
     std::uint32_t uiValue;
     std::uint8_t  ucValue;
 
-    if (GetModelHandling(uiModel, eProperty, fValue, true))
+    if (GetModelHandling(model, eProperty, fValue, true))
     {
         SetEntryHandling(pEntry, eProperty, fValue);
     }
-    else if (GetModelHandling(uiModel, eProperty, strValue, true))
+    else if (GetModelHandling(model, eProperty, strValue, true))
     {
         SetEntryHandling(pEntry, eProperty, strValue);
     }
-    else if (GetModelHandling(uiModel, eProperty, vecValue, true))
+    else if (GetModelHandling(model, eProperty, vecValue, true))
     {
         SetEntryHandling(pEntry, eProperty, vecValue);
     }
-    else if (GetModelHandling(uiModel, eProperty, uiValue, true))
+    else if (GetModelHandling(model, eProperty, uiValue, true))
     {
         SetEntryHandling(pEntry, eProperty, uiValue);
     }
-    else if (GetModelHandling(uiModel, eProperty, ucValue, true))
+    else if (GetModelHandling(model, eProperty, ucValue, true))
     {
         SetEntryHandling(pEntry, eProperty, ucValue);
     }

@@ -19,36 +19,25 @@ extern CGameSA* pGame;
 CHandlingEntrySA::CHandlingEntrySA()
 {
     // Create a new interface and zero it
-    m_pHandlingSA = new (std::nothrow) tHandlingDataSA;
-    if (m_pHandlingSA)
+    m_HandlingSA = std::make_unique<tHandlingDataSA>();
+    if (m_HandlingSA)
     {
-        memset(m_pHandlingSA, 0, sizeof(tHandlingDataSA));
+        memset(m_HandlingSA.get(), 0, sizeof(tHandlingDataSA));
     }
-    m_bDeleteInterface = true;
 }
 
-CHandlingEntrySA::CHandlingEntrySA(tHandlingDataSA* pOriginal)
+CHandlingEntrySA::CHandlingEntrySA(const tHandlingDataSA* const pOriginal)
 {
     // Store gta's pointer
-    m_pHandlingSA = nullptr;
-    m_bDeleteInterface = false;
-
+    m_HandlingSA = nullptr;
     if (pOriginal)
     {
         memcpy(&m_Handling, pOriginal, sizeof(tHandlingDataSA));
     }
 }
 
-CHandlingEntrySA::~CHandlingEntrySA()
-{
-    if (m_bDeleteInterface)
-    {
-        SAFE_DELETE(m_pHandlingSA);
-    }
-}
-
 // Apply the handlingdata from another data
-void CHandlingEntrySA::Assign(const CHandlingEntry* pEntry) noexcept
+void CHandlingEntrySA::Assign(const CHandlingEntry* const pEntry) noexcept
 {
     if (!pEntry)
         return;
@@ -56,7 +45,7 @@ void CHandlingEntrySA::Assign(const CHandlingEntry* pEntry) noexcept
     try
     {
         // Copy the data
-        const CHandlingEntrySA* pEntrySA = static_cast<const CHandlingEntrySA*>(pEntry);
+        const CHandlingEntrySA* const pEntrySA = static_cast<const CHandlingEntrySA const*>(pEntry);
         m_Handling = pEntrySA->m_Handling;
     }
     catch (...)
@@ -67,14 +56,14 @@ void CHandlingEntrySA::Assign(const CHandlingEntry* pEntry) noexcept
 void CHandlingEntrySA::Recalculate() noexcept
 {
     // Real GTA class?
-    if (!m_pHandlingSA)
+    if (!m_HandlingSA)
         return;
 
     try
     {
         // Copy our stored field to GTA's
-        memcpy(m_pHandlingSA, &m_Handling, sizeof(m_Handling));
-        ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_pHandlingSA);
+        memcpy(m_HandlingSA.get(), &m_Handling, sizeof(m_Handling));
+        ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_HandlingSA.get());
     }
     catch (...)
     {

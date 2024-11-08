@@ -71,7 +71,7 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
     return true;
 }
 
-CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t uiModel, std::uint8_t ucVariation, std::uint8_t ucVariation2) noexcept
+CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t model, std::uint8_t variation, std::uint8_t variation2) noexcept
 {
     try
     {
@@ -79,14 +79,14 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t uiM
 
         if (m_vehiclePool.ulCount < MAX_VEHICLES)
         {
-            MemSetFast((void*)VAR_CVehicle_Variation1, ucVariation, 1);
-            MemSetFast((void*)VAR_CVehicle_Variation2, ucVariation2, 1);
+            MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
+            MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
 
             // CCarCtrl::CreateCarForScript
             CVehicleSAInterface* pInterface =
-                ((CVehicleSAInterface * (__cdecl*)(int, CVector, unsigned char)) FUNC_CCarCtrlCreateCarForScript)(uiModel, CVector(0, 0, 0), 0);
+                ((CVehicleSAInterface*(__cdecl*)(int, CVector, unsigned char)) FUNC_CCarCtrlCreateCarForScript)(model, CVector(0, 0, 0), 0);
 
-            auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(uiModel)->GetVehicleType());
+            auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
 
             switch (vehicleClass)
             {
@@ -124,8 +124,8 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t uiM
 
             if (pVehicle && AddVehicleToPool(pClientVehicle, pVehicle))
             {
-                pVehicle->m_ucVariant = ucVariation;
-                pVehicle->m_ucVariant2 = ucVariation2;
+                pVehicle->m_ucVariant = variation;
+                pVehicle->m_ucVariant2 = variation2;
 
                 pVehicle->DumpVehicleFrames();
             }

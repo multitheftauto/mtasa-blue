@@ -22,7 +22,7 @@ CHandlingEntry::CHandlingEntry(tHandlingData* pOriginal)
 }
 
 // Apply the handling data from another data
-void CHandlingEntry::ApplyHandlingData(const CHandlingEntry* pData) noexcept
+void CHandlingEntry::ApplyHandlingData(const CHandlingEntry* const pData) noexcept
 {
     if (!pData)
         return;

@@ -213,14 +213,14 @@ int CLuaHandlingDefs::SetVehicleHandling(lua_State* luaVM)
 int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
 {
     //  bool setModelHandling ( int modelId, [ string property, var value ] )
-    std::uint16_t usModel;
+    std::uint16_t model;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModel);
+    argStream.ReadNumber(model);
 
     if (!argStream.HasErrors())
     {
-        if (usModel)
+        if (model)
         {
             if (argStream.NextIsString())
             {
@@ -234,7 +234,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                     {
                         if (argStream.NextIsNil())
                         {
-                            if (CStaticFunctionDefinitions::ResetModelHandlingProperty(usModel, eProperty))
+                            if (CStaticFunctionDefinitions::ResetModelHandlingProperty(model, eProperty))
                             {
                                 lua_pushboolean(luaVM, true);
                                 return 1;
@@ -268,7 +268,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                                 {
                                     float fValue;
                                     argStream.ReadNumber(fValue);
-                                    if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(usModel, eProperty, fValue))
+                                    if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(model, eProperty, fValue))
                                     {
                                         lua_pushboolean(luaVM, true);
                                         return 1;
@@ -288,7 +288,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                                         {
                                             argStream.SetCustomError("Invalid value");
                                         }
-                                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(usModel, eProperty, uiValue))
+                                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(model, eProperty, uiValue))
                                         {
                                             lua_pushboolean(luaVM, true);
                                             return 1;
@@ -301,7 +301,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                                 {
                                     unsigned char ucValue;
                                     argStream.ReadNumber(ucValue);
-                                    if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(usModel, eProperty, ucValue))
+                                    if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(model, eProperty, ucValue))
                                     {
                                         lua_pushboolean(luaVM, true);
                                         return 1;
@@ -329,7 +329,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
 
                                         CVector vecCenterOfMass(fX, fY, fZ);
 
-                                        if (CStaticFunctionDefinitions::SetModelHandling(usModel, eProperty, vecCenterOfMass))
+                                        if (CStaticFunctionDefinitions::SetModelHandling(model, eProperty, vecCenterOfMass))
                                         {
                                             lua_pushboolean(luaVM, true);
                                             return 1;
@@ -347,7 +347,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                                     {
                                         SString strValue;
                                         argStream.ReadString(strValue);
-                                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(usModel, eProperty, strValue))
+                                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(model, eProperty, strValue))
                                         {
                                             lua_pushboolean(luaVM, true);
                                             return 1;
@@ -357,7 +357,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                                 {
                                     bool bValue;
                                     argStream.ReadBool(bValue);
-                                    if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(usModel, eProperty, bValue ? 1.0f : 0.0f))
+                                    if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(model, eProperty, bValue ? 1.0f : 0.0f))
                                     {
                                         lua_pushboolean(luaVM, true);
                                         return 1;
@@ -610,16 +610,16 @@ int CLuaHandlingDefs::GetVehicleHandling(lua_State* luaVM)
 int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 {
     //  table getModelHandling ( int modelId )
-    std::uint16_t usModel;
+    std::uint16_t model;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModel);
+    argStream.ReadNumber(model);
 
     if (!argStream.HasErrors())
     {
-        if (usModel)
+        if (model)
         {
-            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(usModel);
+            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
             if (pEntry)
             {
                 lua_newtable(luaVM);
@@ -782,16 +782,16 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 int CLuaHandlingDefs::GetOriginalHandling(lua_State* luaVM)
 {
     //  table getOriginalHandling ( int modelID )
-    std::uint16_t usModel;
+    std::uint16_t model;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModel);
+    argStream.ReadNumber(model);
 
     if (!argStream.HasErrors())
     {
-        if (usModel)
+        if (model)
         {
-            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usModel);
+            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
             if (pEntry)
             {
                 lua_newtable(luaVM);

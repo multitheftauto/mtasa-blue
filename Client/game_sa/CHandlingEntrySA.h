@@ -91,12 +91,12 @@ public:
     CHandlingEntrySA();
 
     // Constructor for original entries
-    CHandlingEntrySA(tHandlingDataSA* pOriginal);
+    CHandlingEntrySA(const tHandlingDataSA* const pOriginal);
 
-    virtual ~CHandlingEntrySA();
+    virtual ~CHandlingEntrySA(){};
 
     // Use this to copy data from an another handling class to this
-    void Assign(const CHandlingEntry* pEntry) noexcept;
+    void Assign(const CHandlingEntry* const pEntry) noexcept;
 
     // Get functions
     float          GetMass() const noexcept { return m_Handling.fMass; }
@@ -142,7 +142,7 @@ public:
     eLightType    GetTailLight() const noexcept { return static_cast<eLightType>(m_Handling.ucTailLight); }
     unsigned char GetAnimGroup() const noexcept { return m_Handling.ucAnimGroup; }
 
-    eHandlingTypes GetHandlingID() const noexcept { return static_cast<eHandlingTypes>(m_Handling.iVehicleID); }
+    eHandlingTypes GetVehicleID() const noexcept { return static_cast<eHandlingTypes>(m_Handling.iVehicleID); }
 
     // Set functions
     void SetMass(float fMass) noexcept { m_Handling.fMass = fMass; }
@@ -192,11 +192,9 @@ public:
 
     void Recalculate() noexcept;
 
-    tHandlingDataSA* GetInterface() const noexcept { return m_pHandlingSA; }
+    tHandlingDataSA* GetInterface() const noexcept { return m_HandlingSA.get(); }
 
 private:
-    tHandlingDataSA* m_pHandlingSA;
-    bool             m_bDeleteInterface;
-
-    tHandlingDataSA m_Handling;
+    std::unique_ptr<tHandlingDataSA> m_HandlingSA;
+    tHandlingDataSA                  m_Handling;
 };

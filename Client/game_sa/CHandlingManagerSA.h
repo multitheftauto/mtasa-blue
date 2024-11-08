@@ -23,19 +23,19 @@ public:
     CHandlingManagerSA();
     ~CHandlingManagerSA();
 
-    CHandlingEntry*       CreateHandlingData() const noexcept;
-    CFlyingHandlingEntry* CreateFlyingHandlingData() const noexcept;
-    CBoatHandlingEntry*   CreateBoatHandlingData() const noexcept;
-    CBikeHandlingEntry*   CreateBikeHandlingData() const noexcept;
+    std::unique_ptr<CHandlingEntry>       CreateHandlingData() const noexcept;
+    std::unique_ptr<CFlyingHandlingEntry> CreateFlyingHandlingData() const noexcept;
+    std::unique_ptr<CBoatHandlingEntry>   CreateBoatHandlingData() const noexcept;
+    std::unique_ptr<CBikeHandlingEntry>   CreateBikeHandlingData() const noexcept;
 
-    const CHandlingEntry*       GetOriginalHandlingData(std::uint32_t uiModel) const noexcept;
-    const CFlyingHandlingEntry* GetOriginalFlyingHandlingData(std::uint32_t uiModel) const noexcept;
-    const CBoatHandlingEntry*   GetOriginalBoatHandlingData(std::uint32_t uiModel) const noexcept;
-    const CBikeHandlingEntry*   GetOriginalBikeHandlingData(std::uint32_t uiModel) const noexcept;
+    const CHandlingEntry*       GetOriginalHandlingData(std::uint32_t model) const noexcept;
+    const CFlyingHandlingEntry* GetOriginalFlyingHandlingData(std::uint32_t model) const noexcept;
+    const CBoatHandlingEntry*   GetOriginalBoatHandlingData(std::uint32_t model) const noexcept;
+    const CBikeHandlingEntry*   GetOriginalBikeHandlingData(std::uint32_t model) const noexcept;
 
-    eHandlingProperty GetPropertyEnumFromName(const std::string& strName) const noexcept;
+    eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept;
 
-    void CheckSuspensionChanges(const CHandlingEntry* pEntry) const noexcept;
+    void CheckSuspensionChanges(const CHandlingEntry* const pEntry) const noexcept;
 
 private:
     void InitializeDefaultHandlings() noexcept;
