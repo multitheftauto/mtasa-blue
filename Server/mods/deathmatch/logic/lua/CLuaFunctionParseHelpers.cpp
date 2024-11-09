@@ -641,6 +641,41 @@ void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions)
 }
 
 //
+// Check 4x4 lua table
+//
+bool IsValidMatrixLuaTable(lua_State* luaVM, uint uiArgIndex)
+{
+    uint uiRow = 0;
+    uint uiCell = 0;
+
+    if (lua_type(luaVM, uiArgIndex) == LUA_TTABLE)
+    {
+        for (lua_pushnil(luaVM); lua_next(luaVM, uiArgIndex) != 0; lua_pop(luaVM, 1), uiRow++)
+        {
+            if (lua_type(luaVM, -1) != LUA_TTABLE)
+                return false;
+
+            uint uiCol = 0;
+
+            for (lua_pushnil(luaVM); lua_next(luaVM, -2) != 0; lua_pop(luaVM, 1), uiCol++, uiCell++)
+            {
+                int iArgumentType = lua_type(luaVM, -1);
+                if (iArgumentType != LUA_TNUMBER && iArgumentType != LUA_TSTRING)
+                    return false;
+            }
+
+            if (uiCol != 4)
+                return false;
+        }
+    }
+
+    if (uiRow != 4 || uiCell != 16)
+        return false;
+
+    return true;
+}
+
+//
 // 4x4 matrix into CMatrix
 //
 bool ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix)
