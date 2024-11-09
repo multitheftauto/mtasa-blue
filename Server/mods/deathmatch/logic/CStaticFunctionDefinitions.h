@@ -285,11 +285,11 @@ public:
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue);
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue);
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue);
-    static bool GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, float& fValue, bool origin = false);
-    static bool GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, CVector& vecValue, bool origin = false);
-    static bool GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, std::string& strValue, bool origin = false);
-    static bool GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, unsigned int& uiValue, bool origin = false);
-    static bool GetModelHandling(std::uint32_t uiModel, eHandlingProperty eProperty, unsigned char& ucValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, float& fValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, CVector& vecValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, std::string& strValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned int& uiValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned char& ucValue, bool origin = false);
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue);
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue);
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue);
