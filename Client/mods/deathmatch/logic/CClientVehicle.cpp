@@ -2915,17 +2915,17 @@ void CClientVehicle::Destroy()
         m_bIsOnGround = IsOnGround();
         m_fHeliRotorSpeed = GetHeliRotorSpeed();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible();
-        m_HandlingEntry.reset(m_pVehicle->GetHandlingData());
-        m_FlyingHandlingEntry.reset(m_pVehicle->GetFlyingHandlingData());
+        m_HandlingEntry->Assign(m_pVehicle->GetHandlingData());
+        m_FlyingHandlingEntry->Assign(m_pVehicle->GetFlyingHandlingData());
 
         switch (m_eVehicleType)
         {
             case CLIENTVEHICLE_BOAT:
-                m_BoatHandlingEntry.reset(dynamic_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData());
+                m_BoatHandlingEntry->Assign(dynamic_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData());
                 break;
             case CLIENTVEHICLE_BIKE:
             case CLIENTVEHICLE_BMX:
-                m_BikeHandlingEntry.reset(dynamic_cast<CBike*>(m_pVehicle)->GetBikeHandlingData());
+                m_BikeHandlingEntry->Assign(dynamic_cast<CBike*>(m_pVehicle)->GetBikeHandlingData());
                 break;
             default:
                 break;
