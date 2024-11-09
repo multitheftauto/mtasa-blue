@@ -79,27 +79,28 @@
 extern CGame*            g_pGame;
 extern CTimeUsMarker<20> markerLatentEvent;
 
-static CLuaManager*          m_pLuaManager;
-static CColManager*          m_pColManager;
-static CPickupManager*       m_pPickupManager;
-static CPlayerManager*       m_pPlayerManager;
-static CVehicleManager*      m_pVehicleManager;
-static CObjectManager*       m_pObjectManager;
-static CMarkerManager*       m_pMarkerManager;
-static CMapManager*          m_pMapManager;
-static CBlipManager*         m_pBlipManager;
-static CRadarAreaManager*    m_pRadarAreaManager;
-static CTeamManager*         m_pTeamManager;
-static CClock*               m_pClock;
-static CEvents*              m_pEvents;
-static CElementDeleter*      m_pElementDeleter;
-static CMainConfig*          m_pMainConfig;
-static CRegistry*            m_pRegistry;
-static CAccountManager*      m_pAccountManager;
-static CBanManager*          m_pBanManager;
-static CPedManager*          m_pPedManager;
-static CWaterManager*        m_pWaterManager;
-static CCustomWeaponManager* m_pCustomWeaponManager;
+static CLuaManager*                      m_pLuaManager;
+static CColManager*                      m_pColManager;
+static CPickupManager*                   m_pPickupManager;
+static CPlayerManager*                   m_pPlayerManager;
+static CVehicleManager*                  m_pVehicleManager;
+static CObjectManager*                   m_pObjectManager;
+static CMarkerManager*                   m_pMarkerManager;
+static CMapManager*                      m_pMapManager;
+static CBlipManager*                     m_pBlipManager;
+static CRadarAreaManager*                m_pRadarAreaManager;
+static CTeamManager*                     m_pTeamManager;
+static CClock*                           m_pClock;
+static CEvents*                          m_pEvents;
+static CElementDeleter*                  m_pElementDeleter;
+static CMainConfig*                      m_pMainConfig;
+static CRegistry*                        m_pRegistry;
+static CAccountManager*                  m_pAccountManager;
+static CBanManager*                      m_pBanManager;
+static CPedManager*                      m_pPedManager;
+static CWaterManager*                    m_pWaterManager;
+static CCustomWeaponManager*             m_pCustomWeaponManager;
+static std::shared_ptr<CHandlingManager> m_HandlingManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN(func) \
@@ -134,6 +135,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CGame* pGame)
     m_pPedManager = pGame->GetPedManager();
     m_pWaterManager = pGame->GetWaterManager();
     m_pCustomWeaponManager = pGame->GetCustomWeaponManager();
+    m_HandlingManager = pGame->GetHandlingManager();
 }
 
 CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
@@ -5485,11 +5487,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
+        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+        pEntry = m_HandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5509,11 +5511,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
+        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+        pEntry = m_HandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5527,11 +5529,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
+        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+        pEntry = m_HandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5545,11 +5547,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
+        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+        pEntry = m_HandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5563,11 +5565,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
+        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+        pEntry = m_HandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5578,66 +5580,66 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, float fValue)
 {
-    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (SetEntryHandling(pEntry, eProperty, fValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
+    m_HandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, CVector vecValue)
 {
-    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, vecValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
+    m_HandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, std::string strValue)
 {
-    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, strValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
+    m_HandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned char ucValue)
 {
-    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, ucValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
+    m_HandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned int uiValue)
 {
-    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, uiValue))
         return false;
 
-    g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(model, true);
+    m_HandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
@@ -7399,7 +7401,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
 
         if (bUseOriginal)
         {
-            pNewEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
+            pNewEntry = m_HandlingManager->GetOriginalHandlingData(model);
             if (!pNewEntry)
                 return false;
 
@@ -7407,7 +7409,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
         }
         else
         {
-            pNewEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+            pNewEntry = m_HandlingManager->GetModelHandlingData(model);
             if (!pNewEntry)
                 return false;
 
@@ -7545,11 +7547,11 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
 
 bool CStaticFunctionDefinitions::ResetModelHandling(std::uint32_t model)
 {
-    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
-    const CHandlingEntry* pHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
+    const CHandlingEntry* pHandlingEntry = m_HandlingManager->GetOriginalHandlingData(model);
     if (!pHandlingEntry)
         return false;
 
@@ -7559,7 +7561,7 @@ bool CStaticFunctionDefinitions::ResetModelHandling(std::uint32_t model)
 
 bool CStaticFunctionDefinitions::ResetModelHandlingProperty(std::uint32_t model, eHandlingProperty eProperty)
 {
-    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
 
     float         fValue;
     CVector       vecValue;

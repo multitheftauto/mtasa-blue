@@ -19,8 +19,7 @@ extern CGameSA* pGame;
 CHandlingEntrySA::CHandlingEntrySA()
 {
     // Create a new interface and zero it
-    m_HandlingSA = std::make_unique<tHandlingDataSA>();
-    if (m_HandlingSA)
+    if (m_HandlingSA = std::make_unique<tHandlingDataSA>())
     {
         memset(m_HandlingSA.get(), 0, sizeof(tHandlingDataSA));
     }

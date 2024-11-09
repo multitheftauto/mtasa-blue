@@ -47,7 +47,7 @@ int CLuaHandlingDefs::SetVehicleHandling(lua_State* luaVM)
             SString strProperty;
             argStream.ReadString(strProperty);
 
-            eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName(strProperty);
+            eHandlingProperty eProperty = m_HandlingManager->GetPropertyEnumFromName(strProperty);
             if (eProperty)
             {
                 if (argStream.NextIsNil())
@@ -229,7 +229,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
 
                 if (!argStream.HasErrors())
                 {
-                    eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName(strProperty);
+                    eHandlingProperty eProperty = m_HandlingManager->GetPropertyEnumFromName(strProperty);
                     if (eProperty)
                     {
                         if (argStream.NextIsNil())
@@ -402,7 +402,7 @@ int CLuaHandlingDefs::GetVehicleHandling(lua_State* luaVM)
             SString strProperty;
             argStream.ReadString(strProperty);
 
-            eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName(strProperty);
+            eHandlingProperty eProperty = m_HandlingManager->GetPropertyEnumFromName(strProperty);
             if (eProperty == HANDLING_MAX)
             {
                 argStream.SetCustomError("Invalid property");
@@ -619,7 +619,7 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
     {
         if (model)
         {
-            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(model);
+            const CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
             if (pEntry)
             {
                 lua_newtable(luaVM);
@@ -791,7 +791,7 @@ int CLuaHandlingDefs::GetOriginalHandling(lua_State* luaVM)
     {
         if (model)
         {
-            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(model);
+            const CHandlingEntry* pEntry = m_HandlingManager->GetOriginalHandlingData(model);
             if (pEntry)
             {
                 lua_newtable(luaVM);
