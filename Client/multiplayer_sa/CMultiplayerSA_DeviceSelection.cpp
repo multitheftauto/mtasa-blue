@@ -20,64 +20,69 @@ std::map<std::string, std::string, std::less<>> GetFriendlyMonitorNamesForDevice
     return monitorNames;
 #else
     HMODULE user32Lib = LoadLibrary(TEXT("user32"));
-    if (user32Lib != nullptr)
+    if (!user32Lib)
+        return monitorNames;
+
+    auto getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes");
+    auto queryDisplayConfig = (decltype(QueryDisplayConfig)*)GetProcAddress(user32Lib, "QueryDisplayConfig");
+    auto displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo");
+    if (!getDisplayConfigBufferSizes || !queryDisplayConfig || !displayConfigGetDeviceInfo)
     {
-        auto getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes");
-        auto queryDisplayConfig = (decltype(QueryDisplayConfig)*)GetProcAddress(user32Lib, "QueryDisplayConfig");
-        auto displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo");
-        if (getDisplayConfigBufferSizes != nullptr && queryDisplayConfig != nullptr && displayConfigGetDeviceInfo != nullptr)
-        {
-            UINT32                                     pathCount, modeCount;
-            std::unique_ptr<DISPLAYCONFIG_PATH_INFO[]> paths;
-            std::unique_ptr<DISPLAYCONFIG_MODE_INFO[]> modes;
-
-            LONG result = ERROR_SUCCESS;
-            do
-            {
-                result = getDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &pathCount, &modeCount);
-                if (result != ERROR_SUCCESS)
-                {
-                    break;
-                }
-                paths = std::make_unique<DISPLAYCONFIG_PATH_INFO[]>(pathCount);
-                modes = std::make_unique<DISPLAYCONFIG_MODE_INFO[]>(modeCount);
-                result = queryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &pathCount, paths.get(), &modeCount, modes.get(), nullptr);
-            } while (result == ERROR_INSUFFICIENT_BUFFER);
-
-            if (result == ERROR_SUCCESS)
-            {
-                for (size_t i = 0; i < pathCount; i++)
-                {
-                    DISPLAYCONFIG_TARGET_DEVICE_NAME targetName = {};
-                    targetName.header.adapterId = paths[i].targetInfo.adapterId;
-                    targetName.header.id = paths[i].targetInfo.id;
-                    targetName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME;
-                    targetName.header.size = sizeof(targetName);
-                    const LONG targetNameResult = DisplayConfigGetDeviceInfo(&targetName.header);
-
-                    DISPLAYCONFIG_SOURCE_DEVICE_NAME sourceName = {};
-                    sourceName.header.adapterId = paths[i].sourceInfo.adapterId;
-                    sourceName.header.id = paths[i].sourceInfo.id;
-                    sourceName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
-                    sourceName.header.size = sizeof(sourceName);
-                    const LONG sourceNameResult = DisplayConfigGetDeviceInfo(&sourceName.header);
-                    if (targetNameResult == ERROR_SUCCESS && sourceNameResult == ERROR_SUCCESS && targetName.monitorFriendlyDeviceName[0] != '\0')
-                    {
-                        char gdiDeviceName[std::size(sourceName.viewGdiDeviceName)];
-                        char monitorFriendlyDeviceName[std::size(targetName.monitorFriendlyDeviceName)];
-                        WideCharToMultiByte(CP_ACP, 0, sourceName.viewGdiDeviceName, -1, gdiDeviceName, static_cast<int>(std::size(gdiDeviceName)), nullptr,
-                                            nullptr);
-                        WideCharToMultiByte(CP_ACP, 0, targetName.monitorFriendlyDeviceName, -1, monitorFriendlyDeviceName,
-                                            static_cast<int>(std::size(monitorFriendlyDeviceName)), nullptr, nullptr);
-
-                        monitorNames.try_emplace(gdiDeviceName, monitorFriendlyDeviceName);
-                    }
-                }
-            }
-        }
         FreeLibrary(user32Lib);
+        return monitorNames;
     }
 
+    UINT32                                     pathCount, modeCount;
+    std::unique_ptr<DISPLAYCONFIG_PATH_INFO[]> paths;
+    std::unique_ptr<DISPLAYCONFIG_MODE_INFO[]> modes;
+
+    LONG result = ERROR_SUCCESS;
+    do
+    {
+        result = getDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &pathCount, &modeCount);
+        if (result != ERROR_SUCCESS)
+        {
+            break;
+        }
+        paths = std::make_unique<DISPLAYCONFIG_PATH_INFO[]>(pathCount);
+        modes = std::make_unique<DISPLAYCONFIG_MODE_INFO[]>(modeCount);
+        result = queryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &pathCount, paths.get(), &modeCount, modes.get(), nullptr);
+    } while (result == ERROR_INSUFFICIENT_BUFFER);
+
+    if (result != ERROR_SUCCESS)
+    {
+        FreeLibrary(user32Lib);
+        return monitorNames;
+    }
+
+    for (size_t i = 0; i < pathCount; i++)
+    {
+        DISPLAYCONFIG_TARGET_DEVICE_NAME targetName = {};
+        targetName.header.adapterId = paths[i].targetInfo.adapterId;
+        targetName.header.id = paths[i].targetInfo.id;
+        targetName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME;
+        targetName.header.size = sizeof(targetName);
+        const LONG targetNameResult = DisplayConfigGetDeviceInfo(&targetName.header);
+
+        DISPLAYCONFIG_SOURCE_DEVICE_NAME sourceName = {};
+        sourceName.header.adapterId = paths[i].sourceInfo.adapterId;
+        sourceName.header.id = paths[i].sourceInfo.id;
+        sourceName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
+        sourceName.header.size = sizeof(sourceName);
+        const LONG sourceNameResult = DisplayConfigGetDeviceInfo(&sourceName.header);
+        if (targetNameResult == ERROR_SUCCESS && sourceNameResult == ERROR_SUCCESS && targetName.monitorFriendlyDeviceName[0] != '\0')
+        {
+            char gdiDeviceName[std::size(sourceName.viewGdiDeviceName)];
+            char monitorFriendlyDeviceName[std::size(targetName.monitorFriendlyDeviceName)];
+            WideCharToMultiByte(CP_ACP, 0, sourceName.viewGdiDeviceName, -1, gdiDeviceName, static_cast<int>(std::size(gdiDeviceName)), nullptr, nullptr);
+            WideCharToMultiByte(CP_ACP, 0, targetName.monitorFriendlyDeviceName, -1, monitorFriendlyDeviceName,
+                                static_cast<int>(std::size(monitorFriendlyDeviceName)), nullptr, nullptr);
+
+            monitorNames.try_emplace(gdiDeviceName, monitorFriendlyDeviceName);
+        }
+    }
+
+    FreeLibrary(user32Lib);
     return monitorNames;
 #endif
 }
@@ -125,23 +130,21 @@ static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSyst
 static INT_PTR CALLBACK CustomDlgProc(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     auto orgDialogFunc = (DLGPROC)FUNC_DialogFunc;
-    if (msg == WM_INITDIALOG)
-    {
-        orgDialogFunc(window, msg, wParam, lParam);
+    if (msg != WM_INITDIALOG)
+        return orgDialogFunc(window, msg, wParam, lParam);
 
-        // Set Icon
-        HMODULE hGameModule = GetModuleHandle(nullptr);
-        SendMessage(window, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(LoadIcon(hGameModule, MAKEINTRESOURCE(100))));
+    orgDialogFunc(window, msg, wParam, lParam);
 
-        // Make the dialog visible in the task bar
-        // https://stackoverflow.com/a/1462811
-        SetWindowLongPtr(window, GWL_EXSTYLE, WS_EX_APPWINDOW);
-        ShowWindow(window, SW_HIDE);
-        ShowWindow(window, SW_SHOW);
-        return FALSE;
-    }
+    // Set Icon
+    HMODULE hGameModule = GetModuleHandle(nullptr);
+    SendMessage(window, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(LoadIcon(hGameModule, MAKEINTRESOURCE(100))));
 
-    return orgDialogFunc(window, msg, wParam, lParam);
+    // Make the dialog visible in the task bar
+    // https://stackoverflow.com/a/1462811
+    SetWindowLongPtr(window, GWL_EXSTYLE, WS_EX_APPWINDOW);
+    ShowWindow(window, SW_HIDE);
+    ShowWindow(window, SW_SHOW);
+    return FALSE;
 }
 
 void CMultiplayerSA::InitHooks_DeviceSelection()
