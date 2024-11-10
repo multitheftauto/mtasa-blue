@@ -16,9 +16,6 @@ std::map<std::string, std::string, std::less<>> GetFriendlyMonitorNamesForDevice
 {
     std::map<std::string, std::string, std::less<>> monitorNames;
 
-#if WINVER < _WIN32_WINNT_WIN7
-    return monitorNames;
-#else
     HMODULE user32Lib = LoadLibrary(TEXT("user32"));
     if (!user32Lib)
         return monitorNames;
@@ -84,7 +81,6 @@ std::map<std::string, std::string, std::less<>> GetFriendlyMonitorNamesForDevice
 
     FreeLibrary(user32Lib);
     return monitorNames;
-#endif
 }
 
 struct RwSubSystemInfo
