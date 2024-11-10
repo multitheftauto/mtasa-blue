@@ -125,7 +125,7 @@ CGameSA::CGameSA()
     m_pControllerConfigManager = new CControllerConfigManagerSA();
     m_pProjectileInfo = new CProjectileInfoSA();
     m_pRenderWare = new CRenderWareSA();
-    m_pHandlingManager = new CHandlingManagerSA();
+    m_HandlingManager = std::make_shared<CHandlingManagerSA>();
     m_pEventList = new CEventListSA();
     m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
     m_pTasks = new CTasksSA((CTaskManagementSystemSA*)m_pTaskManagementSystem);
@@ -261,7 +261,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAnimManagerSA*>(m_pAnimManager);
     delete reinterpret_cast<CTasksSA*>(m_pTasks);
     delete reinterpret_cast<CTaskManagementSystemSA*>(m_pTaskManagementSystem);
-    delete reinterpret_cast<CHandlingManagerSA*>(m_pHandlingManager);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);

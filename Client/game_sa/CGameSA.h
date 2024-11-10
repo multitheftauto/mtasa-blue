@@ -155,7 +155,7 @@ public:
     CCarEnterExit*            GetCarEnterExit() { return m_pCarEnterExit; }
     CControllerConfigManager* GetControllerConfigManager() { return m_pControllerConfigManager; }
     CRenderWare*              GetRenderWare() { return m_pRenderWare; }
-    CHandlingManager*         GetHandlingManager() { return m_pHandlingManager; }
+    std::shared_ptr<CHandlingManager> GetHandlingManager() const noexcept { return m_HandlingManager; }
     CAnimManager*             GetAnimManager() { return m_pAnimManager; }
     CStreaming*               GetStreaming() { return m_pStreaming; }
     CVisibilityPlugins*       GetVisibilityPlugins() { return m_pVisibilityPlugins; }
@@ -331,7 +331,7 @@ private:
     CExplosionManager*              m_pExplosionManager;
     C3DMarkers*                     m_p3DMarkers;
     CRenderWareSA*                  m_pRenderWare;
-    CHandlingManager*               m_pHandlingManager;
+    std::shared_ptr<CHandlingManager> m_HandlingManager;
     CAnimManager*                   m_pAnimManager;
     CStreaming*                     m_pStreaming;
     CVisibilityPlugins*             m_pVisibilityPlugins;
