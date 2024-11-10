@@ -9,6 +9,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#define FUNC_rwDeviceSystemRequest     0x7F2AB0
+#define FUNC_DialogFunc                0x745E50
+#define FUNC_RwEngineGetSubSystemInfo  0x7F2C30
+#define CLASS_RwGlobals                0xC97B24
+#define CLASS_IDirect3D9               0xC97C20
+#define NUM_DialogFuncStackPushAddress 0x746239
 
 // This is copied from SilentPatch:
 // https://github.com/CookiePLMonster/SilentPatch/blob/dev/SilentPatch/FriendlyMonitorNames.cpp
@@ -88,16 +94,15 @@ struct RwSubSystemInfo
     char name[80];
 };
 
-#define FUNC_rwDeviceSystemRequest 0x7F2AB0
 using rwDeviceSystemRequest = RwSubSystemInfo*(__cdecl*)(RwDevice* device, std::int32_t requestId, RwSubSystemInfo* pOut, void* pInOut, std::int32_t numIn);
 static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSystemInfo, std::int32_t subSystemIndex)
 {
-    auto* rwGlobals = *(RwGlobals**)(0xC97B24);
+    auto* rwGlobals = *(RwGlobals**)CLASS_RwGlobals;
     auto* rwDeviceSystemRequestFunc = (rwDeviceSystemRequest)(FUNC_rwDeviceSystemRequest);
     if (!rwDeviceSystemRequestFunc(&rwGlobals->dOpenDevice, 14, subSystemInfo, nullptr, subSystemIndex))
         return nullptr;
 
-    auto* pDxDevice = *(IDirect3D9**)0xC97C20;
+    auto* pDxDevice = *(IDirect3D9**)CLASS_IDirect3D9;
     if (!pDxDevice)
         return subSystemInfo;
 
@@ -121,7 +126,6 @@ static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSyst
     return subSystemInfo;
 }
 
-#define FUNC_DialogFunc 0x745E50
 INT_PTR CALLBACK CustomDlgProc(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     auto* orgDialogFunc = (DLGPROC)FUNC_DialogFunc;
@@ -142,11 +146,10 @@ INT_PTR CALLBACK CustomDlgProc(HWND window, UINT msg, WPARAM wParam, LPARAM lPar
     return FALSE;
 }
 
-#define FUNC_RwEngineGetSubSystemInfo 0x7F2C30
 void CMultiplayerSA::InitHooks_DeviceSelection()
 {
     // 0x746239 -> Exact address where the original DialogFunc address is being pushed as an argument to DialogBoxParamA(),
     // we're replacing it with out own proxy function
-    MemPut<DLGPROC>(0x746239, (DLGPROC)&CustomDlgProc);
+    MemPut<DLGPROC>(NUM_DialogFuncStackPushAddress, (DLGPROC)&CustomDlgProc);
     HookInstall(FUNC_RwEngineGetSubSystemInfo, (DWORD)RwEngineGetSubSystemInfo_Hooked, 6);
 }
