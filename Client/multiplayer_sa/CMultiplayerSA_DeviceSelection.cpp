@@ -94,7 +94,7 @@ struct RwSubSystemInfo
 
 #define FUNC_rwDeviceSystemRequest 0x7F2AB0
 using rwDeviceSystemRequest = RwSubSystemInfo*(__cdecl*)(RwDevice* device, std::int32_t requestId, RwSubSystemInfo* pOut, void* pInOut, std::int32_t numIn);
-static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSystemInfo, int32_t subSystemIndex)
+static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSystemInfo, std::int32_t subSystemIndex)
 {
     auto rwGlobals = *(RwGlobals**)(0xC97B24);
     auto rwDeviceSystemRequestFunc = (rwDeviceSystemRequest)(FUNC_rwDeviceSystemRequest);
