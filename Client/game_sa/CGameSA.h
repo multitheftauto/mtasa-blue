@@ -125,7 +125,7 @@ public:
     CGameSA();
     ~CGameSA();
 
-    CPools*                   GetPools() { return m_pPools; }
+    std::shared_ptr<CPools>   GetPools() const noexcept { return m_Pools; }
     CPlayerInfo*              GetPlayerInfo() { return m_pPlayerInfo; }
     CProjectileInfo*          GetProjectileInfo() { return m_pProjectileInfo; }
     CRadar*                   GetRadar() { return m_pRadar; }
@@ -311,7 +311,7 @@ public:
     bool SetBuildingPoolSize(size_t size);
 
 private:
-    CPools*                         m_pPools;
+    std::shared_ptr<CPools>         m_Pools;
     CPlayerInfo*                    m_pPlayerInfo;
     CProjectileInfo*                m_pProjectileInfo;
     CRadar*                         m_pRadar;

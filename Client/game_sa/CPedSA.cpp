@@ -718,12 +718,12 @@ CEntity* CPedSA::GetContactEntity()
     CEntitySAInterface* pInterface = ((CPedSAInterface*)GetInterface())->pContactEntity;
     if (pInterface)
     {
-        CPools* pPools = pGame->GetPools();
+        auto pools = pGame->GetPools();
         switch (pInterface->nType)
         {
             case ENTITY_TYPE_VEHICLE:
             {
-                SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)pInterface);
                 if (pVehicleClientEntity)
                 {
                     return pVehicleClientEntity->pEntity;
@@ -732,7 +732,7 @@ CEntity* CPedSA::GetContactEntity()
             }
             case ENTITY_TYPE_OBJECT:
             {
-                SClientEntity<CObjectSA>* pObjectClientEntity = pPools->GetObject((DWORD*)pInterface);
+                SClientEntity<CObjectSA>* pObjectClientEntity = pools->GetObject((DWORD*)pInterface);
                 if (pObjectClientEntity)
                 {
                     return pObjectClientEntity->pEntity;
@@ -758,8 +758,7 @@ CEntity* CPedSA::GetTargetedEntity()
     CEntitySAInterface* pInterface = ((CPedSAInterface*)GetInterface())->pTargetedEntity;
     if (pInterface)
     {
-        CPools* pPools = pGame->GetPools();
-        return pPools->GetEntity((DWORD*)pInterface);
+        return pGame->GetPools()->GetEntity((DWORD*)pInterface);
     }
     return nullptr;
 }

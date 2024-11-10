@@ -20,8 +20,8 @@ CEntity* CCamSA::GetTargetEntity() const
     CEntitySAInterface* pInterface = m_pInterface->CamTargetEntity;
     if (pInterface)
     {
-        CPools* pPools = pGame->GetPools();
-        return pPools->GetEntity((DWORD*)pInterface);
+        auto pools = pGame->GetPools();
+        return pools->GetEntity((DWORD*)pInterface);
     }
     return nullptr;
 }

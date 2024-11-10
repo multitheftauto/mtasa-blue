@@ -7260,7 +7260,7 @@ void PostCWorld_ProcessPedsAfterPreRender()
         m_postWorldProcessPedsAfterPreRenderHandler();
 
     // Scale the object entities
-    CPools* pools = pGameInterface->GetPools();
+    auto pools = pGameInterface->GetPools();
     for (std::uint32_t i = 0; i < MAX_OBJECTS; i++)
     {
         CObject* objectEntity = pools->GetObjectFromIndex(i);

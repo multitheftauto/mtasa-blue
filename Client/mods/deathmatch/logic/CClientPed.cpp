@@ -5108,8 +5108,8 @@ bool CClientPed::IsGettingJacked()
 
 CClientEntity* CClientPed::GetContactEntity()
 {
-    CPools* pPools = g_pGame->GetPools();
-    if (pPools && m_pPlayerPed)
+    auto pools = g_pGame->GetPools();
+    if (pools && m_pPlayerPed)
     {
         CEntity* pEntity = m_pPlayerPed->GetContactEntity();
         if (pEntity)
@@ -5118,7 +5118,7 @@ CClientEntity* CClientPed::GetContactEntity()
             eEntityType         entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
             if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
-                return pPools->GetClientEntity((DWORD*)pInterface);
+                return pools->GetClientEntity((DWORD*)pInterface);
             }
         }
     }
@@ -5477,8 +5477,7 @@ CClientEntity* CClientPed::GetTargetedEntity()
         CEntity* pEntity = m_pPlayerPed->GetTargetedEntity();
         if (pEntity)
         {
-            CPools* pPools = g_pGame->GetPools();
-            pReturn = pPools->GetClientEntity((DWORD*)pEntity->GetInterface());
+            pReturn = g_pGame->GetPools()->GetClientEntity((DWORD*)pEntity->GetInterface());
         }
     }
     return pReturn;

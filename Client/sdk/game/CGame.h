@@ -108,7 +108,7 @@ class __declspec(novtable) CGame
     typedef std::unique_ptr<CAnimBlendAssocGroup> AssocGroup_type;
 
 public:
-    virtual CPools*                   GetPools() = 0;
+    virtual std::shared_ptr<CPools>   GetPools() const noexcept = 0;
     virtual CPlayerInfo*              GetPlayerInfo() = 0;
     virtual CProjectileInfo*          GetProjectileInfo() = 0;
     virtual CRadar*                   GetRadar() = 0;

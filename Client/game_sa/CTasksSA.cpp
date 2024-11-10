@@ -262,7 +262,7 @@ __declspec(noinline) void _cdecl OnCEventHandler_ComputeDamageResponse_Mid(CPedS
                                                                            ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
 {
     // Make sure victim is local player
-    CPedSAInterface* pLocalPlayer = ((CPoolsSA*)pGame->GetPools())->GetPedInterface((DWORD)1);
+    CPedSAInterface* pLocalPlayer = std::static_pointer_cast<CPoolsSA>(pGame->GetPools())->GetPedInterface(1UL);
     if (pPedVictim != pLocalPlayer)
         return;
 

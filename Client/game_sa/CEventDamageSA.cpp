@@ -72,8 +72,7 @@ CEntity* CEventDamageSA::GetInflictingEntity()
     CEntitySAInterface* pInterface = m_pInterface->pInflictor;
     if (pInterface)
     {
-        CPools* pPools = pGame->GetPools();
-        return pPools->GetEntity((DWORD*)pInterface);
+        return pGame->GetPools()->GetEntity((DWORD*)pInterface);
     }
     return pReturn;
 }
