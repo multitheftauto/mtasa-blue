@@ -27,17 +27,17 @@ extern CGameSA*        pGame;
 #define DUMP_HANDLING_DATA 0
 
 // Original handling data unaffected by handling.cfg changes
-tHandlingDataSA                   m_OriginalHandlingData[HT_MAX];
-std::unique_ptr<CHandlingEntrySA> m_OriginalEntries[HT_MAX];
+std::unordered_map<std::size_t, tHandlingDataSA>                   m_OriginalHandlingData;
+std::unordered_map<std::size_t, std::unique_ptr<CHandlingEntrySA>> m_OriginalEntries;
 
-tFlyingHandlingDataSA                   m_OriginalFlyingHandlingData[24];
-std::unique_ptr<CFlyingHandlingEntrySA> m_OriginalFlyingEntries[24];
+std::unordered_map<std::size_t, tFlyingHandlingDataSA>                   m_OriginalFlyingHandlingData;
+std::unordered_map<std::size_t, std::unique_ptr<CFlyingHandlingEntrySA>> m_OriginalFlyingEntries;
 
-tBoatHandlingDataSA                   m_OriginalBoatHandlingData[12];
-std::unique_ptr<CBoatHandlingEntrySA> m_OriginalBoatEntries[12];
+std::unordered_map<std::size_t, tBoatHandlingDataSA>                   m_OriginalBoatHandlingData;
+std::unordered_map<std::size_t, std::unique_ptr<CBoatHandlingEntrySA>> m_OriginalBoatEntries;
 
-tBikeHandlingDataSA                   m_OriginalBikeHandlingData[14];
-std::unique_ptr<CBikeHandlingEntrySA> m_OriginalBikeEntries[14];
+std::unordered_map<std::size_t, tBikeHandlingDataSA>                   m_OriginalBikeHandlingData;
+std::unordered_map<std::size_t, std::unique_ptr<CBikeHandlingEntrySA>> m_OriginalBikeEntries;
 
 std::map<std::string, eHandlingProperty> m_HandlingNames;
 
@@ -124,7 +124,7 @@ static bool IsVehicleModel(std::uint32_t model) noexcept
 {
     try
     {
-        const CModelInfo* pModelInfo = pGame->GetModelInfo(model);
+        const auto* pModelInfo = pGame->GetModelInfo(model);
         return pModelInfo && pModelInfo->IsVehicle();
     }
     catch (...)
@@ -721,9 +721,6 @@ eHandlingTypes CHandlingManagerSA::GetHandlingID(std::uint32_t model) const noex
 
 void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
 {
-    // Reset
-    MemSetFast(m_OriginalHandlingData, 0, sizeof(m_OriginalHandlingData));
-
     // NB: Don't waste your time changing this manually. Use the dumping code
     //     commented out at the bottom :)
     m_OriginalHandlingData[0].iVehicleID = 0;
@@ -9150,7 +9147,7 @@ void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const pEnt
             return;
 
         // Grab us a multiplayer_sa pointer
-        CMultiplayer* const pMultiplayer = g_pCore->GetMultiplayer();
+        const CMultiplayer* const pMultiplayer = g_pCore->GetMultiplayer();
         if (!pMultiplayer)
             return;
 
@@ -9159,27 +9156,31 @@ void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const pEnt
         if (eHandling >= HT_MAX)
             return;
 
-        const auto& OriginalEntries = m_OriginalEntries[eHandling];
-        if (!OriginalEntries)
+        const auto it = m_OriginalEntries.find(eHandling);
+        if (it == m_OriginalEntries.end())
+            return;
+
+        const auto& entries = it->second;
+        if (!entries)
             return;
 
         // Default bChanged to false
         bool bChanged = false;
 
         // Set bChanged to true if we find ANY change.
-        if (pEntry->GetSuspensionAntiDiveMultiplier() != OriginalEntries->GetSuspensionAntiDiveMultiplier())
+        if (pEntry->GetSuspensionAntiDiveMultiplier() != entries->GetSuspensionAntiDiveMultiplier())
             bChanged = true;
-        else if (pEntry->GetSuspensionDamping() != OriginalEntries->GetSuspensionDamping())
+        else if (pEntry->GetSuspensionDamping() != entries->GetSuspensionDamping())
             bChanged = true;
-        else if (pEntry->GetSuspensionForceLevel() != OriginalEntries->GetSuspensionForceLevel())
+        else if (pEntry->GetSuspensionForceLevel() != entries->GetSuspensionForceLevel())
             bChanged = true;
-        else if (pEntry->GetSuspensionFrontRearBias() != OriginalEntries->GetSuspensionFrontRearBias())
+        else if (pEntry->GetSuspensionFrontRearBias() != entries->GetSuspensionFrontRearBias())
             bChanged = true;
-        else if (pEntry->GetSuspensionHighSpeedDamping() != OriginalEntries->GetSuspensionHighSpeedDamping())
+        else if (pEntry->GetSuspensionHighSpeedDamping() != entries->GetSuspensionHighSpeedDamping())
             bChanged = true;
-        else if (pEntry->GetSuspensionLowerLimit() != OriginalEntries->GetSuspensionLowerLimit())
+        else if (pEntry->GetSuspensionLowerLimit() != entries->GetSuspensionLowerLimit())
             bChanged = true;
-        else if (pEntry->GetSuspensionUpperLimit() != OriginalEntries->GetSuspensionUpperLimit())
+        else if (pEntry->GetSuspensionUpperLimit() != entries->GetSuspensionUpperLimit())
             bChanged = true;
 
         if (!bChanged)

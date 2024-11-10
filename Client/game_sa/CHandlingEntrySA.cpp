@@ -21,7 +21,7 @@ CHandlingEntrySA::CHandlingEntrySA()
     // Create a new interface and zero it
     if (m_HandlingSA = std::make_unique<tHandlingDataSA>())
     {
-        memset(m_HandlingSA.get(), 0, sizeof(tHandlingDataSA));
+        MemSet(m_HandlingSA.get(), 0, sizeof(tHandlingDataSA));
     }
 }
 
@@ -31,7 +31,7 @@ CHandlingEntrySA::CHandlingEntrySA(const tHandlingDataSA* const pOriginal)
     m_HandlingSA = nullptr;
     if (pOriginal)
     {
-        memcpy(&m_Handling, pOriginal, sizeof(tHandlingDataSA));
+        MemCpy(&m_Handling, pOriginal, sizeof(tHandlingDataSA));
     }
 }
 
@@ -61,7 +61,7 @@ void CHandlingEntrySA::Recalculate() noexcept
     try
     {
         // Copy our stored field to GTA's
-        memcpy(m_HandlingSA.get(), &m_Handling, sizeof(m_Handling));
+        MemCpy(m_HandlingSA.get(), &m_Handling, sizeof(m_Handling));
         ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_HandlingSA.get());
     }
     catch (...)

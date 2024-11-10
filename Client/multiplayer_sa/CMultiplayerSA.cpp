@@ -6182,7 +6182,7 @@ void _declspec(naked) HOOK_ProcessVehicleCollision()
     }
 }
 
-void CMultiplayerSA::UpdateVehicleSuspension() noexcept
+void CMultiplayerSA::UpdateVehicleSuspension() const noexcept
 {
     HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
     HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));

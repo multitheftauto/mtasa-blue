@@ -34,21 +34,8 @@ public:
     // Helper functions
     eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept;
     bool              HasModelHandlingChanged(std::uint32_t model) const noexcept;
-    void              SetModelHandlingHasChanged(std::uint32_t model, bool bChanged) noexcept;
-
-    std::map<std::string, eHandlingProperty> m_HandlingNames;
+    void              SetModelHandlingHasChanged(std::uint32_t model, bool bChanged) const noexcept;
 
 private:
     void InitializeDefaultHandlings() noexcept;
-
-    // Original handling data unaffected by handling.cfg changes
-    static SFixedArray<tHandlingData, HT_MAX> m_OriginalHandlingData;
-
-    // Array with the original handling entries
-    static SFixedArray<std::unique_ptr<CHandlingEntry>, HT_MAX> m_OriginalEntries;
-
-    // Array with the model handling entries
-    static SFixedArray<std::unique_ptr<CHandlingEntry>, HT_MAX> m_ModelEntries;
-
-    SFixedArray<bool, HT_MAX> m_bModelHandlingChanged;
 };

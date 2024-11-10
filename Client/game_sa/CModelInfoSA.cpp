@@ -273,18 +273,11 @@ bool CModelInfoSA::IsTrailer()
 BYTE CModelInfoSA::GetVehicleType() const noexcept
 {
     // This function will return a vehicle type for vehicles or 0xFF on failure
-    try
-    {
-        if (!IsVehicle())
-            return 0xFF;
+    if (!IsVehicle())
+        return -1;
 
-        auto GetVehicleModelType = reinterpret_cast<BYTE(__cdecl*)(DWORD)>(FUNC_IsVehicleModelType);
-        return GetVehicleModelType(m_dwModelID);
-    }
-    catch (...)
-    {
-        return 0xFF;
-    }
+    auto GetVehicleModelType = reinterpret_cast<BYTE(__cdecl*)(DWORD)>(FUNC_IsVehicleModelType);
+    return GetVehicleModelType(m_dwModelID);
 }
 
 bool CModelInfoSA::IsVehicle() const

@@ -14,10 +14,15 @@
 #include "CCommon.h"
 #include "CVehicleManager.h"
 
-SFixedArray<tHandlingData, HT_MAX> CHandlingManager::m_OriginalHandlingData;
+// Original handling data
+static std::unordered_map<std::size_t, tHandlingData>                   m_OriginalHandlingData;
+static std::unordered_map<std::size_t, std::unique_ptr<CHandlingEntry>> m_OriginalEntries;
 
-SFixedArray<std::unique_ptr<CHandlingEntry>, HT_MAX> CHandlingManager::m_OriginalEntries;
-SFixedArray<std::unique_ptr<CHandlingEntry>, HT_MAX> CHandlingManager::m_ModelEntries;
+// Model handling data
+static std::unordered_map<std::size_t, std::unique_ptr<CHandlingEntry>> m_ModelEntries;
+static std::unordered_map<std::size_t, bool>                            m_bModelHandlingChanged;
+
+static std::map<std::string, eHandlingProperty> m_HandlingNames;
 
 CHandlingManager::CHandlingManager()
 {
@@ -29,10 +34,6 @@ CHandlingManager::CHandlingManager()
     {
         // For every original handling data
         m_OriginalEntries[i] = std::make_unique<CHandlingEntry>(&m_OriginalHandlingData[i]);
-
-        // For every model
-        m_ModelEntries[i] = std::make_unique<CHandlingEntry>(&m_OriginalHandlingData[i]);
-        m_bModelHandlingChanged[i] = false;
     }
 
     // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
@@ -85,14 +86,11 @@ std::unique_ptr<CHandlingEntry> CHandlingManager::CreateHandlingData() const noe
 
 bool CHandlingManager::ApplyHandlingData(std::uint32_t model, CHandlingEntry* pEntry) const noexcept
 {
-    // Within range?
-    if (!CVehicleManager::IsValidModel(model))
+    CHandlingEntry* pHandling = GetModelHandlingData(model);
+    if (!pHandling)
         return false;
 
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(model);
-    // Apply the data and return success
-    m_ModelEntries[eHandling]->ApplyHandlingData(pEntry);
+    pHandling->ApplyHandlingData(pEntry);
     return true;
 }
 
@@ -103,9 +101,14 @@ const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(std::uint32_t mo
         return nullptr;
 
     // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(model);
+    const eHandlingTypes eHandling = GetHandlingID(model);
+
+    const auto it = m_OriginalEntries.find(model);
+    if (it == m_OriginalEntries.end())
+        return nullptr;
+
     // Return it
-    return m_OriginalEntries[eHandling].get();
+    return it->second.get();
 }
 
 CHandlingEntry* CHandlingManager::GetModelHandlingData(std::uint32_t model) const noexcept
@@ -114,10 +117,20 @@ CHandlingEntry* CHandlingManager::GetModelHandlingData(std::uint32_t model) cons
     if (!CVehicleManager::IsValidModel(model))
         return nullptr;
 
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(model);
-    // Return it
-    return m_ModelEntries[eHandling].get();
+    auto entries = m_ModelEntries.find(model);
+    if (entries == m_ModelEntries.end())
+    {
+        // Get our Handling ID
+        const eHandlingTypes eHandling = GetHandlingID(model);
+
+        m_ModelEntries[model] = std::make_unique<CHandlingEntry>(&m_OriginalHandlingData[eHandling]);
+        if (!m_ModelEntries[model])
+            return nullptr;
+
+        entries = m_ModelEntries.find(model);
+    }
+
+    return entries->second.get();
 }
 
 eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& name) const noexcept
@@ -132,22 +145,18 @@ bool CHandlingManager::HasModelHandlingChanged(std::uint32_t model) const noexce
     if (!CVehicleManager::IsValidModel(model))
         return false;
 
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(model);
     // Return if we have changed
-    return m_bModelHandlingChanged[eHandling];
+    return m_bModelHandlingChanged[model];
 }
 
-void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t model, bool bChanged) noexcept
+void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t model, bool bChanged) const noexcept
 {
     // Within range?
     if (!CVehicleManager::IsValidModel(model))
         return;
 
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(model);
     // Return if we have changed.
-    m_bModelHandlingChanged[eHandling] = bChanged;
+    m_bModelHandlingChanged[model] = bChanged;
 }
 
 // Return the handling manager id
