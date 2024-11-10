@@ -96,9 +96,9 @@ struct RwSubSystemInfo
 using rwDeviceSystemRequest = RwSubSystemInfo*(__cdecl*)(RwDevice* device, std::int32_t requestId, RwSubSystemInfo* pOut, void* pInOut, std::int32_t numIn);
 static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSystemInfo, int32_t subSystemIndex)
 {
-    auto        rwGlobals = *(RwGlobals**)(0xC97B24);
+    auto rwGlobals = *(RwGlobals**)(0xC97B24);
     auto rwDeviceSystemRequestFunc = (rwDeviceSystemRequest)(FUNC_rwDeviceSystemRequest);
-    auto        result = rwDeviceSystemRequestFunc(&rwGlobals->dOpenDevice, 14, subSystemInfo, nullptr, subSystemIndex);
+    auto result = rwDeviceSystemRequestFunc(&rwGlobals->dOpenDevice, 14, subSystemInfo, nullptr, subSystemIndex);
     if (!result)
         return nullptr;
 
@@ -127,7 +127,7 @@ static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSyst
 }
 
 #define FUNC_DialogFunc 0x745E50
-static INT_PTR CALLBACK CustomDlgProc(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK CustomDlgProc(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     auto orgDialogFunc = (DLGPROC)FUNC_DialogFunc;
     if (msg != WM_INITDIALOG)
@@ -147,8 +147,11 @@ static INT_PTR CALLBACK CustomDlgProc(HWND window, UINT msg, WPARAM wParam, LPAR
     return FALSE;
 }
 
+#define FUNC_RwEngineGetSubSystemInfo 0x7F2C30
 void CMultiplayerSA::InitHooks_DeviceSelection()
 {
+    // 0x746239 -> Exact address where the original DialogFunc address is being pushed as an argument to DialogBoxParamA(),
+    // we're replacing it with out own proxy function
     MemPut<DLGPROC>(0x746239, (DLGPROC)&CustomDlgProc);
-    HookInstall(0x7F2C30, (DWORD)RwEngineGetSubSystemInfo_Hooked, 6);
+    HookInstall(FUNC_RwEngineGetSubSystemInfo, (DWORD)RwEngineGetSubSystemInfo_Hooked, 6);
 }
