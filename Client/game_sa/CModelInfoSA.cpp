@@ -270,20 +270,21 @@ bool CModelInfoSA::IsTrailer()
     return bReturn;
 }
 
-BYTE CModelInfoSA::GetVehicleType()
+BYTE CModelInfoSA::GetVehicleType() const noexcept
 {
     // This function will return a vehicle type for vehicles or 0xFF on failure
-    DWORD dwFunction = FUNC_IsVehicleModelType;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = -1;
-    _asm
+    try
     {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
+        if (!IsVehicle())
+            return 0xFF;
+
+        auto GetVehicleModelType = reinterpret_cast<BYTE(__cdecl*)(DWORD)>(FUNC_IsVehicleModelType);
+        return GetVehicleModelType(m_dwModelID);
     }
-    return bReturn;
+    catch (...)
+    {
+        return 0xFF;
+    }
 }
 
 bool CModelInfoSA::IsVehicle() const

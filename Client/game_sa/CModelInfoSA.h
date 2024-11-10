@@ -359,7 +359,7 @@ public:
 
     char* GetNameIfVehicle();
 
-    BYTE           GetVehicleType();
+    BYTE           GetVehicleType() const noexcept;
     void           Request(EModelRequestType requestType, const char* szTag);
     void           Remove();
     bool           UnloadUnused();

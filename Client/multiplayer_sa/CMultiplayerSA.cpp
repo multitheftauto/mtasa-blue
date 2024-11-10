@@ -4581,7 +4581,7 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
         pVehicle->GetGravity(&vecGravity);
         pVehicle->GetMoveSpeed(&vecMoveSpeed);
         vecMoveSpeed += vecGravity * fTimeStep * fGravity;
-        pVehicle->SetMoveSpeed(&vecMoveSpeed);
+        pVehicle->SetMoveSpeed(vecMoveSpeed);
     }
     else
     {
@@ -4678,7 +4678,7 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 
     pVehicle->GetMoveSpeed(&gravcam_vecVehicleVelocity);
     CVector vecVelocityInverted = gravcam_matInvertGravity * gravcam_vecVehicleVelocity;
-    pVehicle->SetMoveSpeed(&vecVelocityInverted);
+    pVehicle->SetMoveSpeed(vecVelocityInverted);
     return true;
 }
 
@@ -4874,7 +4874,7 @@ void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
         return;
 
     pVehicle->SetMatrix(&gravcam_matVehicleTransform);
-    pVehicle->SetMoveSpeed(&gravcam_vecVehicleVelocity);
+    pVehicle->SetMoveSpeed(gravcam_vecVehicleVelocity);
 }
 
 void _declspec(naked) HOOK_VehicleCamEnd()
@@ -5012,7 +5012,7 @@ void _cdecl ApplyVehicleBlowHop(DWORD pVehicleInterface)
     pVehicle->GetGravity(&vecGravity);
     pVehicle->GetMoveSpeed(&vecVelocity);
     vecVelocity -= vecGravity * 0.13f;
-    pVehicle->SetMoveSpeed(&vecVelocity);
+    pVehicle->SetMoveSpeed(vecVelocity);
 }
 
 void _declspec(naked) HOOK_ApplyCarBlowHop()

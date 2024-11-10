@@ -131,6 +131,7 @@ struct SVehicleSupportedUpgrades
     bool m_bMisc;
     bool m_bInitialised;
 };
+
 class CModelInfo
 {
 public:
@@ -154,7 +155,7 @@ public:
 
     virtual char* GetNameIfVehicle() = 0;
 
-    virtual BYTE           GetVehicleType() = 0;
+    virtual BYTE           GetVehicleType() const noexcept = 0;
     virtual void           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual bool           IsLoaded() = 0;
     virtual unsigned short GetFlags() = 0;

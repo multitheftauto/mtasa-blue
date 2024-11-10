@@ -92,8 +92,8 @@ public:
     virtual unsigned long          GetPedCount() = 0;
 
     // Others
-    virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
-                               uchar ucTrackId = 0xFF) = 0;
+    virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> Models, bool iDirection,
+                               std::uint8_t ucTrackId = 255) noexcept = 0;
 
     virtual CEntity*       GetEntity(DWORD* pGameInterface) = 0;
     virtual CClientEntity* GetClientEntity(DWORD* pGameInterface) = 0;
