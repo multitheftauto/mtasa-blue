@@ -10,12 +10,6 @@
 
 #include "StdInc.h"
 
-#ifdef _WIN32
-    #ifndef NOMINMAX
-        #define NOMINMAX
-    #endif
-#endif
-
 // This is copied from SilentPatch:
 // https://github.com/CookiePLMonster/SilentPatch/blob/dev/SilentPatch/FriendlyMonitorNames.cpp
 std::map<std::string, std::string, std::less<>> GetFriendlyMonitorNamesForDevicePaths()
