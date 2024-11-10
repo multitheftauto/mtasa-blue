@@ -93,17 +93,17 @@ struct RwSubSystemInfo
 };
 
 #define FUNC_rwDeviceSystemRequest 0x7F2AB0
-using rwDeviceSystemRequest = RwSubSystemInfo*(__cdecl*)(void* device, uint32_t requestId, RwSubSystemInfo* pOut, void* pInOut, uint32_t numIn);
+using rwDeviceSystemRequest = RwSubSystemInfo*(__cdecl*)(RwDevice* device, std::int32_t requestId, RwSubSystemInfo* pOut, void* pInOut, std::int32_t numIn);
 static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSystemInfo, int32_t subSystemIndex)
 {
-    static auto rwDeviceSystemRequestFunc = (rwDeviceSystemRequest)(FUNC_rwDeviceSystemRequest);
-    auto        devicePointer = *(uint32_t*)(0xC97B24);
-    auto        result = rwDeviceSystemRequestFunc((void*)(devicePointer + 0x10), 14, subSystemInfo, nullptr, subSystemIndex);
-    if (result == nullptr)
+    auto        rwGlobals = *(RwGlobals**)(0xC97B24);
+    auto rwDeviceSystemRequestFunc = (rwDeviceSystemRequest)(FUNC_rwDeviceSystemRequest);
+    auto        result = rwDeviceSystemRequestFunc(&rwGlobals->dOpenDevice, 14, subSystemInfo, nullptr, subSystemIndex);
+    if (!result)
         return nullptr;
 
     auto pDxDevice = *(IDirect3D9**)0xC97C20;
-    if (pDxDevice == nullptr)
+    if (!pDxDevice)
         return subSystemInfo;
 
     D3DADAPTER_IDENTIFIER9 identifier;
