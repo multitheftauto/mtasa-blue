@@ -104,7 +104,7 @@ CGameSA::CGameSA()
     m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
     m_pAudioContainer = new CAudioContainerSA();
     m_pWorld = new CWorldSA();
-    m_pPools = new CPoolsSA();
+    m_Pools = std::make_unique<CPoolsSA>();
     m_pClock = new CClockSA();
     m_pRadar = new CRadarSA();
     m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);
@@ -208,17 +208,17 @@ CGameSA::CGameSA()
     m_Cheats[CHEAT_HEALTARMORMONEY] = new SCheatSA((BYTE*)VAR_HealthArmorMoney, false);
 
     // Change pool sizes here
-    m_pPools->SetPoolCapacity(TASK_POOL, 5000);                                               // Default is 500
-    m_pPools->SetPoolCapacity(OBJECT_POOL, MAX_OBJECTS);                                      // Default is 350
-    m_pPools->SetPoolCapacity(EVENT_POOL, 5000);                                              // Default is 200
-    m_pPools->SetPoolCapacity(COL_MODEL_POOL, 12000);                                         // Default is 10150
-    m_pPools->SetPoolCapacity(ENV_MAP_MATERIAL_POOL, 16000);                                  // Default is 4096
-    m_pPools->SetPoolCapacity(ENV_MAP_ATOMIC_POOL, 4000);                                     // Default is 1024
-    m_pPools->SetPoolCapacity(SPEC_MAP_MATERIAL_POOL, 16000);                                 // Default is 4096
-    m_pPools->SetPoolCapacity(ENTRY_INFO_NODE_POOL, MAX_ENTRY_INFO_NODES);                    // Default is 500
-    m_pPools->SetPoolCapacity(POINTER_SINGLE_LINK_POOL, MAX_POINTER_SINGLE_LINKS);            // Default is 70000
-    m_pPools->SetPoolCapacity(POINTER_DOUBLE_LINK_POOL, MAX_POINTER_DOUBLE_LINKS);            // Default is 3200
-    dassert(m_pPools->GetPoolCapacity(POINTER_SINGLE_LINK_POOL) == MAX_POINTER_SINGLE_LINKS);
+    m_Pools->SetPoolCapacity(TASK_POOL, 5000);                                                // Default is 500
+    m_Pools->SetPoolCapacity(OBJECT_POOL, MAX_OBJECTS);                                       // Default is 350
+    m_Pools->SetPoolCapacity(EVENT_POOL, 5000);                                               // Default is 200
+    m_Pools->SetPoolCapacity(COL_MODEL_POOL, 12000);                                          // Default is 10150
+    m_Pools->SetPoolCapacity(ENV_MAP_MATERIAL_POOL, 16000);                                   // Default is 4096
+    m_Pools->SetPoolCapacity(ENV_MAP_ATOMIC_POOL, 4000);                                      // Default is 1024
+    m_Pools->SetPoolCapacity(SPEC_MAP_MATERIAL_POOL, 16000);                                  // Default is 4096
+    m_Pools->SetPoolCapacity(ENTRY_INFO_NODE_POOL, MAX_ENTRY_INFO_NODES);                     // Default is 500
+    m_Pools->SetPoolCapacity(POINTER_SINGLE_LINK_POOL, MAX_POINTER_SINGLE_LINKS);             // Default is 70000
+    m_Pools->SetPoolCapacity(POINTER_DOUBLE_LINK_POOL, MAX_POINTER_DOUBLE_LINKS);             // Default is 3200
+    dassert(m_Pools->GetPoolCapacity(POINTER_SINGLE_LINK_POOL) == MAX_POINTER_SINGLE_LINKS);
 
     // Increase streaming object instances list size
     MemPut<WORD>(0x05B8E55, MAX_RWOBJECT_INSTANCES * 12);            // Default is 1000 * 12
@@ -275,7 +275,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CCameraSA*>(m_pCamera);
     delete reinterpret_cast<CRadarSA*>(m_pRadar);
     delete reinterpret_cast<CClockSA*>(m_pClock);
-    delete reinterpret_cast<CPoolsSA*>(m_pPools);
     delete reinterpret_cast<CWorldSA*>(m_pWorld);
     delete reinterpret_cast<CAudioEngineSA*>(m_pAudioEngine);
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
@@ -1010,8 +1009,8 @@ void CGameSA::RemoveAllBuildings()
 {
     m_pIplStore->SetDynamicIplStreamingEnabled(false);
 
-    m_pPools->GetDummyPool().RemoveAllBuildingLods();
-    m_pPools->GetBuildingsPool().RemoveAllBuildings();
+    m_Pools->GetDummyPool().RemoveAllBuildingLods();
+    m_Pools->GetBuildingsPool().RemoveAllBuildings();
 
     auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
     pBuildingRemoval->DropCaches();
@@ -1021,8 +1020,8 @@ void CGameSA::RemoveAllBuildings()
 
 void CGameSA::RestoreGameBuildings()
 {
-    m_pPools->GetBuildingsPool().RestoreAllBuildings();
-    m_pPools->GetDummyPool().RestoreAllBuildingsLods();
+    m_Pools->GetBuildingsPool().RestoreAllBuildings();
+    m_Pools->GetDummyPool().RestoreAllBuildingsLods();
 
     m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
     m_isBuildingsRemoved = false;
@@ -1040,7 +1039,7 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
         static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
     }
 
-    bool status = m_pPools->GetBuildingsPool().Resize(size);
+    bool status = m_Pools->GetBuildingsPool().Resize(size);
 
     if (shouldRemoveBuilding)
     {
