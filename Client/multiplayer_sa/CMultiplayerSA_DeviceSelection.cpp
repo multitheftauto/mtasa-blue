@@ -20,9 +20,9 @@ std::map<std::string, std::string, std::less<>> GetFriendlyMonitorNamesForDevice
     if (!user32Lib)
         return monitorNames;
 
-    auto getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes");
-    auto queryDisplayConfig = (decltype(QueryDisplayConfig)*)GetProcAddress(user32Lib, "QueryDisplayConfig");
-    auto displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo");
+    auto* getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes");
+    auto* queryDisplayConfig = (decltype(QueryDisplayConfig)*)GetProcAddress(user32Lib, "QueryDisplayConfig");
+    auto* displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo");
     if (!getDisplayConfigBufferSizes || !queryDisplayConfig || !displayConfigGetDeviceInfo)
     {
         FreeLibrary(user32Lib);
@@ -92,12 +92,12 @@ struct RwSubSystemInfo
 using rwDeviceSystemRequest = RwSubSystemInfo*(__cdecl*)(RwDevice* device, std::int32_t requestId, RwSubSystemInfo* pOut, void* pInOut, std::int32_t numIn);
 static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSystemInfo, std::int32_t subSystemIndex)
 {
-    auto rwGlobals = *(RwGlobals**)(0xC97B24);
-    auto rwDeviceSystemRequestFunc = (rwDeviceSystemRequest)(FUNC_rwDeviceSystemRequest);
+    auto* rwGlobals = *(RwGlobals**)(0xC97B24);
+    auto* rwDeviceSystemRequestFunc = (rwDeviceSystemRequest)(FUNC_rwDeviceSystemRequest);
     if (!rwDeviceSystemRequestFunc(&rwGlobals->dOpenDevice, 14, subSystemInfo, nullptr, subSystemIndex))
         return nullptr;
 
-    auto pDxDevice = *(IDirect3D9**)0xC97C20;
+    auto* pDxDevice = *(IDirect3D9**)0xC97C20;
     if (!pDxDevice)
         return subSystemInfo;
 
@@ -124,7 +124,7 @@ static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSyst
 #define FUNC_DialogFunc 0x745E50
 INT_PTR CALLBACK CustomDlgProc(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    auto orgDialogFunc = (DLGPROC)FUNC_DialogFunc;
+    auto* orgDialogFunc = (DLGPROC)FUNC_DialogFunc;
     if (msg != WM_INITDIALOG)
         return orgDialogFunc(window, msg, wParam, lParam);
 
