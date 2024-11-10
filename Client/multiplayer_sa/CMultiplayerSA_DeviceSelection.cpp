@@ -94,8 +94,7 @@ static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSyst
 {
     auto rwGlobals = *(RwGlobals**)(0xC97B24);
     auto rwDeviceSystemRequestFunc = (rwDeviceSystemRequest)(FUNC_rwDeviceSystemRequest);
-    auto result = rwDeviceSystemRequestFunc(&rwGlobals->dOpenDevice, 14, subSystemInfo, nullptr, subSystemIndex);
-    if (!result)
+    if (!rwDeviceSystemRequestFunc(&rwGlobals->dOpenDevice, 14, subSystemInfo, nullptr, subSystemIndex))
         return nullptr;
 
     auto pDxDevice = *(IDirect3D9**)0xC97C20;
