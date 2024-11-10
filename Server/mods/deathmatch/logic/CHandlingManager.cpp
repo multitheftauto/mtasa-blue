@@ -103,12 +103,8 @@ const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(std::uint32_t mo
     // Get our Handling ID
     const eHandlingTypes eHandling = GetHandlingID(model);
 
-    const auto it = m_OriginalEntries.find(model);
-    if (it == m_OriginalEntries.end())
-        return nullptr;
-
     // Return it
-    return it->second.get();
+    return m_OriginalEntries[eHandling].get();
 }
 
 CHandlingEntry* CHandlingManager::GetModelHandlingData(std::uint32_t model) const noexcept
