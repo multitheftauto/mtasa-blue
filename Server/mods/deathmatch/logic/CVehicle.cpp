@@ -850,12 +850,14 @@ void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOut
 
 void CVehicle::GenerateHandlingData() noexcept
 {
+    const auto handlingManager = g_pGame->GetHandlingManager();
+
     // Make a new CHandlingEntry
     if (!m_HandlingEntry)
-        m_HandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
+        m_HandlingEntry = handlingManager->CreateHandlingData();
 
     // Apply the model handling info
-    m_HandlingEntry->ApplyHandlingData(g_pGame->GetHandlingManager()->GetModelHandlingData(m_usModel));
+    m_HandlingEntry->ApplyHandlingData(handlingManager->GetModelHandlingData(m_usModel));
 
     m_bHandlingChanged = false;
 }

@@ -86,11 +86,11 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
         if (!pInterface)
             return nullptr;
 
-        const auto* modelInfo = pGame->GetModelInfo(model);
-        if (!modelInfo || !modelInfo->IsVehicle())
+        const auto* const pModelInfo = pGame->GetModelInfo(model);
+        if (!pModelInfo || !pModelInfo->IsVehicle())
             return nullptr;
 
-        auto vehicleClass = static_cast<VehicleClass>(modelInfo->GetVehicleType());
+        auto vehicleClass = static_cast<VehicleClass>(pModelInfo->GetVehicleType());
 
         std::unique_ptr<CVehicleSA> vehicle = nullptr;
         switch (vehicleClass)

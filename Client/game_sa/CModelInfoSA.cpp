@@ -286,9 +286,12 @@ bool CModelInfoSA::IsVehicle() const
     if (m_dwModelID >= 20000)
         return false;
 
+    if (!IsAllocatedInArchive())
+        return false;
+
     // NOTE(botder): m_pInterface might be a nullptr here, we can't use it
-    CBaseModelInfoSAInterface* model = ppModelInfo[m_dwModelID];
-    return model != nullptr && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
+    CBaseModelInfoSAInterface* pModel = ppModelInfo[m_dwModelID];
+    return pModel && reinterpret_cast<intptr_t>(pModel->VFTBL) == vftable_CVehicleModelInfo;
 }
 
 bool CModelInfoSA::IsPlayerModel()
@@ -748,9 +751,16 @@ bool CModelInfoSA::IsValid()
     return true;
 }
 
-bool CModelInfoSA::IsAllocatedInArchive()
+bool CModelInfoSA::IsAllocatedInArchive() const noexcept
 {
-    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
+    try
+    {
+        return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()

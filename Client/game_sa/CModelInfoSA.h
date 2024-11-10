@@ -374,7 +374,7 @@ public:
     static void    StaticResetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
-    bool           IsAllocatedInArchive();
+    bool           IsAllocatedInArchive() const noexcept;
     float          GetDistanceFromCentreOfMassToBaseOfModel();
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
