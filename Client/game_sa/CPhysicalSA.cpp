@@ -237,7 +237,8 @@ CEntity* CPhysicalSA::GetDamageEntity()
     CEntitySAInterface* pInterface = ((CPhysicalSAInterface*)GetInterface())->m_pCollidedEntity;
     if (pInterface)
     {
-        return pGame->GetPools()->GetEntity((DWORD*)pInterface);
+        CPools* pPools = pGame->GetPools();
+        return pPools->GetEntity((DWORD*)pInterface);
     }
     return nullptr;
 }
@@ -260,7 +261,8 @@ CEntity* CPhysicalSA::GetAttachedEntity()
     CEntitySAInterface* pInterface = ((CPhysicalSAInterface*)GetInterface())->m_pAttachedEntity;
     if (pInterface)
     {
-        return pGame->GetPools()->GetEntity((DWORD*)pInterface);
+        CPools* pPools = pGame->GetPools();
+        return pPools->GetEntity((DWORD*)pInterface);
     }
     return nullptr;
 }

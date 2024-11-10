@@ -1901,9 +1901,9 @@ CClientVehicle* CClientVehicle::GetPreviousTrainCarriage()
         CVehicle* pPreviousTrainCarriage = m_pVehicle->GetPreviousTrainCarriage();
         if (pPreviousTrainCarriage)
         {
-            auto                       pools = g_pGame->GetPools();
+            CPools*                    pPools = g_pGame->GetPools();
             CEntitySAInterface*        pInterface = pPreviousTrainCarriage->GetInterface();
-            SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)pInterface);
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
             if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
             {
                 return reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
@@ -1923,9 +1923,9 @@ CClientVehicle* CClientVehicle::GetNextTrainCarriage()
         CVehicle* pNextTrainCarriage = m_pVehicle->GetNextTrainCarriage();
         if (pNextTrainCarriage)
         {
-            auto                       pools = g_pGame->GetPools();
+            CPools*                    pPools = g_pGame->GetPools();
             CEntitySAInterface*        pInterface = pNextTrainCarriage->GetInterface();
-            SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)pInterface);
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
             if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
             {
                 return reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
@@ -3075,8 +3075,8 @@ CClientVehicle* CClientVehicle::GetTowedVehicle()
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
         {
-            auto                       pools = g_pGame->GetPools();
-            SClientEntity<CVehicleSA>* pVehicleEntity = pools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
+            CPools*                    pPools = g_pGame->GetPools();
+            SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
             if (pVehicleEntity && pVehicleEntity->pClientEntity)
             {
                 return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
@@ -3094,8 +3094,8 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle()
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
         {
-            auto                       pools = g_pGame->GetPools();
-            SClientEntity<CVehicleSA>* pVehicleEntity = pools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
+            CPools*                    pPools = g_pGame->GetPools();
+            SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
             if (pVehicleEntity && pVehicleEntity->pClientEntity)
             {
                 return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
@@ -3366,8 +3366,8 @@ CClientEntity* CClientVehicle::GetPickedUpEntityWithWinch()
         CPhysical* pPhysical = m_pVehicle->QueryPickedUpEntityWithWinch();
         if (pPhysical)
         {
-            auto pools = g_pGame->GetPools();
-            pEntity = pools->GetClientEntity((DWORD*)pPhysical->GetInterface());
+            CPools* pPools = g_pGame->GetPools();
+            pEntity = pPools->GetClientEntity((DWORD*)pPhysical->GetInterface());
         }
     }
 

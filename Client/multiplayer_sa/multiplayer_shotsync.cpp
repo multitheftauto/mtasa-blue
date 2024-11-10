@@ -77,7 +77,7 @@ char szDebug[255] = {'\0'};
 DWORD RETURN_CProjectile__AddProjectile = 0x401C3D;
 DWORD RETURN_CProjectile__CProjectile = 0x4037B3;
 
-std::shared_ptr<CPools> m_pools = nullptr;
+CPools* m_pools = 0;
 
 #define VAR_CWorld_IncludeCarTyres 0xb7cd70 // Used for CWorld_ProcessLineOfSight
 
@@ -764,8 +764,8 @@ bool ProcessDamageEvent(CEventDamageSAInterface* event, CPedSAInterface* affects
 {
     if (m_pDamageHandler && event)
     {
-        auto                   pools = pGameInterface->GetPools();
-        SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)affectsPed);
+        CPoolsSA*              pPools = (CPoolsSA*)pGameInterface->GetPools();
+        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)affectsPed);
         CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
         CEntity*               pInflictor = NULL;
 
@@ -929,7 +929,7 @@ void _declspec(naked) HOOK_CFireManager__StartFire_()
     }
 }
 
-static CEntity* GetProjectileOwner(std::shared_ptr<CPools> pools)
+static CEntity* GetProjectileOwner(CPools* pPools)
 {
     CEntity* pOwner = nullptr;
     if (pProjectileOwner)
@@ -938,7 +938,7 @@ static CEntity* GetProjectileOwner(std::shared_ptr<CPools> pools)
         {
             case ENTITY_TYPE_VEHICLE:
             {
-                SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)pProjectileOwner);
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pProjectileOwner);
                 if (pVehicleClientEntity)
                 {
                     pOwner = pVehicleClientEntity->pEntity;
@@ -947,7 +947,7 @@ static CEntity* GetProjectileOwner(std::shared_ptr<CPools> pools)
             }
             case ENTITY_TYPE_PED:
             {
-                SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)pProjectileOwner);
+                SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pProjectileOwner);
                 if (pPedClientEntity)
                 {
                     pOwner = pPedClientEntity->pEntity;
@@ -959,7 +959,7 @@ static CEntity* GetProjectileOwner(std::shared_ptr<CPools> pools)
     return pOwner;
 }
 
-static void GetProjectileTarget(std::shared_ptr<CPools> pools)
+static void GetProjectileTarget(CPools* pPools)
 {
     projectileTargetEntity = nullptr;
 
@@ -969,7 +969,7 @@ static void GetProjectileTarget(std::shared_ptr<CPools> pools)
         {
             case ENTITY_TYPE_VEHICLE:
             {
-                SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)projectileTargetEntityInterface);
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)projectileTargetEntityInterface);
                 if (pVehicleClientEntity)
                 {
                     projectileTargetEntity = pVehicleClientEntity->pEntity;
@@ -978,7 +978,7 @@ static void GetProjectileTarget(std::shared_ptr<CPools> pools)
             }
             case ENTITY_TYPE_PED:
             {
-                SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)projectileTargetEntityInterface);
+                SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)projectileTargetEntityInterface);
                 if (pPedClientEntity)
                 {
                     projectileTargetEntity = pPedClientEntity->pEntity;
@@ -997,9 +997,9 @@ bool ProcessProjectileAdd()
 {
     if (m_pProjectileStopHandler)
     {
-        auto     pools = pGameInterface->GetPools();
-        CEntity* pOwner = GetProjectileOwner(pools);
-        GetProjectileTarget(pools);
+        CPools*  pPools = pGameInterface->GetPools();
+        CEntity* pOwner = GetProjectileOwner(pPools);
+        GetProjectileTarget(pPools);
 
         return m_pProjectileStopHandler(pOwner, projectileWeaponType, projectileOrigin, projectileForce, projectileTarget, projectileTargetEntity);
     }
@@ -1010,9 +1010,9 @@ void ProcessProjectile()
 {
     if (m_pProjectileHandler != NULL)
     {
-        auto     pools = pGameInterface->GetPools();
-        CEntity* pOwner = GetProjectileOwner(pools);
-        GetProjectileTarget(pools);
+        CPoolsSA* pPools = (CPoolsSA*)pGameInterface->GetPools();
+        CEntity*  pOwner = GetProjectileOwner(pPools);
+        GetProjectileTarget(pPools);
 
         CProjectileInfo* projectileInfo = pGameInterface->GetProjectileInfo()->GetProjectileInfo(dwProjectileInfoIndex);
         CProjectile*     projectile = pGameInterface->GetProjectileInfo()->GetProjectile(pProjectile);
@@ -1698,8 +1698,8 @@ void CEventVehicleExplosion_NotifyDeathmatch()
 {
     if (m_pDeathHandler)
     {
-        auto                   pools = pGameInterface->GetPools();
-        SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)CEventVehicleExplosion_pPed);
+        CPoolsSA*              pPools = (CPoolsSA*)pGameInterface->GetPools();
+        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)CEventVehicleExplosion_pPed);
         CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
 
         if (pPed)

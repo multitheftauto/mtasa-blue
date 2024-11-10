@@ -39,7 +39,7 @@ CEntity* CExplosionSA::GetExplosionCreator()
 {
     eEntityType entityType = (eEntityType)GetInterface()->m_pEntExplosionOwner->nType;
 
-    auto pools = pGame->GetPools();
+    CPools* pools = pGame->GetPools();
     switch (entityType)
     {
         case ENTITY_TYPE_PED:

@@ -52,7 +52,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     SetInterface((CEntitySAInterface*)dwPedPointer);
 
     Init();            // init our interfaces
-    auto      pools = pGame->GetPools();
+    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
     SetModelIndex(nModelIndex);
@@ -65,7 +65,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     m_pData = new CPlayerPedDataSAInterface;
 
     // Copy the local player data so we're defaulted to something good
-    CPlayerPedSA* pLocalPlayerSA = dynamic_cast<CPlayerPedSA*>(pools->GetPedFromRef(1UL));
+    CPlayerPedSA* pLocalPlayerSA = dynamic_cast<CPlayerPedSA*>(pools->GetPedFromRef((DWORD)1));
     if (pLocalPlayerSA)
         MemCpyFast(m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface())->pPlayerData, sizeof(CPlayerPedDataSAInterface));
 
@@ -104,6 +104,7 @@ CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
     SetInterface((CEntitySAInterface*)pPlayer);
 
     Init();
+    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
     SetType(PLAYER_PED);
     BeingDeleted = false;
 
@@ -148,7 +149,7 @@ CPlayerPedSA::~CPlayerPedSA()
             }
         }
         BeingDeleted = true;
-        pGame->GetPools()->RemovePed((CPed*)(CPedSA*)this, false);
+        ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
     }
 
     // Delete the player data

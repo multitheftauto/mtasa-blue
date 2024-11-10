@@ -42,7 +42,7 @@ bool CClientExplosionManager::Hook_StaticExplosionCreation(CEntity* pGameExplodi
 bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEntity, CEntity* pGameCreator, const CVector& vecPosition,
                                                      eExplosionType explosionType)
 {
-    const auto pools = g_pGame->GetPools();
+    CPools* const pPools = g_pGame->GetPools();
 
     // Grab the entity responsible
     CEntity* const pResponsibleGameEntity = pGameExplodingEntity ? pGameExplodingEntity : pGameCreator;
@@ -50,7 +50,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     if (!pResponsibleGameEntity)
         return false;
 
-    CClientEntity* const pResponsible = pools->GetClientEntity(reinterpret_cast<DWORD*>(pResponsibleGameEntity->GetInterface()));
+    CClientEntity* const pResponsible = pPools->GetClientEntity(reinterpret_cast<DWORD*>(pResponsibleGameEntity->GetInterface()));
 
     if (!pResponsible)
         return false;

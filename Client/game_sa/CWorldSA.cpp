@@ -452,8 +452,8 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
     // Building info needed?
     if (pBuildingResult)
     {
-        auto pools = pGame->GetPools();
-        if (pools)
+        CPoolsSA* pPools = ((CPoolsSA*)pGame->GetPools());
+        if (pPools)
         {
             if (targetEntity && targetEntity->nType == ENTITY_TYPE_BUILDING)
             {
@@ -498,12 +498,12 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
 
     if (CollisionEntity)
     {
-        auto pools = pGame->GetPools();
-        if (pools)
+        CPools* pPools = pGame->GetPools();
+        if (pPools)
         {
             if (targetEntity)
             {
-                *CollisionEntity = pools->GetEntity((DWORD*)targetEntity);
+                *CollisionEntity = pPools->GetEntity((DWORD*)targetEntity);
             }
         }
     }

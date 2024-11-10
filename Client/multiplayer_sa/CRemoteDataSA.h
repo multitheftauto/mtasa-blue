@@ -73,6 +73,6 @@ public:
     static void                  RemoveRemoteDataStorage(CPlayerPed* pPed);
 
 private:
-    static std::shared_ptr<CPools>                      m_Pools;
+    static CPools*                                      m_pPools;
     static std::map<CPlayerPed*, CRemoteDataStorageSA*> m_RemoteData;
 };

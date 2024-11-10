@@ -161,7 +161,7 @@ CObjectSA::~CObjectSA()
         }
 
         BeingDeleted = true;
-        pGame->GetPools()->RemoveObject((CObject*)(CObjectSA*)this);
+        ((CPoolsSA*)pGame->GetPools())->RemoveObject((CObject*)(CObjectSA*)this);
     }
 }
 

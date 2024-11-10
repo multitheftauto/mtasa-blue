@@ -1647,8 +1647,8 @@ CClientEntity* CStaticFunctionDefinitions::GetPedTarget(CClientPed& Ped)
     CClientEntity* pCollisionEntity = NULL;
     if (pCollisionGameEntity)
     {
-        auto pools = g_pGame->GetPools();
-        pCollisionEntity = pools->GetClientEntity((DWORD*)pCollisionGameEntity->GetInterface());
+        CPools* pPools = g_pGame->GetPools();
+        pCollisionEntity = pPools->GetClientEntity((DWORD*)pCollisionGameEntity->GetInterface());
         return pCollisionEntity;
     }
 
@@ -6412,8 +6412,8 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
     if (pIgnoredEntity)
         g_pGame->GetWorld()->IgnoreEntity(NULL);
 
-    auto pools = g_pGame->GetPools();
-    *pColEntity = pColGameEntity ? pools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
+    CPools* pPools = g_pGame->GetPools();
+    *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
     return true;
 }
 

@@ -236,7 +236,7 @@ CVehicleSA::~CVehicleSA()
             }
         }
         BeingDeleted = true;
-        pGame->GetPools()->RemoveVehicle((CVehicle*)this);
+        ((CPoolsSA*)pGame->GetPools())->RemoveVehicle((CVehicle*)this);
     }
 }
 
@@ -830,11 +830,12 @@ void CVehicleSA::SetEngineOn(bool bEngineOn)
 
 CPed* CVehicleSA::GetDriver()
 {
-    auto             pools = pGame->GetPools();
+    CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
+
     CPedSAInterface* pDriver = GetVehicleInterface()->pDriver;
-    if (pools && pDriver)
+    if (pDriver)
     {
-        SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)pDriver);
+        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pDriver);
         if (pPedClientEntity)
         {
             return pPedClientEntity->pEntity;
@@ -845,13 +846,14 @@ CPed* CVehicleSA::GetDriver()
 
 CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
 {
-    auto pools = pGame->GetPools();
-    if (pools && ucSlot < 8)
+    CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
+
+    if (ucSlot < 8)
     {
         CPedSAInterface* pPassenger = GetVehicleInterface()->pPassengers[ucSlot];
         if (pPassenger)
         {
-            SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)pPassenger);
+            SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pPassenger);
             if (pPedClientEntity)
             {
                 return pPedClientEntity->pEntity;
@@ -1245,7 +1247,8 @@ CPhysical* CVehicleSA::QueryPickedUpEntityWithWinch()
 
     if (phys)
     {
-        return reinterpret_cast<CPhysical*>(pGame->GetPools()->GetEntity((DWORD*)phys));
+        CPools* pPools = pGame->GetPools();
+        return reinterpret_cast<CPhysical*>(pPools->GetEntity((DWORD*)phys));
     }
     return nullptr;
 }

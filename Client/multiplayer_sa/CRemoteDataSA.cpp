@@ -14,12 +14,12 @@
 // These includes have to be fixed!
 #include "../game_sa/CPedSA.h"
 
-std::shared_ptr<CPools>                      CRemoteDataSA::m_Pools;
+CPools*                                      CRemoteDataSA::m_pPools;
 std::map<CPlayerPed*, CRemoteDataStorageSA*> CRemoteDataSA::m_RemoteData;
 
 void CRemoteDataSA::Init()
 {
-    m_Pools = pGameInterface->GetPools();
+    m_pPools = pGameInterface->GetPools();
 }
 
 CRemoteDataStorageSA* CRemoteDataSA::GetRemoteDataStorage(CPlayerPed* pPlayerPed)
@@ -34,7 +34,7 @@ CRemoteDataStorageSA* CRemoteDataSA::GetRemoteDataStorage(CPlayerPed* pPlayerPed
 
 CRemoteDataStorageSA* CRemoteDataSA::GetRemoteDataStorage(CPedSAInterface* ped)
 {
-    SClientEntity<CPedSA>* pPedClientEntity = m_Pools->GetPed((DWORD*)ped);
+    SClientEntity<CPedSA>* pPedClientEntity = m_pPools->GetPed((DWORD*)ped);
     if (pPedClientEntity)
     {
         CPlayerPed* pPed = dynamic_cast<CPlayerPed*>(pPedClientEntity->pEntity);

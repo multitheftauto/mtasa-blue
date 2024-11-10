@@ -366,7 +366,8 @@ CEntity* CCameraSA::GetTargetEntity()
     CEntitySAInterface* pInterface = GetInterface()->pTargetEntity;
     if (pInterface)
     {
-        return pGame->GetPools()->GetEntity((DWORD*)pInterface);
+        CPools* pPools = pGame->GetPools();
+        return pPools->GetEntity((DWORD*)pInterface);
     }
     return nullptr;
 }
