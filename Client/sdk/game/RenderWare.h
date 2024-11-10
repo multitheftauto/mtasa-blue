@@ -549,7 +549,7 @@ struct RwDevice
     // RwIm3DRenderPrimitiveFunction        fpIm3DRenderPrimitive;
     // RwIm3DRenderIndexedPrimitiveFunction fpIm3DRenderIndexedPrimitive;
 };
-// static_assert(sizeof(RwDevice) == 0x38, "Incorrect class size: RwGlobals");
+// static_assert(sizeof(RwDevice) == 0x38, "Incorrect class size: RwDevice");
 
 typedef bool (*RwStandardFunc)(void*, void*, std::int32_t);
 struct RwGlobals
