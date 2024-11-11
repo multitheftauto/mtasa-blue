@@ -86,11 +86,12 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
         if (!pInterface)
             return nullptr;
 
-        const auto* const pModelInfo = pGame->GetModelInfo(model);
-        if (!pModelInfo || !pModelInfo->IsVehicle())
+        // Valid model?
+        const auto* const modelInfo = pGame->GetModelInfo(model);
+        if (!modelInfo || !modelInfo->IsVehicle())
             return nullptr;
 
-        auto vehicleClass = static_cast<VehicleClass>(pModelInfo->GetVehicleType());
+        auto vehicleClass = static_cast<VehicleClass>(modelInfo->GetVehicleType());
 
         std::unique_ptr<CVehicleSA> vehicle = nullptr;
         switch (vehicleClass)
@@ -585,7 +586,7 @@ static void CreateMissionTrain(const CVector& vecPos, bool bDirection, std::uint
     }
 }
 
-CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> Models, bool bDirection,
+CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> models, bool bDirection,
                              std::uint8_t ucTrackId) noexcept
 {
     // clean the existing array
@@ -593,8 +594,13 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
 
     // now load the models we're going to use and add them to the array
     std::size_t count = 0;
-    for (const auto model : Models)
+    for (const auto model : models)
     {
+        // Valid model?
+        const auto* const modelInfo = pGame->GetModelInfo(model);
+        if (!modelInfo || !modelInfo->IsVehicle())
+            return nullptr;
+
         if (model == 449 || model == 537 || model == 538 || model == 569 || model == 590 || model == 570)
         {
             MemPutFast<DWORD>(VAR_TrainModelArray + count * 4, model);

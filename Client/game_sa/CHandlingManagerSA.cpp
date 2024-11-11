@@ -124,8 +124,8 @@ static bool IsVehicleModel(std::uint32_t model) noexcept
 {
     try
     {
-        const auto* const pModelInfo = pGame->GetModelInfo(model);
-        return pModelInfo && pModelInfo->IsVehicle();
+        const auto* const modelInfo = pGame->GetModelInfo(model);
+        return modelInfo && modelInfo->IsVehicle();
     }
     catch (...)
     {

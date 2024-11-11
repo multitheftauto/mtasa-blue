@@ -290,8 +290,8 @@ bool CModelInfoSA::IsVehicle() const
         return false;
 
     // NOTE(botder): m_pInterface might be a nullptr here, we can't use it
-    CBaseModelInfoSAInterface* pModel = ppModelInfo[m_dwModelID];
-    return pModel && reinterpret_cast<intptr_t>(pModel->VFTBL) == vftable_CVehicleModelInfo;
+    CBaseModelInfoSAInterface* model = ppModelInfo[m_dwModelID];
+    return model && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
 }
 
 bool CModelInfoSA::IsPlayerModel()

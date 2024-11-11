@@ -76,7 +76,7 @@ public:
     uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
-    CVehicle* AddTrain(CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> Models, bool bDirection,
+    CVehicle* AddTrain(CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> models, bool bDirection,
                        std::uint8_t ucTrackId = 255) noexcept;
 
     DWORD GetPedPoolIndex(std::uint8_t* pInterface);
