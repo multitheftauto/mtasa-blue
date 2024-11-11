@@ -27,6 +27,8 @@ constexpr std::array<std::uint32_t, 2> MAP_IMAGE_SIZES = {1024, 2048};
 
 CPlayerMap::CPlayerMap(CClientManager* pManager)
 {
+    m_failedToLoadTextures = false;
+
     // Setup our managers
     m_pManager = pManager;
     m_pRadarMarkerManager = pManager->GetRadarMarkerManager();
@@ -55,16 +57,8 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_iHorizontalMovement = 0;
     m_iVerticalMovement = 0;
 
-    // Create the local player blip image
-    m_playerMarkerTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
-
-    // Create the map image
-    m_mapImageTexture = nullptr;
-    m_playerMapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
-    SetMapImage(m_playerMapImageIndex);
-
-    // Create the marker textures
-    CreateMarkerTextures();
+    // Create all map textures
+    CreateAllTextures();
 
     // Create the text displays for the help text
     const SColorRGBA colorWhiteTransparent(255, 255, 255, 200);
@@ -120,13 +114,61 @@ CPlayerMap::~CPlayerMap()
     // Don't need to delete the help texts as those are destroyed by the display manager
 }
 
-void CPlayerMap::SetMapImage(std::size_t imageIndex)
+void CPlayerMap::CreateOrUpdateMapTexture()
 {
-    std::uint32_t mapSize = MAP_IMAGE_SIZES[imageIndex];
-    SString       fileName("MTA\\cgui\\images\\map_%d.png", mapSize);
+    const std::uint32_t mapSize = MAP_IMAGE_SIZES[m_playerMapImageIndex];
+    const SString       fileName("MTA\\cgui\\images\\map_%d.png", mapSize);
+
+    auto* newTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, mapSize, mapSize, RFORMAT_DXT1);
+    if (!newTexture)
+        throw std::runtime_error("Failed to load map image");
 
     SAFE_RELEASE(m_mapImageTexture);
-    m_mapImageTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, mapSize, mapSize, RFORMAT_DXT1);
+    m_mapImageTexture = newTexture;
+}
+
+void CPlayerMap::UpdateOrRevertMapTexture(std::size_t newImageIndex)
+{
+    const std::size_t oldImageIndex = m_playerMapImageIndex;
+    try
+    {
+        m_playerMapImageIndex = newImageIndex;
+        CreateOrUpdateMapTexture();
+    }
+    catch (const std::exception& e)
+    {
+        m_playerMapImageIndex = oldImageIndex;
+        g_pCore->GetConsole()->Printf("Problem updating map image: %s", e.what());
+    }
+}
+
+void CPlayerMap::CreatePlayerBlipTexture()
+{
+    m_playerMarkerTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png"));
+    if (!m_playerMarkerTexture)
+        throw std::runtime_error("Failed to load player blip image");
+}
+
+void CPlayerMap::CreateAllTextures()
+{
+    try
+    {
+        // Create the map texture
+        m_mapImageTexture = nullptr;
+        m_playerMapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
+        CreateOrUpdateMapTexture();
+
+        // Create the player blip texture
+        CreatePlayerBlipTexture();
+
+        // Create the other marker textures
+        CreateMarkerTextures();
+    }
+    catch (const std::exception& e)
+    {
+        m_failedToLoadTextures = true;
+        g_pCore->GetConsole()->Printf("Problem initializing player map: %s", e.what());
+    }
 }
 
 void CPlayerMap::DoPulse()
@@ -173,7 +215,7 @@ void CPlayerMap::DoPulse()
 //
 void CPlayerMap::CreateMarkerTextures()
 {
-    assert(m_markerTextureList.empty());
+    m_markerTextureList.clear();
     SString strRadarSetDirectory = CalcMTASAPath("MTA\\cgui\\images\\radarset\\");
 
     // Load the 3 shapes
@@ -184,7 +226,8 @@ void CPlayerMap::CreateMarkerTextures()
         m_markerTextureList.push_back(pTextureItem);
     }
 
-    assert(m_markerTextureList.size() == MARKER_FIRST_SPRITE_INDEX);
+    if (m_markerTextureList.size() != MARKER_FIRST_SPRITE_INDEX)
+        throw std::runtime_error("Failed to load marker textures [1]");
 
     // Load the icons
     for (uint i = 0; i < RADAR_MARKER_LIMIT; i++)
@@ -193,7 +236,8 @@ void CPlayerMap::CreateMarkerTextures()
         m_markerTextureList.push_back(pTextureItem);
     }
 
-    assert(m_markerTextureList.size() == MARKER_LAST_SPRITE_INDEX + 1);
+    if (m_markerTextureList.size() != MARKER_LAST_SPRITE_INDEX + 1)
+        throw std::runtime_error("Failed to load marker textures [2]");
 }
 
 //
@@ -245,8 +289,8 @@ void CPlayerMap::DoRender()
 {
     bool isMapShowing = IsPlayerMapShowing();
 
-    // Render if showing
-    if (isMapShowing)
+    // Render if showing and textures are all loaded
+    if (isMapShowing && !m_failedToLoadTextures)
     {
         // Get the alpha value from the settings
         int mapAlpha;
@@ -257,8 +301,7 @@ void CPlayerMap::DoRender()
         auto mapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
         if (mapImageIndex != m_playerMapImageIndex)
         {
-            m_playerMapImageIndex = mapImageIndex;
-            SetMapImage(m_playerMapImageIndex);
+            UpdateOrRevertMapTexture(mapImageIndex);
         }
 
         g_pCore->GetGraphics()->DrawTexture(m_mapImageTexture, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),

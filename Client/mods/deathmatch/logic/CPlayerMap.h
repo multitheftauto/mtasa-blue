@@ -42,6 +42,10 @@ protected:
 
     void          CreateMarkerTextures();
     CTextureItem* GetMarkerTexture(CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor);
+    void          CreatePlayerBlipTexture();
+    void          CreateOrUpdateMapTexture();
+    void          UpdateOrRevertMapTexture(std::size_t imageIndex);
+    void          CreateAllTextures();
 
 public:
     bool IsAttachedToLocalPlayer() const { return m_bIsAttachedToLocal; };
@@ -62,8 +66,6 @@ public:
     void ZoomIn();
     void ZoomOut();
 
-    void SetMapImage(std::size_t imageIndex);
-
     SString GetBoundKeyName(const SString& strCommand);
 
 private:
@@ -80,6 +82,8 @@ private:
     class CClientManager*            m_pManager;
     class CClientRadarMarkerManager* m_pRadarMarkerManager;
     class CClientRadarAreaManager*   m_pRadarAreaManager;
+
+    bool m_failedToLoadTextures;
 
     std::size_t m_playerMapImageIndex;
 
