@@ -275,4 +275,8 @@
           Max events per interval range: 1 to 1000. Default: 100  -->
     <player_triggered_event_interval>1000</player_triggered_event_interval>
     <max_player_triggered_events_per_interval>100</max_player_triggered_events_per_interval>
+	
+	<!-- This parameter determines if resource client files that end in PNG, DFF and TXD should be checked for errors;
+          Values: 0 - Off, 1 - Enabled.  Default - 1 -->
+    <resource_client_file_checks>1</resource_client_file_checks>
 </config>
