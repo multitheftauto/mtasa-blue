@@ -18,9 +18,9 @@
 
 // This is copied from SilentPatch:
 // https://github.com/CookiePLMonster/SilentPatch/blob/dev/SilentPatch/FriendlyMonitorNames.cpp
-std::map<std::string, std::string, std::less<>> GetFriendlyMonitorNamesForDevicePaths()
+std::unordered_map<std::string, std::string> GetFriendlyMonitorNamesForDevicePaths()
 {
-    std::map<std::string, std::string, std::less<>> monitorNames;
+    std::unordered_map<std::string, std::string> monitorNames;
 
     HMODULE user32Lib = LoadLibrary(TEXT("user32"));
     if (!user32Lib)
