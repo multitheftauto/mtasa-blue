@@ -87,11 +87,10 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
             return nullptr;
 
         // Valid model?
-        const auto* const modelInfo = pGame->GetModelInfo(model);
-        if (!modelInfo || !modelInfo->IsVehicle())
+        if (!CModelInfoSA::IsVehicleModel(model))
             return nullptr;
 
-        auto vehicleClass = static_cast<VehicleClass>(modelInfo->GetVehicleType());
+        auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
 
         std::unique_ptr<CVehicleSA> vehicle = nullptr;
         switch (vehicleClass)
@@ -597,8 +596,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
     for (const auto model : models)
     {
         // Valid model?
-        const auto* const modelInfo = pGame->GetModelInfo(model);
-        if (!modelInfo || !modelInfo->IsVehicle())
+        if (!CModelInfoSA::IsVehicleModel(model))
             return nullptr;
 
         if (model == 449 || model == 537 || model == 538 || model == 569 || model == 590 || model == 570)

@@ -294,6 +294,19 @@ bool CModelInfoSA::IsVehicle() const
     return model && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
 }
 
+bool CModelInfoSA::IsVehicleModel(std::uint32_t model) noexcept
+{
+    try
+    {
+        const auto* const modelInfo = pGame->GetModelInfo(model);
+        return modelInfo && modelInfo->IsVehicle();
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
 bool CModelInfoSA::IsPlayerModel()
 {
     return (GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == (CColModelSAInterface*)VAR_CTempColModels_ModelPed1);

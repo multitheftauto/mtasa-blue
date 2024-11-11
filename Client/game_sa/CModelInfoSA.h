@@ -468,6 +468,8 @@ public:
 
     bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != 0xffff : false; };
 
+    static bool IsVehicleModel(std::uint32_t model) noexcept;
+
 private:
     void CopyStreamingInfoFromModel(ushort usCopyFromModelID);
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);

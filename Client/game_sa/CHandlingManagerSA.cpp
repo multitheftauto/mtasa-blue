@@ -120,19 +120,6 @@ static __declspec(naked) void Hook_Calculate()
     }
 }
 
-static bool IsVehicleModel(std::uint32_t model) noexcept
-{
-    try
-    {
-        const auto* const modelInfo = pGame->GetModelInfo(model);
-        return modelInfo && modelInfo->IsVehicle();
-    }
-    catch (...)
-    {
-        return false;
-    }
-}
-
 CHandlingManagerSA::CHandlingManagerSA()
 {
     // Initialize all default handlings
@@ -231,7 +218,7 @@ std::unique_ptr<CBikeHandlingEntry> CHandlingManagerSA::CreateBikeHandlingData()
 const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(std::uint32_t model) const noexcept
 {
     // Vehicle?
-    if (!IsVehicleModel(model))
+    if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
@@ -243,7 +230,7 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(std::uint32_t 
 const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(std::uint32_t model) const noexcept
 {
     // Vehicle?
-    if (!IsVehicleModel(model))
+    if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
@@ -258,7 +245,7 @@ const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(st
 const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::uint32_t model) const noexcept
 {
     // Vehicle?
-    if (!IsVehicleModel(model))
+    if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
@@ -273,7 +260,7 @@ const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::u
 const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::uint32_t model) const noexcept
 {
     // Vehicle?
-    if (!IsVehicleModel(model))
+    if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
