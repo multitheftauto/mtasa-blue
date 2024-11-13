@@ -1799,9 +1799,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
         }
 
         // Check if another player is using the same serial
-        CPlayer* playerExisting = m_pPlayerManager->GetBySerial(strSerial);
-
-        if (playerExisting)
+        if (m_pPlayerManager->GetBySerial(strSerial))
         {
             // Tell the console
             CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
