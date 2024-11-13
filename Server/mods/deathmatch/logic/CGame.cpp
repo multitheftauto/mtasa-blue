@@ -1798,6 +1798,19 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             return;
         }
 
+        // Check if another player is using the same serial
+        CPlayer* playerExisting = m_pPlayerManager->GetBySerial(strSerial);
+
+        if (playerExisting)
+        {
+            // Tell the console
+            CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
+
+            // Tell the player the problem
+            DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
+            return;
+        }
+
         // Check the nick is valid
         if (!CheckNickProvided(szNick))
         {

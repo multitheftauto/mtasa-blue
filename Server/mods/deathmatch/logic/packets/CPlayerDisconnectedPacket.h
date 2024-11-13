@@ -35,6 +35,7 @@ public:
         ELEMENT_FAILURE,
         GENERAL_REFUSED,
         SERIAL_VERIFICATION,
+        SERIAL_DUPLICATE,
         CONNECTION_DESYNC,
         BAN,
         KICK,
