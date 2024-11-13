@@ -40,7 +40,7 @@ public:
 
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false);
-    CPlayer* GetBySerial(const SString& serial) noexcept;
+    CPlayer* GetBySerial(const SString& serial) const noexcept;
 
     std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
     std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };

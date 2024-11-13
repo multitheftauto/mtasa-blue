@@ -138,7 +138,7 @@ CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive)
     return NULL;
 }
 
-CPlayer* CPlayerManager::GetBySerial(const SString& serial) noexcept
+CPlayer* CPlayerManager::GetBySerial(const SString& serial) const noexcept
 {
     for (auto& player : m_Players)
     {
