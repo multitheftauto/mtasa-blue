@@ -79,6 +79,7 @@ CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_bSyncMapElementData = true;
+    m_elementDataWhitelisted = false;
 }
 
 bool CMainConfig::Load()
@@ -132,6 +133,9 @@ bool CMainConfig::Load()
         CLogger::ErrorPrintf("Server name must be between 1 and 96 characters\n");
         return false;
     }
+
+    // Strip spaces from beginning and end of server name
+    m_strServerName = SString(m_strServerName).TrimStart(" ").TrimEnd(" ");
 
     // Grab the forced server ip(s)
     GetString(m_pRootNode, "serverip", m_strServerIP);
@@ -522,6 +526,8 @@ bool CMainConfig::Load()
         GetInteger(m_pRootNode, "lightsync_rate", g_TickRateSettings.iLightSync);
         g_TickRateSettings.iLightSync = Clamp(200, g_TickRateSettings.iLightSync, 4000);
     }
+
+    GetBoolean(m_pRootNode, "elementdata_whitelisted", m_elementDataWhitelisted);
 
     ApplyNetOptions();
 
@@ -1465,6 +1471,7 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {false, false, 0, 0, 1, "fakelag", &m_bFakeLagCommandEnabled, NULL},
         {true, true, 50, 1000, 5000, "player_triggered_event_interval", &m_iPlayerTriggeredEventIntervalMs, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
         {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
+        {true, true, 0, 1, 1, "resource_client_file_checks", &m_checkResourceClientFiles, nullptr},
     };
 
     static std::vector<SIntSetting> settingsList;
