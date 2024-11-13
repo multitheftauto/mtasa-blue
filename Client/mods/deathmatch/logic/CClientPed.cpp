@@ -1340,6 +1340,10 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
         }
     }
 
+    // Wrong seat or undefined passengers count?
+    if ((uiSeat > 0 && uiSeat > pVehicle->m_ucMaxPassengers) || (uiSeat > 0 && pVehicle->m_ucMaxPassengers == 255))
+        return;
+
     // Transfer WaitingForGroundToLoad state to vehicle
     if (m_bIsLocalPlayer)
     {
@@ -3873,22 +3877,7 @@ void CClientPed::_ChangeModel()
                 // So make sure clothes geometry is built now...
                 m_pClothes->AddAllToModel();
                 m_pPlayerPed->RebuildPlayer();
-
-                // ...and decrement the extra ref
-            #ifdef NO_CRASH_FIX_TEST2
-                m_pPlayerPed->RemoveGeometryRef();
-            #endif
-            }
-            else
-            {
-                // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
-                // So decrement the extra ref here
-            #ifdef NO_CRASH_FIX_TEST
-                m_pPlayerPed->RemoveGeometryRef();
-            #endif
-                // As we will have problem removing the geometry later, we might as well keep the model cached until exit
-                g_pCore->AddModelToPersistentCache((ushort)m_ulModel);
-            }
+            }    
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
             pLoadedModel->RemoveRef(true);
@@ -5650,28 +5639,6 @@ bool CClientPed::IsRunningAnimation()
         return false;
     }
     return (m_AnimationCache.bLoop && m_pAnimationBlock);
-}
-
-void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
-{
-    KillAnimation();
-
-    if (m_pPlayerPed)
-    {
-        // Remove jetpack now so it doesn't stay on (#9522#c25612)
-        if (HasJetPack())
-            SetHasJetPack(false);
-
-        // Let's not choke them any longer
-        if (IsChoking())
-            SetChoking(false);
-
-        CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunAnim(animGroup, animID, 4.0f, TASK_SIMPLE_ANIM, "TASK_SIMPLE_ANIM");
-        if (pTask)
-        {
-            pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
-        }
-    }
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
