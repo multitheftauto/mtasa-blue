@@ -2656,7 +2656,12 @@ void CClientVehicle::Create()
         {
             if (m_pPassengers[i])
             {
-                m_pPassengers[i]->WarpIntoVehicle(this, i + 1);
+                // Undefined passengers count?
+                if (m_ucMaxPassengers != 255)
+                    m_pPassengers[i]->WarpIntoVehicle(this, i + 1);
+                else
+                    m_pPassengers[i]->SetWarpInToVehicleRequired(false);
+
                 if (m_pPassengers[i])
                     m_pPassengers[i]->StreamIn(true);
             }
