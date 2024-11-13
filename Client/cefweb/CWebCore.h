@@ -54,7 +54,7 @@ class CWebCore : public CWebCoreInterface
 public:
     CWebCore();
     ~CWebCore();
-    bool Initialise(bool gpuEnabled, bool gpuCompositingEnabled) override;
+    bool Initialise(bool gpuEnabled) override;
 
     CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent);
     void               DestroyWebView(CWebViewInterface* pWebViewInterface);
@@ -109,7 +109,6 @@ public:
     static void StaticFetchBlacklistFinished(const SHttpDownloadResult& result);
 
     bool GetGPUEnabled() const noexcept;
-    bool GetGPUCompositingEnabled() const noexcept;
 
 private:
     typedef std::pair<bool, eWebFilterType> WebFilterPair;
@@ -135,5 +134,4 @@ private:
 
     // Shouldn't be changed after init
     bool m_bGPUEnabled;
-    bool m_bGPUCompositingEnabled;
 };
