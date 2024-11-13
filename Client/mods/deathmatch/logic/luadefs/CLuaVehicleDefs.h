@@ -179,4 +179,9 @@ public:
     LUA_DECLARE(SetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponents);
+
+    static bool SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime);
+
+    static bool SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state);
+    static bool IsSmokeTrailEnabled(CClientVehicle* vehicle) noexcept;
 };

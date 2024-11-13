@@ -954,14 +954,19 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType,
+                                                std::optional<eCustomDataClientTrust> clientTrust)
 {
     assert(pElement);
     assert(szName);
     assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    ESyncType     lastSyncType = ESyncType::BROADCAST;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+    ESyncType              lastSyncType = ESyncType::BROADCAST;
+    eCustomDataClientTrust lastClientTrust{};
+    CLuaArgument*          pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType, &lastClientTrust);
+
+    if (clientTrust.has_value() && lastClientTrust != clientTrust.value())
+        pElement->GetCustomDataManager().SetClientChangesMode(szName, clientTrust.value());
 
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
@@ -8358,6 +8363,43 @@ bool CStaticFunctionDefinitions::SetObjectBreakable(CElement* pElement, const bo
     return false;
 }
 
+bool CStaticFunctionDefinitions::RespawnObject(CElement* const pElement) noexcept
+{
+    RUN_CHILDREN(RespawnObject(*iter));
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+    if (!pObject)
+        return false;
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, RESPAWN_OBJECT, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ToggleObjectRespawn(CElement* const pElement, const bool bRespawn) noexcept
+{
+    RUN_CHILDREN(ToggleObjectRespawn(*iter, bRespawn));
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+    if (!pObject)
+        return false;
+
+    pObject->SetRespawnEnabled(bRespawn);
+
+    CBitStream BitStream;
+    BitStream->WriteBit(bRespawn);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, TOGGLE_OBJECT_RESPAWN, *BitStream.pBitStream));
+
+    return true;
+}
+
 CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color,
                                                         CElement* pVisibleTo)
 {
@@ -12450,4 +12492,15 @@ bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, f
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::uint8_t collisionType, std::int32_t removalTime)
+{
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(nodeIndex);
+    bitStream.pBitStream->Write(collisionType);
+    bitStream.pBitStream->Write(removalTime);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SPAWN_VEHICLE_FLYING_COMPONENT, *bitStream.pBitStream));
+
+    return true;
 }

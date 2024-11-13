@@ -917,6 +917,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxRemoteJavascript->GetPosition(vecTemp);
     m_pCheckBoxRemoteJavascript->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxBrowserGPUEnabled = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable GPU rendering"), true));
+    m_pCheckBoxBrowserGPUEnabled->SetPosition(CVector2D(vecTemp.fX + 300.0f, vecTemp.fY - 25.0f));
+    m_pCheckBoxBrowserGPUEnabled->AutoSize(NULL, 20.0f);
+
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);
@@ -3287,6 +3291,8 @@ void CSettings::LoadData()
     m_pCheckBoxRemoteBrowser->SetSelected(bVar);
     CVARS_GET("browser_remote_javascript", bVar);
     m_pCheckBoxRemoteJavascript->SetSelected(bVar);
+    CVARS_GET("browser_enable_gpu", bVar);
+    m_pCheckBoxBrowserGPUEnabled->SetSelected(bVar);
 
     ReloadBrowserLists();
 }
@@ -3711,6 +3717,13 @@ void CSettings::SaveData()
             bBrowserSettingChanged = true;
     }
 
+    bool bBrowserGPUEnabled = false;
+    CVARS_GET("browser_enable_gpu", bBrowserGPUEnabled);
+
+    bool bBrowserGPUSetting = m_pCheckBoxBrowserGPUEnabled->GetSelected();
+    bool bBrowserGPUSettingChanged = (bBrowserGPUSetting != bBrowserGPUEnabled);
+    CVARS_SET("browser_enable_gpu", bBrowserGPUSetting);
+
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues();
 
@@ -3720,7 +3733,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
