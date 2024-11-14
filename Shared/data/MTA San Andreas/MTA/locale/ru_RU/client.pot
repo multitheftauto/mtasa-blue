@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-21 22:24+0000\n"
-"PO-Revision-Date: 2024-10-21 23:20\n"
+"POT-Creation-Date: 2024-10-23 16:33+0000\n"
+"PO-Revision-Date: 2024-11-14 17:36\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -160,31 +160,31 @@ msgstr "(Режим разработки) писать идентификато�
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1089 Client/core/CCore.cpp:674
 #: Client/core/CSettings.cpp:3489
 msgid "In-game"
-msgstr ""
+msgstr "В игре"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:374
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "Летает на НЛО вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:374
 msgid "Cruising around"
-msgstr ""
+msgstr "Путешествует вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:374
 msgid "Riding the waves of"
-msgstr ""
+msgstr "Плавает по волнам в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:375
 msgid "Riding the train in"
-msgstr ""
+msgstr "Ездит на поезде в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:375
 msgid "Flying around"
-msgstr ""
+msgstr "Летает вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:376
 msgid "Riding around"
-msgstr ""
+msgstr "Ездит вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:376
 msgid "Monster truckin' around"
@@ -429,23 +429,23 @@ msgstr "Отключено: соединение было сброшено"
 msgid "MTA Client verification failed!"
 msgstr "Проверка клиента MTA не удалась!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "In a ditch"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "En-route to hospital"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "Meeting their maker"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
 msgid "Regretting their decisions"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
 msgid "Wasted"
 msgstr "Потрачено"
 
@@ -540,7 +540,7 @@ msgstr "Отключение: Такой никнейм уже использу�
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
 msgid "Disconnected: Player element could not be created."
-msgstr "Отключен: Элемент Player не может быть создан."
+msgstr "Отключение: \"Элемент\" игрок не может быть создан."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:567
 #, c-format
@@ -748,16 +748,16 @@ msgstr "Отмена"
 msgid "Download error: %s"
 msgstr "Ошибка скачивания: %s"
 
-#: Client/game_sa/CSettingsSA.cpp:767
+#: Client/game_sa/CSettingsSA.cpp:781
 msgid "Can't find valid screen resolution."
 msgstr "Невозможно подобрать подходящее разрешение экрана."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:843
+#: Client/game_sa/CSettingsSA.cpp:857
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Вы уверены, что хотите использовать это разрешение экрана?"
 
-#: Client/game_sa/CSettingsSA.cpp:845 Client/loader/Dialogs.cpp:194
+#: Client/game_sa/CSettingsSA.cpp:859 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -1319,7 +1319,7 @@ msgstr "Пожалуйста, проверьте антивирус на пре�
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Создание GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
@@ -1935,7 +1935,7 @@ msgstr "показать график производительности"
 
 #: Client/core/CCore.cpp:1429
 msgid "for developers: reload news"
-msgstr ""
+msgstr "для разработчиков: "
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -2082,7 +2082,7 @@ msgstr "Всегда показывать окно загрузки"
 
 #: Client/core/CSettings.cpp:403
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Разрешить соединение с Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:408
 msgid "Use customized GTA:SA files"
@@ -2350,7 +2350,7 @@ msgstr "Разрешить Javascript на сторонних сайтах"
 
 #: Client/core/CSettings.cpp:920
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "Включить рендеринг через ГПУ"
 
 #: Client/core/CSettings.cpp:924
 msgid "Custom blacklist"
