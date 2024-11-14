@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-23 16:33+0000\n"
-"PO-Revision-Date: 2024-11-14 18:31\n"
+"PO-Revision-Date: 2024-11-14 19:33\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1287,7 +1287,7 @@ msgstr "Multi Theft Auto установлена неправильно, пере
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "Создание GTA:SA соединения"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
@@ -1311,7 +1311,7 @@ msgstr "Зависимость от исправлений GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA не может запуститься потому что GTA:SA исполняемый файл неверен или отсутствует:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
@@ -2799,7 +2799,7 @@ msgstr "Кажется, вы включили параметр Rich Presence.\n"
 
 #: Client/core/CSettings.cpp:4573
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
+msgstr "СОГЛАСИЕ ДЛЯ РАЗРЕШЕНИЯ ОБМЕНА ДАННЫМИ"
 
 #: Client/core/CSettings.cpp:4597
 msgid "Some files in your GTA:SA data directory are customized.\n"
