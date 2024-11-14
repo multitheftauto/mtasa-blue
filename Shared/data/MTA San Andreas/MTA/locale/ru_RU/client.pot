@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-23 16:33+0000\n"
-"PO-Revision-Date: 2024-11-14 17:36\n"
+"PO-Revision-Date: 2024-11-14 18:31\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -188,94 +188,94 @@ msgstr "Ездит вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:376
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "Крушит все вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:376
 msgid "Quaddin' around"
-msgstr ""
+msgstr "Ездит на квадроцикле вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "Банни-хоппит вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "Творит странные вещи в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Climbing around in"
-msgstr ""
+msgstr "Взбирается рядом с"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "Давит кого-то в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Blub blub..."
-msgstr ""
+msgstr "Плаки плаки..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Breathing water"
-msgstr ""
+msgstr "Дышит водой"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Drowning in"
-msgstr ""
+msgstr "Тонет в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "Ищет укрытие в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Fighting in"
-msgstr ""
+msgstr "Летает в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Throwing fists in"
-msgstr ""
+msgstr "Машет кулаками в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "Взрывает дураков в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Shooting up"
-msgstr ""
+msgstr "Стреляет вверх"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Jetpacking in"
-msgstr ""
+msgstr "Летает на джетпаке в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Literally on fire in"
-msgstr ""
+msgstr "Буквально горит в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Burning up in"
-msgstr ""
+msgstr "Сгорает в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Swimming in"
-msgstr ""
+msgstr "Плавает в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Floating around in"
-msgstr ""
+msgstr "Плавает вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "Преследуется акулой"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Choking to death in"
-msgstr ""
+msgstr "Задыхается до смерти в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:533
 #: Client/core/CMainMenu.cpp:304 Client/core/CCore.cpp:674
 #: Client/core/CSettings.cpp:3485
 msgid "Main menu"
-msgstr ""
+msgstr "Главное меню"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -350,11 +350,11 @@ msgstr "Запуск локального сервера ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1019
 msgid "Area 51"
-msgstr ""
+msgstr "Зона 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1028
 msgid "Walking around "
-msgstr ""
+msgstr "Ходит вокруг "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1174
 #, c-format
@@ -431,19 +431,19 @@ msgstr "Проверка клиента MTA не удалась!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "In a ditch"
-msgstr ""
+msgstr "в канаве"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "En-route to hospital"
-msgstr ""
+msgstr "В пути до больницы"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5619
 msgid "Meeting their maker"
-msgstr ""
+msgstr "Встреча с создателем"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5620
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "Сожалеет о своих решениях"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5620
 msgid "Wasted"
@@ -1005,11 +1005,11 @@ msgstr "B - Альтернативный NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Стандарт интел"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Альтернативный интел"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -1291,23 +1291,23 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA не может запуститься потому что копирование файлов неудачно:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA не может запуститься потому что MTA:SA файл некорректен или отсутствует:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Копирование MTA:SA файлов"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA не может запуститься потому что GTA:SA файл некорректен или пропал:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Зависимость от исправлений GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
