@@ -11,7 +11,6 @@
 #include "StdInc.h"
 #include "..\game_sa\gamesa_renderware.h"
 
-#define FUNC_CVehicleModelInfo_ResetColors 0x4C8490
 #define FUNC_CBaseModelInfo_Shutdown       0x4C4D50
 #define IN_PLACE_BUFFER_DIRT_SIZE          30
 
@@ -114,18 +113,12 @@ static void _declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise()
     }
 }
 
-static void CVehicleModelInfo_Shutdown()
+static void __fastcall CVehicleModelInfo_Shutdown(CVehicleModelInfoSAInterface* mi)
 {
-    CVehicleModelInfoSAInterface* mi = nullptr;
-    _asm
-    {
-        mov mi, ecx
-    }
-
     if (!mi)
         return;
 
-    ((void(__cdecl*)(void*))FUNC_CBaseModelInfo_Shutdown)(mi);
+    mi->Shutdown();
 
     delete[] mi->m_dirtMaterials;
     mi->m_dirtMaterials = nullptr;
@@ -145,12 +138,10 @@ static void _declspec(naked) HOOK_CVehicleModelInfo_SetDirtTextures()
 {
     _asm
     {
-        pushad
         push ebx
         push esi
         call SetDirtTextures
         add esp, 8
-        popad
 
         jmp CONTINUE_CVehicleModelInfo_SetDirtTextures
     }
@@ -195,7 +186,10 @@ static void __fastcall FindEditableMaterialList(CVehicleModelInfoSAInterface* mi
         std::copy(list.begin(), list.end(), mi->m_staticDirtMaterials);
     }
 
-    ((void(__thiscall*)(CVehicleModelInfoSAInterface*))FUNC_CVehicleModelInfo_ResetColors)(mi);
+    mi->primColor = 255;
+    mi->secColor = 255;
+    mi->tertColor = 255;
+    mi->quatColor = 255;
 }
 
 #define HOOKPOS_CVehicleModelInfo_SetClump 0x4C9648
@@ -205,9 +199,9 @@ static void _declspec(naked) HOOK_CVehicleModelInfo_SetClump()
 {
     _asm
     {
-        pushad
+        push ecx
         call FindEditableMaterialList
-        popad
+        pop ecx
 
         jmp CONTINUE_CVehicleModelInfo_SetClump
     }
