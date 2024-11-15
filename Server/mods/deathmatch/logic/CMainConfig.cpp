@@ -22,6 +22,8 @@
 #include "CHTTPD.h"
 #include "CStaticFunctionDefinitions.h"
 
+#define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
+
 extern CGame* g_pGame;
 
 CBandwidthSettings* g_pBandwidthSettings = new CBandwidthSettings();
@@ -112,6 +114,11 @@ bool CMainConfig::Load()
     {
         CLogger::ErrorPrintf("Missing root node ('config')\n");
         return false;
+    }
+
+    if (AddMissingSettings())
+    {
+        Save();
     }
 
     // Name
@@ -834,6 +841,57 @@ bool CMainConfig::Save()
 
     // No file
     return false;
+}
+
+//
+// Compare against default config and add missing nodes.
+// Returns true if nodes were added.
+//
+bool CMainConfig::AddMissingSettings()
+{
+    // Only mtaserver.conf is currently supported
+    if (!g_pGame->IsUsingMtaServerConf())
+        return false;
+
+    SString templateFileName = PathJoin(g_pServerInterface->GetServerModPath(), MTA_SERVER_CONF_TEMPLATE);
+    if (!FileExists(templateFileName))
+        return false;
+
+    CXMLFile* templateFile = g_pServerInterface->GetXML()->CreateXML(templateFileName);
+    CXMLNode* templateRootNode = templateFile && templateFile->Parse() ? templateFile->GetRootNode() : nullptr;
+    if (!templateRootNode)
+    {
+        CLogger::ErrorPrintf("Can't parse '%s'\n", *templateFileName);
+        return false;
+    }
+
+    // Check that each item in the template also exists in the server config
+    bool      configChanged = false;
+    CXMLNode* previousNode = nullptr;
+    for (auto it = templateRootNode->ChildrenBegin(); it != templateRootNode->ChildrenEnd(); ++it)
+    {
+        CXMLNode* templateNode = *it;
+        SString   templateNodeName = templateNode->GetTagName();
+
+        // Skip certain optional nodes
+        if (templateNodeName == "resource" || templateNodeName == "module")
+            continue;
+
+        CXMLNode* foundNode = m_pRootNode->FindSubNode(templateNodeName);
+        if (!foundNode)
+        {
+            SString templateNodeValue = templateNode->GetTagContent();
+            SString templateNodeComment = templateNode->GetCommentText();
+            foundNode = m_pRootNode->CreateSubNode(templateNodeName, previousNode);
+            foundNode->SetTagContent(templateNodeValue);
+            foundNode->SetCommentText(templateNodeComment, true);
+            CLogger::LogPrintf("[%s] Added missing '%s' setting to mtaserver.conf\n", MTA_SERVER_CONF_TEMPLATE, *templateNodeName);
+            configChanged = true;
+        }
+        previousNode = foundNode;
+    }
+    g_pServerInterface->GetXML()->DeleteXML(templateFile);
+    return configChanged;
 }
 
 bool CMainConfig::IsValidPassword(const char* szPassword)
