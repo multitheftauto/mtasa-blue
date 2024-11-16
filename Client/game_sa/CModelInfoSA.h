@@ -308,17 +308,9 @@ public:
     float                               bikeSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // vehicleStruct
     std::uint8_t                        field_60[464];
-
-    union
-    {
-        struct
-        {
-            RpMaterial** m_dirtMaterials;
-            size_t       m_numDirtMaterials;
-            RpMaterial*  m_staticDirtMaterials[30];
-        };
-    };
-
+    RpMaterial** m_dirtMaterials;
+    std::size_t       m_numDirtMaterials;
+    RpMaterial*  m_staticDirtMaterials[30];
     std::uint8_t primColors[8];
     std::uint8_t secondColors[8];
     std::uint8_t treeColors[8];
