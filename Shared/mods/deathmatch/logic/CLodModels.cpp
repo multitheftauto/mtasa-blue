@@ -10,9 +10,8 @@
 #include "StdInc.h"
 #include "CLodModels.h"
 
-// This array contains all HLOD Object Model ID -> LLOD Object Model ID associations according to the game's IPL files (plaintext + binary).
 constexpr std::size_t OBJ_LOD_MODELS_COUNT = 4289;
-constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, OBJ_LOD_MODELS_COUNT> OBJ_LOD_MODELS = {{
+constexpr std::pair<std::uint32_t, std::uint32_t> OBJ_LOD_MODELS_ARRAY[] = {
     {694, 784},                // sm_redwoodgrp => lod_redwoodgrp (countryS)
     {791, 785},                // vbg_fir_copse => lod_vbg_fir_co (countrye)
     {1259, 1268},              // billbd1 => lodlbd1 (LAe)
@@ -4302,54 +4301,76 @@ constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, OBJ_LOD_MODELS_COU
     {18552, 18554},            // cunts_ammun => cunts_ammun_lod (countryS)
     {18561, 18562},            // cs_newbridge => cs_newbridge_lod (countryS)
     {18563, 18564},            // cs_bsupport => cs_bsupportlod (countryS)
-}};
+};
 
-// This map is for custom definitions of LLOD models for HLOD models.
+const std::unordered_map<std::uint32_t, std::uint32_t> CLodModels::m_predefinedLODModels = []()
+{
+    std::unordered_map<std::uint32_t, std::uint32_t> map;
+    for (const auto& pair : OBJ_LOD_MODELS_ARRAY)
+        map.emplace(pair.first, pair.second);
+    return map;
+}();
+
+const std::unordered_map<std::uint32_t, std::uint32_t> CLodModels::m_reversePredefinedLODModels = []()
+{
+    std::unordered_map<std::uint32_t, std::uint32_t> map;
+    for (const auto& entry : OBJ_LOD_MODELS_ARRAY)
+        map[entry.second] = entry.first;
+    return map;
+}();
+
 std::unordered_map<std::uint32_t, std::uint32_t> CLodModels::m_customLODModels;
+std::unordered_map<std::uint32_t, std::uint32_t> CLodModels::m_reverseCustomLODModels;
+
+void CLodModels::UpdateReverseCustomLODModels()
+{
+    m_reverseCustomLODModels.clear();
+    for (const auto& entry : m_customLODModels)
+        m_reverseCustomLODModels[entry.second] = entry.first;
+}
 
 std::uint32_t CLodModels::GetObjectLowLODModel(std::uint32_t hLODModel) noexcept
 {
-    auto it = CLodModels::m_customLODModels.find(hLODModel);
-    if (it != CLodModels::m_customLODModels.end())
+    // Check custom LOD models first
+    if (auto it = m_customLODModels.find(hLODModel); it != m_customLODModels.end())
         return it->second;
 
-    for (const auto& entry : OBJ_LOD_MODELS)
-    {
-        if (entry.first == hLODModel)
-            return entry.second;
-    }
+    // Fallback to predefined LOD models
+    if (auto it2 = m_predefinedLODModels.find(hLODModel); it2 != m_predefinedLODModels.end())
+        return it2->second;
 
+    // Default value if no match found
     return 0;
 }
 
 std::uint32_t CLodModels::GetObjectHighLODModel(std::uint32_t lLODModel) noexcept
 {
-    for (const auto& entry : CLodModels::m_customLODModels)
-    {
-        if (entry.second == lLODModel)
-            return entry.first;
-    }
+    // Check custom reverse lookup map
+    if (auto it = m_reverseCustomLODModels.find(lLODModel); it != m_reverseCustomLODModels.end())
+        return it->second;
 
-    for (const auto& entry : OBJ_LOD_MODELS)
-    {
-        if (entry.second == lLODModel)
-            return entry.first;
-    }
+    // Check predefined reverse lookup map
+    if (auto it2 = m_reversePredefinedLODModels.find(lLODModel); it2 != m_reversePredefinedLODModels.end())
+        return it2->second;
 
+    // Default return value if no match found
     return 0;
 }
 
 void CLodModels::SetObjectCustomLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept
 {
-    CLodModels::m_customLODModels[hLODModel] = lLODModel;
+    m_customLODModels[hLODModel] = lLODModel;
+    UpdateReverseCustomLODModels();
 }
 
 void CLodModels::ResetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept
 {
-    CLodModels::m_customLODModels.erase(hLODModel);
+    m_customLODModels.erase(hLODModel);
+    UpdateReverseCustomLODModels();
 }
 
 void CLodModels::ResetAllObjectCustomLowLODModels() noexcept
 {
-    CLodModels::m_customLODModels.clear();
+    m_customLODModels.clear();
+    UpdateReverseCustomLODModels();
 }
