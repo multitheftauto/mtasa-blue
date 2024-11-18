@@ -22,7 +22,7 @@
 #include "CHTTPD.h"
 #include "CStaticFunctionDefinitions.h"
 
-#define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
+#define SETTINGS_TEMPLATE_PATH "mtaserver.conf.template"
 
 extern CGame* g_pGame;
 
@@ -853,44 +853,52 @@ bool CMainConfig::AddMissingSettings()
     if (!g_pGame->IsUsingMtaServerConf())
         return false;
 
-    SString templateFileName = PathJoin(g_pServerInterface->GetServerModPath(), MTA_SERVER_CONF_TEMPLATE);
+    const std::string templateFileName = PathJoin(g_pServerInterface->GetServerModPath(), SETTINGS_TEMPLATE_PATH);
     if (!FileExists(templateFileName))
         return false;
 
-    CXMLFile* templateFile = g_pServerInterface->GetXML()->CreateXML(templateFileName);
-    CXMLNode* templateRootNode = templateFile && templateFile->Parse() ? templateFile->GetRootNode() : nullptr;
+    std::unique_ptr<CXMLFile> templateFile(g_pServerInterface->GetXML()->CreateXML(templateFileName.c_str()));
+    if (!templateFile || !templateFile->Parse())
+    {
+        CLogger::ErrorPrintf("Failed to parse template file: '%s'\n", templateFileName.c_str());
+        return false;
+    }
+
+    CXMLNode* templateRootNode = templateFile->GetRootNode();
     if (!templateRootNode)
     {
-        CLogger::ErrorPrintf("Can't parse '%s'\n", *templateFileName);
+        CLogger::ErrorPrintf("Template file '%s' has no root node\n", templateFileName.c_str());
         return false;
     }
 
     // Check that each item in the template also exists in the server config
-    bool      configChanged = false;
+    bool configChanged = false;
     CXMLNode* previousNode = nullptr;
+
     for (auto it = templateRootNode->ChildrenBegin(); it != templateRootNode->ChildrenEnd(); ++it)
     {
         CXMLNode* templateNode = *it;
-        SString   templateNodeName = templateNode->GetTagName();
+        const std::string& templateNodeName = templateNode->GetTagName();
 
         // Skip certain optional nodes
         if (templateNodeName == "resource" || templateNodeName == "module")
             continue;
 
-        CXMLNode* foundNode = m_pRootNode->FindSubNode(templateNodeName);
+        CXMLNode* foundNode = m_pRootNode->FindSubNode(templateNodeName.c_str());
         if (!foundNode)
         {
-            SString templateNodeValue = templateNode->GetTagContent();
-            SString templateNodeComment = templateNode->GetCommentText();
-            foundNode = m_pRootNode->CreateSubNode(templateNodeName, previousNode);
-            foundNode->SetTagContent(templateNodeValue);
-            foundNode->SetCommentText(templateNodeComment, true);
-            CLogger::LogPrintf("[%s] Added missing '%s' setting to mtaserver.conf\n", MTA_SERVER_CONF_TEMPLATE, *templateNodeName);
+            const std::string templateNodeValue = templateNode->GetTagContent();
+            const std::string templateNodeComment = templateNode->GetCommentText();
+
+            foundNode = m_pRootNode->CreateSubNode(templateNodeName.c_str(), previousNode);
+            foundNode->SetTagContent(templateNodeValue.c_str());
+            foundNode->SetCommentText(templateNodeComment.c_str(), true);
+
+            CLogger::LogPrintf("Added missing '%s' setting to mtaserver.conf\n", &templateNodeName);
             configChanged = true;
         }
         previousNode = foundNode;
     }
-    g_pServerInterface->GetXML()->DeleteXML(templateFile);
     return configChanged;
 }
 
