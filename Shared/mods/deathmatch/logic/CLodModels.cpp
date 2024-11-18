@@ -4335,7 +4335,7 @@ std::uint32_t CLodModels::GetObjectLowLODModel(std::uint32_t hLODModel) noexcept
     if (auto it = m_customLODModels.find(hLODModel); it != m_customLODModels.end())
         return it->second;
 
-    // Fallback to predefined LOD models
+    // Check predefined LOD models
     if (auto it2 = m_predefinedLODModels.find(hLODModel); it2 != m_predefinedLODModels.end())
         return it2->second;
 
@@ -4345,11 +4345,11 @@ std::uint32_t CLodModels::GetObjectLowLODModel(std::uint32_t hLODModel) noexcept
 
 std::uint32_t CLodModels::GetObjectHighLODModel(std::uint32_t lLODModel) noexcept
 {
-    // Check custom reverse lookup map
+    // Check custom LOD models reverse lookup map
     if (auto it = m_reverseCustomLODModels.find(lLODModel); it != m_reverseCustomLODModels.end())
         return it->second;
 
-    // Check predefined reverse lookup map
+    // Check predefined LOD models reverse lookup map
     if (auto it2 = m_reversePredefinedLODModels.find(lLODModel); it2 != m_reversePredefinedLODModels.end())
         return it2->second;
 
