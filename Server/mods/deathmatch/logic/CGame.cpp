@@ -1805,7 +1805,11 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
 
             // Tell the player the problem
-            DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
+            if (pPlayer->CanBitStream(eBitStreamVersion::CheckDuplicateSerials))
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
+            else
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::KICK);
+
             return;
         }
 

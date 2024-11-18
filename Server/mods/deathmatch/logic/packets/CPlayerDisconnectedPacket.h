@@ -35,12 +35,12 @@ public:
         ELEMENT_FAILURE,
         GENERAL_REFUSED,
         SERIAL_VERIFICATION,
-        SERIAL_DUPLICATE,
         CONNECTION_DESYNC,
         BAN,
         KICK,
         CUSTOM,
-        SHUTDOWN
+        SHUTDOWN,
+        SERIAL_DUPLICATE
     };
 
     CPlayerDisconnectedPacket(const char* szReason);

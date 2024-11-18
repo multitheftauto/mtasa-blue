@@ -38,12 +38,12 @@ class CPacketHandler
         ELEMENT_FAILURE,
         GENERAL_REFUSED,
         SERIAL_VERIFICATION,
-        SERIAL_DUPLICATE,
         CONNECTION_DESYNC,
         BAN,
         KICK,
         CUSTOM,
-        SHUTDOWN
+        SHUTDOWN,
+        SERIAL_DUPLICATE
     };
 
     struct SEntityDependantStuff

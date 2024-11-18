@@ -17,7 +17,6 @@ class CPlayerManager;
 #include "packets/CPacket.h"
 #include "CPlayer.h"
 #include "../Config.h"
-#include <string>
 
 class CPlayerManager
 {
@@ -41,7 +40,7 @@ public:
 
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false);
-    const CPlayer* GetBySerial(const std::string serial) const noexcept;
+    CPlayer* GetBySerial(const std::string_view serial) const noexcept;
 
     std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
     std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
