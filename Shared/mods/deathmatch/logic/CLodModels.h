@@ -22,6 +22,6 @@ public:
     static void  ResetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept;
     static void  ResetAllObjectCustomLowLODModels() noexcept;
 
-protected:
+private:
     static std::unordered_map<std::uint32_t, std::uint32_t> m_customLODModels;
 };
