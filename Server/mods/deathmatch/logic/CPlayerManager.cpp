@@ -143,9 +143,7 @@ CPlayer* CPlayerManager::GetBySerial(const std::string_view serial) const noexce
     for (const auto& player : m_Players)
     {
         if (player->GetSerial() == serial)
-        {
             return player;
-        }
     }
 
     return nullptr;
