@@ -170,7 +170,6 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     funBugs.data3.bFastSprint = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTSPRINT);
     funBugs.data4.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled(CGame::GLITCH_BADDRIVEBYHITBOX);
     funBugs.data5.bQuickStand = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKSTAND);
-    funBugs.data6.bIgnoreFireState = g_pGame->IsGlitchEnabled(CGame::GLITCH_IGNOREFIRESTATE);
     BitStream.Write(&funBugs);
 
     // Write world special properties states
@@ -193,6 +192,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         wsProps.data3.roadsignstext = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT);
         wsProps.data4.extendedwatercannons = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS);
         wsProps.data5.tunnelweatherblend = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND);
+        wsProps.data6.ignoreFireState = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE);
         BitStream.Write(&wsProps);
     }
 

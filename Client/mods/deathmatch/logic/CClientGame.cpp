@@ -135,8 +135,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
-    m_Glitches[GLITCH_IGNOREFIRESTATE] = false;
-    g_pMultiplayer->SetIgnoreFireState(false);
 
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
@@ -5974,9 +5972,6 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
             g_pMultiplayer->DisableQuickReload(!bEnabled);
         if (ucGlitch == GLITCH_CLOSEDAMAGE)
             g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
-        if (ucGlitch == GLITCH_IGNOREFIRESTATE)
-            g_pMultiplayer->SetIgnoreFireState(bEnabled);
-
         return true;
     }
     return false;
@@ -6031,6 +6026,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::IGNOREFIRESTATE:
+            g_pGame->SetIgnoreFireStateEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -6068,6 +6066,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsRoadSignsTextEnabled();
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             return g_pGame->IsTunnelWeatherBlendEnabled();
+        case WorldSpecialProperty::IGNOREFIRESTATE:
+            return g_pGame->IsIgnoreFireStateEnabled();
     }
     return false;
 }
@@ -6481,7 +6481,7 @@ void CClientGame::OutputServerInfo()
     {
         SString     strEnabledGlitches;
         const char* szGlitchNames[] = {"Quick reload",         "Fast fire",  "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint",
-                                       "Bad driveby hitboxes", "Quick stand", "Kickout of vehicle on model replace", "Ignore fire state"};
+                                       "Bad driveby hitboxes", "Quick stand", "Kickout of vehicle on model replace"};
         for (uint i = 0; i < NUM_GLITCHES; i++)
         {
             if (IsGlitchEnabled(i))
