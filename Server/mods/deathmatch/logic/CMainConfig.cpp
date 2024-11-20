@@ -79,6 +79,7 @@ CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_bSyncMapElementData = true;
+    m_elementDataWhitelisted = false;
 }
 
 bool CMainConfig::Load()
@@ -534,6 +535,8 @@ bool CMainConfig::Load()
         GetInteger(m_pRootNode, "lightsync_rate", g_TickRateSettings.iLightSync);
         g_TickRateSettings.iLightSync = Clamp(200, g_TickRateSettings.iLightSync, 4000);
     }
+
+    GetBoolean(m_pRootNode, "elementdata_whitelisted", m_elementDataWhitelisted);
 
     ApplyNetOptions();
 
