@@ -1862,6 +1862,7 @@ void CMultiplayerSA::DisableCloseRangeDamage(bool bDisabled)
         MemPut<BYTE>(0x73BA00, 0x86);
     }
 }
+
 bool CMultiplayerSA::GetInteriorSoundsEnabled()
 {
     return bInteriorSoundsEnabled;

@@ -249,6 +249,8 @@ public:
     bool IsTunnelWeatherBlendEnabled() const noexcept override { return m_isTunnelWeatherBlendEnabled; }
     void SetTunnelWeatherBlendEnabled(bool isEnabled) override;
 
+    bool IsIgnoreFireStateEnabled() const noexcept override { return m_isIgnoreFireStateEnabled; }
+    void SetIgnoreFireStateEnabled(bool isEnabled) override;
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -378,6 +380,7 @@ private:
     bool         m_isRoadSignsTextEnabled{true};
     bool         m_isBuildingsRemoved{false};
     bool         m_isExtendedWaterCannonsEnabled{false};
+    bool         m_isIgnoreFireStateEnabled{false};
 
     static unsigned int&  ClumpOffset;
 
