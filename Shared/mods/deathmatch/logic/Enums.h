@@ -91,6 +91,7 @@ enum class WorldSpecialProperty
     ROADSIGNSTEXT,
     EXTENDEDWATERCANNONS,
     TUNNELWEATHERBLEND,
+    IGNOREFIRESTATE,
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 
