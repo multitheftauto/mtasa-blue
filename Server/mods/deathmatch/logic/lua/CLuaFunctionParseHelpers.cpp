@@ -649,33 +649,34 @@ void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions)
 //
 // Check 4x4 lua table
 //
-bool IsValidMatrixLuaTable(lua_State* luaVM, uint uiArgIndex)
+bool IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept
 {
-    uint uiRow = 0;
-    uint uiCell = 0;
+    std::uint32_t cell = 0;
 
-    if (lua_type(luaVM, uiArgIndex) == LUA_TTABLE)
+    if (lua_type(luaVM, argIndex) == LUA_TTABLE)
     {
-        for (lua_pushnil(luaVM); lua_next(luaVM, uiArgIndex) != 0; lua_pop(luaVM, 1), uiRow++)
+        lua_pushnil(luaVM);
+        for (std::uint32_t row = 0; lua_next(luaVM, argIndex) != 0; lua_pop(luaVM, 1), ++row)
         {
             if (lua_type(luaVM, -1) != LUA_TTABLE)
                 return false;
 
-            uint uiCol = 0;
+            std::uint32_t col = 0;
 
-            for (lua_pushnil(luaVM); lua_next(luaVM, -2) != 0; lua_pop(luaVM, 1), uiCol++, uiCell++)
+            lua_pushnil(luaVM);
+            for (; lua_next(luaVM, -2) != 0; lua_pop(luaVM, 1), ++col, ++cell)
             {
-                int iArgumentType = lua_type(luaVM, -1);
-                if (iArgumentType != LUA_TNUMBER && iArgumentType != LUA_TSTRING)
+                int argumentType = lua_type(luaVM, -1);
+                if (argumentType != LUA_TNUMBER && argumentType != LUA_TSTRING)
                     return false;
             }
 
-            if (uiCol != 4)
+            if (col != 4)
                 return false;
         }
     }
 
-    if (uiRow != 4 || uiCell != 16)
+    if (cell != 16)
         return false;
 
     return true;
