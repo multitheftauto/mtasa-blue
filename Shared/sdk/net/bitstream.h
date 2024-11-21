@@ -572,6 +572,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-09-04
     RespawnObject_Serverside,
 
+    // Add check_duplicate_serials
+    // 2024-09-04
+    CheckDuplicateSerials,
+
     // Add ignorefirestate special world property
     // 2024-11-07
     WorldSpecialProperty_IgnoreFireState,
