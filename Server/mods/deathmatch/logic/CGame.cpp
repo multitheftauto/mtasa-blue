@@ -1814,6 +1814,21 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             return;
         }
 
+        // Check if another player is using the same serial
+        if (m_pMainConfig->IsCheckDuplicateSerialsEnabled() && m_pPlayerManager->GetBySerial(strSerial))
+        {
+            // Tell the console
+            CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
+
+            // Tell the player the problem
+            if (pPlayer->CanBitStream(eBitStreamVersion::CheckDuplicateSerials))
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
+            else
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::KICK);
+
+            return;
+        }
+
         // Check the nick is valid
         if (!CheckNickProvided(szNick))
         {
