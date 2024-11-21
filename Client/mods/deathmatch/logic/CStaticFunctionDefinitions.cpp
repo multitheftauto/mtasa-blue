@@ -28,7 +28,7 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CBuildingRemoval.h>
-#include <game/Task.h>
+#include <game/TaskBasic.h>
 
 using std::list;
 

@@ -12,7 +12,9 @@
 #include "StdInc.h"
 #include <game/CWeapon.h>
 #include "lua/CLuaFunctionParser.h"
-#include "CMatrix_Pad.h"
+#include <game/CTasks.h>
+#include <game/TaskBasic.h>
+#include <game/CAnimManager.h>
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
@@ -23,68 +25,26 @@ void CLuaPedDefs::LoadFunctions()
         {"createPed", CreatePed},
         {"detonateSatchels", DetonateSatchels},
         {"killPed", KillPed},
-
         {"resetPedVoice", ArgumentParser<ResetPedVoice>},
-        {"getPedVoice", GetPedVoice},
+        {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
+        {"addPedClothes", AddPedClothes},
+        {"removePedClothes", RemovePedClothes},
+        {"warpPedIntoVehicle", WarpPedIntoVehicle},
+        {"removePedFromVehicle", RemovePedFromVehicle},
+        {"givePedWeapon", GivePedWeapon},
+
         {"setPedVoice", SetPedVoice},
-        {"getPedRotation", GetPedRotation},
-        {"canPedBeKnockedOffBike", CanPedBeKnockedOffBike},
-        {"getPedContactElement", GetPedContactElement},
-        {"isPedInVehicle", IsPedInVehicle},
-        {"doesPedHaveJetPack", DoesPedHaveJetPack},
-        {"isPedWearingJetpack", DoesPedHaveJetPack},            // introduced in 1.5.5-9.13846
-        {"isPedOnGround", IsPedOnGround},
-        {"getPedTask", GetPedTask},
-        {"getPedSimplestTask", GetPedSimplestTask},
-        {"isPedDoingTask", IsPedDoingTask},
-        {"getPedTarget", GetPedTarget},
-        {"getPedTargetStart", GetPedTargetStart},
-        {"getPedTargetEnd", GetPedTargetEnd},
-        {"getPedTargetCollision", GetPedTargetCollision},
-        {"getPedWeaponSlot", GetPedWeaponSlot},
-        {"getPedWeapon", GetPedWeapon},
-        {"getPedAmmoInClip", GetPedAmmoInClip},
-        {"getPedTotalAmmo", GetPedTotalAmmo},
-        {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
-        {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
-        {"getPedArmor", GetPedArmor},
-        {"isPedChoking", IsPedChoking},
-        {"isPedDucked", IsPedDucked},
-        {"getPedStat", GetPedStat},
-        {"getPedBonePosition", GetPedBonePosition},
         {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
         {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
-        {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
-        {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
+        {"setElementBoneQuaternion", ArgumentParser<SetElementBoneQuaternion>},
         {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
-        {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
-        {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
-        {"getPedClothes", GetPedClothes},
-        {"getPedControlState", GetPedControlState},
-        {"getPedAnalogControlState", GetPedAnalogControlState},
-        {"isPedDead", IsPedDead},
-
-        {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
-        {"getPedFightingStyle", GetPedFightingStyle},
-        {"getPedAnimation", GetPedAnimation},
-        {"getPedMoveState", GetPedMoveState},
-        {"getPedWalkingStyle", GetPedMoveAnim},
-        {"isPedHeadless", IsPedHeadless},
-        {"isPedFrozen", IsPedFrozen},
-        {"isPedFootBloodEnabled", IsPedFootBloodEnabled},
-        {"getPedCameraRotation", GetPedCameraRotation},
-        {"getPedOxygenLevel", GetPedOxygenLevel},
-        {"isPedBleeding", ArgumentParser<IsPedBleeding>},
-
-        {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedRotation", SetPedRotation},
+        {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedCanBeKnockedOffBike", SetPedCanBeKnockedOffBike},
         {"setPedAnimation", SetPedAnimation},
         {"setPedAnimationProgress", SetPedAnimationProgress},
         {"setPedAnimationSpeed", SetPedAnimationSpeed},
         {"setPedWalkingStyle", SetPedMoveAnim},
-        {"addPedClothes", AddPedClothes},
-        {"removePedClothes", RemovePedClothes},
         {"setPedControlState", SetPedControlState},
         {"setPedAnalogControlState", SetPedAnalogControlState},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
@@ -96,15 +56,65 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedCameraRotation", SetPedCameraRotation},
         {"setPedAimTarget", SetPedAimTarget},
         {"setPedStat", SetPedStat},
-        {"warpPedIntoVehicle", WarpPedIntoVehicle},
-        {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedOxygenLevel", SetPedOxygenLevel},
         {"setPedArmor", ArgumentParser<SetPedArmor>},
-        {"givePedWeapon", GivePedWeapon},
-        {"isPedReloadingWeapon", IsPedReloadingWeapon},
         {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
         {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
         {"setPedBleeding", ArgumentParser<SetPedBleeding>},
+
+        {"getPedVoice", GetPedVoice},
+        {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
+        {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
+        {"getElementBoneQuaternion", ArgumentParser<GetElementBoneQuaternion>},
+        {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
+        {"getPedRotation", GetPedRotation},
+        {"getPedWeaponSlot", GetPedWeaponSlot},
+        {"canPedBeKnockedOffBike", CanPedBeKnockedOffBike},
+        {"getPedAnimation", GetPedAnimation},
+        {"getPedAnimationProgress", ArgumentParser<GetPedAnimationProgress>},
+        {"getPedAnimationSpeed", ArgumentParser<GetPedAnimationSpeed>},
+        {"getPedAnimationLength", ArgumentParser<GetPedAnimationLength>},        
+        {"getPedWalkingStyle", GetPedMoveAnim},
+        {"getPedControlState", GetPedControlState},
+        {"getPedAnalogControlState", GetPedAnalogControlState},
+        {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
+        {"getPedFightingStyle", GetPedFightingStyle},
+
+        {"isPedHeadless", IsPedHeadless},
+        {"isPedFrozen", IsPedFrozen},
+        {"isPedFootBloodEnabled", IsPedFootBloodEnabled},
+        {"getPedCameraRotation", GetPedCameraRotation},
+
+        {"getPedStat", GetPedStat},
+        {"getPedOxygenLevel", GetPedOxygenLevel},
+        {"getPedArmor", GetPedArmor},
+        {"isPedBleeding", ArgumentParser<IsPedBleeding>},
+
+        {"getPedContactElement", GetPedContactElement},
+        {"getPedTask", GetPedTask},
+        {"getPedSimplestTask", GetPedSimplestTask},
+        {"getPedTarget", GetPedTarget},
+        {"getPedTargetStart", GetPedTargetStart},
+        {"getPedTargetEnd", GetPedTargetEnd},
+        {"getPedTargetCollision", GetPedTargetCollision},
+        {"getPedWeapon", GetPedWeapon},
+        {"getPedAmmoInClip", GetPedAmmoInClip},
+        {"getPedTotalAmmo", GetPedTotalAmmo},
+        {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
+        {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
+        {"getPedBonePosition", GetPedBonePosition},
+        {"getPedClothes", GetPedClothes},
+        {"getPedMoveState", GetPedMoveState},
+
+        {"doesPedHaveJetPack", DoesPedHaveJetPack},
+        {"isPedInVehicle", IsPedInVehicle},
+        {"isPedWearingJetpack", DoesPedHaveJetPack},
+        {"isPedOnGround", IsPedOnGround},
+        {"isPedDoingTask", IsPedDoingTask},
+        {"isPedChoking", IsPedChoking},
+        {"isPedDucked", IsPedDucked},
+        {"isPedDead", IsPedDead},
+        {"isPedReloadingWeapon", IsPedReloadingWeapon},
     };
 
     // Add functions
@@ -998,43 +1008,77 @@ int CLuaPedDefs::CanPedBeKnockedOffBike(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CVector position)
+bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CVector position)
 {
     CEntity* theEntity = entity->GetGameEntity();
-    return theEntity ? theEntity->SetBonePosition(static_cast<eBone>(boneId), position) : false;
+    if (!theEntity)
+        return false;
+    return theEntity->SetBonePosition(static_cast<eBone>(boneId), position);
 }
 
-bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float yaw, float pitch, float roll)
+bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float yaw, float pitch, float roll)
 {
+    if (boneId > BONE_RIGHTFOOT)
+        throw LuaFunctionError("Invalid bone ID", false);
+
     CEntity* theEntity = entity->GetGameEntity();
-    return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll) : false;
+    if (!theEntity)
+        return false;
+    return theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+bool CLuaPedDefs::SetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float x, float y, float z, float w)
+{
+    if (boneId > BONE_RIGHTFOOT)
+        throw LuaFunctionError("Invalid bone ID", false);
+
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBoneRotationQuat(static_cast<eBone>(boneId), x, y, z, w) : false;
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     CVector  position;
-    if (theEntity && theEntity->GetBonePosition(static_cast<eBone>(boneId), position))
-        return std::make_tuple(position.fX, position.fY, position.fZ);
-    return false;
+    if (!theEntity || !theEntity->GetBonePosition(static_cast<eBone>(boneId), position))
+        return false;
+
+    return std::make_tuple(position.fX, position.fY, position.fZ);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
 {
-    float    yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
+    if (boneId > BONE_RIGHTFOOT)
+        throw LuaFunctionError("Invalid bone ID", false);
+
+    float yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
     CEntity* theEntity = entity->GetGameEntity();
-    if (theEntity && theEntity->GetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll))
-        return std::make_tuple(yaw, pitch, roll);
-    return false;
+    if (!theEntity || !theEntity->GetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll))
+        return false;
+
+    return std::make_tuple(yaw, pitch, roll);
 }
 
-bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CMatrix boneMatrix)
+std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::GetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
+{
+    if (boneId > BONE_RIGHTFOOT)
+        throw LuaFunctionError("Invalid bone ID", false);
+
+    float x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
+    CEntity* theEntity = entity->GetGameEntity();
+    if (!theEntity || !theEntity->GetBoneRotationQuat(static_cast<eBone>(boneId), x, y, z, w))
+        return false;
+
+    return std::make_tuple(x, y, z, w);
+}
+
+bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CMatrix boneMatrix)
 {
     CEntity* theEntity = entity->GetGameEntity();
     return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity)
@@ -2241,6 +2285,66 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
+{
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetCurrentProgress() / animAssociation->GetLength();
+}
+
+float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
+{
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetCurrentSpeed();
+}
+
+float CLuaPedDefs::GetPedAnimationLength(CClientPed* ped)
+{
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetLength();
 }
 
 int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
