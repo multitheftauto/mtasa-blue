@@ -1607,6 +1607,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerTriggerEventThreshold", "", nullptr, false);
     m_Events.AddEvent("onPlayerTeamChange", "oldTeam, newTeam", nullptr, false);
     m_Events.AddEvent("onPlayerTriggerInvalidEvent", "eventName, isAdded, isRemote", nullptr, false);
+    m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -1794,6 +1795,21 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
 
             // Tell the player the problem
             DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_VERIFICATION);
+            return;
+        }
+
+        // Check if another player is using the same serial
+        if (m_pMainConfig->IsCheckDuplicateSerialsEnabled() && m_pPlayerManager->GetBySerial(strSerial))
+        {
+            // Tell the console
+            CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
+
+            // Tell the player the problem
+            if (pPlayer->CanBitStream(eBitStreamVersion::CheckDuplicateSerials))
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
+            else
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::KICK);
+
             return;
         }
 
@@ -2652,7 +2668,24 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
             }
 
             ESyncType lastSyncType = ESyncType::BROADCAST;
-            pElement->GetCustomData(szName, false, &lastSyncType);
+            eCustomDataClientTrust clientChangesMode{};
+
+            pElement->GetCustomData(szName, false, &lastSyncType, &clientChangesMode);
+
+            const bool changesAllowed = clientChangesMode == eCustomDataClientTrust::UNSET ? !m_pMainConfig->IsElementDataWhitelisted()
+                                                                                           : clientChangesMode == eCustomDataClientTrust::ALLOW;
+            if (!changesAllowed)
+            {
+                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)", Packet.GetSourcePlayer()->GetNick(),
+                                     szName);
+
+                CLuaArguments arguments;
+                arguments.PushElement(pElement);
+                arguments.PushString(szName);
+                arguments.PushArgument(Value);
+                pSourcePlayer->CallEvent("onPlayerChangesProtectedData", arguments);
+                return;
+            }
 
             if (lastSyncType != ESyncType::LOCAL)
             {
