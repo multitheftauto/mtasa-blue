@@ -34,7 +34,8 @@ public:
 class CTaskSimpleRunNamedAnim : public virtual CTaskSimpleAnim
 {
 public:
-    virtual ~CTaskSimpleRunNamedAnim(){};
+    virtual const char* GetAnimName() const noexcept = 0;
+    virtual const char* GetGroupName() const noexcept = 0;
 };
 
 class CTaskComplexDie : public virtual CTaskComplex

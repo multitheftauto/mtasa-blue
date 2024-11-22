@@ -135,6 +135,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
@@ -227,7 +228,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_pObjectSync = new CObjectSync(m_pObjectManager);
 #endif
     m_pNametags = new CNametags(m_pManager);
-    m_pRadarMap = new CRadarMap(m_pManager);
+    m_pPlayerMap = new CPlayerMap(m_pManager);
 
     // Set the screenshot path
     /* This is now done in CCore, to maintain a global screenshot path
@@ -548,7 +549,7 @@ CClientGame::~CClientGame()
 #endif
     SAFE_DELETE(m_pBlendedWeather);
     SAFE_DELETE(m_pMovingObjectsManager);
-    SAFE_DELETE(m_pRadarMap);
+    SAFE_DELETE(m_pPlayerMap);
     SAFE_DELETE(m_pRemoteCalls);
     SAFE_DELETE(m_pLuaManager);
     SAFE_DELETE(m_pLatentTransferManager);
@@ -1097,7 +1098,7 @@ void CClientGame::DoPulsePostFrame()
         CClientPerfStatManager::GetSingleton()->DoPulse();
     }
 
-    m_pRadarMap->DoRender();
+    m_pPlayerMap->DoRender();
     m_pManager->DoRender();
     DoPulses();
 
@@ -1435,8 +1436,8 @@ void CClientGame::DoPulses()
     }
 
     // Check for radar input
-    m_pRadarMap->DoPulse();
-    g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pRadarMap->IsRadarShowing());
+    m_pPlayerMap->DoPulse();
+    g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pPlayerMap->IsPlayerMapShowing());
 
     // Got a local player?
     if (m_pLocalPlayer)
@@ -5406,8 +5407,8 @@ void CClientGame::ResetMapInfo()
     // Keybinds
     g_pCore->GetKeyBinds()->SetAllControlsEnabled(true, true, true);
 
-    // Radarmap
-    m_pRadarMap->SetForcedState(false);
+    // Player map
+    m_pPlayerMap->SetForcedState(false);
 
     // Camera
     m_pCamera->FadeOut(0.0f, 0, 0, 0);
@@ -5455,10 +5456,6 @@ void CClientGame::ResetMapInfo()
 
     // Players
     m_pPlayerManager->ResetAll();
-
-    // Reset Frozen Time
-    g_pGame->GetClock()->ResetTimeFrozen();
-    g_pGame->GetSettings()->ResetVolumetricShadows();
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
@@ -6029,6 +6026,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::IGNOREFIRESTATE:
+            g_pGame->SetIgnoreFireStateEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -6066,6 +6066,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsRoadSignsTextEnabled();
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             return g_pGame->IsTunnelWeatherBlendEnabled();
+        case WorldSpecialProperty::IGNOREFIRESTATE:
+            return g_pGame->IsIgnoreFireStateEnabled();
     }
     return false;
 }
@@ -6479,7 +6481,7 @@ void CClientGame::OutputServerInfo()
     {
         SString     strEnabledGlitches;
         const char* szGlitchNames[] = {"Quick reload",         "Fast fire",  "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint",
-                                       "Bad driveby hitboxes", "Quick stand"};
+                                       "Bad driveby hitboxes", "Quick stand", "Kickout of vehicle on model replace"};
         for (uint i = 0; i < NUM_GLITCHES; i++)
         {
             if (IsGlitchEnabled(i))
@@ -6887,6 +6889,12 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
 
     // Reset volumetric shadows
     g_pGame->GetSettings()->ResetVolumetricShadows();
+
+    // Reset Frozen Time
+    g_pGame->GetClock()->ResetTimeFrozen();
+
+    // Reset DynamicPedShadows
+    g_pGame->GetSettings()->ResetDynamicPedShadows();
 }
 
 void CClientGame::OnWindowFocusChange(bool state)

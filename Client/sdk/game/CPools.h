@@ -14,6 +14,7 @@
 #include "Common.h"
 #include "CBuildingsPool.h"
 #include "CDummyPool.h"
+#include "CTxdPool.h"
 
 class CClientEntity;
 class CEntity;
@@ -107,12 +108,7 @@ public:
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;
 
-    virtual uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName) = 0;
-    virtual void RemoveTextureDictonarySlot(uint uiTxdID) = 0;
-    virtual bool IsFreeTextureDictonarySlot(uint uiTxdID) = 0;
-
-    virtual ushort GetFreeTextureDictonarySlot() = 0;
-
     virtual CBuildingsPool& GetBuildingsPool() noexcept = 0;
-    virtual CDummyPool&   GetDummyPool() noexcept = 0;
+    virtual CDummyPool&     GetDummyPool() noexcept = 0;
+    virtual CTxdPool&       GetTxdPool() noexcept = 0;
 };

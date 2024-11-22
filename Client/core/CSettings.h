@@ -196,6 +196,8 @@ protected:
     CGUIComboBox*  m_pFullscreenStyleCombo;
     CGUILabel*     m_pPriorityLabel;
     CGUIComboBox*  m_pPriorityCombo;
+    CGUILabel*     m_pPlayerMapImageLabel;
+    CGUIComboBox*  m_pPlayerMapImageCombo;
     CGUILabel*     m_pFastClothesLabel;
     CGUIComboBox*  m_pFastClothesCombo;
     CGUILabel*     m_pAudioGeneralLabel;
@@ -338,6 +340,7 @@ protected:
     CGUIButton*   m_pButtonBrowserWhitelistAdd;
     CGUIGridList* m_pGridBrowserWhitelist;
     CGUIButton*   m_pButtonBrowserWhitelistRemove;
+    CGUICheckBox* m_pCheckBoxBrowserGPUEnabled;
     bool          m_bBrowserListsChanged;
     bool          m_bBrowserListsLoadEnabled;
 

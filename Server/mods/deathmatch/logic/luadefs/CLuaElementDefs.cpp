@@ -1543,6 +1543,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     SString      strKey;
     CLuaArgument value;
     ESyncType    syncType = ESyncType::BROADCAST;
+    std::optional<eCustomDataClientTrust> clientTrust{};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1559,6 +1560,13 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     else
         argStream.ReadEnumString(syncType, ESyncType::BROADCAST);
 
+    if (!argStream.NextIsNone())
+    {
+        eCustomDataClientTrust trustReaded;
+        argStream.ReadEnumString(trustReaded);
+        clientTrust = trustReaded;
+    }
+
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
@@ -1571,7 +1579,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
-        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType))
+        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType, clientTrust))
         {
             lua_pushboolean(luaVM, true);
             return 1;

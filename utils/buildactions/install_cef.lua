@@ -9,8 +9,8 @@ local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "129.0.11+g57354b8+chromium-129.0.6668.90"
-local CEF_HASH = "a3e3e7add2235d1865a8570522ff87dba392e7b2d15bca0983ed2ebe19ea048b"
+local CEF_VERSION = "130.1.2+g48f3ef6+chromium-130.0.6723.44"
+local CEF_HASH = "f436f0f23caa8167d14e8de331d15fbb534e411f4235895024c2e242510e8deb"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX

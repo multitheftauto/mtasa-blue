@@ -71,6 +71,7 @@
 #include "version.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
+#include <regex>
 
 #define MAX_BULLETSYNC_DISTANCE      400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE  400.0f
@@ -257,6 +258,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::EXTENDEDWATERCANNONS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::ROADSIGNSTEXT] = true;
     m_WorldSpecialProps[WorldSpecialProperty::TUNNELWEATHERBLEND] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::IGNOREFIRESTATE] = false;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -1606,6 +1608,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerTriggerEventThreshold", "", nullptr, false);
     m_Events.AddEvent("onPlayerTeamChange", "oldTeam, newTeam", nullptr, false);
     m_Events.AddEvent("onPlayerTriggerInvalidEvent", "eventName, isAdded, isRemote", nullptr, false);
+    m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -1783,7 +1786,36 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
 
         SString strIP = pPlayer->GetSourceIP();
         SString strIPAndSerial("IP: %s  Serial: %s  Version: %s", strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
-        if (!CheckNickProvided(szNick))            // check the nick is valid
+
+        // Prevent player from connecting if serial is invalid
+        const std::regex serialRegex("^[A-F0-9]{32}$");
+        if (!std::regex_match(strSerial, serialRegex))
+        {
+            // Tell the console
+            CLogger::LogPrintf("CONNECT: %s failed to connect (Invalid serial) (%s)\n", szNick, strIPAndSerial.c_str());
+
+            // Tell the player the problem
+            DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_VERIFICATION);
+            return;
+        }
+
+        // Check if another player is using the same serial
+        if (m_pMainConfig->IsCheckDuplicateSerialsEnabled() && m_pPlayerManager->GetBySerial(strSerial))
+        {
+            // Tell the console
+            CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
+
+            // Tell the player the problem
+            if (pPlayer->CanBitStream(eBitStreamVersion::CheckDuplicateSerials))
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
+            else
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::KICK);
+
+            return;
+        }
+
+        // Check the nick is valid
+        if (!CheckNickProvided(szNick))
         {
             // Tell the console
             CLogger::LogPrintf("CONNECT: %s failed to connect (Invalid nickname) (%s)\n", szNick, strIPAndSerial.c_str());
@@ -2637,7 +2669,24 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
             }
 
             ESyncType lastSyncType = ESyncType::BROADCAST;
-            pElement->GetCustomData(szName, false, &lastSyncType);
+            eCustomDataClientTrust clientChangesMode{};
+
+            pElement->GetCustomData(szName, false, &lastSyncType, &clientChangesMode);
+
+            const bool changesAllowed = clientChangesMode == eCustomDataClientTrust::UNSET ? !m_pMainConfig->IsElementDataWhitelisted()
+                                                                                           : clientChangesMode == eCustomDataClientTrust::ALLOW;
+            if (!changesAllowed)
+            {
+                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)", Packet.GetSourcePlayer()->GetNick(),
+                                     szName);
+
+                CLuaArguments arguments;
+                arguments.PushElement(pElement);
+                arguments.PushString(szName);
+                arguments.PushArgument(Value);
+                pSourcePlayer->CallEvent("onPlayerChangesProtectedData", arguments);
+                return;
+            }
 
             if (lastSyncType != ESyncType::LOCAL)
             {
