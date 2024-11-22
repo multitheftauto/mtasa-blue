@@ -51,7 +51,7 @@ static CClientMarkerManager*     m_pMarkerManager;
 static CClientPickupManager*     m_pPickupManager;
 static CMovingObjectsManager*    m_pMovingObjectsManager;
 static CBlendedWeather*          m_pBlendedWeather;
-static CRadarMap*                m_pRadarMap;
+static CPlayerMap*               m_pPlayerMap;
 static CClientCamera*            m_pCamera;
 static CClientExplosionManager*  m_pExplosionManager;
 static CClientProjectileManager* m_pProjectileManager;
@@ -88,7 +88,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager,
     m_pPickupManager = pManager->GetPickupManager();
     m_pMovingObjectsManager = m_pClientGame->GetMovingObjectsManager();
     m_pBlendedWeather = m_pClientGame->GetBlendedWeather();
-    m_pRadarMap = m_pClientGame->GetRadarMap();
+    m_pPlayerMap = m_pClientGame->GetPlayerMap();
     m_pCamera = pManager->GetCamera();
     m_pExplosionManager = pManager->GetExplosionManager();
     m_pProjectileManager = pManager->GetProjectileManager();
@@ -7840,25 +7840,25 @@ bool CStaticFunctionDefinitions::SetWeaponClipAmmo(CClientWeapon* pWeapon, int i
 
 bool CStaticFunctionDefinitions::ForcePlayerMap(bool& bForced)
 {
-    m_pClientGame->GetRadarMap()->SetForcedState(bForced);
+    m_pClientGame->GetPlayerMap()->SetForcedState(bForced);
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsPlayerMapForced(bool& bForced)
 {
-    bForced = m_pRadarMap->GetForcedState();
+    bForced = m_pPlayerMap->GetForcedState();
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsPlayerMapVisible(bool& bVisible)
 {
-    bVisible = m_pRadarMap->IsRadarShowing();
+    bVisible = m_pPlayerMap->IsPlayerMapShowing();
     return true;
 }
 
 bool CStaticFunctionDefinitions::GetPlayerMapBoundingBox(CVector& vecMin, CVector& vecMax)
 {
-    if (m_pRadarMap->GetBoundingBox(vecMin, vecMax))
+    if (m_pPlayerMap->GetBoundingBox(vecMin, vecMax))
     {
         return true;
     }
