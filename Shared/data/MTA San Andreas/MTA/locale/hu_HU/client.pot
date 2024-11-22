@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-21 22:47+0000\n"
-"PO-Revision-Date: 2024-11-22 06:10\n"
+"PO-Revision-Date: 2024-11-22 07:08\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -466,11 +466,11 @@ msgstr "Radar mutatása: %s     Súgószöveg mutatása: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr ""
+msgstr "Játékos Követése"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr ""
+msgstr "Szabad Mozgás"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -576,7 +576,7 @@ msgstr "Lecsatlakozva: Serial aktiválás hiba"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "Lecsatlakozva: Ez a serial már használatban van"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
