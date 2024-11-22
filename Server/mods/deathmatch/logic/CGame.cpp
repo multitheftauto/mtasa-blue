@@ -258,6 +258,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::EXTENDEDWATERCANNONS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::ROADSIGNSTEXT] = true;
     m_WorldSpecialProps[WorldSpecialProperty::TUNNELWEATHERBLEND] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::IGNOREFIRESTATE] = false;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -1795,6 +1796,21 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
 
             // Tell the player the problem
             DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_VERIFICATION);
+            return;
+        }
+
+        // Check if another player is using the same serial
+        if (m_pMainConfig->IsCheckDuplicateSerialsEnabled() && m_pPlayerManager->GetBySerial(strSerial))
+        {
+            // Tell the console
+            CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
+
+            // Tell the player the problem
+            if (pPlayer->CanBitStream(eBitStreamVersion::CheckDuplicateSerials))
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
+            else
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::KICK);
+
             return;
         }
 
