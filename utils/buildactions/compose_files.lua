@@ -25,7 +25,7 @@ newaction {
 
 		-- Copy configs
 		os.copydir("Server/mods/deathmatch", OUTPUT_DIR.."/server/mods/deathmatch", "*.conf")
-		os.makeconfigtemplate(OUTPUT_DIR.."/server/mods/deathmatch/mtaserver.conf", OUTPUT_DIR.."/server/mods/deathmatch/mtaserver.conf.template")
+		makeconfigtemplate(OUTPUT_DIR.."/server/mods/deathmatch/mtaserver.conf", OUTPUT_DIR.."/server/mods/deathmatch/mtaserver.conf.template")
 		os.copydir("Server/mods/deathmatch", OUTPUT_DIR.."/server/mods/deathmatch", "*.xml")
 
 		-- Copy compiled binaries

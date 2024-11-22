@@ -49,7 +49,7 @@ newaction {
 			return
 		end
 
-		if not os.makeconfigtemplate(BIN_DIR.."/server/mods/deathmatch/mtaserver.conf", BIN_DIR.."/server/mods/deathmatch/mtaserver.conf.template") then
+		if not makeconfigtemplate(BIN_DIR.."/server/mods/deathmatch/mtaserver.conf", BIN_DIR.."/server/mods/deathmatch/mtaserver.conf.template") then
 			errormsg("ERROR: Could not copy mtaserver.conf to mtaserver.conf.template")
 			os.exit(1)
 			return

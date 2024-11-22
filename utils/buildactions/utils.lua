@@ -156,7 +156,7 @@ end
 
 -- Does a normal file copy and adds hardcoded text to the beginning of the resulting file
 -- Used in compose_files.lua and install_data.lua
-function os.makeconfigtemplate(file_path, result_path)
+function makeconfigtemplate(file_path, result_path)
 	if not os.copyfile(file_path, result_path) then
 		return false
 	end
