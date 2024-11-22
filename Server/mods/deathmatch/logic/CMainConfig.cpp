@@ -80,6 +80,7 @@ CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
     m_iBackupAmount = 5;
     m_bSyncMapElementData = true;
     m_elementDataWhitelisted = false;
+    m_checkDuplicateSerials = true;
 }
 
 bool CMainConfig::Load()
@@ -528,6 +529,7 @@ bool CMainConfig::Load()
     }
 
     GetBoolean(m_pRootNode, "elementdata_whitelisted", m_elementDataWhitelisted);
+    GetBoolean(m_pRootNode, "check_duplicate_serials", m_checkDuplicateSerials);
 
     ApplyNetOptions();
 
