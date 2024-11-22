@@ -277,7 +277,7 @@ namespace
 
         // Base Encoding & Decoding
         {true, "base64Encode", "Please manually change this to encodeString (different syntax). Refer to the wiki for details"},
-        {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"}
+        {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"},
     
         // Ped
         {false, "setPedOnFire", "setElementOnFire"},
