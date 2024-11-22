@@ -167,8 +167,8 @@ namespace
         //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
 
         // Base Encoding & Decoding
-        {false, "base64Encode", "encodeString"},
-        {false, "base64Decode", "decodeString"},
+        {true, "base64Encode", "Please manually change this to encodeString (different syntax). Refer to the wiki for details"},
+        {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"},
 
         {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"}
     };
@@ -271,7 +271,7 @@ namespace
         {true, "setPlayerDiscordJoinParams", "See GitHub PR #2499 for more details"},
 
         // Base Encoding & Decoding
-        {false, "base64Encode", "encodeString"},
-        {false, "base64Decode", "decodeString"}
+        {true, "base64Encode", "Please manually change this to encodeString (different syntax). Refer to the wiki for details"},
+        {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"}
     };
 }            // namespace
