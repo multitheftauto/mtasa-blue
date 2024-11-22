@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-21 22:47+0000\n"
-"PO-Revision-Date: 2024-11-21 23:20\n"
+"PO-Revision-Date: 2024-11-22 16:07\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -88,11 +88,11 @@ msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "mărește harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "micșorează harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
