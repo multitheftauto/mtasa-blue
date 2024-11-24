@@ -21,7 +21,7 @@ void CCustomData::Copy(CCustomData* pCustomData)
     }
 }
 
-SCustomData* CCustomData::Get(const char* szName)
+SCustomData* CCustomData::Get(const char* szName) const
 {
     assert(szName);
 
@@ -100,6 +100,7 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncTyp
         SCustomData newData;
         newData.Variable = Variable;
         newData.syncType = syncType;
+        newData.clientChangesMode = eCustomDataClientTrust::UNSET;
         m_Data[szName] = newData;
         UpdateSynced(szName, Variable, syncType);
     }
@@ -118,6 +119,12 @@ bool CCustomData::Delete(const char* szName)
 
     // Didn't exist
     return false;
+}
+
+void CCustomData::SetClientChangesMode(const char* szName, eCustomDataClientTrust mode)
+{
+    SCustomData& pData = m_Data[szName];
+    pData.clientChangesMode = mode;
 }
 
 CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
