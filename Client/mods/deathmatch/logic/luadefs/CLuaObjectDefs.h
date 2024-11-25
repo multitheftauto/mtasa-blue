@@ -43,7 +43,4 @@ public:
     LUA_DECLARE(ToggleObjectRespawn);
     LUA_DECLARE(SetObjectMass);
     LUA_DECLARE(SetObjectProperty);
-
-    // Object util func
-    static bool IsValidObjectModel(std::uint32_t id, std::optional<std::string> modelPurpose) noexcept;
 };

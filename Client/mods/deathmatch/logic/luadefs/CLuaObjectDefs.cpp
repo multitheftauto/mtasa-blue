@@ -11,9 +11,6 @@
 
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
-#include "CLodModels.h"
-#include "CClientObjectManager.h"
-#include "CClientBuildingManager.h"
 
 void CLuaObjectDefs::LoadFunctions()
 {
