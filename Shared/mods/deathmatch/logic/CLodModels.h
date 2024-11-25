@@ -8,15 +8,18 @@
  *****************************************************************************/
 #pragma once
 
+#include <variant>
+
 class CLodModels
 {
 public:
-    static std::uint32_t GetObjectLowLODModel(std::uint32_t hLODModel) noexcept;
-    static std::uint32_t GetObjectHighLODModel(std::uint32_t lLODModel) noexcept;
+    static std::variant<bool, std::uint32_t> GetLowLODModel(std::uint32_t hLODModel) noexcept;
+    static std::variant<bool, std::uint32_t> GetHighLODModel(std::uint32_t lLODModel) noexcept;
 
-    static void SetObjectCustomLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept;
-    static void ResetObjectCustomLowLODModel(std::uint32_t hLODModel) noexcept;
-    static void ResetAllObjectCustomLowLODModels() noexcept;
+    static bool SetLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept;
+    static bool ResetLowLODModel(std::uint32_t hLODModel) noexcept;
+
+    static void ResetLowLODModels() noexcept;
 
 private:
     // This map contains all HLOD Object Model ID -> LLOD Object Model ID associations
@@ -28,5 +31,5 @@ private:
     static std::unordered_map<std::uint32_t, std::uint32_t> m_customLODModels;
     static std::unordered_map<std::uint32_t, std::uint32_t> m_reverseCustomLODModels;
 
-    static void UpdateReverseCustomLODModels(); // Method to update the reverse map
+    static void UpdateReverseCustomLODModels() noexcept;
 };

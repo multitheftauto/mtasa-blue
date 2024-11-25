@@ -260,6 +260,7 @@ void CLuaManager::LoadCFunctions()
     CLuaMarkerDefs::LoadFunctions();
     CLuaNetworkDefs::LoadFunctions();
     CLuaObjectDefs::LoadFunctions();
+    CLuaModelDefs::LoadFunctions();
     CLuaPedDefs::LoadFunctions();
     CLuaPickupDefs::LoadFunctions();
     CLuaPlayerDefs::LoadFunctions();
