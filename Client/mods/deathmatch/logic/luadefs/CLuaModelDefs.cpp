@@ -34,15 +34,22 @@ void CLuaModelDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
-
 bool CLuaModelDefs::IsValidModel(std::string modelPurpose, std::uint32_t id)
 {
     if (modelPurpose == "object")
         return CClientObjectManager::IsValidModel(id);
+    else if (modelPurpose == "weapon")
+        return CClientPedManager::IsValidWeaponModel(id);
+    else if (modelPurpose == "upgrade")
+        return CVehicleUpgrades::IsUpgrade(id);
     else if (modelPurpose == "building")
         return CClientBuildingManager::IsValidModel(id);
+    else if (modelPurpose == "vehicle")
+        return CClientVehicleManager::IsValidModel(id);
+    else if (modelPurpose == "ped" || modelPurpose == "player")
+        return CClientPlayerManager::IsValidModel(id);
 
-    throw std::invalid_argument("Invalid model purpose passed, expected 'object' or 'building'");
+    throw std::invalid_argument("Invalid model purpose passed, expected [object, weapon, upgrade, building, vehicle, ped, player]");
 }
 
 std::variant<bool, std::uint32_t> CLuaModelDefs::GetLowLODModel(std::uint32_t hLODModel) noexcept
@@ -57,11 +64,14 @@ std::variant<bool, std::uint32_t> CLuaModelDefs::GetHighLODModel(std::uint32_t l
 
 bool CLuaModelDefs::SetLowLODModel(std::string modelPurpose, std::uint32_t hLODModel, std::uint32_t lLODModel)
 {
+    if (!(modelPurpose == "object" || modelPurpose == "building"))
+        throw std::invalid_argument("Invalid model purpose passed, the only options for LOD are 'object' or 'building'");
+
     if (!IsValidModel(modelPurpose, hLODModel))
-        throw std::invalid_argument("Invalid model ID passed for High-LOD argument");
+        throw std::invalid_argument("Invalid High-LOD model ID passed");
 
     if (!IsValidModel(modelPurpose, lLODModel))
-        throw std::invalid_argument("Invalid model ID passed for Low-LOD argument");
+        throw std::invalid_argument("Invalid Low-LOD model ID passed");
 
     return CLodModels::SetLowLODModel(hLODModel, lLODModel);
 }
