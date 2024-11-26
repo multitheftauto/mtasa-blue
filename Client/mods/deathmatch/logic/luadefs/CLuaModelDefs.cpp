@@ -19,7 +19,7 @@ void CLuaModelDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Util func
-        {"IsValidModel", ArgumentParser<IsValidModel>},
+        {"isValidModel", ArgumentParser<IsValidModel>},
 
         // LOD funcs
         {"getLowLODModel", ArgumentParser<GetLowLODModel>},
