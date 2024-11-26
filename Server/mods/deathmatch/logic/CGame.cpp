@@ -4269,9 +4269,7 @@ void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket&
     CPlayer* player = packet.GetSourcePlayer();
 
     if (!player)
-    {
         return;
-    }
 
     const std::string& property = packet.GetProperty();
     const bool         enabled = packet.IsEnabled();
