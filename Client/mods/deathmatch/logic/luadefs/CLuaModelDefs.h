@@ -21,9 +21,10 @@ public:
     static bool IsValidModel(std::string modelPurpose, std::uint32_t id);
 
     // LOD funcs
-    static std::variant<bool, std::uint32_t> GetLowLODModel(std::uint32_t hLODModel) noexcept;
-    static std::variant<bool, std::uint32_t> GetHighLODModel(std::uint32_t lLODModel) noexcept;
-    static bool                              SetLowLODModel(std::string modelPurpose, std::uint32_t hLODModel, std::uint32_t lLODModel);
-    static bool                              ResetLowLODModel(std::uint32_t hLODModel) noexcept;
-    static void                              ResetLowLODModels() noexcept;
+    static std::variant<bool, std::uint32_t> GetModelLowLOD(std::uint32_t hLODModel) noexcept;
+    static std::variant<bool, std::uint32_t> GetModelHighLOD(std::uint32_t lLODModel) noexcept;
+    static bool                              SetModelLOD(std::string modelPurpose, std::uint32_t hLODModel, std::uint32_t lLODModel);
+    static bool                              ResetModelLODByHigh(std::uint32_t hLODModel) noexcept;
+    static bool                              ResetModelLODByLow(std::uint32_t lLODModel) noexcept;
+    static void                              ResetAllModelLOD() noexcept;
 };

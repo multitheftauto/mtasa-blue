@@ -13,13 +13,14 @@
 class CLodModels
 {
 public:
-    static std::variant<bool, std::uint32_t> GetLowLODModel(std::uint32_t hLODModel) noexcept;
-    static std::variant<bool, std::uint32_t> GetHighLODModel(std::uint32_t lLODModel) noexcept;
+    static std::variant<bool, std::uint32_t> GetModelLowLOD(std::uint32_t hLODModel) noexcept;
+    static std::variant<bool, std::uint32_t> GetModelHighLOD(std::uint32_t lLODModel) noexcept;
 
-    static bool SetLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept;
-    static bool ResetLowLODModel(std::uint32_t hLODModel) noexcept;
+    static bool SetModelLOD(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept;
+    static bool ResetModelLODByHigh(std::uint32_t hLODModel) noexcept;
+    static bool ResetModelLODByLow(std::uint32_t lLODModel) noexcept;
 
-    static void ResetLowLODModels() noexcept;
+    static void ResetAllModelLOD() noexcept;
 
 private:
     // This map contains all HLOD Object Model ID -> LLOD Object Model ID associations

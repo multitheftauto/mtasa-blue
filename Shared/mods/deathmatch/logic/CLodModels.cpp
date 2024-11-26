@@ -4329,7 +4329,7 @@ void CLodModels::UpdateReverseCustomLODModels() noexcept
         m_reverseCustomLODModels[entry.second] = entry.first;
 }
 
-std::variant<bool, std::uint32_t> CLodModels::GetLowLODModel(std::uint32_t hLODModel) noexcept
+std::variant<bool, std::uint32_t> CLodModels::GetModelLowLOD(std::uint32_t hLODModel) noexcept
 {
     if (auto it = m_customLODModels.find(hLODModel); it != m_customLODModels.end())
         return it->second;
@@ -4340,7 +4340,7 @@ std::variant<bool, std::uint32_t> CLodModels::GetLowLODModel(std::uint32_t hLODM
     return false;
 }
 
-std::variant<bool, std::uint32_t> CLodModels::GetHighLODModel(std::uint32_t lLODModel) noexcept
+std::variant<bool, std::uint32_t> CLodModels::GetModelHighLOD(std::uint32_t lLODModel) noexcept
 {
     if (auto it = m_reverseCustomLODModels.find(lLODModel); it != m_reverseCustomLODModels.end())
         return it->second;
@@ -4351,7 +4351,7 @@ std::variant<bool, std::uint32_t> CLodModels::GetHighLODModel(std::uint32_t lLOD
     return false;
 }
 
-bool CLodModels::SetLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept
+bool CLodModels::SetModelLOD(std::uint32_t hLODModel, std::uint32_t lLODModel) noexcept
 {
     if (m_customLODModels.find(hLODModel) != m_customLODModels.end())
         return false;
@@ -4361,7 +4361,7 @@ bool CLodModels::SetLowLODModel(std::uint32_t hLODModel, std::uint32_t lLODModel
     return true;
 }
 
-bool CLodModels::ResetLowLODModel(std::uint32_t hLODModel) noexcept
+bool CLodModels::ResetModelLODByHigh(std::uint32_t hLODModel) noexcept
 {
     if (m_customLODModels.find(hLODModel) == m_customLODModels.end())
         return false;
@@ -4371,7 +4371,17 @@ bool CLodModels::ResetLowLODModel(std::uint32_t hLODModel) noexcept
     return true;
 }
 
-void CLodModels::ResetLowLODModels() noexcept
+bool CLodModels::ResetModelLODByLow(std::uint32_t lLODModel) noexcept
+{
+    if (m_reverseCustomLODModels.find(lLODModel) == m_reverseCustomLODModels.end())
+        return false;
+
+    m_customLODModels.erase(m_reverseCustomLODModels[lLODModel]);
+    UpdateReverseCustomLODModels();
+    return true;
+}
+
+void CLodModels::ResetAllModelLOD() noexcept
 {
     m_customLODModels.clear();
     UpdateReverseCustomLODModels();

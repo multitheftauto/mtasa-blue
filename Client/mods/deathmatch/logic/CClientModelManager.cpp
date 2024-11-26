@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLodModels.h"
+
 CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(g_pGame->GetBaseIDforCOL()))
 {
     const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
@@ -21,6 +23,9 @@ CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shar
 CClientModelManager::~CClientModelManager(void)
 {
     RemoveAll();
+
+    // Reset Level-Of-Detail system
+    CLodModels::ResetAllModelLOD();
 }
 
 void CClientModelManager::RemoveAll(void)
@@ -55,6 +60,11 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
         m_Models[modelId]->RestoreEntitiesUsingThisModel();
         m_Models[modelId] = nullptr;
         m_modelCount--;
+
+        // Force reset the model in Level-Of-Detail system
+        CLodModels::ResetModelLODByHigh(modelId);
+        CLodModels::ResetModelLODByLow(modelId);
+
         return true;
     }
     return false;

@@ -22,11 +22,12 @@ void CLuaModelDefs::LoadFunctions()
         {"isValidModel", ArgumentParser<IsValidModel>},
 
         // LOD funcs
-        {"getLowLODModel", ArgumentParser<GetLowLODModel>},
-        {"getHighLODModel", ArgumentParser<GetHighLODModel>},
-        {"setLowLODModel", ArgumentParser<SetLowLODModel>},
-        {"resetLowLODModel", ArgumentParser<ResetLowLODModel>},
-        {"resetLowLODModels", ArgumentParser<ResetLowLODModels>},
+        {"getModelLowLOD", ArgumentParser<GetModelLowLOD>},
+        {"getModelHighLOD", ArgumentParser<GetModelHighLOD>},
+        {"setModelLOD", ArgumentParser<SetModelLOD>},
+        {"resetModelLODByHigh", ArgumentParser<ResetModelLODByHigh>},
+        {"resetModelLODByLow", ArgumentParser<ResetModelLODByLow>},
+        {"resetAllModelLOD", ArgumentParser<ResetAllModelLOD>},
     };
 
     // Add functions
@@ -52,17 +53,17 @@ bool CLuaModelDefs::IsValidModel(std::string modelPurpose, std::uint32_t id)
     throw std::invalid_argument("Invalid model purpose passed, expected [object, weapon, upgrade, building, vehicle, ped, player]");
 }
 
-std::variant<bool, std::uint32_t> CLuaModelDefs::GetLowLODModel(std::uint32_t hLODModel) noexcept
+std::variant<bool, std::uint32_t> CLuaModelDefs::GetModelLowLOD(std::uint32_t hLODModel) noexcept
 {
-    return CLodModels::GetLowLODModel(hLODModel);
+    return CLodModels::GetModelLowLOD(hLODModel);
 }
 
-std::variant<bool, std::uint32_t> CLuaModelDefs::GetHighLODModel(std::uint32_t lLODModel) noexcept
+std::variant<bool, std::uint32_t> CLuaModelDefs::GetModelHighLOD(std::uint32_t lLODModel) noexcept
 {
-    return CLodModels::GetHighLODModel(lLODModel);
+    return CLodModels::GetModelHighLOD(lLODModel);
 }
 
-bool CLuaModelDefs::SetLowLODModel(std::string modelPurpose, std::uint32_t hLODModel, std::uint32_t lLODModel)
+bool CLuaModelDefs::SetModelLOD(std::string modelPurpose, std::uint32_t hLODModel, std::uint32_t lLODModel)
 {
     if (!(modelPurpose == "object" || modelPurpose == "building"))
         throw std::invalid_argument("Invalid model purpose passed, the only options for LOD are 'object' or 'building'");
@@ -73,15 +74,20 @@ bool CLuaModelDefs::SetLowLODModel(std::string modelPurpose, std::uint32_t hLODM
     if (!IsValidModel(modelPurpose, lLODModel))
         throw std::invalid_argument("Invalid Low-LOD model ID passed");
 
-    return CLodModels::SetLowLODModel(hLODModel, lLODModel);
+    return CLodModels::SetModelLOD(hLODModel, lLODModel);
 }
 
-bool CLuaModelDefs::ResetLowLODModel(std::uint32_t hLODModel) noexcept
+bool CLuaModelDefs::ResetModelLODByHigh(std::uint32_t hLODModel) noexcept
 {
-    return CLodModels::ResetLowLODModel(hLODModel);
+    return CLodModels::ResetModelLODByHigh(hLODModel);
 }
 
-void CLuaModelDefs::ResetLowLODModels() noexcept
+bool CLuaModelDefs::ResetModelLODByLow(std::uint32_t hLODModel) noexcept
 {
-    CLodModels::ResetLowLODModels();
+    return CLodModels::ResetModelLODByLow(hLODModel);
+}
+
+void CLuaModelDefs::ResetAllModelLOD() noexcept
+{
+    CLodModels::ResetAllModelLOD();
 }
