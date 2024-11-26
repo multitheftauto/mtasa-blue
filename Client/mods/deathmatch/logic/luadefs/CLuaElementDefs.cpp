@@ -961,9 +961,21 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
 }
 
 CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
-                                                            std::optional<unsigned short> dimension)
+                                                            std::optional<unsigned short> dimension, std::optional<std::variant<std::vector<CClientEntity*>, CClientEntity*>> ignore)
 {
     const auto typeHash = (type.has_value() && !type.value().empty()) ? CClientEntity::GetTypeHashFromString(type.value()) : 0;
+
+    const std::vector<CClientEntity*> ignoreEntities = [&]()
+    {
+        if (ignore.has_value())
+        {
+            if (ignore.value().index() == 0)
+                return std::get<std::vector<CClientEntity*>>(ignore.value());
+            else
+                return std::vector<CClientEntity*>{std::get<CClientEntity*>(ignore.value())};
+        }
+        return std::vector<CClientEntity*>{};
+    }();
 
     CClientEntityResult result;
     GetClientSpatialDatabase()->SphereQuery(result, CSphere{pos, radius});
@@ -972,27 +984,30 @@ CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float r
     if (interior || dimension || typeHash)
     {
         result.erase(std::remove_if(result.begin(), result.end(),
-                                    [&, radiusSq = radius * radius](CElement* pElement) {
-                                        if (typeHash && typeHash != pElement->GetTypeHash())
-                                            return true;
+        [&, radiusSq = radius * radius](CElement* pElement) {
+            if (typeHash && typeHash != pElement->GetTypeHash())
+                return true;
 
-                                        if (interior.has_value() && interior != pElement->GetInterior())
-                                            return true;
+            if (interior.has_value() && interior != pElement->GetInterior())
+                return true;
 
-                                        if (dimension.has_value() && dimension != pElement->GetDimension())
-                                            return true;
+            if (dimension.has_value() && dimension != pElement->GetDimension())
+                return true;
 
-                                        // Check if element is within the sphere, because the spatial database is 2D
-                                        CVector elementPos;
-                                        pElement->GetPosition(elementPos);
-                                        if ((elementPos - pos).LengthSquared() > radiusSq)
-                                            return true;
+            // Check if element is within the sphere, because the spatial database is 2D
+            CVector elementPos;
+            pElement->GetPosition(elementPos);
+            if ((elementPos - pos).LengthSquared() > radiusSq)
+                return true;
 
-                                        return pElement->IsBeingDeleted();
-                                    }),
-                     result.end());
+            // Check if element is in the ignore list
+            if (std::find(ignoreEntities.begin(), ignoreEntities.end(), pElement) != ignoreEntities.end())
+                return true;
+
+            return pElement->IsBeingDeleted();
+        }),
+        result.end());
     }
-
     return result;
 }
 
