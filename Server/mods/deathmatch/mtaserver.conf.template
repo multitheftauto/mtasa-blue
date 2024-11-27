@@ -275,6 +275,12 @@
          Values: 0 - Off, 1 - Enabled.  Default - 0 -->
     <elementdata_whitelisted>0</elementdata_whitelisted>
 
+    <!-- This parameter determines that the server checks when the players connect that there are no other players with the same serial number. 
+         Note that this may break compatibility with virtual machines.
+         Not guarantees that the player cannot manipulate their serial.
+         Values: 0 - Off, 1 - Enabled.  Default - 1 -->
+    <check_duplicate_serials>1</check_duplicate_serials>
+
     <!-- These parameters specify the maximum amount of events that can be triggered by the client (via triggerServerEvent) within the given interval.
           Note: The interval is given in milliseconds
           Interval range: 50 to 5000. Default: 1000
