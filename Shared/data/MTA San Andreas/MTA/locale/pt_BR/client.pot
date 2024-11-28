@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-21 22:47+0000\n"
-"PO-Revision-Date: 2024-11-22 00:20\n"
+"PO-Revision-Date: 2024-11-28 02:30\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -84,47 +84,47 @@ msgstr "estação de rádio anterior"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr ""
+msgstr "ativa a visualização do mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "aproxima o mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "afasta o mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "move o mapa do jogador para cima"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "move o mapa do jogador para baixo"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "move o mapa do jogador para a direita"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "move o mapa do jogador para a esquerda"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "anexa o mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "reduz a opacidade do mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "aumenta a opacidade do mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "alternar texto de ajuda do mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -452,25 +452,25 @@ msgstr "Morreu"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:74
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "Mudar modo: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:76
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "Ampliação: %s/%s    Movimento: %s, %s, %s, %s Opacidade: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "Alternar mapa:  %s     Alternar texto de ajuda: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr ""
+msgstr "Seguir o jogador"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr ""
+msgstr "Livre circulação"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -576,7 +576,7 @@ msgstr "Desconectado: Falha ao verificar o serial"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "Desconectado: Seu serial esta em uso"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -2118,16 +2118,16 @@ msgstr "Transparência:"
 
 #: Client/core/CSettings.cpp:441
 msgid "Image resolution:"
-msgstr ""
+msgstr "Resolução de imagem"
 
 #: Client/core/CSettings.cpp:448
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (Padrão)"
 
 #. index 0
 #: Client/core/CSettings.cpp:449
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
