@@ -125,7 +125,7 @@ CGameSA::CGameSA()
     m_pControllerConfigManager = new CControllerConfigManagerSA();
     m_pProjectileInfo = new CProjectileInfoSA();
     m_pRenderWare = new CRenderWareSA();
-    m_HandlingManager = std::make_shared<CHandlingManagerSA>();
+    m_HandlingManager = std::make_unique<CHandlingManagerSA>();
     m_pEventList = new CEventListSA();
     m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
     m_pTasks = new CTasksSA((CTaskManagementSystemSA*)m_pTaskManagementSystem);

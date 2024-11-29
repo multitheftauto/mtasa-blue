@@ -41,15 +41,9 @@ void CHandlingEntrySA::Assign(const CHandlingEntry* const pEntry) noexcept
     if (!pEntry)
         return;
 
-    try
-    {
-        // Copy the data
-        const CHandlingEntrySA* const pEntrySA = static_cast<const CHandlingEntrySA const*>(pEntry);
-        m_Handling = pEntrySA->m_Handling;
-    }
-    catch (...)
-    {
-    }
+    // Copy the data
+    const CHandlingEntrySA* const pEntrySA = static_cast<const CHandlingEntrySA const*>(pEntry);
+    m_Handling = pEntrySA->m_Handling;
 }
 
 void CHandlingEntrySA::Recalculate() noexcept

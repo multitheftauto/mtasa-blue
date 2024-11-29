@@ -15,8 +15,8 @@
 #include "CVehicleManager.h"
 
 // Original handling data
-static std::unordered_map<std::size_t, tHandlingData>                   m_OriginalHandlingData;
-static std::unordered_map<std::size_t, std::unique_ptr<CHandlingEntry>> m_OriginalEntries;
+static tHandlingData                   m_OriginalHandlingData[HT_MAX];
+static std::unique_ptr<CHandlingEntry> m_OriginalEntries[HT_MAX];
 
 // Model handling data
 static std::unordered_map<std::size_t, std::unique_ptr<CHandlingEntry>> m_ModelEntries;

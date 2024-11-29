@@ -27,19 +27,19 @@ extern CGameSA*        pGame;
 #define DUMP_HANDLING_DATA 0
 
 // Original handling data unaffected by handling.cfg changes
-std::unordered_map<std::size_t, tHandlingDataSA>                   m_OriginalHandlingData;
-std::unordered_map<std::size_t, std::unique_ptr<CHandlingEntrySA>> m_OriginalEntries;
+static tHandlingDataSA                   m_OriginalHandlingData[HT_MAX];
+static std::unique_ptr<CHandlingEntrySA> m_OriginalEntries[HT_MAX];
 
-std::unordered_map<std::size_t, tFlyingHandlingDataSA>                   m_OriginalFlyingHandlingData;
-std::unordered_map<std::size_t, std::unique_ptr<CFlyingHandlingEntrySA>> m_OriginalFlyingEntries;
+static tFlyingHandlingDataSA                   m_OriginalFlyingHandlingData[24];
+static std::unique_ptr<CFlyingHandlingEntrySA> m_OriginalFlyingEntries[24];
 
-std::unordered_map<std::size_t, tBoatHandlingDataSA>                   m_OriginalBoatHandlingData;
-std::unordered_map<std::size_t, std::unique_ptr<CBoatHandlingEntrySA>> m_OriginalBoatEntries;
+static tBoatHandlingDataSA                   m_OriginalBoatHandlingData[12];
+static std::unique_ptr<CBoatHandlingEntrySA> m_OriginalBoatEntries[12];
 
-std::unordered_map<std::size_t, tBikeHandlingDataSA>                   m_OriginalBikeHandlingData;
-std::unordered_map<std::size_t, std::unique_ptr<CBikeHandlingEntrySA>> m_OriginalBikeEntries;
+static tBikeHandlingDataSA                   m_OriginalBikeHandlingData[14];
+static std::unique_ptr<CBikeHandlingEntrySA> m_OriginalBikeEntries[14];
 
-std::map<std::string, eHandlingProperty> m_HandlingNames;
+static std::map<std::string, eHandlingProperty> m_HandlingNames;
 
 // TODO We need install a hook in 0x6F52D0 to make some stuff work corrently
 
@@ -9143,11 +9143,7 @@ void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const pEnt
         if (eHandling >= HT_MAX)
             return;
 
-        const auto it = m_OriginalEntries.find(eHandling);
-        if (it == m_OriginalEntries.end())
-            return;
-
-        const auto& entries = it->second;
+        const auto& entries = m_OriginalEntries[eHandling];
         if (!entries)
             return;
 
