@@ -518,6 +518,7 @@ private:
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
     void Packet_PlayerResourceStart(class CPlayerResourceStartPacket& Packet);
+    void Packet_PlayerWorldSpecialProperty(class CPlayerWorldSpecialPropertyPacket& packet) noexcept;
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 

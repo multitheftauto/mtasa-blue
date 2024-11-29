@@ -1574,6 +1574,7 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x6C4453, 0x90, 0x68);
     
     InitHooks_CrashFixHacks();
+    InitHooks_DeviceSelection();
 
     // Init our 1.3 hooks.
     Init_13();
@@ -1861,6 +1862,7 @@ void CMultiplayerSA::DisableCloseRangeDamage(bool bDisabled)
         MemPut<BYTE>(0x73BA00, 0x86);
     }
 }
+
 bool CMultiplayerSA::GetInteriorSoundsEnabled()
 {
     return bInteriorSoundsEnabled;

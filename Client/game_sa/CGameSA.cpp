@@ -846,6 +846,34 @@ void CGameSA::SetRoadSignsTextEnabled(bool isEnabled)
     m_isRoadSignsTextEnabled = isEnabled;
 }
 
+void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isIgnoreFireStateEnabled)
+        return;
+
+    if (isEnabled)
+    {
+        MemSet((void*)0x6511B9, 0x90, 10);            // CCarEnterExit::IsVehicleStealable
+        MemSet((void*)0x643A95, 0x90, 14);            // CTaskComplexEnterCar::CreateFirstSubTask
+        MemSet((void*)0x6900B5, 0x90, 14);            // CTaskComplexCopInCar::ControlSubTask
+        MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter
+
+        MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon
+    }
+    else
+    {
+        // Restore original bytes
+        MemCpy((void*)0x6511B9, "\x88\x86\x90\x04\x00\x00\x85\xC0\x75\x3E", 10);
+        MemCpy((void*)0x643A95, "\x8B\x88\x90\x04\x00\x00\x85\xC9\x0F\x85\x99\x01\x00\x00", 14);
+        MemCpy((void*)0x6900B5, "\x8B\x81\x90\x04\x00\x00\x85\xC0\x0F\x85\x1A\x01\x00\x00", 14);
+        MemCpy((void*)0x64F3DB, "\x8B\x85\x90\x04\x00\x00\x85\xC0\x0F\x85\x1B\x01\x00\x00", 14);
+
+        MemCpy((void*)0x685A7F, "\x8B\x86\x30\x07\x00\x00\x85\xC0\x0F\x85\x1D\x01\x00\x00", 14);
+    }
+
+    m_isIgnoreFireStateEnabled = isEnabled;
+}
+
 bool CGameSA::PerformChecks()
 {
     std::map<std::string, SCheatSA*>::iterator it;
