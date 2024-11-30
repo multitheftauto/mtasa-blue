@@ -83,7 +83,8 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType);
+    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType,
+                               std::optional<eCustomDataClientTrust> clientTrust);
     static bool RemoveElementData(CElement* pElement, const char* szName);
     static bool AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
     static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);

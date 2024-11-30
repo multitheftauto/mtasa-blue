@@ -954,14 +954,19 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType,
+                                                std::optional<eCustomDataClientTrust> clientTrust)
 {
     assert(pElement);
     assert(szName);
     assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    ESyncType     lastSyncType = ESyncType::BROADCAST;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+    ESyncType              lastSyncType = ESyncType::BROADCAST;
+    eCustomDataClientTrust lastClientTrust{};
+    CLuaArgument*          pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType, &lastClientTrust);
+
+    if (clientTrust.has_value() && lastClientTrust != clientTrust.value())
+        pElement->GetCustomDataManager().SetClientChangesMode(szName, clientTrust.value());
 
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
@@ -10854,6 +10859,13 @@ bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
     BitStream.pBitStream->Write(g_TickRateSettings.iObjectSync);
     BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncRotation);
     BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncAnalogMove);
+
+    if (pPlayer->CanBitStream(eBitStreamVersion::FixSyncerDistance))
+    {
+        BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
+        BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+    }
+
     if (pPlayer)
         pPlayer->Send(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
     else

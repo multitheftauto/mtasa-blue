@@ -39,7 +39,8 @@ public:
         BAN,
         KICK,
         CUSTOM,
-        SHUTDOWN
+        SHUTDOWN,
+        SERIAL_DUPLICATE
     };
 
     CPlayerDisconnectedPacket(const char* szReason);
