@@ -28,7 +28,7 @@
 #include "CUnoccupiedVehicleSync.h"
 #include "CPedSync.h"
 #include "CObjectSync.h"
-#include "CRadarMap.h"
+#include "CPlayerMap.h"
 #include "CClientTeamManager.h"
 #include "CClientPedManager.h"
 #include "lua/CLuaManager.h"
@@ -296,7 +296,7 @@ public:
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };
     CNetAPI*               GetNetAPI() { return m_pNetAPI; };
-    CRadarMap*             GetRadarMap() { return m_pRadarMap; };
+    CPlayerMap*            GetPlayerMap() { return m_pPlayerMap; };
     CMovingObjectsManager* GetMovingObjectsManager() { return m_pMovingObjectsManager; }
 
     CClientPlayer*       GetLocalPlayer() { return m_pLocalPlayer; }
@@ -410,7 +410,7 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
-    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled);
+    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept;
     bool IsWorldSpecialProperty(WorldSpecialProperty property);
 
     bool SetCloudsEnabled(bool bEnabled);
@@ -694,7 +694,7 @@ private:
     CNetworkStats*         m_pNetworkStats;
     CSyncDebug*            m_pSyncDebug;
     // CScreenshot*                          m_pScreenshot;
-    CRadarMap*                    m_pRadarMap;
+    CPlayerMap*                   m_pPlayerMap;
     CTransferBox*                 m_pTransferBox;
     CResourceManager*             m_pResourceManager;
     CScriptKeyBinds*              m_pScriptKeyBinds;

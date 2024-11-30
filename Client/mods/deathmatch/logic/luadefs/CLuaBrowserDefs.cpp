@@ -49,6 +49,7 @@ void CLuaBrowserDefs::LoadFunctions()
         {"resizeBrowser", ResizeBrowser},
         {"guiCreateBrowser", GUICreateBrowser},
         {"guiGetBrowser", GUIGetBrowser},
+        {"isBrowserGPUEnabled", ArgumentParser<IsBrowserGPUEnabled>},
     };
 
     // Add browser functions
@@ -97,6 +98,7 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "renderingPaused", "setBrowserRenderingPaused", "isBrowserRenderingPaused");
     lua_classvariable(luaVM, "volume", "setBrowserVolume", "getBrowserVolume");
     lua_classvariable(luaVM, "devTools", "toggleBrowserDevTools", nullptr);
+    lua_classvariable(luaVM, "gpuEnabled", nullptr, "isBrowserGPUEnabled");
 
     lua_registerclass(luaVM, "Browser", "DxTexture");
 
@@ -1053,4 +1055,9 @@ int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaBrowserDefs::IsBrowserGPUEnabled() noexcept
+{
+    return g_pCore->GetWebCore()->GetGPUEnabled();
 }
