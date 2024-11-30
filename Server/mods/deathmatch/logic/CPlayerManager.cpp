@@ -138,6 +138,17 @@ CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive)
     return NULL;
 }
 
+CPlayer* CPlayerManager::GetBySerial(const std::string_view serial) const noexcept
+{
+    for (const auto& player : m_Players)
+    {
+        if (player->GetSerial() == serial)
+            return player;
+    }
+
+    return nullptr;
+}
+
 void CPlayerManager::DeleteAll()
 {
     // Delete all the items in the list
