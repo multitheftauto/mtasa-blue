@@ -46,6 +46,11 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
         // Has it not already been removed by GTA?
         if (pProjectileInfo->IsActive())
         {
+            // Fix crash when disconnecting
+            // GH #3876
+            if (!projectileInfoInterface->pEntProjectileOwner || projectileInfoInterface->pEntProjectileOwner->nType == ENTITY_TYPE_NOTHING || projectileInfoInterface->pEntProjectileOwner->pReferences == reinterpret_cast<void*>(0x80808080))
+                bBlow = false;
+
             if (bBlow)
             {
                 DWORD dwFunc = FUNC_RemoveProjectile;
