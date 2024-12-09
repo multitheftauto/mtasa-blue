@@ -77,7 +77,7 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     pBuilding->m_pLod = nullptr;
     pBuilding->m_iplIndex = 0;
 
-    // Resore changes properties group
+    // Restore changed properties group
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
         modelInfo->SetObjectPropertiesGroup(prevGroup);
 
