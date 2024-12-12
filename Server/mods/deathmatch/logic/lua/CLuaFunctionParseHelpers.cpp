@@ -271,6 +271,7 @@ ADD_ENUM(CElement::WATER, "water")
 ADD_ENUM(CElement::DATABASE_CONNECTION, "db-connection")
 ADD_ENUM(CElement::ROOT, "root")
 ADD_ENUM(CElement::UNKNOWN, "unknown")
+ADD_ENUM(CElement::BUILDING, "building")
 IMPLEMENT_ENUM_END_DEFAULTS("element-type", CElement::UNKNOWN, "unknown")
 
 IMPLEMENT_ENUM_BEGIN(CAccountPassword::EAccountPasswordType)

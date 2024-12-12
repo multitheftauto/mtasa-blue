@@ -44,6 +44,7 @@ CHandlingManager*          CLuaDefs::m_pHandlingManager = NULL;
 CLuaManager*               CLuaDefs::m_pLuaManager = NULL;
 CMarkerManager*            CLuaDefs::m_pMarkerManager = NULL;
 CObjectManager*            CLuaDefs::m_pObjectManager = NULL;
+CBuildingManager*          CLuaDefs::m_pBuildingManager = nullptr;
 CPickupManager*            CLuaDefs::m_pPickupManager = NULL;
 CPlayerManager*            CLuaDefs::m_pPlayerManager = NULL;
 CRadarAreaManager*         CLuaDefs::m_pRadarAreaManager = NULL;
@@ -67,6 +68,7 @@ void CLuaDefs::Initialize(CGame* pGame)
     m_pLuaManager = pGame->GetLuaManager();
     m_pMarkerManager = pGame->GetMarkerManager();
     m_pObjectManager = pGame->GetObjectManager();
+    m_pBuildingManager = pGame->GetBuildingManager();
     m_pPickupManager = pGame->GetPickupManager();
     m_pPlayerManager = pGame->GetPlayerManager();
     m_pRadarAreaManager = pGame->GetRadarAreaManager();

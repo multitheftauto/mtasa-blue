@@ -542,6 +542,12 @@ void CElementRPCs::SetElementCollisionsEnabled(CClientEntity* pSource, NetBitStr
                 pObject->SetCollisionEnabled(bEnable);
                 break;
             }
+
+            case CCLIENTBUILDING:
+            {
+                static_cast<CClientBuilding*>(pSource)->SetUsesCollision(bEnable);
+                break;
+            }
         }
     }
 }
@@ -591,6 +597,13 @@ void CElementRPCs::SetLowLodElement(CClientEntity* pSource, NetBitStreamInterfac
                 CClientObject* pLowLodObject = DynamicCast<CClientObject>(CElementIDs::GetElement(LowLodObjectID));
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetLowLodObject(pLowLodObject);
+                break;
+            }
+            case CCLIENTBUILDING:
+            {
+                CClientBuilding* pLowLodObject = DynamicCast<CClientBuilding>(CElementIDs::GetElement(LowLodObjectID));
+                CClientBuilding* pObject = static_cast<CClientBuilding*>(pSource);
+                pObject->SetLowLodBuilding(pLowLodObject);
                 break;
             }
         }

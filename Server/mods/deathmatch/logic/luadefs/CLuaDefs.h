@@ -21,6 +21,7 @@
 #include "../CMainConfig.h"
 #include "../CMarkerManager.h"
 #include "../CObjectManager.h"
+#include "../CBuildingManager.h"
 #include "../CPickupManager.h"
 #include "../CPlayerManager.h"
 #include "../CRadarAreaManager.h"
@@ -72,6 +73,7 @@ protected:
     static CLuaManager*               m_pLuaManager;
     static CMarkerManager*            m_pMarkerManager;
     static CObjectManager*            m_pObjectManager;
+    static CBuildingManager*          m_pBuildingManager;
     static CPickupManager*            m_pPickupManager;
     static CPlayerManager*            m_pPlayerManager;
     static CRadarAreaManager*         m_pRadarAreaManager;
