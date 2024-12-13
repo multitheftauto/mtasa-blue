@@ -780,8 +780,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\cgui\unifont.ttf"
 
             SetOutPath "$INSTDIR\MTA\cgui\images"
-            File "${FILES_ROOT}\mta\cgui\images\*.png"
-            File "${FILES_ROOT}\mta\cgui\images\*.jpg"
+            File /nonfatal "${FILES_ROOT}\mta\cgui\images\*.png"
+            File /nonfatal "${FILES_ROOT}\mta\cgui\images\*.jpg"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\radarset"
             File "${FILES_ROOT}\mta\cgui\images\radarset\*.png"
