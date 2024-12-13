@@ -5982,7 +5982,7 @@ bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
 
-bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled)
+bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept
 {
     switch (property)
     {
@@ -5990,47 +5990,60 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::AIRCARS:
         case WorldSpecialProperty::EXTRABUNNY:
         case WorldSpecialProperty::EXTRAJUMP:
-            return g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+            g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+            break;
         case WorldSpecialProperty::RANDOMFOLIAGE:
             g_pGame->SetRandomFoliageEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::SNIPERMOON:
             g_pGame->SetMoonEasterEggEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::EXTRAAIRRESISTANCE:
             g_pGame->SetExtraAirResistanceEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::UNDERWORLDWARP:
             g_pGame->SetUnderWorldWarpEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::VEHICLESUNGLARE:
             g_pGame->SetVehicleSunGlareEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::CORONAZTEST:
             g_pGame->SetCoronaZTestEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::WATERCREATURES:
             g_pGame->SetWaterCreaturesEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::BURNFLIPPEDCARS:
             g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::FIREBALLDESTRUCT:
             g_pGame->SetFireballDestructEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::EXTENDEDWATERCANNONS:
             g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
+            break;
         case WorldSpecialProperty::ROADSIGNSTEXT:
             g_pGame->SetRoadSignsTextEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::IGNOREFIRESTATE:
             g_pGame->SetIgnoreFireStateEnabled(isEnabled);
-            return true;
+            break;
+        default:
+            return false;
     }
-    return false;
+
+    if (g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent)) {
+        NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
+        stream->WriteString(EnumToString(property));
+        stream->WriteBit(isEnabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
+    }
+
+    return true;
 }
 
 bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
