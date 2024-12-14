@@ -10862,14 +10862,16 @@ bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
     BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncRotation);
     BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncAnalogMove);
 
-    if (pPlayer->CanBitStream(eBitStreamVersion::FixSyncerDistance))
-    {
-        BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
-        BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
-    }
-
     if (pPlayer)
+    {
+        if (pPlayer->CanBitStream(eBitStreamVersion::FixSyncerDistance))
+        {
+            BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
+            BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+        }
+
         pPlayer->Send(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
+    }
     else
         m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
 
