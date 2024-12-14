@@ -43,7 +43,7 @@ void CClientGUIManager::DeleteAll()
 
 bool CClientGUIManager::Exists(CClientGUIElement* pGUIElement)
 {
-    return m_Elements.Contains(pGUIElement);
+    return pGUIElement ? m_Elements.Contains(pGUIElement) : false;
 }
 
 bool CClientGUIManager::Exists(CGUIElement* pCGUIElement)
