@@ -18,6 +18,7 @@
 #include "CPlayerInfoSA.h"
 #include "CPlayerPedSA.h"
 #include "CWorldSA.h"
+#include "CProjectileInfoSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -137,6 +138,7 @@ CPlayerPedSA::~CPlayerPedSA()
         if ((DWORD)GetInterface()->vtbl != VTBL_CPlaceable)
         {
             CWorldSA* world = (CWorldSA*)pGame->GetWorld();
+            pGame->GetProjectileInfo()->RemoveEntityReferences(this);
             world->Remove(m_pInterface, CPlayerPed_Destructor);
 
             DWORD dwThis = (DWORD)m_pInterface;
