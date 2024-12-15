@@ -180,3 +180,18 @@ DWORD CProjectileInfoSA::GetCounter()
 {
     return internalInterface->dwCounter - pGame->GetSystemTime();
 }
+
+void CProjectileInfoSA::RemoveEntityReferences(CEntity* entity)
+{
+    const CEntitySAInterface* entityInterface = entity->GetInterface();
+    for (int i = 0; i < PROJECTILE_INFO_COUNT; i++)
+    {
+        auto projectileInterface = projectileInfo[i]->internalInterface;
+
+        if (projectileInterface->pEntProjectileOwner == entityInterface)
+            projectileInterface->pEntProjectileOwner = nullptr;
+
+        if (projectileInterface->pEntProjectileTarget == entityInterface)
+            projectileInterface->pEntProjectileTarget = nullptr;
+    }
+}

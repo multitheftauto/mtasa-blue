@@ -367,16 +367,25 @@ void CResourceChecker::CheckMetaSourceForIssues(CXMLNode* pRootNode, const strin
             attributes.Delete("client");
             attributes.Delete("both");
 
-            if (!m_strReqServerVersion.empty())
+            // Use "both" if client and server versions are the same
+            if (!m_strReqServerVersion.empty() && !m_strReqClientVersion.empty() && m_strReqServerVersion == m_strReqClientVersion)
             {
-                CXMLAttribute* pAttr = attributes.Create("server");
+                CXMLAttribute* pAttr = attributes.Create("both");
                 pAttr->SetValue(m_strReqServerVersion);
             }
-
-            if (!m_strReqClientVersion.empty())
+            else
             {
-                CXMLAttribute* pAttr = attributes.Create("client");
-                pAttr->SetValue(m_strReqClientVersion);
+                if (!m_strReqServerVersion.empty())
+                {
+                    CXMLAttribute* pAttr = attributes.Create("server");
+                    pAttr->SetValue(m_strReqServerVersion);
+                }
+
+                if (!m_strReqClientVersion.empty())
+                {
+                    CXMLAttribute* pAttr = attributes.Create("client");
+                    pAttr->SetValue(m_strReqClientVersion);
+                }
             }
 
             if (pbOutHasChanged)
