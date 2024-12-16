@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-16 18:25+0000\n"
-"PO-Revision-Date: 2024-12-16 18:28\n"
+"PO-Revision-Date: 2024-12-16 19:31\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -853,17 +853,20 @@ msgstr "Se extrag fișierele..."
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Pornește Grand Theft Auto: San Andreas.\n"
+"Asigură-te că jocul este localizat în dosarul 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr ""
+msgstr "În căutarea GTA: San Andreas"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Ne pare rău, jocul nu a fost găsit.\n"
+"Pornește Grand Theft Auto: San Andreas și apasă reîncearcă.\n"
+"Asigură-te că jocul este localizat în dosarul 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
