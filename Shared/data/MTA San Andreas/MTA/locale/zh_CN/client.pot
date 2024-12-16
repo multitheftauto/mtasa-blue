@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-21 22:47+0000\n"
-"PO-Revision-Date: 2024-11-22 00:20\n"
+"POT-Creation-Date: 2024-12-16 18:25+0000\n"
+"PO-Revision-Date: 2024-12-16 19:31\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -157,121 +157,121 @@ msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(开发模式) prints world sound ids into the debug window"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:375
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1090 Client/core/CCore.cpp:674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1095 Client/core/CCore.cpp:674
 #: Client/core/CSettings.cpp:3510
 msgid "In-game"
 msgstr "游戏中"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:375
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
 msgid "Flying a UFO around"
 msgstr "驾驶UFO四处游荡"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:375
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
 msgid "Cruising around"
 msgstr "四处巡游"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:375
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
 msgid "Riding the waves of"
 msgstr "在风浪中骑行"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:376
+#: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Riding the train in"
 msgstr "在火车上骑行"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:376
+#: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Flying around"
 msgstr "飞来飞去"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+#: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Riding around"
 msgstr "四处骑行"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+#: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Monster truckin' around"
 msgstr "开着怪兽卡车到处跑"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+#: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Quaddin' around"
 msgstr "骑四轮摩托车到处跑"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Bunny hopping around"
 msgstr "兔子跳"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing weird stuff in"
 msgstr "做奇怪的事"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:382
+#: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Climbing around in"
 msgstr "爬山"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:383
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Doing a drive-by in"
 msgstr "开枪"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blub blub..."
 msgstr "开枪"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Breathing water"
 msgstr "呼吸水"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:387
+#: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Drowning in"
 msgstr "淹死在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:388
+#: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Ducking for cover in"
 msgstr "寻找掩护在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:389
+#: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Fighting in"
 msgstr "战斗在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:390
+#: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Throwing fists in"
 msgstr "扔拳头在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+#: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Blastin' fools in"
 msgstr "爆破在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:392
+#: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Shooting up"
 msgstr "射击"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:393
+#: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Jetpacking in"
 msgstr "喷射背包飞行在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+#: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Literally on fire in"
 msgstr "在火中"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:395
+#: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Burning up in"
 msgstr "燃烧在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:396
+#: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Swimming in"
 msgstr "游泳在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:397
+#: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Floating around in"
 msgstr "漂浮在"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:398
+#: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Being chased by a shark"
 msgstr "被鲨鱼追赶"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:399
+#: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Choking to death in"
 msgstr "窒息死"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:534
+#: Client/mods/deathmatch/logic/CClientGame.cpp:539
 #: Client/core/CMainMenu.cpp:304 Client/core/CCore.cpp:674
 #: Client/core/CSettings.cpp:3506
 msgid "Main menu"
@@ -281,17 +281,17 @@ msgstr "主菜单"
 #. Display an error, reset the error status and exit
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
-#: Client/mods/deathmatch/logic/CClientGame.cpp:642
-#: Client/mods/deathmatch/logic/CClientGame.cpp:716
-#: Client/mods/deathmatch/logic/CClientGame.cpp:740
-#: Client/mods/deathmatch/logic/CClientGame.cpp:762
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1175
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1255
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1265
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1334
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1371
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1420
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1432
+#: Client/mods/deathmatch/logic/CClientGame.cpp:647
+#: Client/mods/deathmatch/logic/CClientGame.cpp:721
+#: Client/mods/deathmatch/logic/CClientGame.cpp:745
+#: Client/mods/deathmatch/logic/CClientGame.cpp:767
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1180
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1270
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1339
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1376
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1425
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1437
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
@@ -314,138 +314,138 @@ msgstr "主菜单"
 msgid "Error"
 msgstr "错误"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:642
-#: Client/mods/deathmatch/logic/CClientGame.cpp:740
+#: Client/mods/deathmatch/logic/CClientGame.cpp:647
+#: Client/mods/deathmatch/logic/CClientGame.cpp:745
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1307
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1364
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "无效的昵称! 请去设置画面那里设定一个新昵称!"
 
 #. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:658
+#: Client/mods/deathmatch/logic/CClientGame.cpp:663
 #: Client/core/CConnectManager.cpp:148
 msgid "CONNECTING"
 msgstr "连接中"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:658
+#: Client/mods/deathmatch/logic/CClientGame.cpp:663
 msgid "Entering the game ..."
 msgstr "进入游戏中 ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:716
+#: Client/mods/deathmatch/logic/CClientGame.cpp:721
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "未连接; 请使用快速连接或者 'connect' 命令来连接服务器."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:762
+#: Client/mods/deathmatch/logic/CClientGame.cpp:767
 msgid "Could not start the local server. See console for details."
 msgstr "无法启动本地服务器.请在 console 中查看详细信息"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:772
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+#: Client/mods/deathmatch/logic/CClientGame.cpp:777
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
 msgid "Local Server"
 msgstr "本地服务器"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:772
+#: Client/mods/deathmatch/logic/CClientGame.cpp:777
 msgid "Starting local server ..."
 msgstr "正在启用本地服务器 ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1020
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1025
 msgid "Area 51"
 msgstr "51区"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1029
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1034
 msgid "Walking around "
 msgstr "四处走走 "
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1175
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1180
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "您已经被踢出游戏 ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
 msgid "Connecting to local server..."
 msgstr "正在连接到本地服务器..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1255
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
 msgid "Error connecting to server."
 msgstr "连接到服务器时发生错误."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1265
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1270
 msgid "Connecting to local server timed out. See console for details."
 msgstr "连接本地服务器超时.请在console中查看详细内容"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1334
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1339
 #: Client/core/CConnectManager.cpp:263
 msgid "Connection timed out"
 msgstr "连接已超时"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1371
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1376
 msgid "Connection with the server was lost"
 msgstr "与服务器丢失连接"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1382
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1387
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
 msgid "Disconnected: unknown protocol error"
 msgstr "已断开连接: 未知协议错误"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1391
 #: Client/core/CConnectManager.cpp:285
 msgid "Disconnected: disconnected remotely"
 msgstr "已断开连接: 服务器主动断开连接"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1390
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1395
 #: Client/core/CConnectManager.cpp:289
 msgid "Disconnected: connection lost remotely"
 msgstr "已断开连接: 与服务器连接中断"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1394
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1399
 #: Client/core/CConnectManager.cpp:293
 msgid "Disconnected: you are banned from this server"
 msgstr "已断开连接: 你已被该服务器封禁 (Banned)"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1403
 msgid "Disconnected: the server is currently full"
 msgstr "断开连接:服务器满载"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1402
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1407
 #: Client/core/CConnectManager.cpp:300
 msgid "Disconnected: disconnected from the server"
 msgstr "已断开连接: 从服务器断开连接"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1406
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1411
 #: Client/core/CConnectManager.cpp:304
 msgid "Disconnected: connection to the server was lost"
 msgstr "已断开连接: 与服务器的连接已中断"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1410
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1415
 msgid "Disconnected: invalid password specified"
 msgstr "断开连接: 无效的密码"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1414
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
 #: Client/core/CConnectManager.cpp:311
 msgid "Disconnected: connection was refused"
 msgstr "已断开连接: 服务器拒绝连接"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1432
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1437
 msgid "MTA Client verification failed!"
 msgstr "MTA客户端验证失败!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
 msgid "In a ditch"
 msgstr "在沟壑中"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
 msgid "En-route to hospital"
 msgstr "前往医院的路上"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5620
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
 msgid "Meeting their maker"
 msgstr "与上帝见面"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5621
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "Regretting their decisions"
 msgstr "后悔自己的决定"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5621
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "Wasted"
 msgstr "已死亡"
 
@@ -842,19 +842,26 @@ msgstr "安装更新中..."
 msgid "Extracting files..."
 msgstr "解压文件中..."
 
-#: Client/loader/Utils.cpp:534 Client/loader/Dialogs.cpp:890
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "搜索Grand Theft Auto: San Andreas"
+#: Client/loader/Utils.cpp:535
+msgid "Start Grand Theft Auto: San Andreas.\n"
+"Ensure the game is placed in the 'Program Files (x86)' folder."
+msgstr ""
 
-#: Client/loader/Utils.cpp:536 Client/loader/Dialogs.cpp:893
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "请启动Grand Theft Auto San Andreas"
+#: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
+msgid "Searching for GTA: San Andreas"
+msgstr ""
 
-#: Client/loader/Utils.cpp:600
+#: Client/loader/Utils.cpp:548
+msgid "Sorry, game not found.\n"
+"Start Grand Theft Auto: San Andreas and click retry.\n"
+"Ensure the game is placed in the 'Program Files (x86)' folder."
+msgstr ""
+
+#: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "请选择 侠盗猎车手:圣安地列斯的安装目录"
 
-#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
+#: Client/loader/Utils.cpp:965 Client/loader/CInstallManager.cpp:361
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -863,66 +870,66 @@ msgstr "MTA:SA 需要管理员权限运行以下任务:\n\n"
 "     '%s'\n\n"
 "请在下一个窗口中确认指令."
 
-#: Client/loader/Utils.cpp:1069
+#: Client/loader/Utils.cpp:1066
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "在读取 %s 模块时出错! (%s)"
 
-#: Client/loader/Utils.cpp:1394 Client/loader/Dialogs.cpp:914
+#: Client/loader/Utils.cpp:1391 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "复制文件..."
 
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1451 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "文件提前复制完毕.所有数据正常."
 
-#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1457 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "正在完成..."
 
-#: Client/loader/Utils.cpp:1462 Client/loader/Dialogs.cpp:928
+#: Client/loader/Utils.cpp:1459 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "已完成!"
 
-#: Client/loader/Utils.cpp:1502
+#: Client/loader/Utils.cpp:1499
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "检测到最近安装的 %s.\n\n"
 "你想把配置文件从%s复制到这里吗?"
 
-#: Client/loader/Utils.cpp:1541
+#: Client/loader/Utils.cpp:1538
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA 在打开 '%s' 文件时遇到问题."
 
-#: Client/loader/Utils.cpp:1563
+#: Client/loader/Utils.cpp:1560
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA 缺少 '%s' 文件."
 
-#: Client/loader/Utils.cpp:1588
+#: Client/loader/Utils.cpp:1585
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA 在加载模型文件时遇到问题."
 
-#: Client/loader/Utils.cpp:1590
+#: Client/loader/Utils.cpp:1587
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "如果您最近修改了gta3.img，请尝试重新安装GTA:SA。"
 
-#: Client/loader/Utils.cpp:1615
+#: Client/loader/Utils.cpp:1612
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA 在改装车辆时遇到问题."
 
-#: Client/loader/Utils.cpp:1634
+#: Client/loader/Utils.cpp:1631
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA 在以下文件找到错误 '%s'"
 
-#: Client/loader/Utils.cpp:1716
+#: Client/loader/Utils.cpp:1713
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "你在运行MTA:SA的时候重启电脑了吗?"
 
-#: Client/loader/Utils.cpp:1781
+#: Client/loader/Utils.cpp:1778
 msgid "Please terminate the following programs before continuing:"
 msgstr "请在运行前关闭以下程序:"
 
@@ -1064,6 +1071,14 @@ msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "朕才不安装反病毒软件.\n"
 "朕就喜欢慢点的电脑顺便成为僵尸网络的一份子."
+
+#: Client/loader/Dialogs.cpp:890
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "搜索Grand Theft Auto: San Andreas"
+
+#: Client/loader/Dialogs.cpp:893
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "请启动Grand Theft Auto San Andreas"
 
 #: Client/loader/MainFunctions.cpp:248
 msgid "Trouble restarting MTA:SA\n\n"
