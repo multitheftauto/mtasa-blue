@@ -42,7 +42,8 @@ class CPacketHandler
         BAN,
         KICK,
         CUSTOM,
-        SHUTDOWN
+        SHUTDOWN,
+        SERIAL_DUPLICATE
     };
 
     struct SEntityDependantStuff
