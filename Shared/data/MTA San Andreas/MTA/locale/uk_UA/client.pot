@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-16 18:25+0000\n"
-"PO-Revision-Date: 2024-12-16 18:29\n"
+"POT-Creation-Date: 2024-12-16 23:16+0000\n"
+"PO-Revision-Date: 2024-12-17 05:00\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -33,7 +33,7 @@ msgstr "НІКОЛИ НЕ ВВОДЬТЕ КОНФІДЕНЦІЙНІ ДАНІ, Щ
 msgid "Remember decision"
 msgstr "Запам'ятати рішення"
 
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:991
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:978
 msgid "Allow"
 msgstr "Дозволити"
 
@@ -83,47 +83,47 @@ msgid "previous radio channel"
 msgstr "Поп. радіостанція"
 
 #: Client/mods/deathmatch/CClient.cpp:67
-msgid "enables the player-map view"
+msgid "enables the radar view"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:68
-msgid "zooms the player-map in"
+msgid "zooms the radar in"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the player-map out"
+msgid "zooms the radar out"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:70
-msgid "moves the player-map north"
+msgid "moves the radar north"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the player-map south"
+msgid "moves the radar south"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the player-map east"
+msgid "moves the radar east"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the player-map west"
+msgid "moves the radar west"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:74
-msgid "attaches the player-map"
+msgid "attaches the radar"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:75
-msgid "reduces player-map opacity"
+msgid "reduces radar opacity"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:76
-msgid "increases player-map opacity"
+msgid "increases radar opacity"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:77
-msgid "toggles player-map help text"
+msgid "toggles radar help text"
 msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:78
@@ -158,7 +158,7 @@ msgstr "(Режим розробки) писати ідентифікатори 
 
 #: Client/mods/deathmatch/logic/CResource.cpp:375
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1095 Client/core/CCore.cpp:674
-#: Client/core/CSettings.cpp:3510
+#: Client/core/CSettings.cpp:3489
 msgid "In-game"
 msgstr "У грі"
 
@@ -273,7 +273,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:539
 #: Client/core/CMainMenu.cpp:304 Client/core/CCore.cpp:674
-#: Client/core/CSettings.cpp:3506
+#: Client/core/CSettings.cpp:3485
 msgid "Main menu"
 msgstr "Головне меню"
 
@@ -297,9 +297,9 @@ msgstr "Головне меню"
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Client/core/CGUI.cpp:93 Client/core/CCore.cpp:1279
-#: Client/core/CCore.cpp:1292 Client/core/CSettings.cpp:2966
-#: Client/core/CSettings.cpp:4204 Client/core/CSettings.cpp:4232
-#: Client/core/CSettings.cpp:4802 Client/core/CConnectManager.cpp:80
+#: Client/core/CCore.cpp:1292 Client/core/CSettings.cpp:2945
+#: Client/core/CSettings.cpp:4179 Client/core/CSettings.cpp:4207
+#: Client/core/CSettings.cpp:4777 Client/core/CConnectManager.cpp:80
 #: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
 #: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
 #: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
@@ -447,29 +447,6 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "Wasted"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:74
-#, c-format
-msgid "Change mode: %s"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:76
-#, c-format
-msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
-#, c-format
-msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
-msgid "Following Player"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
-msgid "Free Movement"
 msgstr ""
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
@@ -708,8 +685,8 @@ msgstr "СТВОРИТИ СЕРВЕР"
 #. * Webbrowser tab
 #. *
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-#: Client/core/CSettings.cpp:458 Client/core/CSettings.cpp:917
-#: Client/core/CSettings.cpp:2043
+#: Client/core/CSettings.cpp:442 Client/core/CSettings.cpp:630
+#: Client/core/CSettings.cpp:904 Client/core/CSettings.cpp:2022
 msgid "General"
 msgstr "Загальні"
 
@@ -765,7 +742,7 @@ msgstr "Запустити"
 #: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:136
 #: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
 #: Client/core/CVersionUpdater.cpp:1841 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4822
+#: Client/core/CSettings.cpp:4797
 msgid "Cancel"
 msgstr "Відміна"
 
@@ -801,7 +778,7 @@ msgstr "Проблема з графічним драйвером"
 #: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
 #: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
 #: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4823
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4798
 msgid "OK"
 msgstr "ОК"
 
@@ -815,9 +792,9 @@ msgstr "ОК"
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1200
-#: Client/core/CSettings.cpp:1407 Client/core/CSettings.cpp:1431
-#: Client/core/CSettings.cpp:4527 Client/core/CSettings.cpp:4601
-#: Client/core/CSettings.cpp:4631 Client/core/CSettings.cpp:4680
+#: Client/core/CSettings.cpp:1393 Client/core/CSettings.cpp:1417
+#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4576
+#: Client/core/CSettings.cpp:4606 Client/core/CSettings.cpp:4655
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
 msgid "Yes"
 msgstr "Так"
@@ -943,10 +920,10 @@ msgstr "Завершіть наступні програми для продов
 #: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1199 Client/core/CSettings.cpp:1406
-#: Client/core/CSettings.cpp:1430 Client/core/CSettings.cpp:4526
-#: Client/core/CSettings.cpp:4600 Client/core/CSettings.cpp:4630
-#: Client/core/CSettings.cpp:4679 Client/core/ServerBrowser/CServerInfo.cpp:481
+#: Client/core/CMainMenu.cpp:1199 Client/core/CSettings.cpp:1392
+#: Client/core/CSettings.cpp:1416 Client/core/CSettings.cpp:4501
+#: Client/core/CSettings.cpp:4575 Client/core/CSettings.cpp:4605
+#: Client/core/CSettings.cpp:4654 Client/core/ServerBrowser/CServerInfo.cpp:481
 msgid "No"
 msgstr "Ні"
 
@@ -1147,13 +1124,13 @@ msgid "Are you having problems running MTA:SA?.\n\n"
 msgstr "У вас виникли труднощі під час завантаження MTA:SA?\n\n"
 "Ви хочете змінити поточні налаштування?"
 
-#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:675
-#: Client/core/CSettings.cpp:1021
+#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:662
+#: Client/core/CSettings.cpp:1008
 msgid "Fullscreen mode:"
 msgstr "Повноекранний режим:"
 
-#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:683
-#: Client/core/CSettings.cpp:1633
+#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:670
+#: Client/core/CSettings.cpp:1619
 msgid "Borderless window"
 msgstr "Вікно в рамці"
 
@@ -1504,7 +1481,7 @@ msgstr "ЗАВАНТАЖЕННЯ ЗАВЕРШЕНО"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - Невідома проблема в _DialogUpdateResult"
 
-#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4628
+#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4603
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "МОДИФІКОВАНІ ФАЙЛИ GTA:SA"
 
@@ -1554,13 +1531,13 @@ msgstr "Вперед"
 msgid "Backwards"
 msgstr "Назад"
 
-#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2265
-#: Client/core/CSettings.cpp:2293
+#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2244
+#: Client/core/CSettings.cpp:2272
 msgid "Left"
 msgstr "Ліворуч"
 
-#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2267
-#: Client/core/CSettings.cpp:2294
+#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2246
+#: Client/core/CSettings.cpp:2273
 msgid "Right"
 msgstr "Праворуч"
 
@@ -2010,7 +1987,7 @@ msgid "Advanced"
 msgstr "Додаткові"
 
 #: Client/core/CSettings.cpp:147 Client/core/CSettings.cpp:338
-#: Client/core/CSettings.cpp:633 Client/core/CSettings.cpp:902
+#: Client/core/CSettings.cpp:617 Client/core/CSettings.cpp:889
 msgid "Load defaults"
 msgstr "Відновити стандартні"
 
@@ -2127,621 +2104,608 @@ msgstr "Використовувати модифіковані файли GTA:S
 msgid "Map rendering options"
 msgstr "Параметри відображення карти"
 
-#: Client/core/CSettings.cpp:421
+#: Client/core/CSettings.cpp:419 Client/core/CSettings.cpp:628
 msgid "Opacity:"
 msgstr "Непрозорість:"
-
-#: Client/core/CSettings.cpp:441
-msgid "Image resolution:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:448
-msgid "1024 x 1024 (Default)"
-msgstr ""
-
-#. index 0
-#: Client/core/CSettings.cpp:449
-msgid "2048 x 2048"
-msgstr ""
 
 #. *
 #. *  Audio tab
 #. *
-#: Client/core/CSettings.cpp:455 Client/core/CSettings.cpp:464
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:448
 msgid "Master volume:"
 msgstr "Загальна гучність:"
 
-#: Client/core/CSettings.cpp:455 Client/core/CSettings.cpp:483
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:467
 msgid "Radio volume:"
 msgstr "Гучність радіо:"
 
-#: Client/core/CSettings.cpp:455 Client/core/CSettings.cpp:502
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:486
 msgid "SFX volume:"
 msgstr "Загальна гучність:"
 
-#: Client/core/CSettings.cpp:455 Client/core/CSettings.cpp:521
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:505
 msgid "MTA volume:"
 msgstr "Гучність MTA:"
 
-#: Client/core/CSettings.cpp:456 Client/core/CSettings.cpp:540
+#: Client/core/CSettings.cpp:440 Client/core/CSettings.cpp:524
 msgid "Voice volume:"
 msgstr "Гучність мовлення:"
 
-#: Client/core/CSettings.cpp:456 Client/core/CSettings.cpp:581
+#: Client/core/CSettings.cpp:440 Client/core/CSettings.cpp:565
 msgid "Play mode:"
 msgstr "Режим відтворення:"
 
-#: Client/core/CSettings.cpp:559
+#: Client/core/CSettings.cpp:543
 msgid "Radio options"
 msgstr "Параметри радіо"
 
-#: Client/core/CSettings.cpp:565
+#: Client/core/CSettings.cpp:549
 msgid "Radio Equalizer"
 msgstr "Еквалайзер радіо"
 
-#: Client/core/CSettings.cpp:570
+#: Client/core/CSettings.cpp:554
 msgid "Radio Auto-tune"
 msgstr "Автоналаштування радіо"
 
-#: Client/core/CSettings.cpp:575
+#: Client/core/CSettings.cpp:559
 msgid "Usertrack options"
 msgstr "Налаштування користувацької музики"
 
-#: Client/core/CSettings.cpp:589 Client/core/CSettings.cpp:3112
+#: Client/core/CSettings.cpp:573 Client/core/CSettings.cpp:3091
 msgid "Radio"
 msgstr "Радіо"
 
-#: Client/core/CSettings.cpp:590 Client/core/CSettings.cpp:3114
+#: Client/core/CSettings.cpp:574 Client/core/CSettings.cpp:3093
 msgid "Random"
 msgstr "Випадково"
 
-#: Client/core/CSettings.cpp:591 Client/core/CSettings.cpp:3116
+#: Client/core/CSettings.cpp:575 Client/core/CSettings.cpp:3095
 msgid "Sequential"
 msgstr "Послідовно"
 
-#: Client/core/CSettings.cpp:594
+#: Client/core/CSettings.cpp:578
 msgid "Automatic Media Scan"
 msgstr "Автопошук музики"
 
-#: Client/core/CSettings.cpp:601
+#: Client/core/CSettings.cpp:585
 msgid "Mute options"
 msgstr "Параметри вимкнення звуку"
 
-#: Client/core/CSettings.cpp:607
+#: Client/core/CSettings.cpp:591
 msgid "Mute All sounds when minimized"
 msgstr "Вимкнути всі звуки при згортанні гри"
 
-#: Client/core/CSettings.cpp:612
+#: Client/core/CSettings.cpp:596
 msgid "Mute Radio sounds when minimized"
 msgstr "Заглушити радіо, коли гра згорнута"
 
-#: Client/core/CSettings.cpp:617
+#: Client/core/CSettings.cpp:601
 msgid "Mute SFX sounds when minimized"
 msgstr "Заглушити звуки ефектів, коли гра згорнута"
 
-#: Client/core/CSettings.cpp:622
+#: Client/core/CSettings.cpp:606
 msgid "Mute MTA sounds when minimized"
 msgstr "Заглушити звуки MTA, коли гра згорнута"
 
-#: Client/core/CSettings.cpp:627
+#: Client/core/CSettings.cpp:611
 msgid "Mute Voice sounds when minimized"
 msgstr "Заглушити голосовий чат, коли гра згорнута"
 
 #. *
 #. *  Video tab
 #. *
-#: Client/core/CSettings.cpp:643 Client/core/CSettings.cpp:649
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:636
 msgid "Resolution:"
 msgstr "Дозвіл:"
 
-#: Client/core/CSettings.cpp:643 Client/core/CSettings.cpp:696
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:683
 msgid "FOV:"
 msgstr "Кут огляду:"
 
-#: Client/core/CSettings.cpp:643 Client/core/CSettings.cpp:712
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:699
 msgid "Draw Distance:"
 msgstr "Дальність промальовування:"
 
-#: Client/core/CSettings.cpp:643 Client/core/CSettings.cpp:730
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:717
 msgid "Brightness:"
 msgstr "Яскравість:"
 
-#: Client/core/CSettings.cpp:643 Client/core/CSettings.cpp:748
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:735
 msgid "FX Quality:"
 msgstr "Якість ефектів:"
 
-#: Client/core/CSettings.cpp:644 Client/core/CSettings.cpp:762
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:749
 msgid "Anisotropic filtering:"
 msgstr "Анізотропна фільтрація:"
 
-#: Client/core/CSettings.cpp:644 Client/core/CSettings.cpp:789
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:776
 msgid "Anti-aliasing:"
 msgstr "Екранне згладжування:"
 
-#: Client/core/CSettings.cpp:644 Client/core/CSettings.cpp:803
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:790
 msgid "Aspect Ratio:"
 msgstr "Співвідношення сторін:"
 
-#: Client/core/CSettings.cpp:661
+#: Client/core/CSettings.cpp:648
 msgid "Windowed"
 msgstr "Віконний режим"
 
-#: Client/core/CSettings.cpp:667
+#: Client/core/CSettings.cpp:654
 msgid "DPI aware"
 msgstr "DPI aware"
 
-#: Client/core/CSettings.cpp:682 Client/core/CSettings.cpp:1631
+#: Client/core/CSettings.cpp:669 Client/core/CSettings.cpp:1617
 msgid "Standard"
 msgstr "Стандарт"
 
-#: Client/core/CSettings.cpp:684 Client/core/CSettings.cpp:1635
+#: Client/core/CSettings.cpp:671 Client/core/CSettings.cpp:1621
 msgid "Borderless keep res"
 msgstr "Вікно без рамки"
 
-#: Client/core/CSettings.cpp:688
+#: Client/core/CSettings.cpp:675
 msgid "Mip Mapping"
 msgstr "Деталізація"
 
-#: Client/core/CSettings.cpp:756 Client/core/CSettings.cpp:1535
+#: Client/core/CSettings.cpp:743 Client/core/CSettings.cpp:1521
 msgid "Low"
 msgstr "Низьке"
 
-#: Client/core/CSettings.cpp:757 Client/core/CSettings.cpp:1537
+#: Client/core/CSettings.cpp:744 Client/core/CSettings.cpp:1523
 msgid "Medium"
 msgstr "Середнє"
 
-#: Client/core/CSettings.cpp:758 Client/core/CSettings.cpp:1104
-#: Client/core/CSettings.cpp:1539 Client/core/CSettings.cpp:3170
+#: Client/core/CSettings.cpp:745 Client/core/CSettings.cpp:1090
+#: Client/core/CSettings.cpp:1525 Client/core/CSettings.cpp:3149
 msgid "High"
 msgstr "Високе"
 
-#: Client/core/CSettings.cpp:759 Client/core/CSettings.cpp:1541
+#: Client/core/CSettings.cpp:746 Client/core/CSettings.cpp:1527
 msgid "Very high"
 msgstr "Дуже високе"
 
-#: Client/core/CSettings.cpp:774 Client/core/CSettings.cpp:797
-#: Client/core/CSettings.cpp:1035 Client/core/CSettings.cpp:1089
-#: Client/core/CSettings.cpp:1219 Client/core/CSettings.cpp:1545
-#: Client/core/CSettings.cpp:3177 Client/core/CSettings.cpp:3209
-#: Client/core/CSettings.cpp:3231 Client/core/CSettings.cpp:4272
+#: Client/core/CSettings.cpp:761 Client/core/CSettings.cpp:784
+#: Client/core/CSettings.cpp:1021 Client/core/CSettings.cpp:1075
+#: Client/core/CSettings.cpp:1205 Client/core/CSettings.cpp:1531
+#: Client/core/CSettings.cpp:3156 Client/core/CSettings.cpp:3188
+#: Client/core/CSettings.cpp:3210 Client/core/CSettings.cpp:4247
 msgid "Off"
 msgstr "Відключена"
 
-#: Client/core/CSettings.cpp:798 Client/core/CSettings.cpp:1547
+#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1533
 msgid "1x"
 msgstr "1x"
 
-#: Client/core/CSettings.cpp:799 Client/core/CSettings.cpp:1549
+#: Client/core/CSettings.cpp:786 Client/core/CSettings.cpp:1535
 msgid "2x"
 msgstr "2x"
 
-#: Client/core/CSettings.cpp:800 Client/core/CSettings.cpp:1551
+#: Client/core/CSettings.cpp:787 Client/core/CSettings.cpp:1537
 msgid "3x"
 msgstr "3x"
 
-#: Client/core/CSettings.cpp:813 Client/core/CSettings.cpp:1037
-#: Client/core/CSettings.cpp:1557 Client/core/CSettings.cpp:3179
+#: Client/core/CSettings.cpp:800 Client/core/CSettings.cpp:1023
+#: Client/core/CSettings.cpp:1543 Client/core/CSettings.cpp:3158
 msgid "Auto"
 msgstr "Авто"
 
-#: Client/core/CSettings.cpp:814 Client/core/CSettings.cpp:1559
+#: Client/core/CSettings.cpp:801 Client/core/CSettings.cpp:1545
 msgid "4:3"
 msgstr "4:3"
 
-#: Client/core/CSettings.cpp:815 Client/core/CSettings.cpp:1561
+#: Client/core/CSettings.cpp:802 Client/core/CSettings.cpp:1547
 msgid "16:10"
 msgstr "16:10"
 
-#: Client/core/CSettings.cpp:816 Client/core/CSettings.cpp:1563
+#: Client/core/CSettings.cpp:803 Client/core/CSettings.cpp:1549
 msgid "16:9"
 msgstr "16:9"
 
-#: Client/core/CSettings.cpp:819
+#: Client/core/CSettings.cpp:806
 msgid "HUD Match Aspect Ratio"
 msgstr "Розмір HUD під співвідношення"
 
-#: Client/core/CSettings.cpp:825
+#: Client/core/CSettings.cpp:812
 msgid "Volumetric Shadows"
 msgstr "Динамічні тіні"
 
-#: Client/core/CSettings.cpp:829
+#: Client/core/CSettings.cpp:816
 msgid "Grass effect"
 msgstr "Покращена трава"
 
-#: Client/core/CSettings.cpp:833
+#: Client/core/CSettings.cpp:820
 msgid "Heat haze"
 msgstr "Ефект спеки"
 
-#: Client/core/CSettings.cpp:837
+#: Client/core/CSettings.cpp:824
 msgid "Tyre Smoke etc"
 msgstr "Дим шин, тощо"
 
-#: Client/core/CSettings.cpp:841
+#: Client/core/CSettings.cpp:828
 msgid "Dynamic ped shadows"
 msgstr "Динамічні тіні персонажів"
 
-#: Client/core/CSettings.cpp:845
+#: Client/core/CSettings.cpp:832
 msgid "Motion blur"
 msgstr "Розмиття в русі"
 
-#: Client/core/CSettings.cpp:849
-msgid "Corona rain reflections"
-msgstr ""
-
-#: Client/core/CSettings.cpp:854
+#: Client/core/CSettings.cpp:837
 msgid "Full Screen Minimize"
 msgstr "Повноекранний режим (згорнути)"
 
-#: Client/core/CSettings.cpp:866
+#: Client/core/CSettings.cpp:849
 msgid "Enable Device Selection Dialog"
 msgstr "Увімкнути діалог вибору пристрою"
 
-#: Client/core/CSettings.cpp:878
+#: Client/core/CSettings.cpp:861
 msgid "Show unsafe resolutions"
 msgstr "Показати не підтримну роздільність"
 
-#: Client/core/CSettings.cpp:890
+#: Client/core/CSettings.cpp:873
 msgid "Render vehicles always in high detail"
 msgstr "Завжди показувати транспорт у високій деталізації"
 
-#: Client/core/CSettings.cpp:894
+#: Client/core/CSettings.cpp:877
 msgid "Render peds always in high detail"
 msgstr "Завжди показувати персонажів у високій деталізації"
 
-#: Client/core/CSettings.cpp:923
+#: Client/core/CSettings.cpp:881
+msgid "Corona rain reflections"
+msgstr ""
+
+#: Client/core/CSettings.cpp:910
 msgid "Enable remote websites"
 msgstr "Дозволити сторонні веб-сайти"
 
-#: Client/core/CSettings.cpp:928
+#: Client/core/CSettings.cpp:915
 msgid "Enable Javascript on remote websites"
 msgstr "Дозволити Javascript на сторонніх веб-сайтах"
 
-#: Client/core/CSettings.cpp:933
+#: Client/core/CSettings.cpp:920
 msgid "Enable GPU rendering"
 msgstr ""
 
-#: Client/core/CSettings.cpp:937
+#: Client/core/CSettings.cpp:924
 msgid "Custom blacklist"
 msgstr "Чорний список"
 
-#: Client/core/CSettings.cpp:948 Client/core/CSettings.cpp:983
+#: Client/core/CSettings.cpp:935 Client/core/CSettings.cpp:970
 msgid "Enter a domain e.g. google.com"
 msgstr "Введіть домен, наприклад google.com"
 
-#: Client/core/CSettings.cpp:956
+#: Client/core/CSettings.cpp:943
 msgid "Block"
 msgstr "Блокувати"
 
-#: Client/core/CSettings.cpp:964 Client/core/CSettings.cpp:999
+#: Client/core/CSettings.cpp:951 Client/core/CSettings.cpp:986
 msgid "Domain"
 msgstr "Адреса"
 
-#: Client/core/CSettings.cpp:966 Client/core/CSettings.cpp:1001
+#: Client/core/CSettings.cpp:953 Client/core/CSettings.cpp:988
 msgid "Remove domain"
 msgstr "Видалити адресу"
 
 #. Reset vecTemp
-#: Client/core/CSettings.cpp:972
+#: Client/core/CSettings.cpp:959
 msgid "Custom whitelist"
 msgstr "Дозволений список"
 
 #. Misc section label
-#: Client/core/CSettings.cpp:1014
+#: Client/core/CSettings.cpp:1001
 msgid "Misc"
 msgstr "Різне"
 
 #. Fast clothes loading
-#: Client/core/CSettings.cpp:1020 Client/core/CSettings.cpp:1028
-#: Client/core/CSettings.cpp:4841
+#: Client/core/CSettings.cpp:1007 Client/core/CSettings.cpp:1014
+#: Client/core/CSettings.cpp:4816
 msgid "Fast CJ clothes loading:"
 msgstr "Швидке завантаження одягу CJ:"
 
 #. Browser scan speed
-#: Client/core/CSettings.cpp:1020 Client/core/CSettings.cpp:1042
-#: Client/core/CSettings.cpp:4843
+#: Client/core/CSettings.cpp:1007 Client/core/CSettings.cpp:1028
+#: Client/core/CSettings.cpp:4818
 msgid "Browser speed:"
 msgstr "Швидкість оновлення списку серверів:"
 
 #. Single download
-#: Client/core/CSettings.cpp:1020 Client/core/CSettings.cpp:1056
-#: Client/core/CSettings.cpp:4845
+#: Client/core/CSettings.cpp:1007 Client/core/CSettings.cpp:1042
+#: Client/core/CSettings.cpp:4820
 msgid "Single connection:"
 msgstr "Одиночне під'єднання:"
 
 #. Packet tag
-#: Client/core/CSettings.cpp:1020 Client/core/CSettings.cpp:1069
-#: Client/core/CSettings.cpp:4847
+#: Client/core/CSettings.cpp:1007 Client/core/CSettings.cpp:1055
+#: Client/core/CSettings.cpp:4822
 msgid "Packet tag:"
 msgstr "Теґ пакета:"
 
 #. Progress animation
-#: Client/core/CSettings.cpp:1021 Client/core/CSettings.cpp:1082
-#: Client/core/CSettings.cpp:4849
+#: Client/core/CSettings.cpp:1008 Client/core/CSettings.cpp:1068
+#: Client/core/CSettings.cpp:4824
 msgid "Progress animation:"
 msgstr "Анімація індикатора завантаження:"
 
 #. Process priority
-#: Client/core/CSettings.cpp:1021 Client/core/CSettings.cpp:1095
-#: Client/core/CSettings.cpp:4839
+#: Client/core/CSettings.cpp:1008 Client/core/CSettings.cpp:1081
+#: Client/core/CSettings.cpp:4814
 msgid "Process priority:"
 msgstr "Пріоритет процесу"
 
 #. Debug setting
-#: Client/core/CSettings.cpp:1021 Client/core/CSettings.cpp:1109
-#: Client/core/CSettings.cpp:4851
+#: Client/core/CSettings.cpp:1008 Client/core/CSettings.cpp:1095
+#: Client/core/CSettings.cpp:4826
 msgid "Debug setting:"
 msgstr "Настроювання налагоджувача:"
 
 #. Streaming memory
-#: Client/core/CSettings.cpp:1022 Client/core/CSettings.cpp:1132
-#: Client/core/CSettings.cpp:4853
+#: Client/core/CSettings.cpp:1009 Client/core/CSettings.cpp:1118
+#: Client/core/CSettings.cpp:4828
 msgid "Streaming memory:"
 msgstr "Відеопам'ять:"
 
 #. Update build type
-#: Client/core/CSettings.cpp:1022 Client/core/CSettings.cpp:1233
+#: Client/core/CSettings.cpp:1009 Client/core/CSettings.cpp:1219
 msgid "Update build type:"
 msgstr "Тип оновлення:"
 
 #. UpdateAutoInstall
-#: Client/core/CSettings.cpp:1022 Client/core/CSettings.cpp:1212
+#: Client/core/CSettings.cpp:1009 Client/core/CSettings.cpp:1198
 msgid "Install important updates:"
 msgstr "Інсталювати важливі оновлення:"
 
-#: Client/core/CSettings.cpp:1036 Client/core/CSettings.cpp:1064
-#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:3181
-#: Client/core/CSettings.cpp:3197 Client/core/CSettings.cpp:3204
+#: Client/core/CSettings.cpp:1022 Client/core/CSettings.cpp:1050
+#: Client/core/CSettings.cpp:1063 Client/core/CSettings.cpp:3160
+#: Client/core/CSettings.cpp:3176 Client/core/CSettings.cpp:3183
 msgid "On"
 msgstr "Увімкнути"
 
-#: Client/core/CSettings.cpp:1049 Client/core/CSettings.cpp:3186
+#: Client/core/CSettings.cpp:1035 Client/core/CSettings.cpp:3165
 msgid "Very slow"
 msgstr "Дуже повільно"
 
-#: Client/core/CSettings.cpp:1050 Client/core/CSettings.cpp:1063
-#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:1090
-#: Client/core/CSettings.cpp:1116 Client/core/CSettings.cpp:1128
-#: Client/core/CSettings.cpp:1220 Client/core/CSettings.cpp:1240
-#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:3195
-#: Client/core/CSettings.cpp:3202 Client/core/CSettings.cpp:3211
-#: Client/core/CSettings.cpp:3224
+#: Client/core/CSettings.cpp:1036 Client/core/CSettings.cpp:1049
+#: Client/core/CSettings.cpp:1062 Client/core/CSettings.cpp:1076
+#: Client/core/CSettings.cpp:1102 Client/core/CSettings.cpp:1114
+#: Client/core/CSettings.cpp:1206 Client/core/CSettings.cpp:1226
+#: Client/core/CSettings.cpp:3167 Client/core/CSettings.cpp:3174
+#: Client/core/CSettings.cpp:3181 Client/core/CSettings.cpp:3190
+#: Client/core/CSettings.cpp:3203
 msgid "Default"
 msgstr "За промовчанням"
 
-#: Client/core/CSettings.cpp:1051 Client/core/CSettings.cpp:3190
+#: Client/core/CSettings.cpp:1037 Client/core/CSettings.cpp:3169
 msgid "Fast"
 msgstr "Швидко"
 
-#: Client/core/CSettings.cpp:1102 Client/core/CSettings.cpp:3166
+#: Client/core/CSettings.cpp:1088 Client/core/CSettings.cpp:3145
 msgid "Normal"
 msgstr "Середнє"
 
-#: Client/core/CSettings.cpp:1103 Client/core/CSettings.cpp:3168
+#: Client/core/CSettings.cpp:1089 Client/core/CSettings.cpp:3147
 msgid "Above normal"
 msgstr "Вище норми"
 
-#: Client/core/CSettings.cpp:1139
+#: Client/core/CSettings.cpp:1125
 msgid "Min"
 msgstr "Мін."
 
-#: Client/core/CSettings.cpp:1152
+#: Client/core/CSettings.cpp:1138
 msgid "Max"
 msgstr "Макс."
 
 #. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1159
+#: Client/core/CSettings.cpp:1145
 msgid "Windows 8 compatibility:"
 msgstr "Сумісний з Windows 8:"
 
-#: Client/core/CSettings.cpp:1163
+#: Client/core/CSettings.cpp:1149
 msgid "16-bit color"
 msgstr "16-бітові кольори"
 
-#: Client/core/CSettings.cpp:1168
+#: Client/core/CSettings.cpp:1154
 msgid "Mouse fix"
 msgstr "Виправлення миші"
 
 #. Cache path info
-#: Client/core/CSettings.cpp:1186
+#: Client/core/CSettings.cpp:1172
 msgid "Client resource files:"
 msgstr "Шлях завантаження ресурсів:"
 
-#: Client/core/CSettings.cpp:1190
+#: Client/core/CSettings.cpp:1176
 msgid "Show in Explorer"
 msgstr "Відкрити теку"
 
 #. Auto updater section label
-#: Client/core/CSettings.cpp:1205 Client/core/CSettings.cpp:1208
+#: Client/core/CSettings.cpp:1191 Client/core/CSettings.cpp:1194
 msgid "Auto updater"
 msgstr "Автоматичне оновлення"
 
 #. Check for updates
-#: Client/core/CSettings.cpp:1246
+#: Client/core/CSettings.cpp:1232
 msgid "Check for update now"
 msgstr "Перевірити наявність оновлень"
 
-#: Client/core/CSettings.cpp:1400
+#: Client/core/CSettings.cpp:1386
 msgid "Some settings will be changed when you next start MTA"
 msgstr "Налаштування зміняться при наступному старті MTA"
 
-#: Client/core/CSettings.cpp:1401
+#: Client/core/CSettings.cpp:1387
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
 "Ви хочете перезапустити?"
 
-#: Client/core/CSettings.cpp:1404
+#: Client/core/CSettings.cpp:1390
 msgid "RESTART REQUIRED"
 msgstr "НЕОБХІДНИЙ ПЕРЕЗАПУСК"
 
-#: Client/core/CSettings.cpp:1424
+#: Client/core/CSettings.cpp:1410
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr "Деякі налаштування зміняться після відключення від цього сервера"
 
-#: Client/core/CSettings.cpp:1425
+#: Client/core/CSettings.cpp:1411
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
 "Ви хочете від'єднатися?"
 
-#: Client/core/CSettings.cpp:1428
+#: Client/core/CSettings.cpp:1414
 msgid "DISCONNECT REQUIRED"
 msgstr "НЕОБХІДНО ВІД'ЄДНАТИСЯ"
 
 #. Update the joystick name
-#: Client/core/CSettings.cpp:1760
+#: Client/core/CSettings.cpp:1741
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "Не знайдено джойстик. Перевірте, чи під'єднаний він та перезавантажте гру"
 
-#: Client/core/CSettings.cpp:1957
+#: Client/core/CSettings.cpp:1936
 msgid "Binding axis"
 msgstr "Налаштування осей"
 
-#: Client/core/CSettings.cpp:1957
+#: Client/core/CSettings.cpp:1936
 msgid "Move an axis to bind, or escape to clear"
 msgstr "Переміщайте джойстик для налаштування або escape для очищення"
 
-#: Client/core/CSettings.cpp:2034
+#: Client/core/CSettings.cpp:2013
 msgid "Language:"
 msgstr "Мова:"
 
-#: Client/core/CSettings.cpp:2034
+#: Client/core/CSettings.cpp:2013
 msgid "Skin:"
 msgstr "Тема:"
 
-#: Client/core/CSettings.cpp:2034
+#: Client/core/CSettings.cpp:2013
 msgid "Presets:"
 msgstr "Передвстановлення:"
 
-#: Client/core/CSettings.cpp:2083
+#: Client/core/CSettings.cpp:2062
 msgid "Chat"
 msgstr "Чат"
 
-#: Client/core/CSettings.cpp:2100
+#: Client/core/CSettings.cpp:2079
 msgid "Load"
 msgstr "Завантажити"
 
-#: Client/core/CSettings.cpp:2112
+#: Client/core/CSettings.cpp:2091
 msgid "Colors"
 msgstr "Кольори"
 
-#: Client/core/CSettings.cpp:2113
+#: Client/core/CSettings.cpp:2092
 msgid "Layout"
 msgstr "Макет чату"
 
-#: Client/core/CSettings.cpp:2114 Client/core/CSettings.cpp:2360
+#: Client/core/CSettings.cpp:2093 Client/core/CSettings.cpp:2339
 msgid "Options"
 msgstr "Параметри"
 
-#: Client/core/CSettings.cpp:2120
+#: Client/core/CSettings.cpp:2099
 msgid "Chat Background"
 msgstr "Тло чату"
 
-#: Client/core/CSettings.cpp:2120
+#: Client/core/CSettings.cpp:2099
 msgid "Chat Text"
 msgstr "Текст чату"
 
-#: Client/core/CSettings.cpp:2120
+#: Client/core/CSettings.cpp:2099
 msgid "Input Background"
 msgstr "Тло рядка чату"
 
-#: Client/core/CSettings.cpp:2120
+#: Client/core/CSettings.cpp:2099
 msgid "Input Text"
 msgstr "Колір рядка введення"
 
-#: Client/core/CSettings.cpp:2143
+#: Client/core/CSettings.cpp:2122
 msgid "Lines:"
 msgstr "Рядки:"
 
-#: Client/core/CSettings.cpp:2143
+#: Client/core/CSettings.cpp:2122
 msgid "Scale:"
 msgstr "Масштаб:"
 
-#: Client/core/CSettings.cpp:2143
+#: Client/core/CSettings.cpp:2122
 msgid "Width:"
 msgstr "Ширина:"
 
-#: Client/core/CSettings.cpp:2146
+#: Client/core/CSettings.cpp:2125
 msgid "Size"
 msgstr "Величина"
 
-#: Client/core/CSettings.cpp:2195
+#: Client/core/CSettings.cpp:2174
 msgid "after"
 msgstr "після"
 
-#: Client/core/CSettings.cpp:2195
+#: Client/core/CSettings.cpp:2174
 msgid "for"
 msgstr "за"
 
-#: Client/core/CSettings.cpp:2195
+#: Client/core/CSettings.cpp:2174
 msgid "sec"
 msgstr "сек"
 
-#: Client/core/CSettings.cpp:2198
+#: Client/core/CSettings.cpp:2177
 msgid "Fading"
 msgstr "Згасання"
 
-#: Client/core/CSettings.cpp:2204
+#: Client/core/CSettings.cpp:2183
 msgid "Fade out old lines"
 msgstr "Згасання повідомлень"
 
-#: Client/core/CSettings.cpp:2244
+#: Client/core/CSettings.cpp:2223
 msgid "Horizontal:"
 msgstr "Горизонтально:"
 
-#: Client/core/CSettings.cpp:2244
+#: Client/core/CSettings.cpp:2223
 msgid "Vertical:"
 msgstr "Вертикально:"
 
-#: Client/core/CSettings.cpp:2244
+#: Client/core/CSettings.cpp:2223
 msgid "Text-Align:"
 msgstr "Вирівнювання тексту:"
 
-#: Client/core/CSettings.cpp:2244
+#: Client/core/CSettings.cpp:2223
 msgid "X-Offset:"
 msgstr "Зміщення по X:"
 
-#: Client/core/CSettings.cpp:2245
+#: Client/core/CSettings.cpp:2224
 msgid "Y-Offset:"
 msgstr "Зміщення по X:"
 
-#: Client/core/CSettings.cpp:2251
+#: Client/core/CSettings.cpp:2230
 msgid "Position"
 msgstr "Позиція"
 
-#: Client/core/CSettings.cpp:2266 Client/core/CSettings.cpp:2280
+#: Client/core/CSettings.cpp:2245 Client/core/CSettings.cpp:2259
 msgid "Center"
 msgstr "Центр"
 
-#: Client/core/CSettings.cpp:2279
+#: Client/core/CSettings.cpp:2258
 msgid "Top"
 msgstr "Верх"
 
-#: Client/core/CSettings.cpp:2281
+#: Client/core/CSettings.cpp:2260
 msgid "Bottom"
 msgstr "Низ"
 
-#: Client/core/CSettings.cpp:2329
+#: Client/core/CSettings.cpp:2308
 msgid "Font"
 msgstr "Шрифт"
 
-#: Client/core/CSettings.cpp:2366
+#: Client/core/CSettings.cpp:2345
 msgid "Hide background when not typing"
 msgstr "Відображати тло тільки при введенні"
 
-#: Client/core/CSettings.cpp:2371
+#: Client/core/CSettings.cpp:2350
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "Вставляти нікнейм по кнопці \"Tab\""
 
-#: Client/core/CSettings.cpp:2376
+#: Client/core/CSettings.cpp:2355
 msgid "Allow server to flash the window"
 msgstr "Дозволити серверу кліпати вікном додатка"
 
-#: Client/core/CSettings.cpp:2381
+#: Client/core/CSettings.cpp:2360
 msgid "Allow tray balloon notifications"
 msgstr "Показувати повідомлення в області повідомлень"
 
-#: Client/core/CSettings.cpp:2386
+#: Client/core/CSettings.cpp:2365
 msgid "Chat text black/white outline"
 msgstr "Чорно-білий контур тексту чату"
 
@@ -2749,93 +2713,93 @@ msgstr "Чорно-білий контур тексту чату"
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:2635 Client/core/CSettings.cpp:2642
+#: Client/core/CSettings.cpp:2614 Client/core/CSettings.cpp:2621
 msgid "Press a key to bind, or escape to clear"
 msgstr "Натисніть клавішу для налаштування або escape для очищення"
 
-#: Client/core/CSettings.cpp:2636
+#: Client/core/CSettings.cpp:2615
 msgid "Binding a primary key"
 msgstr "Налаштування основної клавіші"
 
-#: Client/core/CSettings.cpp:2643
+#: Client/core/CSettings.cpp:2622
 msgid "Binding a secondary key"
 msgstr "Налаштування додаткової клавіші"
 
-#: Client/core/CSettings.cpp:2719
+#: Client/core/CSettings.cpp:2698
 msgid "GTA GAME CONTROLS"
 msgstr "УПРАВЛІННЯ GTA"
 
-#: Client/core/CSettings.cpp:2721
+#: Client/core/CSettings.cpp:2700
 msgid "MULTIPLAYER CONTROLS"
 msgstr "УПРАВЛІННЯ МУЛЬТИПЛЕЄРУ"
 
-#: Client/core/CSettings.cpp:2966 Client/core/CSettings.cpp:4802
+#: Client/core/CSettings.cpp:2945 Client/core/CSettings.cpp:4777
 msgid "Your nickname contains invalid characters!"
 msgstr "Ваш нікнейм містить неприпустимі символи."
 
-#: Client/core/CSettings.cpp:3816
+#: Client/core/CSettings.cpp:3791
 msgid "Red:"
 msgstr "Червоний:"
 
-#: Client/core/CSettings.cpp:3816
+#: Client/core/CSettings.cpp:3791
 msgid "Green:"
 msgstr "Зелений:"
 
-#: Client/core/CSettings.cpp:3816
+#: Client/core/CSettings.cpp:3791
 msgid "Blue:"
 msgstr "Синій:"
 
-#: Client/core/CSettings.cpp:3816
+#: Client/core/CSettings.cpp:3791
 msgid "Transparency:"
 msgstr "Прозорість:"
 
-#: Client/core/CSettings.cpp:3819
+#: Client/core/CSettings.cpp:3794
 msgid "Color"
 msgstr "Колір"
 
-#: Client/core/CSettings.cpp:3896
+#: Client/core/CSettings.cpp:3871
 msgid "Preview"
 msgstr "Перегляд"
 
-#: Client/core/CSettings.cpp:4204
+#: Client/core/CSettings.cpp:4179
 msgid "Please disconnect before changing language"
 msgstr "Будь ласка, від'єднайтеся, перш ніж змінити мову"
 
-#: Client/core/CSettings.cpp:4232
+#: Client/core/CSettings.cpp:4207
 msgid "Please disconnect before changing skin"
 msgstr "Будь ласка, від'єднайтеся перш ніж змінити тему"
 
-#: Client/core/CSettings.cpp:4520
+#: Client/core/CSettings.cpp:4495
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "Динамічні тіні можуть призвести до зниження продуктивності.\n\n"
 "Ви впевнені, що хочете активувати їх?"
 
-#: Client/core/CSettings.cpp:4524
+#: Client/core/CSettings.cpp:4499
 msgid "PERFORMANCE WARNING"
 msgstr "ПОПЕРЕДЖЕННЯ ПРОДУКТИВНОСТІ"
 
-#: Client/core/CSettings.cpp:4544
+#: Client/core/CSettings.cpp:4519
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "Завантаження знімків вимагається багатьма серверами для античит системи.\n\n"
 "(Область чату і елементи інтерфейсу будуть приховані)\n"
 
-#: Client/core/CSettings.cpp:4546
+#: Client/core/CSettings.cpp:4521
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "ІНФОРМАЦІЯ ПРО ЗАВАНТАЖЕННЯ ЗНІМКІВ"
 
-#: Client/core/CSettings.cpp:4561
+#: Client/core/CSettings.cpp:4536
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4564
+#: Client/core/CSettings.cpp:4539
 msgid "EXTERNAL SOUNDS"
 msgstr "ЗОВНІШНІ ЗВУКИ"
 
-#: Client/core/CSettings.cpp:4593
+#: Client/core/CSettings.cpp:4568
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
@@ -2843,11 +2807,11 @@ msgstr "Схоже, що у вас увімкнено параметри під�
 "Бажаєте дозволити серверам обмінюватися даними?\n\n"
 "Це включає ваш унікальний ідентифікатор ID."
 
-#: Client/core/CSettings.cpp:4598
+#: Client/core/CSettings.cpp:4573
 msgid "CONSENT TO ALLOW DATA SHARING"
 msgstr "ЗГОДА НА ПЕРЕДАЧУ ДАНИХ"
 
-#: Client/core/CSettings.cpp:4622
+#: Client/core/CSettings.cpp:4597
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -2857,7 +2821,7 @@ msgstr "Деякі файли в директорії GTA:SA змінені.\n"
 "Проте, модифіковані файли блокуються більшістю серверами\n\n"
 "Ви дійсно хочете використати їх?"
 
-#: Client/core/CSettings.cpp:4671
+#: Client/core/CSettings.cpp:4646
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -2867,77 +2831,77 @@ msgstr "Увімкнення усвідомлене, DPI є експеримен
 "Якщо ввімкнути цю опцію, у вас можуть виникнути проблеми з графікою.\n\n"
 "Ви впевнені, що бажаєте ввімкнути цю опцію?"
 
-#: Client/core/CSettings.cpp:4677
+#: Client/core/CSettings.cpp:4652
 msgid "EXPERIMENTAL FEATURE"
 msgstr "ЕКСПЕРИМЕНТАЛЬНА ФУНКЦІЯ"
 
-#: Client/core/CSettings.cpp:4820
+#: Client/core/CSettings.cpp:4795
 msgid "Please enter a nickname"
 msgstr "Введіть нікнейм"
 
-#: Client/core/CSettings.cpp:4821
+#: Client/core/CSettings.cpp:4796
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "Введіть нікнейм, який буде використаний в грі  \n"
 "Це буде ваше ім'я, при підключенні до сервера"
 
-#: Client/core/CSettings.cpp:4839
+#: Client/core/CSettings.cpp:4814
 msgid "Very experimental feature."
 msgstr "(Дуже експериментальна функція)"
 
-#: Client/core/CSettings.cpp:4841
+#: Client/core/CSettings.cpp:4816
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "Оптимізація зміни одягу CJ (Потрібні дод. 65Мб RAM)"
 
-#: Client/core/CSettings.cpp:4843
+#: Client/core/CSettings.cpp:4818
 msgid "Older routers may require a slower scan speed."
 msgstr "Старі маршрутизатори будуть краще працювати з повільною швидкістю сканування"
 
-#: Client/core/CSettings.cpp:4845
+#: Client/core/CSettings.cpp:4820
 msgid "Switch on to use only one connection when downloading."
 msgstr "Використовувати одноточне під'єднання при завантаженні файлів."
 
-#: Client/core/CSettings.cpp:4847
+#: Client/core/CSettings.cpp:4822
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "Позначати мережеві пакети для спрощення ідентифікації трафіку MTA"
 
-#: Client/core/CSettings.cpp:4849
+#: Client/core/CSettings.cpp:4824
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Анімація поворотного круга внизу екрана"
 
-#: Client/core/CSettings.cpp:4851
+#: Client/core/CSettings.cpp:4826
 msgid "Select default always. (This setting is not saved)"
 msgstr "Завжди за промовчанням. (Цей параметр не зберігається)"
 
-#: Client/core/CSettings.cpp:4853
+#: Client/core/CSettings.cpp:4828
 msgid "Maximum is usually best"
 msgstr "Найкраще виділити максимальний обсяг"
 
-#: Client/core/CSettings.cpp:4855 Client/core/CSettings.cpp:4857
+#: Client/core/CSettings.cpp:4830 Client/core/CSettings.cpp:4832
 msgid "Auto updater:"
 msgstr "Автоматичне оновлення:"
 
-#: Client/core/CSettings.cpp:4855
+#: Client/core/CSettings.cpp:4830
 msgid "Select default unless you like filling out bug reports."
 msgstr "Використовуйте \"За промовчанням\" якщо бажаєте завантажувати тільки стабільні версії"
 
-#: Client/core/CSettings.cpp:4857
+#: Client/core/CSettings.cpp:4832
 msgid "Select default to automatically install important updates."
 msgstr "Виберіть значення за промовчанням для автоматичної інсталяції важливих оновлень."
 
-#: Client/core/CSettings.cpp:4859
+#: Client/core/CSettings.cpp:4834
 msgid "16-bit color:"
 msgstr "16-бітові кольори:"
 
-#: Client/core/CSettings.cpp:4859
+#: Client/core/CSettings.cpp:4834
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "Увімкнути режим 16-бітних кольорів. Потрібен перезапуск MTA."
 
-#: Client/core/CSettings.cpp:4861
+#: Client/core/CSettings.cpp:4836
 msgid "Mouse fix:"
 msgstr "Виправлення миші:"
 
-#: Client/core/CSettings.cpp:4861
+#: Client/core/CSettings.cpp:4836
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Виправити рух миші - Необхідний перезапуск ПК"
 
