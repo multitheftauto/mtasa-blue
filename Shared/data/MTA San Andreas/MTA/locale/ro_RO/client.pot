@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-16 23:16+0000\n"
-"PO-Revision-Date: 2024-12-16 23:33\n"
+"PO-Revision-Date: 2024-12-17 05:00\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -84,47 +84,47 @@ msgstr "stația radio precedentă"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the radar view"
-msgstr ""
+msgstr "activează vizualizarea radar"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the radar in"
-msgstr ""
+msgstr "mărește radarul"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar out"
-msgstr ""
+msgstr "micșorează radarul"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the radar north"
-msgstr ""
+msgstr "mută radarul către nord"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the radar south"
-msgstr ""
+msgstr "mută radarul către sud"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the radar east"
-msgstr ""
+msgstr "mută radarul către est"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the radar west"
-msgstr ""
+msgstr "mută radarul către vest"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the radar"
-msgstr ""
+msgstr "atașează radarul"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces radar opacity"
-msgstr ""
+msgstr "reduce opacitatea radarului"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases radar opacity"
-msgstr ""
+msgstr "crește opacitatea radarului"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles radar help text"
-msgstr ""
+msgstr "comută textul de ajutor al radarului"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
