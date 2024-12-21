@@ -25,6 +25,7 @@
 #define VAR_COcclusion_NumActiveOccluders                   0xC73CC0
 #define CALL_CCullZones_FindTunnelAttributesForCoors        0x55570D
 #define FUNC_CWorld_FindPositionForTrackPosition            0x6F59E0
+#define FUNC_CWorld_TestSphereAgainstWorld                  0x569E20
 
 #define VAR_IgnoredEntity                                   0xB7CD68
 #define VAR_currArea                                        0xB72914
@@ -73,6 +74,8 @@ public:
     CSurfaceType* GetSurfaceInfo() override;
     void          ResetAllSurfaceInfo() override;
     bool          ResetSurfaceInfo(short sSurfaceID) override;
+
+    CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) override;
 
 private:
     float                                                     m_fAircraftMaxHeight;
