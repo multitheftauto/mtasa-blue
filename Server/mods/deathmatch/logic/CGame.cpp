@@ -58,6 +58,7 @@
 #include "packets/CPlayerNetworkStatusPacket.h"
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
+#include "packets/CPlayerWorldSpecialPropertyPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CLuaPacket.h"
 #include "../utils/COpenPortsTester.h"
@@ -258,6 +259,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::EXTENDEDWATERCANNONS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::ROADSIGNSTEXT] = true;
     m_WorldSpecialProps[WorldSpecialProperty::TUNNELWEATHERBLEND] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::IGNOREFIRESTATE] = false;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -1292,6 +1294,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY:
+        {
+            Packet_PlayerWorldSpecialProperty(static_cast<CPlayerWorldSpecialPropertyPacket&>(Packet));
+            return true;
+        }
+
         default:
             break;
     }
@@ -1608,6 +1616,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerTeamChange", "oldTeam, newTeam", nullptr, false);
     m_Events.AddEvent("onPlayerTriggerInvalidEvent", "eventName, isAdded, isRemote", nullptr, false);
     m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
+    m_Events.AddEvent("onPlayerChangesWorldSpecialProperty", "property, enabled", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -1665,6 +1674,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onSettingChange", "setting, oldValue, newValue", NULL, false);
     m_Events.AddEvent("onChatMessage", "message, element", NULL, false);
     m_Events.AddEvent("onExplosion", "x, y, z, type, origin", nullptr, false);
+    m_Events.AddEvent("onShutdown", "resource, reason", nullptr, false);
 
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
@@ -1795,6 +1805,21 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
 
             // Tell the player the problem
             DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_VERIFICATION);
+            return;
+        }
+
+        // Check if another player is using the same serial
+        if (m_pMainConfig->IsCheckDuplicateSerialsEnabled() && m_pPlayerManager->GetBySerial(strSerial))
+        {
+            // Tell the console
+            CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
+
+            // Tell the player the problem
+            if (pPlayer->CanBitStream(eBitStreamVersion::CheckDuplicateSerials))
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
+            else
+                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::KICK);
+
             return;
         }
 
@@ -4238,6 +4263,23 @@ void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
             pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
         }
     }
+}
+
+void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket& packet) noexcept
+{
+    CPlayer* player = packet.GetSourcePlayer();
+
+    if (!player)
+        return;
+
+    const std::string& property = packet.GetProperty();
+    const bool         enabled = packet.IsEnabled();
+
+    CLuaArguments arguments;
+    arguments.PushString(property);
+    arguments.PushBoolean(enabled);
+
+    player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
 }
 
 void CGame::Packet_PlayerModInfo(CPlayerModInfoPacket& Packet)

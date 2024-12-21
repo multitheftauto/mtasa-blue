@@ -10852,19 +10852,35 @@ bool CStaticFunctionDefinitions::ResetMoonSize()
 
 bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
 {
-    CBitStream BitStream;
-    BitStream.pBitStream->Write(g_TickRateSettings.iPureSync);
-    BitStream.pBitStream->Write(g_TickRateSettings.iLightSync);
-    BitStream.pBitStream->Write(g_TickRateSettings.iCamSync);
-    BitStream.pBitStream->Write(g_TickRateSettings.iPedSync);
-    BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicle);
-    BitStream.pBitStream->Write(g_TickRateSettings.iObjectSync);
-    BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncRotation);
-    BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncAnalogMove);
-    if (pPlayer)
+    auto sendSyncIntervalPatket = [](CPlayer* pPlayer)
+    {
+        CBitStream BitStream;
+        BitStream.pBitStream->Write(g_TickRateSettings.iPureSync);
+        BitStream.pBitStream->Write(g_TickRateSettings.iLightSync);
+        BitStream.pBitStream->Write(g_TickRateSettings.iCamSync);
+        BitStream.pBitStream->Write(g_TickRateSettings.iPedSync);
+        BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicle);
+        BitStream.pBitStream->Write(g_TickRateSettings.iObjectSync);
+        BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncRotation);
+        BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncAnalogMove);
+
+        if (pPlayer->CanBitStream(eBitStreamVersion::FixSyncerDistance))
+        {
+            BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
+            BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+        }
+
         pPlayer->Send(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
+    };
+
+
+    if (pPlayer)
+        sendSyncIntervalPatket(pPlayer);
     else
-        m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
+    {
+        for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
+            sendSyncIntervalPatket(*iter);
+    }
 
     return true;
 }

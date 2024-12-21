@@ -35,6 +35,7 @@
 #include <net/SimHeaders.h>
 #include <zip.h>
 #include <glob/glob.h>
+#include "CStaticFunctionDefinitions.h"
 
 #ifdef WIN32
     #include <zip/iowin32.h>
