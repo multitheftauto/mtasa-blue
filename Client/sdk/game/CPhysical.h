@@ -20,7 +20,7 @@ public:
 
     virtual CVector* GetMoveSpeed(CVector* vecMoveSpeed) = 0;
     virtual CVector* GetTurnSpeed(CVector* vecTurnSpeed) = 0;
-    virtual void     SetMoveSpeed(CVector* vecMoveSpeed) = 0;
+    virtual void     SetMoveSpeed(const CVector& vecMoveSpeed) noexcept = 0;
     virtual void     SetTurnSpeed(CVector* vecTurnSpeed) = 0;
 
     virtual float GetMass() = 0;

@@ -235,137 +235,154 @@ void COMMAND_Screenshot ( const char* szCmdLine )
 }
 */
 
-void COMMAND_PlayerMap(const char* szCmdLine)
+void COMMAND_RadarMap(const char* szCmdLine)
 {
-    int  cmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
-    bool show = (cmd == 1) ? true : (cmd == 0) ? false : !g_pClientGame->GetPlayerMap()->GetPlayerMapEnabled();
-    g_pClientGame->GetPlayerMap()->SetPlayerMapEnabled(show);
+    int  iCmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
+    bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : !g_pClientGame->GetRadarMap()->GetRadarEnabled();
+    g_pClientGame->GetRadarMap()->SetRadarEnabled(bShow);
 }
 
-void COMMAND_PlayerMapZoomIn(const char* szCmdLine)
+void COMMAND_RadarZoomIn(const char* szCmdLine)
 {
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (playerMap->IsPlayerMapShowing())
-        playerMap->ZoomIn();
-}
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
 
-void COMMAND_PlayerMapZoomOut(const char* szCmdLine)
-{
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (playerMap->IsPlayerMapShowing())
-        playerMap->ZoomOut();
-}
-
-void COMMAND_PlayerMapMoveNorth(const char* szCmdLine)
-{
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
-
-    if (playerMap->IsMovingNorth())
-        playerMap->SetMovingNorth(false);
-    else if (playerMap->IsMovingSouth())
-        playerMap->SetMovingSouth(false);
-    else
+    if (pRadarMap->IsRadarShowing())
     {
-        playerMap->SetMovingNorth(true);
-        playerMap->SetMovingSouth(false);
-        playerMap->SetMovingEast(false);
-        playerMap->SetMovingWest(false);
+        pRadarMap->ZoomIn();
     }
 }
 
-void COMMAND_PlayerMapMoveSouth(const char* szCmdLine)
+void COMMAND_RadarZoomOut(const char* szCmdLine)
 {
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
 
-    if (playerMap->IsMovingSouth())
-        playerMap->SetMovingSouth(false);
-    else if (playerMap->IsMovingNorth())
-        playerMap->SetMovingNorth(false);
-    else
+    if (pRadarMap->IsRadarShowing())
     {
-        playerMap->SetMovingNorth(false);
-        playerMap->SetMovingSouth(true);
-        playerMap->SetMovingEast(false);
-        playerMap->SetMovingWest(false);
+        pRadarMap->ZoomOut();
     }
 }
 
-void COMMAND_PlayerMapMoveEast(const char* szCmdLine)
+void COMMAND_RadarMoveNorth(const char* szCmdLine)
 {
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
 
-    if (playerMap->IsMovingEast())
-        playerMap->SetMovingEast(false);
-    else if (playerMap->IsMovingWest())
-        playerMap->SetMovingWest(false);
-    else
+    if (pRadarMap->IsRadarShowing())
     {
-        playerMap->SetMovingNorth(false);
-        playerMap->SetMovingSouth(false);
-        playerMap->SetMovingEast(true);
-        playerMap->SetMovingWest(false);
+        // Toggle on/off
+        if (pRadarMap->IsMovingNorth())
+            pRadarMap->SetMovingNorth(false);
+        else if (pRadarMap->IsMovingSouth())
+            pRadarMap->SetMovingSouth(false);
+        else
+        {
+            pRadarMap->SetMovingNorth(true);
+            pRadarMap->SetMovingSouth(false);
+            pRadarMap->SetMovingEast(false);
+            pRadarMap->SetMovingWest(false);
+        }
     }
 }
 
-void COMMAND_PlayerMapMoveWest(const char* szCmdLine)
+void COMMAND_RadarMoveSouth(const char* szCmdLine)
 {
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
 
-    if (playerMap->IsMovingWest())
-        playerMap->SetMovingWest(false);
-    else if (playerMap->IsMovingEast())
-        playerMap->SetMovingEast(false);
-    else
+    if (pRadarMap->IsRadarShowing())
     {
-        playerMap->SetMovingNorth(false);
-        playerMap->SetMovingSouth(false);
-        playerMap->SetMovingEast(false);
-        playerMap->SetMovingWest(true);
+        // Toggle on/off
+        if (pRadarMap->IsMovingSouth())
+            pRadarMap->SetMovingSouth(false);
+        else if (pRadarMap->IsMovingNorth())
+            pRadarMap->SetMovingNorth(false);
+        else
+        {
+            pRadarMap->SetMovingNorth(false);
+            pRadarMap->SetMovingSouth(true);
+            pRadarMap->SetMovingEast(false);
+            pRadarMap->SetMovingWest(false);
+        }
     }
 }
 
-void COMMAND_PlayerMapAttach(const char* szCmdLine)
+void COMMAND_RadarMoveEast(const char* szCmdLine)
 {
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (playerMap->IsPlayerMapShowing())
-        playerMap->SetAttachedToLocalPlayer(!g_pClientGame->GetPlayerMap()->IsAttachedToLocalPlayer());
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+
+    if (pRadarMap->IsRadarShowing())
+    {
+        // Toggle on/off
+        if (pRadarMap->IsMovingEast())
+            pRadarMap->SetMovingEast(false);
+        else if (pRadarMap->IsMovingWest())
+            pRadarMap->SetMovingWest(false);
+        else
+        {
+            pRadarMap->SetMovingNorth(false);
+            pRadarMap->SetMovingSouth(false);
+            pRadarMap->SetMovingEast(true);
+            pRadarMap->SetMovingWest(false);
+        }
+    }
 }
 
-void COMMAND_PlayerMapOpacityDown(const char* szCmdLine)
+void COMMAND_RadarMoveWest(const char* szCmdLine)
 {
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
 
-    int mapAlpha;
-    g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
-    mapAlpha = std::max(0, mapAlpha - 20);
-    g_pCore->GetCVars()->Set("mapalpha", mapAlpha);
+    if (pRadarMap->IsRadarShowing())
+    {
+        // Toggle on/off
+        if (pRadarMap->IsMovingWest())
+            pRadarMap->SetMovingWest(false);
+        else if (pRadarMap->IsMovingEast())
+            pRadarMap->SetMovingEast(false);
+        else
+        {
+            pRadarMap->SetMovingNorth(false);
+            pRadarMap->SetMovingSouth(false);
+            pRadarMap->SetMovingEast(false);
+            pRadarMap->SetMovingWest(true);
+        }
+    }
 }
 
-void COMMAND_PlayerMapOpacityUp(const char* szCmdLine)
+void COMMAND_RadarAttach(const char* szCmdLine)
 {
-    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
 
-    int mapAlpha;
-    g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
-    mapAlpha = std::min(255, mapAlpha + 20);
-    g_pCore->GetCVars()->Set("mapalpha", mapAlpha);
+    if (pRadarMap->IsRadarShowing())
+    {
+        pRadarMap->SetAttachedToLocalPlayer(!g_pClientGame->GetRadarMap()->IsAttachedToLocalPlayer());
+    }
 }
 
-void COMMAND_PlayerMapHelp(const char* szCmdLine)
+void COMMAND_RadarOpacityDown(const char* szCmdLine)
 {
-    g_pClientGame->GetPlayerMap()->ToggleHelpText();
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+    if (pRadarMap->IsRadarShowing())
+    {
+        int iAlpha;
+        g_pCore->GetCVars()->Get("mapalpha", iAlpha);
+        iAlpha = std::max(0, iAlpha - 20);
+        g_pCore->GetCVars()->Set("mapalpha", iAlpha);
+    }
+}
+
+void COMMAND_RadarOpacityUp(const char* szCmdLine)
+{
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+    if (pRadarMap->IsRadarShowing())
+    {
+        int iAlpha;
+        g_pCore->GetCVars()->Get("mapalpha", iAlpha);
+        iAlpha = std::min(255, iAlpha + 20);
+        g_pCore->GetCVars()->Set("mapalpha", iAlpha);
+    }
+}
+
+void COMMAND_RadarHelp(const char* szCmdLine)
+{
+    g_pClientGame->GetRadarMap()->ToggleHelpText();
 }
 
 void COMMAND_MessageTarget(const char* szCmdLine)

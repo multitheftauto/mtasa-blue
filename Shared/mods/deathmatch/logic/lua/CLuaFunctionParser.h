@@ -561,7 +561,7 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+                return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index));
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;

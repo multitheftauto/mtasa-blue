@@ -34,6 +34,7 @@
 #include <game/Task.h>
 #include <game/CBuildingRemoval.h>
 #include "game/CClock.h"
+#include <game/CProjectileInfo.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -228,7 +229,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_pObjectSync = new CObjectSync(m_pObjectManager);
 #endif
     m_pNametags = new CNametags(m_pManager);
-    m_pPlayerMap = new CPlayerMap(m_pManager);
+    m_pRadarMap = new CRadarMap(m_pManager);
 
     // Set the screenshot path
     /* This is now done in CCore, to maintain a global screenshot path
@@ -403,6 +404,10 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 CClientGame::~CClientGame()
 {
     m_bBeingDeleted = true;
+    // Remove active projectile references to local player
+    if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
+        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());    
+
     // Stop all explosions. Unfortunately this doesn't fix the crash
     // if a vehicle is destroyed while it explodes.
     g_pGame->GetExplosionManager()->RemoveAllExplosions();
@@ -549,7 +554,7 @@ CClientGame::~CClientGame()
 #endif
     SAFE_DELETE(m_pBlendedWeather);
     SAFE_DELETE(m_pMovingObjectsManager);
-    SAFE_DELETE(m_pPlayerMap);
+    SAFE_DELETE(m_pRadarMap);
     SAFE_DELETE(m_pRemoteCalls);
     SAFE_DELETE(m_pLuaManager);
     SAFE_DELETE(m_pLatentTransferManager);
@@ -1098,7 +1103,7 @@ void CClientGame::DoPulsePostFrame()
         CClientPerfStatManager::GetSingleton()->DoPulse();
     }
 
-    m_pPlayerMap->DoRender();
+    m_pRadarMap->DoRender();
     m_pManager->DoRender();
     DoPulses();
 
@@ -1436,8 +1441,8 @@ void CClientGame::DoPulses()
     }
 
     // Check for radar input
-    m_pPlayerMap->DoPulse();
-    g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pPlayerMap->IsPlayerMapShowing());
+    m_pRadarMap->DoPulse();
+    g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pRadarMap->IsRadarShowing());
 
     // Got a local player?
     if (m_pLocalPlayer)
@@ -2779,6 +2784,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientBrowserTooltip", "text", NULL, false);
     m_Events.AddEvent("onClientBrowserInputFocusChanged", "gainedfocus", NULL, false);
     m_Events.AddEvent("onClientBrowserResourceBlocked", "url, domain, reason", NULL, false);
+    m_Events.AddEvent("onClientBrowserConsoleMessage", "message, source, line, level", nullptr, false);
 
     // Misc events
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
@@ -5407,8 +5413,8 @@ void CClientGame::ResetMapInfo()
     // Keybinds
     g_pCore->GetKeyBinds()->SetAllControlsEnabled(true, true, true);
 
-    // Player map
-    m_pPlayerMap->SetForcedState(false);
+    // Radarmap
+    m_pRadarMap->SetForcedState(false);
 
     // Camera
     m_pCamera->FadeOut(0.0f, 0, 0, 0);
@@ -5982,7 +5988,7 @@ bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
 
-bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled)
+bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept
 {
     switch (property)
     {
@@ -5990,47 +5996,60 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::AIRCARS:
         case WorldSpecialProperty::EXTRABUNNY:
         case WorldSpecialProperty::EXTRAJUMP:
-            return g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+            g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+            break;
         case WorldSpecialProperty::RANDOMFOLIAGE:
             g_pGame->SetRandomFoliageEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::SNIPERMOON:
             g_pGame->SetMoonEasterEggEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::EXTRAAIRRESISTANCE:
             g_pGame->SetExtraAirResistanceEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::UNDERWORLDWARP:
             g_pGame->SetUnderWorldWarpEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::VEHICLESUNGLARE:
             g_pGame->SetVehicleSunGlareEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::CORONAZTEST:
             g_pGame->SetCoronaZTestEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::WATERCREATURES:
             g_pGame->SetWaterCreaturesEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::BURNFLIPPEDCARS:
             g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::FIREBALLDESTRUCT:
             g_pGame->SetFireballDestructEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::EXTENDEDWATERCANNONS:
             g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
+            break;
         case WorldSpecialProperty::ROADSIGNSTEXT:
             g_pGame->SetRoadSignsTextEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::IGNOREFIRESTATE:
             g_pGame->SetIgnoreFireStateEnabled(isEnabled);
-            return true;
+            break;
+        default:
+            return false;
     }
-    return false;
+
+    if (g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent)) {
+        NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
+        stream->WriteString(EnumToString(property));
+        stream->WriteBit(isEnabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
+    }
+
+    return true;
 }
 
 bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)

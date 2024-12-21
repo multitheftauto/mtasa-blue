@@ -831,7 +831,7 @@ void CClientPed::SetMoveSpeed(const CVector& vecMoveSpeed)
 {
     if (m_pPlayerPed)
     {
-        m_pPlayerPed->SetMoveSpeed(const_cast<CVector*>(&vecMoveSpeed));
+        m_pPlayerPed->SetMoveSpeed(vecMoveSpeed);
     }
     m_vecMoveSpeed = vecMoveSpeed;
 }
@@ -1131,7 +1131,7 @@ CClientVehicle* CClientPed::GetRealOccupiedVehicle()
 
 CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                        bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition,
-                                                       float fWithinRange)
+                                                       float fWithinRange, bool localVehicles)
 {
     if (bGetPositionFromClosestDoor)
     {
@@ -1163,8 +1163,8 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
     for (; iter != listEnd; iter++)
     {
         pTempVehicle = *iter;
-        // Skip clientside vehicles as they are not enterable
-        if (pTempVehicle->IsLocalEntity())
+        
+        if (pTempVehicle->IsLocalEntity() != localVehicles)
             continue;
 
         CVehicle* pGameVehicle = pTempVehicle->GetGameVehicle();
@@ -2683,9 +2683,6 @@ void CClientPed::WorldIgnore(bool bIgnore)
 
 void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 {
-    if (!m_pPlayerPed)
-        return;
-
     // ControllerState checks and fixes are done at the same same as everything else unless using alt pulse order
     bool bDoControllerStateFixPulse = g_pClientGame->IsUsingAlternatePulseOrder() ? !bDoStandardPulses : bDoStandardPulses;
 
@@ -2714,6 +2711,10 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
     // Do we have a player? (streamed in)
     if (m_pPlayerPed)
     {
+        // If it's local entity, update in/out vehicle state
+        if (IsLocalEntity())
+            UpdateVehicleInOut();
+
         // Handle waiting for the ground to load
         if (IsFrozenWaitingForGroundToLoad())
             HandleWaitingForGroundToLoad();
@@ -2754,7 +2755,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         {
             CVector vecTemp;
             m_pPlayerPed->SetMatrix(&m_matFrozen);
-            m_pPlayerPed->SetMoveSpeed(&vecTemp);
+            m_pPlayerPed->SetMoveSpeed(vecTemp);
         }
 
         // Is our health locked?
@@ -3612,7 +3613,7 @@ void CClientPed::_CreateModel()
         m_pPlayerPed->SetMatrix(&m_Matrix);
         m_pPlayerPed->SetCurrentRotation(m_fCurrentRotation);
         m_pPlayerPed->SetTargetRotation(m_fTargetRotation);
-        m_pPlayerPed->SetMoveSpeed(&m_vecMoveSpeed);
+        m_pPlayerPed->SetMoveSpeed(m_vecMoveSpeed);
         m_pPlayerPed->SetTurnSpeed(&m_vecTurnSpeed);
         Duck(m_bDucked);
         SetWearingGoggles(m_bWearingGoggles);
@@ -6400,7 +6401,7 @@ void CClientPed::UpdateStreamPosition(const CVector& vecInPosition)
 bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 {
     // Are we local player or ped we are syncing
-    if (!IsSyncing() && !IsLocalPlayer())
+    if (!IsSyncing() && !IsLocalPlayer() && !IsLocalEntity())
     {
         return false;
     }
@@ -6456,7 +6457,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     if (!pVehicle)
     {
         // Find the closest vehicle and door
-        CClientVehicle* pClosestVehicle = GetClosestEnterableVehicle(true, !bPassenger, bPassenger, false, &uiDoor, nullptr, 20.0f);
+        CClientVehicle* pClosestVehicle = GetClosestEnterableVehicle(true, !bPassenger, bPassenger, false, &uiDoor, nullptr, 20.0f, IsLocalEntity());
         if (pClosestVehicle)
         {
             pVehicle = pClosestVehicle;
@@ -6478,7 +6479,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    if (!pVehicle->IsEnterable())
+    if (!pVehicle->IsEnterable(IsLocalEntity()))
     {
         // Stop if the vehicle is not enterable
         return false;
@@ -6553,6 +6554,32 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
+    if (IsLocalEntity())
+    {
+        // If vehicle is not local, we can't enter it
+        if (!pVehicle->IsLocalEntity())
+            return false;
+
+        // Set the vehicle id we're about to enter
+        m_VehicleInOutID = pVehicle->GetID();
+        m_ucVehicleInOutSeat = uiSeat;
+        m_bIsJackingVehicle = false;
+
+        // Make ped enter vehicle
+        GetIntoVehicle(pVehicle, uiSeat, uiDoor);
+
+        // Remember that this ped is working on entering a vehicle
+        SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
+
+        pVehicle->CalcAndUpdateCanBeDamagedFlag();
+        pVehicle->CalcAndUpdateTyresCanBurstFlag();
+
+        m_bIsGettingIntoVehicle = true;
+        m_bIsGettingOutOfVehicle = false;
+
+        return true;
+    }
+
     // Send an in request
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
     if (!pBitStream)
@@ -6602,7 +6629,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 bool CClientPed::ExitVehicle()
 {
     // Are we local player or ped we are syncing
-    if (!IsSyncing() && !IsLocalPlayer())
+    if (!IsSyncing() && !IsLocalPlayer() && !IsLocalEntity())
     {
         return false;
     }
@@ -6626,6 +6653,7 @@ bool CClientPed::ExitVehicle()
     {
         return false;
     }
+
 
     // Check the server is compatible if we are a ped
     if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
@@ -6654,6 +6682,37 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
+    std::int8_t targetDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+
+    // If it's a local entity, we can just exit the vehicle
+    if (IsLocalEntity())
+    {
+        // Set the vehicle id and the seat we're about to exit from
+        m_VehicleInOutID = pOccupiedVehicle->GetID();
+        m_ucVehicleInOutSeat = GetOccupiedVehicleSeat();
+
+        // Call the onClientVehicleStartExit event for the ped
+        // Check if it is cancelled before making the ped exit the vehicle
+        CLuaArguments arguments;
+        arguments.PushElement(this);                    // player / ped
+        arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+        arguments.PushNumber(0);                        // door
+
+        if (!pOccupiedVehicle->CallEvent("onClientVehicleStartExit", arguments, true)) // Event has been cancelled
+            return false;
+
+        // Make ped exit vehicle
+        GetOutOfVehicle(targetDoor);
+
+        // Remember that this ped is working on leaving a vehicle
+        SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
+
+        m_bIsGettingIntoVehicle = false;
+        m_bIsGettingOutOfVehicle = true;
+
+        return true;
+    }
+
     // We're about to exit a vehicle
     // Send an out request
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
@@ -6673,11 +6732,10 @@ bool CClientPed::ExitVehicle()
     unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_REQUEST_OUT);
     pBitStream->WriteBits(&ucAction, 4);
 
-    unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
-    if (ucDoor >= 2 && ucDoor <= 5)
+    if (targetDoor >= 2 && targetDoor <= 5)
     {
-        ucDoor -= 2;
-        pBitStream->WriteBits(&ucDoor, 2);
+        targetDoor -= 2;
+        pBitStream->WriteBits(&targetDoor, 2);
     }
 
     // Send and destroy it
@@ -6719,6 +6777,56 @@ void CClientPed::ResetVehicleInOut()
 //////////////////////////////////////////////////////////////////
 void CClientPed::UpdateVehicleInOut()
 {
+    if (IsLocalEntity())
+    {
+        // If getting inside vehicle
+        if (m_bIsGettingIntoVehicle)
+        {
+            CClientVehicle* vehicle = GetRealOccupiedVehicle();
+            if (!vehicle)
+                return;
+                
+            // Call the onClientVehicleEnter event for the ped
+            // Check if it is cancelled before allowing the ped to enter the vehicle
+            CLuaArguments arguments;
+            arguments.PushElement(this);                    // player / ped
+            arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+
+            if (!vehicle->CallEvent("onClientVehicleEnter", arguments, true))
+            {
+                m_bIsGettingIntoVehicle = false;
+                RemoveFromVehicle();
+                return;
+            }
+
+            m_bIsGettingIntoVehicle = false;
+            m_VehicleInOutID = INVALID_ELEMENT_ID;
+            WarpIntoVehicle(vehicle, m_ucVehicleInOutSeat);
+            SetVehicleInOutState(VEHICLE_INOUT_NONE);
+        }
+        else if (m_bIsGettingOutOfVehicle)
+        {
+            // If getting out of vehicle
+            CClientVehicle* realVehicle = GetRealOccupiedVehicle();
+            CClientVehicle* networkVehicle = GetOccupiedVehicle();
+
+            if (realVehicle)
+                return;
+                
+            // Call the onClientVehicleExit event for the ped
+            CLuaArguments arguments;
+            arguments.PushElement(this);                    // player / ped
+            arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+            networkVehicle->CallEvent("onClientVehicleExit", arguments, true);
+
+            m_bIsGettingOutOfVehicle = false;
+            m_VehicleInOutID = INVALID_ELEMENT_ID;
+            SetVehicleInOutState(VEHICLE_INOUT_NONE);
+        }
+
+        return;
+    }
+
     // We got told by the server to animate into a certain vehicle?
     if (m_VehicleInOutID != INVALID_ELEMENT_ID)
     {
@@ -6729,59 +6837,56 @@ void CClientPed::UpdateVehicleInOut()
         if (m_bIsGettingOutOfVehicle)
         {
             // If we aren't working on leaving the car (he's eiter finished or cancelled/failed leaving)
-            if (!IsLeavingVehicle())
+            if (IsLeavingVehicle())
+                return;
+                
+            // Are we outside the car?
+            CClientVehicle* pVehicle = GetRealOccupiedVehicle();
+            if (pVehicle)
             {
-                // Are we outside the car?
-                CClientVehicle* pVehicle = GetRealOccupiedVehicle();
-                if (!pVehicle)
+                // Warp us out now to keep in sync with the server
+                RemoveFromVehicle();
+                return;
+            }
+            // Tell the server that we successfully left the car
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+            if (pBitStream)
+            {
+                // Write the ped ID to it
+                if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
                 {
-                    // Tell the server that we successfully left the car
-                    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-                    if (pBitStream)
-                    {
-                        // Write the ped ID to it
-                        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                        {
-                            pBitStream->Write(GetID());
-                        }
+                    pBitStream->Write(GetID());
+                }
 
-                        // Write the car id and the action id (enter complete)
-                        pBitStream->Write(m_VehicleInOutID);
-                        unsigned char ucAction = CClientGame::VEHICLE_NOTIFY_OUT;
-                        pBitStream->WriteBits(&ucAction, 4);
+                // Write the car id and the action id (enter complete)
+                pBitStream->Write(m_VehicleInOutID);
+                unsigned char ucAction = CClientGame::VEHICLE_NOTIFY_OUT;
+                pBitStream->WriteBits(&ucAction, 4);
 
-                        // Send it and destroy the packet
-                        g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-                        g_pNet->DeallocateNetBitStream(pBitStream);
-                    }
+                // Send it and destroy the packet
+                g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+                g_pNet->DeallocateNetBitStream(pBitStream);
+            }
 
-                    // Warp ourself out (so we're sure the records are correct)
-                    RemoveFromVehicle();
+            // Warp ourself out (so we're sure the records are correct)
+            RemoveFromVehicle();
 
-                    if (pInOutVehicle)
-                    {
-                        pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
-                        pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
-                    }
+            if (pInOutVehicle)
+            {
+                pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
+                pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
+            }
 
-                    // Reset the vehicle in out stuff so we're ready for another car entry/leave.
-                    // Don't allow a new entry/leave until we've gotten the notify return packet
-                    ElementID ReasonVehicleID = m_VehicleInOutID;
-                    ResetVehicleInOut();
-                    m_bNoNewVehicleTask = true;
-                    m_NoNewVehicleTaskReasonID = ReasonVehicleID;
+            // Reset the vehicle in out stuff so we're ready for another car entry/leave.
+            // Don't allow a new entry/leave until we've gotten the notify return packet
+            ElementID ReasonVehicleID = m_VehicleInOutID;
+            ResetVehicleInOut();
+            m_bNoNewVehicleTask = true;
+            m_NoNewVehicleTaskReasonID = ReasonVehicleID;
 
 #ifdef MTA_DEBUG
-                    g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_out");
+            g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_out");
 #endif
-                }
-                // Are we still inside the car?
-                else
-                {
-                    // Warp us out now to keep in sync with the server
-                    RemoveFromVehicle();
-                }
-            }
         }
 
         // Are we getting into a vehicle?
@@ -6789,173 +6894,14 @@ void CClientPed::UpdateVehicleInOut()
         {
             // If we aren't working on entering the car (he's either finished or cancelled)
             // Or we are dead (fix for #908) or we are in water (fix for #521)
-            if (!IsEnteringVehicle() || IsDead() || IsInWater())
-            {
-                // Is he in a vehicle now?
-                CClientVehicle* pVehicle = GetRealOccupiedVehicle();
-                if (pVehicle)
-                {
-                    // Tell the server that we successfully entered the car
-                    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-                    if (pBitStream)
-                    {
-                        // Write the ped or player ID to it
-                        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                        {
-                            pBitStream->Write(GetID());
-                        }
+            if (IsEnteringVehicle() && !IsDead() && !IsInWater())
+                return;
 
-                        // Write the car id and the action id (enter complete)
-                        pBitStream->Write(m_VehicleInOutID);
-                        unsigned char ucAction;
-
-                        if (m_bIsJackingVehicle)
-                        {
-                            ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_JACK);
-#ifdef MTA_DEBUG
-                            g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_jack");
-#endif
-                        }
-                        else
-                        {
-                            ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_IN);
-#ifdef MTA_DEBUG
-                            g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_in");
-#endif
-                        }
-                        pBitStream->WriteBits(&ucAction, 4);
-
-                        // Send it and destroy the packet
-                        g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-                        g_pNet->DeallocateNetBitStream(pBitStream);
-                    }
-
-                    // Warp ourself in (so we're sure the records are correct)
-                    pVehicle->AllowDoorRatioSetting(m_ucEnteringDoor, true);
-                    WarpIntoVehicle(pVehicle, m_ucVehicleInOutSeat);
-
-                    if (pInOutVehicle)
-                    {
-                        pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
-                        pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
-                    }
-                }
-                else
-                {
-                    // Tell the server that we aborted entered the car
-                    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-                    if (pBitStream)
-                    {
-                        // Write the ped or player ID to it
-                        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                        {
-                            pBitStream->Write(GetID());
-                        }
-
-                        // Write the car id and the action id (enter complete)
-                        pBitStream->Write(m_VehicleInOutID);
-                        unsigned char ucAction;
-                        if (m_bIsJackingVehicle)
-                        {
-                            ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_JACK_ABORT);
-                            pBitStream->WriteBits(&ucAction, 4);
-
-                            // Did we start jacking them?
-                            bool            bAlreadyStartedJacking = false;
-                            CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(CElementIDs::GetElement(m_VehicleInOutID));
-                            if (pVehicle)
-                            {
-                                CClientPed* pJackedPlayer = pVehicle->GetOccupant();
-                                if (pJackedPlayer)
-                                {
-                                    // Jax: have we already started to jack the other player?
-                                    if (pJackedPlayer->IsGettingJacked())
-                                    {
-                                        bAlreadyStartedJacking = true;
-                                    }
-                                }
-                                unsigned char ucDoor = m_ucEnteringDoor - 2;
-                                pBitStream->WriteBits(&ucDoor, 3);
-                                SDoorOpenRatioSync door;
-                                door.data.fRatio = pVehicle->GetDoorOpenRatio(m_ucEnteringDoor);
-                                pBitStream->Write(&door);
-                            }
-                            pBitStream->WriteBit(bAlreadyStartedJacking);
-
-#ifdef MTA_DEBUG
-                            g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_jack_abort");
-#endif
-                        }
-                        else
-                        {
-                            ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_IN_ABORT);
-                            pBitStream->WriteBits(&ucAction, 4);
-                            CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(CElementIDs::GetElement(m_VehicleInOutID));
-                            if (pVehicle)
-                            {
-                                unsigned char ucDoor = m_ucEnteringDoor - 2;
-                                pBitStream->WriteBits(&ucDoor, 3);
-                                SDoorOpenRatioSync door;
-                                door.data.fRatio = pVehicle->GetDoorOpenRatio(m_ucEnteringDoor);
-                                pBitStream->Write(&door);
-                            }
-
-#ifdef MTA_DEBUG
-                            g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_in_abort");
-#endif
-                        }
-
-                        // Send it and destroy the packet
-                        g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-                        g_pNet->DeallocateNetBitStream(pBitStream);
-                    }
-
-                    // Warp ourself out again (so we're sure the records are correct)
-                    RemoveFromVehicle();
-
-                    if (pInOutVehicle)
-                    {
-                        pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
-                        pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
-                    }
-                }
-
-                // Reset
-                // Don't allow a new entry/leave until we've gotten the notify return packet
-                ElementID ReasonID = m_VehicleInOutID;
-                ResetVehicleInOut();
-                m_bNoNewVehicleTask = true;
-                m_NoNewVehicleTaskReasonID = ReasonID;
-            }
-        }
-    }
-    else
-    {
-        // If we aren't streamed, stop here
-        if (!m_pPlayerPed)
-            return;
-
-        // If we aren't getting jacked
-        if (!m_bIsGettingJacked)
-        {
+            // Is he in a vehicle now?
             CClientVehicle* pVehicle = GetRealOccupiedVehicle();
-            CClientVehicle* pOccupiedVehicle = GetOccupiedVehicle();
-
-            // Jax: this was commented, re-comment if it was there for a reason (..and give the reason!)
-            // Are we in a vehicle we aren't supposed to be in?
-            if (pVehicle && !pOccupiedVehicle)
+            if (pVehicle)
             {
-                g_pCore->GetConsole()->Print("You shouldn't be in this vehicle");
-                RemoveFromVehicle();
-            }
-
-            // Are we supposed to be in a vehicle? But aren't?
-            if (pOccupiedVehicle && !pVehicle && !IsWarpInToVehicleRequired())
-            {
-                // Jax: this happens when we try to warp into a streamed out vehicle, including when we use CClientVehicle::StreamInNow
-                // ..maybe we need a different way to detect bike falls?
-
-                // Tell the server
+                // Tell the server that we successfully entered the car
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
                 if (pBitStream)
                 {
@@ -6965,46 +6911,205 @@ void CClientPed::UpdateVehicleInOut()
                         pBitStream->Write(GetID());
                     }
 
-                    // Vehicle id
-                    pBitStream->Write(pOccupiedVehicle->GetID());
-                    unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_FELL_OFF);
+                    // Write the car id and the action id (enter complete)
+                    pBitStream->Write(m_VehicleInOutID);
+                    unsigned char ucAction;
+
+                    if (m_bIsJackingVehicle)
+                    {
+                        ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_JACK);
+#ifdef MTA_DEBUG
+                        g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_jack");
+#endif
+                    }
+                    else
+                    {
+                        ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_IN);
+#ifdef MTA_DEBUG
+                        g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_in");
+#endif
+                    }
                     pBitStream->WriteBits(&ucAction, 4);
 
                     // Send it and destroy the packet
                     g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
                     g_pNet->DeallocateNetBitStream(pBitStream);
+                }
 
-                    // We're not allowed to enter any vehicle before we get a confirm
-                    m_bNoNewVehicleTask = true;
-                    m_NoNewVehicleTaskReasonID = pOccupiedVehicle->GetID();
+                // Warp ourself in (so we're sure the records are correct)
+                pVehicle->AllowDoorRatioSetting(m_ucEnteringDoor, true);
+                WarpIntoVehicle(pVehicle, m_ucVehicleInOutSeat);
 
-                    // Remove him from the vehicle
-                    RemoveFromVehicle();
-
-                    /*
-                    // Make it undamagable if we're not syncing it
-                    CDeathmatchVehicle* pInOutVehicle = static_cast < CDeathmatchVehicle* > ( pOccupiedVehicle );
-                    if ( pInOutVehicle )
-                    {
-                        if ( pInOutVehicle->IsSyncing () )
-                        {
-                            pInOutVehicle->SetCanBeDamaged ( true );
-                            pInOutVehicle->SetTyresCanBurst ( true );
-                        }
-                        else
-                        {
-                            pInOutVehicle->SetCanBeDamaged ( false );
-                            pInOutVehicle->SetTyresCanBurst ( false );
-                        }
-                    }
-                    */
-
-#ifdef MTA_DEBUG
-                    g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_fell_off");
-#endif
+                if (pInOutVehicle)
+                {
+                    pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
+                    pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
                 }
             }
+            else
+            {
+                // Tell the server that we aborted entered the car
+                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+                if (pBitStream)
+                {
+                    // Write the ped or player ID to it
+                    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
+                    {
+                        pBitStream->Write(GetID());
+                    }
+
+                    // Write the car id and the action id (enter complete)
+                    pBitStream->Write(m_VehicleInOutID);
+                    unsigned char ucAction;
+                    if (m_bIsJackingVehicle)
+                    {
+                        ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_JACK_ABORT);
+                        pBitStream->WriteBits(&ucAction, 4);
+
+                        // Did we start jacking them?
+                        bool            bAlreadyStartedJacking = false;
+                        CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(CElementIDs::GetElement(m_VehicleInOutID));
+                        if (pVehicle)
+                        {
+                            CClientPed* pJackedPlayer = pVehicle->GetOccupant();
+                            if (pJackedPlayer)
+                            {
+                                // Jax: have we already started to jack the other player?
+                                if (pJackedPlayer->IsGettingJacked())
+                                {
+                                    bAlreadyStartedJacking = true;
+                                }
+                            }
+                            unsigned char ucDoor = m_ucEnteringDoor - 2;
+                            pBitStream->WriteBits(&ucDoor, 3);
+                            SDoorOpenRatioSync door;
+                            door.data.fRatio = pVehicle->GetDoorOpenRatio(m_ucEnteringDoor);
+                            pBitStream->Write(&door);
+                        }
+                        pBitStream->WriteBit(bAlreadyStartedJacking);
+
+#ifdef MTA_DEBUG
+                        g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_jack_abort");
+#endif
+                    }
+                    else
+                    {
+                        ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_IN_ABORT);
+                        pBitStream->WriteBits(&ucAction, 4);
+                        CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(CElementIDs::GetElement(m_VehicleInOutID));
+                        if (pVehicle)
+                        {
+                            unsigned char ucDoor = m_ucEnteringDoor - 2;
+                            pBitStream->WriteBits(&ucDoor, 3);
+                            SDoorOpenRatioSync door;
+                            door.data.fRatio = pVehicle->GetDoorOpenRatio(m_ucEnteringDoor);
+                            pBitStream->Write(&door);
+                        }
+
+#ifdef MTA_DEBUG
+                        g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_in_abort");
+#endif
+                    }
+
+                    // Send it and destroy the packet
+                    g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+                    g_pNet->DeallocateNetBitStream(pBitStream);
+                }
+
+                // Warp ourself out again (so we're sure the records are correct)
+                RemoveFromVehicle();
+
+                if (pInOutVehicle)
+                {
+                    pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
+                    pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
+                }
+            }
+
+            // Reset
+            // Don't allow a new entry/leave until we've gotten the notify return packet
+            ElementID ReasonID = m_VehicleInOutID;
+            ResetVehicleInOut();
+            m_bNoNewVehicleTask = true;
+            m_NoNewVehicleTaskReasonID = ReasonID;
         }
+    }
+    else
+    {
+        // If we aren't streamed, stop here
+        if (!m_pPlayerPed)
+            return;
+
+        // If we aren't getting jacked
+        if (m_bIsGettingJacked)
+            return;
+            
+        CClientVehicle* pVehicle = GetRealOccupiedVehicle();
+        CClientVehicle* pOccupiedVehicle = GetOccupiedVehicle();
+
+        // Jax: this was commented, re-comment if it was there for a reason (..and give the reason!)
+        // Are we in a vehicle we aren't supposed to be in?
+        if (pVehicle && !pOccupiedVehicle)
+        {
+            g_pCore->GetConsole()->Print("You shouldn't be in this vehicle");
+            RemoveFromVehicle();
+        }
+
+        // Are we supposed to be in a vehicle? But aren't?
+        if (!pOccupiedVehicle || pVehicle || IsWarpInToVehicleRequired())
+            return;
+            
+        // Jax: this happens when we try to warp into a streamed out vehicle, including when we use CClientVehicle::StreamInNow
+        // ..maybe we need a different way to detect bike falls?
+
+        // Tell the server
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+        if (!pBitStream)
+            return;
+            
+        // Write the ped or player ID to it
+        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
+        {
+            pBitStream->Write(GetID());
+        }
+
+        // Vehicle id
+        pBitStream->Write(pOccupiedVehicle->GetID());
+        unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_FELL_OFF);
+        pBitStream->WriteBits(&ucAction, 4);
+
+        // Send it and destroy the packet
+        g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(pBitStream);
+
+        // We're not allowed to enter any vehicle before we get a confirm
+        m_bNoNewVehicleTask = true;
+        m_NoNewVehicleTaskReasonID = pOccupiedVehicle->GetID();
+
+        // Remove him from the vehicle
+        RemoveFromVehicle();
+
+        /*
+        // Make it undamagable if we're not syncing it
+        CDeathmatchVehicle* pInOutVehicle = static_cast < CDeathmatchVehicle* > ( pOccupiedVehicle );
+        if ( pInOutVehicle )
+        {
+            if ( pInOutVehicle->IsSyncing () )
+            {
+                pInOutVehicle->SetCanBeDamaged ( true );
+                pInOutVehicle->SetTyresCanBurst ( true );
+            }
+            else
+            {
+                pInOutVehicle->SetCanBeDamaged ( false );
+                pInOutVehicle->SetTyresCanBurst ( false );
+            }
+        }
+        */
+
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_fell_off");
+#endif
     }
 }
 
