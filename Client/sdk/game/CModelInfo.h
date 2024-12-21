@@ -15,6 +15,8 @@
 #include "CAnimBlock.h"
 #include "Common.h"
 
+constexpr std::uint16_t MODEL_PROPERTIES_GROUP_STATIC = 0xFFFF;
+
 class CBaseModelInfoSAInterface;
 class CColModel;
 class CPedModelInfo;
