@@ -1674,6 +1674,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onSettingChange", "setting, oldValue, newValue", NULL, false);
     m_Events.AddEvent("onChatMessage", "message, element", NULL, false);
     m_Events.AddEvent("onExplosion", "x, y, z, type, origin", nullptr, false);
+    m_Events.AddEvent("onShutdown", "resource, reason", nullptr, false);
 
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
