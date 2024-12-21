@@ -41,7 +41,6 @@ public:
     bool IsInputActive();
     void ActivateInput();
 
-    void HandleTextAccepted(bool bHandled);
     void GetCommandInfo(const std::string& strIn, std::string& strCmdOut, std::string& strCmdLineOut);
 
     void ResetHistoryChanges();
