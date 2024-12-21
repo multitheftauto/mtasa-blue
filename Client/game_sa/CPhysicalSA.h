@@ -121,7 +121,7 @@ public:
     CVector*     GetTurnSpeed(CVector* vecTurnSpeed);
     CVector*     GetMoveSpeedInternal(CVector* vecMoveSpeed);
     CVector*     GetTurnSpeedInternal(CVector* vecTurnSpeed);
-    void         SetMoveSpeed(CVector* vecMoveSpeed);
+    void         SetMoveSpeed(const CVector& vecMoveSpeed) noexcept;
     void         SetTurnSpeed(CVector* vecTurnSpeed);
 
     float GetMass();
