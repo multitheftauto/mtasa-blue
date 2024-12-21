@@ -71,70 +71,76 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
     return true;
 }
 
-CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2)
+CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t model, std::uint8_t variation, std::uint8_t variation2) noexcept
 {
-    CVehicleSA* pVehicle = nullptr;
-
-    if (m_vehiclePool.ulCount < MAX_VEHICLES)
+    try
     {
-        MemSetFast((void*)VAR_CVehicle_Variation1, ucVariation, 1);
-        MemSetFast((void*)VAR_CVehicle_Variation2, ucVariation2, 1);
+        if (m_vehiclePool.ulCount >= MAX_VEHICLES)
+            return nullptr;
+
+        MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
+        MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
 
         // CCarCtrl::CreateCarForScript
-        CVehicleSAInterface* pInterface =
-            ((CVehicleSAInterface * (__cdecl*)(int, CVector, unsigned char)) FUNC_CCarCtrlCreateCarForScript)(eVehicleType, CVector(0, 0, 0), 0);
+        auto* pInterface = ((CVehicleSAInterface*(__cdecl*)(int, CVector, std::uint8_t))FUNC_CCarCtrlCreateCarForScript)(model, CVector(), 0);
+        if (!pInterface)
+            return nullptr;
 
-        auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
+        // Valid model?
+        if (!CModelInfoSA::IsVehicleModel(model))
+            return nullptr;
 
+        auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
+
+        std::unique_ptr<CVehicleSA> vehicle = nullptr;
         switch (vehicleClass)
         {
             case VehicleClass::MONSTER_TRUCK:
-                pVehicle = new CMonsterTruckSA(reinterpret_cast<CMonsterTruckSAInterface*>(pInterface));
+                vehicle = std::make_unique<CMonsterTruckSA>(reinterpret_cast<CMonsterTruckSAInterface*>(pInterface));
                 break;
             case VehicleClass::QUAD:
-                pVehicle = new CQuadBikeSA(reinterpret_cast<CQuadBikeSAInterface*>(pInterface));
+                vehicle = std::make_unique<CQuadBikeSA>(reinterpret_cast<CQuadBikeSAInterface*>(pInterface));
                 break;
             case VehicleClass::HELI:
-                pVehicle = new CHeliSA(reinterpret_cast<CHeliSAInterface*>(pInterface));
+                vehicle = std::make_unique<CHeliSA>(reinterpret_cast<CHeliSAInterface*>(pInterface));
                 break;
             case VehicleClass::PLANE:
-                pVehicle = new CPlaneSA(reinterpret_cast<CPlaneSAInterface*>(pInterface));
+                vehicle = std::make_unique<CPlaneSA>(reinterpret_cast<CPlaneSAInterface*>(pInterface));
                 break;
             case VehicleClass::BOAT:
-                pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
+                vehicle = std::make_unique<CBoatSA>(reinterpret_cast<CBoatSAInterface*>(pInterface));
                 break;
             case VehicleClass::TRAIN:
-                pVehicle = new CTrainSA(reinterpret_cast<CTrainSAInterface*>(pInterface));
+                vehicle = std::make_unique<CTrainSA>(reinterpret_cast<CTrainSAInterface*>(pInterface));
                 break;
             case VehicleClass::BIKE:
-                pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
+                vehicle = std::make_unique<CBikeSA>(reinterpret_cast<CBikeSAInterface*>(pInterface));
                 break;
             case VehicleClass::BMX:
-                pVehicle = new CBmxSA(reinterpret_cast<CBmxSAInterface*>(pInterface));
+                vehicle = std::make_unique<CBmxSA>(reinterpret_cast<CBmxSAInterface*>(pInterface));
                 break;
             case VehicleClass::TRAILER:
-                pVehicle = new CTrailerSA(reinterpret_cast<CTrailerSAInterface*>(pInterface));
+                vehicle = std::make_unique<CTrailerSA>(reinterpret_cast<CTrailerSAInterface*>(pInterface));
                 break;
             default:
-                pVehicle = new CAutomobileSA(reinterpret_cast<CAutomobileSAInterface*>(pInterface));
+                vehicle = std::make_unique<CAutomobileSA>(reinterpret_cast<CAutomobileSAInterface*>(pInterface));
                 break;
         }
 
-        if (pVehicle && AddVehicleToPool(pClientVehicle, pVehicle))
-        {
-            pVehicle->m_ucVariant = ucVariation;
-            pVehicle->m_ucVariant2 = ucVariation2;
+        if (!vehicle || !AddVehicleToPool(pClientVehicle, vehicle.get()))
+            return nullptr;
 
-            pVehicle->DumpVehicleFrames();
-        }
-        else
-        {
-            delete pVehicle;
-            pVehicle = nullptr;
-        }
+        vehicle->m_ucVariant = variation;
+        vehicle->m_ucVariant2 = variation2;
+
+        vehicle->DumpVehicleFrames();
+
+        return vehicle.release();
     }
-
-    return pVehicle;
+    catch (...)
+    {
+        return nullptr;
+    }
 }
 
 void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
@@ -564,108 +570,89 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
     return NULL;
 }
 
-CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId)
+static void CreateMissionTrain(const CVector& vecPos, bool bDirection, std::uint32_t uiTrainType, CTrainSAInterface** ppTrainBeginning,
+                               CTrainSAInterface** ppTrainEnd, int iNodeIndex, int iTrackId, bool bMissionTrain) noexcept
+{
+    try
+    {
+        auto createMissionTrain = reinterpret_cast<void(__cdecl*)(CVector, bool, std::uint32_t, CTrainSAInterface**, CTrainSAInterface**,
+                                                                  int, int, bool)>(FUNC_CTrain_CreateMissionTrain);
+
+        createMissionTrain(vecPos, bDirection, uiTrainType, ppTrainBeginning, ppTrainEnd, iNodeIndex, iTrackId, bMissionTrain);
+    }
+    catch (...)
+    {
+    }
+}
+
+CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> models, bool bDirection,
+                             std::uint8_t ucTrackId) noexcept
 {
     // clean the existing array
     MemSetFast((void*)VAR_TrainModelArray, 0, 32 * sizeof(DWORD));
 
     // now load the models we're going to use and add them to the array
-    for (int i = 0; i < iSize; i++)
+    std::size_t count = 0;
+    for (const auto model : models)
     {
-        if (dwModels[i] == 449 || dwModels[i] == 537 || dwModels[i] == 538 || dwModels[i] == 569 || dwModels[i] == 590 || dwModels[i] == 570)
+        // Valid model?
+        if (!CModelInfoSA::IsVehicleModel(model))
+            return nullptr;
+
+        if (model == 449 || model == 537 || model == 538 || model == 569 || model == 590 || model == 570)
         {
-            MemPutFast<DWORD>(VAR_TrainModelArray + i * 4, dwModels[i]);
+            MemPutFast<DWORD>(VAR_TrainModelArray + count * 4, model);
+            count += 1;
         }
     }
-
-    CTrainSAInterface* pTrainBeginning = nullptr;
-    CTrainSAInterface* pTrainEnd = nullptr;
-
-    float fX = vecPosition->fX;
-    float fY = vecPosition->fY;
-    float fZ = vecPosition->fZ;
 
     // Disable GetVehicle because CreateMissionTrain calls it before our CVehicleSA instance is inited
     m_bGetVehicleEnabled = false;
 
     // Find closest track node
     float fRailDistance;
-    int   iNodeId = pGame->GetWorld()->FindClosestRailTrackNode(*vecPosition, ucTrackId, fRailDistance);
+    int   iNodeId = pGame->GetWorld()->FindClosestRailTrackNode(vecPosition, ucTrackId, fRailDistance);
     int   iDesiredTrackId = ucTrackId;
 
-    DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
-    _asm
-    {
-        push    0            // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from
-                             // 1 to 0)
-                             push    iDesiredTrackId            // track ID
-                             push    iNodeId            // node to start at (-1 for closest node)
-                             lea     ecx, pTrainEnd
-                             push    ecx            // end of train
-                             lea     ecx, pTrainBeginning
-                             push    ecx            // begining of train
-                             push    0            // train type (always use 0 as thats where we're writing to)
-                             push    bDirection            // direction
-                             push    fZ            // z
-                             push    fY            // y
-                             push    fX            // x
-                             call    dwFunc
-                             add     esp, 0x28
-    }
+    CTrainSAInterface* pTrainBeginning = nullptr;
+    CTrainSAInterface* pTrainEnd = nullptr;
+
+    CreateMissionTrain(vecPosition, bDirection, 0, &pTrainBeginning, &pTrainEnd, iNodeId, iDesiredTrackId, false);
 
     // Enable GetVehicle
     m_bGetVehicleEnabled = true;
 
-    CVehicleSA* trainHead = NULL;
-    if (pTrainBeginning)
-    {
-        DWORD vehicleIndex = 0;
+    if (!pTrainBeginning || m_vehiclePool.ulCount >= MAX_VEHICLES)
+        return nullptr;
 
-        if (m_vehiclePool.ulCount < MAX_VEHICLES)
+    std::size_t vehicleIndex = 0;
+
+    std::unique_ptr<CVehicleSA> train = std::make_unique<CTrainSA>(pTrainBeginning);
+    if (!train || !AddVehicleToPool(pClientVehicle, train.get()))
+        return nullptr;
+
+    ++vehicleIndex;
+
+    CVehicleSA* pCarriage = train.get();
+    while (m_vehiclePool.ulCount < MAX_VEHICLES && pCarriage && pCarriage->GetNextCarriageInTrain())
+    {
+        CTrainSAInterface* pVehCarriage = pCarriage->GetNextCarriageInTrain();
+        if (!pVehCarriage)
+            break;
+
+        auto newCarriage = std::make_unique<CTrainSA>(pVehCarriage);
+        if (!newCarriage || !AddVehicleToPool(pClientVehicle, newCarriage.get()))
         {
-            trainHead = new CTrainSA(pTrainBeginning);
-            if (!AddVehicleToPool(pClientVehicle, trainHead))
-            {
-                delete trainHead;
-                trainHead = NULL;
-            }
-            else
-                ++vehicleIndex;
+            newCarriage.reset();
+            break;
         }
 
-        CVehicleSA* carriage = trainHead;
-
-        while (carriage)
-        {
-            if (m_vehiclePool.ulCount < MAX_VEHICLES)
-            {
-                CTrainSAInterface* vehCarriage = carriage->GetNextCarriageInTrain();
-                if (vehCarriage)
-                {
-                    carriage = new CTrainSA(vehCarriage);
-                    if (!AddVehicleToPool(pClientVehicle, carriage))
-                    {
-                        delete carriage;
-                        carriage = NULL;
-                    }
-                    else
-                        ++vehicleIndex;
-                }
-                else
-                    carriage = NULL;
-            }
-        }
+        pCarriage = newCarriage.release();
+        ++vehicleIndex;
     }
 
-    // Stops the train from moving at ludacrist speeds right after creation
-    // due to some glitch in the node finding in CreateMissionTrain
-    CVector vec(0, 0, 0);
-    if (trainHead)
-    {
-        trainHead->SetMoveSpeed(&vec);
-    }
-
-    return trainHead;
+    train->SetMoveSpeed(CVector());
+    return train.release();
 }
 
 DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
