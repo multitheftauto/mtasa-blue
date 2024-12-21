@@ -89,6 +89,8 @@ DECLARE_ENUM(eWorldProperty);
 DECLARE_ENUM_CLASS(eModelLoadState);
 DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(taskType);
+DECLARE_ENUM(eEntityType);
+
 
 class CRemoteCall;
 
