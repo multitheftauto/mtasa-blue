@@ -229,7 +229,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_pObjectSync = new CObjectSync(m_pObjectManager);
 #endif
     m_pNametags = new CNametags(m_pManager);
-    m_pPlayerMap = new CPlayerMap(m_pManager);
+    m_pRadarMap = new CRadarMap(m_pManager);
 
     // Set the screenshot path
     /* This is now done in CCore, to maintain a global screenshot path
@@ -554,7 +554,7 @@ CClientGame::~CClientGame()
 #endif
     SAFE_DELETE(m_pBlendedWeather);
     SAFE_DELETE(m_pMovingObjectsManager);
-    SAFE_DELETE(m_pPlayerMap);
+    SAFE_DELETE(m_pRadarMap);
     SAFE_DELETE(m_pRemoteCalls);
     SAFE_DELETE(m_pLuaManager);
     SAFE_DELETE(m_pLatentTransferManager);
@@ -1103,7 +1103,7 @@ void CClientGame::DoPulsePostFrame()
         CClientPerfStatManager::GetSingleton()->DoPulse();
     }
 
-    m_pPlayerMap->DoRender();
+    m_pRadarMap->DoRender();
     m_pManager->DoRender();
     DoPulses();
 
@@ -1441,8 +1441,8 @@ void CClientGame::DoPulses()
     }
 
     // Check for radar input
-    m_pPlayerMap->DoPulse();
-    g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pPlayerMap->IsPlayerMapShowing());
+    m_pRadarMap->DoPulse();
+    g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pRadarMap->IsRadarShowing());
 
     // Got a local player?
     if (m_pLocalPlayer)
@@ -5412,8 +5412,8 @@ void CClientGame::ResetMapInfo()
     // Keybinds
     g_pCore->GetKeyBinds()->SetAllControlsEnabled(true, true, true);
 
-    // Player map
-    m_pPlayerMap->SetForcedState(false);
+    // Radarmap
+    m_pRadarMap->SetForcedState(false);
 
     // Camera
     m_pCamera->FadeOut(0.0f, 0, 0, 0);
