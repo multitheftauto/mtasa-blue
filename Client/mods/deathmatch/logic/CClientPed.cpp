@@ -831,7 +831,7 @@ void CClientPed::SetMoveSpeed(const CVector& vecMoveSpeed)
 {
     if (m_pPlayerPed)
     {
-        m_pPlayerPed->SetMoveSpeed(const_cast<CVector*>(&vecMoveSpeed));
+        m_pPlayerPed->SetMoveSpeed(vecMoveSpeed);
     }
     m_vecMoveSpeed = vecMoveSpeed;
 }
@@ -2754,7 +2754,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         {
             CVector vecTemp;
             m_pPlayerPed->SetMatrix(&m_matFrozen);
-            m_pPlayerPed->SetMoveSpeed(&vecTemp);
+            m_pPlayerPed->SetMoveSpeed(vecTemp);
         }
 
         // Is our health locked?
@@ -3612,7 +3612,7 @@ void CClientPed::_CreateModel()
         m_pPlayerPed->SetMatrix(&m_Matrix);
         m_pPlayerPed->SetCurrentRotation(m_fCurrentRotation);
         m_pPlayerPed->SetTargetRotation(m_fTargetRotation);
-        m_pPlayerPed->SetMoveSpeed(&m_vecMoveSpeed);
+        m_pPlayerPed->SetMoveSpeed(m_vecMoveSpeed);
         m_pPlayerPed->SetTurnSpeed(&m_vecTurnSpeed);
         Duck(m_bDucked);
         SetWearingGoggles(m_bWearingGoggles);
