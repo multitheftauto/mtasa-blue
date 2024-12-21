@@ -71,6 +71,9 @@ public:
     LUA_DECLARE(IsPedDoingGangDriveby);
     LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedAnimation);
+    static float GetPedAnimationProgress(CClientPed* ped);
+    static float GetPedAnimationSpeed(CClientPed* ped);
+    static float GetPedAnimationLength(CClientPed* ped);
     LUA_DECLARE(GetPedMoveState);
     LUA_DECLARE(GetPedMoveAnim);
     LUA_DECLARE(IsPedHeadless);

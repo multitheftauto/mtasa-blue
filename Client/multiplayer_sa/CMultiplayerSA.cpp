@@ -1569,7 +1569,12 @@ void CMultiplayerSA::InitHooks()
     // Fix invisible vehicle windows when lights are on (#2936)
     MemPut<BYTE>(0x6E1425, 1);
 
+    // Allow alpha change for helicopter rotor (#523)
+    MemSet((void*)0x6C444B, 0x90, 6);
+    MemSet((void*)0x6C4453, 0x90, 0x68);
+    
     InitHooks_CrashFixHacks();
+    InitHooks_DeviceSelection();
 
     // Init our 1.3 hooks.
     Init_13();
@@ -1857,6 +1862,7 @@ void CMultiplayerSA::DisableCloseRangeDamage(bool bDisabled)
         MemPut<BYTE>(0x73BA00, 0x86);
     }
 }
+
 bool CMultiplayerSA::GetInteriorSoundsEnabled()
 {
     return bInteriorSoundsEnabled;

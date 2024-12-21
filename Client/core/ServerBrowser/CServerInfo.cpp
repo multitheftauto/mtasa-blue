@@ -469,13 +469,15 @@ void CServerInfo::Connect()
 
 void CServerInfo::ResetServerGUI(CServerListItem* pServer)
 {
+    const SString strVerified = pServer->isStatusVerified ? "" : "*";
+
     // Set our GUI elements to display the server information
     m_pServerNameLabel->SetText(pServer->strName.c_str());
     m_pServerAddressLabel->SetText(pServer->strEndpoint.c_str());
     m_pGamemodeLabel->SetText(pServer->strGameMode.c_str());
     m_pMapLabel->SetText(pServer->strMap.c_str());
-    m_pPlayersLabel->SetText(SString("%i/%i", pServer->nPlayers, pServer->nMaxPlayers).c_str());
-
+    m_pPlayersLabel->SetText(SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified).c_str());
+    
     m_pPasswordedLabel->SetText(pServer->bPassworded ? _("Yes") : _("No"));
     m_pLatencyLabel->SetText(SString("%i", pServer->nPing));
 
