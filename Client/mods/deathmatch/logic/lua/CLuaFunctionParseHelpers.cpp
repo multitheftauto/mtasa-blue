@@ -910,6 +910,16 @@ ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
 ADD_ENUM(PreloadAreaOption::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("preload-area-option")
 
+IMPLEMENT_ENUM_BEGIN(eEntityType)
+ADD_ENUM(ENTITY_TYPE_NOTHING, "unknown")
+ADD_ENUM(ENTITY_TYPE_BUILDING, "building")
+ADD_ENUM(ENTITY_TYPE_VEHICLE, "vehicle")
+ADD_ENUM(ENTITY_TYPE_PED, "ped")
+ADD_ENUM(ENTITY_TYPE_OBJECT, "object")
+ADD_ENUM(ENTITY_TYPE_DUMMY, "dummy")
+ADD_ENUM(ENTITY_TYPE_NOTINPOOLS, "unknown")
+IMPLEMENT_ENUM_END("entity-type")
+
 //
 // CResource from userdata
 //
