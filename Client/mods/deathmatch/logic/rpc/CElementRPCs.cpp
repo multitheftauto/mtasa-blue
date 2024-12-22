@@ -618,8 +618,8 @@ void CElementRPCs::SetLowLodElement(CClientEntity* pSource, NetBitStreamInterfac
             case CCLIENTBUILDING:
             {
                 CClientBuilding* pLowLodBuilding = DynamicCast<CClientBuilding>(CElementIDs::GetElement(LowLodObjectID));
-                CClientBuilding* pObject = static_cast<CClientBuilding*>(pSource);
-                pObject->SetLowLodBuilding(pLowLodBuilding);
+                CClientBuilding* pBuilding = static_cast<CClientBuilding*>(pSource);
+                pBuilding->SetLowLodBuilding(pLowLodBuilding);
                 break;
             }
         }
