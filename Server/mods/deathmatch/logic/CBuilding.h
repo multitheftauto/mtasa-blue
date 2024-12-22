@@ -40,36 +40,36 @@ public:
     void GetRotation(CVector& vecRotation) override;
     void SetRotation(const CVector& vecRotation);
 
-    void GetMatrix(CMatrix& matrix);
-    void SetMatrix(const CMatrix& matrix);
+    void GetMatrix(CMatrix& matrix) override;
+    void SetMatrix(const CMatrix& matrix) override;
 
     unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
 
-    unsigned short GetModel() { return m_usModel; }
+    unsigned short GetModel() const { return m_usModel; }
     void           SetModel(unsigned short usModel) { m_usModel = usModel; }
 
     bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
-    bool     SetLowLodObject(CBuilding* pLowLodObject);
-    CBuilding* GetLowLodElement() const { return m_pLowLodObject; };
+    bool       SetLowLodBuilding(CBuilding* pLowLodBuilding);
+    CBuilding* GetLowLodElement() const { return m_pLowLodBuilding; };
 
-    CBuilding* GetHighLodObject() const { return m_HighLodObject; };
-    void SetHighLodObject(CBuilding* pHighLodObject) { m_HighLodObject = pHighLodObject; };
+    CBuilding* GetHighLodBuilding() const { return m_HighLodBuilding; };
+    void       SetHighLodObject(CBuilding* pHighLodObject) { m_HighLodBuilding = pHighLodObject; };
 
 protected:
     bool ReadSpecialData(const int iLine) override;
 
 private:
-    CBuildingManager* m_pObjectManager;
-    CVector         m_vecRotation;
-    unsigned char   m_ucAlpha;
-    unsigned short  m_usModel;
+    CBuildingManager* m_pBuildingManager;
+    CVector           m_vecRotation;
+    unsigned char     m_ucAlpha;
+    unsigned short    m_usModel;
 
 protected:
     bool m_bCollisionsEnabled;
 
-    CBuilding* m_pLowLodObject;
-    CBuilding* m_HighLodObject;
+    CBuilding* m_pLowLodBuilding;
+    CBuilding* m_HighLodBuilding;
 };

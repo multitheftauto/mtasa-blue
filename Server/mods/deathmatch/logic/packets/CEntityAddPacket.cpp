@@ -1151,8 +1151,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.WriteCompressed(pBuilding->GetInterior());
 
                     CBuilding* pLowLodBuilding = pBuilding->GetLowLodElement();
-                    ElementID LowLodObjectID = pLowLodBuilding ? pLowLodBuilding->GetID() : INVALID_ELEMENT_ID;
-                    BitStream.Write(LowLodObjectID);
+                    ElementID lowLodBuildingID = pLowLodBuilding ? pLowLodBuilding->GetID() : INVALID_ELEMENT_ID;
+                    BitStream.Write(lowLodBuildingID);
                     break;
                 }
 

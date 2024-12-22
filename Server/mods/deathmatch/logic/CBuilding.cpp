@@ -16,13 +16,13 @@
 
 extern CGame* g_pGame;
 
-CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CElement(pParent), m_pLowLodObject(NULL)
+CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CElement(pParent), m_pLowLodBuilding(NULL)
 {
     // Init
     m_iType = CElement::BUILDING;
     SetTypeName("buidling");
 
-    m_pObjectManager = pBuildingManager;
+    m_pBuildingManager = pBuildingManager;
     m_usModel = 0xFFFF;
     m_ucAlpha = 255;
     m_bDoubleSided = false;
@@ -32,13 +32,13 @@ CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CE
     pBuildingManager->AddToList(this);
 }
 
-CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLodObject(Copy.m_pLowLodObject)
+CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLodBuilding(Copy.m_pLowLodBuilding)
 {
     // Init
     m_iType = CElement::BUILDING;
     SetTypeName("buidling");
 
-    m_pObjectManager = Copy.m_pObjectManager;
+    m_pBuildingManager = Copy.m_pBuildingManager;
     m_usModel = Copy.m_usModel;
     m_ucAlpha = Copy.m_ucAlpha;
     m_bDoubleSided = Copy.m_bDoubleSided;
@@ -47,7 +47,7 @@ CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLo
     m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
 
     // Add us to the manager's list
-    m_pObjectManager->AddToList(this);
+    m_pBuildingManager->AddToList(this);
     UpdateSpatialData();
 }
 
@@ -65,13 +65,13 @@ CElement* CBuilding::Clone(bool* bAddEntity, CResource* pResource)
 void CBuilding::Unlink()
 {
     // Remove us from the manager's list
-    m_pObjectManager->RemoveFromList(this);
+    m_pBuildingManager->RemoveFromList(this);
 
     // Remove LowLod refs in others
-    SetLowLodObject(nullptr);
+    SetLowLodBuilding(nullptr);
 
-    if (m_HighLodObject)
-        m_HighLodObject->SetLowLodObject(nullptr);
+    if (m_HighLodBuilding)
+        m_HighLodBuilding->SetLowLodBuilding(nullptr);
 }
 
 bool CBuilding::ReadSpecialData(const int iLine)
@@ -185,27 +185,27 @@ void CBuilding::SetRotation(const CVector& vecRotation)
     m_vecRotation = vecRotation;
 }
 
-bool CBuilding::SetLowLodObject(CBuilding* pNewLowLodObject)
+bool CBuilding::SetLowLodBuilding(CBuilding* pNewLowLodBuilding)
 {
     // Set or clear?
-    if (!pNewLowLodObject)
+    if (!pNewLowLodBuilding)
     {
-        if (m_pLowLodObject)
+        if (m_pLowLodBuilding)
         {
-            m_pLowLodObject->SetHighLodObject(nullptr);
-            m_pLowLodObject = nullptr;
+            m_pLowLodBuilding->SetHighLodObject(nullptr);
+            m_pLowLodBuilding = nullptr;
         }
-        m_pLowLodObject = nullptr;
+        m_pLowLodBuilding = nullptr;
         return true;
     }
     else
     {
         // Remove any previous link
-        SetLowLodObject(nullptr);
+        SetLowLodBuilding(nullptr);
 
         // Make new link
-        m_pLowLodObject = pNewLowLodObject;
-        pNewLowLodObject->SetHighLodObject(this);
+        m_pLowLodBuilding = pNewLowLodBuilding;
+        pNewLowLodBuilding->SetHighLodObject(this);
         return true;
     }
 }
