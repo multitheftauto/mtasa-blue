@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-16 23:16+0000\n"
-"PO-Revision-Date: 2024-12-22 00:00\n"
+"POT-Creation-Date: 2024-12-22 00:06+0000\n"
+"PO-Revision-Date: 2024-12-22 01:00\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -301,14 +301,14 @@ msgstr "Főmenü"
 #: Client/core/CSettings.cpp:4179 Client/core/CSettings.cpp:4207
 #: Client/core/CSettings.cpp:4777 Client/core/CConnectManager.cpp:80
 #: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
-#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
-#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
-#: Client/core/CConnectManager.cpp:421
+#: Client/core/CConnectManager.cpp:265 Client/core/CConnectManager.cpp:323
+#: Client/core/CConnectManager.cpp:406 Client/core/CConnectManager.cpp:413
+#: Client/core/CConnectManager.cpp:423
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1307
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1364
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1413
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -316,14 +316,14 @@ msgstr "Hiba"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:647
 #: Client/mods/deathmatch/logic/CClientGame.cpp:745
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1307
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1364
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Helytelen felhasználónév! Kérlek menj a Beállítások menübe és változtasd meg!"
 
 #. Display the status box
 #: Client/mods/deathmatch/logic/CClientGame.cpp:663
-#: Client/core/CConnectManager.cpp:148
+#: Client/core/CConnectManager.cpp:150
 msgid "CONNECTING"
 msgstr "CSATLAKOZÁS"
 
@@ -374,7 +374,7 @@ msgid "Connecting to local server timed out. See console for details."
 msgstr "Időtúllépés miatt a csatlakozás megszakadt. Adatokért nyisd meg a konzolt."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1339
-#: Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:265
 msgid "Connection timed out"
 msgstr "Időtúllépés miatt a kapcsolat megszakadt"
 
@@ -383,22 +383,22 @@ msgid "Connection with the server was lost"
 msgstr "A kapcsolat megszakadt a szerverrel"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1387
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/core/CConnectManager.cpp:279 Client/core/CConnectManager.cpp:283
 msgid "Disconnected: unknown protocol error"
 msgstr "Lecsatlakozva: ismeretlen protokoll hiba"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1391
-#: Client/core/CConnectManager.cpp:285
+#: Client/core/CConnectManager.cpp:287
 msgid "Disconnected: disconnected remotely"
 msgstr "Lecsatlakozva: lecsatlakozva távolról"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1395
-#: Client/core/CConnectManager.cpp:289
+#: Client/core/CConnectManager.cpp:291
 msgid "Disconnected: connection lost remotely"
 msgstr "Lecsatlakozva: kapcsolat megszakítva távolról"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1399
-#: Client/core/CConnectManager.cpp:293
+#: Client/core/CConnectManager.cpp:295
 msgid "Disconnected: you are banned from this server"
 msgstr "Lecsatlakozva: ki lettél tiltva a szerverről"
 
@@ -407,12 +407,12 @@ msgid "Disconnected: the server is currently full"
 msgstr "Lecsatlakozva: a szerver jelenleg tele van"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1407
-#: Client/core/CConnectManager.cpp:300
+#: Client/core/CConnectManager.cpp:302
 msgid "Disconnected: disconnected from the server"
 msgstr "Lecsatlakozva: lecsatlakozva a szerverről"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1411
-#: Client/core/CConnectManager.cpp:304
+#: Client/core/CConnectManager.cpp:306
 msgid "Disconnected: connection to the server was lost"
 msgstr "Lecsatlakozva: a kapcsolat megszakadt a szerverrel"
 
@@ -421,7 +421,7 @@ msgid "Disconnected: invalid password specified"
 msgstr "Lecsatlakozva: helytelen jelszó"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1419
-#: Client/core/CConnectManager.cpp:311
+#: Client/core/CConnectManager.cpp:313
 msgid "Disconnected: connection was refused"
 msgstr "Lecsatlakozva: a kapcsolat visszautasítva"
 
@@ -429,23 +429,23 @@ msgstr "Lecsatlakozva: a kapcsolat visszautasítva"
 msgid "MTA Client verification failed!"
 msgstr "MTA kliens ellenőrzése nem sikerült!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "In a ditch"
 msgstr "Egy árokban"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "En-route to hospital"
-msgstr "Uton a korházhoz"
+msgstr "Úton a kórházba"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "Meeting their maker"
 msgstr "Találkozni a készítőjükkel"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
 msgid "Regretting their decisions"
 msgstr "Megbánják a döntéseiket"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
 msgid "Wasted"
 msgstr "Meghalt"
 
@@ -783,7 +783,7 @@ msgstr "OK"
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1200
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1196
 #: Client/core/CSettings.cpp:1393 Client/core/CSettings.cpp:1417
 #: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4576
 #: Client/core/CSettings.cpp:4606 Client/core/CSettings.cpp:4655
@@ -920,7 +920,7 @@ msgstr "Kérjük állítsa le a következő programokat a folytatás előtt:"
 #: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1199 Client/core/CSettings.cpp:1392
+#: Client/core/CMainMenu.cpp:1195 Client/core/CSettings.cpp:1392
 #: Client/core/CSettings.cpp:1416 Client/core/CSettings.cpp:4501
 #: Client/core/CSettings.cpp:4575 Client/core/CSettings.cpp:4605
 #: Client/core/CSettings.cpp:4654 Client/core/ServerBrowser/CServerInfo.cpp:481
@@ -1004,7 +1004,7 @@ msgstr "Próbálj meg minden lehetőséget, és lássuk mi működik:"
 
 #: Client/loader/Dialogs.cpp:180
 msgid "A - Standard NVidia"
-msgstr "A - Szabványos NVidia"
+msgstr "A - Általános NVidia"
 
 #: Client/loader/Dialogs.cpp:181
 msgid "B - Alternate NVidia"
@@ -1012,7 +1012,7 @@ msgstr "B - Alternatív NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr "C - Szabványos Intel"
+msgstr "C - Általános Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
@@ -1161,7 +1161,7 @@ msgstr "Egy példánya a GTA: San Andreas-nak már fut. Le kell állítani, miel
 
 #: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
 #: Client/loader/MainFunctions.cpp:1219
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1387
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
 msgstr "Információ"
@@ -1726,16 +1726,16 @@ msgstr "* Az idő %d:%02d:%02d"
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "kapcsolódás: Példa: 'connect <hoszt> [<port> <név> <jelszó>]'"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+#: Client/core/CCommandFuncs.cpp:250
 msgid "connect: Bad port number"
 msgstr "kapcsolódás: Hibás port"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#: Client/core/CCommandFuncs.cpp:272
 #, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "kapcsolódás: Kapcsolódás ide %s:%u..."
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#: Client/core/CCommandFuncs.cpp:276
 #, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "kapcsolódás: nem lehet kapcsolódni ide %s:%u!"
@@ -1744,16 +1744,30 @@ msgstr "kapcsolódás: nem lehet kapcsolódni ide %s:%u!"
 msgid "connect: Failed to unload current mod"
 msgstr "kapcsolódás: A jelenlegi mód betöltése sikertelen"
 
-#: Client/core/CCommandFuncs.cpp:371
+#: Client/core/CCommandFuncs.cpp:317
+msgid "reconnect: Bad port number"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:332
+#, c-format
+msgid "reconnect: Reconnecting to %s:%u..."
+msgstr "reconnect: Újracsatlakozás a %s:%u címre..."
+
+#: Client/core/CCommandFuncs.cpp:336
+#, c-format
+msgid "reconnect: could not connect to %s:%u!"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:370
 msgid "Bound all controls from GTA"
 msgstr "Az összes irányítás importálása a GTA-ból"
 
-#: Client/core/CCommandFuncs.cpp:385
+#: Client/core/CCommandFuncs.cpp:384
 msgid "Saved configuration file"
 msgstr "Konfigurációs fájl elmentve"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:451
+#: Client/core/CCommandFuncs.cpp:450
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* A te serialod: %s"
@@ -1833,13 +1847,13 @@ msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 msgstr "MTA nem kap frissítéseket XP-re/Vistára 2019 július után.\n\n"
 "Frissítsd a Windowst hogy játszhass a legújabb szervereken."
 
-#: Client/core/CMainMenu.cpp:1193
+#: Client/core/CMainMenu.cpp:1189
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Ezzel lefogsz csatlakozni a jelenlegi szerverről.\n\n"
 "Biztos vagy benne, hogy lecsatlakozol?"
 
-#: Client/core/CMainMenu.cpp:1197
+#: Client/core/CMainMenu.cpp:1193
 msgid "DISCONNECT WARNING"
 msgstr "LECSATLAKOZÁS FIGYELMEZTETÉS"
 
@@ -2932,17 +2946,22 @@ msgstr "Kapcsolódás ide %s:%u sikertelen!"
 msgid "Connecting to %s:%u ..."
 msgstr "Csatlakozás ide %s:%u ..."
 
+#: Client/core/CConnectManager.cpp:149
+#, c-format
+msgid "Reconnecting to %s:%u ..."
+msgstr "Újracsatlakozás a %s:%u címre..."
+
 #. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
+#: Client/core/CConnectManager.cpp:405
 #, c-format
 msgid "No such mod installed (%s)"
 msgstr "Nincs ilyen mód telepítve (%s)"
 
-#: Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:413
 msgid "Bad server response (2)"
 msgstr "Nincs szerver válasz (2)"
 
-#: Client/core/CConnectManager.cpp:421
+#: Client/core/CConnectManager.cpp:423
 msgid "Bad server response (1)"
 msgstr "Nincs szerver válasz (1)"
 
@@ -3026,12 +3045,12 @@ msgid "Start search"
 msgstr "Keresés megkezdése"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:299
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1704
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
 msgid "Search players..."
 msgstr "Játékos keresése..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:422
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1702
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
 msgid "Search servers..."
 msgstr "Szerver keresése..."
 
@@ -3091,25 +3110,25 @@ msgstr "Vissza"
 msgid "Loading..."
 msgstr "Betöltés..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1247
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2189
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1223
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2150
 msgid "  ..loading.."
 msgstr "...betöltés..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1413
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 msgid "No address specified!"
 msgstr "Nincs elérés megadva!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1298
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
 msgid "Unknown protocol"
 msgstr "Ismeretlen protokoll"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1298
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
 msgid "Please use the mtasa:// protocol!"
 msgstr "Kérlek használd az mtasa:// protokoll-t!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1387
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 msgid "You have to select a server to connect to."
 msgstr "Választanod kell egy szervert, ahová szeretnél csatlakozni."
 
