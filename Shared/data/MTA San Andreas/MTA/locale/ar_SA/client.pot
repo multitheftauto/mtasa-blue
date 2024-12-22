@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-16 23:16+0000\n"
-"PO-Revision-Date: 2024-12-16 23:33\n"
+"POT-Creation-Date: 2024-12-22 00:06+0000\n"
+"PO-Revision-Date: 2024-12-22 01:00\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -301,14 +301,14 @@ msgstr "القائمة الرئيسية"
 #: Client/core/CSettings.cpp:4179 Client/core/CSettings.cpp:4207
 #: Client/core/CSettings.cpp:4777 Client/core/CConnectManager.cpp:80
 #: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
-#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
-#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
-#: Client/core/CConnectManager.cpp:421
+#: Client/core/CConnectManager.cpp:265 Client/core/CConnectManager.cpp:323
+#: Client/core/CConnectManager.cpp:406 Client/core/CConnectManager.cpp:413
+#: Client/core/CConnectManager.cpp:423
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1307
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1364
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1413
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -316,14 +316,14 @@ msgstr "خطأ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:647
 #: Client/mods/deathmatch/logic/CClientGame.cpp:745
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1307
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1364
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "اسم غير صحيح! الرجاء الذهاب إلى الإعدادات ووضع اسم جديد!"
 
 #. Display the status box
 #: Client/mods/deathmatch/logic/CClientGame.cpp:663
-#: Client/core/CConnectManager.cpp:148
+#: Client/core/CConnectManager.cpp:150
 msgid "CONNECTING"
 msgstr "جاري الاتصال"
 
@@ -374,7 +374,7 @@ msgid "Connecting to local server timed out. See console for details."
 msgstr "انتهت مهلة الاتصال بالخادم المحلي. انظر إلى Console لمزيد من التفاصيل."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1339
-#: Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:265
 msgid "Connection timed out"
 msgstr "انتهت مهلة الاتصال"
 
@@ -383,22 +383,22 @@ msgid "Connection with the server was lost"
 msgstr "لقد فقد الاتصال بالخادم"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1387
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/core/CConnectManager.cpp:279 Client/core/CConnectManager.cpp:283
 msgid "Disconnected: unknown protocol error"
 msgstr "قطع الاتصال: خطأ في بروتوكول غير معروف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1391
-#: Client/core/CConnectManager.cpp:285
+#: Client/core/CConnectManager.cpp:287
 msgid "Disconnected: disconnected remotely"
 msgstr "قطع الاتصال: قطع الاتصال عن بعد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1395
-#: Client/core/CConnectManager.cpp:289
+#: Client/core/CConnectManager.cpp:291
 msgid "Disconnected: connection lost remotely"
 msgstr "قطع الاتصال: فقد الاتصال عن بعد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1399
-#: Client/core/CConnectManager.cpp:293
+#: Client/core/CConnectManager.cpp:295
 msgid "Disconnected: you are banned from this server"
 msgstr "قطع الاتصال: أنت محظور من الدخول إلى هذا الخادم"
 
@@ -407,12 +407,12 @@ msgid "Disconnected: the server is currently full"
 msgstr "قطع الاتصال: الخادم ممتلئ حاليًا"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1407
-#: Client/core/CConnectManager.cpp:300
+#: Client/core/CConnectManager.cpp:302
 msgid "Disconnected: disconnected from the server"
 msgstr "قطع الاتصال: قطع الاتصال من الخادم"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1411
-#: Client/core/CConnectManager.cpp:304
+#: Client/core/CConnectManager.cpp:306
 msgid "Disconnected: connection to the server was lost"
 msgstr "قطع الاتصال: تم فقد الاتصال بالخادم"
 
@@ -421,7 +421,7 @@ msgid "Disconnected: invalid password specified"
 msgstr "قطع الاتصال: كلمة المرور المدخلة غير صحيحة"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1419
-#: Client/core/CConnectManager.cpp:311
+#: Client/core/CConnectManager.cpp:313
 msgid "Disconnected: connection was refused"
 msgstr "قطع الاتصال: تم رفض الاتصال"
 
@@ -429,23 +429,23 @@ msgstr "قطع الاتصال: تم رفض الاتصال"
 msgid "MTA Client verification failed!"
 msgstr "فشل التحقق من العميل MTA!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "In a ditch"
 msgstr "داخل خندق"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "En-route to hospital"
 msgstr "في طريقه إلى المستشفى"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "Meeting their maker"
 msgstr "يتعرف على صانعه"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
 msgid "Regretting their decisions"
 msgstr "يندم على قراراته"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
 msgid "Wasted"
 msgstr "ميت"
 
@@ -799,7 +799,7 @@ msgstr "موافق"
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1200
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1196
 #: Client/core/CSettings.cpp:1393 Client/core/CSettings.cpp:1417
 #: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4576
 #: Client/core/CSettings.cpp:4606 Client/core/CSettings.cpp:4655
@@ -932,7 +932,7 @@ msgstr "الرجاء إيقاف البرامج التالية قبل الاست�
 #: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1199 Client/core/CSettings.cpp:1392
+#: Client/core/CMainMenu.cpp:1195 Client/core/CSettings.cpp:1392
 #: Client/core/CSettings.cpp:1416 Client/core/CSettings.cpp:4501
 #: Client/core/CSettings.cpp:4575 Client/core/CSettings.cpp:4605
 #: Client/core/CSettings.cpp:4654 Client/core/ServerBrowser/CServerInfo.cpp:481
@@ -1172,7 +1172,7 @@ msgstr "يوجد نسخة تعمل من جراند تيڤت أوتو: سان أ�
 
 #: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
 #: Client/loader/MainFunctions.cpp:1219
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1387
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
 msgstr "معلومات"
@@ -1735,16 +1735,16 @@ msgstr "* الوقت الآن %d:%02d:%02d"
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "تصحيح: تركيبة الأمر بالشكل الآتي: '[<كلمة المرور> <الاسم>] <المنفذ> <الخادم> connect'"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+#: Client/core/CCommandFuncs.cpp:250
 msgid "connect: Bad port number"
 msgstr "الاتصال: خطأ في رقم المنفذ"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#: Client/core/CCommandFuncs.cpp:272
 #, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "الاتصال: جاري الاتصال بـ %s:%u..."
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#: Client/core/CCommandFuncs.cpp:276
 #, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "الاتصال: تعذر الاتصال بـ %s:%u!"
@@ -1753,16 +1753,30 @@ msgstr "الاتصال: تعذر الاتصال بـ %s:%u!"
 msgid "connect: Failed to unload current mod"
 msgstr "الاتصال: فشل في إلغاء تحميل المود الحالي"
 
-#: Client/core/CCommandFuncs.cpp:371
+#: Client/core/CCommandFuncs.cpp:317
+msgid "reconnect: Bad port number"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:332
+#, c-format
+msgid "reconnect: Reconnecting to %s:%u..."
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:336
+#, c-format
+msgid "reconnect: could not connect to %s:%u!"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:370
 msgid "Bound all controls from GTA"
 msgstr "تمت إعادة الاختصارات الافتراضية لـ GTA"
 
-#: Client/core/CCommandFuncs.cpp:385
+#: Client/core/CCommandFuncs.cpp:384
 msgid "Saved configuration file"
 msgstr "تم حفظ ملف الإعدادات"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:451
+#: Client/core/CCommandFuncs.cpp:450
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* الرقم التسلسلي (السيريال) الخاص بك هو : %s"
@@ -1842,13 +1856,13 @@ msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 msgstr "لن تتلقى MTA تحديثات على نظامي التشغيل XP و Vista بعد يوليو 2019.\n\n"
 "يرجى تحديث ويندوز للعب على أحدث الخوادم."
 
-#: Client/core/CMainMenu.cpp:1193
+#: Client/core/CMainMenu.cpp:1189
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "هذا سيقوم بقطع اتصالك من الخادم الحالي. \n\n"
 "هل أنت متأكد من أنك تريد قطع الاتصال؟"
 
-#: Client/core/CMainMenu.cpp:1197
+#: Client/core/CMainMenu.cpp:1193
 msgid "DISCONNECT WARNING"
 msgstr "تحذير انقطع الاتصال"
 
@@ -2940,17 +2954,22 @@ msgstr "تعذر الاتصال بـ %s في المنفذ %u!"
 msgid "Connecting to %s:%u ..."
 msgstr "الاتصال بـ %s:%u ..."
 
+#: Client/core/CConnectManager.cpp:149
+#, c-format
+msgid "Reconnecting to %s:%u ..."
+msgstr ""
+
 #. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
+#: Client/core/CConnectManager.cpp:405
 #, c-format
 msgid "No such mod installed (%s)"
 msgstr "لا يوجد mod مُشابه مُثبت (%s)"
 
-#: Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:413
 msgid "Bad server response (2)"
 msgstr "استجابة خادم سيئة (2)"
 
-#: Client/core/CConnectManager.cpp:421
+#: Client/core/CConnectManager.cpp:423
 msgid "Bad server response (1)"
 msgstr "استجابة خادم سيئة (1)"
 
@@ -3034,12 +3053,12 @@ msgid "Start search"
 msgstr "إبدء البحث"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:299
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1704
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
 msgid "Search players..."
 msgstr "بحث عن اللاعبين..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:422
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1702
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
 msgid "Search servers..."
 msgstr "البحث عن خوادم"
 
@@ -3099,25 +3118,25 @@ msgstr "الخلف"
 msgid "Loading..."
 msgstr "جاري التحميل..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1247
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2189
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1223
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2150
 msgid "  ..loading.."
 msgstr "    ..جاري التحميل.."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1413
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 msgid "No address specified!"
 msgstr "لا يوجد عنوان محدد!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1298
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
 msgid "Unknown protocol"
 msgstr "بروتوكول غير معروف"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1298
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
 msgid "Please use the mtasa:// protocol!"
 msgstr "الرجاء إستخدام بروتوكول mtasa://!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1387
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 msgid "You have to select a server to connect to."
 msgstr "يجب إختيار خادم للإتصال به."
 
