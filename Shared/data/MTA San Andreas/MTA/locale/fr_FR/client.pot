@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-16 23:16+0000\n"
-"PO-Revision-Date: 2024-12-16 23:33\n"
+"POT-Creation-Date: 2024-12-22 00:06+0000\n"
+"PO-Revision-Date: 2024-12-22 01:00\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -301,14 +301,14 @@ msgstr "Menu principal"
 #: Client/core/CSettings.cpp:4179 Client/core/CSettings.cpp:4207
 #: Client/core/CSettings.cpp:4777 Client/core/CConnectManager.cpp:80
 #: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
-#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
-#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
-#: Client/core/CConnectManager.cpp:421
+#: Client/core/CConnectManager.cpp:265 Client/core/CConnectManager.cpp:323
+#: Client/core/CConnectManager.cpp:406 Client/core/CConnectManager.cpp:413
+#: Client/core/CConnectManager.cpp:423
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1307
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1364
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1413
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -316,14 +316,14 @@ msgstr "Erreur"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:647
 #: Client/mods/deathmatch/logic/CClientGame.cpp:745
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1307
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1364
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Pseudonyme invalide! Allez dans Paramètres pour le changer!"
 
 #. Display the status box
 #: Client/mods/deathmatch/logic/CClientGame.cpp:663
-#: Client/core/CConnectManager.cpp:148
+#: Client/core/CConnectManager.cpp:150
 msgid "CONNECTING"
 msgstr "CONNEXION"
 
@@ -374,7 +374,7 @@ msgid "Connecting to local server timed out. See console for details."
 msgstr "La connexion au serveur local a expirée. Voir les détails dans la Console."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1339
-#: Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:265
 msgid "Connection timed out"
 msgstr "La connexion a expiré"
 
@@ -383,22 +383,22 @@ msgid "Connection with the server was lost"
 msgstr "La connexion au serveur a été perdue"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1387
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/core/CConnectManager.cpp:279 Client/core/CConnectManager.cpp:283
 msgid "Disconnected: unknown protocol error"
 msgstr "Déconnecté: erreur de protocole inconnue."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1391
-#: Client/core/CConnectManager.cpp:285
+#: Client/core/CConnectManager.cpp:287
 msgid "Disconnected: disconnected remotely"
 msgstr "Déconnecté: déconnecté à distance."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1395
-#: Client/core/CConnectManager.cpp:289
+#: Client/core/CConnectManager.cpp:291
 msgid "Disconnected: connection lost remotely"
 msgstr "Déconnecté: perte de connexion à distance."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1399
-#: Client/core/CConnectManager.cpp:293
+#: Client/core/CConnectManager.cpp:295
 msgid "Disconnected: you are banned from this server"
 msgstr "Déconnecté: vous êtes banni de ce serveur."
 
@@ -407,12 +407,12 @@ msgid "Disconnected: the server is currently full"
 msgstr "Déconnecté: le serveur est plein."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1407
-#: Client/core/CConnectManager.cpp:300
+#: Client/core/CConnectManager.cpp:302
 msgid "Disconnected: disconnected from the server"
 msgstr "Déconnecté: déconnecté du serveur."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1411
-#: Client/core/CConnectManager.cpp:304
+#: Client/core/CConnectManager.cpp:306
 msgid "Disconnected: connection to the server was lost"
 msgstr "Déconnecté: la connexion au serveur a été perdue."
 
@@ -421,7 +421,7 @@ msgid "Disconnected: invalid password specified"
 msgstr "Déconnecté: mot de passe invalide."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1419
-#: Client/core/CConnectManager.cpp:311
+#: Client/core/CConnectManager.cpp:313
 msgid "Disconnected: connection was refused"
 msgstr "Déconnecté: la connexion a été refusée."
 
@@ -429,23 +429,23 @@ msgstr "Déconnecté: la connexion a été refusée."
 msgid "MTA Client verification failed!"
 msgstr "La vérification du Client MTA a échoué!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "In a ditch"
 msgstr "Dans un fossé"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "En-route to hospital"
 msgstr "En route vers l'hôpital"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
 msgid "Meeting their maker"
 msgstr "Sur le chemin du paradis"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
 msgid "Regretting their decisions"
 msgstr "En train de regretter ses décisions"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
 msgid "Wasted"
 msgstr "Mort"
 
@@ -783,7 +783,7 @@ msgstr "OK"
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1200
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1196
 #: Client/core/CSettings.cpp:1393 Client/core/CSettings.cpp:1417
 #: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4576
 #: Client/core/CSettings.cpp:4606 Client/core/CSettings.cpp:4655
@@ -917,7 +917,7 @@ msgstr "Veuillez fermer les programmes suivants, avant de continuer:"
 #: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1199 Client/core/CSettings.cpp:1392
+#: Client/core/CMainMenu.cpp:1195 Client/core/CSettings.cpp:1392
 #: Client/core/CSettings.cpp:1416 Client/core/CSettings.cpp:4501
 #: Client/core/CSettings.cpp:4575 Client/core/CSettings.cpp:4605
 #: Client/core/CSettings.cpp:4654 Client/core/ServerBrowser/CServerInfo.cpp:481
@@ -1157,7 +1157,7 @@ msgstr "Une instance de GTA: San Andreas est déjà en cours d'exécution, et do
 
 #: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
 #: Client/loader/MainFunctions.cpp:1219
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1387
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
 msgstr "Information"
@@ -1721,16 +1721,16 @@ msgstr "* Il est %d:%02d:%02d"
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "connect: La syntaxe est 'connect <hôte> [<port> <pseudonyme> <mot de passe>]'"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+#: Client/core/CCommandFuncs.cpp:250
 msgid "connect: Bad port number"
 msgstr "connect: Numéro de port invalide"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#: Client/core/CCommandFuncs.cpp:272
 #, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "connect: Connexion à %s:%u ..."
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#: Client/core/CCommandFuncs.cpp:276
 #, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "connect: Échec de la connexion à %s:%u !"
@@ -1739,16 +1739,30 @@ msgstr "connect: Échec de la connexion à %s:%u !"
 msgid "connect: Failed to unload current mod"
 msgstr "connect: Impossible de décharger le mod actuel"
 
-#: Client/core/CCommandFuncs.cpp:371
+#: Client/core/CCommandFuncs.cpp:317
+msgid "reconnect: Bad port number"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:332
+#, c-format
+msgid "reconnect: Reconnecting to %s:%u..."
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:336
+#, c-format
+msgid "reconnect: could not connect to %s:%u!"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:370
 msgid "Bound all controls from GTA"
 msgstr "Tous les contrôles ont été assignés"
 
-#: Client/core/CCommandFuncs.cpp:385
+#: Client/core/CCommandFuncs.cpp:384
 msgid "Saved configuration file"
 msgstr "Fichier de configuration enregistré"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:451
+#: Client/core/CCommandFuncs.cpp:450
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* Votre numéro de série est: %s"
@@ -1828,13 +1842,13 @@ msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 msgstr "MTA ne recevra plus de mises à jour sur Windows XP/Vista après juillet 2019.\n\n"
 "Veuillez mettre à niveau Windows pour jouer sur les serveurs récents."
 
-#: Client/core/CMainMenu.cpp:1193
+#: Client/core/CMainMenu.cpp:1189
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Vous serez déconnecté du serveur.\n\n"
 "Êtes-vous sûr de vouloir continuer?"
 
-#: Client/core/CMainMenu.cpp:1197
+#: Client/core/CMainMenu.cpp:1193
 msgid "DISCONNECT WARNING"
 msgstr "AVERTISSEMENT DE DÉCONNEXION"
 
@@ -2927,17 +2941,22 @@ msgstr "La connexion à %s:%u a échoué!"
 msgid "Connecting to %s:%u ..."
 msgstr "Connexion à %s:%u ..."
 
+#: Client/core/CConnectManager.cpp:149
+#, c-format
+msgid "Reconnecting to %s:%u ..."
+msgstr ""
+
 #. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
+#: Client/core/CConnectManager.cpp:405
 #, c-format
 msgid "No such mod installed (%s)"
 msgstr "Ce mod n'est pas installé (%s)"
 
-#: Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:413
 msgid "Bad server response (2)"
 msgstr "Réponse du serveur invalide (2)"
 
-#: Client/core/CConnectManager.cpp:421
+#: Client/core/CConnectManager.cpp:423
 msgid "Bad server response (1)"
 msgstr "Réponse du serveur invalide (1)"
 
@@ -3021,12 +3040,12 @@ msgid "Start search"
 msgstr "Démarrer la recherche"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:299
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1704
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
 msgid "Search players..."
 msgstr "Rechercher des joueurs..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:422
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1702
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
 msgid "Search servers..."
 msgstr "Rechercher des serveurs..."
 
@@ -3086,25 +3105,25 @@ msgstr "Retour"
 msgid "Loading..."
 msgstr "Chargement..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1247
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2189
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1223
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2150
 msgid "  ..loading.."
 msgstr "  ..chargement.."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1413
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 msgid "No address specified!"
 msgstr "Adresse non spécifiée!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1298
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
 msgid "Unknown protocol"
 msgstr "Protocole inconnu"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1298
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
 msgid "Please use the mtasa:// protocol!"
 msgstr "Veuillez utiliser le protocole mtasa:// !"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1387
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 msgid "You have to select a server to connect to."
 msgstr "Vous devez sélectionner un serveur auquel se connecter."
 
