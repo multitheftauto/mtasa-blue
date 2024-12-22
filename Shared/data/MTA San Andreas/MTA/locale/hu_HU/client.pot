@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-16 23:16+0000\n"
-"PO-Revision-Date: 2024-12-16 23:33\n"
+"PO-Revision-Date: 2024-12-22 00:00\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -553,7 +553,7 @@ msgstr "Lecsatlakozva: Serial aktiválás hiba"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr "Lecsatlakozva: Ez a serial már használatban van"
+msgstr "Lecsatlakoztatva: Ez a serial már használatban van"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -800,8 +800,8 @@ msgstr "Ismeretlen"
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr "A '%s' fájlt jelenleg a %zu folyamat zárolta.\n\n"
-"Leállítja a következő folyamatokat, és folytatja a frissítést?\n\n"
+msgstr "A '%s' fájl jelenleg %zu folyamat(ok) által zárolva van.\n\n"
+"Szeretnéd leállítani az alábbi folyamatokat és folytatni a frissítést?\n\n"
 "%s"
 
 #: Client/loader/Install.cpp:479
@@ -836,7 +836,9 @@ msgstr ""
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Sajnáljuk, de a játék nem található. \n"
+"Indítsd el a Grand Theft Auto: San Andreas-t, majd kattints az újrapróbálkozás gombra. \n"
+"Győződj meg róla, hogy a játék a 'Program Files (x86)' mappában van."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
