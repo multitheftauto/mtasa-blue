@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-22 00:06+0000\n"
-"PO-Revision-Date: 2024-12-22 01:00\n"
+"PO-Revision-Date: 2024-12-22 07:00\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -1746,17 +1746,17 @@ msgstr "connect: Dezactivarea modificării curente a eșuat"
 
 #: Client/core/CCommandFuncs.cpp:317
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "reconectare: Număr port incorect"
 
 #: Client/core/CCommandFuncs.cpp:332
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "reconectare: Se reconectează la %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:336
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "reconectare: nu s-a putut conecta la %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:370
 msgid "Bound all controls from GTA"
