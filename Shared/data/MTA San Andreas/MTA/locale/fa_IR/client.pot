@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-22 16:09+0000\n"
-"PO-Revision-Date: 2024-12-22 17:10\n"
+"PO-Revision-Date: 2024-12-22 22:11\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -84,47 +84,47 @@ msgstr "کانال رادیویی قبلی"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr ""
+msgstr "فعال سازی نمایش نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "بزرگ نمایی نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "کوچک نمایی نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "حرکت نقشه بازیکن به سمت شمال"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "حرکت نقشه بازیکن به سمت جنوب"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "حرکت نقشه بازیکن به سمت شرق"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "حرکت نقشه بازیکن به سمت غرب"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "متصل کردن نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "کاهش شفافیت نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "افزایش شفافیت نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "تغییر وضعیت متن راهنمای نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -452,25 +452,25 @@ msgstr "از دست رفتن"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "تغییرد حالت: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "بزرگنمایی: %s/%s حرکت: %s، %s، %s، %s کدورت: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "تغییر نقشه: %s     تغییر متن راهنما: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:715
 msgid "Following Player"
-msgstr ""
+msgstr "دنبال کردن بازیکن"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:717
 msgid "Free Movement"
-msgstr ""
+msgstr "حرکت آزاد"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -576,7 +576,7 @@ msgstr "اتصال قطع شد: تأیید سریال ناموفق بود"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "قطع ارتباط: سریال از قبل در حال استفاده است"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -849,17 +849,20 @@ msgstr "در حال استخراج فایل ها..."
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "بازی Grand Theft Auto: San Andreas را اجرا کنید.\n"
+"اطمینان حاصل کنید که بازی در پوشه 'Program Files (x86)' قرار دارد."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr ""
+msgstr "درحال جستجو GTA: San Andreas"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "متاسفم، بازی پیدا نشد.\n"
+"بازی Grand Theft Auto: San Andreas را اجرا کنید و روی \"تلاش مجدد\" کلیک کنید.\n"
+"اطمینان حاصل کنید که بازی در پوشه 'Program Files (x86)' قرار دارد."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -1763,17 +1766,17 @@ msgstr "اتصال: آنلود سازی مود فعلی ناموفق"
 
 #: Client/core/CCommandFuncs.cpp:317
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "اتصال مجدد: شماره پورت نادرست است"
 
 #: Client/core/CCommandFuncs.cpp:332
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "اتصال مجدد: اتصال مجدد به %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:336
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "اتصال مجدد: نتوانست به %s وصل شود:%u!"
 
 #: Client/core/CCommandFuncs.cpp:370
 msgid "Bound all controls from GTA"
@@ -2147,16 +2150,16 @@ msgstr "شفافیت:"
 
 #: Client/core/CSettings.cpp:441
 msgid "Image resolution:"
-msgstr ""
+msgstr "وضوح تصویر:"
 
 #: Client/core/CSettings.cpp:448
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024x1024 (پیش فرض)"
 
 #. index 0
 #: Client/core/CSettings.cpp:449
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048x2048"
 
 #. *
 #. *  Audio tab
@@ -2412,7 +2415,7 @@ msgstr "فعال سازی Javascript بر روی وبسایت های خارجی"
 
 #: Client/core/CSettings.cpp:933
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "فعال کردن رندر GPU"
 
 #: Client/core/CSettings.cpp:937
 msgid "Custom blacklist"
@@ -2976,7 +2979,7 @@ msgstr "در حال اتصال به %s:%u ..."
 #: Client/core/CConnectManager.cpp:149
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "اتصال مجدد به %s:%u..."
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:405
