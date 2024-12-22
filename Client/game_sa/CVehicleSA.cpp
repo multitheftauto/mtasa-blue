@@ -241,18 +241,24 @@ CVehicleSA::~CVehicleSA()
     }
 }
 
-void CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CVehicleSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
 {
-    DWORD dwFunc = FUNC_GetMoveSpeed;
-    DWORD dwThis = (DWORD)GetInterface();
-    DWORD dwReturn = 0;
-    _asm
+    try
     {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
+        DWORD dwFunc = FUNC_GetMoveSpeed;
+        DWORD dwThis = (DWORD)GetInterface();
+        DWORD dwReturn = 0;
+        _asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+            mov     dwReturn, eax
+        }
+        MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
     }
-    MemCpyFast((void*)dwReturn, vecMoveSpeed, sizeof(CVector));
+    catch (...)
+    {
+    }
 
     // INACCURATE. Use Get/SetTrainSpeed instead of Get/SetMoveSpeed. (Causes issue #4829).
 #if 0

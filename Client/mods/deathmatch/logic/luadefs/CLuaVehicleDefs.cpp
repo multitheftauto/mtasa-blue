@@ -2873,17 +2873,16 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
 
 int CLuaVehicleDefs::GetOriginalHandling(lua_State* luaVM)
 {
-    int              iType = 0;
+    std::uint32_t uiModel;
+
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iType);
+    argStream.ReadNumber(uiModel);
 
     if (!argStream.HasErrors())
     {
-        eVehicleTypes eModel = static_cast<eVehicleTypes>(iType);
-        if (eModel)
+        if (uiModel)
         {
-            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
-            if (pEntry)
+            if (const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(uiModel))
             {
                 lua_newtable(luaVM);
                 lua_pushnumber(luaVM, pEntry->GetMass());
