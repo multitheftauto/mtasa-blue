@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-22 16:09+0000\n"
-"PO-Revision-Date: 2024-12-22 16:10\n"
+"PO-Revision-Date: 2024-12-22 17:10\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -84,47 +84,47 @@ msgstr "stația radio precedentă"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr ""
+msgstr "activează harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "mărește harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "micșorează harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "mută harta jucătorului la nord"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "mută harta jucătorului la sud"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "mută harta jucătorului la est"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "mută hartă jucătorului la vest"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "atașează harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "reduce opacitatea hărții jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "mărește opacitatea hărții jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "comută text ajutor hartă jucător"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -452,25 +452,25 @@ msgstr "Wasted"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "Schimbă mod: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "Mărește: %s/%s Mișcare: %s, %s, %s, %s Opacitate: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "Comutare hartă: %s Comutare text ajutor: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:715
 msgid "Following Player"
-msgstr ""
+msgstr "Urmărire jucător"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:717
 msgid "Free Movement"
-msgstr ""
+msgstr "Mișcare liberă"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -2153,16 +2153,16 @@ msgstr "Opacitate:"
 
 #: Client/core/CSettings.cpp:441
 msgid "Image resolution:"
-msgstr ""
+msgstr "Rezoluție imagine:"
 
 #: Client/core/CSettings.cpp:448
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (Standard)"
 
 #. index 0
 #: Client/core/CSettings.cpp:449
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
