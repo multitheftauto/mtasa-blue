@@ -190,7 +190,7 @@ public:
     int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
     DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
-    int   GetSystemFrameCounter() { return *(int*)0xB7CB4C; } // CTimer::m_FrameCounter
+    int   GetSystemFrameCounter() const { return *(int*)0xB7CB4C; } // CTimer::m_FrameCounter
 
     bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 

@@ -28,8 +28,17 @@ std::int16_t* CHudSA::itemToFlash = reinterpret_cast<std::int16_t*>(VAR_ItemToFl
 
 float CHudSA::calcStreetchX = 0.0f;
 float CHudSA::calcStreetchY = 0.0f;
+float CHudSA::blinkingBarHPValue = 10.0f;
 
-constexpr RwColor COLOR_BLACK = RwColor{0, 0, 0, 0};
+constexpr RwColor COLOR_BLACK = RwColor{0, 0, 0, 255};
+
+// default component properties
+std::unordered_map<eHudComponent, SHudComponentData> defaultComponentProperties = {
+    {HUD_HEALTH, {CHudSA::GetHUDColour(eHudColour::RED)}},
+    {HUD_BREATH, {CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE)}},
+    {HUD_CLOCK, {CHudSA::GetHUDColour(eHudColour::LIGHT_GRAY), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_PRICEDOWN, 2}},
+    {HUD_MONEY, {CHudSA::GetHUDColour(eHudColour::GREEN), CHudSA::GetHUDColour(eHudColour::RED), false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_PRICEDOWN, 2}}
+};
 
 CHudSA::CHudSA()
 {
@@ -53,10 +62,12 @@ CHudSA::CHudSA()
     MemPut<DWORD>(0x53E488 + 2, (DWORD)&m_fSniperCrosshairScale);
     MemPut<DWORD>(0x53E4BF + 2, (DWORD)&m_fSniperCrosshairScale);
 
-    // Initalize default colors
-    componentProperties.hpBar.bar.fillColor = CHudSA::GetHUDColour(eHudColour::RED);
-    componentProperties.breathBar.bar.fillColor = CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE);
-    componentProperties.armorBar.bar.fillColor = CHudSA::GetHUDColour(eHudColour::LIGHT_GRAY);
+    // Initalize default data
+    componentProperties.hpBar = MapGet(defaultComponentProperties, HUD_HEALTH);
+    componentProperties.breathBar = MapGet(defaultComponentProperties, HUD_BREATH);
+    componentProperties.armorBar = MapGet(defaultComponentProperties, HUD_ARMOUR);
+    componentProperties.clock = MapGet(defaultComponentProperties, HUD_CLOCK);
+    componentProperties.money = MapGet(defaultComponentProperties, HUD_MONEY);
 }
 
 void CHudSA::Disable(bool bDisabled)
@@ -172,20 +183,30 @@ void CHudSA::UpdateStreetchCalculations()
     calcStreetchX = rsGlobal->maximumWidth * (*reinterpret_cast<float*>(VAR_AspectRatioMultX));
     calcStreetchY = rsGlobal->maximumHeight * (*m_pfAspectRatioMultiplicator);
 
-    ComponentPlacement& hpPlacement = componentProperties.hpBar.bar.placement;
+    SComponentPlacement& hpPlacement = componentProperties.hpBar.placement;
     hpPlacement.height = calcStreetchY * 9.0f;
     hpPlacement.width = calcStreetchX * 109.0f;
     hpPlacement.setDefaultXY = false;
 
-    ComponentPlacement& breathPlacement = componentProperties.breathBar.bar.placement;
+    SComponentPlacement& breathPlacement = componentProperties.breathBar.placement;
     breathPlacement.height = calcStreetchY * 9.0f;
     breathPlacement.width = calcStreetchX * 62.0f;
     breathPlacement.setDefaultXY = false;
 
-    ComponentPlacement& armorPlacement = componentProperties.armorBar.bar.placement;
+    SComponentPlacement& armorPlacement = componentProperties.armorBar.placement;
     armorPlacement.height = calcStreetchY * 9.0f;
     armorPlacement.width = calcStreetchX * 62.0f;
     armorPlacement.setDefaultXY = false;
+
+    SComponentPlacement& clockPlacement = componentProperties.clock.placement;
+    clockPlacement.height = calcStreetchY * 1.1f;
+    clockPlacement.width = calcStreetchX * 0.55f;
+    clockPlacement.setDefaultXY = false;
+
+    SComponentPlacement& moneyPlacement = componentProperties.money.placement;
+    moneyPlacement.height = calcStreetchY * 1.1f;
+    moneyPlacement.width = calcStreetchX * 0.55f;
+    moneyPlacement.setDefaultXY = false;
 }
 
 //
@@ -271,7 +292,36 @@ bool CHudSA::IsCrosshairVisible()
     return specialAiming || simpleAiming || crossHairType > 0;
 }
 
-RwColor CHudSA::GetHUDColour(const eHudColour& colour)
+bool CHudSA::IsComponentBar(const eHudComponent& component) const noexcept
+{
+    switch (component)
+    {
+        case HUD_HEALTH:
+        case HUD_ARMOUR:
+        case HUD_BREATH:
+            return true;
+    }
+
+    return false;
+}
+
+bool CHudSA::IsComponentText(const eHudComponent& component) const noexcept
+{
+    switch (component)
+    {
+        case HUD_CLOCK:
+        case HUD_MONEY:
+        case HUD_AMMO:
+        case HUD_AREA_NAME:
+        case HUD_VEHICLE_NAME:
+        case HUD_RADIO:
+            return true;
+    }
+
+    return false;
+}
+
+RwColor CHudSA::GetHUDColour(const eHudColour& colour) noexcept
 {
     switch (colour)
     {
@@ -310,27 +360,14 @@ RwColor CHudSA::GetHUDColour(const eHudColour& colour)
     }
 }
 
-HudBar& CHudSA::GetHudBarRef(const eHudComponent& component) noexcept
-{
-    switch (component)
-    {
-        case HUD_HEALTH:
-            return componentProperties.hpBar.bar;
-        case HUD_BREATH:
-            return componentProperties.breathBar.bar;
-        case HUD_ARMOUR:
-            return componentProperties.armorBar.bar;
-    }
-}
-
-void CHudSA::SetComponentPlacementPosition(ComponentPlacement& placement, const CVector2D& position)
+void CHudSA::SetComponentPlacementPosition(SComponentPlacement& placement, const CVector2D& position) noexcept
 {
     placement.customX = position.fX;
     placement.customY = position.fY;
     placement.useCustomPosition = true;
 }
 
-void CHudSA::SetComponentPlacementSize(ComponentPlacement& placement, const CVector2D& size)
+void CHudSA::SetComponentPlacementSize(SComponentPlacement& placement, const CVector2D& size) noexcept
 {
     placement.customWidth = size.fX;
     placement.customHeight = size.fY;
@@ -342,13 +379,13 @@ void CHudSA::SetComponentPosition(const eHudComponent& component, const CVector2
     switch (component)
     {
         case HUD_BREATH:
-            SetComponentPlacementPosition(componentProperties.breathBar.bar.placement, position);
+            SetComponentPlacementPosition(componentProperties.breathBar.placement, position);
             break;
         case HUD_HEALTH:
-            SetComponentPlacementPosition(componentProperties.hpBar.bar.placement, position);
+            SetComponentPlacementPosition(componentProperties.hpBar.placement, position);
             break;
         case HUD_ARMOUR:
-            SetComponentPlacementPosition(componentProperties.armorBar.bar.placement, position);
+            SetComponentPlacementPosition(componentProperties.armorBar.placement, position);
             break;
     }
 }
@@ -358,18 +395,18 @@ void CHudSA::SetComponentSize(const eHudComponent& component, const CVector2D& s
     switch (component)
     {
         case HUD_BREATH:
-            SetComponentPlacementSize(componentProperties.breathBar.bar.placement, size);
+            SetComponentPlacementSize(componentProperties.breathBar.placement, size);
             break;
         case HUD_HEALTH:
-            SetComponentPlacementSize(componentProperties.hpBar.bar.placement, size);
+            SetComponentPlacementSize(componentProperties.hpBar.placement, size);
             break;
         case HUD_ARMOUR:
-            SetComponentPlacementSize(componentProperties.armorBar.bar.placement, size);
+            SetComponentPlacementSize(componentProperties.armorBar.placement, size);
             break;
     }
 }
 
-void CHudSA::ResetComponent(ComponentPlacement& placement, bool resetSize) noexcept
+void CHudSA::ResetComponent(SComponentPlacement& placement, bool resetSize) noexcept
 {
     if (resetSize)
     {
@@ -382,6 +419,54 @@ void CHudSA::ResetComponent(ComponentPlacement& placement, bool resetSize) noexc
         placement.useCustomPosition = false;
         placement.customX = 0.0f;
         placement.customY = 0.0f;
+    }
+}
+
+void CHudSA::ResetComponentFontData(const eHudComponent& component, const eHudComponentProperty& property) noexcept
+{
+    if (!IsComponentText(component))
+        return;
+
+    auto& ref = GetHudComponentRef(component);
+    if (!MapFind(defaultComponentProperties, component))
+        return;
+
+    const auto& defaultRef = MapGet(defaultComponentProperties, component);
+
+    switch (property)
+    {
+        case eHudComponentProperty::TEXT_OUTLINE:
+            ref.textOutline = defaultRef.textOutline;
+            break;
+        case eHudComponentProperty::TEXT_SHADOW:
+            ref.textShadow = defaultRef.textShadow;
+            break;
+        case eHudComponentProperty::TEXT_STYLE:
+            ref.style = defaultRef.style;
+            break;
+        case eHudComponentProperty::TEXT_ALIGNMENT:
+            ref.alignment = defaultRef.alignment;
+            break;
+        case eHudComponentProperty::TEXT_PROPORTIONAL:
+            ref.proportional = defaultRef.proportional;
+            break;
+    }
+}
+
+SHudComponentData& CHudSA::GetHudComponentRef(const eHudComponent& component) const noexcept
+{
+    switch (component)
+    {
+        case HUD_HEALTH:
+            return componentProperties.hpBar;
+        case HUD_BREATH:
+            return componentProperties.breathBar;
+        case HUD_ARMOUR:
+            return componentProperties.armorBar;
+        case HUD_CLOCK:
+            return componentProperties.clock;
+        case HUD_MONEY:
+            return componentProperties.money;
     }
 }
 
@@ -402,36 +487,45 @@ void CHudSA::ResetComponentPlacement(const eHudComponent& component, bool resetS
             break;
         }
         case HUD_HEALTH:
-            ResetComponent(componentProperties.hpBar.bar.placement, resetSize);
+            ResetComponent(componentProperties.hpBar.placement, resetSize);
             break;
         case HUD_BREATH:
-            ResetComponent(componentProperties.breathBar.bar.placement, resetSize);
+            ResetComponent(componentProperties.breathBar.placement, resetSize);
             break;
         case HUD_ARMOUR:
-            ResetComponent(componentProperties.armorBar.bar.placement, resetSize);
+            ResetComponent(componentProperties.armorBar.placement, resetSize);
             break;
     }
 }
 
-void CHudSA::SetComponentBarColor(const eHudComponent& component, float color) noexcept
+void CHudSA::SetComponentColor(const eHudComponent& component, std::uint32_t color, bool secondColor) noexcept
 { 
-    SColor newColor = TOCOLOR2SCOLOR(static_cast<std::uint32_t>(color));
-    GetHudBarRef(component).fillColor = RwColor{newColor.R, newColor.G, newColor.B, newColor.A};
+    SColor newColor = TOCOLOR2SCOLOR(color);
+
+    if (!secondColor)
+        GetHudComponentRef(component).fillColor = RwColor{newColor.R, newColor.G, newColor.B, newColor.A};
+    else
+        GetHudComponentRef(component).fillColor_Second = RwColor{newColor.R, newColor.G, newColor.B, newColor.A};
 }
 
-void CHudSA::SetComponentDrawBlackBorder(const eHudComponent& component, bool draw) noexcept
+void CHudSA::ResetComponentColor(const eHudComponent& component, bool secondColor) noexcept
 {
-    GetHudBarRef(component).drawBlackBorder = draw;
+    auto& componentData = GetHudComponentRef(component);
+    if (!MapFind(defaultComponentProperties, component))
+        return;
+
+    const auto& defaultRef = MapGet(defaultComponentProperties, component);
+
+    if (!secondColor)
+        componentData.fillColor = defaultRef.fillColor;
+    else
+        componentData.fillColor_Second = defaultRef.fillColor_Second;
 }
 
-void CHudSA::SetComponentDrawPercentage(const eHudComponent& component, bool draw) noexcept
+void CHudSA::SetComponentFontDropColor(const eHudComponent& component, std::uint32_t color) noexcept
 {
-    GetHudBarRef(component).drawPercentage = draw;
-}
-
-void CHudSA::SetHealthBarBlinkingValue(float minHealth) noexcept
-{
-    componentProperties.hpBar.blinkingBarHP = minHealth;
+    SColor newColor = TOCOLOR2SCOLOR(color);
+    GetHudComponentRef(component).dropColor = RwColor{newColor.R, newColor.G, newColor.B, newColor.A};
 }
 
 void CHudSA::RenderHealthBar(int x, int y)
@@ -442,30 +536,36 @@ void CHudSA::RenderHealthBar(int x, int y)
         return;
 
     CPed* playerPed = pGame->GetPedContext();
-    if (!playerPed || (playerPed->GetHealth() <= componentProperties.hpBar.blinkingBarHP && isValidFrame))
+    if (!playerPed || (playerPed->GetHealth() <= blinkingBarHPValue && isValidFrame))
         return;
 
     // Save default position once
-    if (!componentProperties.hpBar.bar.placement.setDefaultXY)
+    if (!componentProperties.hpBar.placement.setDefaultXY)
     {
-        componentProperties.hpBar.bar.placement.x = x;
-        componentProperties.hpBar.bar.placement.y = y;
-        componentProperties.hpBar.bar.placement.setDefaultXY = true;
+        componentProperties.hpBar.placement.x = x;
+        componentProperties.hpBar.placement.y = y;
+        componentProperties.hpBar.placement.setDefaultXY = true;
     }
 
     // Get player max health
     float maxHealth = static_cast<float>(pGame->GetPlayerInfo()->GetMaxHealth());
 
     // Use custom position/size?
-    bool useCustomPosition = componentProperties.hpBar.bar.placement.useCustomPosition;
-    bool useCustomSize = componentProperties.hpBar.bar.placement.useCustomSize;
+    bool useCustomPosition = componentProperties.hpBar.placement.useCustomPosition;
+    bool useCustomSize = componentProperties.hpBar.placement.useCustomSize;
+
+    float barWidth = useCustomSize ? componentProperties.hpBar.placement.customWidth : componentProperties.hpBar.placement.width;
 
     // Calc bar width depending on MAX_HEALTH stat
     double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
-    float  totalWidth = ((useCustomSize ? componentProperties.hpBar.bar.placement.customWidth : componentProperties.hpBar.bar.placement.width) * maxHealth) / statModifier;
+    float  totalWidth = (barWidth * maxHealth) / statModifier;
+
+    float posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + x);
+    float posY = useCustomPosition ? componentProperties.hpBar.placement.customY : y;
+    std::uint32_t barHeight = static_cast<std::uint32_t>(useCustomSize ? componentProperties.hpBar.placement.customHeight : componentProperties.hpBar.placement.height);
 
     // call CSprite2d::DrawBarChart
-    ((void(__cdecl*)(float, float, std::uint16_t, std::uint32_t, float, bool, bool, bool, RwColor, RwColor))FUNC_CSprite2d_DrawBarChart)(useCustomPosition ? componentProperties.hpBar.bar.placement.customX : (useCustomSize ? componentProperties.hpBar.bar.placement.customWidth : componentProperties.hpBar.bar.placement.width) - totalWidth + x, useCustomPosition ? componentProperties.hpBar.bar.placement.customY : y, static_cast<std::uint16_t>(totalWidth), static_cast<std::uint32_t>(useCustomSize ? componentProperties.hpBar.bar.placement.customHeight : componentProperties.hpBar.bar.placement.height), playerPed->GetHealth() * 100.0f / maxHealth, false, componentProperties.hpBar.bar.drawPercentage, componentProperties.hpBar.bar.drawBlackBorder, componentProperties.hpBar.bar.fillColor, COLOR_BLACK);
+    ((void(__cdecl*)(float, float, std::uint16_t, std::uint32_t, float, bool, bool, bool, RwColor, RwColor))FUNC_CSprite2d_DrawBarChart)(posX, posY, static_cast<std::uint16_t>(totalWidth), barHeight, playerPed->GetHealth() * 100.0f / maxHealth, false, componentProperties.hpBar.drawPercentage, componentProperties.hpBar.drawBlackBorder, componentProperties.hpBar.fillColor, COLOR_BLACK);
 }
 
 void CHudSA::RenderBreathBar(int x, int y)
@@ -479,22 +579,27 @@ void CHudSA::RenderBreathBar(int x, int y)
         return;
 
     // Save default position once
-    if (!componentProperties.breathBar.bar.placement.setDefaultXY)
+    if (!componentProperties.breathBar.placement.setDefaultXY)
     {
-        componentProperties.breathBar.bar.placement.x = x;
-        componentProperties.breathBar.bar.placement.y = y;
-        componentProperties.breathBar.bar.placement.setDefaultXY = true;
+        componentProperties.breathBar.placement.x = x;
+        componentProperties.breathBar.placement.y = y;
+        componentProperties.breathBar.placement.setDefaultXY = true;
     }
 
     // Calc bar width depending on AIR_IN_LUNG stat
     double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(8);
 
     // Use custom position/size?
-    bool useCustomPosition = componentProperties.breathBar.bar.placement.useCustomPosition;
-    bool useCustomSize = componentProperties.breathBar.bar.placement.useCustomSize;
+    bool useCustomPosition = componentProperties.breathBar.placement.useCustomPosition;
+    bool useCustomSize = componentProperties.breathBar.placement.useCustomSize;
+
+    float posX = useCustomPosition ? componentProperties.breathBar.placement.customX : x;
+    float posY = useCustomPosition ? componentProperties.breathBar.placement.customY : y;
+    std::uint16_t barWidth = static_cast<std::uint16_t>(useCustomSize ? componentProperties.breathBar.placement.customWidth : componentProperties.breathBar.placement.width);
+    std::uint32_t barHeight = static_cast<std::uint32_t>(useCustomSize ? componentProperties.breathBar.placement.customHeight : componentProperties.breathBar.placement.height);
 
     // call CSprite2d::DrawBarChart
-    ((void(__cdecl*)(float, float, std::uint16_t, std::uint32_t, float, bool, bool, bool, RwColor, RwColor))FUNC_CSprite2d_DrawBarChart)(useCustomPosition ? componentProperties.breathBar.bar.placement.customX : x, useCustomPosition ? componentProperties.breathBar.bar.placement.customY : y, static_cast<std::uint16_t>(useCustomSize ? componentProperties.breathBar.bar.placement.customWidth : componentProperties.breathBar.bar.placement.width), static_cast<std::uint32_t>(useCustomSize ? componentProperties.breathBar.bar.placement.customHeight : componentProperties.breathBar.bar.placement.height), playerPed->GetOxygenLevel() / statModifier * 100.0f, false, componentProperties.breathBar.bar.drawPercentage, componentProperties.breathBar.bar.drawBlackBorder, componentProperties.breathBar.bar.fillColor, COLOR_BLACK);
+    ((void(__cdecl*)(float, float, std::uint16_t, std::uint32_t, float, bool, bool, bool, RwColor, RwColor))FUNC_CSprite2d_DrawBarChart)(posX, posY, barWidth, barHeight, playerPed->GetOxygenLevel() / statModifier * 100.0f, false, componentProperties.breathBar.drawPercentage, componentProperties.breathBar.drawBlackBorder, componentProperties.breathBar.fillColor, COLOR_BLACK);
 }
 
 void CHudSA::RenderArmorBar(int x, int y)
@@ -508,19 +613,67 @@ void CHudSA::RenderArmorBar(int x, int y)
         return;
 
     // Save default position once
-    if (!componentProperties.armorBar.bar.placement.setDefaultXY)
+    if (!componentProperties.armorBar.placement.setDefaultXY)
     {
-        componentProperties.armorBar.bar.placement.x = x;
-        componentProperties.armorBar.bar.placement.y = y;
-        componentProperties.armorBar.bar.placement.setDefaultXY = true;
+        componentProperties.armorBar.placement.x = x;
+        componentProperties.armorBar.placement.y = y;
+        componentProperties.armorBar.placement.setDefaultXY = true;
     }
 
     // Use custom position/size?
-    bool useCustomPosition = componentProperties.hpBar.bar.placement.useCustomPosition;
-    bool useCustomSize = componentProperties.hpBar.bar.placement.useCustomSize;
+    bool useCustomPosition = componentProperties.hpBar.placement.useCustomPosition;
+    bool useCustomSize = componentProperties.hpBar.placement.useCustomSize;
+
+    float posX = useCustomPosition ? componentProperties.armorBar.placement.customX : x;
+    float posY = useCustomPosition ? componentProperties.armorBar.placement.customY : y;
+    std::uint16_t barWidth = static_cast<std::uint16_t>(useCustomSize ? componentProperties.armorBar.placement.customWidth : componentProperties.armorBar.placement.width);
+    std::uint32_t barHeight = static_cast<std::uint32_t>(useCustomSize ? componentProperties.armorBar.placement.customHeight : componentProperties.armorBar.placement.height);
 
     // call CSprite2d::DrawBarChart
-    ((void(__cdecl*)(float, float, std::uint16_t, std::uint32_t, float, bool, bool, bool, RwColor, RwColor))FUNC_CSprite2d_DrawBarChart)(useCustomPosition ? componentProperties.armorBar.bar.placement.customX : x, useCustomPosition ? componentProperties.armorBar.bar.placement.customY : y, static_cast<std::uint16_t>(useCustomSize ? componentProperties.armorBar.bar.placement.customWidth : componentProperties.armorBar.bar.placement.width), static_cast<std::uint32_t>(useCustomSize ? componentProperties.armorBar.bar.placement.customHeight : componentProperties.armorBar.bar.placement.height), playerPed->GetArmor() / static_cast<float>(pGame->GetPlayerInfo()->GetMaxArmor()) * 100.0f, false, componentProperties.armorBar.bar.drawPercentage, componentProperties.armorBar.bar.drawBlackBorder, componentProperties.armorBar.bar.fillColor, COLOR_BLACK);
+    ((void(__cdecl*)(float, float, std::uint16_t, std::uint32_t, float, bool, bool, bool, RwColor, RwColor))FUNC_CSprite2d_DrawBarChart)(posX, posY, barWidth, barHeight, playerPed->GetArmor() / static_cast<float>(pGame->GetPlayerInfo()->GetMaxArmor()) * 100.0f, false, componentProperties.armorBar.drawPercentage, componentProperties.armorBar.drawBlackBorder, componentProperties.armorBar.fillColor, COLOR_BLACK);
+}
+
+void CHudSA::RenderText(float x, float y, const char* text, SHudComponentData& properties, bool useSecondColor)
+{
+    // Use custom position/size?
+    bool useCustomPosition = properties.placement.useCustomPosition;
+    bool useCustomSize = properties.placement.useCustomSize;
+
+    // Save default position once
+    if (!properties.placement.setDefaultXY)
+    {
+       properties.placement.x = x;
+       properties.placement.y = y;
+       properties.placement.setDefaultXY = true;
+    }
+
+    CFontSA::SetScale(useCustomSize ? properties.placement.customWidth : properties.placement.width, useCustomSize ? properties.placement.customHeight : properties.placement.height);
+    CFontSA::SetProportional(properties.proportional);
+
+    CFontSA::SetDropShadowPosition(properties.textShadow);
+    CFontSA::SetEdge(properties.textOutline);
+
+    //if (properties.textShadow >= 0 && properties.textOutline <= 0)
+      //  CFontSA::SetDropShadowPosition(properties.textShadow);
+
+    CFontSA::SetOrientation(properties.alignment);
+    CFontSA::SetFontStyle(properties.style);
+
+    CFontSA::SetDropColor(properties.dropColor);
+    CFontSA::SetColor(useSecondColor ? properties.fillColor_Second : properties.fillColor);
+    
+    // Draw text
+    CFontSA::PrintString(useCustomPosition ? properties.placement.customX : x, useCustomPosition ? properties.placement.customY : y, text);
+}
+
+void CHudSA::RenderClock(float x, float y, const char* strTime)
+{
+    RenderText(x, y, strTime, componentProperties.clock);
+}
+
+void CHudSA::RenderMoney(float x, float y, const char* strMoney)
+{
+    RenderText(x, y, strMoney, componentProperties.money, pGame->GetPlayerInfo()->GetPlayerMoney() < 0);
 }
 
 static void _declspec(naked) HOOK_RenderHudBar()
@@ -578,4 +731,7 @@ void CHudSA::StaticSetHooks()
     HookInstall(FUNC_RenderHealthBar, &HOOK_RenderHudBar, 11);
     HookInstall(FUNC_RenderBreathBar, &HOOK_RenderHudBar, 11);
     HookInstall(FUNC_RenderArmorBar, &HOOK_RenderHudBar, 11);
+
+    HookInstallCall(0x58EC21, (DWORD)&RenderClock);
+    HookInstallCall(0x58F607, (DWORD)&RenderMoney);
 }

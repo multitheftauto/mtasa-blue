@@ -1,0 +1,135 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CFontSA.h
+ *  PURPOSE:     Header file for font class
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#pragma once
+#include <CVector2D.h>
+#include <game/RenderWare.h>
+#include <game/CHud.h>
+
+#define FUNC_CFont_PrintChar             0x718A10
+#define FUNC_CFont_PrintString           0x71A700
+#define FUNC_CFont_PrintStringFromBottom 0x71A820
+
+#define FUNC_CFont_SetScale 0x719380
+
+#define FUNC_CFont_SetSlantRefPoint 0x719400
+#define FUNC_CFont_SetSlant         0x719420
+
+#define FUNC_CFont_SetStyle      0x719490
+#define FUNC_CFont_SetCentreSize 0x7194E0
+
+#define FUNC_CFont_SetWrapX            0x7194D0
+#define FUNC_CFont_SetRightJustifyWrap 0x7194F0
+
+#define FUNC_CFont_SetColor     0x719430
+#define FUNC_CFont_SetDropColor 0x719510
+
+#define FUNC_CFont_SetDropShadowPosition 0x719570
+#define FUNC_CFont_SetEdge               0x719590
+
+#define FUNC_CFont_SetProportional 0x7195B0
+
+#define FUNC_CFont_SetBackground      0x7195C0
+#define FUNC_CFont_SetBackgroundColor 0x7195E0
+
+#define FUNC_CFont_SetJustify     0x719600
+#define FUNC_CFont_SetOrientation 0x719610
+
+#define FUNC_CFont_GetStringWidth 0x71A0E0
+#define FUNC_CFont_GetNumberLines 0x71A5E0
+
+#define VAR_CFont_Scale 0xC71A64
+#define VAR_CFont_Color 0xC71A60
+
+#define VAR_CFont_Slant         0xC71A6C
+#define VAR_CFont_SlantRefPoint 0xC71A70
+
+#define VAR_CFont_Justify          0xC71A78
+#define VAR_CFont_RightJustifyWrap 0xC71A90
+
+#define VAR_CFont_CenterAlign 0xC71A79
+#define VAR_CFont_RightAlign  0xC71A7A
+
+#define VAR_CFont_Background            0xC71A7B
+#define VAR_CFont_BackgroundIncludeWrap 0xC71A7C
+#define VAR_CFont_BackgroundColor       0xC71A84
+
+#define VAR_CFont_Proportional 0xC71A7D
+#define VAR_CFont_Wrapx        0xC71A88
+#define VAR_CFont_CentreSize   0xC71A8C
+
+#define VAR_CFont_FontStyle 0xC71A95
+#define VAR_CFont_TextureID 0xC71A94
+#define VAR_CFont_Shadow    0xC71A96
+
+#define VAR_CFont_DropColor 0xC71A97
+#define VAR_CFont_Edge      0xC71A9B
+
+class CFontSA
+{
+public:
+    static void PrintChar(float x, float y, char character);
+    static void PrintString(float x, float y, const char* text);
+    static void PrintStringFromBottom(float x, float y, const char* text);
+
+    static void SetScale(float w, float h);
+    static void SetScale(const CVector2D& scale);
+
+    static void SetSlantRefPoint(float x, float y);
+    static void SetSlant(float slant);
+
+    static void SetColor(const RwColor& color);
+    static void SetDropColor(const RwColor& color);
+
+    static void SetFontStyle(const eFontStyle& style);
+    static void SetCentreSize(float size);
+
+    static void SetWrapX(float wrapx);
+    static void SetRightJustifyWrap(float wrap);
+
+    static void SetDropShadowPosition(std::int16_t offset);
+    static void SetEdge(std::int16_t edgeSize);            // outline
+
+    static void SetProportional(bool enable);
+
+    static void SetBackground(bool enable, bool includeWrap);
+    static void SetBackgroundColor(const RwColor& color);
+
+    static void SetJustify(bool enable);
+    static void SetOrientation(const eFontAlignment& alignment);
+
+    static float        GetStringWidth(const char* string, bool spaces, bool scriptValues = false);
+    static std::int16_t GetNumberLines(float x, float y, const char* text);
+
+    static CVector2D GetScale() { return *reinterpret_cast<CVector2D*>(VAR_CFont_Scale); }
+    static RwColor   GetColor() { return *reinterpret_cast<RwColor*>(VAR_CFont_Color); }
+
+    static float     GetSlant() { return *reinterpret_cast<float*>(VAR_CFont_Slant); }
+    static CVector2D GetSlantRefPoint() { return *reinterpret_cast<CVector2D*>(VAR_CFont_SlantRefPoint); }
+
+    static bool           IsFontJustify() { return *reinterpret_cast<bool*>(VAR_CFont_Justify); }
+    static eFontAlignment GetOrientation();
+
+    static bool    IsBackgroundEnabled() { return *reinterpret_cast<bool*>(VAR_CFont_Background); }
+    static bool    IsBackgroundWrapIncluded() { return *reinterpret_cast<bool*>(VAR_CFont_BackgroundIncludeWrap); }
+    static RwColor GetBackgroundColor() { return *reinterpret_cast<RwColor*>(VAR_CFont_BackgroundColor); }
+
+    static bool IsProportional() { return *reinterpret_cast<bool*>(VAR_CFont_Proportional); }
+
+    static float GetWrapX() { return *reinterpret_cast<float*>(VAR_CFont_Wrapx); }
+    static float GetCentreSize() { return *reinterpret_cast<float*>(VAR_CFont_CentreSize); }
+    static float GetRightJustifyWrap() { return *reinterpret_cast<float*>(VAR_CFont_RightJustifyWrap); }
+
+    static eFontStyle GetFontStyle();
+
+    static float GetEdge() { return *reinterpret_cast<float*>(VAR_CFont_Edge); }
+    static float GetDropdownShadow() { return *reinterpret_cast<float*>(VAR_CFont_Shadow); }
+};

@@ -36,11 +36,35 @@ enum eHudComponent
 enum class eHudComponentProperty
 {
     FILL_COLOR,
+    FILL_COLOR_SECOND,
     DRAW_BLACK_BORDER,
     DRAW_PERCENTAGE,
     BLINKING_HP_VALUE,
     POSITION,
     SIZE,
+    DROP_COLOR,
+    TEXT_OUTLINE,
+    TEXT_SHADOW,
+    TEXT_STYLE,
+    TEXT_ALIGNMENT,
+    TEXT_PROPORTIONAL,
+
+    ALL_PROPERTIES,
+};
+
+enum class eFontStyle
+{
+    FONT_GOTHIC = 0,
+    FONT_SUBTITLES,
+    FONT_MENU,
+    FONT_PRICEDOWN,
+};
+
+enum class eFontAlignment
+{
+    ALIGN_CENTER,
+    ALIGN_LEFT,
+    ALIGN_RIGHT,
 };
 
 class CHud
@@ -55,11 +79,30 @@ public:
     virtual bool IsCrosshairVisible() = 0;
 
     // Hud properties
-    virtual void SetComponentBarColor(const eHudComponent& component, float color) noexcept = 0;
-    virtual void SetComponentDrawBlackBorder(const eHudComponent& component, bool draw) noexcept = 0;
-    virtual void SetComponentDrawPercentage(const eHudComponent& component, bool draw) noexcept = 0;
-    virtual void SetHealthBarBlinkingValue(float minHealth) noexcept = 0;
+    virtual bool IsComponentBar(const eHudComponent& component) const noexcept = 0;
+    virtual bool IsComponentText(const eHudComponent& component) const noexcept = 0;
+
     virtual void SetComponentPosition(const eHudComponent& component, const CVector2D& position) noexcept = 0;
     virtual void SetComponentSize(const eHudComponent& component, const CVector2D& size) noexcept = 0;
     virtual void ResetComponentPlacement(const eHudComponent& component, bool resetSize) noexcept = 0;
+
+    virtual void SetComponentColor(const eHudComponent& component, std::uint32_t color, bool secondColor = false) noexcept = 0;
+    virtual void ResetComponentColor(const eHudComponent& component, bool secondColor = false) noexcept = 0;
+
+    virtual void SetComponentDrawBlackBorder(const eHudComponent& component, bool draw) noexcept = 0;
+    virtual void SetComponentDrawPercentage(const eHudComponent& component, bool draw) noexcept = 0;
+    virtual void SetHealthBarBlinkingValue(float minHealth) noexcept = 0;
+
+    virtual void SetComponentFontDropColor(const eHudComponent& component, std::uint32_t color) noexcept = 0;
+    virtual void SetComponentFontOutline(const eHudComponent& component, float outline) noexcept = 0;
+    virtual void SetComponentFontShadow(const eHudComponent& component, float shadow) noexcept = 0;
+    virtual void SetComponentFontStyle(const eHudComponent& component, const eFontStyle& style) noexcept = 0;
+    virtual void SetComponentFontAlignment(const eHudComponent& component, const eFontAlignment& alignment) noexcept = 0;
+    virtual void SetComponentFontProportional(const eHudComponent& component, bool proportional) noexcept = 0;
+
+    virtual void ResetComponentFontOutline(const eHudComponent& component) noexcept = 0;
+    virtual void ResetComponentFontShadow(const eHudComponent& component) noexcept = 0;
+    virtual void ResetComponentFontStyle(const eHudComponent& component) noexcept = 0;
+    virtual void ResetComponentFontAlignment(const eHudComponent& component) noexcept = 0;
+    virtual void ResetComponentFontProportional(const eHudComponent& component) noexcept = 0;
 };
