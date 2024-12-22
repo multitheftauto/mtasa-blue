@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-22 00:06+0000\n"
-"PO-Revision-Date: 2024-12-22 07:00\n"
+"PO-Revision-Date: 2024-12-22 08:00\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2948,7 +2948,7 @@ msgstr "Se conectează la %s:%u ..."
 #: Client/core/CConnectManager.cpp:149
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "Reconectare la %s:%u ..."
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:405
