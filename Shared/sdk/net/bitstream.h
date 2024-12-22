@@ -588,6 +588,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-11-26
     WorldSpecialPropertyEvent,
 
+    // Add serverside building support
+    // 2024-12-?
+    ServersideBuildingElement,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

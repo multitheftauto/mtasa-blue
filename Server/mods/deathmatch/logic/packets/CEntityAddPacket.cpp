@@ -1127,6 +1127,12 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                 case CElement::BUILDING:
                 {
+                    if (!BitStream.Can(eBitStreamVersion::ServersideBuildingElement))
+                    {
+                        CLogger::LogPrintf("not sending this element - id: %i\n", pElement->GetType());
+                        break;
+                    }
+
                     CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
 
                     // Position

@@ -10,7 +10,6 @@
  *****************************************************************************/
 #pragma once
 
-// Kayl: There is now too many includes here, try to make it work with StdInc.h if possible
 #include "CElement.h"
 #include "CEvents.h"
 #include "CBuildingManager.h"
@@ -18,6 +17,8 @@
 #include "CEasingCurve.h"
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
+
+#define SERVERSIDE_BUILDING_MIN_CLIENT_VERSION "1.6.0-9.22824"
 
 class CBuilding final : public CElement
 {

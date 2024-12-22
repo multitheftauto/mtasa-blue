@@ -45,6 +45,11 @@ CBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::uint16_
     if (!pResource)
         return false;
 
+    const CMtaVersion& minClientVersion = pResource->GetMinClientFromMetaXml();
+
+    if (minClientVersion < CMtaVersion(SERVERSIDE_BUILDING_MIN_CLIENT_VERSION))
+        throw std::exception("Expected client min_mta_version in meta.xml hinger or equal than " SERVERSIDE_BUILDING_MIN_CLIENT_VERSION);
+
     if (!CBuildingManager::IsValidModel(modelId))
         throw std::invalid_argument("Invalid building model id");
 
