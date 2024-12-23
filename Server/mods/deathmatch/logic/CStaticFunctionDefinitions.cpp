@@ -100,7 +100,7 @@ static CBanManager*                      m_pBanManager;
 static CPedManager*                      m_pPedManager;
 static CWaterManager*                    m_pWaterManager;
 static CCustomWeaponManager*             m_pCustomWeaponManager;
-static std::shared_ptr<CHandlingManager> m_HandlingManager;
+static CHandlingManager*                 m_pHandlingManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN(func) \
@@ -135,7 +135,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CGame* pGame)
     m_pPedManager = pGame->GetPedManager();
     m_pWaterManager = pGame->GetWaterManager();
     m_pCustomWeaponManager = pGame->GetCustomWeaponManager();
-    m_HandlingManager = pGame->GetHandlingManager();
+    m_pHandlingManager = pGame->GetHandlingManager();
 }
 
 CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
@@ -5492,11 +5492,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
+        pEntry = m_pHandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = m_HandlingManager->GetModelHandlingData(model);
+        pEntry = m_pHandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5516,11 +5516,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
+        pEntry = m_pHandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = m_HandlingManager->GetModelHandlingData(model);
+        pEntry = m_pHandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5534,11 +5534,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
+        pEntry = m_pHandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = m_HandlingManager->GetModelHandlingData(model);
+        pEntry = m_pHandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5552,11 +5552,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
+        pEntry = m_pHandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = m_HandlingManager->GetModelHandlingData(model);
+        pEntry = m_pHandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5570,11 +5570,11 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
     const CHandlingEntry* pEntry = nullptr;
     if (bOriginal)
     {
-        pEntry = m_HandlingManager->GetOriginalHandlingData(model);
+        pEntry = m_pHandlingManager->GetOriginalHandlingData(model);
     }
     else
     {
-        pEntry = m_HandlingManager->GetModelHandlingData(model);
+        pEntry = m_pHandlingManager->GetModelHandlingData(model);
     }
 
     if (!pEntry)
@@ -5585,66 +5585,66 @@ bool CStaticFunctionDefinitions::GetModelHandling(std::uint32_t model, eHandling
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, float fValue)
 {
-    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_pHandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, fValue))
         return false;
 
-    m_HandlingManager->SetModelHandlingHasChanged(model, true);
+    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, CVector vecValue)
 {
-    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_pHandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, vecValue))
         return false;
 
-    m_HandlingManager->SetModelHandlingHasChanged(model, true);
+    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, std::string strValue)
 {
-    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_pHandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, strValue))
         return false;
 
-    m_HandlingManager->SetModelHandlingHasChanged(model, true);
+    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned char ucValue)
 {
-    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_pHandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, ucValue))
         return false;
 
-    m_HandlingManager->SetModelHandlingHasChanged(model, true);
+    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned int uiValue)
 {
-    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_pHandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
     if (!SetEntryHandling(pEntry, eProperty, uiValue))
         return false;
 
-    m_HandlingManager->SetModelHandlingHasChanged(model, true);
+    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
     return true;
 }
 
@@ -7406,7 +7406,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
 
         if (bUseOriginal)
         {
-            pNewEntry = m_HandlingManager->GetOriginalHandlingData(model);
+            pNewEntry = m_pHandlingManager->GetOriginalHandlingData(model);
             if (!pNewEntry)
                 return false;
 
@@ -7414,7 +7414,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
         }
         else
         {
-            pNewEntry = m_HandlingManager->GetModelHandlingData(model);
+            pNewEntry = m_pHandlingManager->GetModelHandlingData(model);
             if (!pNewEntry)
                 return false;
 
@@ -7552,11 +7552,11 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
 
 bool CStaticFunctionDefinitions::ResetModelHandling(std::uint32_t model)
 {
-    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_pHandlingManager->GetModelHandlingData(model);
     if (!pEntry)
         return false;
 
-    const CHandlingEntry* pHandlingEntry = m_HandlingManager->GetOriginalHandlingData(model);
+    const CHandlingEntry* pHandlingEntry = m_pHandlingManager->GetOriginalHandlingData(model);
     if (!pHandlingEntry)
         return false;
 
@@ -7566,7 +7566,7 @@ bool CStaticFunctionDefinitions::ResetModelHandling(std::uint32_t model)
 
 bool CStaticFunctionDefinitions::ResetModelHandlingProperty(std::uint32_t model, eHandlingProperty eProperty)
 {
-    CHandlingEntry* pEntry = m_HandlingManager->GetModelHandlingData(model);
+    CHandlingEntry* pEntry = m_pHandlingManager->GetModelHandlingData(model);
 
     float         fValue;
     CVector       vecValue;
