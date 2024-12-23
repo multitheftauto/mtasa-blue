@@ -41,8 +41,9 @@ public:
 
     CVector2D m_vecFightMovement;            // 12
     float     m_moveBlendRatio;              // 20
-    float     m_fSprintEnergy;               // 24
-    // FLOAT m_fSprintControlCounter; // Removed arbitatrily to aligned next byte, should be here really
+    float     m_fTimeCanRun;
+    float     m_fSprintEnergy;
+
     BYTE                    m_nChosenWeapon;                   // 28
     BYTE                    m_nCarDangerCounter;               // 29
     BYTE                    m_pad0;                            // 30
@@ -67,8 +68,6 @@ public:
     DWORD m_GroupNeverFollow : 1;                           // The group is told to always follow the player (used for girlfriend missions)
     DWORD m_bInVehicleDontAllowWeaponChange : 1;            // stop weapon change once driveby weapon has been given
     DWORD m_bRenderWeapon : 1;                              //  set to false during cutscenes so that knuckledusters are not rendered
-
-    DWORD m_pad2;            // 56
 
     long m_PlayerGroup;            // 60
 

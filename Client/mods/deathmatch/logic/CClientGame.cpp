@@ -34,6 +34,7 @@
 #include <game/Task.h>
 #include <game/CBuildingRemoval.h>
 #include "game/CClock.h"
+#include <game/CProjectileInfo.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -135,6 +136,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
@@ -227,7 +229,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_pObjectSync = new CObjectSync(m_pObjectManager);
 #endif
     m_pNametags = new CNametags(m_pManager);
-    m_pRadarMap = new CRadarMap(m_pManager);
+    m_pPlayerMap = new CPlayerMap(m_pManager);
 
     // Set the screenshot path
     /* This is now done in CCore, to maintain a global screenshot path
@@ -251,6 +253,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
+    // 3D model renderer
+    m_pModelRenderer = std::make_unique<CModelRenderer>();
+
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
@@ -267,6 +272,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetRender3DStuffHandler(CClientGame::StaticRender3DStuffHandler);
     g_pMultiplayer->SetPreRenderSkyHandler(CClientGame::StaticPreRenderSkyHandler);
     g_pMultiplayer->SetRenderHeliLightHandler(CClientGame::StaticRenderHeliLightHandler);
+    g_pMultiplayer->SetRenderEverythingBarRoadsHandler(CClientGame::StaticRenderEverythingBarRoadsHandler);
     g_pMultiplayer->SetChokingHandler(CClientGame::StaticChokingHandler);
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
@@ -398,6 +404,10 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 CClientGame::~CClientGame()
 {
     m_bBeingDeleted = true;
+    // Remove active projectile references to local player
+    if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
+        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());    
+
     // Stop all explosions. Unfortunately this doesn't fix the crash
     // if a vehicle is destroyed while it explodes.
     g_pGame->GetExplosionManager()->RemoveAllExplosions();
@@ -470,6 +480,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetRender3DStuffHandler(NULL);
     g_pMultiplayer->SetPreRenderSkyHandler(NULL);
     g_pMultiplayer->SetRenderHeliLightHandler(nullptr);
+    g_pMultiplayer->SetRenderEverythingBarRoadsHandler(nullptr);
     g_pMultiplayer->SetChokingHandler(NULL);
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
@@ -543,7 +554,7 @@ CClientGame::~CClientGame()
 #endif
     SAFE_DELETE(m_pBlendedWeather);
     SAFE_DELETE(m_pMovingObjectsManager);
-    SAFE_DELETE(m_pRadarMap);
+    SAFE_DELETE(m_pPlayerMap);
     SAFE_DELETE(m_pRemoteCalls);
     SAFE_DELETE(m_pLuaManager);
     SAFE_DELETE(m_pLatentTransferManager);
@@ -1092,7 +1103,7 @@ void CClientGame::DoPulsePostFrame()
         CClientPerfStatManager::GetSingleton()->DoPulse();
     }
 
-    m_pRadarMap->DoRender();
+    m_pPlayerMap->DoRender();
     m_pManager->DoRender();
     DoPulses();
 
@@ -1430,8 +1441,8 @@ void CClientGame::DoPulses()
     }
 
     // Check for radar input
-    m_pRadarMap->DoPulse();
-    g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pRadarMap->IsRadarShowing());
+    m_pPlayerMap->DoPulse();
+    g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pPlayerMap->IsPlayerMapShowing());
 
     // Got a local player?
     if (m_pLocalPlayer)
@@ -2773,6 +2784,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientBrowserTooltip", "text", NULL, false);
     m_Events.AddEvent("onClientBrowserInputFocusChanged", "gainedfocus", NULL, false);
     m_Events.AddEvent("onClientBrowserResourceBlocked", "url, domain, reason", NULL, false);
+    m_Events.AddEvent("onClientBrowserConsoleMessage", "message, source, line, level", nullptr, false);
 
     // Misc events
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
@@ -3546,6 +3558,11 @@ void CClientGame::StaticRenderHeliLightHandler()
     g_pClientGame->GetManager()->GetPointLightsManager()->RenderHeliLightHandler();
 }
 
+void CClientGame::StaticRenderEverythingBarRoadsHandler()
+{
+    g_pClientGame->GetModelRenderer()->Render();
+}
+
 bool CClientGame::StaticChokingHandler(unsigned char ucWeaponType)
 {
     return g_pClientGame->ChokingHandler(ucWeaponType);
@@ -3853,6 +3870,8 @@ void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
+
+    g_pClientGame->GetModelRenderer()->Update();
 }
 
 void CClientGame::IdleHandler()
@@ -5394,8 +5413,8 @@ void CClientGame::ResetMapInfo()
     // Keybinds
     g_pCore->GetKeyBinds()->SetAllControlsEnabled(true, true, true);
 
-    // Radarmap
-    m_pRadarMap->SetForcedState(false);
+    // Player map
+    m_pPlayerMap->SetForcedState(false);
 
     // Camera
     m_pCamera->FadeOut(0.0f, 0, 0, 0);
@@ -5416,16 +5435,14 @@ void CClientGame::ResetMapInfo()
 
     m_bHudAreaNameDisabled = false;
 
-    // Gravity
-    g_pMultiplayer->SetLocalPlayerGravity(DEFAULT_GRAVITY);
-    g_pMultiplayer->SetGlobalGravity(DEFAULT_GRAVITY);
-    g_pGame->SetGravity(DEFAULT_GRAVITY);
-
-    // Gamespeed
-    SetGameSpeed(DEFAULT_GAME_SPEED);
-
-    // Game minute duration
-    SetMinuteDuration(DEFAULT_MINUTE_DURATION);
+    // Reset world special properties, world properties, weather properties etc
+    ResetWorldPropsInfo desc;
+    desc.resetSpecialProperties = true;
+    desc.resetWorldProperties = true;
+    desc.resetWeatherProperties = true;
+    desc.resetLODs = true;
+    desc.resetSounds = true;
+    ResetWorldProperties(desc);
 
     // Wanted-level
     SetWanted(0);
@@ -5436,76 +5453,9 @@ void CClientGame::ResetMapInfo()
     // Weather
     m_pBlendedWeather->SetWeather(0);
 
-    // Rain
-    g_pGame->GetWeather()->ResetAmountOfRain();
-
-    // Wind
-    g_pMultiplayer->RestoreWindVelocity();
-
-    // Far clip distance
-    g_pMultiplayer->RestoreFarClipDistance();
-
-    // Near clip distance
-    g_pMultiplayer->RestoreNearClipDistance();
-
-    // Fog distance
-    g_pMultiplayer->RestoreFogDistance();
-
-    // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
-
-    // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistance(true);
-
-    // Blur
-    g_pGame->GetSettings()->SetBlurControlledByScript(false);
-    g_pGame->GetSettings()->ResetBlurEnabled();
-
-    // Corona rain reflections
-    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
-    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
-
-    // Sun color
-    g_pMultiplayer->ResetSunColor();
-
-    // Sun size
-    g_pMultiplayer->ResetSunSize();
-
-    // Sky-gradient
-    g_pMultiplayer->ResetSky();
-
-    // Heat haze
-    g_pMultiplayer->ResetHeatHaze();
-
-    // Water-colour
-    g_pMultiplayer->ResetWater();
-    g_pMultiplayer->ResetColorFilter();
-
     // Grain effect
     g_pMultiplayer->SetGrainMultiplier(eGrainMultiplierType::ALL, 1.0f);
     g_pMultiplayer->SetGrainLevel(0);
-
-    // Water
-    GetManager()->GetWaterManager()->ResetWorldWaterLevel();
-
-    // Re-enable interior sounds and furniture
-    g_pMultiplayer->SetInteriorSoundsEnabled(true);
-    for (int i = 0; i <= 4; ++i)
-        g_pMultiplayer->SetInteriorFurnitureEnabled(i, true);
-
-    // Clouds
-    g_pMultiplayer->SetCloudsEnabled(true);
-    g_pClientGame->SetCloudsEnabled(true);
-
-    // Birds
-    g_pMultiplayer->DisableBirds(false);
-    g_pClientGame->SetBirdsEnabled(true);
-
-    // Ambient sounds
-    g_pGame->GetAudioEngine()->ResetAmbientSounds();
-
-    // World sounds
-    g_pGame->GetAudioEngine()->ResetWorldSounds();
 
     // Cheats
     g_pGame->ResetCheats();
@@ -5513,45 +5463,8 @@ void CClientGame::ResetMapInfo()
     // Players
     m_pPlayerManager->ResetAll();
 
-    // Jetpack max height
-    g_pGame->GetWorld()->SetJetpackMaxHeight(DEFAULT_JETPACK_MAXHEIGHT);
-
-    // Aircraft max height
-    g_pGame->GetWorld()->SetAircraftMaxHeight(DEFAULT_AIRCRAFT_MAXHEIGHT);
-
-    // Aircraft max velocity
-    g_pGame->GetWorld()->SetAircraftMaxVelocity(DEFAULT_AIRCRAFT_MAXVELOCITY);
-
-    // Moon size
-    g_pMultiplayer->ResetMoonSize();
-
-    // World properties
-    g_pMultiplayer->ResetAmbientColor();
-    g_pMultiplayer->ResetAmbientObjectColor();
-    g_pMultiplayer->ResetDirectionalColor();
-    g_pMultiplayer->ResetSpriteSize();
-    g_pMultiplayer->ResetSpriteBrightness();
-    g_pMultiplayer->ResetPoleShadowStrength();
-    g_pMultiplayer->ResetShadowStrength();
-    g_pMultiplayer->ResetShadowsOffset();
-    g_pMultiplayer->ResetLightsOnGroundBrightness();
-    g_pMultiplayer->ResetLowCloudsColor();
-    g_pMultiplayer->ResetBottomCloudsColor();
-    g_pMultiplayer->ResetCloudsAlpha1();
-    g_pMultiplayer->ResetIllumination();
-    g_pGame->GetWeather()->ResetWetRoads();
-    g_pGame->GetWeather()->ResetFoggyness();
-    g_pGame->GetWeather()->ResetFog();
-    g_pGame->GetWeather()->ResetRainFog();
-    g_pGame->GetWeather()->ResetWaterFog();
-    g_pGame->GetWeather()->ResetSandstorm();
-    g_pGame->GetWeather()->ResetRainbow();
-
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
-
-    // Reset Frozen Time
-    g_pGame->GetClock()->ResetTimeFrozen();
 
     // Close all garages
     CGarage*  pGarage = NULL;
@@ -6075,7 +5988,7 @@ bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
 
-bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled)
+bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept
 {
     switch (property)
     {
@@ -6083,44 +5996,60 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::AIRCARS:
         case WorldSpecialProperty::EXTRABUNNY:
         case WorldSpecialProperty::EXTRAJUMP:
-            return g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+            g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+            break;
         case WorldSpecialProperty::RANDOMFOLIAGE:
             g_pGame->SetRandomFoliageEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::SNIPERMOON:
             g_pGame->SetMoonEasterEggEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::EXTRAAIRRESISTANCE:
             g_pGame->SetExtraAirResistanceEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::UNDERWORLDWARP:
             g_pGame->SetUnderWorldWarpEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::VEHICLESUNGLARE:
             g_pGame->SetVehicleSunGlareEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::CORONAZTEST:
             g_pGame->SetCoronaZTestEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::WATERCREATURES:
             g_pGame->SetWaterCreaturesEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::BURNFLIPPEDCARS:
             g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::FIREBALLDESTRUCT:
             g_pGame->SetFireballDestructEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::EXTENDEDWATERCANNONS:
             g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
+            break;
         case WorldSpecialProperty::ROADSIGNSTEXT:
             g_pGame->SetRoadSignsTextEnabled(isEnabled);
-            return true;
+            break;
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
-            return true;
+            break;
+        case WorldSpecialProperty::IGNOREFIRESTATE:
+            g_pGame->SetIgnoreFireStateEnabled(isEnabled);
+            break;
+        default:
+            return false;
     }
-    return false;
+
+    if (g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent)) {
+        NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
+        stream->WriteString(EnumToString(property));
+        stream->WriteBit(isEnabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
+    }
+
+    return true;
 }
 
 bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
@@ -6156,6 +6085,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsRoadSignsTextEnabled();
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             return g_pGame->IsTunnelWeatherBlendEnabled();
+        case WorldSpecialProperty::IGNOREFIRESTATE:
+            return g_pGame->IsIgnoreFireStateEnabled();
     }
     return false;
 }
@@ -6569,7 +6500,7 @@ void CClientGame::OutputServerInfo()
     {
         SString     strEnabledGlitches;
         const char* szGlitchNames[] = {"Quick reload",         "Fast fire",  "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint",
-                                       "Bad driveby hitboxes", "Quick stand"};
+                                       "Bad driveby hitboxes", "Quick stand", "Kickout of vehicle on model replace"};
         for (uint i = 0; i < NUM_GLITCHES; i++)
         {
             if (IsGlitchEnabled(i))
@@ -6838,6 +6769,151 @@ void CClientGame::RestreamWorld()
 void CClientGame::ReinitMarkers()
 {
     g_pGame->Get3DMarkers()->ReinitMarkers();
+}
+
+void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
+{
+    // Reset all setWorldSpecialPropertyEnabled to default
+    if (resetPropsInfo.resetSpecialProperties)
+    {
+        g_pGame->SetCheatEnabled("hovercars", false);
+        g_pGame->SetCheatEnabled("aircars", false);
+        g_pGame->SetCheatEnabled("extrabunny", false);
+        g_pGame->SetCheatEnabled("extrajump", false);
+
+        g_pGame->SetRandomFoliageEnabled(true);
+        g_pGame->SetMoonEasterEggEnabled(false);
+        g_pGame->SetExtraAirResistanceEnabled(true);
+        g_pGame->SetUnderWorldWarpEnabled(true);
+        g_pGame->SetVehicleSunGlareEnabled(false);
+        g_pGame->SetCoronaZTestEnabled(true);
+        g_pGame->SetWaterCreaturesEnabled(true);
+        g_pGame->SetBurnFlippedCarsEnabled(true);
+        g_pGame->SetFireballDestructEnabled(true);
+        g_pGame->SetRoadSignsTextEnabled(true);
+        g_pGame->SetExtendedWaterCannonsEnabled(true);
+        g_pGame->SetTunnelWeatherBlendEnabled(true);
+    }
+
+    // Reset all setWorldProperty to default
+    if (resetPropsInfo.resetWorldProperties)
+    {
+        g_pMultiplayer->ResetAmbientColor();
+        g_pMultiplayer->ResetAmbientObjectColor();
+        g_pMultiplayer->ResetDirectionalColor();
+        g_pMultiplayer->ResetSpriteSize();
+        g_pMultiplayer->ResetSpriteBrightness();
+        g_pMultiplayer->ResetPoleShadowStrength();
+        g_pMultiplayer->ResetShadowStrength();
+        g_pMultiplayer->ResetShadowsOffset();
+        g_pMultiplayer->ResetLightsOnGroundBrightness();
+        g_pMultiplayer->ResetLowCloudsColor();
+        g_pMultiplayer->ResetBottomCloudsColor();
+        g_pMultiplayer->ResetCloudsAlpha1();
+        g_pMultiplayer->ResetIllumination();
+
+        CWeather* weather = g_pGame->GetWeather();
+        weather->ResetWetRoads();
+        weather->ResetFoggyness();
+        weather->ResetFog();
+        weather->ResetRainFog();
+        weather->ResetWaterFog();
+        weather->ResetSandstorm();
+        weather->ResetRainbow();
+    }
+
+    // Reset all weather stuff like heat haze, wind velocity etc
+    if (resetPropsInfo.resetWeatherProperties)
+    {
+        g_pMultiplayer->ResetHeatHaze();
+        g_pMultiplayer->RestoreFogDistance();
+        g_pMultiplayer->ResetMoonSize();
+        g_pMultiplayer->ResetSky();
+        g_pMultiplayer->ResetSunColor();
+        g_pMultiplayer->ResetSunSize();
+        g_pMultiplayer->RestoreWindVelocity();
+        g_pMultiplayer->ResetColorFilter();
+
+        g_pGame->GetWeather()->ResetAmountOfRain();
+    }
+
+    // Reset LODs
+    if (resetPropsInfo.resetLODs)
+    {
+        g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
+        g_pGame->GetSettings()->ResetPedsLODDistance(true);
+    }
+
+    // Reset & restore sounds
+    if (resetPropsInfo.resetSounds)
+    {
+        g_pMultiplayer->SetInteriorSoundsEnabled(true);
+        g_pGame->GetAudioEngine()->ResetAmbientSounds();
+        g_pGame->GetAudioEngine()->ResetWorldSounds();
+    }
+
+    // Reset all other world stuff
+    // Reset clip distances
+    g_pMultiplayer->RestoreFarClipDistance();
+    g_pMultiplayer->RestoreNearClipDistance();
+
+    // Reset clouds
+    g_pMultiplayer->SetCloudsEnabled(true);
+    SetCloudsEnabled(true);
+
+    // Reset birds
+    g_pMultiplayer->DisableBirds(false);
+    SetBirdsEnabled(true);
+
+    // Reset occlusions
+    g_pGame->GetWorld()->SetOcclusionsEnabled(true);
+
+    // Reset gravity
+    g_pMultiplayer->SetGlobalGravity(DEFAULT_GRAVITY);
+    g_pCore->GetMultiplayer()->SetLocalPlayerGravity(DEFAULT_GRAVITY);
+    g_pGame->SetGravity(DEFAULT_GRAVITY);
+
+    // Reset game speed
+    g_pGame->SetGameSpeed(DEFAULT_GAME_SPEED);
+
+    // Reset aircraft max velocity & height
+    g_pMultiplayer->SetAircraftMaxHeight(DEFAULT_AIRCRAFT_MAXHEIGHT);
+    g_pMultiplayer->SetAircraftMaxVelocity(DEFAULT_AIRCRAFT_MAXVELOCITY);
+
+    // Reset jetpack max height
+    g_pGame->GetWorld()->SetJetpackMaxHeight(DEFAULT_JETPACK_MAXHEIGHT);
+
+    // Restore furnitures in the interiors
+    for (std::uint8_t i = 0; i <= 4; ++i)
+        g_pMultiplayer->SetInteriorFurnitureEnabled(i, true);
+
+    // Reset minute duration
+    SetMinuteDuration(DEFAULT_MINUTE_DURATION);
+
+    // Reset blur level
+    g_pGame->GetSettings()->SetBlurControlledByScript(false);
+    g_pGame->GetSettings()->ResetBlurEnabled();
+
+    // Reset corona reflections
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
+
+    // Reset traffic lights
+    g_pMultiplayer->SetTrafficLightsLocked(false);
+
+    // Reset water color, water level & wave height
+    g_pMultiplayer->ResetWater();
+    GetManager()->GetWaterManager()->ResetWorldWaterLevel();
+    GetManager()->GetWaterManager()->SetWaveLevel(0.0f);
+
+    // Reset volumetric shadows
+    g_pGame->GetSettings()->ResetVolumetricShadows();
+
+    // Reset Frozen Time
+    g_pGame->GetClock()->ResetTimeFrozen();
+
+    // Reset DynamicPedShadows
+    g_pGame->GetSettings()->ResetDynamicPedShadows();
 }
 
 void CClientGame::OnWindowFocusChange(bool state)

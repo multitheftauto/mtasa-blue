@@ -572,6 +572,10 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
             strReason = _("Disconnected: Serial verification failed");
             strErrorCode = _E("CD44");
             break;
+        case ePlayerDisconnectType::SERIAL_DUPLICATE:
+            strReason = _("Disconnected: Serial already in use");
+            strErrorCode = _E("CD50");
+            break;
         case ePlayerDisconnectType::CONNECTION_DESYNC:
             strReason = _("Disconnected: Connection desync %s");
             strErrorCode = _E("CD45");
@@ -2393,6 +2397,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::ROADSIGNSTEXT, wsProps.data3.roadsignstext);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTENDEDWATERCANNONS, wsProps.data4.extendedwatercannons);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::TUNNELWEATHERBLEND, wsProps.data5.tunnelweatherblend);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::IGNOREFIRESTATE, wsProps.data6.ignoreFireState);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
@@ -2724,6 +2729,7 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // bool                 (1)     - static
         // SObjectHealthSync    (?)     - health
         // bool                 (1)     - is break
+        // bool                 (1)     - respawnable
 
         // Pickups:
         // CVector              (12)    - position
@@ -3089,7 +3095,10 @@ retry:
                             if (bitStream.ReadBit())
                                 pObject->Break();
                         }
-                        
+
+                        if (bitStream.Can(eBitStreamVersion::RespawnObject_Serverside))
+                            pObject->SetRespawnEnabled(bitStream.ReadBit());
+
                         pObject->SetCollisionEnabled(bCollisonsEnabled);
                         if (ucEntityTypeID == CClientGame::WEAPON)
                         {

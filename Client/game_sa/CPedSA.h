@@ -294,6 +294,7 @@ public:
     std::int16_t                     specialModelIndex;
     std::int16_t                     unk_796;
     int                              unk_798;
+    CEntitySAInterface*              pTargetedEntity;            // 1948
 };
 static_assert(sizeof(CPedSAInterface) == 0x79C, "Invalid size for CPedSAInterface");
 
@@ -437,6 +438,9 @@ public:
     void*                   GetPedNodeInterface(std::int32_t nodeId) { return GetPedInterface()->pedNodes[nodeId]; }
     std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
     static void             StaticSetHooks();
+
+    CEntitySAInterface* GetTargetedObject() { return GetPedInterface()->pTargetedObject; }
+    ePedState           GetPedState() { return GetPedInterface()->pedState; }
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 };

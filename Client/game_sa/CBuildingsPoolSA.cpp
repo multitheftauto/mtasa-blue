@@ -53,6 +53,13 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     if (!HasFreeBuildingSlot())
         return nullptr;
 
+    auto modelInfo = pGame->GetModelInfo(modelId);
+
+    // Change the properties group to force dynamic models to be created as buildings instead of dummies
+    auto prevGroup = modelInfo->GetObjectPropertiesGroup();
+    if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
+        modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
+
     // Load building
     SFileObjectInstance instance;
     instance.modelID = modelId;
@@ -70,9 +77,12 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     pBuilding->m_pLod = nullptr;
     pBuilding->m_iplIndex = 0;
 
+    // Restore changed properties group
+    if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
+        modelInfo->SetObjectPropertiesGroup(prevGroup);
+
     // Always stream model collosion
     // TODO We can setup collison bounding box and use GTA streamer for it
-    auto modelInfo = pGame->GetModelInfo(modelId);
     modelInfo->AddColRef();
 
     // Add building in world
@@ -101,7 +111,14 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     // Remove plant
     pGame->GetPlantManager()->RemovePlant(pInterface);
 
-    RemoveBuildingFromWorld(pInterface);
+    // Remove shadow
+    pInterface->RemoveShadows();
+
+    // Remove building from world
+    pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
+
+    // Call virtual destructor
+    ((void*(__thiscall*)(void*, char))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 0);
 
     // Remove col reference
     auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
@@ -143,6 +160,9 @@ void CBuildingsPoolSA::RemoveAllBuildings()
             CBuildingSAInterface* building = pBuildsingsPool->GetObject(i);
 
             RemoveBuildingFromWorld(building);
+
+            if (building->HasMatrix())
+                building->RemoveMatrix();
 
             pBuildsingsPool->Release(i);
 
