@@ -312,7 +312,7 @@ public:
 
     CLimits* GetLimits() { return &m_limits; }
 
-    void UpdateVehicleSuspension() noexcept;
+    void UpdateVehicleSuspension() const noexcept;
 
     virtual void FlushClothesCache();
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading);
