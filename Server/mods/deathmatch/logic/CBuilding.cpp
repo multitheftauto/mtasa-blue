@@ -16,7 +16,7 @@
 
 extern CGame* g_pGame;
 
-CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CElement(pParent), m_pLowLodBuilding(NULL)
+CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CElement(pParent), m_pLowLodBuilding(nullptr)
 {
     // Init
     m_iType = CElement::BUILDING;
