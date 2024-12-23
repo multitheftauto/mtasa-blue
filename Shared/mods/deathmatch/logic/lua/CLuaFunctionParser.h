@@ -536,7 +536,11 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector2D>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                return CVector2D(x, y);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -561,7 +565,12 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector>)
         {
             if (lua_isnumber(L, index))
-                return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index));
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                auto z = PopUnsafe<float>(L, index);
+                return CVector(x, y, z);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -584,7 +593,13 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector4D>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                auto z = PopUnsafe<float>(L, index);
+                auto w = PopUnsafe<float>(L, index);
+                return CVector4D(x, y, z, w);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -606,7 +621,13 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                const auto ReadVector = [&] { return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)); };
+                const auto ReadVector = [&]
+                {
+                    auto x = PopUnsafe<float>(L, index);
+                    auto y = PopUnsafe<float>(L, index);
+                    auto z = PopUnsafe<float>(L, index);
+                    return CVector(x, y, z);
+                };
 
                 CMatrix matrix;
 
