@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <dwmapi.h>
+
 HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
 std::vector<IDirect3D9*> ms_CreatedDirect3D9List;
@@ -165,6 +167,20 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     #else
     SetWindowTextW(hFocusWindow, MbUTF8ToUTF16("MTA: San Andreas").c_str());
     #endif
+
+    // Set dark titlebar if needed
+    HKEY hKey;
+    DWORD systemThemeMode = 1;
+    DWORD dataSize = sizeof(systemThemeMode);
+
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+        RegQueryValueExW(hKey, L"AppsUseLightTheme", nullptr, nullptr, reinterpret_cast<LPBYTE>(&systemThemeMode), &dataSize);
+        RegCloseKey(hKey);
+    }
+
+    BOOL darkTitleBar = systemThemeMode == 0;
+    DwmSetWindowAttribute(hFocusWindow, DWMWA_USE_IMMERSIVE_DARK_MODE, &darkTitleBar, sizeof(darkTitleBar));
 
     // Detect if second call to CreateDevice
     if (CreateDeviceSecondCallCheck(hResult, m_pDevice, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface))
