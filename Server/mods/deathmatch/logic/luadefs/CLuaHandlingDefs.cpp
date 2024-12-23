@@ -402,50 +402,55 @@ int CLuaHandlingDefs::GetVehicleHandling(lua_State* luaVM)
             SString strProperty;
             argStream.ReadString(strProperty);
 
+            bool              bResult = true;
             eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName(strProperty);
-            if (eProperty == HANDLING_MAX)
+            if (eProperty != HANDLING_MAX)
             {
-                argStream.SetCustomError("Invalid property");
-                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-
-            float         fValue = 0.0f;
-            CVector       vecValue = CVector(0.0f, 0.0f, 0.0f);
-            SString       strValue = "";
-            unsigned int  uiValue = 0;
-            unsigned char ucValue = 0;
-            if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, fValue))
-            {
-                lua_pushnumber(luaVM, fValue);
-            }
-            else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, uiValue))
-            {
-                lua_pushnumber(luaVM, uiValue);
-            }
-            else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, ucValue))
-            {
-                lua_pushnumber(luaVM, ucValue);
-            }
-            else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, strValue))
-            {
-                lua_pushstring(luaVM, strValue);
-            }
-            else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, vecValue))
-            {
-                lua_createtable(luaVM, 3, 0);
-                lua_pushnumber(luaVM, 1);
-                lua_pushnumber(luaVM, vecValue.fX);
-                lua_settable(luaVM, -3);
-                lua_pushnumber(luaVM, 2);
-                lua_pushnumber(luaVM, vecValue.fY);
-                lua_settable(luaVM, -3);
-                lua_pushnumber(luaVM, 3);
-                lua_pushnumber(luaVM, vecValue.fZ);
-                lua_settable(luaVM, -3);
+                float         fValue = 0.0f;
+                CVector       vecValue = CVector(0.0f, 0.0f, 0.0f);
+                SString       strValue = "";
+                unsigned int  uiValue = 0;
+                unsigned char ucValue = 0;
+                if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, fValue))
+                {
+                    lua_pushnumber(luaVM, fValue);
+                }
+                else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, uiValue))
+                {
+                    lua_pushnumber(luaVM, uiValue);
+                }
+                else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, ucValue))
+                {
+                    lua_pushnumber(luaVM, ucValue);
+                }
+                else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, strValue))
+                {
+                    lua_pushstring(luaVM, strValue);
+                }
+                else if (CStaticFunctionDefinitions::GetVehicleHandling(pVehicle, eProperty, vecValue))
+                {
+                    lua_createtable(luaVM, 3, 0);
+                    lua_pushnumber(luaVM, 1);
+                    lua_pushnumber(luaVM, vecValue.fX);
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 2);
+                    lua_pushnumber(luaVM, vecValue.fY);
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, vecValue.fZ);
+                    lua_settable(luaVM, -3);
+                }
+                else
+                {
+                    bResult = false;
+                }
             }
             else
+            {
+                bResult = false;
+            }
+
+            if (!bResult)
             {
                 argStream.SetCustomError("Invalid property");
                 m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

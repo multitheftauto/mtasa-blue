@@ -245,9 +245,26 @@ CGameSA::CGameSA()
         CVehicleSA::StaticSetHooks();
         CCheckpointSA::StaticSetHooks();
     }
-    catch (...)
+    catch (const std::bad_alloc& e)
     {
-        MessageBoxUTF8(nullptr, _("Failed initialization game_sa"), _("Error"), MB_ICONERROR | MB_OK);
+        std::string error = _("Failed initialization game_sa");
+        error += "\n";
+        error += _("Memory allocations failed");
+        error += ": ";
+        error += e.what();
+
+        MessageBoxUTF8(nullptr, error.c_str(), _("Error"), MB_ICONERROR | MB_OK);
+        ExitProcess(EXIT_FAILURE);
+    }
+    catch (const std::exception& e)
+    {
+        std::string error = _("Failed initialization game_sa");
+        error += "\n";
+        error += _("Information");
+        error += ": ";
+        error += e.what();
+
+        MessageBoxUTF8(nullptr, error, _("Error"), MB_ICONERROR | MB_OK);
         ExitProcess(EXIT_FAILURE);
     }
 }
