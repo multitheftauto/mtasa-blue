@@ -52,15 +52,9 @@ void CHandlingEntrySA::Recalculate() noexcept
     if (!m_HandlingSA)
         return;
 
-    try
-    {
-        // Copy our stored field to GTA's
-        MemCpy(m_HandlingSA.get(), &m_Handling, sizeof(m_Handling));
-        ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_HandlingSA.get());
-    }
-    catch (...)
-    {
-    }
+     // Copy our stored field to GTA's
+    MemCpy(m_HandlingSA.get(), &m_Handling, sizeof(m_Handling));
+    ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_HandlingSA.get());
 }
 
 void CHandlingEntrySA::SetSuspensionForceLevel(float fForce) noexcept
