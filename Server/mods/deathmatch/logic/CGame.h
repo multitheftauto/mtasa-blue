@@ -216,7 +216,7 @@ public:
     bool IsFinished() { return m_bIsFinished; };
 
     CMainConfig*                        GetConfig() { return m_pMainConfig; }
-    std::shared_ptr<CHandlingManager>   GetHandlingManager() { return m_HandlingManager; }
+    CHandlingManager*                   GetHandlingManager() const noexcept { return m_HandlingManager.get(); }
     CMapManager*                        GetMapManager() { return m_pMapManager; }
     CPlayerManager*                     GetPlayerManager() { return m_pPlayerManager; }
     CObjectManager*                     GetObjectManager() { return m_pObjectManager; }
@@ -571,7 +571,7 @@ private:
     CSettings*                        m_pSettings;
     CZoneNames*                       m_pZoneNames;
     ASE*                              m_pASE;
-    std::shared_ptr<CHandlingManager> m_HandlingManager;
+    std::unique_ptr<CHandlingManager> m_HandlingManager;
     CRPCFunctions*                    m_pRPCFunctions;
     CLanBroadcast*                    m_pLanBroadcast;
     CWaterManager*                    m_pWaterManager;

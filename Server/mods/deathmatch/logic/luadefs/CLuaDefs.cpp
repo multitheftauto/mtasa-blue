@@ -40,7 +40,7 @@ namespace
 
 CElementDeleter*                  CLuaDefs::m_pElementDeleter = NULL;
 CBlipManager*                     CLuaDefs::m_pBlipManager = NULL;
-std::shared_ptr<CHandlingManager> CLuaDefs::m_HandlingManager = nullptr;
+CHandlingManager*                 CLuaDefs::m_pHandlingManager = nullptr;
 CLuaManager*                      CLuaDefs::m_pLuaManager = NULL;
 CMarkerManager*                   CLuaDefs::m_pMarkerManager = NULL;
 CObjectManager*                   CLuaDefs::m_pObjectManager = NULL;
@@ -63,7 +63,7 @@ void CLuaDefs::Initialize(CGame* pGame)
     m_pRootElement = pGame->GetMapManager()->GetRootElement();
     m_pElementDeleter = pGame->GetElementDeleter();
     m_pBlipManager = pGame->GetBlipManager();
-    m_HandlingManager = pGame->GetHandlingManager();
+    m_pHandlingManager = pGame->GetHandlingManager();
     m_pLuaManager = pGame->GetLuaManager();
     m_pMarkerManager = pGame->GetMarkerManager();
     m_pObjectManager = pGame->GetObjectManager();

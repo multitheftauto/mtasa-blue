@@ -850,7 +850,7 @@ void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOut
 
 void CVehicle::GenerateHandlingData() noexcept
 {
-    const auto handlingManager = g_pGame->GetHandlingManager();
+    const auto* handlingManager = g_pGame->GetHandlingManager();
 
     // Make a new CHandlingEntry
     if (!m_HandlingEntry)

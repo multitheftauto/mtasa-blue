@@ -595,7 +595,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         m_pPlayerManager = new CPlayerManager;
         m_pRadarAreaManager = new CRadarAreaManager;
         m_pMarkerManager = new CMarkerManager(m_pColManager);
-        m_HandlingManager = std::make_shared<CHandlingManager>();
+        m_HandlingManager = std::make_unique<CHandlingManager>();
         m_pVehicleManager = new CVehicleManager;
         m_pPacketTranslator = new CPacketTranslator(m_pPlayerManager);
         m_pBanManager = new CBanManager;
