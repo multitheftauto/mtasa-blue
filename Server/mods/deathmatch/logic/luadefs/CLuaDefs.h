@@ -68,7 +68,7 @@ public:
 protected:
     static CElementDeleter*                  m_pElementDeleter;
     static CBlipManager*                     m_pBlipManager;
-    static std::shared_ptr<CHandlingManager> m_HandlingManager;
+    static CHandlingManager*                 m_pHandlingManager;
     static CLuaManager*                      m_pLuaManager;
     static CMarkerManager*                   m_pMarkerManager;
     static CObjectManager*                   m_pObjectManager;
