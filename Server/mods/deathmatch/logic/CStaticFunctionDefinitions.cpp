@@ -5589,7 +5589,7 @@ bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandling
     if (!pEntry)
         return false;
 
-    if (SetEntryHandling(pEntry, eProperty, fValue))
+    if (!SetEntryHandling(pEntry, eProperty, fValue))
         return false;
 
     m_HandlingManager->SetModelHandlingHasChanged(model, true);
