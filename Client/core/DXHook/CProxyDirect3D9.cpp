@@ -169,17 +169,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     #endif
 
     // Set dark titlebar if needed
-    HKEY hKey;
-    DWORD systemThemeMode = 1;
-    DWORD dataSize = sizeof(systemThemeMode);
-
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
-    {
-        RegQueryValueExW(hKey, L"AppsUseLightTheme", nullptr, nullptr, reinterpret_cast<LPBYTE>(&systemThemeMode), &dataSize);
-        RegCloseKey(hKey);
-    }
-
-    BOOL darkTitleBar = systemThemeMode == 0;
+    BOOL darkTitleBar = GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme") == "\x0";
     DwmSetWindowAttribute(hFocusWindow, DWMWA_USE_IMMERSIVE_DARK_MODE, &darkTitleBar, sizeof(darkTitleBar));
 
     // Detect if second call to CreateDevice
