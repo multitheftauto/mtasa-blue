@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CPedSA.cpp
  *  PURPOSE:     Ped entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -25,23 +25,11 @@ extern CGameSA* pGame;
 
 static bool g_onlyUpdateRotations = false;
 
-CPedSA::CPedSA(CPedSAInterface* pPedInterface)
-    : m_pPedInterface(pPedInterface)
-{
-    MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
-}
-
 CPedSA::~CPedSA()
 {
-    SAFE_DELETE(m_pPedIntelligence);
-    SAFE_DELETE(m_pPedSound);
-
-    for (std::uint8_t i = 0; i < WEAPONSLOT_MAX; i++)
-        SAFE_DELETE(m_pWeapons[i]);
-
     // Make sure this ped is not refed in the flame shot info array
-    CFlameShotInfo* info = (CFlameShotInfo*)ARRAY_CFlameShotInfo;
-    for (std::uint8_t i = 0; i < MAX_FLAME_SHOT_INFOS; i++, info++)
+    auto* info = reinterpret_cast<CFlameShotInfo*>(ARRAY_CFlameShotInfo);
+    for (std::size_t i = 0; i < MAX_FLAME_SHOT_INFOS; i++, info++)
     {
         if (info->pInstigator != m_pInterface)
             continue;
@@ -59,42 +47,39 @@ void CPedSA::Init()
 {
     CPedSAInterface* pedInterface = GetPedInterface();
 
-    auto* pedIntelligenceInterface = static_cast<CPedIntelligenceSAInterface*>(pedInterface->pPedIntelligence);
-    m_pPedIntelligence = new CPedIntelligenceSA(pedIntelligenceInterface, this);
+    m_pedIntelligence = std::make_unique<CPedIntelligenceSA>(pedInterface->pPedIntelligence, this);
 
-    m_pPedSound = new CPedSoundSA(&pedInterface->pedSound);
-    m_sDefaultVoiceType = m_pPedSound->GetVoiceTypeID();
-    m_sDefaultVoiceID = m_pPedSound->GetVoiceID();
+    m_pedSound = std::make_unique<CPedSoundSA>(&pedInterface->pedSound);
+    m_defaultVoiceType = m_pedSound->GetVoiceTypeID();
+    m_defaultVoiceID = m_pedSound->GetVoiceID();
 
-    for (std::uint8_t i = 0; i < WEAPONSLOT_MAX; i++)
-        m_pWeapons[i] = new CWeaponSA(&(pedInterface->Weapons[i]), this, static_cast<eWeaponSlot>(i));
+    for (std::size_t i = 0; i < WEAPONSLOT_MAX; i++)
+        m_weapons[i] = std::make_unique<CWeaponSA>(&(pedInterface->Weapons[i]), this, static_cast<eWeaponSlot>(i));
 
     #ifdef PedIK_SA
         this->m_pPedIK = new Cm_pPedIKSA(&(pedInterface->m_pPedIK));
     #endif
 }
 
-void CPedSA::SetModelIndex(DWORD modelIndex)
+void CPedSA::SetModelIndex(std::uint32_t modelIndex)
 {
     // char __thiscall CPed::SetModelIndex(void *this, int a2)
     ((char(__thiscall*)(CEntitySAInterface*, int))FUNC_SetModelIndex)(m_pInterface, modelIndex);
 
     // Also set the voice gender
-    CPedModelInfoSAInterface* modelInfo = static_cast<CPedModelInfoSAInterface*>(pGame->GetModelInfo(modelIndex)->GetInterface());
+    CModelInfo* mi = pGame->GetModelInfo(modelIndex);
+    if (!mi)
+        return;
+
+    CPedModelInfoSAInterface* modelInfo = static_cast<CPedModelInfoSAInterface*>(mi->GetInterface());
     if (!modelInfo)
         return;
 
-    DWORD dwType = modelInfo->pedType;
-    GetPedInterface()->pedSound.m_bIsFemale = (dwType == 5 || dwType == 22);
+    std::uint32_t type = modelInfo->pedType;
+    GetPedInterface()->pedSound.m_bIsFemale = type == 5 || type == 22;
 }
 
-bool CPedSA::IsInWater() const noexcept
-{
-    CTask* task = GetPedIntelligence()->GetTaskManager()->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-    return (task && task->GetTaskType() == TASK_COMPLEX_IN_WATER);
-}
-
-bool CPedSA::AddProjectile(eWeaponType weaponType, CVector origin, float force, const CVector* target, const CEntity* targetEntity)
+bool CPedSA::AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity)
 {
     CProjectileInfo* projectileInfo = pGame->GetProjectileInfo();
     if (!projectileInfo)
@@ -111,31 +96,25 @@ void CPedSA::DetachPedFromEntity()
 
 bool CPedSA::InternalAttachEntityToEntity(DWORD entityInteface, const CVector* position, const CVector* rotation)
 {
-    AttachPedToEntity(entityInteface, const_cast<CVector*>(position), 0, 0.0f, WEAPONTYPE_UNARMED, false);
-    return true;
-}
-
-void CPedSA::AttachPedToEntity(DWORD entityInteface, CVector* vector, std::uint16_t direction, float rotationLimit, eWeaponType weaponType, bool changeCamera)
-{
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
     CPedSAInterface* pedInterface = GetPedInterface();
     std::uint8_t pedType = pedInterface->bPedType;
 
     // Hack the CPed type(?) to non-player so the camera doesn't get changed
-    if (!changeCamera)
-        pedInterface->bPedType = 2;
+    pedInterface->bPedType = 2;
 
     // CEntity *__thiscall CPed::AttachPedToEntity(CPed *this, CEntity *a2, float arg4, float a4, float a5, __int16 a6, int a7, eWeaponType a3)
-    ((CEntitySAInterface*(__thiscall*)(CEntitySAInterface*, CEntitySAInterface*, float, float, float, std::uint16_t, float, std::uint8_t))FUNC_AttachPedToEntity)(m_pInterface, reinterpret_cast<CEntitySAInterface*>(entityInteface), vector->fX, vector->fY, vector->fZ, direction, rotationLimit, static_cast<std::uint8_t>(weaponType));
+    ((CEntitySAInterface*(__thiscall*)(CEntitySAInterface*, CEntitySAInterface*, float, float, float, std::uint16_t, int, eWeaponType))FUNC_AttachPedToEntity)(m_pInterface, reinterpret_cast<CEntitySAInterface*>(entityInteface), position->fX, position->fY, position->fZ, 0, 0, WEAPONTYPE_UNARMED);
 
     // Hack the CPed type(?) to whatever it was set to
-    if (!changeCamera)
-        pedInterface->bPedType = pedType;
+    pedInterface->bPedType = pedType;
+
+    return true;
 }
 
-CVehicle* CPedSA::GetVehicle() const noexcept
+CVehicle* CPedSA::GetVehicle() const
 {
-    const CPedSAInterface* pedInterface = GetPedInterface();
+    CPedSAInterface* pedInterface = GetPedInterface();
     if (!pedInterface || !pedInterface->pedFlags.bInVehicle)
         return nullptr;
 
@@ -147,7 +126,7 @@ CVehicle* CPedSA::GetVehicle() const noexcept
     return vehicleClientEntity ? vehicleClientEntity->pEntity : nullptr;
 }
 
-void CPedSA::Respawn(const CVector* position, bool cameraCut)
+void CPedSA::Respawn(CVector* position, bool cameraCut)
 {
     if (!cameraCut)
         // CGameLogic::RestorePlayerStuffDuringResurrection
@@ -173,24 +152,6 @@ void CPedSA::Respawn(const CVector* position, bool cameraCut)
         MemCpy((void*)0x4422EA, "\xB9\x28\xF0\xB6\x00\xE8\x4C\x9A\x0C\x00\xB9\x28\xF0\xB6\x00\xE8\xB2\x97\x0C\x00", 20);
 }
 
-void CPedSA::SetIsStanding(bool standing)
-{
-    // int __thiscall CPed::SetIsStanding(CPed *this, unsigned __int8 a2)
-    ((void(__thiscall*)(CEntitySAInterface*, bool))FUNC_SetIsStanding)(m_pInterface, standing);
-}
-
-void CPedSA::RemoveWeaponModel(int model)
-{
-    // void __thiscall CPed::RemoveWeaponModel(CPed *this, int modelID)
-    ((void(__thiscall*)(CEntitySAInterface*, int))FUNC_RemoveWeaponModel)(m_pInterface, model);
-}
-
-void CPedSA::ClearWeapon(eWeaponType weaponType)
-{
-    // BYTE *__thiscall CPed::ClearWeapon(CPed *this, eWeaponType a2)
-    ((std::uint8_t*(__thiscall*)(CEntitySAInterface*, std::uint8_t))FUNC_ClearWeapon)(m_pInterface, static_cast<std::uint8_t>(weaponType));
-}
-
 CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill skill)
 {
     // Load weapon model
@@ -199,17 +160,13 @@ CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponS
         CWeaponInfo* weaponInfo = pGame->GetWeaponInfo(weaponType, skill);
         if (weaponInfo)
         {
-            std::uint16_t model = weaponInfo->GetModel();
-            if (model)
+            CModelInfo* modelInfo = pGame->GetModelInfo(static_cast<std::uint32_t>(weaponInfo->GetModel()));
+            if (modelInfo)
             {
-                CModelInfo* modelInfo = pGame->GetModelInfo(model);
-                if (modelInfo)
-                {
-                    modelInfo->Request(BLOCKING, "CPedSA::GiveWeapon");
-                    modelInfo->MakeCustomModel();
-                }
+                modelInfo->Request(BLOCKING, "CPedSA::GiveWeapon");
+                modelInfo->MakeCustomModel();
             }
-
+            
             // If the weapon is satchels, load the detonator too
             if (weaponType == WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
                 GiveWeapon(WEAPONTYPE_DETONATOR, 1, WEAPONSKILL_STD);
@@ -218,12 +175,12 @@ CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponS
 
     // eWeaponType __thiscall CPed::GiveWeapon(CPed *this, eWeaponType weaponID, signed int ammo, int a4)
     // Last argument is unused
-    eWeaponSlot weaponSlot = ((eWeaponSlot(__thiscall*)(CEntitySAInterface*, std::uint8_t, std::uint32_t, std::uint8_t))FUNC_GiveWeapon)(m_pInterface, weaponType, ammo, 1);
+    eWeaponSlot weaponSlot = ((eWeaponSlot(__thiscall*)(CEntitySAInterface*, eWeaponType, std::uint32_t, int))FUNC_GiveWeapon)(m_pInterface, weaponType, ammo, 1);
 
     return GetWeapon(weaponSlot);
 }
 
-CWeapon* CPedSA::GetWeapon(eWeaponType weaponType) const noexcept
+CWeapon* CPedSA::GetWeapon(eWeaponType weaponType) const
 {
     if (weaponType >= WEAPONTYPE_LAST_WEAPONTYPE)
         return nullptr;
@@ -232,20 +189,38 @@ CWeapon* CPedSA::GetWeapon(eWeaponType weaponType) const noexcept
     return (weapon && weapon->GetType() == weaponType) ? weapon : nullptr;
 }
 
-CWeapon* CPedSA::GetWeapon(eWeaponSlot weaponSlot) const noexcept
+CWeapon* CPedSA::GetWeapon(eWeaponSlot weaponSlot) const
 {
-    return (weaponSlot >= 0 && weaponSlot < WEAPONSLOT_MAX) ? m_pWeapons[weaponSlot] : nullptr;
+    return (weaponSlot >= 0 && weaponSlot < WEAPONSLOT_MAX) ? m_weapons[weaponSlot].get() : nullptr;
 }
 
 void CPedSA::ClearWeapons() noexcept
 {
     // Remove all the weapons
-    for (auto& weapon : m_pWeapons)
+    for (auto& weapon : m_weapons)
     {
         weapon->SetAmmoInClip(0);
         weapon->SetAmmoTotal(0);
         weapon->Remove();
     }
+}
+
+void CPedSA::RemoveWeaponModel(std::uint32_t model)
+{
+    // void __thiscall CPed::RemoveWeaponModel(CPed *this, int modelID)
+    ((void(__thiscall*)(CEntitySAInterface*, std::uint32_t))FUNC_RemoveWeaponModel)(m_pInterface, model);
+}
+
+void CPedSA::ClearWeapon(eWeaponType weaponType)
+{
+    // BYTE *__thiscall CPed::ClearWeapon(CPed *this, eWeaponType a2)
+    ((std::uint8_t * (__thiscall*)(CEntitySAInterface*, eWeaponType)) FUNC_ClearWeapon)(m_pInterface, weaponType);
+}
+
+void CPedSA::SetIsStanding(bool standing)
+{
+    // int __thiscall CPed::SetIsStanding(CPed *this, unsigned __int8 a2)
+    ((void(__thiscall*)(CEntitySAInterface*, bool))FUNC_SetIsStanding)(m_pInterface, standing);
 }
 
 void CPedSA::RestoreLastGoodPhysicsState()
@@ -272,19 +247,19 @@ void CPedSA::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
             RemoveWeaponModel(weaponInfo->GetModel());
     }
 
-    CPedSAInterface* pedInterface = GetPedInterface();
-
     // set the new weapon slot
-    pedInterface->bCurrentWeaponSlot = weaponSlot;
+    GetPedInterface()->bCurrentWeaponSlot = weaponSlot;
 
     // is the player the local player?
-    CPed* localPlayer = pGame->GetPools()->GetPedFromRef(static_cast<DWORD>(1));
+    CPed* localPlayer = pGame->GetPedContext();
+
     std::uintptr_t changeWeaponFunc;
 
     if (localPlayer == this)
     {
         auto* playerInfo = static_cast<CPlayerInfoSA*>(pGame->GetPlayerInfo());
-        playerInfo->GetInterface()->PlayerPedData.m_nChosenWeapon = weaponSlot;
+        if (auto* pInfoInterface = playerInfo->GetInterface())
+            pInfoInterface->PlayerPedData.m_nChosenWeapon = weaponSlot;
 
         // void __thiscall CPlayerPed::MakeChangesForNewWeapon(CPlayerPed *this, int a3)
         changeWeaponFunc = FUNC_MakeChangesForNewWeapon_Slot;
@@ -293,7 +268,7 @@ void CPedSA::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
         // void __thiscall CPed::SetCurrentWeapon(CPed *this, int slot)
         changeWeaponFunc = FUNC_SetCurrentWeapon;
 
-    ((void(__thiscall*)(CEntitySAInterface*, std::uint8_t))changeWeaponFunc)(m_pInterface, static_cast<std::uint8_t>(weaponSlot));
+    ((void(__thiscall*)(CEntitySAInterface*, eWeaponSlot))changeWeaponFunc)(m_pInterface, weaponSlot);
 }
 
 CVector* CPedSA::GetBonePosition(eBone bone, CVector* position)
@@ -305,7 +280,7 @@ CVector* CPedSA::GetBonePosition(eBone bone, CVector* position)
     // for a broken model.
     if (entity->m_pRwObject)
         // int __thiscall CPed::GetBonePosition(CPed *this, CVector *pPoint, int bone_id, bool bDynamic)
-        ((int(__thiscall*)(CEntitySAInterface*, CVector*, std::uint16_t, bool))FUNC_GetBonePosition)(entity, position, bone, true);
+        ((void(__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool))FUNC_GetBonePosition)(entity, position, bone, true);
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
@@ -324,7 +299,7 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* position)
     // for a broken model.
     if (entity->m_pRwObject)
         // RwV3D *__thiscall CPed::GetTransformedBonePosition(CPed *this, RwV3D *pointsIn, int boneId, char bUpdateBones)
-        ((RwV3d*(__thiscall*)(CEntitySAInterface*, CVector*, std::uint16_t, bool))FUNC_GetTransformedBonePosition)(entity, position, bone, true);
+        ((RwV3d*(__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool))FUNC_GetTransformedBonePosition)(entity, position, bone, true);
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
@@ -350,6 +325,12 @@ void CPedSA::ApplySwimAndSlopeRotations()
     g_onlyUpdateRotations = false;
 }
 
+bool CPedSA::IsInWater() const
+{
+    CTask* task = GetPedIntelligence()->GetTaskManager()->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
+    return (task && task->GetTaskType() == TASK_COMPLEX_IN_WATER);
+}
+
 void CPedSA::SetGogglesState(bool isWearingThem)
 {
     // void __thiscall CPed::PutOnGoggles(CPed *this)
@@ -360,13 +341,13 @@ void CPedSA::SetGogglesState(bool isWearingThem)
 
 void CPedSA::SetClothesTextureAndModel(const char* texture, const char* model, int textureType)
 {
-    DWORD* clothes = reinterpret_cast<DWORD*>(GetPedInterface()->pPlayerData->m_pClothes);
+    CPedClothesDesc* clothes = GetPedInterface()->pPlayerData->m_pClothes;
     if (!clothes)
         return;
 
     // int __fastcall CPedClothesDesc::SetTextureAndModel(DWORD* this, int unknown, char* textureName, char* modelName, eClothesTexturePart texturePart)
     // Second argument is unused in CKeyGen::GetUppercaseKey
-    ((int(__fastcall*)(DWORD*, int, const char*, const char*, std::uint8_t))FUNC_CPedClothesDesc__SetTextureAndModel)(clothes, 0, texture, model, textureType);
+    ((void(__fastcall*)(CPedClothesDesc*, int, const char*, const char*, std::uint8_t))FUNC_CPedClothesDesc__SetTextureAndModel)(clothes, 0, texture, model, textureType);
 }
 
 void CPedSA::RebuildPlayer()
@@ -378,42 +359,25 @@ void CPedSA::RebuildPlayer()
 void CPedSA::SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra)
 {
     CPedSAInterface* pedInterface = GetPedInterface();
-    std::uint8_t     newStyle = static_cast<std::uint8_t>(style);
-
-    if (newStyle == pedInterface->bFightingStyle)
+    if (style == pedInterface->bFightingStyle)
         return;
 
-    pedInterface->bFightingStyle = newStyle;
+    pedInterface->bFightingStyle = style;
 
     if (styleExtra > 0 && styleExtra <= 6)
         pedInterface->bFightingStyleExtra |= (1 << (styleExtra - 1));
 }
 
-CEntity* CPedSA::GetContactEntity() const noexcept
+CEntity* CPedSA::GetContactEntity() const
 {
     CEntitySAInterface* contactInterface = GetPedInterface()->pContactEntity;
     if (!contactInterface)
         return nullptr;
 
-    CPools* pools = pGame->GetPools();
-    switch (contactInterface->nType)
-    {
-        case ENTITY_TYPE_VEHICLE:
-        {
-            auto* vehicleClientEntity = pools->GetVehicle(reinterpret_cast<DWORD*>(contactInterface));
-            return vehicleClientEntity ? vehicleClientEntity->pEntity : nullptr;
-        }
-        case ENTITY_TYPE_OBJECT:
-        {
-            auto* objectClientEntity = pools->GetObject(reinterpret_cast<DWORD*>(contactInterface));
-            return objectClientEntity ? objectClientEntity->pEntity : nullptr;
-        }
-        default:
-            break;
-    }
+    return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(contactInterface));
 }
 
-CEntity* CPedSA::GetTargetedEntity() const noexcept
+CEntity* CPedSA::GetTargetedEntity() const
 {
     CEntitySAInterface* targetInterface = GetPedInterface()->pTargetedEntity;
     if (!targetInterface)
@@ -424,44 +388,31 @@ CEntity* CPedSA::GetTargetedEntity() const noexcept
 
 void CPedSA::SetTargetedEntity(CEntity* targetEntity)
 {
-    CEntitySAInterface* targetInterface = nullptr;
-    if (targetEntity)
-    {
-        CEntitySA* entity = dynamic_cast<CEntitySA*>(targetEntity);
-        targetInterface = entity ? entity->GetInterface() : nullptr;
-    }
-
-    GetPedInterface()->pTargetedEntity = targetInterface;
+    GetPedInterface()->pTargetedEntity = targetEntity ? targetEntity->GetInterface() : nullptr;
 }
 
 void CPedSA::RemoveBodyPart(std::uint8_t boneID, std::uint8_t direction)
 {
     // char __thiscall CPed::RemoveBodyPart(CPed *this, int boneID, int localDir)
     // second argument is unused (direction)
-    ((char(__thiscall*)(CEntitySAInterface*, std::uint8_t, std::uint8_t))FUNC_CPed_RemoveBodyPart)(m_pInterface, boneID, direction);
+    ((char(__thiscall*)(CEntitySAInterface*, std::uint8_t, std::uint8_t))FUNC_CPed_RemoveBodyPart)(m_pInterface, boneID, 0);
 }
 
 void CPedSA::SetFootBlood(std::uint32_t footBlood)
 {
     CPedSAInterface* pedInterface = GetPedInterface();
-
-    if (footBlood > 0)
-        // Make sure the foot blood flag is activated
-        pedInterface->pedFlags.bDoBloodyFootprints = true;
-    else if (pedInterface->pedFlags.bDoBloodyFootprints)
-        // If the foot blood flag is activated, deactivate it
-        pedInterface->pedFlags.bDoBloodyFootprints = false;
+    pedInterface->pedFlags.bDoBloodyFootprints = footBlood > 0;
 
     // Set the amount of foot blood
-    pedInterface->dwTimeWhenDead = footBlood;
+    pedInterface->timeWhenDead = footBlood;
 }
 
 std::uint32_t CPedSA::GetFootBlood() const
 {
-    const CPedSAInterface* pedInterface = GetPedInterface();
+    CPedSAInterface* pedInterface = GetPedInterface();
     
     // If the foot blood flag is activated, return the amount of foot blood
-    return pedInterface->pedFlags.bDoBloodyFootprints ? pedInterface->dwTimeWhenDead : 0;
+    return pedInterface->pedFlags.bDoBloodyFootprints ? pedInterface->timeWhenDead : 0;
 }
 
 void CPedSA::SetOnFire(bool onFire)
@@ -501,14 +452,14 @@ void CPedSA::SetOnFire(bool onFire)
 
 void CPedSA::GetVoice(std::int16_t* voiceType, std::int16_t* voiceID) const
 {
-    if (!m_pPedSound)
+    if (!m_pedSound)
         return;
 
     if (voiceType)
-        *voiceType = m_pPedSound->GetVoiceTypeID();
+        *voiceType = m_pedSound->GetVoiceTypeID();
 
     if (voiceID)
-        *voiceID = m_pPedSound->GetVoiceID();
+        *voiceID = m_pedSound->GetVoiceID();
 }
 
 void CPedSA::GetVoice(const char** voiceType, const char** voice) const
@@ -524,11 +475,11 @@ void CPedSA::GetVoice(const char** voiceType, const char** voice) const
 
 void CPedSA::SetVoice(std::int16_t voiceType, std::int16_t voiceID)
 {
-    if (!m_pPedSound)
+    if (!m_pedSound)
         return;
 
-    m_pPedSound->SetVoiceTypeID(voiceType);
-    m_pPedSound->SetVoiceID(voiceID);
+    m_pedSound->SetVoiceTypeID(voiceType);
+    m_pedSound->SetVoiceID(voiceID);
 }
 
 void CPedSA::SetVoice(const char* voiceType, const char* voice)
@@ -545,7 +496,7 @@ void CPedSA::SetVoice(const char* voiceType, const char* voice)
 }
 
 // GetCurrentWeaponStat will only work if the game ped context is currently set to this ped
-CWeaponStat* CPedSA::GetCurrentWeaponStat() const noexcept
+CWeaponStat* CPedSA::GetCurrentWeaponStat() const
 {
     if (pGame->GetPedContext() != this)
     {
@@ -564,13 +515,10 @@ CWeaponStat* CPedSA::GetCurrentWeaponStat() const noexcept
     return pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(weaponType, skill);
 }
 
-float CPedSA::GetCurrentWeaponRange() const noexcept
+float CPedSA::GetCurrentWeaponRange() const
 {
     CWeaponStat* weaponStat = GetCurrentWeaponStat();
-    if (!weaponStat)
-        return 1.0f;
-
-    return weaponStat->GetWeaponRange();
+    return weaponStat ? weaponStat->GetWeaponRange() : 1.0f;
 }
 
 void CPedSA::AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType)
@@ -579,9 +527,9 @@ void CPedSA::AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType)
     ((void(__thiscall*)(CPedWeaponAudioEntitySAInterface*, std::uint16_t))FUNC_CAEPedWeaponAudioEntity__AddAudioEvent)(&GetPedInterface()->weaponAudioEntity, static_cast<std::uint16_t>(audioEventType));
 }
 
-bool CPedSA::IsDoingGangDriveby() const noexcept
+bool CPedSA::IsDoingGangDriveby() const
 {
-    if (!m_pPedIntelligence)
+    if (!m_pedIntelligence)
         return false;
 
     CTask* task = GetPedIntelligence()->GetTaskManager()->GetTask(TASK_PRIORITY_PRIMARY);

@@ -14,6 +14,7 @@
 #include <game/CPedSound.h>
 #include "CAudioEngineSA.h"
 #include "CAEVehicleAudioEntitySA.h"
+#include "CAEWeaponAudioEntitySA.h"
 
 class CPedSAInterface;
 
@@ -34,13 +35,14 @@ class CPedSAInterface;
 
 #define NUM_PED_VOICE_TYPES 5
 
-enum
+enum ePedVoiceType : std::uint16_t
 {
     PED_TYPE_GEN,
     PED_TYPE_EMG,
     PED_TYPE_PLAYER,
     PED_TYPE_GANG,
-    PED_TYPE_GFD
+    PED_TYPE_GFD,
+    PED_TYPE_SPC
 };
 
 #define NUM_GEN_VOICES     209
@@ -58,59 +60,64 @@ typedef struct
 class CPedSoundSAInterface : public CAEAudioEntity
 {
 public:
-    std::uint8_t unk_7C[14];
-    std::int8_t  unk_90;
-    std::uint8_t unk_91;
-    std::int16_t m_sVoiceType;
-    std::int16_t m_sVoiceID;
-    std::int16_t m_bIsFemale;            // 0 = male, 1 = female
-    bool         m_bTalking;
-    bool         m_bDisabled;            // m_bEnableSpeech
-    bool         m_bEnableSpeechForScripts;
-    std::uint8_t m_vocalEnableFlag;
-    std::uint8_t unk_9C[4];            // From 9C to 9F
-    CAESound*    m_pSound;             // CSound*
-    std::int16_t m_soundId;
-    std::int16_t m_bankId;
-    std::int16_t m_pedSpeechSlotIndex;
-    std::uint8_t unk_A4[4];
-    float        m_fVoiceVolume;
-    std::int16_t m_sPhraseId;
-    std::int16_t unk_B2;
-    std::uint8_t unk_B4[76];
+    CAESound*     sounds[5];
+    bool          isInitialised;
+    ePedVoiceType m_sVoiceType;
+    std::uint16_t m_sVoiceID;
+    std::uint16_t m_bIsFemale;
+    bool          m_bTalking;
+    bool          m_bDisabled;
+    bool          m_bDisabledSpeechForScripts;
+    bool          m_bIsFrontend;
+    bool          m_bIsForcedAudible;
+    CAESound*     m_sound;
+    std::int16_t  m_soundId;
+    std::int16_t  m_bankId;
+    std::int16_t  m_pedSpeechSlotIndex;
+    float         m_fVoiceVolume;
+    std::int16_t  m_sPhraseId;
+    std::uint32_t m_nextTimeCanSay[19];
 };
+static_assert(sizeof(CPedSoundSAInterface) == 0x100, "Invalid size for CPedSoundSAInterface");
 
 // CAEPedAudioEntity
 class CPedSoundEntitySAInterface : public CAEAudioEntity
 {
 public:
-    std::uint8_t           unk_7C[24];            // from 7C to 8C
-    CPedSAInterface*       ped;
-    std::uint8_t           unk_98[16];            // from 98 to A8
+    bool canAddEvent;
+
+    std::uint8_t  field_7D;
+    std::int16_t  sfxId;
+    std::uint32_t timeInMS;
+
+    float volume1;
+    float volume2;
+    float volume3;
+    float jetpackSoundSpeedMult;
+
+    CPedSAInterface* ped;
+
+    bool      jetpackSoundPlaying;
+    CAESound* jetpackSound1;
+    CAESound* jetpackSound2;
+    CAESound* jetpackSound3;
+
     CAETwinLoopSoundEntity twinLoopSoundEntity;
-    std::uint8_t           unk_150[12];            // from 150 to 15C
+    CAESound*              field_150;
+
+    std::uint8_t field_154[4];
+    std::uint8_t field_158[4];
 };
+static_assert(sizeof(CPedSoundEntitySAInterface) == 0x15C, "Invalid size for CPedSoundEntitySAInterface");
 
 // CAEPedWeaponAudioEntity
-class CPedWeaponAudioEntitySAInterface : public CAEAudioEntity
+class CPedWeaponAudioEntitySAInterface : public CAEWeaponAudioEntitySAInterface
 {
 public:
-    bool                playedMiniGunFireSound;
-    bool                unk_7D;               // CAEWeaponAudioEntity::PlayMiniGunFireSounds
-    std::uint8_t        unk_7E[2];            // from 7E to 7F
-    std::uint8_t        chainsawSoundState;
-    std::uint8_t        unk_81[3];            // from 81 to 83
-    std::uint32_t       flameThrowerLastPlayedTime;
-    std::uint32_t       spraycanLastPlayedTime;
-    std::uint32_t       extinguisherLastPlayedTime;
-    std::uint32_t       miniGunFireSoundPlayedTime;
-    std::uint32_t       timeChainsaw;
-    std::uint32_t       timeLastFired;
-    void*               sounds;
-    bool                active;
-    std::uint8_t        unk_A1[3];            // from A1 to A3
-    CPedSAInterface*    ped;
+    bool m_bIsInitialised;
+    CPedSAInterface* m_ped;
 };
+static_assert(sizeof(CPedWeaponAudioEntitySAInterface) == 0xA8, "Invalid size for CPedWeaponAudioEntitySAInterface");
 
 class CPedSoundSA : public CPedSound
 {
