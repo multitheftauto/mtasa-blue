@@ -549,15 +549,17 @@ void CPedSA::SetOxygenLevel(float oxygen)
 void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
 {
     // Array of projectiles objects
-    CProjectileSAInterface** projectilesArray = (CProjectileSAInterface**)ARRAY_CProjectile;
-    CProjectileSAInterface*  projectileInterface;
+    auto** projectilesArray = reinterpret_cast<CProjectileSAInterface**>(ARRAY_CProjectile);
+    CProjectileSAInterface*  projectileInterface = nullptr;
 
     // Array of projectiles infos
-    CProjectileInfoSAInterface* projectilesInfoArray = (CProjectileInfoSAInterface*)ARRAY_CProjectileInfo;
-    CProjectileInfoSAInterface* projectileInfoInterface;
+    auto* projectilesInfoArray = reinterpret_cast<CProjectileInfoSAInterface*>(ARRAY_CProjectileInfo);
+    CProjectileInfoSAInterface* projectileInfoInterface = nullptr;
+
+    satchelsList.reserve(PROJECTILE_COUNT);
 
     // Loop through all projectiles
-    for (std::uint8_t i = 0; i < PROJECTILE_COUNT; i++)
+    for (std::size_t i = 0; i < PROJECTILE_COUNT; i++)
     {
         projectileInterface = projectilesArray[i];
 
@@ -573,7 +575,7 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
             continue;
 
         // Push satchel into the array. There is no need to check the counter because for satchels it restarts until the player detonates the charges
-        satchelsList.push_back({projectileInterface, &projectileInterface->m_vecAttachedOffset, &projectileInterface->m_vecAttachedRotation});
+        satchelsList.emplace_back(projectileInterface, &projectileInterface->m_vecAttachedOffset, &projectileInterface->m_vecAttachedRotation);
     }
 }
 

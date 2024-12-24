@@ -175,6 +175,8 @@ struct SSatchelsData
     CProjectileSAInterface* pProjectileInterface;
     CVector*                vecAttachedOffsets;
     CVector*                vecAttachedRotation;
+
+    SSatchelsData(CProjectileSAInterface* proj, CVector* offset, CVector* rotation) : pProjectileInterface(proj), vecAttachedOffsets(offset), vecAttachedRotation(rotation) {}
 };
 
 inline bool IsValidMoveAnim(std::uint32_t iMoveAnim) noexcept
