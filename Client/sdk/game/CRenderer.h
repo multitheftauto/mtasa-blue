@@ -13,11 +13,12 @@
 
 class CModelInfo;
 class CMatrix;
+class CVector;
 
 class CRenderer
 {
 public:
     virtual ~CRenderer() {}
 
-    virtual void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix) = 0;
+    virtual void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting) = 0;
 };

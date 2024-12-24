@@ -19,5 +19,5 @@ public:
     CRendererSA();
     ~CRendererSA();
 
-    void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix) override;
+    void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting) override;
 };
