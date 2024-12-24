@@ -66,7 +66,7 @@ class CPools
 {
 public:
     // Vehicles pool
-    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2) = 0;
+    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, std::uint16_t model, std::uint8_t variation, std::uint8_t variation2) noexcept = 0;
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
@@ -92,8 +92,8 @@ public:
     virtual unsigned long          GetPedCount() = 0;
 
     // Others
-    virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
-                               uchar ucTrackId = 0xFF) = 0;
+    virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> models, bool iDirection,
+                               std::uint8_t ucTrackId = 255) noexcept = 0;
 
     virtual CEntity*       GetEntity(DWORD* pGameInterface) = 0;
     virtual CClientEntity* GetClientEntity(DWORD* pGameInterface) = 0;
