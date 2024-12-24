@@ -13,7 +13,6 @@
 
 class CModelInfo;
 class CMatrix;
-class CVector;
 
 class CRenderer
 {
