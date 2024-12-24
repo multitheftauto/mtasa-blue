@@ -910,6 +910,22 @@ ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
 ADD_ENUM(PreloadAreaOption::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("preload-area-option")
 
+
+IMPLEMENT_ENUM_CLASS_BEGIN(taskType)
+ADD_ENUM(taskType::PRIMARY_TASK, "primary")
+ADD_ENUM(taskType::SECONDARY_TASK, "secondary")
+IMPLEMENT_ENUM_CLASS_END("tasks-types")
+
+IMPLEMENT_ENUM_BEGIN(eEntityType)
+ADD_ENUM(ENTITY_TYPE_NOTHING, "unknown")
+ADD_ENUM(ENTITY_TYPE_BUILDING, "building")
+ADD_ENUM(ENTITY_TYPE_VEHICLE, "vehicle")
+ADD_ENUM(ENTITY_TYPE_PED, "ped")
+ADD_ENUM(ENTITY_TYPE_OBJECT, "object")
+ADD_ENUM(ENTITY_TYPE_DUMMY, "dummy")
+ADD_ENUM(ENTITY_TYPE_NOTINPOOLS, "unknown")
+IMPLEMENT_ENUM_END("entity-type")
+
 //
 // CResource from userdata
 //
@@ -1107,6 +1123,42 @@ void MixedReadMaterialString(CScriptArgReader& argStream, CClientMaterial*& pMat
                 argStream.SetCustomError(strFilePath, "Bad file path");
         }
     }
+}
+
+//
+// Check 4x4 lua table
+//
+bool IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept
+{
+    std::uint32_t cell = 0;
+
+    if (lua_type(luaVM, argIndex) == LUA_TTABLE)
+    {
+        lua_pushnil(luaVM);
+        for (std::uint32_t row = 0; lua_next(luaVM, argIndex) != 0; lua_pop(luaVM, 1), ++row)
+        {
+            if (lua_type(luaVM, -1) != LUA_TTABLE)
+                return false;
+
+            std::uint32_t col = 0;
+
+            lua_pushnil(luaVM);
+            for (; lua_next(luaVM, -2) != 0; lua_pop(luaVM, 1), ++col, ++cell)
+            {
+                int argumentType = lua_type(luaVM, -1);
+                if (argumentType != LUA_TNUMBER && argumentType != LUA_TSTRING)
+                    return false;
+            }
+
+            if (col != 4)
+                return false;
+        }
+    }
+
+    if (cell != 16)
+        return false;
+
+    return true;
 }
 
 //

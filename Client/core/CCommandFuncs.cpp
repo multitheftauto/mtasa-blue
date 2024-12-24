@@ -302,7 +302,6 @@ void CCommandFuncs::Reconnect(const char* szParameters)
     unsigned int uiPort;
 
     CVARS_GET("host", strHost);
-    CVARS_GET("nick", strNick);
     CVARS_GET("password", strPassword);
     CVARS_GET("port", uiPort);
 
@@ -315,7 +314,7 @@ void CCommandFuncs::Reconnect(const char* szParameters)
         // Verify and convert the port number
         if (uiPort <= 0 || uiPort > 0xFFFF)
         {
-            CCore::GetSingleton().GetConsole()->Print(_("connect: Bad port number"));
+            CCore::GetSingleton().GetConsole()->Print(_("reconnect: Bad port number"));
             return;
         }
 
@@ -330,16 +329,16 @@ void CCommandFuncs::Reconnect(const char* szParameters)
         // Start the connect
         if (CCore::GetSingleton().GetConnectManager()->Reconnect(strHost.c_str(), usPort, strPassword.c_str(), false))
         {
-            CCore::GetSingleton().GetConsole()->Printf(_("connect: Connecting to %s:%u..."), strHost.c_str(), usPort);
+            CCore::GetSingleton().GetConsole()->Printf(_("reconnect: Reconnecting to %s:%u..."), strHost.c_str(), usPort);
         }
         else
         {
-            CCore::GetSingleton().GetConsole()->Printf(_("connect: could not connect to %s:%u!"), strHost.c_str(), usPort);
+            CCore::GetSingleton().GetConsole()->Printf(_("reconnect: could not connect to %s:%u!"), strHost.c_str(), usPort);
         }
     }
     else
     {
-        CCore::GetSingleton().GetConsole()->Print("connect: Failed to unload current mod");
+        CCore::GetSingleton().GetConsole()->Print("reconnect: Failed to unload current mod");
     }
 }
 

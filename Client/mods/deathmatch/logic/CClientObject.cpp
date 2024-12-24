@@ -668,7 +668,7 @@ void CClientObject::SetMoveSpeed(const CVector& vecMoveSpeed)
 {
     if (m_pObject)
     {
-        m_pObject->SetMoveSpeed(const_cast<CVector*>(&vecMoveSpeed));
+        m_pObject->SetMoveSpeed(vecMoveSpeed);
     }
     m_vecMoveSpeed = vecMoveSpeed;
 }

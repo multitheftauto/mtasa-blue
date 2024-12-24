@@ -38,25 +38,25 @@ namespace
     bool                       ms_bRegisterdPostCallHook = false;
 }            // namespace
 
-CElementDeleter*           CLuaDefs::m_pElementDeleter = NULL;
-CBlipManager*              CLuaDefs::m_pBlipManager = NULL;
-CHandlingManager*          CLuaDefs::m_pHandlingManager = NULL;
-CLuaManager*               CLuaDefs::m_pLuaManager = NULL;
-CMarkerManager*            CLuaDefs::m_pMarkerManager = NULL;
-CObjectManager*            CLuaDefs::m_pObjectManager = NULL;
-CPickupManager*            CLuaDefs::m_pPickupManager = NULL;
-CPlayerManager*            CLuaDefs::m_pPlayerManager = NULL;
-CRadarAreaManager*         CLuaDefs::m_pRadarAreaManager = NULL;
-CRegisteredCommands*       CLuaDefs::m_pRegisteredCommands;
-CElement*                  CLuaDefs::m_pRootElement = NULL;
-CScriptDebugging*          CLuaDefs::m_pScriptDebugging = NULL;
-CVehicleManager*           CLuaDefs::m_pVehicleManager = NULL;
-CTeamManager*              CLuaDefs::m_pTeamManager = NULL;
-CAccountManager*           CLuaDefs::m_pAccountManager = NULL;
-CColManager*               CLuaDefs::m_pColManager = NULL;
-CResourceManager*          CLuaDefs::m_pResourceManager = NULL;
-CAccessControlListManager* CLuaDefs::m_pACLManager = NULL;
-CMainConfig*               CLuaDefs::m_pMainConfig = NULL;
+CElementDeleter*                  CLuaDefs::m_pElementDeleter = NULL;
+CBlipManager*                     CLuaDefs::m_pBlipManager = NULL;
+CHandlingManager*                 CLuaDefs::m_pHandlingManager = nullptr;
+CLuaManager*                      CLuaDefs::m_pLuaManager = NULL;
+CMarkerManager*                   CLuaDefs::m_pMarkerManager = NULL;
+CObjectManager*                   CLuaDefs::m_pObjectManager = NULL;
+CPickupManager*                   CLuaDefs::m_pPickupManager = NULL;
+CPlayerManager*                   CLuaDefs::m_pPlayerManager = NULL;
+CRadarAreaManager*                CLuaDefs::m_pRadarAreaManager = NULL;
+CRegisteredCommands*              CLuaDefs::m_pRegisteredCommands;
+CElement*                         CLuaDefs::m_pRootElement = NULL;
+CScriptDebugging*                 CLuaDefs::m_pScriptDebugging = NULL;
+CVehicleManager*                  CLuaDefs::m_pVehicleManager = NULL;
+CTeamManager*                     CLuaDefs::m_pTeamManager = NULL;
+CAccountManager*                  CLuaDefs::m_pAccountManager = NULL;
+CColManager*                      CLuaDefs::m_pColManager = NULL;
+CResourceManager*                 CLuaDefs::m_pResourceManager = NULL;
+CAccessControlListManager*        CLuaDefs::m_pACLManager = NULL;
+CMainConfig*                      CLuaDefs::m_pMainConfig = NULL;
 
 void CLuaDefs::Initialize(CGame* pGame)
 {

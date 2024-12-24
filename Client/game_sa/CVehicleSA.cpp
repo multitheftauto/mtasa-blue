@@ -281,6 +281,7 @@ CVehicleSA::~CVehicleSA()
             }
 
             CWorldSA* pWorld = (CWorldSA*)pGame->GetWorld();
+            pGame->GetProjectileInfo()->RemoveEntityReferences(this);
             pWorld->Remove(m_pInterface, CVehicle_Destructor);
             pWorld->RemoveReferencesToDeletedObject(m_pInterface);
 
@@ -297,18 +298,24 @@ CVehicleSA::~CVehicleSA()
     }
 }
 
-void CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CVehicleSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
 {
-    DWORD dwFunc = FUNC_GetMoveSpeed;
-    DWORD dwThis = (DWORD)GetInterface();
-    DWORD dwReturn = 0;
-    _asm
+    try
     {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
+        DWORD dwFunc = FUNC_GetMoveSpeed;
+        DWORD dwThis = (DWORD)GetInterface();
+        DWORD dwReturn = 0;
+        _asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+            mov     dwReturn, eax
+        }
+        MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
     }
-    MemCpyFast((void*)dwReturn, vecMoveSpeed, sizeof(CVector));
+    catch (...)
+    {
+    }
 
     // INACCURATE. Use Get/SetTrainSpeed instead of Get/SetMoveSpeed. (Causes issue #4829).
 #if 0
@@ -1425,16 +1432,20 @@ void CVehicleSA::RecalculateHandling()
             continue;
 
         // If NOS is installed we need set the flag
-        if ((upgradeID >= 1008 && upgradeID <= 1010) && !(uiHandlingFlags & HANDLING_NOS_Flag))
+        if ((upgradeID >= 1008 && upgradeID <= 1010))
         {
-            uiHandlingFlags |= HANDLING_NOS_Flag;
+            if (!(uiHandlingFlags & HANDLING_NOS_Flag))
+                uiHandlingFlags |= HANDLING_NOS_Flag;
+
             nitroInstalled = true;
         }
 
         // If hydraulics is installed we need set the flag
-        if ((upgradeID == 1087) && !(uiHandlingFlags & HANDLING_Hydraulics_Flag))
+        if ((upgradeID == 1087))
         {
-            uiHandlingFlags |= HANDLING_Hydraulics_Flag;
+            if (!(uiHandlingFlags & HANDLING_Hydraulics_Flag))
+                uiHandlingFlags |= HANDLING_Hydraulics_Flag;
+
             hydralicsInstalled = true;
         }
     }
