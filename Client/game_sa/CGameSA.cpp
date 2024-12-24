@@ -71,177 +71,202 @@ unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint
  */
 CGameSA::CGameSA()
 {
-    pGame = this;
-
-    // Find the game version and initialize m_eGameVersion so GetGameVersion() will return the correct value
-    FindGameVersion();
-
-    m_bAsyncScriptEnabled = false;
-    m_bAsyncScriptForced = false;
-    m_bASyncLoadingSuspended = false;
-    m_iCheckStatus = 0;
-
-    const unsigned int modelInfoMax = GetCountOfAllFileIDs();
-    ModelInfo = new CModelInfoSA[modelInfoMax];
-    ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
-
-    SetInitialVirtualProtect();
-
-    // Set the model ids for all the CModelInfoSA instances
-    for (unsigned int i = 0; i < modelInfoMax; i++)
+    try
     {
-        ModelInfo[i].SetModelID(i);
-    }
+        pGame = this;
 
-    // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-    for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
-    {
-        ObjectGroupsInfo[i].SetGroup(i);
-    }
+        // Find the game version and initialize m_eGameVersion so GetGameVersion() will return the correct value
+        FindGameVersion();
 
-    m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
-    m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
-    m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
-    m_pAudioContainer = new CAudioContainerSA();
-    m_pWorld = new CWorldSA();
-    m_pPools = new CPoolsSA();
-    m_pClock = new CClockSA();
-    m_pRadar = new CRadarSA();
-    m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);
-    m_pCoronas = new CCoronasSA();
-    m_pCheckpoints = new CCheckpointsSA();
-    m_pPickups = new CPickupsSA();
-    m_pExplosionManager = new CExplosionManagerSA();
-    m_pHud = new CHudSA();
-    m_pFireManager = new CFireManagerSA();
-    m_p3DMarkers = new C3DMarkersSA();
-    m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
-    m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
-    m_pWeather = new CWeatherSA();
-    m_pStats = new CStatsSA();
-    m_pTaskManagementSystem = new CTaskManagementSystemSA();
-    m_pSettings = new CSettingsSA();
-    m_pCarEnterExit = new CCarEnterExitSA();
-    m_pControllerConfigManager = new CControllerConfigManagerSA();
-    m_pProjectileInfo = new CProjectileInfoSA();
-    m_pRenderWare = new CRenderWareSA();
-    m_pHandlingManager = new CHandlingManagerSA();
-    m_pEventList = new CEventListSA();
-    m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
-    m_pTasks = new CTasksSA((CTaskManagementSystemSA*)m_pTaskManagementSystem);
-    m_pAnimManager = new CAnimManagerSA;
-    m_pStreaming = new CStreamingSA;
-    m_pVisibilityPlugins = new CVisibilityPluginsSA;
-    m_pKeyGen = new CKeyGenSA;
-    m_pRopes = new CRopesSA;
-    m_pFx = new CFxSA((CFxSAInterface*)CLASS_CFx);
-    m_pFxManager = new CFxManagerSA((CFxManagerSAInterface*)CLASS_CFxManager);
-    m_pWaterManager = new CWaterManagerSA();
-    m_pWeaponStatsManager = new CWeaponStatManagerSA();
-    m_pPointLights = new CPointLightsSA();
-    m_collisionStore = new CColStoreSA();
-    m_pIplStore = new CIplStoreSA();
-    m_pCoverManager = new CCoverManagerSA();
-    m_pPlantManager = new CPlantManagerSA();
-    m_pBuildingRemoval = new CBuildingRemovalSA();
+        m_bAsyncScriptEnabled = false;
+        m_bAsyncScriptForced = false;
+        m_bASyncLoadingSuspended = false;
+        m_iCheckStatus = 0;
 
-    m_pRenderer = std::make_unique<CRendererSA>();
+        const unsigned int modelInfoMax = GetCountOfAllFileIDs();
+        ModelInfo = new CModelInfoSA[modelInfoMax];
+        ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
-    // Normal weapon types (WEAPONSKILL_STD)
-    for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
-    {
-        eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
-        WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface*)(ARRAY_WeaponInfo + i * CLASSSIZE_WeaponInfo), weaponType);
-        m_pWeaponStatsManager->CreateWeaponStat(WeaponInfos[i], (eWeaponType)(weaponType - WEAPONTYPE_PISTOL), WEAPONSKILL_STD);
-    }
+        SetInitialVirtualProtect();
 
-    // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
-    int          index;
-    eWeaponSkill weaponSkill = eWeaponSkill::WEAPONSKILL_POOR;
-    for (int skill = 0; skill < 3; skill++)
-    {
-        // STD is created first, then it creates "extra weapon types" (poor, pro, special?) but in the enum 1 = STD which meant the STD weapon skill contained
-        // pro info
-        if (skill >= 1)
+        // Set the model ids for all the CModelInfoSA instances
+        for (unsigned int i = 0; i < modelInfoMax; i++)
         {
-            if (skill == 1)
-            {
-                weaponSkill = eWeaponSkill::WEAPONSKILL_PRO;
-            }
-            if (skill == 2)
-            {
-                weaponSkill = eWeaponSkill::WEAPONSKILL_SPECIAL;
-            }
+            ModelInfo[i].SetModelID(i);
         }
-        for (int i = 0; i < NUM_WeaponInfosOtherSkill; i++)
+
+        // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
+        for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+        {
+            ObjectGroupsInfo[i].SetGroup(i);
+        }
+
+        m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
+        m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
+        m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
+        m_pAudioContainer = new CAudioContainerSA();
+        m_pWorld = new CWorldSA();
+        m_Pools = std::make_unique<CPoolsSA>();
+        m_pClock = new CClockSA();
+        m_pRadar = new CRadarSA();
+        m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);
+        m_pCoronas = new CCoronasSA();
+        m_pCheckpoints = new CCheckpointsSA();
+        m_pPickups = new CPickupsSA();
+        m_pExplosionManager = new CExplosionManagerSA();
+        m_pHud = new CHudSA();
+        m_pFireManager = new CFireManagerSA();
+        m_p3DMarkers = new C3DMarkersSA();
+        m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
+        m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
+        m_pWeather = new CWeatherSA();
+        m_pStats = new CStatsSA();
+        m_pTaskManagementSystem = new CTaskManagementSystemSA();
+        m_pSettings = new CSettingsSA();
+        m_pCarEnterExit = new CCarEnterExitSA();
+        m_pControllerConfigManager = new CControllerConfigManagerSA();
+        m_pProjectileInfo = new CProjectileInfoSA();
+        m_pRenderWare = new CRenderWareSA();
+        m_HandlingManager = std::make_unique<CHandlingManagerSA>();
+        m_pEventList = new CEventListSA();
+        m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
+        m_pTasks = new CTasksSA((CTaskManagementSystemSA*)m_pTaskManagementSystem);
+        m_pAnimManager = new CAnimManagerSA;
+        m_pStreaming = new CStreamingSA;
+        m_pVisibilityPlugins = new CVisibilityPluginsSA;
+        m_pKeyGen = new CKeyGenSA;
+        m_pRopes = new CRopesSA;
+        m_pFx = new CFxSA((CFxSAInterface*)CLASS_CFx);
+        m_pFxManager = new CFxManagerSA((CFxManagerSAInterface*)CLASS_CFxManager);
+        m_pWaterManager = new CWaterManagerSA();
+        m_pWeaponStatsManager = new CWeaponStatManagerSA();
+        m_pPointLights = new CPointLightsSA();
+        m_collisionStore = new CColStoreSA();
+        m_pIplStore = new CIplStoreSA();
+        m_pCoverManager = new CCoverManagerSA();
+        m_pPlantManager = new CPlantManagerSA();
+        m_pBuildingRemoval = new CBuildingRemovalSA();
+
+        m_pRenderer = std::make_unique<CRendererSA>();
+
+        // Normal weapon types (WEAPONSKILL_STD)
+        for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
         {
             eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
-            index = NUM_WeaponInfosStdSkill + skill * NUM_WeaponInfosOtherSkill + i;
-            WeaponInfos[index] = new CWeaponInfoSA((CWeaponInfoSAInterface*)(ARRAY_WeaponInfo + index * CLASSSIZE_WeaponInfo), weaponType);
-            m_pWeaponStatsManager->CreateWeaponStat(WeaponInfos[index], weaponType, weaponSkill);
+            WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface*)(ARRAY_WeaponInfo + i * CLASSSIZE_WeaponInfo), weaponType);
+            m_pWeaponStatsManager->CreateWeaponStat(WeaponInfos[i], (eWeaponType)(weaponType - WEAPONTYPE_PISTOL), WEAPONSKILL_STD);
         }
+
+        // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
+        int          index;
+        eWeaponSkill weaponSkill = eWeaponSkill::WEAPONSKILL_POOR;
+        for (int skill = 0; skill < 3; skill++)
+        {
+            // STD is created first, then it creates "extra weapon types" (poor, pro, special?) but in the enum 1 = STD which meant the STD weapon skill
+            // contained pro info
+            if (skill >= 1)
+            {
+                if (skill == 1)
+                {
+                    weaponSkill = eWeaponSkill::WEAPONSKILL_PRO;
+                }
+                if (skill == 2)
+                {
+                    weaponSkill = eWeaponSkill::WEAPONSKILL_SPECIAL;
+                }
+            }
+            for (int i = 0; i < NUM_WeaponInfosOtherSkill; i++)
+            {
+                eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
+                index = NUM_WeaponInfosStdSkill + skill * NUM_WeaponInfosOtherSkill + i;
+                WeaponInfos[index] = new CWeaponInfoSA((CWeaponInfoSAInterface*)(ARRAY_WeaponInfo + index * CLASSSIZE_WeaponInfo), weaponType);
+                m_pWeaponStatsManager->CreateWeaponStat(WeaponInfos[index], weaponType, weaponSkill);
+            }
+        }
+
+        m_pPlayerInfo = new CPlayerInfoSA((CPlayerInfoSAInterface*)CLASS_CPlayerInfo);
+
+        // Init cheat name => address map
+        m_Cheats[CHEAT_HOVERINGCARS] = new SCheatSA((BYTE*)VAR_HoveringCarsEnabled);
+        m_Cheats[CHEAT_FLYINGCARS] = new SCheatSA((BYTE*)VAR_FlyingCarsEnabled);
+        m_Cheats[CHEAT_EXTRABUNNYHOP] = new SCheatSA((BYTE*)VAR_ExtraBunnyhopEnabled);
+        m_Cheats[CHEAT_EXTRAJUMP] = new SCheatSA((BYTE*)VAR_ExtraJumpEnabled);
+
+        // New cheats for Anticheat
+        m_Cheats[CHEAT_TANKMODE] = new SCheatSA((BYTE*)VAR_TankModeEnabled, false);
+        m_Cheats[CHEAT_NORELOAD] = new SCheatSA((BYTE*)VAR_NoReloadEnabled, false);
+        m_Cheats[CHEAT_PERFECTHANDLING] = new SCheatSA((BYTE*)VAR_PerfectHandling, false);
+        m_Cheats[CHEAT_ALLCARSHAVENITRO] = new SCheatSA((BYTE*)VAR_AllCarsHaveNitro, false);
+        m_Cheats[CHEAT_BOATSCANFLY] = new SCheatSA((BYTE*)VAR_BoatsCanFly, false);
+        m_Cheats[CHEAT_INFINITEOXYGEN] = new SCheatSA((BYTE*)VAR_InfiniteOxygen, false);
+        m_Cheats[CHEAT_WALKUNDERWATER] = new SCheatSA((BYTE*)VAR_WalkUnderwater, false);
+        m_Cheats[CHEAT_FASTERCLOCK] = new SCheatSA((BYTE*)VAR_FasterClock, false);
+        m_Cheats[CHEAT_FASTERGAMEPLAY] = new SCheatSA((BYTE*)VAR_FasterGameplay, false);
+        m_Cheats[CHEAT_SLOWERGAMEPLAY] = new SCheatSA((BYTE*)VAR_SlowerGameplay, false);
+        m_Cheats[CHEAT_ALWAYSMIDNIGHT] = new SCheatSA((BYTE*)VAR_AlwaysMidnight, false);
+        m_Cheats[CHEAT_FULLWEAPONAIMING] = new SCheatSA((BYTE*)VAR_FullWeaponAiming, false);
+        m_Cheats[CHEAT_INFINITEHEALTH] = new SCheatSA((BYTE*)VAR_InfiniteHealth, false);
+        m_Cheats[CHEAT_NEVERWANTED] = new SCheatSA((BYTE*)VAR_NeverWanted, false);
+        m_Cheats[CHEAT_HEALTARMORMONEY] = new SCheatSA((BYTE*)VAR_HealthArmorMoney, false);
+
+        // Change pool sizes here
+        m_Pools->SetPoolCapacity(TASK_POOL, 5000);                                               // Default is 500
+        m_Pools->SetPoolCapacity(OBJECT_POOL, MAX_OBJECTS);                                      // Default is 350
+        m_Pools->SetPoolCapacity(EVENT_POOL, 5000);                                              // Default is 200
+        m_Pools->SetPoolCapacity(COL_MODEL_POOL, 12000);                                         // Default is 10150
+        m_Pools->SetPoolCapacity(ENV_MAP_MATERIAL_POOL, 16000);                                  // Default is 4096
+        m_Pools->SetPoolCapacity(ENV_MAP_ATOMIC_POOL, 4000);                                     // Default is 1024
+        m_Pools->SetPoolCapacity(SPEC_MAP_MATERIAL_POOL, 16000);                                 // Default is 4096
+        m_Pools->SetPoolCapacity(ENTRY_INFO_NODE_POOL, MAX_ENTRY_INFO_NODES);                    // Default is 500
+        m_Pools->SetPoolCapacity(POINTER_SINGLE_LINK_POOL, MAX_POINTER_SINGLE_LINKS);            // Default is 70000
+        m_Pools->SetPoolCapacity(POINTER_DOUBLE_LINK_POOL, MAX_POINTER_DOUBLE_LINKS);            // Default is 3200
+        dassert(m_Pools->GetPoolCapacity(POINTER_SINGLE_LINK_POOL) == MAX_POINTER_SINGLE_LINKS);
+
+        // Increase streaming object instances list size
+        MemPut<WORD>(0x05B8E55, MAX_RWOBJECT_INSTANCES * 12);            // Default is 1000 * 12
+        MemPut<WORD>(0x05B8EB0, MAX_RWOBJECT_INSTANCES * 12);            // Default is 1000 * 12
+
+        // Increase matrix array size
+        MemPut<int>(0x054F3A1, MAX_OBJECTS * 3);            // Default is 900
+
+        CEntitySAInterface::StaticSetHooks();
+        CPhysicalSAInterface::StaticSetHooks();
+        CObjectSA::StaticSetHooks();
+        CModelInfoSA::StaticSetHooks();
+        CPlayerPedSA::StaticSetHooks();
+        CRenderWareSA::StaticSetHooks();
+        CRenderWareSA::StaticSetClothesReplacingHooks();
+        CTasksSA::StaticSetHooks();
+        CPedSA::StaticSetHooks();
+        CSettingsSA::StaticSetHooks();
+        CFxSystemSA::StaticSetHooks();
+        CFileLoaderSA::StaticSetHooks();
+        D3DResourceSystemSA::StaticSetHooks();
+        CVehicleSA::StaticSetHooks();
+        CCheckpointSA::StaticSetHooks();
     }
+    catch (const std::bad_alloc& e)
+    {
+        std::string error = _("Failed initialization game_sa");
+        error += "\n";
+        error += _("Memory allocations failed");
+        error += ": ";
+        error += e.what();
 
-    m_pPlayerInfo = new CPlayerInfoSA((CPlayerInfoSAInterface*)CLASS_CPlayerInfo);
+        MessageBoxUTF8(nullptr, error.c_str(), _("Error"), MB_ICONERROR | MB_OK);
+        ExitProcess(EXIT_FAILURE);
+    }
+    catch (const std::exception& e)
+    {
+        std::string error = _("Failed initialization game_sa");
+        error += "\n";
+        error += _("Information");
+        error += ": ";
+        error += e.what();
 
-    // Init cheat name => address map
-    m_Cheats[CHEAT_HOVERINGCARS] = new SCheatSA((BYTE*)VAR_HoveringCarsEnabled);
-    m_Cheats[CHEAT_FLYINGCARS] = new SCheatSA((BYTE*)VAR_FlyingCarsEnabled);
-    m_Cheats[CHEAT_EXTRABUNNYHOP] = new SCheatSA((BYTE*)VAR_ExtraBunnyhopEnabled);
-    m_Cheats[CHEAT_EXTRAJUMP] = new SCheatSA((BYTE*)VAR_ExtraJumpEnabled);
-
-    // New cheats for Anticheat
-    m_Cheats[CHEAT_TANKMODE] = new SCheatSA((BYTE*)VAR_TankModeEnabled, false);
-    m_Cheats[CHEAT_NORELOAD] = new SCheatSA((BYTE*)VAR_NoReloadEnabled, false);
-    m_Cheats[CHEAT_PERFECTHANDLING] = new SCheatSA((BYTE*)VAR_PerfectHandling, false);
-    m_Cheats[CHEAT_ALLCARSHAVENITRO] = new SCheatSA((BYTE*)VAR_AllCarsHaveNitro, false);
-    m_Cheats[CHEAT_BOATSCANFLY] = new SCheatSA((BYTE*)VAR_BoatsCanFly, false);
-    m_Cheats[CHEAT_INFINITEOXYGEN] = new SCheatSA((BYTE*)VAR_InfiniteOxygen, false);
-    m_Cheats[CHEAT_WALKUNDERWATER] = new SCheatSA((BYTE*)VAR_WalkUnderwater, false);
-    m_Cheats[CHEAT_FASTERCLOCK] = new SCheatSA((BYTE*)VAR_FasterClock, false);
-    m_Cheats[CHEAT_FASTERGAMEPLAY] = new SCheatSA((BYTE*)VAR_FasterGameplay, false);
-    m_Cheats[CHEAT_SLOWERGAMEPLAY] = new SCheatSA((BYTE*)VAR_SlowerGameplay, false);
-    m_Cheats[CHEAT_ALWAYSMIDNIGHT] = new SCheatSA((BYTE*)VAR_AlwaysMidnight, false);
-    m_Cheats[CHEAT_FULLWEAPONAIMING] = new SCheatSA((BYTE*)VAR_FullWeaponAiming, false);
-    m_Cheats[CHEAT_INFINITEHEALTH] = new SCheatSA((BYTE*)VAR_InfiniteHealth, false);
-    m_Cheats[CHEAT_NEVERWANTED] = new SCheatSA((BYTE*)VAR_NeverWanted, false);
-    m_Cheats[CHEAT_HEALTARMORMONEY] = new SCheatSA((BYTE*)VAR_HealthArmorMoney, false);
-
-    // Change pool sizes here
-    m_pPools->SetPoolCapacity(TASK_POOL, 5000);                                               // Default is 500
-    m_pPools->SetPoolCapacity(OBJECT_POOL, MAX_OBJECTS);                                      // Default is 350
-    m_pPools->SetPoolCapacity(EVENT_POOL, 5000);                                              // Default is 200
-    m_pPools->SetPoolCapacity(COL_MODEL_POOL, 12000);                                         // Default is 10150
-    m_pPools->SetPoolCapacity(ENV_MAP_MATERIAL_POOL, 16000);                                  // Default is 4096
-    m_pPools->SetPoolCapacity(ENV_MAP_ATOMIC_POOL, 4000);                                     // Default is 1024
-    m_pPools->SetPoolCapacity(SPEC_MAP_MATERIAL_POOL, 16000);                                 // Default is 4096
-    m_pPools->SetPoolCapacity(ENTRY_INFO_NODE_POOL, MAX_ENTRY_INFO_NODES);                    // Default is 500
-    m_pPools->SetPoolCapacity(POINTER_SINGLE_LINK_POOL, MAX_POINTER_SINGLE_LINKS);            // Default is 70000
-    m_pPools->SetPoolCapacity(POINTER_DOUBLE_LINK_POOL, MAX_POINTER_DOUBLE_LINKS);            // Default is 3200
-    dassert(m_pPools->GetPoolCapacity(POINTER_SINGLE_LINK_POOL) == MAX_POINTER_SINGLE_LINKS);
-
-    // Increase streaming object instances list size
-    MemPut<WORD>(0x05B8E55, MAX_RWOBJECT_INSTANCES * 12);            // Default is 1000 * 12
-    MemPut<WORD>(0x05B8EB0, MAX_RWOBJECT_INSTANCES * 12);            // Default is 1000 * 12
-
-    // Increase matrix array size
-    MemPut<int>(0x054F3A1, MAX_OBJECTS * 3);            // Default is 900
-
-    CEntitySAInterface::StaticSetHooks();
-    CPhysicalSAInterface::StaticSetHooks();
-    CObjectSA::StaticSetHooks();
-    CModelInfoSA::StaticSetHooks();
-    CPlayerPedSA::StaticSetHooks();
-    CRenderWareSA::StaticSetHooks();
-    CRenderWareSA::StaticSetClothesReplacingHooks();
-    CTasksSA::StaticSetHooks();
-    CPedSA::StaticSetHooks();
-    CSettingsSA::StaticSetHooks();
-    CFxSystemSA::StaticSetHooks();
-    CFileLoaderSA::StaticSetHooks();
-    D3DResourceSystemSA::StaticSetHooks();
-    CVehicleSA::StaticSetHooks();
-    CCheckpointSA::StaticSetHooks();
+        MessageBoxUTF8(nullptr, error, _("Error"), MB_ICONERROR | MB_OK);
+        ExitProcess(EXIT_FAILURE);
+    }
 }
 
 CGameSA::~CGameSA()
@@ -261,7 +286,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAnimManagerSA*>(m_pAnimManager);
     delete reinterpret_cast<CTasksSA*>(m_pTasks);
     delete reinterpret_cast<CTaskManagementSystemSA*>(m_pTaskManagementSystem);
-    delete reinterpret_cast<CHandlingManagerSA*>(m_pHandlingManager);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
@@ -276,7 +300,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CCameraSA*>(m_pCamera);
     delete reinterpret_cast<CRadarSA*>(m_pRadar);
     delete reinterpret_cast<CClockSA*>(m_pClock);
-    delete reinterpret_cast<CPoolsSA*>(m_pPools);
     delete reinterpret_cast<CWorldSA*>(m_pWorld);
     delete reinterpret_cast<CAudioEngineSA*>(m_pAudioEngine);
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
@@ -848,6 +871,34 @@ void CGameSA::SetRoadSignsTextEnabled(bool isEnabled)
     m_isRoadSignsTextEnabled = isEnabled;
 }
 
+void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isIgnoreFireStateEnabled)
+        return;
+
+    if (isEnabled)
+    {
+        MemSet((void*)0x6511B9, 0x90, 10);            // CCarEnterExit::IsVehicleStealable
+        MemSet((void*)0x643A95, 0x90, 14);            // CTaskComplexEnterCar::CreateFirstSubTask
+        MemSet((void*)0x6900B5, 0x90, 14);            // CTaskComplexCopInCar::ControlSubTask
+        MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter
+
+        MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon
+    }
+    else
+    {
+        // Restore original bytes
+        MemCpy((void*)0x6511B9, "\x88\x86\x90\x04\x00\x00\x85\xC0\x75\x3E", 10);
+        MemCpy((void*)0x643A95, "\x8B\x88\x90\x04\x00\x00\x85\xC9\x0F\x85\x99\x01\x00\x00", 14);
+        MemCpy((void*)0x6900B5, "\x8B\x81\x90\x04\x00\x00\x85\xC0\x0F\x85\x1A\x01\x00\x00", 14);
+        MemCpy((void*)0x64F3DB, "\x8B\x85\x90\x04\x00\x00\x85\xC0\x0F\x85\x1B\x01\x00\x00", 14);
+
+        MemCpy((void*)0x685A7F, "\x8B\x86\x30\x07\x00\x00\x85\xC0\x0F\x85\x1D\x01\x00\x00", 14);
+    }
+
+    m_isIgnoreFireStateEnabled = isEnabled;
+}
+
 bool CGameSA::PerformChecks()
 {
     std::map<std::string, SCheatSA*>::iterator it;
@@ -1011,8 +1062,8 @@ void CGameSA::RemoveAllBuildings()
 {
     m_pIplStore->SetDynamicIplStreamingEnabled(false);
 
-    m_pPools->GetDummyPool().RemoveAllBuildingLods();
-    m_pPools->GetBuildingsPool().RemoveAllBuildings();
+    m_Pools->GetDummyPool().RemoveAllBuildingLods();
+    m_Pools->GetBuildingsPool().RemoveAllBuildings();
 
     auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
     pBuildingRemoval->DropCaches();
@@ -1022,8 +1073,8 @@ void CGameSA::RemoveAllBuildings()
 
 void CGameSA::RestoreGameBuildings()
 {
-    m_pPools->GetBuildingsPool().RestoreAllBuildings();
-    m_pPools->GetDummyPool().RestoreAllBuildingsLods();
+    m_Pools->GetBuildingsPool().RestoreAllBuildings();
+    m_Pools->GetDummyPool().RestoreAllBuildingsLods();
 
     m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
     m_isBuildingsRemoved = false;
@@ -1041,7 +1092,7 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
         static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
     }
 
-    bool status = m_pPools->GetBuildingsPool().Resize(size);
+    bool status = m_Pools->GetBuildingsPool().Resize(size);
 
     if (shouldRemoveBuilding)
     {

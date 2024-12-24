@@ -376,7 +376,7 @@ void CSettings::CreateGUI()
     m_pButtonGenerateNickIcon->SetProperty("DistributeCapturedInputs", "True");
 
     m_pSavePasswords = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save server passwords"), true));
-    m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 50.0f));
+    m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 35.0f));
     m_pSavePasswords->GetPosition(vecTemp, false);
     m_pSavePasswords->AutoSize(NULL, 20.0f);
 
@@ -411,10 +411,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
 
     m_pMapRenderingLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Map rendering options")));
-    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pMapRenderingLabel->GetPosition(vecTemp, false);
     m_pMapRenderingLabel->SetFont("default-bold-small");
     m_pMapRenderingLabel->AutoSize();
+
+    vecTemp.fX += 5.0f;
 
     m_pMapAlphaLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Opacity:")));
     m_pMapAlphaLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 24.0f));
@@ -432,6 +434,20 @@ void CSettings::CreateGUI()
     m_pMapAlphaValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pMapAlphaValueLabel->GetPosition(vecTemp, false);
     m_pMapAlphaValueLabel->AutoSize("100%");
+
+    m_pMapAlphaLabel->GetPosition(vecTemp, false);
+    vecTemp.fY += 24.0f;
+
+    m_pPlayerMapImageLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Image resolution:")));
+    m_pPlayerMapImageLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 2.0f));
+    m_pPlayerMapImageLabel->AutoSize();
+
+    m_pPlayerMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabMultiplayer, ""));
+    m_pPlayerMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
+    m_pPlayerMapImageCombo->SetSize(CVector2D(170.f, 95.0f));
+    m_pPlayerMapImageCombo->AddItem(_("1024 x 1024 (Default)"));            // index 0
+    m_pPlayerMapImageCombo->AddItem(_("2048 x 2048"));                      // index 1
+    m_pPlayerMapImageCombo->SetReadOnly(true);
 
     /**
      *  Audio tab
@@ -625,16 +641,13 @@ void CSettings::CreateGUI()
      *  Video tab
      **/
     fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Resolution:"), _("FOV:"), _("Draw Distance:"), _("Brightness:"), _("FX Quality:"),
-                                               _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"), _("Opacity:"));
+                                               _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"));
 
-    m_pVideoGeneralLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("General")));
-    m_pVideoGeneralLabel->SetPosition(CVector2D(11, 13));
-    m_pVideoGeneralLabel->GetPosition(vecTemp, false);
-    m_pVideoGeneralLabel->AutoSize(NULL, 3.0f);
-    m_pVideoGeneralLabel->SetFont("default-bold-small");
+    vecTemp.fX = 11.0f;
+    vecTemp.fY = 13.0f;
 
     m_pVideoResolutionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Resolution:")));
-    m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
+    m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pVideoResolutionLabel->GetPosition(vecTemp, false);
     m_pVideoResolutionLabel->AutoSize();
 
@@ -833,6 +846,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
     m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 150.0f));
+    m_pCheckBoxCoronaReflections->AutoSize(nullptr, 20.0f);
+
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
     m_pCheckBoxMinimize->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 30.0f));
@@ -878,10 +895,6 @@ void CSettings::CreateGUI()
     m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
     m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
-    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
-    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
-
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -916,6 +929,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxRemoteJavascript->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pCheckBoxRemoteJavascript->GetPosition(vecTemp);
     m_pCheckBoxRemoteJavascript->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxBrowserGPUEnabled = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable GPU rendering"), true));
+    m_pCheckBoxBrowserGPUEnabled->SetPosition(CVector2D(vecTemp.fX + 300.0f, vecTemp.fY - 25.0f));
+    m_pCheckBoxBrowserGPUEnabled->AutoSize(NULL, 20.0f);
 
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
@@ -1006,6 +1023,7 @@ void CSettings::CreateGUI()
                5.0f;
 
     vecTemp.fX += 10.0f;
+
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
     m_pFastClothesLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
@@ -1234,7 +1252,7 @@ void CSettings::CreateGUI()
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY = 354 + 10;
+    vecTemp.fY += 15.0f;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
@@ -1625,12 +1643,17 @@ void CSettings::UpdateVideoTab()
     float fPos = SharedUtil::Unlerp(g_pCore->GetMinStreamingMemory(), uiStreamingMemory, g_pCore->GetMaxStreamingMemory());
     m_pStreamingMemory->SetScrollPosition(fPos);
 
+    // Player map alpha
     int iVar = 0;
     CVARS_GET("mapalpha", iVar);
     int iAlphaPercent = ceil(((float)Clamp(0, iVar, 255) / 255) * 100);
     m_pMapAlphaValueLabel->SetText(SString("%i%%", iAlphaPercent).c_str());
     float sbPos = (float)iAlphaPercent / 100.0f;
     m_pMapAlpha->SetScrollPosition(sbPos);
+
+    // Player map image
+    CVARS_GET("mapimage", iVar);
+    m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
 //
@@ -1847,7 +1870,9 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 
     CVARS_SET("streaming_memory", g_pCore->GetMaxStreamingMemory());
 
+    // Player map defaults
     CVARS_SET("mapalpha", 155);
+    CVARS_SET("mapimage", 0);
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing() != m_pComboAntiAliasing->GetSelectedItemIndex();
@@ -3287,6 +3312,8 @@ void CSettings::LoadData()
     m_pCheckBoxRemoteBrowser->SetSelected(bVar);
     CVARS_GET("browser_remote_javascript", bVar);
     m_pCheckBoxRemoteJavascript->SetSelected(bVar);
+    CVARS_GET("browser_enable_gpu", bVar);
+    m_pCheckBoxBrowserGPUEnabled->SetSelected(bVar);
 
     ReloadBrowserLists();
 }
@@ -3603,11 +3630,15 @@ void CSettings::SaveData()
         CVARS_SET("update_auto_install", iSelected);
     }
 
-    // Map alpha
+    // Player map alpha
     SString sText = m_pMapAlphaValueLabel->GetText();
-
     float fMapAlpha = ((atof(sText.substr(0, sText.length() - 1).c_str())) / 100) * 255;
     CVARS_SET("mapalpha", fMapAlpha);
+
+    // Player map image
+    int selectedComboIndex = m_pPlayerMapImageCombo->GetSelectedItemIndex();
+    if (selectedComboIndex != -1)
+        CVARS_SET("mapimage", selectedComboIndex);
 
     // Language
     CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem();
@@ -3711,6 +3742,13 @@ void CSettings::SaveData()
             bBrowserSettingChanged = true;
     }
 
+    bool bBrowserGPUEnabled = false;
+    CVARS_GET("browser_enable_gpu", bBrowserGPUEnabled);
+
+    bool bBrowserGPUSetting = m_pCheckBoxBrowserGPUEnabled->GetSelected();
+    bool bBrowserGPUSettingChanged = (bBrowserGPUSetting != bBrowserGPUEnabled);
+    CVARS_SET("browser_enable_gpu", bBrowserGPUSetting);
+
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues();
 
@@ -3720,7 +3758,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
