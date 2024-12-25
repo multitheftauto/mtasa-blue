@@ -167,7 +167,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_pUnoccupiedVehicleSync = NULL;
     m_pConsole = NULL;
     m_pMapManager = NULL;
-    m_pHandlingManager = NULL;
+    m_HandlingManager = nullptr;
     m_pLuaManager = NULL;
     m_pPacketTranslator = NULL;
     m_pMarkerManager = NULL;
@@ -345,9 +345,12 @@ CGame::~CGame()
     CSimControl::EnableSimSystem(false);
 
     // Disconnect all players
-    std::list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); iter++)
-        DisconnectPlayer(this, **iter, CPlayerDisconnectedPacket::SHUTDOWN);
+    if (m_pPlayerManager)
+    {
+        std::list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
+        for (; iter != m_pPlayerManager->IterEnd(); iter++)
+            DisconnectPlayer(this, **iter, CPlayerDisconnectedPacket::SHUTDOWN);
+    }
 
     // Stop networking
     Stop();
@@ -374,7 +377,6 @@ CGame::~CGame()
     SAFE_DELETE(m_pRadarAreaManager);
     SAFE_DELETE(m_pPlayerManager);
     SAFE_DELETE(m_pVehicleManager);
-    SAFE_DELETE(m_pHandlingManager);
     SAFE_DELETE(m_pPickupManager);
     SAFE_DELETE(m_pObjectManager);
     SAFE_DELETE(m_pColManager);
@@ -581,43 +583,57 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     CElement::StartupEntitiesFromRoot();
 
     CSimControl::Startup();
-    m_pGroups = new CGroups;
-    m_pClock = new CClock;
-    m_pBlipManager = new CBlipManager;
-    m_pColManager = new CColManager;
-    m_pObjectManager = new CObjectManager;
-    m_pPickupManager = new CPickupManager(m_pColManager);
-    m_pPlayerManager = new CPlayerManager;
-    m_pRadarAreaManager = new CRadarAreaManager;
-    m_pMarkerManager = new CMarkerManager(m_pColManager);
-    m_pHandlingManager = new CHandlingManager;
-    m_pVehicleManager = new CVehicleManager;
-    m_pPacketTranslator = new CPacketTranslator(m_pPlayerManager);
-    m_pBanManager = new CBanManager;
-    m_pTeamManager = new CTeamManager;
-    m_pPedManager = new CPedManager;
-    m_pWaterManager = new CWaterManager;
-    m_pScriptDebugging = new CScriptDebugging();
-    m_pMapManager =
-        new CMapManager(m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager,
-                        m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter);
-    m_pACLManager = new CAccessControlListManager;
-    m_pHqComms = new CHqComms;
 
-    m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
-    m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
-                                    m_pMapManager, &m_Events);
-    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pBanManager, m_pACLManager);
-    m_pMainConfig = new CMainConfig(m_pConsole);
-    m_pRPCFunctions = new CRPCFunctions;
+    try
+    {
+        m_pGroups = new CGroups;
+        m_pClock = new CClock;
+        m_pBlipManager = new CBlipManager;
+        m_pColManager = new CColManager;
+        m_pObjectManager = new CObjectManager;
+        m_pPickupManager = new CPickupManager(m_pColManager);
+        m_pPlayerManager = new CPlayerManager;
+        m_pRadarAreaManager = new CRadarAreaManager;
+        m_pMarkerManager = new CMarkerManager(m_pColManager);
+        m_HandlingManager = std::make_unique<CHandlingManager>();
+        m_pVehicleManager = new CVehicleManager;
+        m_pPacketTranslator = new CPacketTranslator(m_pPlayerManager);
+        m_pBanManager = new CBanManager;
+        m_pTeamManager = new CTeamManager;
+        m_pPedManager = new CPedManager;
+        m_pWaterManager = new CWaterManager;
+        m_pScriptDebugging = new CScriptDebugging();
+        m_pMapManager = new CMapManager(m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager,
+                                        m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pGroups, &m_Events,
+                                        m_pScriptDebugging, &m_ElementDeleter);
+        m_pACLManager = new CAccessControlListManager;
+        m_pHqComms = new CHqComms;
 
-    m_pWeaponStatsManager = new CWeaponStatManager();
+        m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
+        m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
+                                        m_pMapManager, &m_Events);
+        m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pBanManager, m_pACLManager);
+        m_pMainConfig = new CMainConfig(m_pConsole);
+        m_pRPCFunctions = new CRPCFunctions;
 
-    m_pBuildingRemovalManager = new CBuildingRemovalManager;
+        m_pWeaponStatsManager = new CWeaponStatManager();
 
-    m_pCustomWeaponManager = new CCustomWeaponManager();
+        m_pBuildingRemovalManager = new CBuildingRemovalManager;
 
-    m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
+        m_pCustomWeaponManager = new CCustomWeaponManager();
+
+        m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
+    }
+    catch (const std::bad_alloc& e)
+    {
+        std::cout << "ERROR: Memory allocations failed: " << e.what() << std::endl;
+        return false;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "ERROR: Constructors failed: " << e.what() << std::endl;
+        return false;
+    }
 
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))
@@ -1674,6 +1690,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onSettingChange", "setting, oldValue, newValue", NULL, false);
     m_Events.AddEvent("onChatMessage", "message, element", NULL, false);
     m_Events.AddEvent("onExplosion", "x, y, z, type, origin", nullptr, false);
+    m_Events.AddEvent("onShutdown", "resource, reason", nullptr, false);
 
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
