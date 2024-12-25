@@ -99,4 +99,5 @@ public:
     LUA_DECLARE(SetElementFrozen);
     static bool SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity, std::optional<CClientEntity*> pLowLodEntity);
     LUA_DECLARE(SetElementCallPropagationEnabled);
+    static bool SetElementLighting(CClientEntity* entity, float lighting);
 };
