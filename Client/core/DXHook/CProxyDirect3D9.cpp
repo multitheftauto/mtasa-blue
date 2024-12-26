@@ -12,54 +12,6 @@
 #include "StdInc.h"
 #include <dwmapi.h>
 #include <resource.h>
-#include <tlhelp32.h>
-
-static HWND FindWindowByProcessName(const char* processName)
-{
-    HWND  hwnd = NULL;
-    DWORD pid = 0;
-
-    // Найти процесс по имени
-    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (hSnapshot != INVALID_HANDLE_VALUE)
-    {
-        PROCESSENTRY32 pe;
-        pe.dwSize = sizeof(pe);
-
-        if (Process32First(hSnapshot, &pe))
-        {
-            do
-            {
-                if (strcmp(pe.szExeFile, processName) == 0)
-                {
-                    pid = pe.th32ProcessID;
-                    break;
-                }
-            } while (Process32Next(hSnapshot, &pe));
-        }
-        CloseHandle(hSnapshot);
-    }
-
-    if (pid == 0)
-        return NULL;
-
-    // Найти окно по PID
-    EnumWindows(
-        [](HWND hwnd, LPARAM lParam) -> BOOL
-        {
-            DWORD windowPid;
-            GetWindowThreadProcessId(hwnd, &windowPid);
-            if (windowPid == (DWORD)lParam)
-            {
-                *((HWND*)lParam) = hwnd;
-                return FALSE;
-            }
-            return TRUE;
-        },
-        (LPARAM)&pid);
-
-    return hwnd;
-}
 
 extern HINSTANCE g_hModule;
 
