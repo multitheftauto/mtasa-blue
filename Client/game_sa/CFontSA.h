@@ -19,6 +19,7 @@
 #define FUNC_CFont_PrintStringFromBottom 0x71A820
 
 #define FUNC_CFont_SetScale 0x719380
+#define FUNC_CFont_SetScaleForCurrentLanguage 0x7193A0
 
 #define FUNC_CFont_SetSlantRefPoint 0x719400
 #define FUNC_CFont_SetSlant         0x719420
@@ -82,6 +83,7 @@ public:
 
     static void SetScale(float w, float h);
     static void SetScale(const CVector2D& scale);
+    static void SetScaleForCurrentLanguage(float w, float h);
 
     static void SetSlantRefPoint(float x, float y);
     static void SetSlant(float slant);
@@ -108,9 +110,11 @@ public:
 
     static float        GetStringWidth(const char* string, bool spaces, bool scriptValues = false);
     static std::int16_t GetNumberLines(float x, float y, const char* text);
+    static float        GetFontHeight(float scaleY);
 
     static CVector2D GetScale() { return *reinterpret_cast<CVector2D*>(VAR_CFont_Scale); }
     static RwColor   GetColor() { return *reinterpret_cast<RwColor*>(VAR_CFont_Color); }
+    static RwColor   GetDropColor() { return *reinterpret_cast<RwColor*>(VAR_CFont_DropColor); }
 
     static float     GetSlant() { return *reinterpret_cast<float*>(VAR_CFont_Slant); }
     static CVector2D GetSlantRefPoint() { return *reinterpret_cast<CVector2D*>(VAR_CFont_SlantRefPoint); }
@@ -130,6 +134,8 @@ public:
 
     static eFontStyle GetFontStyle();
 
-    static float GetEdge() { return *reinterpret_cast<float*>(VAR_CFont_Edge); }
-    static float GetDropdownShadow() { return *reinterpret_cast<float*>(VAR_CFont_Shadow); }
+    static float GetEdge() { return static_cast<float>(*reinterpret_cast<std::uint8_t*>(VAR_CFont_Edge)); }
+    static float GetDropdownShadow() { return static_cast<float>(*reinterpret_cast<std::uint8_t*>(VAR_CFont_Shadow)); }
+
+    static bool GetProportional() { return *reinterpret_cast<bool*>(VAR_CFont_Proportional); }
 };

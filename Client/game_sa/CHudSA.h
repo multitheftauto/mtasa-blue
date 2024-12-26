@@ -15,6 +15,7 @@
 #include <CVector.h>
 #include <game/RenderWare.h>
 #include "CFontSA.h"
+#include "CRect.h"
 
 #define FUNC_Draw                   0x58FAE0
 
@@ -45,6 +46,8 @@
 
 #define FUNC_CStats_GetFatAndMuscleModifier 0x559AF0
 #define FUNC_CSprite2d_DrawBarChart         0x728640
+#define FUNC_CSprie2d_Draw                  0x728350
+#define FUNC_CSprite_RenderOneXLUSprite     0x70D000
 
 #define CODE_ShowMoney              0x58F47D
 
@@ -121,12 +124,13 @@ struct SHudComponentData
     bool drawPercentage{false};
 
     // Text
-    RwColor             dropColor{};
+    RwColor             dropColor{0,0,0,255};
     eFontAlignment      alignment{};
     eFontStyle          style{};
     std::int16_t        textOutline{0};
     std::int16_t        textShadow{0};
     bool                proportional{false};
+    bool                useCustomAlpha{false};
 
     SHudComponentData(
         RwColor fill = {}, 
@@ -138,7 +142,8 @@ struct SHudComponentData
         eFontStyle fontStyle = eFontStyle::FONT_PRICEDOWN,
         std::int16_t outline = 0, 
         std::int16_t shadow = 0, 
-        bool prop = false) : fillColor(fill),
+        bool prop = false,
+        bool useCustomAlpha = false) : fillColor(fill),
           fillColor_Second(fillSecond), 
           drawBlackBorder(blackBorder), 
           drawPercentage(percentage), 
@@ -147,7 +152,8 @@ struct SHudComponentData
           style(fontStyle), 
           textOutline(outline), 
           textShadow(shadow), 
-          proportional(prop) {}
+          proportional(prop),
+          useCustomAlpha(useCustomAlpha) {}
 };
 
 struct ComponentProperties
@@ -158,6 +164,13 @@ struct ComponentProperties
 
     SHudComponentData clock;
     SHudComponentData money;
+    SHudComponentData ammo;
+    SHudComponentData vehName;
+    SHudComponentData areaName;
+    SHudComponentData radioName;
+
+    SHudComponentData weaponIcon;
+    SHudComponentData wanted;
 };
 
 class CHudSA : public CHud
@@ -178,8 +191,8 @@ public:
     void SetComponentPlacementPosition(SComponentPlacement& placement, const CVector2D& position) noexcept;
     void SetComponentPlacementSize(SComponentPlacement& placement, const CVector2D& size) noexcept;
 
-    void SetComponentPosition(const eHudComponent& component, const CVector2D& position) noexcept override;
-    void SetComponentSize(const eHudComponent& component, const CVector2D& size) noexcept override;
+    void SetComponentPosition(const eHudComponent& component, const CVector2D& position) noexcept override { SetComponentPlacementPosition(GetHudComponentRef(component).placement, position); }
+    void SetComponentSize(const eHudComponent& component, const CVector2D& size) noexcept override { SetComponentPlacementSize(GetHudComponentRef(component).placement, size); }
 
     void ResetComponentPlacement(const eHudComponent& component, bool resetSize) noexcept override;
 
@@ -197,11 +210,32 @@ public:
     void SetComponentFontAlignment(const eHudComponent& component, const eFontAlignment& alignment) noexcept override { GetHudComponentRef(component).alignment = alignment; }
     void SetComponentFontProportional(const eHudComponent& component, bool proportional) noexcept override { GetHudComponentRef(component).proportional = proportional; }
 
+    void SetComponentUseCustomAlpha(const eHudComponent& component, bool useCustomAlpha) noexcept override { GetHudComponentRef(component).useCustomAlpha = useCustomAlpha; }
+
     void ResetComponentFontOutline(const eHudComponent& component) noexcept override { ResetComponentFontData(component, eHudComponentProperty::TEXT_OUTLINE); }
     void ResetComponentFontShadow(const eHudComponent& component) noexcept override { ResetComponentFontData(component, eHudComponentProperty::TEXT_SHADOW); }
     void ResetComponentFontStyle(const eHudComponent& component) noexcept override { ResetComponentFontData(component, eHudComponentProperty::TEXT_STYLE); }
     void ResetComponentFontAlignment(const eHudComponent& component) noexcept override { ResetComponentFontData(component, eHudComponentProperty::TEXT_ALIGNMENT); }
     void ResetComponentFontProportional(const eHudComponent& component) noexcept override { ResetComponentFontData(component, eHudComponentProperty::TEXT_PROPORTIONAL); }
+
+    CVector2D GetComponentPosition(const eHudComponent& component) const noexcept override;
+    CVector2D GetComponentSize(const eHudComponent& component) const noexcept override;
+
+    SColor GetComponentColor(const eHudComponent& component) const noexcept override;
+    SColor GetComponentSecondColor(const eHudComponent& component) const noexcept override;
+    SColor GetComponentFontDropColor(const eHudComponent& component) const override;
+
+    bool  GetComponentDrawBlackBorder(const eHudComponent& component) const noexcept override { return GetHudComponentRef(component).drawBlackBorder; }
+    bool  GetComponentDrawPercentage(const eHudComponent& component) const noexcept override { return GetHudComponentRef(component).drawPercentage; }
+    float GetHealthBarBlinkingValue(const eHudComponent& component) const noexcept override { return CHudSA::blinkingBarHPValue; }
+
+    float          GetComponentFontOutline(const eHudComponent& component) const override { return CFontSA::GetEdge(); }
+    float          GetComponentFontShadow(const eHudComponent& component) const override { return CFontSA::GetDropdownShadow(); }
+    eFontStyle     GetComponentFontStyle(const eHudComponent& component) const override { return CFontSA::GetFontStyle(); }
+    eFontAlignment GetComponentFontAlignment(const eHudComponent& component) const override { return CFontSA::GetOrientation(); }
+    bool           GetComponentFontProportional(const eHudComponent& component) const override { return CFontSA::GetProportional(); }
+
+    bool GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept override { return GetHudComponentRef(component).useCustomAlpha; }
 
     static RsGlobal* GetRSGlobal() noexcept { return rsGlobal; }
     static RwColor   GetHUDColour(const eHudColour& colour) noexcept;
@@ -220,9 +254,18 @@ private:
     static void RenderBreathBar(int x, int y);
     static void RenderArmorBar(int x, int y);
 
-    static void RenderText(float x, float y, const char* text, SHudComponentData& properties, bool useSecondColor = false);
+    static void RenderText(float x, float y, const char* text, SHudComponentData& properties, bool useSecondColor = false, bool drawFromBottom = false, bool scaleForLanguage = false);
     static void RenderClock(float x, float y, const char* strTime);
     static void RenderMoney(float x, float y, const char* strMoney);
+    static void RenderAmmo(float x, float y, const char* strAmmo);
+    static void RenderVehicleName(float x, float y, const char* vehName);
+    static void RenderZoneName(float x, float y, const char* strArea);
+    static void RenderRadioName(float x, float y, const char* strRadio);
+
+    static void __fastcall RenderWeaponIcon_Sprite(void* sprite, void*, CRect* rect, RwColor* color);
+    static void RenderWeaponIcon_XLU(CVector pos, CVector2D halfSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint16_t intensity, float rhw, std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir);
+
+    static void RenderWanted(bool empty, float x, float y, const char* strLevel);
 
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;

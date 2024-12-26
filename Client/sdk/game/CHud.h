@@ -48,19 +48,20 @@ enum class eHudComponentProperty
     TEXT_STYLE,
     TEXT_ALIGNMENT,
     TEXT_PROPORTIONAL,
+    CUSTOM_ALPHA,
 
     ALL_PROPERTIES,
 };
 
-enum class eFontStyle
+enum class eFontStyle : std::uint8_t
 {
-    FONT_GOTHIC = 0,
+    FONT_GOTHIC,
     FONT_SUBTITLES,
     FONT_MENU,
     FONT_PRICEDOWN,
 };
 
-enum class eFontAlignment
+enum class eFontAlignment : std::uint8_t
 {
     ALIGN_CENTER,
     ALIGN_LEFT,
@@ -100,9 +101,30 @@ public:
     virtual void SetComponentFontAlignment(const eHudComponent& component, const eFontAlignment& alignment) noexcept = 0;
     virtual void SetComponentFontProportional(const eHudComponent& component, bool proportional) noexcept = 0;
 
+    virtual void SetComponentUseCustomAlpha(const eHudComponent& component, bool useCustomAlpha) noexcept = 0;
+
     virtual void ResetComponentFontOutline(const eHudComponent& component) noexcept = 0;
     virtual void ResetComponentFontShadow(const eHudComponent& component) noexcept = 0;
     virtual void ResetComponentFontStyle(const eHudComponent& component) noexcept = 0;
     virtual void ResetComponentFontAlignment(const eHudComponent& component) noexcept = 0;
     virtual void ResetComponentFontProportional(const eHudComponent& component) noexcept = 0;
+
+    virtual CVector2D      GetComponentPosition(const eHudComponent& component) const noexcept = 0;
+    virtual CVector2D      GetComponentSize(const eHudComponent& component) const noexcept = 0;
+
+    virtual SColor         GetComponentColor(const eHudComponent& component) const noexcept = 0;
+    virtual SColor         GetComponentSecondColor(const eHudComponent& component) const noexcept = 0;
+    virtual SColor         GetComponentFontDropColor(const eHudComponent& component) const = 0;
+
+    virtual bool           GetComponentDrawBlackBorder(const eHudComponent& component) const noexcept = 0;
+    virtual bool           GetComponentDrawPercentage(const eHudComponent& component) const noexcept = 0;
+    virtual float          GetHealthBarBlinkingValue(const eHudComponent& component) const noexcept = 0;
+
+    virtual float          GetComponentFontOutline(const eHudComponent& component) const = 0;
+    virtual float          GetComponentFontShadow(const eHudComponent& component) const = 0;
+    virtual eFontStyle     GetComponentFontStyle(const eHudComponent& component) const = 0;
+    virtual eFontAlignment GetComponentFontAlignment(const eHudComponent& component) const = 0;
+    virtual bool           GetComponentFontProportional(const eHudComponent& component) const = 0;
+
+    virtual bool           GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept = 0;
 };

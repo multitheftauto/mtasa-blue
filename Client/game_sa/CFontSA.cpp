@@ -41,6 +41,12 @@ void CFontSA::SetScale(const CVector2D& scale)
     SetScale(scale.fX, scale.fY);
 }
 
+void CFontSA::SetScaleForCurrentLanguage(float w, float h)
+{
+    // Call CFont::SetScaleForCurrentLanguage
+    ((void(__cdecl*)(float, float))FUNC_CFont_SetScaleForCurrentLanguage)(w, h);
+}
+
 void CFontSA::SetSlantRefPoint(float x, float y)
 {
     // Call CFont::SetSlantRefPoint
@@ -68,7 +74,7 @@ void CFontSA::SetDropColor(const RwColor& color)
 void CFontSA::SetFontStyle(const eFontStyle& style)
 {
     // Call CFont::SetFontStyle
-    ((void(__cdecl*)(std::uint16_t))FUNC_CFont_SetStyle)(static_cast<std::uint16_t>(style));
+    ((void(__cdecl*)(eFontStyle))FUNC_CFont_SetStyle)(style);
 }
 
 void CFontSA::SetWrapX(float wrapx)
@@ -141,6 +147,11 @@ std::int16_t CFontSA::GetNumberLines(float x, float y, const char* text)
 {
     // Call CFont::GetNumberLines
     return ((std::int16_t(__cdecl*)(float, float, const char*))FUNC_CFont_GetNumberLines)(x, y, text);
+}
+
+float CFontSA::GetFontHeight(float scaleY)
+{
+    return scaleY * 16.0f + scaleY * 2.0f;
 }
 
 eFontAlignment CFontSA::GetOrientation()
