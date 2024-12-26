@@ -176,7 +176,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     DwmSetWindowAttribute(hFocusWindow, DWMWA_USE_IMMERSIVE_DARK_MODE, &darkTitleBar, sizeof(darkTitleBar));
 
     // Update icon
-    if (HICON icon = LoadIconA(g_hModule, MAKEINTRESOURCE(IDI_ICON1)))
+    if (HICON icon = LoadIcon(g_hModule, MAKEINTRESOURCE(IDI_ICON1)))
     {
         const auto paramIcon = reinterpret_cast<LPARAM>(icon);
         for (const WPARAM size : {ICON_SMALL, ICON_BIG})
