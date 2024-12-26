@@ -126,6 +126,7 @@ ADD_ENUM(eHudComponentProperty::TEXT_STYLE, "fontStyle")
 ADD_ENUM(eHudComponentProperty::TEXT_ALIGNMENT, "fontAlignment")
 ADD_ENUM(eHudComponentProperty::TEXT_PROPORTIONAL, "proportional")
 ADD_ENUM(eHudComponentProperty::CUSTOM_ALPHA, "useCustomAlpha")
+ADD_ENUM(eHudComponentProperty::TEXT_SIZE, "textSize")
 ADD_ENUM(eHudComponentProperty::ALL_PROPERTIES, "all")
 IMPLEMENT_ENUM_CLASS_END("hud-component-property")
 

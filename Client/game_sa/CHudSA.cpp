@@ -369,6 +369,12 @@ bool CHudSA::IsComponentText(const eHudComponent& component) const noexcept
     return false;
 }
 
+CVector2D CHudSA::GetComponentTextSize(const eHudComponent& component) const
+{
+    const auto& ref = GetHudComponentRef(component);
+    return CVector2D(ref.placement.stringWidth, ref.placement.stringHeight);
+}
+
 RwColor CHudSA::GetHUDColour(const eHudColour& colour) noexcept
 {
     switch (colour)
@@ -710,14 +716,6 @@ void CHudSA::RenderText(float x, float y, const char* text, SHudComponentData& p
     bool useCustomPosition = properties.placement.useCustomPosition;
     bool useCustomSize = properties.placement.useCustomSize;
 
-    // Save default position once
-    if (!properties.placement.setDefaultXY)
-    {
-       properties.placement.x = x;
-       properties.placement.y = y;
-       properties.placement.setDefaultXY = true;
-    }
-
     float scaleX = useCustomSize ? properties.placement.customWidth : properties.placement.width;
     float scaleY = useCustomSize ? properties.placement.customHeight : properties.placement.height;
 
@@ -750,7 +748,18 @@ void CHudSA::RenderText(float x, float y, const char* text, SHudComponentData& p
         CFontSA::SetDropColor(properties.dropColor);
         CFontSA::SetColor(useSecondColor ? properties.fillColor_Second : properties.fillColor);
     }
-    
+
+    // Save default position once
+    if (!properties.placement.setDefaultXY)
+    {
+        properties.placement.x = x;
+        properties.placement.y = y;
+        properties.placement.stringWidth = CFontSA::GetStringWidth(text, true);
+        properties.placement.stringHeight = CFontSA::GetFontHeight(CFontSA::GetScale().fY);
+
+        properties.placement.setDefaultXY = true;
+    }
+
     // Draw text
     float posX = useCustomPosition ? properties.placement.customX : x;
     float posY = useCustomPosition ? properties.placement.customY : y;

@@ -1040,6 +1040,11 @@ std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiR
         }
         case eHudComponentProperty::CUSTOM_ALPHA:
             return hud->GetComponentUseCustomAlpha(component);
+        case eHudComponentProperty::TEXT_SIZE:
+        {
+            CVector2D& size = hud->GetComponentTextSize(component);
+            return CLuaMultiReturn<float, float>{size.fX, size.fY};
+        }
     }
 
     return false;

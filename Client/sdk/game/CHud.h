@@ -49,6 +49,7 @@ enum class eHudComponentProperty
     TEXT_ALIGNMENT,
     TEXT_PROPORTIONAL,
     CUSTOM_ALPHA,
+    TEXT_SIZE,
 
     ALL_PROPERTIES,
 };
@@ -127,4 +128,6 @@ public:
     virtual bool           GetComponentFontProportional(const eHudComponent& component) const = 0;
 
     virtual bool           GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept = 0;
+
+    virtual CVector2D      GetComponentTextSize(const eHudComponent& component) const = 0;
 };

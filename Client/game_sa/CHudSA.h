@@ -103,6 +103,7 @@ struct SComponentPlacement
     // Original position & size
     float x{0.0f}, y{0.0f}; // for getter function only
     float width{0.0f}, height{0.0f};
+    float stringWidth{0.0f}, stringHeight{0.0f}; // for getter function only
 
     // Custom position & size
     float customX{0.0f}, customY{0.0f};
@@ -236,6 +237,8 @@ public:
     bool           GetComponentFontProportional(const eHudComponent& component) const override { return CFontSA::GetProportional(); }
 
     bool GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept override { return GetHudComponentRef(component).useCustomAlpha; }
+
+    CVector2D GetComponentTextSize(const eHudComponent& component) const override;
 
     static RsGlobal* GetRSGlobal() noexcept { return rsGlobal; }
     static RwColor   GetHUDColour(const eHudColour& colour) noexcept;
