@@ -1825,6 +1825,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
         }
 
         // Check if another player is using the same serial
+        #ifndef MTA_DEBUG
         if (m_pMainConfig->IsCheckDuplicateSerialsEnabled() && m_pPlayerManager->GetBySerial(strSerial))
         {
             // Tell the console
@@ -1849,6 +1850,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::INVALID_NICKNAME);
             return;
         }
+        #endif
 
         // Check the size of the nick
         size_t sizeNick = strlen(szNick);
