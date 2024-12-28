@@ -221,7 +221,7 @@ public:
     CMapManager*            GetMapManager() { return m_pMapManager; }
     CPlayerManager*         GetPlayerManager() { return m_pPlayerManager; }
     CObjectManager*         GetObjectManager() { return m_pObjectManager; }
-    CBuildingManager*       GetBuildingManager() const { return m_pBuildingManager; }
+    CBuildingManager*       GetBuildingManager() const noexcept { return m_pBuildingManager; }
     CVehicleManager*        GetVehicleManager() { return m_pVehicleManager; }
     CTeamManager*           GetTeamManager() { return m_pTeamManager; }
     CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }

@@ -56,11 +56,6 @@ void CBuildingManager::DeleteAll()
     DeletePointersAndClearList(m_List);
 }
 
-bool CBuildingManager::Exists(CBuilding* pBuilding) const
-{
-    return ListContains(m_List, pBuilding);
-}
-
 bool CBuildingManager::IsValidModel(unsigned long ulObjectModel)
 {
     // We are using the same list
