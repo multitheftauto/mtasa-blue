@@ -283,9 +283,12 @@ struct CLuaFunctionParserBase
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
         }
-        // CMatrix may either be represented by 3 CLuaVector or by 12 numbers
+        // CMatrix can be represented either by 3 CLuaVectors, 12 numbers, or a 4x4 Lua table
         else if constexpr (std::is_same_v<T, CMatrix>)
         {
+            if (IsValidMatrixLuaTable(L, index))
+                return true;
+
             for (int i = 0; i < sizeof(CMatrix) / sizeof(float); i++)
             {
                 if (!lua_isnumber(L, index + i))
@@ -635,6 +638,19 @@ struct CLuaFunctionParserBase
                 matrix.vFront = ReadVector();
                 matrix.vUp = ReadVector();
                 matrix.vPos = ReadVector();
+
+                return matrix;
+            }
+
+            if (lua_istable(L, index))
+            {
+                CMatrix matrix;
+
+                if (!ReadMatrix(L, index, matrix))
+                {
+                    SetBadArgumentError(L, "matrix", index, "table");
+                    return T{};
+                }
 
                 return matrix;
             }

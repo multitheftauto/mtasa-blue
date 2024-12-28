@@ -18,15 +18,17 @@ public:
     {
         CModelInfo* pModelInfo;
         CMatrix matrix;
+        float lighting;
 
-        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix) :
+        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f) :
             pModelInfo(pModelInfo),
-            matrix(matrix)
+            matrix(matrix),
+            lighting(lighting)
         {
         }
     };
 
-    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix);
+    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting);
 
     void Update();
 
