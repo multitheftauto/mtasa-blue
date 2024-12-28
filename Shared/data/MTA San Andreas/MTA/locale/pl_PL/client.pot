@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-23 15:13+0000\n"
-"PO-Revision-Date: 2024-12-23 15:50\n"
+"PO-Revision-Date: 2024-12-28 22:10\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -453,7 +453,7 @@ msgstr "Zgon"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "Zmień tryb: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
@@ -467,7 +467,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:715
 msgid "Following Player"
-msgstr ""
+msgstr "Podążanie za graczem"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:717
 msgid "Free Movement"
@@ -877,7 +877,7 @@ msgstr ""
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr ""
+msgstr "Wyszukiwanie GTA: San Andreas"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
@@ -2165,7 +2165,7 @@ msgstr "Przezroczystość:"
 
 #: Client/core/CSettings.cpp:441
 msgid "Image resolution:"
-msgstr ""
+msgstr "Rozdzielczość obrazu:"
 
 #: Client/core/CSettings.cpp:448
 msgid "1024 x 1024 (Default)"
