@@ -43,20 +43,20 @@ public:
     void GetMatrix(CMatrix& matrix) override;
     void SetMatrix(const CMatrix& matrix) override;
 
-    unsigned char GetAlpha() { return m_ucAlpha; }
-    void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
+    std::uint8_t GetAlpha() const noexcept { return m_alpha; }
+    void         SetAlpha(std::uint8_t ucAlpha) noexcept { m_alpha = ucAlpha; }
 
-    unsigned short GetModel() const { return m_usModel; }
-    void           SetModel(unsigned short usModel) { m_usModel = usModel; }
+    std::uint16_t GetModel() const noexcept { return m_model; }
+    void          SetModel(std::uint16_t model) noexcept { m_model = model; }
 
-    bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
-    void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
+    bool GetCollisionEnabled() const noexcept { return m_bCollisionsEnabled; }
+    void SetCollisionEnabled(bool bCollisionEnabled) noexcept { m_bCollisionsEnabled = bCollisionEnabled; }
 
-    bool       SetLowLodBuilding(CBuilding* pLowLodBuilding);
-    CBuilding* GetLowLodElement() const { return m_pLowLodBuilding; };
+    bool       SetLowLodBuilding(CBuilding* pLowLodBuilding) noexcept;
+    CBuilding* GetLowLodElement() const noexcept { return m_pLowLodBuilding; }
 
-    CBuilding* GetHighLodBuilding() const { return m_HighLodBuilding; };
-    void       SetHighLodObject(CBuilding* pHighLodObject) { m_HighLodBuilding = pHighLodObject; };
+    CBuilding* GetHighLodBuilding() const { return m_pHighLodBuilding; }
+    void       SetHighLodObject(CBuilding* pHighLodObject) { m_pHighLodBuilding = pHighLodObject; }
 
 protected:
     bool ReadSpecialData(const int iLine) override;
@@ -64,12 +64,12 @@ protected:
 private:
     CBuildingManager* m_pBuildingManager;
     CVector           m_vecRotation;
-    unsigned char     m_ucAlpha;
-    unsigned short    m_usModel;
+    std::uint8_t      m_alpha;
+    std::uint16_t     m_model;
 
 protected:
     bool m_bCollisionsEnabled;
 
     CBuilding* m_pLowLodBuilding;
-    CBuilding* m_HighLodBuilding;
+    CBuilding* m_pHighLodBuilding;
 };

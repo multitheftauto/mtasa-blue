@@ -16,17 +16,19 @@
 
 extern CGame* g_pGame;
 
-CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CElement(pParent), m_pLowLodBuilding(nullptr)
+CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CElement(pParent)
 {
     // Init
     m_iType = CElement::BUILDING;
     SetTypeName("buidling");
 
     m_pBuildingManager = pBuildingManager;
-    m_usModel = 0xFFFF;
-    m_ucAlpha = 255;
+    m_model = 0xFFFF;
+    m_alpha = 255;
     m_bDoubleSided = false;
     m_bCollisionsEnabled = true;
+    m_pLowLodBuilding = nullptr;
+    m_pHighLodBuilding = nullptr;
 
     // Add us to the manager's list
     pBuildingManager->AddToList(this);
@@ -39,8 +41,8 @@ CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLo
     SetTypeName("buidling");
 
     m_pBuildingManager = Copy.m_pBuildingManager;
-    m_usModel = Copy.m_usModel;
-    m_ucAlpha = Copy.m_ucAlpha;
+    m_model = Copy.m_model;
+    m_alpha = Copy.m_alpha;
     m_bDoubleSided = Copy.m_bDoubleSided;
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
@@ -70,8 +72,8 @@ void CBuilding::Unlink()
     // Remove LowLod refs in others
     SetLowLodBuilding(nullptr);
 
-    if (m_HighLodBuilding)
-        m_HighLodBuilding->SetLowLodBuilding(nullptr);
+    if (m_pHighLodBuilding)
+        m_pHighLodBuilding->SetLowLodBuilding(nullptr);
 }
 
 bool CBuilding::ReadSpecialData(const int iLine)
@@ -109,16 +111,14 @@ bool CBuilding::ReadSpecialData(const int iLine)
     if (GetCustomDataInt("model", iTemp, true))
     {
         // Valid id?
-        if (CBuildingManager::IsValidModel(iTemp))
-        {
-            // Set the building id
-            m_usModel = static_cast<unsigned short>(iTemp);
-        }
-        else
+        if (!CBuildingManager::IsValidModel(iTemp))
         {
             CLogger::ErrorPrintf("Bad 'model' (%d) id specified in <building> (line %d)\n", iTemp, iLine);
             return false;
         }
+
+        // Set the building id
+        m_model = static_cast<unsigned short>(iTemp);
     }
     else
     {

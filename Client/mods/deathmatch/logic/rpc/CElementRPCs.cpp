@@ -502,16 +502,16 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         }
         case CCLIENTBUILDING:
         {
-            CClientBuilding*     pBuilding = static_cast<CClientBuilding*>(pSource);
-            const unsigned short usCurrentModel = pBuilding->GetModel();
+            CClientBuilding* building = static_cast<CClientBuilding*>(pSource);
+            const auto       currentModel = building->GetModel();
 
-            if (usCurrentModel != usModel)
+            if (currentModel != usModel)
             {
-                pBuilding->SetModel(usModel);
+                building->SetModel(usModel);
                 CLuaArguments Arguments;
-                Arguments.PushNumber(usCurrentModel);
+                Arguments.PushNumber(currentModel);
                 Arguments.PushNumber(usModel);
-                pBuilding->CallEvent("onClientElementModelChange", Arguments, true);
+                building->CallEvent("onClientElementModelChange", Arguments, true);
             }
 
             break;
