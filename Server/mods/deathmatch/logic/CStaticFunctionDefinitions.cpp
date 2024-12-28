@@ -839,7 +839,7 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CElement* pElement, CElement* 
             CBuilding* pLowLodObject = nullptr;
             if (pLowLodElement && pLowLodElement->GetType() == CElement::BUILDING)
                 pLowLodObject = static_cast<CBuilding*>(pLowLodElement);
-            if (!pBuilding->SetLowLodObject(pLowLodObject))
+            if (!pBuilding->SetLowLodBuilding(pLowLodObject))
                 return false;
             break;
         }
@@ -894,7 +894,7 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CElement* pElement, bool& bOutI
         }
         case CElement::BUILDING:
         {
-            bOutIsLowLod = static_cast<CBuilding*>(pElement)->GetHighLodObject() ? true : false;
+            bOutIsLowLod = static_cast<CBuilding*>(pElement)->GetHighLodBuilding() ? true : false;
             break;
         }
         default:

@@ -185,7 +185,7 @@ void CBuilding::SetRotation(const CVector& vecRotation)
     m_vecRotation = vecRotation;
 }
 
-bool CBuilding::SetLowLodBuilding(CBuilding* pNewLowLodBuilding)
+bool CBuilding::SetLowLodBuilding(CBuilding* pNewLowLodBuilding) noexcept
 {
     // Set or clear?
     if (!pNewLowLodBuilding)
