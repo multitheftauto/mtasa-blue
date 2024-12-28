@@ -43,7 +43,7 @@ CBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::uint16_
     // Get the resource we belong to
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return false;
+        throw std::exception("Cannot be done in current environment");
 
     const CMtaVersion& minClientVersion = pResource->GetMinClientFromMetaXml();
 
