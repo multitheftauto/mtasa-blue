@@ -452,8 +452,6 @@ void CModelInfoSA::Remove()
 
 bool CModelInfoSA::UnloadUnused()
 {
-    m_pInterface = ppModelInfo[m_dwModelID];
-
     if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
@@ -1094,6 +1092,11 @@ void CModelInfoSA::ModelAddRef(EModelRequestType requestType, const char* szTag)
     }
 
     m_dwReferences++;
+}
+
+int CModelInfoSA::GetRefCount()
+{
+    return static_cast<int>(m_dwReferences);
 }
 
 void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)

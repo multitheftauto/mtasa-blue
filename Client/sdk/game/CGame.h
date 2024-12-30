@@ -278,5 +278,4 @@ public:
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
 
-    virtual void UnloadUnusedModels() = 0;
 };

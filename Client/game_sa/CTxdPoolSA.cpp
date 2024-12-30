@@ -55,12 +55,3 @@ std::uint16_t CTxdPoolSA::GetFreeTextureDictonarySlot()
 {
     return (*m_ppTxdPoolInterface)->GetFreeSlot();
 }
-
-std::uint16_t CTxdPoolSA::GetRefsCount(std::uint16_t slot) const
-{
-    CTextureDictonarySAInterface* pTxd = (*m_ppTxdPoolInterface)->GetObject(slot);
-    if (!pTxd)
-        return -1;
-
-    return pTxd->usUsagesCount;
-}
