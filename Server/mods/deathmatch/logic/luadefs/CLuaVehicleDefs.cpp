@@ -127,6 +127,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleSirens", GetVehicleSirens},
         {"getVehicleSirenParams", GetVehicleSirenParams},
         {"setVehiclePlateText", SetVehiclePlateText},
+        {"setVehicleNitroActivated", ArgumentParser<SetVehicleNitroActivated>},
     };
 
     // Add functions
@@ -3045,4 +3046,13 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::
     }
 
     return CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(vehicle, nodeIndex, static_cast<std::uint8_t>(collisionType), removalTime.value_or(-1));
+}
+
+bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept
+{
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(state);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
+    return true;
 }

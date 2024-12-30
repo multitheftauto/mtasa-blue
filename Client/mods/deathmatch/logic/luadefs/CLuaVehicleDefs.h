@@ -169,6 +169,9 @@ public:
     static bool SetVehicleRotorState(CClientVehicle* const vehicle, bool state, std::optional<bool> stopRotor) noexcept;
     static bool GetVehicleRotorState(CClientVehicle* const vehicle) noexcept;
 
+    static bool AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360, std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept;
+    static bool RemoveVehicleSirens(CClientVehicle* vehicle) noexcept;
+
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
     LUA_DECLARE_OOP(GetVehicleComponentPosition);

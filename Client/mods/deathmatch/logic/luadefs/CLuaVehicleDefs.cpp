@@ -107,7 +107,9 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable},
         {"setVehicleSirensOn", SetVehicleSirensOn},
         {"addVehicleUpgrade", AddVehicleUpgrade},
+        {"addVehicleSirens", ArgumentParser<AddVehicleSirens>},
         {"removeVehicleUpgrade", RemoveVehicleUpgrade},
+        {"removeVehicleSirens", ArgumentParser<RemoveVehicleSirens>},
         {"setVehicleDoorState", SetVehicleDoorState},
         {"setVehicleWheelStates", SetVehicleWheelStates},
         {"setVehicleLightState", SetVehicleLightState},
@@ -4361,6 +4363,30 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
     }
 
     return vehicle->SpawnFlyingComponent(partNodeIndex, collisionType, removalTime.value_or(-1));
+}
+
+bool CLuaVehicleDefs::AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360, std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept
+{
+    eClientVehicleType vehicleType = vehicle->GetVehicleType();
+
+    if (vehicleType != CLIENTVEHICLE_CAR && vehicleType != CLIENTVEHICLE_MONSTERTRUCK && vehicleType != CLIENTVEHICLE_QUADBIKE)
+        return false;
+
+    if (sirenType < 1 || sirenType > 6)
+        return false;
+
+    if (sirenCount < 0 || sirenCount > SIREN_COUNT_MAX)
+        return false;
+
+    vehicle->GiveVehicleSirens(sirenType, sirenCount);
+    vehicle->SetVehicleFlags(enable360.value_or(false), enableRandomiser.value_or(true), enableLOSCheck.value_or(true), enableSilent.value_or(false));
+    return true;
+}
+
+bool CLuaVehicleDefs::RemoveVehicleSirens(CClientVehicle* vehicle) noexcept
+{
+    vehicle->RemoveVehicleSirens();
+    return true;
 }
 
 bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state)

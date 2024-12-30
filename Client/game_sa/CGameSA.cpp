@@ -253,7 +253,7 @@ CGameSA::CGameSA()
         error += ": ";
         error += e.what();
 
-        MessageBoxUTF8(nullptr, error.c_str(), _("Error"), MB_ICONERROR | MB_OK);
+        MessageBoxUTF8(nullptr, error, _("Error"), MB_ICONERROR | MB_OK);
         ExitProcess(EXIT_FAILURE);
     }
     catch (const std::exception& e)
@@ -1100,6 +1100,33 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
     }
 
     return status;
+}
+
+void CGameSA::UnloadUnusedModels()
+{
+    // Unload DFF's
+    // CJ should not be unloaded
+    const std::size_t baseIdForTxd = GetBaseIDforTXD();
+    for (std::size_t id = 1; id < baseIdForTxd; id++)
+    {
+        CStreamingInfo* streamingInfo = m_pStreaming->GetStreamingInfo(id);
+        if (streamingInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED && streamingInfo->sizeInBlocks > 0)
+        {
+            CModelInfoSA& model = ModelInfo[id];
+            if (model.GetRefCount() == 0)
+                model.UnloadUnused();
+        };
+    }
+    // Unload TXD
+    for (std::size_t id = baseIdForTxd; id < GetBaseIDforCOL(); id++)
+    {
+        CStreamingInfo* streamingInfo = m_pStreaming->GetStreamingInfo(id);
+        std::size_t     refsCount = GetPools()->GetTxdPool().GetRefsCount(id - baseIdForTxd);
+        if (streamingInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED && streamingInfo->sizeInBlocks > 0 && refsCount == 0)
+        {
+            GetStreaming()->RemoveModel(id);
+        }
+    }
 }
 
 // Ensure models have the default lod distances
