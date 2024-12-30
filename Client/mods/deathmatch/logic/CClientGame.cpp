@@ -6764,6 +6764,8 @@ void CClientGame::RestreamWorld()
 
     g_pGame->GetStreaming()->RemoveBigBuildings();
     g_pGame->GetStreaming()->ReinitStreaming();
+
+    g_pGame->UnloadUnusedModels();
 }
 
 void CClientGame::ReinitMarkers()
