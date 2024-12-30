@@ -581,7 +581,7 @@ enum class eBitStreamVersion : unsigned short
     WorldSpecialProperty_IgnoreFireState,
 
     // Add setElementOnFire function
-    // 2024-10-08
+    // 2024-30-12
     SetElementOnFire,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
