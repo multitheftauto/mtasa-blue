@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-30 16:03+0000\n"
-"PO-Revision-Date: 2024-12-30 16:14\n"
+"PO-Revision-Date: 2024-12-30 17:22\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2582,7 +2582,7 @@ msgstr "Deschide în Explorer"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:1205
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "Salvează pozele făcute cu camera în dosarul GTA San Andreas User Files"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1211 Client/core/CSettings.cpp:1214
