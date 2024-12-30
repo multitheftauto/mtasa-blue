@@ -25,7 +25,6 @@ public:
     bool          IsFreeTextureDictonarySlot(std::uint32_t uiTxdId);
 
     std::uint16_t GetFreeTextureDictonarySlot();
-    std::uint16_t GetRefsCount(std::uint16_t slot) const;
 
 private:
     CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;

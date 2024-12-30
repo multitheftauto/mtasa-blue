@@ -312,8 +312,6 @@ public:
 
     bool SetBuildingPoolSize(size_t size);
 
-    void UnloadUnusedModels();
-
 private:
     std::unique_ptr<CPools>           m_Pools;
     CPlayerInfo*                      m_pPlayerInfo;
