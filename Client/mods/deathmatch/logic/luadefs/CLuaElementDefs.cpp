@@ -100,6 +100,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementFrozen", SetElementFrozen},
         {"setLowLODElement", ArgumentParser<SetLowLodElement>},
         {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
+        {"setElementLighting", ArgumentParser<SetElementLighting>},
         {"setElementOnFire", ArgumentParser<SetElementOnFire>},
     };
 
@@ -194,6 +195,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setLowLOD", "setLowLODElement");
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
     lua_classfunction(luaVM, "setStreamable", "setElementStreamable");
+    lua_classfunction(luaVM, "setLighting", "setElementLighting");
     lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
 
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
@@ -229,6 +231,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "velocity", SetElementVelocity, OOP_GetElementVelocity);
     lua_classvariable(luaVM, "angularVelocity", SetElementAngularVelocity, OOP_GetElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
+    lua_classvariable(luaVM, "lighting", "setElementLighting", "getElementLighting");
     lua_classvariable(luaVM, "onFire", "setElementOnFire", "isElementOnFire");
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
@@ -1345,6 +1348,7 @@ std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* ent
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CObject* object = static_cast<CClientObject*>(entity)->GetGameObject();
             if (object)
@@ -2616,6 +2620,44 @@ int CLuaElementDefs::IsElementWaitingForGroundToLoad(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaElementDefs::SetElementLighting(CClientEntity* entity, float lighting)
+{
+    switch (entity->GetType())
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        {
+            auto* ped = static_cast<CClientPed*>(entity)->GetGamePlayer();
+            if (!ped)
+                return false;
+
+            ped->SetLighting(lighting);
+            return true;
+        }
+        case CCLIENTVEHICLE:
+        {
+            auto* vehicle = static_cast<CClientVehicle*>(entity)->GetGameVehicle();
+            if (!vehicle)
+                return false;
+
+            vehicle->SetLighting(lighting);
+            return true;
+        }
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        {
+            auto* object = static_cast<CClientObject*>(entity)->GetGameObject();
+            if (!object)
+                return false;
+
+            object->SetLighting(lighting);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool CLuaElementDefs::IsElementOnFire(CClientEntity* entity) noexcept

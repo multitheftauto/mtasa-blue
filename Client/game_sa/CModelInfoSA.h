@@ -359,7 +359,7 @@ public:
 
     char* GetNameIfVehicle();
 
-    BYTE           GetVehicleType();
+    BYTE           GetVehicleType() const noexcept;
     void           Request(EModelRequestType requestType, const char* szTag);
     void           Remove();
     bool           UnloadUnused();
@@ -374,7 +374,7 @@ public:
     static void    StaticResetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
-    bool           IsAllocatedInArchive();
+    bool           IsAllocatedInArchive() const noexcept;
     float          GetDistanceFromCentreOfMassToBaseOfModel();
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
@@ -397,7 +397,7 @@ public:
     static void StaticResetAlphaTransparencies();
 
     void ModelAddRef(EModelRequestType requestType, const char* szTag);
-    int  GetRefCount();
+    int  GetRefCount() const override { return static_cast<int>(m_dwReferences); };
     void RemoveRef(bool bRemoveExtraGTARef = false);
     bool ForceUnload();
 
@@ -466,7 +466,9 @@ public:
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;
 
-    bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != 0xffff : false; };
+    bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
+
+    static bool IsVehicleModel(std::uint32_t model) noexcept;
 
 private:
     void CopyStreamingInfoFromModel(ushort usCopyFromModelID);

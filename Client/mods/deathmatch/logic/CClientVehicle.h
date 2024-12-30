@@ -299,10 +299,12 @@ public:
     // TODO: Make the class remember on virtualization
     float GetHeliRotorSpeed();
     float GetPlaneRotorSpeed();
+    bool  GetVehicleRotorState() const noexcept;
 
     bool GetRotorSpeed(float&);
     bool SetRotorSpeed(float);
     bool SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept;
+    void SetVehicleRotorState(bool state, bool stopRotor) noexcept;
     void SetHeliRotorSpeed(float fSpeed);
     void SetPlaneRotorSpeed(float fSpeed);
     bool IsHeliSearchLightVisible();
@@ -456,7 +458,7 @@ public:
 
     int GetCurrentGear();
 
-    bool IsEnterable();
+    bool IsEnterable(bool localEntity = false);
     bool HasRadio();
     bool HasPoliceRadio();
 
@@ -656,13 +658,13 @@ protected:
     float                                  m_fHeliRotorSpeed;
     float                                  m_fPlaneRotorSpeed;
     const CHandlingEntry*                  m_pOriginalHandlingEntry = nullptr;
-    CHandlingEntry*                        m_pHandlingEntry = nullptr;
+    std::unique_ptr<CHandlingEntry>        m_HandlingEntry = nullptr;
     const CFlyingHandlingEntry*            m_pOriginalFlyingHandlingEntry = nullptr;
-    CFlyingHandlingEntry*                  m_pFlyingHandlingEntry = nullptr;
+    std::unique_ptr<CFlyingHandlingEntry>  m_FlyingHandlingEntry = nullptr;
     const CBoatHandlingEntry*              m_pOriginalBoatHandlingEntry = nullptr;
-    CBoatHandlingEntry*                    m_pBoatHandlingEntry = nullptr;
+    std::unique_ptr<CBoatHandlingEntry>    m_BoatHandlingEntry = nullptr;
     const CBikeHandlingEntry*              m_pOriginalBikeHandlingEntry = nullptr;
-    CBikeHandlingEntry*                    m_pBikeHandlingEntry = nullptr;
+    std::unique_ptr<CBikeHandlingEntry>    m_BikeHandlingEntry = nullptr;
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
     float                                  m_fWheelScale;
@@ -676,6 +678,7 @@ protected:
     uchar m_ucTrackID;
     bool  m_bJustStreamedIn;
     bool  m_bWheelScaleChanged;
+    bool  m_rotorState{true};
 
     // Time dependent error compensation interpolation
     struct

@@ -580,6 +580,14 @@ enum class eBitStreamVersion : unsigned short
     // 2024-11-07
     WorldSpecialProperty_IgnoreFireState,
 
+    // Fix iPedSyncerDistance and iUnoccupiedVehicleSyncerDistance sync
+    // 2024-11-22
+    FixSyncerDistance,
+
+    // Add onPlayerChangesWorldSpecialProperty
+    // 2024-11-26
+    WorldSpecialPropertyEvent,
+
     // Add setElementOnFire function
     // 2024-30-12
     SetElementOnFire,
