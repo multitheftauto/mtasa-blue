@@ -327,4 +327,5 @@ public:
     virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;
 
     virtual const CVector* GetDummyPositions() const = 0;
+
 };

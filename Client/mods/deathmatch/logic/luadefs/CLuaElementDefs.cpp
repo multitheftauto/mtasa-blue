@@ -71,6 +71,7 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementLowLOD", IsElementLowLod},
         {"isElementCallPropagationEnabled", IsElementCallPropagationEnabled},
         {"isElementWaitingForGroundToLoad", IsElementWaitingForGroundToLoad},
+        {"isElementOnFire", ArgumentParser<IsElementOnFire>},
 
         // Element set funcs
         {"createElement", CreateElement},
@@ -100,6 +101,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setLowLODElement", ArgumentParser<SetLowLodElement>},
         {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
         {"setElementLighting", ArgumentParser<SetElementLighting>},
+        {"setElementOnFire", ArgumentParser<SetElementOnFire>},
     };
 
     // Add functions
@@ -170,6 +172,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getData", "getElementData");
     lua_classfunction(luaVM, "getAllData", "getAllElementData");
+    lua_classfunction(luaVM, "isOnFire", "isElementOnFire");
 
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setData", "setElementData");
@@ -193,6 +196,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
     lua_classfunction(luaVM, "setStreamable", "setElementStreamable");
     lua_classfunction(luaVM, "setLighting", "setElementLighting");
+    lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
 
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
     lua_classvariable(luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad");
@@ -228,6 +232,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "angularVelocity", SetElementAngularVelocity, OOP_GetElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
     lua_classvariable(luaVM, "lighting", "setElementLighting", "getElementLighting");
+    lua_classvariable(luaVM, "onFire", "setElementOnFire", "isElementOnFire");
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
     lua_registerclass(luaVM, "Element");
@@ -2513,6 +2518,14 @@ bool CLuaElementDefs::SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity,
     return CStaticFunctionDefinitions::SetLowLodElement(*pEntity, pLowLodEntity.value_or(nullptr));
 }
 
+bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexcept
+{
+    if (!entity->IsLocalEntity())
+        return false;
+
+    return entity->SetOnFire(onFire);
+}
+
 int CLuaElementDefs::IsElementLowLod(lua_State* luaVM)
 {
     //  bool isElementLowLOD ( element theElement )
@@ -2645,4 +2658,9 @@ bool CLuaElementDefs::SetElementLighting(CClientEntity* entity, float lighting)
     }
 
     return false;
+}
+
+bool CLuaElementDefs::IsElementOnFire(CClientEntity* entity) noexcept
+{
+    return entity->IsOnFire();
 }

@@ -26,6 +26,7 @@
 #include "CVisibilityPluginsSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include "CFireManagerSA.h"
 
 extern CGameSA* pGame;
 
@@ -1923,6 +1924,39 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
             pInterface->m_wheelColPoint[REAR_RIGHT_WHEEL].Position += vecDelta;
         }
     }
+}
+
+bool CVehicleSA::SetOnFire(bool onFire)
+{
+    CVehicleSAInterface* vehicleInterface = GetVehicleInterface();
+    if (onFire == !!vehicleInterface->m_pFire)
+        return false;
+
+    auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
+
+    if (onFire)
+    {
+        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        if (!fire)
+            return false;
+
+        fire->SetTarget(this);
+        fire->SetStrength(1.0f);
+        fire->Ignite();
+        fire->SetNumGenerationsAllowed(0);
+
+        vehicleInterface->m_pFire = fire->GetInterface();
+    }
+    else
+    {
+        CFire* fire = fireManager->GetFire(vehicleInterface->m_pFire);
+        if (!fire)
+            return false;
+
+        fire->Extinguish();
+    }
+
+    return true;
 }
 
 void CVehicleSA::StaticSetHooks()

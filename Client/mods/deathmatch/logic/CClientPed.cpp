@@ -5902,22 +5902,13 @@ void CClientPed::SetBleeding(bool bBleeding)
     m_bBleeding = bBleeding;
 }
 
-bool CClientPed::IsOnFire()
+bool CClientPed::SetOnFire(bool bIsOnFire)
 {
     if (m_pPlayerPed)
-    {
-        return m_pPlayerPed->IsOnFire();
-    }
-    return m_bIsOnFire;
-}
-
-void CClientPed::SetOnFire(bool bIsOnFire)
-{
-    if (m_pPlayerPed)
-    {
-        m_pPlayerPed->SetOnFire(bIsOnFire);
-    }
+        return m_pPlayerPed->SetOnFire(bIsOnFire);
+    
     m_bIsOnFire = bIsOnFire;
+    return true;
 }
 
 void CClientPed::GetVoice(short* psVoiceType, short* psVoiceID)
