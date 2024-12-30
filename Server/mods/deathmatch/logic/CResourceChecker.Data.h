@@ -170,7 +170,11 @@ namespace
         {true, "base64Encode", "Please manually change this to encodeString (different syntax). Refer to the wiki for details"},
         {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"},
 
-        {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"}
+        {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"},
+        {false, "getHelicopterRotorSpeed", "getVehicleRotorSpeed"},
+
+        {false, "setPedOnFire", "setElementOnFire"},
+        {false, "isPedOnFire", "isElementOnFire"}
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -246,6 +250,7 @@ namespace
         {false, "getPlayerOccupiedVehicleSeat", "getPedOccupiedVehicleSeat"},
         {false, "isPlayerInVehicle", "isPedInVehicle"},
         {false, "getPlayerFromNick", "getPlayerFromName"},
+      
         // Client
         {false, "getClientName", "getPlayerName"},
         {false, "getClientIP", "getPlayerIP"},
@@ -272,6 +277,10 @@ namespace
 
         // Base Encoding & Decoding
         {true, "base64Encode", "Please manually change this to encodeString (different syntax). Refer to the wiki for details"},
-        {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"}
+        {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"},
+    
+        // Ped
+        {false, "setPedOnFire", "setElementOnFire"},
+        {false, "isPedOnFire", "isElementOnFire"}
     };
 }            // namespace

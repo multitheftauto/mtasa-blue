@@ -86,6 +86,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_bHandlingChanged = false;
     m_ucVariant = ucVariant;
     m_ucVariant2 = ucVariant2;
+    m_onFire = false;
 
     // Initialize the occupied Players
     for (int i = 0; i < MAX_VEHICLE_SEATS; i++)

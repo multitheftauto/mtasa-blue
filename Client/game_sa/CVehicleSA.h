@@ -310,7 +310,7 @@ public:
 
     unsigned char m_nSpecialColModel;
     CEntity*      pEntityWeAreOnForVisibilityCheck;
-    CFire*        m_pFire;
+    CFireSAInterface*        m_pFire;
 
     float m_fSteerAngle;               // +1172
     float m_f2ndSteerAngle;            // used for steering 2nd set of wheels or elevators etc..
@@ -693,6 +693,9 @@ public:
 
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
+
+    bool IsOnFire() override { return GetVehicleInterface()->m_pFire != nullptr; }
+    bool SetOnFire(bool onFire) override;
 
     static void StaticSetHooks();
     static void SetVehiclesSunGlareEnabled(bool bEnabled);

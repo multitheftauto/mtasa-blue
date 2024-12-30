@@ -938,6 +938,23 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled(CElement* pEle
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetElementOnFire(CElement* pElement, bool onFire)
+{
+    assert(pElement);
+
+    if (!IS_PED(pElement) && !IS_VEHICLE(pElement) && !IS_OBJECT(pElement) && !IS_WEAPON(pElement))
+        return false;
+
+    RUN_CHILDREN(SetElementOnFire(*iter, onFire));
+
+    pElement->SetOnFire(onFire);
+
+    CBitStream bitStream;
+    bitStream.pBitStream->WriteBit(onFire);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_ON_FIRE, *bitStream.pBitStream));
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* szID)
 {
     assert(pElement);
