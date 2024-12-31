@@ -555,10 +555,10 @@ namespace SharedUtil
     inline SColor TOCOLOR2SCOLOR(std::uint32_t colorValue)
     {
         SColor color;
-        color.R = static_cast<std::uint8_t>((colorValue >> 16) & mask(8));
-        color.G = static_cast<std::uint8_t>((colorValue >> 8) & mask(8));
-        color.B = static_cast<std::uint8_t>((colorValue >> 0) & mask(8));
-        color.A = static_cast<std::uint8_t>((colorValue >> 24) & mask(8));
+        color.R = static_cast<std::uint8_t>((colorValue >> 16) & BYTE_MASK(8));
+        color.G = static_cast<std::uint8_t>((colorValue >> 8) & BYTE_MASK(8));
+        color.B = static_cast<std::uint8_t>((colorValue >> 0) & BYTE_MASK(8));
+        color.A = static_cast<std::uint8_t>((colorValue >> 24) & BYTE_MASK(8));
 
         return color;
     }

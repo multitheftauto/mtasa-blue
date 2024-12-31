@@ -118,7 +118,7 @@ struct SHudComponentData
 {
     SComponentPlacement placement{};
     RwColor             fillColor{};
-    RwColor             fillColor_Second{0,0,0,255};
+    RwColor             fillColorSecondary{0,0,0,255};
 
     // Bar
     bool drawBlackBorder{true};
@@ -135,7 +135,7 @@ struct SHudComponentData
 
     SHudComponentData(
         RwColor fill = {}, 
-        RwColor fillSecond = {0, 0, 0, 255}, 
+        RwColor fillSecondary = {0, 0, 0, 255}, 
         bool blackBorder = true, 
         bool percentage = false, 
         RwColor drop = {}, 
@@ -145,7 +145,7 @@ struct SHudComponentData
         std::int16_t shadow = 0, 
         bool prop = false,
         bool useCustomAlpha = false) : fillColor(fill),
-          fillColor_Second(fillSecond), 
+          fillColorSecondary(fillSecondary), 
           drawBlackBorder(blackBorder), 
           drawPercentage(percentage), 
           dropColor(drop), 
@@ -223,7 +223,7 @@ public:
     CVector2D GetComponentSize(const eHudComponent& component) const noexcept override;
 
     SColor GetComponentColor(const eHudComponent& component) const noexcept override;
-    SColor GetComponentSecondColor(const eHudComponent& component) const noexcept override;
+    SColor GetComponentSecondaryColor(const eHudComponent& component) const noexcept override;
     SColor GetComponentFontDropColor(const eHudComponent& component) const override;
 
     bool  GetComponentDrawBlackBorder(const eHudComponent& component) const noexcept override { return GetHudComponentRef(component).drawBlackBorder; }
@@ -245,6 +245,10 @@ public:
 
     static void StaticSetHooks();
 
+    static void RenderHealthBar(int x, int y);
+    static void RenderBreathBar(int x, int y);
+    static void RenderArmorBar(int x, int y);
+
 private:
     void InitComponentList();
     void UpdateStreetchCalculations();
@@ -252,10 +256,6 @@ private:
     void ResetComponentFontData(const eHudComponent& component, const eHudComponentProperty& property) noexcept;
     
     SHudComponentData& GetHudComponentRef(const eHudComponent& component) const noexcept;
-
-    static void RenderHealthBar(int x, int y);
-    static void RenderBreathBar(int x, int y);
-    static void RenderArmorBar(int x, int y);
 
     static void RenderText(float x, float y, const char* text, SHudComponentData& properties, bool useSecondColor = false, bool drawFromBottom = false, bool scaleForLanguage = false);
     static void RenderClock(float x, float y, const char* strTime);

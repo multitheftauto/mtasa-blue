@@ -14,39 +14,6 @@
 #include <game/RenderWare.h>
 #include <game/CHud.h>
 
-#define FUNC_CFont_PrintChar             0x718A10
-#define FUNC_CFont_PrintString           0x71A700
-#define FUNC_CFont_PrintStringFromBottom 0x71A820
-
-#define FUNC_CFont_SetScale 0x719380
-#define FUNC_CFont_SetScaleForCurrentLanguage 0x7193A0
-
-#define FUNC_CFont_SetSlantRefPoint 0x719400
-#define FUNC_CFont_SetSlant         0x719420
-
-#define FUNC_CFont_SetStyle      0x719490
-#define FUNC_CFont_SetCentreSize 0x7194E0
-
-#define FUNC_CFont_SetWrapX            0x7194D0
-#define FUNC_CFont_SetRightJustifyWrap 0x7194F0
-
-#define FUNC_CFont_SetColor     0x719430
-#define FUNC_CFont_SetDropColor 0x719510
-
-#define FUNC_CFont_SetDropShadowPosition 0x719570
-#define FUNC_CFont_SetEdge               0x719590
-
-#define FUNC_CFont_SetProportional 0x7195B0
-
-#define FUNC_CFont_SetBackground      0x7195C0
-#define FUNC_CFont_SetBackgroundColor 0x7195E0
-
-#define FUNC_CFont_SetJustify     0x719600
-#define FUNC_CFont_SetOrientation 0x719610
-
-#define FUNC_CFont_GetStringWidth 0x71A0E0
-#define FUNC_CFont_GetNumberLines 0x71A5E0
-
 #define VAR_CFont_Scale 0xC71A64
 #define VAR_CFont_Color 0xC71A60
 

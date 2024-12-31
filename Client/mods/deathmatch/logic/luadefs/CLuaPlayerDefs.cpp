@@ -677,7 +677,7 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
             return true;
         }
         case eHudComponentProperty::FILL_COLOR:
-        case eHudComponentProperty::FILL_COLOR_SECOND:
+        case eHudComponentProperty::FILL_COLOR_SECONDARY:
         {
             if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
                 return false;
@@ -685,7 +685,7 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
             if (!std::holds_alternative<float>(value))
                 return false;
 
-            hud->SetComponentColor(component, static_cast<std::uint32_t>(std::get<float>(value)), property == eHudComponentProperty::FILL_COLOR_SECOND);
+            hud->SetComponentColor(component, static_cast<std::uint32_t>(std::get<float>(value)), property == eHudComponentProperty::FILL_COLOR_SECONDARY);
             return true;
         }
         case eHudComponentProperty::DRAW_BLACK_BORDER:
@@ -847,12 +847,12 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
             hud->ResetComponentPlacement(component, true);
             return true;
         case eHudComponentProperty::FILL_COLOR:
-        case eHudComponentProperty::FILL_COLOR_SECOND:
+        case eHudComponentProperty::FILL_COLOR_SECONDARY:
         {
             if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
                 return false;
 
-            bool second = property == eHudComponentProperty::FILL_COLOR_SECOND;
+            bool second = property == eHudComponentProperty::FILL_COLOR_SECONDARY;
             if (second && (component != HUD_RADIO && component != HUD_MONEY && component != HUD_WANTED && component != HUD_WEAPON))
                 return false;
 
@@ -966,12 +966,12 @@ std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiR
             SColor& color = hud->GetComponentColor(component);
             return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
         }
-        case eHudComponentProperty::FILL_COLOR_SECOND:
+        case eHudComponentProperty::FILL_COLOR_SECONDARY:
         {
             if (component != HUD_RADIO && component != HUD_MONEY && component != HUD_WANTED && component != HUD_WEAPON)
                 return false;
 
-            SColor& color = hud->GetComponentSecondColor(component);
+            SColor& color = hud->GetComponentSecondaryColor(component);
             return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
         }
         case eHudComponentProperty::DROP_COLOR:

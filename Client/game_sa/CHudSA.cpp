@@ -41,6 +41,7 @@ DrawBarChartFunc DrawBarChart = reinterpret_cast<DrawBarChartFunc>(FUNC_CSprite2
 std::unordered_map<eHudComponent, SHudComponentData> defaultComponentProperties = {
     {HUD_HEALTH, {CHudSA::GetHUDColour(eHudColour::RED)}},
     {HUD_BREATH, {CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE)}},
+    {HUD_ARMOUR, {CHudSA::GetHUDColour(eHudColour::LIGHT_GRAY)}},
     {HUD_CLOCK, {CHudSA::GetHUDColour(eHudColour::LIGHT_GRAY), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_PRICEDOWN, 2}},
     {HUD_MONEY, {CHudSA::GetHUDColour(eHudColour::GREEN), CHudSA::GetHUDColour(eHudColour::RED), false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_PRICEDOWN, 2}},
     {HUD_AMMO, {CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER, eFontStyle::FONT_SUBTITLES, 1, 0, true}},
@@ -543,7 +544,7 @@ void CHudSA::SetComponentColor(const eHudComponent& component, std::uint32_t col
     if (!secondColor)
         compRef.fillColor = RwColor{newColor.R, newColor.G, newColor.B, newColor.A};
     else
-        compRef.fillColor_Second = RwColor{newColor.R, newColor.G, newColor.B, newColor.A};
+        compRef.fillColorSecondary = RwColor{newColor.R, newColor.G, newColor.B, newColor.A};
 }
 
 void CHudSA::ResetComponentColor(const eHudComponent& component, bool secondColor) noexcept
@@ -557,7 +558,7 @@ void CHudSA::ResetComponentColor(const eHudComponent& component, bool secondColo
     if (!secondColor)
         componentData.fillColor = defaultRef.fillColor;
     else
-        componentData.fillColor_Second = defaultRef.fillColor_Second;
+        componentData.fillColorSecondary = defaultRef.fillColorSecondary;
 }
 
 void CHudSA::SetComponentFontDropColor(const eHudComponent& component, std::uint32_t color) noexcept
@@ -592,10 +593,10 @@ SColor CHudSA::GetComponentColor(const eHudComponent& component) const noexcept
     return SColorRGBA(ref.fillColor.r, ref.fillColor.g, ref.fillColor.b, ref.fillColor.a);
 }
 
-SColor CHudSA::GetComponentSecondColor(const eHudComponent& component) const noexcept
+SColor CHudSA::GetComponentSecondaryColor(const eHudComponent& component) const noexcept
 {
     const auto& ref = GetHudComponentRef(component);
-    return SColorRGBA(ref.fillColor_Second.r, ref.fillColor_Second.g, ref.fillColor_Second.b, ref.fillColor_Second.a);
+    return SColorRGBA(ref.fillColorSecondary.r, ref.fillColorSecondary.g, ref.fillColorSecondary.b, ref.fillColorSecondary.a);
 }
 
 SColor CHudSA::GetComponentFontDropColor(const eHudComponent& component) const
@@ -741,12 +742,12 @@ void CHudSA::RenderText(float x, float y, const char* text, SHudComponentData& p
     if (!properties.useCustomAlpha)
     {
         CFontSA::SetDropColor(RwColor{properties.dropColor.r, properties.dropColor.g, properties.dropColor.b, CFontSA::GetColor().a});
-        CFontSA::SetColor(useSecondColor ? RwColor{properties.fillColor_Second.r, properties.fillColor_Second.g, properties.fillColor_Second.b, CFontSA::GetColor().a} : RwColor{properties.fillColor.r, properties.fillColor.g, properties.fillColor.b, CFontSA::GetColor().a});
+        CFontSA::SetColor(useSecondColor ? RwColor{properties.fillColorSecondary.r, properties.fillColorSecondary.g, properties.fillColorSecondary.b, CFontSA::GetColor().a} : RwColor{properties.fillColor.r, properties.fillColor.g, properties.fillColor.b, CFontSA::GetColor().a});
     }
     else
     {
         CFontSA::SetDropColor(properties.dropColor);
-        CFontSA::SetColor(useSecondColor ? properties.fillColor_Second : properties.fillColor);
+        CFontSA::SetColor(useSecondColor ? properties.fillColorSecondary : properties.fillColor);
     }
 
     // Save default position once
@@ -828,12 +829,12 @@ void __fastcall CHudSA::RenderWeaponIcon_Sprite(void* sprite, void*, CRect* rect
         rect->bottom = rect->top + (useCustomSize ? properties.placement.customHeight : properties.placement.height);
     }
 
-    color->r = properties.fillColor_Second.r;
-    color->g = properties.fillColor_Second.g;
-    color->b = properties.fillColor_Second.b;
+    color->r = properties.fillColorSecondary.r;
+    color->g = properties.fillColorSecondary.g;
+    color->b = properties.fillColorSecondary.b;
 
     if (properties.useCustomAlpha)
-        color->a = properties.fillColor_Second.a;
+        color->a = properties.fillColorSecondary.a;
 
     // Call CSprite2d::Draw
     ((void(__thiscall*)(void*, CRect*, RwColor*))FUNC_CSprie2d_Draw)(sprite, rect, color);
@@ -888,8 +889,8 @@ void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
     RenderText(x, y, strLevel, componentProperties.wanted, empty);
 }
 
-static constexpr DWORD back = 0x58DFD8;
-static void _declspec(naked) RenderWanted_Hook()
+static constexpr std::uintptr_t CONTINUE_RenderWanted = 0x58DFD8;
+static void _declspec(naked) HOOK_RenderWanted()
 {
     _asm
     {
@@ -906,58 +907,19 @@ static void _declspec(naked) RenderWanted_Hook()
         call CHudSA::RenderWanted
         add esp,4
 
-        jmp back
+        jmp CONTINUE_RenderWanted
     }
 }
 
-static void _declspec(naked) HOOK_RenderHudBar()
+static void HOOK_RenderHudBar(int playerId, int x, int y)
 {
-    _asm
-    {
-        mov eax, [esp]
-
-        push [esp+0Ch] // y
-        push [esp+0Ch] // x
-
-        // Health bar
-        cmp eax, 0058EE9Fh
-        jz renderHealthBar
-
-        cmp eax, 0058EF12h
-        jz renderHealthBar
-
-        // Breath bar
-        cmp eax, 0058F136h
-        jz renderBreathBar
-
-        cmp eax, 0058F1B2h
-        jz renderBreathBar
-
-        // Armor bar
-        cmp eax, 0058EF70h
-        jz renderArmorBar
-
-        cmp eax, 0058EFE3h
-        jz renderArmorBar
-
-        jmp skip
-
-        renderHealthBar:
-        call CHudSA::RenderHealthBar
-        jmp skip
-
-        renderBreathBar:
-        call CHudSA::RenderBreathBar
-        jmp skip
-
-        renderArmorBar:
-        call CHudSA::RenderArmorBar
-        jmp skip
-
-        skip:
-        add esp, 8
-        retn
-    }
+    void* returnAdress = _ReturnAddress();
+    if (returnAdress == (void*)0x58EE9F || returnAdress == (void*)0x58EF12)
+        CHudSA::RenderHealthBar(x, y);
+    else if (returnAdress == (void*)0x58F136 || returnAdress == (void*)0x58F1B2)
+        CHudSA::RenderBreathBar(x, y);
+    else if (returnAdress == (void*)0x58EF70 || returnAdress == (void*)0x58EFE3)
+        CHudSA::RenderArmorBar(x, y);
 }
 
 void CHudSA::StaticSetHooks()
@@ -977,5 +939,5 @@ void CHudSA::StaticSetHooks()
     HookInstallCall(0x58D988, (DWORD)&RenderWeaponIcon_Sprite);
     HookInstallCall(0x58D8FD, (DWORD)&RenderWeaponIcon_XLU);
 
-    HookInstall(0x58DFD3, (DWORD)&RenderWanted_Hook);
+    HookInstall(0x58DFD3, &HOOK_RenderWanted);
 }

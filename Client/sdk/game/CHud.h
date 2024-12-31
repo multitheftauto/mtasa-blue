@@ -36,7 +36,7 @@ enum eHudComponent
 enum class eHudComponentProperty
 {
     FILL_COLOR,
-    FILL_COLOR_SECOND,
+    FILL_COLOR_SECONDARY,
     DRAW_BLACK_BORDER,
     DRAW_PERCENTAGE,
     BLINKING_HP_VALUE,
@@ -114,7 +114,7 @@ public:
     virtual CVector2D      GetComponentSize(const eHudComponent& component) const noexcept = 0;
 
     virtual SColor         GetComponentColor(const eHudComponent& component) const noexcept = 0;
-    virtual SColor         GetComponentSecondColor(const eHudComponent& component) const noexcept = 0;
+    virtual SColor         GetComponentSecondaryColor(const eHudComponent& component) const noexcept = 0;
     virtual SColor         GetComponentFontDropColor(const eHudComponent& component) const = 0;
 
     virtual bool           GetComponentDrawBlackBorder(const eHudComponent& component) const noexcept = 0;
