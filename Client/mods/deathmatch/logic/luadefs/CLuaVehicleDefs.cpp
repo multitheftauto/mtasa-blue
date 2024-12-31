@@ -94,6 +94,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
         {"getVehicleEntryPoints", ArgumentParser<GetVehicleEntryPoints>},
         {"isVehicleSmokeTrailEnabled", ArgumentParser<IsSmokeTrailEnabled>},
+        {"getVehicleRotorState", ArgumentParser<GetVehicleRotorState>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -106,7 +107,9 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable},
         {"setVehicleSirensOn", SetVehicleSirensOn},
         {"addVehicleUpgrade", AddVehicleUpgrade},
+        {"addVehicleSirens", ArgumentParser<AddVehicleSirens>},
         {"removeVehicleUpgrade", RemoveVehicleUpgrade},
+        {"removeVehicleSirens", ArgumentParser<RemoveVehicleSirens>},
         {"setVehicleDoorState", SetVehicleDoorState},
         {"setVehicleWheelStates", SetVehicleWheelStates},
         {"setVehicleLightState", SetVehicleLightState},
@@ -159,6 +162,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
         {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
         {"setVehicleSmokeTrailEnabled", ArgumentParser<SetSmokeTrailEnabled>},
+        {"setVehicleRotorState", ArgumentParser<SetVehicleRotorState>},
     };
 
     // Add functions
@@ -248,6 +252,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
     lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<OOP_GetVehicleEntryPoints>);
     lua_classfunction(luaVM, "isSmokeTrailEnabled", "isVehicleSmokeTrailEnabled");
+    lua_classfunction(luaVM, "getRotorState", "getVehicleRotorState");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -297,6 +302,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setWheelScale", "setVehicleWheelScale");
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
     lua_classfunction(luaVM, "setSmokeTrailEnabled", "setVehicleSmokeTrailEnabled");
+    lua_classfunction(luaVM, "setRotorState", "setVehicleRotorState");
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
@@ -355,6 +361,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "gravity", SetVehicleGravity, OOP_GetVehicleGravity);
     lua_classvariable(luaVM, "turnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
     lua_classvariable(luaVM, "wheelScale", "setVehicleWheelScale", "getVehicleWheelScale");
+    lua_classvariable(luaVM, "rotorState", "setVehicleRotorState", "getVehicleRotorState");
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
@@ -1949,14 +1956,17 @@ int CLuaVehicleDefs::SetVehiclePanelState(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
     unsigned char    ucPanel = 0, ucState = 0;
+    bool             spawnFlyingComponent, breakGlass;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucPanel);
     argStream.ReadNumber(ucState);
+    argStream.ReadBool(spawnFlyingComponent, true);
+    argStream.ReadBool(breakGlass, false);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehiclePanelState(*pEntity, ucPanel, ucState))
+        if (CStaticFunctionDefinitions::SetVehiclePanelState(*pEntity, ucPanel, ucState, spawnFlyingComponent, breakGlass))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -4358,6 +4368,30 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
     return vehicle->SpawnFlyingComponent(partNodeIndex, collisionType, removalTime.value_or(-1));
 }
 
+bool CLuaVehicleDefs::AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360, std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept
+{
+    eClientVehicleType vehicleType = vehicle->GetVehicleType();
+
+    if (vehicleType != CLIENTVEHICLE_CAR && vehicleType != CLIENTVEHICLE_MONSTERTRUCK && vehicleType != CLIENTVEHICLE_QUADBIKE)
+        return false;
+
+    if (sirenType < 1 || sirenType > 6)
+        return false;
+
+    if (sirenCount < 0 || sirenCount > SIREN_COUNT_MAX)
+        return false;
+
+    vehicle->GiveVehicleSirens(sirenType, sirenCount);
+    vehicle->SetVehicleFlags(enable360.value_or(false), enableRandomiser.value_or(true), enableLOSCheck.value_or(true), enableSilent.value_or(false));
+    return true;
+}
+
+bool CLuaVehicleDefs::RemoveVehicleSirens(CClientVehicle* vehicle) noexcept
+{
+    vehicle->RemoveVehicleSirens();
+    return true;
+}
+
 bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state)
 {
     std::uint16_t model = vehicle->GetModel();
@@ -4373,3 +4407,16 @@ bool CLuaVehicleDefs::IsSmokeTrailEnabled(CClientVehicle* vehicle) noexcept
     return vehicle->IsSmokeTrailEnabled();
 }
 
+bool CLuaVehicleDefs::SetVehicleRotorState(CClientVehicle* vehicle, bool state, std::optional<bool> stopRotor) noexcept
+{
+    if (vehicle->GetVehicleType() != eClientVehicleType::CLIENTVEHICLE_HELI && vehicle->GetVehicleType() != eClientVehicleType::CLIENTVEHICLE_PLANE)
+        return false;
+
+    vehicle->SetVehicleRotorState(state, stopRotor.value_or(true));
+    return true;
+}
+
+bool CLuaVehicleDefs::GetVehicleRotorState(CClientVehicle* vehicle) noexcept
+{
+    return vehicle->GetVehicleRotorState();
+}

@@ -127,6 +127,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleSirens", GetVehicleSirens},
         {"getVehicleSirenParams", GetVehicleSirenParams},
         {"setVehiclePlateText", SetVehiclePlateText},
+        {"setVehicleNitroActivated", ArgumentParser<SetVehicleNitroActivated>},
     };
 
     // Add functions
@@ -2124,15 +2125,19 @@ int CLuaVehicleDefs::SetVehiclePanelState(lua_State* luaVM)
     CElement*     pElement;
     unsigned char ucPanel;
     unsigned char ucState;
+    bool          spawnFlyingComponent;
+    bool          breakGlass;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(ucPanel);
     argStream.ReadNumber(ucState);
+    argStream.ReadBool(spawnFlyingComponent, true);
+    argStream.ReadBool(breakGlass, false);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehiclePanelState(pElement, ucPanel, ucState))
+        if (CStaticFunctionDefinitions::SetVehiclePanelState(pElement, ucPanel, ucState, spawnFlyingComponent, breakGlass))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -3045,4 +3050,13 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::
     }
 
     return CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(vehicle, nodeIndex, static_cast<std::uint8_t>(collisionType), removalTime.value_or(-1));
+}
+
+bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept
+{
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(state);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
+    return true;
 }

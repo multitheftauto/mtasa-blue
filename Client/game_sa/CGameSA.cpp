@@ -244,6 +244,7 @@ CGameSA::CGameSA()
         D3DResourceSystemSA::StaticSetHooks();
         CVehicleSA::StaticSetHooks();
         CCheckpointSA::StaticSetHooks();
+        CHudSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {
@@ -253,7 +254,7 @@ CGameSA::CGameSA()
         error += ": ";
         error += e.what();
 
-        MessageBoxUTF8(nullptr, error.c_str(), _("Error"), MB_ICONERROR | MB_OK);
+        MessageBoxUTF8(nullptr, error, _("Error"), MB_ICONERROR | MB_OK);
         ExitProcess(EXIT_FAILURE);
     }
     catch (const std::exception& e)

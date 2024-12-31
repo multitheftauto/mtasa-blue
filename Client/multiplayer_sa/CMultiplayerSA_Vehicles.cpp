@@ -108,6 +108,33 @@ static void _declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::SetPanelDamage
+//
+// This hook allows determining whether flying components should be spawned
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CAutomobile_SetPanelDamage 0x6B15BE
+#define HOOKSIZE_CAutomobile_SetPanelDamage 5
+static DWORD SPAWN_FLYING_COMPONENTS = 0x6B15C3;
+static DWORD SKIP_FLYING_COMPONENTS = 0x6B15DA;
+static void _declspec(naked) HOOK_CAutomobile_SetPanelDamage()
+{
+    _asm
+    {
+        mov al, byte ptr [esp+1Ch]
+        test al, al
+        jnz skipFlyingComponents
+
+        push 5
+        push ebp
+        mov ecx, esi
+        jmp SPAWN_FLYING_COMPONENTS
+
+        skipFlyingComponents:
+        jmp SKIP_FLYING_COMPONENTS
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Vehicles
 //
@@ -118,4 +145,5 @@ void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
     EZHookInstall(CAEVehicleAudioEntity__Initialise);
+    EZHookInstall(CAutomobile_SetPanelDamage);
 }

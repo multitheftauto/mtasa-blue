@@ -259,6 +259,12 @@ public:
     CTimeInfoSAInterface timeInfo;
 };
 
+class CDamageableModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    void* m_damagedAtomic;
+};
+
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
 public:
@@ -447,6 +453,7 @@ public:
     // CModelInfoSA methods
     void         MakePedModel(const char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
+    void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
     void         MakeClumpModel(ushort usBaseModelID);
@@ -467,6 +474,7 @@ public:
     bool IsTowableBy(CModelInfo* towingModel) override;
 
     bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
+    bool IsDamageableAtomic() override;
 
     static bool IsVehicleModel(std::uint32_t model) noexcept;
 

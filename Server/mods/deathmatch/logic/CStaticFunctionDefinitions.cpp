@@ -938,6 +938,23 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled(CElement* pEle
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetElementOnFire(CElement* pElement, bool onFire)
+{
+    assert(pElement);
+
+    if (!IS_PED(pElement) && !IS_VEHICLE(pElement) && !IS_OBJECT(pElement) && !IS_WEAPON(pElement))
+        return false;
+
+    RUN_CHILDREN(SetElementOnFire(*iter, onFire));
+
+    pElement->SetOnFire(onFire);
+
+    CBitStream bitStream;
+    bitStream.pBitStream->WriteBit(onFire);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_ON_FIRE, *bitStream.pBitStream));
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* szID)
 {
     assert(pElement);
@@ -4938,40 +4955,38 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens(CVehicle* pVehicle, unsigned 
     assert(pVehicle);
     eVehicleType vehicleType = CVehicleManager::GetVehicleType(pVehicle->GetModel());
     // Won't work with below.
-    if (vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI &&
-        vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX)
-    {
-        if (ucSirenType >= 1 && ucSirenType <= 6)
-        {
-            if (ucSirenCount <= SIREN_COUNT_MAX)
-            {
-                pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
+    if (vehicleType != VEHICLE_CAR && vehicleType != VEHICLE_MONSTERTRUCK && vehicleType != VEHICLE_QUADBIKE)
+       return false;
 
-                pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
-                pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+    if (ucSirenType < 1 || ucSirenType > 6)
+        return false;
 
-                pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
-                pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck = tSirenInfo.m_bDoLOSCheck;
-                pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser = tSirenInfo.m_bUseRandomiser;
-                pVehicle->m_tSirenBeaconInfo.m_bSirenSilent = tSirenInfo.m_bSirenSilent;
+    if (ucSirenCount > SIREN_COUNT_MAX)
+        return false;
 
-                SVehicleSirenAddSync tSirenSync;
-                tSirenSync.data.m_bOverrideSirens = pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
-                tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
-                tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
-                tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
-                tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
-                tSirenSync.data.m_ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
-                tSirenSync.data.m_ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
+    pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
 
-                CBitStream BitStream;
-                BitStream.pBitStream->Write(&tSirenSync);
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, GIVE_VEHICLE_SIRENS, *BitStream.pBitStream));
-                return true;
-            }
-        }
-    }
-    return false;
+    pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
+    pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+
+    pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
+    pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck = tSirenInfo.m_bDoLOSCheck;
+    pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser = tSirenInfo.m_bUseRandomiser;
+    pVehicle->m_tSirenBeaconInfo.m_bSirenSilent = tSirenInfo.m_bSirenSilent;
+
+    SVehicleSirenAddSync tSirenSync;
+    tSirenSync.data.m_bOverrideSirens = pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
+    tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
+    tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
+    tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
+    tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
+    tSirenSync.data.m_ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
+    tSirenSync.data.m_ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(&tSirenSync);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, GIVE_VEHICLE_SIRENS, *BitStream.pBitStream));
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleSirens(CVehicle* pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo)
@@ -6704,10 +6719,10 @@ bool CStaticFunctionDefinitions::SetVehicleLightState(CElement* pElement, unsign
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent, bool breakGlass)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehiclePanelState(*iter, ucPanel, ucState))
+    RUN_CHILDREN(SetVehiclePanelState(*iter, ucPanel, ucState, spawnFlyingComponent, breakGlass))
 
     if (IS_VEHICLE(pElement))
     {
@@ -6724,6 +6739,8 @@ bool CStaticFunctionDefinitions::SetVehiclePanelState(CElement* pElement, unsign
                 BitStream.pBitStream->Write(ucObject);
                 BitStream.pBitStream->Write(ucPanel);
                 BitStream.pBitStream->Write(ucState);
+                BitStream.pBitStream->WriteBit(spawnFlyingComponent);
+                BitStream.pBitStream->WriteBit(breakGlass);
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_DAMAGE_STATE, *BitStream.pBitStream));
                 return true;
             }

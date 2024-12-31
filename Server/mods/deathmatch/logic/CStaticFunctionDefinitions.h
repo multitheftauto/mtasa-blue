@@ -110,6 +110,7 @@ public:
     static bool SetElementFrozen(CElement* pElement, bool bFrozen);
     static bool SetLowLodElement(CElement* pElement, CElement* pLowLodElement);
     static bool SetElementCallPropagationEnabled(CElement* pElement, bool bEnable);
+    static bool SetElementOnFire(CElement* pElement, bool onFire);
 
     // Player get funcs
     static unsigned int       GetPlayerCount();
@@ -313,7 +314,7 @@ public:
     static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState);
-    static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
+    static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent = true, bool breakGlass = false);
     static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);

@@ -1521,12 +1521,12 @@ bool CClientVehicle::GetWheelMissing(unsigned char ucWheel, const SString& strWh
     return false;
 }
 
-void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus)
+void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus, bool spawnFlyingComponent, bool breakGlass)
 {
     if (ucPanel < MAX_PANELS)
     {
         if (m_pVehicle && HasDamageModel())
-            m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus);
+            m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus, spawnFlyingComponent, breakGlass);
 
         m_ucPanelStates[ucPanel] = ucStatus;
     }
@@ -1570,6 +1570,19 @@ void CClientVehicle::SetHeliRotorSpeed(float fSpeed)
         m_pVehicle->SetHeliRotorSpeed(fSpeed);
 
     m_fHeliRotorSpeed = fSpeed;
+}
+
+bool CClientVehicle::GetVehicleRotorState() const noexcept
+{
+    return m_pVehicle && (m_eVehicleType == CLIENTVEHICLE_HELI || m_eVehicleType == CLIENTVEHICLE_PLANE) ? m_pVehicle->GetVehicleRotorState() : m_rotorState;
+}
+
+void CClientVehicle::SetVehicleRotorState(bool state, bool stopRotor) noexcept
+{
+    if (m_pVehicle && (m_eVehicleType == CLIENTVEHICLE_HELI || m_eVehicleType == CLIENTVEHICLE_PLANE))
+        m_pVehicle->SetVehicleRotorState(state, stopRotor, GetVehicleType() == CLIENTVEHICLE_HELI);
+
+    m_rotorState = state;
 }
 
 void CClientVehicle::SetPlaneRotorSpeed(float fSpeed)
