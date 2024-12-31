@@ -51,7 +51,6 @@ VOID InitKeysyncHooks()
     HookInstallMethod(VTBL_CBoat__ProcessControl, (DWORD)HOOK_CBoat__ProcessControl);
     HookInstallMethod(VTBL_CBike__ProcessControl, (DWORD)HOOK_CBike__ProcessControl);
     HookInstallMethod(VTBL_CHeli__ProcessControl, (DWORD)HOOK_CHeli__ProcessControl);
-    HookInstallMethod(VTBL_CHeli__ProcessControl, (DWORD)HOOK_CHeli__ProcessControl);
 
     // not strictly for keysync, to make CPlayerPed::GetPlayerInfoForThisPlayerPed always return the local playerinfo
     // 00609FF2     EB 1F          JMP SHORT gta_sa_u.0060A013

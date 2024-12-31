@@ -83,7 +83,8 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType);
+    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType,
+                               std::optional<eCustomDataClientTrust> clientTrust);
     static bool RemoveElementData(CElement* pElement, const char* szName);
     static bool AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
     static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
@@ -109,6 +110,7 @@ public:
     static bool SetElementFrozen(CElement* pElement, bool bFrozen);
     static bool SetLowLodElement(CElement* pElement, CElement* pLowLodElement);
     static bool SetElementCallPropagationEnabled(CElement* pElement, bool bEnable);
+    static bool SetElementOnFire(CElement* pElement, bool onFire);
 
     // Player get funcs
     static unsigned int       GetPlayerCount();
@@ -241,6 +243,7 @@ public:
     // Vehicle create/destroy functions
     static CVehicle* CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate,
                                    unsigned char ucVariant, unsigned char ucVariant2, bool bSynced);
+    static bool SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::uint8_t collisionType, std::int32_t removalTime = -1);
 
     // Vehicle get functions
     static bool  GetVehicleVariant(CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
@@ -284,11 +287,11 @@ public:
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue);
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue);
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue);
-    static bool GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, float& fValue, bool origin = false);
-    static bool GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, CVector& vecValue, bool origin = false);
-    static bool GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, std::string& strValue, bool origin = false);
-    static bool GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int& uiValue, bool origin = false);
-    static bool GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char& ucValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, float& fValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, CVector& vecValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, std::string& strValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned int& uiValue, bool origin = false);
+    static bool GetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned char& ucValue, bool origin = false);
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue);
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue);
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue);
@@ -350,13 +353,13 @@ public:
     static bool SetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue);
     static bool SetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue);
     static bool SetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char ucValue);
-    static bool ResetModelHandling(eVehicleTypes eModel);
-    static bool ResetModelHandlingProperty(eVehicleTypes eModel, eHandlingProperty eProperty);
-    static bool SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, float fValue);
-    static bool SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, CVector vecValue);
-    static bool SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, std::string strValue);
-    static bool SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int uiValue);
-    static bool SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char ucValue);
+    static bool ResetModelHandling(std::uint32_t model);
+    static bool ResetModelHandlingProperty(std::uint32_t model, eHandlingProperty eProperty);
+    static bool SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, float fValue);
+    static bool SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, CVector vecValue);
+    static bool SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, std::string strValue);
+    static bool SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned int uiValue);
+    static bool SetModelHandling(std::uint32_t model, eHandlingProperty eProperty, unsigned char ucValue);
     static bool SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue);
     static bool SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector vecValue);
     static bool SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue);

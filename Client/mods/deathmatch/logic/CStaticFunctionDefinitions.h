@@ -167,8 +167,10 @@ public:
     static bool SetPedCanBeKnockedOffBike(CClientEntity& Entity, bool bCanBeKnockedOffBike);
     static bool SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
-    static bool SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
-    static bool SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
+
+    static bool  SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
+    static bool  SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
+
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);
     static bool RemovePedClothes(CClientEntity& Entity, unsigned char ucType);

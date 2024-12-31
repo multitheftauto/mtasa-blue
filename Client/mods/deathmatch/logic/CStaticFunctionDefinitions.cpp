@@ -28,7 +28,7 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CBuildingRemoval.h>
-#include <game/Task.h>
+#include <game/TaskBasic.h>
 
 using std::list;
 
@@ -51,7 +51,7 @@ static CClientMarkerManager*     m_pMarkerManager;
 static CClientPickupManager*     m_pPickupManager;
 static CMovingObjectsManager*    m_pMovingObjectsManager;
 static CBlendedWeather*          m_pBlendedWeather;
-static CRadarMap*                m_pRadarMap;
+static CPlayerMap*               m_pPlayerMap;
 static CClientCamera*            m_pCamera;
 static CClientExplosionManager*  m_pExplosionManager;
 static CClientProjectileManager* m_pProjectileManager;
@@ -88,7 +88,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager,
     m_pPickupManager = pManager->GetPickupManager();
     m_pMovingObjectsManager = m_pClientGame->GetMovingObjectsManager();
     m_pBlendedWeather = m_pClientGame->GetBlendedWeather();
-    m_pRadarMap = m_pClientGame->GetRadarMap();
+    m_pPlayerMap = m_pClientGame->GetPlayerMap();
     m_pCamera = pManager->GetCamera();
     m_pExplosionManager = pManager->GetExplosionManager();
     m_pProjectileManager = pManager->GetProjectileManager();
@@ -2589,6 +2589,9 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
 {
     if (IS_PED(&Entity))
     {
+        if (!Entity.IsLocalEntity())
+            return false;
+
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         Ped.SetOnFire(bOnFire);
         return true;
@@ -7840,25 +7843,25 @@ bool CStaticFunctionDefinitions::SetWeaponClipAmmo(CClientWeapon* pWeapon, int i
 
 bool CStaticFunctionDefinitions::ForcePlayerMap(bool& bForced)
 {
-    m_pClientGame->GetRadarMap()->SetForcedState(bForced);
+    m_pClientGame->GetPlayerMap()->SetForcedState(bForced);
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsPlayerMapForced(bool& bForced)
 {
-    bForced = m_pRadarMap->GetForcedState();
+    bForced = m_pPlayerMap->GetForcedState();
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsPlayerMapVisible(bool& bVisible)
 {
-    bVisible = m_pRadarMap->IsRadarShowing();
+    bVisible = m_pPlayerMap->IsPlayerMapShowing();
     return true;
 }
 
 bool CStaticFunctionDefinitions::GetPlayerMapBoundingBox(CVector& vecMin, CVector& vecMax)
 {
-    if (m_pRadarMap->GetBoundingBox(vecMin, vecMax))
+    if (m_pPlayerMap->GetBoundingBox(vecMin, vecMax))
     {
         return true;
     }
@@ -8975,11 +8978,8 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 {
     assert(pVehicle);
 
-    eVehicleTypes         eModel = (eVehicleTypes)pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
-    const CHandlingEntry* pNewEntry;
-
-    pNewEntry = pVehicle->GetOriginalHandlingData();
+    const CHandlingEntry* pNewEntry = pVehicle->GetOriginalHandlingData();
 
     pEntry->SetMass(pNewEntry->GetMass());
     pEntry->SetTurnMass(pNewEntry->GetTurnMass());
@@ -9015,17 +9015,13 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
     // pEntry->SetTailLight(pNewEntry->GetTailLight ());
     pEntry->SetAnimGroup(pNewEntry->GetAnimGroup());
 
-    // Lower and Upper limits cannot match or LSOD (unless boat)
-    // if ( eModel != VEHICLE_BOAT )     // Commented until fully tested
+    float fSuspensionLimitSize = pEntry->GetSuspensionUpperLimit() - pEntry->GetSuspensionLowerLimit();
+    if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)
     {
-        float fSuspensionLimitSize = pEntry->GetSuspensionUpperLimit() - pEntry->GetSuspensionLowerLimit();
-        if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)
-        {
-            if (fSuspensionLimitSize >= 0.f)
-                pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() + 0.1f);
-            else
-                pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() - 0.1f);
-        }
+        if (fSuspensionLimitSize >= 0.f)
+            pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() + 0.1f);
+        else
+            pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() - 0.1f);
     }
 
     pVehicle->ApplyHandling();

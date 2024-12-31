@@ -15,6 +15,9 @@
 #include "CMatrix.h"
 #include "gamesa_renderware.h"
 
+#define SetLightColoursForPedsCarsAndObjects(fMult) ((RpLight*(__cdecl*)(float))0x735D90)(fMult)
+#define SetAmbientColours() ((RpLight*(__cdecl*)())0x735D30)()
+
 CRendererSA::CRendererSA()
 {
 }
@@ -23,7 +26,7 @@ CRendererSA::~CRendererSA()
 {
 }
 
-void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix)
+void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting)
 {
     CBaseModelInfoSAInterface* pModelInfoSAInterface = pModelInfo->GetInterface();
     if (!pModelInfoSAInterface)
@@ -40,7 +43,10 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix)
     rwMatrix.up = (RwV3d&)matrix.vFront;
     rwMatrix.at = (RwV3d&)matrix.vUp;
     rwMatrix.pos = (RwV3d&)matrix.vPos;
-    RwFrameTransform(pFrame, &rwMatrix, rwCOMBINEREPLACE);    
+    RwFrameTransform(pFrame, &rwMatrix, rwCOMBINEREPLACE);
+
+    // Setup ambient light multiplier
+    SetLightColoursForPedsCarsAndObjects(lighting);
 
     if (pRwObject->type == RP_TYPE_ATOMIC)
     {
@@ -52,4 +58,7 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix)
         RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
         RpClumpRender(pClump);
     }
+
+    // Restore ambient light
+    SetAmbientColours();
 }
