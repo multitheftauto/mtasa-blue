@@ -253,7 +253,7 @@ public:
     CClientVehicle* GetRealOccupiedVehicle();
     CClientVehicle* GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL,
-                                               float fWithinRange = 6000.0f);
+                                               float fWithinRange = 6000.0f, bool localVehicles = false);
     bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
                                    CVector* pClosestDoorPosition = NULL);
 
@@ -460,7 +460,6 @@ public:
 
     bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
-    void RunAnimation(AssocGroupId animGroup, AnimationId animID);
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
                            bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
@@ -484,8 +483,8 @@ public:
     bool IsBleeding() const noexcept { return m_bBleeding; };
     void SetBleeding(bool bBleeding);
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() override { return m_pPlayerPed ? m_pPlayerPed->IsOnFire() : m_bIsOnFire; }
+    bool SetOnFire(bool bOnFire) override;
 
     void GetVoice(short* psVoiceType, short* psVoiceID);
     void GetVoice(const char** pszVoiceType, const char** pszVoice);

@@ -166,6 +166,12 @@ public:
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
+    static bool SetVehicleRotorState(CClientVehicle* const vehicle, bool state, std::optional<bool> stopRotor) noexcept;
+    static bool GetVehicleRotorState(CClientVehicle* const vehicle) noexcept;
+
+    static bool AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360, std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept;
+    static bool RemoveVehicleSirens(CClientVehicle* vehicle) noexcept;
+
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
     LUA_DECLARE_OOP(GetVehicleComponentPosition);
@@ -181,4 +187,7 @@ public:
     LUA_DECLARE(GetVehicleComponents);
 
     static bool SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime);
+
+    static bool SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state);
+    static bool IsSmokeTrailEnabled(CClientVehicle* vehicle) noexcept;
 };

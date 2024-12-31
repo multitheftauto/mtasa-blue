@@ -104,8 +104,8 @@ public:
     CVector                   m_vecUnk;                                   // 280
     uint32                    m_pad4;                                     // 292
     CPtrNodeDoubleLink<void>* m_pControlCodeNodeLink;                           // 296
-    float                     m_fLighting;                                // 300
-    float                     m_fLighting2;                               // 304
+    float                     m_fLighting;                                // 300 surface brightness
+    float                     m_fLighting2;                               // 304 dynamic lighting (unused, always set to 0 in the GTA code)
     class CShadowDataSA*      m_pShadowData;                              // 308
 
     CRect*      GetBoundRect_(CRect* pRect);
@@ -121,7 +121,7 @@ public:
     CVector*     GetTurnSpeed(CVector* vecTurnSpeed);
     CVector*     GetMoveSpeedInternal(CVector* vecMoveSpeed);
     CVector*     GetTurnSpeedInternal(CVector* vecTurnSpeed);
-    void         SetMoveSpeed(CVector* vecMoveSpeed);
+    void         SetMoveSpeed(const CVector& vecMoveSpeed) noexcept;
     void         SetTurnSpeed(CVector* vecTurnSpeed);
 
     float GetMass();

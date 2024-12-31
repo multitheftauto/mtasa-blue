@@ -526,3 +526,49 @@ struct RwError
 {
     int err1, err2;
 };
+
+/*****************************************************************************/
+/** RenderWare Globals                                                      **/
+/*****************************************************************************/
+
+typedef bool (*RwSystemFunc)(std::int32_t, void*, void*, std::int32_t);
+struct RwDevice
+{
+    float        gammaCorrection;
+    RwSystemFunc fpSystem;
+    float        zBufferNear;
+    float        zBufferFar;
+    // RwRenderStateSetFunction             fpRenderStateSet;
+    // RwRenderStateGetFunction             fpRenderStateGet;
+    // RwIm2DRenderLineFunction             fpIm2DRenderLine;
+    // RwIm2DRenderTriangleFunction         fpIm2DRenderTriangle;
+    // RwIm2DRenderPrimitiveFunction        fpIm2DRenderPrimitive;
+    // RwIm2DRenderIndexedPrimitiveFunction fpIm2DRenderIndexedPrimitive;
+    // RwIm3DRenderLineFunction             fpIm3DRenderLine;
+    // RwIm3DRenderTriangleFunction         fpIm3DRenderTriangle;
+    // RwIm3DRenderPrimitiveFunction        fpIm3DRenderPrimitive;
+    // RwIm3DRenderIndexedPrimitiveFunction fpIm3DRenderIndexedPrimitive;
+};
+// static_assert(sizeof(RwDevice) == 0x38, "Incorrect class size: RwDevice");
+
+typedef bool (*RwStandardFunc)(void*, void*, std::int32_t);
+struct RwGlobals
+{
+    void*               curCamera;
+    void*               curWorld;
+    std::uint16_t       renderFrame;
+    std::uint16_t       lightFrame;
+    std::uint16_t       pad[2];
+    RwDevice            dOpenDevice;
+    RwStandardFunc      stdFunc[29];
+    // RwLinkList          dirtyFrameList;
+    // RwFileFunctions     fileFuncs;
+    // RwStringFunctions   stringFuncs;
+    // RwMemoryFunctions   memoryFuncs;
+    // RwMemoryAllocFn     memoryAlloc;
+    // RwMemoryFreeFn      memoryFree;
+    // RwMetrics*          metrics;
+    // RwEngineStatus      engineStatus;
+    // RwUInt32            resArenaInitSize;
+};
+//static_assert(sizeof(RwGlobals) == 0x158, "Incorrect class size: RwGlobals");

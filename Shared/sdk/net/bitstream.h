@@ -572,6 +572,26 @@ enum class eBitStreamVersion : unsigned short
     // 2024-09-04
     RespawnObject_Serverside,
 
+    // Add check_duplicate_serials
+    // 2024-09-04
+    CheckDuplicateSerials,
+
+    // Add ignorefirestate special world property
+    // 2024-11-07
+    WorldSpecialProperty_IgnoreFireState,
+
+    // Fix iPedSyncerDistance and iUnoccupiedVehicleSyncerDistance sync
+    // 2024-11-22
+    FixSyncerDistance,
+
+    // Add onPlayerChangesWorldSpecialProperty
+    // 2024-11-26
+    WorldSpecialPropertyEvent,
+
+    // Add setElementOnFire function
+    // 2024-30-12
+    SetElementOnFire,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

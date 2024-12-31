@@ -215,55 +215,54 @@ public:
     void SetIsFinished(bool bFinished) { m_bIsFinished = bFinished; };
     bool IsFinished() { return m_bIsFinished; };
 
-    CMainConfig*            GetConfig() { return m_pMainConfig; }
-    CHandlingManager*       GetHandlingManager() { return m_pHandlingManager; }
-    CMapManager*            GetMapManager() { return m_pMapManager; }
-    CPlayerManager*         GetPlayerManager() { return m_pPlayerManager; }
-    CObjectManager*         GetObjectManager() { return m_pObjectManager; }
-    CVehicleManager*        GetVehicleManager() { return m_pVehicleManager; }
-    CTeamManager*           GetTeamManager() { return m_pTeamManager; }
-    CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
-    CPedSync*               GetPedSync() { return m_pPedSync; }
-    CRegisteredCommands*    GetRegisteredCommands() { return m_pRegisteredCommands; }
+    CMainConfig*                        GetConfig() { return m_pMainConfig; }
+    CHandlingManager*                   GetHandlingManager() const noexcept { return m_HandlingManager.get(); }
+    CMapManager*                        GetMapManager() { return m_pMapManager; }
+    CPlayerManager*                     GetPlayerManager() { return m_pPlayerManager; }
+    CObjectManager*                     GetObjectManager() { return m_pObjectManager; }
+    CVehicleManager*                    GetVehicleManager() { return m_pVehicleManager; }
+    CTeamManager*                       GetTeamManager() { return m_pTeamManager; }
+    CUnoccupiedVehicleSync*             GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
+    CPedSync*                           GetPedSync() { return m_pPedSync; }
+    CRegisteredCommands*                GetRegisteredCommands() { return m_pRegisteredCommands; }
 #ifdef WITH_OBJECT_SYNC
-    CObjectSync* GetObjectSync() { return m_pObjectSync; }
+    CObjectSync*                        GetObjectSync() { return m_pObjectSync; }
 #endif
-    CConsole*                        GetConsole() { return m_pConsole; }
-    CDatabaseManager*                GetDatabaseManager() { return m_pDatabaseManager; }
-    CLuaCallbackManager*             GetLuaCallbackManager() { return m_pLuaCallbackManager; }
-    CRegistryManager*                GetRegistryManager() { return m_pRegistryManager; }
-    CRegistry*                       GetRegistry() { return m_pRegistry; }
-    CAccountManager*                 GetAccountManager() { return m_pAccountManager; }
-    CScriptDebugging*                GetScriptDebugging() { return m_pScriptDebugging; }
-    CEvents*                         GetEvents() { return &m_Events; }
-    CColManager*                     GetColManager() { return m_pColManager; }
-    CLatentTransferManager*          GetLatentTransferManager() { return m_pLatentTransferManager; }
-    CDebugHookManager*               GetDebugHookManager() { return m_pDebugHookManager; }
-    CPedManager*                     GetPedManager() { return m_pPedManager; }
-    CResourceManager*                GetResourceManager() { return m_pResourceManager; }
-    CMarkerManager*                  GetMarkerManager() { return m_pMarkerManager; }
-    CBlipManager*                    GetBlipManager() { return m_pBlipManager; }
-    CPickupManager*                  GetPickupManager() { return m_pPickupManager; }
-    CRadarAreaManager*               GetRadarAreaManager() { return m_pRadarAreaManager; }
-    CGroups*                         GetGroups() { return m_pGroups; }
-    CElementDeleter*                 GetElementDeleter() { return &m_ElementDeleter; }
-    CConnectHistory*                 GetJoinFloodProtector() { return &m_FloodProtect; }
-    CHTTPD*                          GetHTTPD() { return m_pHTTPD; }
-    CSettings*                       GetSettings() { return m_pSettings; }
-    CAccessControlListManager*       GetACLManager() { return m_pACLManager; }
-    CBanManager*                     GetBanManager() { return m_pBanManager; }
-    CRemoteCalls*                    GetRemoteCalls() { return m_pRemoteCalls; }
-    CZoneNames*                      GetZoneNames() { return m_pZoneNames; }
-    CClock*                          GetClock() { return m_pClock; }
-    CWaterManager*                   GetWaterManager() { return m_pWaterManager; }
-    CLightsyncManager*               GetLightSyncManager() { return &m_lightsyncManager; }
-    CWeaponStatManager*              GetWeaponStatManager() { return m_pWeaponStatsManager; }
-    CBuildingRemovalManager*         GetBuildingRemovalManager() { return m_pBuildingRemovalManager; }
-    CCustomWeaponManager*            GetCustomWeaponManager() { return m_pCustomWeaponManager; }
-    CFunctionUseLogger*              GetFunctionUseLogger() { return m_pFunctionUseLogger; }
-    CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
-    SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
-
+    CConsole*                           GetConsole() { return m_pConsole; }
+    CDatabaseManager*                   GetDatabaseManager() { return m_pDatabaseManager; }
+    CLuaCallbackManager*                GetLuaCallbackManager() { return m_pLuaCallbackManager; }
+    CRegistryManager*                   GetRegistryManager() { return m_pRegistryManager; }
+    CRegistry*                          GetRegistry() { return m_pRegistry; }
+    CAccountManager*                    GetAccountManager() { return m_pAccountManager; }
+    CScriptDebugging*                   GetScriptDebugging() { return m_pScriptDebugging; }
+    CEvents*                            GetEvents() { return &m_Events; }
+    CColManager*                        GetColManager() { return m_pColManager; }
+    CLatentTransferManager*             GetLatentTransferManager() { return m_pLatentTransferManager; }
+    CDebugHookManager*                  GetDebugHookManager() { return m_pDebugHookManager; }
+    CPedManager*                        GetPedManager() { return m_pPedManager; }
+    CResourceManager*                   GetResourceManager() { return m_pResourceManager; }
+    CMarkerManager*                     GetMarkerManager() { return m_pMarkerManager; }
+    CBlipManager*                       GetBlipManager() { return m_pBlipManager; }
+    CPickupManager*                     GetPickupManager() { return m_pPickupManager; }
+    CRadarAreaManager*                  GetRadarAreaManager() { return m_pRadarAreaManager; }
+    CGroups*                            GetGroups() { return m_pGroups; }
+    CElementDeleter*                    GetElementDeleter() { return &m_ElementDeleter; }
+    CConnectHistory*                    GetJoinFloodProtector() { return &m_FloodProtect; }
+    CHTTPD*                             GetHTTPD() { return m_pHTTPD; }
+    CSettings*                          GetSettings() { return m_pSettings; }
+    CAccessControlListManager*          GetACLManager() { return m_pACLManager; }
+    CBanManager*                        GetBanManager() { return m_pBanManager; }
+    CRemoteCalls*                       GetRemoteCalls() { return m_pRemoteCalls; }
+    CZoneNames*                         GetZoneNames() { return m_pZoneNames; }
+    CClock*                             GetClock() { return m_pClock; }
+    CWaterManager*                      GetWaterManager() { return m_pWaterManager; }
+    CLightsyncManager*                  GetLightSyncManager() { return &m_lightsyncManager; }
+    CWeaponStatManager*                 GetWeaponStatManager() { return m_pWeaponStatsManager; }
+    CBuildingRemovalManager*            GetBuildingRemovalManager() { return m_pBuildingRemovalManager; }
+    CCustomWeaponManager*               GetCustomWeaponManager() { return m_pCustomWeaponManager; }
+    CFunctionUseLogger*                 GetFunctionUseLogger() { return m_pFunctionUseLogger; }
+    CMasterServerAnnouncer*             GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
+    SharedUtil::CAsyncTaskScheduler*    GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
     std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
 
     void JoinPlayer(CPlayer& Player);
@@ -519,6 +518,7 @@ private:
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
     void Packet_PlayerResourceStart(class CPlayerResourceStartPacket& Packet);
+    void Packet_PlayerWorldSpecialProperty(class CPlayerWorldSpecialPropertyPacket& packet) noexcept;
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
@@ -528,53 +528,53 @@ private:
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
 
-    CEvents                 m_Events;
-    CRemoteCalls*           m_pRemoteCalls;
-    CHTTPD*                 m_pHTTPD;
-    CMainConfig*            m_pMainConfig;
-    CBlipManager*           m_pBlipManager;
-    CGroups*                m_pGroups;
-    CColManager*            m_pColManager;
-    CObjectManager*         m_pObjectManager;
-    CPickupManager*         m_pPickupManager;
-    CPlayerManager*         m_pPlayerManager;
-    CRadarAreaManager*      m_pRadarAreaManager;
-    CVehicleManager*        m_pVehicleManager;
-    CPacketTranslator*      m_pPacketTranslator;
-    CMapManager*            m_pMapManager;
-    CElementDeleter         m_ElementDeleter;
-    CConnectHistory         m_FloodProtect;
-    CLuaManager*            m_pLuaManager;
-    CScriptDebugging*       m_pScriptDebugging;
-    CConsole*               m_pConsole;
-    CUnoccupiedVehicleSync* m_pUnoccupiedVehicleSync;
-    CPedSync*               m_pPedSync;
+    CEvents                           m_Events;
+    CRemoteCalls*                     m_pRemoteCalls;
+    CHTTPD*                           m_pHTTPD;
+    CMainConfig*                      m_pMainConfig;
+    CBlipManager*                     m_pBlipManager;
+    CGroups*                          m_pGroups;
+    CColManager*                      m_pColManager;
+    CObjectManager*                   m_pObjectManager;
+    CPickupManager*                   m_pPickupManager;
+    CPlayerManager*                   m_pPlayerManager;
+    CRadarAreaManager*                m_pRadarAreaManager;
+    CVehicleManager*                  m_pVehicleManager;
+    CPacketTranslator*                m_pPacketTranslator;
+    CMapManager*                      m_pMapManager;
+    CElementDeleter                   m_ElementDeleter;
+    CConnectHistory                   m_FloodProtect;
+    CLuaManager*                      m_pLuaManager;
+    CScriptDebugging*                 m_pScriptDebugging;
+    CConsole*                         m_pConsole;
+    CUnoccupiedVehicleSync*           m_pUnoccupiedVehicleSync;
+    CPedSync*                         m_pPedSync;
 #ifdef WITH_OBJECT_SYNC
-    CObjectSync* m_pObjectSync;
+    CObjectSync*                      m_pObjectSync;
 #endif
-    CMarkerManager*            m_pMarkerManager;
-    CClock*                    m_pClock;
-    CBanManager*               m_pBanManager;
-    CTeamManager*              m_pTeamManager;
-    CCommandLineParser         m_CommandLineParser;
-    CRegisteredCommands*       m_pRegisteredCommands;
-    CDatabaseManager*          m_pDatabaseManager;
-    CLuaCallbackManager*       m_pLuaCallbackManager;
-    CRegistryManager*          m_pRegistryManager;
-    CRegistry*                 m_pRegistry;
-    CAccountManager*           m_pAccountManager;
-    CLatentTransferManager*    m_pLatentTransferManager;
-    CDebugHookManager*         m_pDebugHookManager;
-    CPedManager*               m_pPedManager;
-    CResourceManager*          m_pResourceManager;
-    CAccessControlListManager* m_pACLManager;
-    CSettings*                 m_pSettings;
-    CZoneNames*                m_pZoneNames;
-    ASE*                       m_pASE;
-    CHandlingManager*          m_pHandlingManager;
-    CRPCFunctions*             m_pRPCFunctions;
-    CLanBroadcast*             m_pLanBroadcast;
-    CWaterManager*             m_pWaterManager;
+    CMarkerManager*                   m_pMarkerManager;
+    CClock*                           m_pClock;
+    CBanManager*                      m_pBanManager;
+    CTeamManager*                     m_pTeamManager;
+    CCommandLineParser                m_CommandLineParser;
+    CRegisteredCommands*              m_pRegisteredCommands;
+    CDatabaseManager*                 m_pDatabaseManager;
+    CLuaCallbackManager*              m_pLuaCallbackManager;
+    CRegistryManager*                 m_pRegistryManager;
+    CRegistry*                        m_pRegistry;
+    CAccountManager*                  m_pAccountManager;
+    CLatentTransferManager*           m_pLatentTransferManager;
+    CDebugHookManager*                m_pDebugHookManager;
+    CPedManager*                      m_pPedManager;
+    CResourceManager*                 m_pResourceManager;
+    CAccessControlListManager*        m_pACLManager;
+    CSettings*                        m_pSettings;
+    CZoneNames*                       m_pZoneNames;
+    ASE*                              m_pASE;
+    std::unique_ptr<CHandlingManager> m_HandlingManager;
+    CRPCFunctions*                    m_pRPCFunctions;
+    CLanBroadcast*                    m_pLanBroadcast;
+    CWaterManager*                    m_pWaterManager;
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;
