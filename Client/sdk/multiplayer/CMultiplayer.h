@@ -83,7 +83,7 @@ typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingB
 typedef void(PostWeaponFireHandler)();
 typedef void(BulletImpactHandler)(class CPed* pInitiator, class CEntity* pVictim, const CVector* pvecStartPosition, const CVector* pvecEndPosition);
 typedef void(BulletFireHandler)(class CPed* pInitiator, const CVector* pvecStartPosition, const CVector* pvecEndPosition);
-typedef bool(DamageHandler)(class CPed* pDamagePed, class CEventDamage* pEvent);
+typedef bool(DamageHandler)(class CPed* pDamagePed, class CEventDamage* pEvent, class CPedSAInterface*& pedInterface);
 typedef void(DeathHandler)(class CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
 typedef void(FireHandler)(class CFire* pFire);
 typedef bool(ProjectileStopHandler)(class CEntity* owner, enum eWeaponType weaponType, class CVector* origin, float fForce, class CVector* target,

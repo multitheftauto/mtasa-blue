@@ -3528,9 +3528,9 @@ void CClientGame::StaticDrawRadarAreasHandler()
     g_pClientGame->DrawRadarAreasHandler();
 }
 
-bool CClientGame::StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
+bool CClientGame::StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent, CPedSAInterface*& pedInterface)
 {
-    return g_pClientGame->DamageHandler(pDamagePed, pEvent);
+    return g_pClientGame->DamageHandler(pDamagePed, pEvent, pedInterface);
 }
 
 void CClientGame::StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart)
@@ -4183,7 +4183,7 @@ void GetDeathAnim(CClientPed* pDamagedPed, CEventDamage* pEvent, AssocGroupId& o
 //      returning false ??
 //      returning true ??
 //
-bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
+bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent, CPedSAInterface*& pedInterface)
 {
     // CEventDamage::AffectsPed: This is/can be called more than once for each bit of damage (and may not actually take any more health (even if we return
     // true))
@@ -4220,6 +4220,9 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
             if (pPedClientEntity->pClientEntity && pPedClientEntity->pClientEntity->GetGameEntity() != nullptr)
             {
                 pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
+
+                // Update the damaged ped, because it might have been invalidated in onClientPedDamage/onClientPlayerDamage using setElementHealth 
+                pedInterface = reinterpret_cast<CPedSAInterface*>(pDamagedPed->GetGameEntity()->GetInterface());
             }
         }
     }
@@ -4356,8 +4359,8 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
 bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, uchar hitZone, CClientPed* pDamagedPed, CClientEntity* pInflictingEntity,
                                          CEventDamage* pEvent)
 {
-    float fPreviousHealth = pDamagedPed->m_fHealth;
     float fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
+    float fPreviousHealth = fCurrentHealth + fDamage;
     float fPreviousArmor = pDamagedPed->m_fArmor;
     float fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
