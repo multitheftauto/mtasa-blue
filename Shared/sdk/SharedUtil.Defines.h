@@ -166,6 +166,8 @@
 #define ZERO_POD_STRUCT(ptr) \
         memset ( ptr, 0, sizeof(*(ptr)) )
 
+#define BYTE_MASK(n) ((1 << (n)) - 1)
+
 // printf/wprintf helpers
 //
 // http://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm
