@@ -244,6 +244,7 @@ CGameSA::CGameSA()
         D3DResourceSystemSA::StaticSetHooks();
         CVehicleSA::StaticSetHooks();
         CCheckpointSA::StaticSetHooks();
+        CHudSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {

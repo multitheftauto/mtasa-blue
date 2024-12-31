@@ -3428,6 +3428,9 @@ void CClientGame::Event_OnIngame()
     pHud->SetComponentVisible(HUD_VITAL_STATS, false);
     pHud->SetComponentVisible(HUD_AREA_NAME, false);
 
+    // Reset properties
+    CLuaPlayerDefs::ResetPlayerHudComponentProperty(HUD_ALL, eHudComponentProperty::ALL_PROPERTIES);
+
     g_pMultiplayer->DeleteAndDisableGangTags();
 
     g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
