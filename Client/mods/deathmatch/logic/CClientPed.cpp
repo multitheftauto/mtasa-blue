@@ -251,6 +251,9 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         // Init the local player
         _CreateLocalModel();
 
+        // Init default analog control states
+        CClientPad::InitAnalogControlStates();
+
         // Give full health, no armor, no weapons and put him at a safe location
         SetHealth(GetMaxHealth());
         SetArmor(0);
