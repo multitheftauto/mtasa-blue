@@ -17,10 +17,10 @@ class CConsoleCommands
 {
 public:
     static bool Update(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
-    static bool StartResource(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
-    static bool StopResource(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
+    static bool StartResource(CConsole* console, const char* arguments, CClient* client, CClient* echo) noexcept;
+    static bool StopResource(CConsole* console, const char* arguments, CClient* client, CClient* echo) noexcept;
     static bool StopAllResources(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
-    static bool RestartResource(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
+    static bool RestartResource(CConsole* console, const char* arguments, CClient* client, CClient* echo) noexcept;
     static bool RefreshResources(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
     static bool RefreshAllResources(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
     static bool ListResources(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
