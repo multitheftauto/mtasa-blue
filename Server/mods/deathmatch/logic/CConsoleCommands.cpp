@@ -60,7 +60,7 @@ static void EndConsoleOutputCapture(CClient* pClient, const SString& strIfNoOutp
     }
 }
 
-bool CConsoleCommands::StartResource(CConsole* console, const char* arguments, CClient* client, CClient* echo) noexcept
+bool CConsoleCommands::StartResource(CConsole* console, const char* arguments, CClient* client, CClient* echo)
 {
     if (!arguments || !arguments[0])
     {
@@ -115,7 +115,7 @@ bool CConsoleCommands::StartResource(CConsole* console, const char* arguments, C
     return true;
 }
 
-bool CConsoleCommands::RestartResource(CConsole* console, const char* arguments, CClient* client, CClient* echo) noexcept
+bool CConsoleCommands::RestartResource(CConsole* console, const char* arguments, CClient* client, CClient* echo)
 {
     if (!arguments || !arguments[0])
     {
@@ -221,7 +221,7 @@ bool CConsoleCommands::ResourceInfo(CConsole* pConsole, const char* szArguments,
     return false;
 }
 
-bool CConsoleCommands::StopResource(CConsole* console, const char* arguments, CClient* client, CClient* echo) noexcept
+bool CConsoleCommands::StopResource(CConsole* console, const char* arguments, CClient* client, CClient* echo)
 {
     if (!arguments || !arguments[0])
     {
