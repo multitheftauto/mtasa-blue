@@ -308,6 +308,8 @@ int CLuaFunctionDefs::SetAnalogControlState(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strControlState);
 
+    CClientPlayer* localPlayer = CStaticFunctionDefinitions::GetLocalPlayer();
+
     if (!argStream.HasErrors())
     {
         if (argStream.NextIsNumber())
@@ -316,7 +318,7 @@ int CLuaFunctionDefs::SetAnalogControlState(lua_State* luaVM)
             if (argStream.NextIsBool())
                 argStream.ReadBool(bForceOverrideNextFrame, false);
 
-            if (CClientPad::SetAnalogControlState(strControlState, fState, bForceOverrideNextFrame))
+            if (localPlayer->m_Pad.SetAnalogControlState(strControlState, fState, bForceOverrideNextFrame))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -324,7 +326,7 @@ int CLuaFunctionDefs::SetAnalogControlState(lua_State* luaVM)
         }
         else if (argStream.NextIsNone())
         {
-            CClientPad::RemoveSetAnalogControlState(strControlState);
+            localPlayer->m_Pad.RemoveSetAnalogControlState(strControlState);
             lua_pushboolean(luaVM, true);
             return 1;
         }
