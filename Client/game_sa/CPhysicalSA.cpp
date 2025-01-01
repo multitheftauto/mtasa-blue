@@ -39,7 +39,7 @@ void CPhysicalSA::RestoreLastGoodPhysicsState()
 
     CVector vecDefault;
     SetTurnSpeed(&vecDefault);
-    SetMoveSpeed(&vecDefault);
+    SetMoveSpeed(vecDefault);
 
     CPhysicalSAInterface* pInterface = (CPhysicalSAInterface*)GetInterface();
     pInterface->m_pad4d = 0;
@@ -100,24 +100,30 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     return vecTurnSpeed;
 }
 
-void CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
 {
-    DWORD dwFunc = FUNC_GetMoveSpeed;
-    DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
-    DWORD dwReturn = 0;
-
-    _asm
+    try
     {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
+        DWORD dwFunc = FUNC_GetMoveSpeed;
+        DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
+        DWORD dwReturn = 0;
+
+        __asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+            mov     dwReturn, eax
+        }
+        MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
+
+        if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
+        {
+            AddToMovingList();
+            SetStatic(false);
+        }
     }
-    MemCpyFast((void*)dwReturn, vecMoveSpeed, sizeof(CVector));
-
-    if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
+    catch (...)
     {
-        AddToMovingList();
-        SetStatic(false);
     }
 }
 

@@ -115,4 +115,6 @@ public:
     static bool SetPedExitVehicle(CClientPed* pPed);
     static bool IsPedBleeding(CClientPed* ped);
     static bool SetPedBleeding(CClientPed* ped, bool bleeding);
+
+    static bool killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept;
 };
