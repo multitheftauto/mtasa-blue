@@ -760,7 +760,7 @@ void _declspec(naked) HOOK_CWeapon__Fire_Sniper()
     }
 }
 
-bool ProcessDamageEvent(CEventDamageSAInterface* event, CPedSAInterface*& affectsPed)
+bool ProcessDamageEvent(CEventDamageSAInterface* event, CPedSAInterface* affectsPed)
 {
     if (m_pDamageHandler && event)
     {
@@ -775,7 +775,7 @@ bool ProcessDamageEvent(CEventDamageSAInterface* event, CPedSAInterface*& affect
             CEventDamage* pEvent = pGameInterface->GetEventList()->GetEventDamage(event);
             pEvent->SetDamageReason(g_GenerateDamageEventReason);
             // Call the event
-            bool bReturn = m_pDamageHandler(pPed, pEvent, affectsPed);
+            bool bReturn = m_pDamageHandler(pPed, pEvent);
             // Destroy the CEventDamageSA (so we dont get a leak)
             pEvent->Destroy();
             // Finally, return
@@ -818,9 +818,6 @@ void _declspec(naked) HOOK_CEventDamage__AffectsPed()
             sub     esp, 0xC        // replacement code
             push    esi
             mov     esi, ecx
-
-            mov ecx, affectsPed
-            mov [esp+14h], ecx
 
             mov     ecx, HOOKPOS_CEventDamage__AffectsPed
             add     ecx, 6

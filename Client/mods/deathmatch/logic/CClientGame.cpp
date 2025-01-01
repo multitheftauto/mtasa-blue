@@ -3428,6 +3428,9 @@ void CClientGame::Event_OnIngame()
     pHud->SetComponentVisible(HUD_VITAL_STATS, false);
     pHud->SetComponentVisible(HUD_AREA_NAME, false);
 
+    // Reset properties
+    CLuaPlayerDefs::ResetPlayerHudComponentProperty(HUD_ALL, eHudComponentProperty::ALL_PROPERTIES);
+
     g_pMultiplayer->DeleteAndDisableGangTags();
 
     g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
@@ -3528,9 +3531,9 @@ void CClientGame::StaticDrawRadarAreasHandler()
     g_pClientGame->DrawRadarAreasHandler();
 }
 
-bool CClientGame::StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent, CPedSAInterface*& pedInterface)
+bool CClientGame::StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
 {
-    return g_pClientGame->DamageHandler(pDamagePed, pEvent, pedInterface);
+    return g_pClientGame->DamageHandler(pDamagePed, pEvent);
 }
 
 void CClientGame::StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart)
@@ -4183,7 +4186,7 @@ void GetDeathAnim(CClientPed* pDamagedPed, CEventDamage* pEvent, AssocGroupId& o
 //      returning false ??
 //      returning true ??
 //
-bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent, CPedSAInterface*& pedInterface)
+bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
 {
     // CEventDamage::AffectsPed: This is/can be called more than once for each bit of damage (and may not actually take any more health (even if we return
     // true))
@@ -4220,9 +4223,6 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent, CPedSAIn
             if (pPedClientEntity->pClientEntity && pPedClientEntity->pClientEntity->GetGameEntity() != nullptr)
             {
                 pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
-
-                // Update the damaged ped, because it might have been invalidated in onClientPedDamage/onClientPlayerDamage using setElementHealth 
-                pedInterface = reinterpret_cast<CPedSAInterface*>(pDamagedPed->GetGameEntity()->GetInterface());
             }
         }
     }
@@ -4359,8 +4359,8 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent, CPedSAIn
 bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, uchar hitZone, CClientPed* pDamagedPed, CClientEntity* pInflictingEntity,
                                          CEventDamage* pEvent)
 {
+    float fPreviousHealth = pDamagedPed->m_fHealth;
     float fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
-    float fPreviousHealth = fCurrentHealth + fDamage;
     float fPreviousArmor = pDamagedPed->m_fArmor;
     float fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
@@ -4404,12 +4404,9 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             return false;
         }
 
-        if (pDamagedPed->IsLocalPlayer())
-        {
-            // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
-            fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
-            fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
-        }
+        // Reget values in case they have been changed during onClientPlayerDamage/onClientPedDamage event (Avoid AC#1 kick)
+        fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
+        fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
         bool bIsBeingShotWhilstAiming = (weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun());
         bool bOldBehaviour = !IsGlitchEnabled(GLITCH_HITANIM);

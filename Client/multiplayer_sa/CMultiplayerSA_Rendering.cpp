@@ -739,37 +739,6 @@ void _declspec(naked) HOOK_CRenderer_EverythingBarRoads()
     }
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// CRenderer::RenderEverythingBarRoads
-//
-// m_pRwObject can be nullptr and crash
-// Fix for a crash caused by frequent re-creation of entities.
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CRender_EverythingBarRoads_Loop 0x553B07
-#define HOOKSIZE_CRender_EverythingBarRoads_Loop 5
-static constexpr std::uintptr_t CONTINUE_CRender_EverythingBarRoads_Loop = 0x553C5A;
-static constexpr std::uintptr_t RETURN_CRender_EverythingBarRoads_Loop = 0x553B0C;
-static void _declspec(naked) HOOK_CRender_EverythingBarRoads_Loop()
-{
-    _asm
-    {
-        // check entity->object.m_pRwObject
-        mov ecx, [esi+18h]
-        test ecx, ecx
-        jz skip
-
-        mov al, [esi+36h]
-        and al, 7
-        jmp RETURN_CRender_EverythingBarRoads_Loop
-
-        skip:
-        jmp CONTINUE_CRender_EverythingBarRoads_Loop
-    }
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Rendering
@@ -794,5 +763,4 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstallChecked(RwCameraSetNearClipPlane);
     EZHookInstall(RenderEffects_HeliLight);
     EZHookInstall(CRenderer_EverythingBarRoads);
-    EZHookInstall(CRender_EverythingBarRoads_Loop);
 }

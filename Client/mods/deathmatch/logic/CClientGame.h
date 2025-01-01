@@ -509,7 +509,7 @@ private:
 
     void SetupGlobalLuaEvents();
 
-    static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent, CPedSAInterface*& pedInterface);
+    static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     static void                              StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
     static void                              StaticFireHandler(CFire* pFire);
     static bool                              StaticBreakTowLinkHandler(CVehicle* pTowedVehicle);
@@ -560,7 +560,7 @@ private:
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     static void        StaticAudioZoneRadioSwitchHandler(DWORD dwStationID);
 
-    bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent, CPedSAInterface*& pedInterface);
+    bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
     void                              FireHandler(CFire* pFire);
     bool                              BreakTowLinkHandler(CVehicle* pTowedVehicle);
