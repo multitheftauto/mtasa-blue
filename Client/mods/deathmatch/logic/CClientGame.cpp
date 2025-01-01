@@ -3428,9 +3428,6 @@ void CClientGame::Event_OnIngame()
     pHud->SetComponentVisible(HUD_VITAL_STATS, false);
     pHud->SetComponentVisible(HUD_AREA_NAME, false);
 
-    // Reset properties
-    CLuaPlayerDefs::ResetPlayerHudComponentProperty(HUD_ALL, eHudComponentProperty::ALL_PROPERTIES);
-
     g_pMultiplayer->DeleteAndDisableGangTags();
 
     g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
@@ -6112,6 +6109,16 @@ bool CClientGame::SetBirdsEnabled(bool bEnabled)
 bool CClientGame::GetBirdsEnabled()
 {
     return m_bBirdsEnabled;
+}
+
+void CClientGame::SetWeaponRenderEnabled(bool enabled)
+{
+    g_pGame->SetWeaponRenderEnabled(enabled);
+}
+
+bool CClientGame::IsWeaponRenderEnabled() const
+{
+    return g_pGame->IsWeaponRenderEnabled();
 }
 
 #pragma code_seg(".text")
