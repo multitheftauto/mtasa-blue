@@ -4024,7 +4024,7 @@ void CClientPed::ReCreateModel()
 
 void CClientPed::ReCreateGameEntity()
 {
-    if (!m_shouldRecreate)
+    if (!m_shouldRecreate || !m_pPlayerPed)
         return;
 
     // Destroy current game entity
