@@ -71,6 +71,9 @@ public:
     LUA_DECLARE(IsPedDoingGangDriveby);
     LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedAnimation);
+    static float GetPedAnimationProgress(CClientPed* ped);
+    static float GetPedAnimationSpeed(CClientPed* ped);
+    static float GetPedAnimationLength(CClientPed* ped);
     LUA_DECLARE(GetPedMoveState);
     LUA_DECLARE(GetPedMoveAnim);
     LUA_DECLARE(IsPedHeadless);
@@ -112,4 +115,6 @@ public:
     static bool SetPedExitVehicle(CClientPed* pPed);
     static bool IsPedBleeding(CClientPed* ped);
     static bool SetPedBleeding(CClientPed* ped, bool bleeding);
+
+    static bool killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept;
 };

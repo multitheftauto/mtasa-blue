@@ -61,6 +61,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementSyncer", getElementSyncer},
         {"getElementCollisionsEnabled", getElementCollisionsEnabled},
         {"getLowLODElement", getLowLODElement},
+        {"isElementOnFire", ArgumentParser<IsElementOnFire>},
 
         // Attachement
         {"attachElements", attachElements},
@@ -102,6 +103,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementCollisionsEnabled", setElementCollisionsEnabled},
         {"setElementFrozen", setElementFrozen},
         {"setLowLODElement", setLowLODElement},
+        {"setElementOnFire", ArgumentParser<SetElementOnFire>},
     };
 
     // Add functions
@@ -151,6 +153,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setLowLOD", "setLowLODElement");
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
+    lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
 
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getChild", "getElementChild");
@@ -189,6 +192,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isVisibleTo", "isElementVisibleTo");
     lua_classfunction(luaVM, "isLowLOD", "isElementLowLOD");
     lua_classfunction(luaVM, "isAttached", "isElementAttached");
+    lua_classfunction(luaVM, "isOnFire", "isElementOnFire");
 
     lua_classvariable(luaVM, "id", "setElementID", "getElementID");
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
@@ -217,6 +221,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, OOP_getElementVelocity);
     lua_classvariable(luaVM, "angularVelocity", "setElementAngularVelocity", "getElementAngularVelocity", setElementTurnVelocity, OOP_getElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
+    lua_classvariable(luaVM, "onFire", "setElementOnFire", "isElementOnFire");
 
     lua_registerclass(luaVM, "Element");
 }
@@ -1538,6 +1543,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     SString      strKey;
     CLuaArgument value;
     ESyncType    syncType = ESyncType::BROADCAST;
+    std::optional<eCustomDataClientTrust> clientTrust{};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1554,6 +1560,13 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     else
         argStream.ReadEnumString(syncType, ESyncType::BROADCAST);
 
+    if (!argStream.NextIsNone())
+    {
+        eCustomDataClientTrust trustReaded;
+        argStream.ReadEnumString(trustReaded);
+        clientTrust = trustReaded;
+    }
+
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
@@ -1566,7 +1579,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
-        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType))
+        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType, clientTrust))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -2436,4 +2449,14 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaElementDefs::IsElementOnFire(CElement* element) noexcept
+{
+    return element->IsOnFire();
+}
+
+bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire) noexcept
+{
+    return CStaticFunctionDefinitions::SetElementOnFire(element, onFire);
 }

@@ -28,6 +28,8 @@ void* FunctionPointerToVoidP(T func)
 
 BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
 
+void HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction);
+
 template <typename T>
 bool HookInstall(DWORD dwInstallAddress, T dwHookHandler, int iJmpCodeSize = 5)
 {

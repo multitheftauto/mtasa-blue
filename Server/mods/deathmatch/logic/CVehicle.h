@@ -374,8 +374,8 @@ public:
     void SpawnAt(const CVector& vecPosition, const CVector& vecRotation);
     void Respawn();
 
-    void            GenerateHandlingData();
-    CHandlingEntry* GetHandlingData() { return m_pHandlingEntry; };
+    void            GenerateHandlingData() noexcept;
+    CHandlingEntry* GetHandlingData() noexcept { return m_HandlingEntry.get(); };
 
     uint GetTimeSinceLastPush() { return (uint)(CTickCount::Now(true) - m_LastPushedTime).ToLongLong(); }
     void ResetLastPushTime() { m_LastPushedTime = CTickCount::Now(true); }
@@ -396,6 +396,9 @@ public:
     bool             IsBlown() const noexcept { return m_blowState != VehicleBlowState::INTACT; }
     void             SetBlowState(VehicleBlowState state);
     VehicleBlowState GetBlowState() const noexcept { return m_blowState; }
+
+    bool IsOnFire() const noexcept override { return m_onFire; }
+    void SetOnFire(bool onFire) noexcept override { m_onFire = onFire; }
 
     void StopIdleTimer();
     void RestartIdleTimer();
@@ -485,11 +488,13 @@ private:
     unsigned short m_usAdjustableProperty;
     bool           m_bCollisionsEnabled;
 
-    CHandlingEntry* m_pHandlingEntry;
-    bool            m_bHandlingChanged;
+    std::unique_ptr<CHandlingEntry> m_HandlingEntry;
+    bool                            m_bHandlingChanged;
 
     unsigned char m_ucVariant;
     unsigned char m_ucVariant2;
+
+    bool m_onFire;
 
     CTickCount m_LastPushedTime;
     CVector    m_vecStationaryCheckPosition;
