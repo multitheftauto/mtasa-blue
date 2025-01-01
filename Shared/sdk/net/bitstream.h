@@ -556,10 +556,6 @@ enum class eBitStreamVersion : unsigned short
     // 2024-06-16
     PedSync_Revision,
 
-    // Ped animations synchronization
-    // 2024-06-29
-    AnimationsSync,
-
     // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
     // 2024-06-30
     WorldSpecialProperty_TunnelWeatherBlend,
@@ -595,6 +591,10 @@ enum class eBitStreamVersion : unsigned short
     // Add setElementOnFire function
     // 2024-30-12
     SetElementOnFire,
+
+    // Ped animations synchronization
+    // 2025-01-01
+    AnimationsSync,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

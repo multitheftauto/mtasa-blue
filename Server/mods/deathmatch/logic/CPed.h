@@ -105,8 +105,8 @@ enum eBone
 
 struct SPlayerAnimData
 {
-    std::string blockName;
-    std::string animName;
+    std::string blockName{};
+    std::string animName{};
     int         time{-1};
     bool        loop{true};
     bool        updatePosition{true};
@@ -120,22 +120,7 @@ struct SPlayerAnimData
     float progress{0.0f};
     float speed{1.0f};
 
-    SPlayerAnimData() = default;
-
-    SPlayerAnimData(const std::string& block, const std::string& anim, int time, bool loop, bool updatePos, bool interrupt, bool freeze, int blend,
-                    bool taskRestore, std::int64_t tick)
-        : blockName(block),
-          animName(anim),
-          time(time),
-          loop(loop),
-          updatePosition(updatePos),
-          interruptable(interrupt),
-          freezeLastFrame(freeze),
-          blendTime(blend),
-          taskToBeRestoredOnAnimEnd(taskRestore),
-          startedTick(tick),
-          progress(0.0f),
-          speed(1.0f){};
+    bool IsAnimating() const noexcept { return !blockName.empty() && !animName.empty(); }
 };
 
 class CWeapon
@@ -356,7 +341,7 @@ protected:
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
     CVehicle*                            m_pJackingVehicle;
-    SPlayerAnimData                      m_animData;
+    SPlayerAnimData                      m_animData{};
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;

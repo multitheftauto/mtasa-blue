@@ -983,16 +983,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         const SPlayerAnimData& animData = pPed->GetAnimationData();
 
                         // Contains animation data?
-                        bool animRunning = !animData.blockName.empty() && !animData.animName.empty();
-
-                        // Is animation still running?
-                        float deltaTime = GetTickCount64_() - animData.startedTick;
-                        if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
-                        {
-                            animRunning = false;
-                            pPed->SetAnimationData({});
-                        }
-
+                        bool animRunning = animData.IsAnimating();
                         BitStream.WriteBit(animRunning);
 
                         if (animRunning)
@@ -1008,6 +999,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
 
                             // Write progress & speed
+                            float deltaTime = GetTickCount64_() - animData.startedTick;
                             BitStream.Write((deltaTime / animData.time) * animData.speed);
                             BitStream.Write(animData.speed);
                         }
