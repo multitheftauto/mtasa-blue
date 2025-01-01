@@ -17,8 +17,6 @@
 
 #define CS_NAN -32768
 
-SFixedArray<short, MAX_GTA_CONTROLS>       CClientPad::m_sScriptedStates;
-SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> CClientPad::m_bScriptedStatesNextFrameOverride;
 bool                                       CClientPad::m_bFlyWithMouse;
 bool                                       CClientPad::m_bSteerWithMouse;
 

@@ -2957,7 +2957,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
         // Process our scripted control settings
         bool bOnFoot = pVehicle ? false : true;
         CClientPad::ProcessAllToggledControls(Current, bOnFoot);
-        CClientPad::ProcessSetAnalogControlState(Current, bOnFoot);
+        m_Pad.ProcessSetAnalogControlState(Current, bOnFoot);
     }
 
     // Is the player stealth aiming?
