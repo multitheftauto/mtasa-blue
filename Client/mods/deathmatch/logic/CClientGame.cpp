@@ -3441,6 +3441,9 @@ void CClientGame::Event_OnIngame()
     g_pGame->ResetAlphaTransparencies();
     g_pGame->ResetModelTimes();
 
+    // Reset weapon render
+    g_pGame->SetWeaponRenderEnabled(true);
+
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
 
