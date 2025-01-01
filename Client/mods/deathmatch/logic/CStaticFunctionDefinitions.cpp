@@ -1725,12 +1725,10 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
         bState = CClientPad::GetControlState(szControl, cs, bOnFoot);
         float        fState = 0;
         unsigned int uiIndex;
-        CClientPad pad = Ped.m_Pad;
-
         // Check it's Analog
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
         {
-            if (pad.GetAnalogControlState(szControl, cs, bOnFoot, fState, false))
+            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, false))
             {
                 bState = fState > 0;
                 return true;
@@ -1767,7 +1765,7 @@ bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const
 
         // check it's analog or use binary.
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
-            Ped.m_Pad.GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput);
+            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput);
         else
             fState = CClientPad::GetControlState(szControl, cs, bOnFoot) == true ? 1.0f : 0.0f;
 
@@ -7198,7 +7196,7 @@ bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, fl
     else
         pLocalPlayer->GetControllerState(cs);
 
-    if (pLocalPlayer->m_Pad.GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput))
+    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput))
     {
         return true;
     }
@@ -7225,13 +7223,12 @@ bool CStaticFunctionDefinitions::SetControlState(const char* szControl, bool bSt
 {
     assert(szControl);
     unsigned int uiIndex;
-    CClientPlayer* pLocalPlayer = m_pPlayerManager->GetLocalPlayer();
 
     if (bState)
     {
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
         {
-            if (pLocalPlayer->m_Pad.SetAnalogControlState(szControl, 1.0, false))
+            if (CClientPad::SetAnalogControlState(szControl, 1.0, false))
             {
                 return true;
             }
@@ -7251,7 +7248,7 @@ bool CStaticFunctionDefinitions::SetControlState(const char* szControl, bool bSt
     {
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
         {
-            pLocalPlayer->m_Pad.RemoveSetAnalogControlState(szControl);
+            CClientPad::RemoveSetAnalogControlState(szControl);
             return true;
         }
         else
