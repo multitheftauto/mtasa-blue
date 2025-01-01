@@ -269,10 +269,26 @@
          Values: 0 - Off, 1 - Enabled.  Default - 1 -->
     <database_credentials_protection>1</database_credentials_protection>
 
+    <!-- Enables extra protection for element data.
+         When this option is enabled, the server ignores element data sync packets from the client,
+         except for allowed keys.
+         Values: 0 - Off, 1 - Enabled.  Default - 0 -->
+    <elementdata_whitelisted>0</elementdata_whitelisted>
+
+    <!-- This parameter determines that the server checks when the players connect that there are no other players with the same serial number. 
+         Note that this may break compatibility with virtual machines.
+         Not guarantees that the player cannot manipulate their serial.
+         Values: 0 - Off, 1 - Enabled.  Default - 1 -->
+    <check_duplicate_serials>1</check_duplicate_serials>
+
     <!-- These parameters specify the maximum amount of events that can be triggered by the client (via triggerServerEvent) within the given interval.
           Note: The interval is given in milliseconds
           Interval range: 50 to 5000. Default: 1000
           Max events per interval range: 1 to 1000. Default: 100  -->
     <player_triggered_event_interval>1000</player_triggered_event_interval>
     <max_player_triggered_events_per_interval>100</max_player_triggered_events_per_interval>
+	
+	<!-- This parameter determines if resource client files that end in PNG, DFF and TXD should be checked for errors;
+          Values: 0 - Off, 1 - Enabled.  Default - 1 -->
+    <resource_client_file_checks>1</resource_client_file_checks>
 </config>

@@ -52,6 +52,8 @@ void CVehicleRPCs::LoadFunctions()
     AddHandler(REMOVE_VEHICLE_SIRENS, RemoveVehicleSirens, "removeVehicleSirens");
     AddHandler(SET_VEHICLE_SIRENS, SetVehicleSirens, "setVehicleSirens");
     AddHandler(SET_VEHICLE_PLATE_TEXT, SetVehiclePlateText, "setVehiclePlateText");
+    AddHandler(SPAWN_VEHICLE_FLYING_COMPONENT, SpawnVehicleFlyingComponent, "spawnVehicleFlyingComponent");
+    AddHandler(SET_VEHICLE_NITRO_ACTIVATED, SetVehicleNitroActivated, "SetVehicleNitroActivated");
 }
 
 void CVehicleRPCs::DestroyAllVehicles(NetBitStreamInterface& bitStream)
@@ -653,3 +655,39 @@ void CVehicleRPCs::SetVehiclePlateText(CClientEntity* pSourceEntity, NetBitStrea
         }
     }
 }
+
+void CVehicleRPCs::SpawnVehicleFlyingComponent(CClientEntity* const sourceEntity, NetBitStreamInterface& bitStream)
+{
+    CClientVehicle* vehicle = m_pVehicleManager->Get(sourceEntity->GetID());
+    if (!vehicle)
+        return;
+
+    std::uint8_t nodeIndex, collisionType;
+    std::int32_t removalTime;
+
+    if (bitStream.Read(nodeIndex) && bitStream.Read(collisionType) && bitStream.Read(removalTime))
+        vehicle->SpawnFlyingComponent(static_cast<eCarNodes>(nodeIndex), static_cast<eCarComponentCollisionTypes>(collisionType), removalTime);
+}
+
+void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream)
+{
+    bool state = bitStream.ReadBit();
+
+    CClientVehicle* vehicle = m_pVehicleManager->Get(pSourceEntity->GetID());
+    if (!vehicle)
+        return;          
+
+    if (!vehicle->IsNitroInstalled())
+        return;
+
+     // If nitro level < 0, nitro is activated. (until nitro level reaches -1, at that point it will become 0 and increase instead of decrease)
+    if ((vehicle->GetNitroLevel() < 0.0f) == state)
+        return;
+
+    // Apply nitro level change
+    if (state)
+        vehicle->SetNitroLevel(vehicle->GetNitroLevel() - 1.0001f);
+    else
+        vehicle->SetNitroLevel(vehicle->GetNitroLevel() + 1.0001f);
+}
+

@@ -429,7 +429,7 @@ public:
 
     virtual CLimits* GetLimits() = 0;
 
-    virtual void UpdateVehicleSuspension() noexcept = 0;
+    virtual void UpdateVehicleSuspension() const noexcept = 0;
 
     virtual void FlushClothesCache() = 0;
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading) = 0;

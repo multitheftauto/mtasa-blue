@@ -82,7 +82,7 @@ public:
     static bool DxDrawWiredSphere(lua_State* const luaVM, const CVector position, const float radius, const std::optional<SColor> color,
                                   const std::optional<float> lineWidth, const std::optional<unsigned int> iterations);
 
-    static bool DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale);
+    static bool DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale, const std::optional<float> lighting);
 
 private:
     static void AddDxMaterialClass(lua_State* luaVM);

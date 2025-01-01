@@ -451,6 +451,9 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
             pSourcePlayer->GetPad()->NewControllerState(ControllerState);
 
+            if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
+                pVehicle->SetOnFire(BitStream.ReadBit());
+
             // Success
             return true;
         }
@@ -675,6 +678,9 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                 damage.data.lights.data.ucStates = pVehicle->m_ucLightStates;
                 BitStream.Write(&damage);
             }
+
+            if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
+                BitStream.WriteBit(pVehicle->IsOnFire());
 
             // Success
             return true;
