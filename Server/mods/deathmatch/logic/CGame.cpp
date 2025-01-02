@@ -985,8 +985,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         m_pASE->SetRuleValue("SerialVerification", "yes");
 
     // Set the Rules loaded from config
-    std::map<SString, SString> rulesMap = m_pMainConfig->GetRulesForASE();
-    for (const auto& [key, value] : rulesMap)
+    for (const auto& [key, value] : m_pMainConfig->GetRulesForASE())
         m_pASE->SetRuleValue(key, value);
 
     ApplyAseSetting();
