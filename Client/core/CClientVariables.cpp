@@ -274,9 +274,6 @@ void CClientVariables::LoadDefaults()
     DEFAULT("host", _S("127.0.0.1"));                                    // hostname
     DEFAULT("port", 22003);                                              // port
     DEFAULT("password", _S(""));                                         // password
-    DEFAULT("qc_host", _S("127.0.0.1"));                                 // quick connect hostname
-    DEFAULT("qc_port", 22003);                                           // quick connect port
-    DEFAULT("qc_password", _S(""));                                      // quick connect password
     DEFAULT("debugfile", _S(""));                                        // debug filename
     DEFAULT("console_pos", CVector2D(0, 0));                             // console position
     DEFAULT("console_size", CVector2D(200, 200));                        // console size
@@ -359,7 +356,6 @@ void CClientVariables::LoadDefaults()
     DEFAULT("allow_discord_rpc", true);                                               // Enable Discord Rich Presence
     DEFAULT("discord_rpc_share_data", false);                                         // Consistent Rich Presence data sharing
     DEFAULT("discord_rpc_share_data_firsttime", false);                               // Display the user data sharing consent dialog box - for the first time
-    DEFAULT("_beta_qc_rightclick_command", _S("reconnect"));                          // Command to run when right clicking quick connect (beta - can be removed at any time)
     DEFAULT("browser_enable_gpu", true);                                              // Enable GPU in CEF? (allows stuff like WebGL to function)
 
     if (!Exists("locale"))
