@@ -251,6 +251,9 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         // Init the local player
         _CreateLocalModel();
 
+        // Init default analog control states
+        CClientPad::InitAnalogControlStates();
+
         // Give full health, no armor, no weapons and put him at a safe location
         SetHealth(GetMaxHealth());
         SetArmor(0);
@@ -2705,6 +2708,10 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         return;
     }
 
+    // Re-create ped
+    if (m_shouldRecreate)
+        ReCreateGameEntity();
+
     // Grab some vars here, saves getting them twice
     CClientVehicle* pVehicle = GetOccupiedVehicle();
 
@@ -3974,11 +3981,7 @@ void CClientPed::_ChangeModel()
         {
             // ChrML: Changing the skin in certain cases causes player sliding. So we recreate instead.
 
-            // Kill the old player
-            _DestroyModel();
-
-            // Create the new with the new skin
-            _CreateModel();
+            m_shouldRecreate = true;
         }
 
         // ReAttach satchels
@@ -4012,11 +4015,7 @@ void CClientPed::ReCreateModel()
             m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::ReCreateModel");
         }
 
-        // Destroy the old model
-        _DestroyModel();
-
-        // Create the new model
-        _CreateModel();
+        m_shouldRecreate = true;
 
         // Remove the reference we temporarily added again
         if (bSameModel)
@@ -4024,6 +4023,20 @@ void CClientPed::ReCreateModel()
             m_pLoadedModelInfo->RemoveRef();
         }
     }
+}
+
+void CClientPed::ReCreateGameEntity()
+{
+    if (!m_shouldRecreate || !m_pPlayerPed)
+        return;
+
+    // Destroy current game entity
+    _DestroyModel();
+
+    // Create the new game entity
+    _CreateModel();
+
+    m_shouldRecreate = false;
 }
 
 void CClientPed::ModelRequestCallback(CModelInfo* pModelInfo)

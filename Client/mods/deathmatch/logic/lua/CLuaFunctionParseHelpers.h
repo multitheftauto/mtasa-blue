@@ -111,6 +111,9 @@ enum eDXVerticalAlign
 DECLARE_ENUM(eDXVerticalAlign);
 
 DECLARE_ENUM(eHudComponent);
+DECLARE_ENUM_CLASS(eHudComponentProperty);
+DECLARE_ENUM_CLASS(eFontStyle);
+DECLARE_ENUM_CLASS(eFontAlignment);
 
 enum eFieldOfViewMode
 {

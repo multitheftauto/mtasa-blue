@@ -892,6 +892,9 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                             case eClientModelType::OBJECT:
                                 usParentID = 1337;            // BinNt07_LA (trash can)
                                 break;
+                            case eClientModelType::OBJECT_DAMAGEABLE:
+                                usParentID = 994;             // lhouse_barrier2
+                                break;
                             case eClientModelType::VEHICLE:
                                 usParentID = VT_LANDSTAL;
                                 break;
