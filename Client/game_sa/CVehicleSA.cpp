@@ -1666,7 +1666,7 @@ bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComp
     MemPut(0x6A85B3, nodesOffset);
     MemPut(0x6A8631, nodesOffset);
 
-    auto* componentObject = ((CObjectSAInterface * (__thiscall*)(CVehicleSAInterface*, int, int)) FUNC_CAutomobile__SpawnFlyingComponent)(GetVehicleInterface(), static_cast<int>(nodeIndex), static_cast<int>(collisionType));
+    auto* componentObject = reinterpret_cast<CAutomobileSAInterface*>(GetInterface())->SpawnFlyingComponent(nodeIndex, collisionType);
 
     // Restore default nodes array in CAutomobile::SpawnFlyingComponent
     // CAutomobile::m_aCarNodes offset

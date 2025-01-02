@@ -104,4 +104,9 @@ namespace SharedUtil
     }
 
     inline float DegreesToRadians(float fValue) { return fValue * 0.017453292f; }
+
+    inline float GetRandomNumberInRange(float minRange, float maxRange)
+    {
+        return Lerp(minRange, maxRange, static_cast<float>(std::rand() * static_cast<float>(1.0f / RAND_MAX)));
+    }
 }            // namespace SharedUtil

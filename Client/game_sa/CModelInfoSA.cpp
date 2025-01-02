@@ -2126,3 +2126,8 @@ bool CModelInfoSA::ForceUnload()
 
     return true;
 }
+
+bool CVehicleModelInfoSAInterface::IsComponentDamageable(int componentIndex) const
+{
+    return pVisualInfo->m_maskComponentDamagable & (1 << componentIndex);
+}

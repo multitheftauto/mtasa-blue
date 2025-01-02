@@ -55,12 +55,12 @@ enum ePlaneComponentStatus
     DT_PLANE_MISSING
 };
 
-enum eComponentStatus
+enum eComponentStatus : std::uint8_t
 {
     DT_PANEL_INTACT = 0,
-    //  DT_PANEL_SHIFTED,
-    DT_PANEL_BASHED,
-    DT_PANEL_BASHED2,
+    DT_PANEL_OPENED,
+    DT_PANEL_DAMAGED,
+    DT_PANEL_OPENED_DAMAGED,
     DT_PANEL_MISSING
 };
 

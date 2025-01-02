@@ -27,6 +27,14 @@
 class CDamageManagerSAInterface            // 28 bytes due to the way its packed (24 containing actual data)
 {
 public:
+    std::uint8_t GetPanelStatus(std::uint8_t panelId)
+    {
+        if (panelId >= MAX_PANELS)
+            return 0;
+
+        return ((std::uint8_t(__thiscall*)(CDamageManagerSAInterface*, std::uint8_t))FUNC_GetPanelStatus)(this, panelId);
+    }
+
     float fWheelDamageEffect;
     BYTE  bEngineStatus;            // old - wont be used
     BYTE  Wheel[MAX_WHEELS];
@@ -61,6 +69,8 @@ public:
     void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status);
 
     void FuckCarCompletely(bool bKeepWheels);
+
+    static int GetCarNodeIndexFromPanel(std::uint8_t panelId);
 
     CDamageManagerSA(class CEntitySAInterface* intEntityInterface, CDamageManagerSAInterface* intInterface)
     {
