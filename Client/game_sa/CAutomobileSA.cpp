@@ -24,6 +24,9 @@ CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* pInterface)
 void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlass, bool spawnFlyingComponent)
 {
     int nodeId = CDamageManagerSA::GetCarNodeIndexFromPanel(panelId);
+    if (nodeId < 0)
+        return;
+
     eCarNodes node = static_cast<eCarNodes>(nodeId);
 
     RwFrame* frame = m_aCarNodes[nodeId];
@@ -47,17 +50,14 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
             if (node != eCarNodes::WINDSCREEN && node != eCarNodes::WING_LF && node != eCarNodes::WING_RF)
             {
                 // Get free bouncing panel
-                CBouncingPanelSAInterface* panelInterface = nullptr;
                 for (auto& panel : m_panels)
                 {
-                    if (panel.m_nFrameId == static_cast<std::uint16_t>(-1))
+                    if (panel.m_nFrameId == (std::uint16_t)0xFFFF)
                     {
-                        panelInterface = &panel;
+                        panel.SetPanel(nodeId, 1, GetRandomNumberInRange(-0.2f, -0.5f));
                         break;
                     }
                 }
-
-                panelInterface->SetPanel(nodeId, 1, GetRandomNumberInRange(-0.2f, -0.5f));
             }
 
             SetComponentVisibility(frame, 2); // ATOMIC_IS_DAM_STATE

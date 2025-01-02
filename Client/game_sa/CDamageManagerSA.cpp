@@ -126,12 +126,15 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                 //  Call CAutomobile::FixPanel to update the vehicle
                 dwFunction = 0x6A3670;
                 dwThis = (DWORD)internalEntityInterface;
-                int iCarNodeIndex = GetCarNodeIndexFromPanel(bPanel);
+                int carNodeIndex = GetCarNodeIndexFromPanel(bPanel);
+                if (carNodeIndex < 0)
+                    return;
+
                 _asm
                 {
                     mov     ecx, dwThis
                     push    dwPanel
-                    push    iCarNodeIndex
+                    push    carNodeIndex
                     call    dwFunction
                 }
             }
@@ -245,7 +248,7 @@ void CDamageManagerSA::FuckCarCompletely(bool bKeepWheels)
     }
 }
 
-int CDamageManagerSA::GetCarNodeIndexFromPanel(std::uint8_t panelId)
+int CDamageManagerSA::GetCarNodeIndexFromPanel(std::uint8_t panelId) noexcept
 {
     int index = -1;
 

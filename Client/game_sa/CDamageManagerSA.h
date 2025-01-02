@@ -27,7 +27,7 @@
 class CDamageManagerSAInterface            // 28 bytes due to the way its packed (24 containing actual data)
 {
 public:
-    std::uint8_t GetPanelStatus(std::uint8_t panelId)
+    std::uint8_t GetPanelStatus(std::uint8_t panelId) const
     {
         if (panelId >= MAX_PANELS)
             return 0;
@@ -70,7 +70,7 @@ public:
 
     void FuckCarCompletely(bool bKeepWheels);
 
-    static int GetCarNodeIndexFromPanel(std::uint8_t panelId);
+    static int GetCarNodeIndexFromPanel(std::uint8_t panelId) noexcept;
 
     CDamageManagerSA(class CEntitySAInterface* intEntityInterface, CDamageManagerSAInterface* intInterface)
     {
