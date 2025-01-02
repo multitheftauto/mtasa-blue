@@ -38,4 +38,6 @@ public:
     virtual float GetBikeRearWheelDist() = 0;
     virtual DWORD GetBikeFrontWheelCounter() = 0;
     virtual float GetBikeFrontWheelDist() = 0;
+    virtual std::uint8_t GetMaxHealth() const = 0;
+    virtual std::uint8_t GetMaxArmor() const = 0;
 };

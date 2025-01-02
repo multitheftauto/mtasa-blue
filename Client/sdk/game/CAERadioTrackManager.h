@@ -21,4 +21,5 @@ public:
     virtual void  SetBassSetting(DWORD dwBass) = 0;
     virtual void  Reset() = 0;
     virtual void  StartRadio(BYTE bStationID, BYTE bUnknown) = 0;
+    virtual bool  IsStationLoading() const = 0;
 };
