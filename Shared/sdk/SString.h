@@ -124,6 +124,8 @@ struct SCharStringRef
 template <class STRING_TYPE, class CHAR_TYPE>
 class TSplitString : public std::vector<const CHAR_TYPE*>
 {
+    using std::vector<const CHAR_TYPE*>::push_back;
+
 public:
     TSplitString() {}
     TSplitString(const STRING_TYPE& strInput, const STRING_TYPE& strDelim, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0)
