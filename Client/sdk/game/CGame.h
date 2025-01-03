@@ -237,6 +237,9 @@ public:
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
+    virtual void SetWeaponRenderEnabled(bool enabled) = 0;
+    virtual bool IsWeaponRenderEnabled() const = 0;
+
     virtual bool VerifySADataFileNames() = 0;
     virtual bool PerformChecks() = 0;
     virtual int& GetCheckStatus() = 0;

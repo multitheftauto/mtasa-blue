@@ -287,6 +287,8 @@ public:
     void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
+    void         SetWeaponRenderEnabled(bool enabled) override;
+    bool         IsWeaponRenderEnabled() const override;
     void         FlushPendingRestreamIPL();
     void         ResetModelLodDistances();
     void         ResetModelFlags();

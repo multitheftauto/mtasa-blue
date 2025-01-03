@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaFunctionParser.h>
 
 class CLuaWeaponDefs : public CLuaDefs
 {
@@ -41,4 +42,6 @@ public:
     LUA_DECLARE(GetWeaponClipAmmo);
     LUA_DECLARE(SetWeaponAmmo);
     LUA_DECLARE(SetWeaponClipAmmo);
+    static bool SetWeaponRenderEnabled(bool enabled);
+    static bool IsWeaponRenderEnabled();
 };
