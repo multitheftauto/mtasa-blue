@@ -173,7 +173,7 @@ public:
     virtual void          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent) = 0;
     virtual BYTE          GetWheelStatus(eWheelPosition bTire) = 0;
     virtual void          SetWheelStatus(eWheelPosition bTire, BYTE bTireStatus) = 0;
-    virtual BYTE          GetPanelStatus(BYTE bPanel) = 0;
+    virtual BYTE          GetPanelStatus(BYTE bPanel) const = 0;
     virtual unsigned long GetPanelStatus() = 0;
     virtual void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawnFlyingComponent = true, bool breakGlass = false) = 0;
     virtual void          SetPanelStatus(unsigned long ulStatus, bool spawnFlyingComponent = true, bool breakGlass = false) = 0;

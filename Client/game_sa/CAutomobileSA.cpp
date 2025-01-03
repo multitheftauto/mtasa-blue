@@ -76,7 +76,7 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
             if (panelId == WINDSCREEN_PANEL)
             {
                 if (breakGlass)
-                    ((void(__cdecl*)(CAutomobileSAInterface*))0x71C2B0)(this, false); // Call CGlass::CarWindscreenShatters
+                    ((void(__cdecl*)(CAutomobileSAInterface*, bool))0x71C2B0)(this, false); // Call CGlass::CarWindscreenShatters
             }
 
             if (spawnFlyingComponent && (panelId != WINDSCREEN_PANEL || (panelId == WINDSCREEN_PANEL && !breakGlass)))

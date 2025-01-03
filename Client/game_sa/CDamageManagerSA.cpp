@@ -155,7 +155,7 @@ void CDamageManagerSA::SetPanelStatus(unsigned long ulStatus, bool spawnFlyingCo
     }
 }
 
-BYTE CDamageManagerSA::GetPanelStatus(BYTE bPanel)
+BYTE CDamageManagerSA::GetPanelStatus(BYTE bPanel) const
 {
     return internalInterface->GetPanelStatus(bPanel);
 }

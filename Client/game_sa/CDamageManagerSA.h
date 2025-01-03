@@ -27,7 +27,7 @@
 class CDamageManagerSAInterface            // 28 bytes due to the way its packed (24 containing actual data)
 {
 public:
-    std::uint8_t GetPanelStatus(std::uint8_t panelId) const
+    std::uint8_t GetPanelStatus(std::uint8_t panelId)
     {
         if (panelId >= MAX_PANELS)
             return 0;
@@ -57,7 +57,7 @@ public:
     void          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent);
     BYTE          GetWheelStatus(eWheelPosition bWheel);
     void          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
-    BYTE          GetPanelStatus(BYTE bPanel);
+    BYTE          GetPanelStatus(BYTE bPanel) const;
     unsigned long GetPanelStatus();
     void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawnFlyingComponent = true, bool breakGlass = false);
     void          SetPanelStatus(unsigned long ulStatus, bool spawnFlyingComponent = true, bool breakGlass = false);
