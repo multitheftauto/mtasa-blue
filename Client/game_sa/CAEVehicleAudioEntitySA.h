@@ -73,6 +73,11 @@ static_assert(sizeof(CAETwinLoopSoundEntity) == 0xA8, "Invalid size for CAETwinL
 class CAEVehicleAudioEntitySAInterface : public CAEAudioEntity
 {
 public:
+    void AddAudioEvent(int eventId, float volume)
+    {
+        ((void(__thiscall*)(CAEVehicleAudioEntitySAInterface*, int, float))0x4F6420)(this, eventId, volume);
+    }
+
     short                  unk1;                                      // +124
     char                   unk2[2];                                   // +126
     tVehicleAudioSettings  m_nSettings;                               // +128
