@@ -1143,6 +1143,9 @@ CWeaponStat* CGameSA::CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weap
 
 void CGameSA::SetWeaponRenderEnabled(bool enabled)
 {
+    if (IsWeaponRenderEnabled() == enabled)
+        return;
+
     if (!enabled)
     {
         // Disable calls to CVisibilityPlugins::RenderWeaponPedsForPC
