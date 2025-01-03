@@ -274,6 +274,11 @@ class CAutoPilot
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
+    void SetComponentVisibility(RwFrame* component, std::uint32_t state)
+    {
+        ((void(__thiscall*)(CVehicleSAInterface*, RwFrame*, std::uint32_t))0x6D2700)(this, component, state);
+    }
+
     CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312
 
     tHandlingDataSA*       pHandlingData;                  // +900
