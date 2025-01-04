@@ -588,6 +588,18 @@ enum class eBitStreamVersion : unsigned short
     // 2024-11-26
     WorldSpecialPropertyEvent,
 
+    // Add setElementOnFire function
+    // 2024-12-30
+    SetElementOnFire,
+
+    // Add "spawnFlyingComponent" to setVehiclePanelState
+    // 2024-12-31
+    SetVehiclePanelState_SpawnFlyingComponent,
+
+    // Ped animations synchronization
+    // 2025-01-01
+    AnimationsSync,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

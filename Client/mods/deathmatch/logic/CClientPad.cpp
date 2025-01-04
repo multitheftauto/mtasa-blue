@@ -116,13 +116,6 @@ CClientPad::CClientPad()
     {
         m_fStates[i] = 0.0f;
     }
-
-    // Initialise our analog control states
-    for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
-    {
-        m_sScriptedStates[i] = CS_NAN;
-        m_bScriptedStatesNextFrameOverride[i] = false;
-    }
 }
 
 bool CClientPad::GetControlState(const char* szName, bool& bState)
@@ -466,6 +459,16 @@ bool CClientPad::GetAnalogControlIndex(const char* szName, unsigned int& uiIndex
         }
     }
     return false;
+}
+
+void CClientPad::InitAnalogControlStates()
+{
+    // Initialise our analog control states
+    for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
+    {
+        m_sScriptedStates[i] = CS_NAN;
+        m_bScriptedStatesNextFrameOverride[i] = false;
+    }
 }
 
 // Get the analog control state directly from a pad state.  Use for players.

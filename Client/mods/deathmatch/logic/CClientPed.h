@@ -253,7 +253,7 @@ public:
     CClientVehicle* GetRealOccupiedVehicle();
     CClientVehicle* GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL,
-                                               float fWithinRange = 6000.0f);
+                                               float fWithinRange = 6000.0f, bool localVehicles = false);
     bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
                                    CVector* pClosestDoorPosition = NULL);
 
@@ -483,8 +483,8 @@ public:
     bool IsBleeding() const noexcept { return m_bBleeding; };
     void SetBleeding(bool bBleeding);
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() override { return m_pPlayerPed ? m_pPlayerPed->IsOnFire() : m_bIsOnFire; }
+    bool SetOnFire(bool bOnFire) override;
 
     void GetVoice(short* psVoiceType, short* psVoiceID);
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
@@ -552,6 +552,9 @@ public:
 
     std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
 
+    void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; }
+    bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; }
+
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
     CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer);
@@ -566,6 +569,7 @@ protected:
 
     // Used to destroy the current game ped and create a new one in the same state.
     void ReCreateModel();
+    void ReCreateGameEntity();
 
     void _CreateModel();
     void _CreateLocalModel();
@@ -725,6 +729,7 @@ public:
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
+    bool                                     m_shouldRecreate{false};
 
     bool             m_bBulletImpactData;
     CClientEntityPtr m_pBulletImpactEntity;
@@ -787,4 +792,7 @@ public:
     CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
 
     std::shared_ptr<CClientModel> m_clientModel;
+
+    bool m_hasSyncedAnim{};
+    bool m_animationOverridedByClient{};
 };

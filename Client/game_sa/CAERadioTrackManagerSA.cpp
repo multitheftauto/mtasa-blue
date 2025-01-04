@@ -107,3 +107,9 @@ void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
         call    dwFunc
     }
 }
+
+bool CAERadioTrackManagerSA::IsStationLoading() const
+{
+    CAERadioTrackManagerSAInterface* trackInterface = GetInterface();
+    return (trackInterface->stationsListed || trackInterface->stationsListDown);
+}

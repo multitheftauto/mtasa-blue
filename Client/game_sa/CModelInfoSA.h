@@ -232,11 +232,6 @@ public:
     // +726 = Word array as referenced in CVehicleModelInfo::GetVehicleUpgrade(int)
     // +762 = Array of WORD containing something relative to paintjobs
     // +772 = Anim file index
-
-    void Shutdown()
-    {
-        ((void(*)())VFTBL->Shutdown)();
-    }
 };
 static_assert(sizeof(CBaseModelInfoSAInterface) == 0x20, "Invalid size for CBaseModelInfoSAInterface");
 
@@ -271,6 +266,13 @@ class CVehicleModelUpgradePosnDesc
     RtQuat  m_vRotation;
     int     m_iParentId;
 };
+static_assert(sizeof(CVehicleModelUpgradePosnDesc) == 0x20, "Invalid size of CVehicleModelUpgradePosnDesc class");
+
+class CDamageableModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    void* m_damagedAtomic;
+};
 
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
@@ -282,10 +284,13 @@ public:
     std::uint8_t                 _pad[3];
     int                          m_maskComponentDamagable;
 };
+static_assert(sizeof(CVehicleModelVisualInfoSAInterface) == 0x314, "Invalid size of CVehicleModelVisualInfoSAInterface class");
 
 class CVehicleModelInfoSAInterface : public CClumpModelInfoSAInterface
 {
 public:
+    bool IsComponentDamageable(int componentIndex) const;
+
     RpMaterial*                         pPlateMaterial;
     char                                plateText[8];
     std::uint8_t                        field_30;
@@ -306,26 +311,27 @@ public:
     std::int16_t                        vehFrequency;
     std::uint32_t                       componentRules;
     float                               bikeSteeringAngle;
-    CVehicleModelVisualInfoSAInterface* pVisualInfo;            // vehicleStruct
+    CVehicleModelVisualInfoSAInterface* pVisualInfo; // vehicleStruct
     std::uint8_t                        field_60[464];
-    RpMaterial** m_dirtMaterials;
-    std::size_t       m_numDirtMaterials;
-    RpMaterial*  m_staticDirtMaterials[30];
-    std::uint8_t primColors[8];
-    std::uint8_t secondColors[8];
-    std::uint8_t treeColors[8];
-    std::uint8_t fourColors[8];
-    std::uint8_t numOfColorVariations;
-    std::uint8_t lastColorVariation;
-    std::uint8_t primColor;
-    std::uint8_t secColor;
-    std::uint8_t tertColor;
-    std::uint8_t quatColor;
-    std::uint8_t upgrades[36];
-    std::uint8_t anRemapTXDs[8];
-    std::uint8_t field_302[2];
-    void*        pAnimBlock;            // CAnimBlock*
+    RpMaterial**                        m_dirtMaterials;
+    std::size_t                         m_numDirtMaterials;
+    RpMaterial*                         m_staticDirtMaterials[30];
+    std::uint8_t                        primColors[8];
+    std::uint8_t                        secondColors[8];
+    std::uint8_t                        treeColors[8];
+    std::uint8_t                        fourColors[8];
+    std::uint8_t                        numOfColorVariations;
+    std::uint8_t                        lastColorVariation;
+    std::uint8_t                        primColor;
+    std::uint8_t                        secColor;
+    std::uint8_t                        tertColor;
+    std::uint8_t                        quatColor;
+    std::uint8_t                        upgrades[36];
+    std::uint8_t                        anRemapTXDs[8];
+    std::uint8_t                        field_302[2];
+    void*                               pAnimBlock; // CAnimBlock*
 };
+static_assert(sizeof(CVehicleModelInfoSAInterface) == 0x308, "Invalid size of CVehicleModelInfoSAInterface class");
 
 class CModelInfoSA : public CModelInfo
 {
@@ -378,7 +384,7 @@ public:
 
     char* GetNameIfVehicle();
 
-    BYTE           GetVehicleType();
+    BYTE           GetVehicleType() const noexcept;
     void           Request(EModelRequestType requestType, const char* szTag);
     void           Remove();
     bool           UnloadUnused();
@@ -393,7 +399,7 @@ public:
     static void    StaticResetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
-    bool           IsAllocatedInArchive();
+    bool           IsAllocatedInArchive() const noexcept;
     float          GetDistanceFromCentreOfMassToBaseOfModel();
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
@@ -466,6 +472,7 @@ public:
     // CModelInfoSA methods
     void         MakePedModel(char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
+    void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
     void         MakeClumpModel(ushort usBaseModelID);
@@ -486,6 +493,9 @@ public:
     bool IsTowableBy(CModelInfo* towingModel) override;
 
     bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
+    bool IsDamageableAtomic() override;
+
+    static bool IsVehicleModel(std::uint32_t model) noexcept;
 
 private:
     void CopyStreamingInfoFromModel(ushort usCopyFromModelID);

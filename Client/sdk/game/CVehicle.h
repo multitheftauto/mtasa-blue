@@ -198,7 +198,8 @@ public:
     virtual bool           GetTakeLessDamage() = 0;
     virtual bool           GetTyresDontBurst() = 0;
     virtual unsigned short GetAdjustablePropertyValue() = 0;
-    virtual float          GetHeliRotorSpeed() = 0;
+    virtual float          GetHeliRotorSpeed() const = 0;
+    virtual bool           GetVehicleRotorState() const noexcept = 0;
     virtual float          GetPlaneRotorSpeed() = 0;
     virtual unsigned long  GetExplodeTime() = 0;
 
@@ -220,6 +221,7 @@ public:
     virtual void SetTyresDontBurst(bool bTyresDontBurst) = 0;
     virtual void SetAdjustablePropertyValue(unsigned short usAdjustableProperty) = 0;
     virtual void SetHeliRotorSpeed(float fSpeed) = 0;
+    virtual void SetVehicleRotorState(bool state, bool stopRotor, bool isHeli) noexcept = 0;
     virtual void SetPlaneRotorSpeed(float fSpeed) = 0;
     virtual bool SetVehicleWheelRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept = 0;
     virtual void SetTaxiLightOn(bool bLightState) = 0;
@@ -325,4 +327,5 @@ public:
     virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;
 
     virtual const CVector* GetDummyPositions() const = 0;
+
 };

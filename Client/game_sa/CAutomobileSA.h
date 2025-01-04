@@ -24,6 +24,11 @@
 class CBouncingPanelSAInterface
 {
 public:
+    void SetPanel(std::int16_t frameId, std::int16_t axis, float angleLimit)
+    {
+        ((void(__thiscall*)(CBouncingPanelSAInterface*, std::int16_t, std::int16_t, float))0x6F4920)(this, frameId, axis, angleLimit);
+    }
+
     unsigned short m_nFrameId;
     unsigned short m_nAxis;
     float          m_fAngleLimit;
@@ -35,6 +40,13 @@ static_assert(sizeof(CBouncingPanelSAInterface) == 0x20, "Invalid size for CBoun
 class CAutomobileSAInterface : public CVehicleSAInterface
 {
 public:
+    void SetPanelDamage(std::uint8_t panelId, bool breakGlass, bool spawnFlyingComponent = true);
+
+    CObjectSAInterface* SpawnFlyingComponent(const eCarNodes& nodeId, const eCarComponentCollisionTypes& collType)
+    {
+        return ((CObjectSAInterface*(__thiscall*)(CAutomobileSAInterface*, eCarNodes, eCarComponentCollisionTypes))0x6a8580)(this, nodeId, collType);
+    }
+
     CDamageManagerSAInterface m_damageManager;
     CDoorSAInterface          m_doors[MAX_DOORS];
     RwFrame*                  m_aCarNodes[static_cast<std::size_t>(eCarNodes::NUM_NODES)];
