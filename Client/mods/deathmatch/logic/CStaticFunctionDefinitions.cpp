@@ -2280,7 +2280,6 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
         else
         {
             Ped.KillAnimation();
-            Ped.m_AnimationCache.progress = 0.0f;
 
             return true;
         }
