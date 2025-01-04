@@ -276,7 +276,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetChokingHandler(CClientGame::StaticChokingHandler);
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
-    g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
+    g_pMultiplayer->SetPostWorldProcessEntitiesAfterPreRenderHandler(CClientGame::StaticPostWorldProcessEntitiesAfterPreRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
     g_pMultiplayer->SetPostColorFilterRenderHandler(CClientGame::StaticPostColorFilterRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
@@ -484,7 +484,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetChokingHandler(NULL);
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
-    g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
+    g_pMultiplayer->SetPostWorldProcessEntitiesAfterPreRenderHandler(nullptr);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
     g_pMultiplayer->SetPostColorFilterRenderHandler(nullptr);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
@@ -2727,7 +2727,7 @@ void CClientGame::AddBuiltInEvents()
 
     // Game events
     m_Events.AddEvent("onClientPreRender", "", NULL, false);
-    m_Events.AddEvent("onClientPedsProcessed", "", NULL, false);
+    m_Events.AddEvent("onClientEntitiesProcessed", "", NULL, false);
     m_Events.AddEvent("onClientHUDRender", "", NULL, false);
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
@@ -3612,9 +3612,9 @@ void CClientGame::StaticPostWorldProcessHandler()
     g_pClientGame->PostWorldProcessHandler();
 }
 
-void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
+void CClientGame::StaticPostWorldProcessEntitiesAfterPreRenderHandler()
 {
-    g_pClientGame->PostWorldProcessPedsAfterPreRenderHandler();
+    g_pClientGame->PostWorldProcessEntitiesAfterPreRenderHandler();
 }
 
 void CClientGame::StaticPreFxRenderHandler()
@@ -3872,10 +3872,10 @@ void CClientGame::PostWorldProcessHandler()
     m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
 }
 
-void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
+void CClientGame::PostWorldProcessEntitiesAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
-    m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
+    m_pRootEntity->CallEvent("onClientEntitiesProcessed", Arguments, false);
 
     g_pClientGame->GetModelRenderer()->Update();
 }

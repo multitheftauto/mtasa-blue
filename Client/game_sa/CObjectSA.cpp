@@ -44,7 +44,7 @@ static void _declspec(naked) HOOK_CCObject_PreRender()
 void CObjectSA::StaticSetHooks()
 {
     // Patch CObject::PreRender. We don't want the scaling code to execute
-    // We'll scale the object entity matrix after onClientPedsProcessed event
+    // We'll scale the object entity matrix after onClientEntitiesProcessed event
     // 5E       - pop asi
     // 83 C4 10 - add esp, 0x10
     // C3       - ret
