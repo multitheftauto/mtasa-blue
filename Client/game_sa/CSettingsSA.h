@@ -138,12 +138,17 @@ public:
     bool IsMipMappingEnabled();
     void SetMipMappingEnabled(bool bEnable);
 
-    bool IsVolumetricShadowsEnabled();
+    bool IsVolumetricShadowsEnabled() const noexcept;
+    bool GetVolumetricShadowsEnabledByVideoSetting() const noexcept;
+    bool ResetVolumetricShadows() noexcept;
+ 
     void SetVolumetricShadowsEnabled(bool bEnable);
     void SetVolumetricShadowsSuspended(bool bSuspended);
 
     bool IsDynamicPedShadowsEnabled();
     void SetDynamicPedShadowsEnabled(bool bEnable);
+    bool IsDynamicPedShadowsEnabledByVideoSetting() const noexcept;
+    bool ResetDynamicPedShadows() noexcept;
 
     float        GetAspectRatioValue();
     eAspectRatio GetAspectRatio();

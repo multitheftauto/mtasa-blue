@@ -60,7 +60,7 @@ void CPlayerRPCs::ForcePlayerMap(NetBitStreamInterface& bitStream)
     if (bitStream.Read(ucVisible))
     {
         bool bVisible = (ucVisible == 1);
-        m_pClientGame->GetRadarMap()->SetForcedState(bVisible);
+        m_pClientGame->GetPlayerMap()->SetForcedState(bVisible);
     }
 }
 

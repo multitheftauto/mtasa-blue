@@ -21,8 +21,13 @@ CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsi
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
-    command_line->AppendSwitch("disable-gpu-compositing");
-    command_line->AppendSwitch("disable-gpu");
+    CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
+
+    if (!pWebCore->GetGPUEnabled())
+        command_line->AppendSwitch("disable-gpu");
+
+    command_line->AppendSwitch("disable-gpu-compositing"); // always disable this, causes issues with official builds
+
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
 

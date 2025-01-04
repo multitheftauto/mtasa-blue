@@ -1541,6 +1541,9 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
 
     pPlayer->SetControllerState(ControllerState);
 
+    if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
+        pVehicle->SetOnFire(BitStream.ReadBit());
+
     // Remember now as the last puresync time
     CVector vecPosition;
     pVehicle->GetPosition(vecPosition);
@@ -1765,6 +1768,9 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(ControllerState.LeftShoulder2 != 0);
         BitStream.WriteBit(ControllerState.RightShoulder2 != 0);
     }
+
+    if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
+        BitStream.WriteBit(pVehicle->IsOnFire());
 
     // Write the sent position to the interpolator
     AddInterpolation(vecPosition);

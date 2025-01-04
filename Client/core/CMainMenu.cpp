@@ -912,17 +912,13 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
-    // If we're right clicking, execute special command
-    if (!left)
+    if (left)
+        g_pCore->GetCommands()->Execute("reconnect", "");
+    else
     {
-        std::string command;
-        CVARS_GET("_beta_qc_rightclick_command", command);
-        g_pCore->GetCommands()->Execute(command.data());
-        return true;
+        m_ServerBrowser.SetVisible(true);
+        m_ServerBrowser.OnQuickConnectButtonClick();
     }
-
-    m_ServerBrowser.SetVisible(true);
-    m_ServerBrowser.OnQuickConnectButtonClick();
     return true;
 }
 

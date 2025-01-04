@@ -1155,8 +1155,12 @@ CWebCoreInterface* CCore::GetWebCore()
 {
     if (m_pWebCore == nullptr)
     {
+        bool gpuEnabled;
+        auto cvars = g_pCore->GetCVars();
+        cvars->Get("browser_enable_gpu", gpuEnabled);
+
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise();
+        m_pWebCore->Initialise(gpuEnabled);
     }
     return m_pWebCore;
 }
@@ -1869,6 +1873,13 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
 
+    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
+    if (m_uiFrameRateLimit == 0)
+    {
+        m_bQueuedFrameRateValid = false;
+        GetGraphStats()->RemoveTimingPoint("Limiter");
+    }
+
     // Print new limits to the console
     if (bLogToConsole)
     {
@@ -2179,11 +2190,6 @@ CModelCacheManager* CCore::GetModelCacheManager()
     if (!m_pModelCacheManager)
         m_pModelCacheManager = NewModelCacheManager();
     return m_pModelCacheManager;
-}
-
-void CCore::AddModelToPersistentCache(ushort usModelId)
-{
-    return GetModelCacheManager()->AddModelToPersistentCache(usModelId);
 }
 
 void CCore::StaticIdleHandler()

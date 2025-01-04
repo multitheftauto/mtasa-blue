@@ -73,11 +73,6 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
     if (!pModelInfo->IsAllocatedInArchive())
         return false;
 
-    if (pModelInfo->IsDynamic())
-    {
-        return false;
-    }
-
     eModelInfoType eType = pModelInfo->GetModelType();
     return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
 }
@@ -98,9 +93,18 @@ void CClientBuildingManager::DestroyAllForABit()
 
 void CClientBuildingManager::RestoreDestroyed()
 {
-    for (CClientBuilding* building : GetBuildings())
+    bool hasInvalidLods = true;
+    while (hasInvalidLods)
     {
-        building->Create();
+        hasInvalidLods = false;
+        for (CClientBuilding* building : GetBuildings())
+        {
+            const CClientBuilding* highLodBuilding = building->GetHighLodBuilding();
+            if (highLodBuilding && !highLodBuilding->IsValid())
+                hasInvalidLods = true;
+            else
+                building->Create();
+        }
     }
 }
 

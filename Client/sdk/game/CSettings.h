@@ -132,12 +132,16 @@ public:
     virtual bool IsMipMappingEnabled() = 0;
     virtual void SetMipMappingEnabled(bool bEnable) = 0;
 
-    virtual bool IsVolumetricShadowsEnabled() = 0;
+    virtual bool IsVolumetricShadowsEnabled() const noexcept = 0;
+    virtual bool GetVolumetricShadowsEnabledByVideoSetting() const noexcept = 0;
     virtual void SetVolumetricShadowsEnabled(bool bEnable) = 0;
     virtual void SetVolumetricShadowsSuspended(bool bSuspended) = 0;
+    virtual bool ResetVolumetricShadows() noexcept = 0;
 
     virtual bool IsDynamicPedShadowsEnabled() = 0;
     virtual void SetDynamicPedShadowsEnabled(bool bEnable) = 0;
+    virtual bool IsDynamicPedShadowsEnabledByVideoSetting() const noexcept = 0;
+    virtual bool ResetDynamicPedShadows()  noexcept = 0;
 
     virtual float        GetAspectRatioValue() = 0;
     virtual eAspectRatio GetAspectRatio() = 0;
