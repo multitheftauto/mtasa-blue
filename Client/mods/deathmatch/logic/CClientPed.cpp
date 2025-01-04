@@ -5856,6 +5856,7 @@ void CClientPed::RunAnimationFromCache()
         }
     }
 
+    animAssoc->SetCurrentProgress(progress);
     animAssoc->SetCurrentSpeed(m_AnimationCache.speed);
 }
 
