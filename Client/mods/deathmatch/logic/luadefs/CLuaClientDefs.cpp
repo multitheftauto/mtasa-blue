@@ -83,12 +83,12 @@ bool CLuaClientDefs::IsCapsLockEnabled()
     return ((::GetKeyState(VK_CAPITAL) & 0x0001) != 0);
 }
 
-bool CLuaClientDefs::SetCursorColor(float r, float g, float b, float alpha) noexcept
+bool CLuaClientDefs::SetCursorColor(std::optional<float> r, std::optional<float> g, std::optional<float> b, std::optional<float> alpha) noexcept
 {
-    if (!g_pCore->IsMenuVisible())
-        g_pCore->GetGUI()->SetCursorColor(r, g, b, alpha);
+    if (!g_pCore->IsMenuVisible()) 
+        g_pCore->GetGUI()->SetCursorColor(r.value_or(255.0f), g.value_or(255.0f), b.value_or(255.0f), alpha.value_or(1.0f));
     else
-        g_pCore->GetGUI()->ResetCursorColor(r, g, b, alpha); // Force values to be updated
+        g_pCore->GetGUI()->ResetCursorColor(r.value_or(255.0f), g.value_or(255.0f), b.value_or(255.0f), alpha.value_or(1.0f));            // Force variables to be updated when close the main menu it will set the new color
 
     return true;
 }
