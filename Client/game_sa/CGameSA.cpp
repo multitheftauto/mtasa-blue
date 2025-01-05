@@ -1069,8 +1069,8 @@ void CGameSA::RemoveGameWorld()
     // Remove all shadows in CStencilShadowObjects::dtorAll
     ((void* (*)())0x711390)();
 
-    m_pPools->GetDummyPool().RemoveAllWithBackup();
-    m_pPools->GetBuildingsPool().RemoveAllWithBackup();
+    m_Pools->GetDummyPool().RemoveAllWithBackup();
+    m_Pools->GetBuildingsPool().RemoveAllWithBackup();
 
     static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
 
@@ -1079,8 +1079,8 @@ void CGameSA::RemoveGameWorld()
 
 void CGameSA::RestoreGameWorld()
 {
-    m_pPools->GetBuildingsPool().RestoreBackup();
-    m_pPools->GetDummyPool().RestoreBackup();
+    m_Pools->GetBuildingsPool().RestoreBackup();
+    m_Pools->GetDummyPool().RestoreBackup();
 
     m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
     m_isGameWorldRemoved = false;
