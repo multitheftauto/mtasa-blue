@@ -899,13 +899,13 @@ bool CMainConfig::AddMissingSettings()
         if (!foundNode)
         {
             const std::string templateNodeValue = templateNode->GetTagContent();
-            const std::string templateNodeComment = templateNode->GetCommentText();
+            const SString templateNodeComment = templateNode->GetCommentText();
 
             foundNode = m_pRootNode->CreateSubNode(templateNodeName.c_str(), previousNode);
             foundNode->SetTagContent(templateNodeValue.c_str());
             foundNode->SetCommentText(templateNodeComment.c_str(), true);
 
-            CLogger::LogPrintf("Added missing '%s' setting to mtaserver.conf\n", &templateNodeName);
+            CLogger::LogPrintf("Added missing '%s' setting to mtaserver.conf\n", templateNodeName.c_str());
             configChanged = true;
         }
         previousNode = foundNode;
