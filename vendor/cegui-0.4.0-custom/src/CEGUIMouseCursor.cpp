@@ -159,7 +159,7 @@ void MouseCursor::setAlpha(float r, float g, float b, float alpha) noexcept
 *************************************************************************/
 void MouseCursor::setColor(float r, float g, float b, float alpha) noexcept
 {
-    d_colourRect.setColours(colour(r/255.f, g/255.f, b/255.f, alpha));
+    d_colourRect.setColours(colour(r/255.f, g/255.f, b/255.f, alpha/255.f));
 }
 /*************************************************************************
 	Checks the mouse cursor position is within the current 'constrain'

@@ -521,7 +521,7 @@ void CGUI_Impl::GetCursorColor(float& r, float& g, float& b, float& alpha) noexc
 
 void CGUI_Impl::ResetMenuCursorColor() noexcept
 {
-    CEGUI::MouseCursor::getSingleton().setColor(255.0f, 255.0f, 255.0f, 1.0f);
+    CEGUI::MouseCursor::getSingleton().setColor(255.0f, 255.0f, 255.0f, 255.0f);
 }
 
 void CGUI_Impl::ResetCursorColor(float r, float g, float b, float alpha) noexcept

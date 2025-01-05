@@ -316,7 +316,7 @@ private:
 
     CEGUI::DefaultWindow* m_pTop;
     const CEGUI::Image*   m_pCursor;
-    float                 m_fCurrentServerCursorAlpha = 1.0f;
+    float                 m_fCurrentServerCursorAlpha = 255.0f;
     float                 m_fCurrentServerCursorRed = 255.0f;
     float                 m_fCurrentServerCursorGreen = 255.0f;
     float                 m_fCurrentServerCursorBlue = 255.0f;
