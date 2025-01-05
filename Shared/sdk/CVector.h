@@ -30,13 +30,12 @@ public:
     float fY;
     float fZ;
 
-    struct NoInit{};
+    struct NoInit {};
+    CVector(NoInit) noexcept {}
 
-    CVector(NoInit) {}
-
-    constexpr CVector() : fX(0.0f), fY(0.0f), fZ(0.0f) {}
-
-    constexpr CVector(float x, float y, float z) : fX(x), fY(y), fZ(z) {}
+    constexpr CVector() noexcept : fX(0.0f), fY(0.0f), fZ(0.0f) {}
+    
+    constexpr explicit CVector(float x, float y = 0.0f, float z = 0.0f) noexcept : fX(x), fY(y), fZ(z) {}
 
     constexpr CVector(const CVector4D& vec) noexcept : fX(vec.fX), fY(vec.fY), fZ(vec.fZ) {}
 
@@ -187,7 +186,7 @@ public:
         {
             *outVec = *this + vecRay * t;
             if (outHitBary) { // Calculate all barycentric coords if necessary
-                *outHitBary = { 1.f - u - v, u, v }; // For vertices A, B, C [I assume?]
+                *outHitBary = CVector( 1.f - u - v, u, v ); // For vertices A, B, C [I assume?]
             }
             return true;
         }

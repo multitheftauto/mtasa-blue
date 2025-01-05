@@ -253,7 +253,7 @@ public:
     CClientVehicle* GetRealOccupiedVehicle();
     CClientVehicle* GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL,
-                                               float fWithinRange = 6000.0f);
+                                               float fWithinRange = 6000.0f, bool localVehicles = false);
     bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
                                    CVector* pClosestDoorPosition = NULL);
 
@@ -483,8 +483,8 @@ public:
     bool IsBleeding() const noexcept { return m_bBleeding; };
     void SetBleeding(bool bBleeding);
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() override { return m_pPlayerPed ? m_pPlayerPed->IsOnFire() : m_bIsOnFire; }
+    bool SetOnFire(bool bOnFire) override;
 
     void GetVoice(short* psVoiceType, short* psVoiceID);
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
@@ -566,6 +566,7 @@ protected:
 
     // Used to destroy the current game ped and create a new one in the same state.
     void ReCreateModel();
+    void ReCreateGameEntity();
 
     void _CreateModel();
     void _CreateLocalModel();
@@ -725,6 +726,7 @@ public:
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
+    bool                                     m_shouldRecreate{false};
 
     bool             m_bBulletImpactData;
     CClientEntityPtr m_pBulletImpactEntity;

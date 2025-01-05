@@ -135,6 +135,21 @@ bool CMainConfig::Load()
         return false;
     }
 
+    // Grab rules
+    CXMLNode* currentNode = nullptr;
+    std::size_t currentIndex = 0;
+    while (currentNode = m_pRootNode->FindSubNode("rule", currentIndex++))
+    {
+        CXMLAttribute* attribute = currentNode->GetAttributes().Find("name");
+        SString ruleName = attribute ? attribute->GetValue() : SString{};
+
+        attribute = currentNode->GetAttributes().Find("value");
+        SString ruleValue = attribute ? attribute->GetValue() : SString{};
+
+        if (!ruleName.empty() && !ruleValue.empty())
+            m_RulesForASEMap[std::move(ruleName)] = std::move(ruleValue);
+    }
+  
     // Strip spaces from beginning and end of server name
     m_strServerName = SString(m_strServerName).TrimStart(" ").TrimEnd(" ");
 
@@ -237,43 +252,37 @@ bool CMainConfig::Load()
     GetInteger(m_pRootNode, "verifyclientsettings", m_iEnableClientChecks);
 
     // Handle the <client_file> nodes
-    CXMLNode*    pNode = NULL;
-    unsigned int uiCurrentIndex = 0;
-    do
+    currentNode = nullptr;
+    currentIndex = 0;
+    while (currentNode = m_pRootNode->FindSubNode("client_file", currentIndex++))
     {
-        // Grab the current script node
-        pNode = m_pRootNode->FindSubNode("client_file", uiCurrentIndex++);
-        if (pNode)
+        // Grab its "name" attribute
+        CXMLAttribute* attribute = currentNode->GetAttributes().Find("name");
+        SString name = attribute ? attribute->GetValue() : SString{};
+        name = name.Replace("\\", "/").ToLower();
+
+        // Grab its "verify" attribute
+        attribute = currentNode->GetAttributes().Find("verify");
+        SString verify = attribute ? attribute->GetValue() : SString{};
+        bool shouldVerify = verify == "true" || verify == "yes" || verify == "1";
+
+        // Find bitnumber
+        bool found = false;
+        for (std::size_t i = 0; i < std::size(gtaDataFiles); i++)
         {
-            // Grab its "name" attribute
-            CXMLAttribute* pAttribute = pNode->GetAttributes().Find("name");
-            SString        strName = pAttribute ? pAttribute->GetValue() : "";
-            strName = strName.Replace("\\", "/").ToLower();
-
-            // Grab its "verify" attribute
-            pAttribute = pNode->GetAttributes().Find("verify");
-            SString strVerify = pAttribute ? pAttribute->GetValue() : "";
-            bool    bVerify = strVerify == "true" || strVerify == "yes" || strVerify == "1";
-
-            // Find bitnumber
-            bool bFound = false;
-            for (uint i = 0; i < NUMELMS(gtaDataFiles); i++)
+            if (name == gtaDataFiles[i].szRealFilename)
             {
-                if (strName == gtaDataFiles[i].szRealFilename)
-                {
-                    if (bVerify)
-                        m_iEnableClientChecks |= 1 << gtaDataFiles[i].iBitNumber;
-                    else
-                        m_iEnableClientChecks &= ~(1 << gtaDataFiles[i].iBitNumber);
-                    bFound = true;
-                    break;
-                }
+                if (shouldVerify)
+                    m_iEnableClientChecks |= 1 << gtaDataFiles[i].iBitNumber;
+                else
+                    m_iEnableClientChecks &= ~(1 << gtaDataFiles[i].iBitNumber);
+                found = true;
+                break;
             }
-
-            if (!bFound)
-                CLogger::ErrorPrintf("Unknown client_file '%s'\n", *strName);
         }
-    } while (pNode);
+        if (!found)
+            CLogger::ErrorPrintf("Unknown client_file '%s'\n", *name);
+    }
 
     // allow_gta3_img_mods
     SString strImgMods;

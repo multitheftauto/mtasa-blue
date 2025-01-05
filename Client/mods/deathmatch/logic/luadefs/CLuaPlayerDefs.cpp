@@ -40,6 +40,8 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerNametagText", SetPlayerNametagText},
         {"setPlayerNametagColor", SetPlayerNametagColor},
         {"setPlayerNametagShowing", SetPlayerNametagShowing},
+        {"setPlayerHudComponentProperty", ArgumentParser<SetPlayerHudComponentProperty>},
+        {"resetPlayerHudComponentProperty", ArgumentParser<ResetPlayerHudComponentProperty>},
 
         // Community funcs
         {"getPlayerUserName", GetPlayerUserName},
@@ -51,6 +53,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"isPlayerMapVisible", IsPlayerMapVisible},
         {"getPlayerMapBoundingBox", GetPlayerMapBoundingBox},
         {"getPlayerMapOpacity", ArgumentParser<GetPlayerMapOpacity>},
+        {"getPlayerHudComponentProperty", ArgumentParser<GetPlayerHudComponentProperty>},
     };
 
     // Add functions
@@ -77,6 +80,8 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isMapVisible", "isPlayerMapVisible");
     lua_classfunction(luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible");
     lua_classfunction(luaVM, "toggleControl", "toggleControl");
+    lua_classfunction(luaVM, "setHudComponentProperty", "setPlayerHudComponentProperty");
+    lua_classfunction(luaVM, "resetHudComponentProperty", "resetPlayerHudComponentProperty");
 
     lua_classfunction(luaVM, "create", "getPlayerFromName");
 
@@ -90,6 +95,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getNametagText", "getPlayerNametagText");
     lua_classfunction(luaVM, "getNametagColor", "getPlayerNametagColor");
     lua_classfunction(luaVM, "getScriptDebugLevel", "getPlayerScriptDebugLevel");
+    lua_classfunction(luaVM, "getHudComponentProperty", "getPlayerHudComponentProperty");
 
     lua_classfunction(luaVM, "isNametagShowing", "isPlayerNametagShowing");
     lua_classfunction(luaVM, "isCrosshairVisible", "isPlayerCrosshairVisible");
@@ -643,4 +649,403 @@ unsigned char CLuaPlayerDefs::GetPlayerMapOpacity()
 bool CLuaPlayerDefs::IsPlayerCrosshairVisible()
 {
     return g_pGame->GetHud()->IsCrosshairVisible();
+}
+
+bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property, std::variant<CVector2D, float, bool, std::string> value)
+{
+    if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
+        return false;
+
+    CHud* hud = g_pGame->GetHud();
+
+    switch (property)
+    {
+        case eHudComponentProperty::POSITION:
+        {
+            if (!std::holds_alternative<CVector2D>(value))
+                return false;
+
+            hud->SetComponentPosition(component, std::get<CVector2D>(value));
+            return true;
+        }
+        case eHudComponentProperty::SIZE:
+        {
+            if (!std::holds_alternative<CVector2D>(value))
+                return false;
+
+            hud->SetComponentSize(component, std::get<CVector2D>(value));
+            return true;
+        }
+        case eHudComponentProperty::FILL_COLOR:
+        case eHudComponentProperty::FILL_COLOR_SECONDARY:
+        {
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+                return false;
+
+            if (!std::holds_alternative<float>(value))
+                return false;
+
+            hud->SetComponentColor(component, static_cast<std::uint32_t>(std::get<float>(value)), property == eHudComponentProperty::FILL_COLOR_SECONDARY);
+            return true;
+        }
+        case eHudComponentProperty::DRAW_BLACK_BORDER:
+        {
+            if (!hud->IsComponentBar(component))
+                return false;
+
+            if (!std::holds_alternative<bool>(value))
+                return false;
+
+            hud->SetComponentDrawBlackBorder(component, std::get<bool>(value));
+            return true;
+        }
+        case eHudComponentProperty::DRAW_PERCENTAGE:
+        {
+            if (!hud->IsComponentBar(component))
+                return false;
+
+            if (!std::holds_alternative<bool>(value))
+                return false;
+
+            hud->SetComponentDrawPercentage(component, std::get<bool>(value));
+            return true;
+        }
+        case eHudComponentProperty::BLINKING_HP_VALUE:
+        {
+            if (component != HUD_HEALTH)
+                return false;
+
+            if (!std::holds_alternative<float>(value))
+                return false;
+
+            hud->SetHealthBarBlinkingValue(std::get<float>(value));
+            return true;
+        }
+        case eHudComponentProperty::DROP_COLOR:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            if (!std::holds_alternative<float>(value))
+                return false;
+
+            hud->SetComponentFontDropColor(component, static_cast<std::uint32_t>(std::get<float>(value)));
+            return true;
+        }
+        case eHudComponentProperty::TEXT_OUTLINE:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            if (!std::holds_alternative<float>(value))
+                return false;
+
+            hud->SetComponentFontOutline(component, std::get<float>(value));
+            return true;
+        }
+        case eHudComponentProperty::TEXT_SHADOW:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            if (!std::holds_alternative<float>(value))
+                return false;
+
+            hud->SetComponentFontShadow(component, std::get<float>(value));
+            return true;
+        }
+        case eHudComponentProperty::TEXT_STYLE:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            if (!std::holds_alternative<std::string>(value))
+                return false;
+
+            eFontStyle val;
+            if (!StringToEnum(std::get<std::string>(value), val))
+                return false;
+
+            // I don't know why, but calling StringToEnum causes the "hud" pointer to become invalid, leading to a crash
+            g_pGame->GetHud()->SetComponentFontStyle(component, val);
+            return true;
+        }
+        case eHudComponentProperty::TEXT_ALIGNMENT:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            if (!std::holds_alternative<std::string>(value))
+                return false;
+
+            eFontAlignment val;
+            if (!StringToEnum(std::get<std::string>(value), val))
+                return false;
+
+            // I don't know why, but calling StringToEnum causes the "hud" pointer to become invalid, leading to a crash
+            g_pGame->GetHud()->SetComponentFontAlignment(component, val);
+            return true;
+        }
+        case eHudComponentProperty::TEXT_PROPORTIONAL:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            if (!std::holds_alternative<bool>(value))
+                return false;
+
+            hud->SetComponentFontProportional(component, std::get<bool>(value));
+            return true;
+        }
+        case eHudComponentProperty::CUSTOM_ALPHA:
+        {
+            if (!std::holds_alternative<bool>(value))
+                return false;
+
+            hud->SetComponentUseCustomAlpha(component, std::get<bool>(value));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property) noexcept
+{
+    if (component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
+        return false;
+
+    CHud* hud = g_pGame->GetHud();
+
+    if (component == HUD_ALL)
+    {
+        for (std::size_t iComp = 0; iComp < static_cast<std::size_t>(HUD_HELP_TEXT); iComp++)
+        {
+            eHudComponent comp = static_cast<eHudComponent>(iComp);
+            if (comp == HUD_ALL)
+                continue;
+
+            ResetPlayerHudComponentProperty(comp, property);
+        }
+
+        return true;
+    }
+
+    switch (property)
+    {
+        case eHudComponentProperty::ALL_PROPERTIES:
+        {
+            for (std::size_t i = 0; i < static_cast<std::size_t>(eHudComponentProperty::ALL_PROPERTIES); i++)
+                ResetPlayerHudComponentProperty(component, static_cast<eHudComponentProperty>(i));
+
+            return true;
+        }
+        case eHudComponentProperty::POSITION:
+            hud->ResetComponentPlacement(component, false);
+            return true;
+        case eHudComponentProperty::SIZE:
+            hud->ResetComponentPlacement(component, true);
+            return true;
+        case eHudComponentProperty::FILL_COLOR:
+        case eHudComponentProperty::FILL_COLOR_SECONDARY:
+        {
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+                return false;
+
+            bool second = property == eHudComponentProperty::FILL_COLOR_SECONDARY;
+            if (second && (component != HUD_RADIO && component != HUD_MONEY && component != HUD_WANTED && component != HUD_WEAPON))
+                return false;
+
+            hud->ResetComponentColor(component, second);
+            return true;
+        }
+        case eHudComponentProperty::DROP_COLOR:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            hud->SetComponentFontDropColor(component, COLOR_RGBA(0, 0, 0, 255));
+            return true;
+        }
+        case eHudComponentProperty::DRAW_BLACK_BORDER:
+        {
+            if (!hud->IsComponentBar(component))
+                return false;
+
+            hud->SetComponentDrawBlackBorder(component, true);
+            return true;
+        }
+        case eHudComponentProperty::DRAW_PERCENTAGE:
+        {
+            if (!hud->IsComponentBar(component))
+                return false;
+
+            hud->SetComponentDrawPercentage(component, false);
+            return true;
+        }
+        case eHudComponentProperty::BLINKING_HP_VALUE:
+        {
+            if (!component != HUD_HEALTH)
+                return false;
+
+            hud->SetHealthBarBlinkingValue(10.0f);
+            return true;
+        }
+        case eHudComponentProperty::TEXT_OUTLINE:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            hud->ResetComponentFontOutline(component);
+            return true;
+        }
+        case eHudComponentProperty::TEXT_SHADOW:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            hud->ResetComponentFontShadow(component);
+            return true;
+        }
+        case eHudComponentProperty::TEXT_STYLE:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            hud->ResetComponentFontStyle(component);
+            return true;
+        }
+        case eHudComponentProperty::TEXT_ALIGNMENT:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            hud->ResetComponentFontAlignment(component);
+            return true;
+        }
+        case eHudComponentProperty::TEXT_PROPORTIONAL:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            hud->ResetComponentFontProportional(component);
+            return true;
+        }
+        case eHudComponentProperty::CUSTOM_ALPHA:
+            hud->SetComponentUseCustomAlpha(component, false);
+            return true;
+    }
+
+    return false;
+} 
+
+std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>> CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property)
+{
+    if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
+        return false;
+
+    CHud* hud = g_pGame->GetHud();
+
+    switch (property)
+    {
+        case eHudComponentProperty::POSITION:
+        {
+            CVector2D& pos = hud->GetComponentPosition(component);
+            return CLuaMultiReturn<float, float>{pos.fX, pos.fY};
+        }
+        case eHudComponentProperty::SIZE:
+        {
+            CVector2D& size = hud->GetComponentSize(component);
+            return CLuaMultiReturn<float, float>{size.fX, size.fY};
+        }
+        case eHudComponentProperty::FILL_COLOR:
+        {
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+                return false;
+
+            SColor& color = hud->GetComponentColor(component);
+            return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
+        }
+        case eHudComponentProperty::FILL_COLOR_SECONDARY:
+        {
+            if (component != HUD_RADIO && component != HUD_MONEY && component != HUD_WANTED && component != HUD_WEAPON)
+                return false;
+
+            SColor& color = hud->GetComponentSecondaryColor(component);
+            return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
+        }
+        case eHudComponentProperty::DROP_COLOR:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            SColor& color = hud->GetComponentFontDropColor(component);
+            return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
+        }
+        case eHudComponentProperty::DRAW_BLACK_BORDER:
+        {
+            if (!hud->IsComponentBar(component))
+                return false;
+
+            return hud->GetComponentDrawBlackBorder(component);
+        }
+        case eHudComponentProperty::DRAW_PERCENTAGE:
+        {
+            if (!hud->IsComponentBar(component))
+                return false;
+
+            return hud->GetComponentDrawPercentage(component);
+        }
+        case eHudComponentProperty::BLINKING_HP_VALUE:
+        {
+            if (component != HUD_HEALTH)
+                return false;
+
+            return hud->GetHealthBarBlinkingValue(component);
+        }
+        case eHudComponentProperty::TEXT_OUTLINE:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            return hud->GetComponentFontOutline(component);
+        }
+        case eHudComponentProperty::TEXT_SHADOW:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            return hud->GetComponentFontShadow(component);
+        }
+        case eHudComponentProperty::TEXT_STYLE:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            return EnumToString(hud->GetComponentFontStyle(component));
+        }
+        case eHudComponentProperty::TEXT_ALIGNMENT:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            return EnumToString(hud->GetComponentFontAlignment(component));
+        }
+        case eHudComponentProperty::TEXT_PROPORTIONAL:
+        {
+            if (!hud->IsComponentText(component))
+                return false;
+
+            return hud->GetComponentFontProportional(component);
+        }
+        case eHudComponentProperty::CUSTOM_ALPHA:
+            return hud->GetComponentUseCustomAlpha(component);
+        case eHudComponentProperty::TEXT_SIZE:
+        {
+            CVector2D& size = hud->GetComponentTextSize(component);
+            return CLuaMultiReturn<float, float>{size.fX, size.fY};
+        }
+    }
+
+    return false;
 }

@@ -13,14 +13,14 @@
 #include "game\CRenderer.h"
 #include "game\CVisibilityPlugins.h"
 
-bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix)
+bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting)
 {
     if (g_pCore->IsWindowMinimized())
         return false;
 
     if (pModelInfo && pModelInfo->IsLoaded())
     {
-        m_Queue.emplace_back(pModelInfo, matrix);
+        m_Queue.emplace_back(pModelInfo, matrix, lighting);
         return true;
     }
 
@@ -54,7 +54,7 @@ void CModelRenderer::Render()
     for (auto& modelDesc : m_Queue)
     {
         if (modelDesc.pModelInfo->IsLoaded() && !modelDesc.pModelInfo->GetIdeFlag(eModelIdeFlag::DRAW_LAST))
-            pRenderer->RenderModel(modelDesc.pModelInfo, modelDesc.matrix);
+            pRenderer->RenderModel(modelDesc.pModelInfo, modelDesc.matrix, modelDesc.lighting);
     }
 
     m_Queue.clear();
@@ -68,5 +68,5 @@ void CModelRenderer::RenderEntity(SModelToRender* modelDesc, float distance)
     CRenderer* pRenderer = g_pGame->GetRenderer();
     assert(pRenderer);
 
-    pRenderer->RenderModel(modelDesc->pModelInfo, modelDesc->matrix);
+    pRenderer->RenderModel(modelDesc->pModelInfo, modelDesc->matrix, modelDesc->lighting);
 }
