@@ -88,7 +88,7 @@ bool CLuaClientDefs::SetCursorColor(std::optional<float> r, std::optional<float>
     if (!g_pCore->IsMenuVisible()) 
         g_pCore->GetGUI()->SetCursorColor(r.value_or(255.0f), g.value_or(255.0f), b.value_or(255.0f), alpha.value_or(255.0f));
     else
-        g_pCore->GetGUI()->ResetCursorColor(r.value_or(255.0f), g.value_or(255.0f), b.value_or(255.0f), alpha.value_or(255.0f));            // Force variables to be updated when close the main menu it will set the new color
+        g_pCore->GetGUI()->ResetCursorColorVariables();            // Force variables to be updated when close the main menu it will set the new color
 
     return true;
 }

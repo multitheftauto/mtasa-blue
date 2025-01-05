@@ -142,14 +142,14 @@ public:
 
     void        SetCursorEnabled(bool bEnabled);
     bool        IsCursorEnabled();
-    void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false);
-    void        SetCurrentServerCursorAlpha(float fAlpha);
+    void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false) override;
+    void        SetCurrentServerCursorAlpha(float fAlpha) override;
     float       GetCurrentServerCursorAlpha();
-    void        SetCursorColor(float r, float g, float b, float alpha) noexcept;
-    void        GetCursorColor(float& r, float& g, float& b, float& alpha) noexcept;
-    void        ResetMenuCursorColor() noexcept;
-    void        RestoreCurrentServerCursorColor() noexcept;
-    void        ResetCursorColor(float r, float g, float b, float alpha) noexcept;
+    void        SetCursorColor(float r, float g, float b, float alpha) noexcept override;
+    void        GetCursorColor(float& r, float& g, float& b, float& alpha) noexcept override;
+    void        ResetMenuCursorColor() noexcept override;
+    void        RestoreCurrentServerCursorColor() noexcept override;
+    void        ResetCursorColorVariables() noexcept override;
     eCursorType GetCursorType();
 
     void                    AddChild(CGUIElement_Impl* pChild);

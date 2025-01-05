@@ -218,7 +218,7 @@ void CModManager::Unload()
         CCore::GetSingleton().GetCommands()->SetExecuteHandler(NULL);
 
         // Reset cursor color
-        CCore::GetSingleton().GetGUI()->ResetCursorColor(255.f, 255.f, 255.f, 255.f);
+        CCore::GetSingleton().GetGUI()->ResetCursorColorVariables();
 
         // Reset the modules
         CCore::GetSingleton().GetGame()->Reset();

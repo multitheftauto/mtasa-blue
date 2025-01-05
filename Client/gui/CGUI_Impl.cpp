@@ -524,12 +524,12 @@ void CGUI_Impl::ResetMenuCursorColor() noexcept
     CEGUI::MouseCursor::getSingleton().setColor(255.0f, 255.0f, 255.0f, 255.0f);
 }
 
-void CGUI_Impl::ResetCursorColor(float r, float g, float b, float alpha) noexcept
+void CGUI_Impl::ResetCursorColorVariables() noexcept
 {
-    CurrentServerCursorRed = r;
-    CurrentServerCursorGreen = g;
-    CurrentServerCursorBlue = b;
-    CurrentServerCursorAlpha = alpha;
+    CurrentServerCursorRed = 255.f;
+    CurrentServerCursorGreen = 255.f;
+    CurrentServerCursorBlue = 255.f;
+    CurrentServerCursorAlpha = 255.f;
 }
 
 void CGUI_Impl::RestoreCurrentServerCursorColor() noexcept
