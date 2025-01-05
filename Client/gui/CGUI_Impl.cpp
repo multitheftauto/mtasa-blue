@@ -30,7 +30,7 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
-CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fCurrentServerCursorAlpha(1.0f)
+CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), CurrentServerCursorAlpha(255.0f)
 {
     m_RenderOkTimer.SetMaxIncrement(100);
 
@@ -496,7 +496,7 @@ bool CGUI_Impl::IsCursorEnabled()
 
 void CGUI_Impl::SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer)
 {
-    CEGUI::MouseCursor::getSingleton().setColor(m_fCurrentServerCursorRed, m_fCurrentServerCursorGreen, m_fCurrentServerCursorBlue, fAlpha);
+    CEGUI::MouseCursor::getSingleton().setColor(CurrentServerCursorRed, CurrentServerCursorGreen, CurrentServerCursorBlue, fAlpha);
 
     if (bOnlyCurrentServer)
         SetCurrentServerCursorAlpha(fAlpha);
@@ -505,18 +505,18 @@ void CGUI_Impl::SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer)
 void CGUI_Impl::SetCursorColor(float r, float g, float b, float alpha) noexcept
 {
     CEGUI::MouseCursor::getSingleton().setColor(r, g, b, alpha);
-    m_fCurrentServerCursorRed = r;
-    m_fCurrentServerCursorGreen = g;
-    m_fCurrentServerCursorBlue = b;
-    m_fCurrentServerCursorAlpha = alpha;
+    CurrentServerCursorRed = r;
+    CurrentServerCursorGreen = g;
+    CurrentServerCursorBlue = b;
+    CurrentServerCursorAlpha = alpha;
 }
 
 void CGUI_Impl::GetCursorColor(float& r, float& g, float& b, float& alpha) noexcept
 {
-    r = m_fCurrentServerCursorRed;
-    g = m_fCurrentServerCursorGreen;
-    b = m_fCurrentServerCursorBlue;
-    alpha = m_fCurrentServerCursorAlpha;
+    r = CurrentServerCursorRed;
+    g = CurrentServerCursorGreen;
+    b = CurrentServerCursorBlue;
+    alpha = CurrentServerCursorAlpha;
 }
 
 void CGUI_Impl::ResetMenuCursorColor() noexcept
@@ -526,25 +526,25 @@ void CGUI_Impl::ResetMenuCursorColor() noexcept
 
 void CGUI_Impl::ResetCursorColor(float r, float g, float b, float alpha) noexcept
 {
-    m_fCurrentServerCursorRed = r;
-    m_fCurrentServerCursorGreen = g;
-    m_fCurrentServerCursorBlue = b;
-    m_fCurrentServerCursorAlpha = alpha;
+    CurrentServerCursorRed = r;
+    CurrentServerCursorGreen = g;
+    CurrentServerCursorBlue = b;
+    CurrentServerCursorAlpha = alpha;
 }
 
 void CGUI_Impl::RestoreCurrentServerCursorColor() noexcept
 {
-    CEGUI::MouseCursor::getSingleton().setColor(m_fCurrentServerCursorRed, m_fCurrentServerCursorGreen, m_fCurrentServerCursorBlue, m_fCurrentServerCursorAlpha);
+    CEGUI::MouseCursor::getSingleton().setColor(CurrentServerCursorRed, CurrentServerCursorGreen, CurrentServerCursorBlue, CurrentServerCursorAlpha);
 }
 
 void CGUI_Impl::SetCurrentServerCursorAlpha(float fAlpha)
 {
-    m_fCurrentServerCursorAlpha = fAlpha;
+    CurrentServerCursorAlpha = fAlpha;
 }
 
 float CGUI_Impl::GetCurrentServerCursorAlpha()
 {
-    return m_fCurrentServerCursorAlpha;
+    return CurrentServerCursorAlpha;
 }
 
 eCursorType CGUI_Impl::GetCursorType()
