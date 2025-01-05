@@ -423,6 +423,9 @@ public:
     bool SetBirdsEnabled(bool bEnabled);
     bool GetBirdsEnabled();
 
+    void SetWeaponRenderEnabled(bool enabled);
+    bool IsWeaponRenderEnabled() const;
+
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
     CTransferBox* GetTransferBox() { return m_pTransferBox; };

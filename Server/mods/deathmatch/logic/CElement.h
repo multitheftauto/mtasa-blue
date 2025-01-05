@@ -228,6 +228,9 @@ public:
     bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }
 
+    virtual bool IsOnFire() const noexcept { return false; }
+    virtual void SetOnFire(bool onFire) noexcept {}
+
     // Spatial database
     virtual CSphere GetWorldBoundingSphere();
     virtual void    UpdateSpatialData();

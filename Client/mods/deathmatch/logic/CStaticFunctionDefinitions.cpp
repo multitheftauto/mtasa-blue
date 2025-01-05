@@ -2274,10 +2274,13 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
                 pAnimAssociation->SetCurrentProgress(fProgress);
                 return true;
             }
+
+            Ped.m_AnimationCache.progress = fProgress;
         }
         else
         {
             Ped.KillAnimation();
+
             return true;
         }
     }
@@ -2300,6 +2303,8 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, con
                 pAnimAssociation->SetCurrentSpeed(fSpeed);
                 return true;
             }
+
+            Ped.m_AnimationCache.speed = fSpeed;
         }
     }
 
@@ -2589,6 +2594,9 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
 {
     if (IS_PED(&Entity))
     {
+        if (!Entity.IsLocalEntity())
+            return false;
+
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         Ped.SetOnFire(bOnFire);
         return true;
@@ -3194,9 +3202,9 @@ bool CStaticFunctionDefinitions::SetVehicleLightState(CClientEntity& Entity, uns
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent, bool breakGlass)
 {
-    RUN_CHILDREN(SetVehiclePanelState(**iter, ucPanel, ucState))
+    RUN_CHILDREN(SetVehiclePanelState(**iter, ucPanel, ucState, spawnFlyingComponent, breakGlass))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -3204,7 +3212,7 @@ bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, uns
 
         if (ucPanel < 7)
         {
-            Vehicle.SetPanelStatus(ucPanel, ucState);
+            Vehicle.SetPanelStatus(ucPanel, ucState, spawnFlyingComponent, breakGlass);
             return true;
         }
     }
@@ -8975,11 +8983,8 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 {
     assert(pVehicle);
 
-    eVehicleTypes         eModel = (eVehicleTypes)pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
-    const CHandlingEntry* pNewEntry;
-
-    pNewEntry = pVehicle->GetOriginalHandlingData();
+    const CHandlingEntry* pNewEntry = pVehicle->GetOriginalHandlingData();
 
     pEntry->SetMass(pNewEntry->GetMass());
     pEntry->SetTurnMass(pNewEntry->GetTurnMass());
@@ -9015,17 +9020,13 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
     // pEntry->SetTailLight(pNewEntry->GetTailLight ());
     pEntry->SetAnimGroup(pNewEntry->GetAnimGroup());
 
-    // Lower and Upper limits cannot match or LSOD (unless boat)
-    // if ( eModel != VEHICLE_BOAT )     // Commented until fully tested
+    float fSuspensionLimitSize = pEntry->GetSuspensionUpperLimit() - pEntry->GetSuspensionLowerLimit();
+    if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)
     {
-        float fSuspensionLimitSize = pEntry->GetSuspensionUpperLimit() - pEntry->GetSuspensionLowerLimit();
-        if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)
-        {
-            if (fSuspensionLimitSize >= 0.f)
-                pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() + 0.1f);
-            else
-                pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() - 0.1f);
-        }
+        if (fSuspensionLimitSize >= 0.f)
+            pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() + 0.1f);
+        else
+            pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() - 0.1f);
     }
 
     pVehicle->ApplyHandling();

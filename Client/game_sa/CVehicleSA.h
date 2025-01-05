@@ -94,6 +94,9 @@ struct RwTexture;
 #define FUNC_CAutomobile_OnVehiclePreRender 0x6ABCFD
 #define FUNC_CVehicle_DoSunGlare            0x6DD6F0
 
+#define FUNC_CHeli_ProcessFlyingCarStuff 0x6C4E7D
+#define FUNC_CPlane_ProcessFlyingCarStuff 0x6CB7D2
+
 // CClumpModelInfo::GetFrameFromName
 #define FUNC_CClumpModelInfo_GetFrameFromName 0x4C5400
 
@@ -271,6 +274,11 @@ class CAutoPilot
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
+    void SetComponentVisibility(RwFrame* component, std::uint32_t state)
+    {
+        ((void(__thiscall*)(CVehicleSAInterface*, RwFrame*, std::uint32_t))0x6D2700)(this, component, state);
+    }
+
     CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312
 
     tHandlingDataSA*       pHandlingData;                  // +900
@@ -307,7 +315,7 @@ public:
 
     unsigned char m_nSpecialColModel;
     CEntity*      pEntityWeAreOnForVisibilityCheck;
-    CFire*        m_pFire;
+    CFireSAInterface*        m_pFire;
 
     float m_fSteerAngle;               // +1172
     float m_f2ndSteerAngle;            // used for steering 2nd set of wheels or elevators etc..
@@ -422,6 +430,7 @@ private:
     unsigned char                    m_ucVariant2;
     unsigned char                    m_ucVariantCount{0};
     bool                             m_doorsUndamageable{false};
+    bool                             m_rotorState{true};
 
     std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
 
@@ -437,7 +446,7 @@ public:
     virtual void OnChangingPosition(const CVector& vecNewPosition);
 
     // Override of CPhysicalSA::SetMoveSpeed to take trains into account
-    void SetMoveSpeed(CVector* vecMoveSpeed);
+    void SetMoveSpeed(const CVector& vecMoveSpeed) noexcept;
 
     bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
 
@@ -552,7 +561,8 @@ public:
     bool           GetTakeLessDamage() { return GetVehicleInterface()->m_nVehicleFlags.bTakeLessDamage; };
     bool           GetTyresDontBurst() { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
     unsigned short GetAdjustablePropertyValue() { return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
-    float          GetHeliRotorSpeed() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124); };
+    float          GetHeliRotorSpeed() const;
+    bool           GetVehicleRotorState() const noexcept override { return m_rotorState; }
     float          GetPlaneRotorSpeed();
 
     unsigned long  GetExplodeTime() { return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240); };
@@ -578,7 +588,8 @@ public:
     {
         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_pInterface) + 2156) = usAdjustableProperty;
     };
-    void SetHeliRotorSpeed(float fSpeed) { *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124) = fSpeed; };
+    void SetHeliRotorSpeed(float speed);
+    void SetVehicleRotorState(bool state, bool stopRotor, bool isHeli) noexcept override;
     void SetPlaneRotorSpeed(float fSpeed);
     bool SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept;
     void SetExplodeTime(unsigned long ulTime) { *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240) = ulTime; };
@@ -687,6 +698,9 @@ public:
 
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
+
+    bool IsOnFire() override { return GetVehicleInterface()->m_pFire != nullptr; }
+    bool SetOnFire(bool onFire) override;
 
     static void StaticSetHooks();
     static void SetVehiclesSunGlareEnabled(bool bEnabled);

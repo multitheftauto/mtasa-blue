@@ -57,6 +57,10 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_iHorizontalMovement = 0;
     m_iVerticalMovement = 0;
 
+    // Init texture vars
+    m_mapImageTexture = nullptr;
+    m_playerMarkerTexture = nullptr;
+
     // Create all map textures
     CreateAllTextures();
 
@@ -105,10 +109,8 @@ CPlayerMap::~CPlayerMap()
     // Delete our images
     SAFE_RELEASE(m_mapImageTexture);
     SAFE_RELEASE(m_playerMarkerTexture);
-
     for (uint i = 0; i < m_markerTextureList.size(); i++)
         SAFE_RELEASE(m_markerTextureList[i]);
-
     m_markerTextureList.clear();
 
     // Don't need to delete the help texts as those are destroyed by the display manager
@@ -154,7 +156,6 @@ void CPlayerMap::CreateAllTextures()
     try
     {
         // Create the map texture
-        m_mapImageTexture = nullptr;
         m_playerMapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
         CreateOrUpdateMapTexture();
 

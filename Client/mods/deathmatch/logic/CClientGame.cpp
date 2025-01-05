@@ -34,6 +34,7 @@
 #include <game/Task.h>
 #include <game/CBuildingRemoval.h>
 #include "game/CClock.h"
+#include <game/CProjectileInfo.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -403,6 +404,10 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 CClientGame::~CClientGame()
 {
     m_bBeingDeleted = true;
+    // Remove active projectile references to local player
+    if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
+        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());    
+
     // Stop all explosions. Unfortunately this doesn't fix the crash
     // if a vehicle is destroyed while it explodes.
     g_pGame->GetExplosionManager()->RemoveAllExplosions();
@@ -2779,6 +2784,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientBrowserTooltip", "text", NULL, false);
     m_Events.AddEvent("onClientBrowserInputFocusChanged", "gainedfocus", NULL, false);
     m_Events.AddEvent("onClientBrowserResourceBlocked", "url, domain, reason", NULL, false);
+    m_Events.AddEvent("onClientBrowserConsoleMessage", "message, source, line, level", nullptr, false);
 
     // Misc events
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
@@ -3422,6 +3428,9 @@ void CClientGame::Event_OnIngame()
     pHud->SetComponentVisible(HUD_VITAL_STATS, false);
     pHud->SetComponentVisible(HUD_AREA_NAME, false);
 
+    // Reset properties
+    CLuaPlayerDefs::ResetPlayerHudComponentProperty(HUD_ALL, eHudComponentProperty::ALL_PROPERTIES);
+
     g_pMultiplayer->DeleteAndDisableGangTags();
 
     g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
@@ -3431,6 +3440,9 @@ void CClientGame::Event_OnIngame()
     g_pGame->ResetModelFlags();
     g_pGame->ResetAlphaTransparencies();
     g_pGame->ResetModelTimes();
+
+    // Reset weapon render
+    g_pGame->SetWeaponRenderEnabled(true);
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
@@ -4395,12 +4407,9 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             return false;
         }
 
-        if (pDamagedPed->IsLocalPlayer())
-        {
-            // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
-            fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
-            fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
-        }
+        // Reget values in case they have been changed during onClientPlayerDamage/onClientPedDamage event (Avoid AC#1 kick)
+        fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
+        fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
         bool bIsBeingShotWhilstAiming = (weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun());
         bool bOldBehaviour = !IsGlitchEnabled(GLITCH_HITANIM);
@@ -6103,6 +6112,16 @@ bool CClientGame::SetBirdsEnabled(bool bEnabled)
 bool CClientGame::GetBirdsEnabled()
 {
     return m_bBirdsEnabled;
+}
+
+void CClientGame::SetWeaponRenderEnabled(bool enabled)
+{
+    g_pGame->SetWeaponRenderEnabled(enabled);
+}
+
+bool CClientGame::IsWeaponRenderEnabled() const
+{
+    return g_pGame->IsWeaponRenderEnabled();
 }
 
 #pragma code_seg(".text")
