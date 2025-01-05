@@ -2274,10 +2274,13 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
                 pAnimAssociation->SetCurrentProgress(fProgress);
                 return true;
             }
+
+            Ped.m_AnimationCache.progress = fProgress;
         }
         else
         {
             Ped.KillAnimation();
+
             return true;
         }
     }
@@ -2300,6 +2303,8 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, con
                 pAnimAssociation->SetCurrentSpeed(fSpeed);
                 return true;
             }
+
+            Ped.m_AnimationCache.speed = fSpeed;
         }
     }
 

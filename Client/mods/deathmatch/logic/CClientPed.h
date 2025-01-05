@@ -127,23 +127,17 @@ struct SReplacedAnimation
 
 struct SAnimationCache
 {
-    SString strName;
-    int     iTime;
-    bool    bLoop;
-    bool    bUpdatePosition;
-    bool    bInterruptable;
-    bool    bFreezeLastFrame;
-    int     iBlend;
-
-    SAnimationCache()
-    {
-        iTime = -1;
-        bLoop = false;
-        bUpdatePosition = false;
-        bInterruptable = false;
-        bFreezeLastFrame = true;
-        iBlend = 250;
-    }
+    std::string strName;
+    int         iTime{-1};
+    bool        bLoop{false};
+    bool        bUpdatePosition{false};
+    bool        bInterruptable{false};
+    bool        bFreezeLastFrame{true};
+    int         iBlend{250};
+    float       progress{0.0f};
+    float       speed{1.0f};
+    bool        progressWaitForStreamIn{false}; // for sync anim only
+    float       elapsedTime{0.0f}; // for sync anim only
 };
 
 class CClientObject;
@@ -466,6 +460,7 @@ public:
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
+    void                        RunAnimationFromCache();
 
     bool IsUsingGun();
 
