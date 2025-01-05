@@ -147,14 +147,6 @@ void MouseCursor::offsetPosition(const Point& offset)
 
 
 /*************************************************************************
-    Set the mouse cursor's alpha
-*************************************************************************/
-void MouseCursor::setAlpha(float r, float g, float b, float alpha) noexcept
-{
-    d_colourRect.setColours(colour(r/255.f, g/255.f, b/255.f, alpha));
-}
-
-/*************************************************************************
     Set the mouse cursor's color
 *************************************************************************/
 void MouseCursor::setColor(float r, float g, float b, float alpha) noexcept

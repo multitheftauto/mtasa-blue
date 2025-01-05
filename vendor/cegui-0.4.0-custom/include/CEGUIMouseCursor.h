@@ -187,7 +187,7 @@ public:
     \return
         Nothing.
     */
-    void setAlpha(float r, float g, float b, float alpha) noexcept;
+
     void setColor(float r, float g, float b, float alpha) noexcept;
 
 	/*!
