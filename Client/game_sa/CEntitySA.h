@@ -344,6 +344,9 @@ public:
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
 
+    bool IsOnFire() override { return false; }
+    bool SetOnFire(bool onFire) override { return false; }
+
     // CEntitySA interface
     virtual void OnChangingPosition(const CVector& vecNewPosition) {}
 

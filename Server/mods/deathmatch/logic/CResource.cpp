@@ -35,6 +35,7 @@
 #include <net/SimHeaders.h>
 #include <zip.h>
 #include <glob/glob.h>
+#include "CStaticFunctionDefinitions.h"
 
 #ifdef WIN32
     #include <zip/iowin32.h>
@@ -509,13 +510,14 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
         if (!GetFilePath(pResourceFile->GetName(), strPath))
             return SString();
 
-        std::vector<char> buffer;
-        FileLoad(strPath, buffer);
-        uint        uiFileSize = buffer.size();
-        const char* pFileContents = uiFileSize ? buffer.data() : "";
-        CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-        pResourceFile->SetLastChecksum(Checksum);
-        pResourceFile->SetLastFileSize(uiFileSize);
+        auto checksumOrError = CChecksum::GenerateChecksumFromFile(strPath);
+        if (std::holds_alternative<std::string>(checksumOrError))
+        {
+            return SString(std::get<std::string>(checksumOrError));
+        }
+
+        pResourceFile->SetLastChecksum(std::get<CChecksum>(checksumOrError));
+        pResourceFile->SetLastFileSizeHint(FileSize(strPath));
 
         // Check if file is blocked
         char szHashResult[33];
@@ -546,7 +548,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
 
                 if (pResourceFile->GetLastChecksum() != cachedChecksum)
                 {
-                    if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                    if (!FileCopy(strPath, strCachedFilePath))
                     {
                         return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
                     }

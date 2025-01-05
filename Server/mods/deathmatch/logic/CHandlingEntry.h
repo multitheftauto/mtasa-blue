@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CHandlingEntry.h
+ *  FILE:        Server/mods/deathmatch/logic/CHandlingEntry.h
  *  PURPOSE:     Header file for vehicle handling data entry class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -104,96 +104,96 @@ public:
     ~CHandlingEntry(){};
 
     // Use this to copy data from an another handling class to this
-    void ApplyHandlingData(const CHandlingEntry* pData);
+    void ApplyHandlingData(const CHandlingEntry* const pData) noexcept;
 
     // Get functions
-    tHandlingData  GetHandlingData() { return m_Handling; };
-    float          GetMass() const { return m_Handling.fMass; };
-    float          GetTurnMass() const { return m_Handling.fTurnMass; };
-    float          GetDragCoeff() const { return m_Handling.fDragCoeff; };
-    const CVector& GetCenterOfMass() const { return m_Handling.vecCenterOfMass; };
+    tHandlingData  GetHandlingData() const noexcept { return m_Handling; }
+    float          GetMass() const noexcept { return m_Handling.fMass; }
+    float          GetTurnMass() const noexcept { return m_Handling.fTurnMass; }
+    float          GetDragCoeff() const noexcept { return m_Handling.fDragCoeff; }
+    const CVector& GetCenterOfMass() const noexcept { return m_Handling.vecCenterOfMass; }
 
-    unsigned int GetPercentSubmerged() const { return m_Handling.uiPercentSubmerged; };
-    float        GetTractionMultiplier() const { return m_Handling.fTractionMultiplier; };
+    unsigned int GetPercentSubmerged() const noexcept { return m_Handling.uiPercentSubmerged; }
+    float        GetTractionMultiplier() const noexcept { return m_Handling.fTractionMultiplier; }
 
-    eDriveType    GetCarDriveType() const { return static_cast<eDriveType>(m_Handling.Transmission.ucDriveType); };
-    eEngineType   GetCarEngineType() const { return static_cast<eEngineType>(m_Handling.Transmission.ucEngineType); };
-    unsigned char GetNumberOfGears() const { return m_Handling.Transmission.ucNumberOfGears; };
+    eDriveType    GetCarDriveType() const noexcept { return static_cast<eDriveType>(m_Handling.Transmission.ucDriveType); }
+    eEngineType   GetCarEngineType() const noexcept { return static_cast<eEngineType>(m_Handling.Transmission.ucEngineType); }
+    unsigned char GetNumberOfGears() const noexcept { return m_Handling.Transmission.ucNumberOfGears; }
 
-    float GetEngineAcceleration() const { return m_Handling.Transmission.fEngineAcceleration; };
-    float GetEngineInertia() const { return m_Handling.Transmission.fEngineInertia; };
-    float GetMaxVelocity() const { return m_Handling.Transmission.fMaxVelocity; };
+    float GetEngineAcceleration() const noexcept { return m_Handling.Transmission.fEngineAcceleration; }
+    float GetEngineInertia() const noexcept { return m_Handling.Transmission.fEngineInertia; }
+    float GetMaxVelocity() const noexcept { return m_Handling.Transmission.fMaxVelocity; }
 
-    float GetBrakeDeceleration() const { return m_Handling.fBrakeDeceleration; };
-    float GetBrakeBias() const { return m_Handling.fBrakeBias; };
-    bool  GetABS() const { return m_Handling.bABS; };
+    float GetBrakeDeceleration() const noexcept { return m_Handling.fBrakeDeceleration; }
+    float GetBrakeBias() const noexcept { return m_Handling.fBrakeBias; }
+    bool  GetABS() const noexcept { return m_Handling.bABS; }
 
-    float GetSteeringLock() const { return m_Handling.fSteeringLock; };
-    float GetTractionLoss() const { return m_Handling.fTractionLoss; };
-    float GetTractionBias() const { return m_Handling.fTractionBias; };
+    float GetSteeringLock() const noexcept { return m_Handling.fSteeringLock; }
+    float GetTractionLoss() const noexcept { return m_Handling.fTractionLoss; }
+    float GetTractionBias() const noexcept { return m_Handling.fTractionBias; }
 
-    float GetSuspensionForceLevel() const { return m_Handling.fSuspensionForceLevel; };
-    float GetSuspensionDamping() const { return m_Handling.fSuspensionDamping; };
-    float GetSuspensionHighSpeedDamping() const { return m_Handling.fSuspensionHighSpdDamping; };
-    float GetSuspensionUpperLimit() const { return m_Handling.fSuspensionUpperLimit; };
-    float GetSuspensionLowerLimit() const { return m_Handling.fSuspensionLowerLimit; };
-    float GetSuspensionFrontRearBias() const { return m_Handling.fSuspensionFrontRearBias; };
-    float GetSuspensionAntiDiveMultiplier() const { return m_Handling.fSuspensionAntiDiveMultiplier; };
+    float GetSuspensionForceLevel() const noexcept { return m_Handling.fSuspensionForceLevel; }
+    float GetSuspensionDamping() const noexcept { return m_Handling.fSuspensionDamping; }
+    float GetSuspensionHighSpeedDamping() const noexcept { return m_Handling.fSuspensionHighSpdDamping; }
+    float GetSuspensionUpperLimit() const noexcept { return m_Handling.fSuspensionUpperLimit; }
+    float GetSuspensionLowerLimit() const noexcept { return m_Handling.fSuspensionLowerLimit; }
+    float GetSuspensionFrontRearBias() const noexcept { return m_Handling.fSuspensionFrontRearBias; }
+    float GetSuspensionAntiDiveMultiplier() const noexcept { return m_Handling.fSuspensionAntiDiveMultiplier; }
 
-    float GetCollisionDamageMultiplier() const { return m_Handling.fCollisionDamageMultiplier; };
+    float GetCollisionDamageMultiplier() const noexcept { return m_Handling.fCollisionDamageMultiplier; }
 
-    unsigned int GetHandlingFlags() const { return m_Handling.uiHandlingFlags; };
-    unsigned int GetModelFlags() const { return m_Handling.uiModelFlags; };
-    float        GetSeatOffsetDistance() const { return m_Handling.fSeatOffsetDistance; };
-    unsigned int GetMonetary() const { return m_Handling.uiMonetary; };
+    unsigned int GetHandlingFlags() const noexcept { return m_Handling.uiHandlingFlags; }
+    unsigned int GetModelFlags() const noexcept { return m_Handling.uiModelFlags; }
+    float        GetSeatOffsetDistance() const noexcept { return m_Handling.fSeatOffsetDistance; }
+    unsigned int GetMonetary() const noexcept { return m_Handling.uiMonetary; }
 
-    eLightType    GetHeadLight() const { return static_cast<eLightType>(m_Handling.ucHeadLight); };
-    eLightType    GetTailLight() const { return static_cast<eLightType>(m_Handling.ucTailLight); };
-    unsigned char GetAnimGroup() const { return m_Handling.ucAnimGroup; };
+    eLightType    GetHeadLight() const noexcept { return static_cast<eLightType>(m_Handling.ucHeadLight); }
+    eLightType    GetTailLight() const noexcept { return static_cast<eLightType>(m_Handling.ucTailLight); }
+    unsigned char GetAnimGroup() const noexcept { return m_Handling.ucAnimGroup; }
 
     // Set functions
-    void SetMass(float fMass) { m_Handling.fMass = fMass; };
-    void SetTurnMass(float fTurnMass) { m_Handling.fTurnMass = fTurnMass; };
-    void SetDragCoeff(float fDrag) { m_Handling.fDragCoeff = fDrag; };
-    void SetCenterOfMass(const CVector& vecCenter) { m_Handling.vecCenterOfMass = vecCenter; };
+    void SetMass(float fMass) noexcept { m_Handling.fMass = fMass; }
+    void SetTurnMass(float fTurnMass) noexcept { m_Handling.fTurnMass = fTurnMass; }
+    void SetDragCoeff(float fDrag) noexcept { m_Handling.fDragCoeff = fDrag; }
+    void SetCenterOfMass(const CVector& vecCenter) noexcept { m_Handling.vecCenterOfMass = vecCenter; }
 
-    void SetPercentSubmerged(unsigned int uiPercent) { m_Handling.uiPercentSubmerged = uiPercent; };
-    void SetTractionMultiplier(float fTractionMultiplier) { m_Handling.fTractionMultiplier = fTractionMultiplier; };
+    void SetPercentSubmerged(unsigned int uiPercent) noexcept { m_Handling.uiPercentSubmerged = uiPercent; }
+    void SetTractionMultiplier(float fTractionMultiplier) noexcept { m_Handling.fTractionMultiplier = fTractionMultiplier; }
 
-    void SetCarDriveType(eDriveType Type) { m_Handling.Transmission.ucDriveType = Type; };
-    void SetCarEngineType(eEngineType Type) { m_Handling.Transmission.ucEngineType = Type; };
-    void SetNumberOfGears(unsigned char ucNumber) { m_Handling.Transmission.ucNumberOfGears = ucNumber; };
+    void SetCarDriveType(eDriveType Type) noexcept { m_Handling.Transmission.ucDriveType = Type; }
+    void SetCarEngineType(eEngineType Type) noexcept { m_Handling.Transmission.ucEngineType = Type; }
+    void SetNumberOfGears(unsigned char ucNumber) noexcept { m_Handling.Transmission.ucNumberOfGears = ucNumber; }
 
-    void SetEngineAcceleration(float fAcceleration) { m_Handling.Transmission.fEngineAcceleration = fAcceleration; };
-    void SetEngineInertia(float fInertia) { m_Handling.Transmission.fEngineInertia = fInertia; };
-    void SetMaxVelocity(float fVelocity) { m_Handling.Transmission.fMaxVelocity = fVelocity; };
+    void SetEngineAcceleration(float fAcceleration) noexcept { m_Handling.Transmission.fEngineAcceleration = fAcceleration; }
+    void SetEngineInertia(float fInertia) noexcept { m_Handling.Transmission.fEngineInertia = fInertia; }
+    void SetMaxVelocity(float fVelocity) noexcept { m_Handling.Transmission.fMaxVelocity = fVelocity; }
 
-    void SetBrakeDeceleration(float fDeceleration) { m_Handling.fBrakeDeceleration = fDeceleration; };
-    void SetBrakeBias(float fBias) { m_Handling.fBrakeBias = fBias; };
-    void SetABS(bool bABS) { m_Handling.bABS = bABS; };
+    void SetBrakeDeceleration(float fDeceleration) noexcept { m_Handling.fBrakeDeceleration = fDeceleration; }
+    void SetBrakeBias(float fBias) noexcept { m_Handling.fBrakeBias = fBias; }
+    void SetABS(bool bABS) noexcept { m_Handling.bABS = bABS; }
 
-    void SetSteeringLock(float fSteeringLock) { m_Handling.fSteeringLock = fSteeringLock; };
-    void SetTractionLoss(float fTractionLoss) { m_Handling.fTractionLoss = fTractionLoss; };
-    void SetTractionBias(float fTractionBias) { m_Handling.fTractionBias = fTractionBias; };
+    void SetSteeringLock(float fSteeringLock) noexcept { m_Handling.fSteeringLock = fSteeringLock; }
+    void SetTractionLoss(float fTractionLoss) noexcept { m_Handling.fTractionLoss = fTractionLoss; }
+    void SetTractionBias(float fTractionBias) noexcept { m_Handling.fTractionBias = fTractionBias; }
 
-    void SetSuspensionForceLevel(float fForce) { m_Handling.fSuspensionForceLevel = fForce; };
-    void SetSuspensionDamping(float fDamping) { m_Handling.fSuspensionDamping = fDamping; };
-    void SetSuspensionHighSpeedDamping(float fDamping) { m_Handling.fSuspensionHighSpdDamping = fDamping; };
-    void SetSuspensionUpperLimit(float fUpperLimit) { m_Handling.fSuspensionUpperLimit = fUpperLimit; };
-    void SetSuspensionLowerLimit(float fLowerLimit) { m_Handling.fSuspensionLowerLimit = fLowerLimit; };
-    void SetSuspensionFrontRearBias(float fBias) { m_Handling.fSuspensionFrontRearBias = fBias; };
-    void SetSuspensionAntiDiveMultiplier(float fAntidive) { m_Handling.fSuspensionAntiDiveMultiplier = fAntidive; };
+    void SetSuspensionForceLevel(float fForce) noexcept { m_Handling.fSuspensionForceLevel = fForce; }
+    void SetSuspensionDamping(float fDamping) noexcept { m_Handling.fSuspensionDamping = fDamping; }
+    void SetSuspensionHighSpeedDamping(float fDamping) noexcept { m_Handling.fSuspensionHighSpdDamping = fDamping; }
+    void SetSuspensionUpperLimit(float fUpperLimit) noexcept { m_Handling.fSuspensionUpperLimit = fUpperLimit; }
+    void SetSuspensionLowerLimit(float fLowerLimit) noexcept { m_Handling.fSuspensionLowerLimit = fLowerLimit; }
+    void SetSuspensionFrontRearBias(float fBias) noexcept { m_Handling.fSuspensionFrontRearBias = fBias; }
+    void SetSuspensionAntiDiveMultiplier(float fAntidive) noexcept { m_Handling.fSuspensionAntiDiveMultiplier = fAntidive; }
 
-    void SetCollisionDamageMultiplier(float fMultiplier) { m_Handling.fCollisionDamageMultiplier = fMultiplier; };
+    void SetCollisionDamageMultiplier(float fMultiplier) noexcept { m_Handling.fCollisionDamageMultiplier = fMultiplier; }
 
-    void SetHandlingFlags(unsigned int uiFlags) { m_Handling.uiHandlingFlags = uiFlags; };
-    void SetModelFlags(unsigned int uiFlags) { m_Handling.uiModelFlags = uiFlags; };
-    void SetSeatOffsetDistance(float fDistance) { m_Handling.fSeatOffsetDistance = fDistance; };
-    void SetMonetary(unsigned int uiMonetary) { m_Handling.uiMonetary = uiMonetary; };
+    void SetHandlingFlags(unsigned int uiFlags) noexcept { m_Handling.uiHandlingFlags = uiFlags; }
+    void SetModelFlags(unsigned int uiFlags) noexcept { m_Handling.uiModelFlags = uiFlags; }
+    void SetSeatOffsetDistance(float fDistance) noexcept { m_Handling.fSeatOffsetDistance = fDistance; }
+    void SetMonetary(unsigned int uiMonetary) noexcept { m_Handling.uiMonetary = uiMonetary; }
 
-    void SetHeadLight(eLightType Style) { m_Handling.ucHeadLight = Style; };
-    void SetTailLight(eLightType Style) { m_Handling.ucTailLight = Style; };
-    void SetAnimGroup(unsigned char ucGroup) { m_Handling.ucAnimGroup = ucGroup; };
+    void SetHeadLight(eLightType Style) noexcept { m_Handling.ucHeadLight = Style; }
+    void SetTailLight(eLightType Style) noexcept { m_Handling.ucTailLight = Style; }
+    void SetAnimGroup(unsigned char ucGroup) noexcept { m_Handling.ucAnimGroup = ucGroup; }
 
 private:
     tHandlingData m_Handling;

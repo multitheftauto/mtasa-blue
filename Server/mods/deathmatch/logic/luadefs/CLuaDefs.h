@@ -66,26 +66,26 @@ public:
     // This is just for the Lua funcs. Please don't public this and use it other
     // places in the server.
 protected:
-    static CElementDeleter*           m_pElementDeleter;
-    static CBlipManager*              m_pBlipManager;
-    static CHandlingManager*          m_pHandlingManager;
-    static CLuaManager*               m_pLuaManager;
-    static CMarkerManager*            m_pMarkerManager;
-    static CObjectManager*            m_pObjectManager;
-    static CPickupManager*            m_pPickupManager;
-    static CPlayerManager*            m_pPlayerManager;
-    static CRadarAreaManager*         m_pRadarAreaManager;
-    static CRegisteredCommands*       m_pRegisteredCommands;
-    static CElement*                  m_pRootElement;
-    static CScriptDebugging*          m_pScriptDebugging;
-    static CVehicleManager*           m_pVehicleManager;
-    static CTeamManager*              m_pTeamManager;
-    static CAccountManager*           m_pAccountManager;
-    static CColManager*               m_pColManager;
-    static CResourceManager*          m_pResourceManager;
-    static CAccessControlListManager* m_pACLManager;
-    static CMainConfig*               m_pMainConfig;
-    static inline CLuaModuleManager*  m_pLuaModuleManager = nullptr;
+    static CElementDeleter*                  m_pElementDeleter;
+    static CBlipManager*                     m_pBlipManager;
+    static CHandlingManager*                 m_pHandlingManager;
+    static CLuaManager*                      m_pLuaManager;
+    static CMarkerManager*                   m_pMarkerManager;
+    static CObjectManager*                   m_pObjectManager;
+    static CPickupManager*                   m_pPickupManager;
+    static CPlayerManager*                   m_pPlayerManager;
+    static CRadarAreaManager*                m_pRadarAreaManager;
+    static CRegisteredCommands*              m_pRegisteredCommands;
+    static CElement*                         m_pRootElement;
+    static CScriptDebugging*                 m_pScriptDebugging;
+    static CVehicleManager*                  m_pVehicleManager;
+    static CTeamManager*                     m_pTeamManager;
+    static CAccountManager*                  m_pAccountManager;
+    static CColManager*                      m_pColManager;
+    static CResourceManager*                 m_pResourceManager;
+    static CAccessControlListManager*        m_pACLManager;
+    static CMainConfig*                      m_pMainConfig;
+    static inline CLuaModuleManager*         m_pLuaModuleManager = nullptr;
 
 protected:
     // Old style: Only warn on failure. This should
