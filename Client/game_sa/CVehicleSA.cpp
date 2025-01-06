@@ -20,11 +20,13 @@
 #include "CProjectileInfoSA.h"
 #include "CTrainSA.h"
 #include "CPlaneSA.h"
+#include "CHeliSA.h"
 #include "CVehicleSA.h"
 #include "CBoatSA.h"
 #include "CVisibilityPluginsSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include "CFireManagerSA.h"
 
 extern CGameSA* pGame;
 
@@ -49,6 +51,62 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
         mov [esp+0D4h], edi
         push 6ABD04h
         retn
+    }
+}
+
+static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleInterface)
+{
+    SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)vehicleInterface);
+    if (!vehicle || !vehicle->pEntity)
+        return true;
+
+    return vehicle->pEntity->GetVehicleRotorState();
+}
+
+static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;
+static constexpr DWORD RETURN_CHeli_ProcessFlyingCarStuff = 0x6C5404;
+static void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
+{
+    _asm
+    {
+        mov esi, ecx
+        mov al, [esi+36h]
+
+        pushad
+        call CanProcessFlyingCarStuff
+        test al, al
+        jz skip
+
+        popad
+        jmp CONTINUE_CHeli_ProcessFlyingCarStuff
+
+        skip:
+        popad
+        jmp RETURN_CHeli_ProcessFlyingCarStuff
+    }
+}
+
+static constexpr DWORD CONTINUE_CPlane_ProcessFlyingCarStuff = 0x6CB7D7;
+static constexpr DWORD RETURN_CPlane_ProcessFlyingCarStuff = 0x6CC482;
+static void _declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
+{
+    _asm
+    {
+        push esi
+        mov esi, ecx
+        fnstsw ax
+
+        pushad
+        call CanProcessFlyingCarStuff
+        test al, al
+        jz skip
+
+        popad
+        jmp CONTINUE_CPlane_ProcessFlyingCarStuff
+
+        skip:
+        popad
+        jmp RETURN_CPlane_ProcessFlyingCarStuff
     }
 }
 
@@ -224,6 +282,7 @@ CVehicleSA::~CVehicleSA()
             }
 
             CWorldSA* pWorld = (CWorldSA*)pGame->GetWorld();
+            pGame->GetProjectileInfo()->RemoveEntityReferences(this);
             pWorld->Remove(m_pInterface, CVehicle_Destructor);
             pWorld->RemoveReferencesToDeletedObject(m_pInterface);
 
@@ -240,18 +299,24 @@ CVehicleSA::~CVehicleSA()
     }
 }
 
-void CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CVehicleSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
 {
-    DWORD dwFunc = FUNC_GetMoveSpeed;
-    DWORD dwThis = (DWORD)GetInterface();
-    DWORD dwReturn = 0;
-    _asm
+    try
     {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
+        DWORD dwFunc = FUNC_GetMoveSpeed;
+        DWORD dwThis = (DWORD)GetInterface();
+        DWORD dwReturn = 0;
+        _asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+            mov     dwReturn, eax
+        }
+        MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
     }
-    MemCpyFast((void*)dwReturn, vecMoveSpeed, sizeof(CVector));
+    catch (...)
+    {
+    }
 
     // INACCURATE. Use Get/SetTrainSpeed instead of Get/SetMoveSpeed. (Causes issue #4829).
 #if 0
@@ -482,6 +547,29 @@ void CVehicleSA::SetTrainSpeed(float fSpeed)
 {
     auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
     pInterface->m_fTrainSpeed = fSpeed;
+}
+
+float CVehicleSA::GetHeliRotorSpeed() const
+{
+    return static_cast<CHeliSAInterface*>(m_pInterface)->m_wheelSpeed[1];
+}
+
+void CVehicleSA::SetHeliRotorSpeed(float speed)
+{
+    static_cast<CHeliSAInterface*>(GetInterface())->m_wheelSpeed[1] = speed;
+}
+
+void CVehicleSA::SetVehicleRotorState(bool state, bool stopRotor, bool isHeli) noexcept
+{
+    m_rotorState = state;
+
+    if (state || !stopRotor)
+        return;
+
+    if (isHeli)
+        SetHeliRotorSpeed(0.0f);
+    else
+        SetPlaneRotorSpeed(0.0f);
 }
 
 void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
@@ -1578,7 +1666,7 @@ bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComp
     MemPut(0x6A85B3, nodesOffset);
     MemPut(0x6A8631, nodesOffset);
 
-    auto* componentObject = ((CObjectSAInterface * (__thiscall*)(CVehicleSAInterface*, int, int)) FUNC_CAutomobile__SpawnFlyingComponent)(GetVehicleInterface(), static_cast<int>(nodeIndex), static_cast<int>(collisionType));
+    auto* componentObject = reinterpret_cast<CAutomobileSAInterface*>(GetInterface())->SpawnFlyingComponent(nodeIndex, collisionType);
 
     // Restore default nodes array in CAutomobile::SpawnFlyingComponent
     // CAutomobile::m_aCarNodes offset
@@ -1838,10 +1926,47 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
     }
 }
 
+bool CVehicleSA::SetOnFire(bool onFire)
+{
+    CVehicleSAInterface* vehicleInterface = GetVehicleInterface();
+    if (onFire == !!vehicleInterface->m_pFire)
+        return false;
+
+    auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
+
+    if (onFire)
+    {
+        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        if (!fire)
+            return false;
+
+        fire->SetTarget(this);
+        fire->SetStrength(1.0f);
+        fire->Ignite();
+        fire->SetNumGenerationsAllowed(0);
+
+        vehicleInterface->m_pFire = fire->GetInterface();
+    }
+    else
+    {
+        CFire* fire = fireManager->GetFire(vehicleInterface->m_pFire);
+        if (!fire)
+            return false;
+
+        fire->Extinguish();
+    }
+
+    return true;
+}
+
 void CVehicleSA::StaticSetHooks()
 {
     // Setup vehicle sun glare hook
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
+
+    // Setup hooks to handle setVehicleRotorState function
+    HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
+    HookInstall(FUNC_CPlane_ProcessFlyingCarStuff, (DWORD)HOOK_CPlane_ProcessFlyingCarStuff, 5);
 }
 
 void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)

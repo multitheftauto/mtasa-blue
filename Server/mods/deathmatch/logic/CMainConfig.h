@@ -87,6 +87,7 @@ public:
     unsigned int                GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
     const std::string&          GetAccessControlListFile() { return m_strAccessControlListFile; };
     bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
+    const std::map<SString, SString>& GetRulesForASE() const noexcept { return m_RulesForASEMap; };
     bool                        IsDisableAC(const char* szTagAC) { return MapContains(m_DisableComboACMap, szTagAC); };
     bool                        IsEnableDiagnostic(const char* szTag) { return MapContains(m_EnableDiagnosticMap, szTag); };
     CMtaVersion                 GetMinClientVersion() { return m_strMinClientVersion; }
@@ -127,6 +128,7 @@ public:
     bool                        IsDatabaseCredentialsProtectionEnabled() const { return m_bDatabaseCredentialsProtectionEnabled != 0; }
     bool                        IsFakeLagCommandEnabled() const { return m_bFakeLagCommandEnabled != 0; }
     bool                        IsElementDataWhitelisted() const { return m_elementDataWhitelisted; }
+    bool                        IsCheckDuplicateSerialsEnabled() const noexcept { return m_checkDuplicateSerials; }
     bool                        IsCheckResourceClientFilesEnabled() const noexcept { return m_checkResourceClientFiles != 0; }
 
     SString GetSetting(const SString& configSetting);
@@ -192,6 +194,7 @@ private:
     unsigned short             m_usFPSLimit;
     int                        m_bDontBroadcastLan;
     std::set<SString>          m_DisableComboACMap;
+    std::map<SString, SString> m_RulesForASEMap;
     std::set<SString>          m_EnableDiagnosticMap;
     std::vector<SString>       m_AuthSerialGroupList;
     bool                       m_bAuthSerialHttpEnabled;
@@ -230,5 +233,6 @@ private:
     int                        m_iPlayerTriggeredEventIntervalMs;
     int                        m_iMaxPlayerTriggeredEventsPerInterval;
     bool                       m_elementDataWhitelisted;
+    bool                       m_checkDuplicateSerials;
     int                        m_checkResourceClientFiles;
 };

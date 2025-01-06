@@ -196,6 +196,8 @@ protected:
     CGUIComboBox*  m_pFullscreenStyleCombo;
     CGUILabel*     m_pPriorityLabel;
     CGUIComboBox*  m_pPriorityCombo;
+    CGUILabel*     m_pPlayerMapImageLabel;
+    CGUIComboBox*  m_pPlayerMapImageCombo;
     CGUILabel*     m_pFastClothesLabel;
     CGUIComboBox*  m_pFastClothesCombo;
     CGUILabel*     m_pAudioGeneralLabel;
@@ -213,6 +215,7 @@ protected:
     CGUILabel*     m_pWin8Label;
     CGUICheckBox*  m_pWin8ColorCheckBox;
     CGUICheckBox*  m_pWin8MouseCheckBox;
+    CGUICheckBox*  m_pPhotoSavingCheckbox;
     CGUILabel*     m_pUpdateBuildTypeLabel;
     CGUIComboBox*  m_pUpdateBuildTypeCombo;
     CGUILabel*     m_pUpdateAutoInstallLabel;
