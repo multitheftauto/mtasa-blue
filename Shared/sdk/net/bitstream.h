@@ -571,10 +571,6 @@ enum class eBitStreamVersion : unsigned short
     // Add respawnObject and toggleObjectRespawn to serverside
     // 2024-09-04
     RespawnObject_Serverside,
-    
-    // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
-    // 2024-07-22
-    WorldSpecialProperty_FlyingComponents,
 
     // Add check_duplicate_serials
     // 2024-09-04
@@ -603,6 +599,10 @@ enum class eBitStreamVersion : unsigned short
     // Ped animations synchronization
     // 2025-01-01
     AnimationsSync,
+
+    // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
+    // 2024-07-22
+    WorldSpecialProperty_FlyingComponents,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
