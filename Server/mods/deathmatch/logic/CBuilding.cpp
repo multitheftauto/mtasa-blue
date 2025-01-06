@@ -48,6 +48,7 @@ CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLo
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
     m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
+    m_pHighLodBuilding = nullptr;
 
     // Add us to the manager's list
     m_pBuildingManager->AddToList(this);
