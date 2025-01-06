@@ -12,11 +12,12 @@
 
 #include "CElement.h"
 #include "CEvents.h"
-#include "CBuildingManager.h"
 
 #include "CEasingCurve.h"
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
+
+class CBuildingManager;
 
 #define SERVERSIDE_BUILDING_MIN_CLIENT_VERSION "1.6.0-9.22824"
 

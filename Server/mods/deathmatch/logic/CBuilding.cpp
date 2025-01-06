@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CBuilding.h"
+#include "CBuildingManager.h"
 #include "CLogger.h"
 #include "Utils.h"
 
