@@ -51,7 +51,7 @@ public:
     void Hide();
 
     void SetVisible(bool bVisible, bool bOverlay = true, bool bFrameDelay = true);
-    bool IsVisible();
+    bool IsVisible() const noexcept;
     bool IsFading() { return m_ucFade == FADE_IN || m_ucFade == FADE_OUT; }
 
     void SetIsIngame(bool bIsIngame);

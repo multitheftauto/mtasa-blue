@@ -316,10 +316,10 @@ private:
 
     CEGUI::DefaultWindow* m_pTop;
     const CEGUI::Image*   m_pCursor;
-    float                 CurrentServerCursorAlpha = 255.0f;
-    float                 CurrentServerCursorRed = 255.0f;
-    float                 CurrentServerCursorGreen = 255.0f;
-    float                 CurrentServerCursorBlue = 255.0f;
+    float                 CurrentServerCursorAlpha = {255.0f};
+    float                 CurrentServerCursorRed   = {255.0f};
+    float                 CurrentServerCursorGreen = {255.0f};
+    float                 CurrentServerCursorBlue  =  {255.0f};
 
     CGUIFont_Impl* m_pDefaultFont;
     CGUIFont_Impl* m_pSmallFont;
