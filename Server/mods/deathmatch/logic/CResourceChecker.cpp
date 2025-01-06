@@ -511,7 +511,7 @@ struct LuaToken {
     };
     
     Type type;
-    string value;
+    std::string value;
     long position;
     long line;
 };
@@ -528,9 +528,9 @@ public:
 
 class CLuaSyntaxChecker {
 public:
-    static bool IsFunctionCall(const string& source, long identifierPos, long identifierLength, long& outLine) {
+    static bool IsFunctionCall(const std::string& source, long identifierPos, long identifierLength, long& outLine) {
         LuaParseState state;
-        vector<LuaToken> tokens;
+        std::vector<LuaToken> tokens;
         
         // First, tokenize everything after the identifier
         long pos = identifierPos + identifierLength;
