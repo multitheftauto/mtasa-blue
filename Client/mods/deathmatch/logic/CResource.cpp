@@ -317,10 +317,7 @@ void CResource::Load()
         else if (pResourceFile->IsAutoDownload())
         {
             // Check the file contents
-            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
-            {
-            }
-            else
+            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) != pResourceFile->GetServerChecksum())
             {
                 HandleDownloadedFileTrouble(pResourceFile, false);
             }

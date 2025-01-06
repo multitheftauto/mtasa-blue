@@ -23,22 +23,22 @@ public:
     CHandlingManagerSA();
     ~CHandlingManagerSA();
 
-    CHandlingEntry*       CreateHandlingData();
-    CFlyingHandlingEntry* CreateFlyingHandlingData();
-    CBoatHandlingEntry*   CreateBoatHandlingData();
-    CBikeHandlingEntry*   CreateBikeHandlingData();
+    std::unique_ptr<CHandlingEntry>       CreateHandlingData() const noexcept;
+    std::unique_ptr<CFlyingHandlingEntry> CreateFlyingHandlingData() const noexcept;
+    std::unique_ptr<CBoatHandlingEntry>   CreateBoatHandlingData() const noexcept;
+    std::unique_ptr<CBikeHandlingEntry>   CreateBikeHandlingData() const noexcept;
 
-    const CHandlingEntry*       GetOriginalHandlingData(eVehicleTypes eModel) const;
-    const CFlyingHandlingEntry* GetOriginalFlyingHandlingData(eVehicleTypes eModel) const;
-    const CBoatHandlingEntry*   GetOriginalBoatHandlingData(eVehicleTypes eModel) const;
-    const CBikeHandlingEntry*   GetOriginalBikeHandlingData(eVehicleTypes eModel) const;
+    const CHandlingEntry*       GetOriginalHandlingData(std::uint32_t model) const noexcept;
+    const CFlyingHandlingEntry* GetOriginalFlyingHandlingData(std::uint32_t model) const noexcept;
+    const CBoatHandlingEntry*   GetOriginalBoatHandlingData(std::uint32_t model) const noexcept;
+    const CBikeHandlingEntry*   GetOriginalBikeHandlingData(std::uint32_t model) const noexcept;
 
-    eHandlingProperty GetPropertyEnumFromName(const std::string& strName) const;
+    eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept;
 
-    void CheckSuspensionChanges(CHandlingEntry* pEntry) noexcept;
+    void CheckSuspensionChanges(const CHandlingEntry* const pEntry) const noexcept;
 
 private:
-    void InitializeDefaultHandlings();
+    void InitializeDefaultHandlings() noexcept;
 
-    eHandlingTypes GetHandlingID(eVehicleTypes eModel) const;
+    eHandlingTypes GetHandlingID(std::uint32_t uiModel) const noexcept;
 };

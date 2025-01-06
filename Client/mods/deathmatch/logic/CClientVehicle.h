@@ -292,17 +292,19 @@ public:
 
     void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent);
     void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true);
-    void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus);
+    void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus, bool spawnFlyingComponent = true, bool breakGlass = false);
     void SetLightStatus(unsigned char ucLight, unsigned char ucStatus);
     bool GetWheelMissing(unsigned char ucWheel, const SString& strWheelName = "");
 
     // TODO: Make the class remember on virtualization
     float GetHeliRotorSpeed();
     float GetPlaneRotorSpeed();
+    bool  GetVehicleRotorState() const noexcept;
 
     bool GetRotorSpeed(float&);
     bool SetRotorSpeed(float);
     bool SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept;
+    void SetVehicleRotorState(bool state, bool stopRotor) noexcept;
     void SetHeliRotorSpeed(float fSpeed);
     void SetPlaneRotorSpeed(float fSpeed);
     bool IsHeliSearchLightVisible();
@@ -456,7 +458,7 @@ public:
 
     int GetCurrentGear();
 
-    bool IsEnterable();
+    bool IsEnterable(bool localEntity = false);
     bool HasRadio();
     bool HasPoliceRadio();
 
@@ -546,6 +548,9 @@ public:
     bool SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);
 
     CVector GetEntryPoint(std::uint32_t entryPointIndex);
+
+    bool IsOnFire() override { return m_pVehicle ? m_pVehicle->IsOnFire() : false; }
+    bool SetOnFire(bool onFire) override { return m_pVehicle ? m_pVehicle->SetOnFire(onFire) : false; }
 
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);
@@ -653,13 +658,13 @@ protected:
     float                                  m_fHeliRotorSpeed;
     float                                  m_fPlaneRotorSpeed;
     const CHandlingEntry*                  m_pOriginalHandlingEntry = nullptr;
-    CHandlingEntry*                        m_pHandlingEntry = nullptr;
+    std::unique_ptr<CHandlingEntry>        m_HandlingEntry = nullptr;
     const CFlyingHandlingEntry*            m_pOriginalFlyingHandlingEntry = nullptr;
-    CFlyingHandlingEntry*                  m_pFlyingHandlingEntry = nullptr;
+    std::unique_ptr<CFlyingHandlingEntry>  m_FlyingHandlingEntry = nullptr;
     const CBoatHandlingEntry*              m_pOriginalBoatHandlingEntry = nullptr;
-    CBoatHandlingEntry*                    m_pBoatHandlingEntry = nullptr;
+    std::unique_ptr<CBoatHandlingEntry>    m_BoatHandlingEntry = nullptr;
     const CBikeHandlingEntry*              m_pOriginalBikeHandlingEntry = nullptr;
-    CBikeHandlingEntry*                    m_pBikeHandlingEntry = nullptr;
+    std::unique_ptr<CBikeHandlingEntry>    m_BikeHandlingEntry = nullptr;
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
     float                                  m_fWheelScale;
@@ -673,6 +678,7 @@ protected:
     uchar m_ucTrackID;
     bool  m_bJustStreamedIn;
     bool  m_bWheelScaleChanged;
+    bool  m_rotorState{true};
 
     // Time dependent error compensation interpolation
     struct

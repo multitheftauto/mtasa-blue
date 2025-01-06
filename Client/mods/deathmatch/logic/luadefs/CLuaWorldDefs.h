@@ -140,6 +140,12 @@ public:
     static bool ResetVolumetricShadows() noexcept;
     
     static void ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept;
-    
+
+    static bool SetDynamicPedShadowsEnabled(bool enable);
+    static bool IsDynamicPedShadowsEnabled() noexcept;
+    static bool ResetDynamicPedShadows() noexcept;
+
+    static CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore);
+
 };
 
