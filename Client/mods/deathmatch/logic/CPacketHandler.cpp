@@ -2400,7 +2400,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTENDEDWATERCANNONS, wsProps.data4.extendedwatercannons);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::TUNNELWEATHERBLEND, wsProps.data5.tunnelweatherblend);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::IGNOREFIRESTATE, wsProps.data6.ignoreFireState);
-    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data6.flyingcomponents);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data7.flyingcomponents);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
