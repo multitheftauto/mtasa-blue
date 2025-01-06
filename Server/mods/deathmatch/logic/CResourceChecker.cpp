@@ -500,6 +500,114 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
     return IsLuaObfuscatedScript(strFileContents.c_str(), strFileContents.length());
 }
 
+// Helper struct to store token information
+struct LuaToken {
+    enum Type {
+        IDENTIFIER,
+        OPERATOR,
+        BRACKET,
+        PARENTHESIS,
+        OTHER
+    };
+    
+    Type type;
+    string value;
+    long position;
+    long line;
+};
+
+// Helper class to track parsing state
+class LuaParseState {
+public:
+    bool isInComment = false;
+    bool isInString = false;
+    char stringDelimiter = 0;
+    int bracketDepth = 0;
+    int parenthesisDepth = 0;
+};
+
+class CLuaSyntaxChecker {
+public:
+    static bool IsFunctionCall(const string& source, long identifierPos, long identifierLength, long& outLine) {
+        LuaParseState state;
+        vector<LuaToken> tokens;
+        
+        // First, tokenize everything after the identifier
+        long pos = identifierPos + identifierLength;
+        while (pos < (long)source.length()) {
+            // Skip whitespace
+            while (pos < (long)source.length() && isspace(source[pos])) {
+                if (source[pos] == '\n') outLine++;
+                pos++;
+            }
+            
+            if (pos >= (long)source.length()) break;
+            
+            char c = source[pos];
+            
+            // Handle comments
+            if (!state.isInString && c == '-' && pos + 1 < (long)source.length() && source[pos + 1] == '-') {
+                // Skip until end of line
+                while (pos < (long)source.length() && source[pos] != '\n') pos++;
+                continue;
+            }
+            
+            // Handle strings
+            if (!state.isInString && (c == '"' || c == '\'')) {
+                state.isInString = true;
+                state.stringDelimiter = c;
+                pos++;
+                continue;
+            }
+            if (state.isInString && c == state.stringDelimiter) {
+                state.isInString = false;
+                pos++;
+                continue;
+            }
+            if (state.isInString) {
+                pos++;
+                continue;
+            }
+            
+            // Track brackets and parentheses
+            if (c == '(') {
+                tokens.push_back({LuaToken::PARENTHESIS, "(", pos, outLine});
+                state.parenthesisDepth++;
+                pos++;
+                break;  // We found an opening parenthesis, no need to look further
+            }
+            else if (c == '{' || c == '[') {
+                tokens.push_back({LuaToken::BRACKET, string(1, c), pos, outLine});
+                state.bracketDepth++;
+                pos++;
+            }
+            else if (c == '}' || c == ']') {
+                tokens.push_back({LuaToken::BRACKET, string(1, c), pos, outLine});
+                state.bracketDepth--;
+                pos++;
+            }
+            else if (isalnum(c) || c == '_') {
+                // Skip identifiers
+                while (pos < (long)source.length() && (isalnum(source[pos]) || source[pos] == '_')) pos++;
+            }
+            else {
+                // Handle operators and other characters
+                tokens.push_back({LuaToken::OPERATOR, string(1, c), pos, outLine});
+                pos++;
+            }
+            
+            // If we find anything other than whitespace or comments before a parenthesis,
+            // then this isn't a function call
+            if (!tokens.empty() && tokens.back().type != LuaToken::PARENTHESIS) {
+                return false;
+            }
+        }
+        
+        // Check if we found an opening parenthesis
+        return !tokens.empty() && tokens.back().type == LuaToken::PARENTHESIS;
+    }
+};
+
 ///////////////////////////////////////////////////////////////
 //
 // CResourceChecker::CheckLuaSourceForIssues
@@ -558,17 +666,12 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
         if (lNameOffset == -1)
             break;
 
-        lNameOffset += lPos;                         // Make offset absolute from the start of the file
-        lPos = lNameOffset + lNameLength;            // Adjust so the next pass starts from just after this identifier
-
-        // Get some context around the identifier (up to 50 chars before and after)
-        long contextStart = max(0L, lNameOffset - 50);
-        long contextEnd = min((long)strLuaSource.length(), lNameOffset + lNameLength + 50);
-        string strContext = strLuaSource.substr(contextStart, contextEnd - contextStart);
+        lNameOffset += lPos;
+        lPos = lNameOffset + lNameLength;
 
         string strIdentifierName(strLuaSource.c_str() + lNameOffset, lNameLength);
 
-        // In-place upgrade...
+        // Handle upgrades...
         if (checkerMode == ECheckerMode::UPGRADE)
         {
             assert(!bCompiledScript);
@@ -591,22 +694,16 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
         // Log warnings...
         if (checkerMode == ECheckerMode::WARNINGS)
         {
-            // Only do the identifier once per file
             string strContextKey = strIdentifierName + ":" + std::to_string(lLineNumber);
             if (doneWarningMap.find(strContextKey) == doneWarningMap.end())
             {
                 doneWarningMap[strContextKey] = 1;
-                if (!bCompiledScript)            // Don't issue deprecated function warnings if the script is compiled
+                if (!bCompiledScript)
                 {
-                    // Skip variable declarations and references
-                    if (strContext.find("local " + strIdentifierName) == string::npos && 
-                        strContext.find("=" + strIdentifierName) == string::npos)
+                    long currentLine = lLineNumber;
+                    if (CLuaSyntaxChecker::IsFunctionCall(strLuaSource, lNameOffset, lNameLength, currentLine))
                     {
-                        // Only check for function calls
-                        if (strContext.find(strIdentifierName + "(") != string::npos)
-                        {
-                            IssueLuaFunctionNameWarnings(strIdentifierName, strFileName, strResourceName, bClientScript, lLineNumber, strContext);
-                        }
+                        IssueLuaFunctionNameWarnings(strIdentifierName, strFileName, strResourceName, bClientScript, lLineNumber);
                     }
                 }
                 CheckVersionRequirements(strIdentifierName, bClientScript);
@@ -733,17 +830,8 @@ bool CResourceChecker::UpgradeLuaFunctionName(const string& strFunctionName, boo
 //
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionName, const string& strFileName, const string& strResourceName, bool bClientScript,
-                                                    unsigned long ulLineNumber, const string& strContext)
+                                                    unsigned long ulLineNumber)
 {
-    // Skip if this is clearly a variable declaration or usage
-    if (strContext.find("local " + strFunctionName) != string::npos || 
-        strContext.find("=" + strFunctionName) != string::npos)
-        return;
-
-    // Only proceed if it looks like a function call
-    if (strContext.find(strFunctionName + "(") == string::npos)
-        return;
-
     string           strHow;
     CMtaVersion      strVersion;
     ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo(strFunctionName, bClientScript, strHow, strVersion);
