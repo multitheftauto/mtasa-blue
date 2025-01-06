@@ -68,7 +68,7 @@ protected:
     long FindLuaIdentifier(const char* szLuaSource, long* plOutLength, long* plLineNumber);
     bool UpgradeLuaFunctionName(const std::string& strFunctionName, bool bClientScript, std::string& strOutUpgraded);
     void IssueLuaFunctionNameWarnings(const std::string& strFunctionName, const std::string& strFileName, const std::string& strResourceName,
-                                      bool bClientScript, unsigned long ulLineNumber, const std::string& strContext);
+                                      bool bClientScript, unsigned long ulLineNumber);
     ECheckerWhatType GetLuaFunctionNameUpgradeInfo(const std::string& strFunctionName, bool bClientScript, std::string& strOutHow, CMtaVersion& strOutVersion);
     int              ReplaceFilesInZIP(const std::string& strOrigZip, const std::string& strTempZip, const std::vector<std::string>& pathInArchiveList,
                                        const std::vector<std::string>& upgradedFullPathList);
