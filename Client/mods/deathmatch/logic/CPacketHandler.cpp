@@ -572,6 +572,10 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
             strReason = _("Disconnected: Serial verification failed");
             strErrorCode = _E("CD44");
             break;
+        case ePlayerDisconnectType::SERIAL_DUPLICATE:
+            strReason = _("Disconnected: Serial already in use");
+            strErrorCode = _E("CD50");
+            break;
         case ePlayerDisconnectType::CONNECTION_DESYNC:
             strReason = _("Disconnected: Connection desync %s");
             strErrorCode = _E("CD45");
@@ -2395,6 +2399,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::ROADSIGNSTEXT, wsProps.data3.roadsignstext);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTENDEDWATERCANNONS, wsProps.data4.extendedwatercannons);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::TUNNELWEATHERBLEND, wsProps.data5.tunnelweatherblend);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::IGNOREFIRESTATE, wsProps.data6.ignoreFireState);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data6.flyingcomponents);
 
     float fJetpackMaxHeight = 100;
@@ -3993,6 +3998,41 @@ retry:
 
                     // Collisions
                     pPed->SetUsesCollision(bCollisonsEnabled);
+
+                    // Animation
+                    if (bitStream.Can(eBitStreamVersion::AnimationsSync))
+                    {
+                        // Contains animation data?
+                        if (bitStream.ReadBit())
+                        {
+                            std::string blockName, animName;
+                            int time, blendTime;
+                            bool looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
+                            float elapsedTime, speed;
+
+                            // Read data
+                            bitStream.ReadString(blockName);
+                            bitStream.ReadString(animName);
+                            bitStream.Read(time);
+                            bitStream.ReadBit(looped);
+                            bitStream.ReadBit(updatePosition);
+                            bitStream.ReadBit(interruptable);
+                            bitStream.ReadBit(freezeLastFrame);
+                            bitStream.Read(blendTime);
+                            bitStream.ReadBit(taskRestore);
+                            bitStream.Read(elapsedTime);
+                            bitStream.Read(speed);
+
+                            // Run anim
+                            CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable, freezeLastFrame);
+                            pPed->m_AnimationCache.progressWaitForStreamIn = true;
+                            pPed->m_AnimationCache.elapsedTime = elapsedTime;
+
+                            CStaticFunctionDefinitions::SetPedAnimationSpeed(*pPed, animName, speed);
+
+                            pPed->SetHasSyncedAnim(true);
+                        }
+                    }
 
                     break;
                 }
