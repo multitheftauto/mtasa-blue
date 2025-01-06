@@ -511,7 +511,7 @@ struct LuaToken {
     };
     
     Type type;
-    std::string value;
+    string value;
     long position;
     long line;
 };
@@ -528,9 +528,9 @@ public:
 
 class CLuaSyntaxChecker {
 public:
-    static bool IsFunctionCall(const std::string& source, long identifierPos, long identifierLength, long& outLine) {
+    static bool IsFunctionCall(const string& source, long identifierPos, long identifierLength, long& outLine) {
         LuaParseState state;
-        std::vector<LuaToken> tokens;
+        vector<LuaToken> tokens;
         
         // First, tokenize everything after the identifier
         long pos = identifierPos + identifierLength;
@@ -694,7 +694,7 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
         // Log warnings...
         if (checkerMode == ECheckerMode::WARNINGS)
         {
-            string strContextKey = strIdentifierName + ":" + std::to_string(lLineNumber);
+            std::string strContextKey = strIdentifierName + ":" + std::to_string(lLineNumber);
             if (doneWarningMap.find(strContextKey) == doneWarningMap.end())
             {
                 doneWarningMap[strContextKey] = 1;
@@ -869,7 +869,7 @@ ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& s
                                                                  CMtaVersion& strOutVersion)
 {
     // Early exit if this is likely a variable assignment
-    if (strFunctionName.find('=') != string::npos)
+    if (strFunctionName.find('=') != std::string::npos)
         return ECheckerWhat::NONE;
 
     static CHashMap<SString, SDeprecatedItem*> clientUpgradeInfoMap;
@@ -884,9 +884,9 @@ ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& s
     }
 
     // Extract just the function name if it's being called
-    string strCleanFunctionName = strFunctionName;
+    std::string strCleanFunctionName = strFunctionName;
     size_t parenPos = strCleanFunctionName.find('(');
-    if (parenPos != string::npos)
+    if (parenPos != std::string::npos)
         strCleanFunctionName = strCleanFunctionName.substr(0, parenPos);
 
     // Trim any whitespace
