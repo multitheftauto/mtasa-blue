@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-30 16:03+0000\n"
-"PO-Revision-Date: 2024-12-30 16:14\n"
+"POT-Creation-Date: 2025-01-04 19:20+0000\n"
+"PO-Revision-Date: 2025-01-06 00:40\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -156,7 +156,7 @@ msgstr "(Fejlesztői mód) colshapes-ek megjelenítése"
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Fejlesztői mód) kiírja az alap játék hangjainak azonosítóját a debug chatbe"
 
-#: Client/mods/deathmatch/logic/CResource.cpp:375
+#: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1095 Client/core/CCore.cpp:674
 #: Client/core/CSettings.cpp:3520
 msgid "In-game"
@@ -293,7 +293,7 @@ msgstr "Főmenü"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1425
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1437
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
+#: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
@@ -430,23 +430,23 @@ msgstr "Lecsatlakozva: a kapcsolat visszautasítva"
 msgid "MTA Client verification failed!"
 msgstr "MTA kliens ellenőrzése nem sikerült!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5629
 msgid "In a ditch"
 msgstr "Egy árokban"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5629
 msgid "En-route to hospital"
 msgstr "Úton a kórházba"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5629
 msgid "Meeting their maker"
 msgstr "Találkozni a készítőjükkel"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5630
 msgid "Regretting their decisions"
 msgstr "Megbánják a döntéseiket"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5630
 msgid "Wasted"
 msgstr "Meghalt"
 
@@ -781,15 +781,15 @@ msgstr "Biztos benne, hogy szeretné használni ezt a képernyő felbontását?"
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/game_sa/CGameSA.cpp:250 Client/game_sa/CGameSA.cpp:261
+#: Client/game_sa/CGameSA.cpp:251 Client/game_sa/CGameSA.cpp:262
 msgid "Failed initialization game_sa"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:252
+#: Client/game_sa/CGameSA.cpp:253
 msgid "Memory allocations failed"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:263 Client/loader/MainFunctions.cpp:603
+#: Client/game_sa/CGameSA.cpp:264 Client/loader/MainFunctions.cpp:603
 #: Client/loader/MainFunctions.cpp:610 Client/loader/MainFunctions.cpp:1219
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
@@ -2162,16 +2162,16 @@ msgstr "Áttetszőség:"
 
 #: Client/core/CSettings.cpp:441
 msgid "Image resolution:"
-msgstr ""
+msgstr "Képfelbontás:"
 
 #: Client/core/CSettings.cpp:448
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (Alapértelmezett)"
 
 #. index 0
 #: Client/core/CSettings.cpp:449
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
