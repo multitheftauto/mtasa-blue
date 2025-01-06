@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-30 16:03+0000\n"
-"PO-Revision-Date: 2024-12-30 17:22\n"
+"POT-Creation-Date: 2025-01-04 19:20+0000\n"
+"PO-Revision-Date: 2025-01-06 20:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -156,7 +156,7 @@ msgstr "(حالت برنامه‌نویس) تمام colshape ها را قابل 
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(حالت برنامه‌نویس) شناسه های صدای محیط را در پنجره اشکال زدایی چاپ می کند"
 
-#: Client/mods/deathmatch/logic/CResource.cpp:375
+#: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1095 Client/core/CCore.cpp:674
 #: Client/core/CSettings.cpp:3520
 msgid "In-game"
@@ -293,7 +293,7 @@ msgstr "فهرست اصلی"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1425
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1437
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
+#: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
@@ -430,23 +430,23 @@ msgstr "قطع اتصال: ارتباط با سرور رد شد"
 msgid "MTA Client verification failed!"
 msgstr "بررسی MTA Client با شکست مواجه شد!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5629
 msgid "In a ditch"
 msgstr "در حفره"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5629
 msgid "En-route to hospital"
 msgstr "در مسیر بیمارستان"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5626
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5629
 msgid "Meeting their maker"
 msgstr "ملاقات با خالقشان"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5630
 msgid "Regretting their decisions"
 msgstr "پشیمانی از تصمیمات"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5627
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5630
 msgid "Wasted"
 msgstr "از دست رفتن"
 
@@ -781,15 +781,15 @@ msgstr "آیا مطمئنید میخواهید از این اندازه‌ی ص�
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/game_sa/CGameSA.cpp:250 Client/game_sa/CGameSA.cpp:261
+#: Client/game_sa/CGameSA.cpp:251 Client/game_sa/CGameSA.cpp:262
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "عدم موفقیت در راه‌اندازی بازی game_sa"
 
-#: Client/game_sa/CGameSA.cpp:252
+#: Client/game_sa/CGameSA.cpp:253
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "عدم موفقیت در اختصاص دادن حافظه"
 
-#: Client/game_sa/CGameSA.cpp:263 Client/loader/MainFunctions.cpp:603
+#: Client/game_sa/CGameSA.cpp:264 Client/loader/MainFunctions.cpp:603
 #: Client/loader/MainFunctions.cpp:610 Client/loader/MainFunctions.cpp:1219
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
@@ -2579,7 +2579,7 @@ msgstr "نمایش در اکسپلورر"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:1205
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "عکس‌های گرفته‌شده با دوربین را در پوشه‌ی فایل‌های کاربری GTA San Andreas ذخیره کنید"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1211 Client/core/CSettings.cpp:1214
