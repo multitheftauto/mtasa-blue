@@ -15,6 +15,7 @@
 #include <list>
 
 using std::list;
+using CBuildingListType = CFastList<CBuilding*>;
 
 class CBuildingManager
 {
@@ -28,7 +29,6 @@ public:
     CBuilding* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void       DeleteAll();
 
-    using CBuildingListType = CFastList<CBuilding*>;
     CBuildingListType::const_iterator IterBegin() const noexcept { return m_List.begin(); }
     CBuildingListType::const_iterator IterEnd() const noexcept { return m_List.end(); }
 
