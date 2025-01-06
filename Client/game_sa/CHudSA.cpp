@@ -86,6 +86,11 @@ CHudSA::CHudSA()
     componentProperties.radioName = MapGet(defaultComponentProperties, HUD_RADIO);
     componentProperties.weaponIcon = MapGet(defaultComponentProperties, HUD_WEAPON);
     componentProperties.wanted = MapGet(defaultComponentProperties, HUD_WANTED);
+
+    // Change multiplier for STAT_10 and STAT_9 (MAX_HEALTH) from 176 to 200
+    // Fix GH #3807
+    float* MAX_HEALTH = reinterpret_cast<float*>(0x8CDE78);
+    *MAX_HEALTH = 200.0f;
 }
 
 void CHudSA::Disable(bool bDisabled)
@@ -635,8 +640,9 @@ void CHudSA::RenderHealthBar(int x, int y)
     float barWidth = useCustomSize ? componentProperties.hpBar.placement.customWidth : componentProperties.hpBar.placement.width;
 
     // Calc bar width depending on MAX_HEALTH stat
-    double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
-    float  totalWidth = (barWidth * maxHealth) / statModifier;
+    // We want to maintain the proportions of the bar and its width after changing MAX_HEALTH from 176 to 200
+    static const float baseWidth = barWidth * 100.0f / 176.0f; // 176 is default STAT_10 value
+    float totalWidth = baseWidth + (((barWidth - baseWidth) / 100.0f) * (maxHealth - 100.0f));
 
     float posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + x);
     float posY = useCustomPosition ? componentProperties.hpBar.placement.customY : y;
@@ -922,6 +928,27 @@ static void HOOK_RenderHudBar(int playerId, int x, int y)
         CHudSA::RenderArmorBar(x, y);
 }
 
+////////////////////////////////////////////////////////////////////////
+// CStats::GetFatAndMuscleModifier
+// 
+// After changing MAX_HEALTH from 176 to 200, we need to maintain the HP proportions
+// meaning stat = 569 = 100 HP, stat = 1000 = 200 HP
+//
+// HP = a * STAT - b
+// a = (100/431) = 0.23196
+// b = 32 (we use 31.9 due to rounding the result down - with 32, instead of 100 HP, it's 99)
+////////////////////////////////////////////////////////////////////////
+static const float mult = 0.23196f;
+static const float subVal = 31.9f;
+static void HOOK_MaxHealthStat_Correction()
+{
+    _asm
+    {
+        fmul dword ptr [mult] // stat * a
+        fsub dword ptr [subVal] // stat * a - b
+    }
+}
+
 void CHudSA::StaticSetHooks()
 {
     HookInstall(FUNC_RenderHealthBar, &HOOK_RenderHudBar, 11);
@@ -940,4 +967,6 @@ void CHudSA::StaticSetHooks()
     HookInstallCall(0x58D8FD, (DWORD)&RenderWeaponIcon_XLU);
 
     HookInstall(0x58DFD3, &HOOK_RenderWanted);
+
+    HookInstall(0x559E0D, &HOOK_MaxHealthStat_Correction, 6);
 }
