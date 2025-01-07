@@ -76,8 +76,6 @@ public:
     virtual bool IsDisabled() = 0;
     virtual void SetComponentVisible(eHudComponent component, bool bVisible) = 0;
     virtual bool IsComponentVisible(eHudComponent component) = 0;
-<<<<<<< HEAD
-=======
     virtual void AdjustComponents(float fAspectRatio) = 0;
     virtual void ResetComponentAdjustment() = 0;
     virtual bool IsCrosshairVisible() = 0;
@@ -132,5 +130,4 @@ public:
     virtual bool           GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept = 0;
 
     virtual CVector2D      GetComponentTextSize(const eHudComponent& component) const = 0;
->>>>>>> e0ce8b64263a44d083123db69692926166156d27
 };

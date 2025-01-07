@@ -3469,13 +3469,12 @@ void CSettings::SaveData()
     {
         eAspectRatio aspectRatio = (eAspectRatio)(int)pRatioSelected->GetData();
         CVARS_SET("aspect_ratio", aspectRatio);
-        gameSettings->SetAspectRatio(aspectRatio);
     }
 
     // HUD match aspect ratio
     bool bHudMatchAspectRatio = m_pCheckBoxHudMatchAspectRatio->GetSelected();
-    bool bMatchARChanged = bHudMatchAspectRatio != CVARS_GET_VALUE<bool>("hud_match_aspect_ratio");
     CVARS_SET("hud_match_aspect_ratio", bHudMatchAspectRatio);
+    gameSettings->SetAspectRatio((eAspectRatio)CVARS_GET_VALUE<int>("aspect_ratio"), bHudMatchAspectRatio);
 
     // Volumetric shadows
     bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected();
@@ -3774,7 +3773,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bMatchARChanged || bBrowserGPUSettingChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
