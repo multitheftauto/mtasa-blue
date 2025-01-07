@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-04 19:20+0000\n"
-"PO-Revision-Date: 2025-01-07 20:00\n"
+"PO-Revision-Date: 2025-01-07 21:00\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -84,47 +84,47 @@ msgstr "előző rádió csatorna"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr ""
+msgstr "radar nézet engedélyezése"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "radar nagyítása"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "radar kicsinyítése"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "radar északra mozgatása"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "radar délre mozgatása"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "radar keletre mozgatása"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "radar nyugatra mozgatása"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "radar csatolása"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "radar átlátszóságának csökkentése"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "radar átlátszóságának növelése"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "súgószöveg mutatása a radaron"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -453,25 +453,25 @@ msgstr "Meghalt"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "Módváltás: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "Nagyítás: %s/%s     Mozgás: %s, %s, %s, %s     Átlátszóság: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "Radar mutatása: %s     Súgószöveg mutatása: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:715
 msgid "Following Player"
-msgstr ""
+msgstr "Játékos Követése"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:717
 msgid "Free Movement"
-msgstr ""
+msgstr "Szabad Mozgás"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -783,11 +783,11 @@ msgstr "MTA: San Andreas"
 
 #: Client/game_sa/CGameSA.cpp:251 Client/game_sa/CGameSA.cpp:262
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "Nem sikerült inicializálni: game_sa"
 
 #: Client/game_sa/CGameSA.cpp:253
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "A memóriafoglalás nem sikerült"
 
 #: Client/game_sa/CGameSA.cpp:264 Client/loader/MainFunctions.cpp:603
 #: Client/loader/MainFunctions.cpp:610 Client/loader/MainFunctions.cpp:1219
@@ -865,11 +865,12 @@ msgstr "Fájlok kicsomagolása..."
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Sajnáljuk, de a játék nem található. Indítsd el a Grand Theft Auto: San Andreas-t, majd kattints az újrapróbálkozás gombra. \n"
+"Győződj meg róla, hogy a játék a 'Program Files (x86)' mappában van."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr ""
+msgstr "GTA: San Andreas keresése"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
@@ -1778,7 +1779,7 @@ msgstr "kapcsolódás: A jelenlegi mód betöltése sikertelen"
 
 #: Client/core/CCommandFuncs.cpp:317
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "kapcsolódás: Hibás port"
 
 #: Client/core/CCommandFuncs.cpp:332
 #, c-format
@@ -1788,7 +1789,7 @@ msgstr "reconnect: Újracsatlakozás a %s:%u címre..."
 #: Client/core/CCommandFuncs.cpp:336
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "kapcsolódás: nem lehet kapcsolódni ide %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:370
 msgid "Bound all controls from GTA"
