@@ -152,7 +152,7 @@ public:
 
     float        GetAspectRatioValue();
     eAspectRatio GetAspectRatio();
-    void         SetAspectRatio(eAspectRatio aspectRatio);
+    void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true);
 
     bool IsGrassEnabled();
     void SetGrassEnabled(bool bEnable);

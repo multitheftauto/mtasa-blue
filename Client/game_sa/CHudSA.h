@@ -21,8 +21,6 @@
 
 #define VAR_DisableClock            0xBAA400
 
-<<<<<<< HEAD
-=======
 // X
 #define VAR_AspectRatioMultX        0x859520
 // Y
@@ -30,7 +28,6 @@
 
 #define VAR_CameraCrosshairScale    0x866C74
 
->>>>>>> e0ce8b64263a44d083123db69692926166156d27
 #define FUNC_DrawAmmo               0x5893B0
 #define FUNC_DrawWeaponIcon         0x58D7D0
 #define FUNC_RenderHealthBar        0x589270
@@ -185,12 +182,9 @@ public:
     bool IsDisabled();
     void SetComponentVisible(eHudComponent component, bool bVisible);
     bool IsComponentVisible(eHudComponent component);
-<<<<<<< HEAD
-=======
     void AdjustComponents(float fAspectRatio);
     void ResetComponentAdjustment();
     bool IsCrosshairVisible();
->>>>>>> e0ce8b64263a44d083123db69692926166156d27
 
     bool IsComponentBar(const eHudComponent& component) const noexcept override;
     bool IsComponentText(const eHudComponent& component) const noexcept override;
@@ -278,10 +272,9 @@ private:
 
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
-<<<<<<< HEAD
-=======
 
-    float* m_pfAspectRatioMultiplicator;
+    float* m_pfAspectRatioMultiplicatorX;
+    float* m_pfAspectRatioMultiplicatorY;
     float* m_pfCameraCrosshairScale;
     float  m_fSniperCrosshairScale;
 
@@ -291,5 +284,4 @@ private:
     static float calcStreetchX;
     static float calcStreetchY;
     static float blinkingBarHPValue;
->>>>>>> e0ce8b64263a44d083123db69692926166156d27
 };
