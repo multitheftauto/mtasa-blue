@@ -292,7 +292,7 @@ public:
 
     void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent);
     void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true);
-    void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus);
+    void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus, bool spawnFlyingComponent = true, bool breakGlass = false);
     void SetLightStatus(unsigned char ucLight, unsigned char ucStatus);
     bool GetWheelMissing(unsigned char ucWheel, const SString& strWheelName = "");
 

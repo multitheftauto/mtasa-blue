@@ -3441,6 +3441,9 @@ void CClientGame::Event_OnIngame()
     g_pGame->ResetAlphaTransparencies();
     g_pGame->ResetModelTimes();
 
+    // Reset weapon render
+    g_pGame->SetWeaponRenderEnabled(true);
+
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
 
@@ -4404,12 +4407,9 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             return false;
         }
 
-        if (pDamagedPed->IsLocalPlayer())
-        {
-            // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
-            fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
-            fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
-        }
+        // Reget values in case they have been changed during onClientPlayerDamage/onClientPedDamage event (Avoid AC#1 kick)
+        fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
+        fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
         bool bIsBeingShotWhilstAiming = (weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun());
         bool bOldBehaviour = !IsGlitchEnabled(GLITCH_HITANIM);
@@ -6112,6 +6112,16 @@ bool CClientGame::SetBirdsEnabled(bool bEnabled)
 bool CClientGame::GetBirdsEnabled()
 {
     return m_bBirdsEnabled;
+}
+
+void CClientGame::SetWeaponRenderEnabled(bool enabled)
+{
+    g_pGame->SetWeaponRenderEnabled(enabled);
+}
+
+bool CClientGame::IsWeaponRenderEnabled() const
+{
+    return g_pGame->IsWeaponRenderEnabled();
 }
 
 #pragma code_seg(".text")
