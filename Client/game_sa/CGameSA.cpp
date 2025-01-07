@@ -1141,6 +1141,32 @@ CWeaponStat* CGameSA::CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weap
     return m_pWeaponStatsManager->CreateWeaponStatUnlisted(weaponType, weaponSkill);
 }
 
+void CGameSA::SetWeaponRenderEnabled(bool enabled)
+{
+    if (IsWeaponRenderEnabled() == enabled)
+        return;
+
+    if (!enabled)
+    {
+        // Disable calls to CVisibilityPlugins::RenderWeaponPedsForPC
+        MemSet((void*)0x53EAC4, 0x90, 5); // Idle
+        MemSet((void*)0x705322, 0x90, 5); // CPostEffects::Render
+        MemSet((void*)0x7271E3, 0x90, 5); // CMirrors::BeforeMainRender
+    }
+    else
+    {
+        // Restore original bytes
+        MemCpy((void*)0x53EAC4, "\xE8\x67\x44\x1F\x00", 5);
+        MemCpy((void*)0x705322, "\xE8\x09\xDC\x02\x00", 5);
+        MemCpy((void*)0x7271E3, "\xE8\x48\xBD\x00\x00", 5);
+    }
+}
+
+bool CGameSA::IsWeaponRenderEnabled() const
+{
+    return *(unsigned char*)0x53EAC4 == 0xE8;
+}
+
 void CGameSA::OnPedContextChange(CPed* pPedContext)
 {
     m_pPedContext = pPedContext;

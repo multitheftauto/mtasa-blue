@@ -307,6 +307,8 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         ucFlags |= 0x20;
     if (pPed->IsInWater() != pPed->m_LastSyncedData->bIsInWater)
         ucFlags |= 0x40;
+    if (pPed->HasSyncedAnim() && (!pPed->IsRunningAnimation() || pPed->m_animationOverridedByClient))
+        ucFlags |= 0x80;
 
     // Do we really have to sync this ped?
     if (ucFlags == 0)
@@ -394,5 +396,12 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     {
         pBitStream->WriteBit(pPed->IsInWater());
         pPed->m_LastSyncedData->bIsInWater = pPed->IsInWater();
+    }
+
+    // The animation has been overwritten or interrupted by the client
+    if (ucFlags & 0x80 && pBitStream->Can(eBitStreamVersion::AnimationsSync))
+    {
+        pPed->SetHasSyncedAnim(false);
+        pPed->m_animationOverridedByClient = false;
     }
 }

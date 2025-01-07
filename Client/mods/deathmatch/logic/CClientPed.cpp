@@ -38,10 +38,10 @@ using std::vector;
 extern CClientGame* g_pClientGame;
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+    #define M_PI 3.14159265358979323846
 #endif
 
-#define INVALID_VALUE   0xFFFFFFFF
+#define INVALID_VALUE 0xFFFFFFFF
 
 #define PED_INTERPOLATION_WARP_THRESHOLD            5   // Minimal threshold
 #define PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  5   // Units to increment the threshold per speed unit
@@ -1166,7 +1166,7 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
     for (; iter != listEnd; iter++)
     {
         pTempVehicle = *iter;
-        
+
         if (pTempVehicle->IsLocalEntity() != localVehicles)
             continue;
 
@@ -2885,11 +2885,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
                 m_bRequestedAnimation = false;
 
-                // Copy our name incase it gets deleted
-                SString strAnimName = m_AnimationCache.strName;
-                // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
-                                  m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+                RunAnimationFromCache();
             }
         }
 
@@ -3400,8 +3396,8 @@ void CClientPed::Interpolate()
         {
             // We're not at the end?
             if (ulCurrentTime < m_ulEndRotationTime)
-            {                              
-                const float fDelta = GetOffsetRadians(m_fBeginRotation, m_fTargetRotationA);                
+            {
+                const float fDelta = GetOffsetRadians(m_fBeginRotation, m_fTargetRotationA);
 
                 // Hack for the wrap-around (the edge seems to be varying...)
                 if (fDelta < -M_PI || fDelta > M_PI)
@@ -3411,7 +3407,7 @@ void CClientPed::Interpolate()
                 }
                 else
                 {
-                    // Interpolate the player rotation  
+                    // Interpolate the player rotation
                     const float fDeltaTime = float(m_ulEndRotationTime - m_ulBeginRotationTime);
                     const float fCameraDelta = GetOffsetRadians(m_fBeginCameraRotation, m_fTargetCameraRotation);
                     const float fProgress = float(ulCurrentTime - m_ulBeginRotationTime);
@@ -3676,18 +3672,15 @@ void CClientPed::_CreateModel()
             Kill(WEAPONTYPE_UNARMED, 0, false, true);
         }
 
-        // Are we still playing a looped animation?
-        if (m_AnimationCache.bLoop && m_pAnimationBlock)
+        // Are we still playing animation?
+        if ((m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame || m_AnimationCache.progressWaitForStreamIn) && m_pAnimationBlock)
         {
             if (m_bisCurrentAnimationCustom)
             {
                 m_bisNextAnimationCustom = true;
             }
-            // Copy our anim name incase it gets deleted
-            SString strAnimName = m_AnimationCache.strName;
-            // Run our animation
-            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
-                              m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+
+            RunAnimationFromCache();
         }
 
         // Set the voice that corresponds to our model
@@ -3939,7 +3932,7 @@ void CClientPed::_ChangeModel()
                 // So make sure clothes geometry is built now...
                 m_pClothes->AddAllToModel();
                 m_pPlayerPed->RebuildPlayer();
-            }    
+            }
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
             pLoadedModel->RemoveRef(true);
@@ -3958,18 +3951,14 @@ void CClientPed::_ChangeModel()
             m_bDontChangeRadio = false;
 
             // Are we still playing a looped animation?
-            if (m_AnimationCache.bLoop && m_pAnimationBlock)
+            if ((m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame || m_AnimationCache.progressWaitForStreamIn) && m_pAnimationBlock)
             {
                 if (m_bisCurrentAnimationCustom)
                 {
                     m_bisNextAnimationCustom = true;
                 }
 
-                // Copy our anim name incase it gets deleted
-                SString strAnimName = m_AnimationCache.strName;
-                // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
-                                  m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+                RunAnimationFromCache();
             }
 
             // Set the voice that corresponds to the new model
@@ -5260,7 +5249,7 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             // Restore the camera's interior whether we're restoring player states or not
             g_pGame->GetWorld()->SetCurrentArea(ucCameraInterior);
 
-            // Reset goggle effect 
+            // Reset goggle effect
             g_pMultiplayer->SetNightVisionEnabled(bOldNightVision, false);
             g_pMultiplayer->SetThermalVisionEnabled(bOldThermalVision, false);
 
@@ -5794,6 +5783,10 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     m_AnimationCache.bUpdatePosition = bUpdatePosition;
     m_AnimationCache.bInterruptable = bInterruptable;
     m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
+    m_AnimationCache.progress = 0.0f;
+    m_AnimationCache.speed = 1.0f;
+    m_AnimationCache.progressWaitForStreamIn = false;
+    m_AnimationCache.elapsedTime = 0.0f;
 }
 
 void CClientPed::KillAnimation()
@@ -5825,6 +5818,46 @@ std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
         return g_pGame->GetAnimManager()->GetAnimBlock(m_pAnimationBlock->GetInterface());
     }
     return nullptr;
+}
+
+void CClientPed::RunAnimationFromCache()
+{
+    if (!m_pAnimationBlock)
+        return;
+
+    bool  needCalcProgress = m_AnimationCache.progressWaitForStreamIn;
+    float elapsedTime = m_AnimationCache.elapsedTime;
+
+    // Copy our name incase it gets deleted
+    std::string animName = m_AnimationCache.strName;
+
+    // Run our animation
+    RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+
+    auto animAssoc = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(GetClump(), animName.c_str());
+    if (!animAssoc)
+        return;
+
+    // If the anim is synced from the server side, we need to calculate the progress
+    float progress = m_AnimationCache.progress;
+    if (needCalcProgress)
+    {
+        float animLength = animAssoc->GetLength();
+
+        if (m_AnimationCache.bFreezeLastFrame) // time and loop is ignored if freezeLastFrame is true
+            progress = (elapsedTime / animLength) * m_AnimationCache.speed;
+        else
+        {
+            if (m_AnimationCache.bLoop)
+                progress = std::fmod(elapsedTime * m_AnimationCache.speed, animLength) / animLength;
+            else
+                // For non-looped animations, limit duration to animLength if time exceeds it
+                progress = (elapsedTime / (m_AnimationCache.iTime <= animLength ? m_AnimationCache.iTime : animLength)) * m_AnimationCache.speed;
+        }
+    }
+
+    animAssoc->SetCurrentProgress(std::clamp(progress, 0.0f, 1.0f));
+    animAssoc->SetCurrentSpeed(m_AnimationCache.speed);
 }
 
 void CClientPed::PostWeaponFire()
@@ -5919,7 +5952,7 @@ bool CClientPed::SetOnFire(bool bIsOnFire)
 {
     if (m_pPlayerPed)
         return m_pPlayerPed->SetOnFire(bIsOnFire);
-    
+
     m_bIsOnFire = bIsOnFire;
     return true;
 }
@@ -6296,9 +6329,9 @@ void CClientPed::HandleWaitingForGroundToLoad()
     {
         // If not near any MTA objects, then don't bother waiting
         SetFrozenWaitingForGroundToLoad(false);
-        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         OutputDebugLine("[AsyncLoading]   FreezeUntilCollisionLoaded - Early stop");
-        #endif
+#endif
         return;
     }
 
@@ -6319,29 +6352,29 @@ void CClientPed::HandleWaitingForGroundToLoad()
     bool                  bASync = g_pGame->IsASyncLoadingEnabled();
     bool                  bMTAObjLimit = pObjectManager->IsObjectLimitReached();
     bool                  bHasModel = GetModelInfo() != NULL;
-    #ifndef ASYNC_LOADING_DEBUG_OUTPUTA
+#ifndef ASYNC_LOADING_DEBUG_OUTPUTA
     bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded(vecPosition, fUseRadius, m_usDimension);
-    #else
+#else
     SString strAround;
     bool    bMTALoaded = pObjectManager->ObjectsAroundPointLoaded(vecPosition, fUseRadius, m_usDimension, &strAround);
-    #endif
+#endif
 
-    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
     SString status = SString(
         "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f   m_fObjectsAroundTolerance:%2.2f  "
         "fUseRadius:%2.1f",
         vecPosition.fX, vecPosition.fY, vecPosition.fZ, bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance, m_fObjectsAroundTolerance,
         fUseRadius);
-    #endif
+#endif
 
     // See if ground is ready
     if ((!bHasModel || !bMTALoaded) && m_fObjectsAroundTolerance < 1.f)
     {
         m_fGroundCheckTolerance = 0.f;
         m_fObjectsAroundTolerance = std::min(1.f, m_fObjectsAroundTolerance + 0.01f);
-        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         status += ("  FreezeUntilCollisionLoaded - wait");
-        #endif
+#endif
     }
     else
     {
@@ -6354,16 +6387,16 @@ void CClientPed::HandleWaitingForGroundToLoad()
         if (fUseDist > -0.2f && fUseDist < 1.5f)
             SetFrozenWaitingForGroundToLoad(false);
 
-        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         status += (SString("  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist));
-        #endif
+#endif
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here)
         if (m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync)
             SetFrozenWaitingForGroundToLoad(false);
     }
 
-    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
     OutputDebugLine(SStringX("[AsyncLoading] ")++ status);
     g_pCore->GetGraphics()->DrawString(10, 220, -1, 1, status);
 
@@ -6371,7 +6404,7 @@ void CClientPed::HandleWaitingForGroundToLoad()
     strAround.Split("\n", lineList);
     for (unsigned int i = 0; i < lineList.size(); i++)
         g_pCore->GetGraphics()->DrawString(10, 230 + i * 10, -1, 1, lineList[i]);
-    #endif
+#endif
 }
 
 //
@@ -6658,7 +6691,6 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-
     // Check the server is compatible if we are a ped
     if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {
@@ -6789,7 +6821,7 @@ void CClientPed::UpdateVehicleInOut()
             CClientVehicle* vehicle = GetRealOccupiedVehicle();
             if (!vehicle)
                 return;
-                
+
             // Call the onClientVehicleEnter event for the ped
             // Check if it is cancelled before allowing the ped to enter the vehicle
             CLuaArguments arguments;
@@ -6816,7 +6848,7 @@ void CClientPed::UpdateVehicleInOut()
 
             if (realVehicle)
                 return;
-                
+
             // Call the onClientVehicleExit event for the ped
             CLuaArguments arguments;
             arguments.PushElement(this);                    // player / ped
@@ -6843,7 +6875,7 @@ void CClientPed::UpdateVehicleInOut()
             // If we aren't working on leaving the car (he's eiter finished or cancelled/failed leaving)
             if (IsLeavingVehicle())
                 return;
-                
+
             // Are we outside the car?
             CClientVehicle* pVehicle = GetRealOccupiedVehicle();
             if (pVehicle)
@@ -7047,7 +7079,7 @@ void CClientPed::UpdateVehicleInOut()
         // If we aren't getting jacked
         if (m_bIsGettingJacked)
             return;
-            
+
         CClientVehicle* pVehicle = GetRealOccupiedVehicle();
         CClientVehicle* pOccupiedVehicle = GetOccupiedVehicle();
 
@@ -7062,7 +7094,7 @@ void CClientPed::UpdateVehicleInOut()
         // Are we supposed to be in a vehicle? But aren't?
         if (!pOccupiedVehicle || pVehicle || IsWarpInToVehicleRequired())
             return;
-            
+
         // Jax: this happens when we try to warp into a streamed out vehicle, including when we use CClientVehicle::StreamInNow
         // ..maybe we need a different way to detect bike falls?
 
@@ -7070,7 +7102,7 @@ void CClientPed::UpdateVehicleInOut()
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         if (!pBitStream)
             return;
-            
+
         // Write the ped or player ID to it
         if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
         {

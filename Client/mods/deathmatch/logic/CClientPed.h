@@ -127,23 +127,17 @@ struct SReplacedAnimation
 
 struct SAnimationCache
 {
-    SString strName;
-    int     iTime;
-    bool    bLoop;
-    bool    bUpdatePosition;
-    bool    bInterruptable;
-    bool    bFreezeLastFrame;
-    int     iBlend;
-
-    SAnimationCache()
-    {
-        iTime = -1;
-        bLoop = false;
-        bUpdatePosition = false;
-        bInterruptable = false;
-        bFreezeLastFrame = true;
-        iBlend = 250;
-    }
+    std::string strName;
+    int         iTime{-1};
+    bool        bLoop{false};
+    bool        bUpdatePosition{false};
+    bool        bInterruptable{false};
+    bool        bFreezeLastFrame{true};
+    int         iBlend{250};
+    float       progress{0.0f};
+    float       speed{1.0f};
+    bool        progressWaitForStreamIn{false}; // for sync anim only
+    float       elapsedTime{0.0f}; // for sync anim only
 };
 
 class CClientObject;
@@ -466,6 +460,7 @@ public:
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
+    void                        RunAnimationFromCache();
 
     bool IsUsingGun();
 
@@ -551,6 +546,9 @@ public:
     SReplacedAnimation* GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface);
 
     std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
+
+    void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; }
+    bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; }
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
@@ -789,4 +787,7 @@ public:
     CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
 
     std::shared_ptr<CClientModel> m_clientModel;
+
+    bool m_hasSyncedAnim{};
+    bool m_animationOverridedByClient{};
 };
