@@ -2727,7 +2727,7 @@ void CClientGame::AddBuiltInEvents()
 
     // Game events
     m_Events.AddEvent("onClientPreRender", "", NULL, false);
-    m_Events.AddEvent("onClientEntitiesProcessed", "", NULL, false);
+    m_Events.AddEvent("onClientPostUpdate", "", NULL, false);
     m_Events.AddEvent("onClientHUDRender", "", NULL, false);
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
@@ -3875,8 +3875,14 @@ void CClientGame::PostWorldProcessHandler()
 void CClientGame::PostWorldProcessEntitiesAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
-    m_pRootEntity->CallEvent("onClientEntitiesProcessed", Arguments, false);
 
+    if (m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false))
+    {
+        throw std::runtime_error("'onClientPedsProcessed' is no longer supported, renamed to 'onClientPostUpdate'");
+        return; 
+    }
+
+    m_pRootEntity->CallEvent("onClientPostUpdate", Arguments, false);
     g_pClientGame->GetModelRenderer()->Update();
 }
 
