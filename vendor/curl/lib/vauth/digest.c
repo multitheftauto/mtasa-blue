@@ -103,7 +103,7 @@ bool Curl_auth_digest_get_pair(const char *str, char *value, char *content,
 
       case ',':
         if(!starts_with_quote) {
-          /* This signals the end of the content if we didn't get a starting
+          /* This signals the end of the content if we did not get a starting
              quote and then we do "sloppy" parsing */
           c = 0; /* the end */
           continue;
@@ -142,7 +142,7 @@ bool Curl_auth_digest_get_pair(const char *str, char *value, char *content,
 }
 
 #if !defined(USE_WINDOWS_SSPI)
-/* Convert md5 chunk to RFC2617 (section 3.1.3) -suitable ascii string */
+/* Convert md5 chunk to RFC2617 (section 3.1.3) -suitable ASCII string */
 static void auth_digest_md5_to_ascii(unsigned char *source, /* 16 bytes */
                                      unsigned char *dest) /* 33 bytes */
 {
@@ -151,7 +151,7 @@ static void auth_digest_md5_to_ascii(unsigned char *source, /* 16 bytes */
     msnprintf((char *) &dest[i * 2], 3, "%02x", source[i]);
 }
 
-/* Convert sha256 or SHA-512/256 chunk to RFC7616 -suitable ascii string */
+/* Convert sha256 or SHA-512/256 chunk to RFC7616 -suitable ASCII string */
 static void auth_digest_sha256_to_ascii(unsigned char *source, /* 32 bytes */
                                      unsigned char *dest) /* 65 bytes */
 {
@@ -227,12 +227,12 @@ static CURLcode auth_digest_get_qop_values(const char *options, int *value)
   *value = 0;
 
   /* Tokenise the list of qop values. Use a temporary clone of the buffer since
-     strtok_r() ruins it. */
+     Curl_strtok_r() ruins it. */
   tmp = strdup(options);
   if(!tmp)
     return CURLE_OUT_OF_MEMORY;
 
-  token = strtok_r(tmp, ",", &tok_buf);
+  token = Curl_strtok_r(tmp, ",", &tok_buf);
   while(token) {
     if(strcasecompare(token, DIGEST_QOP_VALUE_STRING_AUTH))
       *value |= DIGEST_QOP_VALUE_AUTH;
@@ -241,7 +241,7 @@ static CURLcode auth_digest_get_qop_values(const char *options, int *value)
     else if(strcasecompare(token, DIGEST_QOP_VALUE_STRING_AUTH_CONF))
       *value |= DIGEST_QOP_VALUE_AUTH_CONF;
 
-    token = strtok_r(NULL, ",", &tok_buf);
+    token = Curl_strtok_r(NULL, ",", &tok_buf);
   }
 
   free(tmp);
@@ -326,7 +326,7 @@ bool Curl_auth_is_digest_supported(void)
  *
  * data    [in]     - The session handle.
  * chlg    [in]     - The challenge message.
- * userp   [in]     - The user name.
+ * userp   [in]     - The username.
  * passwdp [in]     - The user's password.
  * service [in]     - The service type such as http, smtp, pop or imap.
  * out     [out]    - The result storage.
@@ -388,7 +388,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     return result;
 
   /* So far so good, now calculate A1 and H(A1) according to RFC 2831 */
-  ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
+  ctxt = Curl_MD5_init(&Curl_DIGEST_MD5);
   if(!ctxt)
     return CURLE_OUT_OF_MEMORY;
 
@@ -402,7 +402,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
                   curlx_uztoui(strlen(passwdp)));
   Curl_MD5_final(ctxt, digest);
 
-  ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
+  ctxt = Curl_MD5_init(&Curl_DIGEST_MD5);
   if(!ctxt)
     return CURLE_OUT_OF_MEMORY;
 
@@ -425,7 +425,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     return CURLE_OUT_OF_MEMORY;
 
   /* Calculate H(A2) */
-  ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
+  ctxt = Curl_MD5_init(&Curl_DIGEST_MD5);
   if(!ctxt) {
     free(spn);
 
@@ -443,7 +443,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     msnprintf(&HA2_hex[2 * i], 3, "%02x", digest[i]);
 
   /* Now calculate the response hash */
-  ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
+  ctxt = Curl_MD5_init(&Curl_DIGEST_MD5);
   if(!ctxt) {
     free(spn);
 
@@ -553,12 +553,12 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
       else if(strcasecompare(value, "qop")) {
         char *tok_buf = NULL;
         /* Tokenize the list and choose auth if possible, use a temporary
-           clone of the buffer since strtok_r() ruins it */
+           clone of the buffer since Curl_strtok_r() ruins it */
         tmp = strdup(content);
         if(!tmp)
           return CURLE_OUT_OF_MEMORY;
 
-        token = strtok_r(tmp, ",", &tok_buf);
+        token = Curl_strtok_r(tmp, ",", &tok_buf);
         while(token) {
           /* Pass additional spaces here */
           while(*token && ISBLANK(*token))
@@ -569,7 +569,7 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
           else if(strcasecompare(token, DIGEST_QOP_VALUE_STRING_AUTH_INT)) {
             foundAuthInt = TRUE;
           }
-          token = strtok_r(NULL, ",", &tok_buf);
+          token = Curl_strtok_r(NULL, ",", &tok_buf);
         }
 
         free(tmp);
@@ -629,7 +629,7 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
       }
     }
     else
-      break; /* We're done here */
+      break; /* We are done here */
 
     /* Pass all additional spaces here */
     while(*chlg && ISBLANK(*chlg))
@@ -646,7 +646,7 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
   if(before && !digest->stale)
     return CURLE_BAD_CONTENT_ENCODING;
 
-  /* We got this header without a nonce, that's a bad Digest line! */
+  /* We got this header without a nonce, that is a bad Digest line! */
   if(!digest->nonce)
     return CURLE_BAD_CONTENT_ENCODING;
 
@@ -666,7 +666,7 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
  * Parameters:
  *
  * data    [in]     - The session handle.
- * userp   [in]     - The user name.
+ * userp   [in]     - The username.
  * passwdp [in]     - The user's password.
  * request [in]     - The HTTP request.
  * uripath [in]     - The path of the HTTP uri.
@@ -709,13 +709,17 @@ static CURLcode auth_create_digest_http_message(
     digest->nc = 1;
 
   if(!digest->cnonce) {
-    char cnoncebuf[33];
-    result = Curl_rand_hex(data, (unsigned char *)cnoncebuf,
-                           sizeof(cnoncebuf));
+    char cnoncebuf[12];
+    result = Curl_rand_bytes(data,
+#ifdef DEBUGBUILD
+                             TRUE,
+#endif
+                             (unsigned char *)cnoncebuf,
+                             sizeof(cnoncebuf));
     if(result)
       return result;
 
-    result = Curl_base64_encode(cnoncebuf, strlen(cnoncebuf),
+    result = Curl_base64_encode(cnoncebuf, sizeof(cnoncebuf),
                                 &cnonce, &cnonce_sz);
     if(result)
       return result;
@@ -788,7 +792,7 @@ static CURLcode auth_create_digest_http_message(
     return CURLE_OUT_OF_MEMORY;
 
   if(digest->qop && strcasecompare(digest->qop, "auth-int")) {
-    /* We don't support auth-int for PUT or POST */
+    /* We do not support auth-int for PUT or POST */
     char hashed[65];
     char *hashthis2;
 
@@ -835,12 +839,12 @@ static CURLcode auth_create_digest_http_message(
      Authorization: Digest username="testuser", realm="testrealm", \
      nonce="1053604145", uri="/64", response="c55f7f30d83d774a3d2dcacf725abaca"
 
-     Digest parameters are all quoted strings.  Username which is provided by
+     Digest parameters are all quoted strings. Username which is provided by
      the user will need double quotes and backslashes within it escaped.
      realm, nonce, and opaque will need backslashes as well as they were
-     de-escaped when copied from request header.  cnonce is generated with
-     web-safe characters.  uri is already percent encoded.  nc is 8 hex
-     characters.  algorithm and qop with standard values only contain web-safe
+     de-escaped when copied from request header. cnonce is generated with
+     web-safe characters. uri is already percent encoded. nc is 8 hex
+     characters. algorithm and qop with standard values only contain web-safe
      characters.
   */
   userp_quoted = auth_digest_string_quoted(digest->userhash ? userh : userp);
@@ -957,7 +961,7 @@ static CURLcode auth_create_digest_http_message(
  * Parameters:
  *
  * data    [in]     - The session handle.
- * userp   [in]     - The user name.
+ * userp   [in]     - The username.
  * passwdp [in]     - The user's password.
  * request [in]     - The HTTP request.
  * uripath [in]     - The path of the HTTP uri.
