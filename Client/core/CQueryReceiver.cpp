@@ -192,6 +192,29 @@ SQueryInfo CQueryReceiver::GetServerResponse()
         if (!strHttpPort.empty())
             info.httpPort = atoi(strHttpPort);
 
+        // Check if this reply includes rules
+        if (strncmp(szBuffer + i, "RULES", 5) == 0)
+        {
+            i += 5;
+            while (i < len)
+            {
+                // Check if it's the end of rules
+                if ((unsigned char)szBuffer[i] == 1)
+                {
+                    i++;
+                    break;
+                }
+
+                SString key, value;
+                if (!ReadString(key, szBuffer, i, len))
+                    return info;
+                if (!ReadString(value, szBuffer, i, len))
+                    return info;
+
+                info.rules[key] = value;
+            }
+        }
+
         // Get player nicks
         while (i < len)
         {

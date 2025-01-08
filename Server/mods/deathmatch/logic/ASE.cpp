@@ -187,8 +187,8 @@ void ASE::DoPulse()
                     break;
                 }
                 case 'r':
-                {            // Our own lighter query for ingame browser - Release version only
-                    strReply = QueryLightCached();
+                {            // New query for ingame server browser
+                    strReply = QueryNewBrowserCached();
                     break;
                 }
                 case 'x':
@@ -393,6 +393,133 @@ const std::string* ASE::QueryLightCached()
         m_uiLightLastPlayerCount = m_uiCurrentPlayerCount;
     }
     return &m_strLightCached;
+}
+
+// Protect against a flood of server queries.
+// Send cached version unless player count has changed, or last re-cache is older than m_lNewMinInterval
+const std::string* ASE::QueryNewBrowserCached()
+{
+    if (m_uiCurrentPlayerCount != m_uiNewLastPlayerCount || m_llCurrentTime - m_llNewLastTime > m_lNewMinInterval || m_strNewCached == "")
+    {
+        m_strNewCached = QueryNewBrowser();
+        m_llNewLastTime = m_llCurrentTime;
+        m_uiNewLastPlayerCount = m_uiCurrentPlayerCount;
+    }
+    return &m_strNewCached;
+}
+
+std::string ASE::QueryNewBrowser()
+{
+    std::stringstream reply;
+
+    int               iJoinedPlayers = m_pPlayerManager->CountJoined();
+    int               iMaxPlayers = m_pMainConfig->GetMaxPlayers();
+    SString           strPlayerCount = SString("%d/%d", iJoinedPlayers, iMaxPlayers);
+    SString           strBuildType = SString("%d", MTASA_VERSION_TYPE);
+    SString           strBuildNumber = SString("%d", MTASA_VERSION_BUILD);
+    SFixedString<32>  strPingStatusFixed;
+    SFixedString<32>  strNetRouteFixed;
+    g_pNetServer->GetPingStatus(&strPingStatusFixed);
+    g_pNetServer->GetNetRoute(&strNetRouteFixed);
+    SString strPingStatus = (const char*)strPingStatusFixed;
+    SString strNetRoute = (const char*)strNetRouteFixed;
+    SString strUpTime("%d", (uint)(time(NULL) - m_tStartTime));
+    SString strHttpPort("%d", m_pMainConfig->GetHTTPPort());
+
+    uint uiExtraDataLength = (strPlayerCount.length() + 1 + strBuildType.length() + 1 + strBuildNumber.length() + 1 + strPingStatus.length() + 1 +
+                              strNetRoute.length() + 1 + strUpTime.length() + 1 + strHttpPort.length() + 1);
+    uint uiMaxMapNameLength = 250 - uiExtraDataLength;
+    m_strMapName = m_strMapName.Left(uiMaxMapNameLength);
+
+    reply << "EYE2";
+    // game
+    reply << (unsigned char)4;
+    reply << "mta";
+    // port
+    reply << (unsigned char)(m_strPort.length() + 1);
+    reply << m_strPort;
+    // server name
+    reply << (unsigned char)(m_pMainConfig->GetServerName().length() + 1);
+    reply << m_pMainConfig->GetServerName();
+    // game type
+    reply << (unsigned char)(m_strGameType.length() + 1);
+    reply << m_strGameType;
+    // map name with backwardly compatible large player count, build type and build number
+    reply << (unsigned char)(m_strMapName.length() + 1 + uiExtraDataLength);
+    reply << m_strMapName;
+    reply << (unsigned char)0;
+    reply << strPlayerCount;
+    reply << (unsigned char)0;
+    reply << strBuildType;
+    reply << (unsigned char)0;
+    reply << strBuildNumber;
+    reply << (unsigned char)0;
+    reply << strPingStatus;
+    reply << (unsigned char)0;
+    reply << strNetRoute;
+    reply << (unsigned char)0;
+    reply << strUpTime;
+    reply << (unsigned char)0;
+    reply << strHttpPort;
+    // version
+    std::string temp = MTA_DM_ASE_VERSION;
+    reply << (unsigned char)(temp.length() + 1);
+    reply << temp;
+    // passworded
+    reply << (unsigned char)((m_pMainConfig->HasPassword()) ? 1 : 0);
+    // serial verification?
+    reply << (unsigned char)((m_pMainConfig->GetSerialVerificationEnabled()) ? 1 : 0);
+    // players count
+    reply << (unsigned char)std::min(iJoinedPlayers, 255);
+    // players max
+    reply << (unsigned char)std::min(iMaxPlayers, 255);
+
+    // rules - this informs this response contains them
+    // previous version of this query did not have rules
+    reply << "RULES";
+
+    // send a max of 20 rules
+    list<CASERule*>::iterator rIter = IterBegin();
+    int rulesCount = 0;
+    for (; rIter != IterEnd() && rulesCount < 20; rIter++)
+    {
+        reply << (unsigned char)(strlen((*rIter)->GetKey()) + 1);
+        reply << (*rIter)->GetKey();
+        reply << (unsigned char)(strlen((*rIter)->GetValue()) + 1);
+        reply << (*rIter)->GetValue();
+        rulesCount++;
+    }
+    reply << (unsigned char)1;
+
+    // players
+    CPlayer* pPlayer = NULL;
+
+    // Keep the packet under 1350 bytes to try to avoid fragmentation
+    int iBytesLeft = 1340 - (int)reply.tellp();
+    int iPlayersLeft = iJoinedPlayers;
+
+    list<CPlayer*>::const_iterator pIter = m_pPlayerManager->IterBegin();
+    for (; pIter != m_pPlayerManager->IterEnd(); pIter++)
+    {
+        pPlayer = *pIter;
+        if (pPlayer->IsJoined())
+        {
+            // nick
+            std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
+            if (strPlayerName.length() == 0)
+                strPlayerName = pPlayer->GetNick();
+
+            // Check if we can fit more names
+            iBytesLeft -= strPlayerName.length() + 1;
+            if (iBytesLeft < iPlayersLeft--)
+                strPlayerName = "";
+
+            reply << (unsigned char)(strPlayerName.length() + 1);
+            reply << strPlayerName.c_str();
+        }
+    }
+
+    return reply.str();
 }
 
 std::string ASE::QueryLight()
