@@ -2,8 +2,8 @@ DLL files can be found in `Shared/data/MTA San Andreas/server`.
 That directory gets copied to the "Bin" directory when you run "win-install-data.bat".
 
 The source code for MySQL and OpenSSL used to produce the binaries can be found here:  
-https://github.com/mysql/mysql-server/releases/tag/mysql-8.4.0  
-https://github.com/openssl/openssl/releases/tag/openssl-3.3.1  
+https://github.com/mysql/mysql-server/releases/tag/mysql-8.4.3  
+https://github.com/openssl/openssl/releases/tag/openssl-3.4.0  
 
 ## How to compile OpenSSL
 

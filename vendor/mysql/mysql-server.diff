@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8cd3633b877..21b9f946b2a 100644
+index 7bd3cc1bb37..0e79c02e46a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -54,6 +54,11 @@ IF(WIN32)
@@ -14,7 +14,7 @@ index 8cd3633b877..21b9f946b2a 100644
  ELSEIF(APPLE)
    # Version 3.12.4 is needed because the new build system of Xcode is not
    # supported by cmake. 3.12.4 will force using the legacy build system.
-@@ -661,7 +666,7 @@ MESSAGE(STATUS "SIZEOF_VOIDP ${SIZEOF_VOIDP}")
+@@ -686,7 +691,7 @@ MESSAGE(STATUS "SIZEOF_VOIDP ${SIZEOF_VOIDP}")
  # even if we have configured for 64bit build....
  SET(CMAKE_SIZEOF_VOID_P ${SIZEOF_VOIDP})
  IF(NOT SIZEOF_VOIDP EQUAL 8)
@@ -24,7 +24,7 @@ index 8cd3633b877..21b9f946b2a 100644
  
  INCLUDE(compile_flags)
 diff --git a/cmake/os/Windows.cmake b/cmake/os/Windows.cmake
-index f13bbdf5fff..fee48b56d28 100644
+index 4cb027b8ff9..952b8489324 100644
 --- a/cmake/os/Windows.cmake
 +++ b/cmake/os/Windows.cmake
 @@ -62,6 +62,8 @@ IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
@@ -64,12 +64,12 @@ index 932659d030f..c2e47fc260d 100644
        FIND_FILE(HAVE_CRYPTO_DLL
          NAMES
 diff --git a/extra/libcno/CMakeLists.txt b/extra/libcno/CMakeLists.txt
-index 2cc3a795f59..e1da34163a7 100644
+index 1577bab2d02..07a8527eff4 100644
 --- a/extra/libcno/CMakeLists.txt
 +++ b/extra/libcno/CMakeLists.txt
-@@ -32,9 +32,14 @@ MYSQL_ADD_EXECUTABLE(
+@@ -31,9 +31,14 @@ MYSQL_ADD_EXECUTABLE(
+   cno_huffman_generator.cc
    SKIP_INSTALL
-   EXCLUDE_FROM_ALL
    )
 +IF(WIN32 AND "${CMAKE_GENERATOR_PLATFORM}" STREQUAL "ARM64")
 +  SET(cno_huffman_generator_CMD "${CMAKE_BINARY_DIR}/../build-x64/runtime_output_directory/RelWithDebInfo/cno_huffman_generator.exe")
@@ -83,6 +83,27 @@ index 2cc3a795f59..e1da34163a7 100644
    ARGS "${LIBCNO_GENERATE_DIR}/hpack-data.h"
    DEPENDS
    cno_huffman_generator
+diff --git a/libmysql/CMakeLists.txt b/libmysql/CMakeLists.txt
+index a0ee373a35b..6931af59b21 100644
+--- a/libmysql/CMakeLists.txt
++++ b/libmysql/CMakeLists.txt
+@@ -448,10 +448,15 @@ IF(HAS_WARN_FLAG)
+ ENDIF()
+ 
+ # Verify that libmysql_api_test runs OK
++IF(WIN32 AND "${CMAKE_GENERATOR_PLATFORM}" STREQUAL "ARM64")
++  SET(libmysql_api_test_CMD "${CMAKE_BINARY_DIR}/../build-x64/runtime_output_directory/RelWithDebInfo/libmysql_api_test.exe")
++ELSE()
++  SET(libmysql_api_test_CMD libmysql_api_test)
++ENDIF()
+ ADD_CUSTOM_COMMAND(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/libmysql_api_test.out
+   DEPENDS libmysql_api_test
+-  COMMAND libmysql_api_test
++  COMMAND ${libmysql_api_test_CMD}
+   > ${CMAKE_CURRENT_BINARY_DIR}/libmysql_api_test.out
+   )
+ MY_ADD_CUSTOM_TARGET(run_libmysql_api_test ALL
 diff --git a/scripts/CMakeLists.txt b/scripts/CMakeLists.txt
 index 9ebe10bdb51..4ea0fa5496a 100644
 --- a/scripts/CMakeLists.txt
@@ -237,10 +258,10 @@ index 1d3295e8d4f..08327e3026c 100644
    ${CMAKE_CURRENT_BINARY_DIR}/ALL_SYS_SCHEMA.sql
    sql_commands.h
 diff --git a/sql-common/client.cc b/sql-common/client.cc
-index 891a29a897c..43b9a74c250 100644
+index 9da1e1e164e..27e1072a736 100644
 --- a/sql-common/client.cc
 +++ b/sql-common/client.cc
-@@ -8600,9 +8600,9 @@ int STDCALL mysql_options(MYSQL *mysql, enum mysql_option option,
+@@ -8601,9 +8601,9 @@ int STDCALL mysql_options(MYSQL *mysql, enum mysql_option option,
        mysql->options.report_data_truncation = *static_cast<const bool *>(arg);
        break;
      case MYSQL_OPT_RECONNECT:
@@ -253,7 +274,7 @@ index 891a29a897c..43b9a74c250 100644
        mysql->reconnect = *static_cast<const bool *>(arg);
        break;
      case MYSQL_OPT_BIND:
-@@ -8930,9 +8930,9 @@ int STDCALL mysql_get_option(MYSQL *mysql, enum mysql_option option,
+@@ -8931,9 +8931,9 @@ int STDCALL mysql_get_option(MYSQL *mysql, enum mysql_option option,
            mysql->options.report_data_truncation;
        break;
      case MYSQL_OPT_RECONNECT:
@@ -267,7 +288,7 @@ index 891a29a897c..43b9a74c250 100644
        break;
      case MYSQL_OPT_BIND:
 diff --git a/strings/CMakeLists.txt b/strings/CMakeLists.txt
-index ee363b78bd5..61cfd5890ad 100644
+index 0b314659fdd..b2f1b979193 100644
 --- a/strings/CMakeLists.txt
 +++ b/strings/CMakeLists.txt
 @@ -69,9 +69,15 @@ SET(ZH_HANS_DST_FILE ${CMAKE_BINARY_DIR}/strings/uca900_zh_tbls.cc)
