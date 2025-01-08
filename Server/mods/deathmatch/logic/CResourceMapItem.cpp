@@ -196,7 +196,7 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
 
             if (minClientVersion < CMtaVersion(SERVERSIDE_BUILDING_MIN_CLIENT_VERSION))
             {
-                CLogger::LogPrintf("Resource %s should have client min_mta_version higher or equal than %s\n", m_resource->GetName(),
+                CLogger::LogPrintf("Resource %s should have client min_mta_version higher or equal than %s\n", m_resource->GetName().c_str(),
                                    SERVERSIDE_BUILDING_MIN_CLIENT_VERSION);
                 break;
             }
