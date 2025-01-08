@@ -79,7 +79,7 @@ static unsigned int rtsp_conncheck(struct Curl_easy *data,
                                    unsigned int checks_to_perform);
 
 /* this returns the socket to wait for in the DO and DOING state for the multi
-   interface and then we're always _sending_ a request and thus we wait for
+   interface and then we are always _sending_ a request and thus we wait for
    the single socket to become writable only */
 static int rtsp_getsock_do(struct Curl_easy *data, struct connectdata *conn,
                            curl_socket_t *socks)
@@ -213,6 +213,11 @@ static CURLcode rtsp_done(struct Curl_easy *data,
        (data->conn->proto.rtspc.rtp_channel == -1)) {
       infof(data, "Got an RTP Receive with a CSeq of %ld", CSeq_recv);
     }
+    if(data->set.rtspreq == RTSPREQ_RECEIVE &&
+       data->req.eos_written) {
+      failf(data, "Server prematurely closed the RTSP connection.");
+      return CURLE_RECV_ERROR;
+    }
   }
 
   return httpStatus;
@@ -261,7 +266,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
    * Since all RTSP requests are included here, there is no need to
    * support custom requests like HTTP.
    **/
-  data->req.no_body = TRUE; /* most requests don't contain a body */
+  data->req.no_body = TRUE; /* most requests do not contain a body */
   switch(rtspreq) {
   default:
     failf(data, "Got invalid RTSP request");
@@ -310,13 +315,15 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   }
 
   if(rtspreq == RTSPREQ_RECEIVE) {
-    Curl_xfer_setup(data, FIRSTSOCKET, -1, TRUE, -1);
+    Curl_xfer_setup1(data, CURL_XFER_RECV, -1, TRUE);
     goto out;
   }
 
   p_session_id = data->set.str[STRING_RTSP_SESSION_ID];
   if(!p_session_id &&
-     (rtspreq & ~(RTSPREQ_OPTIONS | RTSPREQ_DESCRIBE | RTSPREQ_SETUP))) {
+     (rtspreq & ~(Curl_RtspReq)(RTSPREQ_OPTIONS |
+                                RTSPREQ_DESCRIBE |
+                                RTSPREQ_SETUP))) {
     failf(data, "Refusing to issue an RTSP request [%s] without a session ID.",
           p_request);
     result = CURLE_BAD_FUNCTION_ARGUMENT;
@@ -357,8 +364,8 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   /* Accept Headers for DESCRIBE requests */
   if(rtspreq == RTSPREQ_DESCRIBE) {
     /* Accept Header */
-    p_accept = Curl_checkheaders(data, STRCONST("Accept"))?
-      NULL:"Accept: application/sdp\r\n";
+    p_accept = Curl_checkheaders(data, STRCONST("Accept")) ?
+      NULL : "Accept: application/sdp\r\n";
 
     /* Accept-Encoding header */
     if(!Curl_checkheaders(data, STRCONST("Accept-Encoding")) &&
@@ -531,8 +538,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
        * actually set a custom Content-Length in the headers */
       if(!Curl_checkheaders(data, STRCONST("Content-Length"))) {
         result =
-          Curl_dyn_addf(&req_buffer,
-                        "Content-Length: %" CURL_FORMAT_CURL_OFF_T"\r\n",
+          Curl_dyn_addf(&req_buffer, "Content-Length: %" FMT_OFF_T"\r\n",
                         req_clen);
         if(result)
           goto out;
@@ -576,7 +582,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   if(result)
     goto out;
 
-  Curl_xfer_setup(data, FIRSTSOCKET, -1, TRUE, FIRSTSOCKET);
+  Curl_xfer_setup1(data, CURL_XFER_SENDRECV, -1, TRUE);
 
   /* issue the request */
   result = Curl_req_send(data, &req_buffer);
@@ -614,7 +620,7 @@ static CURLcode rtp_write_body_junk(struct Curl_easy *data,
   in_body = (data->req.headerline && !rtspc->in_header) &&
             (data->req.size >= 0) &&
             (data->req.bytecount < data->req.size);
-  body_remain = in_body? (data->req.size - data->req.bytecount) : 0;
+  body_remain = in_body ? (data->req.size - data->req.bytecount) : 0;
   DEBUGASSERT(body_remain >= 0);
   if(body_remain) {
     if((curl_off_t)blen > body_remain)
@@ -852,12 +858,12 @@ static CURLcode rtsp_rtp_write_resp(struct Curl_easy *data,
    * In which case we write out the left over bytes, letting the client
    * writer deal with it (it will report EXCESS and fail the transfer). */
   DEBUGF(infof(data, "rtsp_rtp_write_resp(len=%zu, in_header=%d, done=%d "
-               " rtspc->state=%d, req.size=%" CURL_FORMAT_CURL_OFF_T ")",
+               " rtspc->state=%d, req.size=%" FMT_OFF_T ")",
                blen, rtspc->in_header, data->req.done, rtspc->state,
                data->req.size));
   if(!result && (is_eos || blen)) {
     result = Curl_client_write(data, CLIENTWRITE_BODY|
-                               (is_eos? CLIENTWRITE_EOS:0),
+                               (is_eos ? CLIENTWRITE_EOS : 0),
                                (char *)buf, blen);
   }
 
@@ -897,9 +903,9 @@ CURLcode rtp_client_write(struct Curl_easy *data, const char *ptr, size_t len)
     user_ptr = data->set.out;
   }
 
-  Curl_set_in_callback(data, true);
+  Curl_set_in_callback(data, TRUE);
   wrote = writeit((char *)ptr, 1, len, user_ptr);
-  Curl_set_in_callback(data, false);
+  Curl_set_in_callback(data, FALSE);
 
   if(CURL_WRITEFUNC_PAUSE == wrote) {
     failf(data, "Cannot pause RTP");
@@ -950,7 +956,7 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, const char *header)
     /* Find the end of Session ID
      *
      * Allow any non whitespace content, up to the field separator or end of
-     * line. RFC 2326 isn't 100% clear on the session ID and for example
+     * line. RFC 2326 is not 100% clear on the session ID and for example
      * gstreamer does url-encoded session ID's not covered by the standard.
      */
     end = start;
