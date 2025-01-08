@@ -641,7 +641,7 @@ void CHudSA::RenderHealthBar(int x, int y)
 
     // Calc bar width depending on MAX_HEALTH stat
     // We want to maintain the proportions of the bar and its width after changing MAX_HEALTH from 176 to 200
-    static const float baseWidth = barWidth * 100.0f / 176.0f; // 176 is default STAT_10 value
+    const float baseWidth = barWidth * 100.0f / 176.0f; // 176 is default STAT_10 value
     float totalWidth = baseWidth + (((barWidth - baseWidth) / 100.0f) * (maxHealth - 100.0f));
 
     float posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + x);
