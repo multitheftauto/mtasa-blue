@@ -894,8 +894,45 @@ bool CMainConfig::AddMissingSettings()
         // Skip certain optional nodes
         if (templateNodeName == "resource" || templateNodeName == "module")
             continue;
+        
+        // Find node with exact same attributes
+        CXMLAttributes& templateAttributes = templateNode->GetAttributes();
+        CXMLNode*       foundNode = nullptr;
+        for (auto it2 = m_pRootNode->ChildrenBegin(); it2 != m_pRootNode->ChildrenEnd(); ++it2)
+        {
+            CXMLNode* tempNode = *it2;
+            if (tempNode->GetTagName() != templateNodeName)
+                continue;
+            
+            CXMLAttributes& attributes = tempNode->GetAttributes();
+            bool attributesMatch = true;
+            
+            for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
+            {
+                CXMLAttribute* templateAttribute = *it3;
+                const SString& attrName = templateAttribute->GetName();
 
-        CXMLNode* foundNode = m_pRootNode->FindSubNode(templateNodeName.c_str());
+                // Don't check value attribute which is intended to be different
+                if (attrName == "value")
+                    continue;
+                
+                const SString& attrValue = templateAttribute->GetValue();
+        
+                CXMLAttribute* foundAttribute = attributes.Find(attrName);
+                if (!foundAttribute || foundAttribute->GetValue() != attrValue)
+                {
+                    attributesMatch = false;
+                    break;
+                }
+            }
+        
+            if (attributesMatch)
+            {
+                foundNode = tempNode;
+                break;
+            }
+        }
+        
         if (!foundNode)
         {
             const std::string templateNodeValue = templateNode->GetTagContent();
