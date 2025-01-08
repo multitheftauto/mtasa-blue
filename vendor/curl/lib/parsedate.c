@@ -218,7 +218,7 @@ static int checkday(const char *check, size_t len)
     what = &Curl_wkday[0];
   else
     return -1; /* too short */
-  for(i = 0; i<7; i++) {
+  for(i = 0; i < 7; i++) {
     size_t ilen = strlen(what[0]);
     if((ilen == len) &&
        strncasecompare(check, what[0], len))
@@ -235,7 +235,7 @@ static int checkmonth(const char *check, size_t len)
   if(len != 3)
     return -1; /* not a month */
 
-  for(i = 0; i<12; i++) {
+  for(i = 0; i < 12; i++) {
     if(strncasecompare(check, what[0], 3))
       return i;
     what++;
@@ -244,7 +244,7 @@ static int checkmonth(const char *check, size_t len)
 }
 
 /* return the time zone offset between GMT and the input one, in number
-   of seconds or -1 if the timezone wasn't found/legal */
+   of seconds or -1 if the timezone was not found/legal */
 
 static int checktz(const char *check, size_t len)
 {
@@ -253,7 +253,7 @@ static int checktz(const char *check, size_t len)
   if(len > 4) /* longer than any valid timezone */
     return -1;
 
-  for(i = 0; i< sizeof(tz)/sizeof(tz[0]); i++) {
+  for(i = 0; i < sizeof(tz)/sizeof(tz[0]); i++) {
     size_t ilen = strlen(what->name);
     if((ilen == len) &&
        strncasecompare(check, what->name, len))
@@ -265,7 +265,7 @@ static int checktz(const char *check, size_t len)
 
 static void skip(const char **date)
 {
-  /* skip everything that aren't letters or digits */
+  /* skip everything that are not letters or digits */
   while(**date && !ISALNUM(**date))
     (*date)++;
 }
@@ -277,7 +277,7 @@ enum assume {
 };
 
 /*
- * time2epoch: time stamp to seconds since epoch in GMT time zone.  Similar to
+ * time2epoch: time stamp to seconds since epoch in GMT time zone. Similar to
  * mktime but for GMT only.
  */
 static time_t time2epoch(int sec, int min, int hour,
@@ -441,11 +441,11 @@ static int parsedate(const char *date, time_t *output)
         if((tzoff == -1) &&
            ((end - date) == 4) &&
            (val <= 1400) &&
-           (indate< date) &&
+           (indate < date) &&
            ((date[-1] == '+' || date[-1] == '-'))) {
           /* four digits and a value less than or equal to 1400 (to take into
              account all sorts of funny time zone diffs) and it is preceded
-             with a plus or minus. This is a time zone indication.  1400 is
+             with a plus or minus. This is a time zone indication. 1400 is
              picked since +1300 is frequently used and +1400 is mentioned as
              an edge number in the document "ISO C 200X Proposal: Timezone
              Functions" at http://david.tribble.com/text/c0xtimezone.html If
@@ -456,7 +456,7 @@ static int parsedate(const char *date, time_t *output)
 
           /* the + and - prefix indicates the local time compared to GMT,
              this we need their reversed math to get what we want */
-          tzoff = date[-1]=='+'?-tzoff:tzoff;
+          tzoff = date[-1]=='+' ? -tzoff : tzoff;
         }
 
         if(((end - date) == 8) &&
@@ -471,7 +471,7 @@ static int parsedate(const char *date, time_t *output)
         }
 
         if(!found && (dignext == DATE_MDAY) && (mdaynum == -1)) {
-          if((val > 0) && (val<32)) {
+          if((val > 0) && (val < 32)) {
             mdaynum = val;
             found = TRUE;
           }
@@ -521,13 +521,13 @@ static int parsedate(const char *date, time_t *output)
 #if (SIZEOF_TIME_T < 5)
 
 #ifdef HAVE_TIME_T_UNSIGNED
-  /* an unsigned 32 bit time_t can only hold dates to 2106 */
+  /* an unsigned 32-bit time_t can only hold dates to 2106 */
   if(yearnum > 2105) {
     *output = TIME_T_MAX;
     return PARSEDATE_LATER;
   }
 #else
-  /* a signed 32 bit time_t can only hold dates to the beginning of 2038 */
+  /* a signed 32-bit time_t can only hold dates to the beginning of 2038 */
   if(yearnum > 2037) {
     *output = TIME_T_MAX;
     return PARSEDATE_LATER;
@@ -549,7 +549,7 @@ static int parsedate(const char *date, time_t *output)
     return PARSEDATE_FAIL; /* clearly an illegal date */
 
   /* time2epoch() returns a time_t. time_t is often 32 bits, sometimes even on
-     architectures that feature 64 bit 'long' but ultimately time_t is the
+     architectures that feature a 64 bits 'long' but ultimately time_t is the
      correct data type to use.
   */
   t = time2epoch(secnum, minnum, hournum, mdaynum, monnum, yearnum);
