@@ -26,7 +26,7 @@
  * Source file for all GnuTLS-specific code for the TLS/SSL layer. No code
  * but vtls.c should ever call or use these functions.
  *
- * Note: don't use the GnuTLS' *_t variable type names in this source code,
+ * Note: do not use the GnuTLS' *_t variable type names in this source code,
  * since they were not present in 1.0.X.
  */
 
@@ -50,6 +50,7 @@
 #include "vauth/vauth.h"
 #include "parsedate.h"
 #include "connect.h" /* for the connect timeout */
+#include "progress.h"
 #include "select.h"
 #include "strcase.h"
 #include "warnless.h"
@@ -102,13 +103,13 @@ static ssize_t gtls_push(void *s, const void *buf, size_t blen)
   CURLcode result;
 
   DEBUGASSERT(data);
-  nwritten = Curl_conn_cf_send(cf->next, data, buf, blen, &result);
+  nwritten = Curl_conn_cf_send(cf->next, data, buf, blen, FALSE, &result);
   CURL_TRC_CF(data, cf, "gtls_push(len=%zu) -> %zd, err=%d",
               blen, nwritten, result);
   backend->gtls.io_result = result;
   if(nwritten < 0) {
     gnutls_transport_set_errno(backend->gtls.session,
-                               (CURLE_AGAIN == result)? EAGAIN : EINVAL);
+                               (CURLE_AGAIN == result) ? EAGAIN : EINVAL);
     nwritten = -1;
   }
   return nwritten;
@@ -125,7 +126,7 @@ static ssize_t gtls_pull(void *s, void *buf, size_t blen)
   CURLcode result;
 
   DEBUGASSERT(data);
-  if(!backend->gtls.trust_setup) {
+  if(!backend->gtls.shared_creds->trust_setup) {
     result = Curl_gtls_client_trust_setup(cf, data, &backend->gtls);
     if(result) {
       gnutls_transport_set_errno(backend->gtls.session, EINVAL);
@@ -140,7 +141,7 @@ static ssize_t gtls_pull(void *s, void *buf, size_t blen)
   backend->gtls.io_result = result;
   if(nread < 0) {
     gnutls_transport_set_errno(backend->gtls.session,
-                               (CURLE_AGAIN == result)? EAGAIN : EINVAL);
+                               (CURLE_AGAIN == result) ? EAGAIN : EINVAL);
     nread = -1;
   }
   else if(nread == 0)
@@ -159,7 +160,7 @@ static int gtls_init(void)
 {
   int ret = 1;
   if(!gtls_inited) {
-    ret = gnutls_global_init()?0:1;
+    ret = gnutls_global_init() ? 0 : 1;
 #ifdef GTLSDEBUG
     gnutls_global_set_log_function(tls_log_func);
     gnutls_global_set_log_level(2);
@@ -193,7 +194,7 @@ static void showtime(struct Curl_easy *data,
             sizeof(str),
             "  %s: %s, %02d %s %4d %02d:%02d:%02d GMT",
             text,
-            Curl_wkday[tm->tm_wday?tm->tm_wday-1:6],
+            Curl_wkday[tm->tm_wday ? tm->tm_wday-1 : 6],
             tm->tm_mday,
             Curl_month[tm->tm_mon],
             tm->tm_year + 1900,
@@ -251,6 +252,7 @@ static CURLcode handshake(struct Curl_cfilter *cf,
 
   DEBUGASSERT(backend);
   session = backend->gtls.session;
+  connssl->connecting_state = ssl_connect_2;
 
   for(;;) {
     timediff_t timeout_ms;
@@ -265,18 +267,17 @@ static CURLcode handshake(struct Curl_cfilter *cf,
       return CURLE_OPERATION_TIMEDOUT;
     }
 
-    /* if ssl is expecting something, check if it's available. */
-    if(connssl->connecting_state == ssl_connect_2_reading
-       || connssl->connecting_state == ssl_connect_2_writing) {
+    /* if ssl is expecting something, check if it is available. */
+    if(connssl->io_need) {
       int what;
-      curl_socket_t writefd = ssl_connect_2_writing ==
-        connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
-      curl_socket_t readfd = ssl_connect_2_reading ==
-        connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
+      curl_socket_t writefd = (connssl->io_need & CURL_SSL_IO_NEED_SEND) ?
+        sockfd : CURL_SOCKET_BAD;
+      curl_socket_t readfd = (connssl->io_need & CURL_SSL_IO_NEED_RECV) ?
+        sockfd : CURL_SOCKET_BAD;
 
       what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
-                               nonblocking?0:
-                               timeout_ms?timeout_ms:1000);
+                               nonblocking ? 0 :
+                               timeout_ms ? timeout_ms : 1000);
       if(what < 0) {
         /* fatal error */
         failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
@@ -284,7 +285,7 @@ static CURLcode handshake(struct Curl_cfilter *cf,
       }
       else if(0 == what) {
         if(nonblocking)
-          return CURLE_OK;
+          return CURLE_AGAIN;
         else if(timeout_ms) {
           /* timeout */
           failf(data, "SSL connection timeout at %ld", (long)timeout_ms);
@@ -294,10 +295,11 @@ static CURLcode handshake(struct Curl_cfilter *cf,
       /* socket is readable or writable */
     }
 
+    connssl->io_need = CURL_SSL_IO_NEED_NONE;
     backend->gtls.io_result = CURLE_OK;
     rc = gnutls_handshake(session);
 
-    if(!backend->gtls.trust_setup) {
+    if(!backend->gtls.shared_creds->trust_setup) {
       /* After having send off the ClientHello, we prepare the trust
        * store to verify the coming certificate from the server */
       CURLcode result = Curl_gtls_client_trust_setup(cf, data, &backend->gtls);
@@ -306,16 +308,16 @@ static CURLcode handshake(struct Curl_cfilter *cf,
     }
 
     if((rc == GNUTLS_E_AGAIN) || (rc == GNUTLS_E_INTERRUPTED)) {
-      connssl->connecting_state =
-        gnutls_record_get_direction(session)?
-        ssl_connect_2_writing:ssl_connect_2_reading;
+      connssl->io_need =
+        gnutls_record_get_direction(session) ?
+        CURL_SSL_IO_NEED_SEND : CURL_SSL_IO_NEED_RECV;
       continue;
     }
     else if((rc < 0) && !gnutls_error_is_fatal(rc)) {
       const char *strerr = NULL;
 
       if(rc == GNUTLS_E_WARNING_ALERT_RECEIVED) {
-        int alert = gnutls_alert_get(session);
+        gnutls_alert_description_t alert = gnutls_alert_get(session);
         strerr = gnutls_alert_get_name(alert);
       }
 
@@ -332,14 +334,14 @@ static CURLcode handshake(struct Curl_cfilter *cf,
       const char *strerr = NULL;
 
       if(rc == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-        int alert = gnutls_alert_get(session);
+        gnutls_alert_description_t alert = gnutls_alert_get(session);
         strerr = gnutls_alert_get_name(alert);
       }
 
       if(!strerr)
         strerr = gnutls_strerror(rc);
 
-      failf(data, "gnutls_handshake() failed: %s", strerr);
+      failf(data, "GnuTLS, handshake failed: %s", strerr);
       return CURLE_SSL_CONNECT_ERROR;
     }
 
@@ -349,7 +351,7 @@ static CURLcode handshake(struct Curl_cfilter *cf,
   }
 }
 
-static gnutls_x509_crt_fmt_t do_file_type(const char *type)
+static gnutls_x509_crt_fmt_t gnutls_do_file_type(const char *type)
 {
   if(!type || !type[0])
     return GNUTLS_X509_FMT_PEM;
@@ -367,18 +369,24 @@ static gnutls_x509_crt_fmt_t do_file_type(const char *type)
 #define GNUTLS_SRP "+SRP"
 
 static CURLcode
-set_ssl_version_min_max(struct Curl_easy *data,
-                        struct ssl_peer *peer,
-                        struct ssl_primary_config *conn_config,
-                        const char **prioritylist,
-                        const char *tls13support)
+gnutls_set_ssl_version_min_max(struct Curl_easy *data,
+                               struct ssl_peer *peer,
+                               struct ssl_primary_config *conn_config,
+                               const char **prioritylist,
+                               const char *tls13support)
 {
   long ssl_version = conn_config->version;
   long ssl_version_max = conn_config->version_max;
 
+  if((ssl_version == CURL_SSLVERSION_DEFAULT) ||
+     (ssl_version == CURL_SSLVERSION_TLSv1))
+    ssl_version = CURL_SSLVERSION_TLSv1_0;
+  if(ssl_version_max == CURL_SSLVERSION_MAX_NONE)
+    ssl_version_max = CURL_SSLVERSION_MAX_DEFAULT;
+
   if(peer->transport == TRNSPRT_QUIC) {
-    if((ssl_version != CURL_SSLVERSION_DEFAULT) &&
-       (ssl_version < CURL_SSLVERSION_TLSv1_3)) {
+    if((ssl_version_max != CURL_SSLVERSION_MAX_DEFAULT) &&
+       (ssl_version_max < CURL_SSLVERSION_MAX_TLSv1_3)) {
       failf(data, "QUIC needs at least TLS version 1.3");
       return CURLE_SSL_CONNECT_ERROR;
      }
@@ -386,13 +394,8 @@ set_ssl_version_min_max(struct Curl_easy *data,
     return CURLE_OK;
   }
 
-  if((ssl_version == CURL_SSLVERSION_DEFAULT) ||
-     (ssl_version == CURL_SSLVERSION_TLSv1))
-    ssl_version = CURL_SSLVERSION_TLSv1_0;
-  if(ssl_version_max == CURL_SSLVERSION_MAX_NONE)
-    ssl_version_max = CURL_SSLVERSION_MAX_DEFAULT;
   if(!tls13support) {
-    /* If the running GnuTLS doesn't support TLS 1.3, we must not specify a
+    /* If the running GnuTLS does not support TLS 1.3, we must not specify a
        prioritylist involving that since it will make GnuTLS return an en
        error back at us */
     if((ssl_version_max == CURL_SSLVERSION_MAX_TLSv1_3) ||
@@ -450,36 +453,83 @@ set_ssl_version_min_max(struct Curl_easy *data,
   return CURLE_SSL_CONNECT_ERROR;
 }
 
-CURLcode Curl_gtls_client_trust_setup(struct Curl_cfilter *cf,
-                                      struct Curl_easy *data,
-                                      struct gtls_ctx *gtls)
+CURLcode Curl_gtls_shared_creds_create(struct Curl_easy *data,
+                                       struct gtls_shared_creds **pcreds)
+{
+  struct gtls_shared_creds *shared;
+  int rc;
+
+  *pcreds = NULL;
+  shared = calloc(1, sizeof(*shared));
+  if(!shared)
+    return CURLE_OUT_OF_MEMORY;
+
+  rc = gnutls_certificate_allocate_credentials(&shared->creds);
+  if(rc != GNUTLS_E_SUCCESS) {
+    failf(data, "gnutls_cert_all_cred() failed: %s", gnutls_strerror(rc));
+    free(shared);
+    return CURLE_SSL_CONNECT_ERROR;
+  }
+
+  shared->refcount = 1;
+  shared->time = Curl_now();
+  *pcreds = shared;
+  return CURLE_OK;
+}
+
+CURLcode Curl_gtls_shared_creds_up_ref(struct gtls_shared_creds *creds)
+{
+  DEBUGASSERT(creds);
+  if(creds->refcount < SIZE_T_MAX) {
+    ++creds->refcount;
+    return CURLE_OK;
+  }
+  return CURLE_BAD_FUNCTION_ARGUMENT;
+}
+
+void Curl_gtls_shared_creds_free(struct gtls_shared_creds **pcreds)
+{
+  struct gtls_shared_creds *shared = *pcreds;
+  *pcreds = NULL;
+  if(shared) {
+    --shared->refcount;
+    if(!shared->refcount) {
+      gnutls_certificate_free_credentials(shared->creds);
+      free(shared->CAfile);
+      free(shared);
+    }
+  }
+}
+
+static CURLcode gtls_populate_creds(struct Curl_cfilter *cf,
+                                    struct Curl_easy *data,
+                                    gnutls_certificate_credentials_t creds)
 {
   struct ssl_primary_config *config = Curl_ssl_cf_get_primary_config(cf);
   struct ssl_config_data *ssl_config = Curl_ssl_cf_get_config(cf, data);
   int rc;
 
-  CURL_TRC_CF(data, cf, "setup trust anchors and CRLs");
   if(config->verifypeer) {
-    bool imported_native_ca = false;
+    bool imported_native_ca = FALSE;
 
     if(ssl_config->native_ca_store) {
-      rc = gnutls_certificate_set_x509_system_trust(gtls->cred);
+      rc = gnutls_certificate_set_x509_system_trust(creds);
       if(rc < 0)
         infof(data, "error reading native ca store (%s), continuing anyway",
               gnutls_strerror(rc));
       else {
         infof(data, "found %d certificates in native ca store", rc);
         if(rc > 0)
-          imported_native_ca = true;
+          imported_native_ca = TRUE;
       }
     }
 
     if(config->CAfile) {
       /* set the trusted CA cert bundle file */
-      gnutls_certificate_set_verify_flags(gtls->cred,
+      gnutls_certificate_set_verify_flags(creds,
                                           GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
-      rc = gnutls_certificate_set_x509_trust_file(gtls->cred,
+      rc = gnutls_certificate_set_x509_trust_file(creds,
                                                   config->CAfile,
                                                   GNUTLS_X509_FMT_PEM);
       if(rc < 0) {
@@ -497,8 +547,7 @@ CURLcode Curl_gtls_client_trust_setup(struct Curl_cfilter *cf,
 
     if(config->CApath) {
       /* set the trusted CA cert directory */
-      rc = gnutls_certificate_set_x509_trust_dir(gtls->cred,
-                                                 config->CApath,
+      rc = gnutls_certificate_set_x509_trust_dir(creds, config->CApath,
                                                  GNUTLS_X509_FMT_PEM);
       if(rc < 0) {
         infof(data, "error reading ca cert file %s (%s)%s",
@@ -516,8 +565,7 @@ CURLcode Curl_gtls_client_trust_setup(struct Curl_cfilter *cf,
 
   if(config->CRLfile) {
     /* set the CRL list file */
-    rc = gnutls_certificate_set_x509_crl_file(gtls->cred,
-                                              config->CRLfile,
+    rc = gnutls_certificate_set_x509_crl_file(creds, config->CRLfile,
                                               GNUTLS_X509_FMT_PEM);
     if(rc < 0) {
       failf(data, "error reading crl file %s (%s)",
@@ -528,7 +576,141 @@ CURLcode Curl_gtls_client_trust_setup(struct Curl_cfilter *cf,
       infof(data, "found %d CRL in %s", rc, config->CRLfile);
   }
 
-  gtls->trust_setup = TRUE;
+  return CURLE_OK;
+}
+
+/* key to use at `multi->proto_hash` */
+#define MPROTO_GTLS_X509_KEY   "tls:gtls:x509:share"
+
+static bool gtls_shared_creds_expired(const struct Curl_easy *data,
+                                      const struct gtls_shared_creds *sc)
+{
+  const struct ssl_general_config *cfg = &data->set.general_ssl;
+  struct curltime now = Curl_now();
+  timediff_t elapsed_ms = Curl_timediff(now, sc->time);
+  timediff_t timeout_ms = cfg->ca_cache_timeout * (timediff_t)1000;
+
+  if(timeout_ms < 0)
+    return FALSE;
+
+  return elapsed_ms >= timeout_ms;
+}
+
+static bool gtls_shared_creds_different(struct Curl_cfilter *cf,
+                                        const struct gtls_shared_creds *sc)
+{
+  struct ssl_primary_config *conn_config = Curl_ssl_cf_get_primary_config(cf);
+  if(!sc->CAfile || !conn_config->CAfile)
+    return sc->CAfile != conn_config->CAfile;
+
+  return strcmp(sc->CAfile, conn_config->CAfile);
+}
+
+static struct gtls_shared_creds*
+gtls_get_cached_creds(struct Curl_cfilter *cf, struct Curl_easy *data)
+{
+  struct gtls_shared_creds *shared_creds;
+
+  if(data->multi) {
+    shared_creds = Curl_hash_pick(&data->multi->proto_hash,
+                                  (void *)MPROTO_GTLS_X509_KEY,
+                                  sizeof(MPROTO_GTLS_X509_KEY)-1);
+     if(shared_creds && shared_creds->creds &&
+        !gtls_shared_creds_expired(data, shared_creds) &&
+        !gtls_shared_creds_different(cf, shared_creds)) {
+       return shared_creds;
+     }
+  }
+  return NULL;
+}
+
+static void gtls_shared_creds_hash_free(void *key, size_t key_len, void *p)
+{
+  struct gtls_shared_creds *sc = p;
+  DEBUGASSERT(key_len == (sizeof(MPROTO_GTLS_X509_KEY)-1));
+  DEBUGASSERT(!memcmp(MPROTO_GTLS_X509_KEY, key, key_len));
+  (void)key;
+  (void)key_len;
+  Curl_gtls_shared_creds_free(&sc); /* down reference */
+}
+
+static void gtls_set_cached_creds(struct Curl_cfilter *cf,
+                                  struct Curl_easy *data,
+                                  struct gtls_shared_creds *sc)
+{
+  struct ssl_primary_config *conn_config = Curl_ssl_cf_get_primary_config(cf);
+
+  DEBUGASSERT(sc);
+  DEBUGASSERT(sc->creds);
+  DEBUGASSERT(!sc->CAfile);
+  DEBUGASSERT(sc->refcount == 1);
+  if(!data->multi)
+    return;
+
+  if(conn_config->CAfile) {
+    sc->CAfile = strdup(conn_config->CAfile);
+    if(!sc->CAfile)
+      return;
+  }
+
+  if(Curl_gtls_shared_creds_up_ref(sc))
+    return;
+
+  if(!Curl_hash_add2(&data->multi->proto_hash,
+                    (void *)MPROTO_GTLS_X509_KEY,
+                    sizeof(MPROTO_GTLS_X509_KEY)-1,
+                    sc, gtls_shared_creds_hash_free)) {
+    Curl_gtls_shared_creds_free(&sc); /* down reference again */
+    return;
+  }
+}
+
+CURLcode Curl_gtls_client_trust_setup(struct Curl_cfilter *cf,
+                                      struct Curl_easy *data,
+                                      struct gtls_ctx *gtls)
+{
+  struct ssl_primary_config *conn_config = Curl_ssl_cf_get_primary_config(cf);
+  struct ssl_config_data *ssl_config = Curl_ssl_cf_get_config(cf, data);
+  struct gtls_shared_creds *cached_creds = NULL;
+  bool cache_criteria_met;
+  CURLcode result;
+  int rc;
+
+
+  /* Consider the X509 store cacheable if it comes exclusively from a CAfile,
+     or no source is provided and we are falling back to OpenSSL's built-in
+     default. */
+  cache_criteria_met = (data->set.general_ssl.ca_cache_timeout != 0) &&
+    conn_config->verifypeer &&
+    !conn_config->CApath &&
+    !conn_config->ca_info_blob &&
+    !ssl_config->primary.CRLfile &&
+    !ssl_config->native_ca_store &&
+    !conn_config->clientcert; /* GnuTLS adds client cert to its credentials! */
+
+  if(cache_criteria_met)
+    cached_creds = gtls_get_cached_creds(cf, data);
+
+  if(cached_creds && !Curl_gtls_shared_creds_up_ref(cached_creds)) {
+    CURL_TRC_CF(data, cf, "using shared trust anchors and CRLs");
+    Curl_gtls_shared_creds_free(&gtls->shared_creds);
+    gtls->shared_creds = cached_creds;
+    rc = gnutls_credentials_set(gtls->session, GNUTLS_CRD_CERTIFICATE,
+                                gtls->shared_creds->creds);
+    if(rc != GNUTLS_E_SUCCESS) {
+      failf(data, "gnutls_credentials_set() failed: %s", gnutls_strerror(rc));
+      return CURLE_SSL_CONNECT_ERROR;
+    }
+  }
+  else {
+    CURL_TRC_CF(data, cf, "loading trust anchors and CRLs");
+    result = gtls_populate_creds(cf, data, gtls->shared_creds->creds);
+    if(result)
+      return result;
+    gtls->shared_creds->trust_setup = TRUE;
+    if(cache_criteria_met)
+      gtls_set_cached_creds(cf, data, gtls->shared_creds);
+  }
   return CURLE_OK;
 }
 
@@ -538,54 +720,55 @@ static void gtls_sessionid_free(void *sessionid, size_t idsize)
   free(sessionid);
 }
 
-static CURLcode gtls_update_session_id(struct Curl_cfilter *cf,
-                                       struct Curl_easy *data,
-                                       gnutls_session_t session)
+CURLcode Curl_gtls_update_session_id(struct Curl_cfilter *cf,
+                                     struct Curl_easy *data,
+                                     gnutls_session_t session,
+                                     struct ssl_peer *peer,
+                                     const char *alpn)
 {
   struct ssl_config_data *ssl_config = Curl_ssl_cf_get_config(cf, data);
-  struct ssl_connect_data *connssl = cf->ctx;
+  void *connect_sessionid;
+  size_t connect_idsize = 0;
   CURLcode result = CURLE_OK;
 
-  if(ssl_config->primary.sessionid) {
-    /* we always unconditionally get the session id here, as even if we
-       already got it from the cache and asked to use it in the connection, it
-       might've been rejected and then a new one is in use now and we need to
-       detect that. */
-    void *connect_sessionid;
-    size_t connect_idsize = 0;
+  if(!ssl_config->primary.cache_session)
+    return CURLE_OK;
 
-    /* get the session ID data size */
-    gnutls_session_get_data(session, NULL, &connect_idsize);
-    connect_sessionid = malloc(connect_idsize); /* get a buffer for it */
-    if(!connect_sessionid) {
-      return CURLE_OUT_OF_MEMORY;
-    }
-    else {
-      bool incache;
-      void *ssl_sessionid;
+  /* we always unconditionally get the session id here, as even if we
+     already got it from the cache and asked to use it in the connection, it
+     might've been rejected and then a new one is in use now and we need to
+     detect that. */
 
-      /* extract session ID to the allocated buffer */
-      gnutls_session_get_data(session, connect_sessionid, &connect_idsize);
+  /* get the session ID data size */
+  gnutls_session_get_data(session, NULL, &connect_idsize);
+  if(!connect_idsize) /* gnutls does this for some version combinations */
+    return CURLE_OK;
 
-      DEBUGF(infof(data, "get session id (len=%zu) and store in cache",
-                   connect_idsize));
-      Curl_ssl_sessionid_lock(data);
-      incache = !(Curl_ssl_getsessionid(cf, data, &connssl->peer,
-                                        &ssl_sessionid, NULL));
-      if(incache) {
-        /* there was one before in the cache, so instead of risking that the
-           previous one was rejected, we just kill that and store the new */
-        Curl_ssl_delsessionid(data, ssl_sessionid);
-      }
+  connect_sessionid = malloc(connect_idsize); /* get a buffer for it */
+  if(!connect_sessionid)
+    return CURLE_OUT_OF_MEMORY;
 
-      /* store this session id, takes ownership */
-      result = Curl_ssl_addsessionid(cf, data, &connssl->peer,
-                                     connect_sessionid, connect_idsize,
-                                     gtls_sessionid_free);
-      Curl_ssl_sessionid_unlock(data);
-    }
-  }
+  /* extract session ID to the allocated buffer */
+  gnutls_session_get_data(session, connect_sessionid, &connect_idsize);
+
+  CURL_TRC_CF(data, cf, "get session id (len=%zu, alpn=%s) and store in cache",
+              connect_idsize, alpn ? alpn : "-");
+  Curl_ssl_sessionid_lock(data);
+  /* store this session id, takes ownership */
+  result = Curl_ssl_set_sessionid(cf, data, peer, alpn,
+                                  connect_sessionid, connect_idsize,
+                                  gtls_sessionid_free);
+  Curl_ssl_sessionid_unlock(data);
   return result;
+}
+
+static CURLcode cf_gtls_update_session_id(struct Curl_cfilter *cf,
+                                          struct Curl_easy *data,
+                                          gnutls_session_t session)
+{
+  struct ssl_connect_data *connssl = cf->ctx;
+  return Curl_gtls_update_session_id(cf, data, session, &connssl->peer,
+                                     connssl->alpn_negotiated);
 }
 
 static int gtls_handshake_cb(gnutls_session_t session, unsigned int htype,
@@ -599,11 +782,11 @@ static int gtls_handshake_cb(gnutls_session_t session, unsigned int htype,
   if(when) { /* after message has been processed */
     struct Curl_easy *data = CF_DATA_CURRENT(cf);
     if(data) {
-      DEBUGF(infof(data, "handshake: %s message type %d",
-             incoming? "incoming" : "outgoing", htype));
+      CURL_TRC_CF(data, cf, "handshake: %s message type %d",
+                  incoming ? "incoming" : "outgoing", htype);
       switch(htype) {
       case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET: {
-        gtls_update_session_id(cf, data, session);
+        cf_gtls_update_session_id(cf, data, session);
         break;
       }
       default:
@@ -639,12 +822,10 @@ static CURLcode gtls_client_init(struct Curl_cfilter *cf,
   else if(config->version == CURL_SSLVERSION_SSLv3)
     sni = FALSE; /* SSLv3 has no SNI */
 
-  /* allocate a cred struct */
-  rc = gnutls_certificate_allocate_credentials(&gtls->cred);
-  if(rc != GNUTLS_E_SUCCESS) {
-    failf(data, "gnutls_cert_all_cred() failed: %s", gnutls_strerror(rc));
-    return CURLE_SSL_CONNECT_ERROR;
-  }
+  /* allocate a shared creds struct */
+  result = Curl_gtls_shared_creds_create(data, &gtls->shared_creds);
+  if(result)
+    return result;
 
 #ifdef USE_GNUTLS_SRP
   if(config->username && Curl_auth_allowed_to_host(data)) {
@@ -677,9 +858,20 @@ static CURLcode gtls_client_init(struct Curl_cfilter *cf,
   init_flags |= GNUTLS_FORCE_CLIENT_CERT;
 #endif
 
-#if defined(GNUTLS_NO_TICKETS)
-  /* Disable TLS session tickets */
-  init_flags |= GNUTLS_NO_TICKETS;
+#if defined(GNUTLS_NO_TICKETS_TLS12)
+    init_flags |= GNUTLS_NO_TICKETS_TLS12;
+#elif defined(GNUTLS_NO_TICKETS)
+  /* Disable TLS session tickets for non 1.3 connections */
+  if((config->version != CURL_SSLVERSION_TLSv1_3) &&
+     (config->version != CURL_SSLVERSION_DEFAULT))
+    init_flags |= GNUTLS_NO_TICKETS;
+#endif
+
+#if defined(GNUTLS_NO_STATUS_REQUEST)
+  if(!config->verifystatus)
+    /* Disable the "status_request" TLS extension, enabled by default since
+       GnuTLS 3.8.0. */
+    init_flags |= GNUTLS_NO_STATUS_REQUEST;
 #endif
 
   rc = gnutls_init(&gtls->session, init_flags);
@@ -705,7 +897,7 @@ static CURLcode gtls_client_init(struct Curl_cfilter *cf,
   tls13support = gnutls_check_version("3.6.5");
 
   /* Ensure +SRP comes at the *end* of all relevant strings so that it can be
-   * removed if a run-time error indicates that SRP is not supported by this
+   * removed if a runtime error indicates that SRP is not supported by this
    * GnuTLS version */
 
   if(config->version == CURL_SSLVERSION_SSLv2 ||
@@ -722,8 +914,8 @@ static CURLcode gtls_client_init(struct Curl_cfilter *cf,
   }
 
   /* At this point we know we have a supported TLS version, so set it */
-  result = set_ssl_version_min_max(data, peer,
-                                   config, &prioritylist, tls13support);
+  result = gnutls_set_ssl_version_min_max(data, peer,
+                                          config, &prioritylist, tls13support);
   if(result)
     return result;
 
@@ -756,22 +948,34 @@ static CURLcode gtls_client_init(struct Curl_cfilter *cf,
   }
 
   if(config->clientcert) {
-    if(!gtls->trust_setup) {
+    if(!gtls->shared_creds->trust_setup) {
       result = Curl_gtls_client_trust_setup(cf, data, gtls);
       if(result)
         return result;
     }
-    if(ssl_config->key_passwd) {
+    if(ssl_config->cert_type && strcasecompare(ssl_config->cert_type, "P12")) {
+      rc = gnutls_certificate_set_x509_simple_pkcs12_file(
+        gtls->shared_creds->creds, config->clientcert, GNUTLS_X509_FMT_DER,
+        ssl_config->key_passwd ? ssl_config->key_passwd : "");
+      if(rc != GNUTLS_E_SUCCESS) {
+        failf(data,
+              "error reading X.509 potentially-encrypted key or certificate "
+              "file: %s",
+              gnutls_strerror(rc));
+        return CURLE_SSL_CONNECT_ERROR;
+      }
+    }
+    else if(ssl_config->key_passwd) {
       const unsigned int supported_key_encryption_algorithms =
         GNUTLS_PKCS_USE_PKCS12_3DES | GNUTLS_PKCS_USE_PKCS12_ARCFOUR |
         GNUTLS_PKCS_USE_PKCS12_RC2_40 | GNUTLS_PKCS_USE_PBES2_3DES |
         GNUTLS_PKCS_USE_PBES2_AES_128 | GNUTLS_PKCS_USE_PBES2_AES_192 |
         GNUTLS_PKCS_USE_PBES2_AES_256;
       rc = gnutls_certificate_set_x509_key_file2(
-           gtls->cred,
+           gtls->shared_creds->creds,
            config->clientcert,
            ssl_config->key ? ssl_config->key : config->clientcert,
-           do_file_type(ssl_config->cert_type),
+           gnutls_do_file_type(ssl_config->cert_type),
            ssl_config->key_passwd,
            supported_key_encryption_algorithms);
       if(rc != GNUTLS_E_SUCCESS) {
@@ -783,10 +987,10 @@ static CURLcode gtls_client_init(struct Curl_cfilter *cf,
     }
     else {
       if(gnutls_certificate_set_x509_key_file(
-           gtls->cred,
+           gtls->shared_creds->creds,
            config->clientcert,
            ssl_config->key ? ssl_config->key : config->clientcert,
-           do_file_type(ssl_config->cert_type) ) !=
+           gnutls_do_file_type(ssl_config->cert_type) ) !=
          GNUTLS_E_SUCCESS) {
         failf(data, "error reading X.509 key or certificate file");
         return CURLE_SSL_CONNECT_ERROR;
@@ -808,7 +1012,7 @@ static CURLcode gtls_client_init(struct Curl_cfilter *cf,
 #endif
   {
     rc = gnutls_credentials_set(gtls->session, GNUTLS_CRD_CERTIFICATE,
-                                gtls->cred);
+                                gtls->shared_creds->creds);
     if(rc != GNUTLS_E_SUCCESS) {
       failf(data, "gnutls_credentials_set() failed: %s", gnutls_strerror(rc));
       return CURLE_SSL_CONNECT_ERROR;
@@ -847,11 +1051,15 @@ CURLcode Curl_gtls_ctx_init(struct gtls_ctx *gctx,
                             struct Curl_easy *data,
                             struct ssl_peer *peer,
                             const unsigned char *alpn, size_t alpn_len,
+                            struct ssl_connect_data *connssl,
                             Curl_gtls_ctx_setup_cb *cb_setup,
                             void *cb_user_data,
                             void *ssl_user_data)
 {
   struct ssl_primary_config *conn_config = Curl_ssl_cf_get_primary_config(cf);
+  struct ssl_config_data *ssl_config = Curl_ssl_cf_get_config(cf, data);
+  gnutls_datum_t gtls_alpns[5];
+  size_t gtls_alpns_count = 0;
   CURLcode result;
 
   DEBUGASSERT(gctx);
@@ -874,52 +1082,91 @@ CURLcode Curl_gtls_ctx_init(struct gtls_ctx *gctx,
     gnutls_session_set_keylog_function(gctx->session, keylog_callback);
   }
 
-  /* convert the ALPN string from our arguments to a list of strings
-   * that gnutls wants and will convert internally back to this very
-   * string for sending to the server. nice. */
-  if(alpn && alpn_len) {
-    gnutls_datum_t alpns[5];
-    size_t i, alen = alpn_len;
-    unsigned char *s = (unsigned char *)alpn;
-    unsigned char slen;
-    for(i = 0; (i < ARRAYSIZE(alpns)) && alen; ++i) {
-      slen = s[0];
-      if(slen >= alen)
-        return CURLE_FAILED_INIT;
-      alpns[i].data = s + 1;
-      alpns[i].size = slen;
-      s += slen + 1;
-      alen -= (size_t)slen + 1;
-    }
-    if(alen) /* not all alpn chars used, wrong format or too many */
-        return CURLE_FAILED_INIT;
-    if(i && gnutls_alpn_set_protocols(gctx->session,
-                                      alpns, (unsigned int)i,
-                                      GNUTLS_ALPN_MANDATORY)) {
-      failf(data, "failed setting ALPN");
-      return CURLE_SSL_CONNECT_ERROR;
-    }
-  }
-
   /* This might be a reconnect, so we check for a session ID in the cache
      to speed up things */
-  if(conn_config->sessionid) {
+  if(conn_config->cache_session) {
     void *ssl_sessionid;
     size_t ssl_idsize;
-
+    char *session_alpn;
     Curl_ssl_sessionid_lock(data);
-    if(!Curl_ssl_getsessionid(cf, data, peer, &ssl_sessionid, &ssl_idsize)) {
+    if(!Curl_ssl_getsessionid(cf, data, peer,
+                              &ssl_sessionid, &ssl_idsize, &session_alpn)) {
       /* we got a session id, use it! */
       int rc;
 
       rc = gnutls_session_set_data(gctx->session, ssl_sessionid, ssl_idsize);
       if(rc < 0)
         infof(data, "SSL failed to set session ID");
-      else
-        infof(data, "SSL reusing session ID (size=%zu)", ssl_idsize);
+      else {
+        infof(data, "SSL reusing session ID (size=%zu, alpn=%s)",
+              ssl_idsize, session_alpn ? session_alpn : "-");
+#ifdef DEBUGBUILD
+        if((ssl_config->earlydata || !!getenv("CURL_USE_EARLYDATA")) &&
+#else
+        if(ssl_config->earlydata &&
+#endif
+           !cf->conn->connect_only && connssl &&
+           (gnutls_protocol_get_version(gctx->session) == GNUTLS_TLS1_3) &&
+           Curl_alpn_contains_proto(connssl->alpn, session_alpn)) {
+          connssl->earlydata_max =
+            gnutls_record_get_max_early_data_size(gctx->session);
+          if((!connssl->earlydata_max ||
+              connssl->earlydata_max == 0xFFFFFFFFUL)) {
+            /* Seems to be GnuTLS way to signal no EarlyData in session */
+            CURL_TRC_CF(data, cf, "TLS session does not allow earlydata");
+          }
+          else {
+            CURL_TRC_CF(data, cf, "TLS session allows %zu earlydata bytes, "
+                        "reusing ALPN '%s'",
+                        connssl->earlydata_max, session_alpn);
+            connssl->earlydata_state = ssl_earlydata_use;
+            connssl->state = ssl_connection_deferred;
+            result = Curl_alpn_set_negotiated(cf, data, connssl,
+                            (const unsigned char *)session_alpn,
+                            session_alpn ? strlen(session_alpn) : 0);
+            if(result)
+              return result;
+            /* We only try the ALPN protocol the session used before,
+             * otherwise we might send early data for the wrong protocol */
+            gtls_alpns[0].data = (unsigned char *)session_alpn;
+            gtls_alpns[0].size = (unsigned)strlen(session_alpn);
+            gtls_alpns_count = 1;
+          }
+        }
+      }
     }
     Curl_ssl_sessionid_unlock(data);
   }
+
+  /* convert the ALPN string from our arguments to a list of strings that
+   * gnutls wants and will convert internally back to this string for sending
+   * to the server. nice. */
+  if(!gtls_alpns_count && alpn && alpn_len) {
+    size_t i, alen = alpn_len;
+    unsigned char *s = (unsigned char *)alpn;
+    unsigned char slen;
+    for(i = 0; (i < ARRAYSIZE(gtls_alpns)) && alen; ++i) {
+      slen = s[0];
+      if(slen >= alen)
+        return CURLE_FAILED_INIT;
+      gtls_alpns[i].data = s + 1;
+      gtls_alpns[i].size = slen;
+      s += slen + 1;
+      alen -= (size_t)slen + 1;
+    }
+    if(alen) /* not all alpn chars used, wrong format or too many */
+        return CURLE_FAILED_INIT;
+    gtls_alpns_count = i;
+  }
+
+  if(gtls_alpns_count &&
+     gnutls_alpn_set_protocols(gctx->session,
+                               gtls_alpns, (unsigned int)gtls_alpns_count,
+                               GNUTLS_ALPN_MANDATORY)) {
+    failf(data, "failed setting ALPN");
+    return CURLE_SSL_CONNECT_ERROR;
+  }
+
   return CURLE_OK;
 }
 
@@ -950,9 +1197,14 @@ gtls_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
   }
 
   result = Curl_gtls_ctx_init(&backend->gtls, cf, data, &connssl->peer,
-                              proto.data, proto.len, NULL, NULL, cf);
+                              proto.data, proto.len, connssl, NULL, NULL, cf);
   if(result)
     return result;
+
+  if(connssl->alpn && (connssl->state != ssl_connection_deferred)) {
+    Curl_alpn_to_proto_str(&proto, connssl->alpn);
+    infof(data, VTLS_INFOF_ALPN_OFFER_1STR, proto.data);
+  }
 
   gnutls_handshake_set_hook_function(backend->gtls.session,
                                      GNUTLS_HANDSHAKE_ANY, GNUTLS_HOOK_POST,
@@ -979,7 +1231,7 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
   /* Result is returned to caller */
   CURLcode result = CURLE_SSL_PINNEDPUBKEYNOTMATCH;
 
-  /* if a path wasn't specified, don't pin */
+  /* if a path was not specified, do not pin */
   if(!pinnedpubkey)
     return CURLE_OK;
 
@@ -1045,7 +1297,7 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
 #ifndef CURL_DISABLE_VERBOSE_STRINGS
   const char *ptr;
-  unsigned int algo;
+  int algo;
   unsigned int bits;
   gnutls_protocol_t version = gnutls_protocol_get_version(session);
 #endif
@@ -1087,13 +1339,13 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
       }
 #endif
     }
-    infof(data, " common name: WARNING couldn't obtain");
+    infof(data, " common name: WARNING could not obtain");
   }
 
   if(data->set.ssl.certinfo && chainp) {
     unsigned int i;
 
-    result = Curl_ssl_init_certinfo(data, cert_list_size);
+    result = Curl_ssl_init_certinfo(data, (int)cert_list_size);
     if(result)
       return result;
 
@@ -1101,7 +1353,7 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
       const char *beg = (const char *) chainp[i].data;
       const char *end = beg + chainp[i].size;
 
-      result = Curl_extract_certinfo(data, i, beg, end);
+      result = Curl_extract_certinfo(data, (int)i, beg, end);
       if(result)
         return result;
     }
@@ -1127,9 +1379,18 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
     /* verify_status is a bitmask of gnutls_certificate_status bits */
     if(verify_status & GNUTLS_CERT_INVALID) {
       if(config->verifypeer) {
-        failf(data, "server certificate verification failed. CAfile: %s "
-              "CRLfile: %s", config->CAfile ? config->CAfile:
-              "none",
+        const char *cause = "certificate error, no details available";
+        if(verify_status & GNUTLS_CERT_EXPIRED)
+          cause = "certificate has expired";
+        else if(verify_status & GNUTLS_CERT_SIGNER_NOT_FOUND)
+          cause = "certificate signer not trusted";
+        else if(verify_status & GNUTLS_CERT_INSECURE_ALGORITHM)
+          cause = "certificate uses insecure algorithm";
+        else if(verify_status & GNUTLS_CERT_INVALID_OCSP_STATUS)
+          cause = "attached OCSP status response is invalid";
+        failf(data, "server verification failed: %s. (CAfile: %s "
+              "CRLfile: %s)", cause,
+              config->CAfile ? config->CAfile : "none",
               ssl_config->primary.CRLfile ?
               ssl_config->primary.CRLfile : "none");
         return CURLE_PEER_FAILED_VERIFICATION;
@@ -1144,104 +1405,97 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
     infof(data, "  server certificate verification SKIPPED");
 
   if(config->verifystatus) {
-    if(gnutls_ocsp_status_request_is_checked(session, 0) == 0) {
-      gnutls_datum_t status_request;
-      gnutls_ocsp_resp_t ocsp_resp;
+    gnutls_datum_t status_request;
+    gnutls_ocsp_resp_t ocsp_resp;
+    gnutls_ocsp_cert_status_t status;
+    gnutls_x509_crl_reason_t reason;
 
-      gnutls_ocsp_cert_status_t status;
-      gnutls_x509_crl_reason_t reason;
+    rc = gnutls_ocsp_status_request_get(session, &status_request);
 
-      rc = gnutls_ocsp_status_request_get(session, &status_request);
-
-      infof(data, " server certificate status verification FAILED");
-
-      if(rc == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-        failf(data, "No OCSP response received");
-        return CURLE_SSL_INVALIDCERTSTATUS;
-      }
-
-      if(rc < 0) {
-        failf(data, "Invalid OCSP response received");
-        return CURLE_SSL_INVALIDCERTSTATUS;
-      }
-
-      gnutls_ocsp_resp_init(&ocsp_resp);
-
-      rc = gnutls_ocsp_resp_import(ocsp_resp, &status_request);
-      if(rc < 0) {
-        failf(data, "Invalid OCSP response received");
-        return CURLE_SSL_INVALIDCERTSTATUS;
-      }
-
-      (void)gnutls_ocsp_resp_get_single(ocsp_resp, 0, NULL, NULL, NULL, NULL,
-                                        &status, NULL, NULL, NULL, &reason);
-
-      switch(status) {
-      case GNUTLS_OCSP_CERT_GOOD:
-        break;
-
-      case GNUTLS_OCSP_CERT_REVOKED: {
-        const char *crl_reason;
-
-        switch(reason) {
-          default:
-          case GNUTLS_X509_CRLREASON_UNSPECIFIED:
-            crl_reason = "unspecified reason";
-            break;
-
-          case GNUTLS_X509_CRLREASON_KEYCOMPROMISE:
-            crl_reason = "private key compromised";
-            break;
-
-          case GNUTLS_X509_CRLREASON_CACOMPROMISE:
-            crl_reason = "CA compromised";
-            break;
-
-          case GNUTLS_X509_CRLREASON_AFFILIATIONCHANGED:
-            crl_reason = "affiliation has changed";
-            break;
-
-          case GNUTLS_X509_CRLREASON_SUPERSEDED:
-            crl_reason = "certificate superseded";
-            break;
-
-          case GNUTLS_X509_CRLREASON_CESSATIONOFOPERATION:
-            crl_reason = "operation has ceased";
-            break;
-
-          case GNUTLS_X509_CRLREASON_CERTIFICATEHOLD:
-            crl_reason = "certificate is on hold";
-            break;
-
-          case GNUTLS_X509_CRLREASON_REMOVEFROMCRL:
-            crl_reason = "will be removed from delta CRL";
-            break;
-
-          case GNUTLS_X509_CRLREASON_PRIVILEGEWITHDRAWN:
-            crl_reason = "privilege withdrawn";
-            break;
-
-          case GNUTLS_X509_CRLREASON_AACOMPROMISE:
-            crl_reason = "AA compromised";
-            break;
-        }
-
-        failf(data, "Server certificate was revoked: %s", crl_reason);
-        break;
-      }
-
-      default:
-      case GNUTLS_OCSP_CERT_UNKNOWN:
-        failf(data, "Server certificate status is unknown");
-        break;
-      }
-
-      gnutls_ocsp_resp_deinit(ocsp_resp);
-
+    if(rc == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+      failf(data, "No OCSP response received");
       return CURLE_SSL_INVALIDCERTSTATUS;
     }
-    else
-      infof(data, "  server certificate status verification OK");
+
+    if(rc < 0) {
+      failf(data, "Invalid OCSP response received");
+      return CURLE_SSL_INVALIDCERTSTATUS;
+    }
+
+    gnutls_ocsp_resp_init(&ocsp_resp);
+
+    rc = gnutls_ocsp_resp_import(ocsp_resp, &status_request);
+    if(rc < 0) {
+      failf(data, "Invalid OCSP response received");
+      return CURLE_SSL_INVALIDCERTSTATUS;
+    }
+
+    (void)gnutls_ocsp_resp_get_single(ocsp_resp, 0, NULL, NULL, NULL, NULL,
+                                      &status, NULL, NULL, NULL, &reason);
+
+    switch(status) {
+    case GNUTLS_OCSP_CERT_GOOD:
+      break;
+
+    case GNUTLS_OCSP_CERT_REVOKED: {
+      const char *crl_reason;
+
+      switch(reason) {
+      default:
+      case GNUTLS_X509_CRLREASON_UNSPECIFIED:
+        crl_reason = "unspecified reason";
+        break;
+
+      case GNUTLS_X509_CRLREASON_KEYCOMPROMISE:
+        crl_reason = "private key compromised";
+        break;
+
+      case GNUTLS_X509_CRLREASON_CACOMPROMISE:
+        crl_reason = "CA compromised";
+        break;
+
+      case GNUTLS_X509_CRLREASON_AFFILIATIONCHANGED:
+        crl_reason = "affiliation has changed";
+        break;
+
+      case GNUTLS_X509_CRLREASON_SUPERSEDED:
+        crl_reason = "certificate superseded";
+        break;
+
+      case GNUTLS_X509_CRLREASON_CESSATIONOFOPERATION:
+        crl_reason = "operation has ceased";
+        break;
+
+      case GNUTLS_X509_CRLREASON_CERTIFICATEHOLD:
+        crl_reason = "certificate is on hold";
+        break;
+
+      case GNUTLS_X509_CRLREASON_REMOVEFROMCRL:
+        crl_reason = "will be removed from delta CRL";
+        break;
+
+      case GNUTLS_X509_CRLREASON_PRIVILEGEWITHDRAWN:
+        crl_reason = "privilege withdrawn";
+        break;
+
+      case GNUTLS_X509_CRLREASON_AACOMPROMISE:
+        crl_reason = "AA compromised";
+        break;
+      }
+
+      failf(data, "Server certificate was revoked: %s", crl_reason);
+      break;
+    }
+
+    default:
+    case GNUTLS_OCSP_CERT_UNKNOWN:
+      failf(data, "Server certificate status is unknown");
+      break;
+    }
+
+    gnutls_ocsp_resp_deinit(ocsp_resp);
+    if(status != GNUTLS_OCSP_CERT_GOOD)
+      return CURLE_SSL_INVALIDCERTSTATUS;
   }
   else
     infof(data, "  server certificate status verification SKIPPED");
@@ -1258,17 +1512,17 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
     gnutls_x509_crt_init(&x509_issuer);
     issuerp = load_file(config->issuercert);
     gnutls_x509_crt_import(x509_issuer, &issuerp, GNUTLS_X509_FMT_PEM);
-    rc = gnutls_x509_crt_check_issuer(x509_cert, x509_issuer);
+    rc = (int)gnutls_x509_crt_check_issuer(x509_cert, x509_issuer);
     gnutls_x509_crt_deinit(x509_issuer);
     unload_file(issuerp);
     if(rc <= 0) {
       failf(data, "server certificate issuer check failed (IssuerCert: %s)",
-            config->issuercert?config->issuercert:"none");
+            config->issuercert ? config->issuercert : "none");
       gnutls_x509_crt_deinit(x509_cert);
       return CURLE_SSL_ISSUER_ERROR;
     }
     infof(data, "  server certificate issuer check OK (Issuer Cert: %s)",
-          config->issuercert?config->issuercert:"none");
+          config->issuercert ? config->issuercert : "none");
   }
 
   size = sizeof(certname);
@@ -1287,9 +1541,15 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
      in RFC2818 (HTTPS), which takes into account wildcards, and the subject
      alternative name PKIX extension. Returns non zero on success, and zero on
      failure. */
-  rc = gnutls_x509_crt_check_hostname(x509_cert, peer->hostname);
+
+  /* This function does not handle trailing dots, so if we have an SNI name
+     use that and fallback to the hostname only if there is no SNI (like for
+     IP addresses) */
+  rc = (int)gnutls_x509_crt_check_hostname(x509_cert,
+                                           peer->sni ? peer->sni :
+                                           peer->hostname);
 #if GNUTLS_VERSION_NUMBER < 0x030306
-  /* Before 3.3.6, gnutls_x509_crt_check_hostname() didn't check IP
+  /* Before 3.3.6, gnutls_x509_crt_check_hostname() did not check IP
      addresses. */
   if(!rc) {
 #ifdef USE_IPV6
@@ -1315,7 +1575,7 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
         size_t certaddrlen = sizeof(certaddr);
         int ret = gnutls_x509_crt_get_subject_alt_name(x509_cert, i, certaddr,
                                                        &certaddrlen, NULL);
-        /* If this happens, it wasn't an IP address. */
+        /* If this happens, it was not an IP address. */
         if(ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
           continue;
         if(ret < 0)
@@ -1333,7 +1593,7 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
   if(!rc) {
     if(config->verifyhost) {
       failf(data, "SSL: certificate subject name (%s) does not match "
-            "target host name '%s'", certname, peer->dispname);
+            "target hostname '%s'", certname, peer->dispname);
       gnutls_x509_crt_deinit(x509_cert);
       return CURLE_PEER_FAILED_VERIFICATION;
     }
@@ -1422,7 +1682,7 @@ Curl_gtls_verifyserver(struct Curl_easy *data,
   /* public key algorithm's parameters */
   algo = gnutls_x509_crt_get_pk_algorithm(x509_cert, &bits);
   infof(data, "  certificate public key: %s",
-        gnutls_pk_algorithm_get_name(algo));
+        gnutls_pk_algorithm_get_name((gnutls_pk_algorithm_t)algo));
 
   /* version of the X.509 certificate. */
   infof(data, "  certificate version: #%d",
@@ -1467,8 +1727,8 @@ static CURLcode gtls_verifyserver(struct Curl_cfilter *cf,
   struct ssl_primary_config *conn_config = Curl_ssl_cf_get_primary_config(cf);
   struct ssl_config_data *ssl_config = Curl_ssl_cf_get_config(cf, data);
 #ifndef CURL_DISABLE_PROXY
-  const char *pinned_key = Curl_ssl_cf_is_proxy(cf)?
-    data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY]:
+  const char *pinned_key = Curl_ssl_cf_is_proxy(cf) ?
+    data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY] :
     data->set.str[STRING_SSL_PINNEDPUBLICKEY];
 #else
   const char *pinned_key = data->set.str[STRING_SSL_PINNEDPUBLICKEY];
@@ -1480,22 +1740,75 @@ static CURLcode gtls_verifyserver(struct Curl_cfilter *cf,
   if(result)
     goto out;
 
-  if(connssl->alpn) {
-    gnutls_datum_t proto;
-    int rc;
-
-    rc = gnutls_alpn_get_selected_protocol(session, &proto);
-    if(rc == 0)
-      Curl_alpn_set_negotiated(cf, data, proto.data, proto.size);
-    else
-      Curl_alpn_set_negotiated(cf, data, NULL, 0);
-  }
-
   /* Only on TLSv1.2 or lower do we have the session id now. For
    * TLSv1.3 we get it via a SESSION_TICKET message that arrives later. */
   if(gnutls_protocol_get_version(session) < GNUTLS_TLS1_3)
-    result = gtls_update_session_id(cf, data, session);
+    result = cf_gtls_update_session_id(cf, data, session);
 
+out:
+  return result;
+}
+
+static CURLcode gtls_set_earlydata(struct Curl_cfilter *cf,
+                                   struct Curl_easy *data,
+                                   const void *buf, size_t blen)
+{
+  struct ssl_connect_data *connssl = cf->ctx;
+  ssize_t nwritten = 0;
+  CURLcode result = CURLE_OK;
+
+  DEBUGASSERT(connssl->earlydata_state == ssl_earlydata_use);
+  DEBUGASSERT(Curl_bufq_is_empty(&connssl->earlydata));
+  if(blen) {
+    if(blen > connssl->earlydata_max)
+      blen = connssl->earlydata_max;
+    nwritten = Curl_bufq_write(&connssl->earlydata, buf, blen, &result);
+    CURL_TRC_CF(data, cf, "gtls_set_earlydata(len=%zu) -> %zd",
+                blen, nwritten);
+    if(nwritten < 0)
+      return result;
+  }
+  connssl->earlydata_state = ssl_earlydata_sending;
+  connssl->earlydata_skip = Curl_bufq_len(&connssl->earlydata);
+  return CURLE_OK;
+}
+
+static CURLcode gtls_send_earlydata(struct Curl_cfilter *cf,
+                                    struct Curl_easy *data)
+{
+  struct ssl_connect_data *connssl = cf->ctx;
+  struct gtls_ssl_backend_data *backend =
+      (struct gtls_ssl_backend_data *)connssl->backend;
+  CURLcode result = CURLE_OK;
+  const unsigned char *buf;
+  size_t blen;
+  ssize_t n;
+
+  DEBUGASSERT(connssl->earlydata_state == ssl_earlydata_sending);
+  backend->gtls.io_result = CURLE_OK;
+  while(Curl_bufq_peek(&connssl->earlydata, &buf, &blen)) {
+    n = gnutls_record_send_early_data(backend->gtls.session, buf, blen);
+    CURL_TRC_CF(data, cf, "gtls_send_earlydata(len=%zu) -> %zd",
+                blen, n);
+    if(n < 0) {
+      if(n == GNUTLS_E_AGAIN)
+        result = CURLE_AGAIN;
+      else
+        result = backend->gtls.io_result ?
+                 backend->gtls.io_result : CURLE_SEND_ERROR;
+      goto out;
+    }
+    else if(!n) {
+      /* gnutls is buggy, it *SHOULD* return the amount of bytes it took in.
+       * Instead it returns 0 if everything was written. */
+      n = (ssize_t)blen;
+    }
+
+    Curl_bufq_skip(&connssl->earlydata, (size_t)n);
+  }
+  /* sent everything there was */
+  infof(data, "SSL sending %" FMT_OFF_T " bytes of early data",
+        connssl->earlydata_skip);
 out:
   return result;
 }
@@ -1506,53 +1819,96 @@ out:
  */
 /* We use connssl->connecting_state to keep track of the connection status;
    there are three states: 'ssl_connect_1' (not started yet or complete),
-   'ssl_connect_2_reading' (waiting for data from server), and
-   'ssl_connect_2_writing' (waiting to be able to write).
+   'ssl_connect_2' (doing handshake with the server), and
+   'ssl_connect_3' (verifying and getting stats).
  */
 static CURLcode
 gtls_connect_common(struct Curl_cfilter *cf,
                     struct Curl_easy *data,
                     bool nonblocking,
-                    bool *done)
-{
+                    bool *done) {
   struct ssl_connect_data *connssl = cf->ctx;
-  int rc;
+  struct gtls_ssl_backend_data *backend =
+      (struct gtls_ssl_backend_data *)connssl->backend;
   CURLcode result = CURLE_OK;
 
+  DEBUGASSERT(backend);
+
   /* Initiate the connection, if not already done */
-  if(ssl_connect_1 == connssl->connecting_state) {
-    rc = gtls_connect_step1(cf, data);
-    if(rc) {
-      result = rc;
+  if(connssl->connecting_state == ssl_connect_1) {
+    result = gtls_connect_step1(cf, data);
+    if(result)
       goto out;
-    }
+    connssl->connecting_state = ssl_connect_2;
   }
 
-  rc = handshake(cf, data, TRUE, nonblocking);
-  if(rc) {
-    /* handshake() sets its own error message with failf() */
-    result = rc;
-    goto out;
+  if(connssl->connecting_state == ssl_connect_2) {
+    if(connssl->earlydata_state == ssl_earlydata_use) {
+      goto out;
+    }
+    else if(connssl->earlydata_state == ssl_earlydata_sending) {
+      result = gtls_send_earlydata(cf, data);
+      if(result)
+        goto out;
+      connssl->earlydata_state = ssl_earlydata_sent;
+      if(!Curl_ssl_cf_is_proxy(cf))
+        Curl_pgrsEarlyData(data, (curl_off_t)connssl->earlydata_skip);
+    }
+    DEBUGASSERT((connssl->earlydata_state == ssl_earlydata_none) ||
+                (connssl->earlydata_state == ssl_earlydata_sent));
+
+    result = handshake(cf, data, TRUE, nonblocking);
+    if(result)
+      goto out;
+    connssl->connecting_state = ssl_connect_3;
   }
 
   /* Finish connecting once the handshake is done */
-  if(ssl_connect_1 == connssl->connecting_state) {
-    struct gtls_ssl_backend_data *backend =
-      (struct gtls_ssl_backend_data *)connssl->backend;
-    gnutls_session_t session;
-    DEBUGASSERT(backend);
-    session = backend->gtls.session;
-    rc = gtls_verifyserver(cf, data, session);
-    if(rc) {
-      result = rc;
+  if(connssl->connecting_state == ssl_connect_3) {
+    gnutls_datum_t proto;
+    int rc;
+    result = gtls_verifyserver(cf, data, backend->gtls.session);
+    if(result)
       goto out;
-    }
+
     connssl->state = ssl_connection_complete;
+    connssl->connecting_state = ssl_connect_1;
+
+    rc = gnutls_alpn_get_selected_protocol(backend->gtls.session, &proto);
+    if(rc) {  /* No ALPN from server */
+      proto.data = NULL;
+      proto.size = 0;
+    }
+
+    result = Curl_alpn_set_negotiated(cf, data, connssl,
+                                      proto.data, proto.size);
+    if(result)
+      goto out;
+
+    if(connssl->earlydata_state == ssl_earlydata_sent) {
+      if(gnutls_session_get_flags(backend->gtls.session) &
+         GNUTLS_SFLAGS_EARLY_DATA) {
+        connssl->earlydata_state = ssl_earlydata_accepted;
+        infof(data, "Server accepted %zu bytes of TLS early data.",
+              connssl->earlydata_skip);
+      }
+      else {
+        connssl->earlydata_state = ssl_earlydata_rejected;
+        if(!Curl_ssl_cf_is_proxy(cf))
+          Curl_pgrsEarlyData(data, -(curl_off_t)connssl->earlydata_skip);
+        infof(data, "Server rejected TLS early data.");
+        connssl->earlydata_skip = 0;
+      }
+    }
   }
 
 out:
-  *done = ssl_connect_1 == connssl->connecting_state;
-
+  if(result == CURLE_AGAIN) {
+    *done = FALSE;
+    return CURLE_OK;
+  }
+  *done = ((connssl->connecting_state == ssl_connect_1) ||
+           (connssl->state == ssl_connection_deferred));
   return result;
 }
 
@@ -1560,6 +1916,12 @@ static CURLcode gtls_connect_nonblocking(struct Curl_cfilter *cf,
                                          struct Curl_easy *data,
                                          bool *done)
 {
+  struct ssl_connect_data *connssl = cf->ctx;
+  if(connssl->state == ssl_connection_deferred) {
+    /* We refuse to be pushed, we are waiting for someone to send/recv. */
+    *done = TRUE;
+    return CURLE_OK;
+  }
   return gtls_connect_common(cf, data, TRUE, done);
 }
 
@@ -1576,6 +1938,26 @@ static CURLcode gtls_connect(struct Curl_cfilter *cf,
   DEBUGASSERT(done);
 
   return CURLE_OK;
+}
+
+static CURLcode gtls_connect_deferred(struct Curl_cfilter *cf,
+                                      struct Curl_easy *data,
+                                      const void *buf,
+                                      size_t blen,
+                                      bool *done)
+{
+  struct ssl_connect_data *connssl = cf->ctx;
+  CURLcode result = CURLE_OK;
+
+  DEBUGASSERT(connssl->state == ssl_connection_deferred);
+  *done = FALSE;
+  if(connssl->earlydata_state == ssl_earlydata_use) {
+    result = gtls_set_earlydata(cf, data, buf, blen);
+    if(result)
+      return result;
+  }
+
+  return gtls_connect_common(cf, data, TRUE, done);
 }
 
 static bool gtls_data_pending(struct Curl_cfilter *cf,
@@ -1595,29 +1977,153 @@ static bool gtls_data_pending(struct Curl_cfilter *cf,
 
 static ssize_t gtls_send(struct Curl_cfilter *cf,
                          struct Curl_easy *data,
-                         const void *mem,
-                         size_t len,
+                         const void *buf,
+                         size_t blen,
                          CURLcode *curlcode)
 {
   struct ssl_connect_data *connssl = cf->ctx;
   struct gtls_ssl_backend_data *backend =
     (struct gtls_ssl_backend_data *)connssl->backend;
   ssize_t rc;
+  size_t nwritten, total_written = 0;
 
-  (void)data;
   DEBUGASSERT(backend);
-  backend->gtls.io_result = CURLE_OK;
-  rc = gnutls_record_send(backend->gtls.session, mem, len);
 
-  if(rc < 0) {
-    *curlcode = (rc == GNUTLS_E_AGAIN)?
-      CURLE_AGAIN :
-      (backend->gtls.io_result? backend->gtls.io_result : CURLE_SEND_ERROR);
-
-    rc = -1;
+  if(connssl->state == ssl_connection_deferred) {
+    bool done = FALSE;
+    *curlcode = gtls_connect_deferred(cf, data, buf, blen, &done);
+    if(*curlcode) {
+      rc = -1;
+      goto out;
+    }
+    else if(!done) {
+      *curlcode = CURLE_AGAIN;
+      rc = -1;
+      goto out;
+    }
+    DEBUGASSERT(connssl->state == ssl_connection_complete);
   }
 
+  if(connssl->earlydata_skip) {
+    if(connssl->earlydata_skip >= blen) {
+      connssl->earlydata_skip -= blen;
+      *curlcode = CURLE_OK;
+      rc = (ssize_t)blen;
+      goto out;
+    }
+    else {
+      total_written += connssl->earlydata_skip;
+      buf = ((const char *)buf) + connssl->earlydata_skip;
+      blen -= connssl->earlydata_skip;
+      connssl->earlydata_skip = 0;
+    }
+  }
+
+  while(blen) {
+    backend->gtls.io_result = CURLE_OK;
+    rc = gnutls_record_send(backend->gtls.session, buf, blen);
+
+    if(rc < 0) {
+      if(total_written && (rc == GNUTLS_E_AGAIN)) {
+        *curlcode = CURLE_OK;
+        rc = (ssize_t)total_written;
+        goto out;
+      }
+      *curlcode = (rc == GNUTLS_E_AGAIN) ?
+        CURLE_AGAIN :
+        (backend->gtls.io_result ? backend->gtls.io_result : CURLE_SEND_ERROR);
+
+      rc = -1;
+      goto out;
+    }
+    nwritten = (size_t)rc;
+    total_written += nwritten;
+    DEBUGASSERT(nwritten <= blen);
+    buf = (char *)buf + nwritten;
+    blen -= nwritten;
+  }
+  rc = total_written;
+
+out:
   return rc;
+}
+
+/*
+ * This function is called to shut down the SSL layer but keep the
+ * socket open (CCC - Clear Command Channel)
+ */
+static CURLcode gtls_shutdown(struct Curl_cfilter *cf,
+                              struct Curl_easy *data,
+                              bool send_shutdown, bool *done)
+{
+  struct ssl_connect_data *connssl = cf->ctx;
+  struct gtls_ssl_backend_data *backend =
+    (struct gtls_ssl_backend_data *)connssl->backend;
+  char buf[1024];
+  CURLcode result = CURLE_OK;
+  ssize_t nread;
+  size_t i;
+
+  DEBUGASSERT(backend);
+   /* If we have no handshaked connection or already shut down */
+  if(!backend->gtls.session || cf->shutdown ||
+     connssl->state != ssl_connection_complete) {
+    *done = TRUE;
+    goto out;
+  }
+
+  connssl->io_need = CURL_SSL_IO_NEED_NONE;
+  *done = FALSE;
+
+  if(!backend->gtls.sent_shutdown) {
+    /* do this only once */
+    backend->gtls.sent_shutdown = TRUE;
+    if(send_shutdown) {
+      int ret = gnutls_bye(backend->gtls.session, GNUTLS_SHUT_RDWR);
+      if((ret == GNUTLS_E_AGAIN) || (ret == GNUTLS_E_INTERRUPTED)) {
+        CURL_TRC_CF(data, cf, "SSL shutdown, gnutls_bye EAGAIN");
+        connssl->io_need = gnutls_record_get_direction(backend->gtls.session) ?
+          CURL_SSL_IO_NEED_SEND : CURL_SSL_IO_NEED_RECV;
+        backend->gtls.sent_shutdown = FALSE;
+        result = CURLE_OK;
+        goto out;
+      }
+      if(ret != GNUTLS_E_SUCCESS) {
+        CURL_TRC_CF(data, cf, "SSL shutdown, gnutls_bye error: '%s'(%d)",
+                    gnutls_strerror((int)ret), (int)ret);
+        result = CURLE_RECV_ERROR;
+        goto out;
+      }
+    }
+  }
+
+  /* SSL should now have started the shutdown from our side. Since it
+   * was not complete, we are lacking the close notify from the server. */
+  for(i = 0; i < 10; ++i) {
+    nread = gnutls_record_recv(backend->gtls.session, buf, sizeof(buf));
+    if(nread <= 0)
+      break;
+  }
+  if(nread > 0) {
+    /* still data coming in? */
+  }
+  else if(nread == 0) {
+    /* We got the close notify alert and are done. */
+    *done = TRUE;
+  }
+  else if((nread == GNUTLS_E_AGAIN) || (nread == GNUTLS_E_INTERRUPTED)) {
+    connssl->io_need = gnutls_record_get_direction(backend->gtls.session) ?
+      CURL_SSL_IO_NEED_SEND : CURL_SSL_IO_NEED_RECV;
+  }
+  else {
+    CURL_TRC_CF(data, cf, "SSL shutdown, error: '%s'(%d)",
+                gnutls_strerror((int)nread), (int)nread);
+    result = CURLE_RECV_ERROR;
+  }
+
+out:
+  cf->shutdown = (result || *done);
+  return result;
 }
 
 static void gtls_close(struct Curl_cfilter *cf,
@@ -1629,19 +2135,13 @@ static void gtls_close(struct Curl_cfilter *cf,
 
   (void) data;
   DEBUGASSERT(backend);
-
+  CURL_TRC_CF(data, cf, "close");
   if(backend->gtls.session) {
-    char buf[32];
-    /* Maybe the server has already sent a close notify alert.
-       Read it to avoid an RST on the TCP connection. */
-    (void)gnutls_record_recv(backend->gtls.session, buf, sizeof(buf));
-    gnutls_bye(backend->gtls.session, GNUTLS_SHUT_WR);
     gnutls_deinit(backend->gtls.session);
     backend->gtls.session = NULL;
   }
-  if(backend->gtls.cred) {
-    gnutls_certificate_free_credentials(backend->gtls.cred);
-    backend->gtls.cred = NULL;
+  if(backend->gtls.shared_creds) {
+    Curl_gtls_shared_creds_free(&backend->gtls.shared_creds);
   }
 #ifdef USE_GNUTLS_SRP
   if(backend->gtls.srp_client_cred) {
@@ -1649,89 +2149,6 @@ static void gtls_close(struct Curl_cfilter *cf,
     backend->gtls.srp_client_cred = NULL;
   }
 #endif
-}
-
-/*
- * This function is called to shut down the SSL layer but keep the
- * socket open (CCC - Clear Command Channel)
- */
-static int gtls_shutdown(struct Curl_cfilter *cf,
-                         struct Curl_easy *data)
-{
-  struct ssl_connect_data *connssl = cf->ctx;
-  struct gtls_ssl_backend_data *backend =
-    (struct gtls_ssl_backend_data *)connssl->backend;
-  int retval = 0;
-
-  DEBUGASSERT(backend);
-
-#ifndef CURL_DISABLE_FTP
-  /* This has only been tested on the proftpd server, and the mod_tls code
-     sends a close notify alert without waiting for a close notify alert in
-     response. Thus we wait for a close notify alert from the server, but
-     we do not send one. Let's hope other servers do the same... */
-
-  if(data->set.ftp_ccc == CURLFTPSSL_CCC_ACTIVE)
-    gnutls_bye(backend->gtls.session, GNUTLS_SHUT_WR);
-#endif
-
-  if(backend->gtls.session) {
-    ssize_t result;
-    bool done = FALSE;
-    char buf[120];
-
-    while(!done && !connssl->peer_closed) {
-      int what = SOCKET_READABLE(Curl_conn_cf_get_socket(cf, data),
-                                 SSL_SHUTDOWN_TIMEOUT);
-      if(what > 0) {
-        /* Something to read, let's do it and hope that it is the close
-           notify alert from the server */
-        result = gnutls_record_recv(backend->gtls.session,
-                                    buf, sizeof(buf));
-        switch(result) {
-        case 0:
-          /* This is the expected response. There was no data but only
-             the close notify alert */
-          done = TRUE;
-          break;
-        case GNUTLS_E_AGAIN:
-        case GNUTLS_E_INTERRUPTED:
-          infof(data, "GNUTLS_E_AGAIN || GNUTLS_E_INTERRUPTED");
-          break;
-        default:
-          retval = -1;
-          done = TRUE;
-          break;
-        }
-      }
-      else if(0 == what) {
-        /* timeout */
-        failf(data, "SSL shutdown timeout");
-        done = TRUE;
-      }
-      else {
-        /* anything that gets here is fatally bad */
-        failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
-        retval = -1;
-        done = TRUE;
-      }
-    }
-    gnutls_deinit(backend->gtls.session);
-  }
-  gnutls_certificate_free_credentials(backend->gtls.cred);
-
-#ifdef USE_GNUTLS_SRP
-  {
-    struct ssl_config_data *ssl_config = Curl_ssl_cf_get_config(cf, data);
-    if(ssl_config->primary.username)
-      gnutls_srp_free_client_credentials(backend->gtls.srp_client_cred);
-  }
-#endif
-
-  backend->gtls.cred = NULL;
-  backend->gtls.session = NULL;
-
-  return retval;
 }
 
 static ssize_t gtls_recv(struct Curl_cfilter *cf,
@@ -1748,7 +2165,21 @@ static ssize_t gtls_recv(struct Curl_cfilter *cf,
   (void)data;
   DEBUGASSERT(backend);
 
-  backend->gtls.io_result = CURLE_OK;
+  if(connssl->state == ssl_connection_deferred) {
+    bool done = FALSE;
+    *curlcode = gtls_connect_deferred(cf, data, NULL, 0, &done);
+    if(*curlcode) {
+      ret = -1;
+      goto out;
+    }
+    else if(!done) {
+      *curlcode = CURLE_AGAIN;
+      ret = -1;
+      goto out;
+    }
+    DEBUGASSERT(connssl->state == ssl_connection_complete);
+  }
+
   ret = gnutls_record_recv(backend->gtls.session, buf, buffersize);
   if((ret == GNUTLS_E_AGAIN) || (ret == GNUTLS_E_INTERRUPTED)) {
     *curlcode = CURLE_AGAIN;
@@ -1771,10 +2202,9 @@ static ssize_t gtls_recv(struct Curl_cfilter *cf,
 
   if(ret < 0) {
     failf(data, "GnuTLS recv error (%d): %s",
-
           (int)ret, gnutls_strerror((int)ret));
-    *curlcode = backend->gtls.io_result?
-                backend->gtls.io_result : CURLE_RECV_ERROR;
+    *curlcode = backend->gtls.io_result ?
+      backend->gtls.io_result : CURLE_RECV_ERROR;
     ret = -1;
     goto out;
   }
@@ -1795,7 +2225,7 @@ static CURLcode gtls_random(struct Curl_easy *data,
   int rc;
   (void)data;
   rc = gnutls_rnd(GNUTLS_RND_RANDOM, entropy, length);
-  return rc?CURLE_FAILED_INIT:CURLE_OK;
+  return rc ? CURLE_FAILED_INIT : CURLE_OK;
 }
 
 static CURLcode gtls_sha256sum(const unsigned char *tmp, /* input */
@@ -1831,7 +2261,8 @@ const struct Curl_ssl Curl_ssl_gnutls = {
   SSLSUPP_CA_PATH  |
   SSLSUPP_CERTINFO |
   SSLSUPP_PINNEDPUBKEY |
-  SSLSUPP_HTTPS_PROXY,
+  SSLSUPP_HTTPS_PROXY |
+  SSLSUPP_CA_CACHE,
 
   sizeof(struct gtls_ssl_backend_data),
 
@@ -1856,9 +2287,9 @@ const struct Curl_ssl Curl_ssl_gnutls = {
   gtls_sha256sum,                /* sha256sum */
   NULL,                          /* associate_connection */
   NULL,                          /* disassociate_connection */
-  NULL,                          /* free_multi_ssl_backend_data */
   gtls_recv,                     /* recv decrypted data */
   gtls_send,                     /* send data to encrypt */
+  NULL,                          /* get_channel_binding */
 };
 
 #endif /* USE_GNUTLS */
