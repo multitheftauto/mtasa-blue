@@ -3878,7 +3878,7 @@ void CClientGame::PostWorldProcessEntitiesAfterPreRenderHandler()
 
     if (m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false))
     {
-        throw std::runtime_error("'onClientPedsProcessed' is no longer supported, renamed to 'onClientPostUpdate'");
+        CStaticFunctionDefinitions::AddEventHandler("onClientPedsProcessed", "onClientPostUpdate", "The 'onClientPedsProcessed' event is deprecated and has been renamed to 'onClientPostUpdate'.");
         return; 
     }
 
