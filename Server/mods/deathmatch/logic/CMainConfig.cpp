@@ -901,11 +901,15 @@ bool CMainConfig::AddMissingSettings()
             for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
             {
                 CXMLAttribute* templateAttribute = *it3;
-                const SString& strKey = templateAttribute->GetName();
-                const SString& strValue = templateAttribute->GetValue();
+                const SString& attrName = templateAttribute->GetName();
+                const SString& attrValue = templateAttribute->GetValue();
 
-                CXMLAttribute* foundAttribute = attributes.Find(strKey);
-                if (!foundAttribute || foundAttribute->GetValue() != strValue)
+                // Don't check value attributes, as they are meant to be different
+                if (attrName == "value")
+                    continue;
+
+                CXMLAttribute* foundAttribute = attributes.Find(attrName);
+                if (!foundAttribute || foundAttribute->GetValue() != attrValue)
                 {
                     attributesMatch = false;
                     break;
