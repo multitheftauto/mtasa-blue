@@ -195,6 +195,8 @@ SQueryInfo CQueryReceiver::GetServerResponse()
         // Check if this reply includes rules
         if (strncmp(szBuffer + i, "RULES", 5) == 0)
         {
+            g_pCore->GetConsole()->Printf("Parsing rules for server: %s", info.serverName.c_str());
+
             i += 5;
             while (i < len)
             {
@@ -212,7 +214,11 @@ SQueryInfo CQueryReceiver::GetServerResponse()
                     return info;
 
                 info.rules[key] = value;
+
+                g_pCore->GetConsole()->Printf("  Rule: %s = %s", key.c_str(), value.c_str());
             }
+
+            g_pCore->GetConsole()->Printf("Finished parsing rules");
         }
 
         // Get player nicks
