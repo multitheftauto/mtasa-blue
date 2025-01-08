@@ -89,8 +89,8 @@ CHudSA::CHudSA()
 
     // Change multiplier for STAT_10 and STAT_9 (MAX_HEALTH) from 176 to 200
     // Fix GH #3807
-    float* MAX_HEALTH = reinterpret_cast<float*>(0x8CDE78);
-    *MAX_HEALTH = 200.0f;
+    float* maxHealth = reinterpret_cast<float*>(0x8CDE78);
+    *maxHealth = 200.0f;
 }
 
 void CHudSA::Disable(bool bDisabled)
