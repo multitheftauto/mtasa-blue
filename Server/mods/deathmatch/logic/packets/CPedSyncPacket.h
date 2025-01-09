@@ -31,6 +31,7 @@ public:
         float               fArmor;
         bool                bOnFire;
         bool                bIsInWater;
+        bool                isReloadingWeapon;
 
         bool ReadSpatialData(NetBitStreamInterface& BitStream);
         // Backward compatibility
