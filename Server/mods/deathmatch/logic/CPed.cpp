@@ -24,8 +24,7 @@ struct SBodyPartName
 SBodyPartName BodyPartNames[10] = {{"Unknown"},  {"Unknown"},   {"Unknown"},  {"Torso"},     {"Ass"},
                                    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}};
 
-CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel)
-    : CElement(pParent), m_reloadingWeapon(false)
+CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) : CElement(pParent)
 {
     // Init
     m_pPedManager = pPedManager;
