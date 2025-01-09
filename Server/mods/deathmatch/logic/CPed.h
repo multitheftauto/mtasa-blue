@@ -343,7 +343,7 @@ protected:
     bool                                 m_bHeadless;
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
-    bool                                 m_reloadingWeapon;
+    bool                                 m_reloadingWeapon{};
     CVehicle*                            m_pJackingVehicle;
     SPlayerAnimData                      m_animData{};
 
