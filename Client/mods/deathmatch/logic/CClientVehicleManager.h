@@ -78,5 +78,5 @@ protected:
     bool                          m_bCanRemoveFromList;
     CMappedArray<CClientVehicle*> m_List;
     CMappedArray<CClientVehicle*> m_StreamedIn;
-    bool                          m_spawnFlyingComponentsDuringRecreate;
+    bool                          m_spawnFlyingComponentsDuringRecreate{true};
 };

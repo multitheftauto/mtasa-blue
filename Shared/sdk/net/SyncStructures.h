@@ -2141,8 +2141,6 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data7), BITCOUNT7);
-
-
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
         //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
@@ -2215,7 +2213,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data4.extendedwatercannons = true;
         data5.tunnelweatherblend = true;
         data6.ignoreFireState = false;
-        data7.flyingcomponents = false;
+        data7.flyingcomponents = true;
     }
 };
 
