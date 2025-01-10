@@ -2,21 +2,23 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaTeamDefs.cpp
- *  PURPOSE:     Lua team definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-using std::list;
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaTeamDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"getTeamFromName", GetTeamFromName},         {"getTeamName", GetTeamName},           {"getTeamColor", GetTeamColor},
-        {"getTeamFriendlyFire", GetTeamFriendlyFire}, {"getPlayersInTeam", GetPlayersInTeam}, {"countPlayersInTeam", CountPlayersInTeam},
+        {"getTeamFromName", ArgumentParserWarn<false, GetTeamFromName>},
+        {"getTeamName", ArgumentParserWarn<false, GetTeamName>},
+        {"getTeamColor", ArgumentParserWarn<false, GetTeamColor>},
+        {"getTeamFriendlyFire", ArgumentParserWarn<false, GetTeamFriendlyFire>},
+        {"getPlayersInTeam", ArgumentParserWarn<false, GetPlayersInTeam>},
+        {"countPlayersInTeam", ArgumentParserWarn<false, CountPlayersInTeam>}
     };
 
     // Add functions
@@ -28,7 +30,6 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
-    lua_classfunction(luaVM, "create", "getTeamFromName");
     lua_classfunction(luaVM, "getFromName", "getTeamFromName");
     lua_classfunction(luaVM, "countPlayers", "countPlayersInTeam");
     lua_classfunction(luaVM, "getFriendlyFire", "getTeamFriendlyFire");
@@ -36,148 +37,51 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getColor", "getTeamColor");
     lua_classfunction(luaVM, "getPlayers", "getPlayersInTeam");
 
-    lua_classvariable(luaVM, "playerCount", NULL, "countPlayersInTeam");
-    lua_classvariable(luaVM, "friendlyFire", NULL, "getTeamFriendlyFire");
-    lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");
-    lua_classvariable(luaVM, "name", NULL, "getTeamName");
+    lua_classvariable(luaVM, "playerCount", nullptr, "countPlayersInTeam");
+    lua_classvariable(luaVM, "friendlyFire", nullptr, "getTeamFriendlyFire");
+    lua_classvariable(luaVM, "players", nullptr, "getPlayersInTeam");
+    lua_classvariable(luaVM, "name", nullptr, "getTeamName");
 
     lua_registerclass(luaVM, "Team", "Element");
 }
 
-int CLuaTeamDefs::GetTeamFromName(lua_State* luaVM)
+std::variant<CClientTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string name) noexcept
 {
-    SString          strName = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strName);
+    CClientTeam* team = m_pTeamManager->GetTeam(name.c_str());
 
-    if (!argStream.HasErrors())
-    {
-        CClientTeam* pTeam = m_pTeamManager->GetTeam(strName);
-        if (pTeam)
-        {
-            lua_pushelement(luaVM, pTeam);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (!team)
+        return false;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return team;
 }
 
-int CLuaTeamDefs::GetTeamName(lua_State* luaVM)
+std::string CLuaTeamDefs::GetTeamName(CClientTeam* team)
 {
-    CClientTeam*     pTeam = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTeam);
-
-    if (!argStream.HasErrors())
-    {
-        const char* szName = pTeam->GetTeamName();
-        if (szName)
-        {
-            lua_pushstring(luaVM, szName);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return std::string(team->GetTeamName());
 }
 
-int CLuaTeamDefs::GetTeamColor(lua_State* luaVM)
+CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> CLuaTeamDefs::GetTeamColor(CClientTeam* team) noexcept
 {
-    CClientTeam*     pTeam = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTeam);
+    std::uint8_t red;
+    std::uint8_t green;
+    std::uint8_t blue;
 
-    if (!argStream.HasErrors())
-    {
-        unsigned char ucRed, ucGreen, ucBlue;
-        pTeam->GetColor(ucRed, ucGreen, ucBlue);
+    team->GetColor(red, green, blue);
 
-        lua_pushnumber(luaVM, ucRed);
-        lua_pushnumber(luaVM, ucGreen);
-        lua_pushnumber(luaVM, ucBlue);
-        return 3;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return {red, green, blue};
 }
 
-int CLuaTeamDefs::GetTeamFriendlyFire(lua_State* luaVM)
+bool CLuaTeamDefs::GetTeamFriendlyFire(CClientTeam* team) noexcept
 {
-    CClientTeam*     pTeam = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTeam);
-
-    if (!argStream.HasErrors())
-    {
-        bool bFriendlyFire = pTeam->GetFriendlyFire();
-        lua_pushboolean(luaVM, bFriendlyFire);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return team->GetFriendlyFire();
 }
 
-int CLuaTeamDefs::GetPlayersInTeam(lua_State* luaVM)
+std::vector<CClientPlayer*> CLuaTeamDefs::GetPlayersInTeam(CClientTeam* team)
 {
-    CClientTeam*     pTeam = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTeam);
-
-    if (!argStream.HasErrors())
-    {
-        lua_newtable(luaVM);
-
-        unsigned int uiIndex = 0;
-
-        list<CClientPlayer*>::const_iterator iter = pTeam->IterBegin();
-        for (; iter != pTeam->IterEnd(); iter++)
-        {
-            CClientPlayer* pPlayer = *iter;
-            if (!pPlayer->IsBeingDeleted())
-            {
-                lua_pushnumber(luaVM, ++uiIndex);
-                lua_pushelement(luaVM, pPlayer);
-                lua_settable(luaVM, -3);
-            }
-        }
-
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return team->GetPlayers();
 }
 
-int CLuaTeamDefs::CountPlayersInTeam(lua_State* luaVM)
+std::uint32_t CLuaTeamDefs::CountPlayersInTeam(CClientTeam* team) noexcept
 {
-    CClientTeam*     pTeam = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTeam);
-
-    if (!argStream.HasErrors())
-    {
-        unsigned int uiCount = pTeam->CountPlayers();
-        lua_pushnumber(luaVM, uiCount);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return team->CountPlayers();
 }
