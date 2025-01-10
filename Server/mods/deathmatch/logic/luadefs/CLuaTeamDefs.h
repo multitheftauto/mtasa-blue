@@ -1,9 +1,7 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/luadefs/CLuaTeamDefs.h
- *  PURPOSE:     Lua function definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -11,6 +9,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaTeamDefs : public CLuaDefs
 {
@@ -18,20 +17,21 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
+private:
     // Team create/destroy functions
-    LUA_DECLARE(CreateTeam);
+    static CTeam* CreateTeam(lua_State* lua, std::string name, std::uint8_t red, std::uint8_t green, std::uint8_t blue) noexcept;
 
     // Team get funcs
-    LUA_DECLARE(GetTeamFromName);
-    LUA_DECLARE(GetTeamName);
-    LUA_DECLARE(GetTeamColor);
-    LUA_DECLARE(GetTeamFriendlyFire);
-    LUA_DECLARE(GetPlayersInTeam);
-    LUA_DECLARE(CountPlayersInTeam);
+    static CTeam* GetTeamFromName(const std::string name) noexcept;
+    static std::string GetTeamName(CTeam* team) noexcept;
+    static CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> GetTeamColor(CTeam* team) noexcept;
+    static bool GetTeamFriendlyFire(CTeam* team) noexcept;
+    static std::vector<CPlayer*> GetPlayersInTeam(CTeam* team) noexcept;
+    static std::uint32_t CountPlayersInTeam(CTeam* team) noexcept;
 
     // Team set funcs
-    LUA_DECLARE(SetPlayerTeam);
-    LUA_DECLARE(SetTeamName);
-    LUA_DECLARE(SetTeamColor);
-    LUA_DECLARE(SetTeamFriendlyFire);
+    static bool SetPlayerTeam(CPlayer* player, CTeam* team) noexcept;
+    static bool SetTeamName(CTeam* team, std::string name) noexcept;
+    static bool SetTeamColor(CTeam* team, std::uint8_t red, std::uint8_t green, std::uint8_t blue) noexcept;
+    static bool SetTeamFriendlyFire(CTeam* team, bool state) noexcept;
 };
