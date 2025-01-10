@@ -36,7 +36,7 @@ public:
     std::list<CClientRadarMarker*>::const_iterator IterEnd() { return m_Markers.end(); };
 
     bool        Exists(CClientRadarMarker* pMarker);
-    static bool IsValidIcon(unsigned long ulIcon) { return ulIcon <= RADAR_MARKER_LIMIT; }
+    static bool IsValidIcon(unsigned long ulIcon) noexcept { return ulIcon <= RADAR_MARKER_LIMIT; }
 
 private:
     void AddToList(CClientRadarMarker* pMarker) { m_Markers.push_back(pMarker); };
