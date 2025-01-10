@@ -127,23 +127,17 @@ struct SReplacedAnimation
 
 struct SAnimationCache
 {
-    SString strName;
-    int     iTime;
-    bool    bLoop;
-    bool    bUpdatePosition;
-    bool    bInterruptable;
-    bool    bFreezeLastFrame;
-    int     iBlend;
-
-    SAnimationCache()
-    {
-        iTime = -1;
-        bLoop = false;
-        bUpdatePosition = false;
-        bInterruptable = false;
-        bFreezeLastFrame = true;
-        iBlend = 250;
-    }
+    std::string strName;
+    int         iTime{-1};
+    bool        bLoop{false};
+    bool        bUpdatePosition{false};
+    bool        bInterruptable{false};
+    bool        bFreezeLastFrame{true};
+    int         iBlend{250};
+    float       progress{0.0f};
+    float       speed{1.0f};
+    bool        progressWaitForStreamIn{false}; // for sync anim only
+    float       elapsedTime{0.0f}; // for sync anim only
 };
 
 class CClientObject;
@@ -253,7 +247,7 @@ public:
     CClientVehicle* GetRealOccupiedVehicle();
     CClientVehicle* GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL,
-                                               float fWithinRange = 6000.0f);
+                                               float fWithinRange = 6000.0f, bool localVehicles = false);
     bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
                                    CVector* pClosestDoorPosition = NULL);
 
@@ -460,13 +454,13 @@ public:
 
     bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
-    void RunAnimation(AssocGroupId animGroup, AnimationId animID);
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
                            bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
+    void                        RunAnimationFromCache();
 
     bool IsUsingGun();
 
@@ -484,8 +478,8 @@ public:
     bool IsBleeding() const noexcept { return m_bBleeding; };
     void SetBleeding(bool bBleeding);
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() override { return m_pPlayerPed ? m_pPlayerPed->IsOnFire() : m_bIsOnFire; }
+    bool SetOnFire(bool bOnFire) override;
 
     void GetVoice(short* psVoiceType, short* psVoiceID);
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
@@ -553,6 +547,9 @@ public:
 
     std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
 
+    void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; }
+    bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; }
+
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
     CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer);
@@ -567,6 +564,7 @@ protected:
 
     // Used to destroy the current game ped and create a new one in the same state.
     void ReCreateModel();
+    void ReCreateGameEntity();
 
     void _CreateModel();
     void _CreateLocalModel();
@@ -726,6 +724,7 @@ public:
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
+    bool                                     m_shouldRecreate{false};
 
     bool             m_bBulletImpactData;
     CClientEntityPtr m_pBulletImpactEntity;
@@ -788,4 +787,7 @@ public:
     CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
 
     std::shared_ptr<CClientModel> m_clientModel;
+
+    bool m_hasSyncedAnim{};
+    bool m_animationOverridedByClient{};
 };
