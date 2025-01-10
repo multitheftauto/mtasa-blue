@@ -266,7 +266,7 @@ public:
     bool IsRedirecting() const noexcept { return m_bIsRedirecting; }
 
     bool GetTeleported() const noexcept { return m_teleported; }
-    void SetTeleported(bool bState) { m_teleported = bState; }
+    void SetTeleported(bool state) noexcept { m_teleported = state; }
 
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
