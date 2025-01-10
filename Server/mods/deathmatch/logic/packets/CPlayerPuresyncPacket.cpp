@@ -133,7 +133,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         float playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);
         if (playerDistancePosition >= g_TickRateSettings.playerTeleportAlert) {
             if (!pSourcePlayer->GetTeleported()) {
-                pSourcePlayer->CallEvent("onPlayerTeleport");
+                CLuaArguments arguments;
+                pSourcePlayer->CallEvent("onPlayerTeleport", arguments, nullptr);
             }
 
             pSourcePlayer->SetTeleported(false);
