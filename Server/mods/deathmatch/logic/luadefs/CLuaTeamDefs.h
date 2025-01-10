@@ -19,10 +19,10 @@ public:
 
 private:
     // Team create/destroy functions
-    static std::variant<CTeam*, bool> CreateTeam(lua_State* lua, std::string name, std::uint8_t red, std::uint8_t green, std::uint8_t blue) noexcept;
+    static std::variant<CTeam*, bool> CreateTeam(lua_State* lua, const std::string_view name, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) noexcept;
 
     // Team get funcs
-    static std::variant<CTeam*, bool> GetTeamFromName(const std::string name) noexcept;
+    static std::variant<CTeam*, bool> GetTeamFromName(const std::string_view name) noexcept;
     static std::string GetTeamName(CTeam* team) noexcept;
     static CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> GetTeamColor(CTeam* team) noexcept;
     static bool GetTeamFriendlyFire(CTeam* team) noexcept;
@@ -31,7 +31,7 @@ private:
 
     // Team set funcs
     static bool SetPlayerTeam(CPlayer* player, CTeam* team) noexcept;
-    static bool SetTeamName(CTeam* team, std::string name) noexcept;
-    static bool SetTeamColor(CTeam* team, std::uint8_t red, std::uint8_t green, std::uint8_t blue) noexcept;
-    static bool SetTeamFriendlyFire(CTeam* team, bool state) noexcept;
+    static bool SetTeamName(CTeam* team, const std::string_view name) noexcept;
+    static bool SetTeamColor(CTeam* team, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) noexcept;
+    static bool SetTeamFriendlyFire(CTeam* team, const bool state) noexcept;
 };
