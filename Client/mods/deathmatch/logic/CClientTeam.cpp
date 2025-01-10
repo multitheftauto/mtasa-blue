@@ -64,7 +64,7 @@ void CClientTeam::RemoveAll()
     m_List.clear();
 }
 
-std::vector<CClientPlayer*> CClientTeam::GetPlayers() noexcept
+std::vector<CClientPlayer*> CClientTeam::GetPlayers() const
 {
     std::vector<CClientPlayer*> players;
 
