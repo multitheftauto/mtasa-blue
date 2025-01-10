@@ -65,7 +65,7 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Team", "Element");
 }
 
-std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::string_view name, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) noexcept
+std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::string name, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue)
 {
     CLuaMain& vm = lua_getownercluamain(lua);
     CResource* resource = vm.GetResource();
@@ -73,8 +73,7 @@ std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::s
     if (!resource)
         return false;
 
-    std::string string(name);
-    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, string.c_str(), red, green, blue);
+    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, name.c_str(), red, green, blue);
 
     if (!team)
         return false;
@@ -87,10 +86,9 @@ std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::s
     return team;
 }
 
-std::variant<CTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string_view name) noexcept
+std::variant<CTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string name)
 {
-    std::string string(name);
-    CTeam* team = m_pTeamManager->GetTeam(string.c_str());
+    CTeam* team = m_pTeamManager->GetTeam(name.c_str());
 
     if (!team)
         return false;
@@ -134,9 +132,9 @@ bool CLuaTeamDefs::SetPlayerTeam(CPlayer* player, CTeam* team) noexcept
     return CStaticFunctionDefinitions::SetPlayerTeam(player, team);
 }
 
-bool CLuaTeamDefs::SetTeamName(CTeam* team, const std::string_view name) noexcept
+bool CLuaTeamDefs::SetTeamName(CTeam* team, const std::string name)
 {
-    return CStaticFunctionDefinitions::SetTeamName(team, name.data());
+    return CStaticFunctionDefinitions::SetTeamName(team, name.c_str());
 }
 
 bool CLuaTeamDefs::SetTeamColor(CTeam* team, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) noexcept
