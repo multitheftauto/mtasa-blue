@@ -805,11 +805,11 @@ int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
-std::tuple<float, float> CLuaColShapeDefs::GetColPolygonHeight(CColPolygon* pColPolygon)
+CLuaMultiReturn<float, float> CLuaColShapeDefs::GetColPolygonHeight(CColPolygon* pColPolygon)
 {
     float fFloor, fCeil;
     pColPolygon->GetHeight(fFloor, fCeil);
-    return std::make_tuple(fFloor, fCeil);
+    return CLuaMultiReturn{fFloor, fCeil};
 }
 
 bool CLuaColShapeDefs::SetColPolygonHeight(CColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil)
