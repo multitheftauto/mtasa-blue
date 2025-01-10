@@ -163,7 +163,7 @@
     <vehicle_contact_sync_radius>30</vehicle_contact_sync_radius>
 
     <!-- This parameter specifies the player position limit change alert.
-         Available range: 50 to 500. Default - 100 -->
+         Available range: 5 to 500. Default - 100 -->
     <player_teleport_alert>100</player_teleport_alert>
 
     <!-- This parameter sets the amount of extrapolation that clients will apply to remote vehicles. This can reduce
