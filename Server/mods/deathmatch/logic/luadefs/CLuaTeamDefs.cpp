@@ -11,7 +11,6 @@
 #include "CLuaTeamDefs.h"
 #include "CLuaGenericDefs.h"
 #include "CStaticFunctionDefinitions.h"
-#include "CGame.h"
 #include <lua/CLuaFunctionParser.h>
 
 void CLuaTeamDefs::LoadFunctions()
@@ -68,17 +67,14 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
 
 std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::string_view name, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) noexcept
 {
-    CLuaMain* vm = g_pGame->GetLuaManager()->GetVirtualMachine(lua);
-
-    if (!vm)
-        return false;
-
-    CResource* resource = vm->GetResource();
+    CLuaMain& vm = lua_getownercluamain(lua);
+    CResource* resource = vm.GetResource();
 
     if (!resource)
         return false;
 
-    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, name.data(), red, green, blue);
+    std::string string(name);
+    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, string.c_str(), red, green, blue);
 
     if (!team)
         return false;
@@ -93,7 +89,8 @@ std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::s
 
 std::variant<CTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string_view name) noexcept
 {
-    CTeam* team = m_pTeamManager->GetTeam(name.data());
+    std::string string(name);
+    CTeam* team = m_pTeamManager->GetTeam(string.c_str());
 
     if (!team)
         return false;
@@ -101,7 +98,7 @@ std::variant<CTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string_view 
     return team;
 }
 
-std::string CLuaTeamDefs::GetTeamName(CTeam* team) noexcept
+std::string CLuaTeamDefs::GetTeamName(CTeam* team)
 {
     return team->GetTeamName();
 }
@@ -122,7 +119,7 @@ bool CLuaTeamDefs::GetTeamFriendlyFire(CTeam* team) noexcept
     return team->GetFriendlyFire();
 }
 
-std::vector<CPlayer*> CLuaTeamDefs::GetPlayersInTeam(CTeam* team) noexcept
+std::vector<CPlayer*> CLuaTeamDefs::GetPlayersInTeam(CTeam* team)
 {
     return team->GetPlayers();
 }

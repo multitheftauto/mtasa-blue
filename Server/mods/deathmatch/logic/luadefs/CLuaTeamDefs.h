@@ -23,10 +23,10 @@ private:
 
     // Team get funcs
     static std::variant<CTeam*, bool> GetTeamFromName(const std::string_view name) noexcept;
-    static std::string GetTeamName(CTeam* team) noexcept;
+    static std::string GetTeamName(CTeam* team);
     static CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> GetTeamColor(CTeam* team) noexcept;
     static bool GetTeamFriendlyFire(CTeam* team) noexcept;
-    static std::vector<CPlayer*> GetPlayersInTeam(CTeam* team) noexcept;
+    static std::vector<CPlayer*> GetPlayersInTeam(CTeam* team);
     static std::uint32_t CountPlayersInTeam(CTeam* team) noexcept;
 
     // Team set funcs
