@@ -469,5 +469,5 @@ private:
     ushort  m_usPrevDimension;
     SString m_strQuitReasonForLog;
 
-    bool m_teleported;
+    bool m_teleported = false;
 };
