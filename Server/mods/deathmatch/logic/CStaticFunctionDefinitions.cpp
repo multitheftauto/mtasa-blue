@@ -1274,6 +1274,12 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     assert(pElement);
     RUN_CHILDREN(SetElementPosition(*iter, vecPosition, bWarp))
 
+    if (IS_PLAYER(pElement)) 
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+        pPlayer->SetTeleported(true);
+    }
+
     // Update our position for that entity.
     pElement->SetPosition(vecPosition);
 
