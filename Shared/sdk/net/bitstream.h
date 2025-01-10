@@ -600,8 +600,12 @@ enum class eBitStreamVersion : unsigned short
     // 2025-01-01
     AnimationsSync,
 
+    // Add server side isPedReloadingWeapon
+    // 2025-01-09
+    IsPedReloadingWeapon,
+
     // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
-    // 2024-07-22
+    // 2025-01-10
     WorldSpecialProperty_FlyingComponents,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
