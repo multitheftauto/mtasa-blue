@@ -809,7 +809,7 @@ CLuaMultiReturn<float, float> CLuaColShapeDefs::GetColPolygonHeight(CColPolygon*
 {
     float fFloor, fCeil;
     pColPolygon->GetHeight(fFloor, fCeil);
-    return CLuaMultiReturn{fFloor, fCeil};
+    return {fFloor, fCeil};
 }
 
 bool CLuaColShapeDefs::SetColPolygonHeight(CColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil)
