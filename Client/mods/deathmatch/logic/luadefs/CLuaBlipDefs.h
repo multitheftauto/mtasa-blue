@@ -32,8 +32,8 @@ private:
 
     // Set functions
     static bool SetBlipIcon(CClientRadarMarker* radarMarker, std::uint8_t icon);
-    static bool SetBlipSize(lua_State* luaVM, CClientRadarMarker* radarMarker, std::uint8_t size) noexcept;
-    static bool SetBlipColor(CClientRadarMarker* radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a) noexcept;
-    static bool SetBlipOrdering(CClientRadarMarker* radarMarker, std::int16_t ordering) noexcept;
-    static bool SetBlipVisibleDistance(CClientRadarMarker* radarMarker, std::uint16_t visibleDistance) noexcept;
+    static bool SetBlipSize(lua_State* luaVM, CClientRadarMarker* radarMarker, std::uint8_t size);
+    static bool SetBlipColor(CClientRadarMarker* radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a);
+    static bool SetBlipOrdering(CClientRadarMarker* radarMarker, std::int16_t ordering);
+    static bool SetBlipVisibleDistance(CClientRadarMarker* radarMarker, std::uint16_t visibleDistance);
 };
