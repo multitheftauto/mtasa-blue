@@ -1638,7 +1638,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerTriggerInvalidEvent", "eventName, isAdded, isRemote", nullptr, false);
     m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
     m_Events.AddEvent("onPlayerChangesWorldSpecialProperty", "property, enabled", nullptr, false);
-    m_Events.AddEvent("onPlayerTeleport", "", NULL, false);
+    m_Events.AddEvent("onPlayerTeleport", "", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
