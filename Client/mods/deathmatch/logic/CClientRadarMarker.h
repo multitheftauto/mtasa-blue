@@ -39,13 +39,13 @@ public:
     void SetPosition(const CVector& vecPosition);
     void GetPosition(CVector& vecPosition) const;
 
-    unsigned short GetScale() const noexcept { return m_usScale; };
+    unsigned short GetScale() const noexcept { return m_usScale; }
     void           SetScale(unsigned short usScale);
 
     SColor GetColor() const noexcept { return m_Color; }
     void   SetColor(const SColor color);
 
-    unsigned long GetSprite() const noexcept { return m_ulSprite; };
+    unsigned long GetSprite() const noexcept { return m_ulSprite; }
     void          SetSprite(unsigned long ulSprite);
 
     bool IsVisible() const { return m_bIsVisible; };
