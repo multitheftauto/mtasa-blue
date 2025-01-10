@@ -3085,6 +3085,7 @@ void CClientGame::UpdateMimics()
             bool  bSunbathing = m_pLocalPlayer->IsSunbathing();
             bool  bDoingDriveby = m_pLocalPlayer->IsDoingGangDriveby();
             bool  bStealthAiming = m_pLocalPlayer->IsStealthAiming();
+            bool  reloadingWeapon = m_pLocalPlayer->IsReloadingWeapon();
 
             // Is the current weapon goggles (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
             if (weaponSlot == 11 || weaponSlot == 12 || ucWeaponType == 43)
@@ -3142,6 +3143,9 @@ void CClientGame::UpdateMimics()
                 pMimic->SetSunbathing(bSunbathing);
                 pMimic->SetDoingGangDriveby(bDoingDriveby);
                 pMimic->SetStealthAiming(bStealthAiming);
+
+                if (reloadingWeapon)
+                    pMimic->ReloadWeapon();
 
                 Controller.ShockButtonL = 0;
 
