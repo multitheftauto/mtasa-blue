@@ -191,7 +191,6 @@ public:
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
     virtual void SetModelIndex(unsigned long ulModel) = 0;
-    virtual void RemoveGeometryRef() = 0;
 
     virtual float    GetHealth() = 0;
     virtual void     SetHealth(float fHealth) = 0;
@@ -261,9 +260,6 @@ public:
     virtual void         SetFootBlood(unsigned int uiFootBlood) = 0;
     virtual unsigned int GetFootBlood() = 0;
 
-    virtual bool IsOnFire() = 0;
-    virtual void SetOnFire(bool bOnFire) = 0;
-
     virtual bool GetStayInSamePlace() = 0;
     virtual void SetStayInSamePlace(bool bStay) = 0;
 
@@ -285,6 +281,9 @@ public:
     virtual CPedIKSAInterface*      GetPedIKInterface() = 0;
     virtual void*                   GetPedNodeInterface(std::int32_t nodeId) = 0;
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
+
+    virtual CEntitySAInterface* GetTargetedObject() = 0;
+    virtual ePedState           GetPedState() = 0;
 
     virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
 };

@@ -68,6 +68,7 @@ class CWeather;
 class CWorld;
 class CIplStore;
 class CBuildingRemoval;
+class CRenderer;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -107,7 +108,7 @@ class __declspec(novtable) CGame
     typedef std::unique_ptr<CAnimBlendAssocGroup> AssocGroup_type;
 
 public:
-    virtual CPools*                   GetPools() = 0;
+    virtual CPools*                   GetPools() const noexcept = 0;
     virtual CPlayerInfo*              GetPlayerInfo() = 0;
     virtual CProjectileInfo*          GetProjectileInfo() = 0;
     virtual CRadar*                   GetRadar() = 0;
@@ -136,7 +137,7 @@ public:
     virtual CCarEnterExit*            GetCarEnterExit() = 0;
     virtual CControllerConfigManager* GetControllerConfigManager() = 0;
     virtual CRenderWare*              GetRenderWare() = 0;
-    virtual CHandlingManager*         GetHandlingManager() = 0;
+    virtual CHandlingManager*         GetHandlingManager() const noexcept = 0;
     virtual CAnimManager*             GetAnimManager() = 0;
     virtual CStreaming*               GetStreaming() = 0;
     virtual CVisibilityPlugins*       GetVisibilityPlugins() = 0;
@@ -149,11 +150,13 @@ public:
     virtual CPointLights*             GetPointLights() = 0;
     virtual CColStore*                GetCollisionStore() = 0;
     virtual CBuildingRemoval*         GetBuildingRemoval() = 0;
+    virtual CRenderer*                GetRenderer() const noexcept = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
+    virtual int          GetSystemFrameCounter() const = 0;
     virtual bool         IsAtMenu() = 0;
     virtual void         StartGame() = 0;
     virtual void         SetSystemState(eSystemState State) = 0;
@@ -228,8 +231,14 @@ public:
     virtual bool IsTunnelWeatherBlendEnabled() const noexcept = 0;
     virtual void SetTunnelWeatherBlendEnabled(bool isEnabled) = 0;
 
+    virtual bool IsIgnoreFireStateEnabled() const noexcept = 0;
+    virtual void SetIgnoreFireStateEnabled(bool isEnabled) = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
+
+    virtual void SetWeaponRenderEnabled(bool enabled) = 0;
+    virtual bool IsWeaponRenderEnabled() const = 0;
 
     virtual bool VerifySADataFileNames() = 0;
     virtual bool PerformChecks() = 0;
@@ -268,7 +277,7 @@ public:
     virtual int32_t GetBaseIDforSCM() = 0;
     virtual int32_t GetCountOfAllFileIDs() = 0;
 
-    virtual void RemoveAllBuildings(bool clearBuildingRemoval = true) = 0;
+    virtual void RemoveAllBuildings() = 0;
     virtual void RestoreGameBuildings() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;

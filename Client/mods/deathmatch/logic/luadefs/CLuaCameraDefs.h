@@ -43,6 +43,10 @@ public:
     LUA_DECLARE(SetCameraGoggleEffect);
     static bool SetCameraDrunkLevel(short drunkLevel);
 
+    // Cam do funcs
+    static bool ShakeCamera(float radius, std::optional<float> x, std::optional<float> y, std::optional<float> z) noexcept;
+    static bool ResetShakeCamera() noexcept;
+
     // For OOP only
     LUA_DECLARE(OOP_GetCameraPosition);
     LUA_DECLARE(OOP_SetCameraPosition);
