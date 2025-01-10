@@ -28,15 +28,14 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, const CVec
         size = MAX_BLIP_SIZE;
     }
 
-    CResource* resource = &lua_getownerresource(luaVM);
-    if (!resource)
-        return false;
-
-    CBlip* radarMarker = CStaticFunctionDefinitions::CreateBlip(resource, vecPosition, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383), visibleTo.value_or(nullptr));
+    CResource& resource = lua_getownerresource(luaVM);
+    CBlip*     radarMarker = CStaticFunctionDefinitions::CreateBlip(&resource, vecPosition, icon.value_or(0), size.value_or(2),
+                                                                    SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)),
+                                                                    ordering.value_or(0), visibleDistance.value_or(16383), visibleTo.value_or(nullptr));
     if (!radarMarker)
         return false;
 
-    if (CElementGroup* elementGroup = resource->GetElementGroup())
+    if (CElementGroup* elementGroup = resource.GetElementGroup())
         elementGroup->Add(radarMarker);
 
     return radarMarker;
@@ -53,15 +52,15 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, 
         size = MAX_BLIP_SIZE;
     }
 
-    CResource* resource = &lua_getownerresource(luaVM);
-    if (!resource)
-        return false;
+    CResource& resource = lua_getownerresource(luaVM);
+    CBlip*     radarMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo(&resource, entity, icon.value_or(0), size.value_or(2),
+                                                                              SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)),
+                                                                              ordering.value_or(0), visibleDistance.value_or(16383), visibleTo.value_or(nullptr));
 
-    CBlip* radarMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo(resource, entity, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383), visibleTo.value_or(nullptr));
     if (!radarMarker)
         return false;
 
-    if (CElementGroup* elementGroup = resource->GetElementGroup())
+    if (CElementGroup* elementGroup = resource.GetElementGroup())
         elementGroup->Add(radarMarker);
 
     return radarMarker;
