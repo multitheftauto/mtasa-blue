@@ -1610,6 +1610,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerTarget", "target", NULL, false);
     m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", NULL, false);
+    m_Events.AddEvent("onPlayerWeaponFire", "weapon, endX, endY, endZ, hitElement, startX, startY, startZ", nullptr, false);
+    m_Events.AddEvent("onPlayerWeaponReload", "weapon, clip, ammo", nullptr, false);
     m_Events.AddEvent("onPlayerMarkerHit", "marker, matchingDimension", NULL, false);
     m_Events.AddEvent("onPlayerMarkerLeave", "marker, matchingDimension", NULL, false);
     m_Events.AddEvent("onPlayerPickupHit", "pickup", NULL, false);
@@ -1645,6 +1647,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPedVehicleExit", "vehicle, reason, jacker", NULL, false);
     m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
+    m_Events.AddEvent("onPedWeaponReload", "weapon, clip, ammo", nullptr, false);
     m_Events.AddEvent("onPedDamage", "loss", NULL, false);
 
     // Element events
@@ -1700,7 +1703,6 @@ void CGame::AddBuiltInEvents()
 
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
-    m_Events.AddEvent("onPlayerWeaponFire", "weapon, endX, endY, endZ, hitElement, startX, startY, startZ", NULL, false);
 }
 
 void CGame::ProcessTrafficLights(long long llCurrentTime)
