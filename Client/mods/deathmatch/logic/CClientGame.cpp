@@ -6044,6 +6044,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::IGNOREFIRESTATE:
             g_pGame->SetIgnoreFireStateEnabled(isEnabled);
             break;
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            m_pVehicleManager->SetSpawnFlyingComponentEnabled(isEnabled);
+            break;
         default:
             return false;
     }
@@ -6094,6 +6097,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsTunnelWeatherBlendEnabled();
         case WorldSpecialProperty::IGNOREFIRESTATE:
             return g_pGame->IsIgnoreFireStateEnabled();
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
     }
     return false;
 }
