@@ -73,15 +73,7 @@ bool CLuaTeamDefs::GetTeamFriendlyFire(CClientTeam* team) noexcept
 
 std::vector<CClientPlayer*> CLuaTeamDefs::GetPlayersInTeam(CClientTeam* team) noexcept
 {
-    std::vector<CClientPlayer*> players;
-
-    for (auto iter = team->IterBegin(); iter != team->IterEnd(); ++iter)
-    {
-        if (!(*iter)->IsBeingDeleted())
-            players.push_back(*iter);
-    }
-
-    return players;
+    return team->GetPlayers();
 }
 
 std::uint32_t CLuaTeamDefs::CountPlayersInTeam(CClientTeam* team) noexcept

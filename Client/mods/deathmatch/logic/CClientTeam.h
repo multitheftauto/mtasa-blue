@@ -44,6 +44,7 @@ public:
     void AddPlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
     void RemovePlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
     void RemoveAll();
+    std::vector<CClientPlayer*> GetPlayers() noexcept;
 
     bool Exists(CClientPlayer* pPlayer);
 
