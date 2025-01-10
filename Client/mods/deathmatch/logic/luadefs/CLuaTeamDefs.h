@@ -18,7 +18,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
 private:
-    static CClientTeam* GetTeamFromName(const std::string name) noexcept;
+    static std::variant<CClientTeam*, bool> GetTeamFromName(const std::string name) noexcept;
     static std::string GetTeamName(CClientTeam* team) noexcept;
     static CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> GetTeamColor(CClientTeam* team) noexcept;
     static bool GetTeamFriendlyFire(CClientTeam* team) noexcept;

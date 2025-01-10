@@ -45,9 +45,14 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Team", "Element");
 }
 
-CClientTeam* CLuaTeamDefs::GetTeamFromName(const std::string name) noexcept
+std::variant<CClientTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string name) noexcept
 {
-    return m_pTeamManager->GetTeam(name.c_str());
+    CClientTeam* team = m_pTeamManager->GetTeam(name.c_str());
+
+    if (!team)
+        return false;
+
+    return team;
 }
 
 std::string CLuaTeamDefs::GetTeamName(CClientTeam* team) noexcept
