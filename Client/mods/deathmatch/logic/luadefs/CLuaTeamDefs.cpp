@@ -47,7 +47,8 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
 
 std::variant<CClientTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string_view name) noexcept
 {
-    CClientTeam* team = m_pTeamManager->GetTeam(name.data());
+    std::string  string(name);
+    CClientTeam* team = m_pTeamManager->GetTeam(string.c_str());
 
     if (!team)
         return false;
@@ -55,7 +56,7 @@ std::variant<CClientTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string
     return team;
 }
 
-std::string CLuaTeamDefs::GetTeamName(CClientTeam* team) noexcept
+std::string CLuaTeamDefs::GetTeamName(CClientTeam* team)
 {
     return std::string(team->GetTeamName());
 }
@@ -76,7 +77,7 @@ bool CLuaTeamDefs::GetTeamFriendlyFire(CClientTeam* team) noexcept
     return team->GetFriendlyFire();
 }
 
-std::vector<CClientPlayer*> CLuaTeamDefs::GetPlayersInTeam(CClientTeam* team) noexcept
+std::vector<CClientPlayer*> CLuaTeamDefs::GetPlayersInTeam(CClientTeam* team)
 {
     return team->GetPlayers();
 }
