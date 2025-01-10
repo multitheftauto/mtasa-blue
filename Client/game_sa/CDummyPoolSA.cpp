@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CDummyPoolSA.cpp
  *  PURPOSE:     Dummy pool class
@@ -13,64 +13,96 @@
 
 #include "StdInc.h"
 #include "CDummyPoolSA.h"
+#include "CGameSA.h"
+#include <game/CWorld.h>
+
+extern CGameSA* pGame;
 
 CDummyPoolSA::CDummyPoolSA()
 {
     m_ppDummyPoolInterface = (CPoolSAInterface<CEntitySAInterface>**)0xB744A0;
 }
 
-void CDummyPoolSA::RemoveAllBuildingLods()
+void CDummyPoolSA::RemoveAllWithBackup()
 {
-    if (m_pLodBackup)
+    if (m_pOriginalElementsBackup)
         return;
 
-    m_pLodBackup = std::make_unique<std::array<CEntitySAInterface*, MAX_DUMMIES>>();
+    m_pOriginalElementsBackup = std::make_unique<pool_backup_t>();
 
-    for (int i = 0; i < MAX_DUMMIES; i++)
+    auto pDummyPool = (*m_ppDummyPoolInterface);
+    for (auto i = 0; i < MAX_DUMMIES_DEFAULT; i++)
     {
-        CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
-        (*m_pLodBackup)[i] = object->m_pLod;
-        object->m_pLod = nullptr;
-    }
-}
-
-void CDummyPoolSA::RestoreAllBuildingsLods()
-{
-    if (!m_pLodBackup)
-        return;
-
-    for (int i = 0; i < MAX_DUMMIES; i++)
-    {
-        CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
-        object->m_pLod = (*m_pLodBackup)[i];
-    }
-
-    m_pLodBackup.release();
-}
-
-void CDummyPoolSA::UpdateBuildingLods(void* oldPool, void* newPool)
-{
-    const uint32_t offset = (uint32_t)newPool - (uint32_t)oldPool;
-
-    if (m_pLodBackup)
-    {
-        for (int i = 0; i < MAX_DUMMIES; i++)
+        if (pDummyPool->IsContains(i))
         {
-            if ((*m_pLodBackup)[i] != nullptr)
-            {
-                (*m_pLodBackup)[i] = (CEntitySAInterface*)((uint32_t)(*m_pLodBackup)[i] + offset);
-            }
+            CEntitySAInterface* building = pDummyPool->GetObject(i);
+
+            pGame->GetWorld()->Remove(building, CDummyPool_Destructor);
+            building->RemoveRWObjectWithReferencesCleanup();
+
+            pDummyPool->Release(i);
+
+            (*m_pOriginalElementsBackup)[i].first = true;
+            (*m_pOriginalElementsBackup)[i].second = *building;
+        }
+        else
+        {
+            (*m_pOriginalElementsBackup)[i].first = false;
         }
     }
+}
+
+void CDummyPoolSA::RestoreBackup()
+{
+    if (!m_pOriginalElementsBackup)
+        return;
+
+    auto& originalData = *m_pOriginalElementsBackup;
+    auto  pDummyPool = (*m_ppDummyPoolInterface);
+    for (auto i = 0; i < MAX_DUMMIES_DEFAULT; i++)
+    {
+        if (originalData[i].first)
+        {
+            pDummyPool->AllocateAt(i);
+            auto pDummy = pDummyPool->GetObject(i);
+            *pDummy = originalData[i].second;
+
+            pGame->GetWorld()->Add(pDummy, CDummyPool_Constructor);
+        }
+    }
+
+    m_pOriginalElementsBackup = nullptr;
+}
+
+void CDummyPoolSA::UpdateBuildingLods(const std::uint32_t offset)
+{
+    if (m_pOriginalElementsBackup)
+        UpdateBackupLodOffset(offset);
     else
+        UpdateLodsOffestInPool(offset);
+}
+
+void CDummyPoolSA::UpdateBackupLodOffset(const std::uint32_t offset)
+{
+    for (auto& it : *m_pOriginalElementsBackup)
     {
-        for (int i = 0; i < MAX_DUMMIES; i++)
+        if (it.first)
         {
-            CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
-            if (object->m_pLod)
-            {
-                object->m_pLod = (CEntitySAInterface*)((uint32_t)object->m_pLod + offset);
-            }
+            CEntitySAInterface* object = &it.second;
+            CEntitySAInterface* lod = object->GetLod();
+            if (lod)
+                object->SetLod((CEntitySAInterface*)((std::uint32_t)lod + offset));
         }
+    }
+}
+
+void CDummyPoolSA::UpdateLodsOffestInPool(const std::uint32_t offset)
+{
+    for (auto i = 0; i < (*m_ppDummyPoolInterface)->Size(); i++)
+    {
+        CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
+        CEntitySAInterface* lod = object->GetLod();
+        if (lod)
+            object->SetLod((CEntitySAInterface*)((std::uint32_t)lod + offset));
     }
 }
