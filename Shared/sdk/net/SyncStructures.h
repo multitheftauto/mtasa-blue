@@ -2141,6 +2141,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data7), BITCOUNT7);
+
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
         //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
