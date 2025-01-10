@@ -25,15 +25,15 @@ std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaV
         size = MAX_BLIP_SIZE;
     }
 
-    CResource* resource = &lua_getownerresource(luaVM);
-    if (!resource)
-        return false;
+    CResource&          resource = lua_getownerresource(luaVM);
+    CClientRadarMarker* radarMarker = CStaticFunctionDefinitions::CreateBlip(resource, vecPosition, icon.value_or(0), size.value_or(2),
+                                                                             SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)),
+                                                                             ordering.value_or(0), visibleDistance.value_or(16383));
 
-    CClientRadarMarker* radarMarker = CStaticFunctionDefinitions::CreateBlip(*resource, vecPosition, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383));
     if (!radarMarker)
         return false;
 
-    if (CElementGroup* elementGroup = resource->GetElementGroup())
+    if (CElementGroup* elementGroup = resource.GetElementGroup())
         elementGroup->Add(radarMarker);
 
     return radarMarker;
@@ -50,15 +50,15 @@ std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_S
         size = MAX_BLIP_SIZE;
     }
 
-    CResource* resource = &lua_getownerresource(luaVM);
-    if (!resource)
-        return false;
+    CResource&          resource = lua_getownerresource(luaVM);
+    CClientRadarMarker* radarMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo(
+        resource, *entity, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0),
+        visibleDistance.value_or(16383));
 
-    CClientRadarMarker* radarMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo(*resource, *entity, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383));
     if (!radarMarker)
         return false;
     
-    if (CElementGroup* elementGroup = resource->GetElementGroup())
+    if (CElementGroup* elementGroup = resource.GetElementGroup())
         elementGroup->Add(radarMarker);
 
     return radarMarker;
