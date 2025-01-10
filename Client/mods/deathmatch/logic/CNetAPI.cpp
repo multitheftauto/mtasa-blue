@@ -2243,10 +2243,11 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
 
     SVehicleDamageSyncMethodeB damage;
     BitStream.Read(&damage);
+    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
 
     if (damage.data.bSyncDoors)
         for (unsigned int i = 0; i < MAX_DOORS; ++i)
-            pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i], true);
+            pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i], flyingComponents);
 
     if (damage.data.bSyncWheels)
         for (unsigned int i = 0; i < MAX_WHEELS; ++i)
@@ -2254,7 +2255,7 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
 
     if (damage.data.bSyncPanels)
         for (unsigned int i = 0; i < MAX_PANELS; ++i)
-            pVehicle->SetPanelStatus(i, damage.data.panels.data.ucStates[i]);
+            pVehicle->SetPanelStatus(i, damage.data.panels.data.ucStates[i], flyingComponents);
 
     if (damage.data.bSyncLights)
         for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
