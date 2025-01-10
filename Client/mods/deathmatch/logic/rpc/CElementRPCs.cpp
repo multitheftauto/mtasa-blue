@@ -49,6 +49,7 @@ void CElementRPCs::LoadFunctions()
     AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetWeaponConfig, "setWeaponFlags");
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
     AddHandler(SET_COLPOLYGON_HEIGHT, SetColPolygonHeight, "setColShapePolygonHeight");
+    AddHandler(SET_ELEMENT_ON_FIRE, SetElementOnFire, "setElementOnFire");
 }
 
 #define RUN_CHILDREN_SERVER(func) \
@@ -64,22 +65,20 @@ void CElementRPCs::SetElementParent(CClientEntity* pSource, NetBitStreamInterfac
 {
     // Read out the entity id and parent id
     ElementID ParentID;
-    if (bitStream.Read(ParentID))
-    {
-        CClientEntity* pParent = CElementIDs::GetElement(ParentID);
-        if (pParent)
-        {
-            pSource->SetParent(pParent);
-        }
-        else
-        {
-            // TODO: raise an error
-        }
-    }
-    else
-    {
-        // TODO: raise an error
-    }
+    if (!bitStream.Read(ParentID))
+        return;
+
+    CClientEntity* pParent = CElementIDs::GetElement(ParentID);
+    if (!pParent)
+        return;
+
+    if (pParent->IsMyChild(pSource, true))
+        return;
+
+    if (pSource->IsMyChild(pParent, true))
+        return;
+
+    pSource->SetParent(pParent);
 }
 
 void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface& bitStream)
@@ -760,4 +759,9 @@ void CElementRPCs::SetColPolygonHeight(CClientEntity* pSource, NetBitStreamInter
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pSource);
         pColPolygon->SetHeight(fFloor, fCeil);
     }
+}
+
+void CElementRPCs::SetElementOnFire(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    pSource->SetOnFire(bitStream.ReadBit());
 }

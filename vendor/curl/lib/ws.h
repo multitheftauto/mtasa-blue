@@ -25,7 +25,7 @@
  ***************************************************************************/
 #include "curl_setup.h"
 
-#if defined(USE_WEBSOCKETS) && !defined(CURL_DISABLE_HTTP)
+#if !defined(CURL_DISABLE_WEBSOCKETS) && !defined(CURL_DISABLE_HTTP)
 
 #ifdef USE_HYPER
 #define REQTYPE void
@@ -57,7 +57,7 @@ struct ws_encoder {
   curl_off_t payload_len;  /* payload length of current frame */
   curl_off_t payload_remain;  /* remaining payload of current */
   unsigned int xori; /* xor index */
-  unsigned char mask[4]; /* 32 bit mask for this connection */
+  unsigned char mask[4]; /* 32-bit mask for this connection */
   unsigned char firstbyte; /* first byte of frame we encode */
   bool contfragment; /* set TRUE if the previous fragment sent was not final */
 };

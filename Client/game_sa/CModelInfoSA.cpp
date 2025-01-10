@@ -270,20 +270,14 @@ bool CModelInfoSA::IsTrailer()
     return bReturn;
 }
 
-BYTE CModelInfoSA::GetVehicleType()
+BYTE CModelInfoSA::GetVehicleType() const noexcept
 {
     // This function will return a vehicle type for vehicles or 0xFF on failure
-    DWORD dwFunction = FUNC_IsVehicleModelType;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = -1;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return bReturn;
+    if (!IsVehicle())
+        return -1;
+
+    auto GetVehicleModelType = reinterpret_cast<BYTE(__cdecl*)(DWORD)>(FUNC_IsVehicleModelType);
+    return GetVehicleModelType(m_dwModelID);
 }
 
 bool CModelInfoSA::IsVehicle() const
@@ -292,9 +286,25 @@ bool CModelInfoSA::IsVehicle() const
     if (m_dwModelID >= 20000)
         return false;
 
+    if (!IsAllocatedInArchive())
+        return false;
+
     // NOTE(botder): m_pInterface might be a nullptr here, we can't use it
     CBaseModelInfoSAInterface* model = ppModelInfo[m_dwModelID];
-    return model != nullptr && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
+    return model && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
+}
+
+bool CModelInfoSA::IsVehicleModel(std::uint32_t model) noexcept
+{
+    try
+    {
+        const auto* const modelInfo = pGame->GetModelInfo(model);
+        return modelInfo && modelInfo->IsVehicle();
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
 
 bool CModelInfoSA::IsPlayerModel()
@@ -438,6 +448,16 @@ void CModelInfoSA::Remove()
         // Remove the model.
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
+}
+
+bool CModelInfoSA::UnloadUnused()
+{
+    if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
+    {
+        pGame->GetStreaming()->RemoveModel(m_dwModelID);
+        return true;
+    }
+    return false;
 }
 
 bool CModelInfoSA::IsLoaded()
@@ -733,7 +753,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
 bool CModelInfoSA::IsValid()
 {
     if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
-        return !pGame->GetPools()->IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
+        return !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
         
     if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
         return true;
@@ -744,9 +764,16 @@ bool CModelInfoSA::IsValid()
     return true;
 }
 
-bool CModelInfoSA::IsAllocatedInArchive()
+bool CModelInfoSA::IsAllocatedInArchive() const noexcept
 {
-    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
+    try
+    {
+        return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -1035,7 +1062,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = 0;
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 
@@ -1734,6 +1761,24 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
+void CModelInfoSA::MakeObjectDamageableModel(std::uint16_t baseModel)
+{
+    CDamageableModelInfoSAInterface* m_pInterface = new CDamageableModelInfoSAInterface();
+
+    CDamageableModelInfoSAInterface* pBaseObjectInfo = static_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[baseModel]);
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CDamageableModelInfoSAInterface));
+    m_pInterface->usNumberOfRefs = 0;
+    m_pInterface->pRwObject = nullptr;
+    m_pInterface->usUnknown = 65535;
+    m_pInterface->usDynamicIndex = 65535;
+    m_pInterface->m_damagedAtomic = nullptr;
+
+    ppModelInfo[m_dwModelID] = m_pInterface;
+
+    m_dwParentID = baseModel;
+    CopyStreamingInfoFromModel(baseModel);
+}
+
 void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 {
     CTimeModelInfoSAInterface* m_pInterface = new CTimeModelInfoSAInterface();
@@ -1799,7 +1844,14 @@ void CModelInfoSA::DeallocateModel(void)
             delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::ATOMIC:
-            delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            if (IsDamageableAtomic())
+            {
+                delete reinterpret_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            }
+            else
+            {
+                delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            }
             break;
         case eModelInfoType::CLUMP:
             delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
@@ -2018,7 +2070,10 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 
 eModelInfoType CModelInfoSA::GetModelType()
 {
-    return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+    if (auto pInterface = GetInterface())
+        return ((eModelInfoType(*)())pInterface->VFTBL->GetModelType)();
+
+    return eModelInfoType::UNKNOWN;
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
@@ -2049,6 +2104,12 @@ bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
     }
 
     return isTowable;
+}
+
+bool CModelInfoSA::IsDamageableAtomic()
+{
+    void* asDamagable = ((void* (*)())m_pInterface->VFTBL->AsDamageAtomicModelInfoPtr)();
+    return asDamagable != nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -2095,4 +2156,9 @@ bool CModelInfoSA::ForceUnload()
         pGame->GetRenderWare()->TxdForceUnload(usTxdId, true);
 
     return true;
+}
+
+bool CVehicleModelInfoSAInterface::IsComponentDamageable(int componentIndex) const
+{
+    return pVisualInfo->m_maskComponentDamagable & (1 << componentIndex);
 }

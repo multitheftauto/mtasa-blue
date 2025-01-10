@@ -27,6 +27,14 @@
 class CDamageManagerSAInterface            // 28 bytes due to the way its packed (24 containing actual data)
 {
 public:
+    std::uint8_t GetPanelStatus(std::uint8_t panelId)
+    {
+        if (panelId >= MAX_PANELS)
+            return 0;
+
+        return ((std::uint8_t(__thiscall*)(CDamageManagerSAInterface*, std::uint8_t))FUNC_GetPanelStatus)(this, panelId);
+    }
+
     float fWheelDamageEffect;
     BYTE  bEngineStatus;            // old - wont be used
     BYTE  Wheel[MAX_WHEELS];
@@ -49,10 +57,10 @@ public:
     void          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent);
     BYTE          GetWheelStatus(eWheelPosition bWheel);
     void          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
-    BYTE          GetPanelStatus(BYTE bPanel);
+    BYTE          GetPanelStatus(BYTE bPanel) const;
     unsigned long GetPanelStatus();
-    void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);
-    void          SetPanelStatus(unsigned long ulStatus);
+    void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawnFlyingComponent = true, bool breakGlass = false);
+    void          SetPanelStatus(unsigned long ulStatus, bool spawnFlyingComponent = true, bool breakGlass = false);
     BYTE          GetLightStatus(BYTE bLight);
     unsigned char GetLightStatus();
     void          SetLightStatus(BYTE bLight, BYTE bLightStatus);
@@ -61,6 +69,8 @@ public:
     void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status);
 
     void FuckCarCompletely(bool bKeepWheels);
+
+    static int GetCarNodeIndexFromPanel(std::uint8_t panelId) noexcept;
 
     CDamageManagerSA(class CEntitySAInterface* intEntityInterface, CDamageManagerSAInterface* intInterface)
     {

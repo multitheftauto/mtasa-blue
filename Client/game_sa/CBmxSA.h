@@ -14,6 +14,22 @@
 #include <game/CBmx.h>
 #include "CBikeSA.h"
 
+enum class eBmxNodes
+{
+    NONE = 0,
+    CHASSIS,
+    FORKS_FRONT,
+    FORKS_REAR,
+    WHEEL_FRONT,
+    WHEEL_REAR,
+    HANDLEBARS,
+    CHAINSET,
+    PEDAL_R,
+    PEDAL_L,
+
+    NUM_NODES
+};
+
 class CBmxSAInterface : public CBikeSAInterface
 {
     // fill this

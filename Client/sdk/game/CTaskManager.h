@@ -41,6 +41,13 @@ enum
     ABORT_PRIORITY_IMMEDIATE
 };
 
+enum taskType
+{
+    PRIMARY_TASK = 0,
+    SECONDARY_TASK
+};
+
+
 class CTaskManager
 {
 public:

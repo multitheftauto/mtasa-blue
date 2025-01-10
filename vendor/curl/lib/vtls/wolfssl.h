@@ -27,7 +27,40 @@
 
 #ifdef USE_WOLFSSL
 
+#include "urldata.h"
+
+struct WOLFSSL;
+typedef struct WOLFSSL WOLFSSL;
+struct WOLFSSL_CTX;
+typedef struct WOLFSSL_CTX WOLFSSL_CTX;
+struct WOLFSSL_SESSION;
+typedef struct WOLFSSL_SESSION WOLFSSL_SESSION;
+
 extern const struct Curl_ssl Curl_ssl_wolfssl;
+
+struct wolfssl_ctx {
+  WOLFSSL_CTX *ctx;
+  WOLFSSL     *handle;
+  CURLcode    io_result;   /* result of last BIO cfilter operation */
+  int io_send_blocked_len; /* length of last BIO write that EAGAINed */
+  BIT(x509_store_setup);   /* x509 store has been set up */
+  BIT(shutting_down);      /* TLS is being shut down */
+};
+
+CURLcode Curl_wssl_setup_x509_store(struct Curl_cfilter *cf,
+                                    struct Curl_easy *data,
+                                    struct wolfssl_ctx *wssl);
+
+CURLcode wssl_setup_session(struct Curl_cfilter *cf,
+                            struct Curl_easy *data,
+                            struct wolfssl_ctx *wss,
+                            struct ssl_peer *peer);
+
+CURLcode wssl_cache_session(struct Curl_cfilter *cf,
+                            struct Curl_easy *data,
+                            struct ssl_peer *peer,
+                            WOLFSSL_SESSION *session);
+
 
 #endif /* USE_WOLFSSL */
 #endif /* HEADER_CURL_WOLFSSL_H */

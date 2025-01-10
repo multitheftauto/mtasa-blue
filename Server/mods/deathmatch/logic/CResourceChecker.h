@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CResourceChecker.cpp
+ *  FILE:        mods/deathmatch/logic/CResourceChecker.h
  *  PURPOSE:     Resource file content checker/validator/upgrader
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/

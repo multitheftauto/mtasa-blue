@@ -285,6 +285,12 @@ ADD_ENUM(ESyncType::LOCAL, "local")
 ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
 IMPLEMENT_ENUM_CLASS_END("sync-mode")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eCustomDataClientTrust)
+ADD_ENUM(eCustomDataClientTrust::UNSET, "default")
+ADD_ENUM(eCustomDataClientTrust::ALLOW, "allow")
+ADD_ENUM(eCustomDataClientTrust::DENY, "deny")
+IMPLEMENT_ENUM_CLASS_END("client-trust-mode")
+
 //
 // CResource from userdata
 //
@@ -638,6 +644,42 @@ void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions)
             }
         }
     }
+}
+
+//
+// Check 4x4 lua table
+//
+bool IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept
+{
+    std::uint32_t cell = 0;
+
+    if (lua_type(luaVM, argIndex) == LUA_TTABLE)
+    {
+        lua_pushnil(luaVM);
+        for (std::uint32_t row = 0; lua_next(luaVM, argIndex) != 0; lua_pop(luaVM, 1), ++row)
+        {
+            if (lua_type(luaVM, -1) != LUA_TTABLE)
+                return false;
+
+            std::uint32_t col = 0;
+
+            lua_pushnil(luaVM);
+            for (; lua_next(luaVM, -2) != 0; lua_pop(luaVM, 1), ++col, ++cell)
+            {
+                int argumentType = lua_type(luaVM, -1);
+                if (argumentType != LUA_TNUMBER && argumentType != LUA_TSTRING)
+                    return false;
+            }
+
+            if (col != 4)
+                return false;
+        }
+    }
+
+    if (cell != 16)
+        return false;
+
+    return true;
 }
 
 //
