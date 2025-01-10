@@ -61,7 +61,9 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         pSourcePlayer->SetAkimboArmUp(flags.data.bAkimboTargetUp);
         pSourcePlayer->SetOnFire(flags.data.bIsOnFire);
         pSourcePlayer->SetStealthAiming(flags.data.bStealthAiming);
-        pSourcePlayer->SetReloadingWeapon(flags.data.isReloadingWeapon);
+
+        if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+            pSourcePlayer->SetReloadingWeapon(flags.data2.isReloadingWeapon);
 
         // Contact element
         CElement* pContactElement = NULL;
@@ -343,7 +345,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         flags.data.bStealthAiming = (pSourcePlayer->IsStealthAiming() == true);
 
         if (pSourcePlayer->CanBitStream(eBitStreamVersion::IsPedReloadingWeapon))
-            flags.data.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
+            flags.data2.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
 
         CVector vecPosition = pSourcePlayer->GetPosition();
         if (pContactElement)

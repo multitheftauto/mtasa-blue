@@ -1119,7 +1119,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.bStealthAiming = (pPlayerModel->IsStealthAiming() == true);
 
     if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-        flags.data.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
+        flags.data2.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
 
     if (pPlayerWeapon->GetSlot() > 15)
         flags.data.bHasAWeapon = false;
