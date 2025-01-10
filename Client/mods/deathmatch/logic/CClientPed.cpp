@@ -6008,51 +6008,42 @@ void CClientPed::SetSpeechEnabled(bool bEnabled)
     m_bSpeechEnabled = bEnabled;
 }
 
-bool CClientPed::CanReloadWeapon()
+bool CClientPed::CanReloadWeapon() noexcept
 {
-    unsigned long    ulNow = CClientTime::GetTime();
-    CControllerState Current;
-    GetControllerState(Current);
-    int iWeaponType = GetWeapon()->GetType();
-    // Hes not Aiming, ducked or if he is ducked he is not currently moving and he hasn't moved while crouching in the last 300ms (sometimes the crouching move
-    // anim runs over and kills the reload animation)
-    if (Current.RightShoulder1 == false && (!IsDucked() || (Current.LeftStickX == 0 && Current.LeftStickY == 0)) &&
-        ulNow - m_ulLastTimeMovedWhileCrouched > 300)
-    {
-        // Ignore certain weapons (anything without clip ammo)
-        if (iWeaponType >= WEAPONTYPE_PISTOL && iWeaponType <= WEAPONTYPE_TEC9 && iWeaponType != WEAPONTYPE_SHOTGUN)
-        {
-            return true;
-        }
-    }
-    return false;
-}
+    const auto       time = CClientTime::GetTime();
+    CControllerState state;
+    GetControllerState(state);
 
-bool CClientPed::ReloadWeapon()
-{
-    if (m_pTaskManager)
-    {
-        CWeapon* pWeapon = GetWeapon();
-        CTask*   pTask = m_pTaskManager->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+    const auto weapon = GetWeapon()->GetType();
 
-        // Check his control states for anything that can cancel the anim instantly and make sure he is not firing
-        if (CanReloadWeapon() && (!pTask || (pTask && pTask->GetTaskType() != TASK_SIMPLE_USE_GUN)))
-        {
-            // Play anim + reload
-            pWeapon->SetState(WEAPONSTATE_RELOADING);
-
-            return true;
-        }
-    }
-    return false;
-}
-
-bool CClientPed::IsReloadingWeapon()
-{
-    if (CWeapon* weapon = GetWeapon(); weapon != nullptr)
-        return weapon->GetState() == WEAPONSTATE_RELOADING;
-    else
+    if (state.RightShoulder1 || (IsDucked() && (state.LeftStickX != 0 || state.LeftStickY != 0)) || time - m_ulLastTimeMovedWhileCrouched <= 300)
         return false;
+
+    if (weapon < WEAPONTYPE_PISTOL || weapon > WEAPONTYPE_TEC9 || weapon == WEAPONTYPE_SHOTGUN)
+        return false;
+
+    return true;
+}
+
+bool CClientPed::ReloadWeapon() noexcept
+{
+    if (!m_pTaskManager)
+        return false;
+
+    auto* weapon = GetWeapon();
+    auto* task = m_pTaskManager->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+
+    if (!CanReloadWeapon() || (task && task->GetTaskType() == TASK_SIMPLE_USE_GUN))
+        return false;
+
+    weapon->SetState(WEAPONSTATE_RELOADING);
+    return true;
+}
+
+bool CClientPed::IsReloadingWeapon() noexcept
+{
+    auto* weapon = GetWeapon();
+    return weapon && weapon->GetState() == WEAPONSTATE_RELOADING;
 }
 
 bool CClientPed::ShouldBeStealthAiming()

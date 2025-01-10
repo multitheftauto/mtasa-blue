@@ -600,6 +600,10 @@ enum class eBitStreamVersion : unsigned short
     // 2025-01-01
     AnimationsSync,
 
+    // Add server side isPedReloadingWeapon
+    // 2025-01-09
+    IsPedReloadingWeapon,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

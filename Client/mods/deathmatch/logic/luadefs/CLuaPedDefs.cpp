@@ -114,7 +114,7 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedChoking", IsPedChoking},
         {"isPedDucked", IsPedDucked},
         {"isPedDead", IsPedDead},
-        {"isPedReloadingWeapon", IsPedReloadingWeapon},
+        {"isPedReloadingWeapon", ArgumentParserWarn<false, IsPedReloadingWeapon>},
         {"killPedTask", ArgumentParser<killPedTask>},
     };
 
@@ -1233,25 +1233,11 @@ int CLuaPedDefs::GivePedWeapon(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::IsPedReloadingWeapon(lua_State* luaVM)
+bool CLuaPedDefs::IsPedReloadingWeapon(CClientPed* const ped) noexcept
 {
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, pPed->IsReloadingWeapon());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return ped->IsReloadingWeapon();
 }
-
+  
 int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
 {
     // Verify the argument
