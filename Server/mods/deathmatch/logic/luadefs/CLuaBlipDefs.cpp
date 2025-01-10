@@ -30,14 +30,13 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, const CVec
 
     CResource* resource = &lua_getownerresource(luaVM);
     if (!resource)
-        throw LuaFunctionError("Couldn't find the resource element. Please restart the resource and try again", false);
+        return false;
 
     CBlip* radarMarker = CStaticFunctionDefinitions::CreateBlip(resource, vecPosition, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383), visibleTo.value_or(nullptr));
     if (!radarMarker)
         return false;
 
-    CElementGroup* elementGroup = resource->GetElementGroup();
-    if (elementGroup)
+    if (CElementGroup* elementGroup = resource->GetElementGroup())
         elementGroup->Add(radarMarker);
 
     return radarMarker;
@@ -56,14 +55,13 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, 
 
     CResource* resource = &lua_getownerresource(luaVM);
     if (!resource)
-        throw LuaFunctionError("Couldn't find the resource element. Please restart the resource and try again", false);
+        return false;
 
     CBlip* radarMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo(resource, entity, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383), visibleTo.value_or(nullptr));
     if (!radarMarker)
         return false;
 
-    CElementGroup* elementGroup = resource->GetElementGroup();
-    if (elementGroup)
+    if (CElementGroup* elementGroup = resource->GetElementGroup())
         elementGroup->Add(radarMarker);
 
     return radarMarker;
@@ -82,7 +80,7 @@ auto CLuaBlipDefs::GetBlipSize(CBlip* radarMarker) noexcept
 auto CLuaBlipDefs::GetBlipColor(CBlip* radarMarker) noexcept
 {
     SColor color = radarMarker->GetColor();
-    return std::make_tuple(color.R, color.G, color.B, color.A);
+    return CLuaMultiReturn<float, float, float, float>{color.R, color.G, color.B, color.A};
 }
 
 auto CLuaBlipDefs::GetBlipOrdering(CBlip* radarMarker) noexcept
@@ -103,7 +101,7 @@ bool CLuaBlipDefs::SetBlipIcon(CElement* radarMarker, std::uint8_t icon)
     return CStaticFunctionDefinitions::SetBlipIcon(radarMarker, icon);
 }
 
-bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* radarMarker, std::uint8_t size) noexcept
+bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* radarMarker, std::uint8_t size)
 {
     if (size > MAX_BLIP_SIZE)
     {
@@ -114,17 +112,17 @@ bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* radarMarker, std::uin
     return CStaticFunctionDefinitions::SetBlipSize(radarMarker, size);
 }
 
-bool CLuaBlipDefs::SetBlipColor(CElement* radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a) noexcept
+bool CLuaBlipDefs::SetBlipColor(CElement* radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a)
 {
     return CStaticFunctionDefinitions::SetBlipColor(radarMarker, SColorRGBA(r, g, b, a));
 }
 
-bool CLuaBlipDefs::SetBlipOrdering(CElement* radarMarker, std::int16_t ordering) noexcept
+bool CLuaBlipDefs::SetBlipOrdering(CElement* radarMarker, std::int16_t ordering)
 {
     return CStaticFunctionDefinitions::SetBlipOrdering(radarMarker, ordering);
 }
 
-bool CLuaBlipDefs::SetBlipVisibleDistance(CElement* radarMarker, std::uint16_t visibleDistance) noexcept
+bool CLuaBlipDefs::SetBlipVisibleDistance(CElement* radarMarker, std::uint16_t visibleDistance)
 {
     return CStaticFunctionDefinitions::SetBlipVisibleDistance(radarMarker, visibleDistance);
 }
