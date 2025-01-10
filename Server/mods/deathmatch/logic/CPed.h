@@ -286,6 +286,9 @@ public:
     bool IsStealthAiming() { return m_bStealthAiming; }
     void SetStealthAiming(bool bAiming) { m_bStealthAiming = bAiming; }
 
+    bool IsReloadingWeapon() const noexcept { return m_reloadingWeapon; }
+    void SetReloadingWeapon(bool state) noexcept { m_reloadingWeapon = state; }
+
     bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
@@ -340,6 +343,7 @@ protected:
     bool                                 m_bHeadless;
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
+    bool                                 m_reloadingWeapon{};
     CVehicle*                            m_pJackingVehicle;
     SPlayerAnimData                      m_animData{};
 

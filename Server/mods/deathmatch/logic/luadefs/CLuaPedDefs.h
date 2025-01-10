@@ -53,6 +53,7 @@ public:
     LUA_DECLARE(IsPedInVehicle);
     LUA_DECLARE(GetPedAmmoInClip);
     LUA_DECLARE(GetPedTotalAmmo);
+    static bool IsPedReloadingWeapon(CPed* const ped) noexcept;
 
     // Ped set functions
     LUA_DECLARE(SetPedArmor);
@@ -78,5 +79,5 @@ public:
     LUA_DECLARE(SetPedOnFire);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);
-    LUA_DECLARE(reloadPedWeapon);
+    static bool ReloadPedWeapon(lua_State* vm, CPed* const ped) noexcept;
 };
