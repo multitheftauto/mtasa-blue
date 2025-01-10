@@ -19,10 +19,10 @@ public:
 
 private:
     // Team create/destroy functions
-    static CTeam* CreateTeam(lua_State* lua, std::string name, std::uint8_t red, std::uint8_t green, std::uint8_t blue) noexcept;
+    static std::variant<CTeam*, bool> CreateTeam(lua_State* lua, std::string name, std::uint8_t red, std::uint8_t green, std::uint8_t blue) noexcept;
 
     // Team get funcs
-    static CTeam* GetTeamFromName(const std::string name) noexcept;
+    static std::variant<CTeam*, bool> GetTeamFromName(const std::string name) noexcept;
     static std::string GetTeamName(CTeam* team) noexcept;
     static CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> GetTeamColor(CTeam* team) noexcept;
     static bool GetTeamFriendlyFire(CTeam* team) noexcept;

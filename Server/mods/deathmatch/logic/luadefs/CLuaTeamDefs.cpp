@@ -66,22 +66,22 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Team", "Element");
 }
 
-CTeam* CLuaTeamDefs::CreateTeam(lua_State* lua, std::string name, std::uint8_t red, std::uint8_t green, std::uint8_t blue) noexcept
+std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, std::string name, std::uint8_t red, std::uint8_t green, std::uint8_t blue) noexcept
 {
     CLuaMain* vm = g_pGame->GetLuaManager()->GetVirtualMachine(lua);
 
     if (!vm)
-        return nullptr;
+        return false;
 
     CResource* resource = vm->GetResource();
 
     if (!resource)
-        return nullptr;
+        return false;
 
     CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, name.c_str(), red, green, blue);
 
     if (!team)
-        return nullptr;
+        return false;
 
     CElementGroup* group = resource->GetElementGroup();
 
@@ -91,9 +91,14 @@ CTeam* CLuaTeamDefs::CreateTeam(lua_State* lua, std::string name, std::uint8_t r
     return team;
 }
 
-CTeam* CLuaTeamDefs::GetTeamFromName(const std::string name) noexcept
+std::variant<CTeam*, bool> CLuaTeamDefs::GetTeamFromName(const std::string name) noexcept
 {
-    return m_pTeamManager->GetTeam(name.c_str());
+    CTeam* team = m_pTeamManager->GetTeam(name.c_str());
+
+    if (!team)
+        return false;
+
+    return team;
 }
 
 std::string CLuaTeamDefs::GetTeamName(CTeam* team) noexcept
