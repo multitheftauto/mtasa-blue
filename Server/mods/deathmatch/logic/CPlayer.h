@@ -265,7 +265,7 @@ public:
     void SetRedirecting(bool bRedirecting) noexcept { m_bIsRedirecting = bRedirecting; }
     bool IsRedirecting() const noexcept { return m_bIsRedirecting; }
 
-    bool GetTeleported() const { return m_teleported; }
+    bool GetTeleported() const noexcept { return m_teleported; }
     void SetTeleported(bool bState) { m_teleported = bState; }
 
 protected:
