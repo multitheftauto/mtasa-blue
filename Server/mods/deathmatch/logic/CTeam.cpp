@@ -117,7 +117,7 @@ void CTeam::RemoveAllPlayers()
     m_Players.clear();
 }
 
-std::vector<CPlayer*> CTeam::GetPlayers() noexcept
+std::vector<CPlayer*> CTeam::GetPlayers() const
 {
     std::vector<CPlayer*> players;
 
