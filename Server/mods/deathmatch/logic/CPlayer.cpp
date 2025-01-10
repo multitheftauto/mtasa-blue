@@ -99,8 +99,6 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
 
     m_ucBlurLevel = 36;            // Default
 
-    m_bTeleported = false;
-
     // Sync stuff
     m_bSyncingVelocity = false;
     m_uiPuresyncPackets = 0;
@@ -1115,16 +1113,6 @@ void CPlayer::SetPlayerStat(unsigned short usStat, float fValue)
 {
     m_pPlayerStatsPacket->Add(usStat, fValue);
     CPed::SetPlayerStat(usStat, fValue);
-}
-
-bool CPlayer::GetTeleported()
-{
-    return m_bTeleported;
-}
-
-void CPlayer::SetTeleported(bool bState)
-{
-    m_bTeleported = bState;
 }
 
 // Calculate weapon range using efficient stuffs

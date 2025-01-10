@@ -1276,8 +1276,8 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
 
     if (IS_PLAYER(pElement)) 
     {
-        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-        pPlayer->SetTeleported(true);
+        CPlayer* player = static_cast<CPlayer*>(pElement);
+        player->SetTeleported(true);
     }
 
     // Update our position for that entity.

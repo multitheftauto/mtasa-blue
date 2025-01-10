@@ -129,9 +129,9 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             position.data.vecPosition += vecTempPos;
         }
 
-        CVector vecPlayerPosition = pSourcePlayer->GetPosition();
-        float fPlayerDistancePosition = DistanceBetweenPoints3D(vecPlayerPosition, position.data.vecPosition);
-        if (fPlayerDistancePosition >= g_TickRateSettings.iPlayerTeleportAlert) {
+        CVector playerPosition = pSourcePlayer->GetPosition();
+        float playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);
+        if (playerDistancePosition >= g_TickRateSettings.playerTeleportAlert) {
             if (!pSourcePlayer->GetTeleported()) {
                 pSourcePlayer->CallEvent("onPlayerTeleport");
             }
