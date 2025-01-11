@@ -19,7 +19,7 @@ public:
 
 private:
     // Team create/destroy functions
-    static std::variant<CTeam*, bool> CreateTeam(lua_State* lua, const std::string name, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue);
+    static std::variant<CTeam*, bool> CreateTeam(lua_State* lua, const std::string name, const std::optional<std::uint8_t> red, const std::optional<std::uint8_t> green, const std::optional<std::uint8_t> blue);
 
     // Team get funcs
     static std::variant<CTeam*, bool> GetTeamFromName(const std::string name);
