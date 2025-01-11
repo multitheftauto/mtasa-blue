@@ -147,5 +147,6 @@ public:
 
     static CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore);
 
+    static void RemoveGameWorld();
+    static void RestoreGameWorld();
 };
-
