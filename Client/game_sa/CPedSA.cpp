@@ -876,17 +876,17 @@ bool CPedSA::SetOnFire(bool onFire)
     }
     else
     {
+        bool wasFire = false;
+
         CFire* fire = fireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
         if (fire)
+        {
             fire->Extinguish();
+            wasFire = true;
+        }
 
         CTaskManager* taskManager = m_pPedIntelligence->GetTaskManager();
-        if (taskManager)
-        {
-            CTask* task = taskManager->GetTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM);
-            if (task && task->GetTaskType() == TASK_SIMPLE_PLAYER_ON_FIRE)
-                taskManager->RemoveTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM);
-        }            
+        return wasFire || (taskManager && taskManager->RemoveTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM, TASK_SIMPLE_PLAYER_ON_FIRE));
     }
 
     return true;
