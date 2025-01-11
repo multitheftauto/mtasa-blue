@@ -13,7 +13,6 @@
 #include "CTeam.h"
 #include "CLogger.h"
 #include "Utils.h"
-#include "lua/LuaCommon.h"
 
 CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
     : CElement(pParent)
@@ -118,19 +117,17 @@ void CTeam::RemoveAllPlayers()
     m_Players.clear();
 }
 
-void CTeam::GetPlayers(lua_State* luaVM)
+std::vector<CPlayer*> CTeam::GetPlayers() const
 {
-    unsigned int                   uiIndex = 0;
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); ++iter)
+    std::vector<CPlayer*> players;
+
+    for (auto iter = m_Players.begin(); iter != m_Players.end(); ++iter)
     {
         if (!(*iter)->IsBeingDeleted())
-        {
-            lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushelement(luaVM, *iter);
-            lua_settable(luaVM, -3);
-        }
+            players.push_back(*iter);
     }
+
+    return players;
 }
 
 void CTeam::GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue)

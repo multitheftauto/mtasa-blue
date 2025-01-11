@@ -26,8 +26,8 @@ public:
     void       RemoveBuilding(CBuilding* pBuilding);
     bool       HasFreeBuildingSlot();
 
-    void RemoveAllBuildings() override;
-    void RestoreAllBuildings() override;
+    void RemoveAllWithBackup() override;
+    void RestoreBackup() override;
     bool Resize(int size) override;
     int  GetSize() const override { return (*m_ppBuildingPoolInterface)->m_nSize; };
 
@@ -40,8 +40,8 @@ private:
     void RemovePedsContactEnityLinks();
 
 private:
-    SVectorPoolData<CBuildingSA> m_buildingPool{MAX_BUILDINGS};
-    CPoolSAInterface<CBuildingSAInterface>**           m_ppBuildingPoolInterface;
+    SVectorPoolData<CBuildingSA>             m_buildingPool{MAX_BUILDINGS};
+    CPoolSAInterface<CBuildingSAInterface>** m_ppBuildingPoolInterface;
 
     std::unique_ptr<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>> m_pOriginalBuildingsBackup;
 };

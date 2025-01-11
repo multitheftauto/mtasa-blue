@@ -3086,6 +3086,7 @@ void CClientGame::UpdateMimics()
             bool  bSunbathing = m_pLocalPlayer->IsSunbathing();
             bool  bDoingDriveby = m_pLocalPlayer->IsDoingGangDriveby();
             bool  bStealthAiming = m_pLocalPlayer->IsStealthAiming();
+            bool  reloadingWeapon = m_pLocalPlayer->IsReloadingWeapon();
 
             // Is the current weapon goggles (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
             if (weaponSlot == 11 || weaponSlot == 12 || ucWeaponType == 43)
@@ -3143,6 +3144,9 @@ void CClientGame::UpdateMimics()
                 pMimic->SetSunbathing(bSunbathing);
                 pMimic->SetDoingGangDriveby(bDoingDriveby);
                 pMimic->SetStealthAiming(bStealthAiming);
+
+                if (reloadingWeapon)
+                    pMimic->ReloadWeapon();
 
                 Controller.ShockButtonL = 0;
 
@@ -6041,6 +6045,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::IGNOREFIRESTATE:
             g_pGame->SetIgnoreFireStateEnabled(isEnabled);
             break;
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            m_pVehicleManager->SetSpawnFlyingComponentEnabled(isEnabled);
+            break;
         default:
             return false;
     }
@@ -6091,6 +6098,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsTunnelWeatherBlendEnabled();
         case WorldSpecialProperty::IGNOREFIRESTATE:
             return g_pGame->IsIgnoreFireStateEnabled();
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
     }
     return false;
 }

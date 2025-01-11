@@ -277,8 +277,8 @@ public:
     virtual int32_t GetBaseIDforSCM() = 0;
     virtual int32_t GetCountOfAllFileIDs() = 0;
 
-    virtual void RemoveAllBuildings() = 0;
-    virtual void RestoreGameBuildings() = 0;
+    virtual void RemoveGameWorld() = 0;
+    virtual void RestoreGameWorld() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
 

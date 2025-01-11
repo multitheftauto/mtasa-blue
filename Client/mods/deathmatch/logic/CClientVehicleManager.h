@@ -70,9 +70,13 @@ public:
     void OnCreation(CClientVehicle* pVehicle);
     void OnDestruction(CClientVehicle* pVehicle);
 
+    bool IsSpawnFlyingComponentEnabled() const noexcept { return m_spawnFlyingComponentsDuringRecreate; }
+    void SetSpawnFlyingComponentEnabled(bool isEnabled) noexcept { m_spawnFlyingComponentsDuringRecreate = isEnabled; }
+
 protected:
     CClientManager*               m_pManager;
     bool                          m_bCanRemoveFromList;
     CMappedArray<CClientVehicle*> m_List;
     CMappedArray<CClientVehicle*> m_StreamedIn;
+    bool                          m_spawnFlyingComponentsDuringRecreate{true};
 };
