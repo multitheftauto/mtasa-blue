@@ -19,7 +19,7 @@
 
 extern CGameSA* pGame;
 
-static float radarAltimeterFix = 0.0014625f;
+static float radarAltimeterFix = 0.0014625f;                            // Changes altimeter width (and maybe x pos)
 static float aspectRatioMultiplicatorUntouched = 0.0015625f;            // (1 / 640)
 
 static ComponentProperties componentProperties;

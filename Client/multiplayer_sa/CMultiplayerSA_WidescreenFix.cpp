@@ -68,6 +68,7 @@ void InstallAspectRatioFixes()
 
 void InstallFieldOfViewFixes()
 {
+    // Fix sky blurring white in ultrawide screens
     MemPut<const float*>(0x714843, &SkyMultiFix);
     MemPut<const float*>(0x714860, &SkyMultiFix);
 
@@ -76,9 +77,8 @@ void InstallFieldOfViewFixes()
 
     // Skips division by CDraw::ms_fAspectRatio
     MemSet((void*)0x50AD79, 0x90, 6);
-
-    MemPut<float*>(0x50AD5B, &CameraWidth);
-    MemPut<float*>(0x51498F, &CameraWidth);
+    MemPut<float*>(0x50AD5B, &CameraWidth); // CCamera::Find3rdPersonQuickAimPitch
+    MemPut<float*>(0x51498F, &CameraWidth); // CCamera::Find3rdPersonCamTargetVector
 }
 
 void CMultiplayerSA::InitHooks_WidescreenFix()
