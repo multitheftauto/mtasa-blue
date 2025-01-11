@@ -65,7 +65,7 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Team", "Element");
 }
 
-std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::string name, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue)
+std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::string name, const std::optional<std::uint8_t> red, const std::optional<std::uint8_t> green, const std::optional<std::uint8_t> blue)
 {
     CLuaMain& vm = lua_getownercluamain(lua);
     CResource* resource = vm.GetResource();
@@ -73,7 +73,7 @@ std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::s
     if (!resource)
         return false;
 
-    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, name.c_str(), red, green, blue);
+    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, name.c_str(), red.value_or(235), green.value_or(221), blue.value_or(178));
 
     if (!team)
         return false;
