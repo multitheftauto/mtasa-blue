@@ -608,6 +608,8 @@ enum class eBitStreamVersion : unsigned short
     // 2025-01-10
     WorldSpecialProperty_FlyingComponents,
 
+    IsVehicleNitroActivated_Serverside,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

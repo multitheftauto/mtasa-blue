@@ -1777,6 +1777,9 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
 
     // Write the sent position to the interpolator
     AddInterpolation(vecPosition);
+
+    if (BitStream.Can(eBitStreamVersion::IsVehicleNitroActivated_Serverside))
+        BitStream.Write(pVehicle->GetNitroLevel());
 }
 
 bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream)
