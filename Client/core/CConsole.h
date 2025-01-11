@@ -25,9 +25,12 @@ public:
     CConsole(CGUI* pManager, CGUIElement* pParent = NULL);
     ~CConsole();
 
-    void Echo(const char* szText);
-    void Print(const char* szText);
-    void Printf(const char* szFormat, ...);
+    void Echo(const char* text);
+    void Echo(const std::string& text);
+
+    void Print(const char* text);
+    void Printf(const char* format, ...);
+    void Print(const std::string& text);
 
     void Clear();
 

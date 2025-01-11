@@ -81,37 +81,37 @@ bool CCommands::Execute(const char* szCommandLine)
     return Execute(strCmd.c_str(), strCmdLine.c_str());
 }
 
-bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool bHandleRemotely, bool bIsScriptedBind)
+bool CCommands::Execute(const char* command, const char* parametersIn, bool handleRemotely, bool isScriptedBind)
 {
     // Copy szParametersIn so the contents can be changed
-    std::string strParameters = szParametersIn ? std::string(szParametersIn, strlen(szParametersIn)) : "";
+    std::string parameters(parametersIn ? parametersIn : "");
 
     // HACK: if its a 'chatboxsay' command, use the next parameter
     // Is the command "say" and the arguments start with /? (command comes from the chatbox)
-    if (!bIsScriptedBind && !stricmp(szCommand, "chatboxsay"))
+    if (!handleRemotely && !stricmp(command, "chatboxsay"))
     {
-        if (!strParameters.empty())
+        if (!parameters.empty())
         {
             // His line starts with '/'?
-            if (strParameters[0] == '/')
+            if (parameters[0] == '/')
             {
                 // Copy the characters after the slash to the 0 terminator to a seperate buffer
-                std::array<char, 256> szBuffer = {};
-                std::strncpy(szBuffer.data(), strParameters.c_str() + 1, szBuffer.size() - 1);
-                szBuffer.back() = '\0';
+                std::array<char, 256> buffer = {};
+                std::strncpy(buffer.data(), parameters.c_str() + 1, buffer.size() - 1);
+                buffer.back() = '\0';
 
                 // Split it into command and arguments
-                szCommand = std::strtok(szBuffer.data(), " ");
-                if (!szCommand)
+                command = std::strtok(buffer.data(), " ");
+                if (!command)
                     return false;
 
-                if (char* szNewParameters = std::strtok(nullptr, "\0"))
+                if (char* newParameters = std::strtok(nullptr, "\0"))
                 {
-                    strParameters = std::string(szNewParameters, strlen(szNewParameters));
+                    parameters = std::string(newParameters);
                 }
                 else
                 {
-                    strParameters.clear();
+                    parameters.clear();
                 }
             }
         }
@@ -120,28 +120,30 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     }
 
     // Grab the command
-    tagCOMMANDENTRY* pEntry = Get(szCommand);
-    bool             wasHandled = false;
+    const tagCOMMANDENTRY* entry = Get(command);
+    bool                   wasHandled = false;
 
     // If its a core command, or if its enabled
-    if (pEntry && (!pEntry->bModCommand || pEntry->bEnabled))
+    if (entry && (!entry->bModCommand || entry->bEnabled))
     {
         // Execute it
-        if (!bIsScriptedBind || pEntry->bAllowScriptedBind)
-            ExecuteHandler(pEntry->pfnCmdFunc, strParameters.c_str());
+        if (!isScriptedBind || entry->bAllowScriptedBind)
+            ExecuteHandler(entry->pfnCmdFunc, parameters.c_str());
 
         wasHandled = true;
     }
 
     // Recompose the original command text
-    std::string val = std::string(szCommand) + " " + strParameters;
+    std::string val = command;
+    val += " ";
+    val += parameters;
 
     // Is it a cvar? (syntax: cvar[ = value])
     if (!wasHandled)
     {
         // Check to see if '=' exists
-        unsigned int nOpIndex = val.find('=');
-        std::string  key = val.substr(0, nOpIndex);
+        std::size_t nOpIndex = val.find('=');
+        std::string key = val.substr(0, nOpIndex);
 
         // Check to see if ' =' exists
         if (val.find(" =") != std::string::npos)
@@ -152,7 +154,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
         TrimWhiteSpace(key);
 
         // Handle the cvar if it exists
-        if (CClientVariables::GetSingleton().Exists(key) && !bIsScriptedBind)
+        if (CClientVariables::GetSingleton().Exists(key) && !isScriptedBind)
         {
             std::stringstream ss;
 
@@ -178,22 +180,22 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             }
             ss << key << " = " << val;
             val = ss.str();
-            CCore::GetSingleton().GetConsole()->Print(val.c_str());
+            CCore::GetSingleton().GetConsole()->Print(val);
             return true;
         }
     }
 
     // HACK: if its a 'nick' command, save it here
-    bool bIsNickCommand = !stricmp(szCommand, "nick");
-    if (!wasHandled && bIsNickCommand && !strParameters.empty() && !bIsScriptedBind)
+    bool isNickCommand = !stricmp(command, "nick");
+    if (!wasHandled && isNickCommand && !parameters.empty() && !isScriptedBind)
     {
-        if (CCore::GetSingleton().IsValidNick(strParameters.c_str()))
+        if (CCore::GetSingleton().IsValidNick(parameters.c_str()))
         {
-            CVARS_SET("nick", strParameters);
+            CVARS_SET("nick", parameters);
 
             if (!CCore::GetSingleton().IsConnected())
             {
-                CCore::GetSingleton().GetConsole()->Print(std::format("nick: You are now known as {}", strParameters).c_str());
+                CCore::GetSingleton().GetConsole()->Print(std::format("nick: You are now known as {}", parameters));
             }
         }
         else if (!CCore::GetSingleton().IsConnected())
@@ -205,8 +207,8 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     // Try to execute the handler
     if (m_pfnExecuteHandler)
     {
-        bool bAllowScriptedBind = (!pEntry || pEntry->bAllowScriptedBind);
-        if (m_pfnExecuteHandler(szCommand, strParameters.c_str(), bHandleRemotely, wasHandled, bIsScriptedBind, bAllowScriptedBind))
+        bool bAllowScriptedBind = (!entry || entry->bAllowScriptedBind);
+        if (m_pfnExecuteHandler(command, parameters.c_str(), handleRemotely, wasHandled, isScriptedBind, bAllowScriptedBind))
             return true;
     }
 
@@ -214,9 +216,9 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
         return true;
 
     // Unknown command
-    val = _("Unknown command or cvar: ") + szCommand;
-    if (!bIsScriptedBind && !bIsNickCommand && !pEntry)
-        CCore::GetSingleton().GetConsole()->Print(val.c_str());
+    val = _("Unknown command or cvar: ") + command;
+    if (!isScriptedBind && !isNickCommand && !entry)
+        CCore::GetSingleton().GetConsole()->Print(val);
 
     return false;
 }

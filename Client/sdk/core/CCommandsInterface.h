@@ -41,7 +41,7 @@ public:
     virtual bool         Exists(const char* szCommand) = 0;
 
     virtual bool Execute(const char* szCommandLine) = 0;
-    virtual bool Execute(const char* szCommand, const char* szParameters, bool bHandleRemotely = false, bool bIsScriptedBind = false) = 0;
+    virtual bool Execute(const char* command, const char* parametersIn, bool handleRemotely = false, bool isScriptedBind = false) = 0;
 
     virtual void Delete(const char* szCommand) = 0;
     virtual void DeleteAll() = 0;

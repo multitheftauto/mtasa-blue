@@ -64,10 +64,10 @@ CConsole::~CConsole()
     delete m_pConsoleHistory;
 }
 
-void CConsole::Echo(const char* szText)
+void CConsole::Echo(const char* text)
 {
     // Add to add buffer
-    m_strPendingAdd += szText;
+    m_strPendingAdd += text;
     if (!m_strPendingAdd.EndsWith("\n"))
         m_strPendingAdd += "\n";
 
@@ -83,25 +83,52 @@ void CConsole::Echo(const char* szText)
     if (m_pWindow->IsVisible())
         FlushPendingAdd();
 
-    CConsoleLogger::GetSingleton().LinePrintf("[Output] : %s", szText);
+    CConsoleLogger::GetSingleton().LinePrintf("[Output] : %s", text);
 }
 
-void CConsole::Print(const char* szText)
+void CConsole::Echo(const std::string& text)
 {
-    Echo(szText);
+    // Add to add buffer
+    m_strPendingAdd += text;
+    if (!m_strPendingAdd.EndsWith("\n"))
+        m_strPendingAdd += "\n";
+
+    // Trim add buffer
+    if (m_strPendingAdd.length() > CONSOLE_SIZE)
+    {
+        m_strPendingAdd = m_strPendingAdd.Right(CONSOLE_SIZE);
+        m_strPendingAdd = m_strPendingAdd.SplitRight("\n");
+        m_pHistory->SetText("");
+    }
+
+    // Flush add buffer is window is visible
+    if (m_pWindow->IsVisible())
+        FlushPendingAdd();
+
+    CConsoleLogger::GetSingleton().WriteLine("[Output] : " + text);
 }
 
-void CConsole::Printf(const char* szFormat, ...)
+void CConsole::Print(const char* text)
+{
+    Echo(text);
+}
+
+void CConsole::Printf(const char* format, ...)
 {
     // Parse the formatted string to a string we can echo
     char    szBuffer[1024];
     va_list ap;
-    va_start(ap, szFormat);
-    VSNPRINTF(szBuffer, 1024, szFormat, ap);
+    va_start(ap, format);
+    VSNPRINTF(szBuffer, 1024, format, ap);
     va_end(ap);
 
     // Echo it
     Echo(szBuffer);
+}
+
+void CConsole::Print(const std::string& text)
+{
+    Echo(text);
 }
 
 void CConsole::Clear()

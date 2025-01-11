@@ -14,9 +14,12 @@
 class CConsoleInterface
 {
 public:
-    virtual void Echo(const char* szText) = 0;
-    virtual void Print(const char* szText) = 0;
-    virtual void Printf(const char* szFormat, ...) = 0;
+    virtual void Echo(const char* text) = 0;
+    virtual void Echo(const std::string& text) = 0;
+
+    virtual void Print(const char* text) = 0;
+    virtual void Printf(const char* format, ...) = 0;
+    virtual void Print(const std::string& text) = 0;
 
     virtual void Clear() = 0;
 
