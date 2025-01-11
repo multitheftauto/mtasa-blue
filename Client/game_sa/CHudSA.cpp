@@ -19,8 +19,9 @@
 
 extern CGameSA* pGame;
 
-static float               radarAltimeterFix = 0.0014625f;
-static float               aspectRatioMultiplicatorUntouched = 0.0015625f;            // (1 / 640)
+static float radarAltimeterFix = 0.0014625f;
+static float aspectRatioMultiplicatorUntouched = 0.0015625f;            // (1 / 640)
+
 static ComponentProperties componentProperties;
 
 RsGlobal* CHudSA::rsGlobal = reinterpret_cast<RsGlobal*>(VAR_RSGlobal);
@@ -58,10 +59,10 @@ CHudSA::CHudSA()
     m_pfAspectRatioMultiplicatorX = (float*)VAR_AspectRatioMultX;
     m_pfAspectRatioMultiplicatorY = (float*)VAR_AspectRatioMult;
 
+    MemPut<float>(0x866C84, 640.0f / ((4.0f / 3.0f) * 448.0f));            // 0x866C84: Weapon sprite x position
     MemPut<float>(m_pfAspectRatioMultiplicatorX, 0.0015625f);              // (1 / 640)
     MemPut<float>(m_pfAspectRatioMultiplicatorY, 0.002232143f);            // (1 / 448)
 
-    MemPut<float>(0x866C84, 640.0f / ((4.0f / 3.0f) * 448.0f));              // 0x866C84: Weapon sprite position
     MemPut<float*>(0x58B141, &aspectRatioMultiplicatorUntouched);            // Vehicle name x pos
     MemPut<float*>(0x58AE4C, &aspectRatioMultiplicatorUntouched);            // Area name x pos
     MemPut<float*>(0x58A6E0, &radarAltimeterFix);                            // Fix radar altimeter
@@ -261,11 +262,11 @@ void CHudSA::AdjustComponents(float fAspectRatio)
     // 16/9
     const float ratio = (640.0f / (fAspectRatio * 448.0f));
 
-    radarAltimeterFix = ratio * 0.0015f;
+    radarAltimeterFix = ratio * 0.00147f;
     MemPut<float>(m_pfAspectRatioMultiplicatorX, ratio * 0.0015625f);
     MemPut<float>(m_pfAspectRatioMultiplicatorY, ratio * 0.002232143f);
-    MemPut<float>(0x866C84, ratio * 0.17343046f);            // 0x866C84: Weapon sprite position
-
+    MemPut<float>(0x866C84, ratio * 0.17343046f);            // 0x866C84: Weapon sprite x position
+    
     UpdateStreetchCalculations();
 }
 
@@ -278,7 +279,7 @@ void CHudSA::ResetComponentAdjustment()
     radarAltimeterFix = 0.0014625f;
     MemPut<float>(m_pfAspectRatioMultiplicatorX, 0.0015625f);              // (1 / 640)
     MemPut<float>(m_pfAspectRatioMultiplicatorY, 0.002232143f);            // (1 / 448)
-    MemPut<float>(0x866C84, 0.17343046f);                                  // 0x866C84: Weapon sprite position
+    MemPut<float>(0x866C84, 0.17343046f);                                  // 0x866C84: Weapon sprite x position
 
     UpdateStreetchCalculations();
 }
