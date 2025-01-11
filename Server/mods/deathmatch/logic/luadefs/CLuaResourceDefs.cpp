@@ -903,12 +903,7 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
     if (resourceElement.has_value())
         return (*resourceElement)->GetName();
 
-    CResource* localResource = &lua_getownerresource(luaVM);
-
-    if (!localResource)
-        throw std::invalid_argument("Couldn't find the resource");
-
-    return localResource->GetName();
+    return lua_getownerresource(luaVM).GetName();
 }
 
 int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)

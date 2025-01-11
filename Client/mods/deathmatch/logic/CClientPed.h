@@ -107,6 +107,7 @@ struct SLastSyncedPedData
     float   fRotation;
     bool    bOnFire;
     bool    bIsInWater;
+    bool    isReloadingWeapon;
 };
 
 struct SRestoreWeaponItem
@@ -495,9 +496,9 @@ public:
     bool GetBulletImpactData(CClientEntity** ppVictim = 0, CVector* pvecHitPosition = 0);
     void ClearBulletImpactData() { m_bBulletImpactData = false; }
 
-    bool CanReloadWeapon();
-    bool ReloadWeapon();
-    bool IsReloadingWeapon();
+    bool CanReloadWeapon() noexcept;
+    bool ReloadWeapon() noexcept;
+    bool IsReloadingWeapon() noexcept;
 
     bool ShouldBeStealthAiming();
     bool IsStealthAiming() { return m_bStealthAiming; }
