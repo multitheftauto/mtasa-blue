@@ -73,7 +73,7 @@ std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::s
     if (!resource)
         return false;
 
-    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, name.c_str(), red.value_or(0xFF), green.value_or(0xFF), blue.value_or(0xFF));
+    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, name.c_str(), red.value_or(235), green.value_or(221), blue.value_or(178));
 
     if (!team)
         return false;
