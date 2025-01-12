@@ -15,20 +15,21 @@
 #endif
 
 // NOTE: This code is based on ThirteenAG's fix, which is licensed under the MIT license.
-static float           CameraWidth = 0.01403292f;
-static constexpr float WidthMult = 0.0015625f;
-static constexpr float HeightMult = 0.002232143f;
+
+static constexpr float CameraWidth = 0.01403292f;
 static constexpr float SkyMultiFix = 10.0f;
 
 static float* ScreenAspectRatio = reinterpret_cast<float*>(0xC3EFA4);
 static float* ScreenFieldOfView = reinterpret_cast<float*>(0x8D5038);
 
-float AdjustFOV(float f, float ar)
+static float AdjustFOV(float factor, float aspectRatio)
 {
-    return std::round((2.0f * atan(((ar) / (4.0f / 3.0f)) * tan(f / 2.0f * ((float)M_PI / 180.0f)))) * (180.0f / (float)M_PI) * 100.0f) / 100.0f;
+    return std::round((2.0f * std::atan(((aspectRatio) / (4.0f / 3.0f)) *
+        std::tan(factor / 2.0f * ((float)M_PI / 180.0f)))) *
+        (180.0f / (float)M_PI) * 100.0f) / 100.0f;
 }
 
-void SetFOV(float factor)
+static void SetFOV(float factor)
 {
     *ScreenFieldOfView = AdjustFOV(factor, *ScreenAspectRatio);
 }
@@ -47,7 +48,7 @@ static void __declspec(naked) CalculateAimingPoint()
     }
 }
 
-void InstallAspectRatioFixes()
+static void InstallAspectRatioFixes()
 {
     // Disables jump instructions in GetVideoModeList
     MemSet((void*)0x745BD1, 0x90, 2);
@@ -66,7 +67,7 @@ void InstallAspectRatioFixes()
     MemPut<BYTE>(0x714004, 0x38);            // CClouds::Render
 }
 
-void InstallFieldOfViewFixes()
+static void InstallFieldOfViewFixes()
 {
     // Fix sky blurring white in ultrawide screens
     MemPut<const float*>(0x714843, &SkyMultiFix);
@@ -77,8 +78,8 @@ void InstallFieldOfViewFixes()
 
     // Skips division by CDraw::ms_fAspectRatio
     MemSet((void*)0x50AD79, 0x90, 6);
-    MemPut<float*>(0x50AD5B, &CameraWidth); // CCamera::Find3rdPersonQuickAimPitch
-    MemPut<float*>(0x51498F, &CameraWidth); // CCamera::Find3rdPersonCamTargetVector
+    MemPut<const float*>(0x50AD5B, &CameraWidth);            // CCamera::Find3rdPersonQuickAimPitch
+    MemPut<const float*>(0x51498F, &CameraWidth);             // CCamera::Find3rdPersonCamTargetVector
 }
 
 void CMultiplayerSA::InitHooks_WidescreenFix()

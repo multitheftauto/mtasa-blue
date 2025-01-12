@@ -19,8 +19,8 @@
 
 extern CGameSA* pGame;
 
-static float radarAltimeterFix = 0.0014625f;                            // Changes altimeter width (and maybe x pos)
-static float aspectRatioMultiplicatorUntouched = 0.0015625f;            // (1 / 640)
+static float           radarAltimeterFix = 0.0014625f;                            // Changes altimeter width (and maybe x pos)
+static constexpr float aspectRatioMultiplicatorUntouched = 0.0015625f;            // (1 / 640)
 
 static ComponentProperties componentProperties;
 
@@ -63,9 +63,9 @@ CHudSA::CHudSA()
     MemPut<float>(m_pfAspectRatioMultiplicatorX, 0.0015625f);              // (1 / 640)
     MemPut<float>(m_pfAspectRatioMultiplicatorY, 0.002232143f);            // (1 / 448)
 
-    MemPut<float*>(0x58B141, &aspectRatioMultiplicatorUntouched);            // Vehicle name x pos
-    MemPut<float*>(0x58AE4C, &aspectRatioMultiplicatorUntouched);            // Area name x pos
-    MemPut<float*>(0x58A6E0, &radarAltimeterFix);                            // Fix radar altimeter
+    MemPut<const float*>(0x58B141, &aspectRatioMultiplicatorUntouched);            // Vehicle name x pos
+    MemPut<const float*>(0x58AE4C, &aspectRatioMultiplicatorUntouched);            // Area name x pos
+    MemPut<float*>(0x58A6E0, &radarAltimeterFix);                                  // Fix radar altimeter
 
     UpdateStreetchCalculations();
 
