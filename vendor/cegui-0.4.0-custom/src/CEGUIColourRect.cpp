@@ -154,7 +154,7 @@ ColourRect ColourRect::getSubRectangle( float left, float right, float top, floa
 /*************************************************************************
 	Set the colour of all four corners simultaneously.	
 *************************************************************************/
-void ColourRect::setColours(const colour& col)
+void ColourRect::setColours(const colour& col) noexcept
 {
 	d_top_left = d_top_right = d_bottom_left = d_bottom_right = col;
 }
