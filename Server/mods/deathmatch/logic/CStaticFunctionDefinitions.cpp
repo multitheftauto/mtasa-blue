@@ -4508,19 +4508,41 @@ bool CStaticFunctionDefinitions::SetPedFrozen(CElement* pElement, bool bIsFrozen
     }
     return false;
 }
-bool CStaticFunctionDefinitions::reloadPedWeapon(CElement* pElement)
-{
-    assert(pElement);
-    RUN_CHILDREN(reloadPedWeapon(*iter))
 
-    if (IS_PED(pElement))
-    {
-        CPed*      pPed = static_cast<CPed*>(pElement);
-        CBitStream BitStream;
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, RELOAD_PED_WEAPON, *BitStream.pBitStream));
-        return true;
-    }
-    return false;
+bool CStaticFunctionDefinitions::ReloadPedWeapon(CElement* pElement) noexcept {
+    assert(pElement);
+    RUN_CHILDREN(ReloadPedWeapon(*iter))
+
+    if (!IS_PED(pElement))
+        return false;
+
+    CPed* ped = static_cast<CPed*>(pElement);
+
+    bool          result;
+    CLuaArguments arguments;
+
+    std::uint8_t weapon = ped->GetWeaponType();
+    std::uint16_t clip = ped->GetWeaponAmmoInClip();
+    std::uint16_t ammo = ped->GetWeaponTotalAmmo();
+
+    arguments.PushNumber(weapon);
+    arguments.PushNumber(clip);
+    arguments.PushNumber(ammo);
+
+    if (IS_PLAYER(pElement))
+        result = ped->CallEvent("onPlayerWeaponReload", arguments);
+    else
+        result = ped->CallEvent("onPedWeaponReload", arguments);
+
+    if (!result)
+        return false;
+
+    CBitStream stream;
+
+    ped->SetReloadingWeapon(true);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, RELOAD_PED_WEAPON, *stream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetCameraMatrix(CPlayer* pPlayer, CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV)
