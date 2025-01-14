@@ -59,6 +59,8 @@ void CSettings::CreateGUI()
     CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabAdvanced;
     CGUI*    pManager = g_pCore->GetGUI();
 
+    pManager->SetModernSkinEnabled(true);
+
     // Init
     m_bIsModLoaded = false;
     m_bCaptureKey = false;
@@ -1379,6 +1381,8 @@ void CSettings::CreateGUI()
 
     // Load the load of skins
     LoadSkins();
+
+    pManager->SetModernSkinEnabled(false);
 }
 
 void CSettings::DestroyGUI()
