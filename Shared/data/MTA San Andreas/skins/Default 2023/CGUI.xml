@@ -5,7 +5,6 @@
 	<WindowSet Filename="CEGUIFalagardBase" />
 	<FalagardMapping WindowType="CGUI/Titlebar" TargetType="Falagard/Titlebar" LookNFeel="CGUI/Titlebar" />
 	<FalagardMapping WindowType="CGUI/Button" TargetType="Falagard/Button" LookNFeel="CGUI/Button" />
-	<FalagardMapping WindowType="CGUI/FrameWindow" TargetType="Falagard/FrameWindow" LookNFeel="CGUI/FrameWindow" />
 	<FalagardMapping WindowType="CGUI/Editbox" TargetType="Falagard/Editbox" LookNFeel="CGUI/Editbox" />
 	<FalagardMapping WindowType="CGUI/VerticalScrollbarThumb" TargetType="Falagard/Thumb" LookNFeel="CGUI/VerticalScrollbarThumb" />
 	<FalagardMapping WindowType="CGUI/VerticalScrollbar" TargetType="Falagard/Scrollbar" LookNFeel="CGUI/VerticalScrollbar" />
@@ -35,4 +34,10 @@
 	<FalagardMapping WindowType="CGUI/ProgressBar" TargetType="Falagard/ProgressBar" LookNFeel="CGUI/ProgressBar" />
 	<FalagardMapping WindowType="CGUI/ScrollablePane" TargetType="Falagard/ScrollablePane" LookNFeel="CGUI/ScrollablePane" />
 -->
+
+    <!-- Classic definitions -->
+    <FalagardMapping WindowType="CGUI/FrameWindow" TargetType="Falagard/FrameWindow" LookNFeel="CGUI/FrameWindow" />
+
+    <!-- Modern definitions -->
+    <FalagardMapping WindowType="CGUI/FrameWindowModern" TargetType="Falagard/FrameWindow" LookNFeel="CGUI/FrameWindowModern" />
 </GUIScheme>

@@ -594,6 +594,205 @@
         </StateImagery>
     </WidgetLook>
 
+    <WidgetLook name="CGUI/FrameWindowModern">
+        <Property name="NSSizingCursorImage" value="set:CGUI-Images image:NSSizingCursorImage" />
+        <Property name="EWSizingCursorImage" value="set:CGUI-Images image:EWSizingCursorImage" />
+        <Property name="NWSESizingCursorImage" value="set:CGUI-Images image:NWSESizingCursorImage" />
+        <Property name="NESWSizingCursorImage" value="set:CGUI-Images image:NESWSizingCursorImage" />
+        <Property name="RollUpEnabled" value="False" />
+        <NamedArea name="ClientWithTitleWithFrame">
+            <Area>
+                <Dim type="LeftEdge"><AbsoluteDim value="8" /></Dim>
+                    <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" offset="-8" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-8" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientWithTitleNoFrame">
+            <Area>
+                <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientNoTitleWithFrame">
+            <Area>
+                <Dim type="LeftEdge"><AbsoluteDim value="8" /></Dim>
+                <Dim type="TopEdge"><AbsoluteDim value="8" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" offset="-8" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-8" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="ClientNoTitleNoFrame">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+            </Area>
+        </NamedArea>
+        <Child type="CGUI/Titlebar" nameSuffix="__auto_titlebar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><FontDim type="LineSpacing" padding="5" /></Dim>
+            </Area>
+            <Property name="AlwaysOnTop" value="False" />
+        </Child>
+        <Child type="CGUI/Button" nameSuffix="__auto_closebutton__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="-8" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="8" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="8" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="8" /></Dim>
+            </Area>
+            <HorzAlignment type="RightAligned" />
+            <Property name="AlwaysOnTop" value="True" />
+        </Child>
+        <ImagerySection name="withtitle_frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="FrameTopLeftSquared" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="FrameTopRightSquared" />
+                <Image type="BottomLeftCorner" imageset="CGUI-Images" image="FrameBottomLeftSquared" />
+                <Image type="BottomRightCorner" imageset="CGUI-Images" image="FrameBottomRightSquared" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="FrameLeft" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="FrameTop" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="FrameRight" />
+                <Image type="BottomEdge" imageset="CGUI-Images" image="FrameBottom" />
+                <Image type="Background" imageset="CGUI-Images" image="FrameBackground" />
+              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="notitle_frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="FrameTopLeftSquared" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="FrameTopRightSquared" />
+                <Image type="BottomLeftCorner" imageset="CGUI-Images" image="FrameBottomLeftSquared" />
+                <Image type="BottomRightCorner" imageset="CGUI-Images" image="FrameBottomRightSquared" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="FrameLeft" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="FrameTop" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="FrameRight" />
+                <Image type="BottomEdge" imageset="CGUI-Images" image="FrameBottom" />
+                <Image type="Background" imageset="CGUI-Images" image="FrameBackground" />
+              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="withtitle_noframe_client_area">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="FrameTopLeftSquared" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="FrameTopRightSquared" />
+                <Image type="BottomLeftCorner" imageset="CGUI-Images" image="FrameBottomLeftSquared" />
+                <Image type="BottomRightCorner" imageset="CGUI-Images" image="FrameBottomRightSquared" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="FrameLeft" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="FrameTop" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="FrameRight" />
+                <Image type="BottomEdge" imageset="CGUI-Images" image="FrameBottom" />
+                <Image type="Background" imageset="CGUI-Images" image="FrameBackground" />
+              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="notitle_noframe_client_area">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="FrameTopLeftSquared" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="FrameTopRightSquared" />
+                <Image type="BottomLeftCorner" imageset="CGUI-Images" image="FrameBottomLeftSquared" />
+                <Image type="BottomRightCorner" imageset="CGUI-Images" image="FrameBottomRightSquared" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="FrameLeft" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="FrameTop" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="FrameRight" />
+                <Image type="BottomEdge" imageset="CGUI-Images" image="FrameBottom" />
+                <Image type="Background" imageset="CGUI-Images" image="FrameBackground" />
+              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+            </FrameComponent>
+        </ImagerySection>
+        <StateImagery name="ActiveWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledWithTitleWithFrame">
+            <Layer>
+                <Section section="withtitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledWithTitleNoFrame">
+            <Layer>
+                <Section section="withtitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledNoTitleWithFrame">
+            <Layer>
+                <Section section="notitle_frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="ActiveNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="InactiveNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledNoTitleNoFrame">
+            <Layer>
+                <Section section="notitle_noframe_client_area" />
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
     <WidgetLook name="CGUI/Editbox">
         <PropertyDefinition name="ReadOnlyBGColour" initialValue="FFDFDFDF" />
         <Property name="NormalTextColour" value="FF000000" />

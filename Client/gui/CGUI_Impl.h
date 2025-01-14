@@ -279,6 +279,9 @@ public:
     CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename);
     bool        LoadImageset(const SString& strFilename);
 
+    void SetModernSkinEnabled(bool bEnabled) { m_bUseModernSkin = bEnabled; }
+    const char* ResolveSkin(const char* szSkin);
+
 private:
     CGUIButton*      _CreateButton(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
     CGUICheckBox*    _CreateCheckBox(CGUIElement_Impl* pParent = NULL, const char* szCaption = "", bool bChecked = false);
@@ -350,4 +353,6 @@ private:
     bool         m_HasSchemeLoaded;
     SString      m_CurrentSchemeName;
     CElapsedTime m_RenderOkTimer;
+
+    bool m_bUseModernSkin = false;
 };

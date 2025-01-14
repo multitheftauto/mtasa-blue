@@ -100,6 +100,8 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
         SString strMessage = e.getMessage().c_str();
         BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
     }
+
+    SetModernSkinEnabled(true);
 }
 
 CGUI_Impl::~CGUI_Impl()
@@ -1699,4 +1701,10 @@ CEGUI::Window* CGUI_Impl::GetMasterWindow(CEGUI::Window* wnd)
         }
     }
     return wnd;
+}
+
+const char* CGUI_Impl::ResolveSkin(const char* szSkin)
+{
+    const std::string name = m_bUseModernSkin ? std::string(szSkin) + "Modern" : szSkin;
+    return name.c_str();
 }
