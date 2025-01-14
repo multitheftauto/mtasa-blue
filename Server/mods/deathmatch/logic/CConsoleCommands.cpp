@@ -24,6 +24,7 @@
 #include "CDatabaseManager.h"
 #include "CGame.h"
 #include "CMainConfig.h"
+#include "CMapManager.h"
 
 extern CGame* g_pGame;
 
@@ -61,85 +62,104 @@ static void EndConsoleOutputCapture(CClient* pClient, const SString& strIfNoOutp
 
 bool CConsoleCommands::StartResource(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    SString strResponse;
-
-    if (szArguments && szArguments[0])
+    if (!szArguments || !szArguments[0])
     {
-        CResource* resource = g_pGame->GetResourceManager()->GetResource(szArguments);
-        if (resource)
-        {
-            if (pClient->GetNick())
-                CLogger::LogPrintf("start: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
+        pEchoClient->SendConsole("* Syntax: start <resource1> <resource2> ...");
+        return false;
+    }
 
-            if (resource->IsLoaded())
-            {
-                if (!resource->IsActive())
-                {
-                    if (g_pGame->GetResourceManager()->StartResource(resource, NULL, true))
-                    {
-                        strResponse = SString("start: Resource '%s' started", szArguments);
-                    }
-                    else
-                    {
-                        strResponse = SString("start: Resource '%s' start was requested (%s)", szArguments, resource->GetFailureReason().c_str());
-                    }
-                }
-                else
-                    strResponse = "start: Resource is already running";
-            }
-            else
-                strResponse = SString("start: Resource is loaded, but has errors (%s)", resource->GetFailureReason().c_str());
+    if (pClient->GetNick())
+        CLogger::LogPrintf("start: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
+
+    CSplitString      resourceNames(szArguments, " ");
+    CResourceManager* resourceManager = g_pGame->GetResourceManager();
+
+    for (const std::string& resourceName : resourceNames)
+    {
+        CResource* resource = resourceManager->GetResource(resourceName.c_str());
+
+        if (!resource)
+        {
+            pEchoClient->SendConsole(SString("start: Resource '%s' could not be found", resourceName.c_str()));
+            continue;
+        }
+
+        if (!resource->IsLoaded())
+        {
+            pEchoClient->SendConsole(SString("start: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+            continue;
+        }
+
+        if (resource->IsActive())
+        {
+            pEchoClient->SendConsole(SString("start: Resource '%s' is already running", resourceName.c_str()));
+            continue;
+        }
+
+        if (resourceManager->StartResource(resource, nullptr, true))
+        {
+            pEchoClient->SendConsole(SString("start: Resource '%s' started", resourceName.c_str()));
         }
         else
-            strResponse = "start: Resource could not be found";
+        {
+            pEchoClient->SendConsole(SString("start: Resource '%s' start was requested (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+        }
     }
-    else
-        strResponse = "* Syntax: start <resource-name>";
 
-    pEchoClient->SendConsole(strResponse);
     return true;
 }
 
 bool CConsoleCommands::RestartResource(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    if (szArguments && szArguments[0])
+    if (!szArguments || !szArguments[0])
     {
-        CResource* resource = g_pGame->GetResourceManager()->GetResource(szArguments);
-        if (resource)
-        {
-            if (pClient->GetNick())
-                CLogger::LogPrintf("restart: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
-
-            if (resource->IsLoaded())
-            {
-                if (resource->IsActive())
-                {
-                    if (resource->IsProtected())
-                    {
-                        if (!g_pGame->GetACLManager()->CanObjectUseRight(pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                                         "restart.protected", CAccessControlListRight::RIGHT_TYPE_COMMAND, false))
-                        {
-                            pEchoClient->SendConsole("restart: Resource could not be restarted as it is protected");
-                            return false;
-                        }
-                    }
-
-                    g_pGame->GetResourceManager()->QueueResource(resource, CResourceManager::QUEUE_RESTART, NULL);
-                    pEchoClient->SendConsole("restart: Resource restarting...");
-                }
-                else
-                    pEchoClient->SendConsole("restart: Resource is not running");
-            }
-            else
-                pEchoClient->SendConsole(SString("restart: Resource is loaded, but has errors (%s)", resource->GetFailureReason().c_str()));
-        }
-        else
-            pEchoClient->SendConsole("restart: Resource could not be found");
-        return true;
+        pEchoClient->SendConsole("* Syntax: restart <resource1> <resource2> ...");
+        return false;
     }
-    else
-        pEchoClient->SendConsole("* Syntax: restart <resource-name>");
-    return false;
+
+    if (pClient->GetNick())
+        CLogger::LogPrintf("restart: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
+
+    CSplitString      resourceNames(szArguments, " ");
+    CResourceManager* resourceManager = g_pGame->GetResourceManager();
+
+    for (const std::string& resourceName : resourceNames)
+    {
+        CResource* resource = resourceManager->GetResource(resourceName.c_str());
+
+        if (!resource)
+        {
+            pEchoClient->SendConsole(SString("restart: Resource '%s' could not be found", resourceName.c_str()));
+            continue;
+        }
+
+        if (!resource->IsLoaded())
+        {
+            pEchoClient->SendConsole(SString("restart: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+            continue;
+        }
+
+        if (!resource->IsActive())
+        {
+            pEchoClient->SendConsole(SString("restart: Resource '%s' is not running", resourceName.c_str()));
+            continue;
+        }
+
+        if (resource->IsProtected())
+        {
+            if (!g_pGame->GetACLManager()->CanObjectUseRight(pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "restart.protected",
+                                                             CAccessControlListRight::RIGHT_TYPE_COMMAND, false))
+            {
+                pEchoClient->SendConsole(SString("restart: Resource '%s' could not be restarted as it is protected", resourceName.c_str()));
+                continue;
+            }
+        }
+
+        resourceManager->QueueResource(resource, CResourceManager::QUEUE_RESTART, nullptr);
+        pEchoClient->SendConsole(SString("restart: Resource '%s' restarting...", resourceName.c_str()));
+    }
+
+    return true;
 }
 
 bool CConsoleCommands::RefreshResources(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
@@ -194,45 +214,55 @@ bool CConsoleCommands::ResourceInfo(CConsole* pConsole, const char* szArguments,
 
 bool CConsoleCommands::StopResource(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    if (szArguments && szArguments[0])
+    if (!szArguments || !szArguments[0])
     {
-        CResource* resource = g_pGame->GetResourceManager()->GetResource(szArguments);
-        if (resource)
-        {
-            if (pClient->GetNick())
-                CLogger::LogPrintf("stop: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
-
-            if (resource->IsLoaded())
-            {
-                if (resource->IsActive())
-                {
-                    if (resource->IsProtected())
-                    {
-                        if (!g_pGame->GetACLManager()->CanObjectUseRight(pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "stop.protected",
-                                                                         CAccessControlListRight::RIGHT_TYPE_COMMAND, false))
-                        {
-                            pEchoClient->SendConsole("stop: Resource could not be stopped as it is protected");
-                            return false;
-                        }
-                    }
-
-                    g_pGame->GetResourceManager()->QueueResource(resource, CResourceManager::QUEUE_STOP, NULL);
-                    pEchoClient->SendConsole("stop: Resource stopping");
-                }
-                else
-                    pEchoClient->SendConsole("stop: Resource is not running");
-            }
-            else
-                pEchoClient->SendConsole(SString("stop: Resource is loaded, but has errors (%s)", resource->GetFailureReason().c_str()));
-        }
-        else
-            pEchoClient->SendConsole("stop: Resource could not be found");
-        return true;
+        pEchoClient->SendConsole("* Syntax: stop <resource1> <resource2> ...");
+        return false;
     }
-    else
-        pEchoClient->SendConsole("* Syntax: stop <resource-name>");
 
-    return false;
+    if (pClient->GetNick())
+        CLogger::LogPrintf("stop: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
+
+    CSplitString      resourceNames(szArguments, " ");
+    CResourceManager* resourceManager = g_pGame->GetResourceManager();
+
+    for (const std::string& resourceName : resourceNames)
+    {
+        CResource* resource = resourceManager->GetResource(resourceName.c_str());
+
+        if (!resource)
+        {
+            pEchoClient->SendConsole(SString("stop: Resource '%s' could not be found", resourceName.c_str()));
+            continue;
+        }
+
+        if (!resource->IsLoaded())
+        {
+            pEchoClient->SendConsole(SString("stop: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+            continue;
+        }
+
+        if (!resource->IsActive())
+        {
+            pEchoClient->SendConsole(SString("stop: Resource '%s' is not running", resourceName.c_str()));
+            continue;
+        }
+
+        if (resource->IsProtected())
+        {
+            if (!g_pGame->GetACLManager()->CanObjectUseRight(pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "stop.protected",
+                                                             CAccessControlListRight::RIGHT_TYPE_COMMAND, false))
+            {
+                pEchoClient->SendConsole(SString("stop: Resource '%s' could not be stopped as it is protected", resourceName.c_str()));
+                continue;
+            }
+        }
+
+        resourceManager->QueueResource(resource, CResourceManager::QUEUE_STOP, nullptr);
+        pEchoClient->SendConsole(SString("stop: Resource '%s' stopping...", resourceName.c_str()));
+    }
+
+    return true;
 }
 
 bool CConsoleCommands::StopAllResources(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
@@ -1111,6 +1141,9 @@ bool CConsoleCommands::Shutdown(CConsole* pConsole, const char* szArguments, CCl
 {
     // shutdown <reason>
 
+    CLuaArguments arguments;
+    arguments.PushNil();
+
     if (szArguments && strlen(szArguments) > 0)
     {
         // Copy to a buffer and strip it for bad characters
@@ -1118,12 +1151,17 @@ bool CConsoleCommands::Shutdown(CConsole* pConsole, const char* szArguments, CCl
 
         // Output the action + reason to the console
         CLogger::LogPrintf("SHUTDOWN: Got shutdown command from %s (Reason: %s)\n", GetAdminNameForLog(pClient).c_str(), szBuffer);
+        arguments.PushString(szBuffer);
     }
     else
     {
         // Output the action to the console
         CLogger::LogPrintf("SHUTDOWN: Got shutdown command from %s (No reason specified)\n", GetAdminNameForLog(pClient).c_str());
+        arguments.PushString("No reason specified");
     }
+
+    // Call event
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onShutdown", arguments);
 
     // Shut the server down asap
     g_pGame->SetIsFinished(true);

@@ -114,7 +114,8 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedChoking", IsPedChoking},
         {"isPedDucked", IsPedDucked},
         {"isPedDead", IsPedDead},
-        {"isPedReloadingWeapon", IsPedReloadingWeapon},
+        {"isPedReloadingWeapon", ArgumentParserWarn<false, IsPedReloadingWeapon>},
+        {"killPedTask", ArgumentParser<killPedTask>},
     };
 
     // Add functions
@@ -1232,25 +1233,11 @@ int CLuaPedDefs::GivePedWeapon(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::IsPedReloadingWeapon(lua_State* luaVM)
+bool CLuaPedDefs::IsPedReloadingWeapon(CClientPed* const ped) noexcept
 {
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, pPed->IsReloadingWeapon());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return ped->IsReloadingWeapon();
 }
-
+  
 int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
 {
     // Verify the argument
@@ -2247,6 +2234,10 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
             }
 
             pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
+
+            if (pPed->HasSyncedAnim())
+                pPed->m_animationOverridedByClient = true;
+
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -2492,4 +2483,21 @@ bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehi
 bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
 {
     return pPed->ExitVehicle();
+}
+
+bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept
+{
+    switch (taskType)
+    {
+        case taskType::PRIMARY_TASK:
+        {
+            return ped->KillTask(taskNumber, gracefully.value_or(true)); 
+        }
+        case taskType::SECONDARY_TASK:
+        {
+            return ped->KillTaskSecondary(taskNumber, gracefully.value_or(true));
+        }
+        default:
+            return false; 
+    }
 }

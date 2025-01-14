@@ -54,7 +54,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_pTowedByVehicle = NULL;
     m_ucPaintjob = 3;
     m_ucMaxPassengersOverride = VEHICLE_PASSENGERS_UNDEFINED;
-    m_pHandlingEntry = NULL;
+    m_HandlingEntry = nullptr;
 
     m_fRespawnHealth = DEFAULT_VEHICLE_HEALTH;
     m_bRespawnEnabled = false;
@@ -86,6 +86,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_bHandlingChanged = false;
     m_ucVariant = ucVariant;
     m_ucVariant2 = ucVariant2;
+    m_onFire = false;
 
     // Initialize the occupied Players
     for (int i = 0; i < MAX_VEHICLE_SEATS; i++)
@@ -167,7 +168,6 @@ CVehicle::~CVehicle()
         }
     }
     delete m_pUpgrades;
-    delete m_pHandlingEntry;
 
     CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPed, NULL);
 
@@ -849,13 +849,16 @@ void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOut
     }
 }
 
-void CVehicle::GenerateHandlingData()
+void CVehicle::GenerateHandlingData() noexcept
 {
+    const auto* handlingManager = g_pGame->GetHandlingManager();
+
     // Make a new CHandlingEntry
-    if (m_pHandlingEntry == NULL)
-        m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
+    if (!m_HandlingEntry)
+        m_HandlingEntry = handlingManager->CreateHandlingData();
+
     // Apply the model handling info
-    m_pHandlingEntry->ApplyHandlingData(g_pGame->GetHandlingManager()->GetModelHandlingData(static_cast<eVehicleTypes>(m_usModel)));
+    m_HandlingEntry->ApplyHandlingData(handlingManager->GetModelHandlingData(m_usModel));
 
     m_bHandlingChanged = false;
 }

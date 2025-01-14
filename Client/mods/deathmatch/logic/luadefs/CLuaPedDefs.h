@@ -93,7 +93,7 @@ public:
     static bool SetPedArmor(CClientPed* const ped, const float armor);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);
-    LUA_DECLARE(IsPedReloadingWeapon);
+    static bool IsPedReloadingWeapon(CClientPed* const ped) noexcept;
     LUA_DECLARE(AddPedClothes);
     LUA_DECLARE(RemovePedClothes);
     LUA_DECLARE(SetPedControlState);
@@ -115,4 +115,6 @@ public:
     static bool SetPedExitVehicle(CClientPed* pPed);
     static bool IsPedBleeding(CClientPed* ped);
     static bool SetPedBleeding(CClientPed* ped, bool bleeding);
+
+    static bool killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept;
 };

@@ -777,7 +777,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin22.5.0"
+#define CURL_OS "x86_64-apple-darwin22.5.0"
 
 /* Name of package */
 #define PACKAGE "curl"

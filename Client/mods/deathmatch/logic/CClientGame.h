@@ -28,7 +28,7 @@
 #include "CUnoccupiedVehicleSync.h"
 #include "CPedSync.h"
 #include "CObjectSync.h"
-#include "CRadarMap.h"
+#include "CPlayerMap.h"
 #include "CClientTeamManager.h"
 #include "CClientPedManager.h"
 #include "lua/CLuaManager.h"
@@ -296,7 +296,7 @@ public:
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };
     CNetAPI*               GetNetAPI() { return m_pNetAPI; };
-    CRadarMap*             GetRadarMap() { return m_pRadarMap; };
+    CPlayerMap*            GetPlayerMap() { return m_pPlayerMap; };
     CMovingObjectsManager* GetMovingObjectsManager() { return m_pMovingObjectsManager; }
 
     CClientPlayer*       GetLocalPlayer() { return m_pLocalPlayer; }
@@ -418,6 +418,9 @@ public:
 
     bool SetBirdsEnabled(bool bEnabled);
     bool GetBirdsEnabled();
+
+    void SetWeaponRenderEnabled(bool enabled);
+    bool IsWeaponRenderEnabled() const;
 
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
@@ -694,7 +697,7 @@ private:
     CNetworkStats*         m_pNetworkStats;
     CSyncDebug*            m_pSyncDebug;
     // CScreenshot*                          m_pScreenshot;
-    CRadarMap*                    m_pRadarMap;
+    CPlayerMap*                   m_pPlayerMap;
     CTransferBox*                 m_pTransferBox;
     CResourceManager*             m_pResourceManager;
     CScriptKeyBinds*              m_pScriptKeyBinds;
