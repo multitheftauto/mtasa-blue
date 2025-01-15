@@ -16,6 +16,7 @@ class CGUI_Impl;
 #include <gui/CGUI.h>
 #include <list>
 #include <windows.h>
+#include <xml/CXML.h>
 
 #define CGUI_CHAR_SIZE 6
 
@@ -282,6 +283,8 @@ public:
     void SetModernSkinEnabled(bool bEnabled) { m_bUseModernSkin = bEnabled; }
     const char* ResolveSkin(const char* szSkin);
 
+    void SetXMLParser(CXML* pXML) { m_pXML = pXML; }
+
 private:
     CGUIButton*      _CreateButton(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
     CGUICheckBox*    _CreateCheckBox(CGUIElement_Impl* pParent = NULL, const char* szCaption = "", bool bChecked = false);
@@ -302,6 +305,8 @@ private:
     CGUIFont* CreateFntFromWinFont(const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0,
                                    bool bAutoScale = false);
     void      ApplyGuiWorkingDirectory();
+
+    bool ConvertToModernSkin(const char* szSkin);
 
     IDirect3DDevice9* m_pDevice;
 
@@ -355,4 +360,5 @@ private:
     CElapsedTime m_RenderOkTimer;
 
     bool m_bUseModernSkin = false;
+    CXML* m_pXML;
 };

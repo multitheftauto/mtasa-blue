@@ -36,6 +36,7 @@ class CGUI;
 #include "CGUITabPanel.h"
 #include "CGUIComboBox.h"
 #include "CGUITypes.h"
+#include <xml/CXML.h>
 
 // Path defines for CGUI
 #define CGUI_ICON_MESSAGEBOX_INFO       "cgui\\images\\info.png"
@@ -171,4 +172,5 @@ public:
     virtual bool        LoadImageset(const SString& strFilename) = 0;
 
     virtual void SetModernSkinEnabled(bool bEnabled) = 0;
+    virtual void SetXMLParser(CXML* pXML) = 0;
 };

@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<GUIScheme>
+    <FalagardMapping WindowType="CGUI/FrameWindowModern" TargetType="Falagard/FrameWindow" LookNFeel="CGUI/FrameWindowModern" />
+</GUIScheme>

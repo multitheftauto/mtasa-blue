@@ -1020,6 +1020,7 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+    m_pGUI->SetXMLParser(m_pXML);
 }
 
 void CCore::CreateGUI()

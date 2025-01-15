@@ -53,7 +53,7 @@ public:
     virtual void SetTagContentf(const char* szFormat, ...) = 0;
 
     virtual CXMLNode* CopyNode(CXMLNode* pParent) = 0;
-    virtual bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive) = 0;
+    virtual bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive, bool bDelete = true) = 0;
 
     virtual bool IsValid() = 0;
 
@@ -62,4 +62,5 @@ public:
     virtual void    SetCommentText(const char* szCommentText, bool bLeadingBlankLine = false) = 0;
 
     virtual std::string ToString() = 0;
+    virtual void        AddToList(CXMLNode* pNode) = 0;
 };
