@@ -17,6 +17,7 @@ class CGUI_Impl;
 #include <list>
 #include <windows.h>
 #include <xml/CXML.h>
+#include <core/CGraphicsInterface.h>
 
 #define CGUI_CHAR_SIZE 6
 
@@ -284,6 +285,7 @@ public:
     const char* ResolveSkin(const char* szSkin);
 
     void SetXMLParser(CXML* pXML) { m_pXML = pXML; }
+    void SetGraphics(CGraphicsInterface* pGraphicsInterface) { m_pGraphics = pGraphicsInterface; }
 
 private:
     CGUIButton*      _CreateButton(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
@@ -306,7 +308,7 @@ private:
                                    bool bAutoScale = false);
     void      ApplyGuiWorkingDirectory();
 
-    bool ConvertToModernSkin(const char* szSkin);
+    bool ConvertToModernSkin(const char* skinName);
 
     IDirect3DDevice9* m_pDevice;
 
@@ -360,5 +362,7 @@ private:
     CElapsedTime m_RenderOkTimer;
 
     bool m_bUseModernSkin = false;
+    CGraphicsInterface* m_pGraphics;
     CXML* m_pXML;
+    
 };
