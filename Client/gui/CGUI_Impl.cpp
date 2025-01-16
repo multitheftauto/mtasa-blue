@@ -398,7 +398,8 @@ bool CGUI_Impl::ConvertToModernSkin(const char* skinName)
         renderManager->CreateRenderTarget(width, std::max(modernImagesetTexture->m_uiSizeY, skinImagesetTexture->m_uiSizeY), false, true, 0, true);
 
     auto device = m_pGraphics->GetDevice();
-    if (device->BeginScene() != D3D_OK)
+
+    if (!m_HasSchemeLoaded && device->BeginScene() != D3D_OK)
     {
         AddReportLog(1337, "ConvertToModernSkin: Failed to begin scene for imageset drawing");
         return false;
@@ -413,6 +414,12 @@ bool CGUI_Impl::ConvertToModernSkin(const char* skinName)
 
     // Stop draw batch
     renderManager->RestoreDefaultRenderTarget();
+
+    if (!m_HasSchemeLoaded && device->EndScene() != D3D_OK)
+    {
+        AddReportLog(1337, "ConvertToModernSkin: Failed to end scene for imageset drawing");
+        return false;
+    }
 
     D3DXSaveTextureToFile(tempImagesetPngPath, D3DXIFF_PNG, renderTarget->m_pD3DTexture, 0);
 
