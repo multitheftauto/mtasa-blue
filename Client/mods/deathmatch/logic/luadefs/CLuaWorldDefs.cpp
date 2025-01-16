@@ -101,10 +101,18 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setFPSLimit", SetFPSLimit},
                                                                              {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
                                                                              {"setWorldProperty", ArgumentParser<SetWorldProperty>},
+
+                                                                             // World remove/restore functions 
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"removeGameWorld", ArgumentParser<RemoveGameWorld>},
+                                                                             {"restoreGameWorld", ArgumentParser<RestoreGameWorld>},
+
                                                                              {"setTimeFrozen", ArgumentParser<SetTimeFrozen>},
+                                                                             {"setVolumetricShadowsEnabled", ArgumentParser<SetVolumetricShadowsEnabled>},
+                                                                             {"setDynamicPedShadowsEnabled", ArgumentParser<SetDynamicPedShadowsEnabled>}, 
+
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -128,14 +136,20 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"resetBlurLevel", ResetBlurLevel},
                                                                              {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
                                                                              {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
-
+                                                                             {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
+                                                                             {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
+                                                                             {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},    
+      
                                                                              // World check funcs
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
                                                                              {"isGarageOpen", IsGarageOpen},
-                                                                             {"isTimeFrozen", ArgumentParser<IsTimeFrozen>}};
+                                                                             {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
+                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
+                                                                             {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>},
+                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -2252,4 +2266,78 @@ bool CLuaWorldDefs::IsTimeFrozen() noexcept
 bool CLuaWorldDefs::ResetTimeFrozen() noexcept
 {
     return g_pGame->GetClock()->ResetTimeFrozen();
+}
+
+void CLuaWorldDefs::RemoveGameWorld()
+{
+    // We do not want to remove scripted buildings
+    // But we need remove them from the buildings pool for a bit...
+    m_pBuildingManager->DestroyAllForABit();
+
+    // This function makes buildings backup without scripted buildings
+    g_pGame->RemoveGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyed();
+}
+
+void CLuaWorldDefs::RestoreGameWorld()
+{
+    // We want to restore the game buildings to the same positions as they were before the backup.
+    // Remove scripted buildings for a bit
+    m_pBuildingManager->DestroyAllForABit();
+
+    g_pGame->RestoreGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyedSafe();
+}
+
+bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable) noexcept
+{
+    g_pGame->GetSettings()->SetVolumetricShadowsEnabled(enable);
+    return true;
+}
+
+bool CLuaWorldDefs::IsVolumetricShadowsEnabled() noexcept
+{
+    return g_pGame->GetSettings()->IsVolumetricShadowsEnabled();
+}
+
+bool CLuaWorldDefs::ResetVolumetricShadows() noexcept
+{
+    return g_pGame->GetSettings()->ResetVolumetricShadows();
+}
+
+void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept
+{
+    g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true)});
+}
+
+bool CLuaWorldDefs::SetDynamicPedShadowsEnabled(bool enable)
+{
+    g_pGame->GetSettings()->SetDynamicPedShadowsEnabled(enable);
+    return true;
+}
+
+bool CLuaWorldDefs::IsDynamicPedShadowsEnabled() noexcept
+{
+    return g_pGame->GetSettings()->IsDynamicPedShadowsEnabled();
+}
+
+bool CLuaWorldDefs::ResetDynamicPedShadows() noexcept
+{
+    return g_pGame->GetSettings()->ResetDynamicPedShadows();
+}
+
+CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> CLuaWorldDefs::TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore)
+{
+    STestSphereAgainstWorldResult result;
+    CClientEntity* collidedEntity = nullptr;
+
+    CEntity* entity = g_pGame->GetWorld()->TestSphereAgainstWorld(sphereCenter, radius, ignoredEntity.has_value() ? ignoredEntity.value()->GetGameEntity() : nullptr, checkBuildings.value_or(true), checkVehicles.value_or(true), checkPeds.value_or(true), checkObjects.value_or(true), checkDummies.value_or(true), cameraIgnore.value_or(false), result);
+    if (entity)
+        collidedEntity = reinterpret_cast<CClientEntity*>(entity->GetStoredPointer());
+
+    return {result.collisionDetected, collidedEntity, result.modelID, result.entityPosition.fX, result.entityPosition.fY, result.entityPosition.fZ, ConvertRadiansToDegrees(result.entityRotation.fX), ConvertRadiansToDegrees(result.entityRotation.fY), ConvertRadiansToDegrees(result.entityRotation.fZ), result.lodID, result.type};
 }

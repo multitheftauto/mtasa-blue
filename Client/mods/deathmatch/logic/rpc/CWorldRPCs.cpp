@@ -71,6 +71,8 @@ void CWorldRPCs::LoadFunctions()
     AddHandler(RESET_MOON_SIZE, ResetMoonSize, "ResetMoonSize");
 
     AddHandler(SET_WORLD_SPECIAL_PROPERTY, SetWorldSpecialPropertyEnabled, "SetWorldSpecialPropertyEnabled");
+
+    AddHandler(RESET_WORLD_PROPERTIES, ResetWorldProperties, "ResetWorldProperties");
 }
 
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
@@ -617,6 +619,12 @@ void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)
     bitStream.Read(g_TickRateSettings.iObjectSync);
     bitStream.Read(g_TickRateSettings.iKeySyncRotation);
     bitStream.Read(g_TickRateSettings.iKeySyncAnalogMove);
+
+    if (bitStream.Can(eBitStreamVersion::FixSyncerDistance))
+    {
+        bitStream.Read(g_TickRateSettings.iPedSyncerDistance);
+        bitStream.Read(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+    }
 }
 
 void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)
@@ -642,4 +650,15 @@ void CWorldRPCs::SetWorldSpecialPropertyEnabled(NetBitStreamInterface& bitStream
     {
         g_pClientGame->SetWorldSpecialProperty((WorldSpecialProperty)property, isEnabled);
     }
+}
+
+void CWorldRPCs::ResetWorldProperties(NetBitStreamInterface& bitStream)
+{
+    bool resetSpecialProperties = bitStream.ReadBit();
+    bool resetWorldProperties = bitStream.ReadBit();
+    bool resetWeatherProperties = bitStream.ReadBit();
+    bool resetLODs = bitStream.ReadBit();
+    bool resetSounds = bitStream.ReadBit();
+
+    g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialProperties, resetWorldProperties, resetWeatherProperties, resetLODs, resetSounds});
 }

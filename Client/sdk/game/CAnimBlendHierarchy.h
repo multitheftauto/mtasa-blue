@@ -27,6 +27,7 @@ public:
     virtual void                            RemoveFromUncompressedCache() = 0;
     virtual void                            RemoveQuaternionFlips() = 0;
     virtual void                            CalculateTotalTime() = 0;
+    virtual float                           GetTotalTime() const noexcept = 0;
     virtual CAnimBlendSequenceSAInterface*  GetSequence(DWORD dwIndex) = 0;
     virtual CAnimBlendSequenceSAInterface*  GetSequences() = 0;
     virtual unsigned short                  GetNumSequences() = 0;

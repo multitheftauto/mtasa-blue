@@ -53,6 +53,13 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     if (!HasFreeBuildingSlot())
         return nullptr;
 
+    auto modelInfo = pGame->GetModelInfo(modelId);
+
+    // Change the properties group to force dynamic models to be created as buildings instead of dummies
+    auto prevGroup = modelInfo->GetObjectPropertiesGroup();
+    if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
+        modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
+
     // Load building
     SFileObjectInstance instance;
     instance.modelID = modelId;
@@ -70,9 +77,12 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     pBuilding->m_pLod = nullptr;
     pBuilding->m_iplIndex = 0;
 
+    // Restore changed properties group
+    if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
+        modelInfo->SetObjectPropertiesGroup(prevGroup);
+
     // Always stream model collosion
     // TODO We can setup collison bounding box and use GTA streamer for it
-    auto modelInfo = pGame->GetModelInfo(modelId);
     modelInfo->AddColRef();
 
     // Add building in world
@@ -101,7 +111,14 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     // Remove plant
     pGame->GetPlantManager()->RemovePlant(pInterface);
 
-    RemoveBuildingFromWorld(pInterface);
+    // Remove shadow
+    pInterface->RemoveShadows();
+
+    // Remove building from world
+    pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
+
+    // Call virtual destructor
+    ((void*(__thiscall*)(void*, char))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 0);
 
     // Remove col reference
     auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
@@ -121,17 +138,10 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     --m_buildingPool.count;
 }
 
-void CBuildingsPoolSA::RemoveAllBuildings()
+void CBuildingsPoolSA::RemoveAllWithBackup()
 {
     if (m_pOriginalBuildingsBackup)
         return;
-
-    pGame->GetCoverManager()->RemoveAllCovers();
-    pGame->GetPlantManager()->RemoveAllPlants();
-
-    // Remove all shadows
-    using CStencilShadowObjects_dtorAll = void* (*)();
-    ((CStencilShadowObjects_dtorAll)0x711390)();
 
     m_pOriginalBuildingsBackup = std::make_unique<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>>();
 
@@ -143,6 +153,9 @@ void CBuildingsPoolSA::RemoveAllBuildings()
             CBuildingSAInterface* building = pBuildsingsPool->GetObject(i);
 
             RemoveBuildingFromWorld(building);
+
+            if (building->HasMatrix())
+                building->RemoveMatrix();
 
             pBuildsingsPool->Release(i);
 
@@ -156,7 +169,7 @@ void CBuildingsPoolSA::RemoveAllBuildings()
     }
 }
 
-void CBuildingsPoolSA::RestoreAllBuildings()
+void CBuildingsPoolSA::RestoreBackup()
 {
     if (!m_pOriginalBuildingsBackup)
         return;
@@ -182,10 +195,7 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
 {
     // Remove building from world
     pGame->GetWorld()->Remove(pBuilding, CBuildingPool_Destructor);
-
-    pBuilding->DeleteRwObject();
-    pBuilding->ResolveReferences();
-    pBuilding->RemoveShadows();
+    pBuilding->RemoveRWObjectWithReferencesCleanup();
 }
 
 bool CBuildingsPoolSA::Resize(int size)
@@ -234,7 +244,7 @@ bool CBuildingsPoolSA::Resize(int size)
         newBytemap[i].bEmpty = true;
     }
 
-    const uint32_t offset = (uint32_t)newObjects - (uint32_t)oldPool;
+    const std::uint32_t offset = (std::uint32_t)newObjects - (std::uint32_t)oldPool;
     if (oldPool != nullptr)
     {
         UpdateIplEntrysPointers(offset);
@@ -245,7 +255,7 @@ bool CBuildingsPoolSA::Resize(int size)
         UpdateBackupLodPointers(offset);
     }
 
-    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(oldPool, newObjects);
+    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(offset);
 
     RemoveVehicleDamageLinks();
     RemovePedsContactEnityLinks();

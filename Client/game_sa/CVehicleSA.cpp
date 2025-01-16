@@ -20,10 +20,13 @@
 #include "CProjectileInfoSA.h"
 #include "CTrainSA.h"
 #include "CPlaneSA.h"
+#include "CHeliSA.h"
 #include "CVehicleSA.h"
+#include "CBoatSA.h"
 #include "CVisibilityPluginsSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include "CFireManagerSA.h"
 
 extern CGameSA* pGame;
 
@@ -48,6 +51,62 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
         mov [esp+0D4h], edi
         push 6ABD04h
         retn
+    }
+}
+
+static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleInterface)
+{
+    SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)vehicleInterface);
+    if (!vehicle || !vehicle->pEntity)
+        return true;
+
+    return vehicle->pEntity->GetVehicleRotorState();
+}
+
+static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;
+static constexpr DWORD RETURN_CHeli_ProcessFlyingCarStuff = 0x6C5404;
+static void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
+{
+    _asm
+    {
+        mov esi, ecx
+        mov al, [esi+36h]
+
+        pushad
+        call CanProcessFlyingCarStuff
+        test al, al
+        jz skip
+
+        popad
+        jmp CONTINUE_CHeli_ProcessFlyingCarStuff
+
+        skip:
+        popad
+        jmp RETURN_CHeli_ProcessFlyingCarStuff
+    }
+}
+
+static constexpr DWORD CONTINUE_CPlane_ProcessFlyingCarStuff = 0x6CB7D7;
+static constexpr DWORD RETURN_CPlane_ProcessFlyingCarStuff = 0x6CC482;
+static void _declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
+{
+    _asm
+    {
+        push esi
+        mov esi, ecx
+        fnstsw ax
+
+        pushad
+        call CanProcessFlyingCarStuff
+        test al, al
+        jz skip
+
+        popad
+        jmp CONTINUE_CPlane_ProcessFlyingCarStuff
+
+        skip:
+        popad
+        jmp RETURN_CPlane_ProcessFlyingCarStuff
     }
 }
 
@@ -223,6 +282,7 @@ CVehicleSA::~CVehicleSA()
             }
 
             CWorldSA* pWorld = (CWorldSA*)pGame->GetWorld();
+            pGame->GetProjectileInfo()->RemoveEntityReferences(this);
             pWorld->Remove(m_pInterface, CVehicle_Destructor);
             pWorld->RemoveReferencesToDeletedObject(m_pInterface);
 
@@ -239,18 +299,24 @@ CVehicleSA::~CVehicleSA()
     }
 }
 
-void CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CVehicleSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
 {
-    DWORD dwFunc = FUNC_GetMoveSpeed;
-    DWORD dwThis = (DWORD)GetInterface();
-    DWORD dwReturn = 0;
-    _asm
+    try
     {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
+        DWORD dwFunc = FUNC_GetMoveSpeed;
+        DWORD dwThis = (DWORD)GetInterface();
+        DWORD dwReturn = 0;
+        _asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+            mov     dwReturn, eax
+        }
+        MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
     }
-    MemCpyFast((void*)dwReturn, vecMoveSpeed, sizeof(CVector));
+    catch (...)
+    {
+    }
 
     // INACCURATE. Use Get/SetTrainSpeed instead of Get/SetMoveSpeed. (Causes issue #4829).
 #if 0
@@ -483,6 +549,29 @@ void CVehicleSA::SetTrainSpeed(float fSpeed)
     pInterface->m_fTrainSpeed = fSpeed;
 }
 
+float CVehicleSA::GetHeliRotorSpeed() const
+{
+    return static_cast<CHeliSAInterface*>(m_pInterface)->m_wheelSpeed[1];
+}
+
+void CVehicleSA::SetHeliRotorSpeed(float speed)
+{
+    static_cast<CHeliSAInterface*>(GetInterface())->m_wheelSpeed[1] = speed;
+}
+
+void CVehicleSA::SetVehicleRotorState(bool state, bool stopRotor, bool isHeli) noexcept
+{
+    m_rotorState = state;
+
+    if (state || !stopRotor)
+        return;
+
+    if (isHeli)
+        SetHeliRotorSpeed(0.0f);
+    else
+        SetPlaneRotorSpeed(0.0f);
+}
+
 void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
 {
     auto pInterface = static_cast<CPlaneSAInterface*>(GetInterface());
@@ -683,6 +772,17 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
         mov     ecx, dwThis
         push    dwModelID
         call    dwFunc
+    }
+
+    // GTA SA only does this when CVehicle::ClearVehicleUpgradeFlags returns false.
+    // In the case of hydraulics and nitro, this function does not return false and the upgrade is never removed from the array
+    for (std::int16_t& upgrade : GetVehicleInterface()->m_upgrades)
+    {
+        if (upgrade == dwModelID)
+        {
+            upgrade = -1;
+            break;
+        }
     }
 }
 
@@ -1322,49 +1422,45 @@ void CVehicleSA::RecalculateHandling()
     // Put it in our interface
     CVehicleSAInterface* pInt = GetVehicleInterface();
     unsigned int         uiHandlingFlags = m_pHandlingData->GetInterface()->uiHandlingFlags;
-    // user error correction - NOS_INST = NOS Installed t/f
-    // if nos is installed we need the flag set
-    if (pInt->m_upgrades[0] && pInt->m_upgrades[0] >= 1008 && pInt->m_upgrades[0] <= 1010)
+    bool                 hydralicsInstalled = false, nitroInstalled = false;
+
+    // We check whether the user has not set incorrect flags via handlingFlags in the case of nitro and hydraulics
+    // If this happened, we need to correct it
+    for (const std::int16_t& upgradeID : pInt->m_upgrades)
     {
-        // Flag not enabled?
-        if (uiHandlingFlags | HANDLING_NOS_Flag)
+        // Empty upgrades value is -1
+        if (upgradeID < 0)
+            continue;
+
+        // If NOS is installed we need set the flag
+        if ((upgradeID >= 1008 && upgradeID <= 1010))
         {
-            // Set zee flag
-            uiHandlingFlags |= HANDLING_NOS_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
+            if (!(uiHandlingFlags & HANDLING_NOS_Flag))
+                uiHandlingFlags |= HANDLING_NOS_Flag;
+
+            nitroInstalled = true;
+        }
+
+        // If hydraulics is installed we need set the flag
+        if ((upgradeID == 1087))
+        {
+            if (!(uiHandlingFlags & HANDLING_Hydraulics_Flag))
+                uiHandlingFlags |= HANDLING_Hydraulics_Flag;
+
+            hydralicsInstalled = true;
         }
     }
-    else
-    {
-        // Flag Enabled?
-        if (uiHandlingFlags & HANDLING_NOS_Flag)
-        {
-            // Unset the flag
-            uiHandlingFlags &= ~HANDLING_NOS_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
-        }
-    }
-    // Hydraulics Flag fixing
-    if (pInt->m_upgrades[1] && pInt->m_upgrades[1] == 1087)
-    {
-        // Flag not enabled?
-        if (uiHandlingFlags | HANDLING_Hydraulics_Flag)
-        {
-            // Set zee flag
-            uiHandlingFlags |= HANDLING_Hydraulics_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
-        }
-    }
-    else
-    {
-        // Flag Enabled?
-        if (uiHandlingFlags & HANDLING_Hydraulics_Flag)
-        {
-            // Unset the flag
-            uiHandlingFlags &= ~HANDLING_Hydraulics_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
-        }
-    }
+
+    // If hydraulics isn't installed we need unset the flag
+    if ((!hydralicsInstalled) && (uiHandlingFlags & HANDLING_Hydraulics_Flag))
+        uiHandlingFlags &= ~HANDLING_Hydraulics_Flag;
+
+    // If NOS isn't installed we need unset the flag
+    if ((!nitroInstalled) && (uiHandlingFlags & HANDLING_NOS_Flag))
+        uiHandlingFlags &= ~HANDLING_NOS_Flag;
+
+    m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
+
     pInt->dwHandlingFlags = uiHandlingFlags;
     pInt->m_fMass = m_pHandlingData->GetInterface()->fMass;
     pInt->m_fTurnMass = m_pHandlingData->GetInterface()->fTurnMass;            // * pGame->GetHandlingManager()->GetTurnMassMultiplier();
@@ -1501,27 +1597,98 @@ void CVehicleSA::SetGravity(const CVector* pvecGravity)
     m_vecGravity = *pvecGravity;
 }
 
-CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
+bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime)
 {
-    DWORD dwReturn;
-    DWORD dwThis = (DWORD)GetInterface();
-    DWORD dwFunc = FUNC_CAutomobile__SpawnFlyingComponent;
-    _asm
+    if (nodeIndex == eCarNodes::NONE)
+        return false;
+
+    DWORD nodesOffset = OFFSET_CAutomobile_Nodes;
+    RwFrame* defaultBikeChassisFrame = nullptr;
+
+    // CBike, CBmx, CBoat and CTrain don't inherit CAutomobile so let's do it manually!
+    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
     {
-        mov     ecx, dwThis
-        push    ui_2
-        push    i_1
-        call    dwFunc
-        mov     dwReturn, eax
+        case VehicleClass::AUTOMOBILE:
+        case VehicleClass::MONSTER_TRUCK:
+        case VehicleClass::PLANE:
+        case VehicleClass::HELI:
+        case VehicleClass::TRAILER:
+        case VehicleClass::QUAD:
+        {
+            nodesOffset = OFFSET_CAutomobile_Nodes;
+            break;
+        }
+        case VehicleClass::TRAIN:
+        {
+            if (static_cast<eTrainNodes>(nodeIndex) >= eTrainNodes::NUM_NODES)
+                return false;
+
+            nodesOffset = OFFSET_CTrain_Nodes;
+            break;
+        }
+        case VehicleClass::BIKE:
+        case VehicleClass::BMX:
+        {
+            auto* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
+            if (!bikeInterface)
+                return false;
+
+            if (static_cast<eBikeNodes>(nodeIndex) >= eBikeNodes::NUM_NODES)
+                return false;
+
+            nodesOffset = OFFSET_CBike_Nodes;
+            if (static_cast<eBikeNodes>(nodeIndex) != eBikeNodes::CHASSIS)
+                break;
+
+            // Set the correct "bike_chassis" frame for bikes
+            defaultBikeChassisFrame = bikeInterface->m_apModelNodes[1];
+            if (defaultBikeChassisFrame && std::strcmp(defaultBikeChassisFrame->szName, "chassis_dummy") == 0)
+            {
+                RwFrame* correctChassisFrame = RwFrameFindFrame(RpGetFrame(bikeInterface->m_pRwObject), "chassis");
+                if (correctChassisFrame)
+                    bikeInterface->m_apModelNodes[1] = correctChassisFrame;
+            }
+            break;
+        }
+        case VehicleClass::BOAT:
+        {
+            if (static_cast<eBoatNodes>(nodeIndex) >= eBoatNodes::NUM_NODES)
+                return false;
+
+            nodesOffset = OFFSET_CBoat_Nodes;
+            break;
+        }
+        default:
+            return false;
     }
 
-    CObject* pObject = NULL;
-    if (dwReturn)
+    // Patch nodes array in CAutomobile::SpawnFlyingComponent
+    MemPut(0x6A85B3, nodesOffset);
+    MemPut(0x6A8631, nodesOffset);
+
+    auto* componentObject = reinterpret_cast<CAutomobileSAInterface*>(GetInterface())->SpawnFlyingComponent(nodeIndex, collisionType);
+
+    // Restore default nodes array in CAutomobile::SpawnFlyingComponent
+    // CAutomobile::m_aCarNodes offset
+    MemPut(0x6A85B3, 0x648);
+    MemPut(0x6A8631, 0x648);
+
+    // Restore default chassis frame for bikes
+    if (static_cast<eBikeNodes>(nodeIndex) == eBikeNodes::CHASSIS && defaultBikeChassisFrame)
     {
-        SClientEntity<CObjectSA>* pObjectClientEntity = pGame->GetPools()->GetObject((DWORD*)dwReturn);
-        pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
+        auto* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
+        if (bikeInterface && bikeInterface->m_apModelNodes)
+            bikeInterface->m_apModelNodes[1] = defaultBikeChassisFrame;
     }
-    return pObject;
+
+    if (removalTime <= -1 || !componentObject)
+        return true;
+
+    // Set double-sided
+    componentObject->bBackfaceCulled = true;
+
+    componentObject->uiObjectRemovalTime = pGame->GetSystemTime() + static_cast<std::uint32_t>(removalTime);
+    return true;
 }
 
 void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
@@ -1531,16 +1698,16 @@ void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_LF];
+            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_LF)];
             break;
         case REAR_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_LB];
+            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_LB)];
             break;
         case FRONT_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_RF];
+            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_RF)];
             break;
         case REAR_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_RB];
+            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_RB)];
             break;
         default:
             break;
@@ -1759,10 +1926,47 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
     }
 }
 
+bool CVehicleSA::SetOnFire(bool onFire)
+{
+    CVehicleSAInterface* vehicleInterface = GetVehicleInterface();
+    if (onFire == !!vehicleInterface->m_pFire)
+        return false;
+
+    auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
+
+    if (onFire)
+    {
+        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        if (!fire)
+            return false;
+
+        fire->SetTarget(this);
+        fire->SetStrength(1.0f);
+        fire->Ignite();
+        fire->SetNumGenerationsAllowed(0);
+
+        vehicleInterface->m_pFire = fire->GetInterface();
+    }
+    else
+    {
+        CFire* fire = fireManager->GetFire(vehicleInterface->m_pFire);
+        if (!fire)
+            return false;
+
+        fire->Extinguish();
+    }
+
+    return true;
+}
+
 void CVehicleSA::StaticSetHooks()
 {
     // Setup vehicle sun glare hook
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
+
+    // Setup hooks to handle setVehicleRotorState function
+    HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
+    HookInstall(FUNC_CPlane_ProcessFlyingCarStuff, (DWORD)HOOK_CPlane_ProcessFlyingCarStuff, 5);
 }
 
 void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)

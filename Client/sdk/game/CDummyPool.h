@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/game/CDummyPool.h
  *  PURPOSE:     Dummy pool interface
@@ -16,7 +16,7 @@
 class CDummyPool
 {
 public:
-    virtual void RemoveAllBuildingLods() = 0;
-    virtual void RestoreAllBuildingsLods() = 0;
-    virtual void UpdateBuildingLods(void* oldPool, void* newPool) = 0;
+    virtual void RemoveAllWithBackup() = 0;
+    virtual void RestoreBackup() = 0;
+    virtual void UpdateBuildingLods(const std::uint32_t offset) = 0;
 };

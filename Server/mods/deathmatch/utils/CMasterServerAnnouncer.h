@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ASE.h"
 #include "version.h"
 
 struct SMasterServerDefinition
@@ -129,10 +130,15 @@ public:
             if (m_Stage < ANNOUNCE_STAGE_REMINDER)
             {
                 m_Stage = ANNOUNCE_STAGE_REMINDER;
+
+                CArgMap argMap;
+                argMap.SetFromString(result.pData);
+
+                if (result.iErrorCode == 200)
+                    m_remoteAddress = argMap.Get("remote_addr");
+
                 if (!m_Definition.bHideSuccess)
                 {
-                    CArgMap argMap;
-                    argMap.SetFromString(result.pData);
                     SString strOkMessage = argMap.Get("ok_message");
 
                     // Log successful initial announcement
@@ -178,6 +184,9 @@ public:
 
     const SMasterServerDefinition& GetDefinition() const { return m_Definition; }
 
+    bool               HasRemoteAddress() const noexcept { return !m_remoteAddress.empty(); }
+    const std::string& GetRemoteAddress() const noexcept { return m_remoteAddress; }
+
     //
     // Get http downloader used for master server comms etc.
     //
@@ -192,6 +201,7 @@ protected:
     long long                     m_llLastAnnounceTime;
     long long                     m_llLastPushTime;
     const SMasterServerDefinition m_Definition;
+    std::string                   m_remoteAddress;
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -268,6 +278,21 @@ public:
         {
             m_MasterServerList[i]->Pulse();
         }
+    }
+
+    /*
+     * @brief Get remote address of the first master server that has it.
+     */
+    const std::string& GetRemoteAddress() const noexcept
+    {
+        for (CMasterServer* masterServer : m_MasterServerList)
+        {
+            if (masterServer->HasRemoteAddress())
+                return masterServer->GetRemoteAddress();
+        }
+
+        static std::string empty;
+        return empty;
     }
 
 protected:
