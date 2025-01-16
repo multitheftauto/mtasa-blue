@@ -27,7 +27,7 @@ public:
     const CVector& GetPosition();
     void           SetPosition(const CVector& vecPosition);
 
-    SColor GetColor() const { return m_Color; }
+    SColor GetColor() const noexcept { return m_Color; }
     void   SetColor(const SColor color) { m_Color = color; }
 
     void AttachTo(CElement* pElement);

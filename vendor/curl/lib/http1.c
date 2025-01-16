@@ -128,7 +128,7 @@ static ssize_t next_line(struct h1_req_parser *parser,
   else if(*err == CURLE_AGAIN) {
     /* no line end in `buf`, add it to our scratch */
     *err = Curl_dyn_addn(&parser->scratch, (const unsigned char *)buf, buflen);
-    nread = (*err)? -1 : (ssize_t)buflen;
+    nread = (*err) ? -1 : (ssize_t)buflen;
   }
   return nread;
 }
@@ -217,7 +217,7 @@ static CURLcode start_req(struct h1_req_parser *parser,
     tmp[target_len] = '\0';
     /* See if treating TARGET as an absolute URL makes sense */
     if(Curl_is_absolute_url(tmp, NULL, 0, FALSE)) {
-      int url_options;
+      unsigned int url_options;
 
       url = curl_url();
       if(!url) {
@@ -325,10 +325,10 @@ CURLcode Curl_h1_req_write_head(struct httpreq *req, int http_minor,
 
   result = Curl_dyn_addf(dbuf, "%s %s%s%s%s HTTP/1.%d\r\n",
                          req->method,
-                         req->scheme? req->scheme : "",
-                         req->scheme? "://" : "",
-                         req->authority? req->authority : "",
-                         req->path? req->path : "",
+                         req->scheme ? req->scheme : "",
+                         req->scheme ? "://" : "",
+                         req->authority ? req->authority : "",
+                         req->path ? req->path : "",
                          http_minor);
   if(result)
     goto out;
