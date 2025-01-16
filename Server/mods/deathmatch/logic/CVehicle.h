@@ -499,7 +499,7 @@ private:
     unsigned char m_ucVariant2;
 
     bool m_onFire;
-    float m_nitroLevel;
+    float m_nitroLevel {0.0f};
 
     CTickCount m_LastPushedTime;
     CVector    m_vecStationaryCheckPosition;

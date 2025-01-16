@@ -260,7 +260,7 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
              if (!BitStream.Read(vehicleNitro))
                  return false;
 
-             m_Cache.VehNitroLevel = vehicleNitro;
+             m_Cache.vehNitroLevel = vehicleNitro;
         }
          
 
@@ -436,7 +436,7 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 
 
         if (BitStream.Can(eBitStreamVersion::IsVehicleNitroActivated_Serverside))
-            BitStream.Write(m_Cache.VehNitroLevel);
+            BitStream.Write(m_Cache.vehNitroLevel);
 
         // Success
         return true;
