@@ -2062,8 +2062,5 @@ CEGUI::Window* CGUI_Impl::GetMasterWindow(CEGUI::Window* wnd)
 
 std::string CGUI_Impl::ResolveModernName(const char* name)
 {
-    if (name == "DefaultWindow")
-        return "FrameWindowModern";
-
     return m_bUseModernSkin ? std::string(name) + "Modern" : name;
 }
