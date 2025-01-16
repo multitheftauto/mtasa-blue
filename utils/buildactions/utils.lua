@@ -153,3 +153,25 @@ function errormsg(title, message)
 	end
 	term.popColor()
 end
+
+-- Does a normal file copy and adds hardcoded text to the beginning of the resulting file
+-- Used in compose_files.lua and install_data.lua
+function makeconfigtemplate(file_path, result_path)
+	if not os.copyfile(file_path, result_path) then
+		return false
+	end
+	local result_file = io.open(result_path, "r")
+	if not result_file then
+		return false
+	end
+    local file_content = result_file:read("*all")
+    result_file:close()
+	result_file = io.open(result_path, "w")
+    if not result_file then
+        return false, "Failed to open result file for writing."
+    end
+    result_file:write("<!-- DELETING THIS FILE IS NOT RECOMMENDED ('mtaserver.conf.template')!\n     It is automatically used by the server for inserting missing settings into 'mtaserver.conf' on startup.\n-->\n")
+    result_file:write(file_content)
+    result_file:close()
+    return true
+end

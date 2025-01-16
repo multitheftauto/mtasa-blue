@@ -858,6 +858,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libcrypto-3.dll"
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libssl-3.dll"
         !endif
+        File "${SERVER_FILES_ROOT}\mods\deathmatch\mtaserver.conf.template"
 
         ;Only overwrite the following files if previous versions were bugged and explicitly need replacing
         !insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"
