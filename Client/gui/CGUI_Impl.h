@@ -282,7 +282,7 @@ public:
     bool        LoadImageset(const SString& strFilename);
 
     void        SetModernSkinEnabled(bool bEnabled) { m_bUseModernSkin = bEnabled; }
-    std::string ResolveModernName(const char* szSkin);
+    std::string ResolveModernName(const char* name);
 
     void SetXMLParser(CXML* pXML) { m_pXML = pXML; }
     void SetGraphics(CGraphicsInterface* pGraphicsInterface) { m_pGraphics = pGraphicsInterface; }
