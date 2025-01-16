@@ -137,7 +137,7 @@ void CGUI_Impl::SetSkin(const char* szName)
 
     PopGuiWorkingDirectory();
 
-    CEGUI::System::getSingleton().setDefaultMouseCursor("CGUI-Images", "MouseArrow");
+    CEGUI::System::getSingleton().setDefaultMouseCursor("CGUI-Images", "MouseArrowModern"); // Always use modern mouse arrow
 
     // Destroy any windows we already have
     CEGUI::WindowManager::getSingleton().destroyAllWindows();
@@ -430,9 +430,9 @@ bool CGUI_Impl::ConvertToModernSkin(const char* skinName)
     }
 
     // Load the requested skin's imageset, read-write
-    CXMLFile* skinImagesetFile = m_pXML->CreateXML(tempImagesetXmlPath);
+    CXMLFile* tempImagesetFile = m_pXML->CreateXML(tempImagesetXmlPath);
 
-    if (!skinImagesetFile || !skinImagesetFile->Parse())
+    if (!tempImagesetFile || !tempImagesetFile->Parse())
     {
         AddReportLog(1337, "ConvertToModernSkin: Failed to open/parse skin imageset");
         return false;
@@ -472,11 +472,26 @@ bool CGUI_Impl::ConvertToModernSkin(const char* skinName)
         }
     }
 
+    // Set the Imageset root node NativeHorzRes and NativeVertRes to the modern imageset's resolution
+    CXMLAttributes& skinAttributes = tempImagesetFile->GetRootNode()->GetAttributes();
+    CXMLAttributes& modernAttributes = modernImagesetFile->GetRootNode()->GetAttributes();
+
+    auto skinHorzRes = skinAttributes.Find("NativeHorzRes");
+    auto skinVertRes = skinAttributes.Find("NativeVertRes");
+    auto modernHorzRes = modernAttributes.Find("NativeHorzRes");
+    auto modernVertRes = modernAttributes.Find("NativeVertRes");
+
+    if (skinHorzRes && skinVertRes && modernHorzRes && modernVertRes)
+    {
+        skinHorzRes->SetValue(modernHorzRes->GetValue().c_str());
+        skinVertRes->SetValue(modernVertRes->GetValue().c_str());
+    }
+
     // Copy the modern imageset into the skin imageset
-    modernRootNode->CopyChildrenInto(skinImagesetFile->GetRootNode(), true, false);
+    modernRootNode->CopyChildrenInto(tempImagesetFile->GetRootNode(), true, false);
 
     // Save the skin imageset
-    if (!skinImagesetFile->Write())
+    if (!tempImagesetFile->Write())
     {
         AddReportLog(1337, "ConvertToModernSkin: Failed to write skin imageset");
         return false;
@@ -2045,8 +2060,10 @@ CEGUI::Window* CGUI_Impl::GetMasterWindow(CEGUI::Window* wnd)
     return wnd;
 }
 
-const char* CGUI_Impl::ResolveSkin(const char* szSkin)
+std::string CGUI_Impl::ResolveModernName(const char* name)
 {
-    const std::string name = m_bUseModernSkin ? std::string(szSkin) + "Modern" : szSkin;
-    return name.c_str();
+    if (name == "DefaultWindow")
+        return "FrameWindowModern";
+
+    return m_bUseModernSkin ? std::string(name) + "Modern" : name;
 }

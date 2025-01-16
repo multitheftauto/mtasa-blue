@@ -137,6 +137,7 @@ void CLocalGUI::ChangeLocale(const char* szName)
 void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    pGUI->SetModernSkinEnabled(true);
 
     // Create chatbox
     m_pChat = new CChat(pGUI, CVector2D(0.0125f, 0.015f));
@@ -171,6 +172,8 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     // Create our news headlines if we're already ingame
     if (bGameIsAlreadyLoaded)
         m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
+
+    pGUI->SetModernSkinEnabled(false);
 }
 
 void CLocalGUI::CreateObjects(IUnknown* pDevice)

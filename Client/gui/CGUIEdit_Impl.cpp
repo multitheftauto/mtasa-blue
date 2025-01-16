@@ -22,7 +22,7 @@ CGUIEdit_Impl::CGUIEdit_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* 
     pGUI->GetUniqueName(szUnique);
 
     // Create the edit and set default settings
-    m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIEDIT_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->ResolveModernName(CGUIEDIT_NAME), szUnique);
     m_pWindow->setDestroyedByParent(false);
     m_pWindow->setRect(CEGUI::Absolute, CEGUI::Rect(0.00f, 0.00f, 0.128f, 0.24f));
 

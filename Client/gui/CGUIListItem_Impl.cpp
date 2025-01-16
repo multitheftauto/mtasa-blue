@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+extern CGUI_Impl* g_pGUI;
+
 CGUIListItem_Impl::CGUIListItem_Impl(const char* szText, unsigned int uiType, CGUIStaticImage_Impl* pImage)
 {
     ItemType = uiType;
@@ -33,7 +35,7 @@ CGUIListItem_Impl::CGUIListItem_Impl(const char* szText, unsigned int uiType, CG
     {
         // Set flags and properties
         m_pListItem->setAutoDeleted(false);
-        m_pListItem->setSelectionBrushImage("CGUI-Images", "ListboxSelectionBrush");
+        m_pListItem->setSelectionBrushImage("CGUI-Images", g_pGUI->ResolveModernName("ListboxSelectionBrush"));
     }
 
     m_pData = NULL;

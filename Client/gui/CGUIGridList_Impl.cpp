@@ -32,9 +32,9 @@ CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool
 
     // Create the window and set default settings
     if (bFrame)
-        m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIGRIDLIST_NAME, szUnique);
+        m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->ResolveModernName(CGUIGRIDLIST_NAME), szUnique);
     else
-        m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIGRIDLISTNOFRAME_NAME, szUnique);
+        m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->ResolveModernName(CGUIGRIDLISTNOFRAME_NAME), szUnique);
 
     m_pWindow->setDestroyedByParent(false);
     m_pWindow->setRect(CEGUI::Relative, CEGUI::Rect(0.00f, 0.00f, 0.40f, 0.40f));

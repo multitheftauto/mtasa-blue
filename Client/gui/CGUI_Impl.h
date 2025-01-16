@@ -281,8 +281,8 @@ public:
     CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename);
     bool        LoadImageset(const SString& strFilename);
 
-    void SetModernSkinEnabled(bool bEnabled) { m_bUseModernSkin = bEnabled; }
-    const char* ResolveSkin(const char* szSkin);
+    void        SetModernSkinEnabled(bool bEnabled) { m_bUseModernSkin = bEnabled; }
+    std::string ResolveModernName(const char* szSkin);
 
     void SetXMLParser(CXML* pXML) { m_pXML = pXML; }
     void SetGraphics(CGraphicsInterface* pGraphicsInterface) { m_pGraphics = pGraphicsInterface; }
@@ -361,8 +361,7 @@ private:
     SString      m_CurrentSchemeName;
     CElapsedTime m_RenderOkTimer;
 
-    bool m_bUseModernSkin = false;
+    bool                m_bUseModernSkin = false;
     CGraphicsInterface* m_pGraphics;
-    CXML* m_pXML;
-    
+    CXML*               m_pXML;
 };
