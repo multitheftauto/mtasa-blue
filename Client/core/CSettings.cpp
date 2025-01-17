@@ -1320,17 +1320,17 @@ void CSettings::CreateGUI()
     m_pGridRows->SetProperty("StepSize", "0.1");
 
     vecTemp.fY += 20.0f;
-    m_pCellAlphaValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, "0.5"));
+    m_pCellAlphaValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, "XXX"));
     m_pCellAlphaValueLabel->SetPosition(CVector2D(vecTemp.fX + 50.0f, vecTemp.fY));
     m_pCellAlphaValueLabel->AutoSize();
     m_pCellAlphaValueLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
 
-    m_pGridColumnsValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, SString("%d", m_pGridLayout->GetColumns())));
+    m_pGridColumnsValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, "XXX"));
     m_pGridColumnsValueLabel->SetPosition(CVector2D(vecTemp.fX + 250.0f, vecTemp.fY));
     m_pGridColumnsValueLabel->AutoSize();
     m_pGridColumnsValueLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
 
-    m_pGridRowsValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, SString("%d", m_pGridLayout->GetRows())));
+    m_pGridRowsValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, "XXX"));
     m_pGridRowsValueLabel->SetPosition(CVector2D(vecTemp.fX + 450.0f, vecTemp.fY));
     m_pGridRowsValueLabel->AutoSize();
     m_pGridRowsValueLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
@@ -4565,8 +4565,8 @@ bool CSettings::OnCellAlphaChanged(CGUIElement* pElement)
 
 bool CSettings::OnGridColumnsChanged(CGUIElement* pElement)
 {
-    float columns = std::max<float>(0.1f, m_pGridColumns->GetScrollPosition()) * 10;
-    m_pGridColumnsValueLabel->SetText(SString("%g", columns).c_str());
+    int columns = static_cast<int>(std::round(std::max<float>(0.1f, m_pGridColumns->GetScrollPosition()) * 10));
+    m_pGridColumnsValueLabel->SetText(SString("%i", columns).c_str());
 
     m_pGridLayout->SetColumns(columns);
     return true;
@@ -4574,8 +4574,8 @@ bool CSettings::OnGridColumnsChanged(CGUIElement* pElement)
 
 bool CSettings::OnGridRowsChanged(CGUIElement* pElement)
 {
-    float rows = std::max<float>(0.1f, m_pGridRows->GetScrollPosition()) * 10;
-    m_pGridRowsValueLabel->SetText(SString("%g", rows).c_str());
+    int rows = static_cast<int>(std::round(std::max<float>(0.1f, m_pGridRows->GetScrollPosition()) * 10));
+    m_pGridRowsValueLabel->SetText(SString("%i", rows).c_str());
 
     m_pGridLayout->SetRows(rows);
     return true;
