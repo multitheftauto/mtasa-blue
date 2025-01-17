@@ -42,6 +42,7 @@ public:
     const bool RemoveItem(const CGUIElement* item, const bool moveToPreviousCell = false);
 
     SGridCellItem* GetCell(const int column, const int row) const;
+    SGridCellItem* GetCell(const CGUIElement* item) const;
 
     std::vector<SGridCellItem*> GetCellsInGrid(const int startColumn, const int startRow, const int endColumn, const int endRow);
     std::vector<SGridCellItem*> GetCellsOutsideGrid(const int startColumn, const int startRow, const int endColumn, const int endRow);
@@ -70,8 +71,9 @@ private:
 
     float m_defaultCellAlpha = 1.0f;
 
-    std::vector<std::vector<int>>           m_grid;
-    std::unordered_map<int, SGridCellItem*> m_cells;
+    std::vector<std::vector<int>>               m_grid;
+    std::unordered_map<int, SGridCellItem*>     m_cells;
+    std::unordered_map<const CGUIElement*, int> m_items;
 
     CGUITexture* m_cellTexture = nullptr;
     CGUITexture* m_cellTextureAlt = nullptr;

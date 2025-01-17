@@ -33,6 +33,7 @@ enum class eGridLayoutItemAlignment
 
 struct SGridCellItem
 {
+    int                      id;
     CGUIStaticImage*         container;
     CGUIElement*             element;
     eGridLayoutItemAlignment alignment;
@@ -67,6 +68,7 @@ public:
     virtual const bool RemoveItem(const CGUIElement* item, const bool moveToPreviousCell = false) = 0;
 
     virtual SGridCellItem* GetCell(const int column, const int row) const = 0;
+    virtual SGridCellItem* GetCell(const CGUIElement* item) const = 0;
 
     virtual std::vector<SGridCellItem*> GetCellsInGrid(const int startColumn, const int startRow, const int endColumn, const int endRow) = 0;
     virtual std::vector<SGridCellItem*> GetCellsOutsideGrid(const int startColumn, const int startRow, const int endColumn, const int endRow) = 0;

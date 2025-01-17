@@ -76,7 +76,7 @@ const bool CGUIGridLayout_Impl::AddItem(CGUIElement* item, int column, int row, 
     // If cell is already occupied
     if (m_grid[column - 1][row - 1] != 0)
     {
-            return false;
+        return false;
     }
 
     auto* cell = GetCell(column, row);
@@ -87,6 +87,8 @@ const bool CGUIGridLayout_Impl::AddItem(CGUIElement* item, int column, int row, 
 
     item->SetPosition(CVector2D(0.0f, 0.0f), true);
     item->SetSize(CVector2D(1.0f, 1.0f), true);
+
+    m_items.emplace(item, cell->id);
 
     if (moveToNextCell)
     {
@@ -124,6 +126,8 @@ const bool CGUIGridLayout_Impl::RemoveItem(const int column, const int row, cons
     element = nullptr;
     m_grid[column - 1][row - 1] = 0;
 
+    m_items.erase(element);
+
     if (moveToPreviousCell)
     {
         if (m_activeRow == 1)
@@ -145,17 +149,12 @@ const bool CGUIGridLayout_Impl::RemoveItem(const int column, const int row, cons
 
 const bool CGUIGridLayout_Impl::RemoveItem(const CGUIElement* item, const bool moveToPreviousCell)
 {
-    auto& ci = m_cells.begin();
+    auto* cell = GetCell(item);
 
-    while (ci != m_cells.end())
-    {
-        if (ci->second->element == item)            // todo: store column/row on CGUIElement and use that to find the cell instead of iterating
-            return RemoveItem(ci->second->column, ci->second->row, moveToPreviousCell);
-        else
-            ci++;
-    }
+    if (cell == nullptr)
+        return false;
 
-    return false;
+    return RemoveItem(cell->column, cell->row, moveToPreviousCell);
 }
 
 SGridCellItem* CGUIGridLayout_Impl::GetCell(const int column, const int row) const
@@ -169,6 +168,12 @@ SGridCellItem* CGUIGridLayout_Impl::GetCell(const int column, const int row) con
         return nullptr;
 
     return cell->second;
+}
+
+SGridCellItem* CGUIGridLayout_Impl::GetCell(const CGUIElement* item) const
+{
+    int id = m_items.count(item) ? m_items.at(item) : 0;
+    return m_cells.count(id) ? m_cells.at(id) : nullptr;
 }
 
 std::vector<SGridCellItem*> CGUIGridLayout_Impl::GetCellsInColumn(const int column)
@@ -331,27 +336,22 @@ const std::pair<int, int> CGUIGridLayout_Impl::GetActiveCell()
 
 void CGUIGridLayout_Impl::SetItemAlignment(const CGUIElement* item, eGridLayoutItemAlignment alignment)
 {
-    for (auto& cell : m_cells)
-    {
-        if (cell.second->element == item)            // todo: store column/row on CGUIElement and use that to find the cell instead of iterating
-        {
-            cell.second->alignment = alignment;
-            return;
-        }
-    }
+    auto* cell = GetCell(item);
+
+    if (cell == nullptr)
+        return;
+
+    cell->alignment = alignment;
 }
 
 const eGridLayoutItemAlignment CGUIGridLayout_Impl::GetItemAlignment(const CGUIElement* item) const
 {
-    for (auto& cell : m_cells)
-    {
-        if (cell.second->element == item)            // todo: store column/row on CGUIElement and use that to find the cell instead of iterating
-        {
-            return cell.second->alignment;
-        }
-    }
+    const auto* cell = GetCell(item);
 
-    return m_defaultAlignment;
+    if (cell == nullptr)
+        return m_defaultAlignment;
+
+    return cell->alignment;
 }
 
 const bool CGUIGridLayout_Impl::SetCellAlpha(const int column, const int row, const float alpha)
@@ -406,6 +406,7 @@ void CGUIGridLayout_Impl::CreateGridCells()
                 // Size the cell container in the grid
                 cell->container->SetSize(CVector2D(1.0f / m_columns, 1.0f / m_rows), true);
 
+                cell->id = m_nextId;
                 cell->element = nullptr;
                 cell->column = i + 1;
                 cell->row = j + 1;
@@ -430,6 +431,8 @@ void CGUIGridLayout_Impl::CleanupGridItems()
 
             if (cell.second->element)
             {
+                m_items.erase(cell.second->element);
+
                 cell.second->element->SetParent(nullptr);
                 cell.second->element = nullptr;
             }
