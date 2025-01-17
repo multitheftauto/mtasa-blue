@@ -17,9 +17,9 @@ class CSettings;
 #include "CMainMenu.h"
 #include "CCore.h"
 
-#define SKINS_PATH                    "skins/*"
-#define CHAT_PRESETS_PATH             "mta/config/chatboxpresets.xml"
-#define CHAT_PRESETS_ROOT             "chatboxpresets"
+#define SKINS_PATH        "skins/*"
+#define CHAT_PRESETS_PATH "mta/config/chatboxpresets.xml"
+#define CHAT_PRESETS_ROOT "chatboxpresets"
 
 // #define SHOWALLSETTINGS
 
@@ -125,18 +125,18 @@ protected:
     const static int SecKeyNum = 3;            // Number of secondary keys
 
     // Keep these protected so we can access them in the event handlers of CClientGame
-    CGUIElement*  m_pWindow;
-    CGUITabPanel* m_pTabs;
-    CGUITab*      m_pTabInterface;
-    CGUITab*      m_pTabBrowser;
-    CGUIButton*   m_pButtonOK;
-    CGUIButton*   m_pButtonCancel;
-    CGUILabel*    m_pLabelNick;
-    CGUIButton*   m_pButtonGenerateNick;
-    CGUIStaticImage*   m_pButtonGenerateNickIcon;
-    CGUIEdit*     m_pEditNick;
-    CGUICheckBox* m_pSavePasswords;
-    CGUICheckBox* m_pAutoRefreshBrowser;
+    CGUIElement*     m_pWindow;
+    CGUITabPanel*    m_pTabs;
+    CGUITab*         m_pTabInterface;
+    CGUITab*         m_pTabBrowser;
+    CGUIButton*      m_pButtonOK;
+    CGUIButton*      m_pButtonCancel;
+    CGUILabel*       m_pLabelNick;
+    CGUIButton*      m_pButtonGenerateNick;
+    CGUIStaticImage* m_pButtonGenerateNickIcon;
+    CGUIEdit*        m_pEditNick;
+    CGUICheckBox*    m_pSavePasswords;
+    CGUICheckBox*    m_pAutoRefreshBrowser;
 
     CGUILabel*     m_pVideoGeneralLabel;
     CGUILabel*     m_pVideoResolutionLabel;
@@ -345,6 +345,19 @@ protected:
     bool          m_bBrowserListsChanged;
     bool          m_bBrowserListsLoadEnabled;
 
+    CGUILabel*      m_pGridLayoutLabel;
+    CGUIGridLayout* m_pGridLayout;
+    CGUILabel*      m_pTestCellLabel;
+    CGUILabel*      m_pCellAlphaLabel;
+    CGUIScrollBar*  m_pCellAlpha;
+    CGUILabel*      m_pCellAlphaValueLabel;
+    CGUILabel*      m_pGridColumnsLabel;
+    CGUIScrollBar*  m_pGridColumns;
+    CGUILabel*      m_pGridColumnsValueLabel;
+    CGUILabel*      m_pGridRowsLabel;
+    CGUIScrollBar*  m_pGridRows;
+    CGUILabel*      m_pGridRowsValueLabel;
+
     bool OnJoypadTextChanged(CGUIElement* pElement);
     bool OnAxisSelectClick(CGUIElement* pElement);
     bool OnAudioDefaultClick(CGUIElement* pElement);
@@ -386,6 +399,9 @@ protected:
     bool OnBrowserWhitelistRemove(CGUIElement* pElement);
     bool OnBrowserWhitelistDomainAddFocused(CGUIElement* pElement);
     bool OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement);
+    bool OnCellAlphaChanged(CGUIElement* pElement);
+    bool OnGridColumnsChanged(CGUIElement* pElement);
+    bool OnGridRowsChanged(CGUIElement* pElement);
 
     bool OnMouseDoubleClick(CGUIMouseEventArgs Args);
 

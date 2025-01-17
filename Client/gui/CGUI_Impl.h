@@ -142,6 +142,8 @@ public:
     CGUITexture* CreateTexture();
     CGUIFont*    CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false);
 
+    CGUIGridLayout* CreateGridLayout(CGUIElement* pParent = nullptr);
+
     void        SetCursorEnabled(bool bEnabled);
     bool        IsCursorEnabled();
     void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false);
@@ -302,6 +304,7 @@ private:
     CGUIScrollBar*   _CreateScrollBar(bool bHorizontal, CGUIElement_Impl* pParent = NULL);
     CGUIComboBox*    _CreateComboBox(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
     CGUIWebBrowser*  _CreateWebBrowser(CGUIElement_Impl* pParent = nullptr);
+    CGUIGridLayout*  _CreateGridLayout(CGUIElement_Impl* pParent = nullptr);
 
     void      SubscribeToMouseEvents();
     CGUIFont* CreateFntFromWinFont(const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0,

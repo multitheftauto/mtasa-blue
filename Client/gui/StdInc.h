@@ -35,3 +35,4 @@
 #include "CGUIWebBrowser_Impl.h"
 #include "CGUIWindow_Impl.h"
 #include "CGUIComboBox_Impl.h"
+#include "CGUIGridLayout_Impl.h"

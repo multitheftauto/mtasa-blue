@@ -836,6 +836,11 @@ CGUIWindow* CGUI_Impl::CreateWnd(CGUIElement* pParent, const char* szCaption)
     return new CGUIWindow_Impl(this, pParent, szCaption);
 }
 
+CGUIGridLayout* CGUI_Impl::_CreateGridLayout(CGUIElement_Impl* pParent)
+{
+    return new CGUIGridLayout_Impl(this, pParent);
+}
+
 void CGUI_Impl::SetCursorEnabled(bool bEnabled)
 {
     if (bEnabled)
@@ -1994,6 +1999,12 @@ CGUIWebBrowser* CGUI_Impl::CreateWebBrowser(CGUITab* pParent)
 {
     CGUITab_Impl* wnd = reinterpret_cast<CGUITab_Impl*>(pParent);
     return _CreateWebBrowser(wnd);
+}
+
+CGUIGridLayout* CGUI_Impl::CreateGridLayout(CGUIElement* pParent)
+{
+    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
+    return _CreateGridLayout(wnd);
 }
 
 void CGUI_Impl::CleanDeadPool()

@@ -1,0 +1,88 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto: San Andreas
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#pragma once
+
+#include <gui/CGUIGridLayout.h>
+#include "CGUIElement_Impl.h"
+
+class CGUIGridLayout_Impl : public CGUIGridLayout, public CGUIElement_Impl
+{
+public:
+    CGUIGridLayout_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL);
+    ~CGUIGridLayout_Impl();
+
+    eCGUIType GetType() { return CGUI_GRIDLAYOUT; };
+
+    const bool SetColumns(int columns);
+    const bool SetRows(int rows);
+    const bool SetGrid(int columns, int rows);
+
+    const int GetColumns() const { return m_columns; }
+    const int GetRows() const { return m_rows; }
+
+    const bool SetActiveCell(int column, int row);
+    const bool SetActiveColumn(int column);
+    const bool SetActiveRow(int row);
+
+    const int                 GetActiveColumn() const { return m_activeColumn; }
+    const int                 GetActiveRow() const { return m_activeRow; }
+    const std::pair<int, int> GetActiveCell();
+
+    const bool AddItem(CGUIElement* item, int column, int row, const bool moveToNextCell = true);
+    const bool AddItem(CGUIElement* item, const bool moveToNextCell = true);
+
+    const bool RemoveItem(const int column, const int row, const bool moveToPreviousCell = false);
+    const bool RemoveItem(const CGUIElement* item, const bool moveToPreviousCell = false);
+
+    SGridCellItem* GetCell(const int column, const int row) const;
+
+    std::vector<SGridCellItem*> GetCellsInGrid(const int startColumn, const int startRow, const int endColumn, const int endRow);
+    std::vector<SGridCellItem*> GetCellsOutsideGrid(const int startColumn, const int startRow, const int endColumn, const int endRow);
+    std::vector<SGridCellItem*> GetCellsInColumn(const int column);
+    std::vector<SGridCellItem*> GetCellsInRow(const int row);
+
+    void SetItemAlignment(const CGUIElement* item, eGridLayoutItemAlignment alignment);
+    void SetDefaultItemAlignment(eGridLayoutItemAlignment alignment) { m_defaultAlignment = alignment; }
+
+    const eGridLayoutItemAlignment GetItemAlignment(const CGUIElement* item) const;
+    const eGridLayoutItemAlignment GetDefaultItemAlignment() const { return m_defaultAlignment; }
+
+    const bool SetCellAlpha(const int column, const int row, const float alpha);
+    const bool SetDefaultCellAlpha(const float alpha);
+
+#include "CGUIElement_Inc.h"
+
+private:
+    int m_columns = 0;
+    int m_rows = 0;
+
+    int m_activeColumn = 0;
+    int m_activeRow = 0;
+
+    int m_nextId = 1;
+
+    float m_defaultCellAlpha = 1.0f;
+
+    std::vector<std::vector<int>>           m_grid;
+    std::unordered_map<int, SGridCellItem*> m_cells;
+
+    CGUITexture* m_cellTexture = nullptr;
+    CGUITexture* m_cellTextureAlt = nullptr;
+
+    eGridLayoutItemAlignment m_defaultAlignment = eGridLayoutItemAlignment::MIDDLE_CENTER;
+
+    void CreateGridCells();
+    void CleanupGridItems();
+    void RepositionGridItems();
+
+    const bool InGridRange(const int column, const int row) const;
+    const bool InColumnRange(const int column) const;
+    const bool InRowRange(const int row) const;
+};

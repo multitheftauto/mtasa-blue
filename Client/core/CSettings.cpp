@@ -14,6 +14,8 @@
 #include <game/CGame.h>
 #include <game/CSettings.h>
 
+#include <gui/CGUIGridLayout.h>
+
 using namespace std;
 
 #define CORE_MTA_FILLER "cgui\\images\\mta_filler.png"
@@ -56,7 +58,7 @@ void CSettings::CreateGUI()
     if (m_pWindow)
         DestroyGUI();
 
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabAdvanced;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabAdvanced, *pTabCEGUI;
     CGUI*    pManager = g_pCore->GetGUI();
 
     // Init
@@ -121,6 +123,7 @@ void CSettings::CreateGUI()
     m_pTabInterface = m_pTabs->CreateTab(_("Interface"));
     m_pTabBrowser = m_pTabs->CreateTab(_("Web Browser"));
     pTabAdvanced = m_pTabs->CreateTab(_("Advanced"));
+    pTabCEGUI = m_pTabs->CreateTab(_("CEGUI"));
 
     // Create buttons
     //  OK button
@@ -1264,6 +1267,82 @@ void CSettings::CreateGUI()
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
     m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(500.0f, 95.0f));
     m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP);
+
+    /**
+     *  CEGUI tab.
+     **/
+    m_pGridLayout = reinterpret_cast<CGUIGridLayout*>(pManager->CreateGridLayout(pTabCEGUI));
+    m_pGridLayout->SetGrid(1, 1);
+
+    vecTemp = CVector2D(12.f, 12.f);
+
+    // Grid layout section label
+    m_pGridLayoutLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, _("Grid layout")));
+    m_pGridLayoutLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pGridLayoutLabel->SetFont("default-bold-small");
+    m_pGridLayoutLabel->AutoSize();
+    m_pGridLayoutLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP);
+    vecTemp.fY += 15.0f;
+
+    m_pCellAlphaLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, _("Cell alpha:")));
+    m_pCellAlphaLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pCellAlphaLabel->AutoSize();
+    m_pCellAlphaLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
+
+    m_pGridColumnsLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, _("Columns:")));
+    m_pGridColumnsLabel->SetPosition(CVector2D(vecTemp.fX + 200.0f, vecTemp.fY));
+    m_pGridColumnsLabel->AutoSize();
+    m_pGridColumnsLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
+
+    m_pGridRowsLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, _("Rows:")));
+    m_pGridRowsLabel->SetPosition(CVector2D(vecTemp.fX + 400.0f, vecTemp.fY));
+    m_pGridRowsLabel->AutoSize();
+    m_pGridRowsLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
+
+    vecTemp.fY += 5.0f;
+
+    m_pCellAlpha = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabCEGUI));
+    m_pCellAlpha->SetPosition(CVector2D(vecTemp.fX + 50.0f, vecTemp.fY));
+    m_pCellAlpha->SetSize(CVector2D(130.0f, 20.0f));
+    m_pCellAlpha->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnCellAlphaChanged, this));
+    m_pCellAlpha->SetProperty("StepSize", "0.01");
+
+    m_pGridColumns = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabCEGUI));
+    m_pGridColumns->SetPosition(CVector2D(vecTemp.fX + 250.0f, vecTemp.fY));
+    m_pGridColumns->SetSize(CVector2D(130.0f, 20.0f));
+    m_pGridColumns->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnGridColumnsChanged, this));
+    m_pGridColumns->SetProperty("StepSize", "0.1");
+
+    m_pGridRows = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabCEGUI));
+    m_pGridRows->SetPosition(CVector2D(vecTemp.fX + 450.0f, vecTemp.fY));
+    m_pGridRows->SetSize(CVector2D(130.0f, 20.0f));
+    m_pGridRows->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnGridRowsChanged, this));
+    m_pGridRows->SetProperty("StepSize", "0.1");
+
+    vecTemp.fY += 20.0f;
+    m_pCellAlphaValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, "0.5"));
+    m_pCellAlphaValueLabel->SetPosition(CVector2D(vecTemp.fX + 50.0f, vecTemp.fY));
+    m_pCellAlphaValueLabel->AutoSize();
+    m_pCellAlphaValueLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
+
+    m_pGridColumnsValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, SString("%d", m_pGridLayout->GetColumns())));
+    m_pGridColumnsValueLabel->SetPosition(CVector2D(vecTemp.fX + 250.0f, vecTemp.fY));
+    m_pGridColumnsValueLabel->AutoSize();
+    m_pGridColumnsValueLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
+
+    m_pGridRowsValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, SString("%d", m_pGridLayout->GetRows())));
+    m_pGridRowsValueLabel->SetPosition(CVector2D(vecTemp.fX + 450.0f, vecTemp.fY));
+    m_pGridRowsValueLabel->AutoSize();
+    m_pGridRowsValueLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
+
+    m_pCellAlpha->SetScrollPosition(0.5f);
+    m_pGridColumns->SetScrollPosition(0.2f);
+    m_pGridRows->SetScrollPosition(0.2f);
+
+    // Grid layout
+    vecTemp.fY += 20.0f;
+    m_pGridLayout->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pGridLayout->SetSize(CVector2D(500.0f, 300.0f));
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CSettings::OnOKButtonClick, this));
@@ -4473,6 +4552,33 @@ bool CSettings::OnChatAlphaChanged(CGUIElement* pElement)
     }
 
     return false;
+}
+
+bool CSettings::OnCellAlphaChanged(CGUIElement* pElement)
+{
+    float alpha = (m_pCellAlpha->GetScrollPosition());
+    m_pCellAlphaValueLabel->SetText(SString("%g", alpha).c_str());
+
+    m_pGridLayout->SetDefaultCellAlpha(alpha);
+    return true;
+}
+
+bool CSettings::OnGridColumnsChanged(CGUIElement* pElement)
+{
+    float columns = std::max<float>(0.1f, m_pGridColumns->GetScrollPosition()) * 10;
+    m_pGridColumnsValueLabel->SetText(SString("%g", columns).c_str());
+
+    m_pGridLayout->SetColumns(columns);
+    return true;
+}
+
+bool CSettings::OnGridRowsChanged(CGUIElement* pElement)
+{
+    float rows = std::max<float>(0.1f, m_pGridRows->GetScrollPosition()) * 10;
+    m_pGridRowsValueLabel->SetText(SString("%g", rows).c_str());
+
+    m_pGridLayout->SetRows(rows);
+    return true;
 }
 
 bool CSettings::OnUpdateButtonClick(CGUIElement* pElement)

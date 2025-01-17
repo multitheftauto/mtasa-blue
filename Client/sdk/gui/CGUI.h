@@ -35,6 +35,7 @@ class CGUI;
 #include "CGUIWebBrowser.h"
 #include "CGUITabPanel.h"
 #include "CGUIComboBox.h"
+#include "CGUIGridLayout.h"
 #include "CGUITypes.h"
 
 class CXML;
@@ -125,6 +126,8 @@ public:
     virtual CGUIWindow* CreateWnd(CGUIElement* pParent = NULL, const char* szCaption = "") = 0;
     virtual CGUIFont*   CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false) = 0;
     virtual CGUITexture* CreateTexture() = 0;
+
+    virtual CGUIGridLayout* CreateGridLayout(CGUIElement* pParent = nullptr) = 0;
 
     virtual void        SetCursorEnabled(bool bEnabled) = 0;
     virtual bool        IsCursorEnabled() = 0;
