@@ -173,7 +173,7 @@ SGridCellItem* CGUIGridLayout_Impl::GetCell(const int column, const int row) con
 SGridCellItem* CGUIGridLayout_Impl::GetCell(const CGUIElement* item) const
 {
     int id = m_items.count(item) ? m_items.at(item) : 0;
-    return m_cells.count(id) ? m_cells.at(id) : nullptr;
+    return id == 0 ? nullptr : m_cells.at(id);
 }
 
 std::vector<SGridCellItem*> CGUIGridLayout_Impl::GetCellsInColumn(const int column)
