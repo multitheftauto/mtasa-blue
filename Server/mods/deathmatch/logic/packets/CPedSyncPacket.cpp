@@ -64,16 +64,24 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
                 return false;
         }
 
-        if (ucFlags & 0x60 && BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-        {
-            if (!BitStream.ReadBit(Data.isReloadingWeapon))
-                return false;
-        }
-
         // In Water
         if (ucFlags & 0x40)
         {
             if (!BitStream.ReadBit(Data.bIsInWater))
+                return false;
+        }
+
+        // New flags
+        std::uint8_t ucFlags2 = 0;
+
+        if (BitStream.Can(eBitStreamVersion::PedSyncFlags) && !BitStream.Read(ucFlags2))
+            return false;
+
+        Data.ucFlags2 = ucFlags2;
+
+        if (ucFlags2 & 0x1 && BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+        {
+            if (!BitStream.ReadBit(Data.isReloadingWeapon))
                 return false;
         }
 
@@ -142,10 +150,17 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(Data.fArmor);
     if (Data.ucFlags & 0x20)
         BitStream.WriteBit(Data.bOnFire);
-    if (Data.ucFlags & 0x60 && BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-        BitStream.Write(Data.isReloadingWeapon);
     if (Data.ucFlags & 0x40)
         BitStream.Write(Data.bIsInWater);
+
+    // New flags
+    if (!BitStream.Can(eBitStreamVersion::PedSyncFlags))
+        return true;
+
+    BitStream.Write(Data.ucFlags2);
+
+    if (Data.ucFlags2 & 0x1 && BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+        BitStream.Write(Data.isReloadingWeapon);
 
     return true;
 }

@@ -239,6 +239,18 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
                 BitStream.ReadBit(bIsInWater);
 
+            // New flags
+            std::uint8_t ucFlags2 = 0;
+
+            if (BitStream.Can(eBitStreamVersion::PedSyncFlags))
+                BitStream.Read(ucFlags2);
+
+            // New values
+            bool isReloadingWeapon;
+
+            if (ucFlags2 & 0x1 && BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+                BitStream.ReadBit(isReloadingWeapon);
+
             // Grab the ped. Only update the sync if this packet is from the same context.
             CClientPed* pPed = m_pPedManager->Get(ID);
             if (pPed && pPed->CanUpdateSync(ucSyncTimeContext))
@@ -257,6 +269,8 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
                     pPed->SetOnFire(bOnFire);
                 if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
                     pPed->SetInWater(bIsInWater);
+                if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon) && ucFlags2 & 0x1 && isReloadingWeapon)
+                    pPed->ReloadWeapon();
             }
         }
     }
@@ -293,6 +307,8 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     pPed->GetMoveSpeed(vecVelocity);
 
     unsigned char ucFlags = 0;
+    std::uint8_t  ucFlags2 = 0;
+
     if (vecPosition != pPed->m_LastSyncedData->vPosition)
         ucFlags |= 0x01;
     if (pPed->GetCurrentRotation() != pPed->m_LastSyncedData->fRotation)
@@ -307,13 +323,14 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         ucFlags |= 0x20;
     if (pPed->IsInWater() != pPed->m_LastSyncedData->bIsInWater)
         ucFlags |= 0x40;
-    if (pPed->IsReloadingWeapon() != pPed->m_LastSyncedData->isReloadingWeapon && pBitStream->Can(eBitStreamVersion::IsPedReloadingWeapon))
-        ucFlags |= 0x60;
     if (pPed->HasSyncedAnim() && (!pPed->IsRunningAnimation() || pPed->m_animationOverridedByClient))
         ucFlags |= 0x80;
 
+    if (pPed->IsReloadingWeapon() != pPed->m_LastSyncedData->isReloadingWeapon && pBitStream->Can(eBitStreamVersion::IsPedReloadingWeapon))
+        ucFlags2 |= 0x1;
+
     // Do we really have to sync this ped?
-    if (ucFlags == 0)
+    if (ucFlags == 0 && ucFlags2 == 0)
         return;
 
     // Write the ped id
@@ -401,18 +418,23 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         pPed->m_LastSyncedData->bIsInWater = pPed->IsInWater();
     }
 
-    if (ucFlags & 0x60 && pBitStream->Can(eBitStreamVersion::IsPedReloadingWeapon))
-    {
-        bool isReloadingWeapon = pPed->IsReloadingWeapon();
-
-        pBitStream->WriteBit(isReloadingWeapon);
-        pPed->m_LastSyncedData->isReloadingWeapon = isReloadingWeapon;
-    }
-
     // The animation has been overwritten or interrupted by the client
     if (ucFlags & 0x80 && pBitStream->Can(eBitStreamVersion::AnimationsSync))
     {
         pPed->SetHasSyncedAnim(false);
         pPed->m_animationOverridedByClient = false;
+    }
+
+    // New flags
+    if (!pBitStream->Can(eBitStreamVersion::PedSyncFlags))
+        return;
+
+    pBitStream->Write(ucFlags2);
+
+    if (ucFlags2 & 0x1 && pBitStream->Can(eBitStreamVersion::IsPedReloadingWeapon))
+    {
+        const auto isReloadingWeapon = pPed->IsReloadingWeapon();
+        pBitStream->WriteBit(isReloadingWeapon);
+        pPed->m_LastSyncedData->isReloadingWeapon = isReloadingWeapon;
     }
 }

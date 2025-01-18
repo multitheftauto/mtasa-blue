@@ -31,6 +31,7 @@ public:
         float               fArmor;
         bool                bOnFire;
         bool                bIsInWater;
+        std::uint8_t        ucFlags2;
         bool                isReloadingWeapon;
 
         bool ReadSpatialData(NetBitStreamInterface& BitStream);
