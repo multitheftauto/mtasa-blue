@@ -1268,7 +1268,7 @@ bool CLuaPedDefs::GetPedControlState(CClientPed* const ped, const std::string_vi
 {
     bool state;
 
-    if (!CStaticFunctionDefinitions::GetPedControlState(*ped, control.data(), state))
+    if (!CStaticFunctionDefinitions::GetPedControlState(*ped, control, state))
         return false;
 
     return state;
@@ -1820,9 +1820,9 @@ int CLuaPedDefs::RemovePedClothes(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetPedControlState(CClientEntity* const entity, const std::string_view control, const bool state) noexcept
+bool CLuaPedDefs::SetPedControlState(CClientPed* const ped, const std::string_view control, const bool state) noexcept
 {
-    return CStaticFunctionDefinitions::SetPedControlState(*entity, control.data(), state);
+    return CStaticFunctionDefinitions::SetPedControlState(*ped, control, state);
 }
 
 int CLuaPedDefs::SetPedDoingGangDriveby(lua_State* luaVM)

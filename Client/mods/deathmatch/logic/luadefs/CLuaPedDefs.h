@@ -96,7 +96,7 @@ public:
     static bool IsPedReloadingWeapon(CClientPed* const ped) noexcept;
     LUA_DECLARE(AddPedClothes);
     LUA_DECLARE(RemovePedClothes);
-    static bool SetPedControlState(CClientEntity* const entity, const std::string_view control, const bool state) noexcept;
+    static bool SetPedControlState(CClientPed* const ped, const std::string_view control, const bool state) noexcept;
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
     static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);
