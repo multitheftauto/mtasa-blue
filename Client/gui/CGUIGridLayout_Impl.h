@@ -38,8 +38,8 @@ public:
     const bool AddItem(CGUIElement* item, int column, int row, const bool moveToNextCell = true);
     const bool AddItem(CGUIElement* item, const bool moveToNextCell = true);
 
-    const bool RemoveItem(const int column, const int row, const bool moveToPreviousCell = false);
-    const bool RemoveItem(const CGUIElement* item, const bool moveToPreviousCell = false);
+    const bool RemoveItem(const int column, const int row, const bool moveToPreviousCell = false, const bool deleteItem = false);
+    const bool RemoveItem(const CGUIElement* item, const bool moveToPreviousCell = false, const bool deleteItem = false);
 
     SGridCellItem* GetCell(const int column, const int row) const;
     SGridCellItem* GetCell(const CGUIElement* item) const;

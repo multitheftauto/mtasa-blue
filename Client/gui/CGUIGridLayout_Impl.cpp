@@ -70,24 +70,20 @@ CGUIGridLayout_Impl::~CGUIGridLayout_Impl()
 
 const bool CGUIGridLayout_Impl::AddItem(CGUIElement* item, int column, int row, const bool moveToNextCell)
 {
-    if (!InGridRange(column, row))
-        return false;
-
-    // If cell is already occupied
-    if (m_grid[column - 1][row - 1] != 0)
-    {
-        return false;
-    }
-
     auto* cell = GetCell(column, row);
-    cell->element = item;
 
-    item->SetParent(nullptr);
+    if (cell == nullptr)
+        return false;
+
+    if (cell->element != nullptr)
+        RemoveItem(column, row, false, true);
+
     item->SetParent(cell->container);
-
     item->SetPosition(CVector2D(0.0f, 0.0f), true);
     item->SetSize(CVector2D(1.0f, 1.0f), true);
+    item->ForceRedraw();
 
+    cell->element = item;
     m_items.emplace(item, cell->id);
 
     if (moveToNextCell)
@@ -114,19 +110,21 @@ const bool CGUIGridLayout_Impl::AddItem(CGUIElement* item, const bool moveToNext
     return AddItem(item, m_activeColumn, m_activeRow);
 }
 
-const bool CGUIGridLayout_Impl::RemoveItem(const int column, const int row, const bool moveToPreviousCell)
+const bool CGUIGridLayout_Impl::RemoveItem(const int column, const int row, const bool moveToPreviousCell, const bool deleteItem)
 {
     auto* cell = GetCell(column, row);
 
-    if (cell == nullptr)
+    if (cell == nullptr || cell->element == nullptr)
         return false;
 
-    auto& element = cell->element;
-    element->SetParent(nullptr);
-    element = nullptr;
-    m_grid[column - 1][row - 1] = 0;
+    cell->element->SetParent(nullptr);
+    cell->element->ForceRedraw();
 
-    m_items.erase(element);
+    m_items.erase(cell->element);
+    cell->element = nullptr;
+
+    if (deleteItem)
+        delete cell->element;
 
     if (moveToPreviousCell)
     {
@@ -147,7 +145,7 @@ const bool CGUIGridLayout_Impl::RemoveItem(const int column, const int row, cons
     return true;
 }
 
-const bool CGUIGridLayout_Impl::RemoveItem(const CGUIElement* item, const bool moveToPreviousCell)
+const bool CGUIGridLayout_Impl::RemoveItem(const CGUIElement* item, const bool moveToPreviousCell, const bool deleteItem)
 {
     auto* cell = GetCell(item);
 
@@ -356,9 +354,6 @@ const eGridLayoutItemAlignment CGUIGridLayout_Impl::GetItemAlignment(const CGUIE
 
 const bool CGUIGridLayout_Impl::SetCellAlpha(const int column, const int row, const float alpha)
 {
-    if (!InGridRange(column, row))
-        return false;
-
     auto* cell = GetCell(column, row);
 
     if (cell == nullptr)
@@ -407,7 +402,15 @@ void CGUIGridLayout_Impl::CreateGridCells()
                 cell->container->SetSize(CVector2D(1.0f / m_columns, 1.0f / m_rows), true);
 
                 cell->id = m_nextId;
-                cell->element = nullptr;
+
+                auto* label = m_pManager->CreateLabel(cell->container, std::to_string(m_nextId).c_str());
+                label->AutoSize();
+                label->SetPosition(CVector2D(0.0f, 0.0f), true);
+                label->SetSize(CVector2D(1.0f, 1.0f), true);
+                label->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+                label->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+
+                cell->element = label;
                 cell->column = i + 1;
                 cell->row = j + 1;
                 cell->alignment = m_defaultAlignment;
@@ -434,6 +437,9 @@ void CGUIGridLayout_Impl::CleanupGridItems()
                 m_items.erase(cell.second->element);
 
                 cell.second->element->SetParent(nullptr);
+                cell.second->element->ForceRedraw();
+
+                delete cell.second->element;
                 cell.second->element = nullptr;
             }
 
@@ -449,6 +455,13 @@ void CGUIGridLayout_Impl::RepositionGridItems()
     {
         cell.second->container->SetPosition(CVector2D((cell.second->column - 1) * (1.0f / m_columns), (cell.second->row - 1) * (1.0f / m_rows)), true);
         cell.second->container->SetSize(CVector2D(1.0f / m_columns, 1.0f / m_rows), true);
+
+        if (cell.second->element != nullptr)
+        {
+            cell.second->element->SetPosition(CVector2D(0.0f, 0.0f), true);
+            cell.second->element->SetSize(CVector2D(1.0f, 1.0f), true);
+            cell.second->element->ForceRedraw();
+        }
     }
 }
 

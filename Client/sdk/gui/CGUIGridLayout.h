@@ -64,8 +64,8 @@ public:
     virtual const bool AddItem(CGUIElement* item, int column, int row, const bool moveToNextCell = true) = 0;
     virtual const bool AddItem(CGUIElement* item, const bool moveToNextCell = true) = 0;
 
-    virtual const bool RemoveItem(const int column, const int row, const bool moveToPreviousCell = false) = 0;
-    virtual const bool RemoveItem(const CGUIElement* item, const bool moveToPreviousCell = false) = 0;
+    virtual const bool RemoveItem(const int column, const int row, const bool moveToPreviousCell = false, const bool deleteItem = false) = 0;
+    virtual const bool RemoveItem(const CGUIElement* item, const bool moveToPreviousCell = false, const bool deleteItem = false) = 0;
 
     virtual SGridCellItem* GetCell(const int column, const int row) const = 0;
     virtual SGridCellItem* GetCell(const CGUIElement* item) const = 0;
