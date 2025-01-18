@@ -4,6 +4,8 @@ project "CEFLauncher DLL"
 	targetname "CEFLauncher_DLL"
 	targetdir(buildpath("mta/cef"))
 
+	cppdialect "C++20"
+
 	includedirs { "../../vendor/cef3/cef" }
 	libdirs { "../../vendor/cef3/cef/Release" }
 
