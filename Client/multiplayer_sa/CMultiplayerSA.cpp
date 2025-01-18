@@ -388,37 +388,37 @@ static const std::array<uint32_t, 16> shadowAddr{
     0x73A48F             // CWeapon::AddGunshell
 };
 
-PreContextSwitchHandler*                   m_pPreContextSwitchHandler = NULL;
-PostContextSwitchHandler*                  m_pPostContextSwitchHandler = NULL;
-PreWeaponFireHandler*                      m_pPreWeaponFireHandler = NULL;
-PostWeaponFireHandler*                     m_pPostWeaponFireHandler = NULL;
-BulletImpactHandler*                       m_pBulletImpactHandler = NULL;
-BulletFireHandler*                         m_pBulletFireHandler = NULL;
-DamageHandler*                             m_pDamageHandler = NULL;
-DeathHandler*                              m_pDeathHandler = NULL;
-FireHandler*                               m_pFireHandler = NULL;
-ProjectileHandler*                         m_pProjectileHandler = NULL;
-ProjectileStopHandler*                     m_pProjectileStopHandler = NULL;
-ProcessCamHandler*                         m_pProcessCamHandler = NULL;
-ChokingHandler*                            m_pChokingHandler = NULL;
-ExplosionHandler*                          m_pExplosionHandler = NULL;
-BreakTowLinkHandler*                       m_pBreakTowLinkHandler = NULL;
-DrawRadarAreasHandler*                     m_pDrawRadarAreasHandler = NULL;
-Render3DStuffHandler*                      m_pRender3DStuffHandler = NULL;
-PreWorldProcessHandler*                    m_pPreWorldProcessHandler = NULL;
-PostWorldProcessHandler*                   m_pPostWorldProcessHandler = NULL;
-PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
-IdleHandler*                               m_pIdleHandler = NULL;
-PreFxRenderHandler*                        m_pPreFxRenderHandler = NULL;
-PostColorFilterRenderHandler*              m_pPostColorFilterRenderHandler = nullptr;
-PreHudRenderHandler*                       m_pPreHudRenderHandler = NULL;
-ProcessCollisionHandler*                   m_pProcessCollisionHandler = NULL;
-HeliKillHandler*                           m_pHeliKillHandler = NULL;
-ObjectDamageHandler*                       m_pObjectDamageHandler = NULL;
-ObjectBreakHandler*                        m_pObjectBreakHandler = NULL;
-FxSystemDestructionHandler*                m_pFxSystemDestructionHandler = NULL;
-DrivebyAnimationHandler*                   m_pDrivebyAnimationHandler = NULL;
-AudioZoneRadioSwitchHandler*               m_pAudioZoneRadioSwitchHandler = NULL;
+PreContextSwitchHandler*                       m_pPreContextSwitchHandler = NULL;
+PostContextSwitchHandler*                      m_pPostContextSwitchHandler = NULL;
+PreWeaponFireHandler*                          m_pPreWeaponFireHandler = NULL;
+PostWeaponFireHandler*                         m_pPostWeaponFireHandler = NULL;
+BulletImpactHandler*                           m_pBulletImpactHandler = NULL;
+BulletFireHandler*                             m_pBulletFireHandler = NULL;
+DamageHandler*                                 m_pDamageHandler = NULL;
+DeathHandler*                                  m_pDeathHandler = NULL;
+FireHandler*                                   m_pFireHandler = NULL;
+ProjectileHandler*                             m_pProjectileHandler = NULL;
+ProjectileStopHandler*                         m_pProjectileStopHandler = NULL;
+ProcessCamHandler*                             m_pProcessCamHandler = NULL;
+ChokingHandler*                                m_pChokingHandler = NULL;
+ExplosionHandler*                              m_pExplosionHandler = NULL;
+BreakTowLinkHandler*                           m_pBreakTowLinkHandler = NULL;
+DrawRadarAreasHandler*                         m_pDrawRadarAreasHandler = NULL;
+Render3DStuffHandler*                          m_pRender3DStuffHandler = NULL;
+PreWorldProcessHandler*                        m_pPreWorldProcessHandler = NULL;
+PostWorldProcessHandler*                       m_pPostWorldProcessHandler = NULL;
+PostWorldProcessEntitiesAfterPreRenderHandler* m_postWorldProcessEntitiesAfterPreRenderHandler = nullptr;
+IdleHandler*                                   m_pIdleHandler = NULL;
+PreFxRenderHandler*                            m_pPreFxRenderHandler = NULL;
+PostColorFilterRenderHandler*                  m_pPostColorFilterRenderHandler = nullptr;
+PreHudRenderHandler*                           m_pPreHudRenderHandler = NULL;
+ProcessCollisionHandler*                       m_pProcessCollisionHandler = NULL;
+HeliKillHandler*                               m_pHeliKillHandler = NULL;
+ObjectDamageHandler*                           m_pObjectDamageHandler = NULL;
+ObjectBreakHandler*                            m_pObjectBreakHandler = NULL;
+FxSystemDestructionHandler*                    m_pFxSystemDestructionHandler = NULL;
+DrivebyAnimationHandler*                       m_pDrivebyAnimationHandler = NULL;
+AudioZoneRadioSwitchHandler*                   m_pAudioZoneRadioSwitchHandler = NULL;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -2647,9 +2647,9 @@ void CMultiplayerSA::SetPostWorldProcessHandler(PostWorldProcessHandler* pHandle
     m_pPostWorldProcessHandler = pHandler;
 }
 
-void CMultiplayerSA::SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler)
+void CMultiplayerSA::SetPostWorldProcessEntitiesAfterPreRenderHandler(PostWorldProcessEntitiesAfterPreRenderHandler* pHandler)
 {
-    m_postWorldProcessPedsAfterPreRenderHandler = pHandler;
+    m_postWorldProcessEntitiesAfterPreRenderHandler = pHandler;
 }
 
 void CMultiplayerSA::SetIdleHandler(IdleHandler* pHandler)
@@ -7258,8 +7258,8 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
 
 void PostCWorld_ProcessPedsAfterPreRender()
 {
-    if (m_postWorldProcessPedsAfterPreRenderHandler)
-        m_postWorldProcessPedsAfterPreRenderHandler();
+    if (m_postWorldProcessEntitiesAfterPreRenderHandler)
+        m_postWorldProcessEntitiesAfterPreRenderHandler();
 
     // Scale the object entities
     CPools* pools = pGameInterface->GetPools();

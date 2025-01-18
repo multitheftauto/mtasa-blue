@@ -99,7 +99,7 @@ typedef void(RenderHeliLightHandler)();
 typedef bool(ChokingHandler)(unsigned char ucWeaponType);
 typedef void(PreWorldProcessHandler)();
 typedef void(PostWorldProcessHandler)();
-typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
+typedef void(PostWorldProcessEntitiesAfterPreRenderHandler)();
 typedef void(IdleHandler)();
 typedef void(PreFxRenderHandler)();
 typedef void(PostColorFilterRenderHandler)();
@@ -230,7 +230,7 @@ public:
     virtual void  SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler) = 0;
     virtual void  SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
-    virtual void  SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler) = 0;
+    virtual void  SetPostWorldProcessEntitiesAfterPreRenderHandler(PostWorldProcessEntitiesAfterPreRenderHandler* pHandler) = 0;
     virtual void  SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void  SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void  SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler) = 0;
