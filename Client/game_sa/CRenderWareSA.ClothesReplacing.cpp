@@ -52,12 +52,12 @@ namespace
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::ClothesAddReplacementTxd
+// CRenderWareSA::ClothesAddReplacement
 //
-// Add replacement txd for a clothing component
+// Add replacement txd/dff for a clothing component
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::ClothesAddReplacementTxd(char* pFileData, ushort usFileId)
+void CRenderWareSA::ClothesAddReplacement(char* pFileData, ushort usFileId)
 {
     if (!pFileData)
         return;
@@ -70,12 +70,12 @@ void CRenderWareSA::ClothesAddReplacementTxd(char* pFileData, ushort usFileId)
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::ClothesRemoveReplacementTxd
+// CRenderWareSA::ClothesRemoveReplacement
 //
-// Remove replacement txd for a clothing component
+// Remove replacement txd/dff for a clothing component
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::ClothesRemoveReplacementTxd(char* pFileData)
+void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
 {
     if (!pFileData)
         return;
@@ -110,7 +110,7 @@ bool CRenderWareSA::HasClothesReplacementChanged()
 // CStreaming_RequestModel_Mid
 //
 // If request is for a file inside player.img (imgId 5)
-// then maybe switch to replacement txd file data
+// then maybe switch to replacement txd/dff file data
 //
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGTAItemInfo* pImgGTAInfo)
