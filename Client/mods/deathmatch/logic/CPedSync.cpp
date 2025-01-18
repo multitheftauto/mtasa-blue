@@ -269,8 +269,6 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
                     pPed->SetOnFire(bOnFire);
                 if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
                     pPed->SetInWater(bIsInWater);
-                if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon) && ucFlags2 & 0x1 && isReloadingWeapon)
-                    pPed->ReloadWeapon();
             }
         }
     }
