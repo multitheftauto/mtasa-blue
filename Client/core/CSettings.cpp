@@ -1272,8 +1272,11 @@ void CSettings::CreateGUI()
      *  CEGUI tab.
      **/
     m_pGridLayout = reinterpret_cast<CGUIGridLayout*>(pManager->CreateGridLayout(pTabCEGUI));
-    m_pGridLayout->SetGrid(1, 1);
-
+    m_pGridLayout->SetGrid(9, 9);
+    m_pGridLayout->SetColumnWidth(1, 0.25f);
+    m_pGridLayout->SetColumnWidth(3, 0.25f);
+    m_pGridLayout->SetRowHeight(2, 0.25f);
+    m_pGridLayout->SetRowHeight(4, 0.25f);
     vecTemp = CVector2D(12.f, 12.f);
 
     // Grid layout section label
@@ -1336,13 +1339,21 @@ void CSettings::CreateGUI()
     m_pGridRowsValueLabel->SetHorizontalAlign(CGUI_ALIGN_LEFT);
 
     m_pCellAlpha->SetScrollPosition(0.5f);
-    m_pGridColumns->SetScrollPosition(0.2f);
-    m_pGridRows->SetScrollPosition(0.2f);
+    m_pGridColumns->SetScrollPosition(0.9f);
+    m_pGridRows->SetScrollPosition(0.9f);
 
     // Grid layout
     vecTemp.fY += 20.0f;
     m_pGridLayout->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pGridLayout->SetSize(CVector2D(500.0f, 300.0f));
+
+    //m_pTestCellLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabCEGUI, _("Test cell")));
+    //m_pTestCellLabel->AutoSize();
+    //m_pTestCellLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+    //m_pTestCellLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+
+    //bool add = m_pGridLayout->AddItem(m_pTestCellLabel, 1, 1);
+    //m_pTestCellLabel->SetText(add ? "true" : "false");
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CSettings::OnOKButtonClick, this));

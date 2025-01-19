@@ -59,7 +59,7 @@ public:
 
     virtual const int                 GetActiveColumn() const = 0;
     virtual const int                 GetActiveRow() const = 0;
-    virtual const std::pair<int, int> GetActiveCell() = 0;
+    virtual const std::pair<int, int> GetActiveCell() const = 0;
 
     virtual const bool AddItem(CGUIElement* item, int column, int row, const bool moveToNextCell = true) = 0;
     virtual const bool AddItem(CGUIElement* item, const bool moveToNextCell = true) = 0;
@@ -70,10 +70,10 @@ public:
     virtual SGridCellItem* GetCell(const int column, const int row) const = 0;
     virtual SGridCellItem* GetCell(const CGUIElement* item) const = 0;
 
-    virtual std::vector<SGridCellItem*> GetCellsInGrid(const int startColumn, const int startRow, const int endColumn, const int endRow) = 0;
-    virtual std::vector<SGridCellItem*> GetCellsOutsideGrid(const int startColumn, const int startRow, const int endColumn, const int endRow) = 0;
-    virtual std::vector<SGridCellItem*> GetCellsInColumn(const int column) = 0;
-    virtual std::vector<SGridCellItem*> GetCellsInRow(const int row) = 0;
+    virtual std::vector<SGridCellItem*> GetCellsInGrid(const int startColumn, const int startRow, const int endColumn, const int endRow) const = 0;
+    virtual std::vector<SGridCellItem*> GetCellsOutsideGrid(const int startColumn, const int startRow, const int endColumn, const int endRow) const = 0;
+    virtual std::vector<SGridCellItem*> GetCellsInColumn(const int column) const = 0;
+    virtual std::vector<SGridCellItem*> GetCellsInRow(const int row) const = 0;
 
     virtual void SetItemAlignment(const CGUIElement* item, eGridLayoutItemAlignment alignment) = 0;
     virtual void SetDefaultItemAlignment(eGridLayoutItemAlignment alignment) = 0;
@@ -83,4 +83,7 @@ public:
 
     virtual const bool SetCellAlpha(const int column, const int row, const float alpha) = 0;
     virtual const bool SetDefaultCellAlpha(const float alpha) = 0;
+
+    virtual const bool SetColumnWidth(const int column, const float width) = 0;
+    virtual const bool SetRowHeight(const int row, const float height) = 0;
 };
