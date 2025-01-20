@@ -18,6 +18,7 @@
 #include "CPtrNodeSingleListSA.h"
 #include "MemSA.h"
 #include "CVehicleSA.h"
+#include "CBuildingRemovalSA.h"
 
 extern CGameSA* pGame;
 
@@ -138,17 +139,10 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     --m_buildingPool.count;
 }
 
-void CBuildingsPoolSA::RemoveAllBuildings()
+void CBuildingsPoolSA::RemoveAllWithBackup()
 {
     if (m_pOriginalBuildingsBackup)
         return;
-
-    pGame->GetCoverManager()->RemoveAllCovers();
-    pGame->GetPlantManager()->RemoveAllPlants();
-
-    // Remove all shadows
-    using CStencilShadowObjects_dtorAll = void* (*)();
-    ((CStencilShadowObjects_dtorAll)0x711390)();
 
     m_pOriginalBuildingsBackup = std::make_unique<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>>();
 
@@ -176,10 +170,13 @@ void CBuildingsPoolSA::RemoveAllBuildings()
     }
 }
 
-void CBuildingsPoolSA::RestoreAllBuildings()
+void CBuildingsPoolSA::RestoreBackup()
 {
     if (!m_pOriginalBuildingsBackup)
         return;
+
+    auto* worldSA = pGame->GetWorld();
+    auto* buildingRemovealSA = static_cast<CBuildingRemovalSA*>(pGame->GetBuildingRemoval());
 
     auto& originalData = *m_pOriginalBuildingsBackup;
     auto  pBuildsingsPool = (*m_ppBuildingPoolInterface);
@@ -191,7 +188,8 @@ void CBuildingsPoolSA::RestoreAllBuildings()
             auto pBuilding = pBuildsingsPool->GetObject(i);
             *pBuilding = originalData[i].second;
 
-            pGame->GetWorld()->Add(pBuilding, CBuildingPool_Constructor);
+            worldSA->Add(pBuilding, CBuildingPool_Constructor);
+            buildingRemovealSA->AddDataBuilding(pBuilding);
         }
     }
 
@@ -202,10 +200,7 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
 {
     // Remove building from world
     pGame->GetWorld()->Remove(pBuilding, CBuildingPool_Destructor);
-
-    pBuilding->DeleteRwObject();
-    pBuilding->ResolveReferences();
-    pBuilding->RemoveShadows();
+    pBuilding->RemoveRWObjectWithReferencesCleanup();
 }
 
 bool CBuildingsPoolSA::Resize(int size)
@@ -254,7 +249,7 @@ bool CBuildingsPoolSA::Resize(int size)
         newBytemap[i].bEmpty = true;
     }
 
-    const uint32_t offset = (uint32_t)newObjects - (uint32_t)oldPool;
+    const std::uint32_t offset = (std::uint32_t)newObjects - (std::uint32_t)oldPool;
     if (oldPool != nullptr)
     {
         UpdateIplEntrysPointers(offset);
@@ -265,7 +260,7 @@ bool CBuildingsPoolSA::Resize(int size)
         UpdateBackupLodPointers(offset);
     }
 
-    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(oldPool, newObjects);
+    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(offset);
 
     RemoveVehicleDamageLinks();
     RemovePedsContactEnityLinks();
