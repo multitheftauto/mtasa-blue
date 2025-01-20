@@ -5012,6 +5012,7 @@ bool CStaticFunctionDefinitions::RemoveVehicleSirens(CVehicle* pVehicle)
     assert(pVehicle);
 
     pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    pVehicle->SetSirenActive(false);
     pVehicle->RemoveVehicleSirens();
 
     CBitStream BitStream;
