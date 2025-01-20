@@ -103,6 +103,26 @@ enum eBone
     BONE_RIGHTFOOT
 };
 
+struct SPlayerAnimData
+{
+    std::string blockName{};
+    std::string animName{};
+    int         time{-1};
+    bool        loop{true};
+    bool        updatePosition{true};
+    bool        interruptable{true};
+    bool        freezeLastFrame{true};
+    int         blendTime{250};
+    bool        taskToBeRestoredOnAnimEnd{false};
+
+    std::int64_t startedTick{0};
+
+    float progress{0.0f};
+    float speed{1.0f};
+
+    bool IsAnimating() const noexcept { return !blockName.empty() && !animName.empty(); }
+};
+
 class CWeapon
 {
 public:
@@ -154,8 +174,8 @@ public:
     bool IsWearingGoggles() { return m_bWearingGoggles; };
     void SetWearingGoggles(bool bWearingGoggles) { m_bWearingGoggles = bWearingGoggles; };
 
-    bool IsOnFire() { return m_bIsOnFire; }
-    void SetOnFire(bool bOnFire) { m_bIsOnFire = bOnFire; }
+    bool IsOnFire() const noexcept override { return m_bIsOnFire; }
+    void SetOnFire(bool bOnFire) noexcept override { m_bIsOnFire = bOnFire; }
 
     CWeapon*       GetWeapon(unsigned char ucSlot = 0xFF);
     unsigned char  GetWeaponSlot() { return m_ucWeaponSlot; }
@@ -188,7 +208,7 @@ public:
     static const char* GetBodyPartName(unsigned char ucID);
 
     bool HasJetPack() { return m_bHasJetPack; }
-    void SetHasJetPack(bool bHasJetPack) { m_bHasJetPack = bHasJetPack; }
+    void SetHasJetPack(bool bHasJetPack);
 
     bool IsInWater() { return m_bInWater; }
     void SetInWater(bool bInWater) { m_bInWater = bInWater; }
@@ -266,6 +286,9 @@ public:
     bool IsStealthAiming() { return m_bStealthAiming; }
     void SetStealthAiming(bool bAiming) { m_bStealthAiming = bAiming; }
 
+    bool IsReloadingWeapon() const noexcept { return m_reloadingWeapon; }
+    void SetReloadingWeapon(bool state) noexcept { m_reloadingWeapon = state; }
+
     bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
@@ -277,6 +300,11 @@ public:
     bool                                  IsNearPlayersListEmpty() { return m_nearPlayersList.empty(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterBegin() { return m_nearPlayersList.begin(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterEnd() { return m_nearPlayersList.end(); }
+
+    const SPlayerAnimData& GetAnimationData() const noexcept { return m_animData; };
+    void                   SetAnimationData(const SPlayerAnimData& animData) { m_animData = animData; };
+    void                   SetAnimationProgress(float progress) { m_animData.progress = progress; };
+    void                   SetAnimationSpeed(float speed) { m_animData.speed = speed; };
 
 protected:
     bool ReadSpecialData(const int iLine) override;
@@ -315,7 +343,9 @@ protected:
     bool                                 m_bHeadless;
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
+    bool                                 m_reloadingWeapon{};
     CVehicle*                            m_pJackingVehicle;
+    SPlayerAnimData                      m_animData{};
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;

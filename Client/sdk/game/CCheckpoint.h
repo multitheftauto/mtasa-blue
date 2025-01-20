@@ -52,4 +52,7 @@ public:
     virtual void               SetCameraRange(float fCameraRange) = 0;
     virtual float              GetPulseFraction() = 0;
     virtual void               Remove() = 0;
+    virtual SColor             GetTargetArrowColor() const noexcept = 0;
+    virtual float              GetTargetArrowSize() const noexcept = 0;
+    virtual void               SetTargetArrowData(const SColor arrowColo, float size) noexcept = 0;
 };

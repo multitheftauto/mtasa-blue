@@ -550,6 +550,20 @@ namespace SharedUtil
     inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R) { return SColorRGBA(R, G, B, A); }
 
     //
+    // Convert tocolor value to SColor
+    //
+    inline SColor TOCOLOR2SCOLOR(std::uint32_t colorValue)
+    {
+        SColor color;
+        color.R = static_cast<std::uint8_t>((colorValue >> 16) & BYTE_MASK(8));
+        color.G = static_cast<std::uint8_t>((colorValue >> 8) & BYTE_MASK(8));
+        color.B = static_cast<std::uint8_t>((colorValue >> 0) & BYTE_MASK(8));
+        color.A = static_cast<std::uint8_t>((colorValue >> 24) & BYTE_MASK(8));
+
+        return color;
+    }
+
+    //
     // Cross platform critical section
     //
     class CCriticalSection

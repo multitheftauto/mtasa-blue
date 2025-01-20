@@ -50,6 +50,11 @@ public:
     static bool SetCameraUnderwaterDarkness(bool isEnabled, std::optional<float> fullDarknessDepth);
     static bool ResetCameraUnderwaterEffect() noexcept;
     static bool ResetCameraUnderwaterDarkness() noexcept;
+    
+    // Cam do funcs
+    static bool ShakeCamera(float radius, std::optional<float> x, std::optional<float> y, std::optional<float> z) noexcept;
+    static bool ResetShakeCamera() noexcept;
+
 
     // For OOP only
     LUA_DECLARE(OOP_GetCameraPosition);

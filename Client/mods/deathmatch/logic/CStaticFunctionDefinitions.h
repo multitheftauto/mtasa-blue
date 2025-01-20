@@ -167,8 +167,10 @@ public:
     static bool SetPedCanBeKnockedOffBike(CClientEntity& Entity, bool bCanBeKnockedOffBike);
     static bool SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
-    static bool SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
-    static bool SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
+
+    static bool  SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
+    static bool  SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
+
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);
     static bool RemovePedClothes(CClientEntity& Entity, unsigned char ucType);
@@ -241,7 +243,7 @@ public:
     static bool SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CClientEntity& Entity, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CClientEntity& Entity, unsigned char ucLight, unsigned char ucState);
-    static bool SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState);
+    static bool SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent = true, bool breakGlass = false);
     static bool SetVehicleOverrideLights(CClientEntity& Entity, unsigned char ucLights);
     static bool AttachTrailerToVehicle(CClientVehicle& Vehicle, CClientVehicle& Trailer, const CVector& vecRotationOffsetDegrees);
     static bool DetachTrailerFromVehicle(CClientVehicle& Vehicle, CClientVehicle* pTrailer = NULL);
@@ -366,7 +368,7 @@ public:
     static bool SetBlipVisibleDistance(CClientEntity& Entity, unsigned short usVisibleDistance);
 
     // Marker create/destroy funcs
-    static CClientMarker* CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color);
+    static CClientMarker* CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, bool ignoreAlphaLimits);
 
     // Marker get funcs
     static bool GetMarkerTarget(CClientMarker& Marker, CVector& vecTarget);
@@ -377,6 +379,7 @@ public:
     static bool SetMarkerColor(CClientEntity& Entity, const SColor color);
     static bool SetMarkerTarget(CClientEntity& Entity, const CVector* pTarget);
     static bool SetMarkerIcon(CClientEntity& Entity, const char* szIcon);
+    static bool SetMarkerTargetArrowProperties(CClientEntity& Entity, const SColor color, float size);
 
     // Camera get funcs
     static bool           GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV);
