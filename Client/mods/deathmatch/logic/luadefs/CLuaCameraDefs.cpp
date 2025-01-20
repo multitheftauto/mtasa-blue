@@ -506,9 +506,9 @@ bool CLuaCameraDefs::SetCameraUnderwaterEffectEnabled(bool bEnabled) noexcept
     return true;
 }
 
-bool CLuaCameraDefs::SetCameraUnderwaterEffectSpeed(float fSpeed, float fFrequency)
+bool CLuaCameraDefs::SetCameraUnderwaterEffectSpeed(float fSpeed, std::optional<float> fFrequency)
 {
-    g_pMultiplayer->SetUnderwaterEffectSpeed(fSpeed, fFrequency);
+    g_pMultiplayer->SetUnderwaterEffectSpeed(fSpeed, fFrequency.value_or(0.04f));
 
     return true;
 }
