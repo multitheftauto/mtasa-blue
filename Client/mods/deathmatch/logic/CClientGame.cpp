@@ -406,7 +406,7 @@ CClientGame::~CClientGame()
     m_bBeingDeleted = true;
     // Remove active projectile references to local player
     if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
-        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());    
+        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());
 
     // Stop all explosions. Unfortunately this doesn't fix the crash
     // if a vehicle is destroyed while it explodes.
@@ -1026,7 +1026,7 @@ void CClientGame::DoPulsePostFrame()
                     }
 
                     auto taskManager = pLocalPlayer->GetTaskManager();
-                    auto task = taskManager->GetActiveTask();                    
+                    auto task = taskManager->GetActiveTask();
                     auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
                     bool useZoneName = true;
 
@@ -1080,7 +1080,7 @@ void CClientGame::DoPulsePostFrame()
 
                             discordState = taskState.strState;
                             useZoneName = taskState.bUseZone;
-                        }                                       
+                        }
 
                         if (useZoneName)
                         {
@@ -6927,6 +6927,10 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
     g_pMultiplayer->ResetWater();
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
     GetManager()->GetWaterManager()->SetWaveLevel(0.0f);
+
+    // Underwater effects
+    g_pMultiplayer->ResetUnderwaterDarkness();
+    g_pMultiplayer->ResetUnderwaterEffect();
 
     // Reset volumetric shadows
     g_pGame->GetSettings()->ResetVolumetricShadows();
