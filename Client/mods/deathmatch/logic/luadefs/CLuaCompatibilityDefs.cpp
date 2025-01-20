@@ -67,8 +67,8 @@ void CLuaCompatibilityDefs::LoadFunctions()
         {"isPlayerDead", CLuaPedDefs::IsPedDead},
         {"guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex},
         {"guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex},
-        {"setControlState", CLuaPedDefs::SetPedControlState},
-        {"getControlState", CLuaPedDefs::GetPedControlState},
+        {"setControlState", ArgumentParserWarn<false, CLuaPedDefs::SetPedControlState>},
+        {"getControlState", ArgumentParserWarn<false, CLuaPedDefs::GetPedControlState>},
         {"setCameraShakeLevel", ArgumentParserWarn<false, CLuaCameraDefs::SetCameraDrunkLevel>},
         {"getCameraShakeLevel", ArgumentParserWarn<false, CLuaCameraDefs::GetCameraDrunkLevel>},
     };

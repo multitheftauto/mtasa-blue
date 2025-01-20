@@ -137,7 +137,7 @@ public:
     static bool           IsPedDoingTask(CClientPed& Ped, const char* szTaskName, bool& bIsDoingTask);
     static bool           GetPedBonePosition(CClientPed& Ped, eBone bone, CVector& vecPosition);
     static bool           GetPedClothes(CClientPed& Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel);
-    static bool           GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState);
+    static bool           GetPedControlState(CClientPed& const ped, const std::string_view control, bool& state) noexcept;
     static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput);
     static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
     static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
@@ -174,7 +174,7 @@ public:
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);
     static bool RemovePedClothes(CClientEntity& Entity, unsigned char ucType);
-    static bool SetPedControlState(CClientEntity& Entity, const char* szControl, bool bState);
+    static bool SetPedControlState(CClientPed& const ped, const std::string_view control, const bool state) noexcept;
     static bool SetPedAnalogControlState(CClientEntity& Entity, const char* szControl, float fState);
     static bool SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby);
     static bool SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle);
