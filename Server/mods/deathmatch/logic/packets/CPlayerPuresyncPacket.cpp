@@ -132,6 +132,17 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             position.data.vecPosition += vecTempPos;
         }
 
+        CVector playerPosition = pSourcePlayer->GetPosition();
+        float playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);
+        if (playerDistancePosition >= g_TickRateSettings.playerTeleportAlert) {
+            if (!pSourcePlayer->GetTeleported()) {
+                CLuaArguments arguments;
+                pSourcePlayer->CallEvent("onPlayerTeleport", arguments, nullptr);
+            }
+
+            pSourcePlayer->SetTeleported(false);
+        }
+
         pSourcePlayer->SetPosition(position.data.vecPosition);
 
         // Player rotation
