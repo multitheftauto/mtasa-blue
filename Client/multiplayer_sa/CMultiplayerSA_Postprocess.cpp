@@ -131,7 +131,7 @@ void CMultiplayerSA::SetGrainLevel(BYTE ucLevel)
     GrainEffect::dwGrainStrength = static_cast<DWORD>(ucLevel);
 
     if (bEnable == bOverridden)
-        return;    
+        return;
 
     if (bEnable)
     {
@@ -166,12 +166,12 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
     }
 }
 
-void CMultiplayerSA::SetUnderwaterEffectEnabled(bool isEnabled)
+void CMultiplayerSA::SetUnderwaterEffectEnabled(bool isEnabled) const noexcept
 {
-    MemPutFast<uint8_t>(VAR_CPostEffects_WaterEnable, isEnabled ?  1 : 0);
+    MemPutFast<std::uint8_t>(VAR_CPostEffects_WaterEnable, isEnabled ?  1 : 0);
 }
 
-void CMultiplayerSA::SetUnderwaterEffectSpeed(float speed, float frequency)
+void CMultiplayerSA::SetUnderwaterEffectSpeed(float speed, float frequency) const noexcept
 {
     MemPutFast<float>(VAR_CPostEffects_WaterSpeed, speed);
     MemPutFast<float>(VAR_CPostEffects_WaterFreq, frequency);
@@ -179,18 +179,18 @@ void CMultiplayerSA::SetUnderwaterEffectSpeed(float speed, float frequency)
 
 void CMultiplayerSA::SetUnderwaterDarkness(bool isEnabled, float fullDarknessDepth)
 {
-    MemPutFast<uint8_t>(VAR_CPostEffects_WaterDepthDarkessEnabled, isEnabled ? 1 : 0);
+    MemPutFast<std::uint8_t>(VAR_CPostEffects_WaterDepthDarkessEnabled, isEnabled ? 1 : 0);
 
     MemPutFast<float>(VAR_CPostEffects_WaterFullDarknessDepth, fullDarknessDepth);
 }
 
-void CMultiplayerSA::ResetUnderwaterEffect()
+void CMultiplayerSA::ResetUnderwaterEffect() noexcept
 {
     this->SetUnderwaterEffectEnabled(false);
     this->SetUnderwaterEffectSpeed(DEFAULT_UNDERWATER_EFFECT_SPEED, DEFAULT_UNDERWATER_EFFECT_FREQUENCY);
 }
 
-void CMultiplayerSA::ResetUnderwaterDarkness()
+void CMultiplayerSA::ResetUnderwaterDarkness() noexcept
 {
     this->SetUnderwaterDarkness(false, DEFAULT_UNDERWATER_FULL_DARKNESS_DEPTH);
 }
@@ -225,16 +225,16 @@ bool CMultiplayerSA::IsThermalVisionEnabled()
     return (*(BYTE*)0xC402B9 == 1);
 }
 
-void CMultiplayerSA::GetUnderwaterEffect(bool& isEnabled, float& speed, float& frequency)
+void CMultiplayerSA::GetUnderwaterEffect(bool& isEnabled, float& speed, float& frequency) const noexcept
 {
     isEnabled = (*(uint8_t*)VAR_CPostEffects_WaterEnable == 1) || (*(float*)VAR_CWeather_UnderWaterness) >= (*(float*)VAR_CPostEffects_WaterFxStartUnderWaterness);
     speed  = (*(float*)VAR_CPostEffects_WaterSpeed);
     frequency = (*(float*)VAR_CPostEffects_WaterFreq);
 }
 
-void CMultiplayerSA::GetUnderwaterDarkness(bool& isEnabled, float& fullDarknessDepth)
+void CMultiplayerSA::GetUnderwaterDarkness(bool& isEnabled, float& fullDarknessDepth) const noexcept
 {
-    isEnabled = (*(uint8_t*)VAR_CPostEffects_WaterDepthDarkessEnabled);
+    isEnabled = (*(std::uint8_t*)VAR_CPostEffects_WaterDepthDarkessEnabled);
     fullDarknessDepth = (*(float*)VAR_CPostEffects_WaterFullDarknessDepth);
 }
 

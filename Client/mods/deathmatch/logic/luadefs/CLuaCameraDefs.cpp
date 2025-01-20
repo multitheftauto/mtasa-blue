@@ -176,7 +176,7 @@ unsigned char CLuaCameraDefs::GetCameraDrunkLevel()
     return g_pGame->GetPlayerInfo()->GetCamDrunkLevel();
 }
 
-CLuaMultiReturn<bool, float, float> CLuaCameraDefs::GetCameraUnderwaterEffect()
+CLuaMultiReturn<bool, float, float> CLuaCameraDefs::GetCameraUnderwaterEffect() noexcept
 {
     bool isEnabled;
     float speed, frequency;
@@ -184,7 +184,7 @@ CLuaMultiReturn<bool, float, float> CLuaCameraDefs::GetCameraUnderwaterEffect()
     return {isEnabled, speed, frequency};
 }
 
-CLuaMultiReturn<bool, float> CLuaCameraDefs::GetCameraUnderwaterDarkness()
+CLuaMultiReturn<bool, float> CLuaCameraDefs::GetCameraUnderwaterDarkness() noexcept
 {
     bool isEnabled;
     float fullDarknessDepth;
@@ -494,7 +494,7 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaCameraDefs::SetCameraUnderwaterEffectEnabled(bool bEnabled)
+bool CLuaCameraDefs::SetCameraUnderwaterEffectEnabled(bool bEnabled) noexcept
 {
     g_pMultiplayer->SetUnderwaterEffectEnabled(bEnabled);
 
@@ -515,14 +515,14 @@ bool CLuaCameraDefs::SetCameraUnderwaterDarkness(bool bEnabled, std::optional<fl
     return true;
 }
 
-bool CLuaCameraDefs::ResetCameraUnderwaterEffect()
+bool CLuaCameraDefs::ResetCameraUnderwaterEffect() noexcept
 {
     g_pMultiplayer->ResetUnderwaterEffect();
 
     return true;
 }
 
-bool CLuaCameraDefs::ResetCameraUnderwaterDarkness()
+bool CLuaCameraDefs::ResetCameraUnderwaterDarkness() noexcept
 {
     g_pMultiplayer->ResetUnderwaterDarkness();
 

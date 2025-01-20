@@ -31,8 +31,8 @@ public:
     static std::string                                                             GetCameraGoggleEffect();
     LUA_DECLARE(GetCameraFieldOfView);
     static unsigned char GetCameraDrunkLevel();
-    static CLuaMultiReturn<bool, float, float> GetCameraUnderwaterEffect();
-    static CLuaMultiReturn<bool, float>        GetCameraUnderwaterDarkness();
+    static CLuaMultiReturn<bool, float, float> GetCameraUnderwaterEffect() noexcept;
+    static CLuaMultiReturn<bool, float>        GetCameraUnderwaterDarkness() noexcept;
 
     // Cam set funcs
     LUA_DECLARE(SetCameraMatrix);
@@ -45,11 +45,11 @@ public:
     LUA_DECLARE(SetCameraGoggleEffect);
     static bool SetCameraDrunkLevel(short drunkLevel);
 
-    static bool SetCameraUnderwaterEffectEnabled(bool isEnabled);
+    static bool SetCameraUnderwaterEffectEnabled(bool isEnabled) noexcept;
     static bool SetCameraUnderwaterEffectSpeed(float speed, float frequency);
     static bool SetCameraUnderwaterDarkness(bool isEnabled, std::optional<float> fullDarknessDepth);
-    static bool ResetCameraUnderwaterEffect();
-    static bool ResetCameraUnderwaterDarkness();
+    static bool ResetCameraUnderwaterEffect() noexcept;
+    static bool ResetCameraUnderwaterDarkness() noexcept;
 
     // For OOP only
     LUA_DECLARE(OOP_GetCameraPosition);
