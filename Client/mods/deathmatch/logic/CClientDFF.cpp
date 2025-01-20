@@ -101,6 +101,21 @@ void CClientDFF::UnloadDFF()
 
 bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
 {
+    if (usModel >= CLOTHES_MODEL_ID_FIRST && usModel <= CLOTHES_MODEL_ID_LAST)
+    {
+        if (m_RawDataBuffer.empty() && m_bIsRawData)
+            return false;
+
+        if (m_RawDataBuffer.empty())
+        {
+            if (!FileLoad(std::nothrow, m_strDffFilename, m_RawDataBuffer))
+                return false;
+        }
+
+        g_pGame->GetRenderWare()->ClothesAddReplacement(m_RawDataBuffer.data(), usModel - CLOTHES_MODEL_ID_FIRST);
+        return true;
+    }
+
     // Record attempt in case it all goes wrong
     CArgMap argMap;
     argMap.Set("id", usModel);
@@ -231,6 +246,7 @@ void CClientDFF::RestoreModels()
 
     // Clear the list
     m_Replaced.clear();
+    g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_RawDataBuffer.data());
 }
 
 void CClientDFF::InternalRestoreModel(unsigned short usModel)
