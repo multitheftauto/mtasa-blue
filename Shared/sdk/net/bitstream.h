@@ -607,6 +607,10 @@ enum class eBitStreamVersion : unsigned short
     // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
     // 2025-01-10
     WorldSpecialProperty_FlyingComponents,
+    
+    // Add serverside building support
+    // 2025-01-?
+    ServersideBuildingElement,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
