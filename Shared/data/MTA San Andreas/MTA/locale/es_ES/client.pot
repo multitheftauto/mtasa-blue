@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-12 22:37+0000\n"
-"PO-Revision-Date: 2025-01-22 15:24\n"
+"PO-Revision-Date: 2025-01-22 16:41\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -1394,7 +1394,7 @@ msgstr "Mostrar en el Explorador"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:1205
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "Guarda las fotos tomadas con el arma de la cámara en la carpeta de archivos de usuario de GTA San Andreas"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1211 Client/core/CSettings.cpp:1214
@@ -1858,7 +1858,7 @@ msgstr "Estableciendo conexión a %s:%u ..."
 #: Client/core/CConnectManager.cpp:149
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "Reconectando %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:150
@@ -2153,17 +2153,17 @@ msgstr "connect: Error al desactivar la modificación actual"
 
 #: Client/core/CCommandFuncs.cpp:317
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "reconectar: Puerto incorrecto"
 
 #: Client/core/CCommandFuncs.cpp:332
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "reconectar: Reconectando %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:336
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "reconectar: no se ha podido conectar a %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:370
 msgid "Bound all controls from GTA"
@@ -2262,7 +2262,8 @@ msgstr "El servidor dice que se recomienda una actualización, pero no es esenci
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr ""
+msgstr "Actualmente no hay ninguna actualización disponible.\n\n"
+"Revise nuestra web: www.mtasa.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -2675,11 +2676,11 @@ msgstr "Problema con el driver de la tarjeta gráfica"
 
 #: Client/game_sa/CGameSA.cpp:251 Client/game_sa/CGameSA.cpp:262
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "Fallo en la inicialización game_sa"
 
 #: Client/game_sa/CGameSA.cpp:253
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "Fallo en la asignación de memoria"
 
 #: Client/game_sa/CSettingsSA.cpp:781
 msgid "Can't find valid screen resolution."
@@ -2753,31 +2754,31 @@ msgstr "anterior estación de radio"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr ""
+msgstr "activar vista del mapa"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "ampliar el mapa"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "alejar el mapa"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "mover el mapa hacia el norte"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "mover el mapa hacia el sur"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "mover el mapa hacia el este"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "mover el mapa hacia el oeste"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
@@ -2785,15 +2786,15 @@ msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "reducir opacidad del mapa"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "aumentar opacidad del mapa"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "mostrar texto de ayuda del mapa"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -3171,7 +3172,7 @@ msgstr "Desconectado: Falló al verificar el serial"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "Desconectado: El serial ya está en uso"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -3290,25 +3291,25 @@ msgstr "Desconectado"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "Modo cambiado: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "Zoom: %s/%s     Movimiento: %s, %s, %s, %s     Opacidad: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "Mostrar mapa: %s     Alternar texto de ayuda: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:715
 msgid "Following Player"
-msgstr ""
+msgstr "Siguiendo jugador"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:717
 msgid "Free Movement"
-msgstr ""
+msgstr "Movimiento libre"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
