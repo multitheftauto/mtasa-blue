@@ -399,6 +399,134 @@ const bool CGUIGridLayout_Impl::SetRowHeight(const int row, const float height)
     return true;
 }
 
+const bool CGUIGridLayout_Impl::SetCellFullSize(const int column, const int row, const bool fullSize)
+{
+    auto* cell = GetCell(column, row);
+
+    if (cell == nullptr)
+        return false;
+
+    cell->forceFullSize = fullSize;
+    RepositionGridCell(*cell, true);
+    return true;
+}
+
+const bool CGUIGridLayout_Impl::SetDefaultCellFullSize(const bool fullSize, const bool updateExisting)
+{
+    m_defaultFullSize = fullSize;
+
+    if (updateExisting)
+    {
+        for (auto& cell : m_cells)
+        {
+            cell.second->forceFullSize = fullSize;
+        }
+
+        RepositionGridCells(true);
+    }
+
+    return true;
+}
+
+const bool CGUIGridLayout_Impl::GetCellFullSize(const int column, const int row) const
+{
+    auto* cell = GetCell(column, row);
+
+    if (cell == nullptr)
+        return false;
+
+    return cell->forceFullSize;
+}
+
+const bool CGUIGridLayout_Impl::SetCellPadding(const int column, const int row, const CVector2D& padding)
+{
+    auto* cell = GetCell(column, row);
+
+    if (cell == nullptr)
+        return false;
+
+    cell->padding = padding;
+    RepositionGridCell(*cell, true);
+    return true;
+}
+
+const bool CGUIGridLayout_Impl::SetDefaultCellPadding(const CVector2D& padding, const bool updateExisting)
+{
+    m_defaultPadding = padding;
+
+    for (auto& cell : m_cells)
+    {
+        cell.second->padding = padding;
+    }
+
+    RepositionGridCells(true);
+    return true;
+}
+
+const CVector2D& CGUIGridLayout_Impl::GetCellPadding(const int column, const int row) const
+{
+    auto* cell = GetCell(column, row);
+
+    if (cell == nullptr)
+        return m_defaultPadding;
+
+    return cell->padding;
+}
+
+const bool CGUIGridLayout_Impl::SetCellTexture(const int column, const int row, CGUITexture* texture, const bool alt)
+{
+    auto* cell = GetCell(column, row);
+
+    if (cell == nullptr)
+        return false;
+
+    cell->container->LoadFromTexture(texture);
+    return true;
+}
+
+const bool CGUIGridLayout_Impl::SetCellColor(const int column, const int row, const CColor& color, const bool alt)
+{
+    auto* cell = GetCell(column, row);
+
+    if (cell == nullptr)
+        return false;
+
+    auto*         texture = m_pManager->CreateTexture();
+    unsigned long argb = COLOR_ARGB(color.A, color.R, color.G, color.B);
+
+    texture->LoadFromMemory(&argb, 1, 1);
+    cell->container->LoadFromTexture(texture);
+
+    return true;
+}
+
+const bool CGUIGridLayout_Impl::SetDefaultCellTexture(CGUITexture* texture, const bool alt, const bool updateExisting)
+{
+    if (alt)
+        m_cellTextureAlt = texture;
+    else
+        m_cellTexture = texture;
+
+    if (updateExisting)
+    {
+        for (auto& cell : m_cells)
+        {
+            cell.second->container->LoadFromTexture(texture);
+        }
+    }
+
+    return true;
+}
+
+const bool CGUIGridLayout_Impl::SetDefaultCellColor(const CColor& color, const bool alt, const bool updateExisting)
+{
+    auto*         texture = m_pManager->CreateTexture();
+    unsigned long argb = COLOR_ARGB(color.A, color.R, color.G, color.B);
+
+    texture->LoadFromMemory(&argb, 1, 1);
+    return SetDefaultCellTexture(texture, alt, updateExisting);
+}
+
 void CGUIGridLayout_Impl::CreateGridCells()
 {
     auto* parent = reinterpret_cast<CGUIElement*>(this);
@@ -418,6 +546,8 @@ void CGUIGridLayout_Impl::CreateGridCells()
                 auto* cellItem = new SGridCellItem();
                 cellItem->container = m_pManager->CreateStaticImage(parent);
                 cellItem->alignment = m_defaultAlignment;
+                cellItem->forceFullSize = m_defaultFullSize;
+                cellItem->padding = m_defaultPadding;
 
                 // Assign the cell container texture, alternative between m_cellTexture and m_cellTextureAlt
                 cellItem->container->LoadFromTexture((i + j) % 2 == 0 ? m_cellTexture : m_cellTextureAlt);
@@ -431,18 +561,27 @@ void CGUIGridLayout_Impl::CreateGridCells()
                 // Size the cell container in the grid
                 cellItem->container->SetSize(CalculateCellSize(*cellItem, offsets), true);
 
-                cellItem->id = m_nextId;
-
+                // Create a test label for the cell
                 auto* label = m_pManager->CreateLabel(cellItem->container, std::to_string(m_nextId).c_str());
-                label->AutoSize();
+                
+                cellItem->id = m_nextId;
+                cellItem->element = label;
+                cellItem->column = i + 1;
+                cellItem->row = j + 1;
+
+                label->SetFrameEnabled(true);
+                label->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+                label->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+
+                // For testing purposes. Use CGUIGridLayout::SetCellFullSize in proper implementation
+                if (cellItem->forceFullSize)
+                    label->SetSize(CVector2D(1.0f - (cellItem->padding.fX * 2.0f), 1.0f - (cellItem->padding.fY * 2.0f)), true);
+                else
+                    label->SetSize(CVector2D(0.2f, 0.2f), true);
 
                 CVector2D offset = GetAlignmentOffset(*cellItem, label->GetSize(true));
                 label->SetPosition(offset, true);
                 label->ForceRedraw();
-
-                cellItem->element = label;
-                cellItem->column = i + 1;
-                cellItem->row = j + 1;
 
                 m_cells.emplace(m_nextId, cellItem);
                 m_grid[i][j] = m_nextId;
@@ -491,10 +630,9 @@ const CVector2D CGUIGridLayout_Impl::CalculateCellPosition(const SGridCellItem& 
     if (cell.element != nullptr)
         cell.element->SetText(std::to_string(std::max(0, cell.column - widths)).c_str());
 
-    return CVector2D(offsets.first + (std::max(0, cell.column - CountColumnWidths(cell.column) - 1) *
-                                      ((1.0f - AccumulateOffset(m_columnWidths)) / (m_columns - widths))),
-                     offsets.second + (std::max(0, cell.row - CountRowHeights(cell.row) - 1) *
-                                       ((1.0f - AccumulateOffset(m_rowHeights)) / (m_rows - heights))));
+    return CVector2D(
+        offsets.first + (std::max(0, cell.column - CountColumnWidths(cell.column) - 1) * ((1.0f - AccumulateOffset(m_columnWidths)) / (m_columns - widths))),
+        offsets.second + (std::max(0, cell.row - CountRowHeights(cell.row) - 1) * ((1.0f - AccumulateOffset(m_rowHeights)) / (m_rows - heights))));
 }
 
 const CVector2D CGUIGridLayout_Impl::CalculateCellSize(const SGridCellItem& cell, const std::pair<float, float>& offsets) const
@@ -565,6 +703,11 @@ void CGUIGridLayout_Impl::RepositionGridCells(const bool itemOnly) const
 
                 if (cellItem->element != nullptr)
                 {
+                    if (cellItem->forceFullSize)
+                    {
+                        cellItem->element->SetSize(CVector2D(1.0f - (cellItem->padding.fX * 2.0f), 1.0f - (cellItem->padding.fY * 2.0f)), true);
+                    }
+
                     CVector2D position = GetAlignmentOffset(*cellItem, cellItem->element->GetSize(true));
                     cellItem->element->SetPosition(position, true);
                     cellItem->element->ForceRedraw();
@@ -592,6 +735,11 @@ void CGUIGridLayout_Impl::RepositionGridCell(const SGridCellItem& cell, const bo
 
     if (cell.element != nullptr)
     {
+        if (cell.forceFullSize)
+        {
+            cell.element->SetSize(CVector2D(1.0f - (cell.padding.fX * 2.0f), 1.0f - (cell.padding.fY * 2.0f)), true);
+        }
+
         CVector2D position = GetAlignmentOffset(cell, cell.element->GetSize(true));
         cell.element->SetPosition(position, true);
         cell.element->ForceRedraw();
@@ -627,37 +775,42 @@ const CVector2D CGUIGridLayout_Impl::GetAlignmentOffset(const SGridCellItem& cel
 {
     CVector2D offset;
 
-    switch (cell.alignment)
+    if (!cell.forceFullSize)
     {
-        case eGridLayoutItemAlignment::TOP_LEFT:
-            offset = CVector2D(0.0f, 0.0f);
-            break;
-        case eGridLayoutItemAlignment::TOP_CENTER:
-            offset = CVector2D((1.0f - size.fX) / 2.0f, 0.0f);
-            break;
-        case eGridLayoutItemAlignment::TOP_RIGHT:
-            offset = CVector2D(1.0f - size.fX, 0.0f);
-            break;
-        case eGridLayoutItemAlignment::MIDDLE_LEFT:
-            offset = CVector2D(0.0f, (1.0f - size.fY) / 2.0f);
-            break;
-        case eGridLayoutItemAlignment::MIDDLE_CENTER:
-            offset = CVector2D((1.0f - size.fX) / 2.0f, (1.0f - size.fY) / 2.0f);
-            break;
-        case eGridLayoutItemAlignment::MIDDLE_RIGHT:
-            offset = CVector2D(1.0f - size.fX, (1.0f - size.fY) / 2.0f);
-            break;
-        case eGridLayoutItemAlignment::BOTTOM_LEFT:
-            offset = CVector2D(0.0f, 1.0f - size.fY);
-            break;
-        case eGridLayoutItemAlignment::BOTTOM_CENTER:
-            offset = CVector2D((1.0f - size.fX) / 2.0f, 1.0f - size.fY);
-            break;
-        case eGridLayoutItemAlignment::BOTTOM_RIGHT:
-            offset = CVector2D(1.0f - size.fX, 1.0f - size.fY);
-            break;
+        switch (cell.alignment)
+        {
+            case eGridLayoutItemAlignment::TOP_LEFT:
+                offset += CVector2D(0.0f, 0.0f);
+                break;
+            case eGridLayoutItemAlignment::TOP_CENTER:
+                offset += CVector2D(0.5f - (size.fX / 2.0f), 0.0f);
+                break;
+            case eGridLayoutItemAlignment::TOP_RIGHT:
+                offset += CVector2D(1.0f - size.fX, 0.0f);
+                break;
+            case eGridLayoutItemAlignment::MIDDLE_LEFT:
+                offset += CVector2D(0.0f, 0.5f - (size.fY / 2.0f));
+                break;
+            case eGridLayoutItemAlignment::MIDDLE_CENTER:
+                offset += CVector2D(0.5f - (size.fX / 2.0f), 0.5f - (size.fY / 2.0f));
+                break;
+            case eGridLayoutItemAlignment::MIDDLE_RIGHT:
+                offset += CVector2D(1.0f - size.fX, 0.5f - (size.fY / 2.0f));
+                break;
+            case eGridLayoutItemAlignment::BOTTOM_LEFT:
+                offset += CVector2D(0.0f, 1.0f - size.fY);
+                break;
+            case eGridLayoutItemAlignment::BOTTOM_CENTER:
+                offset += CVector2D(0.5f - (size.fX / 2.0f), 1.0f - size.fY);
+                break;
+            case eGridLayoutItemAlignment::BOTTOM_RIGHT:
+                offset += CVector2D(1.0f - size.fX, 1.0f - size.fY);
+                break;
+        }
     }
 
+    offset = CVector2D(std::min(offset.fX, 1.0f - size.fX - cell.padding.fX), std::min(offset.fY, 1.0f - size.fY - cell.padding.fY));
+    offset = CVector2D(std::max(offset.fX, cell.padding.fX), std::max(offset.fY, cell.padding.fY));
     return offset;
 }
 

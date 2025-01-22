@@ -13,10 +13,13 @@
 
 #include "CGUIElement.h"
 #include "CGUIGridLayout.h"
+#include <../Shared/sdk/CVector2D.h>
+#include <../Shared/sdk/CColor.h>
 
 #include <vector>
 
 class CGUIStaticImage;
+class CGUITexture;
 
 enum class eGridLayoutItemAlignment
 {
@@ -39,6 +42,8 @@ struct SGridCellItem
     eGridLayoutItemAlignment alignment;
     int                      column;
     int                      row;
+    bool                     forceFullSize;
+    CVector2D                padding;
 };
 
 class CGUIGridLayout : public CGUIElement
@@ -86,4 +91,22 @@ public:
 
     virtual const bool SetColumnWidth(const int column, const float width) = 0;
     virtual const bool SetRowHeight(const int row, const float height) = 0;
+
+    virtual const bool SetCellFullSize(const int column, const int row, const bool fullSize) = 0;
+    virtual const bool SetDefaultCellFullSize(const bool fullSize, const bool updateExisting = false) = 0;
+
+    virtual const bool GetCellFullSize(const int column, const int row) const = 0;
+    virtual const bool GetDefaultCellFullSize() const = 0;
+
+    virtual const bool SetCellPadding(const int column, const int row, const CVector2D& padding) = 0;
+    virtual const bool SetDefaultCellPadding(const CVector2D& padding, const bool updateExisting) = 0;
+
+    virtual const CVector2D& GetCellPadding(const int column, const int row) const = 0;
+    virtual const CVector2D& GetDefaultCellPadding() const = 0;
+
+    virtual const bool SetCellTexture(const int column, const int row, CGUITexture* texture, const bool alt = false) = 0;
+    virtual const bool SetCellColor(const int column, const int row, const CColor& color, const bool alt = false) = 0;
+
+    virtual const bool SetDefaultCellTexture(CGUITexture* texture, const bool alt = false, const bool updateExisting = false) = 0;
+    virtual const bool SetDefaultCellColor(const CColor& color, const bool alt = false, const bool updateExisting = false) = 0;
 };

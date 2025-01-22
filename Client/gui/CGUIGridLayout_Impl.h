@@ -61,6 +61,24 @@ public:
     const bool SetColumnWidth(const int column, const float width);
     const bool SetRowHeight(const int row, const float height);
 
+    const bool SetCellFullSize(const int column, const int row, const bool fullSize);
+    const bool SetDefaultCellFullSize(const bool fullSize, const bool updateExisting = false);
+
+    const bool GetCellFullSize(const int column, const int row) const;
+    const bool GetDefaultCellFullSize() const { return m_defaultFullSize; }
+
+    const bool SetCellPadding(const int column, const int row, const CVector2D& padding);
+    const bool SetDefaultCellPadding(const CVector2D& padding, const bool updateExisting);
+
+    const CVector2D& GetCellPadding(const int column, const int row) const;
+    const CVector2D& GetDefaultCellPadding() const { return m_defaultPadding; }
+
+    const bool SetCellTexture(const int column, const int row, CGUITexture* texture, const bool alt = false);
+    const bool SetCellColor(const int column, const int row, const CColor& color, const bool alt = false);
+
+    const bool SetDefaultCellTexture(CGUITexture* texture, const bool alt = false, const bool updateExisting = false);
+    const bool SetDefaultCellColor(const CColor& color, const bool alt = false, const bool updateExisting = false);
+
 #include "CGUIElement_Inc.h"
 
 private:
@@ -85,6 +103,9 @@ private:
     CGUITexture* m_cellTextureAlt = nullptr;
 
     eGridLayoutItemAlignment m_defaultAlignment = eGridLayoutItemAlignment::MIDDLE_CENTER;
+
+    bool      m_defaultFullSize = false;
+    CVector2D m_defaultPadding = CVector2D(0.1f, 0.1f);
 
     void CreateGridCells();
     void CleanupGridCells();
