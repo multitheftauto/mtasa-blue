@@ -48,6 +48,16 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
     return true;
 }
 
+CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept
+{
+    auto poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndex(pGameInterface);
+
+    if (poolIndex == -1)
+        return nullptr;
+
+    return m_buildingPool.entities[poolIndex].pClientEntity;
+}
+
 CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior)
 {
     if (!HasFreeBuildingSlot())
