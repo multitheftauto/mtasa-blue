@@ -50,7 +50,7 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
 
 CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept
 {
-    auto poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndex(pGameInterface);
+    std::uint32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndex(pGameInterface);
 
     if (poolIndex == -1)
         return nullptr;
