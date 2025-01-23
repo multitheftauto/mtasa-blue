@@ -52,7 +52,7 @@ CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameIn
 {
     std::uint32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndex(pGameInterface);
 
-    if (poolIndex == -1)
+    if (poolIndex == static_cast<std::uint32_t>(-1))
         return nullptr;
 
     return m_buildingPool.entities[poolIndex].pClientEntity;
