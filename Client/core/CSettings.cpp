@@ -947,7 +947,7 @@ void CSettings::CreateGUI()
 
     m_pLabelBrowserBlacklistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserBlacklistAdd, _("Enter a domain e.g. google.com")));
     m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
-    m_pLabelBrowserBlacklistAdd->SetTextColor(0, 0, 0);
+    m_pLabelBrowserBlacklistAdd->SetPlaceholderColors();
     m_pLabelBrowserBlacklistAdd->SetSize(CVector2D(1, 1), true);
     m_pLabelBrowserBlacklistAdd->SetAlpha(0.7f);
     m_pLabelBrowserBlacklistAdd->SetProperty("MousePassThroughEnabled", "True");
@@ -982,7 +982,7 @@ void CSettings::CreateGUI()
 
     m_pLabelBrowserWhitelistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserWhitelistAdd, _("Enter a domain e.g. google.com")));
     m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
-    m_pLabelBrowserWhitelistAdd->SetTextColor(0, 0, 0);
+    m_pLabelBrowserWhitelistAdd->SetPlaceholderColors();
     m_pLabelBrowserWhitelistAdd->SetSize(CVector2D(1, 1), true);
     m_pLabelBrowserWhitelistAdd->SetAlpha(0.7f);
     m_pLabelBrowserWhitelistAdd->SetProperty("MousePassThroughEnabled", "True");

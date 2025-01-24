@@ -66,7 +66,7 @@ void CTransferBox::CreateTransferWindow()
     float fTempX = (m_progressBar->GetSize().fX - m_GUI->GetTextExtent(m_infoLabel->GetText().c_str()) - TRANSFERBOX_ICONSIZE - 4) * 0.5f;
     m_infoLabel->SetPosition(CVector2D(fTempX + TRANSFERBOX_ICONSIZE + 4, 0));
     m_infoLabel->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_PROGRESSHEIGHT));
-    m_infoLabel->SetTextColor(0, 0, 0);
+    m_infoLabel->SetPlaceholderColors();
     m_infoLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 
     for (size_t i = 0; i < m_iconImages.size(); ++i)

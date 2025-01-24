@@ -164,3 +164,27 @@ float CGUILabel_Impl::GetTextExtent()
 
     return 0.0f;
 }
+
+void CGUILabel_Impl::InvertTextColor()
+{
+    auto& color = GetTextColor();
+    SetTextColor(255 - color.R, 255 - color.G, 255 - color.B);
+}
+
+void CGUILabel_Impl::SetPlaceholderColors()
+{
+    auto* text = reinterpret_cast<CEGUI::StaticText*>(m_pWindow);
+
+    if (!text->isPropertyPresent("PlaceholderTextColours"))
+    {
+        InvertTextColor();
+        return;
+    }
+
+    auto& prop = text->getProperty("PlaceholderTextColours");
+
+    unsigned int color = 0;
+    const char*  buffer = prop.c_str();
+    sscanf(buffer, "tl:%x tr:%x bl:%x br:%x", &color, &color, &color, &color);
+    SetTextColor(color >> 16, (color >> 8) & 0xFF, color & 0xFF);
+}

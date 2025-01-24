@@ -43,7 +43,11 @@ public:
 
     eCGUIType GetType() { return CGUI_LABEL; };
 
+    void InvertTextColor();
+    void SetPlaceholderColors();
+
     #define EXCLUDE_SET_TEXT
     #include "CGUIElement_Inc.h"
     #undef EXCLUDE_SET_TEXT
+
 };

@@ -162,7 +162,7 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     m_pLabelVersionTag->SetSize(CVector2D(m_pLabelVersionTag->GetTextExtent() + 5, 18));
     m_pLabelVersionTag->SetPosition(CVector2D(ScreenSize.fX - m_pLabelVersionTag->GetTextExtent() - 5, ScreenSize.fY - 15));
     m_pLabelVersionTag->SetAlpha(0.5f);
-    m_pLabelVersionTag->SetTextColor(255, 255, 255);
+    m_pLabelVersionTag->SetPlaceholderColors();
     m_pLabelVersionTag->SetZOrderingEnabled(false);
     m_pLabelVersionTag->MoveToBack();
     m_pLabelVersionTag->SetVisible(false);

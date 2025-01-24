@@ -36,4 +36,7 @@ public:
     virtual float GetCharacterWidth(int iCharIndex) = 0;
     virtual float GetFontHeight() = 0;
     virtual float GetTextExtent() = 0;
+
+    virtual void InvertTextColor() = 0;
+    virtual void SetPlaceholderColors() = 0;
 };
