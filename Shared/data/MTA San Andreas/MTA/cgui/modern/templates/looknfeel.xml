@@ -107,7 +107,7 @@
 	
     <WidgetLook name="CGUI/TitlebarModern">
         <Property name="CaptionColour" value="FFFFFFFF" />
-        <Property name="MovingCursorImage" value="set:CGUI-Images image:MouseMoveCursor" />
+        <Property name="MovingCursorImage" value="set:CGUI-Images image:MouseMoveCursorModern" />
         <ImagerySection name="caption">
             <TextComponent>
                 <Area>
@@ -186,10 +186,10 @@
     </WidgetLook>
 
     <WidgetLook name="CGUI/TabButtonModern">
-        <Property name="NormalTextColour" value="FF7D7D7D" />
-        <Property name="HoverTextColour" value="FF7D7D7D" />
-        <Property name="PushedTextColour" value="FFFFFFFF" />
-        <Property name="DisabledTextColour" value="FF000000" />
+        <Property name="NormalTextColour" value="FF7D7D7D" redrawOnWrite="true" />
+        <Property name="HoverTextColour" value="FF7D7D7D" redrawOnWrite="true" />
+        <Property name="PushedTextColour" value="FFFFFFFF" redrawOnWrite="true" />
+        <Property name="DisabledTextColour" value="FF000000" redrawOnWrite="true" />
         <Property name="WantsMultiClickEvents" value="False" />
         <ImagerySection name="frame">
             <FrameComponent>
@@ -286,7 +286,7 @@
                     <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
                     <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
                 </Area>
-                <Image type="TopLeftCorner" imageset="CGUI-Images" image="Frame2TopLeftSquaredModern" />
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="Frame2TopLeftModern" />
                 <Image type="TopRightCorner" imageset="CGUI-Images" image="Frame2TopRightModern" />
                 <Image type="BottomLeftCorner" imageset="CGUI-Images" image="Frame2BottomLeftModern" />
                 <Image type="BottomRightCorner" imageset="CGUI-Images" image="Frame2BottomRightModern" />
@@ -336,10 +336,10 @@
     </WidgetLook>
 
     <WidgetLook name="CGUI/ButtonModern">
-        <Property name="NormalTextColour" value="FF7C7C7C" />
-        <Property name="HoverTextColour" value="FFFFFFFF" />
-        <Property name="PushedTextColour" value="FF7C7C7C" />
-        <Property name="DisabledTextColour" value="FF383838" />
+        <Property name="NormalTextColour" value="FF7C7C7C" redrawOnWrite="true" />
+        <Property name="HoverTextColour" value="FFFFFFFF" redrawOnWrite="true" />
+        <Property name="PushedTextColour" value="FF7C7C7C" redrawOnWrite="true" />
+        <Property name="DisabledTextColour" value="FF383838" redrawOnWrite="true" />
         <Property name="WantsMultiClickEvents" value="False" />
         <ImagerySection name="label">
             <TextComponent>
@@ -396,10 +396,10 @@
     </WidgetLook>
 
     <WidgetLook name="CGUI/FrameWindowModern">
-        <Property name="NSSizingCursorImage" value="set:CGUI-Images image:NSSizingCursorImage" />
-        <Property name="EWSizingCursorImage" value="set:CGUI-Images image:EWSizingCursorImage" />
-        <Property name="NWSESizingCursorImage" value="set:CGUI-Images image:NWSESizingCursorImage" />
-        <Property name="NESWSizingCursorImage" value="set:CGUI-Images image:NESWSizingCursorImage" />
+        <Property name="NSSizingCursorImage" value="set:CGUI-Images image:NSSizingCursorImageModern" />
+        <Property name="EWSizingCursorImage" value="set:CGUI-Images image:EWSizingCursorImageModern" />
+        <Property name="NWSESizingCursorImage" value="set:CGUI-Images image:NWSESizingCursorImageModern" />
+        <Property name="NESWSizingCursorImage" value="set:CGUI-Images image:NESWSizingCursorImageModern" />
         <Property name="RollUpEnabled" value="False" />
         <NamedArea name="ClientWithTitleWithFrame">
             <Area>
@@ -596,10 +596,10 @@
 
     <WidgetLook name="CGUI/EditboxModern">
         <PropertyDefinition name="ReadOnlyBGColour" initialValue="FFDFDFDF" />
-        <Property name="NormalTextColour" value="FF000000" />
-        <Property name="SelectedTextColour" value="FFFFFFFF" />
-        <Property name="ActiveSelectionColour" value="FF607FFF" />
-        <Property name="InactiveSelectionColour" value="FF808080" />
+        <Property name="NormalTextColour" value="FFFFFFFF" redrawOnWrite="true" />
+        <Property name="SelectedTextColour" value="FF808080" redrawOnWrite="true" />
+        <Property name="ActiveSelectionColour" value="FF607FFF" redrawOnWrite="true"/>
+        <Property name="InactiveSelectionColour" value="FFDDDDDD" redrawOnWrite="true" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="7" /></Dim>
@@ -630,7 +630,7 @@
                     <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
                 </Area>
                 <Image imageset="CGUI-Images" image="GenericBrushModern" />
-                <Colours topLeft="FF000000" topRight="FF000000" bottomLeft="FF000000" bottomRight="FF000000" />
+                <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
                 <VertFormat type="Stretched" />
                 <HorzFormat type="Stretched" />
             </ImageryComponent>
@@ -638,6 +638,9 @@
         <StateImagery name="Enabled">
             <Layer>
                 <Section look="CGUI/SharedModern" section="Frame" />
+                <Section section="TextArea">
+                    <ColourProperty name="NormalTextColour" />
+                </Section>
             </Layer>
         </StateImagery>
         <StateImagery name="ReadOnly">
@@ -775,10 +778,10 @@
             <VertAlignment type="CentreAligned" />
             <HorzAlignment type="RightAligned" />
             <Property name="UseStandardImagery" value="False" />
-            <Property name="NormalImage" value="set:CGUI-Images image:ScrollRightArrow" />
-            <Property name="HoverImage" value="set:CGUI-Images image:ScrollRightArrow" />
-            <Property name="PushedImage" value="set:CGUI-Images image:ScrollRightArrow" />
-            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollRightArrow" />
+            <Property name="NormalImage" value="set:CGUI-Images image:ScrollRightArrowModern" />
+            <Property name="HoverImage" value="set:CGUI-Images image:ScrollRightArrowModern" />
+            <Property name="PushedImage" value="set:CGUI-Images image:ScrollRightArrowModern" />
+            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollRightArrowModern" />
         </Child>
         <Child  type="CGUI/ButtonModern" nameSuffix="__auto_decbtn__">
             <Area>
@@ -789,10 +792,10 @@
             </Area>
             <VertAlignment type="CentreAligned" />
             <Property name="UseStandardImagery" value="False" />
-            <Property name="NormalImage" value="set:CGUI-Images image:ScrollLeftArrow" />
-            <Property name="HoverImage" value="set:CGUI-Images image:ScrollLeftArrow" />
-            <Property name="PushedImage" value="set:CGUI-Images image:ScrollLeftArrow" />
-            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollLeftArrow" />
+            <Property name="NormalImage" value="set:CGUI-Images image:ScrollLeftArrowModern" />
+            <Property name="HoverImage" value="set:CGUI-Images image:ScrollLeftArrowModern" />
+            <Property name="PushedImage" value="set:CGUI-Images image:ScrollLeftArrowModern" />
+            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollLeftArrowModern" />
         </Child>
         <Child  type="CGUI/HorizontalScrollbarThumbModern" nameSuffix="__auto_thumb__">
             <Area>
@@ -861,10 +864,10 @@
             <VertAlignment type="BottomAligned" />
             <HorzAlignment type="CentreAligned" />
             <Property name="UseStandardImagery" value="False" />
-            <Property name="NormalImage" value="set:CGUI-Images image:ScrollDownArrow" />
-            <Property name="HoverImage" value="set:CGUI-Images image:ScrollDownArrow" />
-            <Property name="PushedImage" value="set:CGUI-Images image:ScrollDownArrow" />
-            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollDownArrow" />
+            <Property name="NormalImage" value="set:CGUI-Images image:ScrollDownArrowModern" />
+            <Property name="HoverImage" value="set:CGUI-Images image:ScrollDownArrowModern" />
+            <Property name="PushedImage" value="set:CGUI-Images image:ScrollDownArrowModern" />
+            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollDownArrowModern" />
         </Child>
         <Child  type="CGUI/ButtonModern" nameSuffix="__auto_decbtn__">
             <Area>
@@ -875,10 +878,10 @@
             </Area>
             <HorzAlignment type="CentreAligned" />
             <Property name="UseStandardImagery" value="False" />
-            <Property name="NormalImage" value="set:CGUI-Images image:ScrollUpArrow" />
-            <Property name="HoverImage" value="set:CGUI-Images image:ScrollUpArrow" />
-            <Property name="PushedImage" value="set:CGUI-Images image:ScrollUpArrow" />
-            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollUpArrow" />
+            <Property name="NormalImage" value="set:CGUI-Images image:ScrollUpArrowModern" />
+            <Property name="HoverImage" value="set:CGUI-Images image:ScrollUpArrowModern" />
+            <Property name="PushedImage" value="set:CGUI-Images image:ScrollUpArrowModern" />
+            <Property name="DisabledImage" value="set:CGUI-Images image:ScrollUpArrowModern" />
         </Child>
         <Child  type="CGUI/VerticalScrollbarThumbModern" nameSuffix="__auto_thumb__">
             <Area>
@@ -959,7 +962,8 @@
     <WidgetLook name="CGUI/StaticTextModern">
         <Property name="BackgroundEnabled" value="True" />
         <Property name="FrameEnabled" value="True" />
-				<Property name="TextColours" value="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" />
+		<Property name="TextColours" value="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" />
+        <PropertyDefinition name="PlaceholderTextColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" />
         <NamedArea name="TextRenderArea">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
@@ -1021,8 +1025,8 @@
     <WidgetLook name="CGUI/ListHeaderSegmentModern">
       <Property name="NormalTextColour" value="FFFFFFFF" />
       <Property name="DragGhost" value="FF909090" />
-      <Property name="SizingCursorImage" value="set:CGUI-Images image:MouseEsWeCursor" />
-      <Property name="MovingCursorImage" value="set:CGUI-Images image:MouseMoveCursor" />
+      <Property name="SizingCursorImage" value="set:CGUI-Images image:MouseEsWeCursorModern" />
+      <Property name="MovingCursorImage" value="set:CGUI-Images image:MouseMoveCursorModern" />
       <ImagerySection name="segment">
         <ImageryComponent>
           <Area>
@@ -1350,8 +1354,8 @@
 		  </WidgetLook>
 
     <WidgetLook name="CGUI/MultiLineEditboxModern">
-        <Property name="SelectionBrushImage" value="set:CGUI-Images image:GenericBrush" />
-        <Property name="NormalTextColour" value="FF000000" redrawOnWrite="true" />
+        <Property name="SelectionBrushImage" value="set:CGUI-Images image:GenericBrushModern" />
+        <Property name="NormalTextColour" value="FFFFFFFF" redrawOnWrite="true" />
         <Property name="SelectedTextColour" value="FF000000" redrawOnWrite="true" />
         <Property name="ActiveSelectionColour" value="FF9F9F9F" redrawOnWrite="true" />
         <Property name="InactiveSelectionColour" value="FF808080" redrawOnWrite="true" />
@@ -1402,7 +1406,7 @@
                     <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
                 </Area>
                 <Image imageset="CGUI-Images" image="GenericBrushModern" />
-                <Colours topLeft="FF000000" topRight="FF000000" bottomLeft="FF000000" bottomRight="FF000000" />
+                <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
                 <VertFormat type="Stretched" />
                 <HorzFormat type="Stretched" />
             </ImageryComponent>
@@ -1498,6 +1502,7 @@
     </WidgetLook>
 
     <WidgetLook name="CGUI/CheckboxModern">
+        <Property name="NormalTextColour" value="FFFFFFFF" redrawOnWrite="true" />
         <ImagerySection name="label">
             <TextComponent>
                 <Area>
@@ -1924,10 +1929,10 @@
 
     <WidgetLook name="CGUI/ComboEditboxModern">
         <PropertyDefinition name="ReadOnlyBGColour" initialValue="FFDFDFDF" />
-        <Property name="NormalTextColour" value="FF000000" />
-        <Property name="SelectedTextColour" value="FFFFFFFF" />
-        <Property name="ActiveSelectionColour" value="FF607FFF" />
-        <Property name="InactiveSelectionColour" value="FF808080" />
+        <Property name="NormalTextColour" value="FFFFFFFF" redrawOnWrite="true" />
+        <Property name="SelectedTextColour" value="FF000000" redrawOnWrite="true" />
+        <Property name="ActiveSelectionColour" value="FF607FFF" redrawOnWrite="true" />
+        <Property name="InactiveSelectionColour" value="FF808080" redrawOnWrite="true" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="7" /></Dim>
@@ -1977,7 +1982,7 @@
                     <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
                 </Area>
                 <Image imageset="CGUI-Images" image="GenericBrushModern" />
-                <Colours topLeft="FF000000" topRight="FF000000" bottomLeft="FF000000" bottomRight="FF000000" />
+                <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
                 <VertFormat type="Stretched" />
                 <HorzFormat type="Stretched" />
             </ImageryComponent>
@@ -2078,10 +2083,10 @@
         </Dim>
       </Area>
       <HorzAlignment type="RightAligned" />
-	  <Property name="NormalImage" value="set:CGUI-Images image:ComboboxButtonNormal" />
-	  <Property name="HoverImage" value="set:CGUI-Images image:ComboboxButtonHover" />
-      <Property name="PushedImage" value="set:CGUI-Images image:ComboboxButtonHover" />
-	  <Property name="DisabledImage" value="set:CGUI-Images image:ComboboxButtonNormal" />
+	  <Property name="NormalImage" value="set:CGUI-Images image:ComboboxButtonNormalModern" />
+	  <Property name="HoverImage" value="set:CGUI-Images image:ComboboxButtonHoverModern" />
+      <Property name="PushedImage" value="set:CGUI-Images image:ComboboxButtonHoverModern" />
+	  <Property name="DisabledImage" value="set:CGUI-Images image:ComboboxButtonNormalModern" />
     </Child>
     <StateImagery name="Enabled" />
     <StateImagery name="Disabled" />
