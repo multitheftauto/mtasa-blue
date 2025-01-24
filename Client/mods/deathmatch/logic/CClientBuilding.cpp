@@ -132,6 +132,7 @@ void CClientBuilding::Create()
     ConvertZXYEulersToQuaternion(m_vRot, vRot4D);
 
     m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
+    m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
 
     if (!m_usesCollision)
     {
