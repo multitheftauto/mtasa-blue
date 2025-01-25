@@ -387,6 +387,5 @@ void CClientRenderElementManager::DoPulse()
     }   
 
     for (CClientTexture* texture : deleteCandidates)
-        g_pClientGame->GetElementDeleter()->Delete(texture, true);
-   
+        g_pClientGame->GetElementDeleter()->Delete(texture, true);   
 }
