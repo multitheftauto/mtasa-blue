@@ -39,7 +39,7 @@ public:
     CClientTexture*       FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
     void                  Remove(CClientRenderElement* pElement);
 
-    void                 DoPulse();
+    void                  DoPulse();
 
     uint GetDxFontCount() { return m_uiStatsDxFontCount; }
     uint GetGuiFontCount() { return m_uiStatsGuiFontCount; }
