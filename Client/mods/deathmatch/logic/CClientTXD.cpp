@@ -76,7 +76,7 @@ bool CClientTXD::Import(unsigned short usModelID)
         }
         m_bUsingFileDataForClothes = true;
         // Note: ClothesAddReplacement uses the pointer from m_FileData, so don't touch m_FileData until matching ClothesRemove call
-        g_pGame->GetRenderWare()->ClothesAddReplacement(m_FileData.data(), usModelID - CLOTHES_MODEL_ID_FIRST);
+        g_pGame->GetRenderWare()->ClothesAddReplacement(m_FileData.data(), m_FileData.size(), usModelID - CLOTHES_MODEL_ID_FIRST);
         return true;
     }
     else

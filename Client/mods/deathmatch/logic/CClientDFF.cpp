@@ -317,7 +317,7 @@ bool CClientDFF::ReplaceClothes(ushort usModel)
     }
 
     m_Replaced.push_back(usModel);
-    g_pGame->GetRenderWare()->ClothesAddReplacement(m_RawDataBuffer.data(), usModel - CLOTHES_MODEL_ID_FIRST);
+    g_pGame->GetRenderWare()->ClothesAddReplacement(m_RawDataBuffer.data(), m_RawDataBuffer.size(), usModel - CLOTHES_MODEL_ID_FIRST);
     return true;
 }
 
