@@ -13,7 +13,7 @@
 
 namespace
 {
-    const std::int64_t TEMPORARY_TEXTURES_CLEANUP_THRESHOLD = 1000ll;
+    const std::int64_t TEMPORARY_TEXTURES_CLEANUP_THRESHOLD = 10000ll;
     const std::size_t TEMPORARY_TEXTURES_DELETE_THRESHOLD = 10u;
 }
 
