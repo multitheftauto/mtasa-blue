@@ -20,7 +20,7 @@ public:
     CElementDeleter();
     ~CElementDeleter() { DoDeleteAll(); };
 
-    void Delete(class CClientEntity* pElement);
+    void Delete(class CClientEntity* pElement, bool silent = false);
     void DeleteRecursive(class CClientEntity* pElement);
     void DoDeleteAll();
     bool IsBeingDeleted(class CClientEntity* pElement);
