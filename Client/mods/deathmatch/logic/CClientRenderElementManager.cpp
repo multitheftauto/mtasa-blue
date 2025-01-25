@@ -11,11 +11,8 @@
 #include "StdInc.h"
 #include "CClientVectorGraphic.h"
 
-namespace
-{
-    constexpr std::int64_t TEMPORARY_TEXTURES_CLEANUP_THRESHOLD = 10000ll;
-    constexpr std::size_t TEMPORARY_TEXTURES_DELETE_THRESHOLD = 10u;
-}
+constexpr std::int64_t TEMPORARY_TEXTURES_CLEANUP_THRESHOLD = 10000ll;
+constexpr std::size_t TEMPORARY_TEXTURES_DELETE_THRESHOLD = 10u;
 
 ////////////////////////////////////////////////////////////////
 //
