@@ -8,6 +8,7 @@
 
 #include "StdInc.h"
 #include "CGameSA.h"
+#include "CDirectorySA.h"
 #include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
@@ -47,57 +48,11 @@ namespace
         uint            uiArraySize;
     };
 
-    struct DirectoryInfo
-    {
-        uint32 m_nOffset;
-        uint16 m_nStreamingSize;
-        uint16 m_nSizeInArchive;
-        char   m_szName[24];
-    };
-
-    struct CDirectorySA
-    {
-        DirectoryInfo* m_pEntries{};
-        uint32         m_nCapacity{};
-        uint32         m_nNumEntries{};
-        bool           m_bOwnsEntries{};
-    };
-
     DWORD               FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
-    constexpr uintptr_t CLOTHES_DIRECTORY_ADDRESS = 0x5A419B;
+    CDirectorySA*       CLOTHES_DIRECTORY = *reinterpret_cast<CDirectorySA**>(0x5A419B);
     int                 iReturnFileId;
     char*               pReturnBuffer;
 
-    CDirectorySA* GetClothesDirectory()
-    {
-        CDirectorySA* directory = *reinterpret_cast<CDirectorySA**>(CLOTHES_DIRECTORY_ADDRESS);
-
-        if (!directory)
-            return nullptr;
-
-        return directory;
-    }
-
-    DirectoryInfo* GetClothesEntry(ushort usFileId)
-    {
-        SPlayerImgItemArray* pItemArray = (SPlayerImgItemArray*)0x00BC12C0;
-        SPlayerImgItem*      pImgItem = &pItemArray->pItems[usFileId];
-
-        if (!pImgItem)
-            return nullptr;
-
-        CDirectorySA* directory = GetClothesDirectory();
-
-        if (!directory)
-            return nullptr;
-
-        DirectoryInfo* entry = ((DirectoryInfo * (__thiscall*)(CDirectorySA*, const char*))0x532450)(directory, pImgItem->szName);
-
-        if (!entry)
-            return nullptr;
-
-        return entry;
-    }
 
     uint32_t GetSizeInBlocks(uint32_t size)
     {
@@ -125,15 +80,9 @@ void CRenderWareSA::ClothesAddReplacement(char* pFileData, size_t fileSize, usho
 
     if (pFileData != MapFindRef(ms_ReplacementClothesFileDataMap, usFileId))
     {
-        DirectoryInfo* entry = GetClothesEntry(usFileId);
-
-        if (!entry)
-            return;
-
         MapSet(ms_ReplacementClothesFileDataMap, usFileId, pFileData);
-        MapSet(ms_OriginalStreamingSizesMap, usFileId, entry->m_nStreamingSize);
-
-        entry->m_nStreamingSize = GetSizeInBlocks(fileSize);
+        MapSet(ms_OriginalStreamingSizesMap, usFileId, CLOTHES_DIRECTORY->GetModelStreamingSize(usFileId));
+        CLOTHES_DIRECTORY->SetModelStreamingSize(usFileId, GetSizeInBlocks(fileSize));
 
         bClothesReplacementChanged = true;
     }
@@ -155,11 +104,10 @@ void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
     {
         if (iter->second == pFileData)
         {
-            DirectoryInfo* entry = GetClothesEntry(iter->first);
-            uint16         originalStreamingSize = MapFindRef(ms_OriginalStreamingSizesMap, iter->first);
+            uint16 originalStreamingSize = MapFindRef(ms_OriginalStreamingSizesMap, iter->first);
 
-            if (entry && originalStreamingSize)
-                entry->m_nStreamingSize = originalStreamingSize;
+            if (originalStreamingSize)
+                CLOTHES_DIRECTORY->SetModelStreamingSize(iter->first, originalStreamingSize);
 
             ms_ReplacementClothesFileDataMap.erase(iter++);
             bClothesReplacementChanged = true;
