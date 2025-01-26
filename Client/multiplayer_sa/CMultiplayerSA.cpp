@@ -1575,6 +1575,7 @@ void CMultiplayerSA::InitHooks()
     
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
+    InitHooks_SingleLinkNode();
 
     // Init our 1.3 hooks.
     Init_13();
