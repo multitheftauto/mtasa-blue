@@ -3734,6 +3734,9 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
                 case CCLIENTOBJECT:
                     iTypeMask = TYPE_MASK_OBJECT;
                     break;
+                case CCLIENTBUILDING:
+                    iTypeMask = TYPE_MASK_WORLD;
+                    break;
                 default:
                     iTypeMask = TYPE_MASK_OTHER;
                     break;
