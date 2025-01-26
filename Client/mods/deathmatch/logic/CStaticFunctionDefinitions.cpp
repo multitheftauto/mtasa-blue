@@ -1710,10 +1710,10 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const std::string_view control, bool& state) noexcept
+bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept
 {
     if (&ped == GetLocalPlayer())
-        return GetControlState(control.data(), state);
+        return GetControlState(control.c_str(), state);
 
     if (ped.GetType() == CCLIENTPLAYER)
     {
@@ -1721,14 +1721,14 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const
         ped.GetControllerState(controller);
 
         bool foot = !ped.GetRealOccupiedVehicle();
-        state = CClientPad::GetControlState(control.data(), controller, foot);
+        state = CClientPad::GetControlState(control.c_str(), controller, foot);
 
         float         analog = 0;
         std::uint32_t index;
 
-        if (CClientPad::GetAnalogControlIndex(control.data(), index))
+        if (CClientPad::GetAnalogControlIndex(control.c_str(), index))
         {
-            if (CClientPad::GetAnalogControlState(control.data(), controller, foot, analog, false))
+            if (CClientPad::GetAnalogControlState(control.c_str(), controller, foot, analog, false))
             {
                 state = analog > 0;
                 return true;
@@ -1736,12 +1736,12 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const
         }
         else
         {
-            state = CClientPad::GetControlState(control.data(), controller, foot);
+            state = CClientPad::GetControlState(control.c_str(), controller, foot);
             return true;
         }
     }
 
-    if (ped.m_Pad.GetControlState(control.data(), state))
+    if (ped.m_Pad.GetControlState(control.c_str(), state))
         return true;
 
     return false;
@@ -2363,12 +2363,12 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string_view control, const bool state) noexcept
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept
 {
     if (&ped == GetLocalPlayer())
-        return SetControlState(control.data(), state);
+        return SetControlState(control.c_str(), state);
 
-    if (ped.m_Pad.SetControlState(control.data(), state))
+    if (ped.m_Pad.SetControlState(control.c_str(), state))
         return true;
 }
 

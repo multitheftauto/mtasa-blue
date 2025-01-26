@@ -1264,7 +1264,7 @@ int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::GetPedControlState(CClientPed* const ped, const std::string_view control) noexcept
+bool CLuaPedDefs::GetPedControlState(CClientPed* const ped, const std::string control) noexcept
 {
     bool state;
 
@@ -1820,7 +1820,7 @@ int CLuaPedDefs::RemovePedClothes(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetPedControlState(CClientPed* const ped, const std::string_view control, const bool state) noexcept
+bool CLuaPedDefs::SetPedControlState(CClientPed* const ped, const std::string control, const bool state) noexcept
 {
     return CStaticFunctionDefinitions::SetPedControlState(*ped, control, state);
 }
