@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-26 16:31+0000\n"
-"PO-Revision-Date: 2025-01-27 18:31\n"
+"PO-Revision-Date: 2025-01-27 19:31\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -92,15 +92,15 @@ msgstr "يُلحق خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "يقلل وضوح خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "يزيد وضوح خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "يبدل نص مساعده خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -218,11 +218,11 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:715
 msgid "Following Player"
-msgstr ""
+msgstr "اللاعب التابع"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:717
 msgid "Free Movement"
-msgstr ""
+msgstr "حركه حرة"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:506
 msgid "Disconnected: Invalid nickname"
@@ -308,7 +308,7 @@ msgstr "قطع الاتصال: فشل التحقق من الرقم التسلس�
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "قُطع الإتصال: الرقم التسلسى تحت الاستخدام بالفعل"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -1303,17 +1303,20 @@ msgstr "تحديث إعدادات التوافق"
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "تشغيل جراند ثيفت أوتو: سان أندرياس.\n"
+"تأكد ان اللعبة موجودة فى مجلد 'program files (x86)'."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr ""
+msgstr "البحث عن جى تى أيه: سان أندرياس"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "عذرًا, لم يتم العثور على اللعبة.\n"
+"شغل جراند ثيفت أوتو: سان اندرياس و أضغط إعادة المحاولة.\n"
+"تأكد من وجود اللعبة فى مجلد 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -1418,7 +1421,7 @@ msgstr "الاتصال: فشل في إلغاء تحميل المود الحال�
 
 #: Client/core/CCommandFuncs.cpp:317
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "إعادة الإتصال: رقم المنفذ خاطئ"
 
 #: Client/core/CCommandFuncs.cpp:332
 #, c-format
@@ -1428,7 +1431,7 @@ msgstr ""
 #: Client/core/CCommandFuncs.cpp:336
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "إعادة الاتصال: تعذر الاتصال بـ %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:370
 msgid "Bound all controls from GTA"
@@ -1490,7 +1493,7 @@ msgstr "الاتصال بـ %s:%u ..."
 #: Client/core/CConnectManager.cpp:149
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "إعادة الاتصال بـ %s:%u ..."
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:405
@@ -2172,16 +2175,16 @@ msgstr "الشفافية:"
 
 #: Client/core/CSettings.cpp:441
 msgid "Image resolution:"
-msgstr ""
+msgstr "دقة الصورة:"
 
 #: Client/core/CSettings.cpp:448
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (الافتراضى)"
 
 #. index 0
 #: Client/core/CSettings.cpp:449
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -2596,7 +2599,7 @@ msgstr "العرض في المستكشف"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:1205
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "أحفظ الصور المأخوذة بكاميرا السلاح لمجلد المستخدم جى تى أية سان أندرياس"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1211 Client/core/CSettings.cpp:1214
@@ -3293,11 +3296,11 @@ msgstr "جاري الإستعلام..."
 
 #: Client/game_sa/CGameSA.cpp:251 Client/game_sa/CGameSA.cpp:262
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "فشل تهية game_sa"
 
 #: Client/game_sa/CGameSA.cpp:253
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "اعتمادات الذاكرة فشلت"
 
 #: Client/game_sa/CSettingsSA.cpp:781
 msgid "Can't find valid screen resolution."
