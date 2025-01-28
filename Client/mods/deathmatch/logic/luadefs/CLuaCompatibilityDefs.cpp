@@ -37,7 +37,7 @@ void CLuaCompatibilityDefs::LoadFunctions()
         {"getPlayerTotalAmmo", CLuaPedDefs::GetPedTotalAmmo},
         {"getPedWeaponMuzzlePosition", CLuaPedDefs::GetPedWeaponMuzzlePosition},
         {"getPlayerOccupiedVehicle", CLuaPedDefs::GetPedOccupiedVehicle},
-        {"getPlayerArmor", CLuaPedDefs::GetPedArmor},
+        {"getPlayerArmor", ArgumentParserWarn<false, CLuaPedDefs::GetPedArmor>},
         {"getPlayerSkin", CLuaElementDefs::GetElementModel},
         {"isPlayerChoking", CLuaPedDefs::IsPedChoking},
         {"isPlayerDucked", CLuaPedDefs::IsPedDucked},

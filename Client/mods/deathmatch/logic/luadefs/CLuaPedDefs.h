@@ -38,7 +38,7 @@ public:
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);
-    LUA_DECLARE(GetPedArmor);
+    static float GetPedArmor(CClientPed* const ped) noexcept;
     LUA_DECLARE(IsPedChoking);
     LUA_DECLARE(IsPedDucked);
     LUA_DECLARE(IsPedInVehicle);
