@@ -19,17 +19,14 @@ CElementDeleter::CElementDeleter()
     m_bAllowUnreference = true;
 }
 
-void CElementDeleter::Delete(class CClientEntity* pElement, bool silent)
+void CElementDeleter::Delete(class CClientEntity* pElement)
 {
     // Make sure we don't try to delete it twice
     if (pElement && !IsBeingDeleted(pElement))
     {
         // Before we do anything, fire the on-destroy event
-        if (!silent)
-        {
-            CLuaArguments Arguments;
-            pElement->CallEvent("onClientElementDestroy", Arguments, true);
-        }
+        CLuaArguments Arguments;
+        pElement->CallEvent("onClientElementDestroy", Arguments, true);
 
         // Add it to our list
         if (!pElement->IsBeingDeleted())

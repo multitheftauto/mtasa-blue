@@ -295,6 +295,8 @@ CClientTexture* CClientRenderElementManager::FindAutoTexture(const SString& strF
         if (!pNewTextureElement)
             return nullptr;
 
+        pNewTextureElement->MakeSystemEntity();
+
         // Add to automap if created
         MapSet(m_AutoTextureMap, strUniqueName, SAutoTexture{pNewTextureElement});
         ppTextureElement = MapFind(m_AutoTextureMap, strUniqueName);
@@ -390,5 +392,5 @@ void CClientRenderElementManager::DoPulse()
     }   
 
     for (CClientTexture* texture : deleteCandidates)
-        g_pClientGame->GetElementDeleter()->Delete(texture, true);   
+        g_pClientGame->GetElementDeleter()->Delete(texture);   
 }
