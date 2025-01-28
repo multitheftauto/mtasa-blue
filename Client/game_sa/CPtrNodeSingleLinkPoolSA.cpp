@@ -36,9 +36,12 @@ static CPtrNodeSingleLinkPoolSA::pool_item_t* __cdecl HOOK_SingleLinkNodeDestruc
     return item;
 }
 
-void CPtrNodeSingleLinkPoolSA::StaticInstallHooks()
+void CPtrNodeSingleLinkPoolSA::StaticSetHooks()
 {
     EZHookInstall(SingleLinkNodeConstructor);
     EZHookInstall(SingleLinkNodeDestructor);
+
+    // Skip the original pool initialization
+    MemCpy((void*)0x550F26, "\xEB\x2D", 2);
 }
 

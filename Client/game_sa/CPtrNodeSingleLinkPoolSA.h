@@ -27,7 +27,7 @@ public:
     int GetUsedSize() const { return m_customPool->GetUsedSize(); }
 
     static auto* GetPoolInstance() { return m_customPool; } 
-    static void StaticInstallHooks();
+    static void StaticSetHooks();
 private:
     static pool_t* m_customPool;
 };
