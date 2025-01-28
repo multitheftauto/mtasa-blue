@@ -57,6 +57,7 @@ protected:
         CTickCount lastUse;
     };
 
+    CElapsedTime                                  m_texturePulseTimer;
     CClientManager*                               m_pClientManager;
     CRenderItemManagerInterface*                  m_pRenderItemManager;
     std::map<SString, SAutoTexture>               m_AutoTextureMap;

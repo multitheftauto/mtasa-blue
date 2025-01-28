@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include "CClientVectorGraphic.h"
 
+constexpr std::int64_t TEMPORARY_TEXTURES_CLEANUP_PERIOD = 5000ll;
 constexpr std::int64_t TEMPORARY_TEXTURES_CLEANUP_THRESHOLD = 10000ll;
 constexpr std::size_t TEMPORARY_TEXTURES_DELETE_THRESHOLD = 10u;
 
@@ -358,6 +359,11 @@ void CClientRenderElementManager::Remove(CClientRenderElement* pElement)
 
 void CClientRenderElementManager::DoPulse()
 {
+    if (m_texturePulseTimer.Get() < TEMPORARY_TEXTURES_CLEANUP_PERIOD)
+        return;
+
+    m_texturePulseTimer.Reset();
+
     const CTickCount now = CTickCount::Now();
 
     std::vector<CClientTexture*> deleteCandidates;
