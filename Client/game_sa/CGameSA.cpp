@@ -59,6 +59,7 @@
 #include "CIplStoreSA.h"
 #include "CBuildingRemovalSA.h"
 #include "CCheckpointSA.h"
+#include "CPtrNodeSingleLinkPoolSA.h"
 
 extern CGameSA* pGame;
 
@@ -245,6 +246,7 @@ CGameSA::CGameSA()
         CVehicleSA::StaticSetHooks();
         CCheckpointSA::StaticSetHooks();
         CHudSA::StaticSetHooks();
+        CPtrNodeSingleLinkPoolSA::StaticInstallHooks();
     }
     catch (const std::bad_alloc& e)
     {

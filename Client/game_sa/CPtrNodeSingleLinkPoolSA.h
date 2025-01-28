@@ -1,0 +1,33 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPtrNodeSingleLinkPoolSA.h
+ *  PURPOSE:     Custom implementation for the CPtrNodeSingleLinkPool pool
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#pragma once
+ 
+#include "CPoolSAInterface.h"
+#include "CDynamicPool.h"
+#include "CPtrNodeSingleListSA.h"
+
+class CPtrNodeSingleLinkPoolSA
+{
+public:
+    using pool_item_t = CPtrNodeSingleLink<void*>;
+    using pool_t = CDynamicPool<pool_item_t, PoolGrownByHalfStrategy<MAX_POINTER_SINGLE_LINKS>>;
+
+    CPtrNodeSingleLinkPoolSA();
+
+    int GetCapacity() const { return m_customPool->GetCapacity(); }
+    int GetUsedSize() const { return m_customPool->GetUsedSize(); }
+
+    static auto* GetPoolInstance() { return m_customPool; } 
+    static void StaticInstallHooks();
+private:
+    static pool_t* m_customPool;
+};
