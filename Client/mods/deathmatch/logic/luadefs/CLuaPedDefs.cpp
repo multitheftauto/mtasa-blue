@@ -87,7 +87,7 @@ void CLuaPedDefs::LoadFunctions()
 
         {"getPedStat", GetPedStat},
         {"getPedOxygenLevel", GetPedOxygenLevel},
-        {"getPedArmor", GetPedArmor},
+        {"getPedArmor", ArgumentParserWarn<false, GetPedArmor>},
         {"isPedBleeding", ArgumentParser<IsPedBleeding>},
 
         {"getPedContactElement", GetPedContactElement},
@@ -784,26 +784,9 @@ int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedArmor(lua_State* luaVM)
+float CLuaPedDefs::GetPedArmor(CClientPed* const ped) noexcept
 {
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        // Grab the armor and return it
-        float fArmor = pPed->GetArmor();
-        lua_pushnumber(luaVM, fArmor);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return ped->GetArmor();
 }
 
 int CLuaPedDefs::GetPedStat(lua_State* luaVM)
@@ -2395,6 +2378,12 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
 
 bool CLuaPedDefs::SetPedArmor(CClientPed* const ped, const float armor)
 {
+    if (armor < 0.0f)
+        throw std::invalid_argument("Armor must be greater than or equal to 0");
+
+    if (armor > 100.0f)
+        throw std::invalid_argument("Armor must be less than or equal to 100");
+
     ped->SetArmor(armor);
     return true;
 }
