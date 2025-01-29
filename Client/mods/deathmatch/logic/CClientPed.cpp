@@ -129,7 +129,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_uiOccupiedVehicleSeat = 0xFF;
     m_bHealthLocked = false;
     m_bDontChangeRadio = false;
-    m_bArmorLocked = false;
+    m_armorLocked = false;
     m_ulLastOnScreenTime = 0;
     m_pLoadedModelInfo = NULL;
     m_pOutOfVehicleWeaponSlot = WEAPONSLOT_MAX;            // WEAPONSLOT_MAX = invalid
@@ -157,7 +157,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bVisible = true;
     m_bUsesCollision = true;
     m_fHealth = 100.0f;
-    m_fArmor = 0.0f;
+    m_armor = 0.0f;
     m_bDead = false;
     m_bWorldIgnored = false;
     m_fCurrentRotation = 0.0f;
@@ -1793,29 +1793,28 @@ void CClientPed::InternalSetHealth(float fHealth)
     }
 }
 
-float CClientPed::GetArmor()
+float CClientPed::GetArmor() const noexcept
 {
-    if (m_bArmorLocked)
-        return m_fArmor;
+    if (m_armorLocked)
+        return m_armor;
 
     if (m_pPlayerPed)
-    {
         return m_pPlayerPed->GetArmor();
-    }
-    return m_fArmor;
+
+    return m_armor;
 }
 
-void CClientPed::SetArmor(float fArmor)
+void CClientPed::SetArmor(float armor) noexcept
 {
-    // If our armor is locked, dont allow any change
-    if (m_bArmorLocked)
+    if (m_armorLocked)
         return;
 
+    armor = std::clamp(armor, 0.0f, 100.0f);
+
     if (m_pPlayerPed)
-    {
-        m_pPlayerPed->SetArmor(fArmor);
-    }
-    m_fArmor = fArmor;
+        m_pPlayerPed->SetArmor(armor);
+
+    m_armor = armor;
 }
 
 void CClientPed::LockHealth(float fHealth)
@@ -1824,10 +1823,10 @@ void CClientPed::LockHealth(float fHealth)
     m_fHealth = fHealth;
 }
 
-void CClientPed::LockArmor(float fArmor)
+void CClientPed::LockArmor(float armor) noexcept
 {
-    m_bArmorLocked = true;
-    m_fArmor = fArmor;
+    m_armorLocked = true;
+    m_armor = armor;
 }
 
 float CClientPed::GetOxygenLevel()
@@ -2772,9 +2771,9 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         }
 
         // Is our armor locked?
-        if (m_bArmorLocked)
+        if (m_armorLocked)
         {
-            m_pPlayerPed->SetArmor(m_fArmor);
+            m_pPlayerPed->SetArmor(m_armor);
         }
 
         // In a vehicle?
@@ -3334,14 +3333,20 @@ void CClientPed::SetTargetRotation(float fRotation)
     SetCurrentRotation(fRotation);
 }
 
-void CClientPed::SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation)
+void CClientPed::SetTargetRotation(unsigned long ulDelay, std::optional<float> rotation, std::optional<float> cameraRotation)
 {
     m_ulBeginRotationTime = CClientTime::GetTime();
     m_ulEndRotationTime = m_ulBeginRotationTime + ulDelay;
-    m_fBeginRotation = (m_pPlayerPed) ? m_pPlayerPed->GetCurrentRotation() : m_fCurrentRotation;
-    m_fTargetRotationA = fRotation;
-    m_fBeginCameraRotation = GetCameraRotation();
-    m_fTargetCameraRotation = fCameraRotation;
+    if (rotation.has_value())
+    {
+        m_fBeginRotation = (m_pPlayerPed) ? m_pPlayerPed->GetCurrentRotation() : m_fCurrentRotation;
+        m_fTargetRotationA = rotation.value();
+    }
+    if (cameraRotation.has_value())
+    {
+        m_fBeginCameraRotation = GetCameraRotation();
+        m_fTargetCameraRotation = cameraRotation.value();
+    }
 }
 
 // Temporary
@@ -3623,7 +3628,7 @@ void CClientPed::_CreateModel()
         m_pPlayerPed->SetVisible(m_bVisible);
         m_pPlayerPed->SetUsesCollision(m_bUsesCollision);
         m_pPlayerPed->SetHealth(m_fHealth);
-        m_pPlayerPed->SetArmor(m_fArmor);
+        m_pPlayerPed->SetArmor(m_armor);
         m_pPlayerPed->SetLighting(m_fLighting);
         WorldIgnore(m_bWorldIgnored);
 
@@ -4225,10 +4230,10 @@ bool CClientPed::PerformChecks()
             // The player should not be able to gain any health/armor without us knowing..
             // meaning all health/armor giving must go through SetHealth/SetArmor.
             if ((m_fHealth > 0.0f && m_pPlayerPed->GetHealth() > m_fHealth + FLOAT_EPSILON) ||
-                (m_fArmor < 100.0f && m_pPlayerPed->GetArmor() > m_fArmor + FLOAT_EPSILON))
+                (m_armor < 100.0f && m_pPlayerPed->GetArmor() > m_armor + FLOAT_EPSILON))
             {
                 g_pCore->GetConsole()->Printf("healthCheck: %f %f", m_pPlayerPed->GetHealth(), m_fHealth);
-                g_pCore->GetConsole()->Printf("armorCheck: %f %f", m_pPlayerPed->GetArmor(), m_fArmor);
+                g_pCore->GetConsole()->Printf("armorCheck: %f %f", m_pPlayerPed->GetArmor(), m_armor);
                 return false;
             }
             // Perform the checks in CGame

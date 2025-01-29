@@ -566,8 +566,12 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
         {
             return pThePedEntity->pClientEntity;
         }
+
+        auto clientBuilding = m_BuildingsPool.GetClientBuilding(reinterpret_cast<CBuildingSAInterface*>(pGameInterface));
+        if (clientBuilding)
+            return clientBuilding;
     }
-    return NULL;
+    return nullptr;
 }
 
 static void CreateMissionTrain(const CVector& vecPos, bool bDirection, std::uint32_t uiTrainType, CTrainSAInterface** ppTrainBeginning,
