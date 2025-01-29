@@ -1,4 +1,12 @@
-#include <SharedUtil.IntTypes.h>
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CDirectorySA.h
+ *
+ *****************************************************************************/
+
+#pragma once
 
 struct DirectoryInfo
 {

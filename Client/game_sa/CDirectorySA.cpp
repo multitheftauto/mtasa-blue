@@ -1,3 +1,11 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CDirectorySA.cpp
+ *
+ *****************************************************************************/
+
 #include "StdInc.h"
 #include "CDirectorySA.h"
 
