@@ -132,13 +132,13 @@ end
 function http.create_download_progress_handler(options)
 	local last_update = 0
 
-    return function (total, current)
-    	local tick = os.clock()
-    	if tick - last_update < options.update_interval_s then
-    		return
-    	end
+	return function (total, current)
+		local tick = os.clock()
+		if tick - last_update < options.update_interval_s then
+			return
+		end
 
-    	last_update = tick
+		last_update = tick
 
 		local ratio = current / total;
 		ratio = math.min(math.max(ratio, 0), 1)
