@@ -206,7 +206,7 @@ public:
     float GetCurrentRotation();
     void  SetCurrentRotation(float fRotation, bool bIncludeTarget = true);
     void  SetTargetRotation(float fRotation);
-    void  SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation);
+    void  SetTargetRotation(unsigned long ulDelay, std::optional<float> rotation, std::optional<float> cameraRotation);
 
     float GetCameraRotation();
     void  SetCameraRotation(float fRotation);

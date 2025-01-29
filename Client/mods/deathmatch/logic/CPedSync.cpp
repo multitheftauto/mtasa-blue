@@ -266,7 +266,7 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
                 if (ucFlags & 0x01)
                     pPed->SetTargetPosition(vecPosition, PED_SYNC_RATE);
                 if (ucFlags & 0x02)
-                    pPed->SetTargetRotation(PED_SYNC_RATE, fRotation, 0.0f);
+                    pPed->SetTargetRotation(PED_SYNC_RATE, fRotation, std::nullopt);
                 if (ucFlags & 0x04)
                     pPed->SetMoveSpeed(vecMoveSpeed);
                 if (ucFlags & 0x08)
@@ -274,7 +274,7 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
                 if (ucFlags & 0x10)
                     pPed->LockArmor(fArmor);
                 if (flags2 & 0x01)
-                    pPed->SetCameraRotation(cameraRotation);
+                    pPed->SetTargetRotation(PED_SYNC_RATE, std::nullopt, cameraRotation);
                 if (BitStream.Version() >= 0x04E && ucFlags & 0x20)
                     pPed->SetOnFire(bOnFire);
                 if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
