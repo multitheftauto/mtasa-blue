@@ -124,6 +124,14 @@ void CPedSync::Packet_PedStartSync(NetBitStreamInterface& BitStream)
             float fHealth, fArmor;
             BitStream.Read(fHealth);
             BitStream.Read(fArmor);
+            
+            if (BitStream.Can(eBitStreamVersion::PedSync_CameraRotation))
+            {
+                float cameraRotation{};
+                BitStream.Read(cameraRotation);
+
+                pPed->SetCameraRotation(cameraRotation);
+            }
 
             // Set data
             pPed->SetPosition(vecPosition);
@@ -179,10 +187,15 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             unsigned char ucFlags = 0;
             BitStream.Read(ucFlags);
 
+            std::uint8_t flags2{};
+            if (BitStream.Can(eBitStreamVersion::PedSync_CameraRotation))
+                BitStream.Read(flags2);
+
             CVector vecPosition{ CVector::NoInit{} }, vecMoveSpeed{ CVector::NoInit{} };
             float   fRotation, fHealth, fArmor;
             bool    bOnFire;
             bool    bIsInWater;
+            float   cameraRotation;
 
             if (BitStream.Can(eBitStreamVersion::PedSync_Revision))
             {
@@ -231,6 +244,13 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             if (ucFlags & 0x10)
                 BitStream.Read(fArmor);
 
+            if (flags2 & 0x01)
+            {
+                SCameraRotationSync camRotation;
+                BitStream.Read(&camRotation);
+                cameraRotation = camRotation.data.fRotation;
+            }
+
             // And the burning state
             if (BitStream.Version() >= 0x04E && ucFlags & 0x20)
                 BitStream.ReadBit(bOnFire);
@@ -253,6 +273,8 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
                     pPed->LockHealth(fHealth);
                 if (ucFlags & 0x10)
                     pPed->LockArmor(fArmor);
+                if (flags2 & 0x01)
+                    pPed->SetCameraRotation(cameraRotation);
                 if (BitStream.Version() >= 0x04E && ucFlags & 0x20)
                     pPed->SetOnFire(bOnFire);
                 if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
@@ -312,8 +334,12 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     if (pPed->HasSyncedAnim() && (!pPed->IsRunningAnimation() || pPed->m_animationOverridedByClient))
         ucFlags |= 0x80;
 
+    std::uint8_t flags2{};
+    if (pPed->GetCameraRotation() != pPed->m_LastSyncedData->cameraRotation && pBitStream->Can(eBitStreamVersion::PedSync_CameraRotation))
+        flags2 |= 0x01;
+
     // Do we really have to sync this ped?
-    if (ucFlags == 0)
+    if (ucFlags == 0 && flags2 == 0)
         return;
 
     // Write the ped id
@@ -324,6 +350,10 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
 
     // Write flags
     pBitStream->Write(ucFlags);
+
+    // Write flags 2
+    if (pBitStream->Can(eBitStreamVersion::PedSync_CameraRotation))
+        pBitStream->Write(flags2);
 
     // Write position if needed
     if (ucFlags & 0x01)
@@ -387,6 +417,14 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     {
         pBitStream->Write(pPed->GetArmor());
         pPed->m_LastSyncedData->fArmour = pPed->GetArmor();
+    }
+
+    if (flags2 & 0x01)
+    {
+        SCameraRotationSync camRotation;
+        camRotation.data.fRotation = pPed->GetCameraRotation();
+        pBitStream->Write(&camRotation);
+        pPed->m_LastSyncedData->cameraRotation = camRotation.data.fRotation;
     }
 
     if (ucFlags & 0x20 && pBitStream->Version() >= 0x04E)

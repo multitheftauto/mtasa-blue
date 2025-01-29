@@ -236,6 +236,9 @@ public:
     float GetRotation() { return m_fRotation; }
     void  SetRotation(float fRotation) { m_fRotation = fRotation; }
 
+    float GetCameraRotation() const { return m_cameraRotation; }
+    void  SetCameraRotation(float fRotation) { m_cameraRotation = fRotation; }
+
     void GetRotation(CVector& vecRotation);
     void GetMatrix(CMatrix& matrix);
     void SetMatrix(const CMatrix& matrix);
@@ -346,6 +349,7 @@ protected:
     bool                                 m_reloadingWeapon{};
     CVehicle*                            m_pJackingVehicle;
     SPlayerAnimData                      m_animData{};
+    float                                m_cameraRotation{};
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;
