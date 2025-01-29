@@ -854,7 +854,7 @@ void CPedSA::SetBleeding(bool bBleeding)
 bool CPedSA::SetOnFire(bool onFire)
 {
     CPedSAInterface* pInterface = GetPedInterface();
-    if (onFire && pInterface->pFireOnPed)
+    if (onFire == !!pInterface->pFireOnPed)
         return false;
 
     auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
@@ -876,17 +876,11 @@ bool CPedSA::SetOnFire(bool onFire)
     }
     else
     {
-        bool wasFire = false;
-
         CFire* fire = fireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
-        if (fire)
-        {
-            fire->Extinguish();
-            wasFire = true;
-        }
+        if (!fire)
+            return false;
 
-        CTaskManager* taskManager = m_pPedIntelligence->GetTaskManager();
-        return wasFire || (taskManager && taskManager->RemoveTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM, TASK_SIMPLE_PLAYER_ON_FIRE));
+        fire->Extinguish();
     }
 
     return true;
