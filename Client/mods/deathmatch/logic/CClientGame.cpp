@@ -3734,6 +3734,9 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
                 case CCLIENTOBJECT:
                     iTypeMask = TYPE_MASK_OBJECT;
                     break;
+                case CCLIENTBUILDING:
+                    iTypeMask = TYPE_MASK_WORLD;
+                    break;
                 default:
                     iTypeMask = TYPE_MASK_OTHER;
                     break;
@@ -4368,7 +4371,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 {
     float fPreviousHealth = pDamagedPed->m_fHealth;
     float fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
-    float fPreviousArmor = pDamagedPed->m_fArmor;
+    float fPreviousArmor = pDamagedPed->m_armor;
     float fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
     // Have we taken any damage here?
@@ -4404,7 +4407,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             {
                 // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
                 fPreviousHealth = pDamagedPed->m_fHealth;
-                fPreviousArmor = pDamagedPed->m_fArmor;
+                fPreviousArmor = pDamagedPed->m_armor;
             }
             pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
             pDamagedPed->GetGamePlayer()->SetArmor(fPreviousArmor);
@@ -4450,7 +4453,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 
         // Update our stored health/armor
         pDamagedPed->m_fHealth = fCurrentHealth;
-        pDamagedPed->m_fArmor = fCurrentArmor;
+        pDamagedPed->m_armor = fCurrentArmor;
 
         ElementID damagerID = INVALID_ELEMENT_ID;
         if (pInflictingEntity && !pInflictingEntity->IsLocalEntity())
