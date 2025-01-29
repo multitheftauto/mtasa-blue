@@ -133,6 +133,53 @@ public:
         return size;
     }
 
+    bool SetCapacity(std::size_t newSize) {
+        if (newSize == 0)
+            return false;
+
+        std::size_t currentSize = GetCapacity();
+
+        if (currentSize == newSize)
+            return false;
+        else if (currentSize < newSize)
+        {
+            // Grown
+            while (currentSize < newSize)
+            {
+                try
+                {
+                    auto* nextPart = AllocateNewPart();
+                    currentSize += nextPart->GetCapacity();
+                }
+                catch (const std::bad_alloc& ex)
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            // Shrink
+            while (true)
+            {
+                auto* part = m_poolParts.back().get();
+                if (part->GetUsedSize() != 0)
+                    return false;
+
+                currentSize -= part->GetCapacity();
+                if (currentSize < newSize)
+                    return false;
+
+                m_poolParts.pop_back();
+
+                if (currentSize == newSize)
+                    return true;
+            }
+        }
+        
+        return true;
+    }
+
 private:
     CDynamicPoolPart<PoolObjT>* AllocateNewPart()
     {

@@ -98,7 +98,7 @@ public:
     CBuildingsPool& GetBuildingsPool() noexcept override { return m_BuildingsPool; };
     CDummyPool&     GetDummyPool() noexcept { return m_DummyPool; };
     CTxdPool&       GetTxdPool() noexcept { return m_TxdPool; };
-    CPtrNodeSingleLinkPoolSA& GetPtrNodeSingleLinkPool() noexcept { return m_PtrNodeSingleLinkPool; };
+    CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept override { return m_PtrNodeSingleLinkPool; };
 
 private:
     // Pools

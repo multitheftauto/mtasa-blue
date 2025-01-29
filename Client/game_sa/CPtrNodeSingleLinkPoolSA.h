@@ -14,8 +14,9 @@
 #include "CPoolSAInterface.h"
 #include "CDynamicPool.h"
 #include "CPtrNodeSingleListSA.h"
+#include <game/CPtrNodeSingleLinkPool.h>
 
-class CPtrNodeSingleLinkPoolSA
+class CPtrNodeSingleLinkPoolSA final : public CPtrNodeSingleLinkPool
 {
 public:
     using pool_item_t = CPtrNodeSingleLink<void*>;
@@ -23,8 +24,10 @@ public:
 
     CPtrNodeSingleLinkPoolSA();
 
-    int GetCapacity() const { return m_customPool->GetCapacity(); }
-    int GetUsedSize() const { return m_customPool->GetUsedSize(); }
+    std::size_t GetCapacity() const override { return m_customPool->GetCapacity(); }
+    std::size_t GetUsedSize() const override { return m_customPool->GetUsedSize(); }
+
+    bool Resize(std::size_t newSize) override { return m_customPool->SetCapacity(newSize); };
 
     static auto* GetPoolInstance() { return m_customPool; } 
     static void StaticSetHooks();
