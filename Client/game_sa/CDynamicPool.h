@@ -54,7 +54,6 @@ public:
     {
         auto pos = item - m_items.get();
         assert(m_usedSlots[pos], "Invalid item for CDynamicPoolPart::RemoveItem");
-        item->~PoolObjT();
 
         m_usedSlots[pos] = false;
         m_usedSize--;
