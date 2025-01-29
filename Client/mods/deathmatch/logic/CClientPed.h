@@ -105,7 +105,7 @@ struct SLastSyncedPedData
     CVector vPosition;
     CVector vVelocity;
     float   fRotation;
-    float   cameraRotation;
+    float   cameraRotation{};
     bool    bOnFire;
     bool    bIsInWater;
     bool    isReloadingWeapon;

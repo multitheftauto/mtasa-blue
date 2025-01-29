@@ -335,7 +335,7 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         ucFlags |= 0x80;
 
     std::uint8_t flags2{};
-    if (pPed->GetCameraRotation() != pPed->m_LastSyncedData->cameraRotation && pBitStream->Can(eBitStreamVersion::PedSync_CameraRotation))
+    if (!IsNearlyEqual(pPed->GetCameraRotation(), pPed->m_LastSyncedData->cameraRotation) && pBitStream->Can(eBitStreamVersion::PedSync_CameraRotation))
         flags2 |= 0x01;
 
     // Do we really have to sync this ped?
