@@ -59,7 +59,7 @@ public:
         m_usedSize--;
     }
 
-    bool        OwnsItem(PoolObjT* item) const noexcept { return item >= m_items.get() && item < m_items.get() + m_size * sizeof(PoolObjT); }
+    bool        OwnsItem(PoolObjT* item) const noexcept { return item >= m_items.get() && item < m_items.get() + m_size; }
     bool        HasFreeSize() const noexcept { return m_size != m_usedSize; }
     std::size_t GetCapacity() const noexcept { return m_size; }
     std::size_t GetUsedSize() const noexcept { return m_usedSize; }
