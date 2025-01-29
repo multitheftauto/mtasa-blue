@@ -219,9 +219,6 @@ void CFireSA::SetNumGenerationsAllowed(char generations)
 ////////////////////////////////////////////////////////////////////////
 static void AbortFireTask(CEntitySAInterface* entityOnFire)
 {
-    if (!entityOnFire)
-        return;
-
     auto ped = pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(entityOnFire));
     if (!ped || !ped->pEntity)
         return;
