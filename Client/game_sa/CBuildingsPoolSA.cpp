@@ -18,6 +18,7 @@
 #include "CPtrNodeSingleListSA.h"
 #include "MemSA.h"
 #include "CVehicleSA.h"
+#include "CBuildingRemovalSA.h"
 
 extern CGameSA* pGame;
 
@@ -46,6 +47,16 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
     ++m_buildingPool.count;
 
     return true;
+}
+
+CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept
+{
+    std::uint32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pGameInterface);
+
+    if (poolIndex == static_cast<std::uint32_t>(-1))
+        return nullptr;
+
+    return m_buildingPool.entities[poolIndex].pClientEntity;
 }
 
 CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior)
@@ -174,6 +185,9 @@ void CBuildingsPoolSA::RestoreBackup()
     if (!m_pOriginalBuildingsBackup)
         return;
 
+    auto* worldSA = pGame->GetWorld();
+    auto* buildingRemovealSA = static_cast<CBuildingRemovalSA*>(pGame->GetBuildingRemoval());
+
     auto& originalData = *m_pOriginalBuildingsBackup;
     auto  pBuildsingsPool = (*m_ppBuildingPoolInterface);
     for (size_t i = 0; i < MAX_BUILDINGS; i++)
@@ -184,7 +198,8 @@ void CBuildingsPoolSA::RestoreBackup()
             auto pBuilding = pBuildsingsPool->GetObject(i);
             *pBuilding = originalData[i].second;
 
-            pGame->GetWorld()->Add(pBuilding, CBuildingPool_Constructor);
+            worldSA->Add(pBuilding, CBuildingPool_Constructor);
+            buildingRemovealSA->AddDataBuilding(pBuilding);
         }
     }
 

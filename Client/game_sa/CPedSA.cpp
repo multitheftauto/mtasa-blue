@@ -259,14 +259,14 @@ void CPedSA::SetHealth(float fHealth)
     GetPedInterface()->fHealth = fHealth;
 }
 
-float CPedSA::GetArmor()
+float CPedSA::GetArmor() noexcept
 {
     return GetPedInterface()->fArmor;
 }
 
-void CPedSA::SetArmor(float fArmor)
+void CPedSA::SetArmor(float armor) noexcept
 {
-    GetPedInterface()->fArmor = fArmor;
+    GetPedInterface()->fArmor = armor;
 }
 
 float CPedSA::GetOxygenLevel()
