@@ -1266,14 +1266,27 @@ int CLuaWorldDefs::SetOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
+bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(const WorldSpecialProperty property) noexcept
 {
     return m_pClientGame->IsWorldSpecialProperty(property);
 }
 
-bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
+bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(const WorldSpecialProperty property, const bool enabled) noexcept
 {
-    return m_pClientGame->SetWorldSpecialProperty(property, isEnabled);
+    if (!m_pClientGame->SetWorldSpecialProperty(property, enabled))
+        return false;
+
+    if (!g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent))
+        return true;
+
+    if (auto stream = g_pNet->AllocateNetBitStream())
+    {
+        stream->WriteString(EnumToString(property));
+        stream->WriteBit(enabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+    }
+
+    return true;
 }
 
 int CLuaWorldDefs::SetCloudsEnabled(lua_State* luaVM)
