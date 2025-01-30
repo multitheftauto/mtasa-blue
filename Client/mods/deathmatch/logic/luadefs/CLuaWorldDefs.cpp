@@ -1284,6 +1284,7 @@ bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(const WorldSpecialProperty pr
         stream->WriteString(EnumToString(property));
         stream->WriteBit(enabled);
         g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
     }
 
     return true;
