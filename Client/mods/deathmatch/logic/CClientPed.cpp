@@ -3333,14 +3333,20 @@ void CClientPed::SetTargetRotation(float fRotation)
     SetCurrentRotation(fRotation);
 }
 
-void CClientPed::SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation)
+void CClientPed::SetTargetRotation(unsigned long ulDelay, std::optional<float> rotation, std::optional<float> cameraRotation)
 {
     m_ulBeginRotationTime = CClientTime::GetTime();
     m_ulEndRotationTime = m_ulBeginRotationTime + ulDelay;
-    m_fBeginRotation = (m_pPlayerPed) ? m_pPlayerPed->GetCurrentRotation() : m_fCurrentRotation;
-    m_fTargetRotationA = fRotation;
-    m_fBeginCameraRotation = GetCameraRotation();
-    m_fTargetCameraRotation = fCameraRotation;
+    if (rotation.has_value())
+    {
+        m_fBeginRotation = (m_pPlayerPed) ? m_pPlayerPed->GetCurrentRotation() : m_fCurrentRotation;
+        m_fTargetRotationA = rotation.value();
+    }
+    if (cameraRotation.has_value())
+    {
+        m_fBeginCameraRotation = GetCameraRotation();
+        m_fTargetCameraRotation = cameraRotation.value();
+    }
 }
 
 // Temporary
