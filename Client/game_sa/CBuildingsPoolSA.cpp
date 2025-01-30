@@ -51,7 +51,7 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
 
 CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept
 {
-    std::uint32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndex(pGameInterface);
+    std::uint32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pGameInterface);
 
     if (poolIndex == static_cast<std::uint32_t>(-1))
         return nullptr;
