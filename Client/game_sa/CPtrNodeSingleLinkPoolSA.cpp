@@ -36,10 +36,31 @@ static CPtrNodeSingleLinkPoolSA::pool_item_t* __cdecl HOOK_SingleLinkNodeDestruc
     return item;
 }
 
+// Replace pool->RemoveItem here
+constexpr std::uint32_t      HOOKPOS_CPtrListSingleLink_Flush = 0x55243B;
+constexpr std::size_t        HOOKSIZE_CPtrListSingleLink_Flush = 6;
+constexpr std::uint32_t      CONTINUE_CPtrListSingleLink_Flush = 0x55245B;
+static void _declspec(naked) HOOK_CPtrListSingleLink_Flush()
+{
+    __asm {
+        mov edi, ecx ; save register
+
+        ; CPtrNodeSingleLinkPoolSA::m_customPool->RemoveItem(eax)
+
+        mov ecx, CPtrNodeSingleLinkPoolSA::m_customPool
+        push eax
+        call CPtrNodeSingleLinkPoolSA::pool_t::RemoveItem
+
+        mov ecx, edi ; restore
+        jmp CONTINUE_CPtrListSingleLink_Flush
+    }
+}
+
 void CPtrNodeSingleLinkPoolSA::StaticSetHooks()
 {
     EZHookInstall(SingleLinkNodeConstructor);
     EZHookInstall(SingleLinkNodeDestructor);
+    EZHookInstall(CPtrListSingleLink_Flush);
 
     // Skip the original pool initialization
     MemCpy((void*)0x550F26, "\xEB\x2D", 2);
