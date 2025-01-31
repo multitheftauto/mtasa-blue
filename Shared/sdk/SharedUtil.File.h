@@ -1,19 +1,31 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        SharedUtil.File.h
- *  PURPOSE:
+ *  FILE:        Shared/sdk/SharedUtil.File.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
 #include <vector>
 #include "SharedUtil.IntTypes.h"
 #include "SString.h"
 #include "WString.h"
+
+// C++20?
+#if __cplusplus >= 202002L
+// Forward declaration of std::filesystem::path to avoid including the <filesystem>
+namespace std
+{
+    namespace filesystem
+    {
+        class path;
+    }
+}
+#endif
 
 namespace SharedUtil
 {
@@ -99,8 +111,13 @@ namespace SharedUtil
     uint    GetPathFreeSpaceMB(const SString& strPath);
     SString GetDriveNameWithNotEnoughSpace(uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10);
 
-    WString FromUTF8(const SString& strPath);
-    SString ToUTF8(const WString& strPath);
+    std::wstring FromUTF8(const std::string& strPath);
+    std::string  ToUTF8(const std::wstring& wstrPath);
+
+    // C++20?
+    #if __cplusplus >= 202002L
+    std::string PathToUtf8(const std::filesystem::path& path);
+    #endif
 
     std::vector<std::string> ListDir(const char* szPath) noexcept;
 

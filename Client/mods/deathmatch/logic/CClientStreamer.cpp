@@ -53,7 +53,7 @@ CClientStreamer::~CClientStreamer()
     m_ExtraRows.clear();
 }
 
-void CClientStreamer::CreateSectors(list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight)
+void CClientStreamer::CreateSectors(list<CClientStreamSectorRow*>* pList, const CVector2D& vecSize, const CVector2D& vecBottomLeft, const CVector2D& vecTopRight)
 {
     // Creates our sectors within rows, filling up our rectangle, connecting each sector and row
     CClientStreamSector *   pCurrent = NULL, *pPrevious = NULL, *pPreviousRowSector = NULL;

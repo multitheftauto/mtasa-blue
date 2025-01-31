@@ -4,6 +4,8 @@ project "Client Deathmatch"
 	targetname "client"
 	targetdir(buildpath("mods/deathmatch"))
 
+	cppdialect "C++20"
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
