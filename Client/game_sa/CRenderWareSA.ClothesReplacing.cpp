@@ -8,6 +8,7 @@
 
 #include "StdInc.h"
 #include "CGameSA.h"
+#include "CDirectorySA.h"
 #include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
@@ -28,8 +29,10 @@ namespace
         uint uiLoadflag;            // 0-not loaded  2-requested  3-loaded  1-processed
     };
 
-    std::map<ushort, char*> ms_ReplacementClothesFileDataMap;
-    bool                    bClothesReplacementChanged = false;
+    std::map<ushort, char*>  ms_ReplacementClothesFileDataMap;
+    std::map<ushort, uint16> ms_OriginalStreamingSizesMap;
+
+    bool bClothesReplacementChanged = false;
 
     struct SPlayerImgItem
     {
@@ -45,44 +48,67 @@ namespace
         uint            uiArraySize;
     };
 
-    DWORD FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
-    int   iReturnFileId;
-    char* pReturnBuffer;
+    DWORD               FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
+    CDirectorySA*       CLOTHES_DIRECTORY = *reinterpret_cast<CDirectorySA**>(0x5A419B);
+    int                 iReturnFileId;
+    char*               pReturnBuffer;
+
+
+    uint32_t GetSizeInBlocks(uint32_t size)
+    {
+        auto div = std::div(size, 2048);
+        return (div.quot + (div.rem ? 1 : 0));
+    }
+
+    uint32_t GetSizeInBlocks(uint64_t size)
+    {
+        return GetSizeInBlocks((uint32_t)size);
+    }
 }            // namespace
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::ClothesAddReplacementTxd
+// CRenderWareSA::ClothesAddReplacement
 //
-// Add replacement txd for a clothing component
+// Add replacement txd/dff for a clothing component
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::ClothesAddReplacementTxd(char* pFileData, ushort usFileId)
+void CRenderWareSA::ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId)
 {
     if (!pFileData)
         return;
+
     if (pFileData != MapFindRef(ms_ReplacementClothesFileDataMap, usFileId))
     {
         MapSet(ms_ReplacementClothesFileDataMap, usFileId, pFileData);
+        MapSet(ms_OriginalStreamingSizesMap, usFileId, CLOTHES_DIRECTORY->GetModelStreamingSize(usFileId));
+        CLOTHES_DIRECTORY->SetModelStreamingSize(usFileId, GetSizeInBlocks(fileSize));
+
         bClothesReplacementChanged = true;
     }
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::ClothesRemoveReplacementTxd
+// CRenderWareSA::ClothesRemoveReplacement
 //
-// Remove replacement txd for a clothing component
+// Remove replacement txd/dff for a clothing component
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::ClothesRemoveReplacementTxd(char* pFileData)
+void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
 {
     if (!pFileData)
         return;
+
     for (std::map<ushort, char*>::iterator iter = ms_ReplacementClothesFileDataMap.begin(); iter != ms_ReplacementClothesFileDataMap.end();)
     {
         if (iter->second == pFileData)
         {
+            uint16 originalStreamingSize = MapFindRef(ms_OriginalStreamingSizesMap, iter->first);
+
+            if (originalStreamingSize)
+                CLOTHES_DIRECTORY->SetModelStreamingSize(iter->first, originalStreamingSize);
+
             ms_ReplacementClothesFileDataMap.erase(iter++);
             bClothesReplacementChanged = true;
         }
@@ -110,7 +136,7 @@ bool CRenderWareSA::HasClothesReplacementChanged()
 // CStreaming_RequestModel_Mid
 //
 // If request is for a file inside player.img (imgId 5)
-// then maybe switch to replacement txd file data
+// then maybe switch to replacement txd/dff file data
 //
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGTAItemInfo* pImgGTAInfo)

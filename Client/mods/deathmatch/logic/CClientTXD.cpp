@@ -29,7 +29,7 @@ CClientTXD::~CClientTXD()
     }
 
     // Remove us from all the clothes replacement doo dah
-    g_pGame->GetRenderWare()->ClothesRemoveReplacementTxd(m_FileData.data());
+    g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_FileData.data());
 }
 
 bool CClientTXD::Load(bool isRaw, SString input, bool enableFiltering)
@@ -75,8 +75,8 @@ bool CClientTXD::Import(unsigned short usModelID)
                 return false;
         }
         m_bUsingFileDataForClothes = true;
-        // Note: ClothesAddReplacementTxd uses the pointer from m_FileData, so don't touch m_FileData until matching ClothesRemove call
-        g_pGame->GetRenderWare()->ClothesAddReplacementTxd(m_FileData.data(), usModelID - CLOTHES_MODEL_ID_FIRST);
+        // Note: ClothesAddReplacement uses the pointer from m_FileData, so don't touch m_FileData until matching ClothesRemove call
+        g_pGame->GetRenderWare()->ClothesAddReplacement(m_FileData.data(), m_FileData.size(), usModelID - CLOTHES_MODEL_ID_FIRST);
         return true;
     }
     else

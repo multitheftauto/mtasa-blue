@@ -577,3 +577,8 @@ const int CClientPlayerClothes::GetClothingGroupMax(unsigned char ucType)
 
     return 0;
 }
+
+bool CClientPlayerClothes::IsValidModel(unsigned short usModel)
+{
+    return usModel >= CLOTHES_MODEL_ID_FIRST && usModel <= CLOTHES_MODEL_ID_LAST;
+}
