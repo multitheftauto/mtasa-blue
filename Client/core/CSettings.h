@@ -424,10 +424,16 @@ private:
     void   LoadChatColorFromCVar(eChatColorType eType, const char* szCVar);
     void   LoadChatColorFromString(eChatColorType eType, const std::string& strColor);
     void   SaveChatColor(eChatColorType eType, const char* szCVar);
+    void   SaveChatSetting(const char* szCVar, int iVal);
+    void   SaveChatSetting(const char* szCVar, const std::string& strVal);
+    void   SaveChatSetting(const char* szCVar, bool bVal);
     CColor GetChatColorValues(eChatColorType eType);
     void   SetChatColorValues(eChatColorType eType, CColor pColor);
     int    GetMilliseconds(CGUIEdit* pEdit);
     void   SetMilliseconds(CGUIEdit* pEdit, int milliseconds);
+
+    void SetChatLayoutChanged(bool changed) { m_bChatLayoutChanged = changed; };
+    bool GetChatLayoutChanged() const { return m_bChatLayoutChanged; };
 
     void ResetGTAVolume();
     void SetRadioVolume(float fVolume);
@@ -469,4 +475,6 @@ private:
     int   m_iMaxAnisotropic;
 
     std::list<SKeyBindSection*> m_pKeyBindSections;
+
+    bool m_bChatLayoutChanged = false;
 };
