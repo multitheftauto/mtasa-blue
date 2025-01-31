@@ -13,7 +13,8 @@
 class CPtrNodeSingleLinkPool
 {
 public:
-    virtual bool Resize(std::size_t size) = 0;
+    virtual bool        Resize(std::size_t size) = 0;
+    virtual void        ResetCapacity() = 0;
     virtual std::size_t GetCapacity() const = 0;
     virtual std::size_t GetUsedSize() const = 0;
 };

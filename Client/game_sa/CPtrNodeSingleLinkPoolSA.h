@@ -28,6 +28,7 @@ public:
     std::size_t GetUsedSize() const override { return m_customPool->GetUsedSize(); }
 
     bool Resize(std::size_t newSize) override { return m_customPool->SetCapacity(newSize); };
+    void ResetCapacity() override { m_customPool->SetCapacity(MAX_POINTER_SINGLE_LINKS); };
 
     static auto* GetPoolInstance() { return m_customPool; } 
     static void StaticSetHooks();
