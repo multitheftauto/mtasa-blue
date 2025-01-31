@@ -114,7 +114,7 @@ public:
     void SetChokingHandler(ChokingHandler* pChokingHandler);
     void SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler);
     void SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler);
-    void SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler);
+    void SetPostWorldProcessEntitiesAfterPreRenderHandler(PostWorldProcessEntitiesAfterPreRenderHandler* pHandler);
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
     void SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler) override;
