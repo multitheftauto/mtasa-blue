@@ -103,6 +103,12 @@ enum class eRenderStage
     POST_GUI
 };
 
+class CTextureItem;
+class CMaterialItem;
+class CRenderItemManagerInterface;
+class CScreenGrabberInterface;
+class CPixelsManagerInterface;
+
 class CGraphicsInterface
 {
 public:

@@ -333,7 +333,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
 
     m_pLabelAddressDescription[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditAddress[type], "Enter an address [IP:Port]"));
     m_pLabelAddressDescription[type]->SetPosition(CVector2D(10, 5), false);
-    m_pLabelAddressDescription[type]->SetTextColor(0, 0, 0);
+    m_pLabelAddressDescription[type]->SetPlaceholderColors();
     m_pLabelAddressDescription[type]->AutoSize(m_pLabelAddressDescription[type]->GetText().c_str());
     m_pLabelAddressDescription[type]->SetAlpha(0.6f);
     m_pLabelAddressDescription[type]->SetProperty("MousePassThroughEnabled", "True");
@@ -421,7 +421,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
 
     m_pLabelSearchDescription[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditSearch[type], _("Search servers...")));
     m_pLabelSearchDescription[type]->SetPosition(CVector2D(10, 3), false);
-    m_pLabelSearchDescription[type]->SetTextColor(0, 0, 0);
+    m_pLabelSearchDescription[type]->SetPlaceholderColors();
     m_pLabelSearchDescription[type]->SetSize(CVector2D(1, 1), true);
     m_pLabelSearchDescription[type]->SetAlpha(0.6f);
     m_pLabelSearchDescription[type]->SetProperty("MousePassThroughEnabled", "True");

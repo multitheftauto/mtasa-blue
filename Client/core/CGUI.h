@@ -118,4 +118,5 @@ private:
     SString m_LastSkinName;
     SString m_LastLocaleName;
     uint    m_LocaleChangeCounter;
+    bool    m_ModernSkinEnabled;
 };

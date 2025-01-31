@@ -44,6 +44,7 @@ CLocalGUI::CLocalGUI()
 
     m_LastSettingsRevision = -1;
     m_LocaleChangeCounter = 0;
+    CVARS_GET("cgui_modern_interface", m_ModernSkinEnabled);
 }
 
 CLocalGUI::~CLocalGUI()
@@ -138,6 +139,12 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
+    bool modern;
+    CVARS_GET("cgui_modern_interface", modern);
+
+    if (modern)
+        pGUI->SetModernSkinEnabled(true);
+
     // Create chatbox
     m_pChat = new CChat(pGUI, CVector2D(0.0125f, 0.015f));
     m_pChat->SetVisible(false, true);
@@ -171,6 +178,9 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     // Create our news headlines if we're already ingame
     if (bGameIsAlreadyLoaded)
         m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
+
+    if (modern)
+        pGUI->SetModernSkinEnabled(false);
 }
 
 void CLocalGUI::CreateObjects(IUnknown* pDevice)
@@ -212,6 +222,8 @@ void CLocalGUI::DestroyObjects()
 
 void CLocalGUI::DoPulse()
 {
+    bool didSetSkin = false;
+
     m_pVersionUpdater->DoPulse();
 
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
@@ -228,7 +240,10 @@ void CLocalGUI::DoPulse()
         if (currentSkinName != m_LastSkinName)
         {
             if (!CCore::GetSingleton().GetModManager()->IsLoaded())
+            {
                 SetSkin(currentSkinName);
+                didSetSkin = true;
+            }
             else
             {
                 CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing skin");
@@ -271,6 +286,28 @@ void CLocalGUI::DoPulse()
                     CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing language");
                     cvars->Set("locale", m_LastLocaleName);
                 }
+            }
+        }
+
+        // Check for modern skin change
+        bool modern;
+        CVARS_GET("cgui_modern_interface", modern);
+
+        if (modern != m_ModernSkinEnabled)
+        {
+            if (!CCore::GetSingleton().GetModManager()->IsLoaded())
+            {
+                m_ModernSkinEnabled = modern;
+
+                if (!didSetSkin)
+                {
+                    SetSkin(m_LastSkinName);
+                }
+            }
+            else
+            {
+                CCore::GetSingleton().GetConsole()->Printf("Please disconnect before setting modern interface");
+                cvars->Set("cgui_modern_interface", m_ModernSkinEnabled);
             }
         }
     }
