@@ -588,7 +588,7 @@ bool CCore::IsSettingsVisible()
     return false;
 }
 
-bool CCore::IsMenuVisible()
+bool CCore::IsMenuVisible() const noexcept
 {
     if (m_pLocalGUI)
     {

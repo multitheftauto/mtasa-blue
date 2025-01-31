@@ -5106,7 +5106,7 @@ bool CStaticFunctionDefinitions::SetCursorAlpha(float fAlpha)
 {
     if (fAlpha >= 0.0f && fAlpha <= 1.0f)
     {
-        if (!m_pCore->IsMenuVisible() && !m_pCore->GetConsole()->IsVisible())
+        if (!m_pCore->IsMenuVisible())
             m_pGUI->SetCursorAlpha(fAlpha, true);
         else
             m_pGUI->SetCurrentServerCursorAlpha(fAlpha);
