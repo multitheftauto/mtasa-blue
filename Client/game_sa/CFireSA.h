@@ -64,4 +64,6 @@ public:
     void              SetStrength(float fStrength);
     void              SetNumGenerationsAllowed(char generations);
     CFireSAInterface* GetInterface() { return internalInterface; }
+
+    static void StaticSetHooks();
 };
