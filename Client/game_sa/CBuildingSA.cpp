@@ -13,8 +13,21 @@
 #include "CBuildingSA.h"
 #include <game/CWorld.h>
 #include "CGameSA.h"
+#include "CMatrixSA.h"
+#include "CDynamicPool.h"
 
 extern CGameSA* pGame;
+
+class CMatrixLinkSAInterface : public CMatrixSAInterface
+{
+public:
+    CBuildingSAInterface* m_pOwner;
+    CMatrixLinkSAInterface* m_pPrev;
+    CMatrixLinkSAInterface* m_pNext;
+};
+
+using allocated_matrix_t = char[84];
+static CDynamicPool<allocated_matrix_t, PoolGrownAdd<0, 500>> EXCLUSIVE_MATRIX_POOL{};
 
 CBuildingSA::CBuildingSA(CBuildingSAInterface* pInterface)
 {
@@ -64,4 +77,43 @@ void CBuildingSA::SetLod(CBuilding* pLod)
             pGame->GetWorld()->Add(pCurrentLod, CBuilding_SetLod);
         }
     }
+}
+
+void CBuildingSA::SetMatrix(CMatrix* matrix)
+{
+    if (!m_pInterface->HasMatrix())
+        ReallocateMatrix();
+
+    //CEntitySA::SetMatrix(matrix);
+    CMatrixLinkSAInterface* pMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->Placeable.matrix);
+    pMatrix->SetMatrix(matrix->vRight, matrix->vFront, matrix->vUp, matrix->vPos);
+}
+
+void CBuildingSA::ReallocateMatrix()
+{
+    if (!m_pInterface->HasMatrix())
+        return;
+
+    auto* newMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(EXCLUSIVE_MATRIX_POOL.AllocateItem());
+    std::memcpy(newMatrix, m_pInterface->Placeable.matrix, sizeof(allocated_matrix_t));
+    newMatrix->m_pOwner = nullptr;
+    newMatrix->m_pPrev = nullptr;
+    newMatrix->m_pNext = nullptr;
+
+    m_pInterface->RemoveMatrix();
+    m_pInterface->Placeable.matrix = reinterpret_cast<CMatrix_Padded*>(newMatrix);
+}
+
+void CBuildingSA::RemoveAllocatedMatrix()
+{
+    if (!m_pInterface->HasMatrix())
+        return;
+
+    CMatrixLinkSAInterface* pMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->Placeable.matrix);
+
+    if (pMatrix->m_pOwner || (pMatrix->m_pNext && pMatrix->m_pPrev))
+        return;
+
+    EXCLUSIVE_MATRIX_POOL.RemoveItem(reinterpret_cast<allocated_matrix_t*>(m_pInterface->Placeable.matrix));
+    m_pInterface->Placeable.matrix = nullptr;
 }

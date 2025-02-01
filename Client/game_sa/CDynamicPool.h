@@ -29,6 +29,9 @@ public:
 
     PoolObjT* AllocateItem()
     {
+        if (m_unusedIndexes.empty())
+            return nullptr;
+
         std::size_t index = m_unusedIndexes.back();
         m_unusedIndexes.pop_back();
         return &m_items[index];
@@ -37,6 +40,9 @@ public:
     void RemoveItem(PoolObjT* item)
     {
         auto pos = item - m_items.get();
+        if (pos >= m_size)
+            return;
+
         m_unusedIndexes.push_back(pos);
     }
 
@@ -58,6 +64,13 @@ struct PoolGrownByHalfStrategy
     static constexpr std::size_t GetNextSize(std::size_t index) { return InitialSize / 2; }
 };
 
+template <std::size_t InitialSize, std::size_t Add>
+struct PoolGrownAdd
+{
+    static constexpr std::size_t GetInitialSize() { return InitialSize; }
+    static constexpr std::size_t GetNextSize(std::size_t index) { return Add; }
+};
+
 template <typename PoolObjT, typename GrownStrategy>
 class CDynamicPool
 {
@@ -65,7 +78,8 @@ public:
     CDynamicPool()
     {
         constexpr size_t initialSize = GrownStrategy::GetInitialSize();
-        m_poolParts.emplace_back(std::make_unique<CDynamicPoolPart<PoolObjT>>(initialSize));
+        if constexpr (initialSize != 0)
+            m_poolParts.emplace_back(std::make_unique<CDynamicPoolPart<PoolObjT>>(initialSize));
     }
 
     PoolObjT* AllocateItem()
@@ -90,7 +104,7 @@ public:
             }
         }
 
-        throw std::exception("Invalid item for CDynamicPool::RemoveItem");
+        assert(false, "Invalid item for CDynamicPool::RemoveItem");
     }
 
     std::size_t GetCapacity() const noexcept

@@ -98,6 +98,8 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
 
     // Add building in world
     auto pBuildingSA = new CBuildingSA(pBuilding);
+    pBuildingSA->ReallocateMatrix();
+
     pGame->GetWorld()->Add(pBuildingSA, CBuildingPool_Constructor);
 
     // Add CBuildingSA object in pool
@@ -116,6 +118,10 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     if (dwElementIndexInPool == UINT_MAX)
         return;
 
+    // Remove references to allocated matrix
+    auto* pBuildingSA = m_buildingPool.entities[dwElementIndexInPool].pEntity;
+    pBuildingSA->RemoveAllocatedMatrix();
+
     // Remove building from cover list
     pGame->GetCoverManager()->RemoveCover(pInterface);
 
@@ -128,22 +134,23 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     // Remove building from world
     pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
 
+    std::uint16_t modelId = pInterface->m_nModelIndex;
+
     // Call virtual destructor
     ((void*(__thiscall*)(void*, char))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 0);
 
     // Remove col reference
-    auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
+    auto modelInfo = pGame->GetModelInfo(modelId);
     modelInfo->RemoveColRef();
 
+    // Remove building from SA pool
+    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
+
     // Remove from BuildingSA pool
-    auto* pBuildingSA = m_buildingPool.entities[dwElementIndexInPool].pEntity;
     m_buildingPool.entities[dwElementIndexInPool] = {nullptr, nullptr};
 
     // Delete it from memory
     delete pBuildingSA;
-
-    // Remove building from SA pool
-    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
 
     // Decrease the count of elements in the pool
     --m_buildingPool.count;
