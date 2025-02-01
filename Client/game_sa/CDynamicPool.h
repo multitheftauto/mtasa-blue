@@ -19,57 +19,36 @@ template <typename PoolObjT>
 class CDynamicPoolPart
 {
 public:
-    explicit CDynamicPoolPart(std::size_t size) : m_size{size}, m_usedSize{0}, m_lastFreeSlot{0}
+    explicit CDynamicPoolPart(std::size_t size) : m_size{size}
     {
         m_items = std::make_unique<PoolObjT[]>(size);
-        m_usedSlots = std::make_unique<bool[]>(size);
+        m_unusedIndexes.reserve(size);
+        for (std::size_t i = 0; i < size; i++)
+            m_unusedIndexes.push_back(i);
     }
 
     PoolObjT* AllocateItem()
     {
-        bool flipped = false;
-        while (true)
-        {
-            if (m_usedSlots[m_lastFreeSlot])
-            {
-                m_lastFreeSlot++;
-                if (m_lastFreeSlot >= m_size)
-                {
-                    if (flipped)
-                        return nullptr;
-                    m_lastFreeSlot = 0;
-                    flipped = true;
-                }
-            }
-            else
-            {
-                m_usedSlots[m_lastFreeSlot] = true;
-                m_usedSize++;
-                return &m_items[m_lastFreeSlot];
-            }
-        }
+        std::size_t index = m_unusedIndexes.back();
+        m_unusedIndexes.pop_back();
+        return &m_items[index];
     }
 
     void RemoveItem(PoolObjT* item)
     {
         auto pos = item - m_items.get();
-        assert(m_usedSlots[pos], "Invalid item for CDynamicPoolPart::RemoveItem");
-
-        m_usedSlots[pos] = false;
-        m_usedSize--;
+        m_unusedIndexes.push_back(pos);
     }
 
     bool        OwnsItem(PoolObjT* item) const noexcept { return item >= m_items.get() && item < m_items.get() + m_size; }
-    bool        HasFreeSize() const noexcept { return m_size != m_usedSize; }
+    bool        HasFreeSize() const noexcept { return m_unusedIndexes.size() != 0; }
     std::size_t GetCapacity() const noexcept { return m_size; }
-    std::size_t GetUsedSize() const noexcept { return m_usedSize; }
+    std::size_t GetUsedSize() const noexcept { return m_size - m_unusedIndexes.size(); }
 
 private:
     std::unique_ptr<PoolObjT[]> m_items;
-    std::unique_ptr<bool[]>     m_usedSlots;
+    std::vector<std::size_t>    m_unusedIndexes;
     const std::size_t           m_size;
-    std::size_t                 m_usedSize;
-    std::size_t                 m_lastFreeSlot;
 };
 
 template <std::size_t InitialSize>
