@@ -150,7 +150,7 @@ public:
                     auto* nextPart = AllocateNewPart();
                     currentSize += nextPart->GetCapacity();
                 }
-                catch (const std::bad_alloc& ex)
+                catch (const std::bad_alloc&)
                 {
                     return false;
                 }
