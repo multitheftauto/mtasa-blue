@@ -354,7 +354,6 @@ public:
     DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
-    unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
     unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
     CVector      m_vecAkimboTarget;
