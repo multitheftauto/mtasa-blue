@@ -176,6 +176,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_pVehicleManager = NULL;
     m_pPickupManager = NULL;
     m_pObjectManager = NULL;
+    m_pBuildingManager = nullptr;
     m_pColManager = NULL;
     m_pBlipManager = NULL;
     m_pClock = NULL;
@@ -380,6 +381,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pVehicleManager);
     SAFE_DELETE(m_pPickupManager);
     SAFE_DELETE(m_pObjectManager);
+    SAFE_DELETE(m_pBuildingManager);
     SAFE_DELETE(m_pColManager);
     SAFE_DELETE(m_pBlipManager);
     SAFE_DELETE(m_pClock);
@@ -592,6 +594,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         m_pBlipManager = new CBlipManager;
         m_pColManager = new CColManager;
         m_pObjectManager = new CObjectManager;
+        m_pBuildingManager = new CBuildingManager();
         m_pPickupManager = new CPickupManager(m_pColManager);
         m_pPlayerManager = new CPlayerManager;
         m_pRadarAreaManager = new CRadarAreaManager;
