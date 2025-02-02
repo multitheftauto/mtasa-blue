@@ -65,20 +65,20 @@ public:
     CDynamicPool()
     {
         constexpr size_t initialSize = GrowStrategy::GetInitialSize();
-        m_poolParts.emplace_back(std::make_unique<CDynamicPoolPart<PoolObjT>>(initialSize));
+        m_poolParts.emplace_back(initialSize);
     }
 
     PoolObjT* AllocateItem()
     {
         for (auto& pool : m_poolParts)
         {
-            if (pool->HasFreeSize())
-                return pool->AllocateItem();
+            if (pool.HasFreeSize())
+                return pool.AllocateItem();
         }
 
         try
         {
-            return AllocateNewPart()->AllocateItem();
+            return AllocateNewPart().AllocateItem();
         }
         catch (const std::bad_alloc&)
         {
@@ -90,9 +90,9 @@ public:
     {
         for (auto& pool : m_poolParts)
         {
-            if (pool->OwnsItem(item))
+            if (pool.OwnsItem(item))
             {
-                pool->RemoveItem(item);
+                pool.RemoveItem(item);
                 return;
             }
         }
@@ -104,7 +104,7 @@ public:
     {
         std::size_t size = 0;
         for (auto& pool : m_poolParts)
-            size += pool->GetCapacity();
+            size += pool.GetCapacity();
 
         return size;
     }
@@ -113,7 +113,7 @@ public:
     {
         std::size_t size = 0;
         for (auto& pool : m_poolParts)
-            size += pool->GetUsedSize();
+            size += pool.GetUsedSize();
 
         return size;
     }
@@ -128,13 +128,13 @@ public:
             return false;
         else if (currentSize < newSize)
         {
-            // Grown
+            // Grow
             while (currentSize < newSize)
             {
                 try
                 {
-                    auto* nextPart = AllocateNewPart();
-                    currentSize += nextPart->GetCapacity();
+                    auto& nextPart = AllocateNewPart();
+                    currentSize += nextPart.GetCapacity();
                 }
                 catch (const std::bad_alloc&)
                 {
@@ -147,11 +147,11 @@ public:
             // Shrink
             while (true)
             {
-                auto* part = m_poolParts.back().get();
-                if (part->GetUsedSize() != 0)
+                auto& part = m_poolParts.back();
+                if (part.GetUsedSize() != 0)
                     return false;
 
-                currentSize -= part->GetCapacity();
+                currentSize -= part.GetCapacity();
                 if (currentSize < newSize)
                     return false;
 
@@ -166,13 +166,13 @@ public:
     }
 
 private:
-    CDynamicPoolPart<PoolObjT>* AllocateNewPart()
+    CDynamicPoolPart<PoolObjT>& AllocateNewPart()
     {
         const std::size_t nextSize = GrowStrategy::GetNextSize(m_poolParts.size());
-        m_poolParts.emplace_back(std::make_unique<CDynamicPoolPart<PoolObjT>>(nextSize));
-        return m_poolParts.back().get();
+        m_poolParts.emplace_back(nextSize);
+        return m_poolParts.back();
     }
 
 private:
-    std::vector<std::unique_ptr<CDynamicPoolPart<PoolObjT>>> m_poolParts;
+    std::list<CDynamicPoolPart<PoolObjT>> m_poolParts;
 };
