@@ -20,7 +20,7 @@ class CPtrNodeSingleLinkPoolSA final : public CPtrNodeSingleLinkPool
 {
 public:
     using pool_item_t = CPtrNodeSingleLink<void*>;
-    using pool_t = CDynamicPool<pool_item_t, PoolGrownByHalfStrategy<MAX_POINTER_SINGLE_LINKS>>;
+    using pool_t = CDynamicPool<pool_item_t, PoolGrownAddStrategy<MAX_POINTER_SINGLE_LINKS, MAX_POINTER_SINGLE_LINKS / 2>>;
 
     CPtrNodeSingleLinkPoolSA();
 

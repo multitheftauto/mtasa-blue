@@ -51,11 +51,11 @@ private:
     const std::size_t           m_size;
 };
 
-template <std::size_t InitialSize>
-struct PoolGrownByHalfStrategy
+template <std::size_t InitialSize, std::size_t AddSize>
+struct PoolGrownAddStrategy
 {
     static constexpr std::size_t GetInitialSize() { return InitialSize; }
-    static constexpr std::size_t GetNextSize(std::size_t index) { return InitialSize / 2; }
+    static constexpr std::size_t GetNextSize(std::size_t index) { return AddSize; }
 };
 
 template <typename PoolObjT, typename GrowStrategy>
