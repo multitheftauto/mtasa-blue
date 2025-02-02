@@ -44,9 +44,6 @@ public:
     void GetMatrix(CMatrix& matrix) override;
     void SetMatrix(const CMatrix& matrix) override;
 
-    std::uint8_t GetAlpha() const noexcept { return m_alpha; }
-    void         SetAlpha(std::uint8_t ucAlpha) noexcept { m_alpha = ucAlpha; }
-
     std::uint16_t GetModel() const noexcept { return m_model; }
     void          SetModel(std::uint16_t model) noexcept { m_model = model; }
 
@@ -65,7 +62,6 @@ protected:
 private:
     CBuildingManager* m_pBuildingManager;
     CVector           m_vecRotation;
-    std::uint8_t      m_alpha;
     std::uint16_t     m_model;
 
 protected:
