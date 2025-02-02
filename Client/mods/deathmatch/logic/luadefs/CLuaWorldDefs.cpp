@@ -101,12 +101,18 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setFPSLimit", SetFPSLimit},
                                                                              {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
                                                                              {"setWorldProperty", ArgumentParser<SetWorldProperty>},
+
+                                                                             // World remove/restore functions 
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"removeGameWorld", ArgumentParser<RemoveGameWorld>},
+                                                                             {"restoreGameWorld", ArgumentParser<RestoreGameWorld>},
+
                                                                              {"setTimeFrozen", ArgumentParser<SetTimeFrozen>},
                                                                              {"setVolumetricShadowsEnabled", ArgumentParser<SetVolumetricShadowsEnabled>},
                                                                              {"setDynamicPedShadowsEnabled", ArgumentParser<SetDynamicPedShadowsEnabled>}, 
+
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -1260,14 +1266,28 @@ int CLuaWorldDefs::SetOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
+bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(const WorldSpecialProperty property) noexcept
 {
     return m_pClientGame->IsWorldSpecialProperty(property);
 }
 
-bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
+bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(const WorldSpecialProperty property, const bool enabled) noexcept
 {
-    return m_pClientGame->SetWorldSpecialProperty(property, isEnabled);
+    if (!m_pClientGame->SetWorldSpecialProperty(property, enabled))
+        return false;
+
+    if (!g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent))
+        return true;
+
+    if (auto stream = g_pNet->AllocateNetBitStream())
+    {
+        stream->WriteString(EnumToString(property));
+        stream->WriteBit(enabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
+    }
+
+    return true;
 }
 
 int CLuaWorldDefs::SetCloudsEnabled(lua_State* luaVM)
@@ -2260,6 +2280,31 @@ bool CLuaWorldDefs::IsTimeFrozen() noexcept
 bool CLuaWorldDefs::ResetTimeFrozen() noexcept
 {
     return g_pGame->GetClock()->ResetTimeFrozen();
+}
+
+void CLuaWorldDefs::RemoveGameWorld()
+{
+    // We do not want to remove scripted buildings
+    // But we need remove them from the buildings pool for a bit...
+    m_pBuildingManager->DestroyAllForABit();
+
+    // This function makes buildings backup without scripted buildings
+    g_pGame->RemoveGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyed();
+}
+
+void CLuaWorldDefs::RestoreGameWorld()
+{
+    // We want to restore the game buildings to the same positions as they were before the backup.
+    // Remove scripted buildings for a bit
+    m_pBuildingManager->DestroyAllForABit();
+
+    g_pGame->RestoreGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyedSafe();
 }
 
 bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable) noexcept

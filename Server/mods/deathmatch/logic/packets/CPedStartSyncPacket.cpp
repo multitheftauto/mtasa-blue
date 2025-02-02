@@ -37,5 +37,8 @@ bool CPedStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_pPed->GetHealth());
     BitStream.Write(m_pPed->GetArmor());
 
+    if (BitStream.Can(eBitStreamVersion::PedSync_CameraRotation))
+        BitStream.Write(m_pPed->GetCameraRotation());
+
     return true;
 }

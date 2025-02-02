@@ -26,9 +26,9 @@
 #define MYSQLD_ERROR_INCLUDED
 
 static const int errmsg_section_start[] = { 1000, 3000, 3500, 6000, 10000, 15000 };
-static const int errmsg_section_size[] = { 888, 239, 667, 140, 4073, 141 };
+static const int errmsg_section_size[] = { 888, 239, 667, 141, 4074, 145 };
 
-static const int total_error_count = 6148;
+static const int total_error_count = 6154;
 
 //#define OBSOLETE_ER_HASHCHK 1000
 //#define OBSOLETE_ER_NISAMCHK 1001
@@ -1964,6 +1964,7 @@ static const int total_error_count = 6148;
 #define ER_EXCEEDS_VECTOR_MAX_DIMENSIONS 6137
 #define ER_TO_VECTOR_CONVERSION 6138
 #define ER_EXTERNAL_UNSUPPORTED_INDEX_ALGORITHM 6139
+#define ER_TP_CANNOT_DISABLE_MTL_WITH_DL 6140
 #define ER_PARSER_TRACE 10000
 #define ER_BOOTSTRAP_CANT_THREAD 10001
 #define ER_TRIGGER_INVALID_VALUE 10002
@@ -3720,7 +3721,7 @@ static const int total_error_count = 6148;
 #define ER_LDAP_AUTH_FAILED_TO_WRITE_PACKET 11753
 #define ER_LDAP_AUTH_SETTING_USERNAME 11754
 #define ER_LDAP_AUTH_USER_AUTH_DATA 11755
-#define ER_LDAP_AUTH_INFO_FOR_USER 11756
+//#define OBSOLETE_ER_LDAP_AUTH_INFO_FOR_USER 11756
 #define ER_LDAP_AUTH_USER_GROUP_SEARCH_INFO 11757
 #define ER_LDAP_AUTH_GRP_SEARCH_SPECIAL_HDL 11758
 #define ER_LDAP_AUTH_GRP_IS_FULL_DN 11759
@@ -4589,7 +4590,7 @@ static const int total_error_count = 6148;
 #define ER_IB_MSG_797 12622
 #define ER_IB_MSG_798 12623
 #define ER_IB_MSG_799 12624
-#define ER_IB_MSG_800 12625
+//#define OBSOLETE_ER_IB_MSG_800 12625
 #define ER_IB_MSG_801 12626
 #define ER_IB_MSG_802 12627
 #define ER_IB_MSG_803 12628
@@ -6037,6 +6038,7 @@ static const int total_error_count = 6148;
 #define ER_USAGE_DEPRECATION_COUNTER 14070
 #define ER_WAITING_FOR_NO_CONNECTIONS 14071
 #define ER_WAITING_FOR_NO_THDS 14072
+#define ER_IB_INDEX_PART_TOO_LONG 14073
 #define ER_LANGUAGE_COMPONENT_INFO 15000
 #define ER_LANGUAGE_COMPONENT_WARNING 15001
 #define ER_LANGUAGE_COMPONENT_ERROR 15002
@@ -6178,12 +6180,16 @@ static const int total_error_count = 6148;
 #define ER_BULK_READER_ZSTD_ERROR_LOG 15138
 #define ER_SECONDARY_ENGINE_DDL_TRACK_PROGRESS 15139
 #define ER_IB_MSG_INNODB_FLUSH_METHOD 15140
-static const int obsolete_error_count = 614;
+#define ER_BULK_SCANNER_INFO 15141
+#define ER_LOG_DEPRECATE_NON_COMPOSABLE_MULTIPLE_ENGINE 15142
+#define ER_DD_UPDATE_DATADIR_FLAG_FAIL 15143
+#define ER_IB_MSG_FIL_STATE_MOVED_PREV_OR_HAS_DATADIR 15144
+static const int obsolete_error_count = 616;
 
 static const int pfs_no_error_stat_count = 2;
 
-static const int pfs_session_error_stat_count = 1773;
+static const int pfs_session_error_stat_count = 1774;
 
-static const int pfs_global_error_stat_count = 3759;
+static const int pfs_global_error_stat_count = 3762;
 
 #endif

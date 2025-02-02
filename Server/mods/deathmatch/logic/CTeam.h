@@ -36,7 +36,7 @@ public:
     void AddPlayer(CPlayer* pPlayer, bool bChangePlayer = false);
     void RemovePlayer(CPlayer* pPlayer, bool bChangePlayer = false);
     void RemoveAllPlayers();
-    void GetPlayers(lua_State* luaVM);
+    std::vector<CPlayer*> GetPlayers() const;
 
     void GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
     void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);

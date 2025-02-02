@@ -556,7 +556,7 @@ enum class eBitStreamVersion : unsigned short
     // 2024-06-16
     PedSync_Revision,
 
-    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
+    // Add "tunnelweatherblend" to setWorldSpecialPropertyEnabled
     // 2024-06-30
     WorldSpecialProperty_TunnelWeatherBlend,
 
@@ -600,8 +600,20 @@ enum class eBitStreamVersion : unsigned short
     // 2025-01-01
     AnimationsSync,
 
+    // Add server side isPedReloadingWeapon
+    // 2025-01-09
+    IsPedReloadingWeapon,
+
+    // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
+    // 2025-01-10
+    WorldSpecialProperty_FlyingComponents,
+
+    // Ped's camera synchronization
+    // 2025-01-29
+    PedSync_CameraRotation,
+
     // Add serverside building support
-    // 2025-01-?
+    // 2025-02-?
     ServersideBuildingElement,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.

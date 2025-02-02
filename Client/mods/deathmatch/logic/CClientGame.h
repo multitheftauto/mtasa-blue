@@ -414,8 +414,8 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
-    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept;
-    bool IsWorldSpecialProperty(WorldSpecialProperty property);
+    bool SetWorldSpecialProperty(const WorldSpecialProperty property, const bool enabled) noexcept;
+    bool IsWorldSpecialProperty(const WorldSpecialProperty property);
 
     bool SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
