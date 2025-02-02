@@ -58,13 +58,13 @@ struct PoolGrownByHalfStrategy
     static constexpr std::size_t GetNextSize(std::size_t index) { return InitialSize / 2; }
 };
 
-template <typename PoolObjT, typename GrownStrategy>
+template <typename PoolObjT, typename GrowStrategy>
 class CDynamicPool
 {
 public:
     CDynamicPool()
     {
-        constexpr size_t initialSize = GrownStrategy::GetInitialSize();
+        constexpr size_t initialSize = GrowStrategy::GetInitialSize();
         m_poolParts.emplace_back(std::make_unique<CDynamicPoolPart<PoolObjT>>(initialSize));
     }
 
@@ -161,7 +161,7 @@ public:
 private:
     CDynamicPoolPart<PoolObjT>* AllocateNewPart()
     {
-        const std::size_t nextSize = GrownStrategy::GetNextSize(m_poolParts.size());
+        const std::size_t nextSize = GrowStrategy::GetNextSize(m_poolParts.size());
         m_poolParts.emplace_back(std::make_unique<CDynamicPoolPart<PoolObjT>>(nextSize));
         return m_poolParts.back().get();
     }
