@@ -22,32 +22,32 @@ public:
     explicit CDynamicPoolPart(std::size_t size) : m_size{size}
     {
         m_items = std::make_unique<PoolObjT[]>(size);
-        m_unusedIndexes.reserve(size);
+        m_unusedIndices.reserve(size);
         for (std::size_t i = 0; i < size; i++)
-            m_unusedIndexes.push_back(i);
+            m_unusedIndices.push_back(i);
     }
 
     PoolObjT* AllocateItem()
     {
-        std::size_t index = m_unusedIndexes.back();
-        m_unusedIndexes.pop_back();
+        std::size_t index = m_unusedIndices.back();
+        m_unusedIndices.pop_back();
         return &m_items[index];
     }
 
     void RemoveItem(PoolObjT* item)
     {
         auto pos = item - m_items.get();
-        m_unusedIndexes.push_back(pos);
+        m_unusedIndices.push_back(pos);
     }
 
     bool        OwnsItem(PoolObjT* item) const noexcept { return item >= m_items.get() && item < m_items.get() + m_size; }
-    bool        HasFreeSize() const noexcept { return m_unusedIndexes.size() != 0; }
+    bool        HasFreeSize() const noexcept { return m_unusedIndices.size() != 0; }
     std::size_t GetCapacity() const noexcept { return m_size; }
-    std::size_t GetUsedSize() const noexcept { return m_size - m_unusedIndexes.size(); }
+    std::size_t GetUsedSize() const noexcept { return m_size - m_unusedIndices.size(); }
 
 private:
     std::unique_ptr<PoolObjT[]> m_items;
-    std::vector<std::size_t>    m_unusedIndexes;
+    std::vector<std::size_t>    m_unusedIndices;
     const std::size_t           m_size;
 };
 
