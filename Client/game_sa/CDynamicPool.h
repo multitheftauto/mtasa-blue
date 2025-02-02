@@ -97,7 +97,7 @@ public:
             }
         }
 
-        throw std::exception("Invalid item for CDynamicPool::RemoveItem");
+        assert(false && "Invalid item for CDynamicPool::RemoveItem");
     }
 
     std::size_t GetCapacity() const noexcept
