@@ -76,7 +76,14 @@ public:
                 return pool->AllocateItem();
         }
 
-        return AllocateNewPart()->AllocateItem();
+        try
+        {
+            return AllocateNewPart()->AllocateItem();
+        }
+        catch (const std::bad_alloc&)
+        {
+            assert(false && "Could not allocate a memory for CDynamicPoolPart");
+        }
     }
 
     void RemoveItem(PoolObjT* item)
