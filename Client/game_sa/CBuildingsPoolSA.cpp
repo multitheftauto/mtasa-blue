@@ -59,7 +59,7 @@ CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameIn
     return m_buildingPool.entities[poolIndex].pClientEntity;
 }
 
-CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior)
+CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior)
 {
     if (!HasFreeBuildingSlot())
         return nullptr;
@@ -72,15 +72,12 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
         modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
 
     // Load building
-    SFileObjectInstance instance;
+    SFileObjectInstance instance{};
     instance.modelID = modelId;
     instance.lod = -1;
     instance.interiorID = interior;
     instance.position = *vPos;
-    instance.rotation = *vRot;
-
-    // Fix strange SA rotation
-    instance.rotation.fW = -instance.rotation.fW;
+    instance.rotation = {};
 
     auto pBuilding = static_cast<CBuildingSAInterface*>(CFileLoaderSA::LoadObjectInstance(&instance));
 
@@ -98,7 +95,12 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
 
     // Add building in world
     auto pBuildingSA = new CBuildingSA(pBuilding);
-    pBuildingSA->ReallocateMatrix();
+
+    // Set rotation
+    if (vRot->fX != 0 || vRot->fY != 0)
+        pBuildingSA->AllocateMatrix();
+
+    pBuilding->SetOrientation(vRot->fX, vRot->fY, vRot->fZ);
 
     pGame->GetWorld()->Add(pBuildingSA, CBuildingPool_Constructor);
 

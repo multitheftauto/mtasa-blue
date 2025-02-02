@@ -79,14 +79,13 @@ void CBuildingSA::SetLod(CBuilding* pLod)
     }
 }
 
-void CBuildingSA::SetMatrix(CMatrix* matrix)
+void CBuildingSA::AllocateMatrix()
 {
-    if (!m_pInterface->HasMatrix())
-        ReallocateMatrix();
+    auto* newMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(EXCLUSIVE_MATRIX_POOL.AllocateItem());
+    std::memset(newMatrix, 0, sizeof(CMatrixLinkSAInterface));
+    newMatrix->SetTranslateOnly(m_pInterface->Placeable.m_transform.m_translate);
 
-    //CEntitySA::SetMatrix(matrix);
-    CMatrixLinkSAInterface* pMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->Placeable.matrix);
-    pMatrix->SetMatrix(matrix->vRight, matrix->vFront, matrix->vUp, matrix->vPos);
+    m_pInterface->Placeable.matrix = reinterpret_cast<CMatrix_Padded*>(newMatrix);
 }
 
 void CBuildingSA::ReallocateMatrix()
