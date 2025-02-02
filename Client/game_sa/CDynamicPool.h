@@ -52,7 +52,7 @@ private:
 };
 
 template <std::size_t InitialSize, std::size_t AddSize>
-struct PoolGrownAddStrategy
+struct PoolGrowAddStrategy
 {
     static constexpr std::size_t GetInitialSize() { return InitialSize; }
     static constexpr std::size_t GetNextSize(std::size_t index) { return AddSize; }
