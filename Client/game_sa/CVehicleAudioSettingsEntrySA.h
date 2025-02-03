@@ -33,7 +33,7 @@ struct tVehicleAudioSettings
 };
 static_assert(sizeof(tVehicleAudioSettings) == 0x24, "Invalid size for tVehicleAudioSettings");
 
-class CVehicleAudioSettingsEntrySA : public CVehicleAudioSettingsEntry
+class CVehicleAudioSettingsEntrySA final : public CVehicleAudioSettingsEntry
 {
 public:
     CVehicleAudioSettingsEntrySA();
@@ -42,6 +42,7 @@ public:
 
     tVehicleAudioSettings* getInterface() { return &m_Settings; };
 
+    void Assign(const tVehicleAudioSettings& settings) noexcept { m_Settings = settings; }
     void Assign(const CVehicleAudioSettingsEntry* pData);
 
     eVehicleSoundType GetSoundType() const noexcept override { return m_Settings.m_eVehicleSoundType; };

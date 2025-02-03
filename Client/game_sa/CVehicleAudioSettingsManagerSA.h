@@ -13,32 +13,28 @@
 
 #include <game/CVehicleAudioSettingsManager.h>
 #include "CAEVehicleAudioEntitySA.h"
+#include <array>
 
-#define VEHICLES_COUNT 212
+constexpr size_t VEHICLES_COUNT = 212;
 
-class CVehicleAudioSettingsManagerSA;
-
-class CVehicleAudioSettingsManagerSA : public CVehicleAudioSettingsManager
+class CVehicleAudioSettingsManagerSA final : public CVehicleAudioSettingsManager
 {
 public:
     CVehicleAudioSettingsManagerSA();
-    ~CVehicleAudioSettingsManagerSA();
 
     CVehicleAudioSettingsEntry* CreateVehicleAudioSettingsData();
-
-    bool ApplyAudioSettingsData(eVehicleTypes eModel, CVehicleAudioSettingsEntry* pEntry);
-
     CVehicleAudioSettingsEntry* GetVehicleModelAudioSettingsData(eVehicleTypes eModel);
 
+    bool ApplyAudioSettingsData(eVehicleTypes eModel, CVehicleAudioSettingsEntry* pEntry);
     void SetNextSettings(CVehicleAudioSettingsEntry* pSettings);
 
+    static void StaticSetHooks();
+
 private:
-    void InitializeDefaultVehicleAudioSettings();
-    uint GetVehicleModelAudioSettingsID(eVehicleTypes eModel);
+    void   ResetAudioSettingsData();
+    size_t GetVehicleModelAudioSettingsID(eVehicleTypes eModel) const noexcept { return eModel - 400; };
 
-    // Original audio settings
-    SFixedArray<tVehicleAudioSettings, VEHICLES_COUNT> m_OriginalVehicleAudioSettings;
-
+private:
     // Array with the model audio settings entries
-    SFixedArray<CVehicleAudioSettingsEntrySA*, VEHICLES_COUNT> m_pModelEntries;
+    std::array<CVehicleAudioSettingsEntrySA, VEHICLES_COUNT> m_modelEntrys;
 };
