@@ -40,10 +40,10 @@ public:
     CVehicleAudioSettingsEntrySA(tVehicleAudioSettings* pSettings) { m_Settings = *pSettings; };
     ~CVehicleAudioSettingsEntrySA() = default;
 
-    tVehicleAudioSettings* getInterface() { return &m_Settings; };
+    const tVehicleAudioSettings& getInterface() const noexcept { return m_Settings; };
 
     void Assign(const tVehicleAudioSettings& settings) noexcept { m_Settings = settings; }
-    void Assign(const CVehicleAudioSettingsEntry* settings) noexcept { m_Settings = static_cast<const CVehicleAudioSettingsEntrySA*>(settings)->m_Settings; };
+    void Assign(const CVehicleAudioSettingsEntry* settings) noexcept { m_Settings = static_cast<const CVehicleAudioSettingsEntrySA*>(settings)->getInterface(); };
 
     eVehicleSoundType GetSoundType() const noexcept override { return m_Settings.m_eVehicleSoundType; };
     short             GetEngineOnSoundBankID() const noexcept override { return m_Settings.m_nEngineOnSoundBankId; };

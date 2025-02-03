@@ -912,18 +912,8 @@ void CVehicleSA::SetEngineOn(bool bEngineOn)
 
 bool CVehicleSA::IsPassenger(CPed* pPed)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_IsPassenger;
-    bool  bReturn = false;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        push    pPed
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    using FUNC_CVehicle_IsPassenger_t = bool(__thiscall*)(CVehicleSAInterface* self, CPedSAInterface* ped);
+    return ((FUNC_CVehicle_IsPassenger_t)(FUNC_CVehicle_IsPassenger))(GetVehicleInterface(), pPed->GetPedInterface());
 }
 
 CPed* CVehicleSA::GetDriver()
