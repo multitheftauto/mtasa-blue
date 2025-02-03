@@ -4457,17 +4457,17 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint uiModel, const eVeh
         case eVehicleAudioSettingProperty::SOUND_TYPE:
             pModelSettings->SetSoundType((eVehicleSoundType)(int)(varValue));
             break;
-        case eVehicleAudioSettingProperty::STEREO:
-            pModelSettings->SetStereo(varValue);
+        case eVehicleAudioSettingProperty::BASS_SETTING:
+            pModelSettings->SetBassSetting(varValue);
             break;
-        case eVehicleAudioSettingProperty::UNK3:
-            pModelSettings->SetUnk3(varValue);
+        case eVehicleAudioSettingProperty::BASS_EQ:
+            pModelSettings->SetBassEq(varValue);
             break;
-        case eVehicleAudioSettingProperty::UNK4:
-            pModelSettings->SetUnk4(varValue);
+        case eVehicleAudioSettingProperty::FIELD_C:
+            pModelSettings->SetFieldC(varValue);
             break;
-        case eVehicleAudioSettingProperty::UNK6:
-            pModelSettings->SetUnk6(varValue);
+        case eVehicleAudioSettingProperty::ENGINE_UPGRADE:
+            pModelSettings->SetEngineUpgrade(varValue);
             break;
         case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
             pModelSettings->SetVehicleTypeForAudio(varValue);
@@ -4515,17 +4515,17 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
         case eVehicleAudioSettingProperty::SOUND_TYPE:
             pModelSettings->SetSoundType((eVehicleSoundType)(int)(varValue));
             break;
-        case eVehicleAudioSettingProperty::STEREO:
-            pModelSettings->SetStereo(varValue);
+        case eVehicleAudioSettingProperty::BASS_SETTING:
+            pModelSettings->SetBassSetting(varValue);
             break;
-        case eVehicleAudioSettingProperty::UNK3:
-            pModelSettings->SetUnk3(varValue);
+        case eVehicleAudioSettingProperty::BASS_EQ:
+            pModelSettings->SetBassEq(varValue);
             break;
-        case eVehicleAudioSettingProperty::UNK4:
-            pModelSettings->SetUnk4(varValue);
+        case eVehicleAudioSettingProperty::FIELD_C:
+            pModelSettings->SetFieldC(varValue);
             break;
-        case eVehicleAudioSettingProperty::UNK6:
-            pModelSettings->SetUnk6(varValue);
+        case eVehicleAudioSettingProperty::ENGINE_UPGRADE:
+            pModelSettings->SetEngineUpgrade(varValue);
             break;
         case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
             pModelSettings->SetVehicleTypeForAudio(varValue);
@@ -4550,12 +4550,12 @@ std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleModelAudioSett
     output["sound-type"] = (int)pEntry->GetSoundType();
     output["engine-on-soundbank-id"] = pEntry->GetEngineOnSoundBankID();
     output["engine-off-soundbank-id"] = pEntry->GetEngineOffSoundBankID();
-    output["stereo"] = pEntry->GetStereo();
-    output["unk3"] = pEntry->GetUnk3();
-    output["unk4"] = pEntry->GetUnk4();
+    output["bass-setting"] = pEntry->GetBassSetting();
+    output["bass-eq"] = pEntry->GetBassEq();
+    output["field-c"] = pEntry->GetFieldC();
     output["horn-ton"] = pEntry->GetHornTon();
     output["horn-high"] = pEntry->GetHornHign();
-    output["unk6"] = pEntry->GetUnk6();
+    output["engine-upgrade"] = pEntry->GetEngineUpgrade();
     output["door-sound"] = pEntry->GetDoorSound();
     output["radio-num"] = pEntry->GetRadioNum();
     output["radio-type"] = pEntry->GetRadioType();
@@ -4574,12 +4574,12 @@ std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleAudioSetting(C
     output["sound-type"] = (int)pEntry->GetSoundType();
     output["engine-on-soundbank-id"] = pEntry->GetEngineOnSoundBankID();
     output["engine-off-soundbank-id"] = pEntry->GetEngineOffSoundBankID();
-    output["stereo"] = pEntry->GetStereo();
-    output["unk3"] = pEntry->GetUnk3();
-    output["unk4"] = pEntry->GetUnk4();
+    output["bass-setting"] = pEntry->GetBassSetting();
+    output["bass-eq"] = pEntry->GetBassEq();
+    output["field-c"] = pEntry->GetFieldC();
     output["horn-ton"] = pEntry->GetHornTon();
     output["horn-high"] = pEntry->GetHornHign();
-    output["unk6"] = pEntry->GetUnk6();
+    output["engine-upgrade"] = pEntry->GetEngineUpgrade();
     output["door-sound"] = pEntry->GetDoorSound();
     output["radio-num"] = pEntry->GetRadioNum();
     output["radio-type"] = pEntry->GetRadioType();
