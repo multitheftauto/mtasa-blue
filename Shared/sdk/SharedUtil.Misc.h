@@ -344,13 +344,14 @@ namespace SharedUtil
     template <class TL, class T>
     bool ListContains(const TL& itemList, const T& item)
     {
+        if (itemList.empty())
+            return false;
         typename TL ::const_iterator it = itemList.begin();
         for (; it != itemList.end(); ++it)
             if (item == *it)
                 return true;
         return false;
     }
-
     // Add item if it does not aleady exist in itemList
     template <class TL, class T>
     void ListAddUnique(TL& itemList, const T& item)
@@ -547,6 +548,20 @@ namespace SharedUtil
     inline SColor COLOR_RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A) { return SColorRGBA(R, G, B, A); }
     inline SColor COLOR_ARGB(unsigned char A, unsigned char R, unsigned char G, unsigned char B) { return SColorRGBA(R, G, B, A); }
     inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R) { return SColorRGBA(R, G, B, A); }
+
+    //
+    // Convert tocolor value to SColor
+    //
+    inline SColor TOCOLOR2SCOLOR(std::uint32_t colorValue)
+    {
+        SColor color;
+        color.R = static_cast<std::uint8_t>((colorValue >> 16) & BYTE_MASK(8));
+        color.G = static_cast<std::uint8_t>((colorValue >> 8) & BYTE_MASK(8));
+        color.B = static_cast<std::uint8_t>((colorValue >> 0) & BYTE_MASK(8));
+        color.A = static_cast<std::uint8_t>((colorValue >> 24) & BYTE_MASK(8));
+
+        return color;
+    }
 
     //
     // Cross platform critical section

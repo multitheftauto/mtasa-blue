@@ -11,9 +11,9 @@ jobs:
     name: windows-${{ matrix.platform }}
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         id: cache-dxfiles
         with:
           path: utils/DXFiles
@@ -45,16 +45,16 @@ jobs:
       - name: Create build artifacts
         run: utils\premake5 compose_files
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
-          name: InstallFiles
+          name: InstallFiles-${{ matrix.platform }}
           path: InstallFiles/
 
   macOS:
     name: macOS
-    runs-on: macOS-latest
+    runs-on: macOS-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install MySQL
         run: brew install mysql
@@ -80,7 +80,7 @@ jobs:
     container:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run Build
         run: ./linux-build.sh --arch=${{ matrix.architecture }}

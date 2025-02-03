@@ -863,15 +863,15 @@ void CheckDataFiles()
     {
         const char* expected;
         const char* fileName;
-    } integrityCheckList[] = {{"332EFF2D3BE0CD15264E9D54CD1FA25F", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
-                              {"0752692DA87EBF6595AFAC9BC3D3B1BF", "bass_ac3.dll"},       {"DF3BE351F8EDE366FBE542FEBE114508", "bass_fx.dll"},
-                              {"64C96631887874F7ED9D8881FC016846", "bassflac.dll"},       {"4E89426025D1E1F524495D910B60C709", "bassmidi.dll"},
-                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},        {"740214D5D3068C2A725D9E5E1B961ED3", "bassopus.dll"},
+    } integrityCheckList[] = {{"36CB1B284BC7CBB4F25CD00BBB044550", "bass.dll"},           {"80CDC5A50B27C47E53B99DE4D4523698", "bass_aac.dll"},
+                              {"2757D3E0F63C8C62DB32F90D776AB815", "bass_ac3.dll"},       {"539BE2B8762FF618C3BA04B638FD4A8B", "bass_fx.dll"},
+                              {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"F246D72BA73E9624FE8BE66E785FB5C5", "bassmidi.dll"},
+                              {"5DEEC10A943E352EF7E0223327E8B48C", "bassmix.dll"},        {"2F87C5E0A1B7B28C8FC0D7E74116DDFC", "bassopus.dll"},
                               {"0F1B2FC6C0C703A43A24DC05352E7ADA", "basswebm.dll"},       {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
                               {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
-                              {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"1815A2C87B114A262F97D0FCC78D17A3", "tags.dll"},
+                              {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"7A1665DD46726DA4592E77DC05D114F8", "tags.dll"},
                               {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"}, {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
-                              {"7096EB0458485D89BB749474550C7651", "d3dcompiler_47.dll"}, {"F137D5BE2D8E76597B3F269B73DBB6A6", "XInput9_1_0_mta.dll"}};
+                              {"7096EB0458485D89BB749474550C7651", "d3dcompiler_47.dll"}, {"87F689D5636B6F31DBB4B9CBF56E17E3", "XInput9_1_0_mta.dll"}};
 
     for (const auto& item : integrityCheckList)
     {
@@ -1073,6 +1073,7 @@ BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandL
             }
             lpProcessInformation->dwProcessId = pid;
             lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, pid);
+            wasProcessCreated = true;
             break;
         }
         if (lpProcessInformation->dwProcessId)

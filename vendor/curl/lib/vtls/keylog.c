@@ -23,6 +23,12 @@
  ***************************************************************************/
 #include "curl_setup.h"
 
+#if defined(USE_OPENSSL) || \
+  defined(USE_GNUTLS) || \
+  defined(USE_WOLFSSL) || \
+  (defined(USE_NGTCP2) && defined(USE_NGHTTP3)) || \
+  defined(USE_QUICHE)
+
 #include "keylog.h"
 #include <curl/curl.h>
 
@@ -55,7 +61,7 @@ Curl_tls_keylog_open(void)
     if(keylog_file_name) {
       keylog_file_fp = fopen(keylog_file_name, FOPEN_APPENDTEXT);
       if(keylog_file_fp) {
-#ifdef WIN32
+#ifdef _WIN32
         if(setvbuf(keylog_file_fp, NULL, _IONBF, 0))
 #else
         if(setvbuf(keylog_file_fp, NULL, _IOLBF, 4096))
@@ -93,13 +99,13 @@ Curl_tls_keylog_write_line(const char *line)
   char buf[256];
 
   if(!keylog_file_fp || !line) {
-    return false;
+    return FALSE;
   }
 
   linelen = strlen(line);
   if(linelen == 0 || linelen > sizeof(buf) - 2) {
     /* Empty line or too big to fit in a LF and NUL. */
-    return false;
+    return FALSE;
   }
 
   memcpy(buf, line, linelen);
@@ -111,7 +117,7 @@ Curl_tls_keylog_write_line(const char *line)
   /* Using fputs here instead of fprintf since libcurl's fprintf replacement
      may not be thread-safe. */
   fputs(buf, keylog_file_fp);
-  return true;
+  return TRUE;
 }
 
 bool
@@ -125,13 +131,13 @@ Curl_tls_keylog_write(const char *label,
             2 * SECRET_MAXLEN + 1 + 1];
 
   if(!keylog_file_fp) {
-    return false;
+    return FALSE;
   }
 
   pos = strlen(label);
   if(pos > KEYLOG_LABEL_MAXLEN || !secretlen || secretlen > SECRET_MAXLEN) {
     /* Should never happen - sanity check anyway. */
-    return false;
+    return FALSE;
   }
 
   memcpy(line, label, pos);
@@ -155,5 +161,7 @@ Curl_tls_keylog_write(const char *label,
   /* Using fputs here instead of fprintf since libcurl's fprintf replacement
      may not be thread-safe. */
   fputs(line, keylog_file_fp);
-  return true;
+  return TRUE;
 }
+
+#endif  /* TLS or QUIC backend */

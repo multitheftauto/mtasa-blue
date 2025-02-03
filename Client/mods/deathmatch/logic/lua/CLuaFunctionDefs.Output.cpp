@@ -127,25 +127,23 @@ int CLuaFunctionDefs::OutputClientDebugString(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            if (uiLevel == 1)
+            switch (uiLevel)
             {
-                m_pScriptDebugging->LogError(luaVM, "%s", strText.c_str());
-            }
-            else if (uiLevel == 2)
-            {
-                m_pScriptDebugging->LogWarning(luaVM, "%s", strText.c_str());
-            }
-            else if (uiLevel == 3)
-            {
-                m_pScriptDebugging->LogInformation(luaVM, "%s", strText.c_str());
-            }
-            else if (uiLevel == 4)
-            {
-                m_pScriptDebugging->LogCustom(luaVM, ucRed, ucGreen, ucBlue, "%s", strText.c_str());
-            }
-            else if (uiLevel == 0)
-            {
-                m_pScriptDebugging->LogDebug(luaVM, ucRed, ucGreen, ucBlue, "%s", strText.c_str());
+                case 0:
+                    m_pScriptDebugging->LogDebug(luaVM, ucRed, ucGreen, ucBlue, "%s", strText.c_str());
+                    break;
+                case 1:
+                    m_pScriptDebugging->LogError(luaVM, "%s", strText.c_str());
+                    break;
+                case 2:
+                    m_pScriptDebugging->LogWarning(luaVM, "%s", strText.c_str());
+                    break;
+                case 3:
+                    m_pScriptDebugging->LogInformation(luaVM, "%s", strText.c_str());
+                    break;
+                case 4:
+                    m_pScriptDebugging->LogCustom(luaVM, ucRed, ucGreen, ucBlue, "%s", strText.c_str());
+                    break;
             }
 
             // Success

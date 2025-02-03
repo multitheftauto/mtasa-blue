@@ -55,9 +55,6 @@
 /* The last #include file should be: */
 #include "memdebug.h"
 
-/* allocs buffer which will contain one line of LIST command response */
-#define FTP_BUFFER_ALLOCSIZE 160
-
 typedef enum {
   PL_UNIX_TOTALSIZE = 0,
   PL_UNIX_FILETYPE,
@@ -337,7 +334,7 @@ static CURLcode ftp_pl_insert_finfo(struct Curl_easy *data,
     compare = Curl_fnmatch;
 
   /* filter pattern-corresponding filenames */
-  Curl_set_in_callback(data, true);
+  Curl_set_in_callback(data, TRUE);
   if(compare(data->set.fnmatch_data, wc->pattern,
              finfo->filename) == 0) {
     /* discard symlink which is containing multiple " -> " */
@@ -349,10 +346,10 @@ static CURLcode ftp_pl_insert_finfo(struct Curl_easy *data,
   else {
     add = FALSE;
   }
-  Curl_set_in_callback(data, false);
+  Curl_set_in_callback(data, FALSE);
 
   if(add) {
-    Curl_llist_insert_next(llist, llist->tail, finfo, &infop->list);
+    Curl_llist_append(llist, finfo, &infop->list);
   }
   else {
     Curl_fileinfo_cleanup(infop);
@@ -379,7 +376,7 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
     /* scenario:
      * 1. call => OK..
      * 2. call => OUT_OF_MEMORY (or other error)
-     * 3. (last) call => is skipped RIGHT HERE and the error is hadled later
+     * 3. (last) call => is skipped RIGHT HERE and the error is handled later
      *    in wc_statemach()
      */
     goto fail;

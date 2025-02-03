@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@squoosh/lib": "~0.4.0",
-    "chromedriver": "^114.0.2",
+    "chromedriver": "^119.0.1",
     "fs-extra": "^11.1.1",
     "http-server": "^14.1.1",
     "selenium-webdriver": "^4.10.0"

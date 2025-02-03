@@ -11,6 +11,11 @@
 
 #pragma once
 
+#include "Common.h"
+#include "CBuildingsPool.h"
+#include "CDummyPool.h"
+#include "CTxdPool.h"
+
 class CClientEntity;
 class CEntity;
 class CEntitySAInterface;
@@ -18,6 +23,8 @@ class CObject;
 class CObjectSA;
 class CPed;
 class CPedSA;
+class CBuilding;
+class CBuildingSA;
 class CVector;
 class CVehicle;
 class CVehicleSA;
@@ -59,10 +66,11 @@ class CPools
 {
 public:
     // Vehicles pool
-    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2) = 0;
+    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, std::uint16_t model, std::uint8_t variation, std::uint8_t variation2) noexcept = 0;
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
+    virtual SClientEntity<CVehicleSA>* GetVehicle(size_t pos) = 0;
     virtual unsigned long              GetVehicleCount() = 0;
 
     // Objects pool
@@ -79,12 +87,13 @@ public:
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
     virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
+    virtual SClientEntity<CPedSA>* GetPed(size_t pos) = 0;
     virtual CPed*                  GetPedFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long          GetPedCount() = 0;
 
     // Others
-    virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
-                               uchar ucTrackId = 0xFF) = 0;
+    virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> models, bool iDirection,
+                               std::uint8_t ucTrackId = 255) noexcept = 0;
 
     virtual CEntity*       GetEntity(DWORD* pGameInterface) = 0;
     virtual CClientEntity* GetClientEntity(DWORD* pGameInterface) = 0;
@@ -92,15 +101,14 @@ public:
 
     virtual int  GetNumberOfUsedSpaces(ePools pool) = 0;
     virtual int  GetPoolDefaultCapacity(ePools pool) = 0;
+    virtual int  GetPoolDefaultModdedCapacity(ePools pool) = 0;
     virtual int  GetPoolCapacity(ePools pool) = 0;
     virtual void SetPoolCapacity(ePools pool, int iValue) = 0;
 
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;
 
-    virtual uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName) = 0;
-    virtual void RemoveTextureDictonarySlot(uint uiTxdID) = 0;
-    virtual bool IsFreeTextureDictonarySlot(uint uiTxdID) = 0;
-
-    virtual ushort GetFreeTextureDictonarySlot() = 0;
+    virtual CBuildingsPool& GetBuildingsPool() noexcept = 0;
+    virtual CDummyPool&     GetDummyPool() noexcept = 0;
+    virtual CTxdPool&       GetTxdPool() noexcept = 0;
 };

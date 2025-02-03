@@ -147,6 +147,10 @@ bool CClientSound::Create()
     m_pAudio->SetPanEnabled(m_bPan);
     m_pAudio->SetPan(m_fPan);
 
+    // Also check and transfer if paused
+    if (m_bPaused)
+        m_pAudio->SetPaused(m_bPaused);
+
     // Transfer play position if it was being simulated
     EndSimulationOfPlayPositionAndApply();
 

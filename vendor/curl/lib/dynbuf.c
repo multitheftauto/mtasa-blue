@@ -51,7 +51,7 @@ void Curl_dyn_init(struct dynbuf *s, size_t toobig)
 }
 
 /*
- * free the buffer and re-init the necessary fields. It doesn't touch the
+ * free the buffer and re-init the necessary fields. It does not touch the
  * 'init' field and thus this buffer can be reused to add data to again.
  */
 void Curl_dyn_free(struct dynbuf *s)
@@ -71,16 +71,17 @@ static CURLcode dyn_nappend(struct dynbuf *s,
   size_t a = s->allc;
   size_t fit = len + indx + 1; /* new string + old string + zero byte */
 
-  /* try to detect if there's rubbish in the struct */
+  /* try to detect if there is rubbish in the struct */
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(s->toobig);
   DEBUGASSERT(indx < s->toobig);
   DEBUGASSERT(!s->leng || s->bufr);
   DEBUGASSERT(a <= s->toobig);
+  DEBUGASSERT(!len || mem);
 
   if(fit > s->toobig) {
     Curl_dyn_free(s);
-    return CURLE_OUT_OF_MEMORY;
+    return CURLE_TOO_LARGE;
   }
   else if(!a) {
     DEBUGASSERT(!indx);
@@ -174,10 +175,12 @@ CURLcode Curl_dyn_addn(struct dynbuf *s, const void *mem, size_t len)
  */
 CURLcode Curl_dyn_add(struct dynbuf *s, const char *str)
 {
-  size_t n = strlen(str);
+  size_t n;
+  DEBUGASSERT(str);
   DEBUGASSERT(s);
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(!s->leng || s->bufr);
+  n = strlen(str);
   return dyn_nappend(s, (unsigned char *)str, n);
 }
 
@@ -191,10 +194,14 @@ CURLcode Curl_dyn_vaddf(struct dynbuf *s, const char *fmt, va_list ap)
   DEBUGASSERT(s);
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(!s->leng || s->bufr);
+  DEBUGASSERT(fmt);
   rc = Curl_dyn_vprintf(s, fmt, ap);
 
   if(!rc)
     return CURLE_OK;
+  else if(rc == MERR_TOO_LARGE)
+    return CURLE_TOO_LARGE;
+  return CURLE_OUT_OF_MEMORY;
 #else
   char *str;
   str = vaprintf(fmt, ap); /* this allocs a new string to append */
@@ -206,8 +213,8 @@ CURLcode Curl_dyn_vaddf(struct dynbuf *s, const char *fmt, va_list ap)
   }
   /* If we failed, we cleanup the whole buffer and return error */
   Curl_dyn_free(s);
-#endif
   return CURLE_OUT_OF_MEMORY;
+#endif
 }
 
 /*

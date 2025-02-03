@@ -116,13 +116,6 @@ CClientPad::CClientPad()
     {
         m_fStates[i] = 0.0f;
     }
-
-    // Initialise our analog control states
-    for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
-    {
-        m_sScriptedStates[i] = CS_NAN;
-        m_bScriptedStatesNextFrameOverride[i] = false;
-    }
 }
 
 bool CClientPad::GetControlState(const char* szName, bool& bState)
@@ -336,11 +329,9 @@ bool CClientPad::GetControlState(const char* szName, CControllerState& State, bo
                     return State.LeftShoulder2 == 255;
                     break;            // zoom out
                 case 9:
-                    return false;
-                    break;            // enter_exit
+                    return State.ButtonTriangle == 255; // enter_exit
                 case 10:
-                    return false;
-                    break;            // change_cam
+                    return State.Select == 255; // change_cam
                 case 11:
                     return State.ButtonSquare == 255;
                     break;            // jump
@@ -432,8 +423,7 @@ bool CClientPad::GetControlState(const char* szName, CControllerState& State, bo
                     return State.RightShoulder2 == 255;
                     break;            // look right
                 case 33:
-                    return false;
-                    break;            // look behind
+                    return State.LeftShoulder2 == 255 && State.RightShoulder2 == 255; // look behind
                 case 34:
                     return false;
                     break;            // mouse look
@@ -469,6 +459,16 @@ bool CClientPad::GetAnalogControlIndex(const char* szName, unsigned int& uiIndex
         }
     }
     return false;
+}
+
+void CClientPad::InitAnalogControlStates()
+{
+    // Initialise our analog control states
+    for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
+    {
+        m_sScriptedStates[i] = CS_NAN;
+        m_bScriptedStatesNextFrameOverride[i] = false;
+    }
 }
 
 // Get the analog control state directly from a pad state.  Use for players.

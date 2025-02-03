@@ -23,7 +23,7 @@ enum
     TASK_PRIORITY_MAX
 };
 
-enum
+enum eSecondaryTaskType
 {
     TASK_SECONDARY_ATTACK = 0,            // want duck to be after attack
     TASK_SECONDARY_DUCK,                  // because attack controls ducking movement
@@ -40,6 +40,13 @@ enum
     ABORT_PRIORITY_URGENT,
     ABORT_PRIORITY_IMMEDIATE
 };
+
+enum taskType
+{
+    PRIMARY_TASK = 0,
+    SECONDARY_TASK
+};
+
 
 class CTaskManager
 {

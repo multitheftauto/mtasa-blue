@@ -22,6 +22,7 @@
 #include <Softpub.h>
 #include <wintrust.h>
 #include <version.h>
+#include <windows.h>
 #pragma comment (lib, "wintrust")
 
 namespace fs = std::filesystem;
@@ -527,30 +528,26 @@ bool LookForGtaProcess(SString& strOutPathFilename)
 //
 //
 ///////////////////////////////////////////////////////////////
-SString DoUserAssistedSearch()
+static const SString DoUserAssistedSearch() noexcept
 {
-    SString strResult;
+    SString result;
 
-    ShowProgressDialog(g_hInstance, _("Searching for Grand Theft Auto San Andreas"), true);
+    MessageBox(nullptr, _("Start Grand Theft Auto: San Andreas.\nEnsure the game is placed in the 'Program Files (x86)' folder."), _("Searching for GTA: San Andreas"), MB_OK | MB_ICONINFORMATION);
 
-    while (!UpdateProgress(0, 100, _("Please start Grand Theft Auto San Andreas")))
+    while (true)
     {
-        SString strPathFilename;
-        // Check if user has started GTA
-        if (LookForGtaProcess(strPathFilename))
+        SString path;
+
+        if (LookForGtaProcess(path))
         {
-            // If so, get the exe path
-            ExtractFilename(strPathFilename, &strResult, NULL);
-            // And then stop it
+            ExtractFilename(path, &result, nullptr);
             TerminateGTAIfRunning();
-            break;
+            return result;
         }
 
-        Sleep(200);
+        if (MessageBox(nullptr, _("Sorry, game not found.\nStart Grand Theft Auto: San Andreas and click retry.\nEnsure the game is placed in the 'Program Files (x86)' folder."), _("Searching for GTA: San Andreas"), MB_RETRYCANCEL | MB_ICONWARNING) == IDCANCEL)
+            return result;
     }
-
-    HideProgressDialog();
-    return strResult;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2176,6 +2173,32 @@ bool IsNativeArm64Host()
     })();
 
     return isArm64;
+}
+
+bool RegQueryInteger(HKEY rootKey, LPCWSTR keyName, LPCWSTR valueName, DWORD& value)
+{
+    value = {};
+
+    HKEY key{};
+    if (RegOpenKeyExW(rootKey, keyName, 0, KEY_READ, &key) != ERROR_SUCCESS)
+        return false;
+
+    DWORD   valueType = REG_DWORD;
+    DWORD   valueSize = sizeof(value);
+    LSTATUS status = RegQueryValueExW(key, valueName, nullptr, &valueType, reinterpret_cast<LPBYTE>(&value), &valueSize);
+    RegCloseKey(key);
+    return status == ERROR_SUCCESS;
+}
+
+bool RegWriteInteger(HKEY rootKey, LPCWSTR keyName, LPCWSTR valueName, DWORD value)
+{
+    HKEY key{};
+    if (RegCreateKeyExW(rootKey, keyName, 0, 0, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &key, nullptr) != ERROR_SUCCESS)
+        return false;
+
+    LSTATUS status = RegSetValueExW(key, valueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&value), sizeof(value));
+    RegCloseKey(key);
+    return status == ERROR_SUCCESS;
 }
 
 //////////////////////////////////////////////////////////

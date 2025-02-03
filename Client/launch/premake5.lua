@@ -18,7 +18,7 @@ project "Client Launcher"
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
-		["Resources/*"] = {"*.rc", "**.ico", "**.xml"},
+		["Resources/*"] = {"*.rc", "**.ico", "**.xml", "**.manifest"},
 		["*"] = "premake5.lua"
 	}
 
@@ -35,6 +35,7 @@ project "Client Launcher"
 			"NEU/Multi Theft Auto.gdf.xml",
 			"launch.rc",
 			"Multi Theft Auto.rc",
+			"Multi Theft Auto.manifest",
 			"resource/mtaicon.ico"
 		}
 

@@ -129,7 +129,8 @@ void CClientIMGManager::UpdateStreamerBufferSize()
     m_LargestFileSizeBlocks = CalculateLargestFile();
 
     // Only update if necessary, otherwise leave it be [User might've set it manually - we don't want to touch that]
-    if (const auto s = g_pGame->GetStreaming(); m_LargestFileSizeBlocks > s->GetStreamingBufferSize()) {
+    if (const auto s = g_pGame->GetStreaming(); m_LargestFileSizeBlocks * 2048 > s->GetStreamingBufferSize())
+    {
         s->SetStreamingBufferSize(m_LargestFileSizeBlocks);
     }
 }

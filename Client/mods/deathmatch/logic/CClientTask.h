@@ -13,6 +13,7 @@
 #include <list>
 #include "lua/LuaCommon.h"
 #include "CClientEntity.h"
+#include <game/CTaskManager.h>
 
 class CClientEntity;
 class CClientManager;
@@ -22,6 +23,17 @@ class CLuaArgument;
 class CPed;
 class CTask;
 class CVehicle;
+
+struct STaskState
+{
+    bool                              bUseZone;
+    std::string                       strState;
+    std::optional<eTaskType>          eSubTask = {};
+    std::optional<eTaskType>          eSecondaryTask = {};
+    std::optional<eSecondaryTaskType> eSecondaryType = {};
+};
+
+static std::unordered_multimap<eTaskType, STaskState> g_playerTaskStates;
 
 class CClientTask
 {

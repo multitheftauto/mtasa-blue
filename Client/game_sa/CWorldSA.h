@@ -25,6 +25,7 @@
 #define VAR_COcclusion_NumActiveOccluders                   0xC73CC0
 #define CALL_CCullZones_FindTunnelAttributesForCoors        0x55570D
 #define FUNC_CWorld_FindPositionForTrackPosition            0x6F59E0
+#define FUNC_CWorld_TestSphereAgainstWorld                  0x569E20
 
 #define VAR_IgnoredEntity                                   0xB7CD68
 #define VAR_currArea                                        0xB72914
@@ -68,32 +69,15 @@ public:
     bool  GetOcclusionsEnabled();
     void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition);
     int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance);
-
-    void              RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
-    bool              IsRemovedModelInRadius(SIPLInst* pInst);
-    bool              IsModelRemoved(unsigned short modelID);
-    void              ClearRemovedBuildingLists(uint* pOutAmount = NULL);
-    bool              RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
-    SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface);
-    void              AddDataBuilding(CEntitySAInterface* pInterface);
-    void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface);
-    void              AddBinaryBuilding(CEntitySAInterface* pInterface);
-    bool              IsObjectRemoved(CEntitySAInterface* pInterface);
-    bool              IsDataModelRemoved(unsigned short usModelID);
-    bool              IsEntityRemoved(CEntitySAInterface* pInterface);
-    bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
+    bool  CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
 
     CSurfaceType* GetSurfaceInfo() override;
     void          ResetAllSurfaceInfo() override;
     bool          ResetSurfaceInfo(short sSurfaceID) override;
 
+    CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) override;
+
 private:
-    std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
-    std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;
-    std::multimap<unsigned short, sBuildingRemovalItem*>*     m_pBinaryBuildings;
-    std::map<unsigned short, unsigned short>*                 m_pRemovedObjects;
-    std::map<DWORD, bool>                                     m_pRemovedEntities;
-    std::map<DWORD, bool>                                     m_pAddedEntities;
     float                                                     m_fAircraftMaxHeight;
     CSurfaceType*                                             m_pSurfaceInfo;
 };

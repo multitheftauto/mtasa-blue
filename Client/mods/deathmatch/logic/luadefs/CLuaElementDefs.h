@@ -71,6 +71,7 @@ public:
     LUA_DECLARE(IsElementLowLod);
     LUA_DECLARE(IsElementCallPropagationEnabled);
     LUA_DECLARE(IsElementWaitingForGroundToLoad);
+    static bool IsElementOnFire(CClientEntity* entity) noexcept;
 
     // Element set funcs
     LUA_DECLARE(CreateElement);
@@ -97,6 +98,8 @@ public:
     LUA_DECLARE(SetElementCollidableWith);
     LUA_DECLARE(SetElementDoubleSided);
     LUA_DECLARE(SetElementFrozen);
-    LUA_DECLARE(SetLowLodElement);
+    static bool SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity, std::optional<CClientEntity*> pLowLodEntity);
     LUA_DECLARE(SetElementCallPropagationEnabled);
+    static bool SetElementLighting(CClientEntity* entity, float lighting);
+    static bool SetElementOnFire(CClientEntity* entity, bool onFire) noexcept;
 };

@@ -15,6 +15,7 @@
 #include "CClientEntity.h"
 #include "CResourceConfigItem.h"
 #include "CResourceFile.h"
+#include "CResourceModelStreamer.h"
 #include "CElementGroup.h"
 #include <list>
 
@@ -69,6 +70,7 @@ public:
     void                 SetResourceEntity(CClientEntity* pEntity) { m_pResourceEntity = pEntity; }
     class CClientEntity* GetResourceDynamicEntity() { return m_pResourceDynamicEntity; }
     void                 SetResourceDynamicEntity(CClientEntity* pEntity) { m_pResourceDynamicEntity = pEntity; }
+    SString              GetResourceDirectoryPath() { return GetResourceDirectoryPath(eAccessType::ACCESS_PUBLIC, ""); }
     SString              GetResourceDirectoryPath(eAccessType accessType, const SString& strMetaPath);
     class CClientEntity* GetResourceGUIEntity() { return m_pResourceGUIEntity; }
     void                 SetResourceGUIEntity(CClientEntity* pEntity) { m_pResourceGUIEntity = pEntity; }
@@ -77,6 +79,8 @@ public:
     CClientEntity*       GetResourceTXDRoot() { return m_pResourceTXDRoot; };
     CClientEntity*       GetResourceIFPRoot() { return m_pResourceIFPRoot; };
     CClientEntity*       GetResourceIMGRoot() { return m_pResourceIMGRoot; };
+
+    CResourceModelStreamer* GetResourceModelStreamer() { return &m_modelStreamer; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void DeleteClientChildren();
@@ -144,4 +148,6 @@ private:
     CFastHashSet<SString>                 m_exportedFunctions;
     CElementGroup*                        m_pDefaultElementGroup;            // stores elements created by scripts in this resource
     std::list<SNoClientCacheScript>       m_NoClientCacheScriptList;
+
+    CResourceModelStreamer m_modelStreamer{};
 };

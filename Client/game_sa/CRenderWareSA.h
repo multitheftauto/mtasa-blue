@@ -26,7 +26,7 @@ class CRenderWareSA : public CRenderWare
 {
 public:
     ZERO_ON_NEW
-    CRenderWareSA(enum eGameVersion version);
+    CRenderWareSA();
     ~CRenderWareSA();
     void Initialize();
     bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled);

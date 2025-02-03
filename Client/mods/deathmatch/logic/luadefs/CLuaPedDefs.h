@@ -38,7 +38,7 @@ public:
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);
-    LUA_DECLARE(GetPedArmor);
+    static float GetPedArmor(CClientPed* const ped) noexcept;
     LUA_DECLARE(IsPedChoking);
     LUA_DECLARE(IsPedDucked);
     LUA_DECLARE(IsPedInVehicle);
@@ -50,25 +50,30 @@ public:
     LUA_DECLARE(GetPedContactElement);
     LUA_DECLARE(GetPedRotation);
     LUA_DECLARE(CanPedBeKnockedOffBike);
-    static bool SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CVector position);
-    static bool SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float yaw, float pitch, float roll);
-    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
+    static bool SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CVector position);
+    static bool SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float yaw, float pitch, float roll);
+    static bool SetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float x, float y, float z, float w);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId);
 
-    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId);
+    static std::variant<bool, CLuaMultiReturn<float, float, float, float>> GetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId);
 
-    static bool SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CMatrix boneMatrix);
+    static bool SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CMatrix boneMatrix);
 
-    static std::variant<bool, std::array<std::array<float, 4>, 4>> GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
+    static std::variant<bool, std::array<std::array<float, 4>, 4>> GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId);
 
     static bool UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* entity);
     LUA_DECLARE_OOP(GetPedBonePosition);
     LUA_DECLARE(GetPedClothes);
-    LUA_DECLARE(GetPedControlState);
+    static bool GetPedControlState(CClientPed* const ped, const std::string control) noexcept;
     LUA_DECLARE(GetPedAnalogControlState);
     LUA_DECLARE(IsPedSunbathing);
     LUA_DECLARE(IsPedDoingGangDriveby);
     LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedAnimation);
+    static float GetPedAnimationProgress(CClientPed* ped);
+    static float GetPedAnimationSpeed(CClientPed* ped);
+    static float GetPedAnimationLength(CClientPed* ped);
     LUA_DECLARE(GetPedMoveState);
     LUA_DECLARE(GetPedMoveAnim);
     LUA_DECLARE(IsPedHeadless);
@@ -88,10 +93,10 @@ public:
     static bool SetPedArmor(CClientPed* const ped, const float armor);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);
-    LUA_DECLARE(IsPedReloadingWeapon);
+    static bool IsPedReloadingWeapon(CClientPed* const ped) noexcept;
     LUA_DECLARE(AddPedClothes);
     LUA_DECLARE(RemovePedClothes);
-    LUA_DECLARE(SetPedControlState);
+    static bool SetPedControlState(CClientPed* const ped, const std::string control, const bool state) noexcept;
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
     static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);
@@ -110,4 +115,6 @@ public:
     static bool SetPedExitVehicle(CClientPed* pPed);
     static bool IsPedBleeding(CClientPed* ped);
     static bool SetPedBleeding(CClientPed* ped, bool bleeding);
+
+    static bool killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept;
 };

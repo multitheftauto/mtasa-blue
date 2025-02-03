@@ -250,9 +250,11 @@ public:
     bool CheckIfStartable();
     void DisplayInfo();
 
-    bool               GetFilePath(const char* szFilename, std::string& strPath);
-    const std::string& GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
-    const std::string& GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
+    bool                        GetFilePath(const char* szFilename, std::string& strPath);
+    std::vector<std::string>    GetFilePaths(const char* szFilename);
+
+    const std::string&          GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
+    const std::string&          GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
 
     std::list<CResourceFile*>& GetFiles() { return m_ResourceFiles; }
     size_t                     GetFileCount() const noexcept { return m_ResourceFiles.size(); }
@@ -267,6 +269,8 @@ public:
 
     void OnPlayerJoin(CPlayer& Player);
     void SendNoClientCacheScripts(CPlayer* pPlayer = nullptr);
+
+    void OnResourceStateChange(const char* state) noexcept;
 
     CDummy*       GetResourceRootElement() { return m_pResourceElement; }
     const CDummy* GetResourceRootElement() const noexcept { return m_pResourceElement; }
@@ -283,7 +287,7 @@ public:
     bool IsResourceZip() const noexcept { return m_bResourceIsZip; }
     bool UnzipResource();
 
-    ResponseCode HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
+    HttpStatusCode HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
     std::list<CResourceFile*>::iterator       IterBegin() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::const_iterator IterBegin() const noexcept { return m_ResourceFiles.begin(); }
@@ -355,9 +359,10 @@ private:
     bool DestroyVM();
     void TidyUp();
 
-    ResponseCode HandleRequestActive(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
-    ResponseCode HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
-    bool         IsHttpAccessAllowed(CAccount* pAccount);
+    HttpStatusCode HandleRequestRouter(HttpRequest* request, HttpResponse* response, CAccount* account);
+    HttpStatusCode HandleRequestActive(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
+    HttpStatusCode HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
+    bool           IsHttpAccessAllowed(CAccount* pAccount);
 
 private:
     EResourceState m_eState = EResourceState::None;
@@ -393,10 +398,14 @@ private:
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;            // we store them here temporarily, then read them once all the resources are loaded
     std::list<CResourceFile*>      m_ResourceFiles;
+    std::map<std::string, int>     m_ResourceFilesCountPerDir;
     std::list<CResource*>          m_Dependents;            // resources that have "included" or loaded this one
     std::list<CExportedFunction>   m_ExportedFunctions;
     std::list<CResource*>          m_TemporaryIncludes;            // started by startResource script command
 
+    int         m_httpRouterCheck{};
+    std::string m_httpRouterFunction;
+    std::string m_httpRouterAclRight;
     std::string m_strCircularInclude;
     SString     m_strFailureReason;
     unzFile     m_zipfile = nullptr;

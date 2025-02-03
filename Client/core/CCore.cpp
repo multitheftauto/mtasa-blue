@@ -25,6 +25,7 @@
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordRichPresence.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -43,6 +44,7 @@ template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
 static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
@@ -157,14 +159,22 @@ CCore::CCore()
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+    m_timeDiscordAppLastUpdate = 0;
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    // Create discord rich presence
+    m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    // Reset Discord rich presence
+    if (m_pDiscordRichPresence)
+        m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -654,6 +664,20 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
+    {
+        const auto discord = g_pCore->GetDiscord();
+        if (!discord->IsDiscordRPCEnabled())
+            discord->SetDiscordRPCEnabled(true);
+
+        discord->SetPresenceState(bConnected ? _("In-game") : _("Main menu"), false);
+        discord->SetPresenceStartTimestamp(0);
+        discord->SetPresenceDetails("", false);
+
+        if (bConnected)
+            discord->SetPresenceStartTimestamp(time(nullptr));
+    }
 }
 
 bool CCore::IsConnected()
@@ -1131,8 +1155,12 @@ CWebCoreInterface* CCore::GetWebCore()
 {
     if (m_pWebCore == nullptr)
     {
+        bool gpuEnabled;
+        auto cvars = g_pCore->GetCVars();
+        cvars->Get("browser_enable_gpu", gpuEnabled);
+
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise();
+        m_pWebCore->Initialise(gpuEnabled);
     }
     return m_pWebCore;
 }
@@ -1314,6 +1342,20 @@ void CCore::DoPostFramePulse()
     GetMemStats()->Draw();
     GetGraphStats()->Draw();
     m_pConnectManager->DoPulse();
+
+    // Update Discord Rich Presence status
+    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    {
+        if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        {
+            discord->UpdatePresence();
+            m_timeDiscordAppLastUpdate = ticks;
+#ifdef DISCORD_DISABLE_IO_THREAD
+            // Update manually if we're not using the IO thread
+            discord->UpdatePresenceConnection();
+#endif
+        }
+    }
 
     TIMING_CHECKPOINT("-CorePostFrame2");
 }
@@ -1749,6 +1791,19 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::OnPostColorFilterRender()
+{
+    if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+        return;
+    
+    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+    CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
+    CGraphics::GetSingleton().LeavingMTARenderZone();
+}
+
 void CCore::ApplyCoreInitSettings()
 {
 #if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
@@ -1817,6 +1872,13 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
+
+    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
+    if (m_uiFrameRateLimit == 0)
+    {
+        m_bQueuedFrameRateValid = false;
+        GetGraphStats()->RemoveTimingPoint("Limiter");
+    }
 
     // Print new limits to the console
     if (bLogToConsole)
@@ -1956,16 +2018,12 @@ void CCore::OnDeviceRestore()
 //
 void CCore::OnPreFxRender()
 {
-    // Don't do nothing if nothing won't be drawn
-
-    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
-
-    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
-        return;
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
+        return;    
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
+    CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
     CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
@@ -1976,9 +2034,7 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-
-    CGraphics::GetSingleton().EnteringMTARenderZone();
+    CGraphics::GetSingleton().EnteringMTARenderZone();    
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
@@ -2134,11 +2190,6 @@ CModelCacheManager* CCore::GetModelCacheManager()
     if (!m_pModelCacheManager)
         m_pModelCacheManager = NewModelCacheManager();
     return m_pModelCacheManager;
-}
-
-void CCore::AddModelToPersistentCache(ushort usModelId)
-{
-    return GetModelCacheManager()->AddModelToPersistentCache(usModelId);
 }
 
 void CCore::StaticIdleHandler()
@@ -2360,4 +2411,10 @@ size_t CCore::GetStreamingMemory()
     return IsUsingCustomStreamingMemorySize()
         ? m_CustomStreamingMemoryLimitBytes
         : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+}
+
+// Discord rich presence
+std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
+{
+    return m_pDiscordRichPresence;
 }

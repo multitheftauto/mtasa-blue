@@ -363,8 +363,20 @@ void CSettings::CreateGUI()
     m_pEditNick->SetMaxLength(MAX_PLAYER_NICK_LENGTH);
     m_pEditNick->SetTextAcceptedHandler(GUI_CALLBACK(&CSettings::OnOKButtonClick, this));
 
+    m_pButtonGenerateNick = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabMultiplayer));
+    m_pButtonGenerateNick->SetPosition(CVector2D(vecSize.fX + vecTemp.fX + 50.0f + 178.0f + 5.0f, vecTemp.fY - 1.0f), false);
+    m_pButtonGenerateNick->SetSize(CVector2D(26.0f, 26.0f), false);
+    m_pButtonGenerateNick->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickButtonClick, this));
+    m_pButtonGenerateNick->SetZOrderingEnabled(false);
+
+    m_pButtonGenerateNickIcon = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pButtonGenerateNick));
+    m_pButtonGenerateNickIcon->SetSize(CVector2D(1, 1), true);
+    m_pButtonGenerateNickIcon->LoadFromFile("cgui\\images\\serverbrowser\\refresh.png");
+    m_pButtonGenerateNickIcon->SetProperty("MousePassThroughEnabled", "True");
+    m_pButtonGenerateNickIcon->SetProperty("DistributeCapturedInputs", "True");
+
     m_pSavePasswords = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save server passwords"), true));
-    m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 50.0f));
+    m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 35.0f));
     m_pSavePasswords->GetPosition(vecTemp, false);
     m_pSavePasswords->AutoSize(NULL, 20.0f);
 
@@ -388,16 +400,23 @@ void CSettings::CreateGUI()
     m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
     m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
 
+    m_pCheckBoxAllowDiscordRPC = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), false));
+    m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
     m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
 
     m_pMapRenderingLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Map rendering options")));
-    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pMapRenderingLabel->GetPosition(vecTemp, false);
     m_pMapRenderingLabel->SetFont("default-bold-small");
     m_pMapRenderingLabel->AutoSize();
+
+    vecTemp.fX += 5.0f;
 
     m_pMapAlphaLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Opacity:")));
     m_pMapAlphaLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 24.0f));
@@ -415,6 +434,20 @@ void CSettings::CreateGUI()
     m_pMapAlphaValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pMapAlphaValueLabel->GetPosition(vecTemp, false);
     m_pMapAlphaValueLabel->AutoSize("100%");
+
+    m_pMapAlphaLabel->GetPosition(vecTemp, false);
+    vecTemp.fY += 24.0f;
+
+    m_pPlayerMapImageLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Image resolution:")));
+    m_pPlayerMapImageLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 2.0f));
+    m_pPlayerMapImageLabel->AutoSize();
+
+    m_pPlayerMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabMultiplayer, ""));
+    m_pPlayerMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
+    m_pPlayerMapImageCombo->SetSize(CVector2D(170.f, 95.0f));
+    m_pPlayerMapImageCombo->AddItem(_("1024 x 1024 (Default)"));            // index 0
+    m_pPlayerMapImageCombo->AddItem(_("2048 x 2048"));                      // index 1
+    m_pPlayerMapImageCombo->SetReadOnly(true);
 
     /**
      *  Audio tab
@@ -608,16 +641,13 @@ void CSettings::CreateGUI()
      *  Video tab
      **/
     fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Resolution:"), _("FOV:"), _("Draw Distance:"), _("Brightness:"), _("FX Quality:"),
-                                               _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"), _("Opacity:"));
+                                               _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"));
 
-    m_pVideoGeneralLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("General")));
-    m_pVideoGeneralLabel->SetPosition(CVector2D(11, 13));
-    m_pVideoGeneralLabel->GetPosition(vecTemp, false);
-    m_pVideoGeneralLabel->AutoSize(NULL, 3.0f);
-    m_pVideoGeneralLabel->SetFont("default-bold-small");
+    vecTemp.fX = 11.0f;
+    vecTemp.fY = 13.0f;
 
     m_pVideoResolutionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Resolution:")));
-    m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
+    m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pVideoResolutionLabel->GetPosition(vecTemp, false);
     m_pVideoResolutionLabel->AutoSize();
 
@@ -816,6 +846,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
     m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 150.0f));
+    m_pCheckBoxCoronaReflections->AutoSize(nullptr, 20.0f);
+
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
     m_pCheckBoxMinimize->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 30.0f));
@@ -861,10 +895,6 @@ void CSettings::CreateGUI()
     m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
     m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
-    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
-    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
-
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -899,6 +929,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxRemoteJavascript->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pCheckBoxRemoteJavascript->GetPosition(vecTemp);
     m_pCheckBoxRemoteJavascript->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxBrowserGPUEnabled = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable GPU rendering"), true));
+    m_pCheckBoxBrowserGPUEnabled->SetPosition(CVector2D(vecTemp.fX + 300.0f, vecTemp.fY - 25.0f));
+    m_pCheckBoxBrowserGPUEnabled->AutoSize(NULL, 20.0f);
 
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
@@ -989,6 +1023,7 @@ void CSettings::CreateGUI()
                5.0f;
 
     vecTemp.fX += 10.0f;
+
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
     m_pFastClothesLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
@@ -1166,6 +1201,12 @@ void CSettings::CreateGUI()
     m_pCachePathValue->AutoSize();
     vecTemp.fY += fLineHeight;
 
+    // Enable camera photos getting saved to documents folder
+    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
+    m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
+    vecTemp.fY += fLineHeight;
+
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Auto updater")));
     m_pAdvancedUpdaterLabel->SetPosition(CVector2D(vecTemp.fX - 10.0f, vecTemp.fY));
@@ -1217,7 +1258,7 @@ void CSettings::CreateGUI()
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY = 354 + 10;
+    vecTemp.fY += 15.0f;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
@@ -1252,6 +1293,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
     m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
+    m_pCheckBoxAllowDiscordRPC->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowDiscordRPC, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
@@ -1607,12 +1649,17 @@ void CSettings::UpdateVideoTab()
     float fPos = SharedUtil::Unlerp(g_pCore->GetMinStreamingMemory(), uiStreamingMemory, g_pCore->GetMaxStreamingMemory());
     m_pStreamingMemory->SetScrollPosition(fPos);
 
+    // Player map alpha
     int iVar = 0;
     CVARS_GET("mapalpha", iVar);
     int iAlphaPercent = ceil(((float)Clamp(0, iVar, 255) / 255) * 100);
     m_pMapAlphaValueLabel->SetText(SString("%i%%", iAlphaPercent).c_str());
     float sbPos = (float)iAlphaPercent / 100.0f;
     m_pMapAlpha->SetScrollPosition(sbPos);
+
+    // Player map image
+    CVARS_GET("mapimage", iVar);
+    m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
 //
@@ -1829,7 +1876,9 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 
     CVARS_SET("streaming_memory", g_pCore->GetMaxStreamingMemory());
 
+    // Player map defaults
     CVARS_SET("mapalpha", 155);
+    CVARS_SET("mapimage", 0);
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing() != m_pComboAntiAliasing->GetSelectedItemIndex();
@@ -2934,6 +2983,12 @@ bool CSettings::OnOKButtonClick(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnNickButtonClick(CGUIElement* pElement)
+{
+    m_pEditNick->SetText(CNickGen::GetRandomNickname());
+    return true;
+}
+
 bool CSettings::OnCancelButtonClick(CGUIElement* pElement)
 {
     CMainMenu* pMainMenu = CLocalGUI::GetSingleton().GetMainMenu();
@@ -3009,6 +3064,11 @@ void CSettings::LoadData()
     bool alwaysShowTransferBox = false;
     CVARS_GET("always_show_transferbox", alwaysShowTransferBox);
     m_pCheckBoxAlwaysShowTransferBox->SetSelected(alwaysShowTransferBox);
+
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC;
+    CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
+    m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -3164,6 +3224,10 @@ void CSettings::LoadData()
     iVar = GetApplicationSettingInt("Win8MouseFix");
     m_pWin8MouseCheckBox->SetSelected(iVar != 0);
 
+    // Save camera photos inside user documents folder
+    CVARS_GET("photosaving", bVar);
+    m_pPhotoSavingCheckbox->SetSelected(bVar);
+
     // Update build type
     CVARS_GET("update_build_type", iVar);
     if (iVar == 0 || iVar == 1)
@@ -3258,6 +3322,8 @@ void CSettings::LoadData()
     m_pCheckBoxRemoteBrowser->SetSelected(bVar);
     CVARS_GET("browser_remote_javascript", bVar);
     m_pCheckBoxRemoteJavascript->SetSelected(bVar);
+    CVARS_GET("browser_enable_gpu", bVar);
+    m_pCheckBoxBrowserGPUEnabled->SetSelected(bVar);
 
     ReloadBrowserLists();
 }
@@ -3436,6 +3502,31 @@ void CSettings::SaveData()
     CVARS_SET("always_show_transferbox", alwaysShowTransferBox);
     g_pCore->GetModManager()->TriggerCommand(mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX, alwaysShowTransferBox);
 
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    CVARS_SET("allow_discord_rpc", bAllowDiscordRPC);
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(bAllowDiscordRPC);
+
+    if (bAllowDiscordRPC)
+    {
+        const auto discord = g_pCore->GetDiscord();
+
+        if (discord)
+        {
+            const char* state = _("Main menu");
+
+            if (g_pCore->IsConnected())
+            {                
+                state = _("In-game");
+
+                const SString& serverName = g_pCore->GetLastConnectedServerName();
+                discord->SetPresenceDetails(serverName.c_str(), false);
+            }
+
+            discord->SetPresenceState(state, false);
+        }
+    }
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);
@@ -3528,6 +3619,11 @@ void CSettings::SaveData()
     // Windows 8 mouse fix
     SetApplicationSettingInt("Win8MouseFix", m_pWin8MouseCheckBox->GetSelected());
 
+    // Save photos in documents folder
+    bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
+    CVARS_SET("photosaving", photoSaving);
+    CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
+
     // Debug setting
     if (CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem())
     {
@@ -3549,11 +3645,15 @@ void CSettings::SaveData()
         CVARS_SET("update_auto_install", iSelected);
     }
 
-    // Map alpha
+    // Player map alpha
     SString sText = m_pMapAlphaValueLabel->GetText();
-
     float fMapAlpha = ((atof(sText.substr(0, sText.length() - 1).c_str())) / 100) * 255;
     CVARS_SET("mapalpha", fMapAlpha);
+
+    // Player map image
+    int selectedComboIndex = m_pPlayerMapImageCombo->GetSelectedItemIndex();
+    if (selectedComboIndex != -1)
+        CVARS_SET("mapimage", selectedComboIndex);
 
     // Language
     CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem();
@@ -3657,6 +3757,13 @@ void CSettings::SaveData()
             bBrowserSettingChanged = true;
     }
 
+    bool bBrowserGPUEnabled = false;
+    CVARS_GET("browser_enable_gpu", bBrowserGPUEnabled);
+
+    bool bBrowserGPUSetting = m_pCheckBoxBrowserGPUEnabled->GetSelected();
+    bool bBrowserGPUSettingChanged = (bBrowserGPUSetting != bBrowserGPUEnabled);
+    CVARS_SET("browser_enable_gpu", bBrowserGPUSetting);
+
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues();
 
@@ -3666,7 +3773,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
@@ -4472,6 +4579,43 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
         CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
+}
+
+//
+// DiscordRPC
+//
+bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
+{
+    bool isEnabled = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(isEnabled);
+
+    if (isEnabled)
+        ShowRichPresenceShareDataQuestionBox(); // show question box
+
+    return true;
+}
+
+static void ShowRichPresenceShareDataCallback(void* ptr, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    CVARS_SET("discord_rpc_share_data", static_cast<bool>(uiButton));
+}
+
+void CSettings::ShowRichPresenceShareDataQuestionBox() const
+{
+    SStringX strMessage(
+        _("It seems that you have the Rich Presence connection option enabled."
+          "\nDo you want to allow servers to share their data?"
+          "\n\nThis includes yours unique ID identifier."));
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("CONSENT TO ALLOW DATA SHARING"));
+    pQuestionBox->SetMessage(strMessage);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(ShowRichPresenceShareDataCallback);
+    pQuestionBox->Show();
 }
 
 //

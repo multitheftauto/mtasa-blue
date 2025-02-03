@@ -21,7 +21,7 @@ RUN sed -i 's/deb http/deb \[arch=amd64,i386\] http/' /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y make git ncftp \
         gcc-10-arm-linux-gnueabihf g++-10-arm-linux-gnueabihf \
-        libncursesw5:armhf libncursesw5-dev:armhf libmysqlclient-dev:armhf
+        libncurses-dev:armhf libncursesw6:armhf libmysqlclient-dev:armhf
 
 # Set build directory
 VOLUME /build

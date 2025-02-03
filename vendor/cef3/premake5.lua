@@ -20,7 +20,7 @@ project "CEF"
 	postbuildcommands {
 		"{COPY} \""..cef_path.."Release/*\" \""..path.."mta\"",
 		"{COPY} \""..cef_path.."Resources/icudtl.dat\" \""..path.."mta\"",
-		"{COPY} \""..cef_path.."Resources/*.pak\" \""..path.."mta/cef\"",
+		"{COPY} \""..cef_path.."Resources/*.pak\" \""..path.."mta\"",
 		"{COPY} \""..cef_path.."Resources/locales/*\" \""..path.."mta/cef/locales\""
 	}
 

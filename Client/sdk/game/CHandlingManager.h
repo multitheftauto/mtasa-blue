@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CHandlingManager.h
+ *  FILE:        Client/sdk/game/CHandlingManager.h
  *  PURPOSE:     Vehicle handling manager interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -22,17 +22,17 @@ class CHandlingEntry;
 class CHandlingManager
 {
 public:
-    virtual CHandlingEntry*       CreateHandlingData() = 0;
-    virtual CFlyingHandlingEntry* CreateFlyingHandlingData() = 0;
-    virtual CBoatHandlingEntry*   CreateBoatHandlingData() = 0;
-    virtual CBikeHandlingEntry*   CreateBikeHandlingData() = 0;
+    virtual std::unique_ptr<CHandlingEntry>       CreateHandlingData() const noexcept = 0;
+    virtual std::unique_ptr<CFlyingHandlingEntry> CreateFlyingHandlingData() const noexcept = 0;
+    virtual std::unique_ptr<CBoatHandlingEntry>   CreateBoatHandlingData() const noexcept = 0;
+    virtual std::unique_ptr<CBikeHandlingEntry>   CreateBikeHandlingData() const noexcept = 0;
 
-    virtual const CHandlingEntry*       GetOriginalHandlingData(enum eVehicleTypes eModel) = 0;
-    virtual const CFlyingHandlingEntry* GetOriginalFlyingHandlingData(enum eVehicleTypes eModel) = 0;
-    virtual const CBoatHandlingEntry*   GetOriginalBoatHandlingData(enum eVehicleTypes eModel) = 0;
-    virtual const CBikeHandlingEntry*   GetOriginalBikeHandlingData(enum eVehicleTypes eModel) = 0;
+    virtual const CHandlingEntry*       GetOriginalHandlingData(std::uint32_t model) const noexcept = 0;
+    virtual const CFlyingHandlingEntry* GetOriginalFlyingHandlingData(std::uint32_t model) const noexcept = 0;
+    virtual const CBoatHandlingEntry*   GetOriginalBoatHandlingData(std::uint32_t model) const noexcept = 0;
+    virtual const CBikeHandlingEntry*   GetOriginalBikeHandlingData(std::uint32_t model) const noexcept = 0;
 
-    virtual eHandlingProperty GetPropertyEnumFromName(std::string strName) = 0;
-    virtual void              RemoveChangedVehicle() = 0;
-    virtual void              CheckSuspensionChanges(CHandlingEntry* pEntry) = 0;
+    virtual eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept = 0;
+
+    virtual void CheckSuspensionChanges(const CHandlingEntry* const pEntry) const noexcept = 0;
 };
