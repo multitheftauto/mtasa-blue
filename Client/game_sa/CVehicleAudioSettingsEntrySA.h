@@ -36,14 +36,14 @@ static_assert(sizeof(tVehicleAudioSettings) == 0x24, "Invalid size for tVehicleA
 class CVehicleAudioSettingsEntrySA final : public CVehicleAudioSettingsEntry
 {
 public:
-    CVehicleAudioSettingsEntrySA();
-    CVehicleAudioSettingsEntrySA(tVehicleAudioSettings* pSettings);
+    CVehicleAudioSettingsEntrySA(): m_Settings{} {};
+    CVehicleAudioSettingsEntrySA(tVehicleAudioSettings* pSettings) { m_Settings = *pSettings; };
     ~CVehicleAudioSettingsEntrySA() = default;
 
     tVehicleAudioSettings* getInterface() { return &m_Settings; };
 
     void Assign(const tVehicleAudioSettings& settings) noexcept { m_Settings = settings; }
-    void Assign(const CVehicleAudioSettingsEntry* pData);
+    void Assign(const CVehicleAudioSettingsEntry* settings) noexcept { m_Settings = static_cast<const CVehicleAudioSettingsEntrySA*>(settings)->m_Settings; };
 
     eVehicleSoundType GetSoundType() const noexcept override { return m_Settings.m_eVehicleSoundType; };
     short             GetEngineOnSoundBankID() const noexcept override { return m_Settings.m_nEngineOnSoundBankId; };
