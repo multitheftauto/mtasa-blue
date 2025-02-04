@@ -38,7 +38,7 @@ CVehicleAudioSettingsEntry* CVehicleAudioSettingsManagerSA::GetVehicleModelAudio
 
 bool CVehicleAudioSettingsManagerSA::ApplyAudioSettingsData(eVehicleTypes eModel, CVehicleAudioSettingsEntry* pEntry)
 {
-    uint uiSettingsID = GetVehicleModelAudioSettingsID(eModel);
+    size_t uiSettingsID = GetVehicleModelAudioSettingsID(eModel);
     if (uiSettingsID >= VEHICLES_COUNT)
         return false;
 
