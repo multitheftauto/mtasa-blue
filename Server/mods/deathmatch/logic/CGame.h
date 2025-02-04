@@ -265,7 +265,6 @@ public:
     CMasterServerAnnouncer*             GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
     SharedUtil::CAsyncTaskScheduler*    GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
     std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
-    CVehicleSoundSettingsManager*       GetVehicleAudioSettingsManager() { return m_pVehicleSoundSettingsManager; }
 
     void JoinPlayer(CPlayer& Player);
     void InitialDataStream(CPlayer& Player);
@@ -577,7 +576,6 @@ private:
     CRPCFunctions*                    m_pRPCFunctions;
     CLanBroadcast*                    m_pLanBroadcast;
     CWaterManager*                    m_pWaterManager;
-    CVehicleSoundSettingsManager*     m_pVehicleSoundSettingsManager;
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;
