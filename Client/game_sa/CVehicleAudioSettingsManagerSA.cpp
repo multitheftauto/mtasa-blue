@@ -14,7 +14,7 @@
 #include <array>
 
 const auto (&ORIGINAL_AUDIO_SETTINGS)[VEHICLES_COUNT] = *reinterpret_cast<const tVehicleAudioSettings (*)[VEHICLES_COUNT]>(0x860AF0);
-tVehicleAudioSettings* pNextVehicleAudioSettings = nullptr;
+tVehicleAudioSettings const * pNextVehicleAudioSettings = nullptr;
 
 CVehicleAudioSettingsManagerSA::CVehicleAudioSettingsManagerSA()
 {
@@ -48,7 +48,7 @@ bool CVehicleAudioSettingsManagerSA::ApplyAudioSettingsData(eVehicleTypes eModel
 
 void CVehicleAudioSettingsManagerSA::SetNextSettings(CVehicleAudioSettingsEntry* pSettings)
 {
-    pNextVehicleAudioSettings = static_cast<CVehicleAudioSettingsEntrySA*>(pSettings)->getInterface();
+    pNextVehicleAudioSettings = &static_cast<CVehicleAudioSettingsEntrySA*>(pSettings)->getInterface();
 }
 
 void CVehicleAudioSettingsManagerSA::ResetAudioSettingsData()
