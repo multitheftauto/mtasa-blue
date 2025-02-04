@@ -27,7 +27,7 @@ public:
     CVehicleAudioSettingsEntry& GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept override;
 
     void ResetModelSettings(uint32_t modelId) noexcept override;
-    void ResetAudioSettingsData() noexcept;
+    void ResetAudioSettingsData() noexcept override;
 
     void SetNextSettings(CVehicleAudioSettingsEntry const* pSettings) noexcept override;
     void SetNextSettings(uint32_t modelId) noexcept override;

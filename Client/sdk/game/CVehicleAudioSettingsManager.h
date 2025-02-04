@@ -20,6 +20,7 @@ public:
     virtual CVehicleAudioSettingsEntry&                 GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept = 0;
     
     virtual void ResetModelSettings(uint32_t modelId) noexcept = 0;
+    virtual void ResetAudioSettingsData() noexcept = 0;
     virtual void SetNextSettings(CVehicleAudioSettingsEntry const* pSettings) noexcept = 0;
     virtual void SetNextSettings(uint32_t modelId) noexcept = 0;
 };
