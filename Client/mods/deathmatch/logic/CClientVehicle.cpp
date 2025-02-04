@@ -82,10 +82,6 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
         m_BikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
     }
 
-    m_pOriginalSoundSettingsEntry = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData(static_cast<eVehicleTypes>(m_usModel));
-    m_pSoundSettingsEntry = g_pGame->GetVehicleAudioSettingsManager()->CreateVehicleAudioSettingsData();
-    m_pSoundSettingsEntry->Assign(m_pOriginalSoundSettingsEntry);
-
     SetTypeName("vehicle");
 
     m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
@@ -214,6 +210,8 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     // We've not changed the wheel scale
     m_bWheelScaleChanged = false;
     m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
+
+    m_pSoundSettingsEntry = nullptr;
 }
 
 CClientVehicle::~CClientVehicle()
@@ -2495,7 +2493,16 @@ void CClientVehicle::Create()
             m_pModelInfo->SetCustomCarPlateText(m_strRegPlate.c_str());
 
         // Prepare audio settings
-        g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(m_pSoundSettingsEntry);
+        if (m_pSoundSettingsEntry)
+            g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(m_pSoundSettingsEntry.get());
+        else
+        {
+            uint32_t modelId = m_usModel;
+            if (!CClientVehicleManager::IsStandardModel(modelId))
+                modelId = g_pGame->GetModelInfo(m_usModel)->GetParentID();
+
+            g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(m_usModel);
+        }
 
         // Create the vehicle
         if (CClientVehicleManager::IsTrainModel(m_usModel))
@@ -4911,6 +4918,23 @@ bool CClientVehicle::OnVehicleFallThroughMap()
     return false;
 }
 
+const CVehicleAudioSettingsEntry& CClientVehicle::GetAudioSettings() const noexcept
+{
+    if (m_pSoundSettingsEntry)
+        return *m_pSoundSettingsEntry.get();
+    else
+        return g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData(m_usModel);
+}
+
+CVehicleAudioSettingsEntry& CClientVehicle::GetOrCreateAudioSettings()
+{
+    if (!m_pSoundSettingsEntry)
+        m_pSoundSettingsEntry = g_pGame->GetVehicleAudioSettingsManager()->CreateVehicleAudioSettingsData(m_usModel);
+
+    return *m_pSoundSettingsEntry.get();
+}
+
+
 bool CClientVehicle::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
 {
     if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
@@ -5082,10 +5106,16 @@ CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
 
 void CClientVehicle::ApplyAudioSettings()
 {
-    if (m_pVehicle)
-    {
-        g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(GetAudioSettings());
-        m_pVehicle->ReinitAudio();
-    }
+    if (!m_pVehicle)
+        return;
+
+    g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(&GetAudioSettings());
+    m_pVehicle->ReinitAudio();
+}
+
+void CClientVehicle::ResetAudioSettings()
+{
+    m_pSoundSettingsEntry = nullptr;
+    ApplyAudioSettings();
 }
 

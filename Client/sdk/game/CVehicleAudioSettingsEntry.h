@@ -17,10 +17,7 @@ class CVehicleAudioSettingsEntry
 {
 public:
     // Destructor
-    virtual ~CVehicleAudioSettingsEntry(){};
-
-    // Use this to copy data from an another handling class to this
-    virtual void Assign(const CVehicleAudioSettingsEntry* pData) = 0;
+    virtual ~CVehicleAudioSettingsEntry(){}
 
     // Get
     virtual eVehicleSoundType GetSoundType() const noexcept = 0;

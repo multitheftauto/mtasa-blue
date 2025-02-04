@@ -12,6 +12,7 @@
 #pragma once
 
 #include <game/CVehicleAudioSettingsManager.h>
+#include "CVehicleAudioSettingsEntrySA.h"
 #include "CAEVehicleAudioEntitySA.h"
 #include <array>
 
@@ -22,17 +23,19 @@ class CVehicleAudioSettingsManagerSA final : public CVehicleAudioSettingsManager
 public:
     CVehicleAudioSettingsManagerSA();
 
-    CVehicleAudioSettingsEntry* CreateVehicleAudioSettingsData();
-    CVehicleAudioSettingsEntry* GetVehicleModelAudioSettingsData(eVehicleTypes eModel);
+    std::unique_ptr<CVehicleAudioSettingsEntry> CreateVehicleAudioSettingsData(uint32_t modelId) override;
+    CVehicleAudioSettingsEntry& GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept override;
 
-    bool ApplyAudioSettingsData(eVehicleTypes eModel, CVehicleAudioSettingsEntry* pEntry);
-    void SetNextSettings(CVehicleAudioSettingsEntry* pSettings);
+    void ResetModelSettings(uint32_t modelId) noexcept override;
+    void ResetAudioSettingsData() noexcept;
 
-    static void StaticSetHooks();
+    void SetNextSettings(CVehicleAudioSettingsEntry const* pSettings) noexcept override;
+    void SetNextSettings(uint32_t modelId) noexcept override;
+
+    static void StaticSetHooks() noexcept;
 
 private:
-    void   ResetAudioSettingsData();
-    size_t GetVehicleModelAudioSettingsID(eVehicleTypes eModel) const noexcept { return eModel - 400; };
+    size_t GetVehicleModelAudioSettingsID(uint32_t modelId) const noexcept { return modelId - 400; };
 
 private:
     // Array with the model audio settings entries

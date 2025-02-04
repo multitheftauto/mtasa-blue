@@ -21,43 +21,42 @@ CVehicleAudioSettingsManagerSA::CVehicleAudioSettingsManagerSA()
     ResetAudioSettingsData();
 }
 
-CVehicleAudioSettingsEntry* CVehicleAudioSettingsManagerSA::CreateVehicleAudioSettingsData()
+std::unique_ptr<CVehicleAudioSettingsEntry> CVehicleAudioSettingsManagerSA::CreateVehicleAudioSettingsData(uint32_t modelId)
 {
-    CVehicleAudioSettingsEntrySA* pSettings = new CVehicleAudioSettingsEntrySA();
-    return pSettings;
+    auto settings = std::make_unique<CVehicleAudioSettingsEntrySA>();
+    const auto& fromSetting = GetVehicleModelAudioSettingsData(modelId);
+    settings->Assign(fromSetting);
+    return settings;
 }
 
-CVehicleAudioSettingsEntry* CVehicleAudioSettingsManagerSA::GetVehicleModelAudioSettingsData(eVehicleTypes eModel)
+CVehicleAudioSettingsEntry& CVehicleAudioSettingsManagerSA::GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept
 {
-    size_t uiSettingsID = GetVehicleModelAudioSettingsID(eModel);
-    if (uiSettingsID >= VEHICLES_COUNT)
-        return nullptr;
-
-    return &m_modelEntrys[uiSettingsID];
+    return m_modelEntrys[GetVehicleModelAudioSettingsID(modelId)];
 }
 
-bool CVehicleAudioSettingsManagerSA::ApplyAudioSettingsData(eVehicleTypes eModel, CVehicleAudioSettingsEntry* pEntry)
+void CVehicleAudioSettingsManagerSA::SetNextSettings(CVehicleAudioSettingsEntry const* pSettings) noexcept
 {
-    size_t uiSettingsID = GetVehicleModelAudioSettingsID(eModel);
-    if (uiSettingsID >= VEHICLES_COUNT)
-        return false;
-
-    m_modelEntrys[uiSettingsID].Assign(pEntry);
-    return true;
+    pNextVehicleAudioSettings = &static_cast<CVehicleAudioSettingsEntrySA const*>(pSettings)->GetInterface();
 }
 
-void CVehicleAudioSettingsManagerSA::SetNextSettings(CVehicleAudioSettingsEntry* pSettings)
+void CVehicleAudioSettingsManagerSA::SetNextSettings(uint32_t modelId) noexcept
 {
-    pNextVehicleAudioSettings = &static_cast<CVehicleAudioSettingsEntrySA*>(pSettings)->getInterface();
+    pNextVehicleAudioSettings = &m_modelEntrys[GetVehicleModelAudioSettingsID(modelId)].GetInterface();
 }
 
-void CVehicleAudioSettingsManagerSA::ResetAudioSettingsData()
+void CVehicleAudioSettingsManagerSA::ResetModelSettings(uint32_t modelId) noexcept
+{
+    size_t index = GetVehicleModelAudioSettingsID(modelId);
+    m_modelEntrys[index].Assign(ORIGINAL_AUDIO_SETTINGS[index]);
+}
+
+void CVehicleAudioSettingsManagerSA::ResetAudioSettingsData() noexcept
 {
     for (size_t i = 0; i < VEHICLES_COUNT; i++)
         m_modelEntrys[i].Assign(ORIGINAL_AUDIO_SETTINGS[i]);
 }
 
-void CVehicleAudioSettingsManagerSA::StaticSetHooks()
+void CVehicleAudioSettingsManagerSA::StaticSetHooks() noexcept
 {
     // Replace 
     // 8D 34 B5 F0 0A 86 00 ; lea esi, _VehicleAudioProperties.m_eVehicleSoundType[esi*4]

@@ -146,7 +146,7 @@ CGameSA::CGameSA()
         m_pCoverManager = new CCoverManagerSA();
         m_pPlantManager = new CPlantManagerSA();
         m_pBuildingRemoval = new CBuildingRemovalSA();
-        m_pVehicleAudioSettingsManager = new CVehicleAudioSettingsManagerSA();
+        m_pVehicleAudioSettingsManager = std::make_unique<CVehicleAudioSettingsManagerSA>();
 
         m_pRenderer = std::make_unique<CRendererSA>();
 
@@ -308,7 +308,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
-    delete reinterpret_cast<CVehicleAudioSettingsManagerSA*>(m_pVehicleAudioSettingsManager);
     delete static_cast<CColStoreSA*>(m_collisionStore);
     delete static_cast<CIplStore*>(m_pIplStore);
     delete static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);

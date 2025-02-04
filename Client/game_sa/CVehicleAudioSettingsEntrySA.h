@@ -14,6 +14,7 @@
 #include "game/CVehicleAudioSettingsEntry.h"
 #include <game/Common.h>
 
+// SA interface
 struct tVehicleAudioSettings
 {
     eVehicleSoundType m_eVehicleSoundType;
@@ -40,10 +41,10 @@ public:
     CVehicleAudioSettingsEntrySA(tVehicleAudioSettings* pSettings) { m_Settings = *pSettings; };
     ~CVehicleAudioSettingsEntrySA() = default;
 
-    const tVehicleAudioSettings& getInterface() const noexcept { return m_Settings; };
+    const tVehicleAudioSettings& GetInterface() const noexcept { return m_Settings; };
 
     void Assign(const tVehicleAudioSettings& settings) noexcept { m_Settings = settings; }
-    void Assign(const CVehicleAudioSettingsEntry* settings) noexcept { m_Settings = static_cast<const CVehicleAudioSettingsEntrySA*>(settings)->getInterface(); };
+    void Assign(const CVehicleAudioSettingsEntry& settings) noexcept { m_Settings = static_cast<const CVehicleAudioSettingsEntrySA&>(settings).GetInterface(); };
 
     eVehicleSoundType GetSoundType() const noexcept override { return m_Settings.m_eVehicleSoundType; };
     short             GetEngineOnSoundBankID() const noexcept override { return m_Settings.m_nEngineOnSoundBankId; };

@@ -153,7 +153,7 @@ public:
     virtual CBuildingRemoval*         GetBuildingRemoval() = 0;
     virtual CRenderer*                GetRenderer() const noexcept = 0;
 
-    virtual CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() = 0;
+    virtual CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
