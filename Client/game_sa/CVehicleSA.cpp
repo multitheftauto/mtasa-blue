@@ -910,12 +910,6 @@ void CVehicleSA::SetEngineOn(bool bEngineOn)
     }
 }
 
-bool CVehicleSA::IsPassenger(CPed* pPed)
-{
-    using FUNC_CVehicle_IsPassenger_t = bool(__thiscall*)(CVehicleSAInterface* self, CPedSAInterface* ped);
-    return ((FUNC_CVehicle_IsPassenger_t)(FUNC_CVehicle_IsPassenger))(GetVehicleInterface(), pPed->GetPedInterface());
-}
-
 CPed* CVehicleSA::GetDriver()
 {
     CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();

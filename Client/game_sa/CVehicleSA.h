@@ -281,6 +281,10 @@ public:
         ((void(__thiscall*)(CVehicleSAInterface*, RwFrame*, std::uint32_t))0x6D2700)(this, component, state);
     }
 
+    bool IsPassenger(CPedSAInterface* ped) const noexcept {
+        return ((bool(__thiscall*)(CVehicleSAInterface const*, CPedSAInterface*))0x6D1BD0)(this, ped);
+    }
+
     CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312
 
     tHandlingDataSA*       pHandlingData;                  // +900
@@ -476,7 +480,7 @@ public:
     void  SetRailTrack(BYTE ucTrackID);
     float GetTrainPosition();
     void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true);
-    bool  IsPassenger(CPed* pPed);
+    bool  IsPassenger(CPed* pPed) noexcept { return GetVehicleInterface()->IsPassenger(pPed->GetPedInterface()); };
 
     void AddVehicleUpgrade(DWORD dwModelID);
     void RemoveVehicleUpgrade(DWORD dwModelID);
