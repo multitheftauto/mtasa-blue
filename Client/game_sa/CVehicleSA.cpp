@@ -2481,17 +2481,13 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
 
 void CVehicleSA::ReinitAudio()
 {
-    typedef bool(__thiscall * Function_TerminateAudio)(CAEVehicleAudioEntitySAInterface * pAudio);
-    ((Function_TerminateAudio)(0x4FB8C0))(m_pVehicleAudioEntity->GetInterface());
+    auto* audioInterface = m_pVehicleAudioEntity->GetInterface();
 
-    typedef int16(__thiscall * Function_InitAudio)(CAEVehicleAudioEntitySAInterface * pAudio, CVehicleSAInterface * pVehicleInterface);
-    ((Function_InitAudio)(0x4F7670))(m_pVehicleAudioEntity->GetInterface(), GetVehicleInterface());
+    audioInterface->TerminateAudio();
+    audioInterface->InitAudio(GetVehicleInterface());
 
     CPed* pLocalPlayer = pGame->GetPedContext();
 
     if (IsPassenger(pLocalPlayer) || GetDriver() == pLocalPlayer)
-    {
-        typedef bool(__thiscall * Function_SoundJoin)(CAEVehicleAudioEntitySAInterface * pAudio);
-        ((Function_SoundJoin)(0x4F5700))(m_pVehicleAudioEntity->GetInterface());
-    }
+        audioInterface->SoundJoin();
 }

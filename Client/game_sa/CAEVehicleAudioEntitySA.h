@@ -21,6 +21,8 @@
 #define FUNC_CAEVehicleAudioEntity__ProcessAIProp                                      0x4FDFD0
 #define FUNC_CAEVehicleAudioEntity__ProcessAIHeli                                      0x4FEE20
 
+class CVehicleSAInterface;
+
 struct tVehicleSound
 {
     int       m_dwIndex;
@@ -51,9 +53,13 @@ static_assert(sizeof(CAETwinLoopSoundEntity) == 0xA8, "Invalid size for CAETwinL
 class CAEVehicleAudioEntitySAInterface : public CAEAudioEntity
 {
 public:
-    void AddAudioEvent(int eventId, float volume)
+    void    AddAudioEvent(int eventId, float volume) { ((void(__thiscall*)(CAEVehicleAudioEntitySAInterface*, int, float))0x4F6420)(this, eventId, volume); }
+    bool    TerminateAudio() { return ((bool(__thiscall*)(CAEVehicleAudioEntitySAInterface*))0x4FB8C0)(this); }
+    bool    SoundJoin() { return ((bool(__thiscall*)(CAEVehicleAudioEntitySAInterface*))0x4F5700)(this); }
+
+    int16_t InitAudio(CVehicleSAInterface* vehicle)
     {
-        ((void(__thiscall*)(CAEVehicleAudioEntitySAInterface*, int, float))0x4F6420)(this, eventId, volume);
+        return ((int16_t(__thiscall*)(CAEVehicleAudioEntitySAInterface*, CVehicleSAInterface*))0x4F7670)(this, vehicle);
     }
 
     short                  unk1;                                      // +124
