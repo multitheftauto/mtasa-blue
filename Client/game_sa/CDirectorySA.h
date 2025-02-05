@@ -8,7 +8,7 @@
 
 #pragma once
 
-struct DirectoryInfo
+struct DirectoryInfoSA
 {
     uint32 m_nOffset;
     uint16 m_nStreamingSize;
@@ -16,15 +16,15 @@ struct DirectoryInfo
     char   m_szName[24];
 };
 
-class CDirectorySA
+class CDirectorySAInterface
 {
     public:
-        DirectoryInfo*  GetModelEntry(ushort modelId);
-        bool            SetModelStreamingSize(ushort modelId, uint16 size);
-        uint16          GetModelStreamingSize(ushort modelId);
+        DirectoryInfoSA* GetModelEntry(std::uint16_t modelId);
+        bool             SetModelStreamingSize(std::uint16_t modelId, uint16 size);
+        uint16           GetModelStreamingSize(std::uint16_t modelId);
 
     private:
-        DirectoryInfo* m_pEntries{};
+        DirectoryInfoSA* m_pEntries{};
         uint32         m_nCapacity{};
         uint32         m_nNumEntries{};
         bool           m_bOwnsEntries{};

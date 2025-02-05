@@ -29,8 +29,8 @@ namespace
         uint uiLoadflag;            // 0-not loaded  2-requested  3-loaded  1-processed
     };
 
-    std::map<ushort, char*>  ms_ReplacementClothesFileDataMap;
-    std::map<ushort, uint16> ms_OriginalStreamingSizesMap;
+    std::unordered_map<ushort, char*>  ms_ReplacementClothesFileDataMap;
+    std::unordered_map<ushort, uint16> ms_OriginalStreamingSizesMap;
 
     bool bClothesReplacementChanged = false;
 
@@ -48,21 +48,15 @@ namespace
         uint            uiArraySize;
     };
 
-    DWORD               FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
-    CDirectorySA*       CLOTHES_DIRECTORY = *reinterpret_cast<CDirectorySA**>(0x5A419B);
-    int                 iReturnFileId;
-    char*               pReturnBuffer;
+    DWORD                        FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
+    CDirectorySAInterface*       CLOTHES_DIRECTORY = *reinterpret_cast<CDirectorySAInterface**>(0x5A419B);
+    int                          iReturnFileId;
+    char*                        pReturnBuffer;
 
-
-    uint32_t GetSizeInBlocks(uint32_t size)
+    size_t GetSizeInBlocks(size_t size)
     {
         auto div = std::div(size, 2048);
         return (div.quot + (div.rem ? 1 : 0));
-    }
-
-    uint32_t GetSizeInBlocks(uint64_t size)
-    {
-        return GetSizeInBlocks((uint32_t)size);
     }
 }            // namespace
 
@@ -100,16 +94,16 @@ void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
     if (!pFileData)
         return;
 
-    for (std::map<ushort, char*>::iterator iter = ms_ReplacementClothesFileDataMap.begin(); iter != ms_ReplacementClothesFileDataMap.end();)
+    for (auto iter = ms_ReplacementClothesFileDataMap.begin(); iter != ms_ReplacementClothesFileDataMap.end();)
     {
         if (iter->second == pFileData)
         {
-            uint16 originalStreamingSize = MapFindRef(ms_OriginalStreamingSizesMap, iter->first);
+            auto originalStreamingSizeIter = ms_OriginalStreamingSizesMap.find(iter->first);
 
-            if (originalStreamingSize)
-                CLOTHES_DIRECTORY->SetModelStreamingSize(iter->first, originalStreamingSize);
+            if (originalStreamingSizeIter != ms_OriginalStreamingSizesMap.end())
+                CLOTHES_DIRECTORY->SetModelStreamingSize(iter->first, originalStreamingSizeIter->second);
 
-            ms_ReplacementClothesFileDataMap.erase(iter++);
+            ms_ReplacementClothesFileDataMap.erase(iter);
             bClothesReplacementChanged = true;
         }
         else

@@ -9,12 +9,12 @@
 #include "StdInc.h"
 #include "CDirectorySA.h"
 
-DirectoryInfo* CDirectorySA::GetModelEntry(ushort modelId)
+DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(std::uint16_t modelId)
 {
     if (m_nNumEntries <= 0)
         return nullptr;
 
-    DirectoryInfo* entry = m_pEntries + modelId;
+    DirectoryInfoSA* entry = m_pEntries + modelId;
 
     if (!entry)
         return nullptr;
@@ -22,9 +22,9 @@ DirectoryInfo* CDirectorySA::GetModelEntry(ushort modelId)
     return entry;
 }
 
-bool CDirectorySA::SetModelStreamingSize(ushort modelId, uint16 size)
+bool CDirectorySAInterface::SetModelStreamingSize(std::uint16_t modelId, uint16 size)
 {
-    DirectoryInfo* entry = GetModelEntry(modelId);
+    DirectoryInfoSA* entry = GetModelEntry(modelId);
 
     if (!entry)
         return false;
@@ -37,9 +37,9 @@ bool CDirectorySA::SetModelStreamingSize(ushort modelId, uint16 size)
 }
 
 
-uint16 CDirectorySA::GetModelStreamingSize(ushort modelId)
+uint16 CDirectorySAInterface::GetModelStreamingSize(std::uint16_t modelId)
 {
-    DirectoryInfo* entry = GetModelEntry(modelId);
+    DirectoryInfoSA* entry = GetModelEntry(modelId);
 
     if (!entry)
         return false;
