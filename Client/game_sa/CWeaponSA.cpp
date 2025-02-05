@@ -175,19 +175,18 @@ bool CWeaponSA::Fire(CEntity* pFiringEntity, CVector* pvecOrigin, CVector* pvecT
     return bReturn;
 }
 
-void CWeaponSA::AddGunshell(CEntity* pFiringEntity, CVector* pvecOrigin, CVector2D* pvecDirection, float fSize)
+void CWeaponSA::AddGunshell(CEntity* pFiringEntity, const CVector& vecOrigin, const CVector2D& vecDirection, float fSize)
 {
-    DWORD dwEntityInterface = 0;
-    if (pFiringEntity)
-        dwEntityInterface = (DWORD)pFiringEntity->GetInterface();
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CWeapon_AddGunshell;
+    DWORD dwEntityInterface = pFiringEntity ? reinterpret_cast<DWORD>(pFiringEntity->GetInterface()) : 0;
+
+    static DWORD dwThis = reinterpret_cast<DWORD>(m_pInterface);
+    static DWORD dwFunc = FUNC_CWeapon_AddGunshell;
     _asm
     {
         mov     ecx, dwThis
         push    fSize
-        push    pvecDirection
-        push    pvecOrigin
+        push    vecDirection
+        push    vecOrigin
         push    dwEntityInterface
         call    dwFunc
     }

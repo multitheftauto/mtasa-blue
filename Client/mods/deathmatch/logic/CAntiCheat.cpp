@@ -100,9 +100,9 @@ SString CAntiCheat::GetInfo(const SString& acInfo, const SString& sdInfo)
 
     SString strAllowedFiles = "None";
     SString strVerifyFiles = acInfo.SplitLeft(",");
-    SString strEnabledSD = sdInfo == "" ? "None" : sdInfo;
+    SString strEnabledSD = sdInfo.empty() ? SStringX("None") : sdInfo;
     SString strDisabledAC = acInfo.SplitRight(",");
-    strDisabledAC = strDisabledAC == "" ? "None" : strDisabledAC;
+    strDisabledAC = strDisabledAC.empty() ? SStringX("None") : strDisabledAC;
 
     int iVerifyFiles = atoi(strVerifyFiles);
     if (iVerifyFiles == 0)

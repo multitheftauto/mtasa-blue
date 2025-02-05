@@ -5,6 +5,8 @@ project "Client Launcher"
 	targetdir(buildpath("."))
 	debugdir(buildpath("."))
 
+	cppdialect "C++20"
+
 	includedirs {
 		"../../Shared/sdk",
 		"../sdk",

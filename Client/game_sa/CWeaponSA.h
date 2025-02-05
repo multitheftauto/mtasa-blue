@@ -67,7 +67,7 @@ public:
     void         Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed);
     void         Update(CPed* pPed);
     bool         Fire(CEntity* pFiringEntity, CVector* pvecOrigin, CVector* pvecOffset, CEntity* pTargetEntity, CVector* pvec_1, CVector* pvec_2);
-    void         AddGunshell(CEntity* pFiringEntity, CVector* pvecOrigin, CVector2D* pvecDirection, float fSize);
+    void         AddGunshell(CEntity* pFiringEntity, const CVector& vecOrigin, const CVector2D& vecDirection, float fSize);
     void DoBulletImpact(CEntity* pFiringEntity, CEntitySAInterface* pEntityInterface, CVector* pvecOrigin, CVector* pvecTarget, CColPoint* pColPoint, int i_1);
     unsigned char GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone, int i_2);
     bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity, const SLineOfSightFlags flags,

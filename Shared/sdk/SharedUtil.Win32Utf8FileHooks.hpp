@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        SharedUtil.Win32Utf8FileHooks.hpp
+ *  FILE:        Shared/sdk/SharedUtil.Win32Utf8FileHooks.hpp
  *  PURPOSE:     Hooks for making Windows file functions use UTF8 strings
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -107,7 +107,7 @@ namespace SharedUtil
     {
     #ifdef UTF8_FILE_HOOKS_PERSONALITY_Core
         static SString gtaDirCP = ToACP(g_gtaDirectory);
-        static SString gtaDirUTF8 = g_gtaDirectory.u8string();
+        static SString gtaDirUTF8 = PathToUtf8(g_gtaDirectory);
         if (strOriginal.BeginsWithI(gtaDirCP))
         {
             SString tail = strOriginal.SubStr(gtaDirCP.length());
@@ -167,19 +167,28 @@ namespace SharedUtil
         if (IsGTAProcess())
             strFileName = MakeSurePathIsUTF8(strFileName);
 #endif
-        return CreateFileW(FromUTF8(strFileName), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes,
+        return CreateFileW(FromUTF8(strFileName).c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes,
                            hTemplateFile);
     }
 
     HMODULE
     WINAPI
-    MyLoadLibraryA(__in LPCSTR lpLibFileName) { return LoadLibraryW(FromUTF8(lpLibFileName)); }
+    MyLoadLibraryA(__in LPCSTR lpLibFileName)
+    {
+        return LoadLibraryW(FromUTF8(lpLibFileName).c_str());
+    }
 
     HMODULE
     WINAPI
-    MyLoadLibraryExA(__in LPCSTR lpLibFileName, __reserved HANDLE hFile, __in DWORD dwFlags) { return LoadLibraryExW(FromUTF8(lpLibFileName), hFile, dwFlags); }
+    MyLoadLibraryExA(__in LPCSTR lpLibFileName, __reserved HANDLE hFile, __in DWORD dwFlags)
+    {
+        return LoadLibraryExW(FromUTF8(lpLibFileName).c_str(), hFile, dwFlags);
+    }
 
-    BOOL WINAPI MySetDllDirectoryA(__in_opt LPCSTR lpPathName) { return SetDllDirectoryW(FromUTF8(lpPathName)); }
+    BOOL WINAPI MySetDllDirectoryA(__in_opt LPCSTR lpPathName)
+    {
+        return SetDllDirectoryW(FromUTF8(lpPathName).c_str());
+    }
 
     BOOL WINAPI MySetCurrentDirectoryA(__in LPCSTR lpPathName)
     {
@@ -188,12 +197,18 @@ namespace SharedUtil
         if (IsGTAProcess())
             strPathName = MakeSurePathIsUTF8(strPathName);
 #endif
-        return SetCurrentDirectoryW(FromUTF8(strPathName));
+        return SetCurrentDirectoryW(FromUTF8(strPathName).c_str());
     }
 
-    int WINAPI MyAddFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID res) { return AddFontResourceExW(FromUTF8(name), fl, res); }
+    int WINAPI MyAddFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID res)
+    {
+        return AddFontResourceExW(FromUTF8(name).c_str(), fl, res);
+    }
 
-    BOOL WINAPI MyRemoveFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID pdv) { return RemoveFontResourceExW(FromUTF8(name), fl, pdv); }
+    BOOL WINAPI MyRemoveFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID pdv)
+    {
+        return RemoveFontResourceExW(FromUTF8(name).c_str(), fl, pdv);
+    }
 
     BOOL WINAPI MyRemoveDirectoryA(__in LPCSTR lpPathName)
     {
@@ -202,13 +217,13 @@ namespace SharedUtil
         if (IsGTAProcess())
             strPathName = MakeSurePathIsUTF8(lpPathName);
 #endif
-        return RemoveDirectoryW(FromUTF8(strPathName));
+        return RemoveDirectoryW(FromUTF8(strPathName).c_str());
     }
 
     BOOL WINAPI MyGetDiskFreeSpaceExA(__in_opt LPCSTR lpDirectoryName, __out_opt PULARGE_INTEGER lpFreeBytesAvailableToCaller,
                                       __out_opt PULARGE_INTEGER lpTotalNumberOfBytes, __out_opt PULARGE_INTEGER lpTotalNumberOfFreeBytes)
     {
-        return GetDiskFreeSpaceExW(FromUTF8(lpDirectoryName), lpFreeBytesAvailableToCaller, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes);
+        return GetDiskFreeSpaceExW(FromUTF8(lpDirectoryName).c_str(), lpFreeBytesAvailableToCaller, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes);
     }
 
     DWORD
@@ -220,7 +235,7 @@ namespace SharedUtil
         if (IsGTAProcess())
             strFileName = MakeSurePathIsUTF8(strFileName);
 #endif
-        return GetFileAttributesW(FromUTF8(strFileName));
+        return GetFileAttributesW(FromUTF8(strFileName).c_str());
     }
 
     BOOL WINAPI MySetFileAttributesA(__in LPCSTR lpFileName, __in DWORD dwFileAttributes)
@@ -230,12 +245,13 @@ namespace SharedUtil
         if (IsGTAProcess())
             strFileName = MakeSurePathIsUTF8(strFileName);
 #endif
-        return SetFileAttributesW(FromUTF8(strFileName), dwFileAttributes);
+        return SetFileAttributesW(FromUTF8(strFileName).c_str(), dwFileAttributes);
     }
 
     HINSTANCE STDAPICALLTYPE MyShellExecuteA(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
     {
-        return ShellExecuteW(hwnd, FromUTF8(lpOperation), FromUTF8(lpFile), FromUTF8(lpParameters), FromUTF8(lpDirectory), nShowCmd);
+        return ShellExecuteW(hwnd, FromUTF8(lpOperation).c_str(), FromUTF8(lpFile).c_str(), FromUTF8(lpParameters).c_str(), FromUTF8(lpDirectory).c_str(),
+                             nShowCmd);
     }
 
     BOOL WINAPI MyCreateDirectoryA(__in LPCSTR lpPathName, __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes)
@@ -245,17 +261,17 @@ namespace SharedUtil
         if (IsGTAProcess())
             strPathName = MakeSurePathIsUTF8(strPathName);
 #endif
-        return CreateDirectoryW(FromUTF8(strPathName), lpSecurityAttributes);
+        return CreateDirectoryW(FromUTF8(strPathName).c_str(), lpSecurityAttributes);
     }
 
     BOOL WINAPI MyCopyFileA(__in LPCSTR lpExistingFileName, __in LPCSTR lpNewFileName, __in BOOL bFailIfExists)
     {
-        return CopyFileW(FromUTF8(lpExistingFileName), FromUTF8(lpNewFileName), bFailIfExists);
+        return CopyFileW(FromUTF8(lpExistingFileName).c_str(), FromUTF8(lpNewFileName).c_str(), bFailIfExists);
     }
 
     BOOL WINAPI MyMoveFileA(__in LPCSTR lpExistingFileName, __in LPCSTR lpNewFileName)
     {
-        return MoveFileW(FromUTF8(lpExistingFileName), FromUTF8(lpNewFileName));
+        return MoveFileW(FromUTF8(lpExistingFileName).c_str(), FromUTF8(lpNewFileName).c_str());
     }
 
     BOOL WINAPI MyDeleteFileA(__in LPCSTR lpFileName)
@@ -265,7 +281,7 @@ namespace SharedUtil
         if (IsGTAProcess())
             strFileName = MakeSurePathIsUTF8(strFileName);
 #endif
-        return DeleteFileW(FromUTF8(strFileName));
+        return DeleteFileW(FromUTF8(strFileName).c_str());
     }
 
     HMODULE
@@ -274,7 +290,7 @@ namespace SharedUtil
     {
         if (!lpModuleName)
             return GetModuleHandleW(NULL);
-        return GetModuleHandleW(FromUTF8(lpModuleName));
+        return GetModuleHandleW(FromUTF8(lpModuleName).c_str());
     }
 
     /////////////////////////////////////////////////////////////
