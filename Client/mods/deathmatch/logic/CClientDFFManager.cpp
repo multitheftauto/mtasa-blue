@@ -79,7 +79,8 @@ CClientDFF* CClientDFFManager::GetElementThatReplaced(unsigned short usModel, CC
 bool CClientDFFManager::IsReplacableModel(unsigned short usModel)
 {
     // Either a vehicle model or an object model
-    return CClientObjectManager::IsValidModel(usModel) || CClientVehicleManager::IsValidModel(usModel) || CClientPlayerManager::IsValidModel(usModel);
+    return CClientObjectManager::IsValidModel(usModel) || CClientVehicleManager::IsValidModel(usModel) || CClientPlayerManager::IsValidModel(usModel) ||
+           CClientPlayerClothes::IsValidModel(usModel);
 }
 
 bool CClientDFFManager::RestoreModel(unsigned short usModel)
