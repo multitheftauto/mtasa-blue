@@ -12,10 +12,15 @@
 
 #include "CMatrixSA.h"
 
+class CPlaceableSAInterface;
+
 class CMatrixLinkSAInterface : public CMatrixSAInterface
 {
 public:
-    CBuildingSAInterface*   m_pOwner;
+    CMatrixLinkSAInterface() : CMatrixSAInterface{}, m_pOwner{}, m_pPrev{}, m_pNext{} {}
+
+public:
+    CPlaceableSAInterface*  m_pOwner;
     CMatrixLinkSAInterface* m_pPrev;
     CMatrixLinkSAInterface* m_pNext;
 };

@@ -18,8 +18,7 @@
 
 extern CGameSA* pGame;
 
-using allocated_matrix_t = char[84];
-static CDynamicPool<allocated_matrix_t, PoolGrowAddStrategy<0, 500>> EXCLUSIVE_MATRIX_POOL{};
+static CDynamicPool<CMatrixLinkSAInterface, PoolGrowAddStrategy<0, 500>> EXCLUSIVE_MATRIX_POOL{};
 
 CBuildingSA::CBuildingSA(CBuildingSAInterface* pInterface)
 {
@@ -73,7 +72,7 @@ void CBuildingSA::SetLod(CBuilding* pLod)
 
 void CBuildingSA::AllocateMatrix()
 {
-    auto* newMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(EXCLUSIVE_MATRIX_POOL.AllocateItem());
+    auto* newMatrix = EXCLUSIVE_MATRIX_POOL.AllocateItem();
     std::memset(newMatrix, 0, sizeof(CMatrixLinkSAInterface));
     newMatrix->SetTranslateOnly(m_pInterface->Placeable.m_transform.m_translate);
 
@@ -85,8 +84,8 @@ void CBuildingSA::ReallocateMatrix()
     if (!m_pInterface->HasMatrix())
         return;
 
-    auto* newMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(EXCLUSIVE_MATRIX_POOL.AllocateItem());
-    std::memcpy(newMatrix, m_pInterface->Placeable.matrix, sizeof(allocated_matrix_t));
+    auto* newMatrix = EXCLUSIVE_MATRIX_POOL.AllocateItem();
+    std::memcpy(newMatrix, m_pInterface->Placeable.matrix, sizeof(CMatrixLinkSAInterface));
     newMatrix->m_pOwner = nullptr;
     newMatrix->m_pPrev = nullptr;
     newMatrix->m_pNext = nullptr;
@@ -105,6 +104,7 @@ void CBuildingSA::RemoveAllocatedMatrix()
     if (pMatrix->m_pOwner || (pMatrix->m_pNext && pMatrix->m_pPrev))
         return;
 
-    EXCLUSIVE_MATRIX_POOL.RemoveItem(reinterpret_cast<allocated_matrix_t*>(m_pInterface->Placeable.matrix));
+    EXCLUSIVE_MATRIX_POOL.RemoveItem(reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->Placeable.matrix));
+    EXCLUSIVE_MATRIX_POOL.SetCapacity(0);
     m_pInterface->Placeable.matrix = nullptr;
 }
