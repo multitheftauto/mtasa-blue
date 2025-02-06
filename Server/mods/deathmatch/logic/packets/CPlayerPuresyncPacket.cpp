@@ -141,6 +141,12 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 if (!pSourcePlayer->GetTeleported())
                 {
                     CLuaArguments arguments;
+                    arguments.PushNumber(playerPosition.fX);
+                    arguments.PushNumber(playerPosition.fY);
+                    arguments.PushNumber(playerPosition.fZ);
+                    arguments.PushNumber(position.data.vecPosition.fX);
+                    arguments.PushNumber(position.data.vecPosition.fY);
+                    arguments.PushNumber(position.data.vecPosition.fZ);
                     pSourcePlayer->CallEvent("onPlayerTeleport", arguments, nullptr);
                 }
 
