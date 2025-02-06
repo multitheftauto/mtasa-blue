@@ -22,7 +22,7 @@ CGUILabel_Impl::CGUILabel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char
     pGUI->GetUniqueName(szUnique);
 
     // Create the window and set default settings
-    m_pWindow = pGUI->GetWindowManager()->createWindow(CGUILABEL_NAME, szUnique);
+    m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->ResolveModernName(CGUILABEL_NAME), szUnique);
     m_pWindow->setDestroyedByParent(false);
 
     // Store the pointer to this CGUI element in the CEGUI element
@@ -163,4 +163,28 @@ float CGUILabel_Impl::GetTextExtent()
     }
 
     return 0.0f;
+}
+
+void CGUILabel_Impl::InvertTextColor()
+{
+    auto& color = GetTextColor();
+    SetTextColor(255 - color.R, 255 - color.G, 255 - color.B);
+}
+
+void CGUILabel_Impl::SetPlaceholderColors()
+{
+    auto* text = reinterpret_cast<CEGUI::StaticText*>(m_pWindow);
+
+    if (!text->isPropertyPresent("PlaceholderTextColours"))
+    {
+        InvertTextColor();
+        return;
+    }
+
+    auto& prop = text->getProperty("PlaceholderTextColours");
+
+    unsigned int color = 0;
+    const char*  buffer = prop.c_str();
+    sscanf(buffer, "tl:%x tr:%x bl:%x br:%x", &color, &color, &color, &color);
+    SetTextColor(color >> 16, (color >> 8) & 0xFF, color & 0xFF);
 }

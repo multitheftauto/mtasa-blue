@@ -71,7 +71,7 @@ public:
     bool IsUsingIDs() { return m_bUsingIDs; };
 
     CXMLNode* CopyNode(CXMLNode* pParent = NULL);
-    bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive);
+    bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive, bool bDelete = true);
 
     TiXmlElement* GetNode();
     void          DeleteWrapper();
