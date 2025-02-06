@@ -20,7 +20,6 @@
 #define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
 
 #define FUNC_SetRwObjectAlpha                               0x5332C0
-#define FUNC_SetOrientation                                 0x439A80
 
 #define FUNC_CMatrix__ConvertToEulerAngles                  0x59A840
 #define FUNC_CMatrix__ConvertFromEulerAngles                0x59AA40
@@ -245,6 +244,11 @@ public:
         using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
         ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
     };
+
+    void SetOrientation(float x, float y, float z) {
+        using CPlacetable_SetOrientation = void(__thiscall*)(CEntitySAInterface * pEntity, float, float, float);
+        ((CPlacetable_SetOrientation)0x439A80)(this, x, y, z);
+    }
 
     void RemoveRWObjectWithReferencesCleanup() {
         DeleteRwObject();

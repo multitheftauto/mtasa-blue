@@ -22,7 +22,7 @@ public:
     CBuildingsPoolSA();
     ~CBuildingsPoolSA() = default;
 
-    CBuilding* AddBuilding(CClientBuilding*, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior);
+    CBuilding* AddBuilding(CClientBuilding*, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior);
     void       RemoveBuilding(CBuilding* pBuilding);
     bool       HasFreeBuildingSlot();
 

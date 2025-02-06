@@ -27,4 +27,8 @@ public:
     CBuildingSAInterface* GetBuildingInterface() { return static_cast<CBuildingSAInterface*>(GetInterface()); };
 
     void SetLod(CBuilding* pLod) override;
+
+    void AllocateMatrix();
+    void ReallocateMatrix();
+    void RemoveAllocatedMatrix();
 };
