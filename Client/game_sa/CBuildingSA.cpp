@@ -13,21 +13,13 @@
 #include "CBuildingSA.h"
 #include <game/CWorld.h>
 #include "CGameSA.h"
-#include "CMatrixSA.h"
+#include "CMatrixLinkSA.h"
 #include "CDynamicPool.h"
 
 extern CGameSA* pGame;
 
-class CMatrixLinkSAInterface : public CMatrixSAInterface
-{
-public:
-    CBuildingSAInterface* m_pOwner;
-    CMatrixLinkSAInterface* m_pPrev;
-    CMatrixLinkSAInterface* m_pNext;
-};
-
 using allocated_matrix_t = char[84];
-static CDynamicPool<allocated_matrix_t, PoolGrownAdd<0, 500>> EXCLUSIVE_MATRIX_POOL{};
+static CDynamicPool<allocated_matrix_t, PoolGrowAddStrategy<0, 500>> EXCLUSIVE_MATRIX_POOL{};
 
 CBuildingSA::CBuildingSA(CBuildingSAInterface* pInterface)
 {

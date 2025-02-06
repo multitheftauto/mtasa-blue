@@ -96,6 +96,10 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     // Add building in world
     auto pBuildingSA = new CBuildingSA(pBuilding);
 
+    // Edge case for the traincross2 (1374) model
+    if (pBuilding->HasMatrix())
+        pBuildingSA->ReallocateMatrix();
+
     // Set rotation
     if (vRot->fX != 0 || vRot->fY != 0)
         pBuildingSA->AllocateMatrix();
