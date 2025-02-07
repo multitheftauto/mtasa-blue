@@ -1247,11 +1247,31 @@ int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::GetPedControlState(CClientPed* const ped, const std::string control) noexcept
+bool CLuaPedDefs::GetPedControlState(const std::variant<CClientPed*, std::string_view> first, const std::optional<std::string_view> second) noexcept
 {
-    bool state;
+    bool             state;
+    CClientPed*      ped;
+    std::string_view control;
 
-    if (!CStaticFunctionDefinitions::GetPedControlState(*ped, control, state))
+    if (std::holds_alternative<CClientPed*>(first))
+    {
+        ped = std::get<CClientPed*>(first);
+
+        if (!second)
+            return false;
+
+        control = *second;
+    }
+    else if (std::holds_alternative<std::string_view>(first))
+    {
+        ped = CStaticFunctionDefinitions::GetLocalPlayer();
+        control = std::get<std::string_view>(first);
+    }
+
+    if (!ped)
+        return false;
+
+    if (!CStaticFunctionDefinitions::GetPedControlState(*ped, std::string(control), state))
         return false;
 
     return state;
@@ -1803,8 +1823,46 @@ int CLuaPedDefs::RemovePedClothes(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetPedControlState(CClientPed* const ped, const std::string control, const bool state) noexcept
+bool CLuaPedDefs::SetPedControlState(const std::variant<CClientPed*, std::string_view> first, const std::variant<std::string_view, bool> second, const std::optional<bool> third) noexcept
 {
+    CClientPed*      ped;
+    std::string_view control;
+    bool             state;
+
+    if (std::holds_alternative<CClientPed*>(first))
+    {
+        ped = std::get<CClientPed*>(first);
+
+        if (std::holds_alternative<std::string_view>(second))
+        {
+            control = std::get<std::string_view>(second);
+
+            if (third)
+                state = *third;
+            else
+                return false;
+        }
+        else if (std::holds_alternative<bool>(second))
+            state = std::get<bool>(second);
+        else
+            return false;
+    }
+    else if (std::holds_alternative<std::string_view>(first))
+    {
+        ped = CStaticFunctionDefinitions::GetLocalPlayer();
+        control = std::get<std::string_view>(first);
+
+        if (std::holds_alternative<bool>(second))
+            state = std::get<bool>(second);
+        else if (third)
+            state = *third;
+        else
+            return false;
+    }
+
+    if (!ped)
+        return false;
+
     return CStaticFunctionDefinitions::SetPedControlState(*ped, control, state);
 }
 
