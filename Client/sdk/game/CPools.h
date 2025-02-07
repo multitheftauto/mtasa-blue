@@ -15,6 +15,7 @@
 #include "CBuildingsPool.h"
 #include "CDummyPool.h"
 #include "CTxdPool.h"
+#include "CPtrNodeSingleLinkPool.h"
 
 class CClientEntity;
 class CEntity;
@@ -111,4 +112,5 @@ public:
     virtual CBuildingsPool& GetBuildingsPool() noexcept = 0;
     virtual CDummyPool&     GetDummyPool() noexcept = 0;
     virtual CTxdPool&       GetTxdPool() noexcept = 0;
+    virtual CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept = 0;
 };

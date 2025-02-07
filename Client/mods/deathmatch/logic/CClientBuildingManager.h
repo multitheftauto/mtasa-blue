@@ -34,13 +34,11 @@ public:
     void ResizePoolIfNeeds();
     bool SetPoolCapacity(size_t newCapacity);
 
-    void RemoveAllGameBuildings();
-    void RestoreAllGameBuildings();
-
-private:
     void DestroyAllForABit();
     void RestoreDestroyed();
+    void RestoreDestroyedSafe();
 
+private:
     bool DoPoolResize(size_t newCapacity);
     void AddToList(CClientBuilding* pBuilding) { m_List.push_back(pBuilding); }
     void RemoveFromList(CClientBuilding* pBuilding);
