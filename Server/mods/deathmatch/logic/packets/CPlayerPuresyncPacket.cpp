@@ -132,7 +132,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             position.data.vecPosition += vecTempPos;
         }
 
-        // if (position.data.vecPosition.fX != 0.0f || position.data.vecPosition.fY != 0.0f || position.data.vecPosition.fZ != 0.0f)
+        if (position.data.vecPosition.fX != 0.0f || position.data.vecPosition.fY != 0.0f || position.data.vecPosition.fZ != 0.0f)
         {
             CVector playerPosition = pSourcePlayer->GetPosition();
             float playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);
