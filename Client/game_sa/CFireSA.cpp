@@ -217,8 +217,12 @@ void CFireSA::SetNumGenerationsAllowed(char generations)
 //
 // Fix GH #3249 (PLAYER_ON_FIRE task is not aborted after the fire is extinguished)
 ////////////////////////////////////////////////////////////////////////
-static void AbortFireTask(CEntitySAInterface* entityOnFire)
+static void AbortFireTask(CEntitySAInterface* entityOnFire, DWORD returnAddress)
 {
+    // We can't and shouldn't remove the task if we're in CTaskSimplePlayerOnFire::ProcessPed. Otherwise we will crash.
+    if (returnAddress == 0x633783)
+        return;
+
     auto ped = pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(entityOnFire));
     if (!ped || !ped->pEntity)
         return;
@@ -238,10 +242,12 @@ static void _declspec(naked) HOOK_CFire_Extinguish()
     _asm
     {
         mov [eax+730h], edi
+        mov ebx, [esp+8]
 
+        push ebx
         push eax
         call AbortFireTask
-        add esp, 4
+        add esp, 8
 
         jmp CONTINUE_CFire_Extinguish
     }
