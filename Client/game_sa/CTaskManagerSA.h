@@ -57,6 +57,7 @@ public:
     CTask* FindActiveTaskByType(const int iTaskType);
     CTask* FindTaskByType(const int iPriority, const int iTaskType);
     void   RemoveTaskSecondary(const int iTaskPriority);
+    bool   RemoveTaskSecondary(const int taskPriority, const int taskType);
     void   SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType);
     CTask* GetTaskSecondary(const int iType);                        // code it
     bool   HasTaskSecondary(const CTask* pTaskSecondary);            // code it

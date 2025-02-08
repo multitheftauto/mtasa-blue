@@ -2580,7 +2580,7 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
 {
     if (IS_PED(&Entity))
     {
-        if (!Entity.IsLocalEntity())
+        if (!Entity.IsLocalEntity() && &Entity != GetLocalPlayer())
             return false;
 
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
