@@ -49,14 +49,14 @@ namespace
     };
 
     DWORD                        FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
-    CDirectorySAInterface*       CLOTHES_DIRECTORY = *reinterpret_cast<CDirectorySAInterface**>(0x5A419B);
+    CDirectorySAInterface*       g_clothesDirectory = *reinterpret_cast<CDirectorySAInterface**>(0x5A419B);
     int                          iReturnFileId;
     char*                        pReturnBuffer;
 
     size_t GetSizeInBlocks(size_t size)
     {
-        auto div = std::div(size, 2048);
-        return (div.quot + (div.rem ? 1 : 0));
+        auto blockDiv = std::div(size, 2048);
+        return (blockDiv.quot + (blockDiv.rem ? 1 : 0));
     }
 }            // namespace
 
@@ -75,8 +75,8 @@ void CRenderWareSA::ClothesAddReplacement(char* pFileData, size_t fileSize, usho
     if (pFileData != MapFindRef(ms_ReplacementClothesFileDataMap, usFileId))
     {
         MapSet(ms_ReplacementClothesFileDataMap, usFileId, pFileData);
-        MapSet(ms_OriginalStreamingSizesMap, usFileId, CLOTHES_DIRECTORY->GetModelStreamingSize(usFileId));
-        CLOTHES_DIRECTORY->SetModelStreamingSize(usFileId, GetSizeInBlocks(fileSize));
+        MapSet(ms_OriginalStreamingSizesMap, usFileId, g_clothesDirectory->GetModelStreamingSize(usFileId));
+        g_clothesDirectory->SetModelStreamingSize(usFileId, GetSizeInBlocks(fileSize));
 
         bClothesReplacementChanged = true;
     }
@@ -101,7 +101,7 @@ void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
             auto originalStreamingSizeIter = ms_OriginalStreamingSizesMap.find(iter->first);
 
             if (originalStreamingSizeIter != ms_OriginalStreamingSizesMap.end())
-                CLOTHES_DIRECTORY->SetModelStreamingSize(iter->first, originalStreamingSizeIter->second);
+                g_clothesDirectory->SetModelStreamingSize(iter->first, originalStreamingSizeIter->second);
 
             ms_ReplacementClothesFileDataMap.erase(iter);
             bClothesReplacementChanged = true;
