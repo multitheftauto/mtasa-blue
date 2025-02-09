@@ -103,6 +103,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
         auto stride = static_cast<std::uint32_t>(LockedRect.Pitch);
 
         Bitmap bitmap{surfaceData, pVectorGraphicItem->m_uiSizeX, pVectorGraphicItem->m_uiSizeY, stride};
+        bitmap.clear(0);
         svgDocument->render(bitmap, transformationMatrix);
         UnpremultiplyBitmap(bitmap);
 
