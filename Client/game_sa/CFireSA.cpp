@@ -14,6 +14,8 @@
 #include "CFireSA.h"
 #include "CGameSA.h"
 #include "CPoolsSA.h"
+#include <game/CTaskManager.h>
+#include <game/TaskTypes.h>
 
 extern CGameSA* pGame;
 
@@ -208,4 +210,50 @@ void CFireSA::SetStrength(float fStrength)
 void CFireSA::SetNumGenerationsAllowed(char generations)
 {
     internalInterface->nNumGenerationsAllowed = generations;
+}
+
+////////////////////////////////////////////////////////////////////////
+// CFire::Extinguish
+//
+// Fix GH #3249 (PLAYER_ON_FIRE task is not aborted after the fire is extinguished)
+////////////////////////////////////////////////////////////////////////
+static void AbortFireTask(CEntitySAInterface* entityOnFire, DWORD returnAddress)
+{
+    // We can't and shouldn't remove the task if we're in CTaskSimplePlayerOnFire::ProcessPed. Otherwise we will crash.
+    if (returnAddress == 0x633783)
+        return;
+
+    auto ped = pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(entityOnFire));
+    if (!ped || !ped->pEntity)
+        return;
+
+    CTaskManager* taskManager = ped->pEntity->GetPedIntelligence()->GetTaskManager();
+    if (!taskManager)
+        return;
+
+    taskManager->RemoveTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM, TASK_SIMPLE_PLAYER_ON_FIRE);
+}
+
+#define HOOKPOS_CFire_Extinguish 0x539429
+#define HOOKSIZE_CFire_Extinguish 6
+static constexpr std::uintptr_t CONTINUE_CFire_Extinguish = 0x53942F;
+static void _declspec(naked) HOOK_CFire_Extinguish()
+{
+    _asm
+    {
+        mov [eax+730h], edi
+        mov ebx, [esp+8]
+
+        push ebx
+        push eax
+        call AbortFireTask
+        add esp, 8
+
+        jmp CONTINUE_CFire_Extinguish
+    }
+}
+
+void CFireSA::StaticSetHooks()
+{
+    EZHookInstall(CFire_Extinguish);
 }

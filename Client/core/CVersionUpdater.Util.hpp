@@ -12,8 +12,8 @@
 class CVersionUpdater;
 
 // Update master info
-#define UPDATER_MASTER_URL1 "http://updatesa.mtasa.com/sa/master/?v=%VERSION%&id=%ID%"
-#define UPDATER_MASTER_URL2 "http://updatesa.multitheftauto.com/sa/master/?v=%VERSION%&id=%ID%"
+#define UPDATER_MASTER_URL1 "https://updatesa.mtasa.com/sa/master/?v=%VERSION%&id=%ID%"
+#define UPDATER_MASTER_URL2 "https://updatesa.multitheftauto.com/sa/master/?v=%VERSION%&id=%ID%"
 
 /*
 

@@ -38,7 +38,7 @@ public:
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);
-    LUA_DECLARE(GetPedArmor);
+    static float GetPedArmor(CClientPed* const ped) noexcept;
     LUA_DECLARE(IsPedChoking);
     LUA_DECLARE(IsPedDucked);
     LUA_DECLARE(IsPedInVehicle);
@@ -65,7 +65,7 @@ public:
     static bool UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* entity);
     LUA_DECLARE_OOP(GetPedBonePosition);
     LUA_DECLARE(GetPedClothes);
-    LUA_DECLARE(GetPedControlState);
+    static bool GetPedControlState(std::variant<CClientPed*, std::string> first, std::optional<std::string> maybeControl);
     LUA_DECLARE(GetPedAnalogControlState);
     LUA_DECLARE(IsPedSunbathing);
     LUA_DECLARE(IsPedDoingGangDriveby);
@@ -96,7 +96,8 @@ public:
     static bool IsPedReloadingWeapon(CClientPed* const ped) noexcept;
     LUA_DECLARE(AddPedClothes);
     LUA_DECLARE(RemovePedClothes);
-    LUA_DECLARE(SetPedControlState);
+    static bool SetPedControlState(std::variant<CClientPed*, std::string> first, std::variant<std::string, bool> second,
+                                   std::optional<bool> maybeState);
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
     static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);

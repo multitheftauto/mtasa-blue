@@ -132,6 +132,28 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             position.data.vecPosition += vecTempPos;
         }
 
+        // if (position.data.vecPosition.fX != 0.0f || position.data.vecPosition.fY != 0.0f || position.data.vecPosition.fZ != 0.0f)
+        {
+            CVector playerPosition = pSourcePlayer->GetPosition();
+            float playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);
+            if (playerDistancePosition >= g_TickRateSettings.playerTeleportAlert)
+            {
+                if (!pSourcePlayer->GetTeleported())
+                {
+                    CLuaArguments arguments;
+                    arguments.PushNumber(playerPosition.fX);
+                    arguments.PushNumber(playerPosition.fY);
+                    arguments.PushNumber(playerPosition.fZ);
+                    arguments.PushNumber(position.data.vecPosition.fX);
+                    arguments.PushNumber(position.data.vecPosition.fY);
+                    arguments.PushNumber(position.data.vecPosition.fZ);
+                    pSourcePlayer->CallEvent("onPlayerTeleport", arguments, nullptr);
+                }
+
+                pSourcePlayer->SetTeleported(false);
+            }
+        }
+
         pSourcePlayer->SetPosition(position.data.vecPosition);
 
         // Player rotation
