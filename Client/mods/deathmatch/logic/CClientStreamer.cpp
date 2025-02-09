@@ -674,9 +674,6 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
 
         // Remove the element from its old sector
         pPreviousSector->Remove(pElement);
-
-        if (pPreviousSector->IsActivated())
-            m_ActiveElements.remove(pElement);
     }
     if (pSector)
     {
@@ -695,6 +692,10 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
         }
         else
         {
+            // Should we deactivate the element?
+            if (pPreviousSector && pPreviousSector->IsActivated())
+                m_ActiveElements.remove(pElement);
+
             // Should we activate this sector?
             if (pSector->IsExtra() && (m_pSector->IsMySurroundingSector(pSector) || m_pSector == pSector))
             {
