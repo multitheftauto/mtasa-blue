@@ -674,6 +674,9 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
 
         // Remove the element from its old sector
         pPreviousSector->Remove(pElement);
+
+        if (pPreviousSector->IsActivated())
+            m_ActiveElements.remove(pElement);
     }
     if (pSector)
     {
