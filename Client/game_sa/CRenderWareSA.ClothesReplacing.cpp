@@ -49,7 +49,7 @@ namespace
     };
 
     DWORD                        FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
-    CDirectorySAInterface*       g_clothesDirectory = *reinterpret_cast<CDirectorySAInterface**>(0x5A419B);
+    CDirectorySAInterface*       g_clothesDirectory = reinterpret_cast<CDirectorySAInterface*>(0xBC12C0);
     int                          iReturnFileId;
     char*                        pReturnBuffer;
 
