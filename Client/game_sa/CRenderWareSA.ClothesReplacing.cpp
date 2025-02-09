@@ -98,12 +98,15 @@ void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
     {
         if (iter->second == pFileData)
         {
-            auto originalStreamingSizeIter = ms_OriginalStreamingSizesMap.find(iter->first);
+            auto it = ms_OriginalStreamingSizesMap.find(iter->first);
 
-            if (originalStreamingSizeIter != ms_OriginalStreamingSizesMap.end())
-                g_clothesDirectory->SetModelStreamingSize(iter->first, originalStreamingSizeIter->second);
+            if (it != ms_OriginalStreamingSizesMap.end())
+            {
+                uint16 originalStreamingSize = it->second;
+                g_clothesDirectory->SetModelStreamingSize(iter->first, originalStreamingSize);
+            }
 
-            ms_ReplacementClothesFileDataMap.erase(iter);
+            iter = ms_ReplacementClothesFileDataMap.erase(iter);
             bClothesReplacementChanged = true;
         }
         else
