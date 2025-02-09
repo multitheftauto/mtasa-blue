@@ -96,13 +96,18 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     // Add building in world
     auto pBuildingSA = new CBuildingSA(pBuilding);
 
-    // Edge case for the traincross2 (1374) model
     if (pBuilding->HasMatrix())
+    {
+        // Edge case for the traincross2 (1374) model
+        // LoadObjectInstance allocates a matrix for the model
+        // We need allocate our own matrix and put the old matrix in the original pool
         pBuildingSA->ReallocateMatrix();
-
-    // Set rotation
-    if (vRot->fX != 0 || vRot->fY != 0)
+    }
+    else if (vRot->fX != 0 || vRot->fY != 0)
+    {
+        // Allocate matrix in our unlimited storage instead of using the shared pool.
         pBuildingSA->AllocateMatrix();
+    }
 
     pBuilding->SetOrientation(vRot->fX, vRot->fY, vRot->fZ);
 
