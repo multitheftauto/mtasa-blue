@@ -29,8 +29,8 @@ namespace
         uint uiLoadflag;            // 0-not loaded  2-requested  3-loaded  1-processed
     };
 
-    std::unordered_map<ushort, char*>  ms_ReplacementClothesFileDataMap;
-    std::unordered_map<ushort, uint16> ms_OriginalStreamingSizesMap;
+    std::unordered_map<ushort, char*>         ms_ReplacementClothesFileDataMap;
+    std::unordered_map<ushort, std::uint16_t> ms_OriginalStreamingSizesMap;
 
     bool bClothesReplacementChanged = false;
 
@@ -48,10 +48,10 @@ namespace
         uint            uiArraySize;
     };
 
-    DWORD                        FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
-    CDirectorySAInterface*       g_clothesDirectory = reinterpret_cast<CDirectorySAInterface*>(0xBC12C0);
-    int                          iReturnFileId;
-    char*                        pReturnBuffer;
+    DWORD FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
+    auto  g_clothesDirectory = reinterpret_cast<CDirectorySAInterface*>(0xBC12C0);
+    int   iReturnFileId;
+    char* pReturnBuffer;
 
     size_t GetSizeInBlocks(size_t size)
     {
@@ -102,7 +102,7 @@ void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
 
             if (it != ms_OriginalStreamingSizesMap.end())
             {
-                uint16 originalStreamingSize = it->second;
+                std::uint16_t originalStreamingSize = it->second;
                 g_clothesDirectory->SetModelStreamingSize(iter->first, originalStreamingSize);
             }
 

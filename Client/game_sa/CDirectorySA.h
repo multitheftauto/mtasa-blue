@@ -22,8 +22,8 @@ class CDirectorySAInterface
 {
     public:
         DirectoryInfoSA* GetModelEntry(std::uint16_t modelId);
-        bool             SetModelStreamingSize(std::uint16_t modelId, uint16 size);
-        uint16           GetModelStreamingSize(std::uint16_t modelId);
+        bool             SetModelStreamingSize(std::uint16_t modelId, std::uint16_t size);
+        std::uint16_t    GetModelStreamingSize(std::uint16_t modelId);
 
     private:
         DirectoryInfoSA* m_pEntries{};

@@ -24,7 +24,7 @@ DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(std::uint16_t modelId)
     return entry;
 }
 
-bool CDirectorySAInterface::SetModelStreamingSize(std::uint16_t modelId, uint16 size)
+bool CDirectorySAInterface::SetModelStreamingSize(std::uint16_t modelId, std::uint16_t size)
 {
     DirectoryInfoSA* entry = GetModelEntry(modelId);
 
@@ -39,7 +39,7 @@ bool CDirectorySAInterface::SetModelStreamingSize(std::uint16_t modelId, uint16 
 }
 
 
-uint16 CDirectorySAInterface::GetModelStreamingSize(std::uint16_t modelId)
+std::uint16_t CDirectorySAInterface::GetModelStreamingSize(std::uint16_t modelId)
 {
     DirectoryInfoSA* entry = GetModelEntry(modelId);
 
