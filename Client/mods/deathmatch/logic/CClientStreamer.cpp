@@ -686,8 +686,12 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
         // Is this new sector activated?
         if (pSector->IsActivated())
         {
-            // Add this element to our active-elements list
-            AddToSortedList(&m_ActiveElements, pElement);
+            // Was the previous sector not active?
+            if (!pPreviousSector || !pPreviousSector->IsActivated())
+            {
+                // Add this element to our active-elements list
+                AddToSortedList(&m_ActiveElements, pElement);
+            }
         }
         else
         {
