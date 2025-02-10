@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CMatrixSA.h
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #pragma once
 #include "CVector.h"
 #include "CRenderWareSA.h"
@@ -19,6 +29,7 @@ public:
     RwMatrix* m_pAttachMatrix = nullptr;
     bool      m_bOwnsAttachedMatrix = false;            // do we need to delete attaching matrix at detaching
 
+    CMatrixSAInterface() : m_right{}, flags{}, m_forward{}, pad1{}, m_up{}, pad2{}, m_pos{}, pad3{} {};
     CMatrixSAInterface(CMatrixSAInterface const& matrix);
     CMatrixSAInterface(RwMatrix* matrix, bool temporary);            // like previous + attach
     ~CMatrixSAInterface();                                           // destructor detaches matrix if attached
