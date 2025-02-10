@@ -136,7 +136,8 @@ void CClientBuilding::Create()
     if (!m_pBuilding)
         return;
 
-    m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
+	if (m_bDoubleSidedInit)
+		m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
 
     if (!m_usesCollision)
     {
