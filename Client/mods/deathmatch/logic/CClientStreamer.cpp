@@ -709,6 +709,12 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
             }
         }
     }
+    else if (pPreviousSector && pPreviousSector->IsActivated())
+    {
+        // The element was removed from sectors.
+        // Remove it from active elements too.
+        m_ActiveElements.remove(pElement);
+    }
     pElement->SetStreamSector(pSector);
 }
 
