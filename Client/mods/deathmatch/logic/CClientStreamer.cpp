@@ -502,71 +502,67 @@ void CClientStreamer::Restream(bool bMovedFar)
         }
         else
         {
-            // Same dimension as us?
-            if (pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions())
+            // Too far away? Stop here.
+            if (fElementDistanceExp > m_fMaxDistanceExp)
+                continue;
+
+            if (IS_VEHICLE(pElement))
             {
-                // Too far away? Stop here.
-                if (fElementDistanceExp > m_fMaxDistanceExp)
-                    continue;
-
-                if (IS_VEHICLE(pElement))
+                CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pElement);
+                if (pVehicle && pVehicle->GetOccupant() && IS_PLAYER(pVehicle->GetOccupant()))
                 {
-                    CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pElement);
-                    if (pVehicle && pVehicle->GetOccupant() && IS_PLAYER(pVehicle->GetOccupant()))
-                    {
-                        CClientPlayer* pPlayer = DynamicCast<CClientPlayer>(pVehicle->GetOccupant());
-                        if (pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
-                        {
-                            // if the last packet was ls he isn't streaming in soon.
-                            continue;
-                        }
-                    }
-
-                    if (pVehicle && pVehicle->GetTowedByVehicle())
-                    {
-                        // Streaming in of towed vehicles is done in CClientVehicle::StreamIn by the towing vehicle
-                        continue;
-                    }
-                }
-                if (IS_PLAYER(pElement))
-                {
-                    CClientPlayer* pPlayer = DynamicCast<CClientPlayer>(pElement);
+                    CClientPlayer* pPlayer = DynamicCast<CClientPlayer>(pVehicle->GetOccupant());
                     if (pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
                     {
                         // if the last packet was ls he isn't streaming in soon.
                         continue;
                     }
                 }
-                // If attached and attached-to is streamed out, don't consider for streaming in
-                CClientStreamElement* pAttachedTo = DynamicCast<CClientStreamElement>(pElement->GetAttachedTo());
-                if (pAttachedTo && !pAttachedTo->IsStreamedIn())
-                {
-                    // ...unless attached to low LOD version
-                    CClientObject* pAttachedToObject = DynamicCast<CClientObject>(pAttachedTo);
-                    CClientObject* pObject = DynamicCast<CClientObject>(pElement);
-                    if (!pObject || !pAttachedToObject || pObject->IsLowLod() == pAttachedToObject->IsLowLod())
-                        continue;
-                }
 
-                // Not room to stream in more elements?
-                if (bReachedLimit)
+                if (pVehicle && pVehicle->GetTowedByVehicle())
                 {
-                    // Add to the list that might be streamed in during the final phase
-                    if ((int)ClosestStreamedOutList.size() < iMaxIn)            // (only add if there is a chance it will be used)
-                        ClosestStreamedOutList.push_back(pElement);
+                    // Streaming in of towed vehicles is done in CClientVehicle::StreamIn by the towing vehicle
+                    continue;
                 }
-                else
+            }
+            if (IS_PLAYER(pElement))
+            {
+                CClientPlayer* pPlayer = DynamicCast<CClientPlayer>(pElement);
+                if (pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
                 {
-                    // Stream in the new element. Don't do it instantly unless moved from far away.
-                    pElement->InternalStreamIn(bMovedFar);
-                    bReachedLimit = ReachedLimit();
+                    // if the last packet was ls he isn't streaming in soon.
+                    continue;
+                }
+            }
+            // If attached and attached-to is streamed out, don't consider for streaming in
+            CClientStreamElement* pAttachedTo = DynamicCast<CClientStreamElement>(pElement->GetAttachedTo());
+            if (pAttachedTo && !pAttachedTo->IsStreamedIn())
+            {
+                // ...unless attached to low LOD version
+                CClientObject* pAttachedToObject = DynamicCast<CClientObject>(pAttachedTo);
+                CClientObject* pObject = DynamicCast<CClientObject>(pElement);
+                if (!pObject || !pAttachedToObject || pObject->IsLowLod() == pAttachedToObject->IsLowLod())
+                    continue;
+            }
 
-                    if (!bReachedLimit)
-                    {
-                        iMaxIn--;
-                        if (iMaxIn <= 0)
-                            break;
-                    }
+            // Not room to stream in more elements?
+            if (bReachedLimit)
+            {
+                // Add to the list that might be streamed in during the final phase
+                if ((int)ClosestStreamedOutList.size() < iMaxIn)            // (only add if there is a chance it will be used)
+                    ClosestStreamedOutList.push_back(pElement);
+            }
+            else
+            {
+                // Stream in the new element. Don't do it instantly unless moved from far away.
+                pElement->InternalStreamIn(bMovedFar);
+                bReachedLimit = ReachedLimit();
+
+                if (!bReachedLimit)
+                {
+                    iMaxIn--;
+                    if (iMaxIn <= 0)
+                        break;
                 }
             }
         }
