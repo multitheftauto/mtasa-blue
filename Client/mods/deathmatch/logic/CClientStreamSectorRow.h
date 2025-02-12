@@ -31,6 +31,7 @@ public:
     void                                      Add(CClientStreamSector* pSector);
     void                                      Remove(CClientStreamSector* pSector);
     unsigned int                              CountSectors() { return m_Sectors.size(); }
+    std::list<CClientStreamSector*>&          GetList() noexcept { return m_Sectors; }
 
     bool DoesContain(CVector& vecPosition);
     bool DoesContain(float fY);
