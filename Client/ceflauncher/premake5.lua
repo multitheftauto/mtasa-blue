@@ -4,6 +4,8 @@ project "CEFLauncher"
 	targetname "CEFLauncher"
 	targetdir(buildpath("mta/cef"))
 
+	cppdialect "C++20"
+
 	includedirs { "../sdk" }
 
 	links { "CEFLauncher DLL"}

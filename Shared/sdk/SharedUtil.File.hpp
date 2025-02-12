@@ -1,11 +1,10 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        SharedUtil.File.hpp
- *  PURPOSE:
+ *  FILE:        Shared/sdk/SharedUtil.File.hpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 #include "SharedUtil.File.h"
@@ -225,7 +224,7 @@ bool SharedUtil::FileDelete(const SString& strFilename, bool bForce)
 bool SharedUtil::FileRename(const SString& strFilenameOld, const SString& strFilenameNew, int* pOutErrorCode)
 {
 #ifdef _WIN32
-    if (MoveFileExW(FromUTF8(strFilenameOld), FromUTF8(strFilenameNew), MOVEFILE_COPY_ALLOWED) == 0)
+    if (MoveFileExW(FromUTF8(strFilenameOld).c_str(), FromUTF8(strFilenameNew).c_str(), MOVEFILE_COPY_ALLOWED) == 0)
     {
         int errorCode = GetLastError();
         if (errorCode == ERROR_ACCESS_DENIED)
@@ -577,7 +576,7 @@ SString SharedUtil::GetLaunchFilename()
 SString SharedUtil::GetPathDriveName(const SString& strPath)
 {
     wchar_t szDrive[4] = L"";
-    int     iDriveNumber = PathGetDriveNumberW(FromUTF8(strPath));
+    int     iDriveNumber = PathGetDriveNumberW(FromUTF8(strPath).c_str());
     if (iDriveNumber > -1)
         PathBuildRootW(szDrive, iDriveNumber);
     return ToUTF8(szDrive);
@@ -590,7 +589,7 @@ uint SharedUtil::GetPathFreeSpaceMB(const SString& strPath)
     if (!strDrive.empty())
     {
         ULARGE_INTEGER llUserFreeBytesAvailable;
-        if (GetDiskFreeSpaceExW(FromUTF8(strDrive), &llUserFreeBytesAvailable, NULL, NULL))
+        if (GetDiskFreeSpaceExW(FromUTF8(strDrive).c_str(), &llUserFreeBytesAvailable, NULL, NULL))
         {
             llUserFreeBytesAvailable.QuadPart /= 1048576UL;
             if (llUserFreeBytesAvailable.HighPart == 0)
@@ -618,44 +617,45 @@ SString SharedUtil::GetDriveNameWithNotEnoughSpace(uint uiResourcesPathMinMB, ui
 #endif  // #ifdef MTA_CLIENT
 #endif  // #ifdef _WIN32
 
-WString SharedUtil::FromUTF8(const SString& strPath)
+std::wstring SharedUtil::FromUTF8(const std::string& strPath)
 {
-#ifdef WIN32_TESTING   // This might be faster - Needs testing
-    const char* szSrc = strPath;
-    uint        cCharacters = strlen(szSrc) + 1;
+#ifdef WIN32_TESTING // This might be faster - Needs testing
+    uint        cCharacters = strPath.length() + 1;
     uint        cbUnicode = cCharacters * 4;
     wchar_t*    Dest = (wchar_t*)alloca(cbUnicode);
 
-    if (MultiByteToWideChar(CP_UTF8, 0, szSrc, -1, Dest, (int)cbUnicode) == 0)
-    {
-        return WString();
-    }
-    else
-    {
+    if (MultiByteToWideChar(CP_UTF8, 0, &strPath[0], -1, Dest, (int)cbUnicode))
         return Dest;
-    }
+
+    return "";
 #else
     return MbUTF8ToUTF16(strPath);
 #endif
 }
 
-SString SharedUtil::ToUTF8(const WString& strPath)
+std::string SharedUtil::ToUTF8(const std::wstring& wstrPath)
 {
-#ifdef WIN32_TESTING   // This might be faster - Needs testing
-    const wchar_t* pszW = strPath;
-    uint           cCharacters = wcslen(pszW) + 1;
+#ifdef WIN32_TESTING // This might be faster - Needs testing
+    uint           cCharacters = wstrPath.length() + 1;
     uint           cbAnsi = cCharacters * 6;
     char*          pData = (char*)alloca(cbAnsi);
 
-    if (0 == WideCharToMultiByte(CP_UTF8, 0, pszW, cCharacters, pData, cbAnsi, NULL, NULL))
-    {
-        return "";
-    }
-    return pData;
+    if (WideCharToMultiByte(CP_UTF8, 0, &wstrPath[0], cCharacters, pData, cbAnsi, nullptr, nullptr))
+        return pData;
+
+    return "";
 #else
-    return UTF16ToMbUTF8(strPath);
+    return UTF16ToMbUTF8(wstrPath);
 #endif
 }
+
+// C++20?
+#if __cplusplus >= 202002L
+std::string SharedUtil::PathToUtf8(const std::filesystem::path& path)
+{
+    return ToUTF8(path.wstring());
+}
+#endif
 
 #ifdef _WIN32
 ///////////////////////////////////////////////////////////////
@@ -771,7 +771,7 @@ std::vector<SString> SharedUtil::FindFiles(const SString& strInMatch, bool bFile
         strMatch += "*";
 
     _WIN32_FIND_DATAW findData;
-    HANDLE           hFind = FindFirstFileW(FromUTF8(strMatch), &findData);
+    HANDLE            hFind = FindFirstFileW(FromUTF8(strMatch).c_str(), &findData);
     if (hFind != INVALID_HANDLE_VALUE)
     {
         do
@@ -1013,7 +1013,7 @@ SString SharedUtil::GetSystemShortPathName(const SString& strPath)
 {
     wchar_t szBuffer[32000];
     szBuffer[0] = 0;
-    if (!GetShortPathNameW(FromUTF8(strPath), szBuffer, NUMELMS(szBuffer) - 1))
+    if (!GetShortPathNameW(FromUTF8(strPath).c_str(), szBuffer, NUMELMS(szBuffer) - 1))
         return strPath;
     return ToUTF8(szBuffer);
 }
@@ -1022,7 +1022,7 @@ SString SharedUtil::GetSystemLongPathName(const SString& strPath)
 {
     wchar_t szBuffer[32000];
     szBuffer[0] = 0;
-    if (!GetLongPathNameW(FromUTF8(strPath), szBuffer, NUMELMS(szBuffer) - 1))
+    if (!GetLongPathNameW(FromUTF8(strPath).c_str(), szBuffer, NUMELMS(szBuffer) - 1))
         return strPath;
     return ToUTF8(szBuffer);
 }
@@ -1031,7 +1031,7 @@ SString SharedUtil::GetSystemLongPathName(const SString& strPath)
 FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
 {
 #ifdef _WIN32
-    return _wfsopen(FromUTF8(szFilename), FromUTF8(szMode), _SH_DENYNO);
+    return _wfsopen(FromUTF8(szFilename).c_str(), FromUTF8(szMode).c_str(), _SH_DENYNO);
 #else
     return fopen(szFilename, szMode);
 #endif
@@ -1040,7 +1040,7 @@ FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
 int SharedUtil::File::Mkdir(const char* szPath, int iMode)
 {
 #ifdef _WIN32
-    return _wmkdir(FromUTF8(szPath));
+    return _wmkdir(FromUTF8(szPath).c_str());
 #else
     return mkdir(szPath, (mode_t)iMode);
 #endif
@@ -1049,7 +1049,7 @@ int SharedUtil::File::Mkdir(const char* szPath, int iMode)
 int SharedUtil::File::Chdir(const char* szPath)
 {
 #ifdef _WIN32
-    return _wchdir(FromUTF8(szPath));
+    return _wchdir(FromUTF8(szPath).c_str());
 #else
     return chdir(szPath);
 #endif
@@ -1058,7 +1058,7 @@ int SharedUtil::File::Chdir(const char* szPath)
 int SharedUtil::File::Rmdir(const char* szPath)
 {
 #ifdef _WIN32
-    return _wrmdir(FromUTF8(szPath));
+    return _wrmdir(FromUTF8(szPath).c_str());
 #else
     return rmdir(szPath);
 #endif
@@ -1067,7 +1067,7 @@ int SharedUtil::File::Rmdir(const char* szPath)
 int SharedUtil::File::Delete(const char* szFilename)
 {
 #ifdef _WIN32
-    return _wremove(FromUTF8(szFilename));
+    return _wremove(FromUTF8(szFilename).c_str());
 #else
     return remove(szFilename);
 #endif
@@ -1076,7 +1076,7 @@ int SharedUtil::File::Delete(const char* szFilename)
 int SharedUtil::File::Rename(const char* szOldFilename, const char* szNewFilename)
 {
 #ifdef _WIN32
-    return _wrename(FromUTF8(szOldFilename), FromUTF8(szNewFilename));
+    return _wrename(FromUTF8(szOldFilename).c_str(), FromUTF8(szNewFilename).c_str());
 #else
     return rename(szOldFilename, szNewFilename);
 #endif

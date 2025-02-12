@@ -680,7 +680,7 @@ void CClientWeapon::DoGunShells(CVector vecOrigin, CVector vecDirection)
             // Note: Nozzle flare lags behind attached object if it is moving, but we can't set attached entity here as it will crash if not a ped
             g_pGame->GetFx()->TriggerGunshot(NULL, vecOrigin, vecDirection, true);
 
-            m_pWeapon->AddGunshell(m_pObject, &vecOrigin, &CVector2D(0, -1), fShellSize);
+            m_pWeapon->AddGunshell(m_pObject, vecOrigin, CVector2D(0, -1), fShellSize);
         }
         if (m_Type != WEAPONTYPE_MINIGUN)
         {
