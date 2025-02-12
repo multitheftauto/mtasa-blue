@@ -292,8 +292,8 @@ std::string ASE::QueryFull()
     ucFlags |= 0x02;            // team
     ucFlags |= 0x04;            // skin
     ucFlags |= 0x08;            // score
-    ucFlags |= 0x16;            // ping
-    ucFlags |= 0x32;            // time
+    ucFlags |= 0x10;            // ping
+    ucFlags |= 0x20;            // time
 
     char     szTemp[256] = {'\0'};
     CPlayer* pPlayer = NULL;
