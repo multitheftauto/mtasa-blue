@@ -16,11 +16,11 @@
 class CConsoleCommands
 {
 public:
-    static bool Update(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
-    static bool StartResource(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
-    static bool StopResource(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
+    static bool StartResource(class CConsole* const console, const char* arguments, CClient* const client, CClient* const echo);
+    static bool StopResource(class CConsole* const console, const char* arguments, CClient* const client, CClient* const echo);
     static bool StopAllResources(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
-    static bool RestartResource(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
+    static bool EnsureResource(class CConsole* const console, const char* arguments, CClient* const client, CClient* const echo);
+    static bool RestartResource(class CConsole* const console, const char* arguments, CClient* const client, CClient* const echo);
     static bool RefreshResources(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
     static bool RefreshAllResources(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
     static bool ListResources(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
