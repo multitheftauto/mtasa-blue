@@ -8,13 +8,12 @@
  *
  *****************************************************************************/
 
+// NOTE: This code is based on ThirteenAG's fix, which is licensed under the MIT license.
 #include "StdInc.h"
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
-
-// NOTE: This code is based on ThirteenAG's fix, which is licensed under the MIT license.
 
 static constexpr float CameraWidth = 0.01403292f;
 static constexpr float SkyMultiFix = 10.0f;
@@ -22,7 +21,7 @@ static constexpr float SkyMultiFix = 10.0f;
 static float* ScreenAspectRatio = reinterpret_cast<float*>(0xC3EFA4);
 static float* ScreenFieldOfView = reinterpret_cast<float*>(0x8D5038);
 
-static float AdjustFOV(float factor, float aspectRatio)
+static float AdjustFOV(float factor, float aspectRatio) noexcept
 {
     return std::round((2.0f * std::atan(((aspectRatio) / (4.0f / 3.0f)) *
         std::tan(factor / 2.0f * ((float)M_PI / 180.0f)))) *

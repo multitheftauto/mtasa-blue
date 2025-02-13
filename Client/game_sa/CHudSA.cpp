@@ -56,8 +56,8 @@ CHudSA::CHudSA()
 {
     InitComponentList();
 
-    m_pfAspectRatioMultiplicatorX = (float*)VAR_AspectRatioMultX;
-    m_pfAspectRatioMultiplicatorY = (float*)VAR_AspectRatioMult;
+    m_pfAspectRatioMultiplicatorX = reinterpret_cast<float*>(VAR_AspectRatioMultX);
+    m_pfAspectRatioMultiplicatorY = reinterpret_cast<float*>(VAR_AspectRatioMult);
 
     MemPut<float>(0x866C84, 640.0f / ((4.0f / 3.0f) * 448.0f));            // 0x866C84: Weapon sprite x position
     MemPut<float>(m_pfAspectRatioMultiplicatorX, 0.0015625f);              // (1 / 640)
