@@ -147,6 +147,7 @@ CGameSA::CGameSA()
         m_pCoverManager = new CCoverManagerSA();
         m_pPlantManager = new CPlantManagerSA();
         m_pBuildingRemoval = new CBuildingRemovalSA();
+        m_pVehicleAudioSettingsManager = std::make_unique<CVehicleAudioSettingsManagerSA>();
 
         m_pRenderer = std::make_unique<CRendererSA>();
 
@@ -248,6 +249,7 @@ CGameSA::CGameSA()
         CHudSA::StaticSetHooks();
         CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
+        CVehicleAudioSettingsManagerSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {

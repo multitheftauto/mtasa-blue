@@ -18,6 +18,7 @@
 #include "CCoverManagerSA.h"
 #include "CPlantManagerSA.h"
 #include "CRendererSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -174,7 +175,12 @@ public:
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
-    
+
+    CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept override
+    {
+        return m_pVehicleAudioSettingsManager.get();
+    }
+
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
@@ -352,6 +358,8 @@ private:
     CCoverManagerSA*                  m_pCoverManager;
     CPlantManagerSA*                  m_pPlantManager;
     CBuildingRemoval*                 m_pBuildingRemoval;
+
+    std::unique_ptr<CVehicleAudioSettingsManagerSA> m_pVehicleAudioSettingsManager;
 
     std::unique_ptr<CRendererSA>    m_pRenderer;
 
