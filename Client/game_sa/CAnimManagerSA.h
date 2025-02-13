@@ -165,7 +165,4 @@ public:
 
     bool IsValidGroup(std::uint32_t uiAnimGroup) const;
     bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) const;
-private:
-    CAnimBlendAssocGroup* m_pAnimAssocGroups[MAX_ANIM_GROUPS];
-    CAnimBlock*           m_pAnimBlocks[MAX_ANIM_BLOCKS];
 };

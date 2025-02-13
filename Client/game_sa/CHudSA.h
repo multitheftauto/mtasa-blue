@@ -46,7 +46,7 @@
 
 #define FUNC_CStats_GetFatAndMuscleModifier 0x559AF0
 #define FUNC_CSprite2d_DrawBarChart         0x728640
-#define FUNC_CSprie2d_Draw                  0x728350
+#define FUNC_CSprite2d_Draw                  0x728350
 #define FUNC_CSprite_RenderOneXLUSprite     0x70D000
 
 #define CODE_ShowMoney              0x58F47D

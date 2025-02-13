@@ -18,6 +18,7 @@
 #include "CPtrNodeSingleListSA.h"
 #include "MemSA.h"
 #include "CVehicleSA.h"
+#include "CBuildingRemovalSA.h"
 
 extern CGameSA* pGame;
 
@@ -48,7 +49,17 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
     return true;
 }
 
-CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior)
+CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept
+{
+    std::uint32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pGameInterface);
+
+    if (poolIndex == static_cast<std::uint32_t>(-1))
+        return nullptr;
+
+    return m_buildingPool.entities[poolIndex].pClientEntity;
+}
+
+CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior)
 {
     if (!HasFreeBuildingSlot())
         return nullptr;
@@ -61,15 +72,12 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
         modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
 
     // Load building
-    SFileObjectInstance instance;
+    SFileObjectInstance instance{};
     instance.modelID = modelId;
     instance.lod = -1;
     instance.interiorID = interior;
     instance.position = *vPos;
-    instance.rotation = *vRot;
-
-    // Fix strange SA rotation
-    instance.rotation.fW = -instance.rotation.fW;
+    instance.rotation = {};
 
     auto pBuilding = static_cast<CBuildingSAInterface*>(CFileLoaderSA::LoadObjectInstance(&instance));
 
@@ -87,6 +95,22 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
 
     // Add building in world
     auto pBuildingSA = new CBuildingSA(pBuilding);
+
+    if (pBuilding->HasMatrix())
+    {
+        // Edge case for the traincross2 (1374) model
+        // LoadObjectInstance allocates a matrix for the model
+        // We need allocate our own matrix and put the old matrix in the original pool
+        pBuildingSA->ReallocateMatrix();
+    }
+    else if (vRot->fX != 0 || vRot->fY != 0)
+    {
+        // Allocate matrix in our unlimited storage instead of using the shared pool.
+        pBuildingSA->AllocateMatrix();
+    }
+
+    pBuilding->SetOrientation(vRot->fX, vRot->fY, vRot->fZ);
+
     pGame->GetWorld()->Add(pBuildingSA, CBuildingPool_Constructor);
 
     // Add CBuildingSA object in pool
@@ -105,6 +129,10 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     if (dwElementIndexInPool == UINT_MAX)
         return;
 
+    // Remove references to allocated matrix
+    auto* pBuildingSA = m_buildingPool.entities[dwElementIndexInPool].pEntity;
+    pBuildingSA->RemoveAllocatedMatrix();
+
     // Remove building from cover list
     pGame->GetCoverManager()->RemoveCover(pInterface);
 
@@ -117,38 +145,32 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     // Remove building from world
     pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
 
+    std::uint16_t modelId = pInterface->m_nModelIndex;
+
     // Call virtual destructor
     ((void*(__thiscall*)(void*, char))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 0);
 
     // Remove col reference
-    auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
+    auto modelInfo = pGame->GetModelInfo(modelId);
     modelInfo->RemoveColRef();
 
+    // Remove building from SA pool
+    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
+
     // Remove from BuildingSA pool
-    auto* pBuildingSA = m_buildingPool.entities[dwElementIndexInPool].pEntity;
     m_buildingPool.entities[dwElementIndexInPool] = {nullptr, nullptr};
 
     // Delete it from memory
     delete pBuildingSA;
 
-    // Remove building from SA pool
-    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
-
     // Decrease the count of elements in the pool
     --m_buildingPool.count;
 }
 
-void CBuildingsPoolSA::RemoveAllBuildings()
+void CBuildingsPoolSA::RemoveAllWithBackup()
 {
     if (m_pOriginalBuildingsBackup)
         return;
-
-    pGame->GetCoverManager()->RemoveAllCovers();
-    pGame->GetPlantManager()->RemoveAllPlants();
-
-    // Remove all shadows
-    using CStencilShadowObjects_dtorAll = void* (*)();
-    ((CStencilShadowObjects_dtorAll)0x711390)();
 
     m_pOriginalBuildingsBackup = std::make_unique<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>>();
 
@@ -176,10 +198,13 @@ void CBuildingsPoolSA::RemoveAllBuildings()
     }
 }
 
-void CBuildingsPoolSA::RestoreAllBuildings()
+void CBuildingsPoolSA::RestoreBackup()
 {
     if (!m_pOriginalBuildingsBackup)
         return;
+
+    auto* worldSA = pGame->GetWorld();
+    auto* buildingRemovealSA = static_cast<CBuildingRemovalSA*>(pGame->GetBuildingRemoval());
 
     auto& originalData = *m_pOriginalBuildingsBackup;
     auto  pBuildsingsPool = (*m_ppBuildingPoolInterface);
@@ -191,7 +216,8 @@ void CBuildingsPoolSA::RestoreAllBuildings()
             auto pBuilding = pBuildsingsPool->GetObject(i);
             *pBuilding = originalData[i].second;
 
-            pGame->GetWorld()->Add(pBuilding, CBuildingPool_Constructor);
+            worldSA->Add(pBuilding, CBuildingPool_Constructor);
+            buildingRemovealSA->AddDataBuilding(pBuilding);
         }
     }
 
@@ -202,10 +228,7 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
 {
     // Remove building from world
     pGame->GetWorld()->Remove(pBuilding, CBuildingPool_Destructor);
-
-    pBuilding->DeleteRwObject();
-    pBuilding->ResolveReferences();
-    pBuilding->RemoveShadows();
+    pBuilding->RemoveRWObjectWithReferencesCleanup();
 }
 
 bool CBuildingsPoolSA::Resize(int size)
@@ -254,7 +277,7 @@ bool CBuildingsPoolSA::Resize(int size)
         newBytemap[i].bEmpty = true;
     }
 
-    const uint32_t offset = (uint32_t)newObjects - (uint32_t)oldPool;
+    const std::uint32_t offset = (std::uint32_t)newObjects - (std::uint32_t)oldPool;
     if (oldPool != nullptr)
     {
         UpdateIplEntrysPointers(offset);
@@ -265,7 +288,7 @@ bool CBuildingsPoolSA::Resize(int size)
         UpdateBackupLodPointers(offset);
     }
 
-    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(oldPool, newObjects);
+    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(offset);
 
     RemoveVehicleDamageLinks();
     RemovePedsContactEnityLinks();

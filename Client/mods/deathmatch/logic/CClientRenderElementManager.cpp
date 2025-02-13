@@ -11,6 +11,10 @@
 #include "StdInc.h"
 #include "CClientVectorGraphic.h"
 
+constexpr std::int64_t TEMPORARY_TEXTURES_CLEANUP_PERIOD = 5000ll;
+constexpr std::int64_t TEMPORARY_TEXTURES_CLEANUP_THRESHOLD = 10000ll;
+constexpr std::size_t TEMPORARY_TEXTURES_DELETE_THRESHOLD = 10u;
+
 ////////////////////////////////////////////////////////////////
 //
 // CClientRenderElementManager::CClientRenderElementManager
@@ -283,20 +287,24 @@ CClientVectorGraphic* CClientRenderElementManager::CreateVectorGraphic(uint widt
 CClientTexture* CClientRenderElementManager::FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName)
 {
     // Check if we've already done this file
-    CClientTexture** ppTextureElement = MapFind(m_AutoTextureMap, strUniqueName);
+    SAutoTexture* ppTextureElement = MapFind(m_AutoTextureMap, strUniqueName);
     if (!ppTextureElement)
     {
         // Try to create
         CClientTexture* pNewTextureElement = CreateTexture(strFullFilePath);
         if (!pNewTextureElement)
-            return NULL;
+            return nullptr;
+
+        pNewTextureElement->MakeSystemEntity();
 
         // Add to automap if created
-        MapSet(m_AutoTextureMap, strUniqueName, pNewTextureElement);
+        MapSet(m_AutoTextureMap, strUniqueName, SAutoTexture{pNewTextureElement});
         ppTextureElement = MapFind(m_AutoTextureMap, strUniqueName);
     }
 
-    return *ppTextureElement;
+    ppTextureElement->lastUse = CTickCount::Now();
+
+    return ppTextureElement->texture;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -318,9 +326,9 @@ void CClientRenderElementManager::Remove(CClientRenderElement* pElement)
     // Remove from auto texture map
     if (pElement->IsA(CClientTexture::GetClassId()))
     {
-        for (std::map<SString, CClientTexture*>::iterator iter = m_AutoTextureMap.begin(); iter != m_AutoTextureMap.end(); ++iter)
+        for (auto iter = m_AutoTextureMap.begin(); iter != m_AutoTextureMap.end(); ++iter)
         {
-            if (iter->second == pElement)
+            if (iter->second.texture == pElement)
             {
                 m_AutoTextureMap.erase(iter);
                 break;
@@ -349,4 +357,40 @@ void CClientRenderElementManager::Remove(CClientRenderElement* pElement)
     // Release render item
     CRenderItem* pRenderItem = pElement->GetRenderItem();
     SAFE_RELEASE(pRenderItem);
+}
+
+void CClientRenderElementManager::DoPulse()
+{
+    if (m_texturePulseTimer.Get() < TEMPORARY_TEXTURES_CLEANUP_PERIOD)
+        return;
+
+    m_texturePulseTimer.Reset();
+
+    const CTickCount now = CTickCount::Now();
+
+    std::vector<CClientTexture*> deleteCandidates;
+    deleteCandidates.reserve(TEMPORARY_TEXTURES_DELETE_THRESHOLD);
+
+    for (const auto& [texName, texInfo] : m_AutoTextureMap)
+    {
+        const std::int64_t timeElapsedMs = (now - texInfo.lastUse).ToLongLong();
+        if (timeElapsedMs < TEMPORARY_TEXTURES_CLEANUP_THRESHOLD)
+            continue;
+
+        CTextureItem* textureItem = texInfo.texture->GetTextureItem();
+        if (textureItem && textureItem->m_iRefCount > 1)
+            continue;
+
+        // CElementDeleter::Delete causes changes in m_AutoTextureMap
+        // and we cannot delete a texture while iterating over it
+        deleteCandidates.push_back(texInfo.texture);
+
+        // The deletion procedure can be expensive
+        // and we're interested in capping on the number of deleted texture at once
+        if (deleteCandidates.size() == TEMPORARY_TEXTURES_DELETE_THRESHOLD)
+            break;
+    }   
+
+    for (CClientTexture* texture : deleteCandidates)
+        g_pClientGame->GetElementDeleter()->Delete(texture);   
 }

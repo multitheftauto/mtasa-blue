@@ -1274,6 +1274,12 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     assert(pElement);
     RUN_CHILDREN(SetElementPosition(*iter, vecPosition, bWarp))
 
+    if (IS_PLAYER(pElement)) 
+    {
+        CPlayer* player = static_cast<CPlayer*>(pElement);
+        player->SetTeleported(true);
+    }
+
     // Update our position for that entity.
     pElement->SetPosition(vecPosition);
 
@@ -1471,6 +1477,12 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
         BitStream.pBitStream->Write(static_cast<unsigned char>((bSetPosition) ? 1 : 0));
         if (bSetPosition)
         {
+            if (IS_PLAYER(pElement))
+            {
+                CPlayer* player = static_cast<CPlayer*>(pElement);
+                player->SetTeleported(true);
+            }
+
             BitStream.pBitStream->Write(vecPosition.fX);
             BitStream.pBitStream->Write(vecPosition.fY);
             BitStream.pBitStream->Write(vecPosition.fZ);
@@ -3518,11 +3530,11 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
 }
 
 // ***************** PED GET FUNCS ***************** //
-bool CStaticFunctionDefinitions::GetPedArmor(CPed* pPed, float& fArmor)
+bool CStaticFunctionDefinitions::GetPedArmor(CPed* const ped, float& armor)
 {
-    assert(pPed);
+    assert(ped);
 
-    fArmor = pPed->GetArmor();
+    armor = ped->GetArmor();
     return true;
 }
 
@@ -3675,39 +3687,36 @@ bool CStaticFunctionDefinitions::IsPedFrozen(CPed* pPed, bool& bIsFrozen)
 }
 
 // ************** PED SET FUNCS ************** //
-bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float fArmor)
+bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float armor)
 {
     assert(pElement);
 
-    // Make sure it's above 0
-    if (fArmor >= 0.0f)
-    {
-        RUN_CHILDREN(SetPedArmor(*iter, fArmor))
+    if (armor < 0.0f)
+        return false;
 
-        if (IS_PED(pElement))
-        {
-            CPed* pPed = static_cast<CPed*>(pElement);
-            if (pPed->IsSpawned())
-            {
-                // Limit it to 100.0
-                if (fArmor > 100.0f)
-                    fArmor = 100.0f;
+    RUN_CHILDREN(SetPedArmor(*iter, armor))
 
-                pPed->SetArmor(fArmor);
+    if (!IS_PED(pElement))
+        return false;
 
-                unsigned char ucArmor = static_cast<unsigned char>(fArmor * 1.25);
+    CPed* ped = static_cast<CPed*>(pElement);
 
-                // Tell everyone
-                CBitStream BitStream;
-                BitStream.pBitStream->Write(ucArmor);
-                BitStream.pBitStream->Write(pPed->GenerateSyncTimeContext());
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ARMOR, *BitStream.pBitStream));
-                return true;
-            }
-        }
-    }
+    if (!ped->IsSpawned())
+        return false;
 
-    return false;
+    if (armor > 100.0f)
+        armor = 100.0f;
+
+    ped->SetArmor(armor);
+
+    std::uint8_t armorUnsigned = static_cast<std::uint8_t>(armor * 1.25);
+
+    CBitStream stream;
+    stream.pBitStream->Write(armorUnsigned);
+    stream.pBitStream->Write(ped->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, SET_PED_ARMOR, *stream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth)
@@ -4508,19 +4517,41 @@ bool CStaticFunctionDefinitions::SetPedFrozen(CElement* pElement, bool bIsFrozen
     }
     return false;
 }
-bool CStaticFunctionDefinitions::reloadPedWeapon(CElement* pElement)
-{
-    assert(pElement);
-    RUN_CHILDREN(reloadPedWeapon(*iter))
 
-    if (IS_PED(pElement))
-    {
-        CPed*      pPed = static_cast<CPed*>(pElement);
-        CBitStream BitStream;
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, RELOAD_PED_WEAPON, *BitStream.pBitStream));
-        return true;
-    }
-    return false;
+bool CStaticFunctionDefinitions::ReloadPedWeapon(CElement* pElement) noexcept {
+    assert(pElement);
+    RUN_CHILDREN(ReloadPedWeapon(*iter))
+
+    if (!IS_PED(pElement))
+        return false;
+
+    CPed* ped = static_cast<CPed*>(pElement);
+
+    bool          result;
+    CLuaArguments arguments;
+
+    std::uint8_t weapon = ped->GetWeaponType();
+    std::uint16_t clip = ped->GetWeaponAmmoInClip();
+    std::uint16_t ammo = ped->GetWeaponTotalAmmo();
+
+    arguments.PushNumber(weapon);
+    arguments.PushNumber(clip);
+    arguments.PushNumber(ammo);
+
+    if (IS_PLAYER(pElement))
+        result = ped->CallEvent("onPlayerWeaponReload", arguments);
+    else
+        result = ped->CallEvent("onPedWeaponReload", arguments);
+
+    if (!result)
+        return false;
+
+    CBitStream stream;
+
+    ped->SetReloadingWeapon(true);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, RELOAD_PED_WEAPON, *stream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetCameraMatrix(CPlayer* pPlayer, CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV)

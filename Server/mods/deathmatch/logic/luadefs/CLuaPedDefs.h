@@ -28,7 +28,7 @@ public:
 
     // Ped get functions
     LUA_DECLARE(CreatePed);
-    LUA_DECLARE(GetPedArmor);
+    static float GetPedArmor(CPed* const ped);
     LUA_DECLARE(GetPedRotation);
     LUA_DECLARE(IsPedChoking);
     LUA_DECLARE(IsPedDead);
@@ -53,9 +53,10 @@ public:
     LUA_DECLARE(IsPedInVehicle);
     LUA_DECLARE(GetPedAmmoInClip);
     LUA_DECLARE(GetPedTotalAmmo);
+    static bool IsPedReloadingWeapon(CPed* const ped) noexcept;
 
     // Ped set functions
-    LUA_DECLARE(SetPedArmor);
+    static bool SetPedArmor(CPed* const ped, const float armor);
     LUA_DECLARE(KillPed);
     LUA_DECLARE(SetPedRotation);
     LUA_DECLARE(SetPedStat);
@@ -78,5 +79,5 @@ public:
     LUA_DECLARE(SetPedOnFire);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);
-    LUA_DECLARE(reloadPedWeapon);
+    static bool ReloadPedWeapon(lua_State* vm, CPed* const ped) noexcept;
 };

@@ -174,7 +174,10 @@ namespace
         {false, "getHelicopterRotorSpeed", "getVehicleRotorSpeed"},
 
         {false, "setPedOnFire", "setElementOnFire"},
-        {false, "isPedOnFire", "isElementOnFire"}
+        {false, "isPedOnFire", "isElementOnFire"},
+
+        {false, "removeAllGameBuildings", "removeGameWorld"},
+        {false, "restoreAllGameBuildings", "restoreGameWorld"},
     };
 
     SDeprecatedItem serverDeprecatedList[] = {

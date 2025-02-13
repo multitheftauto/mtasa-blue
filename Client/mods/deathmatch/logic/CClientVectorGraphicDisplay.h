@@ -13,6 +13,7 @@ class CClientVectorGraphicDisplay;
 
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
+#include <lunasvg.h>
 
 class CClientVectorGraphicDisplay final : public CClientDisplay
 {
@@ -33,6 +34,9 @@ public:
     bool HasUpdated() const { return m_bHasUpdated; }
 
     void Update();
+
+private:
+    void UnpremultiplyBitmap(lunasvg::Bitmap& bitmap);
 
 private:
     CClientVectorGraphic* m_pVectorGraphic;

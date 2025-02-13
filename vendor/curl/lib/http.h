@@ -73,7 +73,6 @@ char *Curl_checkProxyheaders(struct Curl_easy *data,
                              const struct connectdata *conn,
                              const char *thisheader,
                              const size_t thislen);
-struct HTTP; /* see below */
 
 CURLcode Curl_add_timecondition(struct Curl_easy *data,
 #ifndef USE_HYPER
@@ -90,9 +89,6 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
                                  void *headers
 #endif
   );
-CURLcode Curl_dynhds_add_custom(struct Curl_easy *data,
-                                bool is_connect,
-                                struct dynhds *hds);
 
 void Curl_http_method(struct Curl_easy *data, struct connectdata *conn,
                       const char **method, Curl_HttpReq *);
@@ -147,7 +143,7 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data);
    selected to use no auth at all. Ie, we actively select no auth, as opposed
    to not having one selected. The other CURLAUTH_* defines are present in the
    public curl/curl.h header. */
-#define CURLAUTH_PICKNONE (1<<30) /* don't use auth */
+#define CURLAUTH_PICKNONE (1<<30) /* do not use auth */
 
 /* MAX_INITIAL_POST_SIZE indicates the number of bytes that will make the POST
    data get included in the initial data chunk sent to the server. If the
@@ -187,10 +183,6 @@ void Curl_http_exp100_got100(struct Curl_easy *data);
 /****************************************************************************
  * HTTP unique setup
  ***************************************************************************/
-struct HTTP {
-  /* TODO: no longer used, we should remove it from SingleRequest */
-  char unused;
-};
 
 CURLcode Curl_http_size(struct Curl_easy *data);
 
@@ -240,7 +232,7 @@ struct httpreq {
 };
 
 /**
- * Create a HTTP request struct.
+ * Create an HTTP request struct.
  */
 CURLcode Curl_http_req_make(struct httpreq **preq,
                             const char *method, size_t m_len,
@@ -290,7 +282,7 @@ struct http_resp {
 };
 
 /**
- * Create a HTTP response struct.
+ * Create an HTTP response struct.
  */
 CURLcode Curl_http_resp_make(struct http_resp **presp,
                              int status,

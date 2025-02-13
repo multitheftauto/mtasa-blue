@@ -22,14 +22,15 @@ public:
     CBuildingsPoolSA();
     ~CBuildingsPoolSA() = default;
 
-    CBuilding* AddBuilding(CClientBuilding*, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior);
+    CBuilding* AddBuilding(CClientBuilding*, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior);
     void       RemoveBuilding(CBuilding* pBuilding);
     bool       HasFreeBuildingSlot();
 
-    void RemoveAllBuildings() override;
-    void RestoreAllBuildings() override;
+    void RemoveAllWithBackup() override;
+    void RestoreBackup() override;
     bool Resize(int size) override;
     int  GetSize() const override { return (*m_ppBuildingPoolInterface)->m_nSize; };
+    CClientEntity* GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept;
 
 private:
     void RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding);
@@ -40,8 +41,8 @@ private:
     void RemovePedsContactEnityLinks();
 
 private:
-    SVectorPoolData<CBuildingSA> m_buildingPool{MAX_BUILDINGS};
-    CPoolSAInterface<CBuildingSAInterface>**           m_ppBuildingPoolInterface;
+    SVectorPoolData<CBuildingSA>             m_buildingPool{MAX_BUILDINGS};
+    CPoolSAInterface<CBuildingSAInterface>** m_ppBuildingPoolInterface;
 
     std::unique_ptr<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>> m_pOriginalBuildingsBackup;
 };

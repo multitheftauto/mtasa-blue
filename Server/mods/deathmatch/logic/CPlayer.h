@@ -265,6 +265,9 @@ public:
     void SetRedirecting(bool bRedirecting) noexcept { m_bIsRedirecting = bRedirecting; }
     bool IsRedirecting() const noexcept { return m_bIsRedirecting; }
 
+    bool GetTeleported() const noexcept { return m_teleported; }
+    void SetTeleported(bool state) noexcept { m_teleported = state; }
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -465,4 +468,6 @@ private:
 
     ushort  m_usPrevDimension;
     SString m_strQuitReasonForLog;
+
+    bool m_teleported = false;
 };
