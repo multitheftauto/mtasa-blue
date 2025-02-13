@@ -102,28 +102,22 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
 
 void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
 {
-    try
+    DWORD dwFunc = FUNC_GetMoveSpeed;
+    DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
+    DWORD dwReturn = 0;
+
+    __asm
     {
-        DWORD dwFunc = FUNC_GetMoveSpeed;
-        DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
-        DWORD dwReturn = 0;
-
-        __asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-            mov     dwReturn, eax
-        }
-        MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
-
-        if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
-        {
-            AddToMovingList();
-            SetStatic(false);
-        }
+        mov     ecx, dwThis
+        call    dwFunc
+        mov     dwReturn, eax
     }
-    catch (...)
+    MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
+
+    if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
     {
+        AddToMovingList();
+        SetStatic(false);
     }
 }
 

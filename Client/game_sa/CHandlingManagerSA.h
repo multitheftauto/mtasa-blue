@@ -35,10 +35,10 @@ public:
 
     eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept;
 
-    void CheckSuspensionChanges(const CHandlingEntry* const pEntry) const noexcept;
+    void CheckSuspensionChanges(const CHandlingEntry* const entry) const noexcept;
+
+    static eHandlingTypes GetHandlingID(std::uint32_t model) noexcept;
 
 private:
     void InitializeDefaultHandlings() noexcept;
-
-    eHandlingTypes GetHandlingID(std::uint32_t uiModel) const noexcept;
 };

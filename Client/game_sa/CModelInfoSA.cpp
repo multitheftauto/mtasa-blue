@@ -296,15 +296,8 @@ bool CModelInfoSA::IsVehicle() const
 
 bool CModelInfoSA::IsVehicleModel(std::uint32_t model) noexcept
 {
-    try
-    {
-        const auto* const modelInfo = pGame->GetModelInfo(model);
-        return modelInfo && modelInfo->IsVehicle();
-    }
-    catch (...)
-    {
-        return false;
-    }
+    const auto* const modelInfo = pGame->GetModelInfo(model);
+    return modelInfo && modelInfo->IsVehicle();
 }
 
 bool CModelInfoSA::IsPlayerModel()
@@ -766,14 +759,7 @@ bool CModelInfoSA::IsValid()
 
 bool CModelInfoSA::IsAllocatedInArchive() const noexcept
 {
-    try
-    {
-        return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
-    }
-    catch (...)
-    {
-        return false;
-    }
+    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()

@@ -34,5 +34,5 @@ public:
 
     virtual eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept = 0;
 
-    virtual void CheckSuspensionChanges(const CHandlingEntry* const pEntry) const noexcept = 0;
+    virtual void CheckSuspensionChanges(const CHandlingEntry* const entry) const noexcept = 0;
 };
