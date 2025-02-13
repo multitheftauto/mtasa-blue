@@ -365,10 +365,13 @@ CXMLNode* CXMLNodeImpl::CopyNode(CXMLNode* pParent)
     return dynamic_cast<CXMLNode*>(pNew);
 }
 
-bool CXMLNodeImpl::CopyChildrenInto(CXMLNode* pDestination, bool bRecursive)
+bool CXMLNodeImpl::CopyChildrenInto(CXMLNode* pDestination, bool bRecursive, bool bDelete)
 {
-    // Delete all the children of the target
-    pDestination->DeleteAllSubNodes();
+    if (bDelete)
+    {
+        // Delete all the children of the target
+        pDestination->DeleteAllSubNodes();
+    }
 
     // Iterate through our children if we have. Otherwize just copy the content
     if (m_Children.size() > 0)
@@ -405,14 +408,18 @@ bool CXMLNodeImpl::CopyChildrenInto(CXMLNode* pDestination, bool bRecursive)
                 {
                     if (!pMyChildNode->CopyChildrenInto(pNewChildNode, true))
                     {
-                        pDestination->DeleteAllSubNodes();
+                        if (bDelete)
+                            pDestination->DeleteAllSubNodes();
+
                         return false;
                     }
                 }
             }
             else
             {
-                pDestination->DeleteAllSubNodes();
+                if (bDelete)
+                    pDestination->DeleteAllSubNodes();
+
                 return false;
             }
         }
