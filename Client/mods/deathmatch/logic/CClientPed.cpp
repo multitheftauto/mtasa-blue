@@ -610,8 +610,14 @@ void CClientPed::Teleport(const CVector& vecPosition)
                         SetFrozenWaitingForGroundToLoad(true);
                 }
 
+                // Player has jetpack?
+                bool hasJetpack = HasJetPack();
+
                 // Set the real position
                 m_pPlayerPed->Teleport(vecPosition.fX, vecPosition.fY, vecPosition.fZ);
+
+                // Restore jetpack
+                SetHasJetPack(hasJetpack);
             }
         }
     }
