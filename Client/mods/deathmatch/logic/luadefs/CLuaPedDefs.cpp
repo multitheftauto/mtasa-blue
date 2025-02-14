@@ -1247,10 +1247,31 @@ int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::GetPedControlState(CClientPed* const ped, const std::string control) noexcept
+bool CLuaPedDefs::GetPedControlState(std::variant<CClientPed*, std::string> first, std::optional<std::string> maybeControl)
 {
-    bool state;
+    CClientPed* ped{};
+    std::string control{};
 
+    if (std::holds_alternative<CClientPed*>(first))
+    {
+        if (!maybeControl.has_value())
+            throw std::invalid_argument("Expected control name at argument 2");
+
+        ped = std::get<CClientPed*>(first);
+        control = maybeControl.value();
+    }
+    else if (std::holds_alternative<std::string>(first))
+    {
+        ped = CStaticFunctionDefinitions::GetLocalPlayer();
+        control = std::get<std::string>(first);
+    }
+    else
+    {
+        throw std::invalid_argument("Expected ped or control name at argument 1");
+    }
+
+    bool state;
+    
     if (!CStaticFunctionDefinitions::GetPedControlState(*ped, control, state))
         return false;
 
@@ -1803,8 +1824,38 @@ int CLuaPedDefs::RemovePedClothes(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetPedControlState(CClientPed* const ped, const std::string control, const bool state) noexcept
+bool CLuaPedDefs::SetPedControlState(std::variant<CClientPed*, std::string> first, std::variant<std::string, bool> second, std::optional<bool> maybeState)
 {
+    CClientPed* ped{};
+    std::string control{};
+    bool        state{};
+
+    if (std::holds_alternative<CClientPed*>(first))
+    {
+        if (!std::holds_alternative<std::string>(second))
+            throw std::invalid_argument("Expected control name at argument 2");
+
+        if (!maybeState.has_value())
+            throw std::invalid_argument("Expected state boolean at argument 3");
+
+        ped = std::get<CClientPed*>(first);
+        control = std::get<std::string>(second);
+        state = maybeState.value();
+    }
+    else if (std::holds_alternative<std::string>(first))
+    {
+        if (!std::holds_alternative<bool>(second))
+            throw std::invalid_argument("Expected state boolean at argument 2");
+
+        ped = CStaticFunctionDefinitions::GetLocalPlayer();
+        control = std::get<std::string>(first);
+        state = std::get<bool>(second);
+    }
+    else
+    {
+        throw std::invalid_argument("Expected ped or control name at argument 1");
+    }
+
     return CStaticFunctionDefinitions::SetPedControlState(*ped, control, state);
 }
 
