@@ -75,7 +75,7 @@ private:
         CVector VehTurnSpeed;
 
         float fVehHealth;
-        float vehNitroLevel;
+        float vehNitroLevel {0.0f};
 
         std::vector<STrailerInfo> TrailerList;
 
