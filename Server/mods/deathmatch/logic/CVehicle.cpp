@@ -1026,5 +1026,3 @@ bool CVehicle::IsNitroActivated() const noexcept
 
      return m_nitroLevel < 0;
 }
-
-
