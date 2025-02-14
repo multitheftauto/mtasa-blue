@@ -3068,12 +3068,16 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
    return vehicle->IsNitroActivated();
 }
 
-float CLuaVehicleDefs::GetVehicleNitroLevel(CVehicle* vehicle) noexcept
+std::variant<float, bool> CLuaVehicleDefs::GetVehicleNitroLevel(CVehicle* vehicle) noexcept
 {
-    float fLevel = vehicle->GetNitroLevel();
 
-    if (fLevel < 0)
-        fLevel = 1 + fLevel;
+    if (!vehicle->IsNitroInstalled())
+        return false;
 
-    return fLevel;
+    float level = vehicle->GetNitroLevel();
+
+    if (level < 0)
+        level = 1 + level;
+
+    return level;
 }

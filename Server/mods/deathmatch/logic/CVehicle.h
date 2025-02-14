@@ -402,7 +402,8 @@ public:
 
     void SetNitroLevel(float level) noexcept { m_nitroLevel = level; }
     float GetNitroLevel() const noexcept { return m_nitroLevel; }
-    bool IsNitroActivated() const noexcept { return m_nitroLevel < 0; }
+    bool  IsNitroActivated() const noexcept;
+    bool  IsNitroInstalled() const noexcept;
 
     void StopIdleTimer();
     void RestartIdleTimer();
