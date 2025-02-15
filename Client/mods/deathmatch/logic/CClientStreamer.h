@@ -50,7 +50,7 @@ private:
     void AddElementInSectors(CClientStreamElement* pElement);
     void RemoveElementFromSectors(CClientStreamElement* pElement);
 
-    bool IsElementShouldVisibleInCurrentDimesnion(CClientStreamElement* pElement) const noexcept
+    bool ShouldElementBeVisibleInCurrentDimension(CClientStreamElement* pElement) const noexcept
     {
         return pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions();
     }
