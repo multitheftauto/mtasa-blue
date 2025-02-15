@@ -163,7 +163,7 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
                 {
                     CClientStreamElement* element = *iter;
 
-                    if (IsElementShouldVisibleInCurrentDimesnion(element))
+                    if (ShouldElementBeVisibleInCurrentDimension(element))
                         iter++;
                     else
                     {
@@ -322,7 +322,7 @@ void CClientStreamer::RemoveElementFromSectors(CClientStreamElement* pElement)
 
 void CClientStreamer::AddElement(CClientStreamElement* pElement)
 {
-    if (IsElementShouldVisibleInCurrentDimesnion(pElement))
+    if (ShouldElementBeVisibleInCurrentDimension(pElement))
         AddElementInSectors(pElement);
     else
         m_outsideCurrentDimensionElements.push_back(pElement);
@@ -744,7 +744,7 @@ void CClientStreamer::OnElementForceStreamOut(CClientStreamElement* pElement)
 
 void CClientStreamer::OnElementDimension(CClientStreamElement* pElement)
 {
-    if (IsElementShouldVisibleInCurrentDimesnion(pElement))
+    if (ShouldElementBeVisibleInCurrentDimension(pElement))
     {
         if (!pElement->GetStreamSector())
         {
