@@ -44,7 +44,7 @@ std::uint16_t CDirectorySAInterface::GetModelStreamingSize(std::uint16_t modelId
     DirectoryInfoSA* entry = GetModelEntry(modelId);
 
     if (!entry)
-        return false;
+        return 0;
 
     return entry->m_nStreamingSize;
 }
