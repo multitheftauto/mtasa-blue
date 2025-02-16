@@ -443,7 +443,7 @@ public:
     bool IsBleeding() const override { return GetPedInterface()->pedFlags.bPedIsBleeding; }
     void SetBleeding(bool bleeding) override { GetPedInterface()->pedFlags.bPedIsBleeding = bleeding; }
 
-    bool IsOnFire() override { return GetPedInterface()->pFireOnPed != nullptr; }
+    bool IsOnFire() const override { return GetPedInterface()->pFireOnPed != nullptr; }
     bool SetOnFire(bool onFire) override;
 
     bool GetStayInSamePlace() const override { return GetPedInterface()->pedFlags.bStayInSamePlace; }
