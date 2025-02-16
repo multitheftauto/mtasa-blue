@@ -313,8 +313,8 @@ public:
     float GetHealth();
     void  SetHealth(float fHealth);
 
-    float GetArmor();
-    void  SetArmor(float fArmor);
+    float GetArmor() noexcept;
+    void  SetArmor(float armor) noexcept;
 
     float GetOxygenLevel();
     void  SetOxygenLevel(float fOxygen);

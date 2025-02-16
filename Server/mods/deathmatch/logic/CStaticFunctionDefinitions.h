@@ -163,7 +163,7 @@ public:
 
     // Ped get funcs
     static CPed*     CreatePed(CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true);
-    static bool      GetPedArmor(CPed* pPed, float& fArmor);
+    static bool      GetPedArmor(CPed* const ped, float& armor);
     static bool      GetPedRotation(CPed* pPed, float& fRotation);
     static bool      IsPedDead(CPed* pPed, bool& bDead);
     static bool      IsPedDucked(CPed* pPed, bool& bDucked);
@@ -193,7 +193,7 @@ public:
     static bool      GetOriginalWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable);
 
     // Ped set funcs
-    static bool SetPedArmor(CElement* pElement, float fArmor);
+    static bool SetPedArmor(CElement* pElement, float armor);
     static bool KillPed(CElement* pElement, CElement* pKiller = NULL, unsigned char ucKillerWeapon = 0xFF, unsigned char ucBodyPart = 0xFF,
                         bool bStealth = false);
     static bool SetPedRotation(CElement* pElement, float fRotation, bool bNewWay);

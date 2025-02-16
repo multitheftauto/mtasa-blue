@@ -22,7 +22,7 @@ public:
     CBuildingsPoolSA();
     ~CBuildingsPoolSA() = default;
 
-    CBuilding* AddBuilding(CClientBuilding*, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior);
+    CBuilding* AddBuilding(CClientBuilding*, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior);
     void       RemoveBuilding(CBuilding* pBuilding);
     bool       HasFreeBuildingSlot();
 
@@ -30,6 +30,7 @@ public:
     void RestoreBackup() override;
     bool Resize(int size) override;
     int  GetSize() const override { return (*m_ppBuildingPoolInterface)->m_nSize; };
+    CClientEntity* GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept;
 
 private:
     void RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding);

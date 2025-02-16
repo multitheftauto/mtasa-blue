@@ -277,6 +277,9 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
         if (Data.ucFlags & 0x10)
             pPed->SetArmor(Data.fArmor);
 
+        if (Data.flags2 & 0x01)
+            pPed->SetCameraRotation(Data.cameraRotation);
+
         if (Data.ucFlags & 0x20)
             pPed->SetOnFire(Data.bOnFire);
 

@@ -1710,42 +1710,39 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState)
+bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept
 {
-    if (&Ped == GetLocalPlayer())
-    {
-        return GetControlState(szControl, bState);
-    }
+    if (&ped == GetLocalPlayer())
+        return GetControlState(control.c_str(), state);
 
-    if (Ped.GetType() == CCLIENTPLAYER)
+    if (ped.GetType() == CCLIENTPLAYER)
     {
-        CControllerState cs;
-        Ped.GetControllerState(cs);
-        bool bOnFoot = (!Ped.GetRealOccupiedVehicle());
-        bState = CClientPad::GetControlState(szControl, cs, bOnFoot);
-        float        fState = 0;
-        unsigned int uiIndex;
-        // Check it's Analog
-        if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
+        CControllerState controller;
+        ped.GetControllerState(controller);
+
+        bool foot = !ped.GetRealOccupiedVehicle();
+        state = CClientPad::GetControlState(control.c_str(), controller, foot);
+
+        float         analog = 0;
+        std::uint32_t index;
+
+        if (CClientPad::GetAnalogControlIndex(control.c_str(), index))
         {
-            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, false))
+            if (CClientPad::GetAnalogControlState(control.c_str(), controller, foot, analog, false))
             {
-                bState = fState > 0;
+                state = analog > 0;
                 return true;
             }
         }
-        // or binary.
         else
         {
-            bState = CClientPad::GetControlState(szControl, cs, bOnFoot);
+            state = CClientPad::GetControlState(control.c_str(), controller, foot);
             return true;
         }
     }
 
-    if (Ped.m_Pad.GetControlState(szControl, bState))
-    {
+    if (ped.m_Pad.GetControlState(control.c_str(), state))
         return true;
-    }
 
     return false;
 }
@@ -2366,24 +2363,13 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientEntity& Entity, const char* szControl, bool bState)
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept
 {
-    RUN_CHILDREN(SetPedControlState(**iter, szControl, bState))
-    if (IS_PED(&Entity))
-    {
-        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+    if (&ped == GetLocalPlayer())
+        return SetControlState(control.c_str(), state);
 
-        if (&Ped == GetLocalPlayer())
-        {
-            return SetControlState(szControl, bState);
-        }
-
-        if (Ped.m_Pad.SetControlState(szControl, bState))
-        {
-            return true;
-        }
-    }
-    return false;
+    if (ped.m_Pad.SetControlState(control.c_str(), state))
+        return true;
 }
 
 bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby)
@@ -2594,7 +2580,7 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
 {
     if (IS_PED(&Entity))
     {
-        if (!Entity.IsLocalEntity())
+        if (!Entity.IsLocalEntity() && &Entity != GetLocalPlayer())
             return false;
 
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
