@@ -275,7 +275,7 @@ public:
     virtual void SetBleeding(bool bleeding) = 0;
 
     virtual bool IsOnFire() const = 0;
-    virtual void SetOnFire(bool onFire) = 0;
+    virtual bool SetOnFire(bool onFire) = 0;
 
     virtual bool GetStayInSamePlace() const = 0;
     virtual void SetStayInSamePlace(bool stay) = 0;
