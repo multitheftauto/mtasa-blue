@@ -375,9 +375,9 @@ public:
 
     bool     AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity) override;
     CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill skill) override;
-    CWeapon* GetWeapon(eWeaponSlot weaponSlot) const override;
+    CWeapon* GetWeapon(eWeaponSlot weaponSlot) const noexcept override;
     CWeapon* GetWeapon(eWeaponType weaponType) const override;
-    void     ClearWeapons() noexcept;
+    void     ClearWeapons();
     void     RemoveWeaponModel(std::uint32_t model) override;
     void     ClearWeapon(eWeaponType weaponType) override;
 

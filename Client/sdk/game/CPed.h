@@ -210,9 +210,9 @@ public:
 
     virtual bool     AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity) = 0;
     virtual CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill weaponSkill) = 0;
-    virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) const = 0;
+    virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) const noexcept = 0;
     virtual CWeapon* GetWeapon(eWeaponType weaponType) const = 0;
-    virtual void     ClearWeapons() noexcept = 0;
+    virtual void     ClearWeapons() = 0;
     virtual void     RemoveWeaponModel(std::uint32_t model) = 0;
     virtual void     ClearWeapon(eWeaponType weaponType) = 0;
 

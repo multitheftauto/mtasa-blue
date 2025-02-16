@@ -189,12 +189,12 @@ CWeapon* CPedSA::GetWeapon(eWeaponType weaponType) const
     return (weapon && weapon->GetType() == weaponType) ? weapon : nullptr;
 }
 
-CWeapon* CPedSA::GetWeapon(eWeaponSlot weaponSlot) const
+CWeapon* CPedSA::GetWeapon(eWeaponSlot weaponSlot) const noexcept
 {
     return (weaponSlot >= 0 && weaponSlot < WEAPONSLOT_MAX) ? m_weapons[weaponSlot].get() : nullptr;
 }
 
-void CPedSA::ClearWeapons() noexcept
+void CPedSA::ClearWeapons()
 {
     // Remove all the weapons
     for (auto& weapon : m_weapons)
@@ -258,8 +258,11 @@ void CPedSA::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
     if (localPlayer == this)
     {
         auto* playerInfo = static_cast<CPlayerInfoSA*>(pGame->GetPlayerInfo());
-        if (auto* pInfoInterface = playerInfo->GetInterface())
-            pInfoInterface->PlayerPedData.m_nChosenWeapon = weaponSlot;
+        if (!playerInfo)
+            return;
+
+        if (auto* infoInterface = playerInfo->GetInterface())
+            infoInterface->PlayerPedData.m_nChosenWeapon = weaponSlot;
 
         // void __thiscall CPlayerPed::MakeChangesForNewWeapon(CPlayerPed *this, int a3)
         changeWeaponFunc = FUNC_MakeChangesForNewWeapon_Slot;
@@ -422,6 +425,8 @@ bool CPedSA::SetOnFire(bool onFire)
         return false;
 
     auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
+    if (!fireManager)
+        return false;
 
     if (onFire)
     {
@@ -589,8 +594,8 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
 ////////////////////////////////////////////////////////////////
 #define HOOKPOS_CPed_PreRenderAfterTest 0x5E65A0
 #define HOOKSIZE_CPed_PreRenderAfterTest 15
-static constexpr DWORD RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
-static constexpr DWORD RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
+static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
+static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
 static void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
 {
     _asm
@@ -628,8 +633,8 @@ skip_rotation_update:
 ////////////////////////////////////////////////////////////////
 #define HOOKPOS_CPed_PreRenderAfterTest_Mid 0x5E6669
 #define HOOKSIZE_CPed_PreRenderAfterTest_Mid 5
-static constexpr DWORD RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
-static constexpr DWORD RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
+static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
+static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
 static void _declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
 {
     _asm
