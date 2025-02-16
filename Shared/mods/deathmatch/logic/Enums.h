@@ -92,6 +92,7 @@ enum class WorldSpecialProperty
     EXTENDEDWATERCANNONS,
     TUNNELWEATHERBLEND,
     IGNOREFIRESTATE,
+    FLYINGCOMPONENTS,
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 

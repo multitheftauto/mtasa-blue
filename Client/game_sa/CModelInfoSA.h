@@ -14,6 +14,7 @@
 #include <game/Common.h>
 #include <game/CModelInfo.h>
 #include "CRenderWareSA.h"
+#include "game/RenderWare.h"
 
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
@@ -259,54 +260,78 @@ public:
     CTimeInfoSAInterface timeInfo;
 };
 
+class CVehicleModelUpgradePosnDesc
+{
+    CVector m_vPosition;
+    RtQuat  m_vRotation;
+    int     m_iParentId;
+};
+static_assert(sizeof(CVehicleModelUpgradePosnDesc) == 0x20, "Invalid size of CVehicleModelUpgradePosnDesc class");
+
+class CDamageableModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    void* m_damagedAtomic;
+};
+
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
 public:
-    CVector vecDummies[15];
-    char    m_sUpgrade[18];
+    CVector                      vecDummies[15];
+    CVehicleModelUpgradePosnDesc m_sUpgrade[18];
+    RpAtomic*                    m_pExtra[6];
+    std::uint8_t                 m_numExtras;
+    std::uint8_t                 _pad[3];
+    int                          m_maskComponentDamagable;
 };
+static_assert(sizeof(CVehicleModelVisualInfoSAInterface) == 0x314, "Invalid size of CVehicleModelVisualInfoSAInterface class");
 
-class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
+class CVehicleModelInfoSAInterface : public CClumpModelInfoSAInterface
 {
 public:
-    uint32                              pad1;                      // +32
-    RpMaterial*                         pPlateMaterial;            // +36
+    bool IsComponentDamageable(int componentIndex) const;
+
+    RpMaterial*                         pPlateMaterial;
     char                                plateText[8];
-    char                                pad[2];
+    std::uint8_t                        field_30;
+    std::uint8_t                        plateType;
     char                                gameName[8];
-    char                                pad2[2];
-    unsigned int                        uiVehicleType;
+    std::uint8_t                        field_3A[2];
+    std::uint32_t                       vehicleType;
     float                               fWheelSizeFront;
     float                               fWheelSizeRear;
-    short                               sWheelModel;
-    short                               sHandlingID;
-    byte                                ucNumDoors;
-    byte                                ucVehicleList;
-    byte                                ucVehicleFlags;
-    byte                                ucWheelUpgradeClass;
-    byte                                ucTimesUsed;
-    short                               sVehFrequency;
-    unsigned int                        uiComponentRules;
-    float                               fSteeringAngle;
-    CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
-    char                                pad3[464];
-    char                                pDirtMaterial[64];            // *RwMaterial
-    char                                pad4[64];
-    char                                primColors[8];
-    char                                secondColors[8];
-    char                                treeColors[8];
-    char                                fourColors[8];
-    unsigned char                       ucNumOfColorVariations;
-    unsigned char                       ucLastColorVariation;
-    unsigned char                       ucPrimColor;
-    unsigned char                       ucSecColor;
-    unsigned char                       ucTertColor;
-    unsigned char                       ucQuatColor;
-    char                                upgrades[36];
-    char                                anRemapTXDs[8];
-    char                                pad5[2];
-    char                                pAnimBlock[4];
+    std::int16_t                        wheelModelID;
+    std::int16_t                        handlingID;
+    std::uint8_t                        numDoors;
+    std::uint8_t                        vehicleClass;
+    std::uint8_t                        vehicleFlags;
+    std::uint8_t                        wheelUpgradeClass;
+    std::uint8_t                        timesUsed;
+    std::uint8_t                        field_51;
+    std::int16_t                        vehFrequency;
+    std::uint32_t                       componentRules;
+    float                               bikeSteeringAngle;
+    CVehicleModelVisualInfoSAInterface* pVisualInfo; // vehicleStruct
+    std::uint8_t                        field_60[464];
+    RpMaterial**                        m_dirtMaterials;
+    std::size_t                         m_numDirtMaterials;
+    RpMaterial*                         m_staticDirtMaterials[30];
+    std::uint8_t                        primColors[8];
+    std::uint8_t                        secondColors[8];
+    std::uint8_t                        treeColors[8];
+    std::uint8_t                        fourColors[8];
+    std::uint8_t                        numOfColorVariations;
+    std::uint8_t                        lastColorVariation;
+    std::uint8_t                        primColor;
+    std::uint8_t                        secColor;
+    std::uint8_t                        tertColor;
+    std::uint8_t                        quatColor;
+    std::uint8_t                        upgrades[36];
+    std::uint8_t                        anRemapTXDs[8];
+    std::uint8_t                        field_302[2];
+    void*                               pAnimBlock; // CAnimBlock*
 };
+static_assert(sizeof(CVehicleModelInfoSAInterface) == 0x308, "Invalid size of CVehicleModelInfoSAInterface class");
 
 class CModelInfoSA : public CModelInfo
 {
@@ -447,6 +472,7 @@ public:
     // CModelInfoSA methods
     void         MakePedModel(char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
+    void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
     void         MakeClumpModel(ushort usBaseModelID);
@@ -467,6 +493,7 @@ public:
     bool IsTowableBy(CModelInfo* towingModel) override;
 
     bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
+    bool IsDamageableAtomic() override;
 
     static bool IsVehicleModel(std::uint32_t model) noexcept;
 

@@ -190,6 +190,7 @@ public:
     int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
     DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
+    int   GetSystemFrameCounter() const { return *(int*)0xB7CB4C; } // CTimer::m_FrameCounter
 
     bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
@@ -286,6 +287,8 @@ public:
     void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
+    void         SetWeaponRenderEnabled(bool enabled) override;
+    bool         IsWeaponRenderEnabled() const override;
     void         FlushPendingRestreamIPL();
     void         ResetModelLodDistances();
     void         ResetModelFlags();
@@ -307,8 +310,8 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
-    void RemoveAllBuildings();
-    void RestoreGameBuildings();
+    void RemoveGameWorld();
+    void RestoreGameWorld();
 
     bool SetBuildingPoolSize(size_t size);
 
@@ -378,7 +381,7 @@ private:
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
     bool         m_isRoadSignsTextEnabled{true};
-    bool         m_isBuildingsRemoved{false};
+    bool         m_isGameWorldRemoved{false};
     bool         m_isExtendedWaterCannonsEnabled{false};
     bool         m_isIgnoreFireStateEnabled{false};
 

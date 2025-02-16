@@ -137,7 +137,7 @@ public:
     static bool           IsPedDoingTask(CClientPed& Ped, const char* szTaskName, bool& bIsDoingTask);
     static bool           GetPedBonePosition(CClientPed& Ped, eBone bone, CVector& vecPosition);
     static bool           GetPedClothes(CClientPed& Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel);
-    static bool           GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState);
+    static bool           GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept;
     static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput);
     static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
     static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
@@ -174,7 +174,7 @@ public:
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);
     static bool RemovePedClothes(CClientEntity& Entity, unsigned char ucType);
-    static bool SetPedControlState(CClientEntity& Entity, const char* szControl, bool bState);
+    static bool SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept;
     static bool SetPedAnalogControlState(CClientEntity& Entity, const char* szControl, float fState);
     static bool SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby);
     static bool SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle);
@@ -243,7 +243,7 @@ public:
     static bool SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CClientEntity& Entity, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CClientEntity& Entity, unsigned char ucLight, unsigned char ucState);
-    static bool SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState);
+    static bool SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent = true, bool breakGlass = false);
     static bool SetVehicleOverrideLights(CClientEntity& Entity, unsigned char ucLights);
     static bool AttachTrailerToVehicle(CClientVehicle& Vehicle, CClientVehicle& Trailer, const CVector& vecRotationOffsetDegrees);
     static bool DetachTrailerFromVehicle(CClientVehicle& Vehicle, CClientVehicle* pTrailer = NULL);

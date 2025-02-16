@@ -1761,6 +1761,24 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
+void CModelInfoSA::MakeObjectDamageableModel(std::uint16_t baseModel)
+{
+    CDamageableModelInfoSAInterface* m_pInterface = new CDamageableModelInfoSAInterface();
+
+    CDamageableModelInfoSAInterface* pBaseObjectInfo = static_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[baseModel]);
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CDamageableModelInfoSAInterface));
+    m_pInterface->usNumberOfRefs = 0;
+    m_pInterface->pRwObject = nullptr;
+    m_pInterface->usUnknown = 65535;
+    m_pInterface->usDynamicIndex = 65535;
+    m_pInterface->m_damagedAtomic = nullptr;
+
+    ppModelInfo[m_dwModelID] = m_pInterface;
+
+    m_dwParentID = baseModel;
+    CopyStreamingInfoFromModel(baseModel);
+}
+
 void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 {
     CTimeModelInfoSAInterface* m_pInterface = new CTimeModelInfoSAInterface();
@@ -1826,7 +1844,14 @@ void CModelInfoSA::DeallocateModel(void)
             delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::ATOMIC:
-            delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            if (IsDamageableAtomic())
+            {
+                delete reinterpret_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            }
+            else
+            {
+                delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            }
             break;
         case eModelInfoType::CLUMP:
             delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
@@ -2081,6 +2106,12 @@ bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
     return isTowable;
 }
 
+bool CModelInfoSA::IsDamageableAtomic()
+{
+    void* asDamagable = ((void* (*)())m_pInterface->VFTBL->AsDamageAtomicModelInfoPtr)();
+    return asDamagable != nullptr;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CModelInfoSA::ForceUnload
@@ -2125,4 +2156,9 @@ bool CModelInfoSA::ForceUnload()
         pGame->GetRenderWare()->TxdForceUnload(usTxdId, true);
 
     return true;
+}
+
+bool CVehicleModelInfoSAInterface::IsComponentDamageable(int componentIndex) const
+{
+    return pVisualInfo->m_maskComponentDamagable & (1 << componentIndex);
 }

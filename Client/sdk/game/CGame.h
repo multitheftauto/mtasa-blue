@@ -156,6 +156,7 @@ public:
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
+    virtual int          GetSystemFrameCounter() const = 0;
     virtual bool         IsAtMenu() = 0;
     virtual void         StartGame() = 0;
     virtual void         SetSystemState(eSystemState State) = 0;
@@ -236,6 +237,9 @@ public:
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
+    virtual void SetWeaponRenderEnabled(bool enabled) = 0;
+    virtual bool IsWeaponRenderEnabled() const = 0;
+
     virtual bool VerifySADataFileNames() = 0;
     virtual bool PerformChecks() = 0;
     virtual int& GetCheckStatus() = 0;
@@ -273,8 +277,8 @@ public:
     virtual int32_t GetBaseIDforSCM() = 0;
     virtual int32_t GetCountOfAllFileIDs() = 0;
 
-    virtual void RemoveAllBuildings() = 0;
-    virtual void RestoreGameBuildings() = 0;
+    virtual void RemoveGameWorld() = 0;
+    virtual void RestoreGameWorld() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
 

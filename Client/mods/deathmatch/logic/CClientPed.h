@@ -105,8 +105,10 @@ struct SLastSyncedPedData
     CVector vPosition;
     CVector vVelocity;
     float   fRotation;
+    float   cameraRotation{};
     bool    bOnFire;
     bool    bIsInWater;
+    bool    isReloadingWeapon;
 };
 
 struct SRestoreWeaponItem
@@ -127,23 +129,17 @@ struct SReplacedAnimation
 
 struct SAnimationCache
 {
-    SString strName;
-    int     iTime;
-    bool    bLoop;
-    bool    bUpdatePosition;
-    bool    bInterruptable;
-    bool    bFreezeLastFrame;
-    int     iBlend;
-
-    SAnimationCache()
-    {
-        iTime = -1;
-        bLoop = false;
-        bUpdatePosition = false;
-        bInterruptable = false;
-        bFreezeLastFrame = true;
-        iBlend = 250;
-    }
+    std::string strName;
+    int         iTime{-1};
+    bool        bLoop{false};
+    bool        bUpdatePosition{false};
+    bool        bInterruptable{false};
+    bool        bFreezeLastFrame{true};
+    int         iBlend{250};
+    float       progress{0.0f};
+    float       speed{1.0f};
+    bool        progressWaitForStreamIn{false}; // for sync anim only
+    float       elapsedTime{0.0f}; // for sync anim only
 };
 
 class CClientObject;
@@ -210,7 +206,7 @@ public:
     float GetCurrentRotation();
     void  SetCurrentRotation(float fRotation, bool bIncludeTarget = true);
     void  SetTargetRotation(float fRotation);
-    void  SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation);
+    void  SetTargetRotation(unsigned long ulDelay, std::optional<float> rotation, std::optional<float> cameraRotation);
 
     float GetCameraRotation();
     void  SetCameraRotation(float fRotation);
@@ -272,17 +268,17 @@ public:
     float GetHealth();
     void  SetHealth(float fHealth);
     void  InternalSetHealth(float fHealth);
-    float GetArmor();
-    void  SetArmor(float fArmor);
+    float GetArmor() const noexcept;
+    void  SetArmor(float armor) noexcept;
     float GetOxygenLevel();
     void  SetOxygenLevel(float fOxygen);
 
     void LockHealth(float fHealth);
-    void LockArmor(float fArmor);
+    void LockArmor(float armor) noexcept;
     void UnlockHealth() noexcept { m_bHealthLocked = false; };
-    void UnlockArmor() noexcept { m_bArmorLocked = false; };
+    void UnlockArmor() noexcept { m_armorLocked = false; };
     bool IsHealthLocked() const noexcept { return m_bHealthLocked; };
-    bool IsArmorLocked() const noexcept { return m_bArmorLocked; };
+    bool IsArmorLocked() const noexcept { return m_armorLocked; };
 
     bool IsDying();
     bool IsDead();
@@ -466,6 +462,7 @@ public:
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
+    void                        RunAnimationFromCache();
 
     bool IsUsingGun();
 
@@ -483,8 +480,8 @@ public:
     bool IsBleeding() const noexcept { return m_bBleeding; };
     void SetBleeding(bool bBleeding);
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() override { return m_pPlayerPed ? m_pPlayerPed->IsOnFire() : m_bIsOnFire; }
+    bool SetOnFire(bool bOnFire) override;
 
     void GetVoice(short* psVoiceType, short* psVoiceID);
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
@@ -500,9 +497,9 @@ public:
     bool GetBulletImpactData(CClientEntity** ppVictim = 0, CVector* pvecHitPosition = 0);
     void ClearBulletImpactData() { m_bBulletImpactData = false; }
 
-    bool CanReloadWeapon();
-    bool ReloadWeapon();
-    bool IsReloadingWeapon();
+    bool CanReloadWeapon() noexcept;
+    bool ReloadWeapon() noexcept;
+    bool IsReloadingWeapon() noexcept;
 
     bool ShouldBeStealthAiming();
     bool IsStealthAiming() { return m_bStealthAiming; }
@@ -552,6 +549,9 @@ public:
 
     std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
 
+    void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; }
+    bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; }
+
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
     CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer);
@@ -566,6 +566,7 @@ protected:
 
     // Used to destroy the current game ped and create a new one in the same state.
     void ReCreateModel();
+    void ReCreateGameEntity();
 
     void _CreateModel();
     void _CreateLocalModel();
@@ -619,7 +620,7 @@ public:
     bool                        m_bRadioOn;
     unsigned char               m_ucRadioChannel;
     bool                        m_bHealthLocked;
-    bool                        m_bArmorLocked;
+    bool                        m_armorLocked;
     unsigned long               m_ulLastOnScreenTime;
     CClientVehiclePtr           m_pOccupiedVehicle;
     CClientVehiclePtr           m_pOccupyingVehicle;
@@ -678,7 +679,7 @@ public:
     bool                                     m_bVisible;
     bool                                     m_bUsesCollision;
     float                                    m_fHealth;
-    float                                    m_fArmor;
+    float                                    m_armor;
     bool                                     m_bDead;
     bool                                     m_bWorldIgnored;
     float                                    m_fCurrentRotation;
@@ -725,6 +726,7 @@ public:
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
+    bool                                     m_shouldRecreate{false};
 
     bool             m_bBulletImpactData;
     CClientEntityPtr m_pBulletImpactEntity;
@@ -787,4 +789,7 @@ public:
     CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
 
     std::shared_ptr<CClientModel> m_clientModel;
+
+    bool m_hasSyncedAnim{};
+    bool m_animationOverridedByClient{};
 };

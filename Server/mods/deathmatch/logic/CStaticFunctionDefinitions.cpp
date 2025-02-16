@@ -938,6 +938,23 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled(CElement* pEle
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetElementOnFire(CElement* pElement, bool onFire)
+{
+    assert(pElement);
+
+    if (!IS_PED(pElement) && !IS_VEHICLE(pElement) && !IS_OBJECT(pElement) && !IS_WEAPON(pElement))
+        return false;
+
+    RUN_CHILDREN(SetElementOnFire(*iter, onFire));
+
+    pElement->SetOnFire(onFire);
+
+    CBitStream bitStream;
+    bitStream.pBitStream->WriteBit(onFire);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_ON_FIRE, *bitStream.pBitStream));
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* szID)
 {
     assert(pElement);
@@ -1257,6 +1274,12 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     assert(pElement);
     RUN_CHILDREN(SetElementPosition(*iter, vecPosition, bWarp))
 
+    if (IS_PLAYER(pElement)) 
+    {
+        CPlayer* player = static_cast<CPlayer*>(pElement);
+        player->SetTeleported(true);
+    }
+
     // Update our position for that entity.
     pElement->SetPosition(vecPosition);
 
@@ -1454,6 +1477,12 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
         BitStream.pBitStream->Write(static_cast<unsigned char>((bSetPosition) ? 1 : 0));
         if (bSetPosition)
         {
+            if (IS_PLAYER(pElement))
+            {
+                CPlayer* player = static_cast<CPlayer*>(pElement);
+                player->SetTeleported(true);
+            }
+
             BitStream.pBitStream->Write(vecPosition.fX);
             BitStream.pBitStream->Write(vecPosition.fY);
             BitStream.pBitStream->Write(vecPosition.fZ);
@@ -3501,11 +3530,11 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
 }
 
 // ***************** PED GET FUNCS ***************** //
-bool CStaticFunctionDefinitions::GetPedArmor(CPed* pPed, float& fArmor)
+bool CStaticFunctionDefinitions::GetPedArmor(CPed* const ped, float& armor)
 {
-    assert(pPed);
+    assert(ped);
 
-    fArmor = pPed->GetArmor();
+    armor = ped->GetArmor();
     return true;
 }
 
@@ -3658,39 +3687,36 @@ bool CStaticFunctionDefinitions::IsPedFrozen(CPed* pPed, bool& bIsFrozen)
 }
 
 // ************** PED SET FUNCS ************** //
-bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float fArmor)
+bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float armor)
 {
     assert(pElement);
 
-    // Make sure it's above 0
-    if (fArmor >= 0.0f)
-    {
-        RUN_CHILDREN(SetPedArmor(*iter, fArmor))
+    if (armor < 0.0f)
+        return false;
 
-        if (IS_PED(pElement))
-        {
-            CPed* pPed = static_cast<CPed*>(pElement);
-            if (pPed->IsSpawned())
-            {
-                // Limit it to 100.0
-                if (fArmor > 100.0f)
-                    fArmor = 100.0f;
+    RUN_CHILDREN(SetPedArmor(*iter, armor))
 
-                pPed->SetArmor(fArmor);
+    if (!IS_PED(pElement))
+        return false;
 
-                unsigned char ucArmor = static_cast<unsigned char>(fArmor * 1.25);
+    CPed* ped = static_cast<CPed*>(pElement);
 
-                // Tell everyone
-                CBitStream BitStream;
-                BitStream.pBitStream->Write(ucArmor);
-                BitStream.pBitStream->Write(pPed->GenerateSyncTimeContext());
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ARMOR, *BitStream.pBitStream));
-                return true;
-            }
-        }
-    }
+    if (!ped->IsSpawned())
+        return false;
 
-    return false;
+    if (armor > 100.0f)
+        armor = 100.0f;
+
+    ped->SetArmor(armor);
+
+    std::uint8_t armorUnsigned = static_cast<std::uint8_t>(armor * 1.25);
+
+    CBitStream stream;
+    stream.pBitStream->Write(armorUnsigned);
+    stream.pBitStream->Write(ped->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, SET_PED_ARMOR, *stream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth)
@@ -4336,8 +4362,6 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
-            // TODO: save their animation?
-
             // Tell the players
             CBitStream BitStream;
             if (!blockName.empty() && !animName.empty())
@@ -4349,6 +4373,9 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                 // Remove choking state
                 if (pPed->IsChoking())
                     pPed->SetChoking(false);
+
+                // Store anim data
+                pPed->SetAnimationData(SPlayerAnimData{blockName, animName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, iBlend, bTaskToBeRestoredOnAnimEnd, GetTickCount64_()});
 
                 BitStream.pBitStream->WriteString<unsigned char>(blockName);
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
@@ -4364,9 +4391,12 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
             {
                 // Inform them to kill the current animation instead
                 BitStream.pBitStream->Write((unsigned char)0);
-            }
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION, *BitStream.pBitStream));
 
+                // Clear anim data
+                pPed->SetAnimationData({});
+            }
+
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION, *BitStream.pBitStream));
             return true;
         }
     }
@@ -4388,14 +4418,17 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
             {
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(fProgress);
+
+                pPed->SetAnimationProgress(fProgress);
             }
             else
             {
                 // Inform them to kill the current animation instead
                 BitStream.pBitStream->Write((unsigned char)0);
+                pPed->SetAnimationData({});
             }
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_PROGRESS, *BitStream.pBitStream));
 
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_PROGRESS, *BitStream.pBitStream));
             return true;
         }
     }
@@ -4416,6 +4449,7 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const 
             BitStream.pBitStream->WriteString<unsigned char>(animName);
             BitStream.pBitStream->Write(fSpeed);
 
+            pPed->SetAnimationSpeed(fSpeed);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
 
             return true;
@@ -4483,19 +4517,41 @@ bool CStaticFunctionDefinitions::SetPedFrozen(CElement* pElement, bool bIsFrozen
     }
     return false;
 }
-bool CStaticFunctionDefinitions::reloadPedWeapon(CElement* pElement)
-{
-    assert(pElement);
-    RUN_CHILDREN(reloadPedWeapon(*iter))
 
-    if (IS_PED(pElement))
-    {
-        CPed*      pPed = static_cast<CPed*>(pElement);
-        CBitStream BitStream;
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, RELOAD_PED_WEAPON, *BitStream.pBitStream));
-        return true;
-    }
-    return false;
+bool CStaticFunctionDefinitions::ReloadPedWeapon(CElement* pElement) noexcept {
+    assert(pElement);
+    RUN_CHILDREN(ReloadPedWeapon(*iter))
+
+    if (!IS_PED(pElement))
+        return false;
+
+    CPed* ped = static_cast<CPed*>(pElement);
+
+    bool          result;
+    CLuaArguments arguments;
+
+    std::uint8_t weapon = ped->GetWeaponType();
+    std::uint16_t clip = ped->GetWeaponAmmoInClip();
+    std::uint16_t ammo = ped->GetWeaponTotalAmmo();
+
+    arguments.PushNumber(weapon);
+    arguments.PushNumber(clip);
+    arguments.PushNumber(ammo);
+
+    if (IS_PLAYER(pElement))
+        result = ped->CallEvent("onPlayerWeaponReload", arguments);
+    else
+        result = ped->CallEvent("onPedWeaponReload", arguments);
+
+    if (!result)
+        return false;
+
+    CBitStream stream;
+
+    ped->SetReloadingWeapon(true);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, RELOAD_PED_WEAPON, *stream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetCameraMatrix(CPlayer* pPlayer, CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV)
@@ -4938,40 +4994,38 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens(CVehicle* pVehicle, unsigned 
     assert(pVehicle);
     eVehicleType vehicleType = CVehicleManager::GetVehicleType(pVehicle->GetModel());
     // Won't work with below.
-    if (vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI &&
-        vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX)
-    {
-        if (ucSirenType >= 1 && ucSirenType <= 6)
-        {
-            if (ucSirenCount <= SIREN_COUNT_MAX)
-            {
-                pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
+    if (vehicleType != VEHICLE_CAR && vehicleType != VEHICLE_MONSTERTRUCK && vehicleType != VEHICLE_QUADBIKE)
+       return false;
 
-                pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
-                pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+    if (ucSirenType < 1 || ucSirenType > 6)
+        return false;
 
-                pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
-                pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck = tSirenInfo.m_bDoLOSCheck;
-                pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser = tSirenInfo.m_bUseRandomiser;
-                pVehicle->m_tSirenBeaconInfo.m_bSirenSilent = tSirenInfo.m_bSirenSilent;
+    if (ucSirenCount > SIREN_COUNT_MAX)
+        return false;
 
-                SVehicleSirenAddSync tSirenSync;
-                tSirenSync.data.m_bOverrideSirens = pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
-                tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
-                tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
-                tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
-                tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
-                tSirenSync.data.m_ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
-                tSirenSync.data.m_ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
+    pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
 
-                CBitStream BitStream;
-                BitStream.pBitStream->Write(&tSirenSync);
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, GIVE_VEHICLE_SIRENS, *BitStream.pBitStream));
-                return true;
-            }
-        }
-    }
-    return false;
+    pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
+    pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+
+    pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
+    pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck = tSirenInfo.m_bDoLOSCheck;
+    pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser = tSirenInfo.m_bUseRandomiser;
+    pVehicle->m_tSirenBeaconInfo.m_bSirenSilent = tSirenInfo.m_bSirenSilent;
+
+    SVehicleSirenAddSync tSirenSync;
+    tSirenSync.data.m_bOverrideSirens = pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
+    tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
+    tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
+    tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
+    tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
+    tSirenSync.data.m_ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
+    tSirenSync.data.m_ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(&tSirenSync);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, GIVE_VEHICLE_SIRENS, *BitStream.pBitStream));
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleSirens(CVehicle* pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo)
@@ -6704,10 +6758,10 @@ bool CStaticFunctionDefinitions::SetVehicleLightState(CElement* pElement, unsign
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent, bool breakGlass)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehiclePanelState(*iter, ucPanel, ucState))
+    RUN_CHILDREN(SetVehiclePanelState(*iter, ucPanel, ucState, spawnFlyingComponent, breakGlass))
 
     if (IS_VEHICLE(pElement))
     {
@@ -6724,6 +6778,8 @@ bool CStaticFunctionDefinitions::SetVehiclePanelState(CElement* pElement, unsign
                 BitStream.pBitStream->Write(ucObject);
                 BitStream.pBitStream->Write(ucPanel);
                 BitStream.pBitStream->Write(ucState);
+                BitStream.pBitStream->WriteBit(spawnFlyingComponent);
+                BitStream.pBitStream->WriteBit(breakGlass);
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_DAMAGE_STATE, *BitStream.pBitStream));
                 return true;
             }

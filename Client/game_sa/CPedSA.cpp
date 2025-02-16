@@ -415,39 +415,39 @@ std::uint32_t CPedSA::GetFootBlood() const
     return pedInterface->pedFlags.bDoBloodyFootprints ? pedInterface->timeWhenDead : 0;
 }
 
-void CPedSA::SetOnFire(bool onFire)
+bool CPedSA::SetOnFire(bool onFire)
 {
-    CPedSAInterface* pedInterface = GetPedInterface();
+    CPedSAInterface* pInterface = GetPedInterface();
+    if (onFire == !!pInterface->pFireOnPed)
+        return false;
 
-    // If we are already on fire, don't apply a new fire
-    if ((onFire && pedInterface->pFireOnPed) || (!onFire && !pedInterface->pFireOnPed))
-        return;    
-
-    CFireManagerSA* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
-    if (!fireManager)
-        return;
+    auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
 
     if (onFire)
     {
         CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
         if (!fire)
-            return;
+            return false;
 
+        // Start the fire
         fire->SetTarget(this);
         fire->Ignite();
         fire->SetStrength(1.0f);
-
         // Attach the fire only to the player, do not let it
         // create child fires when moving.
         fire->SetNumGenerationsAllowed(0);
-        pedInterface->pFireOnPed = fire->GetInterface();
+        pInterface->pFireOnPed = fire->GetInterface();
     }
     else
     {
-        CFire* fire = fireManager->GetFire(pedInterface->pFireOnPed);
-        if (fire)
-            fire->Extinguish();
+        CFire* fire = fireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
+        if (!fire)
+            return false;
+
+        fire->Extinguish();
     }
+
+    return true;
 }
 
 void CPedSA::GetVoice(std::int16_t* voiceType, std::int16_t* voiceID) const

@@ -566,8 +566,12 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
         {
             return pThePedEntity->pClientEntity;
         }
+
+        auto clientBuilding = m_BuildingsPool.GetClientBuilding(reinterpret_cast<CBuildingSAInterface*>(pGameInterface));
+        if (clientBuilding)
+            return clientBuilding;
     }
-    return NULL;
+    return nullptr;
 }
 
 static void CreateMissionTrain(const CVector& vecPos, bool bDirection, std::uint32_t uiTrainType, CTrainSAInterface** ppTrainBeginning,
@@ -896,8 +900,7 @@ int CPoolsSA::GetPoolCapacity(ePools pool)
             iPtr = 0x550F82;
             break;
         case POINTER_SINGLE_LINK_POOL:
-            iPtr = 0x550F46;
-            break;
+            return GetPtrNodeSingleLinkPool().GetCapacity();
         case ENV_MAP_MATERIAL_POOL:
             iPtr = 0x5DA08E;
             break;
@@ -1063,9 +1066,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
             dwThis = CLASS_CPtrNodeDoubleLinkPool;
             break;
         case POINTER_SINGLE_LINK_POOL:
-            dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPtrNodeSingleLinkPool;
-            break;
+            return GetPtrNodeSingleLinkPool().GetUsedSize();
         default:
             return -1;
     }

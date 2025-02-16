@@ -45,7 +45,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedAnimationProgress", SetPedAnimationProgress},
         {"setPedAnimationSpeed", SetPedAnimationSpeed},
         {"setPedWalkingStyle", SetPedMoveAnim},
-        {"setPedControlState", SetPedControlState},
+        {"setPedControlState", ArgumentParserWarn<false, SetPedControlState>},
         {"setPedAnalogControlState", SetPedAnalogControlState},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
         {"setPedFightingStyle", ArgumentParser<SetPedFightingStyle>},
@@ -75,7 +75,7 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedAnimationSpeed", ArgumentParser<GetPedAnimationSpeed>},
         {"getPedAnimationLength", ArgumentParser<GetPedAnimationLength>},        
         {"getPedWalkingStyle", GetPedMoveAnim},
-        {"getPedControlState", GetPedControlState},
+        {"getPedControlState", ArgumentParserWarn<false, GetPedControlState>},
         {"getPedAnalogControlState", GetPedAnalogControlState},
         {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
         {"getPedFightingStyle", GetPedFightingStyle},
@@ -87,7 +87,7 @@ void CLuaPedDefs::LoadFunctions()
 
         {"getPedStat", GetPedStat},
         {"getPedOxygenLevel", GetPedOxygenLevel},
-        {"getPedArmor", GetPedArmor},
+        {"getPedArmor", ArgumentParserWarn<false, GetPedArmor>},
         {"isPedBleeding", ArgumentParser<IsPedBleeding>},
 
         {"getPedContactElement", GetPedContactElement},
@@ -114,7 +114,7 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedChoking", IsPedChoking},
         {"isPedDucked", IsPedDucked},
         {"isPedDead", IsPedDead},
-        {"isPedReloadingWeapon", IsPedReloadingWeapon},
+        {"isPedReloadingWeapon", ArgumentParserWarn<false, IsPedReloadingWeapon>},
         {"killPedTask", ArgumentParser<killPedTask>},
     };
 
@@ -784,26 +784,9 @@ int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedArmor(lua_State* luaVM)
+float CLuaPedDefs::GetPedArmor(CClientPed* const ped) noexcept
 {
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        // Grab the armor and return it
-        float fArmor = pPed->GetArmor();
-        lua_pushnumber(luaVM, fArmor);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return ped->GetArmor();
 }
 
 int CLuaPedDefs::GetPedStat(lua_State* luaVM)
@@ -1233,25 +1216,11 @@ int CLuaPedDefs::GivePedWeapon(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::IsPedReloadingWeapon(lua_State* luaVM)
+bool CLuaPedDefs::IsPedReloadingWeapon(CClientPed* const ped) noexcept
 {
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, pPed->IsReloadingWeapon());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return ped->IsReloadingWeapon();
 }
-
+  
 int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
 {
     // Verify the argument
@@ -1278,33 +1247,35 @@ int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedControlState(lua_State* luaVM)
+bool CLuaPedDefs::GetPedControlState(std::variant<CClientPed*, std::string> first, std::optional<std::string> maybeControl)
 {
-    // Verify the argument
-    CClientPed*      pPed = CStaticFunctionDefinitions::GetLocalPlayer();
-    SString          strControl = "";
-    CScriptArgReader argStream(luaVM);
+    CClientPed* ped{};
+    std::string control{};
 
-    if (argStream.NextIsUserData())
+    if (std::holds_alternative<CClientPed*>(first))
     {
-        argStream.ReadUserData(pPed);
+        if (!maybeControl.has_value())
+            throw std::invalid_argument("Expected control name at argument 2");
+
+        ped = std::get<CClientPed*>(first);
+        control = maybeControl.value();
     }
-    argStream.ReadString(strControl);
-
-    if (!argStream.HasErrors())
+    else if (std::holds_alternative<std::string>(first))
     {
-        bool bState;
-        if (CStaticFunctionDefinitions::GetPedControlState(*pPed, strControl, bState))
-        {
-            lua_pushboolean(luaVM, bState);
-            return 1;
-        }
+        ped = CStaticFunctionDefinitions::GetLocalPlayer();
+        control = std::get<std::string>(first);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        throw std::invalid_argument("Expected ped or control name at argument 1");
+    }
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    bool state;
+    
+    if (!CStaticFunctionDefinitions::GetPedControlState(*ped, control, state))
+        return false;
+
+    return state;
 }
 
 int CLuaPedDefs::GetPedAnalogControlState(lua_State* luaVM)
@@ -1853,34 +1824,39 @@ int CLuaPedDefs::RemovePedClothes(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedControlState(lua_State* luaVM)
+bool CLuaPedDefs::SetPedControlState(std::variant<CClientPed*, std::string> first, std::variant<std::string, bool> second, std::optional<bool> maybeState)
 {
-    // Verify the argument
-    CClientEntity*   pEntity = CStaticFunctionDefinitions::GetLocalPlayer();
-    SString          strControl = "";
-    bool             bState = false;
-    CScriptArgReader argStream(luaVM);
+    CClientPed* ped{};
+    std::string control{};
+    bool        state{};
 
-    if (argStream.NextIsUserData())
+    if (std::holds_alternative<CClientPed*>(first))
     {
-        argStream.ReadUserData(pEntity);
+        if (!std::holds_alternative<std::string>(second))
+            throw std::invalid_argument("Expected control name at argument 2");
+
+        if (!maybeState.has_value())
+            throw std::invalid_argument("Expected state boolean at argument 3");
+
+        ped = std::get<CClientPed*>(first);
+        control = std::get<std::string>(second);
+        state = maybeState.value();
     }
-    argStream.ReadString(strControl);
-    argStream.ReadBool(bState);
-
-    if (!argStream.HasErrors())
+    else if (std::holds_alternative<std::string>(first))
     {
-        if (CStaticFunctionDefinitions::SetPedControlState(*pEntity, strControl, bState))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        if (!std::holds_alternative<bool>(second))
+            throw std::invalid_argument("Expected state boolean at argument 2");
+
+        ped = CStaticFunctionDefinitions::GetLocalPlayer();
+        control = std::get<std::string>(first);
+        state = std::get<bool>(second);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        throw std::invalid_argument("Expected ped or control name at argument 1");
+    }
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetPedControlState(*ped, control, state);
 }
 
 int CLuaPedDefs::SetPedDoingGangDriveby(lua_State* luaVM)
@@ -2248,6 +2224,10 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
             }
 
             pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
+
+            if (pPed->HasSyncedAnim())
+                pPed->m_animationOverridedByClient = true;
+
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -2405,6 +2385,12 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
 
 bool CLuaPedDefs::SetPedArmor(CClientPed* const ped, const float armor)
 {
+    if (armor < 0.0f)
+        throw std::invalid_argument("Armor must be greater than or equal to 0");
+
+    if (armor > 100.0f)
+        throw std::invalid_argument("Armor must be less than or equal to 100");
+
     ped->SetArmor(armor);
     return true;
 }

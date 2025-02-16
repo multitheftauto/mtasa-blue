@@ -110,6 +110,7 @@ public:
     static bool SetElementFrozen(CElement* pElement, bool bFrozen);
     static bool SetLowLodElement(CElement* pElement, CElement* pLowLodElement);
     static bool SetElementCallPropagationEnabled(CElement* pElement, bool bEnable);
+    static bool SetElementOnFire(CElement* pElement, bool onFire);
 
     // Player get funcs
     static unsigned int       GetPlayerCount();
@@ -162,7 +163,7 @@ public:
 
     // Ped get funcs
     static CPed*     CreatePed(CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true);
-    static bool      GetPedArmor(CPed* pPed, float& fArmor);
+    static bool      GetPedArmor(CPed* const ped, float& armor);
     static bool      GetPedRotation(CPed* pPed, float& fRotation);
     static bool      IsPedDead(CPed* pPed, bool& bDead);
     static bool      IsPedDucked(CPed* pPed, bool& bDucked);
@@ -192,7 +193,7 @@ public:
     static bool      GetOriginalWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable);
 
     // Ped set funcs
-    static bool SetPedArmor(CElement* pElement, float fArmor);
+    static bool SetPedArmor(CElement* pElement, float armor);
     static bool KillPed(CElement* pElement, CElement* pKiller = NULL, unsigned char ucKillerWeapon = 0xFF, unsigned char ucBodyPart = 0xFF,
                         bool bStealth = false);
     static bool SetPedRotation(CElement* pElement, float fRotation, bool bNewWay);
@@ -217,7 +218,7 @@ public:
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);
     static bool SetPedHeadless(CElement* pElement, bool bIsHeadless);
     static bool SetPedFrozen(CElement* pElement, bool bIsFrozen);
-    static bool reloadPedWeapon(CElement* pElement);
+    static bool ReloadPedWeapon(CElement* pElement) noexcept;
     static bool SetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float fData);
     static bool SetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int sData);
     static bool SetWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool bEnable);
@@ -313,7 +314,7 @@ public:
     static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState);
-    static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
+    static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent = true, bool breakGlass = false);
     static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);

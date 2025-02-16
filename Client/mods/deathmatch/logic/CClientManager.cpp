@@ -218,6 +218,7 @@ void CClientManager::DoPulse(bool bDoStandardPulses, bool bDoVehicleManagerPulse
             m_pColManager->DoPulse();
             m_pGUIManager->DoPulse();
             m_pWeaponManager->DoPulse();
+            m_pRenderElementManager->DoPulse();
         }
         else
         {
