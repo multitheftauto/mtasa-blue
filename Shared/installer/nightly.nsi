@@ -674,7 +674,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libGLESv2.dll"
         File "${FILES_ROOT}\mta\vk_swiftshader.dll"
         File "${FILES_ROOT}\mta\vulkan-1.dll"
-        File "${FILES_ROOT}\mta\snapshot_blob.bin"
         File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
 
         File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
