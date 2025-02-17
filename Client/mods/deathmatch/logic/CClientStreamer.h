@@ -47,14 +47,6 @@ private:
     void AddElement(CClientStreamElement* pElement);
     void RemoveElement(CClientStreamElement* pElement);
 
-    void AddElementInSectors(CClientStreamElement* pElement);
-    void RemoveElementFromSectors(CClientStreamElement* pElement);
-
-    bool ShouldElementBeVisibleInCurrentDimension(CClientStreamElement* pElement) const noexcept
-    {
-        return pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions();
-    }
-
     void SetExpDistances(std::list<CClientStreamElement*>* pList);
     void AddToSortedList(std::list<CClientStreamElement*>* pList, CClientStreamElement* pElement);
 
@@ -80,7 +72,6 @@ private:
     unsigned short                     m_usDimension;
     std::list<CClientStreamElement*>   m_ActiveElements;
     std::list<CClientStreamElement*>   m_ToStreamOut;
-    std::list<CClientStreamElement*>   m_outsideCurrentDimensionElements;
 
     static void* pAddingElement;
 };
