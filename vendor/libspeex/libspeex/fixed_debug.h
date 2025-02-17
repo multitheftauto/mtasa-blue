@@ -305,9 +305,6 @@ static inline int MULT16_32_PX(int a, long long b, int Q)
 }
 
 
-#define MULT16_32_Q11(a,b) MULT16_32_QX(a,b,11)
-#define MAC16_32_Q11(c,a,b) ADD32((c),MULT16_32_Q11((a),(b)))
-#define MULT16_32_Q12(a,b) MULT16_32_QX(a,b,12)
 #define MULT16_32_Q13(a,b) MULT16_32_QX(a,b,13)
 #define MULT16_32_Q14(a,b) MULT16_32_QX(a,b,14)
 #define MULT16_32_Q15(a,b) MULT16_32_QX(a,b,15)
