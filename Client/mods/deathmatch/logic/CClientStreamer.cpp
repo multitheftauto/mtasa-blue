@@ -173,8 +173,6 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
 
                         if (element->IsStreamedIn())
                             m_ToStreamOut.push_back(element);
-                        else if (sector->IsActivated())
-                            m_ActiveElements.remove(element);
                     }
                 }
             }
@@ -188,11 +186,9 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
         return;
 
     auto iter = m_outsideCurrentDimensionElements.begin();
-    bool isLast = false;
-    do
-    {
-        isLast = *iter == lastOutsideElement;
 
+    while (*iter != lastOutsideElement)
+    {
         CClientStreamElement* element = *iter;
         if (element->GetDimension() == usDimension)
         {
@@ -203,7 +199,7 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
         {
             iter++;
         }
-    } while (!isLast);
+    }
 }
 
 CClientStreamSectorRow* CClientStreamer::FindOrCreateRow(CVector& vecPosition, CClientStreamSectorRow* pSurrounding)
@@ -335,10 +331,7 @@ void CClientStreamer::AddElement(CClientStreamElement* pElement)
 void CClientStreamer::RemoveElement(CClientStreamElement* pElement)
 {
     if (pElement->GetStreamSector())
-    {
         RemoveElementFromSectors(pElement);
-        m_ActiveElements.remove(pElement);
-    }
     else
         m_outsideCurrentDimensionElements.remove(pElement);
 }
@@ -426,10 +419,6 @@ void CClientStreamer::Restream(bool bMovedFar)
             // Stream out 1 of them per frame
             pElement->InternalStreamOut();
             iMaxOut--;
-
-            CClientStreamSector* streamSector = pElement->GetStreamSector();
-            if (!streamSector || !streamSector->IsActivated() || !ShouldElementBeVisibleInCurrentDimension(pElement))
-                m_ActiveElements.remove(pElement);
         }
         m_ToStreamOut.remove(pElement);
 
@@ -453,12 +442,6 @@ void CClientStreamer::Restream(bool bMovedFar)
         // Is this element streamed in?
         if (pElement->IsStreamedIn())
         {
-            if (!ShouldElementBeVisibleInCurrentDimension(pElement))
-            {
-                m_ToStreamOut.push_back(pElement);
-                continue;
-            }
-
             if (IS_VEHICLE(pElement))
             {
                 CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pElement);
@@ -718,6 +701,10 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
         }
         else
         {
+            // Should we deactivate the element?
+            if (pPreviousSector && pPreviousSector->IsActivated())
+                m_ActiveElements.remove(pElement);
+
             // Should we activate this sector?
             if (pSector->IsExtra() && (m_pSector->IsMySurroundingSector(pSector) || m_pSector == pSector))
             {
@@ -726,19 +713,17 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
             }
             // If we're in a deactivated sector and streamed in, stream us out
             else if (pElement->IsStreamedIn())
+            {
                 m_ToStreamOut.push_back(pElement);
-            else if (pPreviousSector && pPreviousSector->IsActivated())
-                m_ActiveElements.remove(pElement);
+            }
         }
     }
-    else
+    else if (pPreviousSector && pPreviousSector->IsActivated())
     {
-        if (pElement->IsStreamedIn())
-            m_ToStreamOut.push_back(pElement);
-        else if (pPreviousSector && pPreviousSector->IsActivated())
-            m_ActiveElements.remove(pElement);
+        // The element was removed from sectors.
+        // Remove it from active elements too.
+        m_ActiveElements.remove(pElement);
     }
-
     pElement->SetStreamSector(pSector);
 }
 
