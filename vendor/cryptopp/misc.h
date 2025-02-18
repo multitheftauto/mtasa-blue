@@ -32,8 +32,8 @@
 # pragma GCC diagnostic ignored "-Wunused-function"
 #endif
 
-#ifdef _MSC_VER
-	#if _MSC_VER >= 1400
+#ifdef CRYPTOPP_MSC_VERSION
+	#if CRYPTOPP_MSC_VERSION >= 1400
 		// VC2005 workaround: disable declarations that conflict with winnt.h
 		#define _interlockedbittestandset CRYPTOPP_DISABLED_INTRINSIC_1
 		#define _interlockedbittestandreset CRYPTOPP_DISABLED_INTRINSIC_2
@@ -45,7 +45,7 @@
 		#undef _interlockedbittestandset64
 		#undef _interlockedbittestandreset64
 		#define CRYPTOPP_FAST_ROTATE(x) 1
-	#elif _MSC_VER >= 1300
+	#elif CRYPTOPP_MSC_VERSION >= 1300
 		#define CRYPTOPP_FAST_ROTATE(x) ((x) == 32 | (x) == 64)
 	#else
 		#define CRYPTOPP_FAST_ROTATE(x) ((x) == 32)
@@ -80,9 +80,11 @@
 #endif
 
 #if defined(__BMI__)
-# include <x86intrin.h>
+# if defined(CRYPTOPP_GCC_COMPATIBLE)
+#  include <x86intrin.h>
+# endif
 # include <immintrin.h>
-#endif  // GCC and BMI
+#endif  // BMI
 
 // More LLVM bullshit. Apple Clang 6.0 does not define them.
 // Later version of Clang defines them and results in warnings.
@@ -192,7 +194,7 @@ struct CompileAssert
 #else
 // VS2005 added _countof
 #ifndef COUNTOF
-# if defined(_MSC_VER) && (_MSC_VER >= 1400)
+# if defined(CRYPTOPP_MSC_VERSION) && (CRYPTOPP_MSC_VERSION >= 1400)
 #  define COUNTOF(x) _countof(x)
 # else
 #  define COUNTOF(x) (sizeof(x)/sizeof(x[0]))
@@ -271,7 +273,7 @@ struct NewObject
 #else
 #if defined(CRYPTOPP_CXX11_ATOMIC)
 # define MEMORY_BARRIER() std::atomic_thread_fence(std::memory_order_acq_rel)
-#elif (_MSC_VER >= 1400)
+#elif (CRYPTOPP_MSC_VERSION >= 1400)
 # pragma intrinsic(_ReadWriteBarrier)
 # define MEMORY_BARRIER() _ReadWriteBarrier()
 #elif defined(__INTEL_COMPILER)
@@ -344,8 +346,8 @@ template <class T, class F, int instance>
 		return *p;
 
 	T *newObject = m_objectFactory();
-	s_pObject.store(newObject, std::memory_order_relaxed);
 	std::atomic_thread_fence(std::memory_order_release);
+	s_pObject.store(newObject, std::memory_order_relaxed);
 
 	return *newObject;
 #else
@@ -432,7 +434,7 @@ inline size_t PtrByteDiff(const PTR pointer1, const PTR pointer2)
 }
 
 /// \brief Pointer to the first element of a string
-/// \param str std::string
+/// \param str string
 /// \details BytePtr returns NULL pointer for an empty string.
 /// \return Pointer to the first element of a string
 /// \since Crypto++ 8.0
@@ -454,7 +456,7 @@ inline byte* BytePtr(std::string& str)
 byte* BytePtr(SecByteBlock& str);
 
 /// \brief Const pointer to the first element of a string
-/// \param str std::string
+/// \param str string
 /// \details ConstBytePtr returns non-NULL pointer for an empty string.
 /// \return Pointer to the first element of a string
 /// \since Crypto++ 8.0
@@ -473,7 +475,7 @@ inline const byte* ConstBytePtr(const std::string& str)
 const byte* ConstBytePtr(const SecByteBlock& str);
 
 /// \brief Size of a string
-/// \param str std::string
+/// \param str string
 /// \return size of a string
 /// \since Crypto++ 8.3
 inline size_t BytePtrSize(const std::string& str)
@@ -595,7 +597,7 @@ inline void memmove_s(void *dest, size_t sizeInBytes, const void *src, size_t co
 }
 
 #if __BORLANDC__ >= 0x620
-// C++Builder 2010 workaround: can't use std::memcpy_s
+// C++Builder 2010 workaround: can't use memcpy_s
 // because it doesn't allow 0 lengths
 # define memcpy_s CryptoPP::memcpy_s
 # define memmove_s CryptoPP::memmove_s
@@ -675,7 +677,6 @@ template <class T> inline const T& STDMAX(const T& a, const T& b)
 
 #if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
 # pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wsign-compare"
 # pragma GCC diagnostic ignored "-Wstrict-overflow"
 # if (CRYPTOPP_LLVM_CLANG_VERSION >= 20800) || (CRYPTOPP_APPLE_CLANG_VERSION >= 30000)
 #  pragma GCC diagnostic ignored "-Wtautological-compare"
@@ -690,28 +691,232 @@ template <class T> inline const T& STDMAX(const T& a, const T& b)
 /// \param a the first value
 /// \param b the second value
 /// \return the minimum value based on a comparison a and b using <tt>operator&lt;</tt>.
-/// \details The comparison <tt>b \< a</tt> is performed and the value returned is a's type T1.
+/// \details The comparison <tt>b \< a</tt> is performed and the value returned is type T1.
 template <class T1, class T2> inline const T1 UnsignedMin(const T1& a, const T2& b)
 {
 	CRYPTOPP_COMPILE_ASSERT((sizeof(T1)<=sizeof(T2) && T2(-1)>0) || (sizeof(T1)>sizeof(T2) && T1(-1)>0));
+	CRYPTOPP_COMPILE_ASSERT(std::numeric_limits<T1>::is_signed == false);
+	CRYPTOPP_COMPILE_ASSERT(std::numeric_limits<T2>::is_signed == false);
+
 	if (sizeof(T1)<=sizeof(T2))
 		return b < (T2)a ? (T1)b : a;
 	else
 		return (T1)b < a ? (T1)b : a;
 }
 
-/// \brief Tests whether a conversion from -> to is safe to perform
+/// \brief Perform a conversion from \p from to \p to
 /// \tparam T1 class or type
 /// \tparam T2 class or type
 /// \param from the first value
 /// \param to the second value
-/// \return true if its safe to convert from into to, false otherwise.
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function returns false,
+///  then \p to is undefined and should not be used.
+/// \note for integral conversions, a template specialization should be provided. The specialization
+///  will perform more efficiently, and avoid warnings for truncation and sign compares.
 template <class T1, class T2>
 inline bool SafeConvert(T1 from, T2 &to)
 {
 	to = static_cast<T2>(from);
 	if (from != to || (from > 0) != (to > 0))
 		return false;
+	return true;
+}
+
+// The following specializations are the product of {word32, sword32, word64, sword64} ->
+// {word32, sword32, word64, sword64}. There are 16 of them, but we can omit specializations
+// of {word64} -> {word64}, {word32} -> {word32}, etc.
+//
+// The list below proceeds to list the conversion to word64 (3 each), followed by
+// sword64 (3 each), followed by word32 (3 each), and finally follwed by sword32 (3 each).
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(sword64 from, word64 &to)
+{
+	if (from < 0)
+		return false;
+	to = static_cast<word64>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(word32 from, word64 &to)
+{
+	to = static_cast<word64>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(sword32 from, word64 &to)
+{
+	if (from < 0)
+		return false;
+	to = static_cast<word64>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(word64 from, sword64 &to)
+{
+	if (from > static_cast<word64>((std::numeric_limits<sword64>::max)()))
+		return false;
+	to = static_cast<sword64>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(word32 from, sword64 &to)
+{
+	to = static_cast<sword64>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(sword32 from, sword64 &to)
+{
+	to = static_cast<sword64>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(word64 from, word32 &to)
+{
+	if (from > static_cast<word64>((std::numeric_limits<word32>::max)()))
+		return false;
+	to = static_cast<word32>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(sword64 from, word32 &to)
+{
+	if (from < 0)
+		return false;
+	else if (from > static_cast<sword64>((std::numeric_limits<word32>::max)()))
+		return false;
+	to = static_cast<word32>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(sword32 from, word32 &to)
+{
+	if (from < 0)
+		return false;
+	to = static_cast<word32>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(word64 from, sword32 &to)
+{
+	if (from > static_cast<word64>((std::numeric_limits<sword32>::max)()))
+		return false;
+	to = static_cast<sword32>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(sword64 from, sword32 &to)
+{
+	if (from > static_cast<sword64>((std::numeric_limits<sword32>::max)()))
+		return false;
+	else if (from < static_cast<sword64>((std::numeric_limits<sword32>::min)()))
+		return false;
+	to = static_cast<sword32>(from);
+	return true;
+}
+
+/// \brief Perform a conversion from \p from to \p to
+/// \param from the first value
+/// \param to the second value
+/// \return true if its safe to convert from \p from to \p to, false otherwise.
+/// \details if the function returns true, then it is safe to use \p to. If the function
+///  returns false, then \p to is undefined and should not be used.
+/// \since Crypto++ 8.8
+template<>
+inline bool SafeConvert(word32 from, sword32 &to)
+{
+	if (from > static_cast<word32>((std::numeric_limits<sword32>::max)()))
+		return false;
+	to = static_cast<sword32>(from);
 	return true;
 }
 
@@ -874,7 +1079,7 @@ inline unsigned int TrailingZeros(word32 v)
 	return (unsigned int)_tzcnt_u32(v);
 #elif defined(__GNUC__) && (CRYPTOPP_GCC_VERSION >= 30400)
 	return (unsigned int)__builtin_ctz(v);
-#elif defined(_MSC_VER) && (_MSC_VER >= 1400)
+#elif defined(CRYPTOPP_MSC_VERSION) && (CRYPTOPP_MSC_VERSION >= 1400)
 	unsigned long result;
 	_BitScanForward(&result, v);
 	return static_cast<unsigned int>(result);
@@ -905,7 +1110,7 @@ inline unsigned int TrailingZeros(word64 v)
 	return (unsigned int)_tzcnt_u64(v);
 #elif defined(__GNUC__) && (CRYPTOPP_GCC_VERSION >= 30400)
 	return (unsigned int)__builtin_ctzll(v);
-#elif defined(_MSC_VER) && (_MSC_VER >= 1400) && (defined(_M_X64) || defined(_M_IA64))
+#elif defined(CRYPTOPP_MSC_VERSION) && (CRYPTOPP_MSC_VERSION >= 1400) && (defined(_M_X64) || defined(_M_IA64))
 	unsigned long result;
 	_BitScanForward64(&result, v);
 	return static_cast<unsigned int>(result);
@@ -1075,7 +1280,11 @@ inline word128 NumericLimitsMin()
 template<>
 inline word128 NumericLimitsMax()
 {
+#if defined(CRYPTOPP_APPLE_CLANG_VERSION)
 	return (static_cast<word128>(LWORD_MAX) << 64U) | LWORD_MAX;
+#else
+	return (std::numeric_limits<word128>::max)();
+#endif
 }
 #endif
 
@@ -1201,7 +1410,7 @@ inline unsigned int GetAlignmentOf()
 {
 #if defined(CRYPTOPP_CXX11_ALIGNOF)
 	return alignof(T);
-#elif (_MSC_VER >= 1300)
+#elif (CRYPTOPP_MSC_VERSION >= 1300)
 	return __alignof(T);
 #elif defined(__GNUC__)
 	return __alignof__(T);
@@ -1382,7 +1591,7 @@ void SecureWipeBuffer(T *buf, size_t n)
 }
 
 #if !defined(CRYPTOPP_DISABLE_ASM) && \
-    (_MSC_VER >= 1400 || defined(__GNUC__)) && \
+    (CRYPTOPP_MSC_VERSION >= 1400 || defined(__GNUC__)) && \
     (CRYPTOPP_BOOL_X64 || CRYPTOPP_BOOL_X86)
 
 /// \brief Sets each byte of an array to 0
@@ -1451,7 +1660,7 @@ template<> inline void SecureWipeBuffer(word64 *buf, size_t n)
 
 #endif	// CRYPTOPP_BOOL_X64 || CRYPTOPP_BOOL_X86
 
-#if !defined(CRYPTOPP_DISABLE_ASM) && (_MSC_VER >= 1700) && defined(_M_ARM)
+#if !defined(CRYPTOPP_DISABLE_ASM) && (CRYPTOPP_MSC_VERSION >= 1700) && defined(_M_ARM)
 template<> inline void SecureWipeBuffer(byte *buf, size_t n)
 {
 	char *p = reinterpret_cast<char*>(buf+n);
@@ -1705,7 +1914,7 @@ template <class T> inline T rotrMod(T x, unsigned int y)
 	return T((x>>(y&MASK))|(x<<(-y&MASK)));
 }
 
-#ifdef _MSC_VER
+#ifdef CRYPTOPP_MSC_VERSION
 
 /// \brief Performs a left rotate
 /// \tparam T the word type
@@ -1797,9 +2006,9 @@ template<> inline word32 rotrMod<word32>(word32 x, unsigned int y)
 	return _lrotr(x, static_cast<byte>(y));
 }
 
-#endif // #ifdef _MSC_VER
+#endif // #ifdef CRYPTOPP_MSC_VERSION
 
-#if (_MSC_VER >= 1400) || (defined(_MSC_VER) && !defined(_DLL))
+#if (CRYPTOPP_MSC_VERSION >= 1400) || (defined(CRYPTOPP_MSC_VERSION) && !defined(_DLL))
 // Intel C++ Compiler 10.0 calls a function instead of using the rotate instruction when using these instructions
 
 /// \brief Performs a left rotate
@@ -1892,9 +2101,9 @@ template<> inline word64 rotrMod<word64>(word64 x, unsigned int y)
 	return y ? _rotr64(x, static_cast<byte>(y)) : x;
 }
 
-#endif // #if _MSC_VER >= 1310
+#endif // #if CRYPTOPP_MSC_VERSION >= 1310
 
-#if _MSC_VER >= 1400 && !defined(__INTEL_COMPILER)
+#if CRYPTOPP_MSC_VERSION >= 1400 && !defined(__INTEL_COMPILER)
 // Intel C++ Compiler 10.0 gives undefined externals with these
 template<> inline word16 rotlFixed<word16>(word16 x, unsigned int y)
 {
@@ -1960,7 +2169,7 @@ template<> inline byte rotrMod<byte>(byte x, unsigned int y)
 	return _rotr8(x, static_cast<byte>(y));
 }
 
-#endif // #if _MSC_VER >= 1400
+#endif // #if CRYPTOPP_MSC_VERSION >= 1400
 
 #if (defined(__MWERKS__) && TARGET_CPU_PPC)
 
@@ -2032,7 +2241,7 @@ inline word16 ByteReverse(word16 value)
 {
 #if defined(CRYPTOPP_BYTESWAP_AVAILABLE)
 	return bswap_16(value);
-#elif (_MSC_VER >= 1400) || (defined(_MSC_VER) && !defined(_DLL))
+#elif (CRYPTOPP_MSC_VERSION >= 1400) || (defined(CRYPTOPP_MSC_VERSION) && !defined(_DLL))
 	return _byteswap_ushort(value);
 #else
 	return rotlFixed(value, 8U);
@@ -2056,7 +2265,7 @@ inline word32 ByteReverse(word32 value)
 	return value;
 #elif defined(__MWERKS__) && TARGET_CPU_PPC
 	return (word32)__lwbrx(&value,0);
-#elif (_MSC_VER >= 1400) || (defined(_MSC_VER) && !defined(_DLL))
+#elif (CRYPTOPP_MSC_VERSION >= 1400) || (defined(CRYPTOPP_MSC_VERSION) && !defined(_DLL))
 	return _byteswap_ulong(value);
 #elif CRYPTOPP_FAST_ROTATE(32) && !defined(__xlC__)
 	// 5 instructions with rotate instruction, 9 without
@@ -2079,7 +2288,7 @@ inline word64 ByteReverse(word64 value)
 #elif defined(__GNUC__) && defined(CRYPTOPP_X86_ASM_AVAILABLE) && defined(__x86_64__)
 	__asm__ ("bswap %0" : "=r" (value) : "0" (value));
 	return value;
-#elif (_MSC_VER >= 1400) || (defined(_MSC_VER) && !defined(_DLL))
+#elif (CRYPTOPP_MSC_VERSION >= 1400) || (defined(CRYPTOPP_MSC_VERSION) && !defined(_DLL))
 	return _byteswap_uint64(value);
 #elif CRYPTOPP_BOOL_SLOW_WORD64
 	return (word64(ByteReverse(word32(value))) << 32) | ByteReverse(word32(value>>32));

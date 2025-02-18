@@ -358,8 +358,11 @@ bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& Socket, NetBit
 
         if (pPacket->Read(*BitStream))
         {
-            // Relay it to nearbyers
-            Broadcast(*pPacket, pSourceSimPlayer->GetPuresyncSendList());
+            // Relay it to nearbyers, if the player really has this weapon
+            if (pSourceSimPlayer->m_pRealPlayer->HasWeaponType(pPacket->m_Cache.weaponType))
+            {
+                Broadcast(*pPacket, pSourceSimPlayer->GetPuresyncSendList());
+            }
         }
 
         delete pPacket;

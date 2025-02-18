@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <optional>
 #include <game/CStreaming.h>
 #include <game/CModelInfo.h>
 #include <game/CSettings.h>
@@ -46,7 +47,7 @@ public:
     virtual void OnClientClose();
     virtual void UpdatePedModelCaching(const std::map<ushort, float>& newNeedCacheList);
     virtual void UpdateVehicleModelCaching(const std::map<ushort, float>& newNeedCacheList);
-    virtual void AddModelToPersistentCache(ushort usModelId);
+    virtual void SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds);
 
     // CModelCacheManagerImpl methods
     CModelCacheManagerImpl();
@@ -60,15 +61,16 @@ public:
     void SubModelRefCount(ushort usModelId);
 
 protected:
-    CGame*                            m_pGame;
-    int                               m_iFrameCounter;
-    CTickCount                        m_TickCountNow;
-    bool                              m_bDonePreLoad;
-    uint                              m_uiMaxCachedPedModels;
-    uint                              m_uiMaxCachedVehicleModels;
-    std::map<ushort, SModelCacheInfo> m_PedModelCacheInfoMap;
-    std::map<ushort, SModelCacheInfo> m_VehicleModelCacheInfoMap;
-    std::set<ushort>                  m_PermoLoadedModels;
+    CGame*                            m_pGame{};
+    int                               m_iFrameCounter{};
+    CTickCount                        m_TickCountNow{};
+    bool                              m_bDonePreLoad{};
+    uint                              m_uiMaxCachedPedModels{};
+    bool                              m_IsUsingCustomPedCacheLimit{}; //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
+    uint                              m_uiMaxCachedVehicleModels{};
+    bool                              m_IsUsingCustomVehicleCacheLimit{}; //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
+    std::map<ushort, SModelCacheInfo> m_PedModelCacheInfoMap{};
+    std::map<ushort, SModelCacheInfo> m_VehicleModelCacheInfoMap{};
 };
 
 ///////////////////////////////////////////////////////////////
@@ -101,6 +103,7 @@ CModelCacheManagerImpl::CModelCacheManagerImpl()
 ///////////////////////////////////////////////////////////////
 CModelCacheManagerImpl::~CModelCacheManagerImpl()
 {
+    OnClientClose();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -112,7 +115,10 @@ CModelCacheManagerImpl::~CModelCacheManagerImpl()
 ///////////////////////////////////////////////////////////////
 void CModelCacheManagerImpl::OnClientClose()
 {
-    // Remove all extra refs applied here
+    RemoveCacheRefs(m_PedModelCacheInfoMap);
+    RemoveCacheRefs(m_VehicleModelCacheInfoMap);
+
+    m_IsUsingCustomPedCacheLimit = m_IsUsingCustomVehicleCacheLimit = false;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -213,6 +219,24 @@ void CModelCacheManagerImpl::GetStats(SModelCacheStats& outStats)
 
 ///////////////////////////////////////////////////////////////
 //
+// CModelCacheManagerImpl::SetCustomLimits
+//
+// Function to set custom limits, instead of calculating them automatically.
+// If the optional is empty, the value is restored to the automatic one
+// otherwise it is set to whatever value the opt contains
+// 
+///////////////////////////////////////////////////////////////
+void CModelCacheManagerImpl::SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
+    if (m_IsUsingCustomPedCacheLimit = numPeds.has_value()) {
+        m_uiMaxCachedPedModels = *numPeds;
+    }
+    if (m_IsUsingCustomVehicleCacheLimit = numVehicles.has_value()) {
+        m_uiMaxCachedVehicleModels = *numVehicles;
+    }
+}
+
+///////////////////////////////////////////////////////////////
+//
 // CModelCacheManagerImpl::DoPulse
 //
 ///////////////////////////////////////////////////////////////
@@ -229,28 +253,14 @@ void CModelCacheManagerImpl::DoPulse()
     //  128MB streaming = 8+8 MB for peds & vehicles        36 peds + 56 veh
     //  256MB streaming = 16+8 MB for peds & vehicles       72 peds + 56 veh
     //
-    int iStreamingMemoryAvailableKB = *(int*)0x08A5A80;
-
-    SSamplePoint<float> pedPoints[] = {{65536, 9}, {98304, 18}, {131072, 36}, {262144, 72}};
-    SSamplePoint<float> vehPoints[] = {{65536, 7}, {98304, 28}, {131072, 56}, {262144, 56}};
-
-    m_uiMaxCachedPedModels = (int)EvalSamplePosition<float>(pedPoints, NUMELMS(pedPoints), (float)iStreamingMemoryAvailableKB);
-    m_uiMaxCachedVehicleModels = (int)EvalSamplePosition<float>(vehPoints, NUMELMS(vehPoints), (float)iStreamingMemoryAvailableKB);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CModelCacheManagerImpl::AddModelToPersistentCache
-//
-// Keep this model around 4 evar now
-//
-///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::AddModelToPersistentCache(ushort usModelId)
-{
-    if (!MapContains(m_PermoLoadedModels, usModelId))
-    {
-        AddModelRefCount(usModelId);
-        MapInsert(m_PermoLoadedModels, usModelId);
+    const auto iStreamingMemoryAvailableKB = *(int*)0x08A5A80;
+    if (!m_IsUsingCustomPedCacheLimit) {
+        SSamplePoint<float> pedPoints[] = { {65536, 9}, {98304, 18}, {131072, 36}, {262144, 72} };
+        m_uiMaxCachedPedModels = (int)EvalSamplePosition<float>(pedPoints, NUMELMS(pedPoints), (float)iStreamingMemoryAvailableKB);
+    }
+    if (!m_IsUsingCustomVehicleCacheLimit) {
+        SSamplePoint<float> vehPoints[] = {{65536, 7}, {98304, 28}, {131072, 56}, {262144, 56}};
+        m_uiMaxCachedVehicleModels = (int)EvalSamplePosition<float>(vehPoints, NUMELMS(vehPoints), (float)iStreamingMemoryAvailableKB);
     }
 }
 
@@ -514,13 +524,5 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
                 OutputDebugLine(SString("[Cache] End caching model %d  (OnRestreamModel)", usModelId));
             }
         }
-    }
-
-    // Also check the permo list
-    if (MapContains(m_PermoLoadedModels, usModelId))
-    {
-        SubModelRefCount(usModelId);
-        MapRemove(m_PermoLoadedModels, usModelId);
-        OutputDebugLine(SString("[Cache] End permo-caching model %d  (OnRestreamModel)", usModelId));
-    }
+    }   
 }

@@ -29,13 +29,13 @@
 /*       lib/config-dos.h - Hand crafted config file for DOS        */
 /* ================================================================ */
 
-#ifndef OS
+#ifndef CURL_OS
 #if defined(DJGPP)
-  #define OS  "MSDOS/djgpp"
+  #define CURL_OS  "MSDOS/djgpp"
 #elif defined(__HIGHC__)
-  #define OS  "MSDOS/HighC"
+  #define CURL_OS  "MSDOS/HighC"
 #else
-  #define OS  "MSDOS/?"
+  #define CURL_OS  "MSDOS/?"
 #endif
 #endif
 
@@ -61,7 +61,6 @@
 #define HAVE_RECV              1
 #define HAVE_SELECT            1
 #define HAVE_SEND              1
-#define HAVE_SETJMP_H          1
 #define HAVE_SETLOCALE         1
 #define HAVE_SETMODE           1
 #define HAVE_SIGNAL            1
@@ -74,7 +73,6 @@
 #define HAVE_SYS_SOCKET_H      1
 #define HAVE_SYS_STAT_H        1
 #define HAVE_SYS_TYPES_H       1
-#define HAVE_TIME_H            1
 #define HAVE_UNISTD_H          1
 
 #define NEED_MALLOC_H          1
@@ -84,7 +82,6 @@
 #define SIZEOF_SIZE_T          4
 #define SIZEOF_CURL_OFF_T      8
 #define STDC_HEADERS           1
-#define TIME_WITH_SYS_TIME     1
 
 /* Qualifiers for send() and recv() */
 
@@ -125,7 +122,6 @@
   #define HAVE_SIGSETJMP  1
   #define HAVE_SYS_TIME_H 1
   #define HAVE_TERMIOS_H  1
-  #define HAVE_VARIADIC_MACROS_GCC 1
 
 #elif defined(__HIGHC__)
   #define HAVE_SYS_TIME_H 1

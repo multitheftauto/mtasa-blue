@@ -56,6 +56,7 @@
 #include <CClientCommon.h>
 #include <CClientManager.h>
 #include <CClient3DMarker.h>
+#include <CClientBuilding.h>
 #include <CClientCheckpoint.h>
 #include <CClientColShape.h>
 #include <CClientColCircle.h>
@@ -104,6 +105,7 @@
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
+#include <CModelRenderer.h>
 #include <lua/CLuaCFunctions.h>
 #include <lua/CLuaArguments.h>
 #include <lua/CLuaMain.h>
@@ -120,6 +122,7 @@
 #include <luadefs/CLuaColShapeDefs.h>
 #include <luadefs/CLuaCompatibilityDefs.h>
 #include <luadefs/CLuaDrawingDefs.h>
+#include <luadefs/CLuaDiscordDefs.h>
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>
@@ -142,6 +145,7 @@
 #include <luadefs/CLuaWaterDefs.h>
 #include <luadefs/CLuaWeaponDefs.h>
 #include <luadefs/CLuaWorldDefs.h>
+#include <luadefs/CLuaBuildingDefs.h>
 #include <CRemoteCalls.h>
 
 // Shared includes

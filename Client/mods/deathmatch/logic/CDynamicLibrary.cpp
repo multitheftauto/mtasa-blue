@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "CDynamicLibrary.h"
 
 CDynamicLibrary::CDynamicLibrary()
 {

@@ -135,8 +135,8 @@ public:
     void DeleteAllEvents();
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
-    CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
-    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = NULL);
+    CCustomData&   GetCustomDataManager() { return m_CustomData; }
+    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = nullptr, eCustomDataClientTrust* clientChangesMode = nullptr);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData);
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
@@ -226,6 +226,9 @@ public:
     bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }
 
+    virtual bool IsOnFire() const noexcept { return false; }
+    virtual void SetOnFire(bool onFire) noexcept {}
+
     // Spatial database
     virtual CSphere GetWorldBoundingSphere();
     virtual void    UpdateSpatialData();
@@ -248,7 +251,7 @@ protected:
     void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL);
 
     CMapEventManager* m_pEventManager;
-    CCustomData*      m_pCustomData;
+    CCustomData       m_CustomData;
 
     EElementType m_iType;
     ElementID    m_ID;

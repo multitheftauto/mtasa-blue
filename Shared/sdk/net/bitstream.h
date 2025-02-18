@@ -528,6 +528,90 @@ enum class eBitStreamVersion : unsigned short
 
     CEntityAddPacket_ObjectBreakable,
 
+    // Add serverside setWorldSpecialPropertyEnabled
+    // 2023-08-17
+    WorldSpecialProperties,
+
+    // Add "fireballdestruct" to setWorldSpecialPropertyEnabled
+    // 2023-09-09
+    WorldSpecialProperty_FireballDestruct,
+
+    // Send server name to player in CPlayerJoinCompletePacket
+    // 2023-10-12
+    CPlayerJoinCompletePacket_ServerName,
+
+    // Add "roadsignstext" to setWorldSpecialPropertyEnabled
+    // 2024-05-17
+    WorldSpecialProperty_RoadSignsText,
+
+    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
+    // 2024-05-23
+    WorldSpecialProperty_ExtendedWaterCannons,
+
+    // Add breakObject to serverside as well
+    // 2024-05-31
+    BreakObject_Serverside,   
+    
+    // Ped syncronization revision
+    // 2024-06-16
+    PedSync_Revision,
+
+    // Add "tunnelweatherblend" to setWorldSpecialPropertyEnabled
+    // 2024-06-30
+    WorldSpecialProperty_TunnelWeatherBlend,
+
+    // Checkpoint & arrow alpha fix
+    // 2024-07-03
+    Marker_IgnoreAlphaLimits,
+
+    // Add "setMarkerTargetArrowProperties"
+    // 2024-07-05
+    SetMarkerTargetArrowProperties,
+
+    // Add respawnObject and toggleObjectRespawn to serverside
+    // 2024-09-04
+    RespawnObject_Serverside,
+
+    // Add check_duplicate_serials
+    // 2024-09-04
+    CheckDuplicateSerials,
+
+    // Add ignorefirestate special world property
+    // 2024-11-07
+    WorldSpecialProperty_IgnoreFireState,
+
+    // Fix iPedSyncerDistance and iUnoccupiedVehicleSyncerDistance sync
+    // 2024-11-22
+    FixSyncerDistance,
+
+    // Add onPlayerChangesWorldSpecialProperty
+    // 2024-11-26
+    WorldSpecialPropertyEvent,
+
+    // Add setElementOnFire function
+    // 2024-12-30
+    SetElementOnFire,
+
+    // Add "spawnFlyingComponent" to setVehiclePanelState
+    // 2024-12-31
+    SetVehiclePanelState_SpawnFlyingComponent,
+
+    // Ped animations synchronization
+    // 2025-01-01
+    AnimationsSync,
+
+    // Add server side isPedReloadingWeapon
+    // 2025-01-09
+    IsPedReloadingWeapon,
+
+    // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
+    // 2025-01-10
+    WorldSpecialProperty_FlyingComponents,
+
+    // Ped's camera synchronization
+    // 2025-01-29
+    PedSync_CameraRotation,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

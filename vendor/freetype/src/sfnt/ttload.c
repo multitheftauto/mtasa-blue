@@ -5,7 +5,7 @@
  *   Load the basic TrueType tables, i.e., tables that can be either in
  *   TTF or OTF fonts (body).
  *
- * Copyright (C) 1996-2023 by
+ * Copyright (C) 1996-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -503,6 +503,13 @@
     face->num_tables = valid_entries;
 
     FT_FRAME_EXIT();
+
+    if ( !valid_entries )
+    {
+      FT_TRACE2(( "tt_face_load_font_dir: no valid tables found\n" ));
+      error = FT_THROW( Unknown_File_Format );
+      goto Exit;
+    }
 
     FT_TRACE2(( "table directory loaded\n" ));
     FT_TRACE2(( "\n" ));

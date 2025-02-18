@@ -14,6 +14,7 @@
 #include <game/CSettings.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
+#include <filesystem>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
@@ -24,9 +25,12 @@
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordRichPresence.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
+
+namespace fs = std::filesystem;
 
 static float fTest = 1;
 
@@ -34,18 +38,40 @@ extern CCore* g_pCore;
 bool          g_bBoundsChecker = false;
 SString       g_strJingleBells;
 
+extern fs::path g_gtaDirectory;
+
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
 static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
-    if (StrCmpIA("dpnhpast.dll", fileName) != 0)
-        return Win32LoadLibraryA(fileName);
-
     // GTA:SA expects a valid module handle for DirectPlay. We return a handle for an already loaded library.
-    return Win32LoadLibraryA("d3d8.dll");
+    if (!StrCmpIA("dpnhpast.dll", fileName))
+        return Win32LoadLibraryA("d3d8.dll");
+
+    if (!StrCmpIA("enbseries\\enbhelper.dll", fileName))
+    {
+        std::error_code ec;
+        
+        // Try to load enbhelper.dll from our custom launch directory first.
+        const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
+
+        if (fs::is_regular_file(inLaunchDir, ec))
+            return Win32LoadLibraryA(inLaunchDir.u8string().c_str());
+
+        // Try to load enbhelper.dll from the GTA install directory second.
+        const fs::path inGTADir = g_gtaDirectory / "enbseries" / "enbhelper.dll";
+
+        if (fs::is_regular_file(inGTADir, ec))
+            return Win32LoadLibraryA(inGTADir.u8string().c_str());
+
+        return nullptr;
+    }
+
+    return Win32LoadLibraryA(fileName);
 }
 
 CCore::CCore()
@@ -110,7 +136,6 @@ CCore::CCore()
     m_pMouseControl = new CMouseControl();
 
     // Create our hook objects.
-    // m_pFileSystemHook           = new CFileSystemHook ( );
     m_pDirect3DHookManager = new CDirect3DHookManager();
     m_pDirectInputHookManager = new CDirectInputHookManager();
     m_pMessageLoopHook = new CMessageLoopHook();
@@ -133,14 +158,22 @@ CCore::CCore()
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+    m_timeDiscordAppLastUpdate = 0;
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    // Create discord rich presence
+    m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    // Reset Discord rich presence
+    if (m_pDiscordRichPresence)
+        m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -176,7 +209,6 @@ CCore::~CCore()
 
     // Delete hooks.
     delete m_pSetCursorPosHook;
-    // delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
 
@@ -630,6 +662,20 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
+    {
+        const auto discord = g_pCore->GetDiscord();
+        if (!discord->IsDiscordRPCEnabled())
+            discord->SetDiscordRPCEnabled(true);
+
+        discord->SetPresenceState(bConnected ? _("In-game") : _("Main menu"), false);
+        discord->SetPresenceStartTimestamp(0);
+        discord->SetPresenceDetails("", false);
+
+        if (bConnected)
+            discord->SetPresenceStartTimestamp(time(nullptr));
+    }
 }
 
 bool CCore::IsConnected()
@@ -791,11 +837,7 @@ void CCore::ApplyHooks()
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
     // m_pDirect3DHookManager->ApplyHook ( );
-    // m_pFileSystemHook->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook();
-
-    // Redirect basic files.
-    // m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
@@ -824,7 +866,6 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateNetwork();
             CCore::GetSingleton().CreateGame();
             CCore::GetSingleton().CreateMultiplayer();
-            CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
         }
     }
@@ -1107,8 +1148,12 @@ CWebCoreInterface* CCore::GetWebCore()
 {
     if (m_pWebCore == nullptr)
     {
+        bool gpuEnabled;
+        auto cvars = g_pCore->GetCVars();
+        cvars->Get("browser_enable_gpu", gpuEnabled);
+
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise();
+        m_pWebCore->Initialise(gpuEnabled);
     }
     return m_pWebCore;
 }
@@ -1290,6 +1335,20 @@ void CCore::DoPostFramePulse()
     GetMemStats()->Draw();
     GetGraphStats()->Draw();
     m_pConnectManager->DoPulse();
+
+    // Update Discord Rich Presence status
+    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    {
+        if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        {
+            discord->UpdatePresence();
+            m_timeDiscordAppLastUpdate = ticks;
+#ifdef DISCORD_DISABLE_IO_THREAD
+            // Update manually if we're not using the IO thread
+            discord->UpdatePresenceConnection();
+#endif
+        }
+    }
 
     TIMING_CHECKPOINT("-CorePostFrame2");
 }
@@ -1725,6 +1784,19 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::OnPostColorFilterRender()
+{
+    if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+        return;
+    
+    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+    CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
+    CGraphics::GetSingleton().LeavingMTARenderZone();
+}
+
 void CCore::ApplyCoreInitSettings()
 {
 #if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
@@ -1793,6 +1865,13 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
+
+    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
+    if (m_uiFrameRateLimit == 0)
+    {
+        m_bQueuedFrameRateValid = false;
+        GetGraphStats()->RemoveTimingPoint("Limiter");
+    }
 
     // Print new limits to the console
     if (bLogToConsole)
@@ -1932,16 +2011,12 @@ void CCore::OnDeviceRestore()
 //
 void CCore::OnPreFxRender()
 {
-    // Don't do nothing if nothing won't be drawn
-
-    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
-
-    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
-        return;
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
+        return;    
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
+    CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
     CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
@@ -1952,9 +2027,7 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-
-    CGraphics::GetSingleton().EnteringMTARenderZone();
+    CGraphics::GetSingleton().EnteringMTARenderZone();    
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
@@ -2110,11 +2183,6 @@ CModelCacheManager* CCore::GetModelCacheManager()
     if (!m_pModelCacheManager)
         m_pModelCacheManager = NewModelCacheManager();
     return m_pModelCacheManager;
-}
-
-void CCore::AddModelToPersistentCache(ushort usModelId)
-{
-    return GetModelCacheManager()->AddModelToPersistentCache(usModelId);
 }
 
 void CCore::StaticIdleHandler()
@@ -2315,4 +2383,31 @@ SString CCore::GetBlueCopyrightString()
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
+}
+
+// Set streaming memory size override [See `engineStreamingSetMemorySize`]
+// Use `0` to turn it off, and thus restore the value to the `cvar` setting
+void CCore::SetCustomStreamingMemory(size_t sizeBytes) {
+    // NOTE: The override is applied to the game in `CClientGame::DoPulsePostFrame`
+    // There's no specific reason we couldn't do it here, but we wont
+    m_CustomStreamingMemoryLimitBytes = sizeBytes;
+}
+
+bool CCore::IsUsingCustomStreamingMemorySize()
+{
+    return m_CustomStreamingMemoryLimitBytes != 0;
+}
+
+// Streaming memory size used [In Bytes]
+size_t CCore::GetStreamingMemory()
+{
+    return IsUsingCustomStreamingMemorySize()
+        ? m_CustomStreamingMemoryLimitBytes
+        : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+}
+
+// Discord rich presence
+std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
+{
+    return m_pDiscordRichPresence;
 }

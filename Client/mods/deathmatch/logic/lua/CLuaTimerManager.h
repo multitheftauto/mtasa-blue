@@ -14,7 +14,7 @@ class CLuaTimerManager;
 #pragma once
 
 #include "LuaCommon.h"
-#include "CLuaTimer.h"
+#include "lua/CLuaTimer.h"
 #include <list>
 
 class CLuaTimerManager
@@ -36,6 +36,7 @@ public:
     void          RemoveAllTimers();
     unsigned long GetTimerCount() const { return m_TimerList.size(); }
 
+    void SetTimerPaused(CLuaTimer* timer, bool paused);
     void ResetTimer(CLuaTimer* pLuaTimer);
 
     CFastList<CLuaTimer*>::const_iterator IterBegin() { return m_TimerList.begin(); }

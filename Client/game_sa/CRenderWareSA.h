@@ -26,14 +26,14 @@ class CRenderWareSA : public CRenderWare
 {
 public:
     ZERO_ON_NEW
-    CRenderWareSA(enum eGameVersion version);
+    CRenderWareSA();
     ~CRenderWareSA();
     void Initialize();
     bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled);
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
-    void ClothesAddReplacementTxd(char* pFileData, ushort usFileId);
-    void ClothesRemoveReplacementTxd(char* pFileData);
+    void ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId);
+    void ClothesRemoveReplacement(char* pFileData);
     bool HasClothesReplacementChanged();
 
     // Reads and parses a TXD file specified by a path (szTXD)

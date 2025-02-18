@@ -94,6 +94,9 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
 CResource::~CResource()
 {
+    // Remove refrences from requested models
+    m_modelStreamer.ReleaseAll();
+
     // Deallocate all models that this resource allocated earlier
     g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
 
@@ -314,10 +317,7 @@ void CResource::Load()
         else if (pResourceFile->IsAutoDownload())
         {
             // Check the file contents
-            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
-            {
-            }
-            else
+            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) != pResourceFile->GetServerChecksum())
             {
                 HandleDownloadedFileTrouble(pResourceFile, false);
             }
@@ -361,6 +361,19 @@ void CResource::Stop()
     CLuaArguments Arguments;
     Arguments.PushResource(this);
     m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);
+
+    // When a custom application is used - reset discord stuff
+    const auto discord = g_pCore->GetDiscord();
+    if (discord && !discord->IsDiscordCustomDetailsDisallowed() && discord->GetDiscordResourceName() == m_strResourceName)
+    {
+        if (discord->IsDiscordRPCEnabled())
+        {
+            discord->ResetDiscordData();
+            discord->SetPresenceState(_("In-game"), false);
+            discord->SetPresenceStartTimestamp(time(nullptr));
+            discord->UpdatePresence();
+        }
+    }
 }
 
 SString CResource::GetState()
@@ -438,6 +451,19 @@ SString CResource::GetResourceDirectoryPath(eAccessType accessType, const SStrin
         return PathJoin(m_strResourcePrivateDirectoryPath, strMetaPath);
     }
     return PathJoin(m_strResourceDirectoryPath, strMetaPath);
+}
+
+CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
+{
+    for (CResourceFile* resourceFile : m_ResourceFiles)
+    {
+        if (!stricmp(relativePath.c_str(), resourceFile->GetShortName()))
+        {
+            return resourceFile;
+        }
+    }
+
+    return nullptr;
 }
 
 void CResource::LoadNoClientCacheScript(const char* chunk, unsigned int len, const SString& strFilename)

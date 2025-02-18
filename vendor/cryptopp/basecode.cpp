@@ -3,14 +3,6 @@
 #include "pch.h"
 #include "config.h"
 
-#if CRYPTOPP_MSC_VERSION
-# pragma warning(disable: 4100)
-#endif
-
-#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
-# pragma GCC diagnostic ignored "-Wunused-value"
-#endif
-
 #ifndef CRYPTOPP_IMPORTS
 
 #include "basecode.h"
@@ -51,7 +43,7 @@ size_t BaseN_Encoder::Put2(const byte *begin, size_t length, int messageEnd, boo
 	while (m_inputPosition < length)
 	{
 		if (m_bytePos == 0)
-			memset(m_outBuf, 0, m_outputBlockSize);
+			std::memset(m_outBuf, 0, m_outputBlockSize);
 
 		{
 		unsigned int b = begin[m_inputPosition++], bitsLeftInSource = 8;
@@ -103,7 +95,7 @@ size_t BaseN_Encoder::Put2(const byte *begin, size_t length, int messageEnd, boo
 
 		if (m_padding != -1 && m_bytePos > 0)
 		{
-			memset(m_outBuf+m_bytePos, m_padding, m_outputBlockSize-m_bytePos);
+			std::memset(m_outBuf+m_bytePos, m_padding, m_outputBlockSize-m_bytePos);
 			m_bytePos = m_outputBlockSize;
 		}
 		FILTER_OUTPUT(2, m_outBuf, m_bytePos, messageEnd);
@@ -141,7 +133,7 @@ size_t BaseN_Decoder::Put2(const byte *begin, size_t length, int messageEnd, boo
 			continue;
 
 		if (m_bytePos == 0 && m_bitPos == 0)
-			memset(m_outBuf, 0, m_outputBlockSize);
+			std::memset(m_outBuf, 0, m_outputBlockSize);
 
 		{
 			int newBitPos = m_bitPos + m_bitsPerChar;
@@ -225,7 +217,7 @@ size_t Grouper::Put2(const byte *begin, size_t length, int messageEnd, bool bloc
 			}
 
 			size_t len;
-			FILTER_OUTPUT2(2, len = STDMIN(length-m_inputPosition, m_groupSize-m_counter),
+			FILTER_OUTPUT2(2, (len = STDMIN(length-m_inputPosition, m_groupSize-m_counter)),
 				begin+m_inputPosition, len, 0);
 			m_inputPosition += len;
 			m_counter += len;

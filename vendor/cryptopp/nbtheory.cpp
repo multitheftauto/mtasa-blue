@@ -11,6 +11,7 @@
 #include "smartptr.h"
 #include "misc.h"
 #include "stdcpp.h"
+#include "trap.h"
 
 #ifdef _OPENMP
 # include <omp.h>
@@ -18,43 +19,15 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
+// Keep sync'd with primetab.cpp
+const unsigned int maxPrimeTableSize = 3511;
 const word s_lastSmallPrime = 32719;
-
-struct NewPrimeTable
-{
-	std::vector<word16> * operator()() const
-	{
-		const unsigned int maxPrimeTableSize = 3511;
-
-		member_ptr<std::vector<word16> > pPrimeTable(new std::vector<word16>);
-		std::vector<word16> &primeTable = *pPrimeTable;
-		primeTable.reserve(maxPrimeTableSize);
-
-		primeTable.push_back(2);
-		unsigned int testEntriesEnd = 1;
-
-		for (unsigned int p=3; p<=s_lastSmallPrime; p+=2)
-		{
-			unsigned int j;
-			for (j=1; j<testEntriesEnd; j++)
-				if (p%primeTable[j] == 0)
-					break;
-			if (j == testEntriesEnd)
-			{
-				primeTable.push_back(word16(p));
-				testEntriesEnd = UnsignedMin(54U, primeTable.size());
-			}
-		}
-
-		return pPrimeTable.release();
-	}
-};
 
 const word16 * GetPrimeTable(unsigned int &size)
 {
-	const std::vector<word16> &primeTable = Singleton<std::vector<word16>, NewPrimeTable>().Ref();
-	size = (unsigned int)primeTable.size();
-	return &primeTable[0];
+	extern const word16 precomputedPrimeTable[maxPrimeTableSize];
+	size = maxPrimeTableSize;
+	return precomputedPrimeTable;
 }
 
 bool IsSmallPrime(const Integer &p)
@@ -571,6 +544,9 @@ Integer CRT(const Integer &xp, const Integer &p, const Integer &xq, const Intege
 
 Integer ModularSquareRoot(const Integer &a, const Integer &p)
 {
+	// Callers must ensure p is prime, GH #1249
+	CRYPTOPP_ASSERT(IsPrime(p));
+
 	if (p%4 == 3)
 		return a_exp_b_mod_c(a, (p+1)/4, p);
 
@@ -620,6 +596,9 @@ Integer ModularSquareRoot(const Integer &a, const Integer &p)
 
 bool SolveModularQuadraticEquation(Integer &r1, Integer &r2, const Integer &a, const Integer &b, const Integer &c, const Integer &p)
 {
+	// Callers must ensure p is prime, GH #1249
+	CRYPTOPP_ASSERT(IsPrime(p));
+
 	Integer D = (b.Squared() - 4*a*c) % p;
 	switch (Jacobi(D, p))
 	{
@@ -646,6 +625,9 @@ bool SolveModularQuadraticEquation(Integer &r1, Integer &r2, const Integer &a, c
 Integer ModularRoot(const Integer &a, const Integer &dp, const Integer &dq,
 					const Integer &p, const Integer &q, const Integer &u)
 {
+	// Callers must ensure p and q are prime, GH #1249
+	CRYPTOPP_ASSERT(IsPrime(p) && IsPrime(q));
+
 	// GCC warning bug, https://stackoverflow.com/q/12842306/608639
 #ifdef _OPENMP
 	Integer p2, q2;
@@ -668,6 +650,9 @@ Integer ModularRoot(const Integer &a, const Integer &dp, const Integer &dq,
 Integer ModularRoot(const Integer &a, const Integer &e,
 					const Integer &p, const Integer &q)
 {
+	// Callers must ensure p and q are prime, GH #1249
+	CRYPTOPP_ASSERT(IsPrime(p) && IsPrime(q));
+
 	Integer dp = EuclideanMultiplicativeInverse(e, p-1);
 	Integer dq = EuclideanMultiplicativeInverse(e, q-1);
 	Integer u = EuclideanMultiplicativeInverse(p, q);
@@ -1004,6 +989,8 @@ Integer Lucas(const Integer &n, const Integer &P, const Integer &modulus)
 
 Integer InverseLucas(const Integer &e, const Integer &m, const Integer &p, const Integer &q, const Integer &u)
 {
+	// Callers must ensure p and q are prime, GH #1249
+	CRYPTOPP_ASSERT(IsPrime(p) && IsPrime(q));
 
 	// GCC warning bug, https://stackoverflow.com/q/12842306/608639
 #ifdef _OPENMP

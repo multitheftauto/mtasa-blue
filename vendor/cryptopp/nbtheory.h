@@ -13,7 +13,10 @@
 NAMESPACE_BEGIN(CryptoPP)
 
 /// \brief The Small Prime table
-/// \details GetPrimeTable obtains pointer to small prime table and provides the size of the table.
+/// \param size number of elements in the table
+/// \return prime table with /p size elements
+/// \details GetPrimeTable() obtains pointer to small prime table and provides the size of the table.
+///  /p size is an out parameter.
 CRYPTOPP_DLL const word16 * CRYPTOPP_API GetPrimeTable(unsigned int &size);
 
 // ************ primality testing ****************
@@ -109,7 +112,7 @@ CRYPTOPP_DLL bool CRYPTOPP_API IsPrime(const Integer &p);
 ///   level is greater than 1, then 10 round RabinMillerTest() primality testing is performed.
 CRYPTOPP_DLL bool CRYPTOPP_API VerifyPrime(RandomNumberGenerator &rng, const Integer &p, unsigned int level = 1);
 
-/// \brief Application callback to signal suitability of a cabdidate prime
+/// \brief Application callback to signal suitability of a candidate prime
 class CRYPTOPP_DLL PrimeSelector
 {
 public:

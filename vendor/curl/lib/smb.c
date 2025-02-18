@@ -27,12 +27,6 @@
 
 #if !defined(CURL_DISABLE_SMB) && defined(USE_CURL_NTLM_CORE)
 
-#define BUILDING_CURL_SMB_C
-
-#ifdef WIN32
-#define getpid GetCurrentProcessId
-#endif
-
 #include "smb.h"
 #include "urldata.h"
 #include "sendf.h"
@@ -46,9 +40,203 @@
 #include "escape.h"
 #include "curl_endian.h"
 
-/* The last #include files should be: */
+/* The last 3 #include files should be in this order */
+#include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
+
+/*
+ * Definitions for SMB protocol data structures
+ */
+#if defined(_MSC_VER) || defined(__ILEC400__)
+#  define PACK
+#  pragma pack(push)
+#  pragma pack(1)
+#elif defined(__GNUC__)
+#  define PACK __attribute__((packed))
+#else
+#  define PACK
+#endif
+
+#define SMB_COM_CLOSE                 0x04
+#define SMB_COM_READ_ANDX             0x2e
+#define SMB_COM_WRITE_ANDX            0x2f
+#define SMB_COM_TREE_DISCONNECT       0x71
+#define SMB_COM_NEGOTIATE             0x72
+#define SMB_COM_SETUP_ANDX            0x73
+#define SMB_COM_TREE_CONNECT_ANDX     0x75
+#define SMB_COM_NT_CREATE_ANDX        0xa2
+#define SMB_COM_NO_ANDX_COMMAND       0xff
+
+#define SMB_WC_CLOSE                  0x03
+#define SMB_WC_READ_ANDX              0x0c
+#define SMB_WC_WRITE_ANDX             0x0e
+#define SMB_WC_SETUP_ANDX             0x0d
+#define SMB_WC_TREE_CONNECT_ANDX      0x04
+#define SMB_WC_NT_CREATE_ANDX         0x18
+
+#define SMB_FLAGS_CANONICAL_PATHNAMES 0x10
+#define SMB_FLAGS_CASELESS_PATHNAMES  0x08
+#define SMB_FLAGS2_UNICODE_STRINGS    0x8000
+#define SMB_FLAGS2_IS_LONG_NAME       0x0040
+#define SMB_FLAGS2_KNOWS_LONG_NAME    0x0001
+
+#define SMB_CAP_LARGE_FILES           0x08
+#define SMB_GENERIC_WRITE             0x40000000
+#define SMB_GENERIC_READ              0x80000000
+#define SMB_FILE_SHARE_ALL            0x07
+#define SMB_FILE_OPEN                 0x01
+#define SMB_FILE_OVERWRITE_IF         0x05
+
+#define SMB_ERR_NOACCESS              0x00050001
+
+struct smb_header {
+  unsigned char nbt_type;
+  unsigned char nbt_flags;
+  unsigned short nbt_length;
+  unsigned char magic[4];
+  unsigned char command;
+  unsigned int status;
+  unsigned char flags;
+  unsigned short flags2;
+  unsigned short pid_high;
+  unsigned char signature[8];
+  unsigned short pad;
+  unsigned short tid;
+  unsigned short pid;
+  unsigned short uid;
+  unsigned short mid;
+} PACK;
+
+struct smb_negotiate_response {
+  struct smb_header h;
+  unsigned char word_count;
+  unsigned short dialect_index;
+  unsigned char security_mode;
+  unsigned short max_mpx_count;
+  unsigned short max_number_vcs;
+  unsigned int max_buffer_size;
+  unsigned int max_raw_size;
+  unsigned int session_key;
+  unsigned int capabilities;
+  unsigned int system_time_low;
+  unsigned int system_time_high;
+  unsigned short server_time_zone;
+  unsigned char encryption_key_length;
+  unsigned short byte_count;
+  char bytes[1];
+} PACK;
+
+struct andx {
+  unsigned char command;
+  unsigned char pad;
+  unsigned short offset;
+} PACK;
+
+struct smb_setup {
+  unsigned char word_count;
+  struct andx andx;
+  unsigned short max_buffer_size;
+  unsigned short max_mpx_count;
+  unsigned short vc_number;
+  unsigned int session_key;
+  unsigned short lengths[2];
+  unsigned int pad;
+  unsigned int capabilities;
+  unsigned short byte_count;
+  char bytes[1024];
+} PACK;
+
+struct smb_tree_connect {
+  unsigned char word_count;
+  struct andx andx;
+  unsigned short flags;
+  unsigned short pw_len;
+  unsigned short byte_count;
+  char bytes[1024];
+} PACK;
+
+struct smb_nt_create {
+  unsigned char word_count;
+  struct andx andx;
+  unsigned char pad;
+  unsigned short name_length;
+  unsigned int flags;
+  unsigned int root_fid;
+  unsigned int access;
+  curl_off_t allocation_size;
+  unsigned int ext_file_attributes;
+  unsigned int share_access;
+  unsigned int create_disposition;
+  unsigned int create_options;
+  unsigned int impersonation_level;
+  unsigned char security_flags;
+  unsigned short byte_count;
+  char bytes[1024];
+} PACK;
+
+struct smb_nt_create_response {
+  struct smb_header h;
+  unsigned char word_count;
+  struct andx andx;
+  unsigned char op_lock_level;
+  unsigned short fid;
+  unsigned int create_disposition;
+
+  curl_off_t create_time;
+  curl_off_t last_access_time;
+  curl_off_t last_write_time;
+  curl_off_t last_change_time;
+  unsigned int ext_file_attributes;
+  curl_off_t allocation_size;
+  curl_off_t end_of_file;
+} PACK;
+
+struct smb_read {
+  unsigned char word_count;
+  struct andx andx;
+  unsigned short fid;
+  unsigned int offset;
+  unsigned short max_bytes;
+  unsigned short min_bytes;
+  unsigned int timeout;
+  unsigned short remaining;
+  unsigned int offset_high;
+  unsigned short byte_count;
+} PACK;
+
+struct smb_write {
+  struct smb_header h;
+  unsigned char word_count;
+  struct andx andx;
+  unsigned short fid;
+  unsigned int offset;
+  unsigned int timeout;
+  unsigned short write_mode;
+  unsigned short remaining;
+  unsigned short pad;
+  unsigned short data_length;
+  unsigned short data_offset;
+  unsigned int offset_high;
+  unsigned short byte_count;
+  unsigned char pad2;
+} PACK;
+
+struct smb_close {
+  unsigned char word_count;
+  unsigned short fid;
+  unsigned int last_mtime;
+  unsigned short byte_count;
+} PACK;
+
+struct smb_tree_disconnect {
+  unsigned char word_count;
+  unsigned short byte_count;
+} PACK;
+
+#if defined(_MSC_VER) || defined(__ILEC400__)
+#  pragma pack(pop)
+#endif
 
 /* Local API functions */
 static CURLcode smb_setup_connection(struct Curl_easy *data,
@@ -68,7 +256,7 @@ static CURLcode smb_parse_url_path(struct Curl_easy *data,
  * SMB handler interface
  */
 const struct Curl_handler Curl_handler_smb = {
-  "SMB",                                /* scheme */
+  "smb",                                /* scheme */
   smb_setup_connection,                 /* setup_connection */
   smb_do,                               /* do_it */
   ZERO_NULL,                            /* done */
@@ -81,7 +269,8 @@ const struct Curl_handler Curl_handler_smb = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   smb_disconnect,                       /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_SMB,                             /* defport */
@@ -95,7 +284,7 @@ const struct Curl_handler Curl_handler_smb = {
  * SMBS handler interface
  */
 const struct Curl_handler Curl_handler_smbs = {
-  "SMBS",                               /* scheme */
+  "smbs",                               /* scheme */
   smb_setup_connection,                 /* setup_connection */
   smb_do,                               /* do_it */
   ZERO_NULL,                            /* done */
@@ -108,7 +297,8 @@ const struct Curl_handler Curl_handler_smbs = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   smb_disconnect,                       /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_SMBS,                            /* defport */
@@ -122,20 +312,6 @@ const struct Curl_handler Curl_handler_smbs = {
 #define MAX_MESSAGE_SIZE  (MAX_PAYLOAD_SIZE + 0x1000)
 #define CLIENTNAME        "curl"
 #define SERVICENAME       "?????"
-
-/* Append a string to an SMB message */
-#define MSGCAT(str)                             \
-  do {                                          \
-    strcpy(p, (str));                           \
-    p += strlen(str);                           \
-  } while(0)
-
-/* Append a null-terminated string to an SMB message */
-#define MSGCATNULL(str)                         \
-  do {                                          \
-    strcpy(p, (str));                           \
-    p += strlen(str) + 1;                       \
-  } while(0)
 
 /* SMB is mostly little endian */
 #if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) || \
@@ -265,6 +441,9 @@ static CURLcode smb_connect(struct Curl_easy *data, bool *done)
   smbc->recv_buf = malloc(MAX_MESSAGE_SIZE);
   if(!smbc->recv_buf)
     return CURLE_OUT_OF_MEMORY;
+  smbc->send_buf = malloc(MAX_MESSAGE_SIZE);
+  if(!smbc->send_buf)
+    return CURLE_OUT_OF_MEMORY;
 
   /* Multiple requests are allowed with this connection */
   connkeep(conn, "SMB default");
@@ -294,7 +473,6 @@ static CURLcode smb_connect(struct Curl_easy *data, bool *done)
 static CURLcode smb_recv_message(struct Curl_easy *data, void **msg)
 {
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   struct smb_conn *smbc = &conn->proto.smbc;
   char *buf = smbc->recv_buf;
   ssize_t bytes_read;
@@ -303,7 +481,7 @@ static CURLcode smb_recv_message(struct Curl_easy *data, void **msg)
   size_t len = MAX_MESSAGE_SIZE - smbc->got;
   CURLcode result;
 
-  result = Curl_read(data, sockfd, buf + smbc->got, len, &bytes_read);
+  result = Curl_xfer_recv(data, buf + smbc->got, len, &bytes_read);
   if(result)
     return result;
 
@@ -364,22 +542,20 @@ static void smb_format_message(struct Curl_easy *data, struct smb_header *h,
   h->flags2 = smb_swap16(SMB_FLAGS2_IS_LONG_NAME | SMB_FLAGS2_KNOWS_LONG_NAME);
   h->uid = smb_swap16(smbc->uid);
   h->tid = smb_swap16(req->tid);
-  pid = getpid();
+  pid = (unsigned int)Curl_getpid();
   h->pid_high = smb_swap16((unsigned short)(pid >> 16));
   h->pid = smb_swap16((unsigned short) pid);
 }
 
-static CURLcode smb_send(struct Curl_easy *data, ssize_t len,
+static CURLcode smb_send(struct Curl_easy *data, size_t len,
                          size_t upload_size)
 {
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   struct smb_conn *smbc = &conn->proto.smbc;
-  ssize_t bytes_written;
+  size_t bytes_written;
   CURLcode result;
 
-  result = Curl_write(data, sockfd, data->state.ulbuf,
-                      len, &bytes_written);
+  result = Curl_xfer_send(data, smbc->send_buf, len, FALSE, &bytes_written);
   if(result)
     return result;
 
@@ -396,18 +572,16 @@ static CURLcode smb_send(struct Curl_easy *data, ssize_t len,
 static CURLcode smb_flush(struct Curl_easy *data)
 {
   struct connectdata *conn = data->conn;
-  curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   struct smb_conn *smbc = &conn->proto.smbc;
-  ssize_t bytes_written;
-  ssize_t len = smbc->send_size - smbc->sent;
+  size_t bytes_written;
+  size_t len = smbc->send_size - smbc->sent;
   CURLcode result;
 
   if(!smbc->send_size)
     return CURLE_OK;
 
-  result = Curl_write(data, sockfd,
-                      data->state.ulbuf + smbc->sent,
-                      len, &bytes_written);
+  result = Curl_xfer_send(data, smbc->send_buf + smbc->sent, len, FALSE,
+                          &bytes_written);
   if(result)
     return result;
 
@@ -422,13 +596,13 @@ static CURLcode smb_flush(struct Curl_easy *data)
 static CURLcode smb_send_message(struct Curl_easy *data, unsigned char cmd,
                                  const void *msg, size_t msg_len)
 {
-  CURLcode result = Curl_get_upload_buffer(data);
-  if(result)
-    return result;
-  smb_format_message(data, (struct smb_header *)data->state.ulbuf,
+  struct connectdata *conn = data->conn;
+  struct smb_conn *smbc = &conn->proto.smbc;
+
+  smb_format_message(data, (struct smb_header *)smbc->send_buf,
                      cmd, msg_len);
-  memcpy(data->state.ulbuf + sizeof(struct smb_header),
-         msg, msg_len);
+  DEBUGASSERT((sizeof(struct smb_header) + msg_len) <= MAX_MESSAGE_SIZE);
+  memcpy(smbc->send_buf + sizeof(struct smb_header), msg, msg_len);
 
   return smb_send(data, sizeof(struct smb_header) + msg_len, 0);
 }
@@ -451,9 +625,9 @@ static CURLcode smb_send_setup(struct Curl_easy *data)
   unsigned char nt_hash[21];
   unsigned char nt[24];
 
-  size_t byte_count = sizeof(lm) + sizeof(nt);
-  byte_count += strlen(smbc->user) + strlen(smbc->domain);
-  byte_count += strlen(OS) + strlen(CLIENTNAME) + 4; /* 4 null chars */
+  const size_t byte_count = sizeof(lm) + sizeof(nt) +
+    strlen(smbc->user) + strlen(smbc->domain) +
+    strlen(CURL_OS) + strlen(CLIENTNAME) + 4; /* 4 null chars */
   if(byte_count > sizeof(msg.bytes))
     return CURLE_FILESIZE_EXCEEDED;
 
@@ -462,7 +636,7 @@ static CURLcode smb_send_setup(struct Curl_easy *data)
   Curl_ntlm_core_mk_nt_hash(conn->passwd, nt_hash);
   Curl_ntlm_core_lm_resp(nt_hash, smbc->challenge, nt);
 
-  memset(&msg, 0, sizeof(msg));
+  memset(&msg, 0, sizeof(msg) - sizeof(msg.bytes));
   msg.word_count = SMB_WC_SETUP_ANDX;
   msg.andx.command = SMB_COM_NO_ANDX_COMMAND;
   msg.max_buffer_size = smb_swap16(MAX_MESSAGE_SIZE);
@@ -476,11 +650,14 @@ static CURLcode smb_send_setup(struct Curl_easy *data)
   p += sizeof(lm);
   memcpy(p, nt, sizeof(nt));
   p += sizeof(nt);
-  MSGCATNULL(smbc->user);
-  MSGCATNULL(smbc->domain);
-  MSGCATNULL(OS);
-  MSGCATNULL(CLIENTNAME);
-  byte_count = p - msg.bytes;
+  p += msnprintf(p, byte_count - sizeof(nt) - sizeof(lm),
+                 "%s%c"  /* user */
+                 "%s%c"  /* domain */
+                 "%s%c"  /* OS */
+                 "%s", /* client name */
+                 smbc->user, 0, smbc->domain, 0, CURL_OS, 0, CLIENTNAME);
+  p++; /* count the final null termination */
+  DEBUGASSERT(byte_count == (size_t)(p - msg.bytes));
   msg.byte_count = smb_swap16((unsigned short)byte_count);
 
   return smb_send_message(data, SMB_COM_SETUP_ANDX, &msg,
@@ -494,21 +671,23 @@ static CURLcode smb_send_tree_connect(struct Curl_easy *data)
   struct smb_conn *smbc = &conn->proto.smbc;
   char *p = msg.bytes;
 
-  size_t byte_count = strlen(conn->host.name) + strlen(smbc->share);
-  byte_count += strlen(SERVICENAME) + 5; /* 2 nulls and 3 backslashes */
+  const size_t byte_count = strlen(conn->host.name) + strlen(smbc->share) +
+    strlen(SERVICENAME) + 5; /* 2 nulls and 3 backslashes */
   if(byte_count > sizeof(msg.bytes))
     return CURLE_FILESIZE_EXCEEDED;
 
-  memset(&msg, 0, sizeof(msg));
+  memset(&msg, 0, sizeof(msg) - sizeof(msg.bytes));
   msg.word_count = SMB_WC_TREE_CONNECT_ANDX;
   msg.andx.command = SMB_COM_NO_ANDX_COMMAND;
   msg.pw_len = 0;
-  MSGCAT("\\\\");
-  MSGCAT(conn->host.name);
-  MSGCAT("\\");
-  MSGCATNULL(smbc->share);
-  MSGCATNULL(SERVICENAME); /* Match any type of service */
-  byte_count = p - msg.bytes;
+
+  p += msnprintf(p, byte_count,
+                 "\\\\%s\\"  /* hostname */
+                 "%s%c"      /* share */
+                 "%s",       /* service */
+                 conn->host.name, smbc->share, 0, SERVICENAME);
+  p++; /* count the final null termination */
+  DEBUGASSERT(byte_count == (size_t)(p - msg.bytes));
   msg.byte_count = smb_swap16((unsigned short)byte_count);
 
   return smb_send_message(data, SMB_COM_TREE_CONNECT_ANDX, &msg,
@@ -519,16 +698,15 @@ static CURLcode smb_send_open(struct Curl_easy *data)
 {
   struct smb_request *req = data->req.p.smb;
   struct smb_nt_create msg;
-  size_t byte_count;
+  const size_t byte_count = strlen(req->path) + 1;
 
-  if((strlen(req->path) + 1) > sizeof(msg.bytes))
+  if(byte_count > sizeof(msg.bytes))
     return CURLE_FILESIZE_EXCEEDED;
 
-  memset(&msg, 0, sizeof(msg));
+  memset(&msg, 0, sizeof(msg) - sizeof(msg.bytes));
   msg.word_count = SMB_WC_NT_CREATE_ANDX;
   msg.andx.command = SMB_COM_NO_ANDX_COMMAND;
-  byte_count = strlen(req->path);
-  msg.name_length = smb_swap16((unsigned short)byte_count);
+  msg.name_length = smb_swap16((unsigned short)(byte_count - 1));
   msg.share_access = smb_swap32(SMB_FILE_SHARE_ALL);
   if(data->state.upload) {
     msg.access = smb_swap32(SMB_GENERIC_READ | SMB_GENERIC_WRITE);
@@ -538,7 +716,7 @@ static CURLcode smb_send_open(struct Curl_easy *data)
     msg.access = smb_swap32(SMB_GENERIC_READ);
     msg.create_disposition = smb_swap32(SMB_FILE_OPEN);
   }
-  msg.byte_count = smb_swap16((unsigned short) ++byte_count);
+  msg.byte_count = smb_swap16((unsigned short) byte_count);
   strcpy(msg.bytes, req->path);
 
   return smb_send_message(data, SMB_COM_NT_CREATE_ANDX, &msg,
@@ -586,15 +764,14 @@ static CURLcode smb_send_read(struct Curl_easy *data)
 
 static CURLcode smb_send_write(struct Curl_easy *data)
 {
+  struct connectdata *conn = data->conn;
+  struct smb_conn *smbc = &conn->proto.smbc;
   struct smb_write *msg;
   struct smb_request *req = data->req.p.smb;
   curl_off_t offset = data->req.offset;
   curl_off_t upload_size = data->req.size - data->req.bytecount;
-  CURLcode result = Curl_get_upload_buffer(data);
-  if(result)
-    return result;
-  msg = (struct smb_write *)data->state.ulbuf;
 
+  msg = (struct smb_write *)smbc->send_buf;
   if(upload_size >= MAX_PAYLOAD_SIZE - 1) /* There is one byte of padding */
     upload_size = MAX_PAYLOAD_SIZE - 1;
 
@@ -623,10 +800,11 @@ static CURLcode smb_send_and_recv(struct Curl_easy *data, void **msg)
 
   /* Check if there is data in the transfer buffer */
   if(!smbc->send_size && smbc->upload_size) {
-    size_t nread = smbc->upload_size > (size_t)data->set.upload_buffer_size ?
-      (size_t)data->set.upload_buffer_size : smbc->upload_size;
-    data->req.upload_fromhere = data->state.ulbuf;
-    result = Curl_fillreadbuffer(data, nread, &nread);
+    size_t nread = smbc->upload_size > (size_t)MAX_MESSAGE_SIZE ?
+      (size_t)MAX_MESSAGE_SIZE : smbc->upload_size;
+    bool eos;
+
+    result = Curl_client_read(data, smbc->send_buf, nread, &nread, &eos);
     if(result && result != CURLE_AGAIN)
       return result;
     if(!nread)
@@ -718,7 +896,7 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
     }
     smbc->uid = smb_swap16(h->uid);
     conn_state(data, SMB_CONNECTED);
-    *done = true;
+    *done = TRUE;
     break;
 
   default:
@@ -733,7 +911,7 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
 
 /*
  * Convert a timestamp from the Windows world (100 nsec units from 1 Jan 1601)
- * to Posix time. Cap the output to fit within a time_t.
+ * to POSIX time. Cap the output to fit within a time_t.
  */
 static void get_posix_time(time_t *out, curl_off_t timestamp)
 {
@@ -858,9 +1036,7 @@ static CURLcode smb_request_state(struct Curl_easy *data, bool *done)
         break;
       }
     }
-    data->req.bytecount += len;
     data->req.offset += len;
-    Curl_pgrsSetDownloadCounter(data, data->req.bytecount);
     next_state = (len < MAX_PAYLOAD_SIZE) ? SMB_CLOSE : SMB_DOWNLOAD;
     break;
 
@@ -882,7 +1058,7 @@ static CURLcode smb_request_state(struct Curl_easy *data, bool *done)
     break;
 
   case SMB_CLOSE:
-    /* We don't care if the close failed, proceed to tree disconnect anyway */
+    /* We do not care if the close failed, proceed to tree disconnect anyway */
     next_state = SMB_TREE_DISCONNECT;
     break;
 
@@ -920,7 +1096,7 @@ static CURLcode smb_request_state(struct Curl_easy *data, bool *done)
 
   case SMB_DONE:
     result = req->result;
-    *done = true;
+    *done = TRUE;
     break;
 
   default:
@@ -946,6 +1122,7 @@ static CURLcode smb_disconnect(struct Curl_easy *data,
   Curl_safefree(smbc->share);
   Curl_safefree(smbc->domain);
   Curl_safefree(smbc->recv_buf);
+  Curl_safefree(smbc->send_buf);
   return CURLE_OK;
 }
 

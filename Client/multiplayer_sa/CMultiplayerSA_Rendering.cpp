@@ -13,6 +13,7 @@ extern CCoreInterface*   g_pCore;
 GameEntityRenderHandler* pGameEntityRenderHandler = nullptr;
 PreRenderSkyHandler*     pPreRenderSkyHandlerHandler = nullptr;
 RenderHeliLightHandler*  pRenderHeliLightHandler = nullptr;
+RenderEverythingBarRoadsHandler*  pRenderEverythingBarRoadsHandler = nullptr;
 
 #define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
 #define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
@@ -319,13 +320,9 @@ void OnMY_WinLoop()
 }
 
 // Hook info
-#define HOOKPOS_WinLoop_US                         0x748A93
-#define HOOKPOS_WinLoop_EU                         0x748AE3
-#define HOOKSIZE_WinLoop_US                        5
-#define HOOKSIZE_WinLoop_EU                        5
-DWORD RETURN_WinLoop_US = 0x748A98;
-DWORD RETURN_WinLoop_EU = 0x748AE8;
-DWORD RETURN_WinLoop_BOTH = 0;
+#define HOOKPOS_WinLoop                            0x748A93
+#define HOOKSIZE_WinLoop                           5
+DWORD RETURN_WinLoop = 0x748A98;
 void _declspec(naked) HOOK_WinLoop()
 {
     _asm
@@ -335,7 +332,7 @@ void _declspec(naked) HOOK_WinLoop()
         popad
 
         mov     eax, ds:0x0C8D4C0
-        jmp     RETURN_WinLoop_BOTH
+        jmp     RETURN_WinLoop
     }
 }
 
@@ -499,15 +496,10 @@ float OnMY_RwCameraSetNearClipPlane(DWORD dwCalledFrom, void* pUnknown, float fD
 }
 
 // Hook info
-#define HOOKCHECK_RwCameraSetNearClipPlane_US       0xD9
-#define HOOKCHECK_RwCameraSetNearClipPlane_EU       0xD9
-#define HOOKPOS_RwCameraSetNearClipPlane_US         0x7EE1D0
-#define HOOKPOS_RwCameraSetNearClipPlane_EU         0x7EE210
-#define HOOKSIZE_RwCameraSetNearClipPlane_US        5
-#define HOOKSIZE_RwCameraSetNearClipPlane_EU        5
-DWORD RETURN_RwCameraSetNearClipPlane_US = 0x7EE1D5;
-DWORD RETURN_RwCameraSetNearClipPlane_EU = 0x7EE215;
-DWORD RETURN_RwCameraSetNearClipPlane_BOTH = 0;
+#define HOOKCHECK_RwCameraSetNearClipPlane          0xD9
+#define HOOKPOS_RwCameraSetNearClipPlane            0x7EE1D0
+#define HOOKSIZE_RwCameraSetNearClipPlane           5
+DWORD RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
 void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
     _asm
@@ -523,7 +515,7 @@ void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
         // Result is on fp stack
         //fld     [esp+8]
         push    esi
-        jmp     RETURN_RwCameraSetNearClipPlane_BOTH
+        jmp     RETURN_RwCameraSetNearClipPlane
     }
 }
 
@@ -592,6 +584,17 @@ void CMultiplayerSA::SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CMultiplayerSA::SetRenderEverythingBarRoadsHandler
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetRenderEverythingBarRoadsHandler(RenderEverythingBarRoadsHandler* pHandler)
+{
+    pRenderEverythingBarRoadsHandler = pHandler;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetIsMinimizedAndNotConnected
 //
 //
@@ -636,6 +639,108 @@ void CMultiplayerSA::SetMirrorsEnabled(bool bEnabled)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVisibilityPlugins::RenderPedCB
+//
+// Ped atomic render callback
+// Fix for screen flickering caused by corrupted matrices
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool IsMatrixValid(RwMatrix* pMatrix)
+{
+    constexpr float maxValue = 100000.0;
+    constexpr float minValue = -100000.0;
+
+    return
+        pMatrix->at.x >= minValue && pMatrix->at.x <= maxValue
+        && pMatrix->at.y >= minValue && pMatrix->at.y <= maxValue
+        && pMatrix->at.z >= minValue && pMatrix->at.y <= maxValue
+
+        && pMatrix->right.x >= minValue && pMatrix->right.x <= maxValue
+        && pMatrix->right.y >= minValue && pMatrix->right.y <= maxValue
+        && pMatrix->right.z >= minValue && pMatrix->right.y <= maxValue
+
+        && pMatrix->up.x >= minValue && pMatrix->up.x <= maxValue
+        && pMatrix->up.y >= minValue && pMatrix->up.y <= maxValue
+        && pMatrix->up.z >= minValue && pMatrix->up.y <= maxValue
+
+        && pMatrix->pos.x >= minValue && pMatrix->pos.x <= maxValue
+        && pMatrix->pos.y >= minValue && pMatrix->pos.y <= maxValue
+        && pMatrix->pos.z >= minValue && pMatrix->pos.y <= maxValue;
+}
+
+bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
+{
+    uint32 atomicSkinOffset = *(uint32*)0xC978A4;
+    RpHAnimHierarchy* pSkinPluginData = *(RpHAnimHierarchy**)((char*)pAtomic + atomicSkinOffset);
+
+    if (!pSkinPluginData)
+        return true;
+
+    unsigned __int32 count = pSkinPluginData->numNodes;
+    RwMatrix* pMatrixArray = pSkinPluginData->pMatrixArray;
+
+    for (unsigned int i = 0; i < count; i++)
+    {
+        if (!IsMatrixValid(pMatrixArray + i))
+            return false;
+    }
+
+    return true;
+}
+
+#define HOOKPOS_CVisibilityPlugins_RenderPedCB                        0x7335B0
+#define HOOKSIZE_CVisibilityPlugins_RenderPedCB                       5
+void _declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
+{
+    _asm
+    {
+        push esi;
+        push edi;
+        mov edi, [esp + 0Ch]; // RpAtomic
+        
+        push edi;
+        call AreMatricesOfRpAtomicValid;
+        add esp, 4;
+        
+        test al, al;
+        jz skipRender;
+        
+        push 0x7335B6; // Continue rendering
+        retn;
+        
+    skipRender:
+        pop edi;
+        pop esi;
+        retn;
+    }
+}
+
+// Hook info
+#define HOOKPOS_CRenderer_EverythingBarRoads                         0x553C78
+#define HOOKSIZE_CRenderer_EverythingBarRoads                        5
+DWORD RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
+DWORD DO_CRenderer_EverythingBarRoads = 0x7EE180;
+void _declspec(naked) HOOK_CRenderer_EverythingBarRoads()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (pRenderEverythingBarRoadsHandler)
+        pRenderEverythingBarRoadsHandler();
+
+    _asm
+    {
+        popad
+        call DO_CRenderer_EverythingBarRoads
+        jmp RETURN_CRenderer_EverythingBarRoads
+
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Rendering
 //
 // Setup hook
@@ -648,6 +753,7 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstall(CEntity_RenderOneNonRoad);
     EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC_Mid);
     EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC_End);
+    EZHookInstall(CVisibilityPlugins_RenderPedCB);
     EZHookInstall(Check_NoOfVisibleLods);
     EZHookInstall(Check_NoOfVisibleEntities);
     EZHookInstall(WinLoop);
@@ -656,4 +762,5 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstallChecked(CClouds_RenderSkyPolys);
     EZHookInstallChecked(RwCameraSetNearClipPlane);
     EZHookInstall(RenderEffects_HeliLight);
+    EZHookInstall(CRenderer_EverythingBarRoads);
 }

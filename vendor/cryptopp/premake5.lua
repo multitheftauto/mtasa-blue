@@ -11,12 +11,10 @@ project "cryptopp"
 	}
 
 	defines {
-		"_WINSOCK_DEPRECATED_NO_WARNINGS",
 		"CRYPTOPP_DISABLE_CLMUL",
 		"CRYPTOPP_DISABLE_AESNI",
 		"CRYPTOPP_DISABLE_SSE4",
 		"CRYPTOPP_DISABLE_SSSE3",
-		"_LIB"
 	}
 
 	files {
@@ -30,7 +28,6 @@ project "cryptopp"
 		"arc4.cpp",
 		"aria.cpp",
 		"ariatab.cpp",
-		"aria_simd.cpp",
 		"asn.cpp",
 		"authenc.cpp",
 		"base32.cpp",
@@ -128,6 +125,7 @@ project "cryptopp"
 		"oaep.cpp",
 		"osrng.cpp",
 		"padlkrng.cpp",
+		"primetab.cpp",
 		"panama.cpp",
 		"pch.cpp",
 		"pkcspad.cpp",
@@ -203,8 +201,11 @@ project "cryptopp"
 		"zlib.cpp",
 	}
 
+	filter "files:dll.cpp or iterhash.cpp"
+		flags { "NoPCH" }
+
 	filter "system:macosx"
-		defines {"CRYPTOPP_DISABLE_ASM"}
+		defines { "CRYPTOPP_DISABLE_MIXED_ASM" }
 
 	filter { "platforms:arm*" }
 		defines { "CRYPTOPP_DISABLE_ASM" }
@@ -212,7 +213,8 @@ project "cryptopp"
 	filter "platforms:x64"
 		files {
 			"x64dll.asm",
-			"x64masm.asm"
+			"x64masm.asm",
+			"cpuid64.asm"
 		}
 
 	filter { "system:windows" }

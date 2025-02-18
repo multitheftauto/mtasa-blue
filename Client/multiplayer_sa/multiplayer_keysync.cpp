@@ -10,16 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#define MULTIPLAYER_STATS
 
 #include <game/CWeaponStatManager.h>
-#include <game/CWeaponStat.h>
-
-// These includes have to be fixed!
-#include "../game_sa/CPlayerInfoSA.h"
-#include "../game_sa/CPedSA.h"
-#include "../game_sa/CVehicleSA.h"
-#include "../game_sa/CPadSA.h"
 
 extern CMultiplayerSA* pMultiplayer;
 
@@ -30,13 +22,6 @@ DWORD dwParameter = 0;
 
 BOOL bRadioHackInstalled = FALSE;
 bool b1stPersonWeaponModeHackInPlace = false;
-
-/*
-GTA_CONTROLSET RemotePlayerKeys[MAX_PEDS];
-GTA_CONTROLSET SavedLocalPlayerKeys;
-GTA_CONTROLSET *LocalPlayerKeys = (GTA_CONTROLSET *)VAR_Keystates;
-*/
-
 bool bNotInLocalContext = false;
 bool bMouseLookEnabled = true;
 bool bInfraredVisionEnabled = false;
@@ -65,7 +50,6 @@ VOID InitKeysyncHooks()
     HookInstallMethod(VTBL_CTrain__ProcessControl, (DWORD)HOOK_CTrain__ProcessControl);
     HookInstallMethod(VTBL_CBoat__ProcessControl, (DWORD)HOOK_CBoat__ProcessControl);
     HookInstallMethod(VTBL_CBike__ProcessControl, (DWORD)HOOK_CBike__ProcessControl);
-    HookInstallMethod(VTBL_CHeli__ProcessControl, (DWORD)HOOK_CHeli__ProcessControl);
     HookInstallMethod(VTBL_CHeli__ProcessControl, (DWORD)HOOK_CHeli__ProcessControl);
 
     // not strictly for keysync, to make CPlayerPed::GetPlayerInfoForThisPlayerPed always return the local playerinfo

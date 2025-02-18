@@ -63,7 +63,8 @@ public:
     virtual ~CPixelsManagerInterface() {}
     virtual void OnDeviceCreate(IDirect3DDevice9* pDevice) = 0;
     virtual bool IsPixels(const CPixels& pixels) = 0;
-    virtual bool GetTexturePixels(IDirect3DBaseTexture9* pD3DTexture, CPixels& outPixels, const RECT* pRect = NULL, uint uiSurfaceIndex = 0) = 0;
+    virtual bool GetTexturePixels(IDirect3DBaseTexture9* pD3DTexture, CPixels& outPixels, EPixelsFormatType pixelsFormat = EPixelsFormat::PLAIN,
+                                  ERenderFormat renderFormat = RFORMAT_UNKNOWN, bool bMipMaps = true, const RECT* pRect = NULL, uint uiSurfaceIndex = 0) = 0;
     virtual bool SetTexturePixels(IDirect3DBaseTexture9* pD3DTexture, const CPixels& pixels, const RECT* pRect = NULL, uint uiSurfaceIndex = 0) = 0;
     virtual bool GetPixelsSize(const CPixels& pixels, uint& uiOutWidth, uint& uiOutHeight) = 0;
     virtual EPixelsFormatType GetPixelsFormat(const CPixels& pixels) = 0;

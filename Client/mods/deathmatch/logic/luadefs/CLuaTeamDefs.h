@@ -2,8 +2,6 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaTeamDefs.cpp
- *  PURPOSE:     Lua team definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -11,6 +9,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaTeamDefs : public CLuaDefs
 {
@@ -18,10 +17,11 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(GetTeamFromName);
-    LUA_DECLARE(GetTeamName);
-    LUA_DECLARE(GetTeamColor);
-    LUA_DECLARE(GetTeamFriendlyFire);
-    LUA_DECLARE(GetPlayersInTeam);
-    LUA_DECLARE(CountPlayersInTeam);
+private:
+    static std::variant<CClientTeam*, bool> GetTeamFromName(const std::string name) noexcept;
+    static std::string GetTeamName(CClientTeam* team);
+    static CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> GetTeamColor(CClientTeam* team) noexcept;
+    static bool GetTeamFriendlyFire(CClientTeam* team) noexcept;
+    static std::vector<CClientPlayer*> GetPlayersInTeam(CClientTeam* team);
+    static std::uint32_t CountPlayersInTeam(CClientTeam* team) noexcept;
 };

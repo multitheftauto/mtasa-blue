@@ -547,8 +547,30 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         BITCOUNT = 12
     };
 
-    bool Read(NetBitStreamInterface& bitStream) { return bitStream.ReadBits((char*)&data, BITCOUNT); }
-    void Write(NetBitStreamInterface& bitStream) const { bitStream.WriteBits((const char*)&data, BITCOUNT); }
+    enum
+    {
+        BITCOUNT2 = 1
+    };
+
+    bool Read(NetBitStreamInterface& stream)
+    {
+        bool ok = stream.ReadBits((char*)&data, BITCOUNT);
+
+        if (stream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+            ok &= stream.ReadBits((char*)&data2, BITCOUNT2);
+        else
+            data2.isReloadingWeapon = 0;
+
+        return ok;
+    }
+
+    void Write(NetBitStreamInterface& stream) const
+    {
+        stream.WriteBits((const char*)&data, BITCOUNT);
+
+        if (stream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+            stream.WriteBits((const char*)&data2, BITCOUNT2);
+    }
 
     struct
     {
@@ -565,6 +587,11 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         bool bSyncingVelocity : 1;
         bool bStealthAiming : 1;
     } data;
+
+    struct
+    {
+        bool isReloadingWeapon : 1;
+    } data2;
 };
 
 struct SPedRotationSync : public ISyncStructure
@@ -2015,6 +2042,180 @@ struct SFunBugsStateSync : public ISyncStructure
     {
         bool bQuickStand : 1;
     } data5;
+};
+
+//////////////////////////////////////////
+//                                      //
+//    World special properties state    //
+//                                      //
+//////////////////////////////////////////
+struct SWorldSpecialPropertiesStateSync : public ISyncStructure
+{
+    enum
+    {
+        BITCOUNT = 12
+    };
+    enum
+    {
+        BITCOUNT2 = 1
+    };
+    enum
+    {
+        BITCOUNT3 = 1
+    };
+    enum
+    {
+        BITCOUNT4 = 1
+    };
+    enum
+    {
+        BITCOUNT5 = 1
+    };
+    enum
+    {
+        BITCOUNT6 = 1
+    };
+    enum
+    {
+        BITCOUNT7 = 1
+    };
+
+    bool Read(NetBitStreamInterface& bitStream)
+    {
+        bool isOK = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
+         else
+             data2.fireballdestruct = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data3), BITCOUNT3);
+         else
+             data3.roadsignstext = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
+         else
+             data4.extendedwatercannons = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
+        else
+            data5.tunnelweatherblend = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_IgnoreFireState))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data6), BITCOUNT6);
+        else
+            data6.ignoreFireState = false;
+            
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data7), BITCOUNT7);
+        else
+            data7.flyingcomponents = true;
+            
+        //// Example for adding item:
+        // if (bitStream.Can(eBitStreamVersion::YourProperty))
+        //     isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
+        // else
+        //     data9.YourPropertyVariable = DefaultState (true / false);
+
+        return isOK;
+    }
+    void Write(NetBitStreamInterface& bitStream) const
+    {
+        bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_IgnoreFireState))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data6), BITCOUNT6);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data7), BITCOUNT7);
+
+        //// Example for adding item:
+        // if (bitStream.Can(eBitStreamVersion::YourProperty))
+        //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
+    }
+
+    struct
+    {
+        bool hovercars : 1;
+        bool aircars : 1;
+        bool extrabunny : 1;
+        bool extrajump : 1;
+        bool randomfoliage : 1;
+        bool snipermoon : 1;
+        bool extraairresistance : 1;
+        bool underworldwarp : 1;
+        bool vehiclesunglare : 1;
+        bool coronaztest : 1;
+        bool watercreatures : 1;
+        bool burnflippedcars : 1;
+    } data;
+
+    // Add new ones in separate structs
+    struct
+    {
+        bool fireballdestruct : 1;
+    } data2;
+
+    struct
+    {
+        bool roadsignstext : 1;
+    } data3;
+
+    struct
+    {
+        bool extendedwatercannons : 1;
+    } data4;
+
+    struct
+    {
+        bool tunnelweatherblend : 1;
+    } data5;
+
+    struct
+    {
+        bool ignoreFireState : 1;
+    } data6;
+    
+    struct
+    {
+        bool flyingcomponents : 1;
+    } data7;
+    
+    SWorldSpecialPropertiesStateSync()
+    {
+        // Set default states
+        data.hovercars = false;
+        data.aircars = false;
+        data.extrabunny = false;
+        data.extrajump = false;
+        data.randomfoliage = true;
+        data.snipermoon = false;
+        data.extraairresistance = true;
+        data.underworldwarp = true;
+        data.vehiclesunglare = false;
+        data.coronaztest = true;
+        data.watercreatures = true;
+        data.burnflippedcars = true;
+        data2.fireballdestruct = true;
+        data3.roadsignstext = true;
+        data4.extendedwatercannons = true;
+        data5.tunnelweatherblend = true;
+        data6.ignoreFireState = false;
+        data7.flyingcomponents = true;
+    }
 };
 
 //////////////////////////////////////////

@@ -38,6 +38,7 @@ public:
     // CClientModelCacheManager interface
     virtual void DoPulse();
     virtual void OnRestreamModel(ushort usModelId);
+    virtual void SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds);
 
     // CClientModelCacheManagerImpl methods
     CClientModelCacheManagerImpl();
@@ -517,4 +518,9 @@ void CClientModelCacheManagerImpl::AddProcessStat(const char* szTag, bool bCache
 void CClientModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
 {
     m_pCoreModelCacheManager->OnRestreamModel(usModelId);
+}
+
+void CClientModelCacheManagerImpl::SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds)
+{
+    m_pCoreModelCacheManager->SetCustomLimits(numVehicles, numPeds);
 }

@@ -138,12 +138,17 @@ public:
     bool IsMipMappingEnabled();
     void SetMipMappingEnabled(bool bEnable);
 
-    bool IsVolumetricShadowsEnabled();
+    bool IsVolumetricShadowsEnabled() const noexcept;
+    bool GetVolumetricShadowsEnabledByVideoSetting() const noexcept;
+    bool ResetVolumetricShadows() noexcept;
+ 
     void SetVolumetricShadowsEnabled(bool bEnable);
     void SetVolumetricShadowsSuspended(bool bSuspended);
 
     bool IsDynamicPedShadowsEnabled();
     void SetDynamicPedShadowsEnabled(bool bEnable);
+    bool IsDynamicPedShadowsEnabledByVideoSetting() const noexcept;
+    bool ResetDynamicPedShadows() noexcept;
 
     float        GetAspectRatioValue();
     eAspectRatio GetAspectRatio();
@@ -185,15 +190,4 @@ public:
     uint FindVideoMode(int iResX, int iResY, int iColorBits);
     void SetValidVideoMode();
     int  OnSelectDevice();
-
-private:
-    static unsigned long FUNC_GetNumVideoModes;
-    static unsigned long FUNC_GetVideoModeInfo;
-    static unsigned long FUNC_GetCurrentVideoMode;
-    static unsigned long FUNC_SetCurrentVideoMode;
-    static unsigned long FUNC_SetRadioVolume;
-    static unsigned long FUNC_SetDrawDistance;
-    static unsigned long FUNC_GetNumSubSystems;
-    static unsigned long FUNC_GetCurrentSubSystem;
-    static unsigned long FUNC_SetSubSystem;
 };

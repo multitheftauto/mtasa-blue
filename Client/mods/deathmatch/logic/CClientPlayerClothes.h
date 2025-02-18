@@ -67,7 +67,7 @@ public:
 
     static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
     static const int              GetClothingGroupMax(unsigned char ucType);
-
+    static bool                   IsValidModel(unsigned short usModel);
 private:
     static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
 

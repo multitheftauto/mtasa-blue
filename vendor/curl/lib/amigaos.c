@@ -117,7 +117,7 @@ void Curl_amiga_cleanup(void)
 
 #ifdef CURLRES_AMIGA
 /*
- * Because we need to handle the different cases in hostip4.c at run-time,
+ * Because we need to handle the different cases in hostip4.c at runtime,
  * not at compile-time, based on what was detected in Curl_amiga_init(),
  * we replace it completely with our own as to not complicate the baseline
  * code. Assumes malloc/calloc/free are thread safe because Curl_he2ai()
@@ -178,6 +178,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
 #endif /* CURLRES_AMIGA */
 
 #ifdef USE_AMISSL
+#include <signal.h>
 int Curl_amiga_select(int nfds, fd_set *readfds, fd_set *writefds,
                       fd_set *errorfds, struct timeval *timeout)
 {

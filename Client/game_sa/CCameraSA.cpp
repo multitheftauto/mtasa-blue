@@ -15,7 +15,6 @@
 
 extern CGameSA* pGame;
 
-unsigned long CCameraSA::FUNC_RwFrameGetLTM;
 static bool   bCameraClipObjects;
 static bool   bCameraClipVehicles;
 
@@ -358,16 +357,8 @@ float CCameraSA::GetCameraRotation()
 
 RwMatrix* CCameraSA::GetLTM()
 {
-    DWORD frame = *(DWORD*)(((DWORD)GetInterface()->m_pRwCamera) + 4);
-    DWORD dwReturn;
-    _asm
-    {
-        push    frame
-        call    FUNC_RwFrameGetLTM
-        add     esp, 4
-        mov     dwReturn, eax
-    }
-    return (RwMatrix*)dwReturn;
+    // RwFrameGetLTM
+    return ((RwMatrix*(_cdecl*)(void*))0x7F0990)(GetInterface()->m_pRwCamera->object.object.parent);
 }
 
 CEntity* CCameraSA::GetTargetEntity()
@@ -451,4 +442,24 @@ float CCameraSA::GetShakeForce()
 {
     CCameraSAInterface* pCameraInterface = GetInterface();
     return pCameraInterface->m_fCamShakeForce;
+}
+
+void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
+{
+    static CCameraSAInterface* cameraInterface = GetInterface();
+    if (radius <= 0.0f)
+        return ResetShakeCamera();
+
+    using ShakeCamera_t = void(__thiscall*)(CCameraSAInterface*, float radius, float x, float y, float z);
+    ((ShakeCamera_t)FUNC_ShakeCam)(cameraInterface, radius, x, y, z);
+}
+
+void CCameraSA::ResetShakeCamera() noexcept
+{
+    GetInterface()->m_fCamShakeForce = 0.0f;
+}
+
+std::uint8_t CCameraSA::GetTransitionState()
+{
+    return GetInterface()->m_uiTransitionState;
 }

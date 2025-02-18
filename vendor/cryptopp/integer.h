@@ -444,6 +444,7 @@ public:
 		/// \param rng RandomNumberGenerator used to generate material
 		/// \param bitCount the number of bits in the resulting integer
 		/// \details The random integer created is uniformly distributed over <tt>[0, 2<sup>bitCount</sup>]</tt>.
+		/// \note If \p bitCount is 0, then this Integer is set to 0 (and not 0 or 1).
 		void Randomize(RandomNumberGenerator &rng, size_t bitCount);
 
 		/// \brief Set this Integer to random integer
@@ -706,7 +707,7 @@ public:
 		/// \param out reference to a std::ostream
 		/// \param a a constant reference to an Integer
 		/// \return reference to a std::ostream reference
-		/// \details The output integer responds to std::hex, std::oct, std::hex, std::upper and
+		/// \details The output integer responds to hex, std::oct, std::hex, std::upper and
 		///  std::lower. The output includes the suffix \a h (for hex), \a . (\a dot, for dec)
 		///  and \a o (for octal). There is currently no way to suppress the suffix.
 		/// \details If you want to print an Integer without the suffix or using an arbitrary base, then

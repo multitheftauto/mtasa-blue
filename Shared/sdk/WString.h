@@ -36,6 +36,8 @@ public:
 
     WString(const char* szText);
 
+    WString(const char16_t* szText) : std::wstring(szText ? (const wchar_t*)szText : L""){};
+
     explicit WString(const wchar_t* szFormat, ...) : std::wstring()
     {
         if (szFormat)

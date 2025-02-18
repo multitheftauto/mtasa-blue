@@ -6,13 +6,16 @@ USER root
 # Default build configuration
 ENV AS_BUILDAGENT=0 \
     BUILD_ARCHITECTURE=x86 \
-    BUILD_CONFIG=release
+    BUILD_CONFIG=release \
+    AR=x86_64-linux-gnu-gcc-ar-10 \
+    CC=x86_64-linux-gnu-gcc-10 \
+    CXX=x86_64-linux-gnu-g++-10
 
 # Install build-time dependencies
 RUN dpkg --add-architecture i386 && apt-get update && \
     apt-get install -y software-properties-common wget ca-certificates git build-essential \
         gcc-10-multilib g++-10-multilib curl subversion ncftp \
-        libncurses-dev:i386 libncursesw5:i386 libmysqlclient-dev:i386
+        libncurses-dev:i386 libncursesw6:i386 libmysqlclient-dev:i386
 
 # Set build directory
 VOLUME /build

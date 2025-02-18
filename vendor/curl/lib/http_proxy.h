@@ -30,6 +30,21 @@
 
 #include "urldata.h"
 
+enum Curl_proxy_use {
+  HEADER_SERVER,  /* direct to server */
+  HEADER_PROXY,   /* regular request to proxy */
+  HEADER_CONNECT  /* sending CONNECT to a proxy */
+};
+
+CURLcode Curl_http_proxy_get_destination(struct Curl_cfilter *cf,
+                                         const char **phostname,
+                                         int *pport, bool *pipv6_ip);
+
+CURLcode Curl_http_proxy_create_CONNECT(struct httpreq **preq,
+                                        struct Curl_cfilter *cf,
+                                        struct Curl_easy *data,
+                                        int http_version_major);
+
 /* Default proxy timeout in milliseconds */
 #define PROXY_TIMEOUT (3600*1000)
 

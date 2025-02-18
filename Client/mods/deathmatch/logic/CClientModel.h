@@ -18,8 +18,11 @@ enum class eClientModelType
 {
     PED,
     OBJECT,
+    OBJECT_DAMAGEABLE,
     VEHICLE,
     TIMED_OBJECT,
+    CLUMP,
+    TXD,
 };
 
 class CResource;
@@ -36,10 +39,15 @@ public:
     int              GetModelID(void) const { return m_iModelID; };
     eClientModelType GetModelType(void) const { return m_eModelType; };
     bool             Allocate(ushort usParentID);
+    bool             AllocateTXD(std::string& strTxdName);
     bool             Deallocate(void);
-    void             RestoreEntitiesUsingThisModel();
     void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
     CResource*       GetParentResource(void) const { return m_pParentResource; }
+    void             RestoreEntitiesUsingThisModel();
+
+private:
+    void RestoreDFF(CModelInfo* pModelInfo);
+    void RestoreTXD(CModelInfo* pModelInfo);
 
 protected:
     CClientManager* m_pManager;

@@ -48,4 +48,6 @@ public:
     LUA_DECLARE(aclGroupRemoveObject);
     LUA_DECLARE_OOP(isObjectInACLGroup);
     LUA_DECLARE(hasObjectPermissionTo);
+
+    static std::vector<CAccessControlListGroup*> aclObjectGetGroups(std::string strObject);
 };

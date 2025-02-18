@@ -34,6 +34,7 @@ std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfo
 std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
 
 union tIdeFlags
 {
@@ -269,20 +270,14 @@ bool CModelInfoSA::IsTrailer()
     return bReturn;
 }
 
-BYTE CModelInfoSA::GetVehicleType()
+BYTE CModelInfoSA::GetVehicleType() const noexcept
 {
     // This function will return a vehicle type for vehicles or 0xFF on failure
-    DWORD dwFunction = FUNC_IsVehicleModelType;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = -1;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return bReturn;
+    if (!IsVehicle())
+        return -1;
+
+    auto GetVehicleModelType = reinterpret_cast<BYTE(__cdecl*)(DWORD)>(FUNC_IsVehicleModelType);
+    return GetVehicleModelType(m_dwModelID);
 }
 
 bool CModelInfoSA::IsVehicle() const
@@ -291,9 +286,18 @@ bool CModelInfoSA::IsVehicle() const
     if (m_dwModelID >= 20000)
         return false;
 
+    if (!IsAllocatedInArchive())
+        return false;
+
     // NOTE(botder): m_pInterface might be a nullptr here, we can't use it
     CBaseModelInfoSAInterface* model = ppModelInfo[m_dwModelID];
-    return model != nullptr && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
+    return model && reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
+}
+
+bool CModelInfoSA::IsVehicleModel(std::uint32_t model) noexcept
+{
+    const auto* const modelInfo = pGame->GetModelInfo(model);
+    return modelInfo && modelInfo->IsVehicle();
 }
 
 bool CModelInfoSA::IsPlayerModel()
@@ -437,6 +441,16 @@ void CModelInfoSA::Remove()
         // Remove the model.
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
+}
+
+bool CModelInfoSA::UnloadUnused()
+{
+    if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
+    {
+        pGame->GetStreaming()->RemoveModel(m_dwModelID);
+        return true;
+    }
+    return false;
 }
 
 bool CModelInfoSA::IsLoaded()
@@ -731,6 +745,9 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
 
 bool CModelInfoSA::IsValid()
 {
+    if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
+        return !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
+        
     if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
         return true;
 
@@ -740,7 +757,7 @@ bool CModelInfoSA::IsValid()
     return true;
 }
 
-bool CModelInfoSA::IsAllocatedInArchive()
+bool CModelInfoSA::IsAllocatedInArchive() const noexcept
 {
     return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
 }
@@ -781,8 +798,46 @@ unsigned short CModelInfoSA::GetTextureDictionaryID()
 void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
-    if (m_pInterface)
-        m_pInterface->usTextureDictionary = usID;
+    if (!m_pInterface)
+        return;
+
+    // Remove ref from the old TXD
+    CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
+
+    // Store vanilla TXD ID
+    if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
+        ms_DefaultTxdIDMap[m_dwModelID] = m_pInterface->usTextureDictionary;
+
+    // Set new TXD and increase ref of it
+    m_pInterface->usTextureDictionary = usID;
+    CTxdStore_AddRef(usID);
+}
+
+void CModelInfoSA::ResetTextureDictionaryID()
+{
+    const auto it = ms_DefaultTxdIDMap.find(m_dwModelID);
+    if (it == ms_DefaultTxdIDMap.end()) {
+        return;
+    }
+    SetTextureDictionaryID(it->second);
+    ms_DefaultTxdIDMap.erase(it); // Only erase after calling the function above [otherwise gets reinserted]
+}
+
+void CModelInfoSA::StaticResetTextureDictionaries()
+{
+    while (!ms_DefaultTxdIDMap.empty())
+    {
+        const auto mi = pGame->GetModelInfo(ms_DefaultTxdIDMap.begin()->first);
+        if (mi)
+        {
+            mi->ResetTextureDictionaryID();
+        }
+        else
+        {
+            // Model was deallocated. Skip and remove it from our list.
+            ms_DefaultTxdIDMap.erase(ms_DefaultTxdIDMap.begin());
+        }
+    }
 }
 
 float CModelInfoSA::GetLODDistance()
@@ -993,7 +1048,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = 0;
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 
@@ -1692,6 +1747,24 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
+void CModelInfoSA::MakeObjectDamageableModel(std::uint16_t baseModel)
+{
+    CDamageableModelInfoSAInterface* m_pInterface = new CDamageableModelInfoSAInterface();
+
+    CDamageableModelInfoSAInterface* pBaseObjectInfo = static_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[baseModel]);
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CDamageableModelInfoSAInterface));
+    m_pInterface->usNumberOfRefs = 0;
+    m_pInterface->pRwObject = nullptr;
+    m_pInterface->usUnknown = 65535;
+    m_pInterface->usDynamicIndex = 65535;
+    m_pInterface->m_damagedAtomic = nullptr;
+
+    ppModelInfo[m_dwModelID] = m_pInterface;
+
+    m_dwParentID = baseModel;
+    CopyStreamingInfoFromModel(baseModel);
+}
+
 void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 {
     CTimeModelInfoSAInterface* m_pInterface = new CTimeModelInfoSAInterface();
@@ -1705,6 +1778,22 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     m_pInterface->timeInfo.m_wOtherTimeModel = 0;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
+
+    m_dwParentID = usBaseID;
+    CopyStreamingInfoFromModel(usBaseID);
+}
+
+void CModelInfoSA::MakeClumpModel(ushort usBaseID)
+{
+    CClumpModelInfoSAInterface* pNewInterface = new CClumpModelInfoSAInterface();
+    CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
+    MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
+    pNewInterface->usNumberOfRefs = 0;
+    pNewInterface->pRwObject = nullptr;
+    pNewInterface->usUnknown = 65535;
+    pNewInterface->usDynamicIndex = 65535;
+
+    ppModelInfo[m_dwModelID] = pNewInterface;
 
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
@@ -1741,7 +1830,17 @@ void CModelInfoSA::DeallocateModel(void)
             delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::ATOMIC:
-            delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            if (IsDamageableAtomic())
+            {
+                delete reinterpret_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            }
+            else
+            {
+                delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            }
+            break;
+        case eModelInfoType::CLUMP:
+            delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::TIME:
             delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
@@ -1931,11 +2030,7 @@ void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
 
 unsigned short CModelInfoSA::GetObjectPropertiesGroup()
 {
-    unsigned short usGroup = GetInterface()->usDynamicIndex;
-    if (usGroup == 0xFFFF)
-        usGroup = 0;
-
-    return usGroup;
+    return GetInterface()->usDynamicIndex;
 }
 
 void CModelInfoSA::RestoreObjectPropertiesGroup()
@@ -1961,7 +2056,10 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 
 eModelInfoType CModelInfoSA::GetModelType()
 {
-    return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+    if (auto pInterface = GetInterface())
+        return ((eModelInfoType(*)())pInterface->VFTBL->GetModelType)();
+
+    return eModelInfoType::UNKNOWN;
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
@@ -1992,6 +2090,12 @@ bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
     }
 
     return isTowable;
+}
+
+bool CModelInfoSA::IsDamageableAtomic()
+{
+    void* asDamagable = ((void* (*)())m_pInterface->VFTBL->AsDamageAtomicModelInfoPtr)();
+    return asDamagable != nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -2038,4 +2142,9 @@ bool CModelInfoSA::ForceUnload()
         pGame->GetRenderWare()->TxdForceUnload(usTxdId, true);
 
     return true;
+}
+
+bool CVehicleModelInfoSAInterface::IsComponentDamageable(int componentIndex) const
+{
+    return pVisualInfo->m_maskComponentDamagable & (1 << componentIndex);
 }

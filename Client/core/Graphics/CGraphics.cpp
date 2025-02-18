@@ -55,12 +55,16 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pRenderItemManager = new CRenderItemManager();
     m_pTileBatcher = new CTileBatcher();
     m_pLine3DBatcherPreGUI = new CLine3DBatcher(true);
+    m_pLine3DBatcherPostFX = new CLine3DBatcher(true);
     m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
     m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
+    m_pMaterialLine3DBatcherPostFX = new CMaterialLine3DBatcher(true);
     m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
     m_pPrimitive3DBatcherPreGUI = new CPrimitive3DBatcher(true);
+    m_pPrimitive3DBatcherPostFX = new CPrimitive3DBatcher(true);
     m_pPrimitive3DBatcherPostGUI = new CPrimitive3DBatcher(false);
     m_pMaterialPrimitive3DBatcherPreGUI = new CMaterialPrimitive3DBatcher(true, this);
+    m_pMaterialPrimitive3DBatcherPostFX = new CMaterialPrimitive3DBatcher(true, this);
     m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
     m_pPrimitiveBatcher = new CPrimitiveBatcher();
     m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
@@ -83,14 +87,18 @@ CGraphics::~CGraphics()
     SAFE_DELETE(m_pRenderItemManager);
     SAFE_DELETE(m_pTileBatcher);
     SAFE_DELETE(m_pLine3DBatcherPreGUI);
+    SAFE_DELETE(m_pLine3DBatcherPostFX);
     SAFE_DELETE(m_pLine3DBatcherPostGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPreGUI);
+    SAFE_DELETE(m_pMaterialLine3DBatcherPostFX);
     SAFE_DELETE(m_pMaterialLine3DBatcherPostGUI);
     SAFE_DELETE(m_pPrimitiveBatcher);
     SAFE_DELETE(m_pPrimitiveMaterialBatcher);
     SAFE_DELETE(m_pPrimitive3DBatcherPreGUI);
+    SAFE_DELETE(m_pPrimitive3DBatcherPostFX);
     SAFE_DELETE(m_pPrimitive3DBatcherPostGUI);
     SAFE_DELETE(m_pMaterialPrimitive3DBatcherPreGUI);
+    SAFE_DELETE(m_pMaterialPrimitive3DBatcherPostFX);
     SAFE_DELETE(m_pMaterialPrimitive3DBatcherPostGUI);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
@@ -207,7 +215,7 @@ void CGraphics::DrawStringOutline(const RECT& rect, unsigned long ulColor, const
 
 void CGraphics::DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth)
 {
-    DrawLine3DQueued(vecBegin, vecEnd, fWidth, ulColor, true);
+    DrawLine3DQueued(vecBegin, vecEnd, fWidth, ulColor, eRenderStage::POST_GUI);
 }
 
 void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning)
@@ -831,21 +839,23 @@ void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI)
+void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, eRenderStage stage)
 {
     if (g_pCore->IsWindowMinimized())
         return;
 
     // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+    if (stage == eRenderStage::POST_GUI && !CCore::GetSingleton().IsMenuVisible())
         m_pLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
-    else
+    else if (stage == eRenderStage::PRE_FX)
         m_pLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
+    else
+        m_pLine3DBatcherPostFX->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
 }
 
 void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
                                          float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward,
-                                         const CVector& vecFaceToward, bool bPostGUI)
+                                         const CVector& vecFaceToward, eRenderStage stage)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -857,11 +867,14 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
     }
 
     // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+    if (stage == eRenderStage::POST_GUI && !CCore::GetSingleton().IsMenuVisible())
         m_pMaterialLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                    vecFaceToward);
-    else
+    else if (stage == eRenderStage::PRE_FX)
         m_pMaterialLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
+                                                  vecFaceToward);
+    else
+        m_pMaterialLine3DBatcherPostFX->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                   vecFaceToward);
 }
 
@@ -939,7 +952,7 @@ void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices,
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
+void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, eRenderStage stage)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
@@ -949,14 +962,16 @@ void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertice
     }
 
     // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+    if (stage == eRenderStage::POST_GUI && !CCore::GetSingleton().IsMenuVisible())
         m_pPrimitive3DBatcherPostGUI->AddPrimitive(eType, pVecVertices);
-    else
+    else if (stage == eRenderStage::PRE_FX)
         m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
+    else
+        m_pPrimitive3DBatcherPostFX->AddPrimitive(eType, pVecVertices);
 }
 
 void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
-                                              bool bPostGUI)
+                                              eRenderStage stage)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
@@ -972,10 +987,13 @@ void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVerti
     }
 
     // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+    if (stage == eRenderStage::POST_GUI && !CCore::GetSingleton().IsMenuVisible())
         m_pMaterialPrimitive3DBatcherPostGUI->AddPrimitive(eType, pMaterial, pVecVertices);
-    else
+    else if (stage == eRenderStage::PRE_FX)
         m_pMaterialPrimitive3DBatcherPreGUI->AddPrimitive(eType, pMaterial, pVecVertices);
+    else
+        m_pMaterialPrimitive3DBatcherPostFX->AddPrimitive(eType, pMaterial, pVecVertices);
+    
 }
 
 void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
@@ -1515,14 +1533,18 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
 
     m_pTileBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pLine3DBatcherPostFX->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialLine3DBatcherPostFX->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveMaterialBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPostFX->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialPrimitive3DBatcherPostFX->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
@@ -1612,6 +1634,12 @@ void CGraphics::DrawLine3DPreGUIQueue()
     m_pMaterialLine3DBatcherPreGUI->Flush();
 }
 
+void CGraphics::DrawLine3DPostFXQueue(void)
+{
+    m_pLine3DBatcherPostFX->Flush();
+    m_pMaterialLine3DBatcherPostFX->Flush();
+}
+
 void CGraphics::DrawPrimitive3DPreGUIQueue(void)
 {
     m_pPrimitive3DBatcherPreGUI->Flush();
@@ -1623,9 +1651,25 @@ bool CGraphics::HasLine3DPreGUIQueueItems(void)
     return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
 }
 
+bool CGraphics::HasLine3DPostFXQueueItems()
+{
+    return m_pLine3DBatcherPostFX->HasItems() || m_pMaterialLine3DBatcherPostFX->HasItems();
+}
+
+void CGraphics::DrawPrimitive3DPostFXQueue(void)
+{
+    m_pPrimitive3DBatcherPostFX->Flush();
+    m_pMaterialPrimitive3DBatcherPostFX->Flush();
+}
+
 bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
 {
     return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems();
+}
+
+bool CGraphics::HasPrimitive3DPostFXQueueItems()
+{
+    return m_pMaterialPrimitive3DBatcherPostFX->HasItems() || m_pPrimitive3DBatcherPostFX->HasItems();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
@@ -2154,7 +2198,7 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
             // Save backbuffer pixels
             if (!m_pTempBackBufferData)
                 m_pTempBackBufferData =
-                    CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget(BackBufferDesc.Width, BackBufferDesc.Height, true, true);
+                    CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget(BackBufferDesc.Width, BackBufferDesc.Height, false, true, 0, true);
             if (!m_pTempBackBufferData)
                 break;
             hr = m_pDevice->StretchRect(pD3DBackBufferSurface, NULL, m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, D3DTEXF_POINT);
@@ -2519,6 +2563,6 @@ void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColor color
     {
         const CVector& vecBegin = model.vertexList[i] * fRadius + vecPosition;
         const CVector& vecEnd = model.vertexList[i + 1] * fRadius + vecPosition;
-        DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+        DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
     }
 }

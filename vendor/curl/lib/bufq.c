@@ -91,6 +91,23 @@ static size_t chunk_read(struct buf_chunk *chunk,
   }
 }
 
+static size_t chunk_unwrite(struct buf_chunk *chunk, size_t len)
+{
+  size_t n = chunk->w_offset - chunk->r_offset;
+  DEBUGASSERT(chunk->w_offset >= chunk->r_offset);
+  if(!n) {
+    return 0;
+  }
+  else if(n <= len) {
+    chunk->r_offset = chunk->w_offset = 0;
+    return n;
+  }
+  else {
+    chunk->w_offset -= len;
+    return len;
+  }
+}
+
 static ssize_t chunk_slurpn(struct buf_chunk *chunk, size_t max_len,
                             Curl_bufq_reader *reader,
                             void *reader_ctx, CURLcode *err)
@@ -142,21 +159,6 @@ static size_t chunk_skip(struct buf_chunk *chunk, size_t amount)
       chunk->r_offset = chunk->w_offset = 0;
   }
   return n;
-}
-
-static void chunk_shift(struct buf_chunk *chunk)
-{
-  if(chunk->r_offset) {
-    if(!chunk_is_empty(chunk)) {
-      size_t n = chunk->w_offset - chunk->r_offset;
-      memmove(chunk->x.data, chunk->x.data + chunk->r_offset, n);
-      chunk->w_offset -= chunk->r_offset;
-      chunk->r_offset = 0;
-    }
-    else {
-      chunk->r_offset = chunk->w_offset = 0;
-    }
-  }
 }
 
 static void chunk_list_free(struct buf_chunk **anchor)
@@ -378,6 +380,49 @@ static void prune_head(struct bufq *q)
   }
 }
 
+static struct buf_chunk *chunk_prev(struct buf_chunk *head,
+                                    struct buf_chunk *chunk)
+{
+  while(head) {
+    if(head == chunk)
+      return NULL;
+    if(head->next == chunk)
+      return head;
+    head = head->next;
+  }
+  return NULL;
+}
+
+static void prune_tail(struct bufq *q)
+{
+  struct buf_chunk *chunk;
+
+  while(q->tail && chunk_is_empty(q->tail)) {
+    chunk = q->tail;
+    q->tail = chunk_prev(q->head, chunk);
+    if(q->tail)
+      q->tail->next = NULL;
+    if(q->head == chunk)
+      q->head = q->tail;
+    if(q->pool) {
+      bufcp_put(q->pool, chunk);
+      --q->chunk_count;
+    }
+    else if((q->chunk_count > q->max_chunks) ||
+       (q->opts & BUFQ_OPT_NO_SPARES)) {
+      /* SOFT_LIMIT allowed us more than max. free spares until
+       * we are at max again. Or free them if we are configured
+       * to not use spares. */
+      free(chunk);
+      --q->chunk_count;
+    }
+    else {
+      chunk->next = q->spare;
+      q->spare = chunk;
+    }
+  }
+}
+
 static struct buf_chunk *get_non_full_tail(struct bufq *q)
 {
   struct buf_chunk *chunk;
@@ -411,14 +456,15 @@ ssize_t Curl_bufq_write(struct bufq *q,
   while(len) {
     tail = get_non_full_tail(q);
     if(!tail) {
-      if(q->chunk_count < q->max_chunks) {
+      if((q->chunk_count < q->max_chunks) || (q->opts & BUFQ_OPT_SOFT_LIMIT)) {
         *err = CURLE_OUT_OF_MEMORY;
         return -1;
       }
       break;
     }
     n = chunk_append(tail, buf, len);
-    DEBUGASSERT(n);
+    if(!n)
+      break;
     nwritten += n;
     buf += n;
     len -= n;
@@ -429,6 +475,26 @@ ssize_t Curl_bufq_write(struct bufq *q,
   }
   *err = CURLE_OK;
   return nwritten;
+}
+
+CURLcode Curl_bufq_cwrite(struct bufq *q,
+                          const char *buf, size_t len,
+                          size_t *pnwritten)
+{
+  ssize_t n;
+  CURLcode result;
+  n = Curl_bufq_write(q, (const unsigned char *)buf, len, &result);
+  *pnwritten = (n < 0) ? 0 : (size_t)n;
+  return result;
+}
+
+CURLcode Curl_bufq_unwrite(struct bufq *q, size_t len)
+{
+  while(len && q->tail) {
+    len -= chunk_unwrite(q->tail, len);
+    prune_tail(q);
+  }
+  return len ? CURLE_AGAIN : CURLE_OK;
 }
 
 ssize_t Curl_bufq_read(struct bufq *q, unsigned char *buf, size_t len,
@@ -452,6 +518,16 @@ ssize_t Curl_bufq_read(struct bufq *q, unsigned char *buf, size_t len,
     return -1;
   }
   return nread;
+}
+
+CURLcode Curl_bufq_cread(struct bufq *q, char *buf, size_t len,
+                         size_t *pnread)
+{
+  ssize_t n;
+  CURLcode result;
+  n = Curl_bufq_read(q, (unsigned char *)buf, len, &result);
+  *pnread = (n < 0) ? 0 : (size_t)n;
+  return result;
 }
 
 bool Curl_bufq_peek(struct bufq *q,
@@ -503,13 +579,6 @@ void Curl_bufq_skip(struct bufq *q, size_t amount)
   }
 }
 
-void Curl_bufq_skip_and_shift(struct bufq *q, size_t amount)
-{
-  Curl_bufq_skip(q, amount);
-  if(q->tail)
-    chunk_shift(q->tail);
-}
-
 ssize_t Curl_bufq_pass(struct bufq *q, Curl_bufq_writer *writer,
                        void *writer_ctx, CURLcode *err)
 {
@@ -524,6 +593,14 @@ ssize_t Curl_bufq_pass(struct bufq *q, Curl_bufq_writer *writer,
     if(chunk_written < 0) {
       if(!nwritten || *err != CURLE_AGAIN) {
         /* blocked on first write or real error, fail */
+        nwritten = -1;
+      }
+      break;
+    }
+    if(!chunk_written) {
+      if(!nwritten) {
+        /* treat as blocked */
+        *err = CURLE_AGAIN;
         nwritten = -1;
       }
       break;
@@ -551,7 +628,8 @@ ssize_t Curl_bufq_write_pass(struct bufq *q,
           /* real error, fail */
           return -1;
         }
-        /* would block */
+        /* would block, bufq is full, give up */
+        break;
       }
     }
 
@@ -562,16 +640,25 @@ ssize_t Curl_bufq_write_pass(struct bufq *q,
         /* real error, fail */
         return -1;
       }
-      /* no room in bufq, bail out */
-      goto out;
+      /* no room in bufq */
+      break;
     }
+    /* edge case of writer returning 0 (and len is >0)
+     * break or we might enter an infinite loop here */
+    if(n == 0)
+      break;
+
     /* Maybe only part of `data` has been added, continue to loop */
     buf += (size_t)n;
     len -= (size_t)n;
     nwritten += (size_t)n;
   }
 
-out:
+  if(!nwritten && len) {
+    *err = CURLE_AGAIN;
+    return -1;
+  }
+  *err = CURLE_OK;
   return nwritten;
 }
 

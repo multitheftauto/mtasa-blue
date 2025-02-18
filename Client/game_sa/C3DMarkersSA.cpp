@@ -99,3 +99,15 @@ C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
     }
     return NULL;
 }
+
+void C3DMarkersSA::ReinitMarkers()
+{
+    using Function_ShutdownMarkers = void(__cdecl *)();
+    auto shutdownMarkers = reinterpret_cast<Function_ShutdownMarkers>(0x722710);
+
+    using Function_InitMarkers = void(__cdecl*)();
+    auto initMarkers = reinterpret_cast<Function_InitMarkers>(0x724E40);
+
+    shutdownMarkers();
+    initMarkers();
+}

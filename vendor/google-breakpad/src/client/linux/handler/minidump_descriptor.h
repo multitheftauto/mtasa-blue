@@ -34,6 +34,7 @@
 #include <sys/types.h>
 
 #include <string>
+#include <cstdint>
 
 #include "client/linux/handler/microdump_extra_info.h"
 #include "common/using_std_string.h"

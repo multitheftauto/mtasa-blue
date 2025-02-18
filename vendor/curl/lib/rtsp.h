@@ -31,7 +31,7 @@
 
 extern const struct Curl_handler Curl_handler_rtsp;
 
-CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header);
+CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, const char *header);
 
 #else
 /* disabled */
@@ -39,6 +39,12 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header);
 
 #endif /* CURL_DISABLE_RTSP */
 
+typedef enum {
+  RTP_PARSE_SKIP,
+  RTP_PARSE_CHANNEL,
+  RTP_PARSE_LEN,
+  RTP_PARSE_DATA
+} rtp_parse_st;
 /*
  * RTSP Connection data
  *
@@ -47,22 +53,15 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header);
 struct rtsp_conn {
   struct dynbuf buf;
   int rtp_channel;
+  size_t rtp_len;
+  rtp_parse_st state;
+  BIT(in_header);
 };
 
 /****************************************************************************
  * RTSP unique setup
  ***************************************************************************/
 struct RTSP {
-  /*
-   * http_wrapper MUST be the first element of this structure for the wrap
-   * logic to work. In this way, we get a cheap polymorphism because
-   * &(data->state.proto.rtsp) == &(data->state.proto.http) per the C spec
-   *
-   * HTTP functions can safely treat this as an HTTP struct, but RTSP aware
-   * functions can also index into the later elements.
-   */
-  struct HTTP http_wrapper; /* wrap HTTP to do the heavy lifting */
-
   long CSeq_sent; /* CSeq of this request */
   long CSeq_recv; /* CSeq received */
 };

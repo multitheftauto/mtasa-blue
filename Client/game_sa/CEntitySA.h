@@ -20,7 +20,6 @@
 #define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
 
 #define FUNC_SetRwObjectAlpha                               0x5332C0
-#define FUNC_SetOrientation                                 0x439A80
 
 #define FUNC_CMatrix__ConvertToEulerAngles                  0x59A840
 #define FUNC_CMatrix__ConvertFromEulerAngles                0x59AA40
@@ -123,7 +122,7 @@ public:
 class CEntitySAInterface
 {
 public:
-    CEntitySAInterfaceVTBL* vtbl;            // the virtual table
+    CEntitySAInterfaceVTBL* vtbl;            // the virtual table it should be in the CPlaceableSAInterface
 
     CPlaceableSAInterface Placeable;            // 4
 
@@ -202,6 +201,9 @@ public:
     // Functions to hide member variable misuse
     //
 
+    void SetLod(CEntitySAInterface* pLod) noexcept { m_pLod = pLod; };
+    CEntitySAInterface* GetLod() const noexcept { return m_pLod; };
+
     // Sets
     void SetIsLowLodEntity() { numLodChildrenRendered = 0x40; }
 
@@ -224,6 +226,40 @@ public:
             return numLodChildrenRendered & 0x1f;
         return -1;
     }
+
+    void ResolveReferences()
+    {
+        using CEntity_ResolveReferences = void*(__thiscall*)(CEntitySAInterface*);
+        ((CEntity_ResolveReferences)0x571A40)(this);
+    };
+
+    void RemoveShadows()
+    {
+        using CStencilShadow_dtorByOwner = void*(__cdecl*)(CEntitySAInterface * pEntity);
+        ((CStencilShadow_dtorByOwner)0x711730)(this);
+    };
+
+    void DeleteRwObject()
+    {
+        using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
+        ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
+    };
+
+    void SetOrientation(float x, float y, float z) {
+        using CPlacetable_SetOrientation = void(__thiscall*)(CEntitySAInterface * pEntity, float, float, float);
+        ((CPlacetable_SetOrientation)0x439A80)(this, x, y, z);
+    }
+
+    void RemoveRWObjectWithReferencesCleanup() {
+        DeleteRwObject();
+        ResolveReferences();
+        RemoveShadows();
+    }
+
+    bool HasMatrix() const noexcept { return Placeable.matrix != nullptr; }
+
+    void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
+
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
@@ -306,17 +342,19 @@ public:
     bool      SetBoneMatrix(eBone boneId, const CMatrix& matrix);
 
     bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll);
+    bool GetBoneRotationQuat(eBone boneId, float& x, float& y, float& z, float& w);
     bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll);
+    bool SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w);
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
+
+    bool IsOnFire() override { return false; }
+    bool SetOnFire(bool onFire) override { return false; }
 
     // CEntitySA interface
     virtual void OnChangingPosition(const CVector& vecNewPosition) {}
 
 private:
-    static unsigned long FUNC_CClumpModelInfo__GetFrameFromId;
-    static unsigned long FUNC_RwFrameGetLTM;
-
     void*   m_pStoredPointer;
     CVector m_LastGoodPosition;
 };

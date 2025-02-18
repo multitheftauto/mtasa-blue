@@ -40,8 +40,7 @@
 #  define curl_thread_t          HANDLE
 #  define curl_thread_t_null     (HANDLE)0
 #  if !defined(_WIN32_WINNT) || !defined(_WIN32_WINNT_VISTA) || \
-      (_WIN32_WINNT < _WIN32_WINNT_VISTA) || \
-      (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
+      (_WIN32_WINNT < _WIN32_WINNT_VISTA)
 #    define Curl_mutex_init(m)   InitializeCriticalSection(m)
 #  else
 #    define Curl_mutex_init(m)   InitializeCriticalSectionEx(m, 0, 1)
@@ -53,8 +52,13 @@
 
 #if defined(USE_THREADS_POSIX) || defined(USE_THREADS_WIN32)
 
-/* !checksrc! disable SPACEBEFOREPAREN 1 */
-curl_thread_t Curl_thread_create(unsigned int (CURL_STDCALL *func) (void *),
+curl_thread_t Curl_thread_create(
+#if defined(_WIN32_WCE) || defined(CURL_WINDOWS_UWP)
+                                 DWORD
+#else
+                                 unsigned int
+#endif
+                                 (CURL_STDCALL *func) (void *),
                                  void *arg);
 
 void Curl_thread_destroy(curl_thread_t hnd);

@@ -34,6 +34,8 @@
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>
+#include <glob/glob.h>
+#include "CStaticFunctionDefinitions.h"
 
 #ifdef WIN32
     #include <zip/iowin32.h>
@@ -44,6 +46,13 @@
 #ifndef MAX_PATH
     #define MAX_PATH 260
 #endif
+
+enum HttpRouterCheck
+{
+    HTTP_ROUTER_CHECK_PENDING,
+    HTTP_ROUTER_CHECK_PASSED,
+    HTTP_ROUTER_CHECK_FAILED,
+};
 
 int           do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password, const char* szFilePath);
 unsigned long get_current_file_crc(unzFile uf);
@@ -116,7 +125,6 @@ bool CResource::Load()
     // Register us in the EHS stuff
     g_pGame->GetHTTPD()->RegisterEHS(this, m_strResourceName.c_str());
     this->m_oEHSServerParameters["norouterequest"] = true;
-    this->RegisterEHS(this, "call");
 
     // Store the actual directory and zip paths for fast access
     m_strResourceDirectoryPath = PathJoin(m_strAbsPath, m_strResourceName, "/");
@@ -338,10 +346,13 @@ bool CResource::Unload()
         m_pNodeSettings = nullptr;
     }
 
+    OnResourceStateChange("unloaded");
+
     m_strResourceZip = "";
     m_strResourceCachePath = "";
     m_strResourceDirectoryPath = "";
     m_eState = EResourceState::None;
+
     return true;
 }
 
@@ -385,6 +396,7 @@ void CResource::TidyUp()
         delete pResourceFile;
 
     m_ResourceFiles.clear();
+    m_ResourceFilesCountPerDir.clear();
 
     // Go through each included resource item and delete it
     for (CIncludedResources* pIncludedResources : m_IncludedResources)
@@ -396,7 +408,6 @@ void CResource::TidyUp()
     for (CResource* pDependent : m_Dependents)
         pDependent->InvalidateIncludedResourceReference(this);
 
-    this->UnregisterEHS("call");
     g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
 }
 
@@ -499,13 +510,14 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
         if (!GetFilePath(pResourceFile->GetName(), strPath))
             return SString();
 
-        std::vector<char> buffer;
-        FileLoad(strPath, buffer);
-        uint        uiFileSize = buffer.size();
-        const char* pFileContents = uiFileSize ? buffer.data() : "";
-        CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-        pResourceFile->SetLastChecksum(Checksum);
-        pResourceFile->SetLastFileSize(uiFileSize);
+        auto checksumOrError = CChecksum::GenerateChecksumFromFile(strPath);
+        if (std::holds_alternative<std::string>(checksumOrError))
+        {
+            return SString(std::get<std::string>(checksumOrError));
+        }
+
+        pResourceFile->SetLastChecksum(std::get<CChecksum>(checksumOrError));
+        pResourceFile->SetLastFileSizeHint(FileSize(strPath));
 
         // Check if file is blocked
         char szHashResult[33];
@@ -536,7 +548,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
 
                 if (pResourceFile->GetLastChecksum() != cachedChecksum)
                 {
-                    if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                    if (!FileCopy(strPath, strCachedFilePath))
                     {
                         return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
                     }
@@ -592,8 +604,12 @@ bool CResource::GenerateChecksums()
 bool CResource::HasResourceChanged()
 {
     std::string strPath;
+    std::string_view strDirPath = m_strResourceDirectoryPath;
+
     if (IsResourceZip())
     {
+        strDirPath = m_strResourceCachePath;
+
         // Zip file might have changed
         CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
         if (checksum != m_zipHash)
@@ -602,32 +618,40 @@ bool CResource::HasResourceChanged()
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
-        if (GetFilePath(pResourceFile->GetName(), strPath))
+        if (!GetFilePath(pResourceFile->GetName(), strPath))
+            return true;
+
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+
+        if (pResourceFile->GetLastChecksum() != checksum)
+            return true;
+
+        // Also check if file in http cache has been externally altered
+        switch (pResourceFile->GetType())
         {
-            CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
-
-            if (pResourceFile->GetLastChecksum() != checksum)
-                return true;
-
-            // Also check if file in http cache has been externally altered
-            switch (pResourceFile->GetType())
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
             {
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                {
-                    string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
-                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
+                string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
+                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
-                    if (cachedChecksum != checksum)
-                        return true;
+                if (cachedChecksum != checksum)
+                    return true;
 
-                    break;
-                }
-                default:
-                    break;
+                break;
             }
+            default:
+                break;
         }
+    }
+
+    for (const auto& [strGlob, uiFileCount] : m_ResourceFilesCountPerDir)
+    {
+        std::vector<std::filesystem::path> files = glob::rglob(strDirPath.data() + strGlob);
+
+        if (files.size() != uiFileCount)
+            return true;
     }
 
     if (GetFilePath("meta.xml", strPath))
@@ -740,6 +764,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
     if (m_bDestroyed)
         return false;
+
+    OnResourceStateChange("starting");
 
     m_eState = EResourceState::Starting;
 
@@ -974,6 +1000,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             AddDependent(pDependent);
     }
 
+    OnResourceStateChange("running");
+
     m_eState = EResourceState::Running;
 
     // Call the onResourceStart event. If it returns false, cancel this script again
@@ -1016,6 +1044,37 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     return true;
 }
 
+void CResource::OnResourceStateChange(const char* state) noexcept
+{
+    if (!m_pResourceElement)
+        return;
+
+    CLuaArguments stateArgs;
+    stateArgs.PushResource(this);
+    switch (m_eState)
+    {
+        case EResourceState::Loaded: // When resource is stopped
+            stateArgs.PushString("loaded");
+            break;
+        case EResourceState::Running: // When resource is running
+            stateArgs.PushString("running");
+            break;
+        case EResourceState::Starting: // When resource is starting
+            stateArgs.PushString("starting");
+            break;
+        case EResourceState::Stopping: // When resource is stopping
+            stateArgs.PushString("stopping");
+            break;
+        case EResourceState::None: // When resource is not loaded
+        default:
+            stateArgs.PushString("unloaded");
+            break;
+    }
+    stateArgs.PushString(state);
+
+    m_pResourceElement->CallEvent("onResourceStateChange", stateArgs);
+}
+
 bool CResource::Stop(bool bManualStop)
 {
     if (m_eState == EResourceState::Loaded)
@@ -1026,6 +1085,8 @@ bool CResource::Stop(bool bManualStop)
 
     if (m_bStartedManually && !bManualStop)
         return false;
+
+    OnResourceStateChange("stopping");
 
     m_eState = EResourceState::Stopping;
     m_pResourceManager->RemoveMinClientRequirement(this);
@@ -1113,6 +1174,7 @@ bool CResource::Stop(bool bManualStop)
     // Broadcast the packet to joined players
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
 
+    OnResourceStateChange("loaded");
     m_eState = EResourceState::Loaded;
     return true;
 }
@@ -1300,6 +1362,26 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
     return FileExists(strPath);
 }
 
+std::vector<std::string> CResource::GetFilePaths(const char* szFilename)
+{
+    std::vector<std::string>    vecFiles;
+    const std::string&          strDirectory = IsResourceZip() ? m_strResourceCachePath : m_strResourceDirectoryPath;
+    const std::string           strFilePath = strDirectory + szFilename;
+
+    for (const std::filesystem::path& path : glob::rglob(strFilePath))
+    {
+        std::string strPath = std::filesystem::relative(path, strDirectory).string();
+        ReplaceSlashes(strPath);
+
+        if (strPath == "meta.xml")
+            continue;
+
+        vecFiles.push_back(std::move(strPath));
+    }
+
+    return vecFiles;
+}
+
 // Return true if file name is used by this resource
 bool CResource::IsFilenameUsed(const SString& strFilename, bool bClient)
 {
@@ -1385,43 +1467,54 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (IsFilenameUsed(strFilename, false))
-                {
-                    CLogger::LogPrintf("WARNING: Duplicate html file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                }
-
-                // Try to find the file
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-                {
-                    // This one is supposed to be default, but there's already a default page
-                    if (bFoundDefault && bIsDefault)
-                    {
-                        CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(),
-                                           m_strResourceName.c_str());
-                        bIsDefault = false;
-                    }
-
-                    // If this is supposed to be default, we've now found our default page
-                    if (bIsDefault)
-                        bFoundDefault = true;
-
-                    // Create a new resource HTML file and add it to the list
-                    auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw,
-                                                               bIsRestricted, m_bOOPEnabledInMetaXml);
-                    m_ResourceFiles.push_back(pResourceFile);
-
-                    // This is the first HTML file? Remember it
-                    if (!pFirstHTML)
-                        pFirstHTML = pResourceFile;
-                }
-                else
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
                     m_strFailureReason = SString("Couldn't find html %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
+                }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+                if (vecFiles.empty())
+                {
+                    if (glob::has_magic(strFilename))
+                    {
+                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+                        continue;
+                    }
+
+                    m_strFailureReason = SString("Couldn't find html %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                for (const std::string& strFilePath : vecFiles)
+                {
+                    std::string strFullFilename;
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        // This one is supposed to be default, but there's already a default page
+                        if (bFoundDefault && bIsDefault)
+                        {
+                            CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                            bIsDefault = false;
+                        }
+
+                        // If this is supposed to be default, we've now found our default page
+                        if (bIsDefault)
+                            bFoundDefault = true;
+
+                        // Create a new resource HTML file and add it to the list
+                        auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw, bIsRestricted, m_bOOPEnabledInMetaXml);
+                        m_ResourceFiles.push_back(pResourceFile);
+
+                        // This is the first HTML file? Remember it
+                        if (!pFirstHTML)
+                            pFirstHTML = pResourceFile;
+                    }
                 }
             }
             else
@@ -1545,13 +1638,28 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (IsFilenameUsed(strFilename, true))
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                    continue;
+                    m_strFailureReason = SString("Couldn't find file(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+
+                if (vecFiles.empty())
+                {
+                    if (glob::has_magic(strFilename))
+                    {
+                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+                        continue;
+                    }
+
+                    m_strFailureReason = SString("Couldn't find file(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
                 }
 
                 bool           bDownload = true;
@@ -1559,23 +1667,30 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
 
                 if (pDownload)
                 {
-                    const char* szDownload = pDownload->GetValue().c_str();
+                    const std::string strDownload = pDownload->GetValue();
 
-                    if (!stricmp(szDownload, "no") || !stricmp(szDownload, "false"))
+                    if (strDownload == "no" || strDownload == "false")
                         bDownload = false;
                 }
 
-                // Create a new resourcefile item
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
+                for (const std::string& strFilePath : vecFiles)
                 {
-                    m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                    std::string strFullFilename;
+
+                    if (IsFilenameUsed(strFilePath, true))
+                    {
+                        CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilePath.c_str());
+                        continue;
+                    }
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                    }
                 }
-                else
-                {
-                    m_strFailureReason = SString("Couldn't find file %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
-                    CLogger::ErrorPrintf(m_strFailureReason);
-                    return false;
-                }
+
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
             }
             else
             {
@@ -1595,90 +1710,122 @@ bool CResource::ReadIncludedExports(CXMLNode* pRoot)
 {
     int i = 0;
     m_ExportedFunctions.clear();
+    m_httpRouterFunction.clear();
+    m_httpRouterAclRight.clear();
+    m_httpRouterCheck = HTTP_ROUTER_CHECK_PENDING;
 
     // Read our exportlist
     for (CXMLNode* pExport = pRoot->FindSubNode("export", i); pExport != nullptr; pExport = pRoot->FindSubNode("export", ++i))
     {
         CXMLAttributes& Attributes = pExport->GetAttributes();
 
-        // See if the http attribute is true or false
-        bool           bHTTP = false;
-        CXMLAttribute* pHttp = Attributes.Find("http");
+        CXMLAttribute* functionAttribute = Attributes.Find("function");
 
-        if (pHttp)
-        {
-            const char* szHttp = pHttp->GetValue().c_str();
-
-            if (!stricmp(szHttp, "yes") || !stricmp(szHttp, "true"))
-                bHTTP = true;
-            else
-                bHTTP = false;
-        }
-
-        // See if the restricted attribute is true or false
-        bool           bRestricted = false;
-        CXMLAttribute* pRestricted = Attributes.Find("restricted");
-
-        if (pRestricted)
-        {
-            const char* szRestricted = pRestricted->GetValue().c_str();
-
-            if (!stricmp(szRestricted, "yes") || !stricmp(szRestricted, "true"))
-                bRestricted = true;
-            else
-                bRestricted = false;
-        }
-
-        // Find the type attribute
-        bool bServer = true;
-        bool bClient = false;
-
-        CXMLAttribute* pType = Attributes.Find("type");
-
-        if (pType)
-        {
-            // Grab the type. Client or server or shared
-            const char* szType = pType->GetValue().c_str();
-
-            if (!stricmp(szType, "client"))
-            {
-                bServer = false;
-                bClient = true;
-            }
-            else if (!stricmp(szType, "shared"))
-                bClient = true;
-            else if (stricmp(szType, "server") != 0)
-                CLogger::LogPrintf("Unknown exported function type specified in %s. Assuming 'server'\n", m_strResourceName.c_str());
-        }
-
-        // Grab the functionname attribute
-        CXMLAttribute* pFunction = Attributes.Find("function");
-
-        if (pFunction)
-        {
-            // Grab the functionname from the attribute
-            const std::string& strFunction = pFunction->GetValue();
-
-            // Add it to the list if it wasn't zero long. Otherwize show a warning
-            if (!strFunction.empty())
-            {
-                if (bServer)
-                    m_ExportedFunctions.push_back(CExportedFunction(strFunction.c_str(), bHTTP, CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER,
-                                                                    bRestricted || GetName() == "webadmin" || GetName() == "runcode"));
-                if (bClient)
-                    m_ExportedFunctions.push_back(CExportedFunction(strFunction.c_str(), bHTTP, CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT,
-                                                                    bRestricted || GetName() == "webadmin" || GetName() == "runcode"));
-            }
-            else
-            {
-                CLogger::ErrorPrintf("WARNING: Empty 'function' attribute of 'export' node of 'meta.xml' for resource '%s', ignoring\n",
-                                     m_strResourceName.c_str());
-            }
-        }
-        else
+        if (functionAttribute == nullptr)
         {
             CLogger::LogPrintf("WARNING: Missing 'function' attribute from 'export' node of 'meta.xml' for resource '%s', ignoring\n",
                                m_strResourceName.c_str());
+            continue;
+        }
+
+        const char* functionName = functionAttribute->GetValue().c_str();
+
+        if (functionName[0] == '\0')
+        {
+            CLogger::ErrorPrintf("WARNING: Empty 'function' attribute of 'export' node of 'meta.xml' for resource '%s', ignoring\n",
+                                 m_strResourceName.c_str());
+            continue;
+        }
+
+        // See if the http attribute is true or false
+        bool isHttpFunction = false;
+
+        if (CXMLAttribute* attribute = Attributes.Find("http"); attribute != nullptr)
+        {
+            const char* value = attribute->GetValue().c_str();
+            isHttpFunction = !stricmp(value, "true") || !stricmp(value, "yes");
+        }
+
+        // See if the http router attribute is true or false
+        bool isHttpRouter = false;
+
+        if (CXMLAttribute* attribute = Attributes.Find("router"); attribute != nullptr)
+        {
+            const char* value = attribute->GetValue().c_str();
+            isHttpRouter = !stricmp(value, "true") || !stricmp(value, "yes");
+        }
+
+        if (!isHttpFunction && isHttpRouter)
+        {
+            isHttpRouter = false;
+            CLogger::ErrorPrintf("WARNING: Regular function '%s' in resource '%s' uses HTTP router attribute\n",
+                                 functionName, m_strResourceName.c_str());
+        }
+
+        if (isHttpRouter && !m_httpRouterFunction.empty())
+        {
+            isHttpRouter = false;
+            CLogger::ErrorPrintf("WARNING: HTTP router function '%s' in resource '%s' ignored, using '%s'\n",
+                                 functionName, m_strResourceName.c_str(), m_httpRouterFunction.c_str());
+        }
+
+        // See if the restricted attribute is true or false
+        bool isRestricted = false;
+
+        if (CXMLAttribute* attribute = Attributes.Find("restricted"); attribute != nullptr)
+        {
+            const char* value = attribute->GetValue().c_str();
+            isRestricted = !stricmp(value, "true") || !stricmp(value, "yes");
+        }
+
+        // Find the type attribute
+        bool isServerFunction = true;
+        bool isClientFunction = false;
+
+        if (CXMLAttribute* attribute = Attributes.Find("type"); attribute != nullptr)
+        {
+            const char* value = attribute->GetValue().c_str();
+
+            if (!stricmp(value, "client"))
+            {
+                isServerFunction = false;
+                isClientFunction = true;
+            }
+            else if (!stricmp(value, "shared"))
+            {
+                isClientFunction = true;
+            }
+            else if (stricmp(value, "server") != 0)
+            {
+                CLogger::LogPrintf("WARNING: Function '%s' in resource '%s' uses unknown function type, assuming 'server'\n",
+                                   functionName, m_strResourceName.c_str());
+            }
+        }
+
+        if (isHttpRouter)
+        {
+            if (isServerFunction)
+            {
+                m_httpRouterFunction = functionName;
+                m_httpRouterAclRight = SString("%s.function.%s", m_strResourceName.c_str(), functionName);
+                continue;
+            }
+
+            CLogger::LogPrintf("WARNING: HTTP router function '%s' in resource '%s' is not a server-sided function, ignoring\n",
+                               functionName, m_strResourceName.c_str());
+            continue;
+        }
+
+        if (isServerFunction)
+        {
+            m_ExportedFunctions.push_back(CExportedFunction(functionName, isHttpFunction, CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER,
+                                                            isRestricted || GetName() == "webadmin" || GetName() == "runcode"));
+        }
+
+        if (isClientFunction)
+        {
+            m_ExportedFunctions.push_back(CExportedFunction(functionName, isHttpFunction, CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT,
+                                                            isRestricted || GetName() == "webadmin" || GetName() == "runcode"));
         }
     }
 
@@ -1725,35 +1872,67 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (bClient && IsFilenameUsed(strFilename, true))
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
-                                       strFilename.c_str());
-                    bClient = false;
-                }
-                if (bServer && IsFilenameUsed(strFilename, false))
-                {
-                    CLogger::LogPrintf("WARNING: Duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                }
-
-                // Extract / get the filepath of the file
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-                {
-                    // Create it depending on the type (client or server or shared) and add it to the list of resource files
-                    if (bServer)
-                        m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
-                    if (bClient)
-                        m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
-                }
-                else
-                {
-                    m_strFailureReason = SString("Couldn't find script %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find script(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+
+                if (vecFiles.empty())
+                {
+                    if (glob::has_magic(strFilename))
+                    {
+                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+                        continue;
+                    }
+
+                    m_strFailureReason = SString("Couldn't find script(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                for (const std::string& strFilePath : vecFiles)
+                {
+                    std::string strFullFilename;
+                    bool        bLoadClient = bClient;
+                    bool        bLoadServer = bServer;
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        // Check if the filename is already used by this resource
+
+                        if (bClient && IsFilenameUsed(strFilePath, true))
+                        {
+                            CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                               strFilePath.c_str());
+                            bLoadClient = false;
+                        }
+
+                        if (bServer && IsFilenameUsed(strFilePath, false))
+                        {
+                            CLogger::LogPrintf("WARNING: Ignoring duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                               strFilePath.c_str());
+
+                            bLoadServer = false;
+                        }
+
+                        // Create it depending on the type (client or server or shared) and add it to the list of resource files
+
+                        if (bLoadServer)
+                            m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+
+                        if (bLoadClient)
+                            m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+                    }
+                }
+
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
             }
             else
             {
@@ -2334,39 +2513,29 @@ void CResource::RemoveDependent(CResource* pResource)
 }
 
 // Called on another thread, but g_pGame->Lock() has been called, so everything is going to be OK
-ResponseCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse)
+HttpStatusCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse)
 {
-    std::string strAccessType;
-    const char* szRequest = ipoHttpRequest->sOriginalUri.c_str();
+    CAccount* account = g_pGame->GetHTTPD()->CheckAuthentication(ipoHttpRequest);
 
-    if (*szRequest)
+    if (!account)
     {
-        const char* szSlash1 = strchr(szRequest + 1, '/');
-
-        if (szSlash1)
-        {
-            const char* szSlash2 = strchr(szSlash1 + 1, '/');
-
-            if (szSlash2)
-                strAccessType.assign(szSlash1 + 1, szSlash2 - (szSlash1 + 1));
-        }
+        return HTTP_STATUS_CODE_200_OK;
     }
 
-    CAccount* pAccount = g_pGame->GetHTTPD()->CheckAuthentication(ipoHttpRequest);
-
-    if (pAccount)
+    if (!m_httpRouterFunction.empty())
     {
-        ResponseCode responseCode;
-
-        if (strAccessType == "call")
-            responseCode = HandleRequestCall(ipoHttpRequest, ipoHttpResponse, pAccount);
-        else
-            responseCode = HandleRequestActive(ipoHttpRequest, ipoHttpResponse, pAccount);
-
-        return responseCode;
+        return HandleRequestRouter(ipoHttpRequest, ipoHttpResponse, account);
     }
 
-    return HTTPRESPONSECODE_200_OK;
+    const auto path = std::string_view{ipoHttpRequest->sOriginalUri}.substr(1 /* first slash */ + m_strResourceName.size());
+    const bool isCall = path.size() >= sizeof("/call") && !strnicmp(path.data(), "/call/", 6);
+
+    if (isCall)
+    {
+        return HandleRequestCall(ipoHttpRequest, ipoHttpResponse, account);
+    }
+
+    return HandleRequestActive(ipoHttpRequest, ipoHttpResponse, account);
 }
 
 std::string Unescape(std::string_view sv)
@@ -2413,7 +2582,7 @@ std::string Unescape(std::string_view sv)
     return out;
 }
 
-ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
+HttpStatusCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
 {
     if (!IsHttpAccessAllowed(pAccount))
     {
@@ -2426,7 +2595,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
     {
         const char* szError = "error: resource not running";
         ipoHttpResponse->SetBody(szError, strlen(szError));
-        return HTTPRESPONSECODE_200_OK;
+        return HTTP_STATUS_CODE_200_OK;
     }
 
     const char* szQueryString = ipoHttpRequest->sUri.c_str();
@@ -2435,7 +2604,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
     {
         const char* szError = "error: invalid function name";
         ipoHttpResponse->SetBody(szError, strlen(szError));
-        return HTTPRESPONSECODE_200_OK;
+        return HTTP_STATUS_CODE_200_OK;
     }
 
     std::string              strFuncName;
@@ -2667,15 +2836,281 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(SLuaDebugInfo());
 
         ipoHttpResponse->SetBody(strJSON.c_str(), strJSON.length());
-        return HTTPRESPONSECODE_200_OK;
+        return HTTP_STATUS_CODE_200_OK;
     }
 
     const char* szError = "error: not found";
     ipoHttpResponse->SetBody(szError, strlen(szError));
-    return HTTPRESPONSECODE_200_OK;
+    return HTTP_STATUS_CODE_200_OK;
 }
 
-ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
+static HttpStatusCode ParseLuaHttpRouterResponse(CLuaArguments& luaResponse, HttpResponse& httpResponse)
+{
+    bool           hasBody = false;
+    HttpStatusCode responseCode = HTTP_STATUS_CODE_200_OK;
+
+    for (size_t i = 0; i < luaResponse.Count(); i += 2)
+    {
+        CLuaArgument* argName = luaResponse[i + 0];
+        CLuaArgument* argValue = luaResponse[i + 1];
+
+        std::string_view key;
+
+        if (!argName->TryGetString(key))
+            continue;
+
+        if (key == "status")
+        {
+            if (lua_Number status; argValue->TryGetNumber(status))
+            {
+                responseCode = static_cast<HttpStatusCode>(status);
+            }
+        }
+        else if (key == "body")
+        {
+            if (std::string_view body; argValue->TryGetString(body))
+            {
+                if (body.size() <= std::numeric_limits<int>::max())
+                {
+                    hasBody = true;
+                    httpResponse.SetBody(body.data(), body.size());
+                }
+            }
+        }
+        else if (key == "headers")
+        {
+            if (CLuaArguments* headers; argValue->TryGetTable(headers))
+            {
+                for (size_t j = 0; j < headers->Count(); j += 2)
+                {
+                    argName = (*headers)[j + 0];
+                    argValue = (*headers)[j + 1];
+
+                    if (std::string_view n, v; argName->TryGetString(n) && argValue->TryGetString(v))
+                    {
+                        httpResponse.oResponseHeaders[std::string{n}] = std::string{v};
+                    }
+                }
+            }
+        }
+        else if (key == "cookies")
+        {
+            if (CLuaArguments* cookies; argValue->TryGetTable(cookies))
+            {
+                for (size_t j = 0; j < cookies->Count(); j += 2)
+                {
+                    argName = (*cookies)[j + 0];
+                    argValue = (*cookies)[j + 1];
+
+                    std::string_view n, v;
+                    
+                    if (argName->TryGetString(n) && argValue->TryGetString(v))
+                    {
+                        CookieParameters cookie;
+                        cookie["name"] = std::string{n};
+                        cookie["value"] = std::string{v};
+                        httpResponse.SetCookie(cookie);
+                    }
+                    else if (CLuaArguments* properties; argValue->TryGetTable(properties))
+                    {
+                        CookieParameters cookie;
+
+                        for (size_t k = 0; k < properties->Count(); k += 2)
+                        {
+                            argName = (*properties)[k + 0];
+                            argValue = (*properties)[k + 1];
+
+                            if (argName->TryGetString(n) && argValue->TryGetString(v))
+                            {
+                                cookie[std::string{n}] = std::string{v};
+                            }
+                        }
+
+                        httpResponse.SetCookie(cookie);
+                    }
+                }
+            }
+        }
+    }
+
+    if (!hasBody)
+        httpResponse.SetBody("", 0);
+
+    return responseCode;
+}
+
+HttpStatusCode CResource::HandleRequestRouter(HttpRequest* request, HttpResponse* response, CAccount* account)
+{
+    if (!IsHttpAccessAllowed(account))
+    {
+        return g_pGame->GetHTTPD()->RequestLogin(request, response);
+    }
+
+    if (!g_pGame->GetACLManager()->CanObjectUseRight(account->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_httpRouterAclRight.c_str(),
+                                                     CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
+    {
+        return g_pGame->GetHTTPD()->RequestLogin(request, response);
+    }
+
+    if (m_eState != EResourceState::Running)
+    {
+        const char* errorText = "error: resource not running";
+        response->SetBody(errorText, strlen(errorText));
+        return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
+    }
+
+    if (m_httpRouterCheck == HTTP_ROUTER_CHECK_PENDING)
+    {
+        lua_State* L = m_pVM->GetVM();
+        lua_pushlstring(L, m_httpRouterFunction.c_str(), m_httpRouterFunction.size());
+        lua_gettable(L, LUA_GLOBALSINDEX);
+        {
+            m_httpRouterCheck = lua_isfunction(L, -1) ? HTTP_ROUTER_CHECK_PASSED : HTTP_ROUTER_CHECK_FAILED;
+        }
+        lua_pop(L, 1);
+    }
+
+    if (m_httpRouterCheck != HTTP_ROUTER_CHECK_PASSED)
+    {
+        const char* errorText = "error: router function unavailable";
+        response->SetBody(errorText, strlen(errorText));
+        return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
+    }
+
+    std::string_view path = std::string_view{request->sOriginalUri}.substr(1 /* first slash */ + m_strResourceName.size());
+
+    if (const auto index = path.find_first_of("?&"); index != std::string_view::npos)
+    {
+        path = path.substr(0, index);
+    }
+
+    CLuaArguments luaRequest;
+    {
+        luaRequest.PushString("account");
+        luaRequest.PushAccount(account);
+
+        luaRequest.PushString("method");
+        switch (request->nRequestMethod)
+        {
+            case REQUESTMETHOD_OPTIONS:
+                luaRequest.PushString("OPTIONS");
+                break;
+            case REQUESTMETHOD_GET:
+                luaRequest.PushString("GET");
+                break;
+            case REQUESTMETHOD_HEAD:
+                luaRequest.PushString("HEAD");
+                break;
+            case REQUESTMETHOD_POST:
+                luaRequest.PushString("POST");
+                break;
+            case REQUESTMETHOD_PUT:
+                luaRequest.PushString("PUT");
+                break;
+            case REQUESTMETHOD_DELETE:
+                luaRequest.PushString("DELETE");
+                break;
+            case REQUESTMETHOD_TRACE:
+                luaRequest.PushString("TRACE");
+                break;
+            case REQUESTMETHOD_CONNECT:
+                luaRequest.PushString("CONNECT");
+                break;
+            case REQUESTMETHOD_PATCH:
+                luaRequest.PushString("PATCH");
+                break;
+            default:
+                luaRequest.PushString("*");
+                break;
+        }
+        
+        luaRequest.PushString("path");
+        luaRequest.PushString(path);
+
+        luaRequest.PushString("absolutePath");
+        luaRequest.PushString(request->sOriginalUri);
+
+        luaRequest.PushString("hostname");
+        luaRequest.PushString(request->GetAddress());
+
+        luaRequest.PushString("port");
+        luaRequest.PushNumber(request->GetPort());
+
+        luaRequest.PushString("body");
+        luaRequest.PushString(request->sBody);
+
+        CLuaArguments query;
+        for (const auto& pair : request->oQueryValueMap)
+        {
+            query.PushString(pair.first);
+            query.PushString(pair.second.sBody);
+        }
+        luaRequest.PushString("query");
+        luaRequest.PushTable(&query);
+
+        CLuaArguments formData;
+        for (const auto& pair : request->oFormValueMap)
+        {
+            formData.PushString(pair.first);
+            formData.PushString(pair.second.sBody);
+        }
+        luaRequest.PushString("formData");
+        luaRequest.PushTable(&formData);
+        
+        CLuaArguments cookies;
+        for (const auto& pair : request->oCookieMap)
+        {
+            cookies.PushString(pair.first);
+            cookies.PushString(pair.second);
+        }
+        luaRequest.PushString("cookies");
+        luaRequest.PushTable(&cookies);
+
+        CLuaArguments headers;
+        for (const auto& pair : request->oRequestHeaders)
+        {
+            headers.PushString(pair.first);
+            headers.PushString(pair.second);
+        }
+        luaRequest.PushString("headers");
+        luaRequest.PushTable(&headers);
+    }
+
+    CLuaArguments arguments;
+    arguments.PushTable(&luaRequest);
+
+    CLuaArguments results;
+
+    if (!arguments.CallGlobal(m_pVM, m_httpRouterFunction.c_str(), &results))
+    {
+        const char* errorText = "error: router function error";
+        response->SetBody(errorText, strlen(errorText));
+        return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
+    }
+
+    HttpStatusCode responseCode = HTTP_STATUS_CODE_200_OK;
+
+    if (results.Count() >= 1)
+    {
+        if (lua_Number statusCode; results[0]->TryGetNumber(statusCode))
+        {
+            response->SetBody("", 0);
+            responseCode = static_cast<HttpStatusCode>(statusCode);
+        }
+        else if (CLuaArguments* luaResponse; results[0]->TryGetTable(luaResponse))
+        {
+            responseCode = ParseLuaHttpRouterResponse(*luaResponse, *response);
+        }
+    }
+    else
+    {
+        response->SetBody("", 0);
+    }
+
+    return responseCode;
+}
+
+HttpStatusCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
 {
     const char* szUrl = ipoHttpRequest->sOriginalUri.c_str();
     std::string strFile;
@@ -2732,7 +3167,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 {
                     SString err = "That resource is not running.";
                     ipoHttpResponse->SetBody(err.c_str(), err.size());
-                    return HTTPRESPONSECODE_401_UNAUTHORIZED;
+                    return HTTP_STATUS_CODE_401_UNAUTHORIZED;
                 }
             }
             // Send back any clientfile. Otherwise keep looking for server files matching
@@ -2778,7 +3213,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
 
     SString err = "That resource file could not be found in that resource.";
     ipoHttpResponse->SetBody(err.c_str(), err.size());
-    return HTTPRESPONSECODE_404_NOTFOUND;
+    return HTTP_STATUS_CODE_404_NOT_FOUND;
 }
 
 // Return true if http access allowed for the supplied account
@@ -3406,4 +3841,17 @@ bool CResource::IsFileDbConnectMysqlProtected(const SString& strAbsFilename, boo
     }
 
     return false;
+}
+
+CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
+{
+    for (CResourceFile* resourceFile : m_ResourceFiles)
+    {
+        if (!stricmp(relativePath.c_str(), resourceFile->GetName()))
+        {
+            return resourceFile;
+        }
+    }
+
+    return nullptr;
 }

@@ -150,6 +150,7 @@ private:
     // Fade variables
     unsigned char m_ucFade;
     float         m_fFader;
+    bool          m_bCursorAlphaReset;
 
     // Animation variables
     unsigned long ulPreviousTick;

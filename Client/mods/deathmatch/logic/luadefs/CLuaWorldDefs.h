@@ -15,9 +15,11 @@ class CLuaWorldDefs : public CLuaDefs
 public:
     static void LoadFunctions();
 
+
     LUA_DECLARE(GetTime);
     LUA_DECLARE(GetGroundPosition);
     LUA_DECLARE(GetRoofPosition);
+    static std::variant<bool, CLuaMultiReturn<bool, float, float, const char*, const char*, float, float, float>> ProcessLineAgainstMesh(CClientEntity* e, CVector start, CVector end);
     LUA_DECLARE(ProcessLineOfSight);
     LUA_DECLARE(IsLineOfSightClear);
     LUA_DECLARE(GetWorldFromScreenPosition);
@@ -32,7 +34,7 @@ public:
     LUA_DECLARE(GetGaragePosition);
     LUA_DECLARE(GetGarageSize);
     LUA_DECLARE(GetGarageBoundingBox);
-    LUA_DECLARE(IsWorldSpecialPropertyEnabled);
+    static bool IsWorldSpecialPropertyEnabled(const WorldSpecialProperty property) noexcept;
     LUA_DECLARE(GetBlurLevel);
     LUA_DECLARE(GetTrafficLightState);
     LUA_DECLARE(AreTrafficLightsLocked);
@@ -55,7 +57,7 @@ public:
     LUA_DECLARE(SetMinuteDuration);
     LUA_DECLARE(SetWaveHeight);
     LUA_DECLARE(SetGarageOpen);
-    LUA_DECLARE(SetWorldSpecialPropertyEnabled);
+    static bool SetWorldSpecialPropertyEnabled(const WorldSpecialProperty property, const bool enabled) noexcept;
     LUA_DECLARE(SetBlurLevel);
     LUA_DECLARE(ResetBlurLevel);
     LUA_DECLARE(SetJetpackMaxHeight);
@@ -113,11 +115,38 @@ public:
 
     LUA_DECLARE(CreateExplosion);
 
-    static bool ResetColorFilter();
-    static bool SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha, uchar ucPass1Red, uchar ucPass1Green,
-                               uchar ucPass1Blue, uchar ucPass1Alpha);
+    static bool                                                                    ResetColorFilter();
+    static bool                                                                    SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
+                                                                                                  uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha);
+    static CLuaMultiReturn<uchar, uchar, uchar, uchar, uchar, uchar, uchar, uchar> GetColorFilter(bool isOriginal = false);
+
+    static bool SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier);
+    static bool SetGrainLevel(uchar ucLevel);
 
     static bool  SetCoronaReflectionsEnabled(uchar ucEnabled);
     static uchar GetCoronaReflectionsEnabled();
     static bool  ResetCoronaReflectionsEnabled();
+
+    static std::variant<bool, float, CLuaMultiReturn<float, float, float>> GetWorldProperty(eWorldProperty property);
+    static bool SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3);
+    static bool ResetWorldProperty(eWorldProperty property);
+
+    static bool SetTimeFrozen(bool value) noexcept;
+    static bool IsTimeFrozen() noexcept;
+    static bool ResetTimeFrozen() noexcept;
+    
+    static bool SetVolumetricShadowsEnabled(bool enable) noexcept;
+    static bool IsVolumetricShadowsEnabled() noexcept;
+    static bool ResetVolumetricShadows() noexcept;
+    
+    static void ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept;
+
+    static bool SetDynamicPedShadowsEnabled(bool enable);
+    static bool IsDynamicPedShadowsEnabled() noexcept;
+    static bool ResetDynamicPedShadows() noexcept;
+
+    static CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore);
+
+    static void RemoveGameWorld();
+    static void RestoreGameWorld();
 };

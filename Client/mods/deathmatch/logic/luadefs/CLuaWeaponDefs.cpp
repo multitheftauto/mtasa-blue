@@ -39,6 +39,8 @@ void CLuaWeaponDefs::LoadFunctions()
         {"getWeaponClipAmmo", GetWeaponClipAmmo},
         {"setWeaponAmmo", SetWeaponAmmo},
         {"setWeaponClipAmmo", SetWeaponClipAmmo},
+        {"setWeaponRenderEnabled", ArgumentParser<SetWeaponRenderEnabled>},
+        {"isWeaponRenderEnabled", ArgumentParser<IsWeaponRenderEnabled>}
     };
 
     // Add functions
@@ -978,4 +980,15 @@ int CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaWeaponDefs::SetWeaponRenderEnabled(bool enabled)
+{
+    g_pClientGame->SetWeaponRenderEnabled(enabled);
+    return true;
+}
+
+bool CLuaWeaponDefs::IsWeaponRenderEnabled()
+{
+    return g_pClientGame->IsWeaponRenderEnabled();
 }

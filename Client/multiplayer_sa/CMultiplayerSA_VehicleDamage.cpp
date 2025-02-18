@@ -145,15 +145,10 @@ bool OnMY_CVehicle_InflictDamage(CVehicleSAInterface* pVehicle, CEntitySAInterfa
 }
 
 // Hook info
-#define HOOKPOS_CVehicle_InflictDamage_US                       0x06D7C90
-#define HOOKSIZE_CVehicle_InflictDamage_US                      5
-#define HOOKCHECK_CVehicle_InflictDamage_US                     0x6A
-#define HOOKPOS_CVehicle_InflictDamage_EU                       0x06D7C90
-#define HOOKSIZE_CVehicle_InflictDamage_EU                      5
-#define HOOKCHECK_CVehicle_InflictDamage_EU                     0x6A
-DWORD RETURN_CVehicle_InflictDamage_US = 0x0404CDC;
-DWORD RETURN_CVehicle_InflictDamage_EU = 0x0404CE3;
-DWORD RETURN_CVehicle_InflictDamage_BOTH = 0;
+#define HOOKPOS_CVehicle_InflictDamage                          0x06D7C90
+#define HOOKSIZE_CVehicle_InflictDamage                         5
+#define HOOKCHECK_CVehicle_InflictDamage                        0x6A
+DWORD RETURN_CVehicle_InflictDamage = 0x0404CDC;
 void _declspec(naked) HOOK_CVehicle_InflictDamage()
 {
     _asm
@@ -178,7 +173,7 @@ cont:
 
         popad
         push    0FFFFFFFFh
-        jmp     RETURN_CVehicle_InflictDamage_BOTH
+        jmp     RETURN_CVehicle_InflictDamage
     }
 }
 

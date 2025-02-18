@@ -236,7 +236,7 @@ bool CScreenGrabber::GetBackBufferPixels(uint uiSizeX, uint uiSizeY, CBuffer& bu
 
         // Try to create new one if needed
         if (uiSizeX > 0)
-            m_pScreenShotTemp = CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget(uiSizeX, uiSizeY, false, true);
+            m_pScreenShotTemp = CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget(uiSizeX, uiSizeY, false, false, 0, true);
     }
 
     if (!m_pScreenShotTemp)

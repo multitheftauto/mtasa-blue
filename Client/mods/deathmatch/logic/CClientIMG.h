@@ -50,15 +50,15 @@ public:
     CClientIMG(class CClientManager* pManager, ElementID ID);
     ~CClientIMG();
 
-    void Unlink(){};
+    void Unlink();
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
     eClientEntityType GetType() const { return CCLIENTIMG; }
-    unsigned char     GetArchiveID() { return m_ucArchiveID; }
-    unsigned int      GetFilesCount() { return m_fileInfos.size(); }
+    unsigned char     GetArchiveID() const { return m_ucArchiveID; }
+    unsigned int      GetFilesCount() const { return m_fileInfos.size(); }
     const auto&       GetFileInfos() const noexcept { return m_fileInfos; }
-    unsigned short    GetRequiredBufferSize() { return m_usRequiredBufferSize; }
+    auto              GetLargestFileSizeBlocks() const { return m_LargestFileSizeBlocks; }
 
     bool Load(fs::path filePath);
     void Unload();
@@ -78,10 +78,10 @@ private:
     class CClientIMGManager* m_pImgManager;
 
     std::ifstream             m_ifs;
-    std::string               m_filePath;
+    fs::path                  m_filePath;
     unsigned char             m_ucArchiveID;
     std::vector<tImgFileInfo> m_fileInfos;
-    unsigned short            m_usRequiredBufferSize;
+    size_t                    m_LargestFileSizeBlocks; // The size of the largest file [in streaming blocks/sectors]
 
     std::vector<tLinkedModelRestoreInfo> m_restoreInfo;
 };

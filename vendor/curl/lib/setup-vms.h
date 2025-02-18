@@ -101,7 +101,7 @@ static char *vms_translate_path(const char *path)
   }
 }
 #   else
-    /* VMS translate path is actually not needed on the current 64 bit */
+    /* VMS translate path is actually not needed on the current 64-bit */
     /* VMS platforms, so instead of figuring out the pointer settings */
     /* Change it to a noop */
 #   define vms_translate_path(__path) __path
@@ -144,7 +144,7 @@ static struct passwd *vms_getpwuid(uid_t uid)
 {
   struct passwd *my_passwd;
 
-/* Hack needed to support 64 bit builds, decc_getpwnam is 32 bit only */
+/* Hack needed to support 64-bit builds, decc_getpwnam is 32-bit only */
 #ifdef __DECC
 #   if __INITIAL_POINTER_SIZE
   __char_ptr32 unix_path;
@@ -262,7 +262,6 @@ static struct passwd *vms_getpwuid(uid_t uid)
 #define PKCS12_parse PKCS12_PARSE
 #define RAND_add RAND_ADD
 #define RAND_bytes RAND_BYTES
-#define RAND_egd RAND_EGD
 #define RAND_file_name RAND_FILE_NAME
 #define RAND_load_file RAND_LOAD_FILE
 #define RAND_status RAND_STATUS
@@ -375,8 +374,8 @@ static struct passwd *vms_getpwuid(uid_t uid)
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #ifndef AI_NUMERICHOST
-#ifdef ENABLE_IPV6
-#undef ENABLE_IPV6
+#ifdef USE_IPV6
+#undef USE_IPV6
 #endif
 #endif
 #endif

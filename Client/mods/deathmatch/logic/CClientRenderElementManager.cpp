@@ -168,10 +168,11 @@ CClientShader* CClientRenderElementManager::CreateShader(const SString& strFile,
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientRenderTarget* CClientRenderElementManager::CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel)
+CClientRenderTarget* CClientRenderElementManager::CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel,
+                                                                     _D3DFORMAT surfaceFormat)
 {
     // Create the item
-    CRenderTargetItem* pRenderTargetItem = m_pRenderItemManager->CreateRenderTarget(uiSizeX, uiSizeY, bWithAlphaChannel);
+    CRenderTargetItem* pRenderTargetItem = m_pRenderItemManager->CreateRenderTarget(uiSizeX, uiSizeY, bHasSurfaceFormat, bWithAlphaChannel, surfaceFormat);
 
     // Check create worked
     if (!pRenderTargetItem)

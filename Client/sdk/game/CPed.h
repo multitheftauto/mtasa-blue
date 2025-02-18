@@ -25,6 +25,7 @@ class CTaskManager;
 class CVehicle;
 class CWeapon;
 class CWeaponStat;
+class CProjectileSAInterface;
 
 enum ePedPieceTypes
 {
@@ -170,6 +171,13 @@ namespace EPedWeaponAudioEvent
 }
 using EPedWeaponAudioEvent::EPedWeaponAudioEventType;
 
+struct SSatchelsData
+{
+    CProjectileSAInterface* pProjectileInterface;
+    CVector*                vecAttachedOffsets;
+    CVector*                vecAttachedRotation;
+};
+
 class CPed : public virtual CPhysical
 {
 public:
@@ -183,12 +191,11 @@ public:
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
     virtual void SetModelIndex(unsigned long ulModel) = 0;
-    virtual void RemoveGeometryRef() = 0;
 
     virtual float    GetHealth() = 0;
     virtual void     SetHealth(float fHealth) = 0;
     virtual float    GetArmor() = 0;
-    virtual void     SetArmor(float fArmor) = 0;
+    virtual void     SetArmor(float armor) = 0;
     virtual float    GetOxygenLevel() = 0;
     virtual void     SetOxygenLevel(float fOxygen) = 0;
     virtual bool     AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
@@ -253,9 +260,6 @@ public:
     virtual void         SetFootBlood(unsigned int uiFootBlood) = 0;
     virtual unsigned int GetFootBlood() = 0;
 
-    virtual bool IsOnFire() = 0;
-    virtual void SetOnFire(bool bOnFire) = 0;
-
     virtual bool GetStayInSamePlace() = 0;
     virtual void SetStayInSamePlace(bool bStay) = 0;
 
@@ -263,6 +267,7 @@ public:
     virtual void GetVoice(const char** pszVoiceType, const char** pszVoice) = 0;
     virtual void SetVoice(short sVoiceType, short sVoiceID) = 0;
     virtual void SetVoice(const char* szVoiceType, const char* szVoice) = 0;
+    virtual void ResetVoice() = 0;
     virtual void SetLanding(bool bIsLanding) = 0;
     virtual void SetUpdateMetricsRequired(bool required) = 0;
 
@@ -276,4 +281,9 @@ public:
     virtual CPedIKSAInterface*      GetPedIKInterface() = 0;
     virtual void*                   GetPedNodeInterface(std::int32_t nodeId) = 0;
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
+
+    virtual CEntitySAInterface* GetTargetedObject() = 0;
+    virtual ePedState           GetPedState() = 0;
+
+    virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
 };

@@ -13,6 +13,7 @@
 #include <game/CAudioEngine.h>
 #include <game/CRenderWare.h>
 #include <game/CHud.h>
+#include <game/CStreaming.h>
 #include <type_traits>
 
 enum eLuaType
@@ -60,6 +61,7 @@ DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
 DECLARE_ENUM(eVehicleDummies);
+DECLARE_ENUM_CLASS(eGrainMultiplierType);
 DECLARE_ENUM_CLASS(eResizableVehicleWheelGroup);
 DECLARE_ENUM(eSurfaceProperties);
 DECLARE_ENUM(eSurfaceAudio);
@@ -79,6 +81,16 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
 DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
+DECLARE_ENUM_CLASS(_D3DFORMAT);
+DECLARE_ENUM_CLASS(eRenderStage);
+DECLARE_ENUM_CLASS(eFxParticleSystems);
+DECLARE_ENUM(ePools);
+DECLARE_ENUM(eWorldProperty);
+DECLARE_ENUM_CLASS(eModelLoadState);
+DECLARE_ENUM_CLASS(PreloadAreaOption);
+DECLARE_ENUM_CLASS(taskType);
+DECLARE_ENUM(eEntityType);
+
 
 class CRemoteCall;
 
@@ -99,6 +111,9 @@ enum eDXVerticalAlign
 DECLARE_ENUM(eDXVerticalAlign);
 
 DECLARE_ENUM(eHudComponent);
+DECLARE_ENUM_CLASS(eHudComponentProperty);
+DECLARE_ENUM_CLASS(eFontStyle);
+DECLARE_ENUM_CLASS(eFontAlignment);
 
 enum eFieldOfViewMode
 {
@@ -269,6 +284,10 @@ inline SString GetClassTypeName(CClientTXD*)
 inline SString GetClassTypeName(CClientIMG*)
 {
     return "img";
+}
+inline SString GetClassTypeName(CClientBuilding*)
+{
+    return "building";
 }
 inline SString GetClassTypeName(CClientSound*)
 {
@@ -488,6 +507,10 @@ inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
 {
     return "soundeffect-params-reverb";
 }
+inline SString GetClassTypeName(eWorldProperty*)
+{
+    return "world-property";
+}
 
 inline SString GetClassTypeName(CClientVectorGraphic*)
 {
@@ -567,7 +590,9 @@ class CScriptArgReader;
 void MixedReadDxFontString(CScriptArgReader& argStream, eFontType& outFontType, eFontType defaultFontType, CClientDxFont*& poutDxFontElement);
 void MixedReadGuiFontString(CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& poutGuiFontElement);
 void MixedReadMaterialString(CScriptArgReader& argStream, CClientMaterial*& pMaterialElement);
+bool IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept;
 bool ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix);
+void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* szReason);
 bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason = nullptr);
 void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
 

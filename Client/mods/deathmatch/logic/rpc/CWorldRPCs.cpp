@@ -17,6 +17,7 @@
 #include <game/CGarage.h>
 #include <game/CClock.h>
 #include <game/CWeaponStatManager.h>
+#include <game/CBuildingRemoval.h>
 #include "CWorldRPCs.h"
 
 void CWorldRPCs::LoadFunctions()
@@ -68,6 +69,10 @@ void CWorldRPCs::LoadFunctions()
 
     AddHandler(SET_MOON_SIZE, SetMoonSize, "SetMoonSize");
     AddHandler(RESET_MOON_SIZE, ResetMoonSize, "ResetMoonSize");
+
+    AddHandler(SET_WORLD_SPECIAL_PROPERTY, SetWorldSpecialPropertyEnabled, "SetWorldSpecialPropertyEnabled");
+
+    AddHandler(RESET_WORLD_PROPERTIES, ResetWorldProperties, "ResetWorldProperties");
 }
 
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
@@ -580,7 +585,7 @@ void CWorldRPCs::RemoveWorldModel(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 }
 
@@ -595,13 +600,13 @@ void CWorldRPCs::RestoreWorldModel(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RestoreBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RestoreBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 }
 
 void CWorldRPCs::RestoreAllWorldModels(NetBitStreamInterface& bitStream)
 {
-    g_pGame->GetWorld()->ClearRemovedBuildingLists();
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
 }
 
 void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)
@@ -614,6 +619,12 @@ void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)
     bitStream.Read(g_TickRateSettings.iObjectSync);
     bitStream.Read(g_TickRateSettings.iKeySyncRotation);
     bitStream.Read(g_TickRateSettings.iKeySyncAnalogMove);
+
+    if (bitStream.Can(eBitStreamVersion::FixSyncerDistance))
+    {
+        bitStream.Read(g_TickRateSettings.iPedSyncerDistance);
+        bitStream.Read(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+    }
 }
 
 void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)
@@ -629,4 +640,25 @@ void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)
 void CWorldRPCs::ResetMoonSize(NetBitStreamInterface& bitStream)
 {
     g_pMultiplayer->ResetMoonSize();
+}
+
+void CWorldRPCs::SetWorldSpecialPropertyEnabled(NetBitStreamInterface& bitStream)
+{
+    uchar property;
+    bool  isEnabled;
+    if (bitStream.Read(property) && bitStream.ReadBit(isEnabled))
+    {
+        g_pClientGame->SetWorldSpecialProperty((WorldSpecialProperty)property, isEnabled);
+    }
+}
+
+void CWorldRPCs::ResetWorldProperties(NetBitStreamInterface& bitStream)
+{
+    bool resetSpecialProperties = bitStream.ReadBit();
+    bool resetWorldProperties = bitStream.ReadBit();
+    bool resetWeatherProperties = bitStream.ReadBit();
+    bool resetLODs = bitStream.ReadBit();
+    bool resetSounds = bitStream.ReadBit();
+
+    g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialProperties, resetWorldProperties, resetWeatherProperties, resetLODs, resetSounds});
 }

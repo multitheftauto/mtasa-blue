@@ -101,9 +101,9 @@ void CClientWebBrowser::InjectMouseMove(int iPosX, int iPosY)
     m_pWebView->InjectMouseMove(iPosX, iPosY);
 }
 
-void CClientWebBrowser::InjectMouseDown(eWebBrowserMouseButton mouseButton)
+void CClientWebBrowser::InjectMouseDown(eWebBrowserMouseButton mouseButton, int count)
 {
-    m_pWebView->InjectMouseDown(mouseButton);
+    m_pWebView->InjectMouseDown(mouseButton, count);
 }
 
 void CClientWebBrowser::InjectMouseUp(eWebBrowserMouseButton mouseButton)
@@ -303,6 +303,16 @@ void CClientWebBrowser::Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHan
     auto    callback = callbackMapEntry->second;
     SString result = callback(pHandler->GetGetData(), pHandler->GetPostData());
     pHandler->SetResponse(result);
+}
+
+void CClientWebBrowser::Events_OnConsoleMessage(const std::string& message, const std::string& source, int line, std::int16_t level)
+{
+    CLuaArguments arguments;
+    arguments.PushString(message);
+    arguments.PushString(source);
+    arguments.PushNumber(line);
+    arguments.PushNumber(level);
+    CallEvent("onClientBrowserConsoleMessage", arguments, false);
 }
 
 bool CClientWebBrowser::AddAjaxHandler(const SString& strURL, ajax_callback_t& handler)

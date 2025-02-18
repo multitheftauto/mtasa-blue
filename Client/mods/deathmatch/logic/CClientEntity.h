@@ -79,6 +79,7 @@ enum eClientEntityType
     CCLIENTVECTORGRAPHIC,
     CCLIENTUNKNOWN,
     CCLIENTIMG,
+    CCLIENTBUILDING,
 };
 
 class CEntity;
@@ -143,6 +144,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientPointLights,
     CLASS_CClientSearchLight,
     CLASS_CClientIMG,
+    CLASS_CClientBuilding,
 };
 
 class CClientEntity : public CClientEntityBase
@@ -329,6 +331,9 @@ public:
     bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
+    virtual bool IsOnFire() { return false; }
+    virtual bool SetOnFire(bool onFire) { return false; }
+
 protected:
     CClientManager*         m_pManager;
     CClientEntity*          m_pParent;
@@ -339,11 +344,8 @@ protected:
     CCustomData* m_pCustomData;
 
     ElementID m_ID;
-    CVector   m_vecRelativePosition;
 
     unsigned short m_usDimension;
-
-    unsigned int m_uiLine;
 
 private:
     unsigned int m_uiTypeHash;

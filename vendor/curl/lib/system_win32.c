@@ -24,7 +24,7 @@
 
 #include "curl_setup.h"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 #include <curl/curl.h>
 #include "system_win32.h"
@@ -45,11 +45,11 @@ static HMODULE s_hIpHlpApiDll = NULL;
 /* Pointer to the if_nametoindex function */
 IF_NAMETOINDEX_FN Curl_if_nametoindex = NULL;
 
-/* Curl_win32_init() performs win32 global initialization */
+/* Curl_win32_init() performs Win32 global initialization */
 CURLcode Curl_win32_init(long flags)
 {
   /* CURL_GLOBAL_WIN32 controls the *optional* part of the initialization which
-     is just for Winsock at the moment. Any required win32 initialization
+     is just for Winsock at the moment. Any required Win32 initialization
      should take place after this block. */
   if(flags & CURL_GLOBAL_WIN32) {
 #ifdef USE_WINSOCK
@@ -61,7 +61,7 @@ CURLcode Curl_win32_init(long flags)
     res = WSAStartup(wVersionRequested, &wsaData);
 
     if(res)
-      /* Tell the user that we couldn't find a usable */
+      /* Tell the user that we could not find a usable */
       /* winsock.dll.     */
       return CURLE_FAILED_INIT;
 
@@ -73,7 +73,7 @@ CURLcode Curl_win32_init(long flags)
 
     if(LOBYTE(wsaData.wVersion) != LOBYTE(wVersionRequested) ||
        HIBYTE(wsaData.wVersion) != HIBYTE(wVersionRequested) ) {
-      /* Tell the user that we couldn't find a usable */
+      /* Tell the user that we could not find a usable */
 
       /* winsock.dll. */
       WSACleanup();
@@ -175,11 +175,11 @@ typedef HMODULE (APIENTRY *LOADLIBRARYEX_FN)(LPCTSTR, HANDLE, DWORD);
  */
 HMODULE Curl_load_library(LPCTSTR filename)
 {
-#ifndef CURL_WINDOWS_APP
+#ifndef CURL_WINDOWS_UWP
   HMODULE hModule = NULL;
   LOADLIBRARYEX_FN pLoadLibraryEx = NULL;
 
-  /* Get a handle to kernel32 so we can access it's functions at runtime */
+  /* Get a handle to kernel32 so we can access its functions at runtime */
   HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32"));
   if(!hKernel32)
     return NULL;
@@ -190,7 +190,7 @@ HMODULE Curl_load_library(LPCTSTR filename)
     CURLX_FUNCTION_CAST(LOADLIBRARYEX_FN,
                         (GetProcAddress(hKernel32, LOADLIBARYEX)));
 
-  /* Detect if there's already a path in the filename and load the library if
+  /* Detect if there is already a path in the filename and load the library if
      there is. Note: Both back slashes and forward slashes have been supported
      since the earlier days of DOS at an API level although they are not
      supported by command prompt */
@@ -232,10 +232,10 @@ HMODULE Curl_load_library(LPCTSTR filename)
   }
   return hModule;
 #else
-  /* the Universal Windows Platform (UWP) can't do this */
+  /* the Universal Windows Platform (UWP) cannot do this */
   (void)filename;
   return NULL;
 #endif
 }
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
