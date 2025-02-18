@@ -314,8 +314,7 @@ private:
     CMessageLoopHook*        m_pMessageLoopHook;
     CDirectInputHookManager* m_pDirectInputHookManager;
     CDirect3DHookManager*    m_pDirect3DHookManager;
-    // CFileSystemHook *           m_pFileSystemHook;
-    CSetCursorPosHook* m_pSetCursorPosHook;
+    CSetCursorPosHook*       m_pSetCursorPosHook;
 
     bool m_bLastFocused;
     int  m_iUnminimizeFrameCounter;

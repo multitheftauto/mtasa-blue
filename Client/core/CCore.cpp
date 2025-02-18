@@ -136,7 +136,6 @@ CCore::CCore()
     m_pMouseControl = new CMouseControl();
 
     // Create our hook objects.
-    // m_pFileSystemHook           = new CFileSystemHook ( );
     m_pDirect3DHookManager = new CDirect3DHookManager();
     m_pDirectInputHookManager = new CDirectInputHookManager();
     m_pMessageLoopHook = new CMessageLoopHook();
@@ -210,7 +209,6 @@ CCore::~CCore()
 
     // Delete hooks.
     delete m_pSetCursorPosHook;
-    // delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
 
@@ -839,11 +837,7 @@ void CCore::ApplyHooks()
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
     // m_pDirect3DHookManager->ApplyHook ( );
-    // m_pFileSystemHook->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook();
-
-    // Redirect basic files.
-    // m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
