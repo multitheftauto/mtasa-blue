@@ -2558,7 +2558,7 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
 bool CStaticFunctionDefinitions::SetPedStat(CClientEntity& Entity, ushort usStat, float fValue)
 {
     RUN_CHILDREN(SetPedStat(**iter, usStat, fValue))
-    if (IS_PED(&Entity) && Entity.IsLocalEntity())
+    if (IS_PED(&Entity))
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         // Dont let them set visual stats if they don't have the CJ model
