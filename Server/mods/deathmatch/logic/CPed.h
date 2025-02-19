@@ -193,8 +193,8 @@ public:
     float GetMaxHealth();
     float GetHealth() { return m_fHealth; }
     void  SetHealth(float fHealth) { m_fHealth = fHealth; }
-    float GetArmor() { return m_fArmor; }
-    void  SetArmor(float fArmor) { m_fArmor = fArmor; }
+    float GetArmor() const noexcept { return m_armor; }
+    void  SetArmor(float armor) noexcept { m_armor = std::clamp(armor, 0.0f, 100.0f); }
 
     float GetPlayerStat(unsigned short usStat) { return (usStat < NUM_PLAYER_STATS) ? m_fStats[usStat] : 0; }
     void  SetPlayerStat(unsigned short usStat, float fValue)
@@ -235,6 +235,9 @@ public:
 
     float GetRotation() { return m_fRotation; }
     void  SetRotation(float fRotation) { m_fRotation = fRotation; }
+
+    float GetCameraRotation() const { return m_cameraRotation; }
+    void  SetCameraRotation(float fRotation) { m_cameraRotation = fRotation; }
 
     void GetRotation(CVector& vecRotation);
     void GetMatrix(CMatrix& matrix);
@@ -317,7 +320,7 @@ protected:
     bool                                 m_bWearingGoggles;
     bool                                 m_bIsOnFire;
     float                                m_fHealth;
-    float                                m_fArmor;
+    float                                m_armor;
     SFixedArray<float, NUM_PLAYER_STATS> m_fStats;
     CPlayerClothes*                      m_pClothes;
     bool                                 m_bHasJetPack;
@@ -346,6 +349,7 @@ protected:
     bool                                 m_reloadingWeapon{};
     CVehicle*                            m_pJackingVehicle;
     SPlayerAnimData                      m_animData{};
+    float                                m_cameraRotation{};
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;
