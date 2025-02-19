@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-19 02:18+0000\n"
+"POT-Creation-Date: 2025-02-19 11:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,7 +58,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1377
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1426
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1438
-#: Client/game_sa/CGameSA.cpp:260 Client/game_sa/CGameSA.cpp:271
+#: Client/game_sa/CGameSA.cpp:259 Client/game_sa/CGameSA.cpp:270
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
@@ -2053,7 +2053,7 @@ msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
-#: Client/core/ServerBrowser/CServerInfo.cpp:319 Client/game_sa/CGameSA.cpp:267
+#: Client/core/ServerBrowser/CServerInfo.cpp:319 Client/game_sa/CGameSA.cpp:266
 #: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
 #: Client/loader/MainFunctions.cpp:1219
 msgid "Information"
@@ -2769,11 +2769,11 @@ msgstr ""
 msgid "Wasted"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:254 Client/game_sa/CGameSA.cpp:265
+#: Client/game_sa/CGameSA.cpp:253 Client/game_sa/CGameSA.cpp:264
 msgid "Failed initialization game_sa"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:256
+#: Client/game_sa/CGameSA.cpp:255
 msgid "Memory allocations failed"
 msgstr ""
 
