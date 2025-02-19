@@ -38,7 +38,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_bWearingGoggles = false;
 
     m_fHealth = 0.0f;
-    m_fArmor = 0.0f;
+    m_armor = 0.0f;
 
     memset(&m_fStats[0], 0, sizeof(m_fStats));
     m_fStats[24] = 569.0f;            // default max_health
@@ -239,7 +239,7 @@ bool CPed::ReadSpecialData(const int iLine)
         m_fHealth = 100.0f;
 
     // Grab the "armor" data
-    GetCustomDataFloat("armor", m_fArmor, true);
+    GetCustomDataFloat("armor", m_armor, true);
 
     // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))

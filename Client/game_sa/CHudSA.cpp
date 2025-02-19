@@ -837,7 +837,7 @@ void __fastcall CHudSA::RenderWeaponIcon_Sprite(void* sprite, void*, CRect* rect
         color->a = properties.fillColorSecondary.a;
 
     // Call CSprite2d::Draw
-    ((void(__thiscall*)(void*, CRect*, RwColor*))FUNC_CSprie2d_Draw)(sprite, rect, color);
+    ((void(__thiscall*)(void*, CRect*, RwColor*))FUNC_CSprite2d_Draw)(sprite, rect, color);
 }
 
 void CHudSA::RenderWeaponIcon_XLU(CVector pos, CVector2D halfSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint16_t intensity, float rhw, std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir)

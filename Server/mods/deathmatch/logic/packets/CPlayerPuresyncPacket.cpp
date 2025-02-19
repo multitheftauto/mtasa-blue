@@ -62,6 +62,9 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         pSourcePlayer->SetOnFire(flags.data.bIsOnFire);
         pSourcePlayer->SetStealthAiming(flags.data.bStealthAiming);
 
+        if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+            pSourcePlayer->SetReloadingWeapon(flags.data2.isReloadingWeapon);
+
         // Contact element
         CElement* pContactElement = NULL;
         if (flags.data.bHasContact)
@@ -127,6 +130,28 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             // Get the true position
             CVector vecTempPos = pContactElement->GetPosition();
             position.data.vecPosition += vecTempPos;
+        }
+
+        // if (position.data.vecPosition.fX != 0.0f || position.data.vecPosition.fY != 0.0f || position.data.vecPosition.fZ != 0.0f)
+        {
+            CVector playerPosition = pSourcePlayer->GetPosition();
+            float playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);
+            if (playerDistancePosition >= g_TickRateSettings.playerTeleportAlert)
+            {
+                if (!pSourcePlayer->GetTeleported())
+                {
+                    CLuaArguments arguments;
+                    arguments.PushNumber(playerPosition.fX);
+                    arguments.PushNumber(playerPosition.fY);
+                    arguments.PushNumber(playerPosition.fZ);
+                    arguments.PushNumber(position.data.vecPosition.fX);
+                    arguments.PushNumber(position.data.vecPosition.fY);
+                    arguments.PushNumber(position.data.vecPosition.fZ);
+                    pSourcePlayer->CallEvent("onPlayerTeleport", arguments, nullptr);
+                }
+
+                pSourcePlayer->SetTeleported(false);
+            }
         }
 
         pSourcePlayer->SetPosition(position.data.vecPosition);
@@ -340,6 +365,9 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         flags.data.bHasAWeapon = (ucWeaponSlot != 0);
         flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || pSourcePlayer->IsSyncingVelocity());
         flags.data.bStealthAiming = (pSourcePlayer->IsStealthAiming() == true);
+
+        if (pSourcePlayer->CanBitStream(eBitStreamVersion::IsPedReloadingWeapon))
+            flags.data2.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
 
         CVector vecPosition = pSourcePlayer->GetPosition();
         if (pContactElement)

@@ -105,8 +105,10 @@ struct SLastSyncedPedData
     CVector vPosition;
     CVector vVelocity;
     float   fRotation;
+    float   cameraRotation{};
     bool    bOnFire;
     bool    bIsInWater;
+    bool    isReloadingWeapon;
 };
 
 struct SRestoreWeaponItem
@@ -204,7 +206,7 @@ public:
     float GetCurrentRotation();
     void  SetCurrentRotation(float fRotation, bool bIncludeTarget = true);
     void  SetTargetRotation(float fRotation);
-    void  SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation);
+    void  SetTargetRotation(unsigned long ulDelay, std::optional<float> rotation, std::optional<float> cameraRotation);
 
     float GetCameraRotation();
     void  SetCameraRotation(float fRotation);
@@ -266,17 +268,17 @@ public:
     float GetHealth();
     void  SetHealth(float fHealth);
     void  InternalSetHealth(float fHealth);
-    float GetArmor();
-    void  SetArmor(float fArmor);
+    float GetArmor() const noexcept;
+    void  SetArmor(float armor) noexcept;
     float GetOxygenLevel();
     void  SetOxygenLevel(float fOxygen);
 
     void LockHealth(float fHealth);
-    void LockArmor(float fArmor);
+    void LockArmor(float armor) noexcept;
     void UnlockHealth() noexcept { m_bHealthLocked = false; };
-    void UnlockArmor() noexcept { m_bArmorLocked = false; };
+    void UnlockArmor() noexcept { m_armorLocked = false; };
     bool IsHealthLocked() const noexcept { return m_bHealthLocked; };
-    bool IsArmorLocked() const noexcept { return m_bArmorLocked; };
+    bool IsArmorLocked() const noexcept { return m_armorLocked; };
 
     bool IsDying();
     bool IsDead();
@@ -495,9 +497,9 @@ public:
     bool GetBulletImpactData(CClientEntity** ppVictim = 0, CVector* pvecHitPosition = 0);
     void ClearBulletImpactData() { m_bBulletImpactData = false; }
 
-    bool CanReloadWeapon();
-    bool ReloadWeapon();
-    bool IsReloadingWeapon();
+    bool CanReloadWeapon() noexcept;
+    bool ReloadWeapon() noexcept;
+    bool IsReloadingWeapon() noexcept;
 
     bool ShouldBeStealthAiming();
     bool IsStealthAiming() { return m_bStealthAiming; }
@@ -618,7 +620,7 @@ public:
     bool                        m_bRadioOn;
     unsigned char               m_ucRadioChannel;
     bool                        m_bHealthLocked;
-    bool                        m_bArmorLocked;
+    bool                        m_armorLocked;
     unsigned long               m_ulLastOnScreenTime;
     CClientVehiclePtr           m_pOccupiedVehicle;
     CClientVehiclePtr           m_pOccupyingVehicle;
@@ -677,7 +679,7 @@ public:
     bool                                     m_bVisible;
     bool                                     m_bUsesCollision;
     float                                    m_fHealth;
-    float                                    m_fArmor;
+    float                                    m_armor;
     bool                                     m_bDead;
     bool                                     m_bWorldIgnored;
     float                                    m_fCurrentRotation;
