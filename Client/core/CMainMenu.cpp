@@ -606,7 +606,7 @@ void CMainMenu::Update()
 
                 if (pGUI)
                 {
-                    pGUI->SetCursorAlpha(1.0f);
+                    pGUI->ResetMenuCursorColor();            // Reset cursor menu color when we open up main menu
                     m_bCursorAlphaReset = true;
                 }
             }
@@ -792,7 +792,7 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
     m_bHideGame = !bOverlay;
 }
 
-bool CMainMenu::IsVisible()
+bool CMainMenu::IsVisible() const noexcept
 {
     return m_bIsVisible;
 }
