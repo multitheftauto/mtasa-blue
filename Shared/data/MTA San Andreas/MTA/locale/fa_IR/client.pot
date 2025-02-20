@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-02-19 11:28+0000\n"
-"PO-Revision-Date: 2025-02-19 15:14\n"
+"PO-Revision-Date: 2025-02-20 18:13\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -335,7 +335,7 @@ msgstr "برقراری اتصال در حال حاضر امکان پذیر نم�
 #: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4838
 #: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:133
 msgid "OK"
-msgstr "باشه"
+msgstr "تایید"
 
 #: Client/core/CVersionUpdater.cpp:1788
 msgid "Connecting"
@@ -435,7 +435,7 @@ msgstr "فایل های دستکاری شده GTA:SA"
 
 #: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
 msgid "Ok"
-msgstr "باشه"
+msgstr "تایید"
 
 #: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
@@ -1410,7 +1410,7 @@ msgstr "کنترل های آنلاین"
 
 #: Client/core/CSettings.cpp:2972 Client/core/CSettings.cpp:4817
 msgid "Your nickname contains invalid characters!"
-msgstr "لقب وارد شده حاوی کاراکتر های غیرمجاز است!"
+msgstr "نام مستعار وارد شده حاوی کاراکتر های غیرمجاز است!"
 
 #: Client/core/CSettings.cpp:3831
 msgid "Red:"
@@ -1511,13 +1511,13 @@ msgstr "قابلیت آزمایشی"
 
 #: Client/core/CSettings.cpp:4835
 msgid "Please enter a nickname"
-msgstr "لطفا یک لقب وارد نمایید"
+msgstr "لطفا یک نام مستعار وارد نمایید"
 
 #: Client/core/CSettings.cpp:4836
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr "لطفا یک لقب برای استفاده در بازی وارد نمایید.\n"
-"این لقب نام شما در سروری که به آن متصل شوید خواهد بود"
+msgstr "لطفاً یک نام مستعار برای استفاده در بازی وارد نمایید.\n"
+"این نام، زمانی که به سرور متصل می‌شوید و بازی می‌کنید، نمایش داده می‌شود"
 
 #: Client/core/CSettings.cpp:4854
 msgid "Very experimental feature."
