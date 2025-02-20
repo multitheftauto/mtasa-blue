@@ -5272,6 +5272,14 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
     }
 }
 
+void CClientPed::Say(const ePedSpeechContext& speechId, float probability)
+{
+    if (!m_pPlayerPed)
+        return;
+
+    m_pPlayerPed->Say(speechId, probability);
+}
+
 const char* CClientPed::GetBodyPartName(unsigned char ucID)
 {
     if (ucID <= 10)

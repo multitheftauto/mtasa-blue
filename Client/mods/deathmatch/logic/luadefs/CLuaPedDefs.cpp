@@ -15,6 +15,7 @@
 #include <game/CTasks.h>
 #include <game/TaskBasic.h>
 #include <game/CAnimManager.h>
+#include "CLuaPedDefs.h"
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
@@ -61,6 +62,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
         {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
         {"setPedBleeding", ArgumentParser<SetPedBleeding>},
+        {"pedSay", ArgumentParser<PedSay>},
 
         {"getPedVoice", GetPedVoice},
         {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
@@ -2496,4 +2498,17 @@ bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t t
         default:
             return false; 
     }
+}
+
+bool CLuaPedDefs::PedSay(CClientPed* ped, int speechId, std::optional<float> probabilty)
+{
+    auto speechContextId = static_cast<ePedSpeechContext>(speechId);
+    if (speechContextId < ePedSpeechContext::NOTHING || speechContextId >= ePedSpeechContext::NUM_PED_CONTEXT)
+        return false;
+
+    if (probabilty.has_value() && probabilty < 0.0f)
+        return false;
+
+    ped->Say(speechContextId, probabilty.value_or(1.0f));
+    return true;
 }
