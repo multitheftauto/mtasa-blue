@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-02-19 11:28+0000\n"
-"PO-Revision-Date: 2025-02-20 18:13\n"
+"PO-Revision-Date: 2025-02-20 23:03\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -1820,8 +1820,8 @@ msgstr "بیکار"
 #: Client/core/ServerBrowser/CServerList.cpp:150
 msgid "player"
 msgid_plural "players"
-msgstr[0] "پلیر"
-msgstr[1] "پلیر ها"
+msgstr[0] "بازیکن"
+msgstr[1] "بازیکنان"
 
 #: Client/core/ServerBrowser/CServerList.cpp:151
 msgid "on"
@@ -1926,7 +1926,7 @@ msgstr "جستجوی سرورها"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:257
 msgid "Search players"
-msgstr "جستجوی بازیکن‌ها"
+msgstr "جستجوی بازیکنان"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:258
@@ -1936,7 +1936,7 @@ msgstr "شروع جستجو"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:299
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1680
 msgid "Search players..."
-msgstr "جستجوی بازیکن‌ها..."
+msgstr "جستجوی بازیکنان..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:422
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1678
@@ -1949,7 +1949,7 @@ msgstr "نام"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:454
 msgid "Players"
-msgstr "بازیکن‌ها"
+msgstr "بازیکنان"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 msgid "Ping"
@@ -2076,7 +2076,7 @@ msgstr "نقشه:"
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:97
 msgid "Players:"
-msgstr "بازیکن‌ها:"
+msgstr "بازیکنان:"
 
 #. Passworded
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
