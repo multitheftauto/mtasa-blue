@@ -11487,6 +11487,15 @@ bool CStaticFunctionDefinitions::GetAccountSerial(CAccount* pAccount, SString& s
     return bRegistered;
 }
 
+
+bool CStaticFunctionDefinitions::SetAccountSerial(CAccount* account, const std::string& serial) noexcept
+{
+    if (account && account->IsRegistered())
+        return account->SetAccountSerial(serial);
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts)
 {
     m_pAccountManager->GetAccountsBySerial(strSerial, outAccounts);
