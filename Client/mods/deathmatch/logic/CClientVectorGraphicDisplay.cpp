@@ -42,6 +42,10 @@ void CClientVectorGraphicDisplay::Render()
     {
         m_pVectorGraphic->OnUpdate();
     }
+
+    // if we don't update the SVG, or vector graphic is deleted, after 60 seconds the display manager will destroy it
+    // see CClientDisplayManager::DoPulse
+    SetTimeTillExpiration(60 * 1000); 
 }
 
 void CClientVectorGraphicDisplay::UnpremultiplyBitmap(Bitmap& bitmap)
