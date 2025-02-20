@@ -30,7 +30,7 @@ short CPedSoundSA::GetVoiceID()
 
 void CPedSoundSA::SetVoiceTypeID(short sVoiceType)
 {
-    m_pInterface->m_sVoiceType = sVoiceType;
+    m_pInterface->m_sVoiceType = static_cast<ePedVoiceType>(sVoiceType);
 }
 
 void CPedSoundSA::SetVoiceID(short sVoiceID)

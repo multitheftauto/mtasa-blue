@@ -15,7 +15,7 @@
 
 class CVector;
 
-enum eWeaponSkill
+enum eWeaponSkill : std::uint8_t
 {
     WEAPONSKILL_POOR = 0,
     WEAPONSKILL_STD,
