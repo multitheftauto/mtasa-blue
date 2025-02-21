@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-02-19 11:28+0000\n"
-"PO-Revision-Date: 2025-02-20 23:03\n"
+"PO-Revision-Date: 2025-02-21 11:06\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -157,7 +157,7 @@ msgstr "خیر"
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
 msgid "Yes"
-msgstr "بلی"
+msgstr "بله"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:223
