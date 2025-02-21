@@ -540,6 +540,10 @@ enum class eBitStreamVersion : unsigned short
     // 2023-10-12
     CPlayerJoinCompletePacket_ServerName,
 
+    // Send rotation on detachElements
+    // 2024-04-12
+    DetachElementsRotation,
+    
     // Add "roadsignstext" to setWorldSpecialPropertyEnabled
     // 2024-05-17
     WorldSpecialProperty_RoadSignsText,

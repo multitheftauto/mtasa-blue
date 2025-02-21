@@ -1568,27 +1568,42 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
     assert(pElement);
     assert(pAttachedToElement);
 
-    if (pElement->IsAttachToable() && pAttachedToElement->IsAttachable() && !pAttachedToElement->IsAttachedToElement(pElement) &&
-        pElement->GetDimension() == pAttachedToElement->GetDimension())
+    if (!pElement->IsAttachToable() || !pAttachedToElement->IsAttachable() || pAttachedToElement->IsAttachedToElement(pElement) ||
+        pElement->GetDimension() != pAttachedToElement->GetDimension())
     {
-        pElement->SetAttachedOffsets(vecPosition, vecRotation);
-        ConvertDegreesToRadians(vecRotation);
-        pElement->AttachTo(pAttachedToElement);
-
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(pAttachedToElement->GetID());
-        BitStream.pBitStream->Write(vecPosition.fX);
-        BitStream.pBitStream->Write(vecPosition.fY);
-        BitStream.pBitStream->Write(vecPosition.fZ);
-        BitStream.pBitStream->Write(vecRotation.fX);
-        BitStream.pBitStream->Write(vecRotation.fY);
-        BitStream.pBitStream->Write(vecRotation.fZ);
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, ATTACH_ELEMENTS, *BitStream.pBitStream));
-
-        return true;
+        return false;
     }
 
-    return false;
+    CLuaArguments Arguments;
+    Arguments.PushElement(pAttachedToElement);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!pElement->CallEvent("onElementAttach", Arguments))
+    {
+        return false;
+    }
+
+    ConvertDegreesToRadians(vecRotation);
+
+    pElement->SetAttachedOffsets(vecPosition, vecRotation);
+    pElement->AttachTo(pAttachedToElement);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(pAttachedToElement->GetID());
+    BitStream.pBitStream->Write(vecPosition.fX);
+    BitStream.pBitStream->Write(vecPosition.fY);
+    BitStream.pBitStream->Write(vecPosition.fZ);
+    BitStream.pBitStream->Write(vecRotation.fX);
+    BitStream.pBitStream->Write(vecRotation.fY);
+    BitStream.pBitStream->Write(vecRotation.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, ATTACH_ELEMENTS, *BitStream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::DetachElements(CElement* pElement, CElement* pAttachedToElement)
@@ -1596,28 +1611,47 @@ bool CStaticFunctionDefinitions::DetachElements(CElement* pElement, CElement* pA
     assert(pElement);
 
     CElement* pActualAttachedToElement = pElement->GetAttachedToElement();
-    if (pActualAttachedToElement)
+    if (!pActualAttachedToElement || (pAttachedToElement && pActualAttachedToElement != pAttachedToElement))
     {
-        if (pAttachedToElement == NULL || pActualAttachedToElement == pAttachedToElement)
-        {
-            // Detach it. Also generate a new time context to prevent sync screwup from
-            // old packes arriving.
-            CVector vecPosition = pElement->GetPosition();
-            pElement->AttachTo(NULL);
-            pElement->GenerateSyncTimeContext();
-
-            CBitStream BitStream;
-            BitStream.pBitStream->Write(pElement->GetSyncTimeContext());
-            BitStream.pBitStream->Write(vecPosition.fX);
-            BitStream.pBitStream->Write(vecPosition.fY);
-            BitStream.pBitStream->Write(vecPosition.fZ);
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, DETACH_ELEMENTS, *BitStream.pBitStream));
-
-            return true;
-        }
+        return false;
     }
 
-    return false;
+    CVector vecPosition = pElement->GetPosition();
+    CVector vecRotation;
+
+    pElement->GetRotation(vecRotation);
+    ConvertRadiansToDegrees(vecRotation);
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(pActualAttachedToElement);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!pElement->CallEvent("onElementDetach", Arguments))
+    {
+        return false;
+    }
+
+    // Detach it. Also generate a new time context to prevent sync screwup from
+    // old packets arriving.
+    pElement->AttachTo(NULL);
+    pElement->GenerateSyncTimeContext();
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(pElement->GetSyncTimeContext());
+    BitStream.pBitStream->Write(vecPosition.fX);
+    BitStream.pBitStream->Write(vecPosition.fY);
+    BitStream.pBitStream->Write(vecPosition.fZ);
+    BitStream.pBitStream->Write(vecRotation.fX);
+    BitStream.pBitStream->Write(vecRotation.fY);
+    BitStream.pBitStream->Write(vecRotation.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, DETACH_ELEMENTS, *BitStream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetElementAlpha(CElement* pElement, unsigned char ucAlpha)
