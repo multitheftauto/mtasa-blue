@@ -2487,17 +2487,17 @@ bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t t
     {
         case taskType::PRIMARY_TASK:
         {
-            if (taskNumber == 4)
+            if (taskNumber == TASK_PRIORITY_DEFAULT)
                 throw LuaFunctionError("Killing TASK_PRIORITY_DEFAULT is not allowed");
 
-            if (taskNumber > 3)
+            if (taskNumber > TASK_PRIORITY_MAX)
                 throw LuaFunctionError("Invalid task slot number");
 
             return ped->KillTask(taskNumber, gracefully.value_or(true)); 
         }
         case taskType::SECONDARY_TASK:
         {
-            if (taskNumber > 5)
+            if (taskNumber > TASK_SECONDARY_MAX)
                 throw LuaFunctionError("Invalid task slot number");
 
             return ped->KillTaskSecondary(taskNumber, gracefully.value_or(true));
