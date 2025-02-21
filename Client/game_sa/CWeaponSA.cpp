@@ -68,7 +68,7 @@ void CWeaponSA::Update(CPed* ped)
         m_interface->Update(ped);
 }
 
-void CWeaponSA::AddGunshell(CEntity* firingEntity, CVector* vecOrigin, CVector2D* vecDirection, float size) const
+void CWeaponSA::AddGunshell(CEntity* firingEntity, const CVector& vecOrigin, const CVector2D& vecDirection, float size) const
 {
     if (m_interface && firingEntity)
         m_interface->AddGunshell(firingEntity, vecOrigin, vecDirection, size);
