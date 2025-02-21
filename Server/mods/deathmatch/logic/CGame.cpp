@@ -59,6 +59,7 @@
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
 #include "packets/CPlayerWorldSpecialPropertyPacket.h"
+#include "packets/CPlayerDamageCancelledPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CLuaPacket.h"
 #include "../utils/COpenPortsTester.h"
@@ -1322,6 +1323,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_PLAYER_DAMAGE_CANCELLED:
+        {
+            Packet_PlayerDamageCancelled(static_cast<CPlayerDamageCancelledPacket&>(Packet));
+            return true;
+        }
+
         default:
             break;
     }
@@ -1642,6 +1649,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
     m_Events.AddEvent("onPlayerChangesWorldSpecialProperty", "property, enabled", nullptr, false);
     m_Events.AddEvent("onPlayerTeleport", "previousX, previousY, previousZ, currentX, currentY, currentZ", nullptr, false);
+    m_Events.AddEvent("onPlayerDamageCancelled", "attacker, cause, bodypart, loss", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -4305,6 +4313,32 @@ void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket&
     arguments.PushBoolean(enabled);
 
     player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
+}
+
+void CGame::Packet_PlayerDamageCancelled(CPlayerDamageCancelledPacket& packet) noexcept
+{
+    CPlayer* player = packet.GetSourcePlayer();
+
+    if (!player)
+        return;
+
+    const std::uint32_t attacker = packet.GetAttacker();
+    const std::uint8_t cause = packet.GetCause();
+    const std::uint8_t bodypart = packet.GetBodypart();
+    const float loss = packet.GetLoss();
+
+    CLuaArguments arguments;
+
+    if (GetElementFromId<CElement>(attacker))
+        arguments.PushElement(GetElementFromId<CElement>(attacker));
+    else
+        arguments.PushNil();
+
+    arguments.PushNumber(cause);
+    arguments.PushNumber(bodypart);
+    arguments.PushNumber(loss);
+
+    player->CallEvent("onPlayerDamageCancelled", arguments, nullptr);
 }
 
 void CGame::Packet_PlayerModInfo(CPlayerModInfoPacket& Packet)

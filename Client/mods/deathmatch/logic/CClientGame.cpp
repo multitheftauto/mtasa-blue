@@ -4412,6 +4412,25 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             }
             pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
             pDamagedPed->GetGamePlayer()->SetArmor(fPreviousArmor);
+
+            if (IS_PLAYER(pDamagedPed) && pDamagedPed->IsLocalPlayer() && g_pNet->CanServerBitStream(eBitStreamVersion::PlayerDamageCancelled))
+            {
+                if (auto stream = g_pNet->AllocateNetBitStream())
+                {
+                    if (pInflictingEntity)
+                        stream->Write(pInflictingEntity->GetID());
+                    else
+                        stream->Write(0);
+
+                    stream->Write(static_cast<std::uint8_t>(weaponUsed));
+                    stream->Write(static_cast<std::uint8_t>(hitZone));
+                    stream->Write(fDamage);
+
+                    g_pNet->SendPacket(PACKET_ID_PLAYER_DAMAGE_CANCELLED, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+                    g_pNet->DeallocateNetBitStream(stream);
+                }
+            }
+
             return false;
         }
 
