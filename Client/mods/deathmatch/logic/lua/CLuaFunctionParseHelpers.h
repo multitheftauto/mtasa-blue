@@ -90,7 +90,7 @@ DECLARE_ENUM_CLASS(eModelLoadState);
 DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(taskType);
 DECLARE_ENUM(eEntityType);
-
+DECLARE_ENUM_CLASS(eVehicleAudioSettingProperty);
 
 class CRemoteCall;
 
@@ -515,6 +515,11 @@ inline SString GetClassTypeName(eWorldProperty*)
 inline SString GetClassTypeName(CClientVectorGraphic*)
 {
     return "svg";
+}
+
+inline SString GetClassByTypeName(eVehicleAudioSettingProperty)
+{
+    return "vehicle-audio-setting";
 }
 
 //
