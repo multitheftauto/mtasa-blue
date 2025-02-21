@@ -2481,16 +2481,25 @@ bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
     return pPed->ExitVehicle();
 }
 
-bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept
+bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) 
 {
     switch (taskType)
     {
         case taskType::PRIMARY_TASK:
         {
+            if (taskNumber == 4)
+                throw LuaFunctionError("Killing TASK_PRIORITY_DEFAULT is not allowed");
+
+            if (taskNumber > 3)
+                throw LuaFunctionError("Invaild task slot number");
+
             return ped->KillTask(taskNumber, gracefully.value_or(true)); 
         }
         case taskType::SECONDARY_TASK:
         {
+            if (taskNumber > 5)
+                throw LuaFunctionError("Invaild task slot number");
+
             return ped->KillTaskSecondary(taskNumber, gracefully.value_or(true));
         }
         default:
