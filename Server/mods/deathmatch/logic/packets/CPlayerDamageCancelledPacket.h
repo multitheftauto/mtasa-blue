@@ -23,7 +23,7 @@ public:
     unsigned long           GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
     virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_DEFAULT; }
 
-    bool Read(NetBitStreamInterface& stream) noexcept;
+    bool Read(NetBitStreamInterface& stream);
 
     std::uint32_t GetAttacker() const noexcept { return m_attacker; }
     std::uint8_t GetCause() const noexcept { return m_cause; }

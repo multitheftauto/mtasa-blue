@@ -4315,7 +4315,7 @@ void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket&
     player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
 }
 
-void CGame::Packet_PlayerDamageCancelled(CPlayerDamageCancelledPacket& packet) noexcept
+void CGame::Packet_PlayerDamageCancelled(CPlayerDamageCancelledPacket& packet)
 {
     CPlayer* player = packet.GetSourcePlayer();
 

@@ -4415,13 +4415,9 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 
             if (IS_PLAYER(pDamagedPed) && pDamagedPed->IsLocalPlayer() && g_pNet->CanServerBitStream(eBitStreamVersion::PlayerDamageCancelled))
             {
-                if (auto stream = g_pNet->AllocateNetBitStream())
+                if (auto* stream = g_pNet->AllocateNetBitStream())
                 {
-                    if (pInflictingEntity)
-                        stream->Write(pInflictingEntity->GetID());
-                    else
-                        stream->Write(0);
-
+                    stream->Write(pInflictingEntity ? pInflictingEntity->GetID() : 0);
                     stream->Write(static_cast<std::uint8_t>(weaponUsed));
                     stream->Write(static_cast<std::uint8_t>(hitZone));
                     stream->Write(fDamage);

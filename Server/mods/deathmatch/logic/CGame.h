@@ -519,7 +519,7 @@ private:
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
     void Packet_PlayerResourceStart(class CPlayerResourceStartPacket& Packet);
     void Packet_PlayerWorldSpecialProperty(class CPlayerWorldSpecialPropertyPacket& packet) noexcept;
-    void Packet_PlayerDamageCancelled(class CPlayerDamageCancelledPacket& packet) noexcept;
+    void Packet_PlayerDamageCancelled(class CPlayerDamageCancelledPacket& packet);
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 

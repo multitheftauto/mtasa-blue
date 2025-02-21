@@ -11,7 +11,7 @@
 #include "StdInc.h"
 #include "CPlayerDamageCancelledPacket.h"
 
-bool CPlayerDamageCancelledPacket::Read(NetBitStreamInterface& stream) noexcept
+bool CPlayerDamageCancelledPacket::Read(NetBitStreamInterface& stream)
 {
     stream.Read(m_attacker);
     stream.Read(m_cause);
