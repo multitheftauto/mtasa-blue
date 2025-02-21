@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CColPointSA.h"
 #include "CGameSA.h"
 #include "CPlayerPedSA.h"
 #include "CWeaponSA.h"

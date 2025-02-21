@@ -11,9 +11,6 @@
 
 #pragma once
 
-#include "Common.h"
-#include "CWeaponInfo.h"
-
 class CColPoint;
 class CPed;
 class CVector;
@@ -23,7 +20,6 @@ class CWeaponStat;
 enum ePedPieceTypes;
 struct SLineOfSightBuildingResult;
 struct SLineOfSightFlags;
-struct SWeaponConfiguration;
 
 class CWeapon
 {

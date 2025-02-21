@@ -11,9 +11,6 @@
 
 #pragma once
 
-#include <game/CWeapon.h>
-#include <game/CPed.h>
-
 #define FUNC_CWeapon_Shutdown                           0x73A380
 #define FUNC_CWeapon_CheckForShootingVehicleOccupant    0x73f480
 #define FUNC_CWeapon_Initialize                         0x73b4a0
