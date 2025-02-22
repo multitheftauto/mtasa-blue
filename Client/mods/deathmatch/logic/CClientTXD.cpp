@@ -53,7 +53,7 @@ bool CClientTXD::Load(bool isRaw, SString input, bool enableFiltering)
     }
 }
 
-bool CClientTXD::AddClotheTexture(std::string strModelName)
+bool CClientTXD::AddClothingTexture(std::string strModelName)
 {
     if (strModelName.empty())
         return false;

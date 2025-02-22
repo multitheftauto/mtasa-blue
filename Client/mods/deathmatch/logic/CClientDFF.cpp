@@ -99,7 +99,7 @@ void CClientDFF::UnloadDFF()
     m_LoadedClumpInfoMap.clear();
 }
 
-bool CClientDFF::AddClotheModel(std::string strModelName)
+bool CClientDFF::AddClothingModel(std::string strModelName)
 {
     if (strModelName.empty())
         return false;

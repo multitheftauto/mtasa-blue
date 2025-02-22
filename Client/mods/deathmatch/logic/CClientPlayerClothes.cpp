@@ -652,7 +652,7 @@ bool CClientPlayerClothes::IsValidModel(unsigned short usModel)
     return usModel >= CLOTHES_MODEL_ID_FIRST && usModel <= CLOTHES_MODEL_ID_LAST;
 }
 
-bool CClientPlayerClothes::AddClotheModel(const char* szTexture, const char* szModel, unsigned char ucType)
+bool CClientPlayerClothes::AddClothingModel(const char* szTexture, const char* szModel, unsigned char ucType)
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
@@ -683,7 +683,7 @@ bool CClientPlayerClothes::AddClotheModel(const char* szTexture, const char* szM
     return false;
 }
 
-bool CClientPlayerClothes::RemoveClotheModel(const char* szTexture, const char* szModel, unsigned char ucType)
+bool CClientPlayerClothes::RemoveClothingModel(const char* szTexture, const char* szModel, unsigned char ucType)
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {

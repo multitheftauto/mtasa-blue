@@ -80,11 +80,11 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineLoadDFF", EngineLoadDFF},
         {"engineLoadIFP", EngineLoadIFP},
         {"engineImportTXD", EngineImportTXD},
-        {"engineAddClotheTXD", ArgumentParser<EngineAddClotheTXD>},
+        {"engineAddClothingTXD", ArgumentParser<EngineAddClothingTXD>},
         {"engineReplaceCOL", EngineReplaceCOL},
         {"engineRestoreCOL", EngineRestoreCOL},
         {"engineReplaceModel", EngineReplaceModel},
-        {"engineAddClotheModel", ArgumentParser<EngineAddClotheModel>},
+        {"engineAddClothingModel", ArgumentParser<EngineAddClothingModel>},
         {"engineRestoreModel", EngineRestoreModel},
         {"engineReplaceAnimation", EngineReplaceAnimation},
         {"engineRestoreAnimation", EngineRestoreAnimation},
@@ -651,12 +651,12 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaEngineDefs::EngineAddClotheTXD(CClientTXD* pTXD, std::string strModelName)
+bool CLuaEngineDefs::EngineAddClothingTXD(CClientTXD* pTXD, std::string strModelName)
 {
     if (strModelName.find(".txd") == std::string::npos)
         throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)strModelName.length(), strModelName.data()));
 
-    if (!pTXD->AddClotheTexture(strModelName))
+    if (!pTXD->AddClothingTexture(strModelName))
         throw std::invalid_argument(SString("Texture already added (%*s)", (int)strModelName.length(), strModelName.data()));
 
     return true;
@@ -840,12 +840,12 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaEngineDefs::EngineAddClotheModel(CClientDFF* pDFF, std::string strModelName)
+bool CLuaEngineDefs::EngineAddClothingModel(CClientDFF* pDFF, std::string strModelName)
 {
     if (strModelName.find(".dff") == std::string::npos)
         throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)strModelName.length(), strModelName.data()));
 
-    if (!pDFF->AddClotheModel(strModelName))
+    if (!pDFF->AddClothingModel(strModelName))
         throw std::invalid_argument(SString("Model already added (%*s)", (int)strModelName.length(), strModelName.data()));
 
     return true;

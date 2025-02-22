@@ -70,8 +70,9 @@ public:
     static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
     static const int              GetClothingGroupMax(unsigned char ucType);
     static bool                   IsValidModel(unsigned short usModel);
-    static bool                   AddClotheModel(const char* szTexture, const char* szModel, unsigned char ucType);
-    static bool                   RemoveClotheModel(const char* szTexture, const char* szModel, unsigned char ucType);
+    static bool                   AddClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
+    static bool                   RemoveClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
+
 private:
     static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
 
