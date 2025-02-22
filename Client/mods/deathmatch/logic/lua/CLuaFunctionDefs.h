@@ -61,6 +61,8 @@ public:
     LUA_DECLARE(GetClothesByTypeIndex);
     LUA_DECLARE(GetTypeIndexFromClothes);
     LUA_DECLARE(GetClothesTypeName);
+    LUA_DECLARE(AddClotheModel);
+    LUA_DECLARE(RemoveClotheModel);
 
     // Cursor funcs
     LUA_DECLARE(GetCursorPosition);

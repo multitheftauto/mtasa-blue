@@ -79,6 +79,9 @@ public:
     virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId) = 0;
     virtual void             ClothesRemoveReplacement(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
+    virtual bool             ClothesAddFile(const char* pFileData, size_t fileSize, const char* pFileName) = 0;
+    virtual bool             ClothesRemoveFile(char* pFileData) = 0;
+    virtual bool             HasClothesFile(const char* pFileName) = 0;
     virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
     virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
     virtual CColModel*       ReadCOL(const SString& buffer) = 0;

@@ -102,3 +102,47 @@ int CLuaFunctionDefs::GetClothesTypeName(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaFunctionDefs::AddClotheModel(lua_State* luaVM)
+{
+    unsigned char    ucType = 0;
+    SString          strTexture, strModel;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strTexture);
+    argStream.ReadString(strModel, "");
+    argStream.ReadNumber(ucType);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::AddClotheModel(strTexture, strModel, ucType))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::RemoveClotheModel(lua_State* luaVM)
+{
+    unsigned char    ucType = 0;
+    SString          strTexture, strModel;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strTexture);
+    argStream.ReadString(strModel, "");
+    argStream.ReadNumber(ucType);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::RemoveClotheModel(strTexture, strModel, ucType))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}

@@ -57,6 +57,8 @@ public:
     bool                   RemoveClothes(unsigned char ucType, bool bRemoveFromModel = true);
 
     void AddAllToModel();
+    void RefreshClothes();
+
     void RemoveAll(bool bRemoveFromModel = true);
 
     void DefaultClothes(bool bAddToModel = true);
@@ -68,12 +70,15 @@ public:
     static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
     static const int              GetClothingGroupMax(unsigned char ucType);
     static bool                   IsValidModel(unsigned short usModel);
+    static bool                   AddClotheModel(const char* szTexture, const char* szModel, unsigned char ucType);
+    static bool                   RemoveClotheModel(const char* szTexture, const char* szModel, unsigned char ucType);
 private:
     static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
 
     CClientPed* m_pPlayerModel;
 
-    SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>        m_Clothes;
-    static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> m_GlobalClothes;
-    static bool                                                       m_bStaticInit;
+    SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>              m_Clothes;
+    static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>       m_GlobalClothes;
+    static std::array<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS>  m_NewClothes;
+    static bool                                                             m_bStaticInit;
 };

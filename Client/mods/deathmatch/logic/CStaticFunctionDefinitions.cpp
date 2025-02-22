@@ -2671,6 +2671,22 @@ bool CStaticFunctionDefinitions::GetClothesTypeName(unsigned char ucType, SStrin
     return false;
 }
 
+bool CStaticFunctionDefinitions::AddClotheModel(const char* szTexture, const char* szModel, unsigned char ucType)
+{
+    if (!CClientPlayerClothes::AddClotheModel(szTexture, szModel, ucType))
+        return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::RemoveClotheModel(const char* szTexture, const char* szModel, unsigned char ucType)
+{
+    if (!CClientPlayerClothes::RemoveClotheModel(szTexture, szModel, ucType))
+        return false;
+
+    return true;
+}
+
 CClientPed* CStaticFunctionDefinitions::CreatePed(CResource& Resource, unsigned long ulModel, const CVector& vecPosition, float fRotation)
 {
     // Valid model?

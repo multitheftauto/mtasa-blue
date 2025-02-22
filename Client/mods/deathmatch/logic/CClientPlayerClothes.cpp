@@ -291,8 +291,9 @@ static const SPlayerClothing g_SuitClothing[SUIT_CLOTHING_MAX + 1] = {
     {"balaclava", "balaclava"}, {"pimptr", "pimptr"}, {"garageleg", "garagetr"},  {"medictr", "medictr"}, {NULL, NULL}};
 
 // This represents GTA's 1 clothing block
-SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> CClientPlayerClothes::m_GlobalClothes;
-bool                                                       CClientPlayerClothes::m_bStaticInit = true;
+SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>      CClientPlayerClothes::m_GlobalClothes;
+std::array<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS> CClientPlayerClothes::m_NewClothes;
+bool                                                            CClientPlayerClothes::m_bStaticInit = true;
 
 CClientPlayerClothes::CClientPlayerClothes(CClientPed* pPlayerModel)
 {
@@ -468,45 +469,91 @@ const SPlayerClothing* CClientPlayerClothes::GetClothingGroup(unsigned char ucTy
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
+        static std::vector<SPlayerClothing> clothingList;
+        const SPlayerClothing*              clothingArray = nullptr;
+        size_t                              clothingSize = 0;
+
         switch (ucType)
         {
             case 0:
-                return g_TorsoClothing;
+                clothingArray = g_TorsoClothing;
+                clothingSize = sizeof(g_TorsoClothing) / sizeof(g_TorsoClothing[0]);
+                break;
             case 1:
-                return g_HairClothing;
+                clothingArray = g_HairClothing;
+                clothingSize = sizeof(g_HairClothing) / sizeof(g_HairClothing[0]);
+                break;
             case 2:
-                return g_LegsClothing;
+                clothingArray = g_LegsClothing;
+                clothingSize = sizeof(g_LegsClothing) / sizeof(g_LegsClothing[0]);
+                break;
             case 3:
-                return g_ShoesClothing;
+                clothingArray = g_ShoesClothing;
+                clothingSize = sizeof(g_ShoesClothing) / sizeof(g_ShoesClothing[0]);
+                break;
             case 4:
-                return g_LeftUpperArmClothing;
+                clothingArray = g_LeftUpperArmClothing;
+                clothingSize = sizeof(g_LeftUpperArmClothing) / sizeof(g_LeftUpperArmClothing[0]);
+                break;
             case 5:
-                return g_LeftLowerArmClothing;
+                clothingArray = g_LeftLowerArmClothing;
+                clothingSize = sizeof(g_LeftLowerArmClothing) / sizeof(g_LeftLowerArmClothing[0]);
+                break;
             case 6:
-                return g_RightUpperArmClothing;
+                clothingArray = g_RightUpperArmClothing;
+                clothingSize = sizeof(g_RightUpperArmClothing) / sizeof(g_RightUpperArmClothing[0]);
+                break;
             case 7:
-                return g_RightLowerArmClothing;
+                clothingArray = g_RightLowerArmClothing;
+                clothingSize = sizeof(g_RightLowerArmClothing) / sizeof(g_RightLowerArmClothing[0]);
+                break;
             case 8:
-                return g_BackTopClothing;
+                clothingArray = g_BackTopClothing;
+                clothingSize = sizeof(g_BackTopClothing) / sizeof(g_BackTopClothing[0]);
+                break;
             case 9:
-                return g_LeftChestClothing;
+                clothingArray = g_LeftChestClothing;
+                clothingSize = sizeof(g_LeftChestClothing) / sizeof(g_LeftChestClothing[0]);
+                break;
             case 10:
-                return g_RightChestClothing;
+                clothingArray = g_RightChestClothing;
+                clothingSize = sizeof(g_RightChestClothing) / sizeof(g_RightChestClothing[0]);
+                break;
             case 11:
-                return g_StomachClothing;
+                clothingArray = g_StomachClothing;
+                clothingSize = sizeof(g_StomachClothing) / sizeof(g_StomachClothing[0]);
+                break;
             case 12:
-                return g_LowerBackClothing;
+                clothingArray = g_LowerBackClothing;
+                clothingSize = sizeof(g_LowerBackClothing) / sizeof(g_LowerBackClothing[0]);
+                break;
             case 13:
-                return g_Extra1Clothing;
+                clothingArray = g_Extra1Clothing;
+                clothingSize = sizeof(g_Extra1Clothing) / sizeof(g_Extra1Clothing[0]);
+                break;
             case 14:
-                return g_Extra2Clothing;
+                clothingArray = g_Extra2Clothing;
+                clothingSize = sizeof(g_Extra2Clothing) / sizeof(g_Extra2Clothing[0]);
+                break;
             case 15:
-                return g_Extra3Clothing;
+                clothingArray = g_Extra3Clothing;
+                clothingSize = sizeof(g_Extra3Clothing) / sizeof(g_Extra3Clothing[0]);
+                break;
             case 16:
-                return g_Extra4Clothing;
+                clothingArray = g_Extra4Clothing;
+                clothingSize = sizeof(g_Extra4Clothing) / sizeof(g_Extra4Clothing[0]);
+                break;
             case 17:
-                return g_SuitClothing;
+                clothingArray = g_SuitClothing;
+                clothingSize = sizeof(g_SuitClothing) / sizeof(g_SuitClothing[0]);
+                break;
         }
+
+        clothingList.assign(clothingArray, clothingArray + clothingSize - 1);
+        clothingList.insert(clothingList.end(), m_NewClothes[ucType].begin(), m_NewClothes[ucType].end());
+        clothingList.push_back({NULL, NULL});
+
+        return clothingList.data();
     }
 
     return NULL;
@@ -534,45 +581,67 @@ const int CClientPlayerClothes::GetClothingGroupMax(unsigned char ucType)
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
+        int maxClothe = 0;
+
         switch (ucType)
         {
             case 0:
-                return TORSO_CLOTHING_MAX;
+                maxClothe = TORSO_CLOTHING_MAX;
+                break;
             case 1:
-                return HAIR_CLOTHING_MAX;
+                maxClothe = HAIR_CLOTHING_MAX;
+                break;
             case 2:
-                return LEGS_CLOTHING_MAX;
+                maxClothe = LEGS_CLOTHING_MAX;
+                break;
             case 3:
-                return SHOES_CLOTHING_MAX;
+                maxClothe = SHOES_CLOTHING_MAX;
+                break;
             case 4:
-                return LEFT_UPPER_ARM_CLOTHING_MAX;
+                maxClothe = LEFT_UPPER_ARM_CLOTHING_MAX;
+                break;
             case 5:
-                return LEFT_LOWER_ARM_CLOTHING_MAX;
+                maxClothe = LEFT_LOWER_ARM_CLOTHING_MAX;
+                break;
             case 6:
-                return RIGHT_UPPER_ARM_CLOTHING_MAX;
+                maxClothe = RIGHT_UPPER_ARM_CLOTHING_MAX;
+                break;
             case 7:
-                return RIGHT_LOWER_ARM_CLOTHING_MAX;
+                maxClothe = RIGHT_LOWER_ARM_CLOTHING_MAX;
+                break;
             case 8:
-                return BACK_TOP_CLOTHING_MAX;
+                maxClothe = BACK_TOP_CLOTHING_MAX;
+                break;
             case 9:
-                return LEFT_CHEST_CLOTHING_MAX;
+                maxClothe = LEFT_CHEST_CLOTHING_MAX;
+                break;
             case 10:
-                return RIGHT_CHEST_CLOTHING_MAX;
+                maxClothe = RIGHT_CHEST_CLOTHING_MAX;
+                break;
             case 11:
-                return STOMACH_CLOTHING_MAX;
+                maxClothe = STOMACH_CLOTHING_MAX;
+                break;
             case 12:
-                return LOWER_BACK_CLOTHING_MAX;
+                maxClothe = LOWER_BACK_CLOTHING_MAX;
+                break;
             case 13:
-                return EXTRA1_CLOTHING_MAX;
+                maxClothe = EXTRA1_CLOTHING_MAX;
+                break;
             case 14:
-                return EXTRA2_CLOTHING_MAX;
+                maxClothe = EXTRA2_CLOTHING_MAX;
+                break;
             case 15:
-                return EXTRA3_CLOTHING_MAX;
+                maxClothe = EXTRA3_CLOTHING_MAX;
+                break;
             case 16:
-                return EXTRA4_CLOTHING_MAX;
+                maxClothe = EXTRA4_CLOTHING_MAX;
+                break;
             case 17:
-                return SUIT_CLOTHING_MAX;
+                maxClothe = SUIT_CLOTHING_MAX;
+                break;
         }
+
+        return maxClothe + static_cast<int>(m_NewClothes[ucType].size());
     }
 
     return 0;
@@ -581,4 +650,82 @@ const int CClientPlayerClothes::GetClothingGroupMax(unsigned char ucType)
 bool CClientPlayerClothes::IsValidModel(unsigned short usModel)
 {
     return usModel >= CLOTHES_MODEL_ID_FIRST && usModel <= CLOTHES_MODEL_ID_LAST;
+}
+
+bool CClientPlayerClothes::AddClotheModel(const char* szTexture, const char* szModel, unsigned char ucType)
+{
+    if (ucType < PLAYER_CLOTHING_SLOTS)
+    {
+        if (szTexture == nullptr || szModel == nullptr)
+            return false;
+
+        std::string textureFile = std::string(szTexture) + ".txd";
+
+        if (!g_pGame->GetRenderWare()->HasClothesFile(textureFile.c_str()))
+            return false;
+
+        std::string modelFile = std::string(szTexture) + ".dff";
+
+        if (!g_pGame->GetRenderWare()->HasClothesFile(modelFile.c_str()))
+            return false;
+
+        const SPlayerClothing* pClothing = GetClothing(szTexture, szModel, ucType);
+
+        if (pClothing)
+            return false;
+
+        SPlayerClothing clothing = {strdup(szTexture), strdup(szModel)};
+        m_NewClothes[ucType].push_back(clothing);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientPlayerClothes::RemoveClotheModel(const char* szTexture, const char* szModel, unsigned char ucType)
+{
+    if (ucType < PLAYER_CLOTHING_SLOTS)
+    {
+        if (szTexture == nullptr || szModel == nullptr)
+            return false;
+
+        auto& clothes = m_NewClothes[ucType];
+
+        for (auto it = clothes.begin(); it != clothes.end(); ++it)
+        {
+            if (strcmp(it->szTexture, szTexture) == 0 && strcmp(it->szModel, szModel) == 0)
+            {
+                clothes.erase(it);
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void CClientPlayerClothes::RefreshClothes()
+{
+    for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
+    {
+       auto& clothes = m_NewClothes[ucType];
+
+       if (clothes.empty())
+           continue;
+
+       for (auto it = clothes.begin(); it != clothes.end();)
+       {
+           std::string textureFile = std::string(it->szTexture) + ".txd";
+           std::string modelFile = std::string(it->szModel) + ".dff";
+
+           if (!g_pGame->GetRenderWare()->HasClothesFile(textureFile.c_str()) || !g_pGame->GetRenderWare()->HasClothesFile(modelFile.c_str()))
+           {
+               RemoveClothes(ucType, true);
+               it = clothes.erase(it);
+           }
+           else
+               ++it;
+       }
+    }
 }

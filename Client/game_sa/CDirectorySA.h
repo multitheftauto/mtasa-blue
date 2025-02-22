@@ -21,6 +21,10 @@ struct DirectoryInfoSA
 class CDirectorySAInterface
 {
     public:
+        bool             AddEntry(DirectoryInfoSA& entry);
+        bool             RemoveEntry(const char* pFileName);
+
+        DirectoryInfoSA* GetModelEntry(const char* pFileName);
         DirectoryInfoSA* GetModelEntry(std::uint16_t modelId);
         bool             SetModelStreamingSize(std::uint16_t modelId, std::uint16_t size);
         std::uint16_t    GetModelStreamingSize(std::uint16_t modelId);
