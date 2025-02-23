@@ -21,7 +21,7 @@ jobs:
 
       - name: Auto-merge pull request
         run: |
-          PR_NUMBER=$(gh pr list --repo ${{ github.repository }} --author 'MTABot' --base 'l10n/master' --state open --json number --jq '.[0].number')
+          PR_NUMBER=$(gh pr list --repo ${{ github.repository }} --author 'botder' --base 'l10n/master' --state open --json number --jq '.[0].number')
           if [ -n "$PR_NUMBER" ]; then
             gh pr merge $PR_NUMBER --squash --repo ${{ github.repository }} --admin --subject "New Crowdin updates (PR #$PR_NUMBER)" --body ""
           fi
