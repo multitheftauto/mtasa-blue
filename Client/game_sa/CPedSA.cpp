@@ -1120,3 +1120,9 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
         satchelsList.push_back({pProjectileInterface, &pProjectileInterface->m_vecAttachedOffset, &pProjectileInterface->m_vecAttachedRotation});
     }
 }
+
+void CPedSA::Say(const ePedSpeechContext& speechId, float probability)
+{
+    // Call CPed::Say
+    ((void(__thiscall*)(CPedSAInterface*, ePedSpeechContext, int, float, bool, bool, bool))FUNC_CPed_Say)(GetPedInterface(), speechId, 0, probability, false, false, false);
+}
