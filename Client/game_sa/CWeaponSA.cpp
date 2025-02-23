@@ -74,7 +74,7 @@ void CWeaponSA::AddGunshell(CEntity* firingEntity, const CVector& vecOrigin, con
         m_interface->AddGunshell(firingEntity, vecOrigin, vecDirection, size);
 }
 
-void CWeaponSA::DoBulletImpact(CEntity* firingEntity, CEntitySAInterface* hitEntityInterface, CVector* vecOrigin, CVector* vecTarget, CColPoint* colPoint, int incrementalHit) const
+void CWeaponSA::DoBulletImpact(CEntity* firingEntity, CEntitySAInterface* hitEntityInterface, const CVector& vecOrigin, const CVector& vecTarget, const CColPoint& colPoint, int incrementalHit) const
 {
     if (m_interface)
         m_interface->DoBulletImpact(firingEntity, hitEntityInterface, vecOrigin, vecTarget, colPoint, incrementalHit);

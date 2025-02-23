@@ -48,7 +48,7 @@ public:
     virtual void Update(CPed* ped) = 0;
 
     virtual void AddGunshell(CEntity* firingEntity, const CVector& vecOrigin, const CVector2D& vecDirection, float size) const = 0;
-    virtual void DoBulletImpact(CEntity* firingEntity, CEntitySAInterface* hitEntityInterface, CVector* vecOrigin, CVector* vecTarget, CColPoint* colPoint, int incrementalHit) const = 0;
+    virtual void DoBulletImpact(CEntity* firingEntity, CEntitySAInterface* hitEntityInterface, const CVector& vecOrigin, const CVector& vecTarget, const CColPoint& colPoint, int incrementalHit) const = 0;
     virtual bool Fire(CEntity* firingEntity, CVector* vecOrigin, CVector* vecEffectPos, CEntity* targetEntity, CVector* vecTarget, CVector* vecAlt) = 0;
     virtual bool FireInstantHit(CEntity* firingEntity, const CVector* vecOrigin, const CVector* vecMuzzle, CEntity* targetEntity, const CVector* vecTarget, const CVector* vecForDriveby, bool crossHairGun, bool createGunFx) = 0;
     virtual bool FireBullet(CEntity* firingEntity, const CVector& vecOrigin, const CVector& vecTarget) = 0;

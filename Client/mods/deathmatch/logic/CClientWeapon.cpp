@@ -449,7 +449,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
 #ifdef MARKER_DEBUG
         m_pMarker2->SetPosition(vecTarget);
 #endif
-        m_pWeapon->DoBulletImpact(m_pObject, pEntity, &vecOrigin, &vecTarget, pColPoint, 0);
+        m_pWeapon->DoBulletImpact(m_pObject, pEntity, vecOrigin, vecTarget, *pColPoint, 0);
 
         if (!IsLocalEntity() && m_pOwner)
         {
