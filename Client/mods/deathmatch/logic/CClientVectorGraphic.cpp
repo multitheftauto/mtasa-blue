@@ -18,7 +18,7 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
 
     m_pManager = pManager;
 
-    m_pVectorGraphicDisplay = std::make_unique<CClientVectorGraphicDisplay>(m_pManager->GetDisplayManager(), this);
+    m_pVectorGraphicDisplay = new CClientVectorGraphicDisplay(m_pManager->GetDisplayManager(), this);
 
     // Generate the default XML document
     SString defaultXmlString = SString("<svg viewBox='0 0 %u %u'></svg>", pVectorGraphicItem->m_uiSizeX, pVectorGraphicItem->m_uiSizeY);
