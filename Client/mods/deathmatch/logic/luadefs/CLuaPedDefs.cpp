@@ -2501,15 +2501,14 @@ bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t t
     }
 }
 
-bool CLuaPedDefs::PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probabilty)
+void CLuaPedDefs::PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probabilty)
 {
     auto speechContextId = static_cast<ePedSpeechContext>(speechId);
     if (speechContextId < ePedSpeechContext::NOTHING || speechContextId >= ePedSpeechContext::NUM_PED_CONTEXT)
         throw LuaFunctionError("The argument speechId is invalid. The valid range is 0-359.");
 
     if (probabilty.has_value() && probabilty < 0.0f)
-        return false;
+        throw LuaFunctionError("The argument probabilty cannot have a negative value.");
 
     ped->Say(speechContextId, probabilty.value_or(1.0f));
-    return true;
 }
