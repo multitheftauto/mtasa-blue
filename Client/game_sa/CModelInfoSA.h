@@ -64,12 +64,6 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
 
-#define     FUNC_CClumpModelInfo_SetClump 0x4C4F70
-#define     FUNC_CClumpModelInfo_DeleteRwObject 0x4C4E70
-
-#define     FUNC_CAtomicModelInfo_SetAtomic     0x4C4360
-#define     FUNC_CAtomicModelInfo_DeleteRwObject 0x4C4440
-
 #define VTBL_CClumpModelInfo 0x85BD30
 #define VTBL_CAtomicModelInfo 0x85BBF0
 
@@ -262,15 +256,15 @@ public:
         uint32_t m_nAnimFileIndex;
     };
 
-    void DeleteRwObject() { ((void(__thiscall*)(CClumpModelInfoSAInterface*))FUNC_CClumpModelInfo_DeleteRwObject)(this); }
-    void SetClump(RpClump* clump) { ((void(__thiscall*)(CClumpModelInfoSAInterface*, RpClump*))FUNC_CClumpModelInfo_SetClump)(this, clump); }
+    void DeleteRwObject() { ((void(__thiscall*)(CClumpModelInfoSAInterface*))0x4C4E70)(this); }
+    void SetClump(RpClump* clump) { ((void(__thiscall*)(CClumpModelInfoSAInterface*, RpClump*))0x4C4F70)(this, clump); }
 };
 
 class CAtomicModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 public:
-    void DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfoSAInterface*))FUNC_CAtomicModelInfo_DeleteRwObject)(this); }
-    void SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfoSAInterface*, RpAtomic*))FUNC_CAtomicModelInfo_SetAtomic)(this, atomic); }
+    void DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfoSAInterface*))0x4C4440)(this); }
+    void SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfoSAInterface*, RpAtomic*))0x4C4360)(this, atomic); }
 };
 
 class CTimeModelInfoSAInterface : public CAtomicModelInfoSAInterface

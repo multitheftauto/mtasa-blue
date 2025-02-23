@@ -1538,7 +1538,12 @@ void CModelInfoSA::RestoreOriginalModel()
         CBaseModelInfoSAInterface* currentInterface = ppModelInfo[m_dwModelID];
         ppModelInfo[m_dwModelID] = MapGet(m_convertedModelInterfaces, m_dwModelID);
 
-        delete currentInterface;
+        if (currentInterface)
+        {
+            ppModelInfo[m_dwModelID]->usNumberOfRefs = currentInterface->usNumberOfRefs;
+            delete currentInterface;
+        }
+
         MapRemove(m_convertedModelInterfaces, m_dwModelID);
     }
 
@@ -1814,13 +1819,13 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 bool CModelInfoSA::ConvertToClump()
 {
     // Get current interface
-    CAtomicModelInfoSAInterface* currentAtomicInterface = static_cast<CAtomicModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
-    if (!currentAtomicInterface)
+    CBaseModelInfoSAInterface* currentModelInterface = ppModelInfo[m_dwModelID];
+    if (!currentModelInterface)
         return false;
 
     // Create new clump interface
     CClumpModelInfoSAInterface* newClumpInterface = new CClumpModelInfoSAInterface();
-    MemCpyFast(newClumpInterface, currentAtomicInterface, sizeof(CClumpModelInfoSAInterface));
+    MemCpyFast(newClumpInterface, currentModelInterface, sizeof(CBaseModelInfoSAInterface));
     newClumpInterface->m_nAnimFileIndex = -1;
 
     // (FileEX): We do not destroy or set pRwObject to nullptr here
@@ -1834,7 +1839,7 @@ bool CModelInfoSA::ConvertToClump()
     ppModelInfo[m_dwModelID] = newClumpInterface;
 
     // Store original interface
-    MapSet(m_convertedModelInterfaces, m_dwModelID, static_cast<CBaseModelInfoSAInterface*>(currentAtomicInterface));
+    MapSet(m_convertedModelInterfaces, m_dwModelID, currentModelInterface);
     return true;
 }
 
@@ -1851,7 +1856,7 @@ bool CModelInfoSA::ConvertToAtomic()
 
     // (FileEX): We do not destroy or set pRwObject to nullptr here
     // because our IsLoaded code expects the RwObject to exist.
-    // We destroy the old RwObject in CFileLoader_SetRelatedModelInfoCB after passing the IsLoaded condition in the SetCustomModel.
+    // We destroy the old RwObject in CRenderWareSA::ReplaceAllAtomicsInModel after passing the IsLoaded condition in the SetCustomModel.
 
     // Set CAtomicModelInfo vtbl after copying data
     newAtomicInterface->VFTBL = reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CAtomicModelInfo);
