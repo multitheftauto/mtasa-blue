@@ -270,6 +270,9 @@ uint CPlayer::Send(const CPacket& Packet)
     if (!CNetBufferWatchDog::CanSendPacket(Packet.GetPacketID()))
         return 0;
 
+    if (IsLeavingServer())
+        return 0;
+
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
     unsigned long              ulFlags = Packet.GetFlags();
