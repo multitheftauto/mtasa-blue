@@ -510,7 +510,7 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usMod
     // Check if new model is clump or atomic
     // pSrc->object.type is always RP_TYPE_CLUMP so check number of atomics
     // to check if new model is clump or atomic
-    if (RpClumpGetNumAtomics(pSrc) > 1)
+    if (RpClumpGetNumAtomics(pSrc) > 1 || (RpClumpGetNumAtomics(pSrc) == 1 && pModelInfo->GetModelType() == eModelInfoType::CLUMP))
     {
         // Get new interface but with old RwObject
         auto* currentNewInterface = static_cast<CClumpModelInfoSAInterface*>(pModelInfo->GetInterface());
@@ -522,7 +522,11 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usMod
         if (!originalInterface)
             return false;
 
-        reinterpret_cast<CAtomicModelInfoSAInterface*>(originalInterface)->DeleteRwObject();
+        if (RpClumpGetNumAtomics(reinterpret_cast<RpClump*>(originalInterface->pRwObject)) == 1)
+            reinterpret_cast<CAtomicModelInfoSAInterface*>(originalInterface)->DeleteRwObject();
+        else
+            currentNewInterface->DeleteRwObject();
+
         currentNewInterface->pRwObject = nullptr;
 
         // Init new RwObject (clump type)
@@ -536,7 +540,7 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usMod
         // We need to remove the RwObject from the original interface because
         // the new interface points to the CAtomicModelInfo vtbl
         CBaseModelInfoSAInterface* originalInterface = pModelInfo->GetOriginalInterface();
-        if (originalInterface)
+        if (originalInterface && RpClumpGetNumAtomics(reinterpret_cast<RpClump*>(originalInterface->pRwObject)) > 1)
         {
             reinterpret_cast<CClumpModelInfoSAInterface*>(originalInterface)->DeleteRwObject();
             currentInterface->pRwObject = nullptr;
