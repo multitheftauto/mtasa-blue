@@ -801,8 +801,17 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
-    // Remove ref from the old TXD
-    CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
+    // CBaseModelInfo::AddRef adds references to model and TXD
+    // We need transfer added references from old TXD to new TXD
+    size_t referencesCount = m_pInterface->usNumberOfRefs;
+
+    // +1 reference for active rwObject
+    // TODO: pRwObject can have to unloaded TXD
+    if (m_pInterface->pRwObject)
+        referencesCount++;
+
+    for (size_t i = 0; i < referencesCount; i++)
+        CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
 
     // Store vanilla TXD ID
     if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
@@ -810,7 +819,9 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 
     // Set new TXD and increase ref of it
     m_pInterface->usTextureDictionary = usID;
-    CTxdStore_AddRef(usID);
+
+    for (size_t i = 0; i < referencesCount; i++)
+        CTxdStore_AddRef(usID);
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()

@@ -266,8 +266,10 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 ListRemove(currentTextures, pOriginalTexture);
             }
             assert(currentTextures.empty());
-        #endif
 
+            int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
+            assert(refsCount > 0, "Should have at least one TXD reference here");
+        #endif
             // Remove info
             CTxdStore_RemoveRef(pInfo->usTxdId);
             MapRemove(ms_ModelTexturesInfoMap, usTxdId);
