@@ -787,6 +787,7 @@ public:
     bool          m_bNoNewVehicleTask;                 // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
     ElementID     m_NoNewVehicleTaskReasonID;            // ElementID of the vehicle that we are waiting on
     CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
+    bool          m_vehicleWithoutPairAllowed{false};  // Means that a ped can be in a vehicle (temporarily) without being paired with it. This is used in CClientPed::Kill and SetInternalHealth
 
     std::shared_ptr<CClientModel> m_clientModel;
 
