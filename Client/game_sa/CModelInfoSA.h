@@ -64,6 +64,15 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
 
+#define     FUNC_CClumpModelInfo_SetClump 0x4C4F70
+#define     FUNC_CClumpModelInfo_DeleteRwObject 0x4C4E70
+
+#define     FUNC_CAtomicModelInfo_SetAtomic     0x4C4360
+#define     FUNC_CAtomicModelInfo_DeleteRwObject 0x4C4440
+
+#define VTBL_CClumpModelInfo 0x85BD30
+#define VTBL_CAtomicModelInfo 0x85BBF0
+
 class CBaseModelInfoSAInterface;
 class CModelInfoSAInterface
 {
@@ -252,9 +261,19 @@ public:
         char*    m_animFileName;
         uint32_t m_nAnimFileIndex;
     };
+
+    void DeleteRwObject() { ((void(__thiscall*)(CClumpModelInfoSAInterface*))FUNC_CClumpModelInfo_DeleteRwObject)(this); }
+    void SetClump(RpClump* clump) { ((void(__thiscall*)(CClumpModelInfoSAInterface*, RpClump*))FUNC_CClumpModelInfo_SetClump)(this, clump); }
 };
 
-class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
+class CAtomicModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    void DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfoSAInterface*))FUNC_CAtomicModelInfo_DeleteRwObject)(this); }
+    void SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfoSAInterface*, RpAtomic*))FUNC_CAtomicModelInfo_SetAtomic)(this, atomic); }
+};
+
+class CTimeModelInfoSAInterface : public CAtomicModelInfoSAInterface
 {
 public:
     CTimeInfoSAInterface timeInfo;
@@ -268,10 +287,12 @@ class CVehicleModelUpgradePosnDesc
 };
 static_assert(sizeof(CVehicleModelUpgradePosnDesc) == 0x20, "Invalid size of CVehicleModelUpgradePosnDesc class");
 
-class CDamageableModelInfoSAInterface : public CBaseModelInfoSAInterface
+class CDamageableModelInfoSAInterface : public CAtomicModelInfoSAInterface
 {
 public:
-    void* m_damagedAtomic;
+    RpAtomic* m_damagedAtomic;
+
+    void SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(RpAtomic*))FUNC_CAtomicModelInfo_SetAtomic)(atomic); }
 };
 
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
@@ -355,6 +376,9 @@ protected:
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     static std::map<unsigned short, int>                                         ms_DefaultTxdIDMap;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
+
+    // Store original model interfaces after conersion clump->atomic or atomic->clump
+    static std::unordered_map<std::uint32_t, CBaseModelInfoSAInterface*> m_convertedModelInterfaces;
 
 public:
     CModelInfoSA();
@@ -488,6 +512,11 @@ public:
     unsigned short GetObjectPropertiesGroup();
     void           RestoreObjectPropertiesGroup();
     static void    RestoreAllObjectsPropertiesGroups();
+
+    // Model type conversion functions
+    bool ConvertToClump();
+    bool ConvertToAtomic();
+    CBaseModelInfoSAInterface* GetOriginalInterface() const;
 
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;

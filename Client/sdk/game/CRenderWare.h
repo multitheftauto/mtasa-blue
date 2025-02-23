@@ -26,6 +26,7 @@ struct RwMatrix;
 struct RwTexDictionary;
 struct RwTexture;
 struct RpClump;
+struct RpAtomic;
 
 typedef CShaderItem CSHADERDUMMY;
 
@@ -110,6 +111,8 @@ public:
     virtual void     RemoveClientEntityRefs(CClientEntityBase* pClientEntity) = 0;
     virtual void     RemoveShaderRefs(CSHADERDUMMY* pShaderItem) = 0;
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
+    virtual int      GetClumpNumOfAtomics(RpClump* clump) = 0;
+    virtual RpAtomic* GetFirstAtomic(RpClump* clump) = 0;
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
     virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
 

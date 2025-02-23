@@ -35,6 +35,7 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::unordered_map<std::uint32_t, CBaseModelInfoSAInterface*>         CModelInfoSA::m_convertedModelInterfaces;
 
 union tIdeFlags
 {
@@ -1512,6 +1513,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::ATOMIC:
         case eModelInfoType::LOD_ATOMIC:
         case eModelInfoType::TIME:
+        case eModelInfoType::CLUMP:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         default:
@@ -1528,6 +1530,16 @@ void CModelInfoSA::RestoreOriginalModel()
     if (IsLoaded())
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
+    }
+
+    // Restore original interface if model was converted
+    if (MapContains(m_convertedModelInterfaces, m_dwModelID))
+    {
+        CBaseModelInfoSAInterface* currentInterface = ppModelInfo[m_dwModelID];
+        ppModelInfo[m_dwModelID] = MapGet(m_convertedModelInterfaces, m_dwModelID);
+
+        delete currentInterface;
+        MapRemove(m_convertedModelInterfaces, m_dwModelID);
     }
 
     // Reset the stored custom vehicle clump
@@ -1797,6 +1809,73 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
+}
+
+bool CModelInfoSA::ConvertToClump()
+{
+    if (GetModelType() != eModelInfoType::ATOMIC)
+        return false;
+
+    // Get current interface
+    CAtomicModelInfoSAInterface* currentAtomicInterface = static_cast<CAtomicModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+    if (!currentAtomicInterface)
+        return false;
+
+    // Create new clump interface
+    CClumpModelInfoSAInterface* newClumpInterface = new CClumpModelInfoSAInterface();
+    MemCpyFast(newClumpInterface, currentAtomicInterface, sizeof(CClumpModelInfoSAInterface));
+    newClumpInterface->m_nAnimFileIndex = -1;
+
+    // (FileEX): We do not destroy or set pRwObject to nullptr here
+    // because our IsLoaded code expects the RwObject to exist.
+    // We destroy the old RwObject in CRenderWareSA::ReplaceAllAtomicsInModel after passing the IsLoaded condition in the SetCustomModel.
+
+    // Set CClumpModelInfo vtbl after copying data
+    newClumpInterface->VFTBL = reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CClumpModelInfo);
+
+    // Set new interface for ModelInfo
+    ppModelInfo[m_dwModelID] = newClumpInterface;
+
+    // Store original interface
+    MapSet(m_convertedModelInterfaces, m_dwModelID, static_cast<CBaseModelInfoSAInterface*>(currentAtomicInterface));
+    return true;
+}
+
+bool CModelInfoSA::ConvertToAtomic()
+{
+    if (GetModelType() != eModelInfoType::CLUMP)
+        return false;
+
+    // Get current interface
+    CClumpModelInfoSAInterface* currentClumpInterface = static_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+    if (!currentClumpInterface)
+        return false;
+
+    // Create new atomic interface
+    CAtomicModelInfoSAInterface* newAtomicInterface = new CAtomicModelInfoSAInterface();
+    MemCpyFast(newAtomicInterface, currentClumpInterface, sizeof(CAtomicModelInfoSAInterface));
+
+    // (FileEX): We do not destroy or set pRwObject to nullptr here
+    // because our IsLoaded code expects the RwObject to exist.
+    // We destroy the old RwObject in CFileLoader_SetRelatedModelInfoCB after passing the IsLoaded condition in the SetCustomModel.
+
+    // Set CAtomicModelInfo vtbl after copying data
+    newAtomicInterface->VFTBL = reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CAtomicModelInfo);
+
+    // Set new interface for ModelInfo
+    ppModelInfo[m_dwModelID] = newAtomicInterface;
+
+    // Store original interface
+    MapSet(m_convertedModelInterfaces, m_dwModelID, currentClumpInterface);
+    return true;
+}
+
+CBaseModelInfoSAInterface* CModelInfoSA::GetOriginalInterface() const
+{
+    if (!MapContains(m_convertedModelInterfaces, m_dwModelID))
+        return nullptr;
+
+    return MapGet(m_convertedModelInterfaces, m_dwModelID);
 }
 
 void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)

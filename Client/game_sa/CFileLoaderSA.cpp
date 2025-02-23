@@ -12,6 +12,7 @@
 #include "gamesa_renderware.h"
 #include "CFileLoaderSA.h"
 #include "CModelInfoSA.h"
+#include "CRenderWareSA.h"
 
 CFileLoaderSA::CFileLoaderSA()
 {
@@ -47,53 +48,6 @@ class CDamagableModelInfo
 public:
     void CDamagableModelInfo::SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CDamagableModelInfo*, RpAtomic*))0x4C48D0)(this, atomic); }
 };
-
-static char* GetFrameNodeName(RwFrame* frame)
-{
-    return ((char*(__cdecl*)(RwFrame*))0x72FB30)(frame);
-}
-
-// Originally there was a possibility for this function to cause buffer overflow
-// It should be fixed here.
-template <size_t OutBuffSize>
-void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& outDamage)
-{
-    const auto nodeNameLen = strlen(nodeName);
-
-    const auto NodeNameEndsWith = [=](const char* with) {
-        const auto withLen = strlen(with);
-        // dassert(withLen <= nodeNameLen);
-        return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
-               && strncmp(nodeName + nodeNameLen - withLen, with, withLen) == 0;
-    };
-
-    // Copy `nodeName` into `outName` with `off` trimmed from the end
-    // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
-    const auto TerminatedCopy = [&](size_t off) {
-        dassert(nodeNameLen - off < OutBuffSize);
-        strncpy_s(outName, nodeName,
-                  std::min(nodeNameLen - off, OutBuffSize - 1));            // By providing `OutBuffSize - 1` it is ensured the array will be null terminated
-    };
-
-    if (NodeNameEndsWith("_dam"))
-    {
-        outDamage = true;
-        TerminatedCopy(sizeof("_dam") - 1);
-    }
-    else
-    {
-        outDamage = false;
-        if (NodeNameEndsWith("_l0") || NodeNameEndsWith("_L0"))
-        {
-            TerminatedCopy(sizeof("_l0") - 1);
-        }
-        else
-        {
-            dassert(nodeNameLen < OutBuffSize);
-            strncpy_s(outName, OutBuffSize, nodeName, OutBuffSize - 1);
-        }
-    }
-}
 
 static void CVisibilityPlugins_SetAtomicRenderCallback(RpAtomic* pRpAtomic, RpAtomic* (*renderCB)(RpAtomic*))
 {
@@ -170,9 +124,9 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[gAtomicModelId];
     auto                       pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(pBaseModelInfo);
     RwFrame*                   pOldFrame = reinterpret_cast<RwFrame*>(atomic->object.object.parent);
-    char*                      frameNodeName = GetFrameNodeName(pOldFrame);
+    char*                      frameNodeName = CRenderWareSA::GetFrameNodeName(pOldFrame);
     bool                       bDamage = false;
-    GetNameAndDamage(frameNodeName, name, bDamage);
+    CRenderWareSA::GetNameAndDamage(frameNodeName, name, bDamage);
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
     RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);

@@ -22,6 +22,9 @@ struct SShaderReplacementStats;
 struct STexInfo;
 struct STexTag;
 
+#define FUNC_GetFirstAtomic 0x734820
+#define FUNC_GetFrameNodeName 0x72FB30
+
 class CRenderWareSA : public CRenderWare
 {
 public:
@@ -122,6 +125,13 @@ public:
     CModelTexturesInfo* GetModelTexturesInfo(ushort usModelId);
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
+    int      GetClumpNumOfAtomics(RpClump* clump);
+    RpAtomic* GetFirstAtomic(RpClump* clump);
+
+    static char*     GetFrameNodeName(RwFrame* frame);
+
+    template <size_t OutBuffSize>
+    static void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& outDamage);
 
     static void  StaticSetHooks();
     static void  StaticSetClothesReplacingHooks();

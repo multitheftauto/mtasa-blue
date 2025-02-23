@@ -23,6 +23,7 @@
 #include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
+#include "CVisibilityPluginsSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -496,30 +497,66 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     return true;
 }
 
-bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID)
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
+    if (!pModelInfo)
+        return true;
 
-    if (pModelInfo)
+    RpAtomic* oldAtomic = reinterpret_cast<RpAtomic*>(pModelInfo->GetRwObject());
+    if (reinterpret_cast<RpClump*>(oldAtomic) == pSrc || DoContainTheSameGeometry(pSrc, nullptr, oldAtomic))
+        return true;
+
+    // Check if new model is clump or atomic
+    // pSrc->object.type is always RP_TYPE_CLUMP so check number of atomics
+    // to check if new model is clump or atomic
+    if (RpClumpGetNumAtomics(pSrc) > 1)
     {
-        RpAtomic* pOldAtomic = (RpAtomic*)pModelInfo->GetRwObject();
+        // Get new interface but with old RwObject
+        auto* currentNewInterface = static_cast<CClumpModelInfoSAInterface*>(pModelInfo->GetInterface());
 
-        if (reinterpret_cast<RpClump*>(pOldAtomic) != pNew && !DoContainTheSameGeometry(pNew, NULL, pOldAtomic))
+        // Destroy old RwObject (atomic type)
+        // We need to remove the RwObject from the original interface because
+        // the new interface points to the CClumpModelInfo vtbl
+        CBaseModelInfoSAInterface* originalInterface = pModelInfo->GetOriginalInterface();
+        if (!originalInterface)
+            return false;
+
+        reinterpret_cast<CAtomicModelInfoSAInterface*>(originalInterface)->DeleteRwObject();
+        currentNewInterface->pRwObject = nullptr;
+
+        // Init new RwObject (clump type)
+        currentNewInterface->SetClump(pSrc);
+    }
+    else
+    {
+        auto* currentInterface = static_cast<CAtomicModelInfoSAInterface*>(pModelInfo->GetInterface());
+
+        // Destroy old RwObject (clump type)
+        // We need to remove the RwObject from the original interface because
+        // the new interface points to the CAtomicModelInfo vtbl
+        CBaseModelInfoSAInterface* originalInterface = pModelInfo->GetOriginalInterface();
+        if (originalInterface)
         {
-            // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
-            RpClump* pCopy = RpClumpClone(pNew);
-
-            // Replace the atomics
-            SAtomicsReplacer data;
-            data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-            data.pClump = pCopy;
-
-            MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
-            RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
-
-            // Get rid of the now empty copied clump
-            RpClumpDestroy(pCopy);
+            reinterpret_cast<CClumpModelInfoSAInterface*>(originalInterface)->DeleteRwObject();
+            currentInterface->pRwObject = nullptr;
         }
+        else
+            currentInterface->DeleteRwObject();
+
+        RpAtomic* atomic = GetFirstAtomic(pSrc);
+        RwFrame*  frame = RpGetFrame(atomic);
+
+        char name[24];
+        bool damage = false;
+        GetNameAndDamage(GetFrameNodeName(frame), name, damage);
+
+        if (damage)
+            static_cast<CDamageableModelInfoSAInterface*>(currentInterface)->SetDamagedAtomic(atomic);
+        else
+            currentInterface->SetAtomic(atomic);
+
+        pGame->GetVisibilityPlugins()->SetAtomicId(atomic, usModelID);
     }
 
     return true;
@@ -925,6 +962,65 @@ CD3DDUMMY* GetDeletedMapKey(CD3DDUMMY**)
 RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
 {
     return RwFrameFindFrame(RpGetFrame(pRoot), strName);
+}
+
+int CRenderWareSA::GetClumpNumOfAtomics(RpClump* clump)
+{
+    return RpClumpGetNumAtomics(clump);
+}
+
+RpAtomic* CRenderWareSA::GetFirstAtomic(RpClump* clump)
+{
+    return ((RpAtomic*(__cdecl*)(RpClump*))FUNC_GetFirstAtomic)(clump);
+}
+
+char* CRenderWareSA::GetFrameNodeName(RwFrame* frame)
+{
+    return ((char*(__cdecl*)(RwFrame*))FUNC_GetFrameNodeName)(frame);
+}
+
+// Originally there was a possibility for this function to cause buffer overflow
+// It should be fixed here.
+template <size_t OutBuffSize>
+void CRenderWareSA::GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& outDamage)
+{
+    const auto nodeNameLen = strlen(nodeName);
+
+    const auto NodeNameEndsWith = [=](const char* with)
+    {
+        const auto withLen = strlen(with);
+        // dassert(withLen <= nodeNameLen);
+        return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
+               && strncmp(nodeName + nodeNameLen - withLen, with, withLen) == 0;
+    };
+
+    // Copy `nodeName` into `outName` with `off` trimmed from the end
+    // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
+    const auto TerminatedCopy = [&](size_t off)
+    {
+        dassert(nodeNameLen - off < OutBuffSize);
+        strncpy_s(outName, nodeName,
+                  std::min(nodeNameLen - off, OutBuffSize - 1));            // By providing `OutBuffSize - 1` it is ensured the array will be null terminated
+    };
+
+    if (NodeNameEndsWith("_dam"))
+    {
+        outDamage = true;
+        TerminatedCopy(sizeof("_dam") - 1);
+    }
+    else
+    {
+        outDamage = false;
+        if (NodeNameEndsWith("_l0") || NodeNameEndsWith("_L0"))
+        {
+            TerminatedCopy(sizeof("_l0") - 1);
+        }
+        else
+        {
+            dassert(nodeNameLen < OutBuffSize);
+            strncpy_s(outName, OutBuffSize, nodeName, OutBuffSize - 1);
+        }
+    }
 }
 
 void CRenderWareSA::CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix)
