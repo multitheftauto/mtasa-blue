@@ -1813,9 +1813,6 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 
 bool CModelInfoSA::ConvertToClump()
 {
-    if (GetModelType() != eModelInfoType::ATOMIC)
-        return false;
-
     // Get current interface
     CAtomicModelInfoSAInterface* currentAtomicInterface = static_cast<CAtomicModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
     if (!currentAtomicInterface)
@@ -1843,9 +1840,6 @@ bool CModelInfoSA::ConvertToClump()
 
 bool CModelInfoSA::ConvertToAtomic()
 {
-    if (GetModelType() != eModelInfoType::CLUMP)
-        return false;
-
     // Get current interface
     CClumpModelInfoSAInterface* currentClumpInterface = static_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
     if (!currentClumpInterface)

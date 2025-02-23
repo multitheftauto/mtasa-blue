@@ -335,9 +335,9 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
     // If new model is clump or atomic then we need to convert existing model
     // pClump->object.type is always RP_TYPE_CLUMP so check number of atomics
     // to check if new model is clump or atomic
-    if (g_pGame->GetRenderWare()->GetClumpNumOfAtomics(pClump) > 1 && pModelInfo->GetModelType() == eModelInfoType::ATOMIC)
+    if (g_pGame->GetRenderWare()->GetClumpNumOfAtomics(pClump) > 1)
         pModelInfo->ConvertToClump();
-    else if (g_pGame->GetRenderWare()->GetClumpNumOfAtomics(pClump) == 1 && pModelInfo->GetModelType() == eModelInfoType::CLUMP)
+    else if (g_pGame->GetRenderWare()->GetClumpNumOfAtomics(pClump) == 1)
         pModelInfo->ConvertToAtomic();
     
     if (!pModelInfo->SetCustomModel(pClump))
