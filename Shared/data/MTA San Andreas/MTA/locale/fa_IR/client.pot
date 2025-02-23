@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-02-19 11:28+0000\n"
-"PO-Revision-Date: 2025-02-21 11:06\n"
+"PO-Revision-Date: 2025-02-23 12:50\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -766,7 +766,7 @@ msgstr "میزان صدای MTA:"
 
 #: Client/core/CSettings.cpp:456 Client/core/CSettings.cpp:540
 msgid "Voice volume:"
-msgstr "میزان صدا:"
+msgstr "صدای بازیکنان:"
 
 #: Client/core/CSettings.cpp:456 Client/core/CSettings.cpp:581
 msgid "Play mode:"
