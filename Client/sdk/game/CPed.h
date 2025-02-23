@@ -15,6 +15,7 @@
 #include "Common.h"
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
+#include "CPedSound.h"
 
 class CObject;
 class CPedIK;
@@ -286,4 +287,6 @@ public:
     virtual ePedState           GetPedState() = 0;
 
     virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
+
+    virtual void Say(const ePedSpeechContext& speechId, float probability) = 0;
 };
