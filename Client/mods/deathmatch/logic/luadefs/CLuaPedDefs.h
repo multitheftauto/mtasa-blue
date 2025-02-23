@@ -119,5 +119,5 @@ public:
 
     static bool killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept;
 
-    static bool PedSay(CClientPed* ped, int speechId, std::optional<float> probabilty);
+    static bool PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probabilty);
 };

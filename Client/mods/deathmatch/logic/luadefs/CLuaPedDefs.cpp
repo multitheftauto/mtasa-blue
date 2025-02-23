@@ -62,7 +62,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
         {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
         {"setPedBleeding", ArgumentParser<SetPedBleeding>},
-        {"pedSay", ArgumentParser<PedSay>},
+        {"playPedVoiceLine", ArgumentParser<PlayPedVoiceLine>},
 
         {"getPedVoice", GetPedVoice},
         {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
@@ -212,6 +212,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
     lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
     lua_classfunction(luaVM, "setBleeding", "setPedBleeding");
+    lua_classfunction(luaVM, "playPedVoiceLine", "playVoiceLine");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -2500,11 +2501,11 @@ bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t t
     }
 }
 
-bool CLuaPedDefs::PedSay(CClientPed* ped, int speechId, std::optional<float> probabilty)
+bool CLuaPedDefs::PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probabilty)
 {
     auto speechContextId = static_cast<ePedSpeechContext>(speechId);
     if (speechContextId < ePedSpeechContext::NOTHING || speechContextId >= ePedSpeechContext::NUM_PED_CONTEXT)
-        return false;
+        throw LuaFunctionError("The argument speechId is invalid. The valid range is 0-359.");
 
     if (probabilty.has_value() && probabilty < 0.0f)
         return false;
