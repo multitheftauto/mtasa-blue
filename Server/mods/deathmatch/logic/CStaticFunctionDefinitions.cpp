@@ -21,6 +21,7 @@
 #include "CClock.h"
 #include "CBlip.h"
 #include "CWater.h"
+#include "CBuilding.h"
 #include "CPlayerCamera.h"
 #include "CElementDeleter.h"
 #include "CMainConfig.h"
@@ -775,6 +776,10 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
             CPed* pPed = static_cast<CPed*>(pElement);
             return pPed->GetCollisionEnabled();
         }
+        case CElement::BUILDING:
+        {
+            return static_cast<CBuilding*>(pElement)->GetCollisionEnabled();
+        }
         default:
             return false;
     }
@@ -830,6 +835,16 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CElement* pElement, CElement* 
                 return false;
             break;
         }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            CBuilding* pLowLodObject = nullptr;
+            if (pLowLodElement && pLowLodElement->GetType() == CElement::BUILDING)
+                pLowLodObject = static_cast<CBuilding*>(pLowLodElement);
+            if (!pBuilding->SetLowLodBuilding(pLowLodObject))
+                return false;
+            break;
+        }
         default:
             return false;
     }
@@ -855,6 +870,11 @@ bool CStaticFunctionDefinitions::GetLowLodElement(CElement* pElement, CElement*&
             pOutLowLodElement = pObject->GetLowLodObject();
             break;
         }
+        case CElement::BUILDING:
+        {
+            pOutLowLodElement = static_cast<CBuilding*>(pElement)->GetLowLodElement();
+            break;
+        }
         default:
             return false;
     }
@@ -872,6 +892,11 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CElement* pElement, bool& bOutI
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             bOutIsLowLod = pObject->IsLowLod();
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            bOutIsLowLod = static_cast<CBuilding*>(pElement)->GetHighLodBuilding() ? true : false;
             break;
         }
         default:
@@ -1943,6 +1968,11 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CElement* pElement,
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetCollisionEnabled(bEnable);
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            static_cast<CBuilding*>(pElement)->SetCollisionEnabled(bEnable);
             break;
         }
         default:

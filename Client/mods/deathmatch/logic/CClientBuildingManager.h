@@ -40,7 +40,11 @@ public:
 
 private:
     bool DoPoolResize(size_t newCapacity);
-    void AddToList(CClientBuilding* pBuilding) { m_List.push_back(pBuilding); }
+    void AddToList(CClientBuilding* pBuilding)
+    {
+        ResizePoolIfNeeds();
+        m_List.push_back(pBuilding);
+    }
     void RemoveFromList(CClientBuilding* pBuilding);
 
     std::list<CClientBuilding*> m_List;
