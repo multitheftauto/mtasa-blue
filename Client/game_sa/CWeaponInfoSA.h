@@ -19,6 +19,7 @@ class CEntitySAInterface;
 // Flame shot array for flamethrower flames and maybe molotovs
 #define ARRAY_CFlameShotInfo                0xC89690
 #define MAX_FLAME_SHOT_INFOS                100
+#define FUNC_CWeaponInfo_GetWeaponReloadTime 0x743D70
 
 class CFlameShotInfo
 {
@@ -88,6 +89,8 @@ public:
     /////////////////////////////////
     BYTE m_defaultCombo;                // base combo for this melee weapon
     BYTE m_nCombosAvailable;            // how many further combos are available
+
+    int GetWeaponReloadTime() { return ((int(__thiscall*)(CWeaponInfoSAInterface*))FUNC_CWeaponInfo_GetWeaponReloadTime)(this); }
 };
 
 class CWeaponInfoSA : public CWeaponInfo
