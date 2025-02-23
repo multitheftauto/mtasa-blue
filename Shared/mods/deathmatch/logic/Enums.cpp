@@ -103,6 +103,7 @@ ADD_ENUM(WorldSpecialProperty::ROADSIGNSTEXT, "roadsignstext")
 ADD_ENUM(WorldSpecialProperty::TUNNELWEATHERBLEND, "tunnelweatherblend")
 ADD_ENUM(WorldSpecialProperty::IGNOREFIRESTATE, "ignorefirestate")
 ADD_ENUM(WorldSpecialProperty::FLYINGCOMPONENTS, "flyingcomponents")
+ADD_ENUM(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, "vehicleburnexplosions")
 IMPLEMENT_ENUM_CLASS_END("world-special-property")
 
 IMPLEMENT_ENUM_BEGIN(ePacketID)
