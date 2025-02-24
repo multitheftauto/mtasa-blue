@@ -66,6 +66,8 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 
 #define VTBL_CClumpModelInfo 0x85BD30
 #define VTBL_CAtomicModelInfo 0x85BBF0
+#define VTBL_CDamageAtomicModelInfo 0x85BC30
+#define VTBL_CTimeModelInfo         0x85BCB0
 
 class CBaseModelInfoSAInterface;
 class CModelInfoSAInterface
@@ -235,6 +237,12 @@ public:
     // +726 = Word array as referenced in CVehicleModelInfo::GetVehicleUpgrade(int)
     // +762 = Array of WORD containing something relative to paintjobs
     // +772 = Anim file index
+
+    void DeleteRwObject() { ((void(__thiscall*)(void*))VFTBL->DeleteRwObject)(this); }
+
+    bool IsAtomicVTBL() const { return VFTBL == reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CAtomicModelInfo); }
+    bool IsDamageAtomicVTBL() const { return VFTBL == reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CDamageAtomicModelInfo); }
+    bool IsClumpVTBL() const { return VFTBL == reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CClumpModelInfo); }
 };
 static_assert(sizeof(CBaseModelInfoSAInterface) == 0x20, "Invalid size for CBaseModelInfoSAInterface");
 
@@ -267,6 +275,13 @@ public:
     void SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfoSAInterface*, RpAtomic*))0x4C4360)(this, atomic); }
 };
 
+class CLodAtomicModelInfoSAInterface : public CAtomicModelInfoSAInterface
+{
+public:
+    std::int16_t numChildren; // num child higher level LODs
+    std::int16_t numChildrenRendered; // num child higher level LODs that have been rendered
+};
+
 class CTimeModelInfoSAInterface : public CAtomicModelInfoSAInterface
 {
 public:
@@ -286,7 +301,7 @@ class CDamageableModelInfoSAInterface : public CAtomicModelInfoSAInterface
 public:
     RpAtomic* m_damagedAtomic;
 
-    void SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(RpAtomic*))FUNC_CAtomicModelInfo_SetAtomic)(atomic); }
+    void SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CDamageableModelInfoSAInterface*, RpAtomic*))0x4C48D0)(this, atomic); }
 };
 
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
@@ -371,6 +386,7 @@ protected:
     static std::map<unsigned short, int>                                         ms_DefaultTxdIDMap;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
+    CBaseModelInfoSAInterface* m_lastConversionInterface{nullptr};
     // Store original model interfaces after conersion clump->atomic or atomic->clump
     static std::unordered_map<std::uint32_t, CBaseModelInfoSAInterface*> m_convertedModelInterfaces;
 
@@ -508,9 +524,12 @@ public:
     static void    RestoreAllObjectsPropertiesGroups();
 
     // Model type conversion functions
-    bool ConvertToClump();
-    bool ConvertToAtomic();
-    CBaseModelInfoSAInterface* GetOriginalInterface() const;
+    bool ConvertToClump() override;
+    bool ConvertToAtomic(bool damageable) override;
+    bool ConvertToTimedObject() override;
+    CBaseModelInfoSAInterface* GetLastConversionInterface() const noexcept override { return m_lastConversionInterface; }
+    void                       SetLastConversionInterface(CBaseModelInfoSAInterface* lastInterace) noexcept override { m_lastConversionInterface = lastInterace; }
+    CBaseModelInfoSAInterface* GetOriginalInterface() const override;
 
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;

@@ -193,7 +193,10 @@ public:
     virtual void ResetAlphaTransparency() = 0;
 
     virtual bool ConvertToClump() = 0;
-    virtual bool ConvertToAtomic() = 0;
+    virtual bool ConvertToAtomic(bool damageable) = 0;
+    virtual bool ConvertToTimedObject() = 0;
+    virtual CBaseModelInfoSAInterface* GetLastConversionInterface() const noexcept = 0;
+    virtual void                       SetLastConversionInterface(CBaseModelInfoSAInterface* lastInterface) noexcept = 0;
     virtual CBaseModelInfoSAInterface* GetOriginalInterface() const = 0;
 
     // ONLY use for CVehicleModelInfos

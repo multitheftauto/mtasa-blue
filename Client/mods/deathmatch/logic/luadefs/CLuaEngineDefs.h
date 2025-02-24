@@ -94,6 +94,8 @@ public:
 
     static void EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option);
 
+    static bool EngineConvertModelToType(std::uint32_t model, eClientModelType type);
+
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

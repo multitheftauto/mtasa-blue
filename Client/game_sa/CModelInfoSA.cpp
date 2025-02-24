@@ -1541,6 +1541,8 @@ void CModelInfoSA::RestoreOriginalModel()
         if (currentInterface)
         {
             ppModelInfo[m_dwModelID]->usNumberOfRefs = currentInterface->usNumberOfRefs;
+            ppModelInfo[m_dwModelID]->pColModel = currentInterface->pColModel;
+            
             delete currentInterface;
         }
 
@@ -1818,6 +1820,9 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 
 bool CModelInfoSA::ConvertToClump()
 {
+    if (GetModelType() == eModelInfoType::CLUMP)
+        return false;
+
     // Get current interface
     CBaseModelInfoSAInterface* currentModelInterface = ppModelInfo[m_dwModelID];
     if (!currentModelInterface)
@@ -1838,34 +1843,94 @@ bool CModelInfoSA::ConvertToClump()
     // Set new interface for ModelInfo
     ppModelInfo[m_dwModelID] = newClumpInterface;
 
-    // Store original interface
-    MapSet(m_convertedModelInterfaces, m_dwModelID, currentModelInterface);
+    // Store original (only) interface
+    if (!MapContains(m_convertedModelInterfaces, m_dwModelID))
+        MapSet(m_convertedModelInterfaces, m_dwModelID, currentModelInterface);
+    else
+        m_lastConversionInterface = currentModelInterface;
+
     return true;
 }
 
-bool CModelInfoSA::ConvertToAtomic()
+bool CModelInfoSA::ConvertToAtomic(bool damageable)
 {
     // Get current interface
-    CClumpModelInfoSAInterface* currentClumpInterface = static_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
-    if (!currentClumpInterface)
+    CBaseModelInfoSAInterface* currentModelInterface = ppModelInfo[m_dwModelID];
+    if (!currentModelInterface)
+        return false;
+
+    if (GetModelType() == eModelInfoType::ATOMIC && ((damageable && currentModelInterface->IsDamageAtomicVTBL()) || (!damageable && currentModelInterface->IsAtomicVTBL())))
         return false;
 
     // Create new atomic interface
-    CAtomicModelInfoSAInterface* newAtomicInterface = new CAtomicModelInfoSAInterface();
-    MemCpyFast(newAtomicInterface, currentClumpInterface, sizeof(CAtomicModelInfoSAInterface));
+    CAtomicModelInfoSAInterface* newAtomicInterface = nullptr;
+    CDamageableModelInfoSAInterface* newDamageableAtomicInterface = nullptr;
 
     // (FileEX): We do not destroy or set pRwObject to nullptr here
     // because our IsLoaded code expects the RwObject to exist.
     // We destroy the old RwObject in CRenderWareSA::ReplaceAllAtomicsInModel after passing the IsLoaded condition in the SetCustomModel.
 
-    // Set CAtomicModelInfo vtbl after copying data
-    newAtomicInterface->VFTBL = reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CAtomicModelInfo);
+    if (damageable)
+    {
+        newDamageableAtomicInterface = new CDamageableModelInfoSAInterface();
+        MemCpyFast(newDamageableAtomicInterface, currentModelInterface, sizeof(CDamageableModelInfoSAInterface));
+        newDamageableAtomicInterface->m_damagedAtomic = nullptr;
+
+        // Set CDamageAtomicModelInfo vtbl after copying data
+        newDamageableAtomicInterface->VFTBL = reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CDamageAtomicModelInfo);
+    }
+    else
+    {
+        newAtomicInterface = new CAtomicModelInfoSAInterface();
+        MemCpyFast(newAtomicInterface, currentModelInterface, sizeof(CAtomicModelInfoSAInterface));
+
+        // Set CAtomicModelInfo vtbl after copying data
+        newAtomicInterface->VFTBL = reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CAtomicModelInfo);
+    }
 
     // Set new interface for ModelInfo
-    ppModelInfo[m_dwModelID] = newAtomicInterface;
+    ppModelInfo[m_dwModelID] = damageable ? newDamageableAtomicInterface : newAtomicInterface;
 
-    // Store original interface
-    MapSet(m_convertedModelInterfaces, m_dwModelID, currentClumpInterface);
+    // Store original (only) interface
+    if (!MapContains(m_convertedModelInterfaces, m_dwModelID))
+        MapSet(m_convertedModelInterfaces, m_dwModelID, currentModelInterface);
+    else
+        m_lastConversionInterface = currentModelInterface;
+
+    return true;
+}
+
+bool CModelInfoSA::ConvertToTimedObject()
+{
+    if (GetModelType() == eModelInfoType::TIME)
+        return false;
+
+    // Get current interface
+    CBaseModelInfoSAInterface* currentModelInterface = ppModelInfo[m_dwModelID];
+    if (!currentModelInterface)
+        return false;
+
+    // Create new interface
+    CTimeModelInfoSAInterface* newTimedInterface = new CTimeModelInfoSAInterface();
+    MemCpyFast(newTimedInterface, currentModelInterface, sizeof(CTimeModelInfoSAInterface));
+    newTimedInterface->timeInfo.m_wOtherTimeModel = 0;
+
+    // (FileEX): We do not destroy or set pRwObject to nullptr here
+    // because our IsLoaded code expects the RwObject to exist.
+    // We destroy the old RwObject in CRenderWareSA::ReplaceAllAtomicsInModel after passing the IsLoaded condition in the SetCustomModel.
+
+    // Set CTimeModelInfo vtbl after copying data
+    newTimedInterface->VFTBL = reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CTimeModelInfo);
+
+    // Set new interface for ModelInfo
+    ppModelInfo[m_dwModelID] = newTimedInterface;
+
+    // Store original (only) interface
+    if (!MapContains(m_convertedModelInterfaces, m_dwModelID))
+        MapSet(m_convertedModelInterfaces, m_dwModelID, currentModelInterface);
+    else
+        m_lastConversionInterface = currentModelInterface;
+
     return true;
 }
 
