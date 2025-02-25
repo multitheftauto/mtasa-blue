@@ -806,7 +806,8 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     size_t referencesCount = m_pInterface->usNumberOfRefs;
 
     // +1 reference for active rwObject
-    // TODO: pRwObject can have to unloaded TXD
+    // The current textures will be removed in RpAtomicDestroy
+    // RenderWare uses an additional reference counter per texture
     if (m_pInterface->pRwObject)
         referencesCount++;
 
