@@ -219,20 +219,11 @@ public:
         ((CStencilShadow_dtorByOwner)0x711730)(this);
     };
 
-    void SetOrientation(float x, float y, float z) {
-        using CPlacetable_SetOrientation = void(__thiscall*)(CEntitySAInterface * pEntity, float, float, float);
-        ((CPlacetable_SetOrientation)0x439A80)(this, x, y, z);
-    }
-
     void RemoveRWObjectWithReferencesCleanup() {
         DeleteRwObject();
         ResolveReferences();
         RemoveShadows();
     }
-
-    bool HasMatrix() const noexcept { return Placeable.matrix != nullptr; }
-
-    void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
 };
 
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
