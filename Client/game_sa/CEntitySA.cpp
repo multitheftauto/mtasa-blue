@@ -176,21 +176,11 @@ void CEntitySA::Render()
 void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 {
     pGame->GetWorld()->Remove(this, CEntity_SetOrientation);
+
+    m_pInterface->SetOrientation(fX, fY, fZ);
+
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_SetOrientation;
-    _asm
-    {
-        // ChrML: I've switched the X and Z at this level because that's how the real rotation
-        //        is. GTA has kinda swapped them in this function.
-
-        push    fZ
-        push    fY
-        push    fX
-        mov     ecx, dwThis
-        call    dwFunc
-    }
-
-    dwFunc = 0x446F90;
+    DWORD dwFunc = 0x446F90;
     _asm
     {
         mov     ecx, dwThis
@@ -642,7 +632,7 @@ bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
         return false;
 
     const RwV3d& pos = rwBoneMatrix->pos;
-    position = {pos.x, pos.y, pos.z};
+    position = CVector(pos.x, pos.y, pos.z);
     return true;
 }
 

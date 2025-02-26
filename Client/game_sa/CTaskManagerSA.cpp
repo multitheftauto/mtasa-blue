@@ -151,6 +151,18 @@ void CTaskManagerSA::RemoveTaskSecondary(const int iTaskPriority)
     SetTaskSecondary(NULL, iTaskPriority);
 }
 
+bool CTaskManagerSA::RemoveTaskSecondary(const int taskPriority, const int taskType)
+{
+    CTask* task = GetTaskSecondary(taskPriority);
+    if (task && task->GetTaskType() == taskType)
+    {
+        RemoveTaskSecondary(taskPriority);
+        return true;
+    }
+
+    return false;
+}
+
 void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)
 {
     DWORD             dwFunc = FUNC_SetTaskSecondary;

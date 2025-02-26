@@ -674,7 +674,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libGLESv2.dll"
         File "${FILES_ROOT}\mta\vk_swiftshader.dll"
         File "${FILES_ROOT}\mta\vulkan-1.dll"
-        File "${FILES_ROOT}\mta\snapshot_blob.bin"
         File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
 
         File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
@@ -780,8 +779,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\cgui\unifont.ttf"
 
             SetOutPath "$INSTDIR\MTA\cgui\images"
-            File "${FILES_ROOT}\mta\cgui\images\*.png"
-            File "${FILES_ROOT}\mta\cgui\images\*.jpg"
+            File /nonfatal "${FILES_ROOT}\mta\cgui\images\*.png"
+            File /nonfatal "${FILES_ROOT}\mta\cgui\images\*.jpg"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\radarset"
             File "${FILES_ROOT}\mta\cgui\images\radarset\*.png"

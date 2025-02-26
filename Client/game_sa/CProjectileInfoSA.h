@@ -40,7 +40,8 @@ public:
 };
 // #pragma pack(pop)
 
-class CProjectileInfoSA : public CProjectileInfo
+// TODO extract manager class
+class CProjectileInfoSA final : public CProjectileInfo
 {
 private:
     CProjectileInfoSA*          projectileInfo[PROJECTILE_INFO_COUNT];
@@ -63,6 +64,7 @@ public:
     CProjectileInfo* GetProjectileInfo(DWORD dwIndex);
     bool             AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
     CProjectile*     GetProjectile(void* projectilePointer);
+    void             RemoveEntityReferences(CEntity* entity);
 
     CEntity* GetTarget();
     void     SetTarget(CEntity* pEntity);

@@ -59,6 +59,7 @@ class CPedIntelligenceSAInterface;
 #define FUNC_DetachPedFromEntity        0x5E7EC0
 #define FUNC_CPed_RemoveBodyPart        0x5f0140
 #define FUNC_PreRenderAfterTest         0x5E65A0
+#define FUNC_CPed_Say                   0x5EFFE0
 
 #define VAR_LocalPlayer                 0x94AD28
 
@@ -313,8 +314,8 @@ public:
     float GetHealth();
     void  SetHealth(float fHealth);
 
-    float GetArmor();
-    void  SetArmor(float fArmor);
+    float GetArmor() noexcept;
+    void  SetArmor(float armor) noexcept;
 
     float GetOxygenLevel();
     void  SetOxygenLevel(float fOxygen);
@@ -389,8 +390,8 @@ public:
     bool IsBleeding();
     void SetBleeding(bool bBleeding);
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() override { return GetPedInterface()->pFireOnPed != nullptr; }
+    bool SetOnFire(bool onFire) override;
 
     bool GetStayInSamePlace() { return GetPedInterface()->pedFlags.bStayInSamePlace; }
     void SetStayInSamePlace(bool bStay);
@@ -419,4 +420,6 @@ public:
     ePedState           GetPedState() { return GetPedInterface()->pedState; }
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
+
+    void Say(const ePedSpeechContext& speechId, float probability) override;
 };

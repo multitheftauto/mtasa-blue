@@ -80,6 +80,7 @@ public:
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();
     void                InitHooks_Postprocess();
+    void                InitHooks_DeviceSelection();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -311,7 +312,7 @@ public:
 
     CLimits* GetLimits() { return &m_limits; }
 
-    void UpdateVehicleSuspension() noexcept;
+    void UpdateVehicleSuspension() const noexcept;
 
     virtual void FlushClothesCache();
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading);
@@ -353,7 +354,6 @@ public:
     DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
-    unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
     unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
     CVector      m_vecAkimboTarget;

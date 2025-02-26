@@ -101,12 +101,18 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setFPSLimit", SetFPSLimit},
                                                                              {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
                                                                              {"setWorldProperty", ArgumentParser<SetWorldProperty>},
+
+                                                                             // World remove/restore functions 
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"removeGameWorld", ArgumentParser<RemoveGameWorld>},
+                                                                             {"restoreGameWorld", ArgumentParser<RestoreGameWorld>},
+
                                                                              {"setTimeFrozen", ArgumentParser<SetTimeFrozen>},
                                                                              {"setVolumetricShadowsEnabled", ArgumentParser<SetVolumetricShadowsEnabled>},
                                                                              {"setDynamicPedShadowsEnabled", ArgumentParser<SetDynamicPedShadowsEnabled>}, 
+
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -142,7 +148,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isGarageOpen", IsGarageOpen},
                                                                              {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
                                                                              {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
-                                                                             {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>}};
+                                                                             {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>},
+                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -1259,14 +1266,28 @@ int CLuaWorldDefs::SetOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
+bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(const WorldSpecialProperty property) noexcept
 {
     return m_pClientGame->IsWorldSpecialProperty(property);
 }
 
-bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
+bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(const WorldSpecialProperty property, const bool enabled) noexcept
 {
-    return m_pClientGame->SetWorldSpecialProperty(property, isEnabled);
+    if (!m_pClientGame->SetWorldSpecialProperty(property, enabled))
+        return false;
+
+    if (!g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent))
+        return true;
+
+    if (auto stream = g_pNet->AllocateNetBitStream())
+    {
+        stream->WriteString(EnumToString(property));
+        stream->WriteBit(enabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
+    }
+
+    return true;
 }
 
 int CLuaWorldDefs::SetCloudsEnabled(lua_State* luaVM)
@@ -2261,6 +2282,31 @@ bool CLuaWorldDefs::ResetTimeFrozen() noexcept
     return g_pGame->GetClock()->ResetTimeFrozen();
 }
 
+void CLuaWorldDefs::RemoveGameWorld()
+{
+    // We do not want to remove scripted buildings
+    // But we need remove them from the buildings pool for a bit...
+    m_pBuildingManager->DestroyAllForABit();
+
+    // This function makes buildings backup without scripted buildings
+    g_pGame->RemoveGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyed();
+}
+
+void CLuaWorldDefs::RestoreGameWorld()
+{
+    // We want to restore the game buildings to the same positions as they were before the backup.
+    // Remove scripted buildings for a bit
+    m_pBuildingManager->DestroyAllForABit();
+
+    g_pGame->RestoreGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyedSafe();
+}
+
 bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable) noexcept
 {
     g_pGame->GetSettings()->SetVolumetricShadowsEnabled(enable);
@@ -2296,4 +2342,16 @@ bool CLuaWorldDefs::IsDynamicPedShadowsEnabled() noexcept
 bool CLuaWorldDefs::ResetDynamicPedShadows() noexcept
 {
     return g_pGame->GetSettings()->ResetDynamicPedShadows();
+}
+
+CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> CLuaWorldDefs::TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore)
+{
+    STestSphereAgainstWorldResult result;
+    CClientEntity* collidedEntity = nullptr;
+
+    CEntity* entity = g_pGame->GetWorld()->TestSphereAgainstWorld(sphereCenter, radius, ignoredEntity.has_value() ? ignoredEntity.value()->GetGameEntity() : nullptr, checkBuildings.value_or(true), checkVehicles.value_or(true), checkPeds.value_or(true), checkObjects.value_or(true), checkDummies.value_or(true), cameraIgnore.value_or(false), result);
+    if (entity)
+        collidedEntity = reinterpret_cast<CClientEntity*>(entity->GetStoredPointer());
+
+    return {result.collisionDetected, collidedEntity, result.modelID, result.entityPosition.fX, result.entityPosition.fY, result.entityPosition.fZ, ConvertRadiansToDegrees(result.entityRotation.fX), ConvertRadiansToDegrees(result.entityRotation.fY), ConvertRadiansToDegrees(result.entityRotation.fZ), result.lodID, result.type};
 }

@@ -256,6 +256,7 @@ void CClientVariables::ValidateValues()
     ClampValue("mtavolume", 0.0f, 1.0f);
     ClampValue("voicevolume", 0.0f, 1.0f);
     ClampValue("mapalpha", 0, 255);
+    ClampValue("mapimage", 0, 1);
 }
 
 void CClientVariables::LoadDefaults()
@@ -273,9 +274,6 @@ void CClientVariables::LoadDefaults()
     DEFAULT("host", _S("127.0.0.1"));                                    // hostname
     DEFAULT("port", 22003);                                              // port
     DEFAULT("password", _S(""));                                         // password
-    DEFAULT("qc_host", _S("127.0.0.1"));                                 // quick connect hostname
-    DEFAULT("qc_port", 22003);                                           // quick connect port
-    DEFAULT("qc_password", _S(""));                                      // quick connect password
     DEFAULT("debugfile", _S(""));                                        // debug filename
     DEFAULT("console_pos", CVector2D(0, 0));                             // console position
     DEFAULT("console_size", CVector2D(200, 200));                        // console size
@@ -313,7 +311,8 @@ void CClientVariables::LoadDefaults()
     DEFAULT("mastervolume", 1.0f);                                                    // master volume
     DEFAULT("mtavolume", 1.0f);                                                       // custom sound's volume
     DEFAULT("voicevolume", 1.0f);                                                     // voice chat output volume
-    DEFAULT("mapalpha", 155);                                                         // map alpha
+    DEFAULT("mapalpha", 155);                                                         // player map alpha
+    DEFAULT("mapimage", 0);                                                           // player map image
     DEFAULT("browser_speed", 1);                                                      // Browser speed
     DEFAULT("single_download", 0);                                                    // Single connection for downloads
     DEFAULT("packet_tag", 0);                                                         // Tag network packets
@@ -357,7 +356,6 @@ void CClientVariables::LoadDefaults()
     DEFAULT("allow_discord_rpc", true);                                               // Enable Discord Rich Presence
     DEFAULT("discord_rpc_share_data", false);                                         // Consistent Rich Presence data sharing
     DEFAULT("discord_rpc_share_data_firsttime", false);                               // Display the user data sharing consent dialog box - for the first time
-    DEFAULT("_beta_qc_rightclick_command", _S("reconnect"));                          // Command to run when right clicking quick connect (beta - can be removed at any time)
     DEFAULT("browser_enable_gpu", true);                                              // Enable GPU in CEF? (allows stuff like WebGL to function)
 
     if (!Exists("locale"))

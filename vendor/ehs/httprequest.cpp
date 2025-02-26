@@ -464,7 +464,9 @@ HttpRequest::HttpParseStates HttpRequest::ParseData ( std::string & irsData ///<
 				if ( sName == "Transfer-Encoding" &&
 					 sValue == "chunked" ) {
 					
+#ifdef EHS_DEBUG
 					fprintf ( stderr, "EHS DOES NOT SUPPORT CHUNKED ENCODING.  Send an email to xaxxon@slackworks.com and tell him you want chunked encoding (or send a patch)\n" );
+#endif
 					nCurrentHttpParseState = HTTPPARSESTATE_INVALIDREQUEST;
 
 				}

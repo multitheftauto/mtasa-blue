@@ -91,78 +91,78 @@ public:
     virtual ~CHandlingEntry(){};
 
     // Use this to copy data from an another handling class to this
-    virtual void Assign(const CHandlingEntry* pEntry) = 0;
+    virtual void Assign(const CHandlingEntry* pEntry) noexcept = 0;
 
     // Get functions
-    virtual float          GetMass() const = 0;
-    virtual float          GetTurnMass() const = 0;
-    virtual float          GetDragCoeff() const = 0;
-    virtual const CVector& GetCenterOfMass() const = 0;
+    virtual float          GetMass() const noexcept = 0;
+    virtual float          GetTurnMass() const noexcept = 0;
+    virtual float          GetDragCoeff() const noexcept = 0;
+    virtual const CVector& GetCenterOfMass() const noexcept = 0;
 
-    virtual unsigned int GetPercentSubmerged() const = 0;
-    virtual float        GetTractionMultiplier() const = 0;
+    virtual unsigned int GetPercentSubmerged() const noexcept = 0;
+    virtual float        GetTractionMultiplier() const noexcept = 0;
 
-    virtual eDriveType    GetCarDriveType() const = 0;
-    virtual eEngineType   GetCarEngineType() const = 0;
-    virtual unsigned char GetNumberOfGears() const = 0;
+    virtual eDriveType    GetCarDriveType() const noexcept = 0;
+    virtual eEngineType   GetCarEngineType() const noexcept = 0;
+    virtual unsigned char GetNumberOfGears() const noexcept = 0;
 
-    virtual float GetEngineAcceleration() const = 0;
-    virtual float GetEngineInertia() const = 0;
-    virtual float GetMaxVelocity() const = 0;
+    virtual float GetEngineAcceleration() const noexcept = 0;
+    virtual float GetEngineInertia() const noexcept = 0;
+    virtual float GetMaxVelocity() const noexcept = 0;
 
-    virtual float GetBrakeDeceleration() const = 0;
-    virtual float GetBrakeBias() const = 0;
-    virtual bool  GetABS() const = 0;
+    virtual float GetBrakeDeceleration() const noexcept = 0;
+    virtual float GetBrakeBias() const noexcept = 0;
+    virtual bool  GetABS() const noexcept = 0;
 
-    virtual float GetSteeringLock() const = 0;
-    virtual float GetTractionLoss() const = 0;
-    virtual float GetTractionBias() const = 0;
+    virtual float GetSteeringLock() const noexcept = 0;
+    virtual float GetTractionLoss() const noexcept = 0;
+    virtual float GetTractionBias() const noexcept = 0;
 
-    virtual float GetSuspensionForceLevel() const = 0;
-    virtual float GetSuspensionDamping() const = 0;
-    virtual float GetSuspensionHighSpeedDamping() const = 0;
-    virtual float GetSuspensionUpperLimit() const = 0;
-    virtual float GetSuspensionLowerLimit() const = 0;
-    virtual float GetSuspensionFrontRearBias() const = 0;
-    virtual float GetSuspensionAntiDiveMultiplier() const = 0;
+    virtual float GetSuspensionForceLevel() const noexcept = 0;
+    virtual float GetSuspensionDamping() const noexcept = 0;
+    virtual float GetSuspensionHighSpeedDamping() const noexcept = 0;
+    virtual float GetSuspensionUpperLimit() const noexcept = 0;
+    virtual float GetSuspensionLowerLimit() const noexcept = 0;
+    virtual float GetSuspensionFrontRearBias() const noexcept = 0;
+    virtual float GetSuspensionAntiDiveMultiplier() const noexcept = 0;
 
-    virtual float GetCollisionDamageMultiplier() const = 0;
+    virtual float GetCollisionDamageMultiplier() const noexcept = 0;
 
-    virtual unsigned int GetHandlingFlags() const = 0;
-    virtual unsigned int GetModelFlags() const = 0;
-    virtual float        GetSeatOffsetDistance() const = 0;
-    virtual unsigned int GetMonetary() const = 0;
+    virtual unsigned int GetHandlingFlags() const noexcept = 0;
+    virtual unsigned int GetModelFlags() const noexcept = 0;
+    virtual float        GetSeatOffsetDistance() const noexcept = 0;
+    virtual unsigned int GetMonetary() const noexcept = 0;
 
-    virtual eLightType    GetHeadLight() const = 0;
-    virtual eLightType    GetTailLight() const = 0;
-    virtual unsigned char GetAnimGroup() const = 0;
+    virtual eLightType    GetHeadLight() const noexcept = 0;
+    virtual eLightType    GetTailLight() const noexcept = 0;
+    virtual unsigned char GetAnimGroup() const noexcept = 0;
 
-    virtual std::uint16_t GetVehicleID() const = 0;
+    virtual eHandlingTypes GetVehicleID() const noexcept = 0;
 
     // Set functions
-    virtual void SetMass(float fMass) = 0;
-    virtual void SetTurnMass(float fTurnMass) = 0;
-    virtual void SetDragCoeff(float fDrag) = 0;
-    virtual void SetCenterOfMass(const CVector& vecCenter) = 0;
+    virtual void SetMass(float fMass) noexcept = 0;
+    virtual void SetTurnMass(float fTurnMass) noexcept = 0;
+    virtual void SetDragCoeff(float fDrag) noexcept = 0;
+    virtual void SetCenterOfMass(const CVector& vecCenter) noexcept = 0;
 
-    virtual void SetPercentSubmerged(unsigned int uiPercent) = 0;
-    virtual void SetTractionMultiplier(float fTractionMultiplier) = 0;
+    virtual void SetPercentSubmerged(unsigned int uiPercent) noexcept = 0;
+    virtual void SetTractionMultiplier(float fTractionMultiplier) noexcept = 0;
 
-    virtual void SetCarDriveType(eDriveType Type) = 0;
-    virtual void SetCarEngineType(eEngineType Type) = 0;
-    virtual void SetNumberOfGears(unsigned char ucNumber) = 0;
+    virtual void SetCarDriveType(eDriveType Type) noexcept = 0;
+    virtual void SetCarEngineType(eEngineType Type) noexcept = 0;
+    virtual void SetNumberOfGears(unsigned char ucNumber) noexcept = 0;
 
-    virtual void SetEngineAcceleration(float fAcceleration) = 0;
-    virtual void SetEngineInertia(float fInertia) = 0;
-    virtual void SetMaxVelocity(float fVelocity) = 0;
+    virtual void SetEngineAcceleration(float fAcceleration) noexcept = 0;
+    virtual void SetEngineInertia(float fInertia) noexcept = 0;
+    virtual void SetMaxVelocity(float fVelocity) noexcept = 0;
 
-    virtual void SetBrakeDeceleration(float fDeceleration) = 0;
-    virtual void SetBrakeBias(float fBias) = 0;
-    virtual void SetABS(bool bABS) = 0;
+    virtual void SetBrakeDeceleration(float fDeceleration) noexcept = 0;
+    virtual void SetBrakeBias(float fBias) noexcept = 0;
+    virtual void SetABS(bool bABS) noexcept = 0;
 
-    virtual void SetSteeringLock(float fSteeringLock) = 0;
-    virtual void SetTractionLoss(float fTractionLoss) = 0;
-    virtual void SetTractionBias(float fTractionBias) = 0;
+    virtual void SetSteeringLock(float fSteeringLock) noexcept = 0;
+    virtual void SetTractionLoss(float fTractionLoss) noexcept = 0;
+    virtual void SetTractionBias(float fTractionBias) noexcept = 0;
 
     virtual void SetSuspensionForceLevel(float fForce) noexcept = 0;
     virtual void SetSuspensionDamping(float fDamping) noexcept = 0;
@@ -172,18 +172,20 @@ public:
     virtual void SetSuspensionFrontRearBias(float fBias) noexcept = 0;
     virtual void SetSuspensionAntiDiveMultiplier(float fAntiDive) noexcept = 0;
 
-    virtual void SetCollisionDamageMultiplier(float fMultiplier) = 0;
+    virtual void SetCollisionDamageMultiplier(float fMultiplier) noexcept = 0;
 
-    virtual void SetHandlingFlags(unsigned int uiFlags) = 0;
-    virtual void SetModelFlags(unsigned int uiFlags) = 0;
-    virtual void SetSeatOffsetDistance(float fDistance) = 0;
-    virtual void SetMonetary(unsigned int uiMonetary) = 0;
+    virtual void SetHandlingFlags(unsigned int uiFlags) noexcept = 0;
+    virtual void SetModelFlags(unsigned int uiFlags) noexcept = 0;
+    virtual void SetSeatOffsetDistance(float fDistance) noexcept = 0;
+    virtual void SetMonetary(unsigned int uiMonetary) noexcept = 0;
 
-    virtual void SetHeadLight(eLightType Style) = 0;
-    virtual void SetTailLight(eLightType Style) = 0;
-    virtual void SetAnimGroup(unsigned char ucGroup) = 0;
+    virtual void SetHeadLight(eLightType Style) noexcept = 0;
+    virtual void SetTailLight(eLightType Style) noexcept = 0;
+    virtual void SetAnimGroup(unsigned char ucGroup) noexcept = 0;
+
+    virtual void CheckSuspensionChanges() const noexcept = 0;
 
     // Call this every time you're done changing something. This will recalculate
     // all transmission/handling values according to the new values.
-    virtual void Recalculate() = 0;
+    virtual void Recalculate() noexcept = 0;
 };

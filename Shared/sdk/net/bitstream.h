@@ -556,7 +556,7 @@ enum class eBitStreamVersion : unsigned short
     // 2024-06-16
     PedSync_Revision,
 
-    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
+    // Add "tunnelweatherblend" to setWorldSpecialPropertyEnabled
     // 2024-06-30
     WorldSpecialProperty_TunnelWeatherBlend,
 
@@ -571,6 +571,46 @@ enum class eBitStreamVersion : unsigned short
     // Add respawnObject and toggleObjectRespawn to serverside
     // 2024-09-04
     RespawnObject_Serverside,
+
+    // Add check_duplicate_serials
+    // 2024-09-04
+    CheckDuplicateSerials,
+
+    // Add ignorefirestate special world property
+    // 2024-11-07
+    WorldSpecialProperty_IgnoreFireState,
+
+    // Fix iPedSyncerDistance and iUnoccupiedVehicleSyncerDistance sync
+    // 2024-11-22
+    FixSyncerDistance,
+
+    // Add onPlayerChangesWorldSpecialProperty
+    // 2024-11-26
+    WorldSpecialPropertyEvent,
+
+    // Add setElementOnFire function
+    // 2024-12-30
+    SetElementOnFire,
+
+    // Add "spawnFlyingComponent" to setVehiclePanelState
+    // 2024-12-31
+    SetVehiclePanelState_SpawnFlyingComponent,
+
+    // Ped animations synchronization
+    // 2025-01-01
+    AnimationsSync,
+
+    // Add server side isPedReloadingWeapon
+    // 2025-01-09
+    IsPedReloadingWeapon,
+
+    // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
+    // 2025-01-10
+    WorldSpecialProperty_FlyingComponents,
+
+    // Ped's camera synchronization
+    // 2025-01-29
+    PedSync_CameraRotation,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

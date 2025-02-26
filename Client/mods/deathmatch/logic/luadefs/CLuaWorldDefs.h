@@ -34,7 +34,7 @@ public:
     LUA_DECLARE(GetGaragePosition);
     LUA_DECLARE(GetGarageSize);
     LUA_DECLARE(GetGarageBoundingBox);
-    static bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property);
+    static bool IsWorldSpecialPropertyEnabled(const WorldSpecialProperty property) noexcept;
     LUA_DECLARE(GetBlurLevel);
     LUA_DECLARE(GetTrafficLightState);
     LUA_DECLARE(AreTrafficLightsLocked);
@@ -57,7 +57,7 @@ public:
     LUA_DECLARE(SetMinuteDuration);
     LUA_DECLARE(SetWaveHeight);
     LUA_DECLARE(SetGarageOpen);
-    static bool SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled);
+    static bool SetWorldSpecialPropertyEnabled(const WorldSpecialProperty property, const bool enabled) noexcept;
     LUA_DECLARE(SetBlurLevel);
     LUA_DECLARE(ResetBlurLevel);
     LUA_DECLARE(SetJetpackMaxHeight);
@@ -144,5 +144,9 @@ public:
     static bool SetDynamicPedShadowsEnabled(bool enable);
     static bool IsDynamicPedShadowsEnabled() noexcept;
     static bool ResetDynamicPedShadows() noexcept;
-};
 
+    static CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore);
+
+    static void RemoveGameWorld();
+    static void RestoreGameWorld();
+};
