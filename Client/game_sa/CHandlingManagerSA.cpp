@@ -274,7 +274,7 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::u
 }
 
 // Return the handling manager id
-eHandlingTypes CHandlingManagerSA::GetHandlingID(std::uint32_t model) const noexcept
+eHandlingTypes CHandlingManagerSA::GetHandlingID(std::uint32_t model) noexcept
 {
     switch (model)
     {
@@ -9125,53 +9125,47 @@ void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
     m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
-void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const pEntry) const noexcept
+void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const entry) const noexcept
 {
-    try
-    {
-        // Valid?
-        if (!pEntry)
-            return;
+    // Valid?
+    if (!entry)
+        return;
 
-        // Grab us a multiplayer_sa pointer
-        const CMultiplayer* const pMultiplayer = g_pCore->GetMultiplayer();
-        if (!pMultiplayer)
-            return;
+    // Grab us a multiplayer pointer
+    const CMultiplayer* const multiplayer = g_pCore->GetMultiplayer();
+    if (!multiplayer)
+        return;
 
-        // Get Handling ID
-        const eHandlingTypes eHandling = pEntry->GetVehicleID();
-        if (eHandling >= HT_MAX)
-            return;
+    // Get handling type
+    const eHandlingTypes handlingType = entry->GetVehicleID();
+    if (handlingType >= HT_MAX)
+        return;
 
-        const auto& entries = m_OriginalEntries[eHandling];
-        if (!entries)
-            return;
+    const auto& entries = m_OriginalEntries[handlingType];
+    if (!entries)
+        return;
 
-        // Default bChanged to false
-        bool bChanged = false;
+    // Not changed default
+    bool isChanged = false;
 
-        // Set bChanged to true if we find ANY change.
-        if (pEntry->GetSuspensionAntiDiveMultiplier() != entries->GetSuspensionAntiDiveMultiplier())
-            bChanged = true;
-        else if (pEntry->GetSuspensionDamping() != entries->GetSuspensionDamping())
-            bChanged = true;
-        else if (pEntry->GetSuspensionForceLevel() != entries->GetSuspensionForceLevel())
-            bChanged = true;
-        else if (pEntry->GetSuspensionFrontRearBias() != entries->GetSuspensionFrontRearBias())
-            bChanged = true;
-        else if (pEntry->GetSuspensionHighSpeedDamping() != entries->GetSuspensionHighSpeedDamping())
-            bChanged = true;
-        else if (pEntry->GetSuspensionLowerLimit() != entries->GetSuspensionLowerLimit())
-            bChanged = true;
-        else if (pEntry->GetSuspensionUpperLimit() != entries->GetSuspensionUpperLimit())
-            bChanged = true;
+    // Find changes
+    if (entry->GetSuspensionAntiDiveMultiplier() != entries->GetSuspensionAntiDiveMultiplier())
+        isChanged = true;
+    else if (entry->GetSuspensionDamping() != entries->GetSuspensionDamping())
+        isChanged = true;
+    else if (entry->GetSuspensionForceLevel() != entries->GetSuspensionForceLevel())
+        isChanged = true;
+    else if (entry->GetSuspensionFrontRearBias() != entries->GetSuspensionFrontRearBias())
+        isChanged = true;
+    else if (entry->GetSuspensionHighSpeedDamping() != entries->GetSuspensionHighSpeedDamping())
+        isChanged = true;
+    else if (entry->GetSuspensionLowerLimit() != entries->GetSuspensionLowerLimit())
+        isChanged = true;
+    else if (entry->GetSuspensionUpperLimit() != entries->GetSuspensionUpperLimit())
+        isChanged = true;
 
-        if (!bChanged)
-            return;
+    if (!isChanged)
+        return;
 
-        pMultiplayer->UpdateVehicleSuspension();
-    }
-    catch (...)
-    {
-    }
+    multiplayer->UpdateVehicleSuspension();
 }
