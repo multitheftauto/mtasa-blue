@@ -225,6 +225,13 @@ void CServer::Stop(bool graceful)
         }
     }
 
+    // Print out the remaining server output (but not everything to avoid blocking here).
+    for (int i = 0; i < 5; ++i)
+    {
+        if (!PrintServerOutputToConsole())
+            break;
+    }
+
     if (DWORD exitCode{}; GetExitCodeProcess(m_process, &exitCode))
     {
         const char* errorText = "Unknown exit code";
@@ -256,16 +263,7 @@ void CServer::Pulse()
     if (!m_isRunning)
         return;
 
-    // Try to read the process standard output and then write it to the console window.
-    if (DWORD numBytes{}; PeekNamedPipe(m_stdout, nullptr, 0, nullptr, &numBytes, nullptr) && numBytes > 0)
-    {
-        std::array<char, 4096> buffer{};
-
-        if (ReadFile(m_stdout, buffer.data(), std::min<DWORD>(buffer.size(), numBytes), &numBytes, nullptr) && numBytes > 0)
-        {
-            g_pCore->GetConsole()->Printf("%.*s", numBytes, buffer.data());
-        }
-    }
+    PrintServerOutputToConsole();
 
     // Check if the server process was terminated externally.
     if (!IsProcessRunning(m_process))
@@ -284,4 +282,21 @@ void CServer::Pulse()
             m_isAcceptingConnections = true;
         }
     }
+}
+
+bool CServer::PrintServerOutputToConsole()
+{
+    // Try to read the process standard output and then write it to the console window.
+    if (DWORD numBytes{}; PeekNamedPipe(m_stdout, nullptr, 0, nullptr, &numBytes, nullptr) && numBytes > 0)
+    {
+        std::array<char, 4096> buffer{};
+
+        if (ReadFile(m_stdout, buffer.data(), std::min<DWORD>(buffer.size(), numBytes), &numBytes, nullptr) && numBytes > 0)
+        {
+            g_pCore->GetConsole()->Printf("%.*s", numBytes, buffer.data());
+            return true;
+        }
+    }
+
+    return false;
 }

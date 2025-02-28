@@ -15,6 +15,7 @@
 #include <game/CTasks.h>
 #include <game/TaskBasic.h>
 #include <game/CAnimManager.h>
+#include "CLuaPedDefs.h"
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
@@ -61,6 +62,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
         {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
         {"setPedBleeding", ArgumentParser<SetPedBleeding>},
+        {"playPedVoiceLine", ArgumentParser<PlayPedVoiceLine>},
 
         {"getPedVoice", GetPedVoice},
         {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
@@ -210,6 +212,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
     lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
     lua_classfunction(luaVM, "setBleeding", "setPedBleeding");
+    lua_classfunction(luaVM, "playVoiceLine", "playPedVoiceLine");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -2481,19 +2484,40 @@ bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
     return pPed->ExitVehicle();
 }
 
-bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept
+bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) 
 {
     switch (taskType)
     {
         case taskType::PRIMARY_TASK:
         {
+            if (taskNumber == TASK_PRIORITY_DEFAULT)
+                throw LuaFunctionError("Killing TASK_PRIORITY_DEFAULT is not allowed");
+
+            if (taskNumber >= TASK_PRIORITY_MAX)
+                throw LuaFunctionError("Invalid task slot number");
+
             return ped->KillTask(taskNumber, gracefully.value_or(true)); 
         }
         case taskType::SECONDARY_TASK:
         {
+            if (taskNumber >= TASK_SECONDARY_MAX)
+                throw LuaFunctionError("Invalid task slot number");
+
             return ped->KillTaskSecondary(taskNumber, gracefully.value_or(true));
         }
         default:
             return false; 
     }
+}
+
+void CLuaPedDefs::PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probabilty)
+{
+    auto speechContextId = static_cast<ePedSpeechContext>(speechId);
+    if (speechContextId < ePedSpeechContext::NOTHING || speechContextId >= ePedSpeechContext::NUM_PED_CONTEXT)
+        throw LuaFunctionError("The argument speechId is invalid. The valid range is 0-359.");
+
+    if (probabilty.has_value() && probabilty < 0.0f)
+        throw LuaFunctionError("The argument probabilty cannot have a negative value.");
+
+    ped->Say(speechContextId, probabilty.value_or(1.0f));
 }
