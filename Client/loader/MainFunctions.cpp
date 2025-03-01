@@ -871,7 +871,7 @@ void CheckDataFiles()
                               {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
                               {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"C9523E51FF62D5122939FD4BDF47ED9D", "tags.dll"},
                               {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"}, {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
-                              {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"}, {"87F689D5636B6F31DBB4B9CBF56E17E3", "XInput9_1_0_mta.dll"}};
+                              {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"}, {"CF99634BBF5E557B95FC6C0691418CB3", "XInput9_1_0_mta.dll"}};
 
     for (const auto& item : integrityCheckList)
     {
