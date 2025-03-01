@@ -2763,14 +2763,14 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
                 {
                     activeEntityForStreaming = new CPedSAInterface();
                     MemSet (activeEntityForStreaming, 0, sizeof(CPedSAInterface));
-                    activeEntityForStreaming->Placeable.matrix = new CMatrix_Padded();
+                    activeEntityForStreaming->matrix = new CMatrix_Padded();
                 }
 
                 bActiveEntityForStreamingIsFakePed = true;
 
-                activeEntityForStreaming->Placeable.matrix->vPos.fX = vecPosition->fX;
-                activeEntityForStreaming->Placeable.matrix->vPos.fY = vecPosition->fY;
-                activeEntityForStreaming->Placeable.matrix->vPos.fZ = vecPosition->fZ;
+                activeEntityForStreaming->matrix->vPos.fX = vecPosition->fX;
+                activeEntityForStreaming->matrix->vPos.fY = vecPosition->fY;
+                activeEntityForStreaming->matrix->vPos.fZ = vecPosition->fZ;
             }*/
 
         // DWORD dwCurrentValue = *(DWORD *)FUNC_CPlayerInfoBase;
@@ -2781,7 +2781,7 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
     {
         /*if ( bActiveEntityForStreamingIsFakePed )
         {
-            delete activeEntityForStreaming->Placeable.matrix;
+            delete activeEntityForStreaming->matrix;
             delete activeEntityForStreaming;
         }
 
@@ -3218,10 +3218,10 @@ bool processGrab()
     {
         // CObjectSA * object = (CObjectSA*)entity;
         // CModelInfo * info = pGameInterface->GetModelInfo(entity->m_nModelIndex);
-        if (entity->Placeable.matrix)
-            edgeHeight = *entityEdgeHeight + entity->Placeable.matrix->vPos.fZ;
+        if (entity->matrix)
+            edgeHeight = *entityEdgeHeight + entity->matrix->vPos.fZ;
         else
-            edgeHeight = *entityEdgeHeight + entity->Placeable.m_transform.m_translate.fZ;
+            edgeHeight = *entityEdgeHeight + entity->m_transform.m_translate.fZ;
     }
     else
         edgeHeight = *entityEdgeHeight;
@@ -6372,13 +6372,13 @@ void RemoveObjectIfNeeded()
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
-        if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
+        if (!pBuildingAdd->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pBuildingAdd);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
-        if ((DWORD)(pLODInterface->vtbl) != VTBL_CPlaceable)
+        if (!pLODInterface->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pLODInterface);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
@@ -6451,7 +6451,7 @@ void RemoveDummyIfReplaced()
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
-        if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
+        if (!pBuildingAdd->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pBuildingAdd);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);
