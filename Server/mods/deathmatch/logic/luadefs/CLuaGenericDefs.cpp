@@ -12,6 +12,12 @@
 #include "CLuaGenericDefs.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
+#include "CMasterServerAnnouncer.h"
+
+static auto GetServerIpFromMasterServer() -> std::string
+{
+    return g_pGame->GetMasterServerAnnouncer()->GetRemoteAddress();
+}
 
 void CLuaGenericDefs::LoadFunctions()
 {
@@ -24,6 +30,7 @@ void CLuaGenericDefs::LoadFunctions()
         {"outputConsole", ArgumentParserWarn<false, OutputConsole>},
         {"outputDebugString", ArgumentParserWarn<false, OutputScriptDebugLog>},
         {"outputServerLog", ArgumentParserWarn<false, OutputServerLog>},
+        {"getServerIpFromMasterServer", ArgumentParser<GetServerIpFromMasterServer>},
         {"getServerName", ArgumentParserWarn<nullptr, GetServerName>},
         {"getServerHttpPort", ArgumentParserWarn<nullptr, GetServerHttpPort>},
         {"getServerPassword", ArgumentParserWarn<nullptr, GetServerPassword>},

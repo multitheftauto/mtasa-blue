@@ -14,29 +14,27 @@
 #include "CVehicleSA.h"
 #include "CDoorSA.h"
 
-namespace eTrainNode
+enum class eTrainNodes
 {
-    enum
-    {
-        NONE = 0,
-        DOOR_LF = 1,
-        DOOR_RF = 2,
-        WHEEL_RF1 = 3,
-        WHEEL_RF2 = 4,
-        WHEEL_RF3 = 5,
-        WHEEL_RB1 = 6,
-        WHEEL_RB2 = 7,
-        WHEEL_RB3 = 8,
-        WHEEL_LF1 = 9,
-        WHEEL_LF2 = 10,
-        WHEEL_LF3 = 11,
-        WHEEL_LB1 = 12,
-        WHEEL_LB2 = 13,
-        WHEEL_LB3 = 14,
-        BOGIE_FRONT = 15,
-        BOGIE_REAR = 16,
-        NUM_NODES
-    };
+    NONE = 0,
+    DOOR_LF,
+    DOOR_RF,
+    WHEEL_RF1,
+    WHEEL_RF2,
+    WHEEL_RF3,
+    WHEEL_RB1,
+    WHEEL_RB2,
+    WHEEL_RB3,
+    WHEEL_LF1,
+    WHEEL_LF2,
+    WHEEL_LF3,
+    WHEEL_LB1,
+    WHEEL_LB2,
+    WHEEL_LB3,
+    BOGIE_FRONT,
+    BOGIE_REAR,
+
+    NUM_NODES
 };
 
 enum class eTrainPassengersGenerationState : unsigned char
@@ -101,7 +99,7 @@ public:
     CTrainSAInterface*              m_prevCarriage;
     CTrainSAInterface*              m_nextCarriage;
     CDoorSAInterface                m_aDoors[MAX_DOORS];
-    RwFrame*                        m_aTrainNodes[eTrainNode::NUM_NODES];
+    RwFrame*                        m_aTrainNodes[static_cast<std::size_t>(eTrainNodes::NUM_NODES)];
 };
 static_assert(sizeof(CTrainSAInterface) == 0x6AC, "Invalid size for CTrainSAInterface");
 

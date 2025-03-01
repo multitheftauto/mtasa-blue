@@ -113,23 +113,17 @@
 // SQL variable placeholder (replaces with actual variable content)
 #define SQL_VARIABLE_PLACEHOLDER    '?'
 
-// Security script path
-#define LUA_SECURITY_SCRIPT         "security.lua"
-
 // Server FPS limit (in milliseconds)
 #define FPS_LIMIT                   16
 
 // Max garages
 #define MAX_GARAGES                 50
 
-// Game-monitor.com query URL (use %u for port input)
-#define QUERY_URL_GAME_MONITOR      "http://master.game-monitor.com/heartbeat.php?p=%ASE%&e=3"
-
 // MTA master server query URL (Inputs: game port, ase port, http port, version, extra, serverip)
-#define QUERY_URL_MTA_MASTER_SERVER "http://master.mtasa.com/ase/add.php?g=%GAME%&a=%ASE%&h=%HTTP%&v=%VER%&x=%EXTRA%&ip=%IP%"
+#define QUERY_URL_MTA_MASTER_SERVER "https://master.mtasa.com/ase/add.php?g=%GAME%&a=%ASE%&h=%HTTP%&v=%VER%&x=%EXTRA%&ip=%IP%"
 
 // MTA port tester URL
-#define PORT_TESTER_URL             "http://nightly.mtasa.com/ports/"
+#define PORT_TESTER_URL             "https://nightly.mtasa.com/ports/"
 
 // MTA minclientversion auto update and others
-#define HQCOMMS_URL                 "http://updatesa.multitheftauto.com/sa/server/hqcomms/"
+#define HQCOMMS_URL                 "https://updatesa.multitheftauto.com/sa/server/hqcomms/"

@@ -77,13 +77,9 @@ public:
 
 /*** END PURE R* CLASSES ***/
 
-class CCameraSAInterface
+class CCameraSAInterface : public CPlaceableSAInterface
 {
 public:
-    // CPlaceable
-    CPlaceableSAInterface Placeable;
-    // End CPlaceable
-
     // move these out the class, have decided to set up a mirrored enumerated type thingy at the top
     bool          m_bAboveGroundTrainNodesLoaded;
     bool          m_bBelowGroundTrainNodesLoaded;
@@ -131,16 +127,6 @@ public:
     bool          m_bCooperativeCamMode;
     bool          m_bAllowShootingWith2PlayersInCar;
     bool          m_bDisableFirstPersonInCar;
-    static bool   m_bUseMouse3rdPerson;
-#ifndef FINALBUILD
-    bool bStaticFrustum;
-#endif
-
-    // for debug keyboard stuff
-#ifndef MASTER
-    unsigned char display_kbd_debug;
-    float         kbd_fov_value;
-#endif // MASTER
 
     // The following fields allow the level designers to specify the camera for 2 player games.
     short m_ModeForTwoPlayersSeparateCars;
@@ -430,4 +416,6 @@ public:
 
     void ShakeCamera(float radius, float x, float y, float z) noexcept override;
     void ResetShakeCamera() noexcept override;
+
+    std::uint8_t GetTransitionState();
 };

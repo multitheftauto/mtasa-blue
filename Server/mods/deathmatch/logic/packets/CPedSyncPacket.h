@@ -23,6 +23,7 @@ public:
     {
         ElementID           ID;
         unsigned char       ucFlags;
+        std::uint8_t        flags2;
         unsigned char       ucSyncTimeContext;
         SPositionSync       position;
         SPedRotationSync    rotation;
@@ -31,6 +32,8 @@ public:
         float               fArmor;
         bool                bOnFire;
         bool                bIsInWater;
+        bool                isReloadingWeapon;
+        float               cameraRotation;
 
         bool ReadSpatialData(NetBitStreamInterface& BitStream);
         // Backward compatibility

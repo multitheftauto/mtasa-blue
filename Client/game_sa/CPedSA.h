@@ -59,6 +59,7 @@ class CPedIntelligenceSAInterface;
 #define FUNC_DetachPedFromEntity        0x5E7EC0
 #define FUNC_CPed_RemoveBodyPart        0x5f0140
 #define FUNC_PreRenderAfterTest         0x5E65A0
+#define FUNC_CPed_Say                   0x5EFFE0
 
 #define VAR_LocalPlayer                 0x94AD28
 
@@ -230,7 +231,12 @@ public:
     int                              iMoveAnimGroup;            // 1236
     BYTE                             bPad4b[52];
     CPedIKSAInterface                pedIK;            // 1292 (length 32 bytes)
-    int                              bPad5[5];
+
+    std::uint32_t                    field_52C;
+    ePedState                        pedState;
+    eMoveState                       moveState;
+    eMoveState                       swimmingMoveState;
+    std::uint32_t                    field_53C;
 
     float fHealth;
     int   iUnknown121;
@@ -258,7 +264,9 @@ public:
     // weapons at +1440 ends at +1804
     BYTE                bPad4[12];
     BYTE                bCurrentWeaponSlot;            // is actually here
-    BYTE                bPad6[20];
+    BYTE                bPad6[3];
+    CEntitySAInterface* pTargetedObject;
+    BYTE                tempPad[13];
     BYTE                bFightingStyle;            // 1837
     BYTE                bFightingStyleExtra;
     BYTE                bPad7[1];
@@ -306,8 +314,8 @@ public:
     float GetHealth();
     void  SetHealth(float fHealth);
 
-    float GetArmor();
-    void  SetArmor(float fArmor);
+    float GetArmor() noexcept;
+    void  SetArmor(float armor) noexcept;
 
     float GetOxygenLevel();
     void  SetOxygenLevel(float fOxygen);
@@ -382,8 +390,8 @@ public:
     bool IsBleeding();
     void SetBleeding(bool bBleeding);
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() override { return GetPedInterface()->pFireOnPed != nullptr; }
+    bool SetOnFire(bool onFire) override;
 
     bool GetStayInSamePlace() { return GetPedInterface()->pedFlags.bStayInSamePlace; }
     void SetStayInSamePlace(bool bStay);
@@ -408,5 +416,10 @@ public:
     std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
     static void             StaticSetHooks();
 
+    CEntitySAInterface* GetTargetedObject() { return GetPedInterface()->pTargetedObject; }
+    ePedState           GetPedState() { return GetPedInterface()->pedState; }
+
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
+
+    void Say(const ePedSpeechContext& speechId, float probability) override;
 };

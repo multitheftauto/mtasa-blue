@@ -11,7 +11,6 @@
 #include "StdInc.h"
 
 static unsigned int CEntryInfoNodePool_UsedSpaces = 0;
-static unsigned int CPtrNodeSingleLinkPool_UsedSpaces = 0;
 static unsigned int CPtrNodeDoubleLinkPool_UsedSpaces = 0;
 
 #define HOOKPOS_CEntryInfoNodePool__New 0x536D6E
@@ -52,46 +51,6 @@ static void _declspec(naked) HOOK_CEntryInfoList__Flush()
         or bl, 0x80
         mov [eax], bl
         jmp RETURN_CEntryInfoList__Flush
-    }
-}
-
-#define HOOKPOS_CPtrNodeSingleLinkPool__New 0x55229B
-#define HOOKSIZE_CPtrNodeSingleLinkPool__New 0x5
-static void _declspec(naked) HOOK_CPtrNodeSingleLinkPool__New()
-{
-    _asm {
-        inc CPtrNodeSingleLinkPool_UsedSpaces
-
-        lea eax, [ecx+eax*8]
-        pop esi
-        ret
-    }
-}
-#define HOOKPOS_CPtrNodeSingleLink__operator_delete 0x5523AA
-#define HOOKSIZE_CPtrNodeSingleLink__operator_delete 0x5
-static const unsigned int RETURN_CPtrNodeSingleLink__operator_delete = 0x5523AF;
-static void _declspec(naked) HOOK_CPtrNodeSingleLink__operator_delete()
-{
-    _asm {
-        dec CPtrNodeSingleLinkPool_UsedSpaces
-
-        or bl, 0x80
-        mov [ecx], bl
-        jmp RETURN_CPtrNodeSingleLink__operator_delete
-    }
-}
-
-#define HOOKPOS_CPtrListSingleLink__Flush 0x55244D
-#define HOOKSIZE_CPtrListSingleLink__Flush 0x6
-static const unsigned int RETURN_CPtrListSingleLink__Flush = 0x552453;
-static void _declspec(naked) HOOK_CPtrListSingleLink__Flush()
-{
-    _asm {
-        dec CPtrNodeSingleLinkPool_UsedSpaces
-
-        or byte ptr [edx+eax], 0x80
-        add edx, eax
-        jmp RETURN_CPtrListSingleLink__Flush
     }
 }
 
@@ -142,10 +101,6 @@ void CMultiplayerSA::InitHooks_ObjectStreamerOptimization()
     EZHookInstall(CEntryInfoNode__operator_delete);
     EZHookInstall(CEntryInfoList__Flush);
 
-    EZHookInstall(CPtrNodeSingleLinkPool__New);
-    EZHookInstall(CPtrNodeSingleLink__operator_delete);
-    EZHookInstall(CPtrListSingleLink__Flush);
-
     EZHookInstall(CPtrNodeDoubleLinkPool__New);
     EZHookInstall(CPtrNodeDoubleLink__operator_delete);
     EZHookInstall(CPtrListDoubleLink__Flush);
@@ -154,11 +109,6 @@ void CMultiplayerSA::InitHooks_ObjectStreamerOptimization()
 unsigned int CMultiplayerSA::EntryInfoNodePool_NoOfUsedSpaces() const noexcept
 {
     return CEntryInfoNodePool_UsedSpaces;
-}
-
-unsigned int CMultiplayerSA::PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept
-{
-    return CPtrNodeSingleLinkPool_UsedSpaces;
 }
 
 unsigned int CMultiplayerSA::PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept

@@ -10,7 +10,6 @@
 #include "StdInc.h"
 #include "CClientVectorGraphicDisplay.h"
 #include "CClientVectorGraphic.h"
-#include <lunasvg.h>
 
 using namespace lunasvg;
 
@@ -45,6 +44,37 @@ void CClientVectorGraphicDisplay::Render()
     }
 }
 
+void CClientVectorGraphicDisplay::UnpremultiplyBitmap(Bitmap& bitmap)
+{
+    auto width = bitmap.width();
+    auto height = bitmap.height();
+    auto stride = bitmap.stride();
+    auto rowData = bitmap.data();
+
+    for (std::uint32_t y = 0; y < height; y++)
+    {
+        auto data = rowData;
+        for (std::uint32_t x = 0; x < width; x++)
+        {
+            auto& b = data[0];
+            auto& g = data[1];
+            auto& r = data[2];
+            auto& a = data[3];
+
+            if (a != 0)
+            {
+                r = (r * 255) / a;
+                g = (g * 255) / a;
+                b = (b * 255) / a;
+            }
+
+            data += 4;
+        }
+
+        rowData += stride;
+    }
+}
+
 void CClientVectorGraphicDisplay::UpdateTexture()
 {
     if (!m_pVectorGraphic || m_pVectorGraphic->IsDestroyed())
@@ -62,25 +92,20 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     if (!surface)
         return;
 
-    Bitmap bitmap = svgDocument->renderToBitmap(pVectorGraphicItem->m_uiSizeX, pVectorGraphicItem->m_uiSizeY);
-    if (!bitmap.valid())
-        return;
+    // SVG has a predefined width and height. We need transform it to the requested size
+    const Matrix transformationMatrix(pVectorGraphicItem->m_uiSizeX / svgDocument->width(), 0, 0, pVectorGraphicItem->m_uiSizeY / svgDocument->height(), 0, 0);
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;
     if (SUCCEEDED(surface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
     {
-        auto surfaceData = static_cast<byte*>(LockedRect.pBits);
-        auto sourceData = static_cast<const byte*>(bitmap.data());
+        auto surfaceData = static_cast<std::uint8_t*>(LockedRect.pBits);
+        auto stride = static_cast<std::uint32_t>(LockedRect.Pitch);
 
-        for (uint32_t y = 0; y < bitmap.height(); ++y)
-        {
-            memcpy(surfaceData, sourceData, bitmap.width() * 4);            // 4 bytes per pixel
-
-            // advance row pointers
-            sourceData += bitmap.stride();
-            surfaceData += LockedRect.Pitch;
-        }
+        Bitmap bitmap{surfaceData, pVectorGraphicItem->m_uiSizeX, pVectorGraphicItem->m_uiSizeY, stride};
+        bitmap.clear(0);
+        svgDocument->render(bitmap, transformationMatrix);
+        UnpremultiplyBitmap(bitmap);
 
         // Unlock surface
         surface->UnlockRect();

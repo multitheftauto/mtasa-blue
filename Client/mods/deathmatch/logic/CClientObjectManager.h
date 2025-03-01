@@ -56,7 +56,6 @@ protected:
     void UpdateLimitInfo();
 
     int  m_iEntryInfoNodeEntries;
-    int  m_iPointerNodeSingleLinkEntries;
     int  m_iPointerNodeDoubleLinkEntries;
     uint m_uiMaxStreamedInCount;
     uint m_uiMaxLowLodStreamedInCount;

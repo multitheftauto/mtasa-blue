@@ -35,6 +35,7 @@
 #include <net/SimHeaders.h>
 #include <zip.h>
 #include <glob/glob.h>
+#include "CStaticFunctionDefinitions.h"
 
 #ifdef WIN32
     #include <zip/iowin32.h>
@@ -509,13 +510,14 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
         if (!GetFilePath(pResourceFile->GetName(), strPath))
             return SString();
 
-        std::vector<char> buffer;
-        FileLoad(strPath, buffer);
-        uint        uiFileSize = buffer.size();
-        const char* pFileContents = uiFileSize ? buffer.data() : "";
-        CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-        pResourceFile->SetLastChecksum(Checksum);
-        pResourceFile->SetLastFileSize(uiFileSize);
+        auto checksumOrError = CChecksum::GenerateChecksumFromFile(strPath);
+        if (std::holds_alternative<std::string>(checksumOrError))
+        {
+            return SString(std::get<std::string>(checksumOrError));
+        }
+
+        pResourceFile->SetLastChecksum(std::get<CChecksum>(checksumOrError));
+        pResourceFile->SetLastFileSizeHint(FileSize(strPath));
 
         // Check if file is blocked
         char szHashResult[33];
@@ -546,7 +548,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
 
                 if (pResourceFile->GetLastChecksum() != cachedChecksum)
                 {
-                    if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                    if (!FileCopy(strPath, strCachedFilePath))
                     {
                         return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
                     }
@@ -1371,6 +1373,9 @@ std::vector<std::string> CResource::GetFilePaths(const char* szFilename)
         std::string strPath = std::filesystem::relative(path, strDirectory).string();
         ReplaceSlashes(strPath);
 
+        if (strPath == "meta.xml")
+            continue;
+
         vecFiles.push_back(std::move(strPath));
     }
 
@@ -1462,43 +1467,54 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (IsFilenameUsed(strFilename, false))
-                {
-                    CLogger::LogPrintf("WARNING: Duplicate html file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                }
-
-                // Try to find the file
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-                {
-                    // This one is supposed to be default, but there's already a default page
-                    if (bFoundDefault && bIsDefault)
-                    {
-                        CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(),
-                                           m_strResourceName.c_str());
-                        bIsDefault = false;
-                    }
-
-                    // If this is supposed to be default, we've now found our default page
-                    if (bIsDefault)
-                        bFoundDefault = true;
-
-                    // Create a new resource HTML file and add it to the list
-                    auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw,
-                                                               bIsRestricted, m_bOOPEnabledInMetaXml);
-                    m_ResourceFiles.push_back(pResourceFile);
-
-                    // This is the first HTML file? Remember it
-                    if (!pFirstHTML)
-                        pFirstHTML = pResourceFile;
-                }
-                else
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
                     m_strFailureReason = SString("Couldn't find html %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
+                }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+                if (vecFiles.empty())
+                {
+                    if (glob::has_magic(strFilename))
+                    {
+                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+                        continue;
+                    }
+
+                    m_strFailureReason = SString("Couldn't find html %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                for (const std::string& strFilePath : vecFiles)
+                {
+                    std::string strFullFilename;
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        // This one is supposed to be default, but there's already a default page
+                        if (bFoundDefault && bIsDefault)
+                        {
+                            CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                            bIsDefault = false;
+                        }
+
+                        // If this is supposed to be default, we've now found our default page
+                        if (bIsDefault)
+                            bFoundDefault = true;
+
+                        // Create a new resource HTML file and add it to the list
+                        auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw, bIsRestricted, m_bOOPEnabledInMetaXml);
+                        m_ResourceFiles.push_back(pResourceFile);
+
+                        // This is the first HTML file? Remember it
+                        if (!pFirstHTML)
+                            pFirstHTML = pResourceFile;
+                    }
                 }
             }
             else
@@ -3011,7 +3027,7 @@ HttpStatusCode CResource::HandleRequestRouter(HttpRequest* request, HttpResponse
         luaRequest.PushString("path");
         luaRequest.PushString(path);
 
-        luaRequest.PushString("absolute_path");
+        luaRequest.PushString("absolutePath");
         luaRequest.PushString(request->sOriginalUri);
 
         luaRequest.PushString("hostname");
