@@ -1,4 +1,4 @@
-/* Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2000, 2025, Oracle and/or its affiliates.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License, version 2.0,
@@ -26,9 +26,9 @@
 #define MYSQLD_ERROR_INCLUDED
 
 static const int errmsg_section_start[] = { 1000, 3000, 3500, 6000, 10000, 15000 };
-static const int errmsg_section_size[] = { 888, 239, 667, 141, 4074, 145 };
+static const int errmsg_section_size[] = { 888, 239, 667, 141, 4078, 147 };
 
-static const int total_error_count = 6154;
+static const int total_error_count = 6160;
 
 //#define OBSOLETE_ER_HASHCHK 1000
 //#define OBSOLETE_ER_NISAMCHK 1001
@@ -1979,7 +1979,7 @@ static const int total_error_count = 6154;
 #define ER_LOG_SLOW_CANNOT_OPEN 10011
 #define ER_LOG_GENERAL_CANNOT_OPEN 10012
 #define ER_LOG_CANNOT_WRITE 10013
-#define ER_RPL_ZOMBIE_ENCOUNTERED 10014
+//#define OBSOLETE_ER_RPL_ZOMBIE_ENCOUNTERED 10014
 #define ER_RPL_GTID_TABLE_CANNOT_OPEN 10015
 #define ER_SYSTEM_SCHEMA_NOT_FOUND 10016
 #define ER_DD_INIT_UPGRADE_FAILED 10017
@@ -6039,6 +6039,10 @@ static const int total_error_count = 6154;
 #define ER_WAITING_FOR_NO_CONNECTIONS 14071
 #define ER_WAITING_FOR_NO_THDS 14072
 #define ER_IB_INDEX_PART_TOO_LONG 14073
+//#define OBSOLETE_ER_DD_UPDATE_DATADIR_FLAG_FAIL 14074
+//#define OBSOLETE_ER_IB_MSG_FIL_STATE_MOVED_PREV_OR_HAS_DATADIR 14075
+//#define OBSOLETE_ER_RPL_KILL_OLD_DUMP_THREAD_ENCOUNTERED 14076
+//#define OBSOLETE_ER_RPL_MTA_ALLOW_COMMIT_OUT_OF_ORDER 14077
 #define ER_LANGUAGE_COMPONENT_INFO 15000
 #define ER_LANGUAGE_COMPONENT_WARNING 15001
 #define ER_LANGUAGE_COMPONENT_ERROR 15002
@@ -6183,13 +6187,15 @@ static const int total_error_count = 6154;
 #define ER_BULK_SCANNER_INFO 15141
 #define ER_LOG_DEPRECATE_NON_COMPOSABLE_MULTIPLE_ENGINE 15142
 #define ER_DD_UPDATE_DATADIR_FLAG_FAIL 15143
-#define ER_IB_MSG_FIL_STATE_MOVED_PREV_OR_HAS_DATADIR 15144
-static const int obsolete_error_count = 616;
+#define ER_IB_MSG_FIL_STATE_MOVED_PREV 15144
+#define ER_RPL_KILL_OLD_DUMP_THREAD_ENCOUNTERED 15145
+#define ER_RPL_MTA_ALLOW_COMMIT_OUT_OF_ORDER 15146
+static const int obsolete_error_count = 621;
 
 static const int pfs_no_error_stat_count = 2;
 
 static const int pfs_session_error_stat_count = 1774;
 
-static const int pfs_global_error_stat_count = 3762;
+static const int pfs_global_error_stat_count = 3763;
 
 #endif

@@ -12,6 +12,7 @@
 #pragma once
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
+#include "CPedSound.h"
 
 // To avoid VS intellisense highlight errors
 #include <memory>
@@ -304,4 +305,6 @@ public:
     virtual ePedState           GetPedState() const = 0;
 
     virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
+
+    virtual void Say(const ePedSpeechContext& speechId, float probability) = 0;
 };

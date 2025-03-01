@@ -2520,7 +2520,7 @@ bool CLuaElementDefs::SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity,
 
 bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexcept
 {
-    if (!entity->IsLocalEntity() && entity != CStaticFunctionDefinitions::GetLocalPlayer())
+    if (!entity->IsLocalEntity())
         return false;
 
     return entity->SetOnFire(onFire);

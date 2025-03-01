@@ -42,6 +42,7 @@ class CVehicleSAInterface;
 #define FUNC_RemoveGogglesModel         0x5DF170            // CPed::RemoveGogglesModel
 #define FUNC_CPed_RemoveBodyPart        0x5F0140            // CPed::RemoveBodyPart
 #define FUNC_PreRenderAfterTest         0x5E65A0            // CPed::PreRenderAfterTest
+#define FUNC_CPed_Say                   0x5EFFE0
 
 // CPlayerPed
 #define FUNC_MakeChangesForNewWeapon_Slot 0x60D000            // CPlayerPed::MakeChangesForNewWeapon
@@ -454,6 +455,7 @@ public:
     void SetVoice(std::int16_t voiceType, std::int16_t voiceID) override;
     void SetVoice(const char* voiceType, const char* voice) override;
     void ResetVoice() override { SetVoice(m_defaultVoiceType, m_defaultVoiceID); }
+    void Say(const ePedSpeechContext& speechId, float probability) override;
 
     void SetLanding(bool isLanding) override { GetPedInterface()->pedFlags.bIsLanding = isLanding; }
     void SetUpdateMetricsRequired(bool required) override { GetPedInterface()->pedFlags.bUpdateMatricesRequired = required; }
@@ -494,5 +496,4 @@ private:
 
     std::uint32_t m_type{PLAYER_PED};
     std::uint8_t  m_occupiedSeat;
-
 };

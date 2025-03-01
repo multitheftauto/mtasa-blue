@@ -246,7 +246,6 @@ CGameSA::CGameSA()
         CVehicleSA::StaticSetHooks();
         CCheckpointSA::StaticSetHooks();
         CHudSA::StaticSetHooks();
-        CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)

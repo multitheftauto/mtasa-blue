@@ -551,6 +551,12 @@ void CPedSA::SetOxygenLevel(float oxygen)
     GetPedInterface()->pPlayerData->m_fBreath = oxygen;
 }
 
+void CPedSA::Say(const ePedSpeechContext& speechId, float probability)
+{
+    // Call CPed::Say
+    ((void(__thiscall*)(CPedSAInterface*, ePedSpeechContext, int, float, bool, bool, bool))FUNC_CPed_Say)(GetPedInterface(), speechId, 0, probability, false, false, false);
+}
+
 void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
 {
     // Array of projectiles objects
@@ -664,4 +670,35 @@ void CPedSA::StaticSetHooks()
 {
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
+}
+
+void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
+{
+    // Array of projectiles objects
+    CProjectileSAInterface** projectilesArray = (CProjectileSAInterface**)ARRAY_CProjectile;
+    CProjectileSAInterface*  pProjectileInterface;
+
+    // Array of projectiles infos
+    CProjectileInfoSAInterface* projectilesInfoArray = (CProjectileInfoSAInterface*)ARRAY_CProjectileInfo;
+    CProjectileInfoSAInterface* pProjectileInfoInterface;
+
+    // Loop through all projectiles
+    for (size_t i = 0; i < PROJECTILE_COUNT; i++)
+    {
+        pProjectileInterface = projectilesArray[i];
+
+        // is attached to our ped?
+        if (!pProjectileInterface || pProjectileInterface->m_pAttachedEntity != m_pInterface)
+            continue;
+
+        // index is always the same for both arrays
+        pProjectileInfoInterface = &projectilesInfoArray[i];
+
+        // We are only interested in satchels
+        if (!pProjectileInfoInterface || pProjectileInfoInterface->dwProjectileType != eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
+            continue;
+
+        // Push satchel into the array. There is no need to check the counter because for satchels it restarts until the player detonates the charges
+        satchelsList.push_back({pProjectileInterface, &pProjectileInterface->m_vecAttachedOffset, &pProjectileInterface->m_vecAttachedRotation});
+    }
 }
