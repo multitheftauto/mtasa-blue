@@ -16,6 +16,8 @@
 #include <CVector.h>
 #include "CPtrNodeDoubleListSA.h"
 
+class CColPointSAInterface;
+
 #define FUNC_GetMoveSpeed                       0x404460
 #define FUNC_GetTurnSpeed                       0x470030
 #define FUNC_ProcessCollision                   0x54DFB0
@@ -29,6 +31,8 @@
 
 class CPhysicalSAInterface : public CEntitySAInterface
 {
+    virtual std::int32_t ProcessEntityCollision(CEntitySAInterface* entity, CColPointSAInterface* colPoint) = 0;
+
 public:
     float  pad1;            // 56
     uint32 pad2;            // 60
