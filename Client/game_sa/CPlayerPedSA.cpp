@@ -18,6 +18,7 @@
 #include "CPlayerInfoSA.h"
 #include "CPlayerPedSA.h"
 #include "CWorldSA.h"
+#include "CProjectileInfoSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -75,7 +76,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     // Set default stuff
     m_pData->m_bRenderWeapon = true;
     m_pData->m_Wanted = pLocalWanted;
-    m_pData->m_fSprintEnergy = 1000.0f;
+    m_pData->m_fTimeCanRun = 1000.0f;
 
     // Clothes pointers or we'll crash later (TODO: Wrap up with some cloth classes and make it unique per player)
     m_pData->m_pClothes = pLocalClothes;
@@ -137,6 +138,7 @@ CPlayerPedSA::~CPlayerPedSA()
         if ((DWORD)GetInterface()->vtbl != VTBL_CPlaceable)
         {
             CWorldSA* world = (CWorldSA*)pGame->GetWorld();
+            pGame->GetProjectileInfo()->RemoveEntityReferences(this);
             world->Remove(m_pInterface, CPlayerPed_Destructor);
 
             DWORD dwThis = (DWORD)m_pInterface;

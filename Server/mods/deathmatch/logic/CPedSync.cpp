@@ -82,9 +82,20 @@ void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist)
 
 void CPedSync::UpdateAllSyncer()
 {
+    auto currentTick = GetTickCount64_();
+
     // Update all the ped's sync states
     for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); iter++)
     {
+        // Has the duration of the ped's animation already elapsed?
+        const SPlayerAnimData& animData = (*iter)->GetAnimationData();
+        if (animData.IsAnimating())
+        {
+            float deltaTime = currentTick - animData.startedTick;
+            if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
+                (*iter)->SetAnimationData({});
+        }
+
         // It is a ped, yet not a player
         if (IS_PED(*iter) && !IS_PLAYER(*iter))
             UpdateSyncer(*iter);
@@ -266,11 +277,22 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
         if (Data.ucFlags & 0x10)
             pPed->SetArmor(Data.fArmor);
 
+        if (Data.flags2 & 0x01)
+            pPed->SetCameraRotation(Data.cameraRotation);
+
         if (Data.ucFlags & 0x20)
             pPed->SetOnFire(Data.bOnFire);
 
         if (Data.ucFlags & 0x40)
             pPed->SetInWater(Data.bIsInWater);
+
+        if (Data.ucFlags & 0x60)
+        {
+            pPed->SetReloadingWeapon(Data.isReloadingWeapon);
+        }
+
+        if (Data.ucFlags & 0x80)
+            pPed->SetAnimationData({});
 
         // Is it time to sync to everyone
         bool bDoFarSync = llTickCountNow - pPed->GetLastFarSyncTick() >= g_TickRateSettings.iPedFarSync;

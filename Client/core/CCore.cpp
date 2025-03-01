@@ -136,7 +136,6 @@ CCore::CCore()
     m_pMouseControl = new CMouseControl();
 
     // Create our hook objects.
-    // m_pFileSystemHook           = new CFileSystemHook ( );
     m_pDirect3DHookManager = new CDirect3DHookManager();
     m_pDirectInputHookManager = new CDirectInputHookManager();
     m_pMessageLoopHook = new CMessageLoopHook();
@@ -210,7 +209,6 @@ CCore::~CCore()
 
     // Delete hooks.
     delete m_pSetCursorPosHook;
-    // delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
 
@@ -839,11 +837,7 @@ void CCore::ApplyHooks()
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
     // m_pDirect3DHookManager->ApplyHook ( );
-    // m_pFileSystemHook->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook();
-
-    // Redirect basic files.
-    // m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
@@ -1155,8 +1149,12 @@ CWebCoreInterface* CCore::GetWebCore()
 {
     if (m_pWebCore == nullptr)
     {
+        bool gpuEnabled;
+        auto cvars = g_pCore->GetCVars();
+        cvars->Get("browser_enable_gpu", gpuEnabled);
+
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise();
+        m_pWebCore->Initialise(gpuEnabled);
     }
     return m_pWebCore;
 }
@@ -1787,6 +1785,19 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::OnPostColorFilterRender()
+{
+    if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+        return;
+    
+    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+    CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
+    CGraphics::GetSingleton().LeavingMTARenderZone();
+}
+
 void CCore::ApplyCoreInitSettings()
 {
 #if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
@@ -1855,6 +1866,13 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
+
+    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
+    if (m_uiFrameRateLimit == 0)
+    {
+        m_bQueuedFrameRateValid = false;
+        GetGraphStats()->RemoveTimingPoint("Limiter");
+    }
 
     // Print new limits to the console
     if (bLogToConsole)
@@ -2010,22 +2028,6 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-
-    if (CGraphics::GetSingleton().HasLine3DPostFXQueueItems() || CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
-    {
-        /*
-            Although MTA render zones are expensive, we should use them twice in the bounds of the function
-            because some of render states from PostFX drain to the 2D part of the frame.
-        */
-        CGraphics::GetSingleton().EnteringMTARenderZone();
-
-        CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
-        CGraphics::GetSingleton().DrawLine3DPostFXQueue();
-
-        CGraphics::GetSingleton().LeavingMTARenderZone();
-    }
-
     CGraphics::GetSingleton().EnteringMTARenderZone();    
 
     // Maybe capture screen and other stuff
@@ -2182,11 +2184,6 @@ CModelCacheManager* CCore::GetModelCacheManager()
     if (!m_pModelCacheManager)
         m_pModelCacheManager = NewModelCacheManager();
     return m_pModelCacheManager;
-}
-
-void CCore::AddModelToPersistentCache(ushort usModelId)
-{
-    return GetModelCacheManager()->AddModelToPersistentCache(usModelId);
 }
 
 void CCore::StaticIdleHandler()

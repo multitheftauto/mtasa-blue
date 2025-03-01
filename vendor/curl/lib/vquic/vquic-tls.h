@@ -31,14 +31,15 @@
 #if defined(USE_HTTP3) && \
   (defined(USE_OPENSSL) || defined(USE_GNUTLS) || defined(USE_WOLFSSL))
 
+#include "vtls/wolfssl.h"
+
 struct curl_tls_ctx {
 #ifdef USE_OPENSSL
   struct ossl_ctx ossl;
 #elif defined(USE_GNUTLS)
   struct gtls_ctx gtls;
 #elif defined(USE_WOLFSSL)
-  WOLFSSL_CTX *ssl_ctx;
-  WOLFSSL *ssl;
+  struct wolfssl_ctx wssl;
 #endif
 };
 
@@ -63,7 +64,7 @@ typedef CURLcode Curl_vquic_tls_ctx_setup(struct Curl_cfilter *cf,
  * @param alpn        the ALPN string in protocol format ((len+bytes+)+),
  *                    may be NULL
  * @param alpn_len    the overall number of bytes in `alpn`
- * @param cb_setup    optional callback for very early TLS config
+ * @param cb_setup    optional callback for early TLS config
  ± @param cb_user_data user_data param for callback
  * @param ssl_user_data  optional pointer to set in TLS application context
  */

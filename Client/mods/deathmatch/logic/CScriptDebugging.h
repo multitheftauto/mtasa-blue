@@ -68,6 +68,7 @@ private:
     SString ComposeErrorMessage(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage);
     void LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel, unsigned char ucRed = 255,
                    unsigned char ucGreen = 255, unsigned char ucBlue = 255);
+    bool CheckForSufficientDebugLevel(std::uint8_t playerDebugLevel, std::uint8_t messageDebugLevel) const noexcept;
     void PrintLog(const char* szText);
 
 public:

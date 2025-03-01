@@ -98,8 +98,12 @@ void CPedSA::Init()
 
 void CPedSA::SetModelIndex(DWORD dwModelIndex)
 {
-    DWORD dwFunction = FUNC_SetModelIndex;
+    // Delete any existing RwObject first
+    GetPedInterface()->DeleteRwObject();
+
+    // Set new model
     DWORD dwThis = (DWORD)GetInterface();
+    DWORD dwFunction = FUNC_SetModelIndex;
     _asm
     {
         mov     ecx, dwThis
@@ -114,16 +118,6 @@ void CPedSA::SetModelIndex(DWORD dwModelIndex)
         DWORD dwType = pModelInfo->pedType;
         GetPedInterface()->pedSound.m_bIsFemale = (dwType == 5 || dwType == 22);
     }
-}
-
-// Hacky thing done for the local player when changing model
-void CPedSA::RemoveGeometryRef()
-{
-    RpClump*    pClump = (RpClump*)GetInterface()->m_pRwObject;
-    RpAtomic*   pAtomic = (RpAtomic*)((pClump->atomics.root.next) - 0x8);
-    RpGeometry* pGeometry = pAtomic->geometry;
-    if (pGeometry->refs > 1)
-        pGeometry->refs--;
 }
 
 bool CPedSA::IsInWater()
@@ -265,14 +259,14 @@ void CPedSA::SetHealth(float fHealth)
     GetPedInterface()->fHealth = fHealth;
 }
 
-float CPedSA::GetArmor()
+float CPedSA::GetArmor() noexcept
 {
     return GetPedInterface()->fArmor;
 }
 
-void CPedSA::SetArmor(float fArmor)
+void CPedSA::SetArmor(float armor) noexcept
 {
-    GetPedInterface()->fArmor = fArmor;
+    GetPedInterface()->fArmor = armor;
 }
 
 float CPedSA::GetOxygenLevel()
@@ -857,52 +851,39 @@ void CPedSA::SetBleeding(bool bBleeding)
     GetPedInterface()->pedFlags.bPedIsBleeding = bBleeding;
 }
 
-bool CPedSA::IsOnFire()
-{
-    if (GetPedInterface()->pFireOnPed != NULL)
-        return true;
-    return false;
-}
-
-void CPedSA::SetOnFire(bool bOnFire)
+bool CPedSA::SetOnFire(bool onFire)
 {
     CPedSAInterface* pInterface = GetPedInterface();
+    if (onFire == !!pInterface->pFireOnPed)
+        return false;
 
-    if (bOnFire)
+    auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
+
+    if (onFire)
     {
-        // If we are already on fire, don't apply a new fire
-        if (pInterface->pFireOnPed == NULL)
-        {
-            CFireManagerSA* pFireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
-            CFire*          pFire = pFireManager->StartFire(this, NULL, (float)DEFAULT_FIRE_PARTICLE_SIZE);
+        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        if (!fire)
+            return false;
 
-            if (pFire)
-            {
-                // Start the fire
-                pFire->SetTarget(this);
-                pFire->Ignite();
-                pFire->SetStrength(1.0f);
-                // Attach the fire only to the player, do not let it
-                // create child fires when moving.
-                pFire->SetNumGenerationsAllowed(0);
-                pInterface->pFireOnPed = pFire->GetInterface();
-            }
-        }
+        // Start the fire
+        fire->SetTarget(this);
+        fire->Ignite();
+        fire->SetStrength(1.0f);
+        // Attach the fire only to the player, do not let it
+        // create child fires when moving.
+        fire->SetNumGenerationsAllowed(0);
+        pInterface->pFireOnPed = fire->GetInterface();
     }
     else
     {
-        // Make sure that we have some attached fire
-        if (pInterface->pFireOnPed != NULL)
-        {
-            CFireManagerSA* pFireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
-            CFire*          pFire = pFireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
+        CFire* fire = fireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
+        if (!fire)
+            return false;
 
-            if (pFire)
-            {
-                pFire->Extinguish();
-            }
-        }
+        fire->Extinguish();
     }
+
+    return true;
 }
 
 void CPedSA::SetStayInSamePlace(bool bStay)
@@ -1107,4 +1088,41 @@ void CPedSA::StaticSetHooks()
 {
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
+}
+
+void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
+{
+    // Array of projectiles objects
+    CProjectileSAInterface** projectilesArray = (CProjectileSAInterface**)ARRAY_CProjectile;
+    CProjectileSAInterface*  pProjectileInterface;
+
+    // Array of projectiles infos
+    CProjectileInfoSAInterface* projectilesInfoArray = (CProjectileInfoSAInterface*)ARRAY_CProjectileInfo;
+    CProjectileInfoSAInterface* pProjectileInfoInterface;
+
+    // Loop through all projectiles
+    for (size_t i = 0; i < PROJECTILE_COUNT; i++)
+    {
+        pProjectileInterface = projectilesArray[i];
+
+        // is attached to our ped?
+        if (!pProjectileInterface || pProjectileInterface->m_pAttachedEntity != m_pInterface)
+            continue;
+
+        // index is always the same for both arrays
+        pProjectileInfoInterface = &projectilesInfoArray[i];
+
+        // We are only interested in satchels
+        if (!pProjectileInfoInterface || pProjectileInfoInterface->dwProjectileType != eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
+            continue;
+
+        // Push satchel into the array. There is no need to check the counter because for satchels it restarts until the player detonates the charges
+        satchelsList.push_back({pProjectileInterface, &pProjectileInterface->m_vecAttachedOffset, &pProjectileInterface->m_vecAttachedRotation});
+    }
+}
+
+void CPedSA::Say(const ePedSpeechContext& speechId, float probability)
+{
+    // Call CPed::Say
+    ((void(__thiscall*)(CPedSAInterface*, ePedSpeechContext, int, float, bool, bool, bool))FUNC_CPed_Say)(GetPedInterface(), speechId, 0, probability, false, false, false);
 }

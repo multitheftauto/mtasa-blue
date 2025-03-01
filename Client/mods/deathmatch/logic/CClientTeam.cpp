@@ -64,6 +64,19 @@ void CClientTeam::RemoveAll()
     m_List.clear();
 }
 
+std::vector<CClientPlayer*> CClientTeam::GetPlayers() const
+{
+    std::vector<CClientPlayer*> players;
+
+    for (auto iter = IterBegin(); iter != IterEnd(); ++iter)
+    {
+        if (!(*iter)->IsBeingDeleted())
+            players.push_back(*iter);
+    }
+
+    return players;
+}
+
 bool CClientTeam::Exists(CClientPlayer* pPlayer)
 {
     list<CClientPlayer*>::const_iterator iter = m_List.begin();

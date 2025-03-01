@@ -369,6 +369,9 @@ Function .onInstSuccess
 
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
+
+    # Add 'MaxLoaderThreads' DWORD value for gta_sa.exe to disable multi-threaded loading of DLLs.
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads" 1
 	
 	# Initilize variables holding paths and names
 	Call MTAInitFileNamesAndPaths
@@ -671,7 +674,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libGLESv2.dll"
         File "${FILES_ROOT}\mta\vk_swiftshader.dll"
         File "${FILES_ROOT}\mta\vulkan-1.dll"
-        File "${FILES_ROOT}\mta\snapshot_blob.bin"
         File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
 
         File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
@@ -685,9 +687,12 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
 
 	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
-        File "${FILES_ROOT}\mta\CEF\chrome_100_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\chrome_200_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\resources.pak"
+	# Not currently using \mta\cef\ due to https://github.com/chromiumembedded/cef/issues/3749#issuecomment-2278568964 (it's already crashing and likely won't remain supported)
+        SetOutPath "$INSTDIR\MTA"
+
+        File "${FILES_ROOT}\mta\chrome_100_percent.pak"
+        File "${FILES_ROOT}\mta\chrome_200_percent.pak"
+        File "${FILES_ROOT}\mta\resources.pak"
 
 	# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
         #File "${FILES_ROOT}\mta\CEF\cef.pak"
@@ -774,8 +779,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\cgui\unifont.ttf"
 
             SetOutPath "$INSTDIR\MTA\cgui\images"
-            File "${FILES_ROOT}\mta\cgui\images\*.png"
-            File "${FILES_ROOT}\mta\cgui\images\*.jpg"
+            File /nonfatal "${FILES_ROOT}\mta\cgui\images\*.png"
+            File /nonfatal "${FILES_ROOT}\mta\cgui\images\*.jpg"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\radarset"
             File "${FILES_ROOT}\mta\cgui\images\radarset\*.png"
@@ -1141,6 +1146,10 @@ Section Uninstall
         ${If} $0 == "$INSTDIR\Multi Theft Auto.exe"
             DeleteRegKey HKCR "mtasa"
         ${EndIf}
+
+        # Remove 'MaxLoaderThreads' DWORD value for gta_sa.exe.
+        DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads"
+        DeleteRegKey /ifempty HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe"
 
         ${GameExplorer_RemoveGame} ${GUID}
 

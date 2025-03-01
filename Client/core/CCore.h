@@ -253,7 +253,6 @@ public:
     EDiagnosticDebugType GetDiagnosticDebug();
     void                 SetDiagnosticDebug(EDiagnosticDebugType value);
     CModelCacheManager*  GetModelCacheManager();
-    void                 AddModelToPersistentCache(ushort usModelId);
 
     static void StaticIdleHandler();
     void        IdleHandler();
@@ -289,6 +288,8 @@ public:
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
+    void OnPostColorFilterRender() override;
+
 private:
     void ApplyCoreInitSettings();
 
@@ -313,8 +314,7 @@ private:
     CMessageLoopHook*        m_pMessageLoopHook;
     CDirectInputHookManager* m_pDirectInputHookManager;
     CDirect3DHookManager*    m_pDirect3DHookManager;
-    // CFileSystemHook *           m_pFileSystemHook;
-    CSetCursorPosHook* m_pSetCursorPosHook;
+    CSetCursorPosHook*       m_pSetCursorPosHook;
 
     bool m_bLastFocused;
     int  m_iUnminimizeFrameCounter;

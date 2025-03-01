@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include "lua/CLuaMultiReturn.h"
 
 class CLuaMarkerDefs : public CLuaDefs
 {
@@ -35,4 +36,7 @@ public:
 
     static bool SetCoronaReflectionEnabled(CClientMarker* pMarker, bool bEnabled);
     static bool IsCoronaReflectionEnabled(CClientMarker* pMarker);
+
+    static bool SetMarkerTargetArrowProperties(CClientMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size);
+    static std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> GetMarkerTargetArrowProperties(CClientMarker* marker) noexcept;
 };

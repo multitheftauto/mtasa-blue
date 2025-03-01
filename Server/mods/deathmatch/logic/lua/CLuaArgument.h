@@ -45,7 +45,9 @@ public:
 
     void ReadBool(bool bBool);
     void ReadNumber(double dNumber);
-    void ReadString(const std::string& strString);
+    void ReadString(const std::string& string);
+    void ReadString(const std::string_view& string);
+    void ReadString(const char* string);
     void ReadElement(CElement* pElement);
     void ReadElementID(ElementID ID);
     void ReadScriptID(uint uiScriptID);
@@ -59,6 +61,7 @@ public:
     void*              GetUserData() const { return m_pUserData; };
     CResource*         GetFunctionResource() const { return m_pResource; };
     int                GetFunctionReference() const { return m_iFunctionRef; };
+    CLuaArguments*     GetTable() const { return m_pTableData; }
     CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
 
@@ -72,6 +75,48 @@ public:
 
     static int CallFunction(lua_State* luaVM);
     static int CleanupFunction(lua_State* luaVM);
+
+    [[nodiscard]] bool IsString() const noexcept { return m_iType == LUA_TSTRING; }
+
+    [[nodiscard]] bool TryGetString(std::string_view& string) const noexcept
+    {
+        if (IsString())
+        {
+            string = m_strString;
+            return true;
+        }
+
+        string = {};
+        return false;
+    }
+
+    [[nodiscard]] bool IsNumber() const noexcept { return m_iType == LUA_TNUMBER; }
+
+    [[nodiscard]] bool TryGetNumber(lua_Number& number) const noexcept
+    {
+        if (IsNumber())
+        {
+            number = m_Number;
+            return true;
+        }
+
+        number = {};
+        return false;
+    }
+
+    [[nodiscard]] bool IsTable() const noexcept;
+
+    [[nodiscard]] bool TryGetTable(CLuaArguments*& table) const noexcept
+    {
+        if (IsTable())
+        {
+            table = m_pTableData;
+            return true;
+        }
+
+        table = nullptr;
+        return false;
+    }
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;
