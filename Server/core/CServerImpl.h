@@ -28,6 +28,7 @@ class CServerImpl;
 
 typedef CXML* (*InitXMLInterface)(const char* szSaveFlagDirectory);
 typedef CNetServer* (*InitNetServerInterface)();
+typedef void (*ReleaseNetServerInterface)();
 
 #ifdef WIN32
 constexpr SHORT SCREEN_BUFFER_SIZE = 256;
