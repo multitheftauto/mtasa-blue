@@ -333,6 +333,9 @@ public:
     bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
+    virtual bool IsOnFire() { return false; }
+    virtual bool SetOnFire(bool onFire) { return false; }
+
 protected:
     CClientManager*         m_pManager;
     CClientEntity*          m_pParent;

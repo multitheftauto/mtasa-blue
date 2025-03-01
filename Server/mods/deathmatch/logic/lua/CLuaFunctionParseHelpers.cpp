@@ -285,6 +285,12 @@ ADD_ENUM(ESyncType::LOCAL, "local")
 ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
 IMPLEMENT_ENUM_CLASS_END("sync-mode")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eCustomDataClientTrust)
+ADD_ENUM(eCustomDataClientTrust::UNSET, "default")
+ADD_ENUM(eCustomDataClientTrust::ALLOW, "allow")
+ADD_ENUM(eCustomDataClientTrust::DENY, "deny")
+IMPLEMENT_ENUM_CLASS_END("client-trust-mode")
+
 //
 // CResource from userdata
 //
@@ -641,6 +647,42 @@ void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions)
 }
 
 //
+// Check 4x4 lua table
+//
+bool IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept
+{
+    std::uint32_t cell = 0;
+
+    if (lua_type(luaVM, argIndex) == LUA_TTABLE)
+    {
+        lua_pushnil(luaVM);
+        for (std::uint32_t row = 0; lua_next(luaVM, argIndex) != 0; lua_pop(luaVM, 1), ++row)
+        {
+            if (lua_type(luaVM, -1) != LUA_TTABLE)
+                return false;
+
+            std::uint32_t col = 0;
+
+            lua_pushnil(luaVM);
+            for (; lua_next(luaVM, -2) != 0; lua_pop(luaVM, 1), ++col, ++cell)
+            {
+                int argumentType = lua_type(luaVM, -1);
+                if (argumentType != LUA_TNUMBER && argumentType != LUA_TSTRING)
+                    return false;
+            }
+
+            if (col != 4)
+                return false;
+        }
+    }
+
+    if (cell != 16)
+        return false;
+
+    return true;
+}
+
+//
 // 4x4 matrix into CMatrix
 //
 bool ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix)
@@ -746,17 +788,6 @@ void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisRe
             "Access denied");
 }
 
-std::pair<bool, SString> CheckCanModifyOtherResource(CResource* pThisResource, CResource* pOtherResource) noexcept
-{
-    if (GetResourceModifyScope(pThisResource, pOtherResource) != eResourceModifyScope::NONE)
-        return {true, ""};
-
-    SString str("ModifyOtherObjects in ACL denied resource %s to access %s",
-        pThisResource->GetName().c_str(), pOtherResource->GetName().c_str()
-    );
-    return {false, str};
-}
-
 //
 // Set error if pThisResource does not have permission to modify every resource in resourceList
 //
@@ -798,46 +829,6 @@ void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisR
         SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), ssResourceNames.str().c_str()), "Access denied");
 }
 
-std::pair<bool, SString> CheckCanModifyOtherResources(CResource* pThisResource, std::initializer_list<CResource*> resourceList) noexcept
-{
-    // std::unordered_set only allows unique values and resourceList can contain duplicates
-    std::unordered_set<CResource*> setNoPermissionResources;
-
-    for (const auto& pOtherResource : resourceList)
-    {
-        eResourceModifyScope modifyScope = GetResourceModifyScope(pThisResource, pOtherResource);
-
-        if (modifyScope == eResourceModifyScope::SINGLE_RESOURCE)
-            continue;
-
-        if (modifyScope == eResourceModifyScope::EVERY_RESOURCE)
-            return {true, ""};
-
-        setNoPermissionResources.emplace(pOtherResource);
-    }
-
-    if (setNoPermissionResources.empty())
-        return {true, ""};
-
-    std::stringstream ssResourceNames;
-    std::size_t       remainingElements = setNoPermissionResources.size();
-
-    for (const auto& pResource : setNoPermissionResources)
-    {
-        ssResourceNames << pResource->GetName();
-
-        if (remainingElements > 1)
-            ssResourceNames << ", ";
-
-        --remainingElements;
-    }
-
-    SString str("ModifyOtherObjects in ACL denied resource %s to access %s",
-        pThisResource->GetName().c_str(), ssResourceNames.str().c_str()
-    );
-    return {false, str};
-}
-
 //
 // Set error if resource file access is blocked due to reasons
 //
@@ -863,29 +854,4 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
         argStream.SetCustomError(
             SString("Database credentials protection denied resource %s to access %s", *pThisResource->GetName(), *pOtherResource->GetName()), "Access denied");
     }
-}
-
-std::pair<bool, SString> CheckCanAccessOtherResourceFile(CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly) noexcept
-{
-    if (!g_pGame->GetConfig()->IsDatabaseCredentialsProtectionEnabled())
-        return {true, ""};
-
-    // Is other resource different and requested access denied
-    if (pThisResource == pOtherResource)
-        return {true, ""};
-
-    if (!pOtherResource->IsFileDbConnectMysqlProtected(strAbsPath, pbReadOnly ? *pbReadOnly : false))
-        return {true, ""};
-
-    // No access - See if we can change to readonly
-    if (pbReadOnly && !(*pbReadOnly) && !pOtherResource->IsFileDbConnectMysqlProtected(strAbsPath, true)) {
-        // Yes readonly access
-        *pbReadOnly = true;
-        return {true, ""};
-    }
-
-    SString str("Database credentials protection denied resource %s to access %s",
-        *pThisResource->GetName(), *pOtherResource->GetName()
-    );
-    return {false, str};
 }

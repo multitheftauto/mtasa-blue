@@ -80,6 +80,7 @@ public:
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();
     void                InitHooks_Postprocess();
+    void                InitHooks_DeviceSelection();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -268,6 +269,7 @@ public:
     void SetRender3DStuffHandler(Render3DStuffHandler* pHandler);
     void SetPreRenderSkyHandler(PreRenderSkyHandler* pHandler);
     void SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler);
+    void SetRenderEverythingBarRoadsHandler(RenderEverythingBarRoadsHandler* pHandler) override;
 
     void Reset();
 
@@ -310,8 +312,7 @@ public:
 
     CLimits* GetLimits() { return &m_limits; }
 
-    void SetSuspensionEnabled(bool bEnabled);
-    bool IsSuspensionEnabled() { return m_bSuspensionEnabled; };
+    void UpdateVehicleSuspension() const noexcept;
 
     virtual void FlushClothesCache();
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading);
@@ -353,7 +354,6 @@ public:
     DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
-    unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
     unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
     CVector      m_vecAkimboTarget;
@@ -362,7 +362,6 @@ public:
     bool         m_bBadDrivebyHitboxesDisabled;
 
 private:
-    bool                m_bSuspensionEnabled;
     std::vector<char>   m_PlayerImgCache;
     EFastClothesLoading m_FastClothesLoading;
     CLimitsSA           m_limits;

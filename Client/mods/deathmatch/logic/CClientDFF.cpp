@@ -139,6 +139,9 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
     if (!CClientDFFManager::IsReplacableModel(usModel))
         return false;
 
+    if (CClientPlayerClothes::IsValidModel(usModel))
+        return ReplaceClothes(usModel);
+
     // Get clump loaded for this model id
     RpClump* pClump = GetLoadedClump(usModel);
 
@@ -268,6 +271,12 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
         m_pManager->GetObjectManager()->RestreamObjects(usModel);
         g_pGame->GetModelInfo(usModel)->RestreamIPL();
     }
+    // Is This a clothe ID?
+    else if (CClientPlayerClothes::IsValidModel(usModel))
+    {
+        g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_RawDataBuffer.data());
+        return;
+    }
     else
         return;
 
@@ -294,6 +303,22 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
             g_pGame->GetRenderWare()->DestroyDFF(pInfo->pClump);
         MapRemove(m_LoadedClumpInfoMap, usModel);
     }
+}
+
+bool CClientDFF::ReplaceClothes(ushort usModel)
+{
+    if (m_RawDataBuffer.empty() && m_bIsRawData)
+        return false;
+
+    if (m_RawDataBuffer.empty())
+    {
+        if (!FileLoad(std::nothrow, m_strDffFilename, m_RawDataBuffer))
+            return false;
+    }
+
+    m_Replaced.push_back(usModel);
+    g_pGame->GetRenderWare()->ClothesAddReplacement(m_RawDataBuffer.data(), m_RawDataBuffer.size(), usModel - CLOTHES_MODEL_ID_FIRST);
+    return true;
 }
 
 bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency)

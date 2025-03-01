@@ -39,13 +39,13 @@ public:
     void SetPosition(const CVector& vecPosition);
     void GetPosition(CVector& vecPosition) const;
 
-    unsigned short GetScale() { return m_usScale; };
+    unsigned short GetScale() const noexcept { return m_usScale; }
     void           SetScale(unsigned short usScale);
 
-    SColor GetColor() const { return m_Color; }
+    SColor GetColor() const noexcept { return m_Color; }
     void   SetColor(const SColor color);
 
-    unsigned long GetSprite() const { return m_ulSprite; };
+    unsigned long GetSprite() const noexcept { return m_ulSprite; }
     void          SetSprite(unsigned long ulSprite);
 
     bool IsVisible() const { return m_bIsVisible; };
@@ -54,10 +54,10 @@ public:
     void SetDimension(unsigned short usDimension) override;
     void RelateDimension(unsigned short usDimension);
 
-    short GetOrdering() { return m_sOrdering; }
+    short GetOrdering() const noexcept { return m_sOrdering; }
     void  SetOrdering(short sOrdering);
 
-    unsigned short GetVisibleDistance() { return m_usVisibleDistance; }
+    unsigned short GetVisibleDistance() const noexcept { return m_usVisibleDistance; }
     void           SetVisibleDistance(unsigned short usVisibleDistance) { m_usVisibleDistance = usVisibleDistance; }
 
     bool IsInVisibleDistance();

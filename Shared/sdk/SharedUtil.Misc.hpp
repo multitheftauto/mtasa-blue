@@ -36,8 +36,8 @@
     #endif
 #endif
 
-#ifdef __APPLE__
-    #include "cpuid.h"
+#if defined(__APPLE__) && !defined(__aarch64__)
+    #include <cpuid.h>
 #endif
 
 CCriticalSection     CRefCountable::ms_CS;
@@ -59,7 +59,7 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 
 #define PRODUCT_REGISTRY_PATH       "Software\\Multi Theft Auto: San Andreas All"       // HKLM
 #define PRODUCT_COMMON_DATA_DIR     "MTA San Andreas All"                               // C:\ProgramData
-#define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
+#define TROUBLE_URL1 "https://help.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
 //
 // Output a UTF8 encoded messagebox
@@ -1834,6 +1834,8 @@ namespace SharedUtil
             return FnGetCurrentProcessorNumber();
 
         return _GetCurrentProcessorNumberXP();
+#elif defined(__APPLE__) && defined(__aarch64__)
+        return -1;
 #elif defined(__APPLE__)
         // Hacked from https://stackoverflow.com/a/40398183/1517394
         unsigned long cpu;

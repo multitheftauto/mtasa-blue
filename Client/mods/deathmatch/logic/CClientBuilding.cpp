@@ -110,11 +110,14 @@ void CClientBuilding::SetUsesCollision(bool state)
     if (m_usesCollision == state)
         return;
 
-    m_usesCollision = state;
     if (m_pBuilding)
-    {
         m_pBuilding->SetUsesCollision(state);
-    }
+
+    // Remove all contacts
+    for (const auto& ped : m_Contacts)
+        RemoveContact(ped);
+
+    m_usesCollision = state;
 }
 
 void CClientBuilding::Create()
@@ -125,10 +128,13 @@ void CClientBuilding::Create()
     if (m_bBeingDeleted)
         return;
 
-    CVector4D vRot4D;
-    ConvertZXYEulersToQuaternion(m_vRot, vRot4D);
+    m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &m_vRot, m_interior);
 
-    m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
+    if (!m_pBuilding)
+        return;
+
+	if (m_bDoubleSidedInit)
+		m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
 
     if (!m_usesCollision)
     {
@@ -145,7 +151,7 @@ void CClientBuilding::Destroy()
     if (!m_pBuilding)
         return;
 
-    if (m_pHighBuilding)
+    if (m_pHighBuilding && m_pHighBuilding->IsValid())
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
     }

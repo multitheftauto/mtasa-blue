@@ -115,7 +115,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
                 CChecksum checksum = (*iter)->GetLastChecksum();
                 BitStream.Write(checksum.ulCRC);
                 BitStream.Write((const char*)checksum.md5.data, sizeof(checksum.md5.data));
-                BitStream.Write((*iter)->GetApproxSize());
+                BitStream.Write((double)(*iter)->GetSizeHint()); // Has to be double for bitstream format compatibility
                 if ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE)
                 {
                     CResourceClientFileItem* pRCFItem = reinterpret_cast<CResourceClientFileItem*>(*iter);

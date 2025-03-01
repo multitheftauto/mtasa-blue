@@ -130,7 +130,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaWaterDefs::AddClass(luaVM);
     CLuaWeaponDefs::AddClass(luaVM);
     CLuaGifDefs::AddClass(luaVM);
-
+    CLuaBuildingDefs::AddClass(luaVM);
     CLuaShared::AddClasses(luaVM);
 }
 

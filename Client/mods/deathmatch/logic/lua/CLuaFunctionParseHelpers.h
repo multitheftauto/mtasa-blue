@@ -13,6 +13,7 @@
 #include <game/CAudioEngine.h>
 #include <game/CRenderWare.h>
 #include <game/CHud.h>
+#include <game/CStreaming.h>
 #include <type_traits>
 
 enum eLuaType
@@ -85,6 +86,11 @@ DECLARE_ENUM_CLASS(eRenderStage);
 DECLARE_ENUM_CLASS(eFxParticleSystems);
 DECLARE_ENUM(ePools);
 DECLARE_ENUM(eWorldProperty);
+DECLARE_ENUM_CLASS(eModelLoadState);
+DECLARE_ENUM_CLASS(PreloadAreaOption);
+DECLARE_ENUM_CLASS(taskType);
+DECLARE_ENUM(eEntityType);
+
 
 class CRemoteCall;
 
@@ -105,6 +111,9 @@ enum eDXVerticalAlign
 DECLARE_ENUM(eDXVerticalAlign);
 
 DECLARE_ENUM(eHudComponent);
+DECLARE_ENUM_CLASS(eHudComponentProperty);
+DECLARE_ENUM_CLASS(eFontStyle);
+DECLARE_ENUM_CLASS(eFontAlignment);
 
 enum eFieldOfViewMode
 {
@@ -586,6 +595,7 @@ class CScriptArgReader;
 void MixedReadDxFontString(CScriptArgReader& argStream, eFontType& outFontType, eFontType defaultFontType, CClientDxFont*& poutDxFontElement);
 void MixedReadGuiFontString(CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& poutGuiFontElement);
 void MixedReadMaterialString(CScriptArgReader& argStream, CClientMaterial*& pMaterialElement);
+bool IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept;
 bool ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix);
 void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* szReason);
 bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason = nullptr);
@@ -595,13 +605,9 @@ void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
 // Resource access helpers
 //
 void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
-std::pair<bool, std::string> CheckCanModifyOtherResource(CResource* pThisResource, CResource* pOtherResource) noexcept;
 void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
-std::pair<bool, std::string> CheckCanModifyOtherResources(CResource* pThisResource, std::initializer_list<CResource*> resourceList) noexcept;
-    void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
+void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
                                      bool* pbReadOnly = nullptr);
-std::pair<bool, std::string> CheckCanAccessOtherResourceFile(CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
-                                                             bool* pbReadOnly = nullptr) noexcept;
 
 //
 // Other misc helpers
