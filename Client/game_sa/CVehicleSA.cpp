@@ -1123,7 +1123,7 @@ CDamageManager* CVehicleSA::GetDamageManager()
 
 void CVehicleSA::BlowUp(CEntity* pCreator, unsigned long ulUnknown)
 {
-    GetVehicleInterface()->BlowUpCar(pCreator->GetInterface(), ulUnknown);
+    GetVehicleInterface()->BlowUpCar(pCreator ? pCreator->GetInterface() : nullptr, ulUnknown);
 }
 
 void CVehicleSA::FadeOut(bool bFadeOut)
