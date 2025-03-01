@@ -1,36 +1,28 @@
- /************************************************************************************************************************************\
-|*                                                                                                                                    *|
-|*     Copyright © 2012 NVIDIA Corporation.  All rights reserved.                                                                     *|
-|*                                                                                                                                    *|
-|*  NOTICE TO USER:                                                                                                                   *|
-|*                                                                                                                                    *|
-|*  This software is subject to NVIDIA ownership rights under U.S. and international Copyright laws.                                  *|
-|*                                                                                                                                    *|
-|*  This software and the information contained herein are PROPRIETARY and CONFIDENTIAL to NVIDIA                                     *|
-|*  and are being provided solely under the terms and conditions of an NVIDIA software license agreement.                             *|
-|*  Otherwise, you have no rights to use or access this software in any manner.                                                       *|
-|*                                                                                                                                    *|
-|*  If not covered by the applicable NVIDIA software license agreement:                                                               *|
-|*  NVIDIA MAKES NO REPRESENTATION ABOUT THE SUITABILITY OF THIS SOFTWARE FOR ANY PURPOSE.                                            *|
-|*  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY OF ANY KIND.                                                           *|
-|*  NVIDIA DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,                                                                     *|
-|*  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.                       *|
-|*  IN NO EVENT SHALL NVIDIA BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,                               *|
-|*  OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  WHETHER IN AN ACTION OF CONTRACT,                         *|
-|*  NEGLIGENCE OR OTHER TORTIOUS ACTION,  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOURCE CODE.            *|
-|*                                                                                                                                    *|
-|*  U.S. Government End Users.                                                                                                        *|
-|*  This software is a "commercial item" as that term is defined at 48 C.F.R. 2.101 (OCT 1995),                                       *|
-|*  consisting  of "commercial computer  software"  and "commercial computer software documentation"                                  *|
-|*  as such terms are  used in 48 C.F.R. 12.212 (SEPT 1995) and is provided to the U.S. Government only as a commercial end item.     *|
-|*  Consistent with 48 C.F.R.12.212 and 48 C.F.R. 227.7202-1 through 227.7202-4 (JUNE 1995),                                          *|
-|*  all U.S. Government End Users acquire the software with only those rights set forth herein.                                       *|
-|*                                                                                                                                    *|
-|*  Any use of this software in individual and commercial software must include,                                                      *|
-|*  in the user documentation and internal comments to the code,                                                                      *|
-|*  the above Disclaimer (as applicable) and U.S. Government End Users Notice.                                                        *|
-|*                                                                                                                                    *|
- \************************************************************************************************************************************/
+/*********************************************************************************************************\
+|*                                                                                                        *|
+|* SPDX-FileCopyrightText: Copyright (c) 2019-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
+|* SPDX-License-Identifier: MIT                                                                           *|
+|*                                                                                                        *|
+|* Permission is hereby granted, free of charge, to any person obtaining a                                *|
+|* copy of this software and associated documentation files (the "Software"),                             *|
+|* to deal in the Software without restriction, including without limitation                              *|
+|* the rights to use, copy, modify, merge, publish, distribute, sublicense,                               *|
+|* and/or sell copies of the Software, and to permit persons to whom the                                  *|
+|* Software is furnished to do so, subject to the following conditions:                                   *|
+|*                                                                                                        *|
+|* The above copyright notice and this permission notice shall be included in                             *|
+|* all copies or substantial portions of the Software.                                                    *|
+|*                                                                                                        *|
+|* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                             *|
+|* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                               *|
+|* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL                               *|
+|* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                             *|
+|* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING                                *|
+|* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER                                    *|
+|* DEALINGS IN THE SOFTWARE.                                                                              *|
+|*                                                                                                        *|
+|*                                                                                                        *|
+\*********************************************************************************************************/
 
 #pragma once
 #include"nvapi_lite_salstart.h"
@@ -48,7 +40,7 @@ extern "C" {
 //!                If stereo is not enabled, then calls to functions that require that stereo is enabled have no effect,
 //!                and will return the appropriate error code.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -70,7 +62,7 @@ NVAPI_INTERFACE NvAPI_Stereo_Enable(void);
 //!                If stereo is not enabled, then calls to functions that require that stereo is enabled have no effect,
 //!                and will return the appropriate error code.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -89,7 +81,7 @@ NVAPI_INTERFACE NvAPI_Stereo_Disable(void);
 //
 //! DESCRIPTION:   This API checks if stereo mode is enabled in the registry.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -122,7 +114,7 @@ NVAPI_INTERFACE NvAPI_Stereo_IsEnabled(NvU8 *pIsStereoEnabled);
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -148,7 +140,7 @@ NVAPI_INTERFACE NvAPI_Stereo_CreateHandleFromIUnknown(IUnknown *pDevice, StereoH
 //! DESCRIPTION:   This API destroys the stereo handle created with one of the NvAPI_Stereo_CreateHandleFrom() functions.
 //!                This should be called after the device corresponding to the handle has been destroyed.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -174,7 +166,7 @@ NVAPI_INTERFACE NvAPI_Stereo_DestroyHandle(StereoHandle stereoHandle);
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -200,7 +192,7 @@ NVAPI_INTERFACE NvAPI_Stereo_Activate(StereoHandle stereoHandle);
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -224,7 +216,7 @@ NVAPI_INTERFACE NvAPI_Stereo_Deactivate(StereoHandle stereoHandle);
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -249,7 +241,7 @@ NVAPI_INTERFACE NvAPI_Stereo_IsActivated(StereoHandle stereoHandle, NvU8 *pIsSte
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -274,7 +266,7 @@ NVAPI_INTERFACE NvAPI_Stereo_GetSeparation(StereoHandle stereoHandle, float *pSe
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -300,7 +292,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetSeparation(StereoHandle stereoHandle, float newS
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -325,7 +317,7 @@ NVAPI_INTERFACE NvAPI_Stereo_GetConvergence(StereoHandle stereoHandle, float *pC
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -354,7 +346,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetConvergence(StereoHandle stereoHandle, float new
 //!
 //! \since Release: 285
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   stereoHandle  Stereo handle that corresponds to the device interface.
@@ -392,7 +384,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetActiveEye(StereoHandle hStereoHandle, NV_STEREO_
 //!
 //! \since Release: 285
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!      
 //! \param [in]    mode       Defines the 3D stereo driver mode: Direct or Automatic
@@ -423,7 +415,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetDriverMode( NV_STEREO_DRIVER_MODE mode );
 //! 
 //! HOW TO USE:    After the stereo handle for device interface is created via successfull call to appropriate API. Applies only to DirectX 9 and up.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   stereoHandle  Stereo handle that corresponds to the device interface.
@@ -444,7 +436,7 @@ NVAPI_INTERFACE NvAPI_Stereo_GetEyeSeparation(StereoHandle hStereoHandle,  float
 //
 //! DESCRIPTION:   This API returns availability of windowed mode stereo
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [out] bSupported(OUT)    != 0  - supported,  \n
@@ -469,7 +461,7 @@ NVAPI_INTERFACE NvAPI_Stereo_IsWindowedModeSupported(NvU8* bSupported);
 //!
 //! \since Release: 285
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! DESCRIPTION: This API sets surface creation mode for this device interface.
@@ -501,7 +493,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetSurfaceCreationMode(__in StereoHandle hStereoHan
 //!
 //! \since Release: 295
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! DESCRIPTION: This API gets surface creation mode for this device interface.
@@ -522,7 +514,7 @@ NVAPI_INTERFACE NvAPI_Stereo_GetSurfaceCreationMode(__in StereoHandle hStereoHan
 //! \param [in]  hStereoHandle    Stereo handle that corresponds to the device interface.
 //! \param [out] pWasStereoized   Address where result of the inquiry will be placed.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! DESCRIPTION: This API checks if the last draw call was stereoized. It is a very expensive to call and should be used for debugging purpose *only*.
@@ -540,7 +532,7 @@ NVAPI_INTERFACE NvAPI_Stereo_Debug_WasLastDrawStereoized(__in StereoHandle hSter
 // FUNCTION NAME: NvAPI_Stereo_SetDefaultProfile
 //
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! DESCRIPTION: This API defines the stereo profile used by the driver in case the application has no associated profile.
@@ -563,7 +555,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetDefaultProfile(__in const char* szProfileName);
 //
 // FUNCTION NAME: NvAPI_Stereo_GetDefaultProfile
 //
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! DESCRIPTION: This API retrieves the current default stereo profile.

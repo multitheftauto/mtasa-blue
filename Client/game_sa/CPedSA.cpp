@@ -259,14 +259,14 @@ void CPedSA::SetHealth(float fHealth)
     GetPedInterface()->fHealth = fHealth;
 }
 
-float CPedSA::GetArmor()
+float CPedSA::GetArmor() noexcept
 {
     return GetPedInterface()->fArmor;
 }
 
-void CPedSA::SetArmor(float fArmor)
+void CPedSA::SetArmor(float armor) noexcept
 {
-    GetPedInterface()->fArmor = fArmor;
+    GetPedInterface()->fArmor = armor;
 }
 
 float CPedSA::GetOxygenLevel()
@@ -1119,4 +1119,10 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
         // Push satchel into the array. There is no need to check the counter because for satchels it restarts until the player detonates the charges
         satchelsList.push_back({pProjectileInterface, &pProjectileInterface->m_vecAttachedOffset, &pProjectileInterface->m_vecAttachedRotation});
     }
+}
+
+void CPedSA::Say(const ePedSpeechContext& speechId, float probability)
+{
+    // Call CPed::Say
+    ((void(__thiscall*)(CPedSAInterface*, ePedSpeechContext, int, float, bool, bool, bool))FUNC_CPed_Say)(GetPedInterface(), speechId, 0, probability, false, false, false);
 }

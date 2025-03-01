@@ -9,11 +9,11 @@ local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "131.4.1+g437feba+chromium-131.0.6778.265"
-local CEF_HASH = "dac497bfa8e8925f602871f841f7fb9e6ac463f6361db0778d18fb6992da2ef5"
+local CEF_VERSION = "133.4.5+gdb28106+chromium-133.0.6943.142"
+local CEF_HASH = "043212ba3af5285529ee1f3c167f5b1c93a05493a095b6408cbbfde0569f6c5d"
 
 function make_cef_download_url()
-	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
+	return CEF_URL_PREFIX..CEF_VERSION..CEF_URL_SUFFIX
 end
 
 function update_install_cef(version, hash)
@@ -111,7 +111,7 @@ newaction {
 		else
 			-- Download CEF
 			print("Downloading CEF " .. CEF_VERSION ..  "...")
-			if not http.download_print_errors(make_cef_download_url(), archive_path) then
+			if not http.download_print_errors(make_cef_download_url(), archive_path, { progress = http.create_download_progress_handler{update_interval_s = 5} }) then
 				os.exit(1)
 				return
 			end

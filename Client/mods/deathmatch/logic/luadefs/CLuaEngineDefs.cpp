@@ -13,6 +13,7 @@
 #include <game/CColPoint.h>
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
+#include <game/CPtrNodeSingleLinkPool.h>
 #include <lua/CLuaFunctionParser.h>
 #include "CLuaEngineDefs.h"
 
@@ -2504,6 +2505,10 @@ bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t
         case ePools::BUILDING_POOL:
         {
             return m_pBuildingManager->SetPoolCapacity(newSize);
+        }
+        case ePools::POINTER_SINGLE_LINK_POOL:
+        {
+            return g_pGame->GetPools()->GetPtrNodeSingleLinkPool().Resize(newSize);
         }
         default:
             throw std::invalid_argument("Can not change this pool capacity");

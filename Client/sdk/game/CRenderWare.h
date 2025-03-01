@@ -76,8 +76,8 @@ public:
                                                       bool bFilteringEnabled) = 0;
     virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
-    virtual void             ClothesAddReplacementTxd(char* pFileData, ushort usFileId) = 0;
-    virtual void             ClothesRemoveReplacementTxd(char* pFileData) = 0;
+    virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId) = 0;
+    virtual void             ClothesRemoveReplacement(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
     virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
     virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
