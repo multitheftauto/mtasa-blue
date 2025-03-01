@@ -41,6 +41,13 @@ enum
     ABORT_PRIORITY_IMMEDIATE
 };
 
+enum taskType
+{
+    PRIMARY_TASK = 0,
+    SECONDARY_TASK
+};
+
+
 class CTaskManager
 {
 public:
@@ -53,6 +60,7 @@ public:
     virtual CTask* FindActiveTaskByType(const int iTaskType) = 0;
     virtual CTask* FindTaskByType(const int iPriority, const int iTaskType) = 0;
     virtual void   RemoveTaskSecondary(const int iTaskPriority) = 0;
+    virtual bool   RemoveTaskSecondary(const int taskPriority, const int taskType) = 0;
     // virtual void SetTaskSecondary(CTask* pTaskSecondary, const int iType)=0;
     virtual CTask* GetTaskSecondary(const int iType) = 0;
     virtual bool   HasTaskSecondary(const CTask* pTaskSecondary) = 0;

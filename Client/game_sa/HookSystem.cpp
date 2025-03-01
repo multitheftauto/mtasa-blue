@@ -18,3 +18,10 @@ BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray)
     MemPutFast<DWORD>(&ByteArray[1], dwTo - (dwFrom + 5));
     return ByteArray;
 }
+
+void HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction)
+{
+    DWORD dwOffset = dwHookFunction - (dwInstallAddress + 5);
+    MemPut<BYTE>(dwInstallAddress, 0xE8);
+    MemPut<DWORD>(dwInstallAddress + 1, dwOffset);
+}

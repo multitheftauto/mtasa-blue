@@ -24,7 +24,7 @@ void CLuaPedDefs::LoadFunctions()
 
         // Ped get functions
         {"getPedWeaponSlot", GetPedWeaponSlot},
-        {"getPedArmor", GetPedArmor},
+        {"getPedArmor", ArgumentParserWarn<false, GetPedArmor>},
         {"getPedRotation", GetPedRotation},
         {"isPedChoking", IsPedChoking},
         {"isPedDead", IsPedDead},
@@ -48,9 +48,10 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
         {"isPedInVehicle", IsPedInVehicle},
+        {"isPedReloadingWeapon", ArgumentParser<IsPedReloadingWeapon>},
 
         // Ped set functions
-        {"setPedArmor", SetPedArmor},
+        {"setPedArmor", ArgumentParserWarn<false, SetPedArmor>},
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"killPed", KillPed},
         {"setPedRotation", SetPedRotation},
@@ -71,7 +72,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedOnFire", SetPedOnFire},
         {"setPedHeadless", SetPedHeadless},
         {"setPedFrozen", SetPedFrozen},
-        {"reloadPedWeapon", reloadPedWeapon},
+        {"reloadPedWeapon", ArgumentParserWarn<false, ReloadPedWeapon>},
 
         // Weapon give/take functions
         {"giveWeapon", GiveWeapon},
@@ -118,6 +119,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isFrozen", "isPedFrozen");
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
     lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
 
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
     lua_classfunction(luaVM, "getFightingStyle", "getPedFightingStyle");
@@ -169,6 +171,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
     // TODO(qaisjp): setting this to any value will kill the ped. add OOP_KillPed that only allows `true`.
     lua_classvariable(luaVM, "dead", "killPed", "isPedDead");
@@ -289,28 +292,15 @@ int CLuaPedDefs::GetPedWeaponSlot(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::reloadPedWeapon(lua_State* luaVM)
+bool CLuaPedDefs::ReloadPedWeapon(lua_State* vm, CPed* const ped) noexcept
 {
-    CElement* pPed;
+    LogWarningIfPlayerHasNotJoinedYet(vm, ped);
+    return CStaticFunctionDefinitions::ReloadPedWeapon(ped);
+}
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pPed);
-
-        if (CStaticFunctionDefinitions::reloadPedWeapon(pPed))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+bool CLuaPedDefs::IsPedReloadingWeapon(CPed* const ped) noexcept
+{
+    return ped->IsReloadingWeapon();
 }
 
 int CLuaPedDefs::IsPedDoingGangDriveby(lua_State* luaVM)
@@ -648,27 +638,12 @@ int CLuaPedDefs::GetPedTotalAmmo(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedArmor(lua_State* luaVM)
+float CLuaPedDefs::GetPedArmor(CPed* const ped)
 {
-    CPed* pPed;
+    float armor;
+    CStaticFunctionDefinitions::GetPedArmor(ped, armor);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        float fArmor;
-        if (CStaticFunctionDefinitions::GetPedArmor(pPed, fArmor))
-        {
-            lua_pushnumber(luaVM, fArmor);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return armor;
 }
 
 int CLuaPedDefs::GetPedOccupiedVehicle(lua_State* luaVM)
@@ -1028,30 +1003,15 @@ int CLuaPedDefs::GetPedContactElement(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
+bool CLuaPedDefs::SetPedArmor(CPed* const ped, const float armor)
 {
-    CElement* pElement;
-    float     fArmor;
+    if (armor < 0.0f)
+        throw std::invalid_argument("Armor must be greater than or equal to 0");
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(fArmor);
+    if (armor > 100.0f)
+        throw std::invalid_argument("Armor must be less than or equal to 100");
 
-    if (!argStream.HasErrors())
-    {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-        if (CStaticFunctionDefinitions::SetPedArmor(pElement, fArmor))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetPedArmor(ped, armor);
 }
 
 int CLuaPedDefs::KillPed(lua_State* luaVM)

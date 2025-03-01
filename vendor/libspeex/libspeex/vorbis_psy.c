@@ -342,11 +342,14 @@ VorbisPsy *vorbis_psy_init(int rate, int n)
     inthalfoc=(int)halfoc;
     del=halfoc-inthalfoc;
 
+    if (halfoc < P_BANDS-1) { 
     p->noiseoffset[i]=
       p->vi->noiseoff[inthalfoc]*(1.-del) +
       p->vi->noiseoff[inthalfoc+1]*del;
-
-  }
+    } else {
+      p->noiseoffset[i]=
+        p->vi->noiseoff[inthalfoc]*(1.-del);
+}
 #if 0
   _analysis_output_always("noiseoff0",ls,p->noiseoffset,n,1,0,0);
 #endif

@@ -36,12 +36,14 @@ void TriggerVehicleCollisionEvent()
 
         pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude,
                                  pInterface->m_fDamageImpulseMagnitude, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition,
-                                 pCollisionVehicle->m_vecCollisionImpactVelocity);
+                                 pCollisionVehicle->m_vecCollisionImpactVelocity, false);
     }
     else
     {
+        const bool isProjectile = static_cast<CProjectileSAInterface*>(pEntity)->IsProjectableVTBL();
         pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,
-                                 pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity);
+                                 pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity,
+                                 pEntity->nType == ENTITY_TYPE_OBJECT && isProjectile);
     }
     TIMING_CHECKPOINT("-TriggerVehColEvent");
 }

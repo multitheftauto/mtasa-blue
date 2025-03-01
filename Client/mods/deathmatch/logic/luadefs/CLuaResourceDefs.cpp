@@ -227,12 +227,7 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
     if (resourceElement.has_value())
         return (*resourceElement)->GetName();
 
-    CResource* localResource = &lua_getownerresource(luaVM);
-
-    if (!localResource)
-        throw std::invalid_argument("Couldn't find the resource");
-
-    return localResource->GetName();
+    return lua_getownerresource(luaVM).GetName();
 }
 
 int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
@@ -488,9 +483,9 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
         {
             CLuaArguments returnValues;
             callbackArguments.Call(pLuaMain, iLuaFunction, &returnValues);
-            if (returnValues.Count())
+            if (returnValues.IsNotEmpty())
             {
-                CLuaArgument* returnedValue = *returnValues.IterBegin();
+                CLuaArgument* returnedValue = *returnValues.begin();
                 int           iType = returnedValue->GetType();
                 if (iType == LUA_TNIL)
                     break;
