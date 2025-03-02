@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/CMatrix_Pad.h
  *  PURPOSE:     4x3 GTA padded matrix
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -20,15 +20,19 @@
 class CMatrix_Padded
 {
 public:
-    CVector vRight;                    // 0            RIGHT
-    DWORD   dwPadRoll;                 // 12
-    CVector vFront;                    // 16   FOREWARDS
-    DWORD   dwPadDirection;            // 28
-    CVector vUp;                       // 32          UP
-    DWORD   dwPadWas;                  // 44
-    CVector vPos;                      // 48        TRANSLATE
-    DWORD   dwPadPos;                  // 60
+    CVector       vRight; // right
+    std::uint32_t pad_0;  // flags?
+    CVector       vFront; // forward
+    std::uint32_t pad_1;
+    CVector       vUp;    // up
+    std::uint32_t pad_2;
+    CVector       vPos;   // translate
+    std::uint32_t pad_3;
 
+    void* attachedMatrix; // RwMatrix*
+    bool  ownsAttachedMatrix;
+
+public:
     CMatrix_Padded() { memset(this, 0, sizeof(CMatrix_Padded)); }
 
     CMatrix_Padded(const CMatrix& Matrix) { SetFromMatrix(Matrix); }
@@ -44,16 +48,16 @@ public:
     void SetFromMatrix(const CMatrix& Matrix)
     {
         vPos = Matrix.vPos;
-        dwPadPos = 0;
+        pad_3 = 0;
 
         vFront = Matrix.vFront;
-        dwPadDirection = 0;
+        pad_1 = 0;
 
         vUp = Matrix.vUp;
-        dwPadWas = 0;
+        pad_2 = 0;
 
         vRight = Matrix.vRight;
-        dwPadRoll = 0;
+        pad_0 = 0;
     }
 
     void SetFromMatrixSkipPadding(const CMatrix& Matrix)
