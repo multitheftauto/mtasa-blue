@@ -2343,6 +2343,9 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface
     if (!BitStream.Read((char*)&vecStart, sizeof(CVector)) || !BitStream.Read((char*)&vecEnd, sizeof(CVector)))
         return;
 
+    if (!vecStart.IsValid() || !vecEnd.IsValid())
+        return;
+
     uchar ucOrderCounter = 0;
     if (!BitStream.Read(ucOrderCounter))
         return;
