@@ -3448,6 +3448,9 @@ void CClientGame::Event_OnIngame()
 
     // Reset weapon render
     g_pGame->SetWeaponRenderEnabled(true);
+  
+    // Reset cursor color
+    g_pCore->GetGUI()->ResetCursorColorVariables();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);

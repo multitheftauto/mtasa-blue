@@ -30,7 +30,7 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
-CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fCurrentServerCursorAlpha(1.0f)
+CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), CurrentServerCursorAlpha(255.0f)
 {
     m_RenderOkTimer.SetMaxIncrement(100);
 
@@ -496,20 +496,55 @@ bool CGUI_Impl::IsCursorEnabled()
 
 void CGUI_Impl::SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer)
 {
-    CEGUI::MouseCursor::getSingleton().setAlpha(fAlpha);
+    CEGUI::MouseCursor::getSingleton().setColor(CurrentServerCursorRed, CurrentServerCursorGreen, CurrentServerCursorBlue, fAlpha);
 
     if (bOnlyCurrentServer)
         SetCurrentServerCursorAlpha(fAlpha);
 }
 
+void CGUI_Impl::SetCursorColor(float r, float g, float b, float alpha) noexcept
+{
+    CEGUI::MouseCursor::getSingleton().setColor(r, g, b, alpha);
+    CurrentServerCursorRed = r;
+    CurrentServerCursorGreen = g;
+    CurrentServerCursorBlue = b;
+    CurrentServerCursorAlpha = alpha;
+}
+
+void CGUI_Impl::GetCursorColor(float& r, float& g, float& b, float& alpha) noexcept
+{
+    r = CurrentServerCursorRed;
+    g = CurrentServerCursorGreen;
+    b = CurrentServerCursorBlue;
+    alpha = CurrentServerCursorAlpha;
+}
+
+void CGUI_Impl::ResetMenuCursorColor() noexcept
+{
+    CEGUI::MouseCursor::getSingleton().setColor(255.0f, 255.0f, 255.0f, 255.0f);
+}
+
+void CGUI_Impl::ResetCursorColorVariables() noexcept
+{
+    CurrentServerCursorRed = 255.f;
+    CurrentServerCursorGreen = 255.f;
+    CurrentServerCursorBlue = 255.f;
+    CurrentServerCursorAlpha = 255.f;
+}
+
+void CGUI_Impl::RestoreCurrentServerCursorColor() noexcept
+{
+    CEGUI::MouseCursor::getSingleton().setColor(CurrentServerCursorRed, CurrentServerCursorGreen, CurrentServerCursorBlue, CurrentServerCursorAlpha);
+}
+
 void CGUI_Impl::SetCurrentServerCursorAlpha(float fAlpha)
 {
-    m_fCurrentServerCursorAlpha = fAlpha;
+    CurrentServerCursorAlpha = fAlpha;
 }
 
 float CGUI_Impl::GetCurrentServerCursorAlpha()
 {
-    return m_fCurrentServerCursorAlpha;
+    return CurrentServerCursorAlpha;
 }
 
 eCursorType CGUI_Impl::GetCursorType()
