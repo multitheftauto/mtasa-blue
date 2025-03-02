@@ -26,7 +26,7 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
 {
     char cWeaponType;
     BitStream.Read(cWeaponType);
-    if (!CPickupManager::IsValidWeaponID(cWeaponType))
+    if (!CPickupManager::HasWeaponBulletSync(cWeaponType))
         return false;
     m_Cache.weaponType = (eWeaponType)cWeaponType;
 
