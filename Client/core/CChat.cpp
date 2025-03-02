@@ -660,13 +660,14 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                 {
                     // If the input is a command, check that it isn't the 'login' command, if it is censor it
                     char szInput[256];
-                    strncpy(szInput, m_strInputText.c_str() + 1, 256);
+                    unsigned int uiLength = sizeof(szInput) - 1;
 
-                    const char* szCommand;
-                    if (szInput[0])
-                        szCommand = strtok(szInput, " ");
+                    strncpy(szInput, m_strInputText.c_str() + 1, uiLength);
+                    szInput[uiLength] = '\0';
 
-                    if ((strcmp(szCommand, "login") != 0))
+                    const char* szCommand = strtok(szInput, " ");
+                    
+                    if (szCommand && (strcmp(szCommand, "login") != 0))
                         m_pInputHistory->Add(m_strInputText);
                     else if ((m_pInputHistory->Empty() || m_pInputHistory->GetLast() != std::string("/login")))
                         m_pInputHistory->Add("/login");
