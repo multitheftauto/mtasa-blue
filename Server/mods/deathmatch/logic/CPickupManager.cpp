@@ -68,11 +68,6 @@ bool CPickupManager::IsValidWeaponID(unsigned int uiWeaponID)
     return (uiWeaponID > 0 && uiWeaponID != 13 && uiWeaponID != 19 && uiWeaponID != 20 && uiWeaponID != 21 && uiWeaponID <= 46);
 }
 
-bool CPickupManager::HasWeaponBulletSync(uint32_t weaponID)
-{
-    return weaponID >= 22 && weaponID <= 34;
-}
-
 unsigned short CPickupManager::GetWeaponModel(unsigned int uiWeaponID)
 {
     if (uiWeaponID <= 46)

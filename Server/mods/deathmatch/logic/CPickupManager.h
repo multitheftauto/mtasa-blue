@@ -36,7 +36,6 @@ public:
     std::list<CPickup*>::const_iterator IterEnd() { return m_List.end(); };
 
     static bool           IsValidWeaponID(unsigned int uiWeaponID);
-    static bool           HasWeaponBulletSync(uint32_t weaponID);
     static unsigned short GetWeaponModel(unsigned int uiWeaponID);
     static unsigned short GetHealthModel() { return 1240; };
     static unsigned short GetArmorModel() { return 1242; };
