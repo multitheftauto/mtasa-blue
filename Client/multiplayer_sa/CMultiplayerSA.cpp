@@ -1311,6 +1311,10 @@ void CMultiplayerSA::InitHooks()
     MemPut<DWORD>(0x748EFC, 0x748B08);
     MemPut<BYTE>(0x748B0E, 5);
 
+    // Skip copyright screen
+    MemSet((void*)0x748C2B, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeIn
+    MemSet((void*)0x748C9A, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeOut
+
     // Force triggering of the damage event for players on fire
     MemSet((void*)0x633695, 0x90, 6);
     MemPut<BYTE>(0x633720, 0);
