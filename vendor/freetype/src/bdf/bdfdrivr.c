@@ -349,7 +349,6 @@ THE SOFTWARE.
     FT_Memory      memory  = FT_FACE_MEMORY( face );
 
     bdf_font_t*    font = NULL;
-    bdf_options_t  options;
 
     FT_UNUSED( num_params );
     FT_UNUSED( params );
@@ -360,12 +359,8 @@ THE SOFTWARE.
     if ( FT_STREAM_SEEK( 0 ) )
       goto Exit;
 
-    options.correct_metrics = 1;   /* FZ XXX: options semantics */
-    options.keep_unencoded  = 1;
-    options.keep_comments   = 0;
-    options.font_spacing    = BDF_PROPORTIONAL;
-
-    error = bdf_load_font( stream, memory, &options, &font );
+    error = bdf_load_font( stream, memory,
+                           BDF_CORRECT_METRICS | BDF_KEEP_UNENCODED, &font );
     if ( FT_ERR_EQ( error, Missing_Startfont_Field ) )
     {
       FT_TRACE2(( "  not a BDF file\n" ));
@@ -408,10 +403,18 @@ THE SOFTWARE.
                           FT_FACE_FLAG_HORIZONTAL;
 
       prop = bdf_get_font_property( font, "SPACING" );
-      if ( prop && prop->format == BDF_ATOM                             &&
-           prop->value.atom                                             &&
-           ( *(prop->value.atom) == 'M' || *(prop->value.atom) == 'm' ||
-             *(prop->value.atom) == 'C' || *(prop->value.atom) == 'c' ) )
+      if ( prop && prop->value.atom )
+      {
+        if      ( prop->value.atom[0] == 'p' || prop->value.atom[0] == 'P' )
+          font->spacing = BDF_PROPORTIONAL;
+        else if ( prop->value.atom[0] == 'm' || prop->value.atom[0] == 'M' )
+          font->spacing = BDF_MONOWIDTH;
+        else if ( prop->value.atom[0] == 'c' || prop->value.atom[0] == 'C' )
+          font->spacing = BDF_CHARCELL;
+      }
+
+      if ( font->spacing == BDF_MONOWIDTH ||
+           font->spacing == BDF_CHARCELL  )
         face->face_flags |= FT_FACE_FLAG_FIXED_WIDTH;
 
       /* FZ XXX: TO DO: FT_FACE_FLAGS_VERTICAL   */
@@ -444,19 +447,25 @@ THE SOFTWARE.
         long             value;
 
 
-        /* sanity checks */
-        if ( font->font_ascent > 0x7FFF || font->font_ascent < -0x7FFF )
-        {
-          font->font_ascent = font->font_ascent < 0 ? -0x7FFF : 0x7FFF;
-          FT_TRACE0(( "BDF_Face_Init: clamping font ascent to value %ld\n",
-                      font->font_ascent ));
-        }
-        if ( font->font_descent > 0x7FFF || font->font_descent < -0x7FFF )
-        {
-          font->font_descent = font->font_descent < 0 ? -0x7FFF : 0x7FFF;
-          FT_TRACE0(( "BDF_Face_Init: clamping font descent to value %ld\n",
-                      font->font_descent ));
-        }
+        prop = bdf_get_font_property( font, "FONT_ASCENT" );
+        if ( prop )
+          font->font_ascent = prop->value.l;
+        else
+          font->font_ascent = font->bbx.ascent;
+        if ( font->font_ascent > 0x7FFF )
+          font->font_ascent = 0x7FFF;
+        else if ( font->font_ascent < 0 )
+          font->font_ascent = 0;
+
+        prop = bdf_get_font_property( font, "FONT_DESCENT" );
+        if ( prop )
+          font->font_descent = prop->value.l;
+        else
+          font->font_descent = font->bbx.descent;
+        if ( font->font_descent > 0x7FFF )
+          font->font_descent = 0x7FFF;
+        else if ( font->font_descent < 0 )
+          font->font_descent = 0;
 
         bsize->height = (FT_Short)( font->font_ascent + font->font_descent );
 
@@ -591,6 +600,12 @@ THE SOFTWARE.
                                      resolution_y );
         else
           bsize->x_ppem = bsize->y_ppem;
+
+        prop = bdf_get_font_property( font, "DEFAULT_CHAR" );
+        if ( prop )
+          font->default_char = prop->value.ul;
+        else
+          font->default_char = ~0UL;
       }
 
       /* encoding table */
@@ -780,8 +795,8 @@ THE SOFTWARE.
                   FT_UInt       glyph_index,
                   FT_Int32      load_flags )
   {
-    BDF_Face     bdf    = (BDF_Face)FT_SIZE_FACE( size );
-    FT_Face      face   = FT_FACE( bdf );
+    FT_Face      face   = size->face;
+    BDF_Face     bdf    = (BDF_Face)face;
     FT_Error     error  = FT_Err_Ok;
     FT_Bitmap*   bitmap = &slot->bitmap;
     bdf_glyph_t  glyph;

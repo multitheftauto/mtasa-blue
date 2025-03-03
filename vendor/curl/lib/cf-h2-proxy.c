@@ -865,7 +865,9 @@ static int tunnel_recv_callback(nghttp2_session *session, uint8_t flags,
   if(nwritten < 0) {
     if(result != CURLE_AGAIN)
       return NGHTTP2_ERR_CALLBACK_FAILURE;
+#ifdef DEBUGBUILD
     nwritten = 0;
+#endif
   }
   DEBUGASSERT((size_t)nwritten == len);
   return 0;
@@ -1406,7 +1408,7 @@ static ssize_t cf_h2_proxy_send(struct Curl_cfilter *cf,
   ssize_t nwritten;
   CURLcode result;
 
-  (void)eos; /* TODO, maybe useful for blocks? */
+  (void)eos;
   if(ctx->tunnel.state != H2_TUNNEL_ESTABLISHED) {
     *err = CURLE_SEND_ERROR;
     return -1;

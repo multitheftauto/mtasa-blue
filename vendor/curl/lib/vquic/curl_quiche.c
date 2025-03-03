@@ -926,8 +926,8 @@ static ssize_t cf_quiche_send_body(struct Curl_cfilter *cf,
   nwritten = quiche_h3_send_body(ctx->h3c, ctx->qconn, stream->id,
                                  (uint8_t *)buf, len, eos);
   if(nwritten == QUICHE_H3_ERR_DONE || (nwritten == 0 && len > 0)) {
-    /* TODO: we seem to be blocked on flow control and should HOLD
-     * sending. But when do we open again? */
+    /* Blocked on flow control and should HOLD sending. But when do we open
+     * again? */
     if(!quiche_conn_stream_writable(ctx->qconn, stream->id, len)) {
       CURL_TRC_CF(data, cf, "[%" FMT_PRIu64 "] send_body(len=%zu) "
                   "-> window exhausted", stream->id, len);
@@ -1204,8 +1204,8 @@ static CURLcode h3_data_pause(struct Curl_cfilter *cf,
                               struct Curl_easy *data,
                               bool pause)
 {
-  /* TODO: there seems right now no API in quiche to shrink/enlarge
-   * the streams windows. As we do in HTTP/2. */
+  /* There seems to exist no API in quiche to shrink/enlarge the streams
+   * windows. As we do in HTTP/2. */
   if(!pause) {
     h3_drain_stream(cf, data);
     Curl_expire(data, 0, EXPIRE_RUN_NOW);
@@ -1227,9 +1227,6 @@ static CURLcode cf_quiche_data_event(struct Curl_cfilter *cf,
     break;
   case CF_CTRL_DATA_PAUSE:
     result = h3_data_pause(cf, data, (arg1 != 0));
-    break;
-  case CF_CTRL_DATA_DETACH:
-    h3_data_done(cf, data);
     break;
   case CF_CTRL_DATA_DONE:
     h3_data_done(cf, data);
@@ -1278,10 +1275,6 @@ static CURLcode cf_quiche_ctx_open(struct Curl_cfilter *cf,
   if(result)
     return result;
 
-  result = Curl_ssl_peer_init(&ctx->peer, cf, TRNSPRT_QUIC);
-  if(result)
-    return result;
-
   ctx->cfg = quiche_config_new(QUICHE_PROTOCOL_VERSION);
   if(!ctx->cfg) {
     failf(data, "cannot create quiche config");
@@ -1313,7 +1306,7 @@ static CURLcode cf_quiche_ctx_open(struct Curl_cfilter *cf,
   result = Curl_vquic_tls_init(&ctx->tls, cf, data, &ctx->peer,
                                QUICHE_H3_APPLICATION_PROTOCOL,
                                sizeof(QUICHE_H3_APPLICATION_PROTOCOL) - 1,
-                               NULL, NULL, cf);
+                               NULL, NULL, cf, NULL);
   if(result)
     return result;
 
@@ -1379,7 +1372,6 @@ static CURLcode cf_quiche_verify_peer(struct Curl_cfilter *cf,
   struct cf_quiche_ctx *ctx = cf->ctx;
 
   cf->conn->bits.multiplex = TRUE; /* at least potentially multiplexed */
-  cf->conn->httpversion = 30;
 
   return Curl_vquic_tls_verify_peer(&ctx->tls, cf, data, &ctx->peer);
 }
@@ -1573,6 +1565,9 @@ static CURLcode cf_quiche_query(struct Curl_cfilter *cf,
       *when = ctx->handshake_at;
     return CURLE_OK;
   }
+  case CF_QUERY_HTTP_VERSION:
+    *pres1 = 30;
+    return CURLE_OK;
   default:
     break;
   }
@@ -1620,7 +1615,7 @@ static bool cf_quiche_conn_is_alive(struct Curl_cfilter *cf,
 
 struct Curl_cftype Curl_cft_http3 = {
   "HTTP/3",
-  CF_TYPE_IP_CONNECT | CF_TYPE_SSL | CF_TYPE_MULTIPLEX,
+  CF_TYPE_IP_CONNECT | CF_TYPE_SSL | CF_TYPE_MULTIPLEX | CF_TYPE_HTTP,
   0,
   cf_quiche_destroy,
   cf_quiche_connect,
