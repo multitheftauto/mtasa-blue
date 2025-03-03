@@ -91,6 +91,7 @@ public:
 
     // Static Methods
     static unsigned short GetSkillStatIndex(eWeaponType eWeapon);
+    static bool           HasWeaponBulletSync(uint32_t weaponID) noexcept;
 
 private:
     std::list<CWeaponStat*>                             m_OriginalWeaponData;
