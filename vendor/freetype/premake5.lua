@@ -11,6 +11,6 @@ project "freetype"
 	files {
 		"premake5.lua",
 		"include/**.h",
-		"src/**.c"
+		"src/**.c",
 		"builds/**.c"
 	}
