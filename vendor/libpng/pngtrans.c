@@ -1,3 +1,4 @@
+
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
  * Copyright (c) 2018-2024 Cosmin Truta
