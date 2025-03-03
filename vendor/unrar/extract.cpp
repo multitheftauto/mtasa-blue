@@ -25,7 +25,6 @@ CmdExtract::CmdExtract(CommandData *Cmd)
 #ifdef RAR_SMP
   Unp->SetThreads(Cmd->Threads);
 #endif
-  Unp->AllowLargePages(Cmd->UseLargePages);
 }
 
 
@@ -113,15 +112,6 @@ void CmdExtract::DoExtract()
 
 void CmdExtract::ExtractArchiveInit(Archive &Arc)
 {
-  if (Cmd->Command[0]=='T' || Cmd->Command[0]=='I')
-    Cmd->Test=true;
-
-#ifdef PROPAGATE_MOTW
-  // Invoke here, so it is also supported by unrar.dll.
-  if (!Cmd->Test && Cmd->MotwList.ItemsCount()>0)
-    Arc.Motw.ReadZoneIdStream(Arc.FileName,Cmd->MotwAllFields);
-#endif
-
   DataIO.AdjustTotalArcSize(&Arc);
 
   FileCount=0;
@@ -188,18 +178,12 @@ EXTRACT_ARC_CODE CmdExtract::ExtractArchive()
     }
 #endif
 
-    bool RarExt=false;
+    mprintf(St(MNotRAR),ArcName.c_str());
+
 #ifndef SFX_MODULE
-    RarExt=CmpExt(ArcName,L"rar");
+    if (CmpExt(ArcName,L"rar"))
 #endif
-
-    if (RarExt)
-      uiMsg(UIERROR_BADARCHIVE,ArcName); // Non-archive .rar file.
-    else
-      mprintf(St(MNotRAR),ArcName.c_str()); // Non-archive not .rar file, likely in "rar x *.*".
-
-    if (RarExt)
-      ErrHandler.SetErrorCode(RARX_BADARC);
+      ErrHandler.SetErrorCode(RARX_WARNING);
     return EXTRACT_ARC_NEXT;
   }
 
@@ -269,6 +253,9 @@ EXTRACT_ARC_CODE CmdExtract::ExtractArchive()
   }
 
   ExtractArchiveInit(Arc);
+
+  if (Cmd->Command[0]=='T' || Cmd->Command[0]=='I')
+    Cmd->Test=true;
 
 
   if (Cmd->Command[0]=='I')
@@ -507,7 +494,7 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
           DestFileName=!Cmd->TempPath.empty() ? Cmd->TempPath:Cmd->ExtrPath;
           AddEndSlash(DestFileName);
           DestFileName+=L"__tmp_reference_source_";
-          MkTemp(DestFileName,nullptr);
+          MkTemp(DestFileName);
           MatchedRef.TmpName=DestFileName;
         }
         RefTarget=true; // Need it even for 't' to test the reference source.
@@ -566,7 +553,6 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
       return !Arc.Solid; // Can try extracting next file only in non-solid archive.
     }
 
-#ifndef RAR_NOCRYPT  // For rarext.dll, Setup.SFX and unrar_nocrypt.dll.
     if (Arc.FileHead.Encrypted)
     {
       RarCheckPassword CheckPwd;
@@ -593,9 +579,9 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
         // Set a password before creating the file, so we can skip creating
         // in case of wrong password.
         SecPassword FilePassword=Cmd->Password;
-#if defined(_WIN_ALL) && !defined(SFX_MODULE)
+  #if defined(_WIN_ALL) && !defined(SFX_MODULE)
         ConvertDosPassword(Arc,FilePassword);
-#endif
+  #endif
 
         byte PswCheck[SIZE_PSWCHECK];
         bool EncSet=DataIO.SetEncryption(false,Arc.FileHead.CryptMethod,
@@ -623,16 +609,16 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
 
             // Avoid new requests for unrar.dll to prevent the infinite loop
             // if app always returns the same password.
-#ifndef RARDLL
+  #ifndef RARDLL
             continue; // Request a password again.
-#endif
+  #endif
           }
-#ifdef RARDLL
+  #ifdef RARDLL
           // If we already have ERAR_EOPEN as result of missing volume,
           // we should not replace it with less precise ERAR_BAD_PASSWORD.
           if (Cmd->DllError!=ERAR_EOPEN)
             Cmd->DllError=ERAR_BAD_PASSWORD;
-#endif
+  #endif
           ErrHandler.SetErrorCode(RARX_BADPWD);
           ExtrFile=false;
         }
@@ -641,7 +627,6 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
     }
     else
       DataIO.SetEncryption(false,CRYPT_NONE,NULL,NULL,NULL,0,NULL,NULL);
-#endif // RAR_NOCRYPT
 
     // Per file symlink conversion flag. Can be turned off in unrar.dll.
     bool CurConvertSymlinkPaths=ConvertSymlinkPaths;
@@ -703,29 +688,7 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
           // any overwrite prompts.
           if (!CheckWinLimit(Arc,ArcFileName))
             return false;
-
-          // Read+write mode is required to set "Compressed" attribute.
-          // Other than that prefer the write only mode to avoid
-          // OpenIndiana NAS problem with SetFileTime and read+write files.
-#if defined(_WIN_ALL) && !defined(SFX_MODULE)
-          bool Compressed=Cmd->SetCompressedAttr &&
-               (Arc.FileHead.FileAttr & FILE_ATTRIBUTE_COMPRESSED)!=0;
-          bool WriteOnly=!Compressed;
-#else
-          bool WriteOnly=true;
-#endif
-
-          ExtrFile=ExtrCreateFile(Arc,CurFile,WriteOnly);
-
-#if defined(_WIN_ALL) && !defined(SFX_MODULE)
-          // 2024.03.12: Set early to compress written data immediately.
-          // For 10 GB text file it was ~1.5x faster than when set after close.
-
-          if (ExtrFile && Compressed)
-            SetFileCompression(CurFile.GetHandle(),true);
-
-#endif
-
+          ExtrFile=ExtrCreateFile(Arc,CurFile);
         }
 
     if (!ExtrFile && Arc.Solid)
@@ -1005,9 +968,6 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
           if (Preallocated>0 && (BrokenFile || DataIO.CurUnpWrite!=Preallocated))
             CurFile.Truncate();
 
-#ifdef PROPAGATE_MOTW
-          Arc.Motw.CreateZoneIdStream(DestFileName,Cmd->MotwList);
-#endif
 
           CurFile.SetOpenFileTime(
             Cmd->xmtime==EXTTIME_NONE ? NULL:&Arc.FileHead.mtime,
@@ -1027,6 +987,9 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
         if (SetAttr)
         {
 #if defined(_WIN_ALL) && !defined(SFX_MODULE)
+          if (Cmd->SetCompressedAttr &&
+              (Arc.FileHead.FileAttr & FILE_ATTRIBUTE_COMPRESSED)!=0)
+            SetFileCompression(DestFileName,true);
           if (Cmd->ClearArc)
             Arc.FileHead.FileAttr&=~FILE_ATTRIBUTE_ARCHIVE;
 #endif
@@ -1443,7 +1406,7 @@ void CmdExtract::ExtrCreateDir(Archive &Arc,const std::wstring &ArcFileName)
 }
 
 
-bool CmdExtract::ExtrCreateFile(Archive &Arc,File &CurFile,bool WriteOnly)
+bool CmdExtract::ExtrCreateFile(Archive &Arc,File &CurFile)
 {
   bool Success=true;
   wchar Command=Cmd->Command[0];
@@ -1454,7 +1417,9 @@ bool CmdExtract::ExtrCreateFile(Archive &Arc,File &CurFile,bool WriteOnly)
   if ((Command=='E' || Command=='X') && !Cmd->Test)
   {
     bool UserReject;
-    if (!FileCreate(Cmd,&CurFile,DestFileName,&UserReject,Arc.FileHead.UnpSize,&Arc.FileHead.mtime,WriteOnly))
+    // Specify "write only" mode to avoid OpenIndiana NAS problems
+    // with SetFileTime and read+write files.
+    if (!FileCreate(Cmd,&CurFile,DestFileName,&UserReject,Arc.FileHead.UnpSize,&Arc.FileHead.mtime,true))
     {
       Success=false;
       if (!UserReject)
@@ -1514,16 +1479,10 @@ bool CmdExtract::CheckUnpVer(Archive &Arc,const std::wstring &ArcFileName)
   if (Arc.FileHead.Method==0)
     WrongVer=false;
 
-  // Can't unpack the unknown encryption even for stored files.
-  if (Arc.FileHead.CryptMethod==CRYPT_UNKNOWN)
-    WrongVer=true;
-
   if (WrongVer)
   {
     ErrHandler.UnknownMethodMsg(Arc.FileName,ArcFileName);
-    // No need to suggest a new version if it is just a broken archive.
-    if (!Arc.BrokenHeader)
-      uiMsg(UIERROR_NEWERRAR,Arc.FileName);
+    uiMsg(UIERROR_NEWERRAR,Arc.FileName);
   }
   return !WrongVer;
 }
@@ -1606,10 +1565,8 @@ void CmdExtract::AnalyzeArchive(const std::wstring &ArcName,bool Volume,bool New
 
         if (!Arc.FileHead.SplitBefore)
         {
-          if (!MatchFound && !Arc.FileHead.Solid && !Arc.FileHead.Dir &&
-              Arc.FileHead.RedirType==FSREDIR_NONE && Arc.FileHead.Method!=0)
+          if (!MatchFound && !Arc.FileHead.Solid) // Can start extraction from here.
           {
-            // Can start extraction from here.
             // We would gain nothing and unnecessarily complicate extraction
             // if we set StartName for first volume or StartPos for first
             // archived file.

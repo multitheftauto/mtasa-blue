@@ -55,7 +55,7 @@ struct DecodeTable:PackDef
   // Translates compressed bits (up to QuickBits length)
   // to position in alphabet in quick mode.
   // 'ushort' saves some memory and even provides a little speed gain
-  // comparing to 'uint' here.
+  // comparting to 'uint' here.
   ushort QuickNum[1<<MAX_QUICK_DECODE_BITS];
 
   // Translate the position in code list to position in alphabet.
@@ -241,8 +241,6 @@ class Unpack:PackDef
     byte *ReadBufMT;
 #endif
 
-    LargePageAlloc Alloc;
-
     std::vector<byte> FilterSrcMemory;
     std::vector<byte> FilterDstMemory;
 
@@ -285,6 +283,7 @@ class Unpack:PackDef
     int64 DestUnpSize;
 
     bool Suspended;
+    bool UnpAllBuf;
     bool UnpSomeRead;
     int64 WrittenFileSize;
     bool FileExtracted;
@@ -383,7 +382,6 @@ class Unpack:PackDef
     Unpack(ComprDataIO *DataIO);
     ~Unpack();
     void Init(uint64 WinSize,bool Solid);
-    void AllowLargePages(bool Allow) {Alloc.AllowLargePages(Allow);}
     void DoUnpack(uint Method,bool Solid);
     bool IsFileExtracted() {return FileExtracted;}
     void SetDestSize(int64 DestSize) {DestUnpSize=DestSize;FileExtracted=false;}

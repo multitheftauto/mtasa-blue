@@ -16,7 +16,8 @@ struct DataSet
 
 HANDLE PASCAL RAROpenArchive(struct RAROpenArchiveData *r)
 {
-  RAROpenArchiveDataEx rx{};
+  RAROpenArchiveDataEx rx;
+  memset(&rx,0,sizeof(rx));
   rx.ArcName=r->ArcName;
   rx.OpenMode=r->OpenMode;
   rx.CmtBuf=r->CmtBuf;
@@ -31,7 +32,7 @@ HANDLE PASCAL RAROpenArchive(struct RAROpenArchiveData *r)
 
 HANDLE PASCAL RAROpenArchiveEx(struct RAROpenArchiveDataEx *r)
 {
-  DataSet *Data=nullptr;
+  DataSet *Data=NULL;
   try
   {
     ErrHandler.Clean();
@@ -49,7 +50,7 @@ HANDLE PASCAL RAROpenArchiveEx(struct RAROpenArchiveDataEx *r)
       AnsiArcName=r->ArcName;
 #ifdef _WIN_ALL
       if (!AreFileApisANSI())
-        OemToExt(r->ArcName,AnsiArcName);
+        IntToExt(r->ArcName,AnsiArcName);
 #endif
     }
 
@@ -73,7 +74,7 @@ HANDLE PASCAL RAROpenArchiveEx(struct RAROpenArchiveDataEx *r)
     {
       r->OpenResult=ERAR_EOPEN;
       delete Data;
-      return nullptr;
+      return NULL;
     }
     if (!Data->Arc.IsArchive(true))
     {
@@ -88,7 +89,7 @@ HANDLE PASCAL RAROpenArchiveEx(struct RAROpenArchiveDataEx *r)
           r->OpenResult=ERAR_BAD_ARCHIVE;
       }
       delete Data;
-      return nullptr;
+      return NULL;
     }
     r->Flags=0;
     
@@ -114,7 +115,7 @@ HANDLE PASCAL RAROpenArchiveEx(struct RAROpenArchiveDataEx *r)
     std::wstring CmtDataW;
     if (r->CmtBufSize!=0 && Data->Arc.GetComment(CmtDataW))
     {
-      if (r->CmtBufW!=nullptr)
+      if (r->CmtBufW!=NULL)
       {
 //        CmtDataW.push_back(0);
         size_t Size=wcslen(CmtDataW.data())+1;
@@ -139,18 +140,6 @@ HANDLE PASCAL RAROpenArchiveEx(struct RAROpenArchiveDataEx *r)
     }
     else
       r->CmtState=r->CmtSize=0;
-
-#ifdef PROPAGATE_MOTW
-    if (r->MarkOfTheWeb!=nullptr)
-    {
-      Data->Cmd.MotwAllFields=r->MarkOfTheWeb[0]=='1';
-      const wchar *Sep=wcschr(r->MarkOfTheWeb,'=');
-      if (r->MarkOfTheWeb[0]=='-')
-        Data->Cmd.MotwList.Reset();
-      else
-        Data->Cmd.GetBriefMaskList(Sep==nullptr ? L"*":Sep+1,Data->Cmd.MotwList);
-    }
-#endif
 
     Data->Extract.ExtractArchiveInit(Data->Arc);
     return (HANDLE)Data;
@@ -369,7 +358,7 @@ int PASCAL ProcessFile(HANDLE hArcData,int Operation,char *DestPath,char *DestNa
         // We must not apply OemToCharBuffA directly to DestPath,
         // because we do not know DestPath length and OemToCharBuffA
         // does not stop at 0.
-        OemToExt(ExtrPathA,ExtrPathA);
+        IntToExt(ExtrPathA,ExtrPathA);
 #endif
         CharToWide(ExtrPathA,Data->Cmd.ExtrPath);
         AddEndSlash(Data->Cmd.ExtrPath);
@@ -381,7 +370,7 @@ int PASCAL ProcessFile(HANDLE hArcData,int Operation,char *DestPath,char *DestNa
         // We must not apply OemToCharBuffA directly to DestName,
         // because we do not know DestName length and OemToCharBuffA
         // does not stop at 0.
-        OemToExt(DestNameA,DestNameA);
+        IntToExt(DestNameA,DestNameA);
 #endif
         CharToWide(DestNameA,Data->Cmd.DllDestName);
       }
@@ -505,8 +494,6 @@ static int RarErrorToDll(RAR_EXIT ErrCode)
       return ERAR_BAD_PASSWORD;
     case RARX_SUCCESS:
       return ERAR_SUCCESS; // 0.
-    case RARX_BADARC:
-      return ERAR_BAD_ARCHIVE;
     default:
       return ERAR_UNKNOWN;
   }

@@ -32,9 +32,6 @@
 #ifdef _WIN_ALL
 #include "isnt.hpp"
 #endif
-#ifdef PROPAGATE_MOTW
-#include "motw.hpp"
-#endif
 #include "file.hpp"
 #include "crc.hpp"
 #include "filefn.hpp"
@@ -63,8 +60,6 @@
 #include "model.hpp"
 
 #include "threadpool.hpp"
-
-#include "largepage.hpp"
 
 #include "unpack.hpp"
 

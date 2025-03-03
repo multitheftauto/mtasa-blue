@@ -47,7 +47,6 @@ class Archive:public File
     bool DummyCmd;
     CommandData *Cmd;
 
-    int RecoveryPercent;
 
     RarTime LatestTime;
     int LastReadBlock;
@@ -59,14 +58,13 @@ class Archive:public File
     bool ProhibitQOpen;
 #endif
   public:
-    Archive(CommandData *InitCmd=nullptr);
+    Archive(CommandData *InitCmd=NULL);
     ~Archive();
     static RARFORMAT IsSignature(const byte *D,size_t Size);
     bool IsArchive(bool EnableBroken);
     size_t SearchBlock(HEADER_TYPE HeaderType);
     size_t SearchSubBlock(const wchar *Type);
     size_t SearchRR();
-    int GetRecoveryPercent() {return RecoveryPercent;}
     size_t ReadHeader();
     void CheckArc(bool EnableBroken);
     void CheckOpen(const std::wstring &Name);
@@ -149,9 +147,6 @@ class Archive:public File
     bool NewArchive;
 
     std::wstring FirstVolumeName;
-#ifdef PROPAGATE_MOTW
-    MarkOfTheWeb Motw;
-#endif
 };
 
 
