@@ -273,6 +273,7 @@ const struct Curl_handler Curl_handler_smb = {
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_SMB,                             /* defport */
   CURLPROTO_SMB,                        /* protocol */
   CURLPROTO_SMB,                        /* family */
@@ -301,6 +302,7 @@ const struct Curl_handler Curl_handler_smbs = {
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_SMBS,                            /* defport */
   CURLPROTO_SMBS,                       /* protocol */
   CURLPROTO_SMB,                        /* family */
@@ -840,7 +842,7 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
 
   if(smbc->state == SMB_CONNECTING) {
 #ifdef USE_SSL
-    if((conn->handler->flags & PROTOPT_SSL)) {
+    if(Curl_conn_is_ssl(conn, FIRSTSOCKET)) {
       bool ssl_done = FALSE;
       result = Curl_conn_connect(data, FIRSTSOCKET, FALSE, &ssl_done);
       if(result && result != CURLE_AGAIN)
@@ -879,7 +881,16 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
       return CURLE_COULDNT_CONNECT;
     }
     nrsp = msg;
+#if defined(__GNUC__) && __GNUC__ >= 13
+#pragma GCC diagnostic push
+/* error: 'memcpy' offset [74, 80] from the object at '<unknown>' is out of
+   the bounds of referenced subobject 'bytes' with type 'char[1]' */
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
     memcpy(smbc->challenge, nrsp->bytes, sizeof(smbc->challenge));
+#if defined(__GNUC__) && __GNUC__ >= 13
+#pragma GCC diagnostic pop
+#endif
     smbc->session_key = smb_swap32(nrsp->session_key);
     result = smb_send_setup(data);
     if(result) {
@@ -915,7 +926,7 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
  */
 static void get_posix_time(time_t *out, curl_off_t timestamp)
 {
-  timestamp -= 116444736000000000;
+  timestamp -= CURL_OFF_T_C(116444736000000000);
   timestamp /= 10000000;
 #if SIZEOF_TIME_T < SIZEOF_CURL_OFF_T
   if(timestamp > TIME_T_MAX)
