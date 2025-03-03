@@ -45,8 +45,10 @@ UIASKREP_RESULT uiAskReplace(std::wstring &Name,int64 FileSize,RarTime *FileTime
   if (AllowRename && Choice==5)
   {
     mprintf(St(MAskNewName));
-    getwstr(Name);
-    return UIASKREP_R_RENAME;
+    if (getwstr(Name))
+      return UIASKREP_R_RENAME;
+    else
+      return UIASKREP_R_SKIP; // Process fwgets failure as if user answered 'No'.
   }
   return UIASKREP_R_CANCEL;
 }
@@ -242,18 +244,6 @@ void uiMsgStore::Msg()
       break;
     case UIERROR_UNEXPEOF:
       Log(Str[0],St(MLogUnexpEOF));
-      break;
-    case UIERROR_TRUNCSERVICE:
-      {
-        const wchar *Type=nullptr;
-        if (wcscmp(Str[1],SUBHEAD_TYPE_QOPEN)==0)
-          Type=St(MHeaderQO);
-        else
-          if (wcscmp(Str[1],SUBHEAD_TYPE_RR)==0)
-            Type=St(MHeaderRR);
-        if (Type!=nullptr)
-          Log(Str[0],St(MTruncService),Type);
-      }
       break;
     case UIERROR_BADARCHIVE:
       Log(Str[0],St(MBadArc),Str[0]);

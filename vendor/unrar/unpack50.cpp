@@ -511,7 +511,8 @@ void Unpack::UnpWriteArea(size_t StartPtr,size_t EndPtr)
 {
   if (EndPtr!=StartPtr)
     UnpSomeRead=true;
-
+  if (EndPtr<StartPtr)
+    UnpAllBuf=true;
 
   if (Fragmented)
   {

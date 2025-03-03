@@ -22,9 +22,6 @@ void SetPriority(int Priority);
 clock_t MonoClock();
 void Wait();
 bool EmailFile(const std::wstring &FileName,std::wstring MailToW);
-#ifdef _WIN_ALL
-bool SetPrivilege(LPCTSTR PrivName);
-#endif
 void Shutdown(POWER_MODE Mode);
 bool ShutdownCheckAnother(bool Open);
 

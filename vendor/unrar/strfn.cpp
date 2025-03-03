@@ -12,8 +12,7 @@ const wchar *NullToEmpty(const wchar *Str)
 }
 
 
-// Convert from OEM encoding.
-void OemToExt(const std::string &Src,std::string &Dest)
+void IntToExt(const std::string &Src,std::string &Dest)
 {
 #ifdef _WIN_ALL
   if (std::addressof(Src)!=std::addressof(Dest))
@@ -45,7 +44,7 @@ void ArcCharToWide(const char *Src,std::wstring &Dest,ACTW_ENCODING Encoding)
     std::string NameA;
     if (Encoding==ACTW_OEM)
     {
-      OemToExt(Src,NameA);
+      IntToExt(Src,NameA);
       Src=NameA.data();
     }
     CharToWide(Src,Dest);

@@ -47,10 +47,7 @@ int main(int argc, char *argv[])
       {
         case 'T':
         case 'V':
-          // Also copy 't' and 'a' modifiers for -v[t,a], if present.
-          Cmd->Command.clear();
-          for (char *c=Switch+1;*c!=0;c++)
-            Cmd->Command+=etoupper(*c);
+          Cmd->Command[0]=UpperCmd;
           break;
         case '?':
           Cmd->OutHelp(RARX_SUCCESS);

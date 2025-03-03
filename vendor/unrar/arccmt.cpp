@@ -36,12 +36,7 @@ bool Archive::DoGetComment(std::wstring &CmtData)
     {
       // Current (RAR 3.0+) version of archive comment.
       Seek(GetStartPos(),SEEK_SET);
-      if (SearchSubBlock(SUBHEAD_TYPE_CMT)!=0)
-        if (ReadCommentData(CmtData))
-          return true;
-        else
-          uiMsg(UIERROR_CMTBROKEN,FileName);
-      return false;
+      return SearchSubBlock(SUBHEAD_TYPE_CMT)!=0 && ReadCommentData(CmtData);
     }
 #ifndef SFX_MODULE
     // Old style (RAR 2.9) comment header embedded into the main 

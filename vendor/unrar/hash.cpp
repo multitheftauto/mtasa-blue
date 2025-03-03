@@ -275,9 +275,7 @@ bool DataHash::Cmp(HashValue *CmpValue,byte *Key)
 {
   HashValue Final;
   Result(&Final);
-#ifndef RAR_NOCRYPT
-  if (Key!=nullptr)
+  if (Key!=NULL)
     ConvertHashToMAC(&Final,Key);
-#endif
   return Final==*CmpValue;
 }
