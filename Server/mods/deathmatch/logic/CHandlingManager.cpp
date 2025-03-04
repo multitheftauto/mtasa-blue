@@ -19,8 +19,8 @@ static tHandlingData                   m_OriginalHandlingData[HT_MAX];
 static std::unique_ptr<CHandlingEntry> m_OriginalEntries[HT_MAX];
 
 // Model handling data
-static std::unordered_map<std::size_t, std::unique_ptr<CHandlingEntry>> m_ModelEntries;
-static std::unordered_map<std::size_t, bool>                            m_bModelHandlingChanged;
+static std::unordered_map<std::uint32_t, std::unique_ptr<CHandlingEntry>> m_ModelEntries;
+static std::unordered_map<std::uint32_t, bool>                            m_ModelHandlingChanged;
 
 static std::map<std::string, eHandlingProperty> m_HandlingNames;
 
@@ -142,21 +142,21 @@ bool CHandlingManager::HasModelHandlingChanged(std::uint32_t model) const noexce
         return false;
 
     // Return if we have changed
-    return m_bModelHandlingChanged[model];
+    return m_ModelHandlingChanged[model];
 }
 
-void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t model, bool bChanged) const noexcept
+void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t model, bool changed) const noexcept
 {
     // Within range?
     if (!CVehicleManager::IsValidModel(model))
         return;
 
     // Return if we have changed.
-    m_bModelHandlingChanged[model] = bChanged;
+    m_ModelHandlingChanged[model] = bChanged;
 }
 
 // Return the handling manager id
-eHandlingTypes CHandlingManager::GetHandlingID(std::uint32_t model) const noexcept
+eHandlingTypes CHandlingManager::GetHandlingID(std::uint32_t model) noexcept
 {
     switch (model)
     {
