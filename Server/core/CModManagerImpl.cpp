@@ -130,7 +130,6 @@ void CModManagerImpl::Unload(bool bKeyPressBeforeTerm)
                 Print("Press Q to shut down the server!\n");
                 WaitForKey('q');
             }
-            TerminateProcess(GetCurrentProcess(), GetExitCode());
         }
 #endif
         // Unload the library

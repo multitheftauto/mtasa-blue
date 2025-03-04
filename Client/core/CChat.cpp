@@ -650,7 +650,29 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 
             // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
             if (!m_strInputText.empty() && (m_pInputHistory->Empty() || m_pInputHistory->GetLast() != m_strInputText))
-                m_pInputHistory->Add(m_strInputText);
+            {
+                if (m_strCommand.empty() && m_strInputText[0] != '/')
+                {
+                    // If the input is not a command, store it
+                    m_pInputHistory->Add(m_strInputText);
+                }
+                else if (m_strCommand.compare("login") != 0)
+                {
+                    // If the input is a command, check that it isn't the 'login' command, if it is censor it
+                    char szInput[256];
+                    unsigned int uiLength = sizeof(szInput) - 1;
+
+                    strncpy(szInput, m_strInputText.c_str() + 1, uiLength);
+                    szInput[uiLength] = '\0';
+
+                    const char* szCommand = strtok(szInput, " ");
+                    
+                    if (szCommand && (strcmp(szCommand, "login") != 0))
+                        m_pInputHistory->Add(m_strInputText);
+                    else if ((m_pInputHistory->Empty() || m_pInputHistory->GetLast() != std::string("/login")))
+                        m_pInputHistory->Add("/login");
+                }
+            }
 
             SetInputVisible(false);
 
