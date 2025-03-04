@@ -2582,7 +2582,7 @@ bool CLuaEngineDefs::EngineConvertModelToType(std::uint32_t model, eClientModelT
     if (!modelInfo)
         return false;
 
-    // We need to stream out the model, otherwise it will crash
+    // We need to stream out the model, otherwise it can crash
     g_pClientGame->GetObjectManager()->RestreamObjects(model);
     modelInfo->RestreamIPL();
 

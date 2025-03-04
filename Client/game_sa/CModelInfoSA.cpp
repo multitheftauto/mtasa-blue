@@ -1514,7 +1514,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::LOD_ATOMIC:
         case eModelInfoType::TIME:
         case eModelInfoType::CLUMP:
-            success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            success = pGame->GetRenderWare()->ReplaceObjectModel(pClump, static_cast<std::uint16_t>(m_dwModelID));
             break;
         default:
             break;
@@ -1542,6 +1542,9 @@ void CModelInfoSA::RestoreOriginalModel()
         {
             ppModelInfo[m_dwModelID]->usNumberOfRefs = currentInterface->usNumberOfRefs;
             ppModelInfo[m_dwModelID]->pColModel = currentInterface->pColModel;
+            ppModelInfo[m_dwModelID]->ucAlpha = currentInterface->ucAlpha;
+            ppModelInfo[m_dwModelID]->usFlags = currentInterface->usFlags;
+            ppModelInfo[m_dwModelID]->usTextureDictionary = currentInterface->usTextureDictionary;
             
             delete currentInterface;
         }
@@ -1828,12 +1831,14 @@ bool CModelInfoSA::ConvertToClump()
     if (!currentModelInterface)
         return false;
 
+    m_lastInterfaceVTBL = currentModelInterface->VFTBL;
+
     // Create new clump interface
     CClumpModelInfoSAInterface* newClumpInterface = new CClumpModelInfoSAInterface();
     MemCpyFast(newClumpInterface, currentModelInterface, sizeof(CBaseModelInfoSAInterface));
     newClumpInterface->m_nAnimFileIndex = -1;
 
-    // (FileEX): We do not destroy or set pRwObject to nullptr here
+    // We do not destroy or set pRwObject to nullptr here
     // because our IsLoaded code expects the RwObject to exist.
     // We destroy the old RwObject in CRenderWareSA::ReplaceAllAtomicsInModel after passing the IsLoaded condition in the SetCustomModel.
 
@@ -1862,11 +1867,13 @@ bool CModelInfoSA::ConvertToAtomic(bool damageable)
     if (GetModelType() == eModelInfoType::ATOMIC && ((damageable && currentModelInterface->IsDamageAtomicVTBL()) || (!damageable && currentModelInterface->IsAtomicVTBL())))
         return false;
 
+    m_lastInterfaceVTBL = currentModelInterface->VFTBL;
+
     // Create new atomic interface
     CAtomicModelInfoSAInterface* newAtomicInterface = nullptr;
     CDamageableModelInfoSAInterface* newDamageableAtomicInterface = nullptr;
 
-    // (FileEX): We do not destroy or set pRwObject to nullptr here
+    // We do not destroy or set pRwObject to nullptr here
     // because our IsLoaded code expects the RwObject to exist.
     // We destroy the old RwObject in CRenderWareSA::ReplaceAllAtomicsInModel after passing the IsLoaded condition in the SetCustomModel.
 
@@ -1910,12 +1917,14 @@ bool CModelInfoSA::ConvertToTimedObject()
     if (!currentModelInterface)
         return false;
 
+    m_lastInterfaceVTBL = currentModelInterface->VFTBL;
+
     // Create new interface
     CTimeModelInfoSAInterface* newTimedInterface = new CTimeModelInfoSAInterface();
     MemCpyFast(newTimedInterface, currentModelInterface, sizeof(CTimeModelInfoSAInterface));
     newTimedInterface->timeInfo.m_wOtherTimeModel = 0;
 
-    // (FileEX): We do not destroy or set pRwObject to nullptr here
+    // We do not destroy or set pRwObject to nullptr here
     // because our IsLoaded code expects the RwObject to exist.
     // We destroy the old RwObject in CRenderWareSA::ReplaceAllAtomicsInModel after passing the IsLoaded condition in the SetCustomModel.
 
@@ -1940,6 +1949,14 @@ CBaseModelInfoSAInterface* CModelInfoSA::GetOriginalInterface() const
         return nullptr;
 
     return MapGet(m_convertedModelInterfaces, m_dwModelID);
+}
+
+bool CModelInfoSA::IsSameModelType()
+{
+    if (!m_lastInterfaceVTBL)
+        m_lastInterfaceVTBL = m_pInterface->VFTBL;
+
+    return m_lastInterfaceVTBL == m_pInterface->VFTBL;
 }
 
 void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)

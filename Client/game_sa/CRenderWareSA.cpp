@@ -484,45 +484,27 @@ struct SCDamageableModelinfo
     RpClump*                   clump;
 };
 
-bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplaceObjectModel(RpClump* newClump, std::uint16_t modelID)
 {
-    CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
+    CModelInfo* pModelInfo = pGame->GetModelInfo(modelID);
     if (!pModelInfo)
         return false;
 
-    RpAtomic* oldAtomic = reinterpret_cast<RpAtomic*>(pModelInfo->GetRwObject());
-    if (reinterpret_cast<RpClump*>(oldAtomic) == pNew || DoContainTheSameGeometry(pNew, nullptr, oldAtomic))
+    auto* oldObject = reinterpret_cast<RpClump*>(pModelInfo->GetRwObject());
+    if (DoContainTheSameGeometry(newClump, oldObject, nullptr) && pModelInfo->IsSameModelType())
         return true;
 
     CBaseModelInfoSAInterface* currentModelInterface = pModelInfo->GetInterface();
 
-    // Destroy old RwObject
-    // We need to remove the RwObject from the original interface because (if exists)
-    // the new interface may points to the new vtbl after conversion
-    CBaseModelInfoSAInterface* originalInterface = pModelInfo->GetOriginalInterface();
-    if (originalInterface && originalInterface->pRwObject)
-    {
-        originalInterface->DeleteRwObject();
-        currentModelInterface->pRwObject = nullptr;
-    }
-    else if (!originalInterface)
-        currentModelInterface->DeleteRwObject();
+    // We create a copy of the current interface to later call DeleteRwObject on it,
+    // so we can remove the old RwObject after setting the new one
+    // Old RwObject must be deleted after setting the new one to avoid crashes during restream
+    CBaseModelInfoSAInterface* copyCurrentModelInterface = new CBaseModelInfoSAInterface();
+    MemCpyFast(copyCurrentModelInterface, currentModelInterface, sizeof(CBaseModelInfoSAInterface));
+    currentModelInterface->pRwObject = nullptr;
 
-    // Prevent memory leaks
-    // The user can convert the same model multiple times, but its original model is saved only once,
-    // so we remove the RwObject and the interface created during the last conversion
-    CBaseModelInfoSAInterface* lastConversionInterface = pModelInfo->GetLastConversionInterface();
-    if (lastConversionInterface)
-    {
-        lastConversionInterface->DeleteRwObject();
-        delete lastConversionInterface;
-
-        pModelInfo->SetLastConversionInterface(nullptr);
-        currentModelInterface->pRwObject = nullptr;
-    }
-
-    // We need to make a copy here because DeleteRwObject removes atomics from our loaded clump (pNew).
-    RpClump* clonedClump = RpClumpClone(pNew);
+    // We need to make a copy here because DeleteRwObject removes atomics from our new clump
+    RpClump* clonedClump = RpClumpClone(newClump);
     if (!clonedClump)
         return false;
 
@@ -535,20 +517,24 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
             if (!atomic)
                 return false;
 
+            // Is damageable object?
             if (currentModelInterface->IsDamageAtomicVTBL())
             {
                 SCDamageableModelinfo damagedInfo{};
-                damagedInfo.modelId = usModelID;
+                damagedInfo.modelId = modelID;
                 damagedInfo.baseInterface = currentModelInterface;
-                damagedInfo.clump = pNew;
+                damagedInfo.clump = clonedClump;
 
                 RpClumpForAllAtomics(clonedClump,
                 [](RpAtomic* atomic, void* data) -> bool {
                     auto* damagedInfo = static_cast<SCDamageableModelinfo*>(data);
+                    RwFrame* frame = RpGetFrame(atomic);
+                    if (!frame)
+                        return false;
 
                     bool damage = false;
                     char name[24];
-                    GetNameAndDamage(GetFrameNodeName(RpGetFrame(atomic)), name, damage);
+                    GetNameAndDamage(GetFrameNodeName(frame), name, damage);
 
                     if (damage)
                         static_cast<CDamageableModelInfoSAInterface*>(damagedInfo->baseInterface)->SetDamagedAtomic(atomic);
@@ -562,10 +548,10 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
                     return false;
                 }, &damagedInfo);
             }
-            else
+            else // or standard object?
             {
                 static_cast<CAtomicModelInfoSAInterface*>(currentModelInterface)->SetAtomic(atomic);
-                pGame->GetVisibilityPlugins()->SetAtomicId(atomic, usModelID);
+                pGame->GetVisibilityPlugins()->SetAtomicId(atomic, modelID);
 
                 // Remove our atomic from temp clump
                 RpClumpRemoveAtomic(clonedClump, atomic);
@@ -582,7 +568,7 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
                 return false;
 
             static_cast<CTimeModelInfoSAInterface*>(currentModelInterface)->SetAtomic(atomic);
-            pGame->GetVisibilityPlugins()->SetAtomicId(atomic, usModelID);
+            pGame->GetVisibilityPlugins()->SetAtomicId(atomic, modelID);
 
             // Remove our atomic from temp clump
             RpClumpRemoveAtomic(clonedClump, atomic);
@@ -593,11 +579,51 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
         }
         case eModelInfoType::CLUMP:
         {
-            // We do not delete or clear the clump copy here.
+            // We do not delete or clear the clump copy here
             // The copy will be removed when DestroyRwObject is called in CClumpModelInfo
             static_cast<CClumpModelInfoSAInterface*>(currentModelInterface)->SetClump(clonedClump);
             break;
         }
+    }
+
+    // Destroy old RwObject
+    // RwObject from original interface after type conversion
+    CBaseModelInfoSAInterface* originalInterface = pModelInfo->GetOriginalInterface();
+    if (originalInterface)
+        originalInterface->DeleteRwObject();
+
+    // The user can convert the same model multiple times, but its original model interface is saved only once,
+    // so we remove the RwObject and the interface created during the last conversion
+    CBaseModelInfoSAInterface* lastConversionInterface = pModelInfo->GetLastConversionInterface();
+    if (lastConversionInterface)
+    {
+        lastConversionInterface->DeleteRwObject();
+        delete lastConversionInterface;
+
+        pModelInfo->SetLastConversionInterface(nullptr);
+    }
+
+    // Delete old RwObject (after setting the new one)
+    if (copyCurrentModelInterface)
+    {
+        // Update 2dfx counter
+        RwObject* object = copyCurrentModelInterface->pRwObject;
+        if (object)
+        {
+            if (object->type == RP_TYPE_ATOMIC)
+                currentModelInterface->ucNumOf2DEffects -= RpGeometryGet2dFxCount(reinterpret_cast<RpAtomic*>(object)->geometry);
+            else if (object->type == RP_TYPE_CLUMP)
+            {
+                RpAtomic* atomic = Get2DEffectAtomic(reinterpret_cast<RpClump*>(object));
+                if (atomic)
+                    currentModelInterface->ucNumOf2DEffects -= RpGeometryGet2dFxCount(atomic->geometry);
+            }
+        }
+
+        if (!originalInterface)
+            copyCurrentModelInterface->DeleteRwObject();
+
+        delete copyCurrentModelInterface;
     }
 
     return true;
@@ -1005,19 +1031,28 @@ RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
     return RwFrameFindFrame(RpGetFrame(pRoot), strName);
 }
 
-int CRenderWareSA::GetClumpNumOfAtomics(RpClump* clump)
-{
-    return clump ? RpClumpGetNumAtomics(clump) : 1;
-}
-
 RpAtomic* CRenderWareSA::GetFirstAtomic(RpClump* clump)
 {
-    return ((RpAtomic*(__cdecl*)(RpClump*))FUNC_GetFirstAtomic)(clump);
+    return ((RpAtomic*(__cdecl*)(RpClump*))0x734820)(clump);
 }
 
 char* CRenderWareSA::GetFrameNodeName(RwFrame* frame)
 {
-    return ((char*(__cdecl*)(RwFrame*))FUNC_GetFrameNodeName)(frame);
+    return ((char*(__cdecl*)(RwFrame*))0x72FB30)(frame);
+}
+
+std::uint32_t CRenderWareSA::RpGeometryGet2dFxCount(RpGeometry* geometry)
+{
+    if (!geometry)
+        return 0;
+
+    auto* plugin = RWPLUGINOFFSET(std::uint32_t, geometry, *(int*)0xC3A1E0); // g2dEffectPluginOffset
+    return plugin ? *plugin : 0;
+}
+
+RpAtomic* CRenderWareSA::Get2DEffectAtomic(RpClump* clump)
+{
+    return ((RpAtomic*(__cdecl*)(RpClump*))0x734880)(clump);
 }
 
 void CRenderWareSA::CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix)

@@ -242,6 +242,7 @@ public:
 
     bool IsAtomicVTBL() const { return VFTBL == reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CAtomicModelInfo); }
     bool IsDamageAtomicVTBL() const { return VFTBL == reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CDamageAtomicModelInfo); }
+    bool IsTimedObjectVTBL() const { return VFTBL == reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CTimeModelInfo); }
     bool IsClumpVTBL() const { return VFTBL == reinterpret_cast<CBaseModelInfo_SA_VTBL*>(VTBL_CClumpModelInfo); }
 };
 static_assert(sizeof(CBaseModelInfoSAInterface) == 0x20, "Invalid size for CBaseModelInfoSAInterface");
@@ -386,8 +387,10 @@ protected:
     static std::map<unsigned short, int>                                         ms_DefaultTxdIDMap;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
+    void*                      m_lastInterfaceVTBL{nullptr};
     CBaseModelInfoSAInterface* m_lastConversionInterface{nullptr};
-    // Store original model interfaces after conersion clump->atomic or atomic->clump
+
+    // Store original model interfaces after type conersion 
     static std::unordered_map<std::uint32_t, CBaseModelInfoSAInterface*> m_convertedModelInterfaces;
 
 public:
@@ -530,6 +533,7 @@ public:
     CBaseModelInfoSAInterface* GetLastConversionInterface() const noexcept override { return m_lastConversionInterface; }
     void                       SetLastConversionInterface(CBaseModelInfoSAInterface* lastInterace) noexcept override { m_lastConversionInterface = lastInterace; }
     CBaseModelInfoSAInterface* GetOriginalInterface() const override;
+    bool                       IsSameModelType() override;
 
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;

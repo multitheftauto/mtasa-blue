@@ -22,9 +22,6 @@ struct SShaderReplacementStats;
 struct STexInfo;
 struct STexTag;
 
-#define FUNC_GetFirstAtomic 0x734820
-#define FUNC_GetFrameNodeName 0x72FB30
-
 class CRenderWareSA : public CRenderWare
 {
 public:
@@ -63,9 +60,6 @@ public:
     // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
     unsigned int LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics);
 
-    // Replaces all atomics for a specific model
-    bool ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID) override;
-
     // Replaces all atomics in a clump
     void ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics);
 
@@ -83,10 +77,11 @@ public:
 
     // Replaces a CClumpModelInfo clump with a new clump
     bool ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) override;
-
     bool ReplacePedModel(RpClump* pNew, unsigned short usModelID) override;
-
     bool ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
+
+    // Replaces object model (clump or atomic)
+    bool ReplaceObjectModel(RpClump* newClump, std::uint16_t modelID) override;
 
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
@@ -125,10 +120,12 @@ public:
     CModelTexturesInfo* GetModelTexturesInfo(ushort usModelId);
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
-    int      GetClumpNumOfAtomics(RpClump* clump);
-    RpAtomic* GetFirstAtomic(RpClump* clump);
+    RpAtomic* GetFirstAtomic(RpClump* clump) override;
 
-    static char*     GetFrameNodeName(RwFrame* frame);
+    static char* GetFrameNodeName(RwFrame* frame);
+
+    std::uint32_t RpGeometryGet2dFxCount(RpGeometry* geometry) override;
+    RpAtomic* Get2DEffectAtomic(RpClump* clump) override;
 
     // Originally there was a possibility for this function to cause buffer overflow
     // It should be fixed here.
