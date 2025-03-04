@@ -152,7 +152,7 @@ void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t model, bool chan
         return;
 
     // Return if we have changed.
-    m_ModelHandlingChanged[model] = bChanged;
+    m_ModelHandlingChanged[model] = changed;
 }
 
 // Return the handling manager id
