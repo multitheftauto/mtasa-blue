@@ -802,8 +802,18 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
-    // Remove ref from the old TXD
-    CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
+    // CBaseModelInfo::AddRef adds references to model and TXD
+    // We need transfer added references from old TXD to new TXD
+    size_t referencesCount = m_pInterface->usNumberOfRefs;
+
+    // +1 reference for active rwObject
+    // The current textures will be removed in RpAtomicDestroy
+    // RenderWare uses an additional reference counter per texture
+    if (m_pInterface->pRwObject)
+        referencesCount++;
+
+    for (size_t i = 0; i < referencesCount; i++)
+        CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
 
     // Store vanilla TXD ID
     if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
@@ -811,7 +821,9 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 
     // Set new TXD and increase ref of it
     m_pInterface->usTextureDictionary = usID;
-    CTxdStore_AddRef(usID);
+
+    for (size_t i = 0; i < referencesCount; i++)
+        CTxdStore_AddRef(usID);
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()
@@ -989,14 +1001,15 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             CEntitySAInterface* pEntity = (CEntitySAInterface*)pSectorEntry[0];
 
             // Possible bug - pEntity seems to be invalid here occasionally
-            if (pEntity->vtbl->DeleteRwObject != 0x00534030)
+            constexpr auto CEntity_DeleteRwObject_VTBL_OFFSET = 8;
+            if (static_cast<std::size_t*>(pEntity->GetVTBL())[CEntity_DeleteRwObject_VTBL_OFFSET] != 0x00534030)
             {
                 // Log info
                 OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
                                           i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols));
                 // Assert in debug
                 #if MTA_DEBUG
-                assert(pEntity->vtbl->DeleteRwObject == 0x00534030);
+                assert(static_cast<std::size_t*>(pEntity->GetVTBL())[CEntity_DeleteRwObject_VTBL_OFFSET] != 0x00534030);
                 #endif
                 pSectorEntry = (DWORD*)pSectorEntry[1];
                 continue;
