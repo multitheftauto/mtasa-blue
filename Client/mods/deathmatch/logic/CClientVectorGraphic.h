@@ -36,7 +36,7 @@ public:
     lunasvg::Document* GetSVGDocument() const { return m_pSVGDocument.get(); }
     CXMLNode*          GetXMLDocument() const { return m_pXMLDocument; }
 
-    CClientVectorGraphicDisplay* GetDisplay() const { return m_pVectorGraphicDisplay; }
+    CClientVectorGraphicDisplay* GetDisplay() const { return m_pVectorGraphicDisplay.get(); }
 
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }
     bool IsDestroyed() const { return m_bIsDestroyed; }
@@ -57,7 +57,7 @@ private:
     std::unique_ptr<SXMLString>        m_pXMLString = nullptr;
     CXMLNode*                          m_pXMLDocument = nullptr;
 
-    CClientVectorGraphicDisplay* m_pVectorGraphicDisplay;
+    std::shared_ptr<CClientVectorGraphicDisplay> m_pVectorGraphicDisplay;
 
     std::variant<CLuaFunctionRef, bool> m_updateCallbackRef = false;
 
