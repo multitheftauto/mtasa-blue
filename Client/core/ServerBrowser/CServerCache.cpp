@@ -302,6 +302,9 @@ void CServerCache::StaticSaveServerCache()
     XMLAccess.SetSubNodeValue(CONFIG_NODE_SERVER_INT "11", dataSet);
 
     m_pConfigFile->Write();
+
+    delete pNode;
+    delete m_pConfigFile;
 }
 
 ///////////////////////////////////////////////////////////////
