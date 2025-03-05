@@ -1566,13 +1566,14 @@
     if ( header_only )
       goto Exit;
 
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+    tt_get_metrics_incremental( loader, glyph_index );
+#endif
+    tt_loader_set_pp( loader );
+
+    /* shortcut for empty glyphs */
     if ( loader->byte_len == 0 || loader->n_contours == 0 )
     {
-#ifdef FT_CONFIG_OPTION_INCREMENTAL
-      tt_get_metrics_incremental( loader, glyph_index );
-#endif
-      tt_loader_set_pp( loader );
-
 
 #ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
 
@@ -1626,11 +1627,6 @@
       error = FT_Err_Ok;
       goto Exit;
     }
-
-#ifdef FT_CONFIG_OPTION_INCREMENTAL
-    tt_get_metrics_incremental( loader, glyph_index );
-#endif
-    tt_loader_set_pp( loader );
 
 
     /***********************************************************************/
@@ -2126,9 +2122,6 @@
                                    &sbit_metrics );
     if ( !error )
     {
-      glyph->outline.n_points   = 0;
-      glyph->outline.n_contours = 0;
-
       glyph->metrics.width  = (FT_Pos)sbit_metrics.width  * 64;
       glyph->metrics.height = (FT_Pos)sbit_metrics.height * 64;
 
@@ -2152,6 +2145,50 @@
         glyph->bitmap_left = sbit_metrics.horiBearingX;
         glyph->bitmap_top  = sbit_metrics.horiBearingY;
       }
+    }
+    /* a missing glyph in a bitmap-only font is assumed whitespace */
+    /* that needs to be constructed using metrics data from `hmtx' */
+    /* and, optionally, `vmtx' tables                              */
+    else if ( FT_ERR_EQ( error, Missing_Bitmap ) &&
+              !FT_IS_SCALABLE( glyph->face )     &&
+              face->horz_metrics_size            )
+    {
+      FT_Fixed  x_scale = size->root.metrics.x_scale;
+      FT_Fixed  y_scale = size->root.metrics.y_scale;
+
+      FT_Short  left_bearing = 0;
+      FT_Short  top_bearing  = 0;
+
+      FT_UShort  advance_width  = 0;
+      FT_UShort  advance_height = 0;
+
+
+      TT_Get_HMetrics( face, glyph_index,
+                       &left_bearing,
+                       &advance_width );
+      TT_Get_VMetrics( face, glyph_index,
+                       0,
+                       &top_bearing,
+                       &advance_height );
+
+      glyph->metrics.width  = 0;
+      glyph->metrics.height = 0;
+
+      glyph->metrics.horiBearingX = FT_MulFix( left_bearing, x_scale );
+      glyph->metrics.horiBearingY = 0;
+      glyph->metrics.horiAdvance  = FT_MulFix( advance_width, x_scale );
+
+      glyph->metrics.vertBearingX = 0;
+      glyph->metrics.vertBearingY = FT_MulFix( top_bearing, y_scale );
+      glyph->metrics.vertAdvance  = FT_MulFix( advance_height, y_scale );
+
+      glyph->format            = FT_GLYPH_FORMAT_BITMAP;
+      glyph->bitmap.pixel_mode = FT_PIXEL_MODE_MONO;
+
+      glyph->bitmap_left = 0;
+      glyph->bitmap_top  = 0;
+
+      error = FT_Err_Ok;
     }
 
     return error;
@@ -2431,79 +2468,21 @@
 #ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
 
     /* try to load embedded bitmap (if any) */
-    if ( size->strike_index != 0xFFFFFFFFUL      &&
-         ( load_flags & FT_LOAD_NO_BITMAP ) == 0 &&
-         IS_DEFAULT_INSTANCE( glyph->face )      )
+    if ( size->strike_index != 0xFFFFFFFFUL  &&
+         !( load_flags & FT_LOAD_NO_BITMAP &&
+            FT_IS_SCALABLE( glyph->face )  ) &&
+         IS_DEFAULT_INSTANCE( glyph->face )  )
     {
-      FT_Fixed  x_scale = size->root.metrics.x_scale;
-      FT_Fixed  y_scale = size->root.metrics.y_scale;
-
-
       error = load_sbit_image( size, glyph, glyph_index, load_flags );
-      if ( FT_ERR_EQ( error, Missing_Bitmap ) )
-      {
-        /* the bitmap strike is incomplete and misses the requested glyph; */
-        /* if we have a bitmap-only font, return an empty glyph            */
-        if ( !FT_IS_SCALABLE( glyph->face ) )
-        {
-          FT_Short  left_bearing = 0;
-          FT_Short  top_bearing  = 0;
-
-          FT_UShort  advance_width  = 0;
-          FT_UShort  advance_height = 0;
-
-
-          /* to return an empty glyph, however, we need metrics data   */
-          /* from the `hmtx' (or `vmtx') table; the assumption is that */
-          /* empty glyphs are missing intentionally, representing      */
-          /* whitespace - not having at least horizontal metrics is    */
-          /* thus considered an error                                  */
-          if ( !face->horz_metrics_size )
-            return error;
-
-          /* we now construct an empty bitmap glyph */
-          TT_Get_HMetrics( face, glyph_index,
-                           &left_bearing,
-                           &advance_width );
-          TT_Get_VMetrics( face, glyph_index,
-                           0,
-                           &top_bearing,
-                           &advance_height );
-
-          glyph->outline.n_points   = 0;
-          glyph->outline.n_contours = 0;
-
-          glyph->metrics.width  = 0;
-          glyph->metrics.height = 0;
-
-          glyph->metrics.horiBearingX = FT_MulFix( left_bearing, x_scale );
-          glyph->metrics.horiBearingY = 0;
-          glyph->metrics.horiAdvance  = FT_MulFix( advance_width, x_scale );
-
-          glyph->metrics.vertBearingX = 0;
-          glyph->metrics.vertBearingY = FT_MulFix( top_bearing, y_scale );
-          glyph->metrics.vertAdvance  = FT_MulFix( advance_height, y_scale );
-
-          glyph->format            = FT_GLYPH_FORMAT_BITMAP;
-          glyph->bitmap.pixel_mode = FT_PIXEL_MODE_MONO;
-
-          glyph->bitmap_left = 0;
-          glyph->bitmap_top  = 0;
-
-          return FT_Err_Ok;
-        }
-      }
-      else if ( error )
-      {
-        /* return error if font is not scalable */
-        if ( !FT_IS_SCALABLE( glyph->face ) )
-          return error;
-      }
-      else
+      if ( !error )
       {
         if ( FT_IS_SCALABLE( glyph->face ) ||
              FT_HAS_SBIX( glyph->face )    )
         {
+          FT_Fixed  x_scale = size->root.metrics.x_scale;
+          FT_Fixed  y_scale = size->root.metrics.y_scale;
+
+
           /* for the bbox we need the header only */
           (void)tt_loader_init( &loader, size, glyph, load_flags, TRUE );
           (void)load_truetype_glyph( &loader, glyph_index, 0, TRUE );
@@ -2550,8 +2529,10 @@
                                                     y_scale );
         }
 
-        return FT_Err_Ok;
+        goto Exit;
       }
+      else if ( !FT_IS_SCALABLE( glyph->face ) )
+        goto Exit;
     }
 
     if ( load_flags & FT_LOAD_SBITS_ONLY )
@@ -2614,7 +2595,7 @@
         glyph->metrics.horiAdvance = FT_MulFix( advanceX, x_scale );
         glyph->metrics.vertAdvance = FT_MulFix( advanceY, y_scale );
 
-        return error;
+        goto Exit;
       }
 
       FT_TRACE3(( "Failed to load SVG glyph\n" ));
@@ -2642,10 +2623,6 @@
       goto Done;
     }
 
-    glyph->format        = FT_GLYPH_FORMAT_OUTLINE;
-    glyph->num_subglyphs = 0;
-    glyph->outline.flags = 0;
-
     /* main loading loop */
     error = load_truetype_glyph( &loader, glyph_index, 0, FALSE );
     if ( !error )
@@ -2657,8 +2634,17 @@
       }
       else
       {
+        glyph->format         = FT_GLYPH_FORMAT_OUTLINE;
+
         glyph->outline        = loader.gloader->base.outline;
         glyph->outline.flags &= ~FT_OUTLINE_SINGLE_PASS;
+
+        /* Set the `high precision' bit flag.  This is _critical_ to   */
+        /* get correct output for monochrome TrueType glyphs at all    */
+        /* sizes using the bytecode interpreter.                       */
+        if ( !( load_flags & FT_LOAD_NO_SCALE ) &&
+             size->metrics->y_ppem < 24         )
+          glyph->outline.flags |= FT_OUTLINE_HIGH_PRECISION;
 
         /* Translate array so that (0,0) is the glyph's origin.  Note  */
         /* that this behaviour is independent on the value of bit 1 of */
@@ -2708,14 +2694,6 @@
       error = compute_glyph_metrics( &loader, glyph_index );
     }
 
-    /* Set the `high precision' bit flag.                           */
-    /* This is _critical_ to get correct output for monochrome      */
-    /* TrueType glyphs at all sizes using the bytecode interpreter. */
-    /*                                                              */
-    if ( !( load_flags & FT_LOAD_NO_SCALE ) &&
-         size->metrics->y_ppem < 24         )
-      glyph->outline.flags |= FT_OUTLINE_HIGH_PRECISION;
-
     FT_TRACE1(( "  subglyphs = %u, contours = %hu, points = %hu,"
                 " flags = 0x%.3x\n",
                 loader.gloader->base.num_subglyphs,
@@ -2727,11 +2705,8 @@
     tt_loader_done( &loader );
 
   Exit:
-#ifdef FT_DEBUG_LEVEL_TRACE
-    if ( error )
-      FT_TRACE1(( "  failed (error code 0x%x)\n",
-                  error ));
-#endif
+    FT_TRACE1(( error ? "  failed (error code 0x%x)\n" : "",
+                error ));
 
     return error;
   }

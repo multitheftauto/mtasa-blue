@@ -142,7 +142,7 @@
   {
     TT_Face    ttface = (TT_Face)face;
     TT_BDF     bdf    = &ttface->bdf;
-    FT_Size    size   = FT_FACE_SIZE( face );
+    FT_Size    size   = face->size;
     FT_Error   error  = FT_Err_Ok;
     FT_Byte*   p;
     FT_UInt    count;
