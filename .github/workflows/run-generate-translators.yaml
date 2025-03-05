@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: latest
           cache: 'npm'
+          cache-dependency-path: ./utils/localization/generate-translators/package-lock.json
       - name: Install dependencies
         working-directory: ./utils/localization/generate-translators
         run: npm clean-install
