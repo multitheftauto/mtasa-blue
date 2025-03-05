@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node dist/index.js",
     "compile": "npx tsc",
-    "dev": "npx tsc -w"
+    "dev": "npx tsc -w",
+    "ci": "npx tsc && node dist/index.js"
   },
   "dependencies": {
     "@crowdin/crowdin-api-client": "^1.41.2",
