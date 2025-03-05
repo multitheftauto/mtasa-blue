@@ -9,7 +9,7 @@
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
-/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
+/*  license, FTL.TXT.  By continuing to use, modify, or distribute     */
 /*  this file you indicate that you have read the license and              */
 /*  understand and accept it fully.                                        */
 /*                                                                         */
@@ -19,29 +19,27 @@
 
 #if defined(_MSC_VER)
 #include <intrin.h>
-static unsigned int __inline clz(unsigned int x) {
+static inline int clz(unsigned int x) {
     unsigned long r = 0;
-    if (x != 0)
-    {
-        _BitScanReverse(&r, x);
-    }
-    return  r;
+    if (_BitScanReverse(&r, x))
+        return 31 - r;
+    return 32;
 }
-#define PVG_FT_MSB(x)  (clz(x))
+#define PVG_FT_MSB(x)  (31 - clz(x))
 #elif defined(__GNUC__)
 #define PVG_FT_MSB(x)  (31 - __builtin_clz(x))
 #else
-static unsigned int __inline clz(unsigned int x) {
-    int c = 31;
-    x &= ~x + 1;
-    if (n & 0x0000FFFF) c -= 16;
-    if (n & 0x00FF00FF) c -= 8;
-    if (n & 0x0F0F0F0F) c -= 4;
-    if (n & 0x33333333) c -= 2;
-    if (n & 0x55555555) c -= 1;
-    return c;
+static inline int clz(unsigned int x) {
+    int n = 0;
+    if (x == 0) return 32;
+    if (x <= 0x0000FFFFU) { n += 16; x <<= 16; }
+    if (x <= 0x00FFFFFFU) { n +=  8; x <<=  8; }
+    if (x <= 0x0FFFFFFFU) { n +=  4; x <<=  4; }
+    if (x <= 0x3FFFFFFFU) { n +=  2; x <<=  2; }
+    if (x <= 0x7FFFFFFFU) { n +=  1; }
+    return n;
 }
-#define PVG_FT_MSB(x)  (clz(x))
+#define PVG_FT_MSB(x)  (31 - clz(x))
 #endif
 
 #define PVG_FT_PAD_FLOOR(x, n) ((x) & ~((n)-1))
