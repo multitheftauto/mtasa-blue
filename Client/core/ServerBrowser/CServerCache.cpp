@@ -186,6 +186,10 @@ bool CServerCache::LoadServerCache()
 
         MapSet(m_ServerCachedMap, key, info);
     }
+
+    delete pNode;
+    delete m_pConfigFile;
+
     return true;
 }
 
