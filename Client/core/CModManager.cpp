@@ -107,7 +107,6 @@ void CModManager::DoPulsePostFrame()
 
 bool CModManager::Load(const char* arguments)
 {
-    Unload();
     RequestLoad(arguments);
     return Start();
 }
