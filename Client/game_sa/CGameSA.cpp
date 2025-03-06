@@ -1126,7 +1126,7 @@ void CGameSA::DisableVSync()
 }
 CWeapon* CGameSA::CreateWeapon()
 {
-    return new CWeaponSA(new CWeaponSAInterface, NULL, WEAPONSLOT_MAX);
+    return new CWeaponSA(new CWeaponSAInterface, nullptr, WEAPONSLOT_MAX);
 }
 
 CWeaponStat* CGameSA::CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill)

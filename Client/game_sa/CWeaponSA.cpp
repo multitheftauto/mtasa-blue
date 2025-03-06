@@ -21,7 +21,7 @@ extern CGameSA* pGame;
 
 CWeaponInfo* CWeaponSA::GetInfo(eWeaponSkill skill) const
 {
-    return m_interface ? pGame->GetWeaponInfo(m_interface->m_eWeaponType, skill) : nullptr;
+    return pGame->GetWeaponInfo(m_interface->m_eWeaponType, skill);
 }
 
 void CWeaponSA::SetAsCurrentWeapon()
@@ -32,17 +32,16 @@ void CWeaponSA::SetAsCurrentWeapon()
 
 void CWeaponSA::Destroy()
 {
-    if (m_interface)
-        delete m_interface;
+    // We should not delete weapons from CPedInterface
+    if (m_owner)
+        return;
 
+    delete m_interface;
     delete this;
 }
 
 void CWeaponSA::Remove()
 {
-    if (!m_interface)
-        return;
-
     m_interface->Shutdown();
 
     // If the removed weapon was the currently active weapon, switch to empty-handed
@@ -57,26 +56,24 @@ void CWeaponSA::Remove()
 
 void CWeaponSA::Initialize(eWeaponType type, std::uint32_t ammo, CPed* ped)
 {
-    if (m_interface)
-        m_interface->Initialize(type, ammo, ped ? ped->GetPedInterface() : nullptr);
+    m_interface->Initialize(type, ammo, ped ? ped->GetPedInterface() : nullptr);
 }
 
 void CWeaponSA::AddGunshell(CEntity* firingEntity, const CVector& vecOrigin, const CVector2D& vecDirection, float size) const
 {
-    if (m_interface && firingEntity)
+    if (firingEntity)
         m_interface->AddGunshell(firingEntity->GetInterface(), vecOrigin, vecDirection, size);
 }
 
 void CWeaponSA::DoBulletImpact(CEntity* firingEntity, CEntitySAInterface* hitEntityInterface, const CVector& vecOrigin, const CVector& vecTarget,
                                const CColPointSAInterface& colPoint, int incrementalHit) const
 {
-    if (m_interface)
-        m_interface->DoBulletImpact(firingEntity ? firingEntity->GetInterface() : nullptr, hitEntityInterface, vecOrigin, vecTarget, colPoint, incrementalHit);
+    m_interface->DoBulletImpact(firingEntity ? firingEntity->GetInterface() : nullptr, hitEntityInterface, vecOrigin, vecTarget, colPoint, incrementalHit);
 }
 
 bool CWeaponSA::Fire(CEntity* firingEntity, CVector* vecOrigin, CVector* vecEffectPos, CEntity* targetEntity, CVector* vecTarget, CVector* vecAlt)
 {
-    if (!firingEntity || !m_interface)
+    if (!firingEntity)
         return false;
 
     return m_interface->Fire(firingEntity->GetInterface(), vecOrigin, vecEffectPos, targetEntity ? targetEntity->GetInterface() : nullptr, vecTarget, vecAlt);
@@ -85,9 +82,6 @@ bool CWeaponSA::Fire(CEntity* firingEntity, CVector* vecOrigin, CVector* vecEffe
 bool CWeaponSA::FireInstantHit(CEntity* firingEntity, CVector* vecOrigin, CVector* vecMuzzle, CEntity* targetEntity, CVector* vecTarget, CVector* vecForDriveby,
                                bool crossHairGun, bool createGunFx)
 {
-    if (!m_interface)
-        return false;
-
     return m_interface->FireInstantHit(firingEntity ? firingEntity->GetInterface() : nullptr, vecOrigin, vecMuzzle,
                                        targetEntity ? targetEntity->GetInterface() : nullptr, vecTarget, vecForDriveby, crossHairGun, createGunFx);
 }
@@ -152,10 +146,10 @@ bool CWeaponSA::FireBullet(CEntity* firingEntity, const CVector& vecOrigin, cons
 
 bool CWeaponSA::GenerateDamageEvent(CPed* ped, CEntity* responsible, eWeaponType weaponType, int damagePerHit, ePedPieceTypes hitZone, std::uint8_t dir) const
 {
-    if (!ped || !m_interface)
+    if (!ped)
         return false;
 
-    return m_interface->GenerateDamageEvent(ped ? ped->GetPedInterface() : nullptr, responsible ? responsible->GetInterface() : nullptr, weaponType,
+    return m_interface->GenerateDamageEvent(ped->GetPedInterface(), responsible ? responsible->GetInterface() : nullptr, weaponType,
                                             damagePerHit, hitZone, dir);
 }
 

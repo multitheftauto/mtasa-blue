@@ -73,32 +73,28 @@ public:
     CWeaponSAInterface* GetInterface() { return m_interface; }
     CWeaponSAInterface* GetInterface() const { return m_interface; }
 
-    eWeaponType GetType() const override { return m_interface ? m_interface->m_eWeaponType : eWeaponType::WEAPONTYPE_UNIDENTIFIED; }
+    eWeaponType GetType() const override { return m_interface->m_eWeaponType; }
     void        SetType(eWeaponType type) override
     {
-        if (m_interface)
-            m_interface->m_eWeaponType = type;
+        m_interface->m_eWeaponType = type;
     }
 
-    eWeaponState GetState() const override { return m_interface ? m_interface->m_eState : eWeaponState::WEAPONSTATE_READY; }
+    eWeaponState GetState() const override { return m_interface->m_eState; }
     void         SetState(eWeaponState state) override
     {
-        if (m_interface)
-            m_interface->m_eState = state;
+        m_interface->m_eState = state;
     }
 
-    std::uint32_t GetAmmoInClip() const override { return m_interface ? m_interface->m_ammoInClip : 0; }
+    std::uint32_t GetAmmoInClip() const override { return m_interface->m_ammoInClip; }
     void          SetAmmoInClip(std::uint32_t ammoInClip) override
     {
-        if (m_interface)
-            m_interface->m_ammoInClip = ammoInClip;
+        m_interface->m_ammoInClip = ammoInClip;
     }
 
-    std::uint32_t GetAmmoTotal() const override { return m_interface ? m_interface->m_ammoTotal : 0; }
+    std::uint32_t GetAmmoTotal() const override { return m_interface->m_ammoTotal; }
     void          SetAmmoTotal(std::uint32_t ammoTotal) override
     {
-        if (m_interface)
-            m_interface->m_ammoTotal = ammoTotal;
+        m_interface->m_ammoTotal = ammoTotal;
     }
 
     CPed*        GetPed() const noexcept override { return m_owner; }
