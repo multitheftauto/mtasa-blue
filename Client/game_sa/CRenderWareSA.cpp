@@ -325,33 +325,58 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
     // Fast check if comparing one atomic
     if (pAtomicB)
     {
-        RpGeometry* pGeometryA = ((RpAtomic*)((pClumpA->atomics.root.next) - 0x8))->geometry;
-        RpGeometry* pGeometryB = pAtomicB->geometry;
-        return pGeometryA == pGeometryB;
+        RpAtomic* atomicA = pGame->GetRenderWare()->GetFirstAtomic(pClumpA);
+        if (!atomicA)
+            return false;
+
+        return atomicA->geometry == pAtomicB->geometry;
     }
 
-    // Get atomic list from both sides
-    std::vector<RpAtomic*> atomicListA;
-    std::vector<RpAtomic*> atomicListB;
-    GetClumpAtomicList(pClumpA, atomicListA);
-    if (pClumpB)
-        GetClumpAtomicList(pClumpB, atomicListB);
-    if (pAtomicB)
-        atomicListB.push_back(pAtomicB);
-
-    // Count geometries that exist in both sides
-    std::set<RpGeometry*> geometryListA;
-    for (uint i = 0; i < atomicListA.size(); i++)
-        MapInsert(geometryListA, atomicListA[i]->geometry);
-
-    uint uiInBoth = 0;
-    for (uint i = 0; i < atomicListB.size(); i++)
-        if (MapContains(geometryListA, atomicListB[i]->geometry))
-            uiInBoth++;
-
-    // If less than 50% match then assume it is not the same
-    if (uiInBoth * 2 < atomicListB.size() || atomicListB.size() == 0)
+    // Check number of atomics in clumps
+    int numAtomicsA = RpClumpGetNumAtomics(pClumpA);
+    int numAtomicsB = RpClumpGetNumAtomics(pClumpB);
+    if (numAtomicsA != numAtomicsB)
         return false;
+
+    std::vector<RpGeometry*> geometryListA;
+    std::vector<RpGeometry*> geometryListB;
+    geometryListA.reserve(numAtomicsA * sizeof(RpGeometry*));
+    geometryListB.reserve(numAtomicsB * sizeof(RpGeometry*));
+
+    // Get geometry from clump A
+    RpClumpForAllAtomics(
+        pClumpA, [](RpAtomic* atomic, void* data) -> bool {
+            auto* geometryList = static_cast<std::vector<RpGeometry*>*>(data);
+            geometryList->push_back(atomic->geometry);
+
+            return true;
+        },
+        &geometryListA);
+
+    // Get geometry from clump B
+    RpClumpForAllAtomics(
+        pClumpB,
+        [](RpAtomic* atomic, void* data) -> bool
+        {
+            auto* geometryList = static_cast<std::vector<RpGeometry*>*>(data);
+            geometryList->push_back(atomic->geometry);
+
+            return true;
+        },
+        &geometryListB);
+
+    if (geometryListA.size() != geometryListB.size())
+        return false;
+
+    std::unordered_set<RpGeometry*> geometrySetB;
+    geometrySetB.reserve(geometryListB.size());
+    geometrySetB.insert(geometryListB.begin(), geometryListB.end());
+
+    for (const auto& geomA : geometryListA)
+    {
+        if (geometrySetB.find(geomA) == geometrySetB.end())
+            return false;
+    }
 
     return true;
 }
@@ -490,17 +515,49 @@ bool CRenderWareSA::ReplaceObjectModel(RpClump* newClump, std::uint16_t modelID)
     if (!pModelInfo)
         return false;
 
-    auto* oldObject = reinterpret_cast<RpClump*>(pModelInfo->GetRwObject());
-    if (DoContainTheSameGeometry(newClump, oldObject, nullptr) && pModelInfo->IsSameModelType())
-        return true;
-
     CBaseModelInfoSAInterface* currentModelInterface = pModelInfo->GetInterface();
+
+    // Comparing two clumps here leads to an unknown crash during object creation (std::bad_alloc) in the SA code
+    if ((newClump == reinterpret_cast<RpClump*>(currentModelInterface->pRwObject) || DoContainTheSameGeometry(newClump, nullptr, reinterpret_cast<RpAtomic*>(currentModelInterface->pRwObject))) && pModelInfo->IsSameModelType())
+        return true;
 
     // We create a copy of the current interface to later call DeleteRwObject on it,
     // so we can remove the old RwObject after setting the new one
     // Old RwObject must be deleted after setting the new one to avoid crashes during restream
-    CBaseModelInfoSAInterface* copyCurrentModelInterface = new CBaseModelInfoSAInterface();
-    MemCpyFast(copyCurrentModelInterface, currentModelInterface, sizeof(CBaseModelInfoSAInterface));
+    CBaseModelInfoSAInterface* copyCurrentModelInterface = nullptr;
+    switch (reinterpret_cast<std::uintptr_t>(currentModelInterface->VFTBL))
+    {
+        case VTBL_CAtomicModelInfo:
+        {
+            copyCurrentModelInterface = new CAtomicModelInfoSAInterface();
+            MemCpyFast(copyCurrentModelInterface, currentModelInterface, sizeof(CAtomicModelInfoSAInterface));
+
+            break;
+        }
+        case VTBL_CDamageAtomicModelInfo:
+        {
+            copyCurrentModelInterface = new CDamageableModelInfoSAInterface();
+            MemCpyFast(copyCurrentModelInterface, currentModelInterface, sizeof(CDamageableModelInfoSAInterface));
+
+            break;
+        }
+        case VTBL_CClumpModelInfo:
+        {
+            copyCurrentModelInterface = new CClumpModelInfoSAInterface();
+            MemCpyFast(copyCurrentModelInterface, currentModelInterface, sizeof(CClumpModelInfoSAInterface));
+
+            break;
+        }
+        case VTBL_CTimeModelInfo:
+        {
+            copyCurrentModelInterface = new CTimeModelInfoSAInterface();
+            MemCpyFast(copyCurrentModelInterface, currentModelInterface, sizeof(CTimeModelInfoSAInterface));
+
+            break;
+        }
+    }
+
+    copyCurrentModelInterface->usNumberOfRefs = 0;
     currentModelInterface->pRwObject = nullptr;
 
     // We need to make a copy here because DeleteRwObject removes atomics from our new clump
@@ -589,14 +646,22 @@ bool CRenderWareSA::ReplaceObjectModel(RpClump* newClump, std::uint16_t modelID)
     // Destroy old RwObject
     // RwObject from original interface after type conversion
     CBaseModelInfoSAInterface* originalInterface = pModelInfo->GetOriginalInterface();
-    if (originalInterface)
+    if (originalInterface && originalInterface->pRwObject)
+    {
         originalInterface->DeleteRwObject();
+
+        // If the originalInterface has an existing RwObject, it points to the same one as copyCurrentModelInterface
+        copyCurrentModelInterface->pRwObject = nullptr;
+    }
 
     // The user can convert the same model multiple times, but its original model interface is saved only once,
     // so we remove the RwObject and the interface created during the last conversion
     CBaseModelInfoSAInterface* lastConversionInterface = pModelInfo->GetLastConversionInterface();
     if (lastConversionInterface)
     {
+        if (lastConversionInterface->pRwObject == copyCurrentModelInterface->pRwObject)
+            copyCurrentModelInterface->pRwObject = nullptr;
+
         lastConversionInterface->DeleteRwObject();
         delete lastConversionInterface;
 
@@ -620,9 +685,7 @@ bool CRenderWareSA::ReplaceObjectModel(RpClump* newClump, std::uint16_t modelID)
             }
         }
 
-        if (!originalInterface)
-            copyCurrentModelInterface->DeleteRwObject();
-
+        copyCurrentModelInterface->DeleteRwObject();
         delete copyCurrentModelInterface;
     }
 

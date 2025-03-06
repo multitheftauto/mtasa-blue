@@ -262,7 +262,7 @@ public:
     union
     {
         char*    m_animFileName;
-        uint32_t m_nAnimFileIndex;
+        std::int32_t m_nAnimFileIndex;
     };
 
     void DeleteRwObject() { ((void(__thiscall*)(CClumpModelInfoSAInterface*))0x4C4E70)(this); }
