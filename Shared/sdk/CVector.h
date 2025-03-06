@@ -194,6 +194,18 @@ public:
         return false;
     }
 
+    bool IsValid() const
+    {
+        const float values[3] = {fX, fY, fZ};
+        for (std::size_t i = 0; i < 3; ++i)
+        {
+            if (std::isnan(values[i]) || std::isinf(values[i]))
+                return false;
+        }
+
+        return true;
+    }
+
     constexpr CVector operator+(const CVector& vecRight) const noexcept { return CVector(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ); }
 
     constexpr CVector operator-(const CVector& vecRight) const noexcept { return CVector(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ); }

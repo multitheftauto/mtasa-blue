@@ -25,3 +25,4 @@
 #include "SharedUtil.Logging.hpp"
 #include "SharedUtil.AsyncTaskScheduler.hpp"
 #include "SharedUtil.Memory.hpp"
+#include "UTF8.hpp"

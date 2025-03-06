@@ -438,7 +438,7 @@
     AF_Module  module = (AF_Module)module_;
 
     FT_Error   error  = FT_Err_Ok;
-    FT_Memory  memory = module->root.library->memory;
+    FT_Memory  memory = module->root.memory;
 
 #ifdef FT_DEBUG_AUTOFIT
 

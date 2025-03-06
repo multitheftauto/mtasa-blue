@@ -134,7 +134,7 @@ bool CWeaponSA::FireBullet(CEntity* firingEntity, const CVector& vecOrigin, cons
 
             // Fire sound
             if (firingPlayerPed)
-                firingPlayerPed->AddWeaponAudioEvent(EPedWeaponAudioEvent::FIRE);
+                firingPlayerPed->AddWeaponAudioEvent(EPedWeaponAudioEventType::FIRE);
 
             // Do post shot lag compensation reset & script events
             if (pGame->m_pPostWeaponFireHandler && firingPlayerPed)

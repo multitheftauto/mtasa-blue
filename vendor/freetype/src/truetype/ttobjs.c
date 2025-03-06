@@ -949,11 +949,8 @@
 
       FT_TRACE4(( "Executing `fpgm' table.\n" ));
       error = face->interpreter( exec );
-#ifdef FT_DEBUG_LEVEL_TRACE
-      if ( error )
-        FT_TRACE4(( "  interpretation failed with error code 0x%x\n",
-                    error ));
-#endif
+      FT_TRACE4(( error ? "  failed (error code 0x%x)\n" : "",
+                  error ));
     }
     else
       error = FT_Err_Ok;
@@ -994,16 +991,16 @@
     FT_Error        error;
     FT_UInt         i;
 
-    /* unscaled CVT values are already stored in 26.6 format */
-    FT_Fixed  scale = size->ttmetrics.scale >> 6;
-
 
     /* Scale the cvt values to the new ppem.            */
     /* By default, we use the y ppem value for scaling. */
     FT_TRACE6(( "CVT values:\n" ));
     for ( i = 0; i < size->cvt_size; i++ )
     {
-      size->cvt[i] = FT_MulFix( face->cvt[i], scale );
+      /* Unscaled CVT values are already stored in 26.6 format.            */
+      /* Note that this scaling operation is very sensitive to rounding;   */
+      /* the integer division by 64 must be applied to the first argument. */
+      size->cvt[i] = FT_MulFix( face->cvt[i] / 64, size->ttmetrics.scale );
       FT_TRACE6(( "  %3d: %f (%f)\n",
                   i, (double)face->cvt[i] / 64, (double)size->cvt[i] / 64 ));
     }
@@ -1035,11 +1032,8 @@
 
       FT_TRACE4(( "Executing `prep' table.\n" ));
       error = face->interpreter( exec );
-#ifdef FT_DEBUG_LEVEL_TRACE
-      if ( error )
-        FT_TRACE4(( "  interpretation failed with error code 0x%x\n",
-                    error ));
-#endif
+      FT_TRACE4(( error ? "  failed (error code 0x%x)\n" : "",
+                  error ));
     }
     else
       error = FT_Err_Ok;

@@ -500,6 +500,114 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
     return IsLuaObfuscatedScript(strFileContents.c_str(), strFileContents.length());
 }
 
+// Helper struct to store token information
+struct LuaToken {
+    enum Type {
+        IDENTIFIER,
+        OPERATOR,
+        BRACKET,
+        PARENTHESIS,
+        OTHER
+    };
+    
+    Type type;
+    std::string value;
+    long position;
+    long line;
+};
+
+// Helper class to track parsing state
+class LuaParseState {
+public:
+    bool isInComment = false;
+    bool isInString = false;
+    char stringDelimiter = 0;
+    int bracketDepth = 0;
+    int parenthesisDepth = 0;
+};
+
+class CLuaSyntaxChecker {
+public:
+    static bool IsFunctionCall(const std::string& source, long identifierPos, long identifierLength, long& outLine) {
+        LuaParseState state;
+        std::vector<LuaToken> tokens;
+        
+        // First, tokenize everything after the identifier
+        long pos = identifierPos + identifierLength;
+        while (pos < (long)source.length()) {
+            // Skip whitespace
+            while (pos < (long)source.length() && isspace(source[pos])) {
+                if (source[pos] == '\n') outLine++;
+                pos++;
+            }
+            
+            if (pos >= (long)source.length()) break;
+            
+            char c = source[pos];
+            
+            // Handle comments
+            if (!state.isInString && c == '-' && pos + 1 < (long)source.length() && source[pos + 1] == '-') {
+                // Skip until end of line
+                while (pos < (long)source.length() && source[pos] != '\n') pos++;
+                continue;
+            }
+            
+            // Handle strings
+            if (!state.isInString && (c == '"' || c == '\'')) {
+                state.isInString = true;
+                state.stringDelimiter = c;
+                pos++;
+                continue;
+            }
+            if (state.isInString && c == state.stringDelimiter) {
+                state.isInString = false;
+                pos++;
+                continue;
+            }
+            if (state.isInString) {
+                pos++;
+                continue;
+            }
+            
+            // Track brackets and parentheses
+            if (c == '(') {
+                tokens.push_back({LuaToken::PARENTHESIS, "(", pos, outLine});
+                state.parenthesisDepth++;
+                pos++;
+                break;  // We found an opening parenthesis, no need to look further
+            }
+            else if (c == '{' || c == '[') {
+                tokens.push_back({LuaToken::BRACKET, string(1, c), pos, outLine});
+                state.bracketDepth++;
+                pos++;
+            }
+            else if (c == '}' || c == ']') {
+                tokens.push_back({LuaToken::BRACKET, string(1, c), pos, outLine});
+                state.bracketDepth--;
+                pos++;
+            }
+            else if (isalnum(c) || c == '_') {
+                // Skip identifiers
+                while (pos < (long)source.length() && (isalnum(source[pos]) || source[pos] == '_')) pos++;
+            }
+            else {
+                // Handle operators and other characters
+                tokens.push_back({LuaToken::OPERATOR, string(1, c), pos, outLine});
+                pos++;
+            }
+            
+            // If we find anything other than whitespace or comments before a parenthesis,
+            // then this isn't a function call
+            if (!tokens.empty() && tokens.back().type != LuaToken::PARENTHESIS) {
+                return false;
+            }
+        }
+        
+        // Check if we found an opening parenthesis
+        return !tokens.empty() && tokens.back().type == LuaToken::PARENTHESIS;
+    }
+};
+
 ///////////////////////////////////////////////////////////////
 //
 // CResourceChecker::CheckLuaSourceForIssues
@@ -513,6 +621,7 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
 {
     CHashMap<SString, long> doneWarningMap;
     long                    lLineNumber = 1;
+    
     // Check if this is a UTF-8 script
     bool bUTF8 = IsUTF8BOM(strLuaSource.c_str(), strLuaSource.length());
 
@@ -542,8 +651,8 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
             if (checkerMode == ECheckerMode::WARNINGS)
             {
                 m_ulDeprecatedWarningCount++;
-                CLogger::LogPrintf("WARNING: %s/%s [%s] is encoded in ANSI instead of UTF-8.  Please convert your file to UTF-8.\n", strResourceName.c_str(),
-                                   strFileName.c_str(), bClientScript ? "Client" : "Server");
+                CLogger::LogPrintf("WARNING: %s/%s [%s] is encoded in ANSI instead of UTF-8.  Please convert your file to UTF-8.\n", 
+                                 strResourceName.c_str(), strFileName.c_str(), bClientScript ? "Client" : "Server");
             }
         }
     }
@@ -557,12 +666,12 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
         if (lNameOffset == -1)
             break;
 
-        lNameOffset += lPos;                         // Make offset absolute from the start of the file
-        lPos = lNameOffset + lNameLength;            // Adjust so the next pass starts from just after this identifier
+        lNameOffset += lPos;
+        lPos = lNameOffset + lNameLength;
 
         string strIdentifierName(strLuaSource.c_str() + lNameOffset, lNameLength);
 
-        // In-place upgrade...
+        // Handle upgrades...
         if (checkerMode == ECheckerMode::UPGRADE)
         {
             assert(!bCompiledScript);
@@ -585,12 +694,18 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
         // Log warnings...
         if (checkerMode == ECheckerMode::WARNINGS)
         {
-            // Only do the identifier once per file
-            if (doneWarningMap.find(strIdentifierName) == doneWarningMap.end())
+            std::string strContextKey = strIdentifierName + ":" + std::to_string(lLineNumber);
+            if (doneWarningMap.find(strContextKey) == doneWarningMap.end())
             {
-                doneWarningMap[strIdentifierName] = 1;
-                if (!bCompiledScript)            // Don't issue deprecated function warnings if the script is compiled, because we can't upgrade it
-                    IssueLuaFunctionNameWarnings(strIdentifierName, strFileName, strResourceName, bClientScript, lLineNumber);
+                doneWarningMap[strContextKey] = 1;
+                if (!bCompiledScript)
+                {
+                    long currentLine = lLineNumber;
+                    if (CLuaSyntaxChecker::IsFunctionCall(strLuaSource, lNameOffset, lNameLength, currentLine))
+                    {
+                        IssueLuaFunctionNameWarnings(strIdentifierName, strFileName, strResourceName, bClientScript, lLineNumber);
+                    }
+                }
                 CheckVersionRequirements(strIdentifierName, bClientScript);
             }
         }
@@ -720,7 +835,6 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
     string           strHow;
     CMtaVersion      strVersion;
     ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo(strFunctionName, bClientScript, strHow, strVersion);
-
     if (what == ECheckerWhat::NONE)
         return;
 
@@ -740,7 +854,6 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
         strTemp.Format("%s %s because <min_mta_version> %s setting in meta.xml is below %s", strFunctionName.c_str(), strHow.c_str(),
                        bClientScript ? "Client" : "Server", strVersion.c_str());
     }
-
     CLogger::LogPrint(SString("WARNING: %s/%s(Line %lu) [%s] %s\n", strResourceName.c_str(), strFileName.c_str(), ulLineNumber,
                               bClientScript ? "Client" : "Server", *strTemp));
 }
@@ -755,21 +868,33 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
 ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow,
                                                                  CMtaVersion& strOutVersion)
 {
+    // Early exit if this is likely a variable assignment
+    if (strFunctionName.find('=') != std::string::npos)
+        return ECheckerWhat::NONE;
+
     static CHashMap<SString, SDeprecatedItem*> clientUpgradeInfoMap;
     static CHashMap<SString, SDeprecatedItem*> serverUpgradeInfoMap;
-
     if (clientUpgradeInfoMap.size() == 0)
     {
         // Make maps to speed things up
         for (uint i = 0; i < NUMELMS(clientDeprecatedList); i++)
             clientUpgradeInfoMap[clientDeprecatedList[i].strOldName] = &clientDeprecatedList[i];
-
         for (uint i = 0; i < NUMELMS(serverDeprecatedList); i++)
             serverUpgradeInfoMap[serverDeprecatedList[i].strOldName] = &serverDeprecatedList[i];
     }
 
-    // Query the correct map
-    SDeprecatedItem* pItem = MapFindRef(bClientScript ? clientUpgradeInfoMap : serverUpgradeInfoMap, strFunctionName);
+    // Extract just the function name if it's being called
+    std::string strCleanFunctionName = strFunctionName;
+    size_t parenPos = strCleanFunctionName.find('(');
+    if (parenPos != std::string::npos)
+        strCleanFunctionName = strCleanFunctionName.substr(0, parenPos);
+
+    // Trim any whitespace
+    strCleanFunctionName.erase(0, strCleanFunctionName.find_first_not_of(" \t\n\r"));
+    strCleanFunctionName.erase(strCleanFunctionName.find_last_not_of(" \t\n\r") + 1);
+
+    // Query the correct map with the cleaned function name
+    SDeprecatedItem* pItem = MapFindRef(bClientScript ? clientUpgradeInfoMap : serverUpgradeInfoMap, strCleanFunctionName);
     if (!pItem)
         return ECheckerWhat::NONE;            // Nothing found
 
