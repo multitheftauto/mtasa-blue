@@ -944,7 +944,7 @@ bool CMainMenu::OnHostGameButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "local");
+    CModManager::GetSingleton().RequestLoad("local");
 
     return true;
 }
@@ -956,7 +956,7 @@ bool CMainMenu::OnEditorButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "editor");
+    CModManager::GetSingleton().RequestLoad("editor");
 
     return true;
 }

@@ -515,7 +515,7 @@ void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
 {
     if (m_pLocalGUI)
     {
-        if (m_pGame->GetSystemState() == 9 /* GS_PLAYING_GAME */ && m_pModManager->GetCurrentMod() != NULL && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
+        if (m_pGame->GetSystemState() == 9 /* GS_PLAYING_GAME */ && m_pModManager->IsLoaded() && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
             !m_pLocalGUI->GetMainMenu()->IsVisible() && !m_pLocalGUI->GetConsole()->IsVisible() && !m_pLocalGUI->IsChatBoxInputEnabled())
         {
             CChat* pChat = m_pLocalGUI->GetChat();
@@ -1262,17 +1262,7 @@ void CCore::DoPostFramePulse()
             {
                 // We want to load a mod?
                 const char* szOptionValue;
-                if (szOptionValue = GetCommandLineOption("l"))
-                {
-                    // Try to load the mod
-                    if (!m_pModManager->Load(szOptionValue, m_szCommandLineArgs))
-                    {
-                        SString strTemp(_("Error running mod specified in command line ('%s')"), szOptionValue);
-                        ShowMessageBox(_("Error") + _E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR);            // Command line Mod load failed
-                    }
-                }
-                // We want to connect to a server?
-                else if (szOptionValue = GetCommandLineOption("c"))
+                if (szOptionValue = GetCommandLineOption("c"))
                 {
                     CCommandFuncs::Connect(szOptionValue);
                 }
@@ -2195,8 +2185,9 @@ void CCore::HandleIdlePulse()
         DoPreFramePulse();
         DoPostFramePulse();
     }
-    if (m_pModManager->GetCurrentMod())
-        m_pModManager->GetCurrentMod()->IdleHandler();
+
+    if (m_pModManager->IsLoaded())
+        m_pModManager->GetClient()->IdleHandler();
 }
 
 //

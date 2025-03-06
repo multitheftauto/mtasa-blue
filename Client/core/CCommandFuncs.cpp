@@ -167,36 +167,13 @@ void CCommandFuncs::Clear(const char* szParameters)
 
 void CCommandFuncs::Load(const char* szParameters)
 {
-    if (!szParameters)
-    {
-        CCore::GetSingleton().GetConsole()->Printf("* Syntax: load <mod-name> [<arguments>]");
-        return;
-    }
-
-    // Copy the buffer
-    char* szTemp = new char[strlen(szParameters) + 1];
-    strcpy(szTemp, szParameters);
-
-    // Split it up into mod name and the arguments
-    char* szModName = strtok(szTemp, " ");
-    char* szArguments = strtok(NULL, "\0");
-
-    if (szModName)
-    {
-        // Load the mod with the given arguments
-        CModManager::GetSingleton().RequestLoad(szModName, szArguments);
-    }
-    else
-        CCore::GetSingleton().GetConsole()->Printf("* Syntax: load <mod-name> [<arguments>]");
-
-    // Free the temp buffer
-    delete[] szTemp;
+    CModManager::GetSingleton().RequestLoad(szParameters);
 }
 
 void CCommandFuncs::Unload(const char* szParameters)
 {
     // Any mod loaded?
-    if (CModManager::GetSingleton().GetCurrentMod())
+    if (CModManager::GetSingleton().IsLoaded())
     {
         // Unload it
         CModManager::GetSingleton().RequestUnload();
@@ -264,7 +241,7 @@ void CCommandFuncs::Connect(const char* szParameters)
     CModManager::GetSingleton().Unload();
 
     // Only connect if there is no mod loaded
-    if (!CModManager::GetSingleton().GetCurrentMod())
+    if (!CModManager::GetSingleton().IsLoaded())
     {
         // Start the connect
         if (CCore::GetSingleton().GetConnectManager()->Connect(szHost, usPort, strNick.c_str(), szPass))
@@ -284,7 +261,7 @@ void CCommandFuncs::Connect(const char* szParameters)
 
 void CCommandFuncs::ReloadNews(const char* szParameters)
 {
-    if (CModManager::GetSingleton().GetCurrentMod())
+    if (CModManager::GetSingleton().IsLoaded())
     {
         CCore::GetSingleton().GetConsole()->Print("reloadnews: can't do this whilst connected to server");
         return;
@@ -309,7 +286,7 @@ void CCommandFuncs::Reconnect(const char* szParameters)
     CModManager::GetSingleton().Unload();
 
     // Any mod loaded?
-    if (!CModManager::GetSingleton().GetCurrentMod())
+    if (!CModManager::GetSingleton().IsLoaded())
     {
         // Verify and convert the port number
         if (uiPort <= 0 || uiPort > 0xFFFF)

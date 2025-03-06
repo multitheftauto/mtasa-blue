@@ -131,13 +131,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
 
             if (pModManager && pModManager->IsLoaded())
             {
-                CClientBase* pBase = pModManager->GetCurrentMod();
-
-                if (pBase)
-                {
-                    bool bFocus = (wState == WA_CLICKACTIVE) || (wState == WA_ACTIVE);
-                    pBase->OnWindowFocusChange(bFocus);
-                }
+                bool bFocus = (wState == WA_CLICKACTIVE) || (wState == WA_ACTIVE);
+                pModManager->GetClient()->OnWindowFocusChange(bFocus);
             }
 
             switch (wState)

@@ -364,7 +364,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
             // Process packet data
             CCore::GetSingleton().GetNetwork()->SetServerBitStreamVersion(usServerBitStreamVersion);
 
-            if (strModName != "")
+            if (strModName == "deathmatch")
             {
                 // Populate the arguments to pass it (-c host port nick)
                 SString strArguments("%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str());
@@ -399,7 +399,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 g_pConnectManager->m_tConnectStarted = 0;
 
                 // Load the mod
-                if (!CModManager::GetSingleton().Load(strModName, strArguments))
+                if (!CModManager::GetSingleton().Load(strArguments))
                 {
                     // Failed loading the mod
                     strArguments.Format(_("No such mod installed (%s)"), strModName.c_str());
