@@ -10,7 +10,7 @@
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
-/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
+/*  license, FTL.TXT.  By continuing to use, modify, or distribute     */
 /*  this file you indicate that you have read the license and              */
 /*  understand and accept it fully.                                        */
 /*                                                                         */
@@ -238,77 +238,6 @@ typedef struct PVG_FT_StrokeBorderRec_ {
 
 } PVG_FT_StrokeBorderRec, *PVG_FT_StrokeBorder;
 
-PVG_FT_Error PVG_FT_Outline_Check(PVG_FT_Outline* outline)
-{
-    if (outline) {
-        PVG_FT_Int n_points = outline->n_points;
-        PVG_FT_Int n_contours = outline->n_contours;
-        PVG_FT_Int end0, end;
-        PVG_FT_Int n;
-
-        /* empty glyph? */
-        if (n_points == 0 && n_contours == 0) return 0;
-
-        /* check point and contour counts */
-        if (n_points <= 0 || n_contours <= 0) goto Bad;
-
-        end0 = end = -1;
-        for (n = 0; n < n_contours; n++) {
-            end = outline->contours[n];
-
-            /* note that we don't accept empty contours */
-            if (end <= end0 || end >= n_points) goto Bad;
-
-            end0 = end;
-        }
-
-        if (end != n_points - 1) goto Bad;
-
-        /* XXX: check the tags array */
-        return 0;
-    }
-
-Bad:
-    return -1;  // PVG_FT_THROW( Invalid_Argument );
-}
-
-void PVG_FT_Outline_Get_CBox(const PVG_FT_Outline* outline, PVG_FT_BBox* acbox)
-{
-    PVG_FT_Pos xMin, yMin, xMax, yMax;
-
-    if (outline && acbox) {
-        if (outline->n_points == 0) {
-            xMin = 0;
-            yMin = 0;
-            xMax = 0;
-            yMax = 0;
-        } else {
-            PVG_FT_Vector* vec = outline->points;
-            PVG_FT_Vector* limit = vec + outline->n_points;
-
-            xMin = xMax = vec->x;
-            yMin = yMax = vec->y;
-            vec++;
-
-            for (; vec < limit; vec++) {
-                PVG_FT_Pos x, y;
-
-                x = vec->x;
-                if (x < xMin) xMin = x;
-                if (x > xMax) xMax = x;
-
-                y = vec->y;
-                if (y < yMin) yMin = y;
-                if (y > yMax) yMax = y;
-            }
-        }
-        acbox->xMin = xMin;
-        acbox->xMax = xMax;
-        acbox->yMin = yMin;
-        acbox->yMax = yMax;
-    }
-}
-
 static PVG_FT_Error ft_stroke_border_grow(PVG_FT_StrokeBorder border,
                                          PVG_FT_UInt         new_points)
 {
@@ -402,8 +331,8 @@ static PVG_FT_Error ft_stroke_border_lineto(PVG_FT_StrokeBorder border,
         /* move last point */
         border->points[border->num_points - 1] = *to;
     } else {
-        /* don't add zero-length lineto */
-        if (border->num_points > 0 &&
+        /* don't add zero-length lineto, but always add moveto */
+        if (border->num_points > border->start &&
             PVG_FT_IS_SMALL(border->points[border->num_points - 1].x - to->x) &&
             PVG_FT_IS_SMALL(border->points[border->num_points - 1].y - to->y))
             return error;
@@ -629,12 +558,10 @@ static void ft_stroke_border_export(PVG_FT_StrokeBorder border,
                                     PVG_FT_Outline*     outline)
 {
     /* copy point locations */
-    if (outline->points != NULL && border->points != NULL)
-        memcpy(outline->points + outline->n_points, border->points,
-            border->num_points * sizeof(PVG_FT_Vector));
+    memcpy(outline->points + outline->n_points, border->points,
+           border->num_points * sizeof(PVG_FT_Vector));
 
     /* copy tags */
-    if (outline->tags)
     {
         PVG_FT_UInt  count = border->num_points;
         PVG_FT_Byte* read = border->tags;
@@ -651,7 +578,6 @@ static void ft_stroke_border_export(PVG_FT_StrokeBorder border,
     }
 
     /* copy contours */
-    if (outline->contours)
     {
         PVG_FT_UInt   count = border->num_points;
         PVG_FT_Byte*  tags = border->tags;
