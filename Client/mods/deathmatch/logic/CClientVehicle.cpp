@@ -808,10 +808,12 @@ void CClientVehicle::Fix()
 
     SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
+
+    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
     for (int i = 0; i < MAX_DOORS; i++)
-        SetDoorStatus(i, ucDoorStates[i], true);
+        SetDoorStatus(i, ucDoorStates[i], flyingComponents);
     for (int i = 0; i < MAX_PANELS; i++)
-        SetPanelStatus(i, 0);
+        SetPanelStatus(i, 0, flyingComponents);
     for (int i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
     for (int i = 0; i < MAX_WHEELS; i++)
@@ -906,7 +908,7 @@ void CClientVehicle::Blow(VehicleBlowFlags blow)
         // "Fuck" the car completely, so we don't have weird client-side jumpyness because of differently synced wheel states on clients
         FuckCarCompletely(true);
 
-        m_pVehicle->BlowUp(NULL, 0);
+        m_pVehicle->BlowUp(nullptr, 0);
 
         // Blowing up a vehicle will cause an explosion in the original game code, but we have a hook in place,
         // which will prevent the explosion and forward the information to the server to relay it to everyone from there.
@@ -2170,11 +2172,12 @@ void CClientVehicle::StreamedInPulse()
             {
                 // Set the damage model doors
                 CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
+                bool            flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
 
                 for (int i = 0; i < MAX_DOORS; i++)
-                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], true);
+                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], flyingComponents);
                 for (int i = 0; i < MAX_PANELS; i++)
-                    pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i]);
+                    pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i], flyingComponents);
                 for (int i = 0; i < MAX_LIGHTS; i++)
                     pDamageManager->SetLightStatus(static_cast<eLights>(i), m_ucLightStates[i]);
             }

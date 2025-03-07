@@ -144,7 +144,7 @@ private:
     int m_menuBY;
 
     CGraphics* m_pGraphics;
-    bool       m_bStarted;
+    bool       m_bStarted{false};
     CVector2D  m_ScreenSize;
 
     // Fade variables

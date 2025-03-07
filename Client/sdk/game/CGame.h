@@ -248,7 +248,6 @@ public:
     virtual void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0) = 0;
     virtual bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false) = 0;
 
-    virtual bool HasCreditScreenFadedOut() = 0;
     virtual void FlushPendingRestreamIPL() = 0;
     virtual void ResetModelLodDistances() = 0;
     virtual void ResetModelFlags() = 0;
@@ -277,8 +276,8 @@ public:
     virtual int32_t GetBaseIDforSCM() = 0;
     virtual int32_t GetCountOfAllFileIDs() = 0;
 
-    virtual void RemoveAllBuildings() = 0;
-    virtual void RestoreGameBuildings() = 0;
+    virtual void RemoveGameWorld() = 0;
+    virtual void RestoreGameWorld() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
 

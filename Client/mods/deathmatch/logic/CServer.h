@@ -30,6 +30,9 @@ public:
 
     const std::string& GetPassword() const noexcept { return m_password; }
 
+public:
+    bool PrintServerOutputToConsole();
+
 private:
     bool        m_isRunning{};
     bool        m_isAcceptingConnections{};
