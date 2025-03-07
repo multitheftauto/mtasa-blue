@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-07 20:23+0000\n"
-"PO-Revision-Date: 2025-03-07 20:31\n"
+"POT-Creation-Date: 2025-03-07 21:43+0000\n"
+"PO-Revision-Date: 2025-03-07 22:40\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -20,12 +20,13 @@ msgstr ""
 #. Create buttons
 #. OK button
 #: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:37
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4838
-#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
-#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
-#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
-#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
-#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/core/CMainMenu.cpp:1211 Client/core/CSettings.cpp:127
+#: Client/core/CSettings.cpp:4838 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
+#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
+#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
+#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
+#: Client/core/CVersionUpdater.cpp:2152
 msgid "OK"
 msgstr "OK"
 
@@ -234,7 +235,8 @@ msgstr "Gotowe!"
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Uruchom Grand Theft Auto: San Andreas.\n"
+"Gra powinna znajdować się w katalogu 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
@@ -244,7 +246,9 @@ msgstr "Wyszukiwanie GTA: San Andreas"
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Przepraszamy, nie udało nam się znaleźć gry.\n"
+"Uruchom Grand Theft Auto: San Andreas i naciśnij 'retry' lub 'ponów'.\n"
+"Gra powinna znajdować się w katalogu 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -721,47 +725,47 @@ msgstr "poprzedni kanał radiowy"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr ""
+msgstr "włącza widok mapy"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "przybliża widok mapy"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "oddala widok mapy"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "przesuwa mapę na północ"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "przesuwa mapę na południe"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "przesuwa mapę na wschód"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "przesuwa mapę na zachód"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "przyczepia mapę"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "zmniejsza przeźroczystość mapy"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "zwiększa przeźroczystość mapy"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "pokazuje/ukrywa tekst pomocniczy mapy"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -1352,12 +1356,12 @@ msgstr "Zmień tryb: %s"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "Przybliżenie: %s/%s Ruch: %s, %s, %s, %s Przeźroczystość: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "Mapa: %s Tekst pomocniczy: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:715
 msgid "Following Player"
@@ -1365,7 +1369,7 @@ msgstr "Podążanie za graczem"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:717
 msgid "Free Movement"
-msgstr ""
+msgstr "Swobodny ruch"
 
 #: Client/core/CConnectManager.cpp:85
 msgid "Connecting failed. Invalid nick provided!"
@@ -1389,7 +1393,7 @@ msgstr "Łączenie z %s:%u ..."
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "Ponowne łączenie z %s:%u ..."
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
@@ -1432,12 +1436,7 @@ msgstr "UWAGA - ROZŁĄCZENIE"
 
 #: Client/core/CMainMenu.cpp:1209
 msgid "INFORMATION"
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:1211 Client/core/CVersionUpdater.cpp:2088
-#: Client/core/CVersionUpdater.cpp:2098
-msgid "Ok"
-msgstr "Ok"
+msgstr "INFORMACJA"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -1450,7 +1449,7 @@ msgstr "* Bieżący czas to %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "connect: Sieć nie jest gotowa, zaczekaj chwilę"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -1476,21 +1475,21 @@ msgstr "connect: Nie udało się wyłączyć obecnej modyfikacji"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "reconnect: Sieć nie jest gotowa, zaczekaj chwilę"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "reconnect: Nieprawidłowy port"
 
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "reconnect: Ponowne łączenie z %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "reconnect: Nie udało się połączyć z %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:359
 msgid "Bound all controls from GTA"
@@ -1676,12 +1675,12 @@ msgstr "Rozdzielczość obrazu:"
 
 #: Client/core/CSettings.cpp:448
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (Domyślnie)"
 
 #. index 0
 #: Client/core/CSettings.cpp:449
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -2096,7 +2095,7 @@ msgstr "Pokaż w Eksploratorze"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:1205
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "Zapisuj zdjęcia z aparatu do katalogu GTA San Andreas User Files w dokumentach"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1211 Client/core/CSettings.cpp:1214
@@ -2632,6 +2631,10 @@ msgstr "POBIERANIE UKOŃCZONE"
 #: Client/core/CVersionUpdater.cpp:1990
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - Nieznany problem w _DialogUpdateResult"
+
+#: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
+msgid "Ok"
+msgstr "Ok"
 
 #: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
@@ -3303,11 +3306,11 @@ msgstr "Czy na pewno chcesz użyć tej rozdzielczości ekranu?"
 
 #: Client/game_sa/CGameSA.cpp:253 Client/game_sa/CGameSA.cpp:264
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "Nie udało się zainicjalizować game_sa"
 
 #: Client/game_sa/CGameSA.cpp:255
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "Nie udało się alokować pamięci"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
