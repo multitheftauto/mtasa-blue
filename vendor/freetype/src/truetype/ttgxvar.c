@@ -129,9 +129,6 @@
    *   stream ::
    *     The data stream.
    *
-   *   size ::
-   *     The size of the table holding the data.
-   *
    * @Output:
    *   point_cnt ::
    *     The number of points read.  A zero value means that
@@ -144,14 +141,14 @@
    */
   static FT_UShort*
   ft_var_readpackedpoints( FT_Stream  stream,
-                           FT_ULong   size,
                            FT_UInt   *point_cnt )
   {
     FT_UShort *points = NULL;
     FT_UInt    n;
-    FT_UInt    runcnt;
+    FT_UInt    runcnt, cnt;
     FT_UInt    i, j;
     FT_UShort  first;
+    FT_Byte*   p;
     FT_Memory  memory = stream->memory;
     FT_Error   error;
 
@@ -169,56 +166,60 @@
       n  |= FT_GET_BYTE();
     }
 
-    if ( n > size )
-    {
-      FT_TRACE1(( "ft_var_readpackedpoints: number of points too large\n" ));
-      return NULL;
-    }
-
-    /* in the nested loops below we increase `i' twice; */
-    /* it is faster to simply allocate one more slot    */
-    /* than to add another test within the loop         */
-    if ( FT_QNEW_ARRAY( points, n + 1 ) )
+    if ( FT_QNEW_ARRAY( points, n ) )
       return NULL;
 
-    *point_cnt = n;
-
+    p     = stream->cursor;
     first = 0;
     i     = 0;
     while ( i < n )
     {
-      runcnt = FT_GET_BYTE();
+      if ( p >= stream->limit )
+        goto Fail;
+
+      runcnt = FT_NEXT_BYTE( p );
+      cnt    = runcnt & GX_PT_POINT_RUN_COUNT_MASK;
+
+      /* first point not included in run count */
+      cnt++;
+      if ( cnt > n - i )
+        cnt = n - i;
+
       if ( runcnt & GX_PT_POINTS_ARE_WORDS )
       {
-        runcnt     &= GX_PT_POINT_RUN_COUNT_MASK;
-        first      += FT_GET_USHORT();
-        points[i++] = first;
+        if ( 2 * cnt > (FT_UInt)( stream->limit - p ) )
+          goto Fail;
 
-        /* first point not included in run count */
-        for ( j = 0; j < runcnt; j++ )
+        for ( j = 0; j < cnt; j++ )
         {
-          first      += FT_GET_USHORT();
+          first      += FT_NEXT_USHORT( p );
           points[i++] = first;
-          if ( i >= n )
-            break;
         }
       }
       else
       {
-        first      += FT_GET_BYTE();
-        points[i++] = first;
+        if ( cnt > (FT_UInt)( stream->limit - p ) )
+          goto Fail;
 
-        for ( j = 0; j < runcnt; j++ )
+        for ( j = 0; j < cnt; j++ )
         {
-          first      += FT_GET_BYTE();
+          first      += FT_NEXT_BYTE( p );
           points[i++] = first;
-          if ( i >= n )
-            break;
         }
       }
     }
 
+    stream->cursor = p;
+
+    *point_cnt = n;
+
     return points;
+
+  Fail:
+    FT_TRACE1(( "ft_var_readpackedpoints: invalid table\n" ));
+
+    FT_FREE( points );
+    return NULL;
   }
 
 
@@ -240,9 +241,6 @@
    *   stream ::
    *     The data stream.
    *
-   *   size ::
-   *     The size of the table holding the data.
-   *
    *   delta_cnt ::
    *     The number of deltas to be read.
    *
@@ -258,13 +256,12 @@
    */
   static FT_Fixed*
   ft_var_readpackeddeltas( FT_Stream  stream,
-                           FT_ULong   size,
                            FT_UInt    delta_cnt )
   {
     FT_Fixed  *deltas = NULL;
     FT_UInt    runcnt, cnt;
     FT_UInt    i, j;
-    FT_UInt    bytes_used;
+    FT_Byte*   p;
     FT_Memory  memory = stream->memory;
     FT_Error   error;
 
@@ -272,68 +269,51 @@
     if ( FT_QNEW_ARRAY( deltas, delta_cnt ) )
       return NULL;
 
-    i          = 0;
-    bytes_used = 0;
-
-    while ( i < delta_cnt && bytes_used < size )
+    p = stream->cursor;
+    i = 0;
+    while ( i < delta_cnt )
     {
-      runcnt = FT_GET_BYTE();
+      if ( p >= stream->limit )
+        goto Fail;
+
+      runcnt = FT_NEXT_BYTE( p );
       cnt    = runcnt & GX_DT_DELTA_RUN_COUNT_MASK;
 
-      bytes_used++;
+      /* first point not included in run count */
+      cnt++;
+      if ( cnt > delta_cnt - i )
+        cnt = delta_cnt - i;
 
       if ( runcnt & GX_DT_DELTAS_ARE_ZERO )
       {
-        /* `cnt` + 1 zeroes get added */
-        for ( j = 0; j <= cnt && i < delta_cnt; j++ )
+        for ( j = 0; j < cnt; j++ )
           deltas[i++] = 0;
       }
       else if ( runcnt & GX_DT_DELTAS_ARE_WORDS )
       {
-        /* `cnt` + 1 shorts from the stack */
-        bytes_used += 2 * ( cnt + 1 );
-        if ( bytes_used > size )
-        {
-          FT_TRACE1(( "ft_var_readpackeddeltas:"
-                      " number of short deltas too large\n" ));
+        if ( 2 * cnt > (FT_UInt)( stream->limit - p ) )
           goto Fail;
-        }
 
-        for ( j = 0; j <= cnt && i < delta_cnt; j++ )
-          deltas[i++] = FT_intToFixed( FT_GET_SHORT() );
+        for ( j = 0; j < cnt; j++ )
+          deltas[i++] = FT_intToFixed( FT_NEXT_SHORT( p ) );
       }
       else
       {
-        /* `cnt` + 1 signed bytes from the stack */
-        bytes_used += cnt + 1;
-        if ( bytes_used > size )
-        {
-          FT_TRACE1(( "ft_var_readpackeddeltas:"
-                      " number of byte deltas too large\n" ));
+        if ( cnt > (FT_UInt)( stream->limit - p ) )
           goto Fail;
-        }
 
-        for ( j = 0; j <= cnt && i < delta_cnt; j++ )
-          deltas[i++] = FT_intToFixed( FT_GET_CHAR() );
-      }
-
-      if ( j <= cnt )
-      {
-        FT_TRACE1(( "ft_var_readpackeddeltas:"
-                    " number of deltas too large\n" ));
-        goto Fail;
+        for ( j = 0; j < cnt; j++ )
+          deltas[i++] = FT_intToFixed( FT_NEXT_CHAR( p ) );
       }
     }
 
-    if ( i < delta_cnt )
-    {
-      FT_TRACE1(( "ft_var_readpackeddeltas: not enough deltas\n" ));
-      goto Fail;
-    }
+    stream->cursor = p;
 
     return deltas;
 
   Fail:
+    FT_TRACE1(( "ft_var_readpackeddeltas: invalid table\n" ));
+
     FT_FREE( deltas );
     return NULL;
   }
@@ -2135,7 +2115,7 @@
           /* Convert delta in F2DOT14 to 16.16 before adding. */
           v += MUL_INT( delta, 4 );
 
-          /* Clamp value range [-1, 1]. */
+          /* Clamp value to range [-1, 1]. */
           v = v >=  0x10000L ?  0x10000 : v;
           v = v <= -0x10000L ? -0x10000 : v;
 
@@ -3604,9 +3584,8 @@
 
       FT_Stream_SeekSet( stream, offsetToData );
 
-      sharedpoints = ft_var_readpackedpoints( stream,
-                                              table_len,
-                                              &spoint_count );
+      sharedpoints = ft_var_readpackedpoints( stream, &spoint_count );
+
       offsetToData = FT_Stream_FTell( stream );
 
       FT_Stream_SeekSet( stream, here );
@@ -3680,9 +3659,7 @@
 
       if ( tupleIndex & GX_TI_PRIVATE_POINT_NUMBERS )
       {
-        localpoints = ft_var_readpackedpoints( stream,
-                                               table_len,
-                                               &point_count );
+        localpoints = ft_var_readpackedpoints( stream, &point_count );
         points      = localpoints;
       }
       else
@@ -3693,14 +3670,13 @@
       }
 
       deltas = ft_var_readpackeddeltas( stream,
-                                        table_len,
                                         point_count == 0 ? face->cvt_size
                                                          : point_count );
 
       if ( !points || !deltas )
         ; /* failure, ignore it */
 
-      else if ( localpoints == ALL_POINTS )
+      else if ( points == ALL_POINTS )
       {
 #ifdef FT_DEBUG_LEVEL_TRACE
         int  count = 0;
@@ -3794,8 +3770,8 @@
     for ( i = 0; i < face->cvt_size; i++ )
       face->cvt[i] += FT_fixedToFdot6( cvt_deltas[i] );
 
-    /* iterate over all FT_Size objects and set `cvt_ready' to -1 */
-    /* to trigger rescaling of all CVT values                     */
+    /* Iterate over all `FT_Size` objects and set `cvt_ready` to -1 */
+    /* to trigger rescaling of all CVT values.                      */
     FT_List_Iterate( &root->sizes_list,
                      tt_cvt_ready_iterator,
                      NULL );
@@ -4142,9 +4118,8 @@
 
       FT_Stream_SeekSet( stream, offsetToData );
 
-      sharedpoints = ft_var_readpackedpoints( stream,
-                                              blend->gvar_size,
-                                              &spoint_count );
+      sharedpoints = ft_var_readpackedpoints( stream, &spoint_count );
+
       offsetToData = FT_Stream_FTell( stream );
 
       FT_Stream_SeekSet( stream, here );
@@ -4228,9 +4203,7 @@
 
       if ( tupleIndex & GX_TI_PRIVATE_POINT_NUMBERS )
       {
-        localpoints = ft_var_readpackedpoints( stream,
-                                               blend->gvar_size,
-                                               &point_count );
+        localpoints = ft_var_readpackedpoints( stream, &point_count );
         points      = localpoints;
       }
       else
@@ -4240,11 +4213,9 @@
       }
 
       deltas_x = ft_var_readpackeddeltas( stream,
-                                          blend->gvar_size,
                                           point_count == 0 ? n_points
                                                            : point_count );
       deltas_y = ft_var_readpackeddeltas( stream,
-                                          blend->gvar_size,
                                           point_count == 0 ? n_points
                                                            : point_count );
 

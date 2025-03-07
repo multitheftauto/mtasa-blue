@@ -59,6 +59,7 @@ private:
     void UnloadDFF();
     void InternalRestoreModel(unsigned short usModel);
 
+    bool ReplaceClothes(ushort usModel);
     bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
     bool ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
     bool ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);

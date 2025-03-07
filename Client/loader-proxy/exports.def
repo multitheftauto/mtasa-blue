@@ -1,5 +1,5 @@
 EXPORTS
-    timeBeginPeriod=noreturn
-    timeEndPeriod=noreturn
-    timeGetDevCaps=noreturn
-    timeGetTime=noreturn
+    timeBeginPeriod=winmm.timeBeginPeriod
+    timeEndPeriod=winmm.timeEndPeriod
+    timeGetDevCaps=winmm.timeGetDevCaps
+    timeGetTime=winmm.timeGetTime

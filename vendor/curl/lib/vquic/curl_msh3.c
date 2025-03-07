@@ -132,15 +132,23 @@ struct cf_msh3_ctx {
 
 static void h3_stream_hash_free(void *stream);
 
-static void cf_msh3_ctx_init(struct cf_msh3_ctx *ctx,
-                             const struct Curl_addrinfo *ai)
+static CURLcode cf_msh3_ctx_init(struct cf_msh3_ctx *ctx,
+                                 const struct Curl_addrinfo *ai)
 {
+  CURLcode result;
+
   DEBUGASSERT(!ctx->initialized);
   Curl_hash_offt_init(&ctx->streams, 63, h3_stream_hash_free);
-  Curl_sock_assign_addr(&ctx->addr, ai, TRNSPRT_QUIC);
+
+  result = Curl_sock_assign_addr(&ctx->addr, ai, TRNSPRT_QUIC);
+  if(result)
+    return result;
+
   ctx->sock[SP_LOCAL] = CURL_SOCKET_BAD;
   ctx->sock[SP_REMOTE] = CURL_SOCKET_BAD;
   ctx->initialized = TRUE;
+
+  return result;
 }
 
 static void cf_msh3_ctx_free(struct cf_msh3_ctx *ctx)
@@ -433,10 +441,10 @@ static bool MSH3_CALL msh3_data_received(MSH3_REQUEST *Request,
   CURLcode result;
   bool rv = FALSE;
 
-  /* TODO: we would like to limit the amount of data we are buffer here.
-   * There seems to be no mechanism in msh3 to adjust flow control and
-   * it is undocumented what happens if we return FALSE here or less
-   * length (buflen is an inout parameter).
+  /* We would like to limit the amount of data we are buffer here. There seems
+   * to be no mechanism in msh3 to adjust flow control and it is undocumented
+   * what happens if we return FALSE here or less length (buflen is an inout
+   * parameter).
    */
   (void)Request;
   if(!stream)
@@ -695,8 +703,8 @@ static ssize_t cf_msh3_send(struct Curl_cfilter *cf, struct Curl_easy *data,
       goto out;
     }
 
-    /* TODO - msh3/msquic will hold onto this memory until the send complete
-       event. How do we make sure curl does not free it until then? */
+    /* msh3/msquic will hold onto this memory until the send complete event.
+       How do we make sure curl does not free it until then? */
     *err = CURLE_OK;
     nwritten = len;
   }
@@ -830,7 +838,7 @@ static CURLcode cf_connect_start(struct Curl_cfilter *cf,
   MSH3_SET_PORT(&addr, (uint16_t)cf->conn->remote_port);
 
   if(verify && (conn_config->CAfile || conn_config->CApath)) {
-    /* TODO: need a way to provide trust anchors to MSH3 */
+    /* Need a way to provide trust anchors to MSH3 */
 #ifdef DEBUGBUILD
     /* we need this for our test cases to run */
     CURL_TRC_CF(data, cf, "non-standard CA not supported, "
@@ -910,7 +918,6 @@ static CURLcode cf_msh3_connect(struct Curl_cfilter *cf,
     if(ctx->handshake_succeeded) {
       CURL_TRC_CF(data, cf, "handshake succeeded");
       cf->conn->bits.multiplex = TRUE; /* at least potentially multiplexed */
-      cf->conn->httpversion = 30;
       cf->connected = TRUE;
       cf->conn->alpn = CURL_HTTP_VERSION_3;
       *done = TRUE;
@@ -999,7 +1006,7 @@ static CURLcode cf_msh3_query(struct Curl_cfilter *cf,
 
   switch(query) {
   case CF_QUERY_MAX_CONCURRENT: {
-    /* TODO: we do not have access to this so far, fake it */
+    /* We do not have access to this so far, fake it */
     (void)ctx;
     *pres1 = 100;
     return CURLE_OK;
@@ -1017,6 +1024,9 @@ static CURLcode cf_msh3_query(struct Curl_cfilter *cf,
       *when = ctx->handshake_at;
     return CURLE_OK;
   }
+  case CF_QUERY_HTTP_VERSION:
+    *pres1 = 30;
+    return CURLE_OK;
   default:
     break;
   }
@@ -1039,7 +1049,7 @@ static bool cf_msh3_conn_is_alive(struct Curl_cfilter *cf,
 
 struct Curl_cftype Curl_cft_http3 = {
   "HTTP/3",
-  CF_TYPE_IP_CONNECT | CF_TYPE_SSL | CF_TYPE_MULTIPLEX,
+  CF_TYPE_IP_CONNECT | CF_TYPE_SSL | CF_TYPE_MULTIPLEX | CF_TYPE_HTTP,
   0,
   cf_msh3_destroy,
   cf_msh3_connect,
@@ -1081,13 +1091,16 @@ CURLcode Curl_cf_msh3_create(struct Curl_cfilter **pcf,
 
   (void)data;
   (void)conn;
-  (void)ai; /* TODO: msh3 resolves itself? */
+  (void)ai; /* msh3 resolves itself? */
   ctx = calloc(1, sizeof(*ctx));
   if(!ctx) {
     result = CURLE_OUT_OF_MEMORY;
     goto out;
   }
-  cf_msh3_ctx_init(ctx, ai);
+
+  result = cf_msh3_ctx_init(ctx, ai);
+  if(result)
+    goto out;
 
   result = Curl_cf_create(&cf, &Curl_cft_http3, ctx);
 

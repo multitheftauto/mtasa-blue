@@ -1310,6 +1310,11 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_POSITION, *BitStream.pBitStream));
     }
 
+    // Restore jetpack
+    CPed* ped = IS_PED(pElement) ? static_cast<CPed*>(pElement) : nullptr;
+    if (ped && ped->HasJetPack())
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, GIVE_PED_JETPACK, *BitStream.pBitStream));
+
     return true;
 }
 
@@ -1477,6 +1482,12 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
         BitStream.pBitStream->Write(static_cast<unsigned char>((bSetPosition) ? 1 : 0));
         if (bSetPosition)
         {
+            if (IS_PLAYER(pElement))
+            {
+                CPlayer* player = static_cast<CPlayer*>(pElement);
+                player->SetTeleported(true);
+            }
+
             BitStream.pBitStream->Write(vecPosition.fX);
             BitStream.pBitStream->Write(vecPosition.fY);
             BitStream.pBitStream->Write(vecPosition.fZ);

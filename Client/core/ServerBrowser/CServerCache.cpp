@@ -186,6 +186,10 @@ bool CServerCache::LoadServerCache()
 
         MapSet(m_ServerCachedMap, key, info);
     }
+
+    delete pNode;
+    delete m_pConfigFile;
+
     return true;
 }
 
@@ -302,6 +306,9 @@ void CServerCache::StaticSaveServerCache()
     XMLAccess.SetSubNodeValue(CONFIG_NODE_SERVER_INT "11", dataSet);
 
     m_pConfigFile->Write();
+
+    delete pNode;
+    delete m_pConfigFile;
 }
 
 ///////////////////////////////////////////////////////////////

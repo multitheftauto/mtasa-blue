@@ -59,7 +59,7 @@ CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameIn
     return m_buildingPool.entities[poolIndex].pClientEntity;
 }
 
-CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior)
+CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior)
 {
     if (!HasFreeBuildingSlot())
         return nullptr;
@@ -72,15 +72,12 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
         modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
 
     // Load building
-    SFileObjectInstance instance;
+    SFileObjectInstance instance{};
     instance.modelID = modelId;
     instance.lod = -1;
     instance.interiorID = interior;
     instance.position = *vPos;
-    instance.rotation = *vRot;
-
-    // Fix strange SA rotation
-    instance.rotation.fW = -instance.rotation.fW;
+    instance.rotation = {};
 
     auto pBuilding = static_cast<CBuildingSAInterface*>(CFileLoaderSA::LoadObjectInstance(&instance));
 
@@ -98,6 +95,22 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
 
     // Add building in world
     auto pBuildingSA = new CBuildingSA(pBuilding);
+
+    if (pBuilding->HasMatrix())
+    {
+        // Edge case for the traincross2 (1374) model
+        // LoadObjectInstance allocates a matrix for the model
+        // We need allocate our own matrix and put the old matrix in the original pool
+        pBuildingSA->ReallocateMatrix();
+    }
+    else if (vRot->fX != 0 || vRot->fY != 0)
+    {
+        // Allocate matrix in our unlimited storage instead of using the shared pool.
+        pBuildingSA->AllocateMatrix();
+    }
+
+    pBuilding->SetOrientation(vRot->fX, vRot->fY, vRot->fZ);
+
     pGame->GetWorld()->Add(pBuildingSA, CBuildingPool_Constructor);
 
     // Add CBuildingSA object in pool
@@ -116,6 +129,10 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     if (dwElementIndexInPool == UINT_MAX)
         return;
 
+    // Remove references to allocated matrix
+    auto* pBuildingSA = m_buildingPool.entities[dwElementIndexInPool].pEntity;
+    pBuildingSA->RemoveAllocatedMatrix();
+
     // Remove building from cover list
     pGame->GetCoverManager()->RemoveCover(pInterface);
 
@@ -128,22 +145,23 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     // Remove building from world
     pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
 
+    std::uint16_t modelId = pInterface->m_nModelIndex;
+
     // Call virtual destructor
-    ((void*(__thiscall*)(void*, char))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 0);
+    pInterface->Destructor(false);
 
     // Remove col reference
-    auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
+    auto modelInfo = pGame->GetModelInfo(modelId);
     modelInfo->RemoveColRef();
 
+    // Remove building from SA pool
+    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
+
     // Remove from BuildingSA pool
-    auto* pBuildingSA = m_buildingPool.entities[dwElementIndexInPool].pEntity;
     m_buildingPool.entities[dwElementIndexInPool] = {nullptr, nullptr};
 
     // Delete it from memory
     delete pBuildingSA;
-
-    // Remove building from SA pool
-    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
 
     // Decrease the count of elements in the pool
     --m_buildingPool.count;
@@ -154,7 +172,7 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
     if (m_pOriginalBuildingsBackup)
         return;
 
-    m_pOriginalBuildingsBackup = std::make_unique<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>>();
+    m_pOriginalBuildingsBackup = std::make_unique<backup_array_t>();
 
     auto pBuildsingsPool = (*m_ppBuildingPoolInterface);
     for (size_t i = 0; i < MAX_BUILDINGS; i++)
@@ -171,7 +189,7 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
             pBuildsingsPool->Release(i);
 
             (*m_pOriginalBuildingsBackup)[i].first = true;
-            (*m_pOriginalBuildingsBackup)[i].second = *building;
+            std::memcpy(&(*m_pOriginalBuildingsBackup)[i].second, building, sizeof(CBuildingSAInterface));
         }
         else
         {
@@ -194,9 +212,8 @@ void CBuildingsPoolSA::RestoreBackup()
     {
         if (originalData[i].first)
         {
-            pBuildsingsPool->AllocateAt(i);
-            auto pBuilding = pBuildsingsPool->GetObject(i);
-            *pBuilding = originalData[i].second;
+            auto* pBuilding = pBuildsingsPool->AllocateAtNoInit(i);
+            std::memcpy(pBuilding, &originalData[i].second, sizeof(CBuildingSAInterface));
 
             worldSA->Add(pBuilding, CBuildingPool_Constructor);
             buildingRemovealSA->AddDataBuilding(pBuilding);
@@ -304,13 +321,13 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
 
 void CBuildingsPoolSA::UpdateBackupLodPointers(uint32_t offset)
 {
-    std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS> *arr = m_pOriginalBuildingsBackup.get();
+    backup_array_t* arr = m_pOriginalBuildingsBackup.get();
     for (auto i = 0; i < MAX_BUILDINGS; i++)
     {
-        std::pair<bool, CBuildingSAInterface>* data = &(*arr)[i];
+        std::pair<bool, building_buffer_t>* data = &(*arr)[i];
         if (data->first)
         {
-            CBuildingSAInterface* building = &data->second;
+            CBuildingSAInterface* building = reinterpret_cast<CBuildingSAInterface*>(&data->second);
             if (building->m_pLod != nullptr)
             {
                 building->m_pLod = (CBuildingSAInterface*)((uint32_t)building->m_pLod + offset);
