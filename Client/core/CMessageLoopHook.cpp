@@ -200,8 +200,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
         if (pCDS->dwData == URI_CONNECT)
         {
             // We can receive this message before we are ready to process it (e.g. trying to show a CEGUI message window before CEGUI is initialized).
-            // Ignore these messages until we are in the main menu (when CCore sets m_bFirstFrame to false)
-            if (!g_pCore->IsFirstFrame())
+            if (g_pCore->IsNetworkReady())
             {
                 LPSTR szConnectInfo = (LPSTR)pCDS->lpData;
                 CCommandFuncs::Connect(szConnectInfo);
@@ -456,7 +455,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             }
 
             // Lead the message through the keybinds message processor
-            if (!g_pCore->IsFirstFrame())
+            if (g_pCore->CanHandleKeyMessages())
             {
                 g_pCore->GetKeyBinds()->ProcessMessage(hwnd, uMsg, wParam, lParam);
             }

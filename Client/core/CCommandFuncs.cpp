@@ -186,6 +186,12 @@ void CCommandFuncs::Unload(const char* szParameters)
 
 void CCommandFuncs::Connect(const char* szParameters)
 {
+    if (!CCore::GetSingleton().IsNetworkReady())
+    {
+        CCore::GetSingleton().GetConsole()->Print(_("connect: Network is not ready, please wait a moment"));
+        return;
+    }
+
     // Parse the arguments (host port nick pass)
     char szBuffer[256] = "";
     if (szParameters)
@@ -273,6 +279,12 @@ void CCommandFuncs::ReloadNews(const char* szParameters)
 
 void CCommandFuncs::Reconnect(const char* szParameters)
 {
+    if (!CCore::GetSingleton().IsNetworkReady())
+    {
+        CCore::GetSingleton().GetConsole()->Print(_("reconnect: Network is not ready, please wait a moment"));
+        return;
+    }
+
     CModManager::GetSingleton().Unload();
 
     std::string  strHost, strNick, strPassword;

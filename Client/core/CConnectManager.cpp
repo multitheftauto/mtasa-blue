@@ -52,6 +52,12 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     assert(szNick);
     assert(szPassword);
 
+    if (!CCore::GetSingleton().IsNetworkReady())
+    {
+        CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->ShowNetworkNotReadyWindow();
+        return false;
+    }
+
     m_bNotifyServerBrowser = bNotifyServerBrowser;
 
     // For detecting startup problems
@@ -337,10 +343,13 @@ void CConnectManager::DoPulse()
     }
     else if (m_bReconnect)
     {
-        std::string strNick;
-        CVARS_GET("nick", strNick);
-        Connect(m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str(), false);
-        m_bReconnect = false;
+        if (CCore::GetSingleton().IsNetworkReady())
+        {
+            std::string strNick;
+            CVARS_GET("nick", strNick);
+            Connect(m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str(), false);
+            m_bReconnect = false;
+        }
     }
 }
 

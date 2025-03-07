@@ -117,13 +117,11 @@ CCore::CCore()
     m_pfnMessageProcessor = NULL;
     m_pMessageBox = NULL;
 
-    m_bFirstFrame = true;
     m_bIsOfflineMod = false;
     m_bQuitOnPulse = false;
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
-    m_bWaitToSetNick = false;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Create our Direct3DData handler.
@@ -151,7 +149,6 @@ CCore::CCore()
     m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
     m_uiServerFrameRateLimit = 0;
-    m_uiNewNickWaitFrames = 0;
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
@@ -1236,16 +1233,22 @@ void CCore::DoPostFramePulse()
     // This is the first frame in the menu?
     if (m_pGame->GetSystemState() == 7)            // GS_FRONTEND
     {
-        if (m_bFirstFrame)
-        {
-            m_bFirstFrame = false;
+        if (m_menuFrame < 255)
+            ++m_menuFrame;
 
+        if (m_menuFrame == 1)
+        {
             WatchDogCompletedSection("L2");            // gta_sa.set seems ok
             WatchDogCompletedSection("L3");            // No hang on startup
             HandleCrashDumpEncryption();
 
             // Disable vsync while it's all dark
             m_pGame->DisableVSync();
+        }
+
+        if (m_menuFrame >= 5 && !m_isNetworkReady && m_pNet->IsReady())
+        {
+            m_isNetworkReady = true;
 
             // Parse the command line
             // Does it begin with mtasa://?
@@ -1269,16 +1272,11 @@ void CCore::DoPostFramePulse()
             }
         }
 
-        if (m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
+        if (m_menuFrame >= 75 && m_requestNewNickname && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
         {
-            if (m_uiNewNickWaitFrames > 75)
-            {
-                // Request a new nickname if we're waiting for one
-                GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
-                m_bWaitToSetNick = false;
-            }
-            else
-                m_uiNewNickWaitFrames++;
+            // Request a new nickname if we're waiting for one
+            GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
+            m_requestNewNickname = false;
         }
     }
 
