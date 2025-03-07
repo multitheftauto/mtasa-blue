@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-07 20:23+0000\n"
-"PO-Revision-Date: 2025-03-07 20:31\n"
+"PO-Revision-Date: 2025-03-07 21:40\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -1430,7 +1430,7 @@ msgstr "AVERTISMENT DECONECTARE"
 
 #: Client/core/CMainMenu.cpp:1209
 msgid "INFORMATION"
-msgstr ""
+msgstr "INFORMAȚIE"
 
 #: Client/core/CMainMenu.cpp:1211 Client/core/CVersionUpdater.cpp:2088
 #: Client/core/CVersionUpdater.cpp:2098
@@ -1448,7 +1448,7 @@ msgstr "* Timpul este %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "conectare: Rețeaua nu este gata, te rugăm așteaptă un moment"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -1474,7 +1474,7 @@ msgstr "connect: Dezactivarea modificării curente a eșuat"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "reconectare: Rețeaua nu este gata, te rugăm așteaptă un moment"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
