@@ -1208,7 +1208,7 @@ void CMainMenu::ShowNetworkNotReadyWindow()
     window.Reset();
     window.SetTitle(_("INFORMATION"));
     window.SetMessage("\n\nThe network module is not ready.\nPlease wait a moment and try again.");
-    window.SetButton(0, _("Ok"));
+    window.SetButton(0, _("OK"));
     window.SetCallback(HideQuestionWindow, &window);
     window.Show();
 }
