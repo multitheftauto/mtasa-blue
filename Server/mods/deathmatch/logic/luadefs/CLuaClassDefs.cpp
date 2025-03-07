@@ -323,6 +323,8 @@ const char* CLuaClassDefs::GetElementClass(CElement* pElement)
             return "Blip";
         case CElement::OBJECT:
             return "Object";
+        case CElement::BUILDING:
+            return "Building";
         case CElement::PICKUP:
             return "Pickup";
         case CElement::RADAR_AREA:
