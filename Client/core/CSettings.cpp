@@ -3365,7 +3365,7 @@ void CSettings::SaveData()
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
 
     // Set and save our settings
-    if (CModManager::GetSingleton().GetCurrentMod() != NULL)
+    if (CModManager::GetSingleton().IsLoaded())
     {
         CVARS_GET("nick", strVar);
         if (m_pEditNick->GetText().compare(strVar) != 0)

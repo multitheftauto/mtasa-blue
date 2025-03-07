@@ -483,7 +483,7 @@ void CModelCacheManagerImpl::SubModelRefCount(ushort usModelId)
 bool CModelCacheManagerImpl::UnloadModel(ushort usModelId)
 {
     // Stream out usages in the client module
-    CClientBase* pClientBase = CModManager::GetSingleton().GetCurrentMod();
+    CClientBase* pClientBase = CModManager::GetSingleton().GetClient();
     if (pClientBase)
         pClientBase->RestreamModel(usModelId);
 
