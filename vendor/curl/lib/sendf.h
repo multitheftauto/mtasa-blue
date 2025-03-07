@@ -166,9 +166,6 @@ CURLcode Curl_cwriter_add(struct Curl_easy *data,
 struct Curl_cwriter *Curl_cwriter_get_by_type(struct Curl_easy *data,
                                               const struct Curl_cwtype *cwt);
 
-void Curl_cwriter_remove_by_name(struct Curl_easy *data,
-                                 const char *name);
-
 struct Curl_cwriter *Curl_cwriter_get_by_name(struct Curl_easy *data,
                                               const char *name);
 
@@ -218,6 +215,7 @@ struct Curl_crtype {
                           struct Curl_creader *reader, curl_off_t offset);
   CURLcode (*rewind)(struct Curl_easy *data, struct Curl_creader *reader);
   CURLcode (*unpause)(struct Curl_easy *data, struct Curl_creader *reader);
+  bool (*is_paused)(struct Curl_easy *data, struct Curl_creader *reader);
   void (*done)(struct Curl_easy *data,
                struct Curl_creader *reader, int premature);
   size_t creader_size;  /* sizeof() allocated struct Curl_creader */
@@ -268,6 +266,8 @@ CURLcode Curl_creader_def_rewind(struct Curl_easy *data,
                                  struct Curl_creader *reader);
 CURLcode Curl_creader_def_unpause(struct Curl_easy *data,
                                   struct Curl_creader *reader);
+bool Curl_creader_def_is_paused(struct Curl_easy *data,
+                                struct Curl_creader *reader);
 void Curl_creader_def_done(struct Curl_easy *data,
                            struct Curl_creader *reader, int premature);
 
@@ -374,6 +374,11 @@ CURLcode Curl_creader_resume_from(struct Curl_easy *data, curl_off_t offset);
  * Unpause all installed readers.
  */
 CURLcode Curl_creader_unpause(struct Curl_easy *data);
+
+/**
+ * Return TRUE iff any of the installed readers is paused.
+ */
+bool Curl_creader_is_paused(struct Curl_easy *data);
 
 /**
  * Tell all client readers that they are done.

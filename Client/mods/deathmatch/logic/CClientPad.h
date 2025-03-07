@@ -23,6 +23,7 @@ public:
     static const char* GetControlName(unsigned int uiIndex);
 
     static bool GetAnalogControlIndex(const char* szName, unsigned int& uiIndex);
+    static void InitAnalogControlStates();
 
     CClientPad();
 

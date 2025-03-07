@@ -24,6 +24,7 @@ public:
     virtual CProjectileInfo* GetProjectileInfo(void* projectileInfoInterface) = 0;            // don't use
     virtual void             RemoveProjectile(CProjectileInfo* pProjectileInfo, CProjectile* pProjectile, bool bBlow = true) = 0;
     virtual CProjectileInfo* GetProjectileInfo(DWORD Index) = 0;
+    virtual void             RemoveEntityReferences(CEntity* entity) = 0;
 
     virtual CEntity* GetTarget() = 0;
     virtual void     SetTarget(CEntity* pEntity) = 0;

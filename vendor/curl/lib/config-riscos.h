@@ -28,15 +28,9 @@
 /*               Hand crafted config file for RISC OS               */
 /* ================================================================ */
 
-/* Name of this package! */
-#undef PACKAGE
-
-/* Version number of this archive. */
-#undef VERSION
-
 /* Define cpu-machine-OS */
-#ifndef OS
-#define OS "ARM-RISC OS"
+#ifndef CURL_OS
+#define CURL_OS "ARM-RISC OS"
 #endif
 
 /* Define if you want the built-in manual */
@@ -62,9 +56,6 @@
 
 /* Define this to 'int' if ssize_t is not an available typedefed type */
 #undef ssize_t
-
-/* Define this as a suitable file to read random data from */
-#undef RANDOM_FILE
 
 /* Define if you have the alarm function. */
 #define HAVE_ALARM
@@ -107,12 +98,6 @@
 
 /* Define if you have the <io.h> header file. */
 #undef HAVE_IO_H
-
-/* Define if you have the `socket' library (-lsocket). */
-#undef HAVE_LIBSOCKET
-
-/* Define if you need the malloc.h header file even with stdlib.h  */
-/* #define NEED_MALLOC_H 1 */
 
 /* Define if you have the <netdb.h> header file. */
 #define HAVE_NETDB_H
@@ -189,9 +174,6 @@
 /* Define if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H
 
-/* Name of package */
-#undef PACKAGE
-
 /* The size of `int', as computed by sizeof. */
 #define SIZEOF_INT 4
 
@@ -206,13 +188,6 @@
 
 /* Version number of package */
 #undef VERSION
-
-/* Define if on AIX 3.
-   System headers sometimes define this.
-   We just want to avoid a redefinition error message.  */
-#ifndef _ALL_SOURCE
-# undef _ALL_SOURCE
-#endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS

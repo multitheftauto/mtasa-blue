@@ -29,11 +29,29 @@
 char *Curl_inet_ntop(int af, const void *addr, char *buf, size_t size);
 
 #ifdef HAVE_INET_NTOP
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
+#ifdef _WIN32
+#if defined(_MSC_VER) && (_MSC_VER <= 1900)
+#define Curl_inet_ntop(af,addr,buf,size) inet_ntop(af, (void *)addr, buf, size)
+#else
+#define Curl_inet_ntop(af,addr,buf,size) inet_ntop(af, addr, buf, size)
+#endif
+#elif defined(__AMIGA__)
 #define Curl_inet_ntop(af,addr,buf,size) \
-        inet_ntop(af, addr, buf, (curl_socklen_t)size)
+        (char *)inet_ntop(af, (void *)addr, (unsigned char *)buf, \
+                          (curl_socklen_t)(size))
+#else
+#define Curl_inet_ntop(af,addr,buf,size) \
+        inet_ntop(af, addr, buf, (curl_socklen_t)(size))
+#endif
 #endif
 
 #endif /* HEADER_CURL_INET_NTOP_H */

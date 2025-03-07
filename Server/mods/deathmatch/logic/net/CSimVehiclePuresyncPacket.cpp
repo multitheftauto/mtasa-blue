@@ -251,6 +251,9 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             m_sharedControllerState.RightShoulder2 = BitStream.ReadBit() * 255;
         }
 
+        if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
+            m_Cache.isOnFire = BitStream.ReadBit();
+
         // Success
         return true;
     }
@@ -417,6 +420,9 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             damage.data.lights.data.ucStates = m_DamageInfo.m_ucLightStates;
             BitStream.Write(&damage);
         }
+
+        if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
+            BitStream.WriteBit(m_Cache.isOnFire);
 
         // Success
         return true;

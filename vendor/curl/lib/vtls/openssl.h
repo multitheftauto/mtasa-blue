@@ -31,12 +31,27 @@
  * This header should only be needed to get included by vtls.c, openssl.c
  * and ngtcp2.c
  */
+#include <openssl/opensslv.h>
 #include <openssl/ossl_typ.h>
 #include <openssl/ssl.h>
 
 #include "urldata.h"
 
-/* Struct to hold a Curl OpenSSL instance */
+/*
+ * Whether SSL_CTX_set_keylog_callback is available.
+ * OpenSSL: supported since 1.1.1 https://github.com/openssl/openssl/pull/2287
+ * BoringSSL: supported since d28f59c27bac (committed 2015-11-19)
+ * LibreSSL: not supported. 3.5.0+ has a stub function that does nothing.
+ */
+#if (OPENSSL_VERSION_NUMBER >= 0x10101000L && \
+     !defined(LIBRESSL_VERSION_NUMBER)) || \
+    defined(OPENSSL_IS_BORINGSSL)
+#define HAVE_KEYLOG_CALLBACK
+#endif
+
+struct ssl_peer;
+
+/* Struct to hold a curl OpenSSL instance */
 struct ossl_ctx {
   /* these ones requires specific SSL-types */
   SSL_CTX* ssl_ctx;
@@ -45,12 +60,15 @@ struct ossl_ctx {
   BIO_METHOD *bio_method;
   CURLcode io_result;       /* result of last BIO cfilter operation */
 #ifndef HAVE_KEYLOG_CALLBACK
-  /* Set to true once a valid keylog entry has been created to avoid dupes. */
-  BIT(keylog_done);
+  /* Set to true once a valid keylog entry has been created to avoid dupes.
+     This is a bool and not a bitfield because it is passed by address. */
+  bool keylog_done;
 #endif
   BIT(x509_store_setup);            /* x509 store has been set up */
   BIT(reused_session);              /* session-ID was reused for this */
 };
+
+size_t Curl_ossl_version(char *buffer, size_t size);
 
 typedef CURLcode Curl_ossl_ctx_setup_cb(struct Curl_cfilter *cf,
                                         struct Curl_easy *data,
@@ -62,7 +80,6 @@ CURLcode Curl_ossl_ctx_init(struct ossl_ctx *octx,
                             struct Curl_cfilter *cf,
                             struct Curl_easy *data,
                             struct ssl_peer *peer,
-                            int transport, /* TCP or QUIC */
                             const unsigned char *alpn, size_t alpn_len,
                             Curl_ossl_ctx_setup_cb *cb_setup,
                             void *cb_user_data,
@@ -73,18 +90,7 @@ CURLcode Curl_ossl_ctx_init(struct ossl_ctx *octx,
 #define SSL_get1_peer_certificate SSL_get_peer_certificate
 #endif
 
-CURLcode Curl_ossl_verifyhost(struct Curl_easy *data, struct connectdata *conn,
-                              struct ssl_peer *peer, X509 *server_cert);
 extern const struct Curl_ssl Curl_ssl_openssl;
-
-CURLcode Curl_ossl_set_client_cert(struct Curl_easy *data,
-                                   SSL_CTX *ctx, char *cert_file,
-                                   const struct curl_blob *cert_blob,
-                                   const char *cert_type, char *key_file,
-                                   const struct curl_blob *key_blob,
-                                   const char *key_type, char *key_passwd);
-
-CURLcode Curl_ossl_certchain(struct Curl_easy *data, SSL *ssl);
 
 /**
  * Setup the OpenSSL X509_STORE in `ssl_ctx` for the cfilter `cf` and
@@ -104,8 +110,10 @@ CURLcode Curl_ossl_ctx_configure(struct Curl_cfilter *cf,
  */
 CURLcode Curl_ossl_add_session(struct Curl_cfilter *cf,
                                struct Curl_easy *data,
-                               const struct ssl_peer *peer,
-                               SSL_SESSION *ssl_sessionid);
+                               const char *ssl_peer_key,
+                               SSL_SESSION *ssl_sessionid,
+                               int ietf_tls_id,
+                               const char *alpn);
 
 /*
  * Get the server cert, verify it and show it, etc., only call failf() if

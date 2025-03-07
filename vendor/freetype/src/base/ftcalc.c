@@ -897,11 +897,11 @@
 
 #ifndef FT_INT64
 
-    /* Algorithm by Christophe Meessen (1993) with overflow fixed and    */
-    /* rounding added.  Any unsigned fixed 16.16 argument is acceptable. */
-    /* However, this algorithm is slower than the Babylonian method with */
-    /* a good initial guess. We only use it for large 32-bit values when */
-    /* 64-bit computations are not desirable.                            */
+    /* Algorithm by Christophe Meessen (1993) with overflow fixed and     */
+    /* rounding added.  Any unsigned fixed 16.16 argument is acceptable.  */
+    /* However, this algorithm is slower than the Babylonian method with  */
+    /* a good initial guess.  We only use it for large 32-bit values when */
+    /* 64-bit computations are not desirable.                             */
     else if ( v > 0x10000U )
     {
       FT_UInt32  r = v >> 1;
@@ -920,8 +920,8 @@
         }
         r <<= 1;
         b >>= 1;
-      }
-      while ( b > 0x10 );  /* exactly 25 cycles */
+
+      } while ( b > 0x10 );  /* exactly 25 cycles */
 
       return ( q + 0x40 ) >> 7;
     }
@@ -946,8 +946,8 @@
       {
         t = q;
         q = ( t + (FT_UInt32)( r / t ) + 1 ) >> 1;
-      }
-      while ( q != t );  /* less than 6 cycles */
+
+      } while ( q != t );  /* less than 6 cycles */
 
       return q;
     }

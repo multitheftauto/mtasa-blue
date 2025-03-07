@@ -38,7 +38,7 @@ public:
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);
-    LUA_DECLARE(GetPedArmor);
+    static float GetPedArmor(CClientPed* const ped) noexcept;
     LUA_DECLARE(IsPedChoking);
     LUA_DECLARE(IsPedDucked);
     LUA_DECLARE(IsPedInVehicle);
@@ -65,12 +65,15 @@ public:
     static bool UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* entity);
     LUA_DECLARE_OOP(GetPedBonePosition);
     LUA_DECLARE(GetPedClothes);
-    LUA_DECLARE(GetPedControlState);
+    static bool GetPedControlState(std::variant<CClientPed*, std::string> first, std::optional<std::string> maybeControl);
     LUA_DECLARE(GetPedAnalogControlState);
     LUA_DECLARE(IsPedSunbathing);
     LUA_DECLARE(IsPedDoingGangDriveby);
     LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedAnimation);
+    static float GetPedAnimationProgress(CClientPed* ped);
+    static float GetPedAnimationSpeed(CClientPed* ped);
+    static float GetPedAnimationLength(CClientPed* ped);
     LUA_DECLARE(GetPedMoveState);
     LUA_DECLARE(GetPedMoveAnim);
     LUA_DECLARE(IsPedHeadless);
@@ -90,10 +93,11 @@ public:
     static bool SetPedArmor(CClientPed* const ped, const float armor);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);
-    LUA_DECLARE(IsPedReloadingWeapon);
+    static bool IsPedReloadingWeapon(CClientPed* const ped) noexcept;
     LUA_DECLARE(AddPedClothes);
     LUA_DECLARE(RemovePedClothes);
-    LUA_DECLARE(SetPedControlState);
+    static bool SetPedControlState(std::variant<CClientPed*, std::string> first, std::variant<std::string, bool> second,
+                                   std::optional<bool> maybeState);
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
     static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);
@@ -112,4 +116,8 @@ public:
     static bool SetPedExitVehicle(CClientPed* pPed);
     static bool IsPedBleeding(CClientPed* ped);
     static bool SetPedBleeding(CClientPed* ped, bool bleeding);
+    
+    static bool killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully);
+
+    static void PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probabilty);
 };

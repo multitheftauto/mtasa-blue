@@ -32,17 +32,9 @@
 #define CURL_DISABLE_LDAP 1
 
 #define NEED_REENTRANT 1
-#ifndef OS
-#define OS "plan9"
+#ifndef CURL_OS
+#define CURL_OS "plan9"
 #endif
-#define PACKAGE "curl"
-#define PACKAGE_NAME "curl"
-#define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.se/mail/"
-#define PACKAGE_STRING "curl -"
-#define PACKAGE_TARNAME "curl"
-#define PACKAGE_VERSION "-"
-#define RANDOM_FILE "/dev/random"
-#define VERSION "0.0.0" /* TODO */
 
 #define STDC_HEADERS 1
 
@@ -104,7 +96,7 @@
 #define USE_OPENSSL 1
 
 #define HAVE_PIPE 1
-#define HAVE_POLL_FINE 1
+#define HAVE_POLL 1
 #define HAVE_POLL_H 1
 #define HAVE_PTHREAD_H 1
 #define HAVE_SETLOCALE 1
@@ -114,7 +106,6 @@
 #define HAVE_SIGSETJMP 1
 #define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
 #define HAVE_SOCKET 1
-#define HAVE_SSL_GET_SHUTDOWN 1
 #define HAVE_STDBOOL_H 1
 #define HAVE_STRCASECMP 1
 #define HAVE_STRDUP 1

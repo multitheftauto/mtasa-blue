@@ -508,8 +508,8 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          int nol_pitch[6];
          spx_word16_t nol_pitch_coef[6];
 
-         bw_lpc(0.9, interp_lpc, bw_lpc1, NB_ORDER);
-         bw_lpc(0.55, interp_lpc, bw_lpc2, NB_ORDER);
+         bw_lpc(QCONST16(0.9,15), interp_lpc, bw_lpc1, NB_ORDER);
+         bw_lpc(QCONST16(0.55,15), interp_lpc, bw_lpc2, NB_ORDER);
 
          SPEEX_COPY(st->sw, st->winBuf, diff);
          SPEEX_COPY(st->sw+diff, in, NB_FRAME_SIZE-diff);

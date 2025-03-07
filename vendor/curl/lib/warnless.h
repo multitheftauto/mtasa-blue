@@ -39,8 +39,6 @@ unsigned char curlx_ultouc(unsigned long ulnum);
 
 int curlx_uztosi(size_t uznum);
 
-curl_off_t curlx_uztoso(size_t uznum);
-
 unsigned long curlx_uztoul(size_t uznum);
 
 unsigned int curlx_uztoui(size_t uznum);
@@ -60,14 +58,6 @@ int curlx_sztosi(ssize_t sznum);
 unsigned short curlx_uitous(unsigned int uinum);
 
 size_t curlx_sitouz(int sinum);
-
-#ifdef USE_WINSOCK
-
-int curlx_sktosi(curl_socket_t s);
-
-curl_socket_t curlx_sitosk(int i);
-
-#endif /* USE_WINSOCK */
 
 #if defined(_WIN32)
 

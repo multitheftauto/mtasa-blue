@@ -48,7 +48,6 @@
 #define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
 
-static int          WaitForMenu = 0;
 static const SColor headlineColors[] = {SColorRGBA(233, 234, 106, 255), SColorRGBA(233 / 6 * 4, 234 / 6 * 4, 106 / 6 * 4, 255),
                                         SColorRGBA(233 / 7 * 3, 234 / 7 * 3, 106 / 7 * 3, 255)};
 
@@ -70,11 +69,10 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     // Initialize
     m_pManager = pManager;
-    m_bIsVisible = false;
+    m_bIsVisible = true;
     m_bIsFullyVisible = false;
     m_bIsIngame = true;
     //    m_bIsInSubWindow = false;
-    m_bStarted = false;
     m_fFader = 0;
     m_ucFade = FADE_INVISIBLE;
     m_bCursorAlphaReset = false;
@@ -656,37 +654,15 @@ void CMainMenu::Update()
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
     if ((SystemState == 7 || SystemState == 9) && !m_bIsIngame)
     {
-        // Cope with early finish
-        if (pGame->HasCreditScreenFadedOut())
-            WaitForMenu = std::max(WaitForMenu, 250);
-
-        // Fade up
-        if (WaitForMenu >= 250)
+        if (!m_bStarted)
         {
-            m_bIsVisible = true;
             m_bStarted = true;
-        }
 
-        // Create headlines while the screen is still black
-        if (WaitForMenu == 250)
             m_pNewsBrowser->CreateHeadlines();
-
-        // Start updater after fade up is complete
-        if (WaitForMenu == 275)
             GetVersionUpdater()->EnableChecking(true);
 
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
-        if (WaitForMenu == 275)
-        {
-            CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
-        }
-#endif
-
-        if (WaitForMenu == 299)
-        {
-            if (!g_pCore->GetCVars()->GetValue("discord_rpc_share_data_firsttime", false)
-                && g_pCore->GetCVars()->GetValue("allow_discord_rpc", false)
-                && !g_pCore->GetCVars()->GetValue("discord_rpc_share_data", false))
+            if (!g_pCore->GetCVars()->GetValue("discord_rpc_share_data_firsttime", false) && g_pCore->GetCVars()->GetValue("allow_discord_rpc", false) &&
+                !g_pCore->GetCVars()->GetValue("discord_rpc_share_data", false))
             {
                 m_Settings.ShowRichPresenceShareDataQuestionBox();
                 CVARS_SET("discord_rpc_share_data_firsttime", true);
@@ -694,9 +670,6 @@ void CMainMenu::Update()
             else
                 CVARS_SET("discord_rpc_share_data_firsttime", true);
         }
-
-        if (WaitForMenu < 300)
-            WaitForMenu++;
     }
 
     // If we're visible
@@ -912,17 +885,13 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
-    // If we're right clicking, execute special command
-    if (!left)
+    if (left)
+        g_pCore->GetCommands()->Execute("reconnect", "");
+    else
     {
-        std::string command;
-        CVARS_GET("_beta_qc_rightclick_command", command);
-        g_pCore->GetCommands()->Execute(command.data());
-        return true;
+        m_ServerBrowser.SetVisible(true);
+        m_ServerBrowser.OnQuickConnectButtonClick();
     }
-
-    m_ServerBrowser.SetVisible(true);
-    m_ServerBrowser.OnQuickConnectButtonClick();
     return true;
 }
 
