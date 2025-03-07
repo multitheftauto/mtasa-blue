@@ -49,7 +49,8 @@ enum class StringEncodeFunction
     AES128,
     RSA,
     BASE64,
-    BASE32
+    BASE32,
+    ZLIB,
 };
 
 enum class KeyPairAlgorithm
@@ -65,6 +66,23 @@ enum class HmacAlgorithm
     SHA256,
     SHA384,
     SHA512,
+};
+
+enum class ZLibFormat
+{
+    AUTO = 0,
+    ZRAW = -15,
+    ZLIB = 15,
+    GZIP = 31,
+};
+
+enum class ZLibStrategy
+{
+    DEFAULT,
+    FILTERED,
+    HUFFMAN_ONLY,
+    RLE,
+    FIXED,
 };
 
 namespace SharedUtil

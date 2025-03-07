@@ -17,6 +17,7 @@
 #include <cryptopp/hmac.h>
 #include <cryptopp/hex.h>
 #include <cryptopp/md5.h>
+#include <zlib/zlib.h>
 #include "SString.h"
 
 namespace SharedUtil
@@ -202,4 +203,73 @@ namespace SharedUtil
 
         return result;
     }
+
+    inline int ZLibCompress(const std::string input, std::string* output, const ZLibFormat format = ZLibFormat::GZIP, const int compression = 9,
+                            const ZLibStrategy strategy = ZLibStrategy::DEFAULT)
+    {
+        z_stream stream{};
+
+        int result = deflateInit2(&stream, compression, Z_DEFLATED, (int)format, MAX_MEM_LEVEL, (int)strategy);
+        if (result != Z_OK)
+            return result;
+
+        output->resize(deflateBound(&stream, input.size())); // resize to the upper bound of what the compressed size might be
+
+        stream.next_out = (Bytef*)output->data();
+        stream.avail_out = output->size();
+
+        stream.next_in = (z_const Bytef*)input.data();
+        stream.avail_in = input.size();
+
+        result = deflate(&stream, Z_FINISH);
+        result |= deflateEnd(&stream);
+
+        if (result == Z_STREAM_END)
+            output->resize(stream.total_out); // resize to the actual size
+
+        return result;
+    }
+
+    inline int ZLibUncompress(const std::string& input, std::string* output, const ZLibFormat format = ZLibFormat::AUTO)
+    {
+        int windowBits = (int)format;
+        if (format == ZLibFormat::AUTO)
+        {
+            if (input[0] == 0x78)
+                windowBits = (int)ZLibFormat::ZLIB;
+            else if (input[0] == 0x1F)
+                windowBits = (int)ZLibFormat::GZIP;
+            else
+                windowBits = (int)ZLibFormat::ZRAW;
+        }
+        z_stream stream{};
+
+        int result = inflateInit2(&stream, windowBits);
+        if (result != Z_OK)
+            return result;
+
+        stream.next_in = (z_const Bytef*)input.data();
+        stream.avail_in = input.size();
+
+        // Uncompress in chunks
+        std::string buffer;
+        buffer.resize(std::min(stream.avail_in, 128000U)); // use input length for chunk size (capped to 128k bytes which should be efficient enough)
+        while (true)
+        {
+            stream.next_out = (Bytef*)buffer.data();
+            stream.avail_out = buffer.size();
+
+            result = inflate(&stream, Z_NO_FLUSH);
+            if (result != Z_OK && result != Z_STREAM_END)
+                break;
+
+            output->append(buffer, 0, stream.total_out - output->size()); // append only what was written to buffer
+
+            if (result == Z_STREAM_END)
+                break;
+        }
+        result |= inflateEnd(&stream);
+        return result;
+    }
+
 }            // namespace SharedUtil
