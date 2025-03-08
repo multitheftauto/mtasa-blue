@@ -2381,3 +2381,16 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     }
     return bReturn;
 }
+
+void CVehicleSA::ReinitAudio()
+{
+    auto* audioInterface = m_pVehicleAudioEntity->GetInterface();
+
+    audioInterface->TerminateAudio();
+    audioInterface->InitAudio(GetVehicleInterface());
+
+    CPed* pLocalPlayer = pGame->GetPedContext();
+
+    if (IsPassenger(pLocalPlayer) || GetDriver() == pLocalPlayer)
+        audioInterface->SoundJoin();
+}
