@@ -48,7 +48,6 @@
 #define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
 
-static int          WaitForMenu = 0;
 static const SColor headlineColors[] = {SColorRGBA(233, 234, 106, 255), SColorRGBA(233 / 6 * 4, 234 / 6 * 4, 106 / 6 * 4, 255),
                                         SColorRGBA(233 / 7 * 3, 234 / 7 * 3, 106 / 7 * 3, 255)};
 
@@ -70,11 +69,10 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     // Initialize
     m_pManager = pManager;
-    m_bIsVisible = false;
+    m_bIsVisible = true;
     m_bIsFullyVisible = false;
     m_bIsIngame = true;
     //    m_bIsInSubWindow = false;
-    m_bStarted = false;
     m_fFader = 0;
     m_ucFade = FADE_INVISIBLE;
     m_bCursorAlphaReset = false;
@@ -656,37 +654,15 @@ void CMainMenu::Update()
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
     if ((SystemState == 7 || SystemState == 9) && !m_bIsIngame)
     {
-        // Cope with early finish
-        if (pGame->HasCreditScreenFadedOut())
-            WaitForMenu = std::max(WaitForMenu, 250);
-
-        // Fade up
-        if (WaitForMenu >= 250)
+        if (!m_bStarted)
         {
-            m_bIsVisible = true;
             m_bStarted = true;
-        }
 
-        // Create headlines while the screen is still black
-        if (WaitForMenu == 250)
             m_pNewsBrowser->CreateHeadlines();
-
-        // Start updater after fade up is complete
-        if (WaitForMenu == 275)
             GetVersionUpdater()->EnableChecking(true);
 
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
-        if (WaitForMenu == 275)
-        {
-            CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
-        }
-#endif
-
-        if (WaitForMenu == 299)
-        {
-            if (!g_pCore->GetCVars()->GetValue("discord_rpc_share_data_firsttime", false)
-                && g_pCore->GetCVars()->GetValue("allow_discord_rpc", false)
-                && !g_pCore->GetCVars()->GetValue("discord_rpc_share_data", false))
+            if (!g_pCore->GetCVars()->GetValue("discord_rpc_share_data_firsttime", false) && g_pCore->GetCVars()->GetValue("allow_discord_rpc", false) &&
+                !g_pCore->GetCVars()->GetValue("discord_rpc_share_data", false))
             {
                 m_Settings.ShowRichPresenceShareDataQuestionBox();
                 CVARS_SET("discord_rpc_share_data_firsttime", true);
@@ -694,9 +670,6 @@ void CMainMenu::Update()
             else
                 CVARS_SET("discord_rpc_share_data_firsttime", true);
         }
-
-        if (WaitForMenu < 300)
-            WaitForMenu++;
     }
 
     // If we're visible
@@ -872,6 +845,19 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
                 break;
         }
     }
+    else if (!g_pCore->IsNetworkReady())
+    {
+        switch (m_pHoveredItem->menuType)
+        {
+            // case MENU_ITEM_QUICK_CONNECT:  // We only prevent it for left click in OnQuickConnectButtonClick.
+            case MENU_ITEM_HOST_GAME:
+            case MENU_ITEM_MAP_EDITOR:
+                ShowNetworkNotReadyWindow();
+                return true;
+            default:
+                break;
+        }
+    }
 
     switch (m_pHoveredItem->menuType)
     {
@@ -913,12 +899,21 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
         return false;
 
     if (left)
+    {
+        if (!g_pCore->IsNetworkReady())
+        {
+            ShowNetworkNotReadyWindow();
+            return true;
+        }
+
         g_pCore->GetCommands()->Execute("reconnect", "");
+    }
     else
     {
         m_ServerBrowser.SetVisible(true);
         m_ServerBrowser.OnQuickConnectButtonClick();
     }
+
     return true;
 }
 
@@ -971,7 +966,7 @@ bool CMainMenu::OnHostGameButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "local");
+    CModManager::GetSingleton().RequestLoad("local");
 
     return true;
 }
@@ -983,7 +978,7 @@ bool CMainMenu::OnEditorButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "editor");
+    CModManager::GetSingleton().RequestLoad("editor");
 
     return true;
 }
@@ -1196,6 +1191,26 @@ void CMainMenu::AskUserIfHeWantsToDisconnect(uchar menuType)
     pQuestionBox->SetButton(1, _("Yes"));
     pQuestionBox->SetCallback(StaticWantsToDisconnectCallBack, (void*)menuType);
     pQuestionBox->Show();
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CMainMenu::ShowNetworkNotReadyWindow
+//
+// Shows a window with information that the network module is not ready.
+//
+/////////////////////////////////////////////////////////////
+void CMainMenu::ShowNetworkNotReadyWindow()
+{
+    static auto HideQuestionWindow = [](void* window, uint) { reinterpret_cast<CQuestionBox*>(window)->Hide(); };
+
+    CQuestionBox& window = m_QuestionBox;
+    window.Reset();
+    window.SetTitle(_("INFORMATION"));
+    window.SetMessage("\n\nThe network module is not ready.\nPlease wait a moment and try again.");
+    window.SetButton(0, _("OK"));
+    window.SetCallback(HideQuestionWindow, &window);
+    window.Show();
 }
 
 /////////////////////////////////////////////////////////////

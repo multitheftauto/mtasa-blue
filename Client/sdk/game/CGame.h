@@ -248,7 +248,6 @@ public:
     virtual void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0) = 0;
     virtual bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false) = 0;
 
-    virtual bool HasCreditScreenFadedOut() = 0;
     virtual void FlushPendingRestreamIPL() = 0;
     virtual void ResetModelLodDistances() = 0;
     virtual void ResetModelFlags() = 0;

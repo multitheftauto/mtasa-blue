@@ -1,0 +1,52 @@
+name: "Update crowdin-translators.json"
+
+on:
+  workflow_dispatch:
+  delete:
+    branches:
+      - l10n/master
+
+jobs:
+  generate_translators:
+    if: github.event.repository.fork == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          token: ${{ secrets.POT_CI_PAT }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          cache: 'npm'
+          cache-dependency-path: ./utils/localization/generate-translators/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./utils/localization/generate-translators
+        run: npm clean-install
+      
+      - name: Generate translators
+        working-directory: ./utils/localization/generate-translators
+        env:
+          CROWDIN_TOKEN: "${{ secrets.CROWDIN_TOKEN }}"
+          CROWDIN_ORGANIZATION: "multitheftauto"
+          CROWDIN_PROJECT_ID: "13"  # Multi Theft Auto
+          CROWDIN_IGNORE_USER_ID: "2"  # multitheftautoqa
+        run: npm run ci
+      
+      - name: Commit changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          git add ./utils/localization/generate-translators/crowdin-translators.json
+
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Update crowdin-translators.json" -m "[ci skip]"
+            git push
+          fi

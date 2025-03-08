@@ -847,7 +847,7 @@ FT_BEGIN_HEADER
    *     FT_Property_Set( library, "sdf", "spread", &spread );
    *   ```
    *
-   * @note
+   * @note:
    *   FreeType has two rasterizers for generating SDF, namely:
    *
    *   1. `sdf` for generating SDF directly from glyph's outline, and

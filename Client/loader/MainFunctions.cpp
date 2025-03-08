@@ -863,15 +863,15 @@ void CheckDataFiles()
     {
         const char* expected;
         const char* fileName;
-    } integrityCheckList[] = {{"36CB1B284BC7CBB4F25CD00BBB044550", "bass.dll"},           {"80CDC5A50B27C47E53B99DE4D4523698", "bass_aac.dll"},
-                              {"2757D3E0F63C8C62DB32F90D776AB815", "bass_ac3.dll"},       {"539BE2B8762FF618C3BA04B638FD4A8B", "bass_fx.dll"},
-                              {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"F246D72BA73E9624FE8BE66E785FB5C5", "bassmidi.dll"},
-                              {"5DEEC10A943E352EF7E0223327E8B48C", "bassmix.dll"},        {"2F87C5E0A1B7B28C8FC0D7E74116DDFC", "bassopus.dll"},
-                              {"0F1B2FC6C0C703A43A24DC05352E7ADA", "basswebm.dll"},       {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
+    } integrityCheckList[] = {{"24F61A108D285381A67CE643ABBF589C", "bass.dll"},           {"5F9352A9D36E12E1E167E28040EADA83", "bass_aac.dll"},
+                              {"F0D770E77C5A5816D9E2323CC683BA32", "bass_ac3.dll"},       {"D6669FA6DFD548E60CC20503ABCF2FF8", "bass_fx.dll"},
+                              {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"CD9B45DFE7D8B4D547F8B0193C6CF30B", "bassmidi.dll"},
+                              {"F1F587B6515530634AD489CE507BC957", "bassmix.dll"},        {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
+                              {"0F1B2FC6C0C703A43A24DC05352E7ADA", "basswebm.dll"},       {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
                               {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
-                              {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"7A1665DD46726DA4592E77DC05D114F8", "tags.dll"},
+                              {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"4B3932359373F11CBC542CC96D9A9285", "tags.dll"},
                               {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"}, {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
-                              {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"}, {"87F689D5636B6F31DBB4B9CBF56E17E3", "XInput9_1_0_mta.dll"}};
+                              {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"}, {"F1CA5A1E77965777AC26A81EAF345A7A", "XInput9_1_0_mta.dll"}};
 
     for (const auto& item : integrityCheckList)
     {

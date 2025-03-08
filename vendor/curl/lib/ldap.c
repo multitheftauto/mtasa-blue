@@ -26,6 +26,11 @@
 
 #if !defined(CURL_DISABLE_LDAP) && !defined(USE_OPENLDAP)
 
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 /*
  * Notice that USE_OPENLDAP is only a source code selection switch. When
  * libcurl is built with USE_OPENLDAP defined the libcurl source code that
@@ -52,7 +57,7 @@
 #ifdef USE_WIN32_LDAP           /* Use Windows LDAP implementation. */
 # ifdef _MSC_VER
 #  pragma warning(push)
-#  pragma warning(disable: 4201)
+#  pragma warning(disable:4201)
 # endif
 # include <subauth.h>  /* for [P]UNICODE_STRING */
 # ifdef _MSC_VER
@@ -78,6 +83,7 @@
 
 #include "urldata.h"
 #include <curl/curl.h>
+#include "cfilters.h"
 #include "sendf.h"
 #include "escape.h"
 #include "progress.h"
@@ -148,7 +154,7 @@ static void _ldap_free_urldesc(LDAPURLDesc *ludp);
 #define ldap_err2string ldap_err2stringA
 #endif
 
-#if defined(USE_WIN32_LDAP) && defined(_MSC_VER) && (_MSC_VER <= 1600)
+#if defined(USE_WIN32_LDAP) && defined(_MSC_VER) && (_MSC_VER <= 1700)
 /* Workaround for warning:
    'type cast' : conversion from 'int' to 'void *' of greater size */
 #undef LDAP_OPT_ON
@@ -181,6 +187,7 @@ const struct Curl_handler Curl_handler_ldap = {
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_LDAP,                            /* defport */
   CURLPROTO_LDAP,                       /* protocol */
   CURLPROTO_LDAP,                       /* family */
@@ -210,6 +217,7 @@ const struct Curl_handler Curl_handler_ldaps = {
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_LDAPS,                           /* defport */
   CURLPROTO_LDAPS,                      /* protocol */
   CURLPROTO_LDAP,                       /* family */
@@ -346,7 +354,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
   }
 
   /* Get the URL scheme (either ldap or ldaps) */
-  if(conn->given->flags & PROTOPT_SSL)
+  if(Curl_conn_is_ssl(conn, FIRSTSOCKET))
     ldap_ssl = 1;
   infof(data, "LDAP local: trying to establish %s connection",
         ldap_ssl ? "encrypted" : "cleartext");
@@ -381,55 +389,7 @@ static CURLcode ldap_do(struct Curl_easy *data, bool *done)
 #else
     int ldap_option;
     char *ldap_ca = conn->ssl_config.CAfile;
-#if defined(CURL_HAS_NOVELL_LDAPSDK)
-    rc = ldapssl_client_init(NULL, NULL);
-    if(rc != LDAP_SUCCESS) {
-      failf(data, "LDAP local: ldapssl_client_init %s", ldap_err2string(rc));
-      result = CURLE_SSL_CERTPROBLEM;
-      goto quit;
-    }
-    if(conn->ssl_config.verifypeer) {
-      /* Novell SDK supports DER or BASE64 files. */
-      int cert_type = LDAPSSL_CERT_FILETYPE_B64;
-      if((data->set.ssl.cert_type) &&
-         (strcasecompare(data->set.ssl.cert_type, "DER")))
-        cert_type = LDAPSSL_CERT_FILETYPE_DER;
-      if(!ldap_ca) {
-        failf(data, "LDAP local: ERROR %s CA cert not set",
-              (cert_type == LDAPSSL_CERT_FILETYPE_DER ? "DER" : "PEM"));
-        result = CURLE_SSL_CERTPROBLEM;
-        goto quit;
-      }
-      infof(data, "LDAP local: using %s CA cert '%s'",
-            (cert_type == LDAPSSL_CERT_FILETYPE_DER ? "DER" : "PEM"),
-            ldap_ca);
-      rc = ldapssl_add_trusted_cert(ldap_ca, cert_type);
-      if(rc != LDAP_SUCCESS) {
-        failf(data, "LDAP local: ERROR setting %s CA cert: %s",
-              (cert_type == LDAPSSL_CERT_FILETYPE_DER ? "DER" : "PEM"),
-              ldap_err2string(rc));
-        result = CURLE_SSL_CERTPROBLEM;
-        goto quit;
-      }
-      ldap_option = LDAPSSL_VERIFY_SERVER;
-    }
-    else
-      ldap_option = LDAPSSL_VERIFY_NONE;
-    rc = ldapssl_set_verify_mode(ldap_option);
-    if(rc != LDAP_SUCCESS) {
-      failf(data, "LDAP local: ERROR setting cert verify mode: %s",
-              ldap_err2string(rc));
-      result = CURLE_SSL_CERTPROBLEM;
-      goto quit;
-    }
-    server = ldapssl_init(host, conn->primary.remote_port, 1);
-    if(!server) {
-      failf(data, "LDAP local: Cannot connect to %s:%u",
-            conn->host.dispname, conn->primary.remote_port);
-      result = CURLE_COULDNT_CONNECT;
-      goto quit;
-    }
-#elif defined(LDAP_OPT_X_TLS)
+#ifdef LDAP_OPT_X_TLS
     if(conn->ssl_config.verifypeer) {
       /* OpenLDAP SDK supports BASE64 files. */
       if((data->set.ssl.cert_type) &&
@@ -750,10 +710,6 @@ quit:
     ldap_free_urldesc(ludp);
   if(server)
     ldap_unbind_s(server);
-#if defined(HAVE_LDAP_SSL) && defined(CURL_HAS_NOVELL_LDAPSDK)
-  if(ldap_ssl)
-    ldapssl_client_deinit();
-#endif /* HAVE_LDAP_SSL && CURL_HAS_NOVELL_LDAPSDK */
 
   FREE_ON_WINLDAP(host);
 
@@ -800,7 +756,7 @@ static int str2scope(const char *p)
     return LDAP_SCOPE_SUBTREE;
   if(strcasecompare(p, "subtree"))
     return LDAP_SCOPE_SUBTREE;
-  return (-1);
+  return -1;
 }
 
 /*
@@ -1082,7 +1038,7 @@ static int _ldap_url_parse(struct Curl_easy *data,
     ludp = NULL;
   }
   *ludpp = ludp;
-  return (rc);
+  return rc;
 }
 
 static void _ldap_free_urldesc(LDAPURLDesc *ludp)
@@ -1113,4 +1069,9 @@ static void _ldap_free_urldesc(LDAPURLDesc *ludp)
   free(ludp);
 }
 #endif  /* !HAVE_LDAP_URL_PARSE */
+
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic pop
+#endif
+
 #endif  /* !CURL_DISABLE_LDAP && !USE_OPENLDAP */
