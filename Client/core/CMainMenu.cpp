@@ -778,6 +778,9 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
         m_bIsIngame = bIsIngame;
         m_Settings.SetIsModLoaded(bIsIngame);
 
+        // Reset frame rate limit
+        CCore::GetSingleton().RecalculateFrameRateLimit(-1, false);
+
         m_ulMoveStartTick = GetTickCount32();
         if (bIsIngame)
         {
