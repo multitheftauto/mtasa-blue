@@ -223,6 +223,7 @@ public:
     void ApplyQueuedFrameRateLimit();
     void EnsureFrameRateLimitApplied();
     void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit);
+    void SetCurrentRefreshRate(uint value);
     void DoReliablePulse();
 
     bool IsTimingCheckpoints();
@@ -371,6 +372,7 @@ private:
     CElapsedTimeHD       m_FrameRateTimer;
     uint                 m_uiQueuedFrameRate;
     bool                 m_bQueuedFrameRateValid;
+    uint                 m_CurrentRefreshRate;
     bool                 m_requestNewNickname{false};
     EDiagnosticDebugType m_DiagnosticDebug;
 
