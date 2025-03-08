@@ -41,8 +41,8 @@ struct SPlayerClothingType
 
 struct SPlayerClothing
 {
-    const char* szTexture;
-    const char* szModel;
+    std::string szTexture;
+    std::string szModel;
 };
 
 class CClientPlayerClothes
@@ -67,11 +67,11 @@ public:
     static bool        IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType);
     static const char* GetClothingName(unsigned char ucType);
 
-    static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
-    static const int              GetClothingGroupMax(unsigned char ucType);
-    static bool                   IsValidModel(unsigned short usModel);
-    static bool                   AddClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
-    static bool                   RemoveClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
+    static std::vector<const SPlayerClothing*>  GetClothingGroup(unsigned char ucType);
+    static bool                                 IsValidModel(unsigned short usModel);
+    static bool                                 HasClothesChanged();
+    static bool                                 AddClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
+    static bool                                 RemoveClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
 
 private:
     static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
@@ -79,7 +79,9 @@ private:
     CClientPed* m_pPlayerModel;
 
     SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>              m_Clothes;
+    static bool                                                             m_bHasClothesChanged;
+    static SFixedArray<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS> m_DefaultClothes;
+    static SFixedArray<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS> m_NewClothes;
     static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>       m_GlobalClothes;
-    static std::array<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS>  m_NewClothes;
     static bool                                                             m_bStaticInit;
 };
