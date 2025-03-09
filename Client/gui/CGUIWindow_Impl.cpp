@@ -32,7 +32,7 @@ CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     if (!m_pWindow)
     {
         // Create new here
-        m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIWINDOW_NAME, szUnique);
+        m_pWindow = pGUI->GetWindowManager()->createWindow(pGUI->ResolveModernName(CGUIWINDOW_NAME), szUnique);
         m_pWindow->setRect(CEGUI::Relative, CEGUI::Rect(0.10f, 0.10f, 0.60f, 0.90f));
         m_pWindow->setAlpha(0.8f);
 

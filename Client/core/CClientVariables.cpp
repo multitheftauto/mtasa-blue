@@ -357,6 +357,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("discord_rpc_share_data", false);                                         // Consistent Rich Presence data sharing
     DEFAULT("discord_rpc_share_data_firsttime", false);                               // Display the user data sharing consent dialog box - for the first time
     DEFAULT("browser_enable_gpu", true);                                              // Enable GPU in CEF? (allows stuff like WebGL to function)
+    DEFAULT("cgui_modern_interface", true);                                           // Enable modern CGUI interface (testing for upcoming main menu revamp)
 
     if (!Exists("locale"))
     {
