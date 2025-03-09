@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/CWeaponStatManager.h"
 
 #define MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG     "1.3.5-9.06139"
 
@@ -21,8 +22,8 @@ void CLuaWeaponDefs::LoadFunctions()
         {"getSlotFromWeapon", GetSlotFromWeapon},
         {"createWeapon", CreateWeapon},
         {"setWeaponProperty", SetWeaponProperty},
-        {"getWeaponProperty", GetWeaponProperty},
-        {"getOriginalWeaponProperty", GetOriginalWeaponProperty},
+        {"getWeaponProperty", ArgumentParserWarn<false, GetWeaponProperty>},
+        {"getOriginalWeaponProperty", ArgumentParserWarn<false, GetOriginalWeaponProperty>},
         {"fireWeapon", FireWeapon},
         {"setWeaponState", SetWeaponState},
         {"getWeaponState", GetWeaponState},
@@ -693,293 +694,248 @@ int CLuaWeaponDefs::SetWeaponClipAmmo(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWeaponDefs::GetWeaponProperty(lua_State* luaVM)
+std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDefs::GetWeaponProperty(lua_State* luaVM, std::variant<CClientWeapon*, int, std::string> weapon, eWeaponSkill skill, eWeaponProperty property)
 {
-    eWeaponSkill     eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
-    eWeaponType      eWep = eWeaponType::WEAPONTYPE_UNARMED;
-    eWeaponProperty  eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
-    CClientWeapon*   pWeapon;
-    CScriptArgReader argStream(luaVM);
-
-    if (argStream.NextIsUserData())
+    // custom weapon
+    if (std::holds_alternative<CClientWeapon*>(weapon))
     {
-        argStream.ReadUserData(pWeapon);
-        argStream.ReadEnumString(eProp);
+        auto* weaponPtr = std::get<CClientWeapon*>(weapon);
+        CWeaponStat* weaponStats = weaponPtr->GetWeaponStat();
+        if (!weaponPtr || !weaponStats)
+            return false;
 
-        if (!argStream.HasErrors())
+        switch (property)
         {
-            if (eProp == WEAPON_DAMAGE)
+            case eWeaponProperty::WEAPON_DAMAGE:
+                return weaponStats->GetDamagePerHit();
+            case eWeaponProperty::WEAPON_FIRE_ROTATION:
             {
-                short sData = 0;
-                if (CStaticFunctionDefinitions::GetWeaponProperty(pWeapon, eProp, sData))
-                {
-                    lua_pushnumber(luaVM, sData);
-                    return 1;
-                }
-            }
-            else if (eProp == WEAPON_FIRE_ROTATION)
-            {
-                CVector vecWeaponInfo;
-                if (CStaticFunctionDefinitions::GetWeaponProperty(pWeapon, eProp, vecWeaponInfo))
-                {
-                    lua_pushnumber(luaVM, vecWeaponInfo.fX);
-                    lua_pushnumber(luaVM, vecWeaponInfo.fY);
-                    lua_pushnumber(luaVM, vecWeaponInfo.fZ);
-                    return 1;
-                }
-            }
-            else
-            {
-                float fData = 0;
-                if (CStaticFunctionDefinitions::GetWeaponProperty(pWeapon, eProp, fData))
-                {
-                    lua_pushnumber(luaVM, fData);
-                    return 1;
-                }
-            }
-        }
-        else
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                CVector fireRotation = weaponPtr->GetFireRotationNoTarget();
+                ConvertRadiansToDegrees(fireRotation);
 
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    argStream.ReadEnumStringOrNumber(eWep);
-    argStream.ReadEnumStringOrNumber(eWepSkill);
-    argStream.ReadEnumString(eProp);
-    if (!argStream.HasErrors())
-    {
-        switch (eProp)
-        {
-            case WEAPON_WEAPON_RANGE:
-            case WEAPON_TARGET_RANGE:
-            case WEAPON_ACCURACY:
-            case WEAPON_FIRING_SPEED:
-            case WEAPON_LIFE_SPAN:
-            case WEAPON_SPREAD:
-            case WEAPON_MOVE_SPEED:
-                // Get only
-            case WEAPON_REQ_SKILL_LEVEL:
-            case WEAPON_ANIM_LOOP_START:
-            case WEAPON_ANIM_LOOP_STOP:
-            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
-            case WEAPON_ANIM2_LOOP_START:
-            case WEAPON_ANIM2_LOOP_STOP:
-            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
-            case WEAPON_ANIM_BREAKOUT_TIME:
-            case WEAPON_RADIUS:
-            {
-                float fWeaponInfo = 0.0f;
-
-                if (CStaticFunctionDefinitions::GetWeaponProperty(eProp, eWep, eWepSkill, fWeaponInfo))
-                {
-                    lua_pushnumber(luaVM, fWeaponInfo);
-                    return 1;
-                }
-                break;
+                return CLuaMultiReturn<float, float, float>(fireRotation.fX, fireRotation.fY, fireRotation.fZ);
             }
-            case WEAPON_DAMAGE:
-            case WEAPON_MAX_CLIP_AMMO:
-            case WEAPON_FLAGS:
-            case WEAPON_ANIM_GROUP:
-            case WEAPON_FIRETYPE:
-            case WEAPON_MODEL:
-            case WEAPON_MODEL2:
-            case WEAPON_SLOT:
-            case WEAPON_AIM_OFFSET:
-            case WEAPON_SKILL_LEVEL:
-            case WEAPON_DEFAULT_COMBO:
-            case WEAPON_COMBOS_AVAILABLE:
-            {
-                int sWeaponInfo = 0;
-
-                if (CStaticFunctionDefinitions::GetWeaponProperty(eProp, eWep, eWepSkill, sWeaponInfo))
-                {
-                    lua_pushinteger(luaVM, sWeaponInfo);
-                    return 1;
-                }
-                break;
-            }
-            case WEAPON_FIRE_OFFSET:
-            {
-                CVector vecWeaponInfo;
-
-                if (CStaticFunctionDefinitions::GetWeaponProperty(eProp, eWep, eWepSkill, vecWeaponInfo))
-                {
-                    lua_pushnumber(luaVM, vecWeaponInfo.fX);
-                    lua_pushnumber(luaVM, vecWeaponInfo.fY);
-                    lua_pushnumber(luaVM, vecWeaponInfo.fZ);
-                    return 3;
-                }
-                break;
-            }
-            case WEAPON_FLAG_AIM_NO_AUTO:
-            case WEAPON_FLAG_AIM_ARM:
-            case WEAPON_FLAG_AIM_1ST_PERSON:
-            case WEAPON_FLAG_AIM_FREE:
-            case WEAPON_FLAG_MOVE_AND_AIM:
-            case WEAPON_FLAG_MOVE_AND_SHOOT:
-            case WEAPON_FLAG_TYPE_THROW:
-            case WEAPON_FLAG_TYPE_HEAVY:
-            case WEAPON_FLAG_TYPE_CONSTANT:
-            case WEAPON_FLAG_TYPE_DUAL:
-            case WEAPON_FLAG_ANIM_RELOAD:
-            case WEAPON_FLAG_ANIM_CROUCH:
-            case WEAPON_FLAG_ANIM_RELOAD_LOOP:
-            case WEAPON_FLAG_ANIM_RELOAD_LONG:
-            case WEAPON_FLAG_SHOT_SLOWS:
-            case WEAPON_FLAG_SHOT_RAND_SPEED:
-            case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
-            case WEAPON_FLAG_SHOT_EXPANDS:
-            {
-                MinClientReqCheck(argStream, MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used");
-                if (!argStream.HasErrors())
-                {
-                    bool bEnable;
-                    if (CStaticFunctionDefinitions::GetWeaponPropertyFlag(eProp, eWep, eWepSkill, bEnable))
-                    {
-                        lua_pushboolean(luaVM, bEnable);
-                        return 1;
-                    }
-                }
-                break;
-            }
+            case eWeaponProperty::WEAPON_ACCURACY:
+                return weaponStats->GetAccuracy();
+            case eWeaponProperty::WEAPON_TARGET_RANGE:
+                return weaponStats->GetTargetRange();
+            case eWeaponProperty::WEAPON_WEAPON_RANGE:
+                return weaponStats->GetWeaponRange();
             default:
-            {
-                argStream.SetCustomError("unsupported weapon property at argument 3");
-                break;
-            }
+                return false;
         }
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    eWeaponType weaponType = eWeaponType::WEAPONTYPE_INVALID;
+    if (std::holds_alternative<int>(weapon))
+        weaponType = static_cast<eWeaponType>(std::get<int>(weapon));
+    else if (std::holds_alternative<std::string>(weapon))
+        StringToEnum(std::get<std::string>(weapon), weaponType);
+
+    if (weaponType < eWeaponType::WEAPONTYPE_UNARMED || weaponType > eWeaponType::WEAPONTYPE_FLARE)
+        throw LuaFunctionError("Weapon ID or name is invalid.", true);
+
+    CWeaponStat* weaponStats = g_pGame->GetWeaponStatManager()->GetWeaponStats(weaponType, skill);
+    if (!weaponStats)
+        return false;
+
+    switch (property)
+    {
+        case eWeaponProperty::WEAPON_WEAPON_RANGE:
+            return weaponStats->GetWeaponRange();
+        case eWeaponProperty::WEAPON_TARGET_RANGE:
+            return weaponStats->GetTargetRange();
+        case eWeaponProperty::WEAPON_ACCURACY:
+            return weaponStats->GetAccuracy();
+        case eWeaponProperty::WEAPON_FIRING_SPEED:
+            return weaponStats->GetFiringSpeed();
+        case eWeaponProperty::WEAPON_LIFE_SPAN:
+            return weaponStats->GetLifeSpan();
+        case eWeaponProperty::WEAPON_SPREAD:
+            return weaponStats->GetSpread();
+        case eWeaponProperty::WEAPON_MOVE_SPEED:
+            return weaponStats->GetMoveSpeed();
+        case eWeaponProperty::WEAPON_REQ_SKILL_LEVEL:
+            return weaponStats->GetRequiredStatLevel();
+        case eWeaponProperty::WEAPON_ANIM_LOOP_START:
+            return weaponStats->GetWeaponAnimLoopStart();
+        case eWeaponProperty::WEAPON_ANIM_LOOP_STOP:
+            return weaponStats->GetWeaponAnimLoopStop();
+        case eWeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            return weaponStats->GetWeaponAnimLoopFireTime();
+        case eWeaponProperty::WEAPON_ANIM2_LOOP_START:
+            return weaponStats->GetWeaponAnim2LoopStart();
+        case eWeaponProperty::WEAPON_ANIM2_LOOP_STOP:
+            return weaponStats->GetWeaponAnim2LoopStop();
+        case eWeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            return weaponStats->GetWeaponAnim2LoopFireTime();
+        case eWeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
+            return weaponStats->GetWeaponAnimBreakoutTime();
+        case eWeaponProperty::WEAPON_RADIUS:
+            return weaponStats->GetRadius();
+        case eWeaponProperty::WEAPON_DAMAGE:
+            return weaponStats->GetDamagePerHit();
+        case eWeaponProperty::WEAPON_MAX_CLIP_AMMO:
+            return weaponStats->GetMaximumClipAmmo();
+        case eWeaponProperty::WEAPON_FLAGS:
+            return weaponStats->GetFlags();
+        case eWeaponProperty::WEAPON_ANIM_GROUP:
+            return static_cast<int>(weaponStats->GetAnimGroup());
+        case eWeaponProperty::WEAPON_FIRETYPE:
+            return weaponStats->GetFireType();
+        case eWeaponProperty::WEAPON_MODEL:
+            return weaponStats->GetModel();
+        case eWeaponProperty::WEAPON_MODEL2:
+            return weaponStats->GetModel2();
+        case eWeaponProperty::WEAPON_SLOT:
+            return weaponStats->GetSlot();
+        case eWeaponProperty::WEAPON_AIM_OFFSET:
+            return weaponStats->GetAimOffsetIndex();
+        case eWeaponProperty::WEAPON_SKILL_LEVEL:
+            return weaponStats->GetSkill();
+        case eWeaponProperty::WEAPON_DEFAULT_COMBO:
+            return weaponStats->GetDefaultCombo();
+        case eWeaponProperty::WEAPON_COMBOS_AVAILABLE:
+            return weaponStats->GetCombosAvailable();
+        case eWeaponProperty::WEAPON_FIRE_OFFSET:
+        {
+            CVector* fireOffset = weaponStats->GetFireOffset();
+            return CLuaMultiReturn<float, float, float>(fireOffset->fX, fireOffset->fY, fireOffset->fZ);
+        }
+        case eWeaponProperty::WEAPON_FLAG_AIM_NO_AUTO:
+        case eWeaponProperty::WEAPON_FLAG_AIM_ARM:
+        case eWeaponProperty::WEAPON_FLAG_AIM_1ST_PERSON:
+        case eWeaponProperty::WEAPON_FLAG_AIM_FREE:
+        case eWeaponProperty::WEAPON_FLAG_MOVE_AND_AIM:
+        case eWeaponProperty::WEAPON_FLAG_MOVE_AND_SHOOT:
+        case eWeaponProperty::WEAPON_FLAG_TYPE_THROW:
+        case eWeaponProperty::WEAPON_FLAG_TYPE_HEAVY:
+        case eWeaponProperty::WEAPON_FLAG_TYPE_CONSTANT:
+        case eWeaponProperty::WEAPON_FLAG_TYPE_DUAL:
+        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD:
+        case eWeaponProperty::WEAPON_FLAG_ANIM_CROUCH:
+        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LOOP:
+        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LONG:
+        case eWeaponProperty::WEAPON_FLAG_SHOT_SLOWS:
+        case eWeaponProperty::WEAPON_FLAG_SHOT_RAND_SPEED:
+        case eWeaponProperty::WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+        case eWeaponProperty::WEAPON_FLAG_SHOT_EXPANDS:
+        {
+            MinClientReqCheck(luaVM, MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used");
+            return weaponStats->IsFlagSet(GetWeaponPropertyFlagBit(property));
+        }
+        default:
+            throw LuaFunctionError("Unsupported weapon property at argument 3", true);
+    }
+
+    return false;
 }
 
-int CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State* luaVM)
+std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State* luaVM, std::variant<int, std::string> weapon, eWeaponSkill skill, eWeaponProperty property)
 {
-    eWeaponSkill    eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
-    eWeaponType     eWep = eWeaponType::WEAPONTYPE_UNARMED;
-    eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
+    eWeaponType weaponType = eWeaponType::WEAPONTYPE_INVALID;
+    if (std::holds_alternative<int>(weapon))
+        weaponType = static_cast<eWeaponType>(std::get<int>(weapon));
+    else if (std::holds_alternative<std::string>(weapon))
+        StringToEnum(std::get<std::string>(weapon), weaponType);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumStringOrNumber(eWep);
-    argStream.ReadEnumStringOrNumber(eWepSkill);
-    argStream.ReadEnumString(eProp);
-    if (!argStream.HasErrors())
+    if (weaponType < eWeaponType::WEAPONTYPE_UNARMED || weaponType > eWeaponType::WEAPONTYPE_FLARE)
+        throw LuaFunctionError("Weapon ID or name is invalid.", true);
+
+    CWeaponStat* weaponStats = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(weaponType, skill);
+    if (!weaponStats)
+        return false;
+
+    switch (property)
     {
-        switch (eProp)
+        case eWeaponProperty::WEAPON_WEAPON_RANGE:
+            return weaponStats->GetWeaponRange();
+        case eWeaponProperty::WEAPON_TARGET_RANGE:
+            return weaponStats->GetTargetRange();
+        case eWeaponProperty::WEAPON_ACCURACY:
+            return weaponStats->GetAccuracy();
+        case eWeaponProperty::WEAPON_FIRING_SPEED:
+            return weaponStats->GetFiringSpeed();
+        case eWeaponProperty::WEAPON_LIFE_SPAN:
+            return weaponStats->GetLifeSpan();
+        case eWeaponProperty::WEAPON_SPREAD:
+            return weaponStats->GetSpread();
+        case eWeaponProperty::WEAPON_MOVE_SPEED:
+            return weaponStats->GetMoveSpeed();
+        case eWeaponProperty::WEAPON_REQ_SKILL_LEVEL:
+            return weaponStats->GetRequiredStatLevel();
+        case eWeaponProperty::WEAPON_ANIM_LOOP_START:
+            return weaponStats->GetWeaponAnimLoopStart();
+        case eWeaponProperty::WEAPON_ANIM_LOOP_STOP:
+            return weaponStats->GetWeaponAnimLoopStop();
+        case eWeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            return weaponStats->GetWeaponAnimLoopFireTime();
+        case eWeaponProperty::WEAPON_ANIM2_LOOP_START:
+            return weaponStats->GetWeaponAnim2LoopStart();
+        case eWeaponProperty::WEAPON_ANIM2_LOOP_STOP:
+            return weaponStats->GetWeaponAnim2LoopStop();
+        case eWeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            return weaponStats->GetWeaponAnim2LoopFireTime();
+        case eWeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
+            return weaponStats->GetWeaponAnimBreakoutTime();
+        case eWeaponProperty::WEAPON_RADIUS:
+            return weaponStats->GetRadius();
+        case eWeaponProperty::WEAPON_DAMAGE:
+            return weaponStats->GetDamagePerHit();
+        case eWeaponProperty::WEAPON_MAX_CLIP_AMMO:
+            return weaponStats->GetMaximumClipAmmo();
+        case eWeaponProperty::WEAPON_FLAGS:
+            return weaponStats->GetFlags();
+        case eWeaponProperty::WEAPON_ANIM_GROUP:
+            return static_cast<int>(weaponStats->GetAnimGroup());
+        case eWeaponProperty::WEAPON_FIRETYPE:
+            return weaponStats->GetFireType();
+        case eWeaponProperty::WEAPON_MODEL:
+            return weaponStats->GetModel();
+        case eWeaponProperty::WEAPON_MODEL2:
+            return weaponStats->GetModel2();
+        case eWeaponProperty::WEAPON_SLOT:
+            return weaponStats->GetSlot();
+        case eWeaponProperty::WEAPON_AIM_OFFSET:
+            return weaponStats->GetAimOffsetIndex();
+        case eWeaponProperty::WEAPON_SKILL_LEVEL:
+            return weaponStats->GetSkill();
+        case eWeaponProperty::WEAPON_DEFAULT_COMBO:
+            return weaponStats->GetDefaultCombo();
+        case eWeaponProperty::WEAPON_COMBOS_AVAILABLE:
+            return weaponStats->GetCombosAvailable();
+        case eWeaponProperty::WEAPON_FIRE_OFFSET:
         {
-            case WEAPON_WEAPON_RANGE:
-            case WEAPON_TARGET_RANGE:
-            case WEAPON_ACCURACY:
-            case WEAPON_FIRING_SPEED:
-            case WEAPON_LIFE_SPAN:
-            case WEAPON_SPREAD:
-            case WEAPON_MOVE_SPEED:
-                // Get only
-            case WEAPON_REQ_SKILL_LEVEL:
-            case WEAPON_ANIM_LOOP_START:
-            case WEAPON_ANIM_LOOP_STOP:
-            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
-            case WEAPON_ANIM2_LOOP_START:
-            case WEAPON_ANIM2_LOOP_STOP:
-            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
-            case WEAPON_ANIM_BREAKOUT_TIME:
-            case WEAPON_RADIUS:
-            {
-                float fWeaponInfo = 0.0f;
-
-                if (CStaticFunctionDefinitions::GetOriginalWeaponProperty(eProp, eWep, eWepSkill, fWeaponInfo))
-                {
-                    lua_pushnumber(luaVM, fWeaponInfo);
-                    return 1;
-                }
-                break;
-            }
-            case WEAPON_DAMAGE:
-            case WEAPON_MAX_CLIP_AMMO:
-            case WEAPON_FLAGS:
-            case WEAPON_ANIM_GROUP:
-            case WEAPON_FIRETYPE:
-            case WEAPON_MODEL:
-            case WEAPON_MODEL2:
-            case WEAPON_SLOT:
-            case WEAPON_AIM_OFFSET:
-            case WEAPON_SKILL_LEVEL:
-            case WEAPON_DEFAULT_COMBO:
-            case WEAPON_COMBOS_AVAILABLE:
-            {
-                int sWeaponInfo = 0;
-
-                if (CStaticFunctionDefinitions::GetOriginalWeaponProperty(eProp, eWep, eWepSkill, sWeaponInfo))
-                {
-                    lua_pushinteger(luaVM, sWeaponInfo);
-                    return 1;
-                }
-                break;
-            }
-            case WEAPON_FIRE_OFFSET:
-            {
-                CVector vecWeaponInfo;
-
-                if (CStaticFunctionDefinitions::GetOriginalWeaponProperty(eProp, eWep, eWepSkill, vecWeaponInfo))
-                {
-                    lua_pushnumber(luaVM, vecWeaponInfo.fX);
-                    lua_pushnumber(luaVM, vecWeaponInfo.fY);
-                    lua_pushnumber(luaVM, vecWeaponInfo.fZ);
-                    return 3;
-                }
-                break;
-            }
-            case WEAPON_FLAG_AIM_NO_AUTO:
-            case WEAPON_FLAG_AIM_ARM:
-            case WEAPON_FLAG_AIM_1ST_PERSON:
-            case WEAPON_FLAG_AIM_FREE:
-            case WEAPON_FLAG_MOVE_AND_AIM:
-            case WEAPON_FLAG_MOVE_AND_SHOOT:
-            case WEAPON_FLAG_TYPE_THROW:
-            case WEAPON_FLAG_TYPE_HEAVY:
-            case WEAPON_FLAG_TYPE_CONSTANT:
-            case WEAPON_FLAG_TYPE_DUAL:
-            case WEAPON_FLAG_ANIM_RELOAD:
-            case WEAPON_FLAG_ANIM_CROUCH:
-            case WEAPON_FLAG_ANIM_RELOAD_LOOP:
-            case WEAPON_FLAG_ANIM_RELOAD_LONG:
-            case WEAPON_FLAG_SHOT_SLOWS:
-            case WEAPON_FLAG_SHOT_RAND_SPEED:
-            case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
-            case WEAPON_FLAG_SHOT_EXPANDS:
-            {
-                MinClientReqCheck(argStream, MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used");
-                if (!argStream.HasErrors())
-                {
-                    bool bEnable;
-                    if (CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag(eProp, eWep, eWepSkill, bEnable))
-                    {
-                        lua_pushboolean(luaVM, bEnable);
-                        return 1;
-                    }
-                }
-                break;
-            }
-            default:
-            {
-                argStream.SetCustomError("unsupported weapon property at argument 3");
-                break;
-            }
+            CVector* fireOffset = weaponStats->GetFireOffset();
+            return CLuaMultiReturn<float, float, float>(fireOffset->fX, fireOffset->fY, fireOffset->fZ);
         }
+        case eWeaponProperty::WEAPON_FLAG_AIM_NO_AUTO:
+        case eWeaponProperty::WEAPON_FLAG_AIM_ARM:
+        case eWeaponProperty::WEAPON_FLAG_AIM_1ST_PERSON:
+        case eWeaponProperty::WEAPON_FLAG_AIM_FREE:
+        case eWeaponProperty::WEAPON_FLAG_MOVE_AND_AIM:
+        case eWeaponProperty::WEAPON_FLAG_MOVE_AND_SHOOT:
+        case eWeaponProperty::WEAPON_FLAG_TYPE_THROW:
+        case eWeaponProperty::WEAPON_FLAG_TYPE_HEAVY:
+        case eWeaponProperty::WEAPON_FLAG_TYPE_CONSTANT:
+        case eWeaponProperty::WEAPON_FLAG_TYPE_DUAL:
+        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD:
+        case eWeaponProperty::WEAPON_FLAG_ANIM_CROUCH:
+        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LOOP:
+        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LONG:
+        case eWeaponProperty::WEAPON_FLAG_SHOT_SLOWS:
+        case eWeaponProperty::WEAPON_FLAG_SHOT_RAND_SPEED:
+        case eWeaponProperty::WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+        case eWeaponProperty::WEAPON_FLAG_SHOT_EXPANDS:
+        {
+            MinClientReqCheck(luaVM, MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used");
+            return weaponStats->IsFlagSet(GetWeaponPropertyFlagBit(property));
+        }
+        default:
+            throw LuaFunctionError("Unsupported weapon property at argument 3", true);
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
 bool CLuaWeaponDefs::SetWeaponRenderEnabled(bool enabled)
