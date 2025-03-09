@@ -204,7 +204,7 @@ namespace SharedUtil
         return result;
     }
 
-    inline bool StringToZLibFormat(std::string format, int &outResult)
+    inline bool StringToZLibFormat(const std::string format, int &outResult)
     {
         int value = atoi(format.c_str());
         if ((value >= 9 && value <= 31) || (value >= -15 && value <= -9)) // allowed values: 9..31, -9..-15
