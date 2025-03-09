@@ -694,8 +694,17 @@ int CLuaWeaponDefs::SetWeaponClipAmmo(lua_State* luaVM)
     return 1;
 }
 
-std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDefs::GetWeaponProperty(lua_State* luaVM, std::variant<CClientWeapon*, int, std::string> weapon, eWeaponSkill skill, eWeaponProperty property)
+std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDefs::GetWeaponProperty(lua_State* luaVM, std::variant<CClientWeapon*, int, std::string> weapon, std::variant<int, std::string> weaponSkill, eWeaponProperty property)
 {
+    eWeaponSkill skill = WEAPONSKILL_POOR;
+    if (std::holds_alternative<int>(weaponSkill))
+        skill = static_cast<eWeaponSkill>(std::get<int>(weaponSkill));
+    else if (std::holds_alternative<std::string>(weaponSkill))
+        StringToEnum(std::get<std::string>(weaponSkill), skill);
+
+    if (skill < eWeaponSkill::WEAPONSKILL_POOR || skill >= eWeaponSkill::WEAPONSKILL_MAX_NUMBER)
+        throw LuaFunctionError("Invalid weapon skill value.", true);
+
     // custom weapon
     if (std::holds_alternative<CClientWeapon*>(weapon))
     {
@@ -831,7 +840,7 @@ std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDef
     return false;
 }
 
-std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State* luaVM, std::variant<int, std::string> weapon, eWeaponSkill skill, eWeaponProperty property)
+std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State* luaVM, std::variant<int, std::string> weapon, std::variant<int, std::string> weaponSkill, eWeaponProperty property)
 {
     eWeaponType weaponType = eWeaponType::WEAPONTYPE_INVALID;
     if (std::holds_alternative<int>(weapon))
@@ -841,6 +850,15 @@ std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponD
 
     if (weaponType < eWeaponType::WEAPONTYPE_UNARMED || weaponType > eWeaponType::WEAPONTYPE_FLARE)
         throw LuaFunctionError("Weapon ID or name is invalid.", true);
+
+    eWeaponSkill skill = WEAPONSKILL_POOR;
+    if (std::holds_alternative<int>(weaponSkill))
+        skill = static_cast<eWeaponSkill>(std::get<int>(weaponSkill));
+    else if (std::holds_alternative<std::string>(weaponSkill))
+        StringToEnum(std::get<std::string>(weaponSkill), skill);
+
+    if (skill < eWeaponSkill::WEAPONSKILL_POOR || skill >= eWeaponSkill::WEAPONSKILL_MAX_NUMBER)
+        throw LuaFunctionError("Invalid weapon skill value.", true);
 
     CWeaponStat* weaponStats = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(weaponType, skill);
     if (!weaponStats)
