@@ -2618,18 +2618,18 @@ bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, SString& st
 
 bool CStaticFunctionDefinitions::GetClothesByTypeIndex(unsigned char ucType, unsigned char ucIndex, SString& strOutTexture, SString& strOutModel)
 {
-    const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
-    if (pPlayerClothing)
-    {
-        if (ucIndex < CClientPlayerClothes::GetClothingGroupMax(ucType))
-        {
-            strOutTexture = pPlayerClothing[ucIndex].szTexture;
-            strOutModel = pPlayerClothing[ucIndex].szModel;
-            return true;
-        }
-    }
+    std::vector<const SPlayerClothing*> pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
 
-    return false;
+    if (pPlayerClothing.empty())
+        return false;
+
+    if (ucIndex > (pPlayerClothing.size() - 1))
+        return false;
+
+    strOutTexture = pPlayerClothing.at(ucIndex)->szTexture;
+    strOutModel = pPlayerClothing.at(ucIndex)->szModel;
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn)
@@ -2639,13 +2639,13 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, 
 
     for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
     {
-        const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
-        if (pPlayerClothing)
-        {
-            for (unsigned char ucIter = 0; pPlayerClothing[ucIter].szTexture != NULL; ucIter++)
+        std::vector<const SPlayerClothing*> pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
+
+        if (!pPlayerClothing.empty()) {
+            for (unsigned char ucIter = 0; ucIter < pPlayerClothing.size(); ucIter++)
             {
-                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter].szTexture) == 0) &&
-                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter].szModel) == 0))
+                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter]->szTexture.c_str()) == 0) &&
+                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter]->szModel.c_str()) == 0))
                 {
                     ucTypeReturn = ucType;
                     ucIndexReturn = ucIter;
@@ -2669,6 +2669,22 @@ bool CStaticFunctionDefinitions::GetClothesTypeName(unsigned char ucType, SStrin
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::AddClothingModel(const char* szTexture, const char* szModel, unsigned char ucType)
+{
+    if (!CClientPlayerClothes::AddClothingModel(szTexture, szModel, ucType))
+        return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::RemoveClothingModel(const char* szTexture, const char* szModel, unsigned char ucType)
+{
+    if (!CClientPlayerClothes::RemoveClothingModel(szTexture, szModel, ucType))
+        return false;
+
+    return true;
 }
 
 CClientPed* CStaticFunctionDefinitions::CreatePed(CResource& Resource, unsigned long ulModel, const CVector& vecPosition, float fRotation)
