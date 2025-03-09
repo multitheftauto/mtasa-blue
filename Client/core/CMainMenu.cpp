@@ -778,6 +778,9 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
         m_bIsIngame = bIsIngame;
         m_Settings.SetIsModLoaded(bIsIngame);
 
+        // Reset frame rate limit
+        CCore::GetSingleton().RecalculateFrameRateLimit(-1, false);
+
         m_ulMoveStartTick = GetTickCount32();
         if (bIsIngame)
         {
@@ -845,6 +848,19 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
                 break;
         }
     }
+    else if (!g_pCore->IsNetworkReady())
+    {
+        switch (m_pHoveredItem->menuType)
+        {
+            // case MENU_ITEM_QUICK_CONNECT:  // We only prevent it for left click in OnQuickConnectButtonClick.
+            case MENU_ITEM_HOST_GAME:
+            case MENU_ITEM_MAP_EDITOR:
+                ShowNetworkNotReadyWindow();
+                return true;
+            default:
+                break;
+        }
+    }
 
     switch (m_pHoveredItem->menuType)
     {
@@ -886,12 +902,21 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
         return false;
 
     if (left)
+    {
+        if (!g_pCore->IsNetworkReady())
+        {
+            ShowNetworkNotReadyWindow();
+            return true;
+        }
+
         g_pCore->GetCommands()->Execute("reconnect", "");
+    }
     else
     {
         m_ServerBrowser.SetVisible(true);
         m_ServerBrowser.OnQuickConnectButtonClick();
     }
+
     return true;
 }
 
@@ -944,7 +969,7 @@ bool CMainMenu::OnHostGameButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "local");
+    CModManager::GetSingleton().RequestLoad("local");
 
     return true;
 }
@@ -956,7 +981,7 @@ bool CMainMenu::OnEditorButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "editor");
+    CModManager::GetSingleton().RequestLoad("editor");
 
     return true;
 }
@@ -1169,6 +1194,26 @@ void CMainMenu::AskUserIfHeWantsToDisconnect(uchar menuType)
     pQuestionBox->SetButton(1, _("Yes"));
     pQuestionBox->SetCallback(StaticWantsToDisconnectCallBack, (void*)menuType);
     pQuestionBox->Show();
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CMainMenu::ShowNetworkNotReadyWindow
+//
+// Shows a window with information that the network module is not ready.
+//
+/////////////////////////////////////////////////////////////
+void CMainMenu::ShowNetworkNotReadyWindow()
+{
+    static auto HideQuestionWindow = [](void* window, uint) { reinterpret_cast<CQuestionBox*>(window)->Hide(); };
+
+    CQuestionBox& window = m_QuestionBox;
+    window.Reset();
+    window.SetTitle(_("INFORMATION"));
+    window.SetMessage("\n\nThe network module is not ready.\nPlease wait a moment and try again.");
+    window.SetButton(0, _("OK"));
+    window.SetCallback(HideQuestionWindow, &window);
+    window.Show();
 }
 
 /////////////////////////////////////////////////////////////
