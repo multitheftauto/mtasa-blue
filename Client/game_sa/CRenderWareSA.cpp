@@ -325,58 +325,33 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
     // Fast check if comparing one atomic
     if (pAtomicB)
     {
-        RpAtomic* atomicA = pGame->GetRenderWare()->GetFirstAtomic(pClumpA);
-        if (!atomicA)
-            return false;
-
-        return atomicA->geometry == pAtomicB->geometry;
+        RpGeometry* pGeometryA = ((RpAtomic*)((pClumpA->atomics.root.next) - 0x8))->geometry;
+        RpGeometry* pGeometryB = pAtomicB->geometry;
+        return pGeometryA == pGeometryB;
     }
 
-    // Check number of atomics in clumps
-    int numAtomicsA = RpClumpGetNumAtomics(pClumpA);
-    int numAtomicsB = RpClumpGetNumAtomics(pClumpB);
-    if (numAtomicsA != numAtomicsB)
+    // Get atomic list from both sides
+    std::vector<RpAtomic*> atomicListA;
+    std::vector<RpAtomic*> atomicListB;
+    GetClumpAtomicList(pClumpA, atomicListA);
+    if (pClumpB)
+        GetClumpAtomicList(pClumpB, atomicListB);
+    if (pAtomicB)
+        atomicListB.push_back(pAtomicB);
+
+    // Count geometries that exist in both sides
+    std::set<RpGeometry*> geometryListA;
+    for (uint i = 0; i < atomicListA.size(); i++)
+        MapInsert(geometryListA, atomicListA[i]->geometry);
+
+    uint uiInBoth = 0;
+    for (uint i = 0; i < atomicListB.size(); i++)
+        if (MapContains(geometryListA, atomicListB[i]->geometry))
+            uiInBoth++;
+
+    // If less than 50% match then assume it is not the same
+    if (uiInBoth * 2 < atomicListB.size() || atomicListB.size() == 0)
         return false;
-
-    std::vector<RpGeometry*> geometryListA;
-    std::vector<RpGeometry*> geometryListB;
-    geometryListA.reserve(numAtomicsA * sizeof(RpGeometry*));
-    geometryListB.reserve(numAtomicsB * sizeof(RpGeometry*));
-
-    // Get geometry from clump A
-    RpClumpForAllAtomics(
-        pClumpA, [](RpAtomic* atomic, void* data) -> bool {
-            auto* geometryList = static_cast<std::vector<RpGeometry*>*>(data);
-            geometryList->push_back(atomic->geometry);
-
-            return true;
-        },
-        &geometryListA);
-
-    // Get geometry from clump B
-    RpClumpForAllAtomics(
-        pClumpB,
-        [](RpAtomic* atomic, void* data) -> bool
-        {
-            auto* geometryList = static_cast<std::vector<RpGeometry*>*>(data);
-            geometryList->push_back(atomic->geometry);
-
-            return true;
-        },
-        &geometryListB);
-
-    if (geometryListA.size() != geometryListB.size())
-        return false;
-
-    std::unordered_set<RpGeometry*> geometrySetB;
-    geometrySetB.reserve(geometryListB.size());
-    geometrySetB.insert(geometryListB.begin(), geometryListB.end());
-
-    for (const auto& geomA : geometryListA)
-    {
-        if (geometrySetB.find(geomA) == geometrySetB.end())
-            return false;
-    }
 
     return true;
 }
