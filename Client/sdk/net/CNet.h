@@ -74,6 +74,7 @@ public:
 
     virtual void SetFakeLag(unsigned short usPacketLoss, unsigned short usMinExtraPing, unsigned short usExtraPingVariance, int iKBPSLimit) = 0;
 
+    virtual bool IsReady() = 0;
     virtual bool IsConnected() = 0;
 
     virtual void DoPulse() = 0;
