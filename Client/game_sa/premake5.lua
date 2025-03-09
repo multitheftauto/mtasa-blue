@@ -24,8 +24,10 @@ project "Game SA"
 
 	includedirs {
 		"../../Shared/sdk",
+		".",
 		"../sdk/",
-		"../../vendor/sparsehash/src/"
+		"./interfaces",
+		"../../vendor/sparsehash/src/",
 	}
 
 	files {
