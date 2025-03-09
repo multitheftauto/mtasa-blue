@@ -204,12 +204,23 @@ namespace SharedUtil
         return result;
     }
 
-    inline int ZLibCompress(const std::string input, std::string* output, const ZLibFormat format = ZLibFormat::GZIP, const int compression = 9,
+    inline bool StringToZLibFormat(std::string format, int &outResult)
+    {
+        int value = atoi(format.c_str());
+        if ((value >= 9 && value <= 31) || (value >= -15 && value <= -9)) // allowed values: 9..31, -9..-15
+        {
+            outResult = value;
+            return true;
+        }
+        return false;
+    }
+
+    inline int ZLibCompress(const std::string input, std::string* output, const int windowBits = (int)ZLibFormat::GZIP, const int compression = 9,
                             const ZLibStrategy strategy = ZLibStrategy::DEFAULT)
     {
         z_stream stream{};
 
-        int result = deflateInit2(&stream, compression, Z_DEFLATED, (int)format, MAX_MEM_LEVEL, (int)strategy);
+        int result = deflateInit2(&stream, compression, Z_DEFLATED, windowBits, MAX_MEM_LEVEL, (int)strategy);
         if (result != Z_OK)
             return result;
 
@@ -230,15 +241,14 @@ namespace SharedUtil
         return result;
     }
 
-    inline int ZLibUncompress(const std::string& input, std::string* output, const ZLibFormat format = ZLibFormat::AUTO)
+    inline int ZLibUncompress(const std::string& input, std::string* output, int windowBits = 0)
     {
-        int windowBits = (int)format;
-        if (format == ZLibFormat::AUTO)
+        if (windowBits == 0 && input.size() >= 2) // try to determine format automatically
         {
-            if (input[0] == 0x78)
-                windowBits = (int)ZLibFormat::ZLIB;
-            else if (input[0] == 0x1F)
+            if (input[0] == '\x1F' && input[1] == '\x8B')
                 windowBits = (int)ZLibFormat::GZIP;
+            else if (input[0] == '\x78')
+                windowBits = (int)ZLibFormat::ZLIB;
             else
                 windowBits = (int)ZLibFormat::ZRAW;
         }

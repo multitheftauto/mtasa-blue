@@ -730,10 +730,10 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
             }
             case StringEncodeFunction::ZLIB:
             {
-                int          compression = 9;
-                ZLibFormat   format = ZLibFormat::GZIP;
+                int compression = 9;
+                int format = (int)ZLibFormat::GZIP;
                 ZLibStrategy strategy = ZLibStrategy::DEFAULT;
-                if (!options["format"].empty() && !StringToEnum(options["format"], format))
+                if (!options["format"].empty() && !StringToEnum(options["format"], (ZLibFormat&)format) && !StringToZLibFormat(options["format"], format))
                 {
                     m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'format'");
                     lua::Push(luaVM, false);
@@ -1170,8 +1170,8 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
             }
             case StringEncodeFunction::ZLIB:
             {
-                ZLibFormat format = ZLibFormat::AUTO;
-                if (!options["format"].empty() && !StringToEnum(options["format"], format))
+                int format = 0;
+                if (!options["format"].empty() && !StringToEnum(options["format"], (ZLibFormat&)format) && !StringToZLibFormat(options["format"], format))
                 {
                     m_pScriptDebugging->LogCustom(luaVM, "Not supported value for field 'format'");
                     lua::Push(luaVM, false);

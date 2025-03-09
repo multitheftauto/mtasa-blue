@@ -70,7 +70,6 @@ enum class HmacAlgorithm
 
 enum class ZLibFormat
 {
-    AUTO = 0,
     ZRAW = -15,
     ZLIB = 15,
     GZIP = 31,
