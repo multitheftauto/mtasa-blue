@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-08 23:56+0000\n"
-"PO-Revision-Date: 2025-03-10 16:24\n"
+"PO-Revision-Date: 2025-03-10 23:01\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -1440,7 +1440,7 @@ msgstr "زمان %d:%02d:%02d می باشد"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr "اتصال: شبکه آماده نمیباشد لحظه ای صبر کنید"
+msgstr "اتصال: شبکه آماده نمی‌باشد لحظه ای صبر کنید"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -1466,7 +1466,7 @@ msgstr "اتصال: آنلود سازی مود فعلی ناموفق"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "اتصال مجدد: شبکه آماده نمی باشد, لحظه ای صبر کنید"
+msgstr "اتصال مجدد: شبکه آماده نمی‌باشد لحظه ای صبر کنید"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
