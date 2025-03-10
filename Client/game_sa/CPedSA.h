@@ -301,7 +301,7 @@ public:
     int                              unk_724;
     int                              unk_728;
 
-    eWeaponSkill                     weaponSkill;
+    std::uint8_t                     weaponSkill; // eWeaponSkill but.. later
     eFightingStyle                   bFightingStyle;
     std::uint8_t                     bFightingStyleExtra;
     std::uint8_t                     bPad7;
