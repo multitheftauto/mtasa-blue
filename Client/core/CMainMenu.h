@@ -75,6 +75,8 @@ public:
     void        WantsToDisconnectCallBack(void* pData, uint uiButton);
     void        AskUserIfHeWantsToDisconnect(uchar menuType);
 
+    void ShowNetworkNotReadyWindow();
+
 private:
     sMenuItem* CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition);
     bool       SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHovering);
