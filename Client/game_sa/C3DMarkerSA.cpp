@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/C3DMarkerSA.cpp
  *  PURPOSE:     3D Marker entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -40,14 +40,14 @@ CVector* C3DMarkerSA::GetPosition()
     return &GetInterface()->m_mat.vPos;
 }
 
-DWORD C3DMarkerSA::GetType()
+e3DMarkerType C3DMarkerSA::GetType() const
 {
-    return GetInterface()->m_nType;
+    return static_cast<e3DMarkerType>(GetInterface()->m_nType);
 }
 
-void C3DMarkerSA::SetType(DWORD dwType)
+void C3DMarkerSA::SetType(e3DMarkerType type)
 {
-    GetInterface()->m_nType = (unsigned short)(dwType);
+    GetInterface()->m_nType = type;
 }
 
 bool C3DMarkerSA::IsActive()
@@ -60,22 +60,9 @@ DWORD C3DMarkerSA::GetIdentifier()
     return GetInterface()->m_nIdentifier;
 }
 
-SharedUtil::SColor C3DMarkerSA::GetColor()
-{
-    // From ABGR
-    unsigned long      ulABGR = GetInterface()->rwColour;
-    SharedUtil::SColor color;
-    color.A = (ulABGR >> 24) & 0xff;
-    color.B = (ulABGR >> 16) & 0xff;
-    color.G = (ulABGR >> 8) & 0xff;
-    color.R = ulABGR & 0xff;
-    return color;
-}
-
 void C3DMarkerSA::SetColor(const SharedUtil::SColor color)
 {
-    // To ABGR
-    GetInterface()->rwColour = (color.A << 24) | (color.B << 16) | (color.G << 8) | color.R;
+    GetInterface()->rwColour = RwColor{color.R, color.G, color.B, color.A};
 }
 
 void C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)
