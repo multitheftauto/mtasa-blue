@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-07 20:23+0000\n"
-"PO-Revision-Date: 2025-03-07 20:31\n"
+"POT-Creation-Date: 2025-03-08 23:56+0000\n"
+"PO-Revision-Date: 2025-03-10 16:24\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -20,12 +20,13 @@ msgstr ""
 #. Create buttons
 #. OK button
 #: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:37
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4838
-#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
-#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
-#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
-#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
-#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/core/CMainMenu.cpp:1214 Client/core/CSettings.cpp:127
+#: Client/core/CSettings.cpp:4838 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
+#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
+#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
+#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
+#: Client/core/CVersionUpdater.cpp:2152
 msgid "OK"
 msgstr "تایید"
 
@@ -45,7 +46,7 @@ msgstr "لغو"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:35
-#: Client/core/CMainMenu.cpp:1191 Client/core/CSettings.cpp:1413
+#: Client/core/CMainMenu.cpp:1194 Client/core/CSettings.cpp:1413
 #: Client/core/CSettings.cpp:1437 Client/core/CSettings.cpp:4542
 #: Client/core/CSettings.cpp:4616 Client/core/CSettings.cpp:4646
 #: Client/core/CSettings.cpp:4695 Client/core/CVersionUpdater.cpp:1572
@@ -55,7 +56,7 @@ msgstr "لغو"
 msgid "Yes"
 msgstr "بله"
 
-#: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1190
+#: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1193
 #: Client/core/CSettings.cpp:1412 Client/core/CSettings.cpp:1436
 #: Client/core/CSettings.cpp:4541 Client/core/CSettings.cpp:4615
 #: Client/core/CSettings.cpp:4645 Client/core/CSettings.cpp:4694
@@ -379,7 +380,7 @@ msgstr "به دلیل درگیر بودن فایل ها نمی توان بروز
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
 #: Client/core/CSettings.cpp:2972 Client/core/CSettings.cpp:4219
 #: Client/core/CSettings.cpp:4247 Client/core/CSettings.cpp:4817
-#: Client/core/CCore.cpp:1261 Client/core/CGUI.cpp:93
+#: Client/core/CCore.cpp:1262 Client/core/CGUI.cpp:93
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1261
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1283
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1340
@@ -445,7 +446,7 @@ msgstr "بسته تکمیلی GTA:SA"
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr "MTA:SA اجرا نشد زیرا اعمال بسته تکمیلی GTA:SA با شکست مواجه شد:"
 
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:806
+#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:807
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA نمی تواند ادامه دهد زیرا محل ذخیره سایزی %s فضای کافی ندارد‎‏‎‪‎‏."
@@ -1064,7 +1065,7 @@ msgstr "اتصال قطع شد"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1096
-#: Client/core/CSettings.cpp:3520 Client/core/CCore.cpp:669
+#: Client/core/CSettings.cpp:3520 Client/core/CCore.cpp:670
 msgid "In-game"
 msgstr "در بازی"
 
@@ -1199,7 +1200,7 @@ msgstr "خفگی تا حد مرگ در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:540
 #: Client/core/CMainMenu.cpp:302 Client/core/CSettings.cpp:3516
-#: Client/core/CCore.cpp:669
+#: Client/core/CCore.cpp:670
 msgid "Main menu"
 msgstr "فهرست اصلی"
 
@@ -1414,24 +1415,19 @@ msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 msgstr "MTA بعد از ژوئیه 2019 به‌روزرسانی‌های XP/Vista را دریافت نخواهد کرد.\n\n"
 "برای بازی کردن در سرور های جدید ویندوز خود را ارتقا دهید."
 
-#: Client/core/CMainMenu.cpp:1184
+#: Client/core/CMainMenu.cpp:1187
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "این کار شما را از سرور فعلی قطع اتصال می کند.\n\n"
 "آیا مطمئن هستید که می خواهید قطع اتصال کنید؟"
 
-#: Client/core/CMainMenu.cpp:1188
+#: Client/core/CMainMenu.cpp:1191
 msgid "DISCONNECT WARNING"
 msgstr "اخطار قطع اتصال"
 
-#: Client/core/CMainMenu.cpp:1209
+#: Client/core/CMainMenu.cpp:1212
 msgid "INFORMATION"
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:1211 Client/core/CVersionUpdater.cpp:2088
-#: Client/core/CVersionUpdater.cpp:2098
-msgid "Ok"
-msgstr "تایید"
+msgstr "اطلاعات"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -1444,7 +1440,7 @@ msgstr "زمان %d:%02d:%02d می باشد"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "اتصال: شبکه آماده نمیباشد لحظه ای صبر کنید"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -1470,7 +1466,7 @@ msgstr "اتصال: آنلود سازی مود فعلی ناموفق"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "اتصال مجدد: شبکه آماده نمی باشد, لحظه ای صبر کنید"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
@@ -2625,6 +2621,10 @@ msgstr "دانلود انجام شد"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - مشکل ناشناخته در _DialogUpdateResult"
 
+#: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
+msgid "Ok"
+msgstr "تایید"
+
 #: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
 msgstr "خطا"
@@ -2647,110 +2647,110 @@ msgid "\n\n"
 msgstr "\n\n"
 "منتظر پاسخ - %-3d"
 
-#: Client/core/CCore.cpp:808 Shared/mods/deathmatch/logic/Utils.cpp:129
+#: Client/core/CCore.cpp:809 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
 msgstr "خطای مهلک"
 
-#: Client/core/CCore.cpp:929
+#: Client/core/CCore.cpp:930
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "برای درست کردن، این فایل را حذف کنید:"
 
-#: Client/core/CCore.cpp:961
+#: Client/core/CCore.cpp:962
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "ماژول %s نادرست است!"
 
-#: Client/core/CCore.cpp:1261
+#: Client/core/CCore.cpp:1262
 msgid "Error executing URL"
 msgstr "خطا در اجرای لینک"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1356
 msgid "this help screen"
 msgstr "این صفحه راهنما"
 
-#: Client/core/CCore.cpp:1356 Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1357 Client/core/CCore.cpp:1358
 msgid "exits the application"
 msgstr "از برنامه خارج می شود"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1359
 msgid "shows the version"
 msgstr "نسخه را نشان می دهد"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1360
 msgid "shows the time"
 msgstr "زمان را نشان می دهد"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1361
 msgid "shows the hud"
 msgstr "HUD را نشان می دهد"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1362
 msgid "shows all the binds"
 msgstr "تمامی بایند ها را نشان می دهد"
 
-#: Client/core/CCore.cpp:1362
+#: Client/core/CCore.cpp:1363
 msgid "shows your serial"
 msgstr "سریال شما را نشان می دهد"
 
-#: Client/core/CCore.cpp:1371
+#: Client/core/CCore.cpp:1372
 msgid "connects to a server (host port nick pass)"
 msgstr "اتصال به یک سرور (آدرس پورت لقب رمز)"
 
-#: Client/core/CCore.cpp:1372
+#: Client/core/CCore.cpp:1373
 msgid "connects to a previous server"
 msgstr "اتصال به سرور پیشین"
 
-#: Client/core/CCore.cpp:1373
+#: Client/core/CCore.cpp:1374
 msgid "binds a key (key control)"
 msgstr "یک کلید را بایند می کند (کلید کنترل)"
 
-#: Client/core/CCore.cpp:1374
+#: Client/core/CCore.cpp:1375
 msgid "unbinds a key (key)"
 msgstr "یک کلید را آنباید می کند (کلید)"
 
-#: Client/core/CCore.cpp:1375
+#: Client/core/CCore.cpp:1376
 msgid "copies the default gta controls"
 msgstr "تنظیمات کنترل پیشفرض GTA را کپی می کند"
 
-#: Client/core/CCore.cpp:1376
+#: Client/core/CCore.cpp:1377
 msgid "outputs a screenshot"
 msgstr "یک اسکرین شات را خروجی می دهد"
 
-#: Client/core/CCore.cpp:1377
+#: Client/core/CCore.cpp:1378
 msgid "immediately saves the config"
 msgstr "بلافاصله تنظیمات را ذخیره می کند"
 
-#: Client/core/CCore.cpp:1379
+#: Client/core/CCore.cpp:1380
 msgid "clears the debug view"
 msgstr "نمای اشکال زدایی را پاک می کند"
 
-#: Client/core/CCore.cpp:1380
+#: Client/core/CCore.cpp:1381
 msgid "scrolls the chatbox upwards"
 msgstr "محدوده گفت و گو را به سمت بالا اسکرول می کند"
 
-#: Client/core/CCore.cpp:1381
+#: Client/core/CCore.cpp:1382
 msgid "scrolls the chatbox downwards"
 msgstr "محدوده گفت و گو را به سمت پایین اسکرول می کند"
 
-#: Client/core/CCore.cpp:1382
+#: Client/core/CCore.cpp:1383
 msgid "scrolls the debug view upwards"
 msgstr "اشکال زدایی را به سمت بالا اسکرول می کند"
 
-#: Client/core/CCore.cpp:1383
+#: Client/core/CCore.cpp:1384
 msgid "scrolls the debug view downwards"
 msgstr "اشکال زدایی را به سمت پایین اسکرول می کند"
 
-#: Client/core/CCore.cpp:1386
+#: Client/core/CCore.cpp:1387
 msgid "shows the memory statistics"
 msgstr "جزییات حافظه را نشان می دهد"
 
-#: Client/core/CCore.cpp:1387
+#: Client/core/CCore.cpp:1388
 msgid "shows the frame timing graph"
 msgstr "زمانبندی فریم را به صورت نمودار نشان می دهد"
 
-#: Client/core/CCore.cpp:1391
+#: Client/core/CCore.cpp:1392
 msgid "for developers: reload news"
 msgstr "برای توسعه دهندگان: بروزرسانی اخبار"
 
