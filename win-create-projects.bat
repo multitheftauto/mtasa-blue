@@ -1,6 +1,13 @@
 @echo off
 
+rem Update CEF eventually
+utils\premake5.exe install_cef
 
+rem Update Unifont
+utils\premake5.exe install_unifont
+
+rem Update discord-rpc
+utils\premake5.exe install_discord
 
 rem Generate solutions
 utils\premake5.exe vs2022

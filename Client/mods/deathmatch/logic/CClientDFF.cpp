@@ -330,7 +330,7 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
     g_pGame->GetModelInfo(usModel)->RestreamIPL();
 
     // Grab the model info for that model and replace the model
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);    
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
 
     if (!pModelInfo->SetCustomModel(pClump))
         return false;
