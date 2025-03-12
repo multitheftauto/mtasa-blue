@@ -393,7 +393,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
             }
         }
         // if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
-        if (m_pWeapon->ProcessLineOfSight(&vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity))
+        if (m_pWeapon->ProcessLineOfSight(vecOrigin, vecTarget, &pColPoint, pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity))
         {
             vecTarget = pColPoint->GetPosition();
         }
@@ -449,7 +449,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
 #ifdef MARKER_DEBUG
         m_pMarker2->SetPosition(vecTarget);
 #endif
-        m_pWeapon->DoBulletImpact(m_pObject, pEntity, vecOrigin, vecTarget, *pColPoint, 0);
+        m_pWeapon->DoBulletImpact(m_pObject, pEntity, vecOrigin, vecTarget, *pColPoint->GetInterface(), 0);
 
         if (!IsLocalEntity() && m_pOwner)
         {

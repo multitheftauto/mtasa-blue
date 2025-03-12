@@ -280,8 +280,6 @@ public:
     void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0);
     bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false);
 
-    bool HasCreditScreenFadedOut();
-
     void         SetupSpecialCharacters();
     void         FixModelCol(uint iFixModel, uint iFromModel);
     void         SetupBrokenModels();

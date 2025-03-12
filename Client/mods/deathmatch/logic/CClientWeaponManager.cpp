@@ -44,3 +44,8 @@ void CClientWeaponManager::DoPulse()
         (*iter)->DoPulse();
     }
 }
+
+bool CClientWeaponManager::HasWeaponBulletSync(std::uint32_t weaponID) noexcept
+{
+    return weaponID >= 22 && weaponID <= 34;
+}
