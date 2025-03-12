@@ -12,13 +12,13 @@
 #pragma once
 
 #include <game/C3DMarker.h>
-#include <CMatrix_Pad.h>
 #include "game/RenderWare.h"
+#include "../CMatrixSA.h"
 
 class C3DMarkerSAInterface
 {
 public:
-    CMatrix_Padded m_mat;            // local space to world space transform
+    CMatrixSAInterface m_mat;            // local space to world space transform
     RpAtomic*      m_pRwObject;
     RpMaterial*    m_pMaterial;
     std::uint16_t  m_nType;              // e3DMarkerType
@@ -46,12 +46,12 @@ public:
     std::uint32_t m_OnScreenTestTime;            // time last screen check was done
 
 public:
-    bool AddMarker(std::uint32_t id, e3DMarkerType type, float size, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a, std::uint16_t pulsePeriod,
+    inline bool AddMarker(std::uint32_t id, e3DMarkerType type, float size, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a, std::uint16_t pulsePeriod,
                    float pulseFraction, std::int16_t rotateRate);
-    void DeleteMarkerObject();
-    bool IsZCoordinateUpToDate() const;
-    void SetZCoordinateIfNotUpToDate(float newZPos);
-    void UpdateZCoordinate(CVector point, float zDistance);
-    void DeleteIfHasAtomic();
+    inline void DeleteMarkerObject();
+    inline bool IsZCoordinateUpToDate() const;
+    inline void SetZCoordinateIfNotUpToDate(float newZPos);
+    inline void UpdateZCoordinate(CVector point, float zDistance);
+    inline void DeleteIfHasAtomic();
 };
 static_assert(sizeof(C3DMarkerSAInterface) == 0xA0, "Invalid size for C3DMarkerSAInterface");
