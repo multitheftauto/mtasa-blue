@@ -1207,6 +1207,12 @@ void CSettings::CreateGUI()
     m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
     vecTemp.fY += fLineHeight;
 
+    // Process affinity
+    m_pProcessAffinityCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Set CPU 0 affinity to improve game performance"), true));
+    m_pProcessAffinityCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pProcessAffinityCheckbox->AutoSize(nullptr, 20.0f);
+    vecTemp.fY += fLineHeight;
+
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Auto updater")));
     m_pAdvancedUpdaterLabel->SetPosition(CVector2D(vecTemp.fX - 10.0f, vecTemp.fY));
@@ -3228,6 +3234,22 @@ void CSettings::LoadData()
     CVARS_GET("photosaving", bVar);
     m_pPhotoSavingCheckbox->SetSelected(bVar);
 
+    // Process CPU Affinity
+    CVARS_GET("process_cpu_affinity", bVar);
+    m_pProcessAffinityCheckbox->SetSelected(bVar);
+
+    DWORD_PTR affinityMask = 0;
+    if (bVar)
+        affinityMask = 1 << 0; // CPU 0 only
+    else
+    {
+        SYSTEM_INFO sysInfo;
+        GetSystemInfo(&sysInfo);
+
+        affinityMask = (1 << sysInfo.dwNumberOfProcessors) - 1; // All cores (default)
+    }
+    SetProcessAffinityMask(GetCurrentProcess(), affinityMask);
+
     // Update build type
     CVARS_GET("update_build_type", iVar);
     if (iVar == 0 || iVar == 1)
@@ -3623,6 +3645,22 @@ void CSettings::SaveData()
     bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
     CVARS_SET("photosaving", photoSaving);
     CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
+
+    // Process CPU Affinity
+    bool cpuAffinity = m_pProcessAffinityCheckbox->GetSelected();
+    CVARS_SET("process_cpu_affinity", cpuAffinity);
+
+    DWORD_PTR affinityMask = 0;
+    if (cpuAffinity)
+        affinityMask = 1 << 0;  // CPU 0 only
+    else
+    {
+        SYSTEM_INFO sysInfo;
+        GetSystemInfo(&sysInfo);
+
+        affinityMask = (1 << sysInfo.dwNumberOfProcessors) - 1; // All cores (default)
+    }
+    SetProcessAffinityMask(GetCurrentProcess(), affinityMask);
 
     // Debug setting
     if (CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem())
