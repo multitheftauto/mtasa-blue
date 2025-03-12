@@ -380,20 +380,6 @@ CEntity* CPedSA::GetContactEntity() const
     return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(contactInterface));
 }
 
-CEntity* CPedSA::GetTargetedEntity() const
-{
-    CEntitySAInterface* targetInterface = GetPedInterface()->pTargetedEntity;
-    if (!targetInterface)
-        return nullptr;
-
-    return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(targetInterface));
-}
-
-void CPedSA::SetTargetedEntity(CEntity* targetEntity)
-{
-    GetPedInterface()->pTargetedEntity = targetEntity ? targetEntity->GetInterface() : nullptr;
-}
-
 void CPedSA::RemoveBodyPart(std::uint8_t boneID, std::uint8_t direction)
 {
     // char __thiscall CPed::RemoveBodyPart(CPed *this, int boneID, int localDir)
