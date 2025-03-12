@@ -343,7 +343,6 @@ public:
 };
 static_assert(sizeof(CPedSAInterface) == 0x79C, "Invalid size for CPedSAInterface");
 
-
 class CPedSA : public virtual CPed, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
