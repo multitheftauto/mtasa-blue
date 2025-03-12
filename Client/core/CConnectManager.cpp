@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "net/packetenums.h"
+#include "net/Packets.h"
 using namespace std;
 
 static CConnectManager* g_pConnectManager = NULL;
