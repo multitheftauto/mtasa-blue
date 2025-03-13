@@ -374,7 +374,8 @@ void CBuildingsPoolSA::RemovePedsContactEnityLinks()
             ped->pLastContactedEntity[3] = nullptr;
             ped->m_ucCollisionState = 0;
 
-            reinterpret_cast<CPlayerPedSA*>(pedLinks->pEntity)->SetTargetedEntity(nullptr);
+            if (auto* playerPed = dynamic_cast<CPlayerPedSA*>(pedLinks->pEntity))
+                playerPed->SetTargetedEntity(nullptr);
         }
     }
 }
