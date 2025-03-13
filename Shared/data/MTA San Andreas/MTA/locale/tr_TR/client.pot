@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-07 20:23+0000\n"
-"PO-Revision-Date: 2025-03-07 21:40\n"
+"POT-Creation-Date: 2025-03-13 06:15+0000\n"
+"PO-Revision-Date: 2025-03-13 06:31\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -20,12 +20,13 @@ msgstr ""
 #. Create buttons
 #. OK button
 #: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:37
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4838
-#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
-#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
-#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
-#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
-#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/core/CMainMenu.cpp:1214 Client/core/CSettings.cpp:127
+#: Client/core/CSettings.cpp:4838 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
+#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
+#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
+#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
+#: Client/core/CVersionUpdater.cpp:2152
 msgid "OK"
 msgstr "TAMAM"
 
@@ -45,7 +46,7 @@ msgstr "İptal et"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:35
-#: Client/core/CMainMenu.cpp:1191 Client/core/CSettings.cpp:1413
+#: Client/core/CMainMenu.cpp:1194 Client/core/CSettings.cpp:1413
 #: Client/core/CSettings.cpp:1437 Client/core/CSettings.cpp:4542
 #: Client/core/CSettings.cpp:4616 Client/core/CSettings.cpp:4646
 #: Client/core/CSettings.cpp:4695 Client/core/CVersionUpdater.cpp:1572
@@ -55,7 +56,7 @@ msgstr "İptal et"
 msgid "Yes"
 msgstr "Evet"
 
-#: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1190
+#: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1193
 #: Client/core/CSettings.cpp:1412 Client/core/CSettings.cpp:1436
 #: Client/core/CSettings.cpp:4541 Client/core/CSettings.cpp:4615
 #: Client/core/CSettings.cpp:4645 Client/core/CSettings.cpp:4694
@@ -376,7 +377,7 @@ msgstr "Dosya çakışmaları nedeniyle güncellenemedi. Lütfen diğer uygulama
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
 #: Client/core/CSettings.cpp:2972 Client/core/CSettings.cpp:4219
 #: Client/core/CSettings.cpp:4247 Client/core/CSettings.cpp:4817
-#: Client/core/CCore.cpp:1261 Client/core/CGUI.cpp:93
+#: Client/core/CCore.cpp:1262 Client/core/CGUI.cpp:93
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1261
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1283
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1340
@@ -441,7 +442,7 @@ msgstr "GTA:SA'yı yama"
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr "MTA:SA başlatılamadı çünkü GTA:SA yaması başarısız oldu:"
 
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:806
+#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:807
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "%s diskinde yeterli alan olmadığı için MTA:SA devam edemiyor."
@@ -1062,7 +1063,7 @@ msgstr "Bağlantı kesildi"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1096
-#: Client/core/CSettings.cpp:3520 Client/core/CCore.cpp:669
+#: Client/core/CSettings.cpp:3520 Client/core/CCore.cpp:670
 msgid "In-game"
 msgstr "Oyunda"
 
@@ -1196,8 +1197,8 @@ msgid "Choking to death in"
 msgstr "Boğulma sonucu ölüm"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:540
-#: Client/core/CMainMenu.cpp:302 Client/core/CSettings.cpp:3516
-#: Client/core/CCore.cpp:669
+#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3516
+#: Client/core/CCore.cpp:670
 msgid "Main menu"
 msgstr "Ana menü"
 
@@ -1402,34 +1403,29 @@ msgstr "Sunucudan yanıt alınamıyor (1)"
 msgid "Unknown command or cvar: "
 msgstr "Bilinmeyen komut veya cvar: "
 
-#: Client/core/CMainMenu.cpp:331
+#: Client/core/CMainMenu.cpp:332
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
 msgstr "Yeni özelliklerin olduğu bir versiyon kullanıyorsun! Bu versiyon sadece deneme amaçlıdır ve herhangi bir sunucuya bağlanmak için kullanılamaz!"
 
-#: Client/core/CMainMenu.cpp:350
+#: Client/core/CMainMenu.cpp:351
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
 msgstr "XP ve Vista, Temmuz 2019'dan sonra güncelleme almayacak.\n\n"
 "En son ve güncel serverlarda oynamak için, Windows'unuzu güncelleyin."
 
-#: Client/core/CMainMenu.cpp:1184
+#: Client/core/CMainMenu.cpp:1187
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Bu sizi mevcut sunucudan atacaktır.\n\n"
 "Çıkmak istediğinizden emin misiniz?"
 
-#: Client/core/CMainMenu.cpp:1188
+#: Client/core/CMainMenu.cpp:1191
 msgid "DISCONNECT WARNING"
 msgstr "BAĞLANTI KESME UYARISI"
 
-#: Client/core/CMainMenu.cpp:1209
+#: Client/core/CMainMenu.cpp:1212
 msgid "INFORMATION"
 msgstr ""
-
-#: Client/core/CMainMenu.cpp:1211 Client/core/CVersionUpdater.cpp:2088
-#: Client/core/CVersionUpdater.cpp:2098
-msgid "Ok"
-msgstr "Tamam"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -2625,6 +2621,10 @@ msgstr "İNDİRME TAMAMLANDI"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr "_DialogUpdateResult 'ta bilinmeyen bir problem."
 
+#: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
+msgid "Ok"
+msgstr "Tamam"
+
 #: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
 msgstr "HATA"
@@ -2647,110 +2647,110 @@ msgid "\n\n"
 msgstr "\n\n"
 "Cevap bekleniyor  -  %-3d"
 
-#: Client/core/CCore.cpp:808 Shared/mods/deathmatch/logic/Utils.cpp:129
+#: Client/core/CCore.cpp:809 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
 msgstr "Sistemsel hata"
 
-#: Client/core/CCore.cpp:929
+#: Client/core/CCore.cpp:930
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "DÜZELTMEK İÇİN, ŞU DOSYAYI SİL:"
 
-#: Client/core/CCore.cpp:961
+#: Client/core/CCore.cpp:962
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s modülü yanlış!"
 
-#: Client/core/CCore.cpp:1261
+#: Client/core/CCore.cpp:1262
 msgid "Error executing URL"
 msgstr "URL çalıştırılırken bir hata oluştu"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1356
 msgid "this help screen"
 msgstr "bu yardım ekranı"
 
-#: Client/core/CCore.cpp:1356 Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1357 Client/core/CCore.cpp:1358
 msgid "exits the application"
 msgstr "uygulamadan çıkar"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1359
 msgid "shows the version"
 msgstr "versiyonu gösterir"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1360
 msgid "shows the time"
 msgstr "zamanı gösterir"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1361
 msgid "shows the hud"
 msgstr "arayüzü gösterir"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1362
 msgid "shows all the binds"
 msgstr "bütün tuş atamalarını gösterir"
 
-#: Client/core/CCore.cpp:1362
+#: Client/core/CCore.cpp:1363
 msgid "shows your serial"
 msgstr "seri numaranızı gösterir"
 
-#: Client/core/CCore.cpp:1371
+#: Client/core/CCore.cpp:1372
 msgid "connects to a server (host port nick pass)"
 msgstr "bir sunucuya (ip port takma-ad şifre) bağlanır"
 
-#: Client/core/CCore.cpp:1372
+#: Client/core/CCore.cpp:1373
 msgid "connects to a previous server"
 msgstr "bir önceki sunucuya bağlanır"
 
-#: Client/core/CCore.cpp:1373
+#: Client/core/CCore.cpp:1374
 msgid "binds a key (key control)"
 msgstr "bir tuş atamasını kaydeder (tuş kontrol)"
 
-#: Client/core/CCore.cpp:1374
+#: Client/core/CCore.cpp:1375
 msgid "unbinds a key (key)"
 msgstr "tuş atamasını çıkarır (tuş)"
 
-#: Client/core/CCore.cpp:1375
+#: Client/core/CCore.cpp:1376
 msgid "copies the default gta controls"
 msgstr "varsayılan gta kontrollerini kopyalar"
 
-#: Client/core/CCore.cpp:1376
+#: Client/core/CCore.cpp:1377
 msgid "outputs a screenshot"
 msgstr "bir ekran görüntüsü kaydeder"
 
-#: Client/core/CCore.cpp:1377
+#: Client/core/CCore.cpp:1378
 msgid "immediately saves the config"
 msgstr "yapılandırmayı hemen kaydeder"
 
-#: Client/core/CCore.cpp:1379
+#: Client/core/CCore.cpp:1380
 msgid "clears the debug view"
 msgstr "debug görünümünü temizler"
 
-#: Client/core/CCore.cpp:1380
+#: Client/core/CCore.cpp:1381
 msgid "scrolls the chatbox upwards"
 msgstr "konuşma penceresini yukarı kaydırır"
 
-#: Client/core/CCore.cpp:1381
+#: Client/core/CCore.cpp:1382
 msgid "scrolls the chatbox downwards"
 msgstr "konuşma penceresini aşağı kaydırır"
 
-#: Client/core/CCore.cpp:1382
+#: Client/core/CCore.cpp:1383
 msgid "scrolls the debug view upwards"
 msgstr "debug görünümünü yukarıya doğru kaydırır"
 
-#: Client/core/CCore.cpp:1383
+#: Client/core/CCore.cpp:1384
 msgid "scrolls the debug view downwards"
 msgstr "debug görünümünü aşağı doğru kaydırır"
 
-#: Client/core/CCore.cpp:1386
+#: Client/core/CCore.cpp:1387
 msgid "shows the memory statistics"
 msgstr "hafıza istatistiklerini gösterir"
 
-#: Client/core/CCore.cpp:1387
+#: Client/core/CCore.cpp:1388
 msgid "shows the frame timing graph"
 msgstr "çerçeve zamanlama grafiğini gösterir"
 
-#: Client/core/CCore.cpp:1391
+#: Client/core/CCore.cpp:1392
 msgid "for developers: reload news"
 msgstr "geliştiriciler için: haberleri yeniden yükle"
 
