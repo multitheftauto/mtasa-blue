@@ -1795,17 +1795,6 @@ void CCore::ApplyCoreInitSettings()
 
         SetApplicationSettingInt("reset-settings-revision", 21486);
     }
-
-    // Set process settings
-    HANDLE currProc = GetCurrentProcess();
-
-    // Process priority
-    int PriorityClassList[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
-    SetPriorityClass(currProc, PriorityClassList[CVARS_GET_VALUE<int>("process_priority") % 3]);
-
-    // Process CPU affinity
-    if (CVARS_GET_VALUE<bool>("process_cpu_affinity"))
-        SetProcessAffinityMask(currProc, 1 << 0);
 }
 
 //
