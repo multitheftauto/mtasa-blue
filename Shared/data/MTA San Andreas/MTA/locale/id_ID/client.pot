@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-07 20:23+0000\n"
-"PO-Revision-Date: 2025-03-07 21:41\n"
+"POT-Creation-Date: 2025-03-13 06:15+0000\n"
+"PO-Revision-Date: 2025-03-13 07:30\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -20,12 +20,13 @@ msgstr ""
 #. Create buttons
 #. OK button
 #: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:37
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4838
-#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
-#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
-#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
-#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
-#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/core/CMainMenu.cpp:1214 Client/core/CSettings.cpp:127
+#: Client/core/CSettings.cpp:4838 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
+#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
+#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
+#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
+#: Client/core/CVersionUpdater.cpp:2152
 msgid "OK"
 msgstr "Oke"
 
@@ -45,7 +46,7 @@ msgstr "Batal"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:35
-#: Client/core/CMainMenu.cpp:1191 Client/core/CSettings.cpp:1413
+#: Client/core/CMainMenu.cpp:1194 Client/core/CSettings.cpp:1413
 #: Client/core/CSettings.cpp:1437 Client/core/CSettings.cpp:4542
 #: Client/core/CSettings.cpp:4616 Client/core/CSettings.cpp:4646
 #: Client/core/CSettings.cpp:4695 Client/core/CVersionUpdater.cpp:1572
@@ -55,7 +56,7 @@ msgstr "Batal"
 msgid "Yes"
 msgstr "Ya"
 
-#: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1190
+#: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1193
 #: Client/core/CSettings.cpp:1412 Client/core/CSettings.cpp:1436
 #: Client/core/CSettings.cpp:4541 Client/core/CSettings.cpp:4615
 #: Client/core/CSettings.cpp:4645 Client/core/CSettings.cpp:4694
@@ -376,7 +377,7 @@ msgstr "Tidak dapat memperbarui dikarenakan konflik berkas. Mohon tutup aplikasi
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
 #: Client/core/CSettings.cpp:2972 Client/core/CSettings.cpp:4219
 #: Client/core/CSettings.cpp:4247 Client/core/CSettings.cpp:4817
-#: Client/core/CCore.cpp:1261 Client/core/CGUI.cpp:93
+#: Client/core/CCore.cpp:1262 Client/core/CGUI.cpp:93
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1261
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1283
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1340
@@ -441,7 +442,7 @@ msgstr "Menambal GTA:SA"
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr "MTA:SA tidak dapat diluncurkan karena penambalan GTA:SA telah gagal:"
 
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:806
+#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:807
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA tidak dapat dilanjutkan karena drive %s tidak mempunyai ruang yang cukup."
@@ -1058,7 +1059,7 @@ msgstr "Terputus"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1096
-#: Client/core/CSettings.cpp:3520 Client/core/CCore.cpp:669
+#: Client/core/CSettings.cpp:3520 Client/core/CCore.cpp:670
 msgid "In-game"
 msgstr "Dalam permainan"
 
@@ -1192,8 +1193,8 @@ msgid "Choking to death in"
 msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:540
-#: Client/core/CMainMenu.cpp:302 Client/core/CSettings.cpp:3516
-#: Client/core/CCore.cpp:669
+#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3516
+#: Client/core/CCore.cpp:670
 msgid "Main menu"
 msgstr "Menu utama"
 
@@ -1398,34 +1399,29 @@ msgstr "Respon server tidak baik (1)"
 msgid "Unknown command or cvar: "
 msgstr "Perintah tidak dikenal atau cvar: "
 
-#: Client/core/CMainMenu.cpp:331
+#: Client/core/CMainMenu.cpp:332
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
 msgstr "Anda menggunakan fitur build cabang! Ini hanyalah sebuah tes build yang tidak dapat digunakan untuk menyambungkan ke server publik!"
 
-#: Client/core/CMainMenu.cpp:350
+#: Client/core/CMainMenu.cpp:351
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
 msgstr "MTA tidak akan menerima pembaharuan di XP/Vista setelah July 2019.\n"
 "Perbarui Windows untuk bermain di server terbaru."
 
-#: Client/core/CMainMenu.cpp:1184
+#: Client/core/CMainMenu.cpp:1187
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Ini akan memutuskan anda dari server ini.\n\n"
 "Apakah anda yakin ingin memutuskan?"
 
-#: Client/core/CMainMenu.cpp:1188
+#: Client/core/CMainMenu.cpp:1191
 msgid "DISCONNECT WARNING"
 msgstr "PERINGATAN PEMUTUSAN"
 
-#: Client/core/CMainMenu.cpp:1209
+#: Client/core/CMainMenu.cpp:1212
 msgid "INFORMATION"
 msgstr ""
-
-#: Client/core/CMainMenu.cpp:1211 Client/core/CVersionUpdater.cpp:2088
-#: Client/core/CVersionUpdater.cpp:2098
-msgid "Ok"
-msgstr "Oke"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -2619,6 +2615,10 @@ msgstr "PENGUNDUHAN SELESAI"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - Kesalahan yang tidak diketahui pada _DialogUpdateResult"
 
+#: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
+msgid "Ok"
+msgstr "Oke"
+
 #: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
 msgstr "KESALAHAN"
@@ -2641,110 +2641,110 @@ msgid "\n\n"
 msgstr "\n\n"
 "Sedang menunggu respon  -  %-3d"
 
-#: Client/core/CCore.cpp:808 Shared/mods/deathmatch/logic/Utils.cpp:129
+#: Client/core/CCore.cpp:809 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
 msgstr "Kesalahan fatal"
 
-#: Client/core/CCore.cpp:929
+#: Client/core/CCore.cpp:930
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "UNTUK MEMPERBAIKI, HAPUS BERKAS INI:"
 
-#: Client/core/CCore.cpp:961
+#: Client/core/CCore.cpp:962
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "Modul %s salah!"
 
-#: Client/core/CCore.cpp:1261
+#: Client/core/CCore.cpp:1262
 msgid "Error executing URL"
 msgstr "Kesalahan menjalankan URL"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1356
 msgid "this help screen"
 msgstr "layar bantuan ini"
 
-#: Client/core/CCore.cpp:1356 Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1357 Client/core/CCore.cpp:1358
 msgid "exits the application"
 msgstr "keluar dari aplikasi"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1359
 msgid "shows the version"
 msgstr "menampilkan versi"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1360
 msgid "shows the time"
 msgstr "menampilkan waktu"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1361
 msgid "shows the hud"
 msgstr "menampilkan hud"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1362
 msgid "shows all the binds"
 msgstr "menampilkan semua ikatan"
 
-#: Client/core/CCore.cpp:1362
+#: Client/core/CCore.cpp:1363
 msgid "shows your serial"
 msgstr "menampilkan serial anda"
 
-#: Client/core/CCore.cpp:1371
+#: Client/core/CCore.cpp:1372
 msgid "connects to a server (host port nick pass)"
 msgstr "menyambungkan ke server (host port nama sandi)"
 
-#: Client/core/CCore.cpp:1372
+#: Client/core/CCore.cpp:1373
 msgid "connects to a previous server"
 msgstr "menyambungkan ke server sebelumnya"
 
-#: Client/core/CCore.cpp:1373
+#: Client/core/CCore.cpp:1374
 msgid "binds a key (key control)"
 msgstr "mengikat sebuah tombol (tombol kontrol)"
 
-#: Client/core/CCore.cpp:1374
+#: Client/core/CCore.cpp:1375
 msgid "unbinds a key (key)"
 msgstr "melepas ikatan sebuah tombol (tombol)"
 
-#: Client/core/CCore.cpp:1375
+#: Client/core/CCore.cpp:1376
 msgid "copies the default gta controls"
 msgstr "menyalin kontrol default gta"
 
-#: Client/core/CCore.cpp:1376
+#: Client/core/CCore.cpp:1377
 msgid "outputs a screenshot"
 msgstr "mengeluarkan sebuah tangkapan layar"
 
-#: Client/core/CCore.cpp:1377
+#: Client/core/CCore.cpp:1378
 msgid "immediately saves the config"
 msgstr "langsung menyimpan pengaturan"
 
-#: Client/core/CCore.cpp:1379
+#: Client/core/CCore.cpp:1380
 msgid "clears the debug view"
 msgstr "membersihkan tampilan debug"
 
-#: Client/core/CCore.cpp:1380
+#: Client/core/CCore.cpp:1381
 msgid "scrolls the chatbox upwards"
 msgstr "menggulung kotak obrolan ke atas"
 
-#: Client/core/CCore.cpp:1381
+#: Client/core/CCore.cpp:1382
 msgid "scrolls the chatbox downwards"
 msgstr "menggulung kotak obrolan ke bawah"
 
-#: Client/core/CCore.cpp:1382
+#: Client/core/CCore.cpp:1383
 msgid "scrolls the debug view upwards"
 msgstr "menggulung tampilan debug ke atas"
 
-#: Client/core/CCore.cpp:1383
+#: Client/core/CCore.cpp:1384
 msgid "scrolls the debug view downwards"
 msgstr "menggulung tampilan debug ke bawah"
 
-#: Client/core/CCore.cpp:1386
+#: Client/core/CCore.cpp:1387
 msgid "shows the memory statistics"
 msgstr "menampilkan statistik penyimpanan"
 
-#: Client/core/CCore.cpp:1387
+#: Client/core/CCore.cpp:1388
 msgid "shows the frame timing graph"
 msgstr "menampilkan grafik frame waktu"
 
-#: Client/core/CCore.cpp:1391
+#: Client/core/CCore.cpp:1392
 msgid "for developers: reload news"
 msgstr "untuk developer: muat ulang berita"
 
