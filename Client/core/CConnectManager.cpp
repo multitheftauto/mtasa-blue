@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "net/packetenums.h"
+#include "net/Packets.h"
 using namespace std;
 
 static CConnectManager* g_pConnectManager = NULL;
@@ -51,6 +51,12 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     assert(szHost);
     assert(szNick);
     assert(szPassword);
+
+    if (!CCore::GetSingleton().IsNetworkReady())
+    {
+        CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->ShowNetworkNotReadyWindow();
+        return false;
+    }
 
     m_bNotifyServerBrowser = bNotifyServerBrowser;
 
@@ -337,10 +343,13 @@ void CConnectManager::DoPulse()
     }
     else if (m_bReconnect)
     {
-        std::string strNick;
-        CVARS_GET("nick", strNick);
-        Connect(m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str(), false);
-        m_bReconnect = false;
+        if (CCore::GetSingleton().IsNetworkReady())
+        {
+            std::string strNick;
+            CVARS_GET("nick", strNick);
+            Connect(m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str(), false);
+            m_bReconnect = false;
+        }
     }
 }
 
@@ -364,7 +373,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
             // Process packet data
             CCore::GetSingleton().GetNetwork()->SetServerBitStreamVersion(usServerBitStreamVersion);
 
-            if (strModName != "")
+            if (strModName == "deathmatch")
             {
                 // Populate the arguments to pass it (-c host port nick)
                 SString strArguments("%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str());
@@ -399,7 +408,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 g_pConnectManager->m_tConnectStarted = 0;
 
                 // Load the mod
-                if (!CModManager::GetSingleton().Load(strModName, strArguments))
+                if (!CModManager::GetSingleton().Load(strArguments))
                 {
                     // Failed loading the mod
                     strArguments.Format(_("No such mod installed (%s)"), strModName.c_str());
