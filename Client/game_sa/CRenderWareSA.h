@@ -35,6 +35,9 @@ public:
     void ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId);
     void ClothesRemoveReplacement(char* pFileData);
     bool HasClothesReplacementChanged();
+    bool ClothesAddFile(const char* pFileData, size_t fileSize, const char* pFileName);
+    bool ClothesRemoveFile(char* pFileData);
+    bool HasClothesFile(const char* pFileName);
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);

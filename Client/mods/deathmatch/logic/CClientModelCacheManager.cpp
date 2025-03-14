@@ -139,7 +139,7 @@ void CClientModelCacheManagerImpl::DoPulse()
         DoPulseVehicleModels();
 
     // Handle regeneration of possibly replaced clothes textures
-    if (g_pGame->GetRenderWare()->HasClothesReplacementChanged())
+    if (g_pGame->GetRenderWare()->HasClothesReplacementChanged() || CClientPlayerClothes::HasClothesChanged())
     {
         g_pMultiplayer->FlushClothesCache();
 
