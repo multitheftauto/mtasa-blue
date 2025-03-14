@@ -255,9 +255,6 @@ public:
 
     virtual int GetRunState() const = 0;
 
-    virtual CEntity* GetTargetedEntity() const = 0;
-    virtual void     SetTargetedEntity(CEntity* targetEntity) = 0;
-
     virtual bool GetCanBeShotInVehicle() const = 0;
     virtual bool GetTestForShotInVehicle() const = 0;
 

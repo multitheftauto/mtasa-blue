@@ -40,7 +40,8 @@
 #define CORE_MTA_DISABLED_ALPHA     0.4f
 #define CORE_MTA_ENABLED_ALPHA      1.0f
 
-#define CORE_MTA_ANIMATION_TIME     200
+#define CORE_MTA_ANIMATION_TIME_IN  200
+#define CORE_MTA_ANIMATION_TIME_OUT 100
 #define CORE_MTA_MOVE_ANIM_TIME     600
 
 #define CORE_MTA_STATIC_BG          "cgui\\images\\background.png"
@@ -517,11 +518,9 @@ void CMainMenu::Update()
 
             if (m_pHoveredItem)
             {
-                float fProgress = (m_pHoveredItem->image->GetAlpha() - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
-                // Let's work out what the target progress should be by working out the time passed
-                fProgress = ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA) + fProgress;
+                float progress = m_pHoveredItem->animProgress + ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME_IN);
                 MapRemove(m_unhoveredItems, m_pHoveredItem);
-                SetItemHoverProgress(m_pHoveredItem, fProgress, true);
+                SetItemHoverProgress(m_pHoveredItem, progress, true);
             }
         }
         else if (m_pHoveredItem)
@@ -534,11 +533,10 @@ void CMainMenu::Update()
         std::set<sMenuItem*>::iterator it = m_unhoveredItems.begin();
         while (it != m_unhoveredItems.end())
         {
-            float fProgress = ((*it)->image->GetAlpha() - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
             // Let's work out what the target progress should be by working out the time passed
             // Min of 0.5 progress fixes occasional graphical glitchekal
-            fProgress = fProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
-            if (SetItemHoverProgress((*it), fProgress, false))
+            float newProgress = (*it)->animProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME_OUT) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
+            if (SetItemHoverProgress((*it), newProgress, false))
             {
                 std::set<sMenuItem*>::iterator itToErase = it++;
                 m_unhoveredItems.erase(itToErase);
@@ -778,6 +776,9 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
         m_bIsIngame = bIsIngame;
         m_Settings.SetIsModLoaded(bIsIngame);
 
+        // Reset frame rate limit
+        CCore::GetSingleton().RecalculateFrameRateLimit(-1, false);
+
         m_ulMoveStartTick = GetTickCount32();
         if (bIsIngame)
         {
@@ -845,6 +846,19 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
                 break;
         }
     }
+    else if (!g_pCore->IsNetworkReady())
+    {
+        switch (m_pHoveredItem->menuType)
+        {
+            // case MENU_ITEM_QUICK_CONNECT:  // We only prevent it for left click in OnQuickConnectButtonClick.
+            case MENU_ITEM_HOST_GAME:
+            case MENU_ITEM_MAP_EDITOR:
+                ShowNetworkNotReadyWindow();
+                return true;
+            default:
+                break;
+        }
+    }
 
     switch (m_pHoveredItem->menuType)
     {
@@ -886,12 +900,21 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
         return false;
 
     if (left)
+    {
+        if (!g_pCore->IsNetworkReady())
+        {
+            ShowNetworkNotReadyWindow();
+            return true;
+        }
+
         g_pCore->GetCommands()->Execute("reconnect", "");
+    }
     else
     {
         m_ServerBrowser.SetVisible(true);
         m_ServerBrowser.OnQuickConnectButtonClick();
     }
+
     return true;
 }
 
@@ -944,7 +967,7 @@ bool CMainMenu::OnHostGameButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "local");
+    CModManager::GetSingleton().RequestLoad("local");
 
     return true;
 }
@@ -956,7 +979,7 @@ bool CMainMenu::OnEditorButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "editor");
+    CModManager::GetSingleton().RequestLoad("editor");
 
     return true;
 }
@@ -1076,8 +1099,10 @@ bool CMainMenu::SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHo
 {
     fProgress = Clamp<float>(0, fProgress, 1);
 
-    // Use OutQuad equation for easing, or OutQuad for unhovering
-    fProgress = bHovering ? -fProgress * (fProgress - 2) : fProgress * fProgress;
+    pItem->animProgress = fProgress;
+
+    // Always use OutQuad for both hovering and unhovering, to avoid animation glitches.
+    fProgress = -fProgress * (fProgress - 2);
 
     // Work out the target scale
     float fTargetScale = (CORE_MTA_HOVER_SCALE - CORE_MTA_NORMAL_SCALE) * (fProgress) + CORE_MTA_NORMAL_SCALE;
@@ -1096,7 +1121,7 @@ bool CMainMenu::SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHo
     pItem->image->SetSize(CVector2D(iSizeX, iSizeY), false);
 
     // Return whether the hovering has maxed out
-    return bHovering ? (fProgress == 1) : (fProgress == 0);
+    return bHovering ? (pItem->animProgress >= 1.0) : (pItem->animProgress <= 0.0f);
 }
 
 void CMainMenu::SetNewsHeadline(int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew)
@@ -1169,6 +1194,26 @@ void CMainMenu::AskUserIfHeWantsToDisconnect(uchar menuType)
     pQuestionBox->SetButton(1, _("Yes"));
     pQuestionBox->SetCallback(StaticWantsToDisconnectCallBack, (void*)menuType);
     pQuestionBox->Show();
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CMainMenu::ShowNetworkNotReadyWindow
+//
+// Shows a window with information that the network module is not ready.
+//
+/////////////////////////////////////////////////////////////
+void CMainMenu::ShowNetworkNotReadyWindow()
+{
+    static auto HideQuestionWindow = [](void* window, uint) { reinterpret_cast<CQuestionBox*>(window)->Hide(); };
+
+    CQuestionBox& window = m_QuestionBox;
+    window.Reset();
+    window.SetTitle(_("INFORMATION"));
+    window.SetMessage("\n\nThe network module is not ready.\nPlease wait a moment and try again.");
+    window.SetButton(0, _("OK"));
+    window.SetCallback(HideQuestionWindow, &window);
+    window.Show();
 }
 
 /////////////////////////////////////////////////////////////

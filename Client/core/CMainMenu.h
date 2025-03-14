@@ -33,6 +33,7 @@ struct sMenuItem
     int              nativeSizeX;
     int              nativeSizeY;
     CGUIStaticImage* image;
+    float            animProgress{};
 };
 
 class CMainMenu
@@ -74,6 +75,8 @@ public:
     static void StaticWantsToDisconnectCallBack(void* pData, uint uiButton);
     void        WantsToDisconnectCallBack(void* pData, uint uiButton);
     void        AskUserIfHeWantsToDisconnect(uchar menuType);
+
+    void ShowNetworkNotReadyWindow();
 
 private:
     sMenuItem* CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition);

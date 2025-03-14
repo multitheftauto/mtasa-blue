@@ -14,53 +14,47 @@
 #include <core/CModManagerInterface.h>
 #include <core/CClientBase.h>
 #include "CSingleton.h"
-#include <windows.h>
 
-#ifdef MTA_DEBUG
-    #define CMODMANAGER_CLIENTDLL "client_d.dll"
-#else
-    #define CMODMANAGER_CLIENTDLL "client.dll"
-#endif
+using HISTANCE = struct HINSTANCE__*;
+using HMODULE = HISTANCE;
 
 class CModManager : public CModManagerInterface, public CSingleton<CModManager>
 {
 public:
-    CModManager();
-    ~CModManager();
+    ~CModManager() { Unload(); }
 
-    void RequestLoad(const char* szModName, const char* szArguments);
-    void RequestLoadDefault(const char* szArguments);
-    void RequestUnload();
-    void ClearRequest();
+    void RequestLoad(const char* arguments) override;
+    void RequestUnload() override;
 
-    bool IsLoaded();
+    bool         IsLoaded() const override { return m_library != nullptr; }
+    CClientBase* GetClient() override { return m_client; }
 
-    CClientBase* Load(const char* szName, const char* szArguments);
-    void         Unload();
+    bool TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const override;
 
+public:
     void DoPulsePreFrame();
     void DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets);
     void DoPulsePostFrame();
 
-    CClientBase* GetCurrentMod();
-
-    void RefreshMods();
-
-    bool TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const override;
+    bool Load(const char* arguments);
+    void Unload();
 
 private:
-    void InitializeModList(const char* szModFolderPath);
-    void Clear();
+    bool Start();
+    bool TryStart();
+    void Stop();
+    void TryStop();
 
-    void VerifyAndAddEntry(const char* szModFolderPath, const char* szName);
+private:
+    enum class State
+    {
+        Idle,
+        PendingStop,
+        PendingStart,
+    };
 
-    std::map<std::string, std::string> m_ModDLLFiles;
-    HMODULE                            m_hClientDLL;
-    CClientBase*                       m_pClientBase;
-
-    SString m_strDefaultModName;
-
-    bool    m_bUnloadRequested;
-    SString m_strRequestedMod;
-    SString m_strRequestedModArguments;
+    State        m_state{};
+    HMODULE      m_library{};
+    CClientBase* m_client{};
+    std::string  m_arguments;
 };
