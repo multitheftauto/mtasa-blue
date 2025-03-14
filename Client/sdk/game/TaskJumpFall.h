@@ -23,4 +23,6 @@ class CTaskSimpleJetPack : public virtual CTaskSimple
 {
 public:
     virtual ~CTaskSimpleJetPack(){};
+
+    virtual bool IsFinished() const = 0;
 };
