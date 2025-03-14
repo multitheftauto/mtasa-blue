@@ -770,11 +770,15 @@ void CElementRPCs::SetElementOnFire(CClientEntity* pSource, NetBitStreamInterfac
 void CElementRPCs::SetElementCollidableWith(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     ElementID ElementID;
-    bool      bCollidable;
+
+      if (!bitStream.Can(eBitStreamVersion::SetElementCollidableWith_Serverside))
+        return;
 
     bitStream.Read(ElementID);
-    bitStream.ReadBit(bCollidable);
 
-   CClientEntity* pCollidableWith = CElementIDs::GetElement(ElementID);
-   pSource->SetCollidableWith(pCollidableWith, bCollidable);
+   CClientEntity* collidableWith = CElementIDs::GetElement(ElementID);
+
+   if (collidableWith == nullptr)            // validity check  
+       return;
+   pSource->SetCollidableWith(collidableWith, bitStream.ReadBit());
 }

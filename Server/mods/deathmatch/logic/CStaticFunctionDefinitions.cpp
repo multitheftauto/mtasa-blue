@@ -12567,37 +12567,36 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
 }
 
 bool CStaticFunctionDefinitions::SetElementCollidableWith(CElement* element, CElement* withElement, bool canCollide)
+{
+    switch (element->GetType())
     {
-        switch (element->GetType())
+        case EElementType::PLAYER:
+        case EElementType::PED:
+        case EElementType::OBJECT:
+        case EElementType::WEAPON:
+        case EElementType::VEHICLE:
         {
-            case EElementType::PLAYER:
-            case EElementType::PED:
-            case EElementType::OBJECT:
-            case EElementType::WEAPON:
-            case EElementType::VEHICLE:
+            switch (withElement->GetType())
             {
-                switch (withElement->GetType())
+                case EElementType::PLAYER:
+                case EElementType::PED:
+                case EElementType::OBJECT:
+                case EElementType::WEAPON:
+                case EElementType::VEHICLE:
                 {
-                    case EElementType::PLAYER:
-                    case EElementType::PED:
-                    case EElementType::OBJECT:
-                    case EElementType::WEAPON:
-                    case EElementType::VEHICLE:
-                    {
-                        CBitStream BitStream;
-                        BitStream.pBitStream->Write(withElement->GetID());
-                        BitStream.pBitStream->WriteBit(canCollide);
-                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, SET_ELEMENT_COLLIDABLE_WITH, *BitStream.pBitStream));
-                        return true;
-                    }
-                    default:
-                        break;
+                    CBitStream BitStream;
+                    BitStream.pBitStream->Write(withElement->GetID());
+                    BitStream.pBitStream->WriteBit(canCollide);
+                    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, SET_ELEMENT_COLLIDABLE_WITH, *BitStream.pBitStream));
+                    return true;
                 }
+                default:
                 break;
             }
-            default:
-                break;
+            break;
         }
-
-        return false;
+        default:
+        break;
     }
+    return false;
+}
