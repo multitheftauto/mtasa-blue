@@ -64,7 +64,6 @@
 #include "packets/CChatEchoPacket.h"
 #include "packets/CConsoleEchoPacket.h"
 #include "packets/CChatClearPacket.h"
-#include "packets/CElementRPCPacket.h"
 #include "version.h"
 #include <net/rpc_enums.h>
 
@@ -12563,6 +12562,17 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
     bitStream.pBitStream->Write(collisionType);
     bitStream.pBitStream->Write(removalTime);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SPAWN_VEHICLE_FLYING_COMPONENT, *bitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementCollidableWith(CElement* element, CElement* withElement, bool canCollide)
+{
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(withElement->GetID());
+    BitStream.pBitStream->WriteBit(canCollide);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, SET_ELEMENT_COLLIDABLE_WITH, *BitStream.pBitStream));
 
     return true;
 }

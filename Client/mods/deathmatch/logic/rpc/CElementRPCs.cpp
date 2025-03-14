@@ -50,6 +50,7 @@ void CElementRPCs::LoadFunctions()
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
     AddHandler(SET_COLPOLYGON_HEIGHT, SetColPolygonHeight, "setColShapePolygonHeight");
     AddHandler(SET_ELEMENT_ON_FIRE, SetElementOnFire, "setElementOnFire");
+    AddHandler(SET_ELEMENT_COLLIDABLE_WITH, SetElementCollidableWith, "setElementCollidableWith");
 }
 
 #define RUN_CHILDREN_SERVER(func) \
@@ -764,4 +765,16 @@ void CElementRPCs::SetColPolygonHeight(CClientEntity* pSource, NetBitStreamInter
 void CElementRPCs::SetElementOnFire(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     pSource->SetOnFire(bitStream.ReadBit());
+}
+
+void CElementRPCs::SetElementCollidableWith(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    ElementID ElementID;
+    bool      bCollidable;
+
+    bitStream.Read(ElementID);
+    bitStream.ReadBit(bCollidable);
+
+   CClientEntity* pCollidableWith = CElementIDs::GetElement(ElementID);
+   pSource->SetCollidableWith(pCollidableWith, bCollidable);
 }
