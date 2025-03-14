@@ -19,7 +19,7 @@
 
 extern CGameSA* pGame;
 
-CWeaponInfo* CWeaponSA::GetInfo(const eWeaponSkill& skill) const
+CWeaponInfo* CWeaponSA::GetInfo(eWeaponSkill skill) const
 {
     return m_interface ? pGame->GetWeaponInfo(m_interface->m_eWeaponType, skill) : nullptr;
 }
@@ -55,42 +55,41 @@ void CWeaponSA::Remove()
     }
 }
 
-void CWeaponSA::Initialize(const eWeaponType& type, std::uint32_t ammo, CPed* ped)
+void CWeaponSA::Initialize(eWeaponType type, std::uint32_t ammo, CPed* ped)
 {
     if (m_interface)
-        m_interface->Initialize(type, ammo, ped);
-}
-
-void CWeaponSA::Update(CPed* ped)
-{
-    // Note: CWeapon::Update is called mainly to check for reload
-    if (m_interface)
-        m_interface->Update(ped);
+        m_interface->Initialize(type, ammo, ped ? ped->GetPedInterface() : nullptr);
 }
 
 void CWeaponSA::AddGunshell(CEntity* firingEntity, const CVector& vecOrigin, const CVector2D& vecDirection, float size) const
 {
     if (m_interface && firingEntity)
-        m_interface->AddGunshell(firingEntity, vecOrigin, vecDirection, size);
+        m_interface->AddGunshell(firingEntity->GetInterface(), vecOrigin, vecDirection, size);
 }
 
-void CWeaponSA::DoBulletImpact(CEntity* firingEntity, CEntitySAInterface* hitEntityInterface, const CVector& vecOrigin, const CVector& vecTarget, const CColPoint& colPoint, int incrementalHit) const
+void CWeaponSA::DoBulletImpact(CEntity* firingEntity, CEntitySAInterface* hitEntityInterface, const CVector& vecOrigin, const CVector& vecTarget,
+                               const CColPointSAInterface& colPoint, int incrementalHit) const
 {
     if (m_interface)
-        m_interface->DoBulletImpact(firingEntity, hitEntityInterface, vecOrigin, vecTarget, colPoint, incrementalHit);
+        m_interface->DoBulletImpact(firingEntity ? firingEntity->GetInterface() : nullptr, hitEntityInterface, vecOrigin, vecTarget, colPoint, incrementalHit);
 }
 
 bool CWeaponSA::Fire(CEntity* firingEntity, CVector* vecOrigin, CVector* vecEffectPos, CEntity* targetEntity, CVector* vecTarget, CVector* vecAlt)
 {
-    if (!firingEntity)
+    if (!firingEntity || !m_interface)
         return false;
 
-    return m_interface ? m_interface->Fire(firingEntity, vecOrigin, vecEffectPos, targetEntity, vecTarget, vecAlt) : false;
+    return m_interface->Fire(firingEntity->GetInterface(), vecOrigin, vecEffectPos, targetEntity ? targetEntity->GetInterface() : nullptr, vecTarget, vecAlt);
 }
 
-bool CWeaponSA::FireInstantHit(CEntity* firingEntity, const CVector* vecOrigin, const CVector* vecMuzzle, CEntity* targetEntity, const CVector* vecTarget, const CVector* vecForDriveby, bool crossHairGun, bool createGunFx)
+bool CWeaponSA::FireInstantHit(CEntity* firingEntity, CVector* vecOrigin, CVector* vecMuzzle, CEntity* targetEntity, CVector* vecTarget, CVector* vecForDriveby,
+                               bool crossHairGun, bool createGunFx)
 {
-    return m_interface ? m_interface->FireInstantHit(firingEntity, const_cast<CVector*>(vecOrigin), const_cast<CVector*>(vecMuzzle), targetEntity, const_cast<CVector*>(vecTarget), const_cast<CVector*>(vecForDriveby), crossHairGun, createGunFx) : false;
+    if (!m_interface)
+        return false;
+
+    return m_interface->FireInstantHit(firingEntity ? firingEntity->GetInterface() : nullptr, vecOrigin, vecMuzzle,
+                                       targetEntity ? targetEntity->GetInterface() : nullptr, vecTarget, vecForDriveby, crossHairGun, createGunFx);
 }
 
 bool CWeaponSA::FireBullet(CEntity* firingEntity, const CVector& vecOrigin, const CVector& vecTarget)
@@ -130,7 +129,7 @@ bool CWeaponSA::FireBullet(CEntity* firingEntity, const CVector& vecOrigin, cons
                 firingPlayerPed->GetTransformedBonePosition(BONE_RIGHTWRIST, &vecGunMuzzle);
 
             // Bullet trace
-            FireInstantHit(firingEntity, &vecOrigin, &vecGunMuzzle, nullptr, &vecTarget, nullptr, false, true);
+            FireInstantHit(firingEntity, const_cast<CVector*>(&vecOrigin), &vecGunMuzzle, nullptr, const_cast<CVector*>(&vecTarget), nullptr, false, true);
 
             // Fire sound
             if (firingPlayerPed)
@@ -156,23 +155,26 @@ bool CWeaponSA::GenerateDamageEvent(CPed* ped, CEntity* responsible, eWeaponType
     if (!ped || !m_interface)
         return false;
 
-    return m_interface->GenerateDamageEvent(ped, responsible, weaponType, damagePerHit, hitZone, dir);
+    return m_interface->GenerateDamageEvent(ped ? ped->GetPedInterface() : nullptr, responsible ? responsible->GetInterface() : nullptr, weaponType,
+                                            damagePerHit, hitZone, dir);
 }
 
-bool CWeaponSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** collisionEntity, const SLineOfSightFlags& flags, SLineOfSightBuildingResult* buildingResult, const eWeaponType& weaponType, CEntitySAInterface** entity)
+bool CWeaponSA::ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, CColPoint** colCollision, CEntity*& collisionEntity,
+                                   const SLineOfSightFlags& flags, SLineOfSightBuildingResult* buildingResult, eWeaponType weaponType,
+                                   CEntitySAInterface** entity)
 {
     // Call CBirds::HandleGunShot
-    ((void(__cdecl*)(CVector*, CVector*))FUNC_CBirds_CheckForHit)(const_cast<CVector*>(vecStart), const_cast<CVector*>(vecEnd));
+    ((void(__cdecl*)(const CVector*, const CVector*))FUNC_CBirds_CheckForHit)(&vecStart, &vecEnd);
 
     // Call CShadows::GunShotSetsOilOnFire
-    ((void(__cdecl*)(CVector*, CVector*))FUNC_CShadows_CheckForHit)(const_cast<CVector*>(vecStart), const_cast<CVector*>(vecEnd));
+    ((void(__cdecl*)(const CVector&, const CVector&))FUNC_CShadows_CheckForHit)(vecStart, vecEnd);
 
-    bool hit = pGame->GetWorld()->ProcessLineOfSight(vecStart, vecEnd, colCollision, collisionEntity, flags, buildingResult);
+    bool hit = pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, colCollision, &collisionEntity, flags, buildingResult);
 
     if (hit)
     {
-        if (*collisionEntity)
-            *entity = (*collisionEntity)->GetInterface();
+        if (collisionEntity)
+            *entity = collisionEntity->GetInterface();
         else
         {
             if (buildingResult->bValid)
@@ -182,7 +184,8 @@ bool CWeaponSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEn
 
     // Call CWeapon::CheckForShootingVehicleOccupant
     if (*entity && (*entity)->nType == ENTITY_TYPE_VEHICLE)
-        ((void(__cdecl*)(CEntitySAInterface*, CColPointSAInterface*, eWeaponType, CVector*, CVector*))FUNC_CWeapon_CheckForShootingVehicleOccupant)(*entity, (*colCollision)->GetInterface(), weaponType, const_cast<CVector*>(vecStart), const_cast<CVector*>(vecEnd));
+        ((bool(__cdecl*)(CEntitySAInterface**, CColPointSAInterface*, eWeaponType, const CVector&,
+                         const CVector&))FUNC_CWeapon_CheckForShootingVehicleOccupant)(entity, (*colCollision)->GetInterface(), weaponType, vecStart, vecEnd);
 
     return hit;
 }
@@ -199,6 +202,6 @@ int CWeaponSA::GetWeaponReloadTime(CWeaponStat* weaponStat) const
 int CWeaponSA::GetWeaponFireTime(CWeaponStat* weaponStat)
 {
     std::uint32_t timer = pGame->GetSystemTime();
-    float weaponFireTime = (weaponStat->GetWeaponAnimLoopStop() - weaponStat->GetWeaponAnimLoopStart()) * 1000.0f;
+    float         weaponFireTime = (weaponStat->GetWeaponAnimLoopStop() - weaponStat->GetWeaponAnimLoopStart()) * 1000.0f;
     return static_cast<int>(weaponFireTime);
 }
