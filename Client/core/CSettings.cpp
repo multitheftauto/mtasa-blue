@@ -3665,6 +3665,7 @@ void CSettings::SaveData()
     }
 
     // Chat
+    this->SetChatLayoutChanged(false);
     SaveChatColor(Chat::ColorType::BG, "chat_color");
     SaveChatColor(Chat::ColorType::TEXT, "chat_text_color");
     SaveChatColor(Chat::ColorType::INPUT_BG, "chat_input_color");
@@ -3673,38 +3674,46 @@ void CSettings::SaveData()
     {
         if (m_pRadioChatFont[iFont]->GetSelected())
         {
-            CVARS_SET("chat_font", iFont);
+            SaveChatSetting("chat_font", iFont);
             break;
         }
     }
 
-    strVar = m_pChatScaleX->GetText() + " " + m_pChatScaleY->GetText();
-    CVARS_SET("chat_scale", strVar);
-    CVARS_SET("chat_lines", m_pChatLines->GetText());
-    CVARS_SET("chat_width", m_pChatWidth->GetText());
-    CVARS_SET("chat_css_style_text", m_pChatCssText->GetSelected());
-    CVARS_SET("chat_css_style_background", m_pChatCssBackground->GetSelected());
-    CVARS_SET("chat_nickcompletion", m_pChatNickCompletion->GetSelected());
-    CVARS_SET("chat_text_outline", m_pChatTextBlackOutline->GetSelected());
-    CVARS_SET("chat_line_life", GetMilliseconds(m_pChatLineLife));
-    CVARS_SET("chat_line_fade_out", GetMilliseconds(m_pChatLineFadeout));
+    std::stringstream ss;
+    ss << std::stof(m_pChatScaleX->GetText()) << " " << std::stof(m_pChatScaleY->GetText());
 
-    CVARS_SET("chat_position_offset_x", m_pChatOffsetX->GetText());
-    CVARS_SET("chat_position_offset_y", m_pChatOffsetY->GetText());
+    SaveChatSetting("chat_scale", ss.str());
+    SaveChatSetting("chat_lines", m_pChatLines->GetText());
+    SaveChatSetting("chat_width", m_pChatWidth->GetText());
+
+    SaveChatSetting("chat_css_style_text", m_pChatCssText->GetSelected());
+    SaveChatSetting("chat_css_style_background", m_pChatCssBackground->GetSelected());
+    SaveChatSetting("chat_nickcompletion", m_pChatNickCompletion->GetSelected());
+    SaveChatSetting("chat_text_outline", m_pChatTextBlackOutline->GetSelected());
+    SaveChatSetting("chat_line_life", GetMilliseconds(m_pChatLineLife));
+    SaveChatSetting("chat_line_fade_out", GetMilliseconds(m_pChatLineFadeout));
+
+    SaveChatSetting("chat_position_offset_x", m_pChatOffsetX->GetText());
+    SaveChatSetting("chat_position_offset_y", m_pChatOffsetY->GetText());
     if (CGUIListItem* pSelected = m_pChatHorizontalCombo->GetSelectedItem())
     {
         int iSelected = (int)pSelected->GetData();
-        CVARS_SET("chat_position_horizontal", iSelected);
+        SaveChatSetting("chat_position_horizontal", iSelected);
     }
     if (CGUIListItem* pSelected = m_pChatVerticalCombo->GetSelectedItem())
     {
         int iSelected = (int)pSelected->GetData();
-        CVARS_SET("chat_position_vertical", iSelected);
+        SaveChatSetting("chat_position_vertical", iSelected);
     }
     if (CGUIListItem* pSelected = m_pChatTextAlignCombo->GetSelectedItem())
     {
         int iSelected = (int)pSelected->GetData();
-        CVARS_SET("chat_text_alignment", iSelected);
+        SaveChatSetting("chat_text_alignment", iSelected);
+    }
+
+    if (this->GetChatLayoutChanged() && CModManager::GetSingleton().IsLoaded())
+    {
+        CModManager::GetSingletonPtr()->GetCurrentMod()->OnChatboxLayoutChange();
     }
 
     // Interface
@@ -3957,7 +3966,47 @@ void CSettings::SaveChatColor(eChatColorType eType, const char* szCVar)
     CVARS_GET(szCVar, pOldColor);
 
     if (pColor.R != pOldColor.R || pColor.G != pOldColor.G || pColor.B != pOldColor.B || pColor.A != pOldColor.A)
+    {
         CVARS_SET(szCVar, pColor);
+        this->SetChatLayoutChanged(true);
+    }
+}
+
+
+void CSettings::SaveChatSetting(const char* szCVar, int iVal)
+{
+    // Save value to the CVar if it's different from previous
+    int iPreviousValue;
+    CVARS_GET(szCVar, iPreviousValue);
+    if (iPreviousValue != iVal)
+    {
+        CVARS_SET(szCVar, iVal);
+        this->SetChatLayoutChanged(true);
+    }
+}
+
+void CSettings::SaveChatSetting(const char* szCVar, const std::string& strVal)
+{
+    // Save value to the CVar if it's different from previous
+    std::string strPreviousValue;
+    CVARS_GET(szCVar, strPreviousValue);
+    if (strPreviousValue != strVal)
+    {
+        CVARS_SET(szCVar, strVal);
+        this->SetChatLayoutChanged(true);
+    }
+}
+
+void CSettings::SaveChatSetting(const char* szCVar, bool bVal)
+{
+    // Save value to the CVar if it's different from previous
+    bool bPreviousValue;
+    CVARS_GET(szCVar, bPreviousValue);
+    if (bPreviousValue != bVal)
+    {
+        CVARS_SET(szCVar, bVal);
+        this->SetChatLayoutChanged(true);
+    }
 }
 
 CColor CSettings::GetChatColorValues(eChatColorType eType)
