@@ -1013,3 +1013,16 @@ void CVehicle::SetRespawnEnabled(bool bEnabled)
         m_bRespawnEnabled = bEnabled;
     }
 }
+
+bool CVehicle::IsNitroInstalled() const noexcept
+{
+   return this->m_pUpgrades->GetSlotState(8) != 0;
+}
+
+bool CVehicle::IsNitroActivated() const noexcept
+{
+    if (!IsNitroInstalled())
+        return false;
+
+     return m_nitroLevel < 0;
+}
