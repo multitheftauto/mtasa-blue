@@ -116,7 +116,7 @@ private:
 
     unsigned long m_ulUpdateTime;
 
-    std::vector<CClientTextDisplay*> m_HelpTextList;
+    std::vector<std::shared_ptr<CClientTextDisplay>> m_HelpTextList;
     bool                             m_bHideHelpText;
 
     bool m_bHudVisible;

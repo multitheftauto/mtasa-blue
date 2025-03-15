@@ -13,9 +13,12 @@ class CClientDisplayManager;
 #pragma once
 
 #include "CClientManager.h"
-#include <list>
 
-class CClientDisplay;
+#include "CClientDisplay.h"
+#include "CClientVectorGraphicDisplay.h"
+#include "CClientTextDisplay.h"
+
+#include <list>
 
 class CClientDisplayManager
 {
@@ -23,21 +26,21 @@ class CClientDisplayManager
     friend class CClientDisplay;
 
 public:
-    CClientDisplayManager();
-    ~CClientDisplayManager();
+    CClientDisplayManager() = default;
+    ~CClientDisplayManager() = default;
 
     void DoPulse();
 
     unsigned int    Count() { return static_cast<unsigned int>(m_List.size()); };
-    CClientDisplay* Get(unsigned long ulID);
+    std::shared_ptr<CClientDisplay> Get(unsigned long ulID);
 
     void DrawText2D(const char* szCaption, const CVector& vecPosition, float fScale = 1.0f, RGBA rgbaColor = 0xFFFFFFFF);
 
-    void RemoveAll();
+    void AddToList(const std::shared_ptr<CClientDisplay>& display);
 
-    void AddToList(CClientDisplay* pDisplay);
-    void RemoveFromList(CClientDisplay* pDisplay);
+    std::shared_ptr<CClientVectorGraphicDisplay> CreateVectorGraphicDisplay(CClientVectorGraphic* svg);
+    std::shared_ptr<CClientTextDisplay>          CreateTextDisplay(int ID = 0xFFFFFFFF);
 
-    std::list<CClientDisplay*> m_List;
-    bool                       m_bCanRemoveFromList;
+    std::list<std::weak_ptr<CClientDisplay>> m_List;
 };
+
