@@ -25,11 +25,8 @@ CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* p
 
 void CClientVectorGraphicDisplay::Render()
 {
-    // When the underlying vector graphic is deleted, this display will be destroyed automatically by the manager.
-    // CClientVectorGraphicDisplay::Render should be called as long as the display manager is still alive.
-    // see CClientDisplayManager::DoPulse
     if (!m_pVectorGraphic || m_pVectorGraphic->IsDestroyed())
-        return SetTimeTillExpiration(1);
+        return;
 
     if (!m_bVisible)
     {

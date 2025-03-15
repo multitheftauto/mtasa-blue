@@ -45,7 +45,7 @@ bool CClientVectorGraphic::LoadFromString(std::string strData)
 
 bool CClientVectorGraphic::SetDocument(CXMLNode* node)
 {
-    if (!m_pVectorGraphicDisplay || !node || !node->IsValid())
+    if (!node || !node->IsValid())
         return false;
 
     if (m_pXMLString && m_pXMLString->node != node)
@@ -79,9 +79,6 @@ bool CClientVectorGraphic::RemoveUpdateCallback()
 
 void CClientVectorGraphic::OnUpdate()
 {
-    if (!m_pVectorGraphicDisplay)
-        return;
-
     m_pVectorGraphicDisplay->UpdateTexture();
 
     if (std::holds_alternative<CLuaFunctionRef>(m_updateCallbackRef))

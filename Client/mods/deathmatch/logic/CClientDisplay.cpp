@@ -13,8 +13,6 @@
 CClientDisplay::CClientDisplay(unsigned long ulID)
 {
     m_ulID = ulID;
-
-    m_ulExpirationTime = 0;
     m_bVisible = true;
     m_Color = SColorRGBA(255, 255, 255, 255);
 }
