@@ -17,8 +17,7 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     SetTypeName("svg");
 
     m_pManager = pManager;
-
-    m_pVectorGraphicDisplay = std::make_unique<CClientVectorGraphicDisplay>(m_pManager->GetDisplayManager(), this);
+    m_pVectorGraphicDisplay = m_pManager->GetDisplayManager()->CreateVectorGraphicDisplay(this);
 
     // Generate the default XML document
     SString defaultXmlString = SString("<svg viewBox='0 0 %u %u'></svg>", pVectorGraphicItem->m_uiSizeX, pVectorGraphicItem->m_uiSizeY);
@@ -46,7 +45,7 @@ bool CClientVectorGraphic::LoadFromString(std::string strData)
 
 bool CClientVectorGraphic::SetDocument(CXMLNode* node)
 {
-    if (!node || !node->IsValid())
+    if (!m_pVectorGraphicDisplay || !node || !node->IsValid())
         return false;
 
     if (m_pXMLString && m_pXMLString->node != node)
@@ -80,11 +79,14 @@ bool CClientVectorGraphic::RemoveUpdateCallback()
 
 void CClientVectorGraphic::OnUpdate()
 {
+    if (!m_pVectorGraphicDisplay)
+        return;
+
     m_pVectorGraphicDisplay->UpdateTexture();
 
     if (std::holds_alternative<CLuaFunctionRef>(m_updateCallbackRef))
     {
-        auto func = std::get<CLuaFunctionRef>(m_updateCallbackRef);
+        auto& func = std::get<CLuaFunctionRef>(m_updateCallbackRef);
         auto state = func.GetLuaVM();
 
         if (VERIFY_FUNCTION(func) && state != NULL)

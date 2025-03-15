@@ -13,8 +13,8 @@
 
 using namespace lunasvg;
 
-CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID)
-    : CClientDisplay(pDisplayManager, ID)
+CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID)
+    : CClientDisplay(ID)
 {
     m_pVectorGraphic = pVectorGraphic;
     m_bVisible = true;
@@ -25,8 +25,11 @@ CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* 
 
 void CClientVectorGraphicDisplay::Render()
 {
+    // When the underlying vector graphic is deleted, this display will be destroyed automatically by the manager.
+    // CClientVectorGraphicDisplay::Render should be called as long as the display manager is still alive.
+    // see CClientDisplayManager::DoPulse
     if (!m_pVectorGraphic || m_pVectorGraphic->IsDestroyed())
-        return;
+        return SetTimeTillExpiration(1);
 
     if (!m_bVisible)
     {
