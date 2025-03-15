@@ -612,6 +612,10 @@ enum class eBitStreamVersion : unsigned short
     // 2025-01-29
     PedSync_CameraRotation,
 
+    //Add setElementCollidableWith serverside
+    // 2025-03-14
+    SetElementCollidableWith_Serverside,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
