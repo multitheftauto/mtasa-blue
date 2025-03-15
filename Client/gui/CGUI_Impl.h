@@ -16,6 +16,8 @@ class CGUI_Impl;
 #include <gui/CGUI.h>
 #include <list>
 #include <windows.h>
+#include <xml/CXML.h>
+#include <core/CGraphicsInterface.h>
 
 #define CGUI_CHAR_SIZE 6
 
@@ -279,6 +281,12 @@ public:
     CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename);
     bool        LoadImageset(const SString& strFilename);
 
+    void        SetModernSkinEnabled(bool bEnabled) { m_bUseModernSkin = bEnabled; }
+    std::string ResolveModernName(const char* name);
+
+    void SetXMLParser(CXML* pXML) { m_pXML = pXML; }
+    void SetGraphics(CGraphicsInterface* pGraphicsInterface) { m_pGraphics = pGraphicsInterface; }
+
 private:
     CGUIButton*      _CreateButton(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
     CGUICheckBox*    _CreateCheckBox(CGUIElement_Impl* pParent = NULL, const char* szCaption = "", bool bChecked = false);
@@ -299,6 +307,8 @@ private:
     CGUIFont* CreateFntFromWinFont(const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0,
                                    bool bAutoScale = false);
     void      ApplyGuiWorkingDirectory();
+
+    bool ConvertToModernSkin(const char* skinName);
 
     IDirect3DDevice9* m_pDevice;
 
@@ -350,4 +360,8 @@ private:
     bool         m_HasSchemeLoaded;
     SString      m_CurrentSchemeName;
     CElapsedTime m_RenderOkTimer;
+
+    bool                m_bUseModernSkin = false;
+    CGraphicsInterface* m_pGraphics;
+    CXML*               m_pXML;
 };

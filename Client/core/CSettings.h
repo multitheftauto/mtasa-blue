@@ -288,6 +288,9 @@ protected:
     CGUIComboBox* m_pInterfaceSkinSelector;
     CGUIButton*   m_pInterfaceLoadSkin;
 
+    CGUILabel* m_pInterfaceModernLabel;
+    CGUICheckBox* m_pInterfaceModern;
+
     CGUIComboBox* m_pChatPresets;
     CGUIButton*   m_pChatLoadPreset;
 
@@ -407,6 +410,8 @@ protected:
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
     void ReloadBrowserLists();
+
+    bool OnModernClick(CGUIElement* pElement);
 
 private:
     void CreateInterfaceTabGUI();
