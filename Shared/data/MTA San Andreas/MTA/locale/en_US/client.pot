@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-13 06:15+0000\n"
+"POT-Creation-Date: 2025-03-16 00:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1401,11 +1401,11 @@ msgstr ""
 msgid "Toggle map: %s     Toggle help text: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:715
+#: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:717
+#: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
 msgstr ""
 

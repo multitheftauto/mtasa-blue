@@ -4602,6 +4602,10 @@ bool CClientPed::HasJetPack()
         CTask* pPrimaryTask = m_pTaskManager->GetSimplestActiveTask();
         if (pPrimaryTask && pPrimaryTask->GetTaskType() == TASK_SIMPLE_JETPACK)
         {
+            auto* jetpackTask = dynamic_cast<CTaskSimpleJetPack*>(pPrimaryTask);
+            if (jetpackTask && jetpackTask->IsFinished())
+                return false;
+
             return true;
         }
         return false;
