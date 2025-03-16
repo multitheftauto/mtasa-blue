@@ -8,11 +8,17 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CScriptArgReader.h"
 
 #define MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME         "1.5.3-9.11270"
 #define MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT   "1.3.5"
 #define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE      "1.5.4-9.11342"
 #define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_FORMFIELDS "1.5.4-9.11413"
+
+static auto GetServerIp(std::optional<bool> includePort) -> const char*
+{
+    return g_pNet->GetConnectedServer(includePort.value_or(false));
+}
 
 void CLuaNetworkDefs::LoadFunctions()
 {
@@ -21,6 +27,7 @@ void CLuaNetworkDefs::LoadFunctions()
         {"getRemoteRequests", GetRemoteRequests},
         {"getRemoteRequestInfo", GetRemoteRequestInfo},
         {"abortRemoteRequest", AbortRemoteRequest},
+        {"getServerIp", ArgumentParser<GetServerIp>},
     };
 
     // Add functions

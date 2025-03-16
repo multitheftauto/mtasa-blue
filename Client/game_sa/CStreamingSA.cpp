@@ -431,6 +431,8 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 
 bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
+    numBlocks += numBlocks % 2; // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
+    
     // Check if the size is the same already
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
         return true;
@@ -453,10 +455,6 @@ bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 
     // Suspend streaming thread [otherwise data might become corrupted]
     SuspendThread(*phStreamingThread);
-    
-    // Create new buffer
-    if (numBlocks & 1) // Make it be even [Otherwise it can't be split in half properly]
-        numBlocks++;
 
     // Calculate new buffer pointers
     void* const pNewBuff0 = pNewBuffer;
@@ -504,4 +502,16 @@ void CStreamingSA::AllocateArchive()
 void CStreamingSA::RemoveBigBuildings()
 {
     (reinterpret_cast<void(__cdecl*)()>(0x4093B0))();
+}
+
+void CStreamingSA::LoadScene(const CVector* position)
+{
+    auto CStreaming_LoadScene = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadScene;
+    CStreaming_LoadScene(position);
+}
+
+void CStreamingSA::LoadSceneCollision(const CVector* position)
+{
+    auto CStreaming_LoadSceneCollision = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadSceneCollision;
+    CStreaming_LoadSceneCollision(position);
 }

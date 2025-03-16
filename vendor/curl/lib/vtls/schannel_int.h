@@ -28,7 +28,10 @@
 
 #ifdef USE_SCHANNEL
 
-#if defined(__MINGW32__) || defined(CERT_CHAIN_REVOCATION_CHECK_CHAIN)
+#include "vtls.h"
+
+#if (defined(__MINGW32__) || defined(CERT_CHAIN_REVOCATION_CHECK_CHAIN)) \
+  && !defined(CURL_WINDOWS_UWP)
 #define HAS_MANUAL_VERIFY_API
 #endif
 
@@ -53,6 +56,16 @@
 #define CERT_ALT_NAME_IP_ADDRESS 8
 #endif
 
+#if defined(_MSC_VER) && (_MSC_VER <= 1600)
+/* Workaround for warning:
+   'type cast' : conversion from 'int' to 'LPCSTR' of greater size */
+#undef CERT_STORE_PROV_MEMORY
+#undef CERT_STORE_PROV_SYSTEM_A
+#undef CERT_STORE_PROV_SYSTEM_W
+#define CERT_STORE_PROV_MEMORY    ((LPCSTR)(size_t)2)
+#define CERT_STORE_PROV_SYSTEM_A  ((LPCSTR)(size_t)9)
+#define CERT_STORE_PROV_SYSTEM_W  ((LPCSTR)(size_t)10)
+#endif
 
 #ifndef SCH_CREDENTIALS_VERSION
 
@@ -134,7 +147,7 @@ struct schannel_ssl_backend_data {
   size_t encdata_offset, decdata_offset;
   unsigned char *encdata_buffer, *decdata_buffer;
   /* encdata_is_incomplete: if encdata contains only a partial record that
-     can't be decrypted without another recv() (that is, status is
+     cannot be decrypted without another recv() (that is, status is
      SEC_E_INCOMPLETE_MESSAGE) then set this true. after an recv() adds
      more bytes into encdata then set this back to false. */
   bool encdata_is_incomplete;
@@ -147,7 +160,39 @@ struct schannel_ssl_backend_data {
 #ifdef HAS_MANUAL_VERIFY_API
   bool use_manual_cred_validation; /* true if manual cred validation is used */
 #endif
+  BIT(sent_shutdown);
 };
+
+/* key to use at `multi->proto_hash` */
+#define MPROTO_SCHANNEL_CERT_SHARE_KEY   "tls:schannel:cert:share"
+
+struct schannel_cert_share {
+  unsigned char CAinfo_blob_digest[CURL_SHA256_DIGEST_LENGTH];
+  size_t CAinfo_blob_size;           /* CA info blob size */
+  char *CAfile;                      /* CAfile path used to generate
+                                        certificate store */
+  HCERTSTORE cert_store;             /* cached certificate store or
+                                        NULL if none */
+  struct curltime time;              /* when the cached store was created */
+};
+
+/*
+* size of the structure: 20 bytes.
+*/
+struct num_ip_data {
+  DWORD size; /* 04 bytes */
+  union {
+    struct in_addr  ia;  /* 04 bytes */
+    struct in6_addr ia6; /* 16 bytes */
+  } bData;
+};
+
+HCERTSTORE Curl_schannel_get_cached_cert_store(struct Curl_cfilter *cf,
+                                               const struct Curl_easy *data);
+
+bool Curl_schannel_set_cached_cert_store(struct Curl_cfilter *cf,
+                                         const struct Curl_easy *data,
+                                         HCERTSTORE cert_store);
 
 #endif /* USE_SCHANNEL */
 #endif /* HEADER_CURL_SCHANNEL_INT_H */

@@ -3,19 +3,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
 #include "common.h"
@@ -124,12 +112,10 @@ static psa_status_t psa_get_se_driver_its_file_uid(
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-#if SIZE_MAX > UINT32_MAX
     /* ITS file sizes are limited to 32 bits. */
     if (driver->u.internal.persistent_data_size > UINT32_MAX) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
-#endif
 
     /* See the documentation of PSA_CRYPTO_SE_DRIVER_ITS_UID_BASE. */
     *uid = PSA_CRYPTO_SE_DRIVER_ITS_UID_BASE + driver->location;
@@ -316,6 +302,7 @@ psa_status_t psa_register_se_driver(
      * location because it means a transparent key. */
     MBEDTLS_STATIC_ASSERT(PSA_KEY_LOCATION_LOCAL_STORAGE == 0,
                           "Secure element support requires 0 to mean a local key");
+
     if (location == PSA_KEY_LOCATION_LOCAL_STORAGE) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }

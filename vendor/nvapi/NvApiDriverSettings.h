@@ -1,41 +1,28 @@
-/***************************************************************************\
-|*                                                                           *|
-|*      Copyright NVIDIA Corporation.  All rights reserved.                  *|
-|*                                                                           *|
-|*   NOTICE TO USER:                                                         *|
-|*                                                                           *|
-|*   This source code is subject to NVIDIA ownership rights under U.S.       *|
-|*   and international Copyright laws.  Users and possessors of this         *|
-|*   source code are hereby granted a nonexclusive, royalty-free             *|
-|*   license to use this code in individual and commercial software.         *|
-|*                                                                           *|
-|*   NVIDIA MAKES NO REPRESENTATION ABOUT THE SUITABILITY OF THIS SOURCE     *|
-|*   CODE FOR ANY PURPOSE. IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR         *|
-|*   IMPLIED WARRANTY OF ANY KIND. NVIDIA DISCLAIMS ALL WARRANTIES WITH      *|
-|*   REGARD TO THIS SOURCE CODE, INCLUDING ALL IMPLIED WARRANTIES OF         *|
-|*   MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR          *|
-|*   PURPOSE. IN NO EVENT SHALL NVIDIA BE LIABLE FOR ANY SPECIAL,            *|
-|*   INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES          *|
-|*   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN      *|
-|*   AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING     *|
-|*   OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOURCE      *|
-|*   CODE.                                                                   *|
-|*                                                                           *|
-|*   U.S. Government End Users. This source code is a "commercial item"      *|
-|*   as that term is defined at 48 C.F.R. 2.101 (OCT 1995), consisting       *|
-|*   of "commercial computer  software" and "commercial computer software    *|
-|*   documentation" as such terms are used in 48 C.F.R. 12.212 (SEPT 1995)   *|
-|*   and is provided to the U.S. Government only as a commercial end item.   *|
-|*   Consistent with 48 C.F.R.12.212 and 48 C.F.R. 227.7202-1 through        *|
-|*   227.7202-4 (JUNE 1995), all U.S. Government End Users acquire the       *|
-|*   source code with only those rights set forth herein.                    *|
-|*                                                                           *|
-|*   Any use of this source code in individual and commercial software must  *|
-|*   include, in the user documentation and internal comments to the code,   *|
-|*   the above Disclaimer and U.S. Government End Users Notice.              *|
-|*                                                                           *|
-|*                                                                           *|
-\***************************************************************************/
+/*********************************************************************************************************\
+|*                                                                                                        *|
+|* SPDX-FileCopyrightText: Copyright (c) 2019-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
+|* SPDX-License-Identifier: MIT                                                                           *|
+|*                                                                                                        *|
+|* Permission is hereby granted, free of charge, to any person obtaining a                                *|
+|* copy of this software and associated documentation files (the "Software"),                             *|
+|* to deal in the Software without restriction, including without limitation                              *|
+|* the rights to use, copy, modify, merge, publish, distribute, sublicense,                               *|
+|* and/or sell copies of the Software, and to permit persons to whom the                                  *|
+|* Software is furnished to do so, subject to the following conditions:                                   *|
+|*                                                                                                        *|
+|* The above copyright notice and this permission notice shall be included in                             *|
+|* all copies or substantial portions of the Software.                                                    *|
+|*                                                                                                        *|
+|* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                             *|
+|* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                               *|
+|* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL                               *|
+|* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                             *|
+|* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING                                *|
+|* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER                                    *|
+|* DEALINGS IN THE SOFTWARE.                                                                              *|
+|*                                                                                                        *|
+|*                                                                                                        *|
+\*********************************************************************************************************/
 
 #ifndef _NVAPI_DRIVER_SETTINGS_H_
 #define _NVAPI_DRIVER_SETTINGS_H_
@@ -57,7 +44,6 @@
 #define OGL_OVERLAY_SUPPORT_STRING                 L"Enable overlay"
 #define OGL_QUALITY_ENHANCEMENTS_STRING            L"High level control of the rendering quality on OpenGL"
 #define OGL_SINGLE_BACKDEPTH_BUFFER_STRING         L"Unified back/depth buffer"
-#define OGL_SLI_CFR_MODE_STRING                    L"Set CFR mode"
 #define OGL_SLI_MULTICAST_STRING                   L"Enable NV_gpu_multicast extension"
 #define OGL_THREAD_CONTROL_STRING                  L"Threaded optimization"
 #define OGL_TMON_LEVEL_STRING                      L"Event Log Tmon Severity Threshold"
@@ -74,6 +60,8 @@
 #define ANSEL_ALLOW_STRING                         L"NVIDIA Predefined Ansel Usage"
 #define ANSEL_ALLOWLISTED_STRING                   L"Ansel flags for enabled applications"
 #define ANSEL_ENABLE_STRING                        L"Enable Ansel"
+#define APPIDLE_DYNAMIC_FRL_FPS_STRING             L"Idle Application Max FPS Limit"
+#define APPIDLE_DYNAMIC_FRL_THRESHOLD_TIME_STRING  L"Idle Application Threshold Time out in seconds"
 #define APPLICATION_PROFILE_NOTIFICATION_TIMEOUT_STRING L"Application Profile Notification Popup Timeout"
 #define APPLICATION_STEAM_ID_STRING                L"Steam Application ID"
 #define BATTERY_BOOST_APP_FPS_STRING               L"Battery Boost Application FPS"
@@ -88,6 +76,22 @@
 #define FXAA_INDICATOR_ENABLE_STRING               L"Enable FXAA Indicator"
 #define LATENCY_INDICATOR_AUTOALIGN_STRING         L"Autoalign flash indicator"
 #define MCSFRSHOWSPLIT_STRING                      L"SLI indicator"
+#define NGX_DLAA_OVERRIDE_STRING                   L"Override DLSS mode to be DLAA"
+#define NGX_DLSSG_MULTI_FRAME_COUNT_STRING         L"Override DLSSG multi-frame count"
+#define NGX_DLSS_FG_OVERRIDE_STRING                L"Enable DLSS-FG override"
+#define NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1_STRING  L"Override reserved key 1 for FG"
+#define NGX_DLSS_FG_OVERRIDE_RESERVED_KEY2_STRING  L"Override reserved key 2 for FG"
+#define NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_STRING  L"Override DLSS performance mode to be ultra-perfomance"
+#define NGX_DLSS_RR_MODE_STRING                    L"Override DLSS-RR performance mode"
+#define NGX_DLSS_RR_OVERRIDE_STRING                L"Enable DLSS-RR override"
+#define NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_STRING L"Override DLSS-RR preset"
+#define NGX_DLSS_RR_OVERRIDE_RESERVED_KEY1_STRING  L"Override reserved key 1 for RR"
+#define NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2_STRING  L"Override reserved key 2 for RR"
+#define NGX_DLSS_SR_MODE_STRING                    L"Override DLSS-SR performance mode"
+#define NGX_DLSS_SR_OVERRIDE_STRING                L"Enable DLSS-SR override"
+#define NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_STRING L"Override DLSS-SR presets"
+#define NGX_DLSS_SR_OVERRIDE_RESERVED_KEY1_STRING  L"Override reserved key 1 for SR"
+#define NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2_STRING  L"Override reserved key 2 for SR"
 #define NV_QUALITY_UPSCALING_STRING                L"NVIDIA Quality upscaling"
 #define OPTIMUS_MAXAA_STRING                       L"Maximum AA samples allowed for a given application"
 #define PHYSXINDICATOR_STRING                      L"Display the PhysX indicator"
@@ -115,7 +119,6 @@
 #define VSYNC_BEHAVIOR_FLAGS_STRING                L"Vsync - Behavior Flags"
 #define WKS_API_STEREO_EYES_EXCHANGE_STRING        L"Stereo - Swap eyes"
 #define WKS_API_STEREO_MODE_STRING                 L"Stereo - Display mode"
-#define WKS_MEMORY_ALLOCATION_POLICY_STRING        L"Memory Allocation Policy"
 #define WKS_STEREO_DONGLE_SUPPORT_STRING           L"Stereo - Dongle Support"
 #define WKS_STEREO_SUPPORT_STRING                  L"Stereo - Enable"
 #define WKS_STEREO_SWAP_MODE_STRING                L"Stereo - swap mode"
@@ -128,6 +131,7 @@
 #define MAXWELL_B_SAMPLE_INTERLEAVE_STRING         L"Enable sample interleaving (MFAA)"
 #define PRERENDERLIMIT_STRING                      L"Maximum pre-rendered frames"
 #define PS_SHADERDISKCACHE_STRING                  L"Shader Cache"
+#define PS_SHADERDISKCACHE_DLL_PATH_WCHAR_STRING   L"shader cache path to dll"
 #define PS_SHADERDISKCACHE_MAX_SIZE_STRING         L"Shader disk cache maximum size"
 #define PS_TEXFILTER_ANISO_OPTS2_STRING            L"Texture filtering - Anisotropic sample optimization"
 #define PS_TEXFILTER_BILINEAR_IN_ANISO_STRING      L"Texture filtering - Anisotropic filter optimization"
@@ -159,7 +163,6 @@ enum ESetting {
     OGL_OVERLAY_SUPPORT_ID                        = 0x206C28C4,
     OGL_QUALITY_ENHANCEMENTS_ID                   = 0x20797D6C,
     OGL_SINGLE_BACKDEPTH_BUFFER_ID                = 0x20A29055,
-    OGL_SLI_CFR_MODE_ID                           = 0x20343843,
     OGL_SLI_MULTICAST_ID                          = 0x2092D3BE,
     OGL_THREAD_CONTROL_ID                         = 0x20C1221E,
     OGL_TMON_LEVEL_ID                             = 0x202888C1,
@@ -176,6 +179,8 @@ enum ESetting {
     ANSEL_ALLOW_ID                                = 0x1035DB89,
     ANSEL_ALLOWLISTED_ID                          = 0x1085DA8A,
     ANSEL_ENABLE_ID                               = 0x1075D972,
+    APPIDLE_DYNAMIC_FRL_FPS_ID                    = 0x10835016,
+    APPIDLE_DYNAMIC_FRL_THRESHOLD_TIME_ID         = 0x10835017,
     APPLICATION_PROFILE_NOTIFICATION_TIMEOUT_ID   = 0x104554B6,
     APPLICATION_STEAM_ID_ID                       = 0x107CDDBC,
     BATTERY_BOOST_APP_FPS_ID                      = 0x10115C8C,
@@ -190,6 +195,22 @@ enum ESetting {
     FXAA_INDICATOR_ENABLE_ID                      = 0x1068FB9C,
     LATENCY_INDICATOR_AUTOALIGN_ID                = 0x1095F170,
     MCSFRSHOWSPLIT_ID                             = 0x10287051,
+    NGX_DLAA_OVERRIDE_ID                          = 0x10E41DF4,
+    NGX_DLSSG_MULTI_FRAME_COUNT_ID                = 0x104D6667,
+    NGX_DLSS_FG_OVERRIDE_ID                       = 0x10E41E03,
+    NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1_ID         = 0x10C7D57E,
+    NGX_DLSS_FG_OVERRIDE_RESERVED_KEY2_ID         = 0x10C7D519,
+    NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_ID         = 0x10AFB76C,
+    NGX_DLSS_RR_MODE_ID                           = 0x10BD9423,
+    NGX_DLSS_RR_OVERRIDE_ID                       = 0x10E41E02,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_ID = 0x10E41DF7,
+    NGX_DLSS_RR_OVERRIDE_RESERVED_KEY1_ID         = 0x10C7D86C,
+    NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2_ID         = 0x10C7D597,
+    NGX_DLSS_SR_MODE_ID                           = 0x10AFB768,
+    NGX_DLSS_SR_OVERRIDE_ID                       = 0x10E41E01,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_ID = 0x10E41DF3,
+    NGX_DLSS_SR_OVERRIDE_RESERVED_KEY1_ID         = 0x10C7D684,
+    NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2_ID         = 0x10C7D82C,
     NV_QUALITY_UPSCALING_ID                       = 0x10444444,
     OPTIMUS_MAXAA_ID                              = 0x10F9DC83,
     PHYSXINDICATOR_ID                             = 0x1094F16F,
@@ -217,7 +238,6 @@ enum ESetting {
     VSYNC_BEHAVIOR_FLAGS_ID                       = 0x10FDEC23,
     WKS_API_STEREO_EYES_EXCHANGE_ID               = 0x11AE435C,
     WKS_API_STEREO_MODE_ID                        = 0x11E91A61,
-    WKS_MEMORY_ALLOCATION_POLICY_ID               = 0x11112233,
     WKS_STEREO_DONGLE_SUPPORT_ID                  = 0x112493BD,
     WKS_STEREO_SUPPORT_ID                         = 0x11AA9E99,
     WKS_STEREO_SWAP_MODE_ID                       = 0x11333333,
@@ -230,6 +250,7 @@ enum ESetting {
     MAXWELL_B_SAMPLE_INTERLEAVE_ID                = 0x0098C1AC,
     PRERENDERLIMIT_ID                             = 0x007BA09E,
     PS_SHADERDISKCACHE_ID                         = 0x00198FFF,
+    PS_SHADERDISKCACHE_DLL_PATH_WCHAR_ID          = 0x0019A002,
     PS_SHADERDISKCACHE_MAX_SIZE_ID                = 0x00AC8497,
     PS_TEXFILTER_ANISO_OPTS2_ID                   = 0x00E73211,
     PS_TEXFILTER_BILINEAR_IN_ANISO_ID             = 0x0084CD70,
@@ -242,9 +263,9 @@ enum ESetting {
     SET_VAB_DATA_ID                               = 0x00AB8687,
     VSYNCMODE_ID                                  = 0x00A879CF,
     VSYNCTEARCONTROL_ID                           = 0x005A375C,
-    TOTAL_DWORD_SETTING_NUM = 96,
-    TOTAL_WSTRING_SETTING_NUM = 4,
-    TOTAL_SETTING_NUM = 100,
+    TOTAL_DWORD_SETTING_NUM = 112,
+    TOTAL_WSTRING_SETTING_NUM = 5,
+    TOTAL_SETTING_NUM = 117,
     INVALID_SETTING_ID = 0xFFFFFFFF
 };
 
@@ -369,14 +390,6 @@ enum EValues_OGL_SINGLE_BACKDEPTH_BUFFER {
     OGL_SINGLE_BACKDEPTH_BUFFER_USE_HW_DEFAULT           = 0xffffffff,
     OGL_SINGLE_BACKDEPTH_BUFFER_NUM_VALUES = 3,
     OGL_SINGLE_BACKDEPTH_BUFFER_DEFAULT = OGL_SINGLE_BACKDEPTH_BUFFER_DISABLE
-};
-
-enum EValues_OGL_SLI_CFR_MODE {
-    OGL_SLI_CFR_MODE_DISABLE                             = 0x00,
-    OGL_SLI_CFR_MODE_ENABLE                              = 0x01,
-    OGL_SLI_CFR_MODE_CLASSIC_SFR                         = 0x02,
-    OGL_SLI_CFR_MODE_NUM_VALUES = 3,
-    OGL_SLI_CFR_MODE_DEFAULT = OGL_SLI_CFR_MODE_DISABLE
 };
 
 enum EValues_OGL_SLI_MULTICAST {
@@ -684,6 +697,146 @@ enum EValues_MCSFRSHOWSPLIT {
     MCSFRSHOWSPLIT_DEFAULT = MCSFRSHOWSPLIT_DISABLED
 };
 
+enum EValues_NGX_DLAA_OVERRIDE {
+    NGX_DLAA_OVERRIDE_DLAA_DEFAULT                       = 0,
+    NGX_DLAA_OVERRIDE_DLAA_ON                            = 1,
+    NGX_DLAA_OVERRIDE_NUM_VALUES = 2,
+    NGX_DLAA_OVERRIDE_DEFAULT = NGX_DLAA_OVERRIDE_DLAA_DEFAULT
+};
+
+enum EValues_NGX_DLSSG_MULTI_FRAME_COUNT {
+    NGX_DLSSG_MULTI_FRAME_COUNT_MIN                      = 1,
+    NGX_DLSSG_MULTI_FRAME_COUNT_MAX                      = 15,
+    NGX_DLSSG_MULTI_FRAME_COUNT_DEFAULT                  = 1,
+    NGX_DLSSG_MULTI_FRAME_COUNT_NUM_VALUES = 3,
+};
+
+enum EValues_NGX_DLSS_FG_OVERRIDE {
+    NGX_DLSS_FG_OVERRIDE_OFF                             = 0,
+    NGX_DLSS_FG_OVERRIDE_ON                              = 1,
+    NGX_DLSS_FG_OVERRIDE_NUM_VALUES = 2,
+    NGX_DLSS_FG_OVERRIDE_DEFAULT = NGX_DLSS_FG_OVERRIDE_OFF
+};
+
+enum EValues_NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1 {
+    NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1_DEFAULT           = 0,
+    NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1_NUM_VALUES = 1,
+};
+
+enum EValues_NGX_DLSS_FG_OVERRIDE_RESERVED_KEY2 {
+    NGX_DLSS_FG_OVERRIDE_RESERVED_KEY2_DEFAULT           = 0,
+    NGX_DLSS_FG_OVERRIDE_RESERVED_KEY2_NUM_VALUES = 1,
+};
+
+enum EValues_NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS {
+    NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_NONE = 0x0000,
+    NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_PERF_TO_9X = 0x0001,
+    NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_NUM_VALUES = 2,
+    NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_DEFAULT = NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_NGX_DLSS_OVERRIDE_OPTIMAL_SETTINGS_NONE
+};
+
+enum EValues_NGX_DLSS_RR_MODE {
+    NGX_DLSS_RR_MODE_NGX_DLSS_RR_MODE_PERFORMANCE        = 0,
+    NGX_DLSS_RR_MODE_NGX_DLSS_RR_MODE_BALANCED           = 1,
+    NGX_DLSS_RR_MODE_NGX_DLSS_RR_MODE_QUALITY            = 2,
+    NGX_DLSS_RR_MODE_NGX_DLSS_RR_MODE_SNIPPET_CONTROLLED = 3,
+    NGX_DLSS_RR_MODE_NGX_DLSS_RR_MODE_DLAA               = 4,
+    NGX_DLSS_RR_MODE_NGX_DLSS_RR_MODE_ULTRA_PERFORMANCE  = 5,
+    NGX_DLSS_RR_MODE_NGX_DLSS_RR_MODE_CUSTOM             = 6,
+    NGX_DLSS_RR_MODE_NUM_VALUES = 7,
+    NGX_DLSS_RR_MODE_DEFAULT = NGX_DLSS_RR_MODE_NGX_DLSS_RR_MODE_SNIPPET_CONTROLLED
+};
+
+enum EValues_NGX_DLSS_RR_OVERRIDE {
+    NGX_DLSS_RR_OVERRIDE_OFF                             = 0,
+    NGX_DLSS_RR_OVERRIDE_ON                              = 1,
+    NGX_DLSS_RR_OVERRIDE_NUM_VALUES = 2,
+    NGX_DLSS_RR_OVERRIDE_DEFAULT = NGX_DLSS_RR_OVERRIDE_OFF
+};
+
+enum EValues_NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION {
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_OFF     = 0,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_A = 1,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_B = 2,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_C = 3,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_D = 4,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_E = 5,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_F = 6,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_G = 7,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_H = 8,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_I = 9,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_J = 10,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_K = 11,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_L = 12,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_M = 13,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_N = 14,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_O = 15,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Latest = 0x00ffffff,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_NUM_VALUES = 17,
+    NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_DEFAULT = NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_OFF
+};
+
+enum EValues_NGX_DLSS_RR_OVERRIDE_RESERVED_KEY1 {
+    NGX_DLSS_RR_OVERRIDE_RESERVED_KEY1_DEFAULT           = 0,
+    NGX_DLSS_RR_OVERRIDE_RESERVED_KEY1_NUM_VALUES = 1,
+};
+
+enum EValues_NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2 {
+    NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2_DEFAULT           = 0,
+    NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2_NUM_VALUES = 1,
+};
+
+enum EValues_NGX_DLSS_SR_MODE {
+    NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_PERFORMANCE        = 0,
+    NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_BALANCED           = 1,
+    NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_QUALITY            = 2,
+    NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_SNIPPET_CONTROLLED = 3,
+    NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_DLAA               = 4,
+    NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_ULTRA_PERFORMANCE  = 5,
+    NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_CUSTOM             = 6,
+    NGX_DLSS_SR_MODE_NUM_VALUES = 7,
+    NGX_DLSS_SR_MODE_DEFAULT = NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_SNIPPET_CONTROLLED
+};
+
+enum EValues_NGX_DLSS_SR_OVERRIDE {
+    NGX_DLSS_SR_OVERRIDE_OFF                             = 0,
+    NGX_DLSS_SR_OVERRIDE_ON                              = 1,
+    NGX_DLSS_SR_OVERRIDE_NUM_VALUES = 2,
+    NGX_DLSS_SR_OVERRIDE_DEFAULT = NGX_DLSS_SR_OVERRIDE_OFF
+};
+
+enum EValues_NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION {
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_OFF     = 0,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_A = 1,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_B = 2,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_C = 3,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_D = 4,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_E = 5,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_F = 6,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_G = 7,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_H = 8,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_I = 9,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_J = 10,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_K = 11,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_L = 12,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_M = 13,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_N = 14,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_O = 15,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Latest = 0x00ffffff,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_NUM_VALUES = 17,
+    NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_DEFAULT = NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_OFF
+};
+
+enum EValues_NGX_DLSS_SR_OVERRIDE_RESERVED_KEY1 {
+    NGX_DLSS_SR_OVERRIDE_RESERVED_KEY1_DEFAULT           = 0,
+    NGX_DLSS_SR_OVERRIDE_RESERVED_KEY1_NUM_VALUES = 1,
+};
+
+enum EValues_NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2 {
+    NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2_DEFAULT           = 0,
+    NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2_NUM_VALUES = 1,
+};
+
 enum EValues_NV_QUALITY_UPSCALING {
     NV_QUALITY_UPSCALING_OFF                             = 0,
     NV_QUALITY_UPSCALING_ON                              = 1,
@@ -780,7 +933,9 @@ enum EValues_SHIM_RENDERING_OPTIONS {
     SHIM_RENDERING_OPTIONS_ALLOW_DYNAMIC_DISPLAY_MUX_SWITCH = 0x01000000U,
     SHIM_RENDERING_OPTIONS_DISALLOW_DYNAMIC_DISPLAY_MUX_SWITCH = 0x02000000U,
     SHIM_RENDERING_OPTIONS_DISABLE_TURING_POWER_POLICY   = 0x04000000U,
-    SHIM_RENDERING_OPTIONS_NUM_VALUES = 28,
+    SHIM_RENDERING_OPTIONS_ALLOW_DYNAMIC_DISPLAY_MUX_SWITCH_MDM = 0x08000000U,
+    SHIM_RENDERING_OPTIONS_DISALLOW_DYNAMIC_DISPLAY_MUX_SWITCH_MDM = 0x10000000U,
+    SHIM_RENDERING_OPTIONS_NUM_VALUES = 30,
     SHIM_RENDERING_OPTIONS_DEFAULT = 0x00000000U
 };
 
@@ -964,14 +1119,6 @@ enum EValues_WKS_API_STEREO_MODE {
     WKS_API_STEREO_MODE_DEFAULT = WKS_API_STEREO_MODE_SHUTTER_GLASSES
 };
 
-enum EValues_WKS_MEMORY_ALLOCATION_POLICY {
-    WKS_MEMORY_ALLOCATION_POLICY_AS_NEEDED               = 0x0,
-    WKS_MEMORY_ALLOCATION_POLICY_MODERATE_PRE_ALLOCATION = 0x1,
-    WKS_MEMORY_ALLOCATION_POLICY_AGGRESSIVE_PRE_ALLOCATION = 0x2,
-    WKS_MEMORY_ALLOCATION_POLICY_NUM_VALUES = 3,
-    WKS_MEMORY_ALLOCATION_POLICY_DEFAULT = WKS_MEMORY_ALLOCATION_POLICY_AS_NEEDED
-};
-
 enum EValues_WKS_STEREO_DONGLE_SUPPORT {
     WKS_STEREO_DONGLE_SUPPORT_OFF                        = 0,
     WKS_STEREO_DONGLE_SUPPORT_DAC                        = 1,
@@ -1060,7 +1207,7 @@ enum EValues_PS_SHADERDISKCACHE_MAX_SIZE {
     PS_SHADERDISKCACHE_MAX_SIZE_MIN                      = 0x0,
     PS_SHADERDISKCACHE_MAX_SIZE_MAX                      = 0xffffffff,
     PS_SHADERDISKCACHE_MAX_SIZE_NUM_VALUES = 2,
-    PS_SHADERDISKCACHE_MAX_SIZE_DEFAULT = 0x1000
+    PS_SHADERDISKCACHE_MAX_SIZE_DEFAULT = 0x2000
 };
 
 enum EValues_PS_TEXFILTER_ANISO_OPTS2 {

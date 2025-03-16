@@ -584,14 +584,14 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
   #endif
 
         byte PswCheck[SIZE_PSWCHECK];
-        DataIO.SetEncryption(false,Arc.FileHead.CryptMethod,&FilePassword,
-               Arc.FileHead.SaltSet ? Arc.FileHead.Salt:NULL,
+        bool EncSet=DataIO.SetEncryption(false,Arc.FileHead.CryptMethod,
+               &FilePassword,Arc.FileHead.SaltSet ? Arc.FileHead.Salt:nullptr,
                Arc.FileHead.InitV,Arc.FileHead.Lg2Count,
                Arc.FileHead.HashKey,PswCheck);
 
         // If header is damaged, we cannot rely on password check value,
         // because it can be damaged too.
-        if (Arc.FileHead.UsePswCheck && !Arc.BrokenHeader &&
+        if (EncSet && Arc.FileHead.UsePswCheck && !Arc.BrokenHeader &&
             memcmp(Arc.FileHead.PswCheck,PswCheck,SIZE_PSWCHECK)!=0)
         {
           if (GlobalPassword) // For -p<pwd> or Ctrl+P to avoid the infinite loop.
@@ -963,7 +963,7 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
 
         if (SetTimeAndSize)
         {
-          // We could preallocate more space that really written to broken file
+          // We could preallocate more space than really written to broken file
           // or file with crafted header.
           if (Preallocated>0 && (BrokenFile || DataIO.CurUnpWrite!=Preallocated))
             CurFile.Truncate();

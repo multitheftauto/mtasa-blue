@@ -341,8 +341,8 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
 }
 
 // Fixes excessive particle spawning from water cannons on high FPS.
-#define HOOKPOS_CWaterCannon__Render_FxFix 0x729430
-#define HOOKSIZE_CWaterCannon__Render_FxFix 0x7
+#define HOOKPOS_CWaterCannon__Render_FxFix 0x729437
+#define HOOKSIZE_CWaterCannon__Render_FxFix 0x5
 static const unsigned int RETURN_CWaterCannon__Render_FxFix = 0x729440;
 static const unsigned int RETURN_CWaterCannon__Render_FxFix_SKIP = 0x7294EE;
 static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
@@ -351,8 +351,6 @@ static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
-
-        fstp [esp+0x84]
 
         jmp RETURN_CWaterCannon__Render_FxFix
     skip:

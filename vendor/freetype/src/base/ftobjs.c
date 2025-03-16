@@ -4,7 +4,7 @@
  *
  *   The FreeType private base classes (body).
  *
- * Copyright (C) 1996-2023 by
+ * Copyright (C) 1996-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -1253,13 +1253,13 @@
     FT_Driver  driver = (FT_Driver)driver_;
 
 
-    /* finalize client-specific data */
-    if ( size->generic.finalizer )
-      size->generic.finalizer( size );
-
     /* finalize format-specific stuff */
     if ( driver->clazz->done_size )
       driver->clazz->done_size( size );
+
+    /* finalize client-specific data */
+    if ( size->generic.finalizer )
+      size->generic.finalizer( size );
 
     FT_FREE( size->internal );
     FT_FREE( size );
@@ -1322,10 +1322,6 @@
                       driver );
     face->size = NULL;
 
-    /* now discard client data */
-    if ( face->generic.finalizer )
-      face->generic.finalizer( face );
-
     /* discard charmaps */
     destroy_charmaps( face, memory );
 
@@ -1339,6 +1335,10 @@
       ( face->face_flags & FT_FACE_FLAG_EXTERNAL_STREAM ) != 0 );
 
     face->stream = NULL;
+
+    /* now discard client data */
+    if ( face->generic.finalizer )
+      face->generic.finalizer( face );
 
     /* get rid of it */
     if ( face->internal )
@@ -2302,7 +2302,10 @@
                                       face_index_internal, aface );
       FT_FREE( data_offsets );
       if ( !error )
-        (*aface)->num_faces = count;
+      {
+        (*aface)->num_faces  = count;
+        (*aface)->face_index = face_index_internal;
+      }
     }
 
     return error;
@@ -5791,7 +5794,7 @@
     ttface = (TT_Face)face;
     sfnt   = (SFNT_Service)ttface->sfnt;
 
-    if ( sfnt->get_colr_layer )
+    if ( sfnt->get_colr_glyph_paint )
       return sfnt->get_colr_glyph_paint( ttface,
                                          base_glyph,
                                          root_transform,

@@ -35,9 +35,14 @@
 #include "memdebug.h"
 
 #if defined(__GNUC__)
-#define CURL_ALIGN8   __attribute__ ((aligned(8)))
+#define CURL_ALIGN8  __attribute__((aligned(8)))
 #else
 #define CURL_ALIGN8
+#endif
+
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 gss_OID_desc Curl_spnego_mech_oid CURL_ALIGN8 = {
@@ -148,5 +153,9 @@ void Curl_gss_log_error(struct Curl_easy *data, const char *prefix,
   (void)prefix;
 #endif
 }
+
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic pop
+#endif
 
 #endif /* HAVE_GSSAPI */

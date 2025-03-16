@@ -297,6 +297,14 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     health.data.fValue = pObject->GetHealth();
                     BitStream.Write(&health);
 
+                    // is object break?
+                    if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        BitStream.WriteBit(pObject->GetHealth() <= 0);
+
+                    // Respawnable
+                    if (BitStream.Can(eBitStreamVersion::RespawnObject_Serverside))
+                        BitStream.WriteBit(pObject->IsRespawnEnabled());
+
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
                         CCustomWeapon* pWeapon = static_cast<CCustomWeapon*>(pElement);
@@ -604,8 +612,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(false);
 
                     // Write handling
-                    if (g_pGame->GetHandlingManager()->HasModelHandlingChanged(static_cast<eVehicleTypes>(pVehicle->GetModel())) ||
-                        pVehicle->HasHandlingChanged())
+                    if (g_pGame->GetHandlingManager()->HasModelHandlingChanged(pVehicle->GetModel()) || pVehicle->HasHandlingChanged())
                     {
                         BitStream.WriteBit(true);
                         SVehicleHandlingSync handling;
@@ -724,10 +731,25 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                             position.data.vecPosition = pMarker->GetTarget();
                             BitStream.Write(&position);
+
+                            if (markerType.data.ucType == CMarker::TYPE_CHECKPOINT && BitStream.Can(eBitStreamVersion::SetMarkerTargetArrowProperties))
+                            {
+                                SColor color = pMarker->GetTargetArrowColor();
+
+                                BitStream.Write(color.R);
+                                BitStream.Write(color.G);
+                                BitStream.Write(color.B);
+                                BitStream.Write(color.A);
+                                BitStream.Write(pMarker->GetTargetArrowSize());
+                            }
                         }
                         else
                             BitStream.WriteBit(false);
                     }
+
+                    // Alpha limit
+                    if (BitStream.Can(eBitStreamVersion::Marker_IgnoreAlphaLimits))
+                        BitStream.WriteBit(pMarker->AreAlphaLimitsIgnored());
 
                     break;
                 }
@@ -953,6 +975,34 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         // Send the current weapon spot
                         unsigned char currentWeaponSlot = pPed->GetWeaponSlot();
                         BitStream.Write(currentWeaponSlot);
+                    }
+
+                    // Animation
+                    if (BitStream.Can(eBitStreamVersion::AnimationsSync))
+                    {
+                        const SPlayerAnimData& animData = pPed->GetAnimationData();
+
+                        // Contains animation data?
+                        bool animRunning = animData.IsAnimating();
+                        BitStream.WriteBit(animRunning);
+
+                        if (animRunning)
+                        {
+                            BitStream.WriteString(animData.blockName);
+                            BitStream.WriteString(animData.animName);
+                            BitStream.Write(animData.time);
+                            BitStream.WriteBit(animData.loop);
+                            BitStream.WriteBit(animData.updatePosition);
+                            BitStream.WriteBit(animData.interruptable);
+                            BitStream.WriteBit(animData.freezeLastFrame);
+                            BitStream.Write(animData.blendTime);
+                            BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
+
+                            // Write elapsed time & speed
+                            float elapsedTime = GetTickCount64_() - animData.startedTick;
+                            BitStream.Write(elapsedTime);
+                            BitStream.Write(animData.speed);
+                        }
                     }
 
                     break;

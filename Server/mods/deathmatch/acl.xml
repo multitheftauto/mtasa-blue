@@ -21,6 +21,7 @@
       <acl name="Admin" />
       <acl name="RPC" />
       <object name="resource.admin" />
+      <object name="resource.admin2" />
       <object name="resource.webadmin" />
       <object name="resource.acpanel" />
    </group>
@@ -114,6 +115,8 @@
       <right name="function.stopResource" access="false" />
       <right name="function.restartResource" access="false" />
       <right name="function.createResource" access="false" />
+      <right name="function.renameResource" access="false" />
+      <right name="function.deleteResource" access="false" />
       <right name="function.copyResource" access="false" />
       <right name="function.addResourceMap" access="false" />
       <right name="function.addResourceConfig" access="false" />
@@ -160,6 +163,8 @@
       <right name="function.addBan" access="true" />
       <right name="function.startResource" access="true" />
       <right name="function.stopResource" access="true" />
+      <right name="function.renameResource" access="false" />
+      <right name="function.deleteResource" access="false" />
       <right name="function.restartResource" access="true" />
       <right name="function.refreshResources" access="true" />
       <right name="function.redirectPlayer" access="true" />
@@ -183,6 +188,8 @@
       <right name="function.addAccount" access="true" />
       <right name="function.setAccountName" access="true" />
       <right name="function.setAccountPassword" access="true" />
+      <right name="function.renameResource" access="true" />
+      <right name="function.deleteResource" access="true" />
    </acl>
    <acl name="Admin">
       <right name="general.ModifyOtherObjects" access="true" />
@@ -213,6 +220,8 @@
       <right name="function.getServerPassword" access="true" />
       <right name="function.createResource" access="true" />
       <right name="function.copyResource" access="true" />
+      <right name="function.renameResource" access="true" />
+      <right name="function.deleteResource" access="true" />
       <right name="function.addResourceMap" access="true" />
       <right name="function.addResourceConfig" access="true" />
       <right name="function.removeResourceFile" access="true" />

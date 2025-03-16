@@ -24,7 +24,6 @@
  *
  ***************************************************************************/
 
-
 /*
  * Inclusion of common header files.
  */
@@ -40,14 +39,6 @@
 #include <sys/types.h>
 #endif
 
-#ifdef NEED_MALLOC_H
-#include <malloc.h>
-#endif
-
-#ifdef NEED_MEMORY_H
-#include <memory.h>
-#endif
-
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
@@ -56,8 +47,11 @@
 #include <sys/time.h>
 #endif
 
-#ifdef WIN32
+#ifdef HAVE_IO_H
 #include <io.h>
+#endif
+
+#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 
@@ -70,11 +64,7 @@
 #endif
 
 #ifdef USE_WOLFSSL
-#  if defined(HAVE_STDINT_H)
-#    include <stdint.h>
-#  elif defined(HAVE_INTTYPES_H)
-#    include <inttypes.h>
-#  endif
+#include <stdint.h>
 #endif
 
 #ifdef USE_SCHANNEL
@@ -110,13 +100,13 @@
 #endif
 
 /*
- * Definition of timeval struct for platforms that don't have it.
+ * Definition of timeval struct for platforms that do not have it.
  */
 
 #ifndef HAVE_STRUCT_TIMEVAL
 struct timeval {
- long tv_sec;
- long tv_usec;
+  long tv_sec;
+  long tv_usec;
 };
 #endif
 
@@ -134,7 +124,7 @@ struct timeval {
 
 
 #if defined(__minix)
-/* Minix doesn't support recv on TCP sockets */
+/* Minix does not support recv on TCP sockets */
 #define sread(x,y,z) (ssize_t)read((RECV_TYPE_ARG1)(x), \
                                    (RECV_TYPE_ARG2)(y), \
                                    (RECV_TYPE_ARG3)(z))
@@ -147,7 +137,7 @@ struct timeval {
  *
  * HAVE_RECV is defined if you have a function named recv()
  * which is used to read incoming data from sockets. If your
- * function has another name then don't define HAVE_RECV.
+ * function has another name then do not define HAVE_RECV.
  *
  * If HAVE_RECV is defined then RECV_TYPE_ARG1, RECV_TYPE_ARG2,
  * RECV_TYPE_ARG3, RECV_TYPE_ARG4 and RECV_TYPE_RETV must also
@@ -155,7 +145,7 @@ struct timeval {
  *
  * HAVE_SEND is defined if you have a function named send()
  * which is used to write outgoing data on a connected socket.
- * If yours has another name then don't define HAVE_SEND.
+ * If yours has another name then do not define HAVE_SEND.
  *
  * If HAVE_SEND is defined then SEND_TYPE_ARG1, SEND_QUAL_ARG2,
  * SEND_TYPE_ARG2, SEND_TYPE_ARG3, SEND_TYPE_ARG4 and
@@ -168,15 +158,13 @@ struct timeval {
                                    (RECV_TYPE_ARG4)(0))
 #else /* HAVE_RECV */
 #ifndef sread
-  /* */
-  Error Missing_definition_of_macro_sread
-  /* */
+#error "Missing definition of macro sread!"
 #endif
 #endif /* HAVE_RECV */
 
 
 #if defined(__minix)
-/* Minix doesn't support send on TCP sockets */
+/* Minix does not support send on TCP sockets */
 #define swrite(x,y,z) (ssize_t)write((SEND_TYPE_ARG1)(x), \
                                     (SEND_TYPE_ARG2)(y), \
                                     (SEND_TYPE_ARG3)(z))
@@ -188,9 +176,7 @@ struct timeval {
                                     (SEND_TYPE_ARG4)(SEND_4TH_ARG))
 #else /* HAVE_SEND */
 #ifndef swrite
-  /* */
-  Error Missing_definition_of_macro_swrite
-  /* */
+#error "Missing definition of macro swrite!"
 #endif
 #endif /* HAVE_SEND */
 
@@ -203,7 +189,7 @@ struct timeval {
 #  define sclose(x)  closesocket((x))
 #elif defined(HAVE_CLOSESOCKET_CAMEL)
 #  define sclose(x)  CloseSocket((x))
-#elif defined(HAVE_CLOSE_S)
+#elif defined(MSDOS)  /* Watt-32 */
 #  define sclose(x)  close_s((x))
 #elif defined(USE_LWIPSOCK)
 #  define sclose(x)  lwip_close((x))
@@ -234,19 +220,19 @@ struct timeval {
 
 /*
  * 'bool' exists on platforms with <stdbool.h>, i.e. C99 platforms.
- * On non-C99 platforms there's no bool, so define an enum for that.
+ * On non-C99 platforms there is no bool, so define an enum for that.
  * On C99 platforms 'false' and 'true' also exist. Enum uses a
  * global namespace though, so use bool_false and bool_true.
  */
 
 #ifndef HAVE_BOOL_T
   typedef enum {
-      bool_false = 0,
-      bool_true  = 1
+    bool_false = 0,
+    bool_true  = 1
   } bool;
 
 /*
- * Use a define to let 'true' and 'false' use those enums.  There
+ * Use a define to let 'true' and 'false' use those enums. There
  * are currently no use of true and false in libcurl proper, but
  * there are some in the examples. This will cater for any later
  * code happening to use true and false.
@@ -405,7 +391,7 @@ typedef unsigned int bit;
 #ifdef __VMS
 #define argv_item_t  __char_ptr32
 #elif defined(_UNICODE)
-#define argv_item_t wchar_t *
+#define argv_item_t  wchar_t *
 #else
 #define argv_item_t  char *
 #endif

@@ -76,12 +76,23 @@ public:
     static bool                                            EngineRestoreTXDImage(uint uiModelID);
     static std::vector<std::string_view>                   EngineImageGetFileList(CClientIMG* pImg);
     static std::string                                     EngineImageGetFile(CClientIMG* pImg, std::variant<size_t, std::string_view> file);
-    static bool                                            EngineRestreamWorld(lua_State* const luaVM);
+    static bool                                            EngineRestreamWorld();
     static bool                                            EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
 
+    static size_t EngineGetPoolCapacity(ePools pool);
+    static size_t EngineGetPoolDefaultCapacity(ePools pool);
+    static size_t EngineGetPoolUsedCapacity(ePools pool);
+    static bool   EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t newSize);
+
     static uint EngineRequestTXD(lua_State* const luaVM, std::string strTxdName);
     static bool EngineFreeTXD(uint txdID);
+
+    static bool EngineStreamingRequestModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking);
+    static bool EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference);
+    static eModelLoadState EngineStreamingGetModelLoadState(std::uint16_t modelId);
+
+    static void EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

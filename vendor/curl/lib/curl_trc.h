@@ -55,96 +55,144 @@ void Curl_debug(struct Curl_easy *data, curl_infotype type,
                 char *ptr, size_t size);
 
 /**
- * Output an informational message when transfer's verbose logging is enabled.
- */
-void Curl_infof(struct Curl_easy *data,
-#if defined(__GNUC__) && !defined(printf) &&                    \
-  defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) && \
-  !defined(__MINGW32__)
-                       const char *fmt, ...)
-                       __attribute__((format(printf, 2, 3)));
-#else
-                       const char *fmt, ...);
-#endif
-
-/**
  * Output a failure message on registered callbacks for transfer.
  */
 void Curl_failf(struct Curl_easy *data,
-#if defined(__GNUC__) && !defined(printf) &&                    \
-  defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) && \
-  !defined(__MINGW32__)
-                       const char *fmt, ...)
-                       __attribute__((format(printf, 2, 3)));
-#else
-                       const char *fmt, ...);
-#endif
+                const char *fmt, ...) CURL_PRINTF(2, 3);
 
 #define failf Curl_failf
+
+#define CURL_LOG_LVL_NONE  0
+#define CURL_LOG_LVL_INFO  1
+
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#define CURL_HAVE_C99
+#endif
+
+/**
+ * Output an informational message when transfer's verbose logging is enabled.
+ */
+void Curl_infof(struct Curl_easy *data,
+                const char *fmt, ...) CURL_PRINTF(2, 3);
 
 /**
  * Output an informational message when both transfer's verbose logging
  * and connection filters verbose logging are enabled.
  */
 void Curl_trc_cf_infof(struct Curl_easy *data, struct Curl_cfilter *cf,
-#if defined(__GNUC__) && !defined(printf) &&                    \
-  defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) && \
-  !defined(__MINGW32__)
-                       const char *fmt, ...)
-                       __attribute__((format(printf, 3, 4)));
-#else
-                       const char *fmt, ...);
+                       const char *fmt, ...) CURL_PRINTF(3, 4);
+void Curl_trc_write(struct Curl_easy *data,
+                    const char *fmt, ...) CURL_PRINTF(2, 3);
+void Curl_trc_read(struct Curl_easy *data,
+                   const char *fmt, ...) CURL_PRINTF(2, 3);
+
+#ifndef CURL_DISABLE_FTP
+extern struct curl_trc_feat Curl_trc_feat_ftp;
+void Curl_trc_ftp(struct Curl_easy *data,
+                  const char *fmt, ...) CURL_PRINTF(2, 3);
+#endif
+#ifndef CURL_DISABLE_SMTP
+extern struct curl_trc_feat Curl_trc_feat_smtp;
+void Curl_trc_smtp(struct Curl_easy *data,
+                   const char *fmt, ...) CURL_PRINTF(2, 3);
+#endif
+#ifdef USE_SSL
+extern struct curl_trc_feat Curl_trc_feat_ssls;
+void Curl_trc_ssls(struct Curl_easy *data,
+                   const char *fmt, ...) CURL_PRINTF(2, 3);
+#endif
+#if !defined(CURL_DISABLE_WEBSOCKETS) && !defined(CURL_DISABLE_HTTP)
+extern struct curl_trc_feat Curl_trc_feat_ws;
+void Curl_trc_ws(struct Curl_easy *data,
+                 const char *fmt, ...) CURL_PRINTF(2, 3);
 #endif
 
-#define CURL_LOG_LVL_NONE  0
-#define CURL_LOG_LVL_INFO  1
-
-
-#if !defined(CURL_DISABLE_VERBOSE_STRINGS)
-/* informational messages enabled */
-
-#define Curl_trc_is_verbose(data)    ((data) && (data)->set.verbose)
-#define Curl_trc_cf_is_verbose(cf, data) \
-                            ((data) && (data)->set.verbose && \
-                            (cf) && (cf)->cft->log_level >= CURL_LOG_LVL_INFO)
-
-/* explainer: we have some mix configuration and werror settings
- * that define HAVE_VARIADIC_MACROS_C99 even though C89 is enforced
- * on gnuc and some other compiler. Need to treat carefully.
- */
-#if defined(HAVE_VARIADIC_MACROS_C99) && \
-    defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
-
+#if defined(CURL_HAVE_C99) && !defined(CURL_DISABLE_VERBOSE_STRINGS)
 #define infof(data, ...) \
   do { if(Curl_trc_is_verbose(data)) \
          Curl_infof(data, __VA_ARGS__); } while(0)
 #define CURL_TRC_CF(data, cf, ...) \
   do { if(Curl_trc_cf_is_verbose(cf, data)) \
          Curl_trc_cf_infof(data, cf, __VA_ARGS__); } while(0)
+#define CURL_TRC_WRITE(data, ...) \
+  do { if(Curl_trc_ft_is_verbose(data, &Curl_trc_feat_write)) \
+         Curl_trc_write(data, __VA_ARGS__); } while(0)
+#define CURL_TRC_READ(data, ...) \
+  do { if(Curl_trc_ft_is_verbose(data, &Curl_trc_feat_read)) \
+         Curl_trc_read(data, __VA_ARGS__); } while(0)
 
-#else /* no variadic macro args */
+#ifndef CURL_DISABLE_FTP
+#define CURL_TRC_FTP(data, ...) \
+  do { if(Curl_trc_ft_is_verbose(data, &Curl_trc_feat_ftp)) \
+         Curl_trc_ftp(data, __VA_ARGS__); } while(0)
+#endif /* !CURL_DISABLE_FTP */
+#ifndef CURL_DISABLE_SMTP
+#define CURL_TRC_SMTP(data, ...) \
+  do { if(Curl_trc_ft_is_verbose(data, &Curl_trc_feat_smtp)) \
+         Curl_trc_smtp(data, __VA_ARGS__); } while(0)
+#endif /* !CURL_DISABLE_SMTP */
+#ifdef USE_SSL
+#define CURL_TRC_SSLS(data, ...) \
+  do { if(Curl_trc_ft_is_verbose(data, &Curl_trc_feat_ssls)) \
+         Curl_trc_ssls(data, __VA_ARGS__); } while(0)
+#endif /* USE_SSL */
+#if !defined(CURL_DISABLE_WEBSOCKETS) && !defined(CURL_DISABLE_HTTP)
+#define CURL_TRC_WS(data, ...)                             \
+  do { if(Curl_trc_ft_is_verbose(data, &Curl_trc_feat_ws)) \
+         Curl_trc_ws(data, __VA_ARGS__); } while(0)
+#endif /* !CURL_DISABLE_WEBSOCKETS && !CURL_DISABLE_HTTP */
+
+#else /* CURL_HAVE_C99 */
+
 #define infof Curl_infof
 #define CURL_TRC_CF Curl_trc_cf_infof
-#endif /* variadic macro args */
+#define CURL_TRC_WRITE Curl_trc_write
+#define CURL_TRC_READ  Curl_trc_read
 
-#else /* !CURL_DISABLE_VERBOSE_STRINGS */
-/* All informational messages are not compiled in for size savings */
-
-#define Curl_trc_is_verbose(d)        ((void)(d), FALSE)
-#define Curl_trc_cf_is_verbose(x,y)   ((void)(x), (void)(y), FALSE)
-
-#if defined(HAVE_VARIADIC_MACROS_C99)
-#define infof(...)  Curl_nop_stmt
-#define CURL_TRC_CF(...)  Curl_nop_stmt
-#define Curl_trc_cf_infof(...)  Curl_nop_stmt
-#elif defined(HAVE_VARIADIC_MACROS_GCC)
-#define infof(x...)  Curl_nop_stmt
-#define CURL_TRC_CF(x...)  Curl_nop_stmt
-#define Curl_trc_cf_infof(x...)  Curl_nop_stmt
-#else
-#error "missing VARIADIC macro define, fix and rebuild!"
+#ifndef CURL_DISABLE_FTP
+#define CURL_TRC_FTP   Curl_trc_ftp
+#endif
+#ifndef CURL_DISABLE_SMTP
+#define CURL_TRC_SMTP  Curl_trc_smtp
+#endif
+#ifdef USE_SSL
+#define CURL_TRC_SSLS  Curl_trc_ssls
+#endif
+#if !defined(CURL_DISABLE_WEBSOCKETS) && !defined(CURL_DISABLE_HTTP)
+#define CURL_TRC_WS    Curl_trc_ws
 #endif
 
-#endif /* CURL_DISABLE_VERBOSE_STRINGS */
+#endif /* !CURL_HAVE_C99 */
+
+#ifndef CURL_DISABLE_VERBOSE_STRINGS
+/* informational messages enabled */
+
+struct curl_trc_feat {
+  const char *name;
+  int log_level;
+};
+extern struct curl_trc_feat Curl_trc_feat_read;
+extern struct curl_trc_feat Curl_trc_feat_write;
+
+#define Curl_trc_is_verbose(data) \
+            ((data) && (data)->set.verbose && \
+            (!(data)->state.feat || \
+             ((data)->state.feat->log_level >= CURL_LOG_LVL_INFO)))
+#define Curl_trc_cf_is_verbose(cf, data) \
+            (Curl_trc_is_verbose(data) && \
+             (cf) && (cf)->cft->log_level >= CURL_LOG_LVL_INFO)
+#define Curl_trc_ft_is_verbose(data, ft) \
+            (Curl_trc_is_verbose(data) && \
+             (ft)->log_level >= CURL_LOG_LVL_INFO)
+
+#else /* defined(CURL_DISABLE_VERBOSE_STRINGS) */
+/* All informational messages are not compiled in for size savings */
+
+#define Curl_trc_is_verbose(d)        (FALSE)
+#define Curl_trc_cf_is_verbose(x,y)   (FALSE)
+#define Curl_trc_ft_is_verbose(x,y)   (FALSE)
+
+#endif /* !defined(CURL_DISABLE_VERBOSE_STRINGS) */
 
 #endif /* HEADER_CURL_TRC_H */

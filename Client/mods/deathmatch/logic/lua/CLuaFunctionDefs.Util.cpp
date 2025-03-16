@@ -12,27 +12,40 @@
 
 int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
-    int iIndex = 0;
+    bool includeCustom;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(includeCustom, true);
+
+    auto* modelManager = g_pClientGame->GetManager()->GetModelManager();
+
+    std::size_t index = 0;
     lua_newtable(luaVM);
 
-    // Gather GTASA default skins
-    for (int i = 0; i <= 312; i++)
+    // Gather default and possibly custom GTASA ped model IDs
+    for (std::size_t i = 0; i <= 312; i++)
     {
         if (CClientPlayerManager::IsValidModel(i))
         {
-            lua_pushnumber(luaVM, ++iIndex);
+            // Skip custom skins if not requested
+            if (!includeCustom && modelManager->FindModelByID(i))
+                continue;
+
+            lua_pushnumber(luaVM, ++index);
             lua_pushnumber(luaVM, i);
             lua_settable(luaVM, -3);
         }
     }
 
-    // Gather our custom skin model IDs allocated with engineRequestModel
-    // (there might be some < 313 as well, and since we don't want duplicates, we start at 313, others are already included by the loop above)
-    for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED, 313))
+    if (includeCustom)
     {
-        lua_pushnumber(luaVM, ++iIndex);
-        lua_pushnumber(luaVM, model->GetModelID());
-        lua_settable(luaVM, -3);
+        // Gather the rest of custom skin model IDs allocated with engineRequestModel
+        // (there are usually some < 313 as well, and since we don't want duplicates, we start at 313, others are already included by the loop above)
+        for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED, 313))
+        {
+            lua_pushnumber(luaVM, ++index);
+            lua_pushnumber(luaVM, model->GetModelID());
+            lua_settable(luaVM, -3);
+        }
     }
 
     return 1;

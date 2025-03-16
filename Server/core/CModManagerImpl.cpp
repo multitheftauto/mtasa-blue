@@ -130,7 +130,6 @@ void CModManagerImpl::Unload(bool bKeyPressBeforeTerm)
                 Print("Press Q to shut down the server!\n");
                 WaitForKey('q');
             }
-            TerminateProcess(GetCurrentProcess(), GetExitCode());
         }
 #endif
         // Unload the library
@@ -146,6 +145,11 @@ void CModManagerImpl::DoPulse()
         // Pulse the mod
         m_pBase->DoPulse();
     }
+}
+
+bool CModManagerImpl::IsReadyToAcceptConnections() const noexcept
+{
+    return (m_pBase != nullptr) && m_pBase->IsReadyToAcceptConnections();
 }
 
 bool CModManagerImpl::IsFinished()

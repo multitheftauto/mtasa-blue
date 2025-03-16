@@ -57,6 +57,7 @@ public:
     bool           m_bInAutomaticTransaction;
     CTickCount     m_AutomaticTransactionStartTime;
     int            m_bMultipleStatements;
+    int            m_bUseSSL;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -79,12 +80,16 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
                                                    const SString& strOptions)
     : m_iRefCount(1), m_pManager(pManager)
 {
+    int getServerPublicKey;
+
     // Parse options string
     CArgMap optionsMap("=", ";");
     optionsMap.SetFromString(strOptions);
     optionsMap.Get("autoreconnect", m_bAutomaticReconnect, 1);
     optionsMap.Get("batch", m_bAutomaticTransactionsEnabled, 1);
     optionsMap.Get("multi_statements", m_bMultipleStatements, 0);
+    optionsMap.Get("use_ssl", m_bUseSSL, 0);
+    optionsMap.Get("get_server_public_key", getServerPublicKey, 1);
 
     SString strHostname;
     SString strDatabaseName;
@@ -106,11 +111,15 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     if (m_handle)
     {
         bool reconnect = m_bAutomaticReconnect;
+        uint const ssl_mode = m_bUseSSL ? SSL_MODE_REQUIRED : SSL_MODE_DISABLED;
         mysql_options(m_handle, MYSQL_OPT_RECONNECT, &reconnect);
+        mysql_options(m_handle, MYSQL_OPT_SSL_MODE, &ssl_mode);
         if (!strCharset.empty())
             mysql_options(m_handle, MYSQL_SET_CHARSET_NAME, strCharset);
         if (m_bMultipleStatements)
             ulClientFlags |= CLIENT_MULTI_STATEMENTS;
+        bool getServerPublicKeyOpt = (getServerPublicKey != 0);
+        mysql_options(m_handle, MYSQL_OPT_GET_SERVER_PUBLIC_KEY, &getServerPublicKeyOpt);
 
         if (mysql_real_connect(m_handle, strHostname, strUsername, strPassword, strDatabaseName, iPort, strUnixSocket, ulClientFlags))
             m_bOpened = true;

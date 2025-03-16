@@ -31,6 +31,7 @@ CClientDFFManager*         CLuaFunctionDefs::m_pDFFManager;
 CClientColModelManager*    CLuaFunctionDefs::m_pColModelManager;
 CRegisteredCommands*       CLuaFunctionDefs::m_pRegisteredCommands;
 CClientIMGManager*         CLuaFunctionDefs::m_pImgManager;
+CClientBuildingManager*    CLuaFunctionDefs::m_pBuildingManager;
 
 void CLuaFunctionDefs::Initialize(CLuaManager* pLuaManager, CScriptDebugging* pScriptDebugging, CClientGame* pClientGame)
 {
@@ -55,4 +56,5 @@ void CLuaFunctionDefs::Initialize(CLuaManager* pLuaManager, CScriptDebugging* pS
     m_pColModelManager = m_pManager->GetColModelManager();
     m_pRegisteredCommands = m_pClientGame->GetRegisteredCommands();
     m_pImgManager = m_pManager->GetIMGManager();
+    m_pBuildingManager = m_pManager->GetBuildingManager();
 }

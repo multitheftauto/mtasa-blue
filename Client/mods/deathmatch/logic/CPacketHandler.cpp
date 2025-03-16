@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CPacketHandler.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CPacketHandler.cpp
  *  PURPOSE:     Packet handling and processing
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -19,6 +19,7 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
+#include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
 
@@ -570,6 +571,10 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
         case ePlayerDisconnectType::SERIAL_VERIFICATION:
             strReason = _("Disconnected: Serial verification failed");
             strErrorCode = _E("CD44");
+            break;
+        case ePlayerDisconnectType::SERIAL_DUPLICATE:
+            strReason = _("Disconnected: Serial already in use");
+            strErrorCode = _E("CD50");
             break;
         case ePlayerDisconnectType::CONNECTION_DESYNC:
             strReason = _("Disconnected: Connection desync %s");
@@ -1225,6 +1230,8 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
                 else
                     Arguments.PushBoolean(false);
                 Arguments.PushBoolean(bStealth);
+                Arguments.PushNumber(animGroup);
+                Arguments.PushNumber(animID);
                 if (IS_PLAYER(pPed))
                     pPed->CallEvent("onClientPlayerWasted", Arguments, true);
                 else
@@ -1470,7 +1477,7 @@ void CPacketHandler::Packet_DebugEcho(NetBitStreamInterface& bitStream)
     if (!bitStream.Read(ucLevel))
         return;
 
-    if (ucLevel == 0)
+    if (ucLevel == 0 || ucLevel == 4)
     {
         // Read out the color
         if (!bitStream.Read(ucRed) || !bitStream.Read(ucGreen) || !bitStream.Read(ucBlue))
@@ -1480,7 +1487,7 @@ void CPacketHandler::Packet_DebugEcho(NetBitStreamInterface& bitStream)
     }
 
     // Valid length?
-    int iBytesRead = (ucLevel == 0) ? 4 : 1;
+    int iBytesRead = (ucLevel == 0 || ucLevel == 4) ? 4 : 1;
     int iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - iBytesRead;
     if (iNumberOfBytesUsed >= MIN_DEBUGECHO_LENGTH && iNumberOfBytesUsed <= MAX_DEBUGECHO_LENGTH)
     {
@@ -1621,10 +1628,12 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
         CDeathmatchVehicle* pVehicle = static_cast<CDeathmatchVehicle*>(g_pClientGame->m_pVehicleManager->Get(ID));
         if (pVehicle)
         {
+            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+
             for (unsigned int i = 0; i < MAX_DOORS; ++i)
             {
                 if (damage.data.bDoorStatesChanged[i])
-                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
+                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
             }
             for (unsigned int i = 0; i < MAX_WHEELS; ++i)
             {
@@ -1634,7 +1643,7 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
             for (unsigned int i = 0; i < MAX_PANELS; ++i)
             {
                 if (damage.data.bPanelStatesChanged[i])
-                    pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i]);
+                    pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i], flyingComponents);
             }
             for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
             {
@@ -2387,6 +2396,11 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::WATERCREATURES, wsProps.data.watercreatures);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::BURNFLIPPEDCARS, wsProps.data.burnflippedcars);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FIREBALLDESTRUCT, wsProps.data2.fireballdestruct);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::ROADSIGNSTEXT, wsProps.data3.roadsignstext);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTENDEDWATERCANNONS, wsProps.data4.extendedwatercannons);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::TUNNELWEATHERBLEND, wsProps.data5.tunnelweatherblend);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::IGNOREFIRESTATE, wsProps.data6.ignoreFireState);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data7.flyingcomponents);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
@@ -2639,7 +2653,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 
     bool bOcclusionsEnabled = true;
@@ -2717,6 +2731,8 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // CVector              (12)    - scale
         // bool                 (1)     - static
         // SObjectHealthSync    (?)     - health
+        // bool                 (1)     - is break
+        // bool                 (1)     - respawnable
 
         // Pickups:
         // CVector              (12)    - position
@@ -3077,6 +3093,15 @@ retry:
                         if (bitStream.Read(&health))
                             pObject->SetHealth(health.data.fValue);
 
+                        if (bitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        {
+                            if (bitStream.ReadBit())
+                                pObject->Break();
+                        }
+
+                        if (bitStream.Can(eBitStreamVersion::RespawnObject_Serverside))
+                            pObject->SetRespawnEnabled(bitStream.ReadBit());
+
                         pObject->SetCollisionEnabled(bCollisonsEnabled);
                         if (ucEntityTypeID == CClientGame::WEAPON)
                         {
@@ -3369,13 +3394,14 @@ retry:
                     pVehicle->SetPaintjob(paintjob.data.ucPaintjob);
                     pVehicle->SetColor(vehColor);
 
+                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
                     // Setup our damage model
                     for (int i = 0; i < MAX_DOORS; i++)
-                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
+                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
                     for (int i = 0; i < MAX_WHEELS; i++)
                         pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
                     for (int i = 0; i < MAX_PANELS; i++)
-                        pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i]);
+                        pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i], flyingComponents);
                     for (int i = 0; i < MAX_LIGHTS; i++)
                         pVehicle->SetLightStatus(i, damage.data.ucLightStates[i]);
                     pVehicle->ResetDamageModelSync();
@@ -3619,7 +3645,6 @@ retry:
                             CClientMarker* pMarker = new CClientMarker(g_pClientGame->m_pManager, EntityID, ucType);
                             pMarker->SetPosition(position.data.vecPosition);
                             pMarker->SetSize(fSize);
-                            pMarker->SetColor(color);
 
                             // Entity is this
                             pEntity = pMarker;
@@ -3641,8 +3666,27 @@ retry:
                                         pCheckpoint->SetNextPosition(position.data.vecPosition);
                                         pCheckpoint->SetIcon(CClientCheckpoint::ICON_ARROW);
                                     }
+
+                                    if (ucType == CClientGame::MARKER_CHECKPOINT && bitStream.Can(eBitStreamVersion::SetMarkerTargetArrowProperties))
+                                    {
+                                        SColor color;
+                                        float  size;
+                                        bitStream.Read(color.R);
+                                        bitStream.Read(color.G);
+                                        bitStream.Read(color.B);
+                                        bitStream.Read(color.A);
+                                        bitStream.Read(size);
+
+                                        pCheckpoint->SetTargetArrowProperties(color, size);
+                                    }
                                 }
                             }
+
+                            // Read out alpha limit flag
+                            if (bitStream.Can(eBitStreamVersion::Marker_IgnoreAlphaLimits))
+                                pMarker->SetIgnoreAlphaLimits(bitStream.ReadBit());
+
+                            pMarker->SetColor(color);
                         }
                         else
                         {
@@ -3954,6 +3998,41 @@ retry:
 
                     // Collisions
                     pPed->SetUsesCollision(bCollisonsEnabled);
+
+                    // Animation
+                    if (bitStream.Can(eBitStreamVersion::AnimationsSync))
+                    {
+                        // Contains animation data?
+                        if (bitStream.ReadBit())
+                        {
+                            std::string blockName, animName;
+                            int time, blendTime;
+                            bool looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
+                            float elapsedTime, speed;
+
+                            // Read data
+                            bitStream.ReadString(blockName);
+                            bitStream.ReadString(animName);
+                            bitStream.Read(time);
+                            bitStream.ReadBit(looped);
+                            bitStream.ReadBit(updatePosition);
+                            bitStream.ReadBit(interruptable);
+                            bitStream.ReadBit(freezeLastFrame);
+                            bitStream.Read(blendTime);
+                            bitStream.ReadBit(taskRestore);
+                            bitStream.Read(elapsedTime);
+                            bitStream.Read(speed);
+
+                            // Run anim
+                            CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable, freezeLastFrame);
+                            pPed->m_AnimationCache.progressWaitForStreamIn = true;
+                            pPed->m_AnimationCache.elapsedTime = elapsedTime;
+
+                            CStaticFunctionDefinitions::SetPedAnimationSpeed(*pPed, animName, speed);
+
+                            pPed->SetHasSyncedAnim(true);
+                        }
+                    }
 
                     break;
                 }
@@ -4417,10 +4496,11 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
         if (bDelete)
         {
             // Grab it and delete it
-            CClientDisplay* pDisplay = g_pClientGame->m_pDisplayManager->Get(ulID);
+            std::shared_ptr<CClientDisplay> pDisplay = g_pClientGame->m_pDisplayManager->Get(ulID);
+
             if (pDisplay)
             {
-                delete pDisplay;
+                m_displayTextList.remove(std::static_pointer_cast<CClientTextDisplay>(pDisplay));
             }
         }
         else
@@ -4456,26 +4536,28 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
                 }
 
                 // Does the text not already exist? Create it
-                CClientTextDisplay* pTextDisplay = NULL;
-                CClientDisplay*     pDisplay = g_pClientGame->m_pDisplayManager->Get(ulID);
-                if (pDisplay && pDisplay->GetType() == DISPLAY_TEXT)
+                std::shared_ptr<CClientTextDisplay> textDisplay = nullptr;
+                std::shared_ptr<CClientDisplay> display = g_pClientGame->m_pDisplayManager->Get(ulID);
+
+                if (display && display->GetType() == DISPLAY_TEXT)
                 {
-                    pTextDisplay = static_cast<CClientTextDisplay*>(pDisplay);
+                    textDisplay = std::static_pointer_cast<CClientTextDisplay>(display);
                 }
 
-                if (!pTextDisplay)
+                if (!textDisplay)
                 {
                     // Create it
-                    pTextDisplay = new CClientTextDisplay(g_pClientGame->m_pDisplayManager, ulID);
+                    textDisplay = g_pClientGame->m_pDisplayManager->CreateTextDisplay(ulID);
+                    m_displayTextList.push_back(textDisplay);
                 }
 
                 // Set the text properties
-                pTextDisplay->SetCaption(szText);
-                pTextDisplay->SetPosition(CVector(fX, fY, 0));
-                pTextDisplay->SetColor(color);
-                pTextDisplay->SetScale(fScale);
-                pTextDisplay->SetFormat((unsigned long)ucFormat);
-                pTextDisplay->SetShadowAlpha(ucShadowAlpha);
+                textDisplay->SetCaption(szText);
+                textDisplay->SetPosition(CVector(fX, fY, 0));
+                textDisplay->SetColor(color);
+                textDisplay->SetScale(fScale);
+                textDisplay->SetFormat((unsigned long)ucFormat);
+                textDisplay->SetShadowAlpha(ucShadowAlpha);
 
                 delete[] szText;
             }

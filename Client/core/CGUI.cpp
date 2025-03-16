@@ -56,9 +56,15 @@ CLocalGUI::~CLocalGUI()
 
 void CLocalGUI::SetSkin(const char* szName)
 {
+    CVector2D consolePos, consoleSize;
+
     bool guiWasLoaded = m_pMainMenu != NULL;
     if (guiWasLoaded)
+    {
+        consolePos = m_pConsole->GetPosition();
+        consoleSize = m_pConsole->GetSize();
         DestroyWindows();
+    }
 
     std::string error;
 
@@ -93,7 +99,11 @@ void CLocalGUI::SetSkin(const char* szName)
     m_LastSettingsRevision = cvars->GetRevision();
 
     if (guiWasLoaded)
+    {
         CreateWindows(guiWasLoaded);
+        m_pConsole->SetPosition(consolePos);
+        m_pConsole->SetSize(consoleSize);
+    }
 
     if (CCore::GetSingleton().GetConsole() && !error.empty())
         CCore::GetSingleton().GetConsole()->Echo(error.c_str());
@@ -104,8 +114,8 @@ void CLocalGUI::ChangeLocale(const char* szName)
     bool guiWasLoaded = m_pMainMenu != NULL;
     assert(guiWasLoaded);
 
-    CVector2D vPos = m_pConsole->GetPosition();
-    CVector2D vSize = m_pConsole->GetSize();
+    CVector2D consolePos = m_pConsole->GetPosition();
+    CVector2D consoleSize = m_pConsole->GetSize();
 
     if (guiWasLoaded)
         DestroyWindows();
@@ -119,12 +129,8 @@ void CLocalGUI::ChangeLocale(const char* szName)
     if (guiWasLoaded)
     {
         CreateWindows(guiWasLoaded);
-
-        if (m_pConsole != nullptr)
-        {
-            m_pConsole->SetPosition(vPos);
-            m_pConsole->SetSize(vSize);
-        }
+        m_pConsole->SetPosition(consolePos);
+        m_pConsole->SetSize(consoleSize);
     }
 }
 
@@ -152,7 +158,8 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     m_pLabelVersionTag->SetTextColor(255, 255, 255);
     m_pLabelVersionTag->SetZOrderingEnabled(false);
     m_pLabelVersionTag->MoveToBack();
-    m_pLabelVersionTag->SetVisible(false);
+    if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
+        m_pLabelVersionTag->SetAlwaysOnTop(true);
 
     // Create mainmenu
     m_pMainMenu = new CMainMenu(pGUI);
@@ -279,27 +286,6 @@ void CLocalGUI::Draw()
 
     // Update mainmenu stuff
     m_pMainMenu->Update();
-
-    // Make sure our version labels are always visible
-    static short WaitForMenu = 0;
-
-    // Cope with early finish
-    if (pGame->HasCreditScreenFadedOut())
-        WaitForMenu = 250;
-
-    if (SystemState == 7 || SystemState == 9)
-    {
-        if (WaitForMenu < 250)
-        {
-            WaitForMenu++;
-        }
-        else
-        {
-            m_pLabelVersionTag->SetVisible(true);
-            if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
-                m_pLabelVersionTag->SetAlwaysOnTop(true);
-        }
-    }
 
     // If we're ingame, make sure the chatbox is drawn
     bool bChatVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
@@ -447,6 +433,11 @@ bool CLocalGUI::IsMainMenuVisible()
 CChat* CLocalGUI::GetChat()
 {
     return m_pChat;
+}
+
+float CLocalGUI::GetChatBottomPosition() const noexcept
+{
+    return m_pChat->GetChatBottomPosition();
 }
 
 CDebugView* CLocalGUI::GetDebugView()

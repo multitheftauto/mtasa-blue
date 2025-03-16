@@ -44,11 +44,12 @@ public:
     void AddPlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
     void RemovePlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
     void RemoveAll();
+    std::vector<CClientPlayer*> GetPlayers() const;
 
     bool Exists(CClientPlayer* pPlayer);
 
-    std::list<CClientPlayer*>::const_iterator IterBegin() { return m_List.begin(); }
-    std::list<CClientPlayer*>::const_iterator IterEnd() { return m_List.end(); }
+    std::list<CClientPlayer*>::const_iterator IterBegin() const noexcept { return m_List.begin(); }
+    std::list<CClientPlayer*>::const_iterator IterEnd() const noexcept { return m_List.end(); }
 
     void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; }
     void SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; }

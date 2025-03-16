@@ -92,6 +92,24 @@ bool IsValidFilePath(const char* szDir)
     return true;
 }
 
+bool IsValidFilePath(const char* szDir, size_t length)
+{
+    if (szDir == nullptr)
+        return false;
+
+    std::uint8_t c, c_d;
+
+    // iterate through the char array
+    for (size_t i = 0; i < length; i++)
+    {
+        c = szDir[i];                                          // current character
+        c_d = (i < (length - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
+            return false;
+    }
+    return true;
+}
+
 void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
 {
     int idx = 0;
@@ -435,65 +453,6 @@ SString GetDataUnit(unsigned long long ullInput)
     return strUnknown;
 }
 
-#ifdef MTA_DEBUG
-struct ReleaseVirtualMemory
-{
-    HANDLE process;
-
-    ReleaseVirtualMemory(HANDLE process_) : process(process_) {}
-
-    void operator()(void* p) const noexcept
-    {
-        if (p)
-            VirtualFreeEx(process, p, 0, MEM_RELEASE);
-    }
-};
-
-using VirtualMemoryScope = std::unique_ptr<void, ReleaseVirtualMemory>;
-
-bool RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
-{
-    if (!szLibPath || !szLibPath[0])
-        return false;
-
-    HMODULE kernel32 = GetModuleHandleA("kernel32");
-
-    if (!kernel32)
-        return false;
-
-    // Allocate memory in the remote process for the library path
-    size_t libraryPathSize = strlen(szLibPath) + 1;
-    void*  remoteLibraryPath = VirtualAllocEx(hProcess, nullptr, libraryPathSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-
-    if (!remoteLibraryPath)
-        return false;
-
-    VirtualMemoryScope remoteMemory(remoteLibraryPath, ReleaseVirtualMemory{hProcess});
-
-    // Write the DLL library path to the remote allocation
-    DWORD byteswritten = 0;
-    WriteProcessMemory(hProcess, remoteLibraryPath, static_cast<LPCVOID>(szLibPath), libraryPathSize, &byteswritten);
-
-    if (byteswritten != libraryPathSize)
-        return false;
-
-    // Start a remote thread executing LoadLibraryA exported from Kernel32. Passing the
-    // remotely allocated path buffer as an argument to that thread (and also to LoadLibraryA)
-    // will make the remote process load the DLL into it's userspace (giving the DLL full
-    // access to the game executable).
-    HANDLE remoteThread = CreateRemoteThread(
-        hProcess, nullptr, 0, static_cast<LPTHREAD_START_ROUTINE>(static_cast<void*>(GetProcAddress(kernel32, "LoadLibraryA"))), remoteLibraryPath, 0, nullptr);
-
-    if (!remoteThread)
-        return false;
-
-    // We wait for the created remote thread to finish executing. When it's done, the DLL
-    // is loaded into the game's userspace, and we can destroy the thread-handle.
-    WaitForSingleObject(remoteThread, INFINITE);
-    return true;
-}
-
-#endif
 #else
 bool IsValidFilePath(const char* szDir)
 {
@@ -512,6 +471,24 @@ bool IsValidFilePath(const char* szDir)
     {
         c = szDir[i];                                          // current character
         c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
+            return false;
+    }
+    return true;
+}
+
+bool IsValidFilePath(const char* szDir, size_t length)
+{
+    if (szDir == nullptr)
+        return false;
+
+    std::uint8_t c, c_d;
+
+    // iterate through the char array
+    for (size_t i = 0; i < length; i++)
+    {
+        c = szDir[i];                                           // current character
+        c_d = (i < (length - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
         if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
             return false;
     }

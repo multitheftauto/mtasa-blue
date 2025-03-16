@@ -24,8 +24,15 @@
  *
  ***************************************************************************/
 
-/* get_line() makes sure to only return complete whole lines that fit in 'len'
- * bytes and end with a newline. */
-char *Curl_get_line(char *buf, int len, FILE *input);
+#include "dynbuf.h"
+
+#ifndef BUILDING_LIBCURL
+/* this renames functions so that the tool code can use the same code
+   without getting symbol collisions */
+#define Curl_get_line(a,b) curlx_get_line(a,b)
+#endif
+
+/* Curl_get_line() returns complete lines that end with a newline. */
+int Curl_get_line(struct dynbuf *buf, FILE *input);
 
 #endif /* HEADER_CURL_GET_LINE_H */

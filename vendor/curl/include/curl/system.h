@@ -31,7 +31,7 @@
  * changed.
  *
  * In order to differentiate between platforms/compilers/architectures use
- * only compiler built in predefined preprocessor symbols.
+ * only compiler built-in predefined preprocessor symbols.
  *
  * curl_off_t
  * ----------
@@ -46,68 +46,30 @@
  * As a general rule, curl_off_t shall not be mapped to off_t. This rule shall
  * only be violated if off_t is the only 64-bit data type available and the
  * size of off_t is independent of large file support settings. Keep your
- * build on the safe side avoiding an off_t gating.  If you have a 64-bit
+ * build on the safe side avoiding an off_t gating. If you have a 64-bit
  * off_t then take for sure that another 64-bit data type exists, dig deeper
  * and you will find it.
  *
  */
 
-#if defined(__DJGPP__) || defined(__GO32__)
-#  if defined(__DJGPP__) && (__DJGPP__ > 1)
-#    define CURL_TYPEOF_CURL_OFF_T     long long
-#    define CURL_FORMAT_CURL_OFF_T     "lld"
-#    define CURL_FORMAT_CURL_OFF_TU    "llu"
-#    define CURL_SUFFIX_CURL_OFF_T     LL
-#    define CURL_SUFFIX_CURL_OFF_TU    ULL
-#  else
-#    define CURL_TYPEOF_CURL_OFF_T     long
-#    define CURL_FORMAT_CURL_OFF_T     "ld"
-#    define CURL_FORMAT_CURL_OFF_TU    "lu"
-#    define CURL_SUFFIX_CURL_OFF_T     L
-#    define CURL_SUFFIX_CURL_OFF_TU    UL
-#  endif
-#  define CURL_TYPEOF_CURL_SOCKLEN_T int
-
-#elif defined(__SALFORDC__)
-#  define CURL_TYPEOF_CURL_OFF_T     long
-#  define CURL_FORMAT_CURL_OFF_T     "ld"
-#  define CURL_FORMAT_CURL_OFF_TU    "lu"
-#  define CURL_SUFFIX_CURL_OFF_T     L
-#  define CURL_SUFFIX_CURL_OFF_TU    UL
+#if defined(__DJGPP__)
+#  define CURL_TYPEOF_CURL_OFF_T     long long
+#  define CURL_FORMAT_CURL_OFF_T     "lld"
+#  define CURL_FORMAT_CURL_OFF_TU    "llu"
+#  define CURL_SUFFIX_CURL_OFF_T     LL
+#  define CURL_SUFFIX_CURL_OFF_TU    ULL
 #  define CURL_TYPEOF_CURL_SOCKLEN_T int
 
 #elif defined(__BORLANDC__)
-#  if (__BORLANDC__ < 0x520)
-#    define CURL_TYPEOF_CURL_OFF_T     long
-#    define CURL_FORMAT_CURL_OFF_T     "ld"
-#    define CURL_FORMAT_CURL_OFF_TU    "lu"
-#    define CURL_SUFFIX_CURL_OFF_T     L
-#    define CURL_SUFFIX_CURL_OFF_TU    UL
-#  else
-#    define CURL_TYPEOF_CURL_OFF_T     __int64
-#    define CURL_FORMAT_CURL_OFF_T     "I64d"
-#    define CURL_FORMAT_CURL_OFF_TU    "I64u"
-#    define CURL_SUFFIX_CURL_OFF_T     i64
-#    define CURL_SUFFIX_CURL_OFF_TU    ui64
-#  endif
-#  define CURL_TYPEOF_CURL_SOCKLEN_T int
-
-#elif defined(__TURBOC__)
-#  define CURL_TYPEOF_CURL_OFF_T     long
-#  define CURL_FORMAT_CURL_OFF_T     "ld"
-#  define CURL_FORMAT_CURL_OFF_TU    "lu"
-#  define CURL_SUFFIX_CURL_OFF_T     L
-#  define CURL_SUFFIX_CURL_OFF_TU    UL
+#  define CURL_TYPEOF_CURL_OFF_T     __int64
+#  define CURL_FORMAT_CURL_OFF_T     "I64d"
+#  define CURL_FORMAT_CURL_OFF_TU    "I64u"
+#  define CURL_SUFFIX_CURL_OFF_T     i64
+#  define CURL_SUFFIX_CURL_OFF_TU    ui64
 #  define CURL_TYPEOF_CURL_SOCKLEN_T int
 
 #elif defined(__POCC__)
-#  if (__POCC__ < 280)
-#    define CURL_TYPEOF_CURL_OFF_T     long
-#    define CURL_FORMAT_CURL_OFF_T     "ld"
-#    define CURL_FORMAT_CURL_OFF_TU    "lu"
-#    define CURL_SUFFIX_CURL_OFF_T     L
-#    define CURL_SUFFIX_CURL_OFF_TU    UL
-#  elif defined(_MSC_VER)
+#  if defined(_MSC_VER)
 #    define CURL_TYPEOF_CURL_OFF_T     __int64
 #    define CURL_FORMAT_CURL_OFF_T     "I64d"
 #    define CURL_FORMAT_CURL_OFF_TU    "I64u"
@@ -141,29 +103,6 @@
 #    define CURL_TYPEOF_CURL_SOCKLEN_T int
 #  endif
 
-#elif defined(__SYMBIAN32__)
-#  if defined(__EABI__) /* Treat all ARM compilers equally */
-#    define CURL_TYPEOF_CURL_OFF_T     long long
-#    define CURL_FORMAT_CURL_OFF_T     "lld"
-#    define CURL_FORMAT_CURL_OFF_TU    "llu"
-#    define CURL_SUFFIX_CURL_OFF_T     LL
-#    define CURL_SUFFIX_CURL_OFF_TU    ULL
-#  elif defined(__CW32__)
-#    pragma longlong on
-#    define CURL_TYPEOF_CURL_OFF_T     long long
-#    define CURL_FORMAT_CURL_OFF_T     "lld"
-#    define CURL_FORMAT_CURL_OFF_TU    "llu"
-#    define CURL_SUFFIX_CURL_OFF_T     LL
-#    define CURL_SUFFIX_CURL_OFF_TU    ULL
-#  elif defined(__VC32__)
-#    define CURL_TYPEOF_CURL_OFF_T     __int64
-#    define CURL_FORMAT_CURL_OFF_T     "lld"
-#    define CURL_FORMAT_CURL_OFF_TU    "llu"
-#    define CURL_SUFFIX_CURL_OFF_T     LL
-#    define CURL_SUFFIX_CURL_OFF_TU    ULL
-#  endif
-#  define CURL_TYPEOF_CURL_SOCKLEN_T unsigned int
-
 #elif defined(macintosh)
 #  include <ConditionalMacros.h>
 #  if TYPE_LONGLONG
@@ -182,15 +121,21 @@
 #  define CURL_TYPEOF_CURL_SOCKLEN_T unsigned int
 
 #elif defined(__TANDEM)
-# if ! defined(__LP64)
-   /* Required for 32-bit NonStop builds only. */
-#  define CURL_TYPEOF_CURL_OFF_T     long long
-#  define CURL_FORMAT_CURL_OFF_T     "lld"
-#  define CURL_FORMAT_CURL_OFF_TU    "llu"
-#  define CURL_SUFFIX_CURL_OFF_T     LL
-#  define CURL_SUFFIX_CURL_OFF_TU    ULL
-#  define CURL_TYPEOF_CURL_SOCKLEN_T int
-# endif
+#  if !defined(__LP64)
+#    define CURL_TYPEOF_CURL_OFF_T     long long
+#    define CURL_FORMAT_CURL_OFF_T     "lld"
+#    define CURL_FORMAT_CURL_OFF_TU    "llu"
+#    define CURL_SUFFIX_CURL_OFF_T     LL
+#    define CURL_SUFFIX_CURL_OFF_TU    ULL
+#    define CURL_TYPEOF_CURL_SOCKLEN_T int
+#  else
+#    define CURL_TYPEOF_CURL_OFF_T     long
+#    define CURL_FORMAT_CURL_OFF_T     "ld"
+#    define CURL_FORMAT_CURL_OFF_TU    "lu"
+#    define CURL_SUFFIX_CURL_OFF_T     L
+#    define CURL_SUFFIX_CURL_OFF_TU    UL
+#    define CURL_TYPEOF_CURL_SOCKLEN_T unsigned int
+#  endif
 
 #elif defined(_WIN32_WCE)
 #  define CURL_TYPEOF_CURL_OFF_T     __int64
@@ -201,14 +146,14 @@
 #  define CURL_TYPEOF_CURL_SOCKLEN_T int
 
 #elif defined(__MINGW32__)
+#  include <inttypes.h>
 #  define CURL_TYPEOF_CURL_OFF_T     long long
-#  define CURL_FORMAT_CURL_OFF_T     "I64d"
-#  define CURL_FORMAT_CURL_OFF_TU    "I64u"
+#  define CURL_FORMAT_CURL_OFF_T     PRId64
+#  define CURL_FORMAT_CURL_OFF_TU    PRIu64
 #  define CURL_SUFFIX_CURL_OFF_T     LL
 #  define CURL_SUFFIX_CURL_OFF_TU    ULL
-#  define CURL_TYPEOF_CURL_SOCKLEN_T socklen_t
+#  define CURL_TYPEOF_CURL_SOCKLEN_T int
 #  define CURL_PULL_SYS_TYPES_H      1
-#  define CURL_PULL_WS2TCPIP_H       1
 
 #elif defined(__VMS)
 #  if defined(__VAX)
@@ -243,13 +188,7 @@
 #    define CURL_FORMAT_CURL_OFF_TU    "llu"
 #    define CURL_SUFFIX_CURL_OFF_T     LL
 #    define CURL_SUFFIX_CURL_OFF_TU    ULL
-#  elif defined(_LP64)
-#    define CURL_TYPEOF_CURL_OFF_T     long
-#    define CURL_FORMAT_CURL_OFF_T     "ld"
-#    define CURL_FORMAT_CURL_OFF_TU    "lu"
-#    define CURL_SUFFIX_CURL_OFF_T     L
-#    define CURL_SUFFIX_CURL_OFF_TU    UL
-#  else
+#  else /* _LP64 and default */
 #    define CURL_TYPEOF_CURL_OFF_T     long
 #    define CURL_FORMAT_CURL_OFF_T     "ld"
 #    define CURL_FORMAT_CURL_OFF_TU    "lu"
@@ -262,22 +201,13 @@
 
 #elif defined(__370__)
 #  if defined(__IBMC__) || defined(__IBMCPP__)
-#    if defined(_ILP32)
-#    elif defined(_LP64)
-#    endif
 #    if defined(_LONG_LONG)
 #      define CURL_TYPEOF_CURL_OFF_T     long long
 #      define CURL_FORMAT_CURL_OFF_T     "lld"
 #      define CURL_FORMAT_CURL_OFF_TU    "llu"
 #      define CURL_SUFFIX_CURL_OFF_T     LL
 #      define CURL_SUFFIX_CURL_OFF_TU    ULL
-#    elif defined(_LP64)
-#      define CURL_TYPEOF_CURL_OFF_T     long
-#      define CURL_FORMAT_CURL_OFF_T     "ld"
-#      define CURL_FORMAT_CURL_OFF_TU    "lu"
-#      define CURL_SUFFIX_CURL_OFF_T     L
-#      define CURL_SUFFIX_CURL_OFF_TU    UL
-#    else
+#    else /* _LP64 and default */
 #      define CURL_TYPEOF_CURL_OFF_T     long
 #      define CURL_FORMAT_CURL_OFF_T     "ld"
 #      define CURL_FORMAT_CURL_OFF_TU    "lu"
@@ -370,19 +300,17 @@
 /* ===================================== */
 
 #elif defined(_MSC_VER)
-#  if (_MSC_VER >= 900) && (_INTEGRAL_MAX_BITS >= 64)
-#    define CURL_TYPEOF_CURL_OFF_T     __int64
+#  if (_MSC_VER >= 1800)
+#    include <inttypes.h>
+#    define CURL_FORMAT_CURL_OFF_T     PRId64
+#    define CURL_FORMAT_CURL_OFF_TU    PRIu64
+#  else
 #    define CURL_FORMAT_CURL_OFF_T     "I64d"
 #    define CURL_FORMAT_CURL_OFF_TU    "I64u"
-#    define CURL_SUFFIX_CURL_OFF_T     i64
-#    define CURL_SUFFIX_CURL_OFF_TU    ui64
-#  else
-#    define CURL_TYPEOF_CURL_OFF_T     long
-#    define CURL_FORMAT_CURL_OFF_T     "ld"
-#    define CURL_FORMAT_CURL_OFF_TU    "lu"
-#    define CURL_SUFFIX_CURL_OFF_T     L
-#    define CURL_SUFFIX_CURL_OFF_TU    UL
 #  endif
+#  define CURL_TYPEOF_CURL_OFF_T     __int64
+#  define CURL_SUFFIX_CURL_OFF_T     i64
+#  define CURL_SUFFIX_CURL_OFF_TU    ui64
 #  define CURL_TYPEOF_CURL_SOCKLEN_T int
 
 /* ===================================== */
@@ -418,27 +346,18 @@
 #  define CURL_PULL_SYS_SOCKET_H     1
 
 #else
-/* generic "safe guess" on old 32 bit style */
-# define CURL_TYPEOF_CURL_OFF_T     long
-# define CURL_FORMAT_CURL_OFF_T     "ld"
-# define CURL_FORMAT_CURL_OFF_TU    "lu"
-# define CURL_SUFFIX_CURL_OFF_T     L
-# define CURL_SUFFIX_CURL_OFF_TU    UL
-# define CURL_TYPEOF_CURL_SOCKLEN_T int
+/* generic "safe guess" on old 32-bit style */
+#  define CURL_TYPEOF_CURL_OFF_T     long
+#  define CURL_FORMAT_CURL_OFF_T     "ld"
+#  define CURL_FORMAT_CURL_OFF_TU    "lu"
+#  define CURL_SUFFIX_CURL_OFF_T     L
+#  define CURL_SUFFIX_CURL_OFF_TU    UL
+#  define CURL_TYPEOF_CURL_SOCKLEN_T int
 #endif
 
 #ifdef _AIX
 /* AIX needs <sys/poll.h> */
 #define CURL_PULL_SYS_POLL_H
-#endif
-
-
-/* CURL_PULL_WS2TCPIP_H is defined above when inclusion of header file  */
-/* ws2tcpip.h is required here to properly make type definitions below. */
-#ifdef CURL_PULL_WS2TCPIP_H
-#  include <winsock2.h>
-#  include <windows.h>
-#  include <ws2tcpip.h>
 #endif
 
 /* CURL_PULL_SYS_TYPES_H is defined above when inclusion of header file  */
@@ -487,7 +406,7 @@
 
 #if defined(__STDC__) || defined(_MSC_VER) || defined(__cplusplus) || \
   defined(__HP_aCC) || defined(__BORLANDC__) || defined(__LCC__) || \
-  defined(__POCC__) || defined(__SALFORDC__) || defined(__HIGHC__) || \
+  defined(__POCC__) || defined(__HIGHC__) || \
   defined(__ILEC400__)
   /* This compiler is believed to have an ISO compatible preprocessor */
 #define CURL_ISOCPP

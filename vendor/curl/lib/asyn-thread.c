@@ -64,6 +64,15 @@
 #include "inet_ntop.h"
 #include "curl_threads.h"
 #include "connect.h"
+#include "strdup.h"
+
+#ifdef USE_ARES
+#include <ares.h>
+#ifdef USE_HTTPSRR
+#define USE_HTTPSRR_ARES 1 /* the combo */
+#endif
+#endif
+
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
 #include "curl_memory.h"
@@ -129,14 +138,14 @@ CURLcode Curl_resolver_duphandle(struct Curl_easy *easy, void **to, void *from)
   return Curl_resolver_init(easy, to);
 }
 
-static void destroy_async_data(struct Curl_async *);
+static void destroy_async_data(struct Curl_easy *);
 
 /*
  * Cancel all possibly still on-going resolves for this connection.
  */
 void Curl_resolver_cancel(struct Curl_easy *data)
 {
-  destroy_async_data(&data->state.async);
+  destroy_async_data(data);
 }
 
 /* This function is used to init a threaded resolve */
@@ -144,32 +153,6 @@ static bool init_resolve_thread(struct Curl_easy *data,
                                 const char *hostname, int port,
                                 const struct addrinfo *hints);
 
-
-/* Data for synchronization between resolver thread and its parent */
-struct thread_sync_data {
-  curl_mutex_t *mtx;
-  int done;
-  int port;
-  char *hostname;        /* hostname to resolve, Curl_async.hostname
-                            duplicate */
-#ifndef CURL_DISABLE_SOCKETPAIR
-  struct Curl_easy *data;
-  curl_socket_t sock_pair[2]; /* socket pair */
-#endif
-  int sock_error;
-  struct Curl_addrinfo *res;
-#ifdef HAVE_GETADDRINFO
-  struct addrinfo hints;
-#endif
-  struct thread_data *td; /* for thread-self cleanup */
-};
-
-struct thread_data {
-  curl_thread_t thread_hnd;
-  unsigned int poll_interval;
-  timediff_t interval_end;
-  struct thread_sync_data tsd;
-};
 
 static struct thread_sync_data *conn_thread_sync_data(struct Curl_easy *data)
 {
@@ -195,9 +178,11 @@ void destroy_thread_sync_data(struct thread_sync_data *tsd)
    * close one end of the socket pair (may be done in resolver thread);
    * the other end (for reading) is always closed in the parent thread.
    */
+#ifndef USE_EVENTFD
   if(tsd->sock_pair[1] != CURL_SOCKET_BAD) {
-    sclose(tsd->sock_pair[1]);
+    wakeup_close(tsd->sock_pair[1]);
   }
+#endif
 #endif
   memset(tsd, 0, sizeof(*tsd));
 }
@@ -218,7 +203,7 @@ int init_thread_sync_data(struct thread_data *td,
   /* Treat the request as done until the thread actually starts so any early
    * cleanup gets done properly.
    */
-  tsd->done = 1;
+  tsd->done = TRUE;
 #ifdef HAVE_GETADDRINFO
   DEBUGASSERT(hints);
   tsd->hints = *hints;
@@ -233,8 +218,8 @@ int init_thread_sync_data(struct thread_data *td,
   Curl_mutex_init(tsd->mtx);
 
 #ifndef CURL_DISABLE_SOCKETPAIR
-  /* create socket pair, avoid AF_LOCAL since it doesn't build on Solaris */
-  if(Curl_socketpair(AF_UNIX, SOCK_STREAM, 0, &tsd->sock_pair[0]) < 0) {
+  /* create socket pair or pipe */
+  if(wakeup_create(tsd->sock_pair, FALSE) < 0) {
     tsd->sock_pair[0] = CURL_SOCKET_BAD;
     tsd->sock_pair[1] = CURL_SOCKET_BAD;
     goto err_exit;
@@ -254,7 +239,7 @@ int init_thread_sync_data(struct thread_data *td,
 err_exit:
 #ifndef CURL_DISABLE_SOCKETPAIR
   if(tsd->sock_pair[0] != CURL_SOCKET_BAD) {
-    sclose(tsd->sock_pair[0]);
+    wakeup_close(tsd->sock_pair[0]);
     tsd->sock_pair[0] = CURL_SOCKET_BAD;
   }
 #endif
@@ -269,7 +254,7 @@ static CURLcode getaddrinfo_complete(struct Curl_easy *data)
 
   result = Curl_addrinfo_callback(data, tsd->sock_error, tsd->res);
   /* The tsd->res structure has been copied to async.dns and perhaps the DNS
-     cache.  Set our copy to NULL so destroy_thread_sync_data doesn't free it.
+     cache. Set our copy to NULL so destroy_thread_sync_data does not free it.
   */
   tsd->res = NULL;
 
@@ -282,25 +267,28 @@ static CURLcode getaddrinfo_complete(struct Curl_easy *data)
 /*
  * getaddrinfo_thread() resolves a name and then exits.
  *
- * For builds without ARES, but with ENABLE_IPV6, create a resolver thread
+ * For builds without ARES, but with USE_IPV6, create a resolver thread
  * and wait on it.
  */
-static unsigned int CURL_STDCALL getaddrinfo_thread(void *arg)
+static
+#if defined(_WIN32_WCE) || defined(CURL_WINDOWS_UWP)
+DWORD
+#else
+unsigned int
+#endif
+CURL_STDCALL getaddrinfo_thread(void *arg)
 {
   struct thread_sync_data *tsd = (struct thread_sync_data *)arg;
   struct thread_data *td = tsd->td;
   char service[12];
   int rc;
-#ifndef CURL_DISABLE_SOCKETPAIR
-  char buf[1];
-#endif
 
   msnprintf(service, sizeof(service), "%d", tsd->port);
 
   rc = Curl_getaddrinfo_ex(tsd->hostname, service, &tsd->hints, &tsd->res);
 
   if(rc) {
-    tsd->sock_error = SOCKERRNO?SOCKERRNO:rc;
+    tsd->sock_error = SOCKERRNO ? SOCKERRNO : rc;
     if(tsd->sock_error == 0)
       tsd->sock_error = RESOLVER_ENOMEM;
   }
@@ -318,15 +306,19 @@ static unsigned int CURL_STDCALL getaddrinfo_thread(void *arg)
   else {
 #ifndef CURL_DISABLE_SOCKETPAIR
     if(tsd->sock_pair[1] != CURL_SOCKET_BAD) {
+#ifdef USE_EVENTFD
+      const uint64_t buf[1] = { 1 };
+#else
+      const char buf[1] = { 1 };
+#endif
       /* DNS has been resolved, signal client task */
-      buf[0] = 1;
-      if(swrite(tsd->sock_pair[1],  buf, sizeof(buf)) < 0) {
+      if(wakeup_write(tsd->sock_pair[1], buf, sizeof(buf)) < 0) {
         /* update sock_erro to errno */
         tsd->sock_error = SOCKERRNO;
       }
     }
 #endif
-    tsd->done = 1;
+    tsd->done = TRUE;
     Curl_mutex_release(tsd->mtx);
   }
 
@@ -338,7 +330,13 @@ static unsigned int CURL_STDCALL getaddrinfo_thread(void *arg)
 /*
  * gethostbyname_thread() resolves a name and then exits.
  */
-static unsigned int CURL_STDCALL gethostbyname_thread(void *arg)
+static
+#if defined(_WIN32_WCE) || defined(CURL_WINDOWS_UWP)
+DWORD
+#else
+unsigned int
+#endif
+CURL_STDCALL gethostbyname_thread(void *arg)
 {
   struct thread_sync_data *tsd = (struct thread_sync_data *)arg;
   struct thread_data *td = tsd->td;
@@ -359,7 +357,7 @@ static unsigned int CURL_STDCALL gethostbyname_thread(void *arg)
     free(td);
   }
   else {
-    tsd->done = 1;
+    tsd->done = TRUE;
     Curl_mutex_release(tsd->mtx);
   }
 
@@ -371,23 +369,30 @@ static unsigned int CURL_STDCALL gethostbyname_thread(void *arg)
 /*
  * destroy_async_data() cleans up async resolver data and thread handle.
  */
-static void destroy_async_data(struct Curl_async *async)
+static void destroy_async_data(struct Curl_easy *data)
 {
+  struct Curl_async *async;
+  DEBUGASSERT(data);
+  async = &data->state.async;
+  DEBUGASSERT(async);
   if(async->tdata) {
     struct thread_data *td = async->tdata;
-    int done;
+    bool done;
 #ifndef CURL_DISABLE_SOCKETPAIR
     curl_socket_t sock_rd = td->tsd.sock_pair[0];
-    struct Curl_easy *data = td->tsd.data;
 #endif
 
+#ifdef USE_HTTPSRR_ARES
+    if(data->state.async.tdata->channel)
+      ares_destroy(data->state.async.tdata->channel);
+#endif
     /*
      * if the thread is still blocking in the resolve syscall, detach it and
      * let the thread do the cleanup...
      */
     Curl_mutex_acquire(td->tsd.mtx);
     done = td->tsd.done;
-    td->tsd.done = 1;
+    td->tsd.done = TRUE;
     Curl_mutex_release(td->tsd.mtx);
 
     if(!done) {
@@ -407,7 +412,7 @@ static void destroy_async_data(struct Curl_async *async)
      * before the FD is invalidated to avoid EBADF on EPOLL_CTL_DEL
      */
     Curl_multi_closed(data, sock_rd);
-    sclose(sock_rd);
+    wakeup_close(sock_rd);
 #endif
   }
   async->tdata = NULL;
@@ -415,6 +420,24 @@ static void destroy_async_data(struct Curl_async *async)
   free(async->hostname);
   async->hostname = NULL;
 }
+
+#ifdef USE_HTTPSRR_ARES
+static CURLcode resolve_httpsrr(struct Curl_easy *data,
+                                struct Curl_async *asp)
+{
+  int status = ares_init_options(&asp->tdata->channel, NULL, 0);
+  if(status != ARES_SUCCESS)
+    return CURLE_FAILED_INIT;
+
+  memset(&asp->tdata->hinfo, 0, sizeof(struct Curl_https_rrinfo));
+  ares_query_dnsrec(asp->tdata->channel,
+                    asp->hostname, ARES_CLASS_IN,
+                    ARES_REC_TYPE_HTTPS,
+                    Curl_dnsrec_done_cb, data, NULL);
+
+  return CURLE_OK;
+}
+#endif
 
 /*
  * init_resolve_thread() starts a new thread that performs the actual
@@ -451,8 +474,8 @@ static bool init_resolve_thread(struct Curl_easy *data,
   if(!asp->hostname)
     goto err_exit;
 
-  /* The thread will set this to 1 when complete. */
-  td->tsd.done = 0;
+  /* The thread will set this TRUE when complete. */
+  td->tsd.done = FALSE;
 
 #ifdef HAVE_GETADDRINFO
   td->thread_hnd = Curl_thread_create(getaddrinfo_thread, &td->tsd);
@@ -460,17 +483,20 @@ static bool init_resolve_thread(struct Curl_easy *data,
   td->thread_hnd = Curl_thread_create(gethostbyname_thread, &td->tsd);
 #endif
 
-  if(!td->thread_hnd) {
+  if(td->thread_hnd == curl_thread_t_null) {
     /* The thread never started, so mark it as done here for proper cleanup. */
-    td->tsd.done = 1;
+    td->tsd.done = TRUE;
     err = errno;
     goto err_exit;
   }
-
+#ifdef USE_HTTPSRR_ARES
+  if(resolve_httpsrr(data, asp))
+    infof(data, "Failed HTTPS RR operation");
+#endif
   return TRUE;
 
 err_exit:
-  destroy_async_data(asp);
+  destroy_async_data(data);
 
 errno_exit:
   errno = err;
@@ -509,7 +535,7 @@ static CURLcode thread_wait_resolv(struct Curl_easy *data,
     /* a name was not resolved, report error */
     result = Curl_resolver_error(data);
 
-  destroy_async_data(&data->state.async);
+  destroy_async_data(data);
 
   if(!data->state.async.dns && report)
     connclose(data->conn, "asynch resolve failed");
@@ -526,8 +552,8 @@ void Curl_resolver_kill(struct Curl_easy *data)
 {
   struct thread_data *td = data->state.async.tdata;
 
-  /* If we're still resolving, we must wait for the threads to fully clean up,
-     unfortunately.  Otherwise, we can simply cancel to clean up any resolver
+  /* If we are still resolving, we must wait for the threads to fully clean up,
+     unfortunately. Otherwise, we can simply cancel to clean up any resolver
      data. */
   if(td && td->thread_hnd != curl_thread_t_null
      && (data->set.quick_exit != 1L))
@@ -564,7 +590,7 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
                                    struct Curl_dns_entry **entry)
 {
   struct thread_data *td = data->state.async.tdata;
-  int done = 0;
+  bool done = FALSE;
 
   DEBUGASSERT(entry);
   *entry = NULL;
@@ -573,6 +599,10 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
     DEBUGASSERT(td);
     return CURLE_COULDNT_RESOLVE_HOST;
   }
+#ifdef USE_HTTPSRR_ARES
+  if(Curl_ares_perform(data->state.async.tdata->channel, 0) < 0)
+    return CURLE_UNRECOVERABLE_POLL;
+#endif
 
   Curl_mutex_acquire(td->tsd.mtx);
   done = td->tsd.done;
@@ -583,15 +613,26 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
 
     if(!data->state.async.dns) {
       CURLcode result = Curl_resolver_error(data);
-      destroy_async_data(&data->state.async);
+      destroy_async_data(data);
       return result;
     }
-    destroy_async_data(&data->state.async);
+#ifdef USE_HTTPSRR_ARES
+    {
+      struct Curl_https_rrinfo *lhrr =
+        Curl_memdup(&td->hinfo, sizeof(struct Curl_https_rrinfo));
+      if(!lhrr) {
+        destroy_async_data(data);
+        return CURLE_OUT_OF_MEMORY;
+      }
+      data->state.async.dns->hinfo = lhrr;
+    }
+#endif
+    destroy_async_data(data);
     *entry = data->state.async.dns;
   }
   else {
     /* poll for name lookup done with exponential backoff up to 250ms */
-    /* should be fine even if this converts to 32 bit */
+    /* should be fine even if this converts to 32-bit */
     timediff_t elapsed = Curl_timediff(Curl_now(),
                                        data->progress.t_startsingle);
     if(elapsed < 0)
@@ -622,16 +663,27 @@ int Curl_resolver_getsock(struct Curl_easy *data, curl_socket_t *socks)
   struct resdata *reslv = (struct resdata *)data->state.async.resolver;
 #ifndef CURL_DISABLE_SOCKETPAIR
   struct thread_data *td = data->state.async.tdata;
+#endif
+#if !defined(CURL_DISABLE_SOCKETPAIR) || defined(USE_HTTPSRR_ARES)
+  int socketi = 0;
 #else
   (void)socks;
 #endif
 
+#ifdef USE_HTTPSRR_ARES
+  if(data->state.async.tdata && data->state.async.tdata->channel) {
+    ret_val = Curl_ares_getsock(data, data->state.async.tdata->channel, socks);
+    for(socketi = 0; socketi < (MAX_SOCKSPEREASYHANDLE - 1); socketi++)
+      if(!ARES_GETSOCK_READABLE(ret_val, socketi) &&
+         !ARES_GETSOCK_WRITABLE(ret_val, socketi))
+        break;
+  }
+#endif
 #ifndef CURL_DISABLE_SOCKETPAIR
   if(td) {
     /* return read fd to client for polling the DNS resolution status */
-    socks[0] = td->tsd.sock_pair[0];
-    td->tsd.data = data;
-    ret_val = GETSOCK_READSOCK(0);
+    socks[socketi] = td->tsd.sock_pair[0];
+    ret_val |= GETSOCK_READSOCK(socketi);
   }
   else {
 #endif
@@ -707,7 +759,7 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
 
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = pf;
-  hints.ai_socktype = (data->conn->transport == TRNSPRT_TCP)?
+  hints.ai_socktype = (data->conn->transport == TRNSPRT_TCP) ?
     SOCK_STREAM : SOCK_DGRAM;
 
   reslv->start = Curl_now();

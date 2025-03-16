@@ -4,7 +4,7 @@
  *
  *   FreeType's glyph color management (specification).
  *
- * Copyright (C) 2018-2023 by
+ * Copyright (C) 2018-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -1518,7 +1518,7 @@ FT_BEGIN_HEADER
    *
    * @return:
    *   Value~1 if a clip box is found.  If no clip box is found or an error
-   *   occured, value~0 is returned.
+   *   occurred, value~0 is returned.
    *
    * @note:
    *   To retrieve the clip box in font units, reset scale to units-per-em
@@ -1646,7 +1646,7 @@ FT_BEGIN_HEADER
    *
    * @return:
    *   Value~1 if everything is OK.  Value~0 if no details can be found for
-   *   this paint or any other error occured.
+   *   this paint or any other error occurred.
    *
    * @since:
    *   2.13

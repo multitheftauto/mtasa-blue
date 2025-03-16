@@ -16,7 +16,7 @@ project "Client Core"
 			"../sdk",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-9e",
+			"../../vendor/jpeg-9f",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/detours/4.0.1/src",
@@ -46,13 +46,17 @@ project "Client Core"
 
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
-		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi",
+		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi", "dwmapi",
 		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "discord-rpc",
 	}
 
 	defines {
 		"INITGUID",
 		"PNG_SETJMP_NOT_SUPPORTED"
+	}
+
+	prebuildcommands {
+		"%[%{!wks.location}/../utils/gen_language_list.exe] %[%{!wks.location}/../Shared/data/MTA San Andreas/MTA/locale] %[languages.generated.h]"
 	}
 
 	filter "architecture:not x86"

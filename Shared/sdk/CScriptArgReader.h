@@ -526,6 +526,22 @@ public:
     }
 
     //
+    // Read next bool or false if failed
+    // Intended for use in pair with NextIsBool()
+    //
+    bool ReadBool()
+    {
+        int iArgument = lua_type(m_luaVM, m_iIndex);
+        if (iArgument == LUA_TBOOLEAN)
+        {
+            return lua_toboolean(m_luaVM, m_iIndex++) ? true : false;
+        }
+        
+        m_iIndex++;
+        return false;
+    }
+
+    //
     // Read next bool, using default if needed
     //
     void ReadBool(bool& bOutValue, const bool bDefaultValue)
@@ -912,10 +928,7 @@ public:
     void ReadLuaArguments(CLuaArguments& outValue)
     {
         outValue.ReadArguments(m_luaVM, m_iIndex);
-        for (int i = outValue.Count(); i > 0; i--)
-        {
-            m_iIndex++;
-        }
+        m_iIndex += outValue.Count();
     }
 
     //

@@ -4,7 +4,7 @@
  *
  *   TrueType character mapping table (cmap) support (body).
  *
- * Copyright (C) 2002-2023 by
+ * Copyright (C) 2002-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -179,7 +179,7 @@
 
 
     cmap_info->format   = 0;
-    cmap_info->language = (FT_ULong)TT_PEEK_USHORT( p );
+    cmap_info->language = TT_PEEK_USHORT( p );
 
     return FT_Err_Ok;
   }
@@ -596,7 +596,7 @@
 
 
     cmap_info->format   = 2;
-    cmap_info->language = (FT_ULong)TT_PEEK_USHORT( p );
+    cmap_info->language = TT_PEEK_USHORT( p );
 
     return FT_Err_Ok;
   }
@@ -1539,7 +1539,7 @@
 
 
     cmap_info->format   = 4;
-    cmap_info->language = (FT_ULong)TT_PEEK_USHORT( p );
+    cmap_info->language = TT_PEEK_USHORT( p );
 
     return FT_Err_Ok;
   }
@@ -1712,7 +1712,7 @@
 
 
     cmap_info->format   = 6;
-    cmap_info->language = (FT_ULong)TT_PEEK_USHORT( p );
+    cmap_info->language = TT_PEEK_USHORT( p );
 
     return FT_Err_Ok;
   }
@@ -2009,7 +2009,7 @@
 
 
     cmap_info->format   = 8;
-    cmap_info->language = (FT_ULong)TT_PEEK_ULONG( p );
+    cmap_info->language = TT_PEEK_ULONG( p );
 
     return FT_Err_Ok;
   }
@@ -2184,7 +2184,7 @@
 
 
     cmap_info->format   = 10;
-    cmap_info->language = (FT_ULong)TT_PEEK_ULONG( p );
+    cmap_info->language = TT_PEEK_ULONG( p );
 
     return FT_Err_Ok;
   }
@@ -2528,7 +2528,7 @@
 
 
     cmap_info->format   = 12;
-    cmap_info->language = (FT_ULong)TT_PEEK_ULONG( p );
+    cmap_info->language = TT_PEEK_ULONG( p );
 
     return FT_Err_Ok;
   }
@@ -2844,7 +2844,7 @@
 
 
     cmap_info->format   = 13;
-    cmap_info->language = (FT_ULong)TT_PEEK_ULONG( p );
+    cmap_info->language = TT_PEEK_ULONG( p );
 
     return FT_Err_Ok;
   }

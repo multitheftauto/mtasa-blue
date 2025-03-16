@@ -85,7 +85,7 @@ void Curl_bufcp_free(struct bufc_pool *pool);
  * preferably never fail (except for memory exhaustion).
  *
  * By default and without a pool, a bufq will keep chunks that read
- * read empty in its `spare` list. Option `BUFQ_OPT_NO_SPARES` will
+ * empty in its `spare` list. Option `BUFQ_OPT_NO_SPARES` will
  * disable that and free chunks once they become empty.
  *
  * When providing a pool to a bufq, all chunk creation and spare handling
@@ -151,14 +151,6 @@ void Curl_bufq_free(struct bufq *q);
 size_t Curl_bufq_len(const struct bufq *q);
 
 /**
- * Return the total amount of free space in the queue.
- * The returned length is the number of bytes that can
- * be expected to be written successfully to the bufq,
- * providing no memory allocations fail.
- */
-size_t Curl_bufq_space(const struct bufq *q);
-
-/**
  * Returns TRUE iff there is no data in the buffer queue.
  */
 bool Curl_bufq_is_empty(const struct bufq *q);
@@ -178,6 +170,16 @@ ssize_t Curl_bufq_write(struct bufq *q,
                         const unsigned char *buf, size_t len,
                         CURLcode *err);
 
+CURLcode Curl_bufq_cwrite(struct bufq *q,
+                         const char *buf, size_t len,
+                         size_t *pnwritten);
+
+/**
+ * Remove `len` bytes from the end of the buffer queue again.
+ * Returns CURLE_AGAIN if less than `len` bytes were in the queue.
+ */
+CURLcode Curl_bufq_unwrite(struct bufq *q, size_t len);
+
 /**
  * Read buf from the start of the buffer queue. The buf is copied
  * and the amount of copied bytes is returned.
@@ -186,6 +188,9 @@ ssize_t Curl_bufq_write(struct bufq *q,
  */
 ssize_t Curl_bufq_read(struct bufq *q, unsigned char *buf, size_t len,
                         CURLcode *err);
+
+CURLcode Curl_bufq_cread(struct bufq *q, char *buf, size_t len,
+                         size_t *pnread);
 
 /**
  * Peek at the head chunk in the buffer queue. Returns a pointer to

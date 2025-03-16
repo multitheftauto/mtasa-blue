@@ -75,6 +75,15 @@ extern "C" {
 #define JSON_C_TO_STRING_NOSLASHESCAPE (1 << 4)
 
 /**
+ * A flag for the json_object_to_json_string_ext() and
+ * json_object_to_file_ext() functions which causes
+ * the output to be formatted.
+ *
+ * Use color for printing json.
+ */
+#define JSON_C_TO_STRING_COLOR (1 << 5)
+
+/**
  * A flag for the json_object_object_add_ex function which
  * causes the value to be added without a check if it already exists.
  * Note: it is the responsibility of the caller to ensure that no
@@ -163,10 +172,10 @@ JSON_EXPORT struct json_object *json_object_get(struct json_object *obj);
  * is a member of (unless you know you've called `json_object_get(obj)` to
  * explicitly increment the refcount).
  *
- * NULL may be passed, which which case this is a no-op.
+ * NULL may be passed, in which case this is a no-op.
  *
  * @param obj the json_object instance
- * @returns 1 if the object was freed.
+ * @returns 1 if the object was freed, 0 if only the refcount was decremented
  * @see json_object_get()
  */
 JSON_EXPORT int json_object_put(struct json_object *obj);
@@ -182,6 +191,7 @@ JSON_EXPORT int json_object_put(struct json_object *obj);
      json_type_object,
      json_type_array,
      json_type_string
+ * @returns 1 if the object is of the specified type, 0 otherwise
  */
 JSON_EXPORT int json_object_is_type(const struct json_object *obj, enum json_type type);
 
@@ -449,9 +459,9 @@ JSON_EXPORT struct json_object *json_object_object_get(const struct json_object 
  *              associated with the given field name.
  *
  *              It is safe to pass a NULL value.
- * @returns whether or not the key exists
+ * @returns 1 if the key exists, 0 otherwise
  */
-JSON_EXPORT json_bool json_object_object_get_ex(const struct json_object *obj, const char *key,
+JSON_EXPORT int json_object_object_get_ex(const struct json_object *obj, const char *key,
                                                 struct json_object **value);
 
 /** Delete the given json_object field
@@ -551,7 +561,7 @@ JSON_EXPORT struct array_list *json_object_get_array(const struct json_object *o
 
 /** Get the length of a json_object of type json_type_array
  * @param obj the json_object instance
- * @returns an int
+ * @returns the length of the array
  */
 JSON_EXPORT size_t json_object_array_length(const struct json_object *obj);
 
@@ -613,6 +623,25 @@ JSON_EXPORT int json_object_array_add(struct json_object *obj, struct json_objec
 JSON_EXPORT int json_object_array_put_idx(struct json_object *obj, size_t idx,
                                           struct json_object *val);
 
+/** Insert an element at a specified index in an array (a json_object of type json_type_array)
+ *
+ * The reference count will *not* be incremented. This is to make adding
+ * fields to objects in code more compact. If you want to retain a reference
+ * to an added object you must wrap the passed object with json_object_get
+ *
+ * The array size will be automatically be expanded to the size of the
+ * index if the index is larger than the current size.
+ * If the index is within the existing array limits, then the element will be
+ * inserted and all elements will be shifted. This is the only difference between
+ * this function and json_object_array_put_idx().
+ *
+ * @param obj the json_object instance
+ * @param idx the index to insert the element at
+ * @param val the json_object to be added
+ */
+JSON_EXPORT int json_object_array_insert_idx(struct json_object *obj, size_t idx,
+                                             struct json_object *val);
+
 /** Get the element at specified index of array `obj` (which must be a json_object of type json_type_array)
  *
  * *No* reference counts will be changed, and ownership of the returned
@@ -664,7 +693,7 @@ JSON_EXPORT struct json_object *json_object_new_boolean(json_bool b);
  * The type is coerced to a json_bool if the passed object is not a json_bool.
  * integer and double objects will return 0 if there value is zero
  * or 1 otherwise. If the passed object is a string it will return
- * 1 if it has a non zero length. 
+ * 1 if it has a non zero length.
  * If any other object type is passed 0 will be returned, even non-empty
  *  json_type_array and json_type_object objects.
  *
@@ -710,9 +739,12 @@ JSON_EXPORT struct json_object *json_object_new_uint64(uint64_t i);
 /** Get the int value of a json_object
  *
  * The type is coerced to a int if the passed object is not a int.
- * double objects will return their integer conversion. Strings will be
- * parsed as an integer. If no conversion exists then 0 is returned
- * and errno is set to EINVAL. null is equivalent to 0 (no error values set)
+ * double objects will return their integer conversion except for NaN values
+ * which return INT32_MIN and the errno is set to EINVAL.
+ * Strings will be parsed as an integer. If no conversion exists then 0 is
+ * returned and errno is set to EINVAL. null is equivalent to 0 (no error values
+ * set).
+ * Sets errno to ERANGE if the value exceeds the range of int.
  *
  * Note that integers are stored internally as 64-bit values.
  * If the value of too big or too small to fit into 32-bit, INT32_MAX or
@@ -754,8 +786,12 @@ JSON_EXPORT int json_object_int_inc(struct json_object *obj, int64_t val);
 /** Get the int value of a json_object
  *
  * The type is coerced to a int64 if the passed object is not a int64.
- * double objects will return their int64 conversion. Strings will be
- * parsed as an int64. If no conversion exists then 0 is returned.
+ * double objects will return their int64 conversion except for NaN values
+ * which return INT64_MIN and the errno is set to EINVAL.
+ * Strings will be parsed as an int64. If no conversion exists then 0 is
+ * returned and errno is set to EINVAL. null is equivalent to 0 (no error values
+ * set).
+ * Sets errno to ERANGE if the value exceeds the range of int64.
  *
  * NOTE: Set errno to 0 directly before a call to this function to determine
  * whether or not conversion was successful (it does not clear the value for
@@ -769,8 +805,12 @@ JSON_EXPORT int64_t json_object_get_int64(const struct json_object *obj);
 /** Get the uint value of a json_object
  *
  * The type is coerced to a uint64 if the passed object is not a uint64.
- * double objects will return their uint64 conversion. Strings will be
- * parsed as an uint64. If no conversion exists then 0 is returned.
+ * double objects will return their uint64 conversion except for NaN values
+ * which return 0 and the errno is set to EINVAL.
+ * Strings will be parsed as an uint64. If no conversion exists then 0 is
+ * returned and errno is set to EINVAL. null is equivalent to 0 (no error values
+ * set).
+ * Sets errno to ERANGE if the value exceeds the range of uint64.
  *
  * NOTE: Set errno to 0 directly before a call to this function to determine
  * whether or not conversion was successful (it does not clear the value for
@@ -1014,7 +1054,7 @@ JSON_EXPORT struct json_object *json_object_new_null(void);
  *
  * @param obj1 the first json_object instance
  * @param obj2 the second json_object instance
- * @returns whether both objects are equal or not
+ * @returns 1 if both objects are equal, 0 otherwise
  */
 JSON_EXPORT int json_object_equal(struct json_object *obj1, struct json_object *obj2);
 

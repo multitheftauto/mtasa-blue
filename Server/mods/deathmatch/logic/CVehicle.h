@@ -111,6 +111,49 @@ enum eVehicleType
     VEHICLE_TRAILER
 };
 
+enum class eCarNodes
+{
+    NONE = 0,
+    CHASSIS,
+    WHEEL_RF,
+    WHEEL_RM,
+    WHEEL_RB,
+    WHEEL_LF,
+    WHEEL_LM,
+    WHEEL_LB,
+    DOOR_RF,
+    DOOR_RR,
+    DOOR_LF,
+    DOOR_LR,
+    BUMP_FRONT,
+    BUMP_REAR,
+    WING_RF,
+    WING_LF,
+    BONNET,
+    BOOT,
+    WINDSCREEN,
+    EXHAUST,
+    MISC_A,
+    MISC_B,
+    MISC_C,
+    MISC_D,
+    MISC_E,
+
+    NUM_NODES
+};
+
+enum class eCarComponentCollisionTypes
+{
+    COL_NODE_BUMPER = 0,
+    COL_NODE_WHEEL,
+    COL_NODE_DOOR,
+    COL_NODE_BONNET,
+    COL_NODE_BOOT,
+    COL_NODE_PANEL,
+
+    COL_NODES_NUM
+};
+
 #define SIREN_TYPE_FIRST 1
 #define SIREN_TYPE_LAST 6
 #define SIREN_ID_MAX 7
@@ -321,16 +364,18 @@ public:
     void           SetRespawnRotationDegrees(const CVector& vecRotation) { m_vecRespawnRotationDegrees = vecRotation; };
     float          GetRespawnHealth() { return m_fRespawnHealth; };
     void           SetRespawnHealth(float fHealth) { m_fRespawnHealth = fHealth; };
-    bool           GetRespawnEnabled() { return m_bRespawnEnabled; }
+    bool           GetRespawnEnabled() const noexcept { return m_bRespawnEnabled; }
     void           SetRespawnEnabled(bool bEnabled);
+    std::uint32_t  GetBlowRespawnInterval() const noexcept { return m_ulBlowRespawnInterval; }
     void           SetBlowRespawnInterval(unsigned long ulTime) { m_ulBlowRespawnInterval = ulTime; }
+    std::uint32_t  GetIdleRespawnInterval() const noexcept { return m_ulIdleRespawnInterval; }
     void           SetIdleRespawnInterval(unsigned long ulTime) { m_ulIdleRespawnInterval = ulTime; }
 
     void SpawnAt(const CVector& vecPosition, const CVector& vecRotation);
     void Respawn();
 
-    void            GenerateHandlingData();
-    CHandlingEntry* GetHandlingData() { return m_pHandlingEntry; };
+    void            GenerateHandlingData() noexcept;
+    CHandlingEntry* GetHandlingData() noexcept { return m_HandlingEntry.get(); };
 
     uint GetTimeSinceLastPush() { return (uint)(CTickCount::Now(true) - m_LastPushedTime).ToLongLong(); }
     void ResetLastPushTime() { m_LastPushedTime = CTickCount::Now(true); }
@@ -351,6 +396,9 @@ public:
     bool             IsBlown() const noexcept { return m_blowState != VehicleBlowState::INTACT; }
     void             SetBlowState(VehicleBlowState state);
     VehicleBlowState GetBlowState() const noexcept { return m_blowState; }
+
+    bool IsOnFire() const noexcept override { return m_onFire; }
+    void SetOnFire(bool onFire) noexcept override { m_onFire = onFire; }
 
     void StopIdleTimer();
     void RestartIdleTimer();
@@ -440,11 +488,13 @@ private:
     unsigned short m_usAdjustableProperty;
     bool           m_bCollisionsEnabled;
 
-    CHandlingEntry* m_pHandlingEntry;
-    bool            m_bHandlingChanged;
+    std::unique_ptr<CHandlingEntry> m_HandlingEntry;
+    bool                            m_bHandlingChanged;
 
     unsigned char m_ucVariant;
     unsigned char m_ucVariant2;
+
+    bool m_onFire;
 
     CTickCount m_LastPushedTime;
     CVector    m_vecStationaryCheckPosition;

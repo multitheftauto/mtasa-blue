@@ -4,7 +4,7 @@
  *
  *   Type 1 Glyph Loader (body).
  *
- * Copyright (C) 1996-2023 by
+ * Copyright (C) 1996-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -398,16 +398,12 @@
       glyph->y_scale = 0x10000L;
     }
 
-    t1glyph->outline.n_points   = 0;
-    t1glyph->outline.n_contours = 0;
-
     hinting = FT_BOOL( !( load_flags & FT_LOAD_NO_SCALE   ) &&
                        !( load_flags & FT_LOAD_NO_HINTING ) );
     scaled  = FT_BOOL( !( load_flags & FT_LOAD_NO_SCALE   ) );
 
     glyph->hint     = hinting;
     glyph->scaled   = scaled;
-    t1glyph->format = FT_GLYPH_FORMAT_OUTLINE;
 
     error = decoder_funcs->init( &decoder,
                                  t1glyph->face,
@@ -452,16 +448,12 @@
 
     must_finish_decoder = FALSE;
 
-    /* now, set the metrics -- this is rather simple, as   */
-    /* the left side bearing is the xMin, and the top side */
-    /* bearing the yMax                                    */
     if ( !error )
     {
-      t1glyph->outline.flags &= FT_OUTLINE_OWNER;
-      t1glyph->outline.flags |= FT_OUTLINE_REVERSE_FILL;
-
-      /* for composite glyphs, return only left side bearing and */
-      /* advance width                                           */
+      /* now, set the metrics -- this is rather simple, as   */
+      /* the left side bearing is the xMin, and the top side */
+      /* bearing the yMax; for composite glyphs, return only */
+      /* left side bearing and advance width                 */
       if ( load_flags & FT_LOAD_NO_RECURSE )
       {
         FT_Slot_Internal  internal = t1glyph->internal;
@@ -481,6 +473,13 @@
         FT_BBox            cbox;
         FT_Glyph_Metrics*  metrics = &t1glyph->metrics;
 
+
+        t1glyph->format = FT_GLYPH_FORMAT_OUTLINE;
+
+        t1glyph->outline.flags &= FT_OUTLINE_OWNER;
+        t1glyph->outline.flags |= FT_OUTLINE_REVERSE_FILL;
+        if ( t1size && t1size->metrics.y_ppem < 24 )
+          t1glyph->outline.flags |= FT_OUTLINE_HIGH_PRECISION;
 
         /* copy the _unscaled_ advance width */
         metrics->horiAdvance =
@@ -503,11 +502,6 @@
           t1glyph->linearVertAdvance =
             FIXED_TO_INT( decoder.builder.advance.y );
         }
-
-        t1glyph->format = FT_GLYPH_FORMAT_OUTLINE;
-
-        if ( t1size && t1size->metrics.y_ppem < 24 )
-          t1glyph->outline.flags |= FT_OUTLINE_HIGH_PRECISION;
 
 #if 1
         /* apply the font matrix, if any */

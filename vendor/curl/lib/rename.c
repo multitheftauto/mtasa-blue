@@ -40,8 +40,8 @@
 /* return 0 on success, 1 on error */
 int Curl_rename(const char *oldpath, const char *newpath)
 {
-#ifdef WIN32
-  /* rename() on Windows doesn't overwrite, so we can't use it here.
+#ifdef _WIN32
+  /* rename() on Windows does not overwrite, so we cannot use it here.
      MoveFileEx() will overwrite and is usually atomic, however it fails
      when there are open handles to the file. */
   const int max_wait_ms = 1000;

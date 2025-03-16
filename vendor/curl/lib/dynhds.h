@@ -95,6 +95,9 @@ struct dynhds_entry *Curl_dynhds_get(struct dynhds *dynhds,
                                      const char *name, size_t namelen);
 struct dynhds_entry *Curl_dynhds_cget(struct dynhds *dynhds, const char *name);
 
+#ifdef UNITTESTS
+/* used by unit2602.c */
+
 /**
  * Return TRUE iff one or more headers with the given name exist.
  */
@@ -116,20 +119,6 @@ size_t Curl_dynhds_count_name(struct dynhds *dynhds,
 size_t Curl_dynhds_ccount_name(struct dynhds *dynhds, const char *name);
 
 /**
- * Add a header, name + value, to `dynhds` at the end. Does *not*
- * check for duplicate names.
- */
-CURLcode Curl_dynhds_add(struct dynhds *dynhds,
-                         const char *name, size_t namelen,
-                         const char *value, size_t valuelen);
-
-/**
- * Add a header, c-string name + value, to `dynhds` at the end.
- */
-CURLcode Curl_dynhds_cadd(struct dynhds *dynhds,
-                          const char *name, const char *value);
-
-/**
  * Remove all entries with the given name.
  * Returns number of entries removed.
  */
@@ -146,19 +135,34 @@ size_t Curl_dynhds_cremove(struct dynhds *dynhds, const char *name);
 CURLcode Curl_dynhds_set(struct dynhds *dynhds,
                          const char *name, size_t namelen,
                          const char *value, size_t valuelen);
+#endif
 
 CURLcode Curl_dynhds_cset(struct dynhds *dynhds,
                           const char *name, const char *value);
 
 /**
- * Add a single header from a HTTP/1.1 formatted line at the end. Line
+ * Add a header, name + value, to `dynhds` at the end. Does *not*
+ * check for duplicate names.
+ */
+CURLcode Curl_dynhds_add(struct dynhds *dynhds,
+                         const char *name, size_t namelen,
+                         const char *value, size_t valuelen);
+
+/**
+ * Add a header, c-string name + value, to `dynhds` at the end.
+ */
+CURLcode Curl_dynhds_cadd(struct dynhds *dynhds,
+                          const char *name, const char *value);
+
+/**
+ * Add a single header from an HTTP/1.1 formatted line at the end. Line
  * may contain a delimiting \r\n or just \n. Any characters after
  * that will be ignored.
  */
 CURLcode Curl_dynhds_h1_cadd_line(struct dynhds *dynhds, const char *line);
 
 /**
- * Add a single header from a HTTP/1.1 formatted line at the end. Line
+ * Add a single header from an HTTP/1.1 formatted line at the end. Line
  * may contain a delimiting \r\n or just \n. Any characters after
  * that will be ignored.
  */
@@ -170,5 +174,14 @@ CURLcode Curl_dynhds_h1_add_line(struct dynhds *dynhds,
  * cr+lf line endings. Will NOT output a last empty line.
  */
 CURLcode Curl_dynhds_h1_dprint(struct dynhds *dynhds, struct dynbuf *dbuf);
+
+#ifdef USE_NGHTTP2
+
+#include <stdint.h>
+#include <nghttp2/nghttp2.h>
+
+nghttp2_nv *Curl_dynhds_to_nva(struct dynhds *dynhds, size_t *pcount);
+
+#endif /* USE_NGHTTP2 */
 
 #endif /* HEADER_CURL_DYNHDS_H */

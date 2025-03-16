@@ -26,7 +26,9 @@ workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 
 	if os.host() == "macosx" then
-		platforms { "x64" }
+		platforms { "x64", "arm64" }
+	elseif os.host() == "windows" then
+		platforms { "x86", "x64", "arm64" }
 	else
 		platforms { "x86", "x64", "arm", "arm64" }
 	end
@@ -101,6 +103,10 @@ workspace "MTASA"
 			defaultplatform "x86"
 	end
 
+	filter { "system:macosx", "platforms:arm64" }
+		includedirs { "/opt/homebrew/include" }
+		libdirs { "/opt/homebrew/lib" }
+
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
 		symbolspath "$(SolutionDir)Symbols\\$(Configuration)_$(Platform)\\$(ProjectName).pdb"
 
@@ -156,7 +162,7 @@ workspace "MTASA"
 		include "vendor/cef3"
 		include "vendor/discord-rpc"
 		include "vendor/freetype"
-		include "vendor/jpeg-9e"
+		include "vendor/jpeg-9f"
 		include "vendor/ksignals"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
@@ -194,3 +200,4 @@ workspace "MTASA"
 		include "vendor/unrar"
 		include "vendor/zip"
 		include "vendor/zlib"
+		include "vendor/glob"
