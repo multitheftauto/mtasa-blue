@@ -16,6 +16,7 @@
 
 class CClientEntity;
 class CCustomData;
+class CClientTextDisplay;
 
 class CPacketHandler
 {
@@ -112,4 +113,6 @@ public:
     std::vector<int>       m_EntityAddReadOffsetStore;
     NetBitStreamInterface* m_pEntityAddBitStream;
     uint                   m_uiEntityAddNumEntities;
+
+    std::list<std::shared_ptr<CClientTextDisplay>> m_displayTextList;
 };

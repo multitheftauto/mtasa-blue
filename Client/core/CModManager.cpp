@@ -165,12 +165,12 @@ bool CModManager::TryStart()
         DWORD size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, errorCode,
                                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&buffer), 0, nullptr);
 
-        if (size > 0)
+        if (buffer != nullptr && size > 0)
         {
-            LocalFree(buffer);
-
             std::string message{buffer, size};
             size_t      length = message.find_last_not_of("\t\n\v\f\r ");
+
+            LocalFree(buffer);
 
             if (length == std::string::npos)
                 return false;

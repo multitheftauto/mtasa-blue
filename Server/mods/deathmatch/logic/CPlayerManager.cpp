@@ -300,8 +300,12 @@ static void DoBroadcast(const CPacket& Packet, const T& sendList)
     std::multimap<ushort, CPlayer*> groupMap;
     for (typename T::const_iterator iter = sendList.begin(); iter != sendList.end(); ++iter)
     {
-        CPlayer* pPlayer = *iter;
-        MapInsert(groupMap, pPlayer->GetBitStreamVersion(), pPlayer);
+        CPlayer* player = *iter;
+
+        if (!player->IsLeavingServer())
+        {
+            MapInsert(groupMap, player->GetBitStreamVersion(), player);
+        }
     }
 
     DoBroadcast(Packet, groupMap);
