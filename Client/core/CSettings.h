@@ -407,6 +407,7 @@ protected:
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
+    bool OnAffinityClick(CGUIElement* pElement);
     void ReloadBrowserLists();
 
 private:
