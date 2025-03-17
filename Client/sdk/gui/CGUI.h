@@ -37,6 +37,9 @@ class CGUI;
 #include "CGUIComboBox.h"
 #include "CGUITypes.h"
 
+class CXML;
+class CGraphicsInterface;
+
 // Path defines for CGUI
 #define CGUI_ICON_MESSAGEBOX_INFO       "cgui\\images\\info.png"
 #define CGUI_ICON_MESSAGEBOX_QUESTION   "cgui\\images\\question.png"
@@ -169,4 +172,8 @@ public:
 
     virtual CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename) = 0;
     virtual bool        LoadImageset(const SString& strFilename) = 0;
+
+    virtual void SetModernSkinEnabled(bool bEnabled) = 0;
+    virtual void SetXMLParser(CXML* pXML) = 0;
+    virtual void SetGraphics(CGraphicsInterface* pGraphicsInterface) = 0;
 };

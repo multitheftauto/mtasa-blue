@@ -947,7 +947,7 @@ void CSettings::CreateGUI()
 
     m_pLabelBrowserBlacklistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserBlacklistAdd, _("Enter a domain e.g. google.com")));
     m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
-    m_pLabelBrowserBlacklistAdd->SetTextColor(0, 0, 0);
+    m_pLabelBrowserBlacklistAdd->SetPlaceholderColors();
     m_pLabelBrowserBlacklistAdd->SetSize(CVector2D(1, 1), true);
     m_pLabelBrowserBlacklistAdd->SetAlpha(0.7f);
     m_pLabelBrowserBlacklistAdd->SetProperty("MousePassThroughEnabled", "True");
@@ -982,7 +982,7 @@ void CSettings::CreateGUI()
 
     m_pLabelBrowserWhitelistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserWhitelistAdd, _("Enter a domain e.g. google.com")));
     m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
-    m_pLabelBrowserWhitelistAdd->SetTextColor(0, 0, 0);
+    m_pLabelBrowserWhitelistAdd->SetPlaceholderColors();
     m_pLabelBrowserWhitelistAdd->SetSize(CVector2D(1, 1), true);
     m_pLabelBrowserWhitelistAdd->SetAlpha(0.7f);
     m_pLabelBrowserWhitelistAdd->SetProperty("MousePassThroughEnabled", "True");
@@ -1272,6 +1272,7 @@ void CSettings::CreateGUI()
     m_pChatLoadPreset->SetClickHandler(GUI_CALLBACK(&CSettings::OnChatLoadPresetClick, this));
     m_pInterfaceLanguageSelector->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnLanguageChanged, this));
     m_pInterfaceSkinSelector->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnSkinChanged, this));
+    m_pInterfaceModern->SetClickHandler(GUI_CALLBACK(&CSettings::OnModernClick, this));
     m_pMapAlpha->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnMapAlphaChanged, this));
     m_pAudioMasterVolume->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnMasterVolumeChanged, this));
     m_pAudioRadioVolume->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnRadioVolumeChanged, this));
@@ -2055,6 +2056,11 @@ void CSettings::CreateInterfaceTabGUI()
         // Language
         pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabInterface, strLanguage));
         pLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+
+        m_pInterfaceModernLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabInterface, _("Use modern interface")));
+        m_pInterfaceModernLabel->SetPosition(CVector2D(vecTemp.fX + fIndentX + fComboWidth + 35.0f, vecTemp.fY + 20.0f));
+        m_pInterfaceModernLabel->AutoSize();
+
         pLabel->GetPosition(vecTemp);
         pLabel->AutoSize();
 
@@ -2062,6 +2068,14 @@ void CSettings::CreateInterfaceTabGUI()
         m_pInterfaceLanguageSelector->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
         m_pInterfaceLanguageSelector->SetSize(CVector2D(fComboWidth, 200.0f));
         m_pInterfaceLanguageSelector->SetReadOnly(true);
+
+        m_pInterfaceModern = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabInterface, ""));
+        m_pInterfaceModern->SetPosition(CVector2D(vecTemp.fX + fIndentX + fComboWidth + 10.0f, vecTemp.fY - 1.0f));
+        m_pInterfaceModern->SetSize(CVector2D(20.0f, 20.0f));
+
+        bool modern;
+        CVARS_GET("cgui_modern_interface", modern);
+        m_pInterfaceModern->SetSelected(modern);
 
         // Grab languages and populate
         for (const auto& strLocale : g_pCore->GetLocalization()->GetAvailableLocales())
@@ -3711,6 +3725,10 @@ void CSettings::SaveData()
     CVARS_SET("server_can_flash_window", m_pFlashWindow->GetSelected());
     CVARS_SET("allow_tray_notifications", m_pTrayBalloon->GetSelected());
 
+    // Save modern skin setting
+    CVARS_SET("cgui_modern_interface", m_pInterfaceModern->GetSelected());
+
+
     // Set our new skin last, as it'll destroy all our GUI
     pItem = m_pInterfaceSkinSelector->GetSelectedItem();
     if (pItem)
@@ -4925,4 +4943,16 @@ void CSettings::TabSkip(bool bBackwards)
 bool CSettings::IsActive()
 {
     return m_pWindow->IsActive();
+}
+
+bool CSettings::OnModernClick(CGUIElement* pElement)
+{
+    if (m_bIsModLoaded)
+    {
+        m_pInterfaceModern->SetSelected(!m_pInterfaceModern->GetSelected());
+        g_pCore->ShowMessageBox(_("Error") + _E("CC82"), _("Please disconnect before changing the modern interface"), MB_BUTTON_OK | MB_ICON_INFO);
+        m_pWindow->MoveToBack();
+        return true;
+    }
+    return true;
 }
