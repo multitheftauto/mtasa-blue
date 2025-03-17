@@ -30,8 +30,7 @@ bool CDirectorySAInterface::AddEntry(DirectoryInfoSA& entry)
             entry.m_nOffset += 2048 - (entry.m_nOffset % 2048);
     }
 
-    m_pEntries[m_nNumEntries] = entry;
-    m_nNumEntries++;
+    m_pEntries[m_nNumEntries++] = entry;
 
     return true;
 }
