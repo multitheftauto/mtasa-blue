@@ -204,7 +204,7 @@ namespace SharedUtil
         return result;
     }
 
-    inline bool StringToZLibFormat(const std::string format, int &outResult)
+    inline bool StringToZLibFormat(const std::string& format, int& outResult)
     {
         int value = atoi(format.c_str());
         if ((value >= 9 && value <= 31) || (value >= -15 && value <= -9)) // allowed values: 9..31, -9..-15
@@ -215,7 +215,7 @@ namespace SharedUtil
         return false;
     }
 
-    inline int ZLibCompress(const std::string input, std::string* output, const int windowBits = (int)ZLibFormat::GZIP, const int compression = 9,
+    inline int ZLibCompress(const std::string& input, std::string& output, const int windowBits = (int)ZLibFormat::GZIP, const int compression = 9,
                             const ZLibStrategy strategy = ZLibStrategy::DEFAULT)
     {
         z_stream stream{};
@@ -224,10 +224,10 @@ namespace SharedUtil
         if (result != Z_OK)
             return result;
 
-        output->resize(deflateBound(&stream, input.size())); // resize to the upper bound of what the compressed size might be
+        output.resize(deflateBound(&stream, input.size())); // resize to the upper bound of what the compressed size might be
 
-        stream.next_out = (Bytef*)output->data();
-        stream.avail_out = output->size();
+        stream.next_out = (Bytef*)output.data();
+        stream.avail_out = output.size();
 
         stream.next_in = (z_const Bytef*)input.data();
         stream.avail_in = input.size();
@@ -236,12 +236,12 @@ namespace SharedUtil
         result |= deflateEnd(&stream);
 
         if (result == Z_STREAM_END)
-            output->resize(stream.total_out); // resize to the actual size
+            output.resize(stream.total_out); // resize to the actual size
 
         return result;
     }
 
-    inline int ZLibUncompress(const std::string& input, std::string* output, int windowBits = 0)
+    inline int ZLibUncompress(const std::string& input, std::string& output, int windowBits = 0)
     {
         if (windowBits == 0 && input.size() >= 2) // try to determine format automatically
         {
@@ -273,7 +273,7 @@ namespace SharedUtil
             if (result != Z_OK && result != Z_STREAM_END)
                 break;
 
-            output->append(buffer, 0, stream.total_out - output->size()); // append only what was written to buffer
+            output.append(buffer, 0, stream.total_out - output.size()); // append only what was written to buffer
 
             if (result == Z_STREAM_END)
                 break;

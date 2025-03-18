@@ -767,7 +767,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                             {
                                 // Execute time-consuming task
                                 SString output;
-                                int     result = SharedUtil::ZLibCompress(data, &output, format, compression, strategy);
+                                int     result = SharedUtil::ZLibCompress(data, output, format, compression, strategy);
                                 if (result == Z_STREAM_END)
                                     return std::make_pair(output, true);
                                 else
@@ -799,7 +799,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 else            // Sync
                 {
                     SString output;
-                    int     result = SharedUtil::ZLibCompress(data, &output, format, compression, strategy);
+                    int     result = SharedUtil::ZLibCompress(data, output, format, compression, strategy);
                     if (result == Z_STREAM_END)
                         lua::Push(luaVM, output);
                     else
@@ -1189,7 +1189,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                             {
                                 // Execute time-consuming task
                                 SString output;
-                                int     result = SharedUtil::ZLibUncompress(data, &output, format);
+                                int     result = SharedUtil::ZLibUncompress(data, output, format);
                                 if (result == Z_STREAM_END)
                                     return std::make_pair(output, true);
                                 else
@@ -1221,7 +1221,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 else            // Sync
                 {
                     SString output;
-                    int     result = SharedUtil::ZLibUncompress(data, &output, format);
+                    int     result = SharedUtil::ZLibUncompress(data, output, format);
                     if (result == Z_STREAM_END)
                         lua::Push(luaVM, output);
                     else
