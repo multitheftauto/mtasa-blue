@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-17 23:49+0000\n"
-"PO-Revision-Date: 2025-03-18 00:49\n"
+"PO-Revision-Date: 2025-03-18 05:57\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2096,7 +2096,7 @@ msgstr "Deschide în Explorer"
 #. Process affinity
 #: Client/core/CSettings.cpp:1211
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
+msgstr "Setează afinitate CPU 0 pentru îmbunătățirea performanței jocului"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1217 Client/core/CSettings.cpp:1220
@@ -2439,7 +2439,10 @@ msgid "Enabling this setting may improve game performance, but on some processor
 "We have observed issues with AMD Ryzen processors featuring 3D V-Cache.\n"
 "The exact list of affected processors is unknown.\n\n"
 "Are you sure you  want to enable this option?"
-msgstr ""
+msgstr "Activarea acestei setări poate îmbunătăți performanțele jocului, dar pentru unele procesoare, o poate înrăutăți.\n"
+"Am observat probleme cu procesoarele AMD Ryzen cu funcționalități 3D V-Cache.\n"
+"Lista exactă a procesoarelor afectate este necunoscută.\n\n"
+"Ești sigur că dorești să activezi această opțiune?"
 
 #: Client/core/CSettings.cpp:4915
 msgid "Please enter a nickname"
@@ -2513,11 +2516,11 @@ msgstr "Fixează mişcarea mouseului - Poate necesita restartarea calculatorului
 
 #: Client/core/CSettings.cpp:4958
 msgid "CPU affinity:"
-msgstr ""
+msgstr "Afinitate CPU:"
 
 #: Client/core/CSettings.cpp:4958
 msgid "Experimental feature - It may improve performance or worsen it."
-msgstr ""
+msgstr "Funcționalitate experimentală - Poate îmbunătăți sau înrăutăți performanța."
 
 #: Client/core/CScreenShot.cpp:117
 #, c-format
