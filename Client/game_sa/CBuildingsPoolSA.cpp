@@ -19,6 +19,7 @@
 #include "MemSA.h"
 #include "CVehicleSA.h"
 #include "CBuildingRemovalSA.h"
+#include "CPlayerPedSA.h"
 
 extern CGameSA* pGame;
 
@@ -372,7 +373,9 @@ void CBuildingsPoolSA::RemovePedsContactEnityLinks()
             ped->pLastContactedEntity[2] = nullptr;
             ped->pLastContactedEntity[3] = nullptr;
             ped->m_ucCollisionState = 0;
-            ped->pTargetedEntity = nullptr;
+
+            if (auto* playerPed = dynamic_cast<CPlayerPedSA*>(pedLinks->pEntity))
+                playerPed->SetTargetedEntity(nullptr);
         }
     }
 }
