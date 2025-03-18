@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-17 23:49+0000\n"
-"PO-Revision-Date: 2025-03-18 00:49\n"
+"PO-Revision-Date: 2025-03-18 19:40\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -1367,7 +1367,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr ""
+msgstr "Volný pohyb"
 
 #: Client/core/CConnectManager.cpp:85
 msgid "Connecting failed. Invalid nick provided!"
@@ -1434,7 +1434,7 @@ msgstr "VAROVÁNÍ O ODPOJENÍ"
 
 #: Client/core/CMainMenu.cpp:1212
 msgid "INFORMATION"
-msgstr ""
+msgstr "INFORMACE"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -1678,12 +1678,12 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:454
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (Výchozí)"
 
 #. index 0
 #: Client/core/CSettings.cpp:455
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
