@@ -136,22 +136,22 @@ bool CRenderWareSA::HasClothesReplacementChanged()
 // Add a file to the clothes directory
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::ClothesAddFile(const char* pFileData, size_t fileSize, const char* pFileName)
+bool CRenderWareSA::ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName)
 {
-    if (!pFileData || !pFileName)
+    if (!fileData || !fileName)
         return false;
 
-    if (MapFind(ms_ClothesFileDataMap, pFileName))
+    if (MapFind(ms_ClothesFileDataMap, fileName))
         return false;
 
     DirectoryInfoSA entry{};
     entry.m_streamingSize = GetSizeInBlocks(fileSize);
-    strncpy(entry.m_name, pFileName, sizeof(entry.m_name));
+    std::strncpy(entry.m_name, fileName, sizeof(entry.m_name));
 
     if (!g_clothesDirectory->AddEntry(entry))
         return false;
 
-    MapSet(ms_ClothesFileDataMap, pFileName, (char*)pFileData);
+    MapSet(ms_ClothesFileDataMap, fileName, (char*)fileData);
     bClothesReplacementChanged = true;
 
     return true;
@@ -164,14 +164,14 @@ bool CRenderWareSA::ClothesAddFile(const char* pFileData, size_t fileSize, const
 // Remove a file from the clothes directory
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::ClothesRemoveFile(char* pFileData)
+bool CRenderWareSA::ClothesRemoveFile(char* fileData)
 {
-    if (!pFileData)
+    if (!fileData)
         return false;
 
     for (auto iter = ms_ClothesFileDataMap.begin(); iter != ms_ClothesFileDataMap.end();)
     {
-        if (iter->second == pFileData)
+        if (iter->second == fileData)
         {
             if (!g_clothesDirectory->RemoveEntry(iter->first.c_str()))
                 return false;
@@ -191,14 +191,9 @@ bool CRenderWareSA::ClothesRemoveFile(char* pFileData)
 // Check if clothe file exits
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::HasClothesFile(const char* pFileName)
+bool CRenderWareSA::HasClothesFile(const char* fileName)
 {
-    if (!pFileName)
-    {
-        return false;
-    }
-
-    if (!MapFind(ms_ClothesFileDataMap, pFileName))
+    if (!fileName || !MapFind(ms_ClothesFileDataMap, fileName))
     {
         return false;
     }
