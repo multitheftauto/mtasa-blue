@@ -156,6 +156,7 @@ CCore::CCore()
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
     m_timeDiscordAppLastUpdate = 0;
+    m_CurrentRefreshRate = 60;
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
@@ -1794,6 +1795,17 @@ void CCore::ApplyCoreInitSettings()
 
         SetApplicationSettingInt("reset-settings-revision", 21486);
     }
+
+    // Set process settings
+    HANDLE currProc = GetCurrentProcess();
+
+    // Process priority
+    int PriorityClassList[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
+    SetPriorityClass(currProc, PriorityClassList[CVARS_GET_VALUE<int>("process_priority") % 3]);
+
+    // Process CPU affinity
+    if (CVARS_GET_VALUE<bool>("process_cpu_affinity"))
+        SetProcessAffinityMask(currProc, 1 << 0);
 }
 
 //
@@ -1835,6 +1847,9 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
 
+    if (!IsConnected())
+        m_uiFrameRateLimit = m_CurrentRefreshRate;
+
     // Removes Limiter from Frame Graph if limit is zero and skips frame limit
     if (m_uiFrameRateLimit == 0)
     {
@@ -1858,6 +1873,12 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
 void CCore::SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit)
 {
     m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
+    RecalculateFrameRateLimit(-1, false);
+}
+
+void CCore::SetCurrentRefreshRate(uint value)
+{
+    m_CurrentRefreshRate = value;
     RecalculateFrameRateLimit(-1, false);
 }
 
@@ -1921,7 +1942,7 @@ void CCore::ApplyQueuedFrameRateLimit()
             double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
             if (dSpare <= 0.0)
                 break;
-            if (dSpare >= 2.0)
+            if (dSpare >= 10.0)
                 Sleep(1);
         }
         m_FrameRateTimer.Reset();
