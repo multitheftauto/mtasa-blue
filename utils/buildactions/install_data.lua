@@ -49,9 +49,8 @@ newaction {
 			return
 		end
 
-		local success, message = os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "mtaserver.conf.template", false, true)
-		if not success then
-			errormsg("ERROR: Couldn't copy server config files", "\n"..message)
+		if not makeconfigtemplate(BIN_DIR.."/server/mods/deathmatch/mtaserver.conf", BIN_DIR.."/server/mods/deathmatch/mtaserver.conf.template") then
+			errormsg("ERROR: Could not copy mtaserver.conf to mtaserver.conf.template")
 			os.exit(1)
 			return
 		end
@@ -76,7 +75,7 @@ newaction {
 			success = success and http.download_print_errors(NET_PATH_X64_WIN, BIN_DIR.."/server/x64/net.dll")
 			success = success and http.download_print_errors(NET_PATH_ARM64_WIN, BIN_DIR.."/server/arm64/net.dll")
 			success = success and http.download_print_errors(NETC_PATH_WIN, BIN_DIR.."/MTA/netc.dll")
-			
+
 			-- A download failed
 			if not success then
 				os.exit(1)
