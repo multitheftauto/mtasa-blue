@@ -13,62 +13,59 @@
 
 bool CDirectorySAInterface::AddEntry(DirectoryInfoSA& entry)
 {
-    if (m_nNumEntries >= m_nCapacity)
+    if (m_numEntries >= m_capacity || GetModelEntry(entry.m_name))
         return false;
 
-    if (GetModelEntry(entry.m_szName))
-        return false;
+    entry.m_offset = 0;
 
-    entry.m_nOffset = 0;
-
-    if (m_nNumEntries > 0)
+    if (m_numEntries > 0)
     {
-        DirectoryInfoSA* lastEntry = m_pEntries + m_nNumEntries - 1;
-        entry.m_nOffset = lastEntry->m_nOffset + lastEntry->m_nStreamingSize;
+        DirectoryInfoSA* lastEntry = m_entries + m_numEntries - 1;
+        entry.m_offset = lastEntry->m_offset + lastEntry->m_streamingSize;
 
-        if (entry.m_nOffset % 2048)
-            entry.m_nOffset += 2048 - (entry.m_nOffset % 2048);
+        if (entry.m_offset % 2048)
+            entry.m_offset += 2048 - (entry.m_offset % 2048);
     }
 
-    m_pEntries[m_nNumEntries++] = entry;
+    m_entries[m_numEntries++] = entry;
 
     return true;
 }
 
-bool CDirectorySAInterface::RemoveEntry(const char* pFileName)
+bool CDirectorySAInterface::RemoveEntry(const char* fileName)
 {
-    if (m_nNumEntries <= 0)
+    if (m_numEntries <= 0)
         return false;
 
-    DirectoryInfoSA* entry = GetModelEntry(pFileName);
+    DirectoryInfoSA* entry = GetModelEntry(fileName);
 
     if (!entry)
         return false;
 
-    std::uint32_t index = entry - m_pEntries;
+    std::ptrdiff_t index = entry - m_entries;
 
-    if (index < m_nNumEntries - 1)
+    if (index < m_numEntries - 1)
     {
-        DirectoryInfoSA* lastEntry = m_pEntries + m_nNumEntries - 1;
-        entry->m_nOffset = lastEntry->m_nOffset + lastEntry->m_nSizeInArchive;
+        DirectoryInfoSA* lastEntry = m_entries + m_numEntries - 1;
+        entry->m_offset = lastEntry->m_offset + lastEntry->m_sizeInArchive;
     }
 
-    m_nNumEntries--;
+    m_numEntries--;
 
-    if (index < m_nNumEntries)
-        memmove(entry, entry + 1, (m_nNumEntries - index) * sizeof(DirectoryInfoSA));
+    if (index < m_numEntries)
+        std::memmove(entry, entry + 1, (m_numEntries - index) * sizeof(DirectoryInfoSA));
 
     return true;
 }
 
-DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(const char* pFileName)
+DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(const char* fileName)
 {
-    if (m_nNumEntries <= 0)
+    if (m_numEntries <= 0)
         return nullptr;
 
-    for (DirectoryInfoSA* it = m_pEntries; it != m_pEntries + m_nNumEntries; it++)
+    for (DirectoryInfoSA* it = m_entries; it != m_entries + m_numEntries; it++)
     {
-        if (strcmp(it->m_szName, pFileName) == 0)
+        if (std::strcmp(it->m_name, fileName) == 0)
             return it;
     }
 
@@ -77,10 +74,10 @@ DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(const char* pFileName)
 
 DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(std::uint16_t modelId)
 {
-    if (m_nNumEntries <= 0)
+    if (m_numEntries <= 0)
         return nullptr;
 
-    DirectoryInfoSA* entry = m_pEntries + modelId;
+    DirectoryInfoSA* entry = m_entries + modelId;
 
     if (!entry)
         return nullptr;
@@ -92,13 +89,10 @@ bool CDirectorySAInterface::SetModelStreamingSize(std::uint16_t modelId, std::ui
 {
     DirectoryInfoSA* entry = GetModelEntry(modelId);
 
-    if (!entry)
+    if (!entry || entry->m_streamingSize == size)
         return false;
 
-    if (entry->m_nStreamingSize == size)
-        return false;
-
-    entry->m_nStreamingSize = size;
+    entry->m_streamingSize = size;
     return true;
 }
 
@@ -110,5 +104,5 @@ std::uint16_t CDirectorySAInterface::GetModelStreamingSize(std::uint16_t modelId
     if (!entry)
         return 0;
 
-    return entry->m_nStreamingSize;
+    return entry->m_streamingSize;
 }
