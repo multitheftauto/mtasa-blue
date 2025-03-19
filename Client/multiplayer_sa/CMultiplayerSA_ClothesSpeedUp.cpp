@@ -215,26 +215,23 @@ skip:
 // Speeds up clothes a bit, but is only part of a solution - The actual files from inside player.img are still loaded each time
 //
 
-uint32_t g_pPlayerImgEntries = 0xBBCDC8;
-uint16_t g_nPlayerImgSize = 0x226;
+std::uint32_t g_playerImgEntries = 0xBBCDC8;
+std::uint16_t g_playerImgSize = 0x226;
 
 bool _cdecl IsPlayerImgDirLoaded()
 {
     // When player.img dir is loaded, it looks this this:
     // 0x00BC12C0  00bbcdc8 00000226
     DWORD* ptr1 = (DWORD*)0xBC12C0;
-    if (ptr1[0] == g_pPlayerImgEntries && ptr1[1] == g_nPlayerImgSize)
-    {
-        return true;
-    }
-    return false;
+
+    return ptr1[0] == g_playerImgEntries && ptr1[1] == g_playerImgSize;
 }
 
 // Hook info
 #define HOOKSIZE_LoadingPlayerImgDir 5
-#define HOOKPOS_LoadingPlayerImgDir  0x5A69E3            // 005A69D6 -> CClothesBuilder::CreateSkinnedClump -> playerImgEntries
-DWORD RETURN_LoadingPlayerImgDirA = 0x5A69E8;            // push 00000226 { 550 }
-DWORD RETURN_LoadingPlayerImgDirB = 0x5A6A06;            // return of CreateSkinnedClump function
+#define HOOKPOS_LoadingPlayerImgDir  0x5A69E3                               // 005A69D6 -> CClothesBuilder::CreateSkinnedClump -> playerImgEntries
+static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirA = 0x5A69E8;     // push 00000226 { 550 }
+static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;     // return of CreateSkinnedClump function
 
 void _declspec(naked) HOOK_LoadingPlayerImgDir()
 {
@@ -248,7 +245,7 @@ void _declspec(naked) HOOK_LoadingPlayerImgDir()
         popad
 
          // Standard code to load img directory
-        mov     eax, g_pPlayerImgEntries
+        mov     eax, g_playerImgEntries
         push    eax
         jmp     RETURN_LoadingPlayerImgDirA
 
@@ -264,24 +261,22 @@ skip:
 // Setup clothing directory size
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-bool _cdecl SetClothingDirectorySize(int iCapacity)
+bool SetClothingDirectorySize(int directorySize)
 {
-    DirectoryInfoSA* clothesDirectory = (DirectoryInfoSA*)malloc(sizeof(DirectoryInfoSA) * iCapacity);
+    DirectoryInfoSA* clothesDirectory = (DirectoryInfoSA*)malloc(sizeof(DirectoryInfoSA) * directorySize);
 
-    if (clothesDirectory)
-    {
-        // CClothesBuilder::LoadCdDirectory(void)
-        MemPut<uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));      // push    offset _playerImgEntries; headers
-        MemPut<uint16_t>(0x5A4195 + 1, iCapacity);                                         // push    550             ; count
-        MemPut<uint16_t>(0x5A69E8 + 1, iCapacity);                                         // push    550             ; count
+    if (!clothesDirectory)
+        return false;
 
-        g_pPlayerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
-        g_nPlayerImgSize = iCapacity;
+    // CClothesBuilder::LoadCdDirectory(void)
+    MemPut<uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));      // push    offset _playerImgEntries; headers
+    MemPut<uint16_t>(0x5A4195 + 1, directorySize);                                     // push    550             ; count
+    MemPut<uint16_t>(0x5A69E8 + 1, directorySize);                                     // push    550             ; count
 
-        return true;
-    }
+    g_playerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
+    g_playerImgSize = directorySize;
 
-    return false;
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
