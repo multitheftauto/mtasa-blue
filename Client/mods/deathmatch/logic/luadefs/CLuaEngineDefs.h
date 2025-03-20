@@ -58,6 +58,9 @@ public:
     LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
+
+    static bool                                            EngineAddClothingModel(CClientDFF* pDff, std::string strModelName);
+    static bool                                            EngineAddClothingTXD(CClientTXD* pTxd, std::string strModelName);
     static uint                                            EngineGetModelFlags(uint uiModelID);
     static bool                                            EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);
     static bool                                            EngineGetModelFlag(uint uiModelID, eModelIdeFlag eFlag);

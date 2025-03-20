@@ -31,6 +31,7 @@ namespace
 
     std::unordered_map<ushort, char*>         ms_ReplacementClothesFileDataMap;
     std::unordered_map<ushort, std::uint16_t> ms_OriginalStreamingSizesMap;
+    std::unordered_map<std::string, char*>    ms_ClothesFileDataMap;
 
     bool bClothesReplacementChanged = false;
 
@@ -130,6 +131,73 @@ bool CRenderWareSA::HasClothesReplacementChanged()
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::ClothesAddFile
+//
+// Add a file to the clothes directory
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName)
+{
+    if (!fileData || !fileName)
+        return false;
+
+    if (MapFind(ms_ClothesFileDataMap, fileName))
+        return false;
+
+    DirectoryInfoSA entry{};
+    entry.m_streamingSize = GetSizeInBlocks(fileSize);
+    std::strncpy(entry.m_name, fileName, sizeof(entry.m_name));
+
+    if (!g_clothesDirectory->AddEntry(entry))
+        return false;
+
+    MapSet(ms_ClothesFileDataMap, fileName, const_cast<char*>(fileData));
+    bClothesReplacementChanged = true;
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::ClothesRemoveFile
+//
+// Remove a file from the clothes directory
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::ClothesRemoveFile(char* fileData)
+{
+    if (!fileData)
+        return false;
+
+    for (auto iter = ms_ClothesFileDataMap.begin(); iter != ms_ClothesFileDataMap.end();)
+    {
+        if (iter->second == fileData)
+        {
+            if (!g_clothesDirectory->RemoveEntry(iter->first.c_str()))
+                return false;
+
+            iter = ms_ClothesFileDataMap.erase(iter);
+            bClothesReplacementChanged = true;
+        }
+        else
+            ++iter;
+    }
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::HasClothesFile
+//
+// Check if clothe file exits
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::HasClothesFile(const char* fileName) const noexcept
+{
+    return fileName && MapFind(ms_ClothesFileDataMap, fileName);
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CStreaming_RequestModel_Mid
 //
 // If request is for a file inside player.img (imgId 5)
@@ -143,35 +211,44 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
         return false;
 
     // Early out if no clothes textures to replace with
-    if (ms_ReplacementClothesFileDataMap.empty())
+    if (ms_ReplacementClothesFileDataMap.empty() && ms_ClothesFileDataMap.empty())
         return false;
 
     // Initialze lookup map if needed
-    static std::map<uint, int> blockOffsetToFileIdMap;
+    static std::map<std::uint32_t, int>         blockOffsetToFileIdMap;
+    static std::map<std::uint32_t, std::string> blockOffsetToFileNameMap;
     if (blockOffsetToFileIdMap.empty())
     {
         // Check is player.img dir has been loaded by GTA
         SPlayerImgItemArray* pItemArray = (SPlayerImgItemArray*)0x00BC12C0;
-        if (!pItemArray->pItems || pItemArray->uiArraySize != 542)
+        std::uint32_t        maxArraySize = 542 + ms_ClothesFileDataMap.size();
+
+        if (!pItemArray->pItems || pItemArray->uiArraySize != maxArraySize)
             return false;
 
-        for (uint i = 0; i < pItemArray->uiArraySize; i++)
+        for (std::uint32_t i = 0; i < pItemArray->uiArraySize; i++)
         {
             SPlayerImgItem* pImgItem = &pItemArray->pItems[i];
             MapSet(blockOffsetToFileIdMap, pImgItem->uiBlockOffset, i);
+            MapSet(blockOffsetToFileNameMap, pImgItem->uiBlockOffset, pImgItem->szName);
         }
     }
 
-    // Get player.img fileId by comparing the supplied BlockOffset with entries in the player.img dir
-    int* piPlayerImgFileId = MapFind(blockOffsetToFileIdMap, pImgGTAInfo->iBlockOffset);
-    if (!piPlayerImgFileId)
-        return false;
+    char* replacementFileData = nullptr;
+    int*  playerImgFileId = MapFind(blockOffsetToFileIdMap, pImgGTAInfo->iBlockOffset);
 
-    int iPlayerImgFileId = *piPlayerImgFileId;
+    if (playerImgFileId)
+        replacementFileData = MapFindRef(ms_ReplacementClothesFileDataMap, *playerImgFileId);
 
-    // Do we have a replacement for this clothes texture?
-    char* pReplacementFileData = MapFindRef(ms_ReplacementClothesFileDataMap, iPlayerImgFileId);
-    if (!pReplacementFileData)
+    if (!replacementFileData)
+    {
+        std::string* fileName = MapFind(blockOffsetToFileNameMap, pImgGTAInfo->iBlockOffset);
+
+        if (fileName)
+            replacementFileData = MapFindRef(ms_ClothesFileDataMap, *fileName);
+    }
+
+    if (!replacementFileData)
         return false;
 
         // If bLoadingBigModel is set, try to get it unset
@@ -187,7 +264,7 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
 
     // Set results
     iReturnFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
-    pReturnBuffer = pReplacementFileData;
+    pReturnBuffer = replacementFileData;
 
     // Update flags
     pImgGTAInfo->uiLoadflag = 3;
