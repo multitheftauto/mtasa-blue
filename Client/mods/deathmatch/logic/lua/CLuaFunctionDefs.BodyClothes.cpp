@@ -114,7 +114,7 @@ int CLuaFunctionDefs::AddClothingModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::AddClothingModel(strTexture, strModel, ucType))
+        if (CClientPlayerClothes::AddClothingModel(strTexture, strModel, ucType))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -136,7 +136,7 @@ int CLuaFunctionDefs::RemoveClothingModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::RemoveClothingModel(strTexture, strModel, ucType))
+        if (CClientPlayerClothes::RemoveClothingModel(strTexture, strModel, ucType))
         {
             lua_pushboolean(luaVM, true);
             return 1;

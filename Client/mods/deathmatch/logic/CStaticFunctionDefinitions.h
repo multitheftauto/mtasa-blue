@@ -195,8 +195,6 @@ public:
     static bool GetClothesByTypeIndex(unsigned char ucType, unsigned char ucIndex, SString& strOutTexture, SString& strOutModel);
     static bool GetTypeIndexFromClothes(const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn);
     static bool GetClothesTypeName(unsigned char ucType, SString& strOutName);
-    static bool AddClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
-    static bool RemoveClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
 
     // Vehicle get funcs
     static CClientVehicle* CreateVehicle(CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
