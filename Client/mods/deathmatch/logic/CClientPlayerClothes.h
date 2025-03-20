@@ -81,7 +81,7 @@ private:
     SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>              m_Clothes;
     static bool                                                             m_bHasClothesChanged;
     static SFixedArray<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS> m_DefaultClothes;
-    static SFixedArray<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS> m_NewClothes;
+    static SFixedArray<std::list<SPlayerClothing>, PLAYER_CLOTHING_SLOTS>   m_NewClothes;
     static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>       m_GlobalClothes;
     static bool                                                             m_bStaticInit;
 };

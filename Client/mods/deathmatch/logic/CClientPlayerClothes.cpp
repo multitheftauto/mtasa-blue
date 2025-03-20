@@ -177,7 +177,7 @@ SFixedArray<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS> CClientPlayerCl
 
 // This represents GTA's 1 clothing block
 SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>          CClientPlayerClothes::m_GlobalClothes;
-SFixedArray<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS>    CClientPlayerClothes::m_NewClothes;
+SFixedArray<std::list<SPlayerClothing>, PLAYER_CLOTHING_SLOTS>      CClientPlayerClothes::m_NewClothes;
 bool                                                                CClientPlayerClothes::m_bStaticInit = true;
 bool                                                                CClientPlayerClothes::m_bHasClothesChanged = false;
 
