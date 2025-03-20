@@ -255,6 +255,14 @@ public:
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 
+    void GetUnderwaterEffect(bool& isEnabled, float& speed, float& frequency) const noexcept;
+    void GetUnderwaterDarkness(bool& isEnabled, float& fullDarknessDepth) const noexcept;
+    void SetUnderwaterEffectEnabled(bool isEnabled) const noexcept override;
+    void SetUnderwaterEffectSpeed(float speed, float frequency) const noexcept override;
+    void SetUnderwaterDarkness(bool isEnabled, float fullDarknessDepth) override;
+    void ResetUnderwaterEffect() noexcept override;
+    void ResetUnderwaterDarkness() noexcept override;
+
     void AllowWindowsCursorShowing(bool bAllow);
 
     CShotSyncData* GetLocalShotSyncData();
