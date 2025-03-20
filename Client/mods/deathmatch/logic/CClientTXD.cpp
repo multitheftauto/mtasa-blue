@@ -53,9 +53,9 @@ bool CClientTXD::Load(bool isRaw, SString input, bool enableFiltering)
     }
 }
 
-bool CClientTXD::AddClothingTexture(std::string strModelName)
+bool CClientTXD::AddClothingTexture(std::string modelName)
 {
-    if (strModelName.empty())
+    if (modelName.empty())
         return false;
 
     if (m_FileData.empty() && m_bIsRawData)
@@ -70,7 +70,7 @@ bool CClientTXD::AddClothingTexture(std::string strModelName)
             return false;
     }
 
-    return g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), strModelName.c_str());
+    return g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), modelName.c_str());
 }
 
 bool CClientTXD::Import(unsigned short usModelID)

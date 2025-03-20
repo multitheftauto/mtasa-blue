@@ -218,7 +218,7 @@ skip:
 std::uint32_t g_playerImgEntries = 0xBBCDC8;
 std::uint16_t g_playerImgSize = 0x226;
 
-bool _cdecl IsPlayerImgDirLoaded()
+bool IsPlayerImgDirLoaded()
 {
     // When player.img dir is loaded, it looks this this:
     // 0x00BC12C0  00bbcdc8 00000226
@@ -263,15 +263,15 @@ skip:
 //////////////////////////////////////////////////////////////////////////////////////////
 bool SetClothingDirectorySize(int directorySize)
 {
-    DirectoryInfoSA* clothesDirectory = (DirectoryInfoSA*)malloc(sizeof(DirectoryInfoSA) * directorySize);
+    DirectoryInfoSA* clothesDirectory = new DirectoryInfoSA[directorySize];
 
     if (!clothesDirectory)
         return false;
 
     // CClothesBuilder::LoadCdDirectory(void)
-    MemPut<uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));      // push    offset _playerImgEntries; headers
-    MemPut<uint16_t>(0x5A4195 + 1, directorySize);                                     // push    550             ; count
-    MemPut<uint16_t>(0x5A69E8 + 1, directorySize);                                     // push    550             ; count
+    MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));      // push    offset _playerImgEntries; headers
+    MemPut<std::uint16_t>(0x5A4195 + 1, directorySize);                                     // push    550             ; count
+    MemPut<std::uint16_t>(0x5A69E8 + 1, directorySize);                                     // push    550             ; count
 
     g_playerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
     g_playerImgSize = directorySize;

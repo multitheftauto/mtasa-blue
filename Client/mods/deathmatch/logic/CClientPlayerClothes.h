@@ -70,8 +70,8 @@ public:
     static std::vector<const SPlayerClothing*>  GetClothingGroup(unsigned char ucType);
     static bool                                 IsValidModel(unsigned short usModel);
     static bool                                 HasClothesChanged();
-    static bool                                 AddClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
-    static bool                                 RemoveClothingModel(const char* szTexture, const char* szModel, unsigned char ucType);
+    static bool                                 AddClothingModel(const char* texture, const char* model, unsigned char clothingType);
+    static bool                                 RemoveClothingModel(const char* texture, const char* model, unsigned char clothingType);
 
 private:
     static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);

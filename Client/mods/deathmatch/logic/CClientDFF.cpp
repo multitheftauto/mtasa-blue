@@ -99,9 +99,9 @@ void CClientDFF::UnloadDFF()
     m_LoadedClumpInfoMap.clear();
 }
 
-bool CClientDFF::AddClothingModel(std::string strModelName)
+bool CClientDFF::AddClothingModel(std::string modelName)
 {
-    if (strModelName.empty())
+    if (modelName.empty())
         return false;
 
     if (m_RawDataBuffer.empty() && m_bIsRawData)
@@ -113,7 +113,7 @@ bool CClientDFF::AddClothingModel(std::string strModelName)
             return false;
     }
 
-    return g_pGame->GetRenderWare()->ClothesAddFile(m_RawDataBuffer.data(), m_RawDataBuffer.size(), strModelName.c_str());
+    return g_pGame->GetRenderWare()->ClothesAddFile(m_RawDataBuffer.data(), m_RawDataBuffer.size(), modelName.c_str());
 }
 
 bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
