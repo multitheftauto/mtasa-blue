@@ -2740,10 +2740,13 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", NULL, false);
 
     // Marker events
-    m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientMarkerLeave", "entity, matchingDimension", NULL, false);
+    m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientMarkerLeave", "entity, matchingDimension", nullptr, false);
 
-    // Marker events
+    m_Events.AddEvent("onClientPlayerMarkerHit", "marker, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientPlayerMarkerLeave", "marker, matchingDimension", nullptr, false);
+
+    // Pickup events
     m_Events.AddEvent("onClientPickupHit", "entity, matchingDimension", NULL, false);
     m_Events.AddEvent("onClientPickupLeave", "entity, matchingDimension", NULL, false);
 
