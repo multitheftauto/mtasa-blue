@@ -1,38 +1,41 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Shared/sdk/SharedUtil.IntTypes.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
+
+#include <cstdint>
 
 /*************************************************************************
     Simplification of some 'unsigned' types
 *************************************************************************/
 //                                                  VS      GCC
 //                      Actual sizes:      32bit   64bit   64bit
-typedef unsigned long  ulong;             //  32      32      64
-typedef unsigned int   uint;              //  32
-typedef unsigned short ushort;            //  16
-typedef unsigned char  uchar;             //  8
+using ulong = unsigned long;           //  32      32      64
+using uint = std::uint32_t;            //  32
+using ushort = std::uint16_t;          //  16
+using uchar = std::uint8_t;            //  8
 
-typedef unsigned long long uint64;            //  64
-typedef unsigned int       uint32;            //  32
-typedef unsigned short     uint16;            //  16
-typedef unsigned char      uint8;             //  8
+using uint64 = std::uint64_t;          //  64
+using uint32 = std::uint32_t;          //  32
+using uint16 = std::uint16_t;          //  16
+using uint8 = std::uint8_t;            //  8
 
 // signed types
-typedef signed long long int64;            //  64
-typedef signed int       int32;            //  32
-typedef signed short     int16;            //  16
-typedef signed char      int8;             //  8
+using int64 = std::int64_t;            //  64
+using int32 = std::int32_t;            //  32
+using int16 = std::int16_t;            //  16
+using int8 = std::int8_t;              //  8
 
 // Windowsesq types
-typedef unsigned char  BYTE;             //  8
-typedef unsigned short WORD;             //  16
-typedef unsigned long  DWORD;            //  32      32      64
-typedef float          FLOAT;            //  32
+using BYTE = std::uint8_t;             //  8
+using WORD = std::uint16_t;            //  16
+using DWORD = unsigned long;           //  32      32      64
+using FLOAT = float;                   //  32
 
 // Type: considerations:
 // a) long (and therefore DWORD) is 64 bits when compiled using 64 bit GCC
