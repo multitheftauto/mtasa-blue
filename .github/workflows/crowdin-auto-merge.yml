@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          token: ${{ secrets.POT_CI_PAT }}
 
       - name: Setup Git
         run: |
@@ -27,5 +27,3 @@ jobs:
             gh pr merge $PR_NUMBER --squash --repo ${{ github.repository }} --admin --subject "New Crowdin updates (PR #$PR_NUMBER)" --body ""
             git push origin --delete l10n/master
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
