@@ -17,8 +17,7 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
     SetTypeName("svg");
 
     m_pManager = pManager;
-
-    m_pVectorGraphicDisplay = std::make_unique<CClientVectorGraphicDisplay>(m_pManager->GetDisplayManager(), this);
+    m_pVectorGraphicDisplay = m_pManager->GetDisplayManager()->CreateVectorGraphicDisplay(this);
 
     // Generate the default XML document
     SString defaultXmlString = SString("<svg viewBox='0 0 %u %u'></svg>", pVectorGraphicItem->m_uiSizeX, pVectorGraphicItem->m_uiSizeY);
@@ -84,7 +83,7 @@ void CClientVectorGraphic::OnUpdate()
 
     if (std::holds_alternative<CLuaFunctionRef>(m_updateCallbackRef))
     {
-        auto func = std::get<CLuaFunctionRef>(m_updateCallbackRef);
+        auto& func = std::get<CLuaFunctionRef>(m_updateCallbackRef);
         auto state = func.GetLuaVM();
 
         if (VERIFY_FUNCTION(func) && state != NULL)

@@ -33,6 +33,7 @@ struct sMenuItem
     int              nativeSizeX;
     int              nativeSizeY;
     CGUIStaticImage* image;
+    float            animProgress{};
 };
 
 class CMainMenu

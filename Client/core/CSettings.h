@@ -216,6 +216,7 @@ protected:
     CGUICheckBox*  m_pWin8ColorCheckBox;
     CGUICheckBox*  m_pWin8MouseCheckBox;
     CGUICheckBox*  m_pPhotoSavingCheckbox;
+    CGUICheckBox*  m_pProcessAffinityCheckbox;
     CGUILabel*     m_pUpdateBuildTypeLabel;
     CGUIComboBox*  m_pUpdateBuildTypeCombo;
     CGUILabel*     m_pUpdateAutoInstallLabel;
@@ -406,6 +407,7 @@ protected:
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
+    bool OnAffinityClick(CGUIElement* pElement);
     void ReloadBrowserLists();
 
 private:
