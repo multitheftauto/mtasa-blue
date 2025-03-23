@@ -1769,43 +1769,44 @@ void CCore::OnPostColorFilterRender()
 
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
-    bool bValue;
-    CVARS_GET("process_dpi_aware", bValue);
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
+    const auto aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
-    if (bValue)
-    {
-        // Minimum supported client for the function below is Windows Vista
-        // See also: https://technet.microsoft.com/en-us/evalcenter/dn469266(v=vs.90)
+    if (aware)
         SetProcessDPIAware();
-    }
 #endif
 
-    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
-    {
-        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
-        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
-        std::string currentSkinName;
-        CVARS_GET("current_skin", currentSkinName);
+    const auto revision = GetApplicationSettingInt("reset-settings-revision");
 
-        if (currentSkinName == "Default")
-        {
-            CVARS_SET("current_skin", "Default 2023");
-        }
+    if (revision >= 21486)
+        return;
 
-        SetApplicationSettingInt("reset-settings-revision", 21486);
-    }
+    const auto skin = CVARS_GET_VALUE<std::string>("current_skin");
 
-    // Set process settings
-    HANDLE currProc = GetCurrentProcess();
+    if (skin == "Default")
+        CVARS_SET("current_skin", "Default 2023");
 
-    // Process priority
-    int PriorityClassList[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
-    SetPriorityClass(currProc, PriorityClassList[CVARS_GET_VALUE<int>("process_priority") % 3]);
+    SetApplicationSettingInt("reset-settings-revision", 21486);
 
-    // Process CPU affinity
-    if (CVARS_GET_VALUE<bool>("process_cpu_affinity"))
-        SetProcessAffinityMask(currProc, 1 << 0);
+    const auto process = GetCurrentProcess();
+    const int  priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
+    const auto priority = CVARS_GET_VALUE<int>("process_priority") % 3;
+
+    SetPriorityClass(process, priorities[priority]);
+
+    const auto affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+
+    if (!affinity)
+        return;
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+    const auto result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (!result)
+        return;
+
+    SetProcessAffinityMask(process, mask & ~1);
 }
 
 //
