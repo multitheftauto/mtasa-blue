@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-23 20:04+0000\n"
-"PO-Revision-Date: 2025-03-27 22:51\n"
+"PO-Revision-Date: 2025-03-27 23:51\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1083,7 +1083,7 @@ msgstr "قطع الاتصال"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1096
 #: Client/core/CSettings.cpp:3552 Client/core/CCore.cpp:670
 msgid "In-game"
-msgstr "داخل اللعبة"
+msgstr "في اللعبة"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -1123,7 +1123,7 @@ msgstr "يركب القطار في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Flying around"
-msgstr "يطير حول"
+msgstr "يحلق حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Riding around"
@@ -1192,7 +1192,7 @@ msgstr "يركب الجت باك في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Literally on fire in"
-msgstr "حرفياً يحترق في"
+msgstr "حرفيًا يحترق في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Burning up in"
