@@ -9,11 +9,13 @@ jobs:
   crowdin-auto-merge:
     if: github.event.repository.fork == false
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.POT_CI_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Git
         run: |
