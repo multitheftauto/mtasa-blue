@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-17 23:49+0000\n"
-"PO-Revision-Date: 2025-03-18 00:49\n"
+"POT-Creation-Date: 2025-03-23 20:04+0000\n"
+"PO-Revision-Date: 2025-03-28 00:54\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -21,7 +21,7 @@ msgstr ""
 #. OK button
 #: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:37
 #: Client/core/CMainMenu.cpp:1214 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4918 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CSettings.cpp:4930 Client/core/CVersionUpdater.cpp:1607
 #: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
 #: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
@@ -33,7 +33,7 @@ msgstr "موافق"
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:40
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4917
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4929
 #: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
 #: Client/core/CVersionUpdater.cpp:1841
 msgid "Cancel"
@@ -47,9 +47,9 @@ msgstr "إلغاء"
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:35
 #: Client/core/CMainMenu.cpp:1194 Client/core/CSettings.cpp:1423
-#: Client/core/CSettings.cpp:1447 Client/core/CSettings.cpp:4584
-#: Client/core/CSettings.cpp:4658 Client/core/CSettings.cpp:4688
-#: Client/core/CSettings.cpp:4737 Client/core/CSettings.cpp:4786
+#: Client/core/CSettings.cpp:1447 Client/core/CSettings.cpp:4596
+#: Client/core/CSettings.cpp:4670 Client/core/CSettings.cpp:4700
+#: Client/core/CSettings.cpp:4749 Client/core/CSettings.cpp:4798
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CQuestionBox.cpp:195
@@ -59,9 +59,9 @@ msgstr "نعم"
 
 #: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1193
 #: Client/core/CSettings.cpp:1422 Client/core/CSettings.cpp:1446
-#: Client/core/CSettings.cpp:4583 Client/core/CSettings.cpp:4657
-#: Client/core/CSettings.cpp:4687 Client/core/CSettings.cpp:4736
-#: Client/core/CSettings.cpp:4785 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CSettings.cpp:4595 Client/core/CSettings.cpp:4669
+#: Client/core/CSettings.cpp:4699 Client/core/CSettings.cpp:4748
+#: Client/core/CSettings.cpp:4797 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
@@ -137,7 +137,7 @@ msgstr "MTA: San Andreas - خيارات مربكة"
 
 #: Client/loader/Dialogs.cpp:82
 msgid "NVidia Optimus detected!"
-msgstr "تم إكتشاف NVidia Optimus!"
+msgstr "تم اكتشاف NVidia Optimus!"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "Try each option and see what works:"
@@ -193,13 +193,13 @@ msgstr "MTA تعذرت الكشف عن مكافح فيروسات في هذا ا�
 
 #: Client/loader/Dialogs.cpp:104
 msgid "I have already installed an anti-virus"
-msgstr "انا قد ثبت مكافح فيروسات مسبقًا"
+msgstr "أنا قد ثبت مكافح فيروسات مسبقًا"
 
 #: Client/loader/Dialogs.cpp:106
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "لن أثبت مكافح فيروسات.\n"
-"أريد ان يصاب جهازي بالبطأ."
+"أريد أن يصاب جهازي بالبطء."
 
 #: Client/loader/Dialogs.cpp:678
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -227,7 +227,7 @@ msgstr "تم إكمال نسخ الملفات مبكرًا. كل شيء على �
 
 #: Client/loader/Dialogs.cpp:712 Client/loader/Utils.cpp:1457
 msgid "Finishing..."
-msgstr "جاري الإنتهاء..."
+msgstr "جاري الانتهاء..."
 
 #: Client/loader/Dialogs.cpp:716 Client/loader/Utils.cpp:1459
 msgid "Done!"
@@ -274,12 +274,12 @@ msgstr "خطأ في تحميل الوحدة البرمجية %s !(%s)"
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "تم الكشف عن تثبيت جديد لـ s%. \n\n"
-"هل تريد أن تنسخ اعداداتك من s% ?"
+"هل تريد أن تنسخ إعداداتك من s% ؟"
 
 #: Client/loader/Utils.cpp:1538
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA تواجه مشكلة في فتح الملف '%s'"
+msgstr "GTA:SA واجهت مشكلة في فتح الملف '%s'"
 
 #: Client/loader/Utils.cpp:1560
 #, c-format
@@ -378,8 +378,8 @@ msgstr "تعذر تحديث بسبب تعارض الملفات. الرجاء إ�
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
 #: Client/core/CConnectManager.cpp:329 Client/core/CConnectManager.cpp:415
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
-#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4261
-#: Client/core/CSettings.cpp:4289 Client/core/CSettings.cpp:4897
+#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4273
+#: Client/core/CSettings.cpp:4301 Client/core/CSettings.cpp:4909
 #: Client/core/CCore.cpp:1262 Client/core/CGUI.cpp:93
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1261
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1283
@@ -1081,9 +1081,9 @@ msgstr "قطع الاتصال"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1096
-#: Client/core/CSettings.cpp:3546 Client/core/CCore.cpp:670
+#: Client/core/CSettings.cpp:3552 Client/core/CCore.cpp:670
 msgid "In-game"
-msgstr "داخل اللعبة"
+msgstr "في اللعبة"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -1123,7 +1123,7 @@ msgstr "يركب القطار في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Flying around"
-msgstr "يطير حول"
+msgstr "يحلق حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Riding around"
@@ -1192,7 +1192,7 @@ msgstr "يركب الجت باك في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Literally on fire in"
-msgstr "حرفياً يحترق في"
+msgstr "حرفيًا يحترق في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Burning up in"
@@ -1208,14 +1208,14 @@ msgstr "يطفو في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Being chased by a shark"
-msgstr "يتم مطادرته من قبل سمك قرش"
+msgstr "تتم مطاردته من قبل سمك القرش"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Choking to death in"
 msgstr "يختنق حتى الموت في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:540
-#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3542
+#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3548
 #: Client/core/CCore.cpp:670
 msgid "Main menu"
 msgstr "القائمة الرئيسية"
@@ -1486,7 +1486,7 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "إعادة الإتصال: رقم المنفذ خاطئ"
+msgstr "إعادة الاتصال: رقم المنفذ خاطئ"
 
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
@@ -1667,7 +1667,7 @@ msgstr "سماح الاتصال بـ Discord Rich Presence"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:409
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr "أحفظ الصور المأخوذة بكاميرا السلاح لمجلد المستخدم جى تى أية سان أندرياس"
+msgstr "حفظ الصور الملتقطة بكاميرا السلاح في مجلد GTA San Andreas User Files"
 
 #: Client/core/CSettings.cpp:414
 msgid "Use customized GTA:SA files"
@@ -1853,7 +1853,7 @@ msgstr "مرتفعة جدًا"
 #: Client/core/CSettings.cpp:1041 Client/core/CSettings.cpp:1095
 #: Client/core/CSettings.cpp:1231 Client/core/CSettings.cpp:1561
 #: Client/core/CSettings.cpp:3193 Client/core/CSettings.cpp:3225
-#: Client/core/CSettings.cpp:3267 Client/core/CSettings.cpp:4329
+#: Client/core/CSettings.cpp:3273 Client/core/CSettings.cpp:4341
 msgid "Off"
 msgstr "إيقاف"
 
@@ -1986,49 +1986,49 @@ msgstr "متنوعات"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1034
-#: Client/core/CSettings.cpp:4936
+#: Client/core/CSettings.cpp:4948
 msgid "Fast CJ clothes loading:"
 msgstr "تحميل سريع لملابس CJ:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1048
-#: Client/core/CSettings.cpp:4938
+#: Client/core/CSettings.cpp:4950
 msgid "Browser speed:"
 msgstr "سرعة المتصفح:"
 
 #. Single download
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1062
-#: Client/core/CSettings.cpp:4940
+#: Client/core/CSettings.cpp:4952
 msgid "Single connection:"
 msgstr "اتصال واحد:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1075
-#: Client/core/CSettings.cpp:4942
+#: Client/core/CSettings.cpp:4954
 msgid "Packet tag:"
 msgstr "شعار الرزم:"
 
 #. Progress animation
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1088
-#: Client/core/CSettings.cpp:4944
+#: Client/core/CSettings.cpp:4956
 msgid "Progress animation:"
 msgstr "حركة التقدم:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1101
-#: Client/core/CSettings.cpp:4934
+#: Client/core/CSettings.cpp:4946
 msgid "Process priority:"
 msgstr "أولوية العمل:"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1115
-#: Client/core/CSettings.cpp:4946
+#: Client/core/CSettings.cpp:4958
 msgid "Debug setting:"
 msgstr "إعداد التصحيح:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:1028 Client/core/CSettings.cpp:1138
-#: Client/core/CSettings.cpp:4948
+#: Client/core/CSettings.cpp:4960
 msgid "Streaming memory:"
 msgstr "استخدام الذاكرة العشوائية:"
 
@@ -2058,7 +2058,7 @@ msgstr "بطيء جدًا"
 #: Client/core/CSettings.cpp:1232 Client/core/CSettings.cpp:1252
 #: Client/core/CSettings.cpp:3204 Client/core/CSettings.cpp:3211
 #: Client/core/CSettings.cpp:3218 Client/core/CSettings.cpp:3227
-#: Client/core/CSettings.cpp:3260
+#: Client/core/CSettings.cpp:3266
 msgid "Default"
 msgstr "الافتراضي"
 
@@ -2338,86 +2338,86 @@ msgstr "إعدادات GTA SA بـ التحكم"
 msgid "MULTIPLAYER CONTROLS"
 msgstr "إعدادات متعدد اللاعبين"
 
-#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4897
+#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4909
 msgid "Your nickname contains invalid characters!"
 msgstr "اسمك المستعار يحتوي على حروف ممنوعة!"
 
-#: Client/core/CSettings.cpp:3873
+#: Client/core/CSettings.cpp:3885
 msgid "Red:"
 msgstr "أحمر:"
 
-#: Client/core/CSettings.cpp:3873
+#: Client/core/CSettings.cpp:3885
 msgid "Green:"
 msgstr "أخضر:"
 
-#: Client/core/CSettings.cpp:3873
+#: Client/core/CSettings.cpp:3885
 msgid "Blue:"
 msgstr "أزرق:"
 
-#: Client/core/CSettings.cpp:3873
+#: Client/core/CSettings.cpp:3885
 msgid "Transparency:"
 msgstr "الشفافية:"
 
-#: Client/core/CSettings.cpp:3876
+#: Client/core/CSettings.cpp:3888
 msgid "Color"
 msgstr "اللون"
 
-#: Client/core/CSettings.cpp:3953
+#: Client/core/CSettings.cpp:3965
 msgid "Preview"
 msgstr "معاينة"
 
-#: Client/core/CSettings.cpp:4261
+#: Client/core/CSettings.cpp:4273
 msgid "Please disconnect before changing language"
 msgstr "يرجى قطع الاتصال من بالخادم قبل تغيير اللغة"
 
-#: Client/core/CSettings.cpp:4289
+#: Client/core/CSettings.cpp:4301
 msgid "Please disconnect before changing skin"
 msgstr "يرجى قطع الاتصال عن الخادم قبل تغيير الشخصية"
 
-#: Client/core/CSettings.cpp:4577
+#: Client/core/CSettings.cpp:4589
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "الظلال الحجمية من الممكن أن تسبب بطئ للنظام.\n\n"
 "هل انت متأكد بأنك تريد تفعيلها؟"
 
-#: Client/core/CSettings.cpp:4581
+#: Client/core/CSettings.cpp:4593
 msgid "PERFORMANCE WARNING"
 msgstr "تحذير بالنسبة للأداء"
 
-#: Client/core/CSettings.cpp:4601
+#: Client/core/CSettings.cpp:4613
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "رفع لقطة من الشاشة قد تكون إلزامية لبعض الخوادم لأسباب تتعلق بمكافحة الغش.\n\n"
 "(مربع الدردشة وواجهة اللعبة مستبعدتان من اللقطة)\n"
 
-#: Client/core/CSettings.cpp:4603
+#: Client/core/CSettings.cpp:4615
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "معلومات عن رفع صورة الشاشة"
 
-#: Client/core/CSettings.cpp:4618
+#: Client/core/CSettings.cpp:4630
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr "بعض النصوص(السكربتات) ربما تقوم بتشغيل اصوات, كالراديو مثلاً عن طريق الإنترنت.\n\n"
 "تعطيل هذا الخيار ربما يقلل من إستهلاك الإنترنت.\n"
 
-#: Client/core/CSettings.cpp:4621
+#: Client/core/CSettings.cpp:4633
 msgid "EXTERNAL SOUNDS"
 msgstr "الأصوات الخارجية"
 
-#: Client/core/CSettings.cpp:4650
+#: Client/core/CSettings.cpp:4662
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr "يبدو أنك واقفت علي الاتصال بينك وبين الديسكورد.\n"
-"هل تود مشاركة بياناتك مع الخوادم؟\n\n"
-"يتضمن ذلك معرف الهوية الخاص بك."
+msgstr "يبدو أنك مفعل خيار الاتصال بالديسكورد.\n"
+"هل ترغب بالسماح بمشاركة بياناته للخوادم؟\n\n"
+"يتضمن ذلك المعرف الخاص بك."
 
-#: Client/core/CSettings.cpp:4655
+#: Client/core/CSettings.cpp:4667
 msgid "CONSENT TO ALLOW DATA SHARING"
 msgstr "الموافقة على السماح بمشاركة بياناتك"
 
-#: Client/core/CSettings.cpp:4679
+#: Client/core/CSettings.cpp:4691
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -2427,11 +2427,11 @@ msgstr "بعض الملفات في مسار لعبة GTA:SA معدل عليها 
 "ولكن، الملفات المعدل عليها مسبقًا محظورة من قبل الكثير من الخوادم.\n\n"
 "هل أنت متأكد بأنك تريد استخدامهم؟"
 
-#: Client/core/CSettings.cpp:4685 Client/core/CVersionUpdater.cpp:2081
+#: Client/core/CSettings.cpp:4697 Client/core/CVersionUpdater.cpp:2081
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "ملفات مخصصة GTA:SA"
 
-#: Client/core/CSettings.cpp:4728
+#: Client/core/CSettings.cpp:4740
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -2441,92 +2441,92 @@ msgstr "ميزة معرف الـDPI هي حالياً تجريبية و\n"
 "ربما تواجه مشاكل رسومية في حالة إستخدام هذه الميزة.\n\n"
 "هل أنت متأكد بأنك تريد استخدام هذه الميزة؟"
 
-#: Client/core/CSettings.cpp:4734 Client/core/CSettings.cpp:4783
+#: Client/core/CSettings.cpp:4746 Client/core/CSettings.cpp:4795
 msgid "EXPERIMENTAL FEATURE"
 msgstr "ميزة قيد التجريب"
 
-#: Client/core/CSettings.cpp:4776
+#: Client/core/CSettings.cpp:4788
 msgid "Enabling this setting may improve game performance, but on some processors, it may worsen it.\n"
 "We have observed issues with AMD Ryzen processors featuring 3D V-Cache.\n"
 "The exact list of affected processors is unknown.\n\n"
 "Are you sure you  want to enable this option?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4915
+#: Client/core/CSettings.cpp:4927
 msgid "Please enter a nickname"
 msgstr "الرجاء إدخال إسم مستعار"
 
-#: Client/core/CSettings.cpp:4916
+#: Client/core/CSettings.cpp:4928
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "الرجاء إدخال الإسم المستعار لاستخدامه في اللعبة.\n"
 "وسيكون هذا الاسم عند الاتصال و اللعب في الخادم. "
 
-#: Client/core/CSettings.cpp:4934
+#: Client/core/CSettings.cpp:4946
 msgid "Very experimental feature."
 msgstr "خاصية تجريبية جداً."
 
-#: Client/core/CSettings.cpp:4936
+#: Client/core/CSettings.cpp:4948
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "توقف الشك بوجود اختلافات CJ (يستخدم 65MB أكثر RAM)"
 
-#: Client/core/CSettings.cpp:4938
+#: Client/core/CSettings.cpp:4950
 msgid "Older routers may require a slower scan speed."
 msgstr "المودمات القديمة قد تتطلب سرعة مسح أبطأ"
 
-#: Client/core/CSettings.cpp:4940
+#: Client/core/CSettings.cpp:4952
 msgid "Switch on to use only one connection when downloading."
 msgstr "التحول إلى استخدام اتصال واحد فقط عند تنزيل."
 
-#: Client/core/CSettings.cpp:4942
+#: Client/core/CSettings.cpp:4954
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "وضع علامة على حزام الشبكة لمساعدة مزود خدمة الإنترنت في التعرف على حركة MTA."
 
-#: Client/core/CSettings.cpp:4944
+#: Client/core/CSettings.cpp:4956
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "دوار التحميل الظاهر أسفل الشاشة"
 
-#: Client/core/CSettings.cpp:4946
+#: Client/core/CSettings.cpp:4958
 msgid "Select default always. (This setting is not saved)"
 msgstr "حدد الافتراضي دائماً. (لم يتم حفظ هذا الإعداد)"
 
-#: Client/core/CSettings.cpp:4948
+#: Client/core/CSettings.cpp:4960
 msgid "Maximum is usually best"
 msgstr "الحد الأقصى هو الأفضل عادةً"
 
-#: Client/core/CSettings.cpp:4950 Client/core/CSettings.cpp:4952
+#: Client/core/CSettings.cpp:4962 Client/core/CSettings.cpp:4964
 msgid "Auto updater:"
 msgstr "تحديث تلقائي:"
 
-#: Client/core/CSettings.cpp:4950
+#: Client/core/CSettings.cpp:4962
 msgid "Select default unless you like filling out bug reports."
 msgstr "تحديد الإفتراضي إلا إذا كنت تفضل تعبئة تقارير الأخطاء"
 
-#: Client/core/CSettings.cpp:4952
+#: Client/core/CSettings.cpp:4964
 msgid "Select default to automatically install important updates."
 msgstr "اختر الأفتراضي حتى يتم تثبيت التحديثات المهمة تلقائياً."
 
-#: Client/core/CSettings.cpp:4954
+#: Client/core/CSettings.cpp:4966
 msgid "16-bit color:"
 msgstr "ألوان 16-بت:"
 
-#: Client/core/CSettings.cpp:4954
+#: Client/core/CSettings.cpp:4966
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "تفعيل وضع الألوان 16 بت - ستحتاج إلى إعادة تشغيل MTA"
 
-#: Client/core/CSettings.cpp:4956
+#: Client/core/CSettings.cpp:4968
 msgid "Mouse fix:"
 msgstr "إصلاح الفأرة:"
 
-#: Client/core/CSettings.cpp:4956
+#: Client/core/CSettings.cpp:4968
 msgid "Mouse movement fix - May need PC restart"
 msgstr "إصلاح حركة الفأرة - قد يتطلب إعادة تشغيل الجهاز"
 
-#: Client/core/CSettings.cpp:4958
+#: Client/core/CSettings.cpp:4970
 msgid "CPU affinity:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4958
+#: Client/core/CSettings.cpp:4970
 msgid "Experimental feature - It may improve performance or worsen it."
 msgstr ""
 
@@ -3336,7 +3336,7 @@ msgstr "هل أنت متأكد من أنك تريد استخدام دقة الش
 
 #: Client/game_sa/CGameSA.cpp:253 Client/game_sa/CGameSA.cpp:264
 msgid "Failed initialization game_sa"
-msgstr "فشل تهية game_sa"
+msgstr "فشل تهيئة game_sa"
 
 #: Client/game_sa/CGameSA.cpp:255
 msgid "Memory allocations failed"
