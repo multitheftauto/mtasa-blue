@@ -104,6 +104,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementFrozen", setElementFrozen},
         {"setLowLODElement", setLowLODElement},
         {"setElementOnFire", ArgumentParser<SetElementOnFire>},
+        {"setElementCollidableWith", ArgumentParser<SetElementCollidableWith>},
     };
 
     // Add functions
@@ -2459,4 +2460,9 @@ bool CLuaElementDefs::IsElementOnFire(CElement* element) noexcept
 bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire) noexcept
 {
     return CStaticFunctionDefinitions::SetElementOnFire(element, onFire);
+}
+
+ bool CLuaElementDefs::SetElementCollidableWith(CElement* element, CElement* withElement, bool canCollide)
+{
+    return CStaticFunctionDefinitions::SetElementCollidableWith(element, withElement, canCollide);
 }
