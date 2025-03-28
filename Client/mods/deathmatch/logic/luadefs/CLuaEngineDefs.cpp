@@ -326,12 +326,12 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
                     {
                         // Delete it again. We failed
                         delete pCol;
-                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading COL");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading COL");
                     }
                 }
                 else
                 {
-                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Bad file path");
                 }
             }
         }
@@ -398,12 +398,12 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                     {
                         // Delete it again
                         delete pDFF;
-                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading DFF");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading DFF");
                     }
                 }
                 else
                 {
-                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Bad file path");
                 }
             }
         }
@@ -472,11 +472,11 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                     {
                         // Delete it again
                         delete pTXD;
-                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading TXD");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading TXD");
                     }
                 }
                 else
-                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Bad file path");
             }
         }
     }
@@ -537,12 +537,12 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
                     }
                     else
                     {
-                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading IFP");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading IFP");
                     }
                 }
                 else
                 {
-                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Bad file path");
                 }
             }
         }
@@ -656,7 +656,7 @@ CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string st
     // Get the resource we belong to
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return false;
+        return nullptr;
 
     std::string strFullPath;
 

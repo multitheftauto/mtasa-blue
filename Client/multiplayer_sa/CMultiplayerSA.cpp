@@ -3829,6 +3829,18 @@ static void SetObjectAlpha()
     }
 }
 
+void Handle_ObjRndr()
+{
+    TIMING_CHECKPOINT("+ObjRndr");
+    SetObjectAlpha();
+}
+
+void Handle_ObjRndrF()
+{
+    TIMING_CHECKPOINT("-ObjRndr");
+    RestoreAlphaValues();
+}
+
 DWORD dwCObjectRenderRet = 0;
 void _declspec(naked) HOOK_CObject_PostRender()
 {
@@ -3837,8 +3849,10 @@ void _declspec(naked) HOOK_CObject_PostRender()
         pushad
     }
 
-    TIMING_CHECKPOINT("-ObjRndr");
-    RestoreAlphaValues();
+    _asm
+    {
+        call Handle_ObjRndrF
+    }
 
     _asm
     {
@@ -3857,8 +3871,10 @@ void _declspec(naked) HOOK_CObject_Render()
         pushad
     }
 
-    TIMING_CHECKPOINT("+ObjRndr");
-    SetObjectAlpha();
+    _asm
+    {
+        call Handle_ObjRndr
+    }
 
     _asm
     {
@@ -5040,6 +5056,21 @@ void _declspec(naked) HOOK_ApplyCarBlowHop()
 
 // ---------------------------------------------------
 
+void Handle_CWorld_Process()
+{
+    TIMING_CHECKPOINT("+CWorld_Process");
+    if (m_pPreWorldProcessHandler)
+        m_pPreWorldProcessHandler();
+}
+
+void Handle_CWorld_ProcessF()
+{
+    if (m_pPostWorldProcessHandler)
+        m_pPostWorldProcessHandler();
+
+    TIMING_CHECKPOINT("-CWorld_Process");
+}
+
 DWORD CALL_CWorld_Process = 0x5684a0;
 void _declspec(naked) HOOK_CGame_Process()
 {
@@ -5048,9 +5079,10 @@ void _declspec(naked) HOOK_CGame_Process()
         pushad
     }
 
-    TIMING_CHECKPOINT("+CWorld_Process");
-    if (m_pPreWorldProcessHandler)
-        m_pPreWorldProcessHandler();
+    _asm
+    {
+        call Handle_CWorld_Process
+    }
 
     _asm
     {
@@ -5060,9 +5092,10 @@ void _declspec(naked) HOOK_CGame_Process()
         pushad
     }
 
-    if (m_pPostWorldProcessHandler) m_pPostWorldProcessHandler();
-
-    TIMING_CHECKPOINT("-CWorld_Process");
+    _asm
+    {
+        call Handle_CWorld_ProcessF
+    }
 
     _asm
     {
@@ -5084,22 +5117,40 @@ void __cdecl HandleIdle()
     m_pIdleHandler();
 }
 
-DWORD CALL_CGame_Process = 0x53BEE0;
-void _declspec(naked) HOOK_Idle()
+void CGame_Process()
 {
     TIMING_CHECKPOINT("+CGame_Process");
-    _asm
-    {
-        call    CALL_CGame_Process
-        pushad
-    }
+}
 
+void CGame_ProcessF()
+{
     TIMING_CHECKPOINT("-CGame_Process");
+}
 
+void Idle()
+{
     TIMING_CHECKPOINT("+Idle");
     if (m_pIdleHandler)
         HandleIdle();
     TIMING_CHECKPOINT("-Idle");
+}
+
+DWORD CALL_CGame_Process = 0x53BEE0;
+void _declspec(naked) HOOK_Idle()
+{
+    _asm
+    {
+        call    CGame_Process
+        call    CALL_CGame_Process
+        pushad
+    }
+
+    _asm
+    {
+        call CGame_ProcessF
+
+        call Idle
+    }
 
     _asm
     {
@@ -6429,8 +6480,16 @@ void                RemovePointerToBuilding()
 DWORD dwCWorldRemove = 0x563280;
 // Call to CWorld::Remove in CPopulation::ConvertToDummyObject this is called just before deleting a CObject so we remove the CObject while we are there and
 // remove the new dummy if we need to do so before returning
-void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
+void Handle_CWorld_Remove_CPopulation_ConvertToDummyObject()
 {
+    TIMING_CHECKPOINT("+RemovePointerToBuilding");
+    RemovePointerToBuilding();
+    StorePointerToBuilding();
+    RemoveObjectIfNeeded();
+    TIMING_CHECKPOINT("-RemovePointerToBuilding");
+}
+
+void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject(){
     _asm
     {
         pushad
@@ -6438,11 +6497,12 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
         mov pBuildingAdd, edi
         mov pLODInterface, edi
     }
-    TIMING_CHECKPOINT("+RemovePointerToBuilding");
-    RemovePointerToBuilding();
-    StorePointerToBuilding();
-    RemoveObjectIfNeeded();
-    TIMING_CHECKPOINT("-RemovePointerToBuilding");
+
+    _asm
+    {
+        call Handle_CWorld_Remove_CPopulation_ConvertToDummyObject
+    }
+
     _asm
     {
         popad
@@ -6463,6 +6523,16 @@ void RemoveDummyIfReplaced()
     }
 }
 
+void Handle_CheckForRemoval()
+{
+    TIMING_CHECKPOINT("+CheckForRemoval");
+}
+
+void Handle_CheckForRemovalF()
+{
+    TIMING_CHECKPOINT("-CheckForRemoval");
+}
+
 // Function that handles dummy -> object so we can cancel this process if need be
 void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
 {
@@ -6473,11 +6543,17 @@ void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
         mov pBuildingAdd, edi
     }
 
-    TIMING_CHECKPOINT("+CheckForRemoval");
+    _asm
+    {
+        call Handle_CheckForRemoval
+    }
     StorePointerToBuilding();
     if (CheckForRemoval())
     {
-        TIMING_CHECKPOINT("-CheckForRemoval");
+        _asm
+        {
+            call Handle_CheckForRemovalF
+        }
         _asm
         {
             popad
@@ -6486,7 +6562,10 @@ void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
     }
     else
     {
-        TIMING_CHECKPOINT("-CheckForRemoval");
+        _asm
+        {
+            call Handle_CheckForRemovalF
+        }
         _asm
         {
             popad
@@ -7291,7 +7370,7 @@ void PostCWorld_ProcessPedsAfterPreRender()
 const DWORD CWorld_ProcessPedsAfterPreRender = 0x563430;
 void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
 {
-    __asm
+    _asm
     {
        call CWorld_ProcessPedsAfterPreRender
        call PostCWorld_ProcessPedsAfterPreRender
