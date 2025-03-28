@@ -146,18 +146,12 @@ CObjectSA::~CObjectSA()
         {
             pGame->GetRopes()->RemoveEntityRope(pInterface);
 
-            if ((DWORD)pInterface->vtbl != VTBL_CPlaceable)
+            if (!pInterface->IsPlaceableVTBL())
             {
                 CWorldSA* world = (CWorldSA*)pGame->GetWorld();
                 world->Remove(pInterface, CObject_Destructor);
 
-                DWORD dwFunc = pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
-                _asm
-                {
-                    mov     ecx, pInterface
-                    push    1            // delete too
-                    call    dwFunc
-                }
+                pInterface->Destructor(true);
             }
         }
 
@@ -233,22 +227,10 @@ float CObjectSA::GetHealth()
 void CObjectSA::SetModelIndex(unsigned long ulModel)
 {
     // Delete any existing RwObject first
-    DWORD dwFunc = GetInterface()->vtbl->DeleteRwObject;
-    DWORD dwThis = (DWORD)GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    GetInterface()->DeleteRwObject();
 
-    // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
-    dwFunc = GetInterface()->vtbl->SetModelIndex;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    ulModel
-        call    dwFunc
-    }
+    // Jax: I'm not sure if using the virtual method is right (as ped and vehicle dont), but it works
+    GetInterface()->SetModelIndex(ulModel);
 
     CheckForGangTag();
 }

@@ -610,8 +610,14 @@ void CClientPed::Teleport(const CVector& vecPosition)
                         SetFrozenWaitingForGroundToLoad(true);
                 }
 
+                // Player has jetpack?
+                bool hasJetpack = HasJetPack();
+
                 // Set the real position
                 m_pPlayerPed->Teleport(vecPosition.fX, vecPosition.fY, vecPosition.fZ);
+
+                // Restore jetpack
+                SetHasJetPack(hasJetpack);
             }
         }
     }
@@ -4596,6 +4602,10 @@ bool CClientPed::HasJetPack()
         CTask* pPrimaryTask = m_pTaskManager->GetSimplestActiveTask();
         if (pPrimaryTask && pPrimaryTask->GetTaskType() == TASK_SIMPLE_JETPACK)
         {
+            auto* jetpackTask = dynamic_cast<CTaskSimpleJetPack*>(pPrimaryTask);
+            if (jetpackTask && jetpackTask->IsFinished())
+                return false;
+
             return true;
         }
         return false;
@@ -5270,6 +5280,14 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             }
         }
     }
+}
+
+void CClientPed::Say(const ePedSpeechContext& speechId, float probability)
+{
+    if (!m_pPlayerPed)
+        return;
+
+    m_pPlayerPed->Say(speechId, probability);
 }
 
 const char* CClientPed::GetBodyPartName(unsigned char ucID)

@@ -1,12 +1,14 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        ceflauncher/Main.cpp
  *  PURPOSE:     CEF launcher entry point
  *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
  *****************************************************************************/
+
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <delayimp.h>
@@ -43,6 +45,21 @@ int _declspec(dllexport) InitCEF()
     CefScopedSandboxInfo scopedSandbox;
     sandboxInfo = scopedSandbox.sandbox_info();
 #endif
+
+    if (HANDLE job = CreateJobObjectW(nullptr, nullptr); job != nullptr)
+    {
+        JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
+        limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+
+        if (SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
+        {
+            AssignProcessToJobObject(job, GetCurrentProcess());
+        }
+        else
+        {
+            CloseHandle(job);
+        }
+    }
 
     return CefExecuteProcess(mainArgs, app, sandboxInfo);
 }

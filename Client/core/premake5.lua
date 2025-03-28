@@ -57,6 +57,10 @@ project "Client Core"
 		"PNG_SETJMP_NOT_SUPPORTED"
 	}
 
+	prebuildcommands {
+		"%[%{!wks.location}/../utils/gen_language_list.exe] %[%{!wks.location}/../Shared/data/MTA San Andreas/MTA/locale] %[languages.generated.h]"
+	}
+
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 

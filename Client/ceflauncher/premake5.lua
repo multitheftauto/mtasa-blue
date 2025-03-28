@@ -7,16 +7,13 @@ project "CEFLauncher"
 	cppdialect "C++20"
 
 	includedirs { "../sdk" }
-
 	links { "CEFLauncher DLL"}
-	entrypoint "WinMainCRTStartup"
 
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
-
 
 	files {
 		"premake5.lua",

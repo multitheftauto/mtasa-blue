@@ -246,7 +246,6 @@ CGameSA::CGameSA()
         CVehicleSA::StaticSetHooks();
         CCheckpointSA::StaticSetHooks();
         CHudSA::StaticSetHooks();
-        CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
@@ -1040,14 +1039,6 @@ void CGameSA::SetupBrokenModels()
 {
     FixModelCol(3118, 3059);
     FixModelCol(3553, 3554);
-}
-
-// Well, has it?
-bool CGameSA::HasCreditScreenFadedOut()
-{
-    BYTE ucAlpha = *(BYTE*)0xBAB320;            // CLoadingScreen::m_FadeAlpha
-    bool bCreditScreenFadedOut = (GetSystemState() >= 7) && (ucAlpha < 6);
-    return bCreditScreenFadedOut;
 }
 
 // Ensure replaced/restored textures for models in the GTA map are correct

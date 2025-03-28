@@ -28,10 +28,13 @@
 
 #define SIZEOF_CPLAYERPED               1956
 
-class CPlayerPedSAInterface : public CPedSAInterface            // CPlayerPed 1956 bytes in SA
+class CPlayerPedSAInterface : public CPedSAInterface
 {
 public:
+    CEntitySAInterface* mouseTargetEntity;
+    std::uint8_t        field_7A0[4];
 };
+static_assert(sizeof(CPlayerPedSAInterface) == 0x7A4, "Invalid size for CPlayerPedSAInterface");
 
 class CPlayerPedSA : public virtual CPlayerPed, public virtual CPedSA
 {
@@ -52,7 +55,10 @@ public:
     eMoveAnim GetMoveAnim();
     void      SetMoveAnim(eMoveAnim iAnimGroup);
 
-    CPlayerPedSAInterface* GetPlayerPedInterface() { return static_cast<CPlayerPedSAInterface*>(m_pInterface); };
+    CEntity* GetTargetedEntity() const override;
+    void SetTargetedEntity(CEntity* targetEntity) override;
+
+    CPlayerPedSAInterface* GetPlayerPedInterface() const noexcept { return static_cast<CPlayerPedSAInterface*>(m_pInterface); };
 
     static void StaticSetHooks();
 };
