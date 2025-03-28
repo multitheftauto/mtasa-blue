@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-23 20:04+0000\n"
-"PO-Revision-Date: 2025-03-27 23:51\n"
+"PO-Revision-Date: 2025-03-28 00:54\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -137,7 +137,7 @@ msgstr "MTA: San Andreas - خيارات مربكة"
 
 #: Client/loader/Dialogs.cpp:82
 msgid "NVidia Optimus detected!"
-msgstr "تم إكتشاف NVidia Optimus!"
+msgstr "تم اكتشاف NVidia Optimus!"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "Try each option and see what works:"
@@ -193,13 +193,13 @@ msgstr "MTA تعذرت الكشف عن مكافح فيروسات في هذا ا�
 
 #: Client/loader/Dialogs.cpp:104
 msgid "I have already installed an anti-virus"
-msgstr "انا قد ثبت مكافح فيروسات مسبقًا"
+msgstr "أنا قد ثبت مكافح فيروسات مسبقًا"
 
 #: Client/loader/Dialogs.cpp:106
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "لن أثبت مكافح فيروسات.\n"
-"أريد ان يصاب جهازي بالبطأ."
+"أريد أن يصاب جهازي بالبطء."
 
 #: Client/loader/Dialogs.cpp:678
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -227,7 +227,7 @@ msgstr "تم إكمال نسخ الملفات مبكرًا. كل شيء على �
 
 #: Client/loader/Dialogs.cpp:712 Client/loader/Utils.cpp:1457
 msgid "Finishing..."
-msgstr "جاري الإنتهاء..."
+msgstr "جاري الانتهاء..."
 
 #: Client/loader/Dialogs.cpp:716 Client/loader/Utils.cpp:1459
 msgid "Done!"
@@ -274,12 +274,12 @@ msgstr "خطأ في تحميل الوحدة البرمجية %s !(%s)"
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "تم الكشف عن تثبيت جديد لـ s%. \n\n"
-"هل تريد أن تنسخ اعداداتك من s% ?"
+"هل تريد أن تنسخ إعداداتك من s% ؟"
 
 #: Client/loader/Utils.cpp:1538
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA تواجه مشكلة في فتح الملف '%s'"
+msgstr "GTA:SA واجهت مشكلة في فتح الملف '%s'"
 
 #: Client/loader/Utils.cpp:1560
 #, c-format
@@ -1486,7 +1486,7 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "إعادة الإتصال: رقم المنفذ خاطئ"
+msgstr "إعادة الاتصال: رقم المنفذ خاطئ"
 
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
@@ -1667,7 +1667,7 @@ msgstr "سماح الاتصال بـ Discord Rich Presence"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:409
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr "أحفظ الصور المأخوذة بكاميرا السلاح لمجلد المستخدم جى تى أية سان أندرياس"
+msgstr "حفظ الصور الملتقطة بكاميرا السلاح في مجلد GTA San Andreas User Files"
 
 #: Client/core/CSettings.cpp:414
 msgid "Use customized GTA:SA files"
@@ -2409,9 +2409,9 @@ msgstr "الأصوات الخارجية"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr "يبدو أنك واقفت علي الاتصال بينك وبين الديسكورد.\n"
-"هل تود مشاركة بياناتك مع الخوادم؟\n\n"
-"يتضمن ذلك معرف الهوية الخاص بك."
+msgstr "يبدو أنك مفعل خيار الاتصال بالديسكورد.\n"
+"هل ترغب بالسماح بمشاركة بياناته للخوادم؟\n\n"
+"يتضمن ذلك المعرف الخاص بك."
 
 #: Client/core/CSettings.cpp:4667
 msgid "CONSENT TO ALLOW DATA SHARING"
@@ -3336,7 +3336,7 @@ msgstr "هل أنت متأكد من أنك تريد استخدام دقة الش
 
 #: Client/game_sa/CGameSA.cpp:253 Client/game_sa/CGameSA.cpp:264
 msgid "Failed initialization game_sa"
-msgstr "فشل تهية game_sa"
+msgstr "فشل تهيئة game_sa"
 
 #: Client/game_sa/CGameSA.cpp:255
 msgid "Memory allocations failed"
