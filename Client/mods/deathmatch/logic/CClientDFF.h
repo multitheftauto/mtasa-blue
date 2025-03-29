@@ -37,7 +37,7 @@ public:
 
     bool Load(bool isRaw, SString input);
 
-    bool AddClothingModel(std::string modelName);
+    bool AddClothingModel(const std::string& modelName);
     bool ReplaceModel(unsigned short usModel, bool bAlphaTransparency);
 
     bool HasReplaced(unsigned short usModel);
