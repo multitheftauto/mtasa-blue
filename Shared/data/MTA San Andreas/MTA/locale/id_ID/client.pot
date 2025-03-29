@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-23 20:04+0000\n"
-"PO-Revision-Date: 2025-03-29 07:21\n"
+"PO-Revision-Date: 2025-03-29 08:21\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -739,35 +739,35 @@ msgstr "perkecil peta pemain"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "pindahkan peta pemain kearah utara"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "pindahkan peta pemain kearah selatan"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "pindahkan peta pemain kearah timur"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "pindahkan peta pemain kearah barat"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "melampirkan peta pemain"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "mengurangi opasitas peta pemain"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "menambahkan opasitas peta pemain"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "mengaktifkan teks bantuan peta pemain"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -949,7 +949,7 @@ msgstr "Terputus: Verifikasi serial gagal"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "Terputuskan: Serial sudah terpakai"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -1097,104 +1097,104 @@ msgstr "Berkeliling sekitar"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:376
 msgid "Riding the waves of"
-msgstr ""
+msgstr "Menunggangi ombak"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Riding the train in"
-msgstr ""
+msgstr "Menaiki kereta pada"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Flying around"
-msgstr ""
+msgstr "Terbang berkeliling"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Riding around"
-msgstr ""
+msgstr "Berkeliling"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "Berkeliling menggunakan Truk Monster"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Quaddin' around"
-msgstr ""
+msgstr "Berkeliling dengan kendaraan empat roda"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "Melompat-lompat sekeliling"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "Melakukan hal aneh di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Climbing around in"
-msgstr ""
+msgstr "Memanjat-manjat pada"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "Melakukan sebuah drive-by pada"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blub blub..."
-msgstr ""
+msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Breathing water"
-msgstr ""
+msgstr "Menghirup air"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Drowning in"
-msgstr ""
+msgstr "Tenggelam di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "Menunduk untuk perlindungan di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Fighting in"
-msgstr ""
+msgstr "Bertarung di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Throwing fists in"
-msgstr ""
+msgstr "Bertarung tangan di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "Meledakkan orang bodoh di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Shooting up"
-msgstr ""
+msgstr "Menembaki"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Jetpacking in"
-msgstr ""
+msgstr "Meng-jetpack di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Literally on fire in"
-msgstr ""
+msgstr "Benar-benar terbakar di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Burning up in"
-msgstr ""
+msgstr "Terbakar di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Swimming in"
-msgstr ""
+msgstr "Berenang di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Floating around in"
-msgstr ""
+msgstr "Melayang-layang di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "Sedang dikejar oleh seekor hiu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Choking to death in"
-msgstr ""
+msgstr "Tersedak hingga mati di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:540
 #: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3548
@@ -1242,7 +1242,7 @@ msgstr "Area 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1035
 msgid "Walking around "
-msgstr ""
+msgstr "Berjalan-jalan "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1181
 #, c-format
@@ -1319,46 +1319,46 @@ msgstr "Verifikasi klien MTA gagal!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5637
 msgid "In a ditch"
-msgstr ""
+msgstr "Di sebuah selokan"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5637
 msgid "En-route to hospital"
-msgstr ""
+msgstr "Dalam perjalanan ke rumah sakit"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5637
 msgid "Meeting their maker"
-msgstr ""
+msgstr "Menemui sang pencipta mereka"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5638
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "Menyesali keputusan mereka"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5638
 msgid "Wasted"
-msgstr ""
+msgstr "Meninggal"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "Ubah mode: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "Pembesaran: %s %s Pergerakan: %s, %s, %s, %s Opasitas: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "Aktifkan peta: %s Aktifkan teks bantuan: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr ""
+msgstr "Mengikuti Pemain"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr ""
+msgstr "Bebaskan Gerakan"
 
 #: Client/core/CConnectManager.cpp:85
 msgid "Connecting failed. Invalid nick provided!"
@@ -1382,7 +1382,7 @@ msgstr "Menyambungkan ke %s:%u ..."
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "Menyambung ulang ke %s:%u ..."
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
@@ -1425,7 +1425,7 @@ msgstr "PERINGATAN PEMUTUSAN"
 
 #: Client/core/CMainMenu.cpp:1212
 msgid "INFORMATION"
-msgstr ""
+msgstr "INFORMASI"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -1438,7 +1438,7 @@ msgstr "* Waktunya adalah %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "menyambung: Jaringan belum siap, mohon tunggu sebentar"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -1464,21 +1464,21 @@ msgstr "menyambung: Gagal untuk melepas mod"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "menyambung ulang: Jaringan belum siap, mohon tunggu sebentar"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "menyambung ulang: Nomor port yang tidak bagus"
 
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "menyambung ulang: Menyambung ulang ke %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "menyambung ulang: tidak dapat menyambung ke %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:359
 msgid "Bound all controls from GTA"
@@ -1649,7 +1649,7 @@ msgstr "Perbolehkan penyambungan dengan Discord Rich Presence"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:409
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "Menyimpan foto yang diambil oleh kamera senjata ke folder GTA San Andreas User Files"
 
 #: Client/core/CSettings.cpp:414
 msgid "Use customized GTA:SA files"
@@ -1665,16 +1665,16 @@ msgstr "Opasitas:"
 
 #: Client/core/CSettings.cpp:447
 msgid "Image resolution:"
-msgstr ""
+msgstr "Resolusi gambar:"
 
 #: Client/core/CSettings.cpp:454
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (Bawaan)"
 
 #. index 0
 #: Client/core/CSettings.cpp:455
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -1930,7 +1930,7 @@ msgstr "Aktifkan Javascript di situs web yang dikendalikan"
 
 #: Client/core/CSettings.cpp:939
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "Aktifkan render GPU"
 
 #: Client/core/CSettings.cpp:943
 msgid "Custom blacklist"
@@ -2089,7 +2089,7 @@ msgstr "Tampilkan di Explorer"
 #. Process affinity
 #: Client/core/CSettings.cpp:1211
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
+msgstr "Atur afinitas CPU ke 0 untuk meningkatkan performa game"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1217 Client/core/CSettings.cpp:1220
@@ -2431,7 +2431,10 @@ msgid "Enabling this setting may improve game performance, but on some processor
 "We have observed issues with AMD Ryzen processors featuring 3D V-Cache.\n"
 "The exact list of affected processors is unknown.\n\n"
 "Are you sure you  want to enable this option?"
-msgstr ""
+msgstr "Mengaktifkan pengaturan ini mungkin akan meningkatkan performa game tapi pada beberapa prosesor, pengaturan ini mungkin memperburuk performa. \n"
+"Kami telah memperhatikan masalah dengan prosesor AMD Ryzen yang dilengkapi oleh 3D V-Cache.\n"
+"Daftar prosesor yang terpengaruhi masih tidak diketahui.\n\n"
+"Apakah Anda yakin ingin mengaktifkan opsi ini?"
 
 #: Client/core/CSettings.cpp:4927
 msgid "Please enter a nickname"
@@ -2505,11 +2508,11 @@ msgstr "Penetapan gerakan mouse - Mungkin PC perlu dimulai ulang"
 
 #: Client/core/CSettings.cpp:4970
 msgid "CPU affinity:"
-msgstr ""
+msgstr "Afinitas CPU:"
 
 #: Client/core/CSettings.cpp:4970
 msgid "Experimental feature - It may improve performance or worsen it."
-msgstr ""
+msgstr "Fitur eksperimental - Fitur ini mungkin meningkatkan atau memperburuk performa."
 
 #: Client/core/CScreenShot.cpp:117
 #, c-format
@@ -2608,7 +2611,8 @@ msgstr "Pembaruan direkomendasikan oleh server, tapi tidak wajib.\n\n"
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr ""
+msgstr "Pembaruan tidak tersedia saat ini.\n\n"
+"Mohon periksa www.mtasa.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -3306,11 +3310,11 @@ msgstr "Apa anda yakin ingin menggunakan resolusi layar ini?"
 
 #: Client/game_sa/CGameSA.cpp:253 Client/game_sa/CGameSA.cpp:264
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "Gagal menginisialisasi game_sa"
 
 #: Client/game_sa/CGameSA.cpp:255
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "Gagal mengalokasikan memori"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
