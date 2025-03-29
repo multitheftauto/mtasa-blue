@@ -31,6 +31,8 @@
  * SUCH DAMAGE.
  */
 
+#include <cstdint>
+
 #ifndef SHA2_H
 #define SHA2_H
 
@@ -46,9 +48,9 @@
 
 #ifndef SHA2_TYPES
 #define SHA2_TYPES
-typedef unsigned char      uint8;
-typedef unsigned int       uint32;
-typedef unsigned long long uint64;
+using uint8 = std::uint8_t;
+using uint32 = std::uint32_t;
+using uint64 = std::uint64_t;
 #endif
 
 #ifdef __cplusplus
