@@ -215,8 +215,8 @@ skip:
 // Speeds up clothes a bit, but is only part of a solution - The actual files from inside player.img are still loaded each time
 //
 
-std::uint32_t g_playerImgEntries = 0xBBCDC8;
-std::uint16_t g_playerImgSize = 0x226;
+static std::uint32_t g_playerImgEntries = 0xBBCDC8;
+static std::uint16_t g_playerImgSize = 0x226;
 
 bool IsPlayerImgDirLoaded()
 {
