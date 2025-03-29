@@ -30,7 +30,7 @@ public:
     CVehicleUpgrades(CClientVehicle* pVehicle);
 
     static bool IsUpgrade(unsigned short usModel);
-    bool IsUpgradeCompatible(const std::uint16_t upgrade);
+    bool        IsUpgradeCompatible(const std::uint16_t upgrade) noexcept;
     static bool GetSlotFromUpgrade(unsigned short usUpgrade, unsigned char& ucSlot);
 
     bool               AddUpgrade(unsigned short usUpgrade, bool bAddedLocally);
@@ -52,4 +52,5 @@ protected:
     CClientVehicle* m_pVehicle;
     ushort          m_usLastLocalAddNitroType;
     CElapsedTime    m_lastLocalAddNitroTimer;
+    std::unordered_map<std::uint16_t, std::unordered_set<std::uint16_t>> m_slots;
 };
