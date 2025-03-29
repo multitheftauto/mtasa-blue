@@ -2973,7 +2973,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
             // Grab the ped with the chosen ID
             ElementID PedID = Packet.GetPedID();
             CElement* pPedElement = CElementIDs::GetElement(PedID);
-            if (pPedElement && IS_PED(pPedElement) && (pPedElement == pPlayer || !IS_PLAYER(pPedElement)))
+            if (pPedElement && IS_PED(pPedElement))
             {
                 CPed*     pPed = static_cast<CPed*>(pPedElement);
                 bool      bValidPed = false;
