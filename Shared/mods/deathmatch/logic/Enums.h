@@ -93,6 +93,7 @@ enum class WorldSpecialProperty
     TUNNELWEATHERBLEND,
     IGNOREFIRESTATE,
     FLYINGCOMPONENTS,
+    VEHICLEBURNEXPLOSIONS,
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 
