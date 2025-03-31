@@ -1772,12 +1772,17 @@ void CCore::ApplyCoreInitSettings()
 #if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
     const auto aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
+    // The minimum supported client for the function below is Windows Vista (Longhorn).
+    // For more information, refer to the Microsoft Learn article:
+    // https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
     if (aware)
         SetProcessDPIAware();
 #endif
 
     const auto revision = GetApplicationSettingInt("reset-settings-revision");
 
+    // Users with the default skin will be switched to the 2023 version by replacing "Default" with "Default 2023".
+    // The "Default 2023" GUI skin was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
     if (revision < 21486)
     {
         const auto skin = CVARS_GET_VALUE<std::string>("current_skin");
