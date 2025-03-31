@@ -3242,17 +3242,23 @@ void CSettings::LoadData()
     CVARS_GET("process_cpu_affinity", bVar);
     m_pProcessAffinityCheckbox->SetSelected(bVar);
 
-    DWORD_PTR affinityMask = 0;
-    if (bVar)
-        affinityMask = 1 << 0; // CPU 0 only
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+
+    const auto process = GetCurrentProcess();
+    const auto result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (bVar && result)
+    {
+        SetProcessAffinityMask(process, mask & ~1);
+    }
     else
     {
-        SYSTEM_INFO sysInfo;
-        GetSystemInfo(&sysInfo);
+        SYSTEM_INFO info;
 
-        affinityMask = (1 << sysInfo.dwNumberOfProcessors) - 1; // All cores (default)
+        GetSystemInfo(&info);
+        SetProcessAffinityMask(process, (1 << info.dwNumberOfProcessors) - 1);
     }
-    SetProcessAffinityMask(GetCurrentProcess(), affinityMask);
 
     // Update build type
     CVARS_GET("update_build_type", iVar);
@@ -3651,20 +3657,26 @@ void CSettings::SaveData()
     CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
 
     // Process CPU Affinity
-    bool cpuAffinity = m_pProcessAffinityCheckbox->GetSelected();
-    CVARS_SET("process_cpu_affinity", cpuAffinity);
+    const auto affinity = m_pProcessAffinityCheckbox->GetSelected();
+    CVARS_SET("process_cpu_affinity", affinity);
 
-    DWORD_PTR affinityMask = 0;
-    if (cpuAffinity)
-        affinityMask = 1 << 0;  // CPU 0 only
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+
+    const auto process = GetCurrentProcess();
+    const auto result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (affinity && result)
+    {
+        SetProcessAffinityMask(process, mask & ~1);
+    }
     else
     {
-        SYSTEM_INFO sysInfo;
-        GetSystemInfo(&sysInfo);
+        SYSTEM_INFO info;
 
-        affinityMask = (1 << sysInfo.dwNumberOfProcessors) - 1; // All cores (default)
+        GetSystemInfo(&info);
+        SetProcessAffinityMask(process, (1 << info.dwNumberOfProcessors) - 1);
     }
-    SetProcessAffinityMask(GetCurrentProcess(), affinityMask);
 
     // Debug setting
     if (CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem())
