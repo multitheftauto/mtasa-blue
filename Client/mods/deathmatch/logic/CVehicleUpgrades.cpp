@@ -129,7 +129,7 @@ bool CVehicleUpgrades::IsUpgrade(unsigned short usModel)
     return (usModel >= 1000 && usModel <= 1193);
 }
 
-bool CVehicleUpgrades::IsUpgradeCompatible(const std::uint16_t upgrade) noexcept
+bool CVehicleUpgrades::IsUpgradeCompatible(const std::uint16_t upgrade)
 {
     const auto type = m_pVehicle->GetVehicleType();
 
