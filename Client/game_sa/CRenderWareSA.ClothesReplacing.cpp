@@ -146,7 +146,10 @@ bool CRenderWareSA::ClothesAddFile(const char* fileData, std::size_t fileSize, c
 
     DirectoryInfoSA entry{};
     entry.m_streamingSize = GetSizeInBlocks(fileSize);
-    std::strncpy(entry.m_name, fileName, sizeof(entry.m_name));
+
+    std::size_t nameSize = sizeof(entry.m_name) - 1;
+    std::strncpy(entry.m_name, fileName, nameSize);
+    entry.m_name[nameSize] = '\0';
 
     if (!g_clothesDirectory->AddEntry(entry))
         return false;
