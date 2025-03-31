@@ -34,7 +34,7 @@ bool CDirectorySAInterface::AddEntry(DirectoryInfoSA& entry)
 
 bool CDirectorySAInterface::RemoveEntry(const char* fileName)
 {
-    if (m_numEntries <= 0)
+    if (m_numEntries == 0)
         return false;
 
     DirectoryInfoSA* entry = GetModelEntry(fileName);
@@ -60,7 +60,7 @@ bool CDirectorySAInterface::RemoveEntry(const char* fileName)
 
 DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(const char* fileName)
 {
-    if (m_numEntries <= 0)
+    if (m_numEntries == 0)
         return nullptr;
 
     for (DirectoryInfoSA* it = m_entries; it != m_entries + m_numEntries; it++)
@@ -74,7 +74,7 @@ DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(const char* fileName)
 
 DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(std::uint16_t modelId)
 {
-    if (m_numEntries <= 0)
+    if (m_numEntries == 0)
         return nullptr;
 
     DirectoryInfoSA* entry = m_entries + modelId;
