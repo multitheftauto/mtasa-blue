@@ -1778,15 +1778,15 @@ void CCore::ApplyCoreInitSettings()
 
     const auto revision = GetApplicationSettingInt("reset-settings-revision");
 
-    if (revision >= 21486)
-        return;
+    if (revision < 21486)
+    {
+        const auto skin = CVARS_GET_VALUE<std::string>("current_skin");
 
-    const auto skin = CVARS_GET_VALUE<std::string>("current_skin");
+        if (skin == "Default")
+            CVARS_SET("current_skin", "Default 2023");
 
-    if (skin == "Default")
-        CVARS_SET("current_skin", "Default 2023");
-
-    SetApplicationSettingInt("reset-settings-revision", 21486);
+        SetApplicationSettingInt("reset-settings-revision", 21486);
+    }
 
     const auto process = GetCurrentProcess();
     const int  priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
