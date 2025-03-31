@@ -235,7 +235,7 @@ void CClientPlayerClothes::InternalAddClothes(const SPlayerClothing* pClothing, 
         {
             if (pClothing && !IsEmptyClothing(pClothing, ucType))
             {
-                pPlayerPed->SetClothesTextureAndModel(pClothing->szTexture.c_str(), pClothing->szModel.c_str(), ucType);
+                pPlayerPed->SetClothesTextureAndModel(pClothing->texture.c_str(), pClothing->model.c_str(), ucType);
             }
             else
             {
@@ -381,7 +381,7 @@ const SPlayerClothing* CClientPlayerClothes::GetClothing(const char* szTexture, 
 
     for (const auto& clothing : pGroup)
     {
-        if (!stricmp(szTexture, clothing->szTexture.c_str()) && !stricmp(szModel, clothing->szModel.c_str()))
+        if (!stricmp(szTexture, clothing->texture.c_str()) && !stricmp(szModel, clothing->model.c_str()))
         {
             return clothing;
         }
@@ -415,7 +415,7 @@ bool CClientPlayerClothes::AddClothingModel(const char* texture, const char* mod
         auto& clothes = m_NewClothes[clothingType];
 
         if (std::any_of(clothes.begin(), clothes.end(), [&](const SPlayerClothing& clothing) {
-            return !stricmp(texture, clothing.szTexture.c_str()) && !stricmp(model, clothing.szModel.c_str());
+            return !stricmp(texture, clothing.texture.c_str()) && !stricmp(model, clothing.model.c_str());
         }))
         {
             return false;
@@ -438,7 +438,7 @@ bool CClientPlayerClothes::RemoveClothingModel(const char* texture, const char* 
         auto& clothes = m_NewClothes[clothingType];
 
         auto it = std::find_if(clothes.begin(), clothes.end(),[&](const SPlayerClothing& clothing) {
-            return !stricmp(texture, clothing.szTexture.c_str()) && !stricmp(model, clothing.szModel.c_str());
+            return !stricmp(texture, clothing.texture.c_str()) && !stricmp(model, clothing.model.c_str());
         });
 
         if (it == clothes.end())
@@ -474,12 +474,12 @@ void CClientPlayerClothes::RefreshClothes()
        {
            for (auto clothing = clothes.begin(); clothing != clothes.end();)
            {
-               std::string fileTXD = clothing->szTexture + ".txd";
-               std::string fileDFF = clothing->szModel + ".dff";
+               std::string fileTXD = clothing->texture + ".txd";
+               std::string fileDFF = clothing->model + ".dff";
 
                if (!g_pGame->GetRenderWare()->HasClothesFile(fileTXD.c_str()) || !g_pGame->GetRenderWare()->HasClothesFile(fileDFF.c_str()))
                {
-                   if (pCurrent && (pCurrent->szTexture == clothing->szTexture || pCurrent->szModel == clothing->szModel))
+                   if (pCurrent && (pCurrent->texture == clothing->texture || pCurrent->model == clothing->model))
                    {
                         hasInvalidClothing = true;
                    }
@@ -493,7 +493,7 @@ void CClientPlayerClothes::RefreshClothes()
 
        if (pCurrent && !hasInvalidClothing && m_bHasClothesChanged)
        {
-           const SPlayerClothing* pClothing = GetClothing(pCurrent->szTexture.c_str(), pCurrent->szModel.c_str(), clothingType);
+           const SPlayerClothing* pClothing = GetClothing(pCurrent->texture.c_str(), pCurrent->model.c_str(), clothingType);
 
            if (!pClothing)
            {

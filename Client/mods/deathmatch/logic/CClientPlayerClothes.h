@@ -41,8 +41,8 @@ struct SPlayerClothingType
 
 struct SPlayerClothing
 {
-    std::string szTexture;
-    std::string szModel;
+    std::string texture;
+    std::string model;
 };
 
 class CClientPlayerClothes

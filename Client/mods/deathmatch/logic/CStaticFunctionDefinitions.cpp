@@ -1702,8 +1702,8 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     const SPlayerClothing* pClothing = Ped.GetClothes()->GetClothing(ucType);
     if (pClothing)
     {
-        strOutTexture = pClothing->szTexture;
-        strOutModel = pClothing->szModel;
+        strOutTexture = pClothing->texture;
+        strOutModel = pClothing->model;
         return true;
     }
 
@@ -2626,8 +2626,8 @@ bool CStaticFunctionDefinitions::GetClothesByTypeIndex(unsigned char ucType, uns
     if (ucIndex > (pPlayerClothing.size() - 1))
         return false;
 
-    strOutTexture = pPlayerClothing.at(ucIndex)->szTexture;
-    strOutModel = pPlayerClothing.at(ucIndex)->szModel;
+    strOutTexture = pPlayerClothing.at(ucIndex)->texture;
+    strOutModel = pPlayerClothing.at(ucIndex)->model;
 
     return true;
 }
@@ -2644,8 +2644,8 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, 
         if (!pPlayerClothing.empty()) {
             for (unsigned char ucIter = 0; ucIter < pPlayerClothing.size(); ucIter++)
             {
-                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter]->szTexture.c_str()) == 0) &&
-                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter]->szModel.c_str()) == 0))
+                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter]->texture.c_str()) == 0) &&
+                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter]->model.c_str()) == 0))
                 {
                     ucTypeReturn = ucType;
                     ucIndexReturn = ucIter;
