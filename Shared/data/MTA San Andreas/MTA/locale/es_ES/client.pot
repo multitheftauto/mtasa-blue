@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-23 20:04+0000\n"
-"PO-Revision-Date: 2025-04-01 02:54\n"
+"PO-Revision-Date: 2025-04-01 03:54\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -1429,7 +1429,7 @@ msgstr "ALERTA DE DESCONEXIÓN"
 
 #: Client/core/CMainMenu.cpp:1212
 msgid "INFORMATION"
-msgstr ""
+msgstr "INFORMACIÓN"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -1442,7 +1442,7 @@ msgstr "* La hora es %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "connect: La red no está lista, por favor espera un momento."
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -1468,7 +1468,7 @@ msgstr "connect: Error al desactivar la modificación actual"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "reconnect: La red no está lista, por favor espera un momento."
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
@@ -1678,7 +1678,7 @@ msgstr "1024 x 1024 (Por defecto)"
 #. index 0
 #: Client/core/CSettings.cpp:455
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -2437,7 +2437,10 @@ msgid "Enabling this setting may improve game performance, but on some processor
 "We have observed issues with AMD Ryzen processors featuring 3D V-Cache.\n"
 "The exact list of affected processors is unknown.\n\n"
 "Are you sure you  want to enable this option?"
-msgstr ""
+msgstr "Activar está opción puede mejorar el rendimiento del juego, pero en algunos procesadores, lo puede llegar a empeorar.\n"
+"Hemos observado problemas con los procesadores AMD Ryzen que tienen la tecnología 3D V-Cache.\n"
+"La lista exacta de procesadores afectados es desconocida.\n\n"
+"¿Estás seguro que quieres activar esta opción?"
 
 #: Client/core/CSettings.cpp:4927
 msgid "Please enter a nickname"
@@ -2511,11 +2514,11 @@ msgstr "Arreglo del movimiento del ratón - Puede que se necesite reiniciar el e
 
 #: Client/core/CSettings.cpp:4970
 msgid "CPU affinity:"
-msgstr ""
+msgstr "Afinidad CPU:"
 
 #: Client/core/CSettings.cpp:4970
 msgid "Experimental feature - It may improve performance or worsen it."
-msgstr ""
+msgstr "Experimental - Puede mejorar como empeorar el rendimiento."
 
 #: Client/core/CScreenShot.cpp:117
 #, c-format
