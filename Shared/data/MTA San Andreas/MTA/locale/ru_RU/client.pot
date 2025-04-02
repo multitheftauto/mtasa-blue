@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-23 20:04+0000\n"
-"PO-Revision-Date: 2025-04-02 20:31\n"
+"PO-Revision-Date: 2025-04-02 21:34\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -103,7 +103,7 @@ msgstr "MTA: San Andreas - Предупреждение"
 
 #: Client/loader/Dialogs.cpp:67
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Ваша папка установки Grand Theft Auto: San Andreas содержит следующие файлы:"
+msgstr "Директория с Grand Theft Auto: San Andreas содержит файл:"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
@@ -403,7 +403,7 @@ msgstr "Создание GTA:SA соединения"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA не может запуститься потому что копирование файлов неудачно:"
+msgstr "MTA:SA не может запуститься, потому что копирование файлов неудачно:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
@@ -725,7 +725,7 @@ msgstr "Пред. радиостанция"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr "включает просмотр карты игрока"
+msgstr "радар: Отобразить/Спрятать"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
@@ -737,35 +737,35 @@ msgstr "увеличивает масштаб карты игрока из"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "перемещает карту игрока север"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "перемещает карту игрока на юг"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "перемещает карту игрока на восток"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "перемещает карту игрока на запад"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "прикрепляет карту игрока"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "уменьшает непрозрачность карты игрока"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "увеличивает непрозрачность карты игрока"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "карта: Вкл/откл помощь"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -1127,11 +1127,11 @@ msgstr "Крушит все вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Quaddin' around"
-msgstr "Ездит на квадроцикле вокруг"
+msgstr "Катаюсь на квадроциклах по округе"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Bunny hopping around"
-msgstr "Банни-хоппит вокруг"
+msgstr "Кролик прыгает вокруг"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing weird stuff in"
@@ -1148,7 +1148,7 @@ msgstr "Давит кого-то в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blub blub..."
-msgstr "Плаки плаки..."
+msgstr "Рыдания, рыдания..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Breathing water"
@@ -1180,7 +1180,7 @@ msgstr "Стреляет вверх"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Jetpacking in"
-msgstr "Летает на джетпаке в"
+msgstr "Реактивный ранец в"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Literally on fire in"
@@ -1474,7 +1474,7 @@ msgstr "подключение: Не удалось выгрузить теку�
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "повторное подключение: сеть не готова, пожалуйста, подождите немного"
+msgstr "подключение: Сеть не готова, пожалуйста, подождите немного"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
@@ -1483,12 +1483,12 @@ msgstr "повторное подключение: неверный номер �
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr "переподключение: повторное подключение к %s:%u..."
+msgstr "подключение: Подключение к %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr "подключение к %s:%u не удалось!"
+msgstr "подключение: к %s:%u не удалось!"
 
 #: Client/core/CCommandFuncs.cpp:359
 msgid "Bound all controls from GTA"
@@ -1900,7 +1900,7 @@ msgstr "Дым шин и т.д."
 
 #: Client/core/CSettings.cpp:847
 msgid "Dynamic ped shadows"
-msgstr "Динамические тени от педов"
+msgstr "Динамические тени от персонажа"
 
 #: Client/core/CSettings.cpp:851
 msgid "Motion blur"
@@ -2520,7 +2520,7 @@ msgstr "Исправить движения мыши - Необходим пер
 
 #: Client/core/CSettings.cpp:4970
 msgid "CPU affinity:"
-msgstr "Сходство с CPU:"
+msgstr "Соответствие ЦП:"
 
 #: Client/core/CSettings.cpp:4970
 msgid "Experimental feature - It may improve performance or worsen it."
@@ -3332,7 +3332,7 @@ msgstr "Неудачная инициализация game_sa"
 
 #: Client/game_sa/CGameSA.cpp:255
 msgid "Memory allocations failed"
-msgstr "Сбой при выделении памяти"
+msgstr "Ошибка выделения памяти"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
