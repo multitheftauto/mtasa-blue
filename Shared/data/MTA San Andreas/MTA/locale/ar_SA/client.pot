@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-23 20:04+0000\n"
-"PO-Revision-Date: 2025-03-28 00:54\n"
+"PO-Revision-Date: 2025-04-03 22:01\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1662,7 +1662,7 @@ msgstr "إظهار نافذة التنزيل دائمًا"
 
 #: Client/core/CSettings.cpp:403
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "سماح الاتصال بـ Discord Rich Presence"
+msgstr "السماح بالاتصال بـ Discord Rich Presence"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:409
@@ -3040,7 +3040,7 @@ msgstr[5] "لاعبون"
 
 #: Client/core/ServerBrowser/CServerList.cpp:151
 msgid "on"
-msgstr "يعمل"
+msgstr "في"
 
 #: Client/core/ServerBrowser/CServerList.cpp:154
 msgid "server"
