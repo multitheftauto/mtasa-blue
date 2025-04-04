@@ -1770,7 +1770,7 @@ void CCore::OnPostColorFilterRender()
 void CCore::ApplyCoreInitSettings()
 {
 #if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
-    const auto aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
+    bool aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
     // The minimum supported client for the function below is Windows Vista (Longhorn).
     // For more information, refer to the Microsoft Learn article:
@@ -1779,13 +1779,13 @@ void CCore::ApplyCoreInitSettings()
         SetProcessDPIAware();
 #endif
 
-    const auto revision = GetApplicationSettingInt("reset-settings-revision");
+    int revision = GetApplicationSettingInt("reset-settings-revision");
 
     // Users with the default skin will be switched to the 2023 version by replacing "Default" with "Default 2023".
     // The "Default 2023" GUI skin was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
     if (revision < 21486)
     {
-        const auto skin = CVARS_GET_VALUE<std::string>("current_skin");
+        auto skin = CVARS_GET_VALUE<std::string>("current_skin");
 
         if (skin == "Default")
             CVARS_SET("current_skin", "Default 2023");
@@ -1793,25 +1793,21 @@ void CCore::ApplyCoreInitSettings()
         SetApplicationSettingInt("reset-settings-revision", 21486);
     }
 
-    const auto process = GetCurrentProcess();
-    const int  priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
-    const auto priority = CVARS_GET_VALUE<int>("process_priority") % 3;
+    HANDLE process = GetCurrentProcess();
+    const int priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
+    int priority = CVARS_GET_VALUE<int>("process_priority") % 3;
 
     SetPriorityClass(process, priorities[priority]);
 
-    const auto affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
-
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
     if (!affinity)
         return;
 
     DWORD_PTR mask;
     DWORD_PTR sys;
-    const auto result = GetProcessAffinityMask(process, &mask, &sys);
-
-    if (!result)
-        return;
-
-    SetProcessAffinityMask(process, mask & ~1);
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //
