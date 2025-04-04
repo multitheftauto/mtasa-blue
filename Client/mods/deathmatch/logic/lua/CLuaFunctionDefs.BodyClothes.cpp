@@ -102,3 +102,47 @@ int CLuaFunctionDefs::GetClothesTypeName(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaFunctionDefs::AddClothingModel(lua_State* luaVM)
+{
+    std::uint8_t     clothingType = 0;
+    SString          texture, model;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(texture);
+    argStream.ReadString(model, "");
+    argStream.ReadNumber(clothingType);
+
+    if (!argStream.HasErrors())
+    {
+        if (CClientPlayerClothes::AddClothingModel(texture, model, clothingType))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::RemoveClothingModel(lua_State* luaVM)
+{
+    std::uint8_t     clothingType = 0;
+    SString          texture, model;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(texture);
+    argStream.ReadString(model, "");
+    argStream.ReadNumber(clothingType);
+
+    if (!argStream.HasErrors())
+    {
+        if (CClientPlayerClothes::RemoveClothingModel(texture, model, clothingType))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}

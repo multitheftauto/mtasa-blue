@@ -27,6 +27,7 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTTXD; }
     bool              Load(bool isRaw, SString input, bool enableFiltering);
+    bool              AddClothingTexture(const std::string& modelName);
     bool              Import(unsigned short usModelID);
     static bool       IsImportableModel(unsigned short usModelID);
     static bool       IsTXDData(const SString& strData);
