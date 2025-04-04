@@ -33,7 +33,7 @@ namespace
     std::unordered_map<ushort, std::uint16_t> ms_OriginalStreamingSizesMap;
     std::unordered_map<std::string, char*>    ms_ClothesFileDataMap;
 
-    bool bClothesReplacementChanged = false;
+    bool clothesReplacementChanged = false;
 
     struct SPlayerImgItem
     {
@@ -79,7 +79,7 @@ void CRenderWareSA::ClothesAddReplacement(char* pFileData, size_t fileSize, usho
         MapSet(ms_OriginalStreamingSizesMap, usFileId, g_clothesDirectory->GetModelStreamingSize(usFileId));
         g_clothesDirectory->SetModelStreamingSize(usFileId, GetSizeInBlocks(fileSize));
 
-        bClothesReplacementChanged = true;
+        clothesReplacementChanged = true;
     }
 }
 
@@ -108,7 +108,7 @@ void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
             }
 
             iter = ms_ReplacementClothesFileDataMap.erase(iter);
-            bClothesReplacementChanged = true;
+            clothesReplacementChanged = true;
         }
         else
             ++iter;
@@ -124,8 +124,8 @@ void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::HasClothesReplacementChanged()
 {
-    bool bResult = bClothesReplacementChanged;
-    bClothesReplacementChanged = false;
+    bool bResult = clothesReplacementChanged;
+    clothesReplacementChanged = false;
     return bResult;
 }
 
@@ -155,7 +155,7 @@ bool CRenderWareSA::ClothesAddFile(const char* fileData, std::size_t fileSize, c
         return false;
 
     MapSet(ms_ClothesFileDataMap, fileName, const_cast<char*>(fileData));
-    bClothesReplacementChanged = true;
+    clothesReplacementChanged = true;
 
     return true;
 }
@@ -180,7 +180,7 @@ bool CRenderWareSA::ClothesRemoveFile(char* fileData)
                 return false;
 
             iter = ms_ClothesFileDataMap.erase(iter);
-            bClothesReplacementChanged = true;
+            clothesReplacementChanged = true;
         }
         else
             ++iter;
