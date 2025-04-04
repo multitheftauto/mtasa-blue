@@ -5,6 +5,8 @@ project "Loader Proxy"
 	targetdir(buildpath("mta"))
 	targetsuffix ""
 
+	cppdialect "C++20"
+
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources"] = { "*.cpp" },

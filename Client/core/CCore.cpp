@@ -60,13 +60,13 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
         const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
 
         if (fs::is_regular_file(inLaunchDir, ec))
-            return Win32LoadLibraryA(inLaunchDir.u8string().c_str());
+            return Win32LoadLibraryA(PathToUtf8(inLaunchDir).c_str());
 
         // Try to load enbhelper.dll from the GTA install directory second.
         const fs::path inGTADir = g_gtaDirectory / "enbseries" / "enbhelper.dll";
 
         if (fs::is_regular_file(inGTADir, ec))
-            return Win32LoadLibraryA(inGTADir.u8string().c_str());
+            return Win32LoadLibraryA(PathToUtf8(inGTADir).c_str());
 
         return nullptr;
     }
