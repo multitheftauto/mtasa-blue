@@ -679,10 +679,7 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
         pGame->GetRenderWareSA()->GetTxdTextures(textureList, pTxd);
         for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
         {
-            RwTexture* pTexture = *iter;
-            while (pTexture->refs > 1)
-                RwTextureDestroy(pTexture);
-            RwTextureDestroy(pTexture);
+            RwTextureDestroy(*iter);
         }
     }
 
