@@ -129,31 +129,22 @@ bool CVehicleUpgrades::IsUpgrade(unsigned short usModel)
     return (usModel >= 1000 && usModel <= 1193);
 }
 
-bool CVehicleUpgrades::IsUpgradeCompatible(const std::uint16_t upgrade)
+bool CVehicleUpgrades::IsUpgradeCompatible(std::uint16_t upgrade)
 {
-    const auto type = m_pVehicle->GetVehicleType();
+    auto type = m_pVehicle->GetVehicleType();
 
     if (type == CLIENTVEHICLE_TRAIN || type == CLIENTVEHICLE_BOAT)
-    {
         return false;
-    }
 
-    auto model = m_pVehicle->GetModel();
+    std::uint16_t model = m_pVehicle->GetModel();
     auto* info = g_pGame->GetModelInfo(model);
 
     if (info && info->GetParentID() != 0)
-    {
         model = static_cast<std::uint16_t>(info->GetParentID());
-    }
 
     const auto it = slots.find(model);
 
-    if (it == slots.end())
-    {
-        return false;
-    }
-
-    return it->second.count(upgrade) > 0;
+    return it != slots.end() && it->second.count(upgrade) > 0;
 }
 
 bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSlot)
