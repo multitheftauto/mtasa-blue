@@ -1016,12 +1016,66 @@ void CClientPed::SetTargetTarget(unsigned long ulDelay, const CVector& vecSource
         float fRadius = DistanceBetweenPoints3D(m_vecTargetSource, m_vecTargetTarget);
 
         // Grab the angle of the source vector and the angle of the target vector relative to the source vector that applies
-        m_vecBeginTargetAngle.fX = acos((m_vecBeginTarget.fX - m_vecBeginSource.fX) / fRadius);
-        m_vecBeginTargetAngle.fY = acos((m_vecBeginTarget.fY - m_vecBeginSource.fY) / fRadius);
-        m_vecBeginTargetAngle.fZ = acos((m_vecBeginTarget.fZ - m_vecBeginSource.fZ) / fRadius);
-        m_vecTargetTargetAngle.fX = acos((m_vecTargetTarget.fX - m_vecTargetSource.fX) / fRadius);
-        m_vecTargetTargetAngle.fY = acos((m_vecTargetTarget.fY - m_vecTargetSource.fY) / fRadius);
-        m_vecTargetTargetAngle.fZ = acos((m_vecTargetTarget.fZ - m_vecTargetSource.fZ) / fRadius);
+        m_vecBeginTargetAngle.fX = (m_vecBeginTarget.fX - m_vecBeginSource.fX) / fRadius;
+        if (m_vecBeginTargetAngle.fX > 1)
+        {
+            m_vecBeginTargetAngle.fX = 1;
+        }
+        else if (m_vecBeginTargetAngle.fX < -1)
+        {
+            m_vecBeginTargetAngle.fX = -1;
+        }
+        m_vecBeginTargetAngle.fX = acos(m_vecBeginTargetAngle.fX);
+        m_vecBeginTargetAngle.fY = (m_vecBeginTarget.fY - m_vecBeginSource.fY) / fRadius;
+        if (m_vecBeginTargetAngle.fY > 1)
+        {
+            m_vecBeginTargetAngle.fY = 1;
+        }
+        else if (m_vecBeginTargetAngle.fY < -1)
+        {
+            m_vecBeginTargetAngle.fY = -1;
+        }
+        m_vecBeginTargetAngle.fY = acos(m_vecBeginTargetAngle.fY);
+        m_vecBeginTargetAngle.fZ = (m_vecBeginTarget.fZ - m_vecBeginSource.fZ) / fRadius;
+        if (m_vecBeginTargetAngle.fZ > 1)
+        {
+            m_vecBeginTargetAngle.fZ = 1;
+        }
+        else if (m_vecBeginTargetAngle.fZ < -1)
+        {
+            m_vecBeginTargetAngle.fZ = -1;
+        }
+        m_vecBeginTargetAngle.fZ = acos(m_vecBeginTargetAngle.fZ);
+        m_vecTargetTargetAngle.fX = (m_vecTargetTarget.fX - m_vecTargetSource.fX) / fRadius;
+        if (m_vecTargetTargetAngle.fX > 1)
+        {
+            m_vecTargetTargetAngle.fX = 1;
+        }
+        else if (m_vecTargetTargetAngle.fX < -1)
+        {
+            m_vecTargetTargetAngle.fX = -1;
+        }
+        m_vecTargetTargetAngle.fX = acos(m_vecTargetTargetAngle.fX);
+        m_vecTargetTargetAngle.fY = (m_vecTargetTarget.fY - m_vecTargetSource.fY) / fRadius;
+        if (m_vecTargetTargetAngle.fY > 1)
+        {
+            m_vecTargetTargetAngle.fY = 1;
+        }
+        else if (m_vecTargetTargetAngle.fY < -1)
+        {
+            m_vecTargetTargetAngle.fY = -1;
+        }
+        m_vecTargetTargetAngle.fY = acos(m_vecTargetTargetAngle.fY);
+        m_vecTargetTargetAngle.fZ = (m_vecTargetTarget.fZ - m_vecTargetSource.fZ) / fRadius;
+        if (m_vecTargetTargetAngle.fZ > 1)
+        {
+            m_vecTargetTargetAngle.fZ = 1;
+        }
+        else if (m_vecTargetTargetAngle.fZ < -1)
+        {
+            m_vecTargetTargetAngle.fZ = -1;
+        }
+        m_vecTargetTargetAngle.fZ = acos(m_vecTargetTargetAngle.fZ);
 
         // Grab the angle to interpolate and make sure it's below pi and above -pi (shortest path of interpolation)
         m_vecTargetInterpolateAngle = m_vecTargetTargetAngle - m_vecBeginTargetAngle;
