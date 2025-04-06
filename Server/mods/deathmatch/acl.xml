@@ -103,6 +103,7 @@
       <right name="function.removeAccount" access="false" />
       <right name="function.setAccountName" access="false" />
       <right name="function.setAccountPassword" access="false" />
+      <right name="function.setAccountSerial" access="false" />
       <right name="function.kickPlayer" access="false" />
       <right name="function.banPlayer" access="false" />
       <right name="function.getBans" access="false" />
@@ -188,6 +189,7 @@
       <right name="function.addAccount" access="true" />
       <right name="function.setAccountName" access="true" />
       <right name="function.setAccountPassword" access="true" />
+      <right name="function.setAccountSerial" access="true" />
       <right name="function.renameResource" access="true" />
       <right name="function.deleteResource" access="true" />
    </acl>
