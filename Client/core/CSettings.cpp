@@ -3242,17 +3242,21 @@ void CSettings::LoadData()
     CVARS_GET("process_cpu_affinity", bVar);
     m_pProcessAffinityCheckbox->SetSelected(bVar);
 
-    DWORD_PTR affinityMask = 0;
-    if (bVar)
-        affinityMask = 1 << 0; // CPU 0 only
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+
+    HANDLE process = GetCurrentProcess();
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (bVar && result)
+        SetProcessAffinityMask(process, mask & ~1);
     else
     {
-        SYSTEM_INFO sysInfo;
-        GetSystemInfo(&sysInfo);
+        SYSTEM_INFO info;
 
-        affinityMask = (1 << sysInfo.dwNumberOfProcessors) - 1; // All cores (default)
+        GetSystemInfo(&info);
+        SetProcessAffinityMask(process, (1 << info.dwNumberOfProcessors) - 1);
     }
-    SetProcessAffinityMask(GetCurrentProcess(), affinityMask);
 
     // Update build type
     CVARS_GET("update_build_type", iVar);
@@ -3651,20 +3655,24 @@ void CSettings::SaveData()
     CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
 
     // Process CPU Affinity
-    bool cpuAffinity = m_pProcessAffinityCheckbox->GetSelected();
-    CVARS_SET("process_cpu_affinity", cpuAffinity);
+    bool affinity = m_pProcessAffinityCheckbox->GetSelected();
+    CVARS_SET("process_cpu_affinity", affinity);
 
-    DWORD_PTR affinityMask = 0;
-    if (cpuAffinity)
-        affinityMask = 1 << 0;  // CPU 0 only
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+
+    HANDLE process = GetCurrentProcess();
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (affinity && result)
+        SetProcessAffinityMask(process, mask & ~1);
     else
     {
-        SYSTEM_INFO sysInfo;
-        GetSystemInfo(&sysInfo);
+        SYSTEM_INFO info;
 
-        affinityMask = (1 << sysInfo.dwNumberOfProcessors) - 1; // All cores (default)
+        GetSystemInfo(&info);
+        SetProcessAffinityMask(process, (1 << info.dwNumberOfProcessors) - 1);
     }
-    SetProcessAffinityMask(GetCurrentProcess(), affinityMask);
 
     // Debug setting
     if (CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem())
@@ -4773,9 +4781,7 @@ bool CSettings::OnAffinityClick(CGUIElement* pElement)
         shownWarning = true;
 
         std::string message = std::string(
-            _("Enabling this setting may improve game performance, but on some processors, it may worsen it.\n"
-              "We have observed issues with AMD Ryzen processors featuring 3D V-Cache.\n"
-              "The exact list of affected processors is unknown.\n"
+            _("This option should only be changed if you experience performance issues.\n"
               "\nAre you sure you  want to enable this option?"));
 
         CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
@@ -4955,7 +4961,7 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
     else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
-        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Experimental feature - It may improve performance or worsen it."));
+        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Experimental feature - Change only if you experience performance issues"));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());
