@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 #include <libpng/png.h>
-#include <libpng/pngstruct.h>
+#include <libpng/pngpriv.h>
 
 ///////////////////////////////////////////////////////////////
 //
