@@ -185,6 +185,8 @@ void CLuaManager::LoadCFunctions()
         {"getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex},
         {"getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes},
         {"getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName},
+        {"addClothingModel", CLuaFunctionDefs::AddClothingModel},
+        {"removeClothingModel", CLuaFunctionDefs::RemoveClothingModel},
 
         // Cursor funcs
         {"getCursorPosition", CLuaFunctionDefs::GetCursorPosition},
