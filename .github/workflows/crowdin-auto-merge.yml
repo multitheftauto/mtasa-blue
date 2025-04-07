@@ -28,4 +28,4 @@ jobs:
             git push origin --delete l10n/master
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.POT_CI_PAT }}

@@ -30,7 +30,7 @@ public:
     CVehicleUpgrades(CClientVehicle* pVehicle);
 
     static bool IsUpgrade(unsigned short usModel);
-    bool IsUpgradeCompatible(const std::uint16_t upgrade);
+    bool        IsUpgradeCompatible(unsigned short usUpgrade);
     static bool GetSlotFromUpgrade(unsigned short usUpgrade, unsigned char& ucSlot);
 
     bool               AddUpgrade(unsigned short usUpgrade, bool bAddedLocally);
