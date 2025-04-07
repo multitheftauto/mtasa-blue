@@ -18,6 +18,7 @@ enum eDisplayType
 {
     DISPLAY_TEXT,
     DISPLAY_VECTORGRAPHIC,
+    DISPLAY_GIF
 };
 
 class CClientDisplay
