@@ -189,7 +189,7 @@ HttpStatusCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* i
         strMessage += SString("Your IP address ('%s') is not associated with an authorized serial.", ipoHttpRequest->GetAddress().c_str());
         strMessage += SString("<br/><a href='%s'>See here for more information</a>",
                               "https:"
-                              "//mtasa.com/authserialhttp");
+                              "//multitheftauto.com/authserialhttp");
         ipoHttpResponse->SetBody(strMessage, strMessage.length());
         return HTTP_STATUS_CODE_401_UNAUTHORIZED;
     }

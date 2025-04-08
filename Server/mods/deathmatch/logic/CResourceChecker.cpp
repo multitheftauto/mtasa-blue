@@ -468,7 +468,7 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
         if (bClientScript && IsLuaCompiledScript(strFileContents.c_str(), strFileContents.length()))
         {
             // Compiled client script with no version info
-            SString strMessage("%s is invalid. Please re-compile at http://luac.mtasa.com/", strFileName.c_str());
+            SString strMessage("%s is invalid. Please re-compile at http://luac.multitheftauto.com/", strFileName.c_str());
             CLogger::LogPrint(SString("ERROR: %s %s\n", strResourceName.c_str(), *strMessage));
         }
         return false;
