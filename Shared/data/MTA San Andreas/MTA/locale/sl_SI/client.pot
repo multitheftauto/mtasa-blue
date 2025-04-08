@@ -648,7 +648,7 @@ msgstr ""
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr "Ni bilo mogoče zagnati Grand Theft Auto: San Andreas. Prosimo, da poskusite s ponovnim zagonom. Če pa se problem pojavlja, se obrnite na MTA na http://www.multitheftauto.com/ .\n\n"
+msgstr "Ni bilo mogoče zagnati Grand Theft Auto: San Andreas. Prosimo, da poskusite s ponovnim zagonom. Če pa se problem pojavlja, se obrnite na MTA na https://www.multitheftauto.com/ .\n\n"
 "[%s]"
 
 #: Client/loader/MainFunctions.cpp:1219
@@ -3322,7 +3322,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Usodna napaka (%u). Če se ta problem ponavlja, prosimo, da obiščete https://www.multitheftauto.com/ za podporo."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3331,7 +3331,9 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Napaka protokola (%u). Če se ta problem ponavlja, prosimo, da obiščete https://www.multitheftauto.com/ za podporo."
+
+
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"

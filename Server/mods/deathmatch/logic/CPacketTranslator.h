@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPacketTranslator.h
  *  PURPOSE:     Network packet translator class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

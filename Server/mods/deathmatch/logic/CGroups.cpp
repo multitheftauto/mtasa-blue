@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CGroups.cpp
  *  PURPOSE:     Entity (dummy) group manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

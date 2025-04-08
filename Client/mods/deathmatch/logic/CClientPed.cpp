@@ -1016,12 +1016,12 @@ void CClientPed::SetTargetTarget(unsigned long ulDelay, const CVector& vecSource
         float fRadius = DistanceBetweenPoints3D(m_vecTargetSource, m_vecTargetTarget);
 
         // Grab the angle of the source vector and the angle of the target vector relative to the source vector that applies
-        m_vecBeginTargetAngle.fX = acos((m_vecBeginTarget.fX - m_vecBeginSource.fX) / fRadius);
-        m_vecBeginTargetAngle.fY = acos((m_vecBeginTarget.fY - m_vecBeginSource.fY) / fRadius);
-        m_vecBeginTargetAngle.fZ = acos((m_vecBeginTarget.fZ - m_vecBeginSource.fZ) / fRadius);
-        m_vecTargetTargetAngle.fX = acos((m_vecTargetTarget.fX - m_vecTargetSource.fX) / fRadius);
-        m_vecTargetTargetAngle.fY = acos((m_vecTargetTarget.fY - m_vecTargetSource.fY) / fRadius);
-        m_vecTargetTargetAngle.fZ = acos((m_vecTargetTarget.fZ - m_vecTargetSource.fZ) / fRadius);
+        m_vecBeginTargetAngle.fX = acos(Clamp(-1.0f, (m_vecBeginTarget.fX - m_vecBeginSource.fX) / fRadius, 1.0f));
+        m_vecBeginTargetAngle.fY = acos(Clamp(-1.0f, (m_vecBeginTarget.fY - m_vecBeginSource.fY) / fRadius, 1.0f));
+        m_vecBeginTargetAngle.fZ = acos(Clamp(-1.0f, (m_vecBeginTarget.fZ - m_vecBeginSource.fZ) / fRadius, 1.0f));
+        m_vecTargetTargetAngle.fX = acos(Clamp(-1.0f, (m_vecTargetTarget.fX - m_vecTargetSource.fX) / fRadius, 1.0f));
+        m_vecTargetTargetAngle.fY = acos(Clamp(-1.0f, (m_vecTargetTarget.fY - m_vecTargetSource.fY) / fRadius, 1.0f));
+        m_vecTargetTargetAngle.fZ = acos(Clamp(-1.0f, (m_vecTargetTarget.fZ - m_vecTargetSource.fZ) / fRadius, 1.0f));
 
         // Grab the angle to interpolate and make sure it's below pi and above -pi (shortest path of interpolation)
         m_vecTargetInterpolateAngle = m_vecTargetTargetAngle - m_vecBeginTargetAngle;
@@ -4063,6 +4063,7 @@ void CClientPed::RebuildModel(bool bDelayChange)
         if (m_ulModel == 0)
         {
             // Adds only the neccesary textures
+            m_pClothes->RefreshClothes();
             m_pClothes->AddAllToModel();
 
             m_bPendingRebuildPlayer = true;

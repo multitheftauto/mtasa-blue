@@ -4,8 +4,8 @@
 
     <v3:application>
         <windowsSettings>
-            <dpiAware     xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">True/PM</dpiAware>
-            <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor</dpiAwareness>
+            <dpiAware     xmlns="https://schemas.microsoft.com/SMI/2005/WindowsSettings">True/PM</dpiAware>
+            <dpiAwareness xmlns="https://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor</dpiAwareness>
         </windowsSettings>
     </v3:application>
 

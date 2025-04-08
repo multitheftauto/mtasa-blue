@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CRemoteCalls.cpp
  *  PURPOSE:     Remote HTTP call (callRemote) class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -162,7 +162,7 @@ CRemoteCall::CRemoteCall(const char* szServerHost, const char* szResourceName, c
     m_options.requestHeaders["Content-Type"] = "application/json";
     m_bIsFetch = false;
 
-    m_strURL = SString("http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName);
+    m_strURL = SString("https://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName);
     m_strQueueName = strQueueName;
     m_options.uiConnectionAttempts = uiConnectionAttempts;
     m_options.uiConnectTimeoutMs = uiConnectTimeoutMs;
