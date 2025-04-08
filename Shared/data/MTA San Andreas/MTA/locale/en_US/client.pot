@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 06:00+0000\n"
+"POT-Creation-Date: 2025-04-08 22:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2672,7 +2672,7 @@ msgstr ""
 msgid ""
 "An update is currently not available.\n"
 "\n"
-"Please check www.mtasa.com"
+"Please check www.multitheftauto.com"
 msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
@@ -3410,8 +3410,8 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid ""
-"Fatal error (%u). If this problem persists, please check out mtasa.com for "
-"support."
+"Fatal error (%u). If this problem persists, please check out multitheftauto."
+"com for support."
 msgstr ""
 
 #. #ifdef MTA_DEBUG
@@ -3421,8 +3421,8 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid ""
-"Protocol error (%u). If this problem persists, please check out mtasa.com "
-"for support."
+"Protocol error (%u). If this problem persists, please check out "
+"multitheftauto.com for support."
 msgstr ""
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
