@@ -66,7 +66,7 @@ public:
     // Return a specific entry from history
     CEntryHistoryItem* Get(unsigned int index)
     {
-        auto& iter = std::next(m_entries.begin(), index);
+        auto iter = std::next(m_entries.begin(), index);
         if (iter != m_entries.end())
             return &(*iter);
         return nullptr;
