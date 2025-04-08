@@ -586,9 +586,6 @@ static void __declspec(naked) HOOK_CWeapon_Update()
 {
     _asm
     {
-        push esi
-        push ebp
-
         // timeStep / kOriginalTimeStep
         fld ds:[0xB7CB5C] // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep
@@ -609,8 +606,6 @@ static void __declspec(naked) HOOK_CWeapon_Update()
         mov eax, ebx
 
         xor ebx, ebx
-        pop ebp
-        pop esi
         jmp RETURN_CWeapon_Update
     }
 }
