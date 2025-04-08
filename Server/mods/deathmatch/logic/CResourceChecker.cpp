@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceChecker.cpp
  *  PURPOSE:     Resource file content checker/validator/upgrader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -468,7 +468,7 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
         if (bClientScript && IsLuaCompiledScript(strFileContents.c_str(), strFileContents.length()))
         {
             // Compiled client script with no version info
-            SString strMessage("%s is invalid. Please re-compile at http://luac.multitheftauto.com/", strFileName.c_str());
+            SString strMessage("%s is invalid. Please re-compile at https://luac.multitheftauto.com/", strFileName.c_str());
             CLogger::LogPrint(SString("ERROR: %s %s\n", strResourceName.c_str(), *strMessage));
         }
         return false;
@@ -984,7 +984,7 @@ bool CResourceChecker::RenameBackupFile(const string& strOrigFilename, const str
 //
 // CResourceChecker::ReplaceFilesInZIP
 //
-// Based on example at http://www.winimage.com/zLibDll/minizip.html
+// Based on example at https://www.winimage.com/zLibDll/minizip.html
 // by Ivan A. Krestinin
 //
 ///////////////////////////////////////////////////////////////

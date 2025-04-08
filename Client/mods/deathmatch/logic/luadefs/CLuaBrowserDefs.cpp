@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaBrowserDefs.cpp
  *  PURPOSE:     Lua browser definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -247,9 +247,9 @@ int CLuaBrowserDefs::LoadBrowserURL(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Are we dealing with a remote website?
-        if (strURL.substr(0, 7) == "http://" || strURL.substr(0, 8) == "https://")
+        if (strURL.substr(0, 7) == "https://" || strURL.substr(0, 8) == "https://")
         {
-            bool isLocalURL = strURL.substr(0, 11) == "http://mta/";
+            bool isLocalURL = strURL.substr(0, 11) == "https://mta/";
             if (pWebBrowser->IsLocal() != isLocalURL)
             {
                 lua_pushboolean(luaVM, false);
@@ -261,7 +261,7 @@ int CLuaBrowserDefs::LoadBrowserURL(lua_State* luaVM)
         }
         else
         {
-            argStream.SetCustomError("Invalid URL scheme provided. Only http:// and https:// is supported.", "Invalid parameter");
+            argStream.SetCustomError("Invalid URL scheme provided. Only https:// and https:// is supported.", "Invalid parameter");
         }
     }
 

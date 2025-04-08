@@ -5,7 +5,7 @@
  *  FILE:        sdk/xml/CXMLNode.h
  *  PURPOSE:     XML node interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

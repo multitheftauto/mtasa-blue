@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGameSA.cpp
  *  PURPOSE:     Base game logic handling
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

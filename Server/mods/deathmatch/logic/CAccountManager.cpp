@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CAccountManager.cpp
  *  PURPOSE:     User account manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -340,7 +340,7 @@ bool CAccountManager::IntegrityCheck()
             CLogger::ErrorPrintf("%s\n", *m_pDatabaseManager->GetLastErrorMessage());
             CLogger::ErrorPrintf("Errors were encountered loading '%s' database\n", *ExtractFilename(PathConform("internal.db")));
             CLogger::ErrorPrintf("Maybe now is the perfect time to panic.\n");
-            CLogger::ErrorPrintf("See - http://wiki.multitheftauto.com/wiki/fixdb\n");
+            CLogger::ErrorPrintf("See - https://wiki.multitheftauto.com/wiki/fixdb\n");
             CLogger::ErrorPrintf("************************\n");
             // Allow server to continue
         }
@@ -357,7 +357,7 @@ bool CAccountManager::IntegrityCheck()
             CLogger::ErrorPrintf("%s\n", *m_pDatabaseManager->GetLastErrorMessage());
             CLogger::ErrorPrintf("Errors were encountered updating '%s' database\n", *ExtractFilename(PathConform("internal.db")));
             CLogger::ErrorPrintf("Database might have incorrect file permissions, or locked by another process, or damaged.\n");
-            CLogger::ErrorPrintf("See - http://wiki.multitheftauto.com/wiki/fixdb\n");
+            CLogger::ErrorPrintf("See - https://wiki.multitheftauto.com/wiki/fixdb\n");
             CLogger::ErrorPrintf("************************\n");
             return false;
         }
@@ -388,7 +388,7 @@ bool CAccountManager::IntegrityCheck()
             CLogger::ErrorPrintf("%s\n", *m_pDatabaseManager->GetLastErrorMessage());
             CLogger::ErrorPrintf("Errors were encountered compacting '%s' database\n", *ExtractFilename(PathConform("internal.db")));
             CLogger::ErrorPrintf("Maybe now is the perfect time to panic.\n");
-            CLogger::ErrorPrintf("See - http://wiki.multitheftauto.com/wiki/fixdb\n");
+            CLogger::ErrorPrintf("See - https://wiki.multitheftauto.com/wiki/fixdb\n");
             CLogger::ErrorPrintf("************************\n");
             // Allow server to continue
         }
