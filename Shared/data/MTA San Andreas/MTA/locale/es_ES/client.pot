@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 06:00+0000\n"
-"PO-Revision-Date: 2025-04-06 06:01\n"
+"POT-Creation-Date: 2025-04-08 22:41+0000\n"
+"PO-Revision-Date: 2025-04-08 23:02\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -2611,9 +2611,8 @@ msgstr "El servidor dice que se recomienda una actualización, pero no es esenci
 
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
-"Please check www.mtasa.com"
-msgstr "Actualmente no hay ninguna actualización disponible.\n\n"
-"Revise nuestra web: www.mtasa.com"
+"Please check www.multitheftauto.com"
+msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -3342,8 +3341,8 @@ msgstr "Denegar"
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
-msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "Error fatal (%u). Si este problema persiste, por favor ve a mtasa.com para más soporte."
+msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
+msgstr ""
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3351,8 +3350,8 @@ msgstr "Error fatal (%u). Si este problema persiste, por favor ve a mtasa.com pa
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
-msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "Error de protocolo (%u). Si este problema persiste, por favor ve a mtasa.com para más soporte."
+msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
+msgstr ""
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
