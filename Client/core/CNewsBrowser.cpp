@@ -387,7 +387,7 @@ bool CNewsBrowser::OnOKButtonClick(CGUIElement* pElement)
 bool CNewsBrowser::OnNewsLinkButtonClick(CGUIElement* pElement)
 {
     // Visit the website
-    ShellExecuteNonBlocking("open", "https://mtasa.com/news");
+    ShellExecuteNonBlocking("open", "https://multitheftauto.com/news");
 
     // Close the window
     m_pWindow->SetVisible(false);

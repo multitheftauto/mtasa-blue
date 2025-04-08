@@ -571,13 +571,13 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const std::s
             if (pEchoClient)
                 pEchoClient->SendEcho(
                     SString("login: Serial pending authorization for account '%s' - See https:"
-                            "//mtasa.com/authserial",
+                            "//multitheftauto.com/authserial",
                             szAccountName));
             CLogger::AuthPrintf("LOGIN: %s tried to log in as '%s' with an unauthorized serial (IP: %s  Serial: %s)\n", *strPlayerName, szAccountName,
                                 *strPlayerIP, *strPlayerSerial);
             CLogger::AuthPrintf(
                 "LOGIN: See https:"
-                "//mtasa.com/authserial\n");
+                "//multitheftauto.com/authserial\n");
             return false;
         }
     }
