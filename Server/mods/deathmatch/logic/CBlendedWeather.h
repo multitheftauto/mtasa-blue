@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CBlendedWeather.h
  *  PURPOSE:     Weather blend manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

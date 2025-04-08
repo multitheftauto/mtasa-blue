@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CAudioContainer.h
  *  PURPOSE:     Audio container reader interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

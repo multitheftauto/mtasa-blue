@@ -5,7 +5,7 @@
  *  FILE:        utils/gentable/gentable_vehattr.cpp
  *  PURPOSE:     Vehicle attribute table generator
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

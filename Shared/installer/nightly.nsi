@@ -2516,7 +2516,7 @@ Function TryToSendInfo
         StrCpy $NetDone 1
     ${Else}
         # Check if anything else is contactable
-        StrCpy $0 "http://www.google.com/"
+        StrCpy $0 "https://www.google.com/"
         StrCpy $1 1000
         Call DoSendInfo
         ${If} $0 == 1

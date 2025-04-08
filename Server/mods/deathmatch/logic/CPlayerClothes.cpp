@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayerClothes.cpp
  *  PURPOSE:     Player clothes class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

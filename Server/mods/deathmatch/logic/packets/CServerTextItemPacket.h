@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CServerTextItemPacket.h
  *  PURPOSE:     Server text item packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

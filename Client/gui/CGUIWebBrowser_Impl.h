@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIWebBrowser_Impl.h
  *  PURPOSE:     WebBrowser CGUI class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
