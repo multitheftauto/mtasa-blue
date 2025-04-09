@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-08 22:41\n"
-"PO-Revision-Date: 2025-04-08 23:03\n"
+"PO-Revision-Date: 2025-04-09 05:01\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -20,17 +20,17 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:205
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "Versiunea de MTA:SA pe care ai descărcat-o nu este compatibilă cu Windows XP sau Vista. Te rugăm descarcă o versiune alternativă de pe www.multitheftauto.com."
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "Versiunea de MTA:SA pe care ai descărcat-o nu este compatibilă cu Windows 7, 8 sau 8.1. Te rugăm descarcă o versiune alternativă de pe www.multitheftauto.com."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "Versiunea de MTA:SA pe care ai descărcat-o este destinată versiunilor vechi de Windows. Te rugăm descarcă o versiune alternativă de pe www.multitheftauto.com."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
