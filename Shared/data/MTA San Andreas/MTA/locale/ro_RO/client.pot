@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-08 22:41+0000\n"
-"PO-Revision-Date: 2025-04-08 23:02\n"
+"PO-Revision-Date: 2025-04-09 05:01\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2615,7 +2615,8 @@ msgstr "Serverul spune că o actualizare este recomandată, dar nu necesară.\n\
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr ""
+msgstr "Actualizarea nu este disponibilă momentan.\n\n"
+"Te rugăm verifică www.multitheftauto.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -3347,7 +3348,7 @@ msgstr "Refuză"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Eroare fatală (%u). Dacă această problemă persistă, te rugăm verifică multitheftauto.com pentru ajutor."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3356,7 +3357,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Eroare de protocol (%u). Dacă această problemă persistă, te rugăm verifică multitheftauto.com pentru ajutor."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
