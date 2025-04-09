@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-08 22:41+0000\n"
-"PO-Revision-Date: 2025-04-08 23:02\n"
+"PO-Revision-Date: 2025-04-09 00:01\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1491,7 +1491,7 @@ msgstr "إعادة الاتصال: رقم المنفذ خاطئ"
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "إعادة الاتصال: جاري الاتصال بـ %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
@@ -2673,7 +2673,7 @@ msgstr "بعض ملفات MTA:SA مفقودة. \n\n\n"
 #: Client/core/CVersionUpdater.cpp:2774
 #, c-format
 msgid "%3d %% completed"
-msgstr "%3d %% إكتمل"
+msgstr "اكتمل %3d %%"
 
 #: Client/core/CVersionUpdater.cpp:2777
 #, c-format
