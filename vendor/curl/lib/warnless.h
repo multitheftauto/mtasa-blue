@@ -33,8 +33,6 @@
 #define CURLX_FUNCTION_CAST(target_type, func) \
   (target_type)(void (*) (void))(func)
 
-unsigned short curlx_ultous(unsigned long ulnum);
-
 unsigned char curlx_ultouc(unsigned long ulnum);
 
 int curlx_uztosi(size_t uznum);
@@ -59,7 +57,7 @@ unsigned short curlx_uitous(unsigned int uinum);
 
 size_t curlx_sitouz(int sinum);
 
-#if defined(_WIN32)
+#ifdef _WIN32
 
 ssize_t curlx_read(int fd, void *buf, size_t count);
 
@@ -72,7 +70,7 @@ ssize_t curlx_write(int fd, const void *buf, size_t count);
 #ifndef HEADER_CURL_WARNLESS_H_REDEFS
 #define HEADER_CURL_WARNLESS_H_REDEFS
 
-#if defined(_WIN32)
+#ifdef _WIN32
 #undef  read
 #define read(fd, buf, count)  curlx_read(fd, buf, count)
 #undef  write

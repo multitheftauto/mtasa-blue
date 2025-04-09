@@ -77,7 +77,7 @@
 
 #define SMB_FLAGS_CANONICAL_PATHNAMES 0x10
 #define SMB_FLAGS_CASELESS_PATHNAMES  0x08
-#define SMB_FLAGS2_UNICODE_STRINGS    0x8000
+/* #define SMB_FLAGS2_UNICODE_STRINGS    0x8000 */
 #define SMB_FLAGS2_IS_LONG_NAME       0x0040
 #define SMB_FLAGS2_KNOWS_LONG_NAME    0x0001
 
@@ -544,7 +544,7 @@ static void smb_format_message(struct Curl_easy *data, struct smb_header *h,
   h->flags2 = smb_swap16(SMB_FLAGS2_IS_LONG_NAME | SMB_FLAGS2_KNOWS_LONG_NAME);
   h->uid = smb_swap16(smbc->uid);
   h->tid = smb_swap16(req->tid);
-  pid = (unsigned int)Curl_getpid();
+  pid = (unsigned int)curlx_getpid();
   h->pid_high = smb_swap16((unsigned short)(pid >> 16));
   h->pid = smb_swap16((unsigned short) pid);
 }
