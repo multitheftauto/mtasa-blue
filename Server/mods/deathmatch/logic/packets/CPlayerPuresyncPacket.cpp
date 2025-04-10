@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPlayerPuresyncPacket.cpp
  *  PURPOSE:     Player pure synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -132,7 +132,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             position.data.vecPosition += vecTempPos;
         }
 
-        if (position.data.vecPosition.fX != 0.0f && position.data.vecPosition.fY != 0.0f && position.data.vecPosition.fZ != 0.0f)
+        // if (position.data.vecPosition.fX != 0.0f || position.data.vecPosition.fY != 0.0f || position.data.vecPosition.fZ != 0.0f)
         {
             CVector playerPosition = pSourcePlayer->GetPosition();
             float playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);

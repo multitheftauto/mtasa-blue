@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGameSA.cpp
  *  PURPOSE:     Base game logic handling
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1041,14 +1041,6 @@ void CGameSA::SetupBrokenModels()
 {
     FixModelCol(3118, 3059);
     FixModelCol(3553, 3554);
-}
-
-// Well, has it?
-bool CGameSA::HasCreditScreenFadedOut()
-{
-    BYTE ucAlpha = *(BYTE*)0xBAB320;            // CLoadingScreen::m_FadeAlpha
-    bool bCreditScreenFadedOut = (GetSystemState() >= 7) && (ucAlpha < 6);
-    return bCreditScreenFadedOut;
 }
 
 // Ensure replaced/restored textures for models in the GTA map are correct

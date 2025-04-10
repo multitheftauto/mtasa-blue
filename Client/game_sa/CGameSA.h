@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGameSA.h
  *  PURPOSE:     Header file for base game logic handling class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -285,8 +285,6 @@ public:
     void SetAsyncLoadingFromScript(bool bScriptEnabled, bool bScriptForced);
     void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0);
     bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false);
-
-    bool HasCreditScreenFadedOut();
 
     void         SetupSpecialCharacters();
     void         FixModelCol(uint iFixModel, uint iFromModel);

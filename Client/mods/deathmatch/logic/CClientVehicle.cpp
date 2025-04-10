@@ -911,7 +911,7 @@ void CClientVehicle::Blow(VehicleBlowFlags blow)
         // "Fuck" the car completely, so we don't have weird client-side jumpyness because of differently synced wheel states on clients
         FuckCarCompletely(true);
 
-        m_pVehicle->BlowUp(NULL, 0);
+        m_pVehicle->BlowUp(nullptr, 0);
 
         // Blowing up a vehicle will cause an explosion in the original game code, but we have a hook in place,
         // which will prevent the explosion and forward the information to the server to relay it to everyone from there.

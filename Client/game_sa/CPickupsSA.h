@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPickupsSA.h
  *  PURPOSE:     Header file for pickup manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

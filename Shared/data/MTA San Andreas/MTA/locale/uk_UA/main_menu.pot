@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-24 16:37\n"
+"PO-Revision-Date: 2023-11-18 13:10\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -51,5 +51,5 @@ msgstr "Вийти"
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr ""
+msgstr "Останні новини"
 

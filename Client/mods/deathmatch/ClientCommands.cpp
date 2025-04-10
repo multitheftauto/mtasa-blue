@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/ClientCommands.cpp
  *  PURPOSE:     Client commands handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -60,9 +60,9 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
         g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments);
 
         // Call the onClientConsole event
-        auto pLocalPlayer = g_pClientGame->GetLocalPlayer();
+        CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
 
-        if (pLocalPlayer)
+        if (localPlayer != nullptr)
         {
             CLuaArguments Arguments;
 
@@ -76,7 +76,7 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
                 Arguments.PushString(strClumpedCommand);
             }
 
-            pLocalPlayer->CallEvent("onClientConsole", Arguments, true);
+            localPlayer->CallEvent("onClientConsole", Arguments, true);
         }
 
         // Write the chatlength and the content
@@ -95,12 +95,16 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
     }
     else
     {
-        // Call the onClientCoreCommand event
-        CLuaArguments Arguments;
-        Arguments.PushString(szCommand);
+        CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
 
-        auto pLocalPlayer = g_pClientGame->GetLocalPlayer();
-        pLocalPlayer->CallEvent("onClientCoreCommand", Arguments, true);
+        if (localPlayer != nullptr)
+        {
+            // Call the onClientCoreCommand event
+            CLuaArguments Arguments;
+            Arguments.PushString(szCommand);
+
+            localPlayer->CallEvent("onClientCoreCommand", Arguments, true);
+        }
 
         // Call our comand-handlers for core-executed commands too, if allowed
         if (bAllowScriptedBind)

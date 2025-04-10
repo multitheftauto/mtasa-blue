@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CNetAPI.cpp
  *  PURPOSE:     Packet processing class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -2271,17 +2271,21 @@ void CNetAPI::ReadBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface& BitS
 {
     // Read the bulletsync data
     uchar ucWeapon = 0;
-    BitStream.Read(ucWeapon);
-    if (!CClientPickupManager::IsValidWeaponID(ucWeapon))
+    if (!BitStream.Read(ucWeapon) || !CClientWeaponManager::HasWeaponBulletSync(ucWeapon))
         return;
+
     eWeaponType weaponType = (eWeaponType)ucWeapon;
 
     CVector vecStart, vecEnd;
-    BitStream.Read((char*)&vecStart, sizeof(CVector));
-    BitStream.Read((char*)&vecEnd, sizeof(CVector));
+    if (!BitStream.Read((char*)&vecStart, sizeof(CVector)) || !BitStream.Read((char*)&vecEnd, sizeof(CVector)))
+        return;
+
+    if (!vecStart.IsValid() || !vecEnd.IsValid())
+        return;
 
     uchar ucOrderCounter = 0;
-    BitStream.Read(ucOrderCounter);
+    if (!BitStream.Read(ucOrderCounter))
+        return;
 
     float          fDamage = 0;
     uchar          ucHitZone = 0;
@@ -2289,9 +2293,9 @@ void CNetAPI::ReadBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface& BitS
     if (BitStream.ReadBit())
     {
         ElementID DamagedPlayerID = INVALID_ELEMENT_ID;
-        BitStream.Read(fDamage);
-        BitStream.Read(ucHitZone);
-        BitStream.Read(DamagedPlayerID);
+        if (!BitStream.Read(fDamage) || !BitStream.Read(ucHitZone) || !BitStream.Read(DamagedPlayerID))
+            return;
+
         pDamagedPlayer = DynamicCast<CClientPlayer>(CElementIDs::GetElement(DamagedPlayerID));
     }
 
@@ -2328,15 +2332,23 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface
 {
     // Read the bulletsync data
     ElementID elementID;
-    BitStream.Read(elementID);
+    if (!BitStream.Read(elementID))
+        return;
+
     CClientWeapon* pWeapon = DynamicCast<CClientWeapon>(CElementIDs::GetElement(elementID));
+    if (!pWeapon || !CClientWeaponManager::HasWeaponBulletSync(pWeapon->GetWeaponType()))
+        return;
 
     CVector vecStart, vecEnd;
-    BitStream.Read((char*)&vecStart, sizeof(CVector));
-    BitStream.Read((char*)&vecEnd, sizeof(CVector));
+    if (!BitStream.Read((char*)&vecStart, sizeof(CVector)) || !BitStream.Read((char*)&vecEnd, sizeof(CVector)))
+        return;
+
+    if (!vecStart.IsValid() || !vecEnd.IsValid())
+        return;
 
     uchar ucOrderCounter = 0;
-    BitStream.Read(ucOrderCounter);
+    if (!BitStream.Read(ucOrderCounter))
+        return;
 
     pWeapon->FireInstantHit(vecStart, vecEnd, false, true);
 }

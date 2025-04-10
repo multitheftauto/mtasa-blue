@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCheckpointsSA.cpp
  *  PURPOSE:     Checkpoint entity manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

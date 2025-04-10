@@ -27,7 +27,7 @@
 #include "urldata.h"
 #include "rand.h"
 
-#if defined(USE_EVENTFD)
+#ifdef HAVE_EVENTFD
 #ifdef HAVE_SYS_EVENTFD_H
 #include <sys/eventfd.h>
 #endif
@@ -53,7 +53,7 @@ int Curl_pipe(curl_socket_t socks[2], bool nonblocking)
     return -1;
 #ifdef HAVE_FCNTL
   if(fcntl(socks[0], F_SETFD, FD_CLOEXEC) ||
-     fcntl(socks[1], F_SETFD, FD_CLOEXEC) ) {
+     fcntl(socks[1], F_SETFD, FD_CLOEXEC)) {
     close(socks[0]);
     close(socks[1]);
     socks[0] = socks[1] = CURL_SOCKET_BAD;
@@ -103,7 +103,9 @@ int Curl_socketpair(int domain, int type, int protocol,
  * This is a socketpair() implementation for Windows.
  */
 #include <string.h>
+#ifdef HAVE_IO_H
 #include <io.h>
+#endif
 #else
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
@@ -221,15 +223,15 @@ int Curl_socketpair(int domain, int type, int protocol,
         if(Curl_timediff(Curl_now(), start) > (60 * 1000))
           goto error;
         if(
-#ifdef WSAEWOULDBLOCK
+#ifdef USE_WINSOCK
           /* This is how Windows does it */
-          (WSAEWOULDBLOCK == sockerr)
+          (SOCKEWOULDBLOCK == sockerr)
 #else
           /* errno may be EWOULDBLOCK or on some systems EAGAIN when it
              returned due to its inability to send off data without
              blocking. We therefore treat both error codes the same here */
-          (EWOULDBLOCK == sockerr) || (EAGAIN == sockerr) ||
-          (EINTR == sockerr) || (EINPROGRESS == sockerr)
+          (SOCKEWOULDBLOCK == sockerr) || (EAGAIN == sockerr) ||
+          (SOCKEINTR == sockerr) || (SOCKEINPROGRESS == sockerr)
 #endif
           ) {
           continue;

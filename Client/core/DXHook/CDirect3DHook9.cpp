@@ -5,7 +5,7 @@
  *  FILE:        core/CDirect3DHook9.cpp
  *  PURPOSE:     Function hooker for Direct3D 9
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -5,7 +5,7 @@
  *  FILE:        core/CSettings.cpp
  *  PURPOSE:     In-game settings window
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -404,6 +404,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
+
+    // Enable camera photos getting saved to documents folder
+    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
+    m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pPhotoSavingCheckbox->GetPosition(vecTemp, false);
+    m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -1201,10 +1207,10 @@ void CSettings::CreateGUI()
     m_pCachePathValue->AutoSize();
     vecTemp.fY += fLineHeight;
 
-    // Enable camera photos getting saved to documents folder
-    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
-    m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
-    m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
+    // Process affinity
+    m_pProcessAffinityCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Set CPU 0 affinity to improve game performance"), true));
+    m_pProcessAffinityCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pProcessAffinityCheckbox->AutoSize(nullptr, 20.0f);
     vecTemp.fY += fLineHeight;
 
     // Auto updater section label
@@ -1306,6 +1312,7 @@ void CSettings::CreateGUI()
     m_pButtonBrowserWhitelistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemove, this));
     m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
     m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
+    m_pProcessAffinityCheckbox->SetClickHandler(GUI_CALLBACK(&CSettings::OnAffinityClick, this));
 
     // Set up the events for advanced description
     m_pPriorityLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
@@ -1373,6 +1380,9 @@ void CSettings::CreateGUI()
 
     m_pUpdateAutoInstallCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateAutoInstallCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
+
+    m_pProcessAffinityCheckbox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
+    m_pProcessAffinityCheckbox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
     // Load Chat presets
     LoadChatPresets();
@@ -3228,6 +3238,26 @@ void CSettings::LoadData()
     CVARS_GET("photosaving", bVar);
     m_pPhotoSavingCheckbox->SetSelected(bVar);
 
+    // Process CPU Affinity
+    CVARS_GET("process_cpu_affinity", bVar);
+    m_pProcessAffinityCheckbox->SetSelected(bVar);
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+
+    HANDLE process = GetCurrentProcess();
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (bVar && result)
+        SetProcessAffinityMask(process, mask & ~1);
+    else
+    {
+        SYSTEM_INFO info;
+
+        GetSystemInfo(&info);
+        SetProcessAffinityMask(process, (1 << info.dwNumberOfProcessors) - 1);
+    }
+
     // Update build type
     CVARS_GET("update_build_type", iVar);
     if (iVar == 0 || iVar == 1)
@@ -3365,7 +3395,7 @@ void CSettings::SaveData()
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
 
     // Set and save our settings
-    if (CModManager::GetSingleton().GetCurrentMod() != NULL)
+    if (CModManager::GetSingleton().IsLoaded())
     {
         CVARS_GET("nick", strVar);
         if (m_pEditNick->GetText().compare(strVar) != 0)
@@ -3623,6 +3653,26 @@ void CSettings::SaveData()
     bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
     CVARS_SET("photosaving", photoSaving);
     CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
+
+    // Process CPU Affinity
+    bool affinity = m_pProcessAffinityCheckbox->GetSelected();
+    CVARS_SET("process_cpu_affinity", affinity);
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+
+    HANDLE process = GetCurrentProcess();
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (affinity && result)
+        SetProcessAffinityMask(process, mask & ~1);
+    else
+    {
+        SYSTEM_INFO info;
+
+        GetSystemInfo(&info);
+        SetProcessAffinityMask(process, (1 << info.dwNumberOfProcessors) - 1);
+    }
 
     // Debug setting
     if (CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem())
@@ -4711,6 +4761,42 @@ static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
     }
 }
 
+static void CPUAffinityQuestionCallBack(void* userdata, unsigned int button)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    if (button == 0)
+    {
+        auto const checkBox = reinterpret_cast<CGUICheckBox*>(userdata);
+        checkBox->SetSelected(false);
+    }
+}
+
+bool CSettings::OnAffinityClick(CGUIElement* pElement)
+{
+    static bool shownWarning = false;
+
+    if (m_pProcessAffinityCheckbox->GetSelected() && !shownWarning)
+    {
+        shownWarning = true;
+
+        std::string message = std::string(
+            _("This option should only be changed if you experience performance issues.\n"
+              "\nAre you sure you  want to enable this option?"));
+
+        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        pQuestionBox->Reset();
+        pQuestionBox->SetTitle(_("EXPERIMENTAL FEATURE"));
+        pQuestionBox->SetMessage(message);
+        pQuestionBox->SetButton(0, _("No"));
+        pQuestionBox->SetButton(1, _("Yes"));
+        pQuestionBox->SetCallback(CPUAffinityQuestionCallBack, m_pProcessAffinityCheckbox);
+        pQuestionBox->Show();
+    }
+
+    return true;
+}
+
 bool CSettings::OnBrowserBlacklistAdd(CGUIElement* pElement)
 {
     SString strDomain = m_pEditBrowserBlacklistAdd->GetText();
@@ -4874,6 +4960,8 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("16-bit color:")) + " " + std::string(_("Enable 16 bit color modes - Requires MTA restart"));
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
+    else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
+        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Experimental feature - Change only if you experience performance issues"));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());

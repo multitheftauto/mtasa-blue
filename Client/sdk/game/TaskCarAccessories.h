@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/TaskCarAccessories.h
  *  PURPOSE:     Car accessories task interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

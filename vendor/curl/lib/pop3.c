@@ -65,7 +65,6 @@
 #include "http.h" /* for HTTP proxy tunnel stuff */
 #include "socks.h"
 #include "pop3.h"
-#include "strtoofft.h"
 #include "strcase.h"
 #include "vtls/vtls.h"
 #include "cfilters.h"
@@ -82,10 +81,6 @@
 #include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
-
-#ifndef ARRAYSIZE
-#define ARRAYSIZE(A) (sizeof(A)/sizeof((A)[0]))
-#endif
 
 /* Local API functions */
 static CURLcode pop3_regular_transfer(struct Curl_easy *data, bool *done);
@@ -138,6 +133,7 @@ const struct Curl_handler Curl_handler_pop3 = {
   ZERO_NULL,                        /* write_resp_hd */
   ZERO_NULL,                        /* connection_check */
   ZERO_NULL,                        /* attach connection */
+  ZERO_NULL,                        /* follow */
   PORT_POP3,                        /* defport */
   CURLPROTO_POP3,                   /* protocol */
   CURLPROTO_POP3,                   /* family */
@@ -168,6 +164,7 @@ const struct Curl_handler Curl_handler_pop3s = {
   ZERO_NULL,                        /* write_resp_hd */
   ZERO_NULL,                        /* connection_check */
   ZERO_NULL,                        /* attach connection */
+  ZERO_NULL,                        /* follow */
   PORT_POP3S,                       /* defport */
   CURLPROTO_POP3S,                  /* protocol */
   CURLPROTO_POP3,                   /* family */
@@ -189,19 +186,6 @@ static const struct SASLproto saslpop3 = {
   SASL_AUTH_DEFAULT,    /* Default mechanisms */
   SASL_FLAG_BASE64      /* Configuration flags */
 };
-
-#ifdef USE_SSL
-static void pop3_to_pop3s(struct connectdata *conn)
-{
-  /* Change the connection handler */
-  conn->handler = &Curl_handler_pop3s;
-
-  /* Set the connection's upgraded to TLS flag */
-  conn->bits.tls_upgraded = TRUE;
-}
-#else
-#define pop3_to_pop3s(x) Curl_nop_stmt
-#endif
 
 struct pop3_cmd {
   const char *name;
@@ -237,7 +221,7 @@ static const struct pop3_cmd pop3cmds[] = {
 static bool pop3_is_multiline(const char *cmdline)
 {
   size_t i;
-  for(i = 0; i < ARRAYSIZE(pop3cmds); ++i) {
+  for(i = 0; i < CURL_ARRAYSIZE(pop3cmds); ++i) {
     if(strncasecompare(pop3cmds[i].name, cmdline, pop3cmds[i].nlen)) {
       if(!cmdline[pop3cmds[i].nlen])
         return pop3cmds[i].multiline;
@@ -260,7 +244,7 @@ static bool pop3_is_multiline(const char *cmdline)
  * types and allowed SASL mechanisms.
  */
 static bool pop3_endofresp(struct Curl_easy *data, struct connectdata *conn,
-                           char *line, size_t len, int *resp)
+                           const char *line, size_t len, int *resp)
 {
   struct pop3_conn *pop3c = &conn->proto.pop3c;
   (void)data;
@@ -423,6 +407,7 @@ static CURLcode pop3_perform_starttls(struct Curl_easy *data,
 static CURLcode pop3_perform_upgrade_tls(struct Curl_easy *data,
                                          struct connectdata *conn)
 {
+#ifdef USE_SSL
   /* Start the SSL connection */
   struct pop3_conn *pop3c = &conn->proto.pop3c;
   CURLcode result;
@@ -432,22 +417,26 @@ static CURLcode pop3_perform_upgrade_tls(struct Curl_easy *data,
     result = Curl_ssl_cfilter_add(data, conn, FIRSTSOCKET);
     if(result)
       goto out;
+    /* Change the connection handler */
+    conn->handler = &Curl_handler_pop3s;
   }
 
+  DEBUGASSERT(!pop3c->ssldone);
   result = Curl_conn_connect(data, FIRSTSOCKET, FALSE, &ssldone);
-
-  if(!result) {
+  DEBUGF(infof(data, "pop3_perform_upgrade_tls, connect -> %d, %d",
+         result, ssldone));
+  if(!result && ssldone) {
     pop3c->ssldone = ssldone;
-    if(pop3c->state != POP3_UPGRADETLS)
-      pop3_state(data, POP3_UPGRADETLS);
-
-    if(pop3c->ssldone) {
-      pop3_to_pop3s(conn);
-      result = pop3_perform_capa(data, conn);
-    }
+     /* perform CAPA now, changes pop3c->state out of POP3_UPGRADETLS */
+    result = pop3_perform_capa(data, conn);
   }
 out:
   return result;
+#else
+  (void)data;
+  (void)conn;
+  return CURLE_NOT_BUILT_IN;
+#endif
 }
 
 /***********************************************************************
@@ -859,7 +848,7 @@ static CURLcode pop3_state_starttls_resp(struct Curl_easy *data,
       result = pop3_perform_authentication(data, conn);
   }
   else
-    result = pop3_perform_upgrade_tls(data, conn);
+    pop3_state(data, POP3_UPGRADETLS);
 
   return result;
 }
@@ -1037,8 +1026,12 @@ static CURLcode pop3_statemachine(struct Curl_easy *data,
   (void)data;
 
   /* Busy upgrading the connection; right now all I/O is SSL/TLS, not POP3 */
-  if(pop3c->state == POP3_UPGRADETLS)
-    return pop3_perform_upgrade_tls(data, conn);
+upgrade_tls:
+  if(pop3c->state == POP3_UPGRADETLS) {
+    result = pop3_perform_upgrade_tls(data, conn);
+    if(result || (pop3c->state == POP3_UPGRADETLS))
+      return result;
+  }
 
   /* Flush any data that needs to be sent */
   if(pp->sendleft)
@@ -1065,6 +1058,10 @@ static CURLcode pop3_statemachine(struct Curl_easy *data,
 
     case POP3_STARTTLS:
       result = pop3_state_starttls_resp(data, conn, pop3code, pop3c->state);
+      /* During UPGRADETLS, leave the read loop as we need to connect
+       * (e.g. TLS handshake) before we continue sending/receiving. */
+      if(!result && (pop3c->state == POP3_UPGRADETLS))
+        goto upgrade_tls;
       break;
 
     case POP3_AUTH:
@@ -1109,14 +1106,6 @@ static CURLcode pop3_multi_statemach(struct Curl_easy *data, bool *done)
   CURLcode result = CURLE_OK;
   struct connectdata *conn = data->conn;
   struct pop3_conn *pop3c = &conn->proto.pop3c;
-
-  if((conn->handler->flags & PROTOPT_SSL) && !pop3c->ssldone) {
-    bool ssldone = FALSE;
-    result = Curl_conn_connect(data, FIRSTSOCKET, FALSE, &ssldone);
-    pop3c->ssldone = ssldone;
-    if(result || !pop3c->ssldone)
-      return result;
-  }
 
   result = Curl_pp_statemach(data, &pop3c->pp, FALSE, FALSE);
   *done = (pop3c->state == POP3_STOP);
@@ -1401,14 +1390,8 @@ static CURLcode pop3_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn)
 {
   /* Initialise the POP3 layer */
-  CURLcode result = pop3_init(data);
-  if(result)
-    return result;
-
-  /* Clear the TLS upgraded flag */
-  conn->bits.tls_upgraded = FALSE;
-
-  return CURLE_OK;
+  (void)conn;
+  return pop3_init(data);
 }
 
 /***********************************************************************
@@ -1597,11 +1580,11 @@ static CURLcode pop3_write(struct Curl_easy *data, const char *str,
         /* If the partial match was the CRLF and dot then only write the CRLF
            as the server would have inserted the dot */
         if(strip_dot && prev - 1 > 0) {
-          result = Curl_client_write(data, CLIENTWRITE_BODY, (char *)POP3_EOB,
+          result = Curl_client_write(data, CLIENTWRITE_BODY, POP3_EOB,
                                      prev - 1);
         }
         else if(!strip_dot) {
-          result = Curl_client_write(data, CLIENTWRITE_BODY, (char *)POP3_EOB,
+          result = Curl_client_write(data, CLIENTWRITE_BODY, POP3_EOB,
                                      prev);
         }
         else {
@@ -1621,7 +1604,7 @@ static CURLcode pop3_write(struct Curl_easy *data, const char *str,
     /* We have a full match so the transfer is done, however we must transfer
     the CRLF at the start of the EOB as this is considered to be part of the
     message as per RFC-1939, sect. 3 */
-    result = Curl_client_write(data, CLIENTWRITE_BODY, (char *)POP3_EOB, 2);
+    result = Curl_client_write(data, CLIENTWRITE_BODY, POP3_EOB, 2);
 
     k->keepon &= ~KEEP_RECV;
     pop3c->eob = 0;

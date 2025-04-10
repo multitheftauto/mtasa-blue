@@ -5,7 +5,7 @@
  *  FILE:        core/CProxyDirect3D9.cpp
  *  PURPOSE:     Direct3D 9 function hooking proxy
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -832,6 +832,13 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
         strMessage += "There was a problem starting MTA:SA\n\n";
         strMessage += SString("Direct3D CreateDevice error: %08x", hResult);
         BrowseToSolution("d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage);
+    }
+    else
+    {
+        // Get current refresh rate
+        D3DDISPLAYMODE DisplayMode;
+        if (pDirect3D->GetAdapterDisplayMode(Adapter, &DisplayMode) == D3D_OK)
+            CCore::GetSingleton().SetCurrentRefreshRate(DisplayMode.RefreshRate);
     }
 
     return hResult;
