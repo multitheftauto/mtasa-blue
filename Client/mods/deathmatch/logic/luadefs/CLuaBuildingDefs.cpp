@@ -53,8 +53,6 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::u
     else
         rot.emplace(CVector(0, 0, 0));
 
-    m_pBuildingManager->ResizePoolIfNeeds();
-
     CClientBuilding* pBuilding = new CClientBuilding(m_pManager, INVALID_ELEMENT_ID, modelId, pos, rot.value() , interior.value_or(0));
 
     CClientEntity* pRoot = pResource->GetResourceDynamicEntity();
