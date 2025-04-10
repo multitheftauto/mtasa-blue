@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CVehicleSA.h
  *  PURPOSE:     Header file for vehicle base entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

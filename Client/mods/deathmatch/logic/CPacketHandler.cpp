@@ -439,7 +439,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     }
 
     // Last (or only) HTTP server is internal
-    SString strInternalHTTPDownloadURL = SString("http://%s:%d", g_pNet->GetConnectedServer(), usHTTPDownloadPort);
+    SString strInternalHTTPDownloadURL = SString("https://%s:%d", g_pNet->GetConnectedServer(), usHTTPDownloadPort);
     g_pClientGame->GetResourceFileDownloadManager()->AddServer(strInternalHTTPDownloadURL, 1, EDownloadMode::RESOURCE_INITIAL_FILES_INTERNAL, 10, 10000);
 
     // Set appropriate server for stupid SingularFileDownloadManager
@@ -4496,10 +4496,11 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
         if (bDelete)
         {
             // Grab it and delete it
-            CClientDisplay* pDisplay = g_pClientGame->m_pDisplayManager->Get(ulID);
+            std::shared_ptr<CClientDisplay> pDisplay = g_pClientGame->m_pDisplayManager->Get(ulID);
+
             if (pDisplay)
             {
-                delete pDisplay;
+                m_displayTextList.remove(std::static_pointer_cast<CClientTextDisplay>(pDisplay));
             }
         }
         else
@@ -4535,26 +4536,28 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
                 }
 
                 // Does the text not already exist? Create it
-                CClientTextDisplay* pTextDisplay = NULL;
-                CClientDisplay*     pDisplay = g_pClientGame->m_pDisplayManager->Get(ulID);
-                if (pDisplay && pDisplay->GetType() == DISPLAY_TEXT)
+                std::shared_ptr<CClientTextDisplay> textDisplay = nullptr;
+                std::shared_ptr<CClientDisplay> display = g_pClientGame->m_pDisplayManager->Get(ulID);
+
+                if (display && display->GetType() == DISPLAY_TEXT)
                 {
-                    pTextDisplay = static_cast<CClientTextDisplay*>(pDisplay);
+                    textDisplay = std::static_pointer_cast<CClientTextDisplay>(display);
                 }
 
-                if (!pTextDisplay)
+                if (!textDisplay)
                 {
                     // Create it
-                    pTextDisplay = new CClientTextDisplay(g_pClientGame->m_pDisplayManager, ulID);
+                    textDisplay = g_pClientGame->m_pDisplayManager->CreateTextDisplay(ulID);
+                    m_displayTextList.push_back(textDisplay);
                 }
 
                 // Set the text properties
-                pTextDisplay->SetCaption(szText);
-                pTextDisplay->SetPosition(CVector(fX, fY, 0));
-                pTextDisplay->SetColor(color);
-                pTextDisplay->SetScale(fScale);
-                pTextDisplay->SetFormat((unsigned long)ucFormat);
-                pTextDisplay->SetShadowAlpha(ucShadowAlpha);
+                textDisplay->SetCaption(szText);
+                textDisplay->SetPosition(CVector(fX, fY, 0));
+                textDisplay->SetColor(color);
+                textDisplay->SetScale(fScale);
+                textDisplay->SetFormat((unsigned long)ucFormat);
+                textDisplay->SetShadowAlpha(ucShadowAlpha);
 
                 delete[] szText;
             }

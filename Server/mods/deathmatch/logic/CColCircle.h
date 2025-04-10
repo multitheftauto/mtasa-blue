@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CColCircle.h
  *  PURPOSE:     Circle-shaped collision entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/bitstream.h
  *  PURPOSE:     Network bitstream interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

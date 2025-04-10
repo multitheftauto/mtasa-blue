@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CModelInfoSA.h
  *  PURPOSE:     Header file for entity model information handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

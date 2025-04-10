@@ -5,7 +5,7 @@
  *  FILE:        core/CCore.cpp
  *  PURPOSE:     Base core class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1769,32 +1769,45 @@ void CCore::OnPostColorFilterRender()
 
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
-    bool bValue;
-    CVARS_GET("process_dpi_aware", bValue);
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
+    bool aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
-    if (bValue)
-    {
-        // Minimum supported client for the function below is Windows Vista
-        // See also: https://technet.microsoft.com/en-us/evalcenter/dn469266(v=vs.90)
+    // The minimum supported client for the function below is Windows Vista (Longhorn).
+    // For more information, refer to the Microsoft Learn article:
+    // https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
+    if (aware)
         SetProcessDPIAware();
-    }
 #endif
 
-    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
-    {
-        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
-        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
-        std::string currentSkinName;
-        CVARS_GET("current_skin", currentSkinName);
+    int revision = GetApplicationSettingInt("reset-settings-revision");
 
-        if (currentSkinName == "Default")
-        {
+    // Users with the default skin will be switched to the 2023 version by replacing "Default" with "Default 2023".
+    // The "Default 2023" GUI skin was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+    if (revision < 21486)
+    {
+        auto skin = CVARS_GET_VALUE<std::string>("current_skin");
+
+        if (skin == "Default")
             CVARS_SET("current_skin", "Default 2023");
-        }
 
         SetApplicationSettingInt("reset-settings-revision", 21486);
     }
+
+    HANDLE process = GetCurrentProcess();
+    const int priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
+    int priority = CVARS_GET_VALUE<int>("process_priority") % 3;
+
+    SetPriorityClass(process, priorities[priority]);
+
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+    if (!affinity)
+        return;
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //

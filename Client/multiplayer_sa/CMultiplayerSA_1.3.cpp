@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA.cpp
  *  PURPOSE:     Multiplayer module class 1.3
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

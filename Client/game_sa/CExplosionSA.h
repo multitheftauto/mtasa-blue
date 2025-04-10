@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CExplosionSA.h
  *  PURPOSE:     Header file for explosion class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
