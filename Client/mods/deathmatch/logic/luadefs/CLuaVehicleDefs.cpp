@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <game/CHandlingEntry.h>
 #include <game/CHandlingManager.h>
+#include <game/CVehicleAudioSettingsManager.h>
 #include "lua/CLuaFunctionParser.h"
 #include <CClientVehicleManager.h>
 
@@ -95,6 +96,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleEntryPoints", ArgumentParser<GetVehicleEntryPoints>},
         {"isVehicleSmokeTrailEnabled", ArgumentParser<IsSmokeTrailEnabled>},
         {"getVehicleRotorState", ArgumentParser<GetVehicleRotorState>},
+        {"getVehicleModelAudioSettings", ArgumentParser<GetVehicleModelAudioSettings>},
+        {"getVehicleAudioSettings", ArgumentParser<GetVehicleAudioSettings>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -163,6 +166,10 @@ void CLuaVehicleDefs::LoadFunctions()
         {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
         {"setVehicleSmokeTrailEnabled", ArgumentParser<SetSmokeTrailEnabled>},
         {"setVehicleRotorState", ArgumentParser<SetVehicleRotorState>},
+        {"setVehicleModelAudioSetting", ArgumentParser<SetVehicleModelAudioSetting>},
+        {"resetVehicleModelAudioSettings", ArgumentParser<ResetVehicleModelAudioSettings>},
+        {"setVehicleAudioSetting", ArgumentParser<SetVehicleAudioSetting>},
+        {"resetVehicleAudioSettings", ArgumentParser<ResetVehicleAudioSettings>},
     };
 
     // Add functions
@@ -303,6 +310,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
     lua_classfunction(luaVM, "setSmokeTrailEnabled", "setVehicleSmokeTrailEnabled");
     lua_classfunction(luaVM, "setRotorState", "setVehicleRotorState");
+    lua_classfunction(luaVM, "resetAudioSettings", "resetVehicleAudioSettings");
+    lua_classfunction(luaVM, "setAudioSetting", "setVehicleAudioSetting");
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
@@ -362,6 +371,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "turnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
     lua_classvariable(luaVM, "wheelScale", "setVehicleWheelScale", "getVehicleWheelScale");
     lua_classvariable(luaVM, "rotorState", "setVehicleRotorState", "getVehicleRotorState");
+    lua_classvariable(luaVM, "audioSettings", nullptr, "getVehicleAudioSettings");
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
@@ -4257,7 +4267,7 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
 {
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
- 
+
 std::variant<bool, std::array<std::array<float, 3>, 4>> CLuaVehicleDefs::GetVehicleEntryPoints(CClientVehicle* vehicle)
 {
     auto entryPointVectors = OOP_GetVehicleEntryPoints(vehicle);
@@ -4362,7 +4372,8 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
     return vehicle->SpawnFlyingComponent(partNodeIndex, collisionType, removalTime.value_or(-1));
 }
 
-bool CLuaVehicleDefs::AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360, std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept
+bool CLuaVehicleDefs::AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360,
+                                       std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept
 {
     eClientVehicleType vehicleType = vehicle->GetVehicleType();
 
@@ -4391,7 +4402,7 @@ bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state)
     std::uint16_t model = vehicle->GetModel();
     if (model != 512 && model != 513)
         throw LuaFunctionError("Invaild model ID");
-     
+
     vehicle->SetSmokeTrailEnabled(state);
     return true;
 }
@@ -4414,3 +4425,194 @@ bool CLuaVehicleDefs::GetVehicleRotorState(CClientVehicle* vehicle) noexcept
 {
     return vehicle->GetVehicleRotorState();
 }
+
+bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const eVehicleAudioSettingProperty eProperty, float varValue)
+{
+    if (!CClientVehicleManager::IsStandardModel(uiModel))
+        throw std::invalid_argument("Cannot change audio setting for allocated vechiles");
+    
+    CVehicleAudioSettingsEntry& pModelSettings = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData(uiModel);
+
+    switch (eProperty)
+    {
+        case eVehicleAudioSettingProperty::DOOR_SOUND:
+            pModelSettings.SetDoorSound(varValue);
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
+            pModelSettings.SetEngineOffSoundBankID(varValue);
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
+            pModelSettings.SetEngineOnSoundBankID(varValue);
+            break;
+        case eVehicleAudioSettingProperty::HORN_HIGH:
+            pModelSettings.SetHornHign(varValue);
+            break;
+        case eVehicleAudioSettingProperty::HORN_TON:
+            pModelSettings.SetHornTon(varValue);
+            break;
+        case eVehicleAudioSettingProperty::HORN_VOLUME_DELTA:
+            pModelSettings.SetHornVolumeDelta(varValue);
+            break;
+        case eVehicleAudioSettingProperty::RADIO_NUM:
+            pModelSettings.SetRadioNum(varValue);
+            break;
+        case eVehicleAudioSettingProperty::RADIO_TYPE:
+            pModelSettings.SetRadioType(varValue);
+            break;
+        case eVehicleAudioSettingProperty::SOUND_TYPE:
+            pModelSettings.SetSoundType((eVehicleSoundType)(int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::BASS_SETTING:
+            pModelSettings.SetBassSetting(varValue);
+            break;
+        case eVehicleAudioSettingProperty::BASS_EQ:
+            pModelSettings.SetBassEq(varValue);
+            break;
+        case eVehicleAudioSettingProperty::FIELD_C:
+            pModelSettings.SetFieldC(varValue);
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_UPGRADE:
+            pModelSettings.SetEngineUpgrade(varValue);
+            break;
+        case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
+            pModelSettings.SetVehicleTypeForAudio(varValue);
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CLuaVehicleDefs::ResetVehicleModelAudioSettings(const uint32_t uiModel)
+{
+    if (!CClientVehicleManager::IsStandardModel(uiModel))
+        throw std::invalid_argument("Cannot change audio setting for allocated vechiles");
+
+     g_pGame->GetVehicleAudioSettingsManager()->ResetModelSettings(uiModel);
+}
+
+bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVehicleAudioSettingProperty eProperty, float varValue)
+{
+    CVehicleAudioSettingsEntry& pModelSettings = pVehicle->GetOrCreateAudioSettings();
+
+    switch (eProperty)
+    {
+        case eVehicleAudioSettingProperty::DOOR_SOUND:
+            pModelSettings.SetDoorSound(varValue);
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
+            pModelSettings.SetEngineOffSoundBankID(varValue);
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
+            pModelSettings.SetEngineOnSoundBankID(varValue);
+            break;
+        case eVehicleAudioSettingProperty::HORN_HIGH:
+            pModelSettings.SetHornHign(varValue);
+            break;
+        case eVehicleAudioSettingProperty::HORN_TON:
+            pModelSettings.SetHornTon(varValue);
+            break;
+        case eVehicleAudioSettingProperty::HORN_VOLUME_DELTA:
+            pModelSettings.SetHornVolumeDelta(varValue);
+            break;
+        case eVehicleAudioSettingProperty::RADIO_NUM:
+            pModelSettings.SetRadioNum(varValue);
+            break;
+        case eVehicleAudioSettingProperty::RADIO_TYPE:
+            pModelSettings.SetRadioType(varValue);
+            break;
+        case eVehicleAudioSettingProperty::SOUND_TYPE:
+            pModelSettings.SetSoundType((eVehicleSoundType)(int)(varValue));
+            break;
+        case eVehicleAudioSettingProperty::BASS_SETTING:
+            pModelSettings.SetBassSetting(varValue);
+            break;
+        case eVehicleAudioSettingProperty::BASS_EQ:
+            pModelSettings.SetBassEq(varValue);
+            break;
+        case eVehicleAudioSettingProperty::FIELD_C:
+            pModelSettings.SetFieldC(varValue);
+            break;
+        case eVehicleAudioSettingProperty::ENGINE_UPGRADE:
+            pModelSettings.SetEngineUpgrade(varValue);
+            break;
+        case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
+            pModelSettings.SetVehicleTypeForAudio(varValue);
+            break;
+        default:
+            return false;
+    }
+
+    pVehicle->ApplyAudioSettings();
+
+    return true;
+}
+
+bool CLuaVehicleDefs::ResetVehicleAudioSettings(CClientVehicle* pVehicle)
+{
+    pVehicle->ResetAudioSettings();
+    return true;
+}
+
+std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleModelAudioSettings(uint32_t uiModel)
+{
+    if (!CClientVehicleManager::IsStandardModel(uiModel))
+    {
+        auto* modelInfo = g_pGame->GetModelInfo(uiModel);
+
+        if (!modelInfo)
+            throw std::invalid_argument("Invalid model id");
+
+        uiModel = modelInfo->GetParentID();
+
+        if (!CClientVehicleManager::IsStandardModel(uiModel))
+            throw std::invalid_argument("Invalid model id");
+    }
+
+    CVehicleAudioSettingsEntry& pEntry = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData(uiModel);
+
+    std::unordered_map<std::string, float> output;
+
+    output["sound-type"] = (int)pEntry.GetSoundType();
+    output["engine-on-soundbank-id"] = pEntry.GetEngineOnSoundBankID();
+    output["engine-off-soundbank-id"] = pEntry.GetEngineOffSoundBankID();
+    output["bass-setting"] = pEntry.GetBassSetting();
+    output["bass-eq"] = pEntry.GetBassEq();
+    output["field-c"] = pEntry.GetFieldC();
+    output["horn-ton"] = pEntry.GetHornTon();
+    output["horn-high"] = pEntry.GetHornHign();
+    output["engine-upgrade"] = pEntry.GetEngineUpgrade();
+    output["door-sound"] = pEntry.GetDoorSound();
+    output["radio-num"] = pEntry.GetRadioNum();
+    output["radio-type"] = pEntry.GetRadioType();
+    output["vehicle-type-for-audio"] = pEntry.GetVehicleTypeForAudio();
+    output["horn-volume-delta"] = pEntry.GetHornVolumeDelta();
+
+    return output;
+}
+
+std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleAudioSettings(CClientVehicle* pVehicle)
+{
+    const CVehicleAudioSettingsEntry& pEntry = pVehicle->GetAudioSettings();
+
+    std::unordered_map<std::string, float> output;
+
+    output["sound-type"] = (int)pEntry.GetSoundType();
+    output["engine-on-soundbank-id"] = pEntry.GetEngineOnSoundBankID();
+    output["engine-off-soundbank-id"] = pEntry.GetEngineOffSoundBankID();
+    output["bass-setting"] = pEntry.GetBassSetting();
+    output["bass-eq"] = pEntry.GetBassEq();
+    output["field-c"] = pEntry.GetFieldC();
+    output["horn-ton"] = pEntry.GetHornTon();
+    output["horn-high"] = pEntry.GetHornHign();
+    output["engine-upgrade"] = pEntry.GetEngineUpgrade();
+    output["door-sound"] = pEntry.GetDoorSound();
+    output["radio-num"] = pEntry.GetRadioNum();
+    output["radio-type"] = pEntry.GetRadioType();
+    output["vehicle-type-for-audio"] = pEntry.GetVehicleTypeForAudio();
+    output["horn-volume-delta"] = pEntry.GetHornVolumeDelta();
+
+    return output;
+}
+

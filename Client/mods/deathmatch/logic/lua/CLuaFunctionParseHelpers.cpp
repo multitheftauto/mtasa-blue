@@ -959,6 +959,25 @@ ADD_ENUM(ENTITY_TYPE_DUMMY, "dummy")
 ADD_ENUM(ENTITY_TYPE_NOTINPOOLS, "unknown")
 IMPLEMENT_ENUM_END("entity-type")
 
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eVehicleAudioSettingProperty)
+ADD_ENUM(eVehicleAudioSettingProperty::DOOR_SOUND, "door-sound")
+ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID, "engine-off-soundbank-id")
+ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID, "engine-on-soundbank-id")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_HIGH, "horn-high")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_TON, "horn-ton")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_VOLUME_DELTA, "horn-volume-delta")
+ADD_ENUM(eVehicleAudioSettingProperty::RADIO_NUM, "radion-num")
+ADD_ENUM(eVehicleAudioSettingProperty::RADIO_TYPE, "radio-type")
+ADD_ENUM(eVehicleAudioSettingProperty::SOUND_TYPE, "sound-type")
+ADD_ENUM(eVehicleAudioSettingProperty::BASS_SETTING, "bass-setting")
+ADD_ENUM(eVehicleAudioSettingProperty::BASS_EQ, "bass-eq")
+ADD_ENUM(eVehicleAudioSettingProperty::FIELD_C, "field-c")
+ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_UPGRADE, "engine-upgrade")
+ADD_ENUM(eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-audio")
+IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
+
+
 //
 // CResource from userdata
 //
