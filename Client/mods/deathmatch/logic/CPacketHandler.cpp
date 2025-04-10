@@ -439,7 +439,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     }
 
     // Last (or only) HTTP server is internal
-    SString strInternalHTTPDownloadURL = SString("https://%s:%d", g_pNet->GetConnectedServer(), usHTTPDownloadPort);
+    SString strInternalHTTPDownloadURL = SString("http://%s:%d", g_pNet->GetConnectedServer(), usHTTPDownloadPort);
     g_pClientGame->GetResourceFileDownloadManager()->AddServer(strInternalHTTPDownloadURL, 1, EDownloadMode::RESOURCE_INITIAL_FILES_INTERNAL, 10, 10000);
 
     // Set appropriate server for stupid SingularFileDownloadManager
