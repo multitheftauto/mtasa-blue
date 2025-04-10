@@ -105,6 +105,7 @@ class CWaterManager;
 class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
+class CVehicleSoundSettingsManager;
 
 class CCustomWeaponManager;
 class COpenPortsTester;
