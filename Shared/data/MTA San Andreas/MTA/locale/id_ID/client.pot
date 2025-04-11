@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-23 20:04+0000\n"
-"PO-Revision-Date: 2025-03-29 08:21\n"
+"POT-Creation-Date: 2025-04-08 22:41+0000\n"
+"PO-Revision-Date: 2025-04-08 23:02\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -21,7 +21,7 @@ msgstr ""
 #. OK button
 #: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:37
 #: Client/core/CMainMenu.cpp:1214 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4930 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CSettings.cpp:4924 Client/core/CVersionUpdater.cpp:1607
 #: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
 #: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
@@ -33,7 +33,7 @@ msgstr "Oke"
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:40
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4929
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4923
 #: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
 #: Client/core/CVersionUpdater.cpp:1841
 msgid "Cancel"
@@ -47,9 +47,9 @@ msgstr "Batal"
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:35
 #: Client/core/CMainMenu.cpp:1194 Client/core/CSettings.cpp:1423
-#: Client/core/CSettings.cpp:1447 Client/core/CSettings.cpp:4596
-#: Client/core/CSettings.cpp:4670 Client/core/CSettings.cpp:4700
-#: Client/core/CSettings.cpp:4749 Client/core/CSettings.cpp:4798
+#: Client/core/CSettings.cpp:1447 Client/core/CSettings.cpp:4592
+#: Client/core/CSettings.cpp:4666 Client/core/CSettings.cpp:4696
+#: Client/core/CSettings.cpp:4745 Client/core/CSettings.cpp:4792
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CQuestionBox.cpp:195
@@ -59,9 +59,9 @@ msgstr "Ya"
 
 #: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1193
 #: Client/core/CSettings.cpp:1422 Client/core/CSettings.cpp:1446
-#: Client/core/CSettings.cpp:4595 Client/core/CSettings.cpp:4669
-#: Client/core/CSettings.cpp:4699 Client/core/CSettings.cpp:4748
-#: Client/core/CSettings.cpp:4797 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CSettings.cpp:4591 Client/core/CSettings.cpp:4665
+#: Client/core/CSettings.cpp:4695 Client/core/CSettings.cpp:4744
+#: Client/core/CSettings.cpp:4791 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
@@ -379,8 +379,8 @@ msgstr "Tidak dapat memperbarui dikarenakan konflik berkas. Mohon tutup aplikasi
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
 #: Client/core/CConnectManager.cpp:329 Client/core/CConnectManager.cpp:415
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
-#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4273
-#: Client/core/CSettings.cpp:4301 Client/core/CSettings.cpp:4909
+#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4269
+#: Client/core/CSettings.cpp:4297 Client/core/CSettings.cpp:4903
 #: Client/core/CCore.cpp:1262 Client/core/CGUI.cpp:93
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1261
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1283
@@ -1063,7 +1063,7 @@ msgstr "Terputus"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1096
-#: Client/core/CSettings.cpp:3552 Client/core/CCore.cpp:670
+#: Client/core/CSettings.cpp:3550 Client/core/CCore.cpp:670
 msgid "In-game"
 msgstr "Dalam permainan"
 
@@ -1197,7 +1197,7 @@ msgid "Choking to death in"
 msgstr "Tersedak hingga mati di"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:540
-#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3548
+#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3546
 #: Client/core/CCore.cpp:670
 msgid "Main menu"
 msgstr "Menu utama"
@@ -1835,7 +1835,7 @@ msgstr "Sangat tinggi"
 #: Client/core/CSettings.cpp:1041 Client/core/CSettings.cpp:1095
 #: Client/core/CSettings.cpp:1231 Client/core/CSettings.cpp:1561
 #: Client/core/CSettings.cpp:3193 Client/core/CSettings.cpp:3225
-#: Client/core/CSettings.cpp:3273 Client/core/CSettings.cpp:4341
+#: Client/core/CSettings.cpp:3271 Client/core/CSettings.cpp:4337
 msgid "Off"
 msgstr "Mati"
 
@@ -1968,49 +1968,49 @@ msgstr "Lainnya"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1034
-#: Client/core/CSettings.cpp:4948
+#: Client/core/CSettings.cpp:4942
 msgid "Fast CJ clothes loading:"
 msgstr "Muat pakaian CJ dengan cepat:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1048
-#: Client/core/CSettings.cpp:4950
+#: Client/core/CSettings.cpp:4944
 msgid "Browser speed:"
 msgstr "Kecepatan penjelajah:"
 
 #. Single download
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1062
-#: Client/core/CSettings.cpp:4952
+#: Client/core/CSettings.cpp:4946
 msgid "Single connection:"
 msgstr "Koneksi tunggal:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1075
-#: Client/core/CSettings.cpp:4954
+#: Client/core/CSettings.cpp:4948
 msgid "Packet tag:"
 msgstr "Tanda paket:"
 
 #. Progress animation
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1088
-#: Client/core/CSettings.cpp:4956
+#: Client/core/CSettings.cpp:4950
 msgid "Progress animation:"
 msgstr "Animasi perkembangan:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1101
-#: Client/core/CSettings.cpp:4946
+#: Client/core/CSettings.cpp:4940
 msgid "Process priority:"
 msgstr "Prioritas proses:"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1115
-#: Client/core/CSettings.cpp:4958
+#: Client/core/CSettings.cpp:4952
 msgid "Debug setting:"
 msgstr "Pengaturan debug:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:1028 Client/core/CSettings.cpp:1138
-#: Client/core/CSettings.cpp:4960
+#: Client/core/CSettings.cpp:4954
 msgid "Streaming memory:"
 msgstr "Memori streaming:"
 
@@ -2040,7 +2040,7 @@ msgstr "Sangat lambat"
 #: Client/core/CSettings.cpp:1232 Client/core/CSettings.cpp:1252
 #: Client/core/CSettings.cpp:3204 Client/core/CSettings.cpp:3211
 #: Client/core/CSettings.cpp:3218 Client/core/CSettings.cpp:3227
-#: Client/core/CSettings.cpp:3266
+#: Client/core/CSettings.cpp:3264
 msgid "Default"
 msgstr "Bawaan"
 
@@ -2320,74 +2320,74 @@ msgstr "KONTROL PERMAINAN GTA"
 msgid "MULTIPLAYER CONTROLS"
 msgstr "KONTROL MULTI PEMAIN"
 
-#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4909
+#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4903
 msgid "Your nickname contains invalid characters!"
 msgstr "Nama anda mengandung karakter yang tidak valid!"
 
-#: Client/core/CSettings.cpp:3885
+#: Client/core/CSettings.cpp:3881
 msgid "Red:"
 msgstr "Merah:"
 
-#: Client/core/CSettings.cpp:3885
+#: Client/core/CSettings.cpp:3881
 msgid "Green:"
 msgstr "Hijau:"
 
-#: Client/core/CSettings.cpp:3885
+#: Client/core/CSettings.cpp:3881
 msgid "Blue:"
 msgstr "Biru:"
 
-#: Client/core/CSettings.cpp:3885
+#: Client/core/CSettings.cpp:3881
 msgid "Transparency:"
 msgstr "Transparansi:"
 
-#: Client/core/CSettings.cpp:3888
+#: Client/core/CSettings.cpp:3884
 msgid "Color"
 msgstr "Warna"
 
-#: Client/core/CSettings.cpp:3965
+#: Client/core/CSettings.cpp:3961
 msgid "Preview"
 msgstr "Pratinjau"
 
-#: Client/core/CSettings.cpp:4273
+#: Client/core/CSettings.cpp:4269
 msgid "Please disconnect before changing language"
 msgstr "Silahkan putuskan sebelum mengganti bahasa"
 
-#: Client/core/CSettings.cpp:4301
+#: Client/core/CSettings.cpp:4297
 msgid "Please disconnect before changing skin"
 msgstr "Silakan putuskan sebelum mengganti skin"
 
-#: Client/core/CSettings.cpp:4589
+#: Client/core/CSettings.cpp:4585
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "Bayangan volumetrik dapat menyebabkan beberapa sistem menjadi lambat.\n\n"
 "Apakah anda yakin ingin mengaktifkannya?"
 
-#: Client/core/CSettings.cpp:4593
+#: Client/core/CSettings.cpp:4589
 msgid "PERFORMANCE WARNING"
 msgstr "PERINGATAN KINERJA"
 
-#: Client/core/CSettings.cpp:4613
+#: Client/core/CSettings.cpp:4609
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "Unggah layar diperlukan oleh beberapa server untuk kepentingan anti-cheat.\n\n"
 "(Kotak obrolan dan GUI tidak termasuk dalam pengunggahan)\n"
 
-#: Client/core/CSettings.cpp:4615
+#: Client/core/CSettings.cpp:4611
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "INFORMASI UNGGAH LAYAR"
 
-#: Client/core/CSettings.cpp:4630
+#: Client/core/CSettings.cpp:4626
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr "Beberapa scripts mungkin memainkan suara, seperti radio, dari internet.\n\n"
 "Nonaktifkan setting ini mungkin bisa mengurangi konsumsi pita jaringan.\n"
 
-#: Client/core/CSettings.cpp:4633
+#: Client/core/CSettings.cpp:4629
 msgid "EXTERNAL SOUNDS"
 msgstr "SUARA LUAR"
 
-#: Client/core/CSettings.cpp:4662
+#: Client/core/CSettings.cpp:4658
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
@@ -2395,11 +2395,11 @@ msgstr "Sepertinya Anda telah menyalakan opsi koneksi Rich Presence.\n"
 "Apakah Anda ingin memperbolehkan server untuk membagikan datanya?\n\n"
 "Ini termasuk ID unik identifikasi Anda."
 
-#: Client/core/CSettings.cpp:4667
+#: Client/core/CSettings.cpp:4663
 msgid "CONSENT TO ALLOW DATA SHARING"
 msgstr "MENGIZINKAN UNTUK MEMBAGIKAN DATA"
 
-#: Client/core/CSettings.cpp:4691
+#: Client/core/CSettings.cpp:4687
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -2409,11 +2409,11 @@ msgstr "Beberapa berkas dalam direktori data GTA:SA anda telah dikustomisasi.\n"
 "Namun, BERKAS GTA:SA YANG TELAH DIKUSTOMISASI DIBLOK OLEH BANYAK SERVER\n\n"
 "Apakah anda yakin ingin menggunakannya?"
 
-#: Client/core/CSettings.cpp:4697 Client/core/CVersionUpdater.cpp:2081
+#: Client/core/CSettings.cpp:4693 Client/core/CVersionUpdater.cpp:2081
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "BERKAS GTA:SA YANG TELAH DIKUSTOMISASI"
 
-#: Client/core/CSettings.cpp:4740
+#: Client/core/CSettings.cpp:4736
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -2422,97 +2422,92 @@ msgstr "Pengaktifan kesadaran DPI adalah sebuah fitur eksperimen dan kami hanya 
 "Anda mungkin mengalami masalah grafik jika anda mengaktifkan opsi ini.\n\n"
 "Apakah anda yakin akan mengaktifkan opsi ini?"
 
-#: Client/core/CSettings.cpp:4746 Client/core/CSettings.cpp:4795
+#: Client/core/CSettings.cpp:4742 Client/core/CSettings.cpp:4789
 msgid "EXPERIMENTAL FEATURE"
 msgstr "FITUR EKSPERIMEN"
 
-#: Client/core/CSettings.cpp:4788
-msgid "Enabling this setting may improve game performance, but on some processors, it may worsen it.\n"
-"We have observed issues with AMD Ryzen processors featuring 3D V-Cache.\n"
-"The exact list of affected processors is unknown.\n\n"
+#: Client/core/CSettings.cpp:4784
+msgid "This option should only be changed if you experience performance issues.\n\n"
 "Are you sure you  want to enable this option?"
-msgstr "Mengaktifkan pengaturan ini mungkin akan meningkatkan performa game tapi pada beberapa prosesor, pengaturan ini mungkin memperburuk performa. \n"
-"Kami telah memperhatikan masalah dengan prosesor AMD Ryzen yang dilengkapi oleh 3D V-Cache.\n"
-"Daftar prosesor yang terpengaruhi masih tidak diketahui.\n\n"
-"Apakah Anda yakin ingin mengaktifkan opsi ini?"
+msgstr ""
 
-#: Client/core/CSettings.cpp:4927
+#: Client/core/CSettings.cpp:4921
 msgid "Please enter a nickname"
 msgstr "Silakan masukkan nama"
 
-#: Client/core/CSettings.cpp:4928
+#: Client/core/CSettings.cpp:4922
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "Silakan masukkan nama untuk digunakan dalam permainan.  \n"
 "Ini akan menjadi nama anda ketika anda terhubung dan bermain di sebuah server"
 
-#: Client/core/CSettings.cpp:4946
+#: Client/core/CSettings.cpp:4940
 msgid "Very experimental feature."
 msgstr "Fitur yang sangat eksperimental."
 
-#: Client/core/CSettings.cpp:4948
+#: Client/core/CSettings.cpp:4942
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "Hentikan variasi CJ (Menggunakan 65MB lebih banyak RAM)"
 
-#: Client/core/CSettings.cpp:4950
+#: Client/core/CSettings.cpp:4944
 msgid "Older routers may require a slower scan speed."
 msgstr "Router lama mungkin memerlukan kecepatan pemindaian yang lebih lambat."
 
-#: Client/core/CSettings.cpp:4952
+#: Client/core/CSettings.cpp:4946
 msgid "Switch on to use only one connection when downloading."
 msgstr "Nyalakan untuk menggunakan hanya satu sambungan ketika mengunduh."
 
-#: Client/core/CSettings.cpp:4954
+#: Client/core/CSettings.cpp:4948
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "Tandai paket jaringan untuk membantu ISP mengidentifikasi arus MTA."
 
-#: Client/core/CSettings.cpp:4956
+#: Client/core/CSettings.cpp:4950
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Animasi lingkaran berputar di bagian bawah layar"
 
-#: Client/core/CSettings.cpp:4958
+#: Client/core/CSettings.cpp:4952
 msgid "Select default always. (This setting is not saved)"
 msgstr "Selalu pilih default. (Pengaturan ini tidak di simpan)"
 
-#: Client/core/CSettings.cpp:4960
+#: Client/core/CSettings.cpp:4954
 msgid "Maximum is usually best"
 msgstr "Maksimum biasanya yang paling baik"
 
-#: Client/core/CSettings.cpp:4962 Client/core/CSettings.cpp:4964
+#: Client/core/CSettings.cpp:4956 Client/core/CSettings.cpp:4958
 msgid "Auto updater:"
 msgstr "Pemuktahir otomatis:"
 
-#: Client/core/CSettings.cpp:4962
+#: Client/core/CSettings.cpp:4956
 msgid "Select default unless you like filling out bug reports."
 msgstr "Pilih default kecuali anda ingin mengisi laporan bug."
 
-#: Client/core/CSettings.cpp:4964
+#: Client/core/CSettings.cpp:4958
 msgid "Select default to automatically install important updates."
 msgstr "Pilih default untuk memasang pembaruan penting secara otomatis."
 
-#: Client/core/CSettings.cpp:4966
+#: Client/core/CSettings.cpp:4960
 msgid "16-bit color:"
 msgstr "warna 16-bit:"
 
-#: Client/core/CSettings.cpp:4966
+#: Client/core/CSettings.cpp:4960
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "Aktifkan mode warna 16 bit - MTA perlu dimulai ulang"
 
-#: Client/core/CSettings.cpp:4968
+#: Client/core/CSettings.cpp:4962
 msgid "Mouse fix:"
 msgstr "Penetapan mouse:"
 
-#: Client/core/CSettings.cpp:4968
+#: Client/core/CSettings.cpp:4962
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Penetapan gerakan mouse - Mungkin PC perlu dimulai ulang"
 
-#: Client/core/CSettings.cpp:4970
+#: Client/core/CSettings.cpp:4964
 msgid "CPU affinity:"
 msgstr "Afinitas CPU:"
 
-#: Client/core/CSettings.cpp:4970
-msgid "Experimental feature - It may improve performance or worsen it."
-msgstr "Fitur eksperimental - Fitur ini mungkin meningkatkan atau memperburuk performa."
+#: Client/core/CSettings.cpp:4964
+msgid "Experimental feature - Change only if you experience performance issues"
+msgstr ""
 
 #: Client/core/CScreenShot.cpp:117
 #, c-format
@@ -2610,9 +2605,8 @@ msgstr "Pembaruan direkomendasikan oleh server, tapi tidak wajib.\n\n"
 
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
-"Please check www.mtasa.com"
-msgstr "Pembaruan tidak tersedia saat ini.\n\n"
-"Mohon periksa www.mtasa.com"
+"Please check www.multitheftauto.com"
+msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -3339,8 +3333,8 @@ msgstr "Tolak"
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
-msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "Kesalahan fatal (%u). Jika masalah ini berlanjut, silakan cek mtasa.com untuk bantuan."
+msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
+msgstr ""
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3348,8 +3342,8 @@ msgstr "Kesalahan fatal (%u). Jika masalah ini berlanjut, silakan cek mtasa.com 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
-msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "Kesalahan protokol (%u). Jika masalah ini berlanjut, silakan cek mtasa.com untuk bantuan."
+msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
+msgstr ""
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
