@@ -2497,11 +2497,11 @@ void CClientVehicle::Create()
             g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(m_pSoundSettingsEntry.get());
         else
         {
-            uint32_t modelId = m_usModel;
+            std::uint32_t modelId = m_usModel;
             if (!CClientVehicleManager::IsStandardModel(modelId))
                 modelId = g_pGame->GetModelInfo(m_usModel)->GetParentID();
 
-            g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(m_usModel);
+            g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(modelId);
         }
 
         // Create the vehicle
