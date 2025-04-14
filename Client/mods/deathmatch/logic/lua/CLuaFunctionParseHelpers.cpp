@@ -967,7 +967,7 @@ ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID, "engine-on-sound
 ADD_ENUM(eVehicleAudioSettingProperty::HORN_HIGH, "horn-high")
 ADD_ENUM(eVehicleAudioSettingProperty::HORN_TON, "horn-ton")
 ADD_ENUM(eVehicleAudioSettingProperty::HORN_VOLUME_DELTA, "horn-volume-delta")
-ADD_ENUM(eVehicleAudioSettingProperty::RADIO_NUM, "radion-num")
+ADD_ENUM(eVehicleAudioSettingProperty::RADIO_NUM, "radio-num")
 ADD_ENUM(eVehicleAudioSettingProperty::RADIO_TYPE, "radio-type")
 ADD_ENUM(eVehicleAudioSettingProperty::SOUND_TYPE, "sound-type")
 ADD_ENUM(eVehicleAudioSettingProperty::BASS_SETTING, "bass-setting")
