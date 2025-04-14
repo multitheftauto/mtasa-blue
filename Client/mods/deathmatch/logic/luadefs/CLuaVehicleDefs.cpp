@@ -4440,8 +4440,8 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
             break;
         case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
         {
-            // Using SPC_ sound banks in a language that isn't the one selected in the game causes a crash
-            if (varValue > 364)
+            // Using SPC_ sound banks other than SPC_EA causes a crash
+            if (varValue > 410)
                 throw std::invalid_argument("Invalid engine-off-sound-bank-id value");
 
             pModelSettings.SetEngineOffSoundBankID(varValue);
@@ -4449,8 +4449,8 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
         }
         case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
         {
-            // Using SPC_ sound banks in a language that isn't the one selected in the game causes a crash
-            if (varValue > 364)
+            // Using SPC_ sound banks other than SPC_EA causes a crash
+            if (varValue > 410)
                 throw std::invalid_argument("Invalid engine-on-sound-bank-id value");
 
             pModelSettings.SetEngineOnSoundBankID(varValue);
@@ -4515,8 +4515,8 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
             break;
         case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
         {
-            // Using SPC_ sound banks in a language that isn't the one selected in the game causes a crash
-            if (varValue > 364)
+            // Using SPC_ sound banks other than SPC_EA causes a crash
+            if (varValue > 410)
                 throw std::invalid_argument("Invalid engine-off-sound-bank-id value");
 
             pModelSettings.SetEngineOffSoundBankID(varValue);
@@ -4524,8 +4524,8 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
         }
         case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
         {
-            // Using SPC_ sound banks in a language that isn't the one selected in the game causes a crash
-            if (varValue > 364)
+            // Using SPC_ sound banks other than SPC_EA causes a crash
+            if (varValue > 410)
                 throw std::invalid_argument("Invalid engine-on-sound-bank-id value");
 
             pModelSettings.SetEngineOnSoundBankID(varValue);
