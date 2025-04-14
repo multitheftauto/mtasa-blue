@@ -4439,11 +4439,23 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
             pModelSettings.SetDoorSound(varValue);
             break;
         case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
+        {
+            // Using SPC_ sound banks in a language that isn't the one selected in the game causes a crash
+            if (varValue > 364)
+                throw std::invalid_argument("Invalid engine-off-sound-bank-id value");
+
             pModelSettings.SetEngineOffSoundBankID(varValue);
             break;
+        }
         case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
+        {
+            // Using SPC_ sound banks in a language that isn't the one selected in the game causes a crash
+            if (varValue > 364)
+                throw std::invalid_argument("Invalid engine-on-sound-bank-id value");
+
             pModelSettings.SetEngineOnSoundBankID(varValue);
             break;
+        }
         case eVehicleAudioSettingProperty::HORN_HIGH:
             pModelSettings.SetHornHign(varValue);
             break;
@@ -4502,11 +4514,23 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
             pModelSettings.SetDoorSound(varValue);
             break;
         case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
+        {
+            // Using SPC_ sound banks in a language that isn't the one selected in the game causes a crash
+            if (varValue > 364)
+                throw std::invalid_argument("Invalid engine-off-sound-bank-id value");
+
             pModelSettings.SetEngineOffSoundBankID(varValue);
             break;
+        }
         case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
+        {
+            // Using SPC_ sound banks in a language that isn't the one selected in the game causes a crash
+            if (varValue > 364)
+                throw std::invalid_argument("Invalid engine-on-sound-bank-id value");
+
             pModelSettings.SetEngineOnSoundBankID(varValue);
             break;
+        }
         case eVehicleAudioSettingProperty::HORN_HIGH:
             pModelSettings.SetHornHign(varValue);
             break;
