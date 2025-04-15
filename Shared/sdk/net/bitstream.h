@@ -612,6 +612,10 @@ enum class eBitStreamVersion : unsigned short
     // 2025-01-29
     PedSync_CameraRotation,
 
+    // Add "vehicleburnexplosions" to setWorldSpecialPropertyEnabled
+    // 2025-02-20
+    WorldSpecialProperty_VehicleBurnExplosions,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
