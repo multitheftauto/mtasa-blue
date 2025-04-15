@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaVehicleDefs.h
  *  PURPOSE:     Lua vehicle definitions class header
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -171,6 +171,13 @@ public:
 
     static bool AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360, std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept;
     static bool RemoveVehicleSirens(CClientVehicle* vehicle) noexcept;
+    
+    static bool SetVehicleModelAudioSetting(const uint32_t uiModel, const eVehicleAudioSettingProperty eProperty, float varValue);
+    static bool ResetVehicleModelAudioSettings(const uint32_t uiModel);
+    static bool SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVehicleAudioSettingProperty eProperty, float varValue);
+    static bool ResetVehicleAudioSettings(CClientVehicle* pVehicle);
+    static std::unordered_map<std::string, float> GetVehicleModelAudioSettings(uint32_t uiModel);
+    static std::unordered_map<std::string, float> GetVehicleAudioSettings(CClientVehicle* pVehicle);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);

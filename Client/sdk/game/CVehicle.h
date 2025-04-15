@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CVehicle.h
  *  PURPOSE:     Vehicle entity interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -327,5 +327,5 @@ public:
     virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;
 
     virtual const CVector* GetDummyPositions() const = 0;
-
+    virtual void           ReinitAudio() = 0;
 };

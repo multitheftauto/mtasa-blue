@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGameSA.cpp
  *  PURPOSE:     Base game logic handling
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -147,6 +147,7 @@ CGameSA::CGameSA()
         m_pCoverManager = new CCoverManagerSA();
         m_pPlantManager = new CPlantManagerSA();
         m_pBuildingRemoval = new CBuildingRemovalSA();
+        m_pVehicleAudioSettingsManager = std::make_unique<CVehicleAudioSettingsManagerSA>();
 
         m_pRenderer = std::make_unique<CRendererSA>();
 
@@ -247,6 +248,7 @@ CGameSA::CGameSA()
         CCheckpointSA::StaticSetHooks();
         CHudSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
+        CVehicleAudioSettingsManagerSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {

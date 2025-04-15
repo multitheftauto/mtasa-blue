@@ -33,8 +33,6 @@
  * https://www.innovation.ch/java/ntlm.html
  */
 
-#define DEBUG_ME 0
-
 #include "urldata.h"
 #include "sendf.h"
 #include "strcase.h"
@@ -43,6 +41,7 @@
 #include "curl_base64.h"
 #include "vauth/vauth.h"
 #include "url.h"
+#include "strparse.h"
 
 /* SSL backend-specific #if branches in this file must be kept in the order
    documented in curl_ntlm_core. */
@@ -54,12 +53,6 @@
 #include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
-
-#if DEBUG_ME
-# define DEBUG_OUT(x) x
-#else
-# define DEBUG_OUT(x) Curl_nop_stmt
-#endif
 
 CURLcode Curl_input_ntlm(struct Curl_easy *data,
                          bool proxy,         /* if proxy or not */
@@ -78,9 +71,7 @@ CURLcode Curl_input_ntlm(struct Curl_easy *data,
   if(checkprefix("NTLM", header)) {
     header += strlen("NTLM");
 
-    while(*header && ISSPACE(*header))
-      header++;
-
+    Curl_str_passblanks(&header);
     if(*header) {
       unsigned char *hdr;
       size_t hdrlen;
