@@ -42,6 +42,7 @@ void CLuaAccountDefs::LoadFunctions()
         {"addAccount", AddAccount},
         {"removeAccount", RemoveAccount},
         {"setAccountPassword", SetAccountPassword},
+        {"setAccountSerial", ArgumentParser<SetAccountSerial>},
         {"setAccountData", SetAccountData},
         {"setAccountName", SetAccountName},
         {"copyAccountData", CopyAccountData},
@@ -71,6 +72,7 @@ void CLuaAccountDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setData", "setAccountData");
     lua_classfunction(luaVM, "setPassword", "setAccountPassword");
     lua_classfunction(luaVM, "setName", "setAccountName");
+    lua_classfunction(luaVM, "setSerial", "setAccountSerial");
 
     lua_classfunction(luaVM, "getSerial", "getAccountSerial");
     lua_classfunction(luaVM, "getIP", "getAccountIP");
@@ -512,6 +514,12 @@ int CLuaAccountDefs::RemoveAccount(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+bool CLuaAccountDefs::SetAccountSerial(CAccount* account, std::string serial) noexcept
+{
+    return CStaticFunctionDefinitions::SetAccountSerial(account, serial);
+}
+
 
 int CLuaAccountDefs::SetAccountName(lua_State* luaVM)
 {
