@@ -22,6 +22,7 @@ class CGroups;
 class CMarkerManager;
 class CBlipManager;
 class CObjectManager;
+class CBuildingManager;
 class CPickupManager;
 class CPlayerManager;
 class CRadarAreaManager;
@@ -58,6 +59,7 @@ private:
     CMarkerManager*    m_pMarkerManager;
     CBlipManager*      m_pBlipManager;
     CObjectManager*    m_pObjectManager;
+    CBuildingManager*  m_pBuildingManager;
     CPickupManager*    m_pPickupManager;
     CPlayerManager*    m_pPlayerManager;
     CRadarAreaManager* m_pRadarAreaManager;

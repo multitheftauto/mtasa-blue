@@ -82,6 +82,8 @@ public:
         TRAIN_TRACK,
         ROOT,
         UNKNOWN,
+        BUILDING,
+        _POINTLIGHTS, // client only
     };
 
 public:
