@@ -5,7 +5,7 @@
  *  FILE:        sdk/CVector2D.h
  *  PURPOSE:     2D vector class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

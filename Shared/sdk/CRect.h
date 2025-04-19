@@ -8,7 +8,7 @@
  *               CRect2D, except it's used by GTA:SA, and the initial values
  *               are NOT zero when constructed.
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

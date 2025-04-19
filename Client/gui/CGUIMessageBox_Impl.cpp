@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIMessageBox_Impl.cpp
  *  PURPOSE:     Message box class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CAnimBlendAssociation.h
  *  PURPOSE:     Animation blend association interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
