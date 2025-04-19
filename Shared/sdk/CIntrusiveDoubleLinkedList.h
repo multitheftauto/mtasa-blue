@@ -39,9 +39,11 @@ public:
         {
         }
 
+        // Point to the node value.
         reference operator*() const { return *m_ptr; }
 
-        pointer operator->() { return m_ptr; }
+        // Dereference the node value.
+        pointer operator->() const { return m_ptr; }
 
         // Prefix increment
         SIterator& operator++()
@@ -75,9 +77,72 @@ public:
             return tmp;
         }
 
+        // Test for equality with another iterator.
         friend bool operator== (const SIterator& a, const SIterator& b) { return a.m_ptr == b.m_ptr; };
 
+        // Test for inequality with another iterator.
         friend bool operator!= (const SIterator& a, const SIterator& b) { return a.m_ptr != b.m_ptr; };
+
+    private:
+        T* m_ptr;
+    };
+
+    struct SConstIterator
+    {
+        using iterator_category = std::bidirectional_iterator_tag;
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = T;
+        using pointer           = T*;
+        using reference         = T&;
+
+        SConstIterator(T* ptr) :
+            m_ptr(ptr)
+        {
+        }
+
+        // Point to the node value.
+        const reference operator*() const { return *m_ptr; }
+
+        // Dereference the node value.
+        const pointer operator->() const { return m_ptr; }
+
+        // Prefix increment
+        SConstIterator& operator++()
+        {
+            assert(m_ptr);
+            m_ptr = static_cast<T*>(m_ptr->m_next);
+            return *this;
+        }
+
+        // Prefix decrement
+        SConstIterator& operator--()
+        {
+            assert(m_ptr);
+            m_ptr = static_cast<T*>(m_ptr->m_previous);
+            return *this;
+        }
+
+        // Postfix increment
+        SConstIterator operator++(int)
+        {
+            SConstIterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        // Postfix decrement
+        SConstIterator operator--(int)
+        {
+            SConstIterator tmp = *this;
+            --(*this);
+            return tmp;
+        }
+
+        // Test for equality with another iterator.
+        friend bool operator== (const SConstIterator& a, const SConstIterator& b) { return a.m_ptr == b.m_ptr; };
+
+        // Test for inequality with another iterator.
+        friend bool operator!= (const SConstIterator& a, const SConstIterator& b) { return a.m_ptr != b.m_ptr; };
 
     private:
         T* m_ptr;
@@ -200,9 +265,17 @@ public:
     // Return whether is empty.
     bool Empty() const { return m_head == nullptr; }
 
+    // Return iterator to the first element.
     SIterator begin() { return SIterator(m_head); }
 
+    // Return iterator to the end.
     SIterator end() { return SIterator(nullptr); }
+
+    // Return iterator to the first element.
+    SConstIterator begin() const { return SConstIterator(m_head); }
+
+    // Return iterator to the end.
+    SConstIterator end() const { return SConstIterator(nullptr); }
 
 private:
     // First element.
