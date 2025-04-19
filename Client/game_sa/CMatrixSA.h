@@ -11,6 +11,7 @@
 #pragma once
 #include "CVector.h"
 #include "CRenderWareSA.h"
+#include "CMatrix.h"
 
 class CMatrixSAInterface
 {
@@ -45,4 +46,17 @@ public:
         m_up = up;
         m_pos = pos;
     }
+
+    CMatrix GetMatrix() const
+    {
+        CMatrix matrix;
+        matrix.vRight = m_right;
+        matrix.vFront = m_forward;
+        matrix.vUp = m_up;
+        matrix.vPos = m_pos;
+
+        return matrix;
+    }
+
+    CVector GetPosition() const noexcept { return m_pos; }
 };
