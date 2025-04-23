@@ -407,7 +407,7 @@ bool CClientPlayerClothes::AddClothingModel(const char* texture, const char* mod
         if (!g_pGame->GetRenderWare()->HasClothesFile(textureFile.c_str()))
             return false;
 
-        std::string modelFile = std::string(texture) + ".dff";
+        std::string modelFile = std::string(model) + ".dff";
 
         if (!g_pGame->GetRenderWare()->HasClothesFile(modelFile.c_str()))
             return false;
