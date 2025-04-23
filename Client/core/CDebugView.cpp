@@ -5,7 +5,7 @@
  *  FILE:        core/CDebugView.cpp
  *  PURPOSE:     In-game debug view window implementation
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

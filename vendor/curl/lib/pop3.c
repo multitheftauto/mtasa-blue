@@ -65,7 +65,6 @@
 #include "http.h" /* for HTTP proxy tunnel stuff */
 #include "socks.h"
 #include "pop3.h"
-#include "strtoofft.h"
 #include "strcase.h"
 #include "vtls/vtls.h"
 #include "cfilters.h"
@@ -245,7 +244,7 @@ static bool pop3_is_multiline(const char *cmdline)
  * types and allowed SASL mechanisms.
  */
 static bool pop3_endofresp(struct Curl_easy *data, struct connectdata *conn,
-                           char *line, size_t len, int *resp)
+                           const char *line, size_t len, int *resp)
 {
   struct pop3_conn *pop3c = &conn->proto.pop3c;
   (void)data;
@@ -420,7 +419,6 @@ static CURLcode pop3_perform_upgrade_tls(struct Curl_easy *data,
       goto out;
     /* Change the connection handler */
     conn->handler = &Curl_handler_pop3s;
-    conn->bits.tls_upgraded = TRUE;
   }
 
   DEBUGASSERT(!pop3c->ssldone);
@@ -1392,14 +1390,8 @@ static CURLcode pop3_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn)
 {
   /* Initialise the POP3 layer */
-  CURLcode result = pop3_init(data);
-  if(result)
-    return result;
-
-  /* Clear the TLS upgraded flag */
-  conn->bits.tls_upgraded = FALSE;
-
-  return CURLE_OK;
+  (void)conn;
+  return pop3_init(data);
 }
 
 /***********************************************************************
@@ -1588,11 +1580,11 @@ static CURLcode pop3_write(struct Curl_easy *data, const char *str,
         /* If the partial match was the CRLF and dot then only write the CRLF
            as the server would have inserted the dot */
         if(strip_dot && prev - 1 > 0) {
-          result = Curl_client_write(data, CLIENTWRITE_BODY, (char *)POP3_EOB,
+          result = Curl_client_write(data, CLIENTWRITE_BODY, POP3_EOB,
                                      prev - 1);
         }
         else if(!strip_dot) {
-          result = Curl_client_write(data, CLIENTWRITE_BODY, (char *)POP3_EOB,
+          result = Curl_client_write(data, CLIENTWRITE_BODY, POP3_EOB,
                                      prev);
         }
         else {
@@ -1612,7 +1604,7 @@ static CURLcode pop3_write(struct Curl_easy *data, const char *str,
     /* We have a full match so the transfer is done, however we must transfer
     the CRLF at the start of the EOB as this is considered to be part of the
     message as per RFC-1939, sect. 3 */
-    result = Curl_client_write(data, CLIENTWRITE_BODY, (char *)POP3_EOB, 2);
+    result = Curl_client_write(data, CLIENTWRITE_BODY, POP3_EOB, 2);
 
     k->keepon &= ~KEEP_RECV;
     pop3c->eob = 0;

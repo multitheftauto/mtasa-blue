@@ -5,7 +5,7 @@
  *  FILE:        sdk/CSingleton.h
  *  PURPOSE:     Base singleton template class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *  THIS FILE IS PROPERTY OF
  *  Copyright (C) Scott Bilas, 2000.
