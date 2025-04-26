@@ -842,6 +842,14 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
             case MENU_ITEM_MAP_EDITOR:
                 AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
                 return true;
+            case MENU_ITEM_DISCONNECT:
+                if (g_pCore->GetCVars()->GetValue("ask_before_disconnect", true))
+                {
+                    AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
+                    return true;
+                }
+     
+                break;
             default:
                 break;
         }
@@ -863,7 +871,7 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
     switch (m_pHoveredItem->menuType)
     {
         case MENU_ITEM_DISCONNECT:
-            OnDisconnectButtonClick(pElement);
+            OnDisconnectButtonClick();
             break;
         case MENU_ITEM_QUICK_CONNECT:
             OnQuickConnectButtonClick(pElement, Args.button == LeftButton);
@@ -948,13 +956,14 @@ void CMainMenu::HideServerInfo()
     m_ServerInfo.Hide();
 }
 
-bool CMainMenu::OnDisconnectButtonClick(CGUIElement* pElement)
+bool CMainMenu::OnDisconnectButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
     // Send "disconnect" command to the command handler
+    //m_pDisconnect->image->SetVisible(false);
     CCommands::GetSingleton().Execute("disconnect", "");
 
     return true;
@@ -1250,6 +1259,9 @@ void CMainMenu::WantsToDisconnectCallBack(void* pData, uint uiButton)
                 break;
             case MENU_ITEM_MAP_EDITOR:
                 OnEditorButtonClick();
+                break;
+            case MENU_ITEM_DISCONNECT:
+                OnDisconnectButtonClick();
                 break;
             default:
                 break;
