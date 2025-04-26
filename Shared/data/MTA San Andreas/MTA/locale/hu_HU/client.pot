@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-26 02:03+0000\n"
-"PO-Revision-Date: 2025-04-26 02:51\n"
+"PO-Revision-Date: 2025-04-26 09:13\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -2096,7 +2096,8 @@ msgstr "KÍSÉRLETI FUNKCIÓ"
 #: Client/core/CSettings.cpp:4790
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr ""
+msgstr "Ennek a beállításnak a kikapcsolása nem ajánlott, kivéve, ha teljesítményproblémák merülnek fel.\n\n"
+"Biztos, hogy ki akarja kapcsolni?"
 
 #: Client/core/CSettings.cpp:4926
 msgid "Please enter a nickname"
@@ -2174,7 +2175,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4969
 msgid "Only change if you're having stability issues."
-msgstr ""
+msgstr "Csak akkor változtasson, ha problémái vannak a stabilitással."
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:92
