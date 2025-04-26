@@ -2978,7 +2978,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
             // Check we're not doing any important animations
             eAnimID animId = pAssoc->GetAnimID();
             if (animId == eAnimID::ANIM_ID_WALK || animId == eAnimID::ANIM_ID_RUN || animId == eAnimID::ANIM_ID_IDLE ||
-                animId == eAnimID::ANIM_ID_WEAPON_CROUCH || animId == eAnimID::ANIM_ID_STEALTH_AIM)
+                animId == eAnimID::ANIM_ID_WEAPON_CROUCH || animId == eAnimID::ANIM_ID_KILL_PARTIAL)
             {
                 // Are our knife anims loaded?
                 std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
