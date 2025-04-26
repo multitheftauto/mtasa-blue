@@ -4765,34 +4765,39 @@ static void CPUAffinityQuestionCallBack(void* userdata, unsigned int button)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
-    if (button == 0)
-    {
-        auto const checkBox = reinterpret_cast<CGUICheckBox*>(userdata);
-        checkBox->SetSelected(false);
-    }
+    auto* checkbox = static_cast<CGUICheckBox*>(userdata);
+
+    if (!checkbox)
+        return;
+
+    if (button != 0)
+        return;
+
+    checkbox->SetSelected(true);
 }
 
 bool CSettings::OnAffinityClick(CGUIElement* pElement)
 {
-    static bool shownWarning = false;
+    static bool shown = false;
 
-    if (m_pProcessAffinityCheckbox->GetSelected() && !shownWarning)
-    {
-        shownWarning = true;
+    if (m_pProcessAffinityCheckbox->GetSelected() || shown)
+        return true;
 
-        std::string message = std::string(
-            _("This option should only be changed if you experience performance issues.\n"
-              "\nAre you sure you  want to enable this option?"));
+    shown = true;
 
-        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
-        pQuestionBox->Reset();
-        pQuestionBox->SetTitle(_("EXPERIMENTAL FEATURE"));
-        pQuestionBox->SetMessage(message);
-        pQuestionBox->SetButton(0, _("No"));
-        pQuestionBox->SetButton(1, _("Yes"));
-        pQuestionBox->SetCallback(CPUAffinityQuestionCallBack, m_pProcessAffinityCheckbox);
-        pQuestionBox->Show();
-    }
+    std::string title = _("EXPERIMENTAL FEATURE");
+    std::string message =
+        std::string(_("Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
+                      "Are you sure you want to disable it?"));
+
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(title);
+    pQuestionBox->SetMessage(message);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(CPUAffinityQuestionCallBack, m_pProcessAffinityCheckbox);
+    pQuestionBox->Show();
 
     return true;
 }
@@ -4961,7 +4966,7 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
     else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
-        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Experimental feature - Change only if you experience performance issues"));
+        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());
