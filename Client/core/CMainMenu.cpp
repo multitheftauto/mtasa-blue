@@ -963,7 +963,6 @@ bool CMainMenu::OnDisconnectButtonClick()
         return false;
 
     // Send "disconnect" command to the command handler
-    //m_pDisconnect->image->SetVisible(false);
     CCommands::GetSingleton().Execute("disconnect", "");
 
     return true;
