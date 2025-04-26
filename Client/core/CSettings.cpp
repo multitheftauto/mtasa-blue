@@ -4966,7 +4966,7 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
     else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
-        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only disable if you're having performance issues."));
+        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());
