@@ -89,7 +89,9 @@ void InitRwFunctions()
     RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51A0;
     RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5120;
     RtQuatRotate = (RtQuatRotate_t)0x7EB7C0;
-    
+    RwReadTexture = reinterpret_cast<RwReadTexture_t>(0x7F3AC0);
+    RwFrameRotate = reinterpret_cast<RwFrameRotate_t>(0x7F1010);
+
     SetTextureDict = (SetTextureDict_t)0x007319C0;
     LoadClumpFile = (LoadClumpFile_t)0x005371F0;
     LoadModel = (LoadModel_t)0x0040C6B0;
@@ -102,5 +104,9 @@ void InitRwFunctions()
     CTxdStore_RemoveRef = (CTxdStore_RemoveRef_t)0x00731A30;
     CTxdStore_AddRef = (CTxdStore_AddRef_t)0x00731A00;
     CTxdStore_GetNumRefs = (CTxdStore_GetNumRefs_t)0x00731AA0;
+    CTxdStore_PushCurrentTxd = reinterpret_cast<CTxdStore_PushCurrentTxd_t>(0x7316A0);
+    CTxdStore_PopCurrentTxd = reinterpret_cast<CTxdStore_PopCurrentTxd_t>(0x7316B0);
+    CTxdStore_FindTxdSlot = reinterpret_cast<CTxdStore_FindTxdSlot_t>(0x731850);
+
     CClothesBuilder_CopyTexture = (CClothesBuilder_CopyTexture_t)0x005A5730;
 }

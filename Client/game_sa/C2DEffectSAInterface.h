@@ -12,7 +12,6 @@
 
 #include "game/RenderWare.h"
 #include "game/CModelInfo.h"
-#include "game/C2DEffects.h"
 #include "CObjectSA.h"
 
 struct t2dEffectLight
@@ -206,11 +205,14 @@ union t2dEffectUnion
 class C2DEffectSAInterface
 {
 public:
-    RwV3d         position;
+    CVector       position;            // RwV3d
     e2dEffectType type;
     std::uint8_t  field_D[3];
 
     t2dEffectUnion effect;
+
+public:
+    void Shutdown() { ((void(__thiscall*)(C2DEffectSAInterface*))0x4C57D0)(this); }
 };
 
 class C2DEffectInfoStoreSAInterface
@@ -247,4 +249,11 @@ public:
     float               currentPosition;
     CEntitySAInterface* entity;
     CObjectSAInterface* objects[42];
+
+public:
+    void AddThisOne(CVector* start, CVector* bottom, CVector* top, CVector* end, bool moveDown, CEntitySAInterface* entity)
+    {
+        ((void(__thiscall*)(CEscalatorSAInterface*, CVector*, CVector*, CVector*, CVector*, bool, CEntitySAInterface*))0x717970)(this, start, bottom, top, end, moveDown, entity);
+    }
+    void SwitchOff() { ((void(__thiscall*)(CEscalatorSAInterface*))0x717860)(this); }
 };
