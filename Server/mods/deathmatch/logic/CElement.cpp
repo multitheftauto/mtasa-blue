@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CElement.cpp
  *  PURPOSE:     Base entity (element) class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -508,7 +508,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType)
+CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType, eCustomDataClientTrust* clientChangesMode)
 {
     assert(szName);
 
@@ -518,13 +518,17 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESy
     {
         if (pSyncType)
             *pSyncType = pData->syncType;
+
+        if (clientChangesMode)
+            *clientChangesMode = pData->clientChangesMode;
+
         return &pData->Variable;
     }
 
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pSyncType);
+        return m_pParent->GetCustomData(szName, true, pSyncType, clientChangesMode);
     }
 
     // None available

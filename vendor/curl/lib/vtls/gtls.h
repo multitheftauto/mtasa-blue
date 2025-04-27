@@ -30,6 +30,7 @@
 #ifdef USE_GNUTLS
 
 #include <gnutls/gnutls.h>
+#include "timeval.h"
 
 #ifdef HAVE_GNUTLS_SRP
 /* the function exists */
@@ -41,32 +42,59 @@
 
 struct Curl_easy;
 struct Curl_cfilter;
+struct alpn_spec;
 struct ssl_primary_config;
 struct ssl_config_data;
 struct ssl_peer;
+struct ssl_connect_data;
+struct Curl_ssl_session;
+
+int Curl_glts_get_ietf_proto(gnutls_session_t session);
+
+struct gtls_shared_creds {
+  gnutls_certificate_credentials_t creds;
+  char *CAfile; /* CAfile path used to generate X509 store */
+  struct curltime time; /* when the shared creds was created */
+  size_t refcount;
+  BIT(trust_setup); /* x509 anchors + CRLs have been set up */
+};
+
+CURLcode Curl_gtls_shared_creds_create(struct Curl_easy *data,
+                                       struct gtls_shared_creds **pcreds);
+CURLcode Curl_gtls_shared_creds_up_ref(struct gtls_shared_creds *creds);
+void Curl_gtls_shared_creds_free(struct gtls_shared_creds **pcreds);
 
 struct gtls_ctx {
   gnutls_session_t session;
-  gnutls_certificate_credentials_t cred;
+  struct gtls_shared_creds *shared_creds;
 #ifdef USE_GNUTLS_SRP
   gnutls_srp_client_credentials_t srp_client_cred;
 #endif
   CURLcode io_result; /* result of last IO cfilter operation */
-  BIT(trust_setup); /* x509 anchors + CRLs have been set up */
+  BIT(sent_shutdown);
 };
+
+size_t Curl_gtls_version(char *buffer, size_t size);
 
 typedef CURLcode Curl_gtls_ctx_setup_cb(struct Curl_cfilter *cf,
                                         struct Curl_easy *data,
                                         void *user_data);
 
+typedef CURLcode Curl_gtls_init_session_reuse_cb(struct Curl_cfilter *cf,
+                                                 struct Curl_easy *data,
+                                                 struct alpn_spec *alpns,
+                                                 struct Curl_ssl_session *scs,
+                                                 bool *do_early_data);
+
 CURLcode Curl_gtls_ctx_init(struct gtls_ctx *gctx,
                             struct Curl_cfilter *cf,
                             struct Curl_easy *data,
                             struct ssl_peer *peer,
-                            const unsigned char *alpn, size_t alpn_len,
+                            const struct alpn_spec *alpns,
                             Curl_gtls_ctx_setup_cb *cb_setup,
                             void *cb_user_data,
-                            void *ssl_user_data);
+                            void *ssl_user_data,
+                            Curl_gtls_init_session_reuse_cb *sess_reuse_cb);
 
 CURLcode Curl_gtls_client_trust_setup(struct Curl_cfilter *cf,
                                       struct Curl_easy *data,
@@ -78,6 +106,16 @@ CURLcode Curl_gtls_verifyserver(struct Curl_easy *data,
                                 struct ssl_config_data *ssl_config,
                                 struct ssl_peer *peer,
                                 const char *pinned_key);
+
+/* Extract TLS session and place in cache, if configured. */
+CURLcode Curl_gtls_cache_session(struct Curl_cfilter *cf,
+                                 struct Curl_easy *data,
+                                 const char *ssl_peer_key,
+                                 gnutls_session_t session,
+                                 curl_off_t valid_until,
+                                 const char *alpn,
+                                 unsigned char *quic_tp,
+                                 size_t quic_tp_len);
 
 extern const struct Curl_ssl Curl_ssl_gnutls;
 

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CWorldRPCs.cpp
  *  PURPOSE:     World remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -619,6 +619,12 @@ void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)
     bitStream.Read(g_TickRateSettings.iObjectSync);
     bitStream.Read(g_TickRateSettings.iKeySyncRotation);
     bitStream.Read(g_TickRateSettings.iKeySyncAnalogMove);
+
+    if (bitStream.Can(eBitStreamVersion::FixSyncerDistance))
+    {
+        bitStream.Read(g_TickRateSettings.iPedSyncerDistance);
+        bitStream.Read(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+    }
 }
 
 void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)

@@ -2,8 +2,8 @@ DLL files can be found in `Shared/data/MTA San Andreas/server`.
 That directory gets copied to the "Bin" directory when you run "win-install-data.bat".
 
 The source code for MySQL and OpenSSL used to produce the binaries can be found here:  
-https://github.com/mysql/mysql-server/releases/tag/mysql-8.4.0  
-https://github.com/openssl/openssl/releases/tag/openssl-3.3.1  
+https://github.com/mysql/mysql-server/releases/tag/mysql-8.4.4  
+https://github.com/openssl/openssl/releases/tag/openssl-3.4.1  
 
 ## How to compile OpenSSL
 
@@ -17,7 +17,7 @@ https://github.com/openssl/openssl/releases/tag/openssl-3.3.1
     ```
 5. Switch to the release tag:  
     ```bat
-    git switch --detach --force --recurse-submodules openssl-3.3.1
+    git switch --detach --force --recurse-submodules openssl-3.4.1
     ```
 6. Run `VsDevCmd.cmd` to open three Developer Command Prompts.  
 > [!IMPORTANT]  
@@ -60,7 +60,7 @@ https://github.com/openssl/openssl/releases/tag/openssl-3.3.1
     ```
 4. Switch to the release tag:  
     ```bat
-    git switch --detach --force --recurse-submodules mysql-8.4.0
+    git switch --detach --force --recurse-submodules mysql-8.4.4
     ```
 5. Apply the patch file:  
     ```bat

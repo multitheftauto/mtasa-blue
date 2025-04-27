@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CKeyGenSA.cpp
  *  PURPOSE:     Game key generator
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskSA.h
  *  PURPOSE:     Base game task
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -85,7 +85,8 @@ public:
 
     // our function(s)
     void              SetInterface(CTaskSAInterface* pInterface) { TaskInterface = pInterface; };
-    CTaskSAInterface* GetInterface() { return TaskInterface; }
+    CTaskSAInterface*       GetInterface() noexcept { return TaskInterface; }
+    const CTaskSAInterface* GetInterface() const noexcept { return TaskInterface; }
     bool              IsValid() { return GetInterface() != NULL; }
 
     void CreateTaskInterface(size_t nSize);

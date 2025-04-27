@@ -5,7 +5,7 @@
  *  FILE:        core/CCrashDumpWriter.cpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -194,13 +194,13 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     if (pModManager)
     {
         // Got a client?
-        if (pModManager->GetCurrentMod())
+        if (pModManager->IsLoaded())
         {
             // Protect us from "double-faults"
             try
             {
                 // Let the client handle it. If it could, continue the execution
-                if (pModManager->GetCurrentMod()->HandleException(pExceptionInformation))
+                if (pModManager->GetClient()->HandleException(pExceptionInformation))
                 {
                     // Delete the exception record and continue to search the exception stack
                     delete pExceptionInformation;

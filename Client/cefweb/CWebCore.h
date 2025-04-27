@@ -19,7 +19,7 @@
 #include <cef3/cef/include/cef_app.h>
 #define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
 #define BROWSER_LIST_UPDATE_INTERVAL (24*60*60)
-#define BROWSER_UPDATE_URL "http://cef.multitheftauto.com/get.php"
+#define BROWSER_UPDATE_URL "https://cef.multitheftauto.com/get.php"
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
@@ -54,7 +54,7 @@ class CWebCore : public CWebCoreInterface
 public:
     CWebCore();
     ~CWebCore();
-    bool Initialise() override;
+    bool Initialise(bool gpuEnabled) override;
 
     CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent);
     void               DestroyWebView(CWebViewInterface* pWebViewInterface);
@@ -108,6 +108,8 @@ public:
     static void StaticFetchWhitelistFinished(const SHttpDownloadResult& result);
     static void StaticFetchBlacklistFinished(const SHttpDownloadResult& result);
 
+    bool GetGPUEnabled() const noexcept;
+
 private:
     typedef std::pair<bool, eWebFilterType> WebFilterPair;
 
@@ -129,4 +131,7 @@ private:
     CXMLFile* m_pXmlConfig;
     int       m_iWhitelistRevision;
     int       m_iBlacklistRevision;
+
+    // Shouldn't be changed after init
+    bool m_bGPUEnabled;
 };

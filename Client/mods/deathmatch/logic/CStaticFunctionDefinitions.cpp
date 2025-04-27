@@ -28,7 +28,7 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CBuildingRemoval.h>
-#include <game/Task.h>
+#include <game/TaskBasic.h>
 
 using std::list;
 
@@ -51,7 +51,7 @@ static CClientMarkerManager*     m_pMarkerManager;
 static CClientPickupManager*     m_pPickupManager;
 static CMovingObjectsManager*    m_pMovingObjectsManager;
 static CBlendedWeather*          m_pBlendedWeather;
-static CRadarMap*                m_pRadarMap;
+static CPlayerMap*               m_pPlayerMap;
 static CClientCamera*            m_pCamera;
 static CClientExplosionManager*  m_pExplosionManager;
 static CClientProjectileManager* m_pProjectileManager;
@@ -88,7 +88,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager,
     m_pPickupManager = pManager->GetPickupManager();
     m_pMovingObjectsManager = m_pClientGame->GetMovingObjectsManager();
     m_pBlendedWeather = m_pClientGame->GetBlendedWeather();
-    m_pRadarMap = m_pClientGame->GetRadarMap();
+    m_pPlayerMap = m_pClientGame->GetPlayerMap();
     m_pCamera = pManager->GetCamera();
     m_pExplosionManager = pManager->GetExplosionManager();
     m_pProjectileManager = pManager->GetProjectileManager();
@@ -1702,50 +1702,47 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     const SPlayerClothing* pClothing = Ped.GetClothes()->GetClothing(ucType);
     if (pClothing)
     {
-        strOutTexture = pClothing->szTexture;
-        strOutModel = pClothing->szModel;
+        strOutTexture = pClothing->texture;
+        strOutModel = pClothing->model;
         return true;
     }
 
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState)
+bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept
 {
-    if (&Ped == GetLocalPlayer())
-    {
-        return GetControlState(szControl, bState);
-    }
+    if (&ped == GetLocalPlayer())
+        return GetControlState(control.c_str(), state);
 
-    if (Ped.GetType() == CCLIENTPLAYER)
+    if (ped.GetType() == CCLIENTPLAYER)
     {
-        CControllerState cs;
-        Ped.GetControllerState(cs);
-        bool bOnFoot = (!Ped.GetRealOccupiedVehicle());
-        bState = CClientPad::GetControlState(szControl, cs, bOnFoot);
-        float        fState = 0;
-        unsigned int uiIndex;
-        // Check it's Analog
-        if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
+        CControllerState controller;
+        ped.GetControllerState(controller);
+
+        bool foot = !ped.GetRealOccupiedVehicle();
+        state = CClientPad::GetControlState(control.c_str(), controller, foot);
+
+        float         analog = 0;
+        std::uint32_t index;
+
+        if (CClientPad::GetAnalogControlIndex(control.c_str(), index))
         {
-            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, false))
+            if (CClientPad::GetAnalogControlState(control.c_str(), controller, foot, analog, false))
             {
-                bState = fState > 0;
+                state = analog > 0;
                 return true;
             }
         }
-        // or binary.
         else
         {
-            bState = CClientPad::GetControlState(szControl, cs, bOnFoot);
+            state = CClientPad::GetControlState(control.c_str(), controller, foot);
             return true;
         }
     }
 
-    if (Ped.m_Pad.GetControlState(szControl, bState))
-    {
+    if (ped.m_Pad.GetControlState(control.c_str(), state))
         return true;
-    }
 
     return false;
 }
@@ -2274,10 +2271,13 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
                 pAnimAssociation->SetCurrentProgress(fProgress);
                 return true;
             }
+
+            Ped.m_AnimationCache.progress = fProgress;
         }
         else
         {
             Ped.KillAnimation();
+
             return true;
         }
     }
@@ -2300,6 +2300,8 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, con
                 pAnimAssociation->SetCurrentSpeed(fSpeed);
                 return true;
             }
+
+            Ped.m_AnimationCache.speed = fSpeed;
         }
     }
 
@@ -2361,24 +2363,13 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientEntity& Entity, const char* szControl, bool bState)
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept
 {
-    RUN_CHILDREN(SetPedControlState(**iter, szControl, bState))
-    if (IS_PED(&Entity))
-    {
-        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+    if (&ped == GetLocalPlayer())
+        return SetControlState(control.c_str(), state);
 
-        if (&Ped == GetLocalPlayer())
-        {
-            return SetControlState(szControl, bState);
-        }
-
-        if (Ped.m_Pad.SetControlState(szControl, bState))
-        {
-            return true;
-        }
-    }
-    return false;
+    if (ped.m_Pad.SetControlState(control.c_str(), state))
+        return true;
 }
 
 bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby)
@@ -2567,7 +2558,7 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
 bool CStaticFunctionDefinitions::SetPedStat(CClientEntity& Entity, ushort usStat, float fValue)
 {
     RUN_CHILDREN(SetPedStat(**iter, usStat, fValue))
-    if (IS_PED(&Entity) && Entity.IsLocalEntity())
+    if (IS_PED(&Entity))
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         // Dont let them set visual stats if they don't have the CJ model
@@ -2589,6 +2580,9 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
 {
     if (IS_PED(&Entity))
     {
+        if (!Entity.IsLocalEntity() && &Entity != GetLocalPlayer())
+            return false;
+
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         Ped.SetOnFire(bOnFire);
         return true;
@@ -2624,18 +2618,18 @@ bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, SString& st
 
 bool CStaticFunctionDefinitions::GetClothesByTypeIndex(unsigned char ucType, unsigned char ucIndex, SString& strOutTexture, SString& strOutModel)
 {
-    const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
-    if (pPlayerClothing)
-    {
-        if (ucIndex < CClientPlayerClothes::GetClothingGroupMax(ucType))
-        {
-            strOutTexture = pPlayerClothing[ucIndex].szTexture;
-            strOutModel = pPlayerClothing[ucIndex].szModel;
-            return true;
-        }
-    }
+    std::vector<const SPlayerClothing*> pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
 
-    return false;
+    if (pPlayerClothing.empty())
+        return false;
+
+    if (ucIndex > (pPlayerClothing.size() - 1))
+        return false;
+
+    strOutTexture = pPlayerClothing.at(ucIndex)->texture;
+    strOutModel = pPlayerClothing.at(ucIndex)->model;
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn)
@@ -2645,13 +2639,13 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, 
 
     for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
     {
-        const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
-        if (pPlayerClothing)
-        {
-            for (unsigned char ucIter = 0; pPlayerClothing[ucIter].szTexture != NULL; ucIter++)
+        std::vector<const SPlayerClothing*> pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
+
+        if (!pPlayerClothing.empty()) {
+            for (unsigned char ucIter = 0; ucIter < pPlayerClothing.size(); ucIter++)
             {
-                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter].szTexture) == 0) &&
-                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter].szModel) == 0))
+                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter]->texture.c_str()) == 0) &&
+                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter]->model.c_str()) == 0))
                 {
                     ucTypeReturn = ucType;
                     ucIndexReturn = ucIter;
@@ -3194,9 +3188,9 @@ bool CStaticFunctionDefinitions::SetVehicleLightState(CClientEntity& Entity, uns
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent, bool breakGlass)
 {
-    RUN_CHILDREN(SetVehiclePanelState(**iter, ucPanel, ucState))
+    RUN_CHILDREN(SetVehiclePanelState(**iter, ucPanel, ucState, spawnFlyingComponent, breakGlass))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -3204,7 +3198,7 @@ bool CStaticFunctionDefinitions::SetVehiclePanelState(CClientEntity& Entity, uns
 
         if (ucPanel < 7)
         {
-            Vehicle.SetPanelStatus(ucPanel, ucState);
+            Vehicle.SetPanelStatus(ucPanel, ucState, spawnFlyingComponent, breakGlass);
             return true;
         }
     }
@@ -7840,25 +7834,25 @@ bool CStaticFunctionDefinitions::SetWeaponClipAmmo(CClientWeapon* pWeapon, int i
 
 bool CStaticFunctionDefinitions::ForcePlayerMap(bool& bForced)
 {
-    m_pClientGame->GetRadarMap()->SetForcedState(bForced);
+    m_pClientGame->GetPlayerMap()->SetForcedState(bForced);
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsPlayerMapForced(bool& bForced)
 {
-    bForced = m_pRadarMap->GetForcedState();
+    bForced = m_pPlayerMap->GetForcedState();
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsPlayerMapVisible(bool& bVisible)
 {
-    bVisible = m_pRadarMap->IsRadarShowing();
+    bVisible = m_pPlayerMap->IsPlayerMapShowing();
     return true;
 }
 
 bool CStaticFunctionDefinitions::GetPlayerMapBoundingBox(CVector& vecMin, CVector& vecMax)
 {
-    if (m_pRadarMap->GetBoundingBox(vecMin, vecMax))
+    if (m_pPlayerMap->GetBoundingBox(vecMin, vecMax))
     {
         return true;
     }
@@ -8975,11 +8969,8 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 {
     assert(pVehicle);
 
-    eVehicleTypes         eModel = (eVehicleTypes)pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
-    const CHandlingEntry* pNewEntry;
-
-    pNewEntry = pVehicle->GetOriginalHandlingData();
+    const CHandlingEntry* pNewEntry = pVehicle->GetOriginalHandlingData();
 
     pEntry->SetMass(pNewEntry->GetMass());
     pEntry->SetTurnMass(pNewEntry->GetTurnMass());
@@ -9015,17 +9006,13 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
     // pEntry->SetTailLight(pNewEntry->GetTailLight ());
     pEntry->SetAnimGroup(pNewEntry->GetAnimGroup());
 
-    // Lower and Upper limits cannot match or LSOD (unless boat)
-    // if ( eModel != VEHICLE_BOAT )     // Commented until fully tested
+    float fSuspensionLimitSize = pEntry->GetSuspensionUpperLimit() - pEntry->GetSuspensionLowerLimit();
+    if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)
     {
-        float fSuspensionLimitSize = pEntry->GetSuspensionUpperLimit() - pEntry->GetSuspensionLowerLimit();
-        if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)
-        {
-            if (fSuspensionLimitSize >= 0.f)
-                pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() + 0.1f);
-            else
-                pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() - 0.1f);
-        }
+        if (fSuspensionLimitSize >= 0.f)
+            pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() + 0.1f);
+        else
+            pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() - 0.1f);
     }
 
     pVehicle->ApplyHandling();

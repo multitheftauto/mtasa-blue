@@ -6,8 +6,8 @@
 ::  * Remove inline from class method declarations
 ::  * Apply clang-format (ignoring _asm blocks and preprocessor directives)
 ::
-:: Get clang-format.exe from http://prereleases.llvm.org/win-snapshots/
-:: Get fnr.exe from http://findandreplace.io/download
+:: Get clang-format.exe from https://prereleases.llvm.org/win-snapshots/
+:: Get fnr.exe from https://findandreplace.io/download
 ::
 set CLANGFORMAT="%~dp0\clang-format-r325576.exe"
 set FNR="%~dp0\fnr.exe"

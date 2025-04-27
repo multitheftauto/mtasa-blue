@@ -14,16 +14,16 @@
 //
 
 IMPLEMENT_ENUM_BEGIN(eLuaType)
-ADD_ENUM(LUA_TNONE, "none")
-ADD_ENUM(LUA_TNIL, "nil")
-ADD_ENUM(LUA_TBOOLEAN, "boolean")
-ADD_ENUM(LUA_TLIGHTUSERDATA, "lightuserdata")
-ADD_ENUM(LUA_TNUMBER, "number")
-ADD_ENUM(LUA_TSTRING, "string")
-ADD_ENUM(LUA_TTABLE, "table")
-ADD_ENUM(LUA_TFUNCTION, "function")
-ADD_ENUM(LUA_TUSERDATA, "userdata")
-ADD_ENUM(LUA_TTHREAD, "thread")
+ADD_ENUM(static_cast<eLuaType>(LUA_TNONE), "none")
+ADD_ENUM(static_cast<eLuaType>(LUA_TNIL), "nil")
+ADD_ENUM(static_cast<eLuaType>(LUA_TBOOLEAN), "boolean")
+ADD_ENUM(static_cast<eLuaType>(LUA_TLIGHTUSERDATA), "lightuserdata")
+ADD_ENUM(static_cast<eLuaType>(LUA_TNUMBER), "number")
+ADD_ENUM(static_cast<eLuaType>(LUA_TSTRING), "string")
+ADD_ENUM(static_cast<eLuaType>(LUA_TTABLE), "table")
+ADD_ENUM(static_cast<eLuaType>(LUA_TFUNCTION), "function")
+ADD_ENUM(static_cast<eLuaType>(LUA_TUSERDATA), "userdata")
+ADD_ENUM(static_cast<eLuaType>(LUA_TTHREAD), "thread")
 IMPLEMENT_ENUM_END("lua-type")
 
 IMPLEMENT_ENUM_BEGIN(CGUIVerticalAlign)
@@ -110,6 +110,38 @@ ADD_ENUM(HUD_WANTED, "wanted")
 ADD_ENUM(HUD_CROSSHAIR, "crosshair")
 ADD_ENUM(HUD_ALL, "all")
 IMPLEMENT_ENUM_END("hud-component")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eHudComponentProperty)
+ADD_ENUM(eHudComponentProperty::POSITION, "position")
+ADD_ENUM(eHudComponentProperty::SIZE, "size")
+ADD_ENUM(eHudComponentProperty::FILL_COLOR, "fillColor")
+ADD_ENUM(eHudComponentProperty::FILL_COLOR_SECONDARY, "fillColorSecondary")
+ADD_ENUM(eHudComponentProperty::DRAW_BLACK_BORDER, "drawBlackBorder")
+ADD_ENUM(eHudComponentProperty::DRAW_PERCENTAGE, "drawPercentage")
+ADD_ENUM(eHudComponentProperty::BLINKING_HP_VALUE, "blinkingValue")
+ADD_ENUM(eHudComponentProperty::DROP_COLOR, "dropColor")
+ADD_ENUM(eHudComponentProperty::TEXT_OUTLINE, "fontOutline")
+ADD_ENUM(eHudComponentProperty::TEXT_SHADOW, "fontShadow")
+ADD_ENUM(eHudComponentProperty::TEXT_STYLE, "fontStyle")
+ADD_ENUM(eHudComponentProperty::TEXT_ALIGNMENT, "fontAlignment")
+ADD_ENUM(eHudComponentProperty::TEXT_PROPORTIONAL, "proportional")
+ADD_ENUM(eHudComponentProperty::CUSTOM_ALPHA, "useCustomAlpha")
+ADD_ENUM(eHudComponentProperty::TEXT_SIZE, "textSize")
+ADD_ENUM(eHudComponentProperty::ALL_PROPERTIES, "all")
+IMPLEMENT_ENUM_CLASS_END("hud-component-property")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eFontStyle)
+ADD_ENUM(eFontStyle::FONT_GOTHIC, "gothic")
+ADD_ENUM(eFontStyle::FONT_MENU, "menu")
+ADD_ENUM(eFontStyle::FONT_PRICEDOWN, "pricedown")
+ADD_ENUM(eFontStyle::FONT_SUBTITLES, "subtitles")
+IMPLEMENT_ENUM_CLASS_END("hud-component-font-style")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eFontAlignment)
+ADD_ENUM(eFontAlignment::ALIGN_CENTER, "center")
+ADD_ENUM(eFontAlignment::ALIGN_LEFT, "left")
+ADD_ENUM(eFontAlignment::ALIGN_RIGHT, "right")
+IMPLEMENT_ENUM_CLASS_END("hud-component-font-alignment")
 
 IMPLEMENT_ENUM_BEGIN(eAmbientSoundType)
 ADD_ENUM(AMBIENT_SOUND_GENERAL, "general")
@@ -675,6 +707,7 @@ IMPLEMENT_ENUM_END("surface-adhesion-group")
 IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
 ADD_ENUM(eClientModelType::PED, "ped")
 ADD_ENUM(eClientModelType::OBJECT, "object")
+ADD_ENUM(eClientModelType::OBJECT_DAMAGEABLE, "object-damageable")
 ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
 ADD_ENUM(eClientModelType::TIMED_OBJECT, "timed-object")
 ADD_ENUM(eClientModelType::CLUMP, "clump")
@@ -682,15 +715,15 @@ IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 // Sound effects
 IMPLEMENT_ENUM_BEGIN(eSoundEffectType)
-ADD_ENUM(BASS_FX_DX8_CHORUS, "chorus")
-ADD_ENUM(BASS_FX_DX8_COMPRESSOR, "compressor")
-ADD_ENUM(BASS_FX_DX8_DISTORTION, "distortion")
-ADD_ENUM(BASS_FX_DX8_ECHO, "echo")
-ADD_ENUM(BASS_FX_DX8_FLANGER, "flanger")
-ADD_ENUM(BASS_FX_DX8_GARGLE, "gargle")
-ADD_ENUM(BASS_FX_DX8_I3DL2REVERB, "i3dl2reverb")
-ADD_ENUM(BASS_FX_DX8_PARAMEQ, "parameq")
-ADD_ENUM(BASS_FX_DX8_REVERB, "reverb")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_CHORUS), "chorus")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_COMPRESSOR), "compressor")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_DISTORTION), "distortion")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_ECHO), "echo")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_FLANGER), "flanger")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_GARGLE), "gargle")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_I3DL2REVERB), "i3dl2reverb")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_PARAMEQ), "parameq")
+ADD_ENUM(static_cast<eSoundEffectType>(BASS_FX_DX8_REVERB), "reverb")
 IMPLEMENT_ENUM_END("soundeffect-type")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Chorus)
@@ -910,6 +943,41 @@ ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
 ADD_ENUM(PreloadAreaOption::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("preload-area-option")
 
+
+IMPLEMENT_ENUM_CLASS_BEGIN(taskType)
+ADD_ENUM(taskType::PRIMARY_TASK, "primary")
+ADD_ENUM(taskType::SECONDARY_TASK, "secondary")
+IMPLEMENT_ENUM_CLASS_END("tasks-types")
+
+IMPLEMENT_ENUM_BEGIN(eEntityType)
+ADD_ENUM(ENTITY_TYPE_NOTHING, "unknown")
+ADD_ENUM(ENTITY_TYPE_BUILDING, "building")
+ADD_ENUM(ENTITY_TYPE_VEHICLE, "vehicle")
+ADD_ENUM(ENTITY_TYPE_PED, "ped")
+ADD_ENUM(ENTITY_TYPE_OBJECT, "object")
+ADD_ENUM(ENTITY_TYPE_DUMMY, "dummy")
+ADD_ENUM(ENTITY_TYPE_NOTINPOOLS, "unknown")
+IMPLEMENT_ENUM_END("entity-type")
+
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eVehicleAudioSettingProperty)
+ADD_ENUM(eVehicleAudioSettingProperty::DOOR_SOUND, "door-sound")
+ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID, "engine-off-soundbank-id")
+ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID, "engine-on-soundbank-id")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_HIGH, "horn-high")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_TON, "horn-ton")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_VOLUME_DELTA, "horn-volume-delta")
+ADD_ENUM(eVehicleAudioSettingProperty::RADIO_NUM, "radio-num")
+ADD_ENUM(eVehicleAudioSettingProperty::RADIO_TYPE, "radio-type")
+ADD_ENUM(eVehicleAudioSettingProperty::SOUND_TYPE, "sound-type")
+ADD_ENUM(eVehicleAudioSettingProperty::BASS_SETTING, "bass-setting")
+ADD_ENUM(eVehicleAudioSettingProperty::BASS_EQ, "bass-eq")
+ADD_ENUM(eVehicleAudioSettingProperty::FIELD_C, "field-c")
+ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_UPGRADE, "engine-upgrade")
+ADD_ENUM(eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-audio")
+IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
+
+
 //
 // CResource from userdata
 //
@@ -1107,6 +1175,42 @@ void MixedReadMaterialString(CScriptArgReader& argStream, CClientMaterial*& pMat
                 argStream.SetCustomError(strFilePath, "Bad file path");
         }
     }
+}
+
+//
+// Check 4x4 lua table
+//
+bool IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept
+{
+    std::uint32_t cell = 0;
+
+    if (lua_type(luaVM, argIndex) == LUA_TTABLE)
+    {
+        lua_pushnil(luaVM);
+        for (std::uint32_t row = 0; lua_next(luaVM, argIndex) != 0; lua_pop(luaVM, 1), ++row)
+        {
+            if (lua_type(luaVM, -1) != LUA_TTABLE)
+                return false;
+
+            std::uint32_t col = 0;
+
+            lua_pushnil(luaVM);
+            for (; lua_next(luaVM, -2) != 0; lua_pop(luaVM, 1), ++col, ++cell)
+            {
+                int argumentType = lua_type(luaVM, -1);
+                if (argumentType != LUA_TNUMBER && argumentType != LUA_TSTRING)
+                    return false;
+            }
+
+            if (col != 4)
+                return false;
+        }
+    }
+
+    if (cell != 16)
+        return false;
+
+    return true;
 }
 
 //

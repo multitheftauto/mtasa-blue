@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -172,6 +172,27 @@ struct CLuaFunctionParserBase
         return T{};
     }
 
+    // Check if lua table is array (std::vector) or map
+    bool IsArray(lua_State* L, int index)
+    {
+        if (!lua_istable(L, index))
+            return false;
+
+        lua_pushnil(L);
+        while (lua_next(L, index < 0 ? (index - 1) : index))
+        {
+            if (!lua_isnumber(L, -2))
+            {
+                lua_pop(L, 2);
+                return false;
+            }
+
+            lua_pop(L, 1);
+        }
+
+        return true;
+    }
+
     // Special type matcher for variants. Returns -1 if the type does not match
     // returns n if the nth type of the variant matches
     template <typename T>
@@ -241,7 +262,7 @@ struct CLuaFunctionParserBase
 
         // std::vector is used for arrays built from tables
         else if constexpr (is_2specialization<T, std::vector>::value)
-            return iArgument == LUA_TTABLE;
+            return iArgument == LUA_TTABLE && IsArray(L, index);
 
         // std::unordered_map<k,v> is used for maps built from tables
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
@@ -283,9 +304,12 @@ struct CLuaFunctionParserBase
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
         }
-        // CMatrix may either be represented by 3 CLuaVector or by 12 numbers
+        // CMatrix can be represented either by 3 CLuaVectors, 12 numbers, or a 4x4 Lua table
         else if constexpr (std::is_same_v<T, CMatrix>)
         {
+            if (IsValidMatrixLuaTable(L, index))
+                return true;
+
             for (int i = 0; i < sizeof(CMatrix) / sizeof(float); i++)
             {
                 if (!lua_isnumber(L, index + i))
@@ -452,7 +476,7 @@ struct CLuaFunctionParserBase
             using param = typename is_2specialization<T, std::vector>::param1_t;
             T vecData;
             lua_pushnil(L); /* first key */
-            while (lua_next(L, index) != 0)
+            while (lua_next(L, index < 0 ? (index - 1) : index) != 0)
             {
                 if (!TypeMatch<param>(L, -1))
                 {
@@ -474,7 +498,7 @@ struct CLuaFunctionParserBase
             using value_t = typename is_5specialization<T, std::unordered_map>::param2_t;
             T map;
             lua_pushnil(L); /* first key */
-            while (lua_next(L, index) != 0)
+            while (lua_next(L, index < 0 ? (index - 1) : index) != 0)
             {
                 if (!TypeMatch<value_t>(L, -1) || !TypeMatch<key_t>(L, -2))
                 {
@@ -536,7 +560,11 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector2D>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                return CVector2D(x, y);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -561,7 +589,12 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                auto z = PopUnsafe<float>(L, index);
+                return CVector(x, y, z);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -584,7 +617,13 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector4D>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                auto z = PopUnsafe<float>(L, index);
+                auto w = PopUnsafe<float>(L, index);
+                return CVector4D(x, y, z, w);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -606,7 +645,13 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                const auto ReadVector = [&] { return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)); };
+                const auto ReadVector = [&]
+                {
+                    auto x = PopUnsafe<float>(L, index);
+                    auto y = PopUnsafe<float>(L, index);
+                    auto z = PopUnsafe<float>(L, index);
+                    return CVector(x, y, z);
+                };
 
                 CMatrix matrix;
 
@@ -614,6 +659,19 @@ struct CLuaFunctionParserBase
                 matrix.vFront = ReadVector();
                 matrix.vUp = ReadVector();
                 matrix.vPos = ReadVector();
+
+                return matrix;
+            }
+
+            if (lua_istable(L, index))
+            {
+                CMatrix matrix;
+
+                if (!ReadMatrix(L, index, matrix))
+                {
+                    SetBadArgumentError(L, "matrix", index, "table");
+                    return T{};
+                }
 
                 return matrix;
             }

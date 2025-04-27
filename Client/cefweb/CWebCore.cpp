@@ -49,10 +49,13 @@ CWebCore::~CWebCore()
     delete m_pXmlConfig;
 }
 
-bool CWebCore::Initialise()
+bool CWebCore::Initialise(bool gpuEnabled)
 {
     CefMainArgs        mainArgs;
     void*              sandboxInfo = nullptr;
+
+    m_bGPUEnabled = gpuEnabled;
+
     CefRefPtr<CWebApp> app(new CWebApp);
 
 #ifdef CEF_ENABLE_SANDBOX
@@ -406,7 +409,7 @@ std::unordered_set<SString> CWebCore::AllowPendingPages(bool bRemember)
     }
 
     // Trigger an event now
-    auto pCurrentMod = g_pCore->GetModManager()->GetCurrentMod();
+    auto pCurrentMod = g_pCore->GetModManager()->GetClient();
     if (!pCurrentMod)
         return std::unordered_set<SString>();
 
@@ -868,4 +871,9 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
 #ifdef MTA_DEBUG
     OutputDebugLine("Updated browser blacklist!");
 #endif
+}
+
+bool CWebCore::GetGPUEnabled() const noexcept
+{
+    return m_bGPUEnabled;
 }

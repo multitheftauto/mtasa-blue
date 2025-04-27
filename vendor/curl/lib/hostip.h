@@ -29,6 +29,7 @@
 #include "curl_addrinfo.h"
 #include "timeval.h" /* for timediff_t */
 #include "asyn.h"
+#include "httpsrr.h"
 
 #include <setjmp.h>
 
@@ -53,6 +54,13 @@ struct hostent;
 struct Curl_easy;
 struct connectdata;
 
+enum alpnid {
+  ALPN_none = 0,
+  ALPN_h1 = CURLALTSVC_H1,
+  ALPN_h2 = CURLALTSVC_H2,
+  ALPN_h3 = CURLALTSVC_H3
+};
+
 /*
  * Curl_global_host_cache_init() initializes and sets up a global DNS cache.
  * Global DNS cache is general badness. Do not use. This will be removed in
@@ -62,48 +70,18 @@ struct connectdata;
  */
 struct Curl_hash *Curl_global_host_cache_init(void);
 
-#ifdef USE_HTTPSRR
-
-#define CURL_MAXLEN_host_name 253
-
-struct Curl_https_rrinfo {
-  size_t len; /* raw encoded length */
-  unsigned char *val; /* raw encoded octets */
-  /*
-   * fields from HTTPS RR, with the mandatory fields
-   * first (priority, target), then the others in the
-   * order of the keytag numbers defined at
-   * https://datatracker.ietf.org/doc/html/rfc9460#section-14.3.2
-   */
-  uint16_t priority;
-  char *target;
-  char *alpns; /* keytag = 1 */
-  bool no_def_alpn; /* keytag = 2 */
-  /*
-   * we don't support ports (keytag = 3) as we don't support
-   * port-switching yet
-   */
-  unsigned char *ipv4hints; /* keytag = 4 */
-  size_t ipv4hints_len;
-  unsigned char *echconfiglist; /* keytag = 5 */
-  size_t echconfiglist_len;
-  unsigned char *ipv6hints; /* keytag = 6 */
-  size_t ipv6hints_len;
-};
-#endif
-
 struct Curl_dns_entry {
   struct Curl_addrinfo *addr;
 #ifdef USE_HTTPSRR
   struct Curl_https_rrinfo *hinfo;
 #endif
-  /* timestamp == 0 -- permanent CURLOPT_RESOLVE entry (doesn't time out) */
+  /* timestamp == 0 -- permanent CURLOPT_RESOLVE entry (does not time out) */
   time_t timestamp;
-  /* use-counter, use Curl_resolv_unlock to release reference */
-  long inuse;
+  /* reference counter, entry is freed on reaching 0 */
+  size_t refcount;
   /* hostname port number that resolved to addr. */
   int hostport;
-  /* hostname that resolved to addr. may be NULL (unix domain sockets). */
+  /* hostname that resolved to addr. may be NULL (Unix domain sockets). */
   char hostname[1];
 };
 
@@ -113,8 +91,8 @@ bool Curl_host_is_ipnum(const char *hostname);
  * Curl_resolv() returns an entry with the info for the specified host
  * and port.
  *
- * The returned data *MUST* be "unlocked" with Curl_resolv_unlock() after
- * use, or we'll leak memory!
+ * The returned data *MUST* be "released" with Curl_resolv_unlink() after
+ * use, or we will leak memory!
  */
 /* return codes */
 enum resolve_t {
@@ -161,9 +139,9 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
                                        int *waitp);
 
 
-/* unlock a previously resolved dns entry */
-void Curl_resolv_unlock(struct Curl_easy *data,
-                        struct Curl_dns_entry *dns);
+/* unlink a dns entry, potentially shared with a cache */
+void Curl_resolv_unlink(struct Curl_easy *data,
+                        struct Curl_dns_entry **pdns);
 
 /* init a new dns cache */
 void Curl_init_dnscache(struct Curl_hash *hash, size_t hashsize);
@@ -199,8 +177,8 @@ void Curl_printable_address(const struct Curl_addrinfo *ip,
  *
  * Returns the Curl_dns_entry entry pointer or NULL if not in the cache.
  *
- * The returned data *MUST* be "unlocked" with Curl_resolv_unlock() after
- * use, or we'll leak memory!
+ * The returned data *MUST* be "released" with Curl_resolv_unlink() after
+ * use, or we will leak memory!
  */
 struct Curl_dns_entry *
 Curl_fetch_addr(struct Curl_easy *data,
@@ -209,18 +187,13 @@ Curl_fetch_addr(struct Curl_easy *data,
 
 /*
  * Curl_cache_addr() stores a 'Curl_addrinfo' struct in the DNS cache.
- *
+ * @param permanent   iff TRUE, entry will never become stale
  * Returns the Curl_dns_entry entry pointer or NULL if the storage failed.
  */
 struct Curl_dns_entry *
 Curl_cache_addr(struct Curl_easy *data, struct Curl_addrinfo *addr,
-                const char *hostname, size_t hostlen, int port);
-
-#ifndef INADDR_NONE
-#define CURL_INADDR_NONE (in_addr_t) ~0
-#else
-#define CURL_INADDR_NONE INADDR_NONE
-#endif
+                const char *hostname, size_t hostlen, int port,
+                bool permanent);
 
 /*
  * Function provided by the resolver backend to set DNS servers to use.

@@ -6,7 +6,7 @@
  *  PURPOSE:     RenderWare-compatible definitions for
  *               Grand Theft Auto: San Andreas
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *  RenderWare is © Criterion Software
  *
  *****************************************************************************/

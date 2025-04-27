@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CSettingsSA.h
  *  PURPOSE:     Header file for game settings class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -147,6 +147,8 @@ public:
 
     bool IsDynamicPedShadowsEnabled();
     void SetDynamicPedShadowsEnabled(bool bEnable);
+    bool IsDynamicPedShadowsEnabledByVideoSetting() const noexcept;
+    bool ResetDynamicPedShadows() noexcept;
 
     float        GetAspectRatioValue();
     eAspectRatio GetAspectRatio();

@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CAnimBlendHierarchy.h
  *  PURPOSE:     Animation blend hierarchy interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -27,6 +27,7 @@ public:
     virtual void                            RemoveFromUncompressedCache() = 0;
     virtual void                            RemoveQuaternionFlips() = 0;
     virtual void                            CalculateTotalTime() = 0;
+    virtual float                           GetTotalTime() const noexcept = 0;
     virtual CAnimBlendSequenceSAInterface*  GetSequence(DWORD dwIndex) = 0;
     virtual CAnimBlendSequenceSAInterface*  GetSequences() = 0;
     virtual unsigned short                  GetNumSequences() = 0;

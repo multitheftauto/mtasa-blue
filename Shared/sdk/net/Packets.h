@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/Packets.h
  *  PURPOSE:     Packet enumeration
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,8 +15,34 @@
 
 enum ePacketID
 {
+    // Internal MTA packets
+    PACKET_ID_SERVER_JOIN = 0,
+    PACKET_ID_SERVER_JOIN_DATA,
+    PACKET_ID_SERVER_JOIN_COMPLETE,
+
+    PACKET_ID_PLAYER_JOIN,
+    PACKET_ID_PLAYER_JOINDATA,
+    PACKET_ID_PLAYER_QUIT,
+    PACKET_ID_PLAYER_TIMEOUT,
+
+    PACKET_ID_MOD_NAME,
+    PACKET_ID_PACKET_PROGRESS,
+    PACKET_ID_MTA_RESERVED_03,
+    PACKET_ID_MTA_RESERVED_04,
+    PACKET_ID_MTA_RESERVED_05,
+    PACKET_ID_MTA_RESERVED_06,
+    PACKET_ID_MTA_RESERVED_07,
+    PACKET_ID_MTA_RESERVED_08,
+    PACKET_ID_MTA_RESERVED_09,
+    PACKET_ID_MTA_RESERVED_10,
+    PACKET_ID_MTA_RESERVED_11,
+    PACKET_ID_MTA_RESERVED_12,
+    PACKET_ID_MTA_RESERVED_13,
+    PACKET_ID_MTA_RESERVED_14,
+    PACKET_ID_MTA_RESERVED_15,
+
     // Connection packets
-    PACKET_ID_SERVER_JOINEDGAME = PACKET_ID_END_OF_INTERNAL_PACKETS,
+    PACKET_ID_SERVER_JOINEDGAME,
     PACKET_ID_SERVER_DISCONNECTED,
 
     // All our outgoing only packets use this
@@ -151,4 +177,5 @@ enum ePacketID
     PACKET_ID_SERVER_INFO_SYNC,
     PACKET_ID_DISCORD_JOIN,
     PACKET_ID_PLAYER_RESOURCE_START,
+    PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY
 };

@@ -5,7 +5,7 @@
  *  FILE:        core/CServerBrowser.cpp
  *  PURPOSE:     In-game server browser user interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -924,30 +924,6 @@ void CServerBrowser::CreateHistoryList()
         }
     }
 
-    // If we had no history, import it from our old quick connect
-    if (bEmpty)
-    {
-        std::string strAddress;
-        CVARS_GET("qc_host", strAddress);
-
-        if (!strAddress.empty())
-        {
-            std::string strPort;
-            CVARS_GET("qc_port", strPort);
-
-            if (!strPort.empty())
-            {
-                in_addr Address;
-                if (CServerListItem::Parse(strAddress.c_str(), Address))
-                {
-                    m_ServersHistory.AddUnique(Address, atoi(strPort.c_str()));
-                    CreateHistoryList();            // Restart with our new list.
-                    return;
-                }
-            }
-        }
-    }
-
     m_ServersHistory.Refresh();
 }
 
@@ -1081,7 +1057,8 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
         const SString strVersion = !bIncludeOtherVersions ? "" : pServer->strVersion;
         const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
-        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d", pServer->nPlayers, pServer->nMaxPlayers);
+        const SString strVerified = pServer->isStatusVerified ? "" : "*";
+        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
         const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
 
         const SString strPing = pServer->nPing == 9999 ? "" : SString("%d", pServer->nPing);
@@ -1124,6 +1101,12 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
         m_pServerList[Type]->SetItemColor(iIndex, m_hPlayers[Type], color.R, color.G, color.B, color.A);
         m_pServerList[Type]->SetItemColor(iIndex, m_hPing[Type], color.R, color.G, color.B, color.A);
         m_pServerList[Type]->SetItemColor(iIndex, m_hGame[Type], color.R, color.G, color.B, color.A);
+
+        if (!pServer->isStatusVerified)
+        {
+            SColor orange = SColorRGBA(230, 200, 180, color.A);
+            m_pServerList[Type]->SetItemColor(iIndex, m_hPlayers[Type], orange.R, orange.G, orange.B, orange.A);
+        }
 
         // If the index was modified from the original, then update all indexes because it means there was some sort
         if (pServer->iRowIndex != iIndex)
@@ -2023,21 +2006,6 @@ std::string CServerBrowser::GetServerPassword(const std::string& strHost)
             }
         }
     }
-
-    // If the server is the one from old quick connect, try importing the password from that
-    std::string strQCEndpoint;
-    CVARS_GET("qc_host", strQCEndpoint);
-
-    std::string strTemp;
-    CVARS_GET("qc_port", strTemp);
-
-    strQCEndpoint = strQCEndpoint + ":" + strTemp;
-    if (strQCEndpoint == strHost)
-    {
-        CVARS_GET("qc_password", strTemp);
-        return strTemp;
-    }
-
     return "";
 }
 

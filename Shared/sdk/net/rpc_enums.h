@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/rpc_enums.h
  *  PURPOSE:     Lua RPC enums
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -285,8 +285,13 @@ enum eElementRPCFunctions
 
     RESPAWN_OBJECT,
     TOGGLE_OBJECT_RESPAWN,
-
     RESET_WORLD_PROPERTIES,
+
+    SPAWN_VEHICLE_FLYING_COMPONENT,
+
+    SET_VEHICLE_NITRO_ACTIVATED,
   
+    SET_ELEMENT_ON_FIRE,
+
     NUM_RPC_FUNCS            // Add above this line
 };

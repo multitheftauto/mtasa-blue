@@ -5,7 +5,7 @@
  *  FILE:        core/CServerList.h
  *  PURPOSE:     Header file for master server/LAN querying list
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,7 +23,7 @@ class CMasterServerManagerInterface;
 #include "CSingleton.h"
 
 // Master server list URL
-#define SERVER_LIST_MASTER_URL              "http://master.multitheftauto.com/ase/mta/"
+#define SERVER_LIST_MASTER_URL              "https://master.multitheftauto.com/ase/mta/"
 
 // Query response data buffer
 #define SERVER_LIST_QUERY_BUFFER            4096
@@ -139,6 +139,7 @@ public:
         bScanned = false;
         bSkipped = false;
         bSerials = false;
+        isStatusVerified = true;
         bPassworded = false;
         bKeepFlag = false;
         iRowIndex = -1;
@@ -182,6 +183,7 @@ public:
     unsigned short nPlayers;               // Current players
     unsigned short nMaxPlayers;            // Maximum players
     unsigned short nPing;                  // Ping time
+    bool           isStatusVerified;       // Ping status verified
     bool           bPassworded;            // Password protected
     bool           bSerials;               // Serial verification on
     bool           bScanned;

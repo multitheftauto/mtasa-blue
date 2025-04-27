@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CSettingsSA.cpp
  *  PURPOSE:     Game settings
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -315,6 +315,20 @@ void CSettingsSA::SetDynamicPedShadowsEnabled(bool bEnable)
 {
     m_bDynamicPedShadowsEnabled = bEnable;
 }
+
+bool CSettingsSA::IsDynamicPedShadowsEnabledByVideoSetting() const noexcept
+{
+    bool pedDynamicShadows;
+    g_pCore->GetCVars()->Get("dynamic_ped_shadows", pedDynamicShadows);
+    return pedDynamicShadows;
+}
+
+bool CSettingsSA::ResetDynamicPedShadows() noexcept
+{
+    pGame->GetSettings()->SetDynamicPedShadowsEnabled(pGame->GetSettings()->IsDynamicPedShadowsEnabledByVideoSetting());
+    return true;
+}
+
 
 //
 // Volumetric shadow hooks

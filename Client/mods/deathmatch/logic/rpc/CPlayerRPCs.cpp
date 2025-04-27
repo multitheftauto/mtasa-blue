@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CPlayerRPCs.cpp
  *  PURPOSE:     Player remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -60,7 +60,7 @@ void CPlayerRPCs::ForcePlayerMap(NetBitStreamInterface& bitStream)
     if (bitStream.Read(ucVisible))
     {
         bool bVisible = (ucVisible == 1);
-        m_pClientGame->GetRadarMap()->SetForcedState(bVisible);
+        m_pClientGame->GetPlayerMap()->SetForcedState(bVisible);
     }
 }
 

@@ -18,3 +18,4 @@
     #include "SharedUtil.SysInfo.hpp"
 #endif
 #include "SharedUtil.Memory.hpp"
+#include "UTF8.hpp"

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGaragesSA.h
  *  PURPOSE:     Header file for garage manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

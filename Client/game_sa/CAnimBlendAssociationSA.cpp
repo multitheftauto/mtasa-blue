@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAnimBlendAssociationSA.cpp
  *  PURPOSE:     Animation blend association
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -109,6 +109,11 @@ void CAnimBlendAssociationSA::FreeAnimBlendNodeArray()
 }
 
 std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy()
+{
+    return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);
+}
+
+const std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy() const noexcept
 {
     return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);
 }

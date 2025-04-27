@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CSettings.h
  *  PURPOSE:     Game settings interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -140,6 +140,8 @@ public:
 
     virtual bool IsDynamicPedShadowsEnabled() = 0;
     virtual void SetDynamicPedShadowsEnabled(bool bEnable) = 0;
+    virtual bool IsDynamicPedShadowsEnabledByVideoSetting() const noexcept = 0;
+    virtual bool ResetDynamicPedShadows()  noexcept = 0;
 
     virtual float        GetAspectRatioValue() = 0;
     virtual eAspectRatio GetAspectRatio() = 0;

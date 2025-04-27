@@ -1311,6 +1311,10 @@ void CMultiplayerSA::InitHooks()
     MemPut<DWORD>(0x748EFC, 0x748B08);
     MemPut<BYTE>(0x748B0E, 5);
 
+    // Skip copyright screen
+    MemSet((void*)0x748C2B, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeIn
+    MemSet((void*)0x748C9A, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeOut
+
     // Force triggering of the damage event for players on fire
     MemSet((void*)0x633695, 0x90, 6);
     MemPut<BYTE>(0x633720, 0);
@@ -1569,7 +1573,12 @@ void CMultiplayerSA::InitHooks()
     // Fix invisible vehicle windows when lights are on (#2936)
     MemPut<BYTE>(0x6E1425, 1);
 
+    // Allow alpha change for helicopter rotor (#523)
+    MemSet((void*)0x6C444B, 0x90, 6);
+    MemSet((void*)0x6C4453, 0x90, 0x68);
+    
     InitHooks_CrashFixHacks();
+    InitHooks_DeviceSelection();
 
     // Init our 1.3 hooks.
     Init_13();
@@ -1857,6 +1866,7 @@ void CMultiplayerSA::DisableCloseRangeDamage(bool bDisabled)
         MemPut<BYTE>(0x73BA00, 0x86);
     }
 }
+
 bool CMultiplayerSA::GetInteriorSoundsEnabled()
 {
     return bInteriorSoundsEnabled;
@@ -2757,14 +2767,14 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
                 {
                     activeEntityForStreaming = new CPedSAInterface();
                     MemSet (activeEntityForStreaming, 0, sizeof(CPedSAInterface));
-                    activeEntityForStreaming->Placeable.matrix = new CMatrix_Padded();
+                    activeEntityForStreaming->matrix = new CMatrix_Padded();
                 }
 
                 bActiveEntityForStreamingIsFakePed = true;
 
-                activeEntityForStreaming->Placeable.matrix->vPos.fX = vecPosition->fX;
-                activeEntityForStreaming->Placeable.matrix->vPos.fY = vecPosition->fY;
-                activeEntityForStreaming->Placeable.matrix->vPos.fZ = vecPosition->fZ;
+                activeEntityForStreaming->matrix->vPos.fX = vecPosition->fX;
+                activeEntityForStreaming->matrix->vPos.fY = vecPosition->fY;
+                activeEntityForStreaming->matrix->vPos.fZ = vecPosition->fZ;
             }*/
 
         // DWORD dwCurrentValue = *(DWORD *)FUNC_CPlayerInfoBase;
@@ -2775,7 +2785,7 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
     {
         /*if ( bActiveEntityForStreamingIsFakePed )
         {
-            delete activeEntityForStreaming->Placeable.matrix;
+            delete activeEntityForStreaming->matrix;
             delete activeEntityForStreaming;
         }
 
@@ -3212,10 +3222,10 @@ bool processGrab()
     {
         // CObjectSA * object = (CObjectSA*)entity;
         // CModelInfo * info = pGameInterface->GetModelInfo(entity->m_nModelIndex);
-        if (entity->Placeable.matrix)
-            edgeHeight = *entityEdgeHeight + entity->Placeable.matrix->vPos.fZ;
+        if (entity->matrix)
+            edgeHeight = *entityEdgeHeight + entity->matrix->vPos.fZ;
         else
-            edgeHeight = *entityEdgeHeight + entity->Placeable.m_transform.m_translate.fZ;
+            edgeHeight = *entityEdgeHeight + entity->m_transform.m_translate.fZ;
     }
     else
         edgeHeight = *entityEdgeHeight;
@@ -4577,7 +4587,7 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
         pVehicle->GetGravity(&vecGravity);
         pVehicle->GetMoveSpeed(&vecMoveSpeed);
         vecMoveSpeed += vecGravity * fTimeStep * fGravity;
-        pVehicle->SetMoveSpeed(&vecMoveSpeed);
+        pVehicle->SetMoveSpeed(vecMoveSpeed);
     }
     else
     {
@@ -4674,7 +4684,7 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 
     pVehicle->GetMoveSpeed(&gravcam_vecVehicleVelocity);
     CVector vecVelocityInverted = gravcam_matInvertGravity * gravcam_vecVehicleVelocity;
-    pVehicle->SetMoveSpeed(&vecVelocityInverted);
+    pVehicle->SetMoveSpeed(vecVelocityInverted);
     return true;
 }
 
@@ -4870,7 +4880,7 @@ void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
         return;
 
     pVehicle->SetMatrix(&gravcam_matVehicleTransform);
-    pVehicle->SetMoveSpeed(&gravcam_vecVehicleVelocity);
+    pVehicle->SetMoveSpeed(gravcam_vecVehicleVelocity);
 }
 
 void _declspec(naked) HOOK_VehicleCamEnd()
@@ -5008,7 +5018,7 @@ void _cdecl ApplyVehicleBlowHop(DWORD pVehicleInterface)
     pVehicle->GetGravity(&vecGravity);
     pVehicle->GetMoveSpeed(&vecVelocity);
     vecVelocity -= vecGravity * 0.13f;
-    pVehicle->SetMoveSpeed(&vecVelocity);
+    pVehicle->SetMoveSpeed(vecVelocity);
 }
 
 void _declspec(naked) HOOK_ApplyCarBlowHop()
@@ -6178,7 +6188,7 @@ void _declspec(naked) HOOK_ProcessVehicleCollision()
     }
 }
 
-void CMultiplayerSA::UpdateVehicleSuspension() noexcept
+void CMultiplayerSA::UpdateVehicleSuspension() const noexcept
 {
     HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
     HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
@@ -6366,13 +6376,13 @@ void RemoveObjectIfNeeded()
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
-        if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
+        if (!pBuildingAdd->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pBuildingAdd);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
-        if ((DWORD)(pLODInterface->vtbl) != VTBL_CPlaceable)
+        if (!pLODInterface->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pLODInterface);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
@@ -6445,7 +6455,7 @@ void RemoveDummyIfReplaced()
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
-        if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
+        if (!pBuildingAdd->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pBuildingAdd);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);

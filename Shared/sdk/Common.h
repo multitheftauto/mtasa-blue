@@ -5,7 +5,7 @@
  *  FILE:        sdk/Common.h
  *  PURPOSE:     Header for common definitions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -5,7 +5,7 @@
  *  FILE:        core/CMessageLoopHook.cpp
  *  PURPOSE:     Windows message loop hooking
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -131,13 +131,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
 
             if (pModManager && pModManager->IsLoaded())
             {
-                CClientBase* pBase = pModManager->GetCurrentMod();
-
-                if (pBase)
-                {
-                    bool bFocus = (wState == WA_CLICKACTIVE) || (wState == WA_ACTIVE);
-                    pBase->OnWindowFocusChange(bFocus);
-                }
+                bool bFocus = (wState == WA_CLICKACTIVE) || (wState == WA_ACTIVE);
+                pModManager->GetClient()->OnWindowFocusChange(bFocus);
             }
 
             switch (wState)
@@ -205,8 +200,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
         if (pCDS->dwData == URI_CONNECT)
         {
             // We can receive this message before we are ready to process it (e.g. trying to show a CEGUI message window before CEGUI is initialized).
-            // Ignore these messages until we are in the main menu (when CCore sets m_bFirstFrame to false)
-            if (!g_pCore->IsFirstFrame())
+            if (g_pCore->IsNetworkReady())
             {
                 LPSTR szConnectInfo = (LPSTR)pCDS->lpData;
                 CCommandFuncs::Connect(szConnectInfo);
@@ -461,7 +455,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             }
 
             // Lead the message through the keybinds message processor
-            if (!g_pCore->IsFirstFrame())
+            if (g_pCore->CanHandleKeyMessages())
             {
                 g_pCore->GetKeyBinds()->ProcessMessage(hwnd, uMsg, wParam, lParam);
             }
