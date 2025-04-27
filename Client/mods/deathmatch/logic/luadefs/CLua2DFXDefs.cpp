@@ -82,7 +82,7 @@ bool CLua2DFXDefs::RemoveModel2DFX(std::uint32_t model, std::uint32_t index)
     if (!modelInfo)
         return false;
 
-    if (index > GetModel2DFXCount(model) - 1)
+    if (index > GetModel2DFXCount(model, true) - 1)
         throw std::invalid_argument("Index out of bounds");
 
     return modelInfo->Remove2DFXEffect(index);
@@ -97,7 +97,7 @@ void CLua2DFXDefs::RestoreModel2DFX(std::uint32_t model, std::uint32_t index)
     if (!modelInfo)
         return;
 
-    if (index > GetModel2DFXCount(model) - 1)
+    if (index > GetModel2DFXCount(model, true) - 1)
         throw std::invalid_argument("Index out of bounds");
 
     modelInfo->Restore2DFXEffect(index);
@@ -129,7 +129,7 @@ void CLua2DFXDefs::SetModel2DFXPosition(std::uint32_t model, std::uint32_t index
     if (!modelInfo)
         return;
 
-    if (index > GetModel2DFXCount(model) - 1)
+    if (index > GetModel2DFXCount(model, true) - 1)
         throw std::invalid_argument("Index out of bounds");
 
     // Save original position
@@ -148,7 +148,7 @@ bool CLua2DFXDefs::SetModel2DFXProperty(std::uint32_t model, std::uint32_t index
     if (!modelInfo)
         return false;
 
-    if (index > GetModel2DFXCount(model) - 1)
+    if (index > GetModel2DFXCount(model, true) - 1)
         throw std::invalid_argument("Index out of bounds");
 
     const e2dEffectType& type = g_pGame->Get2DFXEffects()->Get2DFXEffectType(model, index);
@@ -200,7 +200,7 @@ void CLua2DFXDefs::ResetModel2DFXProperty(std::uint32_t model, std::uint32_t ind
     if (!modelInfo)
         return;
 
-    if (index > GetModel2DFXCount(model) - 1)
+    if (index > GetModel2DFXCount(model, true) - 1)
         throw std::invalid_argument("Index out of bounds");
 
     if (!CClient2DFXManager::IsValidProperty(g_pGame->Get2DFXEffects()->Get2DFXEffectType(model, index), property))
@@ -218,7 +218,7 @@ void CLua2DFXDefs::ResetModel2DFXPosition(std::uint32_t model, std::uint32_t ind
     if (!modelInfo)
         return;
 
-    if (index > GetModel2DFXCount(model) - 1)
+    if (index > GetModel2DFXCount(model, true) - 1)
         throw std::invalid_argument("Index out of bounds");
 
     modelInfo->Reset2DFXProperty(index, e2dEffectProperty::POSITION);
@@ -233,7 +233,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLua2DFXDefs::GetModel2
     if (!modelInfo)
         return false;
 
-    if (index > GetModel2DFXCount(model) - 1)
+    if (index > GetModel2DFXCount(model, true) - 1)
         throw std::invalid_argument("Index out of bounds");
 
     CVector& pos = g_pGame->Get2DFXEffects()->Get2DFXEffectPosition(model, index);
@@ -251,7 +251,7 @@ CLua2DFXDefs::GetModel2DFXProperty(std::uint32_t model, std::uint32_t index, e2d
     if (!modelInfo)
         return false;
 
-    if (index > GetModel2DFXCount(model) - 1)
+    if (index > GetModel2DFXCount(model, true) - 1)
         throw std::invalid_argument("Index out of bounds");
 
     if (!CClient2DFXManager::IsValidProperty(g_pGame->Get2DFXEffects()->Get2DFXEffectType(model, index), property))
@@ -349,7 +349,7 @@ std::variant<bool, effectsMap> CLua2DFXDefs::GetModel2DFXEffects(std::uint32_t m
     return tbl;
 }
 
-std::uint32_t CLua2DFXDefs::GetModel2DFXCount(std::uint32_t model)
+std::uint32_t CLua2DFXDefs::GetModel2DFXCount(std::uint32_t model, std::optional<bool> includeCustomEffects)
 {
     if (!CClient2DFXManager::IsValidModel(model))
         throw std::invalid_argument("Invalid model ID");
@@ -358,7 +358,7 @@ std::uint32_t CLua2DFXDefs::GetModel2DFXCount(std::uint32_t model)
     if (!modelInfo)
         return 0;
 
-    return modelInfo->Get2DFXEffectsCount();
+    return modelInfo->Get2DFXEffectsCount(includeCustomEffects.value_or(true));
 }
 
 e2dEffectType CLua2DFXDefs::GetModel2DFXType(std::uint32_t model, std::uint32_t index)

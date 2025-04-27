@@ -56,6 +56,6 @@ public:
                         effectFlagsTable>
     GetModel2DFXProperty(std::uint32_t model, std::uint32_t index, e2dEffectProperty property, std::optional<bool> getFlagsAsTable);
     static std::variant<bool, effectsMap> GetModel2DFXEffects(std::uint32_t model, std::optional<bool> includeCustomEffects);
-    static std::uint32_t                  GetModel2DFXCount(std::uint32_t model);
+    static std::uint32_t                  GetModel2DFXCount(std::uint32_t model, std::optional<bool> includeCustomEffects);
     static e2dEffectType                  GetModel2DFXType(std::uint32_t model, std::uint32_t index);
 };

@@ -2164,6 +2164,9 @@ void CModelInfoSA::Store2DFXProperties(std::uint32_t index, const e2dEffectPrope
     if (!effect)
         return;
 
+    // Save model as modified
+    ms_modified2DFXModels.insert(m_dwModelID);
+
     // Only store properties of game effects,
     // because custom effects retain their properties after a restream
     if (IsCustom2DFXEffect(effect))

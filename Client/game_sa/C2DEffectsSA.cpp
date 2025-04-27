@@ -149,7 +149,7 @@ void C2DEffectsSA::DeInitEffect(C2DEffectSAInterface* effect, std::uint32_t mode
             }
 
             // We only free memory for the custom effect.
-            // The in-game effects are managed by CMemoryMgr in the RW plugin (EffectStreamRead)
+            // The original effects are managed by CMemoryMgr in the RW plugin (EffectStreamRead)
             if (isCustomEffect && effect->effect.roadsign.text)
             {
                 std::free(effect->effect.roadsign.text);
