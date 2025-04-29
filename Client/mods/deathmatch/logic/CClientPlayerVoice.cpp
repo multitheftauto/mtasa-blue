@@ -398,6 +398,20 @@ bool CClientPlayerVoice::IsFxEffectEnabled(uint uiFxEffect)
     return m_EnabledEffects[uiFxEffect] ? true : false;
 }
 
+bool CClientPlayerVoice::SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+{
+    if (IsFxEffectEnabled(uiFxEffect))
+        return BASS_FXSetParameters(m_FxEffects[uiFxEffect], params);
+    return false;
+}
+
+bool CClientPlayerVoice::GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+{
+    if (IsFxEffectEnabled(uiFxEffect))
+        return BASS_FXGetParameters(m_FxEffects[uiFxEffect], params);
+    return false;
+}
+
 bool CClientPlayerVoice::GetPan(float& fPan)
 {
     fPan = 0.0f;
