@@ -1903,18 +1903,48 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
 {
     //  table getSoundEffectParameters ( sound sound, string effectName )
-    CClientSound*    pSound = nullptr;
+    // This wrapper eliminates the need in additional methods inside CClientPlayer.
+    // It doesn't look right to put them there.
+    struct SPlayerVoiceWrapper
+    {
+        CClientPlayer* pPlayer{};
+
+        bool IsFxEffectEnabled(uint uiFxEffect)
+        {
+            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
+            if (pVoice)
+                return pVoice->IsFxEffectEnabled(uiFxEffect);          
+            return false;
+        }
+
+        bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+        {
+            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
+            if (pVoice)
+                return pVoice->SetFxEffectParameters(uiFxEffect, params);            
+            return false;
+        }
+        bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+        {
+            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
+            if (pVoice)
+                return pVoice->GetFxEffectParameters(uiFxEffect, params);            
+            return false;
+        }
+    };
+
+    CClientSound* pSound{};
+    SPlayerVoiceWrapper playerVoice;
     eSoundEffectType eEffectType;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadEnumString(eEffectType);
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    const auto ProcessSoundParams = [luaVM, &eEffectType](auto* pSound) {
+        if (!pSound->IsFxEffectEnabled(eEffectType))
+        {
+            return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
+        }
 
-    if (pSound->IsFxEffectEnabled(eEffectType))
-    {
         using namespace eSoundEffectParams;
         switch (eEffectType)
         {
@@ -2162,7 +2192,34 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 break;
             }
         }
+
+        lua_pushboolean(luaVM, false);
+        return 1;
+    };
+
+    if (argStream.NextIsUserDataOfType<CClientSound>())
+        argStream.ReadUserData(pSound);
+    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
+        argStream.ReadUserData(playerVoice.pPlayer);
+    else
+    {
+        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
+        lua_pushboolean(luaVM, false);
+        return false;
     }
+    argStream.ReadEnumString(eEffectType);
+
+    if (!argStream.HasErrors())
+    {
+        if (pSound)
+            return ProcessSoundParams(pSound);
+        else if (playerVoice.pPlayer)
+            return ProcessSoundParams(&playerVoice);
+        else
+            assert(nullptr && "Unreachable");
+    }
+
+    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
