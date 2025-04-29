@@ -1393,40 +1393,39 @@ int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
     return 1;
 }
 
+// This wrapper eliminates the need in additional methods inside CClientPlayer.
+// It doesn't look right to put them there.
+struct SPlayerVoiceWrapper
+{
+    CClientPlayer* pPlayer{};
+
+    bool IsFxEffectEnabled(uint uiFxEffect)
+    {
+        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
+        if (pVoice)
+            return pVoice->IsFxEffectEnabled(uiFxEffect);          
+        return false;
+    }
+
+    bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+    {
+        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
+        if (pVoice)
+            return pVoice->SetFxEffectParameters(uiFxEffect, params);            
+        return false;
+    }
+    bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+    {
+        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
+        if (pVoice)
+            return pVoice->GetFxEffectParameters(uiFxEffect, params);            
+        return false;
+    }
+};
+
 int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 {
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
-
-    // This wrapper eliminates the need in additional methods inside CClientPlayer.
-    // It doesn't look right to put them there.
-    struct SPlayerVoiceWrapper
-    {
-        CClientPlayer* pPlayer{};
-
-        bool IsFxEffectEnabled(uint uiFxEffect)
-        {
-            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-            if (pVoice)
-                return pVoice->IsFxEffectEnabled(uiFxEffect);          
-            return false;
-        }
-
-        bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
-        {
-            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-            if (pVoice)
-                return pVoice->SetFxEffectParameters(uiFxEffect, params);            
-            return false;
-        }
-        bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
-        {
-            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-            if (pVoice)
-                return pVoice->GetFxEffectParameters(uiFxEffect, params);            
-            return false;
-        }
-    };
-
     CClientSound* pSound{};
     SPlayerVoiceWrapper playerVoice;
     eSoundEffectType eEffectType;
@@ -1903,36 +1902,6 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
 {
     //  table getSoundEffectParameters ( sound sound, string effectName )
-    // This wrapper eliminates the need in additional methods inside CClientPlayer.
-    // It doesn't look right to put them there.
-    struct SPlayerVoiceWrapper
-    {
-        CClientPlayer* pPlayer{};
-
-        bool IsFxEffectEnabled(uint uiFxEffect)
-        {
-            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-            if (pVoice)
-                return pVoice->IsFxEffectEnabled(uiFxEffect);          
-            return false;
-        }
-
-        bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
-        {
-            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-            if (pVoice)
-                return pVoice->SetFxEffectParameters(uiFxEffect, params);            
-            return false;
-        }
-        bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
-        {
-            CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-            if (pVoice)
-                return pVoice->GetFxEffectParameters(uiFxEffect, params);            
-            return false;
-        }
-    };
-
     CClientSound* pSound{};
     SPlayerVoiceWrapper playerVoice;
     eSoundEffectType eEffectType;
