@@ -30,6 +30,9 @@ CClientTXD::~CClientTXD()
 
     // Remove us from all the clothes replacement doo dah
     g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_FileData.data());
+
+    // Remove us from all the clothes
+    g_pGame->GetRenderWare()->ClothesRemoveFile(m_FileData.data());
 }
 
 bool CClientTXD::Load(bool isRaw, SString input, bool enableFiltering)
@@ -48,6 +51,26 @@ bool CClientTXD::Load(bool isRaw, SString input, bool enableFiltering)
     {
         return LoadFromFile(std::move(input));
     }
+}
+
+bool CClientTXD::AddClothingTexture(const std::string& modelName)
+{
+    if (modelName.empty())
+        return false;
+
+    if (m_FileData.empty() && m_bIsRawData)
+        return false;
+
+    if (m_FileData.empty())
+    {
+        SString strUseFilename;
+        if (!GetFilenameToUse(strUseFilename))
+            return false;
+        if (!FileLoad(std::nothrow, strUseFilename, m_FileData))
+            return false;
+    }
+
+    return g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), modelName.c_str());
 }
 
 bool CClientTXD::Import(unsigned short usModelID)

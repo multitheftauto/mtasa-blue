@@ -5,7 +5,7 @@
  *  FILE:        sdk/core/CClientEntityBase.h
  *  PURPOSE:     Representation of client entity for Core
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

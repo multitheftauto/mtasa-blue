@@ -5,7 +5,7 @@
  *  FILE:        core/CConnectManager.h
  *  PURPOSE:     Header file for connect manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

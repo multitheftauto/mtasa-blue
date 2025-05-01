@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-17 23:49+0000\n"
-"PO-Revision-Date: 2025-03-18 01:50\n"
+"POT-Creation-Date: 2025-04-08 22:41+0000\n"
+"PO-Revision-Date: 2025-04-08 23:02\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -21,7 +21,7 @@ msgstr ""
 #. OK button
 #: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:37
 #: Client/core/CMainMenu.cpp:1214 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4918 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CSettings.cpp:4924 Client/core/CVersionUpdater.cpp:1607
 #: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
 #: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
@@ -33,7 +33,7 @@ msgstr "確定"
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:40
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4917
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4923
 #: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
 #: Client/core/CVersionUpdater.cpp:1841
 msgid "Cancel"
@@ -47,9 +47,9 @@ msgstr "取消"
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:35
 #: Client/core/CMainMenu.cpp:1194 Client/core/CSettings.cpp:1423
-#: Client/core/CSettings.cpp:1447 Client/core/CSettings.cpp:4584
-#: Client/core/CSettings.cpp:4658 Client/core/CSettings.cpp:4688
-#: Client/core/CSettings.cpp:4737 Client/core/CSettings.cpp:4786
+#: Client/core/CSettings.cpp:1447 Client/core/CSettings.cpp:4592
+#: Client/core/CSettings.cpp:4666 Client/core/CSettings.cpp:4696
+#: Client/core/CSettings.cpp:4745 Client/core/CSettings.cpp:4792
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CQuestionBox.cpp:195
@@ -59,9 +59,9 @@ msgstr "是"
 
 #: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1193
 #: Client/core/CSettings.cpp:1422 Client/core/CSettings.cpp:1446
-#: Client/core/CSettings.cpp:4583 Client/core/CSettings.cpp:4657
-#: Client/core/CSettings.cpp:4687 Client/core/CSettings.cpp:4736
-#: Client/core/CSettings.cpp:4785 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CSettings.cpp:4591 Client/core/CSettings.cpp:4665
+#: Client/core/CSettings.cpp:4695 Client/core/CSettings.cpp:4744
+#: Client/core/CSettings.cpp:4791 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
@@ -371,8 +371,8 @@ msgstr "由於文件衝突導致無法更新，請關閉其他軟體並重試"
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
 #: Client/core/CConnectManager.cpp:329 Client/core/CConnectManager.cpp:415
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
-#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4261
-#: Client/core/CSettings.cpp:4289 Client/core/CSettings.cpp:4897
+#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4269
+#: Client/core/CSettings.cpp:4297 Client/core/CSettings.cpp:4903
 #: Client/core/CCore.cpp:1262 Client/core/CGUI.cpp:93
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1261
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1283
@@ -1051,7 +1051,7 @@ msgstr "已中斷連線"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1096
-#: Client/core/CSettings.cpp:3546 Client/core/CCore.cpp:670
+#: Client/core/CSettings.cpp:3550 Client/core/CCore.cpp:670
 msgid "In-game"
 msgstr ""
 
@@ -1185,7 +1185,7 @@ msgid "Choking to death in"
 msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:540
-#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3542
+#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3546
 #: Client/core/CCore.cpp:670
 msgid "Main menu"
 msgstr ""
@@ -1823,7 +1823,7 @@ msgstr "非常高"
 #: Client/core/CSettings.cpp:1041 Client/core/CSettings.cpp:1095
 #: Client/core/CSettings.cpp:1231 Client/core/CSettings.cpp:1561
 #: Client/core/CSettings.cpp:3193 Client/core/CSettings.cpp:3225
-#: Client/core/CSettings.cpp:3267 Client/core/CSettings.cpp:4329
+#: Client/core/CSettings.cpp:3271 Client/core/CSettings.cpp:4337
 msgid "Off"
 msgstr "關閉"
 
@@ -1956,49 +1956,49 @@ msgstr "其它"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1034
-#: Client/core/CSettings.cpp:4936
+#: Client/core/CSettings.cpp:4942
 msgid "Fast CJ clothes loading:"
 msgstr "快速載入CJ服裝:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1048
-#: Client/core/CSettings.cpp:4938
+#: Client/core/CSettings.cpp:4944
 msgid "Browser speed:"
 msgstr "瀏覧器速度:"
 
 #. Single download
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1062
-#: Client/core/CSettings.cpp:4940
+#: Client/core/CSettings.cpp:4946
 msgid "Single connection:"
 msgstr "單一連線:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:1026 Client/core/CSettings.cpp:1075
-#: Client/core/CSettings.cpp:4942
+#: Client/core/CSettings.cpp:4948
 msgid "Packet tag:"
 msgstr "封包標籤："
 
 #. Progress animation
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1088
-#: Client/core/CSettings.cpp:4944
+#: Client/core/CSettings.cpp:4950
 msgid "Progress animation:"
 msgstr "進度動畫："
 
 #. Process priority
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1101
-#: Client/core/CSettings.cpp:4934
+#: Client/core/CSettings.cpp:4940
 msgid "Process priority:"
 msgstr "優先處理權:"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1115
-#: Client/core/CSettings.cpp:4946
+#: Client/core/CSettings.cpp:4952
 msgid "Debug setting:"
 msgstr "除錯設定:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:1028 Client/core/CSettings.cpp:1138
-#: Client/core/CSettings.cpp:4948
+#: Client/core/CSettings.cpp:4954
 msgid "Streaming memory:"
 msgstr "串流記憶體:"
 
@@ -2028,7 +2028,7 @@ msgstr "非常慢"
 #: Client/core/CSettings.cpp:1232 Client/core/CSettings.cpp:1252
 #: Client/core/CSettings.cpp:3204 Client/core/CSettings.cpp:3211
 #: Client/core/CSettings.cpp:3218 Client/core/CSettings.cpp:3227
-#: Client/core/CSettings.cpp:3260
+#: Client/core/CSettings.cpp:3264
 msgid "Default"
 msgstr "預設"
 
@@ -2308,63 +2308,63 @@ msgstr "GTA遊戲控制"
 msgid "MULTIPLAYER CONTROLS"
 msgstr "多人遊戲控制"
 
-#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4897
+#: Client/core/CSettings.cpp:2982 Client/core/CSettings.cpp:4903
 msgid "Your nickname contains invalid characters!"
 msgstr "你的暱稱中含有不正當的字元!"
 
-#: Client/core/CSettings.cpp:3873
+#: Client/core/CSettings.cpp:3881
 msgid "Red:"
 msgstr "紅:"
 
-#: Client/core/CSettings.cpp:3873
+#: Client/core/CSettings.cpp:3881
 msgid "Green:"
 msgstr "綠:"
 
-#: Client/core/CSettings.cpp:3873
+#: Client/core/CSettings.cpp:3881
 msgid "Blue:"
 msgstr "藍色:"
 
-#: Client/core/CSettings.cpp:3873
+#: Client/core/CSettings.cpp:3881
 msgid "Transparency:"
 msgstr "透明度:"
 
-#: Client/core/CSettings.cpp:3876
+#: Client/core/CSettings.cpp:3884
 msgid "Color"
 msgstr "顏色"
 
-#: Client/core/CSettings.cpp:3953
+#: Client/core/CSettings.cpp:3961
 msgid "Preview"
 msgstr "預覽"
 
-#: Client/core/CSettings.cpp:4261
+#: Client/core/CSettings.cpp:4269
 msgid "Please disconnect before changing language"
 msgstr "請先離線後再變更語言"
 
-#: Client/core/CSettings.cpp:4289
+#: Client/core/CSettings.cpp:4297
 msgid "Please disconnect before changing skin"
 msgstr "在更換皮膚前請先斷線"
 
-#: Client/core/CSettings.cpp:4577
+#: Client/core/CSettings.cpp:4585
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "陰影體積化有可能會導致系統速度變慢\n\n"
 "你確定要啟用陰影體積化?"
 
-#: Client/core/CSettings.cpp:4581
+#: Client/core/CSettings.cpp:4589
 msgid "PERFORMANCE WARNING"
 msgstr "效能警告"
 
-#: Client/core/CSettings.cpp:4601
+#: Client/core/CSettings.cpp:4609
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "為達防止外掛發生目的，在某些伺服器中你需要上傳螢幕截圖來證明。\n\n"
 "(對話框及其圖像將不會連同螢幕截圖一併上傳)\n"
 
-#: Client/core/CSettings.cpp:4603
+#: Client/core/CSettings.cpp:4611
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "截圖上傳資訊"
 
-#: Client/core/CSettings.cpp:4618
+#: Client/core/CSettings.cpp:4626
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
@@ -2372,21 +2372,21 @@ msgstr "有些腳本會播放音效，像是網路上的電台音樂。\n\n"
 "關閉該設定\n"
 "會減少網路流量的使用。\n"
 
-#: Client/core/CSettings.cpp:4621
+#: Client/core/CSettings.cpp:4629
 msgid "EXTERNAL SOUNDS"
 msgstr "外部音效"
 
-#: Client/core/CSettings.cpp:4650
+#: Client/core/CSettings.cpp:4658
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
 msgstr ""
 
-#: Client/core/CSettings.cpp:4655
+#: Client/core/CSettings.cpp:4663
 msgid "CONSENT TO ALLOW DATA SHARING"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4679
+#: Client/core/CSettings.cpp:4687
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -2396,11 +2396,11 @@ msgstr "在你的GTA:SA目錄有些東西是有經過自行更改的.\n"
 "然而,更改過的GTA SA將會備很多伺服器禁止\n\n"
 "你確定你要使用他們嗎?"
 
-#: Client/core/CSettings.cpp:4685 Client/core/CVersionUpdater.cpp:2081
+#: Client/core/CSettings.cpp:4693 Client/core/CVersionUpdater.cpp:2081
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "已修改俠盜獵車手:聖安地列斯的文件檔"
 
-#: Client/core/CSettings.cpp:4728
+#: Client/core/CSettings.cpp:4736
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -2410,93 +2410,91 @@ msgstr "DPI感知是實驗性功能，\n"
 "若開啟該選項可能會導致畫面產生問題。\n\n"
 "您確定要開啟這個功能嗎？"
 
-#: Client/core/CSettings.cpp:4734 Client/core/CSettings.cpp:4783
+#: Client/core/CSettings.cpp:4742 Client/core/CSettings.cpp:4789
 msgid "EXPERIMENTAL FEATURE"
 msgstr "實驗性功能"
 
-#: Client/core/CSettings.cpp:4776
-msgid "Enabling this setting may improve game performance, but on some processors, it may worsen it.\n"
-"We have observed issues with AMD Ryzen processors featuring 3D V-Cache.\n"
-"The exact list of affected processors is unknown.\n\n"
+#: Client/core/CSettings.cpp:4784
+msgid "This option should only be changed if you experience performance issues.\n\n"
 "Are you sure you  want to enable this option?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4915
+#: Client/core/CSettings.cpp:4921
 msgid "Please enter a nickname"
 msgstr "請輸入一個暱稱"
 
-#: Client/core/CSettings.cpp:4916
+#: Client/core/CSettings.cpp:4922
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "請輸入暱稱以用於遊戲內。  \n"
 "當你進入伺服器後這將會成為你的名稱"
 
-#: Client/core/CSettings.cpp:4934
+#: Client/core/CSettings.cpp:4940
 msgid "Very experimental feature."
 msgstr "非常實驗性的功能。"
 
-#: Client/core/CSettings.cpp:4936
+#: Client/core/CSettings.cpp:4942
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "請停止使用CJ變數暫存檔(使用超過65MB記憶體)"
 
-#: Client/core/CSettings.cpp:4938
+#: Client/core/CSettings.cpp:4944
 msgid "Older routers may require a slower scan speed."
 msgstr "較舊的路由器掃描速度可能較慢。"
 
-#: Client/core/CSettings.cpp:4940
+#: Client/core/CSettings.cpp:4946
 msgid "Switch on to use only one connection when downloading."
 msgstr "當下載時，開啟以只使用單一連線。"
 
-#: Client/core/CSettings.cpp:4942
+#: Client/core/CSettings.cpp:4948
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "標記網路封包來幫助網路供應商識別MTA的流量。"
 
-#: Client/core/CSettings.cpp:4944
+#: Client/core/CSettings.cpp:4950
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "在畫面底部顯示轉圈動畫"
 
-#: Client/core/CSettings.cpp:4946
+#: Client/core/CSettings.cpp:4952
 msgid "Select default always. (This setting is not saved)"
 msgstr "經常選擇預設。(此項設定並不會儲存)"
 
-#: Client/core/CSettings.cpp:4948
+#: Client/core/CSettings.cpp:4954
 msgid "Maximum is usually best"
 msgstr "最大通常是最好"
 
-#: Client/core/CSettings.cpp:4950 Client/core/CSettings.cpp:4952
+#: Client/core/CSettings.cpp:4956 Client/core/CSettings.cpp:4958
 msgid "Auto updater:"
 msgstr "自動更新:"
 
-#: Client/core/CSettings.cpp:4950
+#: Client/core/CSettings.cpp:4956
 msgid "Select default unless you like filling out bug reports."
 msgstr "請選擇預設，有意願要填寫漏洞報告。"
 
-#: Client/core/CSettings.cpp:4952
+#: Client/core/CSettings.cpp:4958
 msgid "Select default to automatically install important updates."
 msgstr "選擇預設會自動安裝重要更新。"
 
-#: Client/core/CSettings.cpp:4954
+#: Client/core/CSettings.cpp:4960
 msgid "16-bit color:"
 msgstr "16位元的顏色:"
 
-#: Client/core/CSettings.cpp:4954
+#: Client/core/CSettings.cpp:4960
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "啟動 16位元顏色 並將MTA重啟"
 
-#: Client/core/CSettings.cpp:4956
+#: Client/core/CSettings.cpp:4962
 msgid "Mouse fix:"
 msgstr "修正滑鼠"
 
-#: Client/core/CSettings.cpp:4956
+#: Client/core/CSettings.cpp:4962
 msgid "Mouse movement fix - May need PC restart"
 msgstr "滑鼠移動修正 - 可能需要重啟電腦"
 
-#: Client/core/CSettings.cpp:4958
+#: Client/core/CSettings.cpp:4964
 msgid "CPU affinity:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4958
-msgid "Experimental feature - It may improve performance or worsen it."
+#: Client/core/CSettings.cpp:4964
+msgid "Experimental feature - Change only if you experience performance issues"
 msgstr ""
 
 #: Client/core/CScreenShot.cpp:117
@@ -2595,7 +2593,7 @@ msgstr "伺服器表示建議你進行更新，但並非一定要。\n\n"
 
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
-"Please check www.mtasa.com"
+"Please check www.multitheftauto.com"
 msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
@@ -3323,8 +3321,8 @@ msgstr "拒絕"
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
-msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "致命的錯誤(%u)，若這問題仍然存在，請參閱mtasa.com 取得技術支援。"
+msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
+msgstr ""
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3332,8 +3330,8 @@ msgstr "致命的錯誤(%u)，若這問題仍然存在，請參閱mtasa.com 取�
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
-msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "協議錯誤(%u)，若這問題仍然存在，請參閱mtasa.com 取得技術支援。"
+msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
+msgstr ""
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"

@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/SyncStructures.h
  *  PURPOSE:     Structures used for syncing stuff through the network.
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

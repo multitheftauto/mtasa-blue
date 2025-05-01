@@ -5,7 +5,7 @@
  *  FILE:        core/CCore.cpp
  *  PURPOSE:     Base core class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1783,7 +1783,7 @@ void CCore::ApplyCoreInitSettings()
 
     // Users with the default skin will be switched to the 2023 version by replacing "Default" with "Default 2023".
     // The "Default 2023" GUI skin was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
-    if (revision < 21486)
+    if (revision && revision < 21486)
     {
         auto skin = CVARS_GET_VALUE<std::string>("current_skin");
 
@@ -1800,12 +1800,14 @@ void CCore::ApplyCoreInitSettings()
     SetPriorityClass(process, priorities[priority]);
 
     bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+
     if (!affinity)
         return;
 
     DWORD_PTR mask;
     DWORD_PTR sys;
     BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
     if (result)
         SetProcessAffinityMask(process, mask & ~1);
 }

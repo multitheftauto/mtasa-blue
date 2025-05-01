@@ -16,6 +16,7 @@ class CClientVehicle;
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
 #include <game/CModelInfo.h>
+#include <game/CVehicleAudioSettingsEntry.h>
 
 #include "CClientCommon.h"
 #include "CClientCamera.h"
@@ -540,6 +541,11 @@ public:
     void  ResetWheelScale();
 
     bool OnVehicleFallThroughMap();
+    const CVehicleAudioSettingsEntry& GetAudioSettings() const noexcept;
+    CVehicleAudioSettingsEntry&       GetOrCreateAudioSettings();
+
+    void ApplyAudioSettings();
+    void ResetAudioSettings();
 
     bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const;
     bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
@@ -668,6 +674,7 @@ protected:
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
     float                                  m_fWheelScale;
+    std::unique_ptr<CVehicleAudioSettingsEntry> m_pSoundSettingsEntry;
 
     bool  m_bChainEngine;
     bool  m_bIsDerailed;

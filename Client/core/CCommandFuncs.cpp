@@ -5,7 +5,7 @@
  *  FILE:        core/CCommandFuncs.cpp
  *  PURPOSE:     Implementation of all built-in commands
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
