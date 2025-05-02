@@ -2106,7 +2106,8 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_IgnoreFireState))
             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data6), BITCOUNT6);
         else
-            data6.ignoreFireState = false;   
+            data6.ignoreFireState = false;
+        
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data7), BITCOUNT7);
         else
