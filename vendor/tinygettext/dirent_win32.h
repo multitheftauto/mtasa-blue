@@ -779,7 +779,7 @@ dirent_mbstowcs_s(
 
 #if defined(_MSC_VER)  &&  _MSC_VER >= 1400
 
-    wcscpy_s(wcstr, sizeInWords, *FromUTF8(mbstr));
+    wcscpy_s(wcstr, sizeInWords, utf8_mbstowcs(mbstr).c_str());
     error = 0;
 
 #else
@@ -829,7 +829,7 @@ dirent_wcstombs_s(
 
 #if defined(_MSC_VER)  &&  _MSC_VER >= 1400
 
-    strcpy_s(mbstr, sizeInBytes, *ToUTF8(wcstr));
+    strcpy_s(mbstr, sizeInBytes, utf8_wcstombs(wcstr).c_str());
     error = 0;
 
 #else

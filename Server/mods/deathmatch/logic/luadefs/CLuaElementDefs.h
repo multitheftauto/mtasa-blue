@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaElementDefs.h
  *  PURPOSE:     Lua element definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -77,6 +77,7 @@ public:
     LUA_DECLARE(addElementDataSubscriber);
     LUA_DECLARE(removeElementDataSubscriber);
     LUA_DECLARE(hasElementDataSubscriber);
+    static bool IsElementOnFire(CElement* element) noexcept;
 
     // Attachement
     LUA_DECLARE(attachElements);
@@ -106,4 +107,5 @@ public:
     LUA_DECLARE(setElementFrozen);
     LUA_DECLARE(setLowLODElement);
     LUA_DECLARE(setElementCallPropagationEnabled);
+    static bool SetElementOnFire(CElement* element, bool onFire) noexcept;
 };

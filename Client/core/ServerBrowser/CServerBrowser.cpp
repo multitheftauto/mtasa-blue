@@ -5,7 +5,7 @@
  *  FILE:        core/CServerBrowser.cpp
  *  PURPOSE:     In-game server browser user interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -920,30 +920,6 @@ void CServerBrowser::CreateHistoryList()
             for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
             {
                 m_pComboAddressHistory[i]->AddItem(("mtasa://" + pServer->strEndpoint).c_str())->SetData(pServer->strEndpoint.c_str());
-            }
-        }
-    }
-
-    // If we had no history, import it from our old quick connect
-    if (bEmpty)
-    {
-        std::string strAddress;
-        CVARS_GET("qc_host", strAddress);
-
-        if (!strAddress.empty())
-        {
-            std::string strPort;
-            CVARS_GET("qc_port", strPort);
-
-            if (!strPort.empty())
-            {
-                in_addr Address;
-                if (CServerListItem::Parse(strAddress.c_str(), Address))
-                {
-                    m_ServersHistory.AddUnique(Address, atoi(strPort.c_str()));
-                    CreateHistoryList();            // Restart with our new list.
-                    return;
-                }
             }
         }
     }
@@ -2030,21 +2006,6 @@ std::string CServerBrowser::GetServerPassword(const std::string& strHost)
             }
         }
     }
-
-    // If the server is the one from old quick connect, try importing the password from that
-    std::string strQCEndpoint;
-    CVARS_GET("qc_host", strQCEndpoint);
-
-    std::string strTemp;
-    CVARS_GET("qc_port", strTemp);
-
-    strQCEndpoint = strQCEndpoint + ":" + strTemp;
-    if (strQCEndpoint == strHost)
-    {
-        CVARS_GET("qc_password", strTemp);
-        return strTemp;
-    }
-
     return "";
 }
 

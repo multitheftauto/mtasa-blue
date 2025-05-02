@@ -38,7 +38,7 @@
 #include "curl_printf.h"
 
 #define IN6ADDRSZ       16
-#define INADDRSZ         4
+/* #define INADDRSZ         4 */
 #define INT16SZ          2
 
 /*
@@ -58,7 +58,7 @@
  *  - uses no statics
  *  - takes a unsigned char* not an in_addr as input
  */
-static char *inet_ntop4 (const unsigned char *src, char *dst, size_t size)
+static char *inet_ntop4(const unsigned char *src, char *dst, size_t size)
 {
   char tmp[sizeof("255.255.255.255")];
   size_t len;
@@ -74,8 +74,12 @@ static char *inet_ntop4 (const unsigned char *src, char *dst, size_t size)
 
   len = strlen(tmp);
   if(len == 0 || len >= size) {
-    errno = ENOSPC;
-    return (NULL);
+#ifdef USE_WINSOCK
+    CURL_SETERRNO(WSAEINVAL);
+#else
+    CURL_SETERRNO(ENOSPC);
+#endif
+    return NULL;
   }
   strcpy(dst, tmp);
   return dst;
@@ -84,14 +88,14 @@ static char *inet_ntop4 (const unsigned char *src, char *dst, size_t size)
 /*
  * Convert IPv6 binary address into presentation (printable) format.
  */
-static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
+static char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
 {
   /*
    * Note that int32_t and int16_t need only be "at least" large enough
-   * to contain a value of the specified size.  On some systems, like
+   * to contain a value of the specified size. On some systems, like
    * Crays, there is no such thing as an integer variable with 16 bits.
    * Keep this in mind if you think this function should have been coded
-   * to use pointer overlays.  All the world's not a VAX.
+   * to use pointer overlays. All the world's not a VAX.
    */
   char tmp[sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")];
   char *tp;
@@ -153,8 +157,7 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
     if(i == 6 && best.base == 0 &&
         (best.len == 6 || (best.len == 5 && words[5] == 0xffff))) {
       if(!inet_ntop4(src + 12, tp, sizeof(tmp) - (tp - tmp))) {
-        errno = ENOSPC;
-        return (NULL);
+        return NULL;
       }
       tp += strlen(tp);
       break;
@@ -168,11 +171,15 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
     *tp++ = ':';
   *tp++ = '\0';
 
-  /* Check for overflow, copy, and we're done.
+  /* Check for overflow, copy, and we are done.
    */
   if((size_t)(tp - tmp) > size) {
-    errno = ENOSPC;
-    return (NULL);
+#ifdef USE_WINSOCK
+    CURL_SETERRNO(WSAEINVAL);
+#else
+    CURL_SETERRNO(ENOSPC);
+#endif
+    return NULL;
   }
   strcpy(dst, tmp);
   return dst;
@@ -185,12 +192,11 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
  * Returns NULL on error and errno set with the specific
  * error, EAFNOSUPPORT or ENOSPC.
  *
- * On Windows we store the error in the thread errno, not
- * in the winsock error code. This is to avoid losing the
- * actual last winsock error. So when this function returns
- * NULL, check errno not SOCKERRNO.
+ * On Windows we store the error in the thread errno, not in the Winsock error
+ * code. This is to avoid losing the actual last Winsock error. When this
+ * function returns NULL, check errno not SOCKERRNO.
  */
-char *Curl_inet_ntop(int af, const void *src, char *buf, size_t size)
+char *curlx_inet_ntop(int af, const void *src, char *buf, size_t size)
 {
   switch(af) {
   case AF_INET:
@@ -198,7 +204,7 @@ char *Curl_inet_ntop(int af, const void *src, char *buf, size_t size)
   case AF_INET6:
     return inet_ntop6((const unsigned char *)src, buf, size);
   default:
-    errno = EAFNOSUPPORT;
+    CURL_SETERRNO(SOCKEAFNOSUPPORT);
     return NULL;
   }
 }

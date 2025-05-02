@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPhysicalSA.h
  *  PURPOSE:     Header file for physical object entity base class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,6 +15,8 @@
 #include "CEntitySA.h"
 #include <CVector.h>
 #include "CPtrNodeDoubleListSA.h"
+
+class CColPointSAInterface;
 
 #define FUNC_GetMoveSpeed                       0x404460
 #define FUNC_GetTurnSpeed                       0x470030
@@ -29,6 +31,8 @@
 
 class CPhysicalSAInterface : public CEntitySAInterface
 {
+    virtual std::int32_t ProcessEntityCollision(CEntitySAInterface* entity, CColPointSAInterface* colPoint) = 0;
+
 public:
     float  pad1;            // 56
     uint32 pad2;            // 60
@@ -104,8 +108,8 @@ public:
     CVector                   m_vecUnk;                                   // 280
     uint32                    m_pad4;                                     // 292
     CPtrNodeDoubleLink<void>* m_pControlCodeNodeLink;                           // 296
-    float                     m_fLighting;                                // 300
-    float                     m_fLighting2;                               // 304
+    float                     m_fLighting;                                // 300 surface brightness
+    float                     m_fLighting2;                               // 304 dynamic lighting (unused, always set to 0 in the GTA code)
     class CShadowDataSA*      m_pShadowData;                              // 308
 
     CRect*      GetBoundRect_(CRect* pRect);
@@ -121,7 +125,7 @@ public:
     CVector*     GetTurnSpeed(CVector* vecTurnSpeed);
     CVector*     GetMoveSpeedInternal(CVector* vecMoveSpeed);
     CVector*     GetTurnSpeedInternal(CVector* vecTurnSpeed);
-    void         SetMoveSpeed(CVector* vecMoveSpeed);
+    void         SetMoveSpeed(const CVector& vecMoveSpeed) noexcept;
     void         SetTurnSpeed(CVector* vecTurnSpeed);
 
     float GetMass();

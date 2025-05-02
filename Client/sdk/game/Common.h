@@ -29,7 +29,7 @@
 #define MAX_BUILDINGS                       13000
 #define MAX_DUMMIES                         2500
 #define MAX_ENTRY_INFO_NODES                ( MAX_ENTRY_INFO_NODES_MTA + 600 )      // 72600
-#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 90000
+#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 90000 May be changed in runtime
 #define MAX_POINTER_DOUBLE_LINKS            ( MAX_POINTER_DOUBLE_LINKS_MTA + 800 )  // 74800
 #define MAX_RWOBJECT_INSTANCES              2500
 
@@ -1441,6 +1441,37 @@ enum eObjectProperty
     OBJECT_PROPERTY_CENTEROFMASS,
     OBJECT_PROPERTY_BUOYANCY,
     OBJECT_PROPERTY_MAX,
+};
+
+enum class eVehicleSoundType : char
+{
+    CAR = 0,
+    MOTORCYCLE,
+    BICYCLE,
+    BOAT,
+    HELI,
+    PLANE,
+    TRAIN = 8,
+    TRAILLER,
+    SPECIAL,
+};
+
+enum class eVehicleAudioSettingProperty
+{
+    SOUND_TYPE,
+    ENGINE_ON_SOUND_BANK_ID,
+    ENGINE_OFF_SOUND_BANK_ID,
+    BASS_SETTING,
+    BASS_EQ,
+    FIELD_C,
+    HORN_TON,
+    ENGINE_UPGRADE,
+    DOOR_SOUND,
+    RADIO_NUM,
+    RADIO_TYPE,
+    VEHICLE_TYPE_FOR_AUDIO,
+    HORN_VOLUME_DELTA,
+    HORN_HIGH,
 };
 
 namespace eObjectGroup

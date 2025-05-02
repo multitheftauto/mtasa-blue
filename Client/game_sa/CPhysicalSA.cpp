@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPhysicalSA.cpp
  *  PURPOSE:     Physical object entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -39,7 +39,7 @@ void CPhysicalSA::RestoreLastGoodPhysicsState()
 
     CVector vecDefault;
     SetTurnSpeed(&vecDefault);
-    SetMoveSpeed(&vecDefault);
+    SetMoveSpeed(vecDefault);
 
     CPhysicalSAInterface* pInterface = (CPhysicalSAInterface*)GetInterface();
     pInterface->m_pad4d = 0;
@@ -100,19 +100,19 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     return vecTurnSpeed;
 }
 
-void CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
 {
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
     }
-    MemCpyFast((void*)dwReturn, vecMoveSpeed, sizeof(CVector));
+    MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
 
     if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
     {

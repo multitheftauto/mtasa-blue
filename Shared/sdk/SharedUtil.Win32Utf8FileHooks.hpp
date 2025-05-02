@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Win32Utf8FileHooks.hpp
  *  PURPOSE:     Hooks for making Windows file functions use UTF8 strings
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

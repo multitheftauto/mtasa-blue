@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPedStartSyncPacket.cpp
  *  PURPOSE:     Ped start synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -36,6 +36,9 @@ bool CPedStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     BitStream.Write(m_pPed->GetHealth());
     BitStream.Write(m_pPed->GetArmor());
+
+    if (BitStream.Can(eBitStreamVersion::PedSync_CameraRotation))
+        BitStream.Write(m_pPed->GetCameraRotation());
 
     return true;
 }

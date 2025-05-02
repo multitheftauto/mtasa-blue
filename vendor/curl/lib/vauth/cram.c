@@ -51,7 +51,7 @@
  * Parameters:
  *
  * chlg    [in]     - The challenge.
- * userp   [in]     - The user name.
+ * userp   [in]     - The username.
  * passwdp [in]     - The user's password.
  * out     [out]    - The result storage.
  *
@@ -67,7 +67,7 @@ CURLcode Curl_auth_create_cram_md5_message(const struct bufref *chlg,
   char *response;
 
   /* Compute the digest using the password as the key */
-  ctxt = Curl_HMAC_init(Curl_HMAC_MD5,
+  ctxt = Curl_HMAC_init(&Curl_HMAC_MD5,
                         (const unsigned char *) passwdp,
                         curlx_uztoui(strlen(passwdp)));
   if(!ctxt)

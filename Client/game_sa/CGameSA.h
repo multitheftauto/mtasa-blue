@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGameSA.h
  *  PURPOSE:     Header file for base game logic handling class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -18,6 +18,7 @@
 #include "CCoverManagerSA.h"
 #include "CPlantManagerSA.h"
 #include "CRendererSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -125,7 +126,7 @@ public:
     CGameSA();
     ~CGameSA();
 
-    CPools*                   GetPools() { return m_pPools; }
+    CPools*                   GetPools() const noexcept { return m_Pools.get(); }
     CPlayerInfo*              GetPlayerInfo() { return m_pPlayerInfo; }
     CProjectileInfo*          GetProjectileInfo() { return m_pProjectileInfo; }
     CRadar*                   GetRadar() { return m_pRadar; }
@@ -155,7 +156,7 @@ public:
     CCarEnterExit*            GetCarEnterExit() { return m_pCarEnterExit; }
     CControllerConfigManager* GetControllerConfigManager() { return m_pControllerConfigManager; }
     CRenderWare*              GetRenderWare() { return m_pRenderWare; }
-    CHandlingManager*         GetHandlingManager() { return m_pHandlingManager; }
+    CHandlingManager*         GetHandlingManager() const noexcept { return m_HandlingManager.get(); }
     CAnimManager*             GetAnimManager() { return m_pAnimManager; }
     CStreaming*               GetStreaming() { return m_pStreaming; }
     CVisibilityPlugins*       GetVisibilityPlugins() { return m_pVisibilityPlugins; }
@@ -174,7 +175,12 @@ public:
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
-    
+
+    CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept override
+    {
+        return m_pVehicleAudioSettingsManager.get();
+    }
+
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
@@ -190,6 +196,7 @@ public:
     int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
     DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
+    int   GetSystemFrameCounter() const { return *(int*)0xB7CB4C; } // CTimer::m_FrameCounter
 
     bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
@@ -279,13 +286,13 @@ public:
     void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0);
     bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false);
 
-    bool HasCreditScreenFadedOut();
-
     void         SetupSpecialCharacters();
     void         FixModelCol(uint iFixModel, uint iFromModel);
     void         SetupBrokenModels();
     CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
+    void         SetWeaponRenderEnabled(bool enabled) override;
+    bool         IsWeaponRenderEnabled() const override;
     void         FlushPendingRestreamIPL();
     void         ResetModelLodDistances();
     void         ResetModelFlags();
@@ -307,48 +314,50 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
-    void RemoveAllBuildings();
-    void RestoreGameBuildings();
+    void RemoveGameWorld();
+    void RestoreGameWorld();
 
     bool SetBuildingPoolSize(size_t size);
 
 private:
-    CPools*                         m_pPools;
-    CPlayerInfo*                    m_pPlayerInfo;
-    CProjectileInfo*                m_pProjectileInfo;
-    CRadar*                         m_pRadar;
-    CClock*                         m_pClock;
-    CCoronas*                       m_pCoronas;
-    CCheckpoints*                   m_pCheckpoints;
-    CEventList*                     m_pEventList;
-    CFireManager*                   m_pFireManager;
-    CGarages*                       m_pGarages;
-    CHud*                           m_pHud;
-    CWeather*                       m_pWeather;
-    CWorld*                         m_pWorld;
-    CCamera*                        m_pCamera;
-    CModelInfo*                     m_pModelInfo;
-    CPickups*                       m_pPickups;
-    CWeaponInfo*                    m_pWeaponInfo;
-    CExplosionManager*              m_pExplosionManager;
-    C3DMarkers*                     m_p3DMarkers;
-    CRenderWareSA*                  m_pRenderWare;
-    CHandlingManager*               m_pHandlingManager;
-    CAnimManager*                   m_pAnimManager;
-    CStreaming*                     m_pStreaming;
-    CVisibilityPlugins*             m_pVisibilityPlugins;
-    CKeyGen*                        m_pKeyGen;
-    CRopes*                         m_pRopes;
-    CFx*                            m_pFx;
-    CFxManagerSA*                   m_pFxManager;
-    CWaterManager*                  m_pWaterManager;
-    CWeaponStatManager*             m_pWeaponStatsManager;
-    CPointLights*                   m_pPointLights;
-    CColStore*                      m_collisionStore;
-    CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
-    CCoverManagerSA*                m_pCoverManager;
-    CPlantManagerSA*                m_pPlantManager;
-    CBuildingRemoval*               m_pBuildingRemoval;
+    std::unique_ptr<CPools>           m_Pools;
+    CPlayerInfo*                      m_pPlayerInfo;
+    CProjectileInfo*                  m_pProjectileInfo;
+    CRadar*                           m_pRadar;
+    CClock*                           m_pClock;
+    CCoronas*                         m_pCoronas;
+    CCheckpoints*                     m_pCheckpoints;
+    CEventList*                       m_pEventList;
+    CFireManager*                     m_pFireManager;
+    CGarages*                         m_pGarages;
+    CHud*                             m_pHud;
+    CWeather*                         m_pWeather;
+    CWorld*                           m_pWorld;
+    CCamera*                          m_pCamera;
+    CModelInfo*                       m_pModelInfo;
+    CPickups*                         m_pPickups;
+    CWeaponInfo*                      m_pWeaponInfo;
+    CExplosionManager*                m_pExplosionManager;
+    C3DMarkers*                       m_p3DMarkers;
+    CRenderWareSA*                    m_pRenderWare;
+    std::unique_ptr<CHandlingManager> m_HandlingManager;
+    CAnimManager*                     m_pAnimManager;
+    CStreaming*                       m_pStreaming;
+    CVisibilityPlugins*               m_pVisibilityPlugins;
+    CKeyGen*                          m_pKeyGen;
+    CRopes*                           m_pRopes;
+    CFx*                              m_pFx;
+    CFxManagerSA*                     m_pFxManager;
+    CWaterManager*                    m_pWaterManager;
+    CWeaponStatManager*               m_pWeaponStatsManager;
+    CPointLights*                     m_pPointLights;
+    CColStore*                        m_collisionStore;
+    CObjectGroupPhysicalProperties*   m_pObjectGroupPhysicalProperties;
+    CCoverManagerSA*                  m_pCoverManager;
+    CPlantManagerSA*                  m_pPlantManager;
+    CBuildingRemoval*                 m_pBuildingRemoval;
+
+    std::unique_ptr<CVehicleAudioSettingsManagerSA> m_pVehicleAudioSettingsManager;
 
     std::unique_ptr<CRendererSA>    m_pRenderer;
 
@@ -378,7 +387,7 @@ private:
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
     bool         m_isRoadSignsTextEnabled{true};
-    bool         m_isBuildingsRemoved{false};
+    bool         m_isGameWorldRemoved{false};
     bool         m_isExtendedWaterCannonsEnabled{false};
     bool         m_isIgnoreFireStateEnabled{false};
 

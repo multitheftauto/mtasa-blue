@@ -167,10 +167,17 @@ namespace
         //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
 
         // Base Encoding & Decoding
-        {false, "base64Encode", "encodeString"},
-        {false, "base64Decode", "decodeString"},
+        {true, "base64Encode", "Please manually change this to encodeString (different syntax). Refer to the wiki for details"},
+        {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"},
 
-        {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"}
+        {false, "setHelicopterRotorSpeed", "setVehicleRotorSpeed"},
+        {false, "getHelicopterRotorSpeed", "getVehicleRotorSpeed"},
+
+        {false, "setPedOnFire", "setElementOnFire"},
+        {false, "isPedOnFire", "isElementOnFire"},
+
+        {false, "removeAllGameBuildings", "removeGameWorld"},
+        {false, "restoreAllGameBuildings", "restoreGameWorld"},
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -246,6 +253,7 @@ namespace
         {false, "getPlayerOccupiedVehicleSeat", "getPedOccupiedVehicleSeat"},
         {false, "isPlayerInVehicle", "isPedInVehicle"},
         {false, "getPlayerFromNick", "getPlayerFromName"},
+      
         // Client
         {false, "getClientName", "getPlayerName"},
         {false, "getClientIP", "getPlayerIP"},
@@ -271,7 +279,11 @@ namespace
         {true, "setPlayerDiscordJoinParams", "See GitHub PR #2499 for more details"},
 
         // Base Encoding & Decoding
-        {false, "base64Encode", "encodeString"},
-        {false, "base64Decode", "decodeString"}
+        {true, "base64Encode", "Please manually change this to encodeString (different syntax). Refer to the wiki for details"},
+        {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"},
+    
+        // Ped
+        {false, "setPedOnFire", "setElementOnFire"},
+        {false, "isPedOnFire", "isElementOnFire"}
     };
 }            // namespace

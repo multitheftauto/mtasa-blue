@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -63,12 +63,14 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::u
     return pBuilding;
 }
 
+// Deprecated
 void CLuaBuildingDefs::RemoveAllGameBuildings()
 {
-    m_pBuildingManager->RemoveAllGameBuildings();
+    CLuaWorldDefs::RemoveGameWorld();
 }
 
+// Deprecated
 void CLuaBuildingDefs::RestoreGameBuildings()
 {
-    m_pBuildingManager->RestoreAllGameBuildings();
+    CLuaWorldDefs::RestoreGameWorld();
 }

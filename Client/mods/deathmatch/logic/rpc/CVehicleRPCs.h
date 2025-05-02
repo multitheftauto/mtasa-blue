@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CVehicleRPCs.h
  *  PURPOSE:     Header for vehicle RPC class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -58,4 +58,5 @@ public:
     DECLARE_ELEMENT_RPC(SetVehicleSirens);
     DECLARE_ELEMENT_RPC(SetVehiclePlateText);
     DECLARE_ELEMENT_RPC(SpawnVehicleFlyingComponent);
+    DECLARE_ELEMENT_RPC(SetVehicleNitroActivated);
 };

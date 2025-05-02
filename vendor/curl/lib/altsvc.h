@@ -29,13 +29,6 @@
 #include <curl/curl.h>
 #include "llist.h"
 
-enum alpnid {
-  ALPN_none = 0,
-  ALPN_h1 = CURLALTSVC_H1,
-  ALPN_h2 = CURLALTSVC_H2,
-  ALPN_h3 = CURLALTSVC_H3
-};
-
 struct althost {
   char *host;
   unsigned short port;
@@ -47,8 +40,8 @@ struct altsvc {
   struct althost dst;
   time_t expires;
   bool persist;
-  int prio;
-  struct Curl_llist_element node;
+  unsigned int prio;
+  struct Curl_llist_node node;
 };
 
 struct altsvcinfo {
