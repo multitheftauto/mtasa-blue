@@ -33,15 +33,6 @@ void Curl_init_CONNECT(struct Curl_easy *data);
 
 CURLcode Curl_pretransfer(struct Curl_easy *data);
 
-typedef enum {
-  FOLLOW_NONE,  /* not used within the function, just a placeholder to
-                   allow initing to this */
-  FOLLOW_FAKE,  /* only records stuff, not actually following */
-  FOLLOW_RETRY, /* set if this is a request retry as opposed to a real
-                   redirect following */
-  FOLLOW_REDIR /* a full true redirect */
-} followtype;
-
 CURLcode Curl_sendrecv(struct Curl_easy *data, struct curltime *nowp);
 int Curl_single_getsock(struct Curl_easy *data,
                         struct connectdata *conn, curl_socket_t *socks);
@@ -63,6 +54,8 @@ bool Curl_meets_timecondition(struct Curl_easy *data, time_t timeofdoc);
 CURLcode Curl_xfer_write_resp(struct Curl_easy *data,
                               const char *buf, size_t blen,
                               bool is_eos);
+
+bool Curl_xfer_write_is_paused(struct Curl_easy *data);
 
 /**
  * Write a single "header" line from a server response.

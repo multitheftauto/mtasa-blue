@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceClientConfigItem.h
  *  PURPOSE:     Resource client-side (XML) configuration file item class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

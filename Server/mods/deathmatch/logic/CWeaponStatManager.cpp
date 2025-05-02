@@ -1675,3 +1675,8 @@ float CWeaponStatManager::GetWeaponRangeFromSkillLevel(eWeaponType eWeapon, floa
     }
     return fWeaponRange;
 }
+
+bool CWeaponStatManager::HasWeaponBulletSync(uint32_t weaponID) noexcept
+{
+    return weaponID >= 22 && weaponID <= 34;
+}

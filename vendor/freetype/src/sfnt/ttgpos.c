@@ -58,6 +58,7 @@
 
   typedef enum  gpos_lookup_type_
   {
+    GPOS_LOOKUP_TYPE_NONE                        = 0,
     GPOS_LOOKUP_TYPE_SINGLE_ADJUSTMENT           = 1,
     GPOS_LOOKUP_TYPE_PAIR_ADJUSTMENT             = 2,
     GPOS_LOOKUP_TYPE_CURSIVE_ATTACHMENT          = 3,
@@ -132,14 +133,14 @@
     else
     {
       context->current_lookup_table = NULL;
-      context->current_lookup_type  = 0;
+      context->current_lookup_type  = GPOS_LOOKUP_TYPE_NONE;
       context->subtable_count       = 0;
       context->subtable_offsets     = NULL;
     }
 
     context->subtable_idx  = 0;
     context->subtable      = NULL;
-    context->subtable_type = 0;
+    context->subtable_type = GPOS_LOOKUP_TYPE_NONE;
   }
 
 
@@ -195,7 +196,7 @@
         FT_Int  m;
 
         FT_Int  straw;
-        FT_Int  needle = glyph;
+        FT_Int  needle = (FT_Int)glyph;
 
 
         /* Binary search. */
@@ -230,7 +231,7 @@
 
         FT_Int  straw_start;
         FT_Int  straw_end;
-        FT_Int  needle = glyph;
+        FT_Int  needle = (FT_Int)glyph;
 
 
         /* Binary search. */
@@ -254,14 +255,11 @@
                         FT_PEEK_USHORT( range_record + 4 );
 
 
-            return start_coverage_index + glyph - straw_start;
+            return (FT_Int)start_coverage_index + (FT_Int)glyph - straw_start;
           }
         }
         break;
       }
-
-    default:
-      return -1;  /* unsupported */
     }
 
     return -1;
@@ -303,7 +301,7 @@
 
         FT_Int  straw_start;
         FT_Int  straw_end;
-        FT_Int  needle = glyph;
+        FT_Int  needle = (FT_Int)glyph;
 
 
         while ( l <= r )
@@ -325,9 +323,6 @@
         }
         break;
       }
-
-    default:
-      return -1;  /* Unsupported definition type, return an error. */
     }
 
     /* "All glyphs not assigned to a class fall into class 0." */
@@ -514,7 +509,7 @@
               pair_value_count = FT_PEEK_USHORT( pair_value_table );
               pair_value_array = pair_value_table + 2;
 
-              needle = right_glyph;
+              needle = (FT_Int)right_glyph;
               r      = pair_value_count - 1;
               l      = 0;
 
@@ -584,9 +579,6 @@
 
               return x_advance;
             }
-
-          default:
-            return 0;
           }
         }
       }

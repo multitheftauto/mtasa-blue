@@ -5,7 +5,7 @@
  *  FILE:        utils/map2xml/Main.h
  *  PURPOSE:     .map (race) to .xml (new) converter utility
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

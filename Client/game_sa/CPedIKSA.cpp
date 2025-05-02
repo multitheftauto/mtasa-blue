@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPedIKSA.cpp
  *  PURPOSE:     Ped entity inverse kinematics for animations
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

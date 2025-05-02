@@ -1702,8 +1702,8 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     const SPlayerClothing* pClothing = Ped.GetClothes()->GetClothing(ucType);
     if (pClothing)
     {
-        strOutTexture = pClothing->szTexture;
-        strOutModel = pClothing->szModel;
+        strOutTexture = pClothing->texture;
+        strOutModel = pClothing->model;
         return true;
     }
 
@@ -2558,7 +2558,7 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
 bool CStaticFunctionDefinitions::SetPedStat(CClientEntity& Entity, ushort usStat, float fValue)
 {
     RUN_CHILDREN(SetPedStat(**iter, usStat, fValue))
-    if (IS_PED(&Entity) && Entity.IsLocalEntity())
+    if (IS_PED(&Entity))
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         // Dont let them set visual stats if they don't have the CJ model
@@ -2618,18 +2618,18 @@ bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, SString& st
 
 bool CStaticFunctionDefinitions::GetClothesByTypeIndex(unsigned char ucType, unsigned char ucIndex, SString& strOutTexture, SString& strOutModel)
 {
-    const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
-    if (pPlayerClothing)
-    {
-        if (ucIndex < CClientPlayerClothes::GetClothingGroupMax(ucType))
-        {
-            strOutTexture = pPlayerClothing[ucIndex].szTexture;
-            strOutModel = pPlayerClothing[ucIndex].szModel;
-            return true;
-        }
-    }
+    std::vector<const SPlayerClothing*> pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
 
-    return false;
+    if (pPlayerClothing.empty())
+        return false;
+
+    if (ucIndex > (pPlayerClothing.size() - 1))
+        return false;
+
+    strOutTexture = pPlayerClothing.at(ucIndex)->texture;
+    strOutModel = pPlayerClothing.at(ucIndex)->model;
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn)
@@ -2639,13 +2639,13 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, 
 
     for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
     {
-        const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
-        if (pPlayerClothing)
-        {
-            for (unsigned char ucIter = 0; pPlayerClothing[ucIter].szTexture != NULL; ucIter++)
+        std::vector<const SPlayerClothing*> pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
+
+        if (!pPlayerClothing.empty()) {
+            for (unsigned char ucIter = 0; ucIter < pPlayerClothing.size(); ucIter++)
             {
-                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter].szTexture) == 0) &&
-                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter].szModel) == 0))
+                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter]->texture.c_str()) == 0) &&
+                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter]->model.c_str()) == 0))
                 {
                     ucTypeReturn = ucType;
                     ucIndexReturn = ucIter;

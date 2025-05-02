@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CVoiceRecorder.cpp
  *  PURPOSE:     Remote player voice chat playback
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

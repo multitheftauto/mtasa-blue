@@ -22,5 +22,6 @@
 #include "..\game_sa\CCameraSA.h"
 #include "..\game_sa\CEntitySA.h"
 #include "..\game_sa\CPedSA.h"
+#include "..\game_sa\CProjectileSA.h"
 
 extern CMultiplayerSA* pMultiplayer;

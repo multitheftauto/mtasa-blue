@@ -39,8 +39,6 @@ public:
     CClientTexture*       FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
     void                  Remove(CClientRenderElement* pElement);
 
-    void                  DoPulse();
-
     uint GetDxFontCount() { return m_uiStatsDxFontCount; }
     uint GetGuiFontCount() { return m_uiStatsGuiFontCount; }
     uint GetTextureCount() { return m_uiStatsTextureCount; }
@@ -51,16 +49,9 @@ public:
     uint GetVectorGraphicCount() { return m_uiStatsVectorGraphicCount; }
 
 protected:
-    struct SAutoTexture
-    {
-        CClientTexture* texture{};
-        CTickCount lastUse;
-    };
-
-    CElapsedTime                                  m_texturePulseTimer;
     CClientManager*                               m_pClientManager;
     CRenderItemManagerInterface*                  m_pRenderItemManager;
-    std::map<SString, SAutoTexture>               m_AutoTextureMap;
+    std::map<SString, CClientTexture*>            m_AutoTextureMap;
     std::map<CRenderItem*, CClientRenderElement*> m_ItemElementMap;
     uint                                          m_uiStatsGuiFontCount;
     uint                                          m_uiStatsDxFontCount;
