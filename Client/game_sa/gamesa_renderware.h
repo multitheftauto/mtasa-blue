@@ -105,7 +105,8 @@ typedef RpHAnimHierarchy*(__cdecl* GetAnimHierarchyFromSkinClump_t)(RpClump*);
 typedef int(__cdecl* RpHAnimIDGetIndex_t)(RpHAnimHierarchy*, int);
 typedef RwMatrix*(__cdecl* RpHAnimHierarchyGetMatrixArray_t)(RpHAnimHierarchy*);
 typedef RtQuat*(__cdecl* RtQuatRotate_t)(RtQuat* quat, const RwV3d* axis, float angle, RwOpCombineType combineOp);
-
+typedef RwTexture*(__cdecl* RwReadTexture_t)(const char* name, const char* mask);
+typedef RwFrame*(__cdecl* RwFrameRotate_t)(RwFrame* frame, const RwV3d* axis, float angle, RwOpCombineType combine);
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
 /*****************************************************************************/
@@ -195,6 +196,8 @@ RWFUNC(GetAnimHierarchyFromSkinClump_t GetAnimHierarchyFromSkinClump, (GetAnimHi
 RWFUNC(RpHAnimIDGetIndex_t RpHAnimIDGetIndex, (RpHAnimIDGetIndex_t)0xDEAD)
 RWFUNC(RpHAnimHierarchyGetMatrixArray_t RpHAnimHierarchyGetMatrixArray, (RpHAnimHierarchyGetMatrixArray_t)0xDEAD)
 RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
+RWFUNC(RwReadTexture_t RwReadTexture, reinterpret_cast<RwReadTexture_t>(0xDEAD))
+RWFUNC(RwFrameRotate_t RwFrameRotate, reinterpret_cast<RwFrameRotate_t>(0xDEAD))
 
 /*****************************************************************************/
 /** GTA function definitions and mappings                                   **/
@@ -213,6 +216,9 @@ typedef void(__cdecl* CTxdStore_RemoveRef_t)(unsigned int id);
 typedef void(__cdecl* CTxdStore_AddRef_t)(unsigned int id);
 typedef int(__cdecl* CTxdStore_GetNumRefs_t)(unsigned int id);
 typedef RwTexDictionary*(__cdecl* CTxdStore_GetTxd_t)(unsigned int id);
+typedef RwTexDictionary*(__cdecl* CTxdStore_PushCurrentTxd_t)();
+typedef void(__cdecl* CTxdStore_PopCurrentTxd_t)();
+typedef std::uint32_t(__cdecl* CTxdStore_FindTxdSlot_t)(const char* name);
 typedef RwTexture*(__cdecl* CClothesBuilder_CopyTexture_t)(RwTexture* texture);
 
 RWFUNC(SetTextureDict_t SetTextureDict, (SetTextureDict_t)0xDEAD)
@@ -227,6 +233,9 @@ RWFUNC(CTxdStore_RemoveTxd_t CTxdStore_RemoveTxd, (CTxdStore_RemoveTxd_t)0xDEAD)
 RWFUNC(CTxdStore_RemoveRef_t CTxdStore_RemoveRef, (CTxdStore_RemoveRef_t)0xDEAD)
 RWFUNC(CTxdStore_AddRef_t CTxdStore_AddRef, (CTxdStore_AddRef_t)0xDEAD)
 RWFUNC(CTxdStore_GetNumRefs_t CTxdStore_GetNumRefs, (CTxdStore_GetNumRefs_t)0xDEAD)
+RWFUNC(CTxdStore_PushCurrentTxd_t CTxdStore_PushCurrentTxd, reinterpret_cast<CTxdStore_PushCurrentTxd_t>(0xDEAD))
+RWFUNC(CTxdStore_PopCurrentTxd_t CTxdStore_PopCurrentTxd, reinterpret_cast<CTxdStore_PopCurrentTxd_t>(0xDEAD))
+RWFUNC(CTxdStore_FindTxdSlot_t CTxdStore_FindTxdSlot, reinterpret_cast<CTxdStore_FindTxdSlot_t>(0xDEAD))
 RWFUNC(CClothesBuilder_CopyTexture_t CClothesBuilder_CopyTexture, (CClothesBuilder_CopyTexture_t)0xDEAD)
 
 /*****************************************************************************/
