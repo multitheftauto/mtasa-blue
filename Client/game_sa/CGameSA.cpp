@@ -890,6 +890,9 @@ void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
         MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter
 
         MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon
+
+        MemSet((void*)0x53A899, 0x90, 5);             // CFire::ProcessFire
+        MemSet((void*)0x53A990, 0x90, 5);             // CFire::ProcessFire
     }
     else
     {
@@ -900,6 +903,9 @@ void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
         MemCpy((void*)0x64F3DB, "\x8B\x85\x90\x04\x00\x00\x85\xC0\x0F\x85\x1B\x01\x00\x00", 14);
 
         MemCpy((void*)0x685A7F, "\x8B\x86\x30\x07\x00\x00\x85\xC0\x0F\x85\x1D\x01\x00\x00", 14);
+
+        MemCpy((void*)0x53A899, "\xE8\x82\xF7\x0C\x00", 5);
+        MemCpy((void*)0x53A990, "\xE8\x8B\xF6\x0C\x00", 5);
     }
 
     m_isIgnoreFireStateEnabled = isEnabled;

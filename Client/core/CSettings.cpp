@@ -411,6 +411,11 @@ void CSettings::CreateGUI()
     m_pPhotoSavingCheckbox->GetPosition(vecTemp, false);
     m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxAskBeforeDisconnect = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Ask before disconnecting from server using main menu"), true));
+    m_pCheckBoxAskBeforeDisconnect->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAskBeforeDisconnect->GetPosition(vecTemp, false);
+    m_pCheckBoxAskBeforeDisconnect->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -3080,6 +3085,10 @@ void CSettings::LoadData()
     CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
     m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
+    bool bAskBeforeDisconnect;
+    CVARS_GET("ask_before_disconnect", bAskBeforeDisconnect);
+    m_pCheckBoxAskBeforeDisconnect->SetSelected(bAskBeforeDisconnect);
+
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
     m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
@@ -3556,6 +3565,9 @@ void CSettings::SaveData()
             discord->SetPresenceState(state, false);
         }
     }
+
+    bool bAskBeforeDisconnect = m_pCheckBoxAskBeforeDisconnect->GetSelected();
+    CVARS_SET("ask_before_disconnect", bAskBeforeDisconnect);
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
