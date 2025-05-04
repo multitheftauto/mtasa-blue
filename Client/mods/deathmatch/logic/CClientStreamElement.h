@@ -30,7 +30,7 @@ public:
     CClientStreamSector*    GetStreamSector() { return m_pStreamSector; }
     bool                    IsStreamedIn() { return m_bStreamedIn; }
     void                    InternalStreamIn(bool bInstantly);
-    void                    InternalStreamOut();
+    void                    InternalStreamOut(bool ignoreSendingEvent = false);
     virtual void            StreamIn(bool bInstantly) = 0;
     virtual void            StreamOut() = 0;
     virtual void            NotifyCreate();
