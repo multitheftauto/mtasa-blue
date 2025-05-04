@@ -61,7 +61,7 @@ void CClientStreamElement::InternalStreamIn(bool bInstantly)
     }
 }
 
-void CClientStreamElement::InternalStreamOut()
+void CClientStreamElement::InternalStreamOut(bool ignoreSendingEvent)
 {
     if (m_bStreamedIn)
     {
@@ -83,13 +83,24 @@ void CClientStreamElement::InternalStreamOut()
             }
         }
 
-        CLuaArguments Arguments;
-        CallEvent("onClientElementStreamOut", Arguments, true);
+        if (!ignoreSendingEvent)
+        {
+            CLuaArguments Arguments;
+            CallEvent("onClientElementStreamOut", Arguments, true);
+        }
     }
 }
 
 void CClientStreamElement::NotifyCreate()
 {
+    // If the dimensions are different, stream out and do not continue
+    if (GetDimension() != m_pStreamer->m_usDimension)
+    {
+        m_bStreamedIn = true; // InternalStreamOut need it
+        InternalStreamOut(true);
+        return;
+    }
+
     // Update common atrributes
     if (!m_bDoubleSidedInit)
         m_bDoubleSided = IsDoubleSided();
