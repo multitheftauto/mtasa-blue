@@ -1595,7 +1595,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_ObjectStreamerOptimization();
 
     InitHooks_Postprocess();
-
+    InitHooks_Explosions();
     InitHooks_Tasks();
 }
 
