@@ -94,7 +94,7 @@ void CClientStreamElement::InternalStreamOut(bool ignoreSendingEvent)
 void CClientStreamElement::NotifyCreate()
 {
     // If the dimensions are different, stream out and do not continue
-    if (GetDimension() != m_pStreamer->m_usDimension)
+    if (GetDimension() != -1 && GetDimension() != m_pStreamer->m_usDimension)
     {
         m_bStreamedIn = true; // InternalStreamOut need it
         InternalStreamOut(true);
