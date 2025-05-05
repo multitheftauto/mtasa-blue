@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-04 20:25+0000\n"
-"PO-Revision-Date: 2025-05-05 20:29\n"
+"PO-Revision-Date: 2025-05-05 21:31\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -2063,11 +2063,13 @@ msgstr "外部音效"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr ""
+msgstr "您似乎已啟用 Discord Rich Presence 連線選項。\n"
+"您是否要允許伺服器分享其資料？\n\n"
+"這包含您的ID識別碼。"
 
 #: Client/core/CSettings.cpp:4675
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
+msgstr "同意資料分享選項"
 
 #: Client/core/CSettings.cpp:4699
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -2096,7 +2098,8 @@ msgstr "實驗性功能"
 #: Client/core/CSettings.cpp:4802
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr ""
+msgstr "除非您遇到效能問題，否則不建議停用此選項。\n\n"
+"您確定要停用嗎？"
 
 #: Client/core/CSettings.cpp:4938
 msgid "Please enter a nickname"
@@ -2170,11 +2173,11 @@ msgstr "滑鼠移動修正 - 可能需要重啟電腦"
 
 #: Client/core/CSettings.cpp:4981
 msgid "CPU affinity:"
-msgstr ""
+msgstr "CPU 親和性："
 
 #: Client/core/CSettings.cpp:4981
 msgid "Only change if you're having stability issues."
-msgstr ""
+msgstr "僅在遇到穩定性問題時才更改。"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:92
@@ -2207,7 +2210,7 @@ msgstr "斷線警告"
 
 #: Client/core/CMainMenu.cpp:1220
 msgid "INFORMATION"
-msgstr ""
+msgstr "資訊"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
@@ -2764,47 +2767,47 @@ msgstr "前一個電台頻道"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr ""
+msgstr "啟用玩家地圖檢視"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "放大玩家地圖"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "縮小玩家地圖"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "將玩家地圖向北移動"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "將玩家地圖向南移動"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "將玩家地圖向東移動"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "將玩家地圖向西移動"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "附加玩家地圖"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "降低玩家地圖不透明度"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "增加玩家地圖不透明度"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "開啟玩家地圖說明文字"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -2884,25 +2887,25 @@ msgstr "啟動"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "變更模式： %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "縮放：%s/%s     移動：%s, %s, %s, %s     不透明度：%s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "開啟地圖： %s     開啟說明文字： %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr ""
+msgstr "跟隨玩家"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr ""
+msgstr "自由移動"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -2932,112 +2935,112 @@ msgstr "中斷連線以取消下載"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "駕駛幽浮四處飛行"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Cruising around"
-msgstr ""
+msgstr "四處遊蕩"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Riding the waves of"
-msgstr ""
+msgstr "騎乘在浪上"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Riding the train in"
-msgstr ""
+msgstr "騎乘火車上在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Flying around"
-msgstr ""
+msgstr "到處飛"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Riding around"
-msgstr ""
+msgstr "到處騎"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "駕駛大腳怪獸車四處行駛"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Quaddin' around"
-msgstr ""
+msgstr "駕駛沙灘車四處行駛"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "到處跳"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "鬼鬼祟祟的在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Climbing around in"
-msgstr ""
+msgstr "到處爬"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "車槍在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Blub blub..."
-msgstr ""
+msgstr "呃呃嗚嗚..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Breathing water"
-msgstr ""
+msgstr "水裡呼吸"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Drowning in"
-msgstr ""
+msgstr "溺死在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "找掩護在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Fighting in"
-msgstr ""
+msgstr "激烈戰鬥在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Throwing fists in"
-msgstr ""
+msgstr "到處揮拳在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "掃射在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Shooting up"
-msgstr ""
+msgstr "開槍在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Jetpacking in"
-msgstr ""
+msgstr "用著噴射背包在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Literally on fire in"
-msgstr ""
+msgstr "熱情著火在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Burning up in"
-msgstr ""
+msgstr "熱情燃燒在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Swimming in"
-msgstr ""
+msgstr "游泳在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Floating around in"
-msgstr ""
+msgstr "水中漂浮在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "被鯊魚追趕在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Choking to death in"
-msgstr ""
+msgstr "斷氣窒息在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 msgid "Entering the game ..."
@@ -3062,11 +3065,11 @@ msgstr "啟動本地伺服器中..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1027
 msgid "Area 51"
-msgstr ""
+msgstr "51區"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1036
 msgid "Walking around "
-msgstr ""
+msgstr "到處走 "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1182
 #, c-format
@@ -3103,23 +3106,23 @@ msgstr "MTA 客戶端驗證失敗"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5640
 msgid "In a ditch"
-msgstr ""
+msgstr "在溝渠裡"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5640
 msgid "En-route to hospital"
-msgstr ""
+msgstr "送往醫院的路上"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5640
 msgid "Meeting their maker"
-msgstr ""
+msgstr "見上帝去了"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5641
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "後悔他們的決定"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5641
 msgid "Wasted"
-msgstr ""
+msgstr "掛了"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:506
 msgid "Disconnected: Invalid nickname"
@@ -3205,7 +3208,7 @@ msgstr "連線中斷: 序列驗證失敗"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "已中斷連線：已有相同硬體序號被使用"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -3319,11 +3322,11 @@ msgstr "已中斷連線"
 
 #: Client/game_sa/CGameSA.cpp:255 Client/game_sa/CGameSA.cpp:266
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "初始化 game_sa 失敗"
 
 #: Client/game_sa/CGameSA.cpp:257
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "記憶體分配失敗"
 
 #: Client/game_sa/CSettingsSA.cpp:781
 msgid "Can't find valid screen resolution."
@@ -3338,7 +3341,7 @@ msgstr "你確定你想要使用此螢幕分辨率?"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "嚴重錯誤 (%u)。如果問題持續存在，請至 multitheftauto.com 尋求支援。"
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3347,7 +3350,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "通訊協定錯誤 (%u)。如果問題持續存在，請至 multitheftauto.com 尋求支援。"
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
