@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-04 16:35+0000\n"
-"PO-Revision-Date: 2025-05-04 18:31\n"
+"POT-Creation-Date: 2025-05-04 20:25+0000\n"
+"PO-Revision-Date: 2025-05-05 20:29\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -87,14 +87,16 @@ msgstr "是"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "未知"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "檔案 '%s' 目前被 %zu 個處理程序鎖定。\n\n"
+"是否要終止下列處理程序並繼續更新？\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -102,7 +104,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "您的安裝現在出現問題可能已損毀。\n\n"
+"%zu / %zu 個檔案無法從備份中還原。\n\n"
+"您應該從 www.multitheftauto.com 重新安裝 Multi Theft Auto\n"
+"或嘗試以管理員身分執行更新。"
 
 #: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:689
 msgid "Installing update..."
@@ -308,14 +313,18 @@ msgstr "主要文件是無符號。可能的病毒活動.\n\n"
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "資料檔案 %s 遺失。可能和電腦病毒有關。\n\n"
+"為了您的安全，請考慮重新安裝 Multi Theft Auto。\n"
+"如果 MTA 無法正常運作，請參閱線上說明。"
 
 #: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "資料檔案 %s 被竄改過。可能和電腦病毒有關。\n\n"
+"為了您的安全，請考慮重新安裝 Multi Theft Auto。\n"
+"如果 MTA 無法正常運作，請參閱線上說明。"
 
 #: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -426,7 +435,7 @@ msgstr "請檢查您的防毒軟體是否有誤判的情形，可嘗試將GTA:SA
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "生成 俠盜獵車手：聖安地列斯"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
@@ -464,17 +473,20 @@ msgstr "更新相容性設置"
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "啟動俠盜獵車手：聖安地列斯。\n"
+"請確認遊戲安裝在 'Program Files (x86)' 資料夾。"
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr ""
+msgstr "搜尋 俠盜獵車手：聖安地列斯"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "很抱歉，看起來沒有找到遊戲本體。\n"
+"請啟動 俠盜獵車手：聖安地列斯 後再重試一次。\n"
+"並請確認遊戲安裝在 'Program Files (x86)' 資料夾。"
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -639,11 +651,11 @@ msgstr "B - 備用NVIDIA"
 
 #: Client/loader/Dialogs.cpp:86
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - 一般 Intel"
 
 #: Client/loader/Dialogs.cpp:87
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - 替代 Intel"
 
 #: Client/loader/Dialogs.cpp:88
 msgid "If you get desperate, this might help:"
@@ -727,7 +739,7 @@ msgstr "正在連線至 %s:%u ..."
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "正在重新連線至 %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
@@ -872,7 +884,8 @@ msgstr "伺服器表示建議你進行更新，但並非一定要。\n\n"
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr ""
+msgstr "目前沒有可用的更新。\n\n"
+"請至 www.multitheftauto.com 確認"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -968,7 +981,7 @@ msgstr "* 現在時間是 %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "連線：網路未就緒，請稍候"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -994,21 +1007,21 @@ msgstr "連線: 移除指定 mod 失敗"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "重新連線：網路未就緒，請稍候"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "重新連線：錯誤的連接埠號碼"
 
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "重新連線：正在重新連線到 %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "重新連線：無法連線到 %s:%u！"
 
 #: Client/core/CCommandFuncs.cpp:359
 msgid "Bound all controls from GTA"
@@ -1028,13 +1041,13 @@ msgstr "* 您的序列號為: %s"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1097
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 msgid "In-game"
-msgstr ""
+msgstr "遊戲內"
 
 #: Client/core/CCore.cpp:670 Client/core/CSettings.cpp:3555
 #: Client/core/CMainMenu.cpp:303
 #: Client/mods/deathmatch/logic/CClientGame.cpp:541
 msgid "Main menu"
-msgstr ""
+msgstr "主選單"
 
 #: Client/core/CCore.cpp:809 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
@@ -1293,16 +1306,16 @@ msgstr "總是顯示下載視窗"
 
 #: Client/core/CSettings.cpp:403
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "允許透過 Discord Rich Presence 連線顯示 Discord 狀態"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:409
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "將相機武器拍攝的照片儲存到 GTA San Andreas User Files 資料夾"
 
 #: Client/core/CSettings.cpp:414
 msgid "Ask before disconnecting from server using main menu"
-msgstr ""
+msgstr "在主選單中斷伺服器連線前先詢問"
 
 #: Client/core/CSettings.cpp:419
 msgid "Use customized GTA:SA files"
@@ -1318,16 +1331,16 @@ msgstr "不透明度:"
 
 #: Client/core/CSettings.cpp:452
 msgid "Image resolution:"
-msgstr ""
+msgstr "影像解析度："
 
 #: Client/core/CSettings.cpp:459
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (預設)"
 
 #. index 0
 #: Client/core/CSettings.cpp:460
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -1592,7 +1605,7 @@ msgstr "在外部網站啟用Javascript"
 
 #: Client/core/CSettings.cpp:944
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "啟用 GPU 渲染"
 
 #: Client/core/CSettings.cpp:948
 msgid "Custom blacklist"
@@ -1747,7 +1760,7 @@ msgstr "在檔案總管中顯示"
 #. Process affinity
 #: Client/core/CSettings.cpp:1216
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
+msgstr "設定 CPU 0 親和性以提升遊戲效能"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1222 Client/core/CSettings.cpp:1225
