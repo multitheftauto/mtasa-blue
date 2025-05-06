@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-04 20:25+0000\n"
-"PO-Revision-Date: 2025-05-06 09:12\n"
+"POT-Creation-Date: 2025-05-06 09:34+0000\n"
+"PO-Revision-Date: 2025-05-06 10:12\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -158,7 +158,7 @@ msgstr "MTA:SA再実行失敗\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1427
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1439
-#: Client/game_sa/CGameSA.cpp:261 Client/game_sa/CGameSA.cpp:272
+#: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -252,7 +252,7 @@ msgstr "GTA: San Andreasのインスタンスはまだ実行しています。�
 #: Client/loader/MainFunctions.cpp:1219
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
-#: Client/game_sa/CGameSA.cpp:268
+#: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr "情報"
 
@@ -3320,11 +3320,11 @@ msgstr[0] "%d 秒"
 msgid "Disconnected"
 msgstr "切断されました"
 
-#: Client/game_sa/CGameSA.cpp:255 Client/game_sa/CGameSA.cpp:266
+#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
 msgid "Failed initialization game_sa"
 msgstr "game_sa の初期化に失敗しました"
 
-#: Client/game_sa/CGameSA.cpp:257
+#: Client/game_sa/CGameSA.cpp:258
 msgid "Memory allocations failed"
 msgstr "メモリ割り当てに失敗しました"
 
