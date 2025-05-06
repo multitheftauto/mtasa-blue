@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-04 20:25+0000\n"
-"PO-Revision-Date: 2025-05-05 21:31\n"
+"PO-Revision-Date: 2025-05-06 08:11\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -651,11 +651,11 @@ msgstr "B - 備用NVIDIA"
 
 #: Client/loader/Dialogs.cpp:86
 msgid "C - Standard Intel"
-msgstr "C - 一般 Intel"
+msgstr "C - Intel標準"
 
 #: Client/loader/Dialogs.cpp:87
 msgid "D - Alternate Intel"
-msgstr "D - 替代 Intel"
+msgstr "D - 代替Intel"
 
 #: Client/loader/Dialogs.cpp:88
 msgid "If you get desperate, this might help:"
