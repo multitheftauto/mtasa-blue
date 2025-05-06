@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-04 16:35+0000\n"
-"PO-Revision-Date: 2025-05-04 18:31\n"
+"POT-Creation-Date: 2025-05-04 20:25+0000\n"
+"PO-Revision-Date: 2025-05-06 07:11\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -94,8 +94,8 @@ msgstr "不明"
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr "%sフィアルが%zuプロセスにロックされています。\n\n"
-"このプロセスを解除し、アップデートを続けましょうか。\n\n"
+msgstr "ファイル '%s' は現在 %zu 個のプロセスによってロックされています。\n\n"
+"以下のプロセスを終了してアップデートを続行しますか？\n\n"
 "%s"
 
 #: Client/loader/Install.cpp:479
@@ -104,9 +104,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr "インストールが不正なのかもしれませ。\n\n"
-"%zuの%zuファイルがバックアップから取り戻すことができませんでした。\n\n"
-"MTASAを「www.multitheftauto.com」で再インストールしてください。または、管理者権限でアップデートを実行してみてください。"
+msgstr "インストールが破損している可能性があります。\n\n"
+"%zu 個中 %zu 個のファイルがバックアップから復元できませんでした。\n\n"
+"www.multitheftauto.com からMulti Theft Autoを再インストールするか\n"
+"管理者権限でアップデートを試してみてください。"
 
 #: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:689
 msgid "Installing update..."
@@ -311,18 +312,18 @@ msgstr "メインファイルが署名されていません。ウイルスの活
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "%s　ファイルは不在。これはウイルスの活動なのかもしれません。\n\n"
-"安全のため、MTASAを再インストールをお勧めします。\n"
-"MTAが実行できない場合はオンラインでヘルプ検索してみてください。"
+msgstr "ファイル %s が見つかりません。ウイルスの活動が原因である可能性があります。\n\n"
+"セキュリティのため、Multi Theft Auto の再インストールを検討してください。\n"
+"MTAが正しく動作しない場合は、オンラインヘルプを参照してください。"
 
 #: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "%s ファイルはモッドされています。これはウイルスの活動なのかもしれません。\n\n"
-"安全のため、MTASAを再インストールをお勧めします。\n"
-"MTAが実行できない場合はオンラインでヘルプ検索してみてください。"
+msgstr "ファイル %s が改竄されています。ウイルスの活動が原因である可能性があります。\n\n"
+"セキュリティのため、Multi Theft Auto の再インストールを検討してください。\n"
+"MTAが正しく動作しない場合は、オンラインヘルプを参照してください。"
 
 #: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -409,7 +410,7 @@ msgstr "ファイルをコピーすることができないため、MTAが実行
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SAファイルが不在、あるいは不正であるため、MTA:SAが実行できません："
+msgstr "MTA:SAのファイルが不正または見つからないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
@@ -425,7 +426,7 @@ msgstr "GTASA依存関係ファイルをパッチする"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "GTA:SA exeが不在、あるいは不正であるため、MTA:SAが実行できません："
+msgstr "GTA:SAの実行ファイルが不正または見つからないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
@@ -437,7 +438,7 @@ msgstr "GTASAを生成する"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "GTA:SA exeがロードできないため、MTA:SAが実行できません："
+msgstr "GTA:SAの実行ファイルが読み込めないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
@@ -471,7 +472,8 @@ msgstr "互換性設定アップデート"
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Grand Theft Auto: San Andreas を起動してください。\n"
+"ゲームが「Program Files (x86)」フォルダにインストールされていることを確認してください。"
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
