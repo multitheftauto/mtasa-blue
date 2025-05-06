@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPlayerPedSA.cpp
  *  PURPOSE:     Player ped entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -133,22 +133,13 @@ CPlayerPedSA::~CPlayerPedSA()
 {
     if (!BeingDeleted && DoNotRemoveFromGame == false)
     {
-        DWORD dwInterface = (DWORD)m_pInterface;
-
-        if ((DWORD)GetInterface()->vtbl != VTBL_CPlaceable)
+        if (!m_pInterface->IsPlaceableVTBL())
         {
             CWorldSA* world = (CWorldSA*)pGame->GetWorld();
             pGame->GetProjectileInfo()->RemoveEntityReferences(this);
             world->Remove(m_pInterface, CPlayerPed_Destructor);
 
-            DWORD dwThis = (DWORD)m_pInterface;
-            DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
-            _asm
-            {
-                mov     ecx, dwThis
-                push    1            // delete too
-                call    dwFunc
-            }
+            m_pInterface->Destructor(true);
         }
         BeingDeleted = true;
         ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
@@ -307,6 +298,20 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         mov     ecx, dwThis
         call    dwFunc
     }
+}
+
+CEntity* CPlayerPedSA::GetTargetedEntity() const
+{
+    CEntitySAInterface* targetInterface = GetPlayerPedInterface()->mouseTargetEntity;
+    if (!targetInterface)
+        return nullptr;
+
+    return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(targetInterface));
+}
+
+void CPlayerPedSA::SetTargetedEntity(CEntity* targetEntity)
+{
+    GetPlayerPedInterface()->mouseTargetEntity = targetEntity ? targetEntity->GetInterface() : nullptr;
 }
 
 ////////////////////////////////////////////////////////////////

@@ -1,6 +1,7 @@
 name: Docker Image
 
 on: 
+  workflow_dispatch:
   push:
     branches:
     - master
@@ -26,6 +27,7 @@ jobs:
           dockerfile: Dockerfile.armhf
         - tag: arm64
           dockerfile: Dockerfile.arm64
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4

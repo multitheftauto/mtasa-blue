@@ -1310,6 +1310,11 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_POSITION, *BitStream.pBitStream));
     }
 
+    // Restore jetpack
+    CPed* ped = IS_PED(pElement) ? static_cast<CPed*>(pElement) : nullptr;
+    if (ped && ped->HasJetPack())
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, GIVE_PED_JETPACK, *BitStream.pBitStream));
+
     return true;
 }
 

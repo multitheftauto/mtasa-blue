@@ -26,16 +26,16 @@
 
 #if defined(USE_GNUTLS) || defined(USE_WOLFSSL) ||      \
   defined(USE_SCHANNEL) || defined(USE_SECTRANSP) ||    \
-  defined(USE_MBEDTLS)
+  defined(USE_MBEDTLS) || defined(USE_RUSTLS)
 
-#if defined(USE_WOLFSSL) || defined(USE_SCHANNEL)
+#if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_SECTRANSP) || \
+  defined(USE_MBEDTLS) || defined(USE_WOLFSSL) || defined(USE_RUSTLS)
 #define WANT_PARSEX509 /* uses Curl_parseX509() */
 #endif
 
 #if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_SECTRANSP) || \
-  defined(USE_MBEDTLS)
+  defined(USE_MBEDTLS) || defined(USE_RUSTLS)
 #define WANT_EXTRACT_CERTINFO /* uses Curl_extract_certinfo() */
-#define WANT_PARSEX509 /* ... uses Curl_parseX509() */
 #endif
 
 #include <curl/curl.h>
@@ -64,10 +64,10 @@
 #define CURL_ASN1_MAX                   ((size_t) 0x40000)      /* 256K */
 
 /* ASN.1 classes. */
-#define CURL_ASN1_UNIVERSAL             0
-#define CURL_ASN1_APPLICATION           1
-#define CURL_ASN1_CONTEXT_SPECIFIC      2
-#define CURL_ASN1_PRIVATE               3
+/* #define CURL_ASN1_UNIVERSAL             0 */
+/* #define CURL_ASN1_APPLICATION           1 */
+/* #define CURL_ASN1_CONTEXT_SPECIFIC      2 */
+/* #define CURL_ASN1_PRIVATE               3 */
 
 /* ASN.1 types. */
 #define CURL_ASN1_BOOLEAN               1
@@ -76,27 +76,27 @@
 #define CURL_ASN1_OCTET_STRING          4
 #define CURL_ASN1_NULL                  5
 #define CURL_ASN1_OBJECT_IDENTIFIER     6
-#define CURL_ASN1_OBJECT_DESCRIPTOR     7
-#define CURL_ASN1_INSTANCE_OF           8
-#define CURL_ASN1_REAL                  9
+/* #define CURL_ASN1_OBJECT_DESCRIPTOR     7 */
+/* #define CURL_ASN1_INSTANCE_OF           8 */
+/* #define CURL_ASN1_REAL                  9 */
 #define CURL_ASN1_ENUMERATED            10
-#define CURL_ASN1_EMBEDDED              11
+/* #define CURL_ASN1_EMBEDDED              11 */
 #define CURL_ASN1_UTF8_STRING           12
-#define CURL_ASN1_RELATIVE_OID          13
-#define CURL_ASN1_SEQUENCE              16
-#define CURL_ASN1_SET                   17
+/* #define CURL_ASN1_RELATIVE_OID          13 */
+/* #define CURL_ASN1_SEQUENCE              16 */
+/* #define CURL_ASN1_SET                   17 */
 #define CURL_ASN1_NUMERIC_STRING        18
 #define CURL_ASN1_PRINTABLE_STRING      19
 #define CURL_ASN1_TELETEX_STRING        20
-#define CURL_ASN1_VIDEOTEX_STRING       21
+/* #define CURL_ASN1_VIDEOTEX_STRING       21 */
 #define CURL_ASN1_IA5_STRING            22
 #define CURL_ASN1_UTC_TIME              23
 #define CURL_ASN1_GENERALIZED_TIME      24
-#define CURL_ASN1_GRAPHIC_STRING        25
+/* #define CURL_ASN1_GRAPHIC_STRING        25 */
 #define CURL_ASN1_VISIBLE_STRING        26
-#define CURL_ASN1_GENERAL_STRING        27
+/* #define CURL_ASN1_GENERAL_STRING        27 */
 #define CURL_ASN1_UNIVERSAL_STRING      28
-#define CURL_ASN1_CHARACTER_STRING      29
+/* #define CURL_ASN1_CHARACTER_STRING      29 */
 #define CURL_ASN1_BMP_STRING            30
 
 
@@ -178,8 +178,11 @@ static const char *getASN1Element(struct Curl_asn1Element *elem,
                                   const char *beg, const char *end)
   WARN_UNUSED_RESULT;
 
-static const char *getASN1Element(struct Curl_asn1Element *elem,
-                                  const char *beg, const char *end)
+#define CURL_ASN1_MAX_RECURSIONS    16
+
+static const char *getASN1Element_(struct Curl_asn1Element *elem,
+                                   const char *beg, const char *end,
+                                   size_t lvl)
 {
   unsigned char b;
   size_t len;
@@ -190,7 +193,8 @@ static const char *getASN1Element(struct Curl_asn1Element *elem,
      Returns a pointer in source string after the parsed element, or NULL
      if an error occurs. */
   if(!beg || !end || beg >= end || !*beg ||
-     (size_t)(end - beg) > CURL_ASN1_MAX)
+     ((size_t)(end - beg) > CURL_ASN1_MAX) ||
+     lvl >=  CURL_ASN1_MAX_RECURSIONS)
     return NULL;
 
   /* Process header byte. */
@@ -216,7 +220,7 @@ static const char *getASN1Element(struct Curl_asn1Element *elem,
       return NULL;
     elem->beg = beg;
     while(beg < end && *beg) {
-      beg = getASN1Element(&lelem, beg, end);
+      beg = getASN1Element_(&lelem, beg, end, lvl + 1);
       if(!beg)
         return NULL;
     }
@@ -243,6 +247,12 @@ static const char *getASN1Element(struct Curl_asn1Element *elem,
   return elem->end;
 }
 
+static const char *getASN1Element(struct Curl_asn1Element *elem,
+                                  const char *beg, const char *end)
+{
+  return getASN1Element_(elem, beg, end, 0);
+}
+
 #ifdef WANT_EXTRACT_CERTINFO
 
 /*
@@ -258,6 +268,17 @@ static const struct Curl_OID *searchOID(const char *oid)
 
   return NULL;
 }
+
+#ifdef UNITTESTS
+/* used by unit1657.c */
+CURLcode Curl_x509_getASN1Element(struct Curl_asn1Element *elem,
+                                  const char *beg, const char *end)
+{
+  if(getASN1Element(elem, beg, end))
+    return CURLE_OK;
+  return CURLE_BAD_FUNCTION_ARGUMENT;
+}
+#endif
 
 /*
  * Convert an ASN.1 Boolean value into its string representation.
@@ -1005,7 +1026,7 @@ static int do_pubkey(struct Curl_easy *data, int certnum,
     len = ((elem.end - q) * 8);
     if(len) {
       unsigned int i;
-      for(i = *(unsigned char *) q; !(i & 0x80); i <<= 1)
+      for(i = *(const unsigned char *) q; !(i & 0x80); i <<= 1)
         len--;
     }
     if(len > 32)
@@ -1256,4 +1277,5 @@ done:
 
 #endif /* WANT_EXTRACT_CERTINFO */
 
-#endif /* USE_GNUTLS or USE_WOLFSSL or USE_SCHANNEL or USE_SECTRANSP */
+#endif /* USE_GNUTLS or USE_WOLFSSL or USE_SCHANNEL or USE_SECTRANSP
+          or USE_MBEDTLS or USE_RUSTLS */

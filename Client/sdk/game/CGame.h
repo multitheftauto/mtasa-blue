@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CGame.h
  *  PURPOSE:     Game base interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -69,6 +69,7 @@ class CWorld;
 class CIplStore;
 class CBuildingRemoval;
 class CRenderer;
+class CVehicleAudioSettingsManager;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -151,6 +152,8 @@ public:
     virtual CColStore*                GetCollisionStore() = 0;
     virtual CBuildingRemoval*         GetBuildingRemoval() = 0;
     virtual CRenderer*                GetRenderer() const noexcept = 0;
+
+    virtual CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
@@ -248,7 +251,6 @@ public:
     virtual void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0) = 0;
     virtual bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false) = 0;
 
-    virtual bool HasCreditScreenFadedOut() = 0;
     virtual void FlushPendingRestreamIPL() = 0;
     virtual void ResetModelLodDistances() = 0;
     virtual void ResetModelFlags() = 0;

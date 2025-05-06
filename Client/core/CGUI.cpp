@@ -5,7 +5,7 @@
  *  FILE:        core/CGUI.cpp
  *  PURPOSE:     Core graphical user interface container class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -158,7 +158,8 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     m_pLabelVersionTag->SetTextColor(255, 255, 255);
     m_pLabelVersionTag->SetZOrderingEnabled(false);
     m_pLabelVersionTag->MoveToBack();
-    m_pLabelVersionTag->SetVisible(false);
+    if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
+        m_pLabelVersionTag->SetAlwaysOnTop(true);
 
     // Create mainmenu
     m_pMainMenu = new CMainMenu(pGUI);
@@ -285,27 +286,6 @@ void CLocalGUI::Draw()
 
     // Update mainmenu stuff
     m_pMainMenu->Update();
-
-    // Make sure our version labels are always visible
-    static short WaitForMenu = 0;
-
-    // Cope with early finish
-    if (pGame->HasCreditScreenFadedOut())
-        WaitForMenu = 250;
-
-    if (SystemState == 7 || SystemState == 9)
-    {
-        if (WaitForMenu < 250)
-        {
-            WaitForMenu++;
-        }
-        else
-        {
-            m_pLabelVersionTag->SetVisible(true);
-            if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
-                m_pLabelVersionTag->SetAlwaysOnTop(true);
-        }
-    }
 
     // If we're ingame, make sure the chatbox is drawn
     bool bChatVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPhysicalSA.h
  *  PURPOSE:     Header file for physical object entity base class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,6 +15,8 @@
 #include "CEntitySA.h"
 #include <CVector.h>
 #include "CPtrNodeDoubleListSA.h"
+
+class CColPointSAInterface;
 
 #define FUNC_GetMoveSpeed                       0x404460
 #define FUNC_GetTurnSpeed                       0x470030
@@ -29,6 +31,8 @@
 
 class CPhysicalSAInterface : public CEntitySAInterface
 {
+    virtual std::int32_t ProcessEntityCollision(CEntitySAInterface* entity, CColPointSAInterface* colPoint) = 0;
+
 public:
     float  pad1;            // 56
     uint32 pad2;            // 60

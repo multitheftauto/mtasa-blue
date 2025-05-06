@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGameSA.h
  *  PURPOSE:     Header file for base game logic handling class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -18,6 +18,7 @@
 #include "CCoverManagerSA.h"
 #include "CPlantManagerSA.h"
 #include "CRendererSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -174,7 +175,12 @@ public:
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
-    
+
+    CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept override
+    {
+        return m_pVehicleAudioSettingsManager.get();
+    }
+
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
@@ -280,8 +286,6 @@ public:
     void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0);
     bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false);
 
-    bool HasCreditScreenFadedOut();
-
     void         SetupSpecialCharacters();
     void         FixModelCol(uint iFixModel, uint iFromModel);
     void         SetupBrokenModels();
@@ -352,6 +356,8 @@ private:
     CCoverManagerSA*                  m_pCoverManager;
     CPlantManagerSA*                  m_pPlantManager;
     CBuildingRemoval*                 m_pBuildingRemoval;
+
+    std::unique_ptr<CVehicleAudioSettingsManagerSA> m_pVehicleAudioSettingsManager;
 
     std::unique_ptr<CRendererSA>    m_pRenderer;
 
