@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-04 20:25+0000\n"
-"PO-Revision-Date: 2025-05-06 07:11\n"
+"PO-Revision-Date: 2025-05-06 08:11\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -410,7 +410,7 @@ msgstr "ファイルをコピーすることができないため、MTAが実行
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SAのファイルが不正または見つからないため、MTA:SAを起動できません："
+msgstr "MTA:SAのファイルが正しくないまたは見つからないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
@@ -418,7 +418,7 @@ msgstr "MTASAファイルをコピーする"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "GTA:SAファイルが不在、あるいは不正であるため、MTA:SAが実行できません："
+msgstr "GTA:SAのファイルが正しくないまたは見つからないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -603,8 +603,8 @@ msgstr "Grand Theft Auto: San Andreas がインストールされたフォルダ
 #: Client/loader/Dialogs.cpp:69
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "これらのファイルがなくても問題なく作動しますが、ゲームと共に起動すると画面機能に影響を与える可能性があります。\n\n"
-"この一覧のファイルを削除か、ファイル名の変更、どちらかをお選ぶのがお勧めです。"
+msgstr "これらのファイルは不要であり、このバージョンのMTA:SAのグラフィック機能に干渉する可能性があります。\n\n"
+"これらのファイルを削除または名前変更することを推奨します。"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Keep these files, but also show this warning on next start"
@@ -3202,7 +3202,7 @@ msgstr "切断： シリアル確認が失敗しました"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "切断されました：マシンシリアルが既に使用されています"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -3316,11 +3316,11 @@ msgstr "切断されました"
 
 #: Client/game_sa/CGameSA.cpp:255 Client/game_sa/CGameSA.cpp:266
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "game_sa の初期化に失敗しました"
 
 #: Client/game_sa/CGameSA.cpp:257
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "メモリ割り当てに失敗しました"
 
 #: Client/game_sa/CSettingsSA.cpp:781
 msgid "Can't find valid screen resolution."
@@ -3335,7 +3335,7 @@ msgstr "この解像度を利用するに確かですか？"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "致命的なエラー (%u) です。この問題が続く場合は、multitheftauto.com でサポートをご確認ください。"
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3344,7 +3344,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "プロトコルエラー (%u) です。この問題が続く場合は、multitheftauto.com でサポートをご確認ください。"
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
