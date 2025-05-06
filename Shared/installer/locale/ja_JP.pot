@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-08 22:41\n"
-"PO-Revision-Date: 2025-05-05 21:31\n"
+"PO-Revision-Date: 2025-05-06 07:11\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -30,7 +30,7 @@ msgstr "ダウンロードしたMTA:SAのバージョンは、Windows 7、8、�
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
-msgstr "ダウンロードしたMTA:SAのバージョンは、旧バージョンのWindows向けに設計されています。www.multitheftauto.com から別のバージョンをダウンロードしてください。"
+msgstr "ダウンロードしたMTA:SAのバージョンは、古いWindows向けに作られています。www.multitheftauto.com から別のバージョンをダウンロードしてください。"
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
