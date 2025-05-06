@@ -172,6 +172,27 @@ struct CLuaFunctionParserBase
         return T{};
     }
 
+    // Check if lua table is array (std::vector) or map
+    bool IsArray(lua_State* L, int index)
+    {
+        if (!lua_istable(L, index))
+            return false;
+
+        lua_pushnil(L);
+        while (lua_next(L, index < 0 ? (index - 1) : index))
+        {
+            if (!lua_isnumber(L, -2))
+            {
+                lua_pop(L, 2);
+                return false;
+            }
+
+            lua_pop(L, 1);
+        }
+
+        return true;
+    }
+
     // Special type matcher for variants. Returns -1 if the type does not match
     // returns n if the nth type of the variant matches
     template <typename T>
@@ -241,7 +262,7 @@ struct CLuaFunctionParserBase
 
         // std::vector is used for arrays built from tables
         else if constexpr (is_2specialization<T, std::vector>::value)
-            return iArgument == LUA_TTABLE;
+            return iArgument == LUA_TTABLE && IsArray(L, index);
 
         // std::unordered_map<k,v> is used for maps built from tables
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
@@ -455,7 +476,7 @@ struct CLuaFunctionParserBase
             using param = typename is_2specialization<T, std::vector>::param1_t;
             T vecData;
             lua_pushnil(L); /* first key */
-            while (lua_next(L, index) != 0)
+            while (lua_next(L, index < 0 ? (index - 1) : index) != 0)
             {
                 if (!TypeMatch<param>(L, -1))
                 {
@@ -477,7 +498,7 @@ struct CLuaFunctionParserBase
             using value_t = typename is_5specialization<T, std::unordered_map>::param2_t;
             T map;
             lua_pushnil(L); /* first key */
-            while (lua_next(L, index) != 0)
+            while (lua_next(L, index < 0 ? (index - 1) : index) != 0)
             {
                 if (!TypeMatch<value_t>(L, -1) || !TypeMatch<key_t>(L, -2))
                 {

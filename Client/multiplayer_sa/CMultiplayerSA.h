@@ -81,6 +81,8 @@ public:
     void                InitHooks_ObjectStreamerOptimization();
     void                InitHooks_Postprocess();
     void                InitHooks_DeviceSelection();
+    void                InitHooks_Explosions();
+    void                InitHooks_Tasks();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
