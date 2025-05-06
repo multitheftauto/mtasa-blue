@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-06 09:34+0000\n"
-"PO-Revision-Date: 2025-05-06 10:12\n"
+"PO-Revision-Date: 2025-05-06 13:25\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -348,7 +348,7 @@ msgstr "MTA:SA無法在安全模式下執行。\n\n"
 
 #: Client/loader/MainFunctions.cpp:1123
 msgid "Fix configuration issue"
-msgstr "修復設置問題"
+msgstr "修復配置問題"
 
 #. Try to relaunch as admin if not done so already
 #: Client/loader/MainFunctions.cpp:1157
@@ -2086,10 +2086,10 @@ msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr "DPI感知是實驗性功能，\n"
-"我們只推薦您在經過縮放的畫面上執行MTA:SA。\n"
-"若開啟該選項可能會導致畫面產生問題。\n\n"
-"您確定要開啟這個功能嗎？"
+msgstr "啟用 DPI 感知是一項實驗性功能\n"
+"我們只建議您在經過縮放的螢幕畫面上玩 MTA:SA 時使用。\n"
+"如果您啟用此選項，可能會導致畫面異常。\n\n"
+"您確定要啟用此選項嗎？"
 
 #: Client/core/CSettings.cpp:4754 Client/core/CSettings.cpp:4800
 msgid "EXPERIMENTAL FEATURE"
@@ -3253,7 +3253,7 @@ msgstr "請從GTA資料夾中刪除D3D9.DLL並重新啟動MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server does not allow virtual machines"
-msgstr "該伺服器禁止在虛擬機器上執行"
+msgstr "該伺服器禁止在虛擬機上執行"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "This server requires driver signing to be enabled"
