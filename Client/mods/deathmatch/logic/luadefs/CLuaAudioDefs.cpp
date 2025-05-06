@@ -1399,27 +1399,21 @@ struct SPlayerVoiceWrapper
 {
     CClientPlayer* pPlayer{};
 
-    bool IsFxEffectEnabled(uint uiFxEffect)
+    bool IsFxEffectEnabled(std::uint32_t uiFxEffect)
     {
         CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-        if (pVoice)
-            return pVoice->IsFxEffectEnabled(uiFxEffect);          
-        return false;
+        return pVoice ? pVoice->IsFxEffectEnabled(uiFxEffect) : false;
     }
 
     bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
     {
-        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-        if (pVoice)
-            return pVoice->SetFxEffectParameters(uiFxEffect, params);            
-        return false;
+        CClientPlayerVoice* pVoice = pPlayer->GetVoice();        
+        return pVoice ? pVoice->SetFxEffectParameters(uiFxEffect, params) : false;
     }
     bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
     {
-        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-        if (pVoice)
-            return pVoice->GetFxEffectParameters(uiFxEffect, params);            
-        return false;
+        CClientPlayerVoice* pVoice = pPlayer->GetVoice();        
+        return pVoice ? pVoice->GetFxEffectParameters(uiFxEffect, params) : false;
     }
 };
 
@@ -1910,9 +1904,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
 
     const auto ProcessSoundParams = [luaVM, &eEffectType](auto* pSound) {
         if (!pSound->IsFxEffectEnabled(eEffectType))
-        {
             return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
-        }
 
         using namespace eSoundEffectParams;
         switch (eEffectType)
