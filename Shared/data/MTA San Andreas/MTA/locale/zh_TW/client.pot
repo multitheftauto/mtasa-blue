@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-04 20:25+0000\n"
-"PO-Revision-Date: 2025-05-06 08:11\n"
+"PO-Revision-Date: 2025-05-06 09:12\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -651,11 +651,11 @@ msgstr "B - 備用NVIDIA"
 
 #: Client/loader/Dialogs.cpp:86
 msgid "C - Standard Intel"
-msgstr "C - Intel標準"
+msgstr "C - 標準 Intel"
 
 #: Client/loader/Dialogs.cpp:87
 msgid "D - Alternate Intel"
-msgstr "D - 代替Intel"
+msgstr "D - 替代 Intel"
 
 #: Client/loader/Dialogs.cpp:88
 msgid "If you get desperate, this might help:"
@@ -2795,7 +2795,7 @@ msgstr "將玩家地圖向西移動"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr "附加玩家地圖"
+msgstr "固定玩家地圖"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
@@ -2935,68 +2935,68 @@ msgstr "中斷連線以取消下載"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Flying a UFO around"
-msgstr "駕駛幽浮四處飛行"
+msgstr "開幽浮亂晃"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Cruising around"
-msgstr "四處遊蕩"
+msgstr "在路上閒晃"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Riding the waves of"
-msgstr "騎乘在浪上"
+msgstr "駕馭海波浪"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Riding the train in"
-msgstr "騎乘火車上在"
+msgstr "搭著列車到處遊"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Flying around"
-msgstr "到處飛"
+msgstr "開飛機亂繞"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Riding around"
-msgstr "到處騎"
+msgstr "騎著野狼飆車"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Monster truckin' around"
-msgstr "駕駛大腳怪獸車四處行駛"
+msgstr "開大腳怪獸車橫衝直撞"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Quaddin' around"
-msgstr "駕駛沙灘車四處行駛"
+msgstr "騎沙灘車亂跑"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Bunny hopping around"
-msgstr "到處跳"
+msgstr "瘋狂兔子跳"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Doing weird stuff in"
-msgstr "鬼鬼祟祟的在"
+msgstr "搞神秘在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Climbing around in"
-msgstr "到處爬"
+msgstr "爬高高在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Doing a drive-by in"
-msgstr "車槍在"
+msgstr "開車掃射在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Blub blub..."
-msgstr "呃呃嗚嗚..."
+msgstr "呃呃嗚嗚……"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Breathing water"
-msgstr "水裡呼吸"
+msgstr "變成水中死人魚"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Drowning in"
-msgstr "溺死在"
+msgstr "水裡喝到溺死"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Ducking for cover in"
-msgstr "找掩護在"
+msgstr "龜起來在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Fighting in"
@@ -3008,15 +3008,15 @@ msgstr "到處揮拳在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Blastin' fools in"
-msgstr "掃射在"
+msgstr "到處轟人在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Shooting up"
-msgstr "開槍在"
+msgstr "亂槍打人在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Jetpacking in"
-msgstr "用著噴射背包在"
+msgstr "噴射背包爽飛在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Literally on fire in"
