@@ -753,7 +753,9 @@ enum e3DMarkerType
     MARKER3D_TORUS,
     MARKER3D_CONE,
     MARKER3D_CONE_NO_COLLISION,
-    MARKER3D_NUM
+    MARKER3D_NUM,
+
+    NOT_ALLOCATED = 257,            // see C3dMarker::DeleteMarkerObject
 };
 
 enum eMarkerSprite
