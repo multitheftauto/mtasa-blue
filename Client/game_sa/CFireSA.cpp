@@ -244,7 +244,7 @@ static void _declspec(naked) HOOK_CFire_Extinguish()
         mov [eax+730h], edi
 
         push ebx
-        mov ebx, [esp+8]
+        mov ebx, [esp+0Ch]
 
         push ebx
         push eax
