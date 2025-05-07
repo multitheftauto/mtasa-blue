@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-04 20:25+0000\n"
+"POT-Creation-Date: 2025-05-07 10:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,7 +162,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1427
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1439
-#: Client/game_sa/CGameSA.cpp:261 Client/game_sa/CGameSA.cpp:272
+#: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -266,7 +266,7 @@ msgstr ""
 #: Client/loader/MainFunctions.cpp:1219
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
-#: Client/game_sa/CGameSA.cpp:268
+#: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr ""
 
@@ -3393,11 +3393,11 @@ msgstr[1] ""
 msgid "Disconnected"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:255 Client/game_sa/CGameSA.cpp:266
+#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
 msgid "Failed initialization game_sa"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:257
+#: Client/game_sa/CGameSA.cpp:258
 msgid "Memory allocations failed"
 msgstr ""
 
