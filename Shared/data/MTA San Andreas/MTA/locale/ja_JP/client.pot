@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-06 09:34+0000\n"
-"PO-Revision-Date: 2025-05-06 10:12\n"
+"PO-Revision-Date: 2025-05-07 19:14\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -1564,7 +1564,7 @@ msgstr "タイヤの煙など"
 
 #: Client/core/CSettings.cpp:852
 msgid "Dynamic ped shadows"
-msgstr "ペッドディナミックシャドウ"
+msgstr "動的なキャラクターの影"
 
 #: Client/core/CSettings.cpp:856
 msgid "Motion blur"
