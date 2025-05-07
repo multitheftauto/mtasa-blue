@@ -54,9 +54,7 @@ void CWeatherSA::ResetAmountOfRain()
 
     static constexpr DWORD originalAddr = 0x00C81324;
     MemPut<DWORD>((LPVOID)(0x72C686 + 2), originalAddr);
-
-    static constexpr DWORD originalAddr2 = 0x00C81324;
-    MemPut<DWORD>((LPVOID)(0x72BC92 + 2), originalAddr2);
+    MemPut<DWORD>((LPVOID)(0x72BC92 + 2), originalAddr);
 }
 
 float CWeatherSA::GetWetRoads() const
