@@ -6443,7 +6443,12 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
     TIMING_CHECKPOINT("+RemovePointerToBuilding");
     RemovePointerToBuilding();
     StorePointerToBuilding();
-    RemoveObjectIfNeeded();
+
+    // pLODInterface contains a dummy object's pointer
+    // And as follows from CPopulation::ConvertToDummyObject this pointer can be nullptr
+    if (pLODInterface)
+        RemoveObjectIfNeeded();
+
     TIMING_CHECKPOINT("-RemovePointerToBuilding");
     _asm
     {
