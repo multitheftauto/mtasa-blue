@@ -52,7 +52,7 @@ static void _declspec(naked) HOOK_CWorld_TriggerExplosionSectorList()
         jz skip
 
         // set entity current scan code
-        mov [esi+2Ch], ecx
+        mov [esi+2Ch], cx
 
         mov al, [esi+36h]
         and al, 7
