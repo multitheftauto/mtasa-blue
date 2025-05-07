@@ -242,6 +242,8 @@ static void _declspec(naked) HOOK_CFire_Extinguish()
     _asm
     {
         mov [eax+730h], edi
+
+        push ebx
         mov ebx, [esp+8]
 
         push ebx
@@ -249,6 +251,7 @@ static void _declspec(naked) HOOK_CFire_Extinguish()
         call AbortFireTask
         add esp, 8
 
+        pop ebx
         jmp CONTINUE_CFire_Extinguish
     }
 }
