@@ -35,10 +35,10 @@ void CLuaPedDefs::LoadFunctions()
         {"givePedWeapon", GivePedWeapon},
 
         {"setPedVoice", SetPedVoice},
-        {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
-        {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
-        {"setElementBoneQuaternion", ArgumentParser<SetElementBoneQuaternion>},
-        {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
+        {"setElementBonePosition", ArgumentParserWarn<false, SetElementBonePosition>},
+        {"setElementBoneRotation", ArgumentParserWarn<false, SetElementBoneRotation>},
+        {"setElementBoneQuaternion", ArgumentParserWarn<false, SetElementBoneQuaternion>},
+        {"setElementBoneMatrix", ArgumentParserWarn<false, SetElementBoneMatrix>},
         {"setPedRotation", SetPedRotation},
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedCanBeKnockedOffBike", SetPedCanBeKnockedOffBike},
@@ -65,10 +65,10 @@ void CLuaPedDefs::LoadFunctions()
         {"playPedVoiceLine", ArgumentParser<PlayPedVoiceLine>},
 
         {"getPedVoice", GetPedVoice},
-        {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
-        {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
-        {"getElementBoneQuaternion", ArgumentParser<GetElementBoneQuaternion>},
-        {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
+        {"getElementBonePosition", ArgumentParserWarn<false, GetElementBonePosition>},
+        {"getElementBoneRotation", ArgumentParserWarn<false, GetElementBoneRotation>},
+        {"getElementBoneQuaternion", ArgumentParserWarn<false, GetElementBoneQuaternion>},
+        {"getElementBoneMatrix", ArgumentParserWarn<false, GetElementBoneMatrix>},
         {"getPedRotation", GetPedRotation},
         {"getPedWeaponSlot", GetPedWeaponSlot},
         {"canPedBeKnockedOffBike", CanPedBeKnockedOffBike},
@@ -1006,7 +1006,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
     if (!entity || !entity->GetBonePosition(static_cast<eBone>(bone), position))
         return false;
 
-    return std::make_tuple(position.fX, position.fY, position.fZ);
+    return CLuaMultiReturn<float, float, float>(position.fX, position.fY, position.fZ);
 }
 
 std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(CClientPed* ped, const std::uint16_t bone)
@@ -1022,7 +1022,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
     if (!entity || !entity->GetBoneRotation(static_cast<eBone>(bone), yaw, pitch, roll))
         return false;
 
-    return std::make_tuple(yaw, pitch, roll);
+    return CLuaMultiReturn<float, float, float>(yaw, pitch, roll);
 }
 
 std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::GetElementBoneQuaternion(CClientPed* ped, const std::uint16_t bone)
@@ -1039,7 +1039,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::Get
     if (!entity || !entity->GetBoneRotationQuat(static_cast<eBone>(bone), x, y, z, w))
         return false;
 
-    return std::make_tuple(x, y, z, w);
+    return CLuaMultiReturn<float, float, float, float>(x, y, z, w);
 }
 
 std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone)
