@@ -73,6 +73,9 @@ public:
     bool SetFxEffect(uint uiFxEffect, bool bEnable);
     bool IsFxEffectEnabled(uint uiFxEffect);
 
+    bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params);
+    bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params);
+
     bool IsActive() { return m_bVoiceActive; }
 
 private:
