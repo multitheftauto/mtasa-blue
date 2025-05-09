@@ -13,6 +13,7 @@
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
 #include "CPedSound.h"
+#include "enums/PedState.h"
 
 // To avoid VS intellisense highlight errors
 #include <memory>
@@ -299,7 +300,7 @@ public:
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
 
     virtual CEntitySAInterface* GetTargetedObject() const = 0;
-    virtual ePedState           GetPedState() const = 0;
+    virtual PedState           GetPedState() const = 0;
 
     virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
 

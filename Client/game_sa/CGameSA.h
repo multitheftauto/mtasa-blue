@@ -201,8 +201,8 @@ public:
     bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
     void         StartGame();
-    void         SetSystemState(eSystemState State);
-    eSystemState GetSystemState();
+    void         SetSystemState(SystemState State);
+    SystemState  GetSystemState();
     void         Pause(bool bPaused);
 
     void Initialize();

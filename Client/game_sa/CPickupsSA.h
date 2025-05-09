@@ -31,6 +31,6 @@ public:
     ~CPickupsSA();
 
     CPickup* GetPickup(DWORD ID);
-    CPickup* CreatePickup(CVector* position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer);
+    CPickup* CreatePickup(CVector* position, DWORD ModelIndex, PickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer);
     void     DisablePickupProcessing(bool bDisabled);
 };
