@@ -35,6 +35,8 @@ public:
     std::list<CClientStreamElement*>::iterator ActiveElementsBegin() { return m_ActiveElements.begin(); }
     std::list<CClientStreamElement*>::iterator ActiveElementsEnd() { return m_ActiveElements.end(); }
 
+    std::uint16_t                              GetDimension() const noexcept { return m_usDimension; }
+
 private:
     void CreateSectors(std::list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight);
     void ConnectSector(CClientStreamSector* pSector);
