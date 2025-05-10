@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #pragma once
+#include "enums/CoronaType.h"
 
 class CRegisteredCorona;
 class CVector;

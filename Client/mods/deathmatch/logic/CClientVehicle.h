@@ -547,8 +547,8 @@ public:
     void ApplyAudioSettings();
     void ResetAudioSettings();
 
-    bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const;
-    bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
+    bool GetDummyPosition(VehicleDummies dummy, CVector& position) const;
+    bool SetDummyPosition(VehicleDummies dummy, const CVector& position);
     bool ResetDummyPositions();
 
     bool SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);
@@ -756,6 +756,6 @@ public:
     std::map<SString, SVehicleComponentData> m_ComponentData;
     bool                                     m_bAsyncLoadingDisabled;
 
-    std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
+    std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
     bool                                     m_copyDummyPositions = true;
 };

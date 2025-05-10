@@ -25,6 +25,8 @@
 #include "CTrainSA.h"
 #include "CWorldSA.h"
 
+#include "enums/VehicleClass.h"
+
 extern CGameSA* pGame;
 
 CPoolsSA::CPoolsSA()

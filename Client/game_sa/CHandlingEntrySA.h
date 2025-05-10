@@ -142,7 +142,7 @@ public:
     eLightType    GetTailLight() const noexcept { return static_cast<eLightType>(m_Handling.ucTailLight); }
     unsigned char GetAnimGroup() const noexcept { return m_Handling.ucAnimGroup; }
 
-    eHandlingTypes GetVehicleID() const noexcept { return static_cast<eHandlingTypes>(m_Handling.iVehicleID); }
+    HandlingType GetVehicleID() const noexcept { return static_cast<HandlingType>(m_Handling.iVehicleID); }
 
     // Set functions
     void SetMass(float fMass) noexcept { m_Handling.fMass = fMass; }

@@ -44,7 +44,7 @@ CRegisteredCorona* CCoronasSA::CreateCorona(DWORD Identifier, CVector* position)
 
     if (corona)
     {
-        RwTexture* texture = GetTexture((eCoronaType)CORONATYPE_SHINYSTAR);
+        RwTexture* texture = GetTexture(CoronaType::CORONATYPE_SHINYSTAR);
         if (texture)
         {
             corona->Init(Identifier);
@@ -81,10 +81,10 @@ CRegisteredCorona* CCoronasSA::FindCorona(DWORD Identifier)
     return (CRegisteredCorona*)NULL;
 }
 
-RwTexture* CCoronasSA::GetTexture(eCoronaType type)
+RwTexture* CCoronasSA::GetTexture(CoronaType type)
 {
-    if (type < MAX_CORONA_TEXTURES)
-        return (RwTexture*)(*(DWORD*)(ARRAY_CORONA_TEXTURES + type * sizeof(DWORD)));
+    if ((DWORD)type < MAX_CORONA_TEXTURES)
+        return (RwTexture*)(*(DWORD*)(ARRAY_CORONA_TEXTURES + static_cast<DWORD>(type) * sizeof(DWORD)));
     else
         return NULL;
 }

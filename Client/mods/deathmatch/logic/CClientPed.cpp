@@ -31,6 +31,7 @@
 #include <game/TaskJumpFall.h>
 #include <game/TaskPhysicalResponse.h>
 #include <game/TaskAttack.h>
+#include "enums/VehicleType.h"
 
 using std::list;
 using std::vector;
@@ -1182,7 +1183,7 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
             continue;
 
         // Should we take the position from the closest door instead of center of vehicle
-        if (bGetPositionFromClosestDoor && pTempVehicle->GetModel() != VT_RCBARON)
+        if (bGetPositionFromClosestDoor && static_cast<VehicleType>(pTempVehicle->GetModel()) != VehicleType::VT_RCBARON)
         {
             // Get the closest front-door
             CVector vecFrontPos;
@@ -3357,6 +3358,7 @@ void CClientPed::SetTargetRotation(unsigned long ulDelay, std::optional<float> r
 
 // Temporary
 #include "../mods/deathmatch/logic/CClientGame.h"
+#include <enums/VehicleType.h>
 extern CClientGame* g_pClientGame;
 
 void CClientPed::Interpolate()
@@ -4456,9 +4458,9 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
     CTask* pTask = 0;
     if (m_pTaskManager)
         pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-    unsigned short usVehicleModel = pVehicle->GetModel();
+    auto usVehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
     if (((pTask && pTask->GetTaskType() == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) &&
-        (usVehicleModel == VT_SKIMMER || usVehicleModel == VT_SEASPAR || usVehicleModel == VT_LEVIATHN || usVehicleModel == VT_VORTEX))
+        (usVehicleModel == VehicleType::VT_SKIMMER || usVehicleModel == VehicleType::VT_SEASPAR || usVehicleModel == VehicleType::VT_LEVIATHN || usVehicleModel == VehicleType::VT_VORTEX))
     {
         CVector      vecDoorPos;
         unsigned int uiDoor;
@@ -6538,9 +6540,9 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     }
 
     // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
-    unsigned short vehicleModel = pVehicle->GetModel();
+    auto vehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
 
-    if (IsInWater() && !(vehicleModel == VT_SKIMMER || vehicleModel == VT_SEASPAR || vehicleModel == VT_LEVIATHN || vehicleModel == VT_VORTEX))
+    if (IsInWater() && !(vehicleModel == VehicleType::VT_SKIMMER || vehicleModel == VehicleType::VT_SEASPAR || vehicleModel == VehicleType::VT_LEVIATHN || vehicleModel == VehicleType::VT_VORTEX))
     {
         return false;
     }
