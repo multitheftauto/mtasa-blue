@@ -273,7 +273,8 @@ private:
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
 
-    float* m_pfAspectRatioMultiplicator;
+    float* m_pfAspectRatioMultiplicatorX;
+    float* m_pfAspectRatioMultiplicatorY;
     float* m_pfCameraCrosshairScale;
     float  m_fSniperCrosshairScale;
 
