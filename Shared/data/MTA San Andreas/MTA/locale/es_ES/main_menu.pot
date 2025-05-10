@@ -51,5 +51,5 @@ msgstr "Salir"
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr "Últimas Notícias"
+msgstr "Últimas Noticias"
 
