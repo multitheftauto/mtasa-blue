@@ -5,7 +5,7 @@
  *  FILE:        sdk/CRect2D.h
  *  PURPOSE:     2D rectangle interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

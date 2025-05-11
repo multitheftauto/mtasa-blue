@@ -324,7 +324,7 @@ public:
     int                              unk_75C;
     std::uint8_t                     lastWeaponDamage;
     std::uint8_t                     unk_761[3];
-    CEntitySAInterface*              pTargetedEntity;
+    CEntitySAInterface*              lastDamagedEntity;
     std::int16_t                     unk_768;
 
     CVector                          vecTurretOffset;
@@ -423,9 +423,6 @@ public:
     CEntity* GetContactEntity() const override;
 
     int GetRunState() const override { return GetPedInterface()->moveState; }
-
-    CEntity* GetTargetedEntity() const override;
-    void     SetTargetedEntity(CEntity* targetEntity) override;
 
     bool GetCanBeShotInVehicle() const override{ return GetPedInterface()->pedFlags.bCanBeShotInVehicle; }
     bool GetTestForShotInVehicle() const override { return GetPedInterface()->pedFlags.bTestForShotInVehicle; }

@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/SyncStructures.h
  *  PURPOSE:     Structures used for syncing stuff through the network.
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -2107,7 +2107,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data6), BITCOUNT6);
         else
             data6.ignoreFireState = false;
-            
+
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data7), BITCOUNT7);
         else

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CClientGame.cpp
  *  PURPOSE:     Client game manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -35,6 +35,7 @@
 #include <game/CBuildingRemoval.h>
 #include "game/CClock.h"
 #include <game/CProjectileInfo.h>
+#include <game/CVehicleAudioSettingsManager.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -3489,6 +3490,8 @@ void CClientGame::Event_OnIngame()
 
     // Make sure we never get tired
     g_pGame->GetPlayerInfo()->SetDoesNotGetTired(true);
+
+    g_pGame->GetVehicleAudioSettingsManager()->ResetAudioSettingsData();
 
     // Tell doggy we got the game running
     WatchDogCompletedSection("L1");

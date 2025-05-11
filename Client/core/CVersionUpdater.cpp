@@ -5,7 +5,7 @@
  *  FILE:        core/CVersionUpdater.cpp
  *  PURPOSE:     Version update check and message dialog class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1912,7 +1912,7 @@ void CVersionUpdater::_DialogUpdateQueryError()
     // Display message
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("UPDATE CHECK"));
-    GetQuestionBox().SetMessage(_("An update is currently not available.\n\nPlease check www.mtasa.com"));
+    GetQuestionBox().SetMessage(_("An update is currently not available.\n\nPlease check www.multitheftauto.com"));
     GetQuestionBox().SetButton(0, _("OK"));
     GetQuestionBox().Show();
     _PollAnyButton();

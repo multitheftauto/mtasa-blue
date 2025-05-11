@@ -118,7 +118,7 @@ Curl_getaddrinfo_ex(const char *nodename,
 
   *result = NULL; /* assume failure */
 
-  error = getaddrinfo(nodename, servname, hints, &aihead);
+  error = CURL_GETADDRINFO(nodename, servname, hints, &aihead);
   if(error)
     return error;
 
@@ -184,7 +184,7 @@ Curl_getaddrinfo_ex(const char *nodename,
 
   /* destroy the addrinfo list */
   if(aihead)
-    freeaddrinfo(aihead);
+    CURL_FREEADDRINFO(aihead);
 
   /* if we failed, also destroy the Curl_addrinfo list */
   if(error) {
@@ -430,13 +430,13 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
 struct Curl_addrinfo *Curl_str2addr(char *address, int port)
 {
   struct in_addr in;
-  if(Curl_inet_pton(AF_INET, address, &in) > 0)
+  if(curlx_inet_pton(AF_INET, address, &in) > 0)
     /* This is a dotted IP address 123.123.123.123-style */
     return Curl_ip2addr(AF_INET, &in, address, port);
 #ifdef USE_IPV6
   {
     struct in6_addr in6;
-    if(Curl_inet_pton(AF_INET6, address, &in6) > 0)
+    if(curlx_inet_pton(AF_INET6, address, &in6) > 0)
       /* This is a dotted IPv6 address ::1-style */
       return Curl_ip2addr(AF_INET6, &in6, address, port);
   }
@@ -509,7 +509,7 @@ curl_dbg_freeaddrinfo(struct addrinfo *freethis,
 #ifdef USE_LWIPSOCK
   lwip_freeaddrinfo(freethis);
 #else
-  (freeaddrinfo)(freethis);
+  freeaddrinfo(freethis);
 #endif
 }
 #endif /* defined(CURLDEBUG) && defined(HAVE_FREEADDRINFO) */
@@ -534,7 +534,7 @@ curl_dbg_getaddrinfo(const char *hostname,
 #ifdef USE_LWIPSOCK
   int res = lwip_getaddrinfo(hostname, service, hints, result);
 #else
-  int res = (getaddrinfo)(hostname, service, hints, result);
+  int res = getaddrinfo(hostname, service, hints, result);
 #endif
   if(0 == res)
     /* success */

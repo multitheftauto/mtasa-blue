@@ -5,7 +5,7 @@
  *  FILE:        sdk/CMatrix4.h
  *  PURPOSE:     4x4 matrix class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

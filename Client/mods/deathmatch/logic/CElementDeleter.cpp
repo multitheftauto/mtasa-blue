@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CElementDeleter.cpp
  *  PURPOSE:     Manager for elements to be destroyed
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

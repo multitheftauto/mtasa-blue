@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CModelInfoSA.cpp
  *  PURPOSE:     Entity model information handler
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
