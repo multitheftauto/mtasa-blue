@@ -48,11 +48,11 @@ static void _declspec(naked) HOOK_CWorld_TriggerExplosionSectorList()
     {
         // check entity->m_nScanCode == CWorld::ms_nCurrentScanCode
         mov ecx, dword ptr ds:[0xB7CD78]
-        cmp [esi+2Ch], ecx
+        cmp [esi+2Ch], cx
         jz skip
 
         // set entity current scan code
-        mov [esi+2Ch], ecx
+        mov [esi+2Ch], cx
 
         mov al, [esi+36h]
         and al, 7
