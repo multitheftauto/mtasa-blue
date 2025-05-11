@@ -107,7 +107,7 @@ Udata *luaS_newudata (lua_State *L, size_t s, Table *e) {
 
 LUALIB_API unsigned int luaS_hash(const char *str, size_t l)
 {
-    if (!str || str[0] == '\0' || l == 0)
+    if (!str || l == 0)
         return 0;
 
     unsigned int h = cast(unsigned int, l);  /* seed */
