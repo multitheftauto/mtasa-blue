@@ -16,6 +16,10 @@ fi
 # Number of cores
 if [ "$(uname)" == "Darwin" ]; then
     NUM_CORES=$(sysctl -n hw.ncpu)
+    : ${GCC_PREFIX:=}
+    : ${AR:=ar}
+    : ${CC:=gcc}
+    : ${CXX:=g++}
 else
     NUM_CORES=$(grep -c ^processor /proc/cpuinfo)
 fi
