@@ -25,7 +25,7 @@ RUN    dpkg --add-architecture i386  \
         libncurses-dev:armhf libmysqlclient21:armhf zlib1g-dev:armhf libssl-dev:armhf g++-10-aarch64-linux-gnu   \
         libncurses-dev:i386  libmysqlclient21:i386  zlib1g-dev:i386  libssl-dev:i386  g++-10-multilib            \
         libncurses-dev       libmysqlclient21       zlib1g-dev       libssl-dev                                  \
-    && apt-get upgrade -y
+    && apt-get upgrade -y \
     && cd /tmp \
     && apt-get download \
         libmysqlclient-dev:armhf \
