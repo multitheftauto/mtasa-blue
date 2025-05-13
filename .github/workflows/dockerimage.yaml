@@ -8,21 +8,10 @@ on:
     paths: 
     - '.github/workflows/build.yaml'
     - '.github/workflows/dockerimage.yaml'
-    - '/utils/docker/**'
+    - 'utils/docker/**'
 
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-        - tag: latest
-          dockerfile: Dockerfile
-        - tag: i386
-          dockerfile: Dockerfile.i386
-        - tag: armhf
-          dockerfile: Dockerfile.armhf
-        - tag: arm64
-          dockerfile: Dockerfile.arm64
     if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
