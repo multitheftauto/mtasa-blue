@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-04 16:35+0000\n"
-"PO-Revision-Date: 2025-05-04 18:31\n"
+"POT-Creation-Date: 2025-05-06 09:34+0000\n"
+"PO-Revision-Date: 2025-05-07 19:14\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -94,8 +94,8 @@ msgstr "不明"
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr "%sフィアルが%zuプロセスにロックされています。\n\n"
-"このプロセスを解除し、アップデートを続けましょうか。\n\n"
+msgstr "ファイル '%s' は現在 %zu 個のプロセスによってロックされています。\n\n"
+"以下のプロセスを終了してアップデートを続行しますか？\n\n"
 "%s"
 
 #: Client/loader/Install.cpp:479
@@ -104,9 +104,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr "インストールが不正なのかもしれませ。\n\n"
-"%zuの%zuファイルがバックアップから取り戻すことができませんでした。\n\n"
-"MTASAを「www.multitheftauto.com」で再インストールしてください。または、管理者権限でアップデートを実行してみてください。"
+msgstr "インストールが破損している可能性があります。\n\n"
+"%zu 個中 %zu 個のファイルがバックアップから復元できませんでした。\n\n"
+"www.multitheftauto.com からMulti Theft Autoを再インストールするか\n"
+"管理者権限でアップデートを試してみてください。"
 
 #: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:689
 msgid "Installing update..."
@@ -157,7 +158,7 @@ msgstr "MTA:SA再実行失敗\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1427
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1439
-#: Client/game_sa/CGameSA.cpp:261 Client/game_sa/CGameSA.cpp:272
+#: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -251,7 +252,7 @@ msgstr "GTA: San Andreasのインスタンスはまだ実行しています。�
 #: Client/loader/MainFunctions.cpp:1219
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
-#: Client/game_sa/CGameSA.cpp:268
+#: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr "情報"
 
@@ -311,18 +312,18 @@ msgstr "メインファイルが署名されていません。ウイルスの活
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "%s　ファイルは不在。これはウイルスの活動なのかもしれません。\n\n"
-"安全のため、MTASAを再インストールをお勧めします。\n"
-"MTAが実行できない場合はオンラインでヘルプ検索してみてください。"
+msgstr "ファイル %s が見つかりません。ウイルスの活動が原因である可能性があります。\n\n"
+"セキュリティのため、Multi Theft Auto の再インストールを検討してください。\n"
+"MTAが正しく動作しない場合は、オンラインヘルプを参照してください。"
 
 #: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "%s ファイルはモッドされています。これはウイルスの活動なのかもしれません。\n\n"
-"安全のため、MTASAを再インストールをお勧めします。\n"
-"MTAが実行できない場合はオンラインでヘルプ検索してみてください。"
+msgstr "ファイル %s が改竄されています。ウイルスの活動が原因である可能性があります。\n\n"
+"セキュリティのため、Multi Theft Auto の再インストールを検討してください。\n"
+"MTAが正しく動作しない場合は、オンラインヘルプを参照してください。"
 
 #: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -409,7 +410,7 @@ msgstr "ファイルをコピーすることができないため、MTAが実行
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SAファイルが不在、あるいは不正であるため、MTA:SAが実行できません："
+msgstr "MTA:SAのファイルが正しくないまたは見つからないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
@@ -417,7 +418,7 @@ msgstr "MTASAファイルをコピーする"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "GTA:SAファイルが不在、あるいは不正であるため、MTA:SAが実行できません："
+msgstr "GTA:SAのファイルが正しくないまたは見つからないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -425,7 +426,7 @@ msgstr "GTASA依存関係ファイルをパッチする"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "GTA:SA exeが不在、あるいは不正であるため、MTA:SAが実行できません："
+msgstr "GTA:SAの実行ファイルが不正または見つからないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
@@ -437,7 +438,7 @@ msgstr "GTASAを生成する"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "GTA:SA exeがロードできないため、MTA:SAが実行できません："
+msgstr "GTA:SAの実行ファイルが読み込めないため、MTA:SAを起動できません："
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
@@ -471,17 +472,20 @@ msgstr "互換性設定アップデート"
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Grand Theft Auto: San Andreas を起動してください。\n"
+"ゲームが「Program Files (x86)」フォルダにインストールされていることを確認してください。"
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr ""
+msgstr "Grand Theft Auto: San Andreas を探しています"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "申し訳ありません、ゲームが見つかりませんでした。\n"
+"Grand Theft Auto: San Andreas を起動してから、再試行してください。\n"
+"ゲームが「Program Files (x86)」フォルダにインストールされていることを確認してください。"
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -601,8 +605,8 @@ msgstr "Grand Theft Auto: San Andreas がインストールされたフォルダ
 #: Client/loader/Dialogs.cpp:69
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "これらのファイルがなくても問題なく作動しますが、ゲームと共に起動すると画面機能に影響を与える可能性があります。\n\n"
-"この一覧のファイルを削除か、ファイル名の変更、どちらかをお選ぶのがお勧めです。"
+msgstr "これらのファイルは不要であり、このバージョンのMTA:SAのグラフィック機能に干渉する可能性があります。\n\n"
+"これらのファイルを削除または名前変更することを推奨します。"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Keep these files, but also show this warning on next start"
@@ -646,11 +650,11 @@ msgstr "B - 別のNVIDIA"
 
 #: Client/loader/Dialogs.cpp:86
 msgid "C - Standard Intel"
-msgstr "C - インテルスタンダード"
+msgstr "C - 標準 Intel"
 
 #: Client/loader/Dialogs.cpp:87
 msgid "D - Alternate Intel"
-msgstr "D - 別インテル"
+msgstr "D - 代替 Intel"
 
 #: Client/loader/Dialogs.cpp:88
 msgid "If you get desperate, this might help:"
@@ -734,7 +738,7 @@ msgstr "%s:%u に接続中。。。"
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "%s:%u に再接続しています…"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
@@ -879,7 +883,8 @@ msgstr "サーバーはアップデートは推奨されていますが、アッ
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr ""
+msgstr "現在、アップデートはできない状態です。\n\n"
+"www.multitheftauto.com をご確認ください"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -975,7 +980,7 @@ msgstr "* 時間は %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "接続：ネットワークが準備できていません。しばらくお待ちください"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -1001,21 +1006,21 @@ msgstr "接続：現在MODをアンロードすることができませんでし
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "再接続：ネットワークが準備できていません。しばらくお待ちください"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "再接続：無効なポート番号です"
 
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "再接続：%s:%u に再接続中…"
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "再接続：%s:%u に接続できませんでした！"
 
 #: Client/core/CCommandFuncs.cpp:359
 msgid "Bound all controls from GTA"
@@ -1035,13 +1040,13 @@ msgstr "＊あなたのシリアル番号は： %s"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1097
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 msgid "In-game"
-msgstr ""
+msgstr "ゲーム内"
 
 #: Client/core/CCore.cpp:670 Client/core/CSettings.cpp:3555
 #: Client/core/CMainMenu.cpp:303
 #: Client/mods/deathmatch/logic/CClientGame.cpp:541
 msgid "Main menu"
-msgstr ""
+msgstr "メインメニュー"
 
 #: Client/core/CCore.cpp:809 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
@@ -1300,16 +1305,16 @@ msgstr "ダウンロードウィンドウを表示する"
 
 #: Client/core/CSettings.cpp:403
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Discordリッチプレゼンスとの連携を許可する"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:409
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "カメラで撮った写真を「GTA San Andreas User Files」フォルダーに保存"
 
 #: Client/core/CSettings.cpp:414
 msgid "Ask before disconnecting from server using main menu"
-msgstr ""
+msgstr "メインメニューからサーバー切断する前に確認する"
 
 #: Client/core/CSettings.cpp:419
 msgid "Use customized GTA:SA files"
@@ -1325,16 +1330,16 @@ msgstr "不透明度:"
 
 #: Client/core/CSettings.cpp:452
 msgid "Image resolution:"
-msgstr ""
+msgstr "画像解像度："
 
 #: Client/core/CSettings.cpp:459
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (初期値)"
 
 #. index 0
 #: Client/core/CSettings.cpp:460
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -1559,7 +1564,7 @@ msgstr "タイヤの煙など"
 
 #: Client/core/CSettings.cpp:852
 msgid "Dynamic ped shadows"
-msgstr "ペッドディナミックシャドウ"
+msgstr "動的なキャラクターの影"
 
 #: Client/core/CSettings.cpp:856
 msgid "Motion blur"
@@ -1599,7 +1604,7 @@ msgstr "リモートウェブサイトにJavascriptを有効する"
 
 #: Client/core/CSettings.cpp:944
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "GPUレンダリングを有効にする"
 
 #: Client/core/CSettings.cpp:948
 msgid "Custom blacklist"
@@ -1754,7 +1759,7 @@ msgstr "エクスプローラに表示する"
 #. Process affinity
 #: Client/core/CSettings.cpp:1216
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
+msgstr "CPU 0 の親和性を設定してゲームパフォーマンスを最適化する"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1222 Client/core/CSettings.cpp:1225
@@ -2057,11 +2062,13 @@ msgstr "外部音"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr ""
+msgstr "リッチプレゼンス連携オプションが有効になっているみたいです。\n"
+"サーバーにデータを共有することを許可しますか？\n\n"
+"これにはあなたの個人IDが含まれます。"
 
 #: Client/core/CSettings.cpp:4675
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
+msgstr "データ共有の許諾"
 
 #: Client/core/CSettings.cpp:4699
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -2090,7 +2097,8 @@ msgstr "実験的機能"
 #: Client/core/CSettings.cpp:4802
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr ""
+msgstr "このオプションを無効にすることは、パフォーマンスの問題が発生している場合を除き、推奨しません。\n\n"
+"無効にしてもよろしいですか？"
 
 #: Client/core/CSettings.cpp:4938
 msgid "Please enter a nickname"
@@ -2164,11 +2172,11 @@ msgstr "マウス移動修正 - パソコンを再起動するのが必要かも
 
 #: Client/core/CSettings.cpp:4981
 msgid "CPU affinity:"
-msgstr ""
+msgstr "CPU親和性："
 
 #: Client/core/CSettings.cpp:4981
 msgid "Only change if you're having stability issues."
-msgstr ""
+msgstr "安定性の問題が発生している場合のみ変更してください。"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:92
@@ -2201,7 +2209,7 @@ msgstr "切断警告"
 
 #: Client/core/CMainMenu.cpp:1220
 msgid "INFORMATION"
-msgstr ""
+msgstr "情報"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
@@ -2759,47 +2767,47 @@ msgstr "前のラジオチャンネル"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "enables the player-map view"
-msgstr ""
+msgstr "プレイヤーマップを表示"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "プレイヤーマップ拡大"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "プレイヤーマップ縮小"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
-msgstr ""
+msgstr "プレイヤーマップ 北へ移動"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr ""
+msgstr "プレイヤーマップ 南へ移動"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
-msgstr ""
+msgstr "プレイヤーマップ 東へ移動"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map west"
-msgstr ""
+msgstr "プレイヤーマップ 西へ移動"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "attaches the player-map"
-msgstr ""
+msgstr "プレイヤーマップを固定"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "プレイヤーマップ 不透明度減少"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "プレイヤーマップ 不透明度増加"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "プレイヤーマップ ヘルプ表示切り替え"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "sends a message to the targetted player"
@@ -2879,25 +2887,25 @@ msgstr "開始"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "モード変更：%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "\"ズーム：%s/%s     移動：%s, %s, %s, %s     不透明度：%s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "マップ表示切替：%s     ヘルプ表示切替：%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr ""
+msgstr "プレイヤー追尾"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr ""
+msgstr "自由移動"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -2927,112 +2935,112 @@ msgstr "ダウンロードをキャンセルするには、切断してくださ
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "UFOで宇宙旅行気分"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Cruising around"
-msgstr ""
+msgstr "街をゆるっと徘徊中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Riding the waves of"
-msgstr ""
+msgstr "波乗りなう"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Riding the train in"
-msgstr ""
+msgstr "電車でガタンゴトン"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 msgid "Flying around"
-msgstr ""
+msgstr "空中散歩中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Riding around"
-msgstr ""
+msgstr "乗り回してるぜ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "モンスタートラック暴走中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Quaddin' around"
-msgstr ""
+msgstr "バギー乗り回しだぜ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "ひたすらバニホぴょんぴょん"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "なんかヤバいことしてる"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Climbing around in"
-msgstr ""
+msgstr "高いとこ目指してよじ登り中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "ドライブバイかまし中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Blub blub..."
-msgstr ""
+msgstr "ぶくぶく…"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Breathing water"
-msgstr ""
+msgstr "死人魚になりました"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Drowning in"
-msgstr ""
+msgstr "絶賛溺れ中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "物陰に隠れてるぜ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Fighting in"
-msgstr ""
+msgstr "ドンパチやってるぜ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Throwing fists in"
-msgstr ""
+msgstr "素手タイマン中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "敵をぶっ飛ばしてるぜ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Shooting up"
-msgstr ""
+msgstr "乱射中だぜ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Jetpacking in"
-msgstr ""
+msgstr "ジェットパック空中散歩"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Literally on fire in"
-msgstr ""
+msgstr "文字通り物理的炎上中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Burning up in"
-msgstr ""
+msgstr "燃え尽きそう"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Swimming in"
-msgstr ""
+msgstr "スイミングなう"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Floating around in"
-msgstr ""
+msgstr "ぷかぷか漂流中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "サメに追われてるなう"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Choking to death in"
-msgstr ""
+msgstr "窒息しそう"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 msgid "Entering the game ..."
@@ -3057,11 +3065,11 @@ msgstr "ローカルサーバーを実行しています。。。"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1027
 msgid "Area 51"
-msgstr ""
+msgstr "エリア 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1036
 msgid "Walking around "
-msgstr ""
+msgstr "お散歩中 "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1182
 #, c-format
@@ -3098,23 +3106,23 @@ msgstr "MTAクライアント確認失敗！"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5640
 msgid "In a ditch"
-msgstr ""
+msgstr "溝にハマり中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5640
 msgid "En-route to hospital"
-msgstr ""
+msgstr "病院直行便に乗車"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5640
 msgid "Meeting their maker"
-msgstr ""
+msgstr "神様と面談中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5641
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "やらかして後悔なう"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5641
 msgid "Wasted"
-msgstr ""
+msgstr "無事、死亡"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:506
 msgid "Disconnected: Invalid nickname"
@@ -3200,7 +3208,7 @@ msgstr "切断： シリアル確認が失敗しました"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "切断されました：マシンシリアルが既に使用されています"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format
@@ -3312,13 +3320,13 @@ msgstr[0] "%d 秒"
 msgid "Disconnected"
 msgstr "切断されました"
 
-#: Client/game_sa/CGameSA.cpp:255 Client/game_sa/CGameSA.cpp:266
+#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "game_sa の初期化に失敗しました"
 
-#: Client/game_sa/CGameSA.cpp:257
+#: Client/game_sa/CGameSA.cpp:258
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "メモリ割り当てに失敗しました"
 
 #: Client/game_sa/CSettingsSA.cpp:781
 msgid "Can't find valid screen resolution."
@@ -3333,7 +3341,7 @@ msgstr "この解像度を利用するに確かですか？"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "致命的なエラー (%u) です。この問題が続く場合は、multitheftauto.com でサポートをご確認ください。"
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3342,7 +3350,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "プロトコルエラー (%u) です。この問題が続く場合は、multitheftauto.com でサポートをご確認ください。"
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
