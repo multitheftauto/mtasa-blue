@@ -25,5 +25,5 @@ jobs:
     - uses: docker/build-push-action@v5
       with:
         push: true
-        file: ./utils/docker/Dockerfile
+        context: utils/docker
         tags: ghcr.io/multitheftauto/mtasa-blue-build:latest
