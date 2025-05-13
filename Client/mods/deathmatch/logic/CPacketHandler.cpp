@@ -4218,6 +4218,26 @@ retry:
                     break;
                 }
 
+                case CClientGame::BUILDING:
+                {
+                    std::uint16_t        modelId;
+                    SRotationRadiansSync rotationRadians(false);
+
+                    // Read out the position, rotation, object ID
+                    bitStream.Read(&position);
+                    bitStream.Read(&rotationRadians);
+                    bitStream.ReadCompressed(modelId);
+
+                    if (!CClientBuildingManager::IsValidModel(modelId))
+                        modelId = 1700;
+
+                    bitStream.Read(LowLodObjectID);
+                    CClientBuilding* pBuilding = new CClientBuilding(g_pClientGame->m_pManager, EntityID, modelId, position.data.vecPosition, rotationRadians.data.vecRotation, ucInterior);
+
+                    pBuilding->SetUsesCollision(bCollisonsEnabled);
+                    break;
+                }
+
                 default:
                 {
                     assert(0);
@@ -4287,10 +4307,18 @@ retry:
 
         if (TempLowLodObjectID != INVALID_ELEMENT_ID)
         {
-            CClientObject* pTempObject = DynamicCast<CClientObject>(pTempEntity);
-            CClientObject* pLowLodObject = DynamicCast<CClientObject>(CElementIDs::GetElement(TempLowLodObjectID));
-            if (pTempObject)
-                pTempObject->SetLowLodObject(pLowLodObject);
+            if (CClientObject* pTempObject = DynamicCast<CClientObject>(pTempEntity))
+            {
+                CClientObject* pLowLodObject = DynamicCast<CClientObject>(CElementIDs::GetElement(TempLowLodObjectID));
+                if (pTempObject)
+                    pTempObject->SetLowLodObject(pLowLodObject);
+            }
+            else if (CClientBuilding* pTempObject = DynamicCast<CClientBuilding>(pTempEntity))
+            {
+                CClientBuilding* pLowLod = DynamicCast<CClientBuilding>(CElementIDs::GetElement(TempLowLodObjectID));
+                if (pTempObject)
+                    pTempObject->SetLowLodBuilding(pLowLod);
+            }
         }
 
         delete pEntityStuff;
