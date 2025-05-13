@@ -154,6 +154,7 @@
 #include "CLatentTransferManager.h"
 #include "CDebugHookManager.h"
 #include "lua/CLuaShared.h"
+#include "CStringName.h"
 
 // Deathmatch includes
 #include "ClientCommands.h"
