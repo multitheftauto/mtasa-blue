@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CHudSA.cpp
  *  PURPOSE:     HUD display
@@ -19,8 +19,8 @@
 
 extern CGameSA* pGame;
 
-char szVehicleName[50] = {'\0'};
-char szZoneName[50] = {'\0'};
+static float           radarAltimeterFix = 0.0014625f;                            // Changes altimeter width (and maybe x pos)
+static constexpr float aspectRatioMultiplicatorUntouched = 0.0015625f;            // (1 / 640)
 
 static ComponentProperties componentProperties;
 
@@ -56,23 +56,18 @@ CHudSA::CHudSA()
 {
     InitComponentList();
 
-    // Set the default values
-    m_fSniperCrosshairScale = 210.0f;
+    m_pfAspectRatioMultiplicatorX = reinterpret_cast<float*>(VAR_AspectRatioMultX);
+    m_pfAspectRatioMultiplicatorY = reinterpret_cast<float*>(VAR_AspectRatioMult);
 
-    m_pfCameraCrosshairScale = (float*)VAR_CameraCrosshairScale;
-    MemPut<float>(m_pfCameraCrosshairScale, 192.0f);
-    m_pfAspectRatioMultiplicator = (float*)VAR_AspectRatioMult;
-    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);
+    MemPut<float>(0x866C84, 640.0f / ((4.0f / 3.0f) * 448.0f));            // 0x866C84: Weapon sprite x position
+    MemPut<float>(m_pfAspectRatioMultiplicatorX, 0.0015625f);              // (1 / 640)
+    MemPut<float>(m_pfAspectRatioMultiplicatorY, 0.002232143f);            // (1 / 448)
+
+    MemPut<const float*>(0x58B141, &aspectRatioMultiplicatorUntouched);            // Vehicle name x pos
+    MemPut<const float*>(0x58AE4C, &aspectRatioMultiplicatorUntouched);            // Area name x pos
+    MemPut<float*>(0x58A6E0, &radarAltimeterFix);                                  // Fix radar altimeter
 
     UpdateStreetchCalculations();
-
-    // Patch xrefs to 0x863B34, because this variable seems to be shared (2 other functions without any context access to it; probably a compiler optimization)
-    MemPut<DWORD>(0x58E7D4 + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x58E7EA + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x53E3ED + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x53E41A + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x53E488 + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x53E4BF + 2, (DWORD)&m_fSniperCrosshairScale);
 
     // Initalize default data
     componentProperties.hpBar = MapGet(defaultComponentProperties, HUD_HEALTH);
@@ -198,8 +193,8 @@ bool CHudSA::IsComponentVisible(eHudComponent component)
 
 void CHudSA::UpdateStreetchCalculations()
 {
-    calcStreetchX = rsGlobal->maximumWidth * (*reinterpret_cast<float*>(VAR_AspectRatioMultX));
-    calcStreetchY = rsGlobal->maximumHeight * (*m_pfAspectRatioMultiplicator);
+    calcStreetchX = rsGlobal->maximumWidth * (*m_pfAspectRatioMultiplicatorX);
+    calcStreetchY = rsGlobal->maximumHeight * (*m_pfAspectRatioMultiplicatorY);
 
     SComponentPlacement& hpPlacement = componentProperties.hpBar.placement;
     hpPlacement.height = calcStreetchY * 9.0f;
@@ -265,14 +260,13 @@ void CHudSA::AdjustComponents(float fAspectRatio)
     // Fix for #7400 (HUD elements do not scale correctly for widescreen)
     // 0x859524: GTA multiplies all HUD and menu transformation variables by this floating point value. It is equal to 1/448, so just translate it to 16/10 /
     // 16/9
-    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f / (4.0f / 3.0f) * fAspectRatio);
+    const float ratio = (640.0f / (fAspectRatio * 448.0f));
 
-    // Set the sniper crosshair scale (fix for #7659)
-    m_fSniperCrosshairScale = 210.0f * (4.0f / 3.0f) / fAspectRatio;
-
-    // Set the camera crosshair scale (same display flaw as in #7659)
-    MemPut<float>(m_pfCameraCrosshairScale, 192.0f * (4.0f / 3.0f) / fAspectRatio);
-
+    radarAltimeterFix = ratio * 0.00147f;
+    MemPut<float>(m_pfAspectRatioMultiplicatorX, ratio * 0.0015625f);
+    MemPut<float>(m_pfAspectRatioMultiplicatorY, ratio * 0.002232143f);
+    MemPut<float>(0x866C84, ratio * 0.17343046f);            // 0x866C84: Weapon sprite x position
+    
     UpdateStreetchCalculations();
 }
 
@@ -282,9 +276,10 @@ void CHudSA::AdjustComponents(float fAspectRatio)
 void CHudSA::ResetComponentAdjustment()
 {
     // Restore default values (4:3 aspect ratio)
-    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);
-    MemPut<float>(m_pfCameraCrosshairScale, 192.0f);
-    m_fSniperCrosshairScale = 210.0f;
+    radarAltimeterFix = 0.0014625f;
+    MemPut<float>(m_pfAspectRatioMultiplicatorX, 0.0015625f);              // (1 / 640)
+    MemPut<float>(m_pfAspectRatioMultiplicatorY, 0.002232143f);            // (1 / 448)
+    MemPut<float>(0x866C84, 0.17343046f);                                  // 0x866C84: Weapon sprite x position
 
     UpdateStreetchCalculations();
 }
