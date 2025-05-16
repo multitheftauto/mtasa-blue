@@ -59,7 +59,7 @@ bool CMouseControl::ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam)
     if (uMsg != WM_MOUSEMOVE)
         return false;
 
-    if (g_pCore->GetGame()->GetSystemState() != 9)
+    if (g_pCore->GetGame()->GetSystemState() != SystemState::GS_PLAYING_GAME)
         return false;
 
     // HACK:  Grab our local player, and check his vehicle

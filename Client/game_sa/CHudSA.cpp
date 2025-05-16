@@ -327,7 +327,7 @@ bool CHudSA::IsCrosshairVisible()
         CTaskSimpleUseGun* taskUseGun = playerPed->GetPedIntelligence()->GetTaskUseGun();
         if ((!taskUseGun || !taskUseGun->GetSkipAim()) && (cameraViewMode == MODE_AIMWEAPON || cameraViewMode == MODE_AIMWEAPON_FROMCAR || cameraViewMode == MODE_AIMWEAPON_ATTACHED))
         {
-            if (playerPed->GetPedState() != PED_ENTER_CAR && playerPed->GetPedState() != PED_CARJACK)
+            if (playerPed->GetPedState() != PedState::PED_ENTER_CAR && playerPed->GetPedState() != PedState::PED_CARJACK)
             {
                 if ((weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_M4) || weaponType == WEAPONTYPE_TEC9 || weaponType == WEAPONTYPE_COUNTRYRIFLE || weaponType == WEAPONTYPE_MINIGUN || weaponType == WEAPONTYPE_FLAMETHROWER)
                     simpleAiming = cameraViewMode != MODE_AIMWEAPON || camera->GetTransitionState() == 0;

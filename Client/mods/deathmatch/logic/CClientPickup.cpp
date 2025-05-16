@@ -140,7 +140,7 @@ void CClientPickup::Create()
     if (!m_pPickup && m_bVisible)
     {
         // Create the pickup
-        m_pPickup = g_pGame->GetPickups()->CreatePickup(&m_vecPosition, m_usModel, PICKUP_ONCE);
+        m_pPickup = g_pGame->GetPickups()->CreatePickup(&m_vecPosition, m_usModel, PickupType::PICKUP_ONCE);
         m_pObject = NULL;
         if (m_pPickup)
         {

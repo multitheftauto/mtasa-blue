@@ -470,7 +470,7 @@ public:
     std::unique_ptr<CPedIK> GetPedIK() override { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
 
     CEntitySAInterface* GetTargetedObject() const override { return GetPedInterface()->pTargetedObject; }
-    ePedState           GetPedState() const override { return static_cast<ePedState>(GetPedInterface()->pedState); }
+    PedState           GetPedState() const override { return static_cast<PedState>(GetPedInterface()->pedState); }
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 

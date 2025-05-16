@@ -33,11 +33,11 @@ public:
     const CBoatHandlingEntry*   GetOriginalBoatHandlingData(std::uint32_t model) const noexcept;
     const CBikeHandlingEntry*   GetOriginalBikeHandlingData(std::uint32_t model) const noexcept;
 
-    eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept;
+    HandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept;
 
     void CheckSuspensionChanges(const CHandlingEntry* const entry) const noexcept;
 
-    static eHandlingTypes GetHandlingID(std::uint32_t model) noexcept;
+    static HandlingType GetHandlingID(std::uint32_t model) noexcept;
 
 private:
     void InitializeDefaultHandlings() noexcept;

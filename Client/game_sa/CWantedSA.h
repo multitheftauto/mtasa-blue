@@ -60,8 +60,8 @@ public:
     DWORD current_chase_time_counter;
     bool  m_bTimeCounting;
 
-    eWantedLevelSA m_WantedLevel;
-    eWantedLevelSA m_WantedLevelBeforeParole;
+    std::uint32_t m_WantedLevel;
+    std::uint32_t m_WantedLevelBeforeParole;
 
     CCrimeBeingQd CrimesBeingQd[MAX_CRIMES_QD];
 

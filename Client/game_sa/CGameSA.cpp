@@ -374,7 +374,7 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
  */
 void CGameSA::StartGame()
 {
-    SetSystemState(GS_INIT_PLAYING_GAME);
+    SetSystemState(SystemState::GS_INIT_PLAYING_GAME);
     MemPutFast<BYTE>(0xB7CB49, 0);            // CTimer::m_UserPause
     MemPutFast<BYTE>(0xBA67A4, 0);            // FrontEndMenuManager + 0x5C
 }
@@ -383,14 +383,14 @@ void CGameSA::StartGame()
  * Sets the part of the game loading process the game is in.
  * @param dwState DWORD containing a valid state 0 - 9
  */
-void CGameSA::SetSystemState(eSystemState State)
+void CGameSA::SetSystemState(SystemState State)
 {
-    MemPutFast<DWORD>(0xC8D4C0, State); // gGameState
+    MemPutFast<DWORD>(0xC8D4C0, (DWORD)State); // gGameState
 }
 
-eSystemState CGameSA::GetSystemState()
+SystemState CGameSA::GetSystemState()
 {
-    return *(eSystemState*)0xC8D4C0; // gGameState
+    return *(SystemState*)0xC8D4C0; // gGameState
 }
 
 /**
@@ -440,7 +440,7 @@ void CGameSA::SetGameSpeed(float fSpeed)
 void CGameSA::Reset()
 {
     // Things to do if the game was loaded
-    if (GetSystemState() == GS_PLAYING_GAME)
+    if (GetSystemState() == SystemState::GS_PLAYING_GAME)
     {
         // Extinguish all fires
         m_pFireManager->ExtinguishAllFires();

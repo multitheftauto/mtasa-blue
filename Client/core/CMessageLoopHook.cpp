@@ -321,8 +321,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     // If CTRL and Tab are pressed, Trigger a skip
                     if ((uMsg == WM_KEYDOWN && wParam == VK_TAB))
                     {
-                        eSystemState systemState = g_pCore->GetGame()->GetSystemState();
-                        if (systemState == 7 || systemState == 8 || systemState == 9)
+                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME || systemState == SystemState::GS_PLAYING_GAME)
                         {
                             short sCtrlState = GetKeyState(VK_CONTROL);
                             short sShiftState = GetKeyState(VK_SHIFT);
@@ -344,8 +344,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     }
                     if ((uMsg == WM_KEYDOWN && (wParam >= VK_1 && wParam <= VK_9)))
                     {
-                        eSystemState systemState = g_pCore->GetGame()->GetSystemState();
-                        if (systemState == 7 || systemState == 8 || systemState == 9)
+                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME || systemState == SystemState::GS_PLAYING_GAME)
                         {
                             short sCtrlState = GetKeyState(VK_CONTROL);
                             if (sCtrlState & 0x8000)
@@ -368,9 +368,9 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     // If F8 is pressed, we show/hide the console
                     if ((uMsg == WM_KEYDOWN && wParam == VK_F8) || (uMsg == WM_CHAR && wParam == '`'))
                     {
-                        eSystemState systemState = g_pCore->GetGame()->GetSystemState();
-                        if (CLocalGUI::GetSingleton().IsConsoleVisible() || systemState == 7 || systemState == 8 ||
-                            systemState == 9) /* GS_FRONTEND, GS_INIT_PLAYING_GAME, GS_PLAYING_GAME */
+                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        if (CLocalGUI::GetSingleton().IsConsoleVisible() || systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME ||
+                            systemState == SystemState::GS_PLAYING_GAME)
                         {
                             CLocalGUI::GetSingleton().SetConsoleVisible(!CLocalGUI::GetSingleton().IsConsoleVisible());
                         }

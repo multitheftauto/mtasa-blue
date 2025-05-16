@@ -12,12 +12,12 @@
 #pragma once
 
 #include "game/CVehicleAudioSettingsEntry.h"
-#include <game/Common.h>
+#include "enums/VehicleSoundType.h"
 
 // SA interface
 struct tVehicleAudioSettings
 {
-    eVehicleSoundType m_eVehicleSoundType;
+    VehicleSoundType m_eVehicleSoundType;
     int16             m_nEngineOnSoundBankId;
     int16             m_nEngineOffSoundBankId;
     int8              m_nBassSetting;            // 0 or 1 or 2
@@ -46,7 +46,7 @@ public:
     void Assign(const tVehicleAudioSettings& settings) noexcept { m_Settings = settings; }
     void Assign(const CVehicleAudioSettingsEntry& settings) noexcept { m_Settings = static_cast<const CVehicleAudioSettingsEntrySA&>(settings).GetInterface(); };
 
-    eVehicleSoundType GetSoundType() const noexcept override { return m_Settings.m_eVehicleSoundType; };
+    VehicleSoundType  GetSoundType() const noexcept override { return m_Settings.m_eVehicleSoundType; };
     short             GetEngineOnSoundBankID() const noexcept override { return m_Settings.m_nEngineOnSoundBankId; };
     short             GetEngineOffSoundBankID() const noexcept override { return m_Settings.m_nEngineOffSoundBankId; };
     char              GetBassSetting() const noexcept override { return m_Settings.m_nBassSetting; };
@@ -61,7 +61,7 @@ public:
     char              GetVehicleTypeForAudio() const noexcept override { return m_Settings.m_nVehTypeForAudio; };
     float             GetHornVolumeDelta() const noexcept override { return m_Settings.m_fHornVolumeDelta; };
 
-    void SetSoundType(eVehicleSoundType value) noexcept override { m_Settings.m_eVehicleSoundType = value; };
+    void SetSoundType(VehicleSoundType value) noexcept override { m_Settings.m_eVehicleSoundType = value; };
     void SetEngineOnSoundBankID(short value) noexcept override { m_Settings.m_nEngineOnSoundBankId = value; };
     void SetEngineOffSoundBankID(short value) noexcept override { m_Settings.m_nEngineOffSoundBankId = value; };
     void SetBassSetting(char value) noexcept override { m_Settings.m_nBassSetting = value; };

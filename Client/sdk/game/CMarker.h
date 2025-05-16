@@ -11,7 +11,10 @@
 
 #pragma once
 
-#include "Common.h"
+#include "enums/MarkerSprite.h"
+#include "enums/MarkerDisplay.h"
+#include "enums/MarkerType.h"
+#include "enums/MarkerColor.h"
 
 class CEntity;
 class CObject;
@@ -26,10 +29,10 @@ class CMarker
 {
 public:
     /* Our Functions */
-    virtual void     SetSprite(eMarkerSprite Sprite) = 0;
-    virtual void     SetDisplay(eMarkerDisplay wDisplay) = 0;
+    virtual void     SetSprite(MarkerSprite Sprite) = 0;
+    virtual void     SetDisplay(MarkerDisplay wDisplay) = 0;
     virtual void     SetScale(WORD wScale) = 0;
-    virtual void     SetColor(eMarkerColor color) = 0;
+    virtual void     SetColor(MarkerColor color) = 0;
     virtual void     SetColor(const SharedUtil::SColor color) = 0;
     virtual void     Remove() = 0;
     virtual bool     IsActive() = 0;

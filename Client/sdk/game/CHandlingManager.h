@@ -14,6 +14,9 @@
 #include <string>
 #include "Common.h"
 
+#include "enums/HandlingType.h"
+#include "enums/HandlingProperty.h"
+
 class CBikeHandlingEntry;
 class CBoatHandlingEntry;
 class CFlyingHandlingEntry;
@@ -32,7 +35,7 @@ public:
     virtual const CBoatHandlingEntry*   GetOriginalBoatHandlingData(std::uint32_t model) const noexcept = 0;
     virtual const CBikeHandlingEntry*   GetOriginalBikeHandlingData(std::uint32_t model) const noexcept = 0;
 
-    virtual eHandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept = 0;
+    virtual HandlingProperty GetPropertyEnumFromName(const std::string& name) const noexcept = 0;
 
     virtual void CheckSuspensionChanges(const CHandlingEntry* const entry) const noexcept = 0;
 };
