@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-16 01:53\n"
-"PO-Revision-Date: 2025-03-07 22:40\n"
+"POT-Creation-Date: 2025-04-08 22:41\n"
+"PO-Revision-Date: 2025-05-11 17:01\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -19,18 +19,18 @@ msgstr ""
 
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:205
-msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr "Ta wersja MTA:SA nie obsługuje systemów Windows XP i Vista. Pobierz inną wersję ze strony www.mtasa.com"
+msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
+msgstr "Ta wersja MTA:SA nie obsługuje systemów Windows XP i Vista. Pobierz inną wersję ze strony www.multitheftauto.com."
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
-msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "Pobrana wersja MTA nie jest wspierana przez systemy Windows 7, Windows 8 i Windows 8.1. Pobierz alternatywną wersję ze strony www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
+msgstr "Ta wersja MTA:SA nie obsługuje systemów Windows 7, Windows 8 i 8.1.  Pobierz inną wersję ze strony www.multitheftauto.com."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
-msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr "Pobrana wersja MTA: SA jest przeznaczona dla starszych wersji systemu Windows. Pobierz alternatywną wersję ze strony www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
+msgstr "Ta wersja MTA:SA jest przeznaczona do starszych wersji systemu Windows.  Pobierz inną wersję ze strony www.multitheftauto.com."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208

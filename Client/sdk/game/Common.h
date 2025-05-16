@@ -1443,6 +1443,37 @@ enum eObjectProperty
     OBJECT_PROPERTY_MAX,
 };
 
+enum class eVehicleSoundType : char
+{
+    CAR = 0,
+    MOTORCYCLE,
+    BICYCLE,
+    BOAT,
+    HELI,
+    PLANE,
+    TRAIN = 8,
+    TRAILLER,
+    SPECIAL,
+};
+
+enum class eVehicleAudioSettingProperty
+{
+    SOUND_TYPE,
+    ENGINE_ON_SOUND_BANK_ID,
+    ENGINE_OFF_SOUND_BANK_ID,
+    BASS_SETTING,
+    BASS_EQ,
+    FIELD_C,
+    HORN_TON,
+    ENGINE_UPGRADE,
+    DOOR_SOUND,
+    RADIO_NUM,
+    RADIO_TYPE,
+    VEHICLE_TYPE_FOR_AUDIO,
+    HORN_VOLUME_DELTA,
+    HORN_HIGH,
+};
+
 namespace eObjectGroup
 {
     enum Modifiable

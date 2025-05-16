@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CInputRPCs.cpp
  *  PURPOSE:     Input remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include <StdInc.h>

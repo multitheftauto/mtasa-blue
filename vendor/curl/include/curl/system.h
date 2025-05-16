@@ -36,12 +36,9 @@
  * curl_off_t
  * ----------
  *
- * For any given platform/compiler curl_off_t must be typedef'ed to a 64-bit
+ * For any given platform/compiler curl_off_t MUST be typedef'ed to a 64-bit
  * wide signed integral data type. The width of this data type must remain
  * constant and independent of any possible large file support settings.
- *
- * As an exception to the above, curl_off_t shall be typedef'ed to a 32-bit
- * wide signed integral data type if there is no 64-bit type.
  *
  * As a general rule, curl_off_t shall not be mapped to off_t. This rule shall
  * only be violated if off_t is the only 64-bit data type available and the
@@ -52,7 +49,7 @@
  *
  */
 
-#if defined(__DJGPP__)
+#ifdef __DJGPP__
 #  define CURL_TYPEOF_CURL_OFF_T     long long
 #  define CURL_FORMAT_CURL_OFF_T     "lld"
 #  define CURL_FORMAT_CURL_OFF_TU    "llu"
@@ -137,13 +134,22 @@
 #    define CURL_TYPEOF_CURL_SOCKLEN_T unsigned int
 #  endif
 
-#elif defined(_WIN32_WCE)
-#  define CURL_TYPEOF_CURL_OFF_T     __int64
-#  define CURL_FORMAT_CURL_OFF_T     "I64d"
-#  define CURL_FORMAT_CURL_OFF_TU    "I64u"
-#  define CURL_SUFFIX_CURL_OFF_T     i64
-#  define CURL_SUFFIX_CURL_OFF_TU    ui64
-#  define CURL_TYPEOF_CURL_SOCKLEN_T int
+#elif defined(UNDER_CE)
+#  if defined(__MINGW32CE__)
+#    define CURL_TYPEOF_CURL_OFF_T     long long
+#    define CURL_FORMAT_CURL_OFF_T     "lld"
+#    define CURL_FORMAT_CURL_OFF_TU    "llu"
+#    define CURL_SUFFIX_CURL_OFF_T     LL
+#    define CURL_SUFFIX_CURL_OFF_TU    ULL
+#    define CURL_TYPEOF_CURL_SOCKLEN_T int
+#  else
+#    define CURL_TYPEOF_CURL_OFF_T     __int64
+#    define CURL_FORMAT_CURL_OFF_T     "I64d"
+#    define CURL_FORMAT_CURL_OFF_TU    "I64u"
+#    define CURL_SUFFIX_CURL_OFF_T     i64
+#    define CURL_SUFFIX_CURL_OFF_TU    ui64
+#    define CURL_TYPEOF_CURL_SOCKLEN_T int
+#  endif
 
 #elif defined(__MINGW32__)
 #  include <inttypes.h>

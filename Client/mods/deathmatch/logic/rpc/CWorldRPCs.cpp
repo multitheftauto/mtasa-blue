@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CWorldRPCs.cpp
  *  PURPOSE:     World remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

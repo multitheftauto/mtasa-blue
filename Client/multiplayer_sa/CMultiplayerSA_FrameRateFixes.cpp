@@ -606,6 +606,7 @@ static void __declspec(naked) HOOK_CWeapon_Update()
         fmul st(0), st(1) // (m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds) * (timeStep / kOriginalTimeStep)
         fadd st(0), ebx // + m_snTimeInMilliseconds
         fistp [esi+10h]
+        fstp st(0)
 
         mov eax, ebx
 

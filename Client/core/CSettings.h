@@ -5,7 +5,7 @@
  *  FILE:        core/CSettings.h
  *  PURPOSE:     Header file for in-game settings window class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -216,6 +216,7 @@ protected:
     CGUICheckBox*  m_pWin8ColorCheckBox;
     CGUICheckBox*  m_pWin8MouseCheckBox;
     CGUICheckBox*  m_pPhotoSavingCheckbox;
+    CGUICheckBox*  m_pCheckBoxAskBeforeDisconnect;
     CGUICheckBox*  m_pProcessAffinityCheckbox;
     CGUILabel*     m_pUpdateBuildTypeLabel;
     CGUIComboBox*  m_pUpdateBuildTypeCombo;
