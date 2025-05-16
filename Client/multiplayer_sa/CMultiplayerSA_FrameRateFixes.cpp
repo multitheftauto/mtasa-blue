@@ -586,6 +586,10 @@ static void __declspec(naked) HOOK_CWeapon_Update()
 {
     _asm
     {
+        // Temp fix for camera
+        cmp [esi], 0x2B // CWeapon::m_eWeaponType
+        je skip
+
         // timeStep / kOriginalTimeStep
         fld ds:[0xB7CB5C] // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep
@@ -607,6 +611,10 @@ static void __declspec(naked) HOOK_CWeapon_Update()
         mov eax, ebx
 
         xor ebx, ebx
+        jmp RETURN_CWeapon_Update
+
+        skip:
+        mov eax, ds:[0xB7CB84]
         jmp RETURN_CWeapon_Update
     }
 }
