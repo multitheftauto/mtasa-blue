@@ -259,6 +259,9 @@ public:
     bool IsIgnoreFireStateEnabled() const noexcept override { return m_isIgnoreFireStateEnabled; }
     void SetIgnoreFireStateEnabled(bool isEnabled) override;
 
+    bool IsVehicleBurnExplosionsEnabled() const noexcept override { return m_isVehicleBurnExplosionsEnabled; }
+    void SetVehicleBurnExplosionsEnabled(bool isEnabled) override;
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -390,6 +393,7 @@ private:
     bool         m_isGameWorldRemoved{false};
     bool         m_isExtendedWaterCannonsEnabled{false};
     bool         m_isIgnoreFireStateEnabled{false};
+    bool         m_isVehicleBurnExplosionsEnabled{true};
 
     static unsigned int&  ClumpOffset;
 
