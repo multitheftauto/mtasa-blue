@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/game/C3DMarker.h
  *  PURPOSE:     3D marker entity interface
@@ -29,10 +29,9 @@ public:
     virtual void               SetMatrix(CMatrix* pMatrix) = 0;
     virtual void               SetPosition(CVector* vecPosition) = 0;
     virtual CVector*           GetPosition() = 0;
-    virtual DWORD              GetType() = 0;            // need enum?
+    virtual e3DMarkerType      GetType() const = 0;
     virtual bool               IsActive() = 0;
     virtual DWORD              GetIdentifier() = 0;
-    virtual SharedUtil::SColor GetColor() = 0;
     virtual void               SetColor(const SharedUtil::SColor color) = 0;
     virtual void               SetPulsePeriod(WORD wPulsePeriod) = 0;
     virtual void               SetPulseFraction(float fPulseFraction) = 0;
