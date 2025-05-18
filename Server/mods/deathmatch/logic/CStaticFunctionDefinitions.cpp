@@ -5651,7 +5651,7 @@ bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandling
     if (!SetEntryHandling(pEntry, eProperty, fValue))
         return false;
 
-    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
+    CHandlingManager::SetModelHandlingHasChanged(model, true);
     return true;
 }
 
@@ -5664,7 +5664,7 @@ bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandling
     if (!SetEntryHandling(pEntry, eProperty, vecValue))
         return false;
 
-    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
+    CHandlingManager::SetModelHandlingHasChanged(model, true);
     return true;
 }
 
@@ -5677,7 +5677,7 @@ bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandling
     if (!SetEntryHandling(pEntry, eProperty, strValue))
         return false;
 
-    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
+    CHandlingManager::SetModelHandlingHasChanged(model, true);
     return true;
 }
 
@@ -5690,7 +5690,7 @@ bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandling
     if (!SetEntryHandling(pEntry, eProperty, ucValue))
         return false;
 
-    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
+    CHandlingManager::SetModelHandlingHasChanged(model, true);
     return true;
 }
 
@@ -5703,7 +5703,7 @@ bool CStaticFunctionDefinitions::SetModelHandling(std::uint32_t model, eHandling
     if (!SetEntryHandling(pEntry, eProperty, uiValue))
         return false;
 
-    m_pHandlingManager->SetModelHandlingHasChanged(model, true);
+    CHandlingManager::SetModelHandlingHasChanged(model, true);
     return true;
 }
 
