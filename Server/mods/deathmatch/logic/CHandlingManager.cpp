@@ -20,7 +20,7 @@ static std::unique_ptr<CHandlingEntry> m_OriginalEntries[HT_MAX];
 
 // Model handling data
 static std::unordered_map<std::uint32_t, std::unique_ptr<CHandlingEntry>> m_ModelEntries;
-static std::unordered_map<std::uint32_t, bool>                            m_ModelHandlingChanged;
+static std::unordered_map<std::uint32_t, bool>                            g_ModelHandlingChanged;
 
 static std::map<std::string, eHandlingProperty> m_HandlingNames;
 
@@ -135,24 +135,24 @@ eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& n
     return it != m_HandlingNames.end() ? it->second : HANDLING_MAX;
 }
 
-bool CHandlingManager::HasModelHandlingChanged(std::uint32_t model) const noexcept
+bool CHandlingManager::HasModelHandlingChanged(std::uint32_t model) noexcept
 {
     // Within range?
     if (!CVehicleManager::IsValidModel(model))
         return false;
 
     // Return if we have changed
-    return m_ModelHandlingChanged[model];
+    return g_ModelHandlingChanged[model];
 }
 
-void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t model, bool changed) const noexcept
+void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t model, bool changed) noexcept
 {
     // Within range?
     if (!CVehicleManager::IsValidModel(model))
         return;
 
     // Return if we have changed.
-    m_ModelHandlingChanged[model] = changed;
+    g_ModelHandlingChanged[model] = changed;
 }
 
 // Return the handling manager id
