@@ -3089,6 +3089,13 @@ void CClientVehicle::ReCreate()
 
 void CClientVehicle::ModelRequestCallback(CModelInfo* pModelInfo)
 {
+    // The model loading may take a while and there's a chance of vehicle being moved to other dimension.
+    if (!IsVisibleInAllDimensions() && GetDimension() != m_pStreamer->GetDimension())
+    {
+        NotifyUnableToCreate();
+        return;
+    }
+
     // Create the vehicle. The model is now loaded.
     Create();
 }

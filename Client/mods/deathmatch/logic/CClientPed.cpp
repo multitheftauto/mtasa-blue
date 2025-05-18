@@ -4043,6 +4043,13 @@ void CClientPed::ReCreateGameEntity()
 
 void CClientPed::ModelRequestCallback(CModelInfo* pModelInfo)
 {
+    // The model loading may take a while and there's a chance of ped being moved to other dimension.
+    if (!IsVisibleInAllDimensions() && GetDimension() != m_pStreamer->GetDimension())
+    {
+        NotifyUnableToCreate();
+        return;
+    }
+
     // If we have a player loaded
     if (m_pPlayerPed)
     {
