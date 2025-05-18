@@ -16,6 +16,8 @@
 #include "lua/CLuaFunctionParser.h"
 #include <CClientVehicleManager.h>
 
+#include "enums/HandlingProperty.h"
+
 void CLuaVehicleDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -2521,8 +2523,8 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
             SString strProperty;
             argStream.ReadString(strProperty);
 
-            eHandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
-            if (eProperty)
+            HandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+            if (eProperty > HandlingProperty::HANDLING_NONE)
             {
                 if (argStream.NextIsNil())
                 {
@@ -2536,27 +2538,27 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                 {
                     switch (eProperty)
                     {
-                        case HANDLING_MASS:
-                        case HANDLING_TURNMASS:
-                        case HANDLING_DRAGCOEFF:
-                        case HANDLING_TRACTIONMULTIPLIER:
-                        case HANDLING_ENGINEACCELERATION:
-                        case HANDLING_ENGINEINERTIA:
-                        case HANDLING_MAXVELOCITY:
-                        case HANDLING_BRAKEDECELERATION:
-                        case HANDLING_BRAKEBIAS:
-                        case HANDLING_STEERINGLOCK:
-                        case HANDLING_TRACTIONLOSS:
-                        case HANDLING_TRACTIONBIAS:
-                        case HANDLING_SUSPENSION_FORCELEVEL:
-                        case HANDLING_SUSPENSION_DAMPING:
-                        case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
-                        case HANDLING_SUSPENSION_UPPER_LIMIT:
-                        case HANDLING_SUSPENSION_LOWER_LIMIT:
-                        case HANDLING_SUSPENSION_FRONTREARBIAS:
-                        case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
-                        case HANDLING_COLLISIONDAMAGEMULTIPLIER:
-                        case HANDLING_SEATOFFSETDISTANCE:
+                        case HandlingProperty::HANDLING_MASS:
+                        case HandlingProperty::HANDLING_TURNMASS:
+                        case HandlingProperty::HANDLING_DRAGCOEFF:
+                        case HandlingProperty::HANDLING_TRACTIONMULTIPLIER:
+                        case HandlingProperty::HANDLING_ENGINEACCELERATION:
+                        case HandlingProperty::HANDLING_ENGINEINERTIA:
+                        case HandlingProperty::HANDLING_MAXVELOCITY:
+                        case HandlingProperty::HANDLING_BRAKEDECELERATION:
+                        case HandlingProperty::HANDLING_BRAKEBIAS:
+                        case HandlingProperty::HANDLING_STEERINGLOCK:
+                        case HandlingProperty::HANDLING_TRACTIONLOSS:
+                        case HandlingProperty::HANDLING_TRACTIONBIAS:
+                        case HandlingProperty::HANDLING_SUSPENSION_FORCELEVEL:
+                        case HandlingProperty::HANDLING_SUSPENSION_DAMPING:
+                        case HandlingProperty::HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                        case HandlingProperty::HANDLING_SUSPENSION_UPPER_LIMIT:
+                        case HandlingProperty::HANDLING_SUSPENSION_LOWER_LIMIT:
+                        case HandlingProperty::HANDLING_SUSPENSION_FRONTREARBIAS:
+                        case HandlingProperty::HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                        case HandlingProperty::HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                        case HandlingProperty::HANDLING_SEATOFFSETDISTANCE:
                         {
                             float fValue;
                             argStream.ReadNumber(fValue);
@@ -2567,10 +2569,10 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                             }
                             break;
                         }
-                        case HANDLING_PERCENTSUBMERGED:            // unsigned int
-                                                                   // case HANDLING_MONETARY:
-                        case HANDLING_HANDLINGFLAGS:
-                        case HANDLING_MODELFLAGS:
+                        case HandlingProperty::HANDLING_PERCENTSUBMERGED:            // unsigned int
+                                                           // case HANDLING_MONETARY:
+                        case HandlingProperty::HANDLING_HANDLINGFLAGS:
+                        case HandlingProperty::HANDLING_MODELFLAGS:
                         {
                             unsigned int uiValue;
                             argStream.ReadNumber(uiValue);
@@ -2581,8 +2583,8 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                             }
                             break;
                         }
-                        case HANDLING_NUMOFGEARS:
-                        case HANDLING_ANIMGROUP:
+                        case HandlingProperty::HANDLING_NUMOFGEARS:
+                        case HandlingProperty::HANDLING_ANIMGROUP:
                         {
                             unsigned char ucValue;
                             argStream.ReadNumber(ucValue);
@@ -2593,7 +2595,7 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                             }
                             break;
                         }
-                        case HANDLING_CENTEROFMASS:
+                        case HandlingProperty::HANDLING_CENTEROFMASS:
                         {
                             if (argStream.NextIsTable())
                             {
@@ -2623,8 +2625,8 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                             argStream.SetTypeError("table");
                             break;
                         }
-                        case HANDLING_DRIVETYPE:
-                        case HANDLING_ENGINETYPE:
+                        case HandlingProperty::HANDLING_DRIVETYPE:
+                        case HandlingProperty::HANDLING_ENGINETYPE:
                             // case HANDLING_HEADLIGHT:
                             // case HANDLING_TAILLIGHT:
                             {
@@ -2637,7 +2639,7 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                                 }
                                 break;
                             }
-                        case HANDLING_ABS:
+                        case HandlingProperty::HANDLING_ABS:
                         {
                             bool bValue;
                             argStream.ReadBool(bValue);
@@ -2648,7 +2650,7 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                             }
                             break;
                         }
-                        case HANDLING_MAX:
+                        case HandlingProperty::HANDLING_MAX:
                         {
                             argStream.SetCustomError("Invalid property");
                             break;
@@ -2690,8 +2692,8 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
             argStream.ReadString(strProperty);
 
             bool              bResult = true;
-            eHandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
-            if (eProperty != HANDLING_MAX)
+            HandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+            if (eProperty != HandlingProperty::HANDLING_MAX)
             {
                 float         fValue = 0.0f;
                 CVector       vecValue = CVector(0.0f, 0.0f, 0.0f);
@@ -3976,7 +3978,7 @@ int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // bool setVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy, float x, float y, float z )
     unsigned short  usModel;
-    eVehicleDummies eDummy;
+    VehicleDummies eDummy;
     CVector         vecPosition;
 
     CScriptArgReader argStream(luaVM);
@@ -4003,7 +4005,7 @@ int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
     unsigned short  usModel;
-    eVehicleDummies eDummy;
+    VehicleDummies eDummy;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4032,7 +4034,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
     unsigned short  usModel;
-    eVehicleDummies eDummy;
+    VehicleDummies eDummy;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4160,7 +4162,7 @@ bool CLuaVehicleDefs::SetVehicleWheelScale(CClientVehicle* const pVehicle, const
 }
 
 std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(
-    const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
+    const unsigned short usModel, const std::optional<ResizableVehicleWheelGroup> eWheelGroup)
 {
     CModelInfo* pModelInfo = nullptr;
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -4169,19 +4171,19 @@ std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::Get
     if (!pModelInfo)
         throw std::invalid_argument("Invalid model ID");
 
-    eResizableVehicleWheelGroup eActualWheelGroup = eWheelGroup.value_or(eResizableVehicleWheelGroup::ALL_WHEELS);
-    if (eActualWheelGroup == eResizableVehicleWheelGroup::ALL_WHEELS)
+    ResizableVehicleWheelGroup eActualWheelGroup = eWheelGroup.value_or(ResizableVehicleWheelGroup::ALL_WHEELS);
+    if (eActualWheelGroup == ResizableVehicleWheelGroup::ALL_WHEELS)
     {
         // Return a table like { ["front_axle"] = 0.7, ["rear_axle"] = 0.8 }
         return std::unordered_map<std::string, float>{
-            {"front_axle", pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::FRONT_AXLE)},
-            {"rear_axle", pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::REAR_AXLE)},
+            {"front_axle", pModelInfo->GetVehicleWheelSize(ResizableVehicleWheelGroup::FRONT_AXLE)},
+            {"rear_axle", pModelInfo->GetVehicleWheelSize(ResizableVehicleWheelGroup::REAR_AXLE)},
         };
     }
     return pModelInfo->GetVehicleWheelSize(eActualWheelGroup);
 }
 
-bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
+bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const ResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
 {
     CModelInfo* pModelInfo = nullptr;
 
@@ -4213,7 +4215,7 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
 }
 
 std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short  vehicleModel,
-                                                                                                              eVehicleDummies dummy)
+                                                                                                              VehicleDummies dummy)
 {
     CVector position;
 
@@ -4223,7 +4225,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVeh
     return std::tuple(position.fX, position.fY, position.fZ);
 }
 
-std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy)
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, VehicleDummies dummy)
 {
     CVector position;
 
@@ -4233,12 +4235,12 @@ std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosi
     return position;
 }
 
-bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position)
+bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy, CVector position)
 {
     return vehicle->SetDummyPosition(dummy, position);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy)
 {
     CVector position;
 
@@ -4248,7 +4250,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVeh
     return std::tuple(position.fX, position.fY, position.fZ);
 }
 
-std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy)
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy)
 {
     CVector position;
 
@@ -4426,7 +4428,7 @@ bool CLuaVehicleDefs::GetVehicleRotorState(CClientVehicle* vehicle) noexcept
     return vehicle->GetVehicleRotorState();
 }
 
-bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const eVehicleAudioSettingProperty eProperty, float varValue)
+bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const VehicleAudioSettingProperty eProperty, float varValue)
 {
     if (!CClientVehicleManager::IsStandardModel(uiModel))
         throw std::invalid_argument("Cannot change audio setting for allocated vechiles");
@@ -4435,10 +4437,10 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
 
     switch (eProperty)
     {
-        case eVehicleAudioSettingProperty::DOOR_SOUND:
+        case VehicleAudioSettingProperty::DOOR_SOUND:
             pModelSettings.SetDoorSound(varValue);
             break;
-        case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
+        case VehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
         {
             // Using SPC_ sound banks other than SPC_EA causes a crash
             if (varValue > 410)
@@ -4447,7 +4449,7 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
             pModelSettings.SetEngineOffSoundBankID(varValue);
             break;
         }
-        case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
+        case VehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
         {
             // Using SPC_ sound banks other than SPC_EA causes a crash
             if (varValue > 410)
@@ -4456,37 +4458,37 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
             pModelSettings.SetEngineOnSoundBankID(varValue);
             break;
         }
-        case eVehicleAudioSettingProperty::HORN_HIGH:
+        case VehicleAudioSettingProperty::HORN_HIGH:
             pModelSettings.SetHornHign(varValue);
             break;
-        case eVehicleAudioSettingProperty::HORN_TON:
+        case VehicleAudioSettingProperty::HORN_TON:
             pModelSettings.SetHornTon(varValue);
             break;
-        case eVehicleAudioSettingProperty::HORN_VOLUME_DELTA:
+        case VehicleAudioSettingProperty::HORN_VOLUME_DELTA:
             pModelSettings.SetHornVolumeDelta(varValue);
             break;
-        case eVehicleAudioSettingProperty::RADIO_NUM:
+        case VehicleAudioSettingProperty::RADIO_NUM:
             pModelSettings.SetRadioNum(varValue);
             break;
-        case eVehicleAudioSettingProperty::RADIO_TYPE:
+        case VehicleAudioSettingProperty::RADIO_TYPE:
             pModelSettings.SetRadioType(varValue);
             break;
-        case eVehicleAudioSettingProperty::SOUND_TYPE:
-            pModelSettings.SetSoundType((eVehicleSoundType)(int)(varValue));
+        case VehicleAudioSettingProperty::SOUND_TYPE:
+            pModelSettings.SetSoundType((VehicleSoundType)(int)(varValue));
             break;
-        case eVehicleAudioSettingProperty::BASS_SETTING:
+        case VehicleAudioSettingProperty::BASS_SETTING:
             pModelSettings.SetBassSetting(varValue);
             break;
-        case eVehicleAudioSettingProperty::BASS_EQ:
+        case VehicleAudioSettingProperty::BASS_EQ:
             pModelSettings.SetBassEq(varValue);
             break;
-        case eVehicleAudioSettingProperty::FIELD_C:
+        case VehicleAudioSettingProperty::FIELD_C:
             pModelSettings.SetFieldC(varValue);
             break;
-        case eVehicleAudioSettingProperty::ENGINE_UPGRADE:
+        case VehicleAudioSettingProperty::ENGINE_UPGRADE:
             pModelSettings.SetEngineUpgrade(varValue);
             break;
-        case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
+        case VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
             pModelSettings.SetVehicleTypeForAudio(varValue);
             break;
         default:
@@ -4504,16 +4506,16 @@ bool CLuaVehicleDefs::ResetVehicleModelAudioSettings(const uint32_t uiModel)
      g_pGame->GetVehicleAudioSettingsManager()->ResetModelSettings(uiModel);
 }
 
-bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVehicleAudioSettingProperty eProperty, float varValue)
+bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const VehicleAudioSettingProperty eProperty, float varValue)
 {
     CVehicleAudioSettingsEntry& pModelSettings = pVehicle->GetOrCreateAudioSettings();
 
     switch (eProperty)
     {
-        case eVehicleAudioSettingProperty::DOOR_SOUND:
+        case VehicleAudioSettingProperty::DOOR_SOUND:
             pModelSettings.SetDoorSound(varValue);
             break;
-        case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
+        case VehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
         {
             // Using SPC_ sound banks other than SPC_EA causes a crash
             if (varValue > 410)
@@ -4522,7 +4524,7 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
             pModelSettings.SetEngineOffSoundBankID(varValue);
             break;
         }
-        case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
+        case VehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
         {
             // Using SPC_ sound banks other than SPC_EA causes a crash
             if (varValue > 410)
@@ -4531,37 +4533,37 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
             pModelSettings.SetEngineOnSoundBankID(varValue);
             break;
         }
-        case eVehicleAudioSettingProperty::HORN_HIGH:
+        case VehicleAudioSettingProperty::HORN_HIGH:
             pModelSettings.SetHornHign(varValue);
             break;
-        case eVehicleAudioSettingProperty::HORN_TON:
+        case VehicleAudioSettingProperty::HORN_TON:
             pModelSettings.SetHornTon(varValue);
             break;
-        case eVehicleAudioSettingProperty::HORN_VOLUME_DELTA:
+        case VehicleAudioSettingProperty::HORN_VOLUME_DELTA:
             pModelSettings.SetHornVolumeDelta(varValue);
             break;
-        case eVehicleAudioSettingProperty::RADIO_NUM:
+        case VehicleAudioSettingProperty::RADIO_NUM:
             pModelSettings.SetRadioNum(varValue);
             break;
-        case eVehicleAudioSettingProperty::RADIO_TYPE:
+        case VehicleAudioSettingProperty::RADIO_TYPE:
             pModelSettings.SetRadioType(varValue);
             break;
-        case eVehicleAudioSettingProperty::SOUND_TYPE:
-            pModelSettings.SetSoundType((eVehicleSoundType)(int)(varValue));
+        case VehicleAudioSettingProperty::SOUND_TYPE:
+            pModelSettings.SetSoundType((VehicleSoundType)(int)(varValue));
             break;
-        case eVehicleAudioSettingProperty::BASS_SETTING:
+        case VehicleAudioSettingProperty::BASS_SETTING:
             pModelSettings.SetBassSetting(varValue);
             break;
-        case eVehicleAudioSettingProperty::BASS_EQ:
+        case VehicleAudioSettingProperty::BASS_EQ:
             pModelSettings.SetBassEq(varValue);
             break;
-        case eVehicleAudioSettingProperty::FIELD_C:
+        case VehicleAudioSettingProperty::FIELD_C:
             pModelSettings.SetFieldC(varValue);
             break;
-        case eVehicleAudioSettingProperty::ENGINE_UPGRADE:
+        case VehicleAudioSettingProperty::ENGINE_UPGRADE:
             pModelSettings.SetEngineUpgrade(varValue);
             break;
-        case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
+        case VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
             pModelSettings.SetVehicleTypeForAudio(varValue);
             break;
         default:

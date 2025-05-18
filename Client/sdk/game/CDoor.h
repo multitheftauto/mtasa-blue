@@ -10,8 +10,7 @@
  *****************************************************************************/
 
 #pragma once
-
-#include "Common.h"
+#include "enums/DoorState.h"
 
 class CDoor
 {
@@ -20,5 +19,5 @@ public:
     virtual bool       IsClosed() = 0;
     virtual bool       IsFullyOpen() = 0;
     virtual void       Open(float fRatio) = 0;
-    virtual eDoorState GetDoorState() = 0;
+    virtual DoorState GetDoorState() = 0;
 };
