@@ -413,6 +413,8 @@ start_input_gif (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
     ERREXIT(cinfo, JERR_INPUT_EOF);
   width = LM_to_uint(hdrbuf, 0);
   height = LM_to_uint(hdrbuf, 2);
+  if (width == 0 || height == 0)
+    ERREXIT(cinfo, JERR_GIF_OUTOFRANGE);
   /* we ignore the color resolution, sort flag, and background color index */
   aspectRatio = UCH(hdrbuf[6]);
   if (aspectRatio != 0 && aspectRatio != 49)
