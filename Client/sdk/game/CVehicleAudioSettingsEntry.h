@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "Common.h"
+#include "enums/VehicleSoundType.h"
 
 class CVehicleAudioSettingsEntry
 {
@@ -20,7 +20,7 @@ public:
     virtual ~CVehicleAudioSettingsEntry(){}
 
     // Get
-    virtual eVehicleSoundType GetSoundType() const noexcept = 0;
+    virtual VehicleSoundType  GetSoundType() const noexcept = 0;
     virtual short             GetEngineOnSoundBankID() const noexcept = 0;
     virtual short             GetEngineOffSoundBankID() const noexcept = 0;
     virtual char              GetBassSetting() const noexcept = 0;
@@ -36,7 +36,7 @@ public:
     virtual float             GetHornVolumeDelta() const noexcept = 0;
 
     // Set
-    virtual void SetSoundType(eVehicleSoundType value) noexcept = 0;
+    virtual void SetSoundType(VehicleSoundType value) noexcept = 0;
     virtual void SetEngineOnSoundBankID(short value) noexcept = 0;
     virtual void SetEngineOffSoundBankID(short value) noexcept = 0;
     virtual void SetBassSetting(char value) noexcept = 0;

@@ -306,7 +306,7 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
     g_pClientGame->m_Status = CClientGame::STATUS_JOINING;
 
     // If the game isn't started, start it
-    if (g_pGame->GetSystemState() == 7)
+    if (g_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         g_pGame->StartGame();
     }
