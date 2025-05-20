@@ -911,6 +911,25 @@ void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
     m_isIgnoreFireStateEnabled = isEnabled;
 }
 
+void CGameSA::SetVehicleBurnExplosionsEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isVehicleBurnExplosionsEnabled)
+        return;
+
+    if (isEnabled)
+    {
+        MemCpy((void*)0x6A74EA, "\xE8\x61\xF5\x08\x00", 5);            // CAutomobile::ProcessCarOnFireAndExplode
+        MemCpy((void*)0x737929, "\xE8\x22\xF1\xFF\xFF", 5);            // CExplosion::Update
+    }
+    else
+    {
+        MemSet((void*)0x6A74EA, 0x90, 5);
+        MemSet((void*)0x737929, 0x90, 5);
+    }
+
+    m_isVehicleBurnExplosionsEnabled = isEnabled;
+}
+
 bool CGameSA::PerformChecks()
 {
     std::map<std::string, SCheatSA*>::iterator it;
