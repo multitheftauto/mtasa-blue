@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-14 00:22+0000\n"
-"PO-Revision-Date: 2025-05-21 03:01\n"
+"PO-Revision-Date: 2025-05-21 04:01\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -149,7 +149,7 @@ msgstr "* الوقت الآن %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "الاتصال: الشبكة غير جاهزة، الرجاء الانتظار لحظات"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -666,7 +666,7 @@ msgstr "حفظ الصور الملتقطة بكاميرا السلاح في مج
 
 #: Client/core/CSettings.cpp:414
 msgid "Ask before disconnecting from server using main menu"
-msgstr ""
+msgstr "اطلب التأكيد قبل قطع الاتصال بالخادم عبر القائمة الرئيسية"
 
 #: Client/core/CSettings.cpp:419
 msgid "Use customized GTA:SA files"
@@ -1547,7 +1547,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4981
 msgid "Only change if you're having stability issues."
-msgstr ""
+msgstr "غير هذا الخيار فقط إذا كنت تواجه مشاكل في الاستقرار."
 
 #: Client/core/CCore.cpp:807 Client/loader/CInstallManager.cpp:1057
 #, c-format
@@ -1778,7 +1778,8 @@ msgstr "الخادم يوصي بالتحديث، ولكنه ليس إجباري.
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr ""
+msgstr "التحديث غير متوفر حاليًا.\n\n"
+"يرجى التحقق من www.multitheftauto.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -3367,7 +3368,7 @@ msgstr "مشكلة في معرّف الرسوم"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "خطأ فادح (%u). إذا استمرت هذه المشكلة، يرجى مراجعة multitheftauto.com للحصول على الدعم."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3376,7 +3377,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "خطأ بروتوكول (%u). إذا استمرت هذه المشكلة، يرجى مراجعة multitheftauto.com للحصول على الدعم."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
