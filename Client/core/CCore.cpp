@@ -513,7 +513,7 @@ void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
 {
     if (m_pLocalGUI)
     {
-        if (m_pGame->GetSystemState() == 9 /* GS_PLAYING_GAME */ && m_pModManager->IsLoaded() && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
+        if (m_pGame->GetSystemState() == SystemState::GS_PLAYING_GAME && m_pModManager->IsLoaded() && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
             !m_pLocalGUI->GetMainMenu()->IsVisible() && !m_pLocalGUI->GetConsole()->IsVisible() && !m_pLocalGUI->IsChatBoxInputEnabled())
         {
             CChat* pChat = m_pLocalGUI->GetChat();
@@ -1232,7 +1232,7 @@ void CCore::DoPostFramePulse()
     }
 
     // This is the first frame in the menu?
-    if (m_pGame->GetSystemState() == 7)            // GS_FRONTEND
+    if (m_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         if (m_menuFrame < 255)
             ++m_menuFrame;

@@ -1422,14 +1422,14 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
     CClientSound* pSound{};
     SPlayerVoiceWrapper playerVoice;
-    eSoundEffectType eEffectType;
+    SoundEffectType eEffectType;
 
     CScriptArgReader argStream(luaVM);    
 
     // Call `SetFxEffectParameters` and log errors if any
     const auto SetParamWithErrorLog = [luaVM, &eEffectType](auto* pSound, auto effectParam, auto& params) {
         // Try setting parameter
-        if (pSound->SetFxEffectParameters(eEffectType, &params))
+        if (pSound->SetFxEffectParameters((uint)eEffectType, &params))
         {
             lua::Push(luaVM, true);
             return 1;
@@ -1452,16 +1452,16 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
     };
 
     const auto ProcessSoundParams = [&eEffectType, luaVM, &argStream, &SetParamWithErrorLog](auto* pSound) {
-        if (!pSound->IsFxEffectEnabled(eEffectType))
+        if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
             return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
 
         using namespace eSoundEffectParams;
         switch (eEffectType)
         {
-            case BASS_FX_DX8_CHORUS:
+            case SoundEffectType::FX_DX8_CHORUS:
             {
                 BASS_DX8_CHORUS params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Chorus eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1509,10 +1509,10 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
-            case BASS_FX_DX8_COMPRESSOR:
+            case SoundEffectType::FX_DX8_COMPRESSOR:
             {
                 BASS_DX8_COMPRESSOR params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Compressor eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1555,10 +1555,10 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
-            case BASS_FX_DX8_DISTORTION:
+            case SoundEffectType::FX_DX8_DISTORTION:
             {
                 BASS_DX8_DISTORTION params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Distortion eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1596,10 +1596,10 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
-            case BASS_FX_DX8_ECHO:
+            case SoundEffectType::FX_DX8_ECHO:
             {
                 BASS_DX8_ECHO params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Echo eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1639,10 +1639,10 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
-            case BASS_FX_DX8_FLANGER:
+            case SoundEffectType::FX_DX8_FLANGER:
             {
                 BASS_DX8_FLANGER params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Flanger eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1690,10 +1690,10 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
-            case BASS_FX_DX8_GARGLE:
+            case SoundEffectType::FX_DX8_GARGLE:
             {
                 BASS_DX8_GARGLE params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Gargle eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1716,10 +1716,10 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
-            case BASS_FX_DX8_I3DL2REVERB:
+            case SoundEffectType::FX_DX8_I3DL2REVERB:
             {
                 BASS_DX8_I3DL2REVERB params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 I3DL2Reverb eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1792,10 +1792,10 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
-            case BASS_FX_DX8_PARAMEQ:
+            case SoundEffectType::FX_DX8_PARAMEQ:
             {
                 BASS_DX8_PARAMEQ params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 ParamEq eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1823,10 +1823,10 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
-            case BASS_FX_DX8_REVERB:
+            case SoundEffectType::FX_DX8_REVERB:
             {
                 BASS_DX8_REVERB params;
-                pSound->GetFxEffectParameters(eEffectType, &params);
+                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Reverb eEffectParameter;
                 argStream.ReadEnumString(eEffectParameter);
@@ -1898,21 +1898,21 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
     //  table getSoundEffectParameters ( sound sound, string effectName )
     CClientSound* pSound{};
     SPlayerVoiceWrapper playerVoice;
-    eSoundEffectType eEffectType;
+    SoundEffectType eEffectType;
 
     CScriptArgReader argStream(luaVM);
 
     const auto ProcessSoundParams = [luaVM, &eEffectType](auto* pSound) {
-        if (!pSound->IsFxEffectEnabled(eEffectType))
+        if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
             return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
 
         using namespace eSoundEffectParams;
         switch (eEffectType)
         {
-            case BASS_FX_DX8_CHORUS:
+            case SoundEffectType::FX_DX8_CHORUS:
             {
                 BASS_DX8_CHORUS fxChorusParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxChorusParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxChorusParams))
                 {
                     lua_createtable(luaVM, 0, 7);
 
@@ -1940,10 +1940,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
                 break;
             }
-            case BASS_FX_DX8_COMPRESSOR:
+            case SoundEffectType::FX_DX8_COMPRESSOR:
             {
                 BASS_DX8_COMPRESSOR fxCompressorParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxCompressorParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxCompressorParams))
                 {
                     lua_createtable(luaVM, 0, 6);
 
@@ -1968,10 +1968,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
                 break;
             }
-            case BASS_FX_DX8_DISTORTION:
+            case SoundEffectType::FX_DX8_DISTORTION:
             {
                 BASS_DX8_DISTORTION fxDistortionParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxDistortionParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxDistortionParams))
                 {
                     lua_createtable(luaVM, 0, 5);
 
@@ -1993,10 +1993,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
                 break;
             }
-            case BASS_FX_DX8_ECHO:
+            case SoundEffectType::FX_DX8_ECHO:
             {
                 BASS_DX8_ECHO fxEchoParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxEchoParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxEchoParams))
                 {
                     lua_createtable(luaVM, 0, 5);
 
@@ -2018,10 +2018,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
                 break;
             }
-            case BASS_FX_DX8_FLANGER:
+            case SoundEffectType::FX_DX8_FLANGER:
             {
                 BASS_DX8_FLANGER fxFlangerParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxFlangerParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxFlangerParams))
                 {
                     lua_createtable(luaVM, 0, 7);
 
@@ -2049,10 +2049,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
                 break;
             }
-            case BASS_FX_DX8_GARGLE:
+            case SoundEffectType::FX_DX8_GARGLE:
             {
                 BASS_DX8_GARGLE fxGargleParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxGargleParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxGargleParams))
                 {
                     lua_createtable(luaVM, 0, 2);
 
@@ -2065,10 +2065,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
                 break;
             }
-            case BASS_FX_DX8_I3DL2REVERB:
+            case SoundEffectType::FX_DX8_I3DL2REVERB:
             {
                 BASS_DX8_I3DL2REVERB fxI3DL2ReverbParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxI3DL2ReverbParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxI3DL2ReverbParams))
                 {
                     lua_createtable(luaVM, 0, 12);
 
@@ -2111,10 +2111,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
                 break;
             }
-            case BASS_FX_DX8_PARAMEQ:
+            case SoundEffectType::FX_DX8_PARAMEQ:
             {
                 BASS_DX8_PARAMEQ fxParameqParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxParameqParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxParameqParams))
                 {
                     lua_createtable(luaVM, 0, 3);
 
@@ -2130,10 +2130,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 }
                 break;
             }
-            case BASS_FX_DX8_REVERB:
+            case SoundEffectType::FX_DX8_REVERB:
             {
                 BASS_DX8_REVERB fxReverbParams;
-                if (pSound->GetFxEffectParameters(eEffectType, &fxReverbParams))
+                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxReverbParams))
                 {
                     lua_createtable(luaVM, 0, 4);
 

@@ -306,7 +306,7 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
     g_pClientGame->m_Status = CClientGame::STATUS_JOINING;
 
     // If the game isn't started, start it
-    if (g_pGame->GetSystemState() == 7)
+    if (g_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         g_pGame->StartGame();
     }
@@ -2401,6 +2401,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::TUNNELWEATHERBLEND, wsProps.data5.tunnelweatherblend);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::IGNOREFIRESTATE, wsProps.data6.ignoreFireState);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data7.flyingcomponents);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, wsProps.data8.vehicleburnexplosions);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
