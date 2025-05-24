@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-14 00:22+0000\n"
-"PO-Revision-Date: 2025-05-23 23:41\n"
+"PO-Revision-Date: 2025-05-24 00:38\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -2458,7 +2458,7 @@ msgstr "في طريقه إلى المستشفى"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5640
 msgid "Meeting their maker"
-msgstr "يتعرف على صانعه"
+msgstr "ودع الحياة"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5641
 msgid "Regretting their decisions"
