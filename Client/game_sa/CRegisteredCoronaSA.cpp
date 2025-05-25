@@ -75,7 +75,7 @@ void CRegisteredCoronaSA::SetTexture(RwTexture* texture)
     internalInterface->pTex = texture;
 }
 
-void CRegisteredCoronaSA::SetTexture(eCoronaType texture)
+void CRegisteredCoronaSA::SetTexture(CoronaType texture)
 {
     CCoronasSA* coronas = ((CCoronasSA*)pGame->GetCoronas());
     RwTexture*  tex = coronas->GetTexture(texture);

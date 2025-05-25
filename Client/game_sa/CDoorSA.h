@@ -49,5 +49,5 @@ public:
     bool       IsClosed();
     bool       IsFullyOpen();
     void       Open(float fOpenRatio);
-    eDoorState GetDoorState() { return (eDoorState)GetInterface()->m_nDoorState; };
+    DoorState GetDoorState() { return (DoorState)GetInterface()->m_nDoorState; };
 };

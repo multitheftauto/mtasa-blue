@@ -23,6 +23,8 @@
 #include "CColPointSA.h"
 #include "CAEVehicleAudioEntitySA.h"
 
+#include "enums/VehicleClass.h"
+
 class CFxSystemSAInterface;
 class CTrainSAInterface;
 class CColModelSAInterface;
@@ -441,7 +443,7 @@ private:
     bool                             m_doorsUndamageable{false};
     bool                             m_rotorState{true};
 
-    std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
+    std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
 
 public:
     CVehicleSA() = default;
@@ -704,8 +706,8 @@ public:
 
     CAEVehicleAudioEntitySA* GetVehicleAudioEntity() { return m_pVehicleAudioEntity; };
 
-    bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const override;
-    bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) override;
+    bool GetDummyPosition(VehicleDummies dummy, CVector& position) const override;
+    bool SetDummyPosition(VehicleDummies dummy, const CVector& position) override;
 
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
@@ -718,7 +720,7 @@ public:
     static bool GetVehiclesSunGlareEnabled();
 
 private:
-    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
+    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position);
 
     void           RecalculateSuspensionLines();
     void           CopyGlobalSuspensionLinesToPrivate();
