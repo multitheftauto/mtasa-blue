@@ -34,7 +34,7 @@
 #include "content_encoding.h"
 #include "http.h"
 #include "multiif.h"
-#include "strtoofft.h"
+#include "strparse.h"
 #include "warnless.h"
 
 /* The last #include files should be: */
@@ -134,7 +134,7 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
     if(cw_next)
       result = Curl_cwriter_write(data, cw_next, CLIENTWRITE_BODY, buf, blen);
     else
-      result = Curl_client_write(data, CLIENTWRITE_BODY, (char *)buf, blen);
+      result = Curl_client_write(data, CLIENTWRITE_BODY, buf, blen);
     if(result) {
       ch->state = CHUNK_FAILED;
       ch->last_code = CHUNKE_PASSTHRU_ERROR;
@@ -158,6 +158,7 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
         (*pconsumed)++;
       }
       else {
+        const char *p;
         if(0 == ch->hexindex) {
           /* This is illegal data, we received junk where we expected
              a hexadecimal digit. */
@@ -166,11 +167,11 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
           ch->last_code = CHUNKE_ILLEGAL_HEX;
           return CURLE_RECV_ERROR;
         }
-
         /* blen and buf are unmodified */
         ch->hexbuffer[ch->hexindex] = 0;
-        if(curlx_strtoofft(ch->hexbuffer, NULL, 16, &ch->datasize)) {
-          failf(data, "chunk hex-length not valid: '%s'", ch->hexbuffer);
+        p = &ch->hexbuffer[0];
+        if(Curl_str_hex(&p, &ch->datasize, CURL_OFF_T_MAX)) {
+          failf(data, "invalid chunk size: '%s'", ch->hexbuffer);
           ch->state = CHUNK_FAILED;
           ch->last_code = CHUNKE_ILLEGAL_HEX;
           return CURLE_RECV_ERROR;
@@ -182,14 +183,14 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
     case CHUNK_LF:
       /* waiting for the LF after a chunk size */
       if(*buf == 0x0a) {
-        /* we're now expecting data to come, unless size was zero! */
+        /* we are now expecting data to come, unless size was zero! */
         if(0 == ch->datasize) {
           ch->state = CHUNK_TRAILER; /* now check for trailers */
         }
         else {
           ch->state = CHUNK_DATA;
           CURL_TRC_WRITE(data, "http_chunked, chunk start of %"
-                         CURL_FORMAT_CURL_OFF_T " bytes", ch->datasize);
+                         FMT_OFF_T " bytes", ch->datasize);
         }
       }
 
@@ -212,8 +213,7 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
           result = Curl_cwriter_write(data, cw_next, CLIENTWRITE_BODY,
                                       buf, piece);
         else
-          result = Curl_client_write(data, CLIENTWRITE_BODY,
-                                    (char *)buf, piece);
+          result = Curl_client_write(data, CLIENTWRITE_BODY, buf, piece);
         if(result) {
           ch->state = CHUNK_FAILED;
           ch->last_code = CHUNKE_PASSTHRU_ERROR;
@@ -226,7 +226,7 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
       buf += piece;    /* move read pointer forward */
       blen -= piece;   /* decrease space left in this round */
       CURL_TRC_WRITE(data, "http_chunked, write %zu body bytes, %"
-                     CURL_FORMAT_CURL_OFF_T " bytes in chunk remain",
+                     FMT_OFF_T " bytes in chunk remain",
                      piece, ch->datasize);
 
       if(0 == ch->datasize)
@@ -257,7 +257,7 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
 
         if(tr) {
           size_t trlen;
-          result = Curl_dyn_addn(&ch->trailer, (char *)STRCONST("\x0d\x0a"));
+          result = Curl_dyn_addn(&ch->trailer, STRCONST("\x0d\x0a"));
           if(result) {
             ch->state = CHUNK_FAILED;
             ch->last_code = CHUNKE_OUT_OF_MEMORY;
@@ -289,9 +289,9 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
             break;
         }
         else {
-          /* no trailer, we're on the final CRLF pair */
+          /* no trailer, we are on the final CRLF pair */
           ch->state = CHUNK_TRAILER_POSTCR;
-          break; /* don't advance the pointer */
+          break; /* do not advance the pointer */
         }
       }
       else {
@@ -344,7 +344,7 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
         blen--;
         (*pconsumed)++;
         /* Record the length of any data left in the end of the buffer
-           even if there's no more chunks to read */
+           even if there is no more chunks to read */
         ch->datasize = blen;
         ch->state = CHUNK_DONE;
         CURL_TRC_WRITE(data, "http_chunk, response complete");
@@ -470,7 +470,7 @@ const struct Curl_cwtype Curl_httpchunk_unencoder = {
   sizeof(struct chunked_writer)
 };
 
-/* max length of a HTTP chunk that we want to generate */
+/* max length of an HTTP chunk that we want to generate */
 #define CURL_CHUNKED_MINLEN   (1024)
 #define CURL_CHUNKED_MAXLEN   (64 * 1024)
 
@@ -516,9 +516,9 @@ static CURLcode add_last_chunk(struct Curl_easy *data,
   if(result)
     goto out;
 
-  Curl_set_in_callback(data, true);
+  Curl_set_in_callback(data, TRUE);
   rc = data->set.trailer_callback(&trailers, data->set.trailer_data);
-  Curl_set_in_callback(data, false);
+  Curl_set_in_callback(data, FALSE);
 
   if(rc != CURL_TRAILERFUNC_OK) {
     failf(data, "operation aborted by trailing headers callback");
@@ -659,6 +659,7 @@ const struct Curl_crtype Curl_httpchunk_encoder = {
   Curl_creader_def_resume_from,
   Curl_creader_def_rewind,
   Curl_creader_def_unpause,
+  Curl_creader_def_is_paused,
   Curl_creader_def_done,
   sizeof(struct chunked_reader)
 };

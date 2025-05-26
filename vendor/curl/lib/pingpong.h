@@ -37,7 +37,7 @@ struct connectdata;
 typedef enum {
   PPTRANSFER_BODY, /* yes do transfer a body */
   PPTRANSFER_INFO, /* do still go through to get info/headers */
-  PPTRANSFER_NONE  /* don't get anything and don't get info */
+  PPTRANSFER_NONE  /* do not get anything and do not get info */
 } curl_pp_transfer;
 
 /*
@@ -69,7 +69,8 @@ struct pingpong {
 
   CURLcode (*statemachine)(struct Curl_easy *data, struct connectdata *conn);
   bool (*endofresp)(struct Curl_easy *data, struct connectdata *conn,
-                    char *ptr, size_t len, int *code);
+                    const char *ptr, size_t len, int *code);
+  BIT(initialised);
 };
 
 #define PINGPONG_SETUP(pp,s,e)                   \
@@ -83,7 +84,7 @@ struct pingpong {
  * Curl_pp_statemach()
  *
  * called repeatedly until done. Set 'wait' to make it wait a while on the
- * socket if there's no traffic.
+ * socket if there is no traffic.
  */
 CURLcode Curl_pp_statemach(struct Curl_easy *data, struct pingpong *pp,
                            bool block, bool disconnecting);
@@ -137,6 +138,8 @@ CURLcode Curl_pp_readresp(struct Curl_easy *data,
                           int *code, /* return the server code if done */
                           size_t *size); /* size of the response */
 
+bool Curl_pp_needs_flush(struct Curl_easy *data,
+                         struct pingpong *pp);
 
 CURLcode Curl_pp_flushsend(struct Curl_easy *data,
                            struct pingpong *pp);

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPickupSA.h
  *  PURPOSE:     Header file for pickup entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -53,8 +53,8 @@ public:
     void     SetPosition(CVector* vecPosition);
     CVector* GetPosition(CVector* vecPosition);
 
-    ePickupType  GetType();
-    void         SetType(ePickupType type);
+    PickupType  GetType();
+    void         SetType(PickupType type);
     float        GetCurrentValue();
     void         SetCurrentValue(float fCurrentValue);
     void         SetRegenerationTime(DWORD dwTime);
@@ -62,8 +62,8 @@ public:
     WORD         GetMoneyPerDay();
     WORD         GetModel();
     void         SetModel(WORD wModelIndex);            // do not export
-    ePickupState GetState();
-    void         SetState(ePickupState bState);
+    PickupState GetState();
+    void         SetState(PickupState bState);
     BYTE         GetAmmo();
     void         SetAmmo(BYTE bAmmo);
     long         GetMonetaryValue();

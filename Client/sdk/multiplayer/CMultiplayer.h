@@ -5,7 +5,7 @@
  *  FILE:        sdk/multiplayer/CMultiplayer.h
  *  PURPOSE:     Multiplayer subsystem interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -429,7 +429,7 @@ public:
 
     virtual CLimits* GetLimits() = 0;
 
-    virtual void UpdateVehicleSuspension() noexcept = 0;
+    virtual void UpdateVehicleSuspension() const noexcept = 0;
 
     virtual void FlushClothesCache() = 0;
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading) = 0;
@@ -460,6 +460,5 @@ public:
     virtual DWORD      GetLastAnimArrayAddress() = 0;
 
     virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
-    virtual unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept = 0;
     virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
 };

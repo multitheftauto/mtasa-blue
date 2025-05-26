@@ -47,7 +47,6 @@ BOOL OnLibraryAttach();
 auto SetImportProcAddress(const char* moduleName, const char* procedureName, FARPROC replacement) -> FARPROC;
 void DisplayErrorMessageBox(const std::wstring& message, const std::wstring& errorCode);
 bool DisplayWarningMessageBox(const std::wstring& message, const std::wstring& errorCode);
-auto PatchWinmmImports() -> int;
 auto GetSystemErrorMessage(DWORD errorCode) -> std::wstring;
 auto GetCurrentProcessPath() -> fs::path;
 auto GetParentProcessPath() -> fs::path;
@@ -232,32 +231,9 @@ VOID OnGameLaunch()
         return;
     }
 
-    // Patch the winmm.dll imports we've taken over with our mtasa.dll library back to the functions from the winmm.dll library.
-    if (int error = PatchWinmmImports())
-    {
-        std::wstring message;
-
-        switch (error)
-        {
-            case 1:
-                message = L"Loading system-provided winmm.dll failed.";
-                break;
-            case 4:
-                message = L"Unable to find winmm.dll import entry.";
-                break;
-            default:
-                message = L"Patching winmm.dll imports failed.";
-                break;
-        }
-
-        AddLaunchLog("Patching imports has failed (%d)", error);
-        DisplayErrorMessageBox(MakeMissingFilesError(message), L"CL58");
-        return;
-    }
-
     // For dll searches, this call replaces the current directory entry and turns off 'SafeDllSearchMode'.
     // Meaning it will search the supplied path before the system and windows directory.
-    // http://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
+    // https://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
     SetDllDirectoryW(mtaDirectory.wstring().c_str());
 
     // Load and set up netc.dll library.
@@ -355,15 +331,6 @@ BOOL WINAPI MyGetVersionExA(LPOSVERSIONINFOA versionInfo)
     OnGameLaunch();
 
     return result;
-}
-
-/**
- * @brief A placeholder function for fake winmm.dll exports.
- */
-EXTERN_C void noreturn()
-{
-    // We should never enter this function.
-    assert(false);
 }
 
 /**
@@ -594,81 +561,6 @@ auto GetParentProcessId() -> DWORD
 auto GetParentProcessPath() -> fs::path
 {
     return GetProcessPath(GetParentProcessId());
-}
-
-/**
- * @brief Loads the winmm.dll library.
- * @return A handle to the library
- */
-auto LoadWinmmLibrary() -> HMODULE
-{
-    if (HMODULE winmm = LoadLibraryExW(L"winmm.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32))
-        return winmm;
-
-    return LoadLibraryW(L"winmm.dll");
-}
-
-/**
- * @brief Replaces fake mtasa.dll imports with functions retrieved from the winmm.dll library.
- */
-auto PatchWinmmImports() -> int
-{
-    auto base = reinterpret_cast<std::byte*>(g_exe);
-    auto dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
-    auto nt = reinterpret_cast<IMAGE_NT_HEADERS32*>(base + dos->e_lfanew);
-    auto descriptor = reinterpret_cast<IMAGE_IMPORT_DESCRIPTOR*>(base + nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
-
-    // Iterate through the import descriptors and find the winmm.dll entry, which we renamed to mtasa.dll.
-    for (; descriptor->Name; ++descriptor)
-    {
-        auto name = reinterpret_cast<const char*>(base + descriptor->Name);
-
-        if (stricmp("mtasa.dll", name))
-            continue;
-
-        HMODULE winmm = LoadWinmmLibrary();
-
-        if (!winmm)
-            return 1;
-
-        auto nameTableEntry = reinterpret_cast<DWORD*>(base + descriptor->FirstThunk);
-        auto addressTableEntry = reinterpret_cast<FARPROC*>(nameTableEntry);
-
-        if (descriptor->OriginalFirstThunk)
-            nameTableEntry = reinterpret_cast<DWORD*>(base + descriptor->OriginalFirstThunk);
-
-        // Replace every import with the correct function from the winmm.dll library.
-        for (; *nameTableEntry; ++nameTableEntry, ++addressTableEntry)
-        {
-            const char* functionName;
-
-            if (IMAGE_SNAP_BY_ORDINAL(*nameTableEntry))
-            {
-                functionName = reinterpret_cast<char const*>(IMAGE_ORDINAL(*nameTableEntry));
-            }
-            else
-            {
-                functionName = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(base + *nameTableEntry)->Name;
-            }
-
-            if (!functionName)
-                return 2;
-
-            FARPROC function = GetProcAddress(winmm, functionName);
-
-            if (!function)
-                return 3;
-
-            DWORD protection;
-            VirtualProtect(addressTableEntry, sizeof(FARPROC), PAGE_READWRITE, &protection);
-            *addressTableEntry = function;
-            VirtualProtect(addressTableEntry, sizeof(FARPROC), protection, &protection);
-        }
-
-        return 0;
-    }
-
-    return 4;
 }
 
 /**

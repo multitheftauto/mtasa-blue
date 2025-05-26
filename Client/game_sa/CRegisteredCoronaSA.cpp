@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CRegisteredCoronaSA.cpp
  *  PURPOSE:     Registered corona entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -75,7 +75,7 @@ void CRegisteredCoronaSA::SetTexture(RwTexture* texture)
     internalInterface->pTex = texture;
 }
 
-void CRegisteredCoronaSA::SetTexture(eCoronaType texture)
+void CRegisteredCoronaSA::SetTexture(CoronaType texture)
 {
     CCoronasSA* coronas = ((CCoronasSA*)pGame->GetCoronas());
     RwTexture*  tex = coronas->GetTexture(texture);

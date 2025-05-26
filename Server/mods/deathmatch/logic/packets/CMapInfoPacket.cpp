@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CMapInfoPacket.h
  *  PURPOSE:     Map/game information packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -192,6 +192,9 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         wsProps.data3.roadsignstext = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT);
         wsProps.data4.extendedwatercannons = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS);
         wsProps.data5.tunnelweatherblend = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND);
+        wsProps.data6.ignoreFireState = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE);
+        wsProps.data7.flyingcomponents = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS);
+        wsProps.data8.vehicleburnexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS);
         BitStream.Write(&wsProps);
     }
 

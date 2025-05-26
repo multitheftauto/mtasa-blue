@@ -24,13 +24,13 @@
 
 #include "curl_setup.h"
 
+#ifdef USE_ARES
+
 /***********************************************************************
  * Only for ares-enabled builds
  * And only for functions that fulfill the asynch resolver backend API
  * as defined in asyn.h, nothing else belongs in this file!
  **********************************************************************/
-
-#ifdef CURLRES_ARES
 
 #include <limits.h>
 #ifdef HAVE_NETINET_IN_H
@@ -59,19 +59,115 @@
 #include "select.h"
 #include "progress.h"
 #include "timediff.h"
+#include "httpsrr.h"
+#include "strdup.h"
 
-#if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
-  defined(_WIN32)
-#  define CARES_STATICLIB
-#endif
 #include <ares.h>
-#include <ares_version.h> /* really old c-ares didn't include this by
+#include <ares_version.h> /* really old c-ares did not include this by
                              itself */
 
-#if ARES_VERSION >= 0x010500
-/* c-ares 1.5.0 or later, the callback proto is modified */
-#define HAVE_CARES_CALLBACK_TIMEOUTS 1
+#ifdef USE_HTTPSRR
+/* 1.28.0 and later have ares_query_dnsrec */
+#if ARES_VERSION < 0x011c00
+#error "requires c-ares 1.28.0 or newer for HTTPSRR"
 #endif
+#define HTTPSRR_WORKS
+#else
+#if ARES_VERSION < 0x010600
+#error "requires c-ares 1.6.0 or newer"
+#endif
+#endif
+
+/*
+ * Curl_ares_getsock() is called when the outside world (using
+ * curl_multi_fdset()) wants to get our fd_set setup and we are talking with
+ * ares. The caller must make sure that this function is only called when we
+ * have a working ares channel.
+ *
+ * Returns: sockets-in-use-bitmap
+ */
+
+int Curl_ares_getsock(struct Curl_easy *data,
+                      ares_channel channel,
+                      curl_socket_t *socks)
+{
+  struct timeval maxtime = { CURL_TIMEOUT_RESOLVE, 0 };
+  struct timeval timebuf;
+  int max = ares_getsock(channel,
+                         (ares_socket_t *)socks, MAX_SOCKSPEREASYHANDLE);
+  struct timeval *timeout = ares_timeout(channel, &maxtime, &timebuf);
+  timediff_t milli = curlx_tvtoms(timeout);
+  Curl_expire(data, milli, EXPIRE_ASYNC_NAME);
+  return max;
+}
+
+/*
+ * Curl_ares_perform()
+ *
+ * 1) Ask ares what sockets it currently plays with, then
+ * 2) wait for the timeout period to check for action on ares' sockets.
+ * 3) tell ares to act on all the sockets marked as "with action"
+ *
+ * return number of sockets it worked on, or -1 on error
+ */
+
+int Curl_ares_perform(ares_channel channel,
+                      timediff_t timeout_ms)
+{
+  int nfds;
+  int bitmask;
+  ares_socket_t socks[ARES_GETSOCK_MAXNUM];
+  struct pollfd pfd[ARES_GETSOCK_MAXNUM];
+  int i;
+  int num = 0;
+
+  if(!channel)
+    return 0;
+
+  bitmask = ares_getsock(channel, socks, ARES_GETSOCK_MAXNUM);
+
+  for(i = 0; i < ARES_GETSOCK_MAXNUM; i++) {
+    pfd[i].events = 0;
+    pfd[i].revents = 0;
+    if(ARES_GETSOCK_READABLE(bitmask, i)) {
+      pfd[i].fd = socks[i];
+      pfd[i].events |= POLLRDNORM|POLLIN;
+    }
+    if(ARES_GETSOCK_WRITABLE(bitmask, i)) {
+      pfd[i].fd = socks[i];
+      pfd[i].events |= POLLWRNORM|POLLOUT;
+    }
+    if(pfd[i].events)
+      num++;
+    else
+      break;
+  }
+
+  if(num) {
+    nfds = Curl_poll(pfd, (unsigned int)num, timeout_ms);
+    if(nfds < 0)
+      return -1;
+  }
+  else
+    nfds = 0;
+
+  if(!nfds)
+    /* Call ares_process() unconditionally here, even if we simply timed out
+       above, as otherwise the ares name resolve will not timeout! */
+    ares_process_fd(channel, ARES_SOCKET_BAD, ARES_SOCKET_BAD);
+  else {
+    /* move through the descriptors and ask for processing on them */
+    for(i = 0; i < num; i++)
+      ares_process_fd(channel,
+                      (pfd[i].revents & (POLLRDNORM|POLLIN)) ?
+                      pfd[i].fd : ARES_SOCKET_BAD,
+                      (pfd[i].revents & (POLLWRNORM|POLLOUT)) ?
+                      pfd[i].fd : ARES_SOCKET_BAD);
+  }
+  return nfds;
+}
+
+#ifdef CURLRES_ARES
 
 #if ARES_VERSION >= 0x010601
 /* IPv6 supported since 1.6.1 */
@@ -98,22 +194,11 @@
 #include "curl_memory.h"
 #include "memdebug.h"
 
-struct thread_data {
-  int num_pending; /* number of outstanding c-ares requests */
-  struct Curl_addrinfo *temp_ai; /* intermediary result while fetching c-ares
-                                    parts */
-  int last_status;
-#ifndef HAVE_CARES_GETADDRINFO
-  struct curltime happy_eyeballs_dns_time; /* when this timer started, or 0 */
-#endif
-  char hostname[1];
-};
-
 /* How long we are willing to wait for additional parallel responses after
    obtaining a "definitive" one. For old c-ares without getaddrinfo.
 
-   This is intended to equal the c-ares default timeout.  cURL always uses that
-   default value.  Unfortunately, c-ares doesn't expose its default timeout in
+   This is intended to equal the c-ares default timeout. cURL always uses that
+   default value. Unfortunately, c-ares does not expose its default timeout in
    its API, but it is officially documented as 5 seconds.
 
    See query_completed_cb() for an explanation of how this is used.
@@ -126,8 +211,8 @@ static int ares_ver = 0;
 
 /*
  * Curl_resolver_global_init() - the generic low-level asynchronous name
- * resolve API.  Called from curl_global_init() to initialize global resolver
- * environment.  Initializes ares library.
+ * resolve API. Called from curl_global_init() to initialize global resolver
+ * environment. Initializes ares library.
  */
 int Curl_resolver_global_init(void)
 {
@@ -160,7 +245,7 @@ static void sock_state_cb(void *data, ares_socket_t socket_fd,
   struct Curl_easy *easy = data;
   if(!readable && !writable) {
     DEBUGASSERT(easy);
-    Curl_multi_closed(easy, socket_fd);
+    Curl_multi_will_close(easy, socket_fd);
   }
 }
 
@@ -169,7 +254,7 @@ static void sock_state_cb(void *data, ares_socket_t socket_fd,
  *
  * Called from curl_easy_init() -> Curl_open() to initialize resolver
  * URL-state specific environment ('resolver' member of the UrlState
- * structure).  Fills the passed pointer by the initialized ares_channel.
+ * structure). Fills the passed pointer by the initialized ares_channel.
  */
 CURLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver)
 {
@@ -211,7 +296,7 @@ CURLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver)
  *
  * Called from curl_easy_cleanup() -> Curl_close() to cleanup resolver
  * URL-state specific environment ('resolver' member of the UrlState
- * structure).  Destroys the ares channel.
+ * structure). Destroys the ares channel.
  */
 void Curl_resolver_cleanup(void *resolver)
 {
@@ -222,7 +307,7 @@ void Curl_resolver_cleanup(void *resolver)
  * Curl_resolver_duphandle()
  *
  * Called from curl_easy_duphandle() to duplicate resolver URL-state specific
- * environment ('resolver' member of the UrlState structure).  Duplicates the
+ * environment ('resolver' member of the UrlState structure). Duplicates the
  * 'from' ares channel and passes the resulting channel to the 'to' pointer.
  */
 CURLcode Curl_resolver_duphandle(struct Curl_easy *easy, void **to, void *from)
@@ -250,12 +335,12 @@ void Curl_resolver_cancel(struct Curl_easy *data)
 }
 
 /*
- * We're equivalent to Curl_resolver_cancel() for the c-ares resolver.  We
+ * We are equivalent to Curl_resolver_cancel() for the c-ares resolver. We
  * never block.
  */
 void Curl_resolver_kill(struct Curl_easy *data)
 {
-  /* We don't need to check the resolver state because we can be called safely
+  /* We do not need to check the resolver state because we can be called safely
      at any time and we always do the same thing. */
   Curl_resolver_cancel(data);
 }
@@ -265,113 +350,23 @@ void Curl_resolver_kill(struct Curl_easy *data)
  */
 static void destroy_async_data(struct Curl_async *async)
 {
-  if(async->tdata) {
-    struct thread_data *res = async->tdata;
-    if(res) {
-      if(res->temp_ai) {
-        Curl_freeaddrinfo(res->temp_ai);
-        res->temp_ai = NULL;
-      }
-      free(res);
-    }
-    async->tdata = NULL;
+  struct thread_data *res = &async->thdata;
+  if(res->temp_ai) {
+    Curl_freeaddrinfo(res->temp_ai);
+    res->temp_ai = NULL;
   }
+  Curl_safefree(res->hostname);
 }
 
 /*
  * Curl_resolver_getsock() is called when someone from the outside world
- * (using curl_multi_fdset()) wants to get our fd_set setup and we're talking
- * with ares. The caller must make sure that this function is only called when
- * we have a working ares channel.
- *
- * Returns: sockets-in-use-bitmap
+ * (using curl_multi_fdset()) wants to get our fd_set setup.
  */
 
-int Curl_resolver_getsock(struct Curl_easy *data,
-                          curl_socket_t *socks)
+int Curl_resolver_getsock(struct Curl_easy *data, curl_socket_t *socks)
 {
-  struct timeval maxtime;
-  struct timeval timebuf;
-  struct timeval *timeout;
-  long milli;
-  int max = ares_getsock((ares_channel)data->state.async.resolver,
-                         (ares_socket_t *)socks, MAX_SOCKSPEREASYHANDLE);
-
-  maxtime.tv_sec = CURL_TIMEOUT_RESOLVE;
-  maxtime.tv_usec = 0;
-
-  timeout = ares_timeout((ares_channel)data->state.async.resolver, &maxtime,
-                         &timebuf);
-  milli = (long)curlx_tvtoms(timeout);
-  if(milli == 0)
-    milli += 10;
-  Curl_expire(data, milli, EXPIRE_ASYNC_NAME);
-
-  return max;
-}
-
-/*
- * waitperform()
- *
- * 1) Ask ares what sockets it currently plays with, then
- * 2) wait for the timeout period to check for action on ares' sockets.
- * 3) tell ares to act on all the sockets marked as "with action"
- *
- * return number of sockets it worked on, or -1 on error
- */
-
-static int waitperform(struct Curl_easy *data, timediff_t timeout_ms)
-{
-  int nfds;
-  int bitmask;
-  ares_socket_t socks[ARES_GETSOCK_MAXNUM];
-  struct pollfd pfd[ARES_GETSOCK_MAXNUM];
-  int i;
-  int num = 0;
-
-  bitmask = ares_getsock((ares_channel)data->state.async.resolver, socks,
-                         ARES_GETSOCK_MAXNUM);
-
-  for(i = 0; i < ARES_GETSOCK_MAXNUM; i++) {
-    pfd[i].events = 0;
-    pfd[i].revents = 0;
-    if(ARES_GETSOCK_READABLE(bitmask, i)) {
-      pfd[i].fd = socks[i];
-      pfd[i].events |= POLLRDNORM|POLLIN;
-    }
-    if(ARES_GETSOCK_WRITABLE(bitmask, i)) {
-      pfd[i].fd = socks[i];
-      pfd[i].events |= POLLWRNORM|POLLOUT;
-    }
-    if(pfd[i].events)
-      num++;
-    else
-      break;
-  }
-
-  if(num) {
-    nfds = Curl_poll(pfd, num, timeout_ms);
-    if(nfds < 0)
-      return -1;
-  }
-  else
-    nfds = 0;
-
-  if(!nfds)
-    /* Call ares_process() unconditionally here, even if we simply timed out
-       above, as otherwise the ares name resolve won't timeout! */
-    ares_process_fd((ares_channel)data->state.async.resolver, ARES_SOCKET_BAD,
-                    ARES_SOCKET_BAD);
-  else {
-    /* move through the descriptors and ask for processing on them */
-    for(i = 0; i < num; i++)
-      ares_process_fd((ares_channel)data->state.async.resolver,
-                      (pfd[i].revents & (POLLRDNORM|POLLIN))?
-                      pfd[i].fd:ARES_SOCKET_BAD,
-                      (pfd[i].revents & (POLLWRNORM|POLLOUT))?
-                      pfd[i].fd:ARES_SOCKET_BAD);
-  }
-  return nfds;
+  return Curl_ares_getsock(data, (ares_channel)data->state.async.resolver,
+                           socks);
 }
 
 /*
@@ -384,21 +379,20 @@ static int waitperform(struct Curl_easy *data, timediff_t timeout_ms)
 CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
                                    struct Curl_dns_entry **dns)
 {
-  struct thread_data *res = data->state.async.tdata;
+  struct thread_data *res = &data->state.async.thdata;
   CURLcode result = CURLE_OK;
 
   DEBUGASSERT(dns);
   *dns = NULL;
 
-  if(waitperform(data, 0) < 0)
+  if(Curl_ares_perform((ares_channel)data->state.async.resolver, 0) < 0)
     return CURLE_UNRECOVERABLE_POLL;
 
 #ifndef HAVE_CARES_GETADDRINFO
-  /* Now that we've checked for any last minute results above, see if there are
-     any responses still pending when the EXPIRE_HAPPY_EYEBALLS_DNS timer
+  /* Now that we have checked for any last minute results above, see if there
+     are any responses still pending when the EXPIRE_HAPPY_EYEBALLS_DNS timer
      expires. */
-  if(res
-     && res->num_pending
+  if(res->num_pending
      /* This is only set to non-zero if the timer was started. */
      && (res->happy_eyeballs_dns_time.tv_sec
          || res->happy_eyeballs_dns_time.tv_usec)
@@ -410,7 +404,7 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
       &res->happy_eyeballs_dns_time, 0, sizeof(res->happy_eyeballs_dns_time));
 
     /* Cancel the raw c-ares request, which will fire query_completed_cb() with
-       ARES_ECANCELLED synchronously for all pending responses.  This will
+       ARES_ECANCELLED synchronously for all pending responses. This will
        leave us with res->num_pending == 0, which is perfect for the next
        block. */
     ares_cancel((ares_channel)data->state.async.resolver);
@@ -418,16 +412,27 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
   }
 #endif
 
-  if(res && !res->num_pending) {
+  if(!res->num_pending) {
     (void)Curl_addrinfo_callback(data, res->last_status, res->temp_ai);
     /* temp_ai ownership is moved to the connection, so we need not free-up
        them */
     res->temp_ai = NULL;
 
+    result = res->result;
     if(!data->state.async.dns)
       result = Curl_resolver_error(data);
-    else
+    if(!result) {
       *dns = data->state.async.dns;
+#ifdef HTTPSRR_WORKS
+      {
+        struct Curl_https_rrinfo *lhrr = Curl_httpsrr_dup_move(&res->hinfo);
+        if(!lhrr)
+          result = CURLE_OUT_OF_MEMORY;
+        else
+          (*dns)->hinfo = lhrr;
+      }
+#endif
+    }
 
     destroy_async_data(&data->state.async);
   }
@@ -490,7 +495,8 @@ CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
     else
       timeout_ms = 1000;
 
-    if(waitperform(data, timeout_ms) < 0)
+    if(Curl_ares_perform((ares_channel)data->state.async.resolver,
+                         timeout_ms) < 0)
       return CURLE_UNRECOVERABLE_POLL;
     result = Curl_resolver_is_resolved(data, entry);
 
@@ -523,7 +529,7 @@ CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
     *entry = data->state.async.dns;
 
   if(result)
-    /* close the connection, since we can't return failure here without
+    /* close the connection, since we cannot return failure here without
        cleaning up this connection properly. */
     connclose(data->conn, "c-ares resolve failed");
 
@@ -570,96 +576,89 @@ static void compound_results(struct thread_data *res,
  */
 static void query_completed_cb(void *arg,  /* (struct connectdata *) */
                                int status,
-#ifdef HAVE_CARES_CALLBACK_TIMEOUTS
                                int timeouts,
-#endif
                                struct hostent *hostent)
 {
   struct Curl_easy *data = (struct Curl_easy *)arg;
-  struct thread_data *res;
+  struct thread_data *res = &data->state.async.thdata;
 
-#ifdef HAVE_CARES_CALLBACK_TIMEOUTS
   (void)timeouts; /* ignored */
-#endif
 
   if(ARES_EDESTRUCTION == status)
     /* when this ares handle is getting destroyed, the 'arg' pointer may not
        be valid so only defer it when we know the 'status' says its fine! */
     return;
 
-  res = data->state.async.tdata;
-  if(res) {
-    res->num_pending--;
+  res->num_pending--;
 
-    if(CURL_ASYNC_SUCCESS == status) {
-      struct Curl_addrinfo *ai = Curl_he2ai(hostent, data->state.async.port);
-      if(ai) {
-        compound_results(res, ai);
-      }
+  if(CURL_ASYNC_SUCCESS == status) {
+    struct Curl_addrinfo *ai = Curl_he2ai(hostent, data->state.async.port);
+    if(ai) {
+      compound_results(res, ai);
     }
-    /* A successful result overwrites any previous error */
-    if(res->last_status != ARES_SUCCESS)
-      res->last_status = status;
+  }
+  /* A successful result overwrites any previous error */
+  if(res->last_status != ARES_SUCCESS)
+    res->last_status = status;
 
-    /* If there are responses still pending, we presume they must be the
-       complementary IPv4 or IPv6 lookups that we started in parallel in
-       Curl_resolver_getaddrinfo() (for Happy Eyeballs).  If we've got a
-       "definitive" response from one of a set of parallel queries, we need to
-       think about how long we're willing to wait for more responses. */
-    if(res->num_pending
-       /* Only these c-ares status values count as "definitive" for these
-          purposes.  For example, ARES_ENODATA is what we expect when there is
-          no IPv6 entry for a domain name, and that's not a reason to get more
-          aggressive in our timeouts for the other response.  Other errors are
-          either a result of bad input (which should affect all parallel
-          requests), local or network conditions, non-definitive server
-          responses, or us cancelling the request. */
-       && (status == ARES_SUCCESS || status == ARES_ENOTFOUND)) {
-      /* Right now, there can only be up to two parallel queries, so don't
-         bother handling any other cases. */
-      DEBUGASSERT(res->num_pending == 1);
+  /* If there are responses still pending, we presume they must be the
+     complementary IPv4 or IPv6 lookups that we started in parallel in
+     Curl_resolver_getaddrinfo() (for Happy Eyeballs). If we have got a
+     "definitive" response from one of a set of parallel queries, we need to
+     think about how long we are willing to wait for more responses. */
+  if(res->num_pending
+     /* Only these c-ares status values count as "definitive" for these
+        purposes. For example, ARES_ENODATA is what we expect when there is
+        no IPv6 entry for a domain name, and that is not a reason to get more
+        aggressive in our timeouts for the other response. Other errors are
+        either a result of bad input (which should affect all parallel
+        requests), local or network conditions, non-definitive server
+        responses, or us cancelling the request. */
+     && (status == ARES_SUCCESS || status == ARES_ENOTFOUND)) {
+    /* Right now, there can only be up to two parallel queries, so do not
+       bother handling any other cases. */
+    DEBUGASSERT(res->num_pending == 1);
 
-      /* It's possible that one of these parallel queries could succeed
-         quickly, but the other could always fail or timeout (when we're
-         talking to a pool of DNS servers that can only successfully resolve
-         IPv4 address, for example).
+    /* it is possible that one of these parallel queries could succeed
+       quickly, but the other could always fail or timeout (when we are
+       talking to a pool of DNS servers that can only successfully resolve
+       IPv4 address, for example).
 
-         It's also possible that the other request could always just take
-         longer because it needs more time or only the second DNS server can
-         fulfill it successfully.  But, to align with the philosophy of Happy
-         Eyeballs, we don't want to wait _too_ long or users will think
-         requests are slow when IPv6 lookups don't actually work (but IPv4 ones
-         do).
+       it is also possible that the other request could always just take
+       longer because it needs more time or only the second DNS server can
+       fulfill it successfully. But, to align with the philosophy of Happy
+       Eyeballs, we do not want to wait _too_ long or users will think
+       requests are slow when IPv6 lookups do not actually work (but IPv4
+       ones do).
 
-         So, now that we have a usable answer (some IPv4 addresses, some IPv6
-         addresses, or "no such domain"), we start a timeout for the remaining
-         pending responses.  Even though it is typical that this resolved
-         request came back quickly, that needn't be the case.  It might be that
-         this completing request didn't get a result from the first DNS server
-         or even the first round of the whole DNS server pool.  So it could
-         already be quite some time after we issued the DNS queries in the
-         first place.  Without modifying c-ares, we can't know exactly where in
-         its retry cycle we are.  We could guess based on how much time has
-         gone by, but it doesn't really matter.  Happy Eyeballs tells us that,
-         given usable information in hand, we simply don't want to wait "too
-         much longer" after we get a result.
+       So, now that we have a usable answer (some IPv4 addresses, some IPv6
+       addresses, or "no such domain"), we start a timeout for the remaining
+       pending responses. Even though it is typical that this resolved
+       request came back quickly, that needn't be the case. It might be that
+       this completing request did not get a result from the first DNS
+       server or even the first round of the whole DNS server pool. So it
+       could already be quite some time after we issued the DNS queries in
+       the first place. Without modifying c-ares, we cannot know exactly
+       where in its retry cycle we are. We could guess based on how much
+       time has gone by, but it does not really matter. Happy Eyeballs tells
+       us that, given usable information in hand, we simply do not want to
+       wait "too much longer" after we get a result.
 
-         We simply wait an additional amount of time equal to the default
-         c-ares query timeout.  That is enough time for a typical parallel
-         response to arrive without being "too long".  Even on a network
-         where one of the two types of queries is failing or timing out
-         constantly, this will usually mean we wait a total of the default
-         c-ares timeout (5 seconds) plus the round trip time for the successful
-         request, which seems bearable.  The downside is that c-ares might race
-         with us to issue one more retry just before we give up, but it seems
-         better to "waste" that request instead of trying to guess the perfect
-         timeout to prevent it.  After all, we don't even know where in the
-         c-ares retry cycle each request is.
-      */
-      res->happy_eyeballs_dns_time = Curl_now();
-      Curl_expire(data, HAPPY_EYEBALLS_DNS_TIMEOUT,
-                  EXPIRE_HAPPY_EYEBALLS_DNS);
-    }
+       We simply wait an additional amount of time equal to the default
+       c-ares query timeout. That is enough time for a typical parallel
+       response to arrive without being "too long". Even on a network
+       where one of the two types of queries is failing or timing out
+       constantly, this will usually mean we wait a total of the default
+       c-ares timeout (5 seconds) plus the round trip time for the successful
+       request, which seems bearable. The downside is that c-ares might race
+       with us to issue one more retry just before we give up, but it seems
+       better to "waste" that request instead of trying to guess the perfect
+       timeout to prevent it. After all, we do not even know where in the
+       c-ares retry cycle each request is.
+    */
+    res->happy_eyeballs_dns_time = Curl_now();
+    Curl_expire(data, HAPPY_EYEBALLS_DNS_TIMEOUT,
+                EXPIRE_HAPPY_EYEBALLS_DNS);
   }
 }
 #else
@@ -743,7 +742,7 @@ static void addrinfo_cb(void *arg, int status, int timeouts,
                         struct ares_addrinfo *result)
 {
   struct Curl_easy *data = (struct Curl_easy *)arg;
-  struct thread_data *res = data->state.async.tdata;
+  struct thread_data *res = &data->state.async.thdata;
   (void)timeouts;
   if(ARES_SUCCESS == status) {
     res->temp_ai = ares2addr(result->nodes);
@@ -754,6 +753,7 @@ static void addrinfo_cb(void *arg, int status, int timeouts,
 }
 
 #endif
+
 /*
  * Curl_resolver_getaddrinfo() - when using ares
  *
@@ -767,77 +767,86 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
                                                 int port,
                                                 int *waitp)
 {
-  struct thread_data *res = NULL;
-  size_t namelen = strlen(hostname);
+  struct thread_data *res = &data->state.async.thdata;
   *waitp = 0; /* default to synchronous response */
 
-  res = calloc(1, sizeof(struct thread_data) + namelen);
-  if(res) {
-    strcpy(res->hostname, hostname);
-    data->state.async.hostname = res->hostname;
-    data->state.async.port = port;
-    data->state.async.done = FALSE;   /* not done */
-    data->state.async.status = 0;     /* clear */
-    data->state.async.dns = NULL;     /* clear */
-    data->state.async.tdata = res;
+  res->hostname = strdup(hostname);
+  if(!res->hostname)
+    return NULL;
 
-    /* initial status - failed */
-    res->last_status = ARES_ENOTFOUND;
+  data->state.async.port = port;
+  data->state.async.done = FALSE;   /* not done */
+  data->state.async.dns = NULL;     /* clear */
+
+  /* initial status - failed */
+  res->last_status = ARES_ENOTFOUND;
 
 #ifdef HAVE_CARES_GETADDRINFO
-    {
-      struct ares_addrinfo_hints hints;
-      char service[12];
-      int pf = PF_INET;
-      memset(&hints, 0, sizeof(hints));
+  {
+    struct ares_addrinfo_hints hints;
+    char service[12];
+    int pf = PF_INET;
+    memset(&hints, 0, sizeof(hints));
 #ifdef CURLRES_IPV6
-      if((data->conn->ip_version != CURL_IPRESOLVE_V4) &&
-         Curl_ipv6works(data)) {
-        /* The stack seems to be IPv6-enabled */
-        if(data->conn->ip_version == CURL_IPRESOLVE_V6)
-          pf = PF_INET6;
-        else
-          pf = PF_UNSPEC;
-      }
-#endif /* CURLRES_IPV6 */
-      hints.ai_family = pf;
-      hints.ai_socktype = (data->conn->transport == TRNSPRT_TCP)?
-        SOCK_STREAM : SOCK_DGRAM;
-      /* Since the service is a numerical one, set the hint flags
-       * accordingly to save a call to getservbyname in inside C-Ares
-       */
-      hints.ai_flags = ARES_AI_NUMERICSERV;
-      msnprintf(service, sizeof(service), "%d", port);
-      res->num_pending = 1;
-      ares_getaddrinfo((ares_channel)data->state.async.resolver, hostname,
-                       service, &hints, addrinfo_cb, data);
+    if((data->conn->ip_version != CURL_IPRESOLVE_V4) &&
+       Curl_ipv6works(data)) {
+      /* The stack seems to be IPv6-enabled */
+      if(data->conn->ip_version == CURL_IPRESOLVE_V6)
+        pf = PF_INET6;
+      else
+        pf = PF_UNSPEC;
     }
+#endif /* CURLRES_IPV6 */
+    hints.ai_family = pf;
+    hints.ai_socktype = (data->conn->transport == TRNSPRT_TCP) ?
+      SOCK_STREAM : SOCK_DGRAM;
+    /* Since the service is a numerical one, set the hint flags
+     * accordingly to save a call to getservbyname in inside C-Ares
+     */
+    hints.ai_flags = ARES_AI_NUMERICSERV;
+    msnprintf(service, sizeof(service), "%d", port);
+    res->num_pending = 1;
+    ares_getaddrinfo((ares_channel)data->state.async.resolver, hostname,
+                     service, &hints, addrinfo_cb, data);
+  }
 #else
 
 #ifdef HAVE_CARES_IPV6
-    if((data->conn->ip_version != CURL_IPRESOLVE_V4) && Curl_ipv6works(data)) {
-      /* The stack seems to be IPv6-enabled */
-      res->num_pending = 2;
+  if((data->conn->ip_version != CURL_IPRESOLVE_V4) && Curl_ipv6works(data)) {
+    /* The stack seems to be IPv6-enabled */
+    res->num_pending = 2;
 
-      /* areschannel is already setup in the Curl_open() function */
-      ares_gethostbyname((ares_channel)data->state.async.resolver, hostname,
-                          PF_INET, query_completed_cb, data);
-      ares_gethostbyname((ares_channel)data->state.async.resolver, hostname,
-                          PF_INET6, query_completed_cb, data);
-    }
-    else
-#endif
-    {
-      res->num_pending = 1;
-
-      /* areschannel is already setup in the Curl_open() function */
-      ares_gethostbyname((ares_channel)data->state.async.resolver,
-                         hostname, PF_INET,
-                         query_completed_cb, data);
-    }
-#endif
-    *waitp = 1; /* expect asynchronous response */
+    /* areschannel is already setup in the Curl_open() function */
+    ares_gethostbyname((ares_channel)data->state.async.resolver, hostname,
+                       PF_INET, query_completed_cb, data);
+    ares_gethostbyname((ares_channel)data->state.async.resolver, hostname,
+                       PF_INET6, query_completed_cb, data);
   }
+  else
+#endif
+  {
+    res->num_pending = 1;
+
+    /* areschannel is already setup in the Curl_open() function */
+    ares_gethostbyname((ares_channel)data->state.async.resolver,
+                       hostname, PF_INET,
+                       query_completed_cb, data);
+  }
+#endif
+#ifdef USE_HTTPSRR
+  {
+    CURL_TRC_DNS(data, "asyn-ares: fire off query for HTTPSRR");
+    res->num_pending++; /* one more */
+    memset(&res->hinfo, 0, sizeof(struct Curl_https_rrinfo));
+    res->hinfo.port = -1;
+    ares_query_dnsrec((ares_channel)data->state.async.resolver,
+                      hostname, ARES_CLASS_IN,
+                      ARES_REC_TYPE_HTTPS,
+                      Curl_dnsrec_done_cb, data, NULL);
+  }
+#endif
+  *waitp = 1; /* expect asynchronous response */
+
   return NULL; /* no struct yet */
 }
 
@@ -847,14 +856,26 @@ CURLcode Curl_set_dns_servers(struct Curl_easy *data,
   CURLcode result = CURLE_NOT_BUILT_IN;
   int ares_result;
 
-  /* If server is NULL or empty, this would purge all DNS servers
-   * from ares library, which will cause any and all queries to fail.
-   * So, just return OK if none are configured and don't actually make
-   * any changes to c-ares.  This lets c-ares use its defaults, which
-   * it gets from the OS (for instance from /etc/resolv.conf on Linux).
+  /* If server is NULL, this purges all DNS servers from c-ares. Reset it to
+   * default.
    */
-  if(!(servers && servers[0]))
-    return CURLE_OK;
+  if(!servers) {
+    Curl_resolver_cleanup(data->state.async.resolver);
+    result = Curl_resolver_init(data, &data->state.async.resolver);
+    if(!result) {
+      /* this now needs to restore the other options set to c-ares */
+      if(data->set.str[STRING_DNS_INTERFACE])
+        (void)Curl_set_dns_interface(data,
+                                     data->set.str[STRING_DNS_INTERFACE]);
+      if(data->set.str[STRING_DNS_LOCAL_IP4])
+        (void)Curl_set_dns_local_ip4(data,
+                                     data->set.str[STRING_DNS_LOCAL_IP4]);
+      if(data->set.str[STRING_DNS_LOCAL_IP6])
+        (void)Curl_set_dns_local_ip6(data,
+                                     data->set.str[STRING_DNS_LOCAL_IP6]);
+    }
+    return result;
+  }
 
 #ifdef HAVE_CARES_SERVERS_CSV
 #ifdef HAVE_CARES_PORTS_CSV
@@ -912,7 +933,7 @@ CURLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
     a4.s_addr = 0; /* disabled: do not bind to a specific address */
   }
   else {
-    if(Curl_inet_pton(AF_INET, local_ip4, &a4) != 1) {
+    if(curlx_inet_pton(AF_INET, local_ip4, &a4) != 1) {
       DEBUGF(infof(data, "bad DNS IPv4 address"));
       return CURLE_BAD_FUNCTION_ARGUMENT;
     }
@@ -940,7 +961,7 @@ CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
     memset(a6, 0, sizeof(a6));
   }
   else {
-    if(Curl_inet_pton(AF_INET6, local_ip6, a6) != 1) {
+    if(curlx_inet_pton(AF_INET6, local_ip6, a6) != 1) {
       DEBUGF(infof(data, "bad DNS IPv6 address"));
       return CURLE_BAD_FUNCTION_ARGUMENT;
     }
@@ -956,3 +977,5 @@ CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
 #endif
 }
 #endif /* CURLRES_ARES */
+
+#endif /* USE_ARES */

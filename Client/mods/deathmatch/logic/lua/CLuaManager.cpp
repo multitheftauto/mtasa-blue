@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/logic/lua/CLuaManager.cpp
  *  PURPOSE:     Lua virtual machine manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -185,6 +185,8 @@ void CLuaManager::LoadCFunctions()
         {"getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex},
         {"getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes},
         {"getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName},
+        {"addClothingModel", CLuaFunctionDefs::AddClothingModel},
+        {"removeClothingModel", CLuaFunctionDefs::RemoveClothingModel},
 
         // Cursor funcs
         {"getCursorPosition", CLuaFunctionDefs::GetCursorPosition},

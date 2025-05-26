@@ -5,7 +5,7 @@
  *  FILE:        game_sa/HookSystem.h
  *  PURPOSE:     Function hook installation system
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,6 +23,8 @@ void* FunctionPointerToVoidP(T func)
     } c = {func};
     return c.b;
 }
+
+void HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction);
 
 template <typename T>
 bool HookInstall(DWORD dwInstallAddress, T dwHookHandler, int iJmpCodeSize = 5)

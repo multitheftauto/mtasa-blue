@@ -50,7 +50,6 @@
 #include "curl_hmac.h"
 #include "curl_sasl.h"
 #include "warnless.h"
-#include "strtok.h"
 #include "sendf.h"
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -328,7 +327,7 @@ bool Curl_sasl_can_authenticate(struct SASL *sasl, struct Curl_easy *data)
   if(data->state.aptr.user)
     return TRUE;
 
-  /* EXTERNAL can authenticate without a user name and/or password */
+  /* EXTERNAL can authenticate without a username and/or password */
   if(sasl->authmechs & sasl->prefmech & SASL_MECH_EXTERNAL)
     return TRUE;
 

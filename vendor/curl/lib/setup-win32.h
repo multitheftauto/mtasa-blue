@@ -62,11 +62,11 @@
 #endif
 
 /*
- * Include header files for windows builds before redefining anything.
+ * Include header files for Windows builds before redefining anything.
  * Use this preprocessor block only to include or exclude windows.h,
- * winsock2.h or ws2tcpip.h. Any other windows thing belongs
- * to any other further and independent block.  Under Cygwin things work
- * just as under linux (e.g. <sys/socket.h>) and the winsock headers should
+ * winsock2.h or ws2tcpip.h. Any other Windows thing belongs
+ * to any other further and independent block. Under Cygwin things work
+ * just as under Linux (e.g. <sys/socket.h>) and the Winsock headers should
  * never be included when __CYGWIN__ is defined.
  */
 
@@ -76,17 +76,6 @@
 #  endif
 #  if defined(_UNICODE) && !defined(UNICODE)
 #    error "_UNICODE is defined but UNICODE is not defined"
-#  endif
-/*
- * Don't include unneeded stuff in Windows headers to avoid compiler
- * warnings and macro clashes.
- * Make sure to define this macro before including any Windows headers.
- */
-#  ifndef WIN32_LEAN_AND_MEAN
-#    define WIN32_LEAN_AND_MEAN
-#  endif
-#  ifndef NOGDI
-#    define NOGDI
 #  endif
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
@@ -104,12 +93,6 @@
  * newer symbols.
  */
 
-#ifndef _WIN32_WINNT_NT4
-#define _WIN32_WINNT_NT4            0x0400   /* Windows NT 4.0 */
-#endif
-#ifndef _WIN32_WINNT_WIN2K
-#define _WIN32_WINNT_WIN2K          0x0500   /* Windows 2000 */
-#endif
 #ifndef _WIN32_WINNT_WINXP
 #define _WIN32_WINNT_WINXP          0x0501   /* Windows XP */
 #endif

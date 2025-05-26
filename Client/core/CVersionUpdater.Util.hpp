@@ -5,15 +5,15 @@
  *  FILE:        core/CVersionUpdater
  *  PURPOSE:     Version update check and message dialog class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 class CVersionUpdater;
 
 // Update master info
-#define UPDATER_MASTER_URL1 "http://updatesa.mtasa.com/sa/master/?v=%VERSION%&id=%ID%"
-#define UPDATER_MASTER_URL2 "http://updatesa.multitheftauto.com/sa/master/?v=%VERSION%&id=%ID%"
+#define UPDATER_MASTER_URL1 "https://updatesa.multitheftauto.com/sa/master/?v=%VERSION%&id=%ID%"
+#define UPDATER_MASTER_URL2 "https://updatesa.mtasa.com/sa/master/?v=%VERSION%&id=%ID%"
 
 /*
 
@@ -24,30 +24,30 @@ class CVersionUpdater;
     <master>
         <revision>2010-09-05-b</revision>
         <serverlist>
-            <server>http://updatesa.mtasa.com/sa/master/?v=%VERSION%&amp;id=%ID%</server>
-            <server>http://updatesa.multitheftauto.com/sa/master/?v=%VERSION%&amp;id=%ID%</server>
+            <server>https://updatesa.mtasa.com/sa/master/?v=%VERSION%&amp;id=%ID%</server>
+            <server>https://updatesa.multitheftauto.com/sa/master/?v=%VERSION%&amp;id=%ID%</server>
         </serverlist>
         <interval>7d</interval>
     </master>
     <version>
         <serverlist>
-            <server priority="3">http://updatesa.mtasa.com/sa/version/?v=%VERSION%&amp;id=%ID%&amp;ty=%TYPE%&amp;da=%DATA%&amp;be=%BETA%&amp;re=%REFER%</server>
+            <server priority="3">https://updatesa.mtasa.com/sa/version/?v=%VERSION%&amp;id=%ID%&amp;ty=%TYPE%&amp;da=%DATA%&amp;be=%BETA%&amp;re=%REFER%</server>
             <server
-priority="3">http://updatesa.multitheftauto.com/sa/version/?v=%VERSION%&amp;id=%ID%&amp;ty=%TYPE%&amp;da=%DATA%&amp;be=%BETA%&amp;re=%REFER%</server>
+priority="3">https://updatesa.multitheftauto.com/sa/version/?v=%VERSION%&amp;id=%ID%&amp;ty=%TYPE%&amp;da=%DATA%&amp;be=%BETA%&amp;re=%REFER%</server>
         </serverlist>
         <interval>12h</interval>
     </version>
     <report>
         <serverlist>
-            <server>http://updatesa.mtasa.com/sa/report/?v=%VERSION%&amp;id=%ID%</server>
-            <server>http://updatesa.multitheftauto.com/sa/report/?v=%VERSION%&amp;id=%ID%</server>
+            <server>https://updatesa.mtasa.com/sa/report/?v=%VERSION%&amp;id=%ID%</server>
+            <server>https://updatesa.multitheftauto.com/sa/report/?v=%VERSION%&amp;id=%ID%</server>
         </serverlist>
         <interval>12h</interval>
     </report>
     <crashdump>
         <serverlist>
-            <server priority="3">http://updatesa.mtasa.com/sa/crashdump/?v=%VERSION%&amp;id=%ID%&amp;file=%FILE%</server>
-            <server priority="4">http://updatesa.multitheftauto.com/sa/crashdump/?v=%VERSION%&amp;id=%ID%&amp;file=%FILE%</server>
+            <server priority="3">https://updatesa.mtasa.com/sa/crashdump/?v=%VERSION%&amp;id=%ID%&amp;file=%FILE%</server>
+            <server priority="4">https://updatesa.multitheftauto.com/sa/crashdump/?v=%VERSION%&amp;id=%ID%&amp;file=%FILE%</server>
         </serverlist>
         <interval>12h</interval>
         <duplicates>0</duplicates>
@@ -55,13 +55,13 @@ priority="3">http://updatesa.multitheftauto.com/sa/version/?v=%VERSION%&amp;id=%
     </crashdump>
     <gtadatafiles>
         <serverlist>
-            <server priority="4">http://updatesa.mtasa.com/sa/gtadatafiles/?v=%VERSION%&amp;id=%ID%</server>
-            <server priority="3">http://updatesa.multitheftauto.com/sa/gtadatafiles/?v=%VERSION%&amp;id=%ID%</server>
+            <server priority="4">https://updatesa.mtasa.com/sa/gtadatafiles/?v=%VERSION%&amp;id=%ID%</server>
+            <server priority="3">https://updatesa.multitheftauto.com/sa/gtadatafiles/?v=%VERSION%&amp;id=%ID%</server>
         </serverlist>
     </gtadatafiles>
     <trouble>
         <serverlist>
-            <server>http://updatesa.mtasa.com/sa/trouble/?v=%VERSION%&amp;id=%ID%&amp;tr=%TROUBLE%</server>
+            <server>https://updatesa.mtasa.com/sa/trouble/?v=%VERSION%&amp;id=%ID%&amp;tr=%TROUBLE%</server>
         </serverlist>
     </trouble>
 </masterroot>
@@ -92,9 +92,9 @@ DO YOU WANT TO DOWNLOAD AND INSTALL THE LATEST VERSION ?
         <md5>1585F5C5FDF77AD3565A75608E0263DD</md5>
     </file>
     <serverlist>
-        <server priority="3">http://updatesa1.mtasa.com/mirror/mtasa-1.0.4-rc-2021-6-files-net.exe</server>
-        <server priority="3">http://updatesa2.mtasa.com/mirror/mtasa-1.0.4-rc-2021-6-files-net.exe</server>
-        <server priority="2">http://updatesa3.mtasa.com/mirror/mtasa-1.0.4-rc-2021-6-files-net.exe</server>
+        <server priority="3">https://updatesa1.mtasa.com/mirror/mtasa-1.0.4-rc-2021-6-files-net.exe</server>
+        <server priority="3">https://updatesa2.mtasa.com/mirror/mtasa-1.0.4-rc-2021-6-files-net.exe</server>
+        <server priority="2">https://updatesa3.mtasa.com/mirror/mtasa-1.0.4-rc-2021-6-files-net.exe</server>
     </serverlist>
     <reportsettings>
         <filter>1000-9999</filter>

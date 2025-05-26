@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CHTTPD.h
  *  PURPOSE:     Built-in HTTP webserver class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

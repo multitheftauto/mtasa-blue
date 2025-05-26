@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CRendererSA.h
  *  PURPOSE:     Game renderer class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -19,5 +19,5 @@ public:
     CRendererSA();
     ~CRendererSA();
 
-    void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix) override;
+    void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting) override;
 };
