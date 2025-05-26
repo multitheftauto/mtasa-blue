@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Shared/mods/logic/luadefs/CLuaCryptDefs.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -403,7 +403,8 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
     argStream.ReadEnumString(algorithm);
     argStream.ReadString(data);
 
-    if ((algorithm != StringEncodeFunction::BASE64 && algorithm != StringEncodeFunction::BASE32) || argStream.NextIsTable())
+    if ((algorithm != StringEncodeFunction::BASE64 && algorithm != StringEncodeFunction::BASE32 && algorithm != StringEncodeFunction::ZLIB) ||
+        argStream.NextIsTable())
     {
         argStream.ReadStringMap(options);
     }
@@ -727,6 +728,88 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 return 1;
             }
+            case StringEncodeFunction::ZLIB:
+            {
+                int compression = 9;
+                int format = (int)ZLibFormat::GZIP;
+                ZLibStrategy strategy = ZLibStrategy::DEFAULT;
+                if (!options["format"].empty() && !StringToEnum(options["format"], (ZLibFormat&)format) && !StringToZLibFormat(options["format"], format))
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'format'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+                if (!options["strategy"].empty() && !StringToEnum(options["strategy"], strategy))
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'strategy'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+                if (!options["compression"].empty())
+                {
+                    compression = atoi(options["compression"].c_str());
+                    if (compression < 0 || compression > 9)
+                    {
+                        m_pScriptDebugging->LogCustom(luaVM, "Value for field 'compression' is out of range (0-9)");
+                        lua::Push(luaVM, false);
+                        return 1;
+                    }
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
+                            [data, format, compression, strategy]
+                            {
+                                // Execute time-consuming task
+                                SString output;
+                                int     result = SharedUtil::ZLibCompress(data, output, format, compression, strategy);
+                                if (result == Z_STREAM_END)
+                                    return std::make_pair(output, true);
+                                else
+                                    return std::make_pair(SString("zlib error: %i", result), false);
+                            },
+                            [luaFunctionRef](const std::pair<SString, bool>& result)
+                            {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result.second)
+                                    {
+                                        arguments.PushString(result.first);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    SString output;
+                    int     result = SharedUtil::ZLibCompress(data, output, format, compression, strategy);
+                    if (result == Z_STREAM_END)
+                        lua::Push(luaVM, output);
+                    else
+                    {
+                        m_pScriptDebugging->LogWarning(luaVM, "zlib error: %i", result);
+                        lua::Push(luaVM, false);
+                    }
+                }
+                return 1;
+            }
             default:
             {
                 m_pScriptDebugging->LogCustom(luaVM, "Unknown encryption algorithm");
@@ -753,7 +836,8 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
     argStream.ReadEnumString(algorithm);
     argStream.ReadString(data);
 
-    if ((algorithm != StringEncodeFunction::BASE64 && algorithm != StringEncodeFunction::BASE32) || argStream.NextIsTable())
+    if ((algorithm != StringEncodeFunction::BASE64 && algorithm != StringEncodeFunction::BASE32 && algorithm != StringEncodeFunction::ZLIB) ||
+        argStream.NextIsTable())
     {
         argStream.ReadStringMap(options);
     }
@@ -1081,6 +1165,70 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                         lua::Push(luaVM, false);
                     }
                     return 1;
+                }
+                return 1;
+            }
+            case StringEncodeFunction::ZLIB:
+            {
+                int format = 0;
+                if (!options["format"].empty() && !StringToEnum(options["format"], (ZLibFormat&)format) && !StringToZLibFormat(options["format"], format))
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Not supported value for field 'format'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
+                            [data, format]
+                            {
+                                // Execute time-consuming task
+                                SString output;
+                                int     result = SharedUtil::ZLibUncompress(data, output, format);
+                                if (result == Z_STREAM_END)
+                                    return std::make_pair(output, true);
+                                else
+                                    return std::make_pair(SString("zlib error: %i", result), false);
+                            },
+                            [luaFunctionRef](const std::pair<SString, bool>& result)
+                            {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result.second)
+                                    {
+                                        arguments.PushString(result.first);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    SString output;
+                    int     result = SharedUtil::ZLibUncompress(data, output, format);
+                    if (result == Z_STREAM_END)
+                        lua::Push(luaVM, output);
+                    else
+                    {
+                        m_pScriptDebugging->LogWarning(luaVM, "zlib error: %i", result);
+                        lua::Push(luaVM, false);
+                    }
                 }
                 return 1;
             }

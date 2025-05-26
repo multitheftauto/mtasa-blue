@@ -4,15 +4,13 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaBitDefs.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "CLuaBitDefs.h"
 #include "CScriptArgReader.h"
-
-#define mask(n) ((1 << (n)) - 1)
 
 void CLuaBitDefs::LoadFunctions()
 {
@@ -352,7 +350,7 @@ int CLuaBitDefs::bitExtract(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            lua_pushnumber(luaVM, (uiVar >> iField) & mask(iWidth));
+            lua_pushnumber(luaVM, (uiVar >> iField) & BYTE_MASK(iWidth));
             return 1;
         }
     }
@@ -391,7 +389,7 @@ int CLuaBitDefs::bitReplace(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            int iMask = mask(iWidth);
+            int iMask = BYTE_MASK(iWidth);
 
             // Erase bits outside given width
             uiReplaceValue &= iMask;

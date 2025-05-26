@@ -1,4 +1,4 @@
--- From: http://industriousone.com/topic/oscopydir
+-- From: https://industriousone.com/topic/oscopydir
 
 --
 -- Allows copying directories.
@@ -127,6 +127,24 @@ function os.extract_archive(archive_path, target_path, override)
 	end
 
 	return false
+end
+
+function http.create_download_progress_handler(options)
+	local last_update = 0
+
+	return function (total, current)
+		local tick = os.clock()
+		if tick - last_update < options.update_interval_s then
+			return
+		end
+
+		last_update = tick
+
+		local ratio = current / total;
+		ratio = math.min(math.max(ratio, 0), 1)
+		local percent = math.floor(ratio * 100)
+		print(string.format("Downloading (%d/%d) %d%%", current, total, percent))
+	end
 end
 
 function http.download_print_errors(url, file, options)

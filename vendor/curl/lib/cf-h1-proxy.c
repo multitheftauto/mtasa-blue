@@ -27,9 +27,6 @@
 #if !defined(CURL_DISABLE_PROXY) && !defined(CURL_DISABLE_HTTP)
 
 #include <curl/curl.h>
-#ifdef USE_HYPER
-#include <hyper.h>
-#endif
 #include "urldata.h"
 #include "dynbuf.h"
 #include "sendf.h"
@@ -47,6 +44,7 @@
 #include "vtls/vtls.h"
 #include "transfer.h"
 #include "multiif.h"
+#include "strparse.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -65,7 +63,6 @@ typedef enum {
 
 /* struct for HTTP CONNECT tunneling */
 struct h1_tunnel_state {
-  struct HTTP CONNECT;
   struct dynbuf rcvbuf;
   struct dynbuf request_data;
   size_t nsent;
@@ -182,12 +179,9 @@ static void h1_tunnel_go_state(struct Curl_cfilter *cf,
     data->info.httpcode = 0; /* clear it as it might've been used for the
                                 proxy */
     /* If a proxy-authorization header was used for the proxy, then we should
-       make sure that it isn't accidentally used for the document request
-       after we've connected. So let's free and clear it here. */
+       make sure that it is not accidentally used for the document request
+       after we have connected. So let's free and clear it here. */
     Curl_safefree(data->state.aptr.proxyuserpwd);
-#ifdef USE_HYPER
-    data->state.hconnect = FALSE;
-#endif
     break;
   }
 }
@@ -210,10 +204,9 @@ static void tunnel_free(struct Curl_cfilter *cf,
 
 static bool tunnel_want_send(struct h1_tunnel_state *ts)
 {
-  return (ts->tunnel_state == H1_TUNNEL_CONNECT);
+  return ts->tunnel_state == H1_TUNNEL_CONNECT;
 }
 
-#ifndef USE_HYPER
 static CURLcode start_CONNECT(struct Curl_cfilter *cf,
                               struct Curl_easy *data,
                               struct h1_tunnel_state *ts)
@@ -222,8 +215,8 @@ static CURLcode start_CONNECT(struct Curl_cfilter *cf,
   int http_minor;
   CURLcode result;
 
-    /* This only happens if we've looped here due to authentication
-       reasons, and we don't really use the newly cloned URL here
+    /* This only happens if we have looped here due to authentication
+       reasons, and we do not really use the newly cloned URL here
        then. Just free() it. */
   Curl_safefree(data->req.newurl);
 
@@ -267,7 +260,7 @@ static CURLcode send_CONNECT(struct Curl_cfilter *cf,
   blen -= ts->nsent;
   buf += ts->nsent;
 
-  nwritten = cf->next->cft->do_send(cf->next, data, buf, blen, &result);
+  nwritten = cf->next->cft->do_send(cf->next, data, buf, blen, FALSE, &result);
   if(nwritten < 0) {
     if(result == CURLE_AGAIN) {
       result = CURLE_OK;
@@ -300,7 +293,7 @@ static CURLcode on_resp_header(struct Curl_cfilter *cf,
      (checkprefix("Proxy-authenticate:", header) &&
       (407 == k->httpcode))) {
 
-    bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
+    bool proxy = (k->httpcode == 407);
     char *auth = Curl_copy_header_value(header);
     if(!auth)
       return CURLE_OUT_OF_MEMORY;
@@ -322,8 +315,11 @@ static CURLcode on_resp_header(struct Curl_cfilter *cf,
             k->httpcode);
     }
     else {
-      (void)curlx_strtoofft(header + strlen("Content-Length:"),
-                            NULL, 10, &ts->cl);
+      const char *p = header + strlen("Content-Length:");
+      if(Curl_str_numblanks(&p, &ts->cl)) {
+        failf(data, "Unsupported Content-Length value");
+        return CURLE_WEIRD_SERVER_REPLY;
+      }
     }
   }
   else if(Curl_compareheader(header,
@@ -422,7 +418,7 @@ static CURLcode recv_CONNECT_resp(struct Curl_cfilter *cf,
 
       if(ts->cl) {
         /* A Content-Length based body: simply count down the counter
-           and make sure to break out of the loop when we're done! */
+           and make sure to break out of the loop when we are done! */
         ts->cl--;
         if(ts->cl <= 0) {
           ts->keepon = KEEPON_DONE;
@@ -440,7 +436,7 @@ static CURLcode recv_CONNECT_resp(struct Curl_cfilter *cf,
         if(result)
           return result;
         if(Curl_httpchunk_is_done(data, &ts->ch)) {
-          /* we're done reading chunks! */
+          /* we are done reading chunks! */
           infof(data, "chunk reading DONE");
           ts->keepon = KEEPON_DONE;
         }
@@ -475,7 +471,7 @@ static CURLcode recv_CONNECT_resp(struct Curl_cfilter *cf,
     if(result)
       return result;
 
-    /* Newlines are CRLF, so the CR is ignored as the line isn't
+    /* Newlines are CRLF, so the CR is ignored as the line is not
        really terminated until the LF comes. Treat a following CR
        as end-of-headers as well.*/
 
@@ -490,15 +486,14 @@ static CURLcode recv_CONNECT_resp(struct Curl_cfilter *cf,
         ts->keepon = KEEPON_IGNORE;
 
         if(ts->cl) {
-          infof(data, "Ignore %" CURL_FORMAT_CURL_OFF_T
-                " bytes of response-body", ts->cl);
+          infof(data, "Ignore %" FMT_OFF_T " bytes of response-body", ts->cl);
         }
         else if(ts->chunked_encoding) {
           infof(data, "Ignore chunked response-body");
         }
         else {
           /* without content-length or chunked encoding, we
-             can't keep the connection alive since the close is
+             cannot keep the connection alive since the close is
              the end signal so we bail out at once instead */
           CURL_TRC_CF(data, cf, "CONNECT: no content-length or chunked");
           ts->keepon = KEEPON_DONE;
@@ -518,7 +513,7 @@ static CURLcode recv_CONNECT_resp(struct Curl_cfilter *cf,
       return result;
 
     Curl_dyn_reset(&ts->rcvbuf);
-  } /* while there's buffer left and loop is requested */
+  } /* while there is buffer left and loop is requested */
 
   if(error)
     result = CURLE_RECV_ERROR;
@@ -530,337 +525,6 @@ static CURLcode recv_CONNECT_resp(struct Curl_cfilter *cf,
   }
   return result;
 }
-
-#else /* USE_HYPER */
-
-static CURLcode CONNECT_host(struct Curl_cfilter *cf,
-                             struct Curl_easy *data,
-                             char **pauthority,
-                             char **phost_header)
-{
-  const char *hostname;
-  int port;
-  bool ipv6_ip;
-  CURLcode result;
-  char *authority; /* for CONNECT, the destination host + port */
-  char *host_header = NULL; /* Host: authority */
-
-  result = Curl_http_proxy_get_destination(cf, &hostname, &port, &ipv6_ip);
-  if(result)
-    return result;
-
-  authority = aprintf("%s%s%s:%d", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
-                      port);
-  if(!authority)
-    return CURLE_OUT_OF_MEMORY;
-
-  /* If user is not overriding the Host header later */
-  if(!Curl_checkProxyheaders(data, cf->conn, STRCONST("Host"))) {
-    host_header = aprintf("Host: %s\r\n", authority);
-    if(!host_header) {
-      free(authority);
-      return CURLE_OUT_OF_MEMORY;
-    }
-  }
-  *pauthority = authority;
-  *phost_header = host_header;
-  return CURLE_OK;
-}
-
-/* The Hyper version of CONNECT */
-static CURLcode start_CONNECT(struct Curl_cfilter *cf,
-                              struct Curl_easy *data,
-                              struct h1_tunnel_state *ts)
-{
-  struct connectdata *conn = cf->conn;
-  struct hyptransfer *h = &data->hyp;
-  curl_socket_t tunnelsocket = Curl_conn_cf_get_socket(cf, data);
-  hyper_io *io = NULL;
-  hyper_request *req = NULL;
-  hyper_headers *headers = NULL;
-  hyper_clientconn_options *options = NULL;
-  hyper_task *handshake = NULL;
-  hyper_task *task = NULL; /* for the handshake */
-  hyper_clientconn *client = NULL;
-  hyper_task *sendtask = NULL; /* for the send */
-  char *authority = NULL; /* for CONNECT */
-  char *host_header = NULL; /* Host: */
-  CURLcode result = CURLE_OUT_OF_MEMORY;
-  (void)ts;
-
-  io = hyper_io_new();
-  if(!io) {
-    failf(data, "Couldn't create hyper IO");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  /* tell Hyper how to read/write network data */
-  h->io_ctx.data = data;
-  h->io_ctx.sockindex = cf->sockindex;
-  hyper_io_set_userdata(io, &h->io_ctx);
-  hyper_io_set_read(io, Curl_hyper_recv);
-  hyper_io_set_write(io, Curl_hyper_send);
-  conn->sockfd = tunnelsocket;
-
-  data->state.hconnect = TRUE;
-
-  /* create an executor to poll futures */
-  if(!h->exec) {
-    h->exec = hyper_executor_new();
-    if(!h->exec) {
-      failf(data, "Couldn't create hyper executor");
-      result = CURLE_OUT_OF_MEMORY;
-      goto error;
-    }
-  }
-
-  options = hyper_clientconn_options_new();
-  if(!options) {
-    failf(data, "Couldn't create hyper client options");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  hyper_clientconn_options_set_preserve_header_case(options, 1);
-  hyper_clientconn_options_set_preserve_header_order(options, 1);
-
-  hyper_clientconn_options_exec(options, h->exec);
-
-  /* "Both the `io` and the `options` are consumed in this function
-     call" */
-  handshake = hyper_clientconn_handshake(io, options);
-  if(!handshake) {
-    failf(data, "Couldn't create hyper client handshake");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  io = NULL;
-  options = NULL;
-
-  if(HYPERE_OK != hyper_executor_push(h->exec, handshake)) {
-    failf(data, "Couldn't hyper_executor_push the handshake");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  handshake = NULL; /* ownership passed on */
-
-  task = hyper_executor_poll(h->exec);
-  if(!task) {
-    failf(data, "Couldn't hyper_executor_poll the handshake");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-
-  client = hyper_task_value(task);
-  hyper_task_free(task);
-
-  req = hyper_request_new();
-  if(!req) {
-    failf(data, "Couldn't hyper_request_new");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  if(hyper_request_set_method(req, (uint8_t *)"CONNECT",
-                              strlen("CONNECT"))) {
-    failf(data, "error setting method");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-
-    /* This only happens if we've looped here due to authentication
-       reasons, and we don't really use the newly cloned URL here
-       then. Just free() it. */
-  Curl_safefree(data->req.newurl);
-
-  result = CONNECT_host(cf, data, &authority, &host_header);
-  if(result)
-    goto error;
-
-  infof(data, "Establish HTTP proxy tunnel to %s", authority);
-
-  if(hyper_request_set_uri(req, (uint8_t *)authority,
-                           strlen(authority))) {
-    failf(data, "error setting path");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  if(data->set.verbose) {
-    char *se = aprintf("CONNECT %s HTTP/1.1\r\n", authority);
-    if(!se) {
-      result = CURLE_OUT_OF_MEMORY;
-      goto error;
-    }
-    Curl_debug(data, CURLINFO_HEADER_OUT, se, strlen(se));
-    free(se);
-  }
-  /* Setup the proxy-authorization header, if any */
-  result = Curl_http_output_auth(data, conn, "CONNECT", HTTPREQ_GET,
-                                 authority, TRUE);
-  if(result)
-    goto error;
-  Curl_safefree(authority);
-
-  /* default is 1.1 */
-  if((conn->http_proxy.proxytype == CURLPROXY_HTTP_1_0) &&
-     (HYPERE_OK != hyper_request_set_version(req,
-                                             HYPER_HTTP_VERSION_1_0))) {
-    failf(data, "error setting HTTP version");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-
-  headers = hyper_request_headers(req);
-  if(!headers) {
-    failf(data, "hyper_request_headers");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  if(host_header) {
-    result = Curl_hyper_header(data, headers, host_header);
-    if(result)
-      goto error;
-    Curl_safefree(host_header);
-  }
-
-  if(data->state.aptr.proxyuserpwd) {
-    result = Curl_hyper_header(data, headers,
-                               data->state.aptr.proxyuserpwd);
-    if(result)
-      goto error;
-  }
-
-  if(!Curl_checkProxyheaders(data, conn, STRCONST("User-Agent")) &&
-     data->set.str[STRING_USERAGENT] && *data->set.str[STRING_USERAGENT]) {
-    struct dynbuf ua;
-    Curl_dyn_init(&ua, DYN_HTTP_REQUEST);
-    result = Curl_dyn_addf(&ua, "User-Agent: %s\r\n",
-                           data->set.str[STRING_USERAGENT]);
-    if(result)
-      goto error;
-    result = Curl_hyper_header(data, headers, Curl_dyn_ptr(&ua));
-    if(result)
-      goto error;
-    Curl_dyn_free(&ua);
-  }
-
-  if(!Curl_checkProxyheaders(data, conn, STRCONST("Proxy-Connection"))) {
-    result = Curl_hyper_header(data, headers,
-                               "Proxy-Connection: Keep-Alive");
-    if(result)
-      goto error;
-  }
-
-  result = Curl_add_custom_headers(data, TRUE, headers);
-  if(result)
-    goto error;
-
-  result = Curl_creader_set_null(data);
-  if(result)
-    goto error;
-
-  sendtask = hyper_clientconn_send(client, req);
-  if(!sendtask) {
-    failf(data, "hyper_clientconn_send");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  req = NULL;
-
-  if(HYPERE_OK != hyper_executor_push(h->exec, sendtask)) {
-    failf(data, "Couldn't hyper_executor_push the send");
-    result = CURLE_OUT_OF_MEMORY;
-    goto error;
-  }
-  sendtask = NULL; /* ownership passed on */
-
-  hyper_clientconn_free(client);
-  client = NULL;
-
-error:
-  free(host_header);
-  free(authority);
-  if(io)
-    hyper_io_free(io);
-  if(options)
-    hyper_clientconn_options_free(options);
-  if(handshake)
-    hyper_task_free(handshake);
-  if(client)
-    hyper_clientconn_free(client);
-  if(req)
-    hyper_request_free(req);
-
-  return result;
-}
-
-static CURLcode send_CONNECT(struct Curl_cfilter *cf,
-                             struct Curl_easy *data,
-                             struct h1_tunnel_state *ts,
-                             bool *done)
-{
-  struct hyptransfer *h = &data->hyp;
-  struct connectdata *conn = cf->conn;
-  hyper_task *task = NULL;
-  hyper_error *hypererr = NULL;
-  CURLcode result = CURLE_OK;
-
-  (void)ts;
-  (void)conn;
-  do {
-    task = hyper_executor_poll(h->exec);
-    if(task) {
-      bool error = hyper_task_type(task) == HYPER_TASK_ERROR;
-      if(error)
-        hypererr = hyper_task_value(task);
-      hyper_task_free(task);
-      if(error) {
-        /* this could probably use a better error code? */
-        result = CURLE_OUT_OF_MEMORY;
-        goto error;
-      }
-    }
-  } while(task);
-error:
-  *done = (result == CURLE_OK);
-  if(hypererr) {
-    uint8_t errbuf[256];
-    size_t errlen = hyper_error_print(hypererr, errbuf, sizeof(errbuf));
-    failf(data, "Hyper: %.*s", (int)errlen, errbuf);
-    hyper_error_free(hypererr);
-  }
-  return result;
-}
-
-static CURLcode recv_CONNECT_resp(struct Curl_cfilter *cf,
-                                  struct Curl_easy *data,
-                                  struct h1_tunnel_state *ts,
-                                  bool *done)
-{
-  struct hyptransfer *h = &data->hyp;
-  CURLcode result;
-  int didwhat;
-
-  (void)ts;
-  result = Curl_hyper_stream(data, cf->conn, &didwhat,
-                             CURL_CSELECT_IN | CURL_CSELECT_OUT);
-  *done = data->req.done;
-  if(result || !*done)
-    return result;
-  if(h->exec) {
-    hyper_executor_free(h->exec);
-    h->exec = NULL;
-  }
-  if(h->read_waker) {
-    hyper_waker_free(h->read_waker);
-    h->read_waker = NULL;
-  }
-  if(h->write_waker) {
-    hyper_waker_free(h->write_waker);
-    h->write_waker = NULL;
-  }
-  return result;
-}
-
-#endif /* USE_HYPER */
 
 static CURLcode H1_CONNECT(struct Curl_cfilter *cf,
                            struct Curl_easy *data,
@@ -937,7 +601,7 @@ static CURLcode H1_CONNECT(struct Curl_cfilter *cf,
           infof(data, "Connect me again please");
           Curl_conn_cf_close(cf, data);
           connkeep(conn, "HTTP proxy CONNECT");
-          result = Curl_conn_cf_connect(cf->next, data, FALSE, &done);
+          result = Curl_conn_cf_connect(cf->next, data, &done);
           goto out;
         }
         else {
@@ -955,7 +619,7 @@ static CURLcode H1_CONNECT(struct Curl_cfilter *cf,
 
   DEBUGASSERT(ts->tunnel_state == H1_TUNNEL_RESPONSE);
   if(data->info.httpproxycode/100 != 2) {
-    /* a non-2xx response and we have no next url to try. */
+    /* a non-2xx response and we have no next URL to try. */
     Curl_safefree(data->req.newurl);
     /* failure, close this connection to avoid reuse */
     streamclose(conn, "proxy CONNECT failure");
@@ -977,7 +641,7 @@ out:
 
 static CURLcode cf_h1_proxy_connect(struct Curl_cfilter *cf,
                                     struct Curl_easy *data,
-                                    bool blocking, bool *done)
+                                    bool *done)
 {
   CURLcode result;
   struct h1_tunnel_state *ts = cf->ctx;
@@ -988,7 +652,7 @@ static CURLcode cf_h1_proxy_connect(struct Curl_cfilter *cf,
   }
 
   CURL_TRC_CF(data, cf, "connect");
-  result = cf->next->cft->do_connect(cf->next, data, blocking, done);
+  result = cf->next->cft->do_connect(cf->next, data, done);
   if(result || !*done)
     return result;
 
@@ -1000,7 +664,6 @@ static CURLcode cf_h1_proxy_connect(struct Curl_cfilter *cf,
     cf->ctx = ts;
   }
 
-  /* TODO: can we do blocking? */
   /* We want "seamless" operations through HTTP proxy tunnel */
 
   result = H1_CONNECT(cf, data, ts);
@@ -1034,9 +697,9 @@ static void cf_h1_proxy_adjust_pollset(struct Curl_cfilter *cf,
      * and not waiting on something, we are tunneling. */
     curl_socket_t sock = Curl_conn_cf_get_socket(cf, data);
     if(ts) {
-      /* when we've sent a CONNECT to a proxy, we should rather either
+      /* when we have sent a CONNECT to a proxy, we should rather either
          wait for the socket to become readable to be able to get the
-         response headers or if we're still sending the request, wait
+         response headers or if we are still sending the request, wait
          for write. */
       if(tunnel_want_send(ts))
         Curl_pollset_set_out_only(data, ps, sock);
@@ -1077,6 +740,7 @@ struct Curl_cftype Curl_cft_h1_proxy = {
   cf_h1_proxy_destroy,
   cf_h1_proxy_connect,
   cf_h1_proxy_close,
+  Curl_cf_def_shutdown,
   Curl_cf_http_proxy_get_host,
   cf_h1_proxy_adjust_pollset,
   Curl_cf_def_data_pending,

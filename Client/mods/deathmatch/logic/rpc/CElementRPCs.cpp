@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CElementRPCs.cpp
  *  PURPOSE:     Element remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -49,6 +49,7 @@ void CElementRPCs::LoadFunctions()
     AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetWeaponConfig, "setWeaponFlags");
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
     AddHandler(SET_COLPOLYGON_HEIGHT, SetColPolygonHeight, "setColShapePolygonHeight");
+    AddHandler(SET_ELEMENT_ON_FIRE, SetElementOnFire, "setElementOnFire");
 }
 
 #define RUN_CHILDREN_SERVER(func) \
@@ -758,4 +759,9 @@ void CElementRPCs::SetColPolygonHeight(CClientEntity* pSource, NetBitStreamInter
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pSource);
         pColPolygon->SetHeight(fFloor, fCeil);
     }
+}
+
+void CElementRPCs::SetElementOnFire(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    pSource->SetOnFire(bitStream.ReadBit());
 }

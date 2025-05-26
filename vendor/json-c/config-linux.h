@@ -137,6 +137,9 @@
 /* Define to 1 if you have the `uselocale' function. */
 #define HAVE_USELOCALE
 
+/* Define to 1 if you have the `duplocale' function. */
+#define HAVE_DUPLOCALE
+
 /* Define to 1 if you have the `vasprintf' function. */
 #define HAVE_VASPRINTF
 

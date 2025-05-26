@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaEffectDefs.cpp
  *  PURPOSE:     Lua definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -643,7 +643,7 @@ int CLuaEffectDefs::SetEffectDensity(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaEffectDefs::FxCreateParticle(eFxParticleSystems eParticleSystem, CVector vecPosition, CVector vecDirection, float fR, float fG, float fB, float fA, std::optional<bool> bRandomizeColors, std::optional<std::uint32_t> iCount, std::optional<float> fBrightness, std::optional<float> fSize, std::optional<bool> bRandomizeSizes, std::optional<float> fLife)
+bool CLuaEffectDefs::FxCreateParticle(FxParticleSystems eParticleSystem, CVector vecPosition, CVector vecDirection, float fR, float fG, float fB, float fA, std::optional<bool> bRandomizeColors, std::optional<std::uint32_t> iCount, std::optional<float> fBrightness, std::optional<float> fSize, std::optional<bool> bRandomizeSizes, std::optional<float> fLife)
 {
     return CStaticFunctionDefinitions::FxCreateParticle(eParticleSystem, vecPosition, vecDirection, fR/255, fG/255, fB/255, fA/255, bRandomizeColors.value_or(false), iCount.value_or(1), fBrightness.value_or(1.0f), fSize.value_or(0.3f), bRandomizeSizes.value_or(false), fLife.value_or(1.0f));
 }

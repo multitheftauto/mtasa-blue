@@ -763,10 +763,10 @@
       case ft_frame_bytes:  /* read a byte sequence */
       case ft_frame_skip:   /* skip some bytes      */
         {
-          FT_UInt  len = fields->size;
+          FT_Offset  len = fields->size;
 
 
-          if ( cursor + len > stream->limit )
+          if ( len > (FT_Offset)( stream->limit - cursor ) )
           {
             error = FT_THROW( Invalid_Stream_Operation );
             goto Exit;

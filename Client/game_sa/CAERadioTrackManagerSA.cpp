@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAERadioTrackManagerSA.cpp
  *  PURPOSE:     Audio entity radio track manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -106,4 +106,10 @@ void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
         push    dwStationID
         call    dwFunc
     }
+}
+
+bool CAERadioTrackManagerSA::IsStationLoading() const
+{
+    CAERadioTrackManagerSAInterface* trackInterface = GetInterface();
+    return (trackInterface->stationsListed || trackInterface->stationsListDown);
 }

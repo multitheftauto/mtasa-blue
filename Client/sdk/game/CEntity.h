@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CEntity.h
  *  PURPOSE:     Base entity interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -117,4 +117,7 @@ public:
     virtual bool SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w) = 0;
     virtual bool GetBonePosition(eBone boneId, CVector& position) = 0;
     virtual bool SetBonePosition(eBone boneId, const CVector& position) = 0;
+
+    virtual bool IsOnFire() = 0;
+    virtual bool SetOnFire(bool onFire) = 0;
 };

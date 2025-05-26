@@ -586,7 +586,7 @@ void CWebView::Refresh(bool bIgnoreCache)
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefClient::OnProcessMessageReceived            //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefClient.html#OnProcessMessageReceived(CefRefPtr%3CCefBrowser%3E,CefProcessId,CefRefPtr%3CCefProcessMessage%3E)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefClient.html#OnProcessMessageReceived(CefRefPtr%3CCefBrowser%3E,CefProcessId,CefRefPtr%3CCefProcessMessage%3E)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -636,7 +636,7 @@ bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRenderHandler::GetViewRect                  //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#GetViewRect(CefRefPtr%3CCefBrowser%3E,CefRect&) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#GetViewRect(CefRefPtr%3CCefBrowser%3E,CefRect&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
@@ -658,7 +658,7 @@ void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRenderHandler::OnPopupShow                  //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPopupShow(CefRefPtr<CefBrowser>,bool) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPopupShow(CefRefPtr<CefBrowser>,bool) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
@@ -674,7 +674,7 @@ void CWebView::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRenderHandler::OnPopupSize                  //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPopupSize(CefRefPtr<CefBrowser>,constCefRect&) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPopupSize(CefRefPtr<CefBrowser>,constCefRect&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
@@ -691,7 +691,7 @@ void CWebView::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRenderHandler::OnPaint                      //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPaint(CefRefPtr%3CCefBrowser%3E,PaintElementType,constRectList&,constvoid*,int,int)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPaint(CefRefPtr%3CCefBrowser%3E,PaintElementType,constRectList&,constvoid*,int,int)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -729,7 +729,7 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefLoadHandler::OnLoadStart                    //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadStart(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadStart(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transitionType)
@@ -746,7 +746,7 @@ void CWebView::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefLoadHandler::OnLoadEnd                      //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadEnd(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,int) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadEnd(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,int) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode)
@@ -767,7 +767,7 @@ void CWebView::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fram
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefLoadHandler::OnLoadError                    //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadError(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,ErrorCode,constCefString&,constCefString&)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadError(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,ErrorCode,constCefString&,constCefString&)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -784,7 +784,7 @@ void CWebView::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRequestHandler::OnBeforeBrowe               //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeBrowse(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E,bool)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeBrowse(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E,bool)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -834,7 +834,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRequestHandler::OnBeforeResourceLoad        //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeResourceLoad(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeResourceLoad(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -914,7 +914,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefLifeSpanHandler::OnBeforeClose              //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforeClose(CefRefPtr%3CCefBrowser%3E) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforeClose(CefRefPtr%3CCefBrowser%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
@@ -932,14 +932,14 @@ void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefLifeSpanHandler::OnBeforePopup              //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforePopup(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,constCefString&,constCefString&,constCefPopupFeatures&,CefWindowInfo&,CefRefPtr%3CCefClient%3E&,CefBrowserSettings&,bool*)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforePopup(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,constCefString&,constCefString&,constCefPopupFeatures&,CefWindowInfo&,CefRefPtr%3CCefClient%3E&,CefBrowserSettings&,bool*)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name,
-                             CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures,
-                             CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, CefRefPtr<CefDictionaryValue>& extra_info,
-                             bool* no_javascript_access)
+bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int popup_id, const CefString& target_url,
+                             const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture,
+                             const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings,
+                             CefRefPtr<CefDictionaryValue>& extra_info, bool* no_javascript_access)
 {
     // ATTENTION: This method is called on the IO thread
 
@@ -958,7 +958,7 @@ bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefLifeSpanHandler::OnAfterCreated             //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnAfterCreated(CefRefPtr<CefBrowser>) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnAfterCreated(CefRefPtr<CefBrowser>) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
@@ -974,7 +974,7 @@ void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefJSDialogHandler::OnJSDialog                 //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefJSDialogHandler.html#OnJSDialog(CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,JSDialogType,constCefString&,constCefString&,CefRefPtr%3CCefJSDialogCallback%3E,bool&)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefJSDialogHandler.html#OnJSDialog(CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,JSDialogType,constCefString&,constCefString&,CefRefPtr%3CCefJSDialogCallback%3E,bool&)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -992,7 +992,7 @@ bool CWebView::OnJSDialog(CefRefPtr<CefBrowser> browser, const CefString& origin
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefDialogHandler::OnFileDialog                 //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDialogHandler.html#OnFileDialog(CefRefPtr%3CCefBrowser%3E,FileDialogMode,constCefString&,constCefString&,conststd::vector%3CCefString%3E&,CefRefPtr%3CCefFileDialogCallback%3E)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefDialogHandler.html#OnFileDialog(CefRefPtr%3CCefBrowser%3E,FileDialogMode,constCefString&,constCefString&,conststd::vector%3CCefString%3E&,CefRefPtr%3CCefFileDialogCallback%3E)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -1007,7 +1007,7 @@ bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, FileDialogMode mode, 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefDisplayHandler::OnTitleChange               //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDisplayHandler.html#OnTitleChange(CefRefPtr%3CCefBrowser%3E,constCefString&) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefDisplayHandler.html#OnTitleChange(CefRefPtr%3CCefBrowser%3E,constCefString&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
@@ -1018,7 +1018,7 @@ void CWebView::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& tit
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefDisplayHandler::OnTooltip                   //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDisplayHandler.html#OnTooltip(CefRefPtr%3CCefBrowser%3E,CefString&) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefDisplayHandler.html#OnTooltip(CefRefPtr%3CCefBrowser%3E,CefString&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& title)
@@ -1033,7 +1033,7 @@ bool CWebView::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& title)
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefDisplayHandler::OnConsoleMessage            //
-// http://magpcss.org/ceforum/apidocs/projects/%28default%29/CefDisplayHandler.html#OnConsoleMessage%28CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,int%29
+// https://magpcss.org/ceforum/apidocs/projects/%28default%29/CefDisplayHandler.html#OnConsoleMessage%28CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,int%29
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -1055,7 +1055,7 @@ bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefDisplayHandler::OnCursorChange              //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, cef_cursor_type_t type, const CefCursorInfo& cursorInfo)
@@ -1073,7 +1073,7 @@ bool CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cur
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefContextMenuHandler::OnBeforeContextMenu     //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefContextMenuHandler.html#OnBeforeContextMenu(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefContextMenuParams%3E,CefRefPtr%3CCefMenuModel%3E)
+// https://magpcss.org/ceforum/apidocs3/projects/(default)/CefContextMenuHandler.html#OnBeforeContextMenu(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefContextMenuParams%3E,CefRefPtr%3CCefMenuModel%3E)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////

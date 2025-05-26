@@ -107,6 +107,7 @@ typedef spx_word32_t spx_sig_t;
 #define SIG_SHIFT    14
 #define GAIN_SHIFT   6
 
+#define EPSILON 1
 #define VERY_SMALL 0
 #define VERY_LARGE32 ((spx_word32_t)2147483647)
 #define VERY_LARGE16 ((spx_word16_t)32767)
@@ -148,6 +149,7 @@ typedef float spx_word32_t;
 #define GAIN_SCALING_1 1.f
 
 
+#define EPSILON 1e-15f
 #define VERY_SMALL 1e-15f
 #define VERY_LARGE32 1e15f
 #define VERY_LARGE16 1e15f
@@ -183,16 +185,13 @@ typedef float spx_word32_t;
 #define MULT16_16(a,b)     ((spx_word32_t)(a)*(spx_word32_t)(b))
 #define MAC16_16(c,a,b)     ((c)+(spx_word32_t)(a)*(spx_word32_t)(b))
 
-#define MULT16_32_Q11(a,b)     ((a)*(b))
 #define MULT16_32_Q13(a,b)     ((a)*(b))
 #define MULT16_32_Q14(a,b)     ((a)*(b))
 #define MULT16_32_Q15(a,b)     ((a)*(b))
 #define MULT16_32_P15(a,b)     ((a)*(b))
 
-#define MAC16_32_Q11(c,a,b)     ((c)+(a)*(b))
 #define MAC16_32_Q15(c,a,b)     ((c)+(a)*(b))
 
-#define MAC16_16_Q11(c,a,b)     ((c)+(a)*(b))
 #define MAC16_16_Q13(c,a,b)     ((c)+(a)*(b))
 #define MAC16_16_P13(c,a,b)     ((c)+(a)*(b))
 #define MULT16_16_Q11_32(a,b)     ((a)*(b))

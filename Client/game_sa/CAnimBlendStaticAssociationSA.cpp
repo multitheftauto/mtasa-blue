@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAnimBlendStaticAssociationSA.cpp
  *  PURPOSE:     Animation blend static association
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

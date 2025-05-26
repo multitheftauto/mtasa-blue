@@ -32,18 +32,10 @@ static const char* const kGateWayAnimationName = "run_wuzi";
 
 CAnimManagerSA::CAnimManagerSA()
 {
-    MemSetFast(m_pAnimAssocGroups, 0, sizeof(m_pAnimAssocGroups));
-    MemSetFast(m_pAnimBlocks, 0, sizeof(m_pAnimBlocks));
 }
 
 CAnimManagerSA::~CAnimManagerSA()
 {
-    for (unsigned int i = 0; i < MAX_ANIM_GROUPS; i++)
-        if (m_pAnimAssocGroups[i])
-            delete m_pAnimAssocGroups[i];
-    for (unsigned int i = 0; i < MAX_ANIM_BLOCKS; i++)
-        if (m_pAnimBlocks[i])
-            delete m_pAnimBlocks[i];
 }
 
 void CAnimManagerSA::Initialize()
@@ -882,12 +874,18 @@ const char* CAnimManagerSA::GetGateWayAnimationName() const
 
 bool CAnimManagerSA::IsValidGroup(std::uint32_t uiAnimGroup) const
 {
+    if ((eAnimGroup)uiAnimGroup <= eAnimGroup::ANIM_GROUP_NONE || (eAnimGroup)uiAnimGroup >= eAnimGroup::ANIM_TOTAL_GROUPS)
+        return false;
+
     const auto pGroup = GetAnimBlendAssoc(uiAnimGroup);
     return pGroup && pGroup->IsCreated();
 }
 
 bool CAnimManagerSA::IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) const
 {
+    if ((eAnimID)uiAnimID <= eAnimID::ANIM_ID_UNDEFINED || (eAnimID)uiAnimID >= eAnimID::ANIM_ID_MAX)
+        return false;
+
     // We get an animation for the checks
     const auto pAnim = GetAnimStaticAssociation((eAnimGroup)uiAnimGroup, (eAnimID)uiAnimID);
     if (!pAnim)

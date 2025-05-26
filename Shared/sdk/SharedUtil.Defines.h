@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Defines.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -166,9 +166,11 @@
 #define ZERO_POD_STRUCT(ptr) \
         memset ( ptr, 0, sizeof(*(ptr)) )
 
+#define BYTE_MASK(n) ((1 << (n)) - 1)
+
 // printf/wprintf helpers
 //
-// http://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm
+// https://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm
 //
 // In VC++, you can use "%s" in the format string of swprintf (or wprintf, fwprintf) to insert a wide string.
 // But in POSIX you have to use "%ls". This may be compiler dependent rather than operating system dependent.
