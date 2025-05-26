@@ -5,7 +5,7 @@
  *  FILE:        core/CModManagerImpl.cpp
  *  PURPOSE:     Mod manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -130,7 +130,6 @@ void CModManagerImpl::Unload(bool bKeyPressBeforeTerm)
                 Print("Press Q to shut down the server!\n");
                 WaitForKey('q');
             }
-            TerminateProcess(GetCurrentProcess(), GetExitCode());
         }
 #endif
         // Unload the library

@@ -262,6 +262,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::TUNNELWEATHERBLEND] = true;
     m_WorldSpecialProps[WorldSpecialProperty::IGNOREFIRESTATE] = false;
     m_WorldSpecialProps[WorldSpecialProperty::FLYINGCOMPONENTS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLEBURNEXPLOSIONS] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -1029,14 +1030,14 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         {
             CLogger::LogPrintf(
                 "Authorized serial account protection is enabled for the ACL group(s): `%s`  See http:"
-                "//mtasa.com/authserial\n",
+                "//multitheftauto.com/authserial\n",
                 *SString::Join(",", m_pMainConfig->GetAuthSerialGroupList()));
         }
         else
         {
             CLogger::LogPrint(
                 "Authorized serial account protection is DISABLED. See http:"
-                "//mtasa.com/authserial\n");
+                "//multitheftauto.com/authserial\n");
         }
 
         // Owner email address
@@ -1644,7 +1645,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerTriggerInvalidEvent", "eventName, isAdded, isRemote", nullptr, false);
     m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
     m_Events.AddEvent("onPlayerChangesWorldSpecialProperty", "property, enabled", nullptr, false);
-    m_Events.AddEvent("onPlayerTeleport", "", nullptr, false);
+    m_Events.AddEvent("onPlayerTeleport", "previousX, previousY, previousZ, currentX, currentY, currentZ", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -4520,6 +4521,9 @@ void CGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND, true);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE, false);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS, true);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, true);
     }
 
     // Reset all weather stuff like heat haze, wind velocity etc

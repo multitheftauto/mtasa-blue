@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/Utils.cpp
  *  PURPOSE:     Miscellaneous utility functions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -124,7 +124,7 @@ void RaiseFatalError(unsigned int uiCode)
 #endif
 
     // Populate the message and show the box
-    SString strBuffer(_("Fatal error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);
+    SString strBuffer(_("Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."), uiCode);
     SString strTroubleLink(SString("fatal-error&code=%d", uiCode));
     g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CD62"), strBuffer, strTroubleLink);
 
@@ -140,7 +140,7 @@ void RaiseProtocolError(unsigned int uiCode)
     // #endif
 
     // Populate the message and show the box
-    SString strBuffer(_("Protocol error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);
+    SString strBuffer(_("Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."), uiCode);
     SString strTroubleLink(SString("protocol-error&code=%d", uiCode));
     g_pCore->ShowErrorMessageBox(_("Connection error") + _E("CD63"), strBuffer, strTroubleLink);            // Protocol error
 

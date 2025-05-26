@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCarEnterExitSA.cpp
  *  PURPOSE:     Car enter and exit handler
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

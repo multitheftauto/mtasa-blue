@@ -5,11 +5,12 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA_ClothesSpeedUp.cpp
  *  PORPOISE:    Reduce stutter when changing clothes for a CJ ped
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../Client/game_sa/CDirectorySA.h"
 
 DWORD FUNC_CStreamingInfoAddToList = 0x407480;
 DWORD FUNC_CStreamingConvertBufferToObject = 0x40C6B0;
@@ -52,49 +53,6 @@ void CMultiplayerSA::SetFastClothesLoading(EFastClothesLoading fastClothesLoadin
         ms_PlayerImgCachePtr = &m_PlayerImgCache[0];
     else
         ms_PlayerImgCachePtr = NULL;
-}
-
-//
-// Skip loading the directory data from player.img if it has already been loaded.
-// Speeds up clothes a bit, but is only part of a solution - The actual files from inside player.img are still loaded each time
-//
-bool _cdecl IsPlayerImgDirLoaded()
-{
-    // When player.img dir is loaded, it looks this this:
-    // 0x00BC12C0  00bbcdc8 00000226
-    DWORD* ptr1 = (DWORD*)0x00BC12C0;
-    if (ptr1[0] == 0x00BBCDC8 && ptr1[1] == 0x0000226)
-    {
-        return true;
-    }
-    return false;
-}
-
-// Hook info
-#define HOOKPOS_LoadingPlayerImgDir                     0x5A69E3
-#define HOOKSIZE_LoadingPlayerImgDir                    5
-DWORD RETURN_LoadingPlayerImgDirA = 0x5A69E8;
-DWORD RETURN_LoadingPlayerImgDirB = 0x5A6A06;
-void _declspec(naked) HOOK_LoadingPlayerImgDir()
-{
-    // hook from 005A69E3 5 bytes
-    _asm
-    {
-        pushad
-        call    IsPlayerImgDirLoaded
-        cmp     al, 0
-        jnz     skip
-        popad
-
-        // Standard code to load img directory
-        push    0BBCDC8h
-        jmp     RETURN_LoadingPlayerImgDirA
-
-        // Skip loading img directory
-skip:
-        popad
-        jmp     RETURN_LoadingPlayerImgDirB
-    }
 }
 
 ////////////////////////////////////////////////
@@ -252,6 +210,75 @@ skip:
     }
 }
 
+//
+// Skip loading the directory data from player.img if it has already been loaded.
+// Speeds up clothes a bit, but is only part of a solution - The actual files from inside player.img are still loaded each time
+//
+
+static std::uint32_t g_playerImgEntries = 0xBBCDC8;
+static std::uint16_t g_playerImgSize = 0x226;
+
+bool IsPlayerImgDirLoaded()
+{
+    // When player.img dir is loaded, it looks this this:
+    // 0x00BC12C0  00bbcdc8 00000226
+    DWORD* ptr1 = (DWORD*)0xBC12C0;
+
+    return ptr1[0] == g_playerImgEntries && ptr1[1] == g_playerImgSize;
+}
+
+// Hook info
+#define HOOKSIZE_LoadingPlayerImgDir 5
+#define HOOKPOS_LoadingPlayerImgDir  0x5A69E3                               // 005A69D6 -> CClothesBuilder::CreateSkinnedClump -> playerImgEntries
+static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirA = 0x5A69E8;     // push 00000226 { 550 }
+static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;     // return of CreateSkinnedClump function
+
+void _declspec(naked) HOOK_LoadingPlayerImgDir()
+{
+    // hook from 005A69E3 5 bytes
+    _asm
+    {
+        pushad
+        call    IsPlayerImgDirLoaded
+        cmp     al, 0
+        jnz     skip
+        popad
+
+         // Standard code to load img directory
+        mov     eax, g_playerImgEntries
+        push    eax
+        jmp     RETURN_LoadingPlayerImgDirA
+
+         // Skip loading img directory
+skip:
+        popad
+        jmp     RETURN_LoadingPlayerImgDirB
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Setup clothing directory size
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool SetClothingDirectorySize(int directorySize)
+{
+    DirectoryInfoSA* clothesDirectory = new DirectoryInfoSA[directorySize];
+
+    if (!clothesDirectory)
+        return false;
+
+    // CClothesBuilder::LoadCdDirectory(void)
+    MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));      // push    offset _playerImgEntries; headers
+    MemPut<std::uint16_t>(0x5A4195 + 1, directorySize);                                     // push    550             ; count
+    MemPut<std::uint16_t>(0x5A69E8 + 1, directorySize);                                     // push    550             ; count
+
+    g_playerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
+    g_playerImgSize = directorySize;
+
+    return true;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for ClothesSpeedUp
@@ -259,6 +286,8 @@ skip:
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_ClothesSpeedUp()
 {
+    SetClothingDirectorySize(2050);
+
     EZHookInstall(CStreamingLoadRequestedModels);
     EZHookInstall(LoadingPlayerImgDir);
     EZHookInstall(CallCStreamingInfoAddToList);

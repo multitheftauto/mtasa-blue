@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CGame.h
  *  PURPOSE:     Server game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -106,6 +106,7 @@ class CWaterManager;
 class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
+class CVehicleSoundSettingsManager;
 
 class CCustomWeaponManager;
 class COpenPortsTester;

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPoolsSA.cpp
  *  PURPOSE:     Game entity pools
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,6 +24,8 @@
 #include "CTrailerSA.h"
 #include "CTrainSA.h"
 #include "CWorldSA.h"
+
+#include "enums/VehicleClass.h"
 
 extern CGameSA* pGame;
 
@@ -73,26 +75,28 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
 
 CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t model, std::uint8_t variation, std::uint8_t variation2) noexcept
 {
+    if (m_vehiclePool.ulCount >= MAX_VEHICLES)
+        return nullptr;
+
+    MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
+    MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
+
+    // CCarCtrl::CreateCarForScript
+    auto* pInterface = ((CVehicleSAInterface * (__cdecl*)(int, CVector, std::uint8_t)) FUNC_CCarCtrlCreateCarForScript)(model, CVector(), 0);
+    if (!pInterface)
+        return nullptr;
+
+    // Valid model?
+    if (!CModelInfoSA::IsVehicleModel(model))
+        return nullptr;
+
+    auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
+
+    std::unique_ptr<CVehicleSA> vehicle = nullptr;
+
+    // Failed construct
     try
     {
-        if (m_vehiclePool.ulCount >= MAX_VEHICLES)
-            return nullptr;
-
-        MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
-        MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
-
-        // CCarCtrl::CreateCarForScript
-        auto* pInterface = ((CVehicleSAInterface*(__cdecl*)(int, CVector, std::uint8_t))FUNC_CCarCtrlCreateCarForScript)(model, CVector(), 0);
-        if (!pInterface)
-            return nullptr;
-
-        // Valid model?
-        if (!CModelInfoSA::IsVehicleModel(model))
-            return nullptr;
-
-        auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
-
-        std::unique_ptr<CVehicleSA> vehicle = nullptr;
         switch (vehicleClass)
         {
             case VehicleClass::MONSTER_TRUCK:
@@ -126,21 +130,21 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
                 vehicle = std::make_unique<CAutomobileSA>(reinterpret_cast<CAutomobileSAInterface*>(pInterface));
                 break;
         }
-
-        if (!vehicle || !AddVehicleToPool(pClientVehicle, vehicle.get()))
-            return nullptr;
-
-        vehicle->m_ucVariant = variation;
-        vehicle->m_ucVariant2 = variation2;
-
-        vehicle->DumpVehicleFrames();
-
-        return vehicle.release();
     }
     catch (...)
     {
         return nullptr;
     }
+
+    if (!vehicle || !AddVehicleToPool(pClientVehicle, vehicle.get()))
+        return nullptr;
+
+    vehicle->m_ucVariant = variation;
+    vehicle->m_ucVariant2 = variation2;
+
+    vehicle->DumpVehicleFrames();
+
+    return vehicle.release();
 }
 
 void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
@@ -577,16 +581,10 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
 static void CreateMissionTrain(const CVector& vecPos, bool bDirection, std::uint32_t uiTrainType, CTrainSAInterface** ppTrainBeginning,
                                CTrainSAInterface** ppTrainEnd, int iNodeIndex, int iTrackId, bool bMissionTrain) noexcept
 {
-    try
-    {
-        auto createMissionTrain = reinterpret_cast<void(__cdecl*)(CVector, bool, std::uint32_t, CTrainSAInterface**, CTrainSAInterface**,
-                                                                  int, int, bool)>(FUNC_CTrain_CreateMissionTrain);
+    auto createMissionTrain = reinterpret_cast<void(__cdecl*)(CVector, bool, std::uint32_t, CTrainSAInterface**, CTrainSAInterface**,
+                                                              int, int, bool)>(FUNC_CTrain_CreateMissionTrain);
 
-        createMissionTrain(vecPos, bDirection, uiTrainType, ppTrainBeginning, ppTrainEnd, iNodeIndex, iTrackId, bMissionTrain);
-    }
-    catch (...)
-    {
-    }
+    createMissionTrain(vecPos, bDirection, uiTrainType, ppTrainBeginning, ppTrainEnd, iNodeIndex, iTrackId, bMissionTrain);
 }
 
 CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> models, bool bDirection,
@@ -900,8 +898,7 @@ int CPoolsSA::GetPoolCapacity(ePools pool)
             iPtr = 0x550F82;
             break;
         case POINTER_SINGLE_LINK_POOL:
-            iPtr = 0x550F46;
-            break;
+            return GetPtrNodeSingleLinkPool().GetCapacity();
         case ENV_MAP_MATERIAL_POOL:
             iPtr = 0x5DA08E;
             break;
@@ -1067,9 +1064,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
             dwThis = CLASS_CPtrNodeDoubleLinkPool;
             break;
         case POINTER_SINGLE_LINK_POOL:
-            dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPtrNodeSingleLinkPool;
-            break;
+            return GetPtrNodeSingleLinkPool().GetUsedSize();
         default:
             return -1;
     }

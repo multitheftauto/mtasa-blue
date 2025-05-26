@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskJumpFallSA.h
  *  PURPOSE:     Jump and fall game tasks
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -59,7 +59,7 @@ public:
 class CTaskSimpleJetPackSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    unsigned char m_bIsFinished;
+    bool          m_bIsFinished;
     unsigned char m_bAddedIdleAnim;
     unsigned char m_bAnimsReferenced;
     unsigned char m_bAttackButtonPressed;
@@ -100,4 +100,6 @@ class CTaskSimpleJetPackSA : public virtual CTaskSimpleSA, public virtual CTaskS
 public:
     CTaskSimpleJetPackSA(){};
     CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float fCruiseHeight = 10.0f, int nHoverTime = 0);
+
+    bool IsFinished() const override { return static_cast<const CTaskSimpleJetPackSAInterface*>(GetInterface())->m_bIsFinished; }
 };

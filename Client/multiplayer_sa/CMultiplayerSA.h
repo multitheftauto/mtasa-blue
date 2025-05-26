@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA.h
  *  PURPOSE:     Multiplayer module class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -77,10 +77,13 @@ public:
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
     void                InitHooks_FrameRateFixes();
+    void                InitHooks_WidescreenFix();
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();
     void                InitHooks_Postprocess();
     void                InitHooks_DeviceSelection();
+    void                InitHooks_Explosions();
+    void                InitHooks_Tasks();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -354,7 +357,6 @@ public:
     DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
-    unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
     unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
     CVector      m_vecAkimboTarget;

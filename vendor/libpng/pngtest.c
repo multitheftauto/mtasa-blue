@@ -1,7 +1,6 @@
-
 /* pngtest.c - a test program for libpng
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -45,8 +44,13 @@
 
 #include "png.h"
 
+/* This hack was introduced for historical reasons, and we are
+ * still keeping it in libpng-1.6.x for compatibility reasons.
+ */
+#define STDERR stdout
+
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_43 Your_png_h_is_not_version_1_6_43;
+typedef png_libpng_version_1_6_47 Your_png_h_is_not_version_1_6_47;
 
 /* Ensure that all version numbers in png.h are consistent with one another. */
 #if (PNG_LIBPNG_VER != PNG_LIBPNG_VER_MAJOR * 10000 + \
@@ -102,11 +106,6 @@ typedef png_libpng_version_1_6_43 Your_png_h_is_not_version_1_6_43;
 #ifndef PNG_STDIO_SUPPORTED
 typedef FILE * png_FILE_p;
 #endif
-
-/* This hack was introduced for historical reasons, and we are
- * still keeping it in libpng-1.6.x for compatibility reasons.
- */
-#define STDERR stdout
 
 #ifndef PNG_DEBUG
 #  define PNG_DEBUG 0
@@ -518,9 +517,9 @@ static int maximum_allocation = 0;
 static int total_allocation = 0;
 static int num_allocations = 0;
 
-png_voidp PNGCBAPI png_debug_malloc PNGARG((png_structp png_ptr,
-    png_alloc_size_t size));
-void PNGCBAPI png_debug_free PNGARG((png_structp png_ptr, png_voidp ptr));
+png_voidp PNGCBAPI png_debug_malloc(png_structp png_ptr,
+    png_alloc_size_t size);
+void PNGCBAPI png_debug_free(png_structp png_ptr, png_voidp ptr);
 
 png_voidp
 PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
@@ -1143,6 +1142,30 @@ test_one_file(const char *inname, const char *outname)
          png_set_gAMA_fixed(write_ptr, write_info_ptr, gamma);
    }
 #endif
+#ifdef PNG_cLLI_SUPPORTED
+   {
+      png_uint_32 maxCLL;
+      png_uint_32 maxFALL;
+
+      if (png_get_cLLI_fixed(read_ptr, read_info_ptr, &maxCLL, &maxFALL) != 0)
+         png_set_cLLI_fixed(write_ptr, write_info_ptr, maxCLL, maxFALL);
+   }
+#endif
+#ifdef PNG_mDCV_SUPPORTED
+   {
+      png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
+          blue_y;
+      png_uint_32 maxDL;
+      png_uint_32 minDL;
+
+      if (png_get_mDCV_fixed(read_ptr, read_info_ptr, &white_x, &white_y,
+               &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y,
+               &maxDL, &minDL) != 0)
+         png_set_mDCV_fixed(write_ptr, write_info_ptr, white_x, white_y,
+               red_x, red_y, green_x, green_y, blue_x, blue_y,
+               maxDL, minDL);
+   }
+#endif
 #else /* Use floating point versions */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 #ifdef PNG_cHRM_SUPPORTED
@@ -1166,8 +1189,46 @@ test_one_file(const char *inname, const char *outname)
          png_set_gAMA(write_ptr, write_info_ptr, gamma);
    }
 #endif
+#ifdef PNG_cLLI_SUPPORTED
+   {
+      double maxCLL;
+      double maxFALL;
+
+      if (png_get_cLLI(read_ptr, read_info_ptr, &maxCLL, &maxFALL) != 0)
+         png_set_cLLI(write_ptr, write_info_ptr, maxCLL, maxFALL);
+   }
+#endif
+#ifdef PNG_mDCV_SUPPORTED
+   {
+      double white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
+      double maxDL;
+      double minDL;
+
+      if (png_get_mDCV(read_ptr, read_info_ptr, &white_x, &white_y,
+               &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y,
+               &maxDL, &minDL) != 0)
+         png_set_mDCV(write_ptr, write_info_ptr, white_x, white_y,
+               red_x, red_y, green_x, green_y, blue_x, blue_y,
+               maxDL, minDL);
+   }
+#endif
 #endif /* Floating point */
 #endif /* Fixed point */
+#ifdef PNG_cICP_SUPPORTED
+   {
+      png_byte colour_primaries;
+      png_byte transfer_function;
+      png_byte matrix_coefficients;
+      png_byte video_full_range_flag;
+
+      if (png_get_cICP(read_ptr, read_info_ptr,
+                       &colour_primaries, &transfer_function,
+                       &matrix_coefficients, &video_full_range_flag) != 0)
+         png_set_cICP(write_ptr, write_info_ptr,
+                      colour_primaries, transfer_function,
+                      matrix_coefficients, video_full_range_flag);
+   }
+#endif
 #ifdef PNG_iCCP_SUPPORTED
    {
       png_charp name;
@@ -2076,6 +2137,7 @@ main(int argc, char *argv[])
       fprintf(STDERR, " libpng FAILS test\n");
 
    dummy_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+#ifdef PNG_USER_LIMITS_SUPPORTED
    fprintf(STDERR, " Default limits:\n");
    fprintf(STDERR, "  width_max  = %lu\n",
        (unsigned long) png_get_user_width_max(dummy_ptr));
@@ -2091,6 +2153,7 @@ main(int argc, char *argv[])
    else
       fprintf(STDERR, "  malloc_max = %lu\n",
           (unsigned long) png_get_chunk_malloc_max(dummy_ptr));
+#endif
    png_destroy_read_struct(&dummy_ptr, NULL, NULL);
 
    return (ierror != 0);

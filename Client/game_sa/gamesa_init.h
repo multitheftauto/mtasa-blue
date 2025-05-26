@@ -5,7 +5,7 @@
  *  FILE:        game_sa/gamesa_init.h
  *  PURPOSE:     Global game module header
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
