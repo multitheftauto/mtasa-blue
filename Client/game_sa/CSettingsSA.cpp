@@ -51,7 +51,7 @@ CSettingsSA::CSettingsSA()
     HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
-    MemPut<BYTE>(0x6FF420, 0xC3);            // Truncate CalculateAspectRatio
+    MemPut<BYTE>(0x6FF420, 0xC3);
 
     MemPut(0x732926, &ms_fVehicleLODDistance);
     MemPut(0x732940, &ms_fTrainPlaneLODDistance);
