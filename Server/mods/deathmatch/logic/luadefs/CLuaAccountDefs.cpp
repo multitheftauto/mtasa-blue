@@ -84,7 +84,7 @@ void CLuaAccountDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getPlayer", "getAccountPlayer");
     lua_classfunction(luaVM, "isGuest", "isGuestAccount");
 
-    lua_classvariable(luaVM, "serial", NULL, "getAccountSerial");
+    lua_classvariable(luaVM, "serial", "setAccountSerial", "getAccountSerial");
     lua_classvariable(luaVM, "name", "setAccountName", "getAccountName");
     lua_classvariable(luaVM, "id", NULL, "getAccountID");
     lua_classvariable(luaVM, "ip", NULL, "getAccountIP");
