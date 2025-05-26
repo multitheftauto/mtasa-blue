@@ -1895,7 +1895,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
 {
-    //  table getSoundEffectParameters ( sound sound, string effectName )
+    //  table getSoundEffectParameters ( sound/player sound, string effectName )
     CClientSound* pSound{};
     SPlayerVoiceWrapper playerVoice;
     SoundEffectType eEffectType;
