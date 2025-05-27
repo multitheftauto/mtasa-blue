@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-14 00:22+0000\n"
-"PO-Revision-Date: 2025-05-21 04:01\n"
+"PO-Revision-Date: 2025-05-24 00:38\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -2213,7 +2213,7 @@ msgstr "يصغر خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map out"
-msgstr "يصغر خرية اللاعب"
+msgstr "تصغير خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "moves the player-map north"
@@ -2221,7 +2221,7 @@ msgstr "يحرك خريطة اللاعب إلى الشمال"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map south"
-msgstr "يحرك خريطة اللاعب إلى الجنوب"
+msgstr "تحريك خريطة اللاعب جنوبًا"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map east"
@@ -2458,7 +2458,7 @@ msgstr "في طريقه إلى المستشفى"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5640
 msgid "Meeting their maker"
-msgstr "يتعرف على صانعه"
+msgstr "ودع الحياة"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5641
 msgid "Regretting their decisions"
@@ -2466,7 +2466,7 @@ msgstr "يندم على قراراته"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5641
 msgid "Wasted"
-msgstr "ميت"
+msgstr "مات"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -2603,7 +2603,7 @@ msgstr "قطع الاتصال: فشل التحقق من الرقم التسلس�
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
 msgid "Disconnected: Serial already in use"
-msgstr "قُطع الإتصال: الرقم التسلسى تحت الاستخدام بالفعل"
+msgstr "قطع الاتصال: الرقم التسلسلي مستخدم بالفعل"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
 #, c-format

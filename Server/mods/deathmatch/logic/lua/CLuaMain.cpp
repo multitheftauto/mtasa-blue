@@ -20,6 +20,7 @@
 #include "luadefs/CLuaACLDefs.h"
 #include "luadefs/CLuaBanDefs.h"
 #include "luadefs/CLuaBlipDefs.h"
+#include "luadefs/CLuaBuildingDefs.h"
 #include "luadefs/CLuaColShapeDefs.h"
 #include "luadefs/CLuaDatabaseDefs.h"
 #include "luadefs/CLuaMarkerDefs.h"
@@ -176,6 +177,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaACLDefs ::AddClass(luaVM);
     CLuaBanDefs ::AddClass(luaVM);
     CLuaBlipDefs ::AddClass(luaVM);
+    CLuaBuildingDefs ::AddClass(luaVM);
     CLuaColShapeDefs ::AddClass(luaVM);
     CLuaDatabaseDefs ::AddClass(luaVM);
     CLuaMarkerDefs ::AddClass(luaVM);
