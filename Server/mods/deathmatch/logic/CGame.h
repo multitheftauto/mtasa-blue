@@ -76,6 +76,7 @@ class CMainConfig;
 class CMapManager;
 class CMarkerManager;
 class CObjectManager;
+class CBuildingManager;
 class CPacket;
 class CPacketTranslator;
 class CLatentTransferManager;
@@ -105,6 +106,7 @@ class CWaterManager;
 class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
+class CVehicleSoundSettingsManager;
 
 class CCustomWeaponManager;
 class COpenPortsTester;
@@ -220,6 +222,7 @@ public:
     CMapManager*                        GetMapManager() { return m_pMapManager; }
     CPlayerManager*                     GetPlayerManager() { return m_pPlayerManager; }
     CObjectManager*                     GetObjectManager() { return m_pObjectManager; }
+    CBuildingManager*                   GetBuildingManager() const noexcept { return m_pBuildingManager; }
     CVehicleManager*                    GetVehicleManager() { return m_pVehicleManager; }
     CTeamManager*                       GetTeamManager() { return m_pTeamManager; }
     CUnoccupiedVehicleSync*             GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
@@ -536,6 +539,7 @@ private:
     CGroups*                          m_pGroups;
     CColManager*                      m_pColManager;
     CObjectManager*                   m_pObjectManager;
+    CBuildingManager*                 m_pBuildingManager;
     CPickupManager*                   m_pPickupManager;
     CPlayerManager*                   m_pPlayerManager;
     CRadarAreaManager*                m_pRadarAreaManager;

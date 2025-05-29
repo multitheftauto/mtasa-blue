@@ -513,7 +513,7 @@ void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
 {
     if (m_pLocalGUI)
     {
-        if (m_pGame->GetSystemState() == 9 /* GS_PLAYING_GAME */ && m_pModManager->IsLoaded() && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
+        if (m_pGame->GetSystemState() == SystemState::GS_PLAYING_GAME && m_pModManager->IsLoaded() && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
             !m_pLocalGUI->GetMainMenu()->IsVisible() && !m_pLocalGUI->GetConsole()->IsVisible() && !m_pLocalGUI->IsChatBoxInputEnabled())
         {
             CChat* pChat = m_pLocalGUI->GetChat();
@@ -1232,7 +1232,7 @@ void CCore::DoPostFramePulse()
     }
 
     // This is the first frame in the menu?
-    if (m_pGame->GetSystemState() == 7)            // GS_FRONTEND
+    if (m_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         if (m_menuFrame < 255)
             ++m_menuFrame;
@@ -1783,7 +1783,7 @@ void CCore::ApplyCoreInitSettings()
 
     // Users with the default skin will be switched to the 2023 version by replacing "Default" with "Default 2023".
     // The "Default 2023" GUI skin was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
-    if (revision < 21486)
+    if (revision && revision < 21486)
     {
         auto skin = CVARS_GET_VALUE<std::string>("current_skin");
 
@@ -1800,12 +1800,14 @@ void CCore::ApplyCoreInitSettings()
     SetPriorityClass(process, priorities[priority]);
 
     bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+
     if (!affinity)
         return;
 
     DWORD_PTR mask;
     DWORD_PTR sys;
     BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
     if (result)
         SetProcessAffinityMask(process, mask & ~1);
 }

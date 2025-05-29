@@ -16,6 +16,7 @@
 #include <SString.h>
 #include "Common.h"
 #include "CWeaponInfo.h"
+#include "enums/SystemState.h"
 
 class C3DMarkers;
 class CAEAudioHardware;
@@ -69,6 +70,7 @@ class CWorld;
 class CIplStore;
 class CBuildingRemoval;
 class CRenderer;
+class CVehicleAudioSettingsManager;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -152,6 +154,8 @@ public:
     virtual CBuildingRemoval*         GetBuildingRemoval() = 0;
     virtual CRenderer*                GetRenderer() const noexcept = 0;
 
+    virtual CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept = 0;
+
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
 
@@ -159,8 +163,8 @@ public:
     virtual int          GetSystemFrameCounter() const = 0;
     virtual bool         IsAtMenu() = 0;
     virtual void         StartGame() = 0;
-    virtual void         SetSystemState(eSystemState State) = 0;
-    virtual eSystemState GetSystemState() = 0;
+    virtual void         SetSystemState(SystemState State) = 0;
+    virtual SystemState  GetSystemState() = 0;
     virtual void         Pause(bool bPaused) = 0;
     virtual void         SetTimeScale(float fTimeScale) = 0;
     virtual float        GetFPS() = 0;
@@ -233,6 +237,9 @@ public:
 
     virtual bool IsIgnoreFireStateEnabled() const noexcept = 0;
     virtual void SetIgnoreFireStateEnabled(bool isEnabled) = 0;
+
+    virtual bool IsVehicleBurnExplosionsEnabled() const noexcept = 0;
+    virtual void SetVehicleBurnExplosionsEnabled(bool isEnabled) = 0;
 
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;

@@ -189,7 +189,7 @@ void CVehicleSA::Init()
     {
         for (size_t i = 0; i < m_dummyPositions.size(); ++i)
         {
-            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((eVehicleDummies)i);
+            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((VehicleDummies)i);
         }
     }
 
@@ -2261,27 +2261,27 @@ void CVehicleSA::UpdateLandingGearPosition()
     }
 }
 
-bool CVehicleSA::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
+bool CVehicleSA::GetDummyPosition(VehicleDummies dummy, CVector& position) const
 {
-    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
-        position = m_dummyPositions[dummy];
+        position = m_dummyPositions[(std::size_t)dummy];
         return true;
     }
 
     return false;
 }
 
-bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
+bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
 {
-    if (dummy < 0 || dummy >= VEHICLE_DUMMY_COUNT)
+    if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
         return false;
 
     auto vehicle = reinterpret_cast<CVehicleSAInterface*>(m_pInterface);
 
-    m_dummyPositions[dummy] = position;
+    m_dummyPositions[static_cast<std::size_t>(dummy)] = position;
 
-    if (dummy == ENGINE)
+    if (dummy == VehicleDummies::ENGINE)
     {
         if (vehicle->m_overheatParticle != nullptr)
             CFxSystemSA::SetPosition(vehicle->m_overheatParticle, position);
@@ -2303,14 +2303,14 @@ bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, const CVector& position
 //
 // NOTE(botder): Move the code to CAutomobileSA::SetDummyPosition, when we start using CAutomobileSA
 //
-void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position)
+void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position)
 {
-    if (dummy == EXHAUST)
+    if (dummy == VehicleDummies::EXHAUST)
     {
         if (automobile->pNitroParticle[0] != nullptr)
             CFxSystemSA::SetPosition(automobile->pNitroParticle[0], position);
     }
-    else if (dummy == EXHAUST_SECONDARY)
+    else if (dummy == VehicleDummies::EXHAUST_SECONDARY)
     {
         if (automobile->pNitroParticle[1] != nullptr)
             CFxSystemSA::SetPosition(automobile->pNitroParticle[1], position);
@@ -2380,4 +2380,17 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
         mov     bReturn, al
     }
     return bReturn;
+}
+
+void CVehicleSA::ReinitAudio()
+{
+    auto* audioInterface = m_pVehicleAudioEntity->GetInterface();
+
+    audioInterface->TerminateAudio();
+    audioInterface->InitAudio(GetVehicleInterface());
+
+    CPed* pLocalPlayer = pGame->GetPedContext();
+
+    if (IsPassenger(pLocalPlayer) || GetDriver() == pLocalPlayer)
+        audioInterface->SoundJoin();
 }
