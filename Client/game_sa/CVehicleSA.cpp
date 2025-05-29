@@ -63,7 +63,7 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
     if (vehicle->pEntity->GetVehicleRotorState())
     {
-        if (*(unsigned char*)0x64BC03 == 0x75) // keep default behavior
+        if (!pGame->IsVehicleEngineManualModeEnabled()) // keep default behavior
             return true;
 
         if (vehicle->pEntity->GetEntityStatus() != eEntityStatus::STATUS_PHYSICS && !vehicle->pEntity->IsBeingDriven())

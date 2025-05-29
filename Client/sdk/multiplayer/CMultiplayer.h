@@ -444,6 +444,8 @@ public:
 
     virtual void SetAutomaticVehicleStartupOnPedEnter(bool bSet) = 0;
 
+    virtual void SetVehicleEngineManualModeEnabled(bool enabled) = 0;
+
     virtual void SetPedTargetingMarkerEnabled(bool bEnabled) = 0;
     virtual bool IsPedTargetingMarkerEnabled() = 0;
 

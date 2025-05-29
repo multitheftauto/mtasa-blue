@@ -262,7 +262,7 @@ public:
     bool IsVehicleBurnExplosionsEnabled() const noexcept override { return m_isVehicleBurnExplosionsEnabled; }
     void SetVehicleBurnExplosionsEnabled(bool isEnabled) override;
 
-    void SetVehicleEngineManualModeEnabled(bool isEnabled) override;
+    bool IsVehicleEngineManualModeEnabled() const noexcept override { return *(unsigned char*)0x64BC03 == 0x90; }
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);

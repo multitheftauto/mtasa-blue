@@ -426,8 +426,8 @@ public:
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
 
-    bool IsVehicleEngineManualModeEnabled() const noexcept { return m_isVehEngineManualModeEnabled; }
-    void SetVehicleEngineManualModeEnabled(bool isEnabled);
+    void SetVehicleEngineManualModeEnabled(bool enabled);
+    bool IsVehicleEngineManualModeEnabled() const;
 
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
@@ -786,8 +786,6 @@ private:
     bool m_bCloudsEnabled;
     // Birds Enabled
     bool m_bBirdsEnabled;
-
-    bool m_isVehEngineManualModeEnabled{false};
 
     unsigned long m_ulMinuteDuration;
 

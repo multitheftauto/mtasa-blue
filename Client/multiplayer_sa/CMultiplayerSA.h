@@ -333,6 +333,8 @@ public:
 
     void SetAutomaticVehicleStartupOnPedEnter(bool bSet);
 
+    void SetVehicleEngineManualModeEnabled(bool enabled) override;
+
     void SetPedTargetingMarkerEnabled(bool bEnable);
     bool IsPedTargetingMarkerEnabled();
     bool IsConnected();
