@@ -46,7 +46,7 @@ await (async () => {
 
         console.log('Doing', locales);
 
-        await driver.get(`https://localhost:8080/?locales=${locales.join(',')}`);
+        await driver.get(`http://localhost:8080/?locales=${locales.join(',')}`);
 
         const result = await driver.executeScript('return main()');
 
