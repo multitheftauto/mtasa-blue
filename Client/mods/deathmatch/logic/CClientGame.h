@@ -426,6 +426,9 @@ public:
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
 
+    bool IsVehicleEngineManualModeEnabled() const noexcept { return m_isVehEngineManualModeEnabled; }
+    void SetVehicleEngineManualModeEnabled(bool isEnabled);
+
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
@@ -783,6 +786,8 @@ private:
     bool m_bCloudsEnabled;
     // Birds Enabled
     bool m_bBirdsEnabled;
+
+    bool m_isVehEngineManualModeEnabled{false};
 
     unsigned long m_ulMinuteDuration;
 

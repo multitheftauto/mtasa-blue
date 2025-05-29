@@ -73,6 +73,8 @@ public:
     bool IsSpawnFlyingComponentEnabled() const noexcept { return m_spawnFlyingComponentsDuringRecreate; }
     void SetSpawnFlyingComponentEnabled(bool isEnabled) noexcept { m_spawnFlyingComponentsDuringRecreate = isEnabled; }
 
+    void ResetNotControlledRotors(bool isManualMode);
+
 protected:
     CClientManager*               m_pManager;
     bool                          m_bCanRemoveFromList;

@@ -54,13 +54,39 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
     }
 }
 
+float& fTimeStep = *(float*)(0xB7CB5C);
 static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleInterface)
 {
     SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)vehicleInterface);
     if (!vehicle || !vehicle->pEntity)
         return true;
 
-    return vehicle->pEntity->GetVehicleRotorState();
+    if (vehicle->pEntity->GetVehicleRotorState())
+    {
+        if (*(unsigned char*)0x64BC03 == 0x75) // keep default behavior
+            return true;
+
+        if (vehicle->pEntity->GetEntityStatus() != eEntityStatus::STATUS_PHYSICS && !vehicle->pEntity->IsBeingDriven())
+        {
+            vehicle->pEntity->SetEntityStatus(eEntityStatus::STATUS_PHYSICS); // this will make rotors spin without driver when engine is on
+            return false;
+        }
+        if (!vehicle->pEntity->IsEngineOn())
+        {
+            // Smoothly change rotors speed to 0
+            float speed = vehicle->pEntity->GetHeliRotorSpeed();
+            if (speed > 0)
+                vehicle->pEntity->SetHeliRotorSpeed(std::max(0.0f, speed - fTimeStep * 0.00055f)); // 0x6C4EB7
+
+            speed = vehicle->pEntity->GetPlaneRotorSpeed();
+            if (speed > 0)
+                vehicle->pEntity->SetPlaneRotorSpeed(std::max(0.0f, speed - fTimeStep * 0.003f)); // 0x6CC145
+
+            return false;
+        }
+        return true;
+    }
+    return false;
 }
 
 static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;

@@ -263,6 +263,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::IGNOREFIRESTATE] = false;
     m_WorldSpecialProps[WorldSpecialProperty::FLYINGCOMPONENTS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::VEHICLEBURNEXPLOSIONS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLE_ENGINE_MANUAL_MODE] = false;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -3405,7 +3406,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                                     // Update our engine State
-                                    pVehicle->SetEngineOn(true);
+                                    if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_MANUAL_MODE))
+                                        pVehicle->SetEngineOn(true);
 
                                     // Tell everyone he's in (they should warp him in)
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_RETURN);
@@ -4524,6 +4526,7 @@ void CGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE, false);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, true);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_MANUAL_MODE, false);
     }
 
     // Reset all weather stuff like heat haze, wind velocity etc
