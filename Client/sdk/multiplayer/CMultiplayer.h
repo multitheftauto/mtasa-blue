@@ -461,4 +461,12 @@ public:
 
     virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
     virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+
+    virtual void GetUnderwaterEffect(bool& isEnabled, float& speed, float& frequency) = 0;
+    virtual void GetUnderwaterDarkness(bool& isEnabled, float& fullDarknessDepth) = 0;
+    virtual void SetUnderwaterEffectEnabled(bool isEnabled) = 0;
+    virtual void SetUnderwaterEffectSpeed(float speed, float frequency) = 0;
+    virtual void SetUnderwaterDarkness(bool isEnabled, float fullDarknessDepth) = 0;
+    virtual void ResetUnderwaterEffect() = 0;
+    virtual void ResetUnderwaterDarkness() = 0;
 };
