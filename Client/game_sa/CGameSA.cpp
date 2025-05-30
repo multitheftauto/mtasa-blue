@@ -932,9 +932,6 @@ void CGameSA::SetVehicleBurnExplosionsEnabled(bool isEnabled)
 
 void CGameSA::SetVehicleEngineManualModeEnabled(bool enabled)
 {
-    if (enabled == m_isVehicleEngineManualModeEnabled)
-        return;
-
     if (enabled)
     {
         MemSet((void*)0x64BC03, 0x90, 5);                          // prevent vehicle engine from turning on (driver enter)
@@ -945,8 +942,11 @@ void CGameSA::SetVehicleEngineManualModeEnabled(bool enabled)
         MemCpy((void*)0x64BC03, "\x75\x05\x80\xC9\x10", 5);
         MemCpy((void*)0x6C4EA9, "\x8A\x86\x28\x04", 4);
     }
+}
 
-    m_isVehicleEngineManualModeEnabled = enabled;
+bool CGameSA::IsVehicleEngineManualModeEnabled() const noexcept
+{
+    return *(unsigned char*)0x64BC03 == 0x90;
 }
 
 bool CGameSA::PerformChecks()
