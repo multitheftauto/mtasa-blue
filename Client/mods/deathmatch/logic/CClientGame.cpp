@@ -6148,7 +6148,7 @@ void CClientGame::SetVehicleEngineManualModeEnabled(bool enabled)
     if (enabled == g_pGame->IsVehicleEngineManualModeEnabled())
         return;
 
-    g_pMultiplayer->SetVehicleEngineManualModeEnabled(enabled);
+    g_pGame->SetVehicleEngineManualModeEnabled(enabled);
     m_pVehicleManager->ResetNotControlledRotors(enabled);
 }
 
