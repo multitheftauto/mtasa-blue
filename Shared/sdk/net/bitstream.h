@@ -620,6 +620,10 @@ enum class eBitStreamVersion : unsigned short
     // 2025-05-26
     ServersideBuildingElement,
 
+    // Add "vehenginemanualmode" to setWorldSpecialPropertyEnabled
+    // 2025-05-29
+    WorldSpecialProperty_VehicleEngineManualMode,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

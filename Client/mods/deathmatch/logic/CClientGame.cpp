@@ -6057,6 +6057,9 @@ bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, c
         case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
             g_pGame->SetVehicleBurnExplosionsEnabled(enabled);
             break;
+        case WorldSpecialProperty::VEHICLE_ENGINE_MANUAL_MODE:
+            SetVehicleEngineManualModeEnabled(enabled);
+            break;
         default:
             return false;
     }
@@ -6103,6 +6106,8 @@ bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
             return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
         case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
             return g_pGame->IsVehicleBurnExplosionsEnabled();
+        case WorldSpecialProperty::VEHICLE_ENGINE_MANUAL_MODE:
+            return IsVehicleEngineManualModeEnabled();
     }
 
     return false;
@@ -6136,6 +6141,20 @@ void CClientGame::SetWeaponRenderEnabled(bool enabled)
 bool CClientGame::IsWeaponRenderEnabled() const
 {
     return g_pGame->IsWeaponRenderEnabled();
+}
+
+void CClientGame::SetVehicleEngineManualModeEnabled(bool enabled)
+{
+    if (enabled == g_pGame->IsVehicleEngineManualModeEnabled())
+        return;
+
+    g_pGame->SetVehicleEngineManualModeEnabled(enabled);
+    m_pVehicleManager->ResetNotControlledRotors(enabled);
+}
+
+bool CClientGame::IsVehicleEngineManualModeEnabled() const
+{
+    return g_pGame->IsVehicleEngineManualModeEnabled();
 }
 
 #pragma code_seg(".text")
@@ -6823,6 +6842,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         g_pGame->SetIgnoreFireStateEnabled(false);
         m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
         g_pGame->SetVehicleBurnExplosionsEnabled(true);
+        SetVehicleEngineManualModeEnabled(false);
     }
 
     // Reset all setWorldProperty to default

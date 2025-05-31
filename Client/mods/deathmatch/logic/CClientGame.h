@@ -426,6 +426,9 @@ public:
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
 
+    void SetVehicleEngineManualModeEnabled(bool enabled);
+    bool IsVehicleEngineManualModeEnabled() const;
+
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
