@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/C3DMarker.h
  *  PURPOSE:     3D marker entity interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

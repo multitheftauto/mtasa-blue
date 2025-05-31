@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -34,7 +34,7 @@ public:
     LUA_DECLARE(GetGaragePosition);
     LUA_DECLARE(GetGarageSize);
     LUA_DECLARE(GetGarageBoundingBox);
-    static bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property);
+    static bool IsWorldSpecialPropertyEnabled(const WorldSpecialProperty property) noexcept;
     LUA_DECLARE(GetBlurLevel);
     LUA_DECLARE(GetTrafficLightState);
     LUA_DECLARE(AreTrafficLightsLocked);
@@ -57,7 +57,7 @@ public:
     LUA_DECLARE(SetMinuteDuration);
     LUA_DECLARE(SetWaveHeight);
     LUA_DECLARE(SetGarageOpen);
-    static bool SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled);
+    static bool SetWorldSpecialPropertyEnabled(const WorldSpecialProperty property, const bool enabled) noexcept;
     LUA_DECLARE(SetBlurLevel);
     LUA_DECLARE(ResetBlurLevel);
     LUA_DECLARE(SetJetpackMaxHeight);
@@ -127,9 +127,9 @@ public:
     static uchar GetCoronaReflectionsEnabled();
     static bool  ResetCoronaReflectionsEnabled();
 
-    static std::variant<bool, float, CLuaMultiReturn<float, float, float>> GetWorldProperty(eWorldProperty property);
-    static bool SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3);
-    static bool ResetWorldProperty(eWorldProperty property);
+    static std::variant<bool, float, CLuaMultiReturn<float, float, float>> GetWorldProperty(WorldProperty property);
+    static bool SetWorldProperty(WorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3);
+    static bool ResetWorldProperty(WorldProperty property);
 
     static bool SetTimeFrozen(bool value) noexcept;
     static bool IsTimeFrozen() noexcept;

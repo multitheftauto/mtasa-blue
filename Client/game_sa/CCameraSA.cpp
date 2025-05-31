@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCameraSA.cpp
  *  PURPOSE:     Camera rendering
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -187,7 +187,7 @@ void CCameraSA::RestoreLastGoodState()
 
 CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 {
-    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;            // ->Placeable.matrix;
+    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;            // ->matrix;
     if (pCamMatrix)
     {
         matrix->vFront = pCamMatrix->vFront;
@@ -210,7 +210,7 @@ CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 
 void CCameraSA::SetMatrix(CMatrix* matrix)
 {
-    CMatrix_Padded* pCamMatrix = GetInterface()->Placeable.matrix;
+    CMatrix_Padded* pCamMatrix = GetInterface()->matrix;
     if (pCamMatrix)
     {
         pCamMatrix->vFront = matrix->vFront;

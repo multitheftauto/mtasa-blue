@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -139,7 +139,7 @@ void CClientModelCacheManagerImpl::DoPulse()
         DoPulseVehicleModels();
 
     // Handle regeneration of possibly replaced clothes textures
-    if (g_pGame->GetRenderWare()->HasClothesReplacementChanged())
+    if (g_pGame->GetRenderWare()->HasClothesReplacementChanged() || CClientPlayerClothes::HasClothesChanged())
     {
         g_pMultiplayer->FlushClothesCache();
 

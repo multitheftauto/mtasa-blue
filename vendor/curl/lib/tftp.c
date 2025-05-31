@@ -62,6 +62,7 @@
 #include "speedcheck.h"
 #include "select.h"
 #include "escape.h"
+#include "strparse.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -135,9 +136,9 @@ struct tftp_state_data {
   struct Curl_sockaddr_storage   remote_addr;
   curl_socklen_t  remote_addrlen;
   int             rbytes;
-  int             sbytes;
-  int             blksize;
-  int             requested_blksize;
+  size_t          sbytes;
+  unsigned int    blksize;
+  unsigned int    requested_blksize;
   unsigned short  block;
   struct tftp_packet rpacket;
   struct tftp_packet spacket;
@@ -185,6 +186,7 @@ const struct Curl_handler Curl_handler_tftp = {
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_TFTP,                            /* defport */
   CURLPROTO_TFTP,                       /* protocol */
   CURLPROTO_TFTP,                       /* family */
@@ -329,17 +331,14 @@ static CURLcode tftp_parse_option_ack(struct tftp_state_data *state,
     infof(data, "got option=(%s) value=(%s)", option, value);
 
     if(checkprefix(TFTP_OPTION_BLKSIZE, option)) {
-      long blksize;
-
-      blksize = strtol(value, NULL, 10);
-
-      if(!blksize) {
-        failf(data, "invalid blocksize value in OACK packet");
-        return CURLE_TFTP_ILLEGAL;
-      }
-      if(blksize > TFTP_BLKSIZE_MAX) {
+      curl_off_t blksize;
+      if(Curl_str_number(&value, &blksize, TFTP_BLKSIZE_MAX)) {
         failf(data, "%s (%d)", "blksize is larger than max supported",
               TFTP_BLKSIZE_MAX);
+        return CURLE_TFTP_ILLEGAL;
+      }
+      if(!blksize) {
+        failf(data, "invalid blocksize value in OACK packet");
         return CURLE_TFTP_ILLEGAL;
       }
       else if(blksize < TFTP_BLKSIZE_MIN) {
@@ -351,28 +350,27 @@ static CURLcode tftp_parse_option_ack(struct tftp_state_data *state,
         /* could realloc pkt buffers here, but the spec does not call out
          * support for the server requesting a bigger blksize than the client
          * requests */
-        failf(data, "%s (%ld)",
-              "server requested blksize larger than allocated", blksize);
+        failf(data, "server requested blksize larger than allocated (%"
+              CURL_FORMAT_CURL_OFF_T ")", blksize);
         return CURLE_TFTP_ILLEGAL;
       }
 
       state->blksize = (int)blksize;
-      infof(data, "%s (%d) %s (%d)", "blksize parsed from OACK",
-            state->blksize, "requested", state->requested_blksize);
+      infof(data, "blksize parsed from OACK (%d) requested (%d)",
+            state->blksize, state->requested_blksize);
     }
     else if(checkprefix(TFTP_OPTION_TSIZE, option)) {
-      long tsize = 0;
-
-      tsize = strtol(value, NULL, 10);
-      infof(data, "%s (%ld)", "tsize parsed from OACK", tsize);
-
+      curl_off_t tsize = 0;
       /* tsize should be ignored on upload: Who cares about the size of the
          remote file? */
-      if(!data->state.upload) {
+      if(!data->state.upload &&
+         !Curl_str_number(&value, &tsize, CURL_OFF_T_MAX)) {
         if(!tsize) {
           failf(data, "invalid tsize -:%s:- value in OACK packet", value);
           return CURLE_TFTP_ILLEGAL;
         }
+        infof(data, "tsize parsed from OACK (%" CURL_FORMAT_CURL_OFF_T ")",
+              tsize);
         Curl_pgrsSetDownloadSize(data, tsize);
       }
     }
@@ -522,9 +520,14 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,
 
     /* the typecase for the 3rd argument is mostly for systems that do
        not have a size_t argument, like older unixes that want an 'int' */
+#ifdef __AMIGA__
+#define CURL_SENDTO_ARG5(x) CURL_UNCONST(x)
+#else
+#define CURL_SENDTO_ARG5(x) (x)
+#endif
     senddata = sendto(state->sockfd, (void *)state->spacket.data,
                       (SEND_TYPE_ARG3)sbytes, 0,
-                      &data->conn->remote_addr->curl_sa_addr,
+                      CURL_SENDTO_ARG5(&data->conn->remote_addr->curl_sa_addr),
                       (curl_socklen_t)data->conn->remote_addr->addrlen);
     if(senddata != (ssize_t)sbytes) {
       char buffer[STRERROR_LEN];
@@ -775,7 +778,7 @@ static CURLcode tftp_tx(struct tftp_state_data *state, tftp_event_t event)
                                 &cb, &eos);
       if(result)
         return result;
-      state->sbytes += (int)cb;
+      state->sbytes += cb;
       bufptr += cb;
     } while(state->sbytes < state->blksize && cb);
 

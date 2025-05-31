@@ -44,6 +44,7 @@
 #include "vquic.h"
 #include "vquic_int.h"
 #include "strerror.h"
+#include "strparse.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -52,12 +53,6 @@
 
 
 #ifdef USE_HTTP3
-
-#ifdef O_BINARY
-#define QLOGMODE O_WRONLY|O_CREAT|O_BINARY
-#else
-#define QLOGMODE O_WRONLY|O_CREAT
-#endif
 
 #define NW_CHUNK_SIZE     (64 * 1024)
 #define NW_SEND_CHUNKS    2
@@ -87,10 +82,10 @@ CURLcode vquic_ctx_init(struct cf_quic_ctx *qctx)
 #endif
 #ifdef DEBUGBUILD
   {
-    char *p = getenv("CURL_DBG_QUIC_WBLOCK");
+    const char *p = getenv("CURL_DBG_QUIC_WBLOCK");
     if(p) {
-      long l = strtol(p, NULL, 10);
-      if(l >= 0 && l <= 100)
+      curl_off_t l;
+      if(!Curl_str_number(&p, &l, 100))
         qctx->wblock_percent = (int)l;
     }
   }
@@ -132,7 +127,7 @@ static CURLcode do_sendmsg(struct Curl_cfilter *cf,
 #endif
 
   *psent = 0;
-  msg_iov.iov_base = (uint8_t *)pkt;
+  msg_iov.iov_base = (uint8_t *)CURL_UNCONST(pkt);
   msg_iov.iov_len = pktlen;
   msg.msg_iov = &msg_iov;
   msg.msg_iovlen = 1;
@@ -153,23 +148,24 @@ static CURLcode do_sendmsg(struct Curl_cfilter *cf,
 #endif
 
 
-  while((sent = sendmsg(qctx->sockfd, &msg, 0)) == -1 && SOCKERRNO == EINTR)
+  while((sent = sendmsg(qctx->sockfd, &msg, 0)) == -1 &&
+        SOCKERRNO == SOCKEINTR)
     ;
 
   if(sent == -1) {
     switch(SOCKERRNO) {
     case EAGAIN:
-#if EAGAIN != EWOULDBLOCK
-    case EWOULDBLOCK:
+#if EAGAIN != SOCKEWOULDBLOCK
+    case SOCKEWOULDBLOCK:
 #endif
       return CURLE_AGAIN;
-    case EMSGSIZE:
+    case SOCKEMSGSIZE:
       /* UDP datagram is too large; caused by PMTUD. Just let it be lost. */
       break;
     case EIO:
       if(pktlen > gsolen) {
         /* GSO failure */
-        failf(data, "sendmsg() returned %zd (errno %d); disable GSO", sent,
+        infof(data, "sendmsg() returned %zd (errno %d); disable GSO", sent,
               SOCKERRNO);
         qctx->no_gso = TRUE;
         return send_packet_no_gso(cf, data, qctx, pkt, pktlen, gsolen, psent);
@@ -191,16 +187,16 @@ static CURLcode do_sendmsg(struct Curl_cfilter *cf,
 
   while((sent = send(qctx->sockfd,
                      (const char *)pkt, (SEND_TYPE_ARG3)pktlen, 0)) == -1 &&
-        SOCKERRNO == EINTR)
+        SOCKERRNO == SOCKEINTR)
     ;
 
   if(sent == -1) {
-    if(SOCKERRNO == EAGAIN || SOCKERRNO == EWOULDBLOCK) {
+    if(SOCKERRNO == EAGAIN || SOCKERRNO == SOCKEWOULDBLOCK) {
       return CURLE_AGAIN;
     }
     else {
       failf(data, "send() returned %zd (errno %d)", sent, SOCKERRNO);
-      if(SOCKERRNO != EMSGSIZE) {
+      if(SOCKERRNO != SOCKEMSGSIZE) {
         return CURLE_SEND_ERROR;
       }
       /* UDP datagram is too large; caused by PMTUD. Just let it be
@@ -248,6 +244,7 @@ static CURLcode vquic_send_packets(struct Curl_cfilter *cf,
   /* simulate network blocking/partial writes */
   if(qctx->wblock_percent > 0) {
     unsigned char c;
+    *psent = 0;
     Curl_rand(data, &c, 1);
     if(c >= ((100-qctx->wblock_percent)*256/100)) {
       CURL_TRC_CF(data, cf, "vquic_flush() simulate EWOULDBLOCK");
@@ -363,7 +360,7 @@ static CURLcode recvmmsg_packets(struct Curl_cfilter *cf,
   struct mmsghdr mmsg[MMSG_NUM];
   uint8_t msg_ctrl[MMSG_NUM * CMSG_SPACE(sizeof(int))];
   struct sockaddr_storage remote_addr[MMSG_NUM];
-  size_t total_nread = 0, pkts;
+  size_t total_nread = 0, pkts = 0;
   int mcount, i, n;
   char errstr[STRERROR_LEN];
   CURLcode result = CURLE_OK;
@@ -380,10 +377,9 @@ static CURLcode recvmmsg_packets(struct Curl_cfilter *cf,
     goto out;
   bufs = (uint8_t (*)[64*1024])sockbuf;
 
-  pkts = 0;
   total_nread = 0;
   while(pkts < max_pkts) {
-    n = (int)CURLMIN(MMSG_NUM, max_pkts);
+    n = (int)CURLMIN(CURLMIN(MMSG_NUM, IOV_MAX), max_pkts);
     memset(&mmsg, 0, sizeof(mmsg));
     for(i = 0; i < n; ++i) {
       msg_iov[i].iov_base = bufs[i];
@@ -397,14 +393,14 @@ static CURLcode recvmmsg_packets(struct Curl_cfilter *cf,
     }
 
     while((mcount = recvmmsg(qctx->sockfd, mmsg, n, 0, NULL)) == -1 &&
-          SOCKERRNO == EINTR)
+          SOCKERRNO == SOCKEINTR)
       ;
     if(mcount == -1) {
-      if(SOCKERRNO == EAGAIN || SOCKERRNO == EWOULDBLOCK) {
+      if(SOCKERRNO == EAGAIN || SOCKERRNO == SOCKEWOULDBLOCK) {
         CURL_TRC_CF(data, cf, "ingress, recvmmsg -> EAGAIN");
         goto out;
       }
-      if(!cf->connected && SOCKERRNO == ECONNREFUSED) {
+      if(!cf->connected && SOCKERRNO == SOCKECONNREFUSED) {
         struct ip_quadruple ip;
         Curl_cf_socket_peek(cf->next, data, NULL, NULL, &ip);
         failf(data, "QUIC: connection to %s port %u refused",
@@ -489,13 +485,13 @@ static CURLcode recvmsg_packets(struct Curl_cfilter *cf,
     msg.msg_namelen = sizeof(remote_addr);
     msg.msg_controllen = sizeof(msg_ctrl);
     while((nread = recvmsg(qctx->sockfd, &msg, 0)) == -1 &&
-          SOCKERRNO == EINTR)
+          SOCKERRNO == SOCKEINTR)
       ;
     if(nread == -1) {
-      if(SOCKERRNO == EAGAIN || SOCKERRNO == EWOULDBLOCK) {
+      if(SOCKERRNO == EAGAIN || SOCKERRNO == SOCKEWOULDBLOCK) {
         goto out;
       }
-      if(!cf->connected && SOCKERRNO == ECONNREFUSED) {
+      if(!cf->connected && SOCKERRNO == SOCKECONNREFUSED) {
         struct ip_quadruple ip;
         Curl_cf_socket_peek(cf->next, data, NULL, NULL, &ip);
         failf(data, "QUIC: connection to %s port %u refused",
@@ -563,14 +559,14 @@ static CURLcode recvfrom_packets(struct Curl_cfilter *cf,
     while((nread = recvfrom(qctx->sockfd, (char *)buf, bufsize, 0,
                             (struct sockaddr *)&remote_addr,
                             &remote_addrlen)) == -1 &&
-          SOCKERRNO == EINTR)
+          SOCKERRNO == SOCKEINTR)
       ;
     if(nread == -1) {
-      if(SOCKERRNO == EAGAIN || SOCKERRNO == EWOULDBLOCK) {
+      if(SOCKERRNO == EAGAIN || SOCKERRNO == SOCKEWOULDBLOCK) {
         CURL_TRC_CF(data, cf, "ingress, recvfrom -> EAGAIN");
         goto out;
       }
-      if(!cf->connected && SOCKERRNO == ECONNREFUSED) {
+      if(!cf->connected && SOCKERRNO == SOCKECONNREFUSED) {
         struct ip_quadruple ip;
         Curl_cf_socket_peek(cf->next, data, NULL, NULL, &ip);
         failf(data, "QUIC: connection to %s port %u refused",
@@ -657,7 +653,7 @@ CURLcode Curl_qlogdir(struct Curl_easy *data,
       result = Curl_dyn_add(&fname, ".sqlog");
 
     if(!result) {
-      int qlogfd = open(Curl_dyn_ptr(&fname), QLOGMODE,
+      int qlogfd = open(Curl_dyn_ptr(&fname), O_WRONLY|O_CREAT|CURL_O_BINARY,
                         data->set.new_file_perms);
       if(qlogfd != -1)
         *qlogfdp = qlogfd;
@@ -692,24 +688,6 @@ CURLcode Curl_cf_quic_create(struct Curl_cfilter **pcf,
   (void)conn;
   (void)ai;
   return CURLE_NOT_BUILT_IN;
-#endif
-}
-
-bool Curl_conn_is_http3(const struct Curl_easy *data,
-                        const struct connectdata *conn,
-                        int sockindex)
-{
-#if defined(USE_NGTCP2) && defined(USE_NGHTTP3)
-  return Curl_conn_is_ngtcp2(data, conn, sockindex);
-#elif defined(USE_OPENSSL_QUIC) && defined(USE_NGHTTP3)
-  return Curl_conn_is_osslq(data, conn, sockindex);
-#elif defined(USE_QUICHE)
-  return Curl_conn_is_quiche(data, conn, sockindex);
-#elif defined(USE_MSH3)
-  return Curl_conn_is_msh3(data, conn, sockindex);
-#else
-  return ((conn->handler->protocol & PROTO_FAMILY_HTTP) &&
-          (conn->httpversion == 30));
 #endif
 }
 

@@ -578,6 +578,47 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
     }
 }
 
+// Fixes invisible weapon particles (extinguisher, spraycan, flamethrower) at high FPS
+#define HOOKPOS_CWeapon_Update 0x73DC3D
+#define HOOKSIZE_CWeapon_Update 5
+static constexpr std::uintptr_t RETURN_CWeapon_Update = 0x073DC42;
+static void __declspec(naked) HOOK_CWeapon_Update()
+{
+    _asm
+    {
+        // Temp fix for camera
+        cmp [esi], 0x2B // CWeapon::m_eWeaponType
+        je skip
+
+        // timeStep / kOriginalTimeStep
+        fld ds:[0xB7CB5C] // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep
+
+        mov eax, [esi+10h] // m_timeToNextShootInMS
+        mov ebx, ds:[0xB7CB84] // CTimer::m_snTimeInMilliseconds
+
+        sub eax, ebx // m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds
+
+        push eax
+        fild dword ptr [esp]
+        add esp, 4
+
+        fmul st(0), st(1) // (m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds) * (timeStep / kOriginalTimeStep)
+        fadd st(0), ebx // + m_snTimeInMilliseconds
+        fistp [esi+10h]
+        fstp st(0)
+
+        mov eax, ebx
+
+        xor ebx, ebx
+        jmp RETURN_CWeapon_Update
+
+        skip:
+        mov eax, ds:[0xB7CB84]
+        jmp RETURN_CWeapon_Update
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -619,4 +660,6 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CVehicle__AddExhaustParticles);
     EZHookInstall(CTaskSimpleSwim__ProcessEffects);
     EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
+
+    EZHookInstall(CWeapon_Update);
 }

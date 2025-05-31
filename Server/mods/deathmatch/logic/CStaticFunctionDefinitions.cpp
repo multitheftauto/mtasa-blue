@@ -21,6 +21,7 @@
 #include "CClock.h"
 #include "CBlip.h"
 #include "CWater.h"
+#include "CBuilding.h"
 #include "CPlayerCamera.h"
 #include "CElementDeleter.h"
 #include "CMainConfig.h"
@@ -775,6 +776,10 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
             CPed* pPed = static_cast<CPed*>(pElement);
             return pPed->GetCollisionEnabled();
         }
+        case CElement::BUILDING:
+        {
+            return static_cast<CBuilding*>(pElement)->GetCollisionEnabled();
+        }
         default:
             return false;
     }
@@ -830,6 +835,16 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CElement* pElement, CElement* 
                 return false;
             break;
         }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            CBuilding* pLowLodObject = nullptr;
+            if (pLowLodElement && pLowLodElement->GetType() == CElement::BUILDING)
+                pLowLodObject = static_cast<CBuilding*>(pLowLodElement);
+            if (!pBuilding->SetLowLodBuilding(pLowLodObject))
+                return false;
+            break;
+        }
         default:
             return false;
     }
@@ -855,6 +870,11 @@ bool CStaticFunctionDefinitions::GetLowLodElement(CElement* pElement, CElement*&
             pOutLowLodElement = pObject->GetLowLodObject();
             break;
         }
+        case CElement::BUILDING:
+        {
+            pOutLowLodElement = static_cast<CBuilding*>(pElement)->GetLowLodElement();
+            break;
+        }
         default:
             return false;
     }
@@ -872,6 +892,11 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CElement* pElement, bool& bOutI
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             bOutIsLowLod = pObject->IsLowLod();
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            bOutIsLowLod = static_cast<CBuilding*>(pElement)->GetHighLodBuilding() ? true : false;
             break;
         }
         default:
@@ -1274,6 +1299,12 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     assert(pElement);
     RUN_CHILDREN(SetElementPosition(*iter, vecPosition, bWarp))
 
+    if (IS_PLAYER(pElement)) 
+    {
+        CPlayer* player = static_cast<CPlayer*>(pElement);
+        player->SetTeleported(true);
+    }
+
     // Update our position for that entity.
     pElement->SetPosition(vecPosition);
 
@@ -1303,6 +1334,11 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     {
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_POSITION, *BitStream.pBitStream));
     }
+
+    // Restore jetpack
+    CPed* ped = IS_PED(pElement) ? static_cast<CPed*>(pElement) : nullptr;
+    if (ped && ped->HasJetPack())
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, GIVE_PED_JETPACK, *BitStream.pBitStream));
 
     return true;
 }
@@ -1471,6 +1507,12 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
         BitStream.pBitStream->Write(static_cast<unsigned char>((bSetPosition) ? 1 : 0));
         if (bSetPosition)
         {
+            if (IS_PLAYER(pElement))
+            {
+                CPlayer* player = static_cast<CPlayer*>(pElement);
+                player->SetTeleported(true);
+            }
+
             BitStream.pBitStream->Write(vecPosition.fX);
             BitStream.pBitStream->Write(vecPosition.fY);
             BitStream.pBitStream->Write(vecPosition.fZ);
@@ -1931,6 +1973,11 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CElement* pElement,
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetCollisionEnabled(bEnable);
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            static_cast<CBuilding*>(pElement)->SetCollisionEnabled(bEnable);
             break;
         }
         default:
@@ -3518,11 +3565,11 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
 }
 
 // ***************** PED GET FUNCS ***************** //
-bool CStaticFunctionDefinitions::GetPedArmor(CPed* pPed, float& fArmor)
+bool CStaticFunctionDefinitions::GetPedArmor(CPed* const ped, float& armor)
 {
-    assert(pPed);
+    assert(ped);
 
-    fArmor = pPed->GetArmor();
+    armor = ped->GetArmor();
     return true;
 }
 
@@ -3675,39 +3722,36 @@ bool CStaticFunctionDefinitions::IsPedFrozen(CPed* pPed, bool& bIsFrozen)
 }
 
 // ************** PED SET FUNCS ************** //
-bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float fArmor)
+bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float armor)
 {
     assert(pElement);
 
-    // Make sure it's above 0
-    if (fArmor >= 0.0f)
-    {
-        RUN_CHILDREN(SetPedArmor(*iter, fArmor))
+    if (armor < 0.0f)
+        return false;
 
-        if (IS_PED(pElement))
-        {
-            CPed* pPed = static_cast<CPed*>(pElement);
-            if (pPed->IsSpawned())
-            {
-                // Limit it to 100.0
-                if (fArmor > 100.0f)
-                    fArmor = 100.0f;
+    RUN_CHILDREN(SetPedArmor(*iter, armor))
 
-                pPed->SetArmor(fArmor);
+    if (!IS_PED(pElement))
+        return false;
 
-                unsigned char ucArmor = static_cast<unsigned char>(fArmor * 1.25);
+    CPed* ped = static_cast<CPed*>(pElement);
 
-                // Tell everyone
-                CBitStream BitStream;
-                BitStream.pBitStream->Write(ucArmor);
-                BitStream.pBitStream->Write(pPed->GenerateSyncTimeContext());
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ARMOR, *BitStream.pBitStream));
-                return true;
-            }
-        }
-    }
+    if (!ped->IsSpawned())
+        return false;
 
-    return false;
+    if (armor > 100.0f)
+        armor = 100.0f;
+
+    ped->SetArmor(armor);
+
+    std::uint8_t armorUnsigned = static_cast<std::uint8_t>(armor * 1.25);
+
+    CBitStream stream;
+    stream.pBitStream->Write(armorUnsigned);
+    stream.pBitStream->Write(ped->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, SET_PED_ARMOR, *stream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth)
@@ -11476,6 +11520,15 @@ bool CStaticFunctionDefinitions::GetAccountSerial(CAccount* pAccount, SString& s
         strSerial = pAccount->GetSerial();
 
     return bRegistered;
+}
+
+
+bool CStaticFunctionDefinitions::SetAccountSerial(CAccount* account, const std::string& serial) noexcept
+{
+    if (account && account->IsRegistered())
+        return account->SetAccountSerial(serial);
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts)

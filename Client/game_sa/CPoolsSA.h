@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPoolsSA.h
  *  PURPOSE:     Header file for game entity pools class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -18,6 +18,7 @@
 #include "CBuildingsPoolSA.h"
 #include "CDummyPoolSA.h"
 #include "CTxdPoolSA.h"
+#include "CPtrNodeSingleLinkPoolSA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
@@ -97,6 +98,7 @@ public:
     CBuildingsPool& GetBuildingsPool() noexcept override { return m_BuildingsPool; };
     CDummyPool&     GetDummyPool() noexcept { return m_DummyPool; };
     CTxdPool&       GetTxdPool() noexcept { return m_TxdPool; };
+    CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept override { return m_PtrNodeSingleLinkPool; };
 
 private:
     // Pools
@@ -111,6 +113,7 @@ private:
     CBuildingsPoolSA m_BuildingsPool;
     CDummyPoolSA     m_DummyPool;
     CTxdPoolSA       m_TxdPool;
+    CPtrNodeSingleLinkPoolSA m_PtrNodeSingleLinkPool;
 
     bool m_bGetVehicleEnabled;
 };

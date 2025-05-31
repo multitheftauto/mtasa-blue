@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaPedDefs.h
  *  PURPOSE:     Lua ped definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -28,7 +28,7 @@ public:
 
     // Ped get functions
     LUA_DECLARE(CreatePed);
-    LUA_DECLARE(GetPedArmor);
+    static float GetPedArmor(CPed* const ped);
     LUA_DECLARE(GetPedRotation);
     LUA_DECLARE(IsPedChoking);
     LUA_DECLARE(IsPedDead);
@@ -56,7 +56,7 @@ public:
     static bool IsPedReloadingWeapon(CPed* const ped) noexcept;
 
     // Ped set functions
-    LUA_DECLARE(SetPedArmor);
+    static bool SetPedArmor(CPed* const ped, const float armor);
     LUA_DECLARE(KillPed);
     LUA_DECLARE(SetPedRotation);
     LUA_DECLARE(SetPedStat);

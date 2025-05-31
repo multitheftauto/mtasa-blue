@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPlayerWastedPacket.cpp
  *  PURPOSE:     Player wasted state packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

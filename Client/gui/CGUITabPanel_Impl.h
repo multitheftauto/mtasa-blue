@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUITabPanel_Impl.h
  *  PURPOSE:     Tab panel widget class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

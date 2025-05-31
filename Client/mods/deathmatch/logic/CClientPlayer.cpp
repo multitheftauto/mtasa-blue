@@ -311,13 +311,13 @@ void CClientPlayer::DischargeWeapon(eWeaponType weaponType, const CVector& vecSt
                 //      CPlayerPed has post damage health/armor
 
                 float fPreviousHealth = pBackupDamagedPlayer->m_fHealth;
-                float fPreviousArmor = pBackupDamagedPlayer->m_fArmor;
+                float fPreviousArmor = pBackupDamagedPlayer->m_armor;
 
                 // Calculate how much damage should be applied to health/armor
-                float fArmorDamage = std::min(fBackupDamage, pBackupDamagedPlayer->m_fArmor);
+                float fArmorDamage = std::min(fBackupDamage, pBackupDamagedPlayer->m_armor);
                 float fHealthDamage = std::min(fBackupDamage - fArmorDamage, pBackupDamagedPlayer->m_fHealth);
 
-                float fNewArmor = pBackupDamagedPlayer->m_fArmor - fArmorDamage;
+                float fNewArmor = pBackupDamagedPlayer->m_armor - fArmorDamage;
                 float fNewHealth = pBackupDamagedPlayer->m_fHealth - fHealthDamage;
 
                 // Ensure CPlayerPed has post damage health/armor

@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Math.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -112,5 +112,10 @@ namespace SharedUtil
     inline float GetRandomNumberInRange(float minRange, float maxRange)
     {
         return std::uniform_real_distribution<float>{minRange, maxRange}(randomEngine);
+    }
+
+    inline bool IsNearlyEqual(float a, float b, float epsilon = std::numeric_limits<float>().epsilon()) noexcept
+    {
+	    return std::fabs(a - b) <= epsilon;
     }
 }            // namespace SharedUtil

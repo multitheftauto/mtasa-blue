@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPedSyncPacket.cpp
  *  PURPOSE:     Ped synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -38,6 +38,14 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
         Data.ucFlags = ucFlags;
 
+        if (BitStream.Can(eBitStreamVersion::PedSync_CameraRotation))
+        {
+            if (!BitStream.Read(Data.flags2))
+                return false;
+        }
+        else
+            Data.flags2 = 0;
+
         // Did we recieve position?
         if (ucFlags & 0x01)
         {    
@@ -55,6 +63,14 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
         {
             if (!BitStream.Read(Data.fArmor))
                 return false;
+        }
+
+        if (Data.flags2 & 0x01)
+        {
+            SCameraRotationSync camRotation;
+            if (!BitStream.Read(&camRotation))
+                return false;
+            Data.cameraRotation = camRotation.data.fRotation;
         }
 
         // On Fire
@@ -100,6 +116,9 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     BitStream.Write(Data.ucFlags);
 
+    if (BitStream.Can(eBitStreamVersion::PedSync_CameraRotation))
+        BitStream.Write(Data.flags2);
+
     if (BitStream.Can(eBitStreamVersion::PedSync_Revision))
     {
         // Position and rotation
@@ -140,6 +159,14 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(Data.fHealth);
     if (Data.ucFlags & 0x10)
         BitStream.Write(Data.fArmor);
+
+    if (Data.flags2 & 0x01)
+    {
+        SCameraRotationSync camRotation;
+        camRotation.data.fRotation = Data.cameraRotation;
+        BitStream.Write(&camRotation);
+    }
+
     if (Data.ucFlags & 0x20)
         BitStream.WriteBit(Data.bOnFire);
     if (Data.ucFlags & 0x60 && BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))

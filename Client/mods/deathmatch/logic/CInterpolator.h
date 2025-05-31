@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CInterpolator.h
  *  PURPOSE:     Header for interpolator class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

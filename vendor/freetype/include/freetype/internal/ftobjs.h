@@ -604,12 +604,6 @@ FT_BEGIN_HEADER
 #define FT_FACE_MEMORY( x )   FT_FACE( x )->memory
 #define FT_FACE_STREAM( x )   FT_FACE( x )->stream
 
-#define FT_SIZE_FACE( x )     FT_SIZE( x )->face
-#define FT_SLOT_FACE( x )     FT_SLOT( x )->face
-
-#define FT_FACE_SLOT( x )     FT_FACE( x )->glyph
-#define FT_FACE_SIZE( x )     FT_FACE( x )->size
-
 
   /**************************************************************************
    *

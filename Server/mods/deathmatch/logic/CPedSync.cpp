@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPedSync.cpp
  *  PURPOSE:     Ped entity synchronization class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -276,6 +276,9 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
 
         if (Data.ucFlags & 0x10)
             pPed->SetArmor(Data.fArmor);
+
+        if (Data.flags2 & 0x01)
+            pPed->SetCameraRotation(Data.cameraRotation);
 
         if (Data.ucFlags & 0x20)
             pPed->SetOnFire(Data.bOnFire);
