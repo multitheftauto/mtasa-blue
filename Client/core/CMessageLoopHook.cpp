@@ -518,6 +518,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     return true;
                 }
 
+                // Process ALT + F4
+                if (uMsg == WM_SYSKEYDOWN && wParam == VK_F4)
+                {
+                    // Tell windows to handle this message.
+                    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+                }
+
                 // If we handled mouse steering, don't let GTA.
                 // if ( !CCore::GetSingleton ().GetMouseControl()->ProcessMouseMove ( uMsg, wParam, lParam ) )
                 // Call GTA's window procedure.
