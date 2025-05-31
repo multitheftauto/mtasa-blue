@@ -18,6 +18,7 @@
 #include "CColRectangle.h"
 #include "CColTube.h"
 #include "CDummy.h"
+#include "CBuilding.h"
 #include "CPickup.h"
 #include "CMarker.h"
 #include "CBlip.h"
@@ -151,6 +152,12 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 {
                     CObject* pObject = static_cast<CObject*>(pElement);
                     bCollisionsEnabled = pObject->GetCollisionEnabled();
+                    break;
+                }
+                case CElement::BUILDING:
+                {
+                    CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+                    bCollisionsEnabled = pBuilding->GetCollisionEnabled();
                     break;
                 }
                 case CElement::PED:
@@ -1142,6 +1149,37 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     }
                     if (BitStream.Can(eBitStreamVersion::Water_bShallow_ServerSide))
                         BitStream.WriteBit(pWater->IsWaterShallow());
+                    break;
+                }
+
+                case CElement::BUILDING:
+                {
+                    if (!BitStream.Can(eBitStreamVersion::ServersideBuildingElement))
+                    {
+                        CLogger::LogPrintf("not sending this element - id: %i\n", pElement->GetType());
+                        break;
+                    }
+
+                    CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+
+                    // Position
+                    position.data.vecPosition = pBuilding->GetPosition();
+                    BitStream.Write(&position);
+
+                    // Rotation
+                    SRotationRadiansSync rotationRadians(false);
+                    pBuilding->GetRotation(rotationRadians.data.vecRotation);
+                    BitStream.Write(&rotationRadians);
+
+                    // Model id
+                    BitStream.WriteCompressed(pBuilding->GetModel());
+
+                    // Interior
+                    BitStream.WriteCompressed(pBuilding->GetInterior());
+
+                    CBuilding* pLowLodBuilding = pBuilding->GetLowLodElement();
+                    ElementID lowLodBuildingID = pLowLodBuilding ? pLowLodBuilding->GetID() : INVALID_ELEMENT_ID;
+                    BitStream.Write(lowLodBuildingID);
                     break;
                 }
 
