@@ -5,7 +5,7 @@
  *  FILE:        core/CServerBrowser.h
  *  PURPOSE:     Header file for server browser class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

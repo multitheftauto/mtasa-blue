@@ -222,6 +222,13 @@ void CClientObject::SetOrientation(const CVector& vecPosition, const CVector& ve
 
 void CClientObject::ModelRequestCallback(CModelInfo* pModelInfo)
 {
+    // The model loading may take a while and there's a chance of object being moved to other dimension.
+    if (!IsVisibleInAllDimensions() && GetDimension() != m_pStreamer->GetDimension())
+    {
+        NotifyUnableToCreate();
+        return;
+    }
+
     // Create our object
     Create();
 }

@@ -324,7 +324,7 @@ public:
     int                              unk_75C;
     std::uint8_t                     lastWeaponDamage;
     std::uint8_t                     unk_761[3];
-    CEntitySAInterface*              pTargetedEntity;
+    CEntitySAInterface*              lastDamagedEntity;
     std::int16_t                     unk_768;
 
     CVector                          vecTurretOffset;
@@ -424,9 +424,6 @@ public:
 
     int GetRunState() const override { return GetPedInterface()->moveState; }
 
-    CEntity* GetTargetedEntity() const override;
-    void     SetTargetedEntity(CEntity* targetEntity) override;
-
     bool GetCanBeShotInVehicle() const override{ return GetPedInterface()->pedFlags.bCanBeShotInVehicle; }
     bool GetTestForShotInVehicle() const override { return GetPedInterface()->pedFlags.bTestForShotInVehicle; }
 
@@ -473,7 +470,7 @@ public:
     std::unique_ptr<CPedIK> GetPedIK() override { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
 
     CEntitySAInterface* GetTargetedObject() const override { return GetPedInterface()->pTargetedObject; }
-    ePedState           GetPedState() const override { return static_cast<ePedState>(GetPedInterface()->pedState); }
+    PedState           GetPedState() const override { return static_cast<PedState>(GetPedInterface()->pedState); }
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 

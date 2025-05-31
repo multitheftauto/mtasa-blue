@@ -13,7 +13,7 @@ namespace EmbeddedLuaCode
 --]]
 inspect ={
   _VERSION = 'inspect.lua 3.1.0',
-  _URL     = 'http://github.com/kikito/inspect.lua',
+  _URL     = 'https://github.com/kikito/inspect.lua',
   _DESCRIPTION = 'human-readable representations of tables and MTA datatypes',
   _LICENSE = [[
     MIT LICENSE

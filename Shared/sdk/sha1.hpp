@@ -3,7 +3,7 @@
  *
  *  Copyright (C) 2006-2014, Brainspark B.V.
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
+ *  This file is part of PolarSSL (https://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
  *
  *  All rights reserved.
@@ -25,7 +25,7 @@
 /*
  *  The SHA-1 standard was published by NIST in 1993.
  *
- *  http://www.itl.nist.gov/fipspubs/fip180-1.htm
+ *  https://www.itl.nist.gov/fipspubs/fip180-1.htm
  */
 
 #include "sha1.h"

@@ -44,6 +44,7 @@
 #include "vtls/vtls.h"
 #include "transfer.h"
 #include "multiif.h"
+#include "strparse.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -314,8 +315,11 @@ static CURLcode on_resp_header(struct Curl_cfilter *cf,
             k->httpcode);
     }
     else {
-      (void)curlx_strtoofft(header + strlen("Content-Length:"),
-                            NULL, 10, &ts->cl);
+      const char *p = header + strlen("Content-Length:");
+      if(Curl_str_numblanks(&p, &ts->cl)) {
+        failf(data, "Unsupported Content-Length value");
+        return CURLE_WEIRD_SERVER_REPLY;
+      }
     }
   }
   else if(Curl_compareheader(header,
@@ -597,7 +601,7 @@ static CURLcode H1_CONNECT(struct Curl_cfilter *cf,
           infof(data, "Connect me again please");
           Curl_conn_cf_close(cf, data);
           connkeep(conn, "HTTP proxy CONNECT");
-          result = Curl_conn_cf_connect(cf->next, data, FALSE, &done);
+          result = Curl_conn_cf_connect(cf->next, data, &done);
           goto out;
         }
         else {
@@ -637,7 +641,7 @@ out:
 
 static CURLcode cf_h1_proxy_connect(struct Curl_cfilter *cf,
                                     struct Curl_easy *data,
-                                    bool blocking, bool *done)
+                                    bool *done)
 {
   CURLcode result;
   struct h1_tunnel_state *ts = cf->ctx;
@@ -648,7 +652,7 @@ static CURLcode cf_h1_proxy_connect(struct Curl_cfilter *cf,
   }
 
   CURL_TRC_CF(data, cf, "connect");
-  result = cf->next->cft->do_connect(cf->next, data, blocking, done);
+  result = cf->next->cft->do_connect(cf->next, data, done);
   if(result || !*done)
     return result;
 

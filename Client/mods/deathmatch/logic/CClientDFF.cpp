@@ -99,6 +99,23 @@ void CClientDFF::UnloadDFF()
     m_LoadedClumpInfoMap.clear();
 }
 
+bool CClientDFF::AddClothingModel(const std::string& modelName)
+{
+    if (modelName.empty())
+        return false;
+
+    if (m_RawDataBuffer.empty() && m_bIsRawData)
+        return false;
+
+    if (m_RawDataBuffer.empty())
+    {
+        if (!FileLoad(std::nothrow, m_strDffFilename, m_RawDataBuffer))
+            return false;
+    }
+
+    return g_pGame->GetRenderWare()->ClothesAddFile(m_RawDataBuffer.data(), m_RawDataBuffer.size(), modelName.c_str());
+}
+
 bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
 {
     // Record attempt in case it all goes wrong
@@ -231,6 +248,9 @@ void CClientDFF::RestoreModels()
         // Restore this model
         InternalRestoreModel(*iter);
     }
+
+    // Remove all clothes models
+    g_pGame->GetRenderWare()->ClothesRemoveFile(m_RawDataBuffer.data());
 
     // Clear the list
     m_Replaced.clear();
