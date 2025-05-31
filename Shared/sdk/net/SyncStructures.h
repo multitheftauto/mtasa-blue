@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/SyncStructures.h
  *  PURPOSE:     Structures used for syncing stuff through the network.
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -547,8 +547,30 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         BITCOUNT = 12
     };
 
-    bool Read(NetBitStreamInterface& bitStream) { return bitStream.ReadBits((char*)&data, BITCOUNT); }
-    void Write(NetBitStreamInterface& bitStream) const { bitStream.WriteBits((const char*)&data, BITCOUNT); }
+    enum
+    {
+        BITCOUNT2 = 1
+    };
+
+    bool Read(NetBitStreamInterface& stream)
+    {
+        bool ok = stream.ReadBits((char*)&data, BITCOUNT);
+
+        if (stream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+            ok &= stream.ReadBits((char*)&data2, BITCOUNT2);
+        else
+            data2.isReloadingWeapon = 0;
+
+        return ok;
+    }
+
+    void Write(NetBitStreamInterface& stream) const
+    {
+        stream.WriteBits((const char*)&data, BITCOUNT);
+
+        if (stream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+            stream.WriteBits((const char*)&data2, BITCOUNT2);
+    }
 
     struct
     {
@@ -565,6 +587,11 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         bool bSyncingVelocity : 1;
         bool bStealthAiming : 1;
     } data;
+
+    struct
+    {
+        bool isReloadingWeapon : 1;
+    } data2;
 };
 
 struct SPedRotationSync : public ISyncStructure
@@ -2040,6 +2067,22 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     {
         BITCOUNT4 = 1
     };
+    enum
+    {
+        BITCOUNT5 = 1
+    };
+    enum
+    {
+        BITCOUNT6 = 1
+    };
+    enum
+    {
+        BITCOUNT7 = 1
+    };
+    enum
+    {
+        BITCOUNT8 = 1
+    };
 
     bool Read(NetBitStreamInterface& bitStream)
     {
@@ -2059,6 +2102,26 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
          else
              data4.extendedwatercannons = true;
 
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
+        else
+            data5.tunnelweatherblend = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_IgnoreFireState))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data6), BITCOUNT6);
+        else
+            data6.ignoreFireState = false;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data7), BITCOUNT7);
+        else
+            data7.flyingcomponents = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleBurnExplosions))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data8), BITCOUNT8);
+        else
+            data8.vehicleburnexplosions = true;
+            
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
         //     isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
@@ -2078,6 +2141,18 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_IgnoreFireState))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data6), BITCOUNT6);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data7), BITCOUNT7);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleBurnExplosions))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data8), BITCOUNT8);
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2116,6 +2191,26 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool extendedwatercannons : 1;
     } data4;
 
+    struct
+    {
+        bool tunnelweatherblend : 1;
+    } data5;
+
+    struct
+    {
+        bool ignoreFireState : 1;
+    } data6;
+    
+    struct
+    {
+        bool flyingcomponents : 1;
+    } data7;
+
+    struct
+    {
+        bool vehicleburnexplosions : 1;
+    } data8;
+    
     SWorldSpecialPropertiesStateSync()
     {
         // Set default states
@@ -2134,6 +2229,10 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data2.fireballdestruct = true;
         data3.roadsignstext = true;
         data4.extendedwatercannons = true;
+        data5.tunnelweatherblend = true;
+        data6.ignoreFireState = false;
+        data7.flyingcomponents = true;
+        data8.vehicleburnexplosions = true;
     }
 };
 

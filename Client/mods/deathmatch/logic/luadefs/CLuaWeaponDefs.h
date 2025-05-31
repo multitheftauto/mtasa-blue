@@ -5,12 +5,13 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaWeaponDefs.cpp
  *  PURPOSE:     Lua definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaFunctionParser.h>
 
 class CLuaWeaponDefs : public CLuaDefs
 {
@@ -24,8 +25,8 @@ public:
     LUA_DECLARE(CreateWeapon);
     LUA_DECLARE(FireWeapon);
     LUA_DECLARE(SetWeaponProperty);
-    LUA_DECLARE(GetWeaponProperty);
-    LUA_DECLARE(GetOriginalWeaponProperty);
+    static std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> GetWeaponProperty(lua_State* luaVM, std::variant<CClientWeapon*, int, std::string> weapon, std::variant<int, std::string> weaponSkill, WeaponProperty property);
+    static std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> GetOriginalWeaponProperty(lua_State* luaVM, std::variant<int, std::string> weapon, std::variant<int, std::string> weaponSkill, WeaponProperty property);
     LUA_DECLARE(SetWeaponState);
     LUA_DECLARE(GetWeaponState);
     LUA_DECLARE(SetWeaponTarget);
@@ -41,4 +42,7 @@ public:
     LUA_DECLARE(GetWeaponClipAmmo);
     LUA_DECLARE(SetWeaponAmmo);
     LUA_DECLARE(SetWeaponClipAmmo);
+
+    static bool SetWeaponRenderEnabled(bool enabled);
+    static bool IsWeaponRenderEnabled();
 };

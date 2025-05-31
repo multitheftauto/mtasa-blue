@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CMarker.cpp
  *  PURPOSE:     Marker entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -33,6 +33,9 @@ CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElem
     m_Color = SColorRGBA(255, 255, 255, 255);
     m_bHasTarget = false;
     m_ucIcon = ICON_NONE;
+    m_ignoreAlphaLimits = false;
+    m_TargetArrowColor = SColorRGBA(255, 64, 64, 255);
+    m_TargetArrowSize = m_fSize * 0.625f;
 
     // Create our collision object
     m_pCollision = new CColCircle(pColManager, nullptr, m_vecPosition, m_fSize, true);
@@ -261,6 +264,8 @@ void CMarker::SetSize(float fSize)
     {
         // Set the new size and update the col object
         m_fSize = fSize;
+        m_TargetArrowSize = fSize * 0.625f;
+
         UpdateCollisionObject(m_ucType);
 
         // Tell all players
@@ -278,12 +283,20 @@ void CMarker::SetColor(const SColor color)
         // Set the new color
         m_Color = color;
 
+        if (!m_ignoreAlphaLimits)
+        {
+            if (m_ucType == CMarker::TYPE_CHECKPOINT)
+                m_Color.A = 128;
+            else if (m_ucType == CMarker::TYPE_ARROW)
+                m_Color.A = 255;
+        }
+
         // Tell all the players
         CBitStream BitStream;
-        BitStream.pBitStream->Write(color.B);
-        BitStream.pBitStream->Write(color.G);
-        BitStream.pBitStream->Write(color.R);
-        BitStream.pBitStream->Write(color.A);
+        BitStream.pBitStream->Write(m_Color.B);
+        BitStream.pBitStream->Write(m_Color.G);
+        BitStream.pBitStream->Write(m_Color.R);
+        BitStream.pBitStream->Write(m_Color.A);
         BroadcastOnlyVisible(CElementRPCPacket(this, SET_MARKER_COLOR, *BitStream.pBitStream));
     }
 }
@@ -299,6 +312,23 @@ void CMarker::SetIcon(unsigned char ucIcon)
         BitStream.pBitStream->Write(m_ucIcon);
         BroadcastOnlyVisible(CElementRPCPacket(this, SET_MARKER_ICON, *BitStream.pBitStream));
     }
+}
+
+void CMarker::SetTargetArrowProperties(const SColor color, float size) noexcept
+{
+    if (m_TargetArrowColor == color && m_TargetArrowSize == size)
+        return;
+
+    m_TargetArrowColor = color;
+    m_TargetArrowSize = size;
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(color.R);
+    BitStream.pBitStream->Write(color.G);
+    BitStream.pBitStream->Write(color.B);
+    BitStream.pBitStream->Write(color.A);
+    BitStream.pBitStream->Write(size);
+    BroadcastOnlyVisible(CElementRPCPacket(this, SET_MARKER_TARGET_ARROW_PROPERTIES, *BitStream.pBitStream));
 }
 
 void CMarker::Callback_OnCollision(CColShape& Shape, CElement& Element)

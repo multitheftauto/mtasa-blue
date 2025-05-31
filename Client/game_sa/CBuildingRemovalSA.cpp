@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CBuildingRemovalSA.cpp
  *  PURPOSE:     Building removal logic
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -54,15 +54,15 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
             if (pFind->m_iCount <= 0 && pFind->m_pInterface)
             {
                 // Grab distances across each axis
-                float fDistanceX = fX - pFind->m_pInterface->Placeable.m_transform.m_translate.fX;
-                float fDistanceY = fY - pFind->m_pInterface->Placeable.m_transform.m_translate.fY;
-                float fDistanceZ = fZ - pFind->m_pInterface->Placeable.m_transform.m_translate.fZ;
+                float fDistanceX = fX - pFind->m_pInterface->m_transform.m_translate.fX;
+                float fDistanceY = fY - pFind->m_pInterface->m_transform.m_translate.fY;
+                float fDistanceZ = fZ - pFind->m_pInterface->m_transform.m_translate.fZ;
 
-                if (pFind->m_pInterface->Placeable.matrix != NULL)
+                if (pFind->m_pInterface->matrix != NULL)
                 {
-                    fDistanceX = fX - pFind->m_pInterface->Placeable.matrix->vPos.fX;
-                    fDistanceY = fY - pFind->m_pInterface->Placeable.matrix->vPos.fY;
-                    fDistanceZ = fZ - pFind->m_pInterface->Placeable.matrix->vPos.fZ;
+                    fDistanceX = fX - pFind->m_pInterface->matrix->vPos.fX;
+                    fDistanceY = fY - pFind->m_pInterface->matrix->vPos.fY;
+                    fDistanceZ = fZ - pFind->m_pInterface->matrix->vPos.fZ;
                 }
 
                 // Square root 'em
@@ -80,7 +80,7 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
                         if ((pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT) &&
                             pInterface->bRemoveFromWorld != 1)
                         {
-                            if ((DWORD)(pInterface->vtbl) != VTBL_CPlaceable)
+                            if (!pInterface->IsPlaceableVTBL())
                             {
                                 // Add the Data Building to the list
                                 pRemoval->AddDataBuilding(pInterface);
@@ -113,15 +113,15 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
             if (pFindBinary->m_iCount <= 0 && pFindBinary->m_pInterface)
             {
                 // Grab distances across each axis
-                float fDistanceX = fX - pFindBinary->m_pInterface->Placeable.m_transform.m_translate.fX;
-                float fDistanceY = fY - pFindBinary->m_pInterface->Placeable.m_transform.m_translate.fY;
-                float fDistanceZ = fZ - pFindBinary->m_pInterface->Placeable.m_transform.m_translate.fZ;
+                float fDistanceX = fX - pFindBinary->m_pInterface->m_transform.m_translate.fX;
+                float fDistanceY = fY - pFindBinary->m_pInterface->m_transform.m_translate.fY;
+                float fDistanceZ = fZ - pFindBinary->m_pInterface->m_transform.m_translate.fZ;
 
-                if (pFindBinary->m_pInterface->Placeable.matrix != NULL)
+                if (pFindBinary->m_pInterface->matrix != NULL)
                 {
-                    fDistanceX = fX - pFindBinary->m_pInterface->Placeable.matrix->vPos.fX;
-                    fDistanceY = fY - pFindBinary->m_pInterface->Placeable.matrix->vPos.fY;
-                    fDistanceZ = fZ - pFindBinary->m_pInterface->Placeable.matrix->vPos.fZ;
+                    fDistanceX = fX - pFindBinary->m_pInterface->matrix->vPos.fX;
+                    fDistanceY = fY - pFindBinary->m_pInterface->matrix->vPos.fY;
+                    fDistanceZ = fZ - pFindBinary->m_pInterface->matrix->vPos.fZ;
                 }
 
                 // Square root 'em
@@ -139,7 +139,7 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
                         if ((pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT) &&
                             pInterface->bRemoveFromWorld != 1)
                         {
-                            if ((DWORD)(pInterface->vtbl) != VTBL_CPlaceable)
+                            if (!pInterface->IsPlaceableVTBL())
                             {
                                 // Add the Data Building to the list
                                 pRemoval->AddBinaryBuilding(pInterface);
@@ -211,7 +211,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                                 pEntity->bRemoveFromWorld != 1)
                             {
                                 // Don't call this on entities being removed.
-                                if ((DWORD)(pEntity->vtbl) != VTBL_CPlaceable)
+                                if (!pEntity->IsPlaceableVTBL())
                                 {
                                     pGame->GetWorld()->Add(pEntity, Building_Restore);
                                     m_pRemovedEntities[(DWORD)pEntity] = false;
@@ -243,7 +243,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                             if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
                                 pEntity->bRemoveFromWorld != 1)
                             {
-                                if ((DWORD)(pEntity->vtbl) != VTBL_CPlaceable)
+                                if (!pEntity->IsPlaceableVTBL())
                                 {
                                     pGame->GetWorld()->Add(pEntity, Building_Restore2);
                                     m_pRemovedEntities[(DWORD)pEntity] = false;
@@ -277,15 +277,15 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
         if (pFound)
         {
             // Grab distances across each axis
-            float fDistanceX = fX - pFound->m_pInterface->Placeable.m_transform.m_translate.fX;
-            float fDistanceY = fY - pFound->m_pInterface->Placeable.m_transform.m_translate.fY;
-            float fDistanceZ = fZ - pFound->m_pInterface->Placeable.m_transform.m_translate.fZ;
+            float fDistanceX = fX - pFound->m_pInterface->m_transform.m_translate.fX;
+            float fDistanceY = fY - pFound->m_pInterface->m_transform.m_translate.fY;
+            float fDistanceZ = fZ - pFound->m_pInterface->m_transform.m_translate.fZ;
 
-            if (pFound->m_pInterface->Placeable.matrix != NULL)
+            if (pFound->m_pInterface->matrix != NULL)
             {
-                fDistanceX = fX - pFound->m_pInterface->Placeable.matrix->vPos.fX;
-                fDistanceY = fY - pFound->m_pInterface->Placeable.matrix->vPos.fY;
-                fDistanceZ = fZ - pFound->m_pInterface->Placeable.matrix->vPos.fZ;
+                fDistanceX = fX - pFound->m_pInterface->matrix->vPos.fX;
+                fDistanceY = fY - pFound->m_pInterface->matrix->vPos.fY;
+                fDistanceZ = fZ - pFound->m_pInterface->matrix->vPos.fZ;
             }
 
             // Square root 'em
@@ -309,15 +309,15 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
         if (pFoundBinary)
         {
             // Grab distances across each axis
-            float fDistanceX = fX - pFoundBinary->m_pInterface->Placeable.m_transform.m_translate.fX;
-            float fDistanceY = fY - pFoundBinary->m_pInterface->Placeable.m_transform.m_translate.fY;
-            float fDistanceZ = fZ - pFoundBinary->m_pInterface->Placeable.m_transform.m_translate.fZ;
+            float fDistanceX = fX - pFoundBinary->m_pInterface->m_transform.m_translate.fX;
+            float fDistanceY = fY - pFoundBinary->m_pInterface->m_transform.m_translate.fY;
+            float fDistanceZ = fZ - pFoundBinary->m_pInterface->m_transform.m_translate.fZ;
 
-            if (pFoundBinary->m_pInterface->Placeable.matrix != NULL)
+            if (pFoundBinary->m_pInterface->matrix != NULL)
             {
-                fDistanceX = fX - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fX;
-                fDistanceY = fY - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fY;
-                fDistanceZ = fZ - pFoundBinary->m_pInterface->Placeable.matrix->vPos.fZ;
+                fDistanceX = fX - pFoundBinary->m_pInterface->matrix->vPos.fX;
+                fDistanceY = fY - pFoundBinary->m_pInterface->matrix->vPos.fY;
+                fDistanceZ = fZ - pFoundBinary->m_pInterface->matrix->vPos.fZ;
             }
 
             // Square root 'em
@@ -386,15 +386,15 @@ bool CBuildingRemovalSA::IsObjectRemoved(CEntitySAInterface* pInterface)
             if (pFind->m_cInterior == -1 || pFind->m_cInterior == pInterface->m_areaCode)
             {
                 // Grab the distance
-                float fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.m_transform.m_translate.fX;
-                float fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.m_transform.m_translate.fY;
-                float fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.m_transform.m_translate.fZ;
+                float fDistanceX = pFind->m_vecPos.fX - pInterface->m_transform.m_translate.fX;
+                float fDistanceY = pFind->m_vecPos.fY - pInterface->m_transform.m_translate.fY;
+                float fDistanceZ = pFind->m_vecPos.fZ - pInterface->m_transform.m_translate.fZ;
 
-                if (pInterface->Placeable.matrix != NULL)
+                if (pInterface->matrix != NULL)
                 {
-                    fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->vPos.fX;
-                    fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->vPos.fY;
-                    fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->vPos.fZ;
+                    fDistanceX = pFind->m_vecPos.fX - pInterface->matrix->vPos.fX;
+                    fDistanceY = pFind->m_vecPos.fY - pInterface->matrix->vPos.fY;
+                    fDistanceZ = pFind->m_vecPos.fZ - pInterface->matrix->vPos.fZ;
                 }
 
                 float fDistance = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
@@ -457,7 +457,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                             pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
-                            if ((DWORD)(pEntity->vtbl) != VTBL_CPlaceable)
+                            if (!pEntity->IsPlaceableVTBL())
                             {
                                 pGame->GetWorld()->Add(pEntity, BuildingRemovalReset);
                                 m_pRemovedEntities[(DWORD)pEntity] = false;
@@ -483,7 +483,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                             pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
-                            if ((DWORD)(pEntity->vtbl) != VTBL_CPlaceable)
+                            if (!pEntity->IsPlaceableVTBL())
                             {
                                 pGame->GetWorld()->Add(pEntity, BuildingRemovalReset2);
                                 m_pRemovedEntities[(DWORD)pEntity] = false;
@@ -546,15 +546,15 @@ SBuildingRemoval* CBuildingRemovalSA::GetBuildingRemoval(CEntitySAInterface* pIn
         if (pFind)
         {
             // Grab the distance
-            float fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.m_transform.m_translate.fX;
-            float fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.m_transform.m_translate.fY;
-            float fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.m_transform.m_translate.fZ;
+            float fDistanceX = pFind->m_vecPos.fX - pInterface->m_transform.m_translate.fX;
+            float fDistanceY = pFind->m_vecPos.fY - pInterface->m_transform.m_translate.fY;
+            float fDistanceZ = pFind->m_vecPos.fZ - pInterface->m_transform.m_translate.fZ;
 
-            if (pInterface->Placeable.matrix != NULL)
+            if (pInterface->matrix != NULL)
             {
-                fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.matrix->vPos.fX;
-                fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.matrix->vPos.fY;
-                fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.matrix->vPos.fZ;
+                fDistanceX = pFind->m_vecPos.fX - pInterface->matrix->vPos.fX;
+                fDistanceY = pFind->m_vecPos.fY - pInterface->matrix->vPos.fY;
+                fDistanceZ = pFind->m_vecPos.fZ - pInterface->matrix->vPos.fZ;
             }
 
             float fDistance = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
@@ -716,4 +716,10 @@ void CBuildingRemovalSA::DropCaches()
 
     m_pBinaryBuildings->clear();
     m_pDataBuildings->clear();
+
+    for (auto &pRemoval : *m_pBuildingRemovals)
+    {
+        pRemoval.second->m_pDataRemoveList->clear();
+        pRemoval.second->m_pBinaryRemoveList->clear();
+    }
 }

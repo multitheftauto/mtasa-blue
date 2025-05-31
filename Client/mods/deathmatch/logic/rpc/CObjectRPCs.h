@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CObjectRPCs.h
  *  PURPOSE:     Header for object RPC class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -27,4 +27,6 @@ public:
     DECLARE_ELEMENT_RPC(SetObjectVisibleInAllDimensions);
     DECLARE_ELEMENT_RPC(SetObjectBreakable);
     DECLARE_ELEMENT_RPC(BreakObject);
+    DECLARE_ELEMENT_RPC(RespawnObject);
+    DECLARE_ELEMENT_RPC(ToggleObjectRespawn);
 };

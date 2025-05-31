@@ -5,7 +5,7 @@
  *  FILE:        sdk/CVector.h
  *  PURPOSE:     3D vector math implementation
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,13 +30,12 @@ public:
     float fY;
     float fZ;
 
-    struct NoInit{};
+    struct NoInit {};
+    CVector(NoInit) noexcept {}
 
-    CVector(NoInit) {}
-
-    constexpr CVector() : fX(0.0f), fY(0.0f), fZ(0.0f) {}
-
-    constexpr CVector(float x, float y, float z) : fX(x), fY(y), fZ(z) {}
+    constexpr CVector() noexcept : fX(0.0f), fY(0.0f), fZ(0.0f) {}
+    
+    constexpr explicit CVector(float x, float y = 0.0f, float z = 0.0f) noexcept : fX(x), fY(y), fZ(z) {}
 
     constexpr CVector(const CVector4D& vec) noexcept : fX(vec.fX), fY(vec.fY), fZ(vec.fZ) {}
 
@@ -187,12 +186,24 @@ public:
         {
             *outVec = *this + vecRay * t;
             if (outHitBary) { // Calculate all barycentric coords if necessary
-                *outHitBary = { 1.f - u - v, u, v }; // For vertices A, B, C [I assume?]
+                *outHitBary = CVector( 1.f - u - v, u, v ); // For vertices A, B, C [I assume?]
             }
             return true;
         }
 
         return false;
+    }
+
+    bool IsValid() const
+    {
+        const float values[3] = {fX, fY, fZ};
+        for (std::size_t i = 0; i < 3; ++i)
+        {
+            if (std::isnan(values[i]) || std::isinf(values[i]))
+                return false;
+        }
+
+        return true;
     }
 
     constexpr CVector operator+(const CVector& vecRight) const noexcept { return CVector(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ); }

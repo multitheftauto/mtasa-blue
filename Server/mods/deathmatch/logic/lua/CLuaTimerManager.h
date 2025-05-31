@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaTimerManager.h
  *  PURPOSE:     Lua timer manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -36,6 +36,7 @@ public:
     void          RemoveAllTimers();
     unsigned long GetTimerCount() const { return m_TimerList.size(); }
 
+    void SetTimerPaused(CLuaTimer* timer, bool paused);
     void ResetTimer(CLuaTimer* pLuaTimer);
 
     CFastList<CLuaTimer*>::const_iterator IterBegin() { return m_TimerList.begin(); }

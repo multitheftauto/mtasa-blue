@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.File.hpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include "SharedUtil.File.h"
@@ -157,10 +157,17 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     CloseHandle(handle);
     return true;
 #else
+#ifdef __APPLE__
+    struct stat info;
+
+    if (stat(filePath, &info) != 0)
+        return false;
+#else
     struct stat64 info;
 
     if (stat64(filePath, &info) != 0)
         return false;
+#endif
 
     size_t fileSize = static_cast<size_t>(info.st_size);
 

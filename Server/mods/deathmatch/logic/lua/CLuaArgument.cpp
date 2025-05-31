@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaArgument.cpp
  *  PURPOSE:     Lua argument handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -325,11 +325,25 @@ void CLuaArgument::ReadNumber(double dNumber)
     m_Number = dNumber;
 }
 
-void CLuaArgument::ReadString(const std::string& strString)
+void CLuaArgument::ReadString(const std::string& string)
 {
     m_iType = LUA_TSTRING;
     DeleteTableData();
-    m_strString = strString;
+    m_strString = string;
+}
+
+void CLuaArgument::ReadString(const std::string_view& string)
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string;
+}
+
+void CLuaArgument::ReadString(const char* string)
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string;
 }
 
 void CLuaArgument::ReadElement(CElement* pElement)
@@ -722,6 +736,11 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
 
     // Success
     return true;
+}
+
+bool CLuaArgument::IsTable() const noexcept
+{
+    return m_iType == LUA_TTABLE && m_pTableData && (m_pTableData->Count() % 2) == 0;
 }
 
 void CLuaArgument::LogUnableToPacketize(const char* szMessage) const

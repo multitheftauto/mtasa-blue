@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Misc.hpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -36,8 +36,8 @@
     #endif
 #endif
 
-#ifdef __APPLE__
-    #include "cpuid.h"
+#if defined(__APPLE__) && !defined(__aarch64__)
+    #include <cpuid.h>
 #endif
 
 CCriticalSection     CRefCountable::ms_CS;
@@ -59,7 +59,7 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 
 #define PRODUCT_REGISTRY_PATH       "Software\\Multi Theft Auto: San Andreas All"       // HKLM
 #define PRODUCT_COMMON_DATA_DIR     "MTA San Andreas All"                               // C:\ProgramData
-#define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
+#define TROUBLE_URL1 "https://help.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
 //
 // Output a UTF8 encoded messagebox
@@ -971,7 +971,7 @@ static bool MyShellExecute(bool bBlocking, const SString& strAction, const SStri
     SString strFile = strInFile;
     SString strParameters = strInParameters;
 
-    if (strAction == "open" && (strFile.BeginsWithI("http://") || strFile.BeginsWithI("https://")) && strParameters.empty())
+    if (strAction == "open" && (strFile.BeginsWithI("https://") || strFile.BeginsWithI("https://")) && strParameters.empty())
     {
         strParameters = "url.dll,FileProtocolHandler " + strFile;
         strFile = "rundll32.exe";
@@ -1251,7 +1251,7 @@ DWORD SharedUtil::GetMainThreadId()
             processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
         }
 
-        // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
+        // Find oldest thread in the current process ( https://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
 
         if (hThreadSnap != INVALID_HANDLE_VALUE)
@@ -1834,6 +1834,8 @@ namespace SharedUtil
             return FnGetCurrentProcessorNumber();
 
         return _GetCurrentProcessorNumberXP();
+#elif defined(__APPLE__) && defined(__aarch64__)
+        return -1;
 #elif defined(__APPLE__)
         // Hacked from https://stackoverflow.com/a/40398183/1517394
         unsigned long cpu;

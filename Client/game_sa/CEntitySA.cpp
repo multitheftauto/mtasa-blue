@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CEntitySA.cpp
  *  PURPOSE:     Base entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -101,14 +101,14 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
 {
     // Remove & add to world?
     CVector* vecPos;
-    if (m_pInterface->Placeable.matrix)
+    if (m_pInterface->matrix)
     {
         OnChangingPosition(CVector(fX, fY, fZ));
-        vecPos = &m_pInterface->Placeable.matrix->vPos;
+        vecPos = &m_pInterface->matrix->vPos;
     }
     else
     {
-        vecPos = &m_pInterface->Placeable.m_transform.m_translate;
+        vecPos = &m_pInterface->m_transform.m_translate;
     }
 
     if (vecPos)
@@ -139,21 +139,10 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
 
 void CEntitySA::Teleport(float fX, float fY, float fZ)
 {
-    if (m_pInterface->Placeable.matrix)
+    if (m_pInterface->matrix)
     {
         SetPosition(fX, fY, fZ);
-
-        DWORD dwFunc = m_pInterface->vtbl->Teleport;
-        DWORD dwThis = (DWORD)m_pInterface;
-        _asm
-        {
-            mov     ecx, dwThis
-            push    1
-            push    fZ
-            push    fY
-            push    fX
-            call    dwFunc
-        }
+        m_pInterface->Teleport(CVector(fX, fY, fZ), true);
     }
     else
     {
@@ -163,34 +152,18 @@ void CEntitySA::Teleport(float fX, float fY, float fZ)
 
 void CEntitySA::ProcessControl()
 {
-    DWORD dwFunc = m_pInterface->vtbl->ProcessControl;
-    DWORD dwThis = (DWORD)m_pInterface;
-    if (dwFunc)
-    {
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
-    }
+    m_pInterface->ProcessControl();
 }
 
 void CEntitySA::SetupLighting()
 {
-    DWORD dwFunc = m_pInterface->vtbl->SetupLighting;
-    DWORD dwThis = (DWORD)m_pInterface;
-    if (dwFunc)
-    {
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
-    }
+    m_pInterface->SetupLighting();
 }
 
+// Remove this function?
 void CEntitySA::Render()
 {
+    // This function may use m_pInterface->Render()
     DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
@@ -198,36 +171,16 @@ void CEntitySA::Render()
         mov     ecx, dwThis
         call    dwFunc
     }
-
-    /*  DWORD dwFunc = 0x553260;
-        DWORD dwThis = (DWORD) m_pInterface;
-
-        _asm
-        {
-            push    dwThis
-            call    dwFunc
-            add     esp, 4
-        }*/
 }
 
 void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 {
     pGame->GetWorld()->Remove(this, CEntity_SetOrientation);
+
+    m_pInterface->SetOrientation(fX, fY, fZ);
+
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_SetOrientation;
-    _asm
-    {
-        // ChrML: I've switched the X and Z at this level because that's how the real rotation
-        //        is. GTA has kinda swapped them in this function.
-
-        push    fZ
-        push    fY
-        push    fX
-        mov     ecx, dwThis
-        call    dwFunc
-    }
-
-    dwFunc = 0x446F90;
+    DWORD dwFunc = 0x446F90;
     _asm
     {
         mov     ecx, dwThis
@@ -305,10 +258,10 @@ CVector* CEntitySA::GetPosition()
 
 CVector* CEntitySA::GetPositionInternal()
 {
-    if (m_pInterface->Placeable.matrix)
-        return &m_pInterface->Placeable.matrix->vPos;
+    if (m_pInterface->matrix)
+        return &m_pInterface->matrix->vPos;
     else
-        return &m_pInterface->Placeable.m_transform.m_translate;
+        return &m_pInterface->m_transform.m_translate;
 }
 
 //
@@ -331,12 +284,12 @@ CMatrix* CEntitySA::GetMatrix(CMatrix* matrix)
 
 CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
 {
-    if (m_pInterface->Placeable.matrix && matrix)
+    if (m_pInterface->matrix && matrix)
     {
-        MemCpyFast(&matrix->vFront, &m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
-        MemCpyFast(&matrix->vPos, &m_pInterface->Placeable.matrix->vPos, sizeof(CVector));
-        MemCpyFast(&matrix->vUp, &m_pInterface->Placeable.matrix->vUp, sizeof(CVector));
-        MemCpyFast(&matrix->vRight, &m_pInterface->Placeable.matrix->vRight, sizeof(CVector));
+        MemCpyFast(&matrix->vFront, &m_pInterface->matrix->vFront, sizeof(CVector));
+        MemCpyFast(&matrix->vPos, &m_pInterface->matrix->vPos, sizeof(CVector));
+        MemCpyFast(&matrix->vUp, &m_pInterface->matrix->vUp, sizeof(CVector));
+        MemCpyFast(&matrix->vRight, &m_pInterface->matrix->vRight, sizeof(CVector));
         return matrix;
     }
     else
@@ -347,16 +300,16 @@ CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
 
 void CEntitySA::SetMatrix(CMatrix* matrix)
 {
-    if (m_pInterface->Placeable.matrix && matrix)
+    if (m_pInterface->matrix && matrix)
     {
         OnChangingPosition(matrix->vPos);
 
-        MemCpyFast(&m_pInterface->Placeable.matrix->vFront, &matrix->vFront, sizeof(CVector));
-        MemCpyFast(&m_pInterface->Placeable.matrix->vPos, &matrix->vPos, sizeof(CVector));
-        MemCpyFast(&m_pInterface->Placeable.matrix->vUp, &matrix->vUp, sizeof(CVector));
-        MemCpyFast(&m_pInterface->Placeable.matrix->vRight, &matrix->vRight, sizeof(CVector));
+        MemCpyFast(&m_pInterface->matrix->vFront, &matrix->vFront, sizeof(CVector));
+        MemCpyFast(&m_pInterface->matrix->vPos, &matrix->vPos, sizeof(CVector));
+        MemCpyFast(&m_pInterface->matrix->vUp, &matrix->vUp, sizeof(CVector));
+        MemCpyFast(&m_pInterface->matrix->vRight, &matrix->vRight, sizeof(CVector));
 
-        m_pInterface->Placeable.m_transform.m_translate = matrix->vPos;
+        m_pInterface->m_transform.m_translate = matrix->vPos;
         m_LastGoodPosition = matrix->vPos;
 
         /*
@@ -500,7 +453,7 @@ void CEntitySA::SetVisible(bool bVisible)
 
 void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown)
 {
-    CMatrix_Padded* matrixPadded = m_pInterface->Placeable.matrix;
+    CMatrix_Padded* matrixPadded = m_pInterface->matrix;
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
@@ -518,7 +471,7 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
 
 void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int iUnknown)
 {
-    CMatrix_Padded* matrixPadded = m_pInterface->Placeable.matrix;
+    CMatrix_Padded* matrixPadded = m_pInterface->matrix;
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
@@ -603,55 +556,97 @@ bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& r
     return false;
 }
 
+bool CEntitySA::GetBoneRotationQuat(eBone boneId, float& x, float& y, float& z, float& w)
+{
+    RpClump* clump = GetRpClump();
+    if (!clump)
+        return false;
+        
+    // updating the bone frame orientation will also update its children
+    // This rotation is only applied when UpdateElementRpHAnim is called
+    auto* clumpDataInterface = *pGame->GetClumpData(clump);
+    auto* frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+    if (!frameData)
+        return false;
+
+    RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+    x = boneOrientation->imag.x;
+    y = boneOrientation->imag.y;
+    z = boneOrientation->imag.z;
+    w = boneOrientation->real;
+    return true;
+}
+
 bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll)
 {
     RpClump* clump = GetRpClump();
-    if (clump)
-    {
-        // updating the bone frame orientation will also update its children
-        // This rotation is only applied when UpdateElementRpHAnim is called
-        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
-        AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
-        if (frameData)
-        {
-            RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
-            RwV3d   angles = {yaw, roll, pitch};
-            BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
-            CEntitySAInterface* theInterface = GetInterface();
-            if (theInterface)
-            {
-                theInterface->bDontUpdateHierarchy = false;
-            }
-            return true;
-        }
-    }
-    return false;
+    if (!clump)
+        return false;
+        
+    // updating the bone frame orientation will also update its children
+    // This rotation is only applied when UpdateElementRpHAnim is called
+    auto* clumpDataInterface = *pGame->GetClumpData(clump);
+    auto* frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+    if (!frameData)
+        return false;
+        
+    RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+    RwV3d angles = { yaw, roll, pitch };
+    BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
+    CEntitySAInterface* theInterface = GetInterface();
+    if (theInterface)
+        theInterface->bDontUpdateHierarchy = false;
+        
+    return true;
+}
+
+bool CEntitySA::SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w)
+{
+    RpClump* clump = GetRpClump();
+    if (!clump)
+        return false;
+        
+    // updating the bone frame orientation will also update its children
+    // This rotation is only applied when UpdateElementRpHAnim is called
+    auto* clumpDataInterface = *pGame->GetClumpData(clump);
+    auto* frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+    if (!frameData)
+        return false;
+
+    RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+    boneOrientation->imag.x = x;
+    boneOrientation->imag.y = y;
+    boneOrientation->imag.z = z;
+    boneOrientation->real = w;
+    CEntitySAInterface* theInterface = GetInterface();
+    if (theInterface)
+        theInterface->bDontUpdateHierarchy = false;
+        
+    return true;
 }
 
 bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
 {
     RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
-    if (rwBoneMatrix)
-    {
-        const RwV3d& pos = rwBoneMatrix->pos;
-        position = {pos.x, pos.y, pos.z};
-        return true;
-    }
-    return false;
+    if (!rwBoneMatrix)
+        return false;
+
+    const RwV3d& pos = rwBoneMatrix->pos;
+    position = CVector(pos.x, pos.y, pos.z);
+    return true;
 }
 
 // NOTE: The position will be reset if UpdateElementRpHAnim is called after this.
 bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
 {
     RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
-    if (rwBoneMatrix)
-    {
-        CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
-        boneMatrix.SetTranslateOnly(position);
-        boneMatrix.UpdateRW();
-        return true;
-    }
-    return false;
+    if (!rwBoneMatrix)
+        return false;
+        
+    CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
+    boneMatrix.SetTranslateOnly(position);
+    boneMatrix.UpdateRW();
+    return true;
 }
 
 BYTE CEntitySA::GetAreaCode()

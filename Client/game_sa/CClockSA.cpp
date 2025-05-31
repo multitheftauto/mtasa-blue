@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CClockSA.cpp
  *  PURPOSE:     Game clock
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -29,4 +29,20 @@ void CClockSA::Get(BYTE* bHour, BYTE* bMinute)
 {
     *bMinute = *(BYTE*)VAR_TimeMinutes;
     *bHour = *(BYTE*)VAR_TimeHours;
+}
+
+bool CClockSA::SetTimeFrozen(bool value) noexcept
+{
+    if (value)
+        MemSet((void*)0x53BFBD, 0x90, 5);
+    else
+        MemCpy((void*)0x53BFBD, "\xE8\x4E\x0F\xFF\xFF", 5);
+
+    m_bTimeCycleFrozen = value;
+    return true;
+}
+
+bool CClockSA::ResetTimeFrozen() noexcept
+{
+    return SetTimeFrozen(false);
 }

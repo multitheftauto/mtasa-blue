@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CGraphStats.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -12,8 +12,6 @@
 
 namespace
 {
-    #define GRAPHSTAT_HISTORY_SIZE 256
-
     struct SGraphStatLine
     {
         TIMEUS              prevData;
@@ -41,6 +39,7 @@ public:
     virtual void SetEnabled(bool bEnabled);
     virtual bool IsEnabled();
     virtual void AddTimingPoint(const char* szName);
+    virtual void RemoveTimingPoint(const char* szName);
 
 protected:
     bool                              m_bEnabled;
@@ -113,6 +112,11 @@ void CGraphStats::AddTimingPoint(const char* szName)
     if (!IsEnabled())
         return;
 
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
+
+    std::uint32_t viewportWidth = pGraphics->GetViewportWidth();
+    std::uint32_t sizeX = viewportWidth / 4; // one quarter of screen width
+
     // Start of next frame?
     if (szName[0] == 0)
     {
@@ -133,7 +137,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
                 for (int i = 0; i < Dups; i++)
                 {
                     pLine->iDataPos++;
-                    if (pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE - 1)
+                    if (pLine->iDataPos > sizeX - 1)
                         pLine->iDataPos = 0;
                     pLine->dataHistory[pLine->iDataPos] = Data;
                 }
@@ -153,7 +157,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
         // Add new line
         MapSet(m_LineList, szName, SGraphStatLine());
         pLine = MapFind(m_LineList, szName);
-        pLine->dataHistory.resize(GRAPHSTAT_HISTORY_SIZE);
+        pLine->dataHistory.resize(sizeX);
         memset(&pLine->dataHistory[0], 0, pLine->dataHistory.size());
         pLine->iDataPos = 0;
         pLine->prevData = 0;
@@ -179,11 +183,26 @@ void CGraphStats::AddTimingPoint(const char* szName)
 
     // Inc position
     pLine->iDataPos++;
-    if (pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE - 1)
+    if (pLine->iDataPos > sizeX - 1)
         pLine->iDataPos = 0;
 
     // Insert data point
     pLine->dataHistory[pLine->iDataPos] = AvgData;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CGraphStats::RemoveTimingPoint
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CGraphStats::RemoveTimingPoint(const char* szName)
+{
+    if (!IsEnabled() || szName[0] == 0)
+        return;
+
+    MapRemove(m_LineList, szName);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -199,29 +218,34 @@ void CGraphStats::Draw()
         return;
 
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
+    CLocalGUI*          pLocalGUI = g_pCore->GetLocalGUI();
 
-    uint  uiViewportHeight = pGraphics->GetViewportHeight();
-    uint  uiOriginX = 10;
-    uint  uiOriginY = std::min<int>(500, uiViewportHeight - 10);
-    uint  uiSizeX = GRAPHSTAT_HISTORY_SIZE;
-    uint  uiSizeY = 150;
-    uint  uiRangeY = 100;            // 100ms
-    float fLineScale = 1 / 1000.f / uiRangeY * uiSizeY;
+    std::uint32_t viewportWidth = pGraphics->GetViewportWidth();    // get width of current resolution
+    std::uint32_t viewportHeight = pGraphics->GetViewportHeight();  // get height of current resolution
+    std::uint32_t originX = 10;                                     // offset the graph by 10 pixels from left side of screen
+    std::uint32_t originY = pLocalGUI->GetChatBottomPosition();     // get chat bottom screen position
+    std::uint32_t sizeX = viewportWidth / 4;                        // set the width of graph to 1/4 of current resolution
+    std::uint32_t sizeY = viewportHeight / 4;                       // set the height of graph to 1/4 of current resolution
+    std::uint32_t rangeY = 100;                                     // 100ms
+
+    originY = originY + sizeY + 30;  // add graph height plus a little gap to the overall Y position
+
+    float fLineScale = 1 / 1000.f / rangeY * sizeY;
     float fLineHeight = pGraphics->GetDXFontHeight();
 
     // Backgroung box
-    pGraphics->DrawRectQueued(uiOriginX, uiOriginY - uiSizeY, uiSizeX, uiSizeY, SColorRGBA(0, 0, 0, 128), true);
+    pGraphics->DrawRectQueued(originX, originY - sizeY, sizeX, sizeY, SColorRGBA(0, 0, 0, 128), true);
 
     // Draw data lines
-    float fLabelX = uiOriginX + uiSizeX + 22;
-    float fLabelY = uiOriginY - m_LineList.size() * fLineHeight;
+    float fLabelX = originX + sizeX + 22;
+    float fLabelY = originY - m_LineList.size() * fLineHeight;
     for (const auto& dataLine : m_LineList)
     {
         const SGraphStatLine& line = dataLine.second;
         int                   iDataPos = line.iDataPos;
         int                   iDataPosPrev = iDataPos;
 
-        for (int i = uiSizeX - 1; i > 0; i--)
+        for (int i = sizeX - 1; i > 0; i--)
         {
             float fY0 = line.dataHistory[iDataPos] * fLineScale;
             float fY1 = line.dataHistory[iDataPosPrev] * fLineScale;
@@ -229,14 +253,14 @@ void CGraphStats::Draw()
             iDataPosPrev = iDataPos;
             iDataPos--;
             if (iDataPos == -1)
-                iDataPos = GRAPHSTAT_HISTORY_SIZE - 1;
+                iDataPos = sizeX - 1;
 
-            pGraphics->DrawLineQueued(uiOriginX + i - 1, uiOriginY - fY0, uiOriginX + i, uiOriginY - fY1, 1, line.color, true);
+            pGraphics->DrawLineQueued(originX + i - 1, originY - fY0, originX + i, originY - fY1, 1, line.color, true);
 
-            if (i == uiSizeX - 1)
+            if (i == sizeX - 1)
             {
                 // Line from graph to label
-                pGraphics->DrawLineQueued(uiOriginX + i - 1, uiOriginY - fY0, fLabelX - 2, fLabelY + fLineHeight / 2, 1, line.color, true);
+                pGraphics->DrawLineQueued(originX + i - 1, originY - fY0, fLabelX - 2, fLabelY + fLineHeight / 2, 1, line.color, true);
             }
         }
 

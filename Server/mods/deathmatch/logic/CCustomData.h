@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CCustomData.h
  *  PURPOSE:     Custom entity data class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -25,10 +25,18 @@ enum class ESyncType
     SUBSCRIBE,
 };
 
+enum class eCustomDataClientTrust : std::uint8_t
+{
+    UNSET,
+    ALLOW,
+    DENY,
+};
+
 struct SCustomData
 {
-    CLuaArgument Variable;
-    ESyncType    syncType;
+    CLuaArgument           Variable;
+    ESyncType              syncType;
+    eCustomDataClientTrust clientChangesMode;
 };
 
 class CCustomData
@@ -36,11 +44,13 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(const char* szName);
+    SCustomData* Get(const char* szName) const;
     SCustomData* GetSynced(const char* szName);
     void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
     bool Delete(const char* szName);
+
+    void SetClientChangesMode(const char* szName, eCustomDataClientTrust mode);
 
     unsigned short CountOnlySynchronized();
 

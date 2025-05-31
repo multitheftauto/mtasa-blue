@@ -5,7 +5,7 @@
  *  FILE:        core/CMainMenu.cpp
  *  PURPOSE:     2D Main menu graphical user interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -40,7 +40,8 @@
 #define CORE_MTA_DISABLED_ALPHA     0.4f
 #define CORE_MTA_ENABLED_ALPHA      1.0f
 
-#define CORE_MTA_ANIMATION_TIME     200
+#define CORE_MTA_ANIMATION_TIME_IN  200
+#define CORE_MTA_ANIMATION_TIME_OUT 100
 #define CORE_MTA_MOVE_ANIM_TIME     600
 
 #define CORE_MTA_STATIC_BG          "cgui\\images\\background.png"
@@ -48,7 +49,6 @@
 #define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
 
-static int          WaitForMenu = 0;
 static const SColor headlineColors[] = {SColorRGBA(233, 234, 106, 255), SColorRGBA(233 / 6 * 4, 234 / 6 * 4, 106 / 6 * 4, 255),
                                         SColorRGBA(233 / 7 * 3, 234 / 7 * 3, 106 / 7 * 3, 255)};
 
@@ -70,11 +70,10 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     // Initialize
     m_pManager = pManager;
-    m_bIsVisible = false;
+    m_bIsVisible = true;
     m_bIsFullyVisible = false;
     m_bIsIngame = true;
     //    m_bIsInSubWindow = false;
-    m_bStarted = false;
     m_fFader = 0;
     m_ucFade = FADE_INVISIBLE;
     m_bCursorAlphaReset = false;
@@ -448,7 +447,7 @@ void CMainMenu::Update()
 
     // Get the game interface and the system state
     CGame*       pGame = CCore::GetSingleton().GetGame();
-    eSystemState SystemState = pGame->GetSystemState();
+    SystemState  systemState = pGame->GetSystemState();
 
     m_Credits.Update();
     m_Settings.Update();
@@ -519,11 +518,9 @@ void CMainMenu::Update()
 
             if (m_pHoveredItem)
             {
-                float fProgress = (m_pHoveredItem->image->GetAlpha() - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
-                // Let's work out what the target progress should be by working out the time passed
-                fProgress = ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA) + fProgress;
+                float progress = m_pHoveredItem->animProgress + ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME_IN);
                 MapRemove(m_unhoveredItems, m_pHoveredItem);
-                SetItemHoverProgress(m_pHoveredItem, fProgress, true);
+                SetItemHoverProgress(m_pHoveredItem, progress, true);
             }
         }
         else if (m_pHoveredItem)
@@ -536,11 +533,10 @@ void CMainMenu::Update()
         std::set<sMenuItem*>::iterator it = m_unhoveredItems.begin();
         while (it != m_unhoveredItems.end())
         {
-            float fProgress = ((*it)->image->GetAlpha() - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
             // Let's work out what the target progress should be by working out the time passed
             // Min of 0.5 progress fixes occasional graphical glitchekal
-            fProgress = fProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
-            if (SetItemHoverProgress((*it), fProgress, false))
+            float newProgress = (*it)->animProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME_OUT) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
+            if (SetItemHoverProgress((*it), newProgress, false))
             {
                 std::set<sMenuItem*>::iterator itToErase = it++;
                 m_unhoveredItems.erase(itToErase);
@@ -654,39 +650,17 @@ void CMainMenu::Update()
     }
 
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
-    if ((SystemState == 7 || SystemState == 9) && !m_bIsIngame)
+    if ((systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME) && !m_bIsIngame)
     {
-        // Cope with early finish
-        if (pGame->HasCreditScreenFadedOut())
-            WaitForMenu = std::max(WaitForMenu, 250);
-
-        // Fade up
-        if (WaitForMenu >= 250)
+        if (!m_bStarted)
         {
-            m_bIsVisible = true;
             m_bStarted = true;
-        }
 
-        // Create headlines while the screen is still black
-        if (WaitForMenu == 250)
             m_pNewsBrowser->CreateHeadlines();
-
-        // Start updater after fade up is complete
-        if (WaitForMenu == 275)
             GetVersionUpdater()->EnableChecking(true);
 
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
-        if (WaitForMenu == 275)
-        {
-            CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
-        }
-#endif
-
-        if (WaitForMenu == 299)
-        {
-            if (!g_pCore->GetCVars()->GetValue("discord_rpc_share_data_firsttime", false)
-                && g_pCore->GetCVars()->GetValue("allow_discord_rpc", false)
-                && !g_pCore->GetCVars()->GetValue("discord_rpc_share_data", false))
+            if (!g_pCore->GetCVars()->GetValue("discord_rpc_share_data_firsttime", false) && g_pCore->GetCVars()->GetValue("allow_discord_rpc", false) &&
+                !g_pCore->GetCVars()->GetValue("discord_rpc_share_data", false))
             {
                 m_Settings.ShowRichPresenceShareDataQuestionBox();
                 CVARS_SET("discord_rpc_share_data_firsttime", true);
@@ -694,17 +668,14 @@ void CMainMenu::Update()
             else
                 CVARS_SET("discord_rpc_share_data_firsttime", true);
         }
-
-        if (WaitForMenu < 300)
-            WaitForMenu++;
     }
 
     // If we're visible
-    if (m_bIsVisible && SystemState != 8)
+    if (m_bIsVisible && systemState != SystemState::GS_INIT_PLAYING_GAME)
     {
         // If we're at the game's mainmenu, or ingame when m_bIsIngame is true show the background
-        if (SystemState == 7 ||                          // GS_FRONTEND
-            SystemState == 9 && !m_bIsIngame)            // GS_PLAYING_GAME
+        if (systemState == SystemState::GS_FRONTEND ||
+            systemState == SystemState::GS_PLAYING_GAME && !m_bIsIngame)
         {
             if (m_ucFade == FADE_INVISIBLE)
                 Show(false);
@@ -805,6 +776,9 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
         m_bIsIngame = bIsIngame;
         m_Settings.SetIsModLoaded(bIsIngame);
 
+        // Reset frame rate limit
+        CCore::GetSingleton().RecalculateFrameRateLimit(-1, false);
+
         m_ulMoveStartTick = GetTickCount32();
         if (bIsIngame)
         {
@@ -868,6 +842,27 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
             case MENU_ITEM_MAP_EDITOR:
                 AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
                 return true;
+            case MENU_ITEM_DISCONNECT:
+                if (g_pCore->GetCVars()->GetValue("ask_before_disconnect", true))
+                {
+                    AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
+                    return true;
+                }
+     
+                break;
+            default:
+                break;
+        }
+    }
+    else if (!g_pCore->IsNetworkReady())
+    {
+        switch (m_pHoveredItem->menuType)
+        {
+            // case MENU_ITEM_QUICK_CONNECT:  // We only prevent it for left click in OnQuickConnectButtonClick.
+            case MENU_ITEM_HOST_GAME:
+            case MENU_ITEM_MAP_EDITOR:
+                ShowNetworkNotReadyWindow();
+                return true;
             default:
                 break;
         }
@@ -876,7 +871,7 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
     switch (m_pHoveredItem->menuType)
     {
         case MENU_ITEM_DISCONNECT:
-            OnDisconnectButtonClick(pElement);
+            OnDisconnectButtonClick();
             break;
         case MENU_ITEM_QUICK_CONNECT:
             OnQuickConnectButtonClick(pElement, Args.button == LeftButton);
@@ -912,17 +907,22 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
-    // If we're right clicking, execute special command
-    if (!left)
+    if (left)
     {
-        std::string command;
-        CVARS_GET("_beta_qc_rightclick_command", command);
-        g_pCore->GetCommands()->Execute(command.data());
-        return true;
+        if (!g_pCore->IsNetworkReady())
+        {
+            ShowNetworkNotReadyWindow();
+            return true;
+        }
+
+        g_pCore->GetCommands()->Execute("reconnect", "");
+    }
+    else
+    {
+        m_ServerBrowser.SetVisible(true);
+        m_ServerBrowser.OnQuickConnectButtonClick();
     }
 
-    m_ServerBrowser.SetVisible(true);
-    m_ServerBrowser.OnQuickConnectButtonClick();
     return true;
 }
 
@@ -956,7 +956,7 @@ void CMainMenu::HideServerInfo()
     m_ServerInfo.Hide();
 }
 
-bool CMainMenu::OnDisconnectButtonClick(CGUIElement* pElement)
+bool CMainMenu::OnDisconnectButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
@@ -975,7 +975,7 @@ bool CMainMenu::OnHostGameButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "local");
+    CModManager::GetSingleton().RequestLoad("local");
 
     return true;
 }
@@ -987,7 +987,7 @@ bool CMainMenu::OnEditorButtonClick()
         return false;
 
     // Load deathmatch, but with local play
-    CModManager::GetSingleton().RequestLoad("deathmatch", "editor");
+    CModManager::GetSingleton().RequestLoad("editor");
 
     return true;
 }
@@ -1107,8 +1107,10 @@ bool CMainMenu::SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHo
 {
     fProgress = Clamp<float>(0, fProgress, 1);
 
-    // Use OutQuad equation for easing, or OutQuad for unhovering
-    fProgress = bHovering ? -fProgress * (fProgress - 2) : fProgress * fProgress;
+    pItem->animProgress = fProgress;
+
+    // Always use OutQuad for both hovering and unhovering, to avoid animation glitches.
+    fProgress = -fProgress * (fProgress - 2);
 
     // Work out the target scale
     float fTargetScale = (CORE_MTA_HOVER_SCALE - CORE_MTA_NORMAL_SCALE) * (fProgress) + CORE_MTA_NORMAL_SCALE;
@@ -1127,7 +1129,7 @@ bool CMainMenu::SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHo
     pItem->image->SetSize(CVector2D(iSizeX, iSizeY), false);
 
     // Return whether the hovering has maxed out
-    return bHovering ? (fProgress == 1) : (fProgress == 0);
+    return bHovering ? (pItem->animProgress >= 1.0) : (pItem->animProgress <= 0.0f);
 }
 
 void CMainMenu::SetNewsHeadline(int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew)
@@ -1204,6 +1206,26 @@ void CMainMenu::AskUserIfHeWantsToDisconnect(uchar menuType)
 
 /////////////////////////////////////////////////////////////
 //
+// CMainMenu::ShowNetworkNotReadyWindow
+//
+// Shows a window with information that the network module is not ready.
+//
+/////////////////////////////////////////////////////////////
+void CMainMenu::ShowNetworkNotReadyWindow()
+{
+    static auto HideQuestionWindow = [](void* window, uint) { reinterpret_cast<CQuestionBox*>(window)->Hide(); };
+
+    CQuestionBox& window = m_QuestionBox;
+    window.Reset();
+    window.SetTitle(_("INFORMATION"));
+    window.SetMessage("\n\nThe network module is not ready.\nPlease wait a moment and try again.");
+    window.SetButton(0, _("OK"));
+    window.SetCallback(HideQuestionWindow, &window);
+    window.Show();
+}
+
+/////////////////////////////////////////////////////////////
+//
 // CMainMenu::StaticWantsToDisconnectCallBack
 //
 // Callback from disconnect question
@@ -1236,6 +1258,9 @@ void CMainMenu::WantsToDisconnectCallBack(void* pData, uint uiButton)
                 break;
             case MENU_ITEM_MAP_EDITOR:
                 OnEditorButtonClick();
+                break;
+            case MENU_ITEM_DISCONNECT:
+                OnDisconnectButtonClick();
                 break;
             default:
                 break;

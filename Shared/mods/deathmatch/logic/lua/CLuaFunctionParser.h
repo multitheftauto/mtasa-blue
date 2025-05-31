@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -32,6 +32,8 @@ public:
     constexpr const char* what() const noexcept { return m_message; }
     constexpr bool        IsWarning() const noexcept { return m_bWarning; }
 };
+
+using LuaVarArgs = std::optional<CLuaArguments>;
 
 struct CLuaFunctionParserBase
 {
@@ -74,6 +76,8 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CLuaArgument>)
             return "value";
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
+            return "values";
         else if constexpr (is_2specialization<T, std::vector>::value)
             return "table";
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
@@ -168,6 +172,27 @@ struct CLuaFunctionParserBase
         return T{};
     }
 
+    // Check if lua table is array (std::vector) or map
+    bool IsArray(lua_State* L, int index)
+    {
+        if (!lua_istable(L, index))
+            return false;
+
+        lua_pushnil(L);
+        while (lua_next(L, index < 0 ? (index - 1) : index))
+        {
+            if (!lua_isnumber(L, -2))
+            {
+                lua_pop(L, 2);
+                return false;
+            }
+
+            lua_pop(L, 1);
+        }
+
+        return true;
+    }
+
     // Special type matcher for variants. Returns -1 if the type does not match
     // returns n if the nth type of the variant matches
     template <typename T>
@@ -219,6 +244,9 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CLuaArgument>)
             return iArgument != LUA_TNONE;
 
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
+            return iArgument != LUA_TNONE;
+
         // All color classes are read as a single tocolor number
         // Do not be tempted to change this to is_base_of<SColor, T>
         // SColorARGB etc are only **constructors** for SColor!
@@ -234,7 +262,7 @@ struct CLuaFunctionParserBase
 
         // std::vector is used for arrays built from tables
         else if constexpr (is_2specialization<T, std::vector>::value)
-            return iArgument == LUA_TTABLE;
+            return iArgument == LUA_TTABLE && IsArray(L, index);
 
         // std::unordered_map<k,v> is used for maps built from tables
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
@@ -276,9 +304,12 @@ struct CLuaFunctionParserBase
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
         }
-        // CMatrix may either be represented by 3 CLuaVector or by 12 numbers
+        // CMatrix can be represented either by 3 CLuaVectors, 12 numbers, or a 4x4 Lua table
         else if constexpr (std::is_same_v<T, CMatrix>)
         {
+            if (IsValidMatrixLuaTable(L, index))
+                return true;
+
             for (int i = 0; i < sizeof(CMatrix) / sizeof(float); i++)
             {
                 if (!lua_isnumber(L, index + i))
@@ -289,7 +320,17 @@ struct CLuaFunctionParserBase
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
-            return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
+        {
+            if (iArgument != LUA_TUSERDATA && iArgument != LUA_TLIGHTUSERDATA)
+                return false;
+
+            using class_t = std::remove_pointer_t<T>;
+            int tempIndex{index};
+            void* pValue = lua::PopPrimitive<void*>(L, tempIndex);                
+            auto result = iArgument == LUA_TLIGHTUSERDATA ? UserDataCast((class_t*)pValue, L) :
+                UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
+            return result != nullptr;
+        }
 
         // dummy type is used as overload extension if one overload has fewer arguments
         // thus it is only allowed if there are no further args on the Lua side
@@ -445,7 +486,7 @@ struct CLuaFunctionParserBase
             using param = typename is_2specialization<T, std::vector>::param1_t;
             T vecData;
             lua_pushnil(L); /* first key */
-            while (lua_next(L, index) != 0)
+            while (lua_next(L, index < 0 ? (index - 1) : index) != 0)
             {
                 if (!TypeMatch<param>(L, -1))
                 {
@@ -467,7 +508,7 @@ struct CLuaFunctionParserBase
             using value_t = typename is_5specialization<T, std::unordered_map>::param2_t;
             T map;
             lua_pushnil(L); /* first key */
-            while (lua_next(L, index) != 0)
+            while (lua_next(L, index < 0 ? (index - 1) : index) != 0)
             {
                 if (!TypeMatch<value_t>(L, -1) || !TypeMatch<key_t>(L, -2))
                 {
@@ -529,7 +570,11 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector2D>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                return CVector2D(x, y);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -554,7 +599,12 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                auto z = PopUnsafe<float>(L, index);
+                return CVector(x, y, z);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -577,7 +627,13 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CVector4D>)
         {
             if (lua_isnumber(L, index))
-                return {PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)};
+            {
+                auto x = PopUnsafe<float>(L, index);
+                auto y = PopUnsafe<float>(L, index);
+                auto z = PopUnsafe<float>(L, index);
+                auto w = PopUnsafe<float>(L, index);
+                return CVector4D(x, y, z, w);
+            }
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
@@ -599,7 +655,13 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                const auto ReadVector = [&] { return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index)); };
+                const auto ReadVector = [&]
+                {
+                    auto x = PopUnsafe<float>(L, index);
+                    auto y = PopUnsafe<float>(L, index);
+                    auto z = PopUnsafe<float>(L, index);
+                    return CVector(x, y, z);
+                };
 
                 CMatrix matrix;
 
@@ -607,6 +669,19 @@ struct CLuaFunctionParserBase
                 matrix.vFront = ReadVector();
                 matrix.vUp = ReadVector();
                 matrix.vPos = ReadVector();
+
+                return matrix;
+            }
+
+            if (lua_istable(L, index))
+            {
+                CMatrix matrix;
+
+                if (!ReadMatrix(L, index, matrix))
+                {
+                    SetBadArgumentError(L, "matrix", index, "table");
+                    return T{};
+                }
 
                 return matrix;
             }
@@ -649,6 +724,12 @@ struct CLuaFunctionParserBase
         {
             CLuaArgument argument;
             argument.Read(L, index++);
+            return argument;
+        }
+        else if constexpr (std::is_same_v<T, CLuaArguments>)
+        {
+            CLuaArguments argument;
+            argument.ReadArguments(L, index);
             return argument;
         }
         else if constexpr (std::is_same_v<T, std::monostate>)

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.h
  *  PURPOSE:     Resource handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -287,7 +287,7 @@ public:
     bool IsResourceZip() const noexcept { return m_bResourceIsZip; }
     bool UnzipResource();
 
-    ResponseCode HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
+    HttpStatusCode HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
     std::list<CResourceFile*>::iterator       IterBegin() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::const_iterator IterBegin() const noexcept { return m_ResourceFiles.begin(); }
@@ -359,9 +359,10 @@ private:
     bool DestroyVM();
     void TidyUp();
 
-    ResponseCode HandleRequestActive(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
-    ResponseCode HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
-    bool         IsHttpAccessAllowed(CAccount* pAccount);
+    HttpStatusCode HandleRequestRouter(HttpRequest* request, HttpResponse* response, CAccount* account);
+    HttpStatusCode HandleRequestActive(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
+    HttpStatusCode HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
+    bool           IsHttpAccessAllowed(CAccount* pAccount);
 
 private:
     EResourceState m_eState = EResourceState::None;
@@ -402,6 +403,9 @@ private:
     std::list<CExportedFunction>   m_ExportedFunctions;
     std::list<CResource*>          m_TemporaryIncludes;            // started by startResource script command
 
+    int         m_httpRouterCheck{};
+    std::string m_httpRouterFunction;
+    std::string m_httpRouterAclRight;
     std::string m_strCircularInclude;
     SString     m_strFailureReason;
     unzFile     m_zipfile = nullptr;

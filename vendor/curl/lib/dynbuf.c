@@ -32,7 +32,9 @@
 
 #define MIN_FIRST_ALLOC 32
 
+#ifdef DEBUGBUILD
 #define DYNINIT 0xbee51da /* random pattern */
+#endif
 
 /*
  * Init a dynbuf struct.
@@ -41,6 +43,7 @@ void Curl_dyn_init(struct dynbuf *s, size_t toobig)
 {
   DEBUGASSERT(s);
   DEBUGASSERT(toobig);
+  DEBUGASSERT(toobig <= MAX_DYNBUF_SIZE); /* catch crazy mistakes */
   s->bufr = NULL;
   s->leng = 0;
   s->allc = 0;
@@ -51,12 +54,13 @@ void Curl_dyn_init(struct dynbuf *s, size_t toobig)
 }
 
 /*
- * free the buffer and re-init the necessary fields. It doesn't touch the
+ * free the buffer and re-init the necessary fields. It does not touch the
  * 'init' field and thus this buffer can be reused to add data to again.
  */
 void Curl_dyn_free(struct dynbuf *s)
 {
   DEBUGASSERT(s);
+  DEBUGASSERT(s->init == DYNINIT);
   Curl_safefree(s->bufr);
   s->leng = s->allc = 0;
 }
@@ -71,7 +75,7 @@ static CURLcode dyn_nappend(struct dynbuf *s,
   size_t a = s->allc;
   size_t fit = len + indx + 1; /* new string + old string + zero byte */
 
-  /* try to detect if there's rubbish in the struct */
+  /* try to detect if there is rubbish in the struct */
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(s->toobig);
   DEBUGASSERT(indx < s->toobig);
@@ -181,7 +185,7 @@ CURLcode Curl_dyn_add(struct dynbuf *s, const char *str)
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(!s->leng || s->bufr);
   n = strlen(str);
-  return dyn_nappend(s, (unsigned char *)str, n);
+  return dyn_nappend(s, (const unsigned char *)str, n);
 }
 
 /*
@@ -207,7 +211,7 @@ CURLcode Curl_dyn_vaddf(struct dynbuf *s, const char *fmt, va_list ap)
   str = vaprintf(fmt, ap); /* this allocs a new string to append */
 
   if(str) {
-    CURLcode result = dyn_nappend(s, (unsigned char *)str, strlen(str));
+    CURLcode result = dyn_nappend(s, (const unsigned char *)str, strlen(str));
     free(str);
     return result;
   }
@@ -242,6 +246,18 @@ char *Curl_dyn_ptr(const struct dynbuf *s)
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(!s->leng || s->bufr);
   return s->bufr;
+}
+
+char *Curl_dyn_take(struct dynbuf *s, size_t *plen)
+{
+  char *ptr = s->bufr;
+  DEBUGASSERT(s);
+  DEBUGASSERT(s->init == DYNINIT);
+  *plen = s->leng;
+  s->bufr = NULL;
+  s->leng = 0;
+  s->allc = 0;
+  return ptr;
 }
 
 /*

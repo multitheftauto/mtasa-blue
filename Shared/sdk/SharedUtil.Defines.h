@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Defines.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -26,10 +26,12 @@
 //
 // Architecture
 //
-#if defined( _M_X64 ) || defined( __x86_64__ ) || defined( _M_AMD64 )
+#if defined( _M_X64 ) || defined( __x86_64__ ) || defined( _M_AMD64 ) || defined( __amd64__ ) 
     #define ANY_x64
     #ifdef _WIN64
         #define WIN_x64
+    #elif defined(__APPLE__)
+        #define APPLE_x64
     #else
         #define LINUX_x64
     #endif
@@ -37,6 +39,8 @@
     #define ANY_arm64
     #ifdef _M_ARM64
         #define WIN_arm64
+    #elif defined(__APPLE__)
+        #define APPLE_arm64
     #else
         #define LINUX_arm64
     #endif
@@ -162,9 +166,11 @@
 #define ZERO_POD_STRUCT(ptr) \
         memset ( ptr, 0, sizeof(*(ptr)) )
 
+#define BYTE_MASK(n) ((1 << (n)) - 1)
+
 // printf/wprintf helpers
 //
-// http://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm
+// https://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm
 //
 // In VC++, you can use "%s" in the format string of swprintf (or wprintf, fwprintf) to insert a wide string.
 // But in POSIX you have to use "%ls". This may be compiler dependent rather than operating system dependent.

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCheckpointSA.h
  *  PURPOSE:     Header file for checkpoint entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,6 +13,12 @@
 
 #include <CVector.h>
 #include <game/CCheckpoint.h>
+
+#define HOOKPOS_CCheckpoint__Render  0x725E56
+#define HOOKSIZE_CCheckpoint__Render 0x5
+static constexpr std::uint32_t RETURN_CCheckpoint__Render = 0x725E5B;
+
+#define C3dMarkers_DirectionArrowSet 0x721140
 
 class CCheckpointSAInterface
 {
@@ -36,11 +42,15 @@ class CCheckpointSA : public CCheckpoint
 {
 private:
     CCheckpointSAInterface* internalInterface;
+    SColor                  m_targetArrowColor{0xFFFF4040};
+    float                   m_targetArrowSize{0.625f};
 
 public:
     CCheckpointSA(CCheckpointSAInterface* checkpointInterface) { internalInterface = checkpointInterface; };
 
     CCheckpointSAInterface* GetInterface() { return internalInterface; }
+
+    static void StaticSetHooks();
 
     void               SetPosition(CVector* vecPosition);
     CVector*           GetPosition();
@@ -62,4 +72,7 @@ public:
     void               SetPulseFraction(float fPulseFraction);            // doesn't work propperly (not virtualed)
     float              GetPulseFraction();
     void               Remove();
+    SColor             GetTargetArrowColor() const noexcept override { return m_targetArrowColor; };
+    float              GetTargetArrowSize() const noexcept override { return m_targetArrowSize; };
+    void               SetTargetArrowData(const SColor color, float size) noexcept;
 };

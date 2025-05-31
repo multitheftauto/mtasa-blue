@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaArguments.h
  *  PURPOSE:     Lua argument manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -67,7 +67,9 @@ public:
     CLuaArgument* PushNil();
     CLuaArgument* PushBoolean(bool bBool);
     CLuaArgument* PushNumber(double dNumber);
-    CLuaArgument* PushString(const std::string& strString);
+    CLuaArgument* PushString(const std::string& string);
+    CLuaArgument* PushString(const std::string_view& string);
+    CLuaArgument* PushString(const char* string);
     CLuaArgument* PushElement(CElement* pElement);
     CLuaArgument* PushBan(CBan* pBan);
     CLuaArgument* PushACL(CAccessControlList* pACL);
@@ -95,9 +97,13 @@ public:
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
-    unsigned int                               Count() const { return static_cast<unsigned int>(m_Arguments.size()); };
-    std::vector<CLuaArgument*>::const_iterator IterBegin() const { return m_Arguments.begin(); };
-    std::vector<CLuaArgument*>::const_iterator IterEnd() const { return m_Arguments.end(); };
+    [[nodiscard]] bool IsNotEmpty() const noexcept { return !m_Arguments.empty(); }
+    [[nodiscard]] bool IsEmpty() const noexcept { return m_Arguments.empty(); }
+
+    [[nodiscard]] std::vector<CLuaArgument*>::size_type Count() const noexcept { return m_Arguments.size(); }
+
+    [[nodiscard]] std::vector<CLuaArgument*>::const_iterator begin() const noexcept { return m_Arguments.begin(); }
+    [[nodiscard]] std::vector<CLuaArgument*>::const_iterator end() const noexcept { return m_Arguments.end(); }
 
     bool IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
 

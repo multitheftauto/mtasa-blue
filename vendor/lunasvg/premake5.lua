@@ -8,8 +8,8 @@ project "lunasvg"
 	rtti "Off"
 
 	defines {
-		"LUNASVG_EXPORT",
-		"LUNASVG_SHARED",
+		"PLUTOVG_BUILD",
+		"LUNASVG_BUILD",
 		"_CRT_SECURE_NO_WARNINGS"
 	}
 
@@ -18,8 +18,9 @@ project "lunasvg"
 		["Headers/*"] = "include/**.h",
 		["Headers/3rdparty/*"] = "3rdparty/**.h",
 		["Sources"] = "source/**.cpp",
-		["Sources/*"] = "3rdparty/**.cpp",
-		["Sources/*"] = "**.c",
+        ["Sources/*"] = "source/**.c",
+		["Sources/3rdparty"] = "3rdparty/**.cpp",
+		["Sources/3rdparty/*"] = "3rdparty/**.c",
 		["*"] = "premake5.lua"
 	}
 
@@ -35,3 +36,8 @@ project "lunasvg"
 		"source",
 		"include"
 	}
+
+	filter "architecture:not x86"
+		flags { "ExcludeFromBuild" }
+	filter "system:not windows"
+		flags { "ExcludeFromBuild" }

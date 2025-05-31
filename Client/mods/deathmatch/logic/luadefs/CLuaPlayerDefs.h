@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaPlayerDefs.h
  *  PURPOSE:     Lua player definitions class header
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,6 +30,8 @@ public:
     LUA_DECLARE(GetPlayerMoney);
     LUA_DECLARE(GetPlayerWantedLevel);
     static std::uint8_t GetPlayerScriptDebugLevel() noexcept;
+    static bool         IsPlayerCrosshairVisible();
+    static std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>> GetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property);
 
     // Player set
     LUA_DECLARE(ShowPlayerHudComponent);
@@ -40,6 +42,8 @@ public:
     LUA_DECLARE(SetPlayerNametagText);
     LUA_DECLARE(SetPlayerNametagColor);
     LUA_DECLARE(SetPlayerNametagShowing);
+    static bool SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property, std::variant<CVector2D, float, bool, std::string> value);
+    static bool ResetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property) noexcept;
 
     // Community funcs
     LUA_DECLARE(GetPlayerUserName);

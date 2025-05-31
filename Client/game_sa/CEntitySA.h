@@ -5,22 +5,20 @@
  *  FILE:        game_sa/CEntitySA.h
  *  PURPOSE:     Header file for base entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
 #include <game/CEntity.h>
+#include "CPlaceableSA.h"
 #include <CMatrix.h>
-#include <CMatrix_Pad.h>
 #include <CVector2D.h>
-#include <CVector.h>
 
 #define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
 
 #define FUNC_SetRwObjectAlpha                               0x5332C0
-#define FUNC_SetOrientation                                 0x439A80
 
 #define FUNC_CMatrix__ConvertToEulerAngles                  0x59A840
 #define FUNC_CMatrix__ConvertFromEulerAngles                0x59AA40
@@ -30,33 +28,8 @@
 // not in CEntity really
 #define FUNC_RpAnimBlendClumpGetAssociation                 0x4D6870
 
+class CPhysicalSAInterface;
 class CRect;
-class CEntitySAInterfaceVTBL
-{
-public:
-    DWORD SCALAR_DELETING_DESTRUCTOR;                 // +0h
-    DWORD Add_CRect;                                  // +4h
-    DWORD Add;                                        // +8h
-    DWORD Remove;                                     // +Ch
-    DWORD SetIsStatic;                                // +10h
-    DWORD SetModelIndex;                              // +14h
-    DWORD SetModelIndexNoCreate;                      // +18h
-    DWORD CreateRwObject;                             // +1Ch
-    DWORD DeleteRwObject;                             // +20h
-    DWORD GetBoundRect;                               // +24h
-    DWORD ProcessControl;                             // +28h
-    DWORD ProcessCollision;                           // +2Ch
-    DWORD ProcessShift;                               // +30h
-    DWORD TestCollision;                              // +34h
-    DWORD Teleport;                                   // +38h
-    DWORD SpecialEntityPreCollisionStuff;             // +3Ch
-    DWORD SpecialEntityCalcCollisionSteps;            // +40h
-    DWORD PreRender;                                  // +44h
-    DWORD Render;                                     // +48h
-    DWORD SetupLighting;                              // +4Ch
-    DWORD RemoveLighting;                             // +50h
-    DWORD FlagToDestroyWhenNextProcessed;             // +54h
-};
 
 /**
  * \todo Move CReferences (and others below?) into it's own file
@@ -106,27 +79,33 @@ public:
 };
 static_assert(sizeof(XYZStore) == 0x1FC, "Invalid size for XYZStore");
 
-class CSimpleTransformSAInterface            // 16 bytes
+class CEntitySAInterface : public CPlaceableSAInterface
 {
 public:
-    CVector m_translate;
-    float   m_heading;
-};
+    virtual void         Add() = 0;
+    virtual void         Add(const CRect& rect) = 0;
+    virtual void         Remove() = 0;
+    virtual void         SetIsStatic(bool isStatic) = 0;
+    virtual void         SetModelIndex(std::uint32_t model) = 0;
+    virtual void         SetModelIndexNoCreate(std::uint32_t model) = 0;
+    virtual void         CreateRwObject() = 0;
+    virtual void         DeleteRwObject() = 0;
+    virtual CRect        GetBoundRect() = 0;
+    virtual void         ProcessControl() = 0;
+    virtual void         ProcessCollision() = 0;
+    virtual void         ProcessShift() = 0;
+    virtual bool         TestCollision(bool bApplySpeed) = 0;
+    virtual void         Teleport(CVector destination, bool resetRotation) = 0;
+    virtual void         SpecialEntityPreCollisionStuff(CPhysicalSAInterface* colPhysical, bool bIgnoreStuckCheck, bool& bCollisionDisabled,
+                                                        bool& bCollidedEntityCollisionIgnored, bool& bCollidedEntityUnableToMove, bool& bThisOrCollidedEntityStuck) = 0;
+    virtual std::uint8_t SpecialEntityCalcCollisionSteps(bool& bProcessCollisionBeforeSettingTimeStep, bool& unk2) = 0;
+    virtual void         PreRender() = 0;
+    virtual void         Render() = 0;
+    virtual bool         SetupLighting() = 0;
+    virtual void*        RemoveLighting(bool bRemove) = 0;
+    virtual void         FlagToDestroyWhenNextProcessed() = 0;
 
-class CPlaceableSAInterface            // 20 bytes
-{
 public:
-    CSimpleTransformSAInterface m_transform;
-    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later
-};
-
-class CEntitySAInterface
-{
-public:
-    CEntitySAInterfaceVTBL* vtbl;            // the virtual table
-
-    CPlaceableSAInterface Placeable;            // 4
-
     RpClump* m_pRwObject;            // 24
     /********** BEGIN CFLAGS **************/
     unsigned long bUsesCollision : 1;                 // does entity use collision
@@ -202,6 +181,9 @@ public:
     // Functions to hide member variable misuse
     //
 
+    void SetLod(CEntitySAInterface* pLod) noexcept { m_pLod = pLod; };
+    CEntitySAInterface* GetLod() const noexcept { return m_pLod; };
+
     // Sets
     void SetIsLowLodEntity() { numLodChildrenRendered = 0x40; }
 
@@ -237,12 +219,13 @@ public:
         ((CStencilShadow_dtorByOwner)0x711730)(this);
     };
 
-    void DeleteRwObject()
-    {
-        using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
-        ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
-    };
+    void RemoveRWObjectWithReferencesCleanup() {
+        DeleteRwObject();
+        ResolveReferences();
+        RemoveShadows();
+    }
 };
+
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
 class CEntitySA : public virtual CEntity
@@ -324,9 +307,14 @@ public:
     bool      SetBoneMatrix(eBone boneId, const CMatrix& matrix);
 
     bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll);
+    bool GetBoneRotationQuat(eBone boneId, float& x, float& y, float& z, float& w);
     bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll);
+    bool SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w);
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
+
+    bool IsOnFire() override { return false; }
+    bool SetOnFire(bool onFire) override { return false; }
 
     // CEntitySA interface
     virtual void OnChangingPosition(const CVector& vecNewPosition) {}

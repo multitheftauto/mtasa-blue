@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaBrowserDefs.cpp
  *  PURPOSE:     Lua browser definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -51,4 +51,5 @@ public:
     LUA_DECLARE(ResizeBrowser);
     LUA_DECLARE(GUICreateBrowser);
     LUA_DECLARE(GUIGetBrowser);
+    static bool IsBrowserGPUEnabled() noexcept;
 };

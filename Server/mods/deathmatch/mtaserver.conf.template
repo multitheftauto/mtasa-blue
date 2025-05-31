@@ -4,6 +4,28 @@
     <!-- This parameter specifies the name the server will be visible as in the ingame server browser
          and on Game-Monitor. It is a required parameter. -->
     <servername>Default MTA Server</servername>
+
+    <!-- The rule parameters are optional settings that the server will make public for the server browser/list.
+         A brief description of the server. -->
+    <rule name="description" value="" />
+
+    <!-- A comma separated list of languages that the server supports (e.g. en). -->
+    <rule name="languages" value="" />
+
+    <!-- A comma separated list of tags that describe the server (e.g. freeroam,roleplay). -->
+    <rule name="tags" value="" />
+
+    <!-- The URL of the server's website. -->
+    <rule name="website_url" value="" />
+
+    <!-- A social media URL #1 (e.g. Discord). -->
+    <rule name="social_url_1" value="" />
+
+    <!-- A social media URL #2 (e.g. YouTube). -->
+    <rule name="social_url_2" value="" />
+
+    <!-- A social media URL #3 (e.g. Facebook). -->
+    <rule name="social_url_3" value="" />
     
     <!-- This parameter specifies the contact email addresses for the owner(s) of this server.
          The email addresses will not be publicly available, and only used by MTA administrators
@@ -62,24 +84,24 @@
     <!-- <client_file name="data/carmods.dat" verify="0"/> -->
 
     <!-- Comma separated list of disabled anti-cheats.
-         For details see http://wiki.multitheftauto.com/wiki/Anti-cheat_guide
+         For details see https://wiki.multitheftauto.com/wiki/Anti-cheat_guide
          e.g. To disable anti-cheat #2 and #3, use: 2,3 -->
     <disableac></disableac>
 
     <!-- Comma separated list of enabled special detections.
          A special detection is a type of anti-cheat for usually harmless game modifications and blocking certain software.
          Competitive servers may wish to enable certain special detections, but most servers should leave this setting on its default.
-         For details and SD codes, see http://wiki.multitheftauto.com/wiki/Anti-cheat_guide
+         For details and SD codes, see https://wiki.multitheftauto.com/wiki/Anti-cheat_guide
          Available values: special detection (SD) codes ; (e.g. To enable special detection #15 use: 15) -->
     <enablesd></enablesd>
 
     <!-- Minimum client version. Clients with a lower version will not be allowed to connect. After
          disconnection, clients will be given an opportunity to download an update.
          If left blank, this setting is disabled and there are no restrictions on who can connect.
-         Version numbers are described here: http://wiki.multitheftauto.com/wiki/GetPlayerVersion
+         Version numbers are described here: https://wiki.multitheftauto.com/wiki/GetPlayerVersion
          and look like this: 1.1.0-9.03100.0
          Note that this setting only determines if the client should be prompted to update. The actual
-         build number they receive will be the highest available. See: http://nightly.mtasa.com/ver  -->
+         build number they receive will be the highest available. See: https://nightly.multitheftauto.com/ver  -->
     <minclientversion></minclientversion>
 
     <!-- This parameter specifies if/when the <minclientversion> setting is automatically updated.
@@ -91,7 +113,7 @@
     <!-- Recommended client version. When connecting, if clients have a lower version, they will be given
          the option to download an update. If left blank, this setting is disabled.
          Note that this setting only determines if the client should be prompted to update. The actual
-         build number they receive will be the highest available. See: http://nightly.mtasa.com/ver  -->
+         build number they receive will be the highest available. See: https://nightly.multitheftauto.com/ver  -->
     <recommendedclientversion></recommendedclientversion>
 
     <!-- This parameter can be used to make the server report to Game-Monitor master servers, allowing it to
@@ -114,7 +136,7 @@
 
     <!-- The following ???_sync_interval parameters determine the time in milliseconds between certain
          network packets being sent. More information on how each settings works is available here:
-         http://wiki.multitheftauto.com/wiki/Server_mtaserver.conf -->
+         https://wiki.multitheftauto.com/wiki/Server_mtaserver.conf -->
     <!-- Player sync interval. Default: 100 -->
     <player_sync_interval>100</player_sync_interval>
     <!-- Lightweight (player) sync interval. Used when players are far apart. Default: 1500 -->
@@ -140,6 +162,10 @@
          Available range: 0 to 130. Default - 30 -->
     <vehicle_contact_sync_radius>30</vehicle_contact_sync_radius>
 
+    <!-- This parameter specifies the player position limit change alert.
+         Available range: 5 to 500. Default - 100 -->
+    <player_teleport_alert>100</player_teleport_alert>
+
     <!-- This parameter sets the amount of extrapolation that clients will apply to remote vehicles. This can reduce
          some of the latency induced location disparency by predicting where the remote vehicles will probably be.
          Depending on the gamemode, an incorrect prediction may have a negative effect. Therefore this setting
@@ -160,7 +186,7 @@
 
     <!-- Specifies the location and file name of this servers unique private key.
          This is used to prevent private files saved on the client from being read by other servers.
-         More infomation about client private files can be found here: http://wiki.multitheftauto.com/wiki/Filepath
+         More infomation about client private files can be found here: https://wiki.multitheftauto.com/wiki/Filepath
          Keep a backup of this file in a safe place. Default value: server-id.keys-->
     <idfile>server-id.keys</idfile>
 
@@ -233,7 +259,7 @@
     <backup_copies>10</backup_copies>
 
     <!-- This parameter specifies when the internal sqlite databases should be defragmented.
-         http://www.sqlite.org/lang_vacuum.html
+         https://www.sqlite.org/lang_vacuum.html
          Values: 0 - Never, 1 - On server start only after basic backup, 2 - On server start always.  Default - 1 -->
     <compact_internal_databases>1</compact_internal_databases>
 
@@ -244,7 +270,7 @@
     <!-- This parameter lists the ACL groups that are protected by serial authorization.
          Login attempts to a protected account from a second serial are blocked until the serial is manually authorized via
          the authserial command.
-         For more info see: https://mtasa.com/authserial
+         For more info see: https://multitheftauto.com/authserial
          Note: This is security critical feature and disabling auth_serial_groups can affect visibility in the master server list.
          Values: Comma separated list of ACL groups.  Default - Admin -->
     <auth_serial_groups>Admin</auth_serial_groups>
@@ -252,7 +278,7 @@
     <!-- This parameter specifies if the authorized serial login checks should also apply to the http interface.
          Protected account login attempts to the http interface will only succeed if the IP address matches one
          recently used by the account holder in-game
-         For more info see: https://mtasa.com/authserialhttp
+         For more info see: https://multitheftauto.com/authserialhttp
          Note: This is security critical feature and disabling auth_serial_http can affect visibility in the master server list.
          Values: 0 - Off, 1 - Enabled.  Default - 1 -->
     <auth_serial_http>1</auth_serial_http>
@@ -269,10 +295,26 @@
          Values: 0 - Off, 1 - Enabled.  Default - 1 -->
     <database_credentials_protection>1</database_credentials_protection>
 
+    <!-- Enables extra protection for element data.
+         When this option is enabled, the server ignores element data sync packets from the client,
+         except for allowed keys.
+         Values: 0 - Off, 1 - Enabled.  Default - 0 -->
+    <elementdata_whitelisted>0</elementdata_whitelisted>
+
+    <!-- This parameter determines that the server checks when the players connect that there are no other players with the same serial number. 
+         Note that this may break compatibility with virtual machines.
+         Not guarantees that the player cannot manipulate their serial.
+         Values: 0 - Off, 1 - Enabled.  Default - 1 -->
+    <check_duplicate_serials>1</check_duplicate_serials>
+
     <!-- These parameters specify the maximum amount of events that can be triggered by the client (via triggerServerEvent) within the given interval.
           Note: The interval is given in milliseconds
           Interval range: 50 to 5000. Default: 1000
           Max events per interval range: 1 to 1000. Default: 100  -->
     <player_triggered_event_interval>1000</player_triggered_event_interval>
     <max_player_triggered_events_per_interval>100</max_player_triggered_events_per_interval>
+	
+	<!-- This parameter determines if resource client files that end in PNG, DFF and TXD should be checked for errors;
+          Values: 0 - Off, 1 - Enabled.  Default - 1 -->
+    <resource_client_file_checks>1</resource_client_file_checks>
 </config>

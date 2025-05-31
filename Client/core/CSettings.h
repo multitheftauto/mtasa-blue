@@ -5,7 +5,7 @@
  *  FILE:        core/CSettings.h
  *  PURPOSE:     Header file for in-game settings window class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -196,6 +196,8 @@ protected:
     CGUIComboBox*  m_pFullscreenStyleCombo;
     CGUILabel*     m_pPriorityLabel;
     CGUIComboBox*  m_pPriorityCombo;
+    CGUILabel*     m_pPlayerMapImageLabel;
+    CGUIComboBox*  m_pPlayerMapImageCombo;
     CGUILabel*     m_pFastClothesLabel;
     CGUIComboBox*  m_pFastClothesCombo;
     CGUILabel*     m_pAudioGeneralLabel;
@@ -213,6 +215,9 @@ protected:
     CGUILabel*     m_pWin8Label;
     CGUICheckBox*  m_pWin8ColorCheckBox;
     CGUICheckBox*  m_pWin8MouseCheckBox;
+    CGUICheckBox*  m_pPhotoSavingCheckbox;
+    CGUICheckBox*  m_pCheckBoxAskBeforeDisconnect;
+    CGUICheckBox*  m_pProcessAffinityCheckbox;
     CGUILabel*     m_pUpdateBuildTypeLabel;
     CGUIComboBox*  m_pUpdateBuildTypeCombo;
     CGUILabel*     m_pUpdateAutoInstallLabel;
@@ -338,6 +343,7 @@ protected:
     CGUIButton*   m_pButtonBrowserWhitelistAdd;
     CGUIGridList* m_pGridBrowserWhitelist;
     CGUIButton*   m_pButtonBrowserWhitelistRemove;
+    CGUICheckBox* m_pCheckBoxBrowserGPUEnabled;
     bool          m_bBrowserListsChanged;
     bool          m_bBrowserListsLoadEnabled;
 
@@ -402,6 +408,7 @@ protected:
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
+    bool OnAffinityClick(CGUIElement* pElement);
     void ReloadBrowserLists();
 
 private:

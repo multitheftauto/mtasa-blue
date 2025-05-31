@@ -46,9 +46,11 @@
 #include <CSphere.h>
 #include <CBox.h>
 #include <CMatrix.h>
+#include "CStringName.h"
 #include <bochs_internal/bochs_crc32.h>
 #include <pcrecpp.h>
 #include <pthread.h>
+#include "version.h"
 
 extern class CNetServer* g_pRealNetServer;
 extern class CGame*      g_pGame;

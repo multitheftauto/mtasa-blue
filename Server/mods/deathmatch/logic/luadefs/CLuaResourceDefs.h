@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaResourceDefs.h
  *  PURPOSE:     Lua resource function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -54,8 +54,8 @@ public:
     LUA_DECLARE(getResourceOrganizationalPath);
     LUA_DECLARE(isResourceArchived);
 
-    static bool isResourceProtected(CResource* const resource);
     static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement);
+    static bool isResourceProtected(CResource* const resource);
 
     // Set stuff
     LUA_DECLARE(setResourceInfo);

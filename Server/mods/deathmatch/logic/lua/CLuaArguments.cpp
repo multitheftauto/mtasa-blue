@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaArguments.cpp
  *  PURPOSE:     Lua argument manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -197,11 +197,9 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
 
 void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 {
-    std::vector<CLuaArgument*>::const_iterator iter = Arguments.IterBegin();
-    for (; iter != Arguments.IterEnd(); ++iter)
+    for (CLuaArgument* argument : Arguments)
     {
-        CLuaArgument* pArgument = new CLuaArgument(**iter);
-        m_Arguments.push_back(pArgument);
+        m_Arguments.push_back(new CLuaArgument(*argument));
     }
 }
 
@@ -358,12 +356,28 @@ CLuaArgument* CLuaArguments::PushArgument(const CLuaArgument& argument)
     return pArgument;
 }
 
-CLuaArgument* CLuaArguments::PushString(const std::string& strString)
+CLuaArgument* CLuaArguments::PushString(const std::string& string)
 {
-    CLuaArgument* pArgument = new CLuaArgument();
-    pArgument->ReadString(strString);
-    m_Arguments.push_back(pArgument);
-    return pArgument;
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
+CLuaArgument* CLuaArguments::PushString(const std::string_view& string)
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
+CLuaArgument* CLuaArguments::PushString(const char* string)
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
 }
 
 CLuaArgument* CLuaArguments::PushElement(CElement* pElement)

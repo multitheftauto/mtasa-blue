@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCameraSA.cpp
  *  PURPOSE:     Camera rendering
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -187,7 +187,7 @@ void CCameraSA::RestoreLastGoodState()
 
 CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 {
-    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;            // ->Placeable.matrix;
+    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;            // ->matrix;
     if (pCamMatrix)
     {
         matrix->vFront = pCamMatrix->vFront;
@@ -210,7 +210,7 @@ CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 
 void CCameraSA::SetMatrix(CMatrix* matrix)
 {
-    CMatrix_Padded* pCamMatrix = GetInterface()->Placeable.matrix;
+    CMatrix_Padded* pCamMatrix = GetInterface()->matrix;
     if (pCamMatrix)
     {
         pCamMatrix->vFront = matrix->vFront;
@@ -442,4 +442,24 @@ float CCameraSA::GetShakeForce()
 {
     CCameraSAInterface* pCameraInterface = GetInterface();
     return pCameraInterface->m_fCamShakeForce;
+}
+
+void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
+{
+    static CCameraSAInterface* cameraInterface = GetInterface();
+    if (radius <= 0.0f)
+        return ResetShakeCamera();
+
+    using ShakeCamera_t = void(__thiscall*)(CCameraSAInterface*, float radius, float x, float y, float z);
+    ((ShakeCamera_t)FUNC_ShakeCam)(cameraInterface, radius, x, y, z);
+}
+
+void CCameraSA::ResetShakeCamera() noexcept
+{
+    GetInterface()->m_fCamShakeForce = 0.0f;
+}
+
+std::uint8_t CCameraSA::GetTransitionState()
+{
+    return GetInterface()->m_uiTransitionState;
 }

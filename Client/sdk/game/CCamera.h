@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CCamera.h
  *  PURPOSE:     Camera scene rendering interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -143,4 +143,9 @@ public:
     virtual BYTE      GetCameraPedViewMode() = 0;
     virtual void      SetShakeForce(float fShakeForce) = 0;
     virtual float     GetShakeForce() = 0;
+
+    virtual void ShakeCamera(float radius, float x, float y, float z) noexcept = 0;
+    virtual void ResetShakeCamera() noexcept = 0;
+
+    virtual std::uint8_t GetTransitionState() = 0;
 };

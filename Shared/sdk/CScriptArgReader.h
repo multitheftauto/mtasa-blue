@@ -5,7 +5,7 @@
  *  FILE:        CScriptArgReader.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,6 +17,7 @@
 #include <cfloat>
 #include "CStringMap.h"
 #include "CScriptDebugging.h"
+#include "CStringName.h"
 
 #ifndef MTA_CLIENT
     #include "CGame.h"
@@ -611,6 +612,35 @@ public:
     }
 
     //
+    // Read next string name
+    //
+    void ReadStringName(CStringName& outValue)
+    {
+        const int iArgument = lua_type(m_luaVM, m_iIndex);
+        if (iArgument == LUA_TSTRING)
+        {
+            size_t length;
+            const char* str = lua_tolstring(m_luaVM, m_iIndex, &length);
+            unsigned hash = lua_tostringhash(m_luaVM, m_iIndex++);
+
+            try
+            {
+                outValue = CStringName::FromStringAndHash(std::string_view(str, length), hash);
+            }
+            catch (const std::bad_alloc&)
+            {
+                SetCustomError("out of memory", "Memory allocation");
+            }
+
+            return;
+        }        
+
+        outValue.Clear();
+        SetTypeError("string");
+        m_iIndex++;
+    }
+
+    //
     // Force-reads next argument as string
     //
     void ReadAnyAsString(SString& outValue)
@@ -928,10 +958,7 @@ public:
     void ReadLuaArguments(CLuaArguments& outValue)
     {
         outValue.ReadArguments(m_luaVM, m_iIndex);
-        for (int i = outValue.Count(); i > 0; i--)
-        {
-            m_iIndex++;
-        }
+        m_iIndex += outValue.Count();
     }
 
     //

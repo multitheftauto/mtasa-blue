@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        multiplayer_sa/CMultiplayerSA_Weapons.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -202,6 +202,33 @@ void _declspec(naked) HOOK_Fx_AddBulletImpact()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVisibilityPlugins::RenderWeaponPedsForPC
+// 
+// Fix for the bright objects after weapon change sometimes
+// 
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC 0x733123
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC 5
+static constexpr DWORD CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC = 0x733128;
+static void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
+{
+    _asm
+    {
+        mov eax, 5DF4E0h
+        call eax // call CPed::ResetGunFlashAlpha
+
+        mov eax, 5533B0h
+        mov ecx, ebx
+
+        push 0
+        call eax // call CPed::RemoveLighting
+
+        jmp CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Weapons
 //
 // Setup hooks
@@ -212,4 +239,5 @@ void CMultiplayerSA::InitHooks_Weapons()
     EZHookInstall(CWeapon_GenerateDamageEvent);
     EZHookInstall(CShotInfo_Update);
     EZHookInstall(Fx_AddBulletImpact);
+    EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC);
 }

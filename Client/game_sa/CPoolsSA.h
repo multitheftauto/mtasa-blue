@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPoolsSA.h
  *  PURPOSE:     Header file for game entity pools class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -15,13 +15,16 @@
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
-#include "CTextureDictonarySA.h"
 #include "CBuildingsPoolSA.h"
 #include "CDummyPoolSA.h"
+#include "CTxdPoolSA.h"
+#include "CPtrNodeSingleLinkPoolSA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
 class CClientEntity;
+class CClientVehicle;
+class CClientObject;
 
 class CPoolsSA : public CPools
 {
@@ -30,7 +33,7 @@ public:
     ~CPoolsSA();
 
     // Vehicles pool
-    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
+    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t model, std::uint8_t variation, std::uint8_t variation2) noexcept;
 
 private:
     bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
@@ -76,7 +79,8 @@ public:
     uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
-    CVehicle* AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
+    CVehicle* AddTrain(CClientVehicle* pClientVehicle, const CVector& vecPosition, std::vector<DWORD> models, bool bDirection,
+                       std::uint8_t ucTrackId = 255) noexcept;
 
     DWORD GetPedPoolIndex(std::uint8_t* pInterface);
     DWORD GetVehiclePoolIndex(std::uint8_t* pInterfacee);
@@ -91,14 +95,10 @@ public:
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
 
-    uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName);
-    void RemoveTextureDictonarySlot(uint uiTxdId);
-    bool IsFreeTextureDictonarySlot(uint uiTxdId);
-
-    ushort GetFreeTextureDictonarySlot();
-
     CBuildingsPool& GetBuildingsPool() noexcept override { return m_BuildingsPool; };
     CDummyPool&     GetDummyPool() noexcept { return m_DummyPool; };
+    CTxdPool&       GetTxdPool() noexcept { return m_TxdPool; };
+    CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept override { return m_PtrNodeSingleLinkPool; };
 
 private:
     // Pools
@@ -109,10 +109,11 @@ private:
     CPoolSAInterface<CPedSAInterface>**              m_ppPedPoolInterface;
     CPoolSAInterface<CObjectSAInterface>**           m_ppObjectPoolInterface;
     CPoolSAInterface<CVehicleSAInterface>**          m_ppVehiclePoolInterface;
-    CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;
 
     CBuildingsPoolSA m_BuildingsPool;
     CDummyPoolSA     m_DummyPool;
+    CTxdPoolSA       m_TxdPool;
+    CPtrNodeSingleLinkPoolSA m_PtrNodeSingleLinkPool;
 
     bool m_bGetVehicleEnabled;
 };

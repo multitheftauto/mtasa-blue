@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCarEnterExitSA.cpp
  *  PURPOSE:     Car enter and exit handler
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -76,6 +76,19 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle,
     }
 
     return bReturn;
+}
+
+void CCarEnterExitSA::GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, std::uint32_t door) const noexcept
+{
+    CVehicleSA* vehicleSA = dynamic_cast<CVehicleSA*>(vehicle);
+
+    if (!vehicleSA)
+        return;
+
+    CVehicleSAInterface* vehicleInterface = vehicleSA->GetVehicleInterface();
+
+    auto CCarEnterExit_GetPositionToOpenCarDoor = (void(__cdecl*)(CVector&, CVehicleSAInterface*, int))FUNC_GetPositionToOpenCarDoor;
+    CCarEnterExit_GetPositionToOpenCarDoor(position, vehicleInterface, door);
 }
 
 int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)

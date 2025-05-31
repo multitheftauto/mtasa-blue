@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWeatherSA.h
  *  PURPOSE:     Header file for weather class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -60,5 +60,4 @@ private:
     static unsigned char* VAR_CWeather__OldWeatherType;
     static unsigned char* VAR_CWeather__NewWeatherType;
     static float*         VAR_CWeather__Rain;
-
 };

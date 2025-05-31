@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaBuildingDefs.h
  *  PURPOSE:     Lua building definitions class header
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -19,7 +19,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Buiding create funcs
-    static CClientBuilding* CreateBuilding(lua_State* const luaVM, uint16_t modelId, CVector pos, CVector rot, std::optional<uint8_t> interior);
+    static CClientBuilding* CreateBuilding(lua_State* const luaVM, std::uint16_t modelId, CVector pos, std::optional<CVector> rot, std::optional<std::uint8_t> interior);
     static void             RemoveAllGameBuildings();
     static void             RestoreGameBuildings();
 };

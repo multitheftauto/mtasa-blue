@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CScriptDebugging.cpp
  *  PURPOSE:     Script debugging facility class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,23 +14,6 @@
 #include "packets/CDebugEchoPacket.h"
 
 extern CGame* g_pGame;
-
-enum DebugScriptLevels : std::uint8_t
-{
-    NONE,
-    ERRORS_ONLY,
-    ERRORS_AND_WARNINGS,
-    ALL,
-};
-
-enum DebugMessageLevels : std::uint8_t
-{
-    MESSAGE_TYPE_DEBUG,
-    MESSAGE_TYPE_ERROR,
-    MESSAGE_TYPE_WARNING,
-    MESSAGE_TYPE_INFO,
-    MESSAGE_TYPE_CUSTOM,
-};
 
 CScriptDebugging::CScriptDebugging()
 {
@@ -158,28 +141,6 @@ void CScriptDebugging::PrintLog(const char* szText)
         fprintf(m_pLogFile, "[%s] %s\n", *GetLocalTimeString(true), szText);
         fflush(m_pLogFile);
     }
-}
-
-bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint8_t playerDebugLevel, std::uint8_t messageDebugLevel) const noexcept
-{
-    bool sufficientDebugLevel = false;
-
-    switch (messageDebugLevel)
-    {
-        case MESSAGE_TYPE_ERROR:
-            sufficientDebugLevel = (playerDebugLevel >= ERRORS_ONLY);
-            break;
-        case MESSAGE_TYPE_WARNING:
-            sufficientDebugLevel = (playerDebugLevel >= ERRORS_AND_WARNINGS);
-            break;
-        case MESSAGE_TYPE_INFO:
-        case MESSAGE_TYPE_CUSTOM:
-        case MESSAGE_TYPE_DEBUG:
-            sufficientDebugLevel = (playerDebugLevel == ALL);
-            break;
-    }
-
-    return sufficientDebugLevel;
 }
 
 void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel)

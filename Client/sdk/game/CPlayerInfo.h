@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CPlayerInfo.h
  *  PURPOSE:     Player entity information interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -38,4 +38,6 @@ public:
     virtual float GetBikeRearWheelDist() = 0;
     virtual DWORD GetBikeFrontWheelCounter() = 0;
     virtual float GetBikeFrontWheelDist() = 0;
+    virtual std::uint8_t GetMaxHealth() const = 0;
+    virtual std::uint8_t GetMaxArmor() const = 0;
 };

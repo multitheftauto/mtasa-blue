@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        multiplayer_sa/CMultiplayerSA_Rendering.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,6 +13,7 @@ extern CCoreInterface*   g_pCore;
 GameEntityRenderHandler* pGameEntityRenderHandler = nullptr;
 PreRenderSkyHandler*     pPreRenderSkyHandlerHandler = nullptr;
 RenderHeliLightHandler*  pRenderHeliLightHandler = nullptr;
+RenderEverythingBarRoadsHandler*  pRenderEverythingBarRoadsHandler = nullptr;
 
 #define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
 #define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
@@ -76,7 +77,7 @@ void _declspec(naked) HOOK_CallIdle()
 //////////////////////////////////////////////////////////////////////////////////////////
 bool IsEntityRenderable(CEntitySAInterface* pEntity)
 {
-    bool bIsPlaceable = ((DWORD)(pEntity->vtbl) == VTBL_CPlaceable);
+    bool bIsPlaceable = pEntity->IsPlaceableVTBL();
     bool bHasRwObject = (pEntity->m_pRwObject != nullptr);
     if (bIsPlaceable || !bHasRwObject)
     {
@@ -583,6 +584,17 @@ void CMultiplayerSA::SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CMultiplayerSA::SetRenderEverythingBarRoadsHandler
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetRenderEverythingBarRoadsHandler(RenderEverythingBarRoadsHandler* pHandler)
+{
+    pRenderEverythingBarRoadsHandler = pHandler;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetIsMinimizedAndNotConnected
 //
 //
@@ -703,6 +715,30 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
     }
 }
 
+// Hook info
+#define HOOKPOS_CRenderer_EverythingBarRoads                         0x553C78
+#define HOOKSIZE_CRenderer_EverythingBarRoads                        5
+DWORD RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
+DWORD DO_CRenderer_EverythingBarRoads = 0x7EE180;
+void _declspec(naked) HOOK_CRenderer_EverythingBarRoads()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (pRenderEverythingBarRoadsHandler)
+        pRenderEverythingBarRoadsHandler();
+
+    _asm
+    {
+        popad
+        call DO_CRenderer_EverythingBarRoads
+        jmp RETURN_CRenderer_EverythingBarRoads
+
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Rendering
@@ -726,4 +762,5 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstallChecked(CClouds_RenderSkyPolys);
     EZHookInstallChecked(RwCameraSetNearClipPlane);
     EZHookInstall(RenderEffects_HeliLight);
+    EZHookInstall(CRenderer_EverythingBarRoads);
 }

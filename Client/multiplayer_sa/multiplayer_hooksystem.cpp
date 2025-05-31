@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/multiplayer_hooksystem.cpp
  *  PURPOSE:     Multiplayer module hook system methods
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

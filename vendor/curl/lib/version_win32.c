@@ -24,14 +24,16 @@
 
 #include "curl_setup.h"
 
-#if defined(_WIN32)
+#ifdef _WIN32
 
 #include <curl/curl.h>
 #include "version_win32.h"
 #include "warnless.h"
 
-/* The last #include files should be: */
+/* The last 2 #include files should be in this order */
+#ifdef BUILDING_LIBCURL
 #include "curl_memory.h"
+#endif
 #include "memdebug.h"
 
 /* This Unicode version struct works for VerifyVersionInfoW (OSVERSIONINFOEXW)
@@ -53,7 +55,7 @@ struct OUR_OSVERSIONINFOEXW {
 /*
  * curlx_verify_windows_version()
  *
- * This is used to verify if we are running on a specific windows version.
+ * This is used to verify if we are running on a specific Windows version.
  *
  * Parameters:
  *
@@ -63,7 +65,7 @@ struct OUR_OSVERSIONINFOEXW {
  *                     ignored.
  * platform     [in] - The optional platform identifier.
  * condition    [in] - The test condition used to specifier whether we are
- *                     checking a version less then, equal to or greater than
+ *                     checking a version less than, equal to or greater than
  *                     what is specified in the major and minor version
  *                     numbers.
  *
@@ -77,13 +79,13 @@ bool curlx_verify_windows_version(const unsigned int majorVersion,
 {
   bool matched = FALSE;
 
-#if defined(CURL_WINDOWS_APP)
-  (void)buildVersion;
-
+#ifdef CURL_WINDOWS_UWP
   /* We have no way to determine the Windows version from Windows apps,
-     so let's assume we're running on the target Windows version. */
+     so let's assume we are running on the target Windows version. */
   const WORD fullVersion = MAKEWORD(minorVersion, majorVersion);
   const WORD targetVersion = (WORD)_WIN32_WINNT;
+
+  (void)buildVersion;
 
   switch(condition) {
   case VERSION_LESS_THAN:
@@ -108,91 +110,15 @@ bool curlx_verify_windows_version(const unsigned int majorVersion,
   }
 
   if(matched && (platform == PLATFORM_WINDOWS)) {
-    /* we're always running on PLATFORM_WINNT */
+    /* we are always running on PLATFORM_WINNT */
     matched = FALSE;
   }
-#elif !defined(_WIN32_WINNT) || !defined(_WIN32_WINNT_WIN2K) || \
-    (_WIN32_WINNT < _WIN32_WINNT_WIN2K)
-  OSVERSIONINFO osver;
-
-  memset(&osver, 0, sizeof(osver));
-  osver.dwOSVersionInfoSize = sizeof(osver);
-
-  /* Find out Windows version */
-  if(GetVersionEx(&osver)) {
-    /* Verify the Operating System version number */
-    switch(condition) {
-    case VERSION_LESS_THAN:
-      if(osver.dwMajorVersion < majorVersion ||
-        (osver.dwMajorVersion == majorVersion &&
-         osver.dwMinorVersion < minorVersion) ||
-        (buildVersion != 0 &&
-         (osver.dwMajorVersion == majorVersion &&
-          osver.dwMinorVersion == minorVersion &&
-          osver.dwBuildNumber < buildVersion)))
-        matched = TRUE;
-      break;
-
-    case VERSION_LESS_THAN_EQUAL:
-      if(osver.dwMajorVersion < majorVersion ||
-        (osver.dwMajorVersion == majorVersion &&
-         osver.dwMinorVersion < minorVersion) ||
-        (osver.dwMajorVersion == majorVersion &&
-         osver.dwMinorVersion == minorVersion &&
-         (buildVersion == 0 ||
-          osver.dwBuildNumber <= buildVersion)))
-        matched = TRUE;
-      break;
-
-    case VERSION_EQUAL:
-      if(osver.dwMajorVersion == majorVersion &&
-         osver.dwMinorVersion == minorVersion &&
-        (buildVersion == 0 ||
-         osver.dwBuildNumber == buildVersion))
-        matched = TRUE;
-      break;
-
-    case VERSION_GREATER_THAN_EQUAL:
-      if(osver.dwMajorVersion > majorVersion ||
-        (osver.dwMajorVersion == majorVersion &&
-         osver.dwMinorVersion > minorVersion) ||
-        (osver.dwMajorVersion == majorVersion &&
-         osver.dwMinorVersion == minorVersion &&
-         (buildVersion == 0 ||
-          osver.dwBuildNumber >= buildVersion)))
-        matched = TRUE;
-      break;
-
-    case VERSION_GREATER_THAN:
-      if(osver.dwMajorVersion > majorVersion ||
-        (osver.dwMajorVersion == majorVersion &&
-         osver.dwMinorVersion > minorVersion) ||
-        (buildVersion != 0 &&
-         (osver.dwMajorVersion == majorVersion &&
-          osver.dwMinorVersion == minorVersion &&
-          osver.dwBuildNumber > buildVersion)))
-        matched = TRUE;
-      break;
-    }
-
-    /* Verify the platform identifier (if necessary) */
-    if(matched) {
-      switch(platform) {
-      case PLATFORM_WINDOWS:
-        if(osver.dwPlatformId != VER_PLATFORM_WIN32_WINDOWS)
-          matched = FALSE;
-        break;
-
-      case PLATFORM_WINNT:
-        if(osver.dwPlatformId != VER_PLATFORM_WIN32_NT)
-          matched = FALSE;
-        break;
-
-      default: /* like platform == PLATFORM_DONT_CARE */
-        break;
-      }
-    }
-  }
+#elif defined(UNDER_CE)
+  (void)majorVersion;
+  (void)minorVersion;
+  (void)buildVersion;
+  (void)platform;
+  (void)condition;
 #else
   ULONGLONG cm = 0;
   struct OUR_OSVERSIONINFOEXW osver;
@@ -207,12 +133,12 @@ bool curlx_verify_windows_version(const unsigned int majorVersion,
   typedef LONG (APIENTRY *RTLVERIFYVERSIONINFO_FN)
     (struct OUR_OSVERSIONINFOEXW *, ULONG, ULONGLONG);
   static RTLVERIFYVERSIONINFO_FN pRtlVerifyVersionInfo;
-  static bool onetime = true; /* safe because first call is during init */
+  static bool onetime = TRUE; /* safe because first call is during init */
 
   if(onetime) {
     pRtlVerifyVersionInfo = CURLX_FUNCTION_CAST(RTLVERIFYVERSIONINFO_FN,
       (GetProcAddress(GetModuleHandleA("ntdll"), "RtlVerifyVersionInfo")));
-    onetime = false;
+    onetime = FALSE;
   }
 
   switch(condition) {

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CMarkerRPCs.h
  *  PURPOSE:     Header for marker RPC class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,4 +23,5 @@ public:
     DECLARE_ELEMENT_RPC(SetMarkerSize);
     DECLARE_ELEMENT_RPC(SetMarkerTarget);
     DECLARE_ELEMENT_RPC(SetMarkerIcon);
+    DECLARE_ELEMENT_RPC(SetMarkerTargetArrowProperties);
 };

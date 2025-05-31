@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaResourceDefs.cpp
  *  PURPOSE:     Lua resource function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -900,28 +900,10 @@ int CLuaResourceDefs::getResourceLoadTime(lua_State* luaVM)
 
 std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    if (resourceElement && resourceElement.has_value())
-    {
-        if (!(*resourceElement)->IsActive())
-            throw std::invalid_argument("The resource isn't active");
-
+    if (resourceElement.has_value())
         return (*resourceElement)->GetName();
-    }
 
-    CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
-
-    if (!localVM)
-        throw std::invalid_argument("Couldn't find the virtual machine");
-
-    CResource* localResource = localVM->GetResource();
-
-    if (!localResource)
-        throw std::invalid_argument("Couldn't find the resource");
-
-    if (!localResource->IsActive())
-        throw std::invalid_argument("The resource isn't active");
-
-    return localResource->GetName();
+    return lua_getownerresource(luaVM).GetName();
 }
 
 int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
@@ -1185,7 +1167,7 @@ int CLuaResourceDefs::call(lua_State* luaVM)
                     OldResourceRoot.Push(targetLuaVM);
                     lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
-                    return returns.Count();
+                    return static_cast<int>(returns.Count());
                 }
                 else
                 {
@@ -1346,7 +1328,7 @@ int CLuaResourceDefs::LoadString(lua_State* luaVM)
         uint        uiSize;
         if (!g_pRealNetServer->DeobfuscateScript(cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName(luaVM) + "/loadstring"))
         {
-            SString strMessage("argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0);
+            SString strMessage("argument 1 is invalid. Please re-compile at https://luac.multitheftauto.com/", 0);
             argStream.SetCustomError(strMessage);
             cpBuffer = NULL;
         }
@@ -1398,9 +1380,9 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
         {
             CLuaArguments returnValues;
             callbackArguments.Call(pLuaMain, iLuaFunction, &returnValues);
-            if (returnValues.Count())
+            if (returnValues.IsNotEmpty())
             {
-                CLuaArgument* returnedValue = *returnValues.IterBegin();
+                CLuaArgument* returnedValue = *returnValues.begin();
                 int           iType = returnedValue->GetType();
                 if (iType == LUA_TNIL)
                     break;
@@ -1427,7 +1409,7 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
         uint        uiSize;
         if (!g_pRealNetServer->DeobfuscateScript(cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName(luaVM) + "/load"))
         {
-            SString strMessage("argument 2 is invalid. Please re-compile at http://luac.mtasa.com/", 0);
+            SString strMessage("argument 2 is invalid. Please re-compile at https://luac.multitheftauto.com/", 0);
             argStream.SetCustomError(strMessage);
             cpBuffer = NULL;
         }

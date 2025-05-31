@@ -3,18 +3,14 @@ project "CEFLauncher"
 	kind "WindowedApp"
 	targetname "CEFLauncher"
 	targetdir(buildpath("mta/cef"))
-
 	includedirs { "../sdk" }
-
 	links { "CEFLauncher DLL"}
-	entrypoint "WinMainCRTStartup"
 
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
-
 
 	files {
 		"premake5.lua",

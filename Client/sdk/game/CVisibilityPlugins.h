@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CVisibilityPlugins.h
  *  PURPOSE:     Visibility plugins interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -22,4 +22,6 @@ class CVisibilityPlugins
 public:
     virtual void SetClumpAlpha(RpClump* pClump, int iAlpha) = 0;
     virtual int  GetAtomicId(RwObject* pAtomic) = 0;
+
+    virtual bool InsertEntityIntoEntityList(void* entity, float distance, void* callback) = 0;
 };

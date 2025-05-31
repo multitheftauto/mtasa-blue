@@ -23,16 +23,16 @@
 //
 
 IMPLEMENT_ENUM_BEGIN(eLuaType)
-ADD_ENUM(LUA_TNONE, "none")
-ADD_ENUM(LUA_TNIL, "nil")
-ADD_ENUM(LUA_TBOOLEAN, "boolean")
-ADD_ENUM(LUA_TLIGHTUSERDATA, "lightuserdata")
-ADD_ENUM(LUA_TNUMBER, "number")
-ADD_ENUM(LUA_TSTRING, "string")
-ADD_ENUM(LUA_TTABLE, "table")
-ADD_ENUM(LUA_TFUNCTION, "function")
-ADD_ENUM(LUA_TUSERDATA, "userdata")
-ADD_ENUM(LUA_TTHREAD, "thread")
+ADD_ENUM(static_cast<eLuaType>(LUA_TNONE), "none")
+ADD_ENUM(static_cast<eLuaType>(LUA_TNIL), "nil")
+ADD_ENUM(static_cast<eLuaType>(LUA_TBOOLEAN), "boolean")
+ADD_ENUM(static_cast<eLuaType>(LUA_TLIGHTUSERDATA), "lightuserdata")
+ADD_ENUM(static_cast<eLuaType>(LUA_TNUMBER), "number")
+ADD_ENUM(static_cast<eLuaType>(LUA_TSTRING), "string")
+ADD_ENUM(static_cast<eLuaType>(LUA_TTABLE), "table")
+ADD_ENUM(static_cast<eLuaType>(LUA_TFUNCTION), "function")
+ADD_ENUM(static_cast<eLuaType>(LUA_TUSERDATA), "userdata")
+ADD_ENUM(static_cast<eLuaType>(LUA_TTHREAD), "thread")
 IMPLEMENT_ENUM_END("lua-type")
 
 IMPLEMENT_ENUM_BEGIN(TrafficLight::EColor)
@@ -271,6 +271,7 @@ ADD_ENUM(CElement::WATER, "water")
 ADD_ENUM(CElement::DATABASE_CONNECTION, "db-connection")
 ADD_ENUM(CElement::ROOT, "root")
 ADD_ENUM(CElement::UNKNOWN, "unknown")
+ADD_ENUM(CElement::BUILDING, "building")
 IMPLEMENT_ENUM_END_DEFAULTS("element-type", CElement::UNKNOWN, "unknown")
 
 IMPLEMENT_ENUM_BEGIN(CAccountPassword::EAccountPasswordType)
@@ -284,6 +285,12 @@ ADD_ENUM(ESyncType::BROADCAST, "broadcast")
 ADD_ENUM(ESyncType::LOCAL, "local")
 ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
 IMPLEMENT_ENUM_CLASS_END("sync-mode")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eCustomDataClientTrust)
+ADD_ENUM(eCustomDataClientTrust::UNSET, "default")
+ADD_ENUM(eCustomDataClientTrust::ALLOW, "allow")
+ADD_ENUM(eCustomDataClientTrust::DENY, "deny")
+IMPLEMENT_ENUM_CLASS_END("client-trust-mode")
 
 //
 // CResource from userdata
@@ -638,6 +645,42 @@ void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions)
             }
         }
     }
+}
+
+//
+// Check 4x4 lua table
+//
+bool IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept
+{
+    std::uint32_t cell = 0;
+
+    if (lua_type(luaVM, argIndex) == LUA_TTABLE)
+    {
+        lua_pushnil(luaVM);
+        for (std::uint32_t row = 0; lua_next(luaVM, argIndex) != 0; lua_pop(luaVM, 1), ++row)
+        {
+            if (lua_type(luaVM, -1) != LUA_TTABLE)
+                return false;
+
+            std::uint32_t col = 0;
+
+            lua_pushnil(luaVM);
+            for (; lua_next(luaVM, -2) != 0; lua_pop(luaVM, 1), ++col, ++cell)
+            {
+                int argumentType = lua_type(luaVM, -1);
+                if (argumentType != LUA_TNUMBER && argumentType != LUA_TSTRING)
+                    return false;
+            }
+
+            if (col != 4)
+                return false;
+        }
+    }
+
+    if (cell != 16)
+        return false;
+
+    return true;
 }
 
 //

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CMarkerRPCs.cpp
  *  PURPOSE:     Marker remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -19,6 +19,7 @@ void CMarkerRPCs::LoadFunctions()
     AddHandler(SET_MARKER_SIZE, SetMarkerSize, "SetMarkerSize");
     AddHandler(SET_MARKER_TARGET, SetMarkerTarget, "SetMarkerTarget");
     AddHandler(SET_MARKER_ICON, SetMarkerIcon, "SetMarkerIcon");
+    AddHandler(SET_MARKER_TARGET_ARROW_PROPERTIES, SetMarkerTargetArrowProperties, "SetMarkerTargetArrowProperties");
 }
 
 void CMarkerRPCs::SetMarkerType(CClientEntity* pSource, NetBitStreamInterface& bitStream)
@@ -136,5 +137,23 @@ void CMarkerRPCs::SetMarkerIcon(CClientEntity* pSource, NetBitStreamInterface& b
                 pCheckpoint->SetIcon(static_cast<unsigned int>(ucIcon));
             }
         }
+    }
+}
+
+void CMarkerRPCs::SetMarkerTargetArrowProperties(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    SColor color;
+    float  size;
+    if (bitStream.Read(color.R) && bitStream.Read(color.G) && bitStream.Read(color.B) && bitStream.Read(color.A) && bitStream.Read(size))
+    {
+        CClientMarker* marker = m_pMarkerManager->Get(pSource->GetID());
+        if (!marker)
+            return;
+
+        CClientCheckpoint* checkpoint = marker->GetCheckpoint();
+        if (!checkpoint)
+            return;
+
+        checkpoint->SetTargetArrowProperties(color, size);
     }
 }

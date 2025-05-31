@@ -21,8 +21,13 @@ CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsi
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
-    command_line->AppendSwitch("disable-gpu-compositing");
-    command_line->AppendSwitch("disable-gpu");
+    CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
+
+    if (!pWebCore->GetGPUEnabled())
+        command_line->AppendSwitch("disable-gpu");
+
+    command_line->AppendSwitch("disable-gpu-compositing"); // always disable this, causes issues with official builds
+
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
 
@@ -41,7 +46,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 {
     // browser or frame are NULL if the request does not orginate from a browser window
     // This is for exmaple true for the application cache or CEFURLRequests
-    // (http://www.html5rocks.com/en/tutorials/appcache/beginner/)
+    // (https://www.html5rocks.com/en/tutorials/appcache/beginner/)
     if (!browser || !frame)
         return nullptr;
 
@@ -57,7 +62,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
     SString host = UTF16ToMbUTF8(urlParts.host.str);
     if (scheme_name == "http" && host == "mta")
     {
-        // Scheme format: http://mta/resourceName/file.html or http://mta/local/file.html for the current resource
+        // Scheme format: https://mta/resourceName/file.html or https://mta/local/file.html for the current resource
 
         // Get resource name and path
         SString path = UTF16ToMbUTF8(urlParts.path.str).substr(1);            // Remove slash at the front

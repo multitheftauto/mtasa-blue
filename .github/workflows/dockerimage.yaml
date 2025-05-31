@@ -1,37 +1,18 @@
 name: Docker Image
 
 on: 
+  workflow_dispatch:
   push:
     branches:
     - master
     paths: 
     - '.github/workflows/build.yaml'
     - '.github/workflows/dockerimage.yaml'
-    - 'utils/compat/**'
-    - 'Dockerfile'
-    - 'Dockerfile.i386'
-    - 'Dockerfile.armhf'
-    - 'Dockerfile.arm64'
-    - 'Dockerfile.osx-x64'
-    - 'Dockerfile.osx-arm64'
+    - 'utils/docker/**'
 
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-        - tag: latest
-          dockerfile: Dockerfile
-        - tag: i386
-          dockerfile: Dockerfile.i386
-        - tag: armhf
-          dockerfile: Dockerfile.armhf
-        - tag: arm64
-          dockerfile: Dockerfile.arm64
-        - tag: osx-x64
-          dockerfile: Dockerfile.osx-x64
-        - tag: osx-arm64
-          dockerfile: Dockerfile.osx-arm64
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -44,5 +25,5 @@ jobs:
     - uses: docker/build-push-action@v5
       with:
         push: true
-        file: ./${{ matrix.dockerfile }}
-        tags: ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.tag }}
+        context: utils/docker
+        tags: ghcr.io/multitheftauto/mtasa-blue-build:latest

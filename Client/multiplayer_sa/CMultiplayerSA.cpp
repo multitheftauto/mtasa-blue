@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        multiplayer_sa/CMultiplayerSA.cpp
+ *  FILE:        Client/multiplayer_sa/CMultiplayerSA.cpp
  *  PURPOSE:     Multiplayer module class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -190,8 +190,6 @@ DWORD RETURN_CHandlingData_isNotRWD = 0x6A0493;
 DWORD RETURN_CHandlingData_isNotFWD = 0x6A04C3;
 // end of handling fix
 #define CALL_CAutomobile_ProcessEntityCollision             0x6AD053
-#define CALL_CBike_ProcessEntityCollision1                  0x6BDF82
-#define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 
@@ -268,6 +266,13 @@ DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
 DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
 #define HOOKPOS_CGlass__BreakGlassPhysically                0x71D14B
 DWORD RETURN_CGlass__BreakGlassPhysically = 0x71D150;
+#define HOOKPOS_CGlass_WindowRespondsToExplosion            0x71C255
+DWORD RETURN_CGlass_WindowRespondsToExplosion = 0x71C25A;
+constexpr const DWORD CALL_FROM_CGlass_WindowRespondsToExplosion = 0x71C28E;
+constexpr const DWORD CALL_FROM_CGlass_WasGlassHitByBullet = 0x71C192;
+constexpr const DWORD CALL_FROM_CPhysical_ApplyCollision = 0x548F39;
+constexpr const DWORD CALL_FROM_CPhysical_ApplyCollision_2 = 0x5490AE;
+constexpr const DWORD CALL_FROM_CPhysical_ApplySoftCollision = 0x54A816;
 
 #define HOOKPOS_FxManager_c__DestroyFxSystem                0x4A989A
 
@@ -592,7 +597,6 @@ CMultiplayerSA::CMultiplayerSA()
 
     MemSetFast(&localStatsData, 0, sizeof(CStatsData));
     localStatsData.StatTypesFloat[24] = 569.0f;            // Max Health
-    m_bSuspensionEnabled = true;
 
     m_fAircraftMaxHeight = 800.0f;
 
@@ -746,7 +750,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10);
     HookInstall(HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8);
     HookInstall(HOOKPOS_CGlass__BreakGlassPhysically, (DWORD)HOOK_CGlass__BreakGlassPhysically, 5);
-
+    
     // Post-destruction hook for FxSystems
     HookInstall(HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
 
@@ -1307,6 +1311,10 @@ void CMultiplayerSA::InitHooks()
     MemPut<DWORD>(0x748EFC, 0x748B08);
     MemPut<BYTE>(0x748B0E, 5);
 
+    // Skip copyright screen
+    MemSet((void*)0x748C2B, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeIn
+    MemSet((void*)0x748C9A, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeOut
+
     // Force triggering of the damage event for players on fire
     MemSet((void*)0x633695, 0x90, 6);
     MemPut<BYTE>(0x633720, 0);
@@ -1448,7 +1456,7 @@ void CMultiplayerSA::InitHooks()
     // Disable CStreaming::StreamVehiclesAndPeds_Always
     MemPut<BYTE>(0x40B650, 0xC3);
 
-    SetSuspensionEnabled(true);
+    UpdateVehicleSuspension();
 
     // Aircraft Max Height checks are at 0x6D2614 and 0x6D2625 edit the check to use our own float.
     MemPut(0x6D2614, &m_fAircraftMaxHeight);
@@ -1559,7 +1567,18 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x7225F5, 0x90, 4);
     MemCpy((void*)0x725DDE, "\xFF\x76\xB\x90\x90", 5);
 
+    // Allow switch weapon during jetpack task (#3569)
+    MemSetFast((void*)0x60D86F, 0x90, 19);
+
+    // Fix invisible vehicle windows when lights are on (#2936)
+    MemPut<BYTE>(0x6E1425, 1);
+
+    // Allow alpha change for helicopter rotor (#523)
+    MemSet((void*)0x6C444B, 0x90, 6);
+    MemSet((void*)0x6C4453, 0x90, 0x68);
+    
     InitHooks_CrashFixHacks();
+    InitHooks_DeviceSelection();
 
     // Init our 1.3 hooks.
     Init_13();
@@ -1576,6 +1595,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_ObjectStreamerOptimization();
 
     InitHooks_Postprocess();
+    InitHooks_Explosions();
+    InitHooks_Tasks();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -1847,6 +1868,7 @@ void CMultiplayerSA::DisableCloseRangeDamage(bool bDisabled)
         MemPut<BYTE>(0x73BA00, 0x86);
     }
 }
+
 bool CMultiplayerSA::GetInteriorSoundsEnabled()
 {
     return bInteriorSoundsEnabled;
@@ -2747,14 +2769,14 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
                 {
                     activeEntityForStreaming = new CPedSAInterface();
                     MemSet (activeEntityForStreaming, 0, sizeof(CPedSAInterface));
-                    activeEntityForStreaming->Placeable.matrix = new CMatrix_Padded();
+                    activeEntityForStreaming->matrix = new CMatrix_Padded();
                 }
 
                 bActiveEntityForStreamingIsFakePed = true;
 
-                activeEntityForStreaming->Placeable.matrix->vPos.fX = vecPosition->fX;
-                activeEntityForStreaming->Placeable.matrix->vPos.fY = vecPosition->fY;
-                activeEntityForStreaming->Placeable.matrix->vPos.fZ = vecPosition->fZ;
+                activeEntityForStreaming->matrix->vPos.fX = vecPosition->fX;
+                activeEntityForStreaming->matrix->vPos.fY = vecPosition->fY;
+                activeEntityForStreaming->matrix->vPos.fZ = vecPosition->fZ;
             }*/
 
         // DWORD dwCurrentValue = *(DWORD *)FUNC_CPlayerInfoBase;
@@ -2765,7 +2787,7 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
     {
         /*if ( bActiveEntityForStreamingIsFakePed )
         {
-            delete activeEntityForStreaming->Placeable.matrix;
+            delete activeEntityForStreaming->matrix;
             delete activeEntityForStreaming;
         }
 
@@ -3202,10 +3224,10 @@ bool processGrab()
     {
         // CObjectSA * object = (CObjectSA*)entity;
         // CModelInfo * info = pGameInterface->GetModelInfo(entity->m_nModelIndex);
-        if (entity->Placeable.matrix)
-            edgeHeight = *entityEdgeHeight + entity->Placeable.matrix->vPos.fZ;
+        if (entity->matrix)
+            edgeHeight = *entityEdgeHeight + entity->matrix->vPos.fZ;
         else
-            edgeHeight = *entityEdgeHeight + entity->Placeable.m_transform.m_translate.fZ;
+            edgeHeight = *entityEdgeHeight + entity->m_transform.m_translate.fZ;
     }
     else
         edgeHeight = *entityEdgeHeight;
@@ -4567,7 +4589,7 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
         pVehicle->GetGravity(&vecGravity);
         pVehicle->GetMoveSpeed(&vecMoveSpeed);
         vecMoveSpeed += vecGravity * fTimeStep * fGravity;
-        pVehicle->SetMoveSpeed(&vecMoveSpeed);
+        pVehicle->SetMoveSpeed(vecMoveSpeed);
     }
     else
     {
@@ -4664,7 +4686,7 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 
     pVehicle->GetMoveSpeed(&gravcam_vecVehicleVelocity);
     CVector vecVelocityInverted = gravcam_matInvertGravity * gravcam_vecVehicleVelocity;
-    pVehicle->SetMoveSpeed(&vecVelocityInverted);
+    pVehicle->SetMoveSpeed(vecVelocityInverted);
     return true;
 }
 
@@ -4860,7 +4882,7 @@ void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
         return;
 
     pVehicle->SetMatrix(&gravcam_matVehicleTransform);
-    pVehicle->SetMoveSpeed(&gravcam_vecVehicleVelocity);
+    pVehicle->SetMoveSpeed(gravcam_vecVehicleVelocity);
 }
 
 void _declspec(naked) HOOK_VehicleCamEnd()
@@ -4998,7 +5020,7 @@ void _cdecl ApplyVehicleBlowHop(DWORD pVehicleInterface)
     pVehicle->GetGravity(&vecGravity);
     pVehicle->GetMoveSpeed(&vecVelocity);
     vecVelocity -= vecGravity * 0.13f;
-    pVehicle->SetMoveSpeed(&vecVelocity);
+    pVehicle->SetMoveSpeed(vecVelocity);
 }
 
 void _declspec(naked) HOOK_ApplyCarBlowHop()
@@ -6103,7 +6125,7 @@ bool                 CheckHasSuspensionChanged()
 
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
         if (pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
-            return pVehicle->GetHandlingData()->HasSuspensionChanged();
+            return true;
         else
             return false;
     }
@@ -6168,26 +6190,10 @@ void _declspec(naked) HOOK_ProcessVehicleCollision()
     }
 }
 
-void CMultiplayerSA::SetSuspensionEnabled(bool bEnabled)
+void CMultiplayerSA::UpdateVehicleSuspension() const noexcept
 {
-    // if ( bEnabled )
-    {
-        // Hook Install
-        m_bSuspensionEnabled = true;
-        HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision);
-        // HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
-        // HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
-        HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision);
-    }
-    //     else
-    //     {
-    //         // Hook Uninstall
-    //         m_bSuspensionEnabled = false;
-    //         HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, RETURN_ProcessEntityCollision );
-    //         HookInstallCall ( CALL_CBike_ProcessEntityCollision1, RETURN_ProcessEntityCollision );
-    //         HookInstallCall ( CALL_CBike_ProcessEntityCollision2, RETURN_ProcessEntityCollision );
-    //         HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, RETURN_ProcessEntityCollision );
-    //     }
+    HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
+    HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
 }
 
 // Variables
@@ -6372,13 +6378,13 @@ void RemoveObjectIfNeeded()
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
-        if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
+        if (!pBuildingAdd->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pBuildingAdd);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
-        if ((DWORD)(pLODInterface->vtbl) != VTBL_CPlaceable)
+        if (!pLODInterface->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pLODInterface);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
@@ -6437,7 +6443,12 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
     TIMING_CHECKPOINT("+RemovePointerToBuilding");
     RemovePointerToBuilding();
     StorePointerToBuilding();
-    RemoveObjectIfNeeded();
+
+    // pLODInterface contains a dummy object's pointer
+    // And as follows from CPopulation::ConvertToDummyObject this pointer can be nullptr
+    if (pLODInterface)
+        RemoveObjectIfNeeded();
+
     TIMING_CHECKPOINT("-RemovePointerToBuilding");
     _asm
     {
@@ -6451,7 +6462,7 @@ void RemoveDummyIfReplaced()
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
-        if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
+        if (!pBuildingAdd->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pBuildingAdd);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);
@@ -6801,22 +6812,73 @@ void _declspec(naked) HOOK_CObject_ProcessCollision()
     }
 }
 
+DWORD WindowRespondsToCollision_CalledFrom = 0;
 void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
 {
     _asm
     {
-        pushad
-        mov ecx, [esp+4]
-        mov pDamagedObject, ecx
+        push eax
+        mov eax, [esp + 4]
+        mov WindowRespondsToCollision_CalledFrom, eax
+        pop eax
     }
-    pObjectAttacker = NULL;
+
+    pObjectAttacker = nullptr;
+
+    if (WindowRespondsToCollision_CalledFrom != CALL_FROM_CGlass_WindowRespondsToExplosion)
+    {
+        _asm
+        {
+            mov pDamagedObject, esi
+        }
+    }
+
+    // Get attacker for the glass break
+    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplyCollision ||
+        WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplyCollision_2 ||
+        WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplySoftCollision)
+    {
+        _asm
+        {
+            mov pObjectAttacker, edi
+        }
+    }
+
+    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CGlass_WasGlassHitByBullet)
+    {
+        _asm
+        {
+            mov pObjectAttacker, ebx // WasGlassHitByBullet called from CWeapon::DoBulletImpact
+        }
+
+        if (!pObjectAttacker || (pObjectAttacker && !pObjectAttacker->m_pRwObject)) // WasGlassHitByBullet called from CBulletInfo::Update
+        {
+            _asm
+            {
+                push ecx
+                mov ecx, [edi]
+                mov pObjectAttacker, ecx
+                pop ecx
+            }
+        }
+    }
+
+    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CGlass_WindowRespondsToExplosion)
+    {
+        _asm
+        {
+            mov pDamagedObject, edx
+            mov pObjectAttacker, ebp
+        }
+    }
+
+    if (pObjectAttacker && !pObjectAttacker->m_pRwObject) // Still wrong?
+        pObjectAttacker = nullptr;
 
     if (TriggerObjectBreakEvent())
     {
         _asm
         {
-            popad
-
             sub esp, 68h
             push esi
             mov esi, [esp+6Ch+4]
@@ -6827,7 +6889,6 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
     {
         _asm
         {
-            popad
             retn
         }
     }
@@ -6840,9 +6901,11 @@ void _declspec(naked) HOOK_CGlass__BreakGlassPhysically()
     _asm
     {
         mov     pDamagedObject, esi
+        push    ecx
+        mov     ecx, [esp+4]
+        mov     pObjectAttacker, ecx
+        pop     ecx
     }
-    //   we can't get attacker from here
-    pObjectAttacker = NULL;
 
     if (TriggerObjectBreakEvent())
     {
