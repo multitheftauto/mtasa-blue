@@ -14,6 +14,7 @@
 #include "CMarkerManager.h"
 #include "CColCircle.h"
 #include "CColSphere.h"
+#include "CColTube.h"
 #include "CResource.h"
 #include "CLogger.h"
 #include "Utils.h"
@@ -383,6 +384,11 @@ void CMarker::Callback_OnCollisionDestroy(CColShape* pCollision)
         m_pCollision = NULL;
 }
 
+float CColTube::AdjustSize(float fSize)
+{
+    return (fSize / 2.0f) + 0.15f; 
+}
+
 void CMarker::UpdateCollisionObject(unsigned char ucOldType)
 {
     // Different type than before?
@@ -395,15 +401,19 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
         {
             if (m_pCollision)
                 g_pGame->GetElementDeleter()->Delete(m_pCollision);
-
-            m_pCollision = new CColCircle(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
+                m_pCollision = new CColCircle(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
+        }
+        else if (m_ucType == CMarker::TYPE_CYLINDER)
+        {
+            if (m_pCollision)
+                g_pGame->GetElementDeleter()->Delete(m_pCollision);
+                m_pCollision = new CColTube(m_pColManager, nullptr, m_vecPosition, m_fSize, m_fSize);
         }
         else if (ucOldType == CMarker::TYPE_CHECKPOINT)
         {
             if (m_pCollision)
                 g_pGame->GetElementDeleter()->Delete(m_pCollision);
-
-            m_pCollision = new CColSphere(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
+                m_pCollision = new CColSphere(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
         }
 
         m_pCollision->SetCallback(this);
@@ -415,6 +425,12 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
     if (m_ucType == CMarker::TYPE_CHECKPOINT)
     {
         static_cast<CColCircle*>(m_pCollision)->SetRadius(m_fSize);
+    }
+    else if (m_ucType == CMarker::TYPE_CYLINDER)
+    {
+        CColTube* pShape = static_cast<CColTube*>(m_pCollision);
+        pShape->SetRadius(pShape->AdjustSize(m_fSize));
+        pShape->SetHeight(m_fSize);
     }
     else
     {
