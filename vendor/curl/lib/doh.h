@@ -28,6 +28,7 @@
 #include "curl_addrinfo.h"
 #ifdef USE_HTTPSRR
 # include <stdint.h>
+# include "httpsrr.h"
 #endif
 
 #ifndef CURL_DISABLE_DOH
@@ -124,19 +125,6 @@ struct dohaddr {
 #ifdef USE_HTTPSRR
 
 /*
- * These are the code points for DNS wire format SvcParams as
- * per draft-ietf-dnsop-svcb-https
- * Not all are supported now, and even those that are may need
- * more work in future to fully support the spec.
- */
-#define HTTPS_RR_CODE_ALPN            0x01
-#define HTTPS_RR_CODE_NO_DEF_ALPN     0x02
-#define HTTPS_RR_CODE_PORT            0x03
-#define HTTPS_RR_CODE_IPV4            0x04
-#define HTTPS_RR_CODE_ECH             0x05
-#define HTTPS_RR_CODE_IPV6            0x06
-
-/*
  * These may need escaping when found within an ALPN string
  * value.
  */
@@ -178,8 +166,6 @@ UNITTEST DOHcode doh_resp_decode(const unsigned char *doh,
 UNITTEST void de_init(struct dohentry *d);
 UNITTEST void de_cleanup(struct dohentry *d);
 #endif
-
-extern struct curl_trc_feat Curl_doh_trc;
 
 #else /* if DoH is disabled */
 #define Curl_doh(a,b,c,d) NULL

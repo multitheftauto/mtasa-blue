@@ -53,7 +53,7 @@
 #ifdef _WIN32
 #define PATHSEP "\\"
 #define IS_SEP(x) (((x) == '/') || ((x) == '\\'))
-#elif defined(MSDOS) || defined(__EMX__) || defined(OS2)
+#elif defined(MSDOS) || defined(OS2)
 #define PATHSEP "\\"
 #define IS_SEP(x) ((x) == '\\')
 #else
@@ -105,7 +105,13 @@ CURLcode Curl_fopen(struct Curl_easy *data, const char *filename,
   *fh = fopen(filename, FOPEN_WRITETEXT);
   if(!*fh)
     goto fail;
-  if(fstat(fileno(*fh), &sb) == -1 || !S_ISREG(sb.st_mode)) {
+  if(
+#ifdef UNDER_CE
+     stat(filename, &sb) == -1
+#else
+     fstat(fileno(*fh), &sb) == -1
+#endif
+     || !S_ISREG(sb.st_mode)) {
     return CURLE_OK;
   }
   fclose(*fh);

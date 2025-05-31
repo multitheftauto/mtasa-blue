@@ -5,13 +5,13 @@
  *  FILE:        sdk/game/CRegisteredCorona.h
  *  PURPOSE:     Registered corona entity interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
-#include "Common.h"
+#include "enums/CoronaType.h"
 
 class CVector;
 struct RwTexture;
@@ -29,7 +29,7 @@ public:
     virtual void     SetPullTowardsCamera(float fPullTowardsCamera) = 0;
     virtual void     SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha) = 0;
     virtual void     SetTexture(RwTexture* texture) = 0;
-    virtual void     SetTexture(eCoronaType texture) = 0;
+    virtual void     SetTexture(CoronaType texture) = 0;
     virtual BYTE     GetFlareType() = 0;
     virtual void     SetFlareType(BYTE fFlareType) = 0;
     virtual void     SetReflectionType(BYTE reflectionType) = 0;

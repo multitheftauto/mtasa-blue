@@ -77,7 +77,7 @@
 
 #define SMB_FLAGS_CANONICAL_PATHNAMES 0x10
 #define SMB_FLAGS_CASELESS_PATHNAMES  0x08
-#define SMB_FLAGS2_UNICODE_STRINGS    0x8000
+/* #define SMB_FLAGS2_UNICODE_STRINGS    0x8000 */
 #define SMB_FLAGS2_IS_LONG_NAME       0x0040
 #define SMB_FLAGS2_KNOWS_LONG_NAME    0x0001
 
@@ -273,6 +273,7 @@ const struct Curl_handler Curl_handler_smb = {
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_SMB,                             /* defport */
   CURLPROTO_SMB,                        /* protocol */
   CURLPROTO_SMB,                        /* family */
@@ -301,6 +302,7 @@ const struct Curl_handler Curl_handler_smbs = {
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_SMBS,                            /* defport */
   CURLPROTO_SMBS,                       /* protocol */
   CURLPROTO_SMB,                        /* family */
@@ -542,7 +544,7 @@ static void smb_format_message(struct Curl_easy *data, struct smb_header *h,
   h->flags2 = smb_swap16(SMB_FLAGS2_IS_LONG_NAME | SMB_FLAGS2_KNOWS_LONG_NAME);
   h->uid = smb_swap16(smbc->uid);
   h->tid = smb_swap16(req->tid);
-  pid = (unsigned int)Curl_getpid();
+  pid = (unsigned int)curlx_getpid();
   h->pid_high = smb_swap16((unsigned short)(pid >> 16));
   h->pid = smb_swap16((unsigned short) pid);
 }
@@ -840,7 +842,7 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
 
   if(smbc->state == SMB_CONNECTING) {
 #ifdef USE_SSL
-    if((conn->handler->flags & PROTOPT_SSL)) {
+    if(Curl_conn_is_ssl(conn, FIRSTSOCKET)) {
       bool ssl_done = FALSE;
       result = Curl_conn_connect(data, FIRSTSOCKET, FALSE, &ssl_done);
       if(result && result != CURLE_AGAIN)
@@ -879,7 +881,16 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
       return CURLE_COULDNT_CONNECT;
     }
     nrsp = msg;
+#if defined(__GNUC__) && __GNUC__ >= 13
+#pragma GCC diagnostic push
+/* error: 'memcpy' offset [74, 80] from the object at '<unknown>' is out of
+   the bounds of referenced subobject 'bytes' with type 'char[1]' */
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
     memcpy(smbc->challenge, nrsp->bytes, sizeof(smbc->challenge));
+#if defined(__GNUC__) && __GNUC__ >= 13
+#pragma GCC diagnostic pop
+#endif
     smbc->session_key = smb_swap32(nrsp->session_key);
     result = smb_send_setup(data);
     if(result) {
@@ -915,7 +926,7 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
  */
 static void get_posix_time(time_t *out, curl_off_t timestamp)
 {
-  timestamp -= 116444736000000000;
+  timestamp -= CURL_OFF_T_C(116444736000000000);
   timestamp /= 10000000;
 #if SIZEOF_TIME_T < SIZEOF_CURL_OFF_T
   if(timestamp > TIME_T_MAX)

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CRegisteredCommands.h
  *  PURPOSE:     Registered (lua) command manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

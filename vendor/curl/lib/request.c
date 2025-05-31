@@ -34,6 +34,7 @@
 #include "sendf.h"
 #include "transfer.h"
 #include "url.h"
+#include "strparse.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -66,6 +67,9 @@ CURLcode Curl_req_soft_reset(struct SingleRequest *req,
   req->headerbytecount = 0;
   req->allheadercount =  0;
   req->deductheadercount = 0;
+  req->httpversion_sent = 0;
+  req->httpversion = 0;
+  req->sendbuf_hds_len = 0;
 
   result = Curl_client_start(data);
   if(result)
@@ -139,6 +143,7 @@ void Curl_req_hard_reset(struct SingleRequest *req, struct Curl_easy *data)
   req->httpcode = 0;
   req->keepon = 0;
   req->upgr101 = UPGR101_INIT;
+  req->sendbuf_hds_len = 0;
   req->timeofdoc = 0;
   req->location = NULL;
   req->newurl = NULL;
@@ -162,9 +167,6 @@ void Curl_req_hard_reset(struct SingleRequest *req, struct Curl_easy *data)
   req->no_body = data->set.opt_no_body;
   req->authneg = FALSE;
   req->shutdown = FALSE;
-#ifdef USE_HYPER
-  req->bodywritten = FALSE;
-#endif
 }
 
 void Curl_req_free(struct SingleRequest *req, struct Curl_easy *data)
@@ -196,11 +198,13 @@ static CURLcode xfer_send(struct Curl_easy *data,
     /* Allow debug builds to override this logic to force short initial
        sends */
     size_t body_len = blen - hds_len;
-    char *p = getenv("CURL_SMALLREQSEND");
-    if(p) {
-      size_t body_small = (size_t)strtoul(p, NULL, 10);
-      if(body_small && body_small < body_len)
-        blen = hds_len + body_small;
+    if(body_len) {
+      const char *p = getenv("CURL_SMALLREQSEND");
+      if(p) {
+        curl_off_t body_small;
+        if(!Curl_str_number(&p, &body_small, body_len))
+          blen = hds_len + (size_t)body_small;
+      }
     }
   }
 #endif
@@ -224,11 +228,11 @@ static CURLcode xfer_send(struct Curl_easy *data,
       data->req.eos_sent = TRUE;
     if(*pnwritten) {
       if(hds_len)
-        Curl_debug(data, CURLINFO_HEADER_OUT, (char *)buf,
+        Curl_debug(data, CURLINFO_HEADER_OUT, buf,
                    CURLMIN(hds_len, *pnwritten));
       if(*pnwritten > hds_len) {
         size_t body_len = *pnwritten - hds_len;
-        Curl_debug(data, CURLINFO_DATA_OUT, (char *)buf + hds_len, body_len);
+        Curl_debug(data, CURLINFO_DATA_OUT, buf + hds_len, body_len);
         data->req.writebytecount += body_len;
         Curl_pgrsSetUploadCounter(data, data->req.writebytecount);
       }
@@ -261,7 +265,7 @@ static CURLcode req_send_buffer_flush(struct Curl_easy *data)
   return result;
 }
 
-CURLcode Curl_req_set_upload_done(struct Curl_easy *data)
+static CURLcode req_set_upload_done(struct Curl_easy *data)
 {
   DEBUGASSERT(!data->req.upload_done);
   data->req.upload_done = TRUE;
@@ -339,7 +343,7 @@ static CURLcode req_flush(struct Curl_easy *data)
       if(!done)
         return CURLE_AGAIN;
     }
-    return Curl_req_set_upload_done(data);
+    return req_set_upload_done(data);
   }
   return CURLE_OK;
 }
@@ -360,8 +364,6 @@ static ssize_t add_from_client(void *reader_ctx,
   return (ssize_t)nread;
 }
 
-#ifndef USE_HYPER
-
 static CURLcode req_send_buffer_add(struct Curl_easy *data,
                                     const char *buf, size_t blen,
                                     size_t hds_len)
@@ -378,7 +380,8 @@ static CURLcode req_send_buffer_add(struct Curl_easy *data,
   return CURLE_OK;
 }
 
-CURLcode Curl_req_send(struct Curl_easy *data, struct dynbuf *req)
+CURLcode Curl_req_send(struct Curl_easy *data, struct dynbuf *req,
+                       unsigned char httpversion)
 {
   CURLcode result;
   const char *buf;
@@ -387,6 +390,7 @@ CURLcode Curl_req_send(struct Curl_easy *data, struct dynbuf *req)
   if(!data || !data->conn)
     return CURLE_FAILED_INIT;
 
+  data->req.httpversion_sent = httpversion;
   buf = Curl_dyn_ptr(req);
   blen = Curl_dyn_len(req);
   if(!Curl_creader_total_length(data)) {
@@ -411,7 +415,6 @@ CURLcode Curl_req_send(struct Curl_easy *data, struct dynbuf *req)
   }
   return CURLE_OK;
 }
-#endif /* !USE_HYPER */
 
 bool Curl_req_sendbuf_empty(struct Curl_easy *data)
 {
@@ -464,7 +467,7 @@ CURLcode Curl_req_abort_sending(struct Curl_easy *data)
     data->req.upload_aborted = TRUE;
     /* no longer KEEP_SEND and KEEP_SEND_PAUSE */
     data->req.keepon &= ~KEEP_SENDBITS;
-    return Curl_req_set_upload_done(data);
+    return req_set_upload_done(data);
   }
   return CURLE_OK;
 }

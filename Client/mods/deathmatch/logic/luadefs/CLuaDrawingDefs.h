@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaDrawingDefs.cpp
  *  PURPOSE:     Lua drawing definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

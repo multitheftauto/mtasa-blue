@@ -30,6 +30,7 @@
 #include "share.h"
 #include "psl.h"
 #include "vtls/vtls.h"
+#include "vtls/vtls_scache.h"
 #include "hsts.h"
 #include "url.h"
 
@@ -46,6 +47,16 @@ curl_share_init(void)
     share->magic = CURL_GOOD_SHARE;
     share->specifier |= (1 << CURL_LOCK_DATA_SHARE);
     Curl_init_dnscache(&share->hostcache, 23);
+    share->admin = curl_easy_init();
+    if(!share->admin) {
+      free(share);
+      return NULL;
+    }
+    share->admin->state.internal = TRUE;
+#ifdef DEBUGBUILD
+    if(getenv("CURL_DEBUG"))
+      share->admin->set.verbose = TRUE;
+#endif
   }
 
   return share;
@@ -108,12 +119,13 @@ curl_share_setopt(CURLSH *sh, CURLSHoption option, ...)
 
     case CURL_LOCK_DATA_SSL_SESSION:
 #ifdef USE_SSL
-      if(!share->sslsession) {
-        share->max_ssl_sessions = 8;
-        share->sslsession = calloc(share->max_ssl_sessions,
-                                   sizeof(struct Curl_ssl_session));
-        share->sessionage = 0;
-        if(!share->sslsession)
+      if(!share->ssl_scache) {
+        /* There is no way (yet) for the application to configure the
+         * session cache size, shared between many transfers. As for curl
+         * itself, a high session count will impact startup time. Also, the
+         * scache is not optimized for several hundreds of peers. So,
+         * keep it at a reasonable level. */
+        if(Curl_ssl_scache_create(25, 2, &share->ssl_scache))
           res = CURLSHE_NOMEM;
       }
 #else
@@ -123,9 +135,8 @@ curl_share_setopt(CURLSH *sh, CURLSHoption option, ...)
 
     case CURL_LOCK_DATA_CONNECT:
       /* It is safe to set this option several times on a share. */
-      if(!share->cpool.idata) {
-        if(Curl_cpool_init(&share->cpool, Curl_on_disconnect,
-                           NULL, share, 103))
+      if(!share->cpool.initialised) {
+        if(Curl_cpool_init(&share->cpool, share->admin, share, 103))
           res = CURLSHE_NOMEM;
       }
       break;
@@ -174,7 +185,10 @@ curl_share_setopt(CURLSH *sh, CURLSHoption option, ...)
 
     case CURL_LOCK_DATA_SSL_SESSION:
 #ifdef USE_SSL
-      Curl_safefree(share->sslsession);
+      if(share->ssl_scache) {
+        Curl_ssl_scache_destroy(share->ssl_scache);
+        share->ssl_scache = NULL;
+      }
 #else
       res = CURLSHE_NOT_BUILT_IN;
 #endif
@@ -245,15 +259,14 @@ curl_share_cleanup(CURLSH *sh)
 #endif
 
 #ifdef USE_SSL
-  if(share->sslsession) {
-    size_t i;
-    for(i = 0; i < share->max_ssl_sessions; i++)
-      Curl_ssl_kill_session(&(share->sslsession[i]));
-    free(share->sslsession);
+  if(share->ssl_scache) {
+    Curl_ssl_scache_destroy(share->ssl_scache);
+    share->ssl_scache = NULL;
   }
 #endif
 
   Curl_psl_destroy(&share->psl);
+  Curl_close(&share->admin);
 
   if(share->unlockfunc)
     share->unlockfunc(NULL, CURL_LOCK_DATA_SHARE, share->clientdata);

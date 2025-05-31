@@ -5,7 +5,7 @@
  *  FILE:        game_sa/C3DMarkerSA.cpp
  *  PURPOSE:     3D Marker entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

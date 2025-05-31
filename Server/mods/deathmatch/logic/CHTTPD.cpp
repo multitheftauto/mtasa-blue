@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CHTTPD.cpp
  *  PURPOSE:     Built-in HTTP webserver class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -167,14 +167,14 @@ HttpStatusCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* 
         {
             SString strWelcome("<a href='/%s/'>This is the page you want</a>", m_strDefaultResourceName.c_str());
             ipoHttpResponse->SetBody(strWelcome.c_str(), strWelcome.size());
-            SString strNewURL("http://%s/%s/", ipoHttpRequest->oRequestHeaders["host"].c_str(), m_strDefaultResourceName.c_str());
+            SString strNewURL("https://%s/%s/", ipoHttpRequest->oRequestHeaders["host"].c_str(), m_strDefaultResourceName.c_str());
             ipoHttpResponse->oResponseHeaders["location"] = strNewURL.c_str();
             return HTTP_STATUS_CODE_302_FOUND;
         }
     }
 
     SString strWelcome(
-        "You haven't set a default resource in your configuration file. You can either do this or visit http://%s/<i>resourcename</i>/ to see a specific "
+        "You haven't set a default resource in your configuration file. You can either do this or visit https://%s/<i>resourcename</i>/ to see a specific "
         "resource.<br/><br/>Alternatively, the server may be still starting up, if so, please try again in a minute.",
         ipoHttpRequest->oRequestHeaders["host"].c_str());
     ipoHttpResponse->SetBody(strWelcome.c_str(), strWelcome.size());
@@ -189,7 +189,7 @@ HttpStatusCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* i
         strMessage += SString("Your IP address ('%s') is not associated with an authorized serial.", ipoHttpRequest->GetAddress().c_str());
         strMessage += SString("<br/><a href='%s'>See here for more information</a>",
                               "https:"
-                              "//mtasa.com/authserialhttp");
+                              "//multitheftauto.com/authserialhttp");
         ipoHttpResponse->SetBody(strMessage, strMessage.length());
         return HTTP_STATUS_CODE_401_UNAUTHORIZED;
     }

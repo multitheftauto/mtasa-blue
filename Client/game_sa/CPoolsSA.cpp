@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPoolsSA.cpp
  *  PURPOSE:     Game entity pools
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,6 +24,8 @@
 #include "CTrailerSA.h"
 #include "CTrainSA.h"
 #include "CWorldSA.h"
+
+#include "enums/VehicleClass.h"
 
 extern CGameSA* pGame;
 
