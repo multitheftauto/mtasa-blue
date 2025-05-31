@@ -447,7 +447,7 @@ void CClientMarker::CreateOfType(int iType)
             CClientCheckpoint* pCheckpoint = new CClientCheckpoint(this);
             pCheckpoint->SetCheckpointType(CClientCheckpoint::TYPE_NORMAL);
             m_pMarker = pCheckpoint;
-            m_pCollision = new CClientColCircle(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColCircle(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -458,7 +458,7 @@ void CClientMarker::CreateOfType(int iType)
             CClientCheckpoint* pCheckpoint = new CClientCheckpoint(this);
             pCheckpoint->SetCheckpointType(CClientCheckpoint::TYPE_RING);
             m_pMarker = pCheckpoint;
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -469,7 +469,7 @@ void CClientMarker::CreateOfType(int iType)
             CClient3DMarker* p3DMarker = new CClient3DMarker(this);
             p3DMarker->Set3DMarkerType(CClient3DMarker::TYPE_CYLINDER);
             m_pMarker = p3DMarker;
-            m_pCollision = new CClientColCircle(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColCircle(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -480,7 +480,7 @@ void CClientMarker::CreateOfType(int iType)
             CClient3DMarker* p3DMarker = new CClient3DMarker(this);
             p3DMarker->Set3DMarkerType(CClient3DMarker::TYPE_ARROW);
             m_pMarker = p3DMarker;
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -489,7 +489,7 @@ void CClientMarker::CreateOfType(int iType)
         case MARKER_CORONA:
         {
             m_pMarker = new CClientCorona(this);
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -509,4 +509,9 @@ CSphere CClientMarker::GetWorldBoundingSphere()
     // sphere.vecPosition = GetStreamPosition ();
     sphere.fRadius = GetSize();
     return sphere;
+}
+
+void CClientMarker::SetIgnoreAlphaLimits(bool ignore)
+{
+    m_pMarker->SetIgnoreAlphaLimits(ignore);
 }

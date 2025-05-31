@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceHTMLItem.h
  *  PURPOSE:     Resource server-side HTML item class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -25,10 +25,10 @@ public:
                       bool bIsRaw, bool bRestricted, bool bOOPEnabled);
     ~CResourceHTMLItem();
 
-    bool         Start();
-    bool         Stop();
-    ResponseCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, class CAccount* account);
-    bool         AppendToPageBuffer(const char* szText, size_t length = 0);
+    bool           Start();
+    bool           Stop();
+    HttpStatusCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, class CAccount* account);
+    bool           AppendToPageBuffer(const char* szText, size_t length = 0);
 
     void SetResponseHeader(const char* szHeaderName, const char* szHeaderValue);
     void SetResponseCode(int responseCode);
@@ -53,6 +53,6 @@ private:
 
     bool m_bOOPEnabled;
 
-    ResponseCode  m_responseCode;
-    HttpResponse* m_currentResponse;
+    HttpStatusCode m_responseCode;
+    HttpResponse*  m_currentResponse;
 };

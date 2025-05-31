@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayer.h
  *  PURPOSE:     Player ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -167,7 +167,7 @@ public:
     std::list<CObject*>::const_iterator IterSyncingObjectEnd() { return m_SyncingObjects.end(); };
 
     unsigned int GetScriptDebugLevel() { return m_uiScriptDebugLevel; };
-    bool         SetScriptDebugLevel(unsigned int uiLevel);
+    bool         SetScriptDebugLevel(std::uint8_t level);
 
     void          SetDamageInfo(ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart);
     void          ValidateDamageInfo();
@@ -264,6 +264,9 @@ public:
 
     void SetRedirecting(bool bRedirecting) noexcept { m_bIsRedirecting = bRedirecting; }
     bool IsRedirecting() const noexcept { return m_bIsRedirecting; }
+
+    bool GetTeleported() const noexcept { return m_teleported; }
+    void SetTeleported(bool state) noexcept { m_teleported = state; }
 
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
@@ -465,4 +468,6 @@ private:
 
     ushort  m_usPrevDimension;
     SString m_strQuitReasonForLog;
+
+    bool m_teleported = false;
 };

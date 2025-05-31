@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CSettingsSA.cpp
  *  PURPOSE:     Game settings
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -273,7 +273,7 @@ void CSettingsSA::Save()
     }
 }
 
-bool CSettingsSA::IsVolumetricShadowsEnabled()
+bool CSettingsSA::IsVolumetricShadowsEnabled() const noexcept
 {
     return m_bVolumetricShadowsEnabled && !m_bVolumetricShadowsSuspended;
 }
@@ -285,6 +285,20 @@ void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
     // Disable rendering ped real time shadows when they sit on bikes
     // if vehicle volumetric shadows are disabled because it looks a bit weird
     MemPut<BYTE>(0x5E682A + 1, bEnable);
+}
+
+
+bool CSettingsSA::GetVolumetricShadowsEnabledByVideoSetting() const noexcept
+{
+    bool volumetricShadow;
+    g_pCore->GetCVars()->Get("volumetric_shadows", volumetricShadow);
+    return volumetricShadow;
+}
+
+bool CSettingsSA::ResetVolumetricShadows() noexcept
+{
+    pGame->GetSettings()->SetVolumetricShadowsEnabled(pGame->GetSettings()->GetVolumetricShadowsEnabledByVideoSetting());
+    return true;
 }
 
 void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
@@ -301,6 +315,20 @@ void CSettingsSA::SetDynamicPedShadowsEnabled(bool bEnable)
 {
     m_bDynamicPedShadowsEnabled = bEnable;
 }
+
+bool CSettingsSA::IsDynamicPedShadowsEnabledByVideoSetting() const noexcept
+{
+    bool pedDynamicShadows;
+    g_pCore->GetCVars()->Get("dynamic_ped_shadows", pedDynamicShadows);
+    return pedDynamicShadows;
+}
+
+bool CSettingsSA::ResetDynamicPedShadows() noexcept
+{
+    pGame->GetSettings()->SetDynamicPedShadowsEnabled(pGame->GetSettings()->IsDynamicPedShadowsEnabledByVideoSetting());
+    return true;
+}
+
 
 //
 // Volumetric shadow hooks

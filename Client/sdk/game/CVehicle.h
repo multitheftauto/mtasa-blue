@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CVehicle.h
  *  PURPOSE:     Vehicle entity interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -18,6 +18,9 @@
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
 #include "CDamageManager.h"
+
+#include "enums/VehicleDummies.h"
+#include "enums/ResizableVehicleWheelGroup.h"
 
 class CAEVehicleAudioEntity;
 class CColModel;
@@ -198,7 +201,8 @@ public:
     virtual bool           GetTakeLessDamage() = 0;
     virtual bool           GetTyresDontBurst() = 0;
     virtual unsigned short GetAdjustablePropertyValue() = 0;
-    virtual float          GetHeliRotorSpeed() = 0;
+    virtual float          GetHeliRotorSpeed() const = 0;
+    virtual bool           GetVehicleRotorState() const noexcept = 0;
     virtual float          GetPlaneRotorSpeed() = 0;
     virtual unsigned long  GetExplodeTime() = 0;
 
@@ -220,7 +224,9 @@ public:
     virtual void SetTyresDontBurst(bool bTyresDontBurst) = 0;
     virtual void SetAdjustablePropertyValue(unsigned short usAdjustableProperty) = 0;
     virtual void SetHeliRotorSpeed(float fSpeed) = 0;
+    virtual void SetVehicleRotorState(bool state, bool stopRotor, bool isHeli) noexcept = 0;
     virtual void SetPlaneRotorSpeed(float fSpeed) = 0;
+    virtual bool SetVehicleWheelRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept = 0;
     virtual void SetTaxiLightOn(bool bLightState) = 0;
     virtual void SetExplodeTime(unsigned long ulTime) = 0;
     virtual void SetRadioStatus(bool bStatus) = 0;
@@ -263,7 +269,7 @@ public:
     virtual SColor GetHeadLightColor() = 0;
     virtual void   SetHeadLightColor(const SColor color) = 0;
 
-    virtual CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2) = 0;
+    virtual bool     SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1) = 0;
     virtual void     SetWheelVisibility(eWheelPosition wheel, bool bVisible) = 0;
     virtual CVector  GetWheelPosition(eWheelPosition wheel) = 0;
 
@@ -320,8 +326,9 @@ public:
     virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
 
-    virtual bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const = 0;
-    virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;
+    virtual bool GetDummyPosition(VehicleDummies dummy, CVector& position) const = 0;
+    virtual bool SetDummyPosition(VehicleDummies dummy, const CVector& position) = 0;
 
     virtual const CVector* GetDummyPositions() const = 0;
+    virtual void           ReinitAudio() = 0;
 };

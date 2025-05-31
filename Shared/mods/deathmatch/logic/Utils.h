@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/Utils.h
  *  PURPOSE:     Miscellaneous utility functions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -136,6 +136,7 @@ double GetRandomDouble();
 int    GetRandom(int iLow, int iHigh);
 
 bool IsValidFilePath(const char* szPath);
+bool IsValidFilePath(const char* szDir, size_t length);
 bool IsValidOrganizationPath(const char* szPath);
 #endif
 
@@ -255,28 +256,13 @@ inline float GetSmallestWrapUnsigned(float fValue, float fHigh)
 
 void RotateVector(CVector& vecLine, const CVector& vecRotation);
 
-inline void ConvertZXYEulersToQuaternion(const CVector& vecFrom, CVector4D &vecTo)
-{
-    const float c1 = cos(vecFrom.fX * 0.5f);
-    const float c2 = cos(vecFrom.fY * 0.5f);
-    const float c3 = cos(vecFrom.fZ * 0.5f);
-
-    const float s1 = sin(vecFrom.fX * 0.5f);
-    const float s2 = sin(vecFrom.fY * 0.5f);
-    const float s3 = sin(vecFrom.fZ * 0.5f);
-
-    vecTo.fX = s1 * c2 * c3 - c1 * s2 * s3;
-    vecTo.fY = c1 * s2 * c3 + s1 * c2 * s3;
-    vecTo.fZ = c1 * c2 * s3 + s1 * s2 * c3;
-    vecTo.fW = c1 * c2 * c3 - s1 * s2 * s3;
-}
-
 #ifdef MTA_CLIENT
 // Misc utility functions
 unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace = ' ');
 unsigned int StripControlCodes(char* szText, unsigned char cReplace = ' ');
 bool         IsControlCode(unsigned char c);
 bool         IsValidFilePath(const char* szDir);
+bool         IsValidFilePath(const char* szDir, size_t length);
 void         ReplaceOccurrencesInString(std::string& s, const char* a, const char* b);
 
 void RaiseFatalError(unsigned int uiCode);
@@ -350,8 +336,3 @@ void DeletePointersAndClearList(T& elementList)
         delete *iter;
     }
 }
-
-// for debug
-#if defined(MTA_DEBUG) && defined(MTA_CLIENT)
-bool RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
-#endif

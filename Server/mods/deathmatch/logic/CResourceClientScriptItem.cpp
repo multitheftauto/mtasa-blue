@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceClientScriptItem.cpp
  *  PURPOSE:     Resource client-side script item class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -37,13 +37,13 @@ CResourceClientScriptItem::~CResourceClientScriptItem()
 {
 }
 
-ResponseCode CResourceClientScriptItem::Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse)
+HttpStatusCode CResourceClientScriptItem::Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse)
 {
     if (IsNoClientCache() == true)
     {
         const char* errmsg = "This script is not client cacheable";
         ipoHttpResponse->SetBody(errmsg, strlen(errmsg));
-        return HTTPRESPONSECODE_403_FORBIDDEN;
+        return HTTP_STATUS_CODE_403_FORBIDDEN;
     }
     else
         return CResourceFile::Request(ipoHttpRequest, ipoHttpResponse);

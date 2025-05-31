@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaPedDefs.cpp
  *  PURPOSE:     Lua ped definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,6 +13,7 @@
 #include "CLuaPedDefs.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaPedDefs::LoadFunctions()
 {
@@ -23,7 +24,7 @@ void CLuaPedDefs::LoadFunctions()
 
         // Ped get functions
         {"getPedWeaponSlot", GetPedWeaponSlot},
-        {"getPedArmor", GetPedArmor},
+        {"getPedArmor", ArgumentParserWarn<false, GetPedArmor>},
         {"getPedRotation", GetPedRotation},
         {"isPedChoking", IsPedChoking},
         {"isPedDead", IsPedDead},
@@ -47,9 +48,10 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
         {"isPedInVehicle", IsPedInVehicle},
+        {"isPedReloadingWeapon", ArgumentParser<IsPedReloadingWeapon>},
 
         // Ped set functions
-        {"setPedArmor", SetPedArmor},
+        {"setPedArmor", ArgumentParserWarn<false, SetPedArmor>},
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"killPed", KillPed},
         {"setPedRotation", SetPedRotation},
@@ -64,13 +66,13 @@ void CLuaPedDefs::LoadFunctions()
         {"warpPedIntoVehicle", WarpPedIntoVehicle},
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
-        {"setPedAnimation", SetPedAnimation},
+        {"setPedAnimation", ArgumentParserWarn<false, SetPedAnimation>},
         {"setPedAnimationProgress", SetPedAnimationProgress},
         {"setPedAnimationSpeed", SetPedAnimationSpeed},
         {"setPedOnFire", SetPedOnFire},
         {"setPedHeadless", SetPedHeadless},
         {"setPedFrozen", SetPedFrozen},
-        {"reloadPedWeapon", reloadPedWeapon},
+        {"reloadPedWeapon", ArgumentParserWarn<false, ReloadPedWeapon>},
 
         // Weapon give/take functions
         {"giveWeapon", GiveWeapon},
@@ -117,6 +119,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isFrozen", "isPedFrozen");
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
     lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
 
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
     lua_classfunction(luaVM, "getFightingStyle", "getPedFightingStyle");
@@ -168,6 +171,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
     // TODO(qaisjp): setting this to any value will kill the ped. add OOP_KillPed that only allows `true`.
     lua_classvariable(luaVM, "dead", "killPed", "isPedDead");
@@ -288,28 +292,15 @@ int CLuaPedDefs::GetPedWeaponSlot(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::reloadPedWeapon(lua_State* luaVM)
+bool CLuaPedDefs::ReloadPedWeapon(lua_State* vm, CPed* const ped) noexcept
 {
-    CElement* pPed;
+    LogWarningIfPlayerHasNotJoinedYet(vm, ped);
+    return CStaticFunctionDefinitions::ReloadPedWeapon(ped);
+}
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pPed);
-
-        if (CStaticFunctionDefinitions::reloadPedWeapon(pPed))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+bool CLuaPedDefs::IsPedReloadingWeapon(CPed* const ped) noexcept
+{
+    return ped->IsReloadingWeapon();
 }
 
 int CLuaPedDefs::IsPedDoingGangDriveby(lua_State* luaVM)
@@ -404,56 +395,33 @@ int CLuaPedDefs::IsPedFrozen(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
+bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std::string, std::monostate, bool>> blockName,
+                                  std::optional<std::variant<std::string, std::monostate, bool>> animName, std::optional<int> time, std::optional<bool> loop,
+                                  std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame,
+                                  std::optional<int> blendTime, std::optional<bool> restoreTask)
 {
-    // bool setPedAnimation ( ped thePed [, string block=nil, string anim=nil, int time=-1, int blend=250, bool loop=true, bool updatePosition=true, bool
-    // interruptable=true, bool freezeLastFrame = true] )
-    CElement* pPed;
-    SString   strBlockName, strAnimName;
-    int       iTime;
-    int       iBlend = 250;
-    bool      bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
-    bool      bDummy;
-    bool      bTaskToBeRestoredOnAnimEnd;
+    std::string animBlockName;
+    std::string animationName;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-    if (argStream.NextIsBool())
-        argStream.ReadBool(bDummy);            // Wiki used setPedAnimation(source,false) as an example
-    else if (argStream.NextIsNil())
-        argStream.m_iIndex++;            // Wiki docs said blockName could be nil
-    else
-        argStream.ReadString(strBlockName, "");
-    argStream.ReadString(strAnimName, "");
-    if (argStream.NextCouldBeNumber())            // Freeroam skips the time arg sometimes
-        argStream.ReadNumber(iTime, -1);
-    else
-        iTime = -1;
-    argStream.ReadBool(bLoop, true);
-    argStream.ReadBool(bUpdatePosition, true);
-    argStream.ReadBool(bInterruptable, true);
-    argStream.ReadBool(bFreezeLastFrame, true);
-    argStream.ReadNumber(iBlend, 250);
-    argStream.ReadBool(bTaskToBeRestoredOnAnimEnd, false);
-
-    if (!argStream.HasErrors())
+    if (blockName.has_value())
     {
-        const char *szBlock, *szAnim;
-        szBlock = strBlockName.empty() ? NULL : strBlockName.c_str();
-        szAnim = strAnimName.empty() ? NULL : strAnimName.c_str();
-
-        if (CStaticFunctionDefinitions::SetPedAnimation(pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame,
-                                                        bTaskToBeRestoredOnAnimEnd))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        if (std::holds_alternative<std::string>(blockName.value()))
+            animBlockName = std::get<std::string>(blockName.value());
+        else if (std::holds_alternative<bool>(blockName.value()))
+            if (std::get<bool>(blockName.value()))
+                throw LuaFunctionError("Anim block name cannot be true. Possible values: nil, false, string.");
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (animName.has_value())
+    {
+        if (std::holds_alternative<std::string>(animName.value()))
+            animationName = std::get<std::string>(animName.value());
+        else if (std::holds_alternative<bool>(animName.value()))
+            if (std::get<bool>(animName.value()))
+                throw LuaFunctionError("Animation name cannot be true. Possible values: nil, false, string.");
+    }
+
+    return CStaticFunctionDefinitions::SetPedAnimation(pPed, animBlockName, animationName, time.value_or(-1), blendTime.value_or(250), loop.value_or(true), updatePosition.value_or(true), interruptable.value_or(true), freezeLastFrame.value_or(true), restoreTask.value_or(false));
 }
 
 int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
@@ -670,27 +638,12 @@ int CLuaPedDefs::GetPedTotalAmmo(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedArmor(lua_State* luaVM)
+float CLuaPedDefs::GetPedArmor(CPed* const ped)
 {
-    CPed* pPed;
+    float armor;
+    CStaticFunctionDefinitions::GetPedArmor(ped, armor);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        float fArmor;
-        if (CStaticFunctionDefinitions::GetPedArmor(pPed, fArmor))
-        {
-            lua_pushnumber(luaVM, fArmor);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return armor;
 }
 
 int CLuaPedDefs::GetPedOccupiedVehicle(lua_State* luaVM)
@@ -1050,30 +1003,15 @@ int CLuaPedDefs::GetPedContactElement(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
+bool CLuaPedDefs::SetPedArmor(CPed* const ped, const float armor)
 {
-    CElement* pElement;
-    float     fArmor;
+    if (armor < 0.0f)
+        throw std::invalid_argument("Armor must be greater than or equal to 0");
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(fArmor);
+    if (armor > 100.0f)
+        throw std::invalid_argument("Armor must be less than or equal to 100");
 
-    if (!argStream.HasErrors())
-    {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-        if (CStaticFunctionDefinitions::SetPedArmor(pElement, fArmor))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetPedArmor(ped, armor);
 }
 
 int CLuaPedDefs::KillPed(lua_State* luaVM)

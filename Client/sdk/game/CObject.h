@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CObject.h
  *  PURPOSE:     Object entity interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -41,4 +41,5 @@ public:
     virtual void     SetScale(float fX, float fY, float fZ) = 0;
     virtual CVector* GetScale() = 0;
     virtual void     ResetScale() = 0;
+
 };

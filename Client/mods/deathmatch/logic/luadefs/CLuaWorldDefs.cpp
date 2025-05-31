@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -12,6 +12,7 @@
 #include <game/CWeather.h>
 #include <game/CColPoint.h>
 #include <game/CCoronas.h>
+#include <game/CClock.h>
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaWorldDefs::LoadFunctions()
@@ -58,6 +59,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"getFPSLimit", GetFPSLimit},
                                                                              {"getBirdsEnabled", GetBirdsEnabled},
                                                                              {"getCoronaReflectionsEnabled", ArgumentParser<GetCoronaReflectionsEnabled>},
+                                                                             {"getWorldProperty", ArgumentParser<GetWorldProperty>},
 
                                                                              // World set funcs
                                                                              {"setTime", SetTime},
@@ -73,7 +75,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setWaveHeight", SetWaveHeight},
                                                                              {"setMinuteDuration", SetMinuteDuration},
                                                                              {"setGarageOpen", SetGarageOpen},
-                                                                             {"setWorldSpecialPropertyEnabled", ArgumentParserWarn<false, SetWorldSpecialPropertyEnabled>},
+                                                                             {"setWorldSpecialPropertyEnabled", ArgumentParser<SetWorldSpecialPropertyEnabled>},
                                                                              {"setBlurLevel", SetBlurLevel},
                                                                              {"setJetpackMaxHeight", SetJetpackMaxHeight},
                                                                              {"setCloudsEnabled", SetCloudsEnabled},
@@ -98,9 +100,19 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setMoonSize", SetMoonSize},
                                                                              {"setFPSLimit", SetFPSLimit},
                                                                              {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
+                                                                             {"setWorldProperty", ArgumentParser<SetWorldProperty>},
+
+                                                                             // World remove/restore functions 
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"removeGameWorld", ArgumentParser<RemoveGameWorld>},
+                                                                             {"restoreGameWorld", ArgumentParser<RestoreGameWorld>},
+
+                                                                             {"setTimeFrozen", ArgumentParser<SetTimeFrozen>},
+                                                                             {"setVolumetricShadowsEnabled", ArgumentParser<SetVolumetricShadowsEnabled>},
+                                                                             {"setDynamicPedShadowsEnabled", ArgumentParser<SetDynamicPedShadowsEnabled>}, 
+
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -122,13 +134,22 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"resetSunSize", ResetSunSize},
                                                                              {"resetMoonSize", ResetMoonSize},
                                                                              {"resetBlurLevel", ResetBlurLevel},
-
+                                                                             {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
+                                                                             {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
+                                                                             {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
+                                                                             {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
+                                                                             {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},    
+      
                                                                              // World check funcs
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
-                                                                             {"isGarageOpen", IsGarageOpen}};
+                                                                             {"isGarageOpen", IsGarageOpen},
+                                                                             {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
+                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
+                                                                             {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>},
+                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -1245,14 +1266,28 @@ int CLuaWorldDefs::SetOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
+bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(const WorldSpecialProperty property) noexcept
 {
     return m_pClientGame->IsWorldSpecialProperty(property);
 }
 
-bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
+bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(const WorldSpecialProperty property, const bool enabled) noexcept
 {
-    return m_pClientGame->SetWorldSpecialProperty(property, isEnabled);
+    if (!m_pClientGame->SetWorldSpecialProperty(property, enabled))
+        return false;
+
+    if (!g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent))
+        return true;
+
+    if (auto stream = g_pNet->AllocateNetBitStream())
+    {
+        stream->WriteString(EnumToString(property));
+        stream->WriteBit(enabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
+    }
+
+    return true;
 }
 
 int CLuaWorldDefs::SetCloudsEnabled(lua_State* luaVM)
@@ -2059,4 +2094,264 @@ bool CLuaWorldDefs::ResetCoronaReflectionsEnabled()
     g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
     g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
     return true;
+}
+
+std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::GetWorldProperty(WorldProperty property)
+{
+    switch (property)
+    {
+        case WorldProperty::AMBIENT_COLOR:
+        {
+            float red, green, blue;
+            g_pMultiplayer->GetAmbientColor(red, green, blue);
+            return std::make_tuple((int16)(red * 255), (int16)(green * 255), (int16)(blue * 255));
+        }
+        case WorldProperty::AMBIENT_OBJ_COLOR:
+        {
+            float red, green, blue;
+            g_pMultiplayer->GetAmbientObjectColor(red, green, blue);
+            return std::make_tuple((int16)(red * 255), (int16)(green * 255), (int16)(blue * 255));
+        }
+        case WorldProperty::DIRECTIONAL_COLOR:
+        {
+            float red, green, blue;
+            g_pMultiplayer->GetDirectionalColor(red, green, blue);
+            return std::make_tuple((int16)(red * 255), (int16)(green * 255), (int16)(blue * 255));
+        }
+        case WorldProperty::SPRITE_SIZE:
+            return g_pMultiplayer->GetSpriteSize();
+        case WorldProperty::SPRITE_BRIGHTNESS:
+            return g_pMultiplayer->GetSpriteBrightness();
+        case WorldProperty::POLE_SHADOW_STRENGTH:
+            return (float)g_pMultiplayer->GetPoleShadowStrength();
+        case WorldProperty::SHADOW_STRENGTH:
+            return (float)g_pMultiplayer->GetShadowStrength();
+        case WorldProperty::SHADOWS_OFFSET:
+            return g_pMultiplayer->GetShadowsOffset();
+        case WorldProperty::LIGHTS_ON_GROUND:
+            return g_pMultiplayer->GetLightsOnGroundBrightness();
+        case WorldProperty::LOW_CLOUDS_COLOR:
+        {
+            int16 red, green, blue;
+            g_pMultiplayer->GetLowCloudsColor(red, green, blue);
+            return std::make_tuple(red, green, blue);
+        }
+        case WorldProperty::BOTTOM_CLOUDS_COLOR:
+        {
+            int16 red, green, blue;
+            g_pMultiplayer->GetBottomCloudsColor(red, green, blue);
+            return std::make_tuple(red, green, blue);
+        }
+        case WorldProperty::CLOUDS_ALPHA1:
+            return g_pMultiplayer->GetCloudsAlpha1();
+        case WorldProperty::ILLUMINATION:
+            return g_pMultiplayer->GetIllumination();
+        case WorldProperty::WEATHER_WET_ROADS:
+            return g_pGame->GetWeather()->GetWetRoads();
+        case WorldProperty::WEATHER_FOGGYNESS:
+            return g_pGame->GetWeather()->GetFoggyness();
+        case WorldProperty::WEATHER_FOG:
+            return g_pGame->GetWeather()->GetFog();
+        case WorldProperty::WEATHER_RAIN_FOG:
+            return g_pGame->GetWeather()->GetRainFog();
+        case WorldProperty::WEATHER_WATER_FOG:
+            return g_pGame->GetWeather()->GetWaterFog();
+        case WorldProperty::WEATHER_SANDSTORM:
+            return g_pGame->GetWeather()->GetSandstorm();
+        case WorldProperty::WEATHER_RAINBOW:
+            return g_pGame->GetWeather()->GetRainbow();
+    }
+    return false;
+}
+
+bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3)
+{
+    if (arg2.has_value() && arg3.has_value())
+    {
+        switch (property)
+        {
+            case WorldProperty::AMBIENT_COLOR:
+                return g_pMultiplayer->SetAmbientColor(arg1 / 255, arg2.value() / 255, arg3.value() / 255);
+            case WorldProperty::AMBIENT_OBJ_COLOR:
+                return g_pMultiplayer->SetAmbientObjectColor(arg1 / 255, arg2.value() / 255, arg3.value() / 255);
+            case WorldProperty::DIRECTIONAL_COLOR:
+                return g_pMultiplayer->SetDirectionalColor(arg1 / 255, arg2.value() / 255, arg3.value() / 255);
+            case WorldProperty::LOW_CLOUDS_COLOR:
+                return g_pMultiplayer->SetLowCloudsColor((int16)arg1, (int16)arg2.value(), (int16)arg3.value());
+            case WorldProperty::BOTTOM_CLOUDS_COLOR:
+                return g_pMultiplayer->SetBottomCloudsColor((int16)arg1, (int16)arg2.value(), (int16)arg3.value());
+        }
+        return false;
+    }
+    switch (property)
+    {
+        case WorldProperty::SPRITE_SIZE:
+            return g_pMultiplayer->SetSpriteSize(arg1);
+        case WorldProperty::SPRITE_BRIGHTNESS:
+            return g_pMultiplayer->SetSpriteBrightness(arg1);
+        case WorldProperty::POLE_SHADOW_STRENGTH:
+            return g_pMultiplayer->SetPoleShadowStrength(arg1);
+        case WorldProperty::SHADOW_STRENGTH:
+            return g_pMultiplayer->SetShadowStrength(arg1);
+        case WorldProperty::SHADOWS_OFFSET:
+            return g_pMultiplayer->SetShadowsOffset(arg1);
+        case WorldProperty::LIGHTS_ON_GROUND:
+            return g_pMultiplayer->SetLightsOnGroundBrightness(arg1);
+        case WorldProperty::CLOUDS_ALPHA1:
+            return g_pMultiplayer->SetCloudsAlpha1(arg1);
+        case WorldProperty::ILLUMINATION:
+            return g_pMultiplayer->SetIllumination(arg1);
+        case WorldProperty::WEATHER_WET_ROADS:
+            return g_pGame->GetWeather()->SetWetRoads(arg1);
+        case WorldProperty::WEATHER_FOGGYNESS:
+            return g_pGame->GetWeather()->SetFoggyness(arg1);
+        case WorldProperty::WEATHER_FOG:
+            return g_pGame->GetWeather()->SetFog(arg1);
+        case WorldProperty::WEATHER_RAIN_FOG:
+            return g_pGame->GetWeather()->SetRainFog(arg1);
+        case WorldProperty::WEATHER_WATER_FOG:
+            return g_pGame->GetWeather()->SetWaterFog(arg1);
+        case WorldProperty::WEATHER_SANDSTORM:
+            return g_pGame->GetWeather()->SetSandstorm(arg1);
+        case WorldProperty::WEATHER_RAINBOW:
+            return g_pGame->GetWeather()->SetRainbow(arg1);
+    }
+    return false;
+}
+
+bool CLuaWorldDefs::ResetWorldProperty(WorldProperty property)
+{
+    switch (property)
+    {
+        case WorldProperty::AMBIENT_COLOR:
+            return g_pMultiplayer->ResetAmbientColor();
+        case WorldProperty::AMBIENT_OBJ_COLOR:
+            return g_pMultiplayer->ResetAmbientObjectColor();
+        case WorldProperty::DIRECTIONAL_COLOR:
+            return g_pMultiplayer->ResetDirectionalColor();
+        case WorldProperty::SPRITE_SIZE:
+            return g_pMultiplayer->ResetSpriteSize();
+        case WorldProperty::SPRITE_BRIGHTNESS:
+            return g_pMultiplayer->ResetSpriteBrightness();
+        case WorldProperty::POLE_SHADOW_STRENGTH:
+            return g_pMultiplayer->ResetPoleShadowStrength();
+        case WorldProperty::SHADOW_STRENGTH:
+            return g_pMultiplayer->ResetShadowStrength();
+        case WorldProperty::SHADOWS_OFFSET:
+            return g_pMultiplayer->ResetShadowsOffset();
+        case WorldProperty::LIGHTS_ON_GROUND:
+            return g_pMultiplayer->ResetLightsOnGroundBrightness();
+        case WorldProperty::LOW_CLOUDS_COLOR:
+            return g_pMultiplayer->ResetLowCloudsColor();
+        case WorldProperty::BOTTOM_CLOUDS_COLOR:
+            return g_pMultiplayer->ResetBottomCloudsColor();
+        case WorldProperty::CLOUDS_ALPHA1:
+            return g_pMultiplayer->ResetCloudsAlpha1();
+        case WorldProperty::ILLUMINATION:
+            return g_pMultiplayer->ResetIllumination();
+        case WorldProperty::WEATHER_WET_ROADS:
+            return g_pGame->GetWeather()->ResetWetRoads();
+        case WorldProperty::WEATHER_FOGGYNESS:
+            return g_pGame->GetWeather()->ResetFoggyness();
+        case WorldProperty::WEATHER_FOG:
+            return g_pGame->GetWeather()->ResetFog();
+        case WorldProperty::WEATHER_RAIN_FOG:
+            return g_pGame->GetWeather()->ResetRainFog();
+        case WorldProperty::WEATHER_WATER_FOG:
+            return g_pGame->GetWeather()->ResetWaterFog();
+        case WorldProperty::WEATHER_SANDSTORM:
+            return g_pGame->GetWeather()->ResetSandstorm();
+        case WorldProperty::WEATHER_RAINBOW:
+            return g_pGame->GetWeather()->ResetRainbow();
+    }
+    return false;
+}
+
+bool CLuaWorldDefs::SetTimeFrozen(bool value) noexcept
+{
+    return g_pGame->GetClock()->SetTimeFrozen(value);
+}
+
+bool CLuaWorldDefs::IsTimeFrozen() noexcept
+{
+    return g_pGame->GetClock()->IsTimeFrozen();
+}
+
+bool CLuaWorldDefs::ResetTimeFrozen() noexcept
+{
+    return g_pGame->GetClock()->ResetTimeFrozen();
+}
+
+void CLuaWorldDefs::RemoveGameWorld()
+{
+    // We do not want to remove scripted buildings
+    // But we need remove them from the buildings pool for a bit...
+    m_pBuildingManager->DestroyAllForABit();
+
+    // This function makes buildings backup without scripted buildings
+    g_pGame->RemoveGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyed();
+}
+
+void CLuaWorldDefs::RestoreGameWorld()
+{
+    // We want to restore the game buildings to the same positions as they were before the backup.
+    // Remove scripted buildings for a bit
+    m_pBuildingManager->DestroyAllForABit();
+
+    g_pGame->RestoreGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyedSafe();
+}
+
+bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable) noexcept
+{
+    g_pGame->GetSettings()->SetVolumetricShadowsEnabled(enable);
+    return true;
+}
+
+bool CLuaWorldDefs::IsVolumetricShadowsEnabled() noexcept
+{
+    return g_pGame->GetSettings()->IsVolumetricShadowsEnabled();
+}
+
+bool CLuaWorldDefs::ResetVolumetricShadows() noexcept
+{
+    return g_pGame->GetSettings()->ResetVolumetricShadows();
+}
+
+void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept
+{
+    g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true)});
+}
+
+bool CLuaWorldDefs::SetDynamicPedShadowsEnabled(bool enable)
+{
+    g_pGame->GetSettings()->SetDynamicPedShadowsEnabled(enable);
+    return true;
+}
+
+bool CLuaWorldDefs::IsDynamicPedShadowsEnabled() noexcept
+{
+    return g_pGame->GetSettings()->IsDynamicPedShadowsEnabled();
+}
+
+bool CLuaWorldDefs::ResetDynamicPedShadows() noexcept
+{
+    return g_pGame->GetSettings()->ResetDynamicPedShadows();
+}
+
+CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> CLuaWorldDefs::TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore)
+{
+    STestSphereAgainstWorldResult result;
+    CClientEntity* collidedEntity = nullptr;
+
+    CEntity* entity = g_pGame->GetWorld()->TestSphereAgainstWorld(sphereCenter, radius, ignoredEntity.has_value() ? ignoredEntity.value()->GetGameEntity() : nullptr, checkBuildings.value_or(true), checkVehicles.value_or(true), checkPeds.value_or(true), checkObjects.value_or(true), checkDummies.value_or(true), cameraIgnore.value_or(false), result);
+    if (entity)
+        collidedEntity = reinterpret_cast<CClientEntity*>(entity->GetStoredPointer());
+
+    return {result.collisionDetected, collidedEntity, result.modelID, result.entityPosition.fX, result.entityPosition.fY, result.entityPosition.fZ, ConvertRadiansToDegrees(result.entityRotation.fX), ConvertRadiansToDegrees(result.entityRotation.fY), ConvertRadiansToDegrees(result.entityRotation.fZ), result.lodID, result.type};
 }

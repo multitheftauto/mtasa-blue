@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaDrawingDefs.cpp
  *  PURPOSE:     Lua drawing definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -36,6 +36,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
         {"dxDrawMaterialPrimitive3D", DxDrawMaterialPrimitive3D},
         {"dxDrawWiredSphere", ArgumentParser<DxDrawWiredSphere>},
+        {"dxDrawModel3D", ArgumentParser<DxDrawModel3D>},
         {"dxGetTextWidth", DxGetTextWidth},
         {"dxGetTextSize", ArgumentParser<DxGetTextSize>},
         {"dxGetFontHeight", DxGetFontHeight},
@@ -2120,4 +2121,22 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
 
     g_pCore->GetGraphics()->DrawWiredSphere(position, radius, color.value(), lineWidth.value_or(1), iterations.value_or(1));
     return true;
+}
+
+bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale, const std::optional<float> lighting)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelID);
+    if (!pModelInfo)
+        throw std::invalid_argument("Invalid model ID");
+
+    if (auto modelType = pModelInfo->GetModelType();
+        modelType == eModelInfoType::UNKNOWN || modelType == eModelInfoType::VEHICLE || modelType == eModelInfoType::PED)
+    {
+        throw std::invalid_argument("Invalid model type");
+    }
+
+    ConvertDegreesToRadians(rotation);
+
+    return g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo,
+        CMatrix{position, rotation, scale.value_or(CVector{1.0f, 1.0f, 1.0f})}, lighting.value_or(0.0f));
 }

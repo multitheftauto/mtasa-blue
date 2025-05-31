@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CObject.cpp
  *  PURPOSE:     Object entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -33,6 +33,7 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
     m_bIsFrozen = false;
     m_bDoubleSided = false;
     m_bBreakable = false;
+    m_bRespawnable = true;
 
     m_bCollisionsEnabled = true;
 
@@ -58,6 +59,7 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     m_bBreakable = Copy.m_bBreakable;
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
+    m_bRespawnable = Copy.m_bRespawnable;
 
     m_pMoveAnimation = NULL;
     if (Copy.m_pMoveAnimation != NULL)

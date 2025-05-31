@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaMarkerDefs.cpp
  *  PURPOSE:     Lua marker definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,12 +23,14 @@ void CLuaMarkerDefs::LoadFunctions()
         {"getMarkerColor", GetMarkerColor},
         {"getMarkerTarget", GetMarkerTarget},
         {"getMarkerIcon", GetMarkerIcon},
+        {"getMarkerTargetArrowProperties", ArgumentParser<GetMarkerTargetArrowProperties>},
 
         {"setMarkerType", SetMarkerType},
         {"setMarkerSize", SetMarkerSize},
         {"setMarkerColor", SetMarkerColor},
         {"setMarkerTarget", SetMarkerTarget},
         {"setMarkerIcon", SetMarkerIcon},
+        {"setMarkerTargetArrowProperties", ArgumentParser<SetMarkerTargetArrowProperties>},
 
         {"setCoronaReflectionEnabled", ArgumentParser<SetCoronaReflectionEnabled>},
         {"isCoronaReflectionEnabled", ArgumentParser<IsCoronaReflectionEnabled>},
@@ -75,6 +77,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
     float            fSize = 4.0f;
     SColorRGBA       color(0, 0, 255, 255);
     SString          strType = "default";
+    bool             ignoreAlphaLimits;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadString(strType, "default");
@@ -83,6 +86,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
     argStream.ReadNumber(color.G, 0);
     argStream.ReadNumber(color.B, 255);
     argStream.ReadNumber(color.A, 255);
+    argStream.ReadBool(ignoreAlphaLimits, false);
 
     if (!argStream.HasErrors())
     {
@@ -92,7 +96,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             {
                 // Create it
-                CClientMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(*pResource, vecPosition, strType, fSize, color);
+                CClientMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(*pResource, vecPosition, strType, fSize, color, ignoreAlphaLimits);
                 if (pMarker)
                 {
                     CElementGroup* pGroup = pResource->GetElementGroup();
@@ -177,7 +181,12 @@ int CLuaMarkerDefs::GetMarkerColor(lua_State* luaVM)
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.R));
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.G));
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.B));
-        lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
+
+        if (!pMarker->AreAlphaLimitsIgnored() && (pMarker->GetMarkerType() == CClientMarker::MARKER_CHECKPOINT || pMarker->GetMarkerType() == CClientMarker::MARKER_ARROW))
+            lua_pushnumber(luaVM, 255); // fake alpha
+        else
+            lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
+
         return 4;
     }
     else
@@ -416,4 +425,28 @@ bool CLuaMarkerDefs::IsCoronaReflectionEnabled(CClientMarker* pMarker)
         return false;
 
     return pCorona->IsReflectionEnabled();
+}
+
+bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CClientMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size)
+{
+    SColor color;
+    color.R = r.value_or(255);
+    color.G = g.value_or(64);
+    color.B = b.value_or(64);
+    color.A = a.value_or(255);
+
+    return CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(*marker, color, size.value_or(marker->GetSize() * 0.625f));
+}
+
+std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(CClientMarker* marker) noexcept
+{
+    CClientCheckpoint* checkpoint = marker->GetCheckpoint();
+    if (!checkpoint)
+        return false;
+
+    if (!checkpoint->HasTarget() || marker->GetMarkerType() != CClientMarker::MARKER_CHECKPOINT)
+        return false;
+
+    SColor color = checkpoint->GetTargetArrowColor();
+    return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>(color.R, color.G, color.B, color.A, checkpoint->GetTargetArrowSize());
 }

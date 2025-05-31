@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayer.cpp
  *  PURPOSE:     Player ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -22,6 +22,7 @@
 #include "CBandwidthSettings.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CScriptDebugging.h"
+#include "packets/CLuaPacket.h"
 #include "packets/CConsoleEchoPacket.h"
 #include "packets/CChatEchoPacket.h"
 #include "CWeaponStatManager.h"
@@ -269,6 +270,9 @@ uint CPlayer::Send(const CPacket& Packet)
     if (!CNetBufferWatchDog::CanSendPacket(Packet.GetPacketID()))
         return 0;
 
+    if (IsLeavingServer())
+        return 0;
+
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
     unsigned long              ulFlags = Packet.GetFlags();
@@ -470,9 +474,16 @@ void CPlayer::RemoveAllSyncingObjects()
     }
 }
 
-bool CPlayer::SetScriptDebugLevel(unsigned int uiLevel)
+bool CPlayer::SetScriptDebugLevel(std::uint8_t level)
 {
-    return m_pScriptDebugging->AddPlayer(*this, uiLevel);
+    if (!m_pScriptDebugging->AddPlayer(*this, level))
+        return false;
+
+    CPlayerBitStream BitStream(this);
+    BitStream.pBitStream->Write(level);
+
+    Send(CLuaPacket(SET_PLAYER_SCRIPT_DEBUG_LEVEL, *BitStream.pBitStream));
+    return true;
 }
 
 void CPlayer::SetDamageInfo(ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart)

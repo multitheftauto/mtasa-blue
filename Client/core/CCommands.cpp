@@ -5,7 +5,7 @@
  *  FILE:        core/CCommands.cpp
  *  PURPOSE:     Management for dynamically added commands
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -125,6 +125,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 
     // Grab the command
     tagCOMMANDENTRY* pEntry = Get(szCommand);
+    bool             wasHandled = false;
     if (pEntry)
     {
         // If its a core command, or if its enabled
@@ -133,7 +134,8 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             // Execute it
             if (!bIsScriptedBind || pEntry->bAllowScriptedBind)
                 ExecuteHandler(pEntry->pfnCmdFunc, szParameters);
-            return true;
+
+            wasHandled = true;
         }
     }
 
@@ -141,6 +143,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     std::string val = std::string(szCommand) + " " + std::string(szParameters ? szParameters : "");
 
     // Is it a cvar? (syntax: cvar[ = value])
+    if (!wasHandled)
     {
         // Check to see if '=' exists
         unsigned int nOpIndex = val.find('=');
@@ -188,7 +191,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 
     // HACK: if its a 'nick' command, save it here
     bool bIsNickCommand = !stricmp(szCommand, "nick");
-    if (bIsNickCommand && szParameters && !bIsScriptedBind)
+    if (!wasHandled && bIsNickCommand && szParameters && !bIsScriptedBind)
     {
         if (CCore::GetSingleton().IsValidNick(szParameters))
         {
@@ -208,9 +211,13 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     // Try to execute the handler
     if (m_pfnExecuteHandler)
     {
-        if (m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, (pEntry != NULL), bIsScriptedBind))
+        bool bAllowScriptedBind = (!pEntry || pEntry->bAllowScriptedBind);
+        if (m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, wasHandled, bIsScriptedBind, bAllowScriptedBind))
             return true;
     }
+
+    if (wasHandled)
+        return true;
 
     // Unknown command
     val = _("Unknown command or cvar: ") + szCommand;

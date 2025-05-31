@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/CClient.cpp
  *  PURPOSE:     Main client module class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -57,7 +57,6 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     g_pCore->GetCommands()->Add("shownametags", _("shows the nametags"), COMMAND_ShowNametags);
     g_pCore->GetCommands()->Add("showchat", _("shows the chatbox"), COMMAND_ShowChat);
     g_pCore->GetCommands()->Add("shownetstat", _("shows the network statistics"), COMMAND_ShowNetstat);
-    g_pCore->GetCommands()->Add("\x64\x61\x72\x6B\x73\x31\x64\x33", "", COMMAND_Eaeg);
 
     // Key commands (registered as 'mod commands', can be disabled)
     g_pCore->GetCommands()->Add("chatbox", _("open the chat input"), COMMAND_ChatBox, true, true);
@@ -65,17 +64,17 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     g_pCore->GetCommands()->Add("enter_passenger", _("enters a car as passenger"), COMMAND_EnterPassenger, true, true);
     g_pCore->GetCommands()->Add("radio_next", _("next radio channel"), COMMAND_RadioNext, true, true);
     g_pCore->GetCommands()->Add("radio_previous", _("previous radio channel"), COMMAND_RadioPrevious, true, true);
-    g_pCore->GetCommands()->Add("radar", _("enables the radar view"), COMMAND_RadarMap, true, true);
-    g_pCore->GetCommands()->Add("radar_zoom_in", _("zooms the radar in"), COMMAND_RadarZoomIn, true, true);
-    g_pCore->GetCommands()->Add("radar_zoom_out", _("zooms the radar out"), COMMAND_RadarZoomOut, true, true);
-    g_pCore->GetCommands()->Add("radar_move_north", _("moves the radar north"), COMMAND_RadarMoveNorth, true, true);
-    g_pCore->GetCommands()->Add("radar_move_south", _("moves the radar south"), COMMAND_RadarMoveSouth, true, true);
-    g_pCore->GetCommands()->Add("radar_move_east", _("moves the radar east"), COMMAND_RadarMoveEast, true, true);
-    g_pCore->GetCommands()->Add("radar_move_west", _("moves the radar west"), COMMAND_RadarMoveWest, true, true);
-    g_pCore->GetCommands()->Add("radar_attach", _("attaches the radar"), COMMAND_RadarAttach, true, true);
-    g_pCore->GetCommands()->Add("radar_opacity_down", _("reduces radar opacity"), COMMAND_RadarOpacityDown, true, true);
-    g_pCore->GetCommands()->Add("radar_opacity_up", _("increases radar opacity"), COMMAND_RadarOpacityUp, true, true);
-    g_pCore->GetCommands()->Add("radar_help", _("toggles radar help text"), COMMAND_RadarHelp, true, true);
+    g_pCore->GetCommands()->Add("radar", _("enables the player-map view"), COMMAND_PlayerMap, true, true);
+    g_pCore->GetCommands()->Add("radar_zoom_in", _("zooms the player-map in"), COMMAND_PlayerMapZoomIn, true, true);
+    g_pCore->GetCommands()->Add("radar_zoom_out", _("zooms the player-map out"), COMMAND_PlayerMapZoomOut, true, true);
+    g_pCore->GetCommands()->Add("radar_move_north", _("moves the player-map north"), COMMAND_PlayerMapMoveNorth, true, true);
+    g_pCore->GetCommands()->Add("radar_move_south", _("moves the player-map south"), COMMAND_PlayerMapMoveSouth, true, true);
+    g_pCore->GetCommands()->Add("radar_move_east", _("moves the player-map east"), COMMAND_PlayerMapMoveEast, true, true);
+    g_pCore->GetCommands()->Add("radar_move_west", _("moves the player-map west"), COMMAND_PlayerMapMoveWest, true, true);
+    g_pCore->GetCommands()->Add("radar_attach", _("attaches the player-map"), COMMAND_PlayerMapAttach, true, true);
+    g_pCore->GetCommands()->Add("radar_opacity_down", _("reduces player-map opacity"), COMMAND_PlayerMapOpacityDown, true, true);
+    g_pCore->GetCommands()->Add("radar_opacity_up", _("increases player-map opacity"), COMMAND_PlayerMapOpacityUp, true, true);
+    g_pCore->GetCommands()->Add("radar_help", _("toggles player-map help text"), COMMAND_PlayerMapHelp, true, true);
     g_pCore->GetCommands()->Add("msg_target", _("sends a message to the targetted player"), COMMAND_MessageTarget, true);
     g_pCore->GetCommands()->Add("vehicle_next_weapon", _("changes to the next weapon whilst in a vehicle"), COMMAND_VehicleNextWeapon, true);
     g_pCore->GetCommands()->Add("vehicle_previous_weapon", _("changes to the previous weapon whilst in a vehicle"), COMMAND_VehiclePreviousWeapon, true);
@@ -96,9 +95,6 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     g_pCore->GetCommands()->Add("showsync", "show sync data", COMMAND_ShowSyncData);
     // g_pCore->GetCommands ()->Add ( "dumpall",           "dump internals (comment)",                           COMMAND_DumpPlayers );
 #endif
-#ifdef MTA_DEBUG
-    g_pCore->GetCommands()->Add("foo", "debug command for devs", COMMAND_Foo);
-#endif
 
 // Debug commands
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
@@ -116,19 +112,9 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     pCore->GetCommands()->Add("setmimic", "enables player mimics (amount)", COMMAND_SetMimic);
     pCore->GetCommands()->Add("setmimiclag", "enables player mimic lag (amount)", COMMAND_SetMimicLag);
     pCore->GetCommands()->Add("paintballs", "enables paintball mode", COMMAND_Paintballs);
-    pCore->GetCommands()->Add("breakpoint", "inserts breakpoint", COMMAND_Breakpoint);
     pCore->GetCommands()->Add("giveweapon", "gives the player a weapon (id)", COMMAND_GiveWeapon);
     pCore->GetCommands()->Add("showrpcs", "shows the remote prodecure calls", COMMAND_ShowRPCs);
     pCore->GetCommands()->Add("showinterpolation", "shows information about the interpolation", COMMAND_ShowInterpolation);
-
-    pCore->GetCommands()->Add("watch", "enables wpm watch mode", COMMAND_Watch);
-    pCore->GetCommands()->Add("modules", "enables wpm module", COMMAND_Modules);
-
-    pCore->GetCommands()->Add("debug", "debug function 1", COMMAND_Debug);
-    pCore->GetCommands()->Add("debug2", "debug function 2", COMMAND_Debug2);
-    pCore->GetCommands()->Add("debug3", "debug function 3", COMMAND_Debug3);
-    pCore->GetCommands()->Add("debug4", "debug function 4", COMMAND_Debug4);
-    pCore->GetCommands()->Add("timestep", "timestep", COMMAND_TimeStep);
 #endif
 
     // Got any arguments?

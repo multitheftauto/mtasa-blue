@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAutomobileSA.h
  *  PURPOSE:     Header file for automobile vehicle entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -21,42 +21,14 @@
 #define MAX_PASSENGER_COUNT     8
 #define MAX_DOORS               6 // also in CDamageManager
 
-namespace eCarNode
-{
-    enum
-    {
-        NONE = 0,
-        CHASSIS = 1,
-        WHEEL_RF = 2,
-        WHEEL_RM = 3,
-        WHEEL_RB = 4,
-        WHEEL_LF = 5,
-        WHEEL_LM = 6,
-        WHEEL_LB = 7,
-        DOOR_RF = 8,
-        DOOR_RR = 9,
-        DOOR_LF = 10,
-        DOOR_LR = 11,
-        BUMP_FRONT = 12,
-        BUMP_REAR = 13,
-        WING_RF = 14,
-        WING_LF = 15,
-        BONNET = 16,
-        BOOT = 17,
-        WINDSCREEN = 18,
-        EXHAUST = 19,
-        MISC_A = 20,
-        MISC_B = 21,
-        MISC_C = 22,
-        MISC_D = 23,
-        MISC_E = 24,
-        NUM_NODES
-    };
-};
-
 class CBouncingPanelSAInterface
 {
 public:
+    void SetPanel(std::int16_t frameId, std::int16_t axis, float angleLimit)
+    {
+        ((void(__thiscall*)(CBouncingPanelSAInterface*, std::int16_t, std::int16_t, float))0x6F4920)(this, frameId, axis, angleLimit);
+    }
+
     unsigned short m_nFrameId;
     unsigned short m_nAxis;
     float          m_fAngleLimit;
@@ -68,9 +40,16 @@ static_assert(sizeof(CBouncingPanelSAInterface) == 0x20, "Invalid size for CBoun
 class CAutomobileSAInterface : public CVehicleSAInterface
 {
 public:
+    void SetPanelDamage(std::uint8_t panelId, bool breakGlass, bool spawnFlyingComponent = true);
+
+    CObjectSAInterface* SpawnFlyingComponent(const eCarNodes& nodeId, const eCarComponentCollisionTypes& collType)
+    {
+        return ((CObjectSAInterface*(__thiscall*)(CAutomobileSAInterface*, eCarNodes, eCarComponentCollisionTypes))0x6a8580)(this, nodeId, collType);
+    }
+
     CDamageManagerSAInterface m_damageManager;
     CDoorSAInterface          m_doors[MAX_DOORS];
-    RwFrame*                  m_aCarNodes[eCarNode::NUM_NODES];
+    RwFrame*                  m_aCarNodes[static_cast<std::size_t>(eCarNodes::NUM_NODES)];
     CBouncingPanelSAInterface m_panels[3];
     CDoorSAInterface          m_swingingChassis;
     CColPointSAInterface      m_wheelColPoint[MAX_WHEELS];

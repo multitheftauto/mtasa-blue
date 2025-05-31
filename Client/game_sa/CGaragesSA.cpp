@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGaragesSA.cpp
  *  PURPOSE:     Garage manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

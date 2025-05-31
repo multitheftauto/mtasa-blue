@@ -841,7 +841,8 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
     NullEmptyStrings(szKey, szArguments, szResource, szOriginalScriptKey);
 
     std::string arguments = szArguments ? szArguments : "";
-    szArguments = SharedUtil::Trim(arguments.data());
+    if (!arguments.empty())
+        szArguments = SharedUtil::Trim(arguments.data());
 
     for (KeyBindPtr& bind : m_binds)
     {
@@ -1871,15 +1872,15 @@ bool CKeyBinds::ControlLeftAndRight(CControllerState& cs)
 
 void CKeyBinds::DoPostFramePulse()
 {
-    eSystemState SystemState = CCore::GetSingleton().GetGame()->GetSystemState();
+    SystemState systemState = CCore::GetSingleton().GetGame()->GetSystemState();
 
-    if (m_bWaitingToLoadDefaults && (SystemState == 7 || SystemState == 9))            // Are GTA controls actually initialized?
+    if (m_bWaitingToLoadDefaults && (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME))            // Are GTA controls actually initialized?
     {
         LoadDefaultBinds();
         m_bWaitingToLoadDefaults = false;
     }
 
-    if (SystemState != 9 /* GS_PLAYING_GAME */)
+    if (systemState != SystemState::GS_PLAYING_GAME)
         return;
 
     bool  bInVehicle = false, bHasDetonator = false, bIsDead = false, bAimingWeapon = false, bEnteringVehicle = false;
@@ -2150,10 +2151,10 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
     else
         bLoadDefaults = true;
 
-    eSystemState SystemState = CCore::GetSingleton().GetGame()->GetSystemState();
+    SystemState systemState = CCore::GetSingleton().GetGame()->GetSystemState();
     if (bLoadDefaults)
     {
-        if (SystemState == 7 || SystemState == 9)            // Are GTA controls actually initialized?
+        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME)            // Are GTA controls actually initialized?
             LoadDefaultBinds();
         else
             m_bWaitingToLoadDefaults = true;

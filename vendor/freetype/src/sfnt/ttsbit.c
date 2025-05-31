@@ -4,7 +4,7 @@
  *
  *   TrueType and OpenType embedded bitmap support (body).
  *
- * Copyright (C) 2005-2023 by
+ * Copyright (C) 2005-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * Copyright 2013 by Google, Inc.
@@ -1462,12 +1462,13 @@
     FT_Int    originOffsetX, originOffsetY;
     FT_Tag    graphicType;
     FT_Int    recurse_depth = 0;
+    FT_Bool   flipped       = FALSE;
 
     FT_Error  error;
     FT_Byte*  p;
 
-    FT_UNUSED( map );
 #ifndef FT_CONFIG_OPTION_USE_PNG
+    FT_UNUSED( map );
     FT_UNUSED( metrics_only );
 #endif
 
@@ -1517,12 +1518,16 @@
 
     switch ( graphicType )
     {
+    case FT_MAKE_TAG( 'f', 'l', 'i', 'p' ):
+      flipped = !flipped;
+      FALL_THROUGH;
+
     case FT_MAKE_TAG( 'd', 'u', 'p', 'e' ):
-      if ( recurse_depth < 4 )
+      if ( recurse_depth++ < 4 )
       {
         glyph_index = FT_GET_USHORT();
         FT_FRAME_EXIT();
-        recurse_depth++;
+
         goto retry;
       }
       error = FT_THROW( Invalid_File_Format );
@@ -1540,6 +1545,38 @@
                              glyph_end - glyph_start - 8,
                              TRUE,
                              metrics_only );
+      if ( flipped && !metrics_only && !error )
+      {
+        FT_UInt32*  curr_pos = (FT_UInt32*)map->buffer;
+
+        /* `Load_SBit_Png` always returns a pixmap with 32 bits per pixel */
+        /* and no extra pitch bytes.                                      */
+        FT_UInt  width = map->width;
+        FT_UInt  y;
+
+
+        for ( y = 0; y < map->rows; y++ )
+        {
+          FT_UInt32*  left  = curr_pos;
+          FT_UInt32*  right = curr_pos + width - 1;
+
+
+          while ( left < right )
+          {
+            FT_UInt32  value;
+
+
+            value  = *right;
+            *right = *left;
+            *left  = value;
+
+            left++;
+            right--;
+          }
+
+          curr_pos += width;
+        }
+      }
 #else
       error = FT_THROW( Unimplemented_Feature );
 #endif

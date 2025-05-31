@@ -1,20 +1,26 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CHandlingManagerSA.cpp
+ *  FILE:        Client/game_sa/CHandlingManagerSA.cpp
  *  PURPOSE:     Vehicle handling manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
+#include "CHandlingManagerSA.h"
 #include <core/CCoreInterface.h>
 #include <multiplayer/CMultiplayer.h>
-#include "CHandlingManagerSA.h"
+
+#include "enums/VehicleType.h"
+#include "enums/HandlingType.h"
+#include "enums/HandlingProperty.h"
 
 extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
@@ -22,26 +28,27 @@ extern CCoreInterface* g_pCore;
 #define Var_fTurnMassMultiplier     0x858B8C
 #define Var_fBasicDragCoeff         0x858C58
 
-DWORD CHandlingManagerSA::m_dwStore_LoadHandlingCfg = 0;
+#define DUMP_HANDLING_DATA 0
 
-tHandlingDataSA   CHandlingManagerSA::m_OriginalHandlingData[HT_MAX];
-CHandlingEntrySA* CHandlingManagerSA::m_pOriginalEntries[HT_MAX];
+// Original handling data unaffected by handling.cfg changes
+static tHandlingDataSA                   m_OriginalHandlingData[static_cast<std::size_t>(HandlingType::HT_MAX)];
+static std::unique_ptr<CHandlingEntrySA> m_OriginalEntries[static_cast<std::size_t>(HandlingType::HT_MAX)];
 
-tFlyingHandlingDataSA   CHandlingManagerSA::m_OriginalFlyingHandlingData[24];
-CFlyingHandlingEntrySA* CHandlingManagerSA::m_pOriginalFlyingEntries[24];
+static tFlyingHandlingDataSA                   m_OriginalFlyingHandlingData[24];
+static std::unique_ptr<CFlyingHandlingEntrySA> m_OriginalFlyingEntries[24];
 
-tBoatHandlingDataSA   CHandlingManagerSA::m_OriginalBoatHandlingData[12];
-CBoatHandlingEntrySA* CHandlingManagerSA::m_pOriginalBoatEntries[12];
+static tBoatHandlingDataSA                   m_OriginalBoatHandlingData[12];
+static std::unique_ptr<CBoatHandlingEntrySA> m_OriginalBoatEntries[12];
 
-tBikeHandlingDataSA   CHandlingManagerSA::m_OriginalBikeHandlingData[14];
-CBikeHandlingEntrySA* CHandlingManagerSA::m_pOriginalBikeEntries[14];
+static tBikeHandlingDataSA                   m_OriginalBikeHandlingData[14];
+static std::unique_ptr<CBikeHandlingEntrySA> m_OriginalBikeEntries[14];
+
+static std::map<std::string, HandlingProperty> m_HandlingNames;
 
 // TODO We need install a hook in 0x6F52D0 to make some stuff work corrently
 
 // Use the following code to dump handling data unrecalculated on GTA load.
 // NB: You need to disable the other hook in the constructor of the manager and uncomment the other
-
-DWORD m_dwStore_Calculate = 0;
 
 __declspec(noinline) void DumpHandlingData(tHandlingDataSA* pData)
 {
@@ -98,17 +105,17 @@ __declspec(noinline) void DumpHandlingData(tHandlingDataSA* pData)
     fclose(pFile);
 }
 
-__declspec(naked) void Hook_Calculate()
+static __declspec(naked) void Hook_Calculate()
 {
     tHandlingDataSA* pData;
-    DWORD            dwHandlingData;
+    DWORD dwHandlingData;
     _asm
     {
         mov         eax, [esp+4]
         mov         dwHandlingData, eax
     }
 
-    pData = (tHandlingDataSA*)(dwHandlingData);
+    pData = reinterpret_cast<tHandlingDataSA*>(dwHandlingData);
     DumpHandlingData(pData);
 
     _asm
@@ -123,627 +130,588 @@ CHandlingManagerSA::CHandlingManagerSA()
     InitializeDefaultHandlings();
 
     // Create a handling entry for every original handling data.
-    for (int i = 0; i < HT_MAX; i++)
+    for (std::size_t i = 0; i < static_cast<std::size_t>(HandlingType::HT_MAX); i++)
     {
-        m_pOriginalEntries[i] = new CHandlingEntrySA(&m_OriginalHandlingData[i]);
+        m_OriginalEntries[i] = std::make_unique<CHandlingEntrySA>(&m_OriginalHandlingData[i]);
     }
 
-    for (int i = 0; i < 24; i++)
+    for (std::size_t i = 0; i < 24; i++)
     {
-        m_pOriginalFlyingEntries[i] = new CFlyingHandlingEntrySA(&m_OriginalFlyingHandlingData[i]);
+        m_OriginalFlyingEntries[i] = std::make_unique<CFlyingHandlingEntrySA>(&m_OriginalFlyingHandlingData[i]);
     }
 
-    for (int i = 0; i < 12; i++)
+    for (std::size_t i = 0; i < 12; i++)
     {
-        m_pOriginalBoatEntries[i] = new CBoatHandlingEntrySA(&m_OriginalBoatHandlingData[i]);
+        m_OriginalBoatEntries[i] = std::make_unique<CBoatHandlingEntrySA>(&m_OriginalBoatHandlingData[i]);
     }
 
-    for (int i = 0; i < 14; i++)
+    for (std::size_t i = 0; i < 14; i++)
     {
-        m_pOriginalBikeEntries[i] = new CBikeHandlingEntrySA(&m_OriginalBikeHandlingData[i]);
+        m_OriginalBikeEntries[i] = std::make_unique<CBikeHandlingEntrySA>(&m_OriginalBikeHandlingData[i]);
     }
 
-    // Uncomment this to dump
-    // HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
-    m_HandlingNames["mass"] = HANDLING_MASS;                                                             // works (mass > 0)
-    m_HandlingNames["turnMass"] = HANDLING_TURNMASS;                                                     // works
-    m_HandlingNames["dragCoeff"] = HANDLING_DRAGCOEFF;                                                   // works
-    m_HandlingNames["centerOfMass"] = HANDLING_CENTEROFMASS;                                             // works
-    m_HandlingNames["percentSubmerged"] = HANDLING_PERCENTSUBMERGED;                                     // works
-    m_HandlingNames["tractionMultiplier"] = HANDLING_TRACTIONMULTIPLIER;                                 // works
-    m_HandlingNames["driveType"] = HANDLING_DRIVETYPE;                                                   // works
-    m_HandlingNames["engineType"] = HANDLING_ENGINETYPE;                                                 // works
-    m_HandlingNames["numberOfGears"] = HANDLING_NUMOFGEARS;                                              // works
-    m_HandlingNames["engineAcceleration"] = HANDLING_ENGINEACCELERATION;                                 // works
-    m_HandlingNames["engineInertia"] = HANDLING_ENGINEINERTIA;                                           // works
-    m_HandlingNames["maxVelocity"] = HANDLING_MAXVELOCITY;                                               // works
-    m_HandlingNames["brakeDeceleration"] = HANDLING_BRAKEDECELERATION;                                   // works
-    m_HandlingNames["brakeBias"] = HANDLING_BRAKEBIAS;                                                   // works
-    m_HandlingNames["ABS"] = HANDLING_ABS;                                                               // has no effect in vanilla gta either
-    m_HandlingNames["steeringLock"] = HANDLING_STEERINGLOCK;                                             // works
-    m_HandlingNames["tractionLoss"] = HANDLING_TRACTIONLOSS;                                             // works
-    m_HandlingNames["tractionBias"] = HANDLING_TRACTIONBIAS;                                             // works
-    m_HandlingNames["suspensionForceLevel"] = HANDLING_SUSPENSION_FORCELEVEL;                            // works
-    m_HandlingNames["suspensionDamping"] = HANDLING_SUSPENSION_DAMPING;                                  // works
-    m_HandlingNames["suspensionHighSpeedDamping"] = HANDLING_SUSPENSION_HIGHSPEEDDAMPING;                // works
-    m_HandlingNames["suspensionUpperLimit"] = HANDLING_SUSPENSION_UPPER_LIMIT;                           // works
-    m_HandlingNames["suspensionLowerLimit"] = HANDLING_SUSPENSION_LOWER_LIMIT;                           // works
-    m_HandlingNames["suspensionFrontRearBias"] = HANDLING_SUSPENSION_FRONTREARBIAS;                      // works
-    m_HandlingNames["suspensionAntiDiveMultiplier"] = HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER;            // works
-    m_HandlingNames["collisionDamageMultiplier"] = HANDLING_COLLISIONDAMAGEMULTIPLIER;                   // works
-    m_HandlingNames["seatOffsetDistance"] = HANDLING_SEATOFFSETDISTANCE;                                 // works
-    m_HandlingNames["monetary"] = HANDLING_MONETARY;                      // useless as it only influences SP stats (value of damaged property)
-    m_HandlingNames["handlingFlags"] = HANDLING_HANDLINGFLAGS;            // works
-    m_HandlingNames["modelFlags"] = HANDLING_MODELFLAGS;                  // works
-    m_HandlingNames["headLight"] = HANDLING_HEADLIGHT;                    // doesn't work
-    m_HandlingNames["tailLight"] = HANDLING_TAILLIGHT;                    // doesn't seem to work*
-    m_HandlingNames["animGroup"] = HANDLING_ANIMGROUP;                    // works model based
+#if DUMP_HANDLING_DATA
+    HookInstall(Func_Calculate, (DWORD)Hook_Calculate, 11);
+#endif
 
-    iChangedVehicles = 0;
+    m_HandlingNames["mass"] = HandlingProperty::HANDLING_MASS;                                                             // works (mass > 0)
+    m_HandlingNames["turnMass"] = HandlingProperty::HANDLING_TURNMASS;                                                     // works
+    m_HandlingNames["dragCoeff"] = HandlingProperty::HANDLING_DRAGCOEFF;                                                   // works
+    m_HandlingNames["centerOfMass"] = HandlingProperty::HANDLING_CENTEROFMASS;                                             // works
+    m_HandlingNames["percentSubmerged"] = HandlingProperty::HANDLING_PERCENTSUBMERGED;                                     // works
+    m_HandlingNames["tractionMultiplier"] = HandlingProperty::HANDLING_TRACTIONMULTIPLIER;                                 // works
+    m_HandlingNames["driveType"] = HandlingProperty::HANDLING_DRIVETYPE;                                                   // works
+    m_HandlingNames["engineType"] = HandlingProperty::HANDLING_ENGINETYPE;                                                 // works
+    m_HandlingNames["numberOfGears"] = HandlingProperty::HANDLING_NUMOFGEARS;                                              // works
+    m_HandlingNames["engineAcceleration"] = HandlingProperty::HANDLING_ENGINEACCELERATION;                                 // works
+    m_HandlingNames["engineInertia"] = HandlingProperty::HANDLING_ENGINEINERTIA;                                           // works
+    m_HandlingNames["maxVelocity"] = HandlingProperty::HANDLING_MAXVELOCITY;                                               // works
+    m_HandlingNames["brakeDeceleration"] = HandlingProperty::HANDLING_BRAKEDECELERATION;                                   // works
+    m_HandlingNames["brakeBias"] = HandlingProperty::HANDLING_BRAKEBIAS;                                                   // works
+    m_HandlingNames["ABS"] = HandlingProperty::HANDLING_ABS;                                                               // has no effect in vanilla gta either
+    m_HandlingNames["steeringLock"] = HandlingProperty::HANDLING_STEERINGLOCK;                                             // works
+    m_HandlingNames["tractionLoss"] = HandlingProperty::HANDLING_TRACTIONLOSS;                                             // works
+    m_HandlingNames["tractionBias"] = HandlingProperty::HANDLING_TRACTIONBIAS;                                             // works
+    m_HandlingNames["suspensionForceLevel"] = HandlingProperty::HANDLING_SUSPENSION_FORCELEVEL;                            // works
+    m_HandlingNames["suspensionDamping"] = HandlingProperty::HANDLING_SUSPENSION_DAMPING;                                  // works
+    m_HandlingNames["suspensionHighSpeedDamping"] = HandlingProperty::HANDLING_SUSPENSION_HIGHSPEEDDAMPING;                // works
+    m_HandlingNames["suspensionUpperLimit"] = HandlingProperty::HANDLING_SUSPENSION_UPPER_LIMIT;                           // works
+    m_HandlingNames["suspensionLowerLimit"] = HandlingProperty::HANDLING_SUSPENSION_LOWER_LIMIT;                           // works
+    m_HandlingNames["suspensionFrontRearBias"] = HandlingProperty::HANDLING_SUSPENSION_FRONTREARBIAS;                      // works
+    m_HandlingNames["suspensionAntiDiveMultiplier"] = HandlingProperty::HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER;            // works
+    m_HandlingNames["collisionDamageMultiplier"] = HandlingProperty::HANDLING_COLLISIONDAMAGEMULTIPLIER;                   // works
+    m_HandlingNames["seatOffsetDistance"] = HandlingProperty::HANDLING_SEATOFFSETDISTANCE;                                 // works
+    m_HandlingNames["monetary"] = HandlingProperty::HANDLING_MONETARY;                      // useless as it only influences SP stats (value of damaged property)
+    m_HandlingNames["handlingFlags"] = HandlingProperty::HANDLING_HANDLINGFLAGS;            // works
+    m_HandlingNames["modelFlags"] = HandlingProperty::HANDLING_MODELFLAGS;                  // works
+    m_HandlingNames["headLight"] = HandlingProperty::HANDLING_HEADLIGHT;                    // doesn't work
+    m_HandlingNames["tailLight"] = HandlingProperty::HANDLING_TAILLIGHT;                    // doesn't seem to work*
+    m_HandlingNames["animGroup"] = HandlingProperty::HANDLING_ANIMGROUP;                    // works model based
 }
 
 CHandlingManagerSA::~CHandlingManagerSA()
 {
-    // Destroy all original handling entries
-    for (int i = 0; i < HT_MAX; i++)
-    {
-        delete m_pOriginalEntries[i];
-    }
-
-    for (int i = 0; i < 24; i++)
-    {
-        delete m_pOriginalFlyingEntries[i];
-    }
-
-    for (int i = 0; i < 12; i++)
-    {
-        delete m_pOriginalBoatEntries[i];
-    }
-
-    for (int i = 0; i < 14; i++)
-    {
-        delete m_pOriginalBikeEntries[i];
-    }
 }
 
-eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(std::string strName)
+HandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(const std::string& name) const noexcept
 {
-    std::map<std::string, eHandlingProperty>::iterator it;
-    it = m_HandlingNames.find(strName);
-
-    if (it != m_HandlingNames.end())
-    {
-        return it->second;
-    }
-    return HANDLING_MAX;
+    const auto it = m_HandlingNames.find(name);
+    return it != m_HandlingNames.end() ? it->second : HandlingProperty::HANDLING_MAX;
 }
 
-CHandlingEntry* CHandlingManagerSA::CreateHandlingData()
+std::unique_ptr<CHandlingEntry> CHandlingManagerSA::CreateHandlingData() const noexcept
 {
-    CHandlingEntrySA* pHandlingEntry = new CHandlingEntrySA();
-    return pHandlingEntry;
+    return std::make_unique<CHandlingEntrySA>();
 }
 
-CFlyingHandlingEntry* CHandlingManagerSA::CreateFlyingHandlingData()
+std::unique_ptr<CFlyingHandlingEntry> CHandlingManagerSA::CreateFlyingHandlingData() const noexcept
 {
-    CFlyingHandlingEntrySA* pFlyingHandlingEntry = new CFlyingHandlingEntrySA();
-    return pFlyingHandlingEntry;
+    return std::make_unique<CFlyingHandlingEntrySA>();
 }
 
-CBoatHandlingEntry* CHandlingManagerSA::CreateBoatHandlingData()
+std::unique_ptr<CBoatHandlingEntry> CHandlingManagerSA::CreateBoatHandlingData() const noexcept
 {
-    CBoatHandlingEntrySA* pBoatHandlingEntry = new CBoatHandlingEntrySA();
-    return pBoatHandlingEntry;
+    return std::make_unique<CBoatHandlingEntrySA>();
 }
 
-CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData()
+std::unique_ptr<CBikeHandlingEntry> CHandlingManagerSA::CreateBikeHandlingData() const noexcept
 {
-    CBikeHandlingEntrySA* pBikeHandlingEntry = new CBikeHandlingEntrySA();
-    return pBikeHandlingEntry;
+    return std::make_unique<CBikeHandlingEntrySA>();
 }
 
-const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel)
+const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(std::uint32_t model) const noexcept
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return it
-        return m_pOriginalEntries[eHandling];
-    }
+    // Vehicle?
+    if (!CModelInfoSA::IsVehicleModel(model))
+        return nullptr;
 
-    return NULL;
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const HandlingType eHandling = GetHandlingID(model);
+    // Return it
+    return m_OriginalEntries[(std::size_t)eHandling].get();
 }
 
-const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel)
+const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(std::uint32_t model) const noexcept
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Original GTA:SA behavior
-        if (eHandling < 186 || eHandling > 209)
-            return m_pOriginalFlyingEntries[0];
-        else
-            return m_pOriginalFlyingEntries[eHandling - 186];
-    }
+    // Vehicle?
+    if (!CModelInfoSA::IsVehicleModel(model))
+        return nullptr;
 
-    return NULL;
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const HandlingType eHandling = GetHandlingID(model);
+    // Original GTA:SA behavior
+    if (eHandling < HandlingType::HT_SEAPLANE || eHandling > HandlingType::HT_RCRAIDER)
+        return m_OriginalFlyingEntries[0].get();
+    else
+        return m_OriginalFlyingEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_SEAPLANE)].get();
 }
 
-const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel)
+const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::uint32_t model) const noexcept
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Original GTA:SA behavior
-        if (eHandling < 175 || eHandling > 186)
-            return m_pOriginalBoatEntries[0];
-        else
-            return m_pOriginalBoatEntries[eHandling - 175];
-    }
+    // Vehicle?
+    if (!CModelInfoSA::IsVehicleModel(model))
+        return nullptr;
 
-    return NULL;
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const HandlingType eHandling = GetHandlingID(model);
+    // Original GTA:SA behavior
+    if (eHandling < HandlingType::HT_PREDATOR || eHandling > HandlingType::HT_SEAPLANE)
+        return m_OriginalBoatEntries[0].get();
+    else
+        return m_OriginalBoatEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_PREDATOR)].get();
 }
 
-const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel)
+const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::uint32_t model) const noexcept
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
-            return m_pOriginalBikeEntries[eHandling - HT_BIKE];
-        else if (eHandling == HT_FAGGIO)
-            return m_pOriginalBikeEntries[13];
-    }
+    // Vehicle?
+    if (!CModelInfoSA::IsVehicleModel(model))
+        return nullptr;
 
-    return NULL;
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    const HandlingType eHandling = GetHandlingID(model);
+    if (eHandling >= HandlingType::HT_BIKE && eHandling <= HandlingType::HT_FREEWAY)
+        return m_OriginalBikeEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_BIKE)].get();
+    else if (eHandling == HandlingType::HT_FAGGIO)
+        return m_OriginalBikeEntries[13].get();
+    else
+        return nullptr;
 }
 
 // Return the handling manager id
-eHandlingTypes CHandlingManagerSA::GetHandlingID(eVehicleTypes eModel)
+HandlingType CHandlingManagerSA::GetHandlingID(std::uint32_t model) noexcept
 {
-    switch (eModel)
+    switch (static_cast<VehicleType>(model))
     {
-        case VT_LANDSTAL:
-            return HT_LANDSTAL;
-        case VT_BRAVURA:
-            return HT_BRAVURA;
-        case VT_BUFFALO:
-            return HT_BUFFALO;
-        case VT_LINERUN:
-            return HT_LINERUN;
-        case VT_PEREN:
-            return HT_PEREN;
-        case VT_SENTINEL:
-            return HT_SENTINEL;
-        case VT_DUMPER:
-            return HT_DUMPER;
-        case VT_FIRETRUK:
-            return HT_FIRETRUK;
-        case VT_TRASH:
-            return HT_TRASH;
-        case VT_STRETCH:
-            return HT_STRETCH;
-        case VT_MANANA:
-            return HT_MANANA;
-        case VT_INFERNUS:
-            return HT_INFERNUS;
-        case VT_VOODOO:
-            return HT_VOODOO;
-        case VT_PONY:
-            return HT_PONY;
-        case VT_MULE:
-            return HT_MULE;
-        case VT_CHEETAH:
-            return HT_CHEETAH;
-        case VT_AMBULAN:
-            return HT_AMBULAN;
-        case VT_LEVIATHN:
-            return HT_LEVIATHN;
-        case VT_MOONBEAM:
-            return HT_MOONBEAM;
-        case VT_ESPERANT:
-            return HT_ESPERANT;
-        case VT_TAXI:
-            return HT_TAXI;
-        case VT_WASHING:
-            return HT_WASHING;
-        case VT_BOBCAT:
-            return HT_BOBCAT;
-        case VT_MRWHOOP:
-            return HT_MRWHOOP;
-        case VT_BFINJECT:
-            return HT_BFINJECT;
-        case VT_HUNTER:
-            return HT_HUNTER;
-        case VT_PREMIER:
-            return HT_PREMIER;
-        case VT_ENFORCER:
-            return HT_ENFORCER;
-        case VT_SECURICA:
-            return HT_SECURICA;
-        case VT_BANSHEE:
-            return HT_BANSHEE;
-        case VT_PREDATOR:
-            return HT_PREDATOR;
-        case VT_BUS:
-            return HT_BUS;
-        case VT_RHINO:
-            return HT_RHINO;
-        case VT_BARRACKS:
-            return HT_BARRACKS;
-        case VT_HOTKNIFE:
-            return HT_HOTKNIFE;
-        case VT_ARTICT1:
-            return HT_ARTICT1;
-        case VT_PREVION:
-            return HT_PREVION;
-        case VT_COACH:
-            return HT_COACH;
-        case VT_CABBIE:
-            return HT_CABBIE;
-        case VT_STALLION:
-            return HT_STALLION;
-        case VT_RUMPO:
-            return HT_RUMPO;
-        case VT_RCBANDIT:
-            return HT_RCBANDIT;
-        case VT_ROMERO:
-            return HT_ROMERO;
-        case VT_PACKER:
-            return HT_PACKER;
-        case VT_MONSTER:
-            return HT_MONSTER;
-        case VT_ADMIRAL:
-            return HT_ADMIRAL;
-        case VT_SQUALO:
-            return HT_SQUALO;
-        case VT_SEASPAR:
-            return HT_SEASPAR;
-        case VT_PIZZABOY:
-            return HT_PIZZABOY;
-        case VT_TRAM:
-            return HT_TRAM;
-        case VT_ARTICT2:
-            return HT_ARTICT2;
-        case VT_TURISMO:
-            return HT_TURISMO;
-        case VT_SPEEDER:
-            return HT_SPEEDER;
-        case VT_REEFER:
-            return HT_REEFER;
-        case VT_TROPIC:
-            return HT_TROPIC;
-        case VT_FLATBED:
-            return HT_FLATBED;
-        case VT_YANKEE:
-            return HT_YANKEE;
-        case VT_CADDY:
-            return HT_GOLFCART;
-        case VT_SOLAIR:
-            return HT_SOLAIR;
-        case VT_TOPFUN:
-            return HT_TOPFUN;
-        case VT_SKIMMER:
-            return HT_SEAPLANE;
-        case VT_PCJ600:
-            return HT_BIKE;
-        case VT_FAGGIO:
-            return HT_FAGGIO;
-        case VT_FREEWAY:
-            return HT_FREEWAY;
-        case VT_RCBARON:
-            return HT_RCBARON;
-        case VT_RCRAIDER:
-            return HT_RCRAIDER;
-        case VT_GLENDALE:
-            return HT_GLENDALE;
-        case VT_OCEANIC:
-            return HT_OCEANIC;
-        case VT_SANCHEZ:
-            return HT_DIRTBIKE;
-        case VT_SPARROW:
-            return HT_SPARROW;
-        case VT_PATRIOT:
-            return HT_PATRIOT;
-        case VT_QUAD:
-            return HT_QUADBIKE;
-        case VT_COASTG:
-            return HT_COASTGRD;
-        case VT_DINGHY:
-            return HT_DINGHY;
-        case VT_HERMES:
-            return HT_HERMES;
-        case VT_SABRE:
-            return HT_SABRE;
-        case VT_RUSTLER:
-            return HT_RUSTLER;
-        case VT_ZR350:
-            return HT_ZR350;
-        case VT_WALTON:
-            return HT_WALTON;
-        case VT_REGINA:
-            return HT_REGINA;
-        case VT_COMET:
-            return HT_COMET;
-        case VT_BMX:
-            return HT_BMX;
-        case VT_BURRITO:
-            return HT_BURRITO;
-        case VT_CAMPER:
-            return HT_CAMPER;
-        case VT_MARQUIS:
-            return HT_MARQUIS;
-        case VT_BAGGAGE:
-            return HT_BAGGAGE;
-        case VT_DOZER:
-            return HT_DOZER;
-        case VT_MAVERICK:
-            return HT_MAVERICK;
-        case VT_VCNMAV:
-            return HT_COASTMAV;
-        case VT_RANCHER:
-            return HT_RANCHER;
-        case VT_FBIRANCH:
-            return HT_FBIRANCH;
-        case VT_VIRGO:
-            return HT_VIRGO;
-        case VT_GREENWOO:
-            return HT_GREENWOO;
-        case VT_JETMAX:
-            return HT_CUPBOAT;
-        case VT_HOTRING:
-            return HT_HOTRING;
-        case VT_SANDKING:
-            return HT_SANDKING;
-        case VT_BLISTAC:
-            return HT_BLISTAC;
-        case VT_POLMAV:
-            return HT_POLMAV;
-        case VT_BOXVILLE:
-            return HT_BOXVILLE;
-        case VT_BENSON:
-            return HT_BENSON;
-        case VT_MESA:
-            return HT_MESA;
-        case VT_RCGOBLIN:
-            return HT_RCGOBLIN;
-        case VT_HOTRINA:
-            return HT_HOTRINA;
-        case VT_HOTRINB:
-            return HT_HOTRINB;
-        case VT_BLOODRA:
-            return HT_BLOODRA;
-        case VT_RNCHLURE:
-            return HT_RNCHLURE;
-        case VT_SUPERGT:
-            return HT_SUPERGT;
-        case VT_ELEGANT:
-            return HT_ELEGANT;
-        case VT_JOURNEY:
-            return HT_JOURNEY;
-        case VT_BIKE:
-            return HT_CHOPPERB;
-        case VT_MTBIKE:
-            return HT_MTB;
-        case VT_BEAGLE:
-            return HT_BEAGLE;
-        case VT_CROPDUST:
-            return HT_CROPDUST;
-        case VT_STUNT:
-            return HT_STUNT;
-        case VT_PETRO:
-            return HT_PETROL;
-        case VT_RDTRAIN:
-            return HT_RDTRAIN;
-        case VT_NEBULA:
-            return HT_NEBULA;
-        case VT_MAJESTIC:
-            return HT_MAJESTIC;
-        case VT_BUCCANEE:
-            return HT_BUCCANEE;
-        case VT_SHAMAL:
-            return HT_SHAMAL;
-        case VT_HYDRA:
-            return HT_HYDRA;
-        case VT_FCR900:
-            return HT_FCR900;
-        case VT_NRG500:
-            return HT_NRG500;
-        case VT_COPBIKE:
-            return HT_HPV1000;
-        case VT_CEMENT:
-            return HT_CEMENT;
-        case VT_TOWTRUCK:
-            return HT_TOWTRUCK;
-        case VT_FORTUNE:
-            return HT_FORTUNE;
-        case VT_CADRONA:
-            return HT_CADRONA;
-        case VT_FBITRUCK:
-            return HT_FBITRUCK;
-        case VT_WILLARD:
-            return HT_WILLARD;
-        case VT_FORKLIFT:
-            return HT_FORKLIFT;
-        case VT_TRACTOR:
-            return HT_TRACTOR;
-        case VT_COMBINE:
-            return HT_COMBINE;
-        case VT_FELTZER:
-            return HT_FELTZER;
-        case VT_REMINGTN:
-            return HT_REMINGTN;
-        case VT_SLAMVAN:
-            return HT_SLAMVAN;
-        case VT_BLADE:
-            return HT_BLADE;
-        case VT_FREIGHT:
-            return HT_FREIGHT;
-        case VT_STREAK:
-            return HT_STREAK;
-        case VT_VORTEX:
-            return HT_VORTEX;
-        case VT_VINCENT:
-            return HT_VINCENT;
-        case VT_BULLET:
-            return HT_BULLET;
-        case VT_CLOVER:
-            return HT_CLOVER;
-        case VT_SADLER:
-            return HT_SADLER;
-        case VT_FIRELA:
-            return HT_FIRELA;
-        case VT_HUSTLER:
-            return HT_HUSTLER;
-        case VT_INTRUDER:
-            return HT_INTRUDER;
-        case VT_PRIMO:
-            return HT_PRIMO;
-        case VT_CARGOBOB:
-            return HT_CARGOBOB;
-        case VT_TAMPA:
-            return HT_TAMPA;
-        case VT_SUNRISE:
-            return HT_SUNRISE;
-        case VT_MERIT:
-            return HT_MERIT;
-        case VT_UTILITY:
-            return HT_UTILITY;
-        case VT_NEVADA:
-            return HT_NEVADA;
-        case VT_YOSEMITE:
-            return HT_YOSEMITE;
-        case VT_WINDSOR:
-            return HT_WINDSOR;
-        case VT_MONSTERA:
-            return HT_MTRUCK_A;
-        case VT_MONSTERB:
-            return HT_MTRUCK_B;
-        case VT_URANUS:
-            return HT_URANUS;
-        case VT_JESTER:
-            return HT_JESTER;
-        case VT_SULTAN:
-            return HT_SULTAN;
-        case VT_STRATUM:
-            return HT_STRATUM;
-        case VT_ELEGY:
-            return HT_ELEGY;
-        case VT_RAINDANC:
-            return HT_RAINDANC;
-        case VT_RCTIGER:
-            return HT_RCTIGER;
-        case VT_FLASH:
-            return HT_FLASH;
-        case VT_TAHOMA:
-            return HT_TAHOMA;
-        case VT_SAVANNA:
-            return HT_SAVANNA;
-        case VT_BANDITO:
-            return HT_BANDITO;
-        case VT_FREIFLAT:
-            return HT_FREIFLAT;
-        case VT_STREAKC:
-            return HT_CSTREAK;
-        case VT_KART:
-            return HT_KART;
-        case VT_MOWER:
-            return HT_MOWER;
-        case VT_DUNERIDE:
-            return HT_DUNE;
-        case VT_SWEEPER:
-            return HT_SWEEPER;
-        case VT_BROADWAY:
-            return HT_BROADWAY;
-        case VT_TORNADO:
-            return HT_TORNADO;
-        case VT_AT400:
-            return HT_AT400;
-        case VT_DFT30:
-            return HT_DFT30;
-        case VT_HUNTLEY:
-            return HT_HUNTLEY;
-        case VT_STAFFORD:
-            return HT_STAFFORD;
-        case VT_BF400:
-            return HT_BF400;
-        case VT_NEWSVAN:
-            return HT_NEWSVAN;
-        case VT_TUG:
-            return HT_TUG;
-        case VT_PETROTR:
-            return HT_PETROTR;
-        case VT_EMPEROR:
-            return HT_EMPEROR;
-        case VT_WAYFARER:
-            return HT_WAYFARER;
-        case VT_EUROS:
-            return HT_EUROS;
-        case VT_HOTDOG:
-            return HT_HOTDOG;
-        case VT_CLUB:
-            return HT_CLUB;
-        case VT_FREIBOX:
-            return HT_FREIBOX;
-        case VT_ARTICT3:
-            return HT_ARTICT3;
-        case VT_ANDROM:
-            return HT_ANDROM;
-        case VT_DODO:
-            return HT_DODO;
-        case VT_RCCAM:
-            return HT_RCCAM;
-        case VT_LAUNCH:
-            return HT_LAUNCH;
-        case VT_COPCARLA:
-            return HT_POLICE_LA;
-        case VT_COPCARSF:
-            return HT_POLICE_SF;
-        case VT_COPCARVG:
-            return HT_POLICE_VG;
-        case VT_COPCARRU:
-            return HT_POLRANGER;
-        case VT_PICADOR:
-            return HT_PICADOR;
-        case VT_SWATVAN:
-            return HT_SWATVAN;
-        case VT_ALPHA:
-            return HT_ALPHA;
-        case VT_PHOENIX:
-            return HT_PHOENIX;
-        case VT_GLENSHIT:
-            return HT_GLENSHIT;
-        case VT_SADLSHIT:
-            return HT_SADLSHIT;
-        case VT_BAGBOXA:
-            return HT_BAGBOXA;
-        case VT_BAGBOXB:
-            return HT_BAGBOXB;
-        case VT_TUGSTAIR:
-            return HT_STAIRS;
-        case VT_BOXBURG:
-            return HT_BOXBURG;
-        case VT_FARMTR1:
-            return HT_FARM_TR1;
-        case VT_UTILTR1:
-            return HT_UTIL_TR1;
+        case VehicleType::VT_LANDSTAL:
+            return HandlingType::HT_LANDSTAL;
+        case VehicleType::VT_BRAVURA:
+            return HandlingType::HT_BRAVURA;
+        case VehicleType::VT_BUFFALO:
+            return HandlingType::HT_BUFFALO;
+        case VehicleType::VT_LINERUN:
+            return HandlingType::HT_LINERUN;
+        case VehicleType::VT_PEREN:
+            return HandlingType::HT_PEREN;
+        case VehicleType::VT_SENTINEL:
+            return HandlingType::HT_SENTINEL;
+        case VehicleType::VT_DUMPER:
+            return HandlingType::HT_DUMPER;
+        case VehicleType::VT_FIRETRUK:
+            return HandlingType::HT_FIRETRUK;
+        case VehicleType::VT_TRASH:
+            return HandlingType::HT_TRASH;
+        case VehicleType::VT_STRETCH:
+            return HandlingType::HT_STRETCH;
+        case VehicleType::VT_MANANA:
+            return HandlingType::HT_MANANA;
+        case VehicleType::VT_INFERNUS:
+            return HandlingType::HT_INFERNUS;
+        case VehicleType::VT_VOODOO:
+            return HandlingType::HT_VOODOO;
+        case VehicleType::VT_PONY:
+            return HandlingType::HT_PONY;
+        case VehicleType::VT_MULE:
+            return HandlingType::HT_MULE;
+        case VehicleType::VT_CHEETAH:
+            return HandlingType::HT_CHEETAH;
+        case VehicleType::VT_AMBULAN:
+            return HandlingType::HT_AMBULAN;
+        case VehicleType::VT_LEVIATHN:
+            return HandlingType::HT_LEVIATHN;
+        case VehicleType::VT_MOONBEAM:
+            return HandlingType::HT_MOONBEAM;
+        case VehicleType::VT_ESPERANT:
+            return HandlingType::HT_ESPERANT;
+        case VehicleType::VT_TAXI:
+            return HandlingType::HT_TAXI;
+        case VehicleType::VT_WASHING:
+            return HandlingType::HT_WASHING;
+        case VehicleType::VT_BOBCAT:
+            return HandlingType::HT_BOBCAT;
+        case VehicleType::VT_MRWHOOP:
+            return HandlingType::HT_MRWHOOP;
+        case VehicleType::VT_BFINJECT:
+            return HandlingType::HT_BFINJECT;
+        case VehicleType::VT_HUNTER:
+            return HandlingType::HT_HUNTER;
+        case VehicleType::VT_PREMIER:
+            return HandlingType::HT_PREMIER;
+        case VehicleType::VT_ENFORCER:
+            return HandlingType::HT_ENFORCER;
+        case VehicleType::VT_SECURICA:
+            return HandlingType::HT_SECURICA;
+        case VehicleType::VT_BANSHEE:
+            return HandlingType::HT_BANSHEE;
+        case VehicleType::VT_PREDATOR:
+            return HandlingType::HT_PREDATOR;
+        case VehicleType::VT_BUS:
+            return HandlingType::HT_BUS;
+        case VehicleType::VT_RHINO:
+            return HandlingType::HT_RHINO;
+        case VehicleType::VT_BARRACKS:
+            return HandlingType::HT_BARRACKS;
+        case VehicleType::VT_HOTKNIFE:
+            return HandlingType::HT_HOTKNIFE;
+        case VehicleType::VT_ARTICT1:
+            return HandlingType::HT_ARTICT1;
+        case VehicleType::VT_PREVION:
+            return HandlingType::HT_PREVION;
+        case VehicleType::VT_COACH:
+            return HandlingType::HT_COACH;
+        case VehicleType::VT_CABBIE:
+            return HandlingType::HT_CABBIE;
+        case VehicleType::VT_STALLION:
+            return HandlingType::HT_STALLION;
+        case VehicleType::VT_RUMPO:
+            return HandlingType::HT_RUMPO;
+        case VehicleType::VT_RCBANDIT:
+            return HandlingType::HT_RCBANDIT;
+        case VehicleType::VT_ROMERO:
+            return HandlingType::HT_ROMERO;
+        case VehicleType::VT_PACKER:
+            return HandlingType::HT_PACKER;
+        case VehicleType::VT_MONSTER:
+            return HandlingType::HT_MONSTER;
+        case VehicleType::VT_ADMIRAL:
+            return HandlingType::HT_ADMIRAL;
+        case VehicleType::VT_SQUALO:
+            return HandlingType::HT_SQUALO;
+        case VehicleType::VT_SEASPAR:
+            return HandlingType::HT_SEASPAR;
+        case VehicleType::VT_PIZZABOY:
+            return HandlingType::HT_PIZZABOY;
+        case VehicleType::VT_TRAM:
+            return HandlingType::HT_TRAM;
+        case VehicleType::VT_ARTICT2:
+            return HandlingType::HT_ARTICT2;
+        case VehicleType::VT_TURISMO:
+            return HandlingType::HT_TURISMO;
+        case VehicleType::VT_SPEEDER:
+            return HandlingType::HT_SPEEDER;
+        case VehicleType::VT_REEFER:
+            return HandlingType::HT_REEFER;
+        case VehicleType::VT_TROPIC:
+            return HandlingType::HT_TROPIC;
+        case VehicleType::VT_FLATBED:
+            return HandlingType::HT_FLATBED;
+        case VehicleType::VT_YANKEE:
+            return HandlingType::HT_YANKEE;
+        case VehicleType::VT_CADDY:
+            return HandlingType::HT_GOLFCART;
+        case VehicleType::VT_SOLAIR:
+            return HandlingType::HT_SOLAIR;
+        case VehicleType::VT_TOPFUN:
+            return HandlingType::HT_TOPFUN;
+        case VehicleType::VT_SKIMMER:
+            return HandlingType::HT_SEAPLANE;
+        case VehicleType::VT_PCJ600:
+            return HandlingType::HT_BIKE;
+        case VehicleType::VT_FAGGIO:
+            return HandlingType::HT_FAGGIO;
+        case VehicleType::VT_FREEWAY:
+            return HandlingType::HT_FREEWAY;
+        case VehicleType::VT_RCBARON:
+            return HandlingType::HT_RCBARON;
+        case VehicleType::VT_RCRAIDER:
+            return HandlingType::HT_RCRAIDER;
+        case VehicleType::VT_GLENDALE:
+            return HandlingType::HT_GLENDALE;
+        case VehicleType::VT_OCEANIC:
+            return HandlingType::HT_OCEANIC;
+        case VehicleType::VT_SANCHEZ:
+            return HandlingType::HT_DIRTBIKE;
+        case VehicleType::VT_SPARROW:
+            return HandlingType::HT_SPARROW;
+        case VehicleType::VT_PATRIOT:
+            return HandlingType::HT_PATRIOT;
+        case VehicleType::VT_QUAD:
+            return HandlingType::HT_QUADBIKE;
+        case VehicleType::VT_COASTG:
+            return HandlingType::HT_COASTGRD;
+        case VehicleType::VT_DINGHY:
+            return HandlingType::HT_DINGHY;
+        case VehicleType::VT_HERMES:
+            return HandlingType::HT_HERMES;
+        case VehicleType::VT_SABRE:
+            return HandlingType::HT_SABRE;
+        case VehicleType::VT_RUSTLER:
+            return HandlingType::HT_RUSTLER;
+        case VehicleType::VT_ZR350:
+            return HandlingType::HT_ZR350;
+        case VehicleType::VT_WALTON:
+            return HandlingType::HT_WALTON;
+        case VehicleType::VT_REGINA:
+            return HandlingType::HT_REGINA;
+        case VehicleType::VT_COMET:
+            return HandlingType::HT_COMET;
+        case VehicleType::VT_BMX:
+            return HandlingType::HT_BMX;
+        case VehicleType::VT_BURRITO:
+            return HandlingType::HT_BURRITO;
+        case VehicleType::VT_CAMPER:
+            return HandlingType::HT_CAMPER;
+        case VehicleType::VT_MARQUIS:
+            return HandlingType::HT_MARQUIS;
+        case VehicleType::VT_BAGGAGE:
+            return HandlingType::HT_BAGGAGE;
+        case VehicleType::VT_DOZER:
+            return HandlingType::HT_DOZER;
+        case VehicleType::VT_MAVERICK:
+            return HandlingType::HT_MAVERICK;
+        case VehicleType::VT_VCNMAV:
+            return HandlingType::HT_COASTMAV;
+        case VehicleType::VT_RANCHER:
+            return HandlingType::HT_RANCHER;
+        case VehicleType::VT_FBIRANCH:
+            return HandlingType::HT_FBIRANCH;
+        case VehicleType::VT_VIRGO:
+            return HandlingType::HT_VIRGO;
+        case VehicleType::VT_GREENWOO:
+            return HandlingType::HT_GREENWOO;
+        case VehicleType::VT_JETMAX:
+            return HandlingType::HT_CUPBOAT;
+        case VehicleType::VT_HOTRING:
+            return HandlingType::HT_HOTRING;
+        case VehicleType::VT_SANDKING:
+            return HandlingType::HT_SANDKING;
+        case VehicleType::VT_BLISTAC:
+            return HandlingType::HT_BLISTAC;
+        case VehicleType::VT_POLMAV:
+            return HandlingType::HT_POLMAV;
+        case VehicleType::VT_BOXVILLE:
+            return HandlingType::HT_BOXVILLE;
+        case VehicleType::VT_BENSON:
+            return HandlingType::HT_BENSON;
+        case VehicleType::VT_MESA:
+            return HandlingType::HT_MESA;
+        case VehicleType::VT_RCGOBLIN:
+            return HandlingType::HT_RCGOBLIN;
+        case VehicleType::VT_HOTRINA:
+            return HandlingType::HT_HOTRINA;
+        case VehicleType::VT_HOTRINB:
+            return HandlingType::HT_HOTRINB;
+        case VehicleType::VT_BLOODRA:
+            return HandlingType::HT_BLOODRA;
+        case VehicleType::VT_RNCHLURE:
+            return HandlingType::HT_RNCHLURE;
+        case VehicleType::VT_SUPERGT:
+            return HandlingType::HT_SUPERGT;
+        case VehicleType::VT_ELEGANT:
+            return HandlingType::HT_ELEGANT;
+        case VehicleType::VT_JOURNEY:
+            return HandlingType::HT_JOURNEY;
+        case VehicleType::VT_BIKE:
+            return HandlingType::HT_CHOPPERB;
+        case VehicleType::VT_MTBIKE:
+            return HandlingType::HT_MTB;
+        case VehicleType::VT_BEAGLE:
+            return HandlingType::HT_BEAGLE;
+        case VehicleType::VT_CROPDUST:
+            return HandlingType::HT_CROPDUST;
+        case VehicleType::VT_STUNT:
+            return HandlingType::HT_STUNT;
+        case VehicleType::VT_PETRO:
+            return HandlingType::HT_PETROL;
+        case VehicleType::VT_RDTRAIN:
+            return HandlingType::HT_RDTRAIN;
+        case VehicleType::VT_NEBULA:
+            return HandlingType::HT_NEBULA;
+        case VehicleType::VT_MAJESTIC:
+            return HandlingType::HT_MAJESTIC;
+        case VehicleType::VT_BUCCANEE:
+            return HandlingType::HT_BUCCANEE;
+        case VehicleType::VT_SHAMAL:
+            return HandlingType::HT_SHAMAL;
+        case VehicleType::VT_HYDRA:
+            return HandlingType::HT_HYDRA;
+        case VehicleType::VT_FCR900:
+            return HandlingType::HT_FCR900;
+        case VehicleType::VT_NRG500:
+            return HandlingType::HT_NRG500;
+        case VehicleType::VT_COPBIKE:
+            return HandlingType::HT_HPV1000;
+        case VehicleType::VT_CEMENT:
+            return HandlingType::HT_CEMENT;
+        case VehicleType::VT_TOWTRUCK:
+            return HandlingType::HT_TOWTRUCK;
+        case VehicleType::VT_FORTUNE:
+            return HandlingType::HT_FORTUNE;
+        case VehicleType::VT_CADRONA:
+            return HandlingType::HT_CADRONA;
+        case VehicleType::VT_FBITRUCK:
+            return HandlingType::HT_FBITRUCK;
+        case VehicleType::VT_WILLARD:
+            return HandlingType::HT_WILLARD;
+        case VehicleType::VT_FORKLIFT:
+            return HandlingType::HT_FORKLIFT;
+        case VehicleType::VT_TRACTOR:
+            return HandlingType::HT_TRACTOR;
+        case VehicleType::VT_COMBINE:
+            return HandlingType::HT_COMBINE;
+        case VehicleType::VT_FELTZER:
+            return HandlingType::HT_FELTZER;
+        case VehicleType::VT_REMINGTN:
+            return HandlingType::HT_REMINGTN;
+        case VehicleType::VT_SLAMVAN:
+            return HandlingType::HT_SLAMVAN;
+        case VehicleType::VT_BLADE:
+            return HandlingType::HT_BLADE;
+        case VehicleType::VT_FREIGHT:
+            return HandlingType::HT_FREIGHT;
+        case VehicleType::VT_STREAK:
+            return HandlingType::HT_STREAK;
+        case VehicleType::VT_VORTEX:
+            return HandlingType::HT_VORTEX;
+        case VehicleType::VT_VINCENT:
+            return HandlingType::HT_VINCENT;
+        case VehicleType::VT_BULLET:
+            return HandlingType::HT_BULLET;
+        case VehicleType::VT_CLOVER:
+            return HandlingType::HT_CLOVER;
+        case VehicleType::VT_SADLER:
+            return HandlingType::HT_SADLER;
+        case VehicleType::VT_FIRELA:
+            return HandlingType::HT_FIRELA;
+        case VehicleType::VT_HUSTLER:
+            return HandlingType::HT_HUSTLER;
+        case VehicleType::VT_INTRUDER:
+            return HandlingType::HT_INTRUDER;
+        case VehicleType::VT_PRIMO:
+            return HandlingType::HT_PRIMO;
+        case VehicleType::VT_CARGOBOB:
+            return HandlingType::HT_CARGOBOB;
+        case VehicleType::VT_TAMPA:
+            return HandlingType::HT_TAMPA;
+        case VehicleType::VT_SUNRISE:
+            return HandlingType::HT_SUNRISE;
+        case VehicleType::VT_MERIT:
+            return HandlingType::HT_MERIT;
+        case VehicleType::VT_UTILITY:
+            return HandlingType::HT_UTILITY;
+        case VehicleType::VT_NEVADA:
+            return HandlingType::HT_NEVADA;
+        case VehicleType::VT_YOSEMITE:
+            return HandlingType::HT_YOSEMITE;
+        case VehicleType::VT_WINDSOR:
+            return HandlingType::HT_WINDSOR;
+        case VehicleType::VT_MONSTERA:
+            return HandlingType::HT_MTRUCK_A;
+        case VehicleType::VT_MONSTERB:
+            return HandlingType::HT_MTRUCK_B;
+        case VehicleType::VT_URANUS:
+            return HandlingType::HT_URANUS;
+        case VehicleType::VT_JESTER:
+            return HandlingType::HT_JESTER;
+        case VehicleType::VT_SULTAN:
+            return HandlingType::HT_SULTAN;
+        case VehicleType::VT_STRATUM:
+            return HandlingType::HT_STRATUM;
+        case VehicleType::VT_ELEGY:
+            return HandlingType::HT_ELEGY;
+        case VehicleType::VT_RAINDANC:
+            return HandlingType::HT_RAINDANC;
+        case VehicleType::VT_RCTIGER:
+            return HandlingType::HT_RCTIGER;
+        case VehicleType::VT_FLASH:
+            return HandlingType::HT_FLASH;
+        case VehicleType::VT_TAHOMA:
+            return HandlingType::HT_TAHOMA;
+        case VehicleType::VT_SAVANNA:
+            return HandlingType::HT_SAVANNA;
+        case VehicleType::VT_BANDITO:
+            return HandlingType::HT_BANDITO;
+        case VehicleType::VT_FREIFLAT:
+            return HandlingType::HT_FREIFLAT;
+        case VehicleType::VT_STREAKC:
+            return HandlingType::HT_CSTREAK;
+        case VehicleType::VT_KART:
+            return HandlingType::HT_KART;
+        case VehicleType::VT_MOWER:
+            return HandlingType::HT_MOWER;
+        case VehicleType::VT_DUNERIDE:
+            return HandlingType::HT_DUNE;
+        case VehicleType::VT_SWEEPER:
+            return HandlingType::HT_SWEEPER;
+        case VehicleType::VT_BROADWAY:
+            return HandlingType::HT_BROADWAY;
+        case VehicleType::VT_TORNADO:
+            return HandlingType::HT_TORNADO;
+        case VehicleType::VT_AT400:
+            return HandlingType::HT_AT400;
+        case VehicleType::VT_DFT30:
+            return HandlingType::HT_DFT30;
+        case VehicleType::VT_HUNTLEY:
+            return HandlingType::HT_HUNTLEY;
+        case VehicleType::VT_STAFFORD:
+            return HandlingType::HT_STAFFORD;
+        case VehicleType::VT_BF400:
+            return HandlingType::HT_BF400;
+        case VehicleType::VT_NEWSVAN:
+            return HandlingType::HT_NEWSVAN;
+        case VehicleType::VT_TUG:
+            return HandlingType::HT_TUG;
+        case VehicleType::VT_PETROTR:
+            return HandlingType::HT_PETROTR;
+        case VehicleType::VT_EMPEROR:
+            return HandlingType::HT_EMPEROR;
+        case VehicleType::VT_WAYFARER:
+            return HandlingType::HT_WAYFARER;
+        case VehicleType::VT_EUROS:
+            return HandlingType::HT_EUROS;
+        case VehicleType::VT_HOTDOG:
+            return HandlingType::HT_HOTDOG;
+        case VehicleType::VT_CLUB:
+            return HandlingType::HT_CLUB;
+        case VehicleType::VT_FREIBOX:
+            return HandlingType::HT_FREIBOX;
+        case VehicleType::VT_ARTICT3:
+            return HandlingType::HT_ARTICT3;
+        case VehicleType::VT_ANDROM:
+            return HandlingType::HT_ANDROM;
+        case VehicleType::VT_DODO:
+            return HandlingType::HT_DODO;
+        case VehicleType::VT_RCCAM:
+            return HandlingType::HT_RCCAM;
+        case VehicleType::VT_LAUNCH:
+            return HandlingType::HT_LAUNCH;
+        case VehicleType::VT_COPCARLA:
+            return HandlingType::HT_POLICE_LA;
+        case VehicleType::VT_COPCARSF:
+            return HandlingType::HT_POLICE_SF;
+        case VehicleType::VT_COPCARVG:
+            return HandlingType::HT_POLICE_VG;
+        case VehicleType::VT_COPCARRU:
+            return HandlingType::HT_POLRANGER;
+        case VehicleType::VT_PICADOR:
+            return HandlingType::HT_PICADOR;
+        case VehicleType::VT_SWATVAN:
+            return HandlingType::HT_SWATVAN;
+        case VehicleType::VT_ALPHA:
+            return HandlingType::HT_ALPHA;
+        case VehicleType::VT_PHOENIX:
+            return HandlingType::HT_PHOENIX;
+        case VehicleType::VT_GLENSHIT:
+            return HandlingType::HT_GLENSHIT;
+        case VehicleType::VT_SADLSHIT:
+            return HandlingType::HT_SADLSHIT;
+        case VehicleType::VT_BAGBOXA:
+            return HandlingType::HT_BAGBOXA;
+        case VehicleType::VT_BAGBOXB:
+            return HandlingType::HT_BAGBOXB;
+        case VehicleType::VT_TUGSTAIR:
+            return HandlingType::HT_STAIRS;
+        case VehicleType::VT_BOXBURG:
+            return HandlingType::HT_BOXBURG;
+        case VehicleType::VT_FARMTR1:
+            return HandlingType::HT_FARM_TR1;
+        case VehicleType::VT_UTILTR1:
+            return HandlingType::HT_UTIL_TR1;
     }
-    return HT_LANDSTAL;
+    return HandlingType::HT_LANDSTAL;
 }
 
-void CHandlingManagerSA::InitializeDefaultHandlings()
+void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
 {
-    // Reset
-    MemSetFast(m_OriginalHandlingData, 0, sizeof(m_OriginalHandlingData));
-
     // NB: Don't waste your time changing this manually. Use the dumping code
     //     commented out at the bottom :)
     m_OriginalHandlingData[0].iVehicleID = 0;
@@ -9161,66 +9129,47 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
-void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)
+void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const entry) const noexcept
 {
-    // Grab us a multiplayer_sa pointer
-    CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
-    eVehicleTypes eModel = pEntry->GetModel();
-    // Find our original data
-    const CHandlingEntry* pOriginal = m_pOriginalEntries[eModel];
-    // Default bChanged to false
-    bool bChanged = false;
+    // Valid?
+    if (!entry)
+        return;
 
-    // loads of if statements because I'm pro like that... na j/k
-    // Set bChanged to true if we find ANY change.
-    if (pEntry->GetSuspensionAntiDiveMultiplier() != pOriginal->GetSuspensionAntiDiveMultiplier())
-        bChanged = true;
+    // Grab us a multiplayer pointer
+    const CMultiplayer* const multiplayer = g_pCore->GetMultiplayer();
+    if (!multiplayer)
+        return;
 
-    if (pEntry->GetSuspensionDamping() != pOriginal->GetSuspensionDamping())
-        bChanged = true;
+    // Get handling type
+    const HandlingType handlingType = static_cast<HandlingType>(entry->GetVehicleID());
+    if (handlingType >= HandlingType::HT_MAX)
+        return;
 
-    if (pEntry->GetSuspensionForceLevel() != pOriginal->GetSuspensionForceLevel())
-        bChanged = true;
+    const auto& entries = m_OriginalEntries[(std::size_t)handlingType];
+    if (!entries)
+        return;
 
-    if (pEntry->GetSuspensionFrontRearBias() != pOriginal->GetSuspensionFrontRearBias())
-        bChanged = true;
+    // Not changed default
+    bool isChanged = false;
 
-    if (pEntry->GetSuspensionHighSpeedDamping() != pOriginal->GetSuspensionHighSpeedDamping())
-        bChanged = true;
+    // Find changes
+    if (entry->GetSuspensionAntiDiveMultiplier() != entries->GetSuspensionAntiDiveMultiplier())
+        isChanged = true;
+    else if (entry->GetSuspensionDamping() != entries->GetSuspensionDamping())
+        isChanged = true;
+    else if (entry->GetSuspensionForceLevel() != entries->GetSuspensionForceLevel())
+        isChanged = true;
+    else if (entry->GetSuspensionFrontRearBias() != entries->GetSuspensionFrontRearBias())
+        isChanged = true;
+    else if (entry->GetSuspensionHighSpeedDamping() != entries->GetSuspensionHighSpeedDamping())
+        isChanged = true;
+    else if (entry->GetSuspensionLowerLimit() != entries->GetSuspensionLowerLimit())
+        isChanged = true;
+    else if (entry->GetSuspensionUpperLimit() != entries->GetSuspensionUpperLimit())
+        isChanged = true;
 
-    if (pEntry->GetSuspensionLowerLimit() != pOriginal->GetSuspensionLowerLimit())
-        bChanged = true;
+    if (!isChanged)
+        return;
 
-    if (pEntry->GetSuspensionUpperLimit() != pOriginal->GetSuspensionUpperLimit())
-        bChanged = true;
-
-    // Is bChanged true and the suspension flag changed marker false
-    if (bChanged == true && pEntry->HasSuspensionChanged() == false)
-    {
-        // Is our hook uninstalled?
-        if (pMultiplayer->IsSuspensionEnabled() == false)
-            // Install the hook
-            pMultiplayer->SetSuspensionEnabled(true);
-
-        // Increment iChangedVehicles
-        iChangedVehicles++;
-        // Set our Suspension Changed flag
-        pEntry->SetSuspensionChanged(true);
-    }
-    // is bChanged false and is this model supposed to contain non-default info? (i.e. they just reverted)
-    else if (bChanged == false && pEntry->HasSuspensionChanged() == true)
-    {
-        // Decrement iChangedVehicles
-        iChangedVehicles--;
-        // Set the suspension Changed flag to false
-        pEntry->SetSuspensionChanged(false);
-    }
-    // if we hit 0 vehicles installed and it's installed uninstall the hook
-    if (iChangedVehicles == 0 && pMultiplayer->IsSuspensionEnabled() == true)
-        pMultiplayer->SetSuspensionEnabled(false);
-}
-void CHandlingManagerSA::RemoveChangedVehicle()
-{
-    // Decrement the count
-    iChangedVehicles--;
+    multiplayer->UpdateVehicleSuspension();
 }

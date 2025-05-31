@@ -38,6 +38,7 @@ DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
 DECLARE_ENUM_CLASS(ESyncType);
+DECLARE_ENUM_CLASS(eCustomDataClientTrust)
 
 enum eHudComponent
 {
@@ -389,6 +390,7 @@ void    MixedReadResourceString(CScriptArgReader& argStream, CResource*& pOutRes
 bool    StringToBool(const SString& strText);
 void    MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason);
 void    ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
+bool    IsValidMatrixLuaTable(lua_State* luaVM, std::uint32_t argIndex) noexcept;
 bool    ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix);
 
 //

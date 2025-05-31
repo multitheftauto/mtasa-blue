@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceClientScriptItem.h
  *  PURPOSE:     Resource client-side script item class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -25,7 +25,7 @@ public:
     bool           IsNoClientCache() const { return m_bIsNoClientCache; }
     const SString& GetSourceCode() const { return m_sourceCode; }
 
-    ResponseCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
+    HttpStatusCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
 private:
     bool    m_bIsNoClientCache;

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CObjectSA.h
  *  PURPOSE:     Header file for object entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -152,6 +152,9 @@ public:
     void     SetScale(float fX, float fY, float fZ);
     CVector* GetScale();
     void     ResetScale();
+
+    bool IsOnFire() override { return GetObjectInterface()->pFire != nullptr; }
+    bool SetOnFire(bool onFire) override;
 
 private:
     void CheckForGangTag();

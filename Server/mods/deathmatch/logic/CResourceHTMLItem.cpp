@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceHTMLItem.cpp
  *  PURPOSE:     Resource server-side HTML item class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -41,7 +41,7 @@ CResourceHTMLItem::~CResourceHTMLItem()
     Stop();
 }
 
-ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* account)
+HttpStatusCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* account)
 {
     if (!m_pVM)
         Start();
@@ -49,12 +49,12 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
     if (m_bIsBeingRequested)
     {
         ipoHttpResponse->SetBody("Busy!", strlen("Busy!"));
-        return HTTPRESPONSECODE_500_INTERNALSERVERERROR;
+        return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
     }
 
     m_bIsBeingRequested = true;
 
-    m_responseCode = HTTPRESPONSECODE_200_OK;
+    m_responseCode = HTTP_STATUS_CODE_200_OK;
 
     if (!m_bIsRaw)
     {
@@ -107,6 +107,9 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
                 break;
             case REQUESTMETHOD_CONNECT:
                 sMethod = "CONNECT";
+                break;
+            case REQUESTMETHOD_PATCH:
+                sMethod = "PATCH";
                 break;
             case REQUESTMETHOD_LAST:
                 sMethod = "LAST";
@@ -173,7 +176,7 @@ void CResourceHTMLItem::SetResponseHeader(const char* szHeaderName, const char* 
 
 void CResourceHTMLItem::SetResponseCode(int responseCode)
 {
-    m_responseCode = (ResponseCode)responseCode;
+    m_responseCode = static_cast<HttpStatusCode>(responseCode);
 }
 
 void CResourceHTMLItem::SetResponseCookie(const char* szCookieName, const char* szCookieValue)

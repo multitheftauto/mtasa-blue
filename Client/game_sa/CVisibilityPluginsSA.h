@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CVisibilityPluginsSA.h
  *  PURPOSE:     Header file for RenderWare entity visibility plugin class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -21,4 +21,6 @@ class CVisibilityPluginsSA : public CVisibilityPlugins
 public:
     void SetClumpAlpha(RpClump* pClump, int iAlpha);
     int  GetAtomicId(RwObject* pAtomic);
+
+    bool InsertEntityIntoEntityList(void* entity, float distance, void* callback);
 };

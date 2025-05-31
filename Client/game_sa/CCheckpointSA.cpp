@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCheckpointSA.cpp
  *  PURPOSE:     Checkpoint entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,6 +13,10 @@
 #include "C3DMarkerSA.h"
 #include "C3DMarkersSA.h"
 #include "CCheckpointSA.h"
+#include "CCheckpointsSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 void CCheckpointSA::SetPosition(CVector* vecPosition)
 {
@@ -131,4 +135,40 @@ void CCheckpointSA::Remove()
     GetInterface()->m_bIsUsed = false;
     GetInterface()->m_nType = 257;
     GetInterface()->rwColour = 0;
+}
+
+void CCheckpointSA::SetTargetArrowData(const SColor color, float size) noexcept
+{
+    m_targetArrowColor = color;
+    m_targetArrowSize = size;
+}
+
+static void __cdecl RenderTargetArrow(CCheckpointSAInterface* pCheckpoint)
+{
+    CCheckpoint* checkpoint = pGame->GetCheckpoints()->FindMarker(pCheckpoint->m_nIdentifier);
+    if (!checkpoint)
+        return;
+
+    CVector* position = checkpoint->GetPosition();
+    CVector* direction = checkpoint->GetPointDirection();
+    SColor   color = checkpoint->GetTargetArrowColor();
+
+    ((void(__cdecl*)(float, float, float, float, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float, float, float))C3dMarkers_DirectionArrowSet)(position->fX, position->fY, position->fZ, checkpoint->GetTargetArrowSize(), color.R, color.G, color.B, color.A, -direction->fX, -direction->fY, -direction->fZ);
+}
+
+static void _declspec(naked) HOOK_CCheckpoint__Render()
+{
+    _asm {
+        pushad
+        push esi
+        call RenderTargetArrow
+        add esp, 4
+        popad
+        jmp RETURN_CCheckpoint__Render
+    }
+}
+
+void CCheckpointSA::StaticSetHooks()
+{
+    EZHookInstall(CCheckpoint__Render);
 }

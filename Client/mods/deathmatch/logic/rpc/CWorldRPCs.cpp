@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CWorldRPCs.cpp
  *  PURPOSE:     World remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -71,6 +71,8 @@ void CWorldRPCs::LoadFunctions()
     AddHandler(RESET_MOON_SIZE, ResetMoonSize, "ResetMoonSize");
 
     AddHandler(SET_WORLD_SPECIAL_PROPERTY, SetWorldSpecialPropertyEnabled, "SetWorldSpecialPropertyEnabled");
+
+    AddHandler(RESET_WORLD_PROPERTIES, ResetWorldProperties, "ResetWorldProperties");
 }
 
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
@@ -426,101 +428,101 @@ void CWorldRPCs::SetWeaponProperty(NetBitStreamInterface& bitStream)
     {
         CWeaponStat* pWeaponInfo =
             g_pGame->GetWeaponStatManager()->GetWeaponStats(static_cast<eWeaponType>(ucWeapon), static_cast<eWeaponSkill>(ucWeaponSkill));
-        switch (ucProperty)
+        switch (static_cast<WeaponProperty>(ucProperty))
         {
-            case WEAPON_WEAPON_RANGE:
+            case WeaponProperty::WEAPON_WEAPON_RANGE:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetWeaponRange(fData);
                 break;
             }
-            case WEAPON_TARGET_RANGE:
+            case WeaponProperty::WEAPON_TARGET_RANGE:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetTargetRange(fData);
                 break;
             }
-            case WEAPON_ACCURACY:
+            case WeaponProperty::WEAPON_ACCURACY:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetAccuracy(fData);
                 break;
             }
-            case WEAPON_LIFE_SPAN:
+            case WeaponProperty::WEAPON_LIFE_SPAN:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetLifeSpan(fData);
                 break;
             }
-            case WEAPON_FIRING_SPEED:
+            case WeaponProperty::WEAPON_FIRING_SPEED:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetFiringSpeed(fData);
                 break;
             }
-            case WEAPON_MOVE_SPEED:
+            case WeaponProperty::WEAPON_MOVE_SPEED:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetMoveSpeed(fData);
                 break;
             }
-            case WEAPON_ANIM_LOOP_START:
+            case WeaponProperty::WEAPON_ANIM_LOOP_START:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetWeaponAnimLoopStart(fData);
                 break;
             }
-            case WEAPON_ANIM_LOOP_STOP:
+            case WeaponProperty::WEAPON_ANIM_LOOP_STOP:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetWeaponAnimLoopStop(fData);
                 break;
             }
-            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            case WeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetWeaponAnimLoopFireTime(fData);
                 break;
             }
 
-            case WEAPON_ANIM2_LOOP_START:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_START:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetWeaponAnim2LoopStart(fData);
                 break;
             }
-            case WEAPON_ANIM2_LOOP_STOP:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_STOP:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetWeaponAnim2LoopStop(fData);
                 break;
             }
-            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetWeaponAnim2LoopFireTime(fData);
                 break;
             }
 
-            case WEAPON_ANIM_BREAKOUT_TIME:
+            case WeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
             {
                 bitStream.Read(fData);
                 pWeaponInfo->SetWeaponAnimBreakoutTime(fData);
                 break;
             }
-            case WEAPON_DAMAGE:
+            case WeaponProperty::WEAPON_DAMAGE:
             {
                 bitStream.Read(sData);
                 pWeaponInfo->SetDamagePerHit(sData);
                 break;
             }
-            case WEAPON_MAX_CLIP_AMMO:
+            case WeaponProperty::WEAPON_MAX_CLIP_AMMO:
             {
                 bitStream.Read(sData);
                 pWeaponInfo->SetMaximumClipAmmo(sData);
                 break;
             }
-            case WEAPON_FLAGS:
+            case WeaponProperty::WEAPON_FLAGS:
             {
                 int iData = 0;
                 if (bitStream.Version() < 0x57)
@@ -534,34 +536,34 @@ void CWorldRPCs::SetWeaponProperty(NetBitStreamInterface& bitStream)
                 pWeaponInfo->ToggleFlagBits(iData);
                 break;
             }
-            case WEAPON_ANIM_GROUP:
+            case WeaponProperty::WEAPON_ANIM_GROUP:
             {
                 bitStream.Read(sData);
                 pWeaponInfo->SetAnimGroup(sData);
                 break;
             }
-            case WEAPON_FLAG_AIM_NO_AUTO:
-            case WEAPON_FLAG_AIM_ARM:
-            case WEAPON_FLAG_AIM_1ST_PERSON:
-            case WEAPON_FLAG_AIM_FREE:
-            case WEAPON_FLAG_MOVE_AND_AIM:
-            case WEAPON_FLAG_MOVE_AND_SHOOT:
-            case WEAPON_FLAG_TYPE_THROW:
-            case WEAPON_FLAG_TYPE_HEAVY:
-            case WEAPON_FLAG_TYPE_CONSTANT:
-            case WEAPON_FLAG_TYPE_DUAL:
-            case WEAPON_FLAG_ANIM_RELOAD:
-            case WEAPON_FLAG_ANIM_CROUCH:
-            case WEAPON_FLAG_ANIM_RELOAD_LOOP:
-            case WEAPON_FLAG_ANIM_RELOAD_LONG:
-            case WEAPON_FLAG_SHOT_SLOWS:
-            case WEAPON_FLAG_SHOT_RAND_SPEED:
-            case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
-            case WEAPON_FLAG_SHOT_EXPANDS:
+            case WeaponProperty::WEAPON_FLAG_AIM_NO_AUTO:
+            case WeaponProperty::WEAPON_FLAG_AIM_ARM:
+            case WeaponProperty::WEAPON_FLAG_AIM_1ST_PERSON:
+            case WeaponProperty::WEAPON_FLAG_AIM_FREE:
+            case WeaponProperty::WEAPON_FLAG_MOVE_AND_AIM:
+            case WeaponProperty::WEAPON_FLAG_MOVE_AND_SHOOT:
+            case WeaponProperty::WEAPON_FLAG_TYPE_THROW:
+            case WeaponProperty::WEAPON_FLAG_TYPE_HEAVY:
+            case WeaponProperty::WEAPON_FLAG_TYPE_CONSTANT:
+            case WeaponProperty::WEAPON_FLAG_TYPE_DUAL:
+            case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD:
+            case WeaponProperty::WEAPON_FLAG_ANIM_CROUCH:
+            case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LOOP:
+            case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LONG:
+            case WeaponProperty::WEAPON_FLAG_SHOT_SLOWS:
+            case WeaponProperty::WEAPON_FLAG_SHOT_RAND_SPEED:
+            case WeaponProperty::WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+            case WeaponProperty::WEAPON_FLAG_SHOT_EXPANDS:
             {
                 bool bEnable;
                 bitStream.ReadBit(bEnable);
-                uint uiFlagBit = GetWeaponPropertyFlagBit((eWeaponProperty)ucProperty);
+                uint uiFlagBit = GetWeaponPropertyFlagBit((WeaponProperty)ucProperty);
                 if (bEnable)
                     pWeaponInfo->SetFlagBits(uiFlagBit);
                 else
@@ -617,6 +619,12 @@ void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)
     bitStream.Read(g_TickRateSettings.iObjectSync);
     bitStream.Read(g_TickRateSettings.iKeySyncRotation);
     bitStream.Read(g_TickRateSettings.iKeySyncAnalogMove);
+
+    if (bitStream.Can(eBitStreamVersion::FixSyncerDistance))
+    {
+        bitStream.Read(g_TickRateSettings.iPedSyncerDistance);
+        bitStream.Read(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+    }
 }
 
 void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)
@@ -642,4 +650,15 @@ void CWorldRPCs::SetWorldSpecialPropertyEnabled(NetBitStreamInterface& bitStream
     {
         g_pClientGame->SetWorldSpecialProperty((WorldSpecialProperty)property, isEnabled);
     }
+}
+
+void CWorldRPCs::ResetWorldProperties(NetBitStreamInterface& bitStream)
+{
+    bool resetSpecialProperties = bitStream.ReadBit();
+    bool resetWorldProperties = bitStream.ReadBit();
+    bool resetWeatherProperties = bitStream.ReadBit();
+    bool resetLODs = bitStream.ReadBit();
+    bool resetSounds = bitStream.ReadBit();
+
+    g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialProperties, resetWorldProperties, resetWeatherProperties, resetLODs, resetSounds});
 }

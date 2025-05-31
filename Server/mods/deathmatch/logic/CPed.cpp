@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPed.cpp
  *  PURPOSE:     Ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -38,7 +38,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_bWearingGoggles = false;
 
     m_fHealth = 0.0f;
-    m_fArmor = 0.0f;
+    m_armor = 0.0f;
 
     memset(&m_fStats[0], 0, sizeof(m_fStats));
     m_fStats[24] = 569.0f;            // default max_health
@@ -239,7 +239,7 @@ bool CPed::ReadSpecialData(const int iLine)
         m_fHealth = 100.0f;
 
     // Grab the "armor" data
-    GetCustomDataFloat("armor", m_fArmor, true);
+    GetCustomDataFloat("armor", m_armor, true);
 
     // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
@@ -533,4 +533,26 @@ void CPed::SetJackingVehicle(CVehicle* pVehicle)
 
     if (m_pJackingVehicle)
         m_pJackingVehicle->SetJackingPed(this);
+}
+
+void CPed::SetHasJetPack(bool bHasJetPack)
+{
+    if (m_bHasJetPack == bHasJetPack)
+        return;
+
+    m_bHasJetPack = bHasJetPack;
+
+    if (!bHasJetPack)
+        return;
+
+    // Set weapon slot to 0 if weapon is disabled with jetpack to avoid HUD and audio bugs
+    eWeaponType weaponType = static_cast<eWeaponType>(GetWeaponType(GetWeaponSlot()));
+    if (weaponType <= WEAPONTYPE_UNARMED)
+        return;
+
+    bool weaponEnabled;
+    CStaticFunctionDefinitions::GetJetpackWeaponEnabled(weaponType, weaponEnabled);
+
+    if (!weaponEnabled)
+        CStaticFunctionDefinitions::SetPedWeaponSlot(this, 0);
 }

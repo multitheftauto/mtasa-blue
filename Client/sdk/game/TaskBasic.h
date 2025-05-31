@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/TaskBasic.h
  *  PURPOSE:     Basic task interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -34,7 +34,8 @@ public:
 class CTaskSimpleRunNamedAnim : public virtual CTaskSimpleAnim
 {
 public:
-    virtual ~CTaskSimpleRunNamedAnim(){};
+    virtual const char* GetAnimName() const noexcept = 0;
+    virtual const char* GetGroupName() const noexcept = 0;
 };
 
 class CTaskComplexDie : public virtual CTaskComplex

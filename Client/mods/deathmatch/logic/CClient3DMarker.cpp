@@ -22,7 +22,7 @@ CClient3DMarker::CClient3DMarker(CClientMarker* pThis)
     m_bVisible = true;
     m_Color = SColorRGBA(255, 0, 0, 128);
     m_fSize = 4.0f;
-    m_dwType = MARKER3D_CYLINDER2;
+    m_dwType = static_cast<DWORD>(T3DMarkerType::MARKER3D_CYLINDER2);
     m_pMarker = NULL;
     m_ulIdentifier = (DWORD)this;
 }
@@ -33,12 +33,12 @@ CClient3DMarker::~CClient3DMarker()
 
 unsigned long CClient3DMarker::Get3DMarkerType()
 {
-    switch (m_dwType)
+    switch (static_cast<T3DMarkerType>(m_dwType))
     {
-        case MARKER3D_CYLINDER2:
+        case T3DMarkerType::MARKER3D_CYLINDER2:
             return CClient3DMarker::TYPE_CYLINDER;
 
-        case MARKER3D_ARROW:
+        case T3DMarkerType::MARKER3D_ARROW:
             return CClient3DMarker::TYPE_ARROW;
 
         default:
@@ -51,15 +51,15 @@ void CClient3DMarker::Set3DMarkerType(unsigned long ulType)
     switch (ulType)
     {
         case CClient3DMarker::TYPE_CYLINDER:
-            m_dwType = MARKER3D_CYLINDER2;
+            m_dwType = static_cast<DWORD>(T3DMarkerType::MARKER3D_CYLINDER2);
             break;
 
         case CClient3DMarker::TYPE_ARROW:
-            m_dwType = MARKER3D_ARROW;
+            m_dwType = static_cast<DWORD>(T3DMarkerType::MARKER3D_ARROW);
             break;
 
         default:
-            m_dwType = MARKER3D_CYLINDER2;
+            m_dwType = static_cast<DWORD>(T3DMarkerType::MARKER3D_CYLINDER2);
             break;
     }
 }
@@ -87,7 +87,7 @@ void CClient3DMarker::DoPulse()
     if (m_bMarkerStreamedIn && m_bVisible && m_pThis->GetInterior() == g_pGame->GetWorld()->GetCurrentArea())
     {
         SColor color = GetColor();
-        m_pMarker = g_pGame->Get3DMarkers()->CreateMarker(m_ulIdentifier, static_cast<e3DMarkerType>(m_dwType), &m_Matrix.vPos, m_fSize, 0.2f, color.R, color.G,
+        m_pMarker = g_pGame->Get3DMarkers()->CreateMarker(m_ulIdentifier, static_cast<T3DMarkerType>(m_dwType), &m_Matrix.vPos, m_fSize, 0.2f, color.R, color.G,
                                                           color.B, color.A);
         if (m_pMarker)
         {
@@ -101,4 +101,12 @@ void CClient3DMarker::DoPulse()
             g_pGame->GetVisibilityPlugins()->SetClumpAlpha((RpClump*)m_pMarker->GetRwObject(), m_Color.A);
         }
     }
+}
+
+void CClient3DMarker::SetColor(const SColor& color) noexcept
+{
+    m_Color = color;
+
+    if (!m_ignoreAlphaLimits && m_dwType == static_cast<DWORD>(T3DMarkerType::MARKER3D_ARROW))
+        m_Color.A = 255;
 }

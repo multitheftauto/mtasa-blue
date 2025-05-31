@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaTimer.cpp
  *  PURPOSE:     Lua timer class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,6 +23,7 @@ CLuaTimer::CLuaTimer(const CLuaFunctionRef& iLuaFunction, const CLuaArguments& A
     m_uiRepeats = 1;
     m_iLuaFunction = iLuaFunction;
     m_Arguments = Arguments;
+    m_paused = false;
 }
 
 CLuaTimer::~CLuaTimer()
@@ -64,9 +65,31 @@ void CLuaTimer::ExecuteTimer(CLuaMain* pLuaMain)
     }
 }
 
+void CLuaTimer::SetPaused(bool paused)
+{
+    if (paused == IsPaused())
+        return;
+
+    CTickCount llTimeRemaining = GetTimeLeft();
+    if (paused)
+    {
+        m_pausedRemainingTime = llTimeRemaining.ToLongLong() == 0LL ? m_llDelay : llTimeRemaining;
+    }
+    else
+    {
+        CTickCount llCurrentTime = CTickCount::Now();
+        CTickCount llNewStartTime = llCurrentTime - (m_llDelay - llTimeRemaining);
+        SetStartTime(llNewStartTime);
+    }
+    m_paused = paused;
+}
+
 CTickCount CLuaTimer::GetTimeLeft()
 {
+    if (IsPaused())
+        return m_pausedRemainingTime;
+
     CTickCount llCurrentTime = CTickCount::Now();
     CTickCount llTimeLeft = m_llStartTime + m_llDelay - llCurrentTime;
-    return llTimeLeft;
+    return llTimeLeft.ToLongLong() < 0LL ? CTickCount(0LL) : llTimeLeft;
 }

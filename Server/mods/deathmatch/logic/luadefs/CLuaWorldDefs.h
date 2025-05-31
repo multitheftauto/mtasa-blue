@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaWorldDefs.h
  *  PURPOSE:     Lua game world function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -94,4 +94,6 @@ public:
     LUA_DECLARE(RestoreWorldModel);
     LUA_DECLARE(RestoreAllWorldModels);
     LUA_DECLARE(resetMoonSize);
+
+    static void ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds, std::optional<bool> resetGlitches, std::optional<bool> resetJetpackWeapons) noexcept;
 };

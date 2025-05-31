@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaDrawingDefs.cpp
  *  PURPOSE:     Lua drawing definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -81,6 +81,8 @@ public:
 
     static bool DxDrawWiredSphere(lua_State* const luaVM, const CVector position, const float radius, const std::optional<SColor> color,
                                   const std::optional<float> lineWidth, const std::optional<unsigned int> iterations);
+
+    static bool DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale, const std::optional<float> lighting);
 
 private:
     static void AddDxMaterialClass(lua_State* luaVM);

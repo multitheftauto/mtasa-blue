@@ -5,7 +5,7 @@
  *  FILE:        core/CVersionUpdater.cpp
  *  PURPOSE:     Version update check and message dialog class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1912,7 +1912,7 @@ void CVersionUpdater::_DialogUpdateQueryError()
     // Display message
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("UPDATE CHECK"));
-    GetQuestionBox().SetMessage(_("Update not currently avalable.\n\nPlease check www.mtasa.com"));
+    GetQuestionBox().SetMessage(_("An update is currently not available.\n\nPlease check www.multitheftauto.com"));
     GetQuestionBox().SetButton(0, _("OK"));
     GetQuestionBox().Show();
     _PollAnyButton();
@@ -2770,7 +2770,7 @@ int CVersionUpdater::_PollDownload()
                     if (m_JobInfo.bShowDownloadPercent)
                     {
                         const bool  bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded;
-                        const float fDownloadedPercent = bIsDownloadedSizeRight ? Round(m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
+                        const int fDownloadedPercent = bIsDownloadedSizeRight ? Round((float)m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
                         GetQuestionBox().SetMessage(SString(_("%3d %% completed"), fDownloadedPercent));
                     }
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)

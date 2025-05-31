@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CHandlingEntrySA.cpp
+ *  FILE:        Client/game_sa/CHandlingEntrySA.cpp
  *  PURPOSE:     Vehicle handling data entry
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -19,94 +19,87 @@ extern CGameSA* pGame;
 CHandlingEntrySA::CHandlingEntrySA()
 {
     // Create a new interface and zero it
-    m_pHandlingSA = new tHandlingDataSA;
-    memset(m_pHandlingSA, 0, sizeof(tHandlingDataSA));
-    m_bDeleteInterface = true;
-
-    // We have no original data
-    m_pOriginalData = NULL;
-    m_bChanged = true;
+    if (m_HandlingSA = std::make_unique<tHandlingDataSA>())
+    {
+        MemSetFast(m_HandlingSA.get(), 0, sizeof(tHandlingDataSA));
+    }
 }
 
-CHandlingEntrySA::CHandlingEntrySA(tHandlingDataSA* pOriginal)
+CHandlingEntrySA::CHandlingEntrySA(const tHandlingDataSA* const pOriginal)
 {
     // Store gta's pointer
-    m_pHandlingSA = NULL;
-    m_pOriginalData = NULL;
-    m_bDeleteInterface = false;
-    memcpy(&m_Handling, pOriginal, sizeof(tHandlingDataSA));
-    m_bChanged = true;
-}
-
-CHandlingEntrySA::~CHandlingEntrySA()
-{
-    if (m_bChanged)
+    m_HandlingSA = nullptr;
+    if (pOriginal)
     {
-        pGame->GetHandlingManager()->RemoveChangedVehicle();
-    }
-    if (m_bDeleteInterface)
-    {
-        delete m_pHandlingSA;
+        MemCpyFast(&m_Handling, pOriginal, sizeof(tHandlingDataSA));
     }
 }
 
 // Apply the handlingdata from another data
-void CHandlingEntrySA::Assign(const CHandlingEntry* pData)
+void CHandlingEntrySA::Assign(const CHandlingEntry* const pEntry) noexcept
 {
+    if (!pEntry)
+        return;
+
     // Copy the data
-    const CHandlingEntrySA* pEntrySA = static_cast<const CHandlingEntrySA*>(pData);
+    const CHandlingEntrySA* const pEntrySA = static_cast<const CHandlingEntrySA const*>(pEntry);
     m_Handling = pEntrySA->m_Handling;
-    if (m_bChanged)
-    {
-        pGame->GetHandlingManager()->RemoveChangedVehicle();
-    }
-    pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }
 
-void CHandlingEntrySA::Recalculate(unsigned short usModel)
+void CHandlingEntrySA::Recalculate() noexcept
 {
     // Real GTA class?
-    if (m_pHandlingSA)
-    {
-        // Copy our stored field to GTA's
-        memcpy(m_pHandlingSA, &m_Handling, sizeof(m_Handling));
-        ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_pHandlingSA);
-    }
+    if (!m_HandlingSA)
+        return;
+
+     // Copy our stored field to GTA's
+    MemCpyFast(m_HandlingSA.get(), &m_Handling, sizeof(m_Handling));
+    ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_HandlingSA.get());
 }
 
-// Moved to cpp to check suspension changes against default values to make sure the handling hasn't changed.
-void CHandlingEntrySA::SetSuspensionForceLevel(float fForce)
+void CHandlingEntrySA::SetSuspensionForceLevel(float fForce) noexcept
 {
+    CheckSuspensionChanges();
     m_Handling.fSuspensionForceLevel = fForce;
-    pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }
-void CHandlingEntrySA::SetSuspensionDamping(float fDamping)
+
+void CHandlingEntrySA::SetSuspensionDamping(float fDamping) noexcept
 {
+    CheckSuspensionChanges();
     m_Handling.fSuspensionDamping = fDamping;
-    pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }
-void CHandlingEntrySA::SetSuspensionHighSpeedDamping(float fDamping)
+
+void CHandlingEntrySA::SetSuspensionHighSpeedDamping(float fDamping) noexcept
 {
+    CheckSuspensionChanges();
     m_Handling.fSuspensionHighSpdDamping = fDamping;
-    pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }
-void CHandlingEntrySA::SetSuspensionUpperLimit(float fUpperLimit)
+
+void CHandlingEntrySA::SetSuspensionUpperLimit(float fUpperLimit) noexcept
 {
+    CheckSuspensionChanges();
     m_Handling.fSuspensionUpperLimit = fUpperLimit;
-    pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }
-void CHandlingEntrySA::SetSuspensionLowerLimit(float fLowerLimit)
+
+void CHandlingEntrySA::SetSuspensionLowerLimit(float fLowerLimit) noexcept
 {
+    CheckSuspensionChanges();
     m_Handling.fSuspensionLowerLimit = fLowerLimit;
-    pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }
-void CHandlingEntrySA::SetSuspensionFrontRearBias(float fBias)
+
+void CHandlingEntrySA::SetSuspensionFrontRearBias(float fBias) noexcept
 {
+    CheckSuspensionChanges();
     m_Handling.fSuspensionFrontRearBias = fBias;
-    pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }
-void CHandlingEntrySA::SetSuspensionAntiDiveMultiplier(float fAntidive)
+
+void CHandlingEntrySA::SetSuspensionAntiDiveMultiplier(float fAntidive) noexcept
 {
+    CheckSuspensionChanges();
     m_Handling.fSuspensionAntiDiveMultiplier = fAntidive;
+}
+
+void CHandlingEntrySA::CheckSuspensionChanges() const noexcept
+{
     pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }

@@ -5,7 +5,7 @@
  *  FILE:        core/CSettings.cpp
  *  PURPOSE:     In-game settings window
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -376,7 +376,7 @@ void CSettings::CreateGUI()
     m_pButtonGenerateNickIcon->SetProperty("DistributeCapturedInputs", "True");
 
     m_pSavePasswords = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save server passwords"), true));
-    m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 50.0f));
+    m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 35.0f));
     m_pSavePasswords->GetPosition(vecTemp, false);
     m_pSavePasswords->AutoSize(NULL, 20.0f);
 
@@ -405,16 +405,29 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
 
+    // Enable camera photos getting saved to documents folder
+    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
+    m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pPhotoSavingCheckbox->GetPosition(vecTemp, false);
+    m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxAskBeforeDisconnect = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Ask before disconnecting from server using main menu"), true));
+    m_pCheckBoxAskBeforeDisconnect->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAskBeforeDisconnect->GetPosition(vecTemp, false);
+    m_pCheckBoxAskBeforeDisconnect->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
     m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
 
     m_pMapRenderingLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Map rendering options")));
-    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pMapRenderingLabel->GetPosition(vecTemp, false);
     m_pMapRenderingLabel->SetFont("default-bold-small");
     m_pMapRenderingLabel->AutoSize();
+
+    vecTemp.fX += 5.0f;
 
     m_pMapAlphaLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Opacity:")));
     m_pMapAlphaLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 24.0f));
@@ -432,6 +445,20 @@ void CSettings::CreateGUI()
     m_pMapAlphaValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pMapAlphaValueLabel->GetPosition(vecTemp, false);
     m_pMapAlphaValueLabel->AutoSize("100%");
+
+    m_pMapAlphaLabel->GetPosition(vecTemp, false);
+    vecTemp.fY += 24.0f;
+
+    m_pPlayerMapImageLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Image resolution:")));
+    m_pPlayerMapImageLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 2.0f));
+    m_pPlayerMapImageLabel->AutoSize();
+
+    m_pPlayerMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabMultiplayer, ""));
+    m_pPlayerMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
+    m_pPlayerMapImageCombo->SetSize(CVector2D(170.f, 95.0f));
+    m_pPlayerMapImageCombo->AddItem(_("1024 x 1024 (Default)"));            // index 0
+    m_pPlayerMapImageCombo->AddItem(_("2048 x 2048"));                      // index 1
+    m_pPlayerMapImageCombo->SetReadOnly(true);
 
     /**
      *  Audio tab
@@ -625,16 +652,13 @@ void CSettings::CreateGUI()
      *  Video tab
      **/
     fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Resolution:"), _("FOV:"), _("Draw Distance:"), _("Brightness:"), _("FX Quality:"),
-                                               _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"), _("Opacity:"));
+                                               _("Anisotropic filtering:"), _("Anti-aliasing:"), _("Aspect Ratio:"));
 
-    m_pVideoGeneralLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("General")));
-    m_pVideoGeneralLabel->SetPosition(CVector2D(11, 13));
-    m_pVideoGeneralLabel->GetPosition(vecTemp, false);
-    m_pVideoGeneralLabel->AutoSize(NULL, 3.0f);
-    m_pVideoGeneralLabel->SetFont("default-bold-small");
+    vecTemp.fX = 11.0f;
+    vecTemp.fY = 13.0f;
 
     m_pVideoResolutionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Resolution:")));
-    m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
+    m_pVideoResolutionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pVideoResolutionLabel->GetPosition(vecTemp, false);
     m_pVideoResolutionLabel->AutoSize();
 
@@ -833,6 +857,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
     m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 150.0f));
+    m_pCheckBoxCoronaReflections->AutoSize(nullptr, 20.0f);
+
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
     m_pCheckBoxMinimize->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 30.0f));
@@ -878,10 +906,6 @@ void CSettings::CreateGUI()
     m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
     m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
-    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
-    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
-
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -916,6 +940,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxRemoteJavascript->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pCheckBoxRemoteJavascript->GetPosition(vecTemp);
     m_pCheckBoxRemoteJavascript->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxBrowserGPUEnabled = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable GPU rendering"), true));
+    m_pCheckBoxBrowserGPUEnabled->SetPosition(CVector2D(vecTemp.fX + 300.0f, vecTemp.fY - 25.0f));
+    m_pCheckBoxBrowserGPUEnabled->AutoSize(NULL, 20.0f);
 
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
@@ -1006,6 +1034,7 @@ void CSettings::CreateGUI()
                5.0f;
 
     vecTemp.fX += 10.0f;
+
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
     m_pFastClothesLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
@@ -1183,6 +1212,12 @@ void CSettings::CreateGUI()
     m_pCachePathValue->AutoSize();
     vecTemp.fY += fLineHeight;
 
+    // Process affinity
+    m_pProcessAffinityCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Set CPU 0 affinity to improve game performance"), true));
+    m_pProcessAffinityCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pProcessAffinityCheckbox->AutoSize(nullptr, 20.0f);
+    vecTemp.fY += fLineHeight;
+
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Auto updater")));
     m_pAdvancedUpdaterLabel->SetPosition(CVector2D(vecTemp.fX - 10.0f, vecTemp.fY));
@@ -1234,7 +1269,7 @@ void CSettings::CreateGUI()
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY = 354 + 10;
+    vecTemp.fY += 15.0f;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
@@ -1282,6 +1317,7 @@ void CSettings::CreateGUI()
     m_pButtonBrowserWhitelistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemove, this));
     m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
     m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
+    m_pProcessAffinityCheckbox->SetClickHandler(GUI_CALLBACK(&CSettings::OnAffinityClick, this));
 
     // Set up the events for advanced description
     m_pPriorityLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
@@ -1349,6 +1385,9 @@ void CSettings::CreateGUI()
 
     m_pUpdateAutoInstallCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateAutoInstallCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
+
+    m_pProcessAffinityCheckbox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
+    m_pProcessAffinityCheckbox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
     // Load Chat presets
     LoadChatPresets();
@@ -1625,12 +1664,17 @@ void CSettings::UpdateVideoTab()
     float fPos = SharedUtil::Unlerp(g_pCore->GetMinStreamingMemory(), uiStreamingMemory, g_pCore->GetMaxStreamingMemory());
     m_pStreamingMemory->SetScrollPosition(fPos);
 
+    // Player map alpha
     int iVar = 0;
     CVARS_GET("mapalpha", iVar);
     int iAlphaPercent = ceil(((float)Clamp(0, iVar, 255) / 255) * 100);
     m_pMapAlphaValueLabel->SetText(SString("%i%%", iAlphaPercent).c_str());
     float sbPos = (float)iAlphaPercent / 100.0f;
     m_pMapAlpha->SetScrollPosition(sbPos);
+
+    // Player map image
+    CVARS_GET("mapimage", iVar);
+    m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
 //
@@ -1847,7 +1891,9 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 
     CVARS_SET("streaming_memory", g_pCore->GetMaxStreamingMemory());
 
+    // Player map defaults
     CVARS_SET("mapalpha", 155);
+    CVARS_SET("mapimage", 0);
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing() != m_pComboAntiAliasing->GetSelectedItemIndex();
@@ -3039,6 +3085,10 @@ void CSettings::LoadData()
     CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
     m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
+    bool bAskBeforeDisconnect;
+    CVARS_GET("ask_before_disconnect", bAskBeforeDisconnect);
+    m_pCheckBoxAskBeforeDisconnect->SetSelected(bAskBeforeDisconnect);
+
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
     m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
@@ -3193,6 +3243,30 @@ void CSettings::LoadData()
     iVar = GetApplicationSettingInt("Win8MouseFix");
     m_pWin8MouseCheckBox->SetSelected(iVar != 0);
 
+    // Save camera photos inside user documents folder
+    CVARS_GET("photosaving", bVar);
+    m_pPhotoSavingCheckbox->SetSelected(bVar);
+
+    // Process CPU Affinity
+    CVARS_GET("process_cpu_affinity", bVar);
+    m_pProcessAffinityCheckbox->SetSelected(bVar);
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+
+    HANDLE process = GetCurrentProcess();
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (bVar && result)
+        SetProcessAffinityMask(process, mask & ~1);
+    else
+    {
+        SYSTEM_INFO info;
+
+        GetSystemInfo(&info);
+        SetProcessAffinityMask(process, (1 << info.dwNumberOfProcessors) - 1);
+    }
+
     // Update build type
     CVARS_GET("update_build_type", iVar);
     if (iVar == 0 || iVar == 1)
@@ -3287,6 +3361,8 @@ void CSettings::LoadData()
     m_pCheckBoxRemoteBrowser->SetSelected(bVar);
     CVARS_GET("browser_remote_javascript", bVar);
     m_pCheckBoxRemoteJavascript->SetSelected(bVar);
+    CVARS_GET("browser_enable_gpu", bVar);
+    m_pCheckBoxBrowserGPUEnabled->SetSelected(bVar);
 
     ReloadBrowserLists();
 }
@@ -3328,7 +3404,7 @@ void CSettings::SaveData()
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
 
     // Set and save our settings
-    if (CModManager::GetSingleton().GetCurrentMod() != NULL)
+    if (CModManager::GetSingleton().IsLoaded())
     {
         CVARS_GET("nick", strVar);
         if (m_pEditNick->GetText().compare(strVar) != 0)
@@ -3490,6 +3566,9 @@ void CSettings::SaveData()
         }
     }
 
+    bool bAskBeforeDisconnect = m_pCheckBoxAskBeforeDisconnect->GetSelected();
+    CVARS_SET("ask_before_disconnect", bAskBeforeDisconnect);
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);
@@ -3582,6 +3661,31 @@ void CSettings::SaveData()
     // Windows 8 mouse fix
     SetApplicationSettingInt("Win8MouseFix", m_pWin8MouseCheckBox->GetSelected());
 
+    // Save photos in documents folder
+    bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
+    CVARS_SET("photosaving", photoSaving);
+    CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
+
+    // Process CPU Affinity
+    bool affinity = m_pProcessAffinityCheckbox->GetSelected();
+    CVARS_SET("process_cpu_affinity", affinity);
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+
+    HANDLE process = GetCurrentProcess();
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (affinity && result)
+        SetProcessAffinityMask(process, mask & ~1);
+    else
+    {
+        SYSTEM_INFO info;
+
+        GetSystemInfo(&info);
+        SetProcessAffinityMask(process, (1 << info.dwNumberOfProcessors) - 1);
+    }
+
     // Debug setting
     if (CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem())
     {
@@ -3603,11 +3707,15 @@ void CSettings::SaveData()
         CVARS_SET("update_auto_install", iSelected);
     }
 
-    // Map alpha
+    // Player map alpha
     SString sText = m_pMapAlphaValueLabel->GetText();
-
     float fMapAlpha = ((atof(sText.substr(0, sText.length() - 1).c_str())) / 100) * 255;
     CVARS_SET("mapalpha", fMapAlpha);
+
+    // Player map image
+    int selectedComboIndex = m_pPlayerMapImageCombo->GetSelectedItemIndex();
+    if (selectedComboIndex != -1)
+        CVARS_SET("mapimage", selectedComboIndex);
 
     // Language
     CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem();
@@ -3711,6 +3819,13 @@ void CSettings::SaveData()
             bBrowserSettingChanged = true;
     }
 
+    bool bBrowserGPUEnabled = false;
+    CVARS_GET("browser_enable_gpu", bBrowserGPUEnabled);
+
+    bool bBrowserGPUSetting = m_pCheckBoxBrowserGPUEnabled->GetSelected();
+    bool bBrowserGPUSettingChanged = (bBrowserGPUSetting != bBrowserGPUEnabled);
+    CVARS_SET("browser_enable_gpu", bBrowserGPUSetting);
+
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues();
 
@@ -3720,7 +3835,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
@@ -4658,6 +4773,47 @@ static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
     }
 }
 
+static void CPUAffinityQuestionCallBack(void* userdata, unsigned int button)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    auto* checkbox = static_cast<CGUICheckBox*>(userdata);
+
+    if (!checkbox)
+        return;
+
+    if (button != 0)
+        return;
+
+    checkbox->SetSelected(true);
+}
+
+bool CSettings::OnAffinityClick(CGUIElement* pElement)
+{
+    static bool shown = false;
+
+    if (m_pProcessAffinityCheckbox->GetSelected() || shown)
+        return true;
+
+    shown = true;
+
+    std::string title = _("EXPERIMENTAL FEATURE");
+    std::string message =
+        std::string(_("Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
+                      "Are you sure you want to disable it?"));
+
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(title);
+    pQuestionBox->SetMessage(message);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(CPUAffinityQuestionCallBack, m_pProcessAffinityCheckbox);
+    pQuestionBox->Show();
+
+    return true;
+}
+
 bool CSettings::OnBrowserBlacklistAdd(CGUIElement* pElement)
 {
     SString strDomain = m_pEditBrowserBlacklistAdd->GetText();
@@ -4821,6 +4977,8 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("16-bit color:")) + " " + std::string(_("Enable 16 bit color modes - Requires MTA restart"));
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
+    else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
+        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CStreamingSA.h
  *  PURPOSE:     Header file for data streamer class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -20,6 +20,8 @@
 #define FUNC_LoadAllRequestedModels                  0x40EA10
 #define FUNC_CStreaming__HasVehicleUpgradeLoaded     0x407820
 #define FUNC_CStreaming_RequestSpecialModel          0x409d10
+#define FUNC_CStreaming_LoadScene                    0x40EB70
+#define FUNC_CStreaming_LoadSceneCollision           0x40ED80
 
 struct CArchiveInfo
 {
@@ -76,6 +78,9 @@ public:
 
     void          MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
     std::uint32_t GetMemoryUsed() const override;
+
+    void LoadScene(const CVector* position);
+    void LoadSceneCollision(const CVector* position);
 
 private:
     void AllocateArchive();

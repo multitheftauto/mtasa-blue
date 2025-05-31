@@ -5,36 +5,33 @@
  *  FILE:        mods/deathmatch/ClientCommands.h
  *  PURPOSE:     Header for client commands class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
-bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind);
+bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind, bool bAllowScriptedBind);
 
 void COMMAND_Help(const char* szCmdLine);
 void COMMAND_Disconnect(const char* szCmdLine);
-void COMMAND_FrameSkip(const char* szCmdLine);
 void COMMAND_ShowNametags(const char* szCmdLine);
 void COMMAND_ShowChat(const char* szCmdLine);
 void COMMAND_ShowNetstat(const char* szCmdLine);
-void COMMAND_Eaeg(const char* szCmdLine);
 void COMMAND_EnterPassenger(const char* szCmdLine);
 void COMMAND_RadioNext(const char* szCmdLine);
 void COMMAND_RadioPrevious(const char* szCmdLine);
-void COMMAND_DriveBy(const char* szCmdLine);
-void COMMAND_RadarMap(const char* szCmdLine);
-void COMMAND_RadarZoomIn(const char* szCmdLine);
-void COMMAND_RadarZoomOut(const char* szCmdLine);
-void COMMAND_RadarMoveNorth(const char* szCmdLine);
-void COMMAND_RadarMoveSouth(const char* szCmdLine);
-void COMMAND_RadarMoveEast(const char* szCmdLine);
-void COMMAND_RadarMoveWest(const char* szCmdLine);
-void COMMAND_RadarAttach(const char* szCmdLine);
-void COMMAND_RadarOpacityDown(const char* szCmdLine);
-void COMMAND_RadarOpacityUp(const char* szCmdLine);
-void COMMAND_RadarHelp(const char* szCmdLine);
+void COMMAND_PlayerMap(const char* szCmdLine);
+void COMMAND_PlayerMapZoomIn(const char* szCmdLine);
+void COMMAND_PlayerMapZoomOut(const char* szCmdLine);
+void COMMAND_PlayerMapMoveNorth(const char* szCmdLine);
+void COMMAND_PlayerMapMoveSouth(const char* szCmdLine);
+void COMMAND_PlayerMapMoveEast(const char* szCmdLine);
+void COMMAND_PlayerMapMoveWest(const char* szCmdLine);
+void COMMAND_PlayerMapAttach(const char* szCmdLine);
+void COMMAND_PlayerMapOpacityDown(const char* szCmdLine);
+void COMMAND_PlayerMapOpacityUp(const char* szCmdLine);
+void COMMAND_PlayerMapHelp(const char* szCmdLine);
 void COMMAND_MessageTarget(const char* szCmdLine);
 void COMMAND_VehicleNextWeapon(const char* szCmdLine);
 void COMMAND_VehiclePreviousWeapon(const char* szCmdLine);
@@ -53,10 +50,6 @@ void COMMAND_ShowSyncData(const char* szCmdLine);
 void COMMAND_ShowSyncing(const char* szCmdLine);
 #endif
 
-#ifdef MTA_DEBUG
-void COMMAND_Foo(const char* szCmdLine);
-#endif
-
 #ifdef MTA_WEPSYNCDBG
 void COMMAND_ShowWepdata(const char* szCmdLine);
 #endif
@@ -68,19 +61,9 @@ void COMMAND_ShowPlayer(const char* szCmdLine);
 void COMMAND_SetMimic(const char* szCmdLine);
 void COMMAND_SetMimicLag(const char* szCmdLine);
 void COMMAND_Paintballs(const char* szCmdLine);
-void COMMAND_Breakpoint(const char* szCmdLine);
 void COMMAND_GiveWeapon(const char* szCmdLine);
 void COMMAND_ShowRPCs(const char* szCmdLine);
 void COMMAND_ShowInterpolation(const char* szCmdLine);
-
-void COMMAND_Watch(const char* szCmdLine);
-void COMMAND_Modules(const char* szCmdLine);
-
-void COMMAND_Debug(const char* szCmdLine);
-void COMMAND_Debug2(const char* szCmdLine);
-void COMMAND_Debug3(const char* szCmdLine);
-void COMMAND_Debug4(const char* szCmdLine);
-void COMMAND_TimeStep(const char* szCmdLine);
 #endif
 
 // Commands enabled when development mode in on

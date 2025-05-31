@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPerfStat.PacketUsage.cpp
  *  PURPOSE:     Performance stats manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -225,6 +225,13 @@ ADD_ENUM1(SET_DISCORD_JOIN_PARAMETERS)
 ADD_ENUM1(SET_COLPOLYGON_HEIGHT)
 ADD_ENUM1(SET_OBJECT_BREAKABLE)
 ADD_ENUM1(BREAK_OBJECT)
+ADD_ENUM1(SET_PLAYER_SCRIPT_DEBUG_LEVEL)
+ADD_ENUM1(SET_MARKER_TARGET_ARROW_PROPERTIES)
+ADD_ENUM1(RESPAWN_OBJECT)
+ADD_ENUM1(TOGGLE_OBJECT_RESPAWN)
+ADD_ENUM1(RESET_WORLD_PROPERTIES)
+ADD_ENUM1(SPAWN_VEHICLE_FLYING_COMPONENT)
+ADD_ENUM1(SET_ELEMENT_ON_FIRE)
 IMPLEMENT_ENUM_END("eElementRPCFunctions")
 
 DECLARE_ENUM(CRPCFunctions::eRPCFunctions);

@@ -73,11 +73,6 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
     if (!pModelInfo->IsAllocatedInArchive())
         return false;
 
-    if (pModelInfo->IsDynamic())
-    {
-        return false;
-    }
-
     eModelInfoType eType = pModelInfo->GetModelType();
     return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
 }
@@ -98,10 +93,34 @@ void CClientBuildingManager::DestroyAllForABit()
 
 void CClientBuildingManager::RestoreDestroyed()
 {
-    for (CClientBuilding* building : GetBuildings())
+    bool hasInvalidLods = true;
+    while (hasInvalidLods)
     {
-        building->Create();
+        hasInvalidLods = false;
+        for (CClientBuilding* building : GetBuildings())
+        {
+            const CClientBuilding* highLodBuilding = building->GetHighLodBuilding();
+            if (highLodBuilding && !highLodBuilding->IsValid())
+                hasInvalidLods = true;
+            else
+                building->Create();
+        }
     }
+}
+
+void CClientBuildingManager::RestoreDestroyedSafe()
+{
+    // Resize the building pool if we need
+    const int currentUsed = g_pGame->GetPools()->GetNumberOfUsedSpaces(ePools::BUILDING_POOL) + m_List.size();
+    const int currentCapacity = g_pGame->GetPools()->GetPoolCapacity(ePools::BUILDING_POOL);
+
+    if (currentCapacity - currentUsed < PRESERVED_POOL_SIZE)
+    {
+        DoPoolResize(currentUsed + PRESERVED_POOL_SIZE);
+    }
+
+    // Restore
+    RestoreDestroyed();
 }
 
 void CClientBuildingManager::ResizePoolIfNeeds()
@@ -134,39 +153,4 @@ bool CClientBuildingManager::DoPoolResize(size_t newCapacity)
     RestoreDestroyed();
 
     return success;
-}
-
-
-void CClientBuildingManager::RemoveAllGameBuildings()
-{
-    // We do not want to remove scripted buildings
-    // But we need remove them from the buildings pool for a bit...
-    DestroyAllForABit();
-
-    // This function makes buildings backup without scripted buildings
-    g_pGame->RemoveAllBuildings();
-
-    // ... And restore here
-    RestoreDestroyed();
-}
-
-void CClientBuildingManager::RestoreAllGameBuildings()
-{
-    // We want to restore the game buildings to the same positions as they were before the backup.
-    // Remove scripted buildings for a bit
-    DestroyAllForABit();
-
-    g_pGame->RestoreGameBuildings();
-
-    // Resize the building pool if we need
-    const int currentUsed = g_pGame->GetPools()->GetNumberOfUsedSpaces(ePools::BUILDING_POOL) + m_List.size();
-    const int currentCapacity = g_pGame->GetPools()->GetPoolCapacity(ePools::BUILDING_POOL);
-
-    if (currentCapacity - currentUsed < PRESERVED_POOL_SIZE)
-    {
-        DoPoolResize(currentUsed + PRESERVED_POOL_SIZE);
-    }
-
-    // Restore
-    RestoreDestroyed();
 }

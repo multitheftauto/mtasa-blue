@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Client/core/CQueryReceiver.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -183,7 +183,7 @@ SQueryInfo CQueryReceiver::GetServerResponse()
 
         // Recover server ping status if present
         const SString strPingStatus = strBuildNumber.Right(strBuildNumber.length() - strlen(strBuildNumber) - 1);
-        CCore::GetSingleton().GetNetwork()->UpdatePingStatus(*strPingStatus, info.players);
+        CCore::GetSingleton().GetNetwork()->UpdatePingStatus(strPingStatus.c_str(), strPingStatus.length(), info.players, info.isStatusVerified);
 
         // Recover server http port if present
         const SString strNetRoute = strPingStatus.Right(strPingStatus.length() - strlen(strPingStatus) - 1);
@@ -213,7 +213,15 @@ SQueryInfo CQueryReceiver::GetServerResponse()
                 return info;
             }
         }
+
         InvalidateSocket();
+
+        if (info.players > info.playerSlot)
+        {
+            info.players = info.playerSlot;
+            info.isStatusVerified = false;
+        }
+
         info.containingInfo = true;
     }
 

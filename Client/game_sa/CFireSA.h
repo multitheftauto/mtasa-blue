@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CFireSA.h
  *  PURPOSE:     Header file for fire class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -64,4 +64,6 @@ public:
     void              SetStrength(float fStrength);
     void              SetNumGenerationsAllowed(char generations);
     CFireSAInterface* GetInterface() { return internalInterface; }
+
+    static void StaticSetHooks();
 };

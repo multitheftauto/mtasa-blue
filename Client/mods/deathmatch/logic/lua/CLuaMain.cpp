@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaMain.cpp
  *  PURPOSE:     Lua main
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -127,6 +127,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaVehicleDefs::AddClass(luaVM);
     CLuaWaterDefs::AddClass(luaVM);
     CLuaWeaponDefs::AddClass(luaVM);
+    CLuaBuildingDefs::AddClass(luaVM);
 
     CLuaShared::AddClasses(luaVM);
 }
@@ -169,6 +170,9 @@ void CLuaMain::InitVM()
 
     lua_pushelement(m_luaVM, m_pResource->GetResourceEntity());
     lua_setglobal(m_luaVM, "resourceRoot");
+
+    lua_pushstring(m_luaVM, m_pResource->GetName());
+    lua_setglobal(m_luaVM, "resourceName");
 
     lua_pushelement(m_luaVM, m_pResource->GetResourceGUIEntity());
     lua_setglobal(m_luaVM, "guiRoot");
@@ -216,7 +220,7 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
     uint        uiSize;
     if (!g_pNet->DeobfuscateScript(cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename))
     {
-        SString strMessage("%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename);
+        SString strMessage("%s is invalid. Please re-compile at https://luac.multitheftauto.com/", *strNiceFilename);
         g_pClientGame->GetScriptDebugging()->LogError(m_luaVM, "Loading script failed: %s", *strMessage);
         g_pClientGame->TellServerSomethingImportant(1003, SString("CLIENT SCRIPT ERROR: %s", *strMessage));
         return false;

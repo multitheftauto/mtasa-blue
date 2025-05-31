@@ -5,7 +5,7 @@
  *  FILE:        core/CChat.cpp
  *  PURPOSE:     In-game chat box user interface implementation
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -650,7 +650,29 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 
             // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
             if (!m_strInputText.empty() && (m_pInputHistory->Empty() || m_pInputHistory->GetLast() != m_strInputText))
-                m_pInputHistory->Add(m_strInputText);
+            {
+                if (m_strCommand.empty() && m_strInputText[0] != '/')
+                {
+                    // If the input is not a command, store it
+                    m_pInputHistory->Add(m_strInputText);
+                }
+                else if (m_strCommand.compare("login") != 0)
+                {
+                    // If the input is a command, check that it isn't the 'login' command, if it is censor it
+                    char szInput[256];
+                    unsigned int uiLength = sizeof(szInput) - 1;
+
+                    strncpy(szInput, m_strInputText.c_str() + 1, uiLength);
+                    szInput[uiLength] = '\0';
+
+                    const char* szCommand = strtok(szInput, " ");
+                    
+                    if (szCommand && (strcmp(szCommand, "login") != 0))
+                        m_pInputHistory->Add(m_strInputText);
+                    else if ((m_pInputHistory->Empty() || m_pInputHistory->GetLast() != std::string("/login")))
+                        m_pInputHistory->Add("/login");
+                }
+            }
 
             SetInputVisible(false);
 
@@ -677,11 +699,11 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                 SString strPlayerNamePart = strCurrentInput.substr(iFound);
 
                 CModManager* pModManager = CModManager::GetSingletonPtr();
-                if (pModManager && pModManager->GetCurrentMod())
+                if (pModManager && pModManager->IsLoaded())
                 {
                     // Create vector and get playernames from deathmatch module
                     std::vector<SString> vPlayerNames;
-                    pModManager->GetCurrentMod()->GetPlayerNames(vPlayerNames);
+                    pModManager->GetClient()->GetPlayerNames(vPlayerNames);
 
                     for (std::vector<SString>::iterator iter = vPlayerNames.begin(); iter != vPlayerNames.end(); ++iter)
                     {
@@ -1115,6 +1137,11 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
 void CChat::SetCharacterLimit(int charLimit)
 {
     m_iCharacterLimit = charLimit;
+}
+
+float CChat::GetChatBottomPosition() const noexcept
+{
+    return m_vecBackgroundSize.fY;
 }
 
 CChatLine::CChatLine()

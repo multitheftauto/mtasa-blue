@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaVehicleDefs.cpp
  *  PURPOSE:     Lua function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -22,6 +22,7 @@ void CLuaVehicleDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Vehicle create/destroy funcs
         {"createVehicle", CreateVehicle},
+        {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
 
         // Vehicle get funcs
         {"getVehicleType", GetVehicleType},
@@ -126,6 +127,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleSirens", GetVehicleSirens},
         {"getVehicleSirenParams", GetVehicleSirenParams},
         {"setVehiclePlateText", SetVehiclePlateText},
+        {"setVehicleNitroActivated", ArgumentParser<SetVehicleNitroActivated>},
     };
 
     // Add functions
@@ -241,6 +243,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     // lua_classfunction(luaVM, "setTrack", "setTrainTrack");
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");            // Reduce confusion
+    lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
 
     lua_classvariable(luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof");
     lua_classvariable(luaVM, "locked", "setVehicleLocked", "isVehicleLocked");
@@ -2122,15 +2125,19 @@ int CLuaVehicleDefs::SetVehiclePanelState(lua_State* luaVM)
     CElement*     pElement;
     unsigned char ucPanel;
     unsigned char ucState;
+    bool          spawnFlyingComponent;
+    bool          breakGlass;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(ucPanel);
     argStream.ReadNumber(ucState);
+    argStream.ReadBool(spawnFlyingComponent, true);
+    argStream.ReadBool(breakGlass, false);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehiclePanelState(pElement, ucPanel, ucState))
+        if (CStaticFunctionDefinitions::SetVehiclePanelState(pElement, ucPanel, ucState, spawnFlyingComponent, breakGlass))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -2981,4 +2988,75 @@ int CLuaVehicleDefs::SetVehiclePlateText(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime)
+{
+    auto partNodeIndex = static_cast<eCarNodes>(nodeIndex);
+    auto collisionType = componentCollisionType.has_value() ? static_cast<eCarComponentCollisionTypes>(componentCollisionType.value()) : eCarComponentCollisionTypes::COL_NODE_PANEL;
+
+    if (nodeIndex < 1 || partNodeIndex >= eCarNodes::NUM_NODES)
+        throw std::invalid_argument("Invalid component index");
+
+    if (collisionType >= eCarComponentCollisionTypes::COL_NODES_NUM)
+        throw std::invalid_argument("Invalid collision type index");
+
+    if (!componentCollisionType.has_value())
+    {
+        switch (partNodeIndex)
+        {
+            case eCarNodes::WHEEL_RF:
+            case eCarNodes::WHEEL_RB:
+            case eCarNodes::WHEEL_LF:
+            case eCarNodes::WHEEL_LB:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_WHEEL;
+                break;
+            }
+            case eCarNodes::DOOR_RF:
+            case eCarNodes::DOOR_RR:
+            case eCarNodes::DOOR_LF:
+            case eCarNodes::DOOR_LR:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_DOOR;
+                break;
+            }
+            case eCarNodes::BUMP_FRONT:
+            case eCarNodes::BUMP_REAR:
+            case eCarNodes::WHEEL_LM:
+            case eCarNodes::WHEEL_RM:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_BUMPER;
+                break;
+            }
+            case eCarNodes::BOOT:
+            case eCarNodes::CHASSIS:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_BOOT;
+                break;
+            }
+            case eCarNodes::BONNET:
+            case eCarNodes::WINDSCREEN:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_BONNET;
+                break;
+            }
+            default:
+            {
+                collisionType = eCarComponentCollisionTypes::COL_NODE_PANEL;
+                break;
+            }
+        }
+    }
+
+    return CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(vehicle, nodeIndex, static_cast<std::uint8_t>(collisionType), removalTime.value_or(-1));
+}
+
+bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept
+{
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(state);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
+    return true;
 }

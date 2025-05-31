@@ -5,7 +5,7 @@
  *  FILE:        core/CCore.cpp
  *  PURPOSE:     Base core class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -117,13 +117,11 @@ CCore::CCore()
     m_pfnMessageProcessor = NULL;
     m_pMessageBox = NULL;
 
-    m_bFirstFrame = true;
     m_bIsOfflineMod = false;
     m_bQuitOnPulse = false;
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
-    m_bWaitToSetNick = false;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Create our Direct3DData handler.
@@ -136,7 +134,6 @@ CCore::CCore()
     m_pMouseControl = new CMouseControl();
 
     // Create our hook objects.
-    // m_pFileSystemHook           = new CFileSystemHook ( );
     m_pDirect3DHookManager = new CDirect3DHookManager();
     m_pDirectInputHookManager = new CDirectInputHookManager();
     m_pMessageLoopHook = new CMessageLoopHook();
@@ -152,7 +149,6 @@ CCore::CCore()
     m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
     m_uiServerFrameRateLimit = 0;
-    m_uiNewNickWaitFrames = 0;
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
@@ -160,6 +156,7 @@ CCore::CCore()
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
     m_timeDiscordAppLastUpdate = 0;
+    m_CurrentRefreshRate = 60;
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
@@ -210,7 +207,6 @@ CCore::~CCore()
 
     // Delete hooks.
     delete m_pSetCursorPosHook;
-    // delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
 
@@ -517,7 +513,7 @@ void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
 {
     if (m_pLocalGUI)
     {
-        if (m_pGame->GetSystemState() == 9 /* GS_PLAYING_GAME */ && m_pModManager->GetCurrentMod() != NULL && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
+        if (m_pGame->GetSystemState() == SystemState::GS_PLAYING_GAME && m_pModManager->IsLoaded() && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
             !m_pLocalGUI->GetMainMenu()->IsVisible() && !m_pLocalGUI->GetConsole()->IsVisible() && !m_pLocalGUI->IsChatBoxInputEnabled())
         {
             CChat* pChat = m_pLocalGUI->GetChat();
@@ -839,11 +835,7 @@ void CCore::ApplyHooks()
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
     // m_pDirect3DHookManager->ApplyHook ( );
-    // m_pFileSystemHook->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook();
-
-    // Redirect basic files.
-    // m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
@@ -1155,8 +1147,12 @@ CWebCoreInterface* CCore::GetWebCore()
 {
     if (m_pWebCore == nullptr)
     {
+        bool gpuEnabled;
+        auto cvars = g_pCore->GetCVars();
+        cvars->Get("browser_enable_gpu", gpuEnabled);
+
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise();
+        m_pWebCore->Initialise(gpuEnabled);
     }
     return m_pWebCore;
 }
@@ -1235,82 +1231,53 @@ void CCore::DoPostFramePulse()
         m_pGUI->SelectInputHandlers(INPUT_CORE);
     }
 
-    if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE
-    {
-        WatchDogCompletedSection("L2");            // gta_sa.set seems ok
-        WatchDogCompletedSection("L3");            // No hang on startup
-    }
-
     // This is the first frame in the menu?
-    if (m_pGame->GetSystemState() == 7)            // GS_FRONTEND
+    if (m_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
-        // Wait 250 frames more than the time it took to get status 7 (fade-out time)
-        static short WaitForMenu = 0;
+        if (m_menuFrame < 255)
+            ++m_menuFrame;
 
-        // Do crash dump encryption while the credit screen is displayed
-        if (WaitForMenu == 0)
+        if (m_menuFrame == 1)
+        {
+            WatchDogCompletedSection("L2");            // gta_sa.set seems ok
+            WatchDogCompletedSection("L3");            // No hang on startup
             HandleCrashDumpEncryption();
 
-        // Cope with early finish
-        if (m_pGame->HasCreditScreenFadedOut())
-            WaitForMenu = 250;
-
-        if (WaitForMenu >= 250)
-        {
-            if (m_bFirstFrame)
-            {
-                m_bFirstFrame = false;
-
-                // Disable vsync while it's all dark
-                m_pGame->DisableVSync();
-
-                // Parse the command line
-                // Does it begin with mtasa://?
-                if (m_szCommandLineArgs && strnicmp(m_szCommandLineArgs, "mtasa://", 8) == 0)
-                {
-                    SString strArguments = GetConnectCommandFromURI(m_szCommandLineArgs);
-                    // Run the connect command
-                    if (strArguments.length() > 0 && !m_pCommands->Execute(strArguments))
-                    {
-                        ShowMessageBox(_("Error") + _E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR);
-                    }
-                }
-                else
-                {
-                    // We want to load a mod?
-                    const char* szOptionValue;
-                    if (szOptionValue = GetCommandLineOption("l"))
-                    {
-                        // Try to load the mod
-                        if (!m_pModManager->Load(szOptionValue, m_szCommandLineArgs))
-                        {
-                            SString strTemp(_("Error running mod specified in command line ('%s')"), szOptionValue);
-                            ShowMessageBox(_("Error") + _E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR);            // Command line Mod load failed
-                        }
-                    }
-                    // We want to connect to a server?
-                    else if (szOptionValue = GetCommandLineOption("c"))
-                    {
-                        CCommandFuncs::Connect(szOptionValue);
-                    }
-                }
-            }
-        }
-        else
-        {
-            WaitForMenu++;
+            // Disable vsync while it's all dark
+            m_pGame->DisableVSync();
         }
 
-        if (m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
+        if (m_menuFrame >= 5 && !m_isNetworkReady && m_pNet->IsReady())
         {
-            if (m_uiNewNickWaitFrames > 75)
+            m_isNetworkReady = true;
+
+            // Parse the command line
+            // Does it begin with mtasa://?
+            if (m_szCommandLineArgs && strnicmp(m_szCommandLineArgs, "mtasa://", 8) == 0)
             {
-                // Request a new nickname if we're waiting for one
-                GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
-                m_bWaitToSetNick = false;
+                SString strArguments = GetConnectCommandFromURI(m_szCommandLineArgs);
+                // Run the connect command
+                if (strArguments.length() > 0 && !m_pCommands->Execute(strArguments))
+                {
+                    ShowMessageBox(_("Error") + _E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR);
+                }
             }
             else
-                m_uiNewNickWaitFrames++;
+            {
+                // We want to load a mod?
+                const char* szOptionValue;
+                if (szOptionValue = GetCommandLineOption("c"))
+                {
+                    CCommandFuncs::Connect(szOptionValue);
+                }
+            }
+        }
+
+        if (m_menuFrame >= 75 && m_requestNewNickname && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
+        {
+            // Request a new nickname if we're waiting for one
+            GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
+            m_requestNewNickname = false;
         }
     }
 
@@ -1787,34 +1754,62 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::OnPostColorFilterRender()
+{
+    if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+        return;
+    
+    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+    CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
+    CGraphics::GetSingleton().LeavingMTARenderZone();
+}
+
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
-    bool bValue;
-    CVARS_GET("process_dpi_aware", bValue);
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
+    bool aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
-    if (bValue)
-    {
-        // Minimum supported client for the function below is Windows Vista
-        // See also: https://technet.microsoft.com/en-us/evalcenter/dn469266(v=vs.90)
+    // The minimum supported client for the function below is Windows Vista (Longhorn).
+    // For more information, refer to the Microsoft Learn article:
+    // https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
+    if (aware)
         SetProcessDPIAware();
-    }
 #endif
 
-    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
-    {
-        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
-        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
-        std::string currentSkinName;
-        CVARS_GET("current_skin", currentSkinName);
+    int revision = GetApplicationSettingInt("reset-settings-revision");
 
-        if (currentSkinName == "Default")
-        {
+    // Users with the default skin will be switched to the 2023 version by replacing "Default" with "Default 2023".
+    // The "Default 2023" GUI skin was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+    if (revision && revision < 21486)
+    {
+        auto skin = CVARS_GET_VALUE<std::string>("current_skin");
+
+        if (skin == "Default")
             CVARS_SET("current_skin", "Default 2023");
-        }
 
         SetApplicationSettingInt("reset-settings-revision", 21486);
     }
+
+    HANDLE process = GetCurrentProcess();
+    const int priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
+    int priority = CVARS_GET_VALUE<int>("process_priority") % 3;
+
+    SetPriorityClass(process, priorities[priority]);
+
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+
+    if (!affinity)
+        return;
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //
@@ -1856,6 +1851,16 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
 
+    if (!IsConnected())
+        m_uiFrameRateLimit = m_CurrentRefreshRate;
+
+    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
+    if (m_uiFrameRateLimit == 0)
+    {
+        m_bQueuedFrameRateValid = false;
+        GetGraphStats()->RemoveTimingPoint("Limiter");
+    }
+
     // Print new limits to the console
     if (bLogToConsole)
     {
@@ -1872,6 +1877,12 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
 void CCore::SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit)
 {
     m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
+    RecalculateFrameRateLimit(-1, false);
+}
+
+void CCore::SetCurrentRefreshRate(uint value)
+{
+    m_CurrentRefreshRate = value;
     RecalculateFrameRateLimit(-1, false);
 }
 
@@ -1935,7 +1946,7 @@ void CCore::ApplyQueuedFrameRateLimit()
             double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
             if (dSpare <= 0.0)
                 break;
-            if (dSpare >= 2.0)
+            if (dSpare >= 10.0)
                 Sleep(1);
         }
         m_FrameRateTimer.Reset();
@@ -2010,22 +2021,6 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-
-    if (CGraphics::GetSingleton().HasLine3DPostFXQueueItems() || CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
-    {
-        /*
-            Although MTA render zones are expensive, we should use them twice in the bounds of the function
-            because some of render states from PostFX drain to the 2D part of the frame.
-        */
-        CGraphics::GetSingleton().EnteringMTARenderZone();
-
-        CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
-        CGraphics::GetSingleton().DrawLine3DPostFXQueue();
-
-        CGraphics::GetSingleton().LeavingMTARenderZone();
-    }
-
     CGraphics::GetSingleton().EnteringMTARenderZone();    
 
     // Maybe capture screen and other stuff
@@ -2184,11 +2179,6 @@ CModelCacheManager* CCore::GetModelCacheManager()
     return m_pModelCacheManager;
 }
 
-void CCore::AddModelToPersistentCache(ushort usModelId)
-{
-    return GetModelCacheManager()->AddModelToPersistentCache(usModelId);
-}
-
 void CCore::StaticIdleHandler()
 {
     g_pCore->IdleHandler();
@@ -2218,8 +2208,9 @@ void CCore::HandleIdlePulse()
         DoPreFramePulse();
         DoPostFramePulse();
     }
-    if (m_pModManager->GetCurrentMod())
-        m_pModManager->GetCurrentMod()->IdleHandler();
+
+    if (m_pModManager->IsLoaded())
+        m_pModManager->GetClient()->IdleHandler();
 }
 
 //

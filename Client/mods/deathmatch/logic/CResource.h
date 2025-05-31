@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.h
  *  PURPOSE:     Resource object class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,6 +15,7 @@
 #include "CClientEntity.h"
 #include "CResourceConfigItem.h"
 #include "CResourceFile.h"
+#include "CResourceModelStreamer.h"
 #include "CElementGroup.h"
 #include <list>
 
@@ -78,6 +79,8 @@ public:
     CClientEntity*       GetResourceTXDRoot() { return m_pResourceTXDRoot; };
     CClientEntity*       GetResourceIFPRoot() { return m_pResourceIFPRoot; };
     CClientEntity*       GetResourceIMGRoot() { return m_pResourceIMGRoot; };
+
+    CResourceModelStreamer* GetResourceModelStreamer() { return &m_modelStreamer; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void DeleteClientChildren();
@@ -145,4 +148,6 @@ private:
     CFastHashSet<SString>                 m_exportedFunctions;
     CElementGroup*                        m_pDefaultElementGroup;            // stores elements created by scripts in this resource
     std::list<SNoClientCacheScript>       m_NoClientCacheScriptList;
+
+    CResourceModelStreamer m_modelStreamer{};
 };

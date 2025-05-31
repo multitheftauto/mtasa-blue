@@ -5,12 +5,13 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaMarkerDefs.h
  *  PURPOSE:     Lua pickup definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 #include "CLuaDefs.h"
+#include "lua/CLuaMultiReturn.h"
 
 class CLuaMarkerDefs : public CLuaDefs
 {
@@ -35,4 +36,6 @@ public:
     LUA_DECLARE(SetMarkerColor);
     LUA_DECLARE(SetMarkerTarget);
     LUA_DECLARE(SetMarkerIcon);
+    static bool SetMarkerTargetArrowProperties(CMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size);
+    static std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> GetMarkerTargetArrowProperties(CMarker* marker) noexcept;
 };

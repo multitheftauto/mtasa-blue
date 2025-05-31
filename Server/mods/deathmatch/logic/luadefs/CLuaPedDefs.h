@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaPedDefs.h
  *  PURPOSE:     Lua ped definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -28,7 +28,7 @@ public:
 
     // Ped get functions
     LUA_DECLARE(CreatePed);
-    LUA_DECLARE(GetPedArmor);
+    static float GetPedArmor(CPed* const ped);
     LUA_DECLARE(GetPedRotation);
     LUA_DECLARE(IsPedChoking);
     LUA_DECLARE(IsPedDead);
@@ -53,9 +53,10 @@ public:
     LUA_DECLARE(IsPedInVehicle);
     LUA_DECLARE(GetPedAmmoInClip);
     LUA_DECLARE(GetPedTotalAmmo);
+    static bool IsPedReloadingWeapon(CPed* const ped) noexcept;
 
     // Ped set functions
-    LUA_DECLARE(SetPedArmor);
+    static bool SetPedArmor(CPed* const ped, const float armor);
     LUA_DECLARE(KillPed);
     LUA_DECLARE(SetPedRotation);
     LUA_DECLARE(SetPedStat);
@@ -71,12 +72,12 @@ public:
     LUA_DECLARE_OOP(WarpPedIntoVehicle);
     LUA_DECLARE(RemovePedFromVehicle);
     LUA_DECLARE(SetPedDoingGangDriveby);
-    LUA_DECLARE(SetPedAnimation);
+    static bool SetPedAnimation(CElement* pPed, std::optional<std::variant<std::string, std::monostate, bool>> blockName, std::optional<std::variant<std::string, std::monostate, bool>> animName, std::optional<int> time, std::optional<bool> loop, std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame, std::optional<int> blendTime, std::optional<bool> restoreTask);
     LUA_DECLARE(SetPedAnimationProgress);
     LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(SetPedOnFire);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);
-    LUA_DECLARE(reloadPedWeapon);
+    static bool ReloadPedWeapon(lua_State* vm, CPed* const ped) noexcept;
 };

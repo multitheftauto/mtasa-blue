@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CScriptDebugging.cpp
  *  PURPOSE:     Script debugging facility class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -146,13 +146,13 @@ void CScriptDebugging::PrintLog(const char* szText)
 void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel)
 {
     // Tell everyone we log to about it
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    auto uiRequiredDebugLevel = std::min(uiMinimumDebugLevel, 3u); // Make sure it doesn't skip outputDebugString with level 4
-    for (; iter != m_Players.end(); iter++)
+    for (const auto& pPlayer : m_Players)
     {
-        if ((*iter)->m_uiScriptDebugLevel >= uiRequiredDebugLevel)
+        bool sufficientDebugLevel = CheckForSufficientDebugLevel(pPlayer->m_uiScriptDebugLevel, uiMinimumDebugLevel);
+
+        if (sufficientDebugLevel)
         {
-            (*iter)->Send(Packet);
+            pPlayer->Send(Packet);
         }
     }
 }

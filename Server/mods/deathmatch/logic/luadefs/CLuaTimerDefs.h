@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaTimerDefs.h
  *  PURPOSE:     Lua function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,4 +24,6 @@ public:
     LUA_DECLARE(GetTimers);
     LUA_DECLARE(IsTimer);
     LUA_DECLARE(GetTimerDetails);
+    static bool IsTimerPaused(CLuaTimer* timer) noexcept;
+    static bool SetTimerPaused(lua_State* luaVM, CLuaTimer* timer, bool paused);
 };

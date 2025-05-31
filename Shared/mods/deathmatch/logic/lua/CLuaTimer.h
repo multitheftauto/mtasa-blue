@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaTimer.h
  *  PURPOSE:     Lua timer class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,7 +17,7 @@ class CLuaTimer;
 #include "lua/LuaCommon.h"
 #include "lua/CLuaArguments.h"
 
-#define LUA_TIMER_MIN_INTERVAL      0
+#define LUA_TIMER_MIN_INTERVAL 0
 
 class CLuaTimer
 {
@@ -35,6 +35,8 @@ public:
 
     unsigned int GetRepeats() const { return m_uiRepeats; };
     void         SetRepeats(unsigned int uiRepeats) { m_uiRepeats = uiRepeats; }
+    bool         IsPaused() const noexcept { return m_paused; };
+    void         SetPaused(bool paused);
 
     void ExecuteTimer(class CLuaMain* pLuaMain);
 
@@ -45,10 +47,12 @@ public:
     void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; }
 
 private:
+    bool            m_paused;
     CLuaFunctionRef m_iLuaFunction;
     CLuaArguments   m_Arguments;
     CTickCount      m_llStartTime;
     CTickCount      m_llDelay;
+    CTickCount      m_pausedRemainingTime;
     unsigned int    m_uiRepeats;
     uint            m_uiScriptID;
     SLuaDebugInfo   m_LuaDebugInfo;

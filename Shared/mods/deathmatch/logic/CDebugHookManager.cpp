@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        CDebugHookManager.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -654,12 +654,13 @@ bool CDebugHookManager::CallHook(const char* szName, const std::vector<SDebugHoo
         // Note: info could be invalid now
 
         // Check for skip option
-        if (returnValues.Count())
+        if (returnValues.IsNotEmpty())
         {
-            CLuaArgument* returnedValue = *returnValues.IterBegin();
+            CLuaArgument* returnedValue = *returnValues.begin();
             if (returnedValue->GetType() == LUA_TSTRING)
             {
-                if (returnedValue->GetString() == "skip")
+                // We don't want to skip the creation of new debug hooks
+                if (returnedValue->GetString() == "skip" && strcmp(szName, "addDebugHook"))
                     bSkip = true;
             }
         }

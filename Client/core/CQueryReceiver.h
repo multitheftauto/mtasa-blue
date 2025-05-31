@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Client/core/CQueryReceiver.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -16,6 +16,7 @@ struct SQueryInfo
     {
         containingInfo = false;
         port = 0;
+        isStatusVerified = true;
         isPassworded = false;
         serials = false;
         players = 0;
@@ -33,6 +34,7 @@ struct SQueryInfo
     SString gameType;
     SString mapName;
     SString versionText;
+    bool    isStatusVerified;
     bool    isPassworded;
     bool    serials;
     ushort  players;

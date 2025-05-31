@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CObjectSA.cpp
  *  PURPOSE:     Object entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,6 +15,7 @@
 #include "CPoolsSA.h"
 #include "CRopesSA.h"
 #include "CWorldSA.h"
+#include "CFireManagerSA.h"
 
 extern CGameSA* pGame;
 
@@ -145,18 +146,12 @@ CObjectSA::~CObjectSA()
         {
             pGame->GetRopes()->RemoveEntityRope(pInterface);
 
-            if ((DWORD)pInterface->vtbl != VTBL_CPlaceable)
+            if (!pInterface->IsPlaceableVTBL())
             {
                 CWorldSA* world = (CWorldSA*)pGame->GetWorld();
                 world->Remove(pInterface, CObject_Destructor);
 
-                DWORD dwFunc = pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
-                _asm
-                {
-                    mov     ecx, pInterface
-                    push    1            // delete too
-                    call    dwFunc
-                }
+                pInterface->Destructor(true);
             }
         }
 
@@ -232,22 +227,10 @@ float CObjectSA::GetHealth()
 void CObjectSA::SetModelIndex(unsigned long ulModel)
 {
     // Delete any existing RwObject first
-    DWORD dwFunc = GetInterface()->vtbl->DeleteRwObject;
-    DWORD dwThis = (DWORD)GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    GetInterface()->DeleteRwObject();
 
-    // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
-    dwFunc = GetInterface()->vtbl->SetModelIndex;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    ulModel
-        call    dwFunc
-    }
+    // Jax: I'm not sure if using the virtual method is right (as ped and vehicle dont), but it works
+    GetInterface()->SetModelIndex(ulModel);
 
     CheckForGangTag();
 }
@@ -303,4 +286,37 @@ CVector* CObjectSA::GetScale()
 void CObjectSA::ResetScale()
 {
     SetScale(1.0f, 1.0f, 1.0f);
+}
+
+bool CObjectSA::SetOnFire(bool onFire)
+{
+    CObjectSAInterface* objectInterface = GetObjectInterface();
+    if (onFire == !!objectInterface->pFire)
+        return false;
+
+    auto* fireManager = static_cast<CFireManagerSA*>(pGame->GetFireManager());
+
+    if (onFire)
+    {
+        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        if (!fire)
+            return false;
+
+        fire->SetTarget(this);
+        fire->SetStrength(1.0f);
+        fire->Ignite();
+        fire->SetNumGenerationsAllowed(0);
+
+        objectInterface->pFire = fire->GetInterface();
+    }
+    else
+    {
+        CFire* fire = fireManager->GetFire(objectInterface->pFire);
+        if (!fire)
+            return false;
+
+        fire->Extinguish();
+    }
+
+    return true;
 }

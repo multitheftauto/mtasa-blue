@@ -39,6 +39,7 @@
 #define Curl_dyn_uptr(a) curlx_dyn_uptr(a)
 #define Curl_dyn_len(a) curlx_dyn_len(a)
 #define Curl_dyn_reset(a) curlx_dyn_reset(a)
+#define Curl_dyn_take(a,b) curlx_dyn_take(a,b)
 #define Curl_dyn_tail(a,b) curlx_dyn_tail(a,b)
 #define Curl_dyn_setlen(a,b) curlx_dyn_setlen(a,b)
 #define curlx_dynbuf dynbuf /* for the struct name */
@@ -75,7 +76,13 @@ size_t Curl_dyn_len(const struct dynbuf *s);
 /* The implementation of this function exists in mprintf.c */
 int Curl_dyn_vprintf(struct dynbuf *dyn, const char *format, va_list ap_save);
 
+/* Take the buffer out of the dynbuf. Caller has ownership and
+ * dynbuf resets to initial state. */
+char *Curl_dyn_take(struct dynbuf *s, size_t *plen);
+
 /* Dynamic buffer max sizes */
+#define MAX_DYNBUF_SIZE (SIZE_T_MAX/2)
+
 #define DYN_DOH_RESPONSE    3000
 #define DYN_DOH_CNAME       256
 #define DYN_PAUSE_BUFFER    (64 * 1024 * 1024)
@@ -90,4 +97,6 @@ int Curl_dyn_vprintf(struct dynbuf *dyn, const char *format, va_list ap_save);
 #define DYN_PINGPPONG_CMD   (64*1024)
 #define DYN_IMAP_CMD        (64*1024)
 #define DYN_MQTT_RECV       (64*1024)
+#define DYN_MQTT_SEND       0xFFFFFFF
+#define DYN_CRLFILE_SIZE    (400*1024*1024) /* 400mb */
 #endif

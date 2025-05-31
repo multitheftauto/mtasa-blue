@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaMarkerDefs.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -12,6 +12,7 @@
 #include "CLuaMarkerDefs.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaMarkerDefs::LoadFunctions()
 {
@@ -26,6 +27,7 @@ void CLuaMarkerDefs::LoadFunctions()
         {"getMarkerColor", GetMarkerColor},
         {"getMarkerTarget", GetMarkerTarget},
         {"getMarkerIcon", GetMarkerIcon},
+        {"getMarkerTargetArrowProperties", ArgumentParser<GetMarkerTargetArrowProperties>},
 
         // Marker set functions
         {"setMarkerType", SetMarkerType},
@@ -33,6 +35,7 @@ void CLuaMarkerDefs::LoadFunctions()
         {"setMarkerColor", SetMarkerColor},
         {"setMarkerTarget", SetMarkerTarget},
         {"setMarkerIcon", SetMarkerIcon},
+        {"setMarkerTargetArrowProperties", ArgumentParser<SetMarkerTargetArrowProperties>},
     };
 
     // Add functions
@@ -76,6 +79,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
     SColorRGBA color(0, 0, 255, 255);
     SString    strType;
     CElement*  pVisibleTo;
+    bool       ignoreAlphaLimits;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
@@ -89,9 +93,12 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
     if (argStream.NextIsBool() || argStream.NextIsNil())
     {
         pVisibleTo = NULL;
+        argStream.m_iIndex++;
     }
     else
         argStream.ReadUserData(pVisibleTo, m_pRootElement);
+
+    argStream.ReadBool(ignoreAlphaLimits, false);
 
     if (!argStream.HasErrors())
     {
@@ -102,7 +109,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
             if (pResource)
             {
                 // Create it
-                CMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(pResource, vecPosition, strType, fSize, color, pVisibleTo);
+                CMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(pResource, vecPosition, strType, fSize, color, pVisibleTo, ignoreAlphaLimits);
                 if (pMarker)
                 {
                     CElementGroup* pGroup = pResource->GetElementGroup();
@@ -197,7 +204,12 @@ int CLuaMarkerDefs::GetMarkerColor(lua_State* luaVM)
             lua_pushnumber(luaVM, static_cast<lua_Number>(color.R));
             lua_pushnumber(luaVM, static_cast<lua_Number>(color.G));
             lua_pushnumber(luaVM, static_cast<lua_Number>(color.B));
-            lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
+
+            if (!pMarker->AreAlphaLimitsIgnored() && (pMarker->GetMarkerType() == CMarker::TYPE_CHECKPOINT || pMarker->GetMarkerType() == CMarker::TYPE_ARROW))
+                lua_pushnumber(luaVM, 255); // fake alpha
+            else
+                lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
+
             return 4;
         }
     }
@@ -409,4 +421,24 @@ int CLuaMarkerDefs::SetMarkerIcon(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size)
+{
+    SColor color;
+    color.R = r.value_or(255);
+    color.G = g.value_or(64);
+    color.B = b.value_or(64);
+    color.A = a.value_or(255);
+
+    return CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(marker, color, size.value_or(marker->GetSize() * 0.625f));
+}
+
+std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(CMarker* marker) noexcept
+{
+    if (!marker->HasTarget() || marker->GetMarkerType() != CMarker::TYPE_CHECKPOINT)
+        return false;
+
+    SColor color = marker->GetTargetArrowColor();
+    return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>(color.R, color.G, color.B, color.A, marker->GetTargetArrowSize());
 }

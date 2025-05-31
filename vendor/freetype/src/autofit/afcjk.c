@@ -4,7 +4,7 @@
  *
  *   Auto-fitter hinting routines for CJK writing system (body).
  *
- * Copyright (C) 2006-2023 by
+ * Copyright (C) 2006-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -1378,7 +1378,7 @@
   }
 
 
-  /* Initalize hinting engine. */
+  /* Initialize hinting engine. */
 
   FT_LOCAL_DEF( FT_Error )
   af_cjk_hints_init( AF_GlyphHints    hints,

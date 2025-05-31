@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CPlayerRPCs.cpp
  *  PURPOSE:     Player remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,6 +23,7 @@ void CPlayerRPCs::LoadFunctions()
     AddHandler(SET_PLAYER_NAMETAG_SHOWING, SetPlayerNametagShowing, "SetPlayerNametagShowing");
     AddHandler(SET_PLAYER_TEAM, SetPlayerTeam, "SetPlayerTeam");
     AddHandler(TAKE_PLAYER_SCREEN_SHOT, TakePlayerScreenShot, "TakePlayerScreenShot");
+    AddHandler(SET_PLAYER_SCRIPT_DEBUG_LEVEL, SetPlayerScriptDebugLevel, "SetPlayerScriptDebugLevel");
 }
 
 void CPlayerRPCs::SetPlayerMoney(NetBitStreamInterface& bitStream)
@@ -59,7 +60,7 @@ void CPlayerRPCs::ForcePlayerMap(NetBitStreamInterface& bitStream)
     if (bitStream.Read(ucVisible))
     {
         bool bVisible = (ucVisible == 1);
-        m_pClientGame->GetRadarMap()->SetForcedState(bVisible);
+        m_pClientGame->GetPlayerMap()->SetForcedState(bVisible);
     }
 }
 
@@ -167,4 +168,19 @@ void CPlayerRPCs::TakePlayerScreenShot(NetBitStreamInterface& bitStream)
         return;
 
     m_pClientGame->TakePlayerScreenShot(usSizeX, usSizeY, strTag, ucQuality, uiMaxBandwidth, usMaxPacketSize, pResource, uiServerSentTime);
+}
+
+void CPlayerRPCs::SetPlayerScriptDebugLevel(NetBitStreamInterface& stream)
+{
+    CClientPlayer* localPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
+
+    if (!localPlayer)
+        return;
+
+    std::uint8_t scriptDebugLevel;
+
+    if (!stream.Read(scriptDebugLevel))
+        return;
+
+    localPlayer->SetPlayerScriptDebugLevel(scriptDebugLevel);
 }

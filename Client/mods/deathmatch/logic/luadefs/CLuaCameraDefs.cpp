@@ -6,7 +6,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaCameraDefs.cpp
  *  PURPOSE:     Lua camera definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -41,6 +41,9 @@ void CLuaCameraDefs::LoadFunctions()
         {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
         {"setCameraDrunkLevel", ArgumentParserWarn<false, SetCameraDrunkLevel>},
+
+        {"shakeCamera", ArgumentParser<ShakeCamera>},
+        {"resetShakeCamera", ArgumentParser<ResetShakeCamera>},
     };
 
     // Add functions
@@ -542,4 +545,26 @@ int CLuaCameraDefs::OOP_SetCameraRotation(lua_State* luaVM)
 const SString& CLuaCameraDefs::GetElementType()
 {
     return m_pManager->GetCamera()->GetTypeName();
+}
+
+bool CLuaCameraDefs::ShakeCamera(float radius, std::optional<float> x, std::optional<float> y, std::optional<float> z) noexcept
+{
+    if (!x || !y || !z)
+    {
+        const auto* player = CStaticFunctionDefinitions::GetLocalPlayer();
+        CVector out;
+        player->GetPosition(out);
+        x = out.fX;
+        y = out.fY;
+        z = out.fZ;
+    }
+    m_pManager->GetCamera()->ShakeCamera(radius, *x, *y, *z);
+
+    return true;
+}
+
+bool CLuaCameraDefs::ResetShakeCamera() noexcept
+{
+    m_pManager->GetCamera()->ResetShakeCamera();
+    return true;
 }

@@ -5,7 +5,7 @@
  *  FILE:        core/CChat.h
  *  PURPOSE:     Header file for the chatbox class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -206,6 +206,8 @@ public:
     int           GetCharacterLimit() const { return m_iCharacterLimit; }
     constexpr int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
     constexpr int GetMaxCharacterLimit() const { return m_iMaxCharacterLimit; }
+
+    float GetChatBottomPosition() const noexcept;
 
 private:
     void LoadCVars();

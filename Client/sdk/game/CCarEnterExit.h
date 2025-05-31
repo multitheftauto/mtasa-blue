@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CCarEnterExit.h
  *  PURPOSE:     Car enter/exit handling interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,4 +23,6 @@ public:
                                             bool bCheckIfRoomToGetIn) = 0;
     virtual int  ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle) = 0;
     virtual bool IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown = 0) = 0;
+
+    virtual void GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, std::uint32_t door) const noexcept = 0;
 };

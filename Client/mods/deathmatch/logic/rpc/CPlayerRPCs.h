@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CPlayerRPCs.h
  *  PURPOSE:     Header for player RPC class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -27,4 +27,5 @@ public:
     DECLARE_ELEMENT_RPC(SetPlayerNametagShowing);
     DECLARE_ELEMENT_RPC(SetPlayerTeam);
     DECLARE_RPC(TakePlayerScreenShot);
+    DECLARE_RPC(SetPlayerScriptDebugLevel);
 };

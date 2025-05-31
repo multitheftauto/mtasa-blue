@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionDefs.Server.cpp
  *  PURPOSE:     Lua special server function definitions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -16,6 +16,7 @@
 #include "ASE.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CPerfStatManager.h"
+#include "CMapManager.h"
 
 #define MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
@@ -267,7 +268,7 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
                     }
 
                     Args.PushArguments(luaVM);
-                    uiArgCount = Args.Count();
+                    uiArgCount = static_cast<unsigned int>(Args.Count());
 
                     /* Don't output a table because although it is more consistent with the multiple values output below,
                     ** due to lua's implementation of associative arrays (assuming we use the "setting-name", "value" key-value pairs)
@@ -348,6 +349,12 @@ bool CLuaFunctionDefs::Shutdown(lua_State* luaVM, std::optional<std::string_view
 
     if (maybeExitCode.has_value())
         g_pServerInterface->GetModManager()->SetExitCode(maybeExitCode.value());
+
+    // Call event
+    CLuaArguments arguments;
+    arguments.PushResource(&resource);
+    arguments.PushString(reason.data());
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onShutdown", arguments);
 
     g_pGame->SetIsFinished(true);
     return true;

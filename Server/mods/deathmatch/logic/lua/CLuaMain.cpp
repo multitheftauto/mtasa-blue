@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaMain.cpp
  *  PURPOSE:     Lua virtual machine container class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -20,6 +20,7 @@
 #include "luadefs/CLuaACLDefs.h"
 #include "luadefs/CLuaBanDefs.h"
 #include "luadefs/CLuaBlipDefs.h"
+#include "luadefs/CLuaBuildingDefs.h"
 #include "luadefs/CLuaColShapeDefs.h"
 #include "luadefs/CLuaDatabaseDefs.h"
 #include "luadefs/CLuaMarkerDefs.h"
@@ -176,6 +177,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaACLDefs ::AddClass(luaVM);
     CLuaBanDefs ::AddClass(luaVM);
     CLuaBlipDefs ::AddClass(luaVM);
+    CLuaBuildingDefs ::AddClass(luaVM);
     CLuaColShapeDefs ::AddClass(luaVM);
     CLuaDatabaseDefs ::AddClass(luaVM);
     CLuaMarkerDefs ::AddClass(luaVM);
@@ -234,6 +236,9 @@ void CLuaMain::Initialize()
 
     lua_pushelement(m_luaVM, m_pResource->GetResourceRootElement());
     lua_setglobal(m_luaVM, "resourceRoot");
+
+    lua_pushstring(m_luaVM, m_pResource->GetName());
+    lua_setglobal(m_luaVM, "resourceName");
 }
 
 void CLuaMain::LoadEmbeddedScripts()
@@ -284,7 +289,7 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
     uint        uiSize;
     if (!g_pRealNetServer->DeobfuscateScript(cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename))
     {
-        SString strMessage("%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename);
+        SString strMessage("%s is invalid. Please re-compile at https://luac.multitheftauto.com/", *strNiceFilename);
         g_pGame->GetScriptDebugging()->LogError(m_luaVM, "Loading script failed: %s", *strMessage);
         return false;
     }

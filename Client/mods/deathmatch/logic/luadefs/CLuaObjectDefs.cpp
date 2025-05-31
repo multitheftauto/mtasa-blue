@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaObjectDefs.cpp
  *  PURPOSE:     Lua object definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -25,6 +25,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
         {"isObjectMoving", ArgumentParser<IsObjectMoving>},
+        {"isObjectRespawnable", ArgumentParser<IsObjectRespawnable>},
 
         // Object set funcs
         {"moveObject", MoveObject},
@@ -61,6 +62,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
     lua_classfunction(luaVM, "isMoving", "isObjectMoving");
+    lua_classfunction(luaVM, "isRespawnable", "isObjectRespawnable");
 
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
@@ -251,43 +253,43 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
 {
     //  float, float, float getObjectProperty ( object theObject, string property )
     CClientObject*  pObject;
-    eObjectProperty eProp;
+    ObjectProperty eProp;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pObject);
-    argStream.ReadEnumString(eProp, eObjectProperty::OBJECT_PROPERTY_MAX);
+    argStream.ReadEnumString(eProp, ObjectProperty::OBJECT_PROPERTY_MAX);
 
     if (!argStream.HasErrors())
     {
         switch (eProp)
         {
-            case OBJECT_PROPERTY_ALL:
+            case ObjectProperty::OBJECT_PROPERTY_ALL:
             {
                 lua_newtable(luaVM);
 
                 lua_pushnumber(luaVM, pObject->GetMass());
-                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_MASS));
+                lua_setfield(luaVM, -2, EnumToString(ObjectProperty::OBJECT_PROPERTY_MASS));
 
                 lua_pushnumber(luaVM, pObject->GetTurnMass());
-                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_TURNMASS));
+                lua_setfield(luaVM, -2, EnumToString(ObjectProperty::OBJECT_PROPERTY_TURNMASS));
 
                 lua_pushnumber(luaVM, pObject->GetAirResistance());
-                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_TURNMASS));
+                lua_setfield(luaVM, -2, EnumToString(ObjectProperty::OBJECT_PROPERTY_AIRRESISTANCE));
 
                 lua_pushnumber(luaVM, pObject->GetElasticity());
-                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_ELASTICITY));
+                lua_setfield(luaVM, -2, EnumToString(ObjectProperty::OBJECT_PROPERTY_ELASTICITY));
 
                 CVector vecCenter;
                 pObject->GetCenterOfMass(vecCenter);
                 lua_pushvector(luaVM, vecCenter);
-                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_CENTEROFMASS));
+                lua_setfield(luaVM, -2, EnumToString(ObjectProperty::OBJECT_PROPERTY_CENTEROFMASS));
 
                 lua_pushnumber(luaVM, pObject->GetBuoyancyConstant());
-                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_BUOYANCY));
+                lua_setfield(luaVM, -2, EnumToString(ObjectProperty::OBJECT_PROPERTY_BUOYANCY));
                 return 1;
                 break;
             }
-            case OBJECT_PROPERTY_MASS:
+            case ObjectProperty::OBJECT_PROPERTY_MASS:
             {
                 float fMass;
                 if (CStaticFunctionDefinitions::GetObjectMass(*pObject, fMass))
@@ -297,7 +299,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_TURNMASS:
+            case ObjectProperty::OBJECT_PROPERTY_TURNMASS:
             {
                 float fTurnMass;
                 if (CStaticFunctionDefinitions::GetObjectTurnMass(*pObject, fTurnMass))
@@ -307,7 +309,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_AIRRESISTANCE:
+            case ObjectProperty::OBJECT_PROPERTY_AIRRESISTANCE:
             {
                 float fAirResistance;
                 if (CStaticFunctionDefinitions::GetObjectAirResistance(*pObject, fAirResistance))
@@ -317,7 +319,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_ELASTICITY:
+            case ObjectProperty::OBJECT_PROPERTY_ELASTICITY:
             {
                 float fElasticity;
                 if (CStaticFunctionDefinitions::GetObjectElasticity(*pObject, fElasticity))
@@ -327,7 +329,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_CENTEROFMASS:
+            case ObjectProperty::OBJECT_PROPERTY_CENTEROFMASS:
             {
                 CVector vecCenterOfMass;
                 if (CStaticFunctionDefinitions::GetObjectCenterOfMass(*pObject, vecCenterOfMass))
@@ -339,7 +341,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_BUOYANCY:
+            case ObjectProperty::OBJECT_PROPERTY_BUOYANCY:
             {
                 float fBuoyancyConstant;
                 if (CStaticFunctionDefinitions::GetObjectBuoyancyConstant(*pObject, fBuoyancyConstant))
@@ -609,13 +611,13 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
 {
     //  bool setObjectProperty ( object theObject, string property, ... )
     CClientEntity*  pEntity;
-    eObjectProperty eProp;
+    ObjectProperty eProp;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadEnumString(eProp);
 
-    if (!argStream.HasErrors() && eProp == OBJECT_PROPERTY_ALL)
+    if (!argStream.HasErrors() && eProp == ObjectProperty::OBJECT_PROPERTY_ALL)
     {
         argStream.SetTypeError(GetEnumTypeName(eProp), 2);
     }
@@ -624,7 +626,7 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
     {
         switch (eProp)
         {
-            case OBJECT_PROPERTY_MASS:
+            case ObjectProperty::OBJECT_PROPERTY_MASS:
             {
                 float fMass;
                 argStream.ReadNumber(fMass);
@@ -635,7 +637,7 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_TURNMASS:
+            case ObjectProperty::OBJECT_PROPERTY_TURNMASS:
             {
                 float fTurnMass;
                 argStream.ReadNumber(fTurnMass);
@@ -646,7 +648,7 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_AIRRESISTANCE:
+            case ObjectProperty::OBJECT_PROPERTY_AIRRESISTANCE:
             {
                 float fAirResistance;
                 argStream.ReadNumber(fAirResistance);
@@ -657,7 +659,7 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_ELASTICITY:
+            case ObjectProperty::OBJECT_PROPERTY_ELASTICITY:
             {
                 float fElasticity;
                 argStream.ReadNumber(fElasticity);
@@ -668,7 +670,7 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_CENTEROFMASS:
+            case ObjectProperty::OBJECT_PROPERTY_CENTEROFMASS:
             {
                 CVector vecCenterOfMass;
                 if (argStream.NextIsVector3D())
@@ -688,7 +690,7 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
                 }
                 break;
             }
-            case OBJECT_PROPERTY_BUOYANCY:
+            case ObjectProperty::OBJECT_PROPERTY_BUOYANCY:
             {
                 float fBuoyancyConstant;
                 argStream.ReadNumber(fBuoyancyConstant);
@@ -706,4 +708,16 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaObjectDefs::IsObjectRespawnable(CClientEntity* const pEntity) noexcept
+{
+    if (!IS_OBJECT(pEntity))
+        return false;
+
+    auto* pObject = static_cast<CDeathmatchObject*>(pEntity);
+    if (!pObject)
+        return false;
+
+    return pObject->IsRespawnEnabled();
 }

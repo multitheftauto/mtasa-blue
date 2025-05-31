@@ -5,7 +5,7 @@
  *  FILE:        core/CServerList.cpp
  *  PURPOSE:     Master server list querying
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -514,6 +514,7 @@ bool CServerListItem::ParseQuery()
     if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_LIST) == false)
         vecPlayers = info.playersPool;
 
+    isStatusVerified = info.isStatusVerified;
     bScanned = true;
 
     PostChange();

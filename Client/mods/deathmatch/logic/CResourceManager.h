@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceManager.h
  *  PURPOSE:     Header for resource manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -54,7 +54,7 @@ public:
     void                   ValidateResourceFile(const SString& strFilename, const char* buffer, size_t bufferSize);
     CDownloadableResource* GetDownloadableResourceFile(const SString& strFilename) { return MapFindRef(m_ResourceFileMap, strFilename); }
 
-    static bool ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr);
+    static bool ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr, bool bPassSize = false);
 
 private:
     CMappedList<CResource*>                   m_resources;

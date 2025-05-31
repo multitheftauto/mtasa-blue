@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceChecker.cpp
  *  PURPOSE:     Resource file content checker/validator/upgrader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,6 +13,8 @@
 #include "CResourceChecker.h"
 #include "CResourceChecker.Data.h"
 #include "CResource.h"
+#include "CMainConfig.h"
+#include "CGame.h"
 #include "CLogger.h"
 #include "CStaticFunctionDefinitions.h"
 #include <core/CServerInterface.h>
@@ -28,6 +30,7 @@
 
 extern CNetServer*       g_pRealNetServer;
 extern CServerInterface* g_pServerInterface;
+extern CGame*            g_pGame;
 
 ///////////////////////////////////////////////////////////////
 //
@@ -47,6 +50,9 @@ void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string
 
     m_ulDeprecatedWarningCount = 0;
     m_upgradedFullPathList.clear();
+
+    // Checking certain resource client files is optional
+    bool checkResourceClientFiles = g_pGame->GetConfig()->IsCheckResourceClientFilesEnabled();
 
     // Check each file in the resource
     std::list<CResourceFile*>::iterator iterf = pResource->IterBegin();
@@ -73,7 +79,7 @@ void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string
                     bScript = true;
                     bClient = true;
                 }
-                else if (type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
+                else if (type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE && checkResourceClientFiles)
                 {
                     bScript = false;
                     bClient = true;
@@ -361,16 +367,25 @@ void CResourceChecker::CheckMetaSourceForIssues(CXMLNode* pRootNode, const strin
             attributes.Delete("client");
             attributes.Delete("both");
 
-            if (!m_strReqServerVersion.empty())
+            // Use "both" if client and server versions are the same
+            if (!m_strReqServerVersion.empty() && !m_strReqClientVersion.empty() && m_strReqServerVersion == m_strReqClientVersion)
             {
-                CXMLAttribute* pAttr = attributes.Create("server");
+                CXMLAttribute* pAttr = attributes.Create("both");
                 pAttr->SetValue(m_strReqServerVersion);
             }
-
-            if (!m_strReqClientVersion.empty())
+            else
             {
-                CXMLAttribute* pAttr = attributes.Create("client");
-                pAttr->SetValue(m_strReqClientVersion);
+                if (!m_strReqServerVersion.empty())
+                {
+                    CXMLAttribute* pAttr = attributes.Create("server");
+                    pAttr->SetValue(m_strReqServerVersion);
+                }
+
+                if (!m_strReqClientVersion.empty())
+                {
+                    CXMLAttribute* pAttr = attributes.Create("client");
+                    pAttr->SetValue(m_strReqClientVersion);
+                }
             }
 
             if (pbOutHasChanged)
@@ -453,7 +468,7 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
         if (bClientScript && IsLuaCompiledScript(strFileContents.c_str(), strFileContents.length()))
         {
             // Compiled client script with no version info
-            SString strMessage("%s is invalid. Please re-compile at http://luac.mtasa.com/", strFileName.c_str());
+            SString strMessage("%s is invalid. Please re-compile at https://luac.multitheftauto.com/", strFileName.c_str());
             CLogger::LogPrint(SString("ERROR: %s %s\n", strResourceName.c_str(), *strMessage));
         }
         return false;
@@ -490,14 +505,12 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
 // CResourceChecker::CheckLuaSourceForIssues
 //
 // Look for function names not in comment blocks
-// Note: Ignores quotes
+// Note: Ignores function calls from evaluated expressions, like `(getPlayerName)(...)`.
 //
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string& strFileName, const string& strResourceName, bool bClientScript,
                                                bool bCompiledScript, ECheckerModeType checkerMode, string* pstrOutResult)
 {
-    CHashMap<SString, long> doneWarningMap;
-    long                    lLineNumber = 1;
     // Check if this is a UTF-8 script
     bool bUTF8 = IsUTF8BOM(strLuaSource.c_str(), strLuaSource.length());
 
@@ -527,147 +540,439 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
             if (checkerMode == ECheckerMode::WARNINGS)
             {
                 m_ulDeprecatedWarningCount++;
-                CLogger::LogPrintf("WARNING: %s/%s [%s] is encoded in ANSI instead of UTF-8.  Please convert your file to UTF-8.\n", strResourceName.c_str(),
-                                   strFileName.c_str(), bClientScript ? "Client" : "Server");
+                CLogger::LogPrintf("WARNING: %s/%s [%s] is encoded in ANSI instead of UTF-8.  Please convert your file to UTF-8.\n", 
+                                 strResourceName.c_str(), strFileName.c_str(), bClientScript ? "Client" : "Server");
             }
         }
     }
 
-    // Step through each identifier in the file.
-    for (long lPos = 0; lPos < (long)strLuaSource.length(); lPos++)
+    auto begin = reinterpret_cast<const unsigned char*>(strLuaSource.data());
+    auto end = begin + strLuaSource.length();
+    auto current = begin;
+    auto line = 1ul;
+
+    enum class Token
     {
-        long lNameLength;
-        long lNameOffset = FindLuaIdentifier(strLuaSource.c_str() + lPos, &lNameLength, &lLineNumber);
+        NONE,
+        COMMENT_SHORT,
+        COMMENT_LONG,
+        STRING_LONG,
+    };
 
-        if (lNameOffset == -1)
-            break;
+    auto token = Token::NONE;
+    auto tokenLevel = 0;
+    auto tokenLine = 0ul;
+    auto tokenContent = std::string_view{};
 
-        lNameOffset += lPos;                         // Make offset absolute from the start of the file
-        lPos = lNameOffset + lNameLength;            // Adjust so the next pass starts from just after this identifier
+    unsigned long    lastIdentifierLine{};
+    std::string_view lastIdentifier{};
+    std::string_view lastKeyword{};
 
-        string strIdentifierName(strLuaSource.c_str() + lNameOffset, lNameLength);
+    std::unordered_set<std::string> doneWarnings;
 
-        // In-place upgrade...
+    const auto processLastIdentifier = [&]()
+    {
+        std::string oldName{lastIdentifier};
+
         if (checkerMode == ECheckerMode::UPGRADE)
         {
             assert(!bCompiledScript);
 
-            string strUpgraded;
-            if (UpgradeLuaFunctionName(strIdentifierName, bClientScript, strUpgraded))
-            {
-                // Old head
-                string strHead(strLuaSource.c_str(), lNameOffset);
-                // Old tail
-                string strTail(strLuaSource.c_str() + lNameOffset + lNameLength);
-                // New source
-                strLuaSource = strHead + strUpgraded + strTail;
+            std::string newName;
 
-                lPos += -lNameLength + strUpgraded.length();
+            if (UpgradeLuaFunctionName(oldName, bClientScript, newName))
+            {
+                const auto diff = static_cast<ptrdiff_t>(newName.length()) - static_cast<ptrdiff_t>(oldName.length());
+
+                if (!diff)
+                {
+                    const size_t offset = lastIdentifier.data() - reinterpret_cast<const char*>(begin);
+                    std::copy_n(newName.begin(), newName.length(), strLuaSource.data() + offset);
+                }
+                else
+                {
+                    const size_t      position = current - begin;
+                    const size_t      offset = lastIdentifier.data() - reinterpret_cast<const char*>(begin);
+                    const std::string tail = strLuaSource.substr(offset + lastIdentifier.length());
+
+                    if (diff > 0)
+                        strLuaSource.reserve(offset + newName.length() + tail.length());
+
+                    strLuaSource.resize(offset);
+                    strLuaSource.append(newName);
+                    strLuaSource.append(tail);
+
+                    begin = reinterpret_cast<const unsigned char*>(strLuaSource.data());
+                    end = begin + strLuaSource.length();
+                    current = begin + position;
+                }
             }
-            CheckVersionRequirements(strIdentifierName, bClientScript);
+
+            CheckVersionRequirements(oldName, bClientScript);
         }
 
         // Log warnings...
         if (checkerMode == ECheckerMode::WARNINGS)
         {
-            // Only do the identifier once per file
-            if (doneWarningMap.find(strIdentifierName) == doneWarningMap.end())
+            std::string key = oldName + ":" + std::to_string(lastIdentifierLine);
+
+            if (doneWarnings.find(key) == doneWarnings.end())
             {
-                doneWarningMap[strIdentifierName] = 1;
-                if (!bCompiledScript)            // Don't issue deprecated function warnings if the script is compiled, because we can't upgrade it
-                    IssueLuaFunctionNameWarnings(strIdentifierName, strFileName, strResourceName, bClientScript, lLineNumber);
-                CheckVersionRequirements(strIdentifierName, bClientScript);
+                doneWarnings.insert(key);
+
+                if (!bCompiledScript)
+                {
+                    IssueLuaFunctionNameWarnings(oldName, strFileName, strResourceName, bClientScript, lastIdentifierLine);
+                }
+
+                CheckVersionRequirements(oldName, bClientScript);
             }
         }
+
+        lastIdentifierLine = {};
+        lastIdentifier = {};
+        lastKeyword = {};
+    };
+
+    const auto processStringLiteral = [&]()
+    {
+        if (tokenContent.length() > 3 && tokenContent.length() <= MAPEVENT_MAX_LENGTH_NAME)
+        {
+            if (tokenContent[0] == 'o' && tokenContent[1] == 'n' && tokenContent[2] >= 'A' && tokenContent[2] <= 'Z')
+            {
+                // A string literal that matches "^on[A-Z]" and is not longer than MAPEVENT_MAX_LENGTH_NAME, could be an event name.
+                lastIdentifier = tokenContent;
+                lastIdentifierLine = tokenLine;
+                processLastIdentifier();
+            }
+        }
+
+        tokenContent = {};
+        tokenLine = {};
+    };
+
+    const auto isKeyword = [](const std::string_view keyword) -> bool
+    {
+        // In Lua 5.1, the shortest keyword is 2 and the longest 8 characters long.
+        if (keyword.length() < 2 || keyword.length() > 8)
+            return false;
+
+        switch (keyword[0])
+        {
+            case 'a':
+                return keyword == "and";
+            case 'b':
+                return keyword == "break";
+            case 'd':
+                return keyword == "do";
+            case 'e':
+                return keyword == "else" || keyword == "elseif" || keyword == "end";
+            case 'f':
+                return keyword == "false" || keyword == "for" || keyword == "function";
+            case 'i':
+                return keyword == "if" || keyword == "in";
+            case 'l':
+                return keyword == "local";
+            case 'n':
+                return keyword == "nil" || keyword == "not";
+            case 'o':
+                return keyword == "or";
+            case 'r':
+                return keyword == "repeat" || keyword == "return";
+            case 't':
+                return keyword == "then" || keyword == "true";
+            case 'u':
+                return keyword == "until";
+            case 'w':
+                return keyword == "while";
+            default:
+                break;
+        }
+
+        return false;
+    };
+
+    while (current < end)
+    {
+        unsigned char first = *current;
+        unsigned char second = ((current + 1) < end) ? *(current + 1) : '\0';
+
+        // Handle new line characters.
+        if (first == '\r' && second == '\n')
+        {
+            current += 2;
+            line += 1;
+            if (token == Token::COMMENT_SHORT)
+                token = Token::NONE;
+            continue;
+        }
+        if (first == '\n' || first == '\r')
+        {
+            current += 1;
+            line += 1;
+            if (token == Token::COMMENT_SHORT)
+                token = Token::NONE;
+            continue;
+        }
+
+        // Ignore whitespace.
+        if (isspace(static_cast<int>(first)))
+        {
+            current += isspace(static_cast<int>(second)) ? 2 : 1;
+            continue;
+        }
+
+        // Handle continuing short comments.
+        if (token == Token::COMMENT_SHORT)
+        {
+            current += 1;
+            continue;
+        }
+
+        // Handle ending both long comments and long string literals.
+        if (token == Token::COMMENT_LONG || token == Token::STRING_LONG)
+        {
+            if (first == ']' && second == ']' && tokenLevel == 0)
+            {
+                // Ending one of:
+                // - a long comment        of level 0: "--[[ ... ]]"
+                // - a long string literal of level 0:   "[[ ... ]]"
+
+                if (token == Token::STRING_LONG)
+                {
+                    const size_t length = reinterpret_cast<const char*>(current) - tokenContent.data();
+                    tokenContent = std::string_view{tokenContent.data(), length};
+                    processStringLiteral();
+                }
+
+                token = Token::NONE;
+                current += 2;
+                continue;
+            }
+
+            if (first == ']' && second == '=' && tokenLevel > 0)            // Maybe close a long comment of level 1 and above: "]=]" or "]==]" or ...
+            {
+                const unsigned char* start = current + 1;
+                const unsigned char* equals = start + 1;
+                Token                before = token;
+
+                while (equals < end)
+                {
+                    if (*equals == '=')
+                    {
+                        equals += 1;
+                        continue;
+                    }
+
+                    if (*equals == ']')
+                    {
+                        if (tokenLevel == (equals - start))
+                        {
+                            token = Token::NONE;
+                            tokenLevel = 0;
+                        }
+
+                        equals += 1;
+                    }
+
+                    break;
+                }
+
+                // Ending one of:
+                // - a long comment        of level 1 and above: "--[=[ ... ]=]" or "--[==[ ... ]==]" or ...
+                // - a long string literal of level 1 and above:   "[=[ ... ]=]" or   "[==[ ... ]==]" or ...
+                if (token == Token::NONE && before == Token::STRING_LONG)
+                {
+                    const size_t length = reinterpret_cast<const char*>(current) - tokenContent.data();
+                    tokenContent = std::string_view{tokenContent.data(), length};
+                    processStringLiteral();
+                }
+
+                current = equals;
+                continue;
+            }
+
+            current += 1;
+            continue;
+        }
+
+        // Handle starting comments.
+        if (first == '-' && second == '-')
+        {
+            current += 2;
+            token = Token::COMMENT_SHORT;
+            tokenLevel = 0;
+            tokenLine = line;
+            // We handle long comments in the block below.
+            first = (current < end) ? *current : '\0';
+            second = ((current + 1) < end) ? *(current + 1) : '\0';
+        }
+
+        // Handle both starting long comments and starting long string literals.
+        if (first == '[' && second == '[')
+        {
+            // Opening one of:
+            // - a long comment        of level 0: "--[[ ... ]]"
+            // - a long string literal of level 0:   "[[ ... ]]"
+            token = (token == Token::COMMENT_SHORT) ? Token::COMMENT_LONG : Token::STRING_LONG;
+            tokenLine = line;
+            tokenContent = std::string_view{reinterpret_cast<const char*>(current + 2), 0};
+            current += 2;
+
+            if (token == Token::STRING_LONG && !lastIdentifier.empty())
+            {
+                // We are calling a function with a string: foo [[...]]
+                processLastIdentifier();
+            }
+            continue;
+        }
+        else if (first == '[' && second == '=')
+        {
+            const unsigned char* start = current + 1;
+            const unsigned char* equals = start + 1;
+
+            while (equals < end)
+            {
+                if (*equals == '=')
+                {
+                    equals += 1;
+                    continue;
+                }
+
+                if (*equals == '[')
+                {
+                    // Opening one of:
+                    // - a long comment        of level 1 and above: "--[=[ ... ]=]" or "--[==[ ... ]==]" or ...
+                    // - a long string literal of level 1 and above:   "[=[ ... ]=]" or   "[==[ ... ]==]" or ...
+                    token = (token == Token::COMMENT_SHORT) ? Token::COMMENT_LONG : Token::STRING_LONG;
+                    tokenLevel = equals - start;
+                    tokenLine = line;
+                    tokenContent = std::string_view{reinterpret_cast<const char*>(equals + 1), 0};
+                    equals += 1;
+                }
+
+                break;
+            }
+
+            if (token == Token::STRING_LONG && !lastIdentifier.empty())
+            {
+                // We are calling a function with a string: foo [===[...]===]
+                processLastIdentifier();
+            }
+
+            current = equals;
+            continue;
+        }
+        else if (token == Token::COMMENT_SHORT)
+        {
+            // Unfortunately, we didn't start a long comment.
+            tokenContent = std::string_view{reinterpret_cast<const char*>(current), 0};
+            continue;
+        }
+
+        // Handle short string literals.
+        if (first == '"' || first == '\'')
+        {
+            if (!lastIdentifier.empty())
+            {
+                // We are calling a function with a string: foo "..."  or  foo '...'
+                processLastIdentifier();
+            }
+
+            const unsigned char* pos = current + 1;
+
+            while (pos < end)
+            {
+                if (*pos == '\\' && (pos + 1) < end)
+                {
+                    pos += 2;
+                    continue;
+                }
+
+                if (*pos == '\n')
+                {
+                    // Line breaks are not allowed in string literals, but the script might contain errors.
+                    break;
+                }
+
+                if (*pos != first)
+                {
+                    pos += 1;
+                    continue;
+                }
+
+                pos += 1;
+                break;
+            }
+
+            if (const size_t length = pos - current; length > 2)
+            {
+                std::string_view literal(reinterpret_cast<const char*>(current + 1), length - 2);            // Do not include surrounding quotes.
+                tokenContent = literal;
+                tokenLine = line;
+                processStringLiteral();
+            }
+
+            current = pos;
+            continue;
+        }
+
+        // Handle identifiers.
+        if (isalpha(static_cast<int>(first)) || first == '_')
+        {
+            const unsigned char* pos = current + 1;
+
+            while (pos < end)
+            {
+                if (isalnum(*pos) || *pos == '_' || *pos == '.')
+                {
+                    pos += 1;
+                    continue;
+                }
+
+                break;
+            }
+
+            std::string_view identifier(reinterpret_cast<const char*>(current), pos - current);
+
+            if (isKeyword(identifier))
+            {
+                lastKeyword = identifier;
+                lastIdentifierLine = {};
+                lastIdentifier = {};
+            }
+            else
+            {
+                lastIdentifierLine = line;
+                lastIdentifier = identifier;
+            }
+
+            current = pos;
+            continue;
+        }
+
+        // We want to keep the last keyword, if we define/call table functions with syntax sugar: function foo:bar() ... end
+        if (first == ':' && !lastKeyword.empty())
+        {
+            current += 1;
+            continue;
+        }
+        
+        // We are calling a function with several arguments or with a table: foo (...)  or  foo {...}
+        if ((first == '(' && lastKeyword != "function") || first == '{')
+        {
+            if (!lastIdentifier.empty())
+                processLastIdentifier();
+        }
+
+        lastIdentifierLine = {};
+        lastIdentifier = {};
+        lastKeyword = {};
+        current += 1;
     }
 
     if (pstrOutResult)
         *pstrOutResult = strLuaSource;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CResourceChecker::FindLuaIdentifier
-//
-// Finds the first identifier in a zero terminated character string.
-// Returns an offset to the identifier if found, and puts its length in plOutLength.
-// Returns -1 if no identifier could be found.
-//
-///////////////////////////////////////////////////////////////
-long CResourceChecker::FindLuaIdentifier(const char* szLuaSource, long* plOutLength, long* plLineNumber)
-{
-    bool bBlockComment = false;
-    bool bLineComment = false;
-    long lStartOfName = -1;
-    bool bPrevIsNonIdent = true;
-
-    // Search the string for function names
-    for (long lPos = 0; szLuaSource[lPos]; lPos++)
-    {
-        const char*   pBufPos = szLuaSource + lPos;
-        unsigned char c = *pBufPos;
-
-        // Handle comments
-        if (c == '-' && strncmp(pBufPos, "--[[", 4) == 0)
-        {
-            if (!bLineComment)
-            {
-                bBlockComment = true;
-                lPos += 3;
-                continue;
-            }
-        }
-        if (c == ']' && strncmp(pBufPos, "]]", 2) == 0)
-        {
-            bBlockComment = false;
-            lPos += 1;
-            continue;
-        }
-        if (c == '-' && strncmp(pBufPos, "--", 2) == 0)
-        {
-            bLineComment = true;
-        }
-        if (c == '\n' || c == '\r')
-        {
-            bLineComment = false;
-        }
-        if (c == '\n')
-        {
-            if (plLineNumber)
-                (*plLineNumber)++;
-        }
-
-        if (bLineComment || bBlockComment)
-            continue;
-
-        // Look for identifier
-        bool bIsFirstIdent = (isalpha(c) || c == '_' || c == '$' || c == '.' || c == ':');
-        bool bIsMidIdent = (isdigit(c) || bIsFirstIdent);
-        bool bIsNonIdent = !bIsMidIdent;
-
-        // Identifier start is bIsNonIdent followed by a bIsFirstIdent
-        // Identifier end   is bIsMidIdent followed by a bIsNonIdent
-        if (lStartOfName == -1)
-        {
-            if (bIsFirstIdent)
-            {
-                if (lPos == 0 || bPrevIsNonIdent)
-                    lStartOfName = lPos;            // Start of identifier
-            }
-        }
-        else
-        {
-            if (!bIsMidIdent)
-            {
-                *plOutLength = lPos - lStartOfName;            // End of identifier
-                return lStartOfName;
-            }
-        }
-
-        bPrevIsNonIdent = bIsNonIdent;
-    }
-
-    return -1;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -705,7 +1010,6 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
     string           strHow;
     CMtaVersion      strVersion;
     ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo(strFunctionName, bClientScript, strHow, strVersion);
-
     if (what == ECheckerWhat::NONE)
         return;
 
@@ -725,7 +1029,6 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
         strTemp.Format("%s %s because <min_mta_version> %s setting in meta.xml is below %s", strFunctionName.c_str(), strHow.c_str(),
                        bClientScript ? "Client" : "Server", strVersion.c_str());
     }
-
     CLogger::LogPrint(SString("WARNING: %s/%s(Line %lu) [%s] %s\n", strResourceName.c_str(), strFileName.c_str(), ulLineNumber,
                               bClientScript ? "Client" : "Server", *strTemp));
 }
@@ -742,18 +1045,16 @@ ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& s
 {
     static CHashMap<SString, SDeprecatedItem*> clientUpgradeInfoMap;
     static CHashMap<SString, SDeprecatedItem*> serverUpgradeInfoMap;
-
     if (clientUpgradeInfoMap.size() == 0)
     {
         // Make maps to speed things up
         for (uint i = 0; i < NUMELMS(clientDeprecatedList); i++)
             clientUpgradeInfoMap[clientDeprecatedList[i].strOldName] = &clientDeprecatedList[i];
-
         for (uint i = 0; i < NUMELMS(serverDeprecatedList); i++)
             serverUpgradeInfoMap[serverDeprecatedList[i].strOldName] = &serverDeprecatedList[i];
     }
 
-    // Query the correct map
+    // Query the correct map with the cleaned function name
     SDeprecatedItem* pItem = MapFindRef(bClientScript ? clientUpgradeInfoMap : serverUpgradeInfoMap, strFunctionName);
     if (!pItem)
         return ECheckerWhat::NONE;            // Nothing found
@@ -844,7 +1145,7 @@ bool CResourceChecker::RenameBackupFile(const string& strOrigFilename, const str
 //
 // CResourceChecker::ReplaceFilesInZIP
 //
-// Based on example at http://www.winimage.com/zLibDll/minizip.html
+// Based on example at https://www.winimage.com/zLibDll/minizip.html
 // by Ivan A. Krestinin
 //
 ///////////////////////////////////////////////////////////////

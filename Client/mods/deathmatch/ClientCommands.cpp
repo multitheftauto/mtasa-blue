@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/ClientCommands.cpp
  *  PURPOSE:     Client commands handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -29,7 +29,7 @@ using std::vector;
 
 extern CClientGame* g_pClientGame;
 
-bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind)
+bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind, bool bAllowScriptedBind)
 {
     // Has the core already handled this command?
     if (!bHandled)
@@ -60,9 +60,9 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
         g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments);
 
         // Call the onClientConsole event
-        auto pLocalPlayer = g_pClientGame->GetLocalPlayer();
+        CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
 
-        if (pLocalPlayer)
+        if (localPlayer != nullptr)
         {
             CLuaArguments Arguments;
 
@@ -76,7 +76,7 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
                 Arguments.PushString(strClumpedCommand);
             }
 
-            pLocalPlayer->CallEvent("onClientConsole", Arguments, true);
+            localPlayer->CallEvent("onClientConsole", Arguments, true);
         }
 
         // Write the chatlength and the content
@@ -95,8 +95,20 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
     }
     else
     {
-        // Call our comand-handlers for core-executed commands too
-        g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments);
+        CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
+
+        if (localPlayer != nullptr)
+        {
+            // Call the onClientCoreCommand event
+            CLuaArguments Arguments;
+            Arguments.PushString(szCommand);
+
+            localPlayer->CallEvent("onClientCoreCommand", Arguments, true);
+        }
+
+        // Call our comand-handlers for core-executed commands too, if allowed
+        if (bAllowScriptedBind)
+            g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments);
     }
     return false;
 }
@@ -159,11 +171,6 @@ void COMMAND_ShowNetstat(const char* szCmdLine)
 {
     int iCmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
     g_pClientGame->ShowNetstat(iCmd);
-}
-
-void COMMAND_Eaeg(const char* szCmdLine)
-{
-    g_pClientGame->ShowEaeg(true);
 }
 
 void COMMAND_EnterPassenger(const char* szCmdLine)
@@ -232,154 +239,137 @@ void COMMAND_Screenshot ( const char* szCmdLine )
 }
 */
 
-void COMMAND_RadarMap(const char* szCmdLine)
+void COMMAND_PlayerMap(const char* szCmdLine)
 {
-    int  iCmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
-    bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : !g_pClientGame->GetRadarMap()->GetRadarEnabled();
-    g_pClientGame->GetRadarMap()->SetRadarEnabled(bShow);
+    int  cmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
+    bool show = (cmd == 1) ? true : (cmd == 0) ? false : !g_pClientGame->GetPlayerMap()->GetPlayerMapEnabled();
+    g_pClientGame->GetPlayerMap()->SetPlayerMapEnabled(show);
 }
 
-void COMMAND_RadarZoomIn(const char* szCmdLine)
+void COMMAND_PlayerMapZoomIn(const char* szCmdLine)
 {
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (playerMap->IsPlayerMapShowing())
+        playerMap->ZoomIn();
+}
 
-    if (pRadarMap->IsRadarShowing())
+void COMMAND_PlayerMapZoomOut(const char* szCmdLine)
+{
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (playerMap->IsPlayerMapShowing())
+        playerMap->ZoomOut();
+}
+
+void COMMAND_PlayerMapMoveNorth(const char* szCmdLine)
+{
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (!playerMap->IsPlayerMapShowing())
+        return;
+
+    if (playerMap->IsMovingNorth())
+        playerMap->SetMovingNorth(false);
+    else if (playerMap->IsMovingSouth())
+        playerMap->SetMovingSouth(false);
+    else
     {
-        pRadarMap->ZoomIn();
+        playerMap->SetMovingNorth(true);
+        playerMap->SetMovingSouth(false);
+        playerMap->SetMovingEast(false);
+        playerMap->SetMovingWest(false);
     }
 }
 
-void COMMAND_RadarZoomOut(const char* szCmdLine)
+void COMMAND_PlayerMapMoveSouth(const char* szCmdLine)
 {
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (!playerMap->IsPlayerMapShowing())
+        return;
 
-    if (pRadarMap->IsRadarShowing())
+    if (playerMap->IsMovingSouth())
+        playerMap->SetMovingSouth(false);
+    else if (playerMap->IsMovingNorth())
+        playerMap->SetMovingNorth(false);
+    else
     {
-        pRadarMap->ZoomOut();
+        playerMap->SetMovingNorth(false);
+        playerMap->SetMovingSouth(true);
+        playerMap->SetMovingEast(false);
+        playerMap->SetMovingWest(false);
     }
 }
 
-void COMMAND_RadarMoveNorth(const char* szCmdLine)
+void COMMAND_PlayerMapMoveEast(const char* szCmdLine)
 {
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (!playerMap->IsPlayerMapShowing())
+        return;
 
-    if (pRadarMap->IsRadarShowing())
+    if (playerMap->IsMovingEast())
+        playerMap->SetMovingEast(false);
+    else if (playerMap->IsMovingWest())
+        playerMap->SetMovingWest(false);
+    else
     {
-        // Toggle on/off
-        if (pRadarMap->IsMovingNorth())
-            pRadarMap->SetMovingNorth(false);
-        else if (pRadarMap->IsMovingSouth())
-            pRadarMap->SetMovingSouth(false);
-        else
-        {
-            pRadarMap->SetMovingNorth(true);
-            pRadarMap->SetMovingSouth(false);
-            pRadarMap->SetMovingEast(false);
-            pRadarMap->SetMovingWest(false);
-        }
+        playerMap->SetMovingNorth(false);
+        playerMap->SetMovingSouth(false);
+        playerMap->SetMovingEast(true);
+        playerMap->SetMovingWest(false);
     }
 }
 
-void COMMAND_RadarMoveSouth(const char* szCmdLine)
+void COMMAND_PlayerMapMoveWest(const char* szCmdLine)
 {
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (!playerMap->IsPlayerMapShowing())
+        return;
 
-    if (pRadarMap->IsRadarShowing())
+    if (playerMap->IsMovingWest())
+        playerMap->SetMovingWest(false);
+    else if (playerMap->IsMovingEast())
+        playerMap->SetMovingEast(false);
+    else
     {
-        // Toggle on/off
-        if (pRadarMap->IsMovingSouth())
-            pRadarMap->SetMovingSouth(false);
-        else if (pRadarMap->IsMovingNorth())
-            pRadarMap->SetMovingNorth(false);
-        else
-        {
-            pRadarMap->SetMovingNorth(false);
-            pRadarMap->SetMovingSouth(true);
-            pRadarMap->SetMovingEast(false);
-            pRadarMap->SetMovingWest(false);
-        }
+        playerMap->SetMovingNorth(false);
+        playerMap->SetMovingSouth(false);
+        playerMap->SetMovingEast(false);
+        playerMap->SetMovingWest(true);
     }
 }
 
-void COMMAND_RadarMoveEast(const char* szCmdLine)
+void COMMAND_PlayerMapAttach(const char* szCmdLine)
 {
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
-
-    if (pRadarMap->IsRadarShowing())
-    {
-        // Toggle on/off
-        if (pRadarMap->IsMovingEast())
-            pRadarMap->SetMovingEast(false);
-        else if (pRadarMap->IsMovingWest())
-            pRadarMap->SetMovingWest(false);
-        else
-        {
-            pRadarMap->SetMovingNorth(false);
-            pRadarMap->SetMovingSouth(false);
-            pRadarMap->SetMovingEast(true);
-            pRadarMap->SetMovingWest(false);
-        }
-    }
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (playerMap->IsPlayerMapShowing())
+        playerMap->SetAttachedToLocalPlayer(!g_pClientGame->GetPlayerMap()->IsAttachedToLocalPlayer());
 }
 
-void COMMAND_RadarMoveWest(const char* szCmdLine)
+void COMMAND_PlayerMapOpacityDown(const char* szCmdLine)
 {
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (!playerMap->IsPlayerMapShowing())
+        return;
 
-    if (pRadarMap->IsRadarShowing())
-    {
-        // Toggle on/off
-        if (pRadarMap->IsMovingWest())
-            pRadarMap->SetMovingWest(false);
-        else if (pRadarMap->IsMovingEast())
-            pRadarMap->SetMovingEast(false);
-        else
-        {
-            pRadarMap->SetMovingNorth(false);
-            pRadarMap->SetMovingSouth(false);
-            pRadarMap->SetMovingEast(false);
-            pRadarMap->SetMovingWest(true);
-        }
-    }
+    int mapAlpha;
+    g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
+    mapAlpha = std::max(0, mapAlpha - 20);
+    g_pCore->GetCVars()->Set("mapalpha", mapAlpha);
 }
 
-void COMMAND_RadarAttach(const char* szCmdLine)
+void COMMAND_PlayerMapOpacityUp(const char* szCmdLine)
 {
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
+    CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
+    if (!playerMap->IsPlayerMapShowing())
+        return;
 
-    if (pRadarMap->IsRadarShowing())
-    {
-        pRadarMap->SetAttachedToLocalPlayer(!g_pClientGame->GetRadarMap()->IsAttachedToLocalPlayer());
-    }
+    int mapAlpha;
+    g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
+    mapAlpha = std::min(255, mapAlpha + 20);
+    g_pCore->GetCVars()->Set("mapalpha", mapAlpha);
 }
 
-void COMMAND_RadarOpacityDown(const char* szCmdLine)
+void COMMAND_PlayerMapHelp(const char* szCmdLine)
 {
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
-    if (pRadarMap->IsRadarShowing())
-    {
-        int iAlpha;
-        g_pCore->GetCVars()->Get("mapalpha", iAlpha);
-        iAlpha = std::max(0, iAlpha - 20);
-        g_pCore->GetCVars()->Set("mapalpha", iAlpha);
-    }
-}
-
-void COMMAND_RadarOpacityUp(const char* szCmdLine)
-{
-    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap();
-    if (pRadarMap->IsRadarShowing())
-    {
-        int iAlpha;
-        g_pCore->GetCVars()->Get("mapalpha", iAlpha);
-        iAlpha = std::min(255, iAlpha + 20);
-        g_pCore->GetCVars()->Set("mapalpha", iAlpha);
-    }
-}
-
-void COMMAND_RadarHelp(const char* szCmdLine)
-{
-    g_pClientGame->GetRadarMap()->ToggleHelpText();
+    g_pClientGame->GetPlayerMap()->ToggleHelpText();
 }
 
 void COMMAND_MessageTarget(const char* szCmdLine)
@@ -790,15 +780,6 @@ void COMMAND_ShowSyncing(const char* szCmdLine)
 
 #endif
 
-#ifdef MTA_DEBUG
-
-void COMMAND_Foo(const char* szCmdLine)
-{
-    g_pClientGame->m_Foo.Test(szCmdLine);
-}
-
-#endif
-
 #if defined(MTA_DEBUG) || defined(MTA_DEBUG_COMMANDS)
 void COMMAND_ShowWepdata(const char* szCmdLine)
 {
@@ -842,19 +823,6 @@ void COMMAND_Paintballs(const char* szCmdLine)
     g_pClientGame->SetDoPaintballs(atoi(szCmdLine) == 1);
 }
 
-void COMMAND_Breakpoint(const char* szCmdLine)
-{
-    if (!(szCmdLine && szCmdLine[0]))
-        return;
-    _asm
-    {
-        int 3
-    }
-    //   Make our main pointer easily accessable
-    //   Added by slush:  You're a lazy ass if you use this.
-    g_pClientGame;
-}
-
 void COMMAND_GiveWeapon(const char* szCmdLine)
 {
     if (!(szCmdLine && szCmdLine[0]))
@@ -889,150 +857,6 @@ void COMMAND_ShowRPCs(const char* szCmdLine)
 void COMMAND_ShowInterpolation(const char*)
 {
     g_pClientGame->ShowInterpolation(!g_pClientGame->IsShowingInterpolation());
-}
-
-void COMMAND_Watch(const char* szCmdLine)
-{
-    // Note: This code might be a little unsafe if the detouring done by the DLL happens to be done
-    //       exactly on a call to WriteProcessMemory even though the chance is small.
-    // adds a hook to a process and watches for WPMs to this one
-    DWORD        dwProcessIDs[250];
-    DWORD        pBytesReturned = 0;
-    unsigned int uiListSize = 50;
-    if (EnumProcesses(dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned))
-    {
-        for (unsigned int i = 0; i < pBytesReturned / sizeof(DWORD); i++)
-        {
-            // Open the process
-            HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
-            if (hProcess)
-            {
-                HMODULE pModule;
-                DWORD   cbNeeded;
-                if (EnumProcessModules(hProcess, &pModule, sizeof(HMODULE), &cbNeeded))
-                {
-                    char szModuleName[500];
-                    if (GetModuleFileNameEx(hProcess, pModule, szModuleName, 500))
-                    {
-                        if (stricmp(szModuleName + strlen(szModuleName) - strlen(szCmdLine), szCmdLine) == 0)
-                        {
-                            g_pCore->GetConsole()->Printf("Attaching to %s with process id %d...", szModuleName, hProcess);
-                            RemoteLoadLibrary(hProcess, "C:/Program Files/Rockstar Games/GTA San Andreas/mta/wpmhookdll.dll");
-                            CloseHandle(hProcess);
-                            return;
-                        }
-                    }
-                }
-
-                // Close the process
-                CloseHandle(hProcess);
-            }
-        }
-    }
-}
-
-void COMMAND_Modules(const char* szCmdLine)
-{
-    // Get the base address of the requested module
-    // Take a snapshot of all modules in the specified process.
-    HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, GetCurrentProcessId());
-    if (hModuleSnap != INVALID_HANDLE_VALUE)
-    {
-        //  Set the size of the structure before using it.
-        MODULEENTRY32 ModuleEntry;
-        ModuleEntry.dwSize = sizeof(MODULEENTRY32);
-
-        // Retrieve information about the first module,
-        // and exit if unsuccessful
-        if (Module32First(hModuleSnap, &ModuleEntry))
-        {
-            // Create a file
-            FILE* pFile = fopen("modules.txt", "w+");
-            if (pFile)
-            {
-                // Now walk the module list of the process,
-                // and display information about each module
-                do
-                {
-                    // Print it
-                    fprintf(pFile,
-                            "** MODULE **\n"
-                            "Name: %s\n"
-                            "Base: 0x%p\n"
-                            "Size: 0x%x\n"
-                            "\n",
-                            ModuleEntry.szModule, ModuleEntry.modBaseAddr, ModuleEntry.modBaseSize);
-                } while (Module32Next(hModuleSnap, &ModuleEntry));
-
-                // Close it
-                fclose(pFile);
-            }
-        }
-
-        // Close the snapshot object
-        CloseHandle(hModuleSnap);
-    }
-}
-
-#include <CClientCorona.h>
-CClientPickup* pPickupTest = NULL;
-CClientCorona* pCoronaTest = NULL;
-CVehicle*      debugTrain = NULL;
-CClientPlayer* pRonkert = NULL;
-CObject*       obj = NULL;
-
-void COMMAND_Debug(const char* szCmdLine)
-{
-    __debugbreak();
-
-    return;
-}
-
-#include "CVehicleNames.h"
-
-CVehicle* aaa = NULL;
-CVehicle* bbb = NULL;
-
-CMatrix* save = NULL;
-float    fTest = 0;
-
-#include <crtdbg.h>
-void COMMAND_Debug2(const char* szCmdLine)
-{
-    g_pGame->GetAudioEngine()->StopRadio();
-}
-
-CClientPed*     pTest = NULL;
-CClientVehicle *v, *vnew;
-
-void COMMAND_Debug3(const char* szCmdLine)
-{
-    _asm
-    {
-        pushad
-        mov     ecx, 0x8CB6F8
-        mov     eax, 0x4E7F80
-        call    eax
-        popad
-    }
-    g_pGame->GetAudioEngine()->StopRadio();
-    g_pGame->GetAudioEngine()->StartRadio(1);
-    return;
-}
-
-CVector  origin22;
-CObject* o;
-
-void COMMAND_Debug4(const char* szCmdLine)
-{
-    g_pCore->GetConsole()->Printf("debug4");
-    g_pClientGame->StartPlayback();
-    return;
-}
-
-void COMMAND_TimeStep(const char* szCmdLine)
-{
-    g_pCore->GetConsole()->Printf("TimeStep: %f", *(float*)0xB7CB5C);            // CTimer::ms_fTimeStep
 }
 
 #endif

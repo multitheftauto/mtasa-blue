@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CElement.h
  *  PURPOSE:     Base entity (element) class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -82,6 +82,8 @@ public:
         TRAIN_TRACK,
         ROOT,
         UNKNOWN,
+        BUILDING,
+        _POINTLIGHTS, // client only
     };
 
 public:
@@ -136,7 +138,7 @@ public:
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
     CCustomData&   GetCustomDataManager() { return m_CustomData; }
-    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = NULL);
+    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = nullptr, eCustomDataClientTrust* clientChangesMode = nullptr);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData);
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
@@ -225,6 +227,9 @@ public:
 
     bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }
+
+    virtual bool IsOnFire() const noexcept { return false; }
+    virtual void SetOnFire(bool onFire) noexcept {}
 
     // Spatial database
     virtual CSphere GetWorldBoundingSphere();

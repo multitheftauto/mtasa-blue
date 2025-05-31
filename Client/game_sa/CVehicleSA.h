@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CVehicleSA.h
  *  PURPOSE:     Header file for vehicle base entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,13 +17,17 @@
 #include "CPhysicalSA.h"
 #include "CPoolsSA.h"
 #include "CHandlingManagerSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 #include "CColPointSA.h"
 #include "CAEVehicleAudioEntitySA.h"
 
+#include "enums/VehicleClass.h"
+
 class CFxSystemSAInterface;
 class CTrainSAInterface;
+class CColModelSAInterface;
 struct RwTexture;
 
 #define SIZEOF_CHELI                            2584
@@ -34,6 +38,7 @@ struct RwTexture;
 #define FUNC_CVehicle_GetBaseVehicleType        0x411D50
 #define FUNC_CVehicle_IsUpsideDown              0x6D1D90
 #define FUNC_CVehicle_SetEngineOn               0x41BDD0
+#define FUNC_CVehicle_IsPassenger               0x6D1BD0
 #define FUNC_CTrain_FindPositionOnTrackFromCoors           0x6F6CC0
 
 #define FUNC_CVehicle_QueryPickedUpEntityWithWinch              0x6d3cf0
@@ -70,9 +75,6 @@ struct RwTexture;
 
 #define VARS_CarCounts                          0x969094 // 5 values for each vehicle type
 
-// Used when deleting vehicles
-#define VTBL_CPlaceable                         0x863C40
-
 #define MAX_PASSENGERS                          8
 
 #define NUM_RAILTRACKS                          4
@@ -94,6 +96,21 @@ struct RwTexture;
 #define FUNC_CAutomobile_OnVehiclePreRender 0x6ABCFD
 #define FUNC_CVehicle_DoSunGlare            0x6DD6F0
 
+#define FUNC_CHeli_ProcessFlyingCarStuff 0x6C4E7D
+#define FUNC_CPlane_ProcessFlyingCarStuff 0x6CB7D2
+
+// CClumpModelInfo::GetFrameFromName
+#define FUNC_CClumpModelInfo_GetFrameFromName 0x4C5400
+
+// CAutomobile::m_aCarNodes
+// CTrain::m_aTrainNodes
+// CBike::m_apModelNodes
+// CBoat::pBoatParts
+#define OFFSET_CAutomobile_Nodes 0x648
+#define OFFSET_CTrain_Nodes 0x668
+#define OFFSET_CBike_Nodes 0x5A0
+#define OFFSET_CBoat_Nodes 0x5B0
+
 struct SRailNodeSA
 {
     short sX;                       // x coordinate times 8
@@ -101,55 +118,6 @@ struct SRailNodeSA
     short sZ;                       // z coordinate times 8
     WORD  sRailDistance;            // on-rail distance times 3.33333334
     WORD  padding;
-};
-
-class CVehicleSAInterfaceVTBL : public CEntitySAInterfaceVTBL
-{
-public:
-    DWORD ProcessEntityCollision;                  // +58h
-    DWORD ProcessControlCollisionCheck;            // +5Ch
-    DWORD ProcessControlInputs;                    // +60h
-    DWORD GetComponentWorldPosition;               // +64h
-    DWORD IsComponentPresent;                      // +68h
-    DWORD OpenDoor;                                // +6Ch
-    DWORD ProcessOpenDoor;                         // +70h
-    DWORD GetDoorAngleOpenRatio;                   // +74h
-    DWORD GetDoorAngleOpenRatio_;                  // +78h
-    DWORD IsDoorReady;                             // +7Ch
-    DWORD IsDoorReady_;                            // +80h
-    DWORD IsDoorFullyOpen;                         // +84h
-    DWORD IsDoorFullyOpen_;                        // +88h
-    DWORD IsDoorClosed;                            // +8Ch
-    DWORD IsDoorClosed_;                           // +90h
-    DWORD IsDoorMissing;                           // +94h
-    DWORD IsDoorMissing_;                          // +98h
-    DWORD IsOpenTopCar;                            // +9Ch
-    DWORD RemoveRefsToVehicle;                     // +A0h
-    DWORD BlowUpCar;                               // +A4h
-    DWORD BlowUpCarCutSceneNoExtras;               // +A8h
-    DWORD SetUpWheelColModel;                      // +ACh
-    DWORD BurstTyre;                               // +B0h
-    DWORD IsRoomForPedToLeaveCar;                  // +B4h
-    DWORD ProcessDrivingAnims;                     // +B8h
-    DWORD GetRideAnimData;                         // +BCh
-    DWORD SetupSuspensionLines;                    // +C0h
-    DWORD AddMovingCollisionSpeed;                 // +C4h
-    DWORD Fix;                                     // +C8h
-    DWORD SetupDamageAfterLoad;                    // +CCh
-    DWORD DoBurstAndSoftGroundRatios;              // +D0h
-    DWORD GetHeightAboveRoad;                      // +D4h
-    DWORD PlayCarHorn;                             // +D8h
-    DWORD GetNumContactWheels;                     // +DCh
-    DWORD VehicleDamage;                           // +E0h
-    DWORD CanPedStepOutCar;                        // +E4h
-    DWORD CanPedJumpOutCar;                        // +E8h
-    DWORD GetTowHitchPos;                          // +ECh
-    DWORD GetTowbarPos;                            // +F0h
-    DWORD SetTowLink;                              // +F4h
-    DWORD BreakTowLink;                            // +F8h
-    DWORD FindWheelWidth;                          // +FCh
-    DWORD Save;                                    // +100h
-    DWORD Load;                                    // +104h
 };
 
 struct CVehicleFlags
@@ -259,6 +227,69 @@ class CAutoPilot
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
+    virtual void ProcessControlCollisionCheck(bool applySpeed) = 0;
+    virtual void ProcessControlInputs(std::uint8_t playerNum) = 0;
+    virtual void GetComponentWorldPosition(std::int32_t componentId, CVector& outPos) = 0;
+    virtual bool IsComponentPresent(std::int32_t componentId) = 0;
+    virtual void OpenDoor(CPedSAInterface* entity, std::uint32_t doorFrameId, std::uint32_t doorId, float ratio, bool makeNoise) = 0;
+    virtual void ProcessOpenDoor(CPedSAInterface* ped, std::uint32_t doorComponentId, std::uint32_t animGroup, std::uint32_t animId, float fTime) = 0;
+
+    virtual float GetDoorAngleOpenRatio(std::uint32_t door) = 0;
+    virtual float GetDoorAngleOpenRatio_(std::uint8_t door) = 0;
+
+    virtual bool IsDoorReady(std::uint32_t door) = 0;
+    virtual bool IsDoorReady_(std::uint8_t door) = 0;
+    virtual bool IsDoorFullyOpen(std::uint32_t door) = 0;
+    virtual bool IsDoorFullyOpen_(std::uint8_t door) = 0;
+    virtual bool IsDoorClosed(std::uint32_t door) = 0;
+    virtual bool IsDoorClosed_(std::uint8_t door) = 0;
+    virtual bool IsDoorMissing(std::uint32_t door) = 0;
+    virtual bool IsDoorMissing_(std::uint8_t door) = 0;
+
+    virtual bool IsOpenTopCar() = 0;
+
+    virtual void RemoveRefsToVehicle(CEntitySAInterface* entity) = 0;
+    virtual void BlowUpCar(CEntitySAInterface* creator, bool bHideExplosion) = 0;
+    virtual void BlowUpCarCutSceneNoExtras(bool bNoCamShake, bool bNoSpawnFlyingComps, bool bDetachWheels, bool bExplosionSound) = 0;
+    virtual bool SetUpWheelColModel(CColModelSAInterface* wheelCol) = 0;
+    virtual bool BurstTyre(std::uint8_t tireId, bool bPhysicalEffect) = 0;
+    virtual bool IsRoomForPedToLeaveCar(std::uint32_t doorId, CVector* arg) = 0;
+    virtual void ProcessDrivingAnims(CPedSAInterface* driver, bool bBlend) = 0;
+
+    virtual void* GetRideAnimData() = 0;
+
+    virtual void    SetupSuspensionLines() = 0;
+    virtual CVector AddMovingCollisionSpeed(CVector& point) = 0;
+    virtual void    Fix() = 0;
+    virtual void    SetupDamageAfterLoad() = 0;
+    virtual void    DoBurstAndSoftGroundRatios() = 0;
+
+    virtual float GetHeightAboveRoad() = 0;
+
+    virtual void         PlayCarHorn() = 0;
+    virtual std::int32_t GetNumContactWheels() = 0;
+
+    virtual void  VehicleDamage(float damageIntensity, std::uint16_t collisionComponent, CEntitySAInterface* damager, CVector* vecCollisionCoors,
+                                CVector* vecCollisionDirection, eWeaponType weapon) = 0;
+    virtual bool  CanPedStepOutCar(bool bIgnoreSpeedUpright = false) = 0;
+    virtual bool  CanPedJumpOutCar(CPedSAInterface* ped) = 0;
+    virtual bool  GetTowHitchPos(CVector* pVector, bool bCheckModelInfo, CVehicleSAInterface* anotherVehicle) = 0;
+    virtual bool  GetTowbarPos(CVector* pVector, bool ignoreModelType, CVehicleSAInterface* pTrailer) = 0;
+    virtual void  SetTowLink() = 0;
+    virtual bool  BreakTowLink() = 0;
+    virtual float FindWheelWidth() = 0;
+    virtual bool  Save() = 0;
+    virtual bool  Load() = 0;
+
+    void SetComponentVisibility(RwFrame* component, std::uint32_t state)
+    {
+        ((void(__thiscall*)(CVehicleSAInterface*, RwFrame*, std::uint32_t))0x6D2700)(this, component, state);
+    }
+
+    bool IsPassenger(CPedSAInterface* ped) const {
+        return ((bool(__thiscall*)(CVehicleSAInterface const*, CPedSAInterface*))0x6D1BD0)(this, ped);
+    }
+
     CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312
 
     tHandlingDataSA*       pHandlingData;                  // +900
@@ -295,7 +326,7 @@ public:
 
     unsigned char m_nSpecialColModel;
     CEntity*      pEntityWeAreOnForVisibilityCheck;
-    CFire*        m_pFire;
+    CFireSAInterface*        m_pFire;
 
     float m_fSteerAngle;               // +1172
     float m_f2ndSteerAngle;            // used for steering 2nd set of wheels or elevators etc..
@@ -375,7 +406,7 @@ public:
     float m_steeringLeftRight;
 
     // 1424
-    uint8_t  m_vehicleClass;
+    VehicleClass m_vehicleClass;
     uint32_t m_vehicleSubClass;
 
     int16_t    m_peviousRemapTxd;
@@ -410,8 +441,9 @@ private:
     unsigned char                    m_ucVariant2;
     unsigned char                    m_ucVariantCount{0};
     bool                             m_doorsUndamageable{false};
+    bool                             m_rotorState{true};
 
-    std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
+    std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
 
 public:
     CVehicleSA() = default;
@@ -425,7 +457,7 @@ public:
     virtual void OnChangingPosition(const CVector& vecNewPosition);
 
     // Override of CPhysicalSA::SetMoveSpeed to take trains into account
-    void SetMoveSpeed(CVector* vecMoveSpeed);
+    void SetMoveSpeed(const CVector& vecMoveSpeed) noexcept;
 
     bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
 
@@ -453,6 +485,7 @@ public:
     void  SetRailTrack(BYTE ucTrackID);
     float GetTrainPosition();
     void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true);
+    bool  IsPassenger(CPed* pPed) { return GetVehicleInterface()->IsPassenger(pPed->GetPedInterface()); };
 
     void AddVehicleUpgrade(DWORD dwModelID);
     void RemoveVehicleUpgrade(DWORD dwModelID);
@@ -540,7 +573,8 @@ public:
     bool           GetTakeLessDamage() { return GetVehicleInterface()->m_nVehicleFlags.bTakeLessDamage; };
     bool           GetTyresDontBurst() { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
     unsigned short GetAdjustablePropertyValue() { return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
-    float          GetHeliRotorSpeed() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124); };
+    float          GetHeliRotorSpeed() const;
+    bool           GetVehicleRotorState() const noexcept override { return m_rotorState; }
     float          GetPlaneRotorSpeed();
 
     unsigned long  GetExplodeTime() { return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240); };
@@ -566,8 +600,10 @@ public:
     {
         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_pInterface) + 2156) = usAdjustableProperty;
     };
-    void SetHeliRotorSpeed(float fSpeed) { *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124) = fSpeed; };
+    void SetHeliRotorSpeed(float speed);
+    void SetVehicleRotorState(bool state, bool stopRotor, bool isHeli) noexcept override;
     void SetPlaneRotorSpeed(float fSpeed);
+    bool SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept;
     void SetExplodeTime(unsigned long ulTime) { *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240) = ulTime; };
     void SetRadioStatus(bool bStatus) { *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_pInterface) + 0x1D3) = bStatus; };
 
@@ -603,7 +639,7 @@ public:
     SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
     void               SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
 
-    CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2);
+    bool     SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1);
     void     SetWheelVisibility(eWheelPosition wheel, bool bVisible);
     CVector  GetWheelPosition(eWheelPosition wheel);
 
@@ -664,26 +700,31 @@ public:
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
+    void                              ReinitAudio();
 
     void UpdateLandingGearPosition();
 
     CAEVehicleAudioEntitySA* GetVehicleAudioEntity() { return m_pVehicleAudioEntity; };
 
-    bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const override;
-    bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) override;
+    bool GetDummyPosition(VehicleDummies dummy, CVector& position) const override;
+    bool SetDummyPosition(VehicleDummies dummy, const CVector& position) override;
 
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
+
+    bool IsOnFire() override { return GetVehicleInterface()->m_pFire != nullptr; }
+    bool SetOnFire(bool onFire) override;
 
     static void StaticSetHooks();
     static void SetVehiclesSunGlareEnabled(bool bEnabled);
     static bool GetVehiclesSunGlareEnabled();
 
 private:
-    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
+    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position);
 
     void           RecalculateSuspensionLines();
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();
+    void           DumpVehicleFrames();
 };

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaTimerManager.cpp
  *  PURPOSE:     Lua timer manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -26,7 +26,10 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
     // Use a separate queue to avoid trouble
     // What kind of problems are we trying to avoid? Doing a copy each frame isn't quite efficient
     for (CFastList<CLuaTimer*>::const_iterator iter = m_TimerList.begin(); iter != m_TimerList.end(); ++iter)
-        m_ProcessQueue.push_back(*iter);
+    {
+        if (!(*iter)->IsPaused())
+            m_ProcessQueue.push_back(*iter);
+    }
 
     while (!m_ProcessQueue.empty())
     {
@@ -111,6 +114,15 @@ void CLuaTimerManager::RemoveAllTimers()
     m_ProcessQueue.clear();
     m_pPendingDelete = NULL;
     m_pProcessingTimer = NULL;
+}
+
+void CLuaTimerManager::SetTimerPaused(CLuaTimer* timer, bool paused)
+{
+    assert(timer);
+
+    timer->SetPaused(paused);
+    if (paused)
+        ListRemove(m_ProcessQueue, timer);
 }
 
 void CLuaTimerManager::ResetTimer(CLuaTimer* pLuaTimer)

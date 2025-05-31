@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPedIntelligenceSA.cpp
  *  PURPOSE:     Ped entity AI logic
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,6 +14,7 @@
 #include "CPedSA.h"
 #include "CTaskManagementSystemSA.h"
 #include "CTaskManagerSA.h"
+#include "TaskAttackSA.h"
 
 CPedIntelligenceSA::CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped)
 {
@@ -54,4 +55,17 @@ CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengt
 {
     auto SetTaskDuckSecondary = (CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230;
     return SetTaskDuckSecondary(internalInterface, nLengthOfDuck);
+}
+
+CTaskSimpleUseGun* CPedIntelligenceSA::GetTaskUseGun()
+{
+    CTaskManager* taskMgr = GetTaskManager();
+    if (!taskMgr)
+        return nullptr;
+
+    CTask* secondaryTask = taskMgr->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+    if (secondaryTask && secondaryTask->GetTaskType() == TASK_SIMPLE_USE_GUN)
+        return dynamic_cast<CTaskSimpleUseGun*>(secondaryTask);
+
+    return nullptr;
 }

@@ -5,7 +5,7 @@
  *  FILE:        core/CConsole.h
  *  PURPOSE:     Header file for console class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -41,7 +41,6 @@ public:
     bool IsInputActive();
     void ActivateInput();
 
-    void HandleTextAccepted(bool bHandled);
     void GetCommandInfo(const std::string& strIn, std::string& strCmdOut, std::string& strCmdLineOut);
 
     void ResetHistoryChanges();

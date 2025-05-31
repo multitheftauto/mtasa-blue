@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.cpp
  *  PURPOSE:     Resource object
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -94,6 +94,9 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
 CResource::~CResource()
 {
+    // Remove refrences from requested models
+    m_modelStreamer.ReleaseAll();
+
     // Deallocate all models that this resource allocated earlier
     g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
 
@@ -314,10 +317,7 @@ void CResource::Load()
         else if (pResourceFile->IsAutoDownload())
         {
             // Check the file contents
-            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
-            {
-            }
-            else
+            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) != pResourceFile->GetServerChecksum())
             {
                 HandleDownloadedFileTrouble(pResourceFile, false);
             }

@@ -4,10 +4,6 @@
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
-> **Note**
-> If you're a fork developer, please read this note carefully. We have changed the default build type back to *CUSTOM* in `Shared/sdk/version.h`. If you're developing without the anti-cheat in mind, say in the Debug configuration, this doesn't affect you at all. Now, if you plan to test your custom client with anti-cheat enabled, you should change your build type to `UNTESTED`. If you want to publish a release of your custom client, you must switch to a *fork support* hardened release of `netc.dll`.
-> Please read our [Forks_Full_AC](https://wiki.multitheftauto.com/wiki/Forks_Full_AC) wiki page for more information.
-
 ## Introduction
 
 Multi Theft Auto is based on code injection and hooking techniques whereby the game is manipulated without altering any original files supplied with the game. The software functions as a game engine that installs itself as an extension of the original game, adding core functionality such as networking and GUI rendering while exposing the original game's engine functionality through a scripting language.
@@ -30,7 +26,7 @@ Using a framework based on resources has a number of advantages. It allows conte
 
 Our project's code repository can be found on the [multitheftauto/mtasa-blue](https://github.com/multitheftauto/mtasa-blue/) Git repository at [GitHub](https://github.com/). We are always looking for new developers, so if you're interested, here are some useful links:
 
-* [Coding guidelines](https://github.com/multitheftauto/mtasa-blue/blob/master/CONTRIBUTING.md#contributors-guide)
+* [Contributors Guide and Coding Guidelines](https://github.com/multitheftauto/mtasa-docs/blob/main/mtasa-blue/CONTRIBUTING.md)
 * [Nightly Builds](https://nightly.multitheftauto.com/)
 * [Milestones](https://github.com/multitheftauto/mtasa-blue/milestones)
 
@@ -39,7 +35,9 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 #### Windows
 
 Prerequisites
-- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) with:
+  - Desktop development with C++
+  - Optional component *C++ MFC for latest v143 build tools (x86 & x64)*
 - [Microsoft DirectX SDK](https://wiki.multitheftauto.com/wiki/Compiling_MTASA#Microsoft_DirectX_SDK)
 - [Git for Windows](https://git-scm.com/download/win) (Optional)
 
@@ -48,20 +46,19 @@ Prerequisites
 3. Compile
 4. Execute: `win-install-data.bat`
 
+Visit the wiki article ["Compiling MTASA"](https://wiki.multitheftauto.com/wiki/Compiling_MTASA) for additional information and error troubleshooting.
+
 #### GNU/Linux
 
 You can build the MTA:SA server on GNU/Linux distributions only for x86, x86_64, armhf and arm64 CPU architectures. ARM architectures are currently in **experimental phase**, which means they're unstable, untested and may crash randomly. Beware that we only officially support building from x86_64 and that includes cross-compiling for x86, arm and arm64.
 
 **Build dependencies**
 
-*Please always read the Dockerfiles for up-to-date build dependencies.*  
-*Note: ncftp is not required for building the MTA:SA server.*
+*Please always read the utils/docker/Dockerfile for up-to-date build dependencies.*
 
-- git
 - make
 - GNU GCC compiler (version 10 or newer)
-- libncursesw5
-- libncursesw5-dev
+- libncurses-dev
 - libmysqlclient-dev
 
 **Build instructions: Script**
@@ -69,7 +66,7 @@ You can build the MTA:SA server on GNU/Linux distributions only for x86, x86_64,
 **Note:** This script always deletes `Build/` and `Bin/` directories and does a clean build.
 
 ```sh
-$ ./linux-build.sh [--arch=x86|x64|arm|arm64] [--config=debug|release]
+$ ./linux-build.sh [--arch=x86|x64|arm|arm64] [--config=debug|release] [--cores=<n>]
 $ ./linux-install-data.sh  # optional step
 ```
 
@@ -77,7 +74,9 @@ If build architecture `--arch` is not provided, then it's taken from the environ
 
 If build configuration `--config` is not provided, then it's taken from the environment variable `BUILD_CONFIG` (defaults to: release).
 
-If you are trying to **cross-compile** to another architecture, then set `AR`, `CC`, `CXX`, `GCC_PREFIX` environment variables accordingly (see Dockerfile.arm64 for an example).
+If the number of jobs `--cores` is not provided, then the build will default to the amount of CPU cores.
+
+If you are trying to **cross-compile** to another architecture, then set `AR`, `CC`, `CXX`, `GCC_PREFIX` environment variables accordingly (see `utils/docker/Dockerfile` for an example).
 
 **Build instructions: Manual**
 
@@ -99,23 +98,23 @@ If you have problems resolving the required dependencies or want maximum compati
 $ docker pull ghcr.io/multitheftauto/mtasa-blue-build:latest
 ```
 
-| Architecture | Docker image tag |
-| ------------ | ---------------- |
-| x86_64       | latest           |
-| x86          | i386             |
-| arm          | armhf            |
-| arm64        | arm64            |
-
 **Building with Docker**
 
-These examples assume that your current directory is the mtasa-blue checkout directory. You should also know that `/build` is the code directory required by our Docker images inside the container. If the current directory is not a valid git repository, it instead create a (shallow) clone of the mtasa-blue repository. After compiling, you will find the resulting binaries in `./Bin`. To build the unoptimised debug build, add `-e BUILD_CONFIG=debug` to the docker run arguments.
+These examples assume that your current directory is the mtasa-blue checkout directory. You should also know that `/build` is the code directory required by our Docker image inside the container. After compiling, you will find the resulting binaries in `./Bin`. To build the unoptimised debug build, add `--config=debug` to the docker run arguments.
 
-| Architecture | Build command                                                                          |
-| ------------ | -------------------------------------------------------------------------------------- |
-| x86_64       | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest ``` |
-| x86          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:i386 ```   |
-| arm          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:armhf ```  |
-| arm64        | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:arm64 ```  |
+```sh
+# x86_64
+docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest --arch=x64
+
+# x86
+docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest --arch=x86
+
+# arm
+docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest --arch=arm
+
+# arm64
+docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest --arch=arm64
+```
 
 ### Premake FAQ
 
@@ -127,4 +126,4 @@ Execute `win-create-projects.bat`
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the [LICENSE](./LICENSE) file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997–2023.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997–2025.

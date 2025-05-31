@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceManager.cpp
  *  PURPOSE:     Resource manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -150,7 +150,7 @@ void CResourceManager::StopAll()
 }
 
 // pResource may be changed on return, and it could be NULL if the function returns false.
-bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath)
+bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath, bool bPassSize)
 {
     ReplaceOccurrencesInString(strInput, "\\", "/");
 
@@ -190,7 +190,7 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
             }
         }
     }
-    else if (pResource && IsValidFilePath(strInput.c_str()))
+    else if (pResource && (bPassSize ? IsValidFilePath(strInput.c_str(), strInput.size()) : IsValidFilePath(strInput.c_str())))
     {
         if (pStrPath)
             *pStrPath = pResource->GetResourceDirectoryPath(accessType, strInput);

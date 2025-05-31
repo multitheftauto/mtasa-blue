@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CStreamingSA.cpp
  *  PURPOSE:     Data streamer
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -502,4 +502,16 @@ void CStreamingSA::AllocateArchive()
 void CStreamingSA::RemoveBigBuildings()
 {
     (reinterpret_cast<void(__cdecl*)()>(0x4093B0))();
+}
+
+void CStreamingSA::LoadScene(const CVector* position)
+{
+    auto CStreaming_LoadScene = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadScene;
+    CStreaming_LoadScene(position);
+}
+
+void CStreamingSA::LoadSceneCollision(const CVector* position)
+{
+    auto CStreaming_LoadSceneCollision = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadSceneCollision;
+    CStreaming_LoadSceneCollision(position);
 }

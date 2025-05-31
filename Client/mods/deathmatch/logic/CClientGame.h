@@ -6,7 +6,7 @@
  *  FILE:        mods/deathmatch/logic/CClientGame.h
  *  PURPOSE:     Header for client game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -28,7 +28,7 @@
 #include "CUnoccupiedVehicleSync.h"
 #include "CPedSync.h"
 #include "CObjectSync.h"
-#include "CRadarMap.h"
+#include "CPlayerMap.h"
 #include "CClientTeamManager.h"
 #include "CClientPedManager.h"
 #include "lua/CLuaManager.h"
@@ -38,7 +38,6 @@
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
 #include "CElementDeleter.h"
-#include "CFoo.h"
 #include "CRegisteredCommands.h"
 #include "CClientGUIElement.h"
 #include "CLocalServer.h"
@@ -70,6 +69,15 @@ struct SMiscGameSettings
     bool bAllowFastSprintFix;
     bool bAllowBadDrivebyHitboxFix;
     bool bAllowShotgunDamageFix;
+};
+
+struct ResetWorldPropsInfo
+{
+    bool resetSpecialProperties{};
+    bool resetWorldProperties{};
+    bool resetWeatherProperties{};
+    bool resetLODs{};
+    bool resetSounds{};
 };
 
 class CClientGame
@@ -121,8 +129,12 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
-        POINTLIGHTS,
+        _DATABASE_CONNECTION, // server only
+        TRAIN_TRACK,
+        ROOT,
         UNKNOWN,
+        BUILDING,
+        POINTLIGHTS,
     };
 
     enum
@@ -288,7 +300,7 @@ public:
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };
     CNetAPI*               GetNetAPI() { return m_pNetAPI; };
-    CRadarMap*             GetRadarMap() { return m_pRadarMap; };
+    CPlayerMap*            GetPlayerMap() { return m_pPlayerMap; };
     CMovingObjectsManager* GetMovingObjectsManager() { return m_pMovingObjectsManager; }
 
     CClientPlayer*       GetLocalPlayer() { return m_pLocalPlayer; }
@@ -309,11 +321,12 @@ public:
     CRemoteCalls*                 GetRemoteCalls() { return m_pRemoteCalls; }
     CResourceFileDownloadManager* GetResourceFileDownloadManager() { return m_pResourceFileDownloadManager; }
 
+    CModelRenderer* GetModelRenderer() const noexcept { return m_pModelRenderer.get(); }
+
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
 
     // Status toggles
     void ShowNetstat(int iCmd);
-    void ShowEaeg(bool bShow);
     void ShowFPS(bool bShow) { m_bShowFPS = bShow; };
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
@@ -401,14 +414,19 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
-    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled);
-    bool IsWorldSpecialProperty(WorldSpecialProperty property);
+    bool SetWorldSpecialProperty(const WorldSpecialProperty property, const bool enabled) noexcept;
+    bool IsWorldSpecialProperty(const WorldSpecialProperty property);
 
     bool SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
 
     bool SetBirdsEnabled(bool bEnabled);
     bool GetBirdsEnabled();
+
+    void SetWeaponRenderEnabled(bool enabled);
+    bool IsWeaponRenderEnabled() const;
+
+    void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
 
@@ -443,7 +461,7 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
-    void RestreamWorld(bool removeBigBuildings);
+    void RestreamWorld();
     void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
@@ -506,11 +524,13 @@ private:
     static void                              StaticRender3DStuffHandler();
     static void                              StaticPreRenderSkyHandler();
     static void                              StaticRenderHeliLightHandler();
+    static void                              StaticRenderEverythingBarRoadsHandler();
     static bool                              StaticChokingHandler(unsigned char ucWeaponType);
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
     static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
     static void                              StaticPreFxRenderHandler();
+    static void                              StaticPostColorFilterRenderHandler();
     static void                              StaticPreHudRenderHandler();
     static void                              StaticCAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
     static CAnimBlendAssociationSAInterface* StaticAddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
@@ -523,7 +543,7 @@ private:
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     static bool StaticVehicleCollisionHandler(CVehicleSAInterface*& pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
                                               float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
-                                              CVector vecCollisionVelocity);
+                                              CVector vecCollisionVelocity, bool isProjectile);
     static bool StaticVehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                            const CVector& vecDamagePos, uchar ucTyre);
     static bool StaticHeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
@@ -568,7 +588,7 @@ private:
                                                RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     bool        VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
-                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity);
+                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity, bool isProjectile);
     bool        VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                      const CVector& vecDamagePos, uchar ucTyre);
     bool        HeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
@@ -681,7 +701,7 @@ private:
     CNetworkStats*         m_pNetworkStats;
     CSyncDebug*            m_pSyncDebug;
     // CScreenshot*                          m_pScreenshot;
-    CRadarMap*                    m_pRadarMap;
+    CPlayerMap*                   m_pPlayerMap;
     CTransferBox*                 m_pTransferBox;
     CResourceManager*             m_pResourceManager;
     CScriptKeyBinds*              m_pScriptKeyBinds;
@@ -698,6 +718,8 @@ private:
     CDebugHookManager*            m_pDebugHookManager;
     CRemoteCalls*                 m_pRemoteCalls;
     CResourceFileDownloadManager* m_pResourceFileDownloadManager;
+
+    std::unique_ptr<CModelRenderer> m_pModelRenderer;
 
     // Revised facilities
     CServer m_Server;
@@ -812,10 +834,6 @@ private:
     bool m_bDevelopmentMode;
     bool m_bShowCollision;
     bool m_bShowSound;
-
-    // Debug class. Empty in release.
-public:
-    CFoo m_Foo;
 
 private:
     CEvents                                     m_Events;

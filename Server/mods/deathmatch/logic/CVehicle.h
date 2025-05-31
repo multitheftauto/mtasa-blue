@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CVehicle.h
  *  PURPOSE:     Vehicle entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -109,6 +109,49 @@ enum eVehicleType
     VEHICLE_QUADBIKE,
     VEHICLE_BMX,
     VEHICLE_TRAILER
+};
+
+enum class eCarNodes
+{
+    NONE = 0,
+    CHASSIS,
+    WHEEL_RF,
+    WHEEL_RM,
+    WHEEL_RB,
+    WHEEL_LF,
+    WHEEL_LM,
+    WHEEL_LB,
+    DOOR_RF,
+    DOOR_RR,
+    DOOR_LF,
+    DOOR_LR,
+    BUMP_FRONT,
+    BUMP_REAR,
+    WING_RF,
+    WING_LF,
+    BONNET,
+    BOOT,
+    WINDSCREEN,
+    EXHAUST,
+    MISC_A,
+    MISC_B,
+    MISC_C,
+    MISC_D,
+    MISC_E,
+
+    NUM_NODES
+};
+
+enum class eCarComponentCollisionTypes
+{
+    COL_NODE_BUMPER = 0,
+    COL_NODE_WHEEL,
+    COL_NODE_DOOR,
+    COL_NODE_BONNET,
+    COL_NODE_BOOT,
+    COL_NODE_PANEL,
+
+    COL_NODES_NUM
 };
 
 #define SIREN_TYPE_FIRST 1
@@ -331,8 +374,8 @@ public:
     void SpawnAt(const CVector& vecPosition, const CVector& vecRotation);
     void Respawn();
 
-    void            GenerateHandlingData();
-    CHandlingEntry* GetHandlingData() { return m_pHandlingEntry; };
+    void            GenerateHandlingData() noexcept;
+    CHandlingEntry* GetHandlingData() noexcept { return m_HandlingEntry.get(); };
 
     uint GetTimeSinceLastPush() { return (uint)(CTickCount::Now(true) - m_LastPushedTime).ToLongLong(); }
     void ResetLastPushTime() { m_LastPushedTime = CTickCount::Now(true); }
@@ -353,6 +396,9 @@ public:
     bool             IsBlown() const noexcept { return m_blowState != VehicleBlowState::INTACT; }
     void             SetBlowState(VehicleBlowState state);
     VehicleBlowState GetBlowState() const noexcept { return m_blowState; }
+
+    bool IsOnFire() const noexcept override { return m_onFire; }
+    void SetOnFire(bool onFire) noexcept override { m_onFire = onFire; }
 
     void StopIdleTimer();
     void RestartIdleTimer();
@@ -442,11 +488,13 @@ private:
     unsigned short m_usAdjustableProperty;
     bool           m_bCollisionsEnabled;
 
-    CHandlingEntry* m_pHandlingEntry;
-    bool            m_bHandlingChanged;
+    std::unique_ptr<CHandlingEntry> m_HandlingEntry;
+    bool                            m_bHandlingChanged;
 
     unsigned char m_ucVariant;
     unsigned char m_ucVariant2;
+
+    bool m_onFire;
 
     CTickCount m_LastPushedTime;
     CVector    m_vecStationaryCheckPosition;

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaArgument.h
  *  PURPOSE:     Lua argument handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -43,7 +43,9 @@ public:
 
     void ReadBool(bool bBool);
     void ReadNumber(double dNumber);
-    void ReadString(const std::string& strString);
+    void ReadString(const std::string& string);
+    void ReadString(const std::string_view& string);
+    void ReadString(const char* string);
     void ReadElement(CElement* pElement);
     void ReadElementID(ElementID ID);
     void ReadScriptID(uint uiScriptID);
@@ -55,6 +57,7 @@ public:
     lua_Number         GetNumber() const { return m_Number; };
     const std::string& GetString() { return m_strString; };
     void*              GetUserData() const { return m_pUserData; };
+    CLuaArguments*     GetTable() const { return m_pTableData; }
     CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
 
@@ -65,6 +68,48 @@ public:
     char*        WriteToString(char* szBuffer, int length);
 
     bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
+
+    [[nodiscard]] bool IsString() const noexcept { return m_iType == LUA_TSTRING; }
+
+    [[nodiscard]] bool TryGetString(std::string_view& string) const noexcept
+    {
+        if (IsString())
+        {
+            string = m_strString;
+            return true;
+        }
+
+        string = {};
+        return false;
+    }
+
+    [[nodiscard]] bool IsNumber() const noexcept { return m_iType == LUA_TNUMBER; }
+
+    [[nodiscard]] bool TryGetNumber(lua_Number& number) const noexcept
+    {
+        if (IsNumber())
+        {
+            number = m_Number;
+            return true;
+        }
+
+        number = {};
+        return false;
+    }
+
+    [[nodiscard]] bool IsTable() const noexcept;
+
+    [[nodiscard]] bool TryGetTable(CLuaArguments*& table) const noexcept
+    {
+        if (IsTable())
+        {
+            table = m_pTableData;
+            return true;
+        }
+
+        table = nullptr;
+        return false;
+    }
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;

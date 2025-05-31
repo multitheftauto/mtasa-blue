@@ -41,7 +41,7 @@ CClientCamera::CClientCamera(CClientManager* pManager) : ClassInit(this), CClien
 CClientCamera::~CClientCamera()
 {
     // We need to be ingame
-    if (g_pGame->GetSystemState() == 9)
+    if (g_pGame->GetSystemState() == SystemState::GS_PLAYING_GAME)
     {
         // Restore the camera to the local player
         SetFocusToLocalPlayerImpl();
@@ -633,4 +633,14 @@ void CClientCamera::SetGtaMatrix(const CMatrix& matInNew, CCam* pCam) const
     *pCam->GetUp() = matNew.vUp;
     *pCam->GetFront() = matNew.vFront;
     *pCam->GetSource() = matNew.vPos;
+}
+
+void CClientCamera::ShakeCamera(float radius, float x, float y, float z) noexcept
+{
+    m_pCamera->ShakeCamera(radius, x, y, z);
+}
+
+void CClientCamera::ResetShakeCamera() noexcept
+{
+    m_pCamera->ResetShakeCamera();
 }

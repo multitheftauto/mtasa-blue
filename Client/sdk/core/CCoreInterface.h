@@ -5,7 +5,7 @@
  *  FILE:        sdk/core/CCoreInterface.h
  *  PURPOSE:     Core interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -160,7 +160,6 @@ public:
     virtual EDiagnosticDebugType GetDiagnosticDebug() = 0;
     virtual void                 SetDiagnosticDebug(EDiagnosticDebugType value) = 0;
     virtual CModelCacheManager*  GetModelCacheManager() = 0;
-    virtual void                 AddModelToPersistentCache(ushort usModelId) = 0;
     virtual void                 UpdateDummyProgress(int iValue = -1, const char* szType = "") = 0;
     virtual void                 SetDummyProgressUpdateAlways(bool bAlways) = 0;
 
@@ -192,6 +191,8 @@ public:
 
     virtual const SString& GetLastConnectedServerName() const = 0;
     virtual void           SetLastConnectedServerName(const SString& strServerName) = 0;
+
+    virtual void OnPostColorFilterRender() = 0;
 };
 
 class CClientTime

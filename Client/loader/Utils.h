@@ -156,6 +156,16 @@ bool IsErrorCodeLoggable(const std::error_code& ec);
  */
 bool IsNativeArm64Host();
 
+/**
+ * @brief Queries the integer value of a specific value item from the registry.
+ */
+bool RegQueryInteger(HKEY rootKey, LPCWSTR keyName, LPCWSTR valueName, DWORD& value);
+
+/**
+ * @brief Writes an integer value to a specific value item in the registry.
+ */
+bool RegWriteInteger(HKEY rootKey, LPCWSTR keyName, LPCWSTR valueName, DWORD value);
+
 // Return false on read failure
 template <class T>
 bool ReadFileValue(const SString& strFilename, T& value, uint uiOffset)

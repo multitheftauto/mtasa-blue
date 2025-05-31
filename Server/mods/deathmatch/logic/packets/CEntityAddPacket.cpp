@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CEntityAddPacket.cpp
  *  PURPOSE:     Entity-add packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -18,6 +18,7 @@
 #include "CColRectangle.h"
 #include "CColTube.h"
 #include "CDummy.h"
+#include "CBuilding.h"
 #include "CPickup.h"
 #include "CMarker.h"
 #include "CBlip.h"
@@ -151,6 +152,12 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 {
                     CObject* pObject = static_cast<CObject*>(pElement);
                     bCollisionsEnabled = pObject->GetCollisionEnabled();
+                    break;
+                }
+                case CElement::BUILDING:
+                {
+                    CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+                    bCollisionsEnabled = pBuilding->GetCollisionEnabled();
                     break;
                 }
                 case CElement::PED:
@@ -300,6 +307,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // is object break?
                     if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
                         BitStream.WriteBit(pObject->GetHealth() <= 0);
+
+                    // Respawnable
+                    if (BitStream.Can(eBitStreamVersion::RespawnObject_Serverside))
+                        BitStream.WriteBit(pObject->IsRespawnEnabled());
 
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
@@ -608,8 +619,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(false);
 
                     // Write handling
-                    if (g_pGame->GetHandlingManager()->HasModelHandlingChanged(static_cast<eVehicleTypes>(pVehicle->GetModel())) ||
-                        pVehicle->HasHandlingChanged())
+                    if (g_pGame->GetHandlingManager()->HasModelHandlingChanged(pVehicle->GetModel()) || pVehicle->HasHandlingChanged())
                     {
                         BitStream.WriteBit(true);
                         SVehicleHandlingSync handling;
@@ -728,10 +738,25 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                             position.data.vecPosition = pMarker->GetTarget();
                             BitStream.Write(&position);
+
+                            if (markerType.data.ucType == CMarker::TYPE_CHECKPOINT && BitStream.Can(eBitStreamVersion::SetMarkerTargetArrowProperties))
+                            {
+                                SColor color = pMarker->GetTargetArrowColor();
+
+                                BitStream.Write(color.R);
+                                BitStream.Write(color.G);
+                                BitStream.Write(color.B);
+                                BitStream.Write(color.A);
+                                BitStream.Write(pMarker->GetTargetArrowSize());
+                            }
                         }
                         else
                             BitStream.WriteBit(false);
                     }
+
+                    // Alpha limit
+                    if (BitStream.Can(eBitStreamVersion::Marker_IgnoreAlphaLimits))
+                        BitStream.WriteBit(pMarker->AreAlphaLimitsIgnored());
 
                     break;
                 }
@@ -959,6 +984,34 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.Write(currentWeaponSlot);
                     }
 
+                    // Animation
+                    if (BitStream.Can(eBitStreamVersion::AnimationsSync))
+                    {
+                        const SPlayerAnimData& animData = pPed->GetAnimationData();
+
+                        // Contains animation data?
+                        bool animRunning = animData.IsAnimating();
+                        BitStream.WriteBit(animRunning);
+
+                        if (animRunning)
+                        {
+                            BitStream.WriteString(animData.blockName);
+                            BitStream.WriteString(animData.animName);
+                            BitStream.Write(animData.time);
+                            BitStream.WriteBit(animData.loop);
+                            BitStream.WriteBit(animData.updatePosition);
+                            BitStream.WriteBit(animData.interruptable);
+                            BitStream.WriteBit(animData.freezeLastFrame);
+                            BitStream.Write(animData.blendTime);
+                            BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
+
+                            // Write elapsed time & speed
+                            float elapsedTime = GetTickCount64_() - animData.startedTick;
+                            BitStream.Write(elapsedTime);
+                            BitStream.Write(animData.speed);
+                        }
+                    }
+
                     break;
                 }
 
@@ -1096,6 +1149,37 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     }
                     if (BitStream.Can(eBitStreamVersion::Water_bShallow_ServerSide))
                         BitStream.WriteBit(pWater->IsWaterShallow());
+                    break;
+                }
+
+                case CElement::BUILDING:
+                {
+                    if (!BitStream.Can(eBitStreamVersion::ServersideBuildingElement))
+                    {
+                        CLogger::LogPrintf("not sending this element - id: %i\n", pElement->GetType());
+                        break;
+                    }
+
+                    CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+
+                    // Position
+                    position.data.vecPosition = pBuilding->GetPosition();
+                    BitStream.Write(&position);
+
+                    // Rotation
+                    SRotationRadiansSync rotationRadians(false);
+                    pBuilding->GetRotation(rotationRadians.data.vecRotation);
+                    BitStream.Write(&rotationRadians);
+
+                    // Model id
+                    BitStream.WriteCompressed(pBuilding->GetModel());
+
+                    // Interior
+                    BitStream.WriteCompressed(pBuilding->GetInterior());
+
+                    CBuilding* pLowLodBuilding = pBuilding->GetLowLodElement();
+                    ElementID lowLodBuildingID = pLowLodBuilding ? pLowLodBuilding->GetID() : INVALID_ELEMENT_ID;
+                    BitStream.Write(lowLodBuildingID);
                     break;
                 }
 

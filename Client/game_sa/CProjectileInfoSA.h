@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CProjectileInfoSA.h
  *  PURPOSE:     Header file for projectile type information class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -25,8 +25,6 @@
 #define ARRAY_CProjectile                   0xC89110 //##SA##
 #define ARRAY_CProjectileInfo               0xC891A8 //##SA##
 
-#define VTBL_CProjectile 0x867030
-
 // #pragma pack(push,1)
 class CProjectileInfoSAInterface
 {
@@ -42,7 +40,8 @@ public:
 };
 // #pragma pack(pop)
 
-class CProjectileInfoSA : public CProjectileInfo
+// TODO extract manager class
+class CProjectileInfoSA final : public CProjectileInfo
 {
 private:
     CProjectileInfoSA*          projectileInfo[PROJECTILE_INFO_COUNT];
@@ -65,6 +64,7 @@ public:
     CProjectileInfo* GetProjectileInfo(DWORD dwIndex);
     bool             AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
     CProjectile*     GetProjectile(void* projectilePointer);
+    void             RemoveEntityReferences(CEntity* entity);
 
     CEntity* GetTarget();
     void     SetTarget(CEntity* pEntity);

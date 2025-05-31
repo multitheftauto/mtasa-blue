@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPoolsSA.h
  *  PURPOSE:     Header file for pools interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -104,6 +104,14 @@ public:
         return &m_pObjects[uiSlot];
     }
 
+    B* AllocateAtNoInit(std::uint32_t uiSlot)
+    {
+        m_byteMap[uiSlot].bEmpty = false;
+        m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
+
+        return &m_pObjects[uiSlot];
+    }
+
     void Release(uint index)
     {
         m_byteMap[index].bEmpty = true;
@@ -114,8 +122,9 @@ public:
 
     void Delete(uint index) { Release(index); }
 
-    bool IsEmpty(std::int32_t objectIndex) { return m_byteMap[objectIndex].bEmpty; }
-    bool IsContains(uint index)
+    std::int32_t Size() const noexcept { return m_nSize; };
+    bool IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
+    bool IsContains(uint index) const
     {
         if (m_nSize <= index)
             return false;
