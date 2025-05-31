@@ -3457,7 +3457,7 @@ void CClientGame::Event_OnIngame()
 
     // This is to prevent the 'white arrows in checkpoints' bug (#274)
     CVector pos(0, 0, 0);
-    g_pGame->Get3DMarkers()->CreateMarker(87654, (e3DMarkerType)5, &pos, 1, 0.2f, 0, 0, 0, 0);
+    g_pGame->Get3DMarkers()->CreateMarker(87654, T3DMarkerType::MARKER3D_CONE, &pos, 1, 0.2f, 0, 0, 0, 0);
 
     // Stop us getting 4 stars if we visit the SF or LV
     // g_pGame->GetPlayerInfo()->GetWanted()->SetMaximumWantedLevel ( 0 );
@@ -6056,6 +6056,9 @@ bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, c
         case WorldSpecialProperty::FLYINGCOMPONENTS:
             m_pVehicleManager->SetSpawnFlyingComponentEnabled(enabled);
             break;
+        case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
+            g_pGame->SetVehicleBurnExplosionsEnabled(enabled);
+            break;
         default:
             return false;
     }
@@ -6100,6 +6103,8 @@ bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
             return g_pGame->IsIgnoreFireStateEnabled();
         case WorldSpecialProperty::FLYINGCOMPONENTS:
             return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
+        case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
+            return g_pGame->IsVehicleBurnExplosionsEnabled();
     }
 
     return false;
@@ -6817,6 +6822,9 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         g_pGame->SetRoadSignsTextEnabled(true);
         g_pGame->SetExtendedWaterCannonsEnabled(true);
         g_pGame->SetTunnelWeatherBlendEnabled(true);
+        g_pGame->SetIgnoreFireStateEnabled(false);
+        m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
+        g_pGame->SetVehicleBurnExplosionsEnabled(true);
     }
 
     // Reset all setWorldProperty to default
