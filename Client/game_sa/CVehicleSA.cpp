@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
 #include "CAutomobileSA.h"
 #include "CBikeSA.h"
 #include "CCameraSA.h"
@@ -28,7 +30,8 @@
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
 
-extern CGameSA* pGame;
+extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
 _declspec(naked) void DoVehicleSunGlare(void* this_)
@@ -63,7 +66,7 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
     if (vehicle->pEntity->GetVehicleRotorState())
     {
-        if (!pGame->IsVehicleEngineManualModeEnabled()) // keep default behavior
+        if (!g_pCore->GetMultiplayer()->IsVehicleEngineManualModeEnabled()) // keep default behavior
             return true;
 
         if (vehicle->pEntity->GetEntityStatus() != eEntityStatus::STATUS_PHYSICS && !vehicle->pEntity->IsBeingDriven())

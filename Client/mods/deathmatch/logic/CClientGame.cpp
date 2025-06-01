@@ -6145,16 +6145,16 @@ bool CClientGame::IsWeaponRenderEnabled() const
 
 void CClientGame::SetVehicleEngineManualModeEnabled(bool enabled)
 {
-    if (enabled == g_pGame->IsVehicleEngineManualModeEnabled())
+    if (enabled == g_pMultiplayer->IsVehicleEngineManualModeEnabled())
         return;
 
-    g_pGame->SetVehicleEngineManualModeEnabled(enabled);
+    g_pMultiplayer->SetVehicleEngineManualModeEnabled(enabled);
     m_pVehicleManager->ResetNotControlledRotors(enabled);
 }
 
 bool CClientGame::IsVehicleEngineManualModeEnabled() const
 {
-    return g_pGame->IsVehicleEngineManualModeEnabled();
+    return g_pMultiplayer->IsVehicleEngineManualModeEnabled();
 }
 
 #pragma code_seg(".text")

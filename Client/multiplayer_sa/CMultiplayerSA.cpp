@@ -6634,6 +6634,25 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter(bool bSet)
         MemSet((char*)0x64BC0D, 0x90, 6);
 }
 
+bool CMultiplayerSA::IsVehicleEngineManualModeEnabled() const noexcept
+{
+    return *(unsigned char*)0x64BC03 == 0x90;
+}
+
+void CMultiplayerSA::SetVehicleEngineManualModeEnabled(bool enabled)
+{
+    if (enabled)
+    {
+        MemSet((void*)0x64BC03, 0x90, 5);                          // prevent vehicle engine from turning on (driver enter)
+        MemCpy((void*)0x6C4EA9, "\xE9\x15\x03\x00", 4);            // prevent aircraft engine from turning off (driver exit)
+    }
+    else
+    {
+        MemCpy((void*)0x64BC03, "\x75\x05\x80\xC9\x10", 5);
+        MemCpy((void*)0x6C4EA9, "\x8A\x86\x28\x04", 4);
+    }
+}
+
 // Storage
 CVehicleSAInterface* pHeliKiller = NULL;
 CEntitySAInterface*  pHitByHeli = NULL;
