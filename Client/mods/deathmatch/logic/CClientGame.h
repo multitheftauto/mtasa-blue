@@ -426,8 +426,8 @@ public:
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
 
-    void SetVehicleEngineManualModeEnabled(bool enabled);
-    bool IsVehicleEngineManualModeEnabled() const;
+    void SetVehicleEngineAutoStartEnabled(bool enabled);
+    bool IsVehicleEngineAutoStartEnabled() const;
 
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 

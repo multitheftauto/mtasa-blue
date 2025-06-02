@@ -2126,10 +2126,10 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         else
             data8.vehicleburnexplosions = true;
 
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleEngineManualMode))
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleEngineAutoStart))
             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
         else
-            data9.vehEngineManualMode = false;
+            data9.vehicleEngineAutoStart = true;
             
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2163,7 +2163,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleBurnExplosions))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data8), BITCOUNT8);
 
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleEngineManualMode))
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleEngineAutoStart))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
 
         //// Example for adding item:
@@ -2225,7 +2225,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 
     struct
     {
-        bool vehEngineManualMode : 1;
+        bool vehicleEngineAutoStart : 1;
     } data9;
     
     SWorldSpecialPropertiesStateSync()
@@ -2250,7 +2250,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data6.ignoreFireState = false;
         data7.flyingcomponents = true;
         data8.vehicleburnexplosions = true;
-        data9.vehEngineManualMode = false;
+        data9.vehicleEngineAutoStart = true;
     }
 };
 

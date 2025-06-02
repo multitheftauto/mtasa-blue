@@ -57,7 +57,7 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
     }
 }
 
-float& fTimeStep = *(float*)(0xB7CB5C);
+static float& fTimeStep = *(float*)(0xB7CB5C);
 static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleInterface)
 {
     SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)vehicleInterface);
@@ -66,7 +66,7 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
     if (vehicle->pEntity->GetVehicleRotorState())
     {
-        if (!g_pCore->GetMultiplayer()->IsVehicleEngineManualModeEnabled()) // keep default behavior
+        if (g_pCore->GetMultiplayer()->IsVehicleEngineAutoStartEnabled()) // keep default behavior
             return true;
 
         if (vehicle->pEntity->GetEntityStatus() != eEntityStatus::STATUS_PHYSICS && !vehicle->pEntity->IsBeingDriven())

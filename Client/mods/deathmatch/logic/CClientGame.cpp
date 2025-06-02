@@ -6057,8 +6057,8 @@ bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, c
         case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
             g_pGame->SetVehicleBurnExplosionsEnabled(enabled);
             break;
-        case WorldSpecialProperty::VEHICLE_ENGINE_MANUAL_MODE:
-            SetVehicleEngineManualModeEnabled(enabled);
+        case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
+            SetVehicleEngineAutoStartEnabled(enabled);
             break;
         default:
             return false;
@@ -6106,8 +6106,8 @@ bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
             return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
         case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
             return g_pGame->IsVehicleBurnExplosionsEnabled();
-        case WorldSpecialProperty::VEHICLE_ENGINE_MANUAL_MODE:
-            return IsVehicleEngineManualModeEnabled();
+        case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
+            return IsVehicleEngineAutoStartEnabled();
     }
 
     return false;
@@ -6143,18 +6143,18 @@ bool CClientGame::IsWeaponRenderEnabled() const
     return g_pGame->IsWeaponRenderEnabled();
 }
 
-void CClientGame::SetVehicleEngineManualModeEnabled(bool enabled)
+void CClientGame::SetVehicleEngineAutoStartEnabled(bool enabled)
 {
-    if (enabled == g_pMultiplayer->IsVehicleEngineManualModeEnabled())
+    if (enabled == g_pMultiplayer->IsVehicleEngineAutoStartEnabled())
         return;
 
-    g_pMultiplayer->SetVehicleEngineManualModeEnabled(enabled);
+    g_pMultiplayer->SetVehicleEngineAutoStartEnabled(enabled);
     m_pVehicleManager->ResetNotControlledRotors(enabled);
 }
 
-bool CClientGame::IsVehicleEngineManualModeEnabled() const
+bool CClientGame::IsVehicleEngineAutoStartEnabled() const
 {
-    return g_pMultiplayer->IsVehicleEngineManualModeEnabled();
+    return g_pMultiplayer->IsVehicleEngineAutoStartEnabled();
 }
 
 #pragma code_seg(".text")
@@ -6842,7 +6842,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         g_pGame->SetIgnoreFireStateEnabled(false);
         m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
         g_pGame->SetVehicleBurnExplosionsEnabled(true);
-        SetVehicleEngineManualModeEnabled(false);
+        SetVehicleEngineAutoStartEnabled(true);
     }
 
     // Reset all setWorldProperty to default
