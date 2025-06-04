@@ -195,6 +195,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         wsProps.data6.ignoreFireState = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE);
         wsProps.data7.flyingcomponents = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS);
         wsProps.data8.vehicleburnexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS);
+        wsProps.data9.vehicleEngineAutoStart = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART);
         BitStream.Write(&wsProps);
     }
 
