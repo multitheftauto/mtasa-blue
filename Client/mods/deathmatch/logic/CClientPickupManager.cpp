@@ -92,7 +92,7 @@ bool CClientPickupManager::IsValidPickupID(unsigned short usPickupID)
 
 bool CClientPickupManager::IsValidWeaponID(unsigned short usWeaponID)
 {
-    return (usWeaponID > 0 && usWeaponID != 13 && usWeaponID != 19 && usWeaponID != 20 && usWeaponID != 21 && usWeaponID <= 46);
+    return (usWeaponID > 0 && usWeaponID != 19 && usWeaponID != 20 && usWeaponID != 21 && usWeaponID <= 46);
 }
 
 bool CClientPickupManager::IsPickupLimitReached()
