@@ -791,3 +791,20 @@ void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
         pVehicle->GetUpgrades()->RestreamVehicleUpgrades(usModel);
     }
 }
+
+void CClientVehicleManager::ResetNotControlledRotors(bool engineAutoStart)
+{
+    // Reset rotors to original or custom state for loaded vehicles without controller
+    // Custom state allows rotors to spin without driver inside (if engine is on)
+    eEntityStatus status = engineAutoStart ? eEntityStatus::STATUS_ABANDONED : eEntityStatus::STATUS_PHYSICS;
+    for (auto& pVehicle : m_List)
+    {
+        if (pVehicle->GetGameEntity() && pVehicle->GetVehicleRotorState() && !pVehicle->IsDriven())
+        {
+            float speed = (!engineAutoStart && pVehicle->IsEngineOn()) ? 0.001f : 0.0f;
+            pVehicle->GetGameEntity()->SetEntityStatus(status);
+            pVehicle->SetHeliRotorSpeed(speed);
+            pVehicle->SetPlaneRotorSpeed(speed);
+        }
+    }
+}
