@@ -65,7 +65,7 @@ bool CPickupManager::Exists(CPickup* pPickup)
 
 bool CPickupManager::IsValidWeaponID(unsigned int uiWeaponID)
 {
-    return (uiWeaponID > 0 && uiWeaponID != 13 && uiWeaponID != 19 && uiWeaponID != 20 && uiWeaponID != 21 && uiWeaponID <= 46);
+    return (uiWeaponID > 0 && uiWeaponID != 19 && uiWeaponID != 20 && uiWeaponID != 21 && uiWeaponID <= 46);
 }
 
 unsigned short CPickupManager::GetWeaponModel(unsigned int uiWeaponID)
