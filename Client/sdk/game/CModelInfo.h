@@ -194,6 +194,14 @@ public:
     virtual bool IsAlphaTransparencyEnabled() = 0;
     virtual void ResetAlphaTransparency() = 0;
 
+    virtual bool ConvertToClump() = 0;
+    virtual bool ConvertToAtomic(bool damageable) = 0;
+    virtual bool ConvertToTimedObject() = 0;
+    virtual CBaseModelInfoSAInterface* GetLastConversionInterface() const noexcept = 0;
+    virtual void                       SetLastConversionInterface(CBaseModelInfoSAInterface* lastInterface) noexcept = 0;
+    virtual CBaseModelInfoSAInterface* GetOriginalInterface() const = 0;
+    virtual bool                       IsSameModelType() = 0;
+
     // ONLY use for CVehicleModelInfos
     virtual short        GetAvailableVehicleMod(unsigned short usSlot) = 0;
     virtual bool         IsUpgradeAvailable(eVehicleUpgradePosn posn) = 0;
