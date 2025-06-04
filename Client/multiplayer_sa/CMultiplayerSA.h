@@ -333,6 +333,9 @@ public:
 
     void SetAutomaticVehicleStartupOnPedEnter(bool bSet);
 
+    bool IsVehicleEngineAutoStartEnabled() const noexcept override;
+    void SetVehicleEngineAutoStartEnabled(bool enabled) override;
+
     void SetPedTargetingMarkerEnabled(bool bEnable);
     bool IsPedTargetingMarkerEnabled();
     bool IsConnected();
