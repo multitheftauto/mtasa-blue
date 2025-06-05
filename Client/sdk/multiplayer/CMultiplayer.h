@@ -447,6 +447,9 @@ public:
     virtual bool IsVehicleEngineAutoStartEnabled() const noexcept = 0;
     virtual void SetVehicleEngineAutoStartEnabled(bool enabled) = 0;
 
+    virtual bool IsRapidVehicleStopFixEnabled() const noexcept = 0;
+    virtual void SetRapidVehicleStopFixEnabled(bool enabled) = 0;
+
     virtual void SetPedTargetingMarkerEnabled(bool bEnabled) = 0;
     virtual bool IsPedTargetingMarkerEnabled() = 0;
 
