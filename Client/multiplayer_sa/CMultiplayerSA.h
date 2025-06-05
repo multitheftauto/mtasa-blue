@@ -336,7 +336,7 @@ public:
     bool IsVehicleEngineAutoStartEnabled() const noexcept override;
     void SetVehicleEngineAutoStartEnabled(bool enabled) override;
 
-    bool IsRapidVehicleStopFixEnabled() const noexcept override { return isRapidVehicleStopFixEnabled; };
+    bool IsRapidVehicleStopFixEnabled() const noexcept override { return m_isRapidVehicleStopFixEnabled; };
     void SetRapidVehicleStopFixEnabled(bool enabled) override;
 
     void SetPedTargetingMarkerEnabled(bool bEnable);
@@ -388,7 +388,7 @@ private:
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
 
-    bool isRapidVehicleStopFixEnabled{false};
+    bool m_isRapidVehicleStopFixEnabled{false};
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

@@ -659,7 +659,7 @@ static void _declspec(naked) HOOK_VehicleRapidStopFix()
 
 void CMultiplayerSA::SetRapidVehicleStopFixEnabled(bool enabled)
 {
-    if (isRapidVehicleStopFixEnabled == enabled)
+    if (m_isRapidVehicleStopFixEnabled == enabled)
         return;
 
     if (enabled)
@@ -687,7 +687,7 @@ void CMultiplayerSA::SetRapidVehicleStopFixEnabled(bool enabled)
         MemCpy((void*)0x6D76CD, "\xD9\x05\xCC\xB9\xC2\x00", 6);
     }
 
-    isRapidVehicleStopFixEnabled = enabled;
+    m_isRapidVehicleStopFixEnabled = enabled;
 }
 
 void CMultiplayerSA::InitHooks_FrameRateFixes()
