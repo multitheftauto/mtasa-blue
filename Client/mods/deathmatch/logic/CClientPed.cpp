@@ -5733,7 +5733,7 @@ bool CClientPed::IsRunningAnimation()
         }
         return false;
     }
-    return (m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame && m_pAnimationBlock);
+    return (m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame) && m_pAnimationBlock;
 }
 
 bool CClientPed::IsAnimationInProgress()
