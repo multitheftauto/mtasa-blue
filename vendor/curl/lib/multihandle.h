@@ -27,20 +27,23 @@
 #include "llist.h"
 #include "hash.h"
 #include "conncache.h"
+#include "cshutdn.h"
+#include "multi_ev.h"
 #include "psl.h"
 #include "socketpair.h"
 
 struct connectdata;
+struct Curl_easy;
 
 struct Curl_message {
-  struct Curl_llist_element list;
+  struct Curl_llist_node list;
   /* the 'CURLMsg' is the part that is visible to the external user */
   struct CURLMsg extmsg;
 };
 
-/* NOTE: if you add a state here, add the name to the statename[] array as
-   well!
-*/
+/* NOTE: if you add a state here, add the name to the statenames[] array
+ * in curl_trc.c as well!
+ */
 typedef enum {
   MSTATE_INIT,         /* 0 - start in this state */
   MSTATE_PENDING,      /* 1 - no connections, waiting for one */
@@ -80,19 +83,11 @@ typedef enum {
 /* value for MAXIMUM CONCURRENT STREAMS upper limit */
 #define INITIAL_MAX_CONCURRENT_STREAMS ((1U << 31) - 1)
 
-/* Curl_multi SSL backend-specific data; declared differently by each SSL
-   backend */
-struct multi_ssl_backend_data;
-
 /* This is the struct known as CURLM on the outside */
 struct Curl_multi {
   /* First a simple identifier to easier detect if a user mix up
      this multi handle with an easy handle. Set this to CURL_MULTI_HANDLE. */
   unsigned int magic;
-
-  /* We have a doubly-linked list with easy handles */
-  struct Curl_easy *easyp;
-  struct Curl_easy *easylp; /* last node */
 
   unsigned int num_easy; /* amount of entries in the linked list above. */
   unsigned int num_alive; /* amount of easy handles that are added but have
@@ -100,10 +95,13 @@ struct Curl_multi {
 
   struct Curl_llist msglist; /* a list of messages from completed transfers */
 
-  struct Curl_llist pending; /* Curl_easys that are in the
-                                MSTATE_PENDING state */
-  struct Curl_llist msgsent; /* Curl_easys that are in the
-                                MSTATE_MSGSENT state */
+  /* Each added easy handle is added to ONE of these three lists */
+  struct Curl_llist process; /* not in PENDING or MSGSENT */
+  struct Curl_llist pending; /* in PENDING */
+  struct Curl_llist msgsent; /* in MSGSENT */
+  curl_off_t next_easy_mid; /* next multi-id for easy handle added */
+
+  struct Curl_easy *admin; /* internal easy handle for admin operations */
 
   /* callback function and user data pointer for the *socket() API */
   curl_socket_callback socket_cb;
@@ -113,8 +111,8 @@ struct Curl_multi {
   curl_push_callback push_cb;
   void *push_userp;
 
-  /* Hostname cache */
-  struct Curl_hash hostcache;
+  struct Curl_hash hostcache; /* Hostname cache */
+  struct Curl_ssl_scache *ssl_scache; /* TLS session pool */
 
 #ifdef USE_LIBPSL
   /* PSL cache. */
@@ -131,18 +129,23 @@ struct Curl_multi {
   /* buffer used for upload data, lazy initialized */
   char *xfer_ulbuf; /* the actual buffer */
   size_t xfer_ulbuf_len;      /* the allocated length */
+  /* buffer used for socket I/O operations, lazy initialized */
+  char *xfer_sockbuf; /* the actual buffer */
+  size_t xfer_sockbuf_len; /* the allocated length */
 
-#if defined(USE_SSL)
-  struct multi_ssl_backend_data *ssl_backend_data;
-#endif
+  /* multi event related things */
+  struct curl_multi_ev ev;
 
-  /* 'sockhash' is the lookup hash for socket descriptor => easy handles (note
-     the pluralis form, there can be more than one easy handle waiting on the
-     same actual socket) */
-  struct Curl_hash sockhash;
+  /* `proto_hash` is a general key-value store for protocol implementations
+   * with the lifetime of the multi handle. The number of elements kept here
+   * should be in the order of supported protocols (and sub-protocols like
+   * TLS), *not* in the order of connections or current transfers!
+   * Elements need to be added with their own destructor to be invoked when
+   * the multi handle is cleaned up (see Curl_hash_add2()).*/
+  struct Curl_hash proto_hash;
 
-  /* Shared connection cache (bundles)*/
-  struct conncache conn_cache;
+  struct cshutdn cshutdn; /* connection shutdown handling */
+  struct cpool cpool;     /* connection pool (bundles) */
 
   long max_host_connections; /* if >0, a fixed limit of the maximum number
                                 of connections per host */
@@ -153,19 +156,21 @@ struct Curl_multi {
   /* timer callback and user data pointer for the *socket() API */
   curl_multi_timer_callback timer_cb;
   void *timer_userp;
-  struct curltime timer_lastcall; /* the fixed time for the timeout for the
-                                    previous callback */
+  long last_timeout_ms;        /* the last timeout value set via timer_cb */
+  struct curltime last_expire_ts; /* timestamp of last expiry */
+
 #ifdef USE_WINSOCK
-  WSAEVENT wsa_event; /* winsock event used for waits */
+  WSAEVENT wsa_event; /* Winsock event used for waits */
 #else
 #ifdef ENABLE_WAKEUP
-  curl_socket_t wakeup_pair[2]; /* pipe()/socketpair() used for wakeup
-                                   0 is used for read, 1 is used for write */
+  curl_socket_t wakeup_pair[2]; /* eventfd()/pipe()/socketpair() used for
+                                   wakeup 0 is used for read, 1 is used
+                                   for write */
 #endif
 #endif
   unsigned int max_concurrent_streams;
   unsigned int maxconnects; /* if >0, a fixed limit of the maximum number of
-                               entries we're allowed to grow the connection
+                               entries we are allowed to grow the connection
                                cache to */
 #define IPV6_UNKNOWN 0
 #define IPV6_DEAD    1
@@ -181,6 +186,7 @@ struct Curl_multi {
                 burn */
   BIT(xfer_buf_borrowed);      /* xfer_buf is currently being borrowed */
   BIT(xfer_ulbuf_borrowed);    /* xfer_ulbuf is currently being borrowed */
+  BIT(xfer_sockbuf_borrowed);  /* xfer_sockbuf is currently being borrowed */
 #ifdef DEBUGBUILD
   BIT(warned);                 /* true after user warned of DEBUGBUILD */
 #endif

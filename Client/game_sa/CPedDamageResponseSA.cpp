@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPedDamageResponseCalculatorSA.cpp
  *  PURPOSE:     ped damage response calculator
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

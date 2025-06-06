@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/bitstream.h
  *  PURPOSE:     Network bitstream interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -556,7 +556,7 @@ enum class eBitStreamVersion : unsigned short
     // 2024-06-16
     PedSync_Revision,
 
-    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
+    // Add "tunnelweatherblend" to setWorldSpecialPropertyEnabled
     // 2024-06-30
     WorldSpecialProperty_TunnelWeatherBlend,
 
@@ -599,6 +599,30 @@ enum class eBitStreamVersion : unsigned short
     // Ped animations synchronization
     // 2025-01-01
     AnimationsSync,
+
+    // Add server side isPedReloadingWeapon
+    // 2025-01-09
+    IsPedReloadingWeapon,
+
+    // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
+    // 2025-01-10
+    WorldSpecialProperty_FlyingComponents,
+
+    // Ped's camera synchronization
+    // 2025-01-29
+    PedSync_CameraRotation,
+
+    // Add "vehicleburnexplosions" to setWorldSpecialPropertyEnabled
+    // 2025-02-20
+    WorldSpecialProperty_VehicleBurnExplosions,
+
+    // Add serverside building support
+    // 2025-05-26
+    ServersideBuildingElement,
+
+    // Add "vehenginemanualmode" to setWorldSpecialPropertyEnabled
+    // 2025-06-02
+    WorldSpecialProperty_VehicleEngineAutoStart,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

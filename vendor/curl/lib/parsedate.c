@@ -83,6 +83,7 @@
 #include "strcase.h"
 #include "warnless.h"
 #include "parsedate.h"
+#include "strparse.h"
 
 /*
  * parsedate()
@@ -100,7 +101,9 @@ static int parsedate(const char *date, time_t *output);
 #define PARSEDATE_OK     0
 #define PARSEDATE_FAIL   -1
 #define PARSEDATE_LATER  1
+#if defined(HAVE_TIME_T_UNSIGNED) || (SIZEOF_TIME_T < 5)
 #define PARSEDATE_SOONER 2
+#endif
 
 #if !defined(CURL_DISABLE_PARSEDATE) || !defined(CURL_DISABLE_FTP) || \
   !defined(CURL_DISABLE_FILE)
@@ -218,7 +221,7 @@ static int checkday(const char *check, size_t len)
     what = &Curl_wkday[0];
   else
     return -1; /* too short */
-  for(i = 0; i<7; i++) {
+  for(i = 0; i < 7; i++) {
     size_t ilen = strlen(what[0]);
     if((ilen == len) &&
        strncasecompare(check, what[0], len))
@@ -235,7 +238,7 @@ static int checkmonth(const char *check, size_t len)
   if(len != 3)
     return -1; /* not a month */
 
-  for(i = 0; i<12; i++) {
+  for(i = 0; i < 12; i++) {
     if(strncasecompare(check, what[0], 3))
       return i;
     what++;
@@ -244,7 +247,7 @@ static int checkmonth(const char *check, size_t len)
 }
 
 /* return the time zone offset between GMT and the input one, in number
-   of seconds or -1 if the timezone wasn't found/legal */
+   of seconds or -1 if the timezone was not found/legal */
 
 static int checktz(const char *check, size_t len)
 {
@@ -253,7 +256,7 @@ static int checktz(const char *check, size_t len)
   if(len > 4) /* longer than any valid timezone */
     return -1;
 
-  for(i = 0; i< sizeof(tz)/sizeof(tz[0]); i++) {
+  for(i = 0; i < CURL_ARRAYSIZE(tz); i++) {
     size_t ilen = strlen(what->name);
     if((ilen == len) &&
        strncasecompare(check, what->name, len))
@@ -265,7 +268,7 @@ static int checktz(const char *check, size_t len)
 
 static void skip(const char **date)
 {
-  /* skip everything that aren't letters or digits */
+  /* skip everything that are not letters or digits */
   while(**date && !ISALNUM(**date))
     (*date)++;
 }
@@ -277,7 +280,7 @@ enum assume {
 };
 
 /*
- * time2epoch: time stamp to seconds since epoch in GMT time zone.  Similar to
+ * time2epoch: time stamp to seconds since epoch in GMT time zone. Similar to
  * mktime but for GMT only.
  */
 static time_t time2epoch(int sec, int min, int hour,
@@ -336,7 +339,7 @@ match:
   *h = hh;
   *m = mm;
   *s = ss;
-  *endp = (char *)p;
+  *endp = (char *)CURL_UNCONST(p);
   return TRUE;
 }
 
@@ -409,7 +412,7 @@ static int parsedate(const char *date, time_t *output)
     }
     else if(ISDIGIT(*date)) {
       /* a digit */
-      int val;
+      unsigned int val;
       char *end;
       if((secnum == -1) &&
          match_time(date, &hournum, &minnum, &secnum, &end)) {
@@ -417,35 +420,24 @@ static int parsedate(const char *date, time_t *output)
         date = end;
       }
       else {
-        long lval;
-        int error;
-        int old_errno;
-
-        old_errno = errno;
-        errno = 0;
-        lval = strtol(date, &end, 10);
-        error = errno;
-        if(errno != old_errno)
-          errno = old_errno;
-
-        if(error)
+        curl_off_t lval;
+        int num_digits = 0;
+        const char *p = date;
+        if(Curl_str_number(&p, &lval, 99999999))
           return PARSEDATE_FAIL;
 
-#if LONG_MAX != INT_MAX
-        if((lval > (long)INT_MAX) || (lval < (long)INT_MIN))
-          return PARSEDATE_FAIL;
-#endif
-
-        val = curlx_sltosi(lval);
+        /* we know num_digits cannot be larger than 8 */
+        num_digits = (int)(p - date);
+        val = (unsigned int)lval;
 
         if((tzoff == -1) &&
-           ((end - date) == 4) &&
+           (num_digits == 4) &&
            (val <= 1400) &&
-           (indate< date) &&
+           (indate < date) &&
            ((date[-1] == '+' || date[-1] == '-'))) {
           /* four digits and a value less than or equal to 1400 (to take into
              account all sorts of funny time zone diffs) and it is preceded
-             with a plus or minus. This is a time zone indication.  1400 is
+             with a plus or minus. This is a time zone indication. 1400 is
              picked since +1300 is frequently used and +1400 is mentioned as
              an edge number in the document "ISO C 200X Proposal: Timezone
              Functions" at http://david.tribble.com/text/c0xtimezone.html If
@@ -456,13 +448,13 @@ static int parsedate(const char *date, time_t *output)
 
           /* the + and - prefix indicates the local time compared to GMT,
              this we need their reversed math to get what we want */
-          tzoff = date[-1]=='+'?-tzoff:tzoff;
+          tzoff = date[-1]=='+' ? -tzoff : tzoff;
         }
 
-        if(((end - date) == 8) &&
-           (yearnum == -1) &&
-           (monnum == -1) &&
-           (mdaynum == -1)) {
+        else if((num_digits == 8) &&
+                (yearnum == -1) &&
+                (monnum == -1) &&
+                (mdaynum == -1)) {
           /* 8 digits, no year, month or day yet. This is YYYYMMDD */
           found = TRUE;
           yearnum = val/10000;
@@ -471,7 +463,7 @@ static int parsedate(const char *date, time_t *output)
         }
 
         if(!found && (dignext == DATE_MDAY) && (mdaynum == -1)) {
-          if((val > 0) && (val<32)) {
+          if((val > 0) && (val < 32)) {
             mdaynum = val;
             found = TRUE;
           }
@@ -494,7 +486,7 @@ static int parsedate(const char *date, time_t *output)
         if(!found)
           return PARSEDATE_FAIL;
 
-        date = end;
+        date = p;
       }
     }
 
@@ -521,13 +513,13 @@ static int parsedate(const char *date, time_t *output)
 #if (SIZEOF_TIME_T < 5)
 
 #ifdef HAVE_TIME_T_UNSIGNED
-  /* an unsigned 32 bit time_t can only hold dates to 2106 */
+  /* an unsigned 32-bit time_t can only hold dates to 2106 */
   if(yearnum > 2105) {
     *output = TIME_T_MAX;
     return PARSEDATE_LATER;
   }
 #else
-  /* a signed 32 bit time_t can only hold dates to the beginning of 2038 */
+  /* a signed 32-bit time_t can only hold dates to the beginning of 2038 */
   if(yearnum > 2037) {
     *output = TIME_T_MAX;
     return PARSEDATE_LATER;
@@ -549,7 +541,7 @@ static int parsedate(const char *date, time_t *output)
     return PARSEDATE_FAIL; /* clearly an illegal date */
 
   /* time2epoch() returns a time_t. time_t is often 32 bits, sometimes even on
-     architectures that feature 64 bit 'long' but ultimately time_t is the
+     architectures that feature a 64 bits 'long' but ultimately time_t is the
      correct data type to use.
   */
   t = time2epoch(secnum, minnum, hournum, mdaynum, monnum, yearnum);
@@ -558,7 +550,7 @@ static int parsedate(const char *date, time_t *output)
   if(tzoff == -1)
     tzoff = 0;
 
-  if((tzoff > 0) && (t > TIME_T_MAX - tzoff)) {
+  if((tzoff > 0) && (t > (time_t)(TIME_T_MAX - tzoff))) {
     *output = TIME_T_MAX;
     return PARSEDATE_LATER; /* time_t overflow */
   }
@@ -586,7 +578,7 @@ time_t curl_getdate(const char *p, const time_t *now)
   (void)now; /* legacy argument from the past that we ignore */
 
   if(rc == PARSEDATE_OK) {
-    if(parsed == -1)
+    if(parsed == (time_t)-1)
       /* avoid returning -1 for a working scenario */
       parsed++;
     return parsed;
@@ -606,7 +598,7 @@ time_t Curl_getdate_capped(const char *p)
 
   switch(rc) {
   case PARSEDATE_OK:
-    if(parsed == -1)
+    if(parsed == (time_t)-1)
       /* avoid returning -1 for a working scenario */
       parsed++;
     return parsed;

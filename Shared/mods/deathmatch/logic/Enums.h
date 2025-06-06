@@ -72,6 +72,8 @@ DECLARE_ENUM_CLASS(PasswordHashFunction);
 DECLARE_ENUM_CLASS(StringEncodeFunction);
 DECLARE_ENUM_CLASS(KeyPairAlgorithm);
 DECLARE_ENUM_CLASS(HmacAlgorithm);
+DECLARE_ENUM_CLASS(ZLibFormat);
+DECLARE_ENUM_CLASS(ZLibStrategy);
 
 enum class WorldSpecialProperty
 {
@@ -92,6 +94,9 @@ enum class WorldSpecialProperty
     EXTENDEDWATERCANNONS,
     TUNNELWEATHERBLEND,
     IGNOREFIRESTATE,
+    FLYINGCOMPONENTS,
+    VEHICLEBURNEXPLOSIONS,
+    VEHICLE_ENGINE_AUTOSTART,
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 

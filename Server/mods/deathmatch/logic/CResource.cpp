@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.cpp
  *  PURPOSE:     Resource handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -510,13 +510,14 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
         if (!GetFilePath(pResourceFile->GetName(), strPath))
             return SString();
 
-        std::vector<char> buffer;
-        FileLoad(strPath, buffer);
-        uint        uiFileSize = buffer.size();
-        const char* pFileContents = uiFileSize ? buffer.data() : "";
-        CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-        pResourceFile->SetLastChecksum(Checksum);
-        pResourceFile->SetLastFileSize(uiFileSize);
+        auto checksumOrError = CChecksum::GenerateChecksumFromFile(strPath);
+        if (std::holds_alternative<std::string>(checksumOrError))
+        {
+            return SString(std::get<std::string>(checksumOrError));
+        }
+
+        pResourceFile->SetLastChecksum(std::get<CChecksum>(checksumOrError));
+        pResourceFile->SetLastFileSizeHint(FileSize(strPath));
 
         // Check if file is blocked
         char szHashResult[33];
@@ -547,7 +548,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
 
                 if (pResourceFile->GetLastChecksum() != cachedChecksum)
                 {
-                    if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                    if (!FileCopy(strPath, strCachedFilePath))
                     {
                         return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
                     }

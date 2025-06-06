@@ -13,13 +13,14 @@ class CClientVectorGraphicDisplay;
 
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
+#include <lunasvg.h>
 
 class CClientVectorGraphicDisplay final : public CClientDisplay
 {
     friend class CClientDisplayManager;
 
 public:
-    CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID = DISPLAY_VECTORGRAPHIC);
+    CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID = DISPLAY_VECTORGRAPHIC);
     ~CClientVectorGraphicDisplay() = default;
 
     eDisplayType GetType() { return DISPLAY_VECTORGRAPHIC; }
@@ -35,6 +36,8 @@ public:
     void Update();
 
 private:
+    void UnpremultiplyBitmap(lunasvg::Bitmap& bitmap);
+
     CClientVectorGraphic* m_pVectorGraphic;
 
     bool m_bIsCleared;

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAudioContainerSA.h
  *  PURPOSE:     Audio container reader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -56,7 +56,7 @@ struct SRiffWavePCMHeader
 static_assert(sizeof(SRiffWavePCMHeader) == 0x2C, "Invalid size for SRiffWavePCMHeader");
 
 // Documentation by SAAT //
-// http://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //
+// https://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //
 struct SBeatEntry
 {
     int32 timing;
@@ -80,7 +80,7 @@ struct SRadioTrackHeader
 static_assert(sizeof(SRadioTrackHeader) == 8068, "Invalid size for SRadioTrackHeader");
 
 // End of documentation by SAAT //
-// http://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //
+// https://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //
 
 class CAudioContainerSA : public CAudioContainer
 {

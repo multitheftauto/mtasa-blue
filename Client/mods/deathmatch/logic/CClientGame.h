@@ -6,7 +6,7 @@
  *  FILE:        mods/deathmatch/logic/CClientGame.h
  *  PURPOSE:     Header for client game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -129,8 +129,12 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
-        POINTLIGHTS,
+        _DATABASE_CONNECTION, // server only
+        TRAIN_TRACK,
+        ROOT,
         UNKNOWN,
+        BUILDING,
+        POINTLIGHTS,
     };
 
     enum
@@ -410,8 +414,8 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
-    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept;
-    bool IsWorldSpecialProperty(WorldSpecialProperty property);
+    bool SetWorldSpecialProperty(const WorldSpecialProperty property, const bool enabled) noexcept;
+    bool IsWorldSpecialProperty(const WorldSpecialProperty property);
 
     bool SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
@@ -421,6 +425,9 @@ public:
 
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
+
+    void SetVehicleEngineAutoStartEnabled(bool enabled);
+    bool IsVehicleEngineAutoStartEnabled() const;
 
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 

@@ -19,9 +19,13 @@
 
 #include <sys/types.h>
 #include <fstream>
-#include "SharedUtil.h"
 #ifdef WIN32
+  #include <windows.h>
+  #include <UTF8.h>
   #include <dirent_win32.h>
+  #ifdef TGT_STANDALONE
+    #include <UTF8.hpp>
+  #endif
 #else
   #include <dirent.h>
 #endif
@@ -75,7 +79,7 @@ std::unique_ptr<std::istream>
 UnixFileSystem::open_file(const std::string& filename)
 {
 #ifdef WIN32
-  return std::unique_ptr<std::istream>(new std::ifstream(FromUTF8(filename.c_str())));
+  return std::unique_ptr<std::istream>(new std::ifstream(utf8_mbstowcs(filename.c_str())));
 #else
   return std::unique_ptr<std::istream>(new std::ifstream(filename.c_str()));
 #endif
@@ -85,7 +89,7 @@ bool
 UnixFileSystem::file_exists(const std::string& filename)
 {
 #ifdef WIN32
-  std::ifstream file( FromUTF8(filename.c_str()).c_str () );
+  std::ifstream file( utf8_mbstowcs(filename.c_str()).c_str () );
 #else
   std::ifstream file(filename.c_str());
 #endif

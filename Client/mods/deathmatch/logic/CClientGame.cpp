@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CClientGame.cpp
  *  PURPOSE:     Client game manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -35,6 +35,7 @@
 #include <game/CBuildingRemoval.h>
 #include "game/CClock.h"
 #include <game/CProjectileInfo.h>
+#include <game/CVehicleAudioSettingsManager.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -515,6 +516,7 @@ CClientGame::~CClientGame()
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
+    g_pGame->GetPools()->GetPtrNodeSingleLinkPool().ResetCapacity();
     g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
     g_pCore->SetMessageProcessor(NULL);
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(NULL);
@@ -3085,6 +3087,7 @@ void CClientGame::UpdateMimics()
             bool  bSunbathing = m_pLocalPlayer->IsSunbathing();
             bool  bDoingDriveby = m_pLocalPlayer->IsDoingGangDriveby();
             bool  bStealthAiming = m_pLocalPlayer->IsStealthAiming();
+            bool  reloadingWeapon = m_pLocalPlayer->IsReloadingWeapon();
 
             // Is the current weapon goggles (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
             if (weaponSlot == 11 || weaponSlot == 12 || ucWeaponType == 43)
@@ -3142,6 +3145,9 @@ void CClientGame::UpdateMimics()
                 pMimic->SetSunbathing(bSunbathing);
                 pMimic->SetDoingGangDriveby(bDoingDriveby);
                 pMimic->SetStealthAiming(bStealthAiming);
+
+                if (reloadingWeapon)
+                    pMimic->ReloadWeapon();
 
                 Controller.ShockButtonL = 0;
 
@@ -3449,7 +3455,7 @@ void CClientGame::Event_OnIngame()
 
     // This is to prevent the 'white arrows in checkpoints' bug (#274)
     CVector pos(0, 0, 0);
-    g_pGame->Get3DMarkers()->CreateMarker(87654, (e3DMarkerType)5, &pos, 1, 0.2f, 0, 0, 0, 0);
+    g_pGame->Get3DMarkers()->CreateMarker(87654, T3DMarkerType::MARKER3D_CONE, &pos, 1, 0.2f, 0, 0, 0, 0);
 
     // Stop us getting 4 stars if we visit the SF or LV
     // g_pGame->GetPlayerInfo()->GetWanted()->SetMaximumWantedLevel ( 0 );
@@ -3484,6 +3490,8 @@ void CClientGame::Event_OnIngame()
 
     // Make sure we never get tired
     g_pGame->GetPlayerInfo()->SetDoesNotGetTired(true);
+
+    g_pGame->GetVehicleAudioSettingsManager()->ResetAudioSettingsData();
 
     // Tell doggy we got the game running
     WatchDogCompletedSection("L1");
@@ -3729,6 +3737,9 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
                     break;
                 case CCLIENTOBJECT:
                     iTypeMask = TYPE_MASK_OBJECT;
+                    break;
+                case CCLIENTBUILDING:
+                    iTypeMask = TYPE_MASK_WORLD;
                     break;
                 default:
                     iTypeMask = TYPE_MASK_OTHER;
@@ -4364,7 +4375,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 {
     float fPreviousHealth = pDamagedPed->m_fHealth;
     float fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
-    float fPreviousArmor = pDamagedPed->m_fArmor;
+    float fPreviousArmor = pDamagedPed->m_armor;
     float fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
     // Have we taken any damage here?
@@ -4400,7 +4411,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             {
                 // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
                 fPreviousHealth = pDamagedPed->m_fHealth;
-                fPreviousArmor = pDamagedPed->m_fArmor;
+                fPreviousArmor = pDamagedPed->m_armor;
             }
             pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
             pDamagedPed->GetGamePlayer()->SetArmor(fPreviousArmor);
@@ -4446,7 +4457,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 
         // Update our stored health/armor
         pDamagedPed->m_fHealth = fCurrentHealth;
-        pDamagedPed->m_fArmor = fCurrentArmor;
+        pDamagedPed->m_armor = fCurrentArmor;
 
         ElementID damagerID = INVALID_ELEMENT_ID;
         if (pInflictingEntity && !pInflictingEntity->IsLocalEntity())
@@ -5991,7 +6002,7 @@ bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
 
-bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept
+bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, const bool enabled) noexcept
 {
     switch (property)
     {
@@ -5999,63 +6010,64 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::AIRCARS:
         case WorldSpecialProperty::EXTRABUNNY:
         case WorldSpecialProperty::EXTRAJUMP:
-            g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+            g_pGame->SetCheatEnabled(EnumToString(property), enabled);
             break;
         case WorldSpecialProperty::RANDOMFOLIAGE:
-            g_pGame->SetRandomFoliageEnabled(isEnabled);
+            g_pGame->SetRandomFoliageEnabled(enabled);
             break;
         case WorldSpecialProperty::SNIPERMOON:
-            g_pGame->SetMoonEasterEggEnabled(isEnabled);
+            g_pGame->SetMoonEasterEggEnabled(enabled);
             break;
         case WorldSpecialProperty::EXTRAAIRRESISTANCE:
-            g_pGame->SetExtraAirResistanceEnabled(isEnabled);
+            g_pGame->SetExtraAirResistanceEnabled(enabled);
             break;
         case WorldSpecialProperty::UNDERWORLDWARP:
-            g_pGame->SetUnderWorldWarpEnabled(isEnabled);
+            g_pGame->SetUnderWorldWarpEnabled(enabled);
             break;
         case WorldSpecialProperty::VEHICLESUNGLARE:
-            g_pGame->SetVehicleSunGlareEnabled(isEnabled);
+            g_pGame->SetVehicleSunGlareEnabled(enabled);
             break;
         case WorldSpecialProperty::CORONAZTEST:
-            g_pGame->SetCoronaZTestEnabled(isEnabled);
+            g_pGame->SetCoronaZTestEnabled(enabled);
             break;
         case WorldSpecialProperty::WATERCREATURES:
-            g_pGame->SetWaterCreaturesEnabled(isEnabled);
+            g_pGame->SetWaterCreaturesEnabled(enabled);
             break;
         case WorldSpecialProperty::BURNFLIPPEDCARS:
-            g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
+            g_pGame->SetBurnFlippedCarsEnabled(enabled);
             break;
         case WorldSpecialProperty::FIREBALLDESTRUCT:
-            g_pGame->SetFireballDestructEnabled(isEnabled);
+            g_pGame->SetFireballDestructEnabled(enabled);
             break;
         case WorldSpecialProperty::EXTENDEDWATERCANNONS:
-            g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
+            g_pGame->SetExtendedWaterCannonsEnabled(enabled);
             break;
         case WorldSpecialProperty::ROADSIGNSTEXT:
-            g_pGame->SetRoadSignsTextEnabled(isEnabled);
+            g_pGame->SetRoadSignsTextEnabled(enabled);
             break;
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
-            g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
+            g_pGame->SetTunnelWeatherBlendEnabled(enabled);
             break;
         case WorldSpecialProperty::IGNOREFIRESTATE:
-            g_pGame->SetIgnoreFireStateEnabled(isEnabled);
+            g_pGame->SetIgnoreFireStateEnabled(enabled);
+            break;
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            m_pVehicleManager->SetSpawnFlyingComponentEnabled(enabled);
+            break;
+        case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
+            g_pGame->SetVehicleBurnExplosionsEnabled(enabled);
+            break;
+        case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
+            SetVehicleEngineAutoStartEnabled(enabled);
             break;
         default:
             return false;
     }
 
-    if (g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent)) {
-        NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
-        stream->WriteString(EnumToString(property));
-        stream->WriteBit(isEnabled);
-        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-        g_pNet->DeallocateNetBitStream(stream);
-    }
-
     return true;
 }
 
-bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
+bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
 {
     switch (property)
     {
@@ -6090,7 +6102,14 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsTunnelWeatherBlendEnabled();
         case WorldSpecialProperty::IGNOREFIRESTATE:
             return g_pGame->IsIgnoreFireStateEnabled();
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
+        case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
+            return g_pGame->IsVehicleBurnExplosionsEnabled();
+        case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
+            return IsVehicleEngineAutoStartEnabled();
     }
+
     return false;
 }
 
@@ -6122,6 +6141,20 @@ void CClientGame::SetWeaponRenderEnabled(bool enabled)
 bool CClientGame::IsWeaponRenderEnabled() const
 {
     return g_pGame->IsWeaponRenderEnabled();
+}
+
+void CClientGame::SetVehicleEngineAutoStartEnabled(bool enabled)
+{
+    if (enabled == g_pMultiplayer->IsVehicleEngineAutoStartEnabled())
+        return;
+
+    g_pMultiplayer->SetVehicleEngineAutoStartEnabled(enabled);
+    m_pVehicleManager->ResetNotControlledRotors(enabled);
+}
+
+bool CClientGame::IsVehicleEngineAutoStartEnabled() const
+{
+    return g_pMultiplayer->IsVehicleEngineAutoStartEnabled();
 }
 
 #pragma code_seg(".text")
@@ -6806,6 +6839,10 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         g_pGame->SetRoadSignsTextEnabled(true);
         g_pGame->SetExtendedWaterCannonsEnabled(true);
         g_pGame->SetTunnelWeatherBlendEnabled(true);
+        g_pGame->SetIgnoreFireStateEnabled(false);
+        m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
+        g_pGame->SetVehicleBurnExplosionsEnabled(true);
+        SetVehicleEngineAutoStartEnabled(true);
     }
 
     // Reset all setWorldProperty to default

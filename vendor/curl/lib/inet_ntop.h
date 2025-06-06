@@ -26,14 +26,26 @@
 
 #include "curl_setup.h"
 
-char *Curl_inet_ntop(int af, const void *addr, char *buf, size_t size);
+char *curlx_inet_ntop(int af, const void *addr, char *buf, size_t size);
 
 #ifdef HAVE_INET_NTOP
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#define Curl_inet_ntop(af,addr,buf,size) \
-        inet_ntop(af, addr, buf, (curl_socklen_t)size)
+#ifdef __AMIGA__
+#define curlx_inet_ntop(af,addr,buf,size) \
+        (char *)inet_ntop(af, CURL_UNCONST(addr), (unsigned char *)buf, \
+                          (curl_socklen_t)(size))
+#else
+#define curlx_inet_ntop(af,addr,buf,size) \
+        inet_ntop(af, addr, buf, (curl_socklen_t)(size))
+#endif
 #endif
 
 #endif /* HEADER_CURL_INET_NTOP_H */

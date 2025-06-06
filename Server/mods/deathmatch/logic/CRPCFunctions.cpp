@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CRPCFunctions.cpp
  *  PURPOSE:     Remote procedure call functionality class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
