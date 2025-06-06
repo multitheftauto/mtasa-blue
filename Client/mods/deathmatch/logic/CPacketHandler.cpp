@@ -4010,7 +4010,8 @@ retry:
                             std::string blockName, animName;
                             int time, blendTime;
                             bool looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
-                            float elapsedTime, speed;
+                            float speed;
+                            double startTime;
 
                             // Read data
                             bitStream.ReadString(blockName);
@@ -4022,15 +4023,14 @@ retry:
                             bitStream.ReadBit(freezeLastFrame);
                             bitStream.Read(blendTime);
                             bitStream.ReadBit(taskRestore);
-                            bitStream.Read(elapsedTime);
+                            bitStream.Read(startTime);
                             bitStream.Read(speed);
 
                             // Run anim
                             CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable, freezeLastFrame);
-                            pPed->m_AnimationCache.progressWaitForStreamIn = true;
-                            pPed->m_AnimationCache.elapsedTime = elapsedTime;
-
-                            CStaticFunctionDefinitions::SetPedAnimationSpeed(*pPed, animName, speed);
+                            pPed->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                            pPed->m_AnimationCache.speed = speed;
+                            pPed->m_AnimationCache.progress = 0.0f;
 
                             pPed->SetHasSyncedAnim(true);
                         }
