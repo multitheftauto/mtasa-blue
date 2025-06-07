@@ -1005,9 +1005,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             BitStream.Write(animData.blendTime);
                             BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
 
-                            // Write elapsed time & speed
-                            float elapsedTime = GetTickCount64_() - animData.startedTick;
-                            BitStream.Write(elapsedTime);
+                            // Write start time & speed
+                            BitStream.Write(static_cast<double>(animData.startTime));
                             BitStream.Write(animData.speed);
                         }
                     }
