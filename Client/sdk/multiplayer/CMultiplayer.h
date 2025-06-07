@@ -5,7 +5,7 @@
  *  FILE:        sdk/multiplayer/CMultiplayer.h
  *  PURPOSE:     Multiplayer subsystem interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -443,6 +443,9 @@ public:
     virtual void  SetAircraftMaxVelocity(float fVelocity) = 0;
 
     virtual void SetAutomaticVehicleStartupOnPedEnter(bool bSet) = 0;
+
+    virtual bool IsVehicleEngineAutoStartEnabled() const noexcept = 0;
+    virtual void SetVehicleEngineAutoStartEnabled(bool enabled) = 0;
 
     virtual void SetPedTargetingMarkerEnabled(bool bEnabled) = 0;
     virtual bool IsPedTargetingMarkerEnabled() = 0;

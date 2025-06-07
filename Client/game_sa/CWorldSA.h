@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWorldSA.h
  *  PURPOSE:     Header file for game world
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

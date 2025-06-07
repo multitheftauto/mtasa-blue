@@ -5,7 +5,7 @@
  *  FILE:        core/CChat.cpp
  *  PURPOSE:     In-game chat box user interface implementation
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -699,11 +699,11 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                 SString strPlayerNamePart = strCurrentInput.substr(iFound);
 
                 CModManager* pModManager = CModManager::GetSingletonPtr();
-                if (pModManager && pModManager->GetCurrentMod())
+                if (pModManager && pModManager->IsLoaded())
                 {
                     // Create vector and get playernames from deathmatch module
                     std::vector<SString> vPlayerNames;
-                    pModManager->GetCurrentMod()->GetPlayerNames(vPlayerNames);
+                    pModManager->GetClient()->GetPlayerNames(vPlayerNames);
 
                     for (std::vector<SString>::iterator iter = vPlayerNames.begin(); iter != vPlayerNames.end(); ++iter)
                     {

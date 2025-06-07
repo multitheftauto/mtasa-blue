@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA.h
  *  PURPOSE:     Multiplayer module class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -81,6 +81,8 @@ public:
     void                InitHooks_ObjectStreamerOptimization();
     void                InitHooks_Postprocess();
     void                InitHooks_DeviceSelection();
+    void                InitHooks_Explosions();
+    void                InitHooks_Tasks();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -330,6 +332,9 @@ public:
     };
 
     void SetAutomaticVehicleStartupOnPedEnter(bool bSet);
+
+    bool IsVehicleEngineAutoStartEnabled() const noexcept override;
+    void SetVehicleEngineAutoStartEnabled(bool enabled) override;
 
     void SetPedTargetingMarkerEnabled(bool bEnable);
     bool IsPedTargetingMarkerEnabled();

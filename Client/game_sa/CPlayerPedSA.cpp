@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPlayerPedSA.cpp
  *  PURPOSE:     Player ped entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -298,6 +298,20 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         mov     ecx, dwThis
         call    dwFunc
     }
+}
+
+CEntity* CPlayerPedSA::GetTargetedEntity() const
+{
+    CEntitySAInterface* targetInterface = GetPlayerPedInterface()->mouseTargetEntity;
+    if (!targetInterface)
+        return nullptr;
+
+    return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(targetInterface));
+}
+
+void CPlayerPedSA::SetTargetedEntity(CEntity* targetEntity)
+{
+    GetPlayerPedInterface()->mouseTargetEntity = targetEntity ? targetEntity->GetInterface() : nullptr;
 }
 
 ////////////////////////////////////////////////////////////////

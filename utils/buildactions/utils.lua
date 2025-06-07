@@ -1,4 +1,4 @@
--- From: http://industriousone.com/topic/oscopydir
+-- From: https://industriousone.com/topic/oscopydir
 
 --
 -- Allows copying directories.
