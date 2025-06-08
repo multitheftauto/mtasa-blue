@@ -71,6 +71,7 @@ class CIplStore;
 class CBuildingRemoval;
 class CRenderer;
 class CVehicleAudioSettingsManager;
+class C2DEffects;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -155,6 +156,7 @@ public:
     virtual CRenderer*                GetRenderer() const noexcept = 0;
 
     virtual CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept = 0;
+    virtual C2DEffects*                   Get2DFXEffects() const noexcept = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
@@ -261,6 +263,7 @@ public:
     virtual void ResetAlphaTransparencies() = 0;
     virtual void DisableVSync() = 0;
     virtual void ResetModelTimes() = 0;
+    virtual void Reset2DFXEffects() const = 0;
 
     virtual void  OnPedContextChange(CPed* pPedContext) = 0;
     virtual CPed* GetPedContext() = 0;
