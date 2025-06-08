@@ -45,7 +45,8 @@ bool CClientModel::Allocate(ushort usParentID)
             pModelInfo->MakePedModel("PSYCHO");
             return true;
         case eClientModelType::OBJECT:
-            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID) &&
+                !CClientPedManager::IsValidWeaponModel(usParentID))
             {
                 pModelInfo->MakeObjectModel(usParentID);
                 return true;
@@ -53,7 +54,8 @@ bool CClientModel::Allocate(ushort usParentID)
             break;
         case eClientModelType::OBJECT_DAMAGEABLE:
         {
-            bool isValidModel = g_pClientGame->GetObjectManager()->IsValidModel(usParentID);
+            bool isValidModel = g_pClientGame->GetObjectManager()->IsValidModel(usParentID) &&
+                                !CClientPedManager::IsValidWeaponModel(usParentID);
             bool isDamagable = pParentModelInfo->IsDamageableAtomic();
             if (isValidModel && isDamagable)
             {
@@ -63,14 +65,16 @@ bool CClientModel::Allocate(ushort usParentID)
             break;
         }
         case eClientModelType::CLUMP:
-            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID) &&
+                !CClientPedManager::IsValidWeaponModel(usParentID))
             {
                 pModelInfo->MakeClumpModel(usParentID);
                 return true;
             }
             break;
         case eClientModelType::TIMED_OBJECT:
-            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID) &&
+                !CClientPedManager::IsValidWeaponModel(usParentID))
             {
                 pModelInfo->MakeTimedObjectModel(usParentID);
                 return true;
