@@ -447,7 +447,7 @@ void CMainMenu::Update()
 
     // Get the game interface and the system state
     CGame*       pGame = CCore::GetSingleton().GetGame();
-    eSystemState SystemState = pGame->GetSystemState();
+    SystemState  systemState = pGame->GetSystemState();
 
     m_Credits.Update();
     m_Settings.Update();
@@ -650,7 +650,7 @@ void CMainMenu::Update()
     }
 
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
-    if ((SystemState == 7 || SystemState == 9) && !m_bIsIngame)
+    if ((systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME) && !m_bIsIngame)
     {
         if (!m_bStarted)
         {
@@ -671,11 +671,11 @@ void CMainMenu::Update()
     }
 
     // If we're visible
-    if (m_bIsVisible && SystemState != 8)
+    if (m_bIsVisible && systemState != SystemState::GS_INIT_PLAYING_GAME)
     {
         // If we're at the game's mainmenu, or ingame when m_bIsIngame is true show the background
-        if (SystemState == 7 ||                          // GS_FRONTEND
-            SystemState == 9 && !m_bIsIngame)            // GS_PLAYING_GAME
+        if (systemState == SystemState::GS_FRONTEND ||
+            systemState == SystemState::GS_PLAYING_GAME && !m_bIsIngame)
         {
             if (m_ucFade == FADE_INVISIBLE)
                 Show(false);

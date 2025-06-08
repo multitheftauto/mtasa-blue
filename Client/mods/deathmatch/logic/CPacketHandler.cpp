@@ -306,7 +306,7 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
     g_pClientGame->m_Status = CClientGame::STATUS_JOINING;
 
     // If the game isn't started, start it
-    if (g_pGame->GetSystemState() == 7)
+    if (g_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         g_pGame->StartGame();
     }
@@ -2401,6 +2401,8 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::TUNNELWEATHERBLEND, wsProps.data5.tunnelweatherblend);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::IGNOREFIRESTATE, wsProps.data6.ignoreFireState);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data7.flyingcomponents);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, wsProps.data8.vehicleburnexplosions);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART, wsProps.data9.vehicleEngineAutoStart);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
@@ -4218,6 +4220,26 @@ retry:
                     break;
                 }
 
+                case CClientGame::BUILDING:
+                {
+                    std::uint16_t        modelId;
+                    SRotationRadiansSync rotationRadians(false);
+
+                    // Read out the position, rotation, object ID
+                    bitStream.Read(&position);
+                    bitStream.Read(&rotationRadians);
+                    bitStream.ReadCompressed(modelId);
+
+                    if (!CClientBuildingManager::IsValidModel(modelId))
+                        modelId = 1700;
+
+                    bitStream.Read(LowLodObjectID);
+                    CClientBuilding* pBuilding = new CClientBuilding(g_pClientGame->m_pManager, EntityID, modelId, position.data.vecPosition, rotationRadians.data.vecRotation, ucInterior);
+
+                    pBuilding->SetUsesCollision(bCollisonsEnabled);
+                    break;
+                }
+
                 default:
                 {
                     assert(0);
@@ -4287,10 +4309,18 @@ retry:
 
         if (TempLowLodObjectID != INVALID_ELEMENT_ID)
         {
-            CClientObject* pTempObject = DynamicCast<CClientObject>(pTempEntity);
-            CClientObject* pLowLodObject = DynamicCast<CClientObject>(CElementIDs::GetElement(TempLowLodObjectID));
-            if (pTempObject)
-                pTempObject->SetLowLodObject(pLowLodObject);
+            if (CClientObject* pTempObject = DynamicCast<CClientObject>(pTempEntity))
+            {
+                CClientObject* pLowLodObject = DynamicCast<CClientObject>(CElementIDs::GetElement(TempLowLodObjectID));
+                if (pTempObject)
+                    pTempObject->SetLowLodObject(pLowLodObject);
+            }
+            else if (CClientBuilding* pTempObject = DynamicCast<CClientBuilding>(pTempEntity))
+            {
+                CClientBuilding* pLowLod = DynamicCast<CClientBuilding>(CElementIDs::GetElement(TempLowLodObjectID));
+                if (pTempObject)
+                    pTempObject->SetLowLodBuilding(pLowLod);
+            }
         }
 
         delete pEntityStuff;

@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
 #include "CAutomobileSA.h"
 #include "CBikeSA.h"
 #include "CCameraSA.h"
@@ -28,7 +30,8 @@
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
 
-extern CGameSA* pGame;
+extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
 _declspec(naked) void DoVehicleSunGlare(void* this_)
@@ -54,13 +57,39 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
     }
 }
 
+static float& fTimeStep = *(float*)(0xB7CB5C);
 static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleInterface)
 {
     SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)vehicleInterface);
     if (!vehicle || !vehicle->pEntity)
         return true;
 
-    return vehicle->pEntity->GetVehicleRotorState();
+    if (vehicle->pEntity->GetVehicleRotorState())
+    {
+        if (g_pCore->GetMultiplayer()->IsVehicleEngineAutoStartEnabled()) // keep default behavior
+            return true;
+
+        if (vehicle->pEntity->GetEntityStatus() != eEntityStatus::STATUS_PHYSICS && !vehicle->pEntity->IsBeingDriven())
+        {
+            vehicle->pEntity->SetEntityStatus(eEntityStatus::STATUS_PHYSICS); // this will make rotors spin without driver when engine is on
+            return false;
+        }
+        if (!vehicle->pEntity->IsEngineOn())
+        {
+            // Smoothly change rotors speed to 0
+            float speed = vehicle->pEntity->GetHeliRotorSpeed();
+            if (speed > 0)
+                vehicle->pEntity->SetHeliRotorSpeed(std::max(0.0f, speed - fTimeStep * 0.00055f)); // 0x6C4EB7
+
+            speed = vehicle->pEntity->GetPlaneRotorSpeed();
+            if (speed > 0)
+                vehicle->pEntity->SetPlaneRotorSpeed(std::max(0.0f, speed - fTimeStep * 0.003f)); // 0x6CC145
+
+            return false;
+        }
+        return true;
+    }
+    return false;
 }
 
 static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;
@@ -189,7 +218,7 @@ void CVehicleSA::Init()
     {
         for (size_t i = 0; i < m_dummyPositions.size(); ++i)
         {
-            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((eVehicleDummies)i);
+            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((VehicleDummies)i);
         }
     }
 
@@ -2261,27 +2290,27 @@ void CVehicleSA::UpdateLandingGearPosition()
     }
 }
 
-bool CVehicleSA::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
+bool CVehicleSA::GetDummyPosition(VehicleDummies dummy, CVector& position) const
 {
-    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
-        position = m_dummyPositions[dummy];
+        position = m_dummyPositions[(std::size_t)dummy];
         return true;
     }
 
     return false;
 }
 
-bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
+bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
 {
-    if (dummy < 0 || dummy >= VEHICLE_DUMMY_COUNT)
+    if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
         return false;
 
     auto vehicle = reinterpret_cast<CVehicleSAInterface*>(m_pInterface);
 
-    m_dummyPositions[dummy] = position;
+    m_dummyPositions[static_cast<std::size_t>(dummy)] = position;
 
-    if (dummy == ENGINE)
+    if (dummy == VehicleDummies::ENGINE)
     {
         if (vehicle->m_overheatParticle != nullptr)
             CFxSystemSA::SetPosition(vehicle->m_overheatParticle, position);
@@ -2303,14 +2332,14 @@ bool CVehicleSA::SetDummyPosition(eVehicleDummies dummy, const CVector& position
 //
 // NOTE(botder): Move the code to CAutomobileSA::SetDummyPosition, when we start using CAutomobileSA
 //
-void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position)
+void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position)
 {
-    if (dummy == EXHAUST)
+    if (dummy == VehicleDummies::EXHAUST)
     {
         if (automobile->pNitroParticle[0] != nullptr)
             CFxSystemSA::SetPosition(automobile->pNitroParticle[0], position);
     }
-    else if (dummy == EXHAUST_SECONDARY)
+    else if (dummy == VehicleDummies::EXHAUST_SECONDARY)
     {
         if (automobile->pNitroParticle[1] != nullptr)
             CFxSystemSA::SetPosition(automobile->pNitroParticle[1], position);

@@ -175,7 +175,7 @@ public:
     void TriggerWaterSplash(CVector& vecPosition);
     void TriggerBulletSplash(CVector& vecPosition);
     void TriggerFootSplash(CVector& vecPosition);
-    void AddParticle(eFxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife);
+    void AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife);
 
     static std::vector<CEntitySAInterface*> GetEntitiesFromFx(std::uint32_t modelID);
 

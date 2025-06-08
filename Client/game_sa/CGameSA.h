@@ -204,8 +204,8 @@ public:
     bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
     void         StartGame();
-    void         SetSystemState(eSystemState State);
-    eSystemState GetSystemState();
+    void         SetSystemState(SystemState State);
+    SystemState  GetSystemState();
     void         Pause(bool bPaused);
 
     void Initialize();
@@ -261,6 +261,9 @@ public:
 
     bool IsIgnoreFireStateEnabled() const noexcept override { return m_isIgnoreFireStateEnabled; }
     void SetIgnoreFireStateEnabled(bool isEnabled) override;
+
+    bool IsVehicleBurnExplosionsEnabled() const noexcept override { return m_isVehicleBurnExplosionsEnabled; }
+    void SetVehicleBurnExplosionsEnabled(bool isEnabled) override;
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -395,6 +398,7 @@ private:
     bool         m_isGameWorldRemoved{false};
     bool         m_isExtendedWaterCannonsEnabled{false};
     bool         m_isIgnoreFireStateEnabled{false};
+    bool         m_isVehicleBurnExplosionsEnabled{true};
 
     static unsigned int&  ClumpOffset;
 

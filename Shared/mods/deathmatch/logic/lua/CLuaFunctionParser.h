@@ -320,7 +320,17 @@ struct CLuaFunctionParserBase
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
-            return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
+        {
+            if (iArgument != LUA_TUSERDATA && iArgument != LUA_TLIGHTUSERDATA)
+                return false;
+
+            using class_t = std::remove_pointer_t<T>;
+            int tempIndex{index};
+            void* pValue = lua::PopPrimitive<void*>(L, tempIndex);                
+            auto result = iArgument == LUA_TLIGHTUSERDATA ? UserDataCast((class_t*)pValue, L) :
+                UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
+            return result != nullptr;
+        }
 
         // dummy type is used as overload extension if one overload has fewer arguments
         // thus it is only allowed if there are no further args on the Lua side

@@ -176,6 +176,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_pVehicleManager = NULL;
     m_pPickupManager = NULL;
     m_pObjectManager = NULL;
+    m_pBuildingManager = nullptr;
     m_pColManager = NULL;
     m_pBlipManager = NULL;
     m_pClock = NULL;
@@ -261,6 +262,8 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::TUNNELWEATHERBLEND] = true;
     m_WorldSpecialProps[WorldSpecialProperty::IGNOREFIRESTATE] = false;
     m_WorldSpecialProps[WorldSpecialProperty::FLYINGCOMPONENTS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLEBURNEXPLOSIONS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -380,6 +383,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pVehicleManager);
     SAFE_DELETE(m_pPickupManager);
     SAFE_DELETE(m_pObjectManager);
+    SAFE_DELETE(m_pBuildingManager);
     SAFE_DELETE(m_pColManager);
     SAFE_DELETE(m_pBlipManager);
     SAFE_DELETE(m_pClock);
@@ -592,6 +596,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         m_pBlipManager = new CBlipManager;
         m_pColManager = new CColManager;
         m_pObjectManager = new CObjectManager;
+        m_pBuildingManager = new CBuildingManager();
         m_pPickupManager = new CPickupManager(m_pColManager);
         m_pPlayerManager = new CPlayerManager;
         m_pRadarAreaManager = new CRadarAreaManager;
@@ -3401,7 +3406,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                                     // Update our engine State
-                                    pVehicle->SetEngineOn(true);
+                                    if (g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART))
+                                        pVehicle->SetEngineOn(true);
 
                                     // Tell everyone he's in (they should warp him in)
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_RETURN);
@@ -4517,6 +4523,10 @@ void CGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND, true);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE, false);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS, true);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, true);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART, true);
     }
 
     // Reset all weather stuff like heat haze, wind velocity etc

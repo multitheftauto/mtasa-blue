@@ -48,4 +48,5 @@ public:
     LUA_DECLARE(SetAccountPassword);
     LUA_DECLARE(SetAccountData);
     LUA_DECLARE(CopyAccountData);
+    static bool SetAccountSerial(CAccount* account, std::string serial) noexcept;
 };

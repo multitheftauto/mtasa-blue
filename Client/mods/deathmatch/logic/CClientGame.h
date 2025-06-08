@@ -129,8 +129,12 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
-        POINTLIGHTS,
+        _DATABASE_CONNECTION, // server only
+        TRAIN_TRACK,
+        ROOT,
         UNKNOWN,
+        BUILDING,
+        POINTLIGHTS,
     };
 
     enum
@@ -421,6 +425,9 @@ public:
 
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
+
+    void SetVehicleEngineAutoStartEnabled(bool enabled);
+    bool IsVehicleEngineAutoStartEnabled() const;
 
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
