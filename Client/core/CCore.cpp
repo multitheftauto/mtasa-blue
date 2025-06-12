@@ -1452,6 +1452,9 @@ void CCore::Quit(bool bInstantly)
 
         WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
 
+        // Hide game window to make quit look instant
+        ShowWindow(GetHookedWindow(), SW_HIDE);
+
         // Destroy the client
         CModManager::GetSingleton().Unload();
 
