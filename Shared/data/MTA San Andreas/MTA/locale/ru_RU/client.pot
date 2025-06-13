@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-31 08:19+0000\n"
-"PO-Revision-Date: 2025-06-13 10:31\n"
+"PO-Revision-Date: 2025-06-13 11:32\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1469,7 +1469,8 @@ msgstr "Сервер предлагает обновить клиент, но э
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr ""
+msgstr "В настоящее время обновление недоступно.\n\n"
+"Пожалуйста, проверьте www.multitheftauto.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -2111,7 +2112,7 @@ msgstr "Сохранять фотографии, сделанные камеро
 
 #: Client/core/CSettings.cpp:414
 msgid "Ask before disconnecting from server using main menu"
-msgstr ""
+msgstr "Спросите перед отключением от сервера с помощью главного меню"
 
 #: Client/core/CSettings.cpp:419
 msgid "Use customized GTA:SA files"
