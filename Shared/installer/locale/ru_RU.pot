@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-08 22:41\n"
-"PO-Revision-Date: 2025-04-08 23:03\n"
+"PO-Revision-Date: 2025-06-13 10:31\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -20,17 +20,17 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:205
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "Загруженная вами версия MTA:SA не поддерживает Windows XP или Vista.  Пожалуйста, загрузите альтернативную версию с сайта www.multitheftauto.com."
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "Загруженная вами версия MTA:SA не поддерживает Windows 7, 8 или 8.1. Пожалуйста, скачайте альтернативную версию с сайта www.multitheftauto.com."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "Загруженная вами версия MTA:SA предназначена для старых версий Windows.  Пожалуйста, скачайте альтернативную версию с сайта www.multitheftauto.com."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
