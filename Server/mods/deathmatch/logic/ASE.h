@@ -84,6 +84,8 @@ private:
     const std::string* QueryFullCached();
     std::string        QueryFull();
     const std::string* QueryLightCached();
+    std::string        QueryNewBrowser();
+    const std::string* QueryNewBrowserCached();
     const std::string* QueryXfireLightCached();
     std::string        QueryXfireLight();
 
@@ -119,6 +121,12 @@ private:
     long long    m_llLightLastTime;
     long         m_lLightMinInterval;
     std::string  m_strLightCached;
+
+    // New query cache
+    unsigned int m_uiNewLastPlayerCount;
+    long long    m_llNewLastTime;
+    long         m_lNewMinInterval;
+    std::string  m_strNewCached;
 
     // XFire Light query cache
     unsigned int m_uiXfireLightLastPlayerCount;
