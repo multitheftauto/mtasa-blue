@@ -29,6 +29,7 @@ project "Client Deathmatch"
 	filter {}
 		includedirs {
 			"../../../Shared/sdk",
+                        "../../../Shared/gta",
 			".",
 			"./logic",
 			"../../sdk/",
