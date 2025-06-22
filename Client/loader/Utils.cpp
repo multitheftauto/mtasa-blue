@@ -29,7 +29,6 @@ namespace fs = std::filesystem;
 
 static SString g_strMTASAPath;
 static SString g_strGTAPath;
-static HANDLE  g_hMutex = NULL;
 static HMODULE hLibraryModule = NULL;
 HINSTANCE      g_hInstance = NULL;
 
@@ -310,18 +309,6 @@ std::vector<DWORD> GetGTAProcessList()
         ListAddUnique(result, processId);
 
     return result;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-// IsGTARunning
-//
-//
-//
-///////////////////////////////////////////////////////////////////////////
-bool IsGTARunning()
-{
-    return !GetGTAProcessList().empty();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -679,60 +666,6 @@ bool HasGTAPath()
 
 ///////////////////////////////////////////////////////////////
 //
-// GetPEFileOffsets
-//
-// Get some commonly used file offsets
-//
-///////////////////////////////////////////////////////////////
-void GetPEFileOffsets(SPEFileOffsets& outOffsets, const SString& strGTAEXEPath)
-{
-    outOffsets = {0};
-    long NtHeaders = 0;
-    ReadFileValue(strGTAEXEPath, NtHeaders, offsetof(IMAGE_DOS_HEADER, e_lfanew));
-    outOffsets.TimeDateStamp = NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.TimeDateStamp);
-    outOffsets.Characteristics = NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.Characteristics);
-    outOffsets.AddressOfEntryPoint = NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader.AddressOfEntryPoint);
-    outOffsets.DllCharacteristics = NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader.DllCharacteristics);
-
-    ushort usSizeOfOptionalHeader = 0;
-    ReadFileValue(strGTAEXEPath, usSizeOfOptionalHeader, NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.SizeOfOptionalHeader));
-    ReadFileValue(strGTAEXEPath, outOffsets.sections[0].PointerToRawData,
-                  NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader) + usSizeOfOptionalHeader + offsetof(IMAGE_SECTION_HEADER, PointerToRawData));
-}
-
-///////////////////////////////////////////////////////////////
-//
-// GetGtaFileVersion
-//
-// Hardcoded numbers used:
-//  0x44 - File offset 0x44 is zero in legacy DOS stub. Encrypted exe does not have this.
-//  0x347ADD is the section offset equivalent of 0x748ADD as used in CGameSA::FindGameVersion
-//  0x53FF and 0x840F are also used in CGameSA::FindGameVersion
-//
-///////////////////////////////////////////////////////////////
-EGtaFileVersion GetGtaFileVersion(const SString& strGTAEXEPath)
-{
-    SPEFileOffsets fileOffsets;
-    GetPEFileOffsets(fileOffsets, strGTAEXEPath);
-
-    char   bIsEncypted = false;
-    ushort usIdBytes = 0;
-    ReadFileValue(strGTAEXEPath, bIsEncypted, 0x44);
-    ReadFileValue(strGTAEXEPath, usIdBytes, 0x347ADD + fileOffsets.sections[0].PointerToRawData);
-
-    EGtaFileVersion versionType = EGtaFileVersion::Unknown;
-    if (usIdBytes == 0x53FF)
-        versionType = EGtaFileVersion::US;
-    else if (usIdBytes == 0x840F)
-        versionType = EGtaFileVersion::EU;
-    else if (bIsEncypted)
-        versionType = EGtaFileVersion::Encrypted;
-
-    return versionType;
-}
-
-///////////////////////////////////////////////////////////////
-//
 // FindFilesRecursive
 //
 // Return a list of files inside strPath
@@ -817,27 +750,6 @@ void FindRelevantFiles(const SString& strPath, std::vector<SString>& outFilePath
         if (MaxFiles && outFilePathList.size() > MaxFiles)
             if (MaxDirs && outDirPathList.size() > MaxDirs)
                 break;
-    }
-}
-
-///////////////////////////////////////////////////////////////
-//
-// MakeRandomIndexList
-//
-// Create a list of randomlu ordered indices from 0 to Size-1
-//
-///////////////////////////////////////////////////////////////
-void MakeRandomIndexList(int Size, std::vector<int>& outList)
-{
-    for (int i = 0; i < Size; i++)
-        outList.push_back(i);
-
-    for (int i = 0; i < Size; i++)
-    {
-        int otherIdx = rand() % Size;
-        int Temp = outList[i];
-        outList[i] = outList[otherIdx];
-        outList[otherIdx] = Temp;
     }
 }
 
@@ -964,7 +876,6 @@ void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason)
     AddReportLog(7115, SString("Loader - Request to elevate privileges (%s)", *strReason));
     MessageBoxUTF8(NULL, SString(_("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *strReason),
                    "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
-    ReleaseSingleInstanceMutex();
     ShellExecuteNonBlocking("runas", PathJoin(GetMTASAPath(), MTA_EXE_NAME), strCmdLine);
 }
 
@@ -1178,42 +1089,6 @@ bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
     }
 
     return success;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-// CreateSingleInstanceMutex
-//
-//
-//
-///////////////////////////////////////////////////////////////////////////
-bool CreateSingleInstanceMutex()
-{
-    HANDLE hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
-
-    if (GetLastError() == ERROR_ALREADY_EXISTS)
-    {
-        if (hMutex)
-            CloseHandle(hMutex);
-        return false;
-    }
-    assert(!g_hMutex);
-    g_hMutex = hMutex;
-    return true;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-// ReleaseSingleInstanceMutex
-//
-//
-//
-///////////////////////////////////////////////////////////////////////////
-void ReleaseSingleInstanceMutex()
-{
-    // assert(g_hMutex);
-    CloseHandle(g_hMutex);
-    g_hMutex = NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////

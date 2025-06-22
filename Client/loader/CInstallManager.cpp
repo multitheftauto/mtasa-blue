@@ -361,17 +361,14 @@ SString CInstallManager::_ChangeToAdmin()
             NULL, SString(_("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *m_strAdminReason),
             "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
         SetIsBlockingUserProcess();
-        ReleaseSingleInstanceMutex();
         if (ShellExecuteBlocking("runas", GetLauncherPathFilename(), GetSequencerSnapshot()))
         {
             // Will return here once admin process has finished
-            CreateSingleInstanceMutex();
             UpdateSettingsForReportLog();
             RestoreSequencerFromSnapshot(ReceiveStringFromAdminProcess());
             ClearIsBlockingUserProcess();
             return "ok";            // This will appear as the result for _ChangeFromAdmin
         }
-        CreateSingleInstanceMutex();
         ClearIsBlockingUserProcess();
         MessageBoxUTF8(NULL, SString(_("MTA:SA could not complete the following task:\n\n  '%s'\n"), *m_strAdminReason),
                        "Multi Theft Auto: San Andreas" + _E("CL01"), MB_OK | MB_ICONWARNING | MB_TOPMOST);
@@ -478,10 +475,9 @@ SString CInstallManager::_MaybeSwitchToTempExe()
     // If a new "Multi Theft Auto.exe" exists, let that complete the install
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
     {
-        ReleaseSingleInstanceMutex();
         if (ShellExecuteNonBlocking("open", GetLauncherPathFilename(), GetSequencerSnapshot()))
             ExitProcess(0);            // All done here
-        CreateSingleInstanceMutex();
+
         return "fail";
     }
     return "ok";
@@ -501,10 +497,9 @@ SString CInstallManager::_SwitchBackFromTempExe()
     {
         m_pSequencer->SetVariable(INSTALL_LOCATION, "near");
 
-        ReleaseSingleInstanceMutex();
         if (ShellExecuteNonBlocking("open", GetLauncherPathFilename(), GetSequencerSnapshot()))
             ExitProcess(0);            // All done here
-        CreateSingleInstanceMutex();
+
         return "fail";
     }
     return "ok";
@@ -583,9 +578,6 @@ void MigrateFile(const SString& strFilenameOld, const SString& strFilenameNew)
 SString CInstallManager::_PrepareLaunchLocation()
 {
     const bool isAdmin = IsUserAdmin();
-
-    // Ensure GTA exe is not running
-    TerminateGTAIfRunning();
 
     const fs::path gtaDir = GetGameBaseDirectory();
     const fs::path mtaDir = GetMTARootDirectory() / "MTA";
@@ -718,9 +710,6 @@ SString CInstallManager::_ProcessGtaPatchCheck()
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessGtaDllCheck()
 {
-    // Ensure GTA exe is not running
-    TerminateGTAIfRunning();
-
     struct DependencyHash
     {
         const char* fileName;

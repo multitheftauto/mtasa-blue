@@ -93,9 +93,6 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LP
     BsodDetectionPreLaunch();
     MaybeShowCopySettingsDialog();
 
-    // Make sure GTA is not running
-    HandleIfGTAIsAlreadyRunning();
-
     // Maybe warn user if no anti-virus running
     CheckAntiVirusStatus();
 

@@ -834,12 +834,27 @@ void CCore::ApplyHooks()
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
-    // m_pDirect3DHookManager->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook();
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
     DetourLibraryFunction("kernel32.dll", "LoadLibraryA", Win32LoadLibraryA, SkipDirectPlay_LoadLibraryA);
+
+    // Disable code that disallows multiple instances of GTA:SA
+    // Disable `if (IsAppAlreadyRunning())` in WinMain
+    {
+        DWORD oldProtect;
+        VirtualProtect(reinterpret_cast<void*>(0x74872D), 9, PAGE_READWRITE, &oldProtect);
+        memcpy(reinterpret_cast<void*>(0x74872D), "\x90\x90\x90\x90\x90\x90\x90\x90\x90", 9);
+        VirtualProtect(reinterpret_cast<void*>(0x74872D), 9, oldProtect, &oldProtect);
+    }
+    // Create an unnamed semaphore in CdStreamInitThread.
+    {
+        DWORD oldProtect;
+        VirtualProtect(reinterpret_cast<void*>(0x406945), 5, PAGE_READWRITE, &oldProtect);
+        memcpy(reinterpret_cast<void*>(0x406945), "\x6A\x00\x90\x90\x90", 5);
+        VirtualProtect(reinterpret_cast<void*>(0x406945), 5, oldProtect, &oldProtect);
+    }
 }
 
 bool UsingAltD3DSetup()

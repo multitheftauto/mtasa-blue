@@ -65,7 +65,6 @@ struct SPEFileOffsets
 };
 
 void TerminateGTAIfRunning();
-bool IsGTARunning();
 void TerminateOtherMTAIfRunning();
 bool IsOtherMTARunning();
 
@@ -84,8 +83,6 @@ SString         GetMTASAPath();
 ePathResult     DiscoverGTAPath(bool bFindIfMissing);
 SString         GetGTAPath();
 bool            HasGTAPath();
-EGtaFileVersion GetGtaFileVersion(const SString& strGTAEXEPath);
-void            GetPEFileOffsets(SPEFileOffsets& outOffsets, const SString& strGTAEXEPath);
 
 void           FindFilesRecursive(const SString& strPathMatch, std::vector<SString>& outFileList, uint uiMaxDepth = 99);
 SOSVersionInfo GetOSVersion();
@@ -99,9 +96,6 @@ void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason);
 void UpdateMTAVersionApplicationSetting(bool bQuiet = false);
 bool Is32bitProcess(DWORD processID);
 bool TerminateProcess(DWORD dwProcessID, uint uiExitCode = 0);
-
-bool CreateSingleInstanceMutex();
-void ReleaseSingleInstanceMutex();
 
 void CleanDownloadCache();
 

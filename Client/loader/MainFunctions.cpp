@@ -200,81 +200,38 @@ void HandleSpecialLaunchOptions()
 //////////////////////////////////////////////////////////
 void HandleDuplicateLaunching()
 {
-    LPSTR lpCmdLine = GetCommandLine();
+    LPWSTR szCommandLine = GetCommandLineW();
 
-    int iRecheckTimeLimit = 2000;
-    while (!CreateSingleInstanceMutex())
-    {
-        if (strcmp(lpCmdLine, "") != 0)
-        {
-            HWND hwMTAWindow = FindWindow(NULL, "MTA: San Andreas");
+    if (!szCommandLine[0])
+        return;
+
+    HWND gameWindow = FindWindowA(nullptr, "MTA: San Andreas");
 #ifdef MTA_DEBUG
-            if (hwMTAWindow == NULL)
-                hwMTAWindow = FindWindow(NULL, "MTA: San Andreas [DEBUG]");
+    if (gameWindow == nullptr)
+        gameWindow = FindWindowA(nullptr, "MTA: San Andreas [DEBUG]");
 #endif
-            if (hwMTAWindow != NULL)
-            {
-                LPWSTR  szCommandLine = GetCommandLineW();
-                int     numArgs;
-                LPWSTR* aCommandLineArgs = CommandLineToArgvW(szCommandLine, &numArgs);
-                for (int i = 1; i < numArgs; ++i)
-                {
-                    if (WStringX(aCommandLineArgs[i]).BeginsWith(L"mtasa://"))
-                    {
-                        WString wideConnectInfo = aCommandLineArgs[i];
-                        SString strConnectInfo = ToUTF8(wideConnectInfo);
 
-                        COPYDATASTRUCT cdStruct;
-                        cdStruct.cbData = strConnectInfo.length() + 1;
-                        cdStruct.lpData = const_cast<char*>(strConnectInfo.c_str());
-                        cdStruct.dwData = URI_CONNECT;
+    if (gameWindow == nullptr)
+        return;
 
-                        SendMessage(hwMTAWindow, WM_COPYDATA, NULL, (LPARAM)&cdStruct);
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                if (iRecheckTimeLimit > 0)
-                {
-                    // Sleep a little bit and check the mutex again
-                    Sleep(500);
-                    iRecheckTimeLimit -= 500;
-                    continue;
-                }
-                SString strMessage;
-                strMessage +=
-                    _("Trouble restarting MTA:SA\n\n"
-                      "If the problem persists, open Task Manager and\n"
-                      "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
-                      "Try to launch MTA:SA again?");
-                if (MessageBoxUTF8(0, strMessage, _("Error") + _E("CL04"), MB_ICONWARNING | MB_YESNO | MB_TOPMOST) ==
-                    IDYES)            // Trouble restarting MTA:SA
-                {
-                    TerminateGTAIfRunning();
-                    TerminateOtherMTAIfRunning();
-                    ShellExecuteNonBlocking("open", PathJoin(GetMTASAPath(), MTA_EXE_NAME), lpCmdLine);
-                }
-                return ExitProcess(EXIT_ERROR);
-            }
-        }
-        else
+    int     numArgs;
+    LPWSTR* aCommandLineArgs = CommandLineToArgvW(szCommandLine, &numArgs);
+
+    for (int i = 1; i < numArgs; ++i)
+    {
+        if (WStringX(aCommandLineArgs[i]).BeginsWith(L"mtasa://"))
         {
-            if (!IsGTARunning() && !IsOtherMTARunning())
-            {
-                MessageBoxUTF8(0, _("Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer"),
-                               _("Error") + _E("CL05"), MB_ICONERROR | MB_TOPMOST);
-            }
-            else if (MessageBoxUTF8(0, _("Another instance of MTA is already running.\n\nDo you want to terminate it?"), _("Error") + _E("CL06"),
-                                    MB_ICONQUESTION | MB_YESNO | MB_TOPMOST) == IDYES)
-            {
-                TerminateGTAIfRunning();
-                TerminateOtherMTAIfRunning();
-                ShellExecuteNonBlocking("open", PathJoin(GetMTASAPath(), MTA_EXE_NAME), lpCmdLine);
-            }
+            WString wideConnectInfo = aCommandLineArgs[i];
+            SString strConnectInfo = ToUTF8(wideConnectInfo);
+
+            COPYDATASTRUCT cdStruct;
+            cdStruct.cbData = strConnectInfo.length() + 1;
+            cdStruct.lpData = const_cast<char*>(strConnectInfo.c_str());
+            cdStruct.dwData = URI_CONNECT;
+
+            SendMessage(gameWindow, WM_COPYDATA, NULL, (LPARAM)&cdStruct);
+            return ExitProcess(EXIT_ERROR);
         }
-        return ExitProcess(EXIT_ERROR);
     }
 }
 
@@ -480,8 +437,6 @@ void HandleCustomStartMessage()
 //////////////////////////////////////////////////////////
 void PreLaunchWatchDogs()
 {
-    assert(!CreateSingleInstanceMutex());
-
     //
     // "L0" is opened before the launch sequence and is closed if MTA shutsdown with no error
     // "L1" is opened before the launch sequence and is closed if GTA is succesfully started
@@ -584,35 +539,6 @@ void PostRunWatchDogs(int iReturnCode)
     {
         WatchDogClearCounter("CR1");
         WatchDogCompletedSection("L0");
-    }
-}
-
-//////////////////////////////////////////////////////////
-//
-// HandleIfGTAIsAlreadyRunning
-//
-// Check for and maybe stop a running GTA process
-//
-//////////////////////////////////////////////////////////
-void HandleIfGTAIsAlreadyRunning()
-{
-    if (IsGTARunning())
-    {
-        if (MessageBoxUTF8(
-                0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"),
-                _("Information") + _E("CL10"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST) == IDYES)
-        {
-            TerminateOtherMTAIfRunning();
-            TerminateGTAIfRunning();
-            if (IsGTARunning())
-            {
-                MessageBoxUTF8(0, _("Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."),
-                               _("Information") + _E("CL11"), MB_OK | MB_ICONERROR | MB_TOPMOST);
-                return ExitProcess(EXIT_ERROR);
-            }
-        }
-        else
-            return ExitProcess(EXIT_OK);
     }
 }
 
@@ -844,7 +770,6 @@ void CheckDataFiles()
     {
         SString strMessage(_("Main file has an incorrect name (%s)"), *GetLaunchFilename());
         int     iResponse = MessageBoxUTF8(NULL, strMessage, _("Error") + _E("CL33"), MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST);
-        ReleaseSingleInstanceMutex();
         if (iResponse == IDRETRY)
             ShellExecuteNonBlocking("open", PathJoin(strMTASAPath, MTA_EXE_NAME));
         return ExitProcess(EXIT_ERROR);
@@ -1272,7 +1197,6 @@ int LaunchGame(SString strCmdLine)
     //
     // Cleanup and exit.
     CloseHandle(piLoadee.hProcess);
-    ReleaseSingleInstanceMutex();
 
     // Success, maybe
     return dwExitCode;
