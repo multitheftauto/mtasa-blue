@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-16 19:16+0000\n"
+"POT-Creation-Date: 2025-06-23 17:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1554,91 +1554,91 @@ msgstr ""
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1356
+#: Client/core/CCore.cpp:1357
 msgid "this help screen"
 msgstr ""
 
-#: Client/core/CCore.cpp:1357 Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1358 Client/core/CCore.cpp:1359
 msgid "exits the application"
 msgstr ""
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1360
 msgid "shows the version"
 msgstr ""
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1361
 msgid "shows the time"
 msgstr ""
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1362
 msgid "shows the hud"
 msgstr ""
 
-#: Client/core/CCore.cpp:1362
+#: Client/core/CCore.cpp:1363
 msgid "shows all the binds"
 msgstr ""
 
-#: Client/core/CCore.cpp:1363
+#: Client/core/CCore.cpp:1364
 msgid "shows your serial"
 msgstr ""
 
-#: Client/core/CCore.cpp:1372
+#: Client/core/CCore.cpp:1373
 msgid "connects to a server (host port nick pass)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1373
+#: Client/core/CCore.cpp:1374
 msgid "connects to a previous server"
 msgstr ""
 
-#: Client/core/CCore.cpp:1374
+#: Client/core/CCore.cpp:1375
 msgid "binds a key (key control)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1375
+#: Client/core/CCore.cpp:1376
 msgid "unbinds a key (key)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1376
+#: Client/core/CCore.cpp:1377
 msgid "copies the default gta controls"
 msgstr ""
 
-#: Client/core/CCore.cpp:1377
+#: Client/core/CCore.cpp:1378
 msgid "outputs a screenshot"
 msgstr ""
 
-#: Client/core/CCore.cpp:1378
+#: Client/core/CCore.cpp:1379
 msgid "immediately saves the config"
 msgstr ""
 
-#: Client/core/CCore.cpp:1380
+#: Client/core/CCore.cpp:1381
 msgid "clears the debug view"
 msgstr ""
 
-#: Client/core/CCore.cpp:1381
+#: Client/core/CCore.cpp:1382
 msgid "scrolls the chatbox upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1382
+#: Client/core/CCore.cpp:1383
 msgid "scrolls the chatbox downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1383
+#: Client/core/CCore.cpp:1384
 msgid "scrolls the debug view upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1384
+#: Client/core/CCore.cpp:1385
 msgid "scrolls the debug view downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1387
+#: Client/core/CCore.cpp:1388
 msgid "shows the memory statistics"
 msgstr ""
 
-#: Client/core/CCore.cpp:1388
+#: Client/core/CCore.cpp:1389
 msgid "shows the frame timing graph"
 msgstr ""
 
-#: Client/core/CCore.cpp:1392
+#: Client/core/CCore.cpp:1393
 msgid "for developers: reload news"
 msgstr ""
 
