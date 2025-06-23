@@ -1273,7 +1273,8 @@ void CCore::DoPostFramePulse()
             }
         }
 
-        if (m_menuFrame >= 75 && m_requestNewNickname && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
+        if (m_menuFrame >= 75 && m_requestNewNickname && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading() &&
+            !GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->IsVisible())
         {
             // Request a new nickname if we're waiting for one
             GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
