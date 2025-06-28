@@ -240,6 +240,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+    m_Glitches[GLITCH_VEHICLE_RAPID_STOP] = false;
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
 
@@ -279,6 +280,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_GlitchNames["baddrivebyhitbox"] = GLITCH_BADDRIVEBYHITBOX;
     m_GlitchNames["quickstand"] = GLITCH_QUICKSTAND;
     m_GlitchNames["kickoutofvehicle_onmodelreplace"] = GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE;
+    m_GlitchNames["vehicle_rapid_stop"] = GLITCH_VEHICLE_RAPID_STOP;
 
     m_bCloudsEnabled = true;
 
