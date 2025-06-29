@@ -246,7 +246,7 @@ void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPositio
     FxPrtMult_c fxPrt{{fR,fG,fB,fA}, fSize, 0, fLife};
     CVector     newDirection;
 
-    FxSystem_c* fxParticleSystem;
+    FxSystem_cSAInterface* fxParticleSystem;
 
     switch (eFxParticle)
     {
@@ -326,6 +326,25 @@ void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPositio
         newDirection.fZ = (rand() % 10000) * 0.0001f * 4 - 2 + newDirection.fZ;
 
         // Call FxSystem_c::AddParticle
-        ((int(__thiscall*)(FxSystem_c*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
+        ((int(__thiscall*)(FxSystem_cSAInterface*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FxSystem_c_AddParticle)(fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
     }
+}
+
+std::vector<CEntitySAInterface*> CFxSA::GetEntitiesFromFx(std::uint32_t modelID)
+{
+    auto  vec = std::vector<CEntitySAInterface*>();
+    void* lastParticle = g_Fx->m_lastParticleEntity;
+
+    while (lastParticle)
+    {
+        auto** entity = reinterpret_cast<CEntitySAInterface**>(reinterpret_cast<std::uint8_t*>(lastParticle) + 0xC);
+        auto*  prevParticle = *reinterpret_cast<CFxSAInterface**>(reinterpret_cast<std::uint8_t*>(lastParticle) + 0x4);
+
+        if (entity && *entity && (*entity)->m_nModelIndex == modelID)
+            vec.push_back(*entity);
+
+        lastParticle = prevParticle;
+    }
+
+    return vec;
 }
