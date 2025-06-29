@@ -1641,7 +1641,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
     m_Events.AddEvent("onPlayerProjectileCreation", "weaponType, posX, posY, posZ, force, target, rotX, rotY, rotZ, velX, velY, velZ", nullptr, false);
     m_Events.AddEvent("onPlayerDetonateSatchels", "", nullptr, false);
-    m_Events.AddEvent("onPlayerTriggerEventThreshold", "", nullptr, false);
+    m_Events.AddEvent("onPlayerTriggerEventThreshold", "eventName", nullptr, false);
     m_Events.AddEvent("onPlayerTeamChange", "oldTeam, newTeam", nullptr, false);
     m_Events.AddEvent("onPlayerTriggerInvalidEvent", "eventName, isAdded, isRemote", nullptr, false);
     m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
@@ -2680,7 +2680,7 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
                 m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName);
             }
 
-        RegisterClientTriggeredEventUsage(pCaller);
+        RegisterClientTriggeredEventUsage(pCaller, szName);
     }
 }
 
@@ -4982,7 +4982,7 @@ void CGame::HandleCrashDumpEncryption()
 #endif
 }
 
-void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
+void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer, const char* szEventName)
 {
     if (!pPlayer || !pPlayer->IsPlayer() || pPlayer->IsBeingDeleted())
         return;
@@ -4994,8 +4994,13 @@ void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
         m_mapClientTriggeredEvents[pPlayer].m_llTicks = now;
 
     // Only increment if we haven't reached the interval time already
-    if (now - m_mapClientTriggeredEvents[pPlayer].m_llTicks <= m_iClientTriggeredEventsIntervalMs)
-        m_mapClientTriggeredEvents[pPlayer].m_uiCounter++;
+    ClientTriggeredEventsInfo& info = m_mapClientTriggeredEvents[pPlayer];
+
+    if (now - info.m_llTicks <= m_iClientTriggeredEventsIntervalMs)
+        info.m_uiCounter++;
+
+    if (szEventName)
+        info.m_strLastEventName = szEventName;
 }
 
 void CGame::ProcessClientTriggeredEventSpam()
@@ -5010,7 +5015,11 @@ void CGame::ProcessClientTriggeredEventSpam()
             if (GetTickCount64_() - data.m_llTicks >= m_iClientTriggeredEventsIntervalMs)
             {
                 if (data.m_uiCounter > m_iMaxClientTriggeredEventsPerInterval)
-                    player->CallEvent("onPlayerTriggerEventThreshold", {});
+                {
+                    CLuaArguments args;
+                    args.PushString(data.m_strLastEventName.c_str());
+                    player->CallEvent("onPlayerTriggerEventThreshold", args);
+                }
 
                 remove = true;
             }
