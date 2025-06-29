@@ -1273,7 +1273,8 @@ void CCore::DoPostFramePulse()
             }
         }
 
-        if (m_menuFrame >= 75 && m_requestNewNickname && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
+        if (m_menuFrame >= 75 && m_requestNewNickname && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading() &&
+            !GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->IsVisible())
         {
             // Request a new nickname if we're waiting for one
             GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
@@ -1451,6 +1452,9 @@ void CCore::Quit(bool bInstantly)
         SetApplicationSettingInt("last-server-ip", 1);
 
         WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
+
+        // Hide game window to make quit look instant
+        ShowWindow(GetHookedWindow(), SW_HIDE);
 
         // Destroy the client
         CModManager::GetSingleton().Unload();
