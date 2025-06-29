@@ -1697,7 +1697,7 @@ void CGame::AddBuiltInEvents()
 
     // Account events
     m_Events.AddEvent("onAccountDataChange", "account, key, value", NULL, false);
-
+    m_Events.AddEvent("onAccountNameChange", "account, previousName, newName", nullptr, false);
     m_Events.AddEvent("onAccountCreate", "account", NULL, false);
     m_Events.AddEvent("onAccountRemove", "account", NULL, false);
 
