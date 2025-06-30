@@ -5204,6 +5204,12 @@ void CClientPed::SetAlpha(unsigned char ucAlpha)
         if ( pClump ) g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( pClump, ucAlpha );
     }
     */
+    if (m_ucAlpha != ucAlpha) {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(m_ucAlpha);
+        Arguments.PushNumber(ucAlpha);
+        CallEvent("onClientElementAlphaChange", Arguments, true);
+    }
     m_ucAlpha = ucAlpha;
 }
 
