@@ -5017,7 +5017,7 @@ void CGame::ProcessClientTriggeredEventSpam()
                 if (data.m_uiCounter > m_iMaxClientTriggeredEventsPerInterval)
                 {
                     CLuaArguments args;
-                    args.PushString(data.m_strLastEventName.c_str());
+                    args.PushString(data.m_strLastEventName);
                     player->CallEvent("onPlayerTriggerEventThreshold", args);
                 }
 
