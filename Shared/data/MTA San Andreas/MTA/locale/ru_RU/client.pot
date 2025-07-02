@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-06-23 17:55+0000\n"
-"PO-Revision-Date: 2025-07-02 22:11\n"
+"PO-Revision-Date: 2025-07-02 23:12\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -545,7 +545,7 @@ msgstr "1024 x 1024 (Стандарт)"
 #. index 0
 #: Client/core/CSettings.cpp:460
 msgid "2048 x 2048"
-msgstr "Установите соответствие CPU 0 для повышения производительности игры."
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -1404,7 +1404,7 @@ msgstr "Исправить движения мыши - Необходим пер
 
 #: Client/core/CSettings.cpp:4981
 msgid "CPU affinity:"
-msgstr "Соответствие ЦП:"
+msgstr "Сходство с процессором CPU:"
 
 #: Client/core/CSettings.cpp:4981
 msgid "Only change if you're having stability issues."
@@ -1444,7 +1444,7 @@ msgstr "* Время: %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr "подключение: Сеть не готова, пожалуйста, подождите немного"
+msgstr "Подключение: Сеть не готова, пожалуйста, подождите немного"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -1470,21 +1470,21 @@ msgstr "подключение: Не удалось выгрузить теку�
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "подключение: Сеть не готова, пожалуйста, подождите немного"
+msgstr "переподключение: Сеть не готова, пожалуйста, подождите немного"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "повторное подключение: неверный номер порта"
+msgstr "переподключение: неверный номер порта"
 
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr "подключение: Подключение к %s:%u..."
+msgstr "переподключение: Подключение к %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr "подключение: к %s:%u не удалось!"
+msgstr "переподключение: к %s:%u не удалось!"
 
 #: Client/core/CCommandFuncs.cpp:359
 msgid "Bound all controls from GTA"
@@ -1625,7 +1625,7 @@ msgstr "показать график производительности"
 
 #: Client/core/CCore.cpp:1393
 msgid "for developers: reload news"
-msgstr "для разработчиков: "
+msgstr "для разработчиков: обновите новости"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2505,7 +2505,7 @@ msgstr "Пожалуйста, проверьте антивирус на пре�
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr "Создание GTA:SA"
+msgstr "Сгенерировать GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
