@@ -10,7 +10,6 @@
 
 #include "StdInc.h"
 #include <libpng/png.h>
-#include <libpng/pngpriv.h>
 
 ///////////////////////////////////////////////////////////////
 //
@@ -112,7 +111,15 @@ void ParseRGB(CBuffer& outImage, const png_structp& png_ptr, const png_infop& in
 ///////////////////////////////////////////////////////////////
 void ReadDataFromInputStream(png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead)
 {
-    CBufferReadStream& stream = *(CBufferReadStream*)png_ptr->io_ptr;
+    if (!png_ptr)
+        return;
+
+    void* ioPtr = png_get_io_ptr(png_ptr);
+
+    if (!ioPtr)
+        return;
+
+    CBufferReadStream& stream = *(CBufferReadStream*)ioPtr;
     stream.ReadBytes((byte*)outBytes, (size_t)byteCountToRead);
 }
 
@@ -215,12 +222,18 @@ bool PngDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& ui
 ///////////////////////////////////////////////////////////////
 void my_png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-    CBufferWriteStream* pStream = (CBufferWriteStream*)png_ptr->io_ptr;
-
-    if (!pStream)
+    if (!png_ptr)
         return;
-    pStream->WriteBytes(data, length);
+
+    void* io_ptr = png_get_io_ptr(png_ptr);
+
+    if (!io_ptr)
+        return;
+
+    CBufferWriteStream* stream = (CBufferWriteStream*)io_ptr;
+    stream->WriteBytes(data, length);
 }
+
 
 ///////////////////////////////////////////////////////////////
 //
