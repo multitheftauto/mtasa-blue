@@ -122,6 +122,7 @@ ipch/
 *.out
 *out.png
 [._]deps/
+[._]libs/
 .dirstamp
 /Makefile
 /autom4te.cache/
@@ -138,17 +139,21 @@ ipch/
 CMake*.json
 !CMakePresets.json
 CMakeLists.txt.*
+pnglibconf.[ch]
 pnglibconf.dfn
 pnglibconf.pre
 pngprefix.h
 
-# Libpng test programs
-png-fix-itxt
-pngcp
-pngfix
-pngimage
-pngstest
-pngtest
-pngunknown
-pngvalid
-timepng
+# Libpng test programs, scripts and artifacts
+/test-suite.log
+/tests/*.log
+/tests/*.trs
+/png-fix-itxt
+/pngcp
+/pngfix
+/pngimage
+/pngstest
+/pngtest
+/pngunknown
+/pngvalid
+/timepng
