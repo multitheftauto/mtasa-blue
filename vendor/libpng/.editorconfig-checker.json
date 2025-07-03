@@ -1,9 +1,0 @@
-{
-  "Disable": {
-    "IndentSize": true
-  },
-  "Exclude": [
-    ".git/",
-    "out/"
-  ]
-}
