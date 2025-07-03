@@ -139,7 +139,6 @@ ipch/
 CMake*.json
 !CMakePresets.json
 CMakeLists.txt.*
-pnglibconf.[ch]
 pnglibconf.dfn
 pnglibconf.pre
 pngprefix.h
