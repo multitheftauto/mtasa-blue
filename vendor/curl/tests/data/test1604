@@ -1,0 +1,24 @@
+<testcase>
+<info>
+<keywords>
+unittest
+</keywords>
+</info>
+
+#
+# Client-side
+<client>
+<server>
+none
+</server>
+<features>
+unittest
+</features>
+<name>
+Test Windows/MS-DOS filename sanitization
+</name>
+<tool>
+tool%TESTNUMBER
+</tool>
+</client>
+</testcase>
