@@ -24,13 +24,13 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 #include <curl/curl.h>
 
 #ifdef USE_GNUTLS
 
 #include <gnutls/gnutls.h>
-#include "timeval.h"
+#include "../curlx/timeval.h"
 
 #ifdef HAVE_GNUTLS_SRP
 /* the function exists */

@@ -28,16 +28,13 @@
 
 #include <curl/curl.h>
 #include "system_win32.h"
-#include "version_win32.h"
+#include "curlx/version_win32.h"
 #include "curl_sspi.h"
-#include "warnless.h"
+#include "curlx/warnless.h"
 
 /* The last #include files should be: */
 #include "curl_memory.h"
 #include "memdebug.h"
-
-LARGE_INTEGER Curl_freq;
-bool Curl_isVistaOrGreater;
 
 /* Handle of iphlpapp.dll */
 static HMODULE s_hIpHlpApiDll = NULL;
@@ -217,7 +214,7 @@ HMODULE Curl_load_library(LPCTSTR filename)
     /* Attempt to get the Windows system path */
     UINT systemdirlen = GetSystemDirectory(NULL, 0);
     if(systemdirlen) {
-      /* Allocate space for the full DLL path (Room for the null terminator
+      /* Allocate space for the full DLL path (Room for the null-terminator
          is included in systemdirlen) */
       size_t filenamelen = _tcslen(filename);
       TCHAR *path = malloc(sizeof(TCHAR) * (systemdirlen + 1 + filenamelen));

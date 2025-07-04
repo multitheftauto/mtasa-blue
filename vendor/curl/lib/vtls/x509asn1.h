@@ -25,14 +25,14 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #if defined(USE_GNUTLS) || defined(USE_WOLFSSL) || \
   defined(USE_SCHANNEL) || defined(USE_SECTRANSP) || \
   defined(USE_MBEDTLS) || defined(USE_RUSTLS)
 
-#include "cfilters.h"
-#include "urldata.h"
+#include "../cfilters.h"
+#include "../urldata.h"
 
 /*
  * Types.
@@ -45,7 +45,7 @@ struct Curl_asn1Element {
   const char *end;            /* Pointer to 1st byte after element. */
   unsigned char class;        /* ASN.1 element class. */
   unsigned char tag;          /* ASN.1 element tag. */
-  bool          constructed;  /* Element is constructed. */
+  BIT(constructed);           /* Element is constructed. */
 };
 
 /* X509 certificate: RFC 5280. */
