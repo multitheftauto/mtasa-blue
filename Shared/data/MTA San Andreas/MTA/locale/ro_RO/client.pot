@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-06-23 17:55+0000\n"
-"PO-Revision-Date: 2025-07-05 04:51\n"
+"PO-Revision-Date: 2025-07-10 05:21\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2882,7 +2882,7 @@ msgstr "Ghemuit în cover în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Fighting in"
-msgstr "Luptându-se prin"
+msgstr "Se luptă în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Throwing fists in"
