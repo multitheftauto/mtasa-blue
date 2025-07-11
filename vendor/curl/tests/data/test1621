@@ -1,0 +1,27 @@
+<testcase>
+<info>
+<keywords>
+unittest
+stripcredentials
+</keywords>
+</info>
+
+#
+# Client-side
+<client>
+<server>
+none
+</server>
+<features>
+unittest
+https
+pop3s
+</features>
+<name>
+unit tests for stripcredentials from URL
+</name>
+<tool>
+tool%TESTNUMBER
+</tool>
+</client>
+</testcase>

@@ -113,7 +113,6 @@ static CURLcode cf_hc_baller_cntrl(struct cf_hc_baller *b,
 
 struct cf_hc_ctx {
   cf_hc_state state;
-  const struct Curl_dns_entry *remotehost;
   struct curltime started;  /* when connect started */
   CURLcode result;          /* overall result */
   struct cf_hc_baller ballers[2];
@@ -147,11 +146,10 @@ static void cf_hc_baller_init(struct cf_hc_baller *b,
                               struct Curl_easy *data,
                               int transport)
 {
-  struct cf_hc_ctx *ctx = cf->ctx;
   struct Curl_cfilter *save = cf->next;
 
   cf->next = NULL;
-  b->started = Curl_now();
+  b->started = curlx_now();
   switch(b->alpn_id) {
   case ALPN_h3:
     transport = TRNSPRT_QUIC;
@@ -161,8 +159,8 @@ static void cf_hc_baller_init(struct cf_hc_baller *b,
   }
 
   if(!b->result)
-    b->result = Curl_cf_setup_insert_after(cf, data, ctx->remotehost,
-                                           transport, CURL_CF_SSL_ENABLE);
+    b->result = Curl_cf_setup_insert_after(cf, data, transport,
+                                           CURL_CF_SSL_ENABLE);
   b->cf = cf->next;
   cf->next = save;
 }
@@ -213,11 +211,12 @@ static CURLcode baller_connected(struct Curl_cfilter *cf,
   reply_ms = cf_hc_baller_reply_ms(winner, data);
   if(reply_ms >= 0)
     CURL_TRC_CF(data, cf, "connect+handshake %s: %dms, 1st data: %dms",
-                winner->name, (int)Curl_timediff(Curl_now(), winner->started),
-                reply_ms);
+                winner->name, (int)curlx_timediff(curlx_now(),
+                                                  winner->started), reply_ms);
   else
     CURL_TRC_CF(data, cf, "deferred handshake %s: %dms",
-                winner->name, (int)Curl_timediff(Curl_now(), winner->started));
+                winner->name, (int)curlx_timediff(curlx_now(),
+                                                  winner->started));
 
   cf->next = winner->cf;
   winner->cf = NULL;
@@ -267,7 +266,7 @@ static bool time_to_start_next(struct Curl_cfilter *cf,
                 ctx->ballers[idx].name);
     return TRUE;
   }
-  elapsed_ms = Curl_timediff(now, ctx->started);
+  elapsed_ms = curlx_timediff(now, ctx->started);
   if(elapsed_ms >= ctx->hard_eyeballs_timeout_ms) {
     CURL_TRC_CF(data, cf, "hard timeout of %dms reached, starting %s",
                 ctx->hard_eyeballs_timeout_ms, ctx->ballers[idx].name);
@@ -304,7 +303,7 @@ static CURLcode cf_hc_connect(struct Curl_cfilter *cf,
   }
 
   *done = FALSE;
-  now = Curl_now();
+  now = curlx_now();
   switch(ctx->state) {
   case CF_HC_INIT:
     DEBUGASSERT(!cf->next);
@@ -469,7 +468,7 @@ static struct curltime cf_get_max_baller_time(struct Curl_cfilter *cf,
     struct Curl_cfilter *cfb = ctx->ballers[i].cf;
     memset(&t, 0, sizeof(t));
     if(cfb && !cfb->cft->query(cfb, data, query, NULL, &t)) {
-      if((t.tv_sec || t.tv_usec) && Curl_timediff_us(t, tmax) > 0)
+      if((t.tv_sec || t.tv_usec) && curlx_timediff_us(t, tmax) > 0)
         tmax = t;
     }
   }
@@ -575,7 +574,6 @@ struct Curl_cftype Curl_cft_http_connect = {
 
 static CURLcode cf_hc_create(struct Curl_cfilter **pcf,
                              struct Curl_easy *data,
-                             const struct Curl_dns_entry *remotehost,
                              enum alpnid *alpnids, size_t alpn_count)
 {
   struct Curl_cfilter *cf = NULL;
@@ -597,7 +595,6 @@ static CURLcode cf_hc_create(struct Curl_cfilter **pcf,
     result = CURLE_OUT_OF_MEMORY;
     goto out;
   }
-  ctx->remotehost = remotehost;
   for(i = 0; i < alpn_count; ++i)
     cf_hc_baller_assign(&ctx->ballers[i], alpnids[i]);
   for(; i < CURL_ARRAYSIZE(ctx->ballers); ++i)
@@ -619,14 +616,13 @@ out:
 static CURLcode cf_http_connect_add(struct Curl_easy *data,
                                     struct connectdata *conn,
                                     int sockindex,
-                                    const struct Curl_dns_entry *remotehost,
                                     enum alpnid *alpn_ids, size_t alpn_count)
 {
   struct Curl_cfilter *cf;
   CURLcode result = CURLE_OK;
 
   DEBUGASSERT(data);
-  result = cf_hc_create(&cf, data, remotehost, alpn_ids, alpn_count);
+  result = cf_hc_create(&cf, data, alpn_ids, alpn_count);
   if(result)
     goto out;
   Curl_conn_cf_add(data, conn, sockindex, cf);
@@ -647,8 +643,7 @@ static bool cf_https_alpns_contain(enum alpnid id,
 
 CURLcode Curl_cf_https_setup(struct Curl_easy *data,
                              struct connectdata *conn,
-                             int sockindex,
-                             const struct Curl_dns_entry *remotehost)
+                             int sockindex)
 {
   enum alpnid alpn_ids[2];
   size_t alpn_count = 0;
@@ -656,7 +651,6 @@ CURLcode Curl_cf_https_setup(struct Curl_easy *data,
   struct Curl_cfilter cf_fake, *cf = NULL;
 
   (void)sockindex;
-  (void)remotehost;
   /* we want to log for the filter before we create it, fake it. */
   memset(&cf_fake, 0, sizeof(cf_fake));
   cf_fake.cft = &Curl_cft_http_connect;
@@ -664,22 +658,23 @@ CURLcode Curl_cf_https_setup(struct Curl_easy *data,
 
   if(conn->bits.tls_enable_alpn) {
 #ifdef USE_HTTPSRR
-    /* Is there a HTTPSRR and if so, do its ALPNs it apply here?
+    /* Is there an HTTPSRR use its ALPNs here.
      * We are here after having selected a connection to a host+port and
      * can no longer change that. Any HTTPSRR advice for other hosts and ports
      * we need to ignore. */
-    if(conn->dns_entry && conn->dns_entry->hinfo &&
-       !conn->dns_entry->hinfo->no_def_alpn &&  /* ALPNs are defaults */
-       (!conn->dns_entry->hinfo->target ||      /* for same host */
-        !conn->dns_entry->hinfo->target[0] ||
-        (conn->dns_entry->hinfo->target[0] == '.' &&
-         !conn->dns_entry->hinfo->target[0])) &&
-       (conn->dns_entry->hinfo->port < 0 ||    /* for same port */
-        conn->dns_entry->hinfo->port == conn->remote_port)) {
+    struct Curl_dns_entry *dns = data->state.dns[sockindex];
+    struct Curl_https_rrinfo *rr = dns ? dns->hinfo : NULL;
+    if(rr && !rr->no_def_alpn &&  /* ALPNs are defaults */
+       (!rr->target ||      /* for same host */
+        !rr->target[0] ||
+        (rr->target[0] == '.' &&
+         !rr->target[1])) &&
+       (rr->port < 0 ||    /* for same port */
+        rr->port == conn->remote_port)) {
       size_t i;
-      for(i = 0; i < CURL_ARRAYSIZE(conn->dns_entry->hinfo->alpns) &&
+      for(i = 0; i < CURL_ARRAYSIZE(rr->alpns) &&
                  alpn_count < CURL_ARRAYSIZE(alpn_ids); ++i) {
-        enum alpnid alpn = conn->dns_entry->hinfo->alpns[i];
+        enum alpnid alpn = rr->alpns[i];
         if(cf_https_alpns_contain(alpn, alpn_ids, alpn_count))
           continue;
         switch(alpn) {
@@ -738,8 +733,7 @@ CURLcode Curl_cf_https_setup(struct Curl_easy *data,
   /* If we identified ALPNs to use, install our filter. Otherwise,
    * install nothing, so our call will use a default connect setup. */
   if(alpn_count) {
-    result = cf_http_connect_add(data, conn, sockindex, remotehost,
-                                 alpn_ids, alpn_count);
+    result = cf_http_connect_add(data, conn, sockindex, alpn_ids, alpn_count);
   }
 
 out:
