@@ -41,7 +41,7 @@
 #include "connect.h"
 #include "select.h"
 #include "strcase.h"
-#include "strparse.h"
+#include "curlx/strparse.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -53,8 +53,6 @@ static void cshutdn_run_conn_handler(struct Curl_easy *data,
                                      struct connectdata *conn)
 {
   if(!conn->bits.shutdown_handler) {
-    if(conn->dns_entry)
-      Curl_resolv_unlink(data, &conn->dns_entry);
 
     /* Cleanup NTLM connection-related data */
     Curl_http_auth_cleanup_ntlm(conn);
@@ -80,9 +78,6 @@ static void cshutdn_run_conn_handler(struct Curl_easy *data,
        * server responses here (FTP). Set a short timeout. */
       conn->handler->disconnect(data, conn, conn->bits.aborted);
     }
-
-    /* possible left-overs from the async name resolvers */
-    Curl_resolver_cancel(data);
 
     conn->bits.shutdown_handler = TRUE;
   }
@@ -166,7 +161,9 @@ void Curl_cshutdn_terminate(struct Curl_easy *data,
      * not done so already. */
     cshutdn_run_once(admin, conn, &done);
   }
-  CURL_TRC_M(admin, "[SHUTDOWN] closing connection");
+  CURL_TRC_M(admin, "[SHUTDOWN] %sclosing connection #%" FMT_OFF_T,
+             conn->bits.shutdown_filters ? "" : "force ",
+             conn->connection_id);
   Curl_conn_close(admin, SECONDARYSOCKET);
   Curl_conn_close(admin, FIRSTSOCKET);
   Curl_detach_connection(admin);
@@ -181,13 +178,21 @@ void Curl_cshutdn_terminate(struct Curl_easy *data,
   }
 }
 
-static void cshutdn_destroy_oldest(struct cshutdn *cshutdn,
-                                     struct Curl_easy *data)
+static bool cshutdn_destroy_oldest(struct cshutdn *cshutdn,
+                                   struct Curl_easy *data,
+                                   const char *destination)
 {
   struct Curl_llist_node *e;
   struct connectdata *conn;
 
   e = Curl_llist_head(&cshutdn->list);
+  while(e) {
+    conn = Curl_node_elem(e);
+    if(!destination || !strcmp(destination, conn->destination))
+      break;
+    e = Curl_node_next(e);
+  }
+
   if(e) {
     SIGPIPE_VARIABLE(pipe_st);
     conn = Curl_node_elem(e);
@@ -196,7 +201,19 @@ static void cshutdn_destroy_oldest(struct cshutdn *cshutdn,
     sigpipe_apply(data, &pipe_st);
     Curl_cshutdn_terminate(data, conn, FALSE);
     sigpipe_restore(&pipe_st);
+    return TRUE;
   }
+  return FALSE;
+}
+
+bool Curl_cshutdn_close_oldest(struct Curl_easy *data,
+                               const char *destination)
+{
+  if(data && data->multi) {
+    struct cshutdn *csd = &data->multi->cshutdn;
+    return cshutdn_destroy_oldest(csd, data, destination);
+  }
+  return FALSE;
 }
 
 #define NUM_POLLS_ON_STACK 10
@@ -251,7 +268,7 @@ static void cshutdn_perform(struct cshutdn *cshutdn,
       /* idata has one timer list, but maybe more than one connection.
        * Set EXPIRE_SHUTDOWN to the smallest time left for all. */
       if(!nowp) {
-        now = Curl_now();
+        now = curlx_now();
         nowp = &now;
       }
       ms = Curl_conn_shutdown_timeleft(conn, nowp);
@@ -270,7 +287,7 @@ static void cshutdn_terminate_all(struct cshutdn *cshutdn,
                                   struct Curl_easy *data,
                                   int timeout_ms)
 {
-  struct curltime started = Curl_now();
+  struct curltime started = curlx_now();
   struct Curl_llist_node *e;
   SIGPIPE_VARIABLE(pipe_st);
 
@@ -293,7 +310,7 @@ static void cshutdn_terminate_all(struct cshutdn *cshutdn,
     }
 
     /* wait for activity, timeout or "nothing" */
-    timespent = Curl_timediff(Curl_now(), started);
+    timespent = curlx_timediff(curlx_now(), started);
     if(timespent >= (timediff_t)timeout_ms) {
       CURL_TRC_M(data, "[SHUTDOWN] shutdown finished, %s",
                 (timeout_ms > 0) ? "timeout" : "best effort done");
@@ -316,8 +333,6 @@ static void cshutdn_terminate_all(struct cshutdn *cshutdn,
     e = Curl_llist_head(&cshutdn->list);
   }
   DEBUGASSERT(!Curl_llist_count(&cshutdn->list));
-
-  Curl_hostcache_clean(data, data->dns.hostcache);
 
   sigpipe_restore(&pipe_st);
 }
@@ -345,7 +360,7 @@ void Curl_cshutdn_destroy(struct cshutdn *cshutdn,
       const char *p = getenv("CURL_GRACEFUL_SHUTDOWN");
       if(p) {
         curl_off_t l;
-        if(!Curl_str_number(&p, &l, INT_MAX))
+        if(!curlx_str_number(&p, &l, INT_MAX))
           timeout_ms = (int)l;
       }
     }
@@ -416,7 +431,7 @@ void Curl_cshutdn_add(struct cshutdn *cshutdn,
         (conns_in_pool + Curl_llist_count(&cshutdn->list)))) {
     CURL_TRC_M(data, "[SHUTDOWN] discarding oldest shutdown connection "
                "due to connection limit of %zu", max_total);
-    cshutdn_destroy_oldest(cshutdn, data);
+    cshutdn_destroy_oldest(cshutdn, data, NULL);
   }
 
   if(cshutdn->multi->socket_cb) {

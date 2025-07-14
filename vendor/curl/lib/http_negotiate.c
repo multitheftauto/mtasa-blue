@@ -32,7 +32,7 @@
 #include "http_negotiate.h"
 #include "vauth/vauth.h"
 #include "vtls/vtls.h"
-#include "strparse.h"
+#include "curlx/strparse.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -87,7 +87,7 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
 
   /* Obtain the input token, if any */
   header += strlen("Negotiate");
-  Curl_str_passblanks(&header);
+  curlx_str_passblanks(&header);
 
   len = strlen(header);
   neg_ctx->havenegdata = len != 0;
@@ -110,8 +110,8 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
 #endif
   /* Check if the connection is using SSL and get the channel binding data */
 #ifdef HAVE_GSSAPI
-  Curl_dyn_init(&neg_ctx->channel_binding_data, SSL_CB_MAX_SIZE + 1);
 #ifdef USE_SSL
+  curlx_dyn_init(&neg_ctx->channel_binding_data, SSL_CB_MAX_SIZE + 1);
   if(Curl_conn_is_ssl(conn, FIRSTSOCKET)) {
     result = Curl_ssl_get_channel_binding(
       data, FIRSTSOCKET, &neg_ctx->channel_binding_data);
@@ -120,6 +120,8 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
       return result;
     }
   }
+#else
+  curlx_dyn_init(&neg_ctx->channel_binding_data, 1);
 #endif /* USE_SSL */
 #endif /* HAVE_GSSAPI */
 
@@ -128,7 +130,7 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
                                            host, header, neg_ctx);
 
 #ifdef HAVE_GSSAPI
-  Curl_dyn_free(&neg_ctx->channel_binding_data);
+  curlx_dyn_free(&neg_ctx->channel_binding_data);
 #endif
 
   if(result)
