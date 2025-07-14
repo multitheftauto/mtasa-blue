@@ -359,7 +359,7 @@
 /* #undef HAVE_IOCTL_SIOCGIFADDR */
 
 /* Define to 1 if you have the <io.h> header file. */
-#define HAVE_IO_H 1
+/* #undef HAVE_IO_H */
 
 /* Define to 1 if you have the lber.h header file. */
 /* #undef HAVE_LBER_H */
