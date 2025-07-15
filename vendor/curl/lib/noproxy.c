@@ -26,10 +26,10 @@
 
 #ifndef CURL_DISABLE_PROXY
 
-#include "inet_pton.h"
+#include "curlx/inet_pton.h"
 #include "strcase.h"
 #include "noproxy.h"
-#include "strparse.h"
+#include "curlx/strparse.h"
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -178,7 +178,7 @@ bool Curl_check_noproxy(const char *name, const char *no_proxy)
       bool match = FALSE;
 
       /* pass blanks */
-      Curl_str_passblanks(&p);
+      curlx_str_passblanks(&p);
 
       token = p;
       /* pass over the pattern */
@@ -234,7 +234,7 @@ bool Curl_check_noproxy(const char *name, const char *no_proxy)
             /* if the bits variable gets a crazy value here, that is fine as
                the value will then be rejected in the cidr function */
             bits = (unsigned int)atoi(slash + 1);
-            *slash = 0; /* null terminate there */
+            *slash = 0; /* null-terminate there */
           }
           if(type == TYPE_IPV6)
             match = Curl_cidr6_match(name, check, bits);
@@ -247,7 +247,7 @@ bool Curl_check_noproxy(const char *name, const char *no_proxy)
           return TRUE;
       } /* if(tokenlen) */
       /* pass blanks after pattern */
-      Curl_str_passblanks(&p);
+      curlx_str_passblanks(&p);
       /* if not a comma, this ends the loop */
       if(*p != ',')
         break;

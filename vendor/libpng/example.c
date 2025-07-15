@@ -2,7 +2,7 @@
 
 /* example.c - an example of using libpng
  *
- * Maintained 2018-2024 Cosmin Truta
+ * Maintained 2018-2025 Cosmin Truta
  * Maintained 1998-2016 Glenn Randers-Pehrson
  * Maintained 1996-1997 Andreas Dilger
  * Written 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -179,11 +179,11 @@ int main(int argc, const char **argv)
  *    components.
  *
  * You do not have to read directly from a file.  You can read from memory or,
- * on systems that support it, from a <stdio.h> FILE*.  This is controlled by
- * the particular png_image_read_from_ function you call at the start.
- * Likewise, on write, you can write to a FILE* if your system supports it.
- * Check the macro PNG_STDIO_SUPPORTED to see if stdio support has been
- * included in your libpng build.
+ * on systems that support <stdio.h>, from a FILE object.  This is controlled
+ * by the particular png_image_begin_read_from_ function you call at the start.
+ * Likewise, on write, you can write to a FILE object if your system supports
+ * <stdio.h>.  The macro PNG_STDIO_SUPPORTED indicates if stdio is available
+ * and accessible from your libpng build.
  *
  * If you read 16-bit (PNG_FORMAT_FLAG_LINEAR) data, you may need to write it
  * in the 8-bit format for display.  You do this by setting the convert_to_8bit

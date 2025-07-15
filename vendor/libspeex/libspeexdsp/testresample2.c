@@ -30,16 +30,18 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "speex/speex_resampler.h"
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 #define PERIOD 32
 #define INBLOCK 1024
