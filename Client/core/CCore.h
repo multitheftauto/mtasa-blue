@@ -70,6 +70,8 @@ class CDiscordInterface;
 #define CONFIG_HISTORY_LIST_TAG    "connected_server"
 #define IDT_TIMER1                 1234
 
+class CSteamClient;
+
 extern class CCore*         g_pCore;
 extern class CGraphics*     g_pGraphics;
 extern class CLocalization* g_pLocalization;
@@ -104,6 +106,7 @@ public:
     CWebCoreInterface*                 GetWebCore();
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
+    CSteamClient*                      GetSteamClient() { return m_steamClient.get(); }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -311,6 +314,7 @@ private:
     CClientVariables                      m_ClientVariables;
     CWebCoreInterface*                    m_pWebCore = nullptr;
     CTrayIcon*                            m_pTrayIcon;
+    std::unique_ptr<CSteamClient>         m_steamClient;
     std::shared_ptr<CDiscordRichPresence> m_pDiscordRichPresence;
 
     // Hook interfaces.
