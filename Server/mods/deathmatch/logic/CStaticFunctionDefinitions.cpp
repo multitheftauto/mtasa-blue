@@ -9450,6 +9450,8 @@ CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* p
         return nullptr;
     }
 
+    pWater->SetDefaultLevel(pWater->GetLevel());
+
     if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;

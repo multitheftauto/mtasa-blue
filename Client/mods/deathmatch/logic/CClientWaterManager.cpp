@@ -104,6 +104,24 @@ bool CClientWaterManager::SetAllElementWaterLevel(float fLevel, void* pChangeSou
     return true;
 }
 
+bool CClientWaterManager::ResetAllElementWaterLevel()
+{
+    for (CClientWater* pWater : m_List)
+        pWater->ResetLevel();
+    return true;
+}
+
+void CClientWaterManager::ResetElementWaterLevel(CClientWater* pWater)
+{
+    pWater->ResetLevel();
+}
+
+void CClientWaterManager::ResetElementWaterLevel(std::vector<CClientWater*>& vecWaterElements)
+{
+    for (CClientWater* pWater : vecWaterElements)
+        pWater->ResetLevel();
+}
+
 void CClientWaterManager::ResetWorldWaterLevel()
 {
     g_pGame->GetWaterManager()->ResetWorldWaterLevel();
