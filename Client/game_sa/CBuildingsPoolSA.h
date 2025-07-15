@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CBuildingsPoolSA.h
  *  PURPOSE:     Buildings pool class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -44,5 +44,8 @@ private:
     SVectorPoolData<CBuildingSA>             m_buildingPool{MAX_BUILDINGS};
     CPoolSAInterface<CBuildingSAInterface>** m_ppBuildingPoolInterface;
 
-    std::unique_ptr<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>> m_pOriginalBuildingsBackup;
+    using building_buffer_t = std::uint8_t[sizeof(CBuildingSAInterface)];
+    using backup_array_t = std::array<std::pair<bool, building_buffer_t>, MAX_BUILDINGS>;
+
+    std::unique_ptr<backup_array_t> m_pOriginalBuildingsBackup;
 };

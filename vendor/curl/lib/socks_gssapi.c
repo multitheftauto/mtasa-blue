@@ -32,15 +32,20 @@
 #include "sendf.h"
 #include "cfilters.h"
 #include "connect.h"
-#include "timeval.h"
+#include "curlx/timeval.h"
 #include "socks.h"
-#include "warnless.h"
+#include "curlx/warnless.h"
 #include "strdup.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
+
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 #define MAX_GSS_LEN 1024
 
@@ -60,7 +65,7 @@ static int check_gss_err(struct Curl_easy *data,
     gss_buffer_desc status_string = GSS_C_EMPTY_BUFFER;
     struct dynbuf dbuf;
 
-    Curl_dyn_init(&dbuf, MAX_GSS_LEN);
+    curlx_dyn_init(&dbuf, MAX_GSS_LEN);
     msg_ctx = 0;
     while(!msg_ctx) {
       /* convert major status code (GSS-API error) to text */
@@ -69,7 +74,7 @@ static int check_gss_err(struct Curl_easy *data,
                                     GSS_C_NULL_OID,
                                     &msg_ctx, &status_string);
       if(maj_stat == GSS_S_COMPLETE) {
-        if(Curl_dyn_addn(&dbuf, status_string.value,
+        if(curlx_dyn_addn(&dbuf, status_string.value,
                          status_string.length))
           return 1; /* error */
         gss_release_buffer(&min_stat, &status_string);
@@ -77,7 +82,7 @@ static int check_gss_err(struct Curl_easy *data,
       }
       gss_release_buffer(&min_stat, &status_string);
     }
-    if(Curl_dyn_addn(&dbuf, ".\n", 2))
+    if(curlx_dyn_addn(&dbuf, ".\n", 2))
       return 1; /* error */
     msg_ctx = 0;
     while(!msg_ctx) {
@@ -87,7 +92,7 @@ static int check_gss_err(struct Curl_easy *data,
                                     GSS_C_NULL_OID,
                                     &msg_ctx, &status_string);
       if(maj_stat == GSS_S_COMPLETE) {
-        if(Curl_dyn_addn(&dbuf, status_string.value,
+        if(curlx_dyn_addn(&dbuf, status_string.value,
                          status_string.length))
           return 1; /* error */
         gss_release_buffer(&min_stat, &status_string);
@@ -95,8 +100,9 @@ static int check_gss_err(struct Curl_easy *data,
       }
       gss_release_buffer(&min_stat, &status_string);
     }
-    failf(data, "GSS-API error: %s failed: %s", function, Curl_dyn_ptr(&dbuf));
-    Curl_dyn_free(&dbuf);
+    failf(data, "GSS-API error: %s failed: %s", function,
+          curlx_dyn_ptr(&dbuf));
+    curlx_dyn_free(&dbuf);
     return 1;
   }
 
@@ -536,5 +542,9 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(struct Curl_cfilter *cf,
 
   return CURLE_OK;
 }
+
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic pop
+#endif
 
 #endif /* HAVE_GSSAPI && !CURL_DISABLE_PROXY */

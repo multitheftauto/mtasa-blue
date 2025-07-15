@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -127,9 +127,9 @@ public:
     static uchar GetCoronaReflectionsEnabled();
     static bool  ResetCoronaReflectionsEnabled();
 
-    static std::variant<bool, float, CLuaMultiReturn<float, float, float>> GetWorldProperty(eWorldProperty property);
-    static bool SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3);
-    static bool ResetWorldProperty(eWorldProperty property);
+    static std::variant<bool, float, CLuaMultiReturn<float, float, float>> GetWorldProperty(WorldProperty property);
+    static bool SetWorldProperty(WorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3);
+    static bool ResetWorldProperty(WorldProperty property);
 
     static bool SetTimeFrozen(bool value) noexcept;
     static bool IsTimeFrozen() noexcept;

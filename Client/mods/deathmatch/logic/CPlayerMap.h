@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayerMap.h
  *  PURPOSE:     Header for player map class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -116,7 +116,7 @@ private:
 
     unsigned long m_ulUpdateTime;
 
-    std::vector<CClientTextDisplay*> m_HelpTextList;
+    std::vector<std::shared_ptr<CClientTextDisplay>> m_HelpTextList;
     bool                             m_bHideHelpText;
 
     bool m_bHudVisible;

@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/multiplayer_shotsync.h
  *  PURPOSE:     Multiplayer module shooting sync methods
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

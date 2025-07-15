@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPed.h
  *  PURPOSE:     Ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -115,7 +115,7 @@ struct SPlayerAnimData
     int         blendTime{250};
     bool        taskToBeRestoredOnAnimEnd{false};
 
-    std::int64_t startedTick{0};
+    std::int64_t startTime{0};
 
     float progress{0.0f};
     float speed{1.0f};

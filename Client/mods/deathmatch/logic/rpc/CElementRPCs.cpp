@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CElementRPCs.cpp
  *  PURPOSE:     Element remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -501,6 +501,22 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding* building = static_cast<CClientBuilding*>(pSource);
+            const auto       currentModel = building->GetModel();
+
+            if (currentModel != usModel)
+            {
+                building->SetModel(usModel);
+                CLuaArguments Arguments;
+                Arguments.PushNumber(currentModel);
+                Arguments.PushNumber(usModel);
+                building->CallEvent("onClientElementModelChange", Arguments, true);
+            }
+
+            break;
+        }
     }
 }
 
@@ -541,6 +557,12 @@ void CElementRPCs::SetElementCollisionsEnabled(CClientEntity* pSource, NetBitStr
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetCollisionEnabled(bEnable);
+                break;
+            }
+
+            case CCLIENTBUILDING:
+            {
+                static_cast<CClientBuilding*>(pSource)->SetUsesCollision(bEnable);
                 break;
             }
         }
@@ -592,6 +614,13 @@ void CElementRPCs::SetLowLodElement(CClientEntity* pSource, NetBitStreamInterfac
                 CClientObject* pLowLodObject = DynamicCast<CClientObject>(CElementIDs::GetElement(LowLodObjectID));
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetLowLodObject(pLowLodObject);
+                break;
+            }
+            case CCLIENTBUILDING:
+            {
+                CClientBuilding* pLowLodBuilding = DynamicCast<CClientBuilding>(CElementIDs::GetElement(LowLodObjectID));
+                CClientBuilding* pBuilding = static_cast<CClientBuilding*>(pSource);
+                pBuilding->SetLowLodBuilding(pLowLodBuilding);
                 break;
             }
         }

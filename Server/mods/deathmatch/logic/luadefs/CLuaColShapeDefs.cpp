@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaColShapeDefs.cpp
  *  PURPOSE:     Lua function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -292,7 +292,7 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
     std::vector<CVector2D> vecPointList;
 
     CScriptArgReader argStream(luaVM);
-    for (uint i = 0; i < 4 || argStream.NextIsVector2D(); i++)
+    for (uint i = 0; !argStream.HasErrors() && (i < 4 || argStream.NextIsVector2D()); i++)
     {
         CVector2D vecPoint;
         argStream.ReadVector2D(vecPoint);

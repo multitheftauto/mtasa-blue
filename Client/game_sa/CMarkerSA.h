@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CMarkerSA.h
  *  PURPOSE:     Header file for marker entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -52,10 +52,10 @@ public:
 
     void Init();
 
-    void                SetSprite(eMarkerSprite Sprite);
-    void                SetDisplay(eMarkerDisplay wDisplay);
+    void                SetSprite(MarkerSprite Sprite);
+    void                SetDisplay(MarkerDisplay wDisplay);
     void                SetScale(WORD wScale);
-    void                SetColor(eMarkerColor color);
+    void                SetColor(MarkerColor color);
     void                SetColor(const SharedUtil::SColor color);
     void                Remove();
     bool                IsActive();

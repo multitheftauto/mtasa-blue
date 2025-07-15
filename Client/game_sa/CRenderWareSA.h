@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CRenderWareSA.h
  *  PURPOSE:     Header file for RenderWare game engine class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -35,6 +35,9 @@ public:
     void ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId);
     void ClothesRemoveReplacement(char* pFileData);
     bool HasClothesReplacementChanged();
+    bool ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) override;
+    bool ClothesRemoveFile(char* fileData) override;
+    bool HasClothesFile(const char* fileName) const noexcept override;
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);

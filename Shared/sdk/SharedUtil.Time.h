@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Time.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -40,6 +40,8 @@ namespace SharedUtil
     // Retrieves the number of seconds that have elapsed since some arbitrary point in time.
     //
     double GetSecondCount();
+
+    std::int64_t GetTimestamp();
 
     //
     // Get the time as a sortable string.

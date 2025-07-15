@@ -445,7 +445,7 @@
                                     cf2_stack_getReal( opStack,
                                                        delta++ ) ) );
 
-      FT_TRACE6(( "%f ", (float) sum / 65536 ));
+      FT_TRACE6(( "%f ", (double)sum / 65536 ));
 
       /* store blended result  */
       cf2_stack_setReal( opStack, i + base, sum );
@@ -2282,7 +2282,7 @@
 
                     arg = cf2_stack_popFixed( opStack );
                     if ( arg > 0 )
-                      arg = (CF2_F16Dot16)FT_SqrtFixed( arg );
+                      arg = (CF2_F16Dot16)FT_SqrtFixed( (FT_UInt32)arg );
                     else
                       arg = 0;
 
