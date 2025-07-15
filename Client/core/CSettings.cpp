@@ -13,6 +13,7 @@
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
 #include <game/CSettings.h>
+#include "CSteamClient.h"
 
 using namespace std;
 
@@ -404,6 +405,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxAllowSteamClient = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow GTA:SA ingame status on Steam"), false));
+    m_pCheckBoxAllowSteamClient->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowSteamClient->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowSteamClient->AutoSize(NULL, 20.0f);
 
     // Enable camera photos getting saved to documents folder
     m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
@@ -3085,6 +3091,14 @@ void CSettings::LoadData()
     CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
     m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
+    // Allow connecting with the local Steam client
+    bool allowSteamClient = false;
+    CVARS_GET("allow_steam_client", allowSteamClient);
+    m_pCheckBoxAllowSteamClient->SetSelected(allowSteamClient);
+
+    if (allowSteamClient)
+        g_pCore->GetSteamClient()->Connect();
+
     bool bAskBeforeDisconnect;
     CVARS_GET("ask_before_disconnect", bAskBeforeDisconnect);
     m_pCheckBoxAskBeforeDisconnect->SetSelected(bAskBeforeDisconnect);
@@ -3565,6 +3579,12 @@ void CSettings::SaveData()
             discord->SetPresenceState(state, false);
         }
     }
+
+    // Allow connecting with the local Steam client
+    bool allowSteamClient = m_pCheckBoxAllowSteamClient->GetSelected();
+    CVARS_SET("allow_steam_client", allowSteamClient);
+    if (allowSteamClient)
+        g_pCore->GetSteamClient()->Connect();
 
     bool bAskBeforeDisconnect = m_pCheckBoxAskBeforeDisconnect->GetSelected();
     CVARS_SET("ask_before_disconnect", bAskBeforeDisconnect);

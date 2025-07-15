@@ -26,6 +26,7 @@
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordRichPresence.h"
+#include "CSteamClient.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -160,6 +161,7 @@ CCore::CCore()
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+    m_steamClient = std::make_unique<CSteamClient>();
 
     // Create discord rich presence
     m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
@@ -172,6 +174,8 @@ CCore::~CCore()
     // Reset Discord rich presence
     if (m_pDiscordRichPresence)
         m_pDiscordRichPresence.reset();
+
+    m_steamClient.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -1227,6 +1231,12 @@ void CCore::DoPostFramePulse()
         // Apply all settings
         ApplyConsoleSettings();
         ApplyGameSettings();
+
+        // Allow connecting with the local Steam client
+        bool allowSteamClient = false;
+        CVARS_GET("allow_steam_client", allowSteamClient);
+        if (allowSteamClient)
+            m_steamClient->Connect();
 
         m_pGUI->SelectInputHandlers(INPUT_CORE);
     }

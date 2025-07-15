@@ -1964,6 +1964,10 @@ struct SFunBugsStateSync : public ISyncStructure
     {
         BITCOUNT5 = 1
     };
+    enum
+    {
+        BITCOUNT6 = 1
+    };
 
     bool Read(NetBitStreamInterface& bitStream)
     {
@@ -1984,6 +1988,10 @@ struct SFunBugsStateSync : public ISyncStructure
             bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
         else
             data5.bQuickStand = 0;
+        if (bitStream.Can(eBitStreamVersion::Glitch_VehicleRapidStop))
+            bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data6), BITCOUNT6);
+        else
+            data6.vehicleRapidStop = 0;
 
         //// Example for adding item:
         // if ( bitStream.Version() >= 0x999 )
@@ -2004,6 +2012,8 @@ struct SFunBugsStateSync : public ISyncStructure
             bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
         if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
+        if (bitStream.Can(eBitStreamVersion::Glitch_VehicleRapidStop))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data6), BITCOUNT6);
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourGlitch))
@@ -2042,6 +2052,12 @@ struct SFunBugsStateSync : public ISyncStructure
     {
         bool bQuickStand : 1;
     } data5;
+
+    // Add new ones in separate structs
+    struct
+    {
+        bool vehicleRapidStop : 1;
+    } data6;
 };
 
 //////////////////////////////////////////

@@ -5485,7 +5485,9 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, std::optional<b
 
     CLuaArguments arguments;
     arguments.PushBoolean(createExplosion);            // withExplosion
-    vehicle->CallEvent("onVehicleExplode", arguments);
+
+    if (!vehicle->CallEvent("onVehicleExplode", arguments))
+        return false;
 
     // Abort if vehicle got fixed or destroyed
     if (!vehicle->IsBlown() || vehicle->IsBeingDeleted())
