@@ -196,6 +196,7 @@ public:
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
+        GLITCH_VEHICLE_RAPID_STOP,
         NUM_GLITCHES
     };
 
@@ -526,7 +527,7 @@ private:
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
     void ProcessClientTriggeredEventSpam();
-    void RegisterClientTriggeredEventUsage(CPlayer* pPlayer);
+    void RegisterClientTriggeredEventUsage(CPlayer* pPlayer, const char* szEventName);
 
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
@@ -687,6 +688,7 @@ private:
     {
         long long m_llTicks = 0;
         uint32_t  m_uiCounter = 0;
+        std::string m_strLastEventName;
     };
 
     std::map<CPlayer*, ClientTriggeredEventsInfo> m_mapClientTriggeredEvents;
