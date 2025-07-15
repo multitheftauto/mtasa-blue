@@ -137,6 +137,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+    m_Glitches[GLITCH_VEHICLE_RAPID_STOP] = false;
+    g_pMultiplayer->SetRapidVehicleStopFixEnabled(true);
 
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
@@ -5992,6 +5994,8 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
             g_pMultiplayer->DisableQuickReload(!bEnabled);
         if (ucGlitch == GLITCH_CLOSEDAMAGE)
             g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
+        if (ucGlitch == GLITCH_VEHICLE_RAPID_STOP)
+            g_pMultiplayer->SetRapidVehicleStopFixEnabled(!bEnabled);
         return true;
     }
     return false;
