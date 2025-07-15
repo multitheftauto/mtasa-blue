@@ -101,6 +101,13 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
         }
 
+        // If the client reported contact but the element doesn't exist anymore,
+        // the coordinates become invalid as they are relative to that element.
+        if (positionRead && pContactElement == nullptr && flags.data.bHasContact)
+        {
+            position.data.vecPosition = pSourcePlayer->GetPosition();
+        }
+        
         CElement* pPreviousContactElement = pSourcePlayer->GetContactElement();
         pSourcePlayer->SetContactElement(pContactElement);
 
