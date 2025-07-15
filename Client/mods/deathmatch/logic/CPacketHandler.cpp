@@ -2378,6 +2378,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_FASTSPRINT, funBugs.data3.bFastSprint);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_BADDRIVEBYHITBOX, funBugs.data4.bBadDrivebyHitboxes);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_QUICKSTAND, funBugs.data5.bQuickStand);
+    g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_VEHICLE_RAPID_STOP, funBugs.data6.vehicleRapidStop);
 
     SWorldSpecialPropertiesStateSync wsProps;
     if (bitStream.Can(eBitStreamVersion::WorldSpecialProperties))
@@ -2402,6 +2403,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::IGNOREFIRESTATE, wsProps.data6.ignoreFireState);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data7.flyingcomponents);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, wsProps.data8.vehicleburnexplosions);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART, wsProps.data9.vehicleEngineAutoStart);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
@@ -4009,7 +4011,8 @@ retry:
                             std::string blockName, animName;
                             int time, blendTime;
                             bool looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
-                            float elapsedTime, speed;
+                            float speed;
+                            double startTime;
 
                             // Read data
                             bitStream.ReadString(blockName);
@@ -4021,15 +4024,14 @@ retry:
                             bitStream.ReadBit(freezeLastFrame);
                             bitStream.Read(blendTime);
                             bitStream.ReadBit(taskRestore);
-                            bitStream.Read(elapsedTime);
+                            bitStream.Read(startTime);
                             bitStream.Read(speed);
 
                             // Run anim
                             CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable, freezeLastFrame);
-                            pPed->m_AnimationCache.progressWaitForStreamIn = true;
-                            pPed->m_AnimationCache.elapsedTime = elapsedTime;
-
-                            CStaticFunctionDefinitions::SetPedAnimationSpeed(*pPed, animName, speed);
+                            pPed->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                            pPed->m_AnimationCache.speed = speed;
+                            pPed->m_AnimationCache.progress = 0.0f;
 
                             pPed->SetHasSyncedAnim(true);
                         }

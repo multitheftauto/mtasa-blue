@@ -28,9 +28,6 @@
 #define CURL_NO_OLDIES
 #endif
 
-/* Tell "curl/curl.h" not to include "curl/mprintf.h" */
-#define CURL_SKIP_INCLUDE_MPRINTF
-
 /* Set default _WIN32_WINNT */
 #ifdef __MINGW32__
 #include <_mingw.h>
@@ -455,6 +452,11 @@
 #  define __NO_NET_API
 #endif
 
+/* Whether to use eventfd() */
+#if defined(HAVE_EVENTFD) && defined(HAVE_SYS_EVENTFD_H)
+#define USE_EVENTFD
+#endif
+
 #include <stdio.h>
 #include <assert.h>
 
@@ -466,12 +468,6 @@
 
 #ifndef STDC_HEADERS /* no standard C headers! */
 #include <curl/stdcheaders.h>
-#endif
-
-#ifdef _WIN32
-#define curlx_getpid() GetCurrentProcessId()
-#else
-#define curlx_getpid() getpid()
 #endif
 
 /*

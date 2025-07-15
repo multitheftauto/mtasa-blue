@@ -129,12 +129,6 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     {
         auto vehicle = reinterpret_cast<CClientVehicle*>(pResponsible);
         pOriginSource = vehicle;
-
-        // Create an explosion, if the vehicle was not blown by us directly (CClientVehicle::Blow)
-        if (vehicle->GetBlowState() == VehicleBlowState::INTACT)
-        {
-            vehicle->SetBlowState(VehicleBlowState::AWAITING_EXPLOSION_SYNC);
-        }
     }
     // If theres other players, sync it relative to the closest (lag compensation)
     else if (m_pManager->GetPlayerManager()->Count() > 1)
@@ -157,7 +151,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     }
 
     // Request a new explosion
-    g_pClientGame->SendExplosionSync(vecPosition, explosionType, pOriginSource);
+    g_pClientGame->SendExplosionSync(vecPosition, explosionType, pOriginSource, VehicleBlowState::AWAITING_EXPLOSION_SYNC);
     return false;
 }
 

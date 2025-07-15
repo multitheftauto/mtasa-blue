@@ -137,6 +137,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+    m_Glitches[GLITCH_VEHICLE_RAPID_STOP] = false;
+    g_pMultiplayer->SetRapidVehicleStopFixEnabled(true);
 
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
@@ -5262,7 +5264,7 @@ bool CClientGame::StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInte
     return false;
 }
 
-void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin)
+void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin, std::optional<VehicleBlowState> vehicleBlowState)
 {
     SPositionSync position(false);
     position.data.vecPosition = vecPosition;
@@ -5285,7 +5287,7 @@ void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType T
                 {
                     auto vehicle = reinterpret_cast<CClientVehicle*>(pOrigin);
                     pBitStream->WriteBit(1);
-                    pBitStream->WriteBit(vehicle->GetBlowState() == VehicleBlowState::BLOWN);
+                    pBitStream->WriteBit(vehicleBlowState.value_or(vehicle->GetBlowState()) == VehicleBlowState::BLOWN);
                 }
                 else
                 {
@@ -5992,6 +5994,8 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
             g_pMultiplayer->DisableQuickReload(!bEnabled);
         if (ucGlitch == GLITCH_CLOSEDAMAGE)
             g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
+        if (ucGlitch == GLITCH_VEHICLE_RAPID_STOP)
+            g_pMultiplayer->SetRapidVehicleStopFixEnabled(!bEnabled);
         return true;
     }
     return false;
@@ -6057,6 +6061,9 @@ bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, c
         case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
             g_pGame->SetVehicleBurnExplosionsEnabled(enabled);
             break;
+        case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
+            SetVehicleEngineAutoStartEnabled(enabled);
+            break;
         default:
             return false;
     }
@@ -6103,6 +6110,8 @@ bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
             return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
         case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
             return g_pGame->IsVehicleBurnExplosionsEnabled();
+        case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
+            return IsVehicleEngineAutoStartEnabled();
     }
 
     return false;
@@ -6136,6 +6145,20 @@ void CClientGame::SetWeaponRenderEnabled(bool enabled)
 bool CClientGame::IsWeaponRenderEnabled() const
 {
     return g_pGame->IsWeaponRenderEnabled();
+}
+
+void CClientGame::SetVehicleEngineAutoStartEnabled(bool enabled)
+{
+    if (enabled == g_pMultiplayer->IsVehicleEngineAutoStartEnabled())
+        return;
+
+    g_pMultiplayer->SetVehicleEngineAutoStartEnabled(enabled);
+    m_pVehicleManager->ResetNotControlledRotors(enabled);
+}
+
+bool CClientGame::IsVehicleEngineAutoStartEnabled() const
+{
+    return g_pMultiplayer->IsVehicleEngineAutoStartEnabled();
 }
 
 #pragma code_seg(".text")
@@ -6823,6 +6846,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         g_pGame->SetIgnoreFireStateEnabled(false);
         m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
         g_pGame->SetVehicleBurnExplosionsEnabled(true);
+        SetVehicleEngineAutoStartEnabled(true);
     }
 
     // Reset all setWorldProperty to default

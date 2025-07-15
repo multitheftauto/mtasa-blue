@@ -204,6 +204,7 @@ public:
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
+        GLITCH_VEHICLE_RAPID_STOP,
         NUM_GLITCHES
     };
 
@@ -426,6 +427,9 @@ public:
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
 
+    void SetVehicleEngineAutoStartEnabled(bool enabled);
+    bool IsVehicleEngineAutoStartEnabled() const;
+
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
@@ -624,7 +628,7 @@ public:
     bool VerifySADataFiles(int iEnableClientChecks = 0);
     void DebugElementRender();
 
-    void SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin = NULL);
+    void SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin = nullptr, std::optional<VehicleBlowState> vehicleBlowState = std::nullopt);
     void SendFireSync(CFire* pFire);
     void SendProjectileSync(CClientProjectile* pProjectile);
 

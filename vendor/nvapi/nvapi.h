@@ -1,6 +1,6 @@
 /*********************************************************************************************************\
 |*                                                                                                        *|
-|* SPDX-FileCopyrightText: Copyright (c) 2019-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
+|* SPDX-FileCopyrightText: Copyright (c) 2019-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
 |* SPDX-License-Identifier: MIT                                                                           *|
 |*                                                                                                        *|
 |* Permission is hereby granted, free of charge, to any person obtaining a                                *|
@@ -25,7 +25,7 @@
 \*********************************************************************************************************/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Date: Jan 30, 2025 
+// Date: Apr 11, 2025 
 // File: nvapi.h
 //
 // NvAPI provides an interface to NVIDIA devices. This file contains the 
@@ -201,6 +201,22 @@ typedef enum _NV_DP_LINK_RATE
     NV_EDP_4_32GBPS           = 0x10
 } NV_DP_LINK_RATE;
 
+typedef enum _NV_DP2X_LINK_RATE
+{
+    NV_DP2X_1_62Gbps          = 0x00A2,   //  162
+    NV_DP2X_2_16Gbps          = 0x00D8,   //  216
+    NV_DP2X_2_43Gbps          = 0x00F3,   //  243
+    NV_DP2X_2_50Gbps          = 0x00FA,   //  250
+    NV_DP2X_2_70Gbps          = 0x010E,   //  270
+    NV_DP2X_3_24Gbps          = 0x0144,   //  324
+    NV_DP2X_4_32Gbps          = 0x01B0,   //  432
+    NV_DP2X_5_40Gbps          = 0x021C,   //  540
+    NV_DP2X_6_75Gbps          = 0x02A3,   //  675
+    NV_DP2X_8_10Gbps          = 0x032A,   //  810
+    NV_DP2X_10_0Gbps          = 0x03E8,   // 1000
+    NV_DP2X_13_5Gbps          = 0x0546,   // 1350
+    NV_DP2X_20_0Gbps          = 0x07D0,   // 2000
+} NV_DP2X_LINK_RATE;
 
 //! \ingroup dispcontrol
 //! Used in NV_DISPLAY_PORT_INFO.
@@ -20290,7 +20306,7 @@ typedef struct _NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_V1
     NvU32                                   numRows;                //!< [in]    Is the number of rows in the matrix.
     NvU32                                   numColumns;             //!< [in]    Is the number of columns in the matrix.
     NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT  srcLayout;              //!< [in]    Is the layout of the source matrix.
-    size_t                                  srcStride;              //!< [in]    Is the number of elements between a consecutive row or column (depending on srcLayout) of the source matrix, if it is row-major or column-major.
+    size_t                                  srcStride;              //!< [in]    Is the number of bytes between a consecutive row or column (depending on srcLayout) of the source matrix, if it is row-major or column-major.
     NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT  dstLayout;              //!< [in]    Is the layout the matrix is converted to.
     size_t                                  dstStride;              //!< [in]    Is the number of bytes between a consecutive row or column (depending on dstLayout) of the destination matrix if it is row-major or column-major.
 } NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_V1;
@@ -21000,6 +21016,7 @@ typedef enum {
     NV_NGX_DLSS_OVERRIDE_FLAG_SCALING_RATIO     = NV_BIT(7),
     NV_NGX_DLSS_OVERRIDE_FLAG_OPTIMAL_SETTINGS  = NV_BIT(8),
     NV_NGX_DLSS_OVERRIDE_FLAG_CREATED           = NV_BIT(9),
+    NV_NGX_DLSS_OVERRIDE_FLAG_EVALUATE          = NV_BIT(10),
 
     NV_NGX_DLSS_OVERRIDE_FLAG_SR_DLAA_MODE      = NV_BIT(14),
     NV_NGX_DLSS_OVERRIDE_FLAG_FG_MULTI_FRAME    = NV_BIT(15),
@@ -21022,7 +21039,11 @@ typedef struct _NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1
     NvU64  feedbackMaskSR;          //!< [out] Feedback bits for Super Resolution
     NvU64  feedbackMaskRR;          //!< [out] Feedback bits for Ray Reconstruction
     NvU64  feedbackMaskFG;          //!< [out] Feedback bits for Frame Generation
-    NvU64  reserved[4];             //!< Reserved for future use. Must be zero.
+    NvF32  scalingRatio;            //!< [out] Scaling Ratio
+    NvU32  performanceMode;         //!< [out] Performance Mode
+    NvU32  renderPreset;            //!< [out] Render Preset for SR/RR
+    NvU32  frameGenerationCount;    //!< [out] FG Override Frame Count Target
+    NvU64  reserved[2];             //!< Reserved for future use. Must be zero.
 } NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1;
 
 #define NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_VER1  MAKE_NVAPI_VERSION(NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1, 1)
