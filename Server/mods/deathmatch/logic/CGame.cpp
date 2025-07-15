@@ -2833,17 +2833,19 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
 
                             if (previousBlowState != VehicleBlowState::BLOWN)
                             {
-                                vehicle->SetBlowState(VehicleBlowState::BLOWN);
-                                vehicle->SetEngineOn(false);
-
                                 // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
                                 if (previousBlowState == VehicleBlowState::INTACT)
                                 {
                                     CLuaArguments arguments;
                                     arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
                                     arguments.PushElement(clientSource);
-                                    vehicle->CallEvent("onVehicleExplode", arguments);
+
+                                    if (!vehicle->CallEvent("onVehicleExplode", arguments))
+                                        return;
                                 }
+
+                                vehicle->SetBlowState(VehicleBlowState::BLOWN);
+                                vehicle->SetEngineOn(false);
 
                                 syncToPlayers = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
                             }
