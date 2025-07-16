@@ -45,6 +45,18 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
             }
         }
 
+        // Give scripts a chance to cancel this command before processing
+        CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
+        if (localPlayer != nullptr)
+        {
+            CLuaArguments cancelArguments;
+            cancelArguments.PushString(szCommandBufferPointer);
+            if (!localPlayer->CallEvent("onClientCommand", cancelArguments, true))
+            {
+                return true;
+            }
+        }
+
         // Toss them together so we can send it to the server
         SString strClumpedCommand;
         if (szArguments && szArguments[0])
@@ -60,7 +72,6 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
         g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments);
 
         // Call the onClientConsole event
-        CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
 
         if (localPlayer != nullptr)
         {
