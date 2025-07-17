@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-15 04:08+0000\n"
-"PO-Revision-Date: 2025-07-17 15:29\n"
+"PO-Revision-Date: 2025-07-17 16:32\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -3346,7 +3346,7 @@ msgstr "عدم موفقیت در اختصاص دادن حافظه"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr "خطای بحرانی (%u). در صورت حل نشدن مشکل، برای دریافت پشتیبانی به multitheftauto.com مراجعه کنید."
+msgstr "خطای جدی (%u). در صورت حل نشدن مشکل، برای دریافت پشتیبانی به multitheftauto.com مراجعه کنید."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
