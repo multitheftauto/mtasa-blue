@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-15 04:08+0000\n"
-"PO-Revision-Date: 2025-07-17 22:31\n"
+"PO-Revision-Date: 2025-07-17 23:31\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -885,7 +885,7 @@ msgstr "اجازه برقراری ارتباط با Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:409
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr ""
+msgstr "نمایش \"وضعیت درون‌بازی\" GTA:SA را در استیم فعال کن"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:415
