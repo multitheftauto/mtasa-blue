@@ -3448,6 +3448,7 @@ void CClientGame::Event_OnIngame()
     g_pGame->ResetModelFlags();
     g_pGame->ResetAlphaTransparencies();
     g_pGame->ResetModelTimes();
+    g_pGame->Reset2DFXEffects();
 
     // Reset weapon render
     g_pGame->SetWeaponRenderEnabled(true);
