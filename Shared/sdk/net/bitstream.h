@@ -615,6 +615,10 @@ enum class eBitStreamVersion : unsigned short
     // Add "vehicleburnexplosions" to setWorldSpecialPropertyEnabled
     // 2025-02-20
     WorldSpecialProperty_VehicleBurnExplosions,
+    
+    //Add setElementCollidableWith serverside
+    // 2025-03-14
+    SetElementCollidableWith_Serverside,
 
     // Add serverside building support
     // 2025-05-26
