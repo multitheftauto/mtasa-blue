@@ -82,7 +82,7 @@ void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist)
 
 void CPedSync::UpdateAllSyncer()
 {
-    auto currentTimestamp = GetTimestamp();
+    auto currentTick = GetTickCount64_();
 
     // Update all the ped's sync states
     for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); iter++)
@@ -91,7 +91,7 @@ void CPedSync::UpdateAllSyncer()
         const SPlayerAnimData& animData = (*iter)->GetAnimationData();
         if (animData.IsAnimating())
         {
-            float deltaTime = static_cast<float>(currentTimestamp - animData.startTime);
+            float deltaTime = currentTick - animData.startedTick;
             if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
                 (*iter)->SetAnimationData({});
         }
