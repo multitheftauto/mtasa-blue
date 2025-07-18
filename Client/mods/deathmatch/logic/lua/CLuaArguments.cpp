@@ -547,49 +547,53 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
         bKnownTablesCreated = true;
     }
 
-    pKnownTables->insert(std::make_pair(this, pKnownTables->size()));
+    pKnownTables->insert({this, pKnownTables->size()});
 
-    bool                                  bIsArray = true;
-    unsigned int                          iArrayPos = 1;            // lua arrays are 1 based
-    vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
+    bool                                                 bIsArray = true;
+    std::vector<std::pair<std::uint32_t, CLuaArgument*>> vecSortedArguments;            // lua arrays are not necessarily sorted
+    std::vector<CLuaArgument*>::const_iterator           iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); iter += 2)
     {
         CLuaArgument* pArgument = *iter;
         if (pArgument->GetType() == LUA_TNUMBER)
         {
-            double       num = pArgument->GetNumber();
-            unsigned int iNum = static_cast<unsigned int>(num);
-            if (num == iNum)
-            {
-                if (iArrayPos != iNum)            // check if the value matches its index in the table
-                {
-                    bIsArray = false;
-                    break;
-                }
-            }
-            else
-            {
-                bIsArray = false;
-                break;
-            }
+            double const num = pArgument->GetNumber();
+            auto const   iNum = static_cast<std::uint32_t>(num);
+
+            vecSortedArguments.push_back({iNum, *(iter + 1)});
         }
         else
         {
             bIsArray = false;
             break;
         }
-        iArrayPos++;
     }
 
-    if (bIsArray)
+    if (bIsArray && !vecSortedArguments.empty())            // the table could possibly be an array
     {
-        json_object*                          my_array = json_object_new_array();
-        vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
-        for (; iter != m_Arguments.end(); iter++)
+        // sort the table based on the keys (already handled correctly by std::pair)
+        std::sort(vecSortedArguments.begin(), vecSortedArguments.end());
+
+        // only the first and last element are checked, everything else is correct by default because the vector was sorted
+        // the last key should match the size of vecSortedArguments to ensure there are no gaps in this array-like table
+        auto const iFirstKey = vecSortedArguments.front().first;
+        auto const iLastKey = vecSortedArguments.back().first;
+
+        auto const iFirstArrayPos = 1U;            // lua arrays are 1 based
+        auto const iLastArrayPos = static_cast<std::uint32_t>(vecSortedArguments.size());
+
+        if (iFirstKey != iFirstArrayPos || iLastKey != iLastArrayPos)
         {
-            iter++;            // skip the key values
-            CLuaArgument* pArgument = *iter;
-            json_object*  object = pArgument->WriteToJSONObject(bSerialize, pKnownTables);
+            bIsArray = false;
+        }
+    }
+
+    if (bIsArray)            // the table is definitely an array
+    {
+        json_object* my_array = json_object_new_array();
+        for (auto const& [iKey, pArgument] : vecSortedArguments)
+        {
+            json_object* object = pArgument->WriteToJSONObject(bSerialize, pKnownTables);
             if (object)
             {
                 json_object_array_add(my_array, object);
