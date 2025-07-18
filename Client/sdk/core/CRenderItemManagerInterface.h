@@ -40,6 +40,7 @@ enum eAspectRatio;
 class CWebViewInterface;
 class CEffectTemplate;
 class CVectorGraphicItem;
+class CGifItem;
 
 #define RDEFAULT ((uint)-1)
 
@@ -164,6 +165,7 @@ public:
     virtual CScreenSourceItem*  CreateScreenSource(uint uiSizeX, uint uiSizeY) = 0;
     virtual CWebBrowserItem*    CreateWebBrowser(uint uiSizeX, uint uiSizeY) = 0;
     virtual CVectorGraphicItem* CreateVectorGraphic(uint uiSizeX, uint uiSizeY) = 0;
+    virtual CGifItem*           CreateGif(uint uiSizeX, uint uiSizeY) = 0;
     virtual bool                SetRenderTarget(CRenderTargetItem* pItem, bool bClear) = 0;
     virtual void                EnableSetRenderTargetOldVer(bool bEnable) = 0;
     virtual bool                IsSetRenderTargetEnabledOldVer() = 0;
@@ -240,6 +242,7 @@ enum eRenderItemClassTypes
     CLASS_CShaderInstance,
     CLASS_CTextureItem,
     CLASS_CVectorGraphicItem,
+    CLASS_CGifItem,
     CLASS_CFileTextureItem,
     CLASS_CRenderTargetItem,
     CLASS_CScreenSourceItem,
@@ -481,6 +484,28 @@ class CVectorGraphicItem : public CTextureItem
 {
     DECLARE_CLASS(CVectorGraphicItem, CTextureItem)
     CVectorGraphicItem() : ClassInit(this) {}
+    virtual void PostConstruct(CRenderItemManager* pRenderItemManager, uint width, uint height);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
+    void         CreateUnderlyingData();
+    void         ReleaseUnderlyingData();
+    void         UpdateTexture();
+    virtual void Resize(const CVector2D& size);
+
+    IDirect3DSurface9* m_pD3DRenderTargetSurface;
+};
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// CGifItem - CClientGif to texture
+//
+class CGifItem : public CTextureItem
+{
+    DECLARE_CLASS(CGifItem, CTextureItem)
+    CGifItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pRenderItemManager, uint width, uint height);
     virtual void PreDestruct();
     virtual bool IsValid();
