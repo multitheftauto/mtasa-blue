@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas Installer 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-16 01:53\n"
+"POT-Creation-Date: 2025-04-08 22:41\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,21 +16,22 @@ msgstr ""
 #: Shared/installer/nightly.nsi:205
 msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
-"Vista.  Please download an alternative version from www.mtasa.com."
+"Vista.  Please download an alternative version from www.multitheftauto.com."
 msgstr ""
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid ""
 "The version of MTA:SA you've downloaded does not support Windows 7, 8 or "
-"8.1.  Please download an alternative version from www.mtasa.com."
+"8.1.  Please download an alternative version from www.multitheftauto.com."
 msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid ""
 "The version of MTA:SA you've downloaded is designed for old versions of "
-"Windows.  Please download an alternative version from www.mtasa.com."
+"Windows.  Please download an alternative version from "
+"www.multitheftauto.com."
 msgstr ""
 
 #. WELCOME_TEXT

@@ -5,7 +5,7 @@
  *  FILE:        sdk/core/CLocalizationInterface.h
  *  PURPOSE:     Localization/translation interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

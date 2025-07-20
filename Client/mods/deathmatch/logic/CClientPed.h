@@ -598,6 +598,8 @@ public:
 
     void Respawn(CVector* pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false);
 
+    void Say(const ePedSpeechContext& speechId, float probability = 1.0f);
+
     void      SetTaskToBeRestoredOnAnimEnd(bool bSetOnEnd) noexcept { m_bTaskToBeRestoredOnAnimEnd = bSetOnEnd; }
     bool      IsTaskToBeRestoredOnAnimEnd() const noexcept { return m_bTaskToBeRestoredOnAnimEnd; }
     void      SetTaskTypeToBeRestoredOnAnimEnd(eTaskType taskType) noexcept { m_eTaskTypeToBeRestoredOnAnimEnd = taskType; }

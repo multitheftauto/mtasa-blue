@@ -74,11 +74,7 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
 
 TString *luaS_newlstr (lua_State *L, const char *str, size_t l) {
   GCObject *o;
-  unsigned int h = cast(unsigned int, l);  /* seed */
-  size_t step = (l>>5)+1;  /* if string is too long, don't hash all its chars */
-  size_t l1;
-  for (l1=l; l1>=step; l1-=step)  /* compute hash */
-    h = h ^ ((h<<5)+(h>>2)+cast(unsigned char, str[l1-1]));
+  unsigned int h = luaS_hash(str, l);  
   for (o = G(L)->strt.hash[lmod(h, G(L)->strt.size)];
        o != NULL;
        o = o->gch.next) {
@@ -109,3 +105,16 @@ Udata *luaS_newudata (lua_State *L, size_t s, Table *e) {
   return u;
 }
 
+LUALIB_API unsigned int luaS_hash(const char *str, size_t l)
+{
+    if (!str || l == 0)
+        return 0;
+
+    unsigned int h = cast(unsigned int, l);  /* seed */
+    size_t step = (l>>5)+1;  /* if string is too long, don't hash all its chars */
+    size_t l1;
+    for (l1=l; l1>=step; l1-=step)  /* compute hash */
+        h = h ^ ((h<<5)+(h>>2)+cast(unsigned char, str[l1-1]));
+
+    return h;
+}

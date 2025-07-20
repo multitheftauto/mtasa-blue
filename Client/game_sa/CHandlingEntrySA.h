@@ -15,8 +15,8 @@
 
 #define FUNC_HandlingDataMgr_ConvertDataToGameUnits 0x6F5080
 
-// http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
-// http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
+// https://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
+// https://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
 
 class CTransmissionSAInterface
 {
@@ -142,7 +142,7 @@ public:
     eLightType    GetTailLight() const noexcept { return static_cast<eLightType>(m_Handling.ucTailLight); }
     unsigned char GetAnimGroup() const noexcept { return m_Handling.ucAnimGroup; }
 
-    eHandlingTypes GetVehicleID() const noexcept { return static_cast<eHandlingTypes>(m_Handling.iVehicleID); }
+    HandlingType GetVehicleID() const noexcept { return static_cast<HandlingType>(m_Handling.iVehicleID); }
 
     // Set functions
     void SetMass(float fMass) noexcept { m_Handling.fMass = fMass; }

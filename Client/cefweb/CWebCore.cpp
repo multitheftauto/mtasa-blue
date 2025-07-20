@@ -409,7 +409,7 @@ std::unordered_set<SString> CWebCore::AllowPendingPages(bool bRemember)
     }
 
     // Trigger an event now
-    auto pCurrentMod = g_pCore->GetModManager()->GetCurrentMod();
+    auto pCurrentMod = g_pCore->GetModManager()->GetClient();
     if (!pCurrentMod)
         return std::unordered_set<SString>();
 

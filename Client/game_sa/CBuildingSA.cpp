@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CBuildingSA.cpp
  *  PURPOSE:     Building entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -74,9 +74,9 @@ void CBuildingSA::AllocateMatrix()
 {
     auto* newMatrix = g_matrixPool.AllocateItem();
     std::memset(newMatrix, 0, sizeof(CMatrixLinkSAInterface));
-    newMatrix->SetTranslateOnly(m_pInterface->Placeable.m_transform.m_translate);
+    newMatrix->SetTranslateOnly(m_pInterface->m_transform.m_translate);
 
-    m_pInterface->Placeable.matrix = reinterpret_cast<CMatrix_Padded*>(newMatrix);
+    m_pInterface->matrix = reinterpret_cast<CMatrix_Padded*>(newMatrix);
 }
 
 void CBuildingSA::ReallocateMatrix()
@@ -85,13 +85,13 @@ void CBuildingSA::ReallocateMatrix()
         return;
 
     auto* newMatrix = g_matrixPool.AllocateItem();
-    std::memcpy(newMatrix, m_pInterface->Placeable.matrix, sizeof(CMatrixLinkSAInterface));
+    std::memcpy(newMatrix, m_pInterface->matrix, sizeof(CMatrixLinkSAInterface));
     newMatrix->m_pOwner = nullptr;
     newMatrix->m_pPrev = nullptr;
     newMatrix->m_pNext = nullptr;
 
     m_pInterface->RemoveMatrix();
-    m_pInterface->Placeable.matrix = reinterpret_cast<CMatrix_Padded*>(newMatrix);
+    m_pInterface->matrix = reinterpret_cast<CMatrix_Padded*>(newMatrix);
 }
 
 void CBuildingSA::RemoveAllocatedMatrix()
@@ -99,12 +99,12 @@ void CBuildingSA::RemoveAllocatedMatrix()
     if (!m_pInterface->HasMatrix())
         return;
 
-    CMatrixLinkSAInterface* pMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->Placeable.matrix);
+    CMatrixLinkSAInterface* pMatrix = reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->matrix);
 
     if (pMatrix->m_pOwner || (pMatrix->m_pNext && pMatrix->m_pPrev))
         return;
 
-    g_matrixPool.RemoveItem(reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->Placeable.matrix));
+    g_matrixPool.RemoveItem(reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->matrix));
     g_matrixPool.SetCapacity(0);
-    m_pInterface->Placeable.matrix = nullptr;
+    m_pInterface->matrix = nullptr;
 }

@@ -6,7 +6,7 @@
  *  PURPOSE:     Solution wide utility functions.
  *               Include this file once per dll.
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -25,3 +25,4 @@
 #include "SharedUtil.Logging.hpp"
 #include "SharedUtil.AsyncTaskScheduler.hpp"
 #include "SharedUtil.Memory.hpp"
+#include "UTF8.hpp"

@@ -5,13 +5,15 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaVehicleDefs.h
  *  PURPOSE:     Lua vehicle definitions class header
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 #include "CLuaDefs.h"
 #include <lua/CLuaMultiReturn.h>
+
+#include "enums/VehicleAudioSettingProperty.h"
 
 class CLuaVehicleDefs : public CLuaDefs
 {
@@ -144,12 +146,12 @@ public:
     LUA_DECLARE(SetVehicleModelDummyPosition);
     LUA_DECLARE_OOP(GetVehicleModelDummyPosition)
 
-    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy);
-    static std::variant<bool, CVector>                              OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, VehicleDummies dummy);
+    static std::variant<bool, CVector>                              OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, VehicleDummies dummy);
 
-    static bool                                                     SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position);
-    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
-    static std::variant<bool, CVector>                              OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
+    static bool                                                     SetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy, CVector position);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy);
+    static std::variant<bool, CVector>                              OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy);
     static bool                                                     ResetVehicleDummyPositions(CClientVehicle* vehicle);
 
     static std::variant<bool, std::array<std::array<float, 3>, 4>>    GetVehicleEntryPoints(CClientVehicle* vehicle);
@@ -162,8 +164,8 @@ public:
     static float GetVehicleWheelScale(CClientVehicle* const pVehicle);
     static bool  SetVehicleWheelScale(CClientVehicle* const pVehicle, const float fWheelScale);
     static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const unsigned short                             usModel,
-                                                                                                const std::optional<eResizableVehicleWheelGroup> eWheelGroup);
-    static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
+                                                                                                const std::optional<ResizableVehicleWheelGroup> eWheelGroup);
+    static bool SetVehicleModelWheelSize(const unsigned short usModel, const ResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
     static bool SetVehicleRotorState(CClientVehicle* const vehicle, bool state, std::optional<bool> stopRotor) noexcept;
@@ -171,6 +173,13 @@ public:
 
     static bool AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360, std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept;
     static bool RemoveVehicleSirens(CClientVehicle* vehicle) noexcept;
+    
+    static bool SetVehicleModelAudioSetting(const uint32_t uiModel, const VehicleAudioSettingProperty eProperty, float varValue);
+    static bool ResetVehicleModelAudioSettings(const uint32_t uiModel);
+    static bool SetVehicleAudioSetting(CClientVehicle* pVehicle, const VehicleAudioSettingProperty eProperty, float varValue);
+    static bool ResetVehicleAudioSettings(CClientVehicle* pVehicle);
+    static std::unordered_map<std::string, float> GetVehicleModelAudioSettings(uint32_t uiModel);
+    static std::unordered_map<std::string, float> GetVehicleAudioSettings(CClientVehicle* pVehicle);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);

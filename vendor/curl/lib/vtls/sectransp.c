@@ -28,17 +28,18 @@
  * TLS/SSL layer. No code but vtls.c should ever call or use these functions.
  */
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef USE_SECTRANSP
 
-#include "urldata.h" /* for the Curl_easy definition */
-#include "curl_base64.h"
-#include "strtok.h"
-#include "multiif.h"
-#include "strcase.h"
+#include "../urldata.h" /* for the Curl_easy definition */
+#include "../curlx/base64.h"
+#include "../curlx/strparse.h"
+#include "../multiif.h"
+#include "../strcase.h"
 #include "x509asn1.h"
-#include "strerror.h"
+#include "vtls_scache.h"
+#include "../strerror.h"
 #include "cipher_suite.h"
 
 #ifdef __clang__
@@ -49,6 +50,11 @@
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress"
+#endif
+
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 #include <limits.h>
@@ -128,19 +134,19 @@
 #include <sys/sysctl.h>
 #endif /* CURL_BUILD_MAC */
 
-#include "sendf.h"
-#include "inet_pton.h"
-#include "connect.h"
-#include "select.h"
+#include "../sendf.h"
+#include "../curlx/inet_pton.h"
+#include "../connect.h"
+#include "../select.h"
 #include "vtls.h"
 #include "vtls_int.h"
 #include "sectransp.h"
-#include "curl_printf.h"
-#include "strdup.h"
+#include "../curl_printf.h"
+#include "../strdup.h"
 
-#include "curl_memory.h"
+#include "../curl_memory.h"
 /* The last #include file should be: */
-#include "memdebug.h"
+#include "../memdebug.h"
 
 
 /* From MacTypes.h (which we cannot include because it is not present in
@@ -205,9 +211,6 @@ static const uint16_t default_ciphers[] = {
 #endif /* CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11 */
 };
 
-#define DEFAULT_CIPHERS_LEN sizeof(default_ciphers)/sizeof(default_ciphers[0])
-
-
 /* pinned public key support tests */
 
 /* version 1 supports macOS 10.12+ and iOS 10+ */
@@ -260,7 +263,7 @@ static OSStatus sectransp_bio_cf_in_read(SSLConnectionRef connection,
                                          void *buf,
                                          size_t *dataLength)  /* IN/OUT */
 {
-  struct Curl_cfilter *cf = (struct Curl_cfilter *)connection;
+  const struct Curl_cfilter *cf = (const struct Curl_cfilter *)connection;
   struct ssl_connect_data *connssl = cf->ctx;
   struct st_ssl_backend_data *backend =
     (struct st_ssl_backend_data *)connssl->backend;
@@ -300,7 +303,7 @@ static OSStatus sectransp_bio_cf_out_write(SSLConnectionRef connection,
                                            const void *buf,
                                            size_t *dataLength)  /* IN/OUT */
 {
-  struct Curl_cfilter *cf = (struct Curl_cfilter *)connection;
+  const struct Curl_cfilter *cf = (const struct Curl_cfilter *)connection;
   struct ssl_connect_data *connssl = cf->ctx;
   struct st_ssl_backend_data *backend =
     (struct st_ssl_backend_data *)connssl->backend;
@@ -335,30 +338,28 @@ static OSStatus sectransp_bio_cf_out_write(SSLConnectionRef connection,
 CF_INLINE void GetDarwinVersionNumber(int *major, int *minor)
 {
   int mib[2];
-  char *os_version;
   size_t os_version_len;
-  char *os_version_major, *os_version_minor;
-  char *tok_buf;
+  char buf[256];
 
   /* Get the Darwin kernel version from the kernel using sysctl(): */
   mib[0] = CTL_KERN;
   mib[1] = KERN_OSRELEASE;
   if(sysctl(mib, 2, NULL, &os_version_len, NULL, 0) == -1)
     return;
-  os_version = malloc(os_version_len*sizeof(char));
-  if(!os_version)
-    return;
-  if(sysctl(mib, 2, os_version, &os_version_len, NULL, 0) == -1) {
-    free(os_version);
-    return;
+  if(os_version_len < sizeof(buf)) {
+    if(sysctl(mib, 2, buf, &os_version_len, NULL, 0) != -1) {
+      const char *os = buf;
+      curl_off_t fnum;
+      curl_off_t snum;
+      /* Parse the version: */
+      if(!curlx_str_number(&os, &fnum, INT_MAX) &&
+         !curlx_str_single(&os, '.') &&
+         !curlx_str_number(&os, &snum, INT_MAX)) {
+        *major = (int)fnum;
+        *minor = (int)snum;
+      }
+    }
   }
-
-  /* Parse the version: */
-  os_version_major = Curl_strtok_r(os_version, ".", &tok_buf);
-  os_version_minor = Curl_strtok_r(NULL, ".", &tok_buf);
-  *major = atoi(os_version_major);
-  *minor = atoi(os_version_minor);
-  free(os_version);
 }
 #endif /* CURL_BUILD_MAC */
 
@@ -535,8 +536,8 @@ static OSStatus CopyIdentityWithLabel(char *label,
       for(i = 0; i < keys_list_count; i++) {
         OSStatus err = noErr;
         SecCertificateRef cert = NULL;
-        SecIdentityRef identity =
-          (SecIdentityRef) CFArrayGetValueAtIndex(keys_list, i);
+        const void *item = CFArrayGetValueAtIndex(keys_list, i);
+        SecIdentityRef identity = (SecIdentityRef)CURL_UNCONST(item);
         err = SecIdentityCopyCertificate(identity, &cert);
         if(err == noErr) {
           CFStringRef common_name = NULL;
@@ -665,22 +666,22 @@ static OSStatus CopyIdentityFromPKCS12File(const char *cPath,
       count = CFArrayGetCount(items);
 
       for(i = 0; i < count; i++) {
-        CFTypeRef item = (CFTypeRef) CFArrayGetValueAtIndex(items, i);
-        CFTypeID  itemID = CFGetTypeID(item);
+        const CFTypeRef item = CFArrayGetValueAtIndex(items, i);
+        CFTypeID itemID = CFGetTypeID(item);
 
         if(itemID == CFDictionaryGetTypeID()) {
-          CFTypeRef identity = (CFTypeRef) CFDictionaryGetValue(
-                                                 (CFDictionaryRef) item,
-                                                 kSecImportItemIdentity);
+          const CFTypeRef identity = CFDictionaryGetValue(
+                                           (CFDictionaryRef)item,
+                                           kSecImportItemIdentity);
           CFRetain(identity);
-          *out_cert_and_key = (SecIdentityRef) identity;
+          *out_cert_and_key = (SecIdentityRef)CURL_UNCONST(identity);
           break;
         }
 #if CURL_BUILD_MAC_10_7
         else if(itemID == SecCertificateGetTypeID()) {
           status = SecIdentityCreateWithCertificate(NULL,
-                                                 (SecCertificateRef) item,
-                                                 out_cert_and_key);
+                                         (SecCertificateRef)CURL_UNCONST(item),
+                                         out_cert_and_key);
           break;
         }
 #endif
@@ -921,7 +922,7 @@ static CURLcode sectransp_set_default_ciphers(struct Curl_easy *data,
   /* Intersect the ciphers supported by Secure Transport with the default
    * ciphers, using the order of the former. */
   for(i = 0; i < supported_len; i++) {
-    for(j = 0; j < DEFAULT_CIPHERS_LEN; j++) {
+    for(j = 0; j < CURL_ARRAYSIZE(default_ciphers); j++) {
       if(default_ciphers[j] == ciphers[i]) {
         ciphers[count++] = ciphers[i];
         break;
@@ -1015,7 +1016,7 @@ failed:
   return ret;
 }
 
-static void sectransp_session_free(void *sessionid, size_t idsize)
+static void sectransp_session_free(void *sessionid)
 {
   /* ST, as of iOS 5 and Mountain Lion, has no public method of deleting a
      cached session ID inside the Security framework. There is a private
@@ -1023,7 +1024,6 @@ static void sectransp_session_free(void *sessionid, size_t idsize)
      got your application rejected from the App Store due to the use of a
      private API, so the best we can do is free up our own char array that we
      created way back in sectransp_connect_step1... */
-  (void)idsize;
   Curl_safefree(sessionid);
 }
 
@@ -1091,10 +1091,13 @@ static CURLcode sectransp_connect_step1(struct Curl_cfilter *cf,
   if(result != CURLE_OK)
     return result;
 
-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && \
-    defined(HAVE_BUILTIN_AVAILABLE)
   if(connssl->alpn) {
+#if CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11
+#ifdef HAVE_BUILTIN_AVAILABLE
     if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
+#else
+    if(&SSLSetALPNProtocols && &SSLCopyALPNProtocols) {
+#endif
       struct alpn_proto_buf proto;
       size_t i;
       CFStringRef cstr;
@@ -1116,8 +1119,8 @@ static CURLcode sectransp_connect_step1(struct Curl_cfilter *cf,
       Curl_alpn_to_proto_str(&proto, connssl->alpn);
       infof(data, VTLS_INFOF_ALPN_OFFER_1STR, proto.data);
     }
+#endif /* CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11 */
   }
-#endif
 
   if(ssl_config->key) {
     infof(data, "WARNING: SSL: CURLOPT_SSLKEY is ignored by Secure "
@@ -1332,19 +1335,20 @@ static CURLcode sectransp_connect_step1(struct Curl_cfilter *cf,
     char *ssl_sessionid;
     size_t ssl_sessionid_len;
 
-    Curl_ssl_sessionid_lock(data);
-    if(!Curl_ssl_getsessionid(cf, data, &connssl->peer,
-                              (void **)&ssl_sessionid, &ssl_sessionid_len,
-                              NULL)) {
+    Curl_ssl_scache_lock(data);
+    ssl_sessionid = Curl_ssl_scache_get_obj(cf, data,
+                                            connssl->peer.scache_key);
+    if(ssl_sessionid) {
       /* we got a session id, use it! */
-      err = SSLSetPeerID(backend->ssl_ctx, ssl_sessionid, ssl_sessionid_len);
-      Curl_ssl_sessionid_unlock(data);
+      err = SSLSetPeerID(backend->ssl_ctx, ssl_sessionid,
+                         strlen(ssl_sessionid));
+      Curl_ssl_scache_unlock(data);
       if(err != noErr) {
         failf(data, "SSL: SSLSetPeerID() failed: OSStatus %d", err);
         return CURLE_SSL_CONNECT_ERROR;
       }
-      /* Informational message */
-      infof(data, "SSL reusing session ID");
+      else
+        infof(data, "SSL reusing session ID");
     }
     /* If there is not one, then let's make one up! This has to be done prior
        to starting the handshake. */
@@ -1358,15 +1362,17 @@ static CURLcode sectransp_connect_step1(struct Curl_cfilter *cf,
 
       err = SSLSetPeerID(backend->ssl_ctx, ssl_sessionid, ssl_sessionid_len);
       if(err != noErr) {
-        Curl_ssl_sessionid_unlock(data);
+        Curl_ssl_scache_unlock(data);
         failf(data, "SSL: SSLSetPeerID() failed: OSStatus %d", err);
         return CURLE_SSL_CONNECT_ERROR;
       }
 
-      result = Curl_ssl_set_sessionid(cf, data, &connssl->peer, NULL,
-                                      ssl_sessionid, ssl_sessionid_len,
+      /* This is all a bit weird, as we have not handshaked yet.
+       * I hope this backend will go away soon. */
+      result = Curl_ssl_scache_add_obj(cf, data, connssl->peer.scache_key,
+                                      (void *)ssl_sessionid,
                                       sectransp_session_free);
-      Curl_ssl_sessionid_unlock(data);
+      Curl_ssl_scache_unlock(data);
       if(result)
         return result;
     }
@@ -1429,7 +1435,7 @@ static long pem_to_der(const char *in, unsigned char **out, size_t *outlen)
   }
   b64[j] = '\0';
 
-  err = Curl_base64_decode((const char *)b64, out, outlen);
+  err = curlx_base64_decode((const char *)b64, out, outlen);
   free(b64);
   if(err) {
     free(*out);
@@ -1448,7 +1454,7 @@ static int read_cert(const char *file, unsigned char **out, size_t *outlen)
   unsigned char buf[512];
   struct dynbuf certs;
 
-  Curl_dyn_init(&certs, MAX_CERTS_SIZE);
+  curlx_dyn_init(&certs, MAX_CERTS_SIZE);
 
   fd = open(file, 0);
   if(fd < 0)
@@ -1460,18 +1466,18 @@ static int read_cert(const char *file, unsigned char **out, size_t *outlen)
       break;
     if(n < 0) {
       close(fd);
-      Curl_dyn_free(&certs);
+      curlx_dyn_free(&certs);
       return -1;
     }
-    if(Curl_dyn_addn(&certs, buf, n)) {
+    if(curlx_dyn_addn(&certs, buf, n)) {
       close(fd);
       return -1;
     }
   }
   close(fd);
 
-  *out = Curl_dyn_uptr(&certs);
-  *outlen = Curl_dyn_len(&certs);
+  *out = curlx_dyn_uptr(&certs);
+  *outlen = curlx_dyn_len(&certs);
 
   return 0;
 }
@@ -1504,9 +1510,11 @@ static CURLcode append_cert_to_array(struct Curl_easy *data,
       case CURLE_OK:
         break;
       case CURLE_PEER_FAILED_VERIFICATION:
+        CFRelease(cacert);
         return CURLE_SSL_CACERT_BADFILE;
       case CURLE_OUT_OF_MEMORY:
       default:
+        CFRelease(cacert);
         return result;
     }
     free(certp);
@@ -1687,7 +1695,8 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
                                     const char *pinnedpubkey)
 {  /* Scratch */
   size_t pubkeylen, realpubkeylen, spkiHeaderLength = 24;
-  unsigned char *pubkey = NULL, *realpubkey = NULL;
+  const unsigned char *pubkey = NULL;
+  unsigned char *realpubkey = NULL;
   const unsigned char *spkiHeader = NULL;
   CFDataRef publicKeyBits = NULL;
 
@@ -1737,7 +1746,7 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
 #endif /* SECTRANSP_PINNEDPUBKEY_V2 */
 
     pubkeylen = (size_t)CFDataGetLength(publicKeyBits);
-    pubkey = (unsigned char *)CFDataGetBytePtr(publicKeyBits);
+    pubkey = (const unsigned char *)CFDataGetBytePtr(publicKeyBits);
 
     switch(pubkeylen) {
       case 526:
@@ -2083,10 +2092,13 @@ check_handshake:
         break;
     }
 
-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && \
-    defined(HAVE_BUILTIN_AVAILABLE)
     if(connssl->alpn) {
+#if CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11
+#ifdef HAVE_BUILTIN_AVAILABLE
       if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
+#else
+      if(&SSLSetALPNProtocols && &SSLCopyALPNProtocols) {
+#endif
         CFArrayRef alpnArr = NULL;
         CFStringRef chosenProtocol = NULL;
         err = SSLCopyALPNProtocols(backend->ssl_ctx, &alpnArr);
@@ -2113,8 +2125,8 @@ check_handshake:
         if(alpnArr)
           CFRelease(alpnArr);
       }
+#endif /* CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11 */
     }
-#endif
 
     return CURLE_OK;
   }
@@ -2122,7 +2134,7 @@ check_handshake:
 
 static CURLcode
 add_cert_to_certinfo(struct Curl_easy *data,
-                     SecCertificateRef server_cert,
+                     const SecCertificateRef server_cert,
                      int idx)
 {
   CURLcode result = CURLE_OK;
@@ -2142,7 +2154,7 @@ add_cert_to_certinfo(struct Curl_easy *data,
 
 static CURLcode
 collect_server_cert_single(struct Curl_cfilter *cf, struct Curl_easy *data,
-                           SecCertificateRef server_cert,
+                           const SecCertificateRef server_cert,
                            CFIndex idx)
 {
   CURLcode result = CURLE_OK;
@@ -2239,8 +2251,8 @@ static CURLcode collect_server_cert(struct Curl_cfilter *cf,
       if(ssl_config->certinfo)
         result = Curl_ssl_init_certinfo(data, (int)count);
       for(i = 0L ; !result && (i < count) ; i++) {
-        server_cert = (SecCertificateRef)CFArrayGetValueAtIndex(server_certs,
-                                                                i);
+        const void *item = CFArrayGetValueAtIndex(server_certs, i);
+        server_cert = (SecCertificateRef)CURL_UNCONST(item);
         result = collect_server_cert_single(cf, data, server_cert, i);
       }
       CFRelease(server_certs);
@@ -2256,7 +2268,8 @@ static CURLcode collect_server_cert(struct Curl_cfilter *cf,
     if(ssl_config->certinfo)
       result = Curl_ssl_init_certinfo(data, (int)count);
     for(i = 0L ; !result && (i < count) ; i++) {
-      server_cert = (SecCertificateRef)CFArrayGetValueAtIndex(server_certs, i);
+      const void *item = CFArrayGetValueAtIndex(server_certs, i);
+      server_cert = (SecCertificateRef)CURL_UNCONST(item);
       result = collect_server_cert_single(cf, data, server_cert, i);
     }
     CFRelease(server_certs);
@@ -2283,15 +2296,12 @@ static CURLcode sectransp_connect_step3(struct Curl_cfilter *cf,
   return CURLE_OK;
 }
 
-static CURLcode
-sectransp_connect_common(struct Curl_cfilter *cf, struct Curl_easy *data,
-                         bool nonblocking,
-                         bool *done)
+static CURLcode sectransp_connect(struct Curl_cfilter *cf,
+                                  struct Curl_easy *data,
+                                  bool *done)
 {
   CURLcode result;
   struct ssl_connect_data *connssl = cf->ctx;
-  curl_socket_t sockfd = Curl_conn_cf_get_socket(cf, data);
-  int what;
 
   /* check if the connection has already been established */
   if(ssl_connection_complete == connssl->state) {
@@ -2299,73 +2309,20 @@ sectransp_connect_common(struct Curl_cfilter *cf, struct Curl_easy *data,
     return CURLE_OK;
   }
 
+  *done = FALSE;
+  connssl->io_need = CURL_SSL_IO_NEED_NONE;
+
   if(ssl_connect_1 == connssl->connecting_state) {
-    /* Find out how much more time we are allowed */
-    const timediff_t timeout_ms = Curl_timeleft(data, NULL, TRUE);
-
-    if(timeout_ms < 0) {
-      /* no need to continue if time already is up */
-      failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
-    }
-
     result = sectransp_connect_step1(cf, data);
     if(result)
       return result;
   }
 
-  while(ssl_connect_2 == connssl->connecting_state) {
-
-    /* check allowed time left */
-    const timediff_t timeout_ms = Curl_timeleft(data, NULL, TRUE);
-
-    if(timeout_ms < 0) {
-      /* no need to continue if time already is up */
-      failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
-    }
-
-    /* if ssl is expecting something, check if it is available. */
-    if(connssl->io_need) {
-
-      curl_socket_t writefd = (connssl->io_need & CURL_SSL_IO_NEED_SEND) ?
-        sockfd : CURL_SOCKET_BAD;
-      curl_socket_t readfd = (connssl->io_need & CURL_SSL_IO_NEED_RECV) ?
-        sockfd : CURL_SOCKET_BAD;
-
-      what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
-                               nonblocking ? 0 : timeout_ms);
-      if(what < 0) {
-        /* fatal error */
-        failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
-        return CURLE_SSL_CONNECT_ERROR;
-      }
-      else if(0 == what) {
-        if(nonblocking) {
-          *done = FALSE;
-          return CURLE_OK;
-        }
-        else {
-          /* timeout */
-          failf(data, "SSL connection timeout");
-          return CURLE_OPERATION_TIMEDOUT;
-        }
-      }
-      /* socket is readable or writable */
-    }
-
-    /* Run transaction, and return to the caller if it failed or if this
-     * connection is done nonblocking and this loop would execute again. This
-     * permits the owner of a multi handle to abort a connection attempt
-     * before step2 has completed while ensuring that a client using select()
-     * or epoll() will always have a valid fdset to wait on.
-     */
+  if(ssl_connect_2 == connssl->connecting_state) {
     result = sectransp_connect_step2(cf, data);
-    if(result || (nonblocking && (ssl_connect_2 == connssl->connecting_state)))
+    if(result)
       return result;
-
-  } /* repeat step2 until all transactions are done. */
-
+  }
 
   if(ssl_connect_3 == connssl->connecting_state) {
     result = sectransp_connect_step3(cf, data);
@@ -2378,34 +2335,6 @@ sectransp_connect_common(struct Curl_cfilter *cf, struct Curl_easy *data,
     connssl->state = ssl_connection_complete;
     *done = TRUE;
   }
-  else
-    *done = FALSE;
-
-  /* Reset our connect state machine */
-  connssl->connecting_state = ssl_connect_1;
-
-  return CURLE_OK;
-}
-
-static CURLcode sectransp_connect_nonblocking(struct Curl_cfilter *cf,
-                                              struct Curl_easy *data,
-                                              bool *done)
-{
-  return sectransp_connect_common(cf, data, TRUE, done);
-}
-
-static CURLcode sectransp_connect(struct Curl_cfilter *cf,
-                                  struct Curl_easy *data)
-{
-  CURLcode result;
-  bool done = FALSE;
-
-  result = sectransp_connect_common(cf, data, FALSE, &done);
-
-  if(result)
-    return result;
-
-  DEBUGASSERT(done);
 
   return CURLE_OK;
 }
@@ -2424,7 +2353,7 @@ static CURLcode sectransp_shutdown(struct Curl_cfilter *cf,
   struct st_ssl_backend_data *backend =
     (struct st_ssl_backend_data *)connssl->backend;
   CURLcode result = CURLE_OK;
-  ssize_t nread;
+  ssize_t nread = 0;
   char buf[1024];
   size_t i;
 
@@ -2540,7 +2469,7 @@ static bool sectransp_data_pending(struct Curl_cfilter *cf,
   DEBUGASSERT(backend);
 
   if(backend->ssl_ctx) {  /* SSL is in use */
-    CURL_TRC_CF((struct Curl_easy *)data, cf, "data_pending");
+    CURL_TRC_CF((struct Curl_easy *)CURL_UNCONST(data), cf, "data_pending");
     err = SSLGetBufferedReadSize(backend->ssl_ctx, &buffer);
     if(err == noErr)
       return buffer > 0UL;
@@ -2742,31 +2671,31 @@ const struct Curl_ssl Curl_ssl_sectransp = {
 
   sizeof(struct st_ssl_backend_data),
 
-  Curl_none_init,                     /* init */
-  Curl_none_cleanup,                  /* cleanup */
+  NULL,                               /* init */
+  NULL,                               /* cleanup */
   sectransp_version,                  /* version */
-  Curl_none_check_cxn,                /* check_cxn */
   sectransp_shutdown,                 /* shutdown */
   sectransp_data_pending,             /* data_pending */
   sectransp_random,                   /* random */
-  Curl_none_cert_status_request,      /* cert_status_request */
+  NULL,                               /* cert_status_request */
   sectransp_connect,                  /* connect */
-  sectransp_connect_nonblocking,      /* connect_nonblocking */
   Curl_ssl_adjust_pollset,            /* adjust_pollset */
   sectransp_get_internals,            /* get_internals */
   sectransp_close,                    /* close_one */
-  Curl_none_close_all,                /* close_all */
-  Curl_none_set_engine,               /* set_engine */
-  Curl_none_set_engine_default,       /* set_engine_default */
-  Curl_none_engines_list,             /* engines_list */
+  NULL,                               /* close_all */
+  NULL,                               /* set_engine */
+  NULL,                               /* set_engine_default */
+  NULL,                               /* engines_list */
   sectransp_false_start,              /* false_start */
   sectransp_sha256sum,                /* sha256sum */
-  NULL,                               /* associate_connection */
-  NULL,                               /* disassociate_connection */
   sectransp_recv,                     /* recv decrypted data */
   sectransp_send,                     /* send data to encrypt */
   NULL,                               /* get_channel_binding */
 };
+
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic pop
+#endif
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop

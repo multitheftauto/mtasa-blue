@@ -25,7 +25,7 @@
  ***************************************************************************/
 #include "curl_setup.h"
 
-#include "nonblock.h" /* for curlx_nonblock(), formerly Curl_nonblock() */
+#include "curlx/nonblock.h" /* for curlx_nonblock() */
 #include "sockaddr.h"
 
 struct Curl_addrinfo;
@@ -95,9 +95,9 @@ void Curl_sndbuf_init(curl_socket_t sockfd);
  * Assign the address `ai` to the Curl_sockaddr_ex `dest` and
  * set the transport used.
  */
-void Curl_sock_assign_addr(struct Curl_sockaddr_ex *dest,
-                           const struct Curl_addrinfo *ai,
-                           int transport);
+CURLcode Curl_sock_assign_addr(struct Curl_sockaddr_ex *dest,
+                               const struct Curl_addrinfo *ai,
+                               int transport);
 
 /**
  * Creates a cfilter that opens a TCP socket to the given address

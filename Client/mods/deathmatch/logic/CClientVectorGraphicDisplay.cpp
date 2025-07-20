@@ -13,8 +13,8 @@
 
 using namespace lunasvg;
 
-CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID)
-    : CClientDisplay(pDisplayManager, ID)
+CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID)
+    : CClientDisplay(ID)
 {
     m_pVectorGraphic = pVectorGraphic;
     m_bVisible = true;
@@ -100,9 +100,9 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     if (SUCCEEDED(surface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
     {
         auto surfaceData = static_cast<std::uint8_t*>(LockedRect.pBits);
-        auto stride = static_cast<std::uint32_t>(LockedRect.Pitch);
+        auto stride = static_cast<std::int32_t>(LockedRect.Pitch);
 
-        Bitmap bitmap{surfaceData, pVectorGraphicItem->m_uiSizeX, pVectorGraphicItem->m_uiSizeY, stride};
+        Bitmap bitmap{surfaceData, (int32_t)pVectorGraphicItem->m_uiSizeX, (int32_t)pVectorGraphicItem->m_uiSizeY, stride};
         bitmap.clear(0);
         svgDocument->render(bitmap, transformationMatrix);
         UnpremultiplyBitmap(bitmap);

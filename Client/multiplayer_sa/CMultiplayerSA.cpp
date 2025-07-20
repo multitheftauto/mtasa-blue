@@ -1311,6 +1311,10 @@ void CMultiplayerSA::InitHooks()
     MemPut<DWORD>(0x748EFC, 0x748B08);
     MemPut<BYTE>(0x748B0E, 5);
 
+    // Skip copyright screen
+    MemSet((void*)0x748C2B, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeIn
+    MemSet((void*)0x748C9A, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeOut
+
     // Force triggering of the damage event for players on fire
     MemSet((void*)0x633695, 0x90, 6);
     MemPut<BYTE>(0x633720, 0);
@@ -1599,6 +1603,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_ObjectStreamerOptimization();
 
     InitHooks_Postprocess();
+    InitHooks_Explosions();
+    InitHooks_Tasks();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -2771,14 +2777,14 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
                 {
                     activeEntityForStreaming = new CPedSAInterface();
                     MemSet (activeEntityForStreaming, 0, sizeof(CPedSAInterface));
-                    activeEntityForStreaming->Placeable.matrix = new CMatrix_Padded();
+                    activeEntityForStreaming->matrix = new CMatrix_Padded();
                 }
 
                 bActiveEntityForStreamingIsFakePed = true;
 
-                activeEntityForStreaming->Placeable.matrix->vPos.fX = vecPosition->fX;
-                activeEntityForStreaming->Placeable.matrix->vPos.fY = vecPosition->fY;
-                activeEntityForStreaming->Placeable.matrix->vPos.fZ = vecPosition->fZ;
+                activeEntityForStreaming->matrix->vPos.fX = vecPosition->fX;
+                activeEntityForStreaming->matrix->vPos.fY = vecPosition->fY;
+                activeEntityForStreaming->matrix->vPos.fZ = vecPosition->fZ;
             }*/
 
         // DWORD dwCurrentValue = *(DWORD *)FUNC_CPlayerInfoBase;
@@ -2789,7 +2795,7 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
     {
         /*if ( bActiveEntityForStreamingIsFakePed )
         {
-            delete activeEntityForStreaming->Placeable.matrix;
+            delete activeEntityForStreaming->matrix;
             delete activeEntityForStreaming;
         }
 
@@ -3226,10 +3232,10 @@ bool processGrab()
     {
         // CObjectSA * object = (CObjectSA*)entity;
         // CModelInfo * info = pGameInterface->GetModelInfo(entity->m_nModelIndex);
-        if (entity->Placeable.matrix)
-            edgeHeight = *entityEdgeHeight + entity->Placeable.matrix->vPos.fZ;
+        if (entity->matrix)
+            edgeHeight = *entityEdgeHeight + entity->matrix->vPos.fZ;
         else
-            edgeHeight = *entityEdgeHeight + entity->Placeable.m_transform.m_translate.fZ;
+            edgeHeight = *entityEdgeHeight + entity->m_transform.m_translate.fZ;
     }
     else
         edgeHeight = *entityEdgeHeight;
@@ -6380,13 +6386,13 @@ void RemoveObjectIfNeeded()
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
-        if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
+        if (!pBuildingAdd->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pBuildingAdd);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
-        if ((DWORD)(pLODInterface->vtbl) != VTBL_CPlaceable)
+        if (!pLODInterface->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pLODInterface);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
@@ -6445,7 +6451,12 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
     TIMING_CHECKPOINT("+RemovePointerToBuilding");
     RemovePointerToBuilding();
     StorePointerToBuilding();
-    RemoveObjectIfNeeded();
+
+    // pLODInterface contains a dummy object's pointer
+    // And as follows from CPopulation::ConvertToDummyObject this pointer can be nullptr
+    if (pLODInterface)
+        RemoveObjectIfNeeded();
+
     TIMING_CHECKPOINT("-RemovePointerToBuilding");
     _asm
     {
@@ -6459,7 +6470,7 @@ void RemoveDummyIfReplaced()
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
-        if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
+        if (!pBuildingAdd->IsPlaceableVTBL())
         {
             pBuildingRemoval->AddDataBuilding(pBuildingAdd);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);
@@ -6629,6 +6640,25 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter(bool bSet)
         MemCpy((char*)0x64BC0D, originalCode, 6);
     else
         MemSet((char*)0x64BC0D, 0x90, 6);
+}
+
+bool CMultiplayerSA::IsVehicleEngineAutoStartEnabled() const noexcept
+{
+    return *(unsigned char*)0x64BC03 == 0x75;
+}
+
+void CMultiplayerSA::SetVehicleEngineAutoStartEnabled(bool enabled)
+{
+    if (enabled)
+    {
+        MemCpy((void*)0x64BC03, "\x75\x05\x80\xC9\x10", 5);
+        MemCpy((void*)0x6C4EA9, "\x8A\x86\x28\x04", 4);
+    }
+    else
+    {
+        MemSet((void*)0x64BC03, 0x90, 5);                          // prevent vehicle engine from turning on (driver enter)
+        MemCpy((void*)0x6C4EA9, "\xE9\x15\x03\x00", 4);            // prevent aircraft engine from turning off (driver exit)
+    }
 }
 
 // Storage

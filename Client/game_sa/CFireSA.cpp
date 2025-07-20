@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CFireSA.cpp
  *  PURPOSE:     Fire
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -223,7 +223,7 @@ static void AbortFireTask(CEntitySAInterface* entityOnFire, DWORD returnAddress)
     if (returnAddress == 0x633783)
         return;
 
-    auto ped = pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(entityOnFire));
+    auto* ped = pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(entityOnFire));
     if (!ped || !ped->pEntity)
         return;
 
@@ -242,13 +242,16 @@ static void _declspec(naked) HOOK_CFire_Extinguish()
     _asm
     {
         mov [eax+730h], edi
-        mov ebx, [esp+8]
+
+        push ebx
+        mov ebx, [esp+0Ch]
 
         push ebx
         push eax
         call AbortFireTask
         add esp, 8
 
+        pop ebx
         jmp CONTINUE_CFire_Extinguish
     }
 }
