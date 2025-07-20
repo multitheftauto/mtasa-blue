@@ -28,18 +28,18 @@
  * TLS/SSL layer. No code but vtls.c should ever call or use these functions.
  */
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef USE_SECTRANSP
 
-#include "urldata.h" /* for the Curl_easy definition */
-#include "curl_base64.h"
-#include "strparse.h"
-#include "multiif.h"
-#include "strcase.h"
+#include "../urldata.h" /* for the Curl_easy definition */
+#include "../curlx/base64.h"
+#include "../curlx/strparse.h"
+#include "../multiif.h"
+#include "../strcase.h"
 #include "x509asn1.h"
 #include "vtls_scache.h"
-#include "strerror.h"
+#include "../strerror.h"
 #include "cipher_suite.h"
 
 #ifdef __clang__
@@ -134,19 +134,19 @@
 #include <sys/sysctl.h>
 #endif /* CURL_BUILD_MAC */
 
-#include "sendf.h"
-#include "inet_pton.h"
-#include "connect.h"
-#include "select.h"
+#include "../sendf.h"
+#include "../curlx/inet_pton.h"
+#include "../connect.h"
+#include "../select.h"
 #include "vtls.h"
 #include "vtls_int.h"
 #include "sectransp.h"
-#include "curl_printf.h"
-#include "strdup.h"
+#include "../curl_printf.h"
+#include "../strdup.h"
 
-#include "curl_memory.h"
+#include "../curl_memory.h"
 /* The last #include file should be: */
-#include "memdebug.h"
+#include "../memdebug.h"
 
 
 /* From MacTypes.h (which we cannot include because it is not present in
@@ -352,9 +352,9 @@ CF_INLINE void GetDarwinVersionNumber(int *major, int *minor)
       curl_off_t fnum;
       curl_off_t snum;
       /* Parse the version: */
-      if(!Curl_str_number(&os, &fnum, INT_MAX) &&
-         !Curl_str_single(&os, '.') &&
-         !Curl_str_number(&os, &snum, INT_MAX)) {
+      if(!curlx_str_number(&os, &fnum, INT_MAX) &&
+         !curlx_str_single(&os, '.') &&
+         !curlx_str_number(&os, &snum, INT_MAX)) {
         *major = (int)fnum;
         *minor = (int)snum;
       }
@@ -1092,8 +1092,8 @@ static CURLcode sectransp_connect_step1(struct Curl_cfilter *cf,
     return result;
 
   if(connssl->alpn) {
-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && \
-    defined(HAVE_BUILTIN_AVAILABLE)
+#if CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11
+#ifdef HAVE_BUILTIN_AVAILABLE
     if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
 #else
     if(&SSLSetALPNProtocols && &SSLCopyALPNProtocols) {
@@ -1119,6 +1119,7 @@ static CURLcode sectransp_connect_step1(struct Curl_cfilter *cf,
       Curl_alpn_to_proto_str(&proto, connssl->alpn);
       infof(data, VTLS_INFOF_ALPN_OFFER_1STR, proto.data);
     }
+#endif /* CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11 */
   }
 
   if(ssl_config->key) {
@@ -1434,7 +1435,7 @@ static long pem_to_der(const char *in, unsigned char **out, size_t *outlen)
   }
   b64[j] = '\0';
 
-  err = Curl_base64_decode((const char *)b64, out, outlen);
+  err = curlx_base64_decode((const char *)b64, out, outlen);
   free(b64);
   if(err) {
     free(*out);
@@ -1453,7 +1454,7 @@ static int read_cert(const char *file, unsigned char **out, size_t *outlen)
   unsigned char buf[512];
   struct dynbuf certs;
 
-  Curl_dyn_init(&certs, MAX_CERTS_SIZE);
+  curlx_dyn_init(&certs, MAX_CERTS_SIZE);
 
   fd = open(file, 0);
   if(fd < 0)
@@ -1465,18 +1466,18 @@ static int read_cert(const char *file, unsigned char **out, size_t *outlen)
       break;
     if(n < 0) {
       close(fd);
-      Curl_dyn_free(&certs);
+      curlx_dyn_free(&certs);
       return -1;
     }
-    if(Curl_dyn_addn(&certs, buf, n)) {
+    if(curlx_dyn_addn(&certs, buf, n)) {
       close(fd);
       return -1;
     }
   }
   close(fd);
 
-  *out = Curl_dyn_uptr(&certs);
-  *outlen = Curl_dyn_len(&certs);
+  *out = curlx_dyn_uptr(&certs);
+  *outlen = curlx_dyn_len(&certs);
 
   return 0;
 }
@@ -2092,8 +2093,8 @@ check_handshake:
     }
 
     if(connssl->alpn) {
-#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && \
-    defined(HAVE_BUILTIN_AVAILABLE)
+#if CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11
+#ifdef HAVE_BUILTIN_AVAILABLE
       if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
 #else
       if(&SSLSetALPNProtocols && &SSLCopyALPNProtocols) {
@@ -2124,6 +2125,7 @@ check_handshake:
         if(alpnArr)
           CFRelease(alpnArr);
       }
+#endif /* CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11 */
     }
 
     return CURLE_OK;

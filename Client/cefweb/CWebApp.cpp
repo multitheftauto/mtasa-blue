@@ -26,6 +26,11 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
     if (!pWebCore->GetGPUEnabled())
         command_line->AppendSwitch("disable-gpu");
 
+    // Disable the AutoDeElevate feature to make launching CEF with Admin privileges work.
+    // https://github.com/chromiumembedded/cef/issues/3960
+    // https://chromium-review.googlesource.com/c/chromium/src/+/6515318
+    command_line->AppendSwitch("do-not-de-elevate");
+
     command_line->AppendSwitch("disable-gpu-compositing"); // always disable this, causes issues with official builds
 
     // command_line->AppendSwitch("disable-d3d11");

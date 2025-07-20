@@ -754,6 +754,8 @@ public:
     SLastSyncedVehData*                      m_LastSyncedData;
     SSirenInfo                               m_tSirenBeaconInfo;
     std::map<SString, SVehicleComponentData> m_ComponentData;
+    // Store visibility state when the component map is regenerated
+    std::map<SString, bool>                  m_ComponentVisibilityBackup;
     bool                                     m_bAsyncLoadingDisabled;
 
     std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;

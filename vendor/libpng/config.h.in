@@ -108,6 +108,9 @@
 /* Enable POWERPC VSX optimizations */
 #undef PNG_POWERPC_VSX_OPT
 
+/* Enable RISCV RVV optimizations */
+#undef PNG_RISCV_RVV_OPT
+
 /* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
