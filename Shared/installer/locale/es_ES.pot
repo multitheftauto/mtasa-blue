@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-25 15:29\n"
+"POT-Creation-Date: 2025-04-08 22:41\n"
+"PO-Revision-Date: 2025-04-08 23:03\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -19,18 +19,18 @@ msgstr ""
 
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:205
-msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr "La versión de MTA:SA que has descargado no soporta Windows XP o Vista. Por favor descarga una versión alternativa desde www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
+msgstr ""
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
-msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "La versión de MTA:SA que has descargado no soporta Windows 7, 8 o 8.1. Por favor descarga una versión alternativa desde www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
+msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
-msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr "La versión de MTA:SA que has descargado está diseñada para versiones antiguas de Windows. Por favor descarga una versión alternativa desde www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
+msgstr ""
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
@@ -147,72 +147,72 @@ msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr "El cliente es el programa que ejecutas para jugar en un servidor de Multi Theft Auto"
 
 #. INST_CLIENTSERVER
-#: Shared/installer/nightly.nsi:441
+#: Shared/installer/nightly.nsi:444
 msgid "Client and Server"
 msgstr "Cliente y Servidor"
 
 #. INST_SERVER
-#: Shared/installer/nightly.nsi:442
+#: Shared/installer/nightly.nsi:445
 msgid "Server only"
 msgstr "Solo servidor"
 
 #. INST_STARTMENU_GROUP
-#: Shared/installer/nightly.nsi:456
+#: Shared/installer/nightly.nsi:459
 msgid "Start menu group"
 msgstr "Grupo en el menú inicio"
 
 #. INST_DESKTOP_ICON
-#: Shared/installer/nightly.nsi:457
+#: Shared/installer/nightly.nsi:460
 msgid "Desktop icon"
 msgstr "Icono en el escritorio"
 
 #. INST_PROTOCOL
-#: Shared/installer/nightly.nsi:458
+#: Shared/installer/nightly.nsi:461
 msgid "Register mtasa:// protocol"
 msgstr "Registrar el protocolo mtasa://"
 
 #. INST_GAMES_EXPLORER
-#: Shared/installer/nightly.nsi:459
+#: Shared/installer/nightly.nsi:462
 msgid "Add to Games Explorer"
 msgstr "Agregar al Explorador de Juegos"
 
 #. INST_DIRECTX
-#: Shared/installer/nightly.nsi:460
+#: Shared/installer/nightly.nsi:463
 msgid "Install DirectX"
 msgstr "Instalar DirectX"
 
 #. INST_SEC_CLIENT
-#: Shared/installer/nightly.nsi:494
+#: Shared/installer/nightly.nsi:497
 msgid "Game client"
 msgstr "Cliente del juego"
 
 #. INST_SEC_SERVER
-#: Shared/installer/nightly.nsi:495
+#: Shared/installer/nightly.nsi:498
 msgid "Dedicated server"
 msgstr "Servidor dedicado"
 
 #. INST_SEC_CORE
-#: Shared/installer/nightly.nsi:496
+#: Shared/installer/nightly.nsi:499
 msgid "Core components"
 msgstr "Componentes principales"
 
 #. INST_SEC_GAME
-#: Shared/installer/nightly.nsi:497
+#: Shared/installer/nightly.nsi:500
 msgid "Game module"
 msgstr "Modulo del Juego"
 
 #. INFO_INPLACE_UPGRADE
-#: Shared/installer/nightly.nsi:499
+#: Shared/installer/nightly.nsi:502
 msgid "Performing in-place upgrade..."
 msgstr "Realizando actualización en la misma ubicación..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: Shared/installer/nightly.nsi:500
+#: Shared/installer/nightly.nsi:503
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "Actualizando permisos. Esto podría tardar un par de minutos..."
 
 #. MSGBOX_INVALID_GTASA
-#: Shared/installer/nightly.nsi:501
+#: Shared/installer/nightly.nsi:504
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
@@ -221,42 +221,42 @@ msgstr "No se ha detectado una versión válida de Grand Theft Auto: San Andrea 
 "Por favor reinstale la aplicación en caso de problemas más adelante."
 
 #. INST_SEC_CORE_RESOURCES
-#: Shared/installer/nightly.nsi:504
+#: Shared/installer/nightly.nsi:507
 msgid "Core Resources"
 msgstr "Recursos Primarios"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: Shared/installer/nightly.nsi:505
+#: Shared/installer/nightly.nsi:508
 msgid "Optional Resources"
 msgstr "Recursos opcionales"
 
 #. INST_SEC_EDITOR
-#: Shared/installer/nightly.nsi:506
+#: Shared/installer/nightly.nsi:509
 msgid "Editor"
 msgstr "Editor"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:1001
+#: Shared/installer/nightly.nsi:985
 msgid "Development"
 msgstr "Desarrollo"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1049
+#: Shared/installer/nightly.nsi:1033
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) fue removido satisfactoriamente de tu computadora."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1056
+#: Shared/installer/nightly.nsi:1040
 msgid "Uninstallation has failed!"
 msgstr "¡La desinstalación ha fallado!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1064
+#: Shared/installer/nightly.nsi:1048
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "¿Estás seguro de que quieres remover $(^Name) y todos sus componentes?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1065
+#: Shared/installer/nightly.nsi:1049
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -265,32 +265,32 @@ msgstr "¿Desinstalando antes de actualizar?$\\r$\n"
 "Ejecute el nuevo instalador para actualizarlo y conservar su configuración."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1078
+#: Shared/installer/nightly.nsi:1062
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "¿Le gustaría preservar sus archivos de datos (como los recursos, capturas de pantalla y la configuración del servidor)? Si hace clic en no, se perderán los recursos, configuraciones o capturas de pantalla que haya creado."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1253
+#: Shared/installer/nightly.nsi:1245
 msgid "This installer requires admin access, try again"
 msgstr "Este instalador necesita privilegios de administrador, inténtelo de nuevo."
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1254
+#: Shared/installer/nightly.nsi:1246
 msgid "This uninstaller requires admin access, try again"
 msgstr "Este desinstalador necesita privilegios de administrador, inténtelo de nuevo."
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1255
+#: Shared/installer/nightly.nsi:1247
 msgid "Logon service not running, aborting!"
 msgstr "¡El servicio de inicio de sesión no está en ejecución, abortando!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1256
+#: Shared/installer/nightly.nsi:1248
 msgid "Unable to elevate"
 msgstr "No es posible elevar"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1852
+#: Shared/installer/nightly.nsi:1844
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -301,7 +301,7 @@ msgstr "Una versión diferente y más reciente de MTA ($1) ya existe en ese dire
 " ¿Está seguro de que quiere sobrescribir MTA $1 en $INSTDIR?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1856
+#: Shared/installer/nightly.nsi:1848
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -312,7 +312,7 @@ msgstr "MTA no puede ser instalado en el mismo directorio que GTA:SA.$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1859
+#: Shared/installer/nightly.nsi:1851
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -321,7 +321,7 @@ msgstr "El directorio seleccionado no existe.$\n"
 "Por favor seleccione el directorio donde está instalado GTA:SA"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1861
+#: Shared/installer/nightly.nsi:1853
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -330,17 +330,17 @@ msgstr "No se pudo encontrar GTA:SA instalado en $GTA_DIR $\n"
 "¿Está seguro de continuar?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1979
+#: Shared/installer/nightly.nsi:1971
 msgid "Choose Install Location"
 msgstr "Seleccione la Ubicación de Instalación"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1980
+#: Shared/installer/nightly.nsi:1972
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Seleccione la carpeta en la cual instalará ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1981
+#: Shared/installer/nightly.nsi:1973
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -351,62 +351,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} se instalará en la siguiente 
 " Haga clic en Siguiente para continuar."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1983
+#: Shared/installer/nightly.nsi:1975
 msgid "Destination Folder"
 msgstr "Carpeta de destino"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1984
+#: Shared/installer/nightly.nsi:1976
 msgid "Browse..."
 msgstr "Examinar..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1985
+#: Shared/installer/nightly.nsi:1977
 msgid "Default"
 msgstr "Predeterminado"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1986
+#: Shared/installer/nightly.nsi:1978
 msgid "Last used"
 msgstr "Usado por última vez"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1987
+#: Shared/installer/nightly.nsi:1979
 msgid "Custom"
 msgstr "Personalizado"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2165
+#: Shared/installer/nightly.nsi:2157
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Seleccione la carpeta en la que instalará ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2183
+#: Shared/installer/nightly.nsi:2175
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Advertencia: Una versión diferente y más reciente de MTA ($1) ya existe en esa ubicación."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2184
+#: Shared/installer/nightly.nsi:2176
 msgid "Installation type:  Upgrade"
 msgstr "Tipo de instalación: Actualización"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2418
+#: Shared/installer/nightly.nsi:2410
 msgid "Online update"
 msgstr "Actualización en línea"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2419
+#: Shared/installer/nightly.nsi:2411
 msgid "Checking for update information"
 msgstr "Comprobando información de actualización"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2420
+#: Shared/installer/nightly.nsi:2412
 msgid "Checking for installer update information..."
 msgstr "Comprobando información de actualización del instalador..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2421
+#: Shared/installer/nightly.nsi:2413
 msgid "Please ensure your firewall is not blocking"
 msgstr "Por favor asegúrate que tu cortafuegos no este bloqueando"
 

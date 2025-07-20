@@ -77,7 +77,7 @@ class RTFileStream;            // File I/O helper class, look below for implemen
 /// Implementation of RTree, a multidimensional bounding rectangle tree.
 /// Example usage: For a 3-dimensional tree use RTree<Object*, float, 3> myTree;
 ///
-/// This modified, templated C++ version by Greg Douglas at Auran (http://www.auran.com)
+/// This modified, templated C++ version by Greg Douglas at Auran (https://www.auran.com)
 ///
 /// DATATYPE Referenced data, should be int, void*, obj* etc. no larger than sizeof<void*> and simple type
 /// ELEMTYPE Type of element such as int or float

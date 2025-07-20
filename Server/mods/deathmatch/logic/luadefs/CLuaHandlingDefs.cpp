@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaHandlingDefs.cpp
  *  PURPOSE:     Lua vehicle handling definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -616,7 +616,7 @@ int CLuaHandlingDefs::GetVehicleHandling(lua_State* luaVM)
 int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 {
     //  table getModelHandling ( int modelId )
-    std::uint16_t model;
+    std::uint32_t model;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(model);
@@ -787,7 +787,7 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 int CLuaHandlingDefs::GetOriginalHandling(lua_State* luaVM)
 {
     //  table getOriginalHandling ( int modelID )
-    std::uint16_t model;
+    std::uint32_t model;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(model);

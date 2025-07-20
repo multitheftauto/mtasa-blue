@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CPlayerPed.h
  *  PURPOSE:     Played ped entity interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -26,4 +26,7 @@ public:
 
     virtual eMoveAnim GetMoveAnim() = 0;
     virtual void      SetMoveAnim(eMoveAnim iAnimGroup) = 0;
+
+    virtual CEntity* GetTargetedEntity() const = 0;
+    virtual void     SetTargetedEntity(CEntity* entity) = 0;
 };

@@ -35,13 +35,6 @@
 #ifndef CURL_OS
 #define CURL_OS "plan9"
 #endif
-#define PACKAGE "curl"
-#define PACKAGE_NAME "curl"
-#define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.se/mail/"
-#define PACKAGE_STRING "curl -"
-#define PACKAGE_TARNAME "curl"
-#define PACKAGE_VERSION "-"
-#define VERSION "0.0.0" /* TODO */
 
 #define STDC_HEADERS 1
 
@@ -113,12 +106,9 @@
 #define HAVE_SIGSETJMP 1
 #define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
 #define HAVE_SOCKET 1
-#define HAVE_SSL_GET_SHUTDOWN 1
 #define HAVE_STDBOOL_H 1
 #define HAVE_STRCASECMP 1
 #define HAVE_STRDUP 1
-#define HAVE_STRTOK_R 1
-#define HAVE_STRTOLL 1
 #define HAVE_STRUCT_TIMEVAL 1
 #define HAVE_SYS_IOCTL_H 1
 #define HAVE_SYS_PARAM_H 1

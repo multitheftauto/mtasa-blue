@@ -35,6 +35,8 @@ public:
     std::list<CClientStreamElement*>::iterator ActiveElementsBegin() { return m_ActiveElements.begin(); }
     std::list<CClientStreamElement*>::iterator ActiveElementsEnd() { return m_ActiveElements.end(); }
 
+    std::uint16_t                              GetDimension() const noexcept { return m_usDimension; }
+
 private:
     void CreateSectors(std::list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight);
     void ConnectSector(CClientStreamSector* pSector);
@@ -46,14 +48,6 @@ private:
 
     void AddElement(CClientStreamElement* pElement);
     void RemoveElement(CClientStreamElement* pElement);
-
-    void AddElementInSectors(CClientStreamElement* pElement);
-    void RemoveElementFromSectors(CClientStreamElement* pElement);
-
-    bool ShouldElementBeVisibleInCurrentDimension(CClientStreamElement* pElement) const noexcept
-    {
-        return pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions();
-    }
 
     void SetExpDistances(std::list<CClientStreamElement*>* pList);
     void AddToSortedList(std::list<CClientStreamElement*>* pList, CClientStreamElement* pElement);
@@ -80,7 +74,6 @@ private:
     unsigned short                     m_usDimension;
     std::list<CClientStreamElement*>   m_ActiveElements;
     std::list<CClientStreamElement*>   m_ToStreamOut;
-    std::list<CClientStreamElement*>   m_outsideCurrentDimensionElements;
 
     static void* pAddingElement;
 };

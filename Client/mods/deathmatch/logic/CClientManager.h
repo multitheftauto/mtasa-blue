@@ -99,7 +99,7 @@ public:
     CClientIMGManager*           GetIMGManager() { return m_pImgManager; }
     CClientBuildingManager*      GetBuildingManager() const noexcept { return m_pBuildingManager; }
 
-    bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
+    bool IsGameLoaded() { return g_pGame->GetSystemState() == SystemState::GS_PLAYING_GAME && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
     bool IsBeingDeleted() { return m_bBeingDeleted; }
     void SetGameUnloadedFlag() { m_bGameUnloadedFlag = true; }
 

@@ -87,7 +87,7 @@
 
 ;----------------------------------------
 ; Overwrite last DetailPrint line
-; From http://nsis.sourceforge.net/DetailUpdate
+; From https://nsis.sourceforge.net/DetailUpdate
 ;----------------------------------------
 Function DetailUpdate
   Exch $R0

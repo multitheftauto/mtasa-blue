@@ -6,7 +6,7 @@
  *  PURPOSE:     RenderWare mapping to Grand Theft Auto: San Andreas
  *               and miscellaneous rendering functions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *  RenderWare is © Criterion Software
  *
  *****************************************************************************/
