@@ -5,7 +5,7 @@
  *  FILE:        core/CJoystickManager.h
  *  PURPOSE:     Header file for the joystick manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

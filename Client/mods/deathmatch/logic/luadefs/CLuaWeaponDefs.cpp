@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaWeaponDefs.cpp
  *  PURPOSE:     Lua definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -209,14 +209,14 @@ int CLuaWeaponDefs::FireWeapon(lua_State* luaVM)
 int CLuaWeaponDefs::SetWeaponProperty(lua_State* luaVM)
 {
     CClientWeapon*   pWeapon;
-    eWeaponProperty  weaponProperty;
+    WeaponProperty  weaponProperty;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pWeapon);
     argStream.ReadEnumString(weaponProperty);
 
     if (!argStream.HasErrors())
     {
-        if (weaponProperty == WEAPON_DAMAGE)
+        if (weaponProperty == WeaponProperty::WEAPON_DAMAGE)
         {
             short sData = 0;
             argStream.ReadNumber(sData);
@@ -229,7 +229,7 @@ int CLuaWeaponDefs::SetWeaponProperty(lua_State* luaVM)
                 }
             }
         }
-        else if (weaponProperty == WEAPON_FIRE_ROTATION)
+        else if (weaponProperty == WeaponProperty::WEAPON_FIRE_ROTATION)
         {
             CVector vecRotation;
             argStream.ReadVector3D(vecRotation);
@@ -694,7 +694,7 @@ int CLuaWeaponDefs::SetWeaponClipAmmo(lua_State* luaVM)
     return 1;
 }
 
-std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDefs::GetWeaponProperty(lua_State* luaVM, std::variant<CClientWeapon*, int, std::string> weapon, std::variant<int, std::string> weaponSkill, eWeaponProperty property)
+std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDefs::GetWeaponProperty(lua_State* luaVM, std::variant<CClientWeapon*, int, std::string> weapon, std::variant<int, std::string> weaponSkill, WeaponProperty property)
 {
     eWeaponSkill skill = WEAPONSKILL_POOR;
     if (std::holds_alternative<int>(weaponSkill))
@@ -715,20 +715,20 @@ std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDef
 
         switch (property)
         {
-            case eWeaponProperty::WEAPON_DAMAGE:
+            case WeaponProperty::WEAPON_DAMAGE:
                 return weaponStats->GetDamagePerHit();
-            case eWeaponProperty::WEAPON_FIRE_ROTATION:
+            case WeaponProperty::WEAPON_FIRE_ROTATION:
             {
                 CVector fireRotation = weaponPtr->GetFireRotationNoTarget();
                 ConvertRadiansToDegrees(fireRotation);
 
                 return CLuaMultiReturn<float, float, float>(fireRotation.fX, fireRotation.fY, fireRotation.fZ);
             }
-            case eWeaponProperty::WEAPON_ACCURACY:
+            case WeaponProperty::WEAPON_ACCURACY:
                 return weaponStats->GetAccuracy();
-            case eWeaponProperty::WEAPON_TARGET_RANGE:
+            case WeaponProperty::WEAPON_TARGET_RANGE:
                 return weaponStats->GetTargetRange();
-            case eWeaponProperty::WEAPON_WEAPON_RANGE:
+            case WeaponProperty::WEAPON_WEAPON_RANGE:
                 return weaponStats->GetWeaponRange();
             default:
                 return false;
@@ -750,85 +750,85 @@ std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDef
 
     switch (property)
     {
-        case eWeaponProperty::WEAPON_WEAPON_RANGE:
+        case WeaponProperty::WEAPON_WEAPON_RANGE:
             return weaponStats->GetWeaponRange();
-        case eWeaponProperty::WEAPON_TARGET_RANGE:
+        case WeaponProperty::WEAPON_TARGET_RANGE:
             return weaponStats->GetTargetRange();
-        case eWeaponProperty::WEAPON_ACCURACY:
+        case WeaponProperty::WEAPON_ACCURACY:
             return weaponStats->GetAccuracy();
-        case eWeaponProperty::WEAPON_FIRING_SPEED:
+        case WeaponProperty::WEAPON_FIRING_SPEED:
             return weaponStats->GetFiringSpeed();
-        case eWeaponProperty::WEAPON_LIFE_SPAN:
+        case WeaponProperty::WEAPON_LIFE_SPAN:
             return weaponStats->GetLifeSpan();
-        case eWeaponProperty::WEAPON_SPREAD:
+        case WeaponProperty::WEAPON_SPREAD:
             return weaponStats->GetSpread();
-        case eWeaponProperty::WEAPON_MOVE_SPEED:
+        case WeaponProperty::WEAPON_MOVE_SPEED:
             return weaponStats->GetMoveSpeed();
-        case eWeaponProperty::WEAPON_REQ_SKILL_LEVEL:
+        case WeaponProperty::WEAPON_REQ_SKILL_LEVEL:
             return weaponStats->GetRequiredStatLevel();
-        case eWeaponProperty::WEAPON_ANIM_LOOP_START:
+        case WeaponProperty::WEAPON_ANIM_LOOP_START:
             return weaponStats->GetWeaponAnimLoopStart();
-        case eWeaponProperty::WEAPON_ANIM_LOOP_STOP:
+        case WeaponProperty::WEAPON_ANIM_LOOP_STOP:
             return weaponStats->GetWeaponAnimLoopStop();
-        case eWeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+        case WeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
             return weaponStats->GetWeaponAnimLoopFireTime();
-        case eWeaponProperty::WEAPON_ANIM2_LOOP_START:
+        case WeaponProperty::WEAPON_ANIM2_LOOP_START:
             return weaponStats->GetWeaponAnim2LoopStart();
-        case eWeaponProperty::WEAPON_ANIM2_LOOP_STOP:
+        case WeaponProperty::WEAPON_ANIM2_LOOP_STOP:
             return weaponStats->GetWeaponAnim2LoopStop();
-        case eWeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+        case WeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
             return weaponStats->GetWeaponAnim2LoopFireTime();
-        case eWeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
+        case WeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
             return weaponStats->GetWeaponAnimBreakoutTime();
-        case eWeaponProperty::WEAPON_RADIUS:
+        case WeaponProperty::WEAPON_RADIUS:
             return weaponStats->GetRadius();
-        case eWeaponProperty::WEAPON_DAMAGE:
+        case WeaponProperty::WEAPON_DAMAGE:
             return weaponStats->GetDamagePerHit();
-        case eWeaponProperty::WEAPON_MAX_CLIP_AMMO:
+        case WeaponProperty::WEAPON_MAX_CLIP_AMMO:
             return weaponStats->GetMaximumClipAmmo();
-        case eWeaponProperty::WEAPON_FLAGS:
+        case WeaponProperty::WEAPON_FLAGS:
             return weaponStats->GetFlags();
-        case eWeaponProperty::WEAPON_ANIM_GROUP:
+        case WeaponProperty::WEAPON_ANIM_GROUP:
             return static_cast<int>(weaponStats->GetAnimGroup());
-        case eWeaponProperty::WEAPON_FIRETYPE:
+        case WeaponProperty::WEAPON_FIRETYPE:
             return weaponStats->GetFireType();
-        case eWeaponProperty::WEAPON_MODEL:
+        case WeaponProperty::WEAPON_MODEL:
             return weaponStats->GetModel();
-        case eWeaponProperty::WEAPON_MODEL2:
+        case WeaponProperty::WEAPON_MODEL2:
             return weaponStats->GetModel2();
-        case eWeaponProperty::WEAPON_SLOT:
+        case WeaponProperty::WEAPON_SLOT:
             return weaponStats->GetSlot();
-        case eWeaponProperty::WEAPON_AIM_OFFSET:
+        case WeaponProperty::WEAPON_AIM_OFFSET:
             return weaponStats->GetAimOffsetIndex();
-        case eWeaponProperty::WEAPON_SKILL_LEVEL:
+        case WeaponProperty::WEAPON_SKILL_LEVEL:
             return weaponStats->GetSkill();
-        case eWeaponProperty::WEAPON_DEFAULT_COMBO:
+        case WeaponProperty::WEAPON_DEFAULT_COMBO:
             return weaponStats->GetDefaultCombo();
-        case eWeaponProperty::WEAPON_COMBOS_AVAILABLE:
+        case WeaponProperty::WEAPON_COMBOS_AVAILABLE:
             return weaponStats->GetCombosAvailable();
-        case eWeaponProperty::WEAPON_FIRE_OFFSET:
+        case WeaponProperty::WEAPON_FIRE_OFFSET:
         {
             CVector* fireOffset = weaponStats->GetFireOffset();
             return CLuaMultiReturn<float, float, float>(fireOffset->fX, fireOffset->fY, fireOffset->fZ);
         }
-        case eWeaponProperty::WEAPON_FLAG_AIM_NO_AUTO:
-        case eWeaponProperty::WEAPON_FLAG_AIM_ARM:
-        case eWeaponProperty::WEAPON_FLAG_AIM_1ST_PERSON:
-        case eWeaponProperty::WEAPON_FLAG_AIM_FREE:
-        case eWeaponProperty::WEAPON_FLAG_MOVE_AND_AIM:
-        case eWeaponProperty::WEAPON_FLAG_MOVE_AND_SHOOT:
-        case eWeaponProperty::WEAPON_FLAG_TYPE_THROW:
-        case eWeaponProperty::WEAPON_FLAG_TYPE_HEAVY:
-        case eWeaponProperty::WEAPON_FLAG_TYPE_CONSTANT:
-        case eWeaponProperty::WEAPON_FLAG_TYPE_DUAL:
-        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD:
-        case eWeaponProperty::WEAPON_FLAG_ANIM_CROUCH:
-        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LOOP:
-        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LONG:
-        case eWeaponProperty::WEAPON_FLAG_SHOT_SLOWS:
-        case eWeaponProperty::WEAPON_FLAG_SHOT_RAND_SPEED:
-        case eWeaponProperty::WEAPON_FLAG_SHOT_ANIM_ABRUPT:
-        case eWeaponProperty::WEAPON_FLAG_SHOT_EXPANDS:
+        case WeaponProperty::WEAPON_FLAG_AIM_NO_AUTO:
+        case WeaponProperty::WEAPON_FLAG_AIM_ARM:
+        case WeaponProperty::WEAPON_FLAG_AIM_1ST_PERSON:
+        case WeaponProperty::WEAPON_FLAG_AIM_FREE:
+        case WeaponProperty::WEAPON_FLAG_MOVE_AND_AIM:
+        case WeaponProperty::WEAPON_FLAG_MOVE_AND_SHOOT:
+        case WeaponProperty::WEAPON_FLAG_TYPE_THROW:
+        case WeaponProperty::WEAPON_FLAG_TYPE_HEAVY:
+        case WeaponProperty::WEAPON_FLAG_TYPE_CONSTANT:
+        case WeaponProperty::WEAPON_FLAG_TYPE_DUAL:
+        case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD:
+        case WeaponProperty::WEAPON_FLAG_ANIM_CROUCH:
+        case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LOOP:
+        case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LONG:
+        case WeaponProperty::WEAPON_FLAG_SHOT_SLOWS:
+        case WeaponProperty::WEAPON_FLAG_SHOT_RAND_SPEED:
+        case WeaponProperty::WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+        case WeaponProperty::WEAPON_FLAG_SHOT_EXPANDS:
         {
             MinClientReqCheck(luaVM, MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used");
             return weaponStats->IsFlagSet(GetWeaponPropertyFlagBit(property));
@@ -840,7 +840,7 @@ std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDef
     return false;
 }
 
-std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State* luaVM, std::variant<int, std::string> weapon, std::variant<int, std::string> weaponSkill, eWeaponProperty property)
+std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State* luaVM, std::variant<int, std::string> weapon, std::variant<int, std::string> weaponSkill, WeaponProperty property)
 {
     eWeaponType weaponType = eWeaponType::WEAPONTYPE_INVALID;
     if (std::holds_alternative<int>(weapon))
@@ -866,85 +866,85 @@ std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponD
 
     switch (property)
     {
-        case eWeaponProperty::WEAPON_WEAPON_RANGE:
+        case WeaponProperty::WEAPON_WEAPON_RANGE:
             return weaponStats->GetWeaponRange();
-        case eWeaponProperty::WEAPON_TARGET_RANGE:
+        case WeaponProperty::WEAPON_TARGET_RANGE:
             return weaponStats->GetTargetRange();
-        case eWeaponProperty::WEAPON_ACCURACY:
+        case WeaponProperty::WEAPON_ACCURACY:
             return weaponStats->GetAccuracy();
-        case eWeaponProperty::WEAPON_FIRING_SPEED:
+        case WeaponProperty::WEAPON_FIRING_SPEED:
             return weaponStats->GetFiringSpeed();
-        case eWeaponProperty::WEAPON_LIFE_SPAN:
+        case WeaponProperty::WEAPON_LIFE_SPAN:
             return weaponStats->GetLifeSpan();
-        case eWeaponProperty::WEAPON_SPREAD:
+        case WeaponProperty::WEAPON_SPREAD:
             return weaponStats->GetSpread();
-        case eWeaponProperty::WEAPON_MOVE_SPEED:
+        case WeaponProperty::WEAPON_MOVE_SPEED:
             return weaponStats->GetMoveSpeed();
-        case eWeaponProperty::WEAPON_REQ_SKILL_LEVEL:
+        case WeaponProperty::WEAPON_REQ_SKILL_LEVEL:
             return weaponStats->GetRequiredStatLevel();
-        case eWeaponProperty::WEAPON_ANIM_LOOP_START:
+        case WeaponProperty::WEAPON_ANIM_LOOP_START:
             return weaponStats->GetWeaponAnimLoopStart();
-        case eWeaponProperty::WEAPON_ANIM_LOOP_STOP:
+        case WeaponProperty::WEAPON_ANIM_LOOP_STOP:
             return weaponStats->GetWeaponAnimLoopStop();
-        case eWeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+        case WeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
             return weaponStats->GetWeaponAnimLoopFireTime();
-        case eWeaponProperty::WEAPON_ANIM2_LOOP_START:
+        case WeaponProperty::WEAPON_ANIM2_LOOP_START:
             return weaponStats->GetWeaponAnim2LoopStart();
-        case eWeaponProperty::WEAPON_ANIM2_LOOP_STOP:
+        case WeaponProperty::WEAPON_ANIM2_LOOP_STOP:
             return weaponStats->GetWeaponAnim2LoopStop();
-        case eWeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+        case WeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
             return weaponStats->GetWeaponAnim2LoopFireTime();
-        case eWeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
+        case WeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
             return weaponStats->GetWeaponAnimBreakoutTime();
-        case eWeaponProperty::WEAPON_RADIUS:
+        case WeaponProperty::WEAPON_RADIUS:
             return weaponStats->GetRadius();
-        case eWeaponProperty::WEAPON_DAMAGE:
+        case WeaponProperty::WEAPON_DAMAGE:
             return weaponStats->GetDamagePerHit();
-        case eWeaponProperty::WEAPON_MAX_CLIP_AMMO:
+        case WeaponProperty::WEAPON_MAX_CLIP_AMMO:
             return weaponStats->GetMaximumClipAmmo();
-        case eWeaponProperty::WEAPON_FLAGS:
+        case WeaponProperty::WEAPON_FLAGS:
             return weaponStats->GetFlags();
-        case eWeaponProperty::WEAPON_ANIM_GROUP:
+        case WeaponProperty::WEAPON_ANIM_GROUP:
             return static_cast<int>(weaponStats->GetAnimGroup());
-        case eWeaponProperty::WEAPON_FIRETYPE:
+        case WeaponProperty::WEAPON_FIRETYPE:
             return weaponStats->GetFireType();
-        case eWeaponProperty::WEAPON_MODEL:
+        case WeaponProperty::WEAPON_MODEL:
             return weaponStats->GetModel();
-        case eWeaponProperty::WEAPON_MODEL2:
+        case WeaponProperty::WEAPON_MODEL2:
             return weaponStats->GetModel2();
-        case eWeaponProperty::WEAPON_SLOT:
+        case WeaponProperty::WEAPON_SLOT:
             return weaponStats->GetSlot();
-        case eWeaponProperty::WEAPON_AIM_OFFSET:
+        case WeaponProperty::WEAPON_AIM_OFFSET:
             return weaponStats->GetAimOffsetIndex();
-        case eWeaponProperty::WEAPON_SKILL_LEVEL:
+        case WeaponProperty::WEAPON_SKILL_LEVEL:
             return weaponStats->GetSkill();
-        case eWeaponProperty::WEAPON_DEFAULT_COMBO:
+        case WeaponProperty::WEAPON_DEFAULT_COMBO:
             return weaponStats->GetDefaultCombo();
-        case eWeaponProperty::WEAPON_COMBOS_AVAILABLE:
+        case WeaponProperty::WEAPON_COMBOS_AVAILABLE:
             return weaponStats->GetCombosAvailable();
-        case eWeaponProperty::WEAPON_FIRE_OFFSET:
+        case WeaponProperty::WEAPON_FIRE_OFFSET:
         {
             CVector* fireOffset = weaponStats->GetFireOffset();
             return CLuaMultiReturn<float, float, float>(fireOffset->fX, fireOffset->fY, fireOffset->fZ);
         }
-        case eWeaponProperty::WEAPON_FLAG_AIM_NO_AUTO:
-        case eWeaponProperty::WEAPON_FLAG_AIM_ARM:
-        case eWeaponProperty::WEAPON_FLAG_AIM_1ST_PERSON:
-        case eWeaponProperty::WEAPON_FLAG_AIM_FREE:
-        case eWeaponProperty::WEAPON_FLAG_MOVE_AND_AIM:
-        case eWeaponProperty::WEAPON_FLAG_MOVE_AND_SHOOT:
-        case eWeaponProperty::WEAPON_FLAG_TYPE_THROW:
-        case eWeaponProperty::WEAPON_FLAG_TYPE_HEAVY:
-        case eWeaponProperty::WEAPON_FLAG_TYPE_CONSTANT:
-        case eWeaponProperty::WEAPON_FLAG_TYPE_DUAL:
-        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD:
-        case eWeaponProperty::WEAPON_FLAG_ANIM_CROUCH:
-        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LOOP:
-        case eWeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LONG:
-        case eWeaponProperty::WEAPON_FLAG_SHOT_SLOWS:
-        case eWeaponProperty::WEAPON_FLAG_SHOT_RAND_SPEED:
-        case eWeaponProperty::WEAPON_FLAG_SHOT_ANIM_ABRUPT:
-        case eWeaponProperty::WEAPON_FLAG_SHOT_EXPANDS:
+        case WeaponProperty::WEAPON_FLAG_AIM_NO_AUTO:
+        case WeaponProperty::WEAPON_FLAG_AIM_ARM:
+        case WeaponProperty::WEAPON_FLAG_AIM_1ST_PERSON:
+        case WeaponProperty::WEAPON_FLAG_AIM_FREE:
+        case WeaponProperty::WEAPON_FLAG_MOVE_AND_AIM:
+        case WeaponProperty::WEAPON_FLAG_MOVE_AND_SHOOT:
+        case WeaponProperty::WEAPON_FLAG_TYPE_THROW:
+        case WeaponProperty::WEAPON_FLAG_TYPE_HEAVY:
+        case WeaponProperty::WEAPON_FLAG_TYPE_CONSTANT:
+        case WeaponProperty::WEAPON_FLAG_TYPE_DUAL:
+        case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD:
+        case WeaponProperty::WEAPON_FLAG_ANIM_CROUCH:
+        case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LOOP:
+        case WeaponProperty::WEAPON_FLAG_ANIM_RELOAD_LONG:
+        case WeaponProperty::WEAPON_FLAG_SHOT_SLOWS:
+        case WeaponProperty::WEAPON_FLAG_SHOT_RAND_SPEED:
+        case WeaponProperty::WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+        case WeaponProperty::WEAPON_FLAG_SHOT_EXPANDS:
         {
             MinClientReqCheck(luaVM, MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used");
             return weaponStats->IsFlagSet(GetWeaponPropertyFlagBit(property));

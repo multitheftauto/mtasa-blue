@@ -5,7 +5,7 @@
  *  FILE:        core/CMainMenu.h
  *  PURPOSE:     Header file for main menu graphical user interface class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -89,7 +89,7 @@ private:
     bool OnResumeButtonClick(CGUIElement* pElement);
     bool OnBrowseServersButtonClick(CGUIElement* pElement);
     bool OnHostGameButtonClick();
-    bool OnDisconnectButtonClick(CGUIElement* pElement);
+    bool OnDisconnectButtonClick();
     bool OnEditorButtonClick();
     bool OnSettingsButtonClick(CGUIElement* pElement);
     bool OnAboutButtonClick(CGUIElement* pElement);

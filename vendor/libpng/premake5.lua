@@ -1,25 +1,24 @@
 project "libpng"
-	language "C++"
-	kind "StaticLib"
-	targetname "libpng"
+    kind "StaticLib"
+    language "C"
+    architecture "x86"
+    systemversion "latest"
 
-	includedirs { "../zlib" }
-	defines { "NDEBUG", "PNG_SETJMP_NOT_SUPPORTED", "WIN32_LEAN_AND_MEAN" }
+    targetdir "bin"
+    objdir "obj"
 
-	vpaths {
-		["Headers/*"] = "**.h",
-		["Sources/*"] = "**.c",
-		["*"] = "premake5.lua"
-	}
+    files {
+        "*.c",
+        "*.h"
+    }
 
-	files {
-		"premake5.lua",
-		"*.h",
-		"*.c"
-	}
+    includedirs {
+        "../zlib"
+    }
 
-	filter "architecture:not x86"
-		flags { "ExcludeFromBuild" }
-	
-	filter "system:not windows"
-		flags { "ExcludeFromBuild" }
+    defines {
+        "_CRT_SECURE_NO_WARNINGS",
+        "WIN32_LEAN_AND_MEAN",
+        "PNG_NO_MMX_CODE",
+        "PNG_SETJMP_NOT_SUPPORTED"
+    }

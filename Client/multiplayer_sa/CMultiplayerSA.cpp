@@ -1595,6 +1595,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_ObjectStreamerOptimization();
 
     InitHooks_Postprocess();
+    InitHooks_Explosions();
+    InitHooks_Tasks();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -6441,7 +6443,12 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
     TIMING_CHECKPOINT("+RemovePointerToBuilding");
     RemovePointerToBuilding();
     StorePointerToBuilding();
-    RemoveObjectIfNeeded();
+
+    // pLODInterface contains a dummy object's pointer
+    // And as follows from CPopulation::ConvertToDummyObject this pointer can be nullptr
+    if (pLODInterface)
+        RemoveObjectIfNeeded();
+
     TIMING_CHECKPOINT("-RemovePointerToBuilding");
     _asm
     {
@@ -6625,6 +6632,25 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter(bool bSet)
         MemCpy((char*)0x64BC0D, originalCode, 6);
     else
         MemSet((char*)0x64BC0D, 0x90, 6);
+}
+
+bool CMultiplayerSA::IsVehicleEngineAutoStartEnabled() const noexcept
+{
+    return *(unsigned char*)0x64BC03 == 0x75;
+}
+
+void CMultiplayerSA::SetVehicleEngineAutoStartEnabled(bool enabled)
+{
+    if (enabled)
+    {
+        MemCpy((void*)0x64BC03, "\x75\x05\x80\xC9\x10", 5);
+        MemCpy((void*)0x6C4EA9, "\x8A\x86\x28\x04", 4);
+    }
+    else
+    {
+        MemSet((void*)0x64BC03, 0x90, 5);                          // prevent vehicle engine from turning on (driver enter)
+        MemCpy((void*)0x6C4EA9, "\xE9\x15\x03\x00", 4);            // prevent aircraft engine from turning off (driver exit)
+    }
 }
 
 // Storage

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskSA.cpp
  *  PURPOSE:     Base game task
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

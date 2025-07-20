@@ -5,7 +5,7 @@
  *  FILE:        core/CConnectManager.cpp
  *  PURPOSE:     Manager for connecting to servers
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -487,7 +487,7 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
         SHttpRequestOptions options;
         options.uiConnectionAttempts = 1;
         options.uiConnectTimeoutMs = uiTimeOut;
-        SString strDummyUrl("http://%s:%d/mta_client_firewall_probe/", inet_ntoa(Address), usHttpPort);
+        SString strDummyUrl("https://%s:%d/mta_client_firewall_probe/", inet_ntoa(Address), usHttpPort);
         g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
     if (usHttpPort == 0 || bHighPriority)
@@ -496,7 +496,7 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
         SHttpRequestOptions options;
         options.uiConnectionAttempts = 1;
         options.uiConnectTimeoutMs = uiTimeOut;
-        SString strDummyUrl("http://%s/mta_client_firewall_probe/", inet_ntoa(Address));
+        SString strDummyUrl("https://%s/mta_client_firewall_probe/", inet_ntoa(Address));
         g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
 }

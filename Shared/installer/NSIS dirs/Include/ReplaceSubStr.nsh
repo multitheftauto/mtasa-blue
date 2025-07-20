@@ -2,7 +2,7 @@
 ; "Another String Replace (and Slash/BackSlash Converter)" 
 ;
 ; for more information please see :
-; http://nsis.sourceforge.net/Another_String_Replace_(and_Slash/BackSlash_Converter)
+; https://nsis.sourceforge.net/Another_String_Replace_(and_Slash/BackSlash_Converter)
  
 Var MODIFIED_STR
  
