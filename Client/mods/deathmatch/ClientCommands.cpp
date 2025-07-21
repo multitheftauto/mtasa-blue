@@ -47,7 +47,7 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
 
         // Give scripts a chance to cancel this command before processing
         CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
-        if (localPlayer != nullptr)
+        if (localPlayer)
         {
             CLuaArguments cancelArguments;
             cancelArguments.PushString(szCommandBufferPointer);
