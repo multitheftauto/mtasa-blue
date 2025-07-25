@@ -1,6 +1,6 @@
 /*
 	BASSmix 2.4 C/C++ header file
-	Copyright (c) 2005-2022 Un4seen Developments Ltd.
+	Copyright (c) 2005-2025 Un4seen Developments Ltd.
 
 	See the BASSMIX.CHM file for more detailed documentation
 */
@@ -46,6 +46,8 @@ extern "C" {
 #define BASS_MIXER_CHAN_LIMIT		0x4000	// limit mixer processing to the amount available from this source
 #define BASS_MIXER_CHAN_MATRIX		0x10000	// matrix mixing
 #define BASS_MIXER_CHAN_PAUSE		0x20000	// don't process the source
+#define BASS_MIXER_CHAN_AUTOFREE	0x40000 // automatically free the source when it ends
+#define BASS_MIXER_CHAN_RAMPOUT		0x80000	// ramp-out when pausing
 #define BASS_MIXER_CHAN_DOWNMIX		0x400000 // downmix to stereo/mono
 #define BASS_MIXER_CHAN_NORAMPIN	0x800000 // don't ramp-in the start
 #define BASS_MIXER_BUFFER		BASS_MIXER_CHAN_BUFFER
@@ -89,6 +91,8 @@ typedef struct {
 #define BASS_SYNC_MIXER_ENVELOPE		0x10200
 #define BASS_SYNC_MIXER_ENVELOPE_NODE	0x10201
 #define BASS_SYNC_MIXER_QUEUE			0x10202
+#define BASS_SYNC_MIXER_STALL			0x10203
+#define BASS_SYNC_MIXER_RESUME			0x10204
 
 // Additional BASS_Mixer_ChannelSetPosition flag
 #define BASS_POS_MIXER_RESET	0x10000 // flag: clear mixer's playback buffer
@@ -119,6 +123,7 @@ BOOL BASSMIXDEF(BASS_Mixer_ChannelGetLevelEx)(DWORD handle, float *levels, float
 DWORD BASSMIXDEF(BASS_Mixer_ChannelGetData)(DWORD handle, void *buffer, DWORD length);
 HSYNC BASSMIXDEF(BASS_Mixer_ChannelSetSync)(DWORD handle, DWORD type, QWORD param, SYNCPROC *proc, void *user);
 BOOL BASSMIXDEF(BASS_Mixer_ChannelRemoveSync)(DWORD channel, HSYNC sync);
+BOOL BASSMIXDEF(BASS_Mixer_ChannelSetMap)(DWORD handle, int *chanmap);
 BOOL BASSMIXDEF(BASS_Mixer_ChannelSetMatrix)(DWORD handle, const void *matrix);
 BOOL BASSMIXDEF(BASS_Mixer_ChannelSetMatrixEx)(DWORD handle, const void *matrix, float time);
 BOOL BASSMIXDEF(BASS_Mixer_ChannelGetMatrix)(DWORD handle, void *matrix);
