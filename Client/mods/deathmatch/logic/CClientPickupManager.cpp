@@ -15,7 +15,7 @@ using std::list;
 
 static const SFixedArray<unsigned short, 47> g_usWeaponModels = {{
     0,   331, 333, 334, 335, 336, 337, 338, 339, 341,            // 9
-    321, 322, 323, 0,   325, 326, 342, 343, 344, 0,              // 19
+    321, 322, 323, 324, 325, 326, 342, 343, 344, 0,              // 19
     0,   0,   346, 347, 348, 349, 350, 351, 352, 353,            // 29
     355, 356, 372, 357, 358, 359, 360, 361, 362, 363,            // 39
     364, 365, 366, 367, 368, 369, 371                            // 46
@@ -92,7 +92,7 @@ bool CClientPickupManager::IsValidPickupID(unsigned short usPickupID)
 
 bool CClientPickupManager::IsValidWeaponID(unsigned short usWeaponID)
 {
-    return (usWeaponID > 0 && usWeaponID != 13 && usWeaponID != 19 && usWeaponID != 20 && usWeaponID != 21 && usWeaponID <= 46);
+    return (usWeaponID > 0 && usWeaponID != 19 && usWeaponID != 20 && usWeaponID != 21 && usWeaponID <= 46);
 }
 
 bool CClientPickupManager::IsPickupLimitReached()
