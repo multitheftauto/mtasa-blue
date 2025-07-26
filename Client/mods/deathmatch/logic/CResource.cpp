@@ -73,7 +73,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_pResourceIMGRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "imgroot");
     m_pResourceIMGRoot->MakeSystemEntity();
 
-    m_strResourceDirectoryPath = SString("%s/resources/%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName);
+    m_strResourceDirectoryPath = SString("%s/resources/%s/%s", g_pClientGame->GetFileCacheRoot(), *GetServerCacheId(), *m_strResourceName);
     m_strResourcePrivateDirectoryPath = PathJoin(CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(), m_strResourceName);
 
     m_strResourcePrivateDirectoryPathOld = CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(true);
@@ -174,7 +174,15 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
                                                   CChecksum serverChecksum, bool bAutoDownload)
 {
     // Create the resource file and add it to the list
-    SString strBuffer("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
+    SString strBuffer("%s\\resources\\%s\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *GetServerCacheId(), *m_strResourceName, szFileName);
+
+    // Check for legacy resource and migrate if found
+    SString strLegacyPath("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
+    if (!FileExists(strBuffer) && FileExists(strLegacyPath))
+    {
+        MakeSureDirExists(strBuffer);
+        FileCopy(strLegacyPath, strBuffer);
+    }
 
     // Reject duplicates
     if (g_pClientGame->GetResourceManager()->IsResourceFile(strBuffer))
@@ -195,7 +203,15 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
 CDownloadableResource* CResource::AddConfigFile(const char* szFileName, uint uiDownloadSize, CChecksum serverChecksum)
 {
     // Create the config file and add it to the list
-    SString strBuffer("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
+    SString strBuffer("%s\\resources\\%s\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *GetServerCacheId(), *m_strResourceName, szFileName);
+
+    // Check for legacy resource and migrate if found
+    SString strLegacyPath("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
+    if (!FileExists(strBuffer) && FileExists(strLegacyPath))
+    {
+        MakeSureDirExists(strBuffer);
+        FileCopy(strLegacyPath, strBuffer);
+    }
 
     // Reject duplicates
     if (g_pClientGame->GetResourceManager()->IsResourceFile(strBuffer))
@@ -419,6 +435,34 @@ void CResource::ShowCursor(bool bShow, bool bToggleControls)
         g_pCore->ForceCursorVisible(m_iShowingCursor > 0, bToggleControls);
         g_pClientGame->SetCursorEventsEnabled(m_iShowingCursor > 0);
     }
+}
+
+SString CResource::GetServerCacheId()
+{
+    static SString s_strCachedServerId;
+    static SString s_strLastPrivateDir;
+    
+    SString strPrivateDir = CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory();
+    if (strPrivateDir != s_strLastPrivateDir)
+    {
+        s_strLastPrivateDir = strPrivateDir;
+        s_strCachedServerId.clear();
+    }
+    
+    if (s_strCachedServerId.empty())
+    {
+        if (!strPrivateDir.empty())
+        {
+            size_t slashPos = strPrivateDir.find_last_of("/\\");
+            if (slashPos != SString::npos)
+                s_strCachedServerId = strPrivateDir.substr(slashPos + 1);
+        }
+        
+        if (s_strCachedServerId.empty())
+            s_strCachedServerId = "default";
+    }
+    
+    return s_strCachedServerId;
 }
 
 SString CResource::GetResourceDirectoryPath(eAccessType accessType, const SString& strMetaPath)
