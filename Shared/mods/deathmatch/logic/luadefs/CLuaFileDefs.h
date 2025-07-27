@@ -31,6 +31,8 @@ private:
     LUA_DECLARE(fileRead);
     LUA_DECLARE(fileWrite);
     static std::optional<std::string> fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents);
+    static std::optional<std::string> fileGetHash(lua_State* const luaVM, CScriptFile* scriptFile, HashFunctionType hashFunction,
+                                                  std::optional<std::unordered_map<std::string, std::string>> options);
 
     LUA_DECLARE(fileGetPos);
     LUA_DECLARE(fileGetSize);
