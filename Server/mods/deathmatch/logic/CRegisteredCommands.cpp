@@ -18,6 +18,8 @@
 #include "CClient.h"
 #include "CConsoleClient.h"
 #include "CPlayer.h"
+#include "CGame.h"
+#include "CScriptDebugging.h"
 
 CRegisteredCommands::CRegisteredCommands(CAccessControlListManager* pACLManager)
 {
@@ -35,11 +37,17 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     assert(pLuaMain);
     assert(szKey);
 
+    if (CommandExists(szKey, NULL))
+    {
+        g_pGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
+        return false;
+    }
+
     // Check if we already have this key and handler
     SCommand* pCommand = GetCommand(szKey, pLuaMain);
 
     if (pCommand && iLuaFunction == pCommand->iLuaFunction)
-        return false;
+        return false;   
 
     // Create the entry
     pCommand = new SCommand;

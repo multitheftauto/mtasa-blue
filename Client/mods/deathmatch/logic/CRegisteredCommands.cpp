@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClientGame.h"
 
 using std::list;
 
@@ -26,6 +27,12 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
 {
     assert(pLuaMain);
     assert(szKey);
+
+    if (CommandExists(szKey, NULL))
+    {
+        g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
+        return false;
+    }
 
     // Check if we already have this key and handler
     SCommand* pCommand = GetCommand(szKey, pLuaMain);
