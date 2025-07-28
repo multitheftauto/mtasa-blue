@@ -30,8 +30,19 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
 
     if (CommandExists(szKey, NULL))
     {
-        g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
-        return false;
+        CClientGame::eMultiCommandHandlerPolicy allowMultiHandlers = g_pClientGame->GetAllowMultiCommandHandlers();
+        
+        // If not allowing duplicate handlers, show warning and block
+        if (allowMultiHandlers == CClientGame::MULTI_COMMAND_DISABLED)
+        {
+            g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
+            return false;
+        }
+        // If allowing with warning (default), log warning and proceed
+        else if (allowMultiHandlers == CClientGame::MULTI_COMMAND_ENABLED)
+        {
+            g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
+        }
     }
 
     // Check if we already have this key and handler

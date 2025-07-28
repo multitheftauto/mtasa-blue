@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClientGame.h"
 #include <game/CClock.h>
 #include <game/CFireManager.h>
 #include <game/CGarage.h>
@@ -22,6 +23,13 @@
 #include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
+
+
+enum eMultiCommandHandlerPolicy
+{
+    BLOCK_DUPLICATE_HANDLERS,
+    ALLOW_MULTI_HANDLERS
+};
 
 using std::list;
 
@@ -5566,6 +5574,10 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
     uchar ucAllowShotgunDamageFix = 0;
     if (bitStream.Can(eBitStreamVersion::ShotgunDamageFix))
         bitStream.Read(ucAllowShotgunDamageFix);
+
+    uchar ucAllowMultiCommandHandlers = 1;
+    bitStream.Read(ucAllowMultiCommandHandlers);
+    g_pClientGame->SetAllowMultiCommandHandlers(static_cast<CClientGame::eMultiCommandHandlerPolicy>(ucAllowMultiCommandHandlers));
 
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = (ucUseAltPulseOrder != 0);

@@ -150,6 +150,7 @@ public:
 
     int GetPlayerTriggeredEventInterval() const { return m_iPlayerTriggeredEventIntervalMs; }
     int GetMaxPlayerTriggeredEventsPerInterval() const { return m_iMaxPlayerTriggeredEventsPerInterval; }
+    int GetAllowMultiCommandHandlers() const { return m_iAllowMultiCommandHandlers; }
 
 private:
     void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, const char* szConsoleHelpText);
@@ -235,4 +236,5 @@ private:
     bool                       m_elementDataWhitelisted;
     bool                       m_checkDuplicateSerials;
     int                        m_checkResourceClientFiles;
+    int                        m_iAllowMultiCommandHandlers;
 };

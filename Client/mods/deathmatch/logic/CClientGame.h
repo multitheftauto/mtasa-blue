@@ -192,6 +192,12 @@ public:
         QUIT_CONNECTION_DESYNC,
         QUIT_TIMEOUT,
     };
+    
+    enum eMultiCommandHandlerPolicy
+    {
+        MULTI_COMMAND_DISABLED = 0,
+        MULTI_COMMAND_ENABLED = 1
+    };
     enum
     {
         GLITCH_QUICKRELOAD,
@@ -469,6 +475,9 @@ public:
     void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
+    
+    void SetAllowMultiCommandHandlers(eMultiCommandHandlerPolicy policy);
+    eMultiCommandHandlerPolicy GetAllowMultiCommandHandlers() const;
 
 private:
     // CGUI Callbacks
@@ -871,6 +880,8 @@ private:
     AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
     // Key is the task and value is the CClientPed*
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
+    
+    eMultiCommandHandlerPolicy m_eAllowMultiCommandHandlers;
     
     long long m_timeLastDiscordStateUpdate;
 };

@@ -120,6 +120,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
+    m_eAllowMultiCommandHandlers = MULTI_COMMAND_ENABLED;
 
     m_bIsPlayingBack = false;
     m_bFirstPlaybackFrame = false;
@@ -6135,6 +6136,16 @@ bool CClientGame::SetBirdsEnabled(bool bEnabled)
 bool CClientGame::GetBirdsEnabled()
 {
     return m_bBirdsEnabled;
+}
+
+void CClientGame::SetAllowMultiCommandHandlers(CClientGame::eMultiCommandHandlerPolicy policy)
+{
+    m_eAllowMultiCommandHandlers = policy;
+}
+
+CClientGame::eMultiCommandHandlerPolicy CClientGame::GetAllowMultiCommandHandlers() const
+{
+    return m_eAllowMultiCommandHandlers;
 }
 
 void CClientGame::SetWeaponRenderEnabled(bool enabled)
