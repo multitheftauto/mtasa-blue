@@ -231,12 +231,16 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_MovementStateNames[MOVEMENTSTATE_JOG] = "jog";
     m_MovementStateNames[MOVEMENTSTATE_SPRINT] = "sprint";
     m_MovementStateNames[MOVEMENTSTATE_CROUCH] = "crouch";
-    // These two are inactive for now
     m_MovementStateNames[MOVEMENTSTATE_CRAWL] = "crawl";
     m_MovementStateNames[MOVEMENTSTATE_ROLL] = "roll";
     m_MovementStateNames[MOVEMENTSTATE_JUMP] = "jump";
     m_MovementStateNames[MOVEMENTSTATE_FALL] = "fall";
     m_MovementStateNames[MOVEMENTSTATE_CLIMB] = "climb";
+    m_MovementStateNames[MOVEMENTSTATE_SWIM] = "swim";
+    m_MovementStateNames[MOVEMENTSTATE_WALK_TO_POINT] = "walk_to_point";
+    m_MovementStateNames[MOVEMENTSTATE_ASCENT_JETPACK] = "ascent_jetpack";
+    m_MovementStateNames[MOVEMENTSTATE_DESCENT_JETPACK] = "descent_jetpack";
+    m_MovementStateNames[MOVEMENTSTATE_JETPACK] = "jetpack_flying";
 
     // Create the player model
     if (m_bIsLocalPlayer)
@@ -2422,43 +2426,52 @@ eMovementState CClientPed::GetMovementState()
         const char* szComplexTaskName = GetTaskManager()->GetActiveTask()->GetTaskName();
         const char* szSimpleTaskName = GetTaskManager()->GetSimplestActiveTask()->GetTaskName();
 
-        // Is he climbing?
-        if (strcmp(szSimpleTaskName, "TASK_SIMPLE_CLIMB") == 0)
+        // Check tasks
+        if (strcmp(szSimpleTaskName, "TASK_SIMPLE_CLIMB") == 0) // Is he climbing?
             return MOVEMENTSTATE_CLIMB;
-
-        // Is he jumping?
-        else if (strcmp(szComplexTaskName, "TASK_COMPLEX_JUMP") == 0)
+        else if (strcmp(szComplexTaskName, "TASK_COMPLEX_JUMP") == 0) // Is he jumping?
             return MOVEMENTSTATE_JUMP;
+        else if (strcmp(szSimpleTaskName, "TASK_SIMPLE_GO_TO_POINT") == 0) // Entering vehicle (walking to the doors)?
+            return MOVEMENTSTATE_WALK_TO_POINT;
+        else if (strcmp(szSimpleTaskName, "TASK_SIMPLE_SWIM") == 0) // Is he swimming?
+            return MOVEMENTSTATE_SWIM;
+        else if (strcmp(szSimpleTaskName, "TASK_SIMPLE_JETPACK") == 0) // Is he flying?
+        {
+            if (cs.ButtonCross != 0)
+                return MOVEMENTSTATE_ASCENT_JETPACK;
+            else if (cs.ButtonSquare != 0)
+                return MOVEMENTSTATE_DESCENT_JETPACK;
+            else
+                return MOVEMENTSTATE_JETPACK;
+        }
 
-        // Is he falling?
-        else if (!IsOnGround() && !GetContactEntity())
+        // Check movement state
+        if (!IsOnGround() && !GetContactEntity() && !m_pPlayerPed->IsStandingOnEntity() && !m_pPlayerPed->IsInWater() && (strcmp(szSimpleTaskName, "TASK_SIMPLE_IN_AIR") == 0 || strcmp(szSimpleTaskName, "TASK_SIMPLE_FALL") == 0)) // Is he falling?
             return MOVEMENTSTATE_FALL;
 
-        // Grab his controller state
-        bool bWalkKey = false;
-        if (GetType() == CCLIENTPLAYER)
-            bWalkKey = CClientPad::GetControlState("walk", cs, true);
-        else
-            m_Pad.GetControlState("walk", bWalkKey);
+        // Sometimes it returns 'fall' or 'walk', so it's better to return false instead
+        if (IsEnteringVehicle() || IsLeavingVehicle())
+            return MOVEMENTSTATE_UNKNOWN;
 
-        // Is he standing up?
         if (!IsDucked())
         {
-            unsigned int iRunState = m_pPlayerPed->GetRunState();
+            bool walking = false;
+            if (GetType() == CCLIENTPLAYER)
+                walking = CClientPad::GetControlState("walk", cs, true);
+            else
+                m_Pad.GetControlState("walk", walking);
 
-            // Is he moving the contoller at all?
-            if (iRunState == 1 && cs.LeftStickX == 0 && cs.LeftStickY == 0)
-                return MOVEMENTSTATE_STAND;
-
-            // Is he either pressing the walk key, or has run state 1?
-            if (iRunState == 1 || bWalkKey && iRunState == 6)
-                return MOVEMENTSTATE_WALK;
-            else if (iRunState == 4)
-                return MOVEMENTSTATE_POWERWALK;
-            else if (iRunState == 6)
-                return MOVEMENTSTATE_JOG;
-            else if (iRunState == 7)
-                return MOVEMENTSTATE_SPRINT;
+            switch (m_pPlayerPed->GetMoveState())
+            {
+                case PedMoveState::PEDMOVE_STILL:
+                    return MOVEMENTSTATE_STAND;
+                case PedMoveState::PEDMOVE_WALK:
+                    return (cs.LeftStickX == 0 && cs.LeftStickY == 0) ? MOVEMENTSTATE_STAND : MOVEMENTSTATE_WALK;
+                case PedMoveState::PEDMOVE_SPRINT:
+                    return MOVEMENTSTATE_SPRINT;
+                case PedMoveState::PEDMOVE_RUN:
+                    return walking ? MOVEMENTSTATE_WALK : MOVEMENTSTATE_JOG; // FileEX: It should be MOVEMENTSTATE_RUN, but we're keeping JOG for backward compatibility (PEDMOVE_JOG is unused in SA)
+            }
         }
         else
         {
@@ -2466,9 +2479,10 @@ eMovementState CClientPed::GetMovementState()
             if (cs.LeftStickX == 0 && cs.LeftStickY == 0)
                 return MOVEMENTSTATE_CROUCH;
             else
-                return MOVEMENTSTATE_CRAWL;
+                return (cs.LeftStickX != 0 && cs.RightShoulder1 != 0) ? MOVEMENTSTATE_ROLL : MOVEMENTSTATE_CRAWL;
         }
     }
+
     return MOVEMENTSTATE_UNKNOWN;
 }
 
@@ -6098,7 +6112,7 @@ bool CClientPed::ShouldBeStealthAiming()
                 {
                     // We need to be either crouched, walking or standing
                     SBindableGTAControl* pWalkControl = pKeyBinds->GetBindableFromControl("walk");
-                    if (m_pPlayerPed->GetRunState() == 1 || m_pPlayerPed->GetRunState() == 4 || pWalkControl && pWalkControl->bState)
+                    if (m_pPlayerPed->GetMoveState() == PedMoveState::PEDMOVE_STILL || m_pPlayerPed->GetMoveState() == PedMoveState::PEDMOVE_WALK || pWalkControl && pWalkControl->bState)
                     {
                         // Do we have a target ped?
                         CClientPed* pTargetPed = GetTargetedPed();
