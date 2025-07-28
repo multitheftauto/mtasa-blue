@@ -2276,8 +2276,6 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                     }
                 }
             }
-
-            Ped.m_AnimationCache.startTime = GetTimestamp();
         }
         else
         {
