@@ -253,6 +253,7 @@ public:
     virtual void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra) = 0;
 
     virtual CEntity* GetContactEntity() const = 0;
+    virtual bool     IsStandingOnEntity() const = 0;
 
     virtual int GetRunState() const = 0;
 

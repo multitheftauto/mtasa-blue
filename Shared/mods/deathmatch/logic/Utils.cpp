@@ -1107,3 +1107,23 @@ CVector ConvertEulerRotationOrder(const CVector& a_vRotation, eEulerRotationOrde
         return a_vRotation;
     }
 }
+
+bool approximatelyEqual(float a, float b, float epsilon)
+{
+    return std::fabs(a - b) <= std::max(std::fabs(a), std::fabs(b)) * epsilon;
+}
+
+bool essentiallyEqual(float a, float b, float epsilon)
+{
+    return std::fabs(a - b) <= std::min(std::fabs(a), std::fabs(b)) * epsilon;
+}
+
+bool definitelyGreaterThan(float a, float b, float epsilon)
+{
+    return (a - b) > std::max(std::fabs(a), std::fabs(b)) * epsilon;
+}
+
+bool definitelyLessThan(float a, float b, float epsilon)
+{
+    return (b - a) > std::max(std::fabs(a), std::fabs(b)) * epsilon;
+}

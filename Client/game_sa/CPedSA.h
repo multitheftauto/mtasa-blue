@@ -421,6 +421,7 @@ public:
     void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra = 6) override;
 
     CEntity* GetContactEntity() const override;
+    bool     IsStandingOnEntity() const override { return GetPedInterface()->pContactEntity != nullptr; };
 
     int GetRunState() const override { return GetPedInterface()->moveState; }
 
