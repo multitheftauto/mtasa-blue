@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-27 23:26+0000\n"
-"PO-Revision-Date: 2025-07-27 23:31\n"
+"PO-Revision-Date: 2025-07-28 04:53\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -505,7 +505,7 @@ msgstr "** Crashul a fost provocat de o eroare a driverului grafic **\n\n"
 
 #: Client/loader/CInstallManager.cpp:441
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr ""
+msgstr "** Out of memory - acest crash a fost cauzat de memorie insuficientă sau fragmentată. **"
 
 #: Client/loader/CInstallManager.cpp:543
 msgid "Install updated MTA:SA files"
