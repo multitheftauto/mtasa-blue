@@ -608,6 +608,10 @@ enum class eBitStreamVersion : unsigned short
     // 2025-01-10
     WorldSpecialProperty_FlyingComponents,
 
+    // Add isVehicleNitroActivated and getVehicleNitroLevel Server side
+    // 2025-01-16
+    IsVehicleNitroActivated_Serverside,
+    
     // Ped's camera synchronization
     // 2025-01-29
     PedSync_CameraRotation,

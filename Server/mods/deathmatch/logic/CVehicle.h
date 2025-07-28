@@ -400,6 +400,11 @@ public:
     bool IsOnFire() const noexcept override { return m_onFire; }
     void SetOnFire(bool onFire) noexcept override { m_onFire = onFire; }
 
+    void SetNitroLevel(float level) noexcept { m_nitroLevel = level; }
+    float GetNitroLevel() const noexcept { return m_nitroLevel; }
+    bool  IsNitroActivated() const noexcept;
+    bool  IsNitroInstalled() const noexcept;
+
     void StopIdleTimer();
     void RestartIdleTimer();
     bool IsIdleTimerRunning();
@@ -495,6 +500,7 @@ private:
     unsigned char m_ucVariant2;
 
     bool m_onFire;
+    float m_nitroLevel {0.0f};
 
     CTickCount m_LastPushedTime;
     CVector    m_vecStationaryCheckPosition;

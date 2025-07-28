@@ -128,6 +128,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleSirenParams", GetVehicleSirenParams},
         {"setVehiclePlateText", SetVehiclePlateText},
         {"setVehicleNitroActivated", ArgumentParser<SetVehicleNitroActivated>},
+        {"isVehicleNitroActivated", ArgumentParser<IsVehicleNitroActivated>},
+        {"getVehicleNitroLevel", ArgumentParser<GetVehicleNitroLevel>},
     };
 
     // Add functions
@@ -3059,4 +3061,23 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
 
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
     return true;
+}
+
+ bool CLuaVehicleDefs::IsVehicleNitroActivated(CVehicle* vehicle) noexcept
+{
+   return vehicle->IsNitroActivated();
+}
+
+std::variant<float, bool> CLuaVehicleDefs::GetVehicleNitroLevel(CVehicle* vehicle) noexcept
+{
+
+    if (!vehicle->IsNitroInstalled())
+        return false;
+
+    float level = vehicle->GetNitroLevel();
+
+    if (level < 0)
+        level = 1 + level;
+
+    return level;
 }

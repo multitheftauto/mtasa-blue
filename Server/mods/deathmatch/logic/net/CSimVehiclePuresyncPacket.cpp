@@ -254,6 +254,16 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
             m_Cache.isOnFire = BitStream.ReadBit();
 
+        if (BitStream.Can(eBitStreamVersion::IsVehicleNitroActivated_Serverside))
+        {
+             float vehicleNitro;
+             if (!BitStream.Read(vehicleNitro))
+                 return false;
+
+             m_Cache.vehNitroLevel = vehicleNitro;
+        }
+         
+
         // Success
         return true;
     }
@@ -423,6 +433,10 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 
         if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
             BitStream.WriteBit(m_Cache.isOnFire);
+
+
+        if (BitStream.Can(eBitStreamVersion::IsVehicleNitroActivated_Serverside))
+            BitStream.Write(m_Cache.vehNitroLevel);
 
         // Success
         return true;
