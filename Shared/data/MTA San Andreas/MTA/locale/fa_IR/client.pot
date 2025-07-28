@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-27 23:26+0000\n"
-"PO-Revision-Date: 2025-07-27 23:31\n"
+"PO-Revision-Date: 2025-07-28 09:52\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -645,7 +645,7 @@ msgstr "خطا در بارگذاری %s ماژول! (%s)"
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "نسخه نصبی جدید %s شناسایی شد.\n\n"
-"آیا میخواهید تنظیمات خود را از %s بازیابی کنید؟"
+"آیا میخواهید تنظیمات خود را از %s بازیابی کنید ؟"
 
 #: Client/loader/Utils.cpp:1538
 #, c-format
@@ -3152,7 +3152,7 @@ msgstr "جت پک سواری در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Literally on fire in"
-msgstr "به معنای واقعی کلمه در حال سوختن"
+msgstr "به معنای واقعی کلمه درحال سوختن"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Burning up in"
@@ -3238,7 +3238,7 @@ msgstr "بررسی MTA Client با شکست مواجه شد!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5642
 msgid "In a ditch"
-msgstr "در حفره"
+msgstr "توی یه گودال"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5642
 msgid "En-route to hospital"
