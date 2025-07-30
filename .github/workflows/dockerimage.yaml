@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - master
+    - release/1.6.0
     paths: 
     - '.github/workflows/build.yaml'
     - '.github/workflows/dockerimage.yaml'
@@ -26,4 +26,4 @@ jobs:
       with:
         push: true
         context: utils/docker
-        tags: ghcr.io/multitheftauto/mtasa-blue-build:latest
+        tags: ghcr.io/multitheftauto/mtasa-blue-build:1.6.0
