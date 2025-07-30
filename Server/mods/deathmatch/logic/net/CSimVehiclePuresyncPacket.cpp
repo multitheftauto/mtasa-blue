@@ -55,10 +55,7 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
 
         // Read out the remote model
-        if (BitStream.Version() >= 0x05F)
-            BitStream.Read(m_Cache.iModelID);
-        else
-            m_Cache.iModelID = m_usVehicleGotModel;
+        BitStream.Read(m_Cache.iModelID);
 
         // Read out its position
         SPositionSync position(false);
@@ -166,25 +163,6 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
         }
 
-        // Read Damage info, but do not store, as we do not relay this info
-        if (BitStream.Version() >= 0x047)
-        {
-            if (BitStream.ReadBit() == true)
-            {
-                ElementID DamagerID;
-                if (!BitStream.Read(DamagerID))
-                    return false;
-
-                SWeaponTypeSync weaponType;
-                if (!BitStream.Read(&weaponType))
-                    return false;
-
-                SBodypartSync bodyPart;
-                if (!BitStream.Read(&bodyPart))
-                    return false;
-            }
-        }
-
         // Player health
         SPlayerHealthSync health;
         if (!BitStream.Read(&health))
@@ -213,7 +191,7 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             if (m_Cache.flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo(slot.data.uiSlot))
             {
                 // Read the ammo states
-                SWeaponAmmoSync ammo(m_ucPlayerGotWeaponType, BitStream.Version() >= 0x44, true);
+                SWeaponAmmoSync ammo(m_ucPlayerGotWeaponType, true, true);
                 if (!BitStream.Read(&ammo))
                     return false;
                 m_Cache.usAmmoInClip = ammo.data.usAmmoInClip;
@@ -251,8 +229,7 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             m_sharedControllerState.RightShoulder2 = BitStream.ReadBit() * 255;
         }
 
-        if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
-            m_Cache.isOnFire = BitStream.ReadBit();
+        m_Cache.isOnFire = BitStream.ReadBit();
 
         // Success
         return true;
@@ -282,8 +259,7 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         WriteFullKeysync(m_sharedControllerState, BitStream);
 
         // Write the serverside model (#8800)
-        if (BitStream.Version() >= 0x05F)
-            BitStream.Write(m_Cache.iModelID);
+        BitStream.Write(m_Cache.iModelID);
 
         // Write the vehicle matrix only if he's the driver
         CVector      vecTemp;
@@ -325,25 +301,22 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(&health);
 
             // Write trailer chain
-            if (BitStream.Version() >= 0x42)
+            for (std::vector<STrailerInfo>::const_iterator it = m_Cache.TrailerList.begin(); it != m_Cache.TrailerList.end(); ++it)
             {
-                for (std::vector<STrailerInfo>::const_iterator it = m_Cache.TrailerList.begin(); it != m_Cache.TrailerList.end(); ++it)
-                {
-                    BitStream.WriteBit(true);
+                BitStream.WriteBit(true);
 
-                    BitStream.Write(it->m_TrailerID);
+                BitStream.Write(it->m_TrailerID);
 
-                    SPositionSync trailerPosition(false);
-                    trailerPosition.data.vecPosition = it->m_TrailerPosition;
-                    BitStream.Write(&trailerPosition);
+                SPositionSync trailerPosition(false);
+                trailerPosition.data.vecPosition = it->m_TrailerPosition;
+                BitStream.Write(&trailerPosition);
 
-                    SRotationDegreesSync trailerRotation;
-                    trailerRotation.data.vecRotation = it->m_TrailerRotationDeg;
-                    BitStream.Write(&trailerRotation);
-                }
-
-                BitStream.WriteBit(false);
+                SRotationDegreesSync trailerRotation;
+                trailerRotation.data.vecRotation = it->m_TrailerRotationDeg;
+                BitStream.Write(&trailerRotation);
             }
+
+            BitStream.WriteBit(false);
         }
 
         // Player health and armor
@@ -371,7 +344,7 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             if (m_Cache.flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo(slot.data.uiSlot))
             {
                 // Write the ammo states
-                SWeaponAmmoSync ammo(ucWeaponType, BitStream.Version() >= 0x44, true);
+                SWeaponAmmoSync ammo(ucWeaponType, true, true);
                 ammo.data.usAmmoInClip = m_Cache.usAmmoInClip;
                 ammo.data.usTotalAmmo = m_Cache.usTotalAmmo;
                 BitStream.Write(&ammo);
@@ -405,24 +378,20 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Write parts state
-        if (BitStream.Version() >= 0x5D)
-        {
-            SVehicleDamageSyncMethodeB damage;
-            // Check where we are in the cycle
-            uint uiPhase = (m_uiDamageInfoSendPhase & 3);
-            damage.data.bSyncDoors = (uiPhase == 0);
-            damage.data.bSyncWheels = (uiPhase == 1);
-            damage.data.bSyncPanels = (uiPhase == 2);
-            damage.data.bSyncLights = (uiPhase == 3);
-            damage.data.doors.data.ucStates = m_DamageInfo.m_ucDoorStates;
-            damage.data.wheels.data.ucStates = m_DamageInfo.m_ucWheelStates;
-            damage.data.panels.data.ucStates = m_DamageInfo.m_ucPanelStates;
-            damage.data.lights.data.ucStates = m_DamageInfo.m_ucLightStates;
-            BitStream.Write(&damage);
-        }
+        SVehicleDamageSyncMethodeB damage;
+        // Check where we are in the cycle
+        uint uiPhase = (m_uiDamageInfoSendPhase & 3);
+        damage.data.bSyncDoors = (uiPhase == 0);
+        damage.data.bSyncWheels = (uiPhase == 1);
+        damage.data.bSyncPanels = (uiPhase == 2);
+        damage.data.bSyncLights = (uiPhase == 3);
+        damage.data.doors.data.ucStates = m_DamageInfo.m_ucDoorStates;
+        damage.data.wheels.data.ucStates = m_DamageInfo.m_ucWheelStates;
+        damage.data.panels.data.ucStates = m_DamageInfo.m_ucPanelStates;
+        damage.data.lights.data.ucStates = m_DamageInfo.m_ucLightStates;
+        BitStream.Write(&damage);
 
-        if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
-            BitStream.WriteBit(m_Cache.isOnFire);
+        BitStream.WriteBit(m_Cache.isOnFire);
 
         // Success
         return true;
