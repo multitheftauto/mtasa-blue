@@ -376,13 +376,13 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         pPed->m_LastSyncedData->cameraRotation = camRotation.data.fRotation;
     }
 
-    if (ucFlags & 0x20 && pBitStream->Version() >= 0x04E)
+    if (ucFlags & 0x20)
     {
         pBitStream->WriteBit(pPed->IsOnFire());
         pPed->m_LastSyncedData->bOnFire = pPed->IsOnFire();
     }
 
-    if (ucFlags & 0x40 && pBitStream->Version() >= 0x55)
+    if (ucFlags & 0x40)
     {
         pBitStream->WriteBit(pPed->IsInWater());
         pPed->m_LastSyncedData->bIsInWater = pPed->IsInWater();
