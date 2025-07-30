@@ -4613,34 +4613,32 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
             // Make sure it created
             if (pBitStream)
             {
-                if (pBitStream->Version() >= 0x028)
+                // Sync Stuff
+                // if it's not a local vehicle + it collided with the local player
+                if (pVehicleClientEntity->IsLocalEntity() == false && pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer())
                 {
-                    // Sync Stuff
-                    // if it's not a local vehicle + it collided with the local player
-                    if (pVehicleClientEntity->IsLocalEntity() == false && pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer())
+                    // is it below the anti spam threshold?
+                    if (pClientVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE)
                     {
-                        // is it below the anti spam threshold?
-                        if (pClientVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE)
+                        // if there is no controlling player
+                        if (!pClientVehicle->GetControllingPlayer())
                         {
-                            // if there is no controlling player
-                            if (!pClientVehicle->GetControllingPlayer())
+                            CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(pVehicleClientEntity);
+                            // if We aren't already syncing the vehicle
+                            if (GetUnoccupiedVehicleSync()->Exists(Vehicle) == false)
                             {
-                                CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(pVehicleClientEntity);
-                                // if We aren't already syncing the vehicle
-                                if (GetUnoccupiedVehicleSync()->Exists(Vehicle) == false)
-                                {
-                                    // Write the vehicle ID
-                                    pBitStream->Write(pVehicleClientEntity->GetID());
-                                    // Send!
-                                    g_pNet->SendPacket(PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM,
-                                                       PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
-                                    // Reset our push time
-                                    pClientVehicle->ResetLastPushTime();
-                                }
+                                // Write the vehicle ID
+                                pBitStream->Write(pVehicleClientEntity->GetID());
+                                // Send!
+                                g_pNet->SendPacket(PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM,
+                                                    PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+                                // Reset our push time
+                                pClientVehicle->ResetLastPushTime();
                             }
                         }
                     }
                 }
+
                 g_pNet->DeallocateNetBitStream(pBitStream);
             }
             return true;
@@ -5350,9 +5348,7 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
         pBitStream->Write(&weaponTypeSync);
 
         // Write the projectile's model
-        if (pBitStream->Version() >= 0x4F)
-            if (pBitStream->Version() >= 0x52 || pOriginSource)            // Fix possible error for 0x51 server
-                pBitStream->Write(pProjectile->GetModel());
+        pBitStream->Write(pProjectile->GetModel());
 
         switch (weaponType)
         {
@@ -6242,10 +6238,7 @@ void CClientGame::TakePlayerScreenShot(uint uiSizeX, uint uiSizeY, const SString
         else
             pBitStream->Write((uchar)EPlayerScreenShotResult::MINIMIZED);
         pBitStream->Write(uiServerSentTime);
-        if (pBitStream->Version() >= 0x053)
-            pBitStream->Write(pResource->GetNetID());
-        else
-            pBitStream->WriteString(pResource->GetName());
+        pBitStream->Write(pResource->GetNetID());
         pBitStream->WriteString(strTag);
         g_pNet->SendPacket(PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER);
         g_pNet->DeallocateNetBitStream(pBitStream);
@@ -6310,13 +6303,9 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         pBitStream->Write((uchar)EPlayerScreenShotResult::ERROR_);
         pBitStream->Write(uiServerGrabTime);
-        if (pBitStream->Version() >= 0x053)
-            pBitStream->Write(pResource->GetNetID());
-        else
-            pBitStream->WriteString(pResource->GetName());
+        pBitStream->Write(pResource->GetNetID());
         pBitStream->WriteString(strTag);
-        if (pBitStream->Version() >= 0x053)
-            pBitStream->WriteString(strError);
+        pBitStream->WriteString(strError);
         g_pNet->SendPacket(PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER);
         g_pNet->DeallocateNetBitStream(pBitStream);
         return;
@@ -6356,10 +6345,7 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
             pBitStream->Write(uiServerGrabTime);
             pBitStream->Write(uiTotalByteSize);
             pBitStream->Write((ushort)uiNumParts);
-            if (pBitStream->Version() >= 0x053)
-                pBitStream->Write(pResource->GetNetID());
-            else
-                pBitStream->WriteString(pResource->GetName());
+            pBitStream->Write(pResource->GetNetID());
             pBitStream->WriteString(strTag);
         }
 

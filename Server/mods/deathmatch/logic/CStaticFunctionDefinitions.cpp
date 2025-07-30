@@ -3265,10 +3265,7 @@ bool CStaticFunctionDefinitions::TakePlayerScreenShot(CElement* pElement, uint u
         BitStream.pBitStream->Write(static_cast<uchar>(uiQuality));
         BitStream.pBitStream->Write(uiMaxBandwidth);
         BitStream.pBitStream->Write(static_cast<ushort>(uiMaxPacketSize));
-        if (BitStream.pBitStream->Version() >= 0x53)
-            BitStream.pBitStream->Write(pResource->GetNetID());
-        else
-            BitStream.pBitStream->WriteString(pResource->GetName());
+        BitStream.pBitStream->Write(pResource->GetNetID());
         BitStream.pBitStream->Write(GetTickCount32());
         pPlayer->Send(CLuaPacket(TAKE_PLAYER_SCREEN_SHOT, *BitStream.pBitStream));
 
