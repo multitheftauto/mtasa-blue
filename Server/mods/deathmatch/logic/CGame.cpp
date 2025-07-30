@@ -78,8 +78,7 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE  400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
-#define RELEASE_MIN_CLIENT_VERSION          "1.6.0-0.00000"
-#define FIREBALLDESTRUCT_MIN_CLIENT_VERSION "1.6.0-9.22199"
+#define RELEASE_MIN_CLIENT_VERSION "1.6.1-0.00000"
 
 #define DEFAULT_GRAVITY              0.008f
 #define DEFAULT_GAME_SPEED           1.0f
@@ -4888,12 +4887,6 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < strMinClientRequirementFromResources)
         strNewMin = strMinClientRequirementFromResources;
 
-    if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
-    {
-        if (strNewMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
-            strNewMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
-    }
-
     // Log effective min client version
     if (strNewMin != m_strPrevMinClientConnectRequirement)
     {
@@ -4914,12 +4907,6 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     // Do version based kick check as well
     {
         CMtaVersion strKickMin;
-
-        if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
-        {
-            if (strKickMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
-                strKickMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
-        }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)
         {
