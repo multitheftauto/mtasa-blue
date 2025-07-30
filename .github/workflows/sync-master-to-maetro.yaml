@@ -2,7 +2,8 @@ name: 'Sync master to maetro'
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - release/1.6.0
   workflow_dispatch:
 
 jobs:
@@ -22,8 +23,8 @@ jobs:
           git config --global user.name "Maetro Bot"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git checkout release/maetro
-          git merge master --no-ff --no-edit --no-commit || true
+          git checkout release/1.6.0m
+          git merge release/1.6.0 --no-ff --no-edit --no-commit || true
           
           # Discard locale conflicts
           git checkout --ours -- Shared/installer/locale "Shared/data/MTA San Andreas/MTA/locale"
@@ -45,8 +46,8 @@ jobs:
           git add --verbose "Client/loader/MainFunctions.cpp"
           
           # We should be done with the merge now
-          printf "Synchronize changes from 1.6 master branch [ci skip]\n\n" > commit.txt
-          git log --expand-tabs=4 --pretty=format:'%h %s' release/maetro..master >> commit.txt
+          printf "Synchronize changes from 1.6 branch [ci skip]\n\n" > commit.txt
+          git log --expand-tabs=4 --pretty=format:'%h %s' release/1.6.0m..release/1.6.0 >> commit.txt
           git commit --no-edit --allow-empty -F commit.txt
 
-          git push origin release/maetro
+          git push origin release/1.6.0m
