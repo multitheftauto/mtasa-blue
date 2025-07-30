@@ -1576,6 +1576,10 @@ void CMultiplayerSA::InitHooks()
     // Allow alpha change for helicopter rotor (#523)
     MemSet((void*)0x6C444B, 0x90, 6);
     MemSet((void*)0x6C4453, 0x90, 0x68);
+
+    // Disable spreading fires (Moved from multiplayer_shotsync)
+    MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
+    MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
     
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
