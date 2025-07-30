@@ -568,6 +568,8 @@ void PreLaunchWatchDogs()
     WatchDogBeginSection("L1");            // Gets closed when online game has started
     SetApplicationSetting("diagnostics", "gta-fopen-fail", "");
     SetApplicationSetting("diagnostics", "last-crash-reason", "");
+    SetApplicationSetting("diagnostics", "last-crash-module", "");
+    SetApplicationSetting("diagnostics", "last-crash-code", "");
     SetApplicationSetting("diagnostics", "gta-fopen-last", "");
 }
 
