@@ -15,6 +15,7 @@ namespace
     // Minimum version requirements for functions/events
     //
 
+#if 0 // Activate the counterpart in CResourceChecker::CheckVersionRequirements when you add items to these lists
     struct SVersionItem
     {
         SString functionName;
@@ -30,6 +31,7 @@ namespace
         // Features added in 1.6.1
         // {"name", "1.6.1-9.bbbbb"},
     };
+#endif
 
     //
     // Deprecated function/events
