@@ -3092,18 +3092,14 @@ const std::string& CStaticFunctionDefinitions::GetPlayerSerial(CPlayer* pPlayer,
     return pPlayer->GetSerial(uiIndex);
 }
 
-const std::string& CStaticFunctionDefinitions::GetPlayerUserName(CPlayer* pPlayer)
+std::string CStaticFunctionDefinitions::GetPlayerUserName(CPlayer* pPlayer)
 {
-    assert(pPlayer);
-
-    return pPlayer->GetSerialUser();
+    return "";
 }
 
-const std::string& CStaticFunctionDefinitions::GetPlayerCommunityID(CPlayer* pPlayer)
+std::string CStaticFunctionDefinitions::GetPlayerCommunityID(CPlayer* pPlayer)
 {
-    assert(pPlayer);
-
-    return pPlayer->GetCommunityID();
+    return "";
 }
 
 bool CStaticFunctionDefinitions::GetPlayerBlurLevel(CPlayer* pPlayer, unsigned char& ucLevel)
@@ -5498,7 +5494,7 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, std::optional<b
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(vehicle->GenerateSyncTimeContext());
-    BitStream.pBitStream->WriteBit(createExplosion);            // only consumed by clients with at least eBitStreamVersion::VehicleBlowStateSupport
+    BitStream.pBitStream->WriteBit(createExplosion);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, BLOW_VEHICLE, *BitStream.pBitStream));
     return true;
 }
@@ -10941,12 +10937,8 @@ bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
         BitStream.pBitStream->Write(g_TickRateSettings.iObjectSync);
         BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncRotation);
         BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncAnalogMove);
-
-        if (pPlayer->CanBitStream(eBitStreamVersion::FixSyncerDistance))
-        {
-            BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
-            BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
-        }
+        BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
+        BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
 
         pPlayer->Send(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
     };
@@ -11810,19 +11802,18 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pTargetPlayer, bool bIP, bo
     // Ban the player
     if (bIP)
         pBan = m_pBanManager->AddBan(pTargetPlayer, strResponsible, strReason, tUnban);
-    else if (bUsername || bSerial)
+    else if (bSerial)
         pBan = m_pBanManager->AddBan(strResponsible, strReason, tUnban);
 
     // If the ban was successful
     if (pBan)
     {
-        // Set the data if banned by either username or serial
-        if (bUsername)
-            pBan->SetAccount(pTargetPlayer->GetSerialUser());
+        // Set the data if banned by serial
         if (bSerial)
+        {
             pBan->SetSerial(pTargetPlayer->GetSerial());
-        if (bUsername || bSerial)
             pBan->SetNick(pTargetPlayer->GetNick());
+        }
 
         // Check if we passed a responsible player
         if (pResponsible)
@@ -11863,13 +11854,6 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pTargetPlayer, bool bIP, bo
             if (!bBan && bIP)
             {
                 bBan = (pBan->GetIP() == pPlayer->GetSourceIP());
-            }
-
-            // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
-            if (!bBan && bUsername && pBan->GetAccount().length() > 0)
-            {
-                const std::string& strPlayerUsername = pPlayer->GetSerialUser();
-                bBan = stricmp(strPlayerUsername.c_str(), pBan->GetAccount().c_str()) == 0;
             }
 
             // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
@@ -11956,10 +11940,6 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
     {
         pBan = m_pBanManager->AddBan(strResponsible, strReason, tUnban);
     }
-    else if (bUsernameSpecified && !m_pBanManager->IsAccountBanned(strUsername))
-    {
-        pBan = m_pBanManager->AddBan(strResponsible, strReason, tUnban);
-    }
 
     // If the ban was added
     if (pBan)
@@ -11995,8 +11975,6 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
             strMessage = strMessage.substr(0, 255);
 
         // Set the account or serial if either one is set to be banned
-        if (bUsernameSpecified)
-            pBan->SetAccount(strUsername);
         if (bSerialSpecified)
             pBan->SetSerial(strSerial);
 
@@ -12044,13 +12022,6 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
             if (bIPSpecified)
             {
                 bBan = (strIP == pPlayer->GetSourceIP());
-            }
-
-            // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
-            if (!bBan && bUsernameSpecified && strUsername.length() > 0)
-            {
-                const std::string& strPlayerUsername = pPlayer->GetSerialUser();
-                bBan = stricmp(strPlayerUsername.c_str(), strUsername.c_str()) == 0;
             }
 
             // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
@@ -12168,11 +12139,6 @@ bool CStaticFunctionDefinitions::GetBanSerial(CBan* pBan, SString& strOutSerial)
 
 bool CStaticFunctionDefinitions::GetBanUsername(CBan* pBan, SString& strOutUsername)
 {
-    if (!pBan->GetAccount().empty())
-    {
-        strOutUsername = pBan->GetAccount();
-        return true;
-    }
     return false;
 }
 
