@@ -1287,9 +1287,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     // differs from the local one (#8800)
     int iModelID = pVehicle->GetModel();
     int iRemoteModelID = iModelID;
-
-    if (BitStream.Version() >= 0x05F)
-        BitStream.Read(iRemoteModelID);
+    BitStream.Read(iRemoteModelID);
 
     eClientVehicleType remoteVehicleType = CClientVehicleManager::GetVehicleType(iRemoteModelID);
     eClientVehicleType vehicleType = pVehicle->GetVehicleType();
@@ -1478,7 +1476,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
             }
 
             // Read out the weapon ammo
-            SWeaponAmmoSync ammo(ucCurrentWeapon, BitStream.Version() >= 0x44, true);
+            SWeaponAmmoSync ammo(ucCurrentWeapon, true, true);
             BitStream.Read(&ammo);
             unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
 
@@ -1487,7 +1485,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
                 CWeapon* pPlayerWeapon = pPlayer->GiveWeapon(static_cast<eWeaponType>(ucCurrentWeapon), usWeaponAmmo, true);
                 if (pPlayerWeapon)
                 {
-                    pPlayerWeapon->SetAmmoTotal(BitStream.Version() >= 0x44 ? ammo.data.usTotalAmmo : 9999);
+                    pPlayerWeapon->SetAmmoTotal(ammo.data.usTotalAmmo);
                     pPlayerWeapon->SetAmmoInClip(usWeaponAmmo);
                 }
             }
@@ -1571,8 +1569,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         iModelID = pVehicle->GetModelInfo()->GetParentID();
 
     // Write the clientside model
-    if (BitStream.Version() >= 0x05F)
-        BitStream.Write(iModelID);
+    BitStream.Write(iModelID);
 
     // Grab the vehicle position
     CVector vecPosition;
@@ -1664,38 +1661,6 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(false);
     }
 
-    // Update Damage Info if changed
-    if (BitStream.Version() >= 0x047)
-    {
-        if (!g_pClientGame->GetDamageSent())
-        {
-            g_pClientGame->SetDamageSent(true);
-
-            ElementID DamagerID = g_pClientGame->GetDamagerID();
-            if (DamagerID != RESERVED_ELEMENT_ID)
-            {
-                BitStream.WriteBit(true);
-                BitStream.Write(DamagerID);
-
-                SWeaponTypeSync weaponType;
-                weaponType.data.ucWeaponType = g_pClientGame->GetDamageWeapon();
-                BitStream.Write(&weaponType);
-
-                SBodypartSync bodypart;
-                bodypart.data.uiBodypart = g_pClientGame->GetDamageBodyPiece();
-                BitStream.Write(&bodypart);
-            }
-            else
-            {
-                BitStream.WriteBit(false);
-            }
-        }
-        else
-        {
-            BitStream.WriteBit(false);
-        }
-    }
-
     // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
     // Scale goes up to 200.0f because having max stats gives you the double of health.
     SPlayerHealthSync health;
@@ -1738,7 +1703,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         if (flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo(uiSlot))
         {
             // Write the ammo states
-            SWeaponAmmoSync ammo(pPlayerWeapon->GetType(), BitStream.Version() >= 0x44, true);
+            SWeaponAmmoSync ammo(pPlayerWeapon->GetType(), true, true);
             ammo.data.usAmmoInClip = static_cast<unsigned short>(pPlayerWeapon->GetAmmoInClip());
             ammo.data.usTotalAmmo = static_cast<unsigned short>(pPlayerWeapon->GetAmmoTotal());
             BitStream.Write(&ammo);
@@ -1984,8 +1949,7 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
 {
     CClientCamera* pCamera = m_pManager->GetCamera();
 
-    if (BitStream.Version() >= 0x05E)
-        BitStream.Write(pCamera->GetSyncTimeContext());
+    BitStream.Write(pCamera->GetSyncTimeContext());
 
     // Are we in fixed mode?
     bool bFixed = pCamera->IsInFixedMode();
@@ -2235,9 +2199,6 @@ void CNetAPI::ReadVehicleResync(CClientVehicle* pVehicle, NetBitStreamInterface&
 
 void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterface& BitStream)
 {
-    if (BitStream.Version() < 0x5D)
-        return;
-
     SVehicleDamageSyncMethodeB damage;
     BitStream.Read(&damage);
     bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();

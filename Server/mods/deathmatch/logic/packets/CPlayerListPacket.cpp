@@ -116,11 +116,8 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Version info
-        if (BitStream.Version() >= 0x34)
-        {
-            BitStream.Write(pPlayer->GetBitStreamVersion());
-            BitStream.Write(pPlayer->GetPlayerVersion().GetBuildNumber());
-        }
+        BitStream.Write(pPlayer->GetBitStreamVersion());
+        BitStream.Write(pPlayer->GetPlayerVersion().GetBuildNumber());
 
         // Flags
         bool bInVehicle = (pPlayer->GetOccupiedVehicle() != NULL);
@@ -154,11 +151,8 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Move anim
-        if (BitStream.Version() > 0x4B)
-        {
-            uchar ucMoveAnim = pPlayer->GetMoveAnim();
-            BitStream.Write(ucMoveAnim);
-        }
+        uchar ucMoveAnim = pPlayer->GetMoveAnim();
+        BitStream.Write(ucMoveAnim);
 
         // Always send extra info (Was: "Write spawn info if he's spawned")
         if (true)

@@ -225,11 +225,11 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             }
 
             // And the burning state
-            if (BitStream.Version() >= 0x04E && ucFlags & 0x20)
+            if (ucFlags & 0x20)
                 BitStream.ReadBit(bOnFire);
 
             // And the in water state
-            if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
+            if (ucFlags & 0x40)
                 BitStream.ReadBit(bIsInWater);
 
             // Grab the ped. Only update the sync if this packet is from the same context.
@@ -248,9 +248,9 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
                     pPed->LockArmor(fArmor);
                 if (flags2 & 0x01)
                     pPed->SetTargetRotation(PED_SYNC_RATE, std::nullopt, cameraRotation);
-                if (BitStream.Version() >= 0x04E && ucFlags & 0x20)
+                if (ucFlags & 0x20)
                     pPed->SetOnFire(bOnFire);
-                if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
+                if (ucFlags & 0x40)
                     pPed->SetInWater(bIsInWater);
             }
         }

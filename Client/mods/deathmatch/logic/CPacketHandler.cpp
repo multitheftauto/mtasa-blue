@@ -813,11 +813,8 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
         // Read version info
         ushort usBitStreamVersion = 0;
         uint   uiBuildNumber = 0;
-        if (bitStream.Version() >= 0x34)
-        {
-            bitStream.Read(usBitStreamVersion);
-            bitStream.Read(uiBuildNumber);
-        }
+        bitStream.Read(usBitStreamVersion);
+        bitStream.Read(uiBuildNumber);
 
         // Player flags
         bool bIsDead = bitStream.ReadBit();
@@ -846,8 +843,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
 
         // Move anim
         uchar ucMoveAnim = MOVE_DEFAULT;
-        if (bitStream.Version() > 0x4B)
-            bitStream.Read(ucMoveAnim);
+        bitStream.Read(ucMoveAnim);
 
         // Read out the spawndata if he has spawned
         unsigned short   usPlayerModelID;
@@ -2428,17 +2424,14 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Moon size
     bool bOverrideMoonSize = false;
     int  iMoonSize = 3;
-    if (bitStream.Version() >= 0x40)
+    if (!bitStream.ReadBit(bOverrideMoonSize))
+        return;
+    if (bOverrideMoonSize)
     {
-        if (!bitStream.ReadBit(bOverrideMoonSize))
+        if (!bitStream.Read(iMoonSize))
             return;
-        if (bOverrideMoonSize)
-        {
-            if (!bitStream.Read(iMoonSize))
-                return;
 
-            g_pMultiplayer->SetMoonSize(iMoonSize);
-        }
+        g_pMultiplayer->SetMoonSize(iMoonSize);
     }
 
     // Sun size
@@ -2516,27 +2509,22 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
 
     // Aircraft max velocity
     float fAircraftMaxVelocity = 1.5f;
-    if (bitStream.Version() >= 0x3E)
-    {
-        if (!bitStream.Read(fAircraftMaxVelocity))
-            return;
+    if (!bitStream.Read(fAircraftMaxVelocity))
+        return;
 
-        g_pGame->GetWorld()->SetAircraftMaxVelocity(fAircraftMaxVelocity);
-    }
+    g_pGame->GetWorld()->SetAircraftMaxVelocity(fAircraftMaxVelocity);
 
     g_pGame->SetJetpackWeaponEnabled(WEAPONTYPE_TEC9, true);
     g_pGame->SetJetpackWeaponEnabled(WEAPONTYPE_MICRO_UZI, true);
     g_pGame->SetJetpackWeaponEnabled(WEAPONTYPE_PISTOL, true);
 
-    if (bitStream.Version() >= 0x30)
+    for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
     {
-        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
-        {
-            bool bEnabled;
-            bitStream.ReadBit(bEnabled);
-            g_pGame->SetJetpackWeaponEnabled((eWeaponType)i, bEnabled);
-        }
+        bool bEnabled;
+        bitStream.ReadBit(bEnabled);
+        g_pGame->SetJetpackWeaponEnabled((eWeaponType)i, bEnabled);
     }
+
     for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         bool                bReadWeaponInfo = true;
@@ -2564,13 +2552,12 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
 
             pWeaponInfo->SetAnimBreakoutTime(weaponProperty.data.anim_breakout_time);
         }
-        if (bitStream.Version() >= 0x30)
-        {
-            bool bEnabled;
-            bitStream.ReadBit(bEnabled);
-            g_pGame->SetJetpackWeaponEnabled((eWeaponType)weaponProperty.data.weaponType, bEnabled);
-        }
+
+        bool bEnabled;
+        bitStream.ReadBit(bEnabled);
+        g_pGame->SetJetpackWeaponEnabled((eWeaponType)weaponProperty.data.weaponType, bEnabled);
     }
+
     for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
     {
         bool                bReadWeaponInfo = true;
@@ -2601,21 +2588,17 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
                 pWeaponInfo->SetAnimBreakoutTime(weaponProperty.data.anim_breakout_time);
             }
         }
-        if (bitStream.Version() >= 0x36)
-        {
-            bool bEnabled;
-            bitStream.ReadBit(bEnabled);
-            g_pGame->SetJetpackWeaponEnabled((eWeaponType)weaponProperty.data.weaponType, bEnabled);
-        }
+
+        bool bEnabled;
+        bitStream.ReadBit(bEnabled);
+        g_pGame->SetJetpackWeaponEnabled((eWeaponType)weaponProperty.data.weaponType, bEnabled);
     }
-    if (bitStream.Version() >= 0x30)
+
+    for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
     {
-        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
-        {
-            bool bEnabled;
-            bitStream.ReadBit(bEnabled);
-            g_pGame->SetJetpackWeaponEnabled((eWeaponType)i, bEnabled);
-        }
+        bool bEnabled;
+        bitStream.ReadBit(bEnabled);
+        g_pGame->SetJetpackWeaponEnabled((eWeaponType)i, bEnabled);
     }
 
     unsigned short usModel = 0;
@@ -2628,16 +2611,12 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         bitStream.Read(fX);
         bitStream.Read(fY);
         bitStream.Read(fZ);
-        if (bitStream.Version() >= 0x039)
-        {
-            bitStream.Read(cInterior);
-        }
+        bitStream.Read(cInterior);
         g_pGame->GetBuildingRemoval()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 
     bool bOcclusionsEnabled = true;
-    if (bitStream.Version() >= 0x25)
-        bitStream.ReadBit(bOcclusionsEnabled);
+    bitStream.ReadBit(bOcclusionsEnabled);
 
     g_pGame->GetWorld()->SetOcclusionsEnabled(bOcclusionsEnabled);
 }
@@ -2840,11 +2819,7 @@ retry:
 
             // Check element collisions enabled ( for use later on )
             bitStream.ReadBit(bCollisonsEnabled);
-
-            if (bitStream.Version() >= 0x56)
-                bitStream.ReadBit(bCallPropagationEnabled);
-            else
-                bCallPropagationEnabled = true;
+            bitStream.ReadBit(bCallPropagationEnabled);
 
             // Read custom data
             CCustomData*   pCustomData = new CCustomData;
@@ -3032,33 +3007,24 @@ retry:
                         }
 
                         CVector vecScale;
-                        if (bitStream.Version() >= 0x41)
+                        bool bIsUniform;
+                        bitStream.ReadBit(bIsUniform);
+                        if (bIsUniform)
                         {
-                            bool bIsUniform;
-                            bitStream.ReadBit(bIsUniform);
-                            if (bIsUniform)
-                            {
-                                bool bIsUnitSize;
-                                bitStream.ReadBit(bIsUnitSize);
-                                if (!bIsUnitSize)
-                                    bitStream.Read(vecScale.fX);
-                                else
-                                    vecScale.fX = 1.0f;
-                                vecScale.fY = vecScale.fX;
-                                vecScale.fZ = vecScale.fX;
-                            }
-                            else
-                            {
+                            bool bIsUnitSize;
+                            bitStream.ReadBit(bIsUnitSize);
+                            if (!bIsUnitSize)
                                 bitStream.Read(vecScale.fX);
-                                bitStream.Read(vecScale.fY);
-                                bitStream.Read(vecScale.fZ);
-                            }
+                            else
+                                vecScale.fX = 1.0f;
+                            vecScale.fY = vecScale.fX;
+                            vecScale.fZ = vecScale.fX;
                         }
                         else
                         {
                             bitStream.Read(vecScale.fX);
-                            vecScale.fY = vecScale.fX;
-                            vecScale.fZ = vecScale.fX;
+                            bitStream.Read(vecScale.fY);
+                            bitStream.Read(vecScale.fZ);
                         }
                         pObject->SetScale(vecScale);
 
@@ -3549,35 +3515,34 @@ retry:
                         // pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
                         // pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
                     }
-                    if (bitStream.Version() >= 0x02A)
-                    {
-                        unsigned char ucSirenCount = 0;
-                        unsigned char ucSirenType = 0;
-                        bool          bSync = false;
-                        bitStream.ReadBit(bSync);
-                        if (bSync)
-                        {
-                            bitStream.Read(ucSirenCount);
-                            bitStream.Read(ucSirenType);
 
-                            pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
-                            for (int i = 0; i < ucSirenCount; i++)
-                            {
-                                SVehicleSirenSync sirenData;
-                                bitStream.Read(&sirenData);
-                                pVehicle->SetVehicleSirenPosition(i, sirenData.data.m_vecSirenPositions);
-                                pVehicle->SetVehicleSirenColour(i, sirenData.data.m_colSirenColour);
-                                pVehicle->SetVehicleSirenMinimumAlpha(i, sirenData.data.m_dwSirenMinAlpha);
-                                pVehicle->SetVehicleFlags(sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck,
-                                                          sirenData.data.m_bEnableSilent);
-                            }
-                        }
-                        // If the vehicle has sirens, set the siren state
-                        if (CClientVehicleManager::HasSirens(usModel) || pVehicle->DoesVehicleHaveSirens())
+                    unsigned char ucSirenCount = 0;
+                    unsigned char ucSirenType = 0;
+                    bool          bSync = false;
+                    bitStream.ReadBit(bSync);
+                    if (bSync)
+                    {
+                        bitStream.Read(ucSirenCount);
+                        bitStream.Read(ucSirenType);
+
+                        pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
+                        for (int i = 0; i < ucSirenCount; i++)
                         {
-                            pVehicle->SetSirenOrAlarmActive(bSirenesActive);
+                            SVehicleSirenSync sirenData;
+                            bitStream.Read(&sirenData);
+                            pVehicle->SetVehicleSirenPosition(i, sirenData.data.m_vecSirenPositions);
+                            pVehicle->SetVehicleSirenColour(i, sirenData.data.m_colSirenColour);
+                            pVehicle->SetVehicleSirenMinimumAlpha(i, sirenData.data.m_dwSirenMinAlpha);
+                            pVehicle->SetVehicleFlags(sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck,
+                                                        sirenData.data.m_bEnableSilent);
                         }
                     }
+                    // If the vehicle has sirens, set the siren state
+                    if (CClientVehicleManager::HasSirens(usModel) || pVehicle->DoesVehicleHaveSirens())
+                    {
+                        pVehicle->SetSirenOrAlarmActive(bSirenesActive);
+                    }
+
                     pVehicle->ApplyHandling();
 
                     // Set the matrix
@@ -3885,8 +3850,7 @@ retry:
 
                     // Move anim
                     uchar ucMoveAnim = MOVE_DEFAULT;
-                    if (bitStream.Version() > 0x4B)
-                        bitStream.Read(ucMoveAnim);
+                    bitStream.Read(ucMoveAnim);
                     pPed->SetMoveAnim((eMoveAnim)ucMoveAnim);
 
                     // clothes
@@ -3922,42 +3886,39 @@ retry:
                     }
 
                     // weapons
-                    if (bitStream.Version() >= 0x61)
+                    unsigned char slot;
+                    bitStream.Read(slot);
+
+                    while (slot != 0xFF)
                     {
-                        unsigned char slot;
-                        bitStream.Read(slot);
+                        // Read info from bitstream
+                        unsigned char ucType;
+                        bitStream.Read(ucType);
 
-                        while (slot != 0xFF)
+                        unsigned short usTotalAmmo;
+                        bitStream.Read(usTotalAmmo);
+
+                        // ammoInClip is not implemented generally
+                        // unsigned short usAmmoInClip;
+                        // bitStream.Read ( usAmmoInClip );
+
+                        // Apply read info
+                        CWeapon* pWeapon = pPed->GiveWeapon((eWeaponType)ucType, usTotalAmmo);
+                        pPed->m_usWeaponAmmo[slot] = usTotalAmmo;
+                        if (pWeapon)
                         {
-                            // Read info from bitstream
-                            unsigned char ucType;
-                            bitStream.Read(ucType);
-
-                            unsigned short usTotalAmmo;
-                            bitStream.Read(usTotalAmmo);
-
-                            // ammoInClip is not implemented generally
-                            // unsigned short usAmmoInClip;
-                            // bitStream.Read ( usAmmoInClip );
-
-                            // Apply read info
-                            CWeapon* pWeapon = pPed->GiveWeapon((eWeaponType)ucType, usTotalAmmo);
-                            pPed->m_usWeaponAmmo[slot] = usTotalAmmo;
-                            if (pWeapon)
-                            {
-                                // pWeapon->SetAmmoInClip ( usAmmoInClip );
-                                pWeapon->SetAmmoTotal(usTotalAmmo);
-                            }
-
-                            // Get next slot
-                            bitStream.Read(slot);
+                            // pWeapon->SetAmmoInClip ( usAmmoInClip );
+                            pWeapon->SetAmmoTotal(usTotalAmmo);
                         }
 
-                        // Read and set current slot
-                        unsigned char ucCurrentSlot;
-                        bitStream.Read(ucCurrentSlot);
-                        pPed->SetCurrentWeaponSlot((eWeaponSlot)ucCurrentSlot);
+                        // Get next slot
+                        bitStream.Read(slot);
                     }
+
+                    // Read and set current slot
+                    unsigned char ucCurrentSlot;
+                    bitStream.Read(ucCurrentSlot);
+                    pPed->SetCurrentWeaponSlot((eWeaponSlot)ucCurrentSlot);
 
                     // Collisions
                     pPed->SetUsesCollision(bCollisonsEnabled);
@@ -4797,15 +4758,8 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
 
     // Read the model
     unsigned short usModel = 0;
-    if (bitStream.Version() >= 0x4F)
-    {
-        if (bitStream.Version() >= 0x52 || bHasCreator)            // Fix possible error from 0x51 server
-            if (!bitStream.Read(usModel))
-                return;
-    }
-
-    if (bitStream.Version() < 0x52)
-        usModel = 0;            // Fix possible error from 0x51 server
+    if (!bitStream.Read(usModel))
+        return;
 
     // Crash fix - usModel is not valid for some clients
     //              either because number is incorrect due to some mismatch in bitstream versions
@@ -5110,28 +5064,18 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     bitStream.Read(ResourceDynamicEntityID);
 
     // Read the amount of 'no client cache' scripts
-    if (bitStream.Version() >= 0x26)
-        bitStream.Read(usNoClientCacheScriptCount);
+    bitStream.Read(usNoClientCacheScriptCount);
 
     // Read the declared min client version for this resource
     CMtaVersion strMinServerReq, strMinClientReq;
-    if (bitStream.Version() >= 0x32)
-    {
-        bitStream.ReadString(strMinServerReq);
-        bitStream.ReadString(strMinClientReq);
-    }
+    bitStream.ReadString(strMinServerReq);
+    bitStream.ReadString(strMinClientReq);
 
     bool bEnableOOP = false;
-    if (bitStream.Version() >= 0x45)
-    {
-        bitStream.ReadBit(bEnableOOP);
-    }
+    bitStream.ReadBit(bEnableOOP);
 
     int iDownloadPriorityGroup = 0;
-    if (bitStream.Version() >= 0x62)
-    {
-        bitStream.Read(iDownloadPriorityGroup);
-    }
+    bitStream.Read(iDownloadPriorityGroup);
 
     // Get the resource entity
     CClientEntity* pResourceEntity = CElementIDs::GetElement(ResourceEntityID);
@@ -5356,8 +5300,7 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
             for (unsigned int i = 0; i < usScriptCount; ++i)
             {
                 SString strFilename = "(unknown)";
-                if (bitStream.Version() >= 0x50)
-                    bitStream.ReadString(strFilename);
+                bitStream.ReadString(strFilename);
 
                 // Read the script compressed chunk
                 unsigned int len;
@@ -5681,11 +5624,7 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
 
         // Check element collisions enabled ( for use later on )
         bitStream.ReadBit(bCollisonsEnabled);
-
-        if (bitStream.Version() >= 0x56)
-            bitStream.ReadBit(bCallPropagationEnabled);
-        else
-            bCallPropagationEnabled = true;
+        bitStream.ReadBit(bCallPropagationEnabled);
 
         // Read custom data
         // CCustomData* pCustomData = new CCustomData;

@@ -216,13 +216,10 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     }
 
     // Moon size
-    if (BitStream.Version() >= 0x40)
+    BitStream.WriteBit(m_bOverrideMoonSize);
+    if (m_bOverrideMoonSize)
     {
-        BitStream.WriteBit(m_bOverrideMoonSize);
-        if (m_bOverrideMoonSize)
-        {
-            BitStream.Write(m_iMoonSize);
-        }
+        BitStream.Write(m_iMoonSize);
     }
 
     // Sun size
@@ -268,19 +265,15 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     }
 
     BitStream.Write(m_fAircraftMaxHeight);
+    BitStream.Write(m_fAircraftMaxVelocity);
 
-    if (BitStream.Version() >= 0x3E)
-        BitStream.Write(m_fAircraftMaxVelocity);
-
-    if (BitStream.Version() >= 0x30)
+    for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
     {
-        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
-        {
-            bool bEnabled;
-            bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
-            BitStream.WriteBit(bEnabled);
-        }
+        bool bEnabled;
+        bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
+        BitStream.WriteBit(bEnabled);
     }
+
     for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         sWeaponPropertySync WeaponProperty;
@@ -305,10 +298,8 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
 
         WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
         BitStream.Write(&WeaponProperty);
-        if (BitStream.Version() >= 0x30)
-        {
-            BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
-        }
+
+        BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
     }
 
     for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
@@ -338,19 +329,15 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
             WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
             BitStream.Write(&WeaponProperty);
         }
-        if (BitStream.Version() >= 0x36)
-        {
-            BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
-        }
+
+        BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
     }
-    if (BitStream.Version() >= 0x30)
+
+    for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
     {
-        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
-        {
-            bool bEnabled;
-            bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
-            BitStream.WriteBit(bEnabled);
-        }
+        bool bEnabled;
+        bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
+        BitStream.WriteBit(bEnabled);
     }
 
     multimap<unsigned short, CBuildingRemoval*>::const_iterator iter = g_pGame->GetBuildingRemovalManager()->IterBegin();
@@ -363,18 +350,12 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(pBuildingRemoval->GetPosition().fX);
         BitStream.Write(pBuildingRemoval->GetPosition().fY);
         BitStream.Write(pBuildingRemoval->GetPosition().fZ);
-        if (BitStream.Version() >= 0x039)
-        {
-            BitStream.Write(pBuildingRemoval->GetInterior());
-        }
+        BitStream.Write(pBuildingRemoval->GetInterior());
     }
     BitStream.WriteBit(false);
 
-    if (BitStream.Version() >= 0x25)
-    {
-        bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled();
-        BitStream.WriteBit(bOcclusionsEnabled);
-    }
+    bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled();
+    BitStream.WriteBit(bOcclusionsEnabled);
 
     return true;
 }
