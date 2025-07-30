@@ -142,13 +142,10 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     {
         BitStream.Write(m_WorldWaterLevelInfo.fNonSeaLevel);
     }
-    if (BitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideWorldLevel))
+    BitStream.WriteBit(m_WorldWaterLevelInfo.bOutsideLevelSet);
+    if (m_WorldWaterLevelInfo.bOutsideLevelSet)
     {
-        BitStream.WriteBit(m_WorldWaterLevelInfo.bOutsideLevelSet);
-        if (m_WorldWaterLevelInfo.bOutsideLevelSet)
-        {
-            BitStream.Write(m_WorldWaterLevelInfo.fOutsideLevel);
-        }
+        BitStream.Write(m_WorldWaterLevelInfo.fOutsideLevel);
     }
     BitStream.WriteCompressed(m_usFPSLimit);
 
@@ -166,39 +163,36 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     funBugs.data.bFastMove = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTMOVE);
     funBugs.data.bCrouchBug = g_pGame->IsGlitchEnabled(CGame::GLITCH_CROUCHBUG);
     funBugs.data.bCloseRangeDamage = g_pGame->IsGlitchEnabled(CGame::GLITCH_CLOSEDAMAGE);
-    funBugs.data2.bHitAnim = g_pGame->IsGlitchEnabled(CGame::GLITCH_HITANIM);
-    funBugs.data3.bFastSprint = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTSPRINT);
-    funBugs.data4.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled(CGame::GLITCH_BADDRIVEBYHITBOX);
-    funBugs.data5.bQuickStand = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKSTAND);
-    funBugs.data6.vehicleRapidStop = g_pGame->IsGlitchEnabled(CGame::GLITCH_VEHICLE_RAPID_STOP);
+    funBugs.data.bHitAnim = g_pGame->IsGlitchEnabled(CGame::GLITCH_HITANIM);
+    funBugs.data.bFastSprint = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTSPRINT);
+    funBugs.data.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled(CGame::GLITCH_BADDRIVEBYHITBOX);
+    funBugs.data.bQuickStand = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKSTAND);
+    funBugs.data.vehicleRapidStop = g_pGame->IsGlitchEnabled(CGame::GLITCH_VEHICLE_RAPID_STOP);
     BitStream.Write(&funBugs);
 
     // Write world special properties states
-    if (BitStream.Can(eBitStreamVersion::WorldSpecialProperties))
-    {
-        SWorldSpecialPropertiesStateSync wsProps;
-        wsProps.data.hovercars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::HOVERCARS);
-        wsProps.data.aircars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::AIRCARS);
-        wsProps.data.extrabunny = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRABUNNY);
-        wsProps.data.extrajump = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAJUMP);
-        wsProps.data.randomfoliage = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::RANDOMFOLIAGE);
-        wsProps.data.snipermoon = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::SNIPERMOON);
-        wsProps.data.extraairresistance = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAAIRRESISTANCE);
-        wsProps.data.underworldwarp = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::UNDERWORLDWARP);
-        wsProps.data.vehiclesunglare = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLESUNGLARE);
-        wsProps.data.coronaztest = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::CORONAZTEST);
-        wsProps.data.watercreatures = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::WATERCREATURES);
-        wsProps.data.burnflippedcars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::BURNFLIPPEDCARS);
-        wsProps.data2.fireballdestruct = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT);
-        wsProps.data3.roadsignstext = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT);
-        wsProps.data4.extendedwatercannons = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS);
-        wsProps.data5.tunnelweatherblend = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND);
-        wsProps.data6.ignoreFireState = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE);
-        wsProps.data7.flyingcomponents = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS);
-        wsProps.data8.vehicleburnexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS);
-        wsProps.data9.vehicleEngineAutoStart = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART);
-        BitStream.Write(&wsProps);
-    }
+    SWorldSpecialPropertiesStateSync wsProps;
+    wsProps.data.hovercars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::HOVERCARS);
+    wsProps.data.aircars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::AIRCARS);
+    wsProps.data.extrabunny = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRABUNNY);
+    wsProps.data.extrajump = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAJUMP);
+    wsProps.data.randomfoliage = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::RANDOMFOLIAGE);
+    wsProps.data.snipermoon = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::SNIPERMOON);
+    wsProps.data.extraairresistance = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAAIRRESISTANCE);
+    wsProps.data.underworldwarp = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::UNDERWORLDWARP);
+    wsProps.data.vehiclesunglare = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLESUNGLARE);
+    wsProps.data.coronaztest = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::CORONAZTEST);
+    wsProps.data.watercreatures = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::WATERCREATURES);
+    wsProps.data.burnflippedcars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::BURNFLIPPEDCARS);
+    wsProps.data.fireballdestruct = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT);
+    wsProps.data.roadsignstext = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT);
+    wsProps.data.extendedwatercannons = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS);
+    wsProps.data.tunnelweatherblend = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND);
+    wsProps.data.ignoreFireState = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE);
+    wsProps.data.flyingcomponents = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS);
+    wsProps.data.vehicleburnexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS);
+    wsProps.data.vehicleEngineAutoStart = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART);
+    BitStream.Write(&wsProps);
 
     BitStream.Write(m_fJetpackMaxHeight);
 

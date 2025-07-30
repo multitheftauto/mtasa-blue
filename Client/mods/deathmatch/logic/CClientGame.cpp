@@ -703,16 +703,6 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             pBitStream->Write(strTemp.c_str(), MAX_PLAYER_NICK_LENGTH);
             pBitStream->Write(reinterpret_cast<const char*>(Password.data), sizeof(MD5));
 
-            // Append community information (Removed)
-            std::string strUser;
-            pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
-
-            // Send an empty string if server still has old Discord implementation (#2499)
-            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation) && !g_pNet->CanServerBitStream(eBitStreamVersion::Discord_Cleanup))
-            {
-                pBitStream->WriteString<uchar>("");
-            }
-
             // Send the packet as joindata
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
@@ -5281,18 +5271,15 @@ void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType T
 
             // Because we use this packet to notify the server of blown vehicles,
             // we include a bit, whether the vehicle was blown without an explosion
-            if (pBitStream->Can(eBitStreamVersion::VehicleBlowStateSupport))
+            if (pOrigin->GetType() == CCLIENTVEHICLE)
             {
-                if (pOrigin->GetType() == CCLIENTVEHICLE)
-                {
-                    auto vehicle = reinterpret_cast<CClientVehicle*>(pOrigin);
-                    pBitStream->WriteBit(1);
-                    pBitStream->WriteBit(vehicleBlowState.value_or(vehicle->GetBlowState()) == VehicleBlowState::BLOWN);
-                }
-                else
-                {
-                    pBitStream->WriteBit(0);
-                }
+                auto vehicle = reinterpret_cast<CClientVehicle*>(pOrigin);
+                pBitStream->WriteBit(1);
+                pBitStream->WriteBit(vehicleBlowState.value_or(vehicle->GetBlowState()) == VehicleBlowState::BLOWN);
+            }
+            else
+            {
+                pBitStream->WriteBit(0);
             }
 
             // Convert position

@@ -1118,9 +1118,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.bHasAWeapon = (pPlayerWeapon != NULL);
     flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || (pPlayerModel->GetPlayerSyncCount() % 4) == 0);
     flags.data.bStealthAiming = (pPlayerModel->IsStealthAiming() == true);
-
-    if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-        flags.data2.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
+    flags.data.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
 
     if (pPlayerWeapon->GetSlot() > 15)
         flags.data.bHasAWeapon = false;
@@ -1545,8 +1543,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
 
     pPlayer->SetControllerState(ControllerState);
 
-    if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
-        pVehicle->SetOnFire(BitStream.ReadBit());
+    pVehicle->SetOnFire(BitStream.ReadBit());
 
     // Remember now as the last puresync time
     CVector vecPosition;
@@ -1773,8 +1770,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(ControllerState.RightShoulder2 != 0);
     }
 
-    if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
-        BitStream.WriteBit(pVehicle->IsOnFire());
+    BitStream.WriteBit(pVehicle->IsOnFire());
 
     // Write the sent position to the interpolator
     AddInterpolation(vecPosition);
@@ -1786,12 +1782,8 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
     if (!BitStream.Read(&keys))
         return false;
 
-    // Put the result into the controllerstate
-    ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
-    ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     short sButtonSquare = 255 * keys.data.bButtonSquare;
     short sButtonCross = 255 * keys.data.bButtonCross;
-    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -1799,6 +1791,10 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
         if (keys.data.ucButtonCross != 0)
             sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
+
+    // Put the result into the controllerstate
+    ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = 255 * keys.data.bButtonCircle;
@@ -1837,12 +1833,8 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
     if (!BitStream.Read(&keys))
         return false;
 
-    // Put the result into the controllerstate
-    ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
-    ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     short sButtonSquare = 255 * keys.data.bButtonSquare;
     short sButtonCross = 255 * keys.data.bButtonCross;
-    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -1850,6 +1842,10 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
         if (keys.data.ucButtonCross != 0)
             sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
+
+    // Put the result into the controllerstate
+    ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = 255 * keys.data.bButtonCircle;
