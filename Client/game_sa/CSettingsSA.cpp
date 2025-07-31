@@ -739,12 +739,14 @@ bool CSettingsSA::SetFieldOfViewSniperAiming(float angle, bool fromScript)
     }
 
     if (cameraViewMode == MODE_SNIPER)
+    {
         cam->SetFOV(angle);
+        *(float*)0x00B6FFE8 = angle;
+    }
 
     ms_fovSniperAimingFromScript = fromScript;
     ms_fovSniperAiming = angle;
 
-    *(float*)0x00B6FFE8 = angle;
     return true;
 }
 
