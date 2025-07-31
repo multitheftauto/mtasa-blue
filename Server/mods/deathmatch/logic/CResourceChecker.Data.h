@@ -23,13 +23,13 @@ namespace
     };
 
     SVersionItem clientFunctionInitList[] = {
-        // Features added in 1.6.1
-        // {"name", "1.6.1-9.bbbbb"},
+        // Features added in 1.7.0
+        // {"name", "1.7.0-9.bbbbb"},
     };
 
     SVersionItem serverFunctionInitList[] = {
-        // Features added in 1.6.1
-        // {"name", "1.6.1-9.bbbbb"},
+        // Features added in 1.7.0
+        // {"name", "1.7.0-9.bbbbb"},
     };
 #endif
 
