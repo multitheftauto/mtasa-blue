@@ -2438,7 +2438,7 @@ void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)
                         if (pOther->GetDimension() == pPlayer->GetDimension())
                         {
                             // Newer clients only need sync if vehicle has no driver
-                            if (pOther->GetBitStreamVersion() < 0x5D || pVehicle->GetOccupant(0) == NULL)
+                            if (pVehicle->GetOccupant(0) == nullptr)
                             {
                                 sendList.push_back(pOther);
                             }
