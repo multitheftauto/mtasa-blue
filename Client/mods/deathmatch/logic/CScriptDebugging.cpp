@@ -116,23 +116,6 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
     return false;
 }
 
-enum DebugScriptLevels : std::uint8_t
-{
-    NONE,
-    ERRORS_ONLY,
-    ERRORS_AND_WARNINGS,
-    ALL,
-};
-
-enum DebugMessageLevels : std::uint8_t
-{
-    MESSAGE_TYPE_DEBUG,
-    MESSAGE_TYPE_ERROR,
-    MESSAGE_TYPE_WARNING,
-    MESSAGE_TYPE_INFO,
-    MESSAGE_TYPE_CUSTOM,
-};
-
 
 void CScriptDebugging::UpdateLogOutput()
 {
