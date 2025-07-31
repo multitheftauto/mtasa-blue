@@ -572,16 +572,16 @@ void CSettingsSA::ResetFieldOfViewSniperAiming()
 {
     // Restore original bytes
     // Zoom in
-    MemPut<void*>(0x51089F, (void*)0x858CE0);
-    MemPut<void*>(0x5108B9, (void*)0x858CE0);
-    MemPut<void*>(0x5108AE, "\x8C\x42");
-    MemPut<void*>(0x5108CF, "\x8C\x42");
+    MemCpy((void*)0x51089D, "\xD8\x1D\xE0\x8C\x85\x00", 6);
+    MemCpy((void*)0x5108B6, "\xD8\x1D\xE0\x8C\x85\x00", 6);
+    MemCpy((void*)0x5108AA, "\xC7\x07\x00\x00\x8C\x42", 6);
+    MemCpy((void*)0x5108C7, "\xC7\x05\xE8\xFF\xB6\x00\x00\x00\x8C\x42", 10);
 
     // Zoom out
-    MemPut<void*>(0x5109A3, (void*)0x858B48);
-    MemPut<void*>(0x5109BC, (void*)0x858B48);
-    MemPut<void*>(0x5109B2, "\x70\x41");
-    MemPut<void*>(0x5109CF, "\x70\x41");
+    MemCpy((void*)0x5109A1, "\xD8\x1D\x48\x8B\x85\x00", 6);
+    MemCpy((void*)0x5109BA, "\xD8\x1D\x48\x8B\x85\x00", 6);
+    MemCpy((void*)0x5109AE, "\xC7\x07\x00\x00\x70\x41", 6);
+    MemCpy((void*)0x5109C7, "\xC7\x05\xE8\xFF\xB6\x00\x00\x00\x70\x41 ", 10);   
 
     ms_fovSniperAimingFromScript = false;
     ms_fovSniperAiming = 70.0f;
@@ -589,8 +589,8 @@ void CSettingsSA::ResetFieldOfViewSniperAiming()
 
 void CSettingsSA::ResetFieldOfView1stPersonAiming()
 {
-    MemPut((void*)0x510711, "\xC7\x07\x00\x00\x8C\x42");
-    MemPut((void*)0x511B71, "\xC7\x86\xB4\x00\x00\x00\x00\x00\x8C\x42");
+    MemCpy((void*)0x510711, "\xC7\x07\x00\x00\x8C\x42", 6);
+    MemCpy((void*)0x511B71, "\xC7\x86\xB4\x00\x00\x00\x00\x00\x8C\x42", 10);
 
     ms_fov1stPersonAimingFromScript = false;
     ms_fov1stPersonAiming = 70.0f;
@@ -701,7 +701,7 @@ bool CSettingsSA::SetFieldOfViewAiming(float angle, bool fromScript)
 
     CCamera* camera = pGame->GetCamera();
     CCam*    cam = camera->GetCam(camera->GetActiveCam());
-    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+    eCamMode cameraViewMode = static_cast<eCamMode>(cam->GetMode());
 
     if (cameraViewMode != MODE_AIMWEAPON && cameraViewMode != MODE_AIMWEAPON_FROMCAR && cameraViewMode != MODE_AIMWEAPON_ATTACHED)
         return false;
@@ -720,23 +720,24 @@ bool CSettingsSA::SetFieldOfViewSniperAiming(float angle, bool fromScript)
 
     CCamera* camera = pGame->GetCamera();
     CCam*    cam = camera->GetCam(camera->GetActiveCam());
-    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+    eCamMode cameraViewMode = static_cast<eCamMode>(cam->GetMode());
 
     if (!ms_fovSniperAimingFromScript && fromScript)
     {
         // Patch sniper zoom-in/zoom-out limit
-        // zoom in
+        // Zoom in
+        //MemCpy((void*)0x51089D, "\xD8\x1D\xE0\x8C\x85\x00", 6);
+       //MemCpy((void*)0x5108B6, "\xD8\x1D\xE0\x8C\x85\x00", 6);
         MemPut<void*>(0x51089F, &ms_fovSniperAiming_Max);
-        MemPut<void*>(0x5108B9, &ms_fovSniperAiming_Max);
+        MemPut<void*>(0x5108B8, &ms_fovSniperAiming_Max);
+        MemCpy((void*)0x5108AA, "\xC7\x07\x00\x00\x33\x43", 6);
+        MemCpy((void*)0x5108C7, "\xC7\x05\xE8\xFF\xB6\x00\x00\x00\x33\x43", 10);
 
-        MemPut<void*>(0x5108AE, "\x33\x43");
-        MemPut<void*>(0x5108CF, "\x33\x43");
-
-        // zoom out
+        // Zoom out
         MemPut<void*>(0x5109A3, &ms_fovSniperAiming_Min);
         MemPut<void*>(0x5109BC, &ms_fovSniperAiming_Min);
-        MemPut<void*>(0x5109B2, "\x00\x00");
-        MemPut<void*>(0x5109CF, "\x00\x00");
+        MemCpy((void*)0x5109AE, "\xC7\x07\x00\x00\x00\x00", 6);
+        MemCpy((void*)0x5109C7, "\xC7\x05\xE8\xFF\xB6\x00\x00\x00\x00\x00", 10);
     }
 
     if (cameraViewMode == MODE_SNIPER)
@@ -754,7 +755,7 @@ bool CSettingsSA::SetFieldOfView1stPersonAiming(float angle, bool fromScript)
 
     CCamera* camera = pGame->GetCamera();
     CCam*    cam = camera->GetCam(camera->GetActiveCam());
-    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+    eCamMode cameraViewMode = static_cast<eCamMode>(cam->GetMode());
 
     if (!ms_fov1stPersonAimingFromScript && fromScript)
     {
