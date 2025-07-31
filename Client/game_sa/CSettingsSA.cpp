@@ -590,6 +590,7 @@ void CSettingsSA::ResetFieldOfViewSniperAiming()
 void CSettingsSA::ResetFieldOfView1stPersonAiming()
 {
     MemPut((void*)0x510711, "\xC7\x07\x00\x00\x8C\x42");
+    MemPut((void*)0x511B71, "\xC7\x86\xB4\x00\x00\x00\x00\x00\x8C\x42");
 
     ms_fov1stPersonAimingFromScript = false;
     ms_fov1stPersonAiming = 70.0f;
@@ -756,7 +757,10 @@ bool CSettingsSA::SetFieldOfView1stPersonAiming(float angle, bool fromScript)
     eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
 
     if (!ms_fov1stPersonAimingFromScript && fromScript)
+    {
         MemSet((void*)0x510711, 0x90, 6);
+        MemSet((void*)0x511B71, 0x90, 10);
+    }
 
     if (cameraViewMode == MODE_SNIPER || cameraViewMode == MODE_M16_1STPERSON || cameraViewMode == MODE_HELICANNON_1STPERSON || cameraViewMode == MODE_CAMERA)
         cam->SetFOV(angle);
