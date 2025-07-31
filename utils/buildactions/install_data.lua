@@ -5,18 +5,19 @@ premake.modules.install_data = {}
 -- Config variables
 local BIN_DIR = "Bin"
 local DATA_DIR = "Shared/data/MTA San Andreas"
+local BASE_URL = "https://mirror-cdn.multitheftauto.com/bdata/"
 
-local NET_PATH_X86_WIN = "https://mirror-cdn.multitheftauto.com/bdata/net.dll"
-local NET_PATH_X64_WIN = "https://mirror-cdn.multitheftauto.com/bdata/net_64.dll"
-local NET_PATH_ARM64_WIN = "https://mirror-cdn.multitheftauto.com/bdata/net_arm64.dll"
-local NETC_PATH_WIN = "https://mirror-cdn.multitheftauto.com/bdata/netc.dll"
+local NET_PATH_X86_WIN   = BASE_URL .. "net.dll"
+local NET_PATH_X64_WIN   = BASE_URL .. "net_64.dll"
+local NET_PATH_ARM64_WIN = BASE_URL .. "net_arm64.dll"
+local NETC_PATH_WIN      = BASE_URL .. "netc.dll"
 
-local NET_PATH_X86_LINUX = "https://mirror-cdn.multitheftauto.com/bdata/net.so"
-local NET_PATH_X64_LINUX = "https://mirror-cdn.multitheftauto.com/bdata/net_64.so"
-local NET_PATH_ARM_LINUX = "https://mirror-cdn.multitheftauto.com/bdata/net_arm.so"
-local NET_PATH_ARM64_LINUX = "https://mirror-cdn.multitheftauto.com/bdata/net_arm64.so"
+local NET_PATH_X86_LINUX   = BASE_URL .. "net.so"
+local NET_PATH_X64_LINUX   = BASE_URL .. "net_64.so"
+local NET_PATH_ARM_LINUX   = BASE_URL .. "net_arm.so"
+local NET_PATH_ARM64_LINUX = BASE_URL .. "net_arm64.so"
 
-local NET_PATH_X64_MACOS = "https://mirror-cdn.multitheftauto.com/bdata/net.dylib"
+local NET_PATH_X64_MACOS = BASE_URL .. "net.dylib"
 
 newaction {
 	trigger = "install_data",
