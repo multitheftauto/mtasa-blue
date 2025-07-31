@@ -1713,14 +1713,12 @@ void CClientPed::SetUsesCollision(bool bUsesCollision)
 
 float CClientPed::GetMaxHealth()
 {
-    // TODO: Verify this formula
-
     // Grab his player health stat
     float fStat = GetStat(MAX_HEALTH);
 
     // Do a linear interpolation to get how much health this would allow
-    // Assumes: 100 health = 569 stat, 200 health = 1000 stat.
-    float fMaxHealth = 100.0f + (100.0f / 431.0f * (fStat - 569.0f));
+    // Assumes: 100 health = 569 stat, 176 health = 1000 stat.
+    float fMaxHealth = fStat * 0.176f;
 
     // Return the max health. Make sure it can't be below 1
     if (fMaxHealth < 1.0f)
@@ -6477,12 +6475,6 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Check the server is compatible if we are a ped
-    if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        return false;
-    }
-
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
     {
@@ -6651,11 +6643,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Write the ped ID to it if server supports it
-    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        pBitStream->Write(GetID());
-    }
+    pBitStream->Write(GetID());
 
     // Write the vehicle id to it and that we're requesting to get into it
     pBitStream->Write(pVehicle->GetID());
@@ -6714,12 +6702,6 @@ bool CClientPed::ExitVehicle()
 
     // We dead?
     if (IsDead())
-    {
-        return false;
-    }
-
-    // Check the server is compatible if we are a ped
-    if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {
         return false;
     }
@@ -6784,11 +6766,7 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    // Write the ped ID to it if server supports it
-    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        pBitStream->Write(GetID());
-    }
+    pBitStream->Write(GetID());
 
     // Write the vehicle id to it and that we're requesting to get out of it
     pBitStream->Write(pOccupiedVehicle->GetID());
@@ -6916,10 +6894,7 @@ void CClientPed::UpdateVehicleInOut()
             if (pBitStream)
             {
                 // Write the ped ID to it
-                if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                {
-                    pBitStream->Write(GetID());
-                }
+                pBitStream->Write(GetID());
 
                 // Write the car id and the action id (enter complete)
                 pBitStream->Write(m_VehicleInOutID);
@@ -6969,10 +6944,7 @@ void CClientPed::UpdateVehicleInOut()
                 if (pBitStream)
                 {
                     // Write the ped or player ID to it
-                    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                    {
-                        pBitStream->Write(GetID());
-                    }
+                    pBitStream->Write(GetID());
 
                     // Write the car id and the action id (enter complete)
                     pBitStream->Write(m_VehicleInOutID);
@@ -7016,10 +6988,7 @@ void CClientPed::UpdateVehicleInOut()
                 if (pBitStream)
                 {
                     // Write the ped or player ID to it
-                    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                    {
-                        pBitStream->Write(GetID());
-                    }
+                    pBitStream->Write(GetID());
 
                     // Write the car id and the action id (enter complete)
                     pBitStream->Write(m_VehicleInOutID);
@@ -7131,10 +7100,7 @@ void CClientPed::UpdateVehicleInOut()
             return;
 
         // Write the ped or player ID to it
-        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-        {
-            pBitStream->Write(GetID());
-        }
+        pBitStream->Write(GetID());
 
         // Vehicle id
         pBitStream->Write(pOccupiedVehicle->GetID());

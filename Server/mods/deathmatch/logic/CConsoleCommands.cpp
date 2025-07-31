@@ -1570,7 +1570,7 @@ bool CConsoleCommands::OpenPortsTest(CConsole* pConsole, const char* szArguments
 {
     if (pClient->GetClientType() == CClient::CLIENT_CONSOLE)
     {
-#if MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE < VERSION_TYPE_UNTESTED
         if (SStringX(szArguments) == "crashme")
         {
             // For testing crash handling
