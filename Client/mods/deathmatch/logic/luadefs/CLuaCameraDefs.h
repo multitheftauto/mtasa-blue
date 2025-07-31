@@ -36,7 +36,8 @@ public:
     LUA_DECLARE(SetCameraMatrix);
     LUA_DECLARE(SetCameraTarget);
     LUA_DECLARE(SetCameraInterior);
-    LUA_DECLARE(SetCameraFieldOfView);
+    static bool SetCameraFieldOfView(eFieldOfViewMode mode, float fov, std::optional<bool> instant);
+    static void ResetCameraFieldOfView(eFieldOfViewMode mode);
     LUA_DECLARE(FadeCamera);
     LUA_DECLARE(SetCameraClip);
     LUA_DECLARE(GetCameraClip);

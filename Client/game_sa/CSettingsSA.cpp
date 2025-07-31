@@ -494,6 +494,15 @@ float ms_fFOVCarMax = 100;            // at high vehicle velocity
 bool  ms_bFOVPlayerFromScript = false;
 bool  ms_bFOVVehicleFromScript = false;
 
+float ms_fovAiming = 70.0f;
+float ms_fovSniperAiming_Min = 0.0f; // default 15
+float ms_fovSniperAiming_Max = 179.0f; // default 70
+float ms_fov1stPersonAiming = 70.0f;
+float ms_fovSniperAiming = 70.0f;
+bool  ms_fovAimingFromScript = false;
+bool  ms_fovSniperAimingFromScript = false;
+bool  ms_fov1stPersonAimingFromScript = false;
+
 // consider moving this to the camera class - qaisjp
 float CSettingsSA::GetFieldOfViewPlayer()
 {
@@ -510,6 +519,82 @@ float CSettingsSA::GetFieldOfViewVehicleMax()
     return ms_fFOVCarMax;
 }
 
+float CSettingsSA::GetFieldOfViewAiming()
+{
+    CCamera* camera = pGame->GetCamera();
+    CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+
+    return (cameraViewMode == MODE_AIMWEAPON || cameraViewMode == MODE_AIMWEAPON_FROMCAR || cameraViewMode == MODE_AIMWEAPON_ATTACHED) ? cam->GetFOV() : ms_fovAiming;
+}
+
+float CSettingsSA::GetFieldOfViewSniperAiming()
+{
+    CCamera* camera = pGame->GetCamera();
+    CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+
+    return (cameraViewMode == MODE_SNIPER) ? cam->GetFOV() : ms_fovSniperAiming;
+}
+
+float CSettingsSA::GetFieldOfView1stPersonAiming()
+{
+    return ms_fov1stPersonAiming;
+}
+
+void CSettingsSA::ResetFieldOfViewPlayer()
+{
+    float fieldOfView;
+    g_pCore->GetCVars()->Get("fov", fieldOfView);
+    fieldOfView = Clamp(70.f, fieldOfView, 100.f);
+
+    ms_bFOVPlayerFromScript = false;
+    SetFieldOfViewPlayer(fieldOfView, false);
+}
+
+void CSettingsSA::ResetFieldOfViewVehicle()
+{
+    float fieldOfView;
+    g_pCore->GetCVars()->Get("fov", fieldOfView);
+    fieldOfView = Clamp(70.f, fieldOfView, 100.f);
+
+    ms_bFOVVehicleFromScript = false;
+    SetFieldOfViewVehicle(fieldOfView, false);
+}
+
+void CSettingsSA::ResetFieldOfViewVehicleMax()
+{
+    ms_bFOVVehicleFromScript = false;
+    SetFieldOfViewVehicleMax(100, false);
+}
+
+void CSettingsSA::ResetFieldOfViewSniperAiming()
+{
+    // Restore original bytes
+    // Zoom in
+    MemPut<void*>(0x51089F, (void*)0x858CE0);
+    MemPut<void*>(0x5108B8, (void*)0x858CE0);
+    MemPut<void*>(0x5108AE, "\x8C\x42");
+    MemPut<void*>(0x5108CF, "\x8C\x42");
+
+    // Zoom out
+    MemPut<void*>(0x5109A3, (void*)0x858B48);
+    MemPut<void*>(0x5109BC, (void*)0x858B48);
+    MemPut<void*>(0x5109B2, "\x70\x41");
+    MemPut<void*>(0x5109CF, "\x70\x41");
+
+    ms_fovSniperAimingFromScript = false;
+    ms_fovSniperAiming = 70.0f;
+}
+
+void CSettingsSA::ResetFieldOfView1stPersonAiming()
+{
+    MemPut((void*)0x510711, "\xC7\x07\x00\x00\x8C\x42");
+
+    ms_fov1stPersonAimingFromScript = false;
+    ms_fov1stPersonAiming = 70.0f;
+}
+
 void CSettingsSA::UpdateFieldOfViewFromSettings()
 {
     float fFieldOfView;
@@ -518,12 +603,19 @@ void CSettingsSA::UpdateFieldOfViewFromSettings()
     SetFieldOfViewPlayer(fFieldOfView, false);
     SetFieldOfViewVehicle(fFieldOfView, false);
     SetFieldOfViewVehicleMax(100, false);
+
+    ResetFieldOfViewSniperAiming();
+    ResetFieldOfView1stPersonAiming();
 }
 
 void CSettingsSA::ResetFieldOfViewFromScript()
 {
     ms_bFOVPlayerFromScript = false;
     ms_bFOVVehicleFromScript = false;
+    ms_fovAimingFromScript = false;
+    ms_fovSniperAimingFromScript = false;
+    ms_fov1stPersonAimingFromScript = false;
+
     UpdateFieldOfViewFromSettings();
 }
 
@@ -596,6 +688,82 @@ void CSettingsSA::SetFieldOfViewVehicleMax(float fAngle, bool bFromScript, bool 
     // CCam::Process_FollowCar_SA
     MemPut<void*>(0x0524BB4, &ms_fFOVCarMax);
     MemPut<float>(0x0524BC5, ms_fFOVCarMax);
+}
+
+//////////////////////////////////////////////
+// This needs to be called every frame, because CCam::Process_AimWeapon overrides the FOV every frame
+//////////////////////////////////////////////
+bool CSettingsSA::SetFieldOfViewAiming(float angle, bool fromScript)
+{
+    if (!fromScript && ms_fovAimingFromScript)
+        return false;
+
+    CCamera* camera = pGame->GetCamera();
+    CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+
+    if (cameraViewMode != MODE_AIMWEAPON && cameraViewMode != MODE_AIMWEAPON_FROMCAR && cameraViewMode != MODE_AIMWEAPON_ATTACHED)
+        return false;
+
+    cam->SetFOV(angle);
+    ms_fovAimingFromScript = fromScript;
+    ms_fovAiming = angle;
+
+    return true;
+}
+
+bool CSettingsSA::SetFieldOfViewSniperAiming(float angle, bool fromScript)
+{
+    if (!fromScript && ms_fovSniperAimingFromScript)
+        return false;
+
+    CCamera* camera = pGame->GetCamera();
+    CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+
+    if (!ms_fovSniperAimingFromScript && fromScript)
+    {
+        // Patch sniper zoom-in/zoom-out limit
+        // zoom in
+        MemPut<void*>(0x51089F, &ms_fovSniperAiming_Max);
+        MemPut<void*>(0x5108B8, &ms_fovSniperAiming_Max);
+
+        MemPut<void*>(0x5108AE, "\x33\x43");
+        MemPut<void*>(0x5108CF, "\x33\x43");
+
+        // zoom out
+        MemPut<void*>(0x5109A3, &ms_fovSniperAiming_Min);
+        MemPut<void*>(0x5109BC, &ms_fovSniperAiming_Min);
+        MemPut<void*>(0x5109B2, "\x00\x00");
+        MemPut<void*>(0x5109CF, "\x00\x00");
+    }
+
+    if (cameraViewMode == MODE_SNIPER)
+        cam->SetFOV(angle);
+
+    ms_fovSniperAimingFromScript = fromScript;
+    ms_fovSniperAiming = angle;
+    return true;
+}
+
+bool CSettingsSA::SetFieldOfView1stPersonAiming(float angle, bool fromScript)
+{
+    if (!fromScript && ms_fov1stPersonAimingFromScript)
+        return false;
+
+    CCamera* camera = pGame->GetCamera();
+    CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+
+    if (!ms_fov1stPersonAimingFromScript && fromScript)
+        MemSet((void*)0x510711, 0x90, 6);
+
+    if (cameraViewMode == MODE_SNIPER || cameraViewMode == MODE_M16_1STPERSON || cameraViewMode == MODE_HELICANNON_1STPERSON || cameraViewMode == MODE_CAMERA)
+        cam->SetFOV(angle);
+
+    ms_fov1stPersonAimingFromScript = fromScript;
+    ms_fov1stPersonAiming = angle;
+    return true;
 }
 
 ////////////////////////////////////////////////
