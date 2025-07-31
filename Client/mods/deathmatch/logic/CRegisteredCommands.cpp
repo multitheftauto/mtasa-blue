@@ -28,21 +28,19 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     assert(pLuaMain);
     assert(szKey);
 
-    if (CommandExists(szKey, NULL))
+    if (CommandExists(szKey, nullptr))
     {
-        CClientGame::eMultiCommandHandlerPolicy allowMultiHandlers = g_pClientGame->GetAllowMultiCommandHandlers();
+        CClientGame::MultiCommandHandlerPolicy allowMultiHandlers = g_pClientGame->GetAllowMultiCommandHandlers();
         
-        // If not allowing duplicate handlers, show warning and block
-        if (allowMultiHandlers == CClientGame::MULTI_COMMAND_DISABLED)
+        // If not allowing duplicate handlers, throw error and block
+        if (allowMultiHandlers == CClientGame::MultiCommandHandlerPolicy::DISABLED)
         {
-            g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
+            g_pClientGame->GetScriptDebugging()->LogError(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
             return false;
         }
         // If allowing with warning (default), log warning and proceed
-        else if (allowMultiHandlers == CClientGame::MULTI_COMMAND_ENABLED)
-        {
+        else if (allowMultiHandlers == CClientGame::MultiCommandHandlerPolicy::ENABLED)
             g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
-        }
     }
 
     // Check if we already have this key and handler
@@ -144,7 +142,7 @@ bool CRegisteredCommands::CommandExists(const char* szKey, CLuaMain* pLuaMain)
 {
     assert(szKey);
 
-    return GetCommand(szKey, pLuaMain) != NULL;
+    return GetCommand(szKey, pLuaMain) != nullptr;
 }
 
 bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArguments)
@@ -201,7 +199,7 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand(const char* szKey
     }
 
     // Doesn't exist
-    return NULL;
+    return nullptr;
 }
 
 void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments)
@@ -222,7 +220,7 @@ void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunct
         while (arg)
         {
             Arguments.PushString(arg);
-            arg = strtok(NULL, " ");
+            arg = strtok(nullptr, " ");
         }
         delete[] szTempArguments;
     }

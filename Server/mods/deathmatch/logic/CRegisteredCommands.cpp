@@ -38,21 +38,19 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     assert(pLuaMain);
     assert(szKey);
 
-    if (CommandExists(szKey, NULL))
+    if (CommandExists(szKey, nullptr))
     {
-        int iAllowMultiCommandHandlers = g_pGame->GetConfig()->GetAllowMultiCommandHandlers();
+        int allowMultiCommandHandlers = g_pGame->GetConfig()->GetAllowMultiCommandHandlers();
         
-        if (iAllowMultiCommandHandlers == 0)
+        if (allowMultiCommandHandlers == 0)
         {
-            // Block silently
+            g_pGame->GetScriptDebugging()->LogError(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
             return false;
         }
-        else if (iAllowMultiCommandHandlers == 1)
-        {
+        else if (allowMultiCommandHandlers == 1)
             // Allow with warning (default behavior)
             g_pGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "Attempt to register duplicate command '%s'", szKey);
-        }
-        // For iAllowMultiCommandHandlers == 2, allow silently (no action needed)
+        // For allowMultiCommandHandlers == 2, allow silently (no action needed)
     }
 
     // Check if we already have this key and handler
@@ -159,7 +157,7 @@ bool CRegisteredCommands::CommandExists(const char* szKey, CLuaMain* pLuaMain)
 {
     assert(szKey);
 
-    return GetCommand(szKey, pLuaMain) != NULL;
+    return GetCommand(szKey, pLuaMain) != nullptr;
 }
 
 bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArguments, CClient* pClient)
@@ -223,7 +221,7 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand(const char* szKey
     }
 
     // Doesn't exist
-    return NULL;
+    return nullptr;
 }
 
 void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments,
@@ -273,7 +271,7 @@ void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunct
         while (arg)
         {
             Arguments.PushString(arg);
-            arg = strtok(NULL, " ");
+            arg = strtok(nullptr, " ");
         }
 
         delete[] szTempArguments;

@@ -81,7 +81,7 @@ CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
     m_bSyncMapElementData = true;
     m_elementDataWhitelisted = false;
     m_checkDuplicateSerials = true;
-    m_iAllowMultiCommandHandlers = 1;
+    m_allowMultiCommandHandlers = 1;
 }
 
 bool CMainConfig::Load()
@@ -540,8 +540,8 @@ bool CMainConfig::Load()
 
     GetBoolean(m_pRootNode, "elementdata_whitelisted", m_elementDataWhitelisted);
     GetBoolean(m_pRootNode, "check_duplicate_serials", m_checkDuplicateSerials);
-    GetInteger(m_pRootNode, "allow_multi_command_handlers", m_iAllowMultiCommandHandlers);
-    m_iAllowMultiCommandHandlers = Clamp(0, m_iAllowMultiCommandHandlers, 2);
+    GetInteger(m_pRootNode, "allow_multi_command_handlers", m_allowMultiCommandHandlers);
+    m_allowMultiCommandHandlers = Clamp(0, m_allowMultiCommandHandlers, 2);
 
     ApplyNetOptions();
 

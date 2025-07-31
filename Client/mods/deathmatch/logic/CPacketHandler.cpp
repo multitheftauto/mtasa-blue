@@ -25,11 +25,6 @@
 #include "CServerInfo.h"
 
 
-enum eMultiCommandHandlerPolicy
-{
-    BLOCK_DUPLICATE_HANDLERS,
-    ALLOW_MULTI_HANDLERS
-};
 
 using std::list;
 
@@ -5575,9 +5570,10 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
     if (bitStream.Can(eBitStreamVersion::ShotgunDamageFix))
         bitStream.Read(ucAllowShotgunDamageFix);
 
-    uchar ucAllowMultiCommandHandlers = 1;
-    bitStream.Read(ucAllowMultiCommandHandlers);
-    g_pClientGame->SetAllowMultiCommandHandlers(static_cast<CClientGame::eMultiCommandHandlerPolicy>(ucAllowMultiCommandHandlers));
+    uchar allowMultiCommandHandlers = 1;
+    if (bitStream.Can(eBitStreamVersion::MultiCommandHandlers))
+        bitStream.Read(allowMultiCommandHandlers);
+    g_pClientGame->SetAllowMultiCommandHandlers(static_cast<CClientGame::MultiCommandHandlerPolicy>(allowMultiCommandHandlers));
 
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = (ucUseAltPulseOrder != 0);

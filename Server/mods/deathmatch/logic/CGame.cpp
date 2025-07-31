@@ -4831,10 +4831,10 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
     uchar ucAllowFastSprintFix = true;
     uchar ucAllowDrivebyAnimFix = true;
     uchar ucAllowShotgunDamageFix = true;
-    uchar ucAllowMultiCommandHandlers = m_pMainConfig->GetAllowMultiCommandHandlers();
+    uchar allowMultiCommandHandlers = m_pMainConfig->GetAllowMultiCommandHandlers();
 
     CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs,
-                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix, ucAllowMultiCommandHandlers);
+                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix, allowMultiCommandHandlers);
     if (pPlayer)
         pPlayer->Send(packet);
     else

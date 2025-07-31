@@ -193,10 +193,10 @@ public:
         QUIT_TIMEOUT,
     };
     
-    enum eMultiCommandHandlerPolicy
+    enum class MultiCommandHandlerPolicy
     {
-        MULTI_COMMAND_DISABLED = 0,
-        MULTI_COMMAND_ENABLED = 1
+        DISABLED = 0,
+        ENABLED = 1
     };
     enum
     {
@@ -476,8 +476,8 @@ public:
 
     void OnWindowFocusChange(bool state);
     
-    void SetAllowMultiCommandHandlers(eMultiCommandHandlerPolicy policy);
-    eMultiCommandHandlerPolicy GetAllowMultiCommandHandlers() const;
+    void SetAllowMultiCommandHandlers(MultiCommandHandlerPolicy policy) noexcept { m_allowMultiCommandHandlers = policy; }
+    MultiCommandHandlerPolicy GetAllowMultiCommandHandlers() const noexcept { return m_allowMultiCommandHandlers; }
 
 private:
     // CGUI Callbacks
@@ -881,7 +881,7 @@ private:
     // Key is the task and value is the CClientPed*
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
     
-    eMultiCommandHandlerPolicy m_eAllowMultiCommandHandlers;
+    MultiCommandHandlerPolicy m_allowMultiCommandHandlers;
     
     long long m_timeLastDiscordStateUpdate;
 };
