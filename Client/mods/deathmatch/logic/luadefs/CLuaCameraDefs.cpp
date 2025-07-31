@@ -28,7 +28,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraTarget", ArgumentParserWarn<false, GetCameraTarget>},
         {"getCameraInterior", ArgumentParserWarn<false, GetCameraInterior>},
         {"getCameraGoggleEffect", ArgumentParserWarn<false, GetCameraGoggleEffect>},
-        {"getCameraFieldOfView", GetCameraFieldOfView},
+        {"getCameraFieldOfView", ArgumentParserWarn<false, GetCameraFieldOfView>},
         {"getCameraDrunkLevel", ArgumentParserWarn<false, GetCameraDrunkLevel>},
 
         // Cam set funcs
@@ -163,6 +163,27 @@ std::string CLuaCameraDefs::GetCameraGoggleEffect()
         return "normal";
 }
 
+std::variant<float, bool> CLuaCameraDefs::GetCameraFieldOfView(eFieldOfViewMode mode)
+{
+    switch (mode)
+    {
+        case FOV_MODE_PLAYER:
+            return g_pGame->GetSettings()->GetFieldOfViewPlayer();
+        case FOV_MODE_VEHICLE:
+            return g_pGame->GetSettings()->GetFieldOfViewVehicle();
+        case FOV_MODE_VEHICLE_MAX:
+            return g_pGame->GetSettings()->GetFieldOfViewVehicleMax();
+        case FOV_MODE_AIMING:
+            return g_pGame->GetSettings()->GetFieldOfViewAiming();
+        case FOV_MODE_SNIPER_AIMING:
+            return g_pGame->GetSettings()->GetFieldOfViewSniperAiming();
+        case FOV_MODE_1ST_PERSON_AIMING:
+            return g_pGame->GetSettings()->GetFieldOfView1stPersonAiming();
+        default:
+            return false;
+    }
+}
+
 unsigned char CLuaCameraDefs::GetCameraDrunkLevel()
 {
     return g_pGame->GetPlayerInfo()->GetCamDrunkLevel();
@@ -262,40 +283,6 @@ void CLuaCameraDefs::ResetCameraFieldOfView(eFieldOfViewMode mode)
             g_pGame->GetSettings()->ResetFieldOfView1stPersonAiming();
             break;
     }
-}
-
-// Only when onfoot/invehicle
-int CLuaCameraDefs::GetCameraFieldOfView(lua_State* luaVM)
-{
-    eFieldOfViewMode eMode;
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadEnumString(eMode);
-
-    if (!argStream.HasErrors())
-    {
-        float fFOV;
-        if (eMode == FOV_MODE_PLAYER)
-            fFOV = g_pGame->GetSettings()->GetFieldOfViewPlayer();
-        else if (eMode == FOV_MODE_VEHICLE)
-            fFOV = g_pGame->GetSettings()->GetFieldOfViewVehicle();
-        else if (eMode == FOV_MODE_VEHICLE_MAX)
-            fFOV = g_pGame->GetSettings()->GetFieldOfViewVehicleMax();
-        else
-        {
-            argStream.m_iIndex = 1;
-            m_pScriptDebugging->LogCustom(luaVM, SString("Enum not yet implemented: " + EnumToString(eMode)));
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        lua_pushnumber(luaVM, fFOV);
-        return 1;
-    }
-
-    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
 int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
