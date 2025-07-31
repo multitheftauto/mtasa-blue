@@ -409,6 +409,10 @@ enum class eBitStreamVersion : unsigned short
     // 2025-07-30
     MultiCommandHandlers,
 
+    // Add support for multiple command handlers configuration
+    // 2025-07-30
+    MultiCommandHandlers,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

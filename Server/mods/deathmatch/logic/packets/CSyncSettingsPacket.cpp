@@ -74,5 +74,6 @@ bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const
 
     if (BitStream.Can(eBitStreamVersion::MultiCommandHandlers))
         BitStream.Write(m_allowMultiCommandHandlers);
+
     return true;
 }
