@@ -145,7 +145,6 @@ DWORD RETURN_CWeapon_FireAreaEffect = 0x73EC03;
 #define HOOKPOS_RenderScene_end                             0x53E159
 #define HOOKPOS_CPlantMgr_Render                            0x5DBC4C
 DWORD RETURN_CPlantMgr_Render_success = 0x5DBC52;
-DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
@@ -5674,9 +5673,6 @@ rendercheck:
         mov edx, edi
         fld ds:[0x8D12C0]
         jmp RETURN_CPlantMgr_Render_success
-
-fail:
-        jmp RETURN_CPlantMgr_Render_fail
     }
 }
 

@@ -291,6 +291,8 @@ void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
 
         // For the crash dialog
         SetApplicationSetting("diagnostics", "last-crash-info", strInfo);
+        SetApplicationSetting("diagnostics", "last-crash-module", pExceptionInformation->GetModulePathName());
+        SetApplicationSettingInt("diagnostics", "last-crash-code", pExceptionInformation->GetCode());
         WriteDebugEvent(strInfo.Replace("\n", " "));
     }
 }
