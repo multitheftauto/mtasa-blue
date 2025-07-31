@@ -32,7 +32,7 @@
             </Rating>
         </Ratings>
         <Version>
-            <VersionNumber versionNumber="1.6.1.0" />
+            <VersionNumber versionNumber="1.7.0.0" />
         </Version>
         <WindowsSystemPerformanceRating minimum="2.0" recommended="4.0" />
         <Developers>
