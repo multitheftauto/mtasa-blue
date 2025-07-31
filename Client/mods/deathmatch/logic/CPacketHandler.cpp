@@ -3220,17 +3220,9 @@ retry:
                     bitStream.Read(&rotationDegrees);
 
                     // Read out the vehicle value as a char, then convert
-                    unsigned char ucModel = 0xFF;
-                    bitStream.Read(ucModel);
-
-                    // The server appears to subtract 400 from the vehicle id before
-                    // sending it to us, as to allow the value to fit into an unsigned
-                    // char.
-                    //
-                    // Too bad this was never documented.
-                    //
-                    // --slush
-                    unsigned short usModel = ucModel + 400;
+                    std::uint16_t usModel = 0xFFFF;
+                    bitStream.Read(usModel);
+                    
                     if (!CClientVehicleManager::IsValidModel(usModel))
                     {
                         RaiseEntityAddError(39);
