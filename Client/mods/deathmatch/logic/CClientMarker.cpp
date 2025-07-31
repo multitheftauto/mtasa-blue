@@ -298,11 +298,6 @@ float CClientMarker::GetSize() const
     return m_pMarker->GetSize();
 }
 
-float CClientColTube::AdjustSize(float fSize)
-{
-    return (fSize / 2.0f) + 0.15f;  
-}
-
 void CClientMarker::SetSize(float fSize)
 {
     switch (m_pCollision->GetShapeType())
@@ -322,7 +317,7 @@ void CClientMarker::SetSize(float fSize)
         case COLSHAPE_TUBE:
         {
             CClientColTube* pShape = static_cast<CClientColTube*>(m_pCollision);
-            pShape->SetRadius(pShape->AdjustSize(fSize));
+            pShape->SetRadius(fSize);
             pShape->SetHeight(fSize);
             break;
         }
