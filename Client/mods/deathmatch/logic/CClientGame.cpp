@@ -3886,12 +3886,7 @@ void CClientGame::PostWorldProcessEntitiesAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
 
-    if (m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false))
-    {
-        CStaticFunctionDefinitions::AddEventHandler("onClientPedsProcessed", "onClientPostUpdate", "The 'onClientPedsProcessed' event is deprecated and has been renamed to 'onClientPostUpdate'.");
-        return; 
-    }
-
+    // Only trigger the new event onClientPostUpdate
     m_pRootEntity->CallEvent("onClientPostUpdate", Arguments, false);
     g_pClientGame->GetModelRenderer()->Update();
 }
