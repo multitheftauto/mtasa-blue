@@ -726,8 +726,6 @@ bool CSettingsSA::SetFieldOfViewSniperAiming(float angle, bool fromScript)
     {
         // Patch sniper zoom-in/zoom-out limit
         // Zoom in
-        //MemCpy((void*)0x51089D, "\xD8\x1D\xE0\x8C\x85\x00", 6);
-       //MemCpy((void*)0x5108B6, "\xD8\x1D\xE0\x8C\x85\x00", 6);
         MemPut<void*>(0x51089F, &ms_fovSniperAiming_Max);
         MemPut<void*>(0x5108B8, &ms_fovSniperAiming_Max);
         MemCpy((void*)0x5108AA, "\xC7\x07\x00\x00\x33\x43", 6);
@@ -745,6 +743,8 @@ bool CSettingsSA::SetFieldOfViewSniperAiming(float angle, bool fromScript)
 
     ms_fovSniperAimingFromScript = fromScript;
     ms_fovSniperAiming = angle;
+
+    *(float*)0x00B6FFE8 = angle;
     return true;
 }
 
@@ -763,7 +763,7 @@ bool CSettingsSA::SetFieldOfView1stPersonAiming(float angle, bool fromScript)
         MemSet((void*)0x511B71, 0x90, 10);
     }
 
-    if (cameraViewMode == MODE_SNIPER || cameraViewMode == MODE_M16_1STPERSON || cameraViewMode == MODE_HELICANNON_1STPERSON || cameraViewMode == MODE_CAMERA)
+    if (cameraViewMode == MODE_SNIPER || cameraViewMode == MODE_M16_1STPERSON || cameraViewMode == MODE_HELICANNON_1STPERSON || cameraViewMode == MODE_CAMERA || cameraViewMode == MODE_ROCKETLAUNCHER)
         cam->SetFOV(angle);
 
     ms_fov1stPersonAimingFromScript = fromScript;
