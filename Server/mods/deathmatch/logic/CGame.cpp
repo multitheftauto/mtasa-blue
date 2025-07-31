@@ -78,8 +78,7 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE  400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
-#define RELEASE_MIN_CLIENT_VERSION          "1.6.0-0.00000"
-#define FIREBALLDESTRUCT_MIN_CLIENT_VERSION "1.6.0-9.22199"
+#define RELEASE_MIN_CLIENT_VERSION "1.6.1-0.00000"
 
 #define DEFAULT_GRAVITY              0.008f
 #define DEFAULT_GAME_SPEED           1.0f
@@ -1847,11 +1846,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             CLogger::LogPrintf("CONNECT: %s failed to connect (Serial already in use) (%s)\n", szNick, strIPAndSerial.c_str());
 
             // Tell the player the problem
-            if (pPlayer->CanBitStream(eBitStreamVersion::CheckDuplicateSerials))
-                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
-            else
-                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::KICK);
-
+            DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::SERIAL_DUPLICATE);
             return;
         }
 
@@ -1903,7 +1898,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetNick(szNick);
                             pPlayer->SetGameVersion(Packet.GetGameVersion());
                             pPlayer->SetMTAVersion(Packet.GetMTAVersion());
-                            pPlayer->SetSerialUser(Packet.GetSerialUser());
                             pPlayer->SetSerial(strSerial, 0);
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
@@ -1966,25 +1960,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
 
                                 // Tell the player he's banned
                                 DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::BANNED_IP, Duration, pBan->GetReason().c_str());
-                                return;
-                            }
-
-                            if (!pPlayer->GetSerialUser().empty() && m_pBanManager->IsAccountBanned(pPlayer->GetSerialUser().c_str()))
-                            {
-                                // Tell the console
-                                CLogger::LogPrintf("CONNECT: %s failed to connect (Account is banned) (%s)\n", szNick, strIPAndSerial.c_str());
-
-                                CBan*   pBan = m_pBanManager->GetBanFromAccount(pPlayer->GetSerialUser().c_str());
-                                time_t  Duration = 0;
-                                SString strReason;
-                                if (pBan)
-                                {
-                                    strReason = pBan->GetReason();
-                                    Duration = pBan->GetBanTimeRemaining();
-                                }
-
-                                // Tell the player he's banned
-                                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::BANNED_ACCOUNT, Duration, strReason.c_str());
                                 return;
                             }
 
@@ -2463,7 +2438,7 @@ void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)
                         if (pOther->GetDimension() == pPlayer->GetDimension())
                         {
                             // Newer clients only need sync if vehicle has no driver
-                            if (pOther->GetBitStreamVersion() < 0x5D || pVehicle->GetOccupant(0) == NULL)
+                            if (pVehicle->GetOccupant(0) == nullptr)
                             {
                                 sendList.push_back(pOther);
                             }
@@ -2984,10 +2959,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
             CElement* pPedElement = CElementIDs::GetElement(PedID);
             if (pPedElement && IS_PED(pPedElement))
             {
-                CPed*     pPed = static_cast<CPed*>(pPedElement);
-                bool      bValidPed = false;
-                bool      bValidVehicle = false;
-                CSendList sendListIncompatiblePlayers;
+                CPed* pPed = static_cast<CPed*>(pPedElement);
+                bool  bValidPed = false;
+                bool  bValidVehicle = false;
 
                 // Grab the vehicle with the chosen ID
                 ElementID VehicleID = Packet.GetVehicleID();
@@ -3014,31 +2988,6 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         {
                             bValidPed = true;
                         }
-                        switch (ucAction)
-                        {
-                            // Check if we are finishing a jacking sequence
-                            case VEHICLE_NOTIFY_JACK:
-                            case VEHICLE_NOTIFY_JACK_ABORT:
-                            {
-                                // Are we jacking a ped?
-                                CPed* pJacked = pVehicle->GetOccupant(0);
-                                if (pJacked && !pJacked->IsPlayer())
-                                {
-                                    // Check that all clients have a compatible bitstream
-                                    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
-                                    {
-                                        CPlayer* pSendPlayer = *iter;
-                                        if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
-                                        {
-                                            if (pSendPlayer->IsJoined())
-                                                // Store this player as incompatible for later
-                                                // This happens because the player joined during a player jacking a ped
-                                                sendListIncompatiblePlayers.push_back(pSendPlayer);
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
                     else
                     {
@@ -3046,34 +2995,6 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         if (pPed->GetSyncer() == pPlayer)
                         {
                             bValidPed = true;
-
-                            // Check that all clients have a compatible bitstream when we have a ped enter/exit
-                            for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
-                            {
-                                CPlayer* pSendPlayer = *iter;
-                                if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
-                                {
-                                    switch (ucAction)
-                                    {
-                                        // Is he requesting to start enter/exit then reject it
-                                        case VEHICLE_REQUEST_IN:
-                                        case VEHICLE_REQUEST_OUT:
-                                        case VEHICLE_NOTIFY_FELL_OFF:
-                                        {
-                                            bValidPed = false;
-                                            break;
-                                        }
-                                        // Otherwise allow it to move on
-                                        default:
-                                        {
-                                            if (pSendPlayer->IsJoined())
-                                                // Store this player as incompatible for later
-                                                // This happens because the player joined during a ped enter/exit
-                                                sendListIncompatiblePlayers.push_back(pSendPlayer);
-                                        }
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -3221,26 +3142,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                 }
                                                 else
                                                 {
-                                                    bool bValidOccupant = false;
                                                     // Is the jacked ped stationary in the car (ie not getting in or out)
-                                                    if (IS_PED(pOccupant) && pOccupant->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
-                                                    {
-                                                        bValidOccupant = true;
-                                                        // Check if we are jacking a ped
-                                                        if (!IS_PLAYER(pOccupant))
-                                                        {
-                                                            // Check that all clients have a compatible bitstream
-                                                            for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
-                                                            {
-                                                                CPlayer* pSendPlayer = *iter;
-                                                                if (!pSendPlayer->CanBitStream(eBitStreamVersion::PedEnterExit))
-                                                                {
-                                                                    bValidOccupant = false;
-                                                                    break;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
+                                                    bool bValidOccupant = (IS_PED(pOccupant) && pOccupant->GetVehicleAction() == CPed::VEHICLEACTION_NONE);
 
                                                     if (bValidOccupant)
                                                     {
@@ -3464,13 +3367,6 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor);
                                     Reply.SetDoorAngle(fDoorAngle);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
-                                    if (!sendListIncompatiblePlayers.empty())
-                                    {
-                                        CBitStream BitStream;
-                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
-                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream),
-                                                                    sendListIncompatiblePlayers);
-                                    }
                                 }
                             }
 
@@ -3551,14 +3447,6 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     // Tell everyone he can start exiting the vehicle
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_RETURN);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
-                                    if (!sendListIncompatiblePlayers.empty())
-                                    {
-                                        // Warp the ped out of the vehicle manually for incompatible players
-                                        CBitStream BitStream;
-                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
-                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream),
-                                                                    sendListIncompatiblePlayers);
-                                    }
 
                                     // Call the ped->vehicle event
                                     CLuaArguments Arguments;
@@ -3744,17 +3632,6 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     Arguments2.PushBoolean(false);            // jacked
                                     pVehicle->CallEvent("onVehicleEnter", Arguments2);
                                 }
-
-                                if (!sendListIncompatiblePlayers.empty())
-                                {
-                                    // Warp the ped into the vehicle manually for incompatible players
-                                    CBitStream BitStream;
-                                    BitStream.pBitStream->Write(pVehicle->GetID());
-                                    BitStream.pBitStream->Write((unsigned char)0);
-                                    BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
-                                    m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream),
-                                                                sendListIncompatiblePlayers);
-                                }
                             }
 
                             break;
@@ -3820,17 +3697,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         Arguments2.PushNumber(ucOccupiedSeat);            // seat
                                         Arguments2.PushElement(pPed);                     // jacker
                                         Arguments2.PushBoolean(false);                    // forcedByScript
-
                                         pVehicle->CallEvent("onVehicleExit", Arguments2);
-
-                                        if (!sendListIncompatiblePlayers.empty())
-                                        {
-                                            // Warp the ped out of the vehicle manually for incompatible players
-                                            CBitStream BitStream;
-                                            BitStream.pBitStream->Write(pJacked->GetSyncTimeContext());
-                                            m_pPlayerManager->Broadcast(CElementRPCPacket(pJacked, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream),
-                                                                        sendListIncompatiblePlayers);
-                                        }
                                     }
                                     pJacked->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                 }
@@ -4421,7 +4288,7 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     CLuaArguments Arguments;
     Arguments.PushString(pPlayer->GetNick());
     Arguments.PushString(pPlayer->GetSourceIP());
-    Arguments.PushString(pPlayer->GetSerialUser().c_str());
+    Arguments.PushString("");
     Arguments.PushString(pPlayer->GetSerial().c_str());
     Arguments.PushNumber(pPlayer->GetMTAVersion());
     Arguments.PushString(pPlayer->GetPlayerVersion());
@@ -4888,12 +4755,6 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < strMinClientRequirementFromResources)
         strNewMin = strMinClientRequirementFromResources;
 
-    if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
-    {
-        if (strNewMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
-            strNewMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
-    }
-
     // Log effective min client version
     if (strNewMin != m_strPrevMinClientConnectRequirement)
     {
@@ -4914,12 +4775,6 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     // Do version based kick check as well
     {
         CMtaVersion strKickMin;
-
-        if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
-        {
-            if (strKickMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
-                strKickMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
-        }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)
         {

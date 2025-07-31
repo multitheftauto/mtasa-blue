@@ -52,19 +52,16 @@ bool CVehicleResyncPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(&health);
 
     // Write parts state
-    if (BitStream.Version() >= 0x5D)
-    {
-        SVehicleDamageSyncMethodeB damage;
-        damage.data.bSyncDoors = true;
-        damage.data.bSyncWheels = true;
-        damage.data.bSyncPanels = true;
-        damage.data.bSyncLights = true;
-        damage.data.doors.data.ucStates = m_pVehicle->m_ucDoorStates;
-        damage.data.wheels.data.ucStates = m_pVehicle->m_ucWheelStates;
-        damage.data.panels.data.ucStates = m_pVehicle->m_ucPanelStates;
-        damage.data.lights.data.ucStates = m_pVehicle->m_ucLightStates;
-        BitStream.Write(&damage);
-    }
+    SVehicleDamageSyncMethodeB damage;
+    damage.data.bSyncDoors = true;
+    damage.data.bSyncWheels = true;
+    damage.data.bSyncPanels = true;
+    damage.data.bSyncLights = true;
+    damage.data.doors.data.ucStates = m_pVehicle->m_ucDoorStates;
+    damage.data.wheels.data.ucStates = m_pVehicle->m_ucWheelStates;
+    damage.data.panels.data.ucStates = m_pVehicle->m_ucPanelStates;
+    damage.data.lights.data.ucStates = m_pVehicle->m_ucLightStates;
+    BitStream.Write(&damage);
 
     return true;
 }
