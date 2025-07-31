@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail -o posix
 
-# Copyright (c) 2019-2024 Cosmin Truta.
+# Copyright (c) 2019-2025 Cosmin Truta.
 #
 # Use, modification and distribution are subject to the MIT License.
 # Please see the accompanying file LICENSE_MIT.txt
@@ -61,7 +61,7 @@ function ci_lint_ci_scripts {
     }
     ci_info "## LINTING: CI scripts ##"
     ci_spawn "$CI_SHELLCHECK" --version
-    find ./ci -maxdepth 1 -name "*.sh" | {
+    find ./ci -name "ci_*.sh" -not -name "ci_env.*.sh" | {
         local my_file
         while IFS="" read -r my_file
         do

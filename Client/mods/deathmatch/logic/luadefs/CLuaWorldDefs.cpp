@@ -1276,9 +1276,6 @@ bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(const WorldSpecialProperty pr
     if (!m_pClientGame->SetWorldSpecialProperty(property, enabled))
         return false;
 
-    if (!g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent))
-        return true;
-
     if (auto stream = g_pNet->AllocateNetBitStream())
     {
         stream->WriteString(EnumToString(property));

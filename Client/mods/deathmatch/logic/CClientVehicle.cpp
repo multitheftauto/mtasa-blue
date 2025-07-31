@@ -1090,7 +1090,10 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
 
         SetSirenOrAlarmActive(false);
 
-        // clear our component data to regenerate it
+        // Cache current component visibility and clear data so it can be regenerated.
+        m_ComponentVisibilityBackup.clear();
+        for (const auto& pair : m_ComponentData)
+            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
         m_ComponentData.clear();
 
         // Reset stored dummy positions
@@ -1118,7 +1121,11 @@ void CClientVehicle::SetVariant(unsigned char ucVariant, unsigned char ucVariant
     m_ucVariation = ucVariant;
     m_ucVariation2 = ucVariant2;
 
-    // clear our component data to regenerate it
+    // Cache visibility so component state survives variant changes
+    m_ComponentVisibilityBackup.clear();
+    for (const auto& pair : m_ComponentData)
+        m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
+    // Clear component data to regenerate it on next create
     m_ComponentData.clear();
 
     ReCreate();
@@ -2858,6 +2865,22 @@ void CClientVehicle::Create()
                 }
             }
         }
+
+        // Merge saved visibility data from previous variant/handling updates
+        if (!m_ComponentVisibilityBackup.empty())
+        {
+            for (const auto& pair : m_ComponentVisibilityBackup)
+            {
+                auto it = m_ComponentData.find(pair.first);
+                if (it != m_ComponentData.end())
+                {
+                    it->second.m_bVisible = pair.second;
+                    SetComponentVisible(pair.first, pair.second);
+                }
+            }
+            m_ComponentVisibilityBackup.clear();
+        }
+            
         // Grab our component data
         std::map<SString, SVehicleComponentData>::iterator iter = m_ComponentData.begin();
         // Loop through our component data

@@ -21,7 +21,8 @@ RM_F = rm -f
 
 # Compiler and linker flags
 NOHWOPT = -DPNG_ARM_NEON_OPT=0 -DPNG_MIPS_MSA_OPT=0 \
-          -DPNG_POWERPC_VSX_OPT=0 -DPNG_INTEL_SSE_OPT=0
+          -DPNG_POWERPC_VSX_OPT=0 -DPNG_INTEL_SSE_OPT=0 \
+          -DPNG_RISCV_RVV_OPT=0
 STDC = -pedantic-errors # -std=c99
 WARN = -Wall -Wextra -Wundef
 WARNMORE = -Wcast-align -Wconversion -Wshadow -Wpointer-arith -Wwrite-strings \
