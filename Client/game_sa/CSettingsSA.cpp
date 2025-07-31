@@ -503,6 +503,9 @@ bool  ms_fovAimingFromScript = false;
 bool  ms_fovSniperAimingFromScript = false;
 bool  ms_fov1stPersonAimingFromScript = false;
 
+float ms_fov1stPerson = 60.0f;
+bool  ms_fov1stPersonFromScript = false;
+
 // consider moving this to the camera class - qaisjp
 float CSettingsSA::GetFieldOfViewPlayer()
 {
@@ -540,6 +543,11 @@ float CSettingsSA::GetFieldOfViewSniperAiming()
 float CSettingsSA::GetFieldOfView1stPersonAiming()
 {
     return ms_fov1stPersonAiming;
+}
+
+float CSettingsSA::GetFieldOfViewVehicleBump()
+{
+    return ms_fov1stPerson;
 }
 
 void CSettingsSA::ResetFieldOfViewPlayer()
@@ -596,6 +604,14 @@ void CSettingsSA::ResetFieldOfView1stPersonAiming()
     ms_fov1stPersonAiming = 70.0f;
 }
 
+void CSettingsSA::ResetFieldOfViewVehicleBump()
+{
+    ms_fov1stPerson = 60.0f;
+    
+    MemCpy((void*)0x517EBA, "\x00\x00\x8C\x42", 4);
+    MemCpy((void*)0x51814B, "\x00\x00\x70\x42", 4);
+}
+
 void CSettingsSA::UpdateFieldOfViewFromSettings()
 {
     float fFieldOfView;
@@ -605,8 +621,10 @@ void CSettingsSA::UpdateFieldOfViewFromSettings()
     SetFieldOfViewVehicle(fFieldOfView, false);
     SetFieldOfViewVehicleMax(100, false);
 
+    ms_fovAiming = 70.0f;
     ResetFieldOfViewSniperAiming();
     ResetFieldOfView1stPersonAiming();
+    ResetFieldOfViewVehicleBump();
 }
 
 void CSettingsSA::ResetFieldOfViewFromScript()
@@ -616,6 +634,7 @@ void CSettingsSA::ResetFieldOfViewFromScript()
     ms_fovAimingFromScript = false;
     ms_fovSniperAimingFromScript = false;
     ms_fov1stPersonAimingFromScript = false;
+    ms_fov1stPersonFromScript = false;
 
     UpdateFieldOfViewFromSettings();
 }
@@ -741,7 +760,8 @@ bool CSettingsSA::SetFieldOfViewSniperAiming(float angle, bool fromScript)
     if (cameraViewMode == MODE_SNIPER)
     {
         cam->SetFOV(angle);
-        *(float*)0x00B6FFE8 = angle;
+
+        *(float*)0xB6FFE8 = angle; // something related to FOV - need it to be set here
     }
 
     ms_fovSniperAimingFromScript = fromScript;
@@ -770,6 +790,20 @@ bool CSettingsSA::SetFieldOfView1stPersonAiming(float angle, bool fromScript)
 
     ms_fov1stPersonAimingFromScript = fromScript;
     ms_fov1stPersonAiming = angle;
+    return true;
+}
+
+bool CSettingsSA::SetFieldOfViewVehicleBump(float angle, bool fromScript)
+{
+    if (!fromScript && ms_fov1stPersonFromScript)
+        return false;
+
+    ms_fov1stPerson = angle;
+
+    MemCpy((void*)0x517EBA, &ms_fov1stPerson, 4);
+    MemCpy((void*)0x51814B, &ms_fov1stPerson, 4);
+
+    ms_fov1stPersonFromScript = fromScript;
     return true;
 }
 

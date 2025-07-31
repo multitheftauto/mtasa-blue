@@ -179,6 +179,8 @@ std::variant<float, bool> CLuaCameraDefs::GetCameraFieldOfView(eFieldOfViewMode 
             return g_pGame->GetSettings()->GetFieldOfViewSniperAiming();
         case FOV_MODE_1ST_PERSON_AIMING:
             return g_pGame->GetSettings()->GetFieldOfView1stPersonAiming();
+        case FOV_MODE_VEHICLE_BUMP:
+            return g_pGame->GetSettings()->GetFieldOfViewVehicleBump();
         default:
             return false;
     }
@@ -256,6 +258,8 @@ bool CLuaCameraDefs::SetCameraFieldOfView(eFieldOfViewMode mode, float fov, std:
             return g_pGame->GetSettings()->SetFieldOfViewSniperAiming(fov, true);
         case FOV_MODE_1ST_PERSON_AIMING:
             return g_pGame->GetSettings()->SetFieldOfView1stPersonAiming(fov, true);
+        case FOV_MODE_VEHICLE_BUMP:
+            return g_pGame->GetSettings()->SetFieldOfViewVehicleBump(fov, true);
     }
 
     return true;
@@ -281,6 +285,9 @@ void CLuaCameraDefs::ResetCameraFieldOfView(eFieldOfViewMode mode)
             break;
         case FOV_MODE_1ST_PERSON_AIMING:
             g_pGame->GetSettings()->ResetFieldOfView1stPersonAiming();
+            break;
+        case FOV_MODE_VEHICLE_BUMP:
+            g_pGame->GetSettings()->ResetFieldOfViewVehicleBump();
             break;
     }
 }
