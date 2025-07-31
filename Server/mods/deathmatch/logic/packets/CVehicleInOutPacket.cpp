@@ -76,17 +76,10 @@ CVehicleInOutPacket::~CVehicleInOutPacket()
 bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream)
 {
     m_PedID = INVALID_ELEMENT_ID;
-    if (BitStream.Can(eBitStreamVersion::PedEnterExit))
+    BitStream.Read(m_PedID);
+    if (m_PedID == INVALID_ELEMENT_ID)
     {
-        BitStream.Read(m_PedID);
-        if (m_PedID == INVALID_ELEMENT_ID)
-        {
-            return false;
-        }
-    }
-    else
-    {
-        m_PedID = GetSourcePlayer()->GetID();
+        return false;
     }
 
     // Read out the vehicle id

@@ -359,6 +359,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("browser_enable_gpu", true);                                              // Enable GPU in CEF? (allows stuff like WebGL to function)
     DEFAULT("process_cpu_affinity", true);                                            // Set CPU 0 affinity to improve game performance and fix the known issue in single-threaded games
     DEFAULT("ask_before_disconnect", true);                                           // Ask before disconnecting from a server
+    DEFAULT("allow_steam_client", false);                                             // Allow connecting with the local Steam client (to set GTA:SA ingame status)
 
     if (!Exists("locale"))
     {

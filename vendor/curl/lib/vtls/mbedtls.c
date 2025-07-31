@@ -29,7 +29,7 @@
  *
  */
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef USE_MBEDTLS
 
@@ -57,26 +57,26 @@
 #endif /* MBEDTLS_VERSION_MAJOR >= 2 */
 
 #include "cipher_suite.h"
-#include "strcase.h"
-#include "urldata.h"
-#include "sendf.h"
-#include "inet_pton.h"
+#include "../strcase.h"
+#include "../urldata.h"
+#include "../sendf.h"
+#include "../curlx/inet_pton.h"
 #include "mbedtls.h"
 #include "vtls.h"
 #include "vtls_int.h"
 #include "vtls_scache.h"
 #include "x509asn1.h"
-#include "parsedate.h"
-#include "connect.h" /* for the connect timeout */
-#include "select.h"
-#include "multiif.h"
+#include "../parsedate.h"
+#include "../connect.h" /* for the connect timeout */
+#include "../select.h"
+#include "../multiif.h"
 #include "mbedtls_threadlock.h"
-#include "strdup.h"
+#include "../strdup.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
+#include "../curl_printf.h"
+#include "../curl_memory.h"
+#include "../memdebug.h"
 
 /* ALPN for http2 */
 #if defined(USE_HTTP2) && defined(MBEDTLS_SSL_ALPN)
@@ -273,7 +273,13 @@ mbed_set_ssl_version_min_max(struct Curl_easy *data,
 #else
   /* mbedTLS 3.2.0 (2022) introduced new methods for setting TLS version */
   mbedtls_ssl_protocol_version ver_min = MBEDTLS_SSL_VERSION_TLS1_2;
-  mbedtls_ssl_protocol_version ver_max = MBEDTLS_SSL_VERSION_TLS1_2;
+  mbedtls_ssl_protocol_version ver_max =
+#ifdef HAS_TLS13_SUPPORT
+    MBEDTLS_SSL_VERSION_TLS1_3
+#else
+    MBEDTLS_SSL_VERSION_TLS1_2
+#endif
+    ;
 #endif
 
   switch(conn_config->version) {
@@ -292,7 +298,11 @@ mbed_set_ssl_version_min_max(struct Curl_easy *data,
   case CURL_SSLVERSION_TLSv1_1:
 #endif
   case CURL_SSLVERSION_TLSv1_2:
-    /* ver_min = MBEDTLS_SSL_VERSION_TLS1_2; */
+#if MBEDTLS_VERSION_NUMBER < 0x03020000
+    ver_min = MBEDTLS_SSL_MINOR_VERSION_3; /* TLS 1.2 */
+#else
+    ver_min = MBEDTLS_SSL_VERSION_TLS1_2;
+#endif
     break;
   case CURL_SSLVERSION_TLSv1_3:
 #ifdef HAS_TLS13_SUPPORT
@@ -314,7 +324,11 @@ mbed_set_ssl_version_min_max(struct Curl_easy *data,
     break;
 #endif
   case CURL_SSLVERSION_MAX_TLSv1_2:
-    /* ver_max = MBEDTLS_SSL_VERSION_TLS1_2; */
+#if MBEDTLS_VERSION_NUMBER < 0x03020000
+    ver_max = MBEDTLS_SSL_MINOR_VERSION_3; /* TLS 1.2 */
+#else
+    ver_max = MBEDTLS_SSL_VERSION_TLS1_2;
+#endif
     break;
 #if MBEDTLS_VERSION_NUMBER < 0x03000000
   case CURL_SSLVERSION_MAX_TLSv1_1:

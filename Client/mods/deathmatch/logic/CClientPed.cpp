@@ -4970,7 +4970,10 @@ void CClientPed::DestroySatchelCharges(bool bBlow, bool bDestroy)
                 bool bCancelExplosion = !CallEvent("onClientExplosion", Arguments, true);
 
                 if (!bCancelExplosion)
+                {
                     m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
+                    g_pClientGame->SendExplosionSync(vecPosition, EXP_TYPE_GRENADE, this);
+                }
             }
             if (bDestroy)
             {
@@ -6474,12 +6477,6 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Check the server is compatible if we are a ped
-    if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        return false;
-    }
-
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
     {
@@ -6648,11 +6645,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Write the ped ID to it if server supports it
-    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        pBitStream->Write(GetID());
-    }
+    pBitStream->Write(GetID());
 
     // Write the vehicle id to it and that we're requesting to get into it
     pBitStream->Write(pVehicle->GetID());
@@ -6711,12 +6704,6 @@ bool CClientPed::ExitVehicle()
 
     // We dead?
     if (IsDead())
-    {
-        return false;
-    }
-
-    // Check the server is compatible if we are a ped
-    if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {
         return false;
     }
@@ -6781,11 +6768,7 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    // Write the ped ID to it if server supports it
-    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        pBitStream->Write(GetID());
-    }
+    pBitStream->Write(GetID());
 
     // Write the vehicle id to it and that we're requesting to get out of it
     pBitStream->Write(pOccupiedVehicle->GetID());
@@ -6913,10 +6896,7 @@ void CClientPed::UpdateVehicleInOut()
             if (pBitStream)
             {
                 // Write the ped ID to it
-                if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                {
-                    pBitStream->Write(GetID());
-                }
+                pBitStream->Write(GetID());
 
                 // Write the car id and the action id (enter complete)
                 pBitStream->Write(m_VehicleInOutID);
@@ -6966,10 +6946,7 @@ void CClientPed::UpdateVehicleInOut()
                 if (pBitStream)
                 {
                     // Write the ped or player ID to it
-                    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                    {
-                        pBitStream->Write(GetID());
-                    }
+                    pBitStream->Write(GetID());
 
                     // Write the car id and the action id (enter complete)
                     pBitStream->Write(m_VehicleInOutID);
@@ -7013,10 +6990,7 @@ void CClientPed::UpdateVehicleInOut()
                 if (pBitStream)
                 {
                     // Write the ped or player ID to it
-                    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                    {
-                        pBitStream->Write(GetID());
-                    }
+                    pBitStream->Write(GetID());
 
                     // Write the car id and the action id (enter complete)
                     pBitStream->Write(m_VehicleInOutID);
@@ -7128,10 +7102,7 @@ void CClientPed::UpdateVehicleInOut()
             return;
 
         // Write the ped or player ID to it
-        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-        {
-            pBitStream->Write(GetID());
-        }
+        pBitStream->Write(GetID());
 
         // Vehicle id
         pBitStream->Write(pOccupiedVehicle->GetID());

@@ -61,9 +61,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         pSourcePlayer->SetAkimboArmUp(flags.data.bAkimboTargetUp);
         pSourcePlayer->SetOnFire(flags.data.bIsOnFire);
         pSourcePlayer->SetStealthAiming(flags.data.bStealthAiming);
-
-        if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-            pSourcePlayer->SetReloadingWeapon(flags.data2.isReloadingWeapon);
+        pSourcePlayer->SetReloadingWeapon(flags.data.isReloadingWeapon);
 
         // Contact element
         CElement* pContactElement = NULL;
@@ -101,6 +99,13 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
         }
 
+        // If the client reported contact but the element doesn't exist anymore,
+        // the coordinates become invalid as they are relative to that element.
+        if (positionRead && pContactElement == nullptr && flags.data.bHasContact)
+        {
+            position.data.vecPosition = pSourcePlayer->GetPosition();
+        }
+        
         CElement* pPreviousContactElement = pSourcePlayer->GetContactElement();
         pSourcePlayer->SetContactElement(pContactElement);
 
@@ -365,9 +370,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         flags.data.bHasAWeapon = (ucWeaponSlot != 0);
         flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || pSourcePlayer->IsSyncingVelocity());
         flags.data.bStealthAiming = (pSourcePlayer->IsStealthAiming() == true);
-
-        if (pSourcePlayer->CanBitStream(eBitStreamVersion::IsPedReloadingWeapon))
-            flags.data2.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
+        flags.data.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
 
         CVector vecPosition = pSourcePlayer->GetPosition();
         if (pContactElement)
