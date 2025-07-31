@@ -151,18 +151,10 @@ void CPlayerRPCs::TakePlayerScreenShot(NetBitStreamInterface& bitStream)
     bitStream.Read(ucQuality);
     bitStream.Read(uiMaxBandwidth);
     bitStream.Read(usMaxPacketSize);
-    if (bitStream.Version() >= 0x53)
-    {
-        ushort usResourceNetId;
-        bitStream.Read(usResourceNetId);
-        pResource = g_pClientGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
-    }
-    else
-    {
-        SString strResourceName;
-        bitStream.ReadString(strResourceName);
-        pResource = g_pClientGame->GetResourceManager()->GetResource(strResourceName);
-    }
+
+    ushort usResourceNetId;
+    bitStream.Read(usResourceNetId);
+    pResource = g_pClientGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
 
     if (!bitStream.Read(uiServerSentTime))
         return;

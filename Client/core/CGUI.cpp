@@ -158,7 +158,7 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     m_pLabelVersionTag->SetTextColor(255, 255, 255);
     m_pLabelVersionTag->SetZOrderingEnabled(false);
     m_pLabelVersionTag->MoveToBack();
-    if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
+    if (MTASA_VERSION_TYPE < VERSION_TYPE_UNTESTED)
         m_pLabelVersionTag->SetAlwaysOnTop(true);
 
     // Create mainmenu
