@@ -65,6 +65,15 @@
 /* The last #include file should be: */
 #include "memdebug.h"
 
+
+#define DICT_MATCH "/MATCH:"
+#define DICT_MATCH2 "/M:"
+#define DICT_MATCH3 "/FIND:"
+#define DICT_DEFINE "/DEFINE:"
+#define DICT_DEFINE2 "/D:"
+#define DICT_DEFINE3 "/LOOKUP:"
+
+
 /*
  * Forward declarations.
  */
@@ -93,6 +102,7 @@ const struct Curl_handler Curl_handler_dict = {
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_DICT,                            /* defport */
   CURLPROTO_DICT,                       /* protocol */
   CURLPROTO_DICT,                       /* family */
@@ -105,7 +115,7 @@ static char *unescape_word(const char *input)
   struct dynbuf out;
   const char *ptr;
   CURLcode result = CURLE_OK;
-  Curl_dyn_init(&out, DYN_DICT_WORD);
+  curlx_dyn_init(&out, DYN_DICT_WORD);
 
   /* According to RFC2229 section 2.2, these letters need to be escaped with
      \[letter] */
@@ -113,13 +123,13 @@ static char *unescape_word(const char *input)
     char ch = *ptr;
     if((ch <= 32) || (ch == 127) ||
        (ch == '\'') || (ch == '\"') || (ch == '\\'))
-      result = Curl_dyn_addn(&out, "\\", 1);
+      result = curlx_dyn_addn(&out, "\\", 1);
     if(!result)
-      result = Curl_dyn_addn(&out, ptr, 1);
+      result = curlx_dyn_addn(&out, ptr, 1);
     if(result)
       return NULL;
   }
-  return Curl_dyn_ptr(&out);
+  return curlx_dyn_ptr(&out);
 }
 
 /* sendf() sends formatted data to the server */
@@ -146,7 +156,7 @@ static CURLcode sendf(struct Curl_easy *data, const char *fmt, ...)
 
   for(;;) {
     /* Write the buffer to the socket */
-    result = Curl_xfer_send(data, sptr, write_len, &bytes_written);
+    result = Curl_xfer_send(data, sptr, write_len, FALSE, &bytes_written);
 
     if(result)
       break;
@@ -211,16 +221,8 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
 
     if(!word || (*word == (char)0)) {
       infof(data, "lookup word is missing");
-      word = (char *)"default";
     }
-    if(!database || (*database == (char)0)) {
-      database = (char *)"!";
-    }
-    if(!strategy || (*strategy == (char)0)) {
-      strategy = (char *)".";
-    }
-
-    eword = unescape_word(word);
+    eword = unescape_word((!word || (*word == (char)0)) ? "default" : word);
     if(!eword) {
       result = CURLE_OUT_OF_MEMORY;
       goto error;
@@ -233,15 +235,15 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
                    "%s "    /* strategy */
                    "%s\r\n" /* word */
                    "QUIT\r\n",
-                   database,
-                   strategy,
+                   (!database || (*database == (char)0)) ? "!" : database,
+                   (!strategy || (*strategy == (char)0)) ? "." : strategy,
                    eword);
 
     if(result) {
       failf(data, "Failed sending DICT request");
       goto error;
     }
-    Curl_xfer_setup(data, FIRSTSOCKET, -1, FALSE, -1); /* no upload */
+    Curl_xfer_setup1(data, CURL_XFER_RECV, -1, FALSE); /* no upload */
   }
   else if(strncasecompare(path, DICT_DEFINE, sizeof(DICT_DEFINE)-1) ||
           strncasecompare(path, DICT_DEFINE2, sizeof(DICT_DEFINE2)-1) ||
@@ -262,13 +264,8 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
 
     if(!word || (*word == (char)0)) {
       infof(data, "lookup word is missing");
-      word = (char *)"default";
     }
-    if(!database || (*database == (char)0)) {
-      database = (char *)"!";
-    }
-
-    eword = unescape_word(word);
+    eword = unescape_word((!word || (*word == (char)0)) ? "default" : word);
     if(!eword) {
       result = CURLE_OUT_OF_MEMORY;
       goto error;
@@ -280,14 +277,14 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
                    "%s "     /* database */
                    "%s\r\n"  /* word */
                    "QUIT\r\n",
-                   database,
+                   (!database || (*database == (char)0)) ? "!" : database,
                    eword);
 
     if(result) {
       failf(data, "Failed sending DICT request");
       goto error;
     }
-    Curl_xfer_setup(data, FIRSTSOCKET, -1, FALSE, -1);
+    Curl_xfer_setup1(data, CURL_XFER_RECV, -1, FALSE);
   }
   else {
 
@@ -309,7 +306,7 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
         goto error;
       }
 
-      Curl_xfer_setup(data, FIRSTSOCKET, -1, FALSE, -1);
+      Curl_xfer_setup1(data, CURL_XFER_RECV, -1, FALSE);
     }
   }
 

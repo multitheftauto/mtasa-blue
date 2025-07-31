@@ -5,7 +5,7 @@
  *  FILE:        core/CGUI.cpp
  *  PURPOSE:     Core graphical user interface container class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -158,7 +158,8 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     m_pLabelVersionTag->SetTextColor(255, 255, 255);
     m_pLabelVersionTag->SetZOrderingEnabled(false);
     m_pLabelVersionTag->MoveToBack();
-    m_pLabelVersionTag->SetVisible(false);
+    if (MTASA_VERSION_TYPE < VERSION_TYPE_UNTESTED)
+        m_pLabelVersionTag->SetAlwaysOnTop(true);
 
     // Create mainmenu
     m_pMainMenu = new CMainMenu(pGUI);
@@ -280,38 +281,17 @@ void CLocalGUI::Draw()
 {
     // Get the game interface
     CGame*       pGame = CCore::GetSingleton().GetGame();
-    eSystemState SystemState = pGame->GetSystemState();
+    SystemState  systemState = pGame->GetSystemState();
     CGUI*        pGUI = CCore::GetSingleton().GetGUI();
 
     // Update mainmenu stuff
     m_pMainMenu->Update();
 
-    // Make sure our version labels are always visible
-    static short WaitForMenu = 0;
-
-    // Cope with early finish
-    if (pGame->HasCreditScreenFadedOut())
-        WaitForMenu = 250;
-
-    if (SystemState == 7 || SystemState == 9)
-    {
-        if (WaitForMenu < 250)
-        {
-            WaitForMenu++;
-        }
-        else
-        {
-            m_pLabelVersionTag->SetVisible(true);
-            if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
-                m_pLabelVersionTag->SetAlwaysOnTop(true);
-        }
-    }
-
     // If we're ingame, make sure the chatbox is drawn
-    bool bChatVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bChatVisible = (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pChat->IsVisible() != bChatVisible)
         m_pChat->SetVisible(bChatVisible, !bChatVisible);
-    bool bDebugVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bDebugVisible = (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pDebugView->IsVisible() != bDebugVisible)
         m_pDebugView->SetVisible(bDebugVisible, true);
 
@@ -325,7 +305,7 @@ void CLocalGUI::Draw()
 
     // If we're not at the loadingscreen
     static bool bDelayedFrame = false;
-    if (SystemState != 8 || !bDelayedFrame /* GS_INIT_PLAYING_GAME */)
+    if (systemState != SystemState::GS_INIT_PLAYING_GAME || !bDelayedFrame)
     {
         // If we have a GUI manager, draw the GUI
         if (pGUI)
@@ -334,7 +314,7 @@ void CLocalGUI::Draw()
         }
 
         // If the system state was 8, make sure we don't do another delayed frame
-        if (SystemState == 8)
+        if (systemState == SystemState::GS_INIT_PLAYING_GAME)
         {
             bDelayedFrame = true;
         }

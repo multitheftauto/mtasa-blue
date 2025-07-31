@@ -1873,6 +1873,7 @@ typedef ptrdiff_t  FT_PtrDist;
     TCoord*  band;
 
     int  continued = 0;
+    int  error     = Smooth_Err_Ok;
 
 
     /* Initialize the null cell at the end of the poll. */
@@ -1907,7 +1908,6 @@ typedef ptrdiff_t  FT_PtrDist;
       do
       {
         TCoord  i;
-        int     error;
 
 
         ras.min_ex = band[1];
@@ -1936,7 +1936,7 @@ typedef ptrdiff_t  FT_PtrDist;
           continue;
         }
         else if ( error != Smooth_Err_Raster_Overflow )
-          return error;
+          goto Exit;
 
         /* render pool overflow; we will reduce the render band by half */
         i = ( band[0] - band[1] ) >> 1;
@@ -1945,7 +1945,8 @@ typedef ptrdiff_t  FT_PtrDist;
         if ( i == 0 )
         {
           FT_TRACE7(( "gray_convert_glyph: rotten glyph\n" ));
-          return FT_THROW( Raster_Overflow );
+          error = FT_THROW( Raster_Overflow );
+          goto Exit;
         }
 
         band++;
@@ -1954,7 +1955,11 @@ typedef ptrdiff_t  FT_PtrDist;
       } while ( band >= bands );
     }
 
-    return Smooth_Err_Ok;
+  Exit:
+    ras.cell   = ras.cell_free = ras.cell_null = NULL;
+    ras.ycells = NULL;
+
+    return error;
   }
 
 

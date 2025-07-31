@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CPedRPCs.cpp
  *  PURPOSE:     Ped remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -260,14 +260,11 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                 if (bitStream.ReadString<unsigned char>(animName) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
                     bitStream.ReadBit(bInterruptable) && bitStream.ReadBit(bFreezeLastFrame))
                 {
-                    if (bitStream.Can(eBitStreamVersion::SetPedAnimation_Blend))
+                    bitStream.Read(iBlend);
+                    bitStream.ReadBit(bTaskToBeRestoredOnAnimEnd);
+                    if (!pPed->IsDucked())
                     {
-                        bitStream.Read(iBlend);
-                        bitStream.ReadBit(bTaskToBeRestoredOnAnimEnd);
-                        if (!pPed->IsDucked())
-                        {
-                            bTaskToBeRestoredOnAnimEnd = false;
-                        }
+                        bTaskToBeRestoredOnAnimEnd = false;
                     }
 
                     std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(blockName.c_str());

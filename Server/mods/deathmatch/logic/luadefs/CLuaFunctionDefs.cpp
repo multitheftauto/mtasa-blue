@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionDefs.cpp
  *  PURPOSE:     Lua function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -40,7 +40,7 @@ void CLuaFunctionDefs::LoadFunctions()
             {"setWeaponProperty", CLuaFunctionDefs::SetWeaponProperty}, {"setWeaponAmmo", CLuaFunctionDefs::SetWeaponAmmo},
             {"getSlotFromWeapon", CLuaFunctionDefs::GetSlotFromWeapon},
 
-    #if MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE
+    #if MTASA_VERSION_TYPE < VERSION_TYPE_UNTESTED
             {"createWeapon", CLuaFunctionDefs::CreateWeapon}, {"fireWeapon", CLuaFunctionDefs::FireWeapon},
             {"setWeaponState", CLuaFunctionDefs::SetWeaponState}, {"getWeaponState", CLuaFunctionDefs::GetWeaponState},
             {"setWeaponTarget", CLuaFunctionDefs::SetWeaponTarget}, {"getWeaponTarget", CLuaFunctionDefs::GetWeaponTarget},

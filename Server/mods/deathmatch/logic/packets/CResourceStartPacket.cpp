@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CResourceStartPacket.cpp
  *  PURPOSE:     Resource start packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -62,20 +62,10 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(usNoClientCacheScriptCount);
 
         // Write the declared min client version for this resource
-        if (BitStream.Version() >= 0x32)
-        {
-            BitStream.WriteString(m_pResource->GetMinServerRequirement());
-            BitStream.WriteString(m_pResource->GetMinClientRequirement());
-        }
-        if (BitStream.Version() >= 0x45)
-        {
-            BitStream.WriteBit(m_pResource->IsOOPEnabledInMetaXml());
-        }
-
-        if (BitStream.Version() >= 0x62)
-        {
-            BitStream.Write(m_pResource->GetDownloadPriorityGroup());
-        }
+        BitStream.WriteString(m_pResource->GetMinServerRequirement());
+        BitStream.WriteString(m_pResource->GetMinClientRequirement());
+        BitStream.WriteBit(m_pResource->IsOOPEnabledInMetaXml());
+        BitStream.Write(m_pResource->GetDownloadPriorityGroup());
 
         // Send the resource files info
         std::list<CResourceFile*>::iterator iter = m_pResource->IterBegin();
@@ -115,7 +105,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
                 CChecksum checksum = (*iter)->GetLastChecksum();
                 BitStream.Write(checksum.ulCRC);
                 BitStream.Write((const char*)checksum.md5.data, sizeof(checksum.md5.data));
-                BitStream.Write((*iter)->GetApproxSize());
+                BitStream.Write((double)(*iter)->GetSizeHint()); // Has to be double for bitstream format compatibility
                 if ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE)
                 {
                     CResourceClientFileItem* pRCFItem = reinterpret_cast<CResourceClientFileItem*>(*iter);

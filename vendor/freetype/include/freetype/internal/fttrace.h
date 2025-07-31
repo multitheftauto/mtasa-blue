@@ -19,7 +19,7 @@
   /* definitions of trace levels for FreeType 2 */
 
   /* the maximum string length (if the argument to `FT_TRACE_DEF` */
-  /* gets used as a string) plus one charachter for ':' plus      */
+  /* gets used as a string) plus one character for ':' plus       */
   /* another one for the trace level                              */
 #define FT_MAX_TRACE_LEVEL_LENGTH  (9 + 1 + 1)
 

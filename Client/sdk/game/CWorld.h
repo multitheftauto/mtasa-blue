@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CWorld.h
  *  PURPOSE:     Game world interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -99,6 +99,8 @@ enum eDebugCaller
     CBuildingPool_Constructor,
     CBuildingPool_Destructor,
     CBuilding_SetLod,
+    CDummyPool_Constructor,
+    CDummyPool_Destructor,
 };
 
 enum eSurfaceProperties

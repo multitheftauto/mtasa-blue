@@ -19,12 +19,12 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
     //  var getElementData ( element theElement, string key [, inherit = true] )
 
     CElement* pElement;
-    SString   strKey;
+    CStringName key;
     bool      bInherit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
     argStream.ReadBool(bInherit, true);
 
     if (!argStream.HasErrors())
@@ -32,18 +32,19 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+            if (key->length() > MAX_CUSTOMDATA_NAME_LENGTH)
             {
                 // Warn and truncate if key is too long
                 m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
                                                              *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+
+                key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
 #ifdef MTA_CLIENT
-            CLuaArgument* pVariable = pElement->GetCustomData(strKey, bInherit);
+            CLuaArgument* pVariable = pElement->GetCustomData(key.ToCString(), bInherit);
 #else
-            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, strKey, bInherit);
+            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, key.ToCString(), bInherit);
 #endif
             if (pVariable)
             {
@@ -72,12 +73,12 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
     //  bool hasElementData ( element theElement, string key [, bool inherit = true ] )
 
     CElement* pElement;
-    SString   strKey;
+    CStringName key;
     bool      bInherit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
     argStream.ReadBool(bInherit, true);
 
     if (argStream.HasErrors())
@@ -85,16 +86,16 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
 
-    if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+    if (key->length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Warn and truncate if key is too long
         m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
                                                      *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-        strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+        key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
     }
 
     // Check if data exists with the given key
-    bool exists = pElement->GetCustomData(strKey, bInherit) != nullptr;
+    bool exists = pElement->GetCustomData(key.ToCString(), bInherit) != nullptr;
     lua_pushboolean(luaVM, exists);
     return 1;
 }

@@ -23,6 +23,8 @@ public:
 
     void DoPulse();
 
+    static bool HasWeaponBulletSync(std::uint32_t weaponID) noexcept;
+
 private:
     void AddToList(CClientWeapon* pWeapon) { m_Weapons.push_back(pWeapon); }
     void RemoveFromList(CClientWeapon* pWeapon);

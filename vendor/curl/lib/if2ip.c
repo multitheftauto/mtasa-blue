@@ -67,7 +67,8 @@
 unsigned int Curl_ipv6_scope(const struct sockaddr *sa)
 {
   if(sa->sa_family == AF_INET6) {
-    const struct sockaddr_in6 * sa6 = (const struct sockaddr_in6 *)(void *) sa;
+    const struct sockaddr_in6 * sa6 =
+      (const struct sockaddr_in6 *)(const void *) sa;
     const unsigned char *b = sa6->sin6_addr.s6_addr;
     unsigned short w = (unsigned short) ((b[0] << 8) | b[1]);
 
@@ -92,7 +93,7 @@ unsigned int Curl_ipv6_scope(const struct sockaddr *sa)
 }
 #endif
 
-#ifndef CURL_DISABLE_BINDLOCAL
+#if !defined(CURL_DISABLE_BINDLOCAL) || !defined(CURL_DISABLE_FTP)
 
 #if defined(HAVE_GETIFADDRS)
 
@@ -216,7 +217,15 @@ if2ip_result_t Curl_if2ip(int af,
   memcpy(req.ifr_name, interf, len + 1);
   req.ifr_addr.sa_family = AF_INET;
 
+#if defined(__GNUC__) && defined(_AIX)
+/* Suppress warning inside system headers */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshift-sign-overflow"
+#endif
   if(ioctl(dummy, SIOCGIFADDR, &req) < 0) {
+#if defined(__GNUC__) && defined(_AIX)
+#pragma GCC diagnostic pop
+#endif
     sclose(dummy);
     /* With SIOCGIFADDR, we cannot tell the difference between an interface
        that does not exist and an interface that has no address of the
@@ -257,4 +266,4 @@ if2ip_result_t Curl_if2ip(int af,
 
 #endif
 
-#endif /* CURL_DISABLE_BINDLOCAL */
+#endif /* CURL_DISABLE_BINDLOCAL && CURL_DISABLE_FTP */

@@ -5,7 +5,7 @@
  *  FILE:        core/CLanguage.cpp
  *  PURPOSE:     Class to abstract a translation file to translated strings
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

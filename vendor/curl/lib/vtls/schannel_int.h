@@ -24,11 +24,14 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef USE_SCHANNEL
 
-#if defined(__MINGW32__) || defined(CERT_CHAIN_REVOCATION_CHECK_CHAIN)
+#include "vtls.h"
+
+#if (defined(__MINGW32__) || defined(CERT_CHAIN_REVOCATION_CHECK_CHAIN)) \
+  && !defined(CURL_WINDOWS_UWP)
 #define HAS_MANUAL_VERIFY_API
 #endif
 
@@ -144,29 +147,44 @@ struct schannel_ssl_backend_data {
   size_t encdata_offset, decdata_offset;
   unsigned char *encdata_buffer, *decdata_buffer;
   /* encdata_is_incomplete: if encdata contains only a partial record that
-     can't be decrypted without another recv() (that is, status is
+     cannot be decrypted without another recv() (that is, status is
      SEC_E_INCOMPLETE_MESSAGE) then set this true. after an recv() adds
      more bytes into encdata then set this back to false. */
-  bool encdata_is_incomplete;
   unsigned long req_flags, ret_flags;
   CURLcode recv_unrecoverable_err; /* schannel_recv had an unrecoverable err */
-  bool recv_sspi_close_notify; /* true if connection closed by close_notify */
-  bool recv_connection_closed; /* true if connection closed, regardless how */
-  bool recv_renegotiating;     /* true if recv is doing renegotiation */
-  bool use_alpn; /* true if ALPN is used for this connection */
+  BIT(recv_sspi_close_notify); /* true if connection closed by close_notify */
+  BIT(recv_connection_closed); /* true if connection closed, regardless how */
+  BIT(recv_renegotiating);     /* true if recv is doing renegotiation */
+  BIT(use_alpn); /* true if ALPN is used for this connection */
 #ifdef HAS_MANUAL_VERIFY_API
-  bool use_manual_cred_validation; /* true if manual cred validation is used */
+  BIT(use_manual_cred_validation); /* true if manual cred validation is used */
 #endif
+  BIT(sent_shutdown);
+  BIT(encdata_is_incomplete);
 };
 
-struct schannel_multi_ssl_backend_data {
-  unsigned char *CAinfo_blob_digest; /* CA info blob digest */
+/* key to use at `multi->proto_hash` */
+#define MPROTO_SCHANNEL_CERT_SHARE_KEY   "tls:schannel:cert:share"
+
+struct schannel_cert_share {
+  unsigned char CAinfo_blob_digest[CURL_SHA256_DIGEST_LENGTH];
   size_t CAinfo_blob_size;           /* CA info blob size */
   char *CAfile;                      /* CAfile path used to generate
                                         certificate store */
   HCERTSTORE cert_store;             /* cached certificate store or
                                         NULL if none */
   struct curltime time;              /* when the cached store was created */
+};
+
+/*
+* size of the structure: 20 bytes.
+*/
+struct num_ip_data {
+  DWORD size; /* 04 bytes */
+  union {
+    struct in_addr  ia;  /* 04 bytes */
+    struct in6_addr ia6; /* 16 bytes */
+  } bData;
 };
 
 HCERTSTORE Curl_schannel_get_cached_cert_store(struct Curl_cfilter *cf,
