@@ -3219,7 +3219,7 @@ retry:
                     SRotationDegreesSync rotationDegrees(false);
                     bitStream.Read(&rotationDegrees);
 
-                    // Read out the vehicle value as a char, then convert
+                    // Read out the vehicle model
                     std::uint16_t usModel = 0xFFFF;
                     bitStream.Read(usModel);
                     
