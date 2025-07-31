@@ -145,7 +145,6 @@ DWORD RETURN_CWeapon_FireAreaEffect = 0x73EC03;
 #define HOOKPOS_RenderScene_end                             0x53E159
 #define HOOKPOS_CPlantMgr_Render                            0x5DBC4C
 DWORD RETURN_CPlantMgr_Render_success = 0x5DBC52;
-DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
@@ -1576,6 +1575,14 @@ void CMultiplayerSA::InitHooks()
     // Allow alpha change for helicopter rotor (#523)
     MemSet((void*)0x6C444B, 0x90, 6);
     MemSet((void*)0x6C4453, 0x90, 0x68);
+
+    // Disable Z position changes in the matrix in the C3dMarkers::PlaceMarker (#4000, #536)
+    // To prevent arrow-type markers from snapping to the ground
+    MemCpy((void*)0x725844, "\xDD\xD8\x90", 3);
+    MemCpy((void*)0x725619, "\xDD\xD8\x90", 3);
+    MemCpy((void*)0x72565A, "\xDD\xD8\x90", 3);
+    MemCpy((void*)0x7259B0, "\xDD\xD8\x90", 3);
+    MemSet((void*)0x7258B8, 0x90, 6);
     
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
@@ -5666,9 +5673,6 @@ rendercheck:
         mov edx, edi
         fld ds:[0x8D12C0]
         jmp RETURN_CPlantMgr_Render_success
-
-fail:
-        jmp RETURN_CPlantMgr_Render_fail
     }
 }
 
