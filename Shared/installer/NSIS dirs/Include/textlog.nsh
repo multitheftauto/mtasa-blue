@@ -1,6 +1,6 @@
 
 #####################################################################################################
-# From http://nsis.sourceforge.net/GetTimeStamp
+# From https://nsis.sourceforge.net/GetTimeStamp
 !ifndef TimeStamp
 !define TimeStamp "!insertmacro _TimeStamp"
 !macro _TimeStamp FormatedString
@@ -64,8 +64,8 @@ FunctionEnd
 
 #####################################################################################################
 # LogText
-# Based on http://nsis.sourceforge.net/Logging:_Simple_Text_File_Logging_Functions_and_Macros
-# Written on by Mike Schinkel [http://www.mikeschinkel.com/blog/]
+# Based on https://nsis.sourceforge.net/Logging:_Simple_Text_File_Logging_Functions_and_Macros
+# Written on by Mike Schinkel [https://www.mikeschinkel.com/blog/]
  
 Var /GLOBAL __TextLog_FileName
 Var /GLOBAL __TextLog_Indent

@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #if defined(USE_OPENSSL)                        \
   || defined(USE_SCHANNEL)
@@ -34,15 +34,14 @@
 #ifdef HAVE_NETINET_IN6_H
 #include <netinet/in6.h>
 #endif
-#include "curl_memrchr.h"
-
+#include "../curl_memrchr.h"
 #include "hostcheck.h"
-#include "strcase.h"
-#include "hostip.h"
+#include "../strcase.h"
+#include "../hostip.h"
 
-#include "curl_memory.h"
+#include "../curl_memory.h"
 /* The last #include file should be: */
-#include "memdebug.h"
+#include "../memdebug.h"
 
 /* check the two input strings with given length, but do not
    assume they end in nul-bytes */
@@ -62,7 +61,7 @@ static bool pmatch(const char *hostname, size_t hostlen,
  * We use the matching rule described in RFC6125, section 6.4.3.
  * https://datatracker.ietf.org/doc/html/rfc6125#section-6.4.3
  *
- * In addition: ignore trailing dots in the host names and wildcards, so that
+ * In addition: ignore trailing dots in the hostnames and wildcards, so that
  * the names are used normalized. This is what the browsers do.
  *
  * Do not allow wildcard matching on IP numbers. There are apparently

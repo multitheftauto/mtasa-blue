@@ -314,7 +314,15 @@ void CClientMarker::SetSize(float fSize)
             pShape->SetRadius(fSize);
             break;
         }
+        case COLSHAPE_TUBE:
+        {
+            CClientColTube* pShape = static_cast<CClientColTube*>(m_pCollision);
+            pShape->SetRadius(fSize);
+            pShape->SetHeight(fSize);
+            break;
+        }
     }
+   
     m_pMarker->SetSize(fSize);
 }
 
@@ -410,28 +418,44 @@ void CClientMarker::StreamOut()
     }
 }
 
-void CClientMarker::Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity)
+void CClientMarker::Callback_OnCollision(CClientColShape& shape, CClientEntity& entity)
 {
-    if (IS_PLAYER(&Entity))
-    {
-        // Call the marker hit event
-        CLuaArguments Arguments;
-        Arguments.PushElement(&Entity);                                              // player that hit it
-        Arguments.PushBoolean((GetDimension() == Entity.GetDimension()));            // matching dimension?
-        CallEvent("onClientMarkerHit", Arguments, true);
-    }
+    if (GetInterior() != entity.GetInterior())
+        return;
+
+    // Call the marker hit event
+    CLuaArguments arguments;
+    arguments.PushElement(&entity);                                            // Hit element
+    arguments.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    CallEvent("onClientMarkerHit", arguments, true);
+
+    if (!IS_PLAYER(&entity))
+        return;
+
+    CLuaArguments arguments2;
+    arguments2.PushElement(this);                                               // marker
+    arguments2.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    entity.CallEvent("onClientPlayerMarkerHit", arguments2, false);
 }
 
-void CClientMarker::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Entity)
+void CClientMarker::Callback_OnLeave(CClientColShape& shape, CClientEntity& entity)
 {
-    if (IS_PLAYER(&Entity))
-    {
-        // Call the marker hit event
-        CLuaArguments Arguments;
-        Arguments.PushElement(&Entity);                                              // player that hit it
-        Arguments.PushBoolean((GetDimension() == Entity.GetDimension()));            // matching dimension?
-        CallEvent("onClientMarkerLeave", Arguments, true);
-    }
+    if (GetInterior() != entity.GetInterior())
+        return;
+
+    // Call the marker leave event
+    CLuaArguments arguments;
+    arguments.PushElement(&entity);                                            // Hit element
+    arguments.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    CallEvent("onClientMarkerLeave", arguments, true);
+
+    if (!IS_PLAYER(&entity))
+        return;
+
+    CLuaArguments arguments2;
+    arguments2.PushElement(this);                                               // marker
+    arguments2.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    entity.CallEvent("onPlayerMarkerLeave", arguments2, false);
 }
 
 void CClientMarker::CreateOfType(int iType)
@@ -447,7 +471,7 @@ void CClientMarker::CreateOfType(int iType)
             CClientCheckpoint* pCheckpoint = new CClientCheckpoint(this);
             pCheckpoint->SetCheckpointType(CClientCheckpoint::TYPE_NORMAL);
             m_pMarker = pCheckpoint;
-            m_pCollision = new CClientColCircle(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColCircle(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -458,7 +482,7 @@ void CClientMarker::CreateOfType(int iType)
             CClientCheckpoint* pCheckpoint = new CClientCheckpoint(this);
             pCheckpoint->SetCheckpointType(CClientCheckpoint::TYPE_RING);
             m_pMarker = pCheckpoint;
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -469,7 +493,8 @@ void CClientMarker::CreateOfType(int iType)
             CClient3DMarker* p3DMarker = new CClient3DMarker(this);
             p3DMarker->Set3DMarkerType(CClient3DMarker::TYPE_CYLINDER);
             m_pMarker = p3DMarker;
-            m_pCollision = new CClientColCircle(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+
+            m_pCollision = new CClientColTube(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize(), GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -480,7 +505,7 @@ void CClientMarker::CreateOfType(int iType)
             CClient3DMarker* p3DMarker = new CClient3DMarker(this);
             p3DMarker->Set3DMarkerType(CClient3DMarker::TYPE_ARROW);
             m_pMarker = p3DMarker;
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
@@ -489,7 +514,7 @@ void CClientMarker::CreateOfType(int iType)
         case MARKER_CORONA:
         {
             m_pMarker = new CClientCorona(this);
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPlayerJoinDataPacket.h
  *  PURPOSE:     Player join data packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -39,9 +39,6 @@ public:
     const MD5& GetPassword() { return m_Password; };
     void       SetPassword(const MD5& Password) { m_Password = Password; };
 
-    const char* GetSerialUser() { return m_strSerialUser; }
-    void        SetSerialUser(const char* szSerialUser) { m_strSerialUser.AssignLeft(szSerialUser, MAX_SERIAL_LENGTH); }
-
     bool IsOptionalUpdateInfoRequired() { return m_bOptionalUpdateInfoRequired; }
 
 private:
@@ -52,6 +49,5 @@ private:
     bool           m_bOptionalUpdateInfoRequired;
     SString        m_strNick;
     MD5            m_Password;
-    SString        m_strSerialUser;
     CMtaVersion    m_strPlayerVersion;
 };

@@ -7,7 +7,7 @@ Please submit your security vulnerabilities and cheats to our [private bugtracke
 
 Please do not submit vulnerabilities and cheats publicly, on GitHub or anywhere else.
 
-[private bugtracker]: https://forum.mtasa.com/forum/156-private-bugs/
+[private bugtracker]: https://forum.multitheftauto.com/forum/156-private-bugs/
 
 ## Bug Bounty
 
@@ -16,4 +16,4 @@ We also run a bug bounty programme. Please read
 
 Payment is by PayPal only -- please include your PayPal email when posting on the [private bugtracker].
 
-[bounty]: https://forum.mtasa.com/topic/66858-bounty-for-finding-security-flaws-and-working-cheats-in-mta/
+[bounty]: https://forum.multitheftauto.com/topic/66858-bounty-for-finding-security-flaws-and-working-cheats-in-mta/

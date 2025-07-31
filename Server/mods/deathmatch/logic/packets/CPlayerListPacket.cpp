@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPlayerListPacket.cpp
  *  PURPOSE:     Player list packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -116,11 +116,8 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Version info
-        if (BitStream.Version() >= 0x34)
-        {
-            BitStream.Write(pPlayer->GetBitStreamVersion());
-            BitStream.Write(pPlayer->GetPlayerVersion().GetBuildNumber());
-        }
+        BitStream.Write(pPlayer->GetBitStreamVersion());
+        BitStream.Write(pPlayer->GetPlayerVersion().GetBuildNumber());
 
         // Flags
         bool bInVehicle = (pPlayer->GetOccupiedVehicle() != NULL);
@@ -139,12 +136,6 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         if (szNametagText)
             ucNametagTextLength = static_cast<unsigned char>(strlen(szNametagText));
 
-        if (!BitStream.Can(eBitStreamVersion::UnicodeNametags))
-        {
-            // Old client version has a fixed buffer of 22 characters
-            ucNametagTextLength = std::min<uchar>(ucNametagTextLength, 22);
-        }
-
         BitStream.Write(ucNametagTextLength);
         if (ucNametagTextLength > 0)
             BitStream.Write(szNametagText, ucNametagTextLength);
@@ -160,11 +151,8 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Move anim
-        if (BitStream.Version() > 0x4B)
-        {
-            uchar ucMoveAnim = pPlayer->GetMoveAnim();
-            BitStream.Write(ucMoveAnim);
-        }
+        uchar ucMoveAnim = pPlayer->GetMoveAnim();
+        BitStream.Write(ucMoveAnim);
 
         // Always send extra info (Was: "Write spawn info if he's spawned")
         if (true)

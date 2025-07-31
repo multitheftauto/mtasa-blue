@@ -105,8 +105,10 @@ struct SLastSyncedPedData
     CVector vPosition;
     CVector vVelocity;
     float   fRotation;
+    float   cameraRotation{};
     bool    bOnFire;
     bool    bIsInWater;
+    bool    isReloadingWeapon;
 };
 
 struct SRestoreWeaponItem
@@ -127,23 +129,17 @@ struct SReplacedAnimation
 
 struct SAnimationCache
 {
-    SString strName;
-    int     iTime;
-    bool    bLoop;
-    bool    bUpdatePosition;
-    bool    bInterruptable;
-    bool    bFreezeLastFrame;
-    int     iBlend;
-
-    SAnimationCache()
-    {
-        iTime = -1;
-        bLoop = false;
-        bUpdatePosition = false;
-        bInterruptable = false;
-        bFreezeLastFrame = true;
-        iBlend = 250;
-    }
+    std::string  strName;
+    int          iTime{-1};
+    bool         bLoop{false};
+    bool         bUpdatePosition{false};
+    bool         bInterruptable{false};
+    bool         bFreezeLastFrame{true};
+    int          iBlend{250};
+    float        progress{0.0f};
+    float        speed{1.0f};
+    bool         progressWaitForStreamIn{false};
+    std::int64_t startTime{0};
 };
 
 class CClientObject;
@@ -210,7 +206,7 @@ public:
     float GetCurrentRotation();
     void  SetCurrentRotation(float fRotation, bool bIncludeTarget = true);
     void  SetTargetRotation(float fRotation);
-    void  SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation);
+    void  SetTargetRotation(unsigned long ulDelay, std::optional<float> rotation, std::optional<float> cameraRotation);
 
     float GetCameraRotation();
     void  SetCameraRotation(float fRotation);
@@ -272,17 +268,17 @@ public:
     float GetHealth();
     void  SetHealth(float fHealth);
     void  InternalSetHealth(float fHealth);
-    float GetArmor();
-    void  SetArmor(float fArmor);
+    float GetArmor() const noexcept;
+    void  SetArmor(float armor) noexcept;
     float GetOxygenLevel();
     void  SetOxygenLevel(float fOxygen);
 
     void LockHealth(float fHealth);
-    void LockArmor(float fArmor);
+    void LockArmor(float armor) noexcept;
     void UnlockHealth() noexcept { m_bHealthLocked = false; };
-    void UnlockArmor() noexcept { m_bArmorLocked = false; };
+    void UnlockArmor() noexcept { m_armorLocked = false; };
     bool IsHealthLocked() const noexcept { return m_bHealthLocked; };
-    bool IsArmorLocked() const noexcept { return m_bArmorLocked; };
+    bool IsArmorLocked() const noexcept { return m_armorLocked; };
 
     bool IsDying();
     bool IsDead();
@@ -460,12 +456,18 @@ public:
 
     bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
+
+    // It checks whether the animation is still playing based on time, not on task execution.
+    bool IsAnimationInProgress();
+
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
                            bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
+    void                        RunAnimationFromCache();
+    void                        UpdateAnimationProgressAndSpeed();
 
     bool IsUsingGun();
 
@@ -500,9 +502,9 @@ public:
     bool GetBulletImpactData(CClientEntity** ppVictim = 0, CVector* pvecHitPosition = 0);
     void ClearBulletImpactData() { m_bBulletImpactData = false; }
 
-    bool CanReloadWeapon();
-    bool ReloadWeapon();
-    bool IsReloadingWeapon();
+    bool CanReloadWeapon() noexcept;
+    bool ReloadWeapon() noexcept;
+    bool IsReloadingWeapon() noexcept;
 
     bool ShouldBeStealthAiming();
     bool IsStealthAiming() { return m_bStealthAiming; }
@@ -601,6 +603,8 @@ public:
 
     void Respawn(CVector* pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false);
 
+    void Say(const ePedSpeechContext& speechId, float probability = 1.0f);
+
     void      SetTaskToBeRestoredOnAnimEnd(bool bSetOnEnd) noexcept { m_bTaskToBeRestoredOnAnimEnd = bSetOnEnd; }
     bool      IsTaskToBeRestoredOnAnimEnd() const noexcept { return m_bTaskToBeRestoredOnAnimEnd; }
     void      SetTaskTypeToBeRestoredOnAnimEnd(eTaskType taskType) noexcept { m_eTaskTypeToBeRestoredOnAnimEnd = taskType; }
@@ -623,7 +627,7 @@ public:
     bool                        m_bRadioOn;
     unsigned char               m_ucRadioChannel;
     bool                        m_bHealthLocked;
-    bool                        m_bArmorLocked;
+    bool                        m_armorLocked;
     unsigned long               m_ulLastOnScreenTime;
     CClientVehiclePtr           m_pOccupiedVehicle;
     CClientVehiclePtr           m_pOccupyingVehicle;
@@ -682,7 +686,7 @@ public:
     bool                                     m_bVisible;
     bool                                     m_bUsesCollision;
     float                                    m_fHealth;
-    float                                    m_fArmor;
+    float                                    m_armor;
     bool                                     m_bDead;
     bool                                     m_bWorldIgnored;
     float                                    m_fCurrentRotation;

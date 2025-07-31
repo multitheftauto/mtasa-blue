@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CPlayerRPCs.cpp
  *  PURPOSE:     Player remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -151,18 +151,10 @@ void CPlayerRPCs::TakePlayerScreenShot(NetBitStreamInterface& bitStream)
     bitStream.Read(ucQuality);
     bitStream.Read(uiMaxBandwidth);
     bitStream.Read(usMaxPacketSize);
-    if (bitStream.Version() >= 0x53)
-    {
-        ushort usResourceNetId;
-        bitStream.Read(usResourceNetId);
-        pResource = g_pClientGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
-    }
-    else
-    {
-        SString strResourceName;
-        bitStream.ReadString(strResourceName);
-        pResource = g_pClientGame->GetResourceManager()->GetResource(strResourceName);
-    }
+
+    ushort usResourceNetId;
+    bitStream.Read(usResourceNetId);
+    pResource = g_pClientGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
 
     if (!bitStream.Read(uiServerSentTime))
         return;

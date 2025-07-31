@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWeatherSA.h
  *  PURPOSE:     Header file for weather class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

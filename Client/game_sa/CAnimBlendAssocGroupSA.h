@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAnimBlendAssocGroupSA.h
  *  PURPOSE:     Header file for animation blend association group class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.cpp
  *  PURPOSE:     Resource object
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -317,10 +317,7 @@ void CResource::Load()
         else if (pResourceFile->IsAutoDownload())
         {
             // Check the file contents
-            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
-            {
-            }
-            else
+            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) != pResourceFile->GetServerChecksum())
             {
                 HandleDownloadedFileTrouble(pResourceFile, false);
             }
@@ -342,14 +339,9 @@ void CResource::Load()
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         if (pBitStream)
         {
-            if (pBitStream->Can(eBitStreamVersion::OnPlayerResourceStart))
-            {
-                // Write resource net ID
-                pBitStream->Write(GetNetID());
-
-                g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-            }
-
+            // Write resource net ID
+            pBitStream->Write(GetNetID());
+            g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CScriptFile.h
  *  PURPOSE:     Script file element class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -60,6 +60,7 @@ public:
 
     void Flush();
     long Read(unsigned long ulSize, SString& outBuffer);
+    long ReadToBuffer(unsigned char* buffer, unsigned long bufferSize);
     long Write(unsigned long ulSize, const char* pData);
 
     long GetContents(std::string& buffer);

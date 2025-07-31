@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2015, 2025, Oracle and/or its affiliates.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2.0,
@@ -95,7 +95,8 @@ enum enum_server_command {
   COM_RESET_CONNECTION, /**< See @ref page_protocol_com_reset_connection */
   COM_CLONE,
   COM_SUBSCRIBE_GROUP_REPLICATION_STREAM,
-  /* don't forget to update const char *command_name[] in sql_parse.cc */
+  /* don't forget to update std::string Command_names::m_names[] in sql_parse.cc
+   */
 
   /* Must be last */
   COM_END /**< Not a real command. Refused. */

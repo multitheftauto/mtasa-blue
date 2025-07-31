@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CBanManager.h
  *  PURPOSE:     Ban manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -28,18 +28,13 @@ public:
     CBan* AddSerialBan(CPlayer* pPlayer, CClient* pBanner = NULL, const SString& strReason = "", time_t tTimeOfUnban = 0);
     CBan* AddSerialBan(const SString& strSerial, CClient* pBanner = NULL, const SString& strReason = "", time_t tTimeOfUnban = 0);
 
-    CBan* AddAccountBan(CPlayer* pPlayer, CClient* pBanner = NULL, const SString& strReason = "", time_t tTimeOfUnban = 0);
-    CBan* AddAccountBan(const SString& szAccount, CClient* pBanner = NULL, const SString& strReason = "", time_t tTimeOfUnban = 0);
-
     CBan* AddBan(const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0);
 
     CBan* GetBanFromScriptID(uint uiScriptID);
 
-    bool  IsSpecificallyBanned(const char* szIP);
-    bool  IsSerialBanned(const char* szSerial);
-    bool  IsAccountBanned(const char* szAccount);
-    CBan* GetBanFromAccount(const char* szAccount);
-    void  RemoveBan(CBan* pBan);
+    bool IsSpecificallyBanned(const char* szIP);
+    bool IsSerialBanned(const char* szSerial);
+    void RemoveBan(CBan* pBan);
 
     CBan* GetBanFromSerial(const char* szSerial);
     CBan* GetBanFromIP(const char* szIP);

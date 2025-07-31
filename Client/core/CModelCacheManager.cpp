@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -483,7 +483,7 @@ void CModelCacheManagerImpl::SubModelRefCount(ushort usModelId)
 bool CModelCacheManagerImpl::UnloadModel(ushort usModelId)
 {
     // Stream out usages in the client module
-    CClientBase* pClientBase = CModManager::GetSingleton().GetCurrentMod();
+    CClientBase* pClientBase = CModManager::GetSingleton().GetClient();
     if (pClientBase)
         pClientBase->RestreamModel(usModelId);
 

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CClientGame.cpp
  *  PURPOSE:     Client game manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -35,6 +35,7 @@
 #include <game/CBuildingRemoval.h>
 #include "game/CClock.h"
 #include <game/CProjectileInfo.h>
+#include <game/CVehicleAudioSettingsManager.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -136,6 +137,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+    m_Glitches[GLITCH_VEHICLE_RAPID_STOP] = false;
+    g_pMultiplayer->SetRapidVehicleStopFixEnabled(true);
 
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
@@ -515,6 +518,7 @@ CClientGame::~CClientGame()
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
+    g_pGame->GetPools()->GetPtrNodeSingleLinkPool().ResetCapacity();
     g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
     g_pCore->SetMessageProcessor(NULL);
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(NULL);
@@ -699,15 +703,9 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             pBitStream->Write(strTemp.c_str(), MAX_PLAYER_NICK_LENGTH);
             pBitStream->Write(reinterpret_cast<const char*>(Password.data), sizeof(MD5));
 
-            // Append community information (Removed)
+            // Append community information (removed, but we keep this to retain protocol compat)
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
-
-            // Send an empty string if server still has old Discord implementation (#2499)
-            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation) && !g_pNet->CanServerBitStream(eBitStreamVersion::Discord_Cleanup))
-            {
-                pBitStream->WriteString<uchar>("");
-            }
 
             // Send the packet as joindata
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
@@ -1825,12 +1823,10 @@ void CClientGame::UpdatePlayerWeapons()
             SWeaponSlotSync        slot;
 
             // Always send bit in case server is not in sync
-            if ((BitStream.Version() >= 0x44 && m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN) || BitStream.Version() >= 0x4D)
             {
                 CWeapon* pLastWeapon = m_pLocalPlayer->GetWeapon(m_lastWeaponSlot);
                 if (pLastWeapon && pLastWeapon->GetAmmoTotal() == 0 &&
-                    (m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN ||
-                     (BitStream.Version() >= 0x5A && (m_lastWeaponSlot == WEAPONSLOT_TYPE_HEAVY || m_lastWeaponSlot == WEAPONSLOT_TYPE_SPECIAL))))
+                    (m_lastWeaponSlot == WEAPONSLOT_TYPE_THROWN || m_lastWeaponSlot == WEAPONSLOT_TYPE_HEAVY || m_lastWeaponSlot == WEAPONSLOT_TYPE_SPECIAL))
                     BitStream.WriteBit(true);
                 else
                     BitStream.WriteBit(false);
@@ -2634,6 +2630,8 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
     m_Events.AddEvent("onClientElementDimensionChange", "oldDimension, newDimension", nullptr, false);
     m_Events.AddEvent("onClientElementInteriorChange", "oldInterior, newInterior", nullptr, false);
+    m_Events.AddEvent("onClientElementAttach", "attachSource, attachOffsetX, attachOffsetY, attachOffsetZ, attachOffsetRX, attachOffsetRY, attachOffsetRZ", nullptr, false);
+    m_Events.AddEvent("onClientElementDetach", "detachSource, detachWorldX, detachWorldY, detachWorldZ, detachWorldRX, detachWorldRY, detachWorldRZ", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -2739,10 +2737,13 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", NULL, false);
 
     // Marker events
-    m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientMarkerLeave", "entity, matchingDimension", NULL, false);
+    m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientMarkerLeave", "entity, matchingDimension", nullptr, false);
 
-    // Marker events
+    m_Events.AddEvent("onClientPlayerMarkerHit", "marker, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientPlayerMarkerLeave", "marker, matchingDimension", nullptr, false);
+
+    // Pickup events
     m_Events.AddEvent("onClientPickupHit", "entity, matchingDimension", NULL, false);
     m_Events.AddEvent("onClientPickupLeave", "entity, matchingDimension", NULL, false);
 
@@ -3085,6 +3086,7 @@ void CClientGame::UpdateMimics()
             bool  bSunbathing = m_pLocalPlayer->IsSunbathing();
             bool  bDoingDriveby = m_pLocalPlayer->IsDoingGangDriveby();
             bool  bStealthAiming = m_pLocalPlayer->IsStealthAiming();
+            bool  reloadingWeapon = m_pLocalPlayer->IsReloadingWeapon();
 
             // Is the current weapon goggles (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
             if (weaponSlot == 11 || weaponSlot == 12 || ucWeaponType == 43)
@@ -3142,6 +3144,9 @@ void CClientGame::UpdateMimics()
                 pMimic->SetSunbathing(bSunbathing);
                 pMimic->SetDoingGangDriveby(bDoingDriveby);
                 pMimic->SetStealthAiming(bStealthAiming);
+
+                if (reloadingWeapon)
+                    pMimic->ReloadWeapon();
 
                 Controller.ShockButtonL = 0;
 
@@ -3449,7 +3454,7 @@ void CClientGame::Event_OnIngame()
 
     // This is to prevent the 'white arrows in checkpoints' bug (#274)
     CVector pos(0, 0, 0);
-    g_pGame->Get3DMarkers()->CreateMarker(87654, (e3DMarkerType)5, &pos, 1, 0.2f, 0, 0, 0, 0);
+    g_pGame->Get3DMarkers()->CreateMarker(87654, T3DMarkerType::MARKER3D_CONE, &pos, 1, 0.2f, 0, 0, 0, 0);
 
     // Stop us getting 4 stars if we visit the SF or LV
     // g_pGame->GetPlayerInfo()->GetWanted()->SetMaximumWantedLevel ( 0 );
@@ -3484,6 +3489,8 @@ void CClientGame::Event_OnIngame()
 
     // Make sure we never get tired
     g_pGame->GetPlayerInfo()->SetDoesNotGetTired(true);
+
+    g_pGame->GetVehicleAudioSettingsManager()->ResetAudioSettingsData();
 
     // Tell doggy we got the game running
     WatchDogCompletedSection("L1");
@@ -3729,6 +3736,9 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
                     break;
                 case CCLIENTOBJECT:
                     iTypeMask = TYPE_MASK_OBJECT;
+                    break;
+                case CCLIENTBUILDING:
+                    iTypeMask = TYPE_MASK_WORLD;
                     break;
                 default:
                     iTypeMask = TYPE_MASK_OTHER;
@@ -4370,7 +4380,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 {
     float fPreviousHealth = pDamagedPed->m_fHealth;
     float fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
-    float fPreviousArmor = pDamagedPed->m_fArmor;
+    float fPreviousArmor = pDamagedPed->m_armor;
     float fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
     // Have we taken any damage here?
@@ -4406,7 +4416,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             {
                 // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
                 fPreviousHealth = pDamagedPed->m_fHealth;
-                fPreviousArmor = pDamagedPed->m_fArmor;
+                fPreviousArmor = pDamagedPed->m_armor;
             }
             pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
             pDamagedPed->GetGamePlayer()->SetArmor(fPreviousArmor);
@@ -4452,7 +4462,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 
         // Update our stored health/armor
         pDamagedPed->m_fHealth = fCurrentHealth;
-        pDamagedPed->m_fArmor = fCurrentArmor;
+        pDamagedPed->m_armor = fCurrentArmor;
 
         ElementID damagerID = INVALID_ELEMENT_ID;
         if (pInflictingEntity && !pInflictingEntity->IsLocalEntity())
@@ -4618,34 +4628,32 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
             // Make sure it created
             if (pBitStream)
             {
-                if (pBitStream->Version() >= 0x028)
+                // Sync Stuff
+                // if it's not a local vehicle + it collided with the local player
+                if (pVehicleClientEntity->IsLocalEntity() == false && pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer())
                 {
-                    // Sync Stuff
-                    // if it's not a local vehicle + it collided with the local player
-                    if (pVehicleClientEntity->IsLocalEntity() == false && pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer())
+                    // is it below the anti spam threshold?
+                    if (pClientVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE)
                     {
-                        // is it below the anti spam threshold?
-                        if (pClientVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE)
+                        // if there is no controlling player
+                        if (!pClientVehicle->GetControllingPlayer())
                         {
-                            // if there is no controlling player
-                            if (!pClientVehicle->GetControllingPlayer())
+                            CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(pVehicleClientEntity);
+                            // if We aren't already syncing the vehicle
+                            if (GetUnoccupiedVehicleSync()->Exists(Vehicle) == false)
                             {
-                                CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(pVehicleClientEntity);
-                                // if We aren't already syncing the vehicle
-                                if (GetUnoccupiedVehicleSync()->Exists(Vehicle) == false)
-                                {
-                                    // Write the vehicle ID
-                                    pBitStream->Write(pVehicleClientEntity->GetID());
-                                    // Send!
-                                    g_pNet->SendPacket(PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM,
-                                                       PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
-                                    // Reset our push time
-                                    pClientVehicle->ResetLastPushTime();
-                                }
+                                // Write the vehicle ID
+                                pBitStream->Write(pVehicleClientEntity->GetID());
+                                // Send!
+                                g_pNet->SendPacket(PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM,
+                                                    PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+                                // Reset our push time
+                                pClientVehicle->ResetLastPushTime();
                             }
                         }
                     }
                 }
+
                 g_pNet->DeallocateNetBitStream(pBitStream);
             }
             return true;
@@ -5257,7 +5265,7 @@ bool CClientGame::StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInte
     return false;
 }
 
-void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin)
+void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin, std::optional<VehicleBlowState> vehicleBlowState)
 {
     SPositionSync position(false);
     position.data.vecPosition = vecPosition;
@@ -5274,18 +5282,15 @@ void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType T
 
             // Because we use this packet to notify the server of blown vehicles,
             // we include a bit, whether the vehicle was blown without an explosion
-            if (pBitStream->Can(eBitStreamVersion::VehicleBlowStateSupport))
+            if (pOrigin->GetType() == CCLIENTVEHICLE)
             {
-                if (pOrigin->GetType() == CCLIENTVEHICLE)
-                {
-                    auto vehicle = reinterpret_cast<CClientVehicle*>(pOrigin);
-                    pBitStream->WriteBit(1);
-                    pBitStream->WriteBit(vehicle->GetBlowState() == VehicleBlowState::BLOWN);
-                }
-                else
-                {
-                    pBitStream->WriteBit(0);
-                }
+                auto vehicle = reinterpret_cast<CClientVehicle*>(pOrigin);
+                pBitStream->WriteBit(1);
+                pBitStream->WriteBit(vehicleBlowState.value_or(vehicle->GetBlowState()) == VehicleBlowState::BLOWN);
+            }
+            else
+            {
+                pBitStream->WriteBit(0);
             }
 
             // Convert position
@@ -5358,9 +5363,7 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
         pBitStream->Write(&weaponTypeSync);
 
         // Write the projectile's model
-        if (pBitStream->Version() >= 0x4F)
-            if (pBitStream->Version() >= 0x52 || pOriginSource)            // Fix possible error for 0x51 server
-                pBitStream->Write(pProjectile->GetModel());
+        pBitStream->Write(pProjectile->GetModel());
 
         switch (weaponType)
         {
@@ -5987,6 +5990,8 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
             g_pMultiplayer->DisableQuickReload(!bEnabled);
         if (ucGlitch == GLITCH_CLOSEDAMAGE)
             g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
+        if (ucGlitch == GLITCH_VEHICLE_RAPID_STOP)
+            g_pMultiplayer->SetRapidVehicleStopFixEnabled(!bEnabled);
         return true;
     }
     return false;
@@ -5997,7 +6002,7 @@ bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
 
-bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept
+bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, const bool enabled) noexcept
 {
     switch (property)
     {
@@ -6005,63 +6010,64 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::AIRCARS:
         case WorldSpecialProperty::EXTRABUNNY:
         case WorldSpecialProperty::EXTRAJUMP:
-            g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+            g_pGame->SetCheatEnabled(EnumToString(property), enabled);
             break;
         case WorldSpecialProperty::RANDOMFOLIAGE:
-            g_pGame->SetRandomFoliageEnabled(isEnabled);
+            g_pGame->SetRandomFoliageEnabled(enabled);
             break;
         case WorldSpecialProperty::SNIPERMOON:
-            g_pGame->SetMoonEasterEggEnabled(isEnabled);
+            g_pGame->SetMoonEasterEggEnabled(enabled);
             break;
         case WorldSpecialProperty::EXTRAAIRRESISTANCE:
-            g_pGame->SetExtraAirResistanceEnabled(isEnabled);
+            g_pGame->SetExtraAirResistanceEnabled(enabled);
             break;
         case WorldSpecialProperty::UNDERWORLDWARP:
-            g_pGame->SetUnderWorldWarpEnabled(isEnabled);
+            g_pGame->SetUnderWorldWarpEnabled(enabled);
             break;
         case WorldSpecialProperty::VEHICLESUNGLARE:
-            g_pGame->SetVehicleSunGlareEnabled(isEnabled);
+            g_pGame->SetVehicleSunGlareEnabled(enabled);
             break;
         case WorldSpecialProperty::CORONAZTEST:
-            g_pGame->SetCoronaZTestEnabled(isEnabled);
+            g_pGame->SetCoronaZTestEnabled(enabled);
             break;
         case WorldSpecialProperty::WATERCREATURES:
-            g_pGame->SetWaterCreaturesEnabled(isEnabled);
+            g_pGame->SetWaterCreaturesEnabled(enabled);
             break;
         case WorldSpecialProperty::BURNFLIPPEDCARS:
-            g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
+            g_pGame->SetBurnFlippedCarsEnabled(enabled);
             break;
         case WorldSpecialProperty::FIREBALLDESTRUCT:
-            g_pGame->SetFireballDestructEnabled(isEnabled);
+            g_pGame->SetFireballDestructEnabled(enabled);
             break;
         case WorldSpecialProperty::EXTENDEDWATERCANNONS:
-            g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
+            g_pGame->SetExtendedWaterCannonsEnabled(enabled);
             break;
         case WorldSpecialProperty::ROADSIGNSTEXT:
-            g_pGame->SetRoadSignsTextEnabled(isEnabled);
+            g_pGame->SetRoadSignsTextEnabled(enabled);
             break;
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
-            g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
+            g_pGame->SetTunnelWeatherBlendEnabled(enabled);
             break;
         case WorldSpecialProperty::IGNOREFIRESTATE:
-            g_pGame->SetIgnoreFireStateEnabled(isEnabled);
+            g_pGame->SetIgnoreFireStateEnabled(enabled);
+            break;
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            m_pVehicleManager->SetSpawnFlyingComponentEnabled(enabled);
+            break;
+        case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
+            g_pGame->SetVehicleBurnExplosionsEnabled(enabled);
+            break;
+        case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
+            SetVehicleEngineAutoStartEnabled(enabled);
             break;
         default:
             return false;
     }
 
-    if (g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent)) {
-        NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
-        stream->WriteString(EnumToString(property));
-        stream->WriteBit(isEnabled);
-        g_pNet->SendPacket(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-        g_pNet->DeallocateNetBitStream(stream);
-    }
-
     return true;
 }
 
-bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
+bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
 {
     switch (property)
     {
@@ -6096,7 +6102,14 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsTunnelWeatherBlendEnabled();
         case WorldSpecialProperty::IGNOREFIRESTATE:
             return g_pGame->IsIgnoreFireStateEnabled();
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
+        case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
+            return g_pGame->IsVehicleBurnExplosionsEnabled();
+        case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
+            return IsVehicleEngineAutoStartEnabled();
     }
+
     return false;
 }
 
@@ -6128,6 +6141,20 @@ void CClientGame::SetWeaponRenderEnabled(bool enabled)
 bool CClientGame::IsWeaponRenderEnabled() const
 {
     return g_pGame->IsWeaponRenderEnabled();
+}
+
+void CClientGame::SetVehicleEngineAutoStartEnabled(bool enabled)
+{
+    if (enabled == g_pMultiplayer->IsVehicleEngineAutoStartEnabled())
+        return;
+
+    g_pMultiplayer->SetVehicleEngineAutoStartEnabled(enabled);
+    m_pVehicleManager->ResetNotControlledRotors(enabled);
+}
+
+bool CClientGame::IsVehicleEngineAutoStartEnabled() const
+{
+    return g_pMultiplayer->IsVehicleEngineAutoStartEnabled();
 }
 
 #pragma code_seg(".text")
@@ -6226,10 +6253,7 @@ void CClientGame::TakePlayerScreenShot(uint uiSizeX, uint uiSizeY, const SString
         else
             pBitStream->Write((uchar)EPlayerScreenShotResult::MINIMIZED);
         pBitStream->Write(uiServerSentTime);
-        if (pBitStream->Version() >= 0x053)
-            pBitStream->Write(pResource->GetNetID());
-        else
-            pBitStream->WriteString(pResource->GetName());
+        pBitStream->Write(pResource->GetNetID());
         pBitStream->WriteString(strTag);
         g_pNet->SendPacket(PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER);
         g_pNet->DeallocateNetBitStream(pBitStream);
@@ -6294,13 +6318,9 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         pBitStream->Write((uchar)EPlayerScreenShotResult::ERROR_);
         pBitStream->Write(uiServerGrabTime);
-        if (pBitStream->Version() >= 0x053)
-            pBitStream->Write(pResource->GetNetID());
-        else
-            pBitStream->WriteString(pResource->GetName());
+        pBitStream->Write(pResource->GetNetID());
         pBitStream->WriteString(strTag);
-        if (pBitStream->Version() >= 0x053)
-            pBitStream->WriteString(strError);
+        pBitStream->WriteString(strError);
         g_pNet->SendPacket(PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER);
         g_pNet->DeallocateNetBitStream(pBitStream);
         return;
@@ -6340,10 +6360,7 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
             pBitStream->Write(uiServerGrabTime);
             pBitStream->Write(uiTotalByteSize);
             pBitStream->Write((ushort)uiNumParts);
-            if (pBitStream->Version() >= 0x053)
-                pBitStream->Write(pResource->GetNetID());
-            else
-                pBitStream->WriteString(pResource->GetName());
+            pBitStream->Write(pResource->GetNetID());
             pBitStream->WriteString(strTag);
         }
 
@@ -6812,6 +6829,10 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         g_pGame->SetRoadSignsTextEnabled(true);
         g_pGame->SetExtendedWaterCannonsEnabled(true);
         g_pGame->SetTunnelWeatherBlendEnabled(true);
+        g_pGame->SetIgnoreFireStateEnabled(false);
+        m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
+        g_pGame->SetVehicleBurnExplosionsEnabled(true);
+        SetVehicleEngineAutoStartEnabled(true);
     }
 
     // Reset all setWorldProperty to default

@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Game.hpp
  *  PURPOSE:     Shared stuff which measures things
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include "SharedUtil.Profiling.h"

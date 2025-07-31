@@ -26,19 +26,19 @@
 
 #ifndef CURL_DISABLE_HTTP
 
-#include "dynbuf.h"
+#include "curlx/dynbuf.h"
 
 struct connectdata;
 
 /*
  * The longest possible hexadecimal number we support in a chunked transfer.
  * Neither RFC2616 nor the later HTTP specs define a maximum chunk size.
- * For 64 bit curl_off_t we support 16 digits. For 32 bit, 8 digits.
+ * For 64-bit curl_off_t we support 16 digits. For 32-bit, 8 digits.
  */
 #define CHUNK_MAXNUM_LEN (SIZEOF_CURL_OFF_T * 2)
 
 typedef enum {
-  /* await and buffer all hexadecimal digits until we get one that isn't a
+  /* await and buffer all hexadecimal digits until we get one that is not a
      hexadecimal digit. When done, we go CHUNK_LF */
   CHUNK_HEX,
 
@@ -49,14 +49,14 @@ typedef enum {
      POST_CR state. */
   CHUNK_DATA,
 
-  /* POSTLF should get a CR and then a LF and nothing else, then move back to
+  /* POSTLF should get a CR and then an LF and nothing else, then move back to
      HEX as the CRLF combination marks the end of a chunk. A missing CR is no
      big deal. */
   CHUNK_POSTLF,
 
-  /* Used to mark that we're out of the game.  NOTE: that there's a 'datasize'
-     field in the struct that will tell how many bytes that were not passed to
-     the client in the end of the last buffer! */
+  /* Used to mark that we are out of the game. NOTE: that there is a
+     'datasize' field in the struct that will tell how many bytes that were
+     not passed to the client in the end of the last buffer! */
   CHUNK_STOP,
 
   /* At this point optional trailer headers can be found, unless the next line
@@ -64,7 +64,7 @@ typedef enum {
   CHUNK_TRAILER,
 
   /* A trailer CR has been found - next state is CHUNK_TRAILER_POSTCR.
-     Next char must be a LF */
+     Next char must be an LF */
   CHUNK_TRAILER_CR,
 
   /* A trailer LF must be found now, otherwise CHUNKE_BAD_CHUNK will be

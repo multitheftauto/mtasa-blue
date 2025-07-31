@@ -5,7 +5,7 @@
  *  FILE:        core/CCore.h
  *  PURPOSE:     Header file for base core class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -70,6 +70,8 @@ class CDiscordInterface;
 #define CONFIG_HISTORY_LIST_TAG    "connected_server"
 #define IDT_TIMER1                 1234
 
+class CSteamClient;
+
 extern class CCore*         g_pCore;
 extern class CGraphics*     g_pGraphics;
 extern class CLocalization* g_pLocalization;
@@ -104,6 +106,7 @@ public:
     CWebCoreInterface*                 GetWebCore();
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
+    CSteamClient*                      GetSteamClient() { return m_steamClient.get(); }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -223,6 +226,7 @@ public:
     void ApplyQueuedFrameRateLimit();
     void EnsureFrameRateLimitApplied();
     void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit);
+    void SetCurrentRefreshRate(uint value);
     void DoReliablePulse();
 
     bool IsTimingCheckpoints();
@@ -238,8 +242,8 @@ public:
     std::map<std::string, std::string>& GetCommandLineOptions() { return m_CommandLineOptions; }
     const char*                         GetCommandLineOption(const char* szOption);
     const char*                         GetCommandLineArgs() { return m_szCommandLineArgs; }
-    void                                RequestNewNickOnStart() { m_bWaitToSetNick = true; };
-    bool                                WillRequestNewNickOnStart() { return m_bWaitToSetNick; };
+    void                                RequestNewNickOnStart() { m_requestNewNickname = true; }
+    bool                                WillRequestNewNickOnStart() { return m_requestNewNickname; }
     bool                                WasLaunchedWithConnectURI();
     void                                HandleCrashDumpEncryption();
 
@@ -279,7 +283,9 @@ public:
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
-    bool        IsFirstFrame() const noexcept { return m_bFirstFrame; }
+
+    bool IsNetworkReady() const noexcept { return m_isNetworkReady; }
+    bool CanHandleKeyMessages() const noexcept { return m_menuFrame > 1; }
 
     void   SetCustomStreamingMemory(size_t szMB);
     bool   IsUsingCustomStreamingMemorySize();
@@ -308,14 +314,14 @@ private:
     CClientVariables                      m_ClientVariables;
     CWebCoreInterface*                    m_pWebCore = nullptr;
     CTrayIcon*                            m_pTrayIcon;
+    std::unique_ptr<CSteamClient>         m_steamClient;
     std::shared_ptr<CDiscordRichPresence> m_pDiscordRichPresence;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;
     CDirectInputHookManager* m_pDirectInputHookManager;
     CDirect3DHookManager*    m_pDirect3DHookManager;
-    // CFileSystemHook *           m_pFileSystemHook;
-    CSetCursorPosHook* m_pSetCursorPosHook;
+    CSetCursorPosHook*       m_pSetCursorPosHook;
 
     bool m_bLastFocused;
     int  m_iUnminimizeFrameCounter;
@@ -347,7 +353,8 @@ private:
     CKeyBinds*     m_pKeyBinds;
     CMouseControl* m_pMouseControl;
 
-    bool              m_bFirstFrame;
+    unsigned short    m_menuFrame{};
+    bool              m_isNetworkReady{};
     bool              m_bIsOfflineMod;
     bool              m_bCursorToggleControls;
     pfnProcessMessage m_pfnMessageProcessor;
@@ -369,8 +376,8 @@ private:
     CElapsedTimeHD       m_FrameRateTimer;
     uint                 m_uiQueuedFrameRate;
     bool                 m_bQueuedFrameRateValid;
-    bool                 m_bWaitToSetNick;
-    uint                 m_uiNewNickWaitFrames;
+    uint                 m_CurrentRefreshRate;
+    bool                 m_requestNewNickname{false};
     EDiagnosticDebugType m_DiagnosticDebug;
 
     // Below 2 are used for the UI only

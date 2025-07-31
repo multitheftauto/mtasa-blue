@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaResourceDefs.cpp
  *  PURPOSE:     Lua resource definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -227,12 +227,7 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
     if (resourceElement.has_value())
         return (*resourceElement)->GetName();
 
-    CResource* localResource = &lua_getownerresource(luaVM);
-
-    if (!localResource)
-        throw std::invalid_argument("Couldn't find the resource");
-
-    return localResource->GetName();
+    return lua_getownerresource(luaVM).GetName();
 }
 
 int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
@@ -437,7 +432,7 @@ int CLuaResourceDefs::LoadString(lua_State* luaVM)
         uint        uiSize;
         if (!g_pNet->DeobfuscateScript(cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName(luaVM) + "/loadstring"))
         {
-            SString strMessage("argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0);
+            SString strMessage("argument 1 is invalid. Please re-compile at https://luac.multitheftauto.com/", 0);
             argStream.SetCustomError(strMessage);
             cpBuffer = NULL;
             g_pClientGame->TellServerSomethingImportant(1004, argStream.GetFullErrorMessage(), 3);
@@ -517,7 +512,7 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
         uint        uiSize;
         if (!g_pNet->DeobfuscateScript(cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName(luaVM) + "/load"))
         {
-            SString strMessage("argument 2 is invalid. Please re-compile at http://luac.mtasa.com/", 0);
+            SString strMessage("argument 2 is invalid. Please re-compile at https://luac.multitheftauto.com/", 0);
             argStream.SetCustomError(strMessage);
             cpBuffer = NULL;
             g_pClientGame->TellServerSomethingImportant(1005, argStream.GetFullErrorMessage(), 3);
