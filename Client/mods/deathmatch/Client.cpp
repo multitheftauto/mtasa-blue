@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Memory.h"
 
 CClient* g_pClient = NULL;
 
@@ -18,6 +19,7 @@ MTAEXPORT CClientBase* __cdecl InitClient(void)
     // Eventually create a client base interface
     if (!g_pClient)
     {
+        SetMemoryAllocationFailureHandler();
         g_pClient = new CClient;
     }
     return g_pClient;

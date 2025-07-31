@@ -26,9 +26,9 @@
 #define MYSQLD_ERROR_INCLUDED
 
 static const int errmsg_section_start[] = { 1000, 3000, 3500, 6000, 10000, 15000 };
-static const int errmsg_section_size[] = { 888, 239, 667, 141, 4078, 147 };
+static const int errmsg_section_size[] = { 888, 239, 668, 141, 4086, 148 };
 
-static const int total_error_count = 6160;
+static const int total_error_count = 6170;
 
 //#define OBSOLETE_ER_HASHCHK 1000
 //#define OBSOLETE_ER_NISAMCHK 1001
@@ -1824,6 +1824,7 @@ static const int total_error_count = 6160;
 #define ER_WARN_NO_SPACE_VERSION_COMMENT 4164
 #define ER_VALIDATE_PASSWORD_INSUFFICIENT_CHANGED_CHARACTERS 4165
 #define ER_WARN_DEPRECATED_WITH_NOTE 4166
+#define ER_CANT_RUN_COMMAND_SERVICES_RECURSIVELY 4167
 #define ER_LANGUAGE_COMPONENT 6000
 #define ER_LANGUAGE_COMPONENT_NOT_AVAILABLE 6001
 #define ER_LANGUAGE_COMPONENT_UNSUPPORTED_LANGUAGE 6002
@@ -3873,7 +3874,7 @@ static const int total_error_count = 6160;
 #define ER_IB_MSG_80 11905
 #define ER_IB_MSG_81 11906
 #define ER_IB_MSG_82 11907
-#define ER_IB_MSG_83 11908
+#define ER_IB_ERR_PAGE_DIRTY_AT_SHUTDOWN 11908
 #define ER_IB_MSG_84 11909
 #define ER_IB_MSG_85 11910
 #define ER_IB_MSG_86 11911
@@ -6043,6 +6044,14 @@ static const int total_error_count = 6160;
 //#define OBSOLETE_ER_IB_MSG_FIL_STATE_MOVED_PREV_OR_HAS_DATADIR 14075
 //#define OBSOLETE_ER_RPL_KILL_OLD_DUMP_THREAD_ENCOUNTERED 14076
 //#define OBSOLETE_ER_RPL_MTA_ALLOW_COMMIT_OUT_OF_ORDER 14077
+#define ER_CHECK_TABLE_FUNCTIONS 14078
+#define ER_CHECK_TABLE_FUNCTIONS_DETAIL 14079
+#define ER_GRP_RPL_CERT_BROADCAST_THREAD_CREATE_FAILED 14080
+#define ER_GRP_RPL_CERT_BROADCAST_THREAD_STARTED 14081
+#define ER_GRP_RPL_CERT_BROADCAST_THREAD_STOPPED 14082
+#define ER_GRP_RPL_APPLIER_THD_KILLED_BY_SQL_KILL 14083
+#define ER_IB_MSG_WAITING_ON_LAGGING_REDO_LOG_CONSUMER 14084
+#define ER_IB_MSG_ABORTING_LOG_ARCHIVER 14085
 #define ER_LANGUAGE_COMPONENT_INFO 15000
 #define ER_LANGUAGE_COMPONENT_WARNING 15001
 #define ER_LANGUAGE_COMPONENT_ERROR 15002
@@ -6190,12 +6199,13 @@ static const int total_error_count = 6160;
 #define ER_IB_MSG_FIL_STATE_MOVED_PREV 15144
 #define ER_RPL_KILL_OLD_DUMP_THREAD_ENCOUNTERED 15145
 #define ER_RPL_MTA_ALLOW_COMMIT_OUT_OF_ORDER 15146
+#define ER_TEMPTABLE_ENGINE_ERROR 15147
 static const int obsolete_error_count = 621;
 
 static const int pfs_no_error_stat_count = 2;
 
-static const int pfs_session_error_stat_count = 1774;
+static const int pfs_session_error_stat_count = 1775;
 
-static const int pfs_global_error_stat_count = 3763;
+static const int pfs_global_error_stat_count = 3772;
 
 #endif
