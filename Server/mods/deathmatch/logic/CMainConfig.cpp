@@ -771,7 +771,6 @@ bool CMainConfig::LoadExtended()
     RegisterCommand("start", CConsoleCommands::StartResource, false, "Usage: start <resource> [<resource> ...] or start <directory> [<directory> ...]\nStart one or more resources, or start all resources in a directory");
     RegisterCommand("stop", CConsoleCommands::StopResource, false, "Usage: stop <resource> [<resource> ...] or stop <directory> [<directory> ...]\nStop one or more resources, or stop all resources in a directory");
     RegisterCommand("stopall", CConsoleCommands::StopAllResources, false, "Stop all running resources");
-    RegisterCommand("ensure", CConsoleCommands::EnsureResource, false, "Usage: ensure <resource> [<resource> ...] or ensure <directory> [<directory> ...]\nEnsure one or more resources, or ensure all resources in a directory");
     RegisterCommand("restart", CConsoleCommands::RestartResource, false, "Usage: restart <resource> [<resource> ...] or restart <directory> [<directory> ...]\nRestart one or more resources, or restart all resources in a directory");
     RegisterCommand("refresh", CConsoleCommands::RefreshResources, false, "Refresh resource list to find new resources");
     RegisterCommand("refreshall", CConsoleCommands::RefreshAllResources, false, "Refresh resources and restart any changed resources");
