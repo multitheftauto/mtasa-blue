@@ -573,7 +573,7 @@ void CSettingsSA::ResetFieldOfViewSniperAiming()
     // Restore original bytes
     // Zoom in
     MemPut<void*>(0x51089F, (void*)0x858CE0);
-    MemPut<void*>(0x5108B8, (void*)0x858CE0);
+    MemPut<void*>(0x5108B9, (void*)0x858CE0);
     MemPut<void*>(0x5108AE, "\x8C\x42");
     MemPut<void*>(0x5108CF, "\x8C\x42");
 
@@ -727,7 +727,7 @@ bool CSettingsSA::SetFieldOfViewSniperAiming(float angle, bool fromScript)
         // Patch sniper zoom-in/zoom-out limit
         // zoom in
         MemPut<void*>(0x51089F, &ms_fovSniperAiming_Max);
-        MemPut<void*>(0x5108B8, &ms_fovSniperAiming_Max);
+        MemPut<void*>(0x5108B9, &ms_fovSniperAiming_Max);
 
         MemPut<void*>(0x5108AE, "\x33\x43");
         MemPut<void*>(0x5108CF, "\x33\x43");
