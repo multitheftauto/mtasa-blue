@@ -432,10 +432,10 @@ SString CInstallManager::_ShowCrashFailDialog()
         strMessage += strReason;
     }
 
-    const SString moduleName = GetApplicationSetting("diagnostics", "last-crash-module");
-    const int     exceptionCode = GetApplicationSettingInt("diagnostics", "last-crash-code");
+    // const SString moduleName = GetApplicationSetting("diagnostics", "last-crash-module");
+    const int exceptionCode = GetApplicationSettingInt("diagnostics", "last-crash-code");
 
-    if (exceptionCode == CUSTOM_EXCEPTION_CODE_OOM && moduleName.EndsWithI("\\kernelbase.dll"))
+    if (exceptionCode == CUSTOM_EXCEPTION_CODE_OOM)
     {
         strMessage += '\n';
         strMessage += _("** Out of memory - this crash was caused by insufficient free or fragmented memory. **");
