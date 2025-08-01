@@ -115,7 +115,7 @@ struct SPlayerAnimData
     int         blendTime{250};
     bool        taskToBeRestoredOnAnimEnd{false};
 
-    std::int64_t startedTick{0};
+    std::int64_t startTime{0};
 
     float progress{0.0f};
     float speed{1.0f};
