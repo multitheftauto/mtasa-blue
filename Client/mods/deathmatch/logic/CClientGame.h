@@ -533,7 +533,7 @@ private:
     static bool                              StaticChokingHandler(unsigned char ucWeaponType);
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
-    static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
+    static void                              StaticPostWorldProcessEntitiesAfterPreRenderHandler();
     static void                              StaticPreFxRenderHandler();
     static void                              StaticPostColorFilterRenderHandler();
     static void                              StaticPreHudRenderHandler();
@@ -582,7 +582,7 @@ private:
     bool                              ChokingHandler(unsigned char ucWeaponType);
     void                              PreWorldProcessHandler();
     void                              PostWorldProcessHandler();
-    void                              PostWorldProcessPedsAfterPreRenderHandler();
+    void                              PostWorldProcessEntitiesAfterPreRenderHandler();
     void                              CAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
     CAnimBlendAssociationSAInterface* AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     CAnimBlendAssociationSAInterface* AddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,

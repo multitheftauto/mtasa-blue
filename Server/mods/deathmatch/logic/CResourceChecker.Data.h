@@ -51,6 +51,8 @@ namespace
     };
 
     SDeprecatedItem clientDeprecatedList[] = {
+		// Client events
+		{false, "onClientPedsProcessed", "onClientPostUpdate"},
         // Client functions
         {false, "getPlayerRotation", "getPedRotation"},
         {false, "canPlayerBeKnockedOffBike", "canPedBeKnockedOffBike"},
