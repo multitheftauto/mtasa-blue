@@ -1000,6 +1000,38 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
                     pPlayer->GiveWeapon(static_cast<eWeaponType>(weaponType.data.ucWeaponType), 1);
                 }
             }
+
+            // Animation
+            if (bitStream.ReadBit())
+            {
+                std::string blockName, animName;
+                int         time, blendTime;
+                bool        looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
+                float       speed;
+                double      startTime;
+
+                // Read data
+                bitStream.ReadString(blockName);
+                bitStream.ReadString(animName);
+                bitStream.Read(time);
+                bitStream.ReadBit(looped);
+                bitStream.ReadBit(updatePosition);
+                bitStream.ReadBit(interruptable);
+                bitStream.ReadBit(freezeLastFrame);
+                bitStream.Read(blendTime);
+                bitStream.ReadBit(taskRestore);
+                bitStream.Read(startTime);
+                bitStream.Read(speed);
+
+                // Run anim
+                CStaticFunctionDefinitions::SetPedAnimation(*pPlayer, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable,
+                                                            freezeLastFrame);
+                pPlayer->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                pPlayer->m_AnimationCache.speed = speed;
+                pPlayer->m_AnimationCache.progress = 0.0f;
+
+                pPlayer->SetHasSyncedAnim(true);
+            }
         }
 
         // Set move anim even if not spawned
@@ -3219,18 +3251,10 @@ retry:
                     SRotationDegreesSync rotationDegrees(false);
                     bitStream.Read(&rotationDegrees);
 
-                    // Read out the vehicle value as a char, then convert
-                    unsigned char ucModel = 0xFF;
-                    bitStream.Read(ucModel);
-
-                    // The server appears to subtract 400 from the vehicle id before
-                    // sending it to us, as to allow the value to fit into an unsigned
-                    // char.
-                    //
-                    // Too bad this was never documented.
-                    //
-                    // --slush
-                    unsigned short usModel = ucModel + 400;
+                    // Read out the vehicle model
+                    std::uint16_t usModel = 0xFFFF;
+                    bitStream.Read(usModel);
+                    
                     if (!CClientVehicleManager::IsValidModel(usModel))
                     {
                         RaiseEntityAddError(39);
@@ -3929,7 +3953,8 @@ retry:
                         std::string blockName, animName;
                         int time, blendTime;
                         bool looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
-                        float elapsedTime, speed;
+                        float speed;
+                        double startTime;
 
                         // Read data
                         bitStream.ReadString(blockName);
@@ -3941,15 +3966,14 @@ retry:
                         bitStream.ReadBit(freezeLastFrame);
                         bitStream.Read(blendTime);
                         bitStream.ReadBit(taskRestore);
-                        bitStream.Read(elapsedTime);
+                        bitStream.Read(startTime);
                         bitStream.Read(speed);
 
                         // Run anim
                         CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable, freezeLastFrame);
-                        pPed->m_AnimationCache.progressWaitForStreamIn = true;
-                        pPed->m_AnimationCache.elapsedTime = elapsedTime;
-
-                        CStaticFunctionDefinitions::SetPedAnimationSpeed(*pPed, animName, speed);
+                        pPed->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                        pPed->m_AnimationCache.speed = speed;
+                        pPed->m_AnimationCache.progress = 0.0f;
 
                         pPed->SetHasSyncedAnim(true);
                     }

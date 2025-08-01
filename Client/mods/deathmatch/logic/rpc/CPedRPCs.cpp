@@ -273,6 +273,12 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                         pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
                         pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
                         pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
+
+                        pPed->m_AnimationCache.startTime = GetTimestamp();
+                        pPed->m_AnimationCache.speed = 1.0f;
+                        pPed->m_AnimationCache.progress = 0.0f;
+
+                        pPed->SetHasSyncedAnim(true);
                     }
                 }
             }
@@ -304,6 +310,7 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
                     if (pAnimAssociation)
                     {
                         pAnimAssociation->SetCurrentProgress(fProgress);
+                        pPed->m_AnimationCache.progress = fProgress;
                     }
                 }
             }
@@ -331,6 +338,7 @@ void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterfac
                 if (pAnimAssociation)
                 {
                     pAnimAssociation->SetCurrentSpeed(fSpeed);
+                    pPed->m_AnimationCache.speed = fSpeed;
                 }
             }
         }

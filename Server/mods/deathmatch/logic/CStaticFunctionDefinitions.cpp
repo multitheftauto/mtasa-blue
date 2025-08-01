@@ -11697,7 +11697,15 @@ bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strN
         }
         else
         {
+            CLuaArguments arguments;
+            arguments.PushAccount(pAccount);
+            arguments.PushString(pAccount->GetName().c_str());
+            arguments.PushString(strNewName);
+            if (!m_pMapManager->GetRootElement()->CallEvent("onAccountNameChange", arguments))
+                return false;
+
             pAccount->SetName(strNewName);
+
             return true;
         }
     }
