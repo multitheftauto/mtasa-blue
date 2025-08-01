@@ -447,12 +447,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&position);
                     BitStream.Write(&rotationDegrees);
 
-                    // Vehicle id as a char
-                    // I'm assuming the "-400" is for adjustment so that all car values can
-                    // fit into a char?  Why doesn't someone document this?
-                    //
-                    // --slush
-                    BitStream.Write(static_cast<unsigned char>(pVehicle->GetModel() - 400));
+                    BitStream.Write(static_cast<std::uint16_t>(pVehicle->GetModel()));
 
                     // Health
                     SVehicleHealthSync health;
