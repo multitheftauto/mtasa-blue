@@ -427,7 +427,6 @@ class CAutomobileSAInterface;
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
-    friend class CAutomobileSA;
 
 protected:
     static std::unordered_map<std::uint16_t, ModelFeaturesArray> m_modelSpecialFeatures;

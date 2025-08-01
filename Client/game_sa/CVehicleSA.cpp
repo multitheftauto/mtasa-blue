@@ -214,8 +214,7 @@ void CVehicleSA::Init()
     // important)
     GetVehicleInterface()->m_pVehicle = this;
 
-    std::uint16_t modelIndex = GetModelIndex();
-    CModelInfo* modelInfo = pGame->GetModelInfo(modelIndex);
+    CModelInfo* modelInfo = pGame->GetModelInfo(GetModelIndex());
 
     if (modelInfo != nullptr)
     {

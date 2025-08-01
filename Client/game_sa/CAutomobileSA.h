@@ -44,7 +44,7 @@ public:
 
     CObjectSAInterface* SpawnFlyingComponent(const CarNodes::Enum& nodeId, const eCarComponentCollisionTypes& collType)
     {
-        return ((CObjectSAInterface * (__thiscall*)(CAutomobileSAInterface*, CarNodes::Enum, eCarComponentCollisionTypes))0x6a8580)(this, nodeId, collType);
+        return ((CObjectSAInterface*(__thiscall*)(CAutomobileSAInterface*, CarNodes::Enum, eCarComponentCollisionTypes))0x6a8580)(this, nodeId, collType);
     }
 
     CDamageManagerSAInterface                       m_damageManager;
