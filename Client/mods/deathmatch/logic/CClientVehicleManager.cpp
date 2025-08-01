@@ -808,3 +808,22 @@ void CClientVehicleManager::ResetNotControlledRotors(bool engineAutoStart)
         }
     }
 }
+
+bool CClientVehicleManager::SetModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature, bool enabled)
+{
+    if (!IsValidModel(model))
+        return false;
+
+    if (!g_pGame->SetVehicleModelSpecialFeatureEnabled(model, feature, enabled))
+        return false;
+
+    for (CClientVehicle* vehicle : m_List)
+    {
+        if (vehicle->GetModel() != model)
+            continue;
+
+        vehicle->SetSpecialFeatureEnabled(feature, enabled);
+    }
+
+    return true;
+}
