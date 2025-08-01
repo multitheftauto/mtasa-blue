@@ -27,8 +27,7 @@
 #define HOOKRET_CWeapon__Fire_Sniper                    0x7424D7
 #define HOOKPOS_CEventDamage__AffectsPed                0x4B35A0
 #define HOOKPOS_CEventVehicleExplosion__AffectsPed      0x4B0E58
-#define HOOKPOS_CFireManager__StartFire                 0x539F00
-#define HOOKPOS_CFireManager__StartFire_                0x53A050
+#define HOOKPOS_CFireManager__StartFire                 0x53A050
 #define HOOKPOS_CProjectileInfo__AddProjectile          0x737C80
 #define HOOKPOS_CProjectile__CProjectile                0x5A4030
 #define HOOKPOS_IKChainManager_PointArm                 0x618B66
