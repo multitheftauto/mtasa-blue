@@ -41,6 +41,8 @@ namespace SharedUtil
     //
     double GetSecondCount();
 
+    std::int64_t GetTimestamp();
+
     //
     // Get the time as a sortable string.
     // Set bDate to include the date, bMs to include milliseconds
