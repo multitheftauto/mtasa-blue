@@ -1122,7 +1122,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.animInterrupted = pPlayerModel->HasSyncedAnim() && (!pPlayerModel->IsRunningAnimation() || pPlayerModel->m_animationOverridedByClient);
 
     // The animation has been overwritten or interrupted by the client
-    if (flags.data.animInterrupted & 0x80)
+    if (flags.data.animInterrupted)
     {
         pPlayerModel->SetHasSyncedAnim(false);
         pPlayerModel->m_animationOverridedByClient = false;
