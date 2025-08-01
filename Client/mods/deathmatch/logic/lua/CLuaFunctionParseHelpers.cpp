@@ -1275,10 +1275,10 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         {
             if (pResource->GetMinClientReq() < szVersionReq)
             {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
                 if (szReason)
                     argStream.SetVersionWarning(szVersionReq, "client", szReason);
-                #endif
+#endif
                 return false;
             }
         }
@@ -1302,11 +1302,11 @@ void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* s
     
     if (pResource->GetMinClientReq() < szVersionReq)
     {
-        #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
         SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client %s because %s)",
                                 szVersionReq, szReason);
         throw std::invalid_argument(err);
-        #endif
+#endif
     }
     
 }
