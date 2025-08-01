@@ -14,6 +14,7 @@
 #include "CWeaponInfo.h"
 #include "CPedSound.h"
 #include "enums/PedState.h"
+#include "enums/PedMoveState.h"
 
 // To avoid VS intellisense highlight errors
 #include <memory>
@@ -255,7 +256,7 @@ public:
     virtual CEntity* GetContactEntity() const = 0;
     virtual bool     IsStandingOnEntity() const = 0;
 
-    virtual int GetRunState() const = 0;
+    virtual PedMoveState::Enum GetMoveState() const = 0;
 
     virtual bool GetCanBeShotInVehicle() const = 0;
     virtual bool GetTestForShotInVehicle() const = 0;

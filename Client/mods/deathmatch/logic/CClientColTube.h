@@ -26,7 +26,7 @@ public:
     float GetRadius() { return m_fRadius; };
     void  SetRadius(float fRadius)
     {
-        m_fRadius = fRadius;
+        m_fRadius = (fRadius / 2.0f) + 0.15f;
         SizeChanged();
     };
     float GetHeight() { return m_fHeight; };
