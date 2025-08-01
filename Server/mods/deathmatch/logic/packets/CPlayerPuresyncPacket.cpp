@@ -63,6 +63,9 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         pSourcePlayer->SetStealthAiming(flags.data.bStealthAiming);
         pSourcePlayer->SetReloadingWeapon(flags.data.isReloadingWeapon);
 
+        if (flags.data.animInterrupted)
+            pSourcePlayer->SetAnimationData({});
+
         // Contact element
         CElement* pContactElement = NULL;
         if (flags.data.bHasContact)
