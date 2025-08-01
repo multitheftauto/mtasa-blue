@@ -75,6 +75,8 @@ public:
 
     void ResetNotControlledRotors(bool engineAutoStart);
 
+    bool SetModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature, bool enabled);
+
 protected:
     CClientManager*               m_pManager;
     bool                          m_bCanRemoveFromList;

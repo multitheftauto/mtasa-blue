@@ -222,6 +222,13 @@ class CAutoPilot
     BYTE pad[56];
 };
 
+enum class eComponentRotationAxis
+{
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z,
+};
+
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
 class CVehicleSAInterface : public CPhysicalSAInterface
@@ -420,6 +427,10 @@ class CAutomobileSAInterface;
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
+    friend class CAutomobileSA;
+
+protected:
+    static std::unordered_map<std::uint16_t, ModelFeaturesArray> m_modelSpecialFeatures;
 
 private:
     CDamageManagerSA*                m_pDamageManager{nullptr};
@@ -444,6 +455,8 @@ private:
     bool                             m_rotorState{true};
 
     std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
+
+    ModelFeaturesArray m_specialFeatures{};
 
 public:
     CVehicleSA() = default;
@@ -639,7 +652,7 @@ public:
     SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
     void               SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
 
-    bool     SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1);
+    bool     SpawnFlyingComponent(const CarNodes::Enum& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1);
     void     SetWheelVisibility(eWheelPosition wheel, bool bVisible);
     CVector  GetWheelPosition(eWheelPosition wheel);
 
@@ -686,6 +699,7 @@ public:
     bool                              GetComponentRotation(const SString& vehicleComponent, CVector& vecPositionModelling);
     bool                              SetComponentPosition(const SString& vehicleComponent, const CVector& vecPosition);
     bool                              GetComponentPosition(const SString& vehicleComponent, CVector& vecPositionModelling);
+    static void                       SetComponentRotation(RwFrame* frame, eComponentRotationAxis axis, float angle, bool resetPosition);
     bool                              SetComponentScale(const SString& vehicleComponent, const CVector& vecScale);
     bool                              GetComponentScale(const SString& vehicleComponent, CVector& vecScaleModelling);
     bool                              IsComponentPresent(const SString& vehicleComponent);
@@ -714,6 +728,18 @@ public:
 
     bool IsOnFire() override { return GetVehicleInterface()->m_pFire != nullptr; }
     bool SetOnFire(bool onFire) override;
+
+    void SetSpecialFeaturesEnabled(const ModelFeaturesArray& features) noexcept { m_specialFeatures = features; }
+
+    bool SetSpecialFeatureEnabled(const VehicleFeatures::Enum& feature, bool enabled) override;
+    bool IsSpecialFeatureEnabled(const VehicleFeatures::Enum& feature) const noexcept override { return m_specialFeatures[feature]; }
+
+    static bool SetModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature, bool enabled);
+    static bool IsModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature);
+
+    static ModelFeaturesArray GetModelSpecialFeatures(std::uint16_t model);
+
+    static void ResetVehicleModelsSpecialFeatures() noexcept;
 
     static void StaticSetHooks();
     static void SetVehiclesSunGlareEnabled(bool bEnabled);

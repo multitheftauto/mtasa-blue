@@ -3492,6 +3492,8 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->GetVehicleAudioSettingsManager()->ResetAudioSettingsData();
 
+    g_pGame->ResetVehicleModelsSpecialFeatures();
+
     // Tell doggy we got the game running
     WatchDogCompletedSection("L1");
 }
