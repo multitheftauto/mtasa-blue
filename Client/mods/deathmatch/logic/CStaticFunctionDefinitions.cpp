@@ -120,11 +120,16 @@ bool CStaticFunctionDefinitions::AddEventHandler(CLuaMain& LuaMain, const char* 
 {
     assert(szName);
 
+    // Intercept deprecated event and register under the new name
+    const char* newEventName = strcmp(szName, "onClientPedsProcessed") == 0 ? "onClientPostUpdate" : szName;
+    if (strcmp(szName, "onClientPedsProcessed") == 0)
+        g_pClientGame->GetScriptDebugging()->LogWarning(LuaMain.GetVM(), "'onClientPedsProcessed' is deprecated and has been renamed to 'onClientPostUpdate'. Consider updating your scripts.");
+
     // We got an event with that name?
-    if (m_pEvents->Exists(szName))
+    if (m_pEvents->Exists(newEventName))
     {
         // Add the event handler
-        if (Entity.AddEvent(&LuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod))
+        if (Entity.AddEvent(&LuaMain, newEventName, iLuaFunction, bPropagated, eventPriority, fPriorityMod))
             return true;
     }
 
