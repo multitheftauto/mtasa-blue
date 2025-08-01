@@ -1000,6 +1000,38 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
                     pPlayer->GiveWeapon(static_cast<eWeaponType>(weaponType.data.ucWeaponType), 1);
                 }
             }
+
+            // Animation
+            if (bitStream.ReadBit())
+            {
+                std::string blockName, animName;
+                int         time, blendTime;
+                bool        looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
+                float       speed;
+                double      startTime;
+
+                // Read data
+                bitStream.ReadString(blockName);
+                bitStream.ReadString(animName);
+                bitStream.Read(time);
+                bitStream.ReadBit(looped);
+                bitStream.ReadBit(updatePosition);
+                bitStream.ReadBit(interruptable);
+                bitStream.ReadBit(freezeLastFrame);
+                bitStream.Read(blendTime);
+                bitStream.ReadBit(taskRestore);
+                bitStream.Read(startTime);
+                bitStream.Read(speed);
+
+                // Run anim
+                CStaticFunctionDefinitions::SetPedAnimation(*pPlayer, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable,
+                                                            freezeLastFrame);
+                pPlayer->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                pPlayer->m_AnimationCache.speed = speed;
+                pPlayer->m_AnimationCache.progress = 0.0f;
+
+                pPlayer->SetHasSyncedAnim(true);
+            }
         }
 
         // Set move anim even if not spawned
