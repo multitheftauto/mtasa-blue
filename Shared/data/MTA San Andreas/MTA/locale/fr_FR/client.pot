@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-15 04:08+0000\n"
-"PO-Revision-Date: 2025-07-16 19:31\n"
+"POT-Creation-Date: 2025-07-27 23:26+0000\n"
+"PO-Revision-Date: 2025-07-27 23:31\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -32,8 +32,8 @@ msgstr "Difficulté de redémarrage de MTA:SA:\n\n"
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
-#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
-#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:848
+#: Client/loader/CInstallManager.cpp:563 Client/loader/CInstallManager.cpp:572
 #: Client/core/CSettings.cpp:2993 Client/core/CSettings.cpp:4301
 #: Client/core/CSettings.cpp:4329 Client/core/CSettings.cpp:4940
 #: Client/core/CConnectManager.cpp:86 Client/core/CConnectManager.cpp:117
@@ -144,31 +144,31 @@ msgstr "ATTENTION\n\n"
 msgid "The detected file was:  %s\n"
 msgstr "Le fichier détecté était: %s\n"
 
-#: Client/loader/MainFunctions.cpp:602
+#: Client/loader/MainFunctions.cpp:604
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "Une instance de GTA: San Andreas est déjà en cours d'exécution, et doit être terminée pour que MTA:SA puisse démarrer. Voulez-vous la terminer maintenant?"
 
-#: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
-#: Client/loader/MainFunctions.cpp:1219
+#: Client/loader/MainFunctions.cpp:605 Client/loader/MainFunctions.cpp:612
+#: Client/loader/MainFunctions.cpp:1221
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr "Information"
 
-#: Client/loader/MainFunctions.cpp:609
+#: Client/loader/MainFunctions.cpp:611
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "Impossible de terminer GTA: San Andreas. Si le problème persiste, veuillez redémarrer votre ordinateur."
 
-#: Client/loader/MainFunctions.cpp:632
+#: Client/loader/MainFunctions.cpp:634
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "Certaines clés du Registre sont manquantes. Veuillez réinstaller Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:638
+#: Client/loader/MainFunctions.cpp:640
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "L'emplacement d'installation de GTA: San Andreas contient des caractères non supportés (Unicode). Veuillez déplacer les fichiers de GTA: San Andreas à un emplacement contenant uniquement des caractères standards (ASCII) et réinstaller Multi Theft Auto: San Andreas"
 
-#: Client/loader/MainFunctions.cpp:648
+#: Client/loader/MainFunctions.cpp:650
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
@@ -178,37 +178,37 @@ msgstr "L'emplacement de l'installation de MTA:SA ou GTA: San Andreas\n"
 "Si vous rencontrez des probèmes en utilisant MTA:SA,\n"
 "déplacez votre installation à un emplacement ne contenant pas ce caractère."
 
-#: Client/loader/MainFunctions.cpp:810
+#: Client/loader/MainFunctions.cpp:812
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Le chargement a échoué. Veuillez vous assurer que les fichiers Data les plus récents ont été installés correctement."
 
-#: Client/loader/MainFunctions.cpp:819
+#: Client/loader/MainFunctions.cpp:821
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Le chargement a échoué. Veuillez vous assurer que %s est installé correctement."
 
-#: Client/loader/MainFunctions.cpp:826
+#: Client/loader/MainFunctions.cpp:828
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Le chargement a échoué. Impossible de localiser gta_sa.exe dans %s."
 
-#: Client/loader/MainFunctions.cpp:836
+#: Client/loader/MainFunctions.cpp:838
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Le chargement a échoué. %s existe à l'emplacement de GTA: San Andreas. Veuillez le supprimer avant de continuer."
 
-#: Client/loader/MainFunctions.cpp:845
+#: Client/loader/MainFunctions.cpp:847
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Le fichier principal a un nom incorrect (%s)"
 
-#: Client/loader/MainFunctions.cpp:856
+#: Client/loader/MainFunctions.cpp:858
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Le fichier principal n'est pas signé, et pourrait être infecté.\n\n"
 "Veuillez consulter l'Aide en ligne, si MTA ne fonctionne pas correctement."
 
-#: Client/loader/MainFunctions.cpp:882
+#: Client/loader/MainFunctions.cpp:884
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
@@ -217,7 +217,7 @@ msgstr "Le fichier %s est manquant. Activité d'un virus possible.\n\n"
 "Envisagez de réinstaller Multi Theft Auto pour votre sécurité.\n"
 "Consultez l'aide en ligne si MTA ne fonctionne pas correctement."
 
-#: Client/loader/MainFunctions.cpp:893
+#: Client/loader/MainFunctions.cpp:895
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
@@ -226,43 +226,43 @@ msgstr "Le fichier %s est modifié. Activité d'un virus possible.\n\n"
 "Envisagez de réinstaller Multi Theft Auto pour votre sécurité.\n"
 "Consultez l'aide en ligne si MTA ne fonctionne pas correctement."
 
-#: Client/loader/MainFunctions.cpp:907
+#: Client/loader/MainFunctions.cpp:909
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "Des fichiers .asi ont été trouvés dans les dossiers d'installation de GTA:SA ou MTA:SA.\n\n"
 "Supprimez ou déplacez ces fichiers si vous constatez des problèmes avec MTA:SA."
 
-#: Client/loader/MainFunctions.cpp:1009
+#: Client/loader/MainFunctions.cpp:1011
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "La version du fichier ne correspond pas. Veuillez réinstaller MTA:SA si vous constatez des problèmes.\n"
 
-#: Client/loader/MainFunctions.cpp:1018
+#: Client/loader/MainFunctions.cpp:1020
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Des fichiers sont manquants. Veuillez réinstaller MTA:SA si vous constatez des problèmes.\n"
 
-#: Client/loader/MainFunctions.cpp:1030
+#: Client/loader/MainFunctions.cpp:1032
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA n'est pas compatible avec le Mode Sans Echec de Windows.\n\n"
 "Veuillez redémarrer votre ordinateur.\n"
 
-#: Client/loader/MainFunctions.cpp:1123
+#: Client/loader/MainFunctions.cpp:1125
 msgid "Fix configuration issue"
 msgstr "Correction d'un problème de configuration"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1157
+#: Client/loader/MainFunctions.cpp:1159
 msgid "Fix elevation required error"
 msgstr "Correction de l'erreur d'élévation requise"
 
-#: Client/loader/MainFunctions.cpp:1164
+#: Client/loader/MainFunctions.cpp:1166
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Impossible de démarrer GTA: San Andreas.  Veuillez tenter de réinstaller, ou si le problème persiste, contactez l'équipe de MTA à l'adresse www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1219
+#: Client/loader/MainFunctions.cpp:1221
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas n'a peut-être pas démarré correctement. Voulez-vous l'arrêter?"
 
@@ -424,7 +424,7 @@ msgstr "Forcer le mode fenêtré"
 msgid "Don't show again"
 msgstr "Ne plus afficher"
 
-#: Client/loader/Dialogs.cpp:98 Client/game_sa/CSettingsSA.cpp:859
+#: Client/loader/Dialogs.cpp:98 Client/game_sa/CSettingsSA.cpp:898
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -482,7 +482,7 @@ msgstr "Finition..."
 msgid "Done!"
 msgstr "Terminé!"
 
-#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:965
+#: Client/loader/CInstallManager.cpp:362 Client/loader/Utils.cpp:965
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -491,98 +491,102 @@ msgstr "MTA:SA nécessite un Accès Administrateur pour effectuer la tâche suiv
 "  '%s'\n\n"
 "Veuillez confirmer dans la prochaine fenêtre."
 
-#: Client/loader/CInstallManager.cpp:376
+#: Client/loader/CInstallManager.cpp:377
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA n'a pas pu accomplir la tâche suivante:\n\n"
 "  '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:426
+#: Client/loader/CInstallManager.cpp:428
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Ce crash a été causé par une erreur du pilote graphique **\n\n"
 "** Veuillez mettre à jour le pilote graphique **"
 
-#: Client/loader/CInstallManager.cpp:532
+#: Client/loader/CInstallManager.cpp:441
+msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:543
 msgid "Install updated MTA:SA files"
 msgstr "Installer les fichiers révisés de MTA:SA"
 
-#: Client/loader/CInstallManager.cpp:552
+#: Client/loader/CInstallManager.cpp:563
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Impossible de mettre à jour à cause de conflits de fichier. Veuillez fermer les autres programmes et réessayer"
 
-#: Client/loader/CInstallManager.cpp:561
+#: Client/loader/CInstallManager.cpp:572
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Auto n'a pas été installé correctement. Veuillez réinstaller. %s"
 
-#: Client/loader/CInstallManager.cpp:613
+#: Client/loader/CInstallManager.cpp:624
 msgid "Create GTA:SA junctions"
 msgstr "Créer les jonctions GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:657
+#: Client/loader/CInstallManager.cpp:668
 msgid "MTA:SA cannot launch because copying a file failed:"
 msgstr "MTA:SA ne peut pas être lancé car la copie d'un fichier a échoué:"
 
-#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+#: Client/loader/CInstallManager.cpp:674 Client/loader/CInstallManager.cpp:714
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
 msgstr "MTA:SA ne peut pas être lancé car un fichier MTA:SA est incorrect ou manquant:"
 
-#: Client/loader/CInstallManager.cpp:672
+#: Client/loader/CInstallManager.cpp:683
 msgid "Copy MTA:SA files"
 msgstr "Copier les fichiers de MTA:SA"
 
-#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+#: Client/loader/CInstallManager.cpp:706 Client/loader/CInstallManager.cpp:784
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
 msgstr "MTA:SA ne peut pas être lancé car un fichier GTA:SA est incorrect ou manquant:"
 
-#: Client/loader/CInstallManager.cpp:780
+#: Client/loader/CInstallManager.cpp:791
 msgid "Patch GTA:SA dependency"
 msgstr "Patcher la dépendance de GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:828
+#: Client/loader/CInstallManager.cpp:839
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
 msgstr "MTA:SA ne peut pas être lancé car l'exécutable de GTA:SA est incorrect ou manquant:"
 
-#: Client/loader/CInstallManager.cpp:832
+#: Client/loader/CInstallManager.cpp:843
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
 msgstr "Veuillez vérifier votre antivirus pour une détection de faux positifs, essayez d'ajouter une exception pour l'exécutable GTA:SA et redémarrez MTA:SA."
 
-#: Client/loader/CInstallManager.cpp:838
+#: Client/loader/CInstallManager.cpp:849
 msgid "Generate GTA:SA"
 msgstr "Générer GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:853
+#: Client/loader/CInstallManager.cpp:864
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
 msgstr "MTA:SA ne peut pas être lancé car l'exécutable de GTA:SA n'est pas chargeable:"
 
-#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
+#: Client/loader/CInstallManager.cpp:871 Client/loader/CInstallManager.cpp:894
 msgid "Patch GTA:SA"
 msgstr "Patcher GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:876
+#: Client/loader/CInstallManager.cpp:887
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr "MTA:SA ne peut pas être lancé car la correction de GTA:SA a échoué:"
 
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:811
+#: Client/loader/CInstallManager.cpp:1068 Client/core/CCore.cpp:811
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA ne peut pas continuer car il n'y a pas assez d'espace libre sur le lecteur %s."
 
-#: Client/loader/CInstallManager.cpp:1113
+#: Client/loader/CInstallManager.cpp:1124
 msgid "Missing file:"
 msgstr "Fichier manquant:"
 
-#: Client/loader/CInstallManager.cpp:1117
+#: Client/loader/CInstallManager.cpp:1128
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Si MTA ne démarre pas, veuillez réinstaller GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:1152
+#: Client/loader/CInstallManager.cpp:1163
 msgid "Update install settings"
 msgstr "MAJ des paramètres d'installation"
 
-#: Client/loader/CInstallManager.cpp:1305
+#: Client/loader/CInstallManager.cpp:1316
 msgid "Update compatibility settings"
 msgstr "MAJ des paramètres de compatibilité"
 
@@ -2183,7 +2187,7 @@ msgid "Saved configuration file"
 msgstr "Fichier de configuration enregistré"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:439
+#: Client/core/CCommandFuncs.cpp:452
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* Votre numéro de série est: %s"
@@ -3330,12 +3334,12 @@ msgstr ""
 msgid "Problem with graphics driver"
 msgstr "Problème avec le pilote graphique"
 
-#: Client/game_sa/CSettingsSA.cpp:781
+#: Client/game_sa/CSettingsSA.cpp:820
 msgid "Can't find valid screen resolution."
 msgstr "Impossible de trouver une résolution valide."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:857
+#: Client/game_sa/CSettingsSA.cpp:896
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Voulez-vous vraiment utiliser cette résolution d'écran?"
 

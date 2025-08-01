@@ -41,6 +41,6 @@ public:
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
 
-    static std::tuple<float, float> GetColPolygonHeight(CColPolygon* pColPolygon);
-    static bool                     SetColPolygonHeight(CColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
+    static CLuaMultiReturn<float, float> GetColPolygonHeight(CColShape* shape);
+    static bool SetColPolygonHeight(CColShape* shape, std::variant<bool, float> floor, std::variant<bool, float> ceil);
 };
