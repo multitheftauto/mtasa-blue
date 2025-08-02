@@ -95,6 +95,11 @@
          Available values: special detection (SD) codes ; (e.g. To enable special detection #15 use: 15) -->
     <enablesd></enablesd>
 
+    <!-- This parameter controls how duplicate command handlers are handled.
+         Some resources may need to register multiple handlers for the same command.
+         Values: 0 - disallow duplicate handlers, 1 - allow with warning, 2 - allow silently ; default value: 1 -->
+    <allow_multi_command_handlers>1</allow_multi_command_handlers>
+
     <!-- Minimum client version. Clients with a lower version will not be allowed to connect. After
          disconnection, clients will be given an opportunity to download an update.
          If left blank, this setting is disabled and there are no restrictions on who can connect.
@@ -317,4 +322,5 @@
 	<!-- This parameter determines if resource client files that end in PNG, DFF and TXD should be checked for errors;
           Values: 0 - Off, 1 - Enabled.  Default - 1 -->
     <resource_client_file_checks>1</resource_client_file_checks>
+
 </config>
