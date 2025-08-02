@@ -3,6 +3,8 @@
 if [ -z "$MSBUILDPATH" ]; then
     echo "Could not find MSBuild. Make sure the MSBUILDPATH environment variable points"
     echo "to either MSBuild.exe or a script that handles the invocation of MSBuild.exe."
+    echo ""
+    echo "If using msvc-wine, it should point to /path/to/msvc-wine-install-dir/bin/x64/msbuild"
     exit 1
 fi
 echo "Found MSBuild at: $MSBUILDPATH"
