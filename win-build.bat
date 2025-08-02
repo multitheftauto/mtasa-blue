@@ -45,7 +45,7 @@ IF /i [%2] == [Win32] (
     set BUILD_PLATFORM=ARM64
 ) ELSE (
     IF not [%2] == [] (
-        echo Invalid first argument %2. Using default platform %BUILD_PLATFORM%.
+        echo Invalid second argument %2. Using default platform %BUILD_PLATFORM%.
     )
 )
 

@@ -96,7 +96,7 @@ function os.sha256_file(path)
 	local windows = os.host() == "windows"
 	local s, errc
 	if windows then
-		s, errc = os.outputof(string.format("CertUtil -hashfile \"%s\" SHA256", path))
+		s, errc = os.outputof(string.format("call \"utils\\7z\\7za.exe\" h -scrcSHA256 \"%s\"", path))
 	else
 		s, errc = os.outputof(string.format("sha256sum \"%s\" | awk '{ print $1 }'", path))
 	end
@@ -109,7 +109,7 @@ function os.sha256_file(path)
 
 	-- Clean windows output
 	if windows then
-		s = (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
+		s = (s:match("SHA256 for data: +([^\n]*)") or "")
 	end
 
 	return s:lower()
