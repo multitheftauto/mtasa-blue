@@ -1119,8 +1119,16 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || (pPlayerModel->GetPlayerSyncCount() % 4) == 0);
     flags.data.bStealthAiming = (pPlayerModel->IsStealthAiming() == true);
     flags.data.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
+    flags.data.animInterrupted = pPlayerModel->HasSyncedAnim() && (!pPlayerModel->IsRunningAnimation() || pPlayerModel->m_animationOverridedByClient);
 
-    if (pPlayerWeapon->GetSlot() > 15)
+    // The animation has been overwritten or interrupted by the client
+    if (flags.data.animInterrupted)
+    {
+        pPlayerModel->SetHasSyncedAnim(false);
+        pPlayerModel->m_animationOverridedByClient = false;
+    }
+
+    if (flags.data.bHasAWeapon && pPlayerWeapon->GetSlot() > 15)
         flags.data.bHasAWeapon = false;
 
     BitStream.Write(&flags);
