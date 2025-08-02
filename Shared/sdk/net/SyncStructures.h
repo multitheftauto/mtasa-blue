@@ -544,7 +544,7 @@ struct SPlayerPuresyncFlags : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 13
+        BITCOUNT = 14
     };
 
     bool Read(NetBitStreamInterface& stream)
@@ -572,6 +572,7 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         bool bSyncingVelocity : 1;
         bool bStealthAiming : 1;
         bool isReloadingWeapon : 1;
+        bool animInterrupted : 1;
     } data;
 };
 
