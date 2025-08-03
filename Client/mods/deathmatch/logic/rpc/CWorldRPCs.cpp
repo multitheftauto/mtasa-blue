@@ -244,11 +244,25 @@ void CWorldRPCs::SetGlitchEnabled(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetPlayerGlitchEnabled(NetBitStreamInterface& bitStream)
 {
+    ElementID sourcePlayerID;
     SString strGlitchName;
     bool    bEnabled;
-    if (bitStream.Read(strGlitchName) && bitStream.ReadBit(bEnabled))
+    
+    // Check if this includes source player ID (for other players' states)
+    if (bitStream.Read(sourcePlayerID) && bitStream.Read(strGlitchName) && bitStream.ReadBit(bEnabled))
     {
-        g_pClientGame->SetPlayerGlitchEnabled(strGlitchName, bEnabled);
+
+        return;
+    }
+    else
+    {
+        
+        bitStream.Reset();
+        if (bitStream.Read(strGlitchName) && bitStream.ReadBit(bEnabled))
+        {
+            
+            g_pClientGame->SetPlayerGlitchEnabled(strGlitchName, bEnabled);
+        }
     }
 }
 

@@ -430,6 +430,7 @@ public:
     bool        IsGlitchEnabled(eGlitchType cGlitch);
     eGlitchType GetGlitchIndex(const std::string& strGlitch) { return m_GlitchNames[strGlitch]; }
     bool        IsGlitch(const std::string& strGlitch) { return m_GlitchNames.count(strGlitch) > 0; }
+    const std::map<std::string, eGlitchType>& GetGlitchNames() const { return m_GlitchNames; }
 
     bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property) { return m_WorldSpecialProps[property]; }
     void SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled) { m_WorldSpecialProps[property] = isEnabled; }
@@ -523,7 +524,7 @@ private:
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
     void Packet_PlayerResourceStart(class CPlayerResourceStartPacket& Packet);
     void Packet_PlayerWorldSpecialProperty(class CPlayerWorldSpecialPropertyPacket& packet) noexcept;
-    void Packet_PlayerGlitchState(class CPlayerGlitchStatePacket& packet) noexcept;
+    void Packet_PlayerGlitchRequest(class CPlayerGlitchRequestPacket& packet) noexcept;
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 

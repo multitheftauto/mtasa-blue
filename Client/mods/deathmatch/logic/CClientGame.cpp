@@ -6036,6 +6036,29 @@ bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
 
+bool CClientGame::RequestPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled)
+{
+    // Find the glitch index for validation
+    auto it = m_GlitchNames.find(strGlitchName);
+    if (it == m_GlitchNames.end())
+        return false;
+
+    unsigned char ucGlitch = it->second;
+    if (ucGlitch >= NUM_GLITCHES)
+        return false;
+
+    // Send request to server (don't apply locally yet)
+    if (auto stream = g_pNet->AllocateNetBitStream())
+    {
+        stream->Write(strGlitchName);
+        stream->WriteBit(bEnabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_GLITCH_REQUEST, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
+    }
+
+    return true;
+}
+
 bool CClientGame::SetPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled)
 {
     
@@ -6054,24 +6077,13 @@ bool CClientGame::SetPlayerGlitchEnabled(const std::string& strGlitchName, bool 
     
     m_PlayerGlitches[ucGlitch] = bEnabled;
 
-    
-    bool bEffectiveState = bEnabled;
-    
+    // apply to game engine?
     if (ucGlitch == GLITCH_QUICKRELOAD)
-        g_pMultiplayer->DisableQuickReload(!bEffectiveState);
+        g_pMultiplayer->DisableQuickReload(!bEnabled);
     else if (ucGlitch == GLITCH_CLOSEDAMAGE)
-        g_pMultiplayer->DisableCloseRangeDamage(!bEffectiveState);
+        g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
     else if (ucGlitch == GLITCH_VEHICLE_RAPID_STOP)
-        g_pMultiplayer->SetRapidVehicleStopFixEnabled(!bEffectiveState);
-
-    
-    if (auto stream = g_pNet->AllocateNetBitStream())
-    {
-        stream->Write(strGlitchName);
-        stream->WriteBit(bEnabled);
-        g_pNet->SendPacket(PACKET_ID_PLAYER_GLITCH_STATE, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-        g_pNet->DeallocateNetBitStream(stream);
-    }
+        g_pMultiplayer->SetRapidVehicleStopFixEnabled(!bEnabled);
 
     return true;
 }

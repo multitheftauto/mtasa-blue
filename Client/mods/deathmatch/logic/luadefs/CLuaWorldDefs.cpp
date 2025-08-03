@@ -2359,7 +2359,7 @@ CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, fl
 
 int CLuaWorldDefs::SetPlayerGlitchEnabled(lua_State* luaVM)
 {
-    
+    //  bool setPlayerGlitchEnabled ( string glitchName, bool enable )
     SString strGlitch;
     bool    bEnabled;
 
@@ -2369,7 +2369,8 @@ int CLuaWorldDefs::SetPlayerGlitchEnabled(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (g_pClientGame->SetPlayerGlitchEnabled(strGlitch, bEnabled))
+        // Send request to server
+        if (g_pClientGame->RequestPlayerGlitchEnabled(strGlitch, bEnabled))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -2384,7 +2385,7 @@ int CLuaWorldDefs::SetPlayerGlitchEnabled(lua_State* luaVM)
 
 int CLuaWorldDefs::IsPlayerGlitchEnabled(lua_State* luaVM)
 {
-    
+    //  bool isPlayerGlitchEnabled ( string glitchName )
     SString strGlitch;
 
     CScriptArgReader argStream(luaVM);

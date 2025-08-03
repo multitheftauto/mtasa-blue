@@ -59,7 +59,7 @@
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
 #include "packets/CPlayerWorldSpecialPropertyPacket.h"
-#include "packets/CPlayerGlitchStatePacket.h"
+#include "packets/CPlayerGlitchRequestPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CLuaPacket.h"
 #include "../utils/COpenPortsTester.h"
@@ -1329,9 +1329,9 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
-        case PACKET_ID_PLAYER_GLITCH_STATE:
+        case PACKET_ID_PLAYER_GLITCH_REQUEST:
         {
-            Packet_PlayerGlitchState(static_cast<CPlayerGlitchStatePacket&>(Packet));
+            Packet_PlayerGlitchRequest(static_cast<CPlayerGlitchRequestPacket&>(Packet));
             return true;
         }
 
@@ -1486,6 +1486,21 @@ void CGame::InitialDataStream(CPlayer& Player)
     // Tell our scripts the player has joined
     CLuaArguments Arguments;
     Player.CallEvent("onPlayerJoin", Arguments);
+
+    // Send existing per-player glitch states from all players
+    if (Player.IsJoined())
+    {
+        list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
+        for (; iter != m_pPlayerManager->IterEnd(); iter++)
+        {
+            CPlayer* pOtherPlayer = *iter;
+            if (pOtherPlayer != &Player && pOtherPlayer->IsJoined())
+            {
+                // Send other players' glitch overrides to the new player
+                pOtherPlayer->SendAllPlayerGlitchStates(&Player);
+            }
+        }
+    }
 
     marker.Set("onPlayerJoin");
 
@@ -4193,25 +4208,31 @@ void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket&
     player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
 }
 
-void CGame::Packet_PlayerGlitchState(CPlayerGlitchStatePacket& packet) noexcept
+void CGame::Packet_PlayerGlitchRequest(CPlayerGlitchRequestPacket& packet) noexcept
 {
-    CPlayer* player = packet.GetSourcePlayer();
-
-    if (!player)
+    CPlayer* pPlayer = packet.GetSourcePlayer();
+    if (!pPlayer)
         return;
 
-    const std::string& glitchName = packet.GetGlitchName();
-    const bool         enabled = packet.IsEnabled();
+    const std::string& strGlitchName = packet.GetGlitchName();
+    const bool bEnabled = packet.IsEnabled();
 
     
-    if (!IsGlitch(glitchName))
+    if (!IsGlitch(strGlitchName))
         return;
 
-    CLuaArguments arguments;
-    arguments.PushString(glitchName);
-    arguments.PushBoolean(enabled);
+    
+    if (pPlayer->SetPlayerGlitchEnabled(strGlitchName, bEnabled))
+    {
+        
+        pPlayer->SendPlayerGlitchState(strGlitchName);
 
-    player->CallEvent("onPlayerGlitchStateChange", arguments, nullptr);
+        
+        CLuaArguments arguments;
+        arguments.PushString(strGlitchName);
+        arguments.PushBoolean(bEnabled);
+        pPlayer->CallEvent("onPlayerGlitchStateChange", arguments, nullptr);
+    }
 }
 
 void CGame::Packet_PlayerModInfo(CPlayerModInfoPacket& Packet)

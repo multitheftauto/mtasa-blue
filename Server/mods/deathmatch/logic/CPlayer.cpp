@@ -120,6 +120,13 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
     m_LastReceivedSyncTimer.SetUseModuleTickCount(true);
     m_ConnectedTimer.SetUseModuleTickCount(true);
     m_bIsLeavingServer = false;
+
+    // Initialize per-player glitch states
+    for (int i = 0; i < NUM_GLITCHES; i++)
+    {
+        m_PlayerGlitches[i] = false;
+        m_bHasPlayerGlitchOverride[i] = false;
+    }
 }
 
 CPlayer::~CPlayer()
@@ -1158,6 +1165,121 @@ CPlayer* GetDeletedMapKey(CPlayer**)
 //
 //
 /////////////////////////////////////////////////////////////////
+bool CPlayer::SetPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled)
+{
+    if (!g_pGame->IsGlitch(strGlitchName))
+        return false;
+        
+    eGlitchType eGlitch = g_pGame->GetGlitchIndex(strGlitchName);
+    if (eGlitch >= NUM_GLITCHES)
+        return false;
+    
+    m_PlayerGlitches[eGlitch] = bEnabled;
+    m_bHasPlayerGlitchOverride[eGlitch] = true;
+    
+    return true;
+}
+
+bool CPlayer::IsPlayerGlitchEnabled(const std::string& strGlitchName) const
+{
+    if (!g_pGame->IsGlitch(strGlitchName))
+        return false;
+        
+    eGlitchType eGlitch = g_pGame->GetGlitchIndex(strGlitchName);
+    if (eGlitch >= NUM_GLITCHES)
+        return false;
+    
+    if (m_bHasPlayerGlitchOverride[eGlitch])
+        return m_PlayerGlitches[eGlitch];
+    
+    return g_pGame->IsGlitchEnabled(eGlitch);
+}
+
+bool CPlayer::HasPlayerGlitchOverride(const std::string& strGlitchName) const
+{
+    if (!g_pGame->IsGlitch(strGlitchName))
+        return false;
+        
+    eGlitchType eGlitch = g_pGame->GetGlitchIndex(strGlitchName);
+    if (eGlitch >= NUM_GLITCHES)
+        return false;
+    
+    return m_bHasPlayerGlitchOverride[eGlitch];
+}
+
+void CPlayer::SendPlayerGlitchState(const std::string& strGlitchName) const
+{
+    if (!g_pGame->IsGlitch(strGlitchName))
+        return;
+        
+    eGlitchType eGlitch = g_pGame->GetGlitchIndex(strGlitchName);
+    if (eGlitch >= NUM_GLITCHES)
+        return;
+    
+    bool bEffectiveState = IsPlayerGlitchEnabled(strGlitchName);
+    
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(strGlitchName);
+    BitStream.pBitStream->WriteBit(bEffectiveState);
+    Send(CLuaPacket(SET_PLAYER_GLITCH_ENABLED, *BitStream.pBitStream));
+}
+
+void CPlayer::SendAllPlayerGlitchStates(CPlayer* pTarget) const
+{
+    CPlayer* pSendTo = pTarget ? pTarget : const_cast<CPlayer*>(this);
+    
+    for (int i = 0; i < NUM_GLITCHES; i++)
+    {
+        if (m_bHasPlayerGlitchOverride[i])
+        {
+            std::string strGlitchName;
+            for (const auto& pair : g_pGame->GetGlitchNames())
+            {
+                if (pair.second == (eGlitchType)i)
+                {
+                    strGlitchName = pair.first;
+                    break;
+                }
+            }
+            
+            if (!strGlitchName.empty())
+            {
+                CBitStream BitStream;
+                BitStream.pBitStream->Write(GetElementID());  // Source player ID
+                BitStream.pBitStream->Write(strGlitchName);
+                BitStream.pBitStream->WriteBit(m_PlayerGlitches[i]);
+                pSendTo->Send(CLuaPacket(SET_PLAYER_GLITCH_ENABLED, *BitStream.pBitStream));
+            }
+        }
+    }
+}
+
+void CPlayer::ResetPlayerGlitchOverrides()
+{
+    for (int i = 0; i < NUM_GLITCHES; i++)
+    {
+        if (m_bHasPlayerGlitchOverride[i])
+        {
+            m_bHasPlayerGlitchOverride[i] = false;
+            
+            std::string strGlitchName;
+            for (const auto& pair : g_pGame->GetGlitchNames())
+            {
+                if (pair.second == (eGlitchType)i)
+                {
+                    strGlitchName = pair.first;
+                    break;
+                }
+            }
+            
+            if (!strGlitchName.empty())
+            {
+                SendPlayerGlitchState(strGlitchName);
+            }
+        }
+    }
+}
+
 CPlayerBitStream::CPlayerBitStream(CPlayer* pPlayer)
 {
     pBitStream = g_pNetServer->AllocateNetServerBitStream(pPlayer->GetBitStreamVersion());

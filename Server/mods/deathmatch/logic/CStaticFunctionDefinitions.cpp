@@ -11261,13 +11261,14 @@ bool CStaticFunctionDefinitions::SetPlayerGlitchEnabled(CPlayer* pPlayer, const 
     if (g_pGame->IsGlitch(strGlitchName))
     {
         
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(strGlitchName);
-        BitStream.pBitStream->WriteBit(bEnabled);
-        pPlayer->Send(CLuaPacket(SET_PLAYER_GLITCH_ENABLED, *BitStream.pBitStream));
-        return true;
+        if (pPlayer->SetPlayerGlitchEnabled(strGlitchName, bEnabled))
+        {
+            
+            pPlayer->SendPlayerGlitchState(strGlitchName);
+            return true;
+        }
     }
-
+    
     return false;
 }
 
@@ -11275,10 +11276,9 @@ bool CStaticFunctionDefinitions::IsPlayerGlitchEnabled(CPlayer* pPlayer, const s
 {
     assert(pPlayer);
 
-
     if (g_pGame->IsGlitch(strGlitchName))
     {
-        bEnabled = g_pGame->IsGlitchEnabled(strGlitchName);
+        bEnabled = pPlayer->IsPlayerGlitchEnabled(strGlitchName);
         return true;
     }
     return false;

@@ -49,7 +49,7 @@
 #include "packets/CPlayerNetworkStatusPacket.h"
 #include "packets/CPlayerResourceStartPacket.h"
 #include "packets/CPlayerWorldSpecialPropertyPacket.h"
-#include "packets/CPlayerGlitchStatePacket.h"
+#include "packets/CPlayerGlitchRequestPacket.h"
 
 CPacketTranslator::CPacketTranslator(CPlayerManager* pPlayerManager)
 {
@@ -218,8 +218,8 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
             pTemp = new CPlayerWorldSpecialPropertyPacket;
             break;
 
-        case PACKET_ID_PLAYER_GLITCH_STATE:
-            pTemp = new CPlayerGlitchStatePacket;
+        case PACKET_ID_PLAYER_GLITCH_REQUEST:
+            pTemp = new CPlayerGlitchRequestPacket;
             break;
 
         default:

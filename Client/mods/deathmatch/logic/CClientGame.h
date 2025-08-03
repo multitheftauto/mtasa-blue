@@ -416,6 +416,7 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
+    bool RequestPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled);
     bool SetPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled);
     bool IsPlayerGlitchEnabled(const std::string& strGlitchName);
 
