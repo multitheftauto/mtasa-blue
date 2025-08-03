@@ -377,9 +377,24 @@ bool CSteamClient::Load()
         return false;
     }
 
+    static auto pAddDllDirectory = ([]() -> decltype(&AddDllDirectory) {
+        if (const HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll"); kernel32 != nullptr)
+        {
+            return reinterpret_cast<decltype(&AddDllDirectory)>(static_cast<void*>(GetProcAddress(kernel32, "AddDllDirectory")));
+        }
+
+        return nullptr;
+    })();
+
+    if (pAddDllDirectory == nullptr)
+    {
+        WriteErrorEvent("Your operating system is outdated and is missing the KB2533623 update package for AddDllDirectory");
+        return false;
+    }
+
     WriteDebugEvent(SString("Using steamclient.dll: %s", *ToUTF8(steamClientPath.value())));
     SetEnvironmentVariableW(L"SteamAppId", L"" STEAM_GTASA_APP_ID);
-    AddDllDirectory(steamDirPath.c_str());
+    pAddDllDirectory(steamDirPath.c_str());
     {
         static wchar_t pathBuffer[65536];
         GetEnvironmentVariableW(L"PATH", pathBuffer, sizeof(pathBuffer) / sizeof(wchar_t));
@@ -425,7 +440,7 @@ bool CSteamClient::Load()
 
     releaseLibraryLock.reset();
     
-    Native::CreateInterface = reinterpret_cast<decltype(Native::CreateInterface)>(GetProcAddress(dll, "CreateInterface"));
+    Native::CreateInterface = reinterpret_cast<decltype(Native::CreateInterface)>(static_cast<void*>(GetProcAddress(dll, "CreateInterface")));
 
     if (!Native::CreateInterface)
     {
