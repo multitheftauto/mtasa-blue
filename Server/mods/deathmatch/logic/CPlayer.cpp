@@ -1228,6 +1228,9 @@ void CPlayer::SendAllPlayerGlitchStates(CPlayer* pTarget) const
 {
     CPlayer* pSendTo = pTarget ? pTarget : const_cast<CPlayer*>(this);
     
+    if (pSendTo != this)
+        return;
+    
     for (int i = 0; i < NUM_GLITCHES; i++)
     {
         if (m_bHasPlayerGlitchOverride[i])
@@ -1244,11 +1247,7 @@ void CPlayer::SendAllPlayerGlitchStates(CPlayer* pTarget) const
             
             if (!strGlitchName.empty())
             {
-                CBitStream BitStream;
-                BitStream.pBitStream->Write(GetElementID());  // Source player ID
-                BitStream.pBitStream->Write(strGlitchName);
-                BitStream.pBitStream->WriteBit(m_PlayerGlitches[i]);
-                pSendTo->Send(CLuaPacket(SET_PLAYER_GLITCH_ENABLED, *BitStream.pBitStream));
+                SendPlayerGlitchState(strGlitchName);
             }
         }
     }

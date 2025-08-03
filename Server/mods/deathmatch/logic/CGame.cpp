@@ -1487,19 +1487,10 @@ void CGame::InitialDataStream(CPlayer& Player)
     CLuaArguments Arguments;
     Player.CallEvent("onPlayerJoin", Arguments);
 
-    // Send existing per-player glitch states from all players
+    // Send the joining player's own glitch states (if any were set before joining)
     if (Player.IsJoined())
     {
-        list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-        for (; iter != m_pPlayerManager->IterEnd(); iter++)
-        {
-            CPlayer* pOtherPlayer = *iter;
-            if (pOtherPlayer != &Player && pOtherPlayer->IsJoined())
-            {
-                // Send other players' glitch overrides to the new player
-                pOtherPlayer->SendAllPlayerGlitchStates(&Player);
-            }
-        }
+        Player.SendAllPlayerGlitchStates();
     }
 
     marker.Set("onPlayerJoin");
