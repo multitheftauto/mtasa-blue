@@ -27,7 +27,7 @@ bool CUnoccupiedVehicleSyncPacket::Read(NetBitStreamInterface& BitStream)
     {
         if (i > uiMaxCount)
         {
-            CLogger::LogPrintf("WARN: Received excess unoccupied vehicle sync data (%d bytes)", BitStream.GetNumberOfUnreadBits() / 8);
+            CLogger::LogPrintf("WARN: Received excess unoccupied vehicle sync data (%d bytes)\n", BitStream.GetNumberOfUnreadBits() / 8);
             break;
         }
 
