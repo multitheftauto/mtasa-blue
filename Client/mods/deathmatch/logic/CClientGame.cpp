@@ -139,13 +139,13 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     m_Glitches[GLITCH_VEHICLE_RAPID_STOP] = false;
 
-    // Initialize per-player glitch overrides (initially match global state)
+    
     for (int i = 0; i < NUM_GLITCHES; i++)
     {
         m_PlayerGlitches[i] = m_Glitches[i];
     }
 
-    // Glitch names (for Lua interface)
+    
     m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
     m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
