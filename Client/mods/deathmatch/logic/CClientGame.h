@@ -416,6 +416,9 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
+    bool SetPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled);
+    bool IsPlayerGlitchEnabled(const std::string& strGlitchName);
+
     bool SetWorldSpecialProperty(const WorldSpecialProperty property, const bool enabled) noexcept;
     bool IsWorldSpecialProperty(const WorldSpecialProperty property);
 
@@ -783,6 +786,8 @@ private:
     DWORD m_dwWanted;
 
     SFixedArray<bool, NUM_GLITCHES> m_Glitches;
+    SFixedArray<bool, NUM_GLITCHES> m_PlayerGlitches;
+    std::map<std::string, unsigned char> m_GlitchNames;
 
     // Clouds Enabled
     bool m_bCloudsEnabled;

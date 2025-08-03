@@ -28,6 +28,7 @@ public:
     LUA_DECLARE(getMinuteDuration);
     LUA_DECLARE(isGarageOpen);
     LUA_DECLARE(isGlitchEnabled);
+    LUA_DECLARE(isPlayerGlitchEnabled);
     LUA_DECLARE(setJetpackWeaponEnabled);
     LUA_DECLARE(getJetpackWeaponEnabled);
     LUA_DECLARE(getCloudsEnabled);
@@ -63,6 +64,7 @@ public:
     LUA_DECLARE(setMinuteDuration);
     LUA_DECLARE(setGarageOpen);
     LUA_DECLARE(setGlitchEnabled);
+    LUA_DECLARE(setPlayerGlitchEnabled);
     LUA_DECLARE(setCloudsEnabled);
     LUA_DECLARE(setTrafficLightState);
     LUA_DECLARE(setTrafficLightsLocked);

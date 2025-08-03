@@ -59,6 +59,7 @@
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
 #include "packets/CPlayerWorldSpecialPropertyPacket.h"
+#include "packets/CPlayerGlitchStatePacket.h"
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CLuaPacket.h"
 #include "../utils/COpenPortsTester.h"
@@ -1325,6 +1326,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
         case PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY:
         {
             Packet_PlayerWorldSpecialProperty(static_cast<CPlayerWorldSpecialPropertyPacket&>(Packet));
+            return true;
+        }
+
+        case PACKET_ID_PLAYER_GLITCH_STATE:
+        {
+            Packet_PlayerGlitchState(static_cast<CPlayerGlitchStatePacket&>(Packet));
             return true;
         }
 
@@ -4184,6 +4191,27 @@ void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket&
     arguments.PushBoolean(enabled);
 
     player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
+}
+
+void CGame::Packet_PlayerGlitchState(CPlayerGlitchStatePacket& packet) noexcept
+{
+    CPlayer* player = packet.GetSourcePlayer();
+
+    if (!player)
+        return;
+
+    const std::string& glitchName = packet.GetGlitchName();
+    const bool         enabled = packet.IsEnabled();
+
+    
+    if (!IsGlitch(glitchName))
+        return;
+
+    CLuaArguments arguments;
+    arguments.PushString(glitchName);
+    arguments.PushBoolean(enabled);
+
+    player->CallEvent("onPlayerGlitchStateChange", arguments, nullptr);
 }
 
 void CGame::Packet_PlayerModInfo(CPlayerModInfoPacket& Packet)

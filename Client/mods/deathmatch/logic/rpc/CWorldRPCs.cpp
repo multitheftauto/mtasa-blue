@@ -39,6 +39,7 @@ void CWorldRPCs::LoadFunctions()
     AddHandler(SET_FPS_LIMIT, SetFPSLimit, "SetFPSLimit");
     AddHandler(SET_GARAGE_OPEN, SetGarageOpen, "SetGarageOpen");
     AddHandler(SET_GLITCH_ENABLED, SetGlitchEnabled, "SetGlitchEnabled");
+    AddHandler(SET_PLAYER_GLITCH_ENABLED, SetPlayerGlitchEnabled, "SetPlayerGlitchEnabled");
     AddHandler(SET_JETPACK_WEAPON_ENABLED, SetJetpackWeaponEnabled, "SetJetpackWeaponEnabled");
     AddHandler(SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled");
     AddHandler(SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState");
@@ -239,6 +240,16 @@ void CWorldRPCs::SetGlitchEnabled(NetBitStreamInterface& bitStream)
     bitStream.Read(eGlitch);
     bitStream.Read(ucIsEnabled);
     g_pClientGame->SetGlitchEnabled(eGlitch, (ucIsEnabled == 1));
+}
+
+void CWorldRPCs::SetPlayerGlitchEnabled(NetBitStreamInterface& bitStream)
+{
+    SString strGlitchName;
+    bool    bEnabled;
+    if (bitStream.Read(strGlitchName) && bitStream.ReadBit(bEnabled))
+    {
+        g_pClientGame->SetPlayerGlitchEnabled(strGlitchName, bEnabled);
+    }
 }
 
 void CWorldRPCs::SetJetpackWeaponEnabled(NetBitStreamInterface& bitStream)

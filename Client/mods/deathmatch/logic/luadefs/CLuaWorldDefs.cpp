@@ -149,7 +149,11 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
                                                                              {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
                                                                              {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>},
-                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>}};
+                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>},
+
+                                                                             // Per-player glitch functions
+                                                                             {"setPlayerGlitchEnabled", SetPlayerGlitchEnabled},
+                                                                             {"isPlayerGlitchEnabled", IsPlayerGlitchEnabled}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -2351,4 +2355,50 @@ CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, fl
         collidedEntity = reinterpret_cast<CClientEntity*>(entity->GetStoredPointer());
 
     return {result.collisionDetected, collidedEntity, result.modelID, result.entityPosition.fX, result.entityPosition.fY, result.entityPosition.fZ, ConvertRadiansToDegrees(result.entityRotation.fX), ConvertRadiansToDegrees(result.entityRotation.fY), ConvertRadiansToDegrees(result.entityRotation.fZ), result.lodID, result.type};
+}
+
+int CLuaWorldDefs::SetPlayerGlitchEnabled(lua_State* luaVM)
+{
+    
+    SString strGlitch;
+    bool    bEnabled;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strGlitch);
+    argStream.ReadBool(bEnabled);
+
+    if (!argStream.HasErrors())
+    {
+        if (g_pClientGame->SetPlayerGlitchEnabled(strGlitch, bEnabled))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::IsPlayerGlitchEnabled(lua_State* luaVM)
+{
+    
+    SString strGlitch;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strGlitch);
+
+    if (!argStream.HasErrors())
+    {
+        bool bEnabled = g_pClientGame->IsPlayerGlitchEnabled(strGlitch);
+        lua_pushboolean(luaVM, bEnabled);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
