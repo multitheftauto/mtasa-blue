@@ -44,36 +44,15 @@ bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write((uchar)*iter);
     }
 
-    if (BitStream.Version() >= 0x35)
-    {
-        BitStream.Write(m_ucVehExtrapolateEnabled);
-        BitStream.Write(m_sVehExtrapolateBaseMs);
-        BitStream.Write(m_sVehExtrapolatePercent);
-        BitStream.Write(m_sVehExtrapolateMaxMs);
-    }
-
-    if (BitStream.Version() >= 0x3D)
-    {
-        BitStream.Write(m_ucUseAltPulseOrder);
-    }
-
-    if (BitStream.Version() >= 0x58)
-    {
-        BitStream.Write(m_ucAllowFastSprintFix);
-    }
-
-    if (BitStream.Version() >= 0x59)
-    {
-        BitStream.Write(m_ucAllowDrivebyAnimationFix);
-    }
-
-    if (BitStream.Can(eBitStreamVersion::ShotgunDamageFix))
-    {
-        BitStream.Write(m_ucAllowShotgunDamageFix);
-    }
-
-    if (BitStream.Can(eBitStreamVersion::MultiCommandHandlers))
-        BitStream.Write(m_allowMultiCommandHandlers);
+    BitStream.Write(m_ucVehExtrapolateEnabled);
+    BitStream.Write(m_sVehExtrapolateBaseMs);
+    BitStream.Write(m_sVehExtrapolatePercent);
+    BitStream.Write(m_sVehExtrapolateMaxMs);
+    BitStream.Write(m_ucUseAltPulseOrder);
+    BitStream.Write(m_ucAllowFastSprintFix);
+    BitStream.Write(m_ucAllowDrivebyAnimationFix);
+    BitStream.Write(m_ucAllowShotgunDamageFix);
+    BitStream.Write(m_allowMultiCommandHandlers);
 
     return true;
 }
