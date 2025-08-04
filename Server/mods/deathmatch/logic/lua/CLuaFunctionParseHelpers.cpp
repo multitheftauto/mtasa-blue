@@ -593,9 +593,9 @@ void MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         {
             if (pResource->GetMinServerRequirement() < szVersionReq)
             {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
                 argStream.SetVersionWarning(szVersionReq, "server", szReason);
-                #endif
+#endif
             }
         }
     }
