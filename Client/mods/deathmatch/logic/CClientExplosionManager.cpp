@@ -53,7 +53,42 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     CClientEntity* const pResponsible = pPools->GetClientEntity(reinterpret_cast<DWORD*>(pResponsibleGameEntity->GetInterface()));
 
     if (!pResponsible)
+    {
+        if (pGameCreator)
+        {
+            CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
+            if (pLocalPlayer && pLocalPlayer->GetGameEntity() == pGameCreator)
+            {
+                eWeaponType explosionWeaponType = WEAPONTYPE_EXPLOSION;
+                switch (explosionType)
+                {
+                    case EXP_TYPE_GRENADE:
+                        explosionWeaponType = WEAPONTYPE_GRENADE;
+                        break;
+                    case EXP_TYPE_MOLOTOV:
+                        explosionWeaponType = WEAPONTYPE_MOLOTOV;
+                        break;
+                    case EXP_TYPE_ROCKET:
+                    case EXP_TYPE_ROCKET_WEAK:
+                        explosionWeaponType = WEAPONTYPE_ROCKET;
+                        break;
+                    case EXP_TYPE_TANK_GRENADE:
+                        explosionWeaponType = WEAPONTYPE_TANK_GRENADE;
+                        break;
+                    default:
+                        break;
+                }
+                
+                CLuaArguments arguments;
+                arguments.PushNumber(vecPosition.fX);
+                arguments.PushNumber(vecPosition.fY);
+                arguments.PushNumber(vecPosition.fZ);
+                arguments.PushNumber(explosionWeaponType);
+                return pLocalPlayer->CallEvent("onClientExplosion", arguments, true);
+            }
+        }
         return false;
+    }
 
     // Determine the used weapon
     eWeaponType explosionWeaponType = WEAPONTYPE_EXPLOSION;
@@ -186,6 +221,23 @@ CExplosion* CClientExplosionManager::Create(eExplosionType explosionType, CVecto
             default:
                 m_LastWeaponType = WEAPONTYPE_EXPLOSION;
                 break;
+        }
+    }
+
+    if (pCreator && pCreator->IsLocalEntity())
+    {
+        bool bAllowExplosion = Hook_ExplosionCreation(nullptr, pGameCreator, vecPosition, explosionType);
+        if (!bAllowExplosion)
+            return nullptr;
+    }
+    else if (!pCreator)
+    {
+        CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
+        if (pLocalPlayer)
+        {
+            bool bAllowExplosion = Hook_ExplosionCreation(nullptr, pLocalPlayer->GetGameEntity(), vecPosition, explosionType);
+            if (!bAllowExplosion)
+                return nullptr;
         }
     }
 
