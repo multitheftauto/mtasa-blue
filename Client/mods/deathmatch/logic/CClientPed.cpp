@@ -4979,18 +4979,8 @@ void CClientPed::DestroySatchelCharges(bool bBlow, bool bDestroy)
             if (bBlow)
             {
                 pProjectile->GetPosition(vecPosition);
-                CLuaArguments Arguments;
-                Arguments.PushNumber(vecPosition.fX);
-                Arguments.PushNumber(vecPosition.fY);
-                Arguments.PushNumber(vecPosition.fZ);
-                Arguments.PushNumber(EXP_TYPE_GRENADE);
-                bool bCancelExplosion = !CallEvent("onClientExplosion", Arguments, true);
-
-                if (!bCancelExplosion)
-                {
-                    m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
-                    g_pClientGame->SendExplosionSync(vecPosition, EXP_TYPE_GRENADE, this);
-                }
+                m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
+                g_pClientGame->SendExplosionSync(vecPosition, EXP_TYPE_GRENADE, this);
             }
             if (bDestroy)
             {
