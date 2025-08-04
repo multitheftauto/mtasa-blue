@@ -5481,7 +5481,7 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
     uchar ucAllowShotgunDamageFix = 0;
     bitStream.Read(ucAllowShotgunDamageFix);
 
-    uchar allowMultiCommandHandlers = 1;  // default to enabled
+    uchar allowMultiCommandHandlers = 1;
     bitStream.Read(allowMultiCommandHandlers);
     g_pClientGame->SetAllowMultiCommandHandlers(static_cast<CClientGame::MultiCommandHandlerPolicy>(allowMultiCommandHandlers));
 
