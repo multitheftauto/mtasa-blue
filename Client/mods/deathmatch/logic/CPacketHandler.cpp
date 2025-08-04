@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CClientGame.h"
 #include <game/CClock.h>
 #include <game/CFireManager.h>
 #include <game/CGarage.h>
@@ -23,8 +22,6 @@
 #include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
-
-
 
 using std::list;
 
@@ -5484,9 +5481,8 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
     uchar ucAllowShotgunDamageFix = 0;
     bitStream.Read(ucAllowShotgunDamageFix);
 
-    uchar allowMultiCommandHandlers = 1;
-    if (bitStream.Can(eBitStreamVersion::MultiCommandHandlers))
-        bitStream.Read(allowMultiCommandHandlers);
+    uchar allowMultiCommandHandlers = 1;  // default to enabled
+    bitStream.Read(allowMultiCommandHandlers);
     g_pClientGame->SetAllowMultiCommandHandlers(static_cast<CClientGame::MultiCommandHandlerPolicy>(allowMultiCommandHandlers));
 
     SMiscGameSettings miscGameSettings;
