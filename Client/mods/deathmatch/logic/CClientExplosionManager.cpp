@@ -58,7 +58,12 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     // Determine the used weapon
     eWeaponType explosionWeaponType = WEAPONTYPE_EXPLOSION;
 
-    switch (explosionType)
+    // Use stored weapon type if available
+    if (m_LastWeaponType != WEAPONTYPE_UNARMED && m_pLastCreator == pResponsible)
+        explosionWeaponType = m_LastWeaponType;
+    else
+    {
+        switch (explosionType)
     {
         case EXP_TYPE_GRENADE:
         {
@@ -82,6 +87,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
             break;
         default:
             break;
+        }
     }
 
     // Handle this explosion client side only if entity is local or breakable (i.e. barrel)

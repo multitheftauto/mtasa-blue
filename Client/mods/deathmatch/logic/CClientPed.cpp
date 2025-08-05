@@ -4980,7 +4980,6 @@ void CClientPed::DestroySatchelCharges(bool bBlow, bool bDestroy)
             {
                 pProjectile->GetPosition(vecPosition);
                 m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
-                g_pClientGame->SendExplosionSync(vecPosition, EXP_TYPE_GRENADE, this);
             }
             if (bDestroy)
             {
