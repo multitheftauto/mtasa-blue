@@ -33,7 +33,7 @@ CScriptDebugging::~CScriptDebugging()
         fprintf(m_pLogFile, "INFO: Logging to this file ended\n");
 
         // if we have a flush timer
-        if (m_flushTimerHandle != nullptr)
+        if (m_flushTimerHandle)
         {
             // delete our flush timer
             DeleteTimerQueueTimer(nullptr, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
@@ -52,7 +52,7 @@ void CScriptDebugging::LogBadLevel(lua_State* luaVM, unsigned int uiRequiredLeve
 void CALLBACK TimerProc(void* lpParametar, BOOLEAN TimerOrWaitFired)
 {
     // Got a logfile?
-    if (CScriptDebugging::m_pLogFile != nullptr)
+    if (CScriptDebugging::m_pLogFile)
     {
         // flush our log file
         fflush((FILE*)CScriptDebugging::m_pLogFile);
@@ -68,7 +68,7 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
     {
         fprintf(m_pLogFile, "INFO: Logging to this file ended\n");
         // if we have a flush timer
-        if (m_flushTimerHandle != nullptr)
+        if (m_flushTimerHandle)
         {
             // delete our flush timer
             DeleteTimerQueueTimer(nullptr, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
