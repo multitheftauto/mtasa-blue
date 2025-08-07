@@ -21,6 +21,7 @@
 #include "CClock.h"
 #include "CBlip.h"
 #include "CWater.h"
+#include "CBuilding.h"
 #include "CPlayerCamera.h"
 #include "CElementDeleter.h"
 #include "CMainConfig.h"
@@ -775,6 +776,10 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
             CPed* pPed = static_cast<CPed*>(pElement);
             return pPed->GetCollisionEnabled();
         }
+        case CElement::BUILDING:
+        {
+            return static_cast<CBuilding*>(pElement)->GetCollisionEnabled();
+        }
         default:
             return false;
     }
@@ -830,6 +835,16 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CElement* pElement, CElement* 
                 return false;
             break;
         }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            CBuilding* pLowLodObject = nullptr;
+            if (pLowLodElement && pLowLodElement->GetType() == CElement::BUILDING)
+                pLowLodObject = static_cast<CBuilding*>(pLowLodElement);
+            if (!pBuilding->SetLowLodBuilding(pLowLodObject))
+                return false;
+            break;
+        }
         default:
             return false;
     }
@@ -855,6 +870,11 @@ bool CStaticFunctionDefinitions::GetLowLodElement(CElement* pElement, CElement*&
             pOutLowLodElement = pObject->GetLowLodObject();
             break;
         }
+        case CElement::BUILDING:
+        {
+            pOutLowLodElement = static_cast<CBuilding*>(pElement)->GetLowLodElement();
+            break;
+        }
         default:
             return false;
     }
@@ -872,6 +892,11 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CElement* pElement, bool& bOutI
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             bOutIsLowLod = pObject->IsLowLod();
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            bOutIsLowLod = static_cast<CBuilding*>(pElement)->GetHighLodBuilding() ? true : false;
             break;
         }
         default:
@@ -1573,27 +1598,42 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
     assert(pElement);
     assert(pAttachedToElement);
 
-    if (pElement->IsAttachToable() && pAttachedToElement->IsAttachable() && !pAttachedToElement->IsAttachedToElement(pElement) &&
-        pElement->GetDimension() == pAttachedToElement->GetDimension())
+    if (!pElement->IsAttachToable() || !pAttachedToElement->IsAttachable() || pAttachedToElement->IsAttachedToElement(pElement) ||
+        pElement->GetDimension() != pAttachedToElement->GetDimension())
     {
-        pElement->SetAttachedOffsets(vecPosition, vecRotation);
-        ConvertDegreesToRadians(vecRotation);
-        pElement->AttachTo(pAttachedToElement);
-
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(pAttachedToElement->GetID());
-        BitStream.pBitStream->Write(vecPosition.fX);
-        BitStream.pBitStream->Write(vecPosition.fY);
-        BitStream.pBitStream->Write(vecPosition.fZ);
-        BitStream.pBitStream->Write(vecRotation.fX);
-        BitStream.pBitStream->Write(vecRotation.fY);
-        BitStream.pBitStream->Write(vecRotation.fZ);
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, ATTACH_ELEMENTS, *BitStream.pBitStream));
-
-        return true;
+        return false;
     }
 
-    return false;
+    CLuaArguments Arguments;
+    Arguments.PushElement(pAttachedToElement);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!pElement->CallEvent("onElementAttach", Arguments))
+    {
+        return false;
+    }
+
+    ConvertDegreesToRadians(vecRotation);
+
+    pElement->SetAttachedOffsets(vecPosition, vecRotation);
+    pElement->AttachTo(pAttachedToElement);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(pAttachedToElement->GetID());
+    BitStream.pBitStream->Write(vecPosition.fX);
+    BitStream.pBitStream->Write(vecPosition.fY);
+    BitStream.pBitStream->Write(vecPosition.fZ);
+    BitStream.pBitStream->Write(vecRotation.fX);
+    BitStream.pBitStream->Write(vecRotation.fY);
+    BitStream.pBitStream->Write(vecRotation.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, ATTACH_ELEMENTS, *BitStream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::DetachElements(CElement* pElement, CElement* pAttachedToElement)
@@ -1601,28 +1641,47 @@ bool CStaticFunctionDefinitions::DetachElements(CElement* pElement, CElement* pA
     assert(pElement);
 
     CElement* pActualAttachedToElement = pElement->GetAttachedToElement();
-    if (pActualAttachedToElement)
+    if (!pActualAttachedToElement || (pAttachedToElement && pActualAttachedToElement != pAttachedToElement))
     {
-        if (pAttachedToElement == NULL || pActualAttachedToElement == pAttachedToElement)
-        {
-            // Detach it. Also generate a new time context to prevent sync screwup from
-            // old packes arriving.
-            CVector vecPosition = pElement->GetPosition();
-            pElement->AttachTo(NULL);
-            pElement->GenerateSyncTimeContext();
-
-            CBitStream BitStream;
-            BitStream.pBitStream->Write(pElement->GetSyncTimeContext());
-            BitStream.pBitStream->Write(vecPosition.fX);
-            BitStream.pBitStream->Write(vecPosition.fY);
-            BitStream.pBitStream->Write(vecPosition.fZ);
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, DETACH_ELEMENTS, *BitStream.pBitStream));
-
-            return true;
-        }
+        return false;
     }
 
-    return false;
+    CVector vecPosition = pElement->GetPosition();
+    CVector vecRotation;
+
+    pElement->GetRotation(vecRotation);
+    ConvertRadiansToDegrees(vecRotation);
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(pActualAttachedToElement);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!pElement->CallEvent("onElementDetach", Arguments))
+    {
+        return false;
+    }
+
+    // Detach it. Also generate a new time context to prevent sync screwup from
+    // old packets arriving.
+    pElement->AttachTo(NULL);
+    pElement->GenerateSyncTimeContext();
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(pElement->GetSyncTimeContext());
+    BitStream.pBitStream->Write(vecPosition.fX);
+    BitStream.pBitStream->Write(vecPosition.fY);
+    BitStream.pBitStream->Write(vecPosition.fZ);
+    BitStream.pBitStream->Write(vecRotation.fX);
+    BitStream.pBitStream->Write(vecRotation.fY);
+    BitStream.pBitStream->Write(vecRotation.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, DETACH_ELEMENTS, *BitStream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetElementAlpha(CElement* pElement, unsigned char ucAlpha)
@@ -1948,6 +2007,11 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CElement* pElement,
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetCollisionEnabled(bEnable);
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            static_cast<CBuilding*>(pElement)->SetCollisionEnabled(bEnable);
             break;
         }
         default:
@@ -3062,18 +3126,14 @@ const std::string& CStaticFunctionDefinitions::GetPlayerSerial(CPlayer* pPlayer,
     return pPlayer->GetSerial(uiIndex);
 }
 
-const std::string& CStaticFunctionDefinitions::GetPlayerUserName(CPlayer* pPlayer)
+std::string CStaticFunctionDefinitions::GetPlayerUserName(CPlayer* pPlayer)
 {
-    assert(pPlayer);
-
-    return pPlayer->GetSerialUser();
+    return "";
 }
 
-const std::string& CStaticFunctionDefinitions::GetPlayerCommunityID(CPlayer* pPlayer)
+std::string CStaticFunctionDefinitions::GetPlayerCommunityID(CPlayer* pPlayer)
 {
-    assert(pPlayer);
-
-    return pPlayer->GetCommunityID();
+    return "";
 }
 
 bool CStaticFunctionDefinitions::GetPlayerBlurLevel(CPlayer* pPlayer, unsigned char& ucLevel)
@@ -3239,10 +3299,7 @@ bool CStaticFunctionDefinitions::TakePlayerScreenShot(CElement* pElement, uint u
         BitStream.pBitStream->Write(static_cast<uchar>(uiQuality));
         BitStream.pBitStream->Write(uiMaxBandwidth);
         BitStream.pBitStream->Write(static_cast<ushort>(uiMaxPacketSize));
-        if (BitStream.pBitStream->Version() >= 0x53)
-            BitStream.pBitStream->Write(pResource->GetNetID());
-        else
-            BitStream.pBitStream->WriteString(pResource->GetName());
+        BitStream.pBitStream->Write(pResource->GetNetID());
         BitStream.pBitStream->Write(GetTickCount32());
         pPlayer->Send(CLuaPacket(TAKE_PLAYER_SCREEN_SHOT, *BitStream.pBitStream));
 
@@ -4232,7 +4289,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                     // If he's the driver, switch on the engine
-                    if (uiSeat == 0)
+                    if (uiSeat == 0 && g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART))
                         pVehicle->SetEngineOn(true);
 
                     // Tell all the players
@@ -4624,8 +4681,7 @@ bool CStaticFunctionDefinitions::SetCameraMatrix(CElement* pElement, const CVect
 
         // Tell the player
         CBitStream BitStream;
-        if (pPlayer->GetBitStreamVersion() >= 0x5E)
-            BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
+        BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
         BitStream.pBitStream->Write(vecPosition.fX);
         BitStream.pBitStream->Write(vecPosition.fY);
         BitStream.pBitStream->Write(vecPosition.fZ);
@@ -4672,8 +4728,7 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
                 pCamera->SetFOV(70.0f);
 
                 CBitStream BitStream;
-                if (pPlayer->GetBitStreamVersion() >= 0x5E)
-                    BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
+                BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
                 BitStream.pBitStream->Write(pTarget->GetID());
                 pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
                 return true;
@@ -5455,7 +5510,9 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, std::optional<b
 
     CLuaArguments arguments;
     arguments.PushBoolean(createExplosion);            // withExplosion
-    vehicle->CallEvent("onVehicleExplode", arguments);
+
+    if (!vehicle->CallEvent("onVehicleExplode", arguments))
+        return false;
 
     // Abort if vehicle got fixed or destroyed
     if (!vehicle->IsBlown() || vehicle->IsBeingDeleted())
@@ -5466,7 +5523,7 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, std::optional<b
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(vehicle->GenerateSyncTimeContext());
-    BitStream.pBitStream->WriteBit(createExplosion);            // only consumed by clients with at least eBitStreamVersion::VehicleBlowStateSupport
+    BitStream.pBitStream->WriteBit(createExplosion);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, BLOW_VEHICLE, *BitStream.pBitStream));
     return true;
 }
@@ -10909,12 +10966,8 @@ bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
         BitStream.pBitStream->Write(g_TickRateSettings.iObjectSync);
         BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncRotation);
         BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncAnalogMove);
-
-        if (pPlayer->CanBitStream(eBitStreamVersion::FixSyncerDistance))
-        {
-            BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
-            BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
-        }
+        BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
+        BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
 
         pPlayer->Send(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
     };
@@ -11492,6 +11545,15 @@ bool CStaticFunctionDefinitions::GetAccountSerial(CAccount* pAccount, SString& s
     return bRegistered;
 }
 
+
+bool CStaticFunctionDefinitions::SetAccountSerial(CAccount* account, const std::string& serial) noexcept
+{
+    if (account && account->IsRegistered())
+        return account->SetAccountSerial(serial);
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts)
 {
     m_pAccountManager->GetAccountsBySerial(strSerial, outAccounts);
@@ -11635,7 +11697,15 @@ bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strN
         }
         else
         {
+            CLuaArguments arguments;
+            arguments.PushAccount(pAccount);
+            arguments.PushString(pAccount->GetName().c_str());
+            arguments.PushString(strNewName);
+            if (!m_pMapManager->GetRootElement()->CallEvent("onAccountNameChange", arguments))
+                return false;
+
             pAccount->SetName(strNewName);
+
             return true;
         }
     }
@@ -11769,19 +11839,18 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pTargetPlayer, bool bIP, bo
     // Ban the player
     if (bIP)
         pBan = m_pBanManager->AddBan(pTargetPlayer, strResponsible, strReason, tUnban);
-    else if (bUsername || bSerial)
+    else if (bSerial)
         pBan = m_pBanManager->AddBan(strResponsible, strReason, tUnban);
 
     // If the ban was successful
     if (pBan)
     {
-        // Set the data if banned by either username or serial
-        if (bUsername)
-            pBan->SetAccount(pTargetPlayer->GetSerialUser());
+        // Set the data if banned by serial
         if (bSerial)
+        {
             pBan->SetSerial(pTargetPlayer->GetSerial());
-        if (bUsername || bSerial)
             pBan->SetNick(pTargetPlayer->GetNick());
+        }
 
         // Check if we passed a responsible player
         if (pResponsible)
@@ -11822,13 +11891,6 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pTargetPlayer, bool bIP, bo
             if (!bBan && bIP)
             {
                 bBan = (pBan->GetIP() == pPlayer->GetSourceIP());
-            }
-
-            // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
-            if (!bBan && bUsername && pBan->GetAccount().length() > 0)
-            {
-                const std::string& strPlayerUsername = pPlayer->GetSerialUser();
-                bBan = stricmp(strPlayerUsername.c_str(), pBan->GetAccount().c_str()) == 0;
             }
 
             // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
@@ -11915,10 +11977,6 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
     {
         pBan = m_pBanManager->AddBan(strResponsible, strReason, tUnban);
     }
-    else if (bUsernameSpecified && !m_pBanManager->IsAccountBanned(strUsername))
-    {
-        pBan = m_pBanManager->AddBan(strResponsible, strReason, tUnban);
-    }
 
     // If the ban was added
     if (pBan)
@@ -11954,8 +12012,6 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
             strMessage = strMessage.substr(0, 255);
 
         // Set the account or serial if either one is set to be banned
-        if (bUsernameSpecified)
-            pBan->SetAccount(strUsername);
         if (bSerialSpecified)
             pBan->SetSerial(strSerial);
 
@@ -12003,13 +12059,6 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
             if (bIPSpecified)
             {
                 bBan = (strIP == pPlayer->GetSourceIP());
-            }
-
-            // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
-            if (!bBan && bUsernameSpecified && strUsername.length() > 0)
-            {
-                const std::string& strPlayerUsername = pPlayer->GetSerialUser();
-                bBan = stricmp(strPlayerUsername.c_str(), strUsername.c_str()) == 0;
             }
 
             // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
@@ -12127,11 +12176,6 @@ bool CStaticFunctionDefinitions::GetBanSerial(CBan* pBan, SString& strOutSerial)
 
 bool CStaticFunctionDefinitions::GetBanUsername(CBan* pBan, SString& strOutUsername)
 {
-    if (!pBan->GetAccount().empty())
-    {
-        strOutUsername = pBan->GetAccount();
-        return true;
-    }
     return false;
 }
 

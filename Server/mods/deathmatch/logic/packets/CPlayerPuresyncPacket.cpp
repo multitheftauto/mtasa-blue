@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPlayerPuresyncPacket.cpp
  *  PURPOSE:     Player pure synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -61,9 +61,10 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         pSourcePlayer->SetAkimboArmUp(flags.data.bAkimboTargetUp);
         pSourcePlayer->SetOnFire(flags.data.bIsOnFire);
         pSourcePlayer->SetStealthAiming(flags.data.bStealthAiming);
+        pSourcePlayer->SetReloadingWeapon(flags.data.isReloadingWeapon);
 
-        if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-            pSourcePlayer->SetReloadingWeapon(flags.data2.isReloadingWeapon);
+        if (flags.data.animInterrupted)
+            pSourcePlayer->SetAnimationData({});
 
         // Contact element
         CElement* pContactElement = NULL;
@@ -101,6 +102,13 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
         }
 
+        // If the client reported contact but the element doesn't exist anymore,
+        // the coordinates become invalid as they are relative to that element.
+        if (positionRead && pContactElement == nullptr && flags.data.bHasContact)
+        {
+            position.data.vecPosition = pSourcePlayer->GetPosition();
+        }
+        
         CElement* pPreviousContactElement = pSourcePlayer->GetContactElement();
         pSourcePlayer->SetContactElement(pContactElement);
 
@@ -365,9 +373,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         flags.data.bHasAWeapon = (ucWeaponSlot != 0);
         flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || pSourcePlayer->IsSyncingVelocity());
         flags.data.bStealthAiming = (pSourcePlayer->IsStealthAiming() == true);
-
-        if (pSourcePlayer->CanBitStream(eBitStreamVersion::IsPedReloadingWeapon))
-            flags.data2.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
+        flags.data.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
 
         CVector vecPosition = pSourcePlayer->GetPosition();
         if (pContactElement)

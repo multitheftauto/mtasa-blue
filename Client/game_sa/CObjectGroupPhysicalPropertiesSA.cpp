@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CObjectGroupPhysicalPropertiesSA.cpp
  *  PURPOSE:     Objects dynamic physical properties handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -193,32 +193,32 @@ float CObjectGroupPhysicalPropertiesSA::GetCollisionDamageMultiplier() const
     return m_pInterface->fColDamageMultiplier;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageEffect(eObjectGroup::DamageEffect eDamageEffect)
+void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageEffect(ObjectGroupPhysicalProperties::DamageEffect eDamageEffect)
 {
-    if (static_cast<eObjectGroup::DamageEffect>(m_pInterface->eColDamageEffect) == eDamageEffect)
+    if (static_cast<ObjectGroupPhysicalProperties::DamageEffect>(m_pInterface->eColDamageEffect) == eDamageEffect)
         return;
 
     ChangeSafeguard();
-    m_pInterface->eColDamageEffect = eDamageEffect;
+    m_pInterface->eColDamageEffect = (uchar)eDamageEffect;
 }
 
-eObjectGroup::DamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect() const
+ObjectGroupPhysicalProperties::DamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect() const
 {
-    return static_cast<eObjectGroup::DamageEffect>(m_pInterface->eColDamageEffect);
+    return static_cast<ObjectGroupPhysicalProperties::DamageEffect>(m_pInterface->eColDamageEffect);
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(eObjectGroup::CollisionResponse eResponseCase)
+void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(ObjectGroupPhysicalProperties::CollisionResponse eResponseCase)
 {
-    if (static_cast<eObjectGroup::CollisionResponse>(m_pInterface->eSpecialColResponse) == eResponseCase)
+    if (static_cast<ObjectGroupPhysicalProperties::CollisionResponse>(m_pInterface->eSpecialColResponse) == eResponseCase)
         return;
 
     ChangeSafeguard();
-    m_pInterface->eSpecialColResponse = eResponseCase;
+    m_pInterface->eSpecialColResponse = (uchar)eResponseCase;
 }
 
-eObjectGroup::CollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase() const
+ObjectGroupPhysicalProperties::CollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase() const
 {
-    return static_cast<eObjectGroup::CollisionResponse>(m_pInterface->eSpecialColResponse);
+    return static_cast<ObjectGroupPhysicalProperties::CollisionResponse>(m_pInterface->eSpecialColResponse);
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetCameraAvoidObject(bool bAvoid)
@@ -249,18 +249,18 @@ bool CObjectGroupPhysicalPropertiesSA::GetCausesExplosion() const
     return m_pInterface->bCausesExplosion;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetFxType(eObjectGroup::FxType eFxType)
+void CObjectGroupPhysicalPropertiesSA::SetFxType(ObjectGroupPhysicalProperties::FxType eFxType)
 {
-    if (static_cast<eObjectGroup::FxType>(m_pInterface->eFxType) == eFxType)
+    if (static_cast<ObjectGroupPhysicalProperties::FxType>(m_pInterface->eFxType) == eFxType)
         return;
 
     ChangeSafeguard();
-    m_pInterface->eFxType = eFxType;
+    m_pInterface->eFxType = (uchar)eFxType;
 }
 
-eObjectGroup::FxType CObjectGroupPhysicalPropertiesSA::GetFxType() const
+ObjectGroupPhysicalProperties::FxType CObjectGroupPhysicalPropertiesSA::GetFxType() const
 {
-    return static_cast<eObjectGroup::FxType>(m_pInterface->eFxType);
+    return static_cast<ObjectGroupPhysicalProperties::FxType>(m_pInterface->eFxType);
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetFxOffset(CVector vecOffset)
@@ -344,18 +344,18 @@ float CObjectGroupPhysicalPropertiesSA::GetBreakVelocityRandomness() const
     return m_pInterface->fBreakVelocityRand;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetBreakMode(eObjectGroup::BreakMode eBreakMode)
+void CObjectGroupPhysicalPropertiesSA::SetBreakMode(ObjectGroupPhysicalProperties::BreakMode eBreakMode)
 {
-    if (static_cast<eObjectGroup::BreakMode>(m_pInterface->eBreakMode) == eBreakMode)
+    if (static_cast<ObjectGroupPhysicalProperties::BreakMode>(m_pInterface->eBreakMode) == eBreakMode)
         return;
 
     ChangeSafeguard();
-    m_pInterface->eBreakMode = eBreakMode;
+    m_pInterface->eBreakMode = (DWORD)eBreakMode;
 }
 
-eObjectGroup::BreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode() const
+ObjectGroupPhysicalProperties::BreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode() const
 {
-    return static_cast<eObjectGroup::BreakMode>(m_pInterface->eBreakMode);
+    return static_cast<ObjectGroupPhysicalProperties::BreakMode>(m_pInterface->eBreakMode);
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetSparksOnImpact(bool bSparks)

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWorldSA.cpp
  *  PURPOSE:     Game world/entity logic
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -31,6 +31,7 @@
 #include <game/TaskJumpFall.h>
 #include <game/TaskPhysicalResponse.h>
 #include <game/TaskAttack.h>
+#include "enums/VehicleType.h"
 
 using std::list;
 using std::vector;
@@ -230,12 +231,16 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_MovementStateNames[MOVEMENTSTATE_JOG] = "jog";
     m_MovementStateNames[MOVEMENTSTATE_SPRINT] = "sprint";
     m_MovementStateNames[MOVEMENTSTATE_CROUCH] = "crouch";
-    // These two are inactive for now
     m_MovementStateNames[MOVEMENTSTATE_CRAWL] = "crawl";
     m_MovementStateNames[MOVEMENTSTATE_ROLL] = "roll";
     m_MovementStateNames[MOVEMENTSTATE_JUMP] = "jump";
     m_MovementStateNames[MOVEMENTSTATE_FALL] = "fall";
     m_MovementStateNames[MOVEMENTSTATE_CLIMB] = "climb";
+    m_MovementStateNames[MOVEMENTSTATE_SWIM] = "swim";
+    m_MovementStateNames[MOVEMENTSTATE_WALK_TO_POINT] = "walk_to_point";
+    m_MovementStateNames[MOVEMENTSTATE_ASCENT_JETPACK] = "ascent_jetpack";
+    m_MovementStateNames[MOVEMENTSTATE_DESCENT_JETPACK] = "descent_jetpack";
+    m_MovementStateNames[MOVEMENTSTATE_JETPACK] = "jetpack_flying";
 
     // Create the player model
     if (m_bIsLocalPlayer)
@@ -1016,12 +1021,12 @@ void CClientPed::SetTargetTarget(unsigned long ulDelay, const CVector& vecSource
         float fRadius = DistanceBetweenPoints3D(m_vecTargetSource, m_vecTargetTarget);
 
         // Grab the angle of the source vector and the angle of the target vector relative to the source vector that applies
-        m_vecBeginTargetAngle.fX = acos((m_vecBeginTarget.fX - m_vecBeginSource.fX) / fRadius);
-        m_vecBeginTargetAngle.fY = acos((m_vecBeginTarget.fY - m_vecBeginSource.fY) / fRadius);
-        m_vecBeginTargetAngle.fZ = acos((m_vecBeginTarget.fZ - m_vecBeginSource.fZ) / fRadius);
-        m_vecTargetTargetAngle.fX = acos((m_vecTargetTarget.fX - m_vecTargetSource.fX) / fRadius);
-        m_vecTargetTargetAngle.fY = acos((m_vecTargetTarget.fY - m_vecTargetSource.fY) / fRadius);
-        m_vecTargetTargetAngle.fZ = acos((m_vecTargetTarget.fZ - m_vecTargetSource.fZ) / fRadius);
+        m_vecBeginTargetAngle.fX = acos(Clamp(-1.0f, (m_vecBeginTarget.fX - m_vecBeginSource.fX) / fRadius, 1.0f));
+        m_vecBeginTargetAngle.fY = acos(Clamp(-1.0f, (m_vecBeginTarget.fY - m_vecBeginSource.fY) / fRadius, 1.0f));
+        m_vecBeginTargetAngle.fZ = acos(Clamp(-1.0f, (m_vecBeginTarget.fZ - m_vecBeginSource.fZ) / fRadius, 1.0f));
+        m_vecTargetTargetAngle.fX = acos(Clamp(-1.0f, (m_vecTargetTarget.fX - m_vecTargetSource.fX) / fRadius, 1.0f));
+        m_vecTargetTargetAngle.fY = acos(Clamp(-1.0f, (m_vecTargetTarget.fY - m_vecTargetSource.fY) / fRadius, 1.0f));
+        m_vecTargetTargetAngle.fZ = acos(Clamp(-1.0f, (m_vecTargetTarget.fZ - m_vecTargetSource.fZ) / fRadius, 1.0f));
 
         // Grab the angle to interpolate and make sure it's below pi and above -pi (shortest path of interpolation)
         m_vecTargetInterpolateAngle = m_vecTargetTargetAngle - m_vecBeginTargetAngle;
@@ -1182,7 +1187,7 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
             continue;
 
         // Should we take the position from the closest door instead of center of vehicle
-        if (bGetPositionFromClosestDoor && pTempVehicle->GetModel() != VT_RCBARON)
+        if (bGetPositionFromClosestDoor && static_cast<VehicleType>(pTempVehicle->GetModel()) != VehicleType::VT_RCBARON)
         {
             // Get the closest front-door
             CVector vecFrontPos;
@@ -1712,14 +1717,12 @@ void CClientPed::SetUsesCollision(bool bUsesCollision)
 
 float CClientPed::GetMaxHealth()
 {
-    // TODO: Verify this formula
-
     // Grab his player health stat
     float fStat = GetStat(MAX_HEALTH);
 
     // Do a linear interpolation to get how much health this would allow
-    // Assumes: 100 health = 569 stat, 200 health = 1000 stat.
-    float fMaxHealth = 100.0f + (100.0f / 431.0f * (fStat - 569.0f));
+    // Assumes: 100 health = 569 stat, 176 health = 1000 stat.
+    float fMaxHealth = fStat * 0.176f;
 
     // Return the max health. Make sure it can't be below 1
     if (fMaxHealth < 1.0f)
@@ -2421,43 +2424,52 @@ eMovementState CClientPed::GetMovementState()
         const char* szComplexTaskName = GetTaskManager()->GetActiveTask()->GetTaskName();
         const char* szSimpleTaskName = GetTaskManager()->GetSimplestActiveTask()->GetTaskName();
 
-        // Is he climbing?
-        if (strcmp(szSimpleTaskName, "TASK_SIMPLE_CLIMB") == 0)
+        // Check tasks
+        if (strcmp(szSimpleTaskName, "TASK_SIMPLE_CLIMB") == 0) // Is he climbing?
             return MOVEMENTSTATE_CLIMB;
-
-        // Is he jumping?
-        else if (strcmp(szComplexTaskName, "TASK_COMPLEX_JUMP") == 0)
+        else if (strcmp(szComplexTaskName, "TASK_COMPLEX_JUMP") == 0) // Is he jumping?
             return MOVEMENTSTATE_JUMP;
+        else if (strcmp(szSimpleTaskName, "TASK_SIMPLE_GO_TO_POINT") == 0) // Entering vehicle (walking to the doors)?
+            return MOVEMENTSTATE_WALK_TO_POINT;
+        else if (strcmp(szSimpleTaskName, "TASK_SIMPLE_SWIM") == 0) // Is he swimming?
+            return MOVEMENTSTATE_SWIM;
+        else if (strcmp(szSimpleTaskName, "TASK_SIMPLE_JETPACK") == 0) // Is he flying?
+        {
+            if (cs.ButtonCross != 0)
+                return MOVEMENTSTATE_ASCENT_JETPACK;
+            else if (cs.ButtonSquare != 0)
+                return MOVEMENTSTATE_DESCENT_JETPACK;
+            else
+                return MOVEMENTSTATE_JETPACK;
+        }
 
-        // Is he falling?
-        else if (!IsOnGround() && !GetContactEntity())
+        // Check movement state
+        if (!IsOnGround() && !GetContactEntity() && !m_pPlayerPed->IsStandingOnEntity() && !m_pPlayerPed->IsInWater() && (strcmp(szSimpleTaskName, "TASK_SIMPLE_IN_AIR") == 0 || strcmp(szSimpleTaskName, "TASK_SIMPLE_FALL") == 0)) // Is he falling?
             return MOVEMENTSTATE_FALL;
 
-        // Grab his controller state
-        bool bWalkKey = false;
-        if (GetType() == CCLIENTPLAYER)
-            bWalkKey = CClientPad::GetControlState("walk", cs, true);
-        else
-            m_Pad.GetControlState("walk", bWalkKey);
+        // Sometimes it returns 'fall' or 'walk', so it's better to return false instead
+        if (IsEnteringVehicle() || IsLeavingVehicle())
+            return MOVEMENTSTATE_UNKNOWN;
 
-        // Is he standing up?
         if (!IsDucked())
         {
-            unsigned int iRunState = m_pPlayerPed->GetRunState();
+            bool walking = false;
+            if (GetType() == CCLIENTPLAYER)
+                walking = CClientPad::GetControlState("walk", cs, true);
+            else
+                m_Pad.GetControlState("walk", walking);
 
-            // Is he moving the contoller at all?
-            if (iRunState == 1 && cs.LeftStickX == 0 && cs.LeftStickY == 0)
-                return MOVEMENTSTATE_STAND;
-
-            // Is he either pressing the walk key, or has run state 1?
-            if (iRunState == 1 || bWalkKey && iRunState == 6)
-                return MOVEMENTSTATE_WALK;
-            else if (iRunState == 4)
-                return MOVEMENTSTATE_POWERWALK;
-            else if (iRunState == 6)
-                return MOVEMENTSTATE_JOG;
-            else if (iRunState == 7)
-                return MOVEMENTSTATE_SPRINT;
+            switch (m_pPlayerPed->GetMoveState())
+            {
+                case PedMoveState::PEDMOVE_STILL:
+                    return MOVEMENTSTATE_STAND;
+                case PedMoveState::PEDMOVE_WALK:
+                    return (cs.LeftStickX == 0 && cs.LeftStickY == 0) ? MOVEMENTSTATE_STAND : MOVEMENTSTATE_WALK;
+                case PedMoveState::PEDMOVE_SPRINT:
+                    return MOVEMENTSTATE_SPRINT;
+                case PedMoveState::PEDMOVE_RUN:
+                    return walking ? MOVEMENTSTATE_WALK : MOVEMENTSTATE_JOG; // FileEX: It should be MOVEMENTSTATE_RUN, but we're keeping JOG for backward compatibility (PEDMOVE_JOG is unused in SA)
+            }
         }
         else
         {
@@ -2465,9 +2477,10 @@ eMovementState CClientPed::GetMovementState()
             if (cs.LeftStickX == 0 && cs.LeftStickY == 0)
                 return MOVEMENTSTATE_CROUCH;
             else
-                return MOVEMENTSTATE_CRAWL;
+                return (cs.LeftStickX != 0 && cs.RightShoulder1 != 0) ? MOVEMENTSTATE_ROLL : MOVEMENTSTATE_CRAWL;
         }
     }
+
     return MOVEMENTSTATE_UNKNOWN;
 }
 
@@ -2894,6 +2907,11 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
             }
         }
 
+        // Are we need to update anim speed & progress?
+        // We need to do it here because the anim starts on the next frame after calling RunNamedAnimation
+        if (m_pAnimationBlock && m_AnimationCache.progressWaitForStreamIn && IsAnimationInProgress())
+            UpdateAnimationProgressAndSpeed();
+
         // Update our alpha
         unsigned char ucAlpha = m_ucAlpha;
         // Are we in a different interior to the camera? set our alpha to 0
@@ -2978,7 +2996,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
             // Check we're not doing any important animations
             eAnimID animId = pAssoc->GetAnimID();
             if (animId == eAnimID::ANIM_ID_WALK || animId == eAnimID::ANIM_ID_RUN || animId == eAnimID::ANIM_ID_IDLE ||
-                animId == eAnimID::ANIM_ID_WEAPON_CROUCH || animId == eAnimID::ANIM_ID_STEALTH_AIM)
+                animId == eAnimID::ANIM_ID_WEAPON_CROUCH || animId == eAnimID::ANIM_ID_KILL_PARTIAL)
             {
                 // Are our knife anims loaded?
                 std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
@@ -3357,6 +3375,7 @@ void CClientPed::SetTargetRotation(unsigned long ulDelay, std::optional<float> r
 
 // Temporary
 #include "../mods/deathmatch/logic/CClientGame.h"
+#include <enums/VehicleType.h>
 extern CClientGame* g_pClientGame;
 
 void CClientPed::Interpolate()
@@ -3683,8 +3702,8 @@ void CClientPed::_CreateModel()
             Kill(WEAPONTYPE_UNARMED, 0, false, true);
         }
 
-        // Are we still playing animation?
-        if ((m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame || m_AnimationCache.progressWaitForStreamIn) && m_pAnimationBlock)
+        // Are we still playing a animation?
+        if (m_pAnimationBlock && IsAnimationInProgress())
         {
             if (m_bisCurrentAnimationCustom)
             {
@@ -3961,8 +3980,8 @@ void CClientPed::_ChangeModel()
             }
             m_bDontChangeRadio = false;
 
-            // Are we still playing a looped animation?
-            if ((m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame || m_AnimationCache.progressWaitForStreamIn) && m_pAnimationBlock)
+            // Are we still playing a animation?
+            if (m_pAnimationBlock && IsAnimationInProgress())
             {
                 if (m_bisCurrentAnimationCustom)
                 {
@@ -4041,6 +4060,13 @@ void CClientPed::ReCreateGameEntity()
 
 void CClientPed::ModelRequestCallback(CModelInfo* pModelInfo)
 {
+    // The model loading may take a while and there's a chance of ped being moved to other dimension.
+    if (!IsVisibleInAllDimensions() && GetDimension() != m_pStreamer->GetDimension())
+    {
+        NotifyUnableToCreate();
+        return;
+    }
+
     // If we have a player loaded
     if (m_pPlayerPed)
     {
@@ -4063,6 +4089,7 @@ void CClientPed::RebuildModel(bool bDelayChange)
         if (m_ulModel == 0)
         {
             // Adds only the neccesary textures
+            m_pClothes->RefreshClothes();
             m_pClothes->AddAllToModel();
 
             m_bPendingRebuildPlayer = true;
@@ -4455,9 +4482,9 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
     CTask* pTask = 0;
     if (m_pTaskManager)
         pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-    unsigned short usVehicleModel = pVehicle->GetModel();
+    auto usVehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
     if (((pTask && pTask->GetTaskType() == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) &&
-        (usVehicleModel == VT_SKIMMER || usVehicleModel == VT_SEASPAR || usVehicleModel == VT_LEVIATHN || usVehicleModel == VT_VORTEX))
+        (usVehicleModel == VehicleType::VT_SKIMMER || usVehicleModel == VehicleType::VT_SEASPAR || usVehicleModel == VehicleType::VT_LEVIATHN || usVehicleModel == VehicleType::VT_VORTEX))
     {
         CVector      vecDoorPos;
         unsigned int uiDoor;
@@ -5718,7 +5745,23 @@ bool CClientPed::IsRunningAnimation()
         }
         return false;
     }
-    return (m_AnimationCache.bLoop && m_pAnimationBlock);
+    return (m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame) && m_pAnimationBlock;
+}
+
+bool CClientPed::IsAnimationInProgress()
+{
+    bool constAnim = m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame;
+
+    if (!m_pAnimationBlock)
+        return constAnim;
+
+    float elapsedTime = static_cast<float>(GetTimestamp() - m_AnimationCache.startTime) / 1000.0f;
+
+    auto animBlendHierarchy = g_pGame->GetAnimManager()->GetAnimation(m_AnimationCache.strName.c_str(), m_pAnimationBlock);
+    if (!animBlendHierarchy)
+        return constAnim;
+
+    return constAnim || elapsedTime < animBlendHierarchy->GetTotalTime();
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
@@ -5806,10 +5849,6 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     m_AnimationCache.bUpdatePosition = bUpdatePosition;
     m_AnimationCache.bInterruptable = bInterruptable;
     m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
-    m_AnimationCache.progress = 0.0f;
-    m_AnimationCache.speed = 1.0f;
-    m_AnimationCache.progressWaitForStreamIn = false;
-    m_AnimationCache.elapsedTime = 0.0f;
 }
 
 void CClientPed::KillAnimation()
@@ -5848,39 +5887,45 @@ void CClientPed::RunAnimationFromCache()
     if (!m_pAnimationBlock)
         return;
 
-    bool  needCalcProgress = m_AnimationCache.progressWaitForStreamIn;
-    float elapsedTime = m_AnimationCache.elapsedTime;
-
     // Copy our name incase it gets deleted
     std::string animName = m_AnimationCache.strName;
 
     // Run our animation
     RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
 
-    auto animAssoc = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(GetClump(), animName.c_str());
+    // Set anim progress & speed
+    m_AnimationCache.progressWaitForStreamIn = true;
+}
+
+void CClientPed::UpdateAnimationProgressAndSpeed()
+{
+    if (!m_AnimationCache.progressWaitForStreamIn)
+        return;
+
+    // Get current anim
+    auto animAssoc = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(GetClump(), m_AnimationCache.strName.c_str());
     if (!animAssoc)
         return;
 
-    // If the anim is synced from the server side, we need to calculate the progress
-    float progress = m_AnimationCache.progress;
-    if (needCalcProgress)
-    {
-        float animLength = animAssoc->GetLength();
+    float animLength = animAssoc->GetLength();
+    float progress = 0.0f;
+    float elapsedTime = static_cast<float>(GetTimestamp() - m_AnimationCache.startTime) / 1000.0f;
 
-        if (m_AnimationCache.bFreezeLastFrame) // time and loop is ignored if freezeLastFrame is true
-            progress = (elapsedTime / animLength) * m_AnimationCache.speed;
+    if (m_AnimationCache.bFreezeLastFrame) // time and loop is ignored if freezeLastFrame is true
+        progress = (elapsedTime / animLength) * m_AnimationCache.speed;
+    else
+    {
+        if (m_AnimationCache.bLoop)
+            progress = std::fmod(elapsedTime * m_AnimationCache.speed, animLength) / animLength;
         else
-        {
-            if (m_AnimationCache.bLoop)
-                progress = std::fmod(elapsedTime * m_AnimationCache.speed, animLength) / animLength;
-            else
-                // For non-looped animations, limit duration to animLength if time exceeds it
-                progress = (elapsedTime / (m_AnimationCache.iTime <= animLength ? m_AnimationCache.iTime : animLength)) * m_AnimationCache.speed;
-        }
+            // For non-looped animations, limit duration to animLength if time exceeds it
+            progress = (elapsedTime / (m_AnimationCache.iTime <= animLength ? m_AnimationCache.iTime : animLength)) * m_AnimationCache.speed;
     }
 
     animAssoc->SetCurrentProgress(std::clamp(progress, 0.0f, 1.0f));
     animAssoc->SetCurrentSpeed(m_AnimationCache.speed);
+
+    m_AnimationCache.progressWaitForStreamIn = false;
 }
 
 void CClientPed::PostWeaponFire()
@@ -6085,7 +6130,7 @@ bool CClientPed::ShouldBeStealthAiming()
                 {
                     // We need to be either crouched, walking or standing
                     SBindableGTAControl* pWalkControl = pKeyBinds->GetBindableFromControl("walk");
-                    if (m_pPlayerPed->GetRunState() == 1 || m_pPlayerPed->GetRunState() == 4 || pWalkControl && pWalkControl->bState)
+                    if (m_pPlayerPed->GetMoveState() == PedMoveState::PEDMOVE_STILL || m_pPlayerPed->GetMoveState() == PedMoveState::PEDMOVE_WALK || pWalkControl && pWalkControl->bState)
                     {
                         // Do we have a target ped?
                         CClientPed* pTargetPed = GetTargetedPed();
@@ -6464,12 +6509,6 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Check the server is compatible if we are a ped
-    if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        return false;
-    }
-
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
     {
@@ -6537,9 +6576,9 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     }
 
     // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
-    unsigned short vehicleModel = pVehicle->GetModel();
+    auto vehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
 
-    if (IsInWater() && !(vehicleModel == VT_SKIMMER || vehicleModel == VT_SEASPAR || vehicleModel == VT_LEVIATHN || vehicleModel == VT_VORTEX))
+    if (IsInWater() && !(vehicleModel == VehicleType::VT_SKIMMER || vehicleModel == VehicleType::VT_SEASPAR || vehicleModel == VehicleType::VT_LEVIATHN || vehicleModel == VehicleType::VT_VORTEX))
     {
         return false;
     }
@@ -6638,11 +6677,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Write the ped ID to it if server supports it
-    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        pBitStream->Write(GetID());
-    }
+    pBitStream->Write(GetID());
 
     // Write the vehicle id to it and that we're requesting to get into it
     pBitStream->Write(pVehicle->GetID());
@@ -6701,12 +6736,6 @@ bool CClientPed::ExitVehicle()
 
     // We dead?
     if (IsDead())
-    {
-        return false;
-    }
-
-    // Check the server is compatible if we are a ped
-    if (!IsLocalPlayer() && !g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
     {
         return false;
     }
@@ -6771,11 +6800,7 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    // Write the ped ID to it if server supports it
-    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-    {
-        pBitStream->Write(GetID());
-    }
+    pBitStream->Write(GetID());
 
     // Write the vehicle id to it and that we're requesting to get out of it
     pBitStream->Write(pOccupiedVehicle->GetID());
@@ -6903,10 +6928,7 @@ void CClientPed::UpdateVehicleInOut()
             if (pBitStream)
             {
                 // Write the ped ID to it
-                if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                {
-                    pBitStream->Write(GetID());
-                }
+                pBitStream->Write(GetID());
 
                 // Write the car id and the action id (enter complete)
                 pBitStream->Write(m_VehicleInOutID);
@@ -6956,10 +6978,7 @@ void CClientPed::UpdateVehicleInOut()
                 if (pBitStream)
                 {
                     // Write the ped or player ID to it
-                    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                    {
-                        pBitStream->Write(GetID());
-                    }
+                    pBitStream->Write(GetID());
 
                     // Write the car id and the action id (enter complete)
                     pBitStream->Write(m_VehicleInOutID);
@@ -7003,10 +7022,7 @@ void CClientPed::UpdateVehicleInOut()
                 if (pBitStream)
                 {
                     // Write the ped or player ID to it
-                    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-                    {
-                        pBitStream->Write(GetID());
-                    }
+                    pBitStream->Write(GetID());
 
                     // Write the car id and the action id (enter complete)
                     pBitStream->Write(m_VehicleInOutID);
@@ -7118,10 +7134,7 @@ void CClientPed::UpdateVehicleInOut()
             return;
 
         // Write the ped or player ID to it
-        if (g_pNet->CanServerBitStream(eBitStreamVersion::PedEnterExit))
-        {
-            pBitStream->Write(GetID());
-        }
+        pBitStream->Write(GetID());
 
         // Vehicle id
         pBitStream->Write(pOccupiedVehicle->GetID());

@@ -5,7 +5,7 @@
  *  FILE:        core/CCore.cpp
  *  PURPOSE:     Base core class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -26,6 +26,7 @@
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordRichPresence.h"
+#include "CSteamClient.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -160,6 +161,7 @@ CCore::CCore()
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+    m_steamClient = std::make_unique<CSteamClient>();
 
     // Create discord rich presence
     m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
@@ -172,6 +174,8 @@ CCore::~CCore()
     // Reset Discord rich presence
     if (m_pDiscordRichPresence)
         m_pDiscordRichPresence.reset();
+
+    m_steamClient.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -513,7 +517,7 @@ void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
 {
     if (m_pLocalGUI)
     {
-        if (m_pGame->GetSystemState() == 9 /* GS_PLAYING_GAME */ && m_pModManager->IsLoaded() && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
+        if (m_pGame->GetSystemState() == SystemState::GS_PLAYING_GAME && m_pModManager->IsLoaded() && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
             !m_pLocalGUI->GetMainMenu()->IsVisible() && !m_pLocalGUI->GetConsole()->IsVisible() && !m_pLocalGUI->IsChatBoxInputEnabled())
         {
             CChat* pChat = m_pLocalGUI->GetChat();
@@ -1228,11 +1232,17 @@ void CCore::DoPostFramePulse()
         ApplyConsoleSettings();
         ApplyGameSettings();
 
+        // Allow connecting with the local Steam client
+        bool allowSteamClient = false;
+        CVARS_GET("allow_steam_client", allowSteamClient);
+        if (allowSteamClient)
+            m_steamClient->Connect();
+
         m_pGUI->SelectInputHandlers(INPUT_CORE);
     }
 
     // This is the first frame in the menu?
-    if (m_pGame->GetSystemState() == 7)            // GS_FRONTEND
+    if (m_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         if (m_menuFrame < 255)
             ++m_menuFrame;
@@ -1273,7 +1283,8 @@ void CCore::DoPostFramePulse()
             }
         }
 
-        if (m_menuFrame >= 75 && m_requestNewNickname && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
+        if (m_menuFrame >= 75 && m_requestNewNickname && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading() &&
+            !GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->IsVisible())
         {
             // Request a new nickname if we're waiting for one
             GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
@@ -1452,6 +1463,10 @@ void CCore::Quit(bool bInstantly)
 
         WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
 
+        // Hide game window to make quit look instant
+        PostQuitMessage(0);
+        ShowWindow(GetHookedWindow(), SW_HIDE);
+
         // Destroy the client
         CModManager::GetSingleton().Unload();
 
@@ -1462,7 +1477,6 @@ void CCore::Quit(bool bInstantly)
 
         // Use TerminateProcess for now as exiting the normal way crashes
         TerminateProcess(GetCurrentProcess(), 0);
-        // PostQuitMessage ( 0 );
     }
     else
     {
@@ -1770,43 +1784,46 @@ void CCore::OnPostColorFilterRender()
 void CCore::ApplyCoreInitSettings()
 {
 #if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
-    const auto aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
+    bool aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
+    // The minimum supported client for the function below is Windows Vista (Longhorn).
+    // For more information, refer to the Microsoft Learn article:
+    // https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
     if (aware)
         SetProcessDPIAware();
 #endif
 
-    const auto revision = GetApplicationSettingInt("reset-settings-revision");
+    int revision = GetApplicationSettingInt("reset-settings-revision");
 
-    if (revision >= 21486)
-        return;
+    // Users with the default skin will be switched to the 2023 version by replacing "Default" with "Default 2023".
+    // The "Default 2023" GUI skin was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+    if (revision && revision < 21486)
+    {
+        auto skin = CVARS_GET_VALUE<std::string>("current_skin");
 
-    const auto skin = CVARS_GET_VALUE<std::string>("current_skin");
+        if (skin == "Default")
+            CVARS_SET("current_skin", "Default 2023");
 
-    if (skin == "Default")
-        CVARS_SET("current_skin", "Default 2023");
+        SetApplicationSettingInt("reset-settings-revision", 21486);
+    }
 
-    SetApplicationSettingInt("reset-settings-revision", 21486);
-
-    const auto process = GetCurrentProcess();
-    const int  priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
-    const auto priority = CVARS_GET_VALUE<int>("process_priority") % 3;
+    HANDLE process = GetCurrentProcess();
+    const int priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
+    int priority = CVARS_GET_VALUE<int>("process_priority") % 3;
 
     SetPriorityClass(process, priorities[priority]);
 
-    const auto affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
 
     if (!affinity)
         return;
 
     DWORD_PTR mask;
     DWORD_PTR sys;
-    const auto result = GetProcessAffinityMask(process, &mask, &sys);
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
 
-    if (!result)
-        return;
-
-    SetProcessAffinityMask(process, mask & ~1);
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //

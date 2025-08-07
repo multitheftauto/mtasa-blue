@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/SyncStructures.h
  *  PURPOSE:     Structures used for syncing stuff through the network.
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -544,32 +544,17 @@ struct SPlayerPuresyncFlags : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 12
-    };
-
-    enum
-    {
-        BITCOUNT2 = 1
+        BITCOUNT = 14
     };
 
     bool Read(NetBitStreamInterface& stream)
     {
-        bool ok = stream.ReadBits((char*)&data, BITCOUNT);
-
-        if (stream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-            ok &= stream.ReadBits((char*)&data2, BITCOUNT2);
-        else
-            data2.isReloadingWeapon = 0;
-
-        return ok;
+        return stream.ReadBits((char*)&data, BITCOUNT);
     }
 
     void Write(NetBitStreamInterface& stream) const
     {
         stream.WriteBits((const char*)&data, BITCOUNT);
-
-        if (stream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-            stream.WriteBits((const char*)&data2, BITCOUNT2);
     }
 
     struct
@@ -586,12 +571,9 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         bool bHasAWeapon : 1;
         bool bSyncingVelocity : 1;
         bool bStealthAiming : 1;
-    } data;
-
-    struct
-    {
         bool isReloadingWeapon : 1;
-    } data2;
+        bool animInterrupted : 1;
+    } data;
 };
 
 struct SPedRotationSync : public ISyncStructure
@@ -907,26 +889,23 @@ struct SFullKeysyncSync : public ISyncStructure
 
         bitStream.ReadBits((char*)&data, 8);
 
-        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
+        if (bitStream.ReadBit())
         {
-            if (bitStream.ReadBit())
-            {
-                unsigned char ucButtonSquare;
-                bitStream.Read(ucButtonSquare);
-                data.ucButtonSquare = ucButtonSquare;
-            }
-            else
-                data.ucButtonSquare = 0;
-
-            if (bitStream.ReadBit())
-            {
-                unsigned char ucButtonCross;
-                bitStream.Read(ucButtonCross);
-                data.ucButtonCross = ucButtonCross;
-            }
-            else
-                data.ucButtonCross = 0;
+            unsigned char ucButtonSquare;
+            bitStream.Read(ucButtonSquare);
+            data.ucButtonSquare = ucButtonSquare;
         }
+        else
+            data.ucButtonSquare = 0;
+
+        if (bitStream.ReadBit())
+        {
+            unsigned char ucButtonCross;
+            bitStream.Read(ucButtonCross);
+            data.ucButtonCross = ucButtonCross;
+        }
+        else
+            data.ucButtonCross = 0;
 
         bitStream.Read(cLeftStickX);
         if (bitStream.Read(cLeftStickY))
@@ -941,24 +920,21 @@ struct SFullKeysyncSync : public ISyncStructure
     {
         bitStream.WriteBits((const char*)&data, 8);
 
-        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
+        if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
         {
-            if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
-            {
-                bitStream.WriteBit(true);
-                bitStream.Write(data.ucButtonSquare);
-            }
-            else
-                bitStream.WriteBit(false);
-
-            if (data.ucButtonCross >= 1 && data.ucButtonCross <= 254)
-            {
-                bitStream.WriteBit(true);
-                bitStream.Write(data.ucButtonCross);
-            }
-            else
-                bitStream.WriteBit(false);
+            bitStream.WriteBit(true);
+            bitStream.Write(data.ucButtonSquare);
         }
+        else
+            bitStream.WriteBit(false);
+
+        if (data.ucButtonCross >= 1 && data.ucButtonCross <= 254)
+        {
+            bitStream.WriteBit(true);
+            bitStream.Write(data.ucButtonCross);
+        }
+        else
+            bitStream.WriteBit(false);
 
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
         bitStream.Write(cLeftStickX);
@@ -996,26 +972,23 @@ struct SSmallKeysyncSync : public ISyncStructure
 
         bitStream.ReadBits((char*)&data, 8);
 
-        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
+        if (bitStream.ReadBit())
         {
-            if (bitStream.ReadBit())
-            {
-                unsigned char ucButtonSquare;
-                bitStream.Read(ucButtonSquare);
-                data.ucButtonSquare = ucButtonSquare;
-            }
-            else
-                data.ucButtonSquare = 0;
-
-            if (bitStream.ReadBit())
-            {
-                unsigned char ucButtonCross;
-                bitStream.Read(ucButtonCross);
-                data.ucButtonCross = ucButtonCross;
-            }
-            else
-                data.ucButtonCross = 0;
+            unsigned char ucButtonSquare;
+            bitStream.Read(ucButtonSquare);
+            data.ucButtonSquare = ucButtonSquare;
         }
+        else
+            data.ucButtonSquare = 0;
+
+        if (bitStream.ReadBit())
+        {
+            unsigned char ucButtonCross;
+            bitStream.Read(ucButtonCross);
+            data.ucButtonCross = ucButtonCross;
+        }
+        else
+            data.ucButtonCross = 0;
 
         bitStream.Read(cLeftStickX);
         if (bitStream.Read(cLeftStickY))
@@ -1030,24 +1003,21 @@ struct SSmallKeysyncSync : public ISyncStructure
     {
         bitStream.WriteBits((const char*)&data, 8);
 
-        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
+        if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
         {
-            if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
-            {
-                bitStream.WriteBit(true);
-                bitStream.Write(data.ucButtonSquare);
-            }
-            else
-                bitStream.WriteBit(false);
-
-            if (data.ucButtonCross >= 1 && data.ucButtonCross <= 254)
-            {
-                bitStream.WriteBit(true);
-                bitStream.Write(data.ucButtonCross);
-            }
-            else
-                bitStream.WriteBit(false);
+            bitStream.WriteBit(true);
+            bitStream.Write(data.ucButtonSquare);
         }
+        else
+            bitStream.WriteBit(false);
+
+        if (data.ucButtonCross >= 1 && data.ucButtonCross <= 254)
+        {
+            bitStream.WriteBit(true);
+            bitStream.Write(data.ucButtonCross);
+        }
+        else
+            bitStream.WriteBit(false);
 
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
         bitStream.Write(cLeftStickX);
@@ -1946,67 +1916,28 @@ struct SFunBugsStateSync : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 5
-    };
-    enum
-    {
-        BITCOUNT2 = 1
-    };
-    enum
-    {
-        BITCOUNT3 = 1
-    };
-    enum
-    {
-        BITCOUNT4 = 1
-    };
-    enum
-    {
-        BITCOUNT5 = 1
+        BITCOUNT = 10
     };
 
     bool Read(NetBitStreamInterface& bitStream)
     {
         bool bOk = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
-        if (bitStream.Version() >= 0x046)
-            bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
-        else
-            data2.bHitAnim = 0;
-        if (bitStream.Version() >= 0x058)
-            bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data3), BITCOUNT3);
-        else
-            data3.bFastSprint = 0;
-        if (bitStream.Version() >= 0x059)
-            bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
-        else
-            data4.bBadDrivebyHitboxes = 0;
-        if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
-            bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
-        else
-            data5.bQuickStand = 0;
 
         //// Example for adding item:
-        // if ( bitStream.Version() >= 0x999 )
+        // if (bitStream.Can(eBitStreamVersion::PLACEHOLDER))
         //     bOk &= bitStream.ReadBits ( reinterpret_cast < char* > ( &data9 ), BITCOUNT9 );
         // else
         //     data9.bItemName = 0;
 
         return bOk;
     }
+
     void Write(NetBitStreamInterface& bitStream) const
     {
         bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
-        if (bitStream.Version() >= 0x046)
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
-        if (bitStream.Version() >= 0x058)
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
-        if (bitStream.Version() >= 0x059)
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
-        if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
 
         //// Example for adding item:
-        // if (bitStream.Can(eBitStreamVersion::YourGlitch))
+        // if (bitStream.Can(eBitStreamVersion::PLACEHOLDER))
         //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
     }
 
@@ -2017,31 +1948,14 @@ struct SFunBugsStateSync : public ISyncStructure
         bool bFastFire : 1;
         bool bFastMove : 1;
         bool bCrouchBug : 1;
+        bool bHitAnim : 1;
+        bool bFastSprint : 1;
+        bool bBadDrivebyHitboxes : 1;
+        bool bQuickStand : 1;
+        bool vehicleRapidStop : 1;
     } data;
 
     // Add new ones in separate structs
-    struct
-    {
-        bool bHitAnim : 1;
-    } data2;
-
-    // Add new ones in separate structs
-    struct
-    {
-        bool bFastSprint : 1;
-    } data3;
-
-    // Add new ones in separate structs
-    struct
-    {
-        bool bBadDrivebyHitboxes : 1;
-    } data4;
-
-    // Add new ones in separate structs
-    struct
-    {
-        bool bQuickStand : 1;
-    } data5;
 };
 
 //////////////////////////////////////////
@@ -2053,66 +1967,13 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 12
-    };
-    enum
-    {
-        BITCOUNT2 = 1
-    };
-    enum
-    {
-        BITCOUNT3 = 1
-    };
-    enum
-    {
-        BITCOUNT4 = 1
-    };
-    enum
-    {
-        BITCOUNT5 = 1
-    };
-    enum
-    {
-        BITCOUNT6 = 1
-    };
-    enum
-    {
-        BITCOUNT7 = 1
+        BITCOUNT = 20
     };
 
     bool Read(NetBitStreamInterface& bitStream)
     {
         bool isOK = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
-             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
-         else
-             data2.fireballdestruct = true;
 
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
-             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data3), BITCOUNT3);
-         else
-             data3.roadsignstext = true;
-
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
-             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
-         else
-             data4.extendedwatercannons = true;
-
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
-            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
-        else
-            data5.tunnelweatherblend = true;
-
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_IgnoreFireState))
-            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data6), BITCOUNT6);
-        else
-            data6.ignoreFireState = false;
-            
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
-            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data7), BITCOUNT7);
-        else
-            data7.flyingcomponents = true;
-            
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
         //     isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
@@ -2121,26 +1982,10 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 
         return isOK;
     }
+
     void Write(NetBitStreamInterface& bitStream) const
     {
         bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
-
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
-
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
-
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
-
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_IgnoreFireState))
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data6), BITCOUNT6);
-
-        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FlyingComponents))
-            bitStream.WriteBits(reinterpret_cast<const char*>(&data7), BITCOUNT7);
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2161,39 +2006,18 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool coronaztest : 1;
         bool watercreatures : 1;
         bool burnflippedcars : 1;
+        bool fireballdestruct : 1;
+        bool roadsignstext : 1;
+        bool extendedwatercannons : 1;
+        bool tunnelweatherblend : 1;
+        bool ignoreFireState : 1;
+        bool flyingcomponents : 1;
+        bool vehicleburnexplosions : 1;
+        bool vehicleEngineAutoStart : 1;
     } data;
 
     // Add new ones in separate structs
-    struct
-    {
-        bool fireballdestruct : 1;
-    } data2;
 
-    struct
-    {
-        bool roadsignstext : 1;
-    } data3;
-
-    struct
-    {
-        bool extendedwatercannons : 1;
-    } data4;
-
-    struct
-    {
-        bool tunnelweatherblend : 1;
-    } data5;
-
-    struct
-    {
-        bool ignoreFireState : 1;
-    } data6;
-    
-    struct
-    {
-        bool flyingcomponents : 1;
-    } data7;
-    
     SWorldSpecialPropertiesStateSync()
     {
         // Set default states
@@ -2209,12 +2033,14 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.coronaztest = true;
         data.watercreatures = true;
         data.burnflippedcars = true;
-        data2.fireballdestruct = true;
-        data3.roadsignstext = true;
-        data4.extendedwatercannons = true;
-        data5.tunnelweatherblend = true;
-        data6.ignoreFireState = false;
-        data7.flyingcomponents = true;
+        data.fireballdestruct = true;
+        data.roadsignstext = true;
+        data.extendedwatercannons = true;
+        data.tunnelweatherblend = true;
+        data.ignoreFireState = false;
+        data.flyingcomponents = true;
+        data.vehicleburnexplosions = true;
+        data.vehicleEngineAutoStart = true;
     }
 };
 

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CBan.h
  *  PURPOSE:     Ban descriptor class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -70,13 +70,6 @@ public:
         m_strSerial = strSerial;
     };
 
-    const std::string& GetAccount() { return m_strAccount; };
-    void               SetAccount(const std::string& strAccount)
-    {
-        CBanManager::SetBansModified();
-        m_strAccount = strAccount;
-    };
-
     time_t  GetBanTimeRemaining();
     SString GetDurationDesc();
     SString GetReasonText() const;
@@ -90,7 +83,6 @@ private:
     std::string m_strBanner;
     std::string m_strReason;
     std::string m_strSerial;
-    std::string m_strAccount;
     time_t      m_tTimeOfBan;
     time_t      m_tTimeOfUnban;
     uint        m_uiScriptID;

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaColShapeDefs.h
  *  PURPOSE:     Lua function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -41,6 +41,6 @@ public:
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
 
-    static std::tuple<float, float> GetColPolygonHeight(CColPolygon* pColPolygon);
-    static bool                     SetColPolygonHeight(CColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
+    static CLuaMultiReturn<float, float> GetColPolygonHeight(CColShape* shape);
+    static bool SetColPolygonHeight(CColShape* shape, std::variant<bool, float> floor, std::variant<bool, float> ceil);
 };

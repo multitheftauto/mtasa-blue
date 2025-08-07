@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Time.hpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include "SharedUtil.Time.h"
@@ -84,6 +84,15 @@ long long SharedUtil::GetTickCount64_()
 double SharedUtil::GetSecondCount()
 {
     return GetTickCount64_() * (1 / 1000.0);
+}
+
+//
+// Returns a timestamp in ms
+//
+std::int64_t SharedUtil::GetTimestamp()
+{
+    auto now = std::chrono::system_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 }
 
 //

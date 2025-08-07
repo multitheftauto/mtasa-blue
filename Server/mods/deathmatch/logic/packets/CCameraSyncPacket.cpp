@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CCameraSyncPacket.cpp
  *  PURPOSE:     Camera synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,20 +17,15 @@
 
 bool CCameraSyncPacket::Read(NetBitStreamInterface& BitStream)
 {
-    if (BitStream.Version() >= 0x5E)
-    {
-        CPlayer* pPlayer = GetSourcePlayer();
-        if (!pPlayer)
-            return false;
+    CPlayer* pPlayer = GetSourcePlayer();
+    if (!pPlayer)
+        return false;
 
-        // Check the time context
-        uchar ucTimeContext = 0;
-        BitStream.Read(ucTimeContext);
-        if (!pPlayer->GetCamera()->CanUpdateSync(ucTimeContext))
-        {
-            return false;
-        }
-    }
+    // Check the time context
+    uchar ucTimeContext = 0;
+    BitStream.Read(ucTimeContext);
+    if (!pPlayer->GetCamera()->CanUpdateSync(ucTimeContext))
+        return false;
 
     if (!BitStream.ReadBit(m_bFixed))
         return false;

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPedSyncPacket.cpp
  *  PURPOSE:     Ped synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -38,18 +38,13 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
         Data.ucFlags = ucFlags;
 
-        if (BitStream.Can(eBitStreamVersion::PedSync_CameraRotation))
-        {
-            if (!BitStream.Read(Data.flags2))
-                return false;
-        }
-        else
-            Data.flags2 = 0;
+        if (!BitStream.Read(Data.flags2))
+            return false;
 
         // Did we recieve position?
         if (ucFlags & 0x01)
         {    
-            if (!(BitStream.Can(eBitStreamVersion::PedSync_Revision) ? Data.ReadSpatialData(BitStream) : Data.ReadSpatialDataBC(BitStream)))
+            if (!Data.ReadSpatialData(BitStream))
                 return false;
         }
 
@@ -80,7 +75,7 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
                 return false;
         }
 
-        if (ucFlags & 0x60 && BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+        if (ucFlags & 0x60)
         {
             if (!BitStream.ReadBit(Data.isReloadingWeapon))
                 return false;
@@ -115,44 +110,18 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(Data.ucSyncTimeContext);
 
     BitStream.Write(Data.ucFlags);
+    BitStream.Write(Data.flags2);
 
-    if (BitStream.Can(eBitStreamVersion::PedSync_CameraRotation))
-        BitStream.Write(Data.flags2);
+    // Position and rotation
+    if (Data.ucFlags & 0x01)
+        BitStream.Write(&Data.position);
 
-    if (BitStream.Can(eBitStreamVersion::PedSync_Revision))
-    {
-        // Position and rotation
-        if (Data.ucFlags & 0x01)
-            BitStream.Write(&Data.position);
+    if (Data.ucFlags & 0x02)
+        BitStream.Write(&Data.rotation);
 
-        if (Data.ucFlags & 0x02)
-            BitStream.Write(&Data.rotation);
-
-        // Velocity
-        if (Data.ucFlags & 0x04)
-            BitStream.Write(&Data.velocity);
-    }
-    else
-    {
-        // Position and rotation
-        if (Data.ucFlags & 0x01)
-        {
-            BitStream.Write(Data.position.data.vecPosition.fX);
-            BitStream.Write(Data.position.data.vecPosition.fY);
-            BitStream.Write(Data.position.data.vecPosition.fZ);
-        }
-
-        if (Data.ucFlags & 0x02)
-            BitStream.Write(Data.rotation.data.fRotation);
-
-        // Velocity
-        if (Data.ucFlags & 0x04)
-        {
-            BitStream.Write(Data.velocity.data.vecVelocity.fX);
-            BitStream.Write(Data.velocity.data.vecVelocity.fY);
-            BitStream.Write(Data.velocity.data.vecVelocity.fZ);
-        }
-    }
+    // Velocity
+    if (Data.ucFlags & 0x04)
+        BitStream.Write(&Data.velocity);
 
     // Health, armour, on fire and is in water
     if (Data.ucFlags & 0x08)
@@ -169,7 +138,7 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     if (Data.ucFlags & 0x20)
         BitStream.WriteBit(Data.bOnFire);
-    if (Data.ucFlags & 0x60 && BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
+    if (Data.ucFlags & 0x60)
         BitStream.Write(Data.isReloadingWeapon);
     if (Data.ucFlags & 0x40)
         BitStream.Write(Data.bIsInWater);

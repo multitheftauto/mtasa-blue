@@ -117,6 +117,8 @@ BOOL OnLibraryAttach()
 
 VOID OnGameLaunch()
 {
+    SetMemoryAllocationFailureHandler();
+
     std::error_code ec{};
 
     // MTA:SA launches GTA:SA process with the GTA:SA installation directory as the current directory.
@@ -233,7 +235,7 @@ VOID OnGameLaunch()
 
     // For dll searches, this call replaces the current directory entry and turns off 'SafeDllSearchMode'.
     // Meaning it will search the supplied path before the system and windows directory.
-    // http://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
+    // https://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
     SetDllDirectoryW(mtaDirectory.wstring().c_str());
 
     // Load and set up netc.dll library.

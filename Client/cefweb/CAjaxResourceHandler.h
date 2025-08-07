@@ -5,7 +5,7 @@
  *  FILE:        core/AjaxResourceHandler.h
  *  PURPOSE:     CEF Handler for Ajax Requests with delayed results
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once

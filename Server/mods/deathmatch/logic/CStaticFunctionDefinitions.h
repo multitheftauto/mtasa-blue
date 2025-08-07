@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.h
  *  PURPOSE:     Lua static function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -130,8 +130,8 @@ public:
     static bool               GetPlayerNametagColor(CPlayer* pPlayer, unsigned char& ucR, unsigned char& ucG, unsigned char& ucB);
     static bool               IsPlayerNametagShowing(CPlayer* pPlayer, bool& bShowing);
     static const std::string& GetPlayerSerial(CPlayer* pPlayer, uint uiIndex);
-    static const std::string& GetPlayerUserName(CPlayer* pPlayer);
-    static const std::string& GetPlayerCommunityID(CPlayer* pPlayer);
+    static std::string        GetPlayerUserName(CPlayer* pPlayer);
+    static std::string        GetPlayerCommunityID(CPlayer* pPlayer);
     static bool               GetPlayerBlurLevel(CPlayer* pPlayer, unsigned char& ucLevel);
     static bool               GetPlayerName(CElement* pElement, SString& strOutName);
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
@@ -705,6 +705,7 @@ public:
     // Account set funcs
     static CAccount* AddAccount(const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError);
     static bool      RemoveAccount(CAccount* pAccount);
+    static bool      SetAccountSerial(CAccount* account, const std::string& serial) noexcept;
     static bool      SetAccountName(CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError);
     static bool      SetAccountPassword(CAccount* pAccount, SString szPassword, CAccountPassword::EAccountPasswordType ePasswordType);
     static bool      SetAccountData(CAccount* pAccount, const char* szKey, CLuaArgument* pArgument);

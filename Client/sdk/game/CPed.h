@@ -13,6 +13,8 @@
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
 #include "CPedSound.h"
+#include "enums/PedState.h"
+#include "enums/PedMoveState.h"
 
 // To avoid VS intellisense highlight errors
 #include <memory>
@@ -252,8 +254,9 @@ public:
     virtual void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra) = 0;
 
     virtual CEntity* GetContactEntity() const = 0;
+    virtual bool     IsStandingOnEntity() const = 0;
 
-    virtual int GetRunState() const = 0;
+    virtual PedMoveState::Enum GetMoveState() const = 0;
 
     virtual bool GetCanBeShotInVehicle() const = 0;
     virtual bool GetTestForShotInVehicle() const = 0;
@@ -299,7 +302,7 @@ public:
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
 
     virtual CEntitySAInterface* GetTargetedObject() const = 0;
-    virtual ePedState           GetPedState() const = 0;
+    virtual PedState           GetPedState() const = 0;
 
     virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
 

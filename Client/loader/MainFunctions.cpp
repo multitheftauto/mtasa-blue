@@ -568,6 +568,8 @@ void PreLaunchWatchDogs()
     WatchDogBeginSection("L1");            // Gets closed when online game has started
     SetApplicationSetting("diagnostics", "gta-fopen-fail", "");
     SetApplicationSetting("diagnostics", "last-crash-reason", "");
+    SetApplicationSetting("diagnostics", "last-crash-module", "");
+    SetApplicationSetting("diagnostics", "last-crash-code", "");
     SetApplicationSetting("diagnostics", "gta-fopen-last", "");
 }
 
@@ -863,11 +865,11 @@ void CheckDataFiles()
     {
         const char* expected;
         const char* fileName;
-    } integrityCheckList[] = {{"24F61A108D285381A67CE643ABBF589C", "bass.dll"},           {"5F9352A9D36E12E1E167E28040EADA83", "bass_aac.dll"},
-                              {"F0D770E77C5A5816D9E2323CC683BA32", "bass_ac3.dll"},       {"D6669FA6DFD548E60CC20503ABCF2FF8", "bass_fx.dll"},
-                              {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"CD9B45DFE7D8B4D547F8B0193C6CF30B", "bassmidi.dll"},
-                              {"F1F587B6515530634AD489CE507BC957", "bassmix.dll"},        {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
-                              {"0F1B2FC6C0C703A43A24DC05352E7ADA", "basswebm.dll"},       {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
+    } integrityCheckList[] = {{"DE5C08577EAA65309974F9860E303F53", "bass.dll"},           {"1D5A1AEF041255DEA49CD4780CAE4CCC", "bass_aac.dll"},
+                              {"8A1AC2AAD7F1691943635CA42F7F2940", "bass_ac3.dll"},       {"61C38C1FD091375F2A30EC631DF337E6", "bass_fx.dll"},
+                              {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"49A603ED114982787FC0A301C0E93FDB", "bassmidi.dll"},
+                              {"064398B1A74B4EF35902F0C218142133", "bassmix.dll"},        {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
+                              {"B35714019BBFF0D0CEE0AFA2637A77A7", "basswebm.dll"},       {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
                               {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
                               {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"4B3932359373F11CBC542CC96D9A9285", "tags.dll"},
                               {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"}, {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
@@ -975,7 +977,7 @@ void CheckDataFiles()
 //////////////////////////////////////////////////////////
 void CheckLibVersions()
 {
-#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
 
     const char* moduleList[] = {"MTA\\loader.dll",
                                 "MTA\\cgui.dll",

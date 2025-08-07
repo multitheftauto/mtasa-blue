@@ -5,7 +5,7 @@
  *  FILE:        core/CSettings.cpp
  *  PURPOSE:     In-game settings window
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,6 +13,7 @@
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
 #include <game/CSettings.h>
+#include "CSteamClient.h"
 
 using namespace std;
 
@@ -405,11 +406,21 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxAllowSteamClient = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow GTA:SA ingame status on Steam"), false));
+    m_pCheckBoxAllowSteamClient->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowSteamClient->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowSteamClient->AutoSize(NULL, 20.0f);
+
     // Enable camera photos getting saved to documents folder
     m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
     m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pPhotoSavingCheckbox->GetPosition(vecTemp, false);
     m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxAskBeforeDisconnect = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Ask before disconnecting from server using main menu"), true));
+    m_pCheckBoxAskBeforeDisconnect->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAskBeforeDisconnect->GetPosition(vecTemp, false);
+    m_pCheckBoxAskBeforeDisconnect->AutoSize(NULL, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -3080,6 +3091,18 @@ void CSettings::LoadData()
     CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
     m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
+    // Allow connecting with the local Steam client
+    bool allowSteamClient = false;
+    CVARS_GET("allow_steam_client", allowSteamClient);
+    m_pCheckBoxAllowSteamClient->SetSelected(allowSteamClient);
+
+    if (allowSteamClient)
+        g_pCore->GetSteamClient()->Connect();
+
+    bool bAskBeforeDisconnect;
+    CVARS_GET("ask_before_disconnect", bAskBeforeDisconnect);
+    m_pCheckBoxAskBeforeDisconnect->SetSelected(bAskBeforeDisconnect);
+
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
     m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
@@ -3245,13 +3268,11 @@ void CSettings::LoadData()
     DWORD_PTR mask;
     DWORD_PTR sys;
 
-    const auto process = GetCurrentProcess();
-    const auto result = GetProcessAffinityMask(process, &mask, &sys);
+    HANDLE process = GetCurrentProcess();
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
 
     if (bVar && result)
-    {
         SetProcessAffinityMask(process, mask & ~1);
-    }
     else
     {
         SYSTEM_INFO info;
@@ -3559,6 +3580,15 @@ void CSettings::SaveData()
         }
     }
 
+    // Allow connecting with the local Steam client
+    bool allowSteamClient = m_pCheckBoxAllowSteamClient->GetSelected();
+    CVARS_SET("allow_steam_client", allowSteamClient);
+    if (allowSteamClient)
+        g_pCore->GetSteamClient()->Connect();
+
+    bool bAskBeforeDisconnect = m_pCheckBoxAskBeforeDisconnect->GetSelected();
+    CVARS_SET("ask_before_disconnect", bAskBeforeDisconnect);
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);
@@ -3657,19 +3687,17 @@ void CSettings::SaveData()
     CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
 
     // Process CPU Affinity
-    const auto affinity = m_pProcessAffinityCheckbox->GetSelected();
+    bool affinity = m_pProcessAffinityCheckbox->GetSelected();
     CVARS_SET("process_cpu_affinity", affinity);
 
     DWORD_PTR mask;
     DWORD_PTR sys;
 
-    const auto process = GetCurrentProcess();
-    const auto result = GetProcessAffinityMask(process, &mask, &sys);
+    HANDLE process = GetCurrentProcess();
+    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
 
     if (affinity && result)
-    {
         SetProcessAffinityMask(process, mask & ~1);
-    }
     else
     {
         SYSTEM_INFO info;
@@ -4769,36 +4797,39 @@ static void CPUAffinityQuestionCallBack(void* userdata, unsigned int button)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
-    if (button == 0)
-    {
-        auto const checkBox = reinterpret_cast<CGUICheckBox*>(userdata);
-        checkBox->SetSelected(false);
-    }
+    auto* checkbox = static_cast<CGUICheckBox*>(userdata);
+
+    if (!checkbox)
+        return;
+
+    if (button != 0)
+        return;
+
+    checkbox->SetSelected(true);
 }
 
 bool CSettings::OnAffinityClick(CGUIElement* pElement)
 {
-    static bool shownWarning = false;
+    static bool shown = false;
 
-    if (m_pProcessAffinityCheckbox->GetSelected() && !shownWarning)
-    {
-        shownWarning = true;
+    if (m_pProcessAffinityCheckbox->GetSelected() || shown)
+        return true;
 
-        std::string message = std::string(
-            _("Enabling this setting may improve game performance, but on some processors, it may worsen it.\n"
-              "We have observed issues with AMD Ryzen processors featuring 3D V-Cache.\n"
-              "The exact list of affected processors is unknown.\n"
-              "\nAre you sure you  want to enable this option?"));
+    shown = true;
 
-        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
-        pQuestionBox->Reset();
-        pQuestionBox->SetTitle(_("EXPERIMENTAL FEATURE"));
-        pQuestionBox->SetMessage(message);
-        pQuestionBox->SetButton(0, _("No"));
-        pQuestionBox->SetButton(1, _("Yes"));
-        pQuestionBox->SetCallback(CPUAffinityQuestionCallBack, m_pProcessAffinityCheckbox);
-        pQuestionBox->Show();
-    }
+    std::string title = _("EXPERIMENTAL FEATURE");
+    std::string message =
+        std::string(_("Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
+                      "Are you sure you want to disable it?"));
+
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(title);
+    pQuestionBox->SetMessage(message);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(CPUAffinityQuestionCallBack, m_pProcessAffinityCheckbox);
+    pQuestionBox->Show();
 
     return true;
 }
@@ -4967,7 +4998,7 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
     else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
-        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Experimental feature - It may improve performance or worsen it."));
+        strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());

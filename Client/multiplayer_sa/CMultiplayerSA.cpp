@@ -145,7 +145,6 @@ DWORD RETURN_CWeapon_FireAreaEffect = 0x73EC03;
 #define HOOKPOS_RenderScene_end                             0x53E159
 #define HOOKPOS_CPlantMgr_Render                            0x5DBC4C
 DWORD RETURN_CPlantMgr_Render_success = 0x5DBC52;
-DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
@@ -1576,6 +1575,18 @@ void CMultiplayerSA::InitHooks()
     // Allow alpha change for helicopter rotor (#523)
     MemSet((void*)0x6C444B, 0x90, 6);
     MemSet((void*)0x6C4453, 0x90, 0x68);
+
+    // Disable Z position changes in the matrix in the C3dMarkers::PlaceMarker (#4000, #536)
+    // To prevent arrow-type markers from snapping to the ground
+    MemCpy((void*)0x725844, "\xDD\xD8\x90", 3);
+    MemCpy((void*)0x725619, "\xDD\xD8\x90", 3);
+    MemCpy((void*)0x72565A, "\xDD\xD8\x90", 3);
+    MemCpy((void*)0x7259B0, "\xDD\xD8\x90", 3);
+    MemSet((void*)0x7258B8, 0x90, 6);
+
+      // Disable spreading fires (Moved from multiplayer_shotsync)
+    MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
+    MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
     
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
@@ -1595,6 +1606,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_ObjectStreamerOptimization();
 
     InitHooks_Postprocess();
+    InitHooks_Explosions();
+    InitHooks_Tasks();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -5715,9 +5728,6 @@ rendercheck:
         mov edx, edi
         fld ds:[0x8D12C0]
         jmp RETURN_CPlantMgr_Render_success
-
-fail:
-        jmp RETURN_CPlantMgr_Render_fail
     }
 }
 
@@ -6480,35 +6490,38 @@ void                RemovePointerToBuilding()
 DWORD dwCWorldRemove = 0x563280;
 // Call to CWorld::Remove in CPopulation::ConvertToDummyObject this is called just before deleting a CObject so we remove the CObject while we are there and
 // remove the new dummy if we need to do so before returning
-void Handle_CWorld_Remove_CPopulation_ConvertToDummyObject()
+static void Handle_CWorld_Remove_CPopulation_ConvertToDummyObject(CEntitySAInterface* pLODInterface)
 {
     TIMING_CHECKPOINT("+RemovePointerToBuilding");
     RemovePointerToBuilding();
     StorePointerToBuilding();
-    RemoveObjectIfNeeded();
+
+    // pLODInterface contains a dummy object's pointer
+    // And as follows from CPopulation::ConvertToDummyObject this pointer can be nullptr
+    if (pLODInterface)
+        RemoveObjectIfNeeded();
+
     TIMING_CHECKPOINT("-RemovePointerToBuilding");
 }
 
 void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject(){
-    _asm
+    __asm
     {
         pushad
+
         mov pBuildingRemove, esi
         mov pBuildingAdd, edi
         mov pLODInterface, edi
-    }
 
-    _asm
-    {
+        push edi
         call Handle_CWorld_Remove_CPopulation_ConvertToDummyObject
-    }
+        add esp, 4
 
-    _asm
-    {
         popad
         jmp dwCWorldRemove
     }
 }
+
 // if it's replaced get rid of it
 void RemoveDummyIfReplaced()
 {
@@ -6704,6 +6717,25 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter(bool bSet)
         MemCpy((char*)0x64BC0D, originalCode, 6);
     else
         MemSet((char*)0x64BC0D, 0x90, 6);
+}
+
+bool CMultiplayerSA::IsVehicleEngineAutoStartEnabled() const noexcept
+{
+    return *(unsigned char*)0x64BC03 == 0x75;
+}
+
+void CMultiplayerSA::SetVehicleEngineAutoStartEnabled(bool enabled)
+{
+    if (enabled)
+    {
+        MemCpy((void*)0x64BC03, "\x75\x05\x80\xC9\x10", 5);
+        MemCpy((void*)0x6C4EA9, "\x8A\x86\x28\x04", 4);
+    }
+    else
+    {
+        MemSet((void*)0x64BC03, 0x90, 5);                          // prevent vehicle engine from turning on (driver enter)
+        MemCpy((void*)0x6C4EA9, "\xE9\x15\x03\x00", 4);            // prevent aircraft engine from turning off (driver exit)
+    }
 }
 
 // Storage

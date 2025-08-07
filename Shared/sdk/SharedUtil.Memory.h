@@ -12,6 +12,8 @@
 
 #include <stddef.h>
 
+#define CUSTOM_EXCEPTION_CODE_OOM 0xE03B10C0            // -533000000
+
 namespace SharedUtil
 {
     struct ProcessMemoryStats
@@ -23,4 +25,6 @@ namespace SharedUtil
     };
 
     bool TryGetProcessMemoryStats(ProcessMemoryStats& out);
+
+    void SetMemoryAllocationFailureHandler();
 }            // namespace SharedUtil

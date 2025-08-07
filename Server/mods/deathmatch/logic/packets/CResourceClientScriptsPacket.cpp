@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CResourceClientScriptsPacket.cpp
  *  PURPOSE:     Resource client-side scripts packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -33,8 +33,7 @@ bool CResourceClientScriptsPacket::Write(NetBitStreamInterface& BitStream) const
 
     for (std::vector<CResourceClientScriptItem*>::const_iterator iter = m_vecItems.begin(); iter != m_vecItems.end(); ++iter)
     {
-        if (BitStream.Version() >= 0x50)
-            BitStream.WriteString(ConformResourcePath((*iter)->GetFullName()));
+        BitStream.WriteString(ConformResourcePath((*iter)->GetFullName()));
 
         const SString& data = (*iter)->GetSourceCode();
         unsigned int   len = data.length();

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CDynamicPool.h
  *  PURPOSE:     Custom implementation for SA pools
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
