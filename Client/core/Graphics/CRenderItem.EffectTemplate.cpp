@@ -228,15 +228,15 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 
-    const char*     szMetaPath = bIsRawData ? "" : strFile.Right(strFile.length() - strRootPath.length()).c_str();
-    CIncludeManager IncludeManager(strRootPath, ExtractPath(szMetaPath));
+    SString         metaPath = bIsRawData ? SString() : strFile.Right(strFile.length() - strRootPath.length());
+    CIncludeManager IncludeManager(strRootPath, ExtractPath(metaPath));
     LPD3DXBUFFER    pBufferErrors = NULL;
     if (bIsRawData)
         m_CreateHResult =
             MyD3DXCreateEffect(m_pDevice, strFile, strFile.length(), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
     else
         m_CreateHResult =
-            MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(szMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
+            MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(metaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
 
     // Handle compile errors
     strOutStatus = "";
