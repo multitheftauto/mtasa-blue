@@ -27,7 +27,8 @@ CConnectManager::CConnectManager()
     m_bIsConnecting = false;
     m_bSave = true;
     m_tConnectStarted = 0;
-
+    m_bQuickConnect = false;
+    
     m_pOnCancelClick = new GUI_CALLBACK(&CConnectManager::Event_OnCancelClick, this);
 
     m_pServerItem = NULL;
