@@ -69,11 +69,13 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
 
     CClientEntity* const pResponsible = pPools->GetClientEntity(reinterpret_cast<DWORD*>(pResponsibleGameEntity->GetInterface()));
 
-    if (!pResponsible) {
-        if (!pGameCreator) return false;
+    if (!pResponsible)
+        if (!pGameCreator)
+            return false;
 
         CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
-        if (!pLocalPlayer || pLocalPlayer->GetGameEntity() != pGameCreator) return false;
+        if (!pLocalPlayer || pLocalPlayer->GetGameEntity() != pGameCreator)
+            return false;
 
         eWeaponType explosionWeaponType = GetWeaponTypeFromExplosionType(explosionType);
 
