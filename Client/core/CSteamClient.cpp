@@ -392,7 +392,7 @@ bool CSteamClient::Load()
         return false;
     }
 
-    WriteDebugEvent(SString("Using steamclient.dll: %s", *ToUTF8(steamClientPath.value())));
+    WriteDebugEvent(std::format("Using steamclient.dll: {}", ToUTF8(steamClientPath.value())));
     SetEnvironmentVariableW(L"SteamAppId", L"" STEAM_GTASA_APP_ID);
     pAddDllDirectory(steamDirPath.c_str());
     {
