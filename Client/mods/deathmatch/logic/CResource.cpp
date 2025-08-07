@@ -258,7 +258,7 @@ void CResource::Load()
         m_pResourceTXDRoot->SetParent(m_pResourceEntity);
     }
 
-    CLogger::LogPrintf("> Starting resource '%s'", *m_strResourceName);
+    CLogger::LogPrintf("> Starting resource '%s'\n", *m_strResourceName);
 
     // Flag resource files as readable
     for (std::list<CResourceConfigItem*>::iterator iter = m_ConfigFiles.begin(); iter != m_ConfigFiles.end(); ++iter)
