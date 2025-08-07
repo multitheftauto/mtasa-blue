@@ -26,10 +26,14 @@ public:
 
     bool Abort();
 
+    bool WasQuickConnect() const { return m_bQuickConnect; }
+
     void DoPulse();
 
     void OnServerExists();
 
+    void SetQuickConnect(bool bQuick) { m_bQuickConnect = bQuick; }
+    
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 
     static bool StaticProcessPacket(unsigned char ucPacketID, class NetBitStreamInterface& bitStream);
@@ -52,6 +56,7 @@ private:
     bool           m_bSave;
     time_t         m_tConnectStarted;
     bool           m_bHasTriedSecondConnect;
+    bool           m_bQuickConnect;
 
     GUI_CALLBACK* m_pOnCancelClick;
 
