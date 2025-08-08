@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-27 23:26+0000\n"
-"PO-Revision-Date: 2025-07-27 23:31\n"
+"POT-Creation-Date: 2025-08-01 03:08+0000\n"
+"PO-Revision-Date: 2025-08-03 10:43\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -48,16 +48,16 @@ msgstr "Problema paleidžiant MTA:SA\n\n"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/mods/deathmatch/logic/CClientGame.cpp:651
-#: Client/mods/deathmatch/logic/CClientGame.cpp:725
-#: Client/mods/deathmatch/logic/CClientGame.cpp:749
-#: Client/mods/deathmatch/logic/CClientGame.cpp:771
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1429
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
+#: Client/mods/deathmatch/logic/CClientGame.cpp:719
+#: Client/mods/deathmatch/logic/CClientGame.cpp:743
+#: Client/mods/deathmatch/logic/CClientGame.cpp:765
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1178
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1374
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1423
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1435
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
@@ -406,7 +406,7 @@ msgstr "E - Standartinis Intel"
 
 #: Client/loader/Dialogs.cpp:87
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D – Alternatyvus Intel"
 
 #: Client/loader/Dialogs.cpp:88
 msgid "If you get desperate, this might help:"
@@ -506,7 +506,7 @@ msgstr "** Žaidimas lūžo dėl grafikos tvarkyklių klaidos **\n\n"
 
 #: Client/loader/CInstallManager.cpp:441
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr ""
+msgstr "Atminties trūkumas – klaida įvyko dėl nepakankamos arba susiskaidžiusios atminties"
 
 #: Client/loader/CInstallManager.cpp:543
 msgid "Install updated MTA:SA files"
@@ -599,7 +599,9 @@ msgstr "Nežinomas"
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Failas '%s' šiuo metu užrakintas %zu procesų.\n\n"
+"Ar norite užbaigti šiuos procesus ir tęsti atnaujinimą?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -607,22 +609,28 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Jūsų diegimas gali būti sugadintas.\n\n"
+"%zu iš %zu failų nepavyko atkurti iš atsarginės kopijos.\n\n"
+"Turėtumėte iš naujo įdiegti „Multi Theft Auto“ iš www.multitheftauto.com\n"
+"arba pabandyti paleisti naujinimą su administratoriaus teisėmis."
 
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Paleiskite Grand Theft Auto: San Andreas.\n"
+"Įsitikinkite, kad žaidimas yra įrašytas į „Program Files (x86)“ aplanką."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr ""
+msgstr "Vykdoma GTA: San Andreas paieška"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Atsiprašome, žaidimas nerastas.\n"
+"Paleiskite Grand Theft Auto: San Andreas ir spustelėkite „Bandyti dar kartą“.\n"
+"Įsitikinkite, kad žaidimas įdiegtas aplanke „Program Files (x86)“."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -702,7 +710,7 @@ msgstr "Atšaukti"
 #: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3569
 #: Client/core/CCore.cpp:674 Client/mods/deathmatch/logic/CClientGame.cpp:543
 msgid "Main menu"
-msgstr ""
+msgstr "Pagrindinis meniu"
 
 #: Client/core/CMainMenu.cpp:332
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -726,7 +734,7 @@ msgstr "ATSIJUNGIMO PERSPĖJIMAS"
 
 #: Client/core/CMainMenu.cpp:1220
 msgid "INFORMATION"
-msgstr ""
+msgstr "INFORMACIJA"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
@@ -878,20 +886,20 @@ msgstr "Visada rodyti atsisiuntimo langą"
 
 #: Client/core/CSettings.cpp:404
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Įjungti ryšį su Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:409
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr ""
+msgstr "Įjungti GTA:SA žaidimo būsenos rodymą „Steam“ platformoje"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:415
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "Išsaugoti nuotraukas, padarytas fotoaparatu, į GTA San Andreas naudotojo failų aplanką"
 
 #: Client/core/CSettings.cpp:420
 msgid "Ask before disconnecting from server using main menu"
-msgstr ""
+msgstr "Paklausti patvirtinimo prieš atsijungiant nuo serverio per pagrindinį meniu"
 
 #: Client/core/CSettings.cpp:425
 msgid "Use customized GTA:SA files"
@@ -907,16 +915,16 @@ msgstr "Nepermatomumas:"
 
 #: Client/core/CSettings.cpp:458
 msgid "Image resolution:"
-msgstr ""
+msgstr "Vaizdo raiška:"
 
 #: Client/core/CSettings.cpp:465
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (Numatytoji)"
 
 #. index 0
 #: Client/core/CSettings.cpp:466
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -1181,7 +1189,7 @@ msgstr "Naudoti Javascript nutolusiuose tinklalapiuose"
 
 #: Client/core/CSettings.cpp:950
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "Įjungti vaizdo apdorojimą GPU"
 
 #: Client/core/CSettings.cpp:954
 msgid "Custom blacklist"
@@ -1336,7 +1344,7 @@ msgstr "Rodyti tinklo naršyklėje"
 #. Process affinity
 #: Client/core/CSettings.cpp:1222
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
+msgstr "Nustatyti CPU 0 branduolį, kad pagerintumėte žaidimo našumą"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1228 Client/core/CSettings.cpp:1231
@@ -1572,10 +1580,10 @@ msgid "Your nickname contains invalid characters!"
 msgstr "Jūsų slapyvardyje yra netinkamų simbolių!"
 
 #: Client/core/CSettings.cpp:3573 Client/core/CCore.cpp:674
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
-#: Client/mods/deathmatch/logic/CResource.cpp:372
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+#: Client/mods/deathmatch/logic/CResource.cpp:367
 msgid "In-game"
-msgstr ""
+msgstr "Žaidime"
 
 #: Client/core/CSettings.cpp:3913
 msgid "Red:"
@@ -1645,11 +1653,13 @@ msgstr "IŠORINIAI GARSAI"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr ""
+msgstr "Atrodo, kad turite įjungtą Rich Presence ryšio parinktį.\n"
+"Ar norite leisti serveriams dalintis savo duomenimis?\n\n"
+"Tai apima ir jūsų unikalų ID identifikatorių."
 
 #: Client/core/CSettings.cpp:4695
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
+msgstr "SUTIKIMAS LEISTI DUOMENŲ DALINIMĄSI"
 
 #: Client/core/CSettings.cpp:4719
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -1682,7 +1692,8 @@ msgstr "EKSPERIMENTINĖ FUNKCIJA"
 #: Client/core/CSettings.cpp:4822
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr ""
+msgstr "Šios parinkties išjungimas nerekomenduojamas, nebent patiriate našumo problemų.\n\n"
+"Ar tikrai norite ją išjungti?"
 
 #: Client/core/CSettings.cpp:4958
 msgid "Please enter a nickname"
@@ -1756,11 +1767,11 @@ msgstr "Pelės valdymo pataisymas - Gali prireikti paleisti kompiuterį iš nauj
 
 #: Client/core/CSettings.cpp:5001
 msgid "CPU affinity:"
-msgstr ""
+msgstr "CPU branduolis:"
 
 #: Client/core/CSettings.cpp:5001
 msgid "Only change if you're having stability issues."
-msgstr ""
+msgstr "Keiskite tik jei kyla stabilumo problemų."
 
 #. Unknown command
 #: Client/core/CCommands.cpp:223
@@ -1850,7 +1861,8 @@ msgstr "Serveris rekomenduoja atsinaujinti, bet tai nėra privaloma.\n\n"
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr ""
+msgstr "Šiuo metu atnaujinimas nėra prieinamas.\n\n"
+"Prašome patikrinti www.multitheftauto.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -1929,7 +1941,7 @@ msgstr "Jungiamasi į %s:%u ..."
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "Jungiamasi iš naujo prie %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
@@ -1938,42 +1950,42 @@ msgid "CONNECTING"
 msgstr "JUNGIAMASI"
 
 #: Client/core/CConnectManager.cpp:271
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
 msgid "Connection timed out"
 msgstr "Baigėsi prisijungimui skirtas laikas"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1391
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1385
 msgid "Disconnected: unknown protocol error"
 msgstr "Atjungta: nežinoma protokolo klaida"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1395
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
 msgid "Disconnected: disconnected remotely"
 msgstr "Atjungta: buvote atjungtas nuotoliniu būdu"
 
 #: Client/core/CConnectManager.cpp:297
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1399
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
 msgid "Disconnected: connection lost remotely"
 msgstr "Atsijungta: Nutrūko ryšys su nuotoliu"
 
 #: Client/core/CConnectManager.cpp:301
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1403
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
 msgid "Disconnected: you are banned from this server"
 msgstr "Atjungta: jūsų prisijungimas yra užblokuotas šiame serveryje"
 
 #: Client/core/CConnectManager.cpp:308
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1411
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
 msgid "Disconnected: disconnected from the server"
 msgstr "Atsijungta: atsijungta nuo serverio "
 
 #: Client/core/CConnectManager.cpp:312
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1415
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
 msgid "Disconnected: connection to the server was lost"
 msgstr "Atsijungta: ryšys su serveriu buvo prarastas"
 
 #: Client/core/CConnectManager.cpp:319
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1423
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1417
 msgid "Disconnected: connection was refused"
 msgstr "Atjungta: prisijungimas buvo atmestas"
 
@@ -2111,7 +2123,7 @@ msgstr "rodo kadrų laiko grafiką"
 
 #: Client/core/CCore.cpp:1403
 msgid "for developers: reload news"
-msgstr ""
+msgstr "skirta kūrėjams: naujienų perkrovimas"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -2124,7 +2136,7 @@ msgstr "* Šiuo metu yra %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "bandoma prisijungti: tinklas dar nėra paruoštas, palaukite truputį"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -2150,21 +2162,21 @@ msgstr "prisijungti: Nepavyko iškrauti dabartinės modifikacijos"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "bandymas prisijungti iš naujo: tinklas dar nėra paruoštas, palaukite truputį"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "bandymas prisijungti iš naujo: neteisingas prievado numeris"
 
 #: Client/core/CCommandFuncs.cpp:321
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "bandymas prisijungti iš naujo prie %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "bandymas prisijungti iš naujo prie %s:%u nepavyko!"
 
 #: Client/core/CCommandFuncs.cpp:359
 msgid "Bound all controls from GTA"
@@ -2661,7 +2673,7 @@ msgstr "Prašome naudoti mtasa:// protokolą!"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1283
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1340
 #: Client/mods/deathmatch/logic/CClientGame.cpp:651
-#: Client/mods/deathmatch/logic/CClientGame.cpp:749
+#: Client/mods/deathmatch/logic/CClientGame.cpp:743
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Netinkamas slapyvardis! Prašome eiti į nustatymus ir pasirinkti naują slapyvardį!"
 
@@ -2725,114 +2737,114 @@ msgstr "Bandoma surasti LAN serverius"
 msgid "This version has expired."
 msgstr "Versijos galiojimo laikas baigėsi."
 
-#: Client/mods/deathmatch/CClient.cpp:56
+#: Client/mods/deathmatch/CClient.cpp:57
 msgid "disconnect from the game"
 msgstr "atsijungia iš žaidimo"
 
-#: Client/mods/deathmatch/CClient.cpp:57
+#: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the nametags"
 msgstr "rodo vardų etiketes"
 
-#: Client/mods/deathmatch/CClient.cpp:58
+#: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the chatbox"
 msgstr "rodo pokalbių langą"
 
-#: Client/mods/deathmatch/CClient.cpp:59
+#: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the network statistics"
 msgstr "rodo tinklo statistikas"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:62
+#: Client/mods/deathmatch/CClient.cpp:63
 msgid "open the chat input"
 msgstr "atidaro pokalbių įvedimo langą"
 
-#: Client/mods/deathmatch/CClient.cpp:63
+#: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
 msgstr "perduoda balsą kitiems žaidėjams"
 
-#: Client/mods/deathmatch/CClient.cpp:64
+#: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
 msgstr "įlipa į tr. priemonę kaip keleivis"
 
-#: Client/mods/deathmatch/CClient.cpp:65
+#: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
 msgstr "sekantis radijo kanalas"
 
-#: Client/mods/deathmatch/CClient.cpp:66
+#: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
 msgstr "buvęs radijos kanalas"
 
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "enables the player-map view"
-msgstr ""
-
 #: Client/mods/deathmatch/CClient.cpp:68
-msgid "zooms the player-map in"
-msgstr ""
+msgid "enables the player-map view"
+msgstr "įjungia žaidėjo žemėlapio vaizdą"
 
 #: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the player-map out"
-msgstr ""
+msgid "zooms the player-map in"
+msgstr "padidina žaidėjo žemėlapio vaizdą"
 
 #: Client/mods/deathmatch/CClient.cpp:70
-msgid "moves the player-map north"
-msgstr ""
+msgid "zooms the player-map out"
+msgstr "sumažina žaidėjo žemėlapio vaizdą"
 
 #: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the player-map south"
-msgstr ""
+msgid "moves the player-map north"
+msgstr "judina žaidėjo žemėlapį į šiaurę"
 
 #: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the player-map east"
-msgstr ""
+msgid "moves the player-map south"
+msgstr "judina žaidėjo žemėlapį į pietus"
 
 #: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the player-map west"
-msgstr ""
+msgid "moves the player-map east"
+msgstr "judina žaidėjo žemėlapį į rytus"
 
 #: Client/mods/deathmatch/CClient.cpp:74
-msgid "attaches the player-map"
-msgstr ""
+msgid "moves the player-map west"
+msgstr "judina žaidėjo žemėlapį į vakarus"
 
 #: Client/mods/deathmatch/CClient.cpp:75
-msgid "reduces player-map opacity"
-msgstr ""
+msgid "attaches the player-map"
+msgstr "prisega žaidėjo žemėlapį"
 
 #: Client/mods/deathmatch/CClient.cpp:76
-msgid "increases player-map opacity"
-msgstr ""
+msgid "reduces player-map opacity"
+msgstr "sumažina žaidėjo žemėlapio skaidrumą"
 
 #: Client/mods/deathmatch/CClient.cpp:77
-msgid "toggles player-map help text"
-msgstr ""
+msgid "increases player-map opacity"
+msgstr "padidina žaidėjo žemėlapio skaidrumą"
 
 #: Client/mods/deathmatch/CClient.cpp:78
+msgid "toggles player-map help text"
+msgstr "įjungia arba išjungia žaidėjo žemėlapio pagalbos tekstą"
+
+#: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
 msgstr "išsiunčia žinutę pasirinktam žaidėjui"
 
-#: Client/mods/deathmatch/CClient.cpp:79
+#: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "pakeičia į sekantį ginklą sėdint tr. priemonėje"
 
-#: Client/mods/deathmatch/CClient.cpp:80
+#: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "pakeičia į buvusį ginklą sėdint tr. priemonėje"
 
-#: Client/mods/deathmatch/CClient.cpp:81
+#: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
 msgstr "parašo informaciją apie dabartinį serverį"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:84
+#: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
 msgstr "nustato dydžio daugiklį visiems tekstiniams rodmenims"
 
 #. Development mode
-#: Client/mods/deathmatch/CClient.cpp:91
+#: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
 msgstr "(Derinimo režimas) rodo 'colshapes'"
 
-#: Client/mods/deathmatch/CClient.cpp:92
+#: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Derinimo režimas) parašo pasaulio garsų id į derinimo langą"
 
@@ -2856,174 +2868,174 @@ msgstr "%s iš %s"
 msgid "Disconnect to cancel download"
 msgstr "Atsijunkite norėdami atšaukti siuntimą"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:506
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:499
 msgid "Disconnected: Invalid nickname"
 msgstr "Atjungta: netinkamas slapyvardis"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:510
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnect from server"
 msgstr "Atsijungta iš serverio"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:514
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr "Atjungta: Serijinis numeris užblokuotas.\n"
 "Priežastis: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr "Atjungta: Priėjimas užblokuotas.\n"
 "Priežastis: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:526
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr "Atjungta: Sąskaita užblokuota.\n"
 "Priežastis: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:531
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:524
 msgid "Disconnected: Version mismatch"
 msgstr "Atjungta: Versija nesutampa"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "Atjungta: Per daug prisijungimų. Prašome palaukti minutę ir bandyti dar kartą."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:539
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr "Atjungta: Serveris iš skirtingos šakos.\n"
 "Informacija: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr "Atjungta: Bloga versija.\n"
 "Informacija: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:549
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:542
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr "Atjungta: Serveris naudoja naujesnę versiją.\n"
 "Informacija: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:547
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr "Atjungta: Serveris naudoja senesnę versiją.\n"
 "Informacija: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:559
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:552
 msgid "Disconnected: Nick already in use"
 msgstr "Atjungta: Slapyvardis jau naudojamas"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
 msgid "Disconnected: Player element could not be created."
 msgstr "Atsijungta: nepavyko sukurti žaidėjo elemento."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:567
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "Atjungta: Serveris atmetė prisijungimą: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:572
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:565
 msgid "Disconnected: Serial verification failed"
 msgstr "Atjungta: Serijinio kodo patvirtinimas nepavyko"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "Atsijungta: serijinis numeris jau naudojamas"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "Atjungta: Prisijungimo desinchronizacija %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "Atjungta: %s išmetė jus iš serverio"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:594
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:587
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "Atjungta: %s uždraudė jums priėjimą prie serverio"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:598
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "Atjungta: Serveris išsijungė arba persikrauna"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:618
 msgid "You were kicked from the game"
 msgstr "Jūs buvote išmestas iš žaidimo"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:637
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:619
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr "Šis serveris reikalauja originalaus gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Please replace gta_sa.exe"
 msgstr "Prašome pakeisti gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr "Šis serveris neleidžia modifikuotu D3D9.DLL"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr "Pašalinkite D3D9.DLL iš GTA aplanko ir paleiskite MTA iš naujo"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 msgid "This server does not allow virtual machines"
 msgstr "Serveris neleidžia naudoti virtualių mašinų"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 msgid "This server requires driver signing to be enabled"
 msgstr "Šis serveris prašo, kad būtų ijungtas driver signing"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "Please restart your PC"
 msgstr "Iš naujo paleiskite kompiuterį"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "This server has detected missing anti-cheat components"
 msgstr "Serveris aptiko trūkstamų anti-cheat komponentų"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "Try restarting MTA"
 msgstr "Perkraukite MTA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr "Serveris prašo originalaus gta3.img ir gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Please replace gta3.img or gta_int.img"
 msgstr "Pakeiskite gta3.img arba gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:639
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server does not allow Wine"
 msgstr "Šis serveris draudžia Wine"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr "Įsitikinkite, kad jokia kita programa nemodifikuoja MTA:SA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:654
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
 msgid "Time Remaining: "
 msgstr "Liko Laiko:"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:664
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:657
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
@@ -3032,7 +3044,7 @@ msgstr[1] "%d dienos"
 msgstr[2] "%d dienų"
 msgstr[3] "%d dienos"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:666
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
@@ -3041,7 +3053,7 @@ msgstr[1] "%d valandos"
 msgstr[2] "%d valandų"
 msgstr[3] "%d valandos"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:668
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
@@ -3050,7 +3062,7 @@ msgstr[1] "%d minutės"
 msgstr[2] "%d minučių"
 msgstr[3] "%d minutės"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:670
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -3060,7 +3072,7 @@ msgstr[2] "%d minučių"
 msgstr[3] "%d sekundės"
 
 #. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:674
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
 msgid "Disconnected"
 msgstr "Atjungta"
 
@@ -3072,80 +3084,80 @@ msgstr "Atsisiuntimo klaida: %s"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "Skraidau su UFO aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Cruising around"
-msgstr ""
+msgstr "Ramiai važinėju aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Riding the waves of"
-msgstr ""
+msgstr "Plaukiu bangomis"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Riding the train in"
-msgstr ""
+msgstr "Važiuoju traukiniu į"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Flying around"
-msgstr ""
+msgstr "Skraidau aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Riding around"
-msgstr ""
+msgstr "Važinėju aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "Monstrišku džipu važinėju aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Quaddin' around"
-msgstr ""
+msgstr "Keturračiu važinėju aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "Šokinėju aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "Darau keistus dalykus"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Climbing around in"
-msgstr ""
+msgstr "Laipioju aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "Šaudau iš automobilio važiuojant"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Blub blub..."
-msgstr ""
+msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Breathing water"
-msgstr ""
+msgstr "Kvepuoju vandeniu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Drowning in"
-msgstr ""
+msgstr "Skęstu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "Slepiuosi už priedangos"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Fighting in"
-msgstr ""
+msgstr "Kovoju"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Throwing fists in"
-msgstr ""
+msgstr "Mosikuoju kumščiais"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "Šaudau kvailius"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Shooting up"
@@ -3153,113 +3165,113 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Jetpacking in"
-msgstr ""
+msgstr "Skraidau su jetpack"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Literally on fire in"
-msgstr ""
+msgstr "Literaliai užsidegęs"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Burning up in"
-msgstr ""
+msgstr "Degu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Swimming in"
-msgstr ""
+msgstr "Plaukiu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Floating around in"
-msgstr ""
+msgstr "Plūduriuoju aplink"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:402
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "Persekiojamas ryklio"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:403
 msgid "Choking to death in"
-msgstr ""
+msgstr "Dustu iki mirties"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:667
 msgid "Entering the game ..."
 msgstr "Įeinama į žaidimą ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:725
+#: Client/mods/deathmatch/logic/CClientGame.cpp:719
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "Neprisijungta; prašome naudoti Jungtis arba komandą 'connect', kad prisijungtumėte į serverį."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:771
+#: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Could not start the local server. See console for details."
 msgstr "Nepavyko paleisti vietinio serverio. Žvilgtelkite į konsolę, norėdami sužinoti detaliau."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:781
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+#: Client/mods/deathmatch/logic/CClientGame.cpp:775
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
 msgid "Local Server"
 msgstr "Vietinis Serveris"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:781
+#: Client/mods/deathmatch/logic/CClientGame.cpp:775
 msgid "Starting local server ..."
 msgstr "Paleidžiamas vietinis serveris ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1029
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1023
 msgid "Area 51"
-msgstr ""
+msgstr "51 zona"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1038
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1032
 msgid "Walking around "
-msgstr ""
+msgstr "Vaikštau aplink "
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1178
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Jūs buvote išmestas iš žaidimo ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
 msgid "Connecting to local server..."
 msgstr "Jungiamasi prie vietinio serverio..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 msgid "Error connecting to server."
 msgstr "Klaida jungiantis prie serverio."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Connecting to local server timed out. See console for details."
 msgstr "Prisijungimui prie vietinio serverio baigėsi laikas. Pažvelkite į konsolę detalėms sužinoti."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1374
 msgid "Connection with the server was lost"
 msgstr "Prisijungimas su serveriu prarastas"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1407
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
 msgid "Disconnected: the server is currently full"
 msgstr "Atjungta: serveris šiuo metu yra pilnas"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
 msgid "Disconnected: invalid password specified"
 msgstr "Atjungta: pateiktas neteisingas slaptažodis"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1435
 msgid "MTA Client verification failed!"
 msgstr "MTA kliento patvirtinimas nepavyko!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5642
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
 msgid "In a ditch"
-msgstr ""
+msgstr "Griovyje"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5642
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
 msgid "En-route to hospital"
-msgstr ""
+msgstr "Kelyje į ligoninę"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5642
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
 msgid "Meeting their maker"
-msgstr ""
+msgstr "Susitinku su savo kūrėju"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5643
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5645
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "Gailisi savo pasirinkimų"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5643
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5645
 msgid "Wasted"
-msgstr ""
+msgstr "Miriau"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
@@ -3323,11 +3335,11 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr ""
+msgstr "Seku žaidėją"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr ""
+msgstr "Laisvas judėjimas"
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1450
