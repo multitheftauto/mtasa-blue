@@ -551,12 +551,15 @@ public:
     bool SetDummyPosition(VehicleDummies dummy, const CVector& position);
     bool ResetDummyPositions();
 
-    bool SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);
+    bool SpawnFlyingComponent(const CarNodes::Enum& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);
 
     CVector GetEntryPoint(std::uint32_t entryPointIndex);
 
     bool IsOnFire() override { return m_pVehicle ? m_pVehicle->IsOnFire() : false; }
     bool SetOnFire(bool onFire) override { return m_pVehicle ? m_pVehicle->SetOnFire(onFire) : false; }
+
+    bool SetSpecialFeatureEnabled(const VehicleFeatures::Enum& feature, bool enabled);
+    bool IsSpecialFeatureEnabled(const VehicleFeatures::Enum& feature) const noexcept { return m_pVehicle ? m_pVehicle->IsSpecialFeatureEnabled(feature) : m_specialFeatures[feature]; }
 
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);
@@ -675,6 +678,8 @@ protected:
     char                                   m_cNitroCount;
     float                                  m_fWheelScale;
     std::unique_ptr<CVehicleAudioSettingsEntry> m_pSoundSettingsEntry;
+
+    std::array<bool, VehicleFeatures::Enum::MAX_FEATURES> m_specialFeatures{};
 
     bool  m_bChainEngine;
     bool  m_bIsDerailed;

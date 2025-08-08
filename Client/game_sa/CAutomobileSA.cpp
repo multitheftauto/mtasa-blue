@@ -27,7 +27,7 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
     if (nodeId < 0)
         return;
 
-    eCarNodes node = static_cast<eCarNodes>(nodeId);
+    CarNodes::Enum node = static_cast<CarNodes::Enum>(nodeId);
 
     RwFrame* frame = m_aCarNodes[nodeId];
     if (!frame)
@@ -47,7 +47,7 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
             if ((pHandlingData->uiModelFlags & 0x10000000) != 0) // check bouncePanels flag
                 return;
 
-            if (node != eCarNodes::WINDSCREEN && node != eCarNodes::WING_LF && node != eCarNodes::WING_RF)
+            if (node != CarNodes::Enum::WINDSCREEN && node != CarNodes::Enum::WING_LF && node != CarNodes::Enum::WING_RF)
             {
                 // Get free bouncing panel
                 for (auto& panel : m_panels)
@@ -86,4 +86,80 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
             break;
         }
     }
+}
+
+void CAutomobileSA::PreRender_End(CAutomobileSAInterface* vehicleInterface)
+{
+    auto* vehicle = pGame->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    if (!vehicle || !vehicle->pEntity)
+        return;
+
+    // Support for default vehicles is still in the GTA code, so we don't need to do it again
+    if (vehicleInterface->m_nModelIndex == 407 || vehicleInterface->m_nModelIndex == 601)
+        return;
+
+    // Simple turret like in fire truck
+    if (vehicle->pEntity->IsSpecialFeatureEnabled(VehicleFeatures::Enum::WATER_CANNON) && !vehicle->pEntity->IsSpecialFeatureEnabled(VehicleFeatures::Enum::TURRET))
+    {
+        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[CarNodes::MISC_A], eComponentRotationAxis::AXIS_X, vehicleInterface->m_fDoomHorizontalRotation, true);
+        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[CarNodes::MISC_A], eComponentRotationAxis::AXIS_Z, vehicleInterface->m_fDoomVerticalRotation, false);
+    }
+
+    // Turret like rhino or swat van
+    if (vehicle->pEntity->IsSpecialFeatureEnabled(VehicleFeatures::Enum::TURRET))
+    {
+        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[CarNodes::MISC_A], eComponentRotationAxis::AXIS_Z, vehicleInterface->m_fDoomVerticalRotation, true);
+        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[CarNodes::MISC_B], eComponentRotationAxis::AXIS_X, vehicleInterface->m_fDoomHorizontalRotation, true);
+    }
+}
+
+bool CAutomobileSA::HasFeatureEnabled(CAutomobileSAInterface* vehicleInterface, VehicleFeatures::Enum feature)
+{
+    auto* vehicle = pGame->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    if (!vehicle || !vehicle->pEntity) // This really shouldn't happen
+        return true;
+
+    return vehicle->pEntity->IsSpecialFeatureEnabled(feature);
+}
+
+static constexpr std::uintptr_t SKIIP_FIRE_TRUCK = 0x6B1F77;
+static constexpr std::uintptr_t CONTINUE_FIRE_TRUCK = 0x6B1F5B;
+static constexpr VehicleFeatures::Enum WATER_CANNON_ID = VehicleFeatures::Enum::WATER_CANNON;
+static void _declspec(naked) HOOK_CAutomobile_ProcessControl_FireTruckCheck()
+{
+    _asm
+    {
+        push WATER_CANNON_ID
+        push esi
+        call CAutomobileSA::HasFeatureEnabled
+        add esp, 8
+
+        test al, al
+        jz skip
+
+        jmp CONTINUE_FIRE_TRUCK
+
+        skip:
+        jmp SKIIP_FIRE_TRUCK
+    }
+}
+
+static constexpr std::uintptr_t FINISH_PRE_RENDER = 0x6ACC92;
+static void _declspec(naked) HOOK_CAutomobile_PreRender_End()
+{
+    _asm
+    {
+        push esi
+        call CAutomobileSA::PreRender_End
+        add esp, 4
+
+        lea ecx, [esp+94h]
+        jmp FINISH_PRE_RENDER
+    }
+}
+
+void CAutomobileSA::StaticSetHooks()
+{
+    HookInstall(0x6B1F4B, (DWORD)HOOK_CAutomobile_ProcessControl_FireTruckCheck, 8); // Model check in CAutomobile::ProcessControl
+    HookInstall(0x6ACC8B, (DWORD)HOOK_CAutomobile_PreRender_End, 7); // The end of the CAutomobile::PreRender function
 }
