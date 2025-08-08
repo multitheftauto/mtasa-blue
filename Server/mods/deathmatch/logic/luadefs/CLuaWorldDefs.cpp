@@ -56,6 +56,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setMinuteDuration", setMinuteDuration},
                                                                              {"setGarageOpen", setGarageOpen},
                                                                              {"setGlitchEnabled", setGlitchEnabled},
+                                                                             {"setPlayerGlitchEnabled", setPlayerGlitchEnabled},
                                                                              {"setCloudsEnabled", setCloudsEnabled},
                                                                              {"setTrafficLightState", setTrafficLightState},
                                                                              {"setTrafficLightsLocked", setTrafficLightsLocked},
@@ -92,6 +93,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              // Check
                                                                              {"isGarageOpen", isGarageOpen},
                                                                              {"isGlitchEnabled", isGlitchEnabled},
+                                                                             {"isPlayerGlitchEnabled", isPlayerGlitchEnabled},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, isWorldSpecialPropertyEnabled>},
                                                                              {"areTrafficLightsLocked", areTrafficLightsLocked}};
 
@@ -1223,6 +1225,33 @@ int CLuaWorldDefs::setGlitchEnabled(lua_State* luaVM)
     return 1;
 }
 
+int CLuaWorldDefs::setPlayerGlitchEnabled(lua_State* luaVM)
+{
+    
+    CPlayer* pPlayer;
+    SString  strGlitch;
+    bool     bEnabled;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPlayer);
+    argStream.ReadString(strGlitch);
+    argStream.ReadBool(bEnabled);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetPlayerGlitchEnabled(pPlayer, strGlitch, bEnabled))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaWorldDefs::isGlitchEnabled(lua_State* luaVM)
 {
     //  bool isGlitchEnabled ( string glitchName )
@@ -1235,6 +1264,32 @@ int CLuaWorldDefs::isGlitchEnabled(lua_State* luaVM)
     {
         bool bEnabled;
         if (CStaticFunctionDefinitions::IsGlitchEnabled(strGlitch, bEnabled))
+        {
+            lua_pushboolean(luaVM, bEnabled);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::isPlayerGlitchEnabled(lua_State* luaVM)
+{
+    //  bool isPlayerGlitchEnabled ( player thePlayer, string glitchName )
+    CPlayer* pPlayer;
+    SString  strGlitch;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPlayer);
+    argStream.ReadString(strGlitch);
+
+    if (!argStream.HasErrors())
+    {
+        bool bEnabled;
+        if (CStaticFunctionDefinitions::IsPlayerGlitchEnabled(pPlayer, strGlitch, bEnabled))
         {
             lua_pushboolean(luaVM, bEnabled);
             return 1;
