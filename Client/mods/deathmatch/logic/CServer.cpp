@@ -141,7 +141,7 @@ bool CServer::Start(const char* configFileName)
 
     PROCESS_INFORMATION processInfo{};
 
-    if (!CreateProcessW(*FromUTF8(serverExePath), const_cast<wchar_t*>(*FromUTF8(commandLine)), nullptr, nullptr, TRUE,
+    if (!CreateProcessW(FromUTF8(serverExePath).c_str(), const_cast<wchar_t*>(FromUTF8(commandLine).c_str()), nullptr, nullptr, TRUE,
                         CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT, nullptr, nullptr, &startupInfo, &processInfo))
     {
         g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to create process\n", GetLastError());

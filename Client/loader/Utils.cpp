@@ -569,7 +569,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
     if (strlen(pathList[0].c_str()))
     {
         // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-        if (strchr(pathList[0].c_str(), '?') > 0)
+        if (strchr(pathList[0].c_str(), '?') != nullptr)
             return GAME_PATH_UNICODE_CHARS;
     }
 
@@ -1280,7 +1280,7 @@ bool CheckService(uint uiStage)
 int GetFileAge(const SString& strPathFilename)
 {
     WIN32_FIND_DATAW findFileData;
-    HANDLE           hFind = FindFirstFileW(FromUTF8(strPathFilename), &findFileData);
+    HANDLE           hFind = FindFirstFileW(FromUTF8(strPathFilename).c_str(), &findFileData);
     if (hFind != INVALID_HANDLE_VALUE)
     {
         FindClose(hFind);
@@ -1679,7 +1679,7 @@ void BsodDetectionPreLaunch()
     SString          strMatch = PathJoin(GetSystemWindowsPath(), "MiniDump", "*");
     SString          strMinidumpTime;
     WIN32_FIND_DATAW findData;
-    HANDLE           hFind = FindFirstFileW(FromUTF8(strMatch), &findData);
+    HANDLE           hFind = FindFirstFileW(FromUTF8(strMatch).c_str(), &findData);
     if (hFind != INVALID_HANDLE_VALUE)
     {
         do

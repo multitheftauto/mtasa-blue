@@ -152,15 +152,15 @@ public:
             if (ulPos == STRING_TYPE::npos || (uiMaxAmount > 0 && uiMaxAmount <= this->size() + 1))
             {
                 if (ulCurrentPoint <= strInput.length())
-                    push_back(&buffer[ulCurrentPoint]);
+                    this->push_back(&buffer[ulCurrentPoint]);
                 break;
             }
-            push_back(&buffer[ulCurrentPoint]);
+            this->push_back(&buffer[ulCurrentPoint]);
             buffer[ulPos] = 0;
             ulCurrentPoint = ulPos + strDelim.length();
         }
         while (this->size() < uiMinAmount)
-            push_back(&buffer[iInputLength]);
+            this->push_back(&buffer[iInputLength]);
     }
 
 protected:

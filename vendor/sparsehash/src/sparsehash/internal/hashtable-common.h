@@ -51,7 +51,7 @@ _START_GOOGLE_NAMESPACE_
 
 template <bool> struct SparsehashCompileAssert { };
 #define SPARSEHASH_COMPILE_ASSERT(expr, msg) \
-  __attribute__((unused)) typedef SparsehashCompileAssert<(bool(expr))> msg[bool(expr) ? 1 : -1]
+  [[maybe_unused]] typedef SparsehashCompileAssert<expr> msg[expr ? 1 : -1]
 
 namespace sparsehash_internal {
 
@@ -163,7 +163,7 @@ bool read_bigendian_number(INPUT* fp, IntType* value, size_t length) {
   *value = 0;
   unsigned char byte;
   // We require IntType to be unsigned or else the shifting gets all screwy.
-  SPARSEHASH_COMPILE_ASSERT(static_cast<IntType>(-1) > static_cast<IntType>(0),
+  SPARSEHASH_COMPILE_ASSERT(std::is_unsigned_v<IntType>,
                             serializing_int_requires_an_unsigned_type);
   for (size_t i = 0; i < length; ++i) {
     if (!read_data(fp, &byte, sizeof(byte))) return false;
@@ -176,7 +176,7 @@ template <typename OUTPUT, typename IntType>
 bool write_bigendian_number(OUTPUT* fp, IntType value, size_t length) {
   unsigned char byte;
   // We require IntType to be unsigned or else the shifting gets all screwy.
-  SPARSEHASH_COMPILE_ASSERT(static_cast<IntType>(-1) > static_cast<IntType>(0),
+  SPARSEHASH_COMPILE_ASSERT(std::is_unsigned_v<IntType>,
                             serializing_int_requires_an_unsigned_type);
   for (size_t i = 0; i < length; ++i) {
     byte = (sizeof(value) <= length-1 - i)

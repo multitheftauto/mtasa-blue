@@ -2301,7 +2301,7 @@ void CKeyBinds::BindCommand(const char* szCmdLine)
 {
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
-    char* szError = "* Syntax: bind <defaults/key> [<up/down>] <command> [<arguments>]";
+    const char* szError = "* Syntax: bind <defaults/key> [<up/down>] <command> [<arguments>]";
     if (szCmdLine == NULL)
     {
         pConsole->Print(szError);
@@ -2384,7 +2384,7 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
 {
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
-    char* szError = "* Syntax: unbind <all/key> [<up/down/both> <command>]";
+    const char* szError = "* Syntax: unbind <all/key> [<up/down/both> <command>]";
     if (szCmdLine == NULL)
     {
         pConsole->Print(szError);

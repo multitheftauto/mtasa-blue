@@ -449,7 +449,7 @@ bool SharedUtil::IsHotFixInstalled(const SString& strHotFixId)
 bool SharedUtil::GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo)
 {
     DWORD dwHandle, dwLen;
-    dwLen = GetFileVersionInfoSizeW(FromUTF8(strLibName), &dwHandle);
+    dwLen = GetFileVersionInfoSizeW(FromUTF8(strLibName).c_str(), &dwHandle);
     if (!dwLen)
         return FALSE;
 
@@ -458,7 +458,7 @@ bool SharedUtil::GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* p
         return FALSE;
 
     SetLastError(0);
-    if (!GetFileVersionInfoW(FromUTF8(strLibName), dwHandle, dwLen, lpData))
+    if (!GetFileVersionInfoW(FromUTF8(strLibName).c_str(), dwHandle, dwLen, lpData))
     {
         free(lpData);
         return FALSE;
