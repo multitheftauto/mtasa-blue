@@ -56,6 +56,11 @@ enum eHudComponent
     HUD_WANTED,
     HUD_CROSSHAIR,
     HUD_ALL,
+    HUD_VITAL_STATS,    // Unused on server, but used on client side
+    HUD_HELP_TEXT,      // Unused on server, but used on client side
+    HUD_RADAR_MAP,
+    HUD_RADAR_BLIPS,
+    HUD_RADAR_ALTIMETER,
 };
 DECLARE_ENUM(eHudComponent);
 
