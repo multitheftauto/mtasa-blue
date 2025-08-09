@@ -32,7 +32,7 @@ public:
 
     void OnServerExists();
 
-    void SetQuickConnect(bool bQuick) noexcept { m_quickConnect = bQuick; }
+    void SetQuickConnect(bool quick) noexcept { m_quickConnect = quick; }
     
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 
