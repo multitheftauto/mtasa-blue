@@ -82,6 +82,7 @@ enum eMovementState
     MOVEMENTSTATE_ASCENT_JETPACK,             // Ascending with jetpack
     MOVEMENTSTATE_DESCENT_JETPACK,            // Descending with jetpack
     MOVEMENTSTATE_JETPACK,                    // Jetpack flying
+    MOVEMENTSTATE_HANGING,                    // Hanging from the whall during climbing task
 };
 
 enum eDeathAnims
