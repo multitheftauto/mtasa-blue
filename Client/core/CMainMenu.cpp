@@ -848,10 +848,11 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
                     AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
                     return true;
                 }
+
+            break;
             case MENU_ITEM_QUICK_CONNECT:
                 AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
                 return true;
-                break;
             default:
                 break;
         }
