@@ -421,6 +421,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pASE);
     SAFE_RELEASE(m_pHqComms);
     CSimControl::Shutdown();
+    CThreadPool::getDefaultThreadPool().shutdown();
 
     // Clear our global pointer
     g_pGame = NULL;
