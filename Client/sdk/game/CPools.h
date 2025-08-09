@@ -20,6 +20,7 @@
 class CClientEntity;
 class CEntity;
 class CEntitySAInterface;
+class CObjectSAInterface;
 class CObject;
 class CObjectSA;
 class CPed;
@@ -113,4 +114,6 @@ public:
     virtual CDummyPool&     GetDummyPool() noexcept = 0;
     virtual CTxdPool&       GetTxdPool() noexcept = 0;
     virtual CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept = 0;
+
+    virtual std::uint16_t GetObjectHandle(CObjectSAInterface* object) const = 0;
 };

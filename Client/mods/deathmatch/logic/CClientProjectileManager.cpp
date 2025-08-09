@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CClientProjectileManager.cpp
@@ -9,14 +9,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/CProjectileInfo.h"
 
 using std::list;
 
 CClientProjectileManager* g_pProjectileManager = NULL;
 
-/* This class is used to manage/control projectiles created from game-layer hooks.
-   Projectile creation should eventually be server-requested.
-*/
 CClientProjectileManager::CClientProjectileManager(CClientManager* pManager)
 {
     CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientProjectileManager"), &m_pCreator, &m_pLastCreated, NULL);
@@ -81,17 +79,19 @@ bool CClientProjectileManager::Exists(CClientProjectile* pProjectile)
     return false;
 }
 
-CClientProjectile* CClientProjectileManager::Get(CEntitySAInterface* pProjectile)
+CClientProjectile* CClientProjectileManager::Get(CEntitySAInterface* projectileObject)
 {
     int iCount = m_List.size();
-    assert(iCount <= 32);
+    //assert(iCount <= 32);
     list<CClientProjectile*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)
     {
-        if ((*iter)->GetGameEntity()->GetInterface() == pProjectile)
-        {
+        CEntity* projectile = (*iter)->GetGameEntity();
+        if (!projectile)
+            continue;
+
+        if (projectile->GetInterface() == projectileObject)
             return (*iter);
-        }
     }
     return NULL;
 }
@@ -101,75 +101,58 @@ void CClientProjectileManager::RemoveFromList(CClientProjectile* pProjectile)
     m_List.remove(pProjectile);
 }
 
-bool CClientProjectileManager::Hook_StaticProjectileAllow(CEntity* pGameCreator, eWeaponType weaponType, CVector* origin, float fForce, CVector* target,
-                                                          CEntity* targetEntity)
-{
-    return g_pProjectileManager->Hook_ProjectileAllow(pGameCreator, weaponType, origin, fForce, target, targetEntity);
-}
-
-bool CClientProjectileManager::Hook_ProjectileAllow(CEntity* pGameCreator, eWeaponType weaponType, CVector* origin, float fForce, CVector* target,
-                                                    CEntity* targetEntity)
-{
-    // Called before projectile creation, we need to decide to allow or cancel it here
-
-    // Is this a local projectile?
-    CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
-
-    CPools* pPools = g_pGame->GetPools();
-
-    // Store the creator/local variables for the next stage
-    m_pCreator = pGameCreator ? pPools->GetClientEntity((DWORD*)pGameCreator->GetInterface()) : nullptr;
-    m_bIsLocal = (m_pCreator == pLocalPlayer || (pLocalPlayer->GetOccupiedVehicleSeat() == 0 && m_pCreator == pLocalPlayer->GetOccupiedVehicle()));
-
-    return (m_bCreating || m_bIsLocal);
-}
-
-void CClientProjectileManager::Hook_StaticProjectileCreation(CEntity* pGameCreator, CProjectile* pGameProjectile, CProjectileInfo* pProjectileInfo,
+bool CClientProjectileManager::Hook_StaticProjectileCreation(CEntity* pGameCreator, CProjectile* pGameProjectile, CProjectileInfo* pProjectileInfo,
                                                              eWeaponType weaponType, CVector* origin, float fForce, CVector* target, CEntity* pGameTarget)
 {
-    g_pProjectileManager->Hook_ProjectileCreation(pGameCreator, pGameProjectile, pProjectileInfo, weaponType, origin, fForce, target, pGameTarget);
+    return g_pProjectileManager->Hook_ProjectileCreation(pGameCreator, pGameProjectile, pProjectileInfo, weaponType, origin, fForce, target, pGameTarget);
 }
 
-void CClientProjectileManager::Hook_ProjectileCreation(CEntity* pGameCreator, CProjectile* pGameProjectile, CProjectileInfo* pProjectileInfo,
+bool CClientProjectileManager::Hook_ProjectileCreation(CEntity* pGameCreator, CProjectile* pGameProjectile, CProjectileInfo* pProjectileInfo,
                                                        eWeaponType weaponType, CVector* origin, float fForce, CVector* target, CEntity* pGameTarget)
 {
-    // Called on projectile construction (projectile doesn't actually exist until the next frame)
-    /* Projectiles:
-    WEAPONTYPE_GRENADE, WEAPONTYPE_TEARGAS, WEAPONTYPE_MOLOTOV,
-    WEAPONTYPE_REMOTE_SATCHEL_CHARGE, WEAPONTYPE_ROCKET, WEAPONTYPE_ROCKET_HS,
-    WEAPONTYPE_FLARE, WEAPONTYPE_FREEFALL_BOMB */
-
     CPools*        pPools = g_pGame->GetPools();
     CClientEntity* pTarget = pGameTarget ? pPools->GetClientEntity((DWORD*)pGameTarget->GetInterface()) : nullptr;
-    m_pLastCreated = new CClientProjectile(m_pManager, pGameProjectile, pProjectileInfo, m_pCreator, pTarget, weaponType, origin, target, fForce, m_bIsLocal);
+    CClientEntity* creator = pGameCreator ? pPools->GetClientEntity((DWORD*)pGameCreator->GetInterface()) : nullptr;
+
+    CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
+    m_bIsLocal = (creator == pLocalPlayer || (pLocalPlayer->GetOccupiedVehicleSeat() == 0 && creator == pLocalPlayer->GetOccupiedVehicle()));
+
+    m_pLastCreated = new CClientProjectile(m_pManager, pGameProjectile, pProjectileInfo, creator, pTarget, weaponType, origin, target, fForce, m_bIsLocal);
+
+    // Validate the projectile for our element tree
+    m_pLastCreated->SetParent(g_pClientGame->GetRootEntity());
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(creator);
+    Arguments.PushNumber(weaponType);
+    Arguments.PushNumber(origin->fX);
+    Arguments.PushNumber(origin->fY);
+    Arguments.PushNumber(origin->fZ);
+    Arguments.PushNumber(fForce);
+    Arguments.PushNumber(target ? target->fX : 0);
+    Arguments.PushNumber(target ? target->fY : 0);
+    Arguments.PushNumber(target ? target->fZ : 0);
+    if (pTarget)
+        Arguments.PushElement(pTarget);
+    else
+        Arguments.PushNil();
+
+    bool continueCreation = m_pLastCreated->CallEvent("onClientProjectileCreation", Arguments, true);
+    if (!continueCreation)
+        m_pLastCreated->Destroy(false);
+
+    return continueCreation;
 }
 
-CClientProjectile* CClientProjectileManager::Create(CClientEntity* pCreator, eWeaponType eWeapon, CVector& vecOrigin, float fForce, CVector* target,
-                                                    CClientEntity* pTargetEntity)
+CClientProjectile* CClientProjectileManager::Create(CClientEntity* creator, eWeaponType weapon, CVector& origin, float force, CVector* target, CClientEntity* targetEntity)
 {
-    m_bCreating = true;
-    m_pLastCreated = NULL;
-    CEntity* pGameCreator = pCreator->GetGameEntity();
-    CEntity* pGameTargetEntity = NULL;
-    if (pTargetEntity)
-        pGameTargetEntity = pTargetEntity->GetGameEntity();
-    if (pGameCreator)
-    {
-        // Peds and players
-        if (pCreator->GetType() == CCLIENTPED || pCreator->GetType() == CCLIENTPLAYER)
-        {
-            CPed* pPed = dynamic_cast<CPed*>(pGameCreator);
-            if (pPed)
-                pPed->AddProjectile(eWeapon, vecOrigin, fForce, target, pGameTargetEntity);
-        }
-        // Vehicles
-        else if (pCreator->GetType() == CCLIENTVEHICLE)
-        {
-            CVehicle* pVehicle = dynamic_cast<CVehicle*>(pGameCreator);
-            if (pVehicle)
-                pVehicle->AddProjectile(eWeapon, vecOrigin, fForce, target, pGameTargetEntity);
-        }
-    }
-    m_bCreating = false;
+    CEntity* creatorGameEntity = creator->GetGameEntity();
+    if (!creatorGameEntity)
+        return nullptr;
+
+    CProjectileInfo* gameProjectile = g_pGame->GetProjectileInfo()->AddProjectile(creatorGameEntity, weapon, origin, force, target, targetEntity ? targetEntity->GetGameEntity() : nullptr);
+    if (!gameProjectile)
+        return nullptr;
+
     return m_pLastCreated;
 }

@@ -100,8 +100,8 @@ CClientProjectile::~CClientProjectile()
     if (m_pProjectile)
     {
         // Make sure we're destroyed
-        delete m_pProjectile;
 
+        //m_pProjectile->Destroy(true);
         m_pProjectile = NULL;
     }
 
@@ -118,7 +118,7 @@ void CClientProjectile::Unlink()
         if (m_pProjectile)
         {
             // Make sure we're destroyed
-            delete m_pProjectile;
+            //m_pProjectile->Destroy(true);
 
             m_pProjectile = NULL;
         }
@@ -127,59 +127,26 @@ void CClientProjectile::Unlink()
 
 void CClientProjectile::DoPulse()
 {
-    // We use initiate data to set values on creation (as it doesn't exist until a frame after our projectile hook)
-    if (m_bInitiate)
-    {
-        if (m_pInitiateData)
-        {
-            if (m_pInitiateData->pvecPosition)
-                SetPosition(*m_pInitiateData->pvecPosition);
-            if (m_pInitiateData->pvecRotation)
-                SetRotationRadians(*m_pInitiateData->pvecRotation);
-            if (m_pInitiateData->pvecVelocity)
-                SetVelocity(*m_pInitiateData->pvecVelocity);
-            if (m_pInitiateData->usModel)
-                SetModel(m_pInitiateData->usModel);
-        }
-
-        // Handle net sync and script event
-        g_pClientGame->ProjectileInitiateHandler(this);
-
-        m_bInitiate = false;
-    }
-
     // Update our position/rotation if we're attached
     DoAttaching();
 
     if (m_bCorrected == false && m_pProjectile != NULL && GetWeaponType() == eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
-    {
         m_bCorrected = m_pProjectile->CorrectPhysics();
-    }
 }
 
 void CClientProjectile::Initiate(CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel)
 {
-    dassert(!m_pInitiateData);
-
-    // Store our initiation data
-    m_pInitiateData = new CProjectileInitiateData;
-    m_pInitiateData->pvecPosition = new CVector(vecPosition);
+    SetPosition(vecPosition);
 
     if (vecRotation != CVector(0, 0, 0))
-    {
-        m_pInitiateData->pvecRotation = new CVector(vecRotation);
-    }
-    else
-    {
-        m_pInitiateData->pvecRotation = NULL;
-    }
+        SetRotationRadians(vecRotation);
 
     if (vecVelocity != CVector(0, 0, 0))
-        m_pInitiateData->pvecVelocity = new CVector(vecVelocity);
-    else
-        m_pInitiateData->pvecVelocity = NULL;
+        SetVelocity(vecVelocity);
 
-    m_pInitiateData->usModel = usModel;
+    SetModel(usModel);
+
+    g_pClientGame->ProjectileInitiateHandler(this);
 }
 
 void CClientProjectile::Destroy(bool bBlow)
@@ -187,6 +154,7 @@ void CClientProjectile::Destroy(bool bBlow)
     if (m_pProjectile)
     {
         m_pProjectile->Destroy(bBlow);
+        m_pProjectile = nullptr;
     }
 }
 

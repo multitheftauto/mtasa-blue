@@ -28,7 +28,7 @@ class CTaskManager;
 class CVehicle;
 class CWeapon;
 class CWeaponStat;
-class CProjectileSAInterface;
+class CProjectile;
 
 enum ePedPieceTypes
 {
@@ -175,11 +175,11 @@ enum class EPedWeaponAudioEventType
 
 struct SSatchelsData
 {
-    CProjectileSAInterface* pProjectileInterface;
+    CProjectile*            pProjectileInterface;
     CVector*                vecAttachedOffsets;
     CVector*                vecAttachedRotation;
 
-    SSatchelsData(CProjectileSAInterface* proj, CVector* offset, CVector* rotation) : pProjectileInterface(proj), vecAttachedOffsets(offset), vecAttachedRotation(rotation) {}
+    SSatchelsData(CProjectile* proj, CVector* offset, CVector* rotation) : pProjectileInterface(proj), vecAttachedOffsets(offset), vecAttachedRotation(rotation) {}
 };
 
 inline bool IsValidMoveAnim(std::uint32_t iMoveAnim) noexcept
@@ -211,7 +211,6 @@ public:
     virtual float GetOxygenLevel() const = 0;
     virtual void  SetOxygenLevel(float oxygen) = 0;
 
-    virtual bool     AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity) = 0;
     virtual CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill weaponSkill) = 0;
     virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) const noexcept = 0;
     virtual CWeapon* GetWeapon(eWeaponType weaponType) const = 0;

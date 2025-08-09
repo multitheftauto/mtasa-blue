@@ -374,7 +374,6 @@ public:
     float GetOxygenLevel() const override;
     void  SetOxygenLevel(float oxygen) override;
 
-    bool     AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity) override;
     CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill skill) override;
     CWeapon* GetWeapon(eWeaponSlot weaponSlot) const noexcept override;
     CWeapon* GetWeapon(eWeaponType weaponType) const override;
