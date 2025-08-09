@@ -19,8 +19,6 @@
 
 class CBuildingManager;
 
-#define SERVERSIDE_BUILDING_MIN_CLIENT_VERSION "1.6.0-9.22824"
-
 class CBuilding final : public CElement
 {
     friend class CPlayer;

@@ -427,6 +427,19 @@ void CCommandFuncs::Test(const char* szParameters)
             }
         }
     }
+#if defined(MTA_DEBUG) || MTASA_VERSION_TYPE == VERSION_TYPE_CUSTOM
+    else if (SStringX(szParameters) == "bad_alloc")
+    {
+        if (FileExists(CalcMTASAPath("debug.txt")))
+        {
+            while (true)
+            {
+                new int[100 * 1024 * 1024]();
+                g_pCore->GetConsole()->Print("Allocated 100 MiB");
+            }
+        }
+    }
+#endif
 }
 
 void CCommandFuncs::Serial(const char* szParameters)

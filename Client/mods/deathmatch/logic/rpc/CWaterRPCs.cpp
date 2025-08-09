@@ -32,11 +32,8 @@ void CWaterRPCs::SetWorldWaterLevel(NetBitStreamInterface& bitStream)
 
     if (bitStream.Read(fLevel) && bitStream.ReadBit(bIncludeWorldNonSeaLevel))
     {
-        if (bitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideWorldLevel))
-        {
-            bitStream.ReadBit(bIncludeWorldSeaLevel);
-            bitStream.ReadBit(bIncludeOutsideWorldLevel);
-        }
+        bitStream.ReadBit(bIncludeWorldSeaLevel);
+        bitStream.ReadBit(bIncludeOutsideWorldLevel);
         m_pWaterManager->SetWorldWaterLevel(fLevel, nullptr, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
     }
 }

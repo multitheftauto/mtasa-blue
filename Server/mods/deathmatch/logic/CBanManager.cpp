@@ -141,34 +141,6 @@ CBan* CBanManager::AddSerialBan(const SString& strSerial, CClient* pBanner, cons
     return NULL;
 }
 
-CBan* CBanManager::AddAccountBan(CPlayer* pPlayer, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban)
-{
-    if (pPlayer)
-    {
-        if (!pPlayer->GetSerialUser().empty() && !IsAccountBanned(pPlayer->GetSerialUser().c_str()))
-        {
-            CBan* pBan = AddBan(pBanner->GetNick(), strReason, tTimeOfUnban);
-            pBan->SetNick(pPlayer->GetNick());
-            pBan->SetAccount(pPlayer->GetSerialUser());
-            return pBan;
-        }
-    }
-
-    return NULL;
-}
-
-CBan* CBanManager::AddAccountBan(const SString& strAccount, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban)
-{
-    if (!IsAccountBanned(strAccount.c_str()))
-    {
-        CBan* pBan = AddBan(pBanner->GetNick(), strReason, tTimeOfUnban);
-        pBan->SetSerial(strAccount);
-        return pBan;
-    }
-
-    return NULL;
-}
-
 CBan* CBanManager::AddBan(const SString& strBanner, const SString& strReason, time_t tTimeOfUnban)
 {
     // Create the ban and assign its values
@@ -221,34 +193,6 @@ bool CBanManager::IsSerialBanned(const char* szSerial)
     }
 
     return false;
-}
-
-bool CBanManager::IsAccountBanned(const char* szAccount)
-{
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
-    {
-        if ((*iter)->GetAccount() == szAccount)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-CBan* CBanManager::GetBanFromAccount(const char* szAccount)
-{
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
-    {
-        if ((*iter)->GetAccount() == szAccount)
-        {
-            return (*iter);
-        }
-    }
-
-    return NULL;
 }
 
 void CBanManager::RemoveBan(CBan* pBan)
@@ -388,15 +332,14 @@ bool CBanManager::LoadBanList()
         {
             if (pNode->GetTagName().compare("ban") == 0)
             {
-                std::string strIP = SafeGetValue(pNode, "ip"), strSerial = SafeGetValue(pNode, "serial"), strAccount = SafeGetValue(pNode, "account");
-                if (!strIP.empty() || !strSerial.empty() || !strAccount.empty())
+                std::string strIP = SafeGetValue(pNode, "ip"), strSerial = SafeGetValue(pNode, "serial");
+                if (!strIP.empty() || !strSerial.empty())
                 {
                     CBan* pBan = AddBan();
                     if (IsValidIP(strIP.c_str()))
                     {
                         pBan->SetIP(strIP);
                     }
-                    pBan->SetAccount(strAccount);
                     pBan->SetSerial(strSerial);
                     pBan->SetBanner(SafeGetValue(pNode, "banner"));
                     pBan->SetNick(SafeGetValue(pNode, "nick"));
@@ -466,7 +409,6 @@ void CBanManager::SaveBanList()
                     SafeSetValue(pNode, "nick", (*iter)->GetNick());
                     SafeSetValue(pNode, "ip", (*iter)->GetIP());
                     SafeSetValue(pNode, "serial", (*iter)->GetSerial());
-                    SafeSetValue(pNode, "account", (*iter)->GetAccount());
                     SafeSetValue(pNode, "banner", (*iter)->GetBanner());
                     SafeSetValue(pNode, "reason", (*iter)->GetReason());
                     SafeSetValue(pNode, "time", (unsigned int)(*iter)->GetTimeOfBan());
