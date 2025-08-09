@@ -56,7 +56,6 @@ private:
     bool           m_bSave;
     time_t         m_tConnectStarted;
     bool           m_bHasTriedSecondConnect;
-    bool           m_quickConnect;
 
     GUI_CALLBACK* m_pOnCancelClick;
 
@@ -64,4 +63,5 @@ private:
     bool             m_bNotifyServerBrowser;
 
     bool CheckNickProvided(const char* szNick);
+    bool m_quickConnect{false};
 };
