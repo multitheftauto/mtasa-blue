@@ -26,13 +26,13 @@ public:
 
     bool Abort();
 
-    bool WasQuickConnect() const { return m_bQuickConnect; }
+    bool WasQuickConnect() const noexcept { return m_quickConnect; }
 
     void DoPulse();
 
     void OnServerExists();
 
-    void SetQuickConnect(bool bQuick) { m_bQuickConnect = bQuick; }
+    void SetQuickConnect(bool bQuick) noexcept { m_quickConnect = bQuick; }
     
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 
@@ -56,7 +56,7 @@ private:
     bool           m_bSave;
     time_t         m_tConnectStarted;
     bool           m_bHasTriedSecondConnect;
-    bool           m_bQuickConnect;
+    bool           m_quickConnect;
 
     GUI_CALLBACK* m_pOnCancelClick;
 
