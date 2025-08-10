@@ -15,6 +15,9 @@
 
 extern CGameSA* pGame;
 
+using namespace CarNodes;
+using namespace VehicleFeatures;
+
 CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* pInterface)
 {
     SetInterface(pInterface);
@@ -47,7 +50,7 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
             if ((pHandlingData->uiModelFlags & 0x10000000) != 0) // check bouncePanels flag
                 return;
 
-            if (node != CarNodes::Enum::WINDSCREEN && node != CarNodes::Enum::WING_LF && node != CarNodes::Enum::WING_RF)
+            if (node != WINDSCREEN && node != WING_LF && node != WING_RF)
             {
                 // Get free bouncing panel
                 for (auto& panel : m_panels)
@@ -99,17 +102,17 @@ void CAutomobileSA::PreRender_End(CAutomobileSAInterface* vehicleInterface)
         return;
 
     // Simple turret like in fire truck
-    if (vehicle->pEntity->IsSpecialFeatureEnabled(VehicleFeatures::Enum::WATER_CANNON) && !vehicle->pEntity->IsSpecialFeatureEnabled(VehicleFeatures::Enum::TURRET))
+    if (vehicle->pEntity->IsSpecialFeatureEnabled(WATER_CANNON) && !vehicle->pEntity->IsSpecialFeatureEnabled(TURRET))
     {
-        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[CarNodes::MISC_A], eComponentRotationAxis::AXIS_X, vehicleInterface->m_fDoomHorizontalRotation, true);
-        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[CarNodes::MISC_A], eComponentRotationAxis::AXIS_Z, vehicleInterface->m_fDoomVerticalRotation, false);
+        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[MISC_A], eComponentRotationAxis::AXIS_X, vehicleInterface->m_fDoomHorizontalRotation, true);
+        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[MISC_A], eComponentRotationAxis::AXIS_Z, vehicleInterface->m_fDoomVerticalRotation, false);
     }
 
     // Turret like rhino or swat van
-    if (vehicle->pEntity->IsSpecialFeatureEnabled(VehicleFeatures::Enum::TURRET))
+    if (vehicle->pEntity->IsSpecialFeatureEnabled(TURRET))
     {
-        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[CarNodes::MISC_A], eComponentRotationAxis::AXIS_Z, vehicleInterface->m_fDoomVerticalRotation, true);
-        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[CarNodes::MISC_B], eComponentRotationAxis::AXIS_X, vehicleInterface->m_fDoomHorizontalRotation, true);
+        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[MISC_A], eComponentRotationAxis::AXIS_Z, vehicleInterface->m_fDoomVerticalRotation, true);
+        CVehicleSA::SetComponentRotation(vehicleInterface->m_aCarNodes[MISC_B], eComponentRotationAxis::AXIS_X, vehicleInterface->m_fDoomHorizontalRotation, true);
     }
 }
 
@@ -124,12 +127,11 @@ bool CAutomobileSA::HasFeatureEnabled(CAutomobileSAInterface* vehicleInterface, 
 
 static constexpr std::uintptr_t SKIIP_FIRE_TRUCK = 0x6B1F77;
 static constexpr std::uintptr_t CONTINUE_FIRE_TRUCK = 0x6B1F5B;
-static constexpr VehicleFeatures::Enum WATER_CANNON_ID = VehicleFeatures::Enum::WATER_CANNON;
 static void _declspec(naked) HOOK_CAutomobile_ProcessControl_FireTruckCheck()
 {
     _asm
     {
-        push WATER_CANNON_ID
+        push WATER_CANNON
         push esi
         call CAutomobileSA::HasFeatureEnabled
         add esp, 8

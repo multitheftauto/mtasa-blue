@@ -323,8 +323,8 @@ public:
 
     bool SetBuildingPoolSize(size_t size);
 
-    bool SetVehicleModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature, bool enabled) override { return CVehicleSA::SetModelSpecialFeatureEnabled(model, feature, enabled); };
-    bool IsVehicleModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature) const override { return CVehicleSA::IsModelSpecialFeatureEnabled(model, feature); };
+    bool SetVehicleModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature, bool enabled) override { return CVehicleSA::SetModelSpecialFeatureEnabled(model, feature, enabled); };
+    bool IsVehicleModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature) const override { return CVehicleSA::IsModelSpecialFeatureEnabled(model, feature); };
 
     ModelFeaturesArray GetModelSpecialFeatures(std::uint16_t model) const noexcept override { return CVehicleSA::GetModelSpecialFeatures(model); }
 

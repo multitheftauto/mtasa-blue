@@ -338,6 +338,6 @@ public:
 
     virtual void SetSpecialFeaturesEnabled(const ModelFeaturesArray& features) noexcept = 0;
 
-    virtual bool SetSpecialFeatureEnabled(const VehicleFeatures::Enum& feature, bool enabled) = 0;
-    virtual bool IsSpecialFeatureEnabled(const VehicleFeatures::Enum& feature) const noexcept = 0;
+    virtual bool SetSpecialFeatureEnabled(VehicleFeatures::Enum feature, bool enabled) = 0;
+    virtual bool IsSpecialFeatureEnabled(VehicleFeatures::Enum feature) const noexcept = 0;
 };

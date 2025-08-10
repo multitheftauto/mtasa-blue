@@ -2422,7 +2422,7 @@ void CVehicleSA::ReinitAudio()
         audioInterface->SoundJoin();
 }
 
-bool CVehicleSA::SetSpecialFeatureEnabled(const VehicleFeatures::Enum& feature, bool enabled)
+bool CVehicleSA::SetSpecialFeatureEnabled(VehicleFeatures::Enum feature, bool enabled)
 {
     CVehicleSAInterface* vehicleInterface = GetVehicleInterface();
 
@@ -2443,21 +2443,23 @@ bool CVehicleSA::SetSpecialFeatureEnabled(const VehicleFeatures::Enum& feature, 
     return true;
 }
 
-bool CVehicleSA::SetModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature, bool enabled)
+bool CVehicleSA::SetModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature, bool enabled)
 {
     CModelInfo* modelInfo = pGame->GetModelInfo(model);
     if (!modelInfo)
         return false;
 
     if (feature == VehicleFeatures::Enum::WATER_CANNON)
+    {
         if (static_cast<VehicleClass>(modelInfo->GetVehicleType()) != VehicleClass::AUTOMOBILE)
             return false;
+    }
 
     m_modelSpecialFeatures[model][feature] = enabled;
     return true;
 }
 
-bool CVehicleSA::IsModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature)
+bool CVehicleSA::IsModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature)
 {
     auto it = m_modelSpecialFeatures.find(model);
     return it == m_modelSpecialFeatures.end() ? false : it->second[feature];

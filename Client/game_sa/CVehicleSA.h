@@ -730,11 +730,11 @@ public:
 
     void SetSpecialFeaturesEnabled(const ModelFeaturesArray& features) noexcept { m_specialFeatures = features; }
 
-    bool SetSpecialFeatureEnabled(const VehicleFeatures::Enum& feature, bool enabled) override;
-    bool IsSpecialFeatureEnabled(const VehicleFeatures::Enum& feature) const noexcept override { return m_specialFeatures[feature]; }
+    bool SetSpecialFeatureEnabled(VehicleFeatures::Enum feature, bool enabled) override;
+    bool IsSpecialFeatureEnabled(VehicleFeatures::Enum feature) const noexcept override { return m_specialFeatures[feature]; }
 
-    static bool SetModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature, bool enabled);
-    static bool IsModelSpecialFeatureEnabled(std::uint16_t model, const VehicleFeatures::Enum& feature);
+    static bool SetModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature, bool enabled);
+    static bool IsModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature);
 
     static ModelFeaturesArray GetModelSpecialFeatures(std::uint16_t model);
 
