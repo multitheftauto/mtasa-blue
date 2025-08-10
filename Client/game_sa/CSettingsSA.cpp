@@ -525,18 +525,24 @@ float CSettingsSA::GetFieldOfViewVehicleMax()
 float CSettingsSA::GetFieldOfViewAiming()
 {
     CCamera* camera = pGame->GetCamera();
-    CCam*    cam = camera->GetCam(camera->GetActiveCam());
-    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+    assert(camera);
 
+    CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    assert(cam);
+
+    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
     return (cameraViewMode == MODE_AIMWEAPON || cameraViewMode == MODE_AIMWEAPON_FROMCAR || cameraViewMode == MODE_AIMWEAPON_ATTACHED) ? cam->GetFOV() : ms_fovAiming;
 }
 
 float CSettingsSA::GetFieldOfViewSniperAiming()
 {
     CCamera* camera = pGame->GetCamera();
-    CCam*    cam = camera->GetCam(camera->GetActiveCam());
-    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+    assert(camera);
 
+    CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    assert(cam);
+
+    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
     return (cameraViewMode == MODE_SNIPER) ? cam->GetFOV() : ms_fovSniperAiming;
 }
 
@@ -719,7 +725,11 @@ bool CSettingsSA::SetFieldOfViewAiming(float angle, bool fromScript)
         return false;
 
     CCamera* camera = pGame->GetCamera();
+    assert(camera);
+
     CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    assert(cam);
+
     eCamMode cameraViewMode = static_cast<eCamMode>(cam->GetMode());
 
     if (cameraViewMode != MODE_AIMWEAPON && cameraViewMode != MODE_AIMWEAPON_FROMCAR && cameraViewMode != MODE_AIMWEAPON_ATTACHED)
@@ -738,7 +748,11 @@ bool CSettingsSA::SetFieldOfViewSniperAiming(float angle, bool fromScript)
         return false;
 
     CCamera* camera = pGame->GetCamera();
+    assert(camera);
+
     CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    assert(cam);
+
     eCamMode cameraViewMode = static_cast<eCamMode>(cam->GetMode());
 
     if (!ms_fovSniperAimingFromScript && fromScript)
@@ -776,7 +790,11 @@ bool CSettingsSA::SetFieldOfView1stPersonAiming(float angle, bool fromScript)
         return false;
 
     CCamera* camera = pGame->GetCamera();
+    assert(camera);
+
     CCam*    cam = camera->GetCam(camera->GetActiveCam());
+    assert(cam);
+
     eCamMode cameraViewMode = static_cast<eCamMode>(cam->GetMode());
 
     if (!ms_fov1stPersonAimingFromScript && fromScript)
