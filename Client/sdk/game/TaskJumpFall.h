@@ -13,10 +13,14 @@
 
 #include "Task.h"
 
+enum eClimbHeights : std::int8_t;
+
 class CTaskSimpleClimb : public virtual CTaskSimple
 {
 public:
     virtual ~CTaskSimpleClimb(){};
+
+    virtual eClimbHeights GetHeightForPos() const = 0;
 };
 
 class CTaskSimpleJetPack : public virtual CTaskSimple
