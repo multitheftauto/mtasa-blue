@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-08 18:21+0000\n"
+"POT-Creation-Date: 2025-08-11 18:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2832,11 +2832,11 @@ msgid ""
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:689
+#: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:693
 msgid "Installing update..."
 msgstr ""
 
-#: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:697
+#: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:701
 msgid "Extracting files..."
 msgstr ""
 
@@ -3099,19 +3099,19 @@ msgstr ""
 msgid "Error loading %s module! (%s)"
 msgstr ""
 
-#: Client/loader/Utils.cpp:1391 Client/loader/Dialogs.cpp:702
+#: Client/loader/Utils.cpp:1391 Client/loader/Dialogs.cpp:706
 msgid "Copying files..."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1451 Client/loader/Dialogs.cpp:707
+#: Client/loader/Utils.cpp:1451 Client/loader/Dialogs.cpp:711
 msgid "Copy finished early. Everything OK."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1457 Client/loader/Dialogs.cpp:712
+#: Client/loader/Utils.cpp:1457 Client/loader/Dialogs.cpp:716
 msgid "Finishing..."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1459 Client/loader/Dialogs.cpp:716
+#: Client/loader/Utils.cpp:1459 Client/loader/Dialogs.cpp:720
 msgid "Done!"
 msgstr ""
 
@@ -3287,11 +3287,11 @@ msgid ""
 "I want my PC to lag and be part of a botnet."
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:678
+#: Client/loader/Dialogs.cpp:682
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:681
+#: Client/loader/Dialogs.cpp:685
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr ""
 
