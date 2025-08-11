@@ -25,7 +25,7 @@
 #define ARRAY_CProjectile                   0xC89110 //##SA##
 #define ARRAY_CProjectileInfo               0xC891A8 //##SA##
 
-static constexpr std::size_t MAX_PROJECTILES_COUNT = 35;
+static constexpr std::size_t MAX_PROJECTILES_COUNT = 32;
 
 class CProjectileInfoSA final : public CProjectileInfo
 {
