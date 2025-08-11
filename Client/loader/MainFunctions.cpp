@@ -1052,7 +1052,18 @@ BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandL
                                             *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
 
     if (wasProcessCreated)
+    {
+        // Rough patch
+        constexpr char newDocumentPath[] = "MTA San Andreas User Files";
+        void*          ducumentPathAddress = (void*)0x8747A9;
+
+        DWORD oldProtect;
+        VirtualProtectEx(lpProcessInformation->hProcess, ducumentPathAddress, 32, PAGE_EXECUTE_READWRITE, &oldProtect);
+        WriteProcessMemory(lpProcessInformation->hProcess, ducumentPathAddress, newDocumentPath, sizeof(newDocumentPath), nullptr);
+        VirtualProtectEx(lpProcessInformation->hProcess, ducumentPathAddress, 32, oldProtect, &oldProtect);
+
         return true;
+    }
 
     std::vector<DWORD> processIdListBefore = GetGTAProcessList();
 
