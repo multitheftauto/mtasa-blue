@@ -22,6 +22,7 @@
 #include "CColModelSA.h"
 
 #include "CExplosionManagerSA.h"
+#include "CFxSA.h"
 
 extern CGameSA* pGame;
 
@@ -336,7 +337,42 @@ void CProjectileInfoSA::Update()
 
         if (projectileInfo->m_weaponType == eWeaponType::WEAPONTYPE_ROCKET || projectileInfo->m_weaponType == eWeaponType::WEAPONTYPE_ROCKET_HS)
         {
-            // fx particle
+            FxPrtMult_c fxPrt{{0.3f, 0.3f, 0.3f, 0.3f}, 0.5f, 1.0f, 0.08f};
+            const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
+
+            CVector velocity = projectile->m_vecLinearVelocity * pGame->GetTimeStep();
+            float   len = velocity.Length();
+            int     particleCount = 1;
+            if (len >= 1.0f)
+                particleCount = static_cast<int>(len);
+
+            for (std::size_t i = 0; i < particleCount; i++)
+            {
+                fxPrt.m_color.red = rand() * 0.000030518509f * 0.25f + 0.25f;
+                fxPrt.m_color.green = fxPrt.m_color.red;
+                fxPrt.m_color.blue = fxPrt.m_color.red;
+
+                fxPrt.m_fLife = rand() * 0.000030518509f * 0.04f + 0.08f;
+
+                float t = 1.0f - (static_cast<float>(i) / static_cast<float>(particleCount));
+
+                CVector prtPos = pos - velocity * t;
+
+                int     rand1 = rand();
+                int     rand2 = rand();
+                int     rand3 = rand();
+                CVector prtVel = CVector(rand1 * 0.000030518509f + rand1 * 0.000030518509f - 1.0f, rand2 * 0.000030518509f + rand2 * 0.000030518509f - 1.0f, rand3 * 0.000030518509f + rand3 * 0.000030518509f - 1.0f);
+                prtVel.Normalize();
+
+                CVector objectVelocity = projectile->m_vecLinearVelocity;
+                objectVelocity.Normalize();
+
+                objectVelocity.CrossProduct(&prtVel);
+                objectVelocity *= 1.5f;
+
+                // Call FxSystem_c::AddParticle
+                ((int(__thiscall*)(FxSystem_c*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(pGame->GetFx()->GetInterface()->m_fxSysSmokeHuge, &prtPos, &objectVelocity, 0, &fxPrt, -1.0f, 1.2f, 0.6f, 0);
+            }
         }
 
         if (projectileInfo->m_counter > 0 && pGame->GetSystemTime() > projectileInfo->m_counter)
