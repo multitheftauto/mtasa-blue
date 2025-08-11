@@ -96,4 +96,6 @@ private:
 
     static int FindFreeIndex();
     static void InitCollision(CObjectSAInterface* projectile);
+    static void UpdateLastPos(CProjectileInfoSA* info);
+    static bool CheckIsLineOfSightClear(CProjectileInfoSA* info);
 };

@@ -83,6 +83,7 @@ void CProjectileInfoSA::DestroyProjectileObject(CObjectSAInterface* object)
         if (info.m_projectile->m_object == object)
         {
             delete info.m_projectile;
+            info.m_projectile = nullptr;
             break;
         }
     }
@@ -131,13 +132,8 @@ void CProjectileInfoSA::RemoveDetonatorProjectiles()
         if (!info.m_isActive || info.m_weaponType != eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
             continue;
 
-        CVector pos;
-
         CObjectSAInterface* object = info.m_projectile->m_object;
-        if (object->matrix)
-            pos = object->matrix->vPos;
-        else
-            pos = object->m_transform.m_translate;
+        CVector             pos = object->matrix ? object->matrix->vPos : object->m_transform.m_translate;
 
         object->bRemoveFromWorld = true;
 
@@ -166,6 +162,7 @@ void CProjectileInfoSA::RemoveIfThisIsAProjectile(CObjectSAInterface* object)
         DestroyProjectileObject(info.m_projectile->m_object);
 
         delete info.m_projectile;
+        info.m_projectile = nullptr;
     }
 }
 
@@ -183,7 +180,9 @@ void CProjectileInfoSA::RemoveAllProjectiles()
         DestroyProjectileObject(info.m_projectile->m_object);
 
         info.m_isActive = false;
+
         delete info.m_projectile;
+        info.m_projectile = nullptr;
     }
 }
 
@@ -351,14 +350,11 @@ void CProjectileInfoSA::Update()
                         projectileInfo->m_counter = 0;
                 }
 
-                // LABEL_138
-                const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
-                projectileInfo->m_lastPos = pos;
+                UpdateLastPos(projectileInfo);
                 continue;
             }
 
-            const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
-            projectileInfo->m_lastPos = pos;
+            UpdateLastPos(projectileInfo);
             StaticRemoveProjectile(projectileInfo, projectileInfo->m_projectile);
             continue;
         }
@@ -366,7 +362,7 @@ void CProjectileInfoSA::Update()
         if (projectileInfo->m_weaponType == eWeaponType::WEAPONTYPE_ROCKET)
         {
             float time = pGame->GetTimeStep() * 0.008f;
-            projectile->m_vecLinearVelocity = projectile->m_vecLinearVelocity + projectile->matrix->vFront * time;
+            projectile->m_vecLinearVelocity += (projectile->matrix ? projectile->matrix->vFront : CVector(0, 0 ,0)) * time;
 
             float length = projectile->m_vecLinearVelocity.Length();
             if (length > 9.9)
@@ -375,43 +371,10 @@ void CProjectileInfoSA::Update()
                 projectile->m_vecLinearVelocity *= 9.9f;
             }
 
-            // LABEL_120
-            if (!projectile->bOnSolidSurface)
-            {
-                CVector pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
+            if (CheckIsLineOfSightClear(projectileInfo))
+                continue;
 
-                *(void**)0xB7CD68 = projectileInfo->m_creator; // pGame->GetWorld()->IgnoreEntity but later
-                projectile->bUsesCollision = false;
-
-                // Call CWorld::GetIsLineOfSightClear
-                bool clear = ((bool(__cdecl*)(CVector*, CVector*, bool, bool, bool, bool, bool, bool, bool))0x56A490)(&projectileInfo->m_lastPos, &pos, true, true, true, true, false, false, false);
-
-                projectile->bUsesCollision = true;
-                *(void**)0xB7CD68 = nullptr;
-
-                projectile->m_entityIgnoredCollision = projectileInfo->m_creator;
-                if (clear)
-                {
-                    const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
-                    projectileInfo->m_lastPos = pos;
-                    continue;
-                }
-            }
-
-            if (projectile->m_ucCollisionState > 0)
-            {
-                if (projectile->pLastContactedEntity[0] && (projectile->pLastContactedEntity[0]->GetInterface() == projectileInfo->m_creator || projectile->pLastContactedEntity[0]->GetModelIndex() == 345))
-                {
-                    // LABEL_138
-                    const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
-                    projectileInfo->m_lastPos = pos;
-                    continue;
-                }
-            }
-
-            // LABEL_56
-            const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
-            projectileInfo->m_lastPos = pos;
+            UpdateLastPos(projectileInfo);
             StaticRemoveProjectile(projectileInfo, projectileInfo->m_projectile);
             continue;
         }
@@ -501,114 +464,68 @@ void CProjectileInfoSA::Update()
                     if (!targetProjectile || evaluate2 <= evaluate1)
                         targetProjectile = (CPhysicalSAInterface*)projectileInfo->m_target;
 
-                    bool unk_v103 = false;
+                    bool isPlaneTargetFromLocalPlayer = false;
 
                     if (targetProjectile->nType == ENTITY_TYPE_VEHICLE)
                     {
                         if ((projectileInfo->m_creator == localPlayer || projectileInfo->m_creator == localPlayer->pVehicle) && static_cast<CVehicleSAInterface*>(targetProjectile)->m_vehicleSubClass == (uint32_t)VehicleClass::PLANE)
-                            unk_v103 = true;
+                            isPlaneTargetFromLocalPlayer = true;
                     }
 
-                    CVector startPoint_unk = projectile->m_vecLinearVelocity * 100.0f + pos;
+                    CVector startPos = projectile->m_vecLinearVelocity * 100.0f + pos;
 
-                    if (unk_v103)
-                        startPoint_unk = pos;
+                    if (isPlaneTargetFromLocalPlayer)
+                        startPos = pos;
 
                     CVector targetProjectilePos = targetProjectile->matrix ? targetProjectile->matrix->vPos : targetProjectile->m_transform.m_translate;
 
-                    float mult = 0.0f;
-
                     CVector diff = pos - targetProjectilePos;
                     float   vecLen = diff.Length();
-                    if (vecLen >= 50.0f)
-                        mult = 50.0f;
-                    else
-                        mult = vecLen;
+                    float   maxDist = isPlaneTargetFromLocalPlayer ? std::min(vecLen, 1.5f) : std::min(vecLen, 50.0f);
 
-                    if (unk_v103)
-                    {
-                        if (vecLen > 1.5f)
-                            mult = 1.5f;
-                        else
-                            mult = vecLen;
-                    }
+                    CVector targetVelocityCompensation = targetProjectile->m_vecLinearVelocity * maxDist;
+                    CVector projectileDir = projectile->m_vecLinearVelocity;
+                    projectileDir.Normalize();
 
-                    CVector vecTarget = targetProjectile->m_vecLinearVelocity * mult;
-                    CVector vec_v113 = projectile->m_vecLinearVelocity;
-                    vec_v113.Normalize();
+                    CVector aimAdjustment  = CVector((targetVelocityCompensation .fX + targetProjectilePos.fX) - startPos.fX, (targetVelocityCompensation .fY + targetProjectilePos.fY) - startPos.fY, (targetVelocityCompensation .fZ + targetProjectilePos.fZ) - startPos.fZ);
 
-                    CVector vec_110 = CVector((vecTarget.fX + targetProjectilePos.fX) - startPoint_unk.fX, (vecTarget.fY + targetProjectilePos.fY) - startPoint_unk.fY, (vecTarget.fZ + targetProjectilePos.fZ) - startPoint_unk.fZ);
+                    float dotToAimDir = aimAdjustment.fX * projectileDir.fX + aimAdjustment.fY * projectileDir.fY + aimAdjustment.fZ * projectileDir.fZ;
+                    if (dotToAimDir < 0.0f)
+                        aimAdjustment -= projectileDir * dotToAimDir;
 
-                    float unk_v84 = vec_110.fX * vec_v113.fX + vec_110.fY * vec_v113.fY + vec_110.fZ * vec_v113.fZ;
-                    if (unk_v84 < 0.0f)
-                        vec_110 -= vec_v113 * unk_v84;
+                    aimAdjustment.Normalize();
 
-                    vec_110.Normalize();
-
-                    float mult2 = 0.0f;
-                    float mult3 = 1.0f;
+                    float steeringStrength = 0.0f;
+                    float velocityScale = 1.0f;
 
                     if (projectileInfo->m_creator == localPlayer || projectileInfo->m_creator == localPlayer->pVehicle)
-                        mult2 = 0.011f;
+                        steeringStrength = 0.011f;
                     else
-                        mult2 = 0.009f;
+                        steeringStrength = 0.009f;
 
                     if (targetProjectile->m_vecLinearVelocity.Length() > 0.8f)
-                        mult2 *= 1.2f;
+                        steeringStrength *= 1.2f;
 
-                    if (unk_v103)
+                    if (isPlaneTargetFromLocalPlayer)
                     {
-                        mult2 = 0.15f;
-                        mult3 = pGame->GetTimeStep() * 0.95f;
+                        steeringStrength = 0.15f;
+                        velocityScale = pGame->GetTimeStep() * 0.95f;
                     }
 
-                    projectile->m_vecLinearVelocity *= mult3;
-                    projectile->m_vecLinearVelocity += vec_110 * (pGame->GetTimeStep() * mult2);
+                    projectile->m_vecLinearVelocity *= velocityScale;
+                    projectile->m_vecLinearVelocity += aimAdjustment * (pGame->GetTimeStep() * steeringStrength);
 
-                    float len3 = projectile->m_vecLinearVelocity.Length();
-                    if (len3 > 9.9f)
+                    if (projectile->m_vecLinearVelocity.Length() > 9.9f)
                     {
                         projectile->m_vecLinearVelocity.Normalize();
                         projectile->m_vecLinearVelocity *= 9.9f;
                     }
 
-                    projectile->matrix->vFront = vec_v113;
+                    projectile->matrix->vFront = projectileDir;
 
-                    // LABEL_120
-                    if (!projectile->bOnSolidSurface)
-                    {
-                        CVector pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
+                    if (CheckIsLineOfSightClear(projectileInfo))
+                        continue;
 
-                        *(void**)0xB7CD68 = projectileInfo->m_creator;
-                        projectile->bUsesCollision = false;
-
-                        // CWorld::GetIsLineOfSightClear
-                        bool clear = ((bool(__cdecl*)(CVector*, CVector*, bool, bool, bool, bool, bool, bool, bool))0x56A490)(&projectileInfo->m_lastPos, &pos, true, true, true, true, false, false, false);
-
-                        projectile->bUsesCollision = true;
-                        *(void**)0xB7CD68 = nullptr;
-
-                        projectile->m_entityIgnoredCollision = projectileInfo->m_creator;
-                        if (clear)
-                        {
-                            const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
-                            projectileInfo->m_lastPos = pos;
-                            continue;
-                        }
-                    }
-
-                    if (projectile->m_ucCollisionState > 0)
-                    {
-                        if (projectile->pLastContactedEntity[0] && (projectile->pLastContactedEntity[0]->GetInterface() == projectileInfo->m_creator || projectile->pLastContactedEntity[0]->GetModelIndex() == 345))
-                        {
-                            // LABEL_138
-                            const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
-                            projectileInfo->m_lastPos = pos;
-                            continue;
-                        }
-                    }
-
-                    // LABEL_56
                     projectileInfo->m_lastPos = pos;
                     StaticRemoveProjectile(projectileInfo, projectileInfo->m_projectile);
                     continue;
@@ -620,9 +537,7 @@ void CProjectileInfoSA::Update()
             {
                 if (projectileInfo->m_weaponType != eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE || projectile->m_fDamageImpulseMagnitude <= 0.0f || !projectile->m_pCollidedEntity || projectile->m_pAttachedEntity)
                 {
-                    // LABEL_138
-                    const CVector& pos = projectile->matrix ? projectile->matrix->vPos : projectile->m_transform.m_translate;
-                    projectileInfo->m_lastPos = pos;
+                    UpdateLastPos(projectileInfo);
                     continue;
                 }
 
@@ -665,8 +580,7 @@ void CProjectileInfoSA::InitCollision(CObjectSAInterface* projectile)
                 colData->m_spheres = ((CColSphereSA * (__cdecl*)(int))0x72F420)(20);            // CMemoryMgr::Malloc
 
                 // CColSphere::Set
-                ((void(__thiscall*)(CColSphereSA*, float, CVector&, unsigned char, char, unsigned char))(0x40FD10))(
-                    colData->m_spheres, col->m_sphere.m_radius * 0.75f, col->m_sphere.m_center, 56, 0, 255);
+                ((void(__thiscall*)(CColSphereSA*, float, CVector&, unsigned char, char, unsigned char))(0x40FD10))(colData->m_spheres, col->m_sphere.m_radius * 0.75f, col->m_sphere.m_center, 56, 0, 255);
             }
         }
         else
@@ -674,11 +588,65 @@ void CProjectileInfoSA::InitCollision(CObjectSAInterface* projectile)
             // CColModel::AllocateData
             ((void(__thiscall*)(CColModelSAInterface*, int, int, int, int, int, int))(0x40F870))(col, 1, 0, 0, 0, 0, 0);
 
-            // CColSphere::Set
-            ((void(__thiscall*)(CColSphereSA*, float, CVector&, unsigned char, char, unsigned char))(0x40FD10))(
-                col->m_data->m_spheres, col->m_sphere.m_radius * 0.75f, col->m_sphere.m_center, 56, 0, 255);
+            if (col->m_data)
+                // CColSphere::Set
+                ((void(__thiscall*)(CColSphereSA*, float, CVector&, unsigned char, char, unsigned char))(0x40FD10))(col->m_data->m_spheres, col->m_sphere.m_radius * 0.75f, col->m_sphere.m_center, 56, 0, 255);
         }
     }
+}
+
+void CProjectileInfoSA::UpdateLastPos(CProjectileInfoSA* info)
+{
+    if (!info)
+        return;
+
+    CObjectSAInterface* object = info->m_projectile ? info->m_projectile->m_object : nullptr;
+    if (!object)
+        return;
+
+    info->m_lastPos = object->matrix ? object->matrix->vPos : object->m_transform.m_translate;
+}
+
+bool CProjectileInfoSA::CheckIsLineOfSightClear(CProjectileInfoSA* info)
+{
+    if (!info)
+        return false;
+
+    CObjectSAInterface* object = info->m_projectile ? info->m_projectile->m_object : nullptr;
+    if (!object)
+        return false;
+
+    if (!object->bOnSolidSurface)
+    {
+        CVector pos = object->matrix ? object->matrix->vPos : object->m_transform.m_translate;
+
+        *(void**)0xB7CD68 = info->m_creator;
+        object->bUsesCollision = false;
+
+        // CWorld::GetIsLineOfSightClear
+        bool clear = ((bool(__cdecl*)(CVector*, CVector*, bool, bool, bool, bool, bool, bool, bool))0x56A490)(&info->m_lastPos, &pos, true, true, true, true, false, false, false);
+
+        object->bUsesCollision = true;
+        *(void**)0xB7CD68 = nullptr;
+
+        object->m_entityIgnoredCollision = info->m_creator;
+        if (clear)
+        {
+            UpdateLastPos(info);
+            return true;
+        }
+    }
+
+    if (object->m_ucCollisionState > 0)
+    {
+        if (object->pLastContactedEntity[0] && (object->pLastContactedEntity[0]->GetInterface() == info->m_creator || object->pLastContactedEntity[0]->GetModelIndex() == 345))
+        {
+            UpdateLastPos(info);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 CProjectileInfo* CProjectileInfoSA::StaticAddProjectile(CEntitySAInterface* creator, eWeaponType projectileType, CVector pos, float force, CVector* target, CEntitySAInterface* targetEntity)
@@ -716,10 +684,10 @@ CProjectileInfo* CProjectileInfoSA::StaticAddProjectile(CEntitySAInterface* crea
 
     CVector projectileVelocity = ComputeOffsetVector(heading, offset, force);
 
-    int unk_v64 = 0;
+    bool useStaticObjectInfo = false;
     bool applyGravity = true;
 
-    int model = 1337;
+    std::uint32_t model;
 
     if (projectileType == eWeaponType::WEAPONTYPE_FLARE)
     {
@@ -755,12 +723,12 @@ CProjectileInfo* CProjectileInfoSA::StaticAddProjectile(CEntitySAInterface* crea
                 projectileVelocity += static_cast<CVehicleSAInterface*>(creator)->m_vecLinearVelocity;
 
             InitCollision(projectile);
-            unk_v64 = 5;
+            useStaticObjectInfo = true;
             break;
         }
         case eWeaponType::WEAPONTYPE_TEARGAS:
         {
-            unk_v64 = 5;
+            useStaticObjectInfo = true;
             elasticity = 0.5f;
             timeToDestroy = 20000;
 
@@ -854,7 +822,8 @@ CProjectileInfo* CProjectileInfoSA::StaticAddProjectile(CEntitySAInterface* crea
     projectile->bEnableCollision = true;
     projectile->bApplyGravity = applyGravity;
 
-    if (unk_v64 == 5)
+    // CObjectData::Initialise (0x5B5420)
+    if (useStaticObjectInfo)
         projectile->pObjectInfo = (CObjectInfo*)0xBB4BD0;
 
     pGame->GetWorld()->Add(projectile, eDebugCaller::CObject_Constructor);
