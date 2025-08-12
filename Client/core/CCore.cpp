@@ -836,6 +836,15 @@ void CCore::ApplyHooks()
 {
     WriteDebugEvent("CCore::ApplyHooks");
 
+    constexpr char newDocumentPath[] = "MTA San Andreas User Files";
+    void*          ducumentPathAddress = (void*)0x8747A9;
+    HANDLE         currentProcess = GetCurrentProcess();
+
+    DWORD oldProtect;
+    VirtualProtectEx(currentProcess, ducumentPathAddress, 32, PAGE_EXECUTE_READWRITE, &oldProtect);
+    WriteProcessMemory(currentProcess, ducumentPathAddress, newDocumentPath, sizeof(newDocumentPath), nullptr);
+    VirtualProtectEx(currentProcess, ducumentPathAddress, 32, oldProtect, &oldProtect);
+
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
     // m_pDirect3DHookManager->ApplyHook ( );
