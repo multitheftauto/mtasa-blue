@@ -49,6 +49,7 @@ String::~String(void)
 		if (d_encodedbufflen > 0)
 	{
 		delete[] d_encodedbuff;
+        d_encodedbuff = nullptr;
 	}
 }
 
@@ -123,6 +124,7 @@ utf8* String::build_utf8_buff(void) const
         if (d_encodedbufflen > 0)
         {
             delete[] d_encodedbuff;
+            d_encodedbuff = nullptr;
         }
 
         d_encodedbuff = new utf8[buffsize];
