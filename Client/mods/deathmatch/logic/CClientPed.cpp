@@ -4672,10 +4672,10 @@ bool CClientPed::IsOnGround(bool checkVehicles)
     GetPosition(vecPosition);
     float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
 
-    if (definitelyLessThan(vecPosition.fZ, fGroundLevel))
+    if (DefinitelyLessThan(vecPosition.fZ, fGroundLevel))
         return false;
 
-    bool isOnGround = definitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f) || essentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f);
+    bool isOnGround = DefinitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f) || EssentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f);
     if (!isOnGround && checkVehicles && m_pPlayerPed)
         return m_pPlayerPed->IsStandingOnEntity();
 

@@ -336,9 +336,3 @@ void DeletePointersAndClearList(T& elementList)
         delete *iter;
     }
 }
-
-// Comparing floating point numbers
-bool approximatelyEqual(float a, float b, float epsilon = FLOAT_EPSILON);
-bool essentiallyEqual(float a, float b, float epsilon = FLOAT_EPSILON);
-bool definitelyGreaterThan(float a, float b, float epsilon = FLOAT_EPSILON);
-bool definitelyLessThan(float a, float b, float epsilon = FLOAT_EPSILON);
