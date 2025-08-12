@@ -213,8 +213,8 @@ CExplosion* CClientExplosionManager::Create(eExplosionType explosionType, CVecto
         CClientPlayer* localPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
         if (localPlayer)
         {
-            bool bAllowExplosion = Hook_ExplosionCreation(nullptr, pLocalPlayer->GetGameEntity(), vecPosition, explosionType);
-            if (!bAllowExplosion)
+            bool allowExplosion = Hook_ExplosionCreation(nullptr, localPlayer->GetGameEntity(), vecPosition, explosionType);
+            if (!allowExplosion)
                 return nullptr;
         }
     }
