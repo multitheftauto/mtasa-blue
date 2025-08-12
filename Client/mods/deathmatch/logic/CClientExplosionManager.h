@@ -34,5 +34,6 @@ public:
     CClientEntityPtr m_pLastCreator;
 
 private:
-    CClientManager* m_pManager;
+    CClientManager*  m_pManager;
+    eWeaponType      GetWeaponTypeFromExplosionType(const eExplosionType explosionType);
 };

@@ -274,6 +274,12 @@ void TiXmlParsingData::Stamp( const char* now, TiXmlEncoding encoding )
 						else
 							{ p +=3; ++col; }	// A normal character.
 					}
+                    else
+                    {
+                    	// TIXML_UTF_LEAD_0 (239) is the start character of a 3 byte sequence, so
+                    	// there is something wrong here. Just advance the pointer to evade infinite loops
+                    	++p;
+                    }
 				}
 				else
 				{
@@ -1602,6 +1608,10 @@ const char* TiXmlDeclaration::Parse( const char* p, TiXmlParsingData* data, TiXm
 		}
 
 		p = SkipWhiteSpace( p, _encoding );
+        if ( !p || !*p )
+        {
+        	break;
+        }
 		if ( StringEqual( p, "version", true, _encoding ) )
 		{
 			TiXmlAttribute attrib;
