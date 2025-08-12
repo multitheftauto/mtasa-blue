@@ -52,7 +52,7 @@ class CVehicle;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
-enum eClimbHeights
+enum eClimbHeights : std::int8_t
 {
     CLIMB_NOT_READY = 0,
     CLIMB_GRAB,

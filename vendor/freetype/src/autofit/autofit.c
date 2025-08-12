@@ -19,10 +19,13 @@
 #define FT_MAKE_OPTION_SINGLE_OBJECT
 
 #include "ft-hb.c"
+#include "ft-hb-ft.c"
+#include "afadjust.c"
 #include "afblue.c"
 #include "afcjk.c"
 #include "afdummy.c"
 #include "afglobal.c"
+#include "afgsub.c"
 #include "afhints.c"
 #include "afindic.c"
 #include "aflatin.c"
