@@ -101,8 +101,8 @@ const SDialogItemInfo g_NoAvDialogItems[] = {
      _td("MTA could not detect an anti-virus on your PC.\n\n"
          "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
          "Press 'Help' for more information.")},
-    {IDC_NOAV_OPT_SKIP, 0, _td("I have already installed an anti-virus")},
-    {IDC_NOAV_OPT_BOTNET, 0,
+    {IDC_NOAV_OPT_SKIP, 1, _td("I have already installed an anti-virus")},
+    {IDC_NOAV_OPT_BOTNET, 1,
      _td("I will not install an anti-virus.\n"
          "I want my PC to lag and be part of a botnet.")},
     {IDC_BUTTON_HELP, 0, dialogStringsHelp},
@@ -618,8 +618,12 @@ void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
         hwndNoAvDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_NOAV_DIALOG), 0, DialogProc);
         dassert((GetWindowLongW(hwndNoAvDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
         InitDialogStrings(hwndNoAvDialog, g_NoAvDialogItems);
-        ShowWindow(GetDlgItem(hwndNoAvDialog, IDC_NOAV_OPT_SKIP), bEnableScaremongering ? SW_HIDE : SW_SHOW);
-        ShowWindow(GetDlgItem(hwndNoAvDialog, IDC_NOAV_OPT_BOTNET), bEnableScaremongering ? SW_SHOW : SW_HIDE);
+        const int textSourceItemId = bEnableScaremongering ? IDC_NOAV_OPT_BOTNET : IDC_NOAV_OPT_SKIP;
+        {
+            wchar_t text[256] = {};
+            GetWindowTextW(GetDlgItem(hwndNoAvDialog, textSourceItemId), text, _countof(text));
+            SetWindowTextW(GetDlgItem(hwndNoAvDialog, IDC_CHECK_NOT_AGAIN), text);
+        }
     }
     ShowWindow(hwndNoAvDialog, SW_SHOW);            // Show after all changes are complete
     SetForegroundWindow(hwndNoAvDialog);

@@ -895,7 +895,7 @@
         FT_TRACE0(( "sfnt_get_var_ps_name:"
                     " Shortening variation PS name prefix\n" ));
         FT_TRACE0(( "                     "
-                    " to %d characters\n", len ));
+                    " to %u characters\n", len ));
       }
 
       face->var_postscript_prefix     = result;

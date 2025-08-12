@@ -31,6 +31,9 @@ enum eHudComponent
     HUD_ALL,
     HUD_VITAL_STATS,
     HUD_HELP_TEXT,
+    HUD_RADAR_MAP,
+    HUD_RADAR_BLIPS,
+    HUD_RADAR_ALTIMETER,
 };
 
 enum class eHudComponentProperty
