@@ -4673,12 +4673,20 @@ float CClientPed::GetDistanceFromGround()
     return (vecPosition.fZ - fGroundLevel);
 }
 
-bool CClientPed::IsOnGround()
+bool CClientPed::IsOnGround(bool checkVehicles)
 {
     CVector vecPosition;
     GetPosition(vecPosition);
     float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
-    return (vecPosition.fZ > fGroundLevel && (vecPosition.fZ - fGroundLevel) <= 1.0f);
+
+    if (DefinitelyLessThan(vecPosition.fZ, fGroundLevel))
+        return false;
+
+    bool isOnGround = DefinitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f) || EssentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f);
+    if (!isOnGround && checkVehicles && m_pPlayerPed)
+        return m_pPlayerPed->IsStandingOnEntity();
+
+    return isOnGround;
 }
 
 bool CClientPed::IsClimbing()
