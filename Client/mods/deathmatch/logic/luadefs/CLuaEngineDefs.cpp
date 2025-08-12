@@ -2597,7 +2597,7 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
 }
 
-bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
+bool CLuaEngineDefs::EngineRestreamModel(const std::uint16_t modelId)
 {
     return g_pClientGame->RestreamModel(modelId);
 }

@@ -6748,47 +6748,49 @@ bool CClientGame::TriggerBrowserRequestResultEvent(const std::unordered_set<SStr
     return GetRootEntity()->CallEvent("onClientBrowserWhitelistChange", Arguments, false);
 }
 
-bool CClientGame::RestreamModel(unsigned short usModel)
+bool CClientGame::RestreamModel(const std::uint16_t model)
 {
     // Is this a vehicle ID?
-    if (CClientVehicleManager::IsValidModel(usModel))
+    if (CClientVehicleManager::IsValidModel(model))
     {
         // Stream the vehicles of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
-        m_pManager->GetVehicleManager()->RestreamVehicles(usModel);
+        m_pManager->GetVehicleManager()->RestreamVehicles(model);
     }
 
     // Is this an object ID?
-    else if (CClientObjectManager::IsValidModel(usModel))
+    else if (CClientObjectManager::IsValidModel(model))
     {
-        if (CClientPedManager::IsValidWeaponModel(usModel))
+        if (CClientPedManager::IsValidWeaponModel(model))
         {
             // Stream the weapon of that model out so we have no
             // loaded when we do the restore. The streamer will
             // eventually stream them back in with async loading.
-            m_pManager->GetPedManager()->RestreamWeapon(usModel);
-            m_pManager->GetPickupManager()->RestreamPickups(usModel);
+            m_pManager->GetPedManager()->RestreamWeapon(model);
+            m_pManager->GetPickupManager()->RestreamPickups(model);
         }
         // Stream the objects of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
-        m_pManager->GetObjectManager()->RestreamObjects(usModel);
-        g_pGame->GetModelInfo(usModel)->RestreamIPL();
+        m_pManager->GetObjectManager()->RestreamObjects(model);
+        g_pGame->GetModelInfo(model)->RestreamIPL();
     }
     // Is this an ped ID?
-    else if (CClientPlayerManager::IsValidModel(usModel))
+    else if (CClientPlayerManager::IsValidModel(model))
     {
         // Stream the ped of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
-        m_pManager->GetPedManager()->RestreamPeds(usModel);
+        m_pManager->GetPedManager()->RestreamPeds(model);
     }
     else
 
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
-        if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
-            m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+        if (CClientObjectManager::IsValidModel(model) && CVehicleUpgrades::IsUpgrade(model))
+            m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(model);
+
+    return true;
 }
 
 void CClientGame::RestreamWorld()
