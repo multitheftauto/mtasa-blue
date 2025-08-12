@@ -16,6 +16,8 @@
 
 #define CLOTHES_REF_TEST    1       // Debug clothes geometry refs
 
+static constexpr uint DEFAULT_CACHE_TIME = 1000;
+
 ////////////////////////////////////////////////
 //
 // class CPedClothesDesc
@@ -126,7 +128,7 @@ public:
     {
         memset(&m_Stats, 0, sizeof(m_Stats));
         m_uiMaxSize = 4;
-        m_uiMinCacheTime = 1000;
+        m_uiMinCacheTime = DEFAULT_CACHE_TIME;
         m_iCacheRevision = 1;
     }
 
@@ -138,30 +140,34 @@ public:
     uint GetNumCached()
     {
         uint uiNumCached = 0;
-        for (std::vector<SSavedClumpInfo>::iterator iter = savedClumpList.begin(); iter != savedClumpList.end(); ++iter)
+
+        if (m_uiMinCacheTime > 0)
         {
-            SSavedClumpInfo& info = *iter;
-            RpGeometry*      pGeometry = ((RpAtomic*)((info.pClump->atomics.root.next) - 0x8))->geometry;
+            for (std::vector<SSavedClumpInfo>::iterator iter = savedClumpList.begin(); iter != savedClumpList.end(); ++iter)
+            {
+                SSavedClumpInfo& info = *iter;
+                RpGeometry*      pGeometry = ((RpAtomic*)((info.pClump->atomics.root.next) - 0x8))->geometry;
 #ifdef CLOTHES_REF_TEST
-            if (pGeometry->refs < 21)
-            {
-                AddReportLog(7521, SString("Clothes geometry refs below expected value: %d", pGeometry->refs));
-                pGeometry->refs = 21;
-            }
-            if (pGeometry->refs == 21)
-#else
-            if (pGeometry->refs == 1)
-#endif
-            {
-                uiNumCached++;
-                if (!info.bUnused)
+                if (pGeometry->refs < 21)
                 {
-                    info.timeUnused = CTickCount::Now();
-                    info.bUnused = true;
+                    AddReportLog(7521, SString("Clothes geometry refs below expected value: %d", pGeometry->refs));
+                    pGeometry->refs = 21;
                 }
+                if (pGeometry->refs == 21)
+#else
+                if (pGeometry->refs == 1)
+#endif
+                {
+                    uiNumCached++;
+                    if (!info.bUnused)
+                    {
+                        info.timeUnused = CTickCount::Now();
+                        info.bUnused = true;
+                    }
+                }
+                else
+                    info.bUnused = false;
             }
-            else
-                info.bUnused = false;
         }
 
         m_Stats.uiNumTotal = savedClumpList.size();
@@ -400,6 +406,34 @@ void CMultiplayerSA::GetClothesCacheStats(SClothesCacheStats& outStats)
 {
     ms_clumpStore.GetNumCached();
     outStats = ms_clumpStore.m_Stats;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::SetClothingCacheTime
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool CMultiplayerSA::SetClothingCacheTime(uint timeInMs)
+{
+    if (timeInMs == ms_clumpStore.m_uiMinCacheTime)
+        return false;
+
+    ms_clumpStore.savedClumpList.clear();
+    ms_clumpStore.m_uiMinCacheTime = timeInMs;
+
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::ResetClothingCacheTime
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::ResetClothingCacheTime()
+{
+    SetClothingCacheTime(DEFAULT_CACHE_TIME);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

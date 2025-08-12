@@ -86,6 +86,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreCOL", EngineRestoreCOL},
         {"engineReplaceModel", EngineReplaceModel},
         {"engineAddClothingModel", ArgumentParser<EngineAddClothingModel>},
+        {"engineSetClothingCacheTime", ArgumentParser<EngineSetClothingCacheTime>},
         {"engineRestoreModel", EngineRestoreModel},
         {"engineReplaceAnimation", EngineReplaceAnimation},
         {"engineRestoreAnimation", EngineRestoreAnimation},
@@ -848,6 +849,14 @@ bool CLuaEngineDefs::EngineAddClothingModel(CClientDFF* pDFF, std::string strMod
 
     if (!pDFF->AddClothingModel(strModelName))
         throw std::invalid_argument(SString("Model already added (%*s)", (int)strModelName.length(), strModelName.data()));
+
+    return true;
+}
+
+bool CLuaEngineDefs::EngineSetClothingCacheTime(uint timeInMs)
+{
+    if (!g_pMultiplayer->SetClothingCacheTime(timeInMs))
+        return false;
 
     return true;
 }
