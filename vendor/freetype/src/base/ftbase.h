@@ -34,7 +34,7 @@ FT_BEGIN_HEADER
 #ifdef FT_CONFIG_OPTION_MAC_FONTS
 
   /* MacOS resource fork cannot exceed 16MB at least for Carbon code; */
-  /* see https://support.microsoft.com/en-us/kb/130437                */
+  /* see https://jeffpar.github.io/kbarchive/kb/130/Q130437/          */
 #define FT_MAC_RFORK_MAX_LEN  0x00FFFFFFUL
 
 
