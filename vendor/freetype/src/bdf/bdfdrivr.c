@@ -389,10 +389,10 @@ THE SOFTWARE.
       bdf_property_t*  prop = NULL;
 
 
-      FT_TRACE4(( "  number of glyphs: allocated %ld (used %ld)\n",
+      FT_TRACE4(( "  number of glyphs: allocated %lu (used %lu)\n",
                   font->glyphs_size,
                   font->glyphs_used ));
-      FT_TRACE4(( "  number of unencoded glyphs: allocated %ld (used %ld)\n",
+      FT_TRACE4(( "  number of unencoded glyphs: allocated %lu (used %lu)\n",
                   font->unencoded_size,
                   font->unencoded_used ));
 
@@ -621,7 +621,7 @@ THE SOFTWARE.
         for ( n = 0; n < font->glyphs_size; n++ )
         {
           (bdfface->en_table[n]).enc = cur[n].encoding;
-          FT_TRACE4(( "  idx %ld, val 0x%lX\n", n, cur[n].encoding ));
+          FT_TRACE4(( "  idx %lu, val 0x%lX\n", n, cur[n].encoding ));
           (bdfface->en_table[n]).glyph = (FT_UShort)n;
 
           if ( cur[n].encoding == font->default_char )
@@ -630,7 +630,7 @@ THE SOFTWARE.
               bdfface->default_glyph = (FT_UInt)n;
             else
               FT_TRACE1(( "BDF_Face_Init:"
-                          " idx %ld is too large for this system\n", n ));
+                          " idx %lu is too large for this system\n", n ));
           }
         }
       }
@@ -817,7 +817,7 @@ THE SOFTWARE.
       goto Exit;
     }
 
-    FT_TRACE1(( "BDF_Glyph_Load: glyph index %d\n", glyph_index ));
+    FT_TRACE1(( "BDF_Glyph_Load: glyph index %u\n", glyph_index ));
 
     /* index 0 is the undefined glyph */
     if ( glyph_index == 0 )
@@ -831,7 +831,7 @@ THE SOFTWARE.
     bitmap->rows  = glyph.bbx.height;
     bitmap->width = glyph.bbx.width;
     if ( glyph.bpr > FT_INT_MAX )
-      FT_TRACE1(( "BDF_Glyph_Load: too large pitch %ld is truncated\n",
+      FT_TRACE1(( "BDF_Glyph_Load: too large pitch %lu is truncated\n",
                    glyph.bpr ));
     bitmap->pitch = (int)glyph.bpr; /* same as FT_Bitmap.pitch */
 

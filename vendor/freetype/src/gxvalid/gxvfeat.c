@@ -306,7 +306,7 @@
       FT_INVALID_FORMAT;
 
     featureNameCount = FT_NEXT_USHORT( p );
-    GXV_TRACE(( " (featureNameCount = %d)\n", featureNameCount ));
+    GXV_TRACE(( " (featureNameCount = %u)\n", featureNameCount ));
 
     if ( !( IS_PARANOID_VALIDATION ) )
       p += 6; /* skip (none) and (none) */
