@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-11 18:27+0000\n"
-"PO-Revision-Date: 2025-08-12 03:21\n"
+"PO-Revision-Date: 2025-08-12 04:21\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -3272,7 +3272,7 @@ msgstr "** فشل التشغيل بسبب خطأ في معرف الرسومات 
 
 #: Client/loader/CInstallManager.cpp:441
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr "نفذت الذاكرة – تعذر إكمال العملية بسبب قلة الذاكرة المتاحة أو تجزئتها."
+msgstr "** نفذت الذاكرة – تعذر إكمال العملية بسبب قلة الذاكرة المتاحة أو تجزئتها. **"
 
 #: Client/loader/CInstallManager.cpp:543
 msgid "Install updated MTA:SA files"
