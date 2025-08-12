@@ -204,8 +204,8 @@ CExplosion* CClientExplosionManager::Create(eExplosionType explosionType, CVecto
 
     if (pCreator && pCreator->IsLocalEntity())
     {
-        bool bAllowExplosion = Hook_ExplosionCreation(nullptr, pGameCreator, vecPosition, explosionType);
-        if (!bAllowExplosion)
+        bool allowExplosion = Hook_ExplosionCreation(nullptr, pGameCreator, vecPosition, explosionType);
+        if (!allowExplosion)
             return nullptr;
     }
     else if (!pCreator)
