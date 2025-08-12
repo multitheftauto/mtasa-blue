@@ -75,7 +75,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
             return false;
 
         CClientPlayer* localPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
-        if (!pLocalPlayer || pLocalPlayer->GetGameEntity() != pGameCreator)
+        if (!localPlayer || localPlayer->GetGameEntity() != pGameCreator)
             return false;
 
         eWeaponType explosionWeaponType = GetWeaponTypeFromExplosionType(explosionType);
