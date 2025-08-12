@@ -74,7 +74,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
         if (!pGameCreator)
             return false;
 
-        CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
+        CClientPlayer* localPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
         if (!pLocalPlayer || pLocalPlayer->GetGameEntity() != pGameCreator)
             return false;
 
