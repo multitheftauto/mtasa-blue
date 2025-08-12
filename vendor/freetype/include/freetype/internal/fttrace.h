@@ -159,6 +159,7 @@ FT_TRACE_DEF( gxvprop )
 FT_TRACE_DEF( gxvtrak )
 
   /* autofit components */
+FT_TRACE_DEF( afadjust )
 FT_TRACE_DEF( afcjk )
 FT_TRACE_DEF( afglobal )
 FT_TRACE_DEF( afhints )
