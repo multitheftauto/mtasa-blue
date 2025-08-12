@@ -39,7 +39,7 @@ bool CClientExplosionManager::Hook_StaticExplosionCreation(CEntity* pGameExplodi
     return g_pExplosionManager->Hook_ExplosionCreation(pGameExplodingEntity, pGameCreator, vecPosition, explosionType);
 }
 
-eWeaponType CClientExplosionManager::GetWeaponTypeFromExplosionType(eExplosionType explosionType)
+eWeaponType CClientExplosionManager::GetWeaponTypeFromExplosionType(const eExplosionType explosionType)
 {
     switch (explosionType) {
         case EXP_TYPE_GRENADE:
