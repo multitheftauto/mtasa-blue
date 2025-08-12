@@ -269,14 +269,8 @@
            * According to Inside Macintosh: More Macintosh Toolbox,
            * "Resource IDs" (1-46), there are some reserved IDs.
            * However, FreeType2 is not a font synthesizer, no need
-           * to check the acceptable resource ID.
+           * to check the acceptable resource ID or its attributes.
            */
-          if ( temp < 0 )
-          {
-            error = FT_THROW( Invalid_Table );
-            goto Exit;
-          }
-
           ref[j].offset = temp & 0xFFFFFFL;
 
           FT_TRACE3(( "             [%d]:"
