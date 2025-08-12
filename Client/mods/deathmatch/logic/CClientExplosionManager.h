@@ -35,5 +35,5 @@ public:
 
 private:
     CClientManager*  m_pManager;
-    eWeaponType      GetWeaponTypeFromExplosionType(eExplosionType explosionType);
+    eWeaponType      GetWeaponTypeFromExplosionType(const eExplosionType explosionType);
 };
