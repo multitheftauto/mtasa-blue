@@ -85,7 +85,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
         arguments.PushNumber(vecPosition.fY);
         arguments.PushNumber(vecPosition.fZ);
         arguments.PushNumber(explosionWeaponType);
-        return pLocalPlayer->CallEvent("onClientExplosion", arguments, true);
+        return localPlayer->CallEvent("onClientExplosion", arguments, true);
     }
 
     // Determine the used weapon
