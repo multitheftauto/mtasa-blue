@@ -21,11 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
-
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>
-#endif
+#include "first.h"
 
 #include "memdebug.h"
 
@@ -33,7 +29,7 @@
  * FTP get with NOBODY but no HEADER
  */
 
-CURLcode test(char *URL)
+static CURLcode test_lib542(const char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;

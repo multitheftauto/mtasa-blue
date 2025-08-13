@@ -107,8 +107,8 @@ static CURLcode mqtt_do(struct Curl_easy *data, bool *done);
 static CURLcode mqtt_done(struct Curl_easy *data,
                           CURLcode status, bool premature);
 static CURLcode mqtt_doing(struct Curl_easy *data, bool *done);
-static int mqtt_getsock(struct Curl_easy *data, struct connectdata *conn,
-                        curl_socket_t *sock);
+static CURLcode mqtt_pollset(struct Curl_easy *data,
+                             struct easy_pollset *ps);
 static CURLcode mqtt_setup_conn(struct Curl_easy *data,
                                 struct connectdata *conn);
 
@@ -125,10 +125,10 @@ const struct Curl_handler Curl_handler_mqtt = {
   ZERO_NULL,                          /* connect_it */
   ZERO_NULL,                          /* connecting */
   mqtt_doing,                         /* doing */
-  ZERO_NULL,                          /* proto_getsock */
-  mqtt_getsock,                       /* doing_getsock */
-  ZERO_NULL,                          /* domore_getsock */
-  ZERO_NULL,                          /* perform_getsock */
+  ZERO_NULL,                          /* proto_pollset */
+  mqtt_pollset,                       /* doing_pollset */
+  ZERO_NULL,                          /* domore_pollset */
+  ZERO_NULL,                          /* perform_pollset */
   ZERO_NULL,                          /* disconnect */
   ZERO_NULL,                          /* write_resp */
   ZERO_NULL,                          /* write_resp_hd */
@@ -213,13 +213,10 @@ static CURLcode mqtt_send(struct Curl_easy *data,
 /* Generic function called by the multi interface to figure out what socket(s)
    to wait for and for what actions during the DOING and PROTOCONNECT
    states */
-static int mqtt_getsock(struct Curl_easy *data,
-                        struct connectdata *conn,
-                        curl_socket_t *sock)
+static CURLcode mqtt_pollset(struct Curl_easy *data,
+                             struct easy_pollset *ps)
 {
-  (void)data;
-  sock[0] = conn->sock[FIRSTSOCKET];
-  return GETSOCK_READSOCK(FIRSTSOCKET);
+  return Curl_pollset_add_in(data, ps, data->conn->sock[FIRSTSOCKET]);
 }
 
 static int mqtt_encode_len(char *buf, size_t len)
@@ -240,7 +237,7 @@ static int mqtt_encode_len(char *buf, size_t len)
 
 /* add the passwd to the CONNECT packet */
 static int add_passwd(const char *passwd, const size_t plen,
-                       char *pkt, const size_t start, int remain_pos)
+                      char *pkt, const size_t start, int remain_pos)
 {
   /* magic number that need to be set properly */
   const size_t conn_flags_pos = remain_pos + 8;
@@ -428,14 +425,13 @@ static CURLcode mqtt_recv_atleast(struct Curl_easy *data, size_t nbytes)
 
   if(rlen < nbytes) {
     unsigned char readbuf[1024];
-    ssize_t nread;
+    size_t nread;
 
     DEBUGASSERT(nbytes - rlen < sizeof(readbuf));
     result = Curl_xfer_recv(data, (char *)readbuf, nbytes - rlen, &nread);
     if(result)
       return result;
-    DEBUGASSERT(nread >= 0);
-    if(curlx_dyn_addn(&mq->recvbuf, readbuf, (size_t)nread))
+    if(curlx_dyn_addn(&mq->recvbuf, readbuf, nread))
       return CURLE_OUT_OF_MEMORY;
     rlen = curlx_dyn_len(&mq->recvbuf);
   }
@@ -703,7 +699,7 @@ static CURLcode mqtt_read_publish(struct Curl_easy *data, bool *done)
 {
   CURLcode result = CURLE_OK;
   struct connectdata *conn = data->conn;
-  ssize_t nread;
+  size_t nread;
   size_t remlen;
   struct mqtt_conn *mqtt = Curl_conn_meta_get(conn, CURL_META_MQTT_CONN);
   struct MQTT *mq = Curl_meta_get(data, CURL_META_MQTT_EASY);
@@ -868,7 +864,7 @@ static CURLcode mqtt_doing(struct Curl_easy *data, bool *done)
 {
   struct MQTT *mq = Curl_meta_get(data, CURL_META_MQTT_EASY);
   CURLcode result = CURLE_OK;
-  ssize_t nread;
+  size_t nread;
   unsigned char recvbyte;
   struct mqtt_conn *mqtt = Curl_conn_meta_get(data->conn, CURL_META_MQTT_CONN);
 

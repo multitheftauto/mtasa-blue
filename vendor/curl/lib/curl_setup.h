@@ -75,6 +75,11 @@
 #endif
 #endif
 
+#if defined(__MINGW32__) && !defined(__MINGW32CE__) && \
+  (!defined(__MINGW64_VERSION_MAJOR) || (__MINGW64_VERSION_MAJOR < 3))
+#error "Building curl requires mingw-w64 3.0 or later"
+#endif
+
 /* Visual Studio 2008 is the minimum Visual Studio version we support.
    Workarounds for older versions of Visual Studio have been removed. */
 #if defined(_MSC_VER) && (_MSC_VER < 1500)
@@ -224,46 +229,46 @@
 
 #ifdef HTTP_ONLY
 #  ifndef CURL_DISABLE_DICT
-#    define CURL_DISABLE_DICT
+#  define CURL_DISABLE_DICT
 #  endif
 #  ifndef CURL_DISABLE_FILE
-#    define CURL_DISABLE_FILE
+#  define CURL_DISABLE_FILE
 #  endif
 #  ifndef CURL_DISABLE_FTP
-#    define CURL_DISABLE_FTP
+#  define CURL_DISABLE_FTP
 #  endif
 #  ifndef CURL_DISABLE_GOPHER
-#    define CURL_DISABLE_GOPHER
+#  define CURL_DISABLE_GOPHER
 #  endif
 #  ifndef CURL_DISABLE_IMAP
-#    define CURL_DISABLE_IMAP
+#  define CURL_DISABLE_IMAP
 #  endif
 #  ifndef CURL_DISABLE_LDAP
-#    define CURL_DISABLE_LDAP
+#  define CURL_DISABLE_LDAP
 #  endif
 #  ifndef CURL_DISABLE_LDAPS
-#    define CURL_DISABLE_LDAPS
+#  define CURL_DISABLE_LDAPS
 #  endif
 #  ifndef CURL_DISABLE_MQTT
-#    define CURL_DISABLE_MQTT
+#  define CURL_DISABLE_MQTT
 #  endif
 #  ifndef CURL_DISABLE_POP3
-#    define CURL_DISABLE_POP3
+#  define CURL_DISABLE_POP3
 #  endif
 #  ifndef CURL_DISABLE_RTSP
-#    define CURL_DISABLE_RTSP
+#  define CURL_DISABLE_RTSP
 #  endif
 #  ifndef CURL_DISABLE_SMB
-#    define CURL_DISABLE_SMB
+#  define CURL_DISABLE_SMB
 #  endif
 #  ifndef CURL_DISABLE_SMTP
-#    define CURL_DISABLE_SMTP
+#  define CURL_DISABLE_SMTP
 #  endif
 #  ifndef CURL_DISABLE_TELNET
-#    define CURL_DISABLE_TELNET
+#  define CURL_DISABLE_TELNET
 #  endif
 #  ifndef CURL_DISABLE_TFTP
-#    define CURL_DISABLE_TFTP
+#  define CURL_DISABLE_TFTP
 #  endif
 #endif
 
@@ -331,10 +336,10 @@
 #define CURL_CONC_MACROS(A,B) CURL_CONC_MACROS_(A,B)
 
 /* curl uses its own printf() function internally. It understands the GNU
- * format. Use this format, so that is matches the GNU format attribute we
+ * format. Use this format, so that it matches the GNU format attribute we
  * use with the MinGW compiler, allowing it to verify them at compile-time.
  */
-#ifdef  __MINGW32__
+#ifdef __MINGW32__
 #  undef CURL_FORMAT_CURL_OFF_T
 #  undef CURL_FORMAT_CURL_OFF_TU
 #  define CURL_FORMAT_CURL_OFF_T   "lld"
@@ -470,62 +475,46 @@
 #include <curl/stdcheaders.h>
 #endif
 
-/*
- * Large file (>2Gb) support using Win32 functions.
- */
-
-#ifdef USE_WIN32_LARGE_FILES
+#ifdef _WIN32
 #  ifdef HAVE_IO_H
 #  include <io.h>
 #  endif
 #  include <sys/types.h>
 #  include <sys/stat.h>
-#  undef  lseek
-#  define lseek(fdes,offset,whence)  _lseeki64(fdes, offset, whence)
-#  undef  fstat
-#  define fstat(fdes,stp)            _fstati64(fdes, stp)
-#  undef  stat
-#  define stat(fname,stp)            curlx_win32_stat(fname, stp)
-#  define struct_stat                struct _stati64
-#  define LSEEK_ERROR                (__int64)-1
-#  define open                       curlx_win32_open
-#  define fopen(fname,mode)          curlx_win32_fopen(fname, mode)
-   int curlx_win32_open(const char *filename, int oflag, ...);
-   int curlx_win32_stat(const char *path, struct_stat *buffer);
-   FILE *curlx_win32_fopen(const char *filename, const char *mode);
-#endif
-
-#ifdef __DJGPP__
-/* Requires DJGPP 2.04 */
+#  ifdef USE_WIN32_LARGE_FILES
+     /* Large file (>2Gb) support using Win32 functions. */
+#    undef  lseek
+#    define lseek(fdes, offset, whence)  _lseeki64(fdes, offset, whence)
+#    undef  fstat
+#    define fstat(fdes,stp)              _fstati64(fdes, stp)
+#    undef  stat
+#    define struct_stat                  struct _stati64
+#    define LSEEK_ERROR                  (__int64)-1
+#  else
+     /* Small file (<2Gb) support using Win32 functions. */
+#    ifndef UNDER_CE
+#      undef  lseek
+#      define lseek(fdes, offset, whence)  _lseek(fdes, (long)offset, whence)
+#      define fstat(fdes, stp)             _fstat(fdes, stp)
+#      define struct_stat                  struct _stat
+#    endif
+#    define LSEEK_ERROR                  (long)-1
+#  endif
+#  ifndef UNDER_CE
+     int curlx_win32_stat(const char *path, struct_stat *buffer);
+     int curlx_win32_open(const char *filename, int oflag, ...);
+     FILE *curlx_win32_fopen(const char *filename, const char *mode);
+#    define stat(fname, stp)           curlx_win32_stat(fname, stp)
+#    define open                       curlx_win32_open
+#    define CURL_FOPEN(fname, mode)    curlx_win32_fopen(fname, mode)
+#    define fopen(fname, mode)         CURL_FOPEN(fname, mode)
+#  endif
+#elif defined(__DJGPP__)
+   /* Requires DJGPP 2.04 */
 #  include <unistd.h>
 #  undef  lseek
 #  define lseek(fdes,offset,whence)  llseek(fdes, offset, whence)
 #  define LSEEK_ERROR                (offset_t)-1
-#endif
-
-/*
- * Small file (<2Gb) support using Win32 functions.
- */
-
-#if defined(_WIN32) && !defined(USE_WIN32_LARGE_FILES)
-#  ifdef HAVE_IO_H
-#  include <io.h>
-#  endif
-#  include <sys/types.h>
-#  include <sys/stat.h>
-#  ifndef UNDER_CE
-#    undef  lseek
-#    define lseek(fdes,offset,whence)  _lseek(fdes, (long)offset, whence)
-#    define fstat(fdes,stp)            _fstat(fdes, stp)
-#    define stat(fname,stp)            curlx_win32_stat(fname, stp)
-#    define struct_stat                struct _stat
-#    define open                       curlx_win32_open
-#    define fopen(fname,mode)          curlx_win32_fopen(fname, mode)
-     int curlx_win32_stat(const char *path, struct_stat *buffer);
-     int curlx_win32_open(const char *filename, int oflag, ...);
-     FILE *curlx_win32_fopen(const char *filename, const char *mode);
-#  endif
-#  define LSEEK_ERROR                (long)-1
 #endif
 
 #ifndef struct_stat
@@ -565,11 +554,11 @@
 
 #ifndef SIZEOF_OFF_T
 #  if defined(__VMS) && !defined(__VAX)
-#    if defined(_LARGEFILE)
+#    ifdef _LARGEFILE
 #      define SIZEOF_OFF_T 8
 #    endif
 #  elif defined(__OS400__) && defined(__ILEC400__)
-#    if defined(_LARGE_FILES)
+#    ifdef _LARGE_FILES
 #      define SIZEOF_OFF_T 8
 #    endif
 #  elif defined(__MVS__) && defined(__IBMC__)
@@ -582,7 +571,7 @@
 #    endif
 #  endif
 #  ifndef SIZEOF_OFF_T
-#    define SIZEOF_OFF_T 4
+#  define SIZEOF_OFF_T 4
 #  endif
 #endif
 
@@ -590,9 +579,9 @@
 #error "too small curl_off_t"
 #else
    /* assume SIZEOF_CURL_OFF_T == 8 */
-#  define CURL_OFF_T_MAX CURL_OFF_T_C(0x7FFFFFFFFFFFFFFF)
+#  define CURL_OFF_T_MAX 0x7FFFFFFFFFFFFFFF
 #endif
-#define CURL_OFF_T_MIN (-CURL_OFF_T_MAX - CURL_OFF_T_C(1))
+#define CURL_OFF_T_MIN (-CURL_OFF_T_MAX - 1)
 
 #if (SIZEOF_CURL_OFF_T != 8)
 #  error "curl_off_t must be exactly 64 bits"
@@ -677,12 +666,8 @@
 #    define select(n,r,w,x,t) select_s(n,r,w,x,t)
 #    define ioctl(x,y,z) ioctlsocket(x,y,(char *)(z))
 #    include <tcp.h>
-#    ifdef word
-#      undef word
-#    endif
-#    ifdef byte
-#      undef byte
-#    endif
+#    undef word
+#    undef byte
 
 #  endif /* MSDOS */
 
@@ -739,8 +724,8 @@
 #endif
 
 #if defined(USE_GNUTLS) || defined(USE_OPENSSL) || defined(USE_MBEDTLS) || \
-  defined(USE_WOLFSSL) || defined(USE_SCHANNEL) || defined(USE_SECTRANSP) || \
-  defined(USE_BEARSSL) || defined(USE_RUSTLS)
+  defined(USE_WOLFSSL) || defined(USE_SCHANNEL) || \
+  defined(USE_RUSTLS)
 #define USE_SSL    /* SSL support has been enabled */
 #endif
 
@@ -775,7 +760,7 @@
 /* Single point where USE_NTLM definition might be defined */
 #ifndef CURL_DISABLE_NTLM
 #  if defined(USE_OPENSSL) || defined(USE_MBEDTLS) ||                   \
-  defined(USE_GNUTLS) || defined(USE_SECTRANSP) ||                      \
+  defined(USE_GNUTLS) ||                                                \
   defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO) ||              \
   (defined(USE_WOLFSSL) && defined(HAVE_WOLFSSL_DES_ECB_ENCRYPT))
 #    define USE_CURL_NTLM_CORE
@@ -952,10 +937,10 @@ endings either CRLF or LF so 't' is appropriate.
 
 /* for systems that do not detect this in configure */
 #ifndef CURL_SA_FAMILY_T
-#  if defined(HAVE_SA_FAMILY_T)
-#    define CURL_SA_FAMILY_T sa_family_t
-#  elif defined(HAVE_ADDRESS_FAMILY)
+#  if defined(_WIN32) && !defined(UNDER_CE)
 #    define CURL_SA_FAMILY_T ADDRESS_FAMILY
+#  elif defined(HAVE_SA_FAMILY_T)
+#    define CURL_SA_FAMILY_T sa_family_t
 #  elif defined(__AMIGA__)
 #    define CURL_SA_FAMILY_T unsigned char
 #  else
@@ -976,15 +961,140 @@ endings either CRLF or LF so 't' is appropriate.
 
 #define CURL_ARRAYSIZE(A) (sizeof(A)/sizeof((A)[0]))
 
+#ifndef CURL_DID_MEMORY_FUNC_TYPEDEFS /* only if not already done */
+/*
+ * The following memory function replacement typedef's are COPIED from
+ * curl/curl.h and MUST match the originals. We copy them to avoid having to
+ * include curl/curl.h here. We avoid that include since it includes stdio.h
+ * and other headers that may get messed up with defines done here.
+ */
+typedef void *(*curl_malloc_callback)(size_t size);
+typedef void (*curl_free_callback)(void *ptr);
+typedef void *(*curl_realloc_callback)(void *ptr, size_t size);
+typedef char *(*curl_strdup_callback)(const char *str);
+typedef void *(*curl_calloc_callback)(size_t nmemb, size_t size);
+#define CURL_DID_MEMORY_FUNC_TYPEDEFS
+#endif
+
+extern curl_malloc_callback Curl_cmalloc;
+extern curl_free_callback Curl_cfree;
+extern curl_realloc_callback Curl_crealloc;
+extern curl_strdup_callback Curl_cstrdup;
+extern curl_calloc_callback Curl_ccalloc;
+
+/*
+ * Curl_safefree defined as a macro to allow MemoryTracking feature
+ * to log free() calls at same location where Curl_safefree is used.
+ * This macro also assigns NULL to given pointer when free'd.
+ */
+#define Curl_safefree(ptr) \
+  do { free((ptr)); (ptr) = NULL;} while(0)
+
 #ifdef CURLDEBUG
+#ifdef __clang__
+#  define ALLOC_FUNC         __attribute__((__malloc__))
+#  if __clang_major__ >= 4
+#  define ALLOC_SIZE(s)      __attribute__((__alloc_size__(s)))
+#  define ALLOC_SIZE2(n, s)  __attribute__((__alloc_size__(n, s)))
+#  else
+#  define ALLOC_SIZE(s)
+#  define ALLOC_SIZE2(n, s)
+#  endif
+#elif defined(__GNUC__) && __GNUC__ >= 3
+#  define ALLOC_FUNC         __attribute__((__malloc__))
+#  define ALLOC_SIZE(s)      __attribute__((__alloc_size__(s)))
+#  define ALLOC_SIZE2(n, s)  __attribute__((__alloc_size__(n, s)))
+#elif defined(_MSC_VER)
+#  define ALLOC_FUNC         __declspec(restrict)
+#  define ALLOC_SIZE(s)
+#  define ALLOC_SIZE2(n, s)
+#else
+#  define ALLOC_FUNC
+#  define ALLOC_SIZE(s)
+#  define ALLOC_SIZE2(n, s)
+#endif
+
+#include <curl/curl.h> /* for CURL_EXTERN */
+
+extern FILE *curl_dbg_logfile;
+
+/* memory functions */
+CURL_EXTERN void curl_dbg_free(void *ptr, int line, const char *source);
+CURL_EXTERN ALLOC_FUNC ALLOC_SIZE(1)
+  void *curl_dbg_malloc(size_t size, int line, const char *source);
+CURL_EXTERN ALLOC_FUNC ALLOC_SIZE2(1, 2)
+  void *curl_dbg_calloc(size_t n, size_t size, int line, const char *source);
+CURL_EXTERN ALLOC_SIZE(2)
+  void *curl_dbg_realloc(void *ptr, size_t size, int line, const char *source);
+CURL_EXTERN ALLOC_FUNC
+  char *curl_dbg_strdup(const char *str, int line, const char *src);
+#if defined(_WIN32) && defined(UNICODE)
+CURL_EXTERN ALLOC_FUNC
+  wchar_t *curl_dbg_wcsdup(const wchar_t *str, int line, const char *source);
+#endif
+
+CURL_EXTERN void curl_dbg_memdebug(const char *logname);
+CURL_EXTERN void curl_dbg_memlimit(long limit);
+CURL_EXTERN void curl_dbg_log(const char *format, ...) CURL_PRINTF(1, 2);
+
+/* file descriptor manipulators */
+CURL_EXTERN curl_socket_t curl_dbg_socket(int domain, int type, int protocol,
+                                          int line, const char *source);
+CURL_EXTERN void curl_dbg_mark_sclose(curl_socket_t sockfd,
+                                      int line, const char *source);
+CURL_EXTERN int curl_dbg_sclose(curl_socket_t sockfd,
+                                int line, const char *source);
+CURL_EXTERN curl_socket_t curl_dbg_accept(curl_socket_t s, void *a, void *alen,
+                                          int line, const char *source);
+#ifdef HAVE_ACCEPT4
+CURL_EXTERN curl_socket_t curl_dbg_accept4(curl_socket_t s, void *saddr,
+                                           void *saddrlen, int flags,
+                                           int line, const char *source);
+#endif
+#ifdef HAVE_SOCKETPAIR
+CURL_EXTERN int curl_dbg_socketpair(int domain, int type, int protocol,
+                                    curl_socket_t socket_vector[2],
+                                    int line, const char *source);
+#endif
+
+/* send/receive sockets */
+CURL_EXTERN SEND_TYPE_RETV curl_dbg_send(SEND_TYPE_ARG1 sockfd,
+                                         SEND_QUAL_ARG2 SEND_TYPE_ARG2 buf,
+                                         SEND_TYPE_ARG3 len,
+                                         SEND_TYPE_ARG4 flags, int line,
+                                         const char *source);
+CURL_EXTERN RECV_TYPE_RETV curl_dbg_recv(RECV_TYPE_ARG1 sockfd,
+                                         RECV_TYPE_ARG2 buf,
+                                         RECV_TYPE_ARG3 len,
+                                         RECV_TYPE_ARG4 flags, int line,
+                                         const char *source);
+
+/* FILE functions */
+CURL_EXTERN int curl_dbg_fclose(FILE *file, int line, const char *source);
+CURL_EXTERN ALLOC_FUNC
+  FILE *curl_dbg_fopen(const char *file, const char *mode,
+                       int line, const char *source);
+CURL_EXTERN ALLOC_FUNC
+  FILE *curl_dbg_fdopen(int filedes, const char *mode,
+                        int line, const char *source);
+
+#define sclose(sockfd) curl_dbg_sclose(sockfd,__LINE__,__FILE__)
+#define fake_sclose(sockfd) curl_dbg_mark_sclose(sockfd,__LINE__,__FILE__)
+
 #define CURL_GETADDRINFO(host,serv,hint,res) \
   curl_dbg_getaddrinfo(host, serv, hint, res, __LINE__, __FILE__)
 #define CURL_FREEADDRINFO(data) \
   curl_dbg_freeaddrinfo(data, __LINE__, __FILE__)
-#else
+
+#else /* !CURLDEBUG */
+
+#define sclose(x) CURL_SCLOSE(x)
+#define fake_sclose(x) Curl_nop_stmt
+
 #define CURL_GETADDRINFO getaddrinfo
 #define CURL_FREEADDRINFO freeaddrinfo
-#endif
+
+#endif /* CURLDEBUG */
 
 /* Some versions of the Android NDK is missing the declaration */
 #if defined(HAVE_GETPWUID_R) && \
@@ -1006,13 +1116,18 @@ int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf,
 
 #if (defined(USE_NGTCP2) && defined(USE_NGHTTP3)) || \
     (defined(USE_OPENSSL_QUIC) && defined(USE_NGHTTP3)) || \
-    defined(USE_QUICHE) || defined(USE_MSH3)
+    defined(USE_QUICHE)
 
 #ifdef CURL_WITH_MULTI_SSL
 #error "MultiSSL combined with QUIC is not supported"
 #endif
 
 #define USE_HTTP3
+#endif
+
+/* WebAssembly builds have TCP_NODELAY, but runtime support is missing. */
+#ifndef __EMSCRIPTEN__
+#define CURL_TCP_NODELAY_SUPPORTED
 #endif
 
 /* Certain Windows implementations are not aligned with what curl expects,
@@ -1023,7 +1138,7 @@ int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf,
 #endif
 
 #if defined(USE_UNIX_SOCKETS) && defined(_WIN32)
-#  if !defined(UNIX_PATH_MAX)
+#  ifndef UNIX_PATH_MAX
      /* Replicating logic present in afunix.h
         (distributed with newer Windows 10 SDK versions only) */
 #    define UNIX_PATH_MAX 108
@@ -1071,3 +1186,5 @@ int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf,
 #endif
 
 #endif /* HEADER_CURL_SETUP_H */
+
+#include "curl_mem_undef.h"

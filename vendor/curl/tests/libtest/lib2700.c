@@ -21,8 +21,8 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
+#include "first.h"
 
-#include "test.h"
 #include "testtrace.h"
 #include "memdebug.h"
 
@@ -207,9 +207,11 @@ static CURLcode recv_frame(CURL *curl, bool *stop)
 
   return res;
 }
+#endif
 
-CURLcode test(char *URL)
+static CURLcode test_lib2700(const char *URL)
 {
+#ifndef CURL_DISABLE_WEBSOCKETS
   CURLcode res = CURLE_OK;
   bool stop = false;
   CURL *curl;
@@ -220,14 +222,14 @@ CURLcode test(char *URL)
 
   easy_setopt(curl, CURLOPT_URL, URL);
   easy_setopt(curl, CURLOPT_USERAGENT, "client/test2700");
-  libtest_debug_config.nohex = 1;
-  libtest_debug_config.tracetime = 1;
-  easy_setopt(curl, CURLOPT_DEBUGDATA, &libtest_debug_config);
+  debug_config.nohex = TRUE;
+  debug_config.tracetime = TRUE;
+  easy_setopt(curl, CURLOPT_DEBUGDATA, &debug_config);
   easy_setopt(curl, CURLOPT_DEBUGFUNCTION, libtest_debug_cb);
   easy_setopt(curl, CURLOPT_VERBOSE, 1L);
   easy_setopt(curl, CURLOPT_CONNECT_ONLY, 2L);
-  if(!getenv("LIB2700_AUTO_PONG"))
-    easy_setopt(curl, CURLOPT_WS_OPTIONS, (long)CURLWS_NOAUTOPONG);
+  if(testnum != 2708)
+    easy_setopt(curl, CURLOPT_WS_OPTIONS, CURLWS_NOAUTOPONG);
 
   res = curl_easy_perform(curl);
   if(res) {
@@ -247,8 +249,7 @@ test_cleanup:
   curl_easy_cleanup(curl);
   curl_global_cleanup();
   return res;
-}
-
 #else
-NO_SUPPORT_BUILT_IN
+  NO_SUPPORT_BUILT_IN
 #endif
+}

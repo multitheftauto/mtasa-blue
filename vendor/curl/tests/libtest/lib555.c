@@ -30,20 +30,14 @@
  * argv3 = proxyuser:password
  */
 
-#include "test.h"
-#include "testutil.h"
-#include "warnless.h"
+#include "first.h"
+
 #include "memdebug.h"
 
-#define TEST_HANG_TIMEOUT 60 * 1000
+static const char t555_uploadthis[] = "this is the blurb we want to upload\n";
+#define T555_DATALEN (sizeof(t555_uploadthis)-1)
 
-static const char uploadthis[] =
-  "this is the blurb we want to upload\n";
-
-static size_t readcallback(char  *ptr,
-                           size_t size,
-                           size_t nmemb,
-                           void *clientp)
+static size_t t555_read_cb(char *ptr, size_t size, size_t nmemb, void *clientp)
 {
   int *counter = (int *)clientp;
 
@@ -54,17 +48,16 @@ static size_t readcallback(char  *ptr,
   }
   (*counter)++; /* bump */
 
-  if(size * nmemb >= strlen(uploadthis)) {
+  if(size * nmemb >= T555_DATALEN) {
     curl_mfprintf(stderr, "READ!\n");
-    strcpy(ptr, uploadthis);
-    return strlen(uploadthis);
+    strcpy(ptr, t555_uploadthis);
+    return T555_DATALEN;
   }
   curl_mfprintf(stderr, "READ NOT FINE!\n");
   return 0;
 }
-static curlioerr ioctlcallback(CURL *handle,
-                               int cmd,
-                               void *clientp)
+
+static curlioerr t555_ioctl_callback(CURL *handle, int cmd, void *clientp)
 {
   int *counter = (int *)clientp;
   (void)handle; /* unused */
@@ -75,8 +68,7 @@ static curlioerr ioctlcallback(CURL *handle,
   return CURLIOE_OK;
 }
 
-
-CURLcode test(char *URL)
+static CURLcode test_lib555(const char *URL)
 {
   CURLcode res = CURLE_OK;
   CURL *curl = NULL;
@@ -95,20 +87,20 @@ CURLcode test(char *URL)
   easy_setopt(curl, CURLOPT_HEADER, 1L);
 
   /* read the POST data from a callback */
-  easy_setopt(curl, CURLOPT_IOCTLFUNCTION, ioctlcallback);
+  easy_setopt(curl, CURLOPT_IOCTLFUNCTION, t555_ioctl_callback);
   easy_setopt(curl, CURLOPT_IOCTLDATA, &counter);
 
-  easy_setopt(curl, CURLOPT_READFUNCTION, readcallback);
+  easy_setopt(curl, CURLOPT_READFUNCTION, t555_read_cb);
   easy_setopt(curl, CURLOPT_READDATA, &counter);
   /* We CANNOT do the POST fine without setting the size (or choose
      chunked)! */
-  easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(uploadthis));
+  easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)T555_DATALEN);
 
   easy_setopt(curl, CURLOPT_POST, 1L);
   easy_setopt(curl, CURLOPT_PROXY, libtest_arg2);
   easy_setopt(curl, CURLOPT_PROXYUSERPWD, libtest_arg3);
   easy_setopt(curl, CURLOPT_PROXYAUTH,
-                   (long) (CURLAUTH_NTLM | CURLAUTH_DIGEST | CURLAUTH_BASIC) );
+              CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NTLM);
 
   multi_init(m);
 
