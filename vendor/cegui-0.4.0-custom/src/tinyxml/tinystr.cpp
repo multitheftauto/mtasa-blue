@@ -181,12 +181,13 @@ void TiXmlString::append( const char* str, int len )
     {
         // we know we can safely append the new string
         // strncat (cstring, str, len);
-        memcpy (cstring + length (), 
+	unsigned old_length = current_length;
+	current_length = new_size - 1;
+	memcpy (cstring + old_length, 
                 str,
                 size_suffix);
+        cstring [current_length] = 0;
     }
-    current_length = new_size - 1;
-    cstring [current_length] = 0;
 }
 
 
