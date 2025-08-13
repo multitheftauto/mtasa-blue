@@ -21,9 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
-
-#include <string.h>
+#include "first.h"
 
 /*
  * This test uses these funny custom memory callbacks for the only purpose
@@ -69,10 +67,10 @@ static void custom_free(void *ptr)
 }
 
 
-CURLcode test(char *URL)
+static CURLcode test_lib509(const char *URL)
 {
-  unsigned char a[] = {0x2f, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
-                       0x91, 0xa2, 0xb3, 0xc4, 0xd5, 0xe6, 0xf7};
+  static const unsigned char a[] = {0x2f, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+                                    0x91, 0xa2, 0xb3, 0xc4, 0xd5, 0xe6, 0xf7};
   CURLcode res;
   CURL *curl;
   int asize;
@@ -100,7 +98,7 @@ CURLcode test(char *URL)
   test_setopt(curl, CURLOPT_USERAGENT, "test509"); /* uses strdup() */
 
   asize = (int)sizeof(a);
-  str = curl_easy_escape(curl, (char *)a, asize); /* uses realloc() */
+  str = curl_easy_escape(curl, (const char *)a, asize); /* uses realloc() */
 
   if(seen)
     curl_mprintf("Callbacks were invoked!\n");
