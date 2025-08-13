@@ -6748,7 +6748,7 @@ bool CClientGame::TriggerBrowserRequestResultEvent(const std::unordered_set<SStr
     return GetRootEntity()->CallEvent("onClientBrowserWhitelistChange", Arguments, false);
 }
 
-void CClientGame::RestreamModel(std::uint16_t model)
+bool CClientGame::RestreamModel(std::uint16_t model)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(model))
@@ -6757,8 +6757,9 @@ void CClientGame::RestreamModel(std::uint16_t model)
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
         m_pManager->GetVehicleManager()->RestreamVehicles(model);
-    }
 
+        return true;
+    }
     // Is this an object ID?
     else if (CClientObjectManager::IsValidModel(model))
     {
@@ -6775,6 +6776,8 @@ void CClientGame::RestreamModel(std::uint16_t model)
         // eventually stream them back in with async loading.
         m_pManager->GetObjectManager()->RestreamObjects(model);
         g_pGame->GetModelInfo(model)->RestreamIPL();
+
+        return true;
     }
     // Is this an ped ID?
     else if (CClientPlayerManager::IsValidModel(model))
@@ -6783,12 +6786,16 @@ void CClientGame::RestreamModel(std::uint16_t model)
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
         m_pManager->GetPedManager()->RestreamPeds(model);
-    }
-    else
 
-        // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
-        if (CClientObjectManager::IsValidModel(model) && CVehicleUpgrades::IsUpgrade(model))
-            m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(model);
+        return true;
+    }
+    // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
+    else if (CClientObjectManager::IsValidModel(model) && CVehicleUpgrades::IsUpgrade(model))
+    {
+        m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(model);
+        return true;
+    }
+    return false;
 }
 
 void CClientGame::RestreamWorld()
