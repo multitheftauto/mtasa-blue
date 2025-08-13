@@ -59,7 +59,7 @@ struct pingpong {
   struct dynbuf recvbuf;
   size_t overflow; /* number of bytes left after a final response line */
   size_t nfinal;   /* number of bytes in the final response line, which
-                      after a match is first in the receice buffer */
+                      after a match is first in the receive buffer */
 
   /* Function pointers the protocols MUST implement and provide for the
      pingpong layer to function */
@@ -147,8 +147,9 @@ CURLcode Curl_pp_flushsend(struct Curl_easy *data,
 /* call this when a pingpong connection is disconnected */
 CURLcode Curl_pp_disconnect(struct pingpong *pp);
 
-int Curl_pp_getsock(struct Curl_easy *data, struct pingpong *pp,
-                    curl_socket_t *socks);
+CURLcode Curl_pp_pollset(struct Curl_easy *data,
+                         struct pingpong *pp,
+                         struct easy_pollset *ps);
 
 
 /***********************************************************************

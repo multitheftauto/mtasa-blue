@@ -21,17 +21,15 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
+#include "first.h"
 
-#include "testutil.h"
-#include "warnless.h"
 #include "memdebug.h"
 
 #define print_err(name, exp)                                            \
   curl_mfprintf(stderr, "Type mismatch for CURLOPT_%s (expected %s)\n", \
-                name, exp);
+                name, exp)
 
-CURLcode test(char *URL)
+static CURLcode test_lib1912(const char *URL)
 {
 /* Only test if GCC typechecking is available */
   int error = 0;

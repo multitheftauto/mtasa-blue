@@ -21,31 +21,10 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
+#include "first.h"
 
 #include "testtrace.h"
-#include "testutil.h"
-#include "warnless.h"
 #include "memdebug.h"
-
-struct entry {
-  const char *name;
-  const char *exp;
-};
-
-static const struct entry preload_hosts[] = {
-#if (SIZEOF_TIME_T < 5)
-  { "1.example.com", "20370320 01:02:03" },
-  { "2.example.com", "20370320 03:02:01" },
-  { "3.example.com", "20370319 01:02:03" },
-#else
-  { "1.example.com", "25250320 01:02:03" },
-  { "2.example.com", "25250320 03:02:01" },
-  { "3.example.com", "25250319 01:02:03" },
-#endif
-  { "4.example.com", "" },
-  { NULL, NULL } /* end of list marker */
-};
 
 struct state {
   int index;
@@ -55,6 +34,25 @@ struct state {
 static CURLSTScode hstsread(CURL *easy, struct curl_hstsentry *e,
                             void *userp)
 {
+  struct entry {
+    const char *name;
+    const char *exp;
+  };
+
+  static const struct entry preload_hosts[] = {
+#if (SIZEOF_TIME_T < 5)
+    { "1.example.com", "20370320 01:02:03" },
+    { "2.example.com", "20370320 03:02:01" },
+    { "3.example.com", "20370319 01:02:03" },
+#else
+    { "1.example.com", "25250320 01:02:03" },
+    { "2.example.com", "25250320 03:02:01" },
+    { "3.example.com", "25250319 01:02:03" },
+#endif
+    { "4.example.com", "" },
+    { NULL, NULL } /* end of list marker */
+  };
+
   const char *host;
   const char *expire;
   struct state *s = (struct state *)userp;
@@ -97,7 +95,7 @@ static CURLSTScode hstswrite(CURL *easy, struct curl_hstsentry *e,
  * Read/write HSTS cache entries via callback.
  */
 
-CURLcode test(char *URL)
+static CURLcode test_lib1915(const char *URL)
 {
   CURLcode res = CURLE_OK;
   CURL *hnd;
@@ -105,8 +103,8 @@ CURLcode test(char *URL)
 
   global_init(CURL_GLOBAL_ALL);
 
-  libtest_debug_config.nohex = 1;
-  libtest_debug_config.tracetime = 1;
+  debug_config.nohex = TRUE;
+  debug_config.tracetime = TRUE;
 
   easy_init(hnd);
   easy_setopt(hnd, CURLOPT_URL, URL);
@@ -116,7 +114,7 @@ CURLcode test(char *URL)
   easy_setopt(hnd, CURLOPT_HSTSWRITEFUNCTION, hstswrite);
   easy_setopt(hnd, CURLOPT_HSTSWRITEDATA, &st);
   easy_setopt(hnd, CURLOPT_HSTS_CTRL, CURLHSTS_ENABLE);
-  easy_setopt(hnd, CURLOPT_DEBUGDATA, &libtest_debug_config);
+  easy_setopt(hnd, CURLOPT_DEBUGDATA, &debug_config);
   easy_setopt(hnd, CURLOPT_DEBUGFUNCTION, libtest_debug_cb);
   easy_setopt(hnd, CURLOPT_VERBOSE, 1L);
   res = curl_easy_perform(hnd);
@@ -135,7 +133,7 @@ CURLcode test(char *URL)
   easy_setopt(hnd, CURLOPT_HSTSWRITEFUNCTION, hstswrite);
   easy_setopt(hnd, CURLOPT_HSTSWRITEDATA, &st);
   easy_setopt(hnd, CURLOPT_HSTS_CTRL, CURLHSTS_ENABLE);
-  easy_setopt(hnd, CURLOPT_DEBUGDATA, &libtest_debug_config);
+  easy_setopt(hnd, CURLOPT_DEBUGDATA, &debug_config);
   easy_setopt(hnd, CURLOPT_DEBUGFUNCTION, libtest_debug_cb);
   easy_setopt(hnd, CURLOPT_VERBOSE, 1L);
   res = curl_easy_perform(hnd);
