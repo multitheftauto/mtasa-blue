@@ -21,43 +21,34 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "unitcheck.h"
 
 #ifdef HAVE_NETINET_IN_H
-#  include <netinet/in.h>
+#include <netinet/in.h>
 #endif
 #ifdef HAVE_NETDB_H
-#  include <netdb.h>
+#include <netdb.h>
 #endif
 #ifdef HAVE_ARPA_INET_H
-#  include <arpa/inet.h>
+#include <arpa/inet.h>
 #endif
-
-#include <curlx.h>
 
 #include "hash.h"
 #include "hostip.h"
 
 #include "memdebug.h" /* LAST include file */
 
-static struct Curl_easy *testdata;
 static struct Curl_dnscache hp;
 static char *data_key;
 static struct Curl_dns_entry *data_node;
 
-static CURLcode unit_setup(void)
+static CURLcode t1305_setup(void)
 {
-  testdata = curl_easy_init();
-  if(!testdata) {
-    curl_global_cleanup();
-    return CURLE_OUT_OF_MEMORY;
-  }
-
   Curl_dnscache_init(&hp, 7);
   return CURLE_OK;
 }
 
-static void unit_stop(void)
+static void t1305_stop(void)
 {
   if(data_node) {
     Curl_freeaddrinfo(data_node->addr);
@@ -65,15 +56,12 @@ static void unit_stop(void)
   }
   free(data_key);
   Curl_dnscache_destroy(&hp);
-
-  curl_easy_cleanup(testdata);
-  curl_global_cleanup();
 }
 
 static struct Curl_addrinfo *fake_ai(void)
 {
   static struct Curl_addrinfo *ai;
-  static const char dummy[]="dummy";
+  static const char dummy[] = "dummy";
   size_t namelen = sizeof(dummy); /* including the null-terminator */
 
   ai = calloc(1, sizeof(struct Curl_addrinfo) + sizeof(struct sockaddr_in) +
@@ -109,14 +97,15 @@ static CURLcode create_node(void)
   return CURLE_OK;
 }
 
-
-UNITTEST_START
+static CURLcode test_unit1305(const char *arg)
+{
+  UNITTEST_BEGIN(t1305_setup())
 
   struct Curl_dns_entry *nodep;
   size_t key_len;
 
   /* Test 1305 exits without adding anything to the hash */
-  if(strcmp(arg, "1305") != 0) {
+  if(testnum == 1306) {
     CURLcode rc = create_node();
     abort_unless(rc == CURLE_OK, "data node creation failed");
     key_len = strlen(data_key);
@@ -128,4 +117,5 @@ UNITTEST_START
     data_node = NULL;
   }
 
-UNITTEST_STOP
+  UNITTEST_END(t1305_stop())
+}

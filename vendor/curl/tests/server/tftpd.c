@@ -49,30 +49,16 @@
  *
  * SPDX-License-Identifier: BSD-4-Clause-UC
  */
-
-#include "server_setup.h"
+#include "first.h"
 
 #ifdef HAVE_SYS_IOCTL_H
-#include <sys/ioctl.h>
-#endif
-#ifndef UNDER_CE
-#include <signal.h>
+#include <sys/ioctl.h>  /* for ioctl() */
 #endif
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#ifdef HAVE_NETINET_IN_H
-#include <netinet/in.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
-#ifdef HAVE_NETDB_H
-#include <netdb.h>
-#endif
 #ifdef HAVE_SYS_FILIO_H
-/* FIONREAD on Solaris 7 */
-#include <sys/filio.h>
+#include <sys/filio.h>  /* FIONREAD on Solaris 7 */
 #endif
 
 #include <setjmp.h>
@@ -83,14 +69,40 @@
 
 #include <ctype.h>
 
-#include <curlx.h> /* from the private lib dir */
-#include "getpart.h"
-#include "util.h"
-#include "server_sockaddr.h"
-#include "tftp.h"
+/*****************************************************************************
+*  This is a rewrite/clone of the arpa/tftp.h file for systems without it.   *
+*****************************************************************************/
+#define SEGSIZE 512 /* data segment size */
 
-/* include memdebug.h last */
-#include <memdebug.h>
+#if defined(__GNUC__) && ((__GNUC__ >= 3) || \
+  ((__GNUC__ == 2) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 7)))
+#  define PACKED_STRUCT __attribute__((__packed__))
+#else
+#  define PACKED_STRUCT /* NOTHING */
+#endif
+
+/* Using a packed struct as binary in a program is begging for problems, but
+   the tftpd server was written like this so we have this struct here to make
+   things build. */
+
+struct tftphdr {
+  unsigned short th_opcode; /* packet type */
+  unsigned short th_block;  /* all sorts of things */
+  char th_data[1];          /* data or error string */
+} PACKED_STRUCT;
+
+#define th_stuff th_block
+#define th_code  th_block
+#define th_msg   th_data
+
+#define TFTP_EUNDEF    0
+#define TFTP_ENOTFOUND 1
+#define TFTP_EACCESS   2
+#define TFTP_ENOSPACE  3
+#define TFTP_EBADOP    4
+#define TFTP_EBADID    5
+#define TFTP_EEXISTS   6
+#define TFTP_ENOUSER   7
 
 /*****************************************************************************
 *                      STRUCT DECLARATIONS AND DEFINES                       *
@@ -146,9 +158,6 @@ struct bf {
 #define opcode_ERROR 5
 
 #define TIMEOUT      5
-
-#undef MIN
-#define MIN(x,y) ((x)<(y)?(x):(y))
 
 #define REQUEST_DUMP  "server.input"
 
@@ -360,7 +369,7 @@ static void read_ahead(struct testcase *test,
   if(convert == 0) {
     /* The former file reading code did this:
        b->counter = read(fileno(file), dp->th_data, SEGSIZE); */
-    size_t copy_n = MIN(SEGSIZE, test->rcount);
+    size_t copy_n = CURLMIN(SEGSIZE, test->rcount);
     memcpy(dp->th_data, test->rptr, copy_n);
 
     /* decrease amount, advance pointer */
@@ -472,7 +481,7 @@ static ssize_t write_behind(struct testcase *test, int convert)
     }
     /* formerly
        putc(c, file); */
-    if(1 != write(test->ofile, &c, 1))
+    if(write(test->ofile, &c, 1) != 1)
       break;
 skipit:
     prevchar = c;
@@ -499,15 +508,15 @@ static int synchnet(curl_socket_t f /* socket to flush */)
   curl_socklen_t fromaddrlen;
 
   for(;;) {
-#if defined(HAVE_IOCTLSOCKET_CAMEL_FIONBIO)
+#ifdef HAVE_IOCTLSOCKET_CAMEL_FIONBIO
     long i;
-    (void) IoctlSocket(f, FIONBIO, &i);
+    (void)IoctlSocket(f, FIONBIO, &i);
 #elif defined(HAVE_IOCTLSOCKET)
     unsigned long i;
-    (void) ioctlsocket(f, FIONREAD, &i);
+    (void)ioctlsocket(f, FIONREAD, &i);
 #else
     int i;
-    (void) ioctl(f, FIONREAD, &i);
+    (void)ioctl(f, FIONREAD, &i);
 #endif
     if(i) {
       j++;
@@ -519,8 +528,8 @@ static int synchnet(curl_socket_t f /* socket to flush */)
       else
         fromaddrlen = sizeof(fromaddr.sa6);
 #endif
-      (void) recvfrom(f, rbuf, sizeof(rbuf), 0,
-                      &fromaddr.sa, &fromaddrlen);
+      (void)recvfrom(f, rbuf, sizeof(rbuf), 0,
+                     &fromaddr.sa, &fromaddrlen);
     }
     else
       break;
@@ -528,7 +537,7 @@ static int synchnet(curl_socket_t f /* socket to flush */)
   return j;
 }
 
-int main(int argc, char **argv)
+static int test_tftpd(int argc, char **argv)
 {
   srvr_sockaddr_union_t me;
   struct tftphdr *tp;
@@ -653,8 +662,8 @@ int main(int argc, char **argv)
   }
 
   flag = 1;
-  if(0 != setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
-            (void *)&flag, sizeof(flag))) {
+  if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
+                (void *)&flag, sizeof(flag))) {
     error = SOCKERRNO;
     logmsg("setsockopt(SO_REUSEADDR) failed with error (%d) %s",
            error, sstrerror(error));
@@ -680,7 +689,7 @@ int main(int argc, char **argv)
     rc = bind(sock, &me.sa, sizeof(me.sa6));
   }
 #endif /* USE_IPV6 */
-  if(0 != rc) {
+  if(rc) {
     error = SOCKERRNO;
     logmsg("Error binding socket on port %hu (%d) %s", port, error,
            sstrerror(error));
@@ -826,7 +835,6 @@ int main(int argc, char **argv)
     }
 
     logmsg("end of one transfer");
-
   }
 
 tftpd_cleanup:
@@ -1021,7 +1029,7 @@ static int tftpd_parse_servercmd(struct testcase *req)
     cmd = orgcmd;
     while(cmd && cmdsize) {
       char *check;
-      if(1 == sscanf(cmd, "writedelay: %d", &num)) {
+      if(sscanf(cmd, "writedelay: %d", &num) == 1) {
         logmsg("instructed to delay %d secs between packets", num);
         req->writedelay = num;
       }
@@ -1110,7 +1118,7 @@ static int validate_access(struct testcase *test,
 
     stream = test2fopen(testno, logdir);
 
-    if(0 != partno)
+    if(partno)
       snprintf(partbuf, sizeof(partbuf), "data%ld", partno);
 
     if(!stream) {
@@ -1171,12 +1179,12 @@ static void sendtftp(struct testcase *test, const struct formats *pf)
     sdp->th_block = htons(sendblock);
     timeout = 0;
 #ifdef HAVE_SIGSETJMP
-    (void) sigsetjmp(timeoutbuf, 1);
+    (void)sigsetjmp(timeoutbuf, 1);
 #endif
     if(test->writedelay) {
       logmsg("Pausing %d seconds before %d bytes", test->writedelay,
              size);
-      wait_ms(1000*test->writedelay);
+      curlx_wait_ms(1000*test->writedelay);
     }
 
 send_data:
@@ -1215,7 +1223,7 @@ send_data:
           break;
         }
         /* Re-synchronize with the other side */
-        (void) synchnet(peer);
+        (void)synchnet(peer);
         if(sap->th_block == (sendblock-1)) {
           goto send_data;
         }
@@ -1249,7 +1257,7 @@ static void recvtftp(struct testcase *test, const struct formats *pf)
     rap->th_block = htons(recvblock);
     recvblock++;
 #ifdef HAVE_SIGSETJMP
-    (void) sigsetjmp(timeoutbuf, 1);
+    (void)sigsetjmp(timeoutbuf, 1);
 #endif
 send_ack:
     logmsg("write");
@@ -1283,7 +1291,7 @@ send_ack:
           break;                         /* normal */
         }
         /* Re-synchronize with the other side */
-        (void) synchnet(peer);
+        (void)synchnet(peer);
         if(rdp->th_block == (recvblock-1))
           goto send_ack;                 /* rexmit */
       }
@@ -1307,7 +1315,7 @@ send_ack:
 
   rap->th_opcode = htons(opcode_ACK);  /* send the "final" ack */
   rap->th_block = htons(recvblock);
-  (void) swrite(peer, &ackbuf.storage[0], 4);
+  (void)swrite(peer, &ackbuf.storage[0], 4);
 #if defined(HAVE_ALARM) && defined(SIGALRM)
   mysignal(SIGALRM, justtimeout);        /* just abort read on timeout */
   alarm(rexmtval);
@@ -1322,7 +1330,7 @@ send_ack:
   if(n >= 4 &&                               /* if read some data */
      rdp->th_opcode == opcode_DATA &&        /* and got a data block */
      recvblock == rdp->th_block) {           /* then my last ack was lost */
-    (void) swrite(peer, &ackbuf.storage[0], 4);  /* resend final ack */
+    (void)swrite(peer, &ackbuf.storage[0], 4);  /* resend final ack */
   }
 abort:
   /* make sure the output file is closed in case of abort */

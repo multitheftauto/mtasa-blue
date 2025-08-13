@@ -66,7 +66,6 @@
 #include "socks.h"
 #include "pingpong.h"
 #include "pop3.h"
-#include "strcase.h"
 #include "vtls/vtls.h"
 #include "cfilters.h"
 #include "connect.h"
@@ -154,8 +153,8 @@ static CURLcode pop3_connect(struct Curl_easy *data, bool *done);
 static CURLcode pop3_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn, bool dead);
 static CURLcode pop3_multi_statemach(struct Curl_easy *data, bool *done);
-static int pop3_getsock(struct Curl_easy *data,
-                        struct connectdata *conn, curl_socket_t *socks);
+static CURLcode pop3_pollset(struct Curl_easy *data,
+                             struct easy_pollset *ps);
 static CURLcode pop3_doing(struct Curl_easy *data, bool *dophase_done);
 static CURLcode pop3_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn);
@@ -187,10 +186,10 @@ const struct Curl_handler Curl_handler_pop3 = {
   pop3_connect,                     /* connect_it */
   pop3_multi_statemach,             /* connecting */
   pop3_doing,                       /* doing */
-  pop3_getsock,                     /* proto_getsock */
-  pop3_getsock,                     /* doing_getsock */
-  ZERO_NULL,                        /* domore_getsock */
-  ZERO_NULL,                        /* perform_getsock */
+  pop3_pollset,                     /* proto_pollset */
+  pop3_pollset,                     /* doing_pollset */
+  ZERO_NULL,                        /* domore_pollset */
+  ZERO_NULL,                        /* perform_pollset */
   pop3_disconnect,                  /* disconnect */
   pop3_write,                       /* write_resp */
   ZERO_NULL,                        /* write_resp_hd */
@@ -218,10 +217,10 @@ const struct Curl_handler Curl_handler_pop3s = {
   pop3_connect,                     /* connect_it */
   pop3_multi_statemach,             /* connecting */
   pop3_doing,                       /* doing */
-  pop3_getsock,                     /* proto_getsock */
-  pop3_getsock,                     /* doing_getsock */
-  ZERO_NULL,                        /* domore_getsock */
-  ZERO_NULL,                        /* perform_getsock */
+  pop3_pollset,                     /* proto_pollset */
+  pop3_pollset,                     /* doing_pollset */
+  ZERO_NULL,                        /* domore_pollset */
+  ZERO_NULL,                        /* perform_pollset */
   pop3_disconnect,                  /* disconnect */
   pop3_write,                       /* write_resp */
   ZERO_NULL,                        /* write_resp_hd */
@@ -285,7 +284,7 @@ static bool pop3_is_multiline(const char *cmdline)
 {
   size_t i;
   for(i = 0; i < CURL_ARRAYSIZE(pop3cmds); ++i) {
-    if(strncasecompare(pop3cmds[i].name, cmdline, pop3cmds[i].nlen)) {
+    if(curl_strnequal(pop3cmds[i].name, cmdline, pop3cmds[i].nlen)) {
       if(!cmdline[pop3cmds[i].nlen])
         return pop3cmds[i].multiline;
       else if(cmdline[pop3cmds[i].nlen] == ' ')
@@ -1117,7 +1116,7 @@ static CURLcode pop3_state_command_resp(struct Curl_easy *data,
 
   if(pop3->transfer == PPTRANSFER_BODY) {
     /* POP3 download */
-    Curl_xfer_setup1(data, CURL_XFER_RECV, -1, FALSE);
+    Curl_xfer_setup_recv(data, FIRSTSOCKET, -1);
 
     if(pp->overflow) {
       /* The recv buffer contains data that is actually body content so send
@@ -1270,13 +1269,12 @@ static CURLcode pop3_block_statemach(struct Curl_easy *data,
 }
 
 /* For the POP3 "protocol connect" and "doing" phases only */
-static int pop3_getsock(struct Curl_easy *data,
-                        struct connectdata *conn, curl_socket_t *socks)
+static CURLcode pop3_pollset(struct Curl_easy *data,
+                             struct easy_pollset *ps)
 {
-  struct pop3_conn *pop3c = Curl_conn_meta_get(conn, CURL_META_POP3_CONN);
-  if(pop3c)
-    return Curl_pp_getsock(data, &pop3c->pp, socks);
-  return GETSOCK_BLANK;
+  struct pop3_conn *pop3c =
+    Curl_conn_meta_get(data->conn, CURL_META_POP3_CONN);
+  return pop3c ? Curl_pp_pollset(data, &pop3c->pp, ps) : CURLE_OK;
 }
 
 /***********************************************************************
@@ -1450,16 +1448,14 @@ static CURLcode pop3_disconnect(struct Curl_easy *data,
      bad in any way, sending quit and waiting around here will make the
      disconnect wait in vain and cause more problems than we need to. */
 
-  if(!dead_connection && conn->bits.protoconnstart) {
+  if(!dead_connection && conn->bits.protoconnstart &&
+     !Curl_pp_needs_flush(data, &pop3c->pp)) {
     if(!pop3_perform_quit(data, conn))
       (void)pop3_block_statemach(data, conn, TRUE); /* ignore errors on QUIT */
   }
 
   /* Disconnect from the server */
   Curl_pp_disconnect(&pop3c->pp);
-
-  /* Cleanup the SASL module */
-  Curl_sasl_cleanup(conn, pop3c->sasl.authused);
 
   /* Cleanup our connection based variables */
   Curl_safefree(pop3c->apoptimestamp);
@@ -1593,11 +1589,11 @@ static CURLcode pop3_parse_url_options(struct connectdata *conn)
     while(*ptr && *ptr != ';')
       ptr++;
 
-    if(strncasecompare(key, "AUTH=", 5)) {
+    if(curl_strnequal(key, "AUTH=", 5)) {
       result = Curl_sasl_parse_url_auth_option(&pop3c->sasl,
                                                value, ptr - value);
 
-      if(result && strncasecompare(value, "+APOP", ptr - value)) {
+      if(result && curl_strnequal(value, "+APOP", ptr - value)) {
         pop3c->preftype = POP3_TYPE_APOP;
         pop3c->sasl.prefmech = SASL_AUTH_NONE;
         result = CURLE_OK;

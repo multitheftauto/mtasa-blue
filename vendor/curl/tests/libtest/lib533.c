@@ -23,17 +23,11 @@
  ***************************************************************************/
 /* used for test case 533, 534, 535 and 546 */
 
-#include "test.h"
+#include "first.h"
 
-#include <fcntl.h>
-
-#include "testutil.h"
-#include "warnless.h"
 #include "memdebug.h"
 
-#define TEST_HANG_TIMEOUT 60 * 1000
-
-CURLcode test(char *URL)
+static CURLcode test_lib533(const char *URL)
 {
   CURLcode res = CURLE_OK;
   CURL *curl = NULL;
