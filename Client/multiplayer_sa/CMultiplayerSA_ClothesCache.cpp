@@ -16,7 +16,7 @@
 
 #define CLOTHES_REF_TEST    1       // Debug clothes geometry refs
 
-static constexpr uint DEFAULT_CACHE_TIME = 1000;
+static constexpr std::uint32_t DEFAULT_CACHE_TIME = 1000;
 
 ////////////////////////////////////////////////
 //
