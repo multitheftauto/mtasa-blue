@@ -220,12 +220,12 @@
     {
       /* Use 'kern' table if available since that can be faster; otherwise */
       /* use GPOS kerning pairs if available.                              */
-      if ( ttface->kern_avail_bits != 0 )
+      if ( ttface->kern_avail_bits )
         kerning->x = sfnt->get_kerning( ttface,
                                         left_glyph,
                                         right_glyph );
 #ifdef TT_CONFIG_OPTION_GPOS_KERNING
-      else if ( ttface->gpos_kerning_available )
+      else if ( ttface->num_gpos_lookups_kerning )
         kerning->x = sfnt->get_gpos_kerning( ttface,
                                              left_glyph,
                                              right_glyph );

@@ -81,10 +81,10 @@ const struct Curl_handler Curl_handler_rtmp = {
   rtmp_connect,                         /* connect_it */
   ZERO_NULL,                            /* connecting */
   ZERO_NULL,                            /* doing */
-  ZERO_NULL,                            /* proto_getsock */
-  ZERO_NULL,                            /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  ZERO_NULL,                            /* perform_getsock */
+  ZERO_NULL,                            /* proto_pollset */
+  ZERO_NULL,                            /* doing_pollset */
+  ZERO_NULL,                            /* domore_pollset */
+  ZERO_NULL,                            /* perform_pollset */
   rtmp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -106,10 +106,10 @@ const struct Curl_handler Curl_handler_rtmpt = {
   rtmp_connect,                         /* connect_it */
   ZERO_NULL,                            /* connecting */
   ZERO_NULL,                            /* doing */
-  ZERO_NULL,                            /* proto_getsock */
-  ZERO_NULL,                            /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  ZERO_NULL,                            /* perform_getsock */
+  ZERO_NULL,                            /* proto_pollset */
+  ZERO_NULL,                            /* doing_pollset */
+  ZERO_NULL,                            /* domore_pollset */
+  ZERO_NULL,                            /* perform_pollset */
   rtmp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -131,10 +131,10 @@ const struct Curl_handler Curl_handler_rtmpe = {
   rtmp_connect,                         /* connect_it */
   ZERO_NULL,                            /* connecting */
   ZERO_NULL,                            /* doing */
-  ZERO_NULL,                            /* proto_getsock */
-  ZERO_NULL,                            /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  ZERO_NULL,                            /* perform_getsock */
+  ZERO_NULL,                            /* proto_pollset */
+  ZERO_NULL,                            /* doing_pollset */
+  ZERO_NULL,                            /* domore_pollset */
+  ZERO_NULL,                            /* perform_pollset */
   rtmp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -156,10 +156,10 @@ const struct Curl_handler Curl_handler_rtmpte = {
   rtmp_connect,                         /* connect_it */
   ZERO_NULL,                            /* connecting */
   ZERO_NULL,                            /* doing */
-  ZERO_NULL,                            /* proto_getsock */
-  ZERO_NULL,                            /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  ZERO_NULL,                            /* perform_getsock */
+  ZERO_NULL,                            /* proto_pollset */
+  ZERO_NULL,                            /* doing_pollset */
+  ZERO_NULL,                            /* domore_pollset */
+  ZERO_NULL,                            /* perform_pollset */
   rtmp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -181,10 +181,10 @@ const struct Curl_handler Curl_handler_rtmps = {
   rtmp_connect,                         /* connect_it */
   ZERO_NULL,                            /* connecting */
   ZERO_NULL,                            /* doing */
-  ZERO_NULL,                            /* proto_getsock */
-  ZERO_NULL,                            /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  ZERO_NULL,                            /* perform_getsock */
+  ZERO_NULL,                            /* proto_pollset */
+  ZERO_NULL,                            /* doing_pollset */
+  ZERO_NULL,                            /* domore_pollset */
+  ZERO_NULL,                            /* perform_pollset */
   rtmp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -206,10 +206,10 @@ const struct Curl_handler Curl_handler_rtmpts = {
   rtmp_connect,                         /* connect_it */
   ZERO_NULL,                            /* connecting */
   ZERO_NULL,                            /* doing */
-  ZERO_NULL,                            /* proto_getsock */
-  ZERO_NULL,                            /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  ZERO_NULL,                            /* perform_getsock */
+  ZERO_NULL,                            /* proto_pollset */
+  ZERO_NULL,                            /* doing_pollset */
+  ZERO_NULL,                            /* domore_pollset */
+  ZERO_NULL,                            /* perform_pollset */
   rtmp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -296,10 +296,10 @@ static CURLcode rtmp_do(struct Curl_easy *data, bool *done)
 
   if(data->state.upload) {
     Curl_pgrsSetUploadSize(data, data->state.infilesize);
-    Curl_xfer_setup1(data, CURL_XFER_SEND, -1, FALSE);
+    Curl_xfer_setup_send(data, FIRSTSOCKET);
   }
   else
-    Curl_xfer_setup1(data, CURL_XFER_RECV, -1, FALSE);
+    Curl_xfer_setup_recv(data, FIRSTSOCKET, -1);
   *done = TRUE;
   return CURLE_OK;
 }
@@ -326,51 +326,54 @@ static CURLcode rtmp_disconnect(struct Curl_easy *data,
   return CURLE_OK;
 }
 
-static ssize_t rtmp_recv(struct Curl_easy *data, int sockindex, char *buf,
-                         size_t len, CURLcode *err)
+static CURLcode rtmp_recv(struct Curl_easy *data, int sockindex, char *buf,
+                          size_t len, size_t *pnread)
 {
   struct connectdata *conn = data->conn;
   RTMP *r = Curl_conn_meta_get(conn, CURL_META_RTMP_CONN);
+  CURLcode result = CURLE_OK;
   ssize_t nread;
 
   (void)sockindex; /* unused */
-  if(!r) {
-    *err = CURLE_FAILED_INIT;
-    return -1;
-  }
+  *pnread = 0;
+  if(!r)
+    return CURLE_FAILED_INIT;
 
   nread = RTMP_Read(r, buf, curlx_uztosi(len));
   if(nread < 0) {
     if(r->m_read.status == RTMP_READ_COMPLETE ||
        r->m_read.status == RTMP_READ_EOF) {
       data->req.size = data->req.bytecount;
-      nread = 0;
     }
     else
-      *err = CURLE_RECV_ERROR;
+      result = CURLE_RECV_ERROR;
   }
-  return nread;
+  else
+    *pnread = (size_t)nread;
+
+  return result;
 }
 
-static ssize_t rtmp_send(struct Curl_easy *data, int sockindex,
-                         const void *buf, size_t len, bool eos, CURLcode *err)
+static CURLcode rtmp_send(struct Curl_easy *data, int sockindex,
+                          const void *buf, size_t len, bool eos,
+                          size_t *pnwritten)
 {
   struct connectdata *conn = data->conn;
   RTMP *r = Curl_conn_meta_get(conn, CURL_META_RTMP_CONN);
-  ssize_t num;
+  ssize_t nwritten;
 
   (void)sockindex; /* unused */
   (void)eos; /* unused */
-  if(!r) {
-    *err = CURLE_FAILED_INIT;
-    return -1;
-  }
+  *pnwritten = 0;
+  if(!r)
+    return CURLE_FAILED_INIT;
 
-  num = RTMP_Write(r, (const char *)buf, curlx_uztosi(len));
-  if(num < 0)
-    *err = CURLE_SEND_ERROR;
+  nwritten = RTMP_Write(r, (const char *)buf, curlx_uztosi(len));
+  if(nwritten < 0)
+    return CURLE_SEND_ERROR;
 
-  return num;
+  *pnwritten = (size_t)nwritten;
+  return CURLE_OK;
 }
 
 void Curl_rtmp_version(char *version, size_t len)

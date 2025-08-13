@@ -45,7 +45,7 @@ BEGIN
       VALUE "FileVersion",      FT_VERSION_STR
       VALUE "ProductName",      "FreeType"
       VALUE "ProductVersion",   FT_VERSION_STR
-      VALUE "LegalCopyright",   L"\x00A9 2000-2024 The FreeType Project www.freetype.org. All rights reserved."
+      VALUE "LegalCopyright",   L"\x00A9 2000-2024 The FreeType Project freetype.org. All rights reserved."
       VALUE "InternalName",     "freetype"
       VALUE "OriginalFilename", FT_FILENAME
     END

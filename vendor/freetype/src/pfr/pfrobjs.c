@@ -326,7 +326,7 @@
     FT_ULong     gps_offset;
 
 
-    FT_TRACE1(( "pfr_slot_load: glyph index %d\n", gindex ));
+    FT_TRACE1(( "pfr_slot_load: glyph index %u\n", gindex ));
 
     if ( gindex > 0 )
       gindex--;

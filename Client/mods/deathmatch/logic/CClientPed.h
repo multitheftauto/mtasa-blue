@@ -82,6 +82,7 @@ enum eMovementState
     MOVEMENTSTATE_ASCENT_JETPACK,             // Ascending with jetpack
     MOVEMENTSTATE_DESCENT_JETPACK,            // Descending with jetpack
     MOVEMENTSTATE_JETPACK,                    // Jetpack flying
+    MOVEMENTSTATE_HANGING,                    // Hanging from the whall during climbing task
 };
 
 enum eDeathAnims
@@ -379,7 +380,7 @@ public:
 
     void SetInWater(bool bIsInWater) { m_bIsInWater = bIsInWater; };
     bool IsInWater();
-    bool IsOnGround();
+    bool IsOnGround(bool checkVehicles = false);
 
     bool          IsClimbing();
     bool          IsRadioOn() const noexcept { return m_bRadioOn; };
