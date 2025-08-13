@@ -21,78 +21,26 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
-#include "test.h"
+#include "first.h"
 
 #ifndef CURL_DISABLE_WEBSOCKETS
 #if 0
-
-static CURLcode send_ping(CURL *curl, const char *send_payload)
-{
-  size_t sent;
-  CURLcode result =
-    curl_ws_send(curl, send_payload, strlen(send_payload), &sent, CURLWS_PING);
-  curl_mfprintf(stderr,
-                "ws: curl_ws_send returned %d, sent %d\n", result, (int)sent);
-
-  return result;
-}
-
-static CURLcode recv_pong(CURL *curl, const char *expected_payload)
-{
-  size_t rlen;
-  unsigned int rflags;
-  char buffer[256];
-  CURLcode result =
-    curl_ws_recv(curl, buffer, sizeof(buffer), &rlen, &rflags);
-  if(rflags & CURLWS_PONG) {
-    int same = 0;
-    curl_mfprintf(stderr, "ws: got PONG back\n");
-    if(rlen == strlen(expected_payload)) {
-      if(!memcmp(expected_payload, buffer, rlen)) {
-        curl_mfprintf(stderr, "ws: got the same payload back\n");
-        same = 1;
-      }
-    }
-    if(!same)
-      curl_mfprintf(stderr, "ws: did NOT get the same payload back\n");
-  }
-  else {
-    curl_mfprintf(stderr, "recv_pong: got %d bytes rflags %x\n",
-                  (int)rlen, rflags);
-  }
-  curl_mfprintf(stderr, "ws: curl_ws_recv returned %d, received %d\n", result,
-                (int)rlen);
-  return result;
-}
-
-/* just close the connection */
-static void websocket_close(CURL *curl)
-{
-  size_t sent;
-  CURLcode result =
-    curl_ws_send(curl, "", 0, &sent, CURLWS_CLOSE);
-  curl_mfprintf(stderr,
-                "ws: curl_ws_send returned %d, sent %d\n", result, (int)sent);
-}
-
-static void websocket(CURL *curl)
+static void t2301_websocket(CURL *curl)
 {
   int i = 0;
   curl_mfprintf(stderr, "ws: websocket() starts\n");
   do {
-    if(send_ping(curl, "foobar"))
+    if(ws_send_ping(curl, "foobar"))
       return;
-    if(recv_pong(curl, "foobar"))
+    if(ws_recv_pong(curl, "foobar"))
       return;
-    sleep(2);
+    curlx_wait_ms(2000);
   } while(i++ < 10);
-  websocket_close(curl);
+  ws_close(curl);
 }
-
 #endif
 
-static size_t writecb(char *b, size_t size, size_t nitems, void *p)
+static size_t t2301_write_cb(char *b, size_t size, size_t nitems, void *p)
 {
   CURL *easy = p;
   unsigned char *buffer = (unsigned char *)b;
@@ -102,8 +50,8 @@ static size_t writecb(char *b, size_t size, size_t nitems, void *p)
     0x8a, 0x0
   };
   size_t incoming = nitems;
-  curl_mfprintf(stderr, "Called CURLOPT_WRITEFUNCTION with %d bytes: ",
-                (int)nitems);
+  curl_mfprintf(stderr, "Called CURLOPT_WRITEFUNCTION with %zu bytes: ",
+                nitems);
   for(i = 0; i < nitems; i++)
     curl_mfprintf(stderr, "%02x ", (unsigned char)buffer[i]);
   curl_mfprintf(stderr, "\n");
@@ -119,9 +67,11 @@ static size_t writecb(char *b, size_t size, size_t nitems, void *p)
     curl_mfprintf(stderr, "returns error from callback\n");
   return nitems;
 }
+#endif
 
-CURLcode test(char *URL)
+static CURLcode test_lib2301(const char *URL)
 {
+#ifndef CURL_DISABLE_WEBSOCKETS
   CURL *curl;
   CURLcode res = CURLE_OK;
 
@@ -134,22 +84,21 @@ CURLcode test(char *URL)
     /* use the callback style */
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "webbie-sox/3");
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-    curl_easy_setopt(curl, CURLOPT_WS_OPTIONS, (long)CURLWS_RAW_MODE);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writecb);
+    curl_easy_setopt(curl, CURLOPT_WS_OPTIONS, CURLWS_RAW_MODE);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, t2301_write_cb);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, curl);
     res = curl_easy_perform(curl);
     curl_mfprintf(stderr, "curl_easy_perform() returned %d\n", res);
 #if 0
     if(res == CURLE_OK)
-      websocket(curl);
+      t2301_websocket(curl);
 #endif
     /* always cleanup */
     curl_easy_cleanup(curl);
   }
   curl_global_cleanup();
   return res;
-}
-
-#else /* no WebSockets */
-NO_SUPPORT_BUILT_IN
+#else
+  NO_SUPPORT_BUILT_IN
 #endif
+}

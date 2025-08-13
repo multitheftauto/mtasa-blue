@@ -238,7 +238,7 @@ int CLuaFunctionDefs::GetKeyboardLayout(lua_State* luaVM)
             case 0:            // Left to right (English)
                 readingLayout = "ltr";
                 break;
-            case 1:            // Right to left (Arabic, Hebrew)
+            case 1:            // Right to left (Arabic, Hebrew, and Persian)
                 readingLayout = "rtl";
                 break;
             case 2:            // Vertical top to bottom with columns to the left and also left to right (Japanese)

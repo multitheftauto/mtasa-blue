@@ -4495,6 +4495,17 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
             return false;
     }
 
+    auto iter = g_pClientGame->GetVehicleManager()->IterBegin();
+    auto end = g_pClientGame->GetVehicleManager()->IterEnd();
+    for (; iter != end; ++iter)
+    {
+        CClientVehicle* pVehicle = *iter;
+        if (pVehicle && pVehicle->GetModel() == uiModel)
+        {
+            pVehicle->ApplyAudioSettings();
+        }
+    }
+
     return true;
 }
 

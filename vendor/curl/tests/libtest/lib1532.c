@@ -21,13 +21,13 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
+#include "first.h"
 
 #include "memdebug.h"
 
 /* Test CURLINFO_RESPONSE_CODE */
 
-CURLcode test(char *URL)
+static CURLcode test_lib1532(const char *URL)
 {
   CURL *curl;
   long httpcode;

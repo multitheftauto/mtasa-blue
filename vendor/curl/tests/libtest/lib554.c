@@ -21,54 +21,54 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
+#include "first.h"
 
 #include "memdebug.h"
 
-static char testdata[]=
-  "this is what we post to the silly web server\n";
-
-struct WriteThis {
-  char *readptr;
+struct t554_WriteThis {
+  const char *readptr;
   size_t sizeleft;
 };
 
-static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
+static size_t t554_read_cb(char *ptr, size_t size, size_t nmemb, void *userp)
 {
-#ifdef LIB587
-  (void)ptr;
-  (void)size;
-  (void)nmemb;
-  (void)userp;
-  return CURL_READFUNC_ABORT;
-#else
-
-  struct WriteThis *pooh = (struct WriteThis *)userp;
+  struct t554_WriteThis *pooh = (struct t554_WriteThis *)userp;
 
   if(size*nmemb < 1)
     return 0;
 
   if(pooh->sizeleft) {
-    *ptr = pooh->readptr[0]; /* copy one single byte */
-    pooh->readptr++;                 /* advance pointer */
-    pooh->sizeleft--;                /* less data left */
-    return 1;                        /* we return 1 byte at a time! */
+    *ptr = pooh->readptr[0];  /* copy one single byte */
+    pooh->readptr++;          /* advance pointer */
+    pooh->sizeleft--;         /* less data left */
+    return 1;                 /* we return 1 byte at a time! */
   }
 
-  return 0;                         /* no more data left to deliver */
-#endif
+  return 0;                   /* no more data left to deliver */
 }
 
-static CURLcode test_once(char *URL, bool oldstyle)
+static size_t t587_read_cb(char *ptr, size_t size, size_t nmemb, void *userp)
 {
+  (void)ptr;
+  (void)size;
+  (void)nmemb;
+  (void)userp;
+  return CURL_READFUNC_ABORT;
+}
+
+static CURLcode t554_test_once(const char *URL, bool oldstyle)
+{
+  static const char testdata[] =
+    "this is what we post to the silly web server\n";
+
   CURL *curl;
   CURLcode res = CURLE_OK;
   CURLFORMcode formrc;
 
   struct curl_httppost *formpost = NULL;
   struct curl_httppost *lastptr = NULL;
-  struct WriteThis pooh;
-  struct WriteThis pooh2;
+  struct t554_WriteThis pooh;
+  struct t554_WriteThis pooh2;
 
   pooh.readptr = testdata;
   pooh.sizeleft = strlen(testdata);
@@ -95,7 +95,7 @@ static CURLcode test_once(char *URL, bool oldstyle)
   }
 
   if(formrc)
-    curl_mprintf("curl_formadd(1) = %d\n", (int)formrc);
+    curl_mprintf("curl_formadd(1) = %d\n", formrc);
 
   /* Now add the same data with another name and make it not look like
      a file upload but still using the callback */
@@ -112,7 +112,7 @@ static CURLcode test_once(char *URL, bool oldstyle)
                         CURLFORM_END);
 
   if(formrc)
-    curl_mprintf("curl_formadd(2) = %d\n", (int)formrc);
+    curl_mprintf("curl_formadd(2) = %d\n", formrc);
 
   /* Fill in the filename field */
   formrc = curl_formadd(&formpost,
@@ -121,7 +121,7 @@ static CURLcode test_once(char *URL, bool oldstyle)
                         CURLFORM_COPYCONTENTS, "postit2.c",
                         CURLFORM_END);
   if(formrc)
-    curl_mprintf("curl_formadd(3) = %d\n", (int)formrc);
+    curl_mprintf("curl_formadd(3) = %d\n", formrc);
 
   /* Fill in a submit field too */
   formrc = curl_formadd(&formpost,
@@ -132,17 +132,17 @@ static CURLcode test_once(char *URL, bool oldstyle)
                         CURLFORM_END);
 
   if(formrc)
-    curl_mprintf("curl_formadd(4) = %d\n", (int)formrc);
+    curl_mprintf("curl_formadd(4) = %d\n", formrc);
 
   formrc = curl_formadd(&formpost, &lastptr,
                         CURLFORM_COPYNAME, "somename",
                         CURLFORM_BUFFER, "somefile.txt",
                         CURLFORM_BUFFERPTR, "blah blah",
-                        CURLFORM_BUFFERLENGTH, (long)9,
+                        CURLFORM_BUFFERLENGTH, 9L,
                         CURLFORM_END);
 
   if(formrc)
-    curl_mprintf("curl_formadd(5) = %d\n", (int)formrc);
+    curl_mprintf("curl_formadd(5) = %d\n", formrc);
 
   curl = curl_easy_init();
   if(!curl) {
@@ -162,7 +162,12 @@ static CURLcode test_once(char *URL, bool oldstyle)
   test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)pooh.sizeleft);
 
   /* we want to use our own read function */
-  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+  if(testnum == 587) {
+    test_setopt(curl, CURLOPT_READFUNCTION, t587_read_cb);
+  }
+  else {
+    test_setopt(curl, CURLOPT_READFUNCTION, t554_read_cb);
+  }
 
   /* send a multi-part formpost */
   test_setopt(curl, CURLOPT_HTTPPOST, formpost);
@@ -187,7 +192,7 @@ test_cleanup:
   return res;
 }
 
-CURLcode test(char *URL)
+static CURLcode test_lib554(const char *URL)
 {
   CURLcode res;
 
@@ -196,9 +201,9 @@ CURLcode test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  res = test_once(URL, TRUE); /* old */
+  res = t554_test_once(URL, TRUE); /* old */
   if(!res)
-    res = test_once(URL, FALSE); /* new */
+    res = t554_test_once(URL, FALSE); /* new */
 
   curl_global_cleanup();
 

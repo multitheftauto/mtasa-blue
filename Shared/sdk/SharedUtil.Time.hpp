@@ -87,6 +87,15 @@ double SharedUtil::GetSecondCount()
 }
 
 //
+// Returns a timestamp in ms
+//
+std::int64_t SharedUtil::GetTimestamp()
+{
+    auto now = std::chrono::system_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+}
+
+//
 // Get the time as a sortable string.
 // Set bDate to include the date, bMs to include milliseconds
 // Return example: "2010-09-01 14:54:31.091"

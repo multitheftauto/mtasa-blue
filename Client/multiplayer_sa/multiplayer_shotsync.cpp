@@ -95,7 +95,6 @@ VOID InitShotsyncHooks()
     HookInstall(HOOKPOS_CEventDamage__AffectsPed, (DWORD)HOOK_CEventDamage__AffectsPed, 6);
     HookInstall(HOOKPOS_CEventVehicleExplosion__AffectsPed, (DWORD)HOOK_CEventVehicleExplosion__AffectsPed, 5);
     HookInstall(HOOKPOS_CFireManager__StartFire, (DWORD)HOOK_CFireManager__StartFire, 6);
-    HookInstall(HOOKPOS_CFireManager__StartFire_, (DWORD)HOOK_CFireManager__StartFire_, 6);
     HookInstall(HOOKPOS_CProjectileInfo__AddProjectile, (DWORD)HOOK_CProjectileInfo__AddProjectile, 7);
     HookInstall(HOOKPOS_CProjectile__CProjectile, (DWORD)HOOK_CProjectile__CProjectile, 7);
     HookInstall(HOOKPOS_IKChainManager_PointArm, (DWORD)HOOK_IKChainManager_PointArm, 7);
@@ -837,95 +836,40 @@ void _declspec(naked) HOOK_CEventDamage__AffectsPed()
     }
 }
 
-void ProcessStartFire(CFireSAInterface* fire)
-{
-    if (m_pFireHandler)
-    {
-        DWORD  dwID = ((DWORD)fire - 0xB71F80 /* CLASS_CFireManager */) / 40;
-        CFire* pFire = pGameInterface->GetFireManager()->GetFire(dwID);
-        if (pFire)
-        {
-            m_pFireHandler(pFire);
-        }
-    }
-}
-
-CFireSAInterface* tempFire;
-DWORD             dwStoredReturn;
-
-//  CFire*  StartFire(CVector vecLocation, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, bool8 bExtinguishEnabled=TRUE, CEntity* pStartedFireEntity = NULL, UInt32
-//  ArgBurnTime = FIRE_AVERAGE_BURNTIME, Int8 NumGenerationsAllowed = 100, Bool8 bReportFire = true);
-void _declspec(naked) HOOK_CFireManager__StartFire()
-{
-    // replacement code
-    _asm
-    {
-        mov     edx, [esp]
-        mov     dwStoredReturn, edx
-        mov     edx, returnHere
-        mov     [esp], edx
-
-        push    ecx
-        push    ebp
-        mov     ebp, [esp+0x10]
-
-        mov     edx, HOOKPOS_CFireManager__StartFire
-        add     edx, 6
-        jmp     edx
-
-        returnHere:
-        mov     tempFire, eax
-
-        pushad
-    }
-
-    ProcessStartFire(tempFire);
-
-    _asm
-    {
-        popad
-
-        mov     eax, tempFire
-        mov     edx, dwStoredReturn
-        jmp     edx
-    }
-}
-
 //  CFire*  StartFire(CEntity *pBurningEntity, CEntity *pStartedFireEntity, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, bool8 bExtinguishEnabled=TRUE, UInt32
 //  ArgBurnTime = FIRE_AVERAGE_BURNTIME, Int8 NumGenerationsAllowed = 100);
-void _declspec(naked) HOOK_CFireManager__StartFire_()
+static constexpr std::uintptr_t SKIP_CFireManager_StartFire = 0x53A0C5;
+static constexpr std::uintptr_t RETURN_CFireManager_StartFire = 0x53A056;
+
+static void _declspec(naked) HOOK_CFireManager__StartFire()
 {
     _asm
     {
-        // replacement code
-        mov     edx, [esp]
-        mov     dwStoredReturn, edx
-        mov     edx, returnHere
-        mov     [esp], edx
+        push esi
+        push edi
+        mov edi, [esp+0Ch]
 
-        push    esi
-        push    edi
-        mov     edi, [esp+0xC]
+        mov eax, m_pFireHandler
+        test eax, eax
+        jz startFire
 
-        //
-        mov     edx, HOOKPOS_CFireManager__StartFire_
-        add     edx, 6
-        jmp     edx
+        push ecx
 
-        returnHere:
-        mov     tempFire, eax
+        push [esp+14h]
+        push edi
+        call m_pFireHandler
+        add esp, 8
 
-        pushad
-    }
+        pop ecx
 
-    ProcessStartFire(tempFire);
+        test al, al
+        jz abortCreatingFire
 
-    _asm
-    {
-        popad
+        startFire:
+        jmp RETURN_CFireManager_StartFire
 
-        mov     eax, tempFire
-        jmp     dwStoredReturn
+        abortCreatingFire:
+        jmp SKIP_CFireManager_StartFire
     }
 }
 

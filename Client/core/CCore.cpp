@@ -1464,6 +1464,7 @@ void CCore::Quit(bool bInstantly)
         WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
 
         // Hide game window to make quit look instant
+        PostQuitMessage(0);
         ShowWindow(GetHookedWindow(), SW_HIDE);
 
         // Destroy the client
@@ -1476,7 +1477,6 @@ void CCore::Quit(bool bInstantly)
 
         // Use TerminateProcess for now as exiting the normal way crashes
         TerminateProcess(GetCurrentProcess(), 0);
-        // PostQuitMessage ( 0 );
     }
     else
     {

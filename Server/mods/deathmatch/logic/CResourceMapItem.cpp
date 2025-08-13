@@ -192,15 +192,6 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
         }
         case CElement::BUILDING:
         {
-            const CMtaVersion& minClientVersion = m_resource->GetMinClientFromMetaXml();
-
-            if (minClientVersion < CMtaVersion(SERVERSIDE_BUILDING_MIN_CLIENT_VERSION))
-            {
-                CLogger::LogPrintf("Resource %s should have client min_mta_version higher or equal than %s\n", m_resource->GetName().c_str(),
-                                   SERVERSIDE_BUILDING_MIN_CLIENT_VERSION);
-                break;
-            }
-
             pNode = m_pBuildingManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }

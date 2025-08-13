@@ -21,17 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
+#include "first.h"
 
-#include <fcntl.h>
-
-#include "testutil.h"
-#include "warnless.h"
 #include "memdebug.h"
 
-#define TEST_HANG_TIMEOUT 60 * 1000
-
-CURLcode test(char *URL)
+static CURLcode test_lib564(const char *URL)
 {
   CURLcode res = CURLE_OK;
   CURL *curl = NULL;
@@ -47,7 +41,7 @@ CURLcode test(char *URL)
   easy_setopt(curl, CURLOPT_URL, URL);
   easy_setopt(curl, CURLOPT_VERBOSE, 1L);
   easy_setopt(curl, CURLOPT_PROXY, libtest_arg2);
-  easy_setopt(curl, CURLOPT_PROXYTYPE, (long)CURLPROXY_SOCKS4);
+  easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4);
 
   multi_init(m);
 

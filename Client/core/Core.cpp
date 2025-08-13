@@ -15,6 +15,7 @@
 #include "profiler/SharedUtil.Profiler.h"
 #define UTF8_FILE_HOOKS_PERSONALITY_Core
 #include "SharedUtil.Win32Utf8FileHooks.hpp"
+#include "SharedUtil.Memory.h"
 
 #define CORE_API extern "C" __declspec(dllexport)
 
@@ -93,6 +94,8 @@ CORE_API int InitializeCore()
     SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto");
 
     WriteDebugEvent(SString("ModuleFileName: %s", *GetLaunchPathFilename()));
+
+    SetMemoryAllocationFailureHandler();
 
     g_pCore = new CCore();
     return 0;

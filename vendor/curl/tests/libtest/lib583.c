@@ -26,13 +26,11 @@
  * https://curl.se/mail/lib-2011-03/0066.html
  */
 
-#include "test.h"
-
-#include <sys/stat.h>
+#include "first.h"
 
 #include "memdebug.h"
 
-CURLcode test(char *URL)
+static CURLcode test_lib583(const char *URL)
 {
   int stillRunning;
   CURLM *multiHandle = NULL;
@@ -56,7 +54,7 @@ CURLcode test(char *URL)
   easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
   easy_setopt(curl, CURLOPT_URL, URL);
-  easy_setopt(curl, CURLOPT_INFILESIZE, (long)5);
+  easy_setopt(curl, CURLOPT_INFILESIZE, 5L);
 
   multi_add_handle(multiHandle, curl);
 
@@ -72,8 +70,8 @@ CURLcode test(char *URL)
   curl_mfprintf(stderr, "curl_multi_remove_handle()...\n");
   mres = curl_multi_remove_handle(multiHandle, curl);
   if(mres) {
-    curl_mfprintf(stderr, "curl_multi_remove_handle() failed, "
-            "with code %d\n", (int)mres);
+    curl_mfprintf(stderr, "curl_multi_remove_handle() failed, with code %d\n",
+                  mres);
     res = TEST_ERR_MULTI;
   }
   else

@@ -23,8 +23,6 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#include <curlx.h>
-
 #include "tool_help.h"
 #include "tool_libinfo.h"
 #include "tool_util.h"
@@ -35,7 +33,7 @@
 #include "tool_cfgable.h"
 #include "terminal.h"
 
-#include <memdebug.h> /* keep this as LAST include */
+#include "memdebug.h" /* keep this as LAST include */
 
 struct category_descriptors {
   const char *opt;

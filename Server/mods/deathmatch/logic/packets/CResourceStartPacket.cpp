@@ -62,20 +62,10 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(usNoClientCacheScriptCount);
 
         // Write the declared min client version for this resource
-        if (BitStream.Version() >= 0x32)
-        {
-            BitStream.WriteString(m_pResource->GetMinServerRequirement());
-            BitStream.WriteString(m_pResource->GetMinClientRequirement());
-        }
-        if (BitStream.Version() >= 0x45)
-        {
-            BitStream.WriteBit(m_pResource->IsOOPEnabledInMetaXml());
-        }
-
-        if (BitStream.Version() >= 0x62)
-        {
-            BitStream.Write(m_pResource->GetDownloadPriorityGroup());
-        }
+        BitStream.WriteString(m_pResource->GetMinServerRequirement());
+        BitStream.WriteString(m_pResource->GetMinClientRequirement());
+        BitStream.WriteBit(m_pResource->IsOOPEnabledInMetaXml());
+        BitStream.Write(m_pResource->GetDownloadPriorityGroup());
 
         // Send the resource files info
         std::list<CResourceFile*>::iterator iter = m_pResource->IterBegin();

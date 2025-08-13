@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-15 00:40+0000\n"
-"PO-Revision-Date: 2025-07-15 01:31\n"
+"POT-Creation-Date: 2025-08-01 03:08+0000\n"
+"PO-Revision-Date: 2025-08-08 15:50\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -32,8 +32,8 @@ msgstr "Problem beim Neustart von MTA:SA\n\n"
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
-#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
-#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:848
+#: Client/loader/CInstallManager.cpp:563 Client/loader/CInstallManager.cpp:572
 #: Client/core/CSettings.cpp:2993 Client/core/CSettings.cpp:4301
 #: Client/core/CSettings.cpp:4329 Client/core/CSettings.cpp:4940
 #: Client/core/CConnectManager.cpp:86 Client/core/CConnectManager.cpp:117
@@ -47,17 +47,17 @@ msgstr "Problem beim Neustart von MTA:SA\n\n"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1340
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:649
-#: Client/mods/deathmatch/logic/CClientGame.cpp:723
-#: Client/mods/deathmatch/logic/CClientGame.cpp:747
-#: Client/mods/deathmatch/logic/CClientGame.cpp:769
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1182
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1341
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1427
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1439
+#: Client/mods/deathmatch/logic/CClientGame.cpp:651
+#: Client/mods/deathmatch/logic/CClientGame.cpp:719
+#: Client/mods/deathmatch/logic/CClientGame.cpp:743
+#: Client/mods/deathmatch/logic/CClientGame.cpp:765
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1178
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1374
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1423
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1435
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
@@ -144,31 +144,31 @@ msgstr "WARNUNG\n\n"
 msgid "The detected file was:  %s\n"
 msgstr "Die erkannte Datei ist:  %s\n"
 
-#: Client/loader/MainFunctions.cpp:602
+#: Client/loader/MainFunctions.cpp:604
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "Eine Instanz von GTA: San Andreas läuft bereits. Diese muss beendet werden, bevor MTA:SA gestartet werden kann. Möchtest du dies jetzt tun?"
 
-#: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
-#: Client/loader/MainFunctions.cpp:1219
+#: Client/loader/MainFunctions.cpp:605 Client/loader/MainFunctions.cpp:612
+#: Client/loader/MainFunctions.cpp:1221
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr "Informationen"
 
-#: Client/loader/MainFunctions.cpp:609
+#: Client/loader/MainFunctions.cpp:611
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "Konnte GTA: San Andreas nicht beenden. Wenn dieses Problem weiterhin besteht starte deinen Computer neu."
 
-#: Client/loader/MainFunctions.cpp:632
+#: Client/loader/MainFunctions.cpp:634
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "Registrierungseinträge fehlen. Bitte installiere Multi Theft Auto: San Andreas neu."
 
-#: Client/loader/MainFunctions.cpp:638
+#: Client/loader/MainFunctions.cpp:640
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "Der Pfad zu deiner Installation von GTA: San Andreas enthält ungültige Unicode Zeichen. Bitte ändere den Pfad deiner GTA: San Andreas Installation, sodass dieser nur ASCII Zeichen enthält und installiere Multi Theft Auto: San Andreas neu."
 
-#: Client/loader/MainFunctions.cpp:648
+#: Client/loader/MainFunctions.cpp:650
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
@@ -178,37 +178,37 @@ msgstr "Der Pfad zu deiner Installation von 'MTA:SA' oder 'GTA: San Andreas'\n"
 " Wenn du Probleme bei der Ausführung von MTA:SA hast,\n"
 " ändere bitte deinen Installationspfad auf einen Pfad der kein Semikolon enthält."
 
-#: Client/loader/MainFunctions.cpp:810
+#: Client/loader/MainFunctions.cpp:812
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Ladevorgang fehlgeschlagen. Bitte stelle sicher, dass die aktuellen Data Files korrekt installiert wurden."
 
-#: Client/loader/MainFunctions.cpp:819
+#: Client/loader/MainFunctions.cpp:821
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Ladevorgang fehlgeschlagen. Bitte stelle sicher, dass %s korrekt installiert wurde."
 
-#: Client/loader/MainFunctions.cpp:826
+#: Client/loader/MainFunctions.cpp:828
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Ladevorgang fehlgeschlagen. Konnte gta_sa.exe nicht in %s finden."
 
-#: Client/loader/MainFunctions.cpp:836
+#: Client/loader/MainFunctions.cpp:838
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Ladevorgang fehlgeschlagen. Die Datei %s existiert im GTA Installationsordner. Bitte lösche diese Datei."
 
-#: Client/loader/MainFunctions.cpp:845
+#: Client/loader/MainFunctions.cpp:847
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Hauptdatei hat einen falschen Namen (%s)"
 
-#: Client/loader/MainFunctions.cpp:856
+#: Client/loader/MainFunctions.cpp:858
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Hauptdatei ist nicht signiert. Grund dafür könnte ein Virus sein.\n\n"
 "Siehe Onlinehilfe, wenn MTA nicht korrekt funktioniert."
 
-#: Client/loader/MainFunctions.cpp:882
+#: Client/loader/MainFunctions.cpp:884
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
@@ -217,7 +217,7 @@ msgstr "Die Datei %s fehlt. Möglicherweise handelt es sich um einen Virus.\n\n"
 "Sie sollten zur Sicherheit eine Neuinstallation von Multi Theft Auto in Betracht ziehen.\n"
 "Siehe online Hilfe, falls MTA nicht korrekt funktioniert."
 
-#: Client/loader/MainFunctions.cpp:893
+#: Client/loader/MainFunctions.cpp:895
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
@@ -226,43 +226,43 @@ msgstr "Die Datei %s wurde verändert. Möglicherweise handelt es sich um einen 
 "Sie sollten zur Sicherheit eine Neuinstallation von Multi Theft Auto in Betracht ziehen.\n"
 "Siehe online Hilfe, falls MTA nicht korrekt funktioniert."
 
-#: Client/loader/MainFunctions.cpp:907
+#: Client/loader/MainFunctions.cpp:909
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ".asi Dateien befinden sich im 'MTA:SA' oder 'GTA: San Andreas' Installationsverzeichnis.\n\n"
 "Entferne die .asi Dateien, wenn du Probleme mit MTA:SA feststellst."
 
-#: Client/loader/MainFunctions.cpp:1009
+#: Client/loader/MainFunctions.cpp:1011
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Dateiversion stimmt nicht überein. Installiere MTA:SA neu, wenn du Probleme hast.\n"
 
-#: Client/loader/MainFunctions.cpp:1018
+#: Client/loader/MainFunctions.cpp:1020
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Einige Dateien fehlen. Installiere MTA:SA neu, wenn Probleme auftreten.\n"
 
-#: Client/loader/MainFunctions.cpp:1030
+#: Client/loader/MainFunctions.cpp:1032
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA ist nicht kompatibel mit dem 'abgesicherten Modus'.\n\n"
 "Bitte starte deinen PC neu.\n"
 
-#: Client/loader/MainFunctions.cpp:1123
+#: Client/loader/MainFunctions.cpp:1125
 msgid "Fix configuration issue"
 msgstr "Behebung eines Konfigurationsproblems"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1157
+#: Client/loader/MainFunctions.cpp:1159
 msgid "Fix elevation required error"
 msgstr "Rechteproblem beheben"
 
-#: Client/loader/MainFunctions.cpp:1164
+#: Client/loader/MainFunctions.cpp:1166
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Konnte Grand Theft Auto: San Andreas nicht starten.  Bitte versuche es erneut, oder, wenn das Problem weiterhin auftritt, kontaktiere das MTA Team via www.multitheftauto.com.\n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1219
+#: Client/loader/MainFunctions.cpp:1221
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas scheint nicht richtig gestartet zu sein. Möchtest du es beenden?"
 
@@ -424,7 +424,7 @@ msgstr "Fenstermodus erzwingen"
 msgid "Don't show again"
 msgstr "Nicht mehr anzeigen"
 
-#: Client/loader/Dialogs.cpp:98 Client/game_sa/CSettingsSA.cpp:859
+#: Client/loader/Dialogs.cpp:98 Client/game_sa/CSettingsSA.cpp:898
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -482,7 +482,7 @@ msgstr "Fertigstellen..."
 msgid "Done!"
 msgstr "Fertig!"
 
-#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:965
+#: Client/loader/CInstallManager.cpp:362 Client/loader/Utils.cpp:965
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -491,98 +491,102 @@ msgstr "MTA:SA benötigt Administratorzugriff für die folgende Aufgabe:\n\n"
 "  '%s'\n\n"
 "Bitte bestätigen Sie dies im nächsten Fenster."
 
-#: Client/loader/CInstallManager.cpp:376
+#: Client/loader/CInstallManager.cpp:377
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA konnte die folgende Operation nicht erfolgreich durchführen:\n\n"
 "  '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:426
+#: Client/loader/CInstallManager.cpp:428
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Der Absturz wurde durch einen Grafiktreiberfehler verursacht **\n\n"
 "** Bitte aktualisieren Sie Ihre Grafiktreiber **"
 
-#: Client/loader/CInstallManager.cpp:532
+#: Client/loader/CInstallManager.cpp:441
+msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
+msgstr "** Nicht genügend Arbeitsspeicher – dieser Absturz wurde verursacht, da nicht genug freier Speicher verfügbar ist oder der Speicher fragmentiert ist. **"
+
+#: Client/loader/CInstallManager.cpp:543
 msgid "Install updated MTA:SA files"
 msgstr "Aktualisierte MTA:SA-Dateien installieren"
 
-#: Client/loader/CInstallManager.cpp:552
+#: Client/loader/CInstallManager.cpp:563
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Die Aktualisierung konnte aufgrund von Dateikonflikten nicht durchgeführt werden. Bitte schließen Sie andere Anwendungen und versuchen Sie es erneut"
 
-#: Client/loader/CInstallManager.cpp:561
+#: Client/loader/CInstallManager.cpp:572
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Auto wurde nicht richtig installiert, bitte installieren Sie es neu. %s"
 
-#: Client/loader/CInstallManager.cpp:613
+#: Client/loader/CInstallManager.cpp:624
 msgid "Create GTA:SA junctions"
 msgstr "GTA:SA-Kreuzungen erstellen"
 
-#: Client/loader/CInstallManager.cpp:657
+#: Client/loader/CInstallManager.cpp:668
 msgid "MTA:SA cannot launch because copying a file failed:"
 msgstr "MTA:SA kann nicht starten, weil das Kopieren einer Datei fehlgeschlagen ist:"
 
-#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+#: Client/loader/CInstallManager.cpp:674 Client/loader/CInstallManager.cpp:714
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
 msgstr "MTA:SA kann nicht gestartet werden, da eine MTA:SA Datei fehlerhaft ist oder fehlt:"
 
-#: Client/loader/CInstallManager.cpp:672
+#: Client/loader/CInstallManager.cpp:683
 msgid "Copy MTA:SA files"
 msgstr "MTA:SA-Dateien kopieren"
 
-#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+#: Client/loader/CInstallManager.cpp:706 Client/loader/CInstallManager.cpp:784
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
 msgstr "MTA:SA kann nicht gestartet werden, da eine GTA:SA Datei fehlerhaft ist oder fehlt:"
 
-#: Client/loader/CInstallManager.cpp:780
+#: Client/loader/CInstallManager.cpp:791
 msgid "Patch GTA:SA dependency"
 msgstr "Patch GTA:SA-Abhängigkeit"
 
-#: Client/loader/CInstallManager.cpp:828
+#: Client/loader/CInstallManager.cpp:839
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
 msgstr "MTA:SA kann nicht gestartet werden, weil die ausführbare Datei GTA:SA falsch ist oder fehlt:"
 
-#: Client/loader/CInstallManager.cpp:832
+#: Client/loader/CInstallManager.cpp:843
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
 msgstr "Bitte überprüfen Sie Ihr Antivirenprogramm auf eine falsch-positive Erkennung, versuchen Sie, eine Ausnahme für die ausführbare Datei GTA:SA hinzuzufügen und starten Sie MTA:SA neu."
 
-#: Client/loader/CInstallManager.cpp:838
+#: Client/loader/CInstallManager.cpp:849
 msgid "Generate GTA:SA"
 msgstr "GTA:SA generieren"
 
-#: Client/loader/CInstallManager.cpp:853
+#: Client/loader/CInstallManager.cpp:864
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
 msgstr "MTA:SA kann nicht starten, weil die ausführbare Datei GTA:SA nicht geladen werden kann:"
 
-#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
+#: Client/loader/CInstallManager.cpp:871 Client/loader/CInstallManager.cpp:894
 msgid "Patch GTA:SA"
 msgstr "Aufnäher GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:876
+#: Client/loader/CInstallManager.cpp:887
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr "MTA:SA kann nicht starten, weil das Patchen von GTA:SA fehlgeschlagen ist:"
 
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:811
+#: Client/loader/CInstallManager.cpp:1068 Client/core/CCore.cpp:811
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA kann nicht fortgesetzt werden, da das Laufwerk %s nicht über genügend Speicherplatz verfügt."
 
-#: Client/loader/CInstallManager.cpp:1113
+#: Client/loader/CInstallManager.cpp:1124
 msgid "Missing file:"
 msgstr "Fehlende Datei:"
 
-#: Client/loader/CInstallManager.cpp:1117
+#: Client/loader/CInstallManager.cpp:1128
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Wenn MTA nicht geladen werden kann, installieren Sie bitte GTA:SA neu"
 
-#: Client/loader/CInstallManager.cpp:1152
+#: Client/loader/CInstallManager.cpp:1163
 msgid "Update install settings"
 msgstr "Installationseinstellungen aktualisieren"
 
-#: Client/loader/CInstallManager.cpp:1305
+#: Client/loader/CInstallManager.cpp:1316
 msgid "Update compatibility settings"
 msgstr "Kompatibilitätseinstellungen aktualisieren"
 
@@ -703,7 +707,7 @@ msgid "Deny"
 msgstr "Verweigern"
 
 #: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3569
-#: Client/core/CCore.cpp:674 Client/mods/deathmatch/logic/CClientGame.cpp:541
+#: Client/core/CCore.cpp:674 Client/mods/deathmatch/logic/CClientGame.cpp:543
 msgid "Main menu"
 msgstr "Hauptmenü"
 
@@ -729,7 +733,7 @@ msgstr "VERBINDUNG GETRENNT"
 
 #: Client/core/CMainMenu.cpp:1220
 msgid "INFORMATION"
-msgstr ""
+msgstr "INFORMATION"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
@@ -885,7 +889,7 @@ msgstr "Verbindung mit Discord Rich Presence zulassen"
 
 #: Client/core/CSettings.cpp:409
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr ""
+msgstr "GTA:SA Spielstatus auf Steam zulassen"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:415
@@ -894,7 +898,7 @@ msgstr "Sichere Fotos die mit der Kamera-Waffe geschossen wurden im GTA San Andr
 
 #: Client/core/CSettings.cpp:420
 msgid "Ask before disconnecting from server using main menu"
-msgstr ""
+msgstr "Nachfragen, bevor die Verbindung zum Server über das Hauptmenü getrennt wird"
 
 #: Client/core/CSettings.cpp:425
 msgid "Use customized GTA:SA files"
@@ -1339,7 +1343,7 @@ msgstr "Im Explorer öffnen"
 #. Process affinity
 #: Client/core/CSettings.cpp:1222
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
+msgstr "CPU 0 Affinität zur Verbesserung der Spielleistung aktivieren"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1228 Client/core/CSettings.cpp:1231
@@ -1575,8 +1579,8 @@ msgid "Your nickname contains invalid characters!"
 msgstr "Dein Nickname enthält ungültige Zeichen!"
 
 #: Client/core/CSettings.cpp:3573 Client/core/CCore.cpp:674
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1097
-#: Client/mods/deathmatch/logic/CResource.cpp:372
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+#: Client/mods/deathmatch/logic/CResource.cpp:367
 msgid "In-game"
 msgstr "Im Spiel"
 
@@ -1686,7 +1690,8 @@ msgstr "EXPERIMENTELLE FUNKTION"
 #: Client/core/CSettings.cpp:4822
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr ""
+msgstr "Das Deaktivieren dieser Option wird nicht empfohlen, außer Sie haben Probleme mit der Leistung.\n\n"
+"Sind Sie sicher, dass Sie sie deaktivieren wollen?"
 
 #: Client/core/CSettings.cpp:4958
 msgid "Please enter a nickname"
@@ -1760,11 +1765,11 @@ msgstr "Maus-Bewegungs Fix - Benötigt möglicherweise Reboot"
 
 #: Client/core/CSettings.cpp:5001
 msgid "CPU affinity:"
-msgstr ""
+msgstr "CPU Affinität:"
 
 #: Client/core/CSettings.cpp:5001
 msgid "Only change if you're having stability issues."
-msgstr ""
+msgstr "Nur ändern bei Stabilitätsproblemen."
 
 #. Unknown command
 #: Client/core/CCommands.cpp:223
@@ -1854,7 +1859,8 @@ msgstr "Der Server empfiehlt eine Aktualisierung durchzuführen, die aber nicht 
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr ""
+msgstr "Derzeit ist kein Update verfügbar.\n\n"
+"Bitte überprüfe www.multitheftauto.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -1937,47 +1943,47 @@ msgstr "Wiederverbinden zu %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
-#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:667
 msgid "CONNECTING"
 msgstr "VERBINDEN"
 
 #: Client/core/CConnectManager.cpp:271
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1341
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
 msgid "Connection timed out"
 msgstr "Zeitüberschreitung der Verbindung"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1385
 msgid "Disconnected: unknown protocol error"
 msgstr "Verbindung getrennt: Unbekannter Protokollfehler"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
 msgid "Disconnected: disconnected remotely"
 msgstr "Verbindung getrennt: Verbindung zum Server getrennt"
 
 #: Client/core/CConnectManager.cpp:297
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
 msgid "Disconnected: connection lost remotely"
 msgstr "Verbindung getrennt: Verbindung zum Server verloren"
 
 #: Client/core/CConnectManager.cpp:301
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
 msgid "Disconnected: you are banned from this server"
 msgstr "Verbindung getrennt: Du wurdest von diesem Server gebannt"
 
 #: Client/core/CConnectManager.cpp:308
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
 msgid "Disconnected: disconnected from the server"
 msgstr "Verbindung getrennt: Verbindung zum Server getrennt"
 
 #: Client/core/CConnectManager.cpp:312
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
 msgid "Disconnected: connection to the server was lost"
 msgstr "Verbindung getrennt: Verbindung zum Server verloren"
 
 #: Client/core/CConnectManager.cpp:319
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1421
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1417
 msgid "Disconnected: connection was refused"
 msgstr "Verbindung getrennt: Verbindung verweigert"
 
@@ -2128,7 +2134,7 @@ msgstr "* Die Zeit ist %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "Verbinden: Netzwerk ist nicht bereit, bitte warten"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -2154,7 +2160,7 @@ msgstr "verbinden: Entladen der aktuellen Mod fehlgeschlagen"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "Wiederverbinden: Netzwerk ist nicht bereit, bitte warten"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
@@ -2179,7 +2185,7 @@ msgid "Saved configuration file"
 msgstr "Gespeicherte Konfigurationsdatei"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:439
+#: Client/core/CCommandFuncs.cpp:452
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* Ihre Seriennummer lautet: %s"
@@ -2664,8 +2670,8 @@ msgstr "Bitte nutze das mtasa:// Protokoll!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1283
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1340
-#: Client/mods/deathmatch/logic/CClientGame.cpp:649
-#: Client/mods/deathmatch/logic/CClientGame.cpp:747
+#: Client/mods/deathmatch/logic/CClientGame.cpp:651
+#: Client/mods/deathmatch/logic/CClientGame.cpp:743
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Ungültiger Nickname! Bitte setze einen neuen in den Einstellungen!"
 
@@ -2725,114 +2731,114 @@ msgstr "LAN wird nach Servern durchsucht"
 msgid "This version has expired."
 msgstr "Diese Version ist abgelaufen."
 
-#: Client/mods/deathmatch/CClient.cpp:56
+#: Client/mods/deathmatch/CClient.cpp:57
 msgid "disconnect from the game"
 msgstr "Verbindung zum Server schließen"
 
-#: Client/mods/deathmatch/CClient.cpp:57
+#: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the nametags"
 msgstr "Nametags anzeigen"
 
-#: Client/mods/deathmatch/CClient.cpp:58
+#: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the chatbox"
 msgstr "Chatbox anzeigen"
 
-#: Client/mods/deathmatch/CClient.cpp:59
+#: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the network statistics"
 msgstr "zeigt die Netzwerkstatistiken"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:62
+#: Client/mods/deathmatch/CClient.cpp:63
 msgid "open the chat input"
 msgstr "Eingabezeile des Chats öffnen"
 
-#: Client/mods/deathmatch/CClient.cpp:63
+#: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
 msgstr "Sprachübertragung an andere Spieler starten"
 
-#: Client/mods/deathmatch/CClient.cpp:64
+#: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
 msgstr "Als Passagier in ein Fahrzeug steigen"
 
-#: Client/mods/deathmatch/CClient.cpp:65
+#: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
 msgstr "Nächsten Radiokanal"
 
-#: Client/mods/deathmatch/CClient.cpp:66
+#: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
 msgstr "Vorherigen Radiokanal"
 
-#: Client/mods/deathmatch/CClient.cpp:67
+#: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the player-map view"
 msgstr "Aktiviert die Spieler-Karte Sicht"
 
-#: Client/mods/deathmatch/CClient.cpp:68
+#: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map in"
 msgstr "Zoomt in die Spieler-Karte"
 
-#: Client/mods/deathmatch/CClient.cpp:69
+#: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map out"
 msgstr "Zoomt aus der Spieler-Karte raus"
 
-#: Client/mods/deathmatch/CClient.cpp:70
+#: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map north"
 msgstr "Bewegt die Spieler-Karte nach Norden"
 
-#: Client/mods/deathmatch/CClient.cpp:71
+#: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map south"
 msgstr "Bewegt die Spieler-Karte nach Süden"
 
-#: Client/mods/deathmatch/CClient.cpp:72
+#: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map east"
 msgstr "Bewegt die Spieler-Karte nach Osten"
 
-#: Client/mods/deathmatch/CClient.cpp:73
+#: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map west"
 msgstr "Bewegt die Spieler-Karte nach Westen"
 
-#: Client/mods/deathmatch/CClient.cpp:74
+#: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the player-map"
 msgstr "Hängt die Spieler-Karte an"
 
-#: Client/mods/deathmatch/CClient.cpp:75
+#: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces player-map opacity"
 msgstr "Verringert die Deckkraft der Spieler-Karte"
 
-#: Client/mods/deathmatch/CClient.cpp:76
+#: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases player-map opacity"
 msgstr "Erhöht die Deckkraft der Spieler-Karte"
 
-#: Client/mods/deathmatch/CClient.cpp:77
+#: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles player-map help text"
 msgstr "Schaltet den Spieler-Karten Text um"
 
-#: Client/mods/deathmatch/CClient.cpp:78
+#: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
 msgstr "Eine Nachricht an den Zielspieler schicken"
 
-#: Client/mods/deathmatch/CClient.cpp:79
+#: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "In einem Fahrzeug die nächste Waffe auswählen"
 
-#: Client/mods/deathmatch/CClient.cpp:80
+#: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "In einem Fahrzeug die vorherige Waffe auswählen"
 
-#: Client/mods/deathmatch/CClient.cpp:81
+#: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
 msgstr "gibt Informationen über den aktuellen Server aus"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:84
+#: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
 msgstr "Definiert den Vergrößerungsmultiplikator aller Textanzeigen"
 
 #. Development mode
-#: Client/mods/deathmatch/CClient.cpp:91
+#: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
 msgstr "(Entwicklungsmodus) Zeigt Colshapes an"
 
-#: Client/mods/deathmatch/CClient.cpp:92
+#: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Entwicklungsmodus) gibt world sound ids im Debugfenster aus"
 
@@ -2856,195 +2862,195 @@ msgstr "%s von %s"
 msgid "Disconnect to cancel download"
 msgstr "Trenne die Verbindung, um den Download abzubrechen."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:506
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:499
 msgid "Disconnected: Invalid nickname"
 msgstr "Verbindung getrennt: Ungültiger Nickname"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:510
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnect from server"
 msgstr "Verbindung vom Server getrennt"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:514
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr "Verbindung getrennt: Serial ist gebannt.\n"
 "Grund:%s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr "Verbindung getrennt: Du bist gebannt.\n"
 "Grund: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:526
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr "Verbindung getrennt: Account wurde gebannt.\n"
 "Grund: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:531
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:524
 msgid "Disconnected: Version mismatch"
 msgstr "Verbindung getrennt: Versionen stimmen nicht überein"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "Verbindung getrennt: Zu viele Verbindungsversuche. Bitte warte eine Minute und versuche es dann erneut."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:539
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr "Verbindung getrennt: Server ist aus anderem Branch.\n"
 "Information: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr "Verbindung getrennt: Ungültige Version.\n"
 "Information: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:549
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:542
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr "Verbindung getrennt: Server nutzt einen neueren Build.\n"
 "Information: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:547
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr "Verbindung getrennt: Server nutzt einen älteren Build.\n"
 "Information: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:559
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:552
 msgid "Disconnected: Nick already in use"
 msgstr "Verbindung getrennt: Nickname wird bereits verwendet"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
 msgid "Disconnected: Player element could not be created."
 msgstr "Verbindung unterbrochen: Das Spielerelement konnte nicht erstellt werden."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:567
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "Verbindung getrennt: Server hat die Verbindung verweigert: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:572
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:565
 msgid "Disconnected: Serial verification failed"
 msgstr "Verbindung getrennt: Verfizierung der Serial fehlgeschlagen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial already in use"
 msgstr "Verbindung getrennt: Seriennummer wird bereits verwendet"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "Verbindung getrennt: Verbindungsdesynchronisation %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "Verbindung getrennt: Du wurdest von %s gekickt"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:594
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:587
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "Verbindung getrennt: Du wurdest von %s gebannt"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:598
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "Verbindung getrennt: Server wurde heruntergefahren oder startet neu"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:618
 msgid "You were kicked from the game"
 msgstr "Du wurdest aus dem Spiel geworfen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:637
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:619
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr "Dieser Server benötigt eine unmodifizierte gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Please replace gta_sa.exe"
 msgstr "Bitte ersetze gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr "Dieser Server erlaubt keine angepassten D3D9.DLLs"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr "Entferne D3D9.DLL aus deinem GTA Installationsordner und starte MTA neu"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 msgid "This server does not allow virtual machines"
 msgstr "Dieser Server erlaubt keine virtuellen Maschinen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 msgid "This server requires driver signing to be enabled"
 msgstr "Dieser Server benötigt aktivierte Treibersignierung"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "Please restart your PC"
 msgstr "Bitte starte deinen PC neu"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "This server has detected missing anti-cheat components"
 msgstr "Dieser Server hat fehlende Komponenten des Anticheats festgestellt"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "Try restarting MTA"
 msgstr "Versuche MTA neu zu starten"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr "Dieser Server benötigt eine unmodifizierte gta3.img und gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Please replace gta3.img or gta_int.img"
 msgstr "Bitte ersetze gta3.img oder gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:639
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server does not allow Wine"
 msgstr "Dieser Server erlaubt Wine nicht"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr "Stelle sicher, dass kein anderes Programm MTA:SA modifiziert"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:654
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
 msgid "Time Remaining: "
 msgstr "Zeit verbleibend: "
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:664
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:657
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d Tag"
 msgstr[1] "%d Tage"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:666
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d Stunde"
 msgstr[1] "%d Stunden"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:668
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d Minute"
 msgstr[1] "%d Minuten"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:670
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -3052,7 +3058,7 @@ msgstr[0] "%d Sekunde"
 msgstr[1] "%d Sekunden"
 
 #. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:674
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
 msgid "Disconnected"
 msgstr "Verbindung getrennt"
 
@@ -3062,194 +3068,194 @@ msgstr "Verbindung getrennt"
 msgid "Download error: %s"
 msgstr "Downloadfehler: %s"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+#: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Flying a UFO around"
 msgstr "Ein UFO herumfliegen lassen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+#: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Cruising around"
 msgstr "Herumfahren"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+#: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Riding the waves of"
 msgstr "Reiten auf den Wellen der"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Riding the train in"
 msgstr "Mit dem Zug fahren in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Flying around"
 msgstr "Herumfliegen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
+#: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Riding around"
 msgstr "Herumreiten"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
+#: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Monster truckin' around"
 msgstr "Monstertrucks fahren herum"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
+#: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Quaddin' around"
 msgstr "Quaddeln um"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Bunny hopping around"
 msgstr "Häschen hüpft herum"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Doing weird stuff in"
 msgstr "Seltsame Dinge tun in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Climbing around in"
 msgstr "Herumklettern in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:385
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:387
+#: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Doing a drive-by in"
 msgstr "Im Vorbeifahren in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:387
+#: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Blub blub..."
 msgstr "Blub blub..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:388
+#: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Breathing water"
 msgstr "Wasser atmen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:389
+#: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Drowning in"
 msgstr "Ertrinken in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:390
+#: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Ducking for cover in"
 msgstr "Sich in Deckung ducken in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+#: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Fighting in"
 msgstr "Kämpfen in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:392
+#: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Throwing fists in"
 msgstr "Die Fäuste in die Hand nehmen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:393
+#: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Blastin' fools in"
 msgstr "Narren in die Luft jagen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+#: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Shooting up"
 msgstr "Hochschießen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:395
+#: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Jetpacking in"
 msgstr "Jetpacking in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:396
+#: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Literally on fire in"
 msgstr "Buchstäblich brennend in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:397
+#: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Burning up in"
 msgstr "Aufflammen in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:398
+#: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Swimming in"
 msgstr "Schwimmen in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:399
+#: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Floating around in"
 msgstr "Herumschweben in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:400
+#: Client/mods/deathmatch/logic/CClientGame.cpp:402
 msgid "Being chased by a shark"
 msgstr "Von einem Hai gejagt zu werden"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:401
+#: Client/mods/deathmatch/logic/CClientGame.cpp:403
 msgid "Choking to death in"
 msgstr "Erstickungstod in"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:667
 msgid "Entering the game ..."
 msgstr "Spiel wird betreten..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:723
+#: Client/mods/deathmatch/logic/CClientGame.cpp:719
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "Nicht verbunden. Bitte verwende den Serverbrowser oder den 'connect' Befehl um zu einem Server zu verbinden."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:769
+#: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Could not start the local server. See console for details."
 msgstr "Konnte lokalen Server nicht starten. Für Details siehe Konsole."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:779
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+#: Client/mods/deathmatch/logic/CClientGame.cpp:775
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
 msgid "Local Server"
 msgstr "Lokaler Server"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:779
+#: Client/mods/deathmatch/logic/CClientGame.cpp:775
 msgid "Starting local server ..."
 msgstr "Lokaler Server wird gestartet..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1027
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1023
 msgid "Area 51"
 msgstr "Area 51"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1036
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1032
 msgid "Walking around "
 msgstr "Herumlaufen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1182
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1178
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Du wurdest aus dem Spiel geworfen ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
 msgid "Connecting to local server..."
 msgstr "Verbinde zu lokalem Server..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 msgid "Error connecting to server."
 msgstr "Fehler beim Verbinden zum Server."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Connecting to local server timed out. See console for details."
 msgstr "Zeitüberschreitung beim Verbinden zum lokalen Server. Siehe Konsole für weitere Details."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1374
 msgid "Connection with the server was lost"
 msgstr "Verbindung zum Server verloren"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
 msgid "Disconnected: the server is currently full"
 msgstr "Verbindung getrennt: Der Server ist voll"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1417
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
 msgid "Disconnected: invalid password specified"
 msgstr "Verbindung getrennt: Ungültiges Passwort angegeben"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1439
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1435
 msgid "MTA Client verification failed!"
 msgstr "Verifikation des MTA Clients fehlgeschlagen!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5640
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
 msgid "In a ditch"
 msgstr "In einem Graben"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5640
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
 msgid "En-route to hospital"
 msgstr "Auf dem Weg ins Krankenhaus"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5640
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
 msgid "Meeting their maker"
 msgstr "Begegnung mit ihrem Schöpfer"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5641
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5645
 msgid "Regretting their decisions"
 msgstr "Bedauern über ihre Entscheidungen"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5641
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5645
 msgid "Wasted"
 msgstr "Vergeudet"
 
@@ -3326,12 +3332,12 @@ msgstr "Freie Bewegung"
 msgid "Problem with graphics driver"
 msgstr "Problem mit dem Grafikkartentreiber"
 
-#: Client/game_sa/CSettingsSA.cpp:781
+#: Client/game_sa/CSettingsSA.cpp:820
 msgid "Can't find valid screen resolution."
 msgstr "Konnte keine gültigen Bildschirmauflösungen finden."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:857
+#: Client/game_sa/CSettingsSA.cpp:896
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Bist du dir sicher, dass du diese Bildschirmauflösungen verwenden willst?"
 
@@ -3347,7 +3353,7 @@ msgstr "Speicher Zuweisung fehlgeschlagen"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Schwerwiegender Fehler (%u). Wenn das Problem bestehen bleibt, wende dich an multitheftauto.com für Unterstützung."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3356,7 +3362,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Protokollfehler (%u). Wenn das Problem bestehen bleibt, wende dich an multitheftauto.com für Unterstützung."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"

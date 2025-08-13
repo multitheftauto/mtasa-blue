@@ -97,8 +97,7 @@ void CLatentReceiver::OnReceive(NetBitStreamInterface* pBitStream)
             pBitStream->Read(usCategory);
             pBitStream->Read(uiFinalSize);
             pBitStream->Read(uiRate);
-            if (pBitStream->Version() >= 0x31)
-                pBitStream->Read(usResourceNetId);
+            pBitStream->Read(usResourceNetId);
         }
         else if (ucSpecialFlag == FLAG_TAIL)
         {

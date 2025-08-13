@@ -21,8 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
-#include "test.h"
+#include "first.h"
 
 #include "memdebug.h"
 
@@ -37,7 +36,7 @@ static curl_socket_t opensocket(void *clientp,
   return CURL_SOCKET_BAD;
 }
 
-CURLcode test(char *URL)
+static CURLcode test_lib1530(const char *URL)
 {
   CURL *curl = NULL;
   CURLcode res = CURLE_FAILED_INIT;
