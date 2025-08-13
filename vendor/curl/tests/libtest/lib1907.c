@@ -21,13 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
+#include "first.h"
 
-#include "testutil.h"
-#include "warnless.h"
 #include "memdebug.h"
 
-CURLcode test(char *URL)
+static CURLcode test_lib1907(const char *URL)
 {
   char *url_after;
   CURL *curl;
@@ -42,8 +40,8 @@ CURLcode test(char *URL)
   res = curl_easy_perform(curl);
   if(!res)
     curl_mfprintf(stderr, "failure expected, "
-                  "curl_easy_perform returned %ld: <%s>, <%s>\n",
-                  (long) res, curl_easy_strerror(res), error_buffer);
+                  "curl_easy_perform returned %d: <%s>, <%s>\n",
+                  res, curl_easy_strerror(res), error_buffer);
 
   /* print the used url */
   if(!curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url_after))

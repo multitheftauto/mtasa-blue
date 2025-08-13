@@ -23,14 +23,12 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#include <curlx.h>
-
 #include "tool_cfgable.h"
 #include "tool_msgs.h"
 #include "tool_cb_dbg.h"
 #include "tool_util.h"
 
-#include <memdebug.h> /* keep this as LAST include */
+#include "memdebug.h" /* keep this as LAST include */
 
 static void dump(const char *timebuf, const char *idsbuf, const char *text,
                  FILE *stream, const unsigned char *ptr, size_t size,
@@ -81,8 +79,6 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
                   char *data, size_t size,
                   void *userdata)
 {
-  struct OperationConfig *operation = userdata;
-  struct GlobalConfig *config = operation->global;
   FILE *output = tool_stderr;
   const char *text;
   struct timeval tv;
@@ -96,8 +92,9 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
   curl_off_t xfer_id, conn_id;
 
   (void)handle; /* not used */
+  (void)userdata;
 
-  if(config->tracetime) {
+  if(global->tracetime) {
     tv = tvrealnow();
     msnprintf(timebuf, sizeof(timebuf), "%s.%06ld ",
               hms_for_sec(tv.tv_sec), (long)tv.tv_usec);
@@ -105,7 +102,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
   else
     timebuf[0] = 0;
 
-  if(handle && config->traceids &&
+  if(handle && global->traceids &&
      !curl_easy_getinfo(handle, CURLINFO_XFER_ID, &xfer_id) && xfer_id >= 0) {
     if(!curl_easy_getinfo(handle, CURLINFO_CONN_ID, &conn_id) &&
         conn_id >= 0) {
@@ -119,28 +116,28 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
   else
     idsbuf[0] = 0;
 
-  if(!config->trace_stream) {
+  if(!global->trace_stream) {
     /* open for append */
-    if(!strcmp("-", config->trace_dump))
-      config->trace_stream = stdout;
-    else if(!strcmp("%", config->trace_dump))
+    if(!strcmp("-", global->trace_dump))
+      global->trace_stream = stdout;
+    else if(!strcmp("%", global->trace_dump))
       /* Ok, this is somewhat hackish but we do it undocumented for now */
-      config->trace_stream = tool_stderr;
+      global->trace_stream = tool_stderr;
     else {
-      config->trace_stream = fopen(config->trace_dump, FOPEN_WRITETEXT);
-      config->trace_fopened = TRUE;
+      global->trace_stream = fopen(global->trace_dump, FOPEN_WRITETEXT);
+      global->trace_fopened = TRUE;
     }
   }
 
-  if(config->trace_stream)
-    output = config->trace_stream;
+  if(global->trace_stream)
+    output = global->trace_stream;
 
   if(!output) {
-    warnf(config, "Failed to create/open output");
+    warnf("Failed to create/open output");
     return 0;
   }
 
-  if(config->tracetype == TRACE_PLAIN) {
+  if(global->tracetype == TRACE_PLAIN) {
     static bool newl = FALSE;
     static bool traced_data = FALSE;
 
@@ -183,7 +180,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
            to stderr or stdout, we do not display the alert about the data not
            being shown as the data _is_ shown then just not via this
            function */
-        if(!config->isatty ||
+        if(!global->isatty ||
            ((output != tool_stderr) && (output != stdout))) {
           if(!newl)
             log_line_start(output, timebuf, idsbuf, type);
@@ -230,7 +227,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
   }
 
   dump(timebuf, idsbuf, text, output, (unsigned char *) data, size,
-       config->tracetype, type);
+       global->tracetype, type);
   return 0;
 }
 
