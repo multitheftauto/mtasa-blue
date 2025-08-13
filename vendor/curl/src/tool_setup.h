@@ -24,7 +24,9 @@
  *
  ***************************************************************************/
 
+#ifndef CURL_NO_OLDIES
 #define CURL_NO_OLDIES
+#endif
 
 /*
  * curl_setup.h may define preprocessor macros such as _FILE_OFFSET_BITS and
@@ -45,7 +47,7 @@ extern FILE *tool_stderr;
 
 #include <curl/curl.h> /* external interface */
 
-#include "timeval.h"
+#include <curlx/curlx.h>
 
 /*
  * Platform specific stuff.
@@ -56,16 +58,16 @@ extern FILE *tool_stderr;
 #endif
 
 #ifndef CURL_OS
-#  define CURL_OS "unknown"
+#define CURL_OS "unknown"
 #endif
 
 #ifndef UNPRINTABLE_CHAR
-   /* define what to use for unprintable characters */
-#  define UNPRINTABLE_CHAR '.'
+/* define what to use for unprintable characters */
+#define UNPRINTABLE_CHAR '.'
 #endif
 
 #ifndef HAVE_STRDUP
-#  include "tool_strdup.h"
+#include "tool_strdup.h"
 #endif
 
 #ifndef tool_nop_stmt
@@ -76,7 +78,7 @@ extern FILE *tool_stderr;
 #  define CURL_STRICMP(p1, p2)  _stricmp(p1, p2)
 #elif defined(HAVE_STRCASECMP)
 #  ifdef HAVE_STRINGS_H
-#    include <strings.h>
+#  include <strings.h>
 #  endif
 #  define CURL_STRICMP(p1, p2)  strcasecmp(p1, p2)
 #elif defined(HAVE_STRCMPI)
@@ -112,6 +114,5 @@ int tool_ftruncate64(int fd, curl_off_t where);
 
 #endif /* ! HAVE_FTRUNCATE */
 #endif /* _WIN32 */
-
 
 #endif /* HEADER_CURL_TOOL_SETUP_H */

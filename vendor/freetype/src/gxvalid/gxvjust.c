@@ -672,7 +672,7 @@
     FT_TRACE3(( "validating `just' table\n" ));
     GXV_INIT;
 
-    limit      = gxvalid->root->limit;
+    limit = gxvalid->root->limit;
 
     GXV_LIMIT_CHECK( 4 + 2 + 2 + 2 );
     version     = FT_NEXT_ULONG( p );

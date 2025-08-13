@@ -23,15 +23,13 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#include <curlx.h>
-
 #include "tool_cfgable.h"
 #include "tool_cb_prg.h"
 #include "tool_util.h"
 #include "tool_operate.h"
 #include "terminal.h"
 
-#include <memdebug.h> /* keep this as LAST include */
+#include "memdebug.h" /* keep this as LAST include */
 
 #define MAX_BARLENGTH 400
 #define MIN_BARLENGTH 20
@@ -115,7 +113,7 @@ static void fly(struct ProgressData *bar, bool moved)
 #error "too small curl_off_t"
 #else
    /* assume SIZEOF_CURL_OFF_T == 8 */
-#  define CURL_OFF_T_MAX CURL_OFF_T_C(0x7FFFFFFFFFFFFFFF)
+#  define CURL_OFF_T_MAX 0x7FFFFFFFFFFFFFFF
 #endif
 
 static void update_width(struct ProgressData *bar)

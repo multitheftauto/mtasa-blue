@@ -167,7 +167,7 @@ CURLcode Curl_vquic_tls_verify_peer(struct curl_tls_ctx *ctx,
 
 #ifdef USE_OPENSSL
   (void)conn_config;
-  result = Curl_oss_check_peer_cert(cf, data, &ctx->ossl, peer);
+  result = Curl_ossl_check_peer_cert(cf, data, &ctx->ossl, peer);
 #elif defined(USE_GNUTLS)
   if(conn_config->verifyhost) {
     result = Curl_gtls_verifyserver(data, ctx->gtls.session,
@@ -196,5 +196,47 @@ CURLcode Curl_vquic_tls_verify_peer(struct curl_tls_ctx *ctx,
   return result;
 }
 
+
+bool Curl_vquic_tls_get_ssl_info(struct curl_tls_ctx *ctx,
+                                 bool give_ssl_ctx,
+                                 struct curl_tlssessioninfo *info)
+{
+#ifdef USE_OPENSSL
+  info->backend = CURLSSLBACKEND_OPENSSL;
+  info->internals = give_ssl_ctx ?
+                    (void *)ctx->ossl.ssl_ctx : (void *)ctx->ossl.ssl;
+  return TRUE;
+#elif defined(USE_GNUTLS)
+  (void)give_ssl_ctx; /* gnutls always returns its session */
+  info->backend = CURLSSLBACKEND_GNUTLS;
+  info->internals = ctx->gtls.session;
+  return TRUE;
+#elif defined(USE_WOLFSSL)
+  info->backend = CURLSSLBACKEND_WOLFSSL;
+  info->internals = give_ssl_ctx ?
+                    (void *)ctx->wssl.ssl_ctx : (void *)ctx->wssl.ssl;
+  return TRUE;
+#else
+  return FALSE;
+#endif
+}
+
+void Curl_vquic_report_handshake(struct curl_tls_ctx *ctx,
+                                 struct Curl_cfilter *cf,
+                                 struct Curl_easy *data)
+{
+  (void)cf;
+#ifdef USE_OPENSSL
+  (void)cf;
+  Curl_ossl_report_handshake(data, &ctx->ossl);
+#elif defined(USE_GNUTLS)
+  Curl_gtls_report_handshake(data, &ctx->gtls);
+#elif defined(USE_WOLFSSL)
+  Curl_wssl_report_handshake(data, &ctx->wssl);
+#else
+  (void)data;
+  (void)ctx;
+#endif
+}
 
 #endif /* !USE_HTTP3 && (USE_OPENSSL || USE_GNUTLS || USE_WOLFSSL) */
