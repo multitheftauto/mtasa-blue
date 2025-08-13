@@ -21,21 +21,9 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "curlcheck.h"
+#include "unitcheck.h"
 
 #include "splay.h"
-#include "warnless.h"
-
-
-static CURLcode unit_setup(void)
-{
-  return CURLE_OK;
-}
-
-static void unit_stop(void)
-{
-
-}
 
 static void splayprint(struct Curl_tree *t, int d, char output)
 {
@@ -51,8 +39,7 @@ static void splayprint(struct Curl_tree *t, int d, char output)
       printf("  ");
 
   if(output) {
-    printf("%ld.%ld[%d]", (long)t->key.tv_sec,
-           (long)t->key.tv_usec, i);
+    printf("%ld.%ld[%d]", (long)t->key.tv_sec, (long)t->key.tv_usec, i);
   }
 
   for(count = 0, node = t->samen; node != t; node = node->samen, count++)
@@ -68,7 +55,9 @@ static void splayprint(struct Curl_tree *t, int d, char output)
   splayprint(t->smaller, d + 1, output);
 }
 
-UNITTEST_START
+static CURLcode test_unit1309(const char *arg)
+{
+  UNITTEST_BEGIN_SIMPLE
 
 /* number of nodes to add to the splay tree */
 #define NUM_NODES 50
@@ -141,4 +130,5 @@ UNITTEST_START
 
   fail_unless(root == NULL, "tree not empty when it should be");
 
-UNITTEST_STOP
+  UNITTEST_END_SIMPLE
+}

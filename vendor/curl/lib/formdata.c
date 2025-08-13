@@ -34,7 +34,6 @@ struct Curl_easy;
 #include "urldata.h" /* for struct Curl_easy */
 #include "mime.h"
 #include "vtls/vtls.h"
-#include "strcase.h"
 #include "sendf.h"
 #include "strdup.h"
 #include "rand.h"
@@ -187,22 +186,24 @@ static void free_formlist(struct FormInfo *ptr)
  * Examples:
  *
  * Simple name/value pair with copied contents:
- * curl_formadd (&post, &last, CURLFORM_COPYNAME, "name",
- * CURLFORM_COPYCONTENTS, "value", CURLFORM_END);
+ * curl_formadd(&post, &last, CURLFORM_COPYNAME, "name",
+ *              CURLFORM_COPYCONTENTS, "value", CURLFORM_END);
  *
  * name/value pair where only the content pointer is remembered:
- * curl_formadd (&post, &last, CURLFORM_COPYNAME, "name",
- * CURLFORM_PTRCONTENTS, ptr, CURLFORM_CONTENTSLENGTH, 10, CURLFORM_END);
+ * curl_formadd(&post, &last, CURLFORM_COPYNAME, "name",
+ *              CURLFORM_PTRCONTENTS, ptr, CURLFORM_CONTENTSLENGTH, 10,
+ *              CURLFORM_END);
  * (if CURLFORM_CONTENTSLENGTH is missing strlen () is used)
  *
  * storing a filename (CONTENTTYPE is optional!):
- * curl_formadd (&post, &last, CURLFORM_COPYNAME, "name",
- * CURLFORM_FILE, "filename1", CURLFORM_CONTENTTYPE, "plain/text",
- * CURLFORM_END);
+ * curl_formadd(&post, &last, CURLFORM_COPYNAME, "name",
+ *              CURLFORM_FILE, "filename1", CURLFORM_CONTENTTYPE, "plain/text",
+ *              CURLFORM_END);
  *
  * storing multiple filenames:
- * curl_formadd (&post, &last, CURLFORM_COPYNAME, "name",
- * CURLFORM_FILE, "filename1", CURLFORM_FILE, "filename2", CURLFORM_END);
+ * curl_formadd(&post, &last, CURLFORM_COPYNAME, "name",
+ *              CURLFORM_FILE, "filename1", CURLFORM_FILE, "filename2",
+ *              CURLFORM_END);
  *
  * Returns:
  * CURL_FORMADD_OK             on success
@@ -927,9 +928,9 @@ CURLFORMcode curl_formadd(struct curl_httppost **httppost,
 int curl_formget(struct curl_httppost *form, void *arg,
                  curl_formget_callback append)
 {
-  (void) form;
-  (void) arg;
-  (void) append;
+  (void)form;
+  (void)arg;
+  (void)append;
   return CURL_FORMADD_DISABLED;
 }
 

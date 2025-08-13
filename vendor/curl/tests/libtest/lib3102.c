@@ -21,7 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "test.h"
+#include "first.h"
 
 #include "memdebug.h"
 
@@ -46,8 +46,8 @@ static bool is_chain_in_order(struct curl_certinfo *cert_info)
 
     /* Find the certificate issuer and subject by enumerating each field */
     for(; slist && (!issuer || !subject); slist = slist->next) {
-      const char issuer_prefix[] = "Issuer:";
-      const char subject_prefix[] = "Subject:";
+      static const char issuer_prefix[] = "Issuer:";
+      static const char subject_prefix[] = "Subject:";
 
       if(!strncmp(slist->data, issuer_prefix, sizeof(issuer_prefix)-1)) {
         issuer = slist->data + sizeof(issuer_prefix)-1;
@@ -89,7 +89,7 @@ static size_t wrfu(void *ptr,  size_t  size,  size_t  nmemb,  void *stream)
   return size * nmemb;
 }
 
-CURLcode test(char *URL)
+static CURLcode test_lib3102(const char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;
