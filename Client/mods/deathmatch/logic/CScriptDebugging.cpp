@@ -135,9 +135,9 @@ void CScriptDebugging::UpdateLogOutput()
     #endif
         
         std::uint8_t clientDebugLevel = 0;
-        auto* pLocalPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
-        if (pLocalPlayer)
-            clientDebugLevel = pLocalPlayer->GetPlayerScriptDebugLevel();
+        auto* localPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
+        if (localPlayer)
+            clientDebugLevel = localPlayer->GetPlayerScriptDebugLevel();
         
         bool shouldDisplayInConsole = CheckForSufficientDebugLevel(clientDebugLevel, line.uiMinimumDebugLevel);
         if (shouldDisplayInConsole)
