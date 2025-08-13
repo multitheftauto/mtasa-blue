@@ -6748,7 +6748,7 @@ bool CClientGame::TriggerBrowserRequestResultEvent(const std::unordered_set<SStr
     return GetRootEntity()->CallEvent("onClientBrowserWhitelistChange", Arguments, false);
 }
 
-bool CClientGame::RestreamModel(const std::uint16_t model)
+void CClientGame::RestreamModel(std::uint16_t model)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(model))
@@ -6789,8 +6789,6 @@ bool CClientGame::RestreamModel(const std::uint16_t model)
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(model) && CVehicleUpgrades::IsUpgrade(model))
             m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(model);
-
-    return true;
 }
 
 void CClientGame::RestreamWorld()
@@ -6849,11 +6847,11 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
         }
 
         m_pManager->GetObjectManager()->RestreamAllObjects();
+        m_pManager->GetPickupManager()->RestreamAllPickups();
     }
 
     if (option == RestreamOption::ALL)
     {
-        m_pManager->GetPickupManager()->RestreamAllPickups();
         g_pGame->GetStreaming()->RemoveBigBuildings();
         g_pGame->GetStreaming()->ReinitStreaming();
     }
