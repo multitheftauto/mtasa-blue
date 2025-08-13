@@ -115,7 +115,7 @@ public:
 
     std::vector<SSavedClumpInfo> savedClumpList;
     uint                         m_uiMaxSize;
-    uint                         m_uiMinCacheTime;
+    std::uint32_t                m_minCacheTime;
     SClothesCacheStats           m_Stats;
     int                          m_iCacheRevision;
 
@@ -128,7 +128,7 @@ public:
     {
         memset(&m_Stats, 0, sizeof(m_Stats));
         m_uiMaxSize = 4;
-        m_uiMinCacheTime = DEFAULT_CACHE_TIME;
+        m_minCacheTime = DEFAULT_CACHE_TIME;
         m_iCacheRevision = 1;
     }
 
@@ -141,7 +141,7 @@ public:
     {
         uint uiNumCached = 0;
 
-        if (m_uiMinCacheTime > 0)
+        if (m_minCacheTime > 0)
         {
             for (std::vector<SSavedClumpInfo>::iterator iter = savedClumpList.begin(); iter != savedClumpList.end(); ++iter)
             {
@@ -242,7 +242,7 @@ public:
             if (info.bUnused)
             {
                 uint uiAge = (timeNow - info.timeUnused).ToInt();
-                if (uiAge > m_uiMinCacheTime)
+                if (uiAge > m_minCacheTime)
                 {
                     if (uiAge > uiBestAge || uiBestAge == -1)
                     {
@@ -414,13 +414,13 @@ void CMultiplayerSA::GetClothesCacheStats(SClothesCacheStats& outStats)
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-bool CMultiplayerSA::SetClothingCacheTime(uint timeInMs)
+bool CMultiplayerSA::SetClothingCacheTime(std::uint32_t timeInMs)
 {
-    if (timeInMs == ms_clumpStore.m_uiMinCacheTime)
+    if (timeInMs == ms_clumpStore.m_minCacheTime)
         return false;
 
     ms_clumpStore.savedClumpList.clear();
-    ms_clumpStore.m_uiMinCacheTime = timeInMs;
+    ms_clumpStore.m_minCacheTime = timeInMs;
 
     return true;
 }

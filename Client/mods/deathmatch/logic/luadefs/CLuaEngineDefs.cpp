@@ -853,7 +853,7 @@ bool CLuaEngineDefs::EngineAddClothingModel(CClientDFF* pDFF, std::string strMod
     return true;
 }
 
-bool CLuaEngineDefs::EngineSetClothingCacheTime(uint timeInMs)
+bool CLuaEngineDefs::EngineSetClothingCacheTime(std::uint32_t timeInMs)
 {
     if (!g_pMultiplayer->SetClothingCacheTime(timeInMs))
         return false;
