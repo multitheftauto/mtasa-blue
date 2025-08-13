@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CAccount.cpp
  *  PURPOSE:     User account class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,6 +14,7 @@
 #include "CAccountManager.h"
 #include "CIdArray.h"
 #include "CClient.h"
+#include <regex>
 
 CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword, int iUserID,
                    const std::string& strIP, const std::string& strSerial, const SString& strHttpPassAppend)
@@ -256,6 +257,20 @@ bool CAccount::IsIpAuthorized(const SString& strIp)
 }
 
 //
+// Check if the serial has 32 hexadecimal characters
+//
+bool CAccount::IsValidSerial(const std::string& serial) const noexcept
+{
+    const std::regex serialPattern("^[A-Fa-f0-9]{32}$");
+
+    try{
+        return std::regex_match(serial, serialPattern);
+    } catch (...) {
+        return false;
+    }
+}
+
+//
 // Mark pending serial as authorized for this account
 //
 bool CAccount::AuthorizeSerial(const SString& strSerial, const SString& strWho)
@@ -287,6 +302,19 @@ bool CAccount::RemoveSerial(const SString& strSerial)
         }
     }
     return false;
+}
+
+//
+// Replace the serial number for a specific account
+//
+bool CAccount::SetAccountSerial(const std::string& serial) noexcept
+{
+    if (!IsValidSerial(serial))
+        return false;
+
+    m_strSerial = serial;
+    m_pManager->MarkAsChanged(this);
+    return true;
 }
 
 //

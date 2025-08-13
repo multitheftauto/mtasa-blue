@@ -12,27 +12,21 @@
 
 using std::list;
 
-CClientDisplayManager::CClientDisplayManager()
-{
-    // Init
-    m_bCanRemoveFromList = true;
-}
-
-CClientDisplayManager::~CClientDisplayManager()
-{
-    RemoveAll();
-}
-
-CClientDisplay* CClientDisplayManager::Get(unsigned long ulID)
+std::shared_ptr<CClientDisplay> CClientDisplayManager::Get(unsigned long ulID)
 {
     // Find the display with the given id
-    list<CClientDisplay*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+    auto iter = m_List.begin();
+
+    for (; iter != m_List.end(); iter++) // Iterate weak_ptr list
     {
-        if ((*iter)->GetID() == ulID)
+        if (const auto& display = (*iter).lock())  // Make sure the shared_ptr still exists
         {
-            return *iter;
+            if (display->GetID() == ulID)
+            {
+                return display;
+            }
         }
+
     }
 
     return NULL;
@@ -49,57 +43,38 @@ void CClientDisplayManager::DrawText2D(const char* szCaption, const CVector& vec
                                        static_cast<int>(fResHeight), rgbaColor, szCaption, fScale, fScale, 0);
 }
 
-void CClientDisplayManager::AddToList(CClientDisplay* pDisplay)
+void CClientDisplayManager::AddToList(const std::shared_ptr<CClientDisplay>& display)
 {
-    m_List.push_back(pDisplay);
-}
-
-void CClientDisplayManager::RemoveAll()
-{
-    // Delete all the items in the list
-    m_bCanRemoveFromList = false;
-    list<CClientDisplay*>::iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
-    {
-        delete *iter;
-    }
-
-    // Clear the list
-    m_List.clear();
-    m_bCanRemoveFromList = true;
-}
-
-void CClientDisplayManager::RemoveFromList(CClientDisplay* pDisplay)
-{
-    if (m_bCanRemoveFromList)
-    {
-        if (!m_List.empty())
-        {
-            m_List.remove(pDisplay);
-        }
-    }
+    m_List.push_back(display);
 }
 
 void CClientDisplayManager::DoPulse()
 {
     // Render all our displays
-    m_bCanRemoveFromList = false;
-    list<CClientDisplay*>::iterator iter = m_List.begin();
-    while (iter != m_List.end())
+    auto iter = m_List.begin();
+
+    // Clean up expired weak_ptr
+    m_List.remove_if([](const std::weak_ptr<CClientDisplay>& wp) { return wp.expired(); });
+
+    for (; iter != m_List.end(); iter++) // Iterate weak_ptr list
     {
-        CClientDisplay* pObject = *iter;
-        if (pObject->IsExpired())
+        if (const auto& display = (*iter).lock())            // Make sure the shared_ptr still exists
         {
-            // Delete it and remove it from the list
-            delete pObject;
-            iter = m_List.erase(iter);
-        }
-        else
-        {
-            ++iter;
-            pObject->Render();
+            display->Render();
         }
     }
+}
 
-    m_bCanRemoveFromList = true;
+std::shared_ptr<CClientVectorGraphicDisplay> CClientDisplayManager::CreateVectorGraphicDisplay(CClientVectorGraphic* svg)
+{
+    auto display = std::make_shared<CClientVectorGraphicDisplay>(svg);
+    AddToList(display);
+    return display;
+}
+
+std::shared_ptr<CClientTextDisplay> CClientDisplayManager::CreateTextDisplay(int ID)
+{
+    auto display = std::make_shared<CClientTextDisplay>(ID);
+    AddToList(display);
+    return display;
 }

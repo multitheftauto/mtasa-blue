@@ -22,30 +22,30 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef USE_WOLFSSH
 
 #include <limits.h>
 
-#include "urldata.h"
-#include "cfilters.h"
-#include "connect.h"
-#include "sendf.h"
-#include "progress.h"
+#include "../urldata.h"
+#include "../url.h"
+#include "../cfilters.h"
+#include "../connect.h"
+#include "../sendf.h"
+#include "../progress.h"
 #include "curl_path.h"
-#include "strtoofft.h"
-#include "transfer.h"
-#include "speedcheck.h"
-#include "select.h"
-#include "multiif.h"
-#include "warnless.h"
-#include "strdup.h"
+#include "../transfer.h"
+#include "../speedcheck.h"
+#include "../select.h"
+#include "../multiif.h"
+#include "../curlx/warnless.h"
+#include "../strdup.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
+#include "../curl_printf.h"
+#include "../curl_memory.h"
+#include "../memdebug.h"
 
 static CURLcode wssh_connect(struct Curl_easy *data, bool *done);
 static CURLcode wssh_multi_statemach(struct Curl_easy *data, bool *done);
@@ -66,11 +66,11 @@ static CURLcode wsftp_doing(struct Curl_easy *data,
 static CURLcode wsftp_disconnect(struct Curl_easy *data,
                                  struct connectdata *conn,
                                  bool dead);
-static int wssh_getsock(struct Curl_easy *data,
-                        struct connectdata *conn,
-                        curl_socket_t *sock);
+static CURLcode wssh_pollset(struct Curl_easy *data,
+                             struct easy_pollset *ps);
 static CURLcode wssh_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn);
+static void wssh_sshc_cleanup(struct ssh_conn *sshc);
 
 #if 0
 /*
@@ -86,15 +86,16 @@ const struct Curl_handler Curl_handler_scp = {
   wssh_connect,                         /* connect_it */
   wssh_multi_statemach,                 /* connecting */
   wscp_doing,                           /* doing */
-  wssh_getsock,                         /* proto_getsock */
-  wssh_getsock,                         /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  wssh_getsock,                         /* perform_getsock */
+  wssh_pollset,                         /* proto_pollset */
+  wssh_pollset,                         /* doing_pollset */
+  ZERO_NULL,                            /* domore_pollset */
+  wssh_pollset,                         /* perform_pollset */
   wscp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_SSH,                             /* defport */
   CURLPROTO_SCP,                        /* protocol */
   PROTOPT_DIRLOCK | PROTOPT_CLOSEACTION
@@ -116,15 +117,16 @@ const struct Curl_handler Curl_handler_sftp = {
   wssh_connect,                         /* connect_it */
   wssh_multi_statemach,                 /* connecting */
   wsftp_doing,                          /* doing */
-  wssh_getsock,                         /* proto_getsock */
-  wssh_getsock,                         /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  wssh_getsock,                         /* perform_getsock */
+  wssh_pollset,                         /* proto_pollset */
+  wssh_pollset,                         /* doing_pollset */
+  ZERO_NULL,                            /* domore_pollset */
+  wssh_pollset,                         /* perform_pollset */
   wsftp_disconnect,                     /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
+  ZERO_NULL,                            /* follow */
   PORT_SSH,                             /* defport */
   CURLPROTO_SFTP,                       /* protocol */
   CURLPROTO_SFTP,                       /* family */
@@ -136,10 +138,10 @@ const struct Curl_handler Curl_handler_sftp = {
  * SSH State machine related code
  */
 /* This is the ONLY way to change SSH state! */
-static void state(struct Curl_easy *data, sshstate nowstate)
+static void wssh_state(struct Curl_easy *data,
+                       struct ssh_conn *sshc,
+                       sshstate nowstate)
 {
-  struct connectdata *conn = data->conn;
-  struct ssh_conn *sshc = &conn->proto.sshc;
 #if defined(DEBUGBUILD) && !defined(CURL_DISABLE_VERBOSE_STRINGS)
   /* for debug purposes */
   static const char * const names[] = {
@@ -206,55 +208,57 @@ static void state(struct Curl_easy *data, sshstate nowstate)
   };
 
   /* a precaution to make sure the lists are in sync */
-  DEBUGASSERT(sizeof(names)/sizeof(names[0]) == SSH_LAST);
+  DEBUGASSERT(CURL_ARRAYSIZE(names) == SSH_LAST);
 
   if(sshc->state != nowstate) {
     infof(data, "wolfssh %p state change from %s to %s",
           (void *)sshc, names[sshc->state], names[nowstate]);
   }
 #endif
-
+  (void)data;
   sshc->state = nowstate;
 }
 
-static ssize_t wscp_send(struct Curl_easy *data, int sockindex,
-                         const void *mem, size_t len, bool eos,
-                         CURLcode *err)
+static CURLcode wscp_send(struct Curl_easy *data, int sockindex,
+                          const void *mem, size_t len, bool eos,
+                          size_t *pnwritten)
 {
-  ssize_t nwrite = 0;
   (void)data;
   (void)sockindex; /* we only support SCP on the fixed known primary socket */
   (void)mem;
   (void)len;
   (void)eos;
-  (void)err;
-
-  return nwrite;
+  *pnwritten = 0;
+  return CURLE_OK;
 }
 
-static ssize_t wscp_recv(struct Curl_easy *data, int sockindex,
-                         char *mem, size_t len, CURLcode *err)
+static CURLcode wscp_recv(struct Curl_easy *data, int sockindex,
+                          char *mem, size_t len, size_t *pnread)
 {
-  ssize_t nread = 0;
   (void)data;
   (void)sockindex; /* we only support SCP on the fixed known primary socket */
   (void)mem;
   (void)len;
-  (void)err;
+  *pnread = 0;
 
-  return nread;
+  return CURLE_OK;
 }
 
 /* return number of sent bytes */
-static ssize_t wsftp_send(struct Curl_easy *data, int sockindex,
-                          const void *mem, size_t len, bool eos, CURLcode *err)
+static CURLcode wsftp_send(struct Curl_easy *data, int sockindex,
+                           const void *mem, size_t len, bool eos,
+                           size_t *pnwritten)
 {
   struct connectdata *conn = data->conn;
-  struct ssh_conn *sshc = &conn->proto.sshc;
+  struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
   word32 offset[2];
   int rc;
   (void)sockindex;
   (void)eos;
+
+  *pnwritten = 0;
+  if(!sshc)
+    return CURLE_FAILED_INIT;
 
   offset[0] = (word32)sshc->offset & 0xFFFFFFFF;
   offset[1] = (word32)(sshc->offset >> 32) & 0xFFFFFFFF;
@@ -262,43 +266,46 @@ static ssize_t wsftp_send(struct Curl_easy *data, int sockindex,
   rc = wolfSSH_SFTP_SendWritePacket(sshc->ssh_session, sshc->handle,
                                     sshc->handleSz,
                                     &offset[0],
-                                    (byte *)mem, (word32)len);
+                                    (byte *)CURL_UNCONST(mem), (word32)len);
 
   if(rc == WS_FATAL_ERROR)
     rc = wolfSSH_get_error(sshc->ssh_session);
   if(rc == WS_WANT_READ) {
     conn->waitfor = KEEP_RECV;
-    *err = CURLE_AGAIN;
-    return -1;
+    return CURLE_AGAIN;
   }
   else if(rc == WS_WANT_WRITE) {
     conn->waitfor = KEEP_SEND;
-    *err = CURLE_AGAIN;
-    return -1;
+    return CURLE_AGAIN;
   }
   if(rc < 0) {
     failf(data, "wolfSSH_SFTP_SendWritePacket returned %d", rc);
-    return -1;
+    return CURLE_SEND_ERROR;
   }
   DEBUGASSERT(rc == (int)len);
+  *pnwritten = (size_t)rc;
+  sshc->offset += *pnwritten;
   infof(data, "sent %zu bytes SFTP from offset %" FMT_OFF_T,
-        len, sshc->offset);
-  sshc->offset += len;
-  return (ssize_t)rc;
+        *pnwritten, sshc->offset);
+  return CURLE_OK;
 }
 
 /*
  * Return number of received (decrypted) bytes
  * or <0 on error
  */
-static ssize_t wsftp_recv(struct Curl_easy *data, int sockindex,
-                          char *mem, size_t len, CURLcode *err)
+static CURLcode wsftp_recv(struct Curl_easy *data, int sockindex,
+                           char *mem, size_t len, size_t *pnread)
 {
   int rc;
   struct connectdata *conn = data->conn;
-  struct ssh_conn *sshc = &conn->proto.sshc;
+  struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
   word32 offset[2];
   (void)sockindex;
+
+  *pnread = 0;
+  if(!sshc)
+    return CURLE_FAILED_INIT;
 
   offset[0] = (word32)sshc->offset & 0xFFFFFFFF;
   offset[1] = (word32)(sshc->offset >> 32) & 0xFFFFFFFF;
@@ -311,24 +318,40 @@ static ssize_t wsftp_recv(struct Curl_easy *data, int sockindex,
     rc = wolfSSH_get_error(sshc->ssh_session);
   if(rc == WS_WANT_READ) {
     conn->waitfor = KEEP_RECV;
-    *err = CURLE_AGAIN;
-    return -1;
+    return CURLE_AGAIN;
   }
   else if(rc == WS_WANT_WRITE) {
     conn->waitfor = KEEP_SEND;
-    *err = CURLE_AGAIN;
-    return -1;
+    return CURLE_AGAIN;
   }
 
   DEBUGASSERT(rc <= (int)len);
 
   if(rc < 0) {
     failf(data, "wolfSSH_SFTP_SendReadPacket returned %d", rc);
-    return -1;
+    return CURLE_RECV_ERROR;
   }
-  sshc->offset += len;
+  *pnread = (size_t)rc;
+  sshc->offset += *pnread;
+  return CURLE_OK;
+}
 
-  return (ssize_t)rc;
+static void wssh_easy_dtor(void *key, size_t klen, void *entry)
+{
+  struct SSHPROTO *sshp = entry;
+  (void)key;
+  (void)klen;
+  Curl_safefree(sshp->path);
+  free(sshp);
+}
+
+static void wssh_conn_dtor(void *key, size_t klen, void *entry)
+{
+  struct ssh_conn *sshc = entry;
+  (void)key;
+  (void)klen;
+  wssh_sshc_cleanup(sshc);
+  free(sshc);
 }
 
 /*
@@ -337,11 +360,21 @@ static ssize_t wsftp_recv(struct Curl_easy *data, int sockindex,
 static CURLcode wssh_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn)
 {
-  struct SSHPROTO *ssh;
+  struct ssh_conn *sshc;
+  struct SSHPROTO *sshp;
   (void)conn;
 
-  data->req.p.ssh = ssh = calloc(1, sizeof(struct SSHPROTO));
-  if(!ssh)
+  sshc = calloc(1, sizeof(*sshc));
+  if(!sshc)
+    return CURLE_OUT_OF_MEMORY;
+
+  sshc->initialised = TRUE;
+  if(Curl_conn_meta_set(conn, CURL_META_SSH_CONN, sshc, wssh_conn_dtor))
+    return CURLE_OUT_OF_MEMORY;
+
+  sshp = calloc(1, sizeof(*sshp));
+  if(!sshp ||
+     Curl_meta_set(data, CURL_META_SSH_EASY, sshp, wssh_easy_dtor))
     return CURLE_OUT_OF_MEMORY;
 
   return CURLE_OK;
@@ -366,13 +399,13 @@ static int userauth(byte authtype,
 static CURLcode wssh_connect(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
-  struct ssh_conn *sshc;
+  struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
+  struct SSHPROTO *sshp = Curl_meta_get(data, CURL_META_SSH_EASY);
   curl_socket_t sock = conn->sock[FIRSTSOCKET];
   int rc;
 
-  /* initialize per-handle data if not already */
-  if(!data->req.p.ssh)
-    wssh_setup_connection(data, conn);
+  if(!sshc || !sshp)
+    return CURLE_FAILED_INIT;
 
   /* We default to persistent connections. We set this already in this connect
      function to make the reuse checks properly be able to check this bit. */
@@ -386,7 +419,6 @@ static CURLcode wssh_connect(struct Curl_easy *data, bool *done)
     conn->recv[FIRSTSOCKET] = wsftp_recv;
     conn->send[FIRSTSOCKET] = wsftp_send;
   }
-  sshc = &conn->proto.sshc;
   sshc->ctx = wolfSSH_CTX_new(WOLFSSH_ENDPOINT_CLIENT, NULL);
   if(!sshc->ctx) {
     failf(data, "No wolfSSH context");
@@ -421,14 +453,13 @@ static CURLcode wssh_connect(struct Curl_easy *data, bool *done)
 
   *done = TRUE;
   if(conn->handler->protocol & CURLPROTO_SCP)
-    state(data, SSH_INIT);
+    wssh_state(data, sshc, SSH_INIT);
   else
-    state(data, SSH_SFTP_INIT);
+    wssh_state(data, sshc, SSH_SFTP_INIT);
 
   return wssh_multi_statemach(data, done);
 error:
-  wolfSSH_free(sshc->ssh_session);
-  wolfSSH_CTX_free(sshc->ctx);
+  wssh_sshc_cleanup(sshc);
   return CURLE_FAILED_INIT;
 }
 
@@ -439,20 +470,24 @@ error:
  * wants to be called again when the socket is ready
  */
 
-static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
+static CURLcode wssh_statemach_act(struct Curl_easy *data,
+                                   struct ssh_conn *sshc,
+                                   bool *block)
 {
   CURLcode result = CURLE_OK;
   struct connectdata *conn = data->conn;
-  struct ssh_conn *sshc = &conn->proto.sshc;
-  struct SSHPROTO *sftp_scp = data->req.p.ssh;
+  struct SSHPROTO *sftp_scp = Curl_meta_get(data, CURL_META_SSH_EASY);
   WS_SFTPNAME *name;
   int rc = 0;
   *block = FALSE; /* we are not blocking by default */
 
+  if(!sftp_scp)
+    return CURLE_FAILED_INIT;
+
   do {
     switch(sshc->state) {
     case SSH_INIT:
-      state(data, SSH_S_STARTUP);
+      wssh_state(data, sshc, SSH_S_STARTUP);
       break;
 
     case SSH_S_STARTUP:
@@ -470,11 +505,11 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         return CURLE_OK;
       }
       else if(rc != WS_SUCCESS) {
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
         return CURLE_SSH;
       }
       infof(data, "wolfssh connected");
-      state(data, SSH_STOP);
+      wssh_state(data, sshc, SSH_STOP);
       break;
     case SSH_STOP:
       break;
@@ -495,7 +530,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
       }
       else if(rc == WS_SUCCESS) {
         infof(data, "wolfssh SFTP connected");
-        state(data, SSH_SFTP_REALPATH);
+        wssh_state(data, sshc, SSH_SFTP_REALPATH);
       }
       else {
         failf(data, "wolfssh SFTP connect error %d", rc);
@@ -503,7 +538,8 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
       }
       break;
     case SSH_SFTP_REALPATH:
-      name = wolfSSH_SFTP_RealPath(sshc->ssh_session, (char *)".");
+      name = wolfSSH_SFTP_RealPath(sshc->ssh_session,
+                                   (char *)CURL_UNCONST("."));
       rc = wolfSSH_get_error(sshc->ssh_session);
       if(rc == WS_WANT_READ) {
         *block = TRUE;
@@ -520,7 +556,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         if(!sshc->homedir)
           sshc->actualcode = CURLE_OUT_OF_MEMORY;
         wolfSSH_SFTPNAME_list_free(name);
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
         return CURLE_OK;
       }
       failf(data, "wolfssh SFTP realpath %d", rc);
@@ -530,35 +566,35 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
       result = Curl_getworkingpath(data, sshc->homedir, &sftp_scp->path);
       if(result) {
         sshc->actualcode = result;
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
         break;
       }
 
       if(data->set.quote) {
         infof(data, "Sending quote commands");
         sshc->quote_item = data->set.quote;
-        state(data, SSH_SFTP_QUOTE);
+        wssh_state(data, sshc, SSH_SFTP_QUOTE);
       }
       else {
-        state(data, SSH_SFTP_GETINFO);
+        wssh_state(data, sshc, SSH_SFTP_GETINFO);
       }
       break;
     case SSH_SFTP_GETINFO:
       if(data->set.get_filetime) {
-        state(data, SSH_SFTP_FILETIME);
+        wssh_state(data, sshc, SSH_SFTP_FILETIME);
       }
       else {
-        state(data, SSH_SFTP_TRANS_INIT);
+        wssh_state(data, sshc, SSH_SFTP_TRANS_INIT);
       }
       break;
     case SSH_SFTP_TRANS_INIT:
       if(data->state.upload)
-        state(data, SSH_SFTP_UPLOAD_INIT);
+        wssh_state(data, sshc, SSH_SFTP_UPLOAD_INIT);
       else {
         if(sftp_scp->path[strlen(sftp_scp->path)-1] == '/')
-          state(data, SSH_SFTP_READDIR_INIT);
+          wssh_state(data, sshc, SSH_SFTP_READDIR_INIT);
         else
-          state(data, SSH_SFTP_DOWNLOAD_INIT);
+          wssh_state(data, sshc, SSH_SFTP_DOWNLOAD_INIT);
       }
       break;
     case SSH_SFTP_UPLOAD_INIT: {
@@ -621,7 +657,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         failf(data, "wolfssh SFTP upload open failed: %d", rc);
         return CURLE_SSH;
       }
-      state(data, SSH_SFTP_DOWNLOAD_STAT);
+      wssh_state(data, sshc, SSH_SFTP_DOWNLOAD_STAT);
 
       /* If we have a restart point then we need to seek to the correct
          position. */
@@ -681,13 +717,13 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         Curl_pgrsSetUploadSize(data, data->state.infilesize);
       }
       /* upload data */
-      Curl_xfer_setup1(data, CURL_XFER_SEND, -1, FALSE);
+      Curl_xfer_setup_send(data, FIRSTSOCKET);
 
       /* not set by Curl_xfer_setup to preserve keepon bits */
-      conn->sockfd = conn->writesockfd;
+      data->conn->recv_idx = FIRSTSOCKET;
 
       if(result) {
-        state(data, SSH_SFTP_CLOSE);
+        wssh_state(data, sshc, SSH_SFTP_CLOSE);
         sshc->actualcode = result;
       }
       else {
@@ -695,17 +731,11 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
            figure out a "real" bitmask */
         sshc->orig_waitfor = data->req.keepon;
 
-        /* we want to use the _sending_ function even when the socket turns
-           out readable as the underlying libssh2 sftp send function will deal
-           with both accordingly */
-        data->state.select_bits = CURL_CSELECT_OUT;
-
         /* since we do not really wait for anything at this point, we want the
-           state machine to move on as soon as possible so we set a very short
-           timeout here */
-        Curl_expire(data, 0, EXPIRE_RUN_NOW);
+           state machine to move on as soon as possible */
+        Curl_multi_mark_dirty(data);
 
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
       }
       break;
     }
@@ -728,7 +758,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
       }
       else if(rc == WS_SUCCESS) {
         infof(data, "wolfssh SFTP open succeeded");
-        state(data, SSH_SFTP_DOWNLOAD_STAT);
+        wssh_state(data, sshc, SSH_SFTP_DOWNLOAD_STAT);
         return CURLE_OK;
       }
 
@@ -783,36 +813,35 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         /* no data to transfer */
         Curl_xfer_setup_nop(data);
         infof(data, "File already completely downloaded");
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
         break;
       }
-      Curl_xfer_setup1(data, CURL_XFER_RECV, data->req.size, FALSE);
+      Curl_xfer_setup_recv(data, FIRSTSOCKET, data->req.size);
 
       /* not set by Curl_xfer_setup to preserve keepon bits */
-      conn->writesockfd = conn->sockfd;
-
-      /* we want to use the _receiving_ function even when the socket turns
-         out writableable as the underlying libssh2 recv function will deal
-         with both accordingly */
-      data->state.select_bits = CURL_CSELECT_IN;
+      conn->send_idx = 0;
 
       if(result) {
         /* this should never occur; the close state should be entered
            at the time the error occurs */
-        state(data, SSH_SFTP_CLOSE);
+        wssh_state(data, sshc, SSH_SFTP_CLOSE);
         sshc->actualcode = result;
       }
       else {
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
       }
       break;
     }
     case SSH_SFTP_CLOSE:
-      if(sshc->handleSz)
+      if(sshc->handleSz) {
         rc = wolfSSH_SFTP_Close(sshc->ssh_session, sshc->handle,
                                 sshc->handleSz);
-      else
+        if(rc != WS_SUCCESS)
+          rc = wolfSSH_get_error(sshc->ssh_session);
+      }
+      else {
         rc = WS_SUCCESS; /* directory listing */
+      }
       if(rc == WS_WANT_READ) {
         *block = TRUE;
         conn->waitfor = KEEP_RECV;
@@ -824,7 +853,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         return CURLE_OK;
       }
       else if(rc == WS_SUCCESS) {
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
         return CURLE_OK;
       }
 
@@ -834,10 +863,10 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
     case SSH_SFTP_READDIR_INIT:
       Curl_pgrsSetDownloadSize(data, -1);
       if(data->req.no_body) {
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
         break;
       }
-      state(data, SSH_SFTP_READDIR);
+      wssh_state(data, sshc, SSH_SFTP_READDIR);
       break;
 
     case SSH_SFTP_READDIR:
@@ -865,7 +894,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
                                data->set.list_only ?
                                name->fName : name->lName);
           if(!line) {
-            state(data, SSH_SFTP_CLOSE);
+            wssh_state(data, sshc, SSH_SFTP_CLOSE);
             sshc->actualcode = CURLE_OUT_OF_MEMORY;
             break;
           }
@@ -879,17 +908,15 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
           name = name->next;
         }
         wolfSSH_SFTPNAME_list_free(origname);
-        state(data, SSH_STOP);
+        wssh_state(data, sshc, SSH_STOP);
         return result;
       }
       failf(data, "wolfssh SFTP ls failed: %d", rc);
       return CURLE_SSH;
 
     case SSH_SFTP_SHUTDOWN:
-      Curl_safefree(sshc->homedir);
-      wolfSSH_free(sshc->ssh_session);
-      wolfSSH_CTX_free(sshc->ctx);
-      state(data, SSH_STOP);
+      wssh_sshc_cleanup(sshc);
+      wssh_state(data, sshc, SSH_STOP);
       return CURLE_OK;
     default:
       break;
@@ -902,12 +929,15 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
 static CURLcode wssh_multi_statemach(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
-  struct ssh_conn *sshc = &conn->proto.sshc;
+  struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
   CURLcode result = CURLE_OK;
-  bool block; /* we store the status and use that to provide a ssh_getsock()
+  bool block; /* we store the status and use that to provide a ssh_pollset()
                  implementation */
+  if(!sshc)
+    return CURLE_FAILED_INIT;
+
   do {
-    result = wssh_statemach_act(data, &block);
+    result = wssh_statemach_act(data, sshc, &block);
     *done = (sshc->state == SSH_STOP);
     /* if there is no error, it is not done and it did not EWOULDBLOCK, then
        try again */
@@ -932,6 +962,7 @@ CURLcode wscp_perform(struct Curl_easy *data,
 
 static
 CURLcode wsftp_perform(struct Curl_easy *data,
+                       struct ssh_conn *sshc,
                        bool *connected,
                        bool *dophase_done)
 {
@@ -942,7 +973,7 @@ CURLcode wsftp_perform(struct Curl_easy *data,
   *dophase_done = FALSE; /* not done yet */
 
   /* start the first command in the DO phase */
-  state(data, SSH_SFTP_QUOTE_INIT);
+  wssh_state(data, sshc, SSH_SFTP_QUOTE_INIT);
 
   /* run the state-machine */
   result = wssh_multi_statemach(data, dophase_done);
@@ -964,9 +995,12 @@ static CURLcode wssh_do(struct Curl_easy *data, bool *done)
   CURLcode result;
   bool connected = FALSE;
   struct connectdata *conn = data->conn;
-  struct ssh_conn *sshc = &conn->proto.sshc;
+  struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
 
   *done = FALSE; /* default to false */
+  if(!sshc)
+    return CURLE_FAILED_INIT;
+
   data->req.size = -1; /* make sure this is unknown at this point */
   sshc->actualcode = CURLE_OK; /* reset error code */
   sshc->secondCreateDirs = 0;   /* reset the create dir attempt state
@@ -980,24 +1014,24 @@ static CURLcode wssh_do(struct Curl_easy *data, bool *done)
   if(conn->handler->protocol & CURLPROTO_SCP)
     result = wscp_perform(data, &connected,  done);
   else
-    result = wsftp_perform(data, &connected,  done);
+    result = wsftp_perform(data, sshc, &connected,  done);
 
   return result;
 }
 
 static CURLcode wssh_block_statemach(struct Curl_easy *data,
-                                    bool disconnect)
+                                     struct ssh_conn *sshc,
+                                     bool disconnect)
 {
   struct connectdata *conn = data->conn;
-  struct ssh_conn *sshc = &conn->proto.sshc;
   CURLcode result = CURLE_OK;
 
   while((sshc->state != SSH_STOP) && !result) {
     bool block;
     timediff_t left = 1000;
-    struct curltime now = Curl_now();
+    struct curltime now = curlx_now();
 
-    result = wssh_statemach_act(data, &block);
+    result = wssh_statemach_act(data, sshc, &block);
     if(result)
       break;
 
@@ -1037,20 +1071,19 @@ static CURLcode wssh_block_statemach(struct Curl_easy *data,
 
 /* generic done function for both SCP and SFTP called from their specific
    done functions */
-static CURLcode wssh_done(struct Curl_easy *data, CURLcode status)
+static CURLcode wssh_done(struct Curl_easy *data,
+                          struct ssh_conn *sshc,
+                          CURLcode status)
 {
   CURLcode result = CURLE_OK;
-  struct SSHPROTO *sftp_scp = data->req.p.ssh;
 
   if(!status) {
     /* run the state-machine */
-    result = wssh_block_statemach(data, FALSE);
+    result = wssh_block_statemach(data, sshc, FALSE);
   }
   else
     result = status;
 
-  if(sftp_scp)
-    Curl_safefree(sftp_scp->path);
   if(Curl_pgrsDone(data))
     return CURLE_ABORTED_BY_CALLBACK;
 
@@ -1058,9 +1091,22 @@ static CURLcode wssh_done(struct Curl_easy *data, CURLcode status)
   return result;
 }
 
+static void wssh_sshc_cleanup(struct ssh_conn *sshc)
+{
+  if(sshc->ssh_session) {
+    wolfSSH_free(sshc->ssh_session);
+    sshc->ssh_session = NULL;
+  }
+  if(sshc->ctx) {
+    wolfSSH_CTX_free(sshc->ctx);
+    sshc->ctx = NULL;
+  }
+  Curl_safefree(sshc->homedir);
+}
+
 #if 0
 static CURLcode wscp_done(struct Curl_easy *data,
-                         CURLcode code, bool premature)
+                          CURLcode code, bool premature)
 {
   CURLcode result = CURLE_OK;
   (void)conn;
@@ -1071,7 +1117,7 @@ static CURLcode wscp_done(struct Curl_easy *data,
 }
 
 static CURLcode wscp_doing(struct Curl_easy *data,
-                          bool *dophase_done)
+                           bool *dophase_done)
 {
   CURLcode result = CURLE_OK;
   (void)conn;
@@ -1083,26 +1129,30 @@ static CURLcode wscp_doing(struct Curl_easy *data,
 static CURLcode wscp_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn, bool dead_connection)
 {
+  struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
   CURLcode result = CURLE_OK;
-  (void)data;
-  (void)conn;
   (void)dead_connection;
-
+  if(sshc)
+    wssh_sshc_cleanup(sshc);
   return result;
 }
 #endif
 
 static CURLcode wsftp_done(struct Curl_easy *data,
-                          CURLcode code, bool premature)
+                           CURLcode code, bool premature)
 {
+  struct ssh_conn *sshc = Curl_conn_meta_get(data->conn, CURL_META_SSH_CONN);
   (void)premature;
-  state(data, SSH_SFTP_CLOSE);
+  if(!sshc)
+    return CURLE_FAILED_INIT;
 
-  return wssh_done(data, code);
+  wssh_state(data, sshc, SSH_SFTP_CLOSE);
+
+  return wssh_done(data, sshc, code);
 }
 
 static CURLcode wsftp_doing(struct Curl_easy *data,
-                           bool *dophase_done)
+                            bool *dophase_done)
 {
   CURLcode result = wssh_multi_statemach(data, dophase_done);
 
@@ -1116,36 +1166,35 @@ static CURLcode wsftp_disconnect(struct Curl_easy *data,
                                  struct connectdata *conn,
                                  bool dead)
 {
+  struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
   CURLcode result = CURLE_OK;
   (void)dead;
 
   DEBUGF(infof(data, "SSH DISCONNECT starts now"));
 
-  if(conn->proto.sshc.ssh_session) {
+  if(sshc && sshc->ssh_session) {
     /* only if there is a session still around to use! */
-    state(data, SSH_SFTP_SHUTDOWN);
-    result = wssh_block_statemach(data, TRUE);
+    wssh_state(data, sshc, SSH_SFTP_SHUTDOWN);
+    result = wssh_block_statemach(data, sshc, TRUE);
   }
 
+  if(sshc)
+    wssh_sshc_cleanup(sshc);
   DEBUGF(infof(data, "SSH DISCONNECT is done"));
   return result;
 }
 
-static int wssh_getsock(struct Curl_easy *data,
-                        struct connectdata *conn,
-                        curl_socket_t *sock)
+static CURLcode wssh_pollset(struct Curl_easy *data,
+                             struct easy_pollset *ps)
 {
-  int bitmap = GETSOCK_BLANK;
-  int dir = conn->waitfor;
-  (void)data;
-  sock[0] = conn->sock[FIRSTSOCKET];
-
-  if(dir == KEEP_RECV)
-    bitmap |= GETSOCK_READSOCK(FIRSTSOCKET);
-  else if(dir == KEEP_SEND)
-    bitmap |= GETSOCK_WRITESOCK(FIRSTSOCKET);
-
-  return bitmap;
+  int flags = 0;
+  if(data->conn->waitfor & KEEP_RECV)
+    flags |= CURL_POLL_IN;
+  if(data->conn->waitfor & KEEP_SEND)
+    flags |= CURL_POLL_OUT;
+  return flags ?
+    Curl_pollset_change(data, ps, data->conn->sock[FIRSTSOCKET], flags, 0) :
+    CURLE_OK;
 }
 
 void Curl_ssh_version(char *buffer, size_t buflen)

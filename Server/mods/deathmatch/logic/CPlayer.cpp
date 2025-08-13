@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayer.cpp
  *  PURPOSE:     Player ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -268,6 +268,9 @@ const char* CPlayer::GetSourceIP()
 uint CPlayer::Send(const CPacket& Packet)
 {
     if (!CNetBufferWatchDog::CanSendPacket(Packet.GetPacketID()))
+        return 0;
+
+    if (IsLeavingServer())
         return 0;
 
     // Use the flags to determine how to send it

@@ -5,7 +5,7 @@
  *  FILE:        core/CProxyDirect3DDevice8.h
  *  PURPOSE:     Header file for Direct3D 9 device proxy class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

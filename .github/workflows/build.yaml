@@ -70,15 +70,10 @@ jobs:
     strategy:
       matrix:
         architecture: [x64, arm64]
-        include:
-        - architecture: x64
-          image-tag: latest
-        - architecture: arm64
-          image-tag: arm64
     name: linux-${{ matrix.architecture }}
     runs-on: ubuntu-latest
     container:
-      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
+      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:
       - uses: actions/checkout@v4
 

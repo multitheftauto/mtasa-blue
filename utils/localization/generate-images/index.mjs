@@ -35,7 +35,8 @@ import 'chromedriver';
 import {Browser, Builder} from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome.js';
 
-const driver = new Builder().forBrowser(Browser.CHROME).setChromeOptions(new chrome.Options().headless()).build();
+// https://www.selenium.dev/blog/2023/headless-is-going-away/
+const driver = new Builder().forBrowser(Browser.CHROME).setChromeOptions(new chrome.Options().addArguments('--headless=new')).build();
 
 await (async () => {
     try {
@@ -95,7 +96,8 @@ await (async () => {
             .map(dirent => dirent.name);
 
         await Promise.allSettled(pngs.map(async (filename) => {
-            const image = imagePool.ingestImage(`uncompressed/${locale}/${filename}`);
+            const file = await fs.readFile(`uncompressed/${locale}/${filename}`);
+            const image = imagePool.ingestImage(file);
 
             try {
                 await image.preprocess({ quant: { dither: 0.1, numColors: 8 } });

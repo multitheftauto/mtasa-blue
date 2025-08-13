@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPlayerInfoSA.h
  *  PURPOSE:     Header file for player ped type information class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

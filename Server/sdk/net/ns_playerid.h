@@ -5,7 +5,7 @@
  *  FILE:        sdk/net/ns_playerid.h
  *  PURPOSE:     Net server player ID interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

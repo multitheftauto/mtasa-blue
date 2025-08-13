@@ -9,7 +9,7 @@
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
-/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
+/*  license, FTL.TXT.  By continuing to use, modify, or distribute     */
 /*  this file you indicate that you have read the license and              */
 /*  understand and accept it fully.                                        */
 /*                                                                         */
@@ -915,6 +915,7 @@ PVG_FT_END_STMNT
   {
     PVG_FT_Vector   bez_stack[16 * 3 + 1];  /* enough to accommodate bisections */
     PVG_FT_Vector*  arc = bez_stack;
+    PVG_FT_Vector*  limit = bez_stack + 45;
     TPos        dx, dy, dx_, dy_;
     TPos        dx1, dy1, dx2, dy2;
     TPos        L, s, s_limit;
@@ -997,6 +998,8 @@ PVG_FT_END_STMNT
       continue;
 
     Split:
+      if( arc == limit )
+        return;
       gray_split_cubic( arc );
       arc += 3;
     }
@@ -1160,6 +1163,77 @@ PVG_FT_END_STMNT
                     ras.count_ex - x );
     }
   }
+
+PVG_FT_Error PVG_FT_Outline_Check(PVG_FT_Outline* outline)
+{
+    if (outline) {
+        PVG_FT_Int n_points = outline->n_points;
+        PVG_FT_Int n_contours = outline->n_contours;
+        PVG_FT_Int end0, end;
+        PVG_FT_Int n;
+
+        /* empty glyph? */
+        if (n_points == 0 && n_contours == 0) return 0;
+
+        /* check point and contour counts */
+        if (n_points <= 0 || n_contours <= 0) goto Bad;
+
+        end0 = end = -1;
+        for (n = 0; n < n_contours; n++) {
+            end = outline->contours[n];
+
+            /* note that we don't accept empty contours */
+            if (end <= end0 || end >= n_points) goto Bad;
+
+            end0 = end;
+        }
+
+        if (end != n_points - 1) goto Bad;
+
+        /* XXX: check the tags array */
+        return 0;
+    }
+
+Bad:
+    return ErrRaster_Invalid_Outline;
+}
+
+void PVG_FT_Outline_Get_CBox(const PVG_FT_Outline* outline, PVG_FT_BBox* acbox)
+{
+    PVG_FT_Pos xMin, yMin, xMax, yMax;
+
+    if (outline && acbox) {
+        if (outline->n_points == 0) {
+            xMin = 0;
+            yMin = 0;
+            xMax = 0;
+            yMax = 0;
+        } else {
+            PVG_FT_Vector* vec = outline->points;
+            PVG_FT_Vector* limit = vec + outline->n_points;
+
+            xMin = xMax = vec->x;
+            yMin = yMax = vec->y;
+            vec++;
+
+            for (; vec < limit; vec++) {
+                PVG_FT_Pos x, y;
+
+                x = vec->x;
+                if (x < xMin) xMin = x;
+                if (x > xMax) xMax = x;
+
+                y = vec->y;
+                if (y < yMin) yMin = y;
+                if (y > yMax) yMax = y;
+            }
+        }
+        acbox->xMin = xMin;
+        acbox->xMax = xMax;
+        acbox->yMin = yMin;
+        acbox->yMax = yMax;
+    }
+}
 
   /*************************************************************************/
   /*                                                                       */

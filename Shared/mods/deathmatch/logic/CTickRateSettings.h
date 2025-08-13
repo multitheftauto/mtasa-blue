@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -26,6 +26,7 @@ public:
         iPedSyncerDistance = 100;
         iUnoccupiedVehicleSyncerDistance = 130;
         iVehicleContactSyncRadius = 30;
+        playerTeleportAlert = 100;
     }
 
     int iPureSync;
@@ -41,6 +42,7 @@ public:
     int iPedSyncerDistance;
     int iUnoccupiedVehicleSyncerDistance;
     int iVehicleContactSyncRadius;
+    int playerTeleportAlert;
 };
 
 extern CTickRateSettings g_TickRateSettings;

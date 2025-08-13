@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA_ClothesMemFix.cpp
  *  PORPOISE:    Fix memory leak when clothes are changed
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

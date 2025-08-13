@@ -5,11 +5,12 @@
  *  FILE:        mods/deathmatch/Client.cpp
  *  PURPOSE:     Module entry point
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Memory.h"
 
 CClient* g_pClient = NULL;
 
@@ -18,6 +19,7 @@ MTAEXPORT CClientBase* __cdecl InitClient(void)
     // Eventually create a client base interface
     if (!g_pClient)
     {
+        SetMemoryAllocationFailureHandler();
         g_pClient = new CClient;
     }
     return g_pClient;

@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/packets/CBulletsyncPacket.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -12,6 +12,7 @@
 #include "CBulletsyncPacket.h"
 #include "net/SyncStructures.h"
 #include "CPlayer.h"
+#include "CWeaponStatManager.h"
 
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* pPlayer)
 {
@@ -28,12 +29,16 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
     // Got a player?
     if (m_pSourceElement)
     {
-        char cWeaponType;
-        BitStream.Read(cWeaponType);
+        char cWeaponType = 0;
+        if (!BitStream.Read(cWeaponType) || !CWeaponStatManager::HasWeaponBulletSync(cWeaponType))
+            return false;
         m_WeaponType = (eWeaponType)cWeaponType;
 
-        BitStream.Read((char*)&m_vecStart, sizeof(CVector));
-        BitStream.Read((char*)&m_vecEnd, sizeof(CVector));
+        if (!BitStream.Read((char*)&m_vecStart, sizeof(CVector)) || !BitStream.Read((char*)&m_vecEnd, sizeof(CVector)))
+            return false;
+
+        if (!m_vecStart.IsValid() || !m_vecEnd.IsValid())
+            return false;
 
         // Duplicate packet protection
         if (!BitStream.Read(m_ucOrderCounter))

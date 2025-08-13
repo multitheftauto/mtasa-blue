@@ -27,6 +27,7 @@ extern "C" {
 #include "json_object.h"
 #include "json_object_iterator.h"
 #include "json_pointer.h"
+#include "json_patch.h"
 #include "json_tokener.h"
 #include "json_util.h"
 #include "linkhash.h"

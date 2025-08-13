@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CTrailer.h
  *  PURPOSE:     Vehicle trailer interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

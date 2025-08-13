@@ -41,7 +41,7 @@ CClientCamera::CClientCamera(CClientManager* pManager) : ClassInit(this), CClien
 CClientCamera::~CClientCamera()
 {
     // We need to be ingame
-    if (g_pGame->GetSystemState() == 9)
+    if (g_pGame->GetSystemState() == SystemState::GS_PLAYING_GAME)
     {
         // Restore the camera to the local player
         SetFocusToLocalPlayerImpl();

@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/multiplayersa_init.h
  *  PURPOSE:     Multiplayer module entry
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

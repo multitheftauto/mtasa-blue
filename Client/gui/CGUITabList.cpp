@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUITabList.cpp
  *  PURPOSE:     Tab-able elements list class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

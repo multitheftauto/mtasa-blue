@@ -5,7 +5,7 @@
  *  FILE:        core/CMainMenu.h
  *  PURPOSE:     Header file for main menu graphical user interface class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -33,6 +33,7 @@ struct sMenuItem
     int              nativeSizeX;
     int              nativeSizeY;
     CGUIStaticImage* image;
+    float            animProgress{};
 };
 
 class CMainMenu
@@ -75,6 +76,8 @@ public:
     void        WantsToDisconnectCallBack(void* pData, uint uiButton);
     void        AskUserIfHeWantsToDisconnect(uchar menuType);
 
+    void ShowNetworkNotReadyWindow();
+
 private:
     sMenuItem* CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition);
     bool       SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHovering);
@@ -86,7 +89,7 @@ private:
     bool OnResumeButtonClick(CGUIElement* pElement);
     bool OnBrowseServersButtonClick(CGUIElement* pElement);
     bool OnHostGameButtonClick();
-    bool OnDisconnectButtonClick(CGUIElement* pElement);
+    bool OnDisconnectButtonClick();
     bool OnEditorButtonClick();
     bool OnSettingsButtonClick(CGUIElement* pElement);
     bool OnAboutButtonClick(CGUIElement* pElement);
@@ -144,7 +147,7 @@ private:
     int m_menuBY;
 
     CGraphics* m_pGraphics;
-    bool       m_bStarted;
+    bool       m_bStarted{false};
     CVector2D  m_ScreenSize;
 
     // Fade variables

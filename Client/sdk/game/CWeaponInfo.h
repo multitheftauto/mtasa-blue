@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CWeaponInfo.h
  *  PURPOSE:     Weapon entity information interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,7 +15,7 @@
 
 class CVector;
 
-enum eWeaponSkill
+enum eWeaponSkill : std::uint8_t
 {
     WEAPONSKILL_POOR = 0,
     WEAPONSKILL_STD,

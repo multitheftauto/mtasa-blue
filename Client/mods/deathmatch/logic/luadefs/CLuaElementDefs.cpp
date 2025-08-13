@@ -6,15 +6,13 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaElementDefs.cpp
  *  PURPOSE:     Lua element definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 using std::list;
-
-#define MIN_CLIENT_REQ_LOD_FOR_BUILDING "1.6.0-9.22470"
 
 void CLuaElementDefs::LoadFunctions()
 {
@@ -1767,13 +1765,13 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
 {
     //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
     CClientEntity* pEntity;
-    SString        strKey;
+    CStringName    key;
     CLuaArgument   value;
     bool           bSynchronize;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
     argStream.ReadLuaArgument(value);
     argStream.ReadBool(bSynchronize, true);
 
@@ -1782,15 +1780,16 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+            if (key->length() > MAX_CUSTOMDATA_NAME_LENGTH)
             {
                 // Warn and truncate if key is too long
                 m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
                                                              *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+
+                key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::SetElementData(*pEntity, strKey, value, bSynchronize))
+            if (CStaticFunctionDefinitions::SetElementData(*pEntity, key.ToCString(), value, bSynchronize))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1809,26 +1808,27 @@ int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
 {
     //  bool removeElementData ( element theElement, string key )
     CClientEntity* pEntity;
-    SString        strKey;
+    CStringName    key;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
 
     if (!argStream.HasErrors())
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+            if (key->length() > MAX_CUSTOMDATA_NAME_LENGTH)
             {
                 // Warn and truncate if key is too long
                 m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
                                                              *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+
+                key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, strKey))
+            if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, key.ToCString()))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -2511,16 +2511,12 @@ int CLuaElementDefs::GetLowLodElement(lua_State* luaVM)
 bool CLuaElementDefs::SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity, std::optional<CClientEntity*> pLowLodEntity)
 {
     //  bool setLowLODElement ( element theElement [, element lowLowElement ] )
-
-    if (pEntity->GetType() == CCLIENTBUILDING)
-        MinClientReqCheck(luaVM, MIN_CLIENT_REQ_LOD_FOR_BUILDING, "target is building");
-
     return CStaticFunctionDefinitions::SetLowLodElement(*pEntity, pLowLodEntity.value_or(nullptr));
 }
 
 bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexcept
 {
-    if (!entity->IsLocalEntity())
+    if (!entity->IsLocalEntity() && entity != CStaticFunctionDefinitions::GetLocalPlayer())
         return false;
 
     return entity->SetOnFire(onFire);

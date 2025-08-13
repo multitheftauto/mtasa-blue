@@ -1,4 +1,4 @@
-/* Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2000, 2025, Oracle and/or its affiliates.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License, version 2.0,
@@ -26,9 +26,9 @@
 #define MYSQLD_ERROR_INCLUDED
 
 static const int errmsg_section_start[] = { 1000, 3000, 3500, 6000, 10000, 15000 };
-static const int errmsg_section_size[] = { 888, 239, 667, 141, 4074, 145 };
+static const int errmsg_section_size[] = { 888, 239, 668, 141, 4086, 148 };
 
-static const int total_error_count = 6154;
+static const int total_error_count = 6170;
 
 //#define OBSOLETE_ER_HASHCHK 1000
 //#define OBSOLETE_ER_NISAMCHK 1001
@@ -1824,6 +1824,7 @@ static const int total_error_count = 6154;
 #define ER_WARN_NO_SPACE_VERSION_COMMENT 4164
 #define ER_VALIDATE_PASSWORD_INSUFFICIENT_CHANGED_CHARACTERS 4165
 #define ER_WARN_DEPRECATED_WITH_NOTE 4166
+#define ER_CANT_RUN_COMMAND_SERVICES_RECURSIVELY 4167
 #define ER_LANGUAGE_COMPONENT 6000
 #define ER_LANGUAGE_COMPONENT_NOT_AVAILABLE 6001
 #define ER_LANGUAGE_COMPONENT_UNSUPPORTED_LANGUAGE 6002
@@ -1979,7 +1980,7 @@ static const int total_error_count = 6154;
 #define ER_LOG_SLOW_CANNOT_OPEN 10011
 #define ER_LOG_GENERAL_CANNOT_OPEN 10012
 #define ER_LOG_CANNOT_WRITE 10013
-#define ER_RPL_ZOMBIE_ENCOUNTERED 10014
+//#define OBSOLETE_ER_RPL_ZOMBIE_ENCOUNTERED 10014
 #define ER_RPL_GTID_TABLE_CANNOT_OPEN 10015
 #define ER_SYSTEM_SCHEMA_NOT_FOUND 10016
 #define ER_DD_INIT_UPGRADE_FAILED 10017
@@ -3873,7 +3874,7 @@ static const int total_error_count = 6154;
 #define ER_IB_MSG_80 11905
 #define ER_IB_MSG_81 11906
 #define ER_IB_MSG_82 11907
-#define ER_IB_MSG_83 11908
+#define ER_IB_ERR_PAGE_DIRTY_AT_SHUTDOWN 11908
 #define ER_IB_MSG_84 11909
 #define ER_IB_MSG_85 11910
 #define ER_IB_MSG_86 11911
@@ -6039,6 +6040,18 @@ static const int total_error_count = 6154;
 #define ER_WAITING_FOR_NO_CONNECTIONS 14071
 #define ER_WAITING_FOR_NO_THDS 14072
 #define ER_IB_INDEX_PART_TOO_LONG 14073
+//#define OBSOLETE_ER_DD_UPDATE_DATADIR_FLAG_FAIL 14074
+//#define OBSOLETE_ER_IB_MSG_FIL_STATE_MOVED_PREV_OR_HAS_DATADIR 14075
+//#define OBSOLETE_ER_RPL_KILL_OLD_DUMP_THREAD_ENCOUNTERED 14076
+//#define OBSOLETE_ER_RPL_MTA_ALLOW_COMMIT_OUT_OF_ORDER 14077
+#define ER_CHECK_TABLE_FUNCTIONS 14078
+#define ER_CHECK_TABLE_FUNCTIONS_DETAIL 14079
+#define ER_GRP_RPL_CERT_BROADCAST_THREAD_CREATE_FAILED 14080
+#define ER_GRP_RPL_CERT_BROADCAST_THREAD_STARTED 14081
+#define ER_GRP_RPL_CERT_BROADCAST_THREAD_STOPPED 14082
+#define ER_GRP_RPL_APPLIER_THD_KILLED_BY_SQL_KILL 14083
+#define ER_IB_MSG_WAITING_ON_LAGGING_REDO_LOG_CONSUMER 14084
+#define ER_IB_MSG_ABORTING_LOG_ARCHIVER 14085
 #define ER_LANGUAGE_COMPONENT_INFO 15000
 #define ER_LANGUAGE_COMPONENT_WARNING 15001
 #define ER_LANGUAGE_COMPONENT_ERROR 15002
@@ -6183,13 +6196,16 @@ static const int total_error_count = 6154;
 #define ER_BULK_SCANNER_INFO 15141
 #define ER_LOG_DEPRECATE_NON_COMPOSABLE_MULTIPLE_ENGINE 15142
 #define ER_DD_UPDATE_DATADIR_FLAG_FAIL 15143
-#define ER_IB_MSG_FIL_STATE_MOVED_PREV_OR_HAS_DATADIR 15144
-static const int obsolete_error_count = 616;
+#define ER_IB_MSG_FIL_STATE_MOVED_PREV 15144
+#define ER_RPL_KILL_OLD_DUMP_THREAD_ENCOUNTERED 15145
+#define ER_RPL_MTA_ALLOW_COMMIT_OUT_OF_ORDER 15146
+#define ER_TEMPTABLE_ENGINE_ERROR 15147
+static const int obsolete_error_count = 621;
 
 static const int pfs_no_error_stat_count = 2;
 
-static const int pfs_session_error_stat_count = 1774;
+static const int pfs_session_error_stat_count = 1775;
 
-static const int pfs_global_error_stat_count = 3762;
+static const int pfs_global_error_stat_count = 3772;
 
 #endif

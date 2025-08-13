@@ -5,7 +5,7 @@
  *  FILE:        sdk/CChecksum.h
  *  PURPOSE:     Checksum class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 // Note: Cannot use #pragma once here, due to a duplicate existing in publicsdk

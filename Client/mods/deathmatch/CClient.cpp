@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/CClient.cpp
  *  PURPOSE:     Main client module class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -33,7 +33,8 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     // Make public client test builds expire
     if (GetDaysUntilExpire() < -1)
     {
-        MessageBox(NULL, _("This version has expired."), "MTA: San Andreas " MTA_DM_BUILDTAG_LONG + _E("CD64"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST);
+        MessageBoxA(NULL, _("This version has expired."), SStringX("MTA: San Andreas " MTA_DM_BUILDTAG_LONG) + _E("CD64"),
+                    MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST);
         TerminateProcess(GetCurrentProcess(), 1);
     }
 #endif

@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaPedDefs.cpp
  *  PURPOSE:     Lua ped definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,6 +15,7 @@
 #include <game/CTasks.h>
 #include <game/TaskBasic.h>
 #include <game/CAnimManager.h>
+#include "CLuaPedDefs.h"
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
@@ -34,10 +35,10 @@ void CLuaPedDefs::LoadFunctions()
         {"givePedWeapon", GivePedWeapon},
 
         {"setPedVoice", SetPedVoice},
-        {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
-        {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
-        {"setElementBoneQuaternion", ArgumentParser<SetElementBoneQuaternion>},
-        {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
+        {"setElementBonePosition", ArgumentParserWarn<false, SetElementBonePosition>},
+        {"setElementBoneRotation", ArgumentParserWarn<false, SetElementBoneRotation>},
+        {"setElementBoneQuaternion", ArgumentParserWarn<false, SetElementBoneQuaternion>},
+        {"setElementBoneMatrix", ArgumentParserWarn<false, SetElementBoneMatrix>},
         {"setPedRotation", SetPedRotation},
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedCanBeKnockedOffBike", SetPedCanBeKnockedOffBike},
@@ -45,7 +46,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedAnimationProgress", SetPedAnimationProgress},
         {"setPedAnimationSpeed", SetPedAnimationSpeed},
         {"setPedWalkingStyle", SetPedMoveAnim},
-        {"setPedControlState", SetPedControlState},
+        {"setPedControlState", ArgumentParserWarn<false, SetPedControlState>},
         {"setPedAnalogControlState", SetPedAnalogControlState},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
         {"setPedFightingStyle", ArgumentParser<SetPedFightingStyle>},
@@ -61,12 +62,13 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
         {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
         {"setPedBleeding", ArgumentParser<SetPedBleeding>},
+        {"playPedVoiceLine", ArgumentParser<PlayPedVoiceLine>},
 
         {"getPedVoice", GetPedVoice},
-        {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
-        {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
-        {"getElementBoneQuaternion", ArgumentParser<GetElementBoneQuaternion>},
-        {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
+        {"getElementBonePosition", ArgumentParserWarn<false, GetElementBonePosition>},
+        {"getElementBoneRotation", ArgumentParserWarn<false, GetElementBoneRotation>},
+        {"getElementBoneQuaternion", ArgumentParserWarn<false, GetElementBoneQuaternion>},
+        {"getElementBoneMatrix", ArgumentParserWarn<false, GetElementBoneMatrix>},
         {"getPedRotation", GetPedRotation},
         {"getPedWeaponSlot", GetPedWeaponSlot},
         {"canPedBeKnockedOffBike", CanPedBeKnockedOffBike},
@@ -75,7 +77,7 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedAnimationSpeed", ArgumentParser<GetPedAnimationSpeed>},
         {"getPedAnimationLength", ArgumentParser<GetPedAnimationLength>},        
         {"getPedWalkingStyle", GetPedMoveAnim},
-        {"getPedControlState", GetPedControlState},
+        {"getPedControlState", ArgumentParserWarn<false, GetPedControlState>},
         {"getPedAnalogControlState", GetPedAnalogControlState},
         {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
         {"getPedFightingStyle", GetPedFightingStyle},
@@ -87,7 +89,7 @@ void CLuaPedDefs::LoadFunctions()
 
         {"getPedStat", GetPedStat},
         {"getPedOxygenLevel", GetPedOxygenLevel},
-        {"getPedArmor", GetPedArmor},
+        {"getPedArmor", ArgumentParserWarn<false, GetPedArmor>},
         {"isPedBleeding", ArgumentParser<IsPedBleeding>},
 
         {"getPedContactElement", GetPedContactElement},
@@ -210,6 +212,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
     lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
     lua_classfunction(luaVM, "setBleeding", "setPedBleeding");
+    lua_classfunction(luaVM, "playVoiceLine", "playPedVoiceLine");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -784,26 +787,9 @@ int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedArmor(lua_State* luaVM)
+float CLuaPedDefs::GetPedArmor(CClientPed* const ped) noexcept
 {
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        // Grab the armor and return it
-        float fArmor = pPed->GetArmor();
-        lua_pushnumber(luaVM, fArmor);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return ped->GetArmor();
 }
 
 int CLuaPedDefs::GetPedStat(lua_State* luaVM)
@@ -928,13 +914,15 @@ int CLuaPedDefs::IsPedOnGround(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
+    bool             checkVehicles = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
+    argStream.ReadBool(checkVehicles, false);
 
     if (!argStream.HasErrors())
     {
         // Find out whether he's on the ground or not and return it
-        bool bOnGround = pPed->IsOnGround();
+        bool bOnGround = pPed->IsOnGround(checkVehicles);
         lua_pushboolean(luaVM, bOnGround);
         return 1;
     }
@@ -1009,110 +997,147 @@ int CLuaPedDefs::CanPedBeKnockedOffBike(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CVector position)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(CClientPed* ped, const std::uint16_t bone)
 {
-    CEntity* theEntity = entity->GetGameEntity();
-    if (!theEntity)
-        return false;
-    return theEntity->SetBonePosition(static_cast<eBone>(boneId), position);
-}
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
 
-bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float yaw, float pitch, float roll)
-{
-    if (boneId > BONE_RIGHTFOOT)
-        throw LuaFunctionError("Invalid bone ID", false);
+    CEntity* entity = ped->GetGameEntity();
+    CVector position;
 
-    CEntity* theEntity = entity->GetGameEntity();
-    if (!theEntity)
-        return false;
-    return theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll);
-}
-
-bool CLuaPedDefs::SetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float x, float y, float z, float w)
-{
-    if (boneId > BONE_RIGHTFOOT)
-        throw LuaFunctionError("Invalid bone ID", false);
-
-    CEntity* theEntity = entity->GetGameEntity();
-    return theEntity ? theEntity->SetBoneRotationQuat(static_cast<eBone>(boneId), x, y, z, w) : false;
-}
-
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
-{
-    CEntity* theEntity = entity->GetGameEntity();
-    CVector  position;
-    if (!theEntity || !theEntity->GetBonePosition(static_cast<eBone>(boneId), position))
+    if (!entity || !entity->GetBonePosition(static_cast<eBone>(bone), position))
         return false;
 
-    return std::make_tuple(position.fX, position.fY, position.fZ);
+    return CLuaMultiReturn<float, float, float>(position.fX, position.fY, position.fZ);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(CClientPed* ped, const std::uint16_t bone)
 {
-    if (boneId > BONE_RIGHTFOOT)
-        throw LuaFunctionError("Invalid bone ID", false);
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
 
-    float yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
-    CEntity* theEntity = entity->GetGameEntity();
-    if (!theEntity || !theEntity->GetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll))
+    CEntity* entity = ped->GetGameEntity();
+    float    yaw = 0.0f;
+    float    pitch = 0.0f;
+    float    roll = 0.0f;
+    
+    if (!entity || !entity->GetBoneRotation(static_cast<eBone>(bone), yaw, pitch, roll))
         return false;
 
-    return std::make_tuple(yaw, pitch, roll);
+    return CLuaMultiReturn<float, float, float>(yaw, pitch, roll);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::GetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
+std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::GetElementBoneQuaternion(CClientPed* ped, const std::uint16_t bone)
 {
-    if (boneId > BONE_RIGHTFOOT)
-        throw LuaFunctionError("Invalid bone ID", false);
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
 
-    float x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
-    CEntity* theEntity = entity->GetGameEntity();
-    if (!theEntity || !theEntity->GetBoneRotationQuat(static_cast<eBone>(boneId), x, y, z, w))
+    CEntity* entity = ped->GetGameEntity();
+    float    x = 0.0f;
+    float    y = 0.0f;
+    float    z = 0.0f;
+    float    w = 0.0f;
+
+    if (!entity || !entity->GetBoneRotationQuat(static_cast<eBone>(bone), x, y, z, w))
         return false;
 
-    return std::make_tuple(x, y, z, w);
+    return CLuaMultiReturn<float, float, float, float>(x, y, z, w);
 }
 
-bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CMatrix boneMatrix)
+std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone)
 {
-    CEntity* theEntity = entity->GetGameEntity();
-    return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    RwMatrix* rwmatrix = entity->GetBoneRwMatrix(static_cast<eBone>(bone));
+
+    if (!rwmatrix)
+        return false;
+
+    CMatrix matrix;
+
+    g_pGame->GetRenderWare()->RwMatrixToCMatrix(*rwmatrix, matrix);
+
+    return matrix.To4x4Array();
 }
 
-std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
+bool CLuaPedDefs::SetElementBonePosition(CClientPed* ped, const std::uint16_t bone, const CVector position)
 {
-    CEntity* theEntity = entity->GetGameEntity();
-    if (theEntity)
-    {
-        RwMatrix* boneRwMatrix = theEntity->GetBoneRwMatrix(static_cast<eBone>(boneId));
-        if (boneRwMatrix)
-        {
-            CMatrix matrix;
-            g_pGame->GetRenderWare()->RwMatrixToCMatrix(*boneRwMatrix, matrix);
-            return matrix.To4x4Array();
-        }
-    }
-    return false;
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    return entity->SetBonePosition(static_cast<eBone>(bone), position);
 }
 
-bool CLuaPedDefs::UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* entity)
+bool CLuaPedDefs::SetElementBoneRotation(CClientPed* ped, const std::uint16_t bone, const float yaw, const float pitch, const float roll)
 {
-    CEntity* theEntity = entity->GetGameEntity();
-    if (theEntity)
-    {
-        theEntity->UpdateRpHAnim();
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
 
-        if (theEntity->GetModelIndex() == 0)            // CJ skin
-        {
-            RpClump* clump = theEntity->GetRpClump();
-            if (clump)
-            {
-                ((void(__cdecl*)(RpClump*))0x5DF560)(clump);            // CPed::ShoulderBoneRotation
-            }
-        }
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    return entity->SetBoneRotation(static_cast<eBone>(bone), yaw, pitch, roll);
+}
+
+bool CLuaPedDefs::SetElementBoneQuaternion(CClientPed* ped, const std::uint16_t bone, const float x, const float y, const float z, const float w)
+{
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    return entity->SetBoneRotationQuat(static_cast<eBone>(bone), x, y, z, w);
+}
+
+bool CLuaPedDefs::SetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone, const CMatrix matrix)
+{
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    return entity->SetBoneMatrix(static_cast<eBone>(bone), matrix);
+}
+
+bool CLuaPedDefs::UpdateElementRpHAnim(CClientPed* ped)
+{
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    entity->UpdateRpHAnim();
+
+    if (entity->GetModelIndex() != 0)
         return true;
+
+    RpClump* clump = entity->GetRpClump();
+
+    if (clump)
+    {
+        ((void(__cdecl*)(RpClump*))0x5DF560)(clump); // CPed::ShoulderBoneRotation
     }
-    return false;
+
+    return true;
 }
 
 int CLuaPedDefs::GetPedBonePosition(lua_State* luaVM)
@@ -1264,33 +1289,35 @@ int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedControlState(lua_State* luaVM)
+bool CLuaPedDefs::GetPedControlState(std::variant<CClientPed*, std::string> first, std::optional<std::string> maybeControl)
 {
-    // Verify the argument
-    CClientPed*      pPed = CStaticFunctionDefinitions::GetLocalPlayer();
-    SString          strControl = "";
-    CScriptArgReader argStream(luaVM);
+    CClientPed* ped{};
+    std::string control{};
 
-    if (argStream.NextIsUserData())
+    if (std::holds_alternative<CClientPed*>(first))
     {
-        argStream.ReadUserData(pPed);
+        if (!maybeControl.has_value())
+            throw std::invalid_argument("Expected control name at argument 2");
+
+        ped = std::get<CClientPed*>(first);
+        control = maybeControl.value();
     }
-    argStream.ReadString(strControl);
-
-    if (!argStream.HasErrors())
+    else if (std::holds_alternative<std::string>(first))
     {
-        bool bState;
-        if (CStaticFunctionDefinitions::GetPedControlState(*pPed, strControl, bState))
-        {
-            lua_pushboolean(luaVM, bState);
-            return 1;
-        }
+        ped = CStaticFunctionDefinitions::GetLocalPlayer();
+        control = std::get<std::string>(first);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        throw std::invalid_argument("Expected ped or control name at argument 1");
+    }
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    bool state;
+    
+    if (!CStaticFunctionDefinitions::GetPedControlState(*ped, control, state))
+        return false;
+
+    return state;
 }
 
 int CLuaPedDefs::GetPedAnalogControlState(lua_State* luaVM)
@@ -1839,34 +1866,39 @@ int CLuaPedDefs::RemovePedClothes(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedControlState(lua_State* luaVM)
+bool CLuaPedDefs::SetPedControlState(std::variant<CClientPed*, std::string> first, std::variant<std::string, bool> second, std::optional<bool> maybeState)
 {
-    // Verify the argument
-    CClientEntity*   pEntity = CStaticFunctionDefinitions::GetLocalPlayer();
-    SString          strControl = "";
-    bool             bState = false;
-    CScriptArgReader argStream(luaVM);
+    CClientPed* ped{};
+    std::string control{};
+    bool        state{};
 
-    if (argStream.NextIsUserData())
+    if (std::holds_alternative<CClientPed*>(first))
     {
-        argStream.ReadUserData(pEntity);
+        if (!std::holds_alternative<std::string>(second))
+            throw std::invalid_argument("Expected control name at argument 2");
+
+        if (!maybeState.has_value())
+            throw std::invalid_argument("Expected state boolean at argument 3");
+
+        ped = std::get<CClientPed*>(first);
+        control = std::get<std::string>(second);
+        state = maybeState.value();
     }
-    argStream.ReadString(strControl);
-    argStream.ReadBool(bState);
-
-    if (!argStream.HasErrors())
+    else if (std::holds_alternative<std::string>(first))
     {
-        if (CStaticFunctionDefinitions::SetPedControlState(*pEntity, strControl, bState))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        if (!std::holds_alternative<bool>(second))
+            throw std::invalid_argument("Expected state boolean at argument 2");
+
+        ped = CStaticFunctionDefinitions::GetLocalPlayer();
+        control = std::get<std::string>(first);
+        state = std::get<bool>(second);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        throw std::invalid_argument("Expected ped or control name at argument 1");
+    }
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetPedControlState(*ped, control, state);
 }
 
 int CLuaPedDefs::SetPedDoingGangDriveby(lua_State* luaVM)
@@ -2395,6 +2427,12 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
 
 bool CLuaPedDefs::SetPedArmor(CClientPed* const ped, const float armor)
 {
+    if (armor < 0.0f)
+        throw std::invalid_argument("Armor must be greater than or equal to 0");
+
+    if (armor > 100.0f)
+        throw std::invalid_argument("Armor must be less than or equal to 100");
+
     ped->SetArmor(armor);
     return true;
 }
@@ -2485,19 +2523,40 @@ bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
     return pPed->ExitVehicle();
 }
 
-bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) noexcept
+bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) 
 {
     switch (taskType)
     {
         case taskType::PRIMARY_TASK:
         {
+            if (taskNumber == TASK_PRIORITY_DEFAULT)
+                throw LuaFunctionError("Killing TASK_PRIORITY_DEFAULT is not allowed");
+
+            if (taskNumber >= TASK_PRIORITY_MAX)
+                throw LuaFunctionError("Invalid task slot number");
+
             return ped->KillTask(taskNumber, gracefully.value_or(true)); 
         }
         case taskType::SECONDARY_TASK:
         {
+            if (taskNumber >= TASK_SECONDARY_MAX)
+                throw LuaFunctionError("Invalid task slot number");
+
             return ped->KillTaskSecondary(taskNumber, gracefully.value_or(true));
         }
         default:
             return false; 
     }
+}
+
+void CLuaPedDefs::PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probability)
+{
+    auto speechContextId = static_cast<ePedSpeechContext>(speechId);
+    if (speechContextId < ePedSpeechContext::NOTHING || speechContextId >= ePedSpeechContext::NUM_PED_CONTEXT)
+        throw LuaFunctionError("The argument speechId is invalid. The valid range is 0-359.");
+
+    if (probability.has_value() && probability < 0.0f)
+        throw LuaFunctionError("The argument probability cannot have a negative value.");
+
+    ped->Say(speechContextId, probability.value_or(1.0f));
 }

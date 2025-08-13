@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-24 16:37\n"
+"PO-Revision-Date: 2023-08-16 16:40\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -19,37 +19,37 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "빠른 연결"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "연결 끊기"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "서버 브라우저"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "호스트 게임"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "맵 에디터"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "설정"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "만든이들"
 
 #. Found in the main menu navigation
 msgid "Quit"
-msgstr ""
+msgstr "종료"
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr ""
+msgstr "최근 소식"
 

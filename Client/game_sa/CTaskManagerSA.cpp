@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CTaskManagerSA.cpp
  *  PURPOSE:     Task manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -149,6 +149,18 @@ CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)
 void CTaskManagerSA::RemoveTaskSecondary(const int iTaskPriority)
 {
     SetTaskSecondary(NULL, iTaskPriority);
+}
+
+bool CTaskManagerSA::RemoveTaskSecondary(const int taskPriority, const int taskType)
+{
+    CTask* task = GetTaskSecondary(taskPriority);
+    if (task && task->GetTaskType() == taskType)
+    {
+        RemoveTaskSecondary(taskPriority);
+        return true;
+    }
+
+    return false;
 }
 
 void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)

@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        multiplayer_sa/CMultiplayerSA_Rendering.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -77,7 +77,7 @@ void _declspec(naked) HOOK_CallIdle()
 //////////////////////////////////////////////////////////////////////////////////////////
 bool IsEntityRenderable(CEntitySAInterface* pEntity)
 {
-    bool bIsPlaceable = ((DWORD)(pEntity->vtbl) == VTBL_CPlaceable);
+    bool bIsPlaceable = pEntity->IsPlaceableVTBL();
     bool bHasRwObject = (pEntity->m_pRwObject != nullptr);
     if (bIsPlaceable || !bHasRwObject)
     {

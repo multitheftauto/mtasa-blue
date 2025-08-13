@@ -39,7 +39,7 @@
 
 ;----------------------------------------
 ; Run KB installer
-; Uses technique described at http://dennisspan.com/slow-installation-of-msu-files-using-the-wusa-exe/
+; Uses technique described at https://dennisspan.com/slow-installation-of-msu-files-using-the-wusa-exe/
 ; In: ID = KB number
 ;     BASENAME = KB filename without path or extention
 ;     MSUFILE = Full .msu filename

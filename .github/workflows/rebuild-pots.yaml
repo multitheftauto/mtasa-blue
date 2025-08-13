@@ -4,6 +4,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   test:
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,6 +24,7 @@ jobs:
         run: pytest "utils/localization/tests"
         shell: bash -l {0}
   rebuild-pots:
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     needs: test
     steps:

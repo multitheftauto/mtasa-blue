@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaAccountDefs.h
  *  PURPOSE:     Lua function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -48,4 +48,5 @@ public:
     LUA_DECLARE(SetAccountPassword);
     LUA_DECLARE(SetAccountData);
     LUA_DECLARE(CopyAccountData);
+    static bool SetAccountSerial(CAccount* account, std::string serial) noexcept;
 };

@@ -3,13 +3,14 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "SimHeaders.h"
 #include "CPickupManager.h"
+#include "CWeaponStatManager.h"
 
 CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID PlayerID) : m_PlayerID(PlayerID)
 {
@@ -24,14 +25,16 @@ CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID PlayerID) : m_PlayerID(Play
 //
 bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
 {
-    char cWeaponType;
-    BitStream.Read(cWeaponType);
-    if (!CPickupManager::IsValidWeaponID(cWeaponType))
+    char cWeaponType = 0;
+    if (!BitStream.Read(cWeaponType) || !CWeaponStatManager::HasWeaponBulletSync(cWeaponType))
         return false;
     m_Cache.weaponType = (eWeaponType)cWeaponType;
 
-    BitStream.Read((char*)&m_Cache.vecStart, sizeof(CVector));
-    BitStream.Read((char*)&m_Cache.vecEnd, sizeof(CVector));
+    if (!BitStream.Read((char*)&m_Cache.vecStart, sizeof(CVector)) || !BitStream.Read((char*)&m_Cache.vecEnd, sizeof(CVector)))
+        return false;
+
+    if (!m_Cache.vecStart.IsValid() || !m_Cache.vecEnd.IsValid())
+        return false;
 
     // Duplicate packet protection
     if (!BitStream.Read(m_Cache.ucOrderCounter))

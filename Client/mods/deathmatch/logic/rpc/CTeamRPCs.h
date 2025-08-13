@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CTeamRPCs.h
  *  PURPOSE:     Header for team RPC class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

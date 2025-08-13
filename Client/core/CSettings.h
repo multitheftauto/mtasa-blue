@@ -5,7 +5,7 @@
  *  FILE:        core/CSettings.h
  *  PURPOSE:     Header file for in-game settings window class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -158,6 +158,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxAllowExternalSounds;
     CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
     CGUICheckBox*  m_pCheckBoxAllowDiscordRPC;
+    CGUICheckBox*  m_pCheckBoxAllowSteamClient = nullptr;
     CGUICheckBox*  m_pCheckBoxAlwaysShowTransferBox;
     CGUICheckBox*  m_pCheckBoxGrass;
     CGUICheckBox*  m_pCheckBoxHeatHaze;
@@ -216,6 +217,8 @@ protected:
     CGUICheckBox*  m_pWin8ColorCheckBox;
     CGUICheckBox*  m_pWin8MouseCheckBox;
     CGUICheckBox*  m_pPhotoSavingCheckbox;
+    CGUICheckBox*  m_pCheckBoxAskBeforeDisconnect;
+    CGUICheckBox*  m_pProcessAffinityCheckbox;
     CGUILabel*     m_pUpdateBuildTypeLabel;
     CGUIComboBox*  m_pUpdateBuildTypeCombo;
     CGUILabel*     m_pUpdateAutoInstallLabel;
@@ -406,6 +409,7 @@ protected:
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
+    bool OnAffinityClick(CGUIElement* pElement);
     void ReloadBrowserLists();
 
 private:

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.cpp
  *  PURPOSE:     Resource object
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -258,7 +258,7 @@ void CResource::Load()
         m_pResourceTXDRoot->SetParent(m_pResourceEntity);
     }
 
-    CLogger::LogPrintf("> Starting resource '%s'", *m_strResourceName);
+    CLogger::LogPrintf("> Starting resource '%s'\n", *m_strResourceName);
 
     // Flag resource files as readable
     for (std::list<CResourceConfigItem*>::iterator iter = m_ConfigFiles.begin(); iter != m_ConfigFiles.end(); ++iter)
@@ -339,14 +339,9 @@ void CResource::Load()
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         if (pBitStream)
         {
-            if (pBitStream->Can(eBitStreamVersion::OnPlayerResourceStart))
-            {
-                // Write resource net ID
-                pBitStream->Write(GetNetID());
-
-                g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-            }
-
+            // Write resource net ID
+            pBitStream->Write(GetNetID());
+            g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }

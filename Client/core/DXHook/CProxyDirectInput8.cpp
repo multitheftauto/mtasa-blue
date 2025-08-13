@@ -5,7 +5,7 @@
  *  FILE:        core/CProxyDirectInput8.cpp
  *  PURPOSE:     DirectInput 8 function hooking proxy
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

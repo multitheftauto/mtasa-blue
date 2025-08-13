@@ -5,7 +5,7 @@
  *  FILE:        core/data/clinkedlist.h
  *  PURPOSE:     Linked list template class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *  The following code deals with implementing a templated
  *  linked list with a built-in public iterator class.  This

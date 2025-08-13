@@ -16,6 +16,7 @@ class CClientVehicle;
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
 #include <game/CModelInfo.h>
+#include <game/CVehicleAudioSettingsEntry.h>
 
 #include "CClientCommon.h"
 #include "CClientCamera.h"
@@ -540,9 +541,14 @@ public:
     void  ResetWheelScale();
 
     bool OnVehicleFallThroughMap();
+    const CVehicleAudioSettingsEntry& GetAudioSettings() const noexcept;
+    CVehicleAudioSettingsEntry&       GetOrCreateAudioSettings();
 
-    bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const;
-    bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
+    void ApplyAudioSettings();
+    void ResetAudioSettings();
+
+    bool GetDummyPosition(VehicleDummies dummy, CVector& position) const;
+    bool SetDummyPosition(VehicleDummies dummy, const CVector& position);
     bool ResetDummyPositions();
 
     bool SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);
@@ -668,6 +674,7 @@ protected:
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
     float                                  m_fWheelScale;
+    std::unique_ptr<CVehicleAudioSettingsEntry> m_pSoundSettingsEntry;
 
     bool  m_bChainEngine;
     bool  m_bIsDerailed;
@@ -747,8 +754,10 @@ public:
     SLastSyncedVehData*                      m_LastSyncedData;
     SSirenInfo                               m_tSirenBeaconInfo;
     std::map<SString, SVehicleComponentData> m_ComponentData;
+    // Store visibility state when the component map is regenerated
+    std::map<SString, bool>                  m_ComponentVisibilityBackup;
     bool                                     m_bAsyncLoadingDisabled;
 
-    std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
+    std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
     bool                                     m_copyDummyPositions = true;
 };

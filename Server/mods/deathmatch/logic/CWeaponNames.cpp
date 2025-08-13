@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CWeaponNames.cpp
  *  PURPOSE:     GTA weapon name definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -34,10 +34,10 @@ SWeaponName WeaponNames[] = {{"Fist"},
                              {"Poolstick"},
                              {"Katana"},
                              {"Chainsaw"},
-                             {"Dildo"},
+                             {"Purple Dildo"},
                              {"Dildo"},
                              {"Vibrator"},
-                             {"Vibrator"},
+                             {"Silver Vibrator"},
                              {"Flower"},
                              {"Cane"},
                              {"Grenade"},

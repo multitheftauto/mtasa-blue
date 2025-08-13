@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CFxSA.cpp
  *  PURPOSE:     Game effects handling
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -240,7 +240,7 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     }
 }
 
-void CFxSA::AddParticle(eFxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
+void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
 {
     // Init our own FxPrtMult struct
     FxPrtMult_c fxPrt{{fR,fG,fB,fA}, fSize, 0, fLife};
@@ -250,55 +250,55 @@ void CFxSA::AddParticle(eFxParticleSystems eFxParticle, const CVector& vecPositi
 
     switch (eFxParticle)
     {
-        case eFxParticleSystems::PRT_BLOOD:
+        case FxParticleSystems::PRT_BLOOD:
             fxParticleSystem = m_pInterface->m_fxSysBlood;
             break;
-        case eFxParticleSystems::PRT_BOATSPLASH:
+        case FxParticleSystems::PRT_BOATSPLASH:
             fxParticleSystem = m_pInterface->m_fxSysBoatSplash;
             break;
-        case eFxParticleSystems::PRT_BUBBLE:
+        case FxParticleSystems::PRT_BUBBLE:
             fxParticleSystem = m_pInterface->m_fxSysBubble;
             break;
-        case eFxParticleSystems::PRT_DEBRIS:
+        case FxParticleSystems::PRT_DEBRIS:
             fxParticleSystem = m_pInterface->m_fxSysDebris;
             break;
-        case eFxParticleSystems::PRT_GUNSHELL:
+        case FxParticleSystems::PRT_GUNSHELL:
             fxParticleSystem = m_pInterface->m_fxSysGunshell;
             break;
-        case eFxParticleSystems::PRT_SAND:
+        case FxParticleSystems::PRT_SAND:
             fxParticleSystem = m_pInterface->m_fxSysSand;
             break;
-        case eFxParticleSystems::PRT_SAND2:
+        case FxParticleSystems::PRT_SAND2:
             fxParticleSystem = m_pInterface->m_fxSysSand2;
             break;
-        case eFxParticleSystems::PRT_SMOKE:
+        case FxParticleSystems::PRT_SMOKE:
             fxParticleSystem = m_pInterface->m_fxSysSmoke;
             break;
-        case eFxParticleSystems::PRT_SMOKEHUGE:
+        case FxParticleSystems::PRT_SMOKEHUGE:
             fxParticleSystem = m_pInterface->m_fxSysSmokeHuge;
             break;
-        case eFxParticleSystems::PRT_SMOKE2:
+        case FxParticleSystems::PRT_SMOKE2:
             fxParticleSystem = m_pInterface->m_fxSysSmoke2;
             break;
-        case eFxParticleSystems::PRT_SPARK:
+        case FxParticleSystems::PRT_SPARK:
             fxParticleSystem = m_pInterface->m_fxSysSpark;
             break;
-        case eFxParticleSystems::PRT_SPARK2:
+        case FxParticleSystems::PRT_SPARK2:
             fxParticleSystem = m_pInterface->m_fxSysSpark2;
             break;
-        case eFxParticleSystems::PRT_SPLASH:
+        case FxParticleSystems::PRT_SPLASH:
             fxParticleSystem = m_pInterface->m_fxSysSplash;
             break;
-        case eFxParticleSystems::PRT_WAKE:
+        case FxParticleSystems::PRT_WAKE:
             fxParticleSystem = m_pInterface->m_fxSysWake;
             break;
-        case eFxParticleSystems::PRT_WATERSPLASH:
+        case FxParticleSystems::PRT_WATERSPLASH:
             fxParticleSystem = m_pInterface->m_fxSysWaterSplash;
             break;
-        case eFxParticleSystems::PRT_WHEELDIRT:
+        case FxParticleSystems::PRT_WHEELDIRT:
             fxParticleSystem = m_pInterface->m_fxSysWheelDirt;
             break;
-        case eFxParticleSystems::PRT_GLASS:
+        case FxParticleSystems::PRT_GLASS:
             fxParticleSystem = m_pInterface->m_fxSysGlass;
             break;
         default:

@@ -41,8 +41,8 @@ struct SPlayerClothingType
 
 struct SPlayerClothing
 {
-    const char* szTexture;
-    const char* szModel;
+    std::string texture;
+    std::string model;
 };
 
 class CClientPlayerClothes
@@ -57,6 +57,8 @@ public:
     bool                   RemoveClothes(unsigned char ucType, bool bRemoveFromModel = true);
 
     void AddAllToModel();
+    void RefreshClothes();
+
     void RemoveAll(bool bRemoveFromModel = true);
 
     void DefaultClothes(bool bAddToModel = true);
@@ -65,15 +67,21 @@ public:
     static bool        IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType);
     static const char* GetClothingName(unsigned char ucType);
 
-    static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
-    static const int              GetClothingGroupMax(unsigned char ucType);
+    static std::vector<const SPlayerClothing*>  GetClothingGroup(unsigned char ucType);
+    static bool                                 IsValidModel(unsigned short usModel);
+    static bool                                 HasClothesChanged();
+    static bool                                 AddClothingModel(const char* texture, const char* model, unsigned char clothingType);
+    static bool                                 RemoveClothingModel(const char* texture, const char* model, unsigned char clothingType);
 
 private:
     static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
 
     CClientPed* m_pPlayerModel;
 
-    SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>        m_Clothes;
-    static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> m_GlobalClothes;
-    static bool                                                       m_bStaticInit;
+    SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>              m_Clothes;
+    static bool                                                             m_bHasClothesChanged;
+    static SFixedArray<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS> m_DefaultClothes;
+    static SFixedArray<std::list<SPlayerClothing>, PLAYER_CLOTHING_SLOTS>   m_NewClothes;
+    static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>       m_GlobalClothes;
+    static bool                                                             m_bStaticInit;
 };

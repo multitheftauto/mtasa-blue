@@ -11,155 +11,197 @@
 
 #include "StdInc.h"
 #include "CModManager.h"
-#include "CFilePathTranslator.h"
-#include <game/CGame.h>
 #define DECLARE_PROFILER_SECTION_CModManager
 #include "profiler/SharedUtil.Profiler.h"
 
-using SharedUtil::CalcMTASAPath;
+#ifdef MTA_DEBUG
+    #define CLIENT_DLL_NAME "client_d.dll"
+#else
+    #define CLIENT_DLL_NAME "client.dll"
+#endif
 
 template <>
 CModManager* CSingleton<CModManager>::m_pSingleton = NULL;
 
-CModManager::CModManager()
+void CModManager::RequestLoad(const char* arguments)
 {
-    // Init
-    m_hClientDLL = NULL;
-    m_pClientBase = NULL;
-    m_bUnloadRequested = false;
-
-    // Default mod name defaults to "default"
-    m_strDefaultModName = "default";
-
-    // Load the modlist from the folders in "mta/mods"
-    InitializeModList(CalcMTASAPath("mods\\"));
-}
-
-CModManager::~CModManager()
-{
-    // Unload the current loaded mod (if loaded)
-    Unload();
-
-    // Clear the modlist
-    Clear();
-}
-
-void CModManager::RequestLoad(const char* szModName, const char* szArguments)
-{
-    // Reset an eventual old request (and free our strings)
-    ClearRequest();
-
-    // An unload is now requested
-    m_bUnloadRequested = true;
-
-    // Requested a mod name?
-    if (szModName)
-    {
-        // Store it
-        m_strRequestedMod = szModName;
-
-        // Arguments?
-        m_strRequestedModArguments = szArguments ? szArguments : "";
-    }
-}
-
-void CModManager::RequestLoadDefault(const char* szArguments)
-{
-    RequestLoad(m_strDefaultModName.c_str(), szArguments);
+    m_state = State::PendingStart;
+    m_arguments = arguments ? arguments : "";
 }
 
 void CModManager::RequestUnload()
 {
-    RequestLoad(NULL, NULL);
-    CCore::GetSingletonPtr()->OnModUnload();
-}
+    if (!IsLoaded())
+        return;
 
-void CModManager::ClearRequest()
-{
-    // Free the old mod name
-    m_strRequestedMod = "";
-
-    // Free the old mod arguments
-    m_strRequestedModArguments = "";
-
-    // No unload requested now
-    m_bUnloadRequested = false;
-}
-
-bool CModManager::IsLoaded()
-{
-    return (m_hClientDLL != NULL);
-}
-
-CClientBase* CModManager::Load(const char* szName, const char* szArguments)
-{
-    // Make sure we haven't already loaded a mod
-    Unload();
-
-    CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(false);
-
-    // Get the entry for the given name
-    std::map<std::string, std::string>::iterator itMod = m_ModDLLFiles.find(szName);
-    if (itMod == m_ModDLLFiles.end())
+    if (m_state == State::Idle)
     {
-        CCore::GetSingleton().GetConsole()->Printf("Unable to load %s (unknown mod)", szName);
-        return NULL;
+        m_state = State::PendingStop;
+        CCore::GetSingletonPtr()->OnModUnload();
+    }
+    else if (m_state == State::PendingStart)
+    {
+        m_state = State::PendingStop;
+    }
+}
+
+bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const
+{
+    if (m_client == nullptr || commandName == nullptr || commandNameLength == 0)
+        return false;
+
+    return m_client->ProcessCommand(commandName, commandNameLength, userdata, userdataSize);
+}
+
+void CModManager::DoPulsePreFrame()
+{
+    if (m_client)
+    {
+        m_client->PreFrameExecutionHandler();
+    }
+}
+
+void CModManager::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets)
+{
+    if (m_client)
+    {
+        m_client->PreHUDRenderExecutionHandler(bDidUnminimize, bDidRecreateRenderTargets);
+    }
+}
+
+void CModManager::DoPulsePostFrame()
+{
+    if (m_state == State::PendingStart)
+    {
+        Start();
+    }
+    else if (m_state == State::PendingStop)
+    {
+        Stop();
     }
 
-    // Ensure DllDirectory has not been changed
-    SString strDllDirectory = GetSystemDllDirectory();
-    if (CalcMTASAPath("mta").CompareI(strDllDirectory) == false)
+    if (m_client)
     {
-        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath("mta")));
+        m_client->PostFrameExecutionHandler();
+    }
+    else
+    {
+        CCore::GetSingleton().GetNetwork()->DoPulse();
+    }
+
+    // Make sure frame rate limit gets applied
+    if (m_client != nullptr)
+        CCore::GetSingleton().EnsureFrameRateLimitApplied();            // Catch missed frames
+    else
+        CCore::GetSingleton().ApplyFrameRateLimit();            // Limit when not connected
+
+    if (m_state == State::PendingStart)
+    {
+        Start();
+    }
+    else if (m_state == State::PendingStop)
+    {
+        Stop();
+    }
+}
+
+bool CModManager::Load(const char* arguments)
+{
+    RequestLoad(arguments);
+    return Start();
+}
+
+void CModManager::Unload()
+{
+    if (IsLoaded())
+    {
+        m_state = State::PendingStop;
+        Stop();
+    }
+}
+
+bool CModManager::Start()
+{
+    dassert(m_state == State::PendingStart);
+    dassert(m_library == nullptr);
+    dassert(m_client == nullptr);
+
+    if (IsLoaded())
+        Stop();
+
+    bool success = false;
+
+    CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(false);
+    {
+        success = TryStart();
+    }
+    CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(true);
+
+    m_state = State::Idle;
+    return success;
+}
+
+bool CModManager::TryStart()
+{
+    // Ensure DllDirectory has not been changed
+    SString dllSearchPath = GetSystemDllDirectory();
+
+    if (CalcMTASAPath("mta").CompareI(dllSearchPath) == false)
+    {
+        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *dllSearchPath, *CalcMTASAPath("mta")));
         SetDllDirectory(CalcMTASAPath("mta"));
     }
 
-    // Load the library and use the supplied path as an extra place to search for dependencies
-    m_hClientDLL = LoadLibraryEx(itMod->second.c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-    if (!m_hClientDLL)
+    const SString modulePath = CalcMTASAPath("mods\\deathmatch\\" CLIENT_DLL_NAME);
+
+    // Load the library and use the supplied path as an extra place to search for dependencies.
+    HMODULE library = LoadLibraryEx(modulePath.c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
+
+    if (library == nullptr)
     {
-        DWORD dwError = GetLastError();
-        char  szError[2048];
-        char* p;
+        const DWORD errorCode = GetLastError();
+        char*       buffer = nullptr;
 
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, dwError, LANG_NEUTRAL, szError, sizeof(szError), NULL);
+        DWORD size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, errorCode,
+                                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&buffer), 0, nullptr);
 
-        // Remove newlines from the error message
-        p = szError + strlen(szError) - 1;
-        while (p >= szError && (*p == '\r' || *p == '\n'))
+        if (buffer != nullptr && size > 0)
         {
-            *p = '\0';
-            --p;
+            std::string message{buffer, size};
+            size_t      length = message.find_last_not_of("\t\n\v\f\r ");
+
+            LocalFree(buffer);
+
+            if (length == std::string::npos)
+                return false;
+
+            message.resize(length + 1);
+            CCore::GetSingleton().GetConsole()->Printf("Unable to load deathmatch's DLL (reason: %s)", message.c_str());
         }
 
-        CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (reason: %s)", szName, szError);
-        return NULL;
+        return false;
     }
 
-    // Get the address of InitClient
-    typedef CClientBase*(__cdecl pfnClientInitializer)(); /* FIXME: Should probably not be here */
+    CClientBase*(__cdecl * InitClient)() = reinterpret_cast<decltype(InitClient)>(GetProcAddress(library, "InitClient"));
 
-    pfnClientInitializer* pClientInitializer = reinterpret_cast<pfnClientInitializer*>(GetProcAddress(m_hClientDLL, "InitClient"));
-    if (pClientInitializer == NULL)
+    if (InitClient == nullptr)
     {
-        CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unknown mod)", szName, GetLastError());
-        FreeLibrary(m_hClientDLL);
-        m_hClientDLL = nullptr;
-        return NULL;
+        CCore::GetSingleton().GetConsole()->Printf("Unable to initialize deathmatch's DLL (missing init)");
+        FreeLibrary(library);
+        return false;
     }
 
-    // Call InitClient and store the Client interface in m_pClientBase
-    m_pClientBase = pClientInitializer();
+    CClientBase* client = InitClient();
 
-    // Call the client base initializer
-    if (!m_pClientBase || m_pClientBase->ClientInitialize(szArguments, CCore::GetSingletonPtr()) != 0)
+    if (client == nullptr || client->ClientInitialize(m_arguments.c_str(), CCore::GetSingletonPtr()) != 0)
     {
-        CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unable to init, bad version?)", szName, GetLastError());
-        FreeLibrary(m_hClientDLL);
-        m_pClientBase = nullptr;
-        m_hClientDLL = nullptr;
-        return NULL;
+        CCore::GetSingleton().GetConsole()->Printf("Unable to initialize deathmatch's DLL (unable to init, bad version?)");
+        FreeLibrary(library);
+        return false;
     }
+
+    m_client = client;
+    m_library = library;
 
     // HACK: make the console input active if its visible
     if (CLocalGUI::GetSingleton().IsConsoleVisible())
@@ -168,234 +210,76 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     // Tell chat to start handling input
     CLocalGUI::GetSingleton().GetChat()->OnModLoad();
 
-    CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(true);
-
-    // Return the interface
-    return m_pClientBase;
+    return true;
 }
 
-void CModManager::Unload()
+void CModManager::Stop()
 {
+    dassert(m_state != State::Idle);
+    dassert(m_library != nullptr);
+    dassert(m_client != nullptr);
+
     CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(false);
-
-    // If a mod is loaded, we call m_pClientBase->ClientShutdown and then free the library
-    if (m_hClientDLL != NULL)
     {
-        // Call m_pClientBase->ClientShutdown
-        if (m_pClientBase)
-        {
-            m_pClientBase->ClientShutdown();
-            m_pClientBase = NULL;
-        }
-
-        // Unregister the commands it had registered
-        CCore::GetSingleton().GetCommands()->DeleteAll();
-
-        // Stop all screen grabs
-        CGraphics::GetSingleton().GetScreenGrabber()->ClearScreenShotQueue();
-
-        // Free the Client DLL
-        FreeLibrary(m_hClientDLL);
-        m_hClientDLL = NULL;
-
-        // Call the on mod unload func
-        CCore::GetSingletonPtr()->OnModUnload();
-
-        // Reset chatbox status (so it won't prevent further input), and clear it
-        /*CLocalGUI::GetSingleton ().GetChatBox ()->SetInputEnabled ( false );
-        CLocalGUI::GetSingleton ().GetChatBox ()->Clear ();*/
-        CLocalGUI::GetSingleton().GetChat()->SetInputVisible(false);
-        CLocalGUI::GetSingleton().GetChat()->Clear();
-        CLocalGUI::GetSingleton().SetChatBoxVisible(true);
-
-        // Reset the debugview status
-        CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false, true);
-        CLocalGUI::GetSingleton().GetDebugView()->Clear();
-        CLocalGUI::GetSingleton().SetDebugViewVisible(false);
-
-        // NULL the message processor and the unhandled command handler
-        CCore::GetSingleton().SetClientMessageProcessor(NULL);
-        CCore::GetSingleton().GetCommands()->SetExecuteHandler(NULL);
-
-        // Reset cursor alpha
-        CCore::GetSingleton().GetGUI()->SetCursorAlpha(1.0f, true);
-
-        // Reset the modules
-        CCore::GetSingleton().GetGame()->Reset();
-        CCore::GetSingleton().GetMultiplayer()->Reset();
-        CCore::GetSingleton().GetNetwork()->Reset();
-        assert(CCore::GetSingleton().GetNetwork()->GetServerBitStreamVersion() == 0);
-
-        // Enable the console again
-        CCore::GetSingleton().GetConsole()->SetEnabled(true);
-
-        // Force the mainmenu back
-        CCore::GetSingleton().SetConnected(false);
-        CLocalGUI::GetSingleton().GetMainMenu()->SetIsIngame(false);
-        CLocalGUI::GetSingleton().GetMainMenu()->SetVisible(true, false);
+        TryStop();
     }
     CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(true);
+
+    if (m_state == State::PendingStop)
+        m_state = State::Idle;
 }
 
-void CModManager::DoPulsePreFrame()
+void CModManager::TryStop()
 {
-    if (m_pClientBase)
+    if (m_client)
     {
-        m_pClientBase->PreFrameExecutionHandler();
-    }
-}
-
-void CModManager::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets)
-{
-    if (m_pClientBase)
-    {
-        m_pClientBase->PreHUDRenderExecutionHandler(bDidUnminimize, bDidRecreateRenderTargets);
-    }
-}
-
-void CModManager::DoPulsePostFrame()
-{
-    // Load/unload requested?
-    if (m_bUnloadRequested)
-    {
-        // Unload the current mod
-        Unload();
-
-        // Load a new mod?
-        if (m_strRequestedMod != "")
-        {
-            Load(m_strRequestedMod, m_strRequestedModArguments);
-        }
-
-        // Clear the request
-        ClearRequest();
+        m_client->ClientShutdown();
+        m_client = {};
     }
 
-    // Pulse the client
-    if (m_pClientBase)
-    {
-        m_pClientBase->PostFrameExecutionHandler();
-    }
-    else
-    {
-        CCore::GetSingleton().GetNetwork()->DoPulse();
-    }
+    // Unregister the commands it had registered
+    CCore::GetSingleton().GetCommands()->DeleteAll();
 
-    // Make sure frame rate limit gets applied
-    if (m_pClientBase)
-        CCore::GetSingleton().EnsureFrameRateLimitApplied();            // Catch missed frames
-    else
-        CCore::GetSingleton().ApplyFrameRateLimit(88);            // Limit when not connected
+    // Stop all screen grabs
+    CGraphics::GetSingleton().GetScreenGrabber()->ClearScreenShotQueue();
 
-    // Load/unload requested?
-    if (m_bUnloadRequested)
-    {
-        // Unload the current mod
-        Unload();
+    // Free the Client DLL
+    FreeLibrary(m_library);
+    m_library = {};
 
-        // Load a new mod?
-        if (m_strRequestedMod != "")
-        {
-            Load(m_strRequestedMod, m_strRequestedModArguments);
-        }
+    // Call the on mod unload func
+    CCore::GetSingletonPtr()->OnModUnload();
 
-        // Clear the request
-        ClearRequest();
-    }
-}
+    // Reset chatbox status (so it won't prevent further input), and clear it
+    /*CLocalGUI::GetSingleton ().GetChatBox ()->SetInputEnabled ( false );
+    CLocalGUI::GetSingleton ().GetChatBox ()->Clear ();*/
+    CLocalGUI::GetSingleton().GetChat()->SetInputVisible(false);
+    CLocalGUI::GetSingleton().GetChat()->Clear();
+    CLocalGUI::GetSingleton().SetChatBoxVisible(true);
 
-CClientBase* CModManager::GetCurrentMod()
-{
-    return m_pClientBase;
-}
+    // Reset the debugview status
+    CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false, true);
+    CLocalGUI::GetSingleton().GetDebugView()->Clear();
+    CLocalGUI::GetSingleton().SetDebugViewVisible(false);
 
-void CModManager::RefreshMods()
-{
-    // Clear the list, and load it again
-    Clear();
-    InitializeModList(CalcMTASAPath("mods\\"));
-}
+    // NULL the message processor and the unhandled command handler
+    CCore::GetSingleton().SetClientMessageProcessor(NULL);
+    CCore::GetSingleton().GetCommands()->SetExecuteHandler(NULL);
 
-bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const
-{
-    if (!m_pClientBase || commandName == nullptr || commandNameLength == 0)
-        return false;
+    // Reset cursor alpha
+    CCore::GetSingleton().GetGUI()->SetCursorAlpha(1.0f, true);
 
-    return m_pClientBase->ProcessCommand(commandName, commandNameLength, userdata, userdataSize);
-}
+    // Reset the modules
+    CCore::GetSingleton().GetGame()->Reset();
+    CCore::GetSingleton().GetMultiplayer()->Reset();
+    CCore::GetSingleton().GetNetwork()->Reset();
+    assert(CCore::GetSingleton().GetNetwork()->GetServerBitStreamVersion() == 0);
 
-void CModManager::InitializeModList(const char* szModFolderPath)
-{
-    // Variables used to search the mod directory
-    WIN32_FIND_DATAW FindData;
-    HANDLE           hFind;
+    // Enable the console again
+    CCore::GetSingleton().GetConsole()->SetEnabled(true);
 
-    // Allocate a string with length of path + 5 letters to store searchpath plus "\*.*"
-    SString strPathWildchars("%s*.*", szModFolderPath);
-
-    // Set the working directory to the MTA folder
-    CFilePathTranslator filePathTranslator;
-    filePathTranslator.SetCurrentWorkingDirectory("mta");
-
-    // Create a search
-    hFind = FindFirstFileW(FromUTF8(strPathWildchars), &FindData);
-
-    // If we found a first file ...
-    if (hFind != INVALID_HANDLE_VALUE)
-    {
-        // Add it to the list
-        VerifyAndAddEntry(szModFolderPath, ToUTF8(FindData.cFileName));
-
-        // Search until there aren't any files left
-        while (FindNextFileW(hFind, &FindData) == TRUE)
-        {
-            VerifyAndAddEntry(szModFolderPath, ToUTF8(FindData.cFileName));
-        }
-
-        // End the search
-        FindClose(hFind);
-    }
-
-    // Reset the working directory
-    filePathTranslator.UnSetCurrentWorkingDirectory();
-}
-
-void CModManager::Clear()
-{
-    // Clear the list
-    m_ModDLLFiles.clear();
-}
-
-void CModManager::VerifyAndAddEntry(const char* szModFolderPath, const char* szName)
-{
-    // Name musn't be a . or .. link or we might load unwanted libraries
-    // Hack: Also skip race for now as it will crash the game!
-    if ((strcmp(szName, ".") != 0) && (strcmp(szName, "..") != 0) && (stricmp(szName, "race") != 0))
-    {
-        // Put together a modpath string and a MTA-relative path to Client(_d).dll
-        SString strClientDLL("%s%s\\%s", szModFolderPath, szName, CMODMANAGER_CLIENTDLL);
-
-        // Attempt to load the primary client DLL
-        HMODULE hDLL = LoadLibraryEx(strClientDLL, NULL, DONT_RESOLVE_DLL_REFERENCES);
-        if (hDLL != 0)
-        {
-            // Check if InitClient symbol exists
-            if (GetProcAddress(hDLL, "InitClient") != NULL)
-            {
-                // Add it to the list
-                m_ModDLLFiles[szName] = strClientDLL;
-            }
-            else
-            {
-                WriteErrorEvent(SString("Unknown mod DLL: %s", szName));
-            }
-
-            // Free the DLL
-            FreeLibrary(hDLL);
-        }
-        else
-        {
-            WriteErrorEvent(SString("Invalid mod DLL: %s (reason: %d)", szName, GetLastError()));
-        }
-    }
+    // Force the mainmenu back
+    CCore::GetSingleton().SetConnected(false);
+    CLocalGUI::GetSingleton().GetMainMenu()->SetIsIngame(false);
+    CLocalGUI::GetSingleton().GetMainMenu()->SetVisible(true, false);
 }

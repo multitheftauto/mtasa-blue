@@ -1,0 +1,31 @@
+name: Crowdin Auto-Merge
+
+on:
+  schedule:
+    - cron: '0 0 * * 5'  # This cron expression runs the workflow every Friday at midnight (UTC)
+  workflow_dispatch:
+
+jobs:
+  crowdin-auto-merge:
+    if: github.event.repository.fork == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.POT_CI_PAT }}
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Auto-merge pull request
+        run: |
+          PR_NUMBER=$(gh pr list --repo ${{ github.repository }} --author 'MTABot' --base 'master' --head 'l10n/master' --state open --json number --jq '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr merge $PR_NUMBER --squash --repo ${{ github.repository }} --admin --subject "New Crowdin updates (PR #$PR_NUMBER)" --body ""
+            git push origin --delete l10n/master
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.POT_CI_PAT }}

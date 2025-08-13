@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CUnoccupiedVehicleSyncPacket.cpp
  *  PURPOSE:     Unoccupied vehicle synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -27,7 +27,7 @@ bool CUnoccupiedVehicleSyncPacket::Read(NetBitStreamInterface& BitStream)
     {
         if (i > uiMaxCount)
         {
-            CLogger::LogPrintf("WARN: Received excess unoccupied vehicle sync data (%d bytes)", BitStream.GetNumberOfUnreadBits() / 8);
+            CLogger::LogPrintf("WARN: Received excess unoccupied vehicle sync data (%d bytes)\n", BitStream.GetNumberOfUnreadBits() / 8);
             break;
         }
 

@@ -242,7 +242,7 @@
     FT_ULong  read_bytes;
 
 
-    FT_TRACE7(( "FT_Stream_EnterFrame: %ld bytes\n", count ));
+    FT_TRACE7(( "FT_Stream_EnterFrame: %lu bytes\n", count ));
 
     /* check for nested frame access */
     FT_ASSERT( stream && stream->cursor == 0 );
@@ -763,10 +763,10 @@
       case ft_frame_bytes:  /* read a byte sequence */
       case ft_frame_skip:   /* skip some bytes      */
         {
-          FT_UInt  len = fields->size;
+          FT_Offset  len = fields->size;
 
 
-          if ( cursor + len > stream->limit )
+          if ( len > (FT_Offset)( stream->limit - cursor ) )
           {
             error = FT_THROW( Invalid_Stream_Operation );
             goto Exit;

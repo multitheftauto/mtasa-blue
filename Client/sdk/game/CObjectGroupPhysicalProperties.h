@@ -5,10 +5,11 @@
  *  FILE:        sdk/game/CObjectGroupPhysicalProperties.h
  *  PURPOSE:     Objects dynamic physical properties handler interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
+#include "enums/ObjectGroupPhysicalProperties.h"
 
 class CFxSystemBPSAInterface;
 class CObjectGroupPhysicalPropertiesSAInterface;
@@ -35,16 +36,16 @@ public:
     virtual float                           GetUprootLimit() const = 0;
     virtual void                            SetCollisionDamageMultiplier(float fColMult) = 0;
     virtual float                           GetCollisionDamageMultiplier() const = 0;
-    virtual void                            SetCollisionDamageEffect(eObjectGroup::DamageEffect eDamageEffect) = 0;
-    virtual eObjectGroup::DamageEffect      GetCollisionDamageEffect() const = 0;
-    virtual void                            SetCollisionSpecialResponseCase(eObjectGroup::CollisionResponse eResponseCase) = 0;
-    virtual eObjectGroup::CollisionResponse GetCollisionSpecialResponseCase() const = 0;
+    virtual void                            SetCollisionDamageEffect(ObjectGroupPhysicalProperties::DamageEffect eDamageEffect) = 0;
+    virtual ObjectGroupPhysicalProperties::DamageEffect      GetCollisionDamageEffect() const = 0;
+    virtual void                            SetCollisionSpecialResponseCase(ObjectGroupPhysicalProperties::CollisionResponse eResponseCase) = 0;
+    virtual ObjectGroupPhysicalProperties::CollisionResponse GetCollisionSpecialResponseCase() const = 0;
     virtual void                            SetCameraAvoidObject(bool bAvoid) = 0;
     virtual bool                            GetCameraAvoidObject() const = 0;
     virtual void                            SetCausesExplosion(bool bExplodes) = 0;
     virtual bool                            GetCausesExplosion() const = 0;
-    virtual void                            SetFxType(eObjectGroup::FxType eFxType) = 0;
-    virtual eObjectGroup::FxType            GetFxType() const = 0;
+    virtual void                            SetFxType(ObjectGroupPhysicalProperties::FxType eFxType) = 0;
+    virtual ObjectGroupPhysicalProperties::FxType            GetFxType() const = 0;
     virtual void                            SetFxOffset(CVector vecOffset) = 0;
     virtual CVector                         GetFxOffset() const = 0;
     virtual bool                            SetFxParticleSystem(CFxSystemBPSAInterface* pBlueprint) = 0;
@@ -55,8 +56,8 @@ public:
     virtual CVector                         GetBreakVelocity() const = 0;
     virtual void                            SetBreakVelocityRandomness(float fRand) = 0;
     virtual float                           GetBreakVelocityRandomness() const = 0;
-    virtual void                            SetBreakMode(eObjectGroup::BreakMode eBreakMode) = 0;
-    virtual eObjectGroup::BreakMode         GetBreakMode() const = 0;
+    virtual void                            SetBreakMode(ObjectGroupPhysicalProperties::BreakMode eBreakMode) = 0;
+    virtual ObjectGroupPhysicalProperties::BreakMode         GetBreakMode() const = 0;
     virtual void                            SetSparksOnImpact(bool bSparks) = 0;
     virtual bool                            GetSparksOnImpact() const = 0;
 };

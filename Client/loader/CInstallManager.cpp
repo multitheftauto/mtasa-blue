@@ -16,6 +16,7 @@
 #include "GameExecutablePatcher.h"
 #include "FileGenerator.h"
 #include "FileSystem.h"
+#include "SharedUtil.Memory.h"
 
 namespace fs = std::filesystem;
 
@@ -418,9 +419,10 @@ SString CInstallManager::_ShowCrashFailDialog()
         SetApplicationSetting("diagnostics", "gta-fopen-fail", GetApplicationSetting("diagnostics", "gta-fopen-last"));
     SetApplicationSetting("diagnostics", "gta-fopen-last", "");
 
-    SString strMessage = GetApplicationSetting("diagnostics", "last-crash-info");
     SString strReason = GetApplicationSetting("diagnostics", "last-crash-reason");
     SetApplicationSetting("diagnostics", "last-crash-reason", "");
+
+    SString strMessage = GetApplicationSetting("diagnostics", "last-crash-info");
     if (strReason == "direct3ddevice-reset")
     {
         strMessage += _("** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **");
@@ -428,6 +430,15 @@ SString CInstallManager::_ShowCrashFailDialog()
     else
     {
         strMessage += strReason;
+    }
+
+    // const SString moduleName = GetApplicationSetting("diagnostics", "last-crash-module");
+    const int exceptionCode = GetApplicationSettingInt("diagnostics", "last-crash-code");
+
+    if (exceptionCode == CUSTOM_EXCEPTION_CODE_OOM)
+    {
+        strMessage += '\n';
+        strMessage += _("** Out of memory - this crash was caused by insufficient free or fragmented memory. **");
     }
 
     strMessage = strMessage.Replace("\r", "").Replace("\n", "\r\n");

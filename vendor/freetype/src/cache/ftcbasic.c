@@ -45,8 +45,9 @@
           FT_BOOL( FTC_SCALER_COMPARE( &(a)->scaler, &(b)->scaler ) && \
                    (a)->load_flags == (b)->load_flags               )
 
-#define FTC_BASIC_ATTR_HASH( a )                                     \
-          ( FTC_SCALER_HASH( &(a)->scaler ) + 31 * (a)->load_flags )
+#define FTC_BASIC_ATTR_HASH( a )                  \
+          ( FTC_SCALER_HASH( &(a)->scaler ) +     \
+            (FT_Offset)( 31 * (a)->load_flags ) )
 
 
   typedef struct  FTC_BasicQueryRec_

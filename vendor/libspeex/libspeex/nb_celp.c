@@ -264,6 +264,10 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
 #if !defined(DISABLE_VBR) && !defined(DISABLE_FLOAT_API)
    case SPEEX_SET_VBR_QUALITY:
       st->vbr_quality = (*(float*)ptr);
+      if (st->vbr_quality < 0)
+          st->vbr_quality = 0;
+      else if (st->vbr_quality > 10)
+          st->vbr_quality = 10;
       break;
    case SPEEX_GET_VBR_QUALITY:
       (*(float*)ptr) = st->vbr_quality;
@@ -508,8 +512,8 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          int nol_pitch[6];
          spx_word16_t nol_pitch_coef[6];
 
-         bw_lpc(0.9, interp_lpc, bw_lpc1, NB_ORDER);
-         bw_lpc(0.55, interp_lpc, bw_lpc2, NB_ORDER);
+         bw_lpc(QCONST16(0.9,15), interp_lpc, bw_lpc1, NB_ORDER);
+         bw_lpc(QCONST16(0.55,15), interp_lpc, bw_lpc2, NB_ORDER);
 
          SPEEX_COPY(st->sw, st->winBuf, diff);
          SPEEX_COPY(st->sw+diff, in, NB_FRAME_SIZE-diff);

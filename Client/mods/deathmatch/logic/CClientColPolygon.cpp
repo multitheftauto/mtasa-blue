@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/CClientColPolygon.cpp
  *  PURPOSE:     Polygon-shaped collision entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

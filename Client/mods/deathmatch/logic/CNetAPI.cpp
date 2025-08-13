@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CNetAPI.cpp
  *  PURPOSE:     Packet processing class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,6 +14,7 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
+#include <enums/VehicleType.h>
 
 extern CClientGame* g_pClientGame;
 CTickRateSettings   g_TickRateSettings;
@@ -683,7 +684,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
         }
 
         // Jax: temp fix for rhino firing, CPlayerInfo::m_LastTimeBigGunFired needs to be context-switched
-        if (pVehicle->GetModel() == VT_RHINO)
+        if (static_cast<VehicleType>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
         {
             ControllerState.ButtonCircle = 0;
         }
@@ -1117,11 +1118,17 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.bHasAWeapon = (pPlayerWeapon != NULL);
     flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || (pPlayerModel->GetPlayerSyncCount() % 4) == 0);
     flags.data.bStealthAiming = (pPlayerModel->IsStealthAiming() == true);
+    flags.data.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
+    flags.data.animInterrupted = pPlayerModel->HasSyncedAnim() && (!pPlayerModel->IsRunningAnimation() || pPlayerModel->m_animationOverridedByClient);
 
-    if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-        flags.data2.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
+    // The animation has been overwritten or interrupted by the client
+    if (flags.data.animInterrupted)
+    {
+        pPlayerModel->SetHasSyncedAnim(false);
+        pPlayerModel->m_animationOverridedByClient = false;
+    }
 
-    if (pPlayerWeapon->GetSlot() > 15)
+    if (flags.data.bHasAWeapon && pPlayerWeapon->GetSlot() > 15)
         flags.data.bHasAWeapon = false;
 
     BitStream.Write(&flags);
@@ -1270,7 +1277,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     ReadFullKeysync(ControllerState, BitStream);
 
     // Jax: temp fix for rhino firing, CPlayerInfo::m_LastTimeBigGunFired needs to be context-switched
-    if (pVehicle->GetModel() == VT_RHINO)
+    if (static_cast<VehicleType>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
     {
         ControllerState.ButtonCircle = 0;
     }
@@ -1288,9 +1295,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     // differs from the local one (#8800)
     int iModelID = pVehicle->GetModel();
     int iRemoteModelID = iModelID;
-
-    if (BitStream.Version() >= 0x05F)
-        BitStream.Read(iRemoteModelID);
+    BitStream.Read(iRemoteModelID);
 
     eClientVehicleType remoteVehicleType = CClientVehicleManager::GetVehicleType(iRemoteModelID);
     eClientVehicleType vehicleType = pVehicle->GetVehicleType();
@@ -1479,7 +1484,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
             }
 
             // Read out the weapon ammo
-            SWeaponAmmoSync ammo(ucCurrentWeapon, BitStream.Version() >= 0x44, true);
+            SWeaponAmmoSync ammo(ucCurrentWeapon, true, true);
             BitStream.Read(&ammo);
             unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
 
@@ -1488,7 +1493,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
                 CWeapon* pPlayerWeapon = pPlayer->GiveWeapon(static_cast<eWeaponType>(ucCurrentWeapon), usWeaponAmmo, true);
                 if (pPlayerWeapon)
                 {
-                    pPlayerWeapon->SetAmmoTotal(BitStream.Version() >= 0x44 ? ammo.data.usTotalAmmo : 9999);
+                    pPlayerWeapon->SetAmmoTotal(ammo.data.usTotalAmmo);
                     pPlayerWeapon->SetAmmoInClip(usWeaponAmmo);
                 }
             }
@@ -1544,8 +1549,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
 
     pPlayer->SetControllerState(ControllerState);
 
-    if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
-        pVehicle->SetOnFire(BitStream.ReadBit());
+    pVehicle->SetOnFire(BitStream.ReadBit());
 
     // Remember now as the last puresync time
     CVector vecPosition;
@@ -1573,8 +1577,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         iModelID = pVehicle->GetModelInfo()->GetParentID();
 
     // Write the clientside model
-    if (BitStream.Version() >= 0x05F)
-        BitStream.Write(iModelID);
+    BitStream.Write(iModelID);
 
     // Grab the vehicle position
     CVector vecPosition;
@@ -1666,38 +1669,6 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(false);
     }
 
-    // Update Damage Info if changed
-    if (BitStream.Version() >= 0x047)
-    {
-        if (!g_pClientGame->GetDamageSent())
-        {
-            g_pClientGame->SetDamageSent(true);
-
-            ElementID DamagerID = g_pClientGame->GetDamagerID();
-            if (DamagerID != RESERVED_ELEMENT_ID)
-            {
-                BitStream.WriteBit(true);
-                BitStream.Write(DamagerID);
-
-                SWeaponTypeSync weaponType;
-                weaponType.data.ucWeaponType = g_pClientGame->GetDamageWeapon();
-                BitStream.Write(&weaponType);
-
-                SBodypartSync bodypart;
-                bodypart.data.uiBodypart = g_pClientGame->GetDamageBodyPiece();
-                BitStream.Write(&bodypart);
-            }
-            else
-            {
-                BitStream.WriteBit(false);
-            }
-        }
-        else
-        {
-            BitStream.WriteBit(false);
-        }
-    }
-
     // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
     // Scale goes up to 200.0f because having max stats gives you the double of health.
     SPlayerHealthSync health;
@@ -1740,7 +1711,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         if (flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo(uiSlot))
         {
             // Write the ammo states
-            SWeaponAmmoSync ammo(pPlayerWeapon->GetType(), BitStream.Version() >= 0x44, true);
+            SWeaponAmmoSync ammo(pPlayerWeapon->GetType(), true, true);
             ammo.data.usAmmoInClip = static_cast<unsigned short>(pPlayerWeapon->GetAmmoInClip());
             ammo.data.usTotalAmmo = static_cast<unsigned short>(pPlayerWeapon->GetAmmoTotal());
             BitStream.Write(&ammo);
@@ -1772,8 +1743,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(ControllerState.RightShoulder2 != 0);
     }
 
-    if (BitStream.Can(eBitStreamVersion::SetElementOnFire))
-        BitStream.WriteBit(pVehicle->IsOnFire());
+    BitStream.WriteBit(pVehicle->IsOnFire());
 
     // Write the sent position to the interpolator
     AddInterpolation(vecPosition);
@@ -1785,12 +1755,8 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
     if (!BitStream.Read(&keys))
         return false;
 
-    // Put the result into the controllerstate
-    ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
-    ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     short sButtonSquare = 255 * keys.data.bButtonSquare;
     short sButtonCross = 255 * keys.data.bButtonCross;
-    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -1798,6 +1764,10 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
         if (keys.data.ucButtonCross != 0)
             sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
+
+    // Put the result into the controllerstate
+    ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = 255 * keys.data.bButtonCircle;
@@ -1836,12 +1806,8 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
     if (!BitStream.Read(&keys))
         return false;
 
-    // Put the result into the controllerstate
-    ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
-    ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     short sButtonSquare = 255 * keys.data.bButtonSquare;
     short sButtonCross = 255 * keys.data.bButtonCross;
-    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -1849,6 +1815,10 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
         if (keys.data.ucButtonCross != 0)
             sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
+
+    // Put the result into the controllerstate
+    ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = 255 * keys.data.bButtonCircle;
@@ -1987,8 +1957,7 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
 {
     CClientCamera* pCamera = m_pManager->GetCamera();
 
-    if (BitStream.Version() >= 0x05E)
-        BitStream.Write(pCamera->GetSyncTimeContext());
+    BitStream.Write(pCamera->GetSyncTimeContext());
 
     // Are we in fixed mode?
     bool bFixed = pCamera->IsInFixedMode();
@@ -2238,9 +2207,6 @@ void CNetAPI::ReadVehicleResync(CClientVehicle* pVehicle, NetBitStreamInterface&
 
 void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterface& BitStream)
 {
-    if (BitStream.Version() < 0x5D)
-        return;
-
     SVehicleDamageSyncMethodeB damage;
     BitStream.Read(&damage);
     bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
@@ -2271,17 +2237,21 @@ void CNetAPI::ReadBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface& BitS
 {
     // Read the bulletsync data
     uchar ucWeapon = 0;
-    BitStream.Read(ucWeapon);
-    if (!CClientPickupManager::IsValidWeaponID(ucWeapon))
+    if (!BitStream.Read(ucWeapon) || !CClientWeaponManager::HasWeaponBulletSync(ucWeapon))
         return;
+
     eWeaponType weaponType = (eWeaponType)ucWeapon;
 
     CVector vecStart, vecEnd;
-    BitStream.Read((char*)&vecStart, sizeof(CVector));
-    BitStream.Read((char*)&vecEnd, sizeof(CVector));
+    if (!BitStream.Read((char*)&vecStart, sizeof(CVector)) || !BitStream.Read((char*)&vecEnd, sizeof(CVector)))
+        return;
+
+    if (!vecStart.IsValid() || !vecEnd.IsValid())
+        return;
 
     uchar ucOrderCounter = 0;
-    BitStream.Read(ucOrderCounter);
+    if (!BitStream.Read(ucOrderCounter))
+        return;
 
     float          fDamage = 0;
     uchar          ucHitZone = 0;
@@ -2289,9 +2259,9 @@ void CNetAPI::ReadBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface& BitS
     if (BitStream.ReadBit())
     {
         ElementID DamagedPlayerID = INVALID_ELEMENT_ID;
-        BitStream.Read(fDamage);
-        BitStream.Read(ucHitZone);
-        BitStream.Read(DamagedPlayerID);
+        if (!BitStream.Read(fDamage) || !BitStream.Read(ucHitZone) || !BitStream.Read(DamagedPlayerID))
+            return;
+
         pDamagedPlayer = DynamicCast<CClientPlayer>(CElementIDs::GetElement(DamagedPlayerID));
     }
 
@@ -2328,15 +2298,23 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface
 {
     // Read the bulletsync data
     ElementID elementID;
-    BitStream.Read(elementID);
+    if (!BitStream.Read(elementID))
+        return;
+
     CClientWeapon* pWeapon = DynamicCast<CClientWeapon>(CElementIDs::GetElement(elementID));
+    if (!pWeapon || !CClientWeaponManager::HasWeaponBulletSync(pWeapon->GetWeaponType()))
+        return;
 
     CVector vecStart, vecEnd;
-    BitStream.Read((char*)&vecStart, sizeof(CVector));
-    BitStream.Read((char*)&vecEnd, sizeof(CVector));
+    if (!BitStream.Read((char*)&vecStart, sizeof(CVector)) || !BitStream.Read((char*)&vecEnd, sizeof(CVector)))
+        return;
+
+    if (!vecStart.IsValid() || !vecEnd.IsValid())
+        return;
 
     uchar ucOrderCounter = 0;
-    BitStream.Read(ucOrderCounter);
+    if (!BitStream.Read(ucOrderCounter))
+        return;
 
     pWeapon->FireInstantHit(vecStart, vecEnd, false, true);
 }

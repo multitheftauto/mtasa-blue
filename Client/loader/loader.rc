@@ -52,6 +52,7 @@ END
 //
 
 IDB_BITMAP1             BITMAP                  "resource/splash.bmp"
+IDB_BITMAP2             BITMAP                  "resource/color-strip.bmp"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Hash.hpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -359,7 +359,7 @@ namespace SharedUtil
 
     //
     // Implementation of Bob Jenkin's awesome hash function
-    // Ref: http://burtleburtle.net/bob/hash/doobs.html
+    // Ref: https://burtleburtle.net/bob/hash/doobs.html
     //
     unsigned int HashString(const char* szString) { return HashString(szString, (unsigned int)strlen(szString)); }
 

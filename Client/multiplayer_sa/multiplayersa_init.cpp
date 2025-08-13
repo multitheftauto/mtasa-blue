@@ -5,11 +5,12 @@
  *  FILE:        multiplayer_sa/multiplayersa_init.cpp
  *  PURPOSE:     Multiplayer module entry
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Memory.h"
 #define DECLARE_PROFILER_SECTION_multiplayersa_init
 #include "profiler/SharedUtil.Profiler.h"
 
@@ -31,6 +32,8 @@ MTAEXPORT CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
     g_pCore = pCore;
     assert(pGameInterface);
     assert(g_pNet);
+
+    SetMemoryAllocationFailureHandler();
 
     // create an instance of our multiplayer class
     pMultiplayer = new CMultiplayerSA;
@@ -82,8 +85,8 @@ void LogEvent(uint uiDebugId, const char* szType, const char* szContext, const c
 
 void CallGameEntityRenderHandler(CEntitySAInterface* pEntity)
 {
-    // Only call if not a building or a dummy
-    if (!pEntity || (pEntity->nType != ENTITY_TYPE_BUILDING && pEntity->nType != ENTITY_TYPE_DUMMY))
+    // Only call if not a dummy
+    if (!pEntity || pEntity->nType != ENTITY_TYPE_DUMMY)
         if (pGameEntityRenderHandler)
             pGameEntityRenderHandler(pEntity);
 }

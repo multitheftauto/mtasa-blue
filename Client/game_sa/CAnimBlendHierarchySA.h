@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAnimBlendHierarchySA.cpp
  *  PURPOSE:     Header file for animation blend hierarchy class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        CefWeb.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -21,6 +21,8 @@ extern "C" _declspec(dllexport) CWebCoreInterface* InitWebCoreInterface(CCoreInt
 
     // Ensure main thread identification is consistent
     IsMainThread();
+
+    SetMemoryAllocationFailureHandler();
 
     CWebCore* pWebCore = new CWebCore;
     return pWebCore;

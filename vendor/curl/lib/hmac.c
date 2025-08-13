@@ -26,14 +26,15 @@
 
 #include "curl_setup.h"
 
-#if (defined(USE_CURL_NTLM_CORE) && !defined(USE_WINDOWS_SSPI))         \
-  || !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH)
+#if (defined(USE_CURL_NTLM_CORE) && !defined(USE_WINDOWS_SSPI)) ||      \
+  !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH) ||   \
+  defined(USE_SSL)
 
 #include <curl/curl.h>
 
 #include "curl_hmac.h"
 #include "curl_memory.h"
-#include "warnless.h"
+#include "curlx/warnless.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -72,7 +73,8 @@ Curl_HMAC_init(const struct HMAC_params *hashparams,
 
   /* If the key is too long, replace it by its hash digest. */
   if(keylen > hashparams->maxkeylen) {
-    hashparams->hinit(ctxt->hashctxt1);
+    if(hashparams->hinit(ctxt->hashctxt1))
+      return NULL;
     hashparams->hupdate(ctxt->hashctxt1, key, keylen);
     hkey = (unsigned char *) ctxt->hashctxt2 + hashparams->ctxtsize;
     hashparams->hfinal(hkey, ctxt->hashctxt1);
@@ -81,8 +83,9 @@ Curl_HMAC_init(const struct HMAC_params *hashparams,
   }
 
   /* Prime the two hash contexts with the modified key. */
-  hashparams->hinit(ctxt->hashctxt1);
-  hashparams->hinit(ctxt->hashctxt2);
+  if(hashparams->hinit(ctxt->hashctxt1) ||
+     hashparams->hinit(ctxt->hashctxt2))
+    return NULL;
 
   for(i = 0; i < keylen; i++) {
     b = (unsigned char)(*key ^ hmac_ipad);

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPed.cpp
  *  PURPOSE:     Ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -38,7 +38,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_bWearingGoggles = false;
 
     m_fHealth = 0.0f;
-    m_fArmor = 0.0f;
+    m_armor = 0.0f;
 
     memset(&m_fStats[0], 0, sizeof(m_fStats));
     m_fStats[24] = 569.0f;            // default max_health
@@ -239,7 +239,7 @@ bool CPed::ReadSpecialData(const int iLine)
         m_fHealth = 100.0f;
 
     // Grab the "armor" data
-    GetCustomDataFloat("armor", m_fArmor, true);
+    GetCustomDataFloat("armor", m_armor, true);
 
     // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
@@ -369,14 +369,12 @@ bool CPed::HasWeaponType(unsigned char ucWeaponType)
 
 float CPed::GetMaxHealth()
 {
-    // TODO: Verify this formula
-
     // Grab his player health stat
     float fStat = GetPlayerStat(24 /*MAX_HEALTH*/);
 
     // Do a linear interpolation to get how much health this would allow
-    // Assumes: 100 health = 569 stat, 200 health = 1000 stat.
-    float fMaxHealth = 100.0f + (100.0f / 431.0f * (fStat - 569.0f));
+    // Assumes: 100 health = 569 stat, 176 health = 1000 stat.
+    float fMaxHealth = fStat * 0.176f;
 
     // Return the max health. Make sure it can't be below 1
     if (fMaxHealth < 1.0f)

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCameraSA.h
  *  PURPOSE:     Header file for camera rendering class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -77,14 +77,9 @@ public:
 
 /*** END PURE R* CLASSES ***/
 
-class CCameraSAInterface
+class CCameraSAInterface : public CPlaceableSAInterface
 {
 public:
-    // CPlaceable
-    CPlaceableSAInterface Placeable;
-    std::uint8_t          specialPadding[4]; // Temporary padding due to incorrect CPlaceableSAInterface class
-    // End CPlaceable
-
     // move these out the class, have decided to set up a mirrored enumerated type thingy at the top
     bool          m_bAboveGroundTrainNodesLoaded;
     bool          m_bBelowGroundTrainNodesLoaded;

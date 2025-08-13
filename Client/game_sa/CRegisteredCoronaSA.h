@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CRegisteredCoronaSA.h
  *  PURPOSE:     Header file for registered corona entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -67,7 +67,7 @@ public:
     void     SetPullTowardsCamera(float fPullTowardsCamera);
     void     SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha);
     void     SetTexture(RwTexture* texture);
-    void     SetTexture(eCoronaType texture);
+    void     SetTexture(CoronaType texture);
     BYTE     GetFlareType();
     void     SetFlareType(BYTE fFlareType);
     void     SetReflectionType(BYTE reflectionType);

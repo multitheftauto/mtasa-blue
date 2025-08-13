@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CDummyPoolSA.cpp
  *  PURPOSE:     Dummy pool class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -43,7 +43,7 @@ void CDummyPoolSA::RemoveAllWithBackup()
             pDummyPool->Release(i);
 
             (*m_pOriginalElementsBackup)[i].first = true;
-            (*m_pOriginalElementsBackup)[i].second = *building;
+            std::memcpy((*m_pOriginalElementsBackup)[i].second, building, sizeof(CEntitySAInterface));
         }
         else
         {
@@ -63,9 +63,9 @@ void CDummyPoolSA::RestoreBackup()
     {
         if (originalData[i].first)
         {
-            pDummyPool->AllocateAt(i);
+            pDummyPool->AllocateAtNoInit(i);
             auto pDummy = pDummyPool->GetObject(i);
-            *pDummy = originalData[i].second;
+            std::memcpy(pDummy, &originalData[i].second, sizeof(CEntitySAInterface));
 
             pGame->GetWorld()->Add(pDummy, CDummyPool_Constructor);
         }
@@ -88,7 +88,7 @@ void CDummyPoolSA::UpdateBackupLodOffset(const std::uint32_t offset)
     {
         if (it.first)
         {
-            CEntitySAInterface* object = &it.second;
+            CEntitySAInterface* object = reinterpret_cast<CEntitySAInterface*>(&it.second);
             CEntitySAInterface* lod = object->GetLod();
             if (lod)
                 object->SetLod((CEntitySAInterface*)((std::uint32_t)lod + offset));

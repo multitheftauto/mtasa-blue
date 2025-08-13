@@ -57,7 +57,7 @@ FT_BEGIN_HEADER
    *     indicate positions inside of contours.
    *
    *   flip_y ::
-   *     Setting this parameter to true maked the output image flipped
+   *     Setting this parameter to true makes the output image flipped
    *     along the y-axis.
    *
    *   overlaps ::

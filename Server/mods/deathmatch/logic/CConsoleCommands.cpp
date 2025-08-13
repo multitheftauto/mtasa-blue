@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CConsoleCommands.cpp
  *  PURPOSE:     Server console command definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1570,7 +1570,7 @@ bool CConsoleCommands::OpenPortsTest(CConsole* pConsole, const char* szArguments
 {
     if (pClient->GetClientType() == CClient::CLIENT_CONSOLE)
     {
-#if MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE < VERSION_TYPE_UNTESTED
         if (SStringX(szArguments) == "crashme")
         {
             // For testing crash handling

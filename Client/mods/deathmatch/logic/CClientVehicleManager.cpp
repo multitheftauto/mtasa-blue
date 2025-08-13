@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include <game/TaskCar.h>
+#include <enums/VehicleType.h>
 
 using std::list;
 using std::vector;
@@ -685,23 +686,23 @@ bool CClientVehicleManager::HasDoors(unsigned long ulModel)
 
     if (HasDamageModel(ulModel) == true)
     {
-        switch (ulModel)
+        switch (static_cast<VehicleType>(ulModel))
         {
-            case VT_BFINJECT:
-            case VT_RCBANDIT:
-            case VT_CADDY:
-            case VT_RCRAIDER:
-            case VT_BAGGAGE:
-            case VT_DOZER:
-            case VT_FORKLIFT:
-            case VT_TRACTOR:
-            case VT_RCTIGER:
-            case VT_BANDITO:
-            case VT_KART:
-            case VT_MOWER:
-            case VT_RCCAM:
-            case VT_RCGOBLIN:
-            case VT_BLOODRA:
+            case VehicleType::VT_BFINJECT:
+            case VehicleType::VT_RCBANDIT:
+            case VehicleType::VT_CADDY:
+            case VehicleType::VT_RCRAIDER:
+            case VehicleType::VT_BAGGAGE:
+            case VehicleType::VT_DOZER:
+            case VehicleType::VT_FORKLIFT:
+            case VehicleType::VT_TRACTOR:
+            case VehicleType::VT_RCTIGER:
+            case VehicleType::VT_BANDITO:
+            case VehicleType::VT_KART:
+            case VehicleType::VT_MOWER:
+            case VehicleType::VT_RCCAM:
+            case VehicleType::VT_RCGOBLIN:
+            case VehicleType::VT_BLOODRA:
                 break;
             default:
                 bHasDoors = true;
@@ -788,5 +789,22 @@ void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
     {
         CClientVehicle* pVehicle = m_List[i];
         pVehicle->GetUpgrades()->RestreamVehicleUpgrades(usModel);
+    }
+}
+
+void CClientVehicleManager::ResetNotControlledRotors(bool engineAutoStart)
+{
+    // Reset rotors to original or custom state for loaded vehicles without controller
+    // Custom state allows rotors to spin without driver inside (if engine is on)
+    eEntityStatus status = engineAutoStart ? eEntityStatus::STATUS_ABANDONED : eEntityStatus::STATUS_PHYSICS;
+    for (auto& pVehicle : m_List)
+    {
+        if (pVehicle->GetGameEntity() && pVehicle->GetVehicleRotorState() && !pVehicle->IsDriven())
+        {
+            float speed = (!engineAutoStart && pVehicle->IsEngineOn()) ? 0.001f : 0.0f;
+            pVehicle->GetGameEntity()->SetEntityStatus(status);
+            pVehicle->SetHeliRotorSpeed(speed);
+            pVehicle->SetPlaneRotorSpeed(speed);
+        }
     }
 }

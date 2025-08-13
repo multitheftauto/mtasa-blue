@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/Utils.cpp
  *  PURPOSE:     Miscellaneous utility functions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -124,7 +124,7 @@ void RaiseFatalError(unsigned int uiCode)
 #endif
 
     // Populate the message and show the box
-    SString strBuffer(_("Fatal error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);
+    SString strBuffer(_("Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."), uiCode);
     SString strTroubleLink(SString("fatal-error&code=%d", uiCode));
     g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CD62"), strBuffer, strTroubleLink);
 
@@ -140,7 +140,7 @@ void RaiseProtocolError(unsigned int uiCode)
     // #endif
 
     // Populate the message and show the box
-    SString strBuffer(_("Protocol error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);
+    SString strBuffer(_("Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."), uiCode);
     SString strTroubleLink(SString("protocol-error&code=%d", uiCode));
     g_pCore->ShowErrorMessageBox(_("Connection error") + _E("CD63"), strBuffer, strTroubleLink);            // Protocol error
 
@@ -730,12 +730,8 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
     if (!BitStream.Read(&keys))
         return false;
 
-    // Put the result into the controllerstate
-    ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
-    ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
     short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
     short sButtonCross = keys.data.bButtonCross ? 255 : 0;
-    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -743,18 +739,18 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
         if (keys.data.ucButtonCross != 0)
             sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
+
+    // Put the result into the controllerstate
+    ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = keys.data.bButtonCircle;
     ControllerState.ButtonTriangle = keys.data.bButtonTriangle;
     ControllerState.ShockButtonL = keys.data.bShockButtonL;
     ControllerState.m_bPedWalk = keys.data.bPedWalk;
-    if (BitStream.Version() >= 0x2C)
-    {
-        ControllerState.LeftStickX = keys.data.sLeftStickX;
-        ControllerState.LeftStickY = keys.data.sLeftStickY;
-    }
-
+    ControllerState.LeftStickX = keys.data.sLeftStickX;
+    ControllerState.LeftStickY = keys.data.sLeftStickY;
     return true;
 }
 
@@ -785,12 +781,8 @@ bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& B
     if (!BitStream.Read(&keys))
         return false;
 
-    // Put the result into the controllerstate
-    ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
-    ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
     short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
     short sButtonCross = keys.data.bButtonCross ? 255 : 0;
-    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
@@ -798,6 +790,10 @@ bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& B
         if (keys.data.ucButtonCross != 0)
             sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
+
+    // Put the result into the controllerstate
+    ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = keys.data.bButtonCircle;
@@ -806,7 +802,6 @@ bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& B
     ControllerState.m_bPedWalk = keys.data.bPedWalk;
     ControllerState.LeftStickX = keys.data.sLeftStickX;
     ControllerState.LeftStickY = keys.data.sLeftStickY;
-
     return true;
 }
 

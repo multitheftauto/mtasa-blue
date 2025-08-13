@@ -30,11 +30,6 @@
 
 #pragma enum(int)
 
-#undef PACKAGE
-
-/* Version number of this archive. */
-#undef VERSION
-
 /* Define cpu-machine-OS */
 #ifndef CURL_OS
 #define CURL_OS "OS/400"
@@ -110,9 +105,6 @@
 /* Define if you have the GNU gssapi libraries */
 #undef HAVE_GSSGNU
 
-/* Define if you need the malloc.h header file even with stdlib.h  */
-/* #define NEED_MALLOC_H 1 */
-
 /* Define if you have the <netdb.h> header file. */
 #define HAVE_NETDB_H
 
@@ -160,29 +152,14 @@
 /* Define if you have the <stropts.h> header file. */
 #undef HAVE_STROPTS_H
 
-/* Define if you have the `strtok_r' function. */
-#define HAVE_STRTOK_R
-
-/* Define if you have the `strtoll' function. */
-#undef HAVE_STRTOLL             /* Allows ASCII compile on V5R1. */
-
 /* Define if you have the <sys/param.h> header file. */
 #define HAVE_SYS_PARAM_H
 
 /* Define if you have the <sys/select.h> header file. */
 #undef HAVE_SYS_SELECT_H
 
-/* Define if you have the <sys/socket.h> header file. */
-#define HAVE_SYS_SOCKET_H
-
 /* Define if you have the <sys/sockio.h> header file. */
 #undef HAVE_SYS_SOCKIO_H
-
-/* Define if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H
-
-/* Define if you have the <sys/time.h> header file. */
-#define HAVE_SYS_TIME_H
 
 /* Define if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H
@@ -201,9 +178,6 @@
 
 /* Define if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H
-
-/* Name of package */
-#undef PACKAGE
 
 /* The size of `int', as computed by sizeof. */
 #define SIZEOF_INT              4
@@ -229,10 +203,6 @@
 /* Define if you have the ANSI C header files. */
 #define STDC_HEADERS
 
-/* Define to enable HTTP3 support (experimental, requires NGTCP2, quiche or
-   MSH3) */
-#undef USE_HTTP3
-
 /* Version number of package */
 #undef VERSION
 
@@ -244,9 +214,6 @@
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
-
-/* type to use in place of in_addr_t if not defined */
-#define in_addr_t       unsigned long
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 #undef size_t

@@ -47,12 +47,16 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi", "dwmapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "discord-rpc",
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "discord-rpc", "wintrust", "crypt32",
 	}
 
 	defines {
 		"INITGUID",
 		"PNG_SETJMP_NOT_SUPPORTED"
+	}
+
+	prebuildcommands {
+		"%[%{!wks.location}/../utils/gen_language_list.exe] %[%{!wks.location}/../Shared/data/MTA San Andreas/MTA/locale] %[languages.generated.h]"
 	}
 
 	filter "architecture:not x86"

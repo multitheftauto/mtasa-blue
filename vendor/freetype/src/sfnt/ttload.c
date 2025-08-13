@@ -535,7 +535,8 @@
    *     The tag of table to load.  Use the value 0 if you want
    *     to access the whole font file, else set this parameter
    *     to a valid TrueType table tag that you can forge with
-   *     the MAKE_TT_TAG macro.
+   *     the MAKE_TT_TAG macro.  Use value 1 to access the table
+   *     directory.
    *
    *   offset ::
    *     The starting offset in the table (or the file if
@@ -577,7 +578,18 @@
     FT_ULong   size;
 
 
-    if ( tag != 0 )
+    if ( tag == 0 )
+    {
+      /* The whole font file. */
+      size = face->root.stream->size;
+    }
+    else if ( tag == 1 )
+    {
+      /* The currently selected font's table directory. */
+      offset += face->ttc_header.offsets[face->root.face_index & 0xFFFF];
+      size    = 4 + 8 + 16 * face->num_tables;
+    }
+    else
     {
       /* look for tag in font directory */
       table = tt_face_lookup_table( face, tag );
@@ -590,9 +602,6 @@
       offset += table->Offset;
       size    = table->Length;
     }
-    else
-      /* tag == 0 -- the user wants to access the font file directly */
-      size = face->root.stream->size;
 
     if ( length && *length == 0 )
     {
@@ -1046,7 +1055,7 @@
   FT_LOCAL_DEF( void )
   tt_face_free_name( TT_Face  face )
   {
-    FT_Memory     memory = face->root.driver->root.memory;
+    FT_Memory     memory = face->root.memory;
     TT_NameTable  table  = &face->name_table;
 
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-06-20 21:46\n"
+"POT-Creation-Date: 2025-04-08 22:41\n"
+"PO-Revision-Date: 2025-04-08 23:03\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -19,18 +19,18 @@ msgstr ""
 
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:205
-msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr "İndirmiş olduğunuz MTA:SA sürümü Windows XP veya Vista'yı desteklemiyor. Lütfen www.mtasa.com adresinden alternatif bir sürüm indiriniz."
+msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
+msgstr ""
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
-msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "İndirmiş olduğunuz MTA:SA sürümü Windows 7, 8 veya 8.1'i desteklemiyor. Lütfen www.mtasa.com adresinden alternatif bir sürüm indiriniz."
+msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
+msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
-msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr "İndirmiş olduğunuz MTA:SA sürümü Windows'un eski sürümleri için tasarlanmış. Lütfen www.mtasa.com adresinden farklı bir sürüm indiriniz."
+msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
+msgstr ""
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
@@ -147,72 +147,72 @@ msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr "İstemci, bir Multi Theft Auto sunucusu üzerinde oynamak için kullanacağınız programdır"
 
 #. INST_CLIENTSERVER
-#: Shared/installer/nightly.nsi:441
+#: Shared/installer/nightly.nsi:444
 msgid "Client and Server"
 msgstr "İstemci ve Sunucu"
 
 #. INST_SERVER
-#: Shared/installer/nightly.nsi:442
+#: Shared/installer/nightly.nsi:445
 msgid "Server only"
 msgstr "Sadece sunucu"
 
 #. INST_STARTMENU_GROUP
-#: Shared/installer/nightly.nsi:456
+#: Shared/installer/nightly.nsi:459
 msgid "Start menu group"
 msgstr "Başlat menüsü grubu"
 
 #. INST_DESKTOP_ICON
-#: Shared/installer/nightly.nsi:457
+#: Shared/installer/nightly.nsi:460
 msgid "Desktop icon"
 msgstr "Masaüstü simgesi"
 
 #. INST_PROTOCOL
-#: Shared/installer/nightly.nsi:458
+#: Shared/installer/nightly.nsi:461
 msgid "Register mtasa:// protocol"
 msgstr "mtasa:// protokolünü kaydet"
 
 #. INST_GAMES_EXPLORER
-#: Shared/installer/nightly.nsi:459
+#: Shared/installer/nightly.nsi:462
 msgid "Add to Games Explorer"
 msgstr "Oyun tarayıcısına ekle"
 
 #. INST_DIRECTX
-#: Shared/installer/nightly.nsi:460
+#: Shared/installer/nightly.nsi:463
 msgid "Install DirectX"
 msgstr "DirectX'i kur"
 
 #. INST_SEC_CLIENT
-#: Shared/installer/nightly.nsi:494
+#: Shared/installer/nightly.nsi:497
 msgid "Game client"
 msgstr "Oyun istemcisi"
 
 #. INST_SEC_SERVER
-#: Shared/installer/nightly.nsi:495
+#: Shared/installer/nightly.nsi:498
 msgid "Dedicated server"
 msgstr "Özel sunucu"
 
 #. INST_SEC_CORE
-#: Shared/installer/nightly.nsi:496
+#: Shared/installer/nightly.nsi:499
 msgid "Core components"
 msgstr "Temel bileşenler"
 
 #. INST_SEC_GAME
-#: Shared/installer/nightly.nsi:497
+#: Shared/installer/nightly.nsi:500
 msgid "Game module"
 msgstr "Oyun modülü"
 
 #. INFO_INPLACE_UPGRADE
-#: Shared/installer/nightly.nsi:499
+#: Shared/installer/nightly.nsi:502
 msgid "Performing in-place upgrade..."
 msgstr "Güncelleme gerçekleştiriliyor..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: Shared/installer/nightly.nsi:500
+#: Shared/installer/nightly.nsi:503
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "Yetkiler güncelleniyor. Bu birkaç dakika sürebilir..."
 
 #. MSGBOX_INVALID_GTASA
-#: Shared/installer/nightly.nsi:501
+#: Shared/installer/nightly.nsi:504
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
@@ -221,42 +221,42 @@ msgstr "Geçerli bir Grand Theft Auto: San Andreas versiyonu bulunamadı.$\\r$\n
 "Eğer herhangi bir sorunla karşılaşırsanız tekrar yükleyin."
 
 #. INST_SEC_CORE_RESOURCES
-#: Shared/installer/nightly.nsi:504
+#: Shared/installer/nightly.nsi:507
 msgid "Core Resources"
 msgstr "Temel Kaynaklar"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: Shared/installer/nightly.nsi:505
+#: Shared/installer/nightly.nsi:508
 msgid "Optional Resources"
 msgstr "İsteğe Bağlı Kaynaklar"
 
 #. INST_SEC_EDITOR
-#: Shared/installer/nightly.nsi:506
+#: Shared/installer/nightly.nsi:509
 msgid "Editor"
 msgstr "Editör"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:1001
+#: Shared/installer/nightly.nsi:985
 msgid "Development"
 msgstr "Geliştirme"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1049
+#: Shared/installer/nightly.nsi:1033
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) bilgisayarınızdan sorunsuz bir şekilde silindi."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1056
+#: Shared/installer/nightly.nsi:1040
 msgid "Uninstallation has failed!"
 msgstr "Kaldırma başarısız oldu!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1064
+#: Shared/installer/nightly.nsi:1048
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "$(^Name) ve bileşenlerini tamamen kaldırmak istediğinize emin misiniz?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1065
+#: Shared/installer/nightly.nsi:1049
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -265,32 +265,32 @@ msgstr "Güncellemeden önce mi kaldırıyorsunuz?$\\r$\n"
 "Oyunu güncellemek ve ayarlarınızı korumak için yeni versiyonun kurulumunu başlatmanız yeterli."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1078
+#: Shared/installer/nightly.nsi:1062
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Veri dosyalarınızı kaydetmek ister misiniz (kaynaklar, ekran görüntüleri ve sunucu ayarları)? Eğer hayıra basarsanız bütün ayarlarınız silinecektir."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1253
+#: Shared/installer/nightly.nsi:1245
 msgid "This installer requires admin access, try again"
 msgstr "Bu kurulum sihirbazı, yönetici izni gerektiriyor. Tekrar deneyin"
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1254
+#: Shared/installer/nightly.nsi:1246
 msgid "This uninstaller requires admin access, try again"
 msgstr "Bu kaldırma sihirbazı, yönetici izni gerektiriyor. Tekrar deneyin"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1255
+#: Shared/installer/nightly.nsi:1247
 msgid "Logon service not running, aborting!"
 msgstr "Oturum Açma hizmeti çalışmıyor, iptal ediliyor!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1256
+#: Shared/installer/nightly.nsi:1248
 msgid "Unable to elevate"
 msgstr "Yükseltilemedi"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1852
+#: Shared/installer/nightly.nsi:1844
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -301,7 +301,7 @@ msgstr "Farklı bir MTA ($1) ana sürümü zaten burada bulunmaktadır. $\n"
 " $INSTDIR konumundaki MTA $1 üzerine kurulum yapmak istediğinizden emin misiniz?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1856
+#: Shared/installer/nightly.nsi:1848
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -312,7 +312,7 @@ msgstr "MTA, GTA:SA ile aynı dizine kurulamaz.$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1859
+#: Shared/installer/nightly.nsi:1851
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -321,7 +321,7 @@ msgstr "Seçilen dizin bulunamıyor.$\n"
 "Lütfen GTA:SA kurulum yerini seçiniz"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1861
+#: Shared/installer/nightly.nsi:1853
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -330,17 +330,17 @@ msgstr " $GTA_DIR konumunda GTA:SA bulunamadı $\n"
 "Devam etmek istediğinize emin misiniz?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1979
+#: Shared/installer/nightly.nsi:1971
 msgid "Choose Install Location"
 msgstr "Kurulum yerini seçiniz"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1980
+#: Shared/installer/nightly.nsi:1972
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} kurmak istediğiniz klasörü seçiniz"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1981
+#: Shared/installer/nightly.nsi:1973
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -351,62 +351,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bu klasöre kurulacaktır.$\n"
 "Devam etmek için İleri tuşuna basın."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1983
+#: Shared/installer/nightly.nsi:1975
 msgid "Destination Folder"
 msgstr "Hedef Klasör"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1984
+#: Shared/installer/nightly.nsi:1976
 msgid "Browse..."
 msgstr "Gözat..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1985
+#: Shared/installer/nightly.nsi:1977
 msgid "Default"
 msgstr "Varsayılan"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1986
+#: Shared/installer/nightly.nsi:1978
 msgid "Last used"
 msgstr "Son kullanılan"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1987
+#: Shared/installer/nightly.nsi:1979
 msgid "Custom"
 msgstr "Özel"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2165
+#: Shared/installer/nightly.nsi:2157
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} kurmak istediğiniz klasörü seçin:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2183
+#: Shared/installer/nightly.nsi:2175
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Uyarı: Başka bir MTA ($1) ana sürümü zaten bu konumda mevcut."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2184
+#: Shared/installer/nightly.nsi:2176
 msgid "Installation type:  Upgrade"
 msgstr "Kurulum tipi: Güncelleme"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2418
+#: Shared/installer/nightly.nsi:2410
 msgid "Online update"
 msgstr "Çevrimiçi güncelleme"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2419
+#: Shared/installer/nightly.nsi:2411
 msgid "Checking for update information"
 msgstr "Güncelleme bilgileri kontrol ediliyor"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2420
+#: Shared/installer/nightly.nsi:2412
 msgid "Checking for installer update information..."
 msgstr "Kurulum sihirbazı güncellemesi kontrol ediliyor..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2421
+#: Shared/installer/nightly.nsi:2413
 msgid "Please ensure your firewall is not blocking"
 msgstr "Lütfen güvenlik duvarınızın engel olmadığına emin olun"
 

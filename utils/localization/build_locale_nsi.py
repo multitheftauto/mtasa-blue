@@ -95,7 +95,7 @@ locale_to_name: t.Mapping[str, str] = {
     "yo" : "Yoruba",
 }
 
-rtl_locales = [ "ar", "he" ]
+rtl_locales = [ "ar", "he", "fa"]
 
 
 def escape_nsis(msgstr: str) -> str:

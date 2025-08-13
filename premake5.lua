@@ -66,7 +66,7 @@ workspace "MTASA"
 	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} \"%{wks.location}../Bin/"..p.."/\"" end
 
 	if GLIBC_COMPAT then
-		filter { "system:linux" }
+		filter { "system:linux", "platforms:x86 or x64" }
 			includedirs "/compat"
 			linkoptions "-static-libstdc++ -static-libgcc"
 			forceincludes  { "glibc_version.h" }

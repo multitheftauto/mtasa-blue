@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaFileDefs.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -31,6 +31,8 @@ private:
     LUA_DECLARE(fileRead);
     LUA_DECLARE(fileWrite);
     static std::optional<std::string> fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents);
+    static std::optional<std::string> fileGetHash(lua_State* const luaVM, CScriptFile* scriptFile, HashFunctionType hashFunction,
+                                                  std::optional<std::unordered_map<std::string, std::string>> options);
 
     LUA_DECLARE(fileGetPos);
     LUA_DECLARE(fileGetSize);

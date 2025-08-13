@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CRPCFunctions.cpp
  *  PURPOSE:     Remote procedure call functionality class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -156,15 +156,11 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
         unsigned char ucPrevSlot = m_pSourcePlayer->GetWeaponSlot();
 
         // We don't get the puresync packet containing totalAmmo = 0 for slot 8 (THROWN), slot 7 (HEAVY) and slot 9 (SPECIAL)
-        if ((bitStream.Version() >= 0x44 && ucPrevSlot == WEAPONSLOT_TYPE_THROWN) || bitStream.Version() >= 0x4D)
+        if (bitStream.ReadBit() && (ucPrevSlot == WEAPONSLOT_TYPE_THROWN || ucPrevSlot == WEAPONSLOT_TYPE_HEAVY || ucPrevSlot == WEAPONSLOT_TYPE_SPECIAL))
         {
-            if (bitStream.ReadBit() && (ucPrevSlot == WEAPONSLOT_TYPE_THROWN ||
-                                        (bitStream.Version() >= 0x5A && (ucPrevSlot == WEAPONSLOT_TYPE_HEAVY || ucPrevSlot == WEAPONSLOT_TYPE_SPECIAL))))
-            {
-                CWeapon* pPrevWeapon = m_pSourcePlayer->GetWeapon(ucPrevSlot);
-                pPrevWeapon->usAmmo = 0;
-                pPrevWeapon->usAmmoInClip = 0;
-            }
+            CWeapon* pPrevWeapon = m_pSourcePlayer->GetWeapon(ucPrevSlot);
+            pPrevWeapon->usAmmo = 0;
+            pPrevWeapon->usAmmoInClip = 0;
         }
 
         SWeaponSlotSync slot;

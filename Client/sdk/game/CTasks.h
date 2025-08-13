@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CTasks.h
  *  PURPOSE:     Tasks interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -52,7 +52,7 @@ class CVehicle;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
-enum eClimbHeights
+enum eClimbHeights : std::int8_t
 {
     CLIMB_NOT_READY = 0,
     CLIMB_GRAB,

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CSettingsSA.cpp
  *  PURPOSE:     Game settings
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -16,6 +16,8 @@
 #include "CGameSA.h"
 #include "CHudSA.h"
 #include "CSettingsSA.h"
+#include "CCameraSA.h"
+#include "CCamSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -525,36 +527,73 @@ void CSettingsSA::ResetFieldOfViewFromScript()
     UpdateFieldOfViewFromSettings();
 }
 
-void CSettingsSA::SetFieldOfViewPlayer(float fAngle, bool bFromScript)
+static std::pair<CCam*, unsigned int> GetActiveCamPlusMode()
+{
+    CCam* cam = pGame->GetCamera()->GetCam(pGame->GetCamera()->GetActiveCam());
+
+    if (cam == nullptr)
+        return std::make_pair(cam, MODE_NONE);
+
+    return std::make_pair(cam, cam->GetMode());
+}
+
+void CSettingsSA::SetFieldOfViewPlayer(float fAngle, bool bFromScript, bool instant)
 {
     if (!bFromScript && ms_bFOVPlayerFromScript)
         return;
+
     ms_bFOVPlayerFromScript = bFromScript;
     ms_fFOV = fAngle;
+
+    // CCam::Process_FollowPed_SA
     MemPut<void*>(0x0522F3A, &ms_fFOV);
     MemPut<void*>(0x0522F5D, &ms_fFOV);
     MemPut<float>(0x0522F7A, ms_fFOV);
+
+    if (instant)
+    {
+        const auto pair = GetActiveCamPlusMode();
+
+        if (pair.second == MODE_FOLLOWPED)
+            pair.first->SetFOV(fAngle);
+    }
 }
 
-void CSettingsSA::SetFieldOfViewVehicle(float fAngle, bool bFromScript)
+void CSettingsSA::SetFieldOfViewVehicle(float fAngle, bool bFromScript, bool instant)
 {
     if (!bFromScript && ms_bFOVVehicleFromScript)
         return;
+
     ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCar = fAngle;
+
+    // CCam::Process_FollowCar_SA
     MemPut<void*>(0x0524B76, &ms_fFOVCar);
     MemPut<void*>(0x0524B9A, &ms_fFOVCar);
     MemPut<void*>(0x0524BA2, &ms_fFOVCar);
     MemPut<void*>(0x0524BD3, &ms_fFOVCar);
     MemPut<float>(0x0524BE4, ms_fFOVCar);
+
+    if (instant)
+    {
+        const auto pair = GetActiveCamPlusMode();
+
+        if (pair.second == MODE_BEHINDCAR || pair.second == MODE_CAM_ON_A_STRING || pair.second == MODE_BEHINDBOAT)
+            pair.first->SetFOV(fAngle);
+    }
 }
 
-void CSettingsSA::SetFieldOfViewVehicleMax(float fAngle, bool bFromScript)
+void CSettingsSA::SetFieldOfViewVehicleMax(float fAngle, bool bFromScript, bool instant)
 {
+    (void)instant;
+
     if (!bFromScript && ms_bFOVVehicleFromScript)
         return;
+
     ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCarMax = fAngle;
+
+    // CCam::Process_FollowCar_SA
     MemPut<void*>(0x0524BB4, &ms_fFOVCarMax);
     MemPut<float>(0x0524BC5, ms_fFOVCarMax);
 }

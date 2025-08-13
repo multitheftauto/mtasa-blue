@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CSettingsSA.h
  *  PURPOSE:     Header file for game settings class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -162,9 +162,9 @@ public:
 
     void  UpdateFieldOfViewFromSettings();
     void  ResetFieldOfViewFromScript();
-    void  SetFieldOfViewPlayer(float fAngle, bool bFromScript);
-    void  SetFieldOfViewVehicle(float fAngle, bool bFromScript);
-    void  SetFieldOfViewVehicleMax(float fAngle, bool bFromScript);
+    void  SetFieldOfViewPlayer(float fAngle, bool bFromScript, bool instant = false);
+    void  SetFieldOfViewVehicle(float fAngle, bool bFromScript, bool instant = false);
+    void  SetFieldOfViewVehicleMax(float fAngle, bool bFromScript, bool instant = false);
     float GetFieldOfViewPlayer();
     float GetFieldOfViewVehicle();
     float GetFieldOfViewVehicleMax();

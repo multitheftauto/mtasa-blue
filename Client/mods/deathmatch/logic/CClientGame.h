@@ -6,7 +6,7 @@
  *  FILE:        mods/deathmatch/logic/CClientGame.h
  *  PURPOSE:     Header for client game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -53,6 +53,7 @@ class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
 class CServerInfo;
+class CFire;
 enum class eAnimID;
 
 struct SVehExtrapolateSettings
@@ -129,8 +130,12 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
-        POINTLIGHTS,
+        _DATABASE_CONNECTION, // server only
+        TRAIN_TRACK,
+        ROOT,
         UNKNOWN,
+        BUILDING,
+        POINTLIGHTS,
     };
 
     enum
@@ -200,6 +205,7 @@ public:
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
+        GLITCH_VEHICLE_RAPID_STOP,
         NUM_GLITCHES
     };
 
@@ -410,8 +416,8 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
-    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled) noexcept;
-    bool IsWorldSpecialProperty(WorldSpecialProperty property);
+    bool SetWorldSpecialProperty(const WorldSpecialProperty property, const bool enabled) noexcept;
+    bool IsWorldSpecialProperty(const WorldSpecialProperty property);
 
     bool SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
@@ -421,6 +427,9 @@ public:
 
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
+
+    void SetVehicleEngineAutoStartEnabled(bool enabled);
+    bool IsVehicleEngineAutoStartEnabled() const;
 
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
@@ -514,7 +523,7 @@ private:
 
     static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     static void                              StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-    static void                              StaticFireHandler(CFire* pFire);
+    static bool                              StaticFireHandler(CEntitySAInterface* target, CEntitySAInterface* creator);
     static bool                              StaticBreakTowLinkHandler(CVehicle* pTowedVehicle);
     static void                              StaticDrawRadarAreasHandler();
     static void                              StaticRender3DStuffHandler();
@@ -565,7 +574,7 @@ private:
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-    void                              FireHandler(CFire* pFire);
+    bool                              FireHandler(CEntitySAInterface* target, CEntitySAInterface* creator);
     bool                              BreakTowLinkHandler(CVehicle* pTowedVehicle);
     void                              DrawRadarAreasHandler();
     void                              Render3DStuffHandler();
@@ -620,7 +629,7 @@ public:
     bool VerifySADataFiles(int iEnableClientChecks = 0);
     void DebugElementRender();
 
-    void SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin = NULL);
+    void SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin = nullptr, std::optional<VehicleBlowState> vehicleBlowState = std::nullopt);
     void SendFireSync(CFire* pFire);
     void SendProjectileSync(CClientProjectile* pProjectile);
 
