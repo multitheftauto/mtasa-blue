@@ -24,12 +24,11 @@
 #include "tool_setup.h"
 
 #ifndef CURL_DISABLE_IPFS
-#include <curlx.h>
 
 #include "tool_cfgable.h"
 #include "tool_msgs.h"
 #include "tool_ipfs.h"
-#include <memdebug.h> /* keep this as LAST include */
+#include "memdebug.h" /* keep this as LAST include */
 
 /* ensure input ends in slash */
 static CURLcode ensure_trailing_slash(char **input)
@@ -272,13 +271,13 @@ clean:
   {
     switch(result) {
     case CURLE_URL_MALFORMAT:
-      helpf(tool_stderr, "malformed target URL");
+      helpf("malformed target URL");
       break;
     case CURLE_FILE_COULDNT_READ_FILE:
-      helpf(tool_stderr, "IPFS automatic gateway detection failed");
+      helpf("IPFS automatic gateway detection failed");
       break;
     case CURLE_BAD_FUNCTION_ARGUMENT:
-      helpf(tool_stderr, "--ipfs-gateway was given a malformed URL");
+      helpf("--ipfs-gateway was given a malformed URL");
       break;
     default:
       break;
