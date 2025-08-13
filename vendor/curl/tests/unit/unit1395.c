@@ -21,32 +21,22 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "curlcheck.h"
-
-/* copied from urlapi.c */
-extern int dedotdotify(const char *input, size_t clen, char **out);
-
+#include "unitcheck.h"
 #include "memdebug.h"
+#include "unitprotos.h"
 
-static CURLcode unit_setup(void)
+static CURLcode test_unit1395(const char *arg)
 {
-  return CURLE_OK;
-}
-
-static void unit_stop(void)
-{
-
-}
-
-struct dotdot {
-  const char *input;
-  const char *output;
-};
-
-UNITTEST_START
+  UNITTEST_BEGIN_SIMPLE
 
   unsigned int i;
   int fails = 0;
+
+  struct dotdot {
+    const char *input;
+    const char *output;
+  };
+
   const struct dotdot pairs[] = {
     { "%2f%2e%2e%2f/../a", "%2f%2e%2e%2f/a" },
     { "%2f%2e%2e%2f/../", "%2f%2e%2e%2f/" },
@@ -148,4 +138,5 @@ UNITTEST_START
 
   fail_if(fails, "output mismatched");
 
-UNITTEST_STOP
+  UNITTEST_END_SIMPLE
+}
