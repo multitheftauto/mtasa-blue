@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #if defined(USE_NTLM) && !defined(USE_WINDOWS_SSPI)
 
@@ -35,24 +35,24 @@
 
 #define DEBUG_ME 0
 
-#include "urldata.h"
-#include "sendf.h"
-#include "curl_ntlm_core.h"
-#include "curl_gethostname.h"
-#include "curl_multibyte.h"
-#include "curl_md5.h"
-#include "warnless.h"
-#include "rand.h"
-#include "vtls/vtls.h"
-#include "strdup.h"
+#include "../urldata.h"
+#include "../sendf.h"
+#include "../curl_ntlm_core.h"
+#include "../curl_gethostname.h"
+#include "../curlx/multibyte.h"
+#include "../curl_md5.h"
+#include "../curlx/warnless.h"
+#include "../rand.h"
+#include "../vtls/vtls.h"
+#include "../strdup.h"
 
-#include "vauth/vauth.h"
-#include "curl_endian.h"
-#include "curl_printf.h"
+#include "vauth.h"
+#include "../curl_endian.h"
+#include "../curl_printf.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
-#include "memdebug.h"
+#include "../curl_memory.h"
+#include "../memdebug.h"
 
 
 /* NTLM buffer fixed size, large enough for long user + host + domain */
@@ -235,7 +235,7 @@ static void ntlm_print_hex(FILE *handle, const char *buf, size_t len)
 {
   const char *p = buf;
 
-  (void) handle;
+  (void)handle;
 
   fprintf(stderr, "0x");
   while(len-- > 0)
@@ -268,8 +268,8 @@ static CURLcode ntlm_decode_type2_target(struct Curl_easy *data,
   const unsigned char *type2 = Curl_bufref_ptr(type2ref);
   size_t type2len = Curl_bufref_len(type2ref);
 
-#if defined(CURL_DISABLE_VERBOSE_STRINGS)
-  (void) data;
+#ifdef CURL_DISABLE_VERBOSE_STRINGS
+  (void)data;
 #endif
 
   if(type2len >= 48) {
@@ -368,7 +368,7 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
   const unsigned char *type2 = Curl_bufref_ptr(type2ref);
   size_t type2len = Curl_bufref_len(type2ref);
 
-#if defined(CURL_DISABLE_VERBOSE_STRINGS)
+#ifdef CURL_DISABLE_VERBOSE_STRINGS
   (void)data;
 #endif
 

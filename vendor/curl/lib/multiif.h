@@ -36,7 +36,7 @@ bool Curl_expire_clear(struct Curl_easy *data);
 void Curl_expire_done(struct Curl_easy *data, expire_id id);
 CURLMcode Curl_update_timer(struct Curl_multi *multi) WARN_UNUSED_RESULT;
 void Curl_attach_connection(struct Curl_easy *data,
-                             struct connectdata *conn);
+                            struct connectdata *conn);
 void Curl_detach_connection(struct Curl_easy *data);
 bool Curl_multiplex_wanted(const struct Curl_multi *multi);
 void Curl_set_in_callback(struct Curl_easy *data, bool value);
@@ -47,24 +47,11 @@ void Curl_multi_connchanged(struct Curl_multi *multi);
 
 /* Internal version of curl_multi_init() accepts size parameters for the
    socket, connection and dns hashes */
-struct Curl_multi *Curl_multi_handle(size_t hashsize,
+struct Curl_multi *Curl_multi_handle(unsigned int xfer_table_size,
+                                     size_t hashsize,
                                      size_t chashsize,
                                      size_t dnssize,
                                      size_t sesssize);
-
-/* the write bits start at bit 16 for the *getsock() bitmap */
-#define GETSOCK_WRITEBITSTART 16
-
-#define GETSOCK_BLANK 0 /* no bits set */
-
-/* set the bit for the given sock number to make the bitmap for writable */
-#define GETSOCK_WRITESOCK(x) (1 << (GETSOCK_WRITEBITSTART + (x)))
-
-/* set the bit for the given sock number to make the bitmap for readable */
-#define GETSOCK_READSOCK(x) (1 << (x))
-
-/* mask for checking if read and/or write is set for index x */
-#define GETSOCK_MASK_RW(x) (GETSOCK_READSOCK(x)|GETSOCK_WRITESOCK(x))
 
 /**
  * Let the multi handle know that the socket is about to be closed.
@@ -85,9 +72,9 @@ CURLMcode Curl_multi_add_perform(struct Curl_multi *multi,
 /* Return the value of the CURLMOPT_MAX_CONCURRENT_STREAMS option */
 unsigned int Curl_multi_max_concurrent_streams(struct Curl_multi *multi);
 
-void Curl_multi_getsock(struct Curl_easy *data,
-                        struct easy_pollset *ps,
-                        const char *caller);
+CURLMcode Curl_multi_pollset(struct Curl_easy *data,
+                             struct easy_pollset *ps,
+                             const char *caller);
 
 /**
  * Borrow the transfer buffer from the multi, suitable
@@ -105,7 +92,7 @@ void Curl_multi_getsock(struct Curl_easy *data,
  *         CURLE_AGAIN if the buffer is borrowed already.
  */
 CURLcode Curl_multi_xfer_buf_borrow(struct Curl_easy *data,
-                                   char **pbuf, size_t *pbuflen);
+                                    char **pbuf, size_t *pbuflen);
 /**
  * Release the borrowed buffer. All references into the buffer become
  * invalid after this.
@@ -163,9 +150,17 @@ CURLcode Curl_multi_xfer_sockbuf_borrow(struct Curl_easy *data,
 void Curl_multi_xfer_sockbuf_release(struct Curl_easy *data, char *buf);
 
 /**
- * Get the transfer handle for the given id. Returns NULL if not found.
+ * Get the easy handle for the given mid.
+ * Returns NULL if not found.
  */
-struct Curl_easy *Curl_multi_get_handle(struct Curl_multi *multi,
-                                        curl_off_t id);
+struct Curl_easy *Curl_multi_get_easy(struct Curl_multi *multi,
+                                      unsigned int mid);
+
+/* Get the # of transfers current in process/pending. */
+unsigned int Curl_multi_xfers_running(struct Curl_multi *multi);
+
+/* Mark a transfer as dirty, e.g. to be rerun at earliest convenience.
+ * A cheap operation, can be done many times repeatedly. */
+void Curl_multi_mark_dirty(struct Curl_easy *data);
 
 #endif /* HEADER_CURL_MULTIIF_H */

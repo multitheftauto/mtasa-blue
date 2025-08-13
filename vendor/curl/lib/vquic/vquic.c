@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef HAVE_NETINET_UDP_H
 #include <netinet/udp.h>
@@ -30,33 +30,42 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#include "urldata.h"
-#include "bufq.h"
-#include "dynbuf.h"
-#include "cfilters.h"
-#include "curl_trc.h"
-#include "curl_msh3.h"
+#include "../urldata.h"
+#include "../bufq.h"
+#include "../curlx/dynbuf.h"
+#include "../cfilters.h"
+#include "../curl_trc.h"
 #include "curl_ngtcp2.h"
 #include "curl_osslq.h"
 #include "curl_quiche.h"
-#include "multiif.h"
-#include "rand.h"
+#include "../multiif.h"
+#include "../rand.h"
 #include "vquic.h"
 #include "vquic_int.h"
-#include "strerror.h"
-#include "strparse.h"
+#include "../strerror.h"
+#include "../curlx/strparse.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
+#include "../curl_printf.h"
+#include "../curl_memory.h"
+#include "../memdebug.h"
 
 
-#ifdef USE_HTTP3
+#if !defined(CURL_DISABLE_HTTP) && defined(USE_HTTP3)
 
 #define NW_CHUNK_SIZE     (64 * 1024)
 #define NW_SEND_CHUNKS    2
 
+
+int Curl_vquic_init(void)
+{
+#if defined(USE_NGTCP2) && defined(OPENSSL_QUIC_API2)
+  if(ngtcp2_crypto_ossl_init())
+    return 0;
+#endif
+
+  return 1;
+}
 
 void Curl_quic_ver(char *p, size_t len)
 {
@@ -66,8 +75,6 @@ void Curl_quic_ver(char *p, size_t len)
   Curl_osslq_ver(p, len);
 #elif defined(USE_QUICHE)
   Curl_quiche_ver(p, len);
-#elif defined(USE_MSH3)
-  Curl_msh3_ver(p, len);
 #endif
 }
 
@@ -85,7 +92,7 @@ CURLcode vquic_ctx_init(struct cf_quic_ctx *qctx)
     const char *p = getenv("CURL_DBG_QUIC_WBLOCK");
     if(p) {
       curl_off_t l;
-      if(!Curl_str_number(&p, &l, 100))
+      if(!curlx_str_number(&p, &l, 100))
         qctx->wblock_percent = (int)l;
     }
   }
@@ -102,7 +109,7 @@ void vquic_ctx_free(struct cf_quic_ctx *qctx)
 
 void vquic_ctx_update_time(struct cf_quic_ctx *qctx)
 {
-  qctx->last_op = Curl_now();
+  qctx->last_op = curlx_now();
 }
 
 static CURLcode send_packet_no_gso(struct Curl_cfilter *cf,
@@ -298,7 +305,7 @@ CURLcode vquic_flush(struct Curl_cfilter *cf, struct Curl_easy *data,
 }
 
 CURLcode vquic_send(struct Curl_cfilter *cf, struct Curl_easy *data,
-                        struct cf_quic_ctx *qctx, size_t gsolen)
+                    struct cf_quic_ctx *qctx, size_t gsolen)
 {
   qctx->gsolen = gsolen;
   return vquic_flush(cf, data, qctx);
@@ -471,19 +478,20 @@ static CURLcode recvmsg_packets(struct Curl_cfilter *cf,
   size_t pktlen;
   size_t offset, to;
 
-  msg_iov.iov_base = buf;
-  msg_iov.iov_len = (int)sizeof(buf);
-
-  memset(&msg, 0, sizeof(msg));
-  msg.msg_iov = &msg_iov;
-  msg.msg_iovlen = 1;
-  msg.msg_control = msg_ctrl;
-
   DEBUGASSERT(max_pkts > 0);
   for(pkts = 0, total_nread = 0; pkts < max_pkts;) {
+    /* fully initialise this on each call to `recvmsg()`. There seem to
+     * operating systems out there that mess with `msg_iov.iov_len`. */
+    memset(&msg, 0, sizeof(msg));
+    msg_iov.iov_base = buf;
+    msg_iov.iov_len = (int)sizeof(buf);
+    msg.msg_iov = &msg_iov;
+    msg.msg_iovlen = 1;
+    msg.msg_control = msg_ctrl;
     msg.msg_name = &remote_addr;
     msg.msg_namelen = sizeof(remote_addr);
     msg.msg_controllen = sizeof(msg_ctrl);
+
     while((nread = recvmsg(qctx->sockfd, &msg, 0)) == -1 &&
           SOCKERRNO == SOCKEINTR)
       ;
@@ -604,7 +612,7 @@ CURLcode vquic_recv_packets(struct Curl_cfilter *cf,
                             vquic_recv_pkt_cb *recv_cb, void *userp)
 {
   CURLcode result;
-#if defined(HAVE_SENDMMSG)
+#ifdef HAVE_SENDMMSG
   result = recvmmsg_packets(cf, data, qctx, max_pkts, recv_cb, userp);
 #elif defined(HAVE_SENDMSG)
   result = recvmsg_packets(cf, data, qctx, max_pkts, recv_cb, userp);
@@ -634,31 +642,32 @@ CURLcode Curl_qlogdir(struct Curl_easy *data,
                       size_t scidlen,
                       int *qlogfdp)
 {
-  const char *qlog_dir = getenv("QLOGDIR");
+  char *qlog_dir = curl_getenv("QLOGDIR");
   *qlogfdp = -1;
   if(qlog_dir) {
     struct dynbuf fname;
     CURLcode result;
     unsigned int i;
-    Curl_dyn_init(&fname, DYN_QLOG_NAME);
-    result = Curl_dyn_add(&fname, qlog_dir);
+    curlx_dyn_init(&fname, DYN_QLOG_NAME);
+    result = curlx_dyn_add(&fname, qlog_dir);
     if(!result)
-      result = Curl_dyn_add(&fname, "/");
+      result = curlx_dyn_add(&fname, "/");
     for(i = 0; (i < scidlen) && !result; i++) {
       char hex[3];
       msnprintf(hex, 3, "%02x", scid[i]);
-      result = Curl_dyn_add(&fname, hex);
+      result = curlx_dyn_add(&fname, hex);
     }
     if(!result)
-      result = Curl_dyn_add(&fname, ".sqlog");
+      result = curlx_dyn_add(&fname, ".sqlog");
 
     if(!result) {
-      int qlogfd = open(Curl_dyn_ptr(&fname), O_WRONLY|O_CREAT|CURL_O_BINARY,
+      int qlogfd = open(curlx_dyn_ptr(&fname), O_WRONLY|O_CREAT|CURL_O_BINARY,
                         data->set.new_file_perms);
       if(qlogfd != -1)
         *qlogfdp = qlogfd;
     }
-    Curl_dyn_free(&fname);
+    curlx_dyn_free(&fname);
+    free(qlog_dir);
     if(result)
       return result;
   }
@@ -680,8 +689,6 @@ CURLcode Curl_cf_quic_create(struct Curl_cfilter **pcf,
   return Curl_cf_osslq_create(pcf, data, conn, ai);
 #elif defined(USE_QUICHE)
   return Curl_cf_quiche_create(pcf, data, conn, ai);
-#elif defined(USE_MSH3)
-  return Curl_cf_msh3_create(pcf, data, conn, ai);
 #else
   *pcf = NULL;
   (void)data;
@@ -692,9 +699,10 @@ CURLcode Curl_cf_quic_create(struct Curl_cfilter **pcf,
 }
 
 CURLcode Curl_conn_may_http3(struct Curl_easy *data,
-                             const struct connectdata *conn)
+                             const struct connectdata *conn,
+                             unsigned char transport)
 {
-  if(conn->transport == TRNSPRT_UNIX) {
+  if(transport == TRNSPRT_UNIX) {
     /* cannot do QUIC over a Unix domain socket */
     return CURLE_QUIC_CONNECT_ERROR;
   }
@@ -716,15 +724,17 @@ CURLcode Curl_conn_may_http3(struct Curl_easy *data,
   return CURLE_OK;
 }
 
-#else /* USE_HTTP3 */
+#else /* CURL_DISABLE_HTTP || !USE_HTTP3 */
 
 CURLcode Curl_conn_may_http3(struct Curl_easy *data,
-                             const struct connectdata *conn)
+                             const struct connectdata *conn,
+                             unsigned char transport)
 {
   (void)conn;
   (void)data;
+  (void)transport;
   DEBUGF(infof(data, "QUIC is not supported in this build"));
   return CURLE_NOT_BUILT_IN;
 }
 
-#endif /* !USE_HTTP3 */
+#endif /* !CURL_DISABLE_HTTP && USE_HTTP3 */

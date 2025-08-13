@@ -85,7 +85,7 @@ typedef void(BulletImpactHandler)(class CPed* pInitiator, class CEntity* pVictim
 typedef void(BulletFireHandler)(class CPed* pInitiator, const CVector* pvecStartPosition, const CVector* pvecEndPosition);
 typedef bool(DamageHandler)(class CPed* pDamagePed, class CEventDamage* pEvent);
 typedef void(DeathHandler)(class CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-typedef void(FireHandler)(class CFire* pFire);
+typedef bool(FireHandler)(class CEntitySAInterface* target, class CEntitySAInterface* creator);
 typedef bool(ProjectileStopHandler)(class CEntity* owner, enum eWeaponType weaponType, class CVector* origin, float fForce, class CVector* target,
                                     class CEntity* targetEntity);
 typedef void(ProjectileHandler)(class CEntity* owner, class CProjectile* projectile, class CProjectileInfo* projectileInfo, enum eWeaponType weaponType,
@@ -446,6 +446,9 @@ public:
 
     virtual bool IsVehicleEngineAutoStartEnabled() const noexcept = 0;
     virtual void SetVehicleEngineAutoStartEnabled(bool enabled) = 0;
+
+    virtual bool IsRapidVehicleStopFixEnabled() const noexcept = 0;
+    virtual void SetRapidVehicleStopFixEnabled(bool enabled) = 0;
 
     virtual void SetPedTargetingMarkerEnabled(bool bEnabled) = 0;
     virtual bool IsPedTargetingMarkerEnabled() = 0;

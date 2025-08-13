@@ -26,7 +26,7 @@
 
 #include "curl_setup.h"
 #ifndef CURL_DISABLE_NETRC
-#include "dynbuf.h"
+#include "curlx/dynbuf.h"
 
 struct store_netrc {
   struct dynbuf filebuf;
@@ -48,7 +48,8 @@ void Curl_netrc_init(struct store_netrc *s);
 void Curl_netrc_cleanup(struct store_netrc *s);
 
 NETRCcode Curl_parsenetrc(struct store_netrc *s, const char *host,
-                          char **loginp, char **passwordp, char *filename);
+                          char **loginp, char **passwordp,
+                          const char *filename);
   /* Assume: (*passwordp)[0]=0, host[0] != 0.
    * If (*loginp)[0] = 0, search for login and password within a machine
    * section in the netrc.

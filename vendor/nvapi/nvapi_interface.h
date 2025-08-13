@@ -1,6 +1,6 @@
 /*********************************************************************************************************\
 |*                                                                                                        *|
-|* SPDX-FileCopyrightText: Copyright (c) 2019-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
+|* SPDX-FileCopyrightText: Copyright (c) 2019-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
 |* SPDX-License-Identifier: MIT                                                                           *|
 |*                                                                                                        *|
 |* Permission is hereby granted, free of charge, to any person obtaining a                                *|
@@ -165,6 +165,7 @@ struct NVAPI_INTERFACE_TABLE nvapi_interface_table[] =
     { "NvAPI_Disp_GetOutputMode", 0x81fed88d },
     { "NvAPI_Disp_SetHdrToneMapping", 0xdd6da362 },
     { "NvAPI_Disp_GetHdrToneMapping", 0xfbd36e71 },
+    { "NvAPI_Disp_GetColorimetry", 0x00b421ad },
     { "NvAPI_DISP_GetTiming", 0x175167e9 },
     { "NvAPI_DISP_GetMonitorCapabilities", 0x3b05c7e1 },
     { "NvAPI_DISP_GetMonitorColorCapabilities", 0x6ae4cfb5 },

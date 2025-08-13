@@ -29,7 +29,7 @@
  * only be invoked by code in schannel.c.
  */
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef USE_SCHANNEL
 #ifndef USE_WINDOWS_SSPI
@@ -39,23 +39,22 @@
 #include "schannel.h"
 #include "schannel_int.h"
 
-#include "inet_pton.h"
+#include "../curlx/inet_pton.h"
 #include "vtls.h"
 #include "vtls_int.h"
-#include "sendf.h"
-#include "strerror.h"
-#include "curl_multibyte.h"
-#include "curl_printf.h"
+#include "../sendf.h"
+#include "../strerror.h"
+#include "../curlx/winapi.h"
+#include "../curlx/multibyte.h"
+#include "../curl_printf.h"
 #include "hostcheck.h"
-#include "version_win32.h"
+#include "../curlx/version_win32.h"
 
 /* The last #include file should be: */
-#include "curl_memory.h"
-#include "memdebug.h"
+#include "../curl_memory.h"
+#include "../memdebug.h"
 
 #define BACKEND ((struct schannel_ssl_backend_data *)connssl->backend)
-
-#ifdef HAS_MANUAL_VERIFY_API
 
 #ifdef __MINGW32CE__
 #define CERT_QUERY_OBJECT_BLOB 0x00000002
@@ -77,6 +76,28 @@
 #define BEGIN_CERT "-----BEGIN CERTIFICATE-----"
 #define END_CERT "\n-----END CERTIFICATE-----"
 
+struct cert_chain_engine_config_win8 {
+  DWORD cbSize;
+  HCERTSTORE hRestrictedRoot;
+  HCERTSTORE hRestrictedTrust;
+  HCERTSTORE hRestrictedOther;
+  DWORD cAdditionalStore;
+  HCERTSTORE *rghAdditionalStore;
+  DWORD dwFlags;
+  DWORD dwUrlRetrievalTimeout;
+  DWORD MaximumCachedCertificates;
+  DWORD CycleDetectionModulus;
+  HCERTSTORE hExclusiveRoot;
+  HCERTSTORE hExclusiveTrustedPeople;
+  DWORD dwExclusiveFlags;
+};
+
+/* Offered by mingw-w64 v4+. MS SDK ~10+/~VS2017+. */
+#ifndef CERT_CHAIN_EXCLUSIVE_ENABLE_CA_FLAG
+#define CERT_CHAIN_EXCLUSIVE_ENABLE_CA_FLAG 0x00000001
+#endif
+
+/* Legacy structure to supply size to Win7 clients */
 struct cert_chain_engine_config_win7 {
   DWORD cbSize;
   HCERTSTORE hRestrictedRoot;
@@ -174,7 +195,7 @@ static CURLcode add_certs_data_to_store(HCERTSTORE trust_store,
                              NULL,
                              NULL,
                              (const void **)&cert_context)) {
-          char buffer[STRERROR_LEN];
+          char buffer[WINAPI_ERROR_LEN];
           failf(data,
                 "schannel: failed to extract certificate from CA file "
                 "'%s': %s",
@@ -203,7 +224,7 @@ static CURLcode add_certs_data_to_store(HCERTSTORE trust_store,
                                                NULL);
             CertFreeCertificateContext(cert_context);
             if(!add_cert_result) {
-              char buffer[STRERROR_LEN];
+              char buffer[WINAPI_ERROR_LEN];
               failf(data,
                     "schannel: failed to add certificate from CA file '%s' "
                     "to certificate store: %s",
@@ -251,7 +272,7 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
 
   ca_file_tstr = curlx_convert_UTF8_to_tchar(ca_file);
   if(!ca_file_tstr) {
-    char buffer[STRERROR_LEN];
+    char buffer[WINAPI_ERROR_LEN];
     failf(data,
           "schannel: invalid path name for CA file '%s': %s",
           ca_file,
@@ -273,7 +294,7 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
                               FILE_ATTRIBUTE_NORMAL,
                               NULL);
   if(ca_file_handle == INVALID_HANDLE_VALUE) {
-    char buffer[STRERROR_LEN];
+    char buffer[WINAPI_ERROR_LEN];
     failf(data,
           "schannel: failed to open CA file '%s': %s",
           ca_file,
@@ -283,7 +304,7 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
   }
 
   if(!GetFileSizeEx(ca_file_handle, &file_size)) {
-    char buffer[STRERROR_LEN];
+    char buffer[WINAPI_ERROR_LEN];
     failf(data,
           "schannel: failed to determine size of CA file '%s': %s",
           ca_file,
@@ -313,7 +334,7 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
 
     if(!ReadFile(ca_file_handle, ca_file_buffer + total_bytes_read,
                  bytes_to_read, &bytes_read, NULL)) {
-      char buffer[STRERROR_LEN];
+      char buffer[WINAPI_ERROR_LEN];
       failf(data,
             "schannel: failed to read from CA file '%s': %s",
             ca_file,
@@ -330,7 +351,7 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
     }
   }
 
-  /* Null terminate the buffer */
+  /* null-terminate the buffer */
   ca_file_buffer[ca_file_bufsize] = '\0';
 
   result = add_certs_data_to_store(trust_store,
@@ -347,11 +368,7 @@ cleanup:
 
   return result;
 }
-#endif
 
-#endif /* HAS_MANUAL_VERIFY_API */
-
-#ifndef UNDER_CE
 /*
  * Returns the number of characters necessary to populate all the host_names.
  * If host_names is not NULL, populate it with all the hostnames. Each string
@@ -367,18 +384,11 @@ static DWORD cert_get_name_string(struct Curl_easy *data,
                                   BOOL Win8_compat)
 {
   DWORD actual_length = 0;
-#if defined(CURL_WINDOWS_UWP)
-  (void)data;
-  (void)cert_context;
-  (void)host_names;
-  (void)length;
-  (void)alt_name_info;
-  (void)Win8_compat;
-#else
   BOOL compute_content = FALSE;
   LPTSTR current_pos = NULL;
   DWORD i;
 
+/* Offered by mingw-w64 v4+. MS SDK ~10+/~VS2017+. */
 #ifdef CERT_NAME_SEARCH_ALL_NAMES_FLAG
   /* CERT_NAME_SEARCH_ALL_NAMES_FLAG is available from Windows 8 onwards. */
   if(Win8_compat) {
@@ -448,7 +458,6 @@ static DWORD cert_get_name_string(struct Curl_easy *data,
     /* Last string has double null-terminator. */
     *current_pos = '\0';
   }
-#endif
   return actual_length;
 }
 
@@ -487,12 +496,6 @@ static bool get_alt_name_info(struct Curl_easy *data,
                               LPDWORD alt_name_info_size)
 {
   bool result = FALSE;
-#if defined(CURL_WINDOWS_UWP)
-  (void)data;
-  (void)ctx;
-  (void)alt_name_info;
-  (void)alt_name_info_size;
-#else
   PCERT_INFO cert_info = NULL;
   PCERT_EXTENSION extension = NULL;
   CRYPT_DECODE_PARA decode_para = { sizeof(CRYPT_DECODE_PARA), NULL, NULL };
@@ -530,7 +533,6 @@ static bool get_alt_name_info(struct Curl_easy *data,
     return result;
   }
   result = TRUE;
-#endif
   return result;
 }
 #endif /* !UNDER_CE */
@@ -614,7 +616,7 @@ CURLcode Curl_verify_host(struct Curl_cfilter *cf,
                                      &pCertContextServer);
 
   if((sspi_status != SEC_E_OK) || !pCertContextServer) {
-    char buffer[STRERROR_LEN];
+    char buffer[WINAPI_ERROR_LEN];
     failf(data, "schannel: Failed to read remote certificate context: %s",
           Curl_sspi_strerror(sspi_status, buffer, sizeof(buffer)));
     goto cleanup;
@@ -744,7 +746,6 @@ cleanup:
   return result;
 }
 
-#ifdef HAS_MANUAL_VERIFY_API
 /* Verify the server's certificate and hostname */
 CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
                                  struct Curl_easy *data)
@@ -770,7 +771,7 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
                                         &pCertContextServer);
 
   if((sspi_status != SEC_E_OK) || !pCertContextServer) {
-    char buffer[STRERROR_LEN];
+    char buffer[WINAPI_ERROR_LEN];
     failf(data, "schannel: Failed to read remote certificate context: %s",
           Curl_sspi_strerror(sspi_status, buffer, sizeof(buffer)));
     result = CURLE_PEER_FAILED_VERIFICATION;
@@ -778,8 +779,8 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
 
 #ifndef UNDER_CE
   if(result == CURLE_OK &&
-      (conn_config->CAfile || conn_config->ca_info_blob) &&
-      BACKEND->use_manual_cred_validation) {
+     (conn_config->CAfile || conn_config->ca_info_blob) &&
+     BACKEND->use_manual_cred_validation) {
     /*
      * Create a chain engine that uses the certificates in the CA file as
      * trusted certificates. This is only supported on Windows 7+.
@@ -806,7 +807,7 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
                                     CERT_STORE_CREATE_NEW_FLAG,
                                     NULL);
         if(!trust_store) {
-          char buffer[STRERROR_LEN];
+          char buffer[WINAPI_ERROR_LEN];
           failf(data, "schannel: failed to create certificate store: %s",
                 curlx_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
           result = CURLE_SSL_CACERT_BADFILE;
@@ -837,12 +838,21 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
     }
 
     if(result == CURLE_OK) {
-      struct cert_chain_engine_config_win7 engine_config;
+      struct cert_chain_engine_config_win8 engine_config;
       BOOL create_engine_result;
 
       memset(&engine_config, 0, sizeof(engine_config));
-      engine_config.cbSize = sizeof(engine_config);
       engine_config.hExclusiveRoot = trust_store;
+
+      /* Win8/Server2012 allows us to match partial chains */
+      if(curlx_verify_windows_version(6, 2, 0, PLATFORM_WINNT,
+                                      VERSION_GREATER_THAN_EQUAL) &&
+         !ssl_config->no_partialchain) {
+        engine_config.cbSize = sizeof(engine_config);
+        engine_config.dwExclusiveFlags = CERT_CHAIN_EXCLUSIVE_ENABLE_CA_FLAG;
+      }
+      else
+        engine_config.cbSize = sizeof(struct cert_chain_engine_config_win7);
 
       /* CertCreateCertificateChainEngine will check the expected size of the
        * CERT_CHAIN_ENGINE_CONFIG structure and fail if the specified size
@@ -853,7 +863,7 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
         CertCreateCertificateChainEngine(
           (CERT_CHAIN_ENGINE_CONFIG *)&engine_config, &cert_chain_engine);
       if(!create_engine_result) {
-        char buffer[STRERROR_LEN];
+        char buffer[WINAPI_ERROR_LEN];
         failf(data,
               "schannel: failed to create certificate chain engine: %s",
               curlx_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
@@ -878,7 +888,7 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
                                  CERT_CHAIN_REVOCATION_CHECK_CHAIN),
                                 NULL,
                                 &pChainContext)) {
-      char buffer[STRERROR_LEN];
+      char buffer[WINAPI_ERROR_LEN];
       failf(data, "schannel: CertGetCertificateChain failed: %s",
             curlx_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
       pChainContext = NULL;
@@ -947,5 +957,4 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
   return result;
 }
 
-#endif /* HAS_MANUAL_VERIFY_API */
 #endif /* USE_SCHANNEL */

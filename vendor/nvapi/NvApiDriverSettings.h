@@ -1,6 +1,6 @@
 /*********************************************************************************************************\
 |*                                                                                                        *|
-|* SPDX-FileCopyrightText: Copyright (c) 2019-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
+|* SPDX-FileCopyrightText: Copyright (c) 2019-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
 |* SPDX-License-Identifier: MIT                                                                           *|
 |*                                                                                                        *|
 |* Permission is hereby granted, free of charge, to any person obtaining a                                *|
@@ -87,11 +87,13 @@
 #define NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_STRING L"Override DLSS-RR preset"
 #define NGX_DLSS_RR_OVERRIDE_RESERVED_KEY1_STRING  L"Override reserved key 1 for RR"
 #define NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2_STRING  L"Override reserved key 2 for RR"
+#define NGX_DLSS_RR_OVERRIDE_SCALING_RATIO_STRING  L"Override scaling ratio for DLSS-RR"
 #define NGX_DLSS_SR_MODE_STRING                    L"Override DLSS-SR performance mode"
 #define NGX_DLSS_SR_OVERRIDE_STRING                L"Enable DLSS-SR override"
 #define NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_STRING L"Override DLSS-SR presets"
 #define NGX_DLSS_SR_OVERRIDE_RESERVED_KEY1_STRING  L"Override reserved key 1 for SR"
 #define NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2_STRING  L"Override reserved key 2 for SR"
+#define NGX_DLSS_SR_OVERRIDE_SCALING_RATIO_STRING  L"Override scaling ratio for DLSS-SR"
 #define NV_QUALITY_UPSCALING_STRING                L"NVIDIA Quality upscaling"
 #define OPTIMUS_MAXAA_STRING                       L"Maximum AA samples allowed for a given application"
 #define PHYSXINDICATOR_STRING                      L"Display the PhysX indicator"
@@ -206,11 +208,13 @@ enum ESetting {
     NGX_DLSS_RR_OVERRIDE_RENDER_PRESET_SELECTION_ID = 0x10E41DF7,
     NGX_DLSS_RR_OVERRIDE_RESERVED_KEY1_ID         = 0x10C7D86C,
     NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2_ID         = 0x10C7D597,
+    NGX_DLSS_RR_OVERRIDE_SCALING_RATIO_ID         = 0x10C7D4A2,
     NGX_DLSS_SR_MODE_ID                           = 0x10AFB768,
     NGX_DLSS_SR_OVERRIDE_ID                       = 0x10E41E01,
     NGX_DLSS_SR_OVERRIDE_RENDER_PRESET_SELECTION_ID = 0x10E41DF3,
     NGX_DLSS_SR_OVERRIDE_RESERVED_KEY1_ID         = 0x10C7D684,
     NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2_ID         = 0x10C7D82C,
+    NGX_DLSS_SR_OVERRIDE_SCALING_RATIO_ID         = 0x10E41DF5,
     NV_QUALITY_UPSCALING_ID                       = 0x10444444,
     OPTIMUS_MAXAA_ID                              = 0x10F9DC83,
     PHYSXINDICATOR_ID                             = 0x1094F16F,
@@ -263,9 +267,9 @@ enum ESetting {
     SET_VAB_DATA_ID                               = 0x00AB8687,
     VSYNCMODE_ID                                  = 0x00A879CF,
     VSYNCTEARCONTROL_ID                           = 0x005A375C,
-    TOTAL_DWORD_SETTING_NUM = 112,
+    TOTAL_DWORD_SETTING_NUM = 114,
     TOTAL_WSTRING_SETTING_NUM = 5,
-    TOTAL_SETTING_NUM = 117,
+    TOTAL_SETTING_NUM = 119,
     INVALID_SETTING_ID = 0xFFFFFFFF
 };
 
@@ -786,6 +790,13 @@ enum EValues_NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2 {
     NGX_DLSS_RR_OVERRIDE_RESERVED_KEY2_NUM_VALUES = 1,
 };
 
+enum EValues_NGX_DLSS_RR_OVERRIDE_SCALING_RATIO {
+    NGX_DLSS_RR_OVERRIDE_SCALING_RATIO_MIN               = 33,
+    NGX_DLSS_RR_OVERRIDE_SCALING_RATIO_MAX               = 100,
+    NGX_DLSS_RR_OVERRIDE_SCALING_RATIO_DEFAULT           = 0,
+    NGX_DLSS_RR_OVERRIDE_SCALING_RATIO_NUM_VALUES = 3,
+};
+
 enum EValues_NGX_DLSS_SR_MODE {
     NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_PERFORMANCE        = 0,
     NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_BALANCED           = 1,
@@ -835,6 +846,13 @@ enum EValues_NGX_DLSS_SR_OVERRIDE_RESERVED_KEY1 {
 enum EValues_NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2 {
     NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2_DEFAULT           = 0,
     NGX_DLSS_SR_OVERRIDE_RESERVED_KEY2_NUM_VALUES = 1,
+};
+
+enum EValues_NGX_DLSS_SR_OVERRIDE_SCALING_RATIO {
+    NGX_DLSS_SR_OVERRIDE_SCALING_RATIO_MIN               = 33,
+    NGX_DLSS_SR_OVERRIDE_SCALING_RATIO_MAX               = 100,
+    NGX_DLSS_SR_OVERRIDE_SCALING_RATIO_DEFAULT           = 0,
+    NGX_DLSS_SR_OVERRIDE_SCALING_RATIO_NUM_VALUES = 3,
 };
 
 enum EValues_NV_QUALITY_UPSCALING {
@@ -1207,7 +1225,7 @@ enum EValues_PS_SHADERDISKCACHE_MAX_SIZE {
     PS_SHADERDISKCACHE_MAX_SIZE_MIN                      = 0x0,
     PS_SHADERDISKCACHE_MAX_SIZE_MAX                      = 0xffffffff,
     PS_SHADERDISKCACHE_MAX_SIZE_NUM_VALUES = 2,
-    PS_SHADERDISKCACHE_MAX_SIZE_DEFAULT = 0x2000
+    PS_SHADERDISKCACHE_MAX_SIZE_DEFAULT = 0x3000
 };
 
 enum EValues_PS_TEXFILTER_ANISO_OPTS2 {

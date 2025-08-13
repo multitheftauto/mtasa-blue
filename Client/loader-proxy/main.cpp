@@ -117,6 +117,8 @@ BOOL OnLibraryAttach()
 
 VOID OnGameLaunch()
 {
+    SetMemoryAllocationFailureHandler();
+
     std::error_code ec{};
 
     // MTA:SA launches GTA:SA process with the GTA:SA installation directory as the current directory.

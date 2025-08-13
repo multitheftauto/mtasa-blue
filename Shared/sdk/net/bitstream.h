@@ -399,7 +399,8 @@ public:
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
 enum class eBitStreamVersion : unsigned short
 {
-    Unk = 0x062,
+    Unk = 0x030,
+
 
     //
     // 1.5.0 UNSTABLE - 2015-01-17
@@ -627,6 +628,10 @@ enum class eBitStreamVersion : unsigned short
     // Add "vehenginemanualmode" to setWorldSpecialPropertyEnabled
     // 2025-06-02
     WorldSpecialProperty_VehicleEngineAutoStart,
+
+    // DESCRIPTION
+    // YYYY-MM-DD
+    // Name,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

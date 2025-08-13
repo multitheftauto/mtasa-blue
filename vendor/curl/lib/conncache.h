@@ -26,7 +26,7 @@
  ***************************************************************************/
 
 #include <curl/curl.h>
-#include "timeval.h"
+#include "curlx/timeval.h"
 
 struct connectdata;
 struct Curl_easy;
@@ -62,12 +62,12 @@ struct cpool {
 };
 
 /* Init the pool, pass multi only if pool is owned by it.
- * returns 1 on error, 0 is fine.
+ * Cannot fail.
  */
-int Curl_cpool_init(struct cpool *cpool,
-                    struct Curl_easy *idata,
-                    struct Curl_share *share,
-                    size_t size);
+void Curl_cpool_init(struct cpool *cpool,
+                     struct Curl_easy *idata,
+                     struct Curl_share *share,
+                     size_t size);
 
 /* Destroy all connections and free all members */
 void Curl_cpool_destroy(struct cpool *connc);
@@ -106,7 +106,7 @@ typedef bool Curl_cpool_done_match_cb(bool result, void *userdata);
  * Find a connection in the pool matching `destination`.
  * All callbacks are invoked while the pool's lock is held.
  * @param data        current transfer
- * @param destination match agaonst `conn->destination` in pool
+ * @param destination match against `conn->destination` in pool
  * @param conn_cb     must be present, called for each connection in the
  *                    bundle until it returns TRUE
  * @return combined result of last conn_db and result_cb or FALSE if no
@@ -162,5 +162,9 @@ void Curl_cpool_do_by_id(struct Curl_easy *data,
 void Curl_cpool_do_locked(struct Curl_easy *data,
                           struct connectdata *conn,
                           Curl_cpool_conn_do_cb *cb, void *cbdata);
+
+/* Close all unused connections, prevent reuse of existing ones. */
+void Curl_cpool_nw_changed(struct Curl_easy *data);
+
 
 #endif /* HEADER_CURL_CONNCACHE_H */

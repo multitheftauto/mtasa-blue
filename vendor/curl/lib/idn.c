@@ -30,8 +30,8 @@
 #include "urldata.h"
 #include "idn.h"
 #include "sendf.h"
-#include "curl_multibyte.h"
-#include "warnless.h"
+#include "curlx/multibyte.h"
+#include "curlx/warnless.h"
 
 #ifdef USE_LIBIDN2
 #include <idn2.h>
@@ -51,7 +51,7 @@
 #include "memdebug.h"
 
 /* for macOS and iOS targets */
-#if defined(USE_APPLE_IDN)
+#ifdef USE_APPLE_IDN
 #include <unicode/uidna.h>
 #include <iconv.h>
 #include <langinfo.h>
@@ -152,7 +152,7 @@ static CURLcode mac_ascii_to_idn(const char *in, char **out)
 #ifdef USE_WIN32_IDN
 /* using Windows kernel32 and normaliz libraries. */
 
-#if (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x600) && \
+#if (!defined(_WIN32_WINNT) || _WIN32_WINNT < _WIN32_WINNT_VISTA) && \
   (!defined(WINVER) || WINVER < 0x600)
 WINBASEAPI int WINAPI IdnToAscii(DWORD dwFlags,
                                  const WCHAR *lpUnicodeCharStr,

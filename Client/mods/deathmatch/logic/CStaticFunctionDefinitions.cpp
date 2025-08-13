@@ -1371,18 +1371,30 @@ bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEn
     RUN_CHILDREN(AttachElements(**iter, AttachedToEntity, vecPosition, vecRotation))
 
     // Can these elements be attached?
-    if (Entity.IsAttachToable() && AttachedToEntity.IsAttachable() && !AttachedToEntity.IsAttachedToElement(&Entity) &&
-        Entity.GetDimension() == AttachedToEntity.GetDimension())
+    if (!Entity.IsAttachToable() || !AttachedToEntity.IsAttachable() || AttachedToEntity.IsAttachedToElement(&Entity) ||
+        Entity.GetDimension() != AttachedToEntity.GetDimension())
     {
-        ConvertDegreesToRadians(vecRotation);
-
-        Entity.SetAttachedOffsets(vecPosition, vecRotation);
-        Entity.AttachTo(&AttachedToEntity);
-
-        return true;
+        return false;
     }
 
-    return false;
+    CLuaArguments Arguments;
+    Arguments.PushElement(&AttachedToEntity);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!Entity.CallEvent("onClientElementAttach", Arguments, true))
+        return false;
+
+    ConvertDegreesToRadians(vecRotation);
+
+    Entity.SetAttachedOffsets(vecPosition, vecRotation);
+    Entity.AttachTo(&AttachedToEntity);
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::DetachElements(CClientEntity& Entity, CClientEntity* pAttachedToEntity)
@@ -1390,16 +1402,33 @@ bool CStaticFunctionDefinitions::DetachElements(CClientEntity& Entity, CClientEn
     RUN_CHILDREN(DetachElements(**iter, pAttachedToEntity))
 
     CClientEntity* pActualAttachedToEntity = Entity.GetAttachedTo();
-    if (pActualAttachedToEntity)
+    if (!pActualAttachedToEntity || (pAttachedToEntity && pActualAttachedToEntity != pAttachedToEntity))
     {
-        if (pAttachedToEntity == NULL || pActualAttachedToEntity == pAttachedToEntity)
-        {
-            Entity.AttachTo(NULL);
-            return true;
-        }
+        return false;
     }
 
-    return false;
+    CVector vecPosition;
+    CVector vecRotation;
+
+    Entity.GetPosition(vecPosition);
+    Entity.GetRotationDegrees(vecRotation);
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(pActualAttachedToEntity);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!Entity.CallEvent("onClientElementDetach", Arguments, true))
+    {
+        return false;
+    }
+
+    Entity.AttachTo(NULL);
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetElementAttachedOffsets(CClientEntity& Entity, CVector& vecPosition, CVector& vecRotation)
@@ -2247,6 +2276,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                     }
                 }
             }
+
+            Ped.m_AnimationCache.startTime = GetTimestamp();
         }
         else
         {
@@ -2866,17 +2897,46 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optiona
 {
     RUN_CHILDREN(BlowVehicle(**iter, withExplosion))
 
-    if (IS_VEHICLE(&Entity))
-    {
-        CClientVehicle& vehicle = static_cast<CClientVehicle&>(Entity);
+    if (!IS_VEHICLE(&Entity))
+        return false;
 
-        VehicleBlowFlags blow;
-        blow.withExplosion = withExplosion.value_or(true);
+    CClientVehicle& vehicle = static_cast<CClientVehicle&>(Entity);
+    VehicleBlowFlags blow;
+
+    blow.withExplosion = withExplosion.value_or(true);
+
+    if (vehicle.IsLocalEntity())
+    {
         vehicle.Blow(blow);
-        return true;
+    }
+    else
+    {
+        CVector position;
+        vehicle.GetPosition(position);
+
+        const auto type = vehicle.GetType();
+        const auto state = (blow.withExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
+        eExplosionType explosion;
+
+        switch (type)
+        {
+            case CLIENTVEHICLE_CAR:
+                explosion = EXP_TYPE_CAR;
+                break;
+            case CLIENTVEHICLE_HELI:
+                explosion = EXP_TYPE_HELI;
+                break;
+            case CLIENTVEHICLE_BOAT:
+                explosion = EXP_TYPE_BOAT;
+                break;
+            default:
+                explosion = EXP_TYPE_CAR;
+        }
+
+        g_pClientGame->SendExplosionSync(position, explosion, &Entity, state);
     }
 
-    return false;
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleVariant(CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2)
