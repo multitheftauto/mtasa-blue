@@ -25,7 +25,7 @@
 \*********************************************************************************************************/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Date: Apr 11, 2025 
+// Date: Jul 28, 2025 
 // File: nvapi.h
 //
 // NvAPI provides an interface to NVIDIA devices. This file contains the 
@@ -3639,11 +3639,46 @@ typedef struct
 typedef void(__cdecl *NVAPI_CALLBACK_QSYNCEVENT)(NV_QSYNC_EVENT_DATA qyncEventData, void *callbackParam);
 
 
+typedef struct _NV_DISPLAY_OUTPUT_MODE_CHANGE_EVENT_DATA
+{
+    NvU32 displayId;                                 //!< displayId of the display
+    NvU32 outputMode;                                //!< display output mode
+} NV_DISPLAY_OUTPUT_MODE_CHANGE_EVENT_DATA;
+
+//! Callback for Display Output Mode change events
+typedef void(__cdecl *NVAPI_CALLBACK_DISPLAY_OUTPUT_MODE_CHANGE_EVENT)(NV_DISPLAY_OUTPUT_MODE_CHANGE_EVENT_DATA* pEventData, void *callbackParam);
+
+typedef struct _NV_DISPLAY_COLORIMETRY_CHANGE_EVENT_DATA
+{
+    NvU32 displayId;                                //!< displayId of the monitor
+
+    float min_luminance;                            //!< min luminance, cd/m^2
+    float max_full_frame_luminance;                 //!< max 100% frame luminance, cd/m^2
+    float max_luminance;                            //!< max 10% frame luminance, cd/m^2
+
+    float hdrBrightnessLuminanceScalingFactor;      //!< HDR brightness luminance scaling factor applied by GPU on output pixels
+
+    float red_primary_x;                            //!< red primary chromaticity coordinate x
+    float red_primary_y;                            //!< red primary chromaticity coordinate y
+    float green_primary_x;                          //!< green primary chromaticity coordinate x
+    float green_primary_y;                          //!< green primary chromaticity coordinate y
+    float blue_primary_x;                           //!< blue primary chromaticity coordinate x
+    float blue_primary_y;                           //!< blue primary chromaticity coordinate y
+    float white_point_x;                            //!< white point chromaticity coordinate x
+    float white_point_y;                            //!< white point chromaticity coordinate y
+} NV_DISPLAY_COLORIMETRY_CHANGE_EVENT_DATA;
+
+//! Callback for Display Colorimetry change events
+typedef void(__cdecl *NVAPI_CALLBACK_DISPLAY_COLORIMETRY_CHANGE_EVENT)(NV_DISPLAY_COLORIMETRY_CHANGE_EVENT_DATA* pEventData, void *callbackParam);
+
+
 //! Enum for Event IDs
 typedef enum
 {
     NV_EVENT_TYPE_NONE = 0,
     NV_EVENT_TYPE_QSYNC = 6,
+    NV_EVENT_TYPE_DISPLAY_OUTPUT_MODE_CHANGE = 103,
+    NV_EVENT_TYPE_DISPLAY_COLORIMETRY_CHANGE = 104,
 } NV_EVENT_TYPE;
 
 //! Core NV_EVENT_REGISTER_CALLBACK structure declaration
@@ -3655,6 +3690,8 @@ typedef struct
     union
     {
         NVAPI_CALLBACK_QSYNCEVENT    nvQSYNCEventCallback;                     //!< Callback function pointer for QSYNC events
+        NVAPI_CALLBACK_DISPLAY_OUTPUT_MODE_CHANGE_EVENT    nvDisplayOutputModeChangeEventCallback;  //!< Callback function pointer for Display Output Mode change events
+        NVAPI_CALLBACK_DISPLAY_COLORIMETRY_CHANGE_EVENT    nvDisplayColorimetryChangeEventCallback; //!< Callback function pointer for Display Colorimetry change events
     }nvCallBackFunc;
 
 } NV_EVENT_REGISTER_CALLBACK, *PNV_EVENT_REGISTER_CALLBACK;
@@ -7812,7 +7849,8 @@ typedef struct _NV_HDR_CAPABILITIES_V3
     NvU32 isDolbyVisionSupported                :1;                 //!< Dolby Vision Support. Boolean: 0 = not supported, 1 = supported;
     NvU32 isHdr10PlusSupported                  :1;                 //!< HDR10+ (Sink Side Tonemapping) is supported
     NvU32 isHdr10PlusGamingSupported            :1;                 //!< HDR10+ Gaming, a.k.a HDR10+ Source Side Tonemapping (SSTM), is supported
-    NvU32 reserved                              :24;
+    NvU32 isNvidiaCertifiedDisplay              :1;                 //!< Nvidia certified HDR display
+    NvU32 reserved                              :23;
 
     NV_STATIC_METADATA_DESCRIPTOR_ID static_metadata_descriptor_id; //!< Static Metadata Descriptor Id (0 for static metadata type 1)
 
@@ -8232,6 +8270,50 @@ NVAPI_INTERFACE NvAPI_Disp_SetHdrToneMapping(__in NvU32 displayId, __in NV_HDR_T
 //
 ///////////////////////////////////////////////////////////////////////////////
 NVAPI_INTERFACE NvAPI_Disp_GetHdrToneMapping(__in NvU32 displayId, __inout NV_HDR_TONEMAPPING_METHOD* pHdrTonemapping);
+
+typedef struct _NV_DISPLAY_COLORIMETRY_V1
+{
+    NvU32    version;                               //!< Version of this structure
+
+    float min_luminance;                            //!< min luminance, cd/m^2
+    float max_full_frame_luminance;                 //!< max 100% frame luminance, cd/m^2
+    float max_luminance;                            //!< max 10% frame luminance, cd/m^2
+
+    float hdrBrightnessLuminanceScalingFactor;      //!< HDR brightness luminance scaling factor applied by GPU on output pixels
+
+    float red_primary_x;                            //!< red primary chromaticity coordinate x
+    float red_primary_y;                            //!< red primary chromaticity coordinate y
+    float green_primary_x;                          //!< green primary chromaticity coordinate x
+    float green_primary_y;                          //!< green primary chromaticity coordinate y
+    float blue_primary_x;                           //!< blue primary chromaticity coordinate x
+    float blue_primary_y;                           //!< blue primary chromaticity coordinate y
+    float white_point_x;                            //!< white point chromaticity coordinate x
+    float white_point_y;                            //!< white point chromaticity coordinate y
+} NV_DISPLAY_COLORIMETRY_V1;
+
+#define NV_DISPLAY_COLORIMETRY_VER1 MAKE_NVAPI_VERSION(NV_DISPLAY_COLORIMETRY_V1, 1)
+#define NV_DISPLAY_COLORIMETRY_VER NV_DISPLAY_COLORIMETRY_VER1
+typedef NV_DISPLAY_COLORIMETRY_V1 NV_DISPLAY_COLORIMETRY;
+
+///////////////////////////////////////////////////////////////////////////////
+// FUNCTION NAME:   NvAPI_Disp_GetColorimetry
+//
+//! \fn NvAPI_Disp_GetColorimetry(__in NvU32 displayId, __inout NV_DISPLAY_COLORIMETRY* pColorimetry)
+//! DESCRIPTION:    This API gets colorimetry parameters for the display.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release: 580
+//!
+//! \param [in]  displayId          display identifier
+//! \param [out] pColorimetry       display colorimetry
+//!
+//! \return    This API can return any of the error codes enumerated in #NvAPI_Status. If there are return error codes with
+//!            specific meaning for this API, they are listed below.
+//
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_Disp_GetColorimetry(__in NvU32 displayId, __inout NV_DISPLAY_COLORIMETRY* pColorimetry);
 //! @}
 
 //! \ingroup dispcontrol
@@ -8880,10 +8962,10 @@ typedef struct _NV_GET_ADAPTIVE_SYNC_DATA_V1
                                           //!<         If default values from EDID are used, this parameter returns 0.
     NvU32  bDisableAdaptiveSync : 1;      //!< [out]   Indicates if adaptive sync is disabled on the display.
     NvU32  bDisableFrameSplitting : 1;    //!< [out]   Indicates if frame splitting is disabled on the display.
-    NvU32  reserved : 30;                 //!< reserved for future use.
+    NvU32  reserved : 30;                 //!<         reserved for future use.
     NvU32  lastFlipRefreshCount;          //!< [out]   Number of times the last flip was shown on the screen
     NvU64  lastFlipTimeStamp;             //!< [out]   Timestamp for the lastest flip on the screen
-    NvU32  reservedEx[4];                 //!< reserved for future use.
+    NvU32  reservedEx[4];                 //!<         reserved for future use.
 } NV_GET_ADAPTIVE_SYNC_DATA_V1;
 
 #define NV_GET_ADAPTIVE_SYNC_DATA_VER1  MAKE_NVAPI_VERSION(NV_GET_ADAPTIVE_SYNC_DATA_V1,1)
@@ -8917,11 +8999,14 @@ typedef struct _NV_SET_ADAPTIVE_SYNC_DATA_V1
 {
     NvU32  version ;                      //!< [in]    structure version
     NvU32  maxFrameInterval;              //!< [in]    maximum frame interval in micro seconds.
-                                          //!<         If maxFrameInterval is send as 0, default values from EDID will be used.
+                                          //!<         If maxFrameInterval is sent as 0, default values from EDID will be used.
     NvU32  bDisableAdaptiveSync : 1;      //!< [in]    Indicates if adaptive sync is disabled on the display.
     NvU32  bDisableFrameSplitting : 1;    //!< [in]    Indicates if Frame Splitting should be disabled.
-    NvU32  reserved : 30;                 //!< reserved for future use.
-    NvU32  reservedEx[7];                 //!< reserved for future use.
+    NvU32  reserved : 30;                 //!<         reserved for future use.
+    NvU32  reserved1;                     //!<         Ensure the alignment is 8 bytes and reserve it for future use.
+    NvU64  maxFrameIntervalNs;            //!< [in]    maximum frame interval in nano seconds.
+                                          //!<         If maxFrameIntervalNs is sent as 0, default values from EDID will be used.
+    NvU32  reservedEx[4];                 //!<         reserved for future use.
 } NV_SET_ADAPTIVE_SYNC_DATA_V1;
 
 #define NV_SET_ADAPTIVE_SYNC_DATA_VER1  MAKE_NVAPI_VERSION(NV_SET_ADAPTIVE_SYNC_DATA_V1,1)
@@ -8957,14 +9042,25 @@ typedef struct _NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1
     NvU32  version;                       //!< [in]    structure version
     NvU32  frameIntervalUs;               //!< [out]   frame interval in micro seconds if Virtual RR is currently applied
     NvU32  rrx1k;                         //!< [out]   Refresh Rate * 1000
-    NvU32  bIsGamingVrr;                     //!< [out]   If the content is Gaming
-    NvU32  reservedEx[6];                 //!< reserved for future use.
+    NvU32  bIsGamingVrr;                  //!< [out]   If the content is Gaming
+    NvU32  reservedEx[6];                 //!<         reserved for future use.
 } NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1;
 
-#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER1  MAKE_NVAPI_VERSION(_NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1,1)
-#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER   NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER1
+typedef struct _NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2
+{
+    NvU32  version;                       //!< [in]    structure version
+    NvU32  frameIntervalUs;               //!< [out]   frame interval in micro seconds if Virtual RR is currently applied. This variable is deprecated in V2 and should not be used.
+    NvU32  rrx1k;                         //!< [out]   Refresh Rate * 1000
+    NvU32  bIsGamingVrr;                  //!< [out]   If the content is Gaming
+    NvU64  frameIntervalNs;               //!< [out]   frame interval in nano seconds if Virtual RR is currently applied
+    NvU32  reservedEx[4];                 //!<         reserved for future use.
+} NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2;
 
-typedef NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1  NV_GET_VIRTUAL_REFRESH_RATE_DATA;
+#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER1  MAKE_NVAPI_VERSION(_NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1,1)
+#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER2  MAKE_NVAPI_VERSION(_NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2,2)
+#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER   NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER2
+
+typedef NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2  NV_GET_VIRTUAL_REFRESH_RATE_DATA;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -8993,14 +9089,25 @@ typedef struct _NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1
     NvU32  version;                       //!< [in]   structure version
     NvU32  frameIntervalUs;               //!< [in]   frame interval in micro seconds if Virtual RR is currently applied
     NvU32  rrx1k;                         //!< [in]   Refresh Rate * 1000
-    NvU32  bIsGamingVrr;                     //!< [in]   If the content is Gaming
-    NvU32  reservedEx[6];                 //!< reserved for future use.
+    NvU32  bIsGamingVrr;                  //!< [in]   If the content is Gaming
+    NvU32  reservedEx[6];                 //!<        reserved for future use.
 } NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1;
 
-#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER1  MAKE_NVAPI_VERSION(_NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1,1)
-#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER   NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER1
+typedef struct _NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2
+{
+    NvU32  version;                       //!< [in]   structure version
+    NvU32  frameIntervalUs;               //!< [in]   frame interval in micro seconds if Virtual RR is currently applied. This variable is deprecated in V2 and should not be used.
+    NvU32  rrx1k;                         //!< [in]   Refresh Rate * 1000
+    NvU32  bIsGamingVrr;                  //!< [in]   If the content is Gaming
+    NvU64  frameIntervalNs;               //!< [in]   frame interval in nano seconds if Virtual RR is currently applied
+    NvU32  reservedEx[4];                 //!<        reserved for future use.
+} NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2;
 
-typedef NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1  NV_SET_VIRTUAL_REFRESH_RATE_DATA;
+#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER1  MAKE_NVAPI_VERSION(_NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1,1)
+#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER2  MAKE_NVAPI_VERSION(_NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2,2)
+#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER   NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER2
+
+typedef NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2  NV_SET_VIRTUAL_REFRESH_RATE_DATA;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -15562,8 +15669,7 @@ NVAPI_INTERFACE NvAPI_D3D_IsGSyncCapable(__in IUnknown *pDeviceOrContext, __in N
 NVAPI_INTERFACE NvAPI_D3D_IsGSyncActive(__in IUnknown *pDeviceOrContext, __in NVDX_ObjectHandle primarySurface, __out BOOL *pIsGsyncActive);
 #endif //if defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d11_h__)
 
-
-
+//! \ingroup dx
 //! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && ( defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__) || defined(__d3d12_h__)) 
@@ -20492,11 +20598,11 @@ typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_F
 //! \ingroup dx
 typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE
 {
-    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_MOVE_CLUSTER_OBJECT                     = 0, //!< Copies/moves CLAS, Cluster BLAS or Templates, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MOVES_DESC as desc. Alignment requirement depends on the type of object moved.
-    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_BLAS_FROM_CLAS                    = 1, //!< Constructs Cluster BLAS from arrays of CLAS addresses, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_CLAS_DESC as desc. Alignment of Cluster BLAS is a multiple of D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BYTE_ALIGNMENT.
-    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLAS_FROM_TRIANGLES               = 2, //!< Constructs CLAS from triangle data, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TRIANGLES_DESC as desc. Alignment of CLAS is a multiple of NVAPI_D3D12_RAYTRACING_CLAS_BYTE_ALIGNMENT.
-    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLUSTER_TEMPLATES_FROM_TRIANGLES  = 3, //!< Constructs Cluster Templates from triangle data, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TRIANGLES_DESC as desc. Alignment of Cluster Templates is a multiple of NVAPI_D3D12_RAYTRACING_CLUSTER_TEMPLATE_BYTE_ALIGNMENT.
-    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_INSTANTIATE_CLUSTER_TEMPLATES           = 4, //!< Instantiates Cluster Templates to create CLAS results, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TRIANGLES_DESC as desc. Alignment of CLAS is a multiple of NVAPI_D3D12_RAYTRACING_CLAS_BYTE_ALIGNMENT.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_MOVE_CLUSTER_OBJECT                     = 0, //!< Copies/moves CLAS, Cluster BLAS or Templates, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_MOVES_DESC as desc. Alignment requirement depends on the type of object moved.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_BLAS_FROM_CLAS                    = 1, //!< Constructs Cluster BLAS from arrays of CLAS addresses, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_CLAS_DESC as desc. Alignment of Cluster BLAS is a multiple of D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BYTE_ALIGNMENT.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLAS_FROM_TRIANGLES               = 2, //!< Constructs CLAS from triangle data, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC as desc. Alignment of CLAS is a multiple of NVAPI_D3D12_RAYTRACING_CLAS_BYTE_ALIGNMENT.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLUSTER_TEMPLATES_FROM_TRIANGLES  = 3, //!< Constructs Cluster Templates from triangle data, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC as desc. Alignment of Cluster Templates is a multiple of NVAPI_D3D12_RAYTRACING_CLUSTER_TEMPLATE_BYTE_ALIGNMENT.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_INSTANTIATE_CLUSTER_TEMPLATES           = 4, //!< Instantiates Cluster Templates to create CLAS results, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC as desc. Alignment of CLAS is a multiple of NVAPI_D3D12_RAYTRACING_CLAS_BYTE_ALIGNMENT.
 } NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE;
 
 //! Specifies the index format to use for cluster operations.
@@ -20723,6 +20829,7 @@ typedef struct _NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_MOV
 {
     D3D12_GPU_VIRTUAL_ADDRESS            srcAccelerationStructure;  //!< [in] The address of the object to copy/move. The source object will not become clobbered unless the destinations of the call overlap with it.
 } NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_MOVE_ARGS;
+
 
 //! Enumeration listing permitted address resolution flag values for NvAPI_D3D12_RaytracingMultiIndirectClusterOperation
 //! Unless flags are set, each address in NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_DESC will point directly to the data value or array of data values
@@ -25213,7 +25320,8 @@ typedef enum _NV_RISE_CONTENT_TYPE
     NV_RISE_CONTENT_TYPE_INSTALLING               = 5,
     NV_RISE_CONTENT_TYPE_PROGRESS_UPDATE          = 6,
     NV_RISE_CONTENT_TYPE_READY                    = 7,
-    NV_RISE_CONTENT_TYPE_DOWNLOAD_REQUEST         = 8
+    NV_RISE_CONTENT_TYPE_DOWNLOAD_REQUEST         = 8,
+    NV_RISE_CONTENT_TYPE_UPDATE_INFO              = 9,
 } NV_RISE_CONTENT_TYPE;
 
 /*!
