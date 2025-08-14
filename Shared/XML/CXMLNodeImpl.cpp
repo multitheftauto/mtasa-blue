@@ -328,7 +328,7 @@ void CXMLNodeImpl::SetTagContent(float fContent)
 {
     // Convert to string and set it
     char szBuffer[40];
-    snprintf(szBuffer, sizeof(szBuffer), "%f", fContent);
+    sprintf(szBuffer, "%f", fContent);
     SetTagContent(szBuffer);
 }
 

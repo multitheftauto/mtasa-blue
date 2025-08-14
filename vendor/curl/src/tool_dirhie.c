@@ -23,55 +23,59 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
+#include <sys/stat.h>
+
 #if defined(_WIN32) && !defined(UNDER_CE)
 #  include <direct.h>
 #endif
 
+#include <curlx.h>
+
 #include "tool_dirhie.h"
 #include "tool_msgs.h"
 
-#include "memdebug.h" /* keep this as LAST include */
+#include <memdebug.h> /* keep this as LAST include */
 
 #if defined(_WIN32) || (defined(MSDOS) && !defined(__DJGPP__))
 #  define mkdir(x,y) (mkdir)((x))
 #  ifndef F_OK
-#  define F_OK 0
+#    define F_OK 0
 #  endif
 #endif
 
-static void show_dir_errno(const char *name)
+static void show_dir_errno(struct GlobalConfig *global, const char *name)
 {
   switch(errno) {
 #ifdef EACCES
   /* !checksrc! disable ERRNOVAR 1 */
   case EACCES:
-    errorf("You do not have permission to create %s", name);
+    errorf(global, "You do not have permission to create %s", name);
     break;
 #endif
 #ifdef ENAMETOOLONG
   case ENAMETOOLONG:
-    errorf("The directory name %s is too long", name);
+    errorf(global, "The directory name %s is too long", name);
     break;
 #endif
 #ifdef EROFS
   case EROFS:
-    errorf("%s resides on a read-only file system", name);
+    errorf(global, "%s resides on a read-only file system", name);
     break;
 #endif
 #ifdef ENOSPC
   case ENOSPC:
-    errorf("No space left on the file system that will "
+    errorf(global, "No space left on the file system that will "
            "contain the directory %s", name);
     break;
 #endif
 #ifdef EDQUOT
   case EDQUOT:
-    errorf("Cannot create directory %s because you "
+    errorf(global, "Cannot create directory %s because you "
            "exceeded your quota", name);
     break;
 #endif
   default:
-    errorf("Error creating directory %s", name);
+    errorf(global, "Error creating directory %s", name);
     break;
   }
 }
@@ -90,7 +94,7 @@ static void show_dir_errno(const char *name)
 #define PATH_DELIMITERS DIR_CHAR
 #endif
 
-CURLcode create_dir_hierarchy(const char *outfile)
+CURLcode create_dir_hierarchy(const char *outfile, struct GlobalConfig *global)
 {
   CURLcode result = CURLE_OK;
   size_t outlen = strlen(outfile);
@@ -126,9 +130,9 @@ CURLcode create_dir_hierarchy(const char *outfile)
 
     /* Create directory. Ignore access denied error to allow traversal. */
     /* !checksrc! disable ERRNOVAR 1 */
-    if(!skip && (mkdir(curlx_dyn_ptr(&dirbuf), (mode_t)0000750) == -1) &&
+    if(!skip && (-1 == mkdir(curlx_dyn_ptr(&dirbuf), (mode_t)0000750)) &&
        (errno != EACCES) && (errno != EEXIST)) {
-      show_dir_errno(curlx_dyn_ptr(&dirbuf));
+      show_dir_errno(global, curlx_dyn_ptr(&dirbuf));
       result = CURLE_WRITE_ERROR;
       break; /* get out of loop */
     }

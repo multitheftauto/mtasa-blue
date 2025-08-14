@@ -26,7 +26,6 @@
 #include "CWorldSA.h"
 
 #include "enums/VehicleClass.h"
-#include <new>
 
 extern CGameSA* pGame;
 
@@ -243,7 +242,7 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
-        pObject = new (std::nothrow) CObjectSA(dwModelID, bBreakingDisabled);
+        pObject = new CObjectSA(dwModelID, bBreakingDisabled);
 
         if (pObject && AddObjectToPool(pClientObject, pObject))
         {

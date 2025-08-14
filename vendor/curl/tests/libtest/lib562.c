@@ -21,7 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
+
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
 
 #include "memdebug.h"
 
@@ -33,7 +37,7 @@
 
  */
 
-static CURLcode test_lib562(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;

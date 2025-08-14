@@ -118,25 +118,4 @@ namespace SharedUtil
     {
 	    return std::fabs(a - b) <= epsilon;
     }
-
-    inline bool ApproximatelyEqual(float a, float b, float epsilon = std::numeric_limits<float>().epsilon()) noexcept
-    {
-        return std::fabs(a - b) <= std::max(std::fabs(a), std::fabs(b)) * epsilon;
-    }
-
-    inline bool EssentiallyEqual(float a, float b, float epsilon = std::numeric_limits<float>().epsilon()) noexcept
-    {
-        return std::fabs(a - b) <= std::min(std::fabs(a), std::fabs(b)) * epsilon;
-    }
-
-    inline bool DefinitelyGreaterThan(float a, float b, float epsilon = std::numeric_limits<float>().epsilon()) noexcept
-    {
-        return (a - b) > std::max(std::fabs(a), std::fabs(b)) * epsilon;
-    }
-
-    inline bool DefinitelyLessThan(float a, float b, float epsilon = std::numeric_limits<float>().epsilon()) noexcept
-    {
-        return (b - a) > std::max(std::fabs(a), std::fabs(b)) * epsilon;
-    }
-
 }            // namespace SharedUtil

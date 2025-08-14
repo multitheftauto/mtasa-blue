@@ -19,6 +19,11 @@
 #ifndef FTGRAYS_H_
 #define FTGRAYS_H_
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
+
+
 #ifdef STANDALONE_
 #include "ftimage.h"
 #else
@@ -26,7 +31,6 @@
 #include <freetype/ftimage.h>
 #endif
 
-FT_BEGIN_HEADER
 
   /**************************************************************************
    *
@@ -42,7 +46,10 @@ FT_BEGIN_HEADER
 
   FT_EXPORT_VAR( const FT_Raster_Funcs )  ft_grays_raster;
 
-FT_END_HEADER
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif /* FTGRAYS_H_ */
 

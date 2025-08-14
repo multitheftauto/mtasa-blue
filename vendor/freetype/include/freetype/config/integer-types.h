@@ -17,8 +17,6 @@
 #ifndef FREETYPE_CONFIG_INTEGER_TYPES_H_
 #define FREETYPE_CONFIG_INTEGER_TYPES_H_
 
-FT_BEGIN_HEADER
-
   /* There are systems (like the Texas Instruments 'C54x) where a `char`  */
   /* has 16~bits.  ANSI~C says that `sizeof(char)` is always~1.  Since an */
   /* `int` has 16~bits also for this system, `sizeof(int)` gives~1 which  */
@@ -244,34 +242,9 @@ FT_BEGIN_HEADER
 #endif /* FT_SIZEOF_LONG == (64 / FT_CHAR_BIT) */
 
 #ifdef FT_INT64
-
   typedef FT_INT64   FT_Int64;
   typedef FT_UINT64  FT_UInt64;
+#endif
 
-#  define FT_INT64_ZERO  0
-
-#else  /* !FT_INT64 */
-
-  /* we need to emulate 64-bit data types if none are available */
-
-  typedef struct  FT_Int64_
-  {
-    FT_UInt32  lo;
-    FT_UInt32  hi;
-
-  } FT_Int64;
-
-  typedef struct  FT_UInt64_
-  {
-    FT_UInt32  lo;
-    FT_UInt32  hi;
-
-  } FT_UInt64;
-
-#  define FT_INT64_ZERO  { 0, 0 }
-
-#endif /* !FT_INT64 */
-
-FT_END_HEADER
 
 #endif  /* FREETYPE_CONFIG_INTEGER_TYPES_H_ */

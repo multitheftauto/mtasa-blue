@@ -128,8 +128,8 @@ FT_BEGIN_HEADER
    * before a function declaration.
    */
 
-  /* Visual C, MinGW, Cygwin */
-#if defined( _WIN32 ) || defined( __CYGWIN__ )
+  /* Visual C, mingw */
+#if defined( _WIN32 )
 #define FT_INTERNAL_FUNCTION_ATTRIBUTE  /* empty */
 
   /* gcc, clang */

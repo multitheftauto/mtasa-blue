@@ -51,7 +51,7 @@
 #define COLOR_STOP_SIZE                   6U
 #define VAR_IDX_BASE_SIZE                 4U
 #define LAYER_SIZE                        4U
-/* https://learn.microsoft.com/typography/opentype/spec/colr#colr-header */
+/* https://docs.microsoft.com/en-us/typography/opentype/spec/colr#colr-header */
 /* 3 * uint16 + 2 * Offset32 */
 #define COLRV0_HEADER_SIZE               14U
 /* COLRV0_HEADER_SIZE + 5 * Offset32 */

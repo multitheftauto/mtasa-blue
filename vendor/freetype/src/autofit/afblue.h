@@ -314,17 +314,14 @@ FT_BEGIN_HEADER
   /* Properties are specific to a writing system.  We assume that a given  */
   /* blue string can't be used in more than a single writing system, which */
   /* is a safe bet.                                                        */
-#define AF_BLUE_PROPERTY_LATIN_TOP       ( 1U << 0 )    /* must be value 1 */
+#define AF_BLUE_PROPERTY_LATIN_TOP       ( 1U << 0 )  /* must have value 1 */
 #define AF_BLUE_PROPERTY_LATIN_SUB_TOP   ( 1U << 1 )
 #define AF_BLUE_PROPERTY_LATIN_NEUTRAL   ( 1U << 2 )
 #define AF_BLUE_PROPERTY_LATIN_X_HEIGHT  ( 1U << 3 )
 #define AF_BLUE_PROPERTY_LATIN_LONG      ( 1U << 4 )
 
-#define AF_BLUE_PROPERTY_LATIN_CAPITAL_BOTTOM  ( 1U << 5 )
-#define AF_BLUE_PROPERTY_LATIN_SMALL_BOTTOM    ( 1U << 6 )
-
-#define AF_BLUE_PROPERTY_CJK_TOP    ( 1U << 0 )         /* must be value 1 */
-#define AF_BLUE_PROPERTY_CJK_HORIZ  ( 1U << 1 )         /* must be value 2 */
+#define AF_BLUE_PROPERTY_CJK_TOP    ( 1U << 0 )       /* must have value 1 */
+#define AF_BLUE_PROPERTY_CJK_HORIZ  ( 1U << 1 )       /* must have value 2 */
 #define AF_BLUE_PROPERTY_CJK_RIGHT  AF_BLUE_PROPERTY_CJK_TOP
 
 

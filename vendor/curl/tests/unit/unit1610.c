@@ -21,26 +21,29 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "curl_sha256.h"
 
-static CURLcode t1610_setup(void)
+static CURLcode unit_setup(void)
 {
   CURLcode res = CURLE_OK;
   global_init(CURL_GLOBAL_ALL);
   return res;
 }
 
-static CURLcode test_unit1610(const char *arg)
+static void unit_stop(void)
 {
-  UNITTEST_BEGIN(t1610_setup())
+  curl_global_cleanup();
+}
 
-#if !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH) || \
-  defined(USE_LIBSSH2)
+UNITTEST_START
 
-  static const char string1[] = "1";
-  static const char string2[] = "hello-you-fool";
+#if !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH) \
+    || defined(USE_LIBSSH2)
+
+  const char string1[] = "1";
+  const char string2[] = "hello-you-fool";
   unsigned char output[CURL_SHA256_DIGEST_LENGTH];
   unsigned char *testp = output;
 
@@ -59,5 +62,5 @@ static CURLcode test_unit1610(const char *arg)
                 "\x15\xae", CURL_SHA256_DIGEST_LENGTH);
 #endif
 
-  UNITTEST_END(curl_global_cleanup())
-}
+
+UNITTEST_STOP

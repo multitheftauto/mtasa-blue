@@ -850,9 +850,6 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
                 }
      
                 break;
-            case MENU_ITEM_QUICK_CONNECT:
-                AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
-                return true;
             default:
                 break;
         }
@@ -917,8 +914,7 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
             ShowNetworkNotReadyWindow();
             return true;
         }
-        
-        g_pCore->GetConnectManager()->SetQuickConnect(true);
+
         g_pCore->GetCommands()->Execute("reconnect", "");
     }
     else
@@ -1265,9 +1261,6 @@ void CMainMenu::WantsToDisconnectCallBack(void* pData, uint uiButton)
                 break;
             case MENU_ITEM_DISCONNECT:
                 OnDisconnectButtonClick();
-                break;
-            case MENU_ITEM_QUICK_CONNECT:
-                OnQuickConnectButtonClick(nullptr, true);
                 break;
             default:
                 break;

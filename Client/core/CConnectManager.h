@@ -26,14 +26,10 @@ public:
 
     bool Abort();
 
-    bool WasQuickConnect() const noexcept { return m_quickConnect; }
-
     void DoPulse();
 
     void OnServerExists();
 
-    void SetQuickConnect(bool quick) noexcept { m_quickConnect = quick; }
-    
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 
     static bool StaticProcessPacket(unsigned char ucPacketID, class NetBitStreamInterface& bitStream);
@@ -63,5 +59,4 @@ private:
     bool             m_bNotifyServerBrowser;
 
     bool CheckNickProvided(const char* szNick);
-    bool m_quickConnect{false};
 };

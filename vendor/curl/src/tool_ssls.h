@@ -27,9 +27,11 @@
 #include "tool_operate.h"
 
 
-CURLcode tool_ssls_load(struct OperationConfig *config,
+CURLcode tool_ssls_load(struct GlobalConfig *global,
+                        struct OperationConfig *config,
                         CURLSH *share, const char *filename);
-CURLcode tool_ssls_save(struct OperationConfig *config,
+CURLcode tool_ssls_save(struct GlobalConfig *global,
+                        struct OperationConfig *config,
                         CURLSH *share, const char *filename);
 
 #endif /* HEADER_CURL_TOOL_SSLS_H */

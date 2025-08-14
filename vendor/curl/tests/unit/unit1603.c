@@ -21,15 +21,16 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
+#include <curlx.h>
 #include "hash.h"
+#include <memdebug.h> /* LAST include file */
 
-#include "memdebug.h" /* LAST include file */
-
+static struct Curl_hash hash_static;
 static const size_t slots = 3;
 
-static void t1603_mydtor(void *p)
+static void mydtor(void *p)
 {
   /* Data are statically allocated */
  (void)p; /* unused */
@@ -45,24 +46,19 @@ static void my_elem_dtor(void *key, size_t key_len, void *p)
   ++elem_dtor_calls;
 }
 
-static CURLcode t1603_setup(struct Curl_hash *hash_static)
+static CURLcode unit_setup(void)
 {
-  Curl_hash_init(hash_static, slots, Curl_hash_str,
-                 curlx_str_key_compare, t1603_mydtor);
+  Curl_hash_init(&hash_static, slots, Curl_hash_str,
+                 curlx_str_key_compare, mydtor);
   return CURLE_OK;
 }
 
-static void t1603_stop(struct Curl_hash *hash_static)
+static void unit_stop(void)
 {
-  Curl_hash_destroy(hash_static);
+  Curl_hash_destroy(&hash_static);
 }
 
-static CURLcode test_unit1603(const char *arg)
-{
-  struct Curl_hash hash_static;
-
-  UNITTEST_BEGIN(t1603_setup(&hash_static))
-
+UNITTEST_START
   char key1[] = "key1";
   char key2[] = "key2b";
   char key3[] = "key3";
@@ -174,8 +170,8 @@ static CURLcode test_unit1603(const char *arg)
   fail_unless(rc == 0, "hash delete failed");
   fail_unless(elem_dtor_calls == 2, "element destructor count should be 1");
 
+
   /* Clean up */
   Curl_hash_clean(&hash_static);
 
-  UNITTEST_END(t1603_stop(&hash_static))
-}
+UNITTEST_STOP

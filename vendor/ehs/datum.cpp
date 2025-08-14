@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define DATUM_BUFFER_SIZE 350
-
 #ifdef _WIN32
 #define strcasecmp stricmp
 #endif
@@ -28,8 +25,8 @@ Datum & Datum::operator= ( int inInt )
 }
 Datum & Datum::operator= ( double inDouble )
 {
-	char psBuffer [ DATUM_BUFFER_SIZE ];
-	snprintf ( psBuffer, DATUM_BUFFER_SIZE, "%lf", inDouble );
+	char psBuffer [ 100 ];
+	sprintf ( psBuffer, "%lf", inDouble );
 	sDatum = psBuffer;
 	return *this;
 }

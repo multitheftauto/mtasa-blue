@@ -117,7 +117,6 @@ ULONG CProxyDirect3DDevice9::Release()
         // Call event handler
         CDirect3DEvents9::OnDirect3DDeviceDestroy(m_pDevice);
         delete this;
-        return ulRefCount - 1;
     }
 
     return m_pDevice->Release();

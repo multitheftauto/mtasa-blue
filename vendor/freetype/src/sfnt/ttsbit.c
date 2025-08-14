@@ -342,7 +342,7 @@
             FT_TRACE2(( "tt_face_load_strike_metrics:"
                         " sanitizing invalid ascender and descender\n" ));
             FT_TRACE2(( "                            "
-                        " values for strike %lu (%dppem, %dppem)\n",
+                        " values for strike %ld (%dppem, %dppem)\n",
                         strike_index,
                         metrics->x_ppem, metrics->y_ppem ));
 
@@ -993,7 +993,7 @@
       goto Fail;
     }
 
-    FT_TRACE3(( "tt_sbit_decoder_load_compound: loading %u component%s\n",
+    FT_TRACE3(( "tt_sbit_decoder_load_compound: loading %d component%s\n",
                 num_components,
                 num_components == 1 ? "" : "s" ));
 
@@ -1419,7 +1419,7 @@
     image_start = image_offset + image_start;
 
     FT_TRACE3(( "tt_sbit_decoder_load_image:"
-                " found sbit (format %u) for glyph index %u\n",
+                " found sbit (format %d) for glyph index %d\n",
                 image_format, glyph_index ));
 
     return tt_sbit_decoder_load_bitmap( decoder,
@@ -1438,13 +1438,13 @@
     if ( recurse_count )
     {
       FT_TRACE4(( "tt_sbit_decoder_load_image:"
-                  " missing subglyph sbit with glyph index %u\n",
+                  " missing subglyph sbit with glyph index %d\n",
                   glyph_index ));
       return FT_THROW( Invalid_Composite );
     }
 
     FT_TRACE4(( "tt_sbit_decoder_load_image:"
-                " no sbit found for glyph index %u\n", glyph_index ));
+                " no sbit found for glyph index %d\n", glyph_index ));
     return FT_THROW( Missing_Bitmap );
   }
 

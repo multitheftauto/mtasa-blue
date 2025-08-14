@@ -21,24 +21,20 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
-static CURLcode test_lib544(const char *URL)
-{
-  CURL *curl;
-  CURLcode res = CURLE_OK;
-
-  static const char teststring_init[] = {
-    'T', 'h', 'i', 's', '\0', ' ', 'i', 's', ' ', 't', 'e', 's', 't', ' ',
+static char teststring[] =
+{   'T', 'h', 'i', 's', '\0', ' ', 'i', 's', ' ', 't', 'e', 's', 't', ' ',
     'b', 'i', 'n', 'a', 'r', 'y', ' ', 'd', 'a', 't', 'a', ' ',
     'w', 'i', 't', 'h', ' ', 'a', 'n', ' ',
     'e', 'm', 'b', 'e', 'd', 'd', 'e', 'd', ' ', 'N', 'U', 'L'};
 
-  char teststring[sizeof(teststring_init)];
-
-  memcpy(teststring, teststring_init, sizeof(teststring_init));
+CURLcode test(char *URL)
+{
+  CURL *curl;
+  CURLcode res = CURLE_OK;
 
   if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
     curl_mfprintf(stderr, "curl_global_init() failed\n");
@@ -55,8 +51,9 @@ static CURLcode test_lib544(const char *URL)
   /* First set the URL that is about to receive our POST. */
   test_setopt(curl, CURLOPT_URL, URL);
 
-  if(testnum == 545)
-    test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)sizeof(teststring));
+#ifdef LIB545
+  test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long) sizeof(teststring));
+#endif
 
   test_setopt(curl, CURLOPT_COPYPOSTFIELDS, teststring);
 

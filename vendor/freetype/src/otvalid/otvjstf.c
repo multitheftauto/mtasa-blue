@@ -163,7 +163,7 @@
     OTV_OPTIONAL_OFFSET( DefJstfLangSys );
     JstfLangSysCount = FT_NEXT_USHORT( p );
 
-    OTV_TRACE(( " (JstfLangSysCount = %u)\n", JstfLangSysCount ));
+    OTV_TRACE(( " (JstfLangSysCount = %d)\n", JstfLangSysCount ));
 
     table_size = JstfLangSysCount * 6 + 6;
 
@@ -227,7 +227,7 @@
 
     JstfScriptCount = FT_NEXT_USHORT( p );
 
-    FT_TRACE3(( " (JstfScriptCount = %u)\n", JstfScriptCount ));
+    FT_TRACE3(( " (JstfScriptCount = %d)\n", JstfScriptCount ));
 
     OTV_LIMIT_CHECK( JstfScriptCount * 6 );
 

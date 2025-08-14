@@ -70,13 +70,8 @@
     /* For incremental fonts get the character data using the */
     /* callback function.                                     */
     if ( inc )
-    {
-      /* So `free_glyph_data` knows whether to free it. */
-      char_string->pointer = NULL;
-
       error = inc->funcs->get_glyph_data( inc->object,
                                           glyph_index, char_string );
-    }
     else
 
 #endif /* FT_CONFIG_OPTION_INCREMENTAL */
@@ -159,9 +154,6 @@
       decoder->builder.advance.x      = INT_TO_FIXED( metrics.advance );
       decoder->builder.advance.y      = INT_TO_FIXED( metrics.advance_v );
     }
-
-    if ( error && inc )
-      inc->funcs->free_glyph_data( inc->object, char_string );
 
 #endif /* FT_CONFIG_OPTION_INCREMENTAL */
 
@@ -303,7 +295,7 @@
       {
         advances[nn] = 0;
 
-        FT_TRACE5(( "  idx %u: advance height 0 font units\n",
+        FT_TRACE5(( "  idx %d: advance height 0 font units\n",
                     first + nn ));
       }
 
@@ -341,7 +333,7 @@
       else
         advances[nn] = 0;
 
-      FT_TRACE5(( "  idx %u: advance width %ld font unit%s\n",
+      FT_TRACE5(( "  idx %d: advance width %ld font unit%s\n",
                   first + nn,
                   advances[nn],
                   advances[nn] == 1 ? "" : "s" ));
@@ -388,7 +380,7 @@
       goto Exit;
     }
 
-    FT_TRACE1(( "T1_Load_Glyph: glyph index %u\n", glyph_index ));
+    FT_TRACE1(( "T1_Load_Glyph: glyph index %d\n", glyph_index ));
 
     FT_ASSERT( ( face->len_buildchar == 0 ) == ( face->buildchar == NULL ) );
 

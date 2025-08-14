@@ -848,22 +848,10 @@
                     FT_Int  y_offset,
                     FT_Int  width )
   {
-#if USE_SQUARED_DISTANCES
-    FT_16D16 edge_threshold = ONE / 4;
-#else
-    FT_16D16 edge_threshold = ONE / 2;
-#endif
     ED*           to_check;
     FT_16D16      dist;
     FT_16D16_Vec  dist_vec;
 
-
-    /*
-     * Skip neighbor comparison if the distance is less than or equal to 0.5.
-     * When using squared distances, compare to 0.25 (= 0.5^2) instead.
-     */
-    if ( current->dist <= edge_threshold )
-      return;
 
     to_check = current + ( y_offset * width ) + x_offset;
 

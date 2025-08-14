@@ -1019,8 +1019,7 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
     }
 
     // Call it on all our children
-    CElementListSnapshotRef childrenList = GetChildrenListSnapshot();
-	for (CElement* pElement : *childrenList)
+    for (CElement* pElement : *GetChildrenListSnapshot())
     {
         if (!pElement->IsBeingDeleted())
         {
