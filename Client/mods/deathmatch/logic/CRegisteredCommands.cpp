@@ -49,7 +49,7 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     }
 
     // Check if we already have this key and handler
-    auto* pCommand = GetCommand(szKey, pLuaMain);
+    SCommand* pCommand = GetCommand(szKey, pLuaMain);
     if (pCommand)
     {
         if (pCommand->iLuaFunction == iLuaFunction)
