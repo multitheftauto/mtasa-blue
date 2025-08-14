@@ -21,20 +21,22 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
+
+#define TEST_HANG_TIMEOUT (60 * 1000)
 
 static int new_fnmatch(void *ptr,
                        const char *pattern, const char *string)
 {
   (void)ptr;
   curl_mfprintf(stderr, "lib574: match string '%s' against pattern '%s'\n",
-                string, pattern);
+          string, pattern);
   return CURL_FNMATCHFUNC_MATCH;
 }
 
-static CURLcode test_lib574(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode res;
   CURL *curl;
@@ -54,7 +56,7 @@ static CURLcode test_lib574(const char *URL)
   test_setopt(curl, CURLOPT_URL, URL);
   test_setopt(curl, CURLOPT_WILDCARDMATCH, 1L);
   test_setopt(curl, CURLOPT_FNMATCH_FUNCTION, new_fnmatch);
-  test_setopt(curl, CURLOPT_TIMEOUT_MS, (long)TEST_HANG_TIMEOUT);
+  test_setopt(curl, CURLOPT_TIMEOUT_MS, (long) TEST_HANG_TIMEOUT);
 
   res = curl_easy_perform(curl);
   if(res) {

@@ -33,6 +33,7 @@
 #include "llist.h"
 #include "hsts.h"
 #include "curl_get_line.h"
+#include "strcase.h"
 #include "sendf.h"
 #include "parsedate.h"
 #include "fopen.h"
@@ -154,7 +155,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
 
   do {
     curlx_str_passblanks(&p);
-    if(curl_strnequal("max-age", p, 7)) {
+    if(strncasecompare("max-age", p, 7)) {
       bool quoted = FALSE;
       int rc;
 
@@ -184,7 +185,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
       }
       gotma = TRUE;
     }
-    else if(curl_strnequal("includesubdomains", p, 17)) {
+    else if(strncasecompare("includesubdomains", p, 17)) {
       if(gotinc)
         return CURLE_BAD_FUNCTION_ARGUMENT;
       subdomains = TRUE;
@@ -271,15 +272,15 @@ struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
       if((subdomain && sts->includeSubDomains) && (ntail < hlen)) {
         size_t offs = hlen - ntail;
         if((hostname[offs-1] == '.') &&
-           curl_strnequal(&hostname[offs], sts->host, ntail) &&
+           strncasecompare(&hostname[offs], sts->host, ntail) &&
            (ntail > blen)) {
           /* save the tail match with the longest tail */
           bestsub = sts;
           blen = ntail;
         }
       }
-      /* avoid curl_strequal because the host name is not null-terminated */
-      if((hlen == ntail) && curl_strnequal(hostname, sts->host, hlen))
+      /* avoid strcasecompare because the host name is not null-terminated */
+      if((hlen == ntail) && strncasecompare(hostname, sts->host, hlen))
         return sts;
     }
   }
@@ -579,9 +580,5 @@ void Curl_hsts_loadfiles(struct Curl_easy *data)
     Curl_share_unlock(data, CURL_LOCK_DATA_HSTS);
   }
 }
-
-#if defined(DEBUGBUILD) || defined(UNITTESTS)
-#undef time
-#endif
 
 #endif /* CURL_DISABLE_HTTP || CURL_DISABLE_HSTS */

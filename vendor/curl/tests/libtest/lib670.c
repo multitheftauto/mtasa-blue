@@ -21,21 +21,27 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
+
+#include <time.h>
 
 #include "memdebug.h"
 
 #define PAUSE_TIME      5
 
-struct t670_ReadThis {
+
+static const char testname[] = "field";
+
+struct ReadThis {
   CURL *easy;
   time_t origin;
   int count;
 };
 
-static size_t t670_read_cb(char *ptr, size_t size, size_t nmemb, void *userp)
+
+static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
 {
-  struct t670_ReadThis *pooh = (struct t670_ReadThis *) userp;
+  struct ReadThis *pooh = (struct ReadThis *) userp;
   time_t delta;
 
   if(size * nmemb < 1)
@@ -59,16 +65,16 @@ static size_t t670_read_cb(char *ptr, size_t size, size_t nmemb, void *userp)
   exit(1);
 }
 
-static int t670_xferinfo(void *clientp,
-                         curl_off_t dltotal, curl_off_t dlnow,
-                         curl_off_t ultotal, curl_off_t ulnow)
+#if !defined(LIB670) && !defined(LIB672)
+static int xferinfo(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
+                    curl_off_t ultotal, curl_off_t ulnow)
 {
-  struct t670_ReadThis *pooh = (struct t670_ReadThis *) clientp;
+  struct ReadThis *pooh = (struct ReadThis *) clientp;
 
-  (void)dltotal;
-  (void)dlnow;
-  (void)ultotal;
-  (void)ulnow;
+  (void) dltotal;
+  (void) dlnow;
+  (void) ultotal;
+  (void) ulnow;
 
   if(pooh->origin) {
     time_t delta = time(NULL) - pooh->origin;
@@ -84,15 +90,27 @@ static int t670_xferinfo(void *clientp,
 
   return 0;
 }
+#endif
 
-static CURLcode test_lib670(const char *URL)
+CURLcode test(char *URL)
 {
-  static const char testname[] = "field";
-
+#if defined(LIB670) || defined(LIB671)
   curl_mime *mime = NULL;
+  curl_mimepart *part;
+#else
+  CURLFORMcode formrc;
   struct curl_httppost *formpost = NULL;
+  struct curl_httppost *lastptr = NULL;
+#endif
+#if defined(LIB670) || defined(LIB672)
+  CURLM *multi = NULL;
+  CURLMcode mres;
+  CURLMsg *msg;
+  int msgs_left;
+  int still_running = 0;
+#endif
 
-  struct t670_ReadThis pooh;
+  struct ReadThis pooh;
   CURLcode res = TEST_ERR_FAILURE;
 
   /*
@@ -117,131 +135,121 @@ static CURLcode test_lib670(const char *URL)
   /* include headers in the output */
   test_setopt(pooh.easy, CURLOPT_HEADER, 1L);
 
-  if(testnum == 670 || testnum == 671) {
-    curl_mimepart *part;
-    /* Build the mime tree. */
-    mime = curl_mime_init(pooh.easy);
-    part = curl_mime_addpart(mime);
-    res = curl_mime_name(part, testname);
-    if(res != CURLE_OK) {
-      curl_mfprintf(stderr,
-                 "Something went wrong when building the mime structure: %d\n",
-                 res);
-      goto test_cleanup;
-    }
-
-    res = curl_mime_data_cb(part, (curl_off_t) 2, t670_read_cb,
-                            NULL, NULL, &pooh);
-
-    /* Bind mime data to its easy handle. */
-    if(res == CURLE_OK)
-      test_setopt(pooh.easy, CURLOPT_MIMEPOST, mime);
-  }
-  else {
-    struct curl_httppost *lastptr = NULL;
-    CURLFORMcode formrc;
-    /* Build the form. */
-    formrc = curl_formadd(&formpost, &lastptr,
-                          CURLFORM_COPYNAME, testname,
-                          CURLFORM_STREAM, &pooh,
-                          CURLFORM_CONTENTLEN, (curl_off_t) 2,
-                          CURLFORM_END);
-    if(formrc) {
-      curl_mfprintf(stderr, "curl_formadd() = %d\n", formrc);
-      goto test_cleanup;
-    }
-
-    /* We want to use our own read function. */
-    test_setopt(pooh.easy, CURLOPT_READFUNCTION, t670_read_cb);
-
-    /* Send a multi-part formpost. */
-    test_setopt(pooh.easy, CURLOPT_HTTPPOST, formpost);
+#if defined(LIB670) || defined(LIB671)
+  /* Build the mime tree. */
+  mime = curl_mime_init(pooh.easy);
+  part = curl_mime_addpart(mime);
+  res = curl_mime_name(part, testname);
+  if(res != CURLE_OK) {
+    curl_mfprintf(stderr,
+            "Something went wrong when building the mime structure: %d\n",
+            res);
+    goto test_cleanup;
   }
 
-  if(testnum == 670 || testnum == 672) {
-    CURLMcode mres;
-    CURLM *multi;
-    /* Use the multi interface. */
-    multi = curl_multi_init();
-    mres = curl_multi_add_handle(multi, pooh.easy);
-    while(!mres) {
-      struct timeval timeout;
-      int rc = 0;
-      fd_set fdread;
-      fd_set fdwrite;
-      fd_set fdexcept;
-      int maxfd = -1;
-      int still_running = 0;
+  res = curl_mime_data_cb(part, (curl_off_t) 2, read_callback,
+                          NULL, NULL, &pooh);
 
-      mres = curl_multi_perform(multi, &still_running);
-      if(!still_running || mres != CURLM_OK)
-        break;
+  /* Bind mime data to its easy handle. */
+  if(res == CURLE_OK)
+    test_setopt(pooh.easy, CURLOPT_MIMEPOST, mime);
+#else
+  /* Build the form. */
+  formrc = curl_formadd(&formpost, &lastptr,
+                        CURLFORM_COPYNAME, testname,
+                        CURLFORM_STREAM, &pooh,
+                        CURLFORM_CONTENTLEN, (curl_off_t) 2,
+                        CURLFORM_END);
+  if(formrc) {
+    curl_mfprintf(stderr, "curl_formadd() = %d\n", (int) formrc);
+    goto test_cleanup;
+  }
 
-      if(pooh.origin) {
-        time_t delta = time(NULL) - pooh.origin;
+  /* We want to use our own read function. */
+  test_setopt(pooh.easy, CURLOPT_READFUNCTION, read_callback);
 
-        if(delta >= 4 * PAUSE_TIME) {
-          curl_mfprintf(stderr, "unpausing failed: drain problem?\n");
-          res = CURLE_OPERATION_TIMEDOUT;
-          break;
-        }
-
-        if(delta >= PAUSE_TIME)
-          curl_easy_pause(pooh.easy, CURLPAUSE_CONT);
-      }
-
-      FD_ZERO(&fdread);
-      FD_ZERO(&fdwrite);
-      FD_ZERO(&fdexcept);
-      timeout.tv_sec = 0;
-      timeout.tv_usec = 1000000 * PAUSE_TIME / 10;
-      mres = curl_multi_fdset(multi, &fdread, &fdwrite, &fdexcept, &maxfd);
-      if(mres)
-        break;
-#ifdef _WIN32
-      if(maxfd == -1)
-        curlx_wait_ms(100);
-      else
+  /* Send a multi-part formpost. */
+  test_setopt(pooh.easy, CURLOPT_HTTPPOST, formpost);
 #endif
-      rc = select(maxfd + 1, &fdread, &fdwrite, &fdexcept, &timeout);
-      if(rc == -1) {
-        curl_mfprintf(stderr, "Select error\n");
+
+#if defined(LIB670) || defined(LIB672)
+  /* Use the multi interface. */
+  multi = curl_multi_init();
+  mres = curl_multi_add_handle(multi, pooh.easy);
+  while(!mres) {
+    struct timeval timeout;
+    int rc = 0;
+    fd_set fdread;
+    fd_set fdwrite;
+    fd_set fdexcept;
+    int maxfd = -1;
+
+    mres = curl_multi_perform(multi, &still_running);
+    if(!still_running || mres != CURLM_OK)
+      break;
+
+    if(pooh.origin) {
+      time_t delta = time(NULL) - pooh.origin;
+
+      if(delta >= 4 * PAUSE_TIME) {
+        curl_mfprintf(stderr, "unpausing failed: drain problem?\n");
+        res = CURLE_OPERATION_TIMEDOUT;
         break;
+      }
+
+      if(delta >= PAUSE_TIME)
+        curl_easy_pause(pooh.easy, CURLPAUSE_CONT);
+    }
+
+    FD_ZERO(&fdread);
+    FD_ZERO(&fdwrite);
+    FD_ZERO(&fdexcept);
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 1000000 * PAUSE_TIME / 10;
+    mres = curl_multi_fdset(multi, &fdread, &fdwrite, &fdexcept, &maxfd);
+    if(mres)
+      break;
+#ifdef _WIN32
+    if(maxfd == -1)
+      Sleep(100);
+    else
+#endif
+    rc = select(maxfd + 1, &fdread, &fdwrite, &fdexcept, &timeout);
+    if(rc == -1) {
+      curl_mfprintf(stderr, "Select error\n");
+      break;
+    }
+  }
+
+  if(mres != CURLM_OK)
+    for(;;) {
+      msg = curl_multi_info_read(multi, &msgs_left);
+      if(!msg)
+        break;
+      if(msg->msg == CURLMSG_DONE) {
+        res = msg->data.result;
       }
     }
 
-    if(mres != CURLM_OK)
-      for(;;) {
-        int msgs_left;
-        CURLMsg *msg;
-        msg = curl_multi_info_read(multi, &msgs_left);
-        if(!msg)
-          break;
-        if(msg->msg == CURLMSG_DONE) {
-          res = msg->data.result;
-        }
-      }
+  curl_multi_remove_handle(multi, pooh.easy);
+  curl_multi_cleanup(multi);
 
-    curl_multi_remove_handle(multi, pooh.easy);
-    curl_multi_cleanup(multi);
-  }
-  else {
-    /* Use the easy interface. */
-    test_setopt(pooh.easy, CURLOPT_XFERINFODATA, &pooh);
-    test_setopt(pooh.easy, CURLOPT_XFERINFOFUNCTION, t670_xferinfo);
-    test_setopt(pooh.easy, CURLOPT_NOPROGRESS, 0L);
-    res = curl_easy_perform(pooh.easy);
-  }
+#else
+  /* Use the easy interface. */
+  test_setopt(pooh.easy, CURLOPT_XFERINFODATA, &pooh);
+  test_setopt(pooh.easy, CURLOPT_XFERINFOFUNCTION, xferinfo);
+  test_setopt(pooh.easy, CURLOPT_NOPROGRESS, 0L);
+  res = curl_easy_perform(pooh.easy);
+#endif
+
 
 test_cleanup:
   curl_easy_cleanup(pooh.easy);
-
-  if(testnum == 670 || testnum == 671) {
-    curl_mime_free(mime);
-  }
-  else {
-    curl_formfree(formpost);
-  }
+#if defined(LIB670) || defined(LIB671)
+  curl_mime_free(mime);
+#else
+  curl_formfree(formpost);
+#endif
 
   curl_global_cleanup();
   return res;

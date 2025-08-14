@@ -21,36 +21,33 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
-#include "uint-hash.h"
+#include <curlx.h>
+#include <uint-hash.h>
+#include <memdebug.h> /* LAST include file */
 
-#include "memdebug.h" /* LAST include file */
+static struct uint_hash hash_static;
 
-static void t1616_mydtor(unsigned int id, void *elem)
+static void mydtor(unsigned int id, void *elem)
 {
   int *ptr = (int *)elem;
   (void)id;
   free(ptr);
 }
 
-static CURLcode t1616_setup(struct uint_hash *hash)
+static CURLcode unit_setup(void)
 {
-  Curl_uint_hash_init(hash, 15, t1616_mydtor);
+  Curl_uint_hash_init(&hash_static, 15, mydtor);
   return CURLE_OK;
 }
 
-static void t1616_stop(struct uint_hash *hash)
+static void unit_stop(void)
 {
-  Curl_uint_hash_destroy(hash);
+  Curl_uint_hash_destroy(&hash_static);
 }
 
-static CURLcode test_unit1616(const char *arg)
-{
-  struct uint_hash hash;
-
-  UNITTEST_BEGIN(t1616_setup(&hash))
-
+UNITTEST_START
   int *value, *v;
   int *value2;
   bool ok;
@@ -58,31 +55,31 @@ static CURLcode test_unit1616(const char *arg)
   unsigned int key = 20;
   unsigned int key2 = 25;
 
+
   value = malloc(sizeof(int));
   abort_unless(value != NULL, "Out of memory");
   *value = 199;
-  ok = Curl_uint_hash_set(&hash, key, value);
+  ok = Curl_uint_hash_set(&hash_static, key, value);
   if(!ok)
     free(value);
   abort_unless(ok, "insertion into hash failed");
-  v = Curl_uint_hash_get(&hash, key);
+  v = Curl_uint_hash_get(&hash_static, key);
   abort_unless(v == value, "lookup present entry failed");
-  v = Curl_uint_hash_get(&hash, key2);
+  v = Curl_uint_hash_get(&hash_static, key2);
   abort_unless(!v, "lookup missing entry failed");
-  Curl_uint_hash_clear(&hash);
+  Curl_uint_hash_clear(&hash_static);
 
   /* Attempt to add another key/value pair */
   value2 = malloc(sizeof(int));
   abort_unless(value2 != NULL, "Out of memory");
   *value2 = 204;
-  ok = Curl_uint_hash_set(&hash, key2, value2);
+  ok = Curl_uint_hash_set(&hash_static, key2, value2);
   if(!ok)
     free(value2);
   abort_unless(ok, "insertion into hash failed");
-  v = Curl_uint_hash_get(&hash, key2);
+  v = Curl_uint_hash_get(&hash_static, key2);
   abort_unless(v == value2, "lookup present entry failed");
-  v = Curl_uint_hash_get(&hash, key);
+  v = Curl_uint_hash_get(&hash_static, key);
   abort_unless(!v, "lookup missing entry failed");
 
-  UNITTEST_END(t1616_stop(&hash))
-}
+UNITTEST_STOP

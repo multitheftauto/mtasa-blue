@@ -24,8 +24,8 @@
 
 #include "curl_setup.h"
 
-#if (defined(USE_CURL_NTLM_CORE) && !defined(USE_WINDOWS_SSPI)) || \
-  !defined(CURL_DISABLE_DIGEST_AUTH)
+#if (defined(USE_CURL_NTLM_CORE) && !defined(USE_WINDOWS_SSPI)) \
+    || !defined(CURL_DISABLE_DIGEST_AUTH)
 
 #include <string.h>
 #include <curl/curl.h>
@@ -57,7 +57,7 @@
   #endif
 #endif
 
-#ifdef USE_GNUTLS
+#if defined(USE_GNUTLS)
 #include <nettle/md5.h>
 #elif defined(USE_OPENSSL_MD5)
 #include <openssl/md5.h>
@@ -84,7 +84,7 @@
 #include "curl_memory.h"
 #include "memdebug.h"
 
-#ifdef USE_GNUTLS
+#if defined(USE_GNUTLS)
 
 typedef struct md5_ctx my_md5_ctx;
 
@@ -177,19 +177,19 @@ static void my_md5_update(void *ctx,
                           const unsigned char *data,
                           unsigned int length)
 {
-#ifndef HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS
-  (void)mbedtls_md5_update(ctx, data, length);
+#if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
+  (void) mbedtls_md5_update(ctx, data, length);
 #else
-  (void)mbedtls_md5_update_ret(ctx, data, length);
+  (void) mbedtls_md5_update_ret(ctx, data, length);
 #endif
 }
 
 static void my_md5_final(unsigned char *digest, void *ctx)
 {
-#ifndef HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS
-  (void)mbedtls_md5_finish(ctx, digest);
+#if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
+  (void) mbedtls_md5_finish(ctx, digest);
 #else
-  (void)mbedtls_md5_finish_ret(ctx, digest);
+  (void) mbedtls_md5_finish_ret(ctx, digest);
 #endif
 }
 

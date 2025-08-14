@@ -21,9 +21,15 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include <fcntl.h>
+
+#include "testutil.h"
+#include "warnless.h"
 #include "memdebug.h"
+
+#define TEST_HANG_TIMEOUT 60 * 1000
 
 /* 3x download!
  * 1. normal
@@ -31,7 +37,7 @@
  * 3. with multi interface
  */
 
-static CURLcode test_lib575(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *handle = NULL;
   CURL *duphandle = NULL;
