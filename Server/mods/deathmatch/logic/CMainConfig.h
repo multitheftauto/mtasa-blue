@@ -147,6 +147,7 @@ public:
     void                            OnTickRateChange();
     void                            OnAseSettingChange();
     void                            OnPlayerTriggeredEventIntervalChange();
+    void                            OnAllowMultiCommandHandlersChange();
 
     int GetPlayerTriggeredEventInterval() const { return m_iPlayerTriggeredEventIntervalMs; }
     int GetMaxPlayerTriggeredEventsPerInterval() const { return m_iMaxPlayerTriggeredEventsPerInterval; }

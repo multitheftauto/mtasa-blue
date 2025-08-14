@@ -19,7 +19,7 @@ public:
     CSyncSettingsPacket(){};
     CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
                         short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
-                        uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, uchar allowMultiCommandHandlers);
+                        uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, std::uint8_t multiCommandHandlerPolicy);
 
     ePacketID     GetPacketID() const { return PACKET_ID_SYNC_SETTINGS; };
     unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -36,5 +36,5 @@ public:
     uchar                 m_ucAllowFastSprintFix;
     uchar                 m_ucAllowDrivebyAnimationFix;
     uchar                 m_ucAllowShotgunDamageFix;
-    uchar                 m_allowMultiCommandHandlers;
+    std::uint8_t          m_multiCommandHandlerPolicy;
 };

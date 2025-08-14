@@ -30,21 +30,26 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
 
     if (CommandExists(szKey, nullptr))
     {
-        CClientGame::MultiCommandHandlerPolicy allowMultiHandlers = g_pClientGame->GetAllowMultiCommandHandlers();
+        const MultiCommandHandlerPolicy allowMultiHandlers = g_pClientGame->GetAllowMultiCommandHandlers();
         
-        // If not allowing duplicate handlers, throw error and block
-        if (allowMultiHandlers == CClientGame::MultiCommandHandlerPolicy::DISABLED)
+        switch (allowMultiHandlers)
         {
-            g_pClientGame->GetScriptDebugging()->LogError(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
-            return false;
+            case MultiCommandHandlerPolicy::BLOCK:
+                g_pClientGame->GetScriptDebugging()->LogError(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
+                return false;
+            
+            case MultiCommandHandlerPolicy::WARN:
+                g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
+                break;
+            
+            case MultiCommandHandlerPolicy::ALLOW:
+            default:
+                break;
         }
-        // If allowing with warning (default), log warning and proceed
-        else if (allowMultiHandlers == CClientGame::MultiCommandHandlerPolicy::ENABLED)
-            g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
     }
 
     // Check if we already have this key and handler
-    SCommand* pCommand = GetCommand(szKey, pLuaMain);
+    auto* pCommand = GetCommand(szKey, pLuaMain);
     if (pCommand)
     {
         if (pCommand->iLuaFunction == iLuaFunction)

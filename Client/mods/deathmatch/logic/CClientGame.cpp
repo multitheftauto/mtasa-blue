@@ -120,7 +120,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
-    m_allowMultiCommandHandlers = MultiCommandHandlerPolicy::ENABLED;
+    m_allowMultiCommandHandlers = MultiCommandHandlerPolicy::WARN;
 
     m_bIsPlayingBack = false;
     m_bFirstPlaybackFrame = false;

@@ -194,11 +194,6 @@ public:
         QUIT_TIMEOUT,
     };
     
-    enum class MultiCommandHandlerPolicy
-    {
-        DISABLED = 0,
-        ENABLED = 1
-    };
     enum
     {
         GLITCH_QUICKRELOAD,

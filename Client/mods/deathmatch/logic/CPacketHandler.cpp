@@ -5483,7 +5483,7 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
 
     uchar allowMultiCommandHandlers = 1;
     bitStream.Read(allowMultiCommandHandlers);
-    g_pClientGame->SetAllowMultiCommandHandlers(static_cast<CClientGame::MultiCommandHandlerPolicy>(allowMultiCommandHandlers));
+    g_pClientGame->SetAllowMultiCommandHandlers(static_cast<MultiCommandHandlerPolicy>(allowMultiCommandHandlers));
 
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = (ucUseAltPulseOrder != 0);
