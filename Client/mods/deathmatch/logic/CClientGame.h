@@ -381,6 +381,7 @@ public:
     void        ProcessServerControlBind(CControlFunctionBind* pBind);
 
     bool ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    CClientEntity* CheckClientSideEntityClick(float fScreenX, float fScreenY);
     bool AreCursorEventsEnabled() { return m_bCursorEventsEnabled; }
     void SetCursorEventsEnabled(bool bCursorEventsEnabled) { m_bCursorEventsEnabled = bCursorEventsEnabled; }
 

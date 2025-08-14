@@ -2325,6 +2325,55 @@ void CClientGame::ProcessServerControlBind(CControlFunctionBind* pBind)
     m_pNetAPI->RPC(KEY_BIND, bitStream.pBitStream);
 }
 
+CClientEntity* CClientGame::CheckClientSideEntityClick(float fScreenX, float fScreenY)
+{
+    if (!m_pMarkerManager)
+        return NULL;
+
+    CClientMarker* pClosestMarker = NULL;
+    float fClosestDist = 99999.9f;
+
+    CFastList<CClientMarker*>::const_iterator iter = m_pMarkerManager->m_Markers.begin();
+    for (; iter != m_pMarkerManager->m_Markers.end(); ++iter)
+    {
+        CClientMarker* pMarker = *iter;
+        if (pMarker && pMarker->IsStreamedIn() && pMarker->IsVisible())
+        {
+            CVector vecPosition;
+            pMarker->GetPosition(vecPosition);
+
+            CVector vecScreen;
+            g_pCore->GetGraphics()->CalcScreenCoors(&vecPosition, &vecScreen);
+            
+            if (pMarker->IsClientSideOnScreen())
+            {
+                CSphere boundingSphere = pMarker->GetWorldBoundingSphere();
+                
+                CVector vecEdgePos = boundingSphere.vecPosition;
+                vecEdgePos.fX += boundingSphere.fRadius;
+                
+                CVector vecCenterScreen, vecEdgeScreen;
+                g_pCore->GetGraphics()->CalcScreenCoors(&boundingSphere.vecPosition, &vecCenterScreen);
+                g_pCore->GetGraphics()->CalcScreenCoors(&vecEdgePos, &vecEdgeScreen);
+                
+                float fScreenRadius = abs(vecEdgeScreen.fX - vecCenterScreen.fX);
+                
+                float fDistX = vecCenterScreen.fX - fScreenX;
+                float fDistY = vecCenterScreen.fY - fScreenY;
+                float fDist = sqrt(fDistX * fDistX + fDistY * fDistY);
+
+                if (fDist < fScreenRadius && fDist < fClosestDist)
+                {
+                    fClosestDist = fDist;
+                    pClosestMarker = pMarker;
+                }
+            }
+        }
+    }
+
+    return pClosestMarker;
+}
+
 bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     bool bCursorForcedVisible = g_pCore->IsCursorForcedVisible();
@@ -2417,6 +2466,17 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                     if (pColPoint)
                     {
                         pColPoint->Destroy();
+                    }
+
+                    if (!pCollisionEntity)
+                    {
+                        CClientEntity* pClientSideEntity = CheckClientSideEntityClick((float)iX, (float)iY);
+                        if (pClientSideEntity)
+                        {
+                            pCollisionEntity = pClientSideEntity;
+                            if (!pClientSideEntity->IsLocalEntity())
+                                CollisionEntityID = pClientSideEntity->GetID();
+                        }
                     }
 
                     const char* szButton = NULL;
