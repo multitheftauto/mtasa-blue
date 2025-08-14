@@ -1633,7 +1633,7 @@
 
         default:
           FT_ERROR(( "t1_decoder_parse_charstrings:"
-                     " unhandled opcode %u\n", op ));
+                     " unhandled opcode %d\n", op ));
           goto Syntax_Error;
         }
 

@@ -207,7 +207,7 @@
 
       func = fmt_funcs_table[type];
       if ( !func )
-        GXV_TRACE(( "morx type %u is reserved\n", type ));
+        GXV_TRACE(( "morx type %d is reserved\n", type ));
 
       func( p, p + rest, gxvalid );
 

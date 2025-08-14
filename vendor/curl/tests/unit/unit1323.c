@@ -21,25 +21,34 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
-static CURLcode test_unit1323(const char *arg)
+#include "timeval.h"
+
+static CURLcode unit_setup(void)
 {
-  UNITTEST_BEGIN_SIMPLE
+  return CURLE_OK;
+}
 
-  struct a {
-    struct curltime first;
-    struct curltime second;
-    time_t result;
-  };
+static void unit_stop(void)
+{
 
+}
+
+struct a {
+  struct curltime first;
+  struct curltime second;
+  time_t result;
+};
+
+UNITTEST_START
+{
   struct a tests[] = {
     { {36762, 8345 }, {36761, 995926 }, 13 },
     { {36761, 995926 }, {36762, 8345 }, -13 },
     { {36761, 995926 }, {0, 0}, 36761995 },
     { {0, 0}, {36761, 995926 }, -36761995 },
   };
-
   size_t i;
 
   for(i = 0; i < CURL_ARRAYSIZE(tests); i++) {
@@ -55,6 +64,5 @@ static CURLcode test_unit1323(const char *arg)
       fail("unexpected result!");
     }
   }
-
-  UNITTEST_END_SIMPLE
 }
+UNITTEST_STOP

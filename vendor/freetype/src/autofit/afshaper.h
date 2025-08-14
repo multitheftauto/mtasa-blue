@@ -23,13 +23,16 @@
 #include <freetype/freetype.h>
 
 
-FT_BEGIN_HEADER
-
 #ifdef FT_CONFIG_OPTION_USE_HARFBUZZ
-  FT_LOCAL_ARRAY( hb_script_t )
-  af_hb_scripts[];
+
+#include <hb.h>
+#include <hb-ot.h>
+#include "ft-hb.h"
+
 #endif
 
+
+FT_BEGIN_HEADER
 
   FT_Error
   af_shaper_get_coverage( AF_FaceGlobals  globals,
@@ -39,11 +42,11 @@ FT_BEGIN_HEADER
 
 
   void*
-  af_shaper_buf_create( AF_FaceGlobals  globals );
+  af_shaper_buf_create( FT_Face  face );
 
   void
-  af_shaper_buf_destroy( AF_FaceGlobals  globals,
-                         void*           buf );
+  af_shaper_buf_destroy( FT_Face  face,
+                         void*    buf );
 
   const char*
   af_shaper_get_cluster( const char*      p,

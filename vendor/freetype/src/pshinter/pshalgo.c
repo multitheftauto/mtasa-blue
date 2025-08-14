@@ -100,7 +100,7 @@
 
     if ( idx >= table->max_hints )
     {
-      FT_TRACE0(( "psh_hint_table_record: invalid hint index %u\n", idx ));
+      FT_TRACE0(( "psh_hint_table_record: invalid hint index %d\n", idx ));
       return;
     }
 

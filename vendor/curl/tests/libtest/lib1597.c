@@ -24,7 +24,7 @@
 
 /* Testing CURLOPT_PROTOCOLS_STR */
 
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
@@ -33,7 +33,7 @@ struct pair {
   CURLcode *exp;
 };
 
-static CURLcode test_lib1597(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl = NULL;
   CURLcode res = CURLE_OK;

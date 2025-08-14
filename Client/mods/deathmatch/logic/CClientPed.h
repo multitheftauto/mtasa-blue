@@ -374,7 +374,7 @@ public:
 
     void SetInWater(bool bIsInWater) { m_bIsInWater = bIsInWater; };
     bool IsInWater();
-    bool IsOnGround(bool checkVehicles = false);
+    bool IsOnGround();
 
     bool          IsClimbing();
     bool          IsRadioOn() const noexcept { return m_bRadioOn; };

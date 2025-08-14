@@ -21,11 +21,12 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+
+#include "test.h"
 
 typedef struct
 {
-  const char *buf;
+  char *buf;
   size_t len;
 } put_buffer;
 
@@ -40,11 +41,11 @@ static size_t put_callback(char *ptr, size_t size, size_t nmemb, void *stream)
   return tocopy;
 }
 
-static CURLcode test_lib1948(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;
-  static const char *testput = "This is test PUT data\n";
+  const char *testput = "This is test PUT data\n";
   put_buffer pbuf;
 
   curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -55,7 +56,7 @@ static CURLcode test_lib1948(const char *URL)
   easy_setopt(curl, CURLOPT_UPLOAD, 1L);
   easy_setopt(curl, CURLOPT_HEADER, 1L);
   easy_setopt(curl, CURLOPT_READFUNCTION, put_callback);
-  pbuf.buf = testput;
+  pbuf.buf = (char *)CURL_UNCONST(testput);
   pbuf.len = strlen(testput);
   easy_setopt(curl, CURLOPT_READDATA, &pbuf);
   easy_setopt(curl, CURLOPT_INFILESIZE, (long)strlen(testput));

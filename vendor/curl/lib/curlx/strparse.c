@@ -23,10 +23,7 @@
  ***************************************************************************/
 
 #include "strparse.h"
-
-#ifndef WITHOUT_LIBCURL
-#include <curl/curl.h>  /* for curl_strnequal() */
-#endif
+#include "../strcase.h"
 
 void curlx_str_init(struct Curl_str *out)
 {
@@ -43,7 +40,7 @@ void curlx_str_assign(struct Curl_str *out, const char *str, size_t len)
 /* Get a word until the first DELIM or end of string. At least one byte long.
    return non-zero on error */
 int curlx_str_until(const char **linep, struct Curl_str *out,
-                    const size_t max, char delim)
+                   const size_t max, char delim)
 {
   const char *s = *linep;
   size_t len = 0;
@@ -67,7 +64,7 @@ int curlx_str_until(const char **linep, struct Curl_str *out,
 /* Get a word until the first space or end of string. At least one byte long.
    return non-zero on error */
 int curlx_str_word(const char **linep, struct Curl_str *out,
-                   const size_t max)
+                  const size_t max)
 {
   return curlx_str_until(linep, out, max, ' ');
 }
@@ -75,7 +72,7 @@ int curlx_str_word(const char **linep, struct Curl_str *out,
 /* Get a word until a newline byte or end of string. At least one byte long.
    return non-zero on error */
 int curlx_str_untilnl(const char **linep, struct Curl_str *out,
-                      const size_t max)
+                     const size_t max)
 {
   const char *s = *linep;
   size_t len = 0;
@@ -99,7 +96,7 @@ int curlx_str_untilnl(const char **linep, struct Curl_str *out,
 /* Get a "quoted" word. No escaping possible.
    return non-zero on error */
 int curlx_str_quotedword(const char **linep, struct Curl_str *out,
-                         const size_t max)
+                        const size_t max)
 {
   const char *s = *linep;
   size_t len = 0;
@@ -241,7 +238,7 @@ int curlx_str_newline(const char **linep)
 int curlx_str_casecompare(struct Curl_str *str, const char *check)
 {
   size_t clen = check ? strlen(check) : 0;
-  return ((str->len == clen) && curl_strnequal(str->str, check, clen));
+  return ((str->len == clen) && strncasecompare(str->str, check, clen));
 }
 #endif
 

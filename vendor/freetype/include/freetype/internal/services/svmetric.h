@@ -77,7 +77,7 @@ FT_BEGIN_HEADER
   typedef void
   (*FT_Metrics_Adjust_Func)( FT_Face  face );
 
-  typedef void
+  typedef FT_Error
   (*FT_Size_Reset_Func)( FT_Size  size );
 
 

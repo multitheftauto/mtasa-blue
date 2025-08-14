@@ -914,15 +914,13 @@ int CLuaPedDefs::IsPedOnGround(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    bool             checkVehicles = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
-    argStream.ReadBool(checkVehicles, false);
 
     if (!argStream.HasErrors())
     {
         // Find out whether he's on the ground or not and return it
-        bool bOnGround = pPed->IsOnGround(checkVehicles);
+        bool bOnGround = pPed->IsOnGround();
         lua_pushboolean(luaVM, bOnGround);
         return 1;
     }

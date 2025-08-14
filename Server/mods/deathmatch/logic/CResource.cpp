@@ -1276,8 +1276,8 @@ void CResource::DisplayInfo()            // duplicated for HTML
         {
             if (pIncludedResources->IsBadVersion())
             {
-                CLogger::LogPrintf("  %s .. BAD VERSION (not between %d and %d)\n", pIncludedResources->GetName().c_str(),
-                                   pIncludedResources->GetMinimumVersion(), pIncludedResources->GetMaximumVersion());
+                CLogger::LogPrintf("  %s .. BAD VERSION (not between %d and %d)\n", pIncludedResources->GetMinimumVersion(),
+                                   pIncludedResources->GetMaximumVersion());
             }
             else
             {

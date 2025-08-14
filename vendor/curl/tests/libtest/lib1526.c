@@ -27,24 +27,24 @@
  * from server http header
  */
 
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
-static const char t1526_testdata[] = "Hello Cloud!\n";
+static char testdata[] = "Hello Cloud!\n";
 
-static size_t t1526_read_cb(char *ptr, size_t size, size_t nmemb, void *stream)
+static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 {
   size_t  amount = nmemb * size; /* Total bytes curl wants */
-  if(amount < strlen(t1526_testdata)) {
-    return strlen(t1526_testdata);
+  if(amount < strlen(testdata)) {
+    return strlen(testdata);
   }
   (void)stream;
-  memcpy(ptr, t1526_testdata, strlen(t1526_testdata));
-  return strlen(t1526_testdata);
+  memcpy(ptr, testdata, strlen(testdata));
+  return strlen(testdata);
 }
 
-static CURLcode test_lib1526(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl = NULL;
   CURLcode res = CURLE_FAILED_INIT;
@@ -78,16 +78,16 @@ static CURLcode test_lib1526(const char *URL)
   test_setopt(curl, CURLOPT_PROXY, libtest_arg2);
   test_setopt(curl, CURLOPT_HTTPHEADER, hhl);
   test_setopt(curl, CURLOPT_PROXYHEADER, phl);
-  test_setopt(curl, CURLOPT_HEADEROPT, CURLHEADER_SEPARATE);
+  test_setopt(curl, CURLOPT_HEADEROPT, (long)CURLHEADER_SEPARATE);
   test_setopt(curl, CURLOPT_POST, 0L);
   test_setopt(curl, CURLOPT_UPLOAD, 1L);
   test_setopt(curl, CURLOPT_VERBOSE, 1L);
-  test_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+  test_setopt(curl, CURLOPT_PROXYTYPE, (long)CURLPROXY_HTTP);
   test_setopt(curl, CURLOPT_HEADER, 1L);
   test_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
-  test_setopt(curl, CURLOPT_READFUNCTION, t1526_read_cb);
+  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
   test_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1L);
-  test_setopt(curl, CURLOPT_INFILESIZE, (long)strlen(t1526_testdata));
+  test_setopt(curl, CURLOPT_INFILESIZE, (long)strlen(testdata));
 
   res = curl_easy_perform(curl);
 

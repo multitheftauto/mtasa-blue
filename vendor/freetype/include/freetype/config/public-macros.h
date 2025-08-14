@@ -62,8 +62,8 @@ FT_BEGIN_HEADER
    * because it is needed by `FT_EXPORT`.
    */
 
-  /* Visual C, MinGW, Cygwin */
-#if defined( _WIN32 ) || defined( __CYGWIN__ )
+  /* Visual C, mingw */
+#if defined( _WIN32 )
 
 #if defined( FT2_BUILD_LIBRARY ) && defined( DLL_EXPORT )
 #define FT_PUBLIC_FUNCTION_ATTRIBUTE  __declspec( dllexport )

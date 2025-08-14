@@ -111,7 +111,7 @@ typedef double           NvF64;
  */
 #define NvF32TONvU32(_pData) *(NvU32 *)(_pData)
 
-#define NVAPI_SDK_VERSION 58087
+#define NVAPI_SDK_VERSION 57594
 /* Boolean type */
 typedef NvU8 NvBool;
 #define NV_TRUE           ((NvBool)(0 == 0))

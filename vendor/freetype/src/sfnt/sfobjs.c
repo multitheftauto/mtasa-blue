@@ -1127,9 +1127,9 @@
         flags |= FT_FACE_FLAG_VERTICAL;
 
       /* kerning available ? */
-      if ( face->kern_avail_bits
+      if ( TT_FACE_HAS_KERNING( face )
 #ifdef TT_CONFIG_OPTION_GPOS_KERNING
-           || face->num_gpos_lookups_kerning
+           || face->gpos_kerning_available
 #endif
          )
         flags |= FT_FACE_FLAG_KERNING;

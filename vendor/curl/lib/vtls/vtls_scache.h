@@ -206,6 +206,12 @@ CURLcode Curl_ssl_session_export(struct Curl_easy *data,
                                  void *userptr);
 
 #endif /* USE_SSLS_EXPORT */
-#endif /* USE_SSL */
+
+#else /* USE_SSL */
+
+#define Curl_ssl_scache_create(x,y,z) ((void)x, CURLE_OK)
+#define Curl_ssl_scache_destroy(x) do {} while(0)
+
+#endif /* USE_SSL (else) */
 
 #endif /* HEADER_CURL_VTLS_SCACHE_H */

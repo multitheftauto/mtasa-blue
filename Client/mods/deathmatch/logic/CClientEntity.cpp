@@ -791,8 +791,7 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
     // Call it on all our children
     if (!m_Children.empty())
     {
-        CElementListSnapshotRef pChildrenSnapshot = GetChildrenListSnapshot();
-		for (CClientEntity* pEntity : *pChildrenSnapshot)
+        for (CClientEntity* pEntity : *GetChildrenListSnapshot())
         {
             if (!pEntity->IsBeingDeleted())
             {

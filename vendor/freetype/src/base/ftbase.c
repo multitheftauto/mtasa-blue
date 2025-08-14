@@ -19,6 +19,7 @@
 #define  FT_MAKE_OPTION_SINGLE_OBJECT
 
 #include "ftadvanc.c"
+#include "ftcalc.c"
 #include "ftcolor.c"
 #include "ftdbgmem.c"
 #include "fterrors.c"
@@ -34,7 +35,6 @@
 #include "ftsnames.c"
 #include "ftstream.c"
 #include "fttrigon.c"
-#include "ftcalc.c"  /* included after FT_MulFix callers to inline it */
 #include "ftutil.c"
 
 

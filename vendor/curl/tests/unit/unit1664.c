@@ -21,7 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -30,19 +30,26 @@
 #include <netinet/in6.h>
 #endif
 
+#include <curl/curl.h>
+
+#include "curlx/strparse.h"
+
 #include "memdebug.h" /* LAST include file */
 
-static CURLcode t1664_setup(void)
+static CURLcode unit_setup(void)
 {
   CURLcode res = CURLE_OK;
   global_init(CURL_GLOBAL_ALL);
   return res;
 }
 
-static CURLcode test_unit1664(const char *arg)
+static void unit_stop(void)
 {
-  UNITTEST_BEGIN(t1664_setup())
+  curl_global_cleanup();
+}
 
+UNITTEST_START
+{
   static const char *wordparse[] = {
     "word",
     "word ",
@@ -480,5 +487,5 @@ static CURLcode test_unit1664(const char *arg)
     }
   }
 
-  UNITTEST_END(curl_global_cleanup())
 }
+UNITTEST_STOP

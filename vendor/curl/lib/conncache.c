@@ -42,6 +42,7 @@
 #include "sigpipe.h"
 #include "connect.h"
 #include "select.h"
+#include "strcase.h"
 #include "curlx/strparse.h"
 #include "uint-table.h"
 
@@ -515,7 +516,7 @@ static bool cpool_foreach(struct Curl_easy *data,
       struct connectdata *conn = Curl_node_elem(curr);
       curr = Curl_node_next(curr);
 
-      if(func(data, conn, param) == 1) {
+      if(1 == func(data, conn, param)) {
         return TRUE;
       }
     }
@@ -709,8 +710,7 @@ static int cpool_reap_dead_cb(struct Curl_easy *data,
                               struct connectdata *conn, void *param)
 {
   struct cpool_reaper_ctx *rctx = param;
-  if((!CONN_INUSE(conn) && conn->bits.no_reuse) ||
-     Curl_conn_seems_dead(conn, data, &rctx->now)) {
+  if(Curl_conn_seems_dead(conn, data, &rctx->now)) {
     /* stop the iteration here, pass back the connection that was pruned */
     Curl_conn_terminate(data, conn, FALSE);
     return 1;
@@ -848,40 +848,6 @@ void Curl_cpool_do_locked(struct Curl_easy *data,
   }
   else
     cb(conn, data, cbdata);
-}
-
-static int cpool_mark_stale(struct Curl_easy *data,
-                            struct connectdata *conn, void *param)
-{
-  (void)data;
-  (void)param;
-  conn->bits.no_reuse = TRUE;
-  return 0;
-}
-
-static int cpool_reap_no_reuse(struct Curl_easy *data,
-                               struct connectdata *conn, void *param)
-{
-  (void)data;
-  (void)param;
-  if(!CONN_INUSE(conn) && conn->bits.no_reuse) {
-    Curl_conn_terminate(data, conn, FALSE);
-    return 1;
-  }
-  return 0; /* continue iteration */
-}
-
-void Curl_cpool_nw_changed(struct Curl_easy *data)
-{
-  struct cpool *cpool = cpool_get_instance(data);
-
-  if(cpool) {
-    CPOOL_LOCK(cpool, data);
-    cpool_foreach(data, cpool, NULL, cpool_mark_stale);
-    while(cpool_foreach(data, cpool, NULL, cpool_reap_no_reuse))
-      ;
-    CPOOL_UNLOCK(cpool, data);
-  }
 }
 
 #if 0

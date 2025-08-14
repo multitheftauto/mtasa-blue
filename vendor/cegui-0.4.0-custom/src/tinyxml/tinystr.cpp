@@ -155,17 +155,14 @@ void TiXmlString::append( const char* str, int len )
         new_string = new char [new_alloc];        
         new_string [0] = 0;
 
-        // cache old length before possible delete
-        unsigned old_length = length();
-
         // copy the previous allocated buffer into this one
         if (allocated && cstring)
             // strcpy (new_string, cstring);
-            memcpy (new_string, cstring, old_length);
+            memcpy (new_string, cstring, length ());
 
         // append the suffix. It does exist, otherwize we wouldn't be expanding 
         // strncat (new_string, str, len);
-        memcpy (new_string + old_length, 
+        memcpy (new_string + length (), 
                 str,
                 size_suffix);
 
@@ -181,13 +178,12 @@ void TiXmlString::append( const char* str, int len )
     {
         // we know we can safely append the new string
         // strncat (cstring, str, len);
-	unsigned old_length = current_length;
-	current_length = new_size - 1;
-	memcpy (cstring + old_length, 
+        memcpy (cstring + length (), 
                 str,
                 size_suffix);
-        cstring [current_length] = 0;
     }
+    current_length = new_size - 1;
+    cstring [current_length] = 0;
 }
 
 

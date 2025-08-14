@@ -1730,7 +1730,7 @@
         {
 #ifdef FT_DEBUG_LEVEL_TRACE
           if ( odtect->range[i].name || odtect->range[j].name )
-            GXV_TRACE(( "found overlap between range %u and range %u\n",
+            GXV_TRACE(( "found overlap between range %d and range %d\n",
                         i, j ));
           else
             GXV_TRACE(( "found overlap between `%s' and `%s\'\n",
