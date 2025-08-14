@@ -1,9 +1,9 @@
 /***************************************************************************
  *                                  _   _ ____  _
- *  Project                     ___| | | |  _ \| |
+ *  Project                     ___| | | |  _ | |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
- *                             \___|\___/|_| \_\_____|
+ *                             ___|___/|_| ______|
  *
  * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
@@ -23,6 +23,7 @@
  ***************************************************************************/
 
 #include "curl_setup.h"
+#include "strcase.h"
 #include "easyoptions.h"
 
 #ifndef CURL_DISABLE_GETOPTIONS
@@ -36,7 +37,7 @@ static const struct curl_easyoption *lookup(const char *name, CURLoption id)
     const struct curl_easyoption *o = &Curl_easyopts[0];
     do {
       if(name) {
-        if(curl_strequal(o->name, name))
+        if(strcasecompare(o->name, name))
           return o;
       }
       else {
@@ -82,7 +83,7 @@ const struct curl_easyoption *curl_easy_option_by_name(const char *name)
   return NULL;
 }
 
-const struct curl_easyoption *curl_easy_option_by_id(CURLoption id)
+const struct curl_easyoption *curl_easy_option_by_id (CURLoption id)
 {
   (void)id;
   return NULL;

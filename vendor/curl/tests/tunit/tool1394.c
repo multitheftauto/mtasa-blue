@@ -21,17 +21,29 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "tool_getparam.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "memdebug.h" /* LAST include file */
 
-static CURLcode test_tool1394(const char *arg)
+static CURLcode unit_setup(void)
 {
-  UNITTEST_BEGIN_SIMPLE
+  return CURLE_OK;
+}
 
-  static const char *values[] = {
+static void unit_stop(void)
+{
+
+}
+
+UNITTEST_START
+
+  const char *values[] = {
     /* -E parameter */        /* exp. cert name */  /* exp. passphrase */
     "foo:bar:baz",            "foo",                "bar:baz",
     "foo\\:bar:baz",          "foo:bar",            "baz",
@@ -74,20 +86,20 @@ static CURLcode test_tool1394(const char *arg)
       if(certname) {
         if(strcmp(p[1], certname)) {
           printf("expected certname '%s' but got '%s' "
-                 "for -E param '%s'\n", p[1], certname, p[0]);
+              "for -E param '%s'\n", p[1], certname, p[0]);
           fail("assertion failure");
         }
       }
       else {
         printf("expected certname '%s' but got NULL "
-               "for -E param '%s'\n", p[1], p[0]);
+            "for -E param '%s'\n", p[1], p[0]);
         fail("assertion failure");
       }
     }
     else {
       if(certname) {
         printf("expected certname NULL but got '%s' "
-               "for -E param '%s'\n", certname, p[0]);
+            "for -E param '%s'\n", certname, p[0]);
         fail("assertion failure");
       }
     }
@@ -95,20 +107,20 @@ static CURLcode test_tool1394(const char *arg)
       if(passphrase) {
         if(strcmp(p[2], passphrase)) {
           printf("expected passphrase '%s' but got '%s'"
-                 "for -E param '%s'\n", p[2], passphrase, p[0]);
+              "for -E param '%s'\n", p[2], passphrase, p[0]);
           fail("assertion failure");
         }
       }
       else {
         printf("expected passphrase '%s' but got NULL "
-               "for -E param '%s'\n", p[2], p[0]);
+            "for -E param '%s'\n", p[2], p[0]);
         fail("assertion failure");
       }
     }
     else {
       if(passphrase) {
         printf("expected passphrase NULL but got '%s' "
-               "for -E param '%s'\n", passphrase, p[0]);
+            "for -E param '%s'\n", passphrase, p[0]);
         fail("assertion failure");
       }
     }
@@ -118,5 +130,4 @@ static CURLcode test_tool1394(const char *arg)
       free(passphrase);
   }
 
-  UNITTEST_END_SIMPLE
-}
+UNITTEST_STOP

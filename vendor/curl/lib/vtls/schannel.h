@@ -37,7 +37,7 @@
 #pragma warning(pop)
 #endif
 /* Wincrypt must be included before anything that could include OpenSSL. */
-#ifdef USE_WIN32_CRYPTO
+#if defined(USE_WIN32_CRYPTO)
 #include <wincrypt.h>
 /* Undefine wincrypt conflicting symbols for BoringSSL. */
 #undef X509_NAME
@@ -68,7 +68,7 @@
  * BoringSSL's <openssl/x509.h>: So just undefine those defines here
  * (and only here).
  */
-#ifdef OPENSSL_IS_BORINGSSL
+#if defined(OPENSSL_IS_BORINGSSL)
 # undef X509_NAME
 # undef X509_CERT_PAIR
 # undef X509_EXTENSIONS

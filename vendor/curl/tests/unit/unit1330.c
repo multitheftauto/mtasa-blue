@@ -21,16 +21,23 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "memdebug.h"
 
-static CURLcode test_unit1330(const char *arg)
+
+static CURLcode unit_setup(void)
 {
-  UNITTEST_BEGIN_SIMPLE
-
-  char *ptr = malloc(1330);
-  Curl_safefree(ptr);
-
-  UNITTEST_END_SIMPLE
+  return CURLE_OK;
 }
+
+static void unit_stop(void)
+{
+}
+
+UNITTEST_START
+
+char *ptr = malloc(1330);
+Curl_safefree(ptr);
+
+UNITTEST_STOP
