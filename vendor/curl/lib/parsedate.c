@@ -80,6 +80,7 @@
 #include <limits.h>
 
 #include <curl/curl.h>
+#include "strcase.h"
 #include "curlx/warnless.h"
 #include "parsedate.h"
 #include "curlx/strparse.h"
@@ -150,7 +151,7 @@ static const struct tzinfo tz[]= {
   {"HDT", 600 tDAYZONE},   /* Hawaii Daylight */
   {"CAT", 600},            /* Central Alaska */
   {"AHST", 600},           /* Alaska-Hawaii Standard */
-  {"NT",  660},            /* Nome */ /* spellchecker:disable-line */
+  {"NT",  660},            /* Nome */
   {"IDLW", 720},           /* International Date Line West */
   {"CET", -60},            /* Central European */
   {"MET", -60},            /* Middle European */
@@ -161,8 +162,7 @@ static const struct tzinfo tz[]= {
   {"FWT", -60},            /* French Winter */
   {"FST", -60 tDAYZONE},   /* French Summer */
   {"EET", -120},           /* Eastern Europe, USSR Zone 1 */
-  {"WAST", -420}, /* spellchecker:disable-line */
-                           /* West Australian Standard */
+  {"WAST", -420},          /* West Australian Standard */
   {"WADT", -420 tDAYZONE}, /* West Australian Daylight */
   {"CCT", -480},           /* China Coast, USSR Zone 7 */
   {"JST", -540},           /* Japan Standard, USSR Zone 8 */
@@ -224,7 +224,7 @@ static int checkday(const char *check, size_t len)
   for(i = 0; i < 7; i++) {
     size_t ilen = strlen(what[0]);
     if((ilen == len) &&
-       curl_strnequal(check, what[0], len))
+       strncasecompare(check, what[0], len))
       return i;
     what++;
   }
@@ -239,7 +239,7 @@ static int checkmonth(const char *check, size_t len)
     return -1; /* not a month */
 
   for(i = 0; i < 12; i++) {
-    if(curl_strnequal(check, what[0], 3))
+    if(strncasecompare(check, what[0], 3))
       return i;
     what++;
   }
@@ -259,7 +259,7 @@ static int checktz(const char *check, size_t len)
   for(i = 0; i < CURL_ARRAYSIZE(tz); i++) {
     size_t ilen = strlen(what->name);
     if((ilen == len) &&
-       curl_strnequal(check, what->name, len))
+       strncasecompare(check, what->name, len))
       return what->offset*60;
     what++;
   }

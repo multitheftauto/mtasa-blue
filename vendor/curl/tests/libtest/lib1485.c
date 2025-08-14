@@ -21,11 +21,13 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
+#include "warnless.h"
 #include "memdebug.h"
 
-struct t1485_transfer_status {
+struct transfer_status {
   CURL *easy;
   curl_off_t out_len;
   size_t hd_line;
@@ -33,10 +35,10 @@ struct t1485_transfer_status {
   int http_status;
 };
 
-static size_t t1485_header_callback(char *ptr, size_t size, size_t nmemb,
-                                    void *userp)
+static size_t header_callback(char *ptr, size_t size, size_t nmemb,
+                              void *userp)
 {
-  struct t1485_transfer_status *st = (struct t1485_transfer_status *)userp;
+  struct transfer_status *st = (struct transfer_status *)userp;
   const char *hd = ptr;
   size_t len = size * nmemb;
   CURLcode result;
@@ -59,8 +61,8 @@ static size_t t1485_header_callback(char *ptr, size_t size, size_t nmemb,
     if(st->http_status >= 200 && st->http_status < 300) {
       result = curl_easy_getinfo(st->easy, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T,
                                  &clen);
-      curl_mfprintf(stderr, "header_callback, info Content-Length: "
-                    "%" CURL_FORMAT_CURL_OFF_T ", %d\n", clen, result);
+      curl_mfprintf(stderr, "header_callback, info Content-Length: %ld, %d\n",
+                    (long)clen, result);
       if(result) {
         st->result = result;
         return CURLE_WRITE_ERROR;
@@ -68,7 +70,7 @@ static size_t t1485_header_callback(char *ptr, size_t size, size_t nmemb,
       if(clen < 0) {
         curl_mfprintf(stderr,
                       "header_callback, expected known Content-Length, "
-                      "got: %" CURL_FORMAT_CURL_OFF_T "\n", clen);
+                      "got: %ld\n", (long)clen);
         return CURLE_WRITE_ERROR;
       }
     }
@@ -76,20 +78,20 @@ static size_t t1485_header_callback(char *ptr, size_t size, size_t nmemb,
   return len;
 }
 
-static size_t t1485_write_cb(char *ptr, size_t size, size_t nmemb, void *userp)
+static size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userp)
 {
-  struct t1485_transfer_status *st = (struct t1485_transfer_status *)userp;
+  struct transfer_status *st = (struct transfer_status *)userp;
   size_t len = size * nmemb;
   fwrite(ptr, size, nmemb, stdout);
   st->out_len += (curl_off_t)len;
   return len;
 }
 
-static CURLcode test_lib1485(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curls = NULL;
   CURLcode res = CURLE_OK;
-  struct t1485_transfer_status st;
+  struct transfer_status st;
 
   start_test_timing();
 
@@ -101,9 +103,9 @@ static CURLcode test_lib1485(const char *URL)
   st.easy = curls; /* to allow callbacks access */
 
   easy_setopt(curls, CURLOPT_URL, URL);
-  easy_setopt(curls, CURLOPT_WRITEFUNCTION, t1485_write_cb);
+  easy_setopt(curls, CURLOPT_WRITEFUNCTION, write_callback);
   easy_setopt(curls, CURLOPT_WRITEDATA, &st);
-  easy_setopt(curls, CURLOPT_HEADERFUNCTION, t1485_header_callback);
+  easy_setopt(curls, CURLOPT_HEADERFUNCTION, header_callback);
   easy_setopt(curls, CURLOPT_HEADERDATA, &st);
 
   easy_setopt(curls, CURLOPT_NOPROGRESS, 1L);

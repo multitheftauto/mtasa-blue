@@ -21,9 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 #include "bufref.h"
 #include "memdebug.h"
+
+static struct bufref bufref;
 
 static int freecount = 0;
 
@@ -34,23 +36,19 @@ static void test_free(void *p)
   free(p);
 }
 
-static CURLcode t1661_setup(struct bufref *bufref)
+static CURLcode unit_setup(void)
 {
-  Curl_bufref_init(bufref);
+  Curl_bufref_init(&bufref);
   return CURLE_OK;
 }
 
-static void t1661_stop(struct bufref *bufref)
+static void unit_stop(void)
 {
-  Curl_bufref_free(bufref);
+  Curl_bufref_free(&bufref);
 }
 
-static CURLcode test_unit1661(const char *arg)
+UNITTEST_START
 {
-  struct bufref bufref;
-
-  UNITTEST_BEGIN(t1661_setup(&bufref))
-
   const char *buffer = NULL;
   CURLcode result = CURLE_OK;
 
@@ -61,6 +59,7 @@ static CURLcode test_unit1661(const char *arg)
    * 2: reference will be NULL
    * 3: destructor will be NULL
    */
+
   fail_unless(!bufref.ptr, "Initial reference must be NULL");
   fail_unless(!bufref.len, "Initial length must be NULL");
   fail_unless(!bufref.dtor, "Destructor must be NULL");
@@ -68,6 +67,7 @@ static CURLcode test_unit1661(const char *arg)
   /**
    * testing Curl_bufref_set
    */
+
   buffer = malloc(13);
   abort_unless(buffer, "Out of memory");
   Curl_bufref_set(&bufref, buffer, 13, test_free);
@@ -79,17 +79,20 @@ static CURLcode test_unit1661(const char *arg)
   /**
    * testing Curl_bufref_ptr
    */
+
   fail_unless((const char *) Curl_bufref_ptr(&bufref) == buffer,
               "Wrong pointer value returned");
 
   /**
    * testing Curl_bufref_len
    */
+
   fail_unless(Curl_bufref_len(&bufref) == 13, "Wrong data size returned");
 
   /**
    * testing Curl_bufref_memdup
    */
+
   result = Curl_bufref_memdup(&bufref, "1661", 3);
   abort_unless(result == CURLE_OK, curl_easy_strerror(result));
   fail_unless(freecount == 1, "Destructor not called");
@@ -105,11 +108,11 @@ static CURLcode test_unit1661(const char *arg)
   /**
    * testing Curl_bufref_free
    */
+
   Curl_bufref_free(&bufref);
   fail_unless(freecount == 1, "Wrong destructor called");
   fail_unless(!bufref.ptr, "Initial reference must be NULL");
   fail_unless(!bufref.len, "Initial length must be NULL");
   fail_unless(!bufref.dtor, "Destructor must be NULL");
-
-  UNITTEST_END(t1661_stop(&bufref))
 }
+UNITTEST_STOP

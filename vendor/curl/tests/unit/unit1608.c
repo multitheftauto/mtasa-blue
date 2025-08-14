@@ -21,7 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "hostip.h"
 
@@ -30,21 +30,25 @@
 CURLcode Curl_shuffle_addr(struct Curl_easy *data,
                            struct Curl_addrinfo **addr);
 
-static struct Curl_addrinfo addrs[8];
+#define NUM_ADDRS 8
+static struct Curl_addrinfo addrs[NUM_ADDRS];
 
-static CURLcode t1608_setup(void)
+static CURLcode unit_setup(void)
 {
-  size_t i;
-  for(i = 0; i < CURL_ARRAYSIZE(addrs) - 1; i++) {
+  int i;
+  for(i = 0; i < NUM_ADDRS - 1; i++) {
     addrs[i].ai_next = &addrs[i + 1];
   }
 
   return CURLE_OK;
 }
 
-static CURLcode test_unit1608(const char *arg)
+static void unit_stop(void)
 {
-  UNITTEST_BEGIN(t1608_setup())
+  curl_global_cleanup();
+}
+
+UNITTEST_START
 
   int i;
   CURLcode code;
@@ -69,15 +73,17 @@ static CURLcode test_unit1608(const char *arg)
 
   abort_unless(addrhead != addrs, "addresses are not being reordered");
 
-  UNITTEST_END(curl_global_cleanup())
-}
+UNITTEST_STOP
 
 #else
-
-static CURLcode test_unit1608(const char *arg)
+static CURLcode unit_setup(void)
 {
-  UNITTEST_BEGIN_SIMPLE
-  UNITTEST_END_SIMPLE
+  return CURLE_OK;
 }
+static void unit_stop(void)
+{
+}
+UNITTEST_START
+UNITTEST_STOP
 
 #endif

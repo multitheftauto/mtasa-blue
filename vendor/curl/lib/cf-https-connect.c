@@ -24,7 +24,7 @@
 
 #include "curl_setup.h"
 
-#ifndef CURL_DISABLE_HTTP
+#if !defined(CURL_DISABLE_HTTP)
 
 #include "urldata.h"
 #include <curl/curl.h>
@@ -35,7 +35,6 @@
 #include "multiif.h"
 #include "cf-https-connect.h"
 #include "http2.h"
-#include "select.h"
 #include "vquic/vquic.h"
 
 /* The last 3 #include files should be in this order */
@@ -56,7 +55,6 @@ struct cf_hc_baller {
   CURLcode result;
   struct curltime started;
   int reply_ms;
-  unsigned char transport;
   enum alpnid alpn_id;
   BIT(shutdown);
 };
@@ -119,20 +117,17 @@ struct cf_hc_ctx {
   CURLcode result;          /* overall result */
   struct cf_hc_baller ballers[2];
   size_t baller_count;
-  timediff_t soft_eyeballs_timeout_ms;
-  timediff_t hard_eyeballs_timeout_ms;
+  unsigned int soft_eyeballs_timeout_ms;
+  unsigned int hard_eyeballs_timeout_ms;
 };
 
 static void cf_hc_baller_assign(struct cf_hc_baller *b,
-                                enum alpnid alpn_id,
-                                unsigned char def_transport)
+                                enum alpnid alpn_id)
 {
   b->alpn_id = alpn_id;
-  b->transport = def_transport;
   switch(b->alpn_id) {
   case ALPN_h3:
     b->name = "h3";
-    b->transport = TRNSPRT_QUIC;
     break;
   case ALPN_h2:
     b->name = "h2";
@@ -223,26 +218,27 @@ static CURLcode baller_connected(struct Curl_cfilter *cf,
                 winner->name, (int)curlx_timediff(curlx_now(),
                                                   winner->started));
 
-  /* install the winning filter below this one. */
   cf->next = winner->cf;
   winner->cf = NULL;
 
+  switch(cf->conn->alpn) {
+  case CURL_HTTP_VERSION_3:
+    break;
+  case CURL_HTTP_VERSION_2:
 #ifdef USE_NGHTTP2
-  {
     /* Using nghttp2, we add the filter "below" us, so when the conn
      * closes, we tear it down for a fresh reconnect */
-    const char *alpn = Curl_conn_cf_get_alpn_negotiated(cf->next, data);
-    if(alpn && !strcmp("h2", alpn)) {
-      result = Curl_http2_switch_at(cf, data);
-      if(result) {
-        ctx->state = CF_HC_FAILURE;
-        ctx->result = result;
-        return result;
-      }
+    result = Curl_http2_switch_at(cf, data);
+    if(result) {
+      ctx->state = CF_HC_FAILURE;
+      ctx->result = result;
+      return result;
     }
-  }
 #endif
-
+    break;
+  default:
+    break;
+  }
   ctx->state = CF_HC_SUCCESS;
   cf->connected = TRUE;
   return result;
@@ -272,16 +268,15 @@ static bool time_to_start_next(struct Curl_cfilter *cf,
   }
   elapsed_ms = curlx_timediff(now, ctx->started);
   if(elapsed_ms >= ctx->hard_eyeballs_timeout_ms) {
-    CURL_TRC_CF(data, cf, "hard timeout of %" FMT_TIMEDIFF_T "ms reached, "
-                "starting %s",
+    CURL_TRC_CF(data, cf, "hard timeout of %dms reached, starting %s",
                 ctx->hard_eyeballs_timeout_ms, ctx->ballers[idx].name);
     return TRUE;
   }
 
   if((idx > 0) && (elapsed_ms >= ctx->soft_eyeballs_timeout_ms)) {
     if(cf_hc_baller_reply_ms(&ctx->ballers[idx - 1], data) < 0) {
-      CURL_TRC_CF(data, cf, "soft timeout of %" FMT_TIMEDIFF_T "ms reached, "
-                  "%s has not seen any data, starting %s",
+      CURL_TRC_CF(data, cf, "soft timeout of %dms reached, %s has not "
+                  "seen any data, starting %s",
                   ctx->soft_eyeballs_timeout_ms,
                   ctx->ballers[idx - 1].name, ctx->ballers[idx].name);
       return TRUE;
@@ -316,11 +311,11 @@ static CURLcode cf_hc_connect(struct Curl_cfilter *cf,
       DEBUGASSERT(!ctx->ballers[i].cf);
     CURL_TRC_CF(data, cf, "connect, init");
     ctx->started = now;
-    cf_hc_baller_init(&ctx->ballers[0], cf, data, ctx->ballers[0].transport);
+    cf_hc_baller_init(&ctx->ballers[0], cf, data, cf->conn->transport);
     if(ctx->baller_count > 1) {
       Curl_expire(data, ctx->soft_eyeballs_timeout_ms, EXPIRE_ALPN_EYEBALLS);
-      CURL_TRC_CF(data, cf, "set next attempt to start in %" FMT_TIMEDIFF_T
-                  "ms", ctx->soft_eyeballs_timeout_ms);
+      CURL_TRC_CF(data, cf, "set next attempt to start in %ums",
+                  ctx->soft_eyeballs_timeout_ms);
     }
     ctx->state = CF_HC_CONNECT;
     FALLTHROUGH();
@@ -335,7 +330,7 @@ static CURLcode cf_hc_connect(struct Curl_cfilter *cf,
     }
 
     if(time_to_start_next(cf, data, 1, now)) {
-      cf_hc_baller_init(&ctx->ballers[1], cf, data, ctx->ballers[1].transport);
+      cf_hc_baller_init(&ctx->ballers[1], cf, data, cf->conn->transport);
     }
 
     if((ctx->baller_count > 1) && cf_hc_baller_is_active(&ctx->ballers[1])) {
@@ -427,24 +422,22 @@ static CURLcode cf_hc_shutdown(struct Curl_cfilter *cf,
   return result;
 }
 
-static CURLcode cf_hc_adjust_pollset(struct Curl_cfilter *cf,
-                                     struct Curl_easy *data,
-                                     struct easy_pollset *ps)
+static void cf_hc_adjust_pollset(struct Curl_cfilter *cf,
+                                  struct Curl_easy *data,
+                                  struct easy_pollset *ps)
 {
-  CURLcode result = CURLE_OK;
   if(!cf->connected) {
     struct cf_hc_ctx *ctx = cf->ctx;
     size_t i;
 
-    for(i = 0; (i < ctx->baller_count) && !result; i++) {
+    for(i = 0; i < ctx->baller_count; i++) {
       struct cf_hc_baller *b = &ctx->ballers[i];
       if(!cf_hc_baller_is_active(b))
         continue;
-      result = Curl_conn_cf_adjust_pollset(b->cf, data, ps);
+      Curl_conn_cf_adjust_pollset(b->cf, data, ps);
     }
-    CURL_TRC_CF(data, cf, "adjust_pollset -> %d, %d socks", result, ps->n);
+    CURL_TRC_CF(data, cf, "adjust_pollset -> %d socks", ps->num);
   }
-  return result;
 }
 
 static bool cf_hc_data_pending(struct Curl_cfilter *cf,
@@ -568,6 +561,7 @@ struct Curl_cftype Curl_cft_http_connect = {
   cf_hc_connect,
   cf_hc_close,
   cf_hc_shutdown,
+  Curl_cf_def_get_host,
   cf_hc_adjust_pollset,
   cf_hc_data_pending,
   Curl_cf_def_send,
@@ -580,8 +574,7 @@ struct Curl_cftype Curl_cft_http_connect = {
 
 static CURLcode cf_hc_create(struct Curl_cfilter **pcf,
                              struct Curl_easy *data,
-                             enum alpnid *alpnids, size_t alpn_count,
-                             unsigned char def_transport)
+                             enum alpnid *alpnids, size_t alpn_count)
 {
   struct Curl_cfilter *cf = NULL;
   struct cf_hc_ctx *ctx;
@@ -603,7 +596,7 @@ static CURLcode cf_hc_create(struct Curl_cfilter **pcf,
     goto out;
   }
   for(i = 0; i < alpn_count; ++i)
-    cf_hc_baller_assign(&ctx->ballers[i], alpnids[i], def_transport);
+    cf_hc_baller_assign(&ctx->ballers[i], alpnids[i]);
   for(; i < CURL_ARRAYSIZE(ctx->ballers); ++i)
     ctx->ballers[i].alpn_id = ALPN_none;
   ctx->baller_count = alpn_count;
@@ -623,14 +616,13 @@ out:
 static CURLcode cf_http_connect_add(struct Curl_easy *data,
                                     struct connectdata *conn,
                                     int sockindex,
-                                    enum alpnid *alpn_ids, size_t alpn_count,
-                                    unsigned char def_transport)
+                                    enum alpnid *alpn_ids, size_t alpn_count)
 {
   struct Curl_cfilter *cf;
   CURLcode result = CURLE_OK;
 
   DEBUGASSERT(data);
-  result = cf_hc_create(&cf, data, alpn_ids, alpn_count, def_transport);
+  result = cf_hc_create(&cf, data, alpn_ids, alpn_count);
   if(result)
     goto out;
   Curl_conn_cf_add(data, conn, sockindex, cf);
@@ -687,7 +679,7 @@ CURLcode Curl_cf_https_setup(struct Curl_easy *data,
           continue;
         switch(alpn) {
         case ALPN_h3:
-          if(Curl_conn_may_http3(data, conn, conn->transport_wanted))
+          if(Curl_conn_may_http3(data, conn))
             break;  /* not possible */
           if(data->state.http_neg.allowed & CURL_HTTP_V3x) {
             CURL_TRC_CF(data, cf, "adding h3 via HTTPS-RR");
@@ -716,7 +708,7 @@ CURLcode Curl_cf_https_setup(struct Curl_easy *data,
     if((alpn_count < CURL_ARRAYSIZE(alpn_ids)) &&
        (data->state.http_neg.wanted & CURL_HTTP_V3x) &&
        !cf_https_alpns_contain(ALPN_h3, alpn_ids, alpn_count)) {
-      result = Curl_conn_may_http3(data, conn, conn->transport_wanted);
+      result = Curl_conn_may_http3(data, conn);
       if(!result) {
         CURL_TRC_CF(data, cf, "adding wanted h3");
         alpn_ids[alpn_count++] = ALPN_h3;
@@ -741,13 +733,11 @@ CURLcode Curl_cf_https_setup(struct Curl_easy *data,
   /* If we identified ALPNs to use, install our filter. Otherwise,
    * install nothing, so our call will use a default connect setup. */
   if(alpn_count) {
-    result = cf_http_connect_add(data, conn, sockindex,
-                                 alpn_ids, alpn_count,
-                                 conn->transport_wanted);
+    result = cf_http_connect_add(data, conn, sockindex, alpn_ids, alpn_count);
   }
 
 out:
   return result;
 }
 
-#endif /* !CURL_DISABLE_HTTP */
+#endif /* !defined(CURL_DISABLE_HTTP) */

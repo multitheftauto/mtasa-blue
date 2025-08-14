@@ -21,7 +21,43 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+
+#include "server_setup.h"
+
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
+#ifndef UNDER_CE
+#include <signal.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
+#ifdef HAVE_NETDB_H
+#include <netdb.h>
+#endif
+#ifdef HAVE_SYS_FILIO_H
+/* FIONREAD on Solaris 7 */
+#include <sys/filio.h>
+#endif
+
+#include <setjmp.h>
+
+#include <ctype.h>
+
+#include <curlx.h> /* from the private lib dir */
+#include "getpart.h"
+#include "util.h"
+#include "server_sockaddr.h"
+
+/* include memdebug.h last */
+#include <memdebug.h>
 
 static int dnsd_wrotepidfile = 0;
 static int dnsd_wroteportfile = 0;
@@ -62,20 +98,6 @@ static int qname(const unsigned char **pkt, size_t *size)
 
 #define QTYPE_A 1
 #define QTYPE_AAAA 28
-#define QTYPE_HTTPS 0x41
-
-static const char *type2string(unsigned short qtype)
-{
-  switch(qtype) {
-  case QTYPE_A:
-    return "A";
-  case QTYPE_AAAA:
-    return "AAAA";
-  case QTYPE_HTTPS:
-    return "HTTPS";
-  }
-  return "<unknown>";
-}
 
 /*
  * Handle initial connection protocol.
@@ -138,7 +160,8 @@ static int store_incoming(const unsigned char *data, size_t size,
   fprintf(server, "Z: %x\n", (id & 0x70) >> 4);
   fprintf(server, "RCODE: %x\n", (id & 0x0f));
 #endif
-  (void) get16bit(&data, &size);
+  qd = get16bit(&data, &size);
+  fprintf(server, "QDCOUNT: %04x\n", qd);
 
   data += 6; /* skip ANCOUNT, NSCOUNT and ARCOUNT */
   size -= 6;
@@ -148,19 +171,18 @@ static int store_incoming(const unsigned char *data, size_t size,
   qptr = data;
 
   if(!qname(&data, &size)) {
+    fprintf(server, "QNAME: %s\n", name);
     qd = get16bit(&data, &size);
-    fprintf(server, "QNAME %s QTYPE %s\n", name, type2string(qd));
+    fprintf(server, "QTYPE: %04x\n", qd);
     *qtype = qd;
-    logmsg("Question for '%s' type %x / %s", name, qd,
-           type2string(qd));
+    logmsg("Question for '%s' type %x", name, qd);
 
-    (void) get16bit(&data, &size);
+    qd = get16bit(&data, &size);
+    fprintf(server, "QCLASS: %04x\n", qd);
 
     *qlen = qsize - size; /* total size of the query */
     memcpy(qbuf, qptr, *qlen);
   }
-  else
-    logmsg("Bad input qname");
 #if 0
   for(i = 0; i < size; i++) {
     fprintf(server, "%02d", (unsigned int)data[i]);
@@ -172,6 +194,76 @@ static int store_incoming(const unsigned char *data, size_t size,
 
   return 0;
 }
+
+#if 0
+static int send_response(curl_socket_t sock,
+                         struct sockaddr *addr,
+                         curl_socklen_t addrlen,
+                         unsigned short id)
+{
+  ssize_t rc;
+  unsigned char bytes[] = {
+    0x80, 0xea, /* ID, overwrite */
+    0x81, 0x80,
+    /*
+    Flags: 0x8180 Standard query response, No error
+        1... .... .... .... = Response: Message is a response
+        .000 0... .... .... = Opcode: Standard query (0)
+        .... .0.. .... .... = Authoritative: Server is not an authority for
+                              domain
+        .... ..0. .... .... = Truncated: Message is not truncated
+        .... ...1 .... .... = Recursion desired: Do query recursively
+        .... .... 1... .... = Recursion available: Server can do recursive
+                              queries
+        .... .... .0.. .... = Z: reserved (0)
+        .... .... ..0. .... = Answer authenticated: Answer/authority portion
+                              was not authenticated by the server
+        .... .... ...0 .... = Non-authenticated data: Unacceptable
+        .... .... .... 0000 = Reply code: No error (0)
+    */
+    0x0, 0x1, /* QDCOUNT */
+    0x0, 0x4, /* ANCOUNT */
+    0x0, 0x0, /* NSCOUNT */
+    0x0, 0x0, /* ARCOUNT */
+
+    /* here's the question */
+    0x4, 0x63, 0x75, 0x72, 0x6c, 0x2, 0x73, 0x65, 0x0, /* curl.se */
+    0x0, 0x1, /* QTYPE: A */
+    0x0, 0x1, /* QCLASS: IN */
+
+    /* 4 answers */
+    0xc0, 0xc, /* points to curl.se */
+    0x0, 0x1, /* QTYPE A */
+    0x0, 0x1, /* QCLASS IN */
+    0x0, 0x0, 0xa, 0x14, /* Time to live: 2580 (43 minutes) */
+    0x0, 0x4, /* data length */
+    0x97, 0x65, 0x41, 0x5b, /* Address: 151.101.65.91 */
+
+    0xc0, 0xc, 0x0, 0x1, 0x0, 0x1, 0x0, 0x0, 0xa, 0x14,
+    0x0, 0x4, 0x97, 0x65, 0x81, 0x5b, /* Address: 151.101.129.91 */
+    0xc0, 0xc, 0x0, 0x1, 0x0, 0x1, 0x0, 0x0, 0xa, 0x14,
+    0x0, 0x4, 0x97, 0x65, 0xc1, 0x5b, /* Address: 151.101.193.91 */
+    0xc0, 0xc, 0x0, 0x1, 0x0, 0x1, 0x0, 0x0, 0xa, 0x14,
+    0x0, 0x4, 0x97, 0x65, 0x1, 0x5b,  /* Address: 151.101.1.91 */
+#if 0
+    /* 1 additional record (ARCOUNT) */
+
+    0x0, 0x0, 0x29, 0x4, 0xd0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0
+#endif
+  };
+  size_t len = sizeof(bytes);
+
+  bytes[0] = (unsigned char)(id >> 8);
+  bytes[1] = (unsigned char)(id & 0xff);
+
+  rc = sendto(sock, bytes, len, 0, addr, addrlen);
+  if(rc != (ssize_t)len) {
+    fprintf(stderr, "failed sending %d bytes\n", (int)len);
+  }
+  return 0;
+}
+#endif
 
 static void add_answer(unsigned char *bytes, size_t *w,
                        const unsigned char *a, size_t alen,
@@ -213,17 +305,6 @@ static void add_answer(unsigned char *bytes, size_t *w,
 #define SENDTO3 size_t
 #endif
 
-#define INSTRUCTIONS "dnsd.cmd"
-
-#define MAX_ALPN 5
-
-static unsigned char ipv4_pref[4];
-static unsigned char ipv6_pref[16];
-static unsigned char alpn_pref[MAX_ALPN];
-static int alpn_count;
-static unsigned char ancount_a;
-static unsigned char ancount_aaaa;
-
 /* this is an answer to a question */
 static int send_response(curl_socket_t sock,
                          const struct sockaddr *addr, curl_socklen_t addrlen,
@@ -233,7 +314,7 @@ static int send_response(curl_socket_t sock,
   ssize_t rc;
   size_t i;
   int a;
-  char addrbuf[128]; /* IP address buffer */
+  unsigned char ancount = 3;
   unsigned char bytes[256] = {
     0x80, 0xea, /* ID, overwrite */
     0x81, 0x80,
@@ -258,9 +339,14 @@ static int send_response(curl_socket_t sock,
     0x0, 0x0, /* NSCOUNT */
     0x0, 0x0  /* ARCOUNT */
   };
+  static const unsigned char ipv4_localhost[] = { 127, 0, 0, 1 };
+  static const unsigned char ipv6_localhost[] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+  };
 
   bytes[0] = (unsigned char)(id >> 8);
   bytes[1] = (unsigned char)(id & 0xff);
+  bytes[7] = ancount;
 
   if(qlen > (sizeof(bytes) - 12))
     return -1;
@@ -270,28 +356,16 @@ static int send_response(curl_socket_t sock,
 
   i = 12 + qlen;
 
-  switch(qtype) {
-  case QTYPE_A:
-    bytes[7] = ancount_a;
-    for(a = 0; a < ancount_a; a++) {
-      const unsigned char *store = ipv4_pref;
-      add_answer(bytes, &i, store, sizeof(ipv4_pref), QTYPE_A);
-      logmsg("Sending back A (%x) '%s'", QTYPE_A,
-             curlx_inet_ntop(AF_INET, store, addrbuf, sizeof(addrbuf)));
+  for(a = 0; a < ancount; a++) {
+    switch(qtype) {
+    case QTYPE_A:
+      add_answer(bytes, &i, ipv4_localhost, sizeof(ipv4_localhost), QTYPE_A);
+      break;
+    case QTYPE_AAAA:
+      add_answer(bytes, &i, ipv6_localhost, sizeof(ipv6_localhost),
+                 QTYPE_AAAA);
+      break;
     }
-    break;
-  case QTYPE_AAAA:
-    bytes[7] = ancount_aaaa;
-    for(a = 0; a < ancount_aaaa; a++) {
-      const unsigned char *store = ipv6_pref;
-      add_answer(bytes, &i, store, sizeof(ipv6_pref), QTYPE_AAAA);
-      logmsg("Sending back AAAA (%x) '%s'", QTYPE_AAAA,
-             curlx_inet_ntop(AF_INET6, store, addrbuf, sizeof(addrbuf)));
-    }
-    break;
-  case QTYPE_HTTPS:
-    bytes[7] = 1; /* one answer */
-    break;
   }
 
 #ifdef __AMIGA__
@@ -311,69 +385,7 @@ static int send_response(curl_socket_t sock,
   return 0;
 }
 
-
-static void read_instructions(void)
-{
-  char file[256];
-  FILE *f;
-  snprintf(file, sizeof(file), "%s/" INSTRUCTIONS, logdir);
-  f = fopen(file, FOPEN_READTEXT);
-  if(f) {
-    char buf[256];
-    ancount_aaaa = ancount_a = 0;
-    alpn_count = 0;
-    while(fgets(buf, sizeof(buf), f)) {
-      char *p = strchr(buf, '\n');
-      if(p) {
-        int rc;
-        *p = 0;
-        if(!strncmp("A: ", buf, 3)) {
-          rc = curlx_inet_pton(AF_INET, &buf[3], ipv4_pref);
-          ancount_a = (rc == 1);
-        }
-        else if(!strncmp("AAAA: ", buf, 6)) {
-          char *p6 = &buf[6];
-          if(*p6 == '[') {
-            char *pt = strchr(p6, ']');
-            if(pt)
-              *pt = 0;
-            p6++;
-          }
-          rc = curlx_inet_pton(AF_INET6, p6, ipv6_pref);
-          ancount_aaaa = (rc == 1);
-        }
-        else if(!strncmp("ALPN: ", buf, 6)) {
-          char *ap = &buf[6];
-          rc = 0;
-          while(*ap) {
-            if('h' == *ap) {
-              ap++;
-              if(*ap >= '1' && *ap <= '3') {
-                if(alpn_count < MAX_ALPN)
-                  alpn_pref[alpn_count++] = *ap;
-              }
-              else
-                break;
-            }
-            else
-              break;
-          }
-        }
-        else {
-          rc = 0;
-        }
-        if(rc != 1) {
-          logmsg("Bad line in %s: '%s'\n", file, buf);
-        }
-      }
-    }
-    fclose(f);
-  }
-  else
-    logmsg("Error opening file '%s'", file);
-}
-
-static int test_dnsd(int argc, char **argv)
+int main(int argc, char **argv)
 {
   srvr_sockaddr_union_t me;
   ssize_t n = 0;
@@ -488,8 +500,8 @@ static int test_dnsd(int argc, char **argv)
   }
 
   flag = 1;
-  if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
-                (void *)&flag, sizeof(flag))) {
+  if(0 != setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
+            (void *)&flag, sizeof(flag))) {
     error = SOCKERRNO;
     logmsg("setsockopt(SO_REUSEADDR) failed with error (%d) %s",
            error, sstrerror(error));
@@ -515,7 +527,7 @@ static int test_dnsd(int argc, char **argv)
     rc = bind(sock, &me.sa, sizeof(me.sa6));
   }
 #endif /* USE_IPV6 */
-  if(rc) {
+  if(0 != rc) {
     error = SOCKERRNO;
     logmsg("Error binding socket on port %hu (%d) %s", port, error,
            sstrerror(error));
@@ -610,10 +622,6 @@ static int test_dnsd(int argc, char **argv)
       break;
     }
 
-    /* read once per incoming query, which is probably more than one
-       per test case */
-    read_instructions();
-
     store_incoming(inbuffer, n, qbuf, &qlen, &qtype, &id);
 
     set_advisor_read_lock(loglockfile);
@@ -629,7 +637,8 @@ static int test_dnsd(int argc, char **argv)
       clear_advisor_read_lock(loglockfile);
     }
 
-    /* logmsg("end of one transfer"); */
+    logmsg("end of one transfer");
+
   }
 
 dnsd_cleanup:
