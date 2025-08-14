@@ -475,6 +475,8 @@ public:
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 
+    static void __fastcall PlayFootSteps(CPedSAInterface* ped);
+
     static void StaticSetHooks();
 
 private:
