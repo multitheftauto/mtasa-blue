@@ -327,6 +327,7 @@ void CClientMarker::SetSize(float fSize)
             break;
         }
     }
+    
     m_pMarker->SetSize(fSize);
 }
 
