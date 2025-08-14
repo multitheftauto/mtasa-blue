@@ -31,6 +31,9 @@ public:
     bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
     bool SetAllElementWaterLevel(float fLevel, void* pChangeSource);
+    bool ResetAllElementWaterLevel();
+    void ResetElementWaterLevel(CClientWater* pWater);
+    void ResetElementWaterLevel(std::vector<CClientWater*>& vecWaterElements);
     void ResetWorldWaterLevel();
 
     float GetWaveLevel();

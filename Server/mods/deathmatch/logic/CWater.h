@@ -33,6 +33,8 @@ public:
     void           SetPosition(const CVector& vecPosition);
     float          GetLevel() const;
     void           SetLevel(float fLevel);
+    void           SetDefaultLevel(float fLevel) { m_iDefaultLevel = fLevel; }
+    void           ResetLevel();
 
     void Unlink();
 
@@ -57,4 +59,6 @@ private:
     SFixedArray<CVector, 4> m_Vertices;
     EWaterType              m_WaterType;
     bool                    m_bShallow;
+
+    float m_iDefaultLevel{};
 };
