@@ -24,6 +24,11 @@ class CColModel;
 class CPedModelInfo;
 struct RpClump;
 struct RwObject;
+struct RpGeometry;
+class C2DEffectSAInterface;
+class CEntitySAInterface;
+struct RwColor;
+struct S2DEffectData;
 
 class CBoundingBox
 {
@@ -256,4 +261,24 @@ public:
     virtual unsigned int GetParentID() = 0;
     virtual bool         IsDynamic() = 0;
     virtual bool         IsDamageableAtomic() = 0;
+
+    // 2dfx functions
+    virtual bool Add2DFXEffect(const e2dEffectType& effectType, const CVector& position, const S2DEffectData& effectProperties) = 0;
+    virtual bool Remove2DFXEffect(std::uint32_t index, bool keepIndex = true, CEntitySAInterface* entity = nullptr) = 0;
+    virtual void Restore2DFXEffect(std::uint32_t index) = 0;
+    virtual bool Reset2DFXEffectProperties(std::uint32_t index) = 0;
+    virtual void Reset2DFXEffects() = 0;
+    virtual void Store2DFXProperties(std::uint32_t index, const e2dEffectProperty& property) = 0;
+    virtual void Store2DFXDefaultProperties(std::uint32_t index) = 0;
+    virtual void Store2DFXRoadsignColor(std::uint32_t index, const RwColor& color) = 0;
+    virtual void Reset2DFXProperty(std::uint32_t index, const e2dEffectProperty& property) = 0;
+
+    virtual std::uint32_t         Get2DFXEffectIndex(C2DEffectSAInterface* effect) const = 0;
+    virtual C2DEffectSAInterface* Get2DFXEffectByIndex(std::uint32_t index) const = 0;
+    virtual C2DEffectSAInterface* Get2DFXEffect(CBaseModelInfoSAInterface* modelInfo, RpGeometry* geometry, std::uint32_t numPluginEffects, std::uint32_t index) = 0;
+    virtual std::uint32_t         Get2DFXEffectsCount(bool includeCustomEffects = true) const = 0;
+    virtual RwColor               GetStored2DFXRoadsignColor(std::uint32_t index) const = 0;
+    virtual bool                  IsCustom2DFXEffect(C2DEffectSAInterface* effect) = 0;
+
+    virtual void On2DFXEffectsLoaded(CEntitySAInterface* entity) = 0;
 };
