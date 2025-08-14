@@ -4173,16 +4173,16 @@ void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
 void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket& packet) noexcept
 {
     CPlayer* player = packet.GetSourcePlayer();
-
     if (!player)
         return;
 
-    const std::string& property = packet.GetProperty();
-    const bool         enabled = packet.IsEnabled();
+    const auto propertyId = static_cast<WorldSpecialProperty>(packet.GetPropertyId());
+    if (!EnumValueValid(propertyId))
+        return;
 
     CLuaArguments arguments;
-    arguments.PushString(property);
-    arguments.PushBoolean(enabled);
+    arguments.PushString(EnumToString(propertyId));
+    arguments.PushBoolean(packet.IsEnabled());
 
     player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
 }
