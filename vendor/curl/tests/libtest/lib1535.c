@@ -21,13 +21,13 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
 /* Test CURLINFO_PROTOCOL */
 
-static CURLcode test_lib1535(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl, *dupe = NULL;
   long protocol;
@@ -80,7 +80,7 @@ static CURLcode test_lib1535(const char *URL)
   if(protocol != CURLPROTO_HTTP) {
     curl_mfprintf(stderr,
                   "%s:%d protocol of http resource is incorrect; "
-                  "expected %ld but is %ld\n",
+                  "expected %d but is %ld\n",
                   __FILE__, __LINE__, CURLPROTO_HTTP, protocol);
     res = CURLE_HTTP_RETURNED_ERROR;
     goto test_cleanup;
@@ -112,6 +112,7 @@ static CURLcode test_lib1535(const char *URL)
     res = CURLE_FAILED_INIT;
     goto test_cleanup;
   }
+
 
   /* Test that a protocol is properly initialized on curl_easy_reset.
   */

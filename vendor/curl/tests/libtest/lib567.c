@@ -21,14 +21,14 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
 /*
  * Test a simple OPTIONS request with a custom header
  */
-static CURLcode test_lib567(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode res;
   CURL *curl;

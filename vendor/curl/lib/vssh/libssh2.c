@@ -61,9 +61,11 @@
 #include "../speedcheck.h"
 #include "../getinfo.h"
 #include "../strdup.h"
+#include "../strcase.h"
 #include "../vtls/vtls.h"
 #include "../cfilters.h"
 #include "../connect.h"
+#include "../inet_ntop.h"
 #include "../parsedate.h" /* for the week day and month names */
 #include "../sockaddr.h" /* required for Curl_sockaddr_storage */
 #include "../multiif.h"
@@ -99,8 +101,8 @@ static CURLcode sftp_disconnect(struct Curl_easy *data,
                                 struct connectdata *conn, bool dead);
 static CURLcode sftp_perform(struct Curl_easy *data, bool *connected,
                              bool *dophase_done);
-static CURLcode ssh_pollset(struct Curl_easy *data,
-                            struct easy_pollset *ps);
+static int ssh_getsock(struct Curl_easy *data, struct connectdata *conn,
+                       curl_socket_t *sock);
 static CURLcode ssh_setup_connection(struct Curl_easy *data,
                                      struct connectdata *conn);
 static void ssh_attach(struct Curl_easy *data, struct connectdata *conn);
@@ -119,10 +121,10 @@ const struct Curl_handler Curl_handler_scp = {
   ssh_connect,                          /* connect_it */
   ssh_multi_statemach,                  /* connecting */
   scp_doing,                            /* doing */
-  ssh_pollset,                          /* proto_pollset */
-  ssh_pollset,                          /* doing_pollset */
-  ZERO_NULL,                            /* domore_pollset */
-  ssh_pollset,                          /* perform_pollset */
+  ssh_getsock,                          /* proto_getsock */
+  ssh_getsock,                          /* doing_getsock */
+  ZERO_NULL,                            /* domore_getsock */
+  ssh_getsock,                          /* perform_getsock */
   scp_disconnect,                       /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -150,10 +152,10 @@ const struct Curl_handler Curl_handler_sftp = {
   ssh_connect,                          /* connect_it */
   ssh_multi_statemach,                  /* connecting */
   sftp_doing,                           /* doing */
-  ssh_pollset,                          /* proto_pollset */
-  ssh_pollset,                          /* doing_pollset */
-  ZERO_NULL,                            /* domore_pollset */
-  ssh_pollset,                          /* perform_pollset */
+  ssh_getsock,                          /* proto_getsock */
+  ssh_getsock,                          /* doing_getsock */
+  ZERO_NULL,                            /* domore_getsock */
+  ssh_getsock,                          /* perform_getsock */
   sftp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -694,7 +696,7 @@ static CURLcode ssh_check_fingerprint(struct Curl_easy *data,
 
     /* This does NOT verify the length of 'pubkey_md5' separately, which will
        make the comparison below fail unless it is exactly 32 characters */
-    if(!fingerprint || !curl_strequal(md5buffer, pubkey_md5)) {
+    if(!fingerprint || !strcasecompare(md5buffer, pubkey_md5)) {
       if(fingerprint) {
         failf(data,
               "Denied establishing ssh session: mismatch md5 fingerprint. "
@@ -918,7 +920,7 @@ static CURLcode sftp_quote(struct Curl_easy *data,
     sshc->acceptfail = TRUE;
   }
 
-  if(curl_strequal("pwd", cmd)) {
+  if(strcasecompare("pwd", cmd)) {
     /* output debug output if that is requested */
     char *tmp = aprintf("257 \"%s\" is current directory.\n", sshp->path);
     if(!tmp)
@@ -1199,18 +1201,24 @@ sftp_upload_init(struct Curl_easy *data,
     Curl_pgrsSetUploadSize(data, data->state.infilesize);
   }
   /* upload data */
-  Curl_xfer_setup_send(data, FIRSTSOCKET);
+  Curl_xfer_setup1(data, CURL_XFER_SEND, -1, FALSE);
 
   /* not set by Curl_xfer_setup to preserve keepon bits */
-  data->conn->recv_idx = FIRSTSOCKET;
+  data->conn->sockfd = data->conn->writesockfd;
 
   /* store this original bitmask setup to use later on if we cannot
      figure out a "real" bitmask */
   sshc->orig_waitfor = data->req.keepon;
 
+  /* we want to use the _sending_ function even when the socket turns
+     out readable as the underlying libssh2 sftp send function will deal
+     with both accordingly */
+  data->state.select_bits = CURL_CSELECT_OUT;
+
   /* since we do not really wait for anything at this point, we want the
-     state machine to move on as soon as possible so mark this as dirty */
-  Curl_multi_mark_dirty(data);
+     state machine to move on as soon as possible so we set a very short
+     timeout here */
+  Curl_expire(data, 0, EXPIRE_RUN_NOW);
 
   myssh_state(data, sshc, SSH_STOP);
   return CURLE_OK;
@@ -1540,11 +1548,15 @@ sftp_download_stat(struct Curl_easy *data,
     myssh_state(data, sshc, SSH_STOP);
     return CURLE_OK;
   }
-  Curl_xfer_setup_recv(data, FIRSTSOCKET, data->req.size);
+  Curl_xfer_setup1(data, CURL_XFER_RECV, data->req.size, FALSE);
 
   /* not set by Curl_xfer_setup to preserve keepon bits */
-  data->conn->send_idx = 0;
+  data->conn->writesockfd = data->conn->sockfd;
 
+  /* we want to use the _receiving_ function even when the socket turns
+     out writableable as the underlying libssh2 recv function will deal
+     with both accordingly */
+  data->state.select_bits = CURL_CSELECT_IN;
   myssh_state(data, sshc, SSH_STOP);
 
   return CURLE_OK;
@@ -1797,7 +1809,7 @@ static CURLcode ssh_state_auth_host_init(struct Curl_easy *data,
 }
 
 static CURLcode ssh_state_auth_agent_init(struct Curl_easy *data,
-                                          struct ssh_conn *sshc)
+                                     struct ssh_conn *sshc)
 {
   int rc = 0;
   if((data->set.ssh_auth_types & CURLSSH_AUTH_AGENT)
@@ -1906,7 +1918,7 @@ static CURLcode ssh_state_auth_key_init(struct Curl_easy *data,
 }
 
 static CURLcode ssh_state_auth_key(struct Curl_easy *data,
-                                   struct ssh_conn *sshc)
+                              struct ssh_conn *sshc)
 {
   /* Authentication failed. Continue with keyboard-interactive now. */
   struct connectdata *conn = data->conn;
@@ -1945,8 +1957,8 @@ static CURLcode ssh_state_auth_done(struct Curl_easy *data,
 
   Curl_pgrsTime(data, TIMER_APPCONNECT); /* SSH is connected */
 
-  data->conn->recv_idx = FIRSTSOCKET;
-  conn->send_idx = -1;
+  conn->sockfd = conn->sock[FIRSTSOCKET];
+  conn->writesockfd = CURL_SOCKET_BAD;
 
   if(conn->handler->protocol == CURLPROTO_SFTP) {
     myssh_state(data, sshc, SSH_SFTP_INIT);
@@ -2262,7 +2274,7 @@ static CURLcode ssh_state_sftp_quote_unlink(struct Curl_easy *data,
 }
 
 static CURLcode ssh_state_sftp_quote_statvfs(struct Curl_easy *data,
-                                             struct ssh_conn *sshc)
+                                        struct ssh_conn *sshc)
 {
   LIBSSH2_SFTP_STATVFS statvfs;
   int rc = libssh2_sftp_statvfs(sshc->sftp_session, sshc->quote_path1,
@@ -2460,10 +2472,15 @@ static CURLcode ssh_state_scp_download_init(struct Curl_easy *data,
   /* download data */
   bytecount = (curl_off_t)sb.st_size;
   data->req.maxdownload = (curl_off_t)sb.st_size;
-  Curl_xfer_setup_recv(data, FIRSTSOCKET, bytecount);
+  Curl_xfer_setup1(data, CURL_XFER_RECV, bytecount, FALSE);
 
   /* not set by Curl_xfer_setup to preserve keepon bits */
-  data->conn->send_idx = 0;
+  data->conn->writesockfd = data->conn->sockfd;
+
+  /* we want to use the _receiving_ function even when the socket turns
+     out writableable as the underlying libssh2 recv function will deal
+     with both accordingly */
+  data->state.select_bits = CURL_CSELECT_IN;
 
   myssh_state(data, sshc, SSH_STOP);
   return CURLE_OK;
@@ -2507,7 +2524,7 @@ static CURLcode ssh_state_sftp_close(struct Curl_easy *data,
 }
 
 static CURLcode ssh_state_sftp_shutdown(struct Curl_easy *data,
-                                        struct ssh_conn *sshc)
+                                   struct ssh_conn *sshc)
 {
   /* during times we get here due to a broken transfer and then the
      sftp_handle might not have been taken down so make sure that is done
@@ -2609,14 +2626,19 @@ static CURLcode ssh_state_scp_upload_init(struct Curl_easy *data,
   /* upload data */
   data->req.size = data->state.infilesize;
   Curl_pgrsSetUploadSize(data, data->state.infilesize);
-  Curl_xfer_setup_send(data, FIRSTSOCKET);
+  Curl_xfer_setup1(data, CURL_XFER_SEND, -1, FALSE);
 
   /* not set by Curl_xfer_setup to preserve keepon bits */
-  data->conn->recv_idx = FIRSTSOCKET;
+  data->conn->sockfd = data->conn->writesockfd;
 
   /* store this original bitmask setup to use later on if we cannot
      figure out a "real" bitmask */
   sshc->orig_waitfor = data->req.keepon;
+
+  /* we want to use the _sending_ function even when the socket turns
+     out readable as the underlying libssh2 scp send function will deal
+     with both accordingly */
+  data->state.select_bits = CURL_CSELECT_OUT;
 
   myssh_state(data, sshc, SSH_STOP);
 
@@ -3087,17 +3109,22 @@ static CURLcode ssh_statemachine(struct Curl_easy *data,
 
 /* called by the multi interface to figure out what socket(s) to wait for and
    for what actions in the DO_DONE, PERFORM and WAITPERFORM states */
-static CURLcode ssh_pollset(struct Curl_easy *data,
-                            struct easy_pollset *ps)
+static int ssh_getsock(struct Curl_easy *data,
+                       struct connectdata *conn,
+                       curl_socket_t *sock)
 {
-  int flags = 0;
-  if(data->conn->waitfor & KEEP_RECV)
-    flags |= CURL_POLL_IN;
-  if(data->conn->waitfor & KEEP_SEND)
-    flags |= CURL_POLL_OUT;
-  return flags ?
-    Curl_pollset_change(data, ps, data->conn->sock[FIRSTSOCKET], flags, 0) :
-    CURLE_OK;
+  int bitmap = GETSOCK_BLANK;
+  (void)data;
+
+  sock[0] = conn->sock[FIRSTSOCKET];
+
+  if(conn->waitfor & KEEP_RECV)
+    bitmap |= GETSOCK_READSOCK(FIRSTSOCKET);
+
+  if(conn->waitfor & KEEP_SEND)
+    bitmap |= GETSOCK_WRITESOCK(FIRSTSOCKET);
+
+  return bitmap;
 }
 
 /*
@@ -3134,7 +3161,7 @@ static CURLcode ssh_multi_statemach(struct Curl_easy *data, bool *done)
   struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
   struct SSHPROTO *sshp = Curl_meta_get(data, CURL_META_SSH_EASY);
   CURLcode result = CURLE_OK;
-  bool block; /* we store the status and use that to provide a ssh_pollset()
+  bool block; /* we store the status and use that to provide a ssh_getsock()
                  implementation */
   if(!sshc || !sshp)
     return CURLE_FAILED_INIT;
@@ -3240,6 +3267,7 @@ static CURLcode ssh_setup_connection(struct Curl_easy *data,
   if(!sshc)
     return CURLE_OUT_OF_MEMORY;
 
+  sshc->initialised = TRUE;
   if(Curl_conn_meta_set(conn, CURL_META_SSH_CONN, sshc, myssh_conn_dtor))
     return CURLE_OUT_OF_MEMORY;
 
@@ -3263,7 +3291,7 @@ static ssize_t ssh_tls_recv(libssh2_socket_t sock, void *buffer,
                             size_t length, int flags, void **abstract)
 {
   struct Curl_easy *data = (struct Curl_easy *)*abstract;
-  size_t nread;
+  ssize_t nread;
   CURLcode result;
   struct connectdata *conn = data->conn;
   Curl_recv *backup = conn->recv[0];
@@ -3284,7 +3312,7 @@ static ssize_t ssh_tls_recv(libssh2_socket_t sock, void *buffer,
   else if(result)
     return -1; /* generic error */
   Curl_debug(data, CURLINFO_DATA_IN, (const char *)buffer, (size_t)nread);
-  return (ssize_t)nread;
+  return nread;
 }
 
 static ssize_t ssh_tls_send(libssh2_socket_t sock, const void *buffer,
@@ -3583,99 +3611,101 @@ static CURLcode sshc_cleanup(struct ssh_conn *sshc, struct Curl_easy *data,
 {
   int rc;
 
-  if(sshc->kh) {
-    libssh2_knownhost_free(sshc->kh);
-    sshc->kh = NULL;
-  }
-
-  if(sshc->ssh_agent) {
-    rc = libssh2_agent_disconnect(sshc->ssh_agent);
-    if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
-      return CURLE_AGAIN;
-
-    if((rc < 0) && data) {
-      char *err_msg = NULL;
-      (void)libssh2_session_last_error(sshc->ssh_session,
-                                       &err_msg, NULL, 0);
-      infof(data, "Failed to disconnect from libssh2 agent: %d %s",
-            rc, err_msg);
+  if(sshc->initialised) {
+    if(sshc->kh) {
+      libssh2_knownhost_free(sshc->kh);
+      sshc->kh = NULL;
     }
-    libssh2_agent_free(sshc->ssh_agent);
-    sshc->ssh_agent = NULL;
 
-    /* NB: there is no need to free identities, they are part of internal
-       agent stuff */
-    sshc->sshagent_identity = NULL;
-    sshc->sshagent_prev_identity = NULL;
-  }
+    if(sshc->ssh_agent) {
+      rc = libssh2_agent_disconnect(sshc->ssh_agent);
+      if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
+        return CURLE_AGAIN;
 
-  if(sshc->sftp_handle) {
-    rc = libssh2_sftp_close(sshc->sftp_handle);
-    if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
-      return CURLE_AGAIN;
+      if((rc < 0) && data) {
+        char *err_msg = NULL;
+        (void)libssh2_session_last_error(sshc->ssh_session,
+                                         &err_msg, NULL, 0);
+        infof(data, "Failed to disconnect from libssh2 agent: %d %s",
+              rc, err_msg);
+      }
+      libssh2_agent_free(sshc->ssh_agent);
+      sshc->ssh_agent = NULL;
 
-    if((rc < 0) && data) {
-      char *err_msg = NULL;
-      (void)libssh2_session_last_error(sshc->ssh_session, &err_msg,
-                                       NULL, 0);
-      infof(data, "Failed to close libssh2 file: %d %s", rc, err_msg);
+      /* NB: there is no need to free identities, they are part of internal
+         agent stuff */
+      sshc->sshagent_identity = NULL;
+      sshc->sshagent_prev_identity = NULL;
     }
-    sshc->sftp_handle = NULL;
-  }
 
-  if(sshc->ssh_channel) {
-    rc = libssh2_channel_free(sshc->ssh_channel);
-    if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
-      return CURLE_AGAIN;
+    if(sshc->sftp_handle) {
+      rc = libssh2_sftp_close(sshc->sftp_handle);
+      if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
+        return CURLE_AGAIN;
 
-    if((rc < 0) && data) {
-      char *err_msg = NULL;
-      (void)libssh2_session_last_error(sshc->ssh_session,
-                                       &err_msg, NULL, 0);
-      infof(data, "Failed to free libssh2 scp subsystem: %d %s",
-            rc, err_msg);
+      if((rc < 0) && data) {
+        char *err_msg = NULL;
+        (void)libssh2_session_last_error(sshc->ssh_session, &err_msg,
+                                         NULL, 0);
+        infof(data, "Failed to close libssh2 file: %d %s", rc, err_msg);
+      }
+      sshc->sftp_handle = NULL;
     }
-    sshc->ssh_channel = NULL;
-  }
 
-  if(sshc->sftp_session) {
-    rc = libssh2_sftp_shutdown(sshc->sftp_session);
-    if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
-      return CURLE_AGAIN;
+    if(sshc->ssh_channel) {
+      rc = libssh2_channel_free(sshc->ssh_channel);
+      if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
+        return CURLE_AGAIN;
 
-    if((rc < 0) && data)
-      infof(data, "Failed to stop libssh2 sftp subsystem");
-    sshc->sftp_session = NULL;
-  }
-
-  if(sshc->ssh_session) {
-    rc = libssh2_session_free(sshc->ssh_session);
-    if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
-      return CURLE_AGAIN;
-
-    if((rc < 0) && data) {
-      char *err_msg = NULL;
-      (void)libssh2_session_last_error(sshc->ssh_session,
-                                       &err_msg, NULL, 0);
-      infof(data, "Failed to free libssh2 session: %d %s", rc, err_msg);
+      if((rc < 0) && data) {
+        char *err_msg = NULL;
+        (void)libssh2_session_last_error(sshc->ssh_session,
+                                         &err_msg, NULL, 0);
+        infof(data, "Failed to free libssh2 scp subsystem: %d %s",
+              rc, err_msg);
+      }
+      sshc->ssh_channel = NULL;
     }
-    sshc->ssh_session = NULL;
+
+    if(sshc->sftp_session) {
+      rc = libssh2_sftp_shutdown(sshc->sftp_session);
+      if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
+        return CURLE_AGAIN;
+
+      if((rc < 0) && data)
+        infof(data, "Failed to stop libssh2 sftp subsystem");
+      sshc->sftp_session = NULL;
+    }
+
+    if(sshc->ssh_session) {
+      rc = libssh2_session_free(sshc->ssh_session);
+      if(!block && (rc == LIBSSH2_ERROR_EAGAIN))
+        return CURLE_AGAIN;
+
+      if((rc < 0) && data) {
+        char *err_msg = NULL;
+        (void)libssh2_session_last_error(sshc->ssh_session,
+                                         &err_msg, NULL, 0);
+        infof(data, "Failed to free libssh2 session: %d %s", rc, err_msg);
+      }
+      sshc->ssh_session = NULL;
+    }
+
+    /* worst-case scenario cleanup */
+    DEBUGASSERT(sshc->ssh_session == NULL);
+    DEBUGASSERT(sshc->ssh_channel == NULL);
+    DEBUGASSERT(sshc->sftp_session == NULL);
+    DEBUGASSERT(sshc->sftp_handle == NULL);
+    DEBUGASSERT(sshc->kh == NULL);
+    DEBUGASSERT(sshc->ssh_agent == NULL);
+
+    Curl_safefree(sshc->rsa_pub);
+    Curl_safefree(sshc->rsa);
+    Curl_safefree(sshc->quote_path1);
+    Curl_safefree(sshc->quote_path2);
+    Curl_safefree(sshc->homedir);
+    sshc->initialised = FALSE;
   }
-
-  /* worst-case scenario cleanup */
-  DEBUGASSERT(sshc->ssh_session == NULL);
-  DEBUGASSERT(sshc->ssh_channel == NULL);
-  DEBUGASSERT(sshc->sftp_session == NULL);
-  DEBUGASSERT(sshc->sftp_handle == NULL);
-  DEBUGASSERT(sshc->kh == NULL);
-  DEBUGASSERT(sshc->ssh_agent == NULL);
-
-  Curl_safefree(sshc->rsa_pub);
-  Curl_safefree(sshc->rsa);
-  Curl_safefree(sshc->quote_path1);
-  Curl_safefree(sshc->quote_path2);
-  Curl_safefree(sshc->homedir);
-
   return CURLE_OK;
 }
 
@@ -3690,7 +3720,7 @@ static CURLcode scp_disconnect(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
   struct SSHPROTO *sshp = Curl_meta_get(data, CURL_META_SSH_EASY);
-  (void)dead_connection;
+  (void) dead_connection;
 
   if(sshc && sshc->ssh_session && sshp) {
     /* only if there is a session still around to use! */
@@ -3740,63 +3770,58 @@ static CURLcode scp_done(struct Curl_easy *data, CURLcode status,
   return ssh_done(data, status);
 }
 
-static CURLcode scp_send(struct Curl_easy *data, int sockindex,
-                         const void *mem, size_t len, bool eos,
-                         size_t *pnwritten)
+static ssize_t scp_send(struct Curl_easy *data, int sockindex,
+                        const void *mem, size_t len, bool eos, CURLcode *err)
 {
+  ssize_t nwrite;
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
-  CURLcode result = CURLE_OK;
-  ssize_t nwritten;
-
   (void)sockindex; /* we only support SCP on the fixed known primary socket */
   (void)eos;
-  *pnwritten = 0;
 
-  if(!sshc)
-    return CURLE_FAILED_INIT;
-
+  if(!sshc) {
+    *err = CURLE_FAILED_INIT;
+    return -1;
+  }
   /* libssh2_channel_write() returns int! */
-  nwritten = (ssize_t) libssh2_channel_write(sshc->ssh_channel, mem, len);
+  nwrite = (ssize_t) libssh2_channel_write(sshc->ssh_channel, mem, len);
 
-  ssh_block2waitfor(data, sshc, (nwritten == LIBSSH2_ERROR_EAGAIN));
+  ssh_block2waitfor(data, sshc, (nwrite == LIBSSH2_ERROR_EAGAIN));
 
-  if(nwritten == LIBSSH2_ERROR_EAGAIN)
-    result = CURLE_AGAIN;
-  else if(nwritten < LIBSSH2_ERROR_NONE)
-    result = libssh2_session_error_to_CURLE((int)nwritten);
-  else
-    *pnwritten = (size_t)nwritten;
+  if(nwrite == LIBSSH2_ERROR_EAGAIN) {
+    *err = CURLE_AGAIN;
+    nwrite = 0;
+  }
+  else if(nwrite < LIBSSH2_ERROR_NONE) {
+    *err = libssh2_session_error_to_CURLE((int)nwrite);
+    nwrite = -1;
+  }
 
-  return result;
+  return nwrite;
 }
 
-static CURLcode scp_recv(struct Curl_easy *data, int sockindex,
-                         char *mem, size_t len, size_t *pnread)
+static ssize_t scp_recv(struct Curl_easy *data, int sockindex,
+                        char *mem, size_t len, CURLcode *err)
 {
+  ssize_t nread;
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
-  CURLcode result = CURLE_OK;
-  ssize_t nread;
-
   (void)sockindex; /* we only support SCP on the fixed known primary socket */
-  *pnread = 0;
 
-  if(!sshc)
-    return CURLE_FAILED_INIT;
-
+  if(!sshc) {
+    *err = CURLE_FAILED_INIT;
+    return -1;
+  }
   /* libssh2_channel_read() returns int */
   nread = (ssize_t) libssh2_channel_read(sshc->ssh_channel, mem, len);
 
   ssh_block2waitfor(data, sshc, (nread == LIBSSH2_ERROR_EAGAIN));
-  if(nread == LIBSSH2_ERROR_EAGAIN)
-    return CURLE_AGAIN;
-  else if(nread < LIBSSH2_ERROR_NONE)
-    result = libssh2_session_error_to_CURLE((int)nread);
-  else
-    *pnread = (size_t)nread;
+  if(nread == LIBSSH2_ERROR_EAGAIN) {
+    *err = CURLE_AGAIN;
+    nread = -1;
+  }
 
-  return result;
+  return nread;
 }
 
 /*
@@ -3862,7 +3887,7 @@ static CURLcode sftp_disconnect(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
   struct SSHPROTO *sshp = Curl_meta_get(data, CURL_META_SSH_EASY);
-  (void)dead_connection;
+  (void) dead_connection;
 
   DEBUGF(infof(data, "SSH DISCONNECT starts now"));
 
@@ -3881,7 +3906,7 @@ static CURLcode sftp_disconnect(struct Curl_easy *data,
 }
 
 static CURLcode sftp_done(struct Curl_easy *data, CURLcode status,
-                          bool premature)
+                               bool premature)
 {
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
@@ -3901,61 +3926,64 @@ static CURLcode sftp_done(struct Curl_easy *data, CURLcode status,
 }
 
 /* return number of sent bytes */
-static CURLcode sftp_send(struct Curl_easy *data, int sockindex,
-                          const void *mem, size_t len, bool eos,
-                          size_t *pnwritten)
+static ssize_t sftp_send(struct Curl_easy *data, int sockindex,
+                         const void *mem, size_t len, bool eos, CURLcode *err)
 {
+  ssize_t nwrite;
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
-  ssize_t nwrite;
-
   (void)sockindex;
   (void)eos;
-  *pnwritten = 0;
 
-  if(!sshc)
-    return CURLE_FAILED_INIT;
-
+  if(!sshc) {
+    *err = CURLE_FAILED_INIT;
+    return -1;
+  }
   nwrite = libssh2_sftp_write(sshc->sftp_handle, mem, len);
 
   ssh_block2waitfor(data, sshc, (nwrite == LIBSSH2_ERROR_EAGAIN));
 
-  if(nwrite == LIBSSH2_ERROR_EAGAIN)
-    return CURLE_AGAIN;
-  else if(nwrite < LIBSSH2_ERROR_NONE)
-    return libssh2_session_error_to_CURLE((int)nwrite);
-  *pnwritten = (size_t)nwrite;
-  return CURLE_OK;
+  if(nwrite == LIBSSH2_ERROR_EAGAIN) {
+    *err = CURLE_AGAIN;
+    nwrite = 0;
+  }
+  else if(nwrite < LIBSSH2_ERROR_NONE) {
+    *err = libssh2_session_error_to_CURLE((int)nwrite);
+    nwrite = -1;
+  }
+
+  return nwrite;
 }
 
 /*
  * Return number of received (decrypted) bytes
  * or <0 on error
  */
-static CURLcode sftp_recv(struct Curl_easy *data, int sockindex,
-                          char *mem, size_t len, size_t *pnread)
+static ssize_t sftp_recv(struct Curl_easy *data, int sockindex,
+                         char *mem, size_t len, CURLcode *err)
 {
+  ssize_t nread;
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = Curl_conn_meta_get(conn, CURL_META_SSH_CONN);
-  ssize_t nread;
-
   (void)sockindex;
-  *pnread = 0;
 
-  if(!sshc)
-    return CURLE_FAILED_INIT;
-
+  if(!sshc) {
+    *err = CURLE_FAILED_INIT;
+    return -1;
+  }
   nread = libssh2_sftp_read(sshc->sftp_handle, mem, len);
 
   ssh_block2waitfor(data, sshc, (nread == LIBSSH2_ERROR_EAGAIN));
 
-  if(nread == LIBSSH2_ERROR_EAGAIN)
-    return CURLE_AGAIN;
-  else if(nread < 0)
-    return libssh2_session_error_to_CURLE((int)nread);
+  if(nread == LIBSSH2_ERROR_EAGAIN) {
+    *err = CURLE_AGAIN;
+    nread = -1;
 
-  *pnread = (size_t)nread;
-  return CURLE_OK;
+  }
+  else if(nread < 0) {
+    *err = libssh2_session_error_to_CURLE((int)nread);
+  }
+  return nread;
 }
 
 static const char *sftp_libssh2_strerror(unsigned long err)

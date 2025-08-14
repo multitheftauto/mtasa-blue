@@ -21,11 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
-static CURLcode test_lib589(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;
@@ -47,7 +47,8 @@ static CURLcode test_lib589(const char *URL)
   test_setopt(curl, CURLOPT_VERBOSE, 1L); /* show verbose for debug */
   test_setopt(curl, CURLOPT_HEADER, 1L); /* include header */
 
-  if(testnum == 584) {
+#ifdef LIB584
+  {
     curl_mime *mime = curl_mime_init(curl);
     curl_mimepart *part = curl_mime_addpart(mime);
     curl_mime_name(part, "fake");
@@ -58,6 +59,7 @@ static CURLcode test_lib589(const char *URL)
     if(res)
       goto test_cleanup;
   }
+#endif
 
   test_setopt(curl, CURLOPT_MIMEPOST, NULL);
 

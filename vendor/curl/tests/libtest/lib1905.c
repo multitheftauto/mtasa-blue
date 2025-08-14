@@ -21,11 +21,14 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
+#include "timediff.h"
+#include "warnless.h"
 #include "memdebug.h"
 
-static CURLcode test_lib1905(const char *URL)
+CURLcode test(char *URL)
 {
   CURLSH *sh = NULL;
   CURL *ch = NULL;

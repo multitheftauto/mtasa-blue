@@ -48,7 +48,6 @@
 
 #include "urldata.h"
 #include <curl/curl.h>
-#include "cfilters.h"
 #include "cf-socket.h"
 #include "transfer.h"
 #include "sendf.h"
@@ -160,8 +159,8 @@ static CURLcode tftp_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn);
 static CURLcode tftp_multi_statemach(struct Curl_easy *data, bool *done);
 static CURLcode tftp_doing(struct Curl_easy *data, bool *dophase_done);
-static CURLcode tftp_pollset(struct Curl_easy *data,
-                             struct easy_pollset *ps);
+static int tftp_getsock(struct Curl_easy *data, struct connectdata *conn,
+                        curl_socket_t *socks);
 static CURLcode tftp_translate_code(tftp_error_t error);
 
 
@@ -178,10 +177,10 @@ const struct Curl_handler Curl_handler_tftp = {
   tftp_connect,                         /* connect_it */
   tftp_multi_statemach,                 /* connecting */
   tftp_doing,                           /* doing */
-  tftp_pollset,                         /* proto_pollset */
-  tftp_pollset,                         /* doing_pollset */
-  ZERO_NULL,                            /* domore_pollset */
-  ZERO_NULL,                            /* perform_pollset */
+  tftp_getsock,                         /* proto_getsock */
+  tftp_getsock,                         /* doing_getsock */
+  ZERO_NULL,                            /* domore_getsock */
+  ZERO_NULL,                            /* perform_getsock */
   ZERO_NULL,                            /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -430,7 +429,6 @@ static CURLcode tftp_send_first(struct tftp_conn *state,
   const char *mode = "octet";
   char *filename;
   struct Curl_easy *data = state->data;
-  const struct Curl_sockaddr_ex *remote_addr = NULL;
   CURLcode result = CURLE_OK;
 
   /* Set ASCII mode if -B flag was used */
@@ -527,14 +525,10 @@ static CURLcode tftp_send_first(struct tftp_conn *state,
 #else
 #define CURL_SENDTO_ARG5(x) (x)
 #endif
-    remote_addr = Curl_conn_get_remote_addr(data, FIRSTSOCKET);
-    if(!remote_addr)
-      return CURLE_FAILED_INIT;
-
     senddata = sendto(state->sockfd, (void *)state->spacket.data,
                       (SEND_TYPE_ARG3)sbytes, 0,
-                      CURL_SENDTO_ARG5(&remote_addr->curl_sa_addr),
-                      (curl_socklen_t)remote_addr->addrlen);
+                      CURL_SENDTO_ARG5(&data->conn->remote_addr->curl_sa_addr),
+                      (curl_socklen_t)data->conn->remote_addr->addrlen);
     if(senddata != (ssize_t)sbytes) {
       char buffer[STRERROR_LEN];
       failf(data, "%s", Curl_strerror(SOCKERRNO, buffer, sizeof(buffer)));
@@ -961,7 +955,6 @@ static CURLcode tftp_connect(struct Curl_easy *data, bool *done)
   int blksize;
   int need_blksize;
   struct connectdata *conn = data->conn;
-  const struct Curl_sockaddr_ex *remote_addr = NULL;
 
   blksize = TFTP_BLKSIZE_DEFAULT;
 
@@ -1005,13 +998,8 @@ static CURLcode tftp_connect(struct Curl_easy *data, bool *done)
   state->blksize = TFTP_BLKSIZE_DEFAULT; /* Unless updated by OACK response */
   state->requested_blksize = blksize;
 
-  remote_addr = Curl_conn_get_remote_addr(data, FIRSTSOCKET);
-  DEBUGASSERT(remote_addr);
-  if(!remote_addr)
-    return CURLE_FAILED_INIT;
-
   ((struct sockaddr *)&state->local_addr)->sa_family =
-    (CURL_SA_FAMILY_T)(remote_addr->family);
+    (CURL_SA_FAMILY_T)(conn->remote_addr->family);
 
   tftp_set_timeouts(state);
 
@@ -1030,7 +1018,7 @@ static CURLcode tftp_connect(struct Curl_easy *data, bool *done)
      * IPv4 and IPv6...
      */
     int rc = bind(state->sockfd, (struct sockaddr *)&state->local_addr,
-                  (curl_socklen_t)remote_addr->addrlen);
+                  (curl_socklen_t)conn->remote_addr->addrlen);
     if(rc) {
       char buffer[STRERROR_LEN];
       failf(data, "bind() failed; %s",
@@ -1074,10 +1062,19 @@ static CURLcode tftp_done(struct Curl_easy *data, CURLcode status,
   return result;
 }
 
-static CURLcode tftp_pollset(struct Curl_easy *data,
-                             struct easy_pollset *ps)
+/**********************************************************
+ *
+ * tftp_getsock
+ *
+ * The getsock callback
+ *
+ **********************************************************/
+static int tftp_getsock(struct Curl_easy *data,
+                        struct connectdata *conn, curl_socket_t *socks)
 {
-  return Curl_pollset_add_in(data, ps, data->conn->sock[FIRSTSOCKET]);
+  (void)data;
+  socks[0] = conn->sock[FIRSTSOCKET];
+  return GETSOCK_READSOCK(0);
 }
 
 /**********************************************************
@@ -1360,7 +1357,7 @@ static CURLcode tftp_setup_connection(struct Curl_easy *data,
 {
   char *type;
 
-  conn->transport_wanted = TRNSPRT_UDP;
+  conn->transport = TRNSPRT_UDP;
 
   /* TFTP URLs support an extension like ";mode=<typecode>" that
    * we will try to get now! */

@@ -24,7 +24,7 @@
 #include "tool_setup.h"
 #include "tool_xattr.h"
 
-#include "memdebug.h" /* keep this as LAST include */
+#include <memdebug.h> /* keep this as LAST include */
 
 #ifdef USE_XATTR
 
@@ -43,7 +43,12 @@ static const struct xattr_mapping {
 
 /* returns a new URL that needs to be freed */
 /* @unittest: 1621 */
-UNITTEST char *stripcredentials(const char *url)
+#ifdef UNITTESTS
+char *stripcredentials(const char *url);
+#else
+static
+#endif
+char *stripcredentials(const char *url)
 {
   CURLU *u;
   CURLUcode uc;

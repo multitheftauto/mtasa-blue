@@ -21,7 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 /*
   Based on a bug report recipe by Rene Bernhardt in
@@ -29,17 +29,16 @@
 
   It is reproducible by the following steps:
 
-  - Use a proxy that offers NTLM and Negotiate
-    (CURLOPT_PROXY and CURLOPT_PROXYPORT)
-  - Tell libcurl NOT to use Negotiate
-    curl_easy_setopt(CURLOPT_PROXYAUTH,
-                     CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NTLM)
+  - Use a proxy that offers NTLM and Negotiate ( CURLOPT_PROXY and
+  CURLOPT_PROXYPORT)
+  - Tell libcurl NOT to use Negotiate  CURL_EASY_SETOPT(CURLOPT_PROXYAUTH,
+  CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NTLM)
   - Start the request
 */
 
 #include "memdebug.h"
 
-static CURLcode test_lib590(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode res;
   CURL *curl;
@@ -60,7 +59,7 @@ static CURLcode test_lib590(const char *URL)
   test_setopt(curl, CURLOPT_URL, URL);
   test_setopt(curl, CURLOPT_HEADER, 1L);
   test_setopt(curl, CURLOPT_PROXYAUTH,
-              CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NTLM);
+              (long) (CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NTLM));
   test_setopt(curl, CURLOPT_PROXY, libtest_arg2); /* set in first.c */
 
   /* set the name + password twice to test that the API is fine with it */

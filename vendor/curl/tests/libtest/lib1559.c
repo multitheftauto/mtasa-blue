@@ -21,14 +21,15 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
+#include "warnless.h"
 #include "memdebug.h"
 
-static CURLcode test_lib1559(const char *URL)
+#define EXCESSIVE 10*1000*1000
+CURLcode test(char *URL)
 {
-  static const int EXCESSIVE = 10*1000*1000;
-
   CURLcode res = CURLE_OK;
   CURL *curl = NULL;
   char *longurl = NULL;
@@ -59,13 +60,13 @@ static CURLcode test_lib1559(const char *URL)
   if(u) {
     CURLUcode uc = curl_url_set(u, CURLUPART_URL, longurl, 0);
     curl_mprintf("CURLUPART_URL %d bytes URL == %d (%s)\n",
-                 EXCESSIVE, uc, curl_url_strerror(uc));
+                 EXCESSIVE, (int)uc, curl_url_strerror(uc));
     uc = curl_url_set(u, CURLUPART_SCHEME, longurl, CURLU_NON_SUPPORT_SCHEME);
     curl_mprintf("CURLUPART_SCHEME %d bytes scheme == %d (%s)\n",
-                 EXCESSIVE, uc, curl_url_strerror(uc));
+                 EXCESSIVE, (int)uc, curl_url_strerror(uc));
     uc = curl_url_set(u, CURLUPART_USER, longurl, 0);
     curl_mprintf("CURLUPART_USER %d bytes user == %d (%s)\n",
-                 EXCESSIVE, uc, curl_url_strerror(uc));
+                 EXCESSIVE, (int)uc, curl_url_strerror(uc));
     curl_url_cleanup(u);
   }
 

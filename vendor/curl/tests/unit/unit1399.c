@@ -21,10 +21,22 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "urldata.h"
 #include "progress.h"
+
+static int usec_magnitude = 1000000;
+
+static bool unit_setup(void)
+{
+  return CURLE_OK;
+}
+
+static void unit_stop(void)
+{
+
+}
 
 /*
  * Invoke Curl_pgrsTime for TIMER_STARTSINGLE to trigger the behavior that
@@ -42,8 +54,6 @@ static void fake_t_startsingle_time(struct Curl_easy *data,
 
 static bool usec_matches_seconds(timediff_t time_usec, int expected_seconds)
 {
-  static int usec_magnitude = 1000000;
-
   int time_sec = (int)(time_usec / usec_magnitude);
   bool same = (time_sec == expected_seconds);
   curl_mfprintf(stderr, "is %d us same as %d seconds? %s\n",
@@ -71,10 +81,7 @@ static void expect_timer_seconds(struct Curl_easy *data, int seconds)
  * E.g., if t_starttransfer took 2 seconds initially and took another 1
  * second for the redirect request, then the resulting t_starttransfer should
  * be 3 seconds. */
-static CURLcode test_unit1399(const char *arg)
-{
-  UNITTEST_BEGIN_SIMPLE
-
+UNITTEST_START
   struct Curl_easy data;
   struct curltime now = curlx_now();
 
@@ -110,6 +117,4 @@ static CURLcode test_unit1399(const char *arg)
   Curl_pgrsTime(&data, TIMER_STARTTRANSFER);
 
   expect_timer_seconds(&data, 3);
-
-  UNITTEST_END_SIMPLE
-}
+UNITTEST_STOP
