@@ -21,42 +21,33 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "curlcheck.h"
 
-#define t1301_fail_unless(expr, msg)                             \
-  do {                                                           \
-    if(!(expr)) {                                                \
-      curl_mfprintf(stderr, "%s:%d Assertion '%s' FAILED: %s\n", \
-                    __FILE__, __LINE__, #expr, msg);             \
-      return TEST_ERR_FAILURE;                                   \
-    }                                                            \
-  } while(0)
-
-static CURLcode test_lib1301(const char *URL)
+CURLcode test(char *URL)
 {
   int rc;
   (void)URL;
 
   rc = curl_strequal("iii", "III");
-  t1301_fail_unless(rc != 0, "return code should be non-zero");
+  fail_unless(rc != 0, "return code should be non-zero");
 
   rc = curl_strequal("iiia", "III");
-  t1301_fail_unless(rc == 0, "return code should be zero");
+  fail_unless(rc == 0, "return code should be zero");
 
   rc = curl_strequal("iii", "IIIa");
-  t1301_fail_unless(rc == 0, "return code should be zero");
+  fail_unless(rc == 0, "return code should be zero");
 
   rc = curl_strequal("iiiA", "IIIa");
-  t1301_fail_unless(rc != 0, "return code should be non-zero");
+  fail_unless(rc != 0, "return code should be non-zero");
 
   rc = curl_strnequal("iii", "III", 3);
-  t1301_fail_unless(rc != 0, "return code should be non-zero");
+  fail_unless(rc != 0, "return code should be non-zero");
 
   rc = curl_strnequal("iiiABC", "IIIcba", 3);
-  t1301_fail_unless(rc != 0, "return code should be non-zero");
+  fail_unless(rc != 0, "return code should be non-zero");
 
   rc = curl_strnequal("ii", "II", 3);
-  t1301_fail_unless(rc != 0, "return code should be non-zero");
+  fail_unless(rc != 0, "return code should be non-zero");
 
   return CURLE_OK;
 }

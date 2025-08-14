@@ -27,14 +27,14 @@
  * from server http header
  */
 
-#include "first.h"
-
+#include "test.h"
+#include <stdio.h>
 #include "memdebug.h"
 
 /*
  * carefully not leak memory on OOM
  */
-static int t1598_trailers_callback(struct curl_slist **list, void *userdata)
+static int trailers_callback(struct curl_slist **list, void *userdata)
 {
   struct curl_slist *nlist = NULL;
   struct curl_slist *nlist2 = NULL;
@@ -52,10 +52,10 @@ static int t1598_trailers_callback(struct curl_slist **list, void *userdata)
   }
 }
 
-static CURLcode test_lib1598(const char *URL)
-{
-  static const char *post_data = "xxx=yyy&aaa=bbbbb";
+static const char *post_data = "xxx=yyy&aaa=bbbbb";
 
+CURLcode test(char *URL)
+{
   CURL *curl = NULL;
   CURLcode res = CURLE_FAILED_INIT;
   /* http and proxy header list */
@@ -65,6 +65,7 @@ static CURLcode test_lib1598(const char *URL)
     curl_mfprintf(stderr, "curl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
+
 
   curl = curl_easy_init();
   if(!curl) {
@@ -88,7 +89,7 @@ static CURLcode test_lib1598(const char *URL)
   test_setopt(curl, CURLOPT_HTTPHEADER, hhl);
   test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(post_data));
   test_setopt(curl, CURLOPT_POSTFIELDS, post_data);
-  test_setopt(curl, CURLOPT_TRAILERFUNCTION, t1598_trailers_callback);
+  test_setopt(curl, CURLOPT_TRAILERFUNCTION, trailers_callback);
   test_setopt(curl, CURLOPT_TRAILERDATA, NULL);
   test_setopt(curl, CURLOPT_VERBOSE, 1L);
 

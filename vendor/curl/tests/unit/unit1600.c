@@ -21,35 +21,33 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "urldata.h"
 #include "curl_ntlm_core.h"
 
-static CURLcode t1600_setup(CURL **easy)
+static CURL *easy;
+
+static CURLcode unit_setup(void)
 {
   CURLcode res = CURLE_OK;
 
   global_init(CURL_GLOBAL_ALL);
-  *easy = curl_easy_init();
-  if(!*easy) {
+  easy = curl_easy_init();
+  if(!easy) {
     curl_global_cleanup();
     return CURLE_OUT_OF_MEMORY;
   }
   return res;
 }
 
-static void t1600_stop(CURL *easy)
+static void unit_stop(void)
 {
   curl_easy_cleanup(easy);
   curl_global_cleanup();
 }
 
-static CURLcode test_unit1600(const char *arg)
-{
-  CURL *easy;
-
-  UNITTEST_BEGIN(t1600_setup(&easy))
+UNITTEST_START
 
 #if defined(USE_NTLM) && (!defined(USE_WINDOWS_SSPI) || \
                           defined(USE_WIN32_CRYPTO))
@@ -67,12 +65,11 @@ static CURLcode test_unit1600(const char *arg)
               "\x39\xaf\x87\xa6\x75\x0a\x7a\x00\xba\xa0"
               "\xd3\x4f\x04\x9e\xc1\xd0\x00\x00\x00\x00\x00", 21);
 
-  /* !checksrc! disable LONGLINE 2 */
+/* !checksrc! disable LONGLINE 2 */
   Curl_ntlm_core_mk_nt_hash("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", output);
 
   verify_memory(testp,
                 "\x36\x9d\xae\x06\x84\x7e\xe1\xc1\x4a\x94\x39\xea\x6f\x44\x8c\x65\x00\x00\x00\x00\x00", 21);
 #endif
 
-  UNITTEST_END(t1600_stop(easy))
-}
+UNITTEST_STOP

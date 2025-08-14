@@ -46,18 +46,18 @@ struct datauv {
   CURLM *multi;
 };
 
-struct curl_context {
+typedef struct curl_context_s {
   uv_poll_t poll_handle;
   curl_socket_t sockfd;
   struct datauv *uv;
-};
+} curl_context_t;
 
-static struct curl_context *create_curl_context(curl_socket_t sockfd,
-                                                struct datauv *uv)
+static curl_context_t *create_curl_context(curl_socket_t sockfd,
+                                           struct datauv *uv)
 {
-  struct curl_context *context;
+  curl_context_t *context;
 
-  context = (struct curl_context *) malloc(sizeof(*context));
+  context = (curl_context_t *) malloc(sizeof(*context));
 
   context->sockfd = sockfd;
   context->uv = uv;
@@ -70,11 +70,11 @@ static struct curl_context *create_curl_context(curl_socket_t sockfd,
 
 static void curl_close_cb(uv_handle_t *handle)
 {
-  struct curl_context *context = (struct curl_context *) handle->data;
+  curl_context_t *context = (curl_context_t *) handle->data;
   free(context);
 }
 
-static void destroy_curl_context(struct curl_context *context)
+static void destroy_curl_context(curl_context_t *context)
 {
   uv_close((uv_handle_t *) &context->poll_handle, curl_close_cb);
 }
@@ -101,7 +101,7 @@ static void add_download(const char *url, int num, CURLM *multi)
   fprintf(stderr, "Added download %s -> %s\n", url, filename);
 }
 
-static void check_multi_info(struct curl_context *context)
+static void check_multi_info(curl_context_t *context)
 {
   char *done_url;
   CURLMsg *message;
@@ -142,7 +142,7 @@ static void on_uv_socket(uv_poll_t *req, int status, int events)
 {
   int running_handles;
   int flags = 0;
-  struct curl_context *context = (struct curl_context *) req->data;
+  curl_context_t *context = (curl_context_t *) req->data;
   (void)status;
   if(events & UV_READABLE)
     flags |= CURL_CSELECT_IN;
@@ -157,7 +157,7 @@ static void on_uv_socket(uv_poll_t *req, int status, int events)
 /* callback from libuv when timeout expires */
 static void on_uv_timeout(uv_timer_t *req)
 {
-  struct curl_context *context = (struct curl_context *) req->data;
+  curl_context_t *context = (curl_context_t *) req->data;
   if(context) {
     int running_handles;
     curl_multi_socket_action(context->uv->multi, CURL_SOCKET_TIMEOUT, 0,
@@ -188,7 +188,7 @@ static int cb_socket(CURL *easy, curl_socket_t s, int action,
                      struct datauv *uv,
                      void *socketp)
 {
-  struct curl_context *curl_context;
+  curl_context_t *curl_context;
   int events = 0;
   (void)easy;
 
@@ -197,7 +197,7 @@ static int cb_socket(CURL *easy, curl_socket_t s, int action,
   case CURL_POLL_OUT:
   case CURL_POLL_INOUT:
     curl_context = socketp ?
-      (struct curl_context *) socketp : create_curl_context(s, uv);
+      (curl_context_t *) socketp : create_curl_context(s, uv);
 
     curl_multi_assign(uv->multi, s, (void *) curl_context);
 
@@ -210,8 +210,8 @@ static int cb_socket(CURL *easy, curl_socket_t s, int action,
     break;
   case CURL_POLL_REMOVE:
     if(socketp) {
-      uv_poll_stop(&((struct curl_context*)socketp)->poll_handle);
-      destroy_curl_context((struct curl_context*) socketp);
+      uv_poll_stop(&((curl_context_t*)socketp)->poll_handle);
+      destroy_curl_context((curl_context_t*) socketp);
       curl_multi_assign(uv->multi, s, NULL);
     }
     break;

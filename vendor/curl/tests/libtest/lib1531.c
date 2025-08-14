@@ -21,15 +21,20 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
+#include "timediff.h"
+#include "warnless.h"
 #include "memdebug.h"
 
-static CURLcode test_lib1531(const char *URL)
-{
-  static char const testData[] = ".abc\0xyz";
-  static curl_off_t const testDataSize = sizeof(testData) - 1;
+#define TEST_HANG_TIMEOUT 60 * 1000
 
+static char const testData[] = ".abc\0xyz";
+static curl_off_t const testDataSize = sizeof(testData) - 1;
+
+CURLcode test(char *URL)
+{
   CURL *easy;
   CURLM *multi_handle;
   int still_running; /* keep number of running handles */
@@ -104,7 +109,15 @@ static CURLcode test_lib1531(const char *URL)
        curl_multi_fdset() doc. */
 
     if(maxfd == -1) {
-      rc = curlx_wait_ms(100);
+#ifdef _WIN32
+      Sleep(100);
+      rc = 0;
+#else
+      /* Portable sleep for platforms other than Windows. */
+      struct timeval wait = {0};
+      wait.tv_usec = 100 * 1000; /* 100ms */
+      rc = select(0, NULL, NULL, NULL, &wait);
+#endif
     }
     else {
       /* Note that on some platforms 'timeout' may be modified by select().

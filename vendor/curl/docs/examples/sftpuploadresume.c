@@ -83,7 +83,7 @@ static int sftpResumeUpload(CURL *curlhandle, const char *remotepath,
   CURLcode result = CURLE_GOT_NOTHING;
 
   curl_off_t remoteFileSizeByte = sftpGetRemoteFileSize(remotepath);
-  if(remoteFileSizeByte == -1) {
+  if(-1 == remoteFileSizeByte) {
     printf("Error reading the remote file size: unable to resume upload\n");
     return -1;
   }

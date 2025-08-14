@@ -21,9 +21,15 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include <limits.h>
+
+#include "testutil.h"
+#include "warnless.h"
 #include "memdebug.h"
+
+#define TEST_HANG_TIMEOUT 60 * 1000
 
 /*
  * Test case for below scenario:
@@ -34,7 +40,7 @@
  * with function curl_multi_info_read().
  */
 
-static CURLcode test_lib597(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *easy = NULL;
   CURLM *multi = NULL;

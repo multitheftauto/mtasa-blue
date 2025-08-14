@@ -36,7 +36,6 @@
 #include "connect.h"
 #include "progress.h"
 #include "transfer.h"
-#include "select.h"
 #include "vtls/vtls.h"
 #include "curl_ntlm_core.h"
 #include "escape.h"
@@ -299,8 +298,8 @@ static CURLcode smb_connect(struct Curl_easy *data, bool *done);
 static CURLcode smb_connection_state(struct Curl_easy *data, bool *done);
 static CURLcode smb_do(struct Curl_easy *data, bool *done);
 static CURLcode smb_request_state(struct Curl_easy *data, bool *done);
-static CURLcode smb_pollset(struct Curl_easy *data,
-                            struct easy_pollset *ps);
+static int smb_getsock(struct Curl_easy *data, struct connectdata *conn,
+                       curl_socket_t *socks);
 static CURLcode smb_parse_url_path(struct Curl_easy *data,
                                    struct smb_conn *smbc,
                                    struct smb_request *req);
@@ -317,10 +316,10 @@ const struct Curl_handler Curl_handler_smb = {
   smb_connect,                          /* connect_it */
   smb_connection_state,                 /* connecting */
   smb_request_state,                    /* doing */
-  smb_pollset,                          /* proto_pollset */
-  smb_pollset,                          /* doing_pollset */
-  ZERO_NULL,                            /* domore_pollset */
-  ZERO_NULL,                            /* perform_pollset */
+  smb_getsock,                          /* proto_getsock */
+  smb_getsock,                          /* doing_getsock */
+  ZERO_NULL,                            /* domore_getsock */
+  ZERO_NULL,                            /* perform_getsock */
   ZERO_NULL,                            /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -346,10 +345,10 @@ const struct Curl_handler Curl_handler_smbs = {
   smb_connect,                          /* connect_it */
   smb_connection_state,                 /* connecting */
   smb_request_state,                    /* doing */
-  smb_pollset,                          /* proto_pollset */
-  smb_pollset,                          /* doing_pollset */
-  ZERO_NULL,                            /* domore_pollset */
-  ZERO_NULL,                            /* perform_pollset */
+  smb_getsock,                          /* proto_getsock */
+  smb_getsock,                          /* doing_getsock */
+  ZERO_NULL,                            /* domore_getsock */
+  ZERO_NULL,                            /* perform_getsock */
   ZERO_NULL,                            /* disconnect */
   ZERO_NULL,                            /* write_resp */
   ZERO_NULL,                            /* write_resp_hd */
@@ -497,7 +496,7 @@ static CURLcode smb_connect(struct Curl_easy *data, bool *done)
   struct smb_conn *smbc = Curl_conn_meta_get(conn, CURL_META_SMB_CONN);
   char *slash;
 
-  (void)done;
+  (void) done;
   if(!smbc)
     return CURLE_FAILED_INIT;
 
@@ -544,7 +543,7 @@ static CURLcode smb_recv_message(struct Curl_easy *data,
                                  void **msg)
 {
   char *buf = smbc->recv_buf;
-  size_t bytes_read;
+  ssize_t bytes_read;
   size_t nbt_size;
   size_t msg_size;
   size_t len = MAX_MESSAGE_SIZE - smbc->got;
@@ -1000,8 +999,8 @@ static CURLcode smb_connection_state(struct Curl_easy *data, bool *done)
  */
 static void get_posix_time(time_t *out, curl_off_t timestamp)
 {
-  if(timestamp >= (curl_off_t)116444736000000000) {
-    timestamp -= (curl_off_t)116444736000000000;
+  if(timestamp >= CURL_OFF_T_C(116444736000000000)) {
+    timestamp -= CURL_OFF_T_C(116444736000000000);
     timestamp /= 10000000;
 #if SIZEOF_TIME_T < SIZEOF_CURL_OFF_T
     if(timestamp > TIME_T_MAX)
@@ -1205,10 +1204,12 @@ static CURLcode smb_request_state(struct Curl_easy *data, bool *done)
   return CURLE_OK;
 }
 
-static CURLcode smb_pollset(struct Curl_easy *data,
-                            struct easy_pollset *ps)
+static int smb_getsock(struct Curl_easy *data,
+                       struct connectdata *conn, curl_socket_t *socks)
 {
-  return Curl_pollset_add_inout(data, ps, data->conn->sock[FIRSTSOCKET]);
+  (void)data;
+  socks[0] = conn->sock[FIRSTSOCKET];
+  return GETSOCK_READSOCK(0) | GETSOCK_WRITESOCK(0);
 }
 
 static CURLcode smb_do(struct Curl_easy *data, bool *done)
@@ -1266,4 +1267,5 @@ static CURLcode smb_parse_url_path(struct Curl_easy *data,
   return CURLE_OK;
 }
 
-#endif /* CURL_DISABLE_SMB && USE_CURL_NTLM_CORE && SIZEOF_CURL_OFF_T > 4 */
+#endif /* CURL_DISABLE_SMB && USE_CURL_NTLM_CORE &&
+          SIZEOF_CURL_OFF_T > 4 */
