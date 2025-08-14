@@ -771,4 +771,5 @@ public:
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
     static CMtaVersion   GetVersionSortable();
+    static bool          SetElementCollidableWith(CElement* element, CElement* withElement, bool canCollide);
 };
