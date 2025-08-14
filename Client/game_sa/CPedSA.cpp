@@ -588,9 +588,9 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
 
     eAnimID animID = (eAnimID)firstAssoc->sAnimID;
 
-    bool unk_v35 = false;
+    bool isMovingAnim = false;
     if (animID == eAnimID::ANIM_ID_WALK || animID == eAnimID::ANIM_ID_RUN || animID == eAnimID::ANIM_ID_SPRINT)
-        unk_v35 = true;
+        isMovingAnim = true;
 
     if (ped->pedFlags.bDoBloodyFootprints && ped->timeWhenDead > 0 && ped->timeWhenDead < 300)
     {
@@ -603,21 +603,30 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
     if (!ped->pedFlags.bIsStanding)
         return;
 
-    CAnimBlendAssociationSAInterface* unk_v4 = nullptr;
-    float                  unk_v30 = 0.0f;
-
-    float unk_a3 = 0.0f;
+    CAnimBlendAssociationSAInterface* walkAnim = nullptr;
+    float                             walkBlendTotal = 0.0f;
+    float                             idleBlendTotal  = 0.0f;
 
     for (auto& assoc = firstAssoc; assoc != nullptr; assoc = ((CAnimBlendAssociationSAInterface * (__cdecl*)(CAnimBlendAssociationSAInterface*))0x4D6AB0)(assoc))
     {
-        if (assoc->m_bf9)
+        if (assoc->m_walkAnim)
         {
-            unk_v4 = assoc;
-            unk_v30 += assoc->fBlendAmount;
+            walkAnim = assoc;
+            walkBlendTotal += assoc->fBlendAmount;
         }
         else if (!assoc->m_bAddAnimBlendToTotalBlend && assoc->sAnimID != 223 && (assoc->m_bPartial || !ped->pedFlags.bIsDucking))
-            unk_a3 += assoc->fBlendAmount;
+            idleBlendTotal  += assoc->fBlendAmount;
     }
+
+   /* if (!walkAnim)
+    {
+        walkAnim = ((CAnimBlendAssociationSAInterface * (__cdecl*)(RpClump*))0x4D15E0)(ped->m_pRwObject);
+
+        if (walkAnim->m_walkAnim)
+            walkBlendTotal = walkAnim->fBlendAmount;
+        else if (walkAnim->m_bAddAnimBlendToTotalBlend && walkAnim->sAnimID != 223 && (walkAnim->m_bPartial || ped->pedFlags.bIsDucking))
+            idleBlendTotal  = walkAnim->fBlendAmount;
+    }*/
 
     auto handleLanding = [](CPedSAInterface* ped)
     {
@@ -642,48 +651,48 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         }
     };
 
-    auto DoFootstep = [unk_v35, handleLanding](CPedSAInterface* ped, bool leftFoot)
+    auto DoFootstep = [isMovingAnim, handleLanding](CPedSAInterface* ped, bool leftFoot)
     {
-        float unk_a3d = 0.0f;
-        float unk_v34 = 0.0f;
+        float volumeOffset = 0.0f;
+        float soundSpeed = 0.0f;
 
         if (ped->pedFlags.bIsDucking)
         {
-            unk_a3d = -18.0f;
-            unk_v34 = 0.8f;
+            volumeOffset = -18.0f;
+            soundSpeed = 0.8f;
         }
         else
         {
             if (ped->moveState == PedMoveState::Enum::PEDMOVE_RUN)
             {
-                unk_a3d = -6.0f;
-                unk_v34 = 1.1f;
+                volumeOffset = -6.0f;
+                soundSpeed = 1.1f;
             }
             else if (ped->moveState == PedMoveState::Enum::PEDMOVE_SPRINT)
             {
-                unk_v34 = 1.2f;
+                soundSpeed = 1.2f;
             }
             else
             {
-                unk_a3d = -12.0f;
-                unk_v34 = 0.9f;
+                volumeOffset = -12.0f;
+                soundSpeed = 0.9f;
             }
 
             if (ped->iMoveAnimGroup == 69)
             {
-                unk_a3d -= 6.0f;
-                unk_v34 -= 0.1f;
+                volumeOffset -= 6.0f;
+                soundSpeed -= 0.1f;
             }
         }
 
         if (ped->pedAudio.canAddEvent)
         {
             // CPedAudio::AddEvent
-            ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, leftFoot ? 54 : 55, unk_a3d, unk_v34, nullptr, 0, 0, 0);
+            ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, leftFoot ? 54 : 55, volumeOffset, soundSpeed, nullptr, 0, 0, 0);
         }
 
         // CPed::DoFootLanded
-        ((void(__thiscall*)(CPedSAInterface*, int, bool))0x5E5380)(ped, leftFoot ? 1 : 0, unk_v35);
+        ((void(__thiscall*)(CPedSAInterface*, int, bool))0x5E5380)(ped, leftFoot ? 1 : 0, isMovingAnim);
 
         handleLanding(ped);
         return;
@@ -705,31 +714,31 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         DoFootstep(ped, true);
     };
 
-    if (!unk_v4 || unk_v30 <= 0.5f || unk_a3 >= 1.0f)
+    if (!walkAnim || walkBlendTotal <= 0.5f || idleBlendTotal  >= 1.0f)
     {
         handleLanding(ped);
         return;
     }
 
-    float totalTime = unk_v4->pAnimHierarchy->fTotalTime * 0.066f;
-    float totalTime2 = unk_v4->pAnimHierarchy->fTotalTime * 0.5f + totalTime;
+    float minAnimTime = walkAnim->pAnimHierarchy->fTotalTime * 0.066f;
+    float maxAnimTime = walkAnim->pAnimHierarchy->fTotalTime * 0.5f + minAnimTime;
 
     if (ped->pedFlags.bIsDucking)
     {
-        totalTime += 0.2f;
-        totalTime2 += 0.2f;
+        minAnimTime += 0.2f;
+        maxAnimTime += 0.2f;
     }
 
     CPedStatSAInterface** ms_apPedStats = reinterpret_cast<CPedStatSAInterface**>(0xC0BBEC);
-    float                 unk_a3a = 0.0f;
+    float                 animTimeMult = 0.0f;
 
-    float unk_v32 = 0.0f;
+    float volumeMult = 0.0f;
 
     if (ped->pPedStats == ms_apPedStats[40])
     {
-        unk_a3a = 0.533f;
-        if (unk_v4->sAnimID != 0)
-            unk_a3a = 0.33f;
+        animTimeMult = 0.533f;
+        if (walkAnim->sAnimID != 0)
+            animTimeMult = 0.33f;
 
         int surface = ((int(__thiscall*)(void*, int))0x55E5C0)((void*)0xB79538, ped->m_ucCollisionContactSurfaceType) - 3;
         if (surface > 0)
@@ -753,7 +762,7 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
                 return;
             }
 
-            unk_v32 = 1.0f;
+            volumeMult = 1.0f;
         }
         else
         {
@@ -762,28 +771,28 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
                 ped->vecAnimMovingShiftLocal *= 0.5f;
             }
 
-            unk_v32 = 0.5f;
+            volumeMult = 0.5f;
         }
 
-        if (unk_v4->fCurrentTime <= 0.0f || unk_v4->fCurrentTime - unk_v4->fTimeStep > 0.0f)
+        if (walkAnim->fCurrentTime <= 0.0f || walkAnim->fCurrentTime - walkAnim->fTimeStep > 0.0f)
         {
-            if (unk_v32 > 0.2f && unk_v4->fCurrentTime > unk_a3a && unk_v4->fCurrentTime - unk_v4->fTimeStep <= unk_a3a && ped->pedAudio.canAddEvent)
+            if (volumeMult > 0.2f && walkAnim->fCurrentTime > animTimeMult && walkAnim->fCurrentTime - walkAnim->fTimeStep <= animTimeMult && ped->pedAudio.canAddEvent)
             {
-                ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, 57, std::log10(unk_v32), unk_v4->sAnimID == 0 ? 0.5 : 1.0f, nullptr, 0, 0, 0);
+                ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, 57, std::log10(volumeMult), walkAnim->sAnimID == 0 ? 0.5 : 1.0f, nullptr, 0, 0, 0);
             }
         }
         else if (ped->pedAudio.canAddEvent)
         {
-            ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, 56, std::log10(unk_v32), unk_v4->sAnimID == 0 ? 0.5 : 1.0f, nullptr, 0, 0, 0);
+            ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, 56, std::log10(volumeMult), walkAnim->sAnimID == 0 ? 0.5 : 1.0f, nullptr, 0, 0, 0);
         }
 
         handleLanding(ped);
         return;
     }
 
-    if (totalTime > unk_v4->fCurrentTime || unk_v4->fCurrentTime - unk_v4->fTimeStep >= totalTime)
+    if (minAnimTime > walkAnim->fCurrentTime || walkAnim->fCurrentTime - walkAnim->fTimeStep >= minAnimTime)
     {
-        if (unk_v4->fCurrentTime >= totalTime2 && unk_v4->fCurrentTime - unk_v4->fTimeStep < totalTime2)
+        if (walkAnim->fCurrentTime >= maxAnimTime && walkAnim->fCurrentTime - walkAnim->fTimeStep < maxAnimTime)
         {
             DoFootstep(ped, false);
             return;
@@ -798,21 +807,21 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         CPlayerPedDataSAInterface* playerData = ped->pPlayerData;
         if (playerData)
         {
-            bool wearingBaclava = ((bool(__fastcall*)(CPedClothesDesc*, int))0x5A7950)(playerData->m_pClothes, 0);
+            bool wearingBalaclava = ((bool(__fastcall*)(CPedClothesDesc*, int))0x5A7950)(playerData->m_pClothes, 0);
             if (ped->moveState >= PedMoveState::Enum::PEDMOVE_JOG)
             {
                 if (ped->moveState <= PedMoveState::Enum::PEDMOVE_RUN)
                 {
                     if (playerData->m_moveBlendRatio >= 2.0f)
                     {
-                        triggerSoundQuietEvent(ped, wearingBaclava ? 55.0f : 45.0f);
+                        triggerSoundQuietEvent(ped, wearingBalaclava ? 55.0f : 45.0f);
                         return;
                     }
 
-                    float unk_v18 = 0.0f;
+                    float soundLevel = 0.0f;
 
-                    if (wearingBaclava && playerData->m_moveBlendRatio > 1.1f)
-                        unk_v18 = (playerData->m_moveBlendRatio - 1.0f) * 20.0f;
+                    if (wearingBalaclava && playerData->m_moveBlendRatio > 1.1f)
+                        soundLevel = (playerData->m_moveBlendRatio - 1.0f) * 20.0f;
                     else
                     {
                         if (playerData->m_moveBlendRatio <= 1.5f)
@@ -821,19 +830,19 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
                             return;
                         }
 
-                        unk_v18 = (playerData->m_moveBlendRatio - 1.0f) * 15.0f;
+                        soundLevel = (playerData->m_moveBlendRatio - 1.0f) * 15.0f;
                     }
 
-                    float level = unk_v18 + 30.0f;  
-                    if (level > 0.0f)
+                    soundLevel += 30.0f;  
+                    if (soundLevel > 0.0f)
                     {
-                        triggerSoundQuietEvent(ped, level);
+                        triggerSoundQuietEvent(ped, soundLevel);
                         return;
                     }
                 }
                 else if (ped->moveState == PedMoveState::Enum::PEDMOVE_SPRINT)
                 {
-                    triggerSoundQuietEvent(ped, wearingBaclava ? 65.0f : 55.0f);
+                    triggerSoundQuietEvent(ped, wearingBalaclava ? 65.0f : 55.0f);
                     return;
                 }
             }

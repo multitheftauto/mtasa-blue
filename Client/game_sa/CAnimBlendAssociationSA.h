@@ -115,7 +115,7 @@ public:
             unsigned short m_bLockLastX : 1;
             unsigned short m_bLockLastY : 1;            // only applies if m_bLockLastX is set
 
-            unsigned short m_bf9 : 1;             // doesn't seem to be used
+            unsigned short m_walkAnim : 1;             // CPed::PlayFootSteps
             unsigned short m_bf10 : 1;            // doesn't seem to be used
 
             // If set to TRUE, then result:
