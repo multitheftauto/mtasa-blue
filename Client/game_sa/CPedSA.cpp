@@ -655,20 +655,6 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         }
     };
 
-    auto triggerSoundQuietEvent = [](CPedSAInterface* ped, float soundLevel)
-    {
-        CVector pos{};
-
-        void* mem = ((void*(__cdecl*)(int))0x72F420)(0x2C);
-
-        ((void*(__thiscall*)(void*, CEntitySAInterface*, float, int, CVector*))0x5E05B0)(mem, ped, soundLevel, -1, &pos);
-
-        void* eventGlobalGroup = ((void*(__cdecl*)())0x4ABA50)();
-        ((void(__thiscall*)(void*, void*, int))0x4AB420)(eventGlobalGroup, mem, 0);
-
-        ((void(__thiscall*)(void*))0x5DEA00)(mem);
-    };
-
     auto DoFootstep = [unk_v35](CPedSAInterface* ped, bool leftFoot)
     {
         float unk_a3d = 0.0f;
@@ -713,6 +699,21 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         ((void(__thiscall*)(CPedSAInterface*, int, bool))0x5E5380)(ped, leftFoot ? 1 : 0, unk_v35);
     };
 
+    auto triggerSoundQuietEvent = [DoFootstep](CPedSAInterface* ped, float soundLevel)
+    {
+        CVector pos{};
+
+        void* mem = ((void*(__cdecl*)(int))0x72F420)(0x2C);
+
+        ((void*(__thiscall*)(void*, CEntitySAInterface*, float, int, CVector*))0x5E05B0)(mem, ped, soundLevel, -1, &pos);
+
+        void* eventGlobalGroup = ((void*(__cdecl*)())0x4ABA50)();
+        ((void(__thiscall*)(void*, void*, int))0x4AB420)(eventGlobalGroup, mem, 0);
+
+        ((void(__thiscall*)(void*))0x5DEA00)(mem);
+
+        DoFootstep(ped, true);
+    };
 
     if (!unk_v4 || unk_v30 <= 0.5f || unk_a3 >= 1.0f)
     {
@@ -815,10 +816,7 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
                 if (ped->moveState <= PedMoveState::Enum::PEDMOVE_RUN)
                 {
                     if (playerData->m_moveBlendRatio >= 2.0f)
-                    {
                         triggerSoundQuietEvent(ped, wearingBaclava ? 55.0f : 45.0f);
-                        // goto label 65
-                    }
 
                     float unk_v18 = 0.0f;
 
@@ -827,12 +825,12 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
                     else
                     {
                         if (playerData->m_moveBlendRatio <= 1.5f)
-                            // goto label 65
+                            DoFootstep(ped, true);
 
-                            unk_v18 = (playerData->m_moveBlendRatio - 1.0f) * 15.0f;
+                        unk_v18 = (playerData->m_moveBlendRatio - 1.0f) * 15.0f;
                     }
 
-                    float level = unk_v18 + 30.0f;
+                    float level = unk_v18 + 30.0f;  
                     if (level > 0.0f)
                         triggerSoundQuietEvent(ped, level);
                 }
