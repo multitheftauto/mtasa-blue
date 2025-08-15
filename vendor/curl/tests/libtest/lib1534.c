@@ -21,13 +21,13 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
 /* Test CURLINFO_FILETIME */
 
-static CURLcode test_lib1534(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl, *dupe = NULL;
   long filetime;
@@ -109,6 +109,7 @@ static CURLcode test_lib1534(const char *URL)
     res = CURLE_FAILED_INIT;
     goto test_cleanup;
   }
+
 
   /* Test that a filetime is properly initialized on curl_easy_reset.
   */

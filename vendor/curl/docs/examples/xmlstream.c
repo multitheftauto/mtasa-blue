@@ -122,7 +122,7 @@ int main(void)
   struct ParserStruct state;
 
   /* Initialize the state structure for parsing. */
-  memset(&state, 0, sizeof(state));
+  memset(&state, 0, sizeof(struct ParserStruct));
   state.ok = 1;
 
   /* Initialize a namespace-aware parser. */

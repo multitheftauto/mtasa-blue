@@ -21,37 +21,36 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
-static CURLcode t1396_setup(void)
+static CURL *hnd;
+
+static CURLcode unit_setup(void)
 {
   CURLcode res = CURLE_OK;
+
   global_init(CURL_GLOBAL_ALL);
   return res;
 }
 
-static void t1396_stop(CURL *easy)
+static void unit_stop(void)
 {
-  if(easy)
-    curl_easy_cleanup(easy);
+  if(hnd)
+    curl_easy_cleanup(hnd);
   curl_global_cleanup();
 }
 
-static CURLcode test_unit1396(const char *arg)
+struct test {
+  const char *in;
+  int inlen;
+  const char *out;
+  int outlen;
+};
+
+UNITTEST_START
 {
-  CURL *easy;
-
-  UNITTEST_BEGIN(t1396_setup())
-
-  struct test {
-    const char *in;
-    int inlen;
-    const char *out;
-    int outlen;
-  };
-
   /* unescape, this => that */
-  const struct test list1[] = {
+  const struct test list1[]={
     {"%61", 3, "a", 1},
     {"%61a", 4, "aa", 2},
     {"%61b", 4, "ab", 2},
@@ -67,7 +66,7 @@ static CURLcode test_unit1396(const char *arg)
     {NULL, 0, NULL, 0} /* end of list marker */
   };
   /* escape, this => that */
-  const struct test list2[] = {
+  const struct test list2[]={
     {"a", 1, "a", 1},
     {"/", 1, "%2F", 3},
     {"a=b", 3, "a%3Db", 5},
@@ -82,11 +81,11 @@ static CURLcode test_unit1396(const char *arg)
   };
   int i;
 
-  easy = curl_easy_init();
-  abort_unless(easy != NULL, "returned NULL!");
+  hnd = curl_easy_init();
+  abort_unless(hnd != NULL, "returned NULL!");
   for(i = 0; list1[i].in; i++) {
     int outlen;
-    char *out = curl_easy_unescape(easy,
+    char *out = curl_easy_unescape(hnd,
                                    list1[i].in, list1[i].inlen,
                                    &outlen);
 
@@ -102,7 +101,7 @@ static CURLcode test_unit1396(const char *arg)
 
   for(i = 0; list2[i].in; i++) {
     int outlen;
-    char *out = curl_easy_escape(easy, list2[i].in, list2[i].inlen);
+    char *out = curl_easy_escape(hnd, list2[i].in, list2[i].inlen);
     abort_unless(out != NULL, "returned NULL!");
 
     outlen = (int)strlen(out);
@@ -114,6 +113,5 @@ static CURLcode test_unit1396(const char *arg)
 
     curl_free(out);
   }
-
-  UNITTEST_END(t1396_stop(easy))
 }
+UNITTEST_STOP

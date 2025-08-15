@@ -21,16 +21,24 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
-#include "testutil.h"
+#ifdef HAVE_SYS_RESOURCE_H
+#include <sys/resource.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#include <limits.h>
+
+#include "warnless.h"
 #include "memdebug.h"
 
 #if !defined(HAVE_POLL) && !defined(USE_WINSOCK) && !defined(FD_SETSIZE)
 #error "this test requires FD_SETSIZE"
 #endif
 
-#define T537_SAFETY_MARGIN (11)
+#define SAFETY_MARGIN (11)
 
 #if defined(_WIN32) || defined(MSDOS)
 #define DEV_NULL "NUL"
@@ -40,31 +48,31 @@
 
 #if defined(HAVE_GETRLIMIT) && defined(HAVE_SETRLIMIT)
 
-static int *t537_testfd = NULL;
-static struct rlimit t537_num_open;
-static char t537_msgbuff[256];
+static int *testfd = NULL;
+static struct rlimit num_open;
+static char msgbuff[256];
 
-static void t537_store_errmsg(const char *msg, int err)
+static void store_errmsg(const char *msg, int err)
 {
   if(!err)
-    curl_msnprintf(t537_msgbuff, sizeof(t537_msgbuff), "%s", msg);
+    curl_msnprintf(msgbuff, sizeof(msgbuff), "%s", msg);
   else
-    curl_msnprintf(t537_msgbuff, sizeof(t537_msgbuff), "%s, errno %d, %s", msg,
-                   err, strerror(err));
+    curl_msnprintf(msgbuff, sizeof(msgbuff), "%s, errno %d, %s", msg,
+              err, strerror(err));
 }
 
-static void t537_close_file_descriptors(void)
+static void close_file_descriptors(void)
 {
-  for(t537_num_open.rlim_cur = 0;
-      t537_num_open.rlim_cur < t537_num_open.rlim_max;
-      t537_num_open.rlim_cur++)
-    if(t537_testfd[t537_num_open.rlim_cur] > 0)
-      close(t537_testfd[t537_num_open.rlim_cur]);
-  free(t537_testfd);
-  t537_testfd = NULL;
+  for(num_open.rlim_cur = 0;
+      num_open.rlim_cur < num_open.rlim_max;
+      num_open.rlim_cur++)
+    if(testfd[num_open.rlim_cur] > 0)
+      close(testfd[num_open.rlim_cur]);
+  free(testfd);
+  testfd = NULL;
 }
 
-static int t537_fopen_works(void)
+static int fopen_works(void)
 {
   FILE *fpa[3];
   int i;
@@ -76,8 +84,8 @@ static int t537_fopen_works(void)
   for(i = 0; i < 3; i++) {
     fpa[i] = fopen(DEV_NULL, FOPEN_READTEXT);
     if(!fpa[i]) {
-      t537_store_errmsg("fopen failed", errno);
-      curl_mfprintf(stderr, "%s\n", t537_msgbuff);
+      store_errmsg("fopen failed", errno);
+      curl_mfprintf(stderr, "%s\n", msgbuff);
       ret = 0;
       break;
     }
@@ -89,7 +97,28 @@ static int t537_fopen_works(void)
   return ret;
 }
 
-static int t537_test_rlimit(int keep_open)
+static void rlim2str(char *buf, size_t len, rlim_t val)
+{
+#ifdef RLIM_INFINITY
+  if(val == RLIM_INFINITY) {
+    curl_msnprintf(buf, len, "INFINITY");
+    return;
+  }
+#endif
+#ifdef HAVE_LONGLONG
+  if(sizeof(rlim_t) > sizeof(long))
+    curl_msnprintf(buf, len, "%llu", (unsigned long long)val);
+  else
+#endif
+  {
+    if(sizeof(rlim_t) < sizeof(long))
+      curl_msnprintf(buf, len, "%u", (unsigned int)val);
+    else
+      curl_msnprintf(buf, len, "%lu", (unsigned long)val);
+  }
+}
+
+static int test_rlimit(int keep_open)
 {
   int *tmpfd;
   rlim_t nitems, i;
@@ -101,17 +130,17 @@ static int t537_test_rlimit(int keep_open)
   /* get initial open file limits */
 
   if(getrlimit(RLIMIT_NOFILE, &rl) != 0) {
-    t537_store_errmsg("getrlimit() failed", errno);
-    curl_mfprintf(stderr, "%s\n", t537_msgbuff);
+    store_errmsg("getrlimit() failed", errno);
+    curl_mfprintf(stderr, "%s\n", msgbuff);
     return -1;
   }
 
   /* show initial open file limits */
 
-  tutil_rlim2str(strbuff, sizeof(strbuff), rl.rlim_cur);
+  rlim2str(strbuff, sizeof(strbuff), rl.rlim_cur);
   curl_mfprintf(stderr, "initial soft limit: %s\n", strbuff);
 
-  tutil_rlim2str(strbuff, sizeof(strbuff), rl.rlim_max);
+  rlim2str(strbuff, sizeof(strbuff), rl.rlim_max);
   curl_mfprintf(stderr, "initial hard limit: %s\n", strbuff);
 
   /* If the OS allows a HUGE number of open files, we do not run.
@@ -142,9 +171,9 @@ static int t537_test_rlimit(int keep_open)
       rl.rlim_cur = OPEN_MAX;
       if(setrlimit(RLIMIT_NOFILE, &rl) != 0) {
         /* on failure don't abort just issue a warning */
-        t537_store_errmsg("setrlimit() failed", errno);
-        curl_mfprintf(stderr, "%s\n", t537_msgbuff);
-        t537_msgbuff[0] = '\0';
+        store_errmsg("setrlimit() failed", errno);
+        curl_mfprintf(stderr, "%s\n", msgbuff);
+        msgbuff[0] = '\0';
       }
     }
 #endif
@@ -153,25 +182,25 @@ static int t537_test_rlimit(int keep_open)
     rl.rlim_cur = rl.rlim_max;
     if(setrlimit(RLIMIT_NOFILE, &rl) != 0) {
       /* on failure don't abort just issue a warning */
-      t537_store_errmsg("setrlimit() failed", errno);
-      curl_mfprintf(stderr, "%s\n", t537_msgbuff);
-      t537_msgbuff[0] = '\0';
+      store_errmsg("setrlimit() failed", errno);
+      curl_mfprintf(stderr, "%s\n", msgbuff);
+      msgbuff[0] = '\0';
     }
 
     /* get current open file limits */
 
     if(getrlimit(RLIMIT_NOFILE, &rl) != 0) {
-      t537_store_errmsg("getrlimit() failed", errno);
-      curl_mfprintf(stderr, "%s\n", t537_msgbuff);
+      store_errmsg("getrlimit() failed", errno);
+      curl_mfprintf(stderr, "%s\n", msgbuff);
       return -3;
     }
 
     /* show current open file limits */
 
-    tutil_rlim2str(strbuff, sizeof(strbuff), rl.rlim_cur);
+    rlim2str(strbuff, sizeof(strbuff), rl.rlim_cur);
     curl_mfprintf(stderr, "current soft limit: %s\n", strbuff);
 
-    tutil_rlim2str(strbuff, sizeof(strbuff), rl.rlim_max);
+    rlim2str(strbuff, sizeof(strbuff), rl.rlim_max);
     curl_mfprintf(stderr, "current hard limit: %s\n", strbuff);
 
   } /* (rl.rlim_cur != rl.rlim_max) */
@@ -191,7 +220,7 @@ static int t537_test_rlimit(int keep_open)
    * avoid a low memory condition once the file descriptors are
    * open. System conditions that could make the test fail should
    * be addressed in the precheck phase. This chunk of memory shall
-   * be always free()ed before exiting the t537_test_rlimit() function so
+   * be always free()ed before exiting the test_rlimit() function so
    * that it becomes available to the test.
    */
 
@@ -200,8 +229,8 @@ static int t537_test_rlimit(int keep_open)
   if(nitems > 0x7fff)
     nitems = 0x40000;
   do {
-    t537_num_open.rlim_max = sizeof(*memchunk) * nitems;
-    tutil_rlim2str(strbuff, sizeof(strbuff), t537_num_open.rlim_max);
+    num_open.rlim_max = sizeof(*memchunk) * nitems;
+    rlim2str(strbuff, sizeof(strbuff), num_open.rlim_max);
     curl_mfprintf(stderr, "allocating memchunk %s byte array\n", strbuff);
     memchunk = malloc(sizeof(*memchunk) * (size_t)nitems);
     if(!memchunk) {
@@ -210,8 +239,8 @@ static int t537_test_rlimit(int keep_open)
     }
   } while(nitems && !memchunk);
   if(!memchunk) {
-    t537_store_errmsg("memchunk, malloc() failed", errno);
-    curl_mfprintf(stderr, "%s\n", t537_msgbuff);
+    store_errmsg("memchunk, malloc() failed", errno);
+    curl_mfprintf(stderr, "%s\n", msgbuff);
     return -4;
   }
 
@@ -229,8 +258,8 @@ static int t537_test_rlimit(int keep_open)
 #else
   if(rl.rlim_cur > 0) {
 #endif
-    /* soft limit minus T537_SAFETY_MARGIN */
-    t537_num_open.rlim_max = rl.rlim_cur - T537_SAFETY_MARGIN;
+    /* soft limit minus SAFETY_MARGIN */
+    num_open.rlim_max = rl.rlim_cur - SAFETY_MARGIN;
   }
   else {
     /* a huge number of file descriptors */
@@ -238,18 +267,18 @@ static int t537_test_rlimit(int keep_open)
       nitems = i;
     if(nitems > 0x7fff)
       nitems = 0x40000;
-    t537_num_open.rlim_max = nitems;
+    num_open.rlim_max = nitems;
   }
 
   /* verify that we won't overflow size_t in malloc() */
 
-  if((size_t)(t537_num_open.rlim_max) > ((size_t)-1) / sizeof(*t537_testfd)) {
-    tutil_rlim2str(strbuff1, sizeof(strbuff1), t537_num_open.rlim_max);
+  if((size_t)(num_open.rlim_max) > ((size_t)-1) / sizeof(*testfd)) {
+    rlim2str(strbuff1, sizeof(strbuff1), num_open.rlim_max);
     curl_msnprintf(strbuff, sizeof(strbuff),
                    "unable to allocate an array for %s "
                    "file descriptors, would overflow size_t", strbuff1);
-    t537_store_errmsg(strbuff, 0);
-    curl_mfprintf(stderr, "%s\n", t537_msgbuff);
+    store_errmsg(strbuff, 0);
+    curl_mfprintf(stderr, "%s\n", msgbuff);
     free(memchunk);
     return -5;
   }
@@ -257,20 +286,19 @@ static int t537_test_rlimit(int keep_open)
   /* allocate array for file descriptors */
 
   do {
-    tutil_rlim2str(strbuff, sizeof(strbuff), t537_num_open.rlim_max);
+    rlim2str(strbuff, sizeof(strbuff), num_open.rlim_max);
     curl_mfprintf(stderr, "allocating array for %s file descriptors\n",
                   strbuff);
 
-    t537_testfd = malloc(sizeof(*t537_testfd) *
-                         (size_t)(t537_num_open.rlim_max));
-    if(!t537_testfd) {
+    testfd = malloc(sizeof(*testfd) * (size_t)(num_open.rlim_max));
+    if(!testfd) {
       curl_mfprintf(stderr, "testfd, malloc() failed\n");
-      t537_num_open.rlim_max /= 2;
+      num_open.rlim_max /= 2;
     }
-  } while(t537_num_open.rlim_max && !t537_testfd);
-  if(!t537_testfd) {
-    t537_store_errmsg("testfd, malloc() failed", errno);
-    curl_mfprintf(stderr, "%s\n", t537_msgbuff);
+  } while(num_open.rlim_max && !testfd);
+  if(!testfd) {
+    store_errmsg("testfd, malloc() failed", errno);
+    curl_mfprintf(stderr, "%s\n", msgbuff);
     free(memchunk);
     return -6;
   }
@@ -279,74 +307,73 @@ static int t537_test_rlimit(int keep_open)
 
   curl_mfprintf(stderr, "initializing testfd array\n");
 
-  for(t537_num_open.rlim_cur = 0;
-      t537_num_open.rlim_cur < t537_num_open.rlim_max;
-      t537_num_open.rlim_cur++)
-    t537_testfd[t537_num_open.rlim_cur] = -1;
+  for(num_open.rlim_cur = 0;
+      num_open.rlim_cur < num_open.rlim_max;
+      num_open.rlim_cur++)
+    testfd[num_open.rlim_cur] = -1;
 
-  tutil_rlim2str(strbuff, sizeof(strbuff), t537_num_open.rlim_max);
+  rlim2str(strbuff, sizeof(strbuff), num_open.rlim_max);
   curl_mfprintf(stderr, "trying to open %s file descriptors\n", strbuff);
 
   /* open a dummy descriptor */
 
-  t537_testfd[0] = open(DEV_NULL, O_RDONLY);
-  if(t537_testfd[0] < 0) {
+  testfd[0] = open(DEV_NULL, O_RDONLY);
+  if(testfd[0] < 0) {
     curl_msnprintf(strbuff, sizeof(strbuff), "opening of %s failed", DEV_NULL);
-    t537_store_errmsg(strbuff, errno);
-    curl_mfprintf(stderr, "%s\n", t537_msgbuff);
-    free(t537_testfd);
-    t537_testfd = NULL;
+    store_errmsg(strbuff, errno);
+    curl_mfprintf(stderr, "%s\n", msgbuff);
+    free(testfd);
+    testfd = NULL;
     free(memchunk);
     return -7;
   }
 
   /* create a bunch of file descriptors */
 
-  for(t537_num_open.rlim_cur = 1;
-      t537_num_open.rlim_cur < t537_num_open.rlim_max;
-      t537_num_open.rlim_cur++) {
+  for(num_open.rlim_cur = 1;
+      num_open.rlim_cur < num_open.rlim_max;
+      num_open.rlim_cur++) {
 
-    t537_testfd[t537_num_open.rlim_cur] = dup(t537_testfd[0]);
+    testfd[num_open.rlim_cur] = dup(testfd[0]);
 
-    if(t537_testfd[t537_num_open.rlim_cur] < 0) {
+    if(testfd[num_open.rlim_cur] < 0) {
 
-      t537_testfd[t537_num_open.rlim_cur] = -1;
+      testfd[num_open.rlim_cur] = -1;
 
-      tutil_rlim2str(strbuff1, sizeof(strbuff1), t537_num_open.rlim_cur);
+      rlim2str(strbuff1, sizeof(strbuff1), num_open.rlim_cur);
       curl_msnprintf(strbuff, sizeof(strbuff), "dup() attempt %s failed",
                      strbuff1);
       curl_mfprintf(stderr, "%s\n", strbuff);
 
-      tutil_rlim2str(strbuff1, sizeof(strbuff1), t537_num_open.rlim_cur);
+      rlim2str(strbuff1, sizeof(strbuff1), num_open.rlim_cur);
       curl_msnprintf(strbuff, sizeof(strbuff),
                      "fds system limit seems close to %s", strbuff1);
       curl_mfprintf(stderr, "%s\n", strbuff);
 
-      t537_num_open.rlim_max = t537_num_open.rlim_cur - T537_SAFETY_MARGIN;
+      num_open.rlim_max = num_open.rlim_cur - SAFETY_MARGIN;
 
-      t537_num_open.rlim_cur -= t537_num_open.rlim_max;
-      tutil_rlim2str(strbuff1, sizeof(strbuff1), t537_num_open.rlim_cur);
+      num_open.rlim_cur -= num_open.rlim_max;
+      rlim2str(strbuff1, sizeof(strbuff1), num_open.rlim_cur);
       curl_msnprintf(strbuff, sizeof(strbuff), "closing %s file descriptors",
                      strbuff1);
       curl_mfprintf(stderr, "%s\n", strbuff);
 
-      for(t537_num_open.rlim_cur = t537_num_open.rlim_max;
-          t537_testfd[t537_num_open.rlim_cur] >= 0;
-          t537_num_open.rlim_cur++) {
-        close(t537_testfd[t537_num_open.rlim_cur]);
-        t537_testfd[t537_num_open.rlim_cur] = -1;
+      for(num_open.rlim_cur = num_open.rlim_max;
+          testfd[num_open.rlim_cur] >= 0;
+          num_open.rlim_cur++) {
+        close(testfd[num_open.rlim_cur]);
+        testfd[num_open.rlim_cur] = -1;
       }
 
-      tutil_rlim2str(strbuff, sizeof(strbuff), t537_num_open.rlim_max);
+      rlim2str(strbuff, sizeof(strbuff), num_open.rlim_max);
       curl_mfprintf(stderr, "shrinking array for %s file descriptors\n",
                     strbuff);
 
       /* we don't care if we can't shrink it */
 
-      tmpfd = realloc(t537_testfd,
-                      sizeof(*t537_testfd) * (size_t)(t537_num_open.rlim_max));
+      tmpfd = realloc(testfd, sizeof(*testfd) * (size_t)(num_open.rlim_max));
       if(tmpfd) {
-        t537_testfd = tmpfd;
+        testfd = tmpfd;
         tmpfd = NULL;
       }
 
@@ -354,7 +381,7 @@ static int t537_test_rlimit(int keep_open)
     }
   }
 
-  tutil_rlim2str(strbuff, sizeof(strbuff), t537_num_open.rlim_max);
+  rlim2str(strbuff, sizeof(strbuff), num_open.rlim_max);
   curl_mfprintf(stderr, "%s file descriptors open\n", strbuff);
 
 #if !defined(HAVE_POLL) && !defined(USE_WINSOCK)
@@ -370,28 +397,28 @@ static int t537_test_rlimit(int keep_open)
    * with an indication that select limit would be exceeded.
    */
 
-  t537_num_open.rlim_cur = FD_SETSIZE - T537_SAFETY_MARGIN;
-  if(t537_num_open.rlim_max > t537_num_open.rlim_cur) {
+  num_open.rlim_cur = FD_SETSIZE - SAFETY_MARGIN;
+  if(num_open.rlim_max > num_open.rlim_cur) {
     curl_msnprintf(strbuff, sizeof(strbuff), "select limit is FD_SETSIZE %d",
-                   FD_SETSIZE);
-    t537_store_errmsg(strbuff, 0);
-    curl_mfprintf(stderr, "%s\n", t537_msgbuff);
-    t537_close_file_descriptors();
+              FD_SETSIZE);
+    store_errmsg(strbuff, 0);
+    curl_mfprintf(stderr, "%s\n", msgbuff);
+    close_file_descriptors();
     free(memchunk);
     return -8;
   }
 
-  t537_num_open.rlim_cur = FD_SETSIZE - T537_SAFETY_MARGIN;
+  num_open.rlim_cur = FD_SETSIZE - SAFETY_MARGIN;
   for(rl.rlim_cur = 0;
-      rl.rlim_cur < t537_num_open.rlim_max;
+      rl.rlim_cur < num_open.rlim_max;
       rl.rlim_cur++) {
-    if((t537_testfd[rl.rlim_cur] > 0) &&
-       ((unsigned int)t537_testfd[rl.rlim_cur] > t537_num_open.rlim_cur)) {
+    if((testfd[rl.rlim_cur] > 0) &&
+       ((unsigned int)testfd[rl.rlim_cur] > num_open.rlim_cur)) {
       curl_msnprintf(strbuff, sizeof(strbuff), "select limit is FD_SETSIZE %d",
-                     FD_SETSIZE);
-      t537_store_errmsg(strbuff, 0);
-      curl_mfprintf(stderr, "%s\n", t537_msgbuff);
-      t537_close_file_descriptors();
+                FD_SETSIZE);
+      store_errmsg(strbuff, 0);
+      curl_mfprintf(stderr, "%s\n", msgbuff);
+      close_file_descriptors();
       free(memchunk);
       return -9;
     }
@@ -408,15 +435,15 @@ static int t537_test_rlimit(int keep_open)
    * if it is capable of fopen()ing some additional files.
    */
 
-  if(!t537_fopen_works()) {
-    tutil_rlim2str(strbuff1, sizeof(strbuff1), t537_num_open.rlim_max);
+  if(!fopen_works()) {
+    rlim2str(strbuff1, sizeof(strbuff1), num_open.rlim_max);
     curl_msnprintf(strbuff, sizeof(strbuff), "fopen fails with %s fds open",
                    strbuff1);
-    curl_mfprintf(stderr, "%s\n", t537_msgbuff);
+    curl_mfprintf(stderr, "%s\n", msgbuff);
     curl_msnprintf(strbuff, sizeof(strbuff),
                    "fopen fails with lots of fds open");
-    t537_store_errmsg(strbuff, 0);
-    t537_close_file_descriptors();
+    store_errmsg(strbuff, 0);
+    close_file_descriptors();
     free(memchunk);
     return -10;
   }
@@ -429,27 +456,27 @@ static int t537_test_rlimit(int keep_open)
   /* close file descriptors unless instructed to keep them */
 
   if(!keep_open) {
-    t537_close_file_descriptors();
+    close_file_descriptors();
   }
 
   return 0;
 }
 
-static CURLcode test_lib537(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode res;
   CURL *curl;
 
   if(!strcmp(URL, "check")) {
     /* used by the test script to ask if we can run this test or not */
-    if(t537_test_rlimit(FALSE)) {
-      curl_mfprintf(stdout, "test_rlimit problem: %s\n", t537_msgbuff);
+    if(test_rlimit(FALSE)) {
+      curl_mfprintf(stdout, "test_rlimit problem: %s\n", msgbuff);
       return TEST_ERR_FAILURE;
     }
     return CURLE_OK; /* sure, run this! */
   }
 
-  if(t537_test_rlimit(TRUE)) {
+  if(test_rlimit(TRUE)) {
     /* failure */
     return TEST_ERR_MAJOR_BAD;
   }
@@ -459,14 +486,14 @@ static CURLcode test_lib537(const char *URL)
 
   if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
     curl_mfprintf(stderr, "curl_global_init() failed\n");
-    t537_close_file_descriptors();
+    close_file_descriptors();
     return TEST_ERR_MAJOR_BAD;
   }
 
   curl = curl_easy_init();
   if(!curl) {
     curl_mfprintf(stderr, "curl_easy_init() failed\n");
-    t537_close_file_descriptors();
+    close_file_descriptors();
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
@@ -478,20 +505,20 @@ static CURLcode test_lib537(const char *URL)
 
 test_cleanup:
 
-  t537_close_file_descriptors();
+  close_file_descriptors();
   curl_easy_cleanup(curl);
   curl_global_cleanup();
 
   return res;
 }
 
-#else /* HAVE_GETRLIMIT && HAVE_SETRLIMIT */
+#else /* defined(HAVE_GETRLIMIT) && defined(HAVE_SETRLIMIT) */
 
-static CURLcode test_lib537(const char *URL)
+CURLcode test(char *URL)
 {
   (void)URL;
   curl_mprintf("system lacks necessary system function(s)");
   return TEST_ERR_MAJOR_BAD; /* skip test */
 }
 
-#endif /* HAVE_GETRLIMIT && HAVE_SETRLIMIT */
+#endif /* defined(HAVE_GETRLIMIT) && defined(HAVE_SETRLIMIT) */

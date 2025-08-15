@@ -22,13 +22,21 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "curl_sha512_256.h"
 
-static CURLcode test_unit1615(const char *arg)
+static CURLcode unit_setup(void)
 {
-  UNITTEST_BEGIN_SIMPLE
+  return CURLE_OK;
+}
+
+static void unit_stop(void)
+{
+
+}
+
+UNITTEST_START
 
 #ifdef CURL_HAVE_SHA512_256
 
@@ -147,5 +155,5 @@ static CURLcode test_unit1615(const char *arg)
 
 #endif /* CURL_HAVE_SHA512_256 */
 
-  UNITTEST_END_SIMPLE
-}
+
+UNITTEST_STOP

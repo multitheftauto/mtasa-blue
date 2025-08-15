@@ -23,6 +23,7 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
+#include <curlx.h>
 #include "tool_cfgable.h"
 #include "tool_getparam.h"
 #include "tool_helpers.h"
@@ -31,15 +32,25 @@
 #include "tool_parsecfg.h"
 #include "tool_paramhlp.h"
 #include "tool_writeout_json.h"
-#include "tool_strdup.h"
 #include "var.h"
-#include "memdebug.h" /* keep this as LAST include */
+#include <memdebug.h> /* keep this as LAST include */
 
 #define MAX_EXPAND_CONTENT 10000000
 #define MAX_VAR_LEN 128 /* max length of a name */
 
+static char *Memdup(const char *data, size_t len)
+{
+  char *p = malloc(len + 1);
+  if(!p)
+    return NULL;
+  if(len)
+    memcpy(p, data, len);
+  p[len] = 0;
+  return p;
+}
+
 /* free everything */
-void varcleanup(void)
+void varcleanup(struct GlobalConfig *global)
 {
   struct tool_var *list = global->variables;
   while(list) {
@@ -50,7 +61,8 @@ void varcleanup(void)
   }
 }
 
-static const struct tool_var *varcontent(const char *name, size_t nlen)
+static const struct tool_var *varcontent(struct GlobalConfig *global,
+                                         const char *name, size_t nlen)
 {
   struct tool_var *list = global->variables;
   while(list) {
@@ -78,7 +90,8 @@ static const struct tool_var *varcontent(const char *name, size_t nlen)
 #define FUNC_64DEC "64dec" /* base64 decode */
 #define FUNC_64DEC_LEN (sizeof(FUNC_64DEC) - 1)
 
-static ParameterError varfunc(char *c, /* content */
+static ParameterError varfunc(struct GlobalConfig *global,
+                              char *c, /* content */
                               size_t clen, /* content length */
                               char *f, /* functions */
                               size_t flen, /* function string length */
@@ -187,7 +200,8 @@ static ParameterError varfunc(char *c, /* content */
     }
     else {
       /* unsupported function */
-      errorf("unknown variable function in '%.*s'", (int)flen, finput);
+      errorf(global, "unknown variable function in '%.*s'",
+             (int)flen, finput);
       err = PARAM_EXPAND_ERROR;
       break;
     }
@@ -195,7 +209,7 @@ static ParameterError varfunc(char *c, /* content */
       free(c);
 
     clen = curlx_dyn_len(out);
-    c = memdup0(curlx_dyn_ptr(out), clen);
+    c = Memdup(curlx_dyn_ptr(out), clen);
     if(!c) {
       err = PARAM_NO_MEM;
       break;
@@ -209,7 +223,8 @@ static ParameterError varfunc(char *c, /* content */
   return err;
 }
 
-ParameterError varexpand(const char *line, struct dynbuf *out,
+ParameterError varexpand(struct GlobalConfig *global,
+                         const char *line, struct dynbuf *out,
                          bool *replaced)
 {
   CURLcode result;
@@ -244,7 +259,7 @@ ParameterError varexpand(const char *line, struct dynbuf *out,
 
       if(!clp) {
         /* uneven braces */
-        warnf("missing close '}}' in '%s'", input);
+        warnf(global, "missing close '}}' in '%s'", input);
         break;
       }
 
@@ -258,7 +273,7 @@ ParameterError varexpand(const char *line, struct dynbuf *out,
       else
         nlen = clp - envp;
       if(!nlen || (nlen >= sizeof(name))) {
-        warnf("bad variable name length '%s'", input);
+        warnf(global, "bad variable name length '%s'", input);
         /* insert the text as-is since this is not an env variable */
         result = curlx_dyn_addn(out, line, clp - line + prefix);
         if(result)
@@ -278,7 +293,7 @@ ParameterError varexpand(const char *line, struct dynbuf *out,
         for(i = 0; (i < nlen) &&
               (ISALNUM(name[i]) || (name[i] == '_')); i++);
         if(i != nlen) {
-          warnf("bad variable name: %s", name);
+          warnf(global, "bad variable name: %s", name);
           /* insert the text as-is since this is not an env variable */
           result = curlx_dyn_addn(out, envp - prefix,
                                   clp - envp + prefix + 2);
@@ -289,7 +304,7 @@ ParameterError varexpand(const char *line, struct dynbuf *out,
           char *value;
           size_t vlen = 0;
           struct dynbuf buf;
-          const struct tool_var *v = varcontent(name, nlen);
+          const struct tool_var *v = varcontent(global, name, nlen);
           if(v) {
             value = (char *)CURL_UNCONST(v->content);
             vlen = v->clen;
@@ -301,7 +316,8 @@ ParameterError varexpand(const char *line, struct dynbuf *out,
           if(funcp) {
             /* apply the list of functions on the value */
             size_t flen = clp - funcp;
-            ParameterError err = varfunc(value, vlen, funcp, flen, &buf);
+            ParameterError err = varfunc(global, value, vlen, funcp, flen,
+                                         &buf);
             if(err)
               return err;
             value = curlx_dyn_ptr(&buf);
@@ -313,7 +329,7 @@ ParameterError varexpand(const char *line, struct dynbuf *out,
                using normal means, this is an error. */
             char *nb = memchr(value, '\0', vlen);
             if(nb) {
-              errorf("variable contains null byte");
+              errorf(global, "variable contains null byte");
               return PARAM_EXPAND_ERROR;
             }
           }
@@ -347,23 +363,24 @@ ParameterError varexpand(const char *line, struct dynbuf *out,
  * that we can improve this if we want better performance when managing many
  * at a later point.
  */
-static ParameterError addvariable(const char *name,
+static ParameterError addvariable(struct GlobalConfig *global,
+                                  const char *name,
                                   size_t nlen,
                                   const char *content,
                                   size_t clen,
                                   bool contalloc)
 {
   struct tool_var *p;
-  const struct tool_var *check = varcontent(name, nlen);
+  const struct tool_var *check = varcontent(global, name, nlen);
   DEBUGASSERT(nlen);
   if(check)
-    notef("Overwriting variable '%s'", check->name);
+    notef(global, "Overwriting variable '%s'", check->name);
 
   p = calloc(1, sizeof(struct tool_var) + nlen);
   if(p) {
     memcpy(p->name, name, nlen);
 
-    p->content = contalloc ? content : memdup0(content, clen);
+    p->content = contalloc ? content : Memdup(content, clen);
     if(p->content) {
       p->clen = clen;
 
@@ -378,7 +395,8 @@ static ParameterError addvariable(const char *name,
 
 #define MAX_FILENAME 10000
 
-ParameterError setvariable(const char *input)
+ParameterError setvariable(struct GlobalConfig *global,
+                           const char *input)
 {
   const char *name;
   size_t nlen;
@@ -402,7 +420,7 @@ ParameterError setvariable(const char *input)
     line++;
   nlen = line - name;
   if(!nlen || (nlen >= MAX_VAR_LEN)) {
-    warnf("Bad variable name length (%zd), skipping", nlen);
+    warnf(global, "Bad variable name length (%zd), skipping", nlen);
     return PARAM_OK;
   }
   if(import) {
@@ -417,7 +435,7 @@ ParameterError setvariable(const char *input)
     ge = getenv(name);
     if(!*line && !ge) {
       /* no assign, no variable, fail */
-      errorf("Variable '%s' import fail, not set", name);
+      errorf(global, "Variable '%s' import fail, not set", name);
       return PARAM_EXPAND_ERROR;
     }
     else if(ge) {
@@ -457,7 +475,8 @@ ParameterError setvariable(const char *input)
     else {
       file = fopen(line, "rb");
       if(!file) {
-        errorf("Failed to open %s: %s", line, strerror(errno));
+        errorf(global, "Failed to open %s: %s", line,
+               strerror(errno));
         err = PARAM_READ_ERROR;
       }
     }
@@ -491,10 +510,10 @@ ParameterError setvariable(const char *input)
     }
   }
   else {
-    warnf("Bad --variable syntax, skipping: %s", input);
+    warnf(global, "Bad --variable syntax, skipping: %s", input);
     return PARAM_OK;
   }
-  err = addvariable(name, nlen, content, clen, contalloc);
+  err = addvariable(global, name, nlen, content, clen, contalloc);
   if(err) {
     if(contalloc)
       free(content);

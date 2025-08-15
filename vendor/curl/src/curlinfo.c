@@ -70,7 +70,7 @@ static const char *disabled[]={
   "ON"
 #endif
   ,
-  "digest: "
+  "digest-auth: "
 #ifdef CURL_DISABLE_DIGEST_AUTH
   "OFF"
 #else
@@ -244,8 +244,8 @@ int main(int argc, char **argv)
 {
   int i;
 
-  (void)argc;
-  (void)argv;
+  (void) argc;
+  (void) argv;
 
   for(i = 0; disabled[i]; i++)
     printf("%s\n", disabled[i]);
