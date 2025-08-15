@@ -21,16 +21,26 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "urldata.h"
 #include "altsvc.h"
 
-static CURLcode test_unit1654(const char *arg)
+static CURLcode
+unit_setup(void)
 {
-  UNITTEST_BEGIN_SIMPLE
+  return CURLE_OK;
+}
 
+static void
+unit_stop(void)
+{
+  curl_global_cleanup();
+}
+
+UNITTEST_START
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_ALTSVC)
+{
   char outname[256];
   CURL *curl;
   CURLcode result;
@@ -95,20 +105,6 @@ static CURLcode test_unit1654(const char *arg)
   fail_if(result, "Curl_altsvc_parse(7) failed!");
   fail_unless(Curl_llist_count(&asi->list) == 10, "wrong number of entries");
 
-  result =
-    Curl_altsvc_parse(curl, asi,
-                      "h2=\":443\", h3=\":443\"; "
-                      "persist = \"1\"; ma = 120;\r\n",
-                      ALPN_h1, "curl.se", 80);
-  fail_if(result, "Curl_altsvc_parse(6) failed!");
-  fail_unless(Curl_llist_count(&asi->list) == 12, "wrong number of entries");
-
-  /* clear - without semicolon */
-  result = Curl_altsvc_parse(curl, asi, "clear\r\n",
-                             ALPN_h1, "curl.se", 80);
-  fail_if(result, "Curl_altsvc_parse(7) failed!");
-  fail_unless(Curl_llist_count(&asi->list) == 10, "wrong number of entries");
-
   /* only a non-existing alpn */
   result = Curl_altsvc_parse(curl, asi,
                              "h6=\"example.net:443\"; ma=\"180\";\r\n",
@@ -138,7 +134,6 @@ static CURLcode test_unit1654(const char *arg)
   curl_easy_cleanup(curl);
 fail:
   Curl_altsvc_cleanup(&asi);
-#endif
-
-  UNITTEST_END(curl_global_cleanup())
 }
+#endif
+UNITTEST_STOP

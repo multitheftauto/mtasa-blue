@@ -25,6 +25,10 @@
  ***************************************************************************/
 #include "curl_setup.h"
 
+#if defined(USE_MSH3) && !defined(_WIN32)
+#include <pthread.h>
+#endif
+
 #include "bufq.h"
 #include "dynhds.h"
 #include "ws.h"
@@ -58,7 +62,7 @@ typedef unsigned char http_majors;
 
 #ifndef CURL_DISABLE_HTTP
 
-#ifdef USE_HTTP3
+#if defined(USE_HTTP3)
 #include <stdint.h>
 #endif
 
@@ -115,8 +119,8 @@ CURLcode Curl_http_setup_conn(struct Curl_easy *data,
 CURLcode Curl_http(struct Curl_easy *data, bool *done);
 CURLcode Curl_http_done(struct Curl_easy *data, CURLcode, bool premature);
 CURLcode Curl_http_connect(struct Curl_easy *data, bool *done);
-CURLcode Curl_http_do_pollset(struct Curl_easy *data,
-                              struct easy_pollset *ps);
+int Curl_http_getsock_do(struct Curl_easy *data, struct connectdata *conn,
+                         curl_socket_t *socks);
 CURLcode Curl_http_write_resp(struct Curl_easy *data,
                               const char *buf, size_t blen,
                               bool is_eos);

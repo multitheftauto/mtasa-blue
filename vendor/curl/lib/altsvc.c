@@ -32,6 +32,7 @@
 #include "urldata.h"
 #include "altsvc.h"
 #include "curl_get_line.h"
+#include "strcase.h"
 #include "parsedate.h"
 #include "sendf.h"
 #include "curlx/warnless.h"
@@ -260,11 +261,11 @@ static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
 #ifdef USE_IPV6
   else {
     char ipv6_unused[16];
-    if(curlx_inet_pton(AF_INET6, as->dst.host, ipv6_unused) == 1) {
+    if(1 == curlx_inet_pton(AF_INET6, as->dst.host, ipv6_unused)) {
       dst6_pre = "[";
       dst6_post = "]";
     }
-    if(curlx_inet_pton(AF_INET6, as->src.host, ipv6_unused) == 1) {
+    if(1 == curlx_inet_pton(AF_INET6, as->src.host, ipv6_unused)) {
       src6_pre = "[";
       src6_post = "]";
     }
@@ -415,7 +416,7 @@ static bool hostcompare(const char *host, const char *check)
   if(hlen != clen)
     /* they cannot match if they have different lengths */
     return FALSE;
-  return curl_strnequal(host, check, hlen);
+  return strncasecompare(host, check, hlen);
 }
 
 /* altsvc_flush() removes all alternatives for this source origin from the
@@ -486,7 +487,8 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
   DEBUGASSERT(asi);
 
   /* initial check for "clear" */
-  if(!curlx_str_cspn(&p, &alpn, ";\n\r")) {
+  if(!curlx_str_until(&p, &alpn, MAX_ALTSVC_LINE, ';') &&
+     !curlx_str_single(&p, ';')) {
     curlx_str_trimblanks(&alpn);
     /* "clear" is a magic keyword */
     if(curlx_str_casecompare(&alpn, "clear")) {
@@ -663,9 +665,5 @@ bool Curl_altsvc_lookup(struct altsvcinfo *asi,
   }
   return FALSE;
 }
-
-#if defined(DEBUGBUILD) || defined(UNITTESTS)
-#undef time
-#endif
 
 #endif /* !CURL_DISABLE_HTTP && !CURL_DISABLE_ALTSVC */

@@ -85,7 +85,7 @@ char *curl_easy_escape(CURL *data, const char *string,
     else {
       /* encode it */
       unsigned char out[3]={'%'};
-      Curl_hexbyte(&out[1], in);
+      Curl_hexbyte(&out[1], in, FALSE);
       if(curlx_dyn_addn(&d, out, 3))
         return NULL;
     }
@@ -212,8 +212,7 @@ void Curl_hexencode(const unsigned char *src, size_t len, /* input length */
   DEBUGASSERT(src && len && (olen >= 3));
   if(src && len && (olen >= 3)) {
     while(len-- && (olen >= 3)) {
-      out[0] = Curl_ldigits[*src >> 4];
-      out[1] = Curl_ldigits[*src & 0x0F];
+      Curl_hexbyte(out, *src, TRUE);
       ++src;
       out += 2;
       olen -= 2;
@@ -226,11 +225,14 @@ void Curl_hexencode(const unsigned char *src, size_t len, /* input length */
 
 /* Curl_hexbyte
  *
- * Output a single unsigned char as a two-digit UPPERCASE hex number.
+ * Output a single unsigned char as a two-digit hex number, lowercase or
+ * uppercase
  */
 void Curl_hexbyte(unsigned char *dest, /* must fit two bytes */
-                  unsigned char val)
+                  unsigned char val,
+                  bool lowercase)
 {
-  dest[0] = Curl_udigits[val >> 4];
-  dest[1] = Curl_udigits[val & 0x0F];
+  const unsigned char *t = lowercase ? Curl_ldigits : Curl_udigits;
+  dest[0] = t[val >> 4];
+  dest[1] = t[val & 0x0F];
 }

@@ -23,17 +23,23 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "curl_setup.h"
 
-/* build request url */
-char *tutil_suburl(const char *base, int i);
+struct timeval tutil_tvnow(void);
 
-#ifdef HAVE_SYS_RESOURCE_H
-#include <sys/resource.h>  /* for getrlimit() */
-#endif
+/*
+ * Make sure that the first argument (t1) is the more recent time and t2 is
+ * the older time, as otherwise you get a weird negative time-diff back...
+ *
+ * Returns: the time difference in number of milliseconds.
+ */
+long tutil_tvdiff(struct timeval t1, struct timeval t2);
 
-#if defined(HAVE_GETRLIMIT) && defined(HAVE_SETRLIMIT)
-void tutil_rlim2str(char *buf, size_t len, rlim_t val);
-#endif
+/*
+ * Same as tutil_tvdiff but with full usec resolution.
+ *
+ * Returns: the time difference in seconds with subsecond resolution.
+ */
+double tutil_tvdiff_secs(struct timeval t1, struct timeval t2);
 
 #endif  /* HEADER_CURL_LIBTEST_TESTUTIL_H */

@@ -67,6 +67,7 @@
 #include "../connect.h" /* for the connect timeout */
 #include "../progress.h"
 #include "../select.h"
+#include "../strcase.h"
 #include "../strdup.h"
 #include "x509asn1.h"
 #include "../curl_printf.h"
@@ -178,7 +179,7 @@ wssl_tls13_secret_callback(SSL *ssl, int id, const unsigned char *secret,
   Curl_tls_keylog_write(label, client_random, secret, secretSz);
   return 0;
 }
-#endif /* HAVE_SECRET_CALLBACK && WOLFSSL_TLS13 */
+#endif /* defined(HAVE_SECRET_CALLBACK) && defined(WOLFSSL_TLS13) */
 
 static void wssl_log_tls12_secret(WOLFSSL *ssl)
 {
@@ -226,9 +227,9 @@ static int wssl_do_file_type(const char *type)
 {
   if(!type || !type[0])
     return WOLFSSL_FILETYPE_PEM;
-  if(curl_strequal(type, "PEM"))
+  if(strcasecompare(type, "PEM"))
     return WOLFSSL_FILETYPE_PEM;
-  if(curl_strequal(type, "DER"))
+  if(strcasecompare(type, "DER"))
     return WOLFSSL_FILETYPE_ASN1;
   return -1;
 }
@@ -243,12 +244,9 @@ static const struct group_name_map gnm[] = {
   { WOLFSSL_ML_KEM_512, "ML_KEM_512" },
   { WOLFSSL_ML_KEM_768, "ML_KEM_768" },
   { WOLFSSL_ML_KEM_1024, "ML_KEM_1024" },
-  { WOLFSSL_SECP256R1MLKEM512, "SecP256r1MLKEM512" },
-  { WOLFSSL_SECP384R1MLKEM768, "SecP384r1MLKEM768" },
-  { WOLFSSL_SECP521R1MLKEM1024, "SecP521r1MLKEM1024" },
-  { WOLFSSL_SECP256R1MLKEM768, "SecP256r1MLKEM768" },
-  { WOLFSSL_SECP384R1MLKEM1024, "SecP384r1MLKEM1024" },
-  { WOLFSSL_X25519MLKEM768, "X25519MLKEM768" },
+  { WOLFSSL_P256_ML_KEM_512, "P256_ML_KEM_512" },
+  { WOLFSSL_P384_ML_KEM_768, "P384_ML_KEM_768" },
+  { WOLFSSL_P521_ML_KEM_1024, "P521_ML_KEM_1024" },
   { 0, NULL }
 };
 #endif
@@ -321,7 +319,7 @@ static int wssl_bio_cf_out_write(WOLFSSL_BIO *bio,
   struct ssl_connect_data *connssl = cf->ctx;
   struct wssl_ctx *wssl = (struct wssl_ctx *)connssl->backend;
   struct Curl_easy *data = CF_DATA_CURRENT(cf);
-  size_t nwritten, skiplen = 0;
+  ssize_t nwritten, skiplen = 0;
   CURLcode result = CURLE_OK;
 
   DEBUGASSERT(data);
@@ -335,21 +333,21 @@ static int wssl_bio_cf_out_write(WOLFSSL_BIO *bio,
     skiplen = (ssize_t)(blen - wssl->io_send_blocked_len);
     blen = wssl->io_send_blocked_len;
   }
-  result = Curl_conn_cf_send(cf->next, data, buf, blen, FALSE, &nwritten);
+  nwritten = Curl_conn_cf_send(cf->next, data, buf, blen, FALSE, &result);
   wssl->io_result = result;
-  CURL_TRC_CF(data, cf, "bio_write(len=%d) -> %d, %zu",
-              blen, result, nwritten);
+  CURL_TRC_CF(data, cf, "bio_write(len=%d) -> %zd, %d",
+              blen, nwritten, result);
 #ifdef USE_FULL_BIO
   wolfSSL_BIO_clear_retry_flags(bio);
 #endif
-  if(CURLE_AGAIN == result) {
+  if(nwritten < 0 && CURLE_AGAIN == result) {
     wolfSSL_BIO_set_retry_write(bio);
     if(wssl->shutting_down && !wssl->io_send_blocked_len)
       wssl->io_send_blocked_len = blen;
   }
   else if(!result && skiplen)
     nwritten += skiplen;
-  return result ? -1 : (int)nwritten;
+  return (int)nwritten;
 }
 
 static int wssl_bio_cf_in_read(WOLFSSL_BIO *bio, char *buf, int blen)
@@ -358,7 +356,7 @@ static int wssl_bio_cf_in_read(WOLFSSL_BIO *bio, char *buf, int blen)
   struct ssl_connect_data *connssl = cf->ctx;
   struct wssl_ctx *wssl = (struct wssl_ctx *)connssl->backend;
   struct Curl_easy *data = CF_DATA_CURRENT(cf);
-  size_t nread;
+  ssize_t nread;
   CURLcode result = CURLE_OK;
 
   DEBUGASSERT(data);
@@ -378,17 +376,17 @@ static int wssl_bio_cf_in_read(WOLFSSL_BIO *bio, char *buf, int blen)
     }
   }
 
-  result = Curl_conn_cf_recv(cf->next, data, buf, blen, &nread);
+  nread = Curl_conn_cf_recv(cf->next, data, buf, blen, &result);
   wssl->io_result = result;
-  CURL_TRC_CF(data, cf, "bio_read(len=%d) -> %d, %zu", blen, result, nread);
+  CURL_TRC_CF(data, cf, "bio_read(len=%d) -> %zd, %d", blen, nread, result);
 #ifdef USE_FULL_BIO
   wolfSSL_BIO_clear_retry_flags(bio);
 #endif
-  if(CURLE_AGAIN == result)
+  if(nread < 0 && CURLE_AGAIN == result)
     wolfSSL_BIO_set_retry_read(bio);
   else if(nread == 0)
     connssl->peer_closed = TRUE;
-  return result ? -1 : (int)nread;
+  return (int)nread;
 }
 
 static WOLFSSL_BIO_METHOD *wssl_bio_cf_method = NULL;
@@ -520,7 +518,7 @@ static CURLcode wssl_on_session_reuse(struct Curl_cfilter *cf,
 #endif
 
   if(!connssl->earlydata_max) {
-    /* Seems to be no WolfSSL way to signal no EarlyData in session */
+    /* Seems to be GnuTLS way to signal no EarlyData in session */
     CURL_TRC_CF(data, cf, "SSL session does not allow earlydata");
   }
   else if(!Curl_alpn_contains_proto(alpns, scs->alpn)) {
@@ -931,7 +929,7 @@ wssl_legacy_CTX_set_min_proto_version(WOLFSSL_CTX* ctx, int version)
 static int
 wssl_legacy_CTX_set_max_proto_version(WOLFSSL_CTX* ctx, int version)
 {
-  (void)ctx, (void)version;
+  (void) ctx, (void) version;
   return WOLFSSL_NOT_IMPLEMENTED;
 }
 #define wolfSSL_CTX_set_min_proto_version wssl_legacy_CTX_set_min_proto_version
@@ -964,7 +962,6 @@ CURLcode Curl_wssl_ctx_init(struct wssl_ctx *wctx,
   size_t idx = 0;
 #endif
   CURLcode result = CURLE_FAILED_INIT;
-  unsigned char transport;
 
   DEBUGASSERT(!wctx->ssl_ctx);
   DEBUGASSERT(!wctx->ssl);
@@ -974,8 +971,6 @@ CURLcode Curl_wssl_ctx_init(struct wssl_ctx *wctx,
     goto out;
   }
   Curl_alpn_copy(&alpns, alpns_requested);
-  DEBUGASSERT(cf->next);
-  transport = Curl_conn_cf_get_transport(cf->next, data);
 
 #if LIBWOLFSSL_VERSION_HEX < 0x04002000 /* 4.2.0 (2019) */
   req_method = wolfSSLv23_client_method();
@@ -1106,7 +1101,7 @@ CURLcode Curl_wssl_ctx_init(struct wssl_ctx *wctx,
 #endif
 
   curves = conn_config->curves;
-  if(!curves && (transport == TRNSPRT_QUIC))
+  if(!curves && cf->conn->transport == TRNSPRT_QUIC)
     curves = (char *)CURL_UNCONST(QUIC_GROUPS);
 
   if(curves) {
@@ -1247,7 +1242,8 @@ CURLcode Curl_wssl_ctx_init(struct wssl_ctx *wctx,
   }
 #endif
 
-  if(ssl_config->primary.cache_session && (transport != TRNSPRT_QUIC)) {
+  if(ssl_config->primary.cache_session &&
+     cf->conn->transport != TRNSPRT_QUIC) {
     /* Register to get notified when a new session is received */
     wolfSSL_CTX_sess_set_new_cb(wctx->ssl_ctx, wssl_vtls_new_session_cb);
   }
@@ -1293,7 +1289,7 @@ CURLcode Curl_wssl_ctx_init(struct wssl_ctx *wctx,
 
   wolfSSL_set_app_data(wctx->ssl, ssl_user_data);
 #ifdef WOLFSSL_QUIC
-  if(transport == TRNSPRT_QUIC)
+  if(cf->conn->transport == TRNSPRT_QUIC)
     wolfSSL_set_quic_use_legacy_codepoint(wctx->ssl, 0);
 #endif
 
@@ -1542,7 +1538,6 @@ CURLcode Curl_wssl_verify_pinned(struct Curl_cfilter *cf,
     data->set.str[STRING_SSL_PINNEDPUBLICKEY];
 #else
   const char * const pinnedpubkey = data->set.str[STRING_SSL_PINNEDPUBLICKEY];
-  (void)cf;
 #endif
 
   if(pinnedpubkey) {
@@ -1759,7 +1754,7 @@ static CURLcode wssl_handshake(struct Curl_cfilter *cf,
       }
     }
 #ifdef USE_ECH_WOLFSSL
-    else if(detail == -1) {
+    else if(-1 == detail) {
       /* try access a retry_config ECHConfigList for tracing */
       byte echConfigs[1000];
       word32 echConfigsLen = 1000;
@@ -1794,48 +1789,49 @@ static CURLcode wssl_handshake(struct Curl_cfilter *cf,
   }
 }
 
-static CURLcode wssl_send(struct Curl_cfilter *cf,
-                          struct Curl_easy *data,
-                          const void *buf, size_t blen,
-                          size_t *pnwritten)
+static ssize_t wssl_send(struct Curl_cfilter *cf,
+                         struct Curl_easy *data,
+                         const void *buf, size_t blen,
+                         CURLcode *curlcode)
 {
   struct ssl_connect_data *connssl = cf->ctx;
   struct wssl_ctx *wssl = (struct wssl_ctx *)connssl->backend;
-  CURLcode result = CURLE_OK;
-  int nwritten;
-
+  size_t total_written = 0;
+  ssize_t nwritten = -1;
   DEBUGASSERT(wssl);
-  *pnwritten = 0;
+
   wolfSSL_ERR_clear_error();
 
   if(blen) {
     int memlen = (blen > (size_t)INT_MAX) ? INT_MAX : (int)blen;
+    int rc;
 
-    nwritten = wolfSSL_write(wssl->ssl, buf, memlen);
-
-    if(nwritten > 0)
-      *pnwritten += (size_t)nwritten;
-    else {
-      int err = wolfSSL_get_error(wssl->ssl, nwritten);
+    rc = wolfSSL_write(wssl->ssl, buf, memlen);
+    if(rc <= 0) {
+      int err = wolfSSL_get_error(wssl->ssl, rc);
 
       switch(err) {
       case WOLFSSL_ERROR_WANT_READ:
       case WOLFSSL_ERROR_WANT_WRITE:
         /* there is data pending, re-invoke wolfSSL_write() */
-        if(*pnwritten) {
-          result = CURLE_OK;
+        if(total_written) {
+          *curlcode = CURLE_OK;
+          nwritten = total_written;
           goto out;
         }
-        result = CURLE_AGAIN;
+        *curlcode = CURLE_AGAIN;
+        nwritten = -1;
         goto out;
 
       default:
         if(wssl->io_result == CURLE_AGAIN) {
-          if(*pnwritten) {
-            result = CURLE_OK;
+          if(total_written) {
+            *curlcode = CURLE_OK;
+            nwritten = total_written;
             goto out;
           }
-          result = CURLE_AGAIN;
+          *curlcode = CURLE_AGAIN;
+          nwritten = -1;
           goto out;
         }
         {
@@ -1845,16 +1841,21 @@ static CURLcode wssl_send(struct Curl_cfilter *cf,
                               sizeof(error_buffer)),
                 SOCKERRNO);
         }
-        result = CURLE_SEND_ERROR;
+        *curlcode = CURLE_SEND_ERROR;
+        nwritten = -1;
         goto out;
       }
     }
+    else
+      total_written += rc;
   }
 
+  *curlcode = CURLE_OK;
+  nwritten = total_written;
 out:
-  CURL_TRC_CF(data, cf, "wssl_send(len=%zu) -> %d, %zu",
-              blen, result, *pnwritten);
-  return result;
+  CURL_TRC_CF(data, cf, "wssl_send(len=%zu) -> %" FMT_OFF_T ", %d",
+              blen, nwritten, *curlcode);
+  return nwritten;
 }
 
 static CURLcode wssl_shutdown(struct Curl_cfilter *cf,
@@ -1967,7 +1968,7 @@ static void wssl_close(struct Curl_cfilter *cf, struct Curl_easy *data)
   struct ssl_connect_data *connssl = cf->ctx;
   struct wssl_ctx *wssl = (struct wssl_ctx *)connssl->backend;
 
-  (void)data;
+  (void) data;
 
   DEBUGASSERT(wssl);
 
@@ -1981,10 +1982,10 @@ static void wssl_close(struct Curl_cfilter *cf, struct Curl_easy *data)
   }
 }
 
-static CURLcode wssl_recv(struct Curl_cfilter *cf,
-                          struct Curl_easy *data,
-                          char *buf, size_t blen,
-                          size_t *pnread)
+static ssize_t wssl_recv(struct Curl_cfilter *cf,
+                         struct Curl_easy *data,
+                         char *buf, size_t blen,
+                         CURLcode *curlcode)
 {
   struct ssl_connect_data *connssl = cf->ctx;
   struct wssl_ctx *wssl = (struct wssl_ctx *)connssl->backend;
@@ -1993,38 +1994,41 @@ static CURLcode wssl_recv(struct Curl_cfilter *cf,
 
   DEBUGASSERT(wssl);
 
-  *pnread = 0;
   wolfSSL_ERR_clear_error();
+  *curlcode = CURLE_OK;
 
   nread = wolfSSL_read(wssl->ssl, buf, buffsize);
 
-  if(nread > 0)
-    *pnread = (size_t)nread;
-  else {
+  if(nread <= 0) {
     int err = wolfSSL_get_error(wssl->ssl, nread);
 
     switch(err) {
     case WOLFSSL_ERROR_ZERO_RETURN: /* no more data */
       CURL_TRC_CF(data, cf, "wssl_recv(len=%zu) -> CLOSED", blen);
-      return CURLE_OK;
+      *curlcode = CURLE_OK;
+      return 0;
     case WOLFSSL_ERROR_NONE:
     case WOLFSSL_ERROR_WANT_READ:
     case WOLFSSL_ERROR_WANT_WRITE:
       if(!wssl->io_result && connssl->peer_closed) {
         CURL_TRC_CF(data, cf, "wssl_recv(len=%zu) -> CLOSED", blen);
-        return CURLE_OK;
+        *curlcode = CURLE_OK;
+        return 0;
       }
       /* there is data pending, re-invoke wolfSSL_read() */
       CURL_TRC_CF(data, cf, "wssl_recv(len=%zu) -> AGAIN", blen);
-      return CURLE_AGAIN;
+      *curlcode = CURLE_AGAIN;
+      return -1;
     default:
       if(wssl->io_result == CURLE_AGAIN) {
         CURL_TRC_CF(data, cf, "wssl_recv(len=%zu) -> AGAIN", blen);
-        return CURLE_AGAIN;
+        *curlcode = CURLE_AGAIN;
+        return -1;
       }
       else if(!wssl->io_result && connssl->peer_closed) {
         CURL_TRC_CF(data, cf, "wssl_recv(len=%zu) -> CLOSED", blen);
-        failf(data, "Connection closed abruptly");
+        *curlcode = CURLE_OK;
+        return 0;
       }
       else {
         char error_buffer[256];
@@ -2033,12 +2037,13 @@ static CURLcode wssl_recv(struct Curl_cfilter *cf,
                             sizeof(error_buffer)),
               SOCKERRNO);
       }
-      return CURLE_RECV_ERROR;
+      *curlcode = CURLE_RECV_ERROR;
+      return -1;
     }
   }
 
-  CURL_TRC_CF(data, cf, "wssl_recv(len=%zu) -> 0, %zu", blen, *pnread);
-  return CURLE_OK;
+  CURL_TRC_CF(data, cf, "wssl_recv(len=%zu) -> %d", blen, nread);
+  return nread;
 }
 
 size_t Curl_wssl_version(char *buffer, size_t size)
@@ -2088,18 +2093,6 @@ static bool wssl_data_pending(struct Curl_cfilter *cf,
     return wolfSSL_pending(wssl->ssl);
   else
     return FALSE;
-}
-
-void Curl_wssl_report_handshake(struct Curl_easy *data,
-                                struct wssl_ctx *wssl)
-{
-#if (LIBWOLFSSL_VERSION_HEX >= 0x03009010)
-    infof(data, "SSL connection using %s / %s",
-          wolfSSL_get_version(wssl->ssl),
-          wolfSSL_get_cipher_name(wssl->ssl));
-#else
-    infof(data, "SSL connected");
-#endif
 }
 
 static CURLcode wssl_connect(struct Curl_cfilter *cf,
@@ -2175,9 +2168,16 @@ static CURLcode wssl_connect(struct Curl_cfilter *cf,
     }
 #endif /* HAVE_ALPN */
 
+#if (LIBWOLFSSL_VERSION_HEX >= 0x03009010)
+    infof(data, "SSL connection using %s / %s",
+          wolfSSL_get_version(wssl->ssl),
+          wolfSSL_get_cipher_name(wssl->ssl));
+#else
+    infof(data, "SSL connected");
+#endif
+
     connssl->connecting_state = ssl_connect_done;
     connssl->state = ssl_connection_complete;
-    Curl_wssl_report_handshake(data, wssl);
 
 #ifdef WOLFSSL_EARLY_DATA
     if(connssl->earlydata_state > ssl_earlydata_none) {
@@ -2240,12 +2240,12 @@ static CURLcode wssl_sha256sum(const unsigned char *tmp, /* input */
 }
 
 static void *wssl_get_internals(struct ssl_connect_data *connssl,
-                                CURLINFO info)
+                                CURLINFO info UNUSED_PARAM)
 {
   struct wssl_ctx *wssl = (struct wssl_ctx *)connssl->backend;
+  (void)info;
   DEBUGASSERT(wssl);
-  return info == CURLINFO_TLS_SESSION ?
-    (void *)wssl->ssl_ctx : (void *)wssl->ssl;
+  return wssl->ssl;
 }
 
 const struct Curl_ssl Curl_ssl_wolfssl = {
@@ -2286,6 +2286,7 @@ const struct Curl_ssl Curl_ssl_wolfssl = {
   NULL,                            /* set_engine */
   NULL,                            /* set_engine_default */
   NULL,                            /* engines_list */
+  NULL,                            /* false_start */
   wssl_sha256sum,                  /* sha256sum */
   wssl_recv,                       /* recv decrypted data */
   wssl_send,                       /* send data to encrypt */
