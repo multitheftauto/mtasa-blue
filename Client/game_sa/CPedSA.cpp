@@ -27,6 +27,8 @@
 
 #include "enums/AdhesionGroup.h"
 
+#include "CEventSoundQuietSA.h"
+
 extern CGameSA* pGame;
 
 static bool g_onlyUpdateRotations = false;
@@ -587,7 +589,9 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
     if (!ped->pedFlags.bIsStanding)
         return;
 
-    auto computeVolumeAndFreq = [](CPedSAInterface* ped, float& volumeOffset, float& relativeFreq)
+    bool doWooble = false;
+
+    auto ComputeVolumeAndFreq = [](CPedSAInterface* ped, float& volumeOffset, float& relativeFreq, bool forAnim = false)
     {
         volumeOffset = 0.0f;
         relativeFreq = 1.0f;
@@ -609,10 +613,12 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
                     relativeFreq = 1.2f;
                     break;
                 default:
-                    volumeOffset = -12.0f;
-                    relativeFreq = 0.9f;
+                    // A custom option so that footstep sounds for animations aren’t quieter than normal steps
+                    volumeOffset = forAnim ? -6.0f : -12.0f;
+                    relativeFreq = forAnim ? 1.0f : 0.9f;
                     break;
             }
+
             if (ped->iMoveAnimGroup == 69) // ANIM_PLAYER_SNEAK_PED
             {
                 volumeOffset -= 6.0f;
@@ -621,10 +627,15 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         }
     };
 
-    auto addFootstepSound = [](CPedSAInterface* ped, bool isLeftFoot, float volumeOffset, float relativeFreq, bool doWooble)
+    auto DoFootstep = [doWooble, &ComputeVolumeAndFreq](CPedSAInterface* ped, bool isLeftFoot, bool forAnim = false)
     {
         if (ped->pedAudio.canAddEvent) // CPedAudio::AddEvent
-            ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, isLeftFoot ? 54 : 55, volumeOffset, relativeFreq, nullptr, 0, 0, 0);
+        {
+            float volumeOffset, relativeFreq;
+            ComputeVolumeAndFreq(ped, volumeOffset, relativeFreq, forAnim);
+
+            ped->pedAudio.AddAudioEvent(isLeftFoot ? AudioEvents::AE_PED_FOOTSTEP_LEFT : AudioEvents::AE_PED_FOOTSTEP_RIGHT, volumeOffset, relativeFreq, nullptr, 0, 0, 0);
+        }
 
         // CPed::DoFootLanded
         ((void(__thiscall*)(CPedSAInterface*, int, bool))0x5E5380)(ped, isLeftFoot ? 1 : 0, doWooble);
@@ -637,7 +648,7 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
     CAnimBlendAssociationSAInterface* walkAnim = nullptr;
     float                             partialBlend = 0.0f, walkcycleBlend = 0.0f;
 
-    auto updateAnimBlend = [&](CAnimBlendAssociationSAInterface* assoc)
+    auto UpdateAnimBlend = [&](CAnimBlendAssociationSAInterface* assoc)
     {
         if (assoc->m_walkAnim)
         {
@@ -651,7 +662,7 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
     };
 
     for (auto& assoc = anim; assoc != nullptr; assoc = pGame->GetAnimManager()->RpAnimBlendGetNextAssociation(assoc))
-        updateAnimBlend(assoc->GetInterface());
+        UpdateAnimBlend(assoc->GetInterface());
 
     if (!walkAnim || walkcycleBlend <= 0.5f || partialBlend >= 1.0f)
         return;
@@ -660,7 +671,7 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
     static constexpr float DUCK_FOOTSTEP_MOVE_TIME = 6.0f / 30.0f;
 
     eAnimID animID = static_cast<eAnimID>(walkAnim->sAnimID);
-    bool    doWooble = (animID == eAnimID::ANIM_ID_WALK || animID == eAnimID::ANIM_ID_RUN || animID == eAnimID::ANIM_ID_SPRINT);
+    doWooble = (animID == eAnimID::ANIM_ID_WALK || animID == eAnimID::ANIM_ID_RUN || animID == eAnimID::ANIM_ID_SPRINT);
 
     float leftFootLanded = walkAnim->pAnimHierarchy->fTotalTime * INITIAL_FOOT_LANDED_RATIO;
     float rightFootLanded = walkAnim->pAnimHierarchy->fTotalTime / 2.0f + leftFootLanded;
@@ -670,7 +681,7 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         rightFootLanded += DUCK_FOOTSTEP_MOVE_TIME;
     }
 
-    auto handleFoot = [&](bool isLeftFoot)
+    auto HandleFoot = [&](bool isLeftFoot)
     {
         float footTime = isLeftFoot ? leftFootLanded : rightFootLanded;
 
@@ -705,10 +716,8 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
 
             float downTime = isLeftFoot ? leftDown : rightDown;
             if (volume > 0.2f && walkAnim->fCurrentTime > downTime && walkAnim->fCurrentTime - walkAnim->fTimeStep <= downTime)
-            {
-                if (ped->pedAudio.canAddEvent) // CPedAudio::AddEvent
-                    ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, isLeftFoot ? 57 : 56, std::log10(volume) * 20.0f, animID == eAnimID::ANIM_ID_WALK ? 0.75f : 1.0f, nullptr, 0, 0, 0);
-            }
+                ped->pedAudio.AddAudioEvent(isLeftFoot ? AudioEvents::AE_PED_SKATE_LEFT : AudioEvents::AE_PED_SKATE_RIGHT, std::log10(volume) * 20.0f, animID == eAnimID::ANIM_ID_WALK ? 0.75f : 1.0f, nullptr, 0, 0, 0);
+
             return;
         }
 
@@ -747,37 +756,22 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
 
                 if (volume > 0.0f)
                 {
-                    CVector pos{};
-
-                    // CMemoryMgr::Malloc
-                    // 0x2C = size of CEventSoundQuiet
-                    void*   eventFootstepNoise = ((void*(__cdecl*)(int))0x72F420)(0x2C);
-
-                    // CEventSoundQuiet::CEventSoundQuiet
-                    ((void*(__thiscall*)(void*, CEntitySAInterface*, float, int, CVector*))0x5E05B0)(eventFootstepNoise, ped, volume, -1, &pos);
+                    CEventSoundQuietSAInterface eventFootstepNoise(ped, volume);
 
                     // GetEventGlobalGroup
                     void* eventGlobalGroup = ((void*(__cdecl*)())0x4ABA50)();
 
                     // CEventGroup::Add
-                    ((void(__thiscall*)(void*, void*, int))0x4AB420)(eventGlobalGroup, eventFootstepNoise, 0);
-
-                    // CEventSoundQuiet::~CEventSoundQuiet
-                    ((void(__thiscall*)(void*))0x5DEA00)(eventFootstepNoise);
-
-                    // CMemoryMgr::Free
-                    ((void(__cdecl*)(void*))0x72F430)(eventFootstepNoise);
+                    ((void(__thiscall*)(void*, void*, int))0x4AB420)(eventGlobalGroup, &eventFootstepNoise, 0);
                 }
             }
 
-            float volumeOffset, relativeFreq;
-            computeVolumeAndFreq(ped, volumeOffset, relativeFreq);
-            addFootstepSound(ped, isLeftFoot, volumeOffset, relativeFreq, doWooble);
+            DoFootstep(ped, isLeftFoot);
         }
     };
 
-    handleFoot(true);
-    handleFoot(false);
+    HandleFoot(true);
+    HandleFoot(false);
 
     // CTaskManager::GetSimplestActiveTask
     auto* task = ((CTaskSAInterface * (__thiscall*)(void*))0x6819D0)(&ped->pPedIntelligence->taskManager);

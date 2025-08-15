@@ -14,6 +14,7 @@
 #include <CVector.h>
 #include "Common.h"
 #include "CWeaponInfo.h"
+#include "enums/AudioEvents.h"
 
 class CEntity;
 class CEntitySAInterface;
