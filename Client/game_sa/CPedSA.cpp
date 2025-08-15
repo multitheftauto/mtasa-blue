@@ -25,6 +25,8 @@
 #include "TaskSA.h"
 #include "CAnimBlendHierarchySA.h"
 
+#include "enums/AdhesionGroup.h"
+
 extern CGameSA* pGame;
 
 static bool g_onlyUpdateRotations = false;
@@ -582,11 +584,11 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
 
 void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
 {
-    auto* firstAssoc = ((CAnimBlendAssociationSAInterface * (__cdecl*)(RpClump*))0x4D15E0)(ped->m_pRwObject);
+    auto firstAssoc = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(ped->m_pRwObject);
     if (!firstAssoc)
         return;
 
-    eAnimID animID = (eAnimID)firstAssoc->sAnimID;
+    eAnimID animID = firstAssoc->GetAnimID();
 
     bool isMovingAnim = false;
     if (animID == eAnimID::ANIM_ID_WALK || animID == eAnimID::ANIM_ID_RUN || animID == eAnimID::ANIM_ID_SPRINT)
@@ -605,28 +607,20 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
 
     CAnimBlendAssociationSAInterface* walkAnim = nullptr;
     float                             walkBlendTotal = 0.0f;
-    float                             idleBlendTotal  = 0.0f;
+    float                             idleBlendTotal = 0.0f;
 
-    for (auto& assoc = firstAssoc; assoc != nullptr; assoc = ((CAnimBlendAssociationSAInterface * (__cdecl*)(CAnimBlendAssociationSAInterface*))0x4D6AB0)(assoc))
+    for (auto& assoc = firstAssoc; assoc != nullptr; assoc = pGame->GetAnimManager()->RpAnimBlendGetNextAssociation(assoc))
     {
-        if (assoc->m_walkAnim)
+        CAnimBlendAssociationSAInterface* assocInterface = assoc->GetInterface();
+
+        if (assocInterface->m_walkAnim)
         {
-            walkAnim = assoc;
-            walkBlendTotal += assoc->fBlendAmount;
+            walkAnim = assocInterface;
+            walkBlendTotal += assocInterface->fBlendAmount;
         }
-        else if (!assoc->m_bAddAnimBlendToTotalBlend && assoc->sAnimID != 223 && (assoc->m_bPartial || !ped->pedFlags.bIsDucking))
-            idleBlendTotal  += assoc->fBlendAmount;
+        else if (!assocInterface->m_bAddAnimBlendToTotalBlend && assoc->GetAnimID() != eAnimID::ANIM_ID_FIGHT_IDLE && (assocInterface->m_bPartial || !ped->pedFlags.bIsDucking))
+            idleBlendTotal += assocInterface->fBlendAmount;
     }
-
-   /* if (!walkAnim)
-    {
-        walkAnim = ((CAnimBlendAssociationSAInterface * (__cdecl*)(RpClump*))0x4D15E0)(ped->m_pRwObject);
-
-        if (walkAnim->m_walkAnim)
-            walkBlendTotal = walkAnim->fBlendAmount;
-        else if (walkAnim->m_bAddAnimBlendToTotalBlend && walkAnim->sAnimID != 223 && (walkAnim->m_bPartial || ped->pedFlags.bIsDucking))
-            idleBlendTotal  = walkAnim->fBlendAmount;
-    }*/
 
     auto handleLanding = [](CPedSAInterface* ped)
     {
@@ -638,9 +632,9 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
             auto* task = ((CTaskSAInterface* (__thiscall*)(void*))0x6819D0)(&ped->pPedIntelligence->taskManager);
             if (!task) return;
 
-            DWORD taskType = reinterpret_cast<int(__thiscall*)(void*)>(task->VTBL->GetTaskType)(task);
-
-            if (taskType == 0xF2) // TASK_SIMPLE_LAND
+            eTaskType taskType = reinterpret_cast<eTaskType(__thiscall*)(void*)>(task->VTBL->GetTaskType)(task);
+            
+            if (taskType == TASK_SIMPLE_LAND)
             {
                 // CTaskSimpleLand::RightFootLanded
                 if (((bool(__thiscall*)(void*))0x678FE0)((void*)task))
@@ -678,7 +672,7 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
                 soundSpeed = 0.9f;
             }
 
-            if (ped->iMoveAnimGroup == 69)
+            if (ped->iMoveAnimGroup == 69) // ANIM_GROUP_PLAYERSNEAK
             {
                 volumeOffset -= 6.0f;
                 soundSpeed -= 0.1f;
@@ -702,14 +696,24 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
     {
         CVector pos{};
 
+        // CMemoryMgr::Malloc
+        // 0x2C = size of CEventSoundQuiet
         void* mem = ((void*(__cdecl*)(int))0x72F420)(0x2C);
 
+        // CEventSoundQuiet::CEventSoundQuiet
         ((void*(__thiscall*)(void*, CEntitySAInterface*, float, int, CVector*))0x5E05B0)(mem, ped, soundLevel, -1, &pos);
 
+        // GetEventGlobalGroup
         void* eventGlobalGroup = ((void*(__cdecl*)())0x4ABA50)();
+
+        // CEventGroup::Add
         ((void(__thiscall*)(void*, void*, int))0x4AB420)(eventGlobalGroup, mem, 0);
 
+        // CEventSoundQuiet::~CEventSoundQuiet
         ((void(__thiscall*)(void*))0x5DEA00)(mem);
+
+        // CMemoryMgr::Free
+        ((void(__cdecl*)(void*))0x72F430)(mem);
 
         DoFootstep(ped, true);
     };
@@ -729,22 +733,21 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         maxAnimTime += 0.2f;
     }
 
-    CPedStatSAInterface** ms_apPedStats = reinterpret_cast<CPedStatSAInterface**>(0xC0BBEC);
-    float                 animTimeMult = 0.0f;
-
-    float volumeMult = 0.0f;
-
-    if (ped->pPedStats == ms_apPedStats[40])
+    if (ped->pPedStats->id == 40) // STAT_SKATER
     {
-        animTimeMult = 0.533f;
-        if (walkAnim->sAnimID != 0)
+        float volumeMult = 1.0f;
+        float animTimeMult = 0.533f;
+
+        if (static_cast<eAnimID>(walkAnim->sAnimID) != eAnimID::ANIM_ID_WALK)
             animTimeMult = 0.33f;
 
-        int surface = ((int(__thiscall*)(void*, int))0x55E5C0)((void*)0xB79538, ped->m_ucCollisionContactSurfaceType) - 3;
-        if (surface > 0)
+        // SurfaceInfos_c::GetAdhesionGroup
+        // 0xB79538 = g_surfaceInfos
+        AdhesionGroups::Enum surface = ((AdhesionGroups::Enum(__thiscall*)(void*, int))0x55E5C0)((void*)0xB79538, ped->m_ucCollisionContactSurfaceType);
+
+        switch (surface)
         {
-            int prevSurface = surface - 1;
-            if (prevSurface == 0)
+            case AdhesionGroups::Enum::SAND:
             {
                 if (rand() % 64 > 0)
                 {
@@ -754,35 +757,35 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
                 handleLanding(ped);
                 return;
             }
+            case AdhesionGroups::Enum::LOOSE:
+            {
+                if (rand() % 128 > 0)
+                {
+                    ped->vecAnimMovingShiftLocal *= 0.5f;
+                }
 
-            if (prevSurface == 1)
+                volumeMult = 0.5f;
+                break;
+            }
+            case AdhesionGroups::Enum::WET:
             {
                 ped->vecAnimMovingShiftLocal *= 0.3f;
                 handleLanding(ped);
                 return;
             }
-
-            volumeMult = 1.0f;
-        }
-        else
-        {
-            if (rand() % 128 > 0)
-            {
-                ped->vecAnimMovingShiftLocal *= 0.5f;
-            }
-
-            volumeMult = 0.5f;
         }
 
         if (walkAnim->fCurrentTime <= 0.0f || walkAnim->fCurrentTime - walkAnim->fTimeStep > 0.0f)
         {
             if (volumeMult > 0.2f && walkAnim->fCurrentTime > animTimeMult && walkAnim->fCurrentTime - walkAnim->fTimeStep <= animTimeMult && ped->pedAudio.canAddEvent)
             {
+                // CAEPedAudioEntity::AddAudioEvent
                 ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, 57, std::log10(volumeMult), walkAnim->sAnimID == 0 ? 0.5 : 1.0f, nullptr, 0, 0, 0);
             }
         }
         else if (ped->pedAudio.canAddEvent)
         {
+            // CAEPedAudioEntity::AddAudioEvent
             ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(&ped->pedAudio, 56, std::log10(volumeMult), walkAnim->sAnimID == 0 ? 0.5 : 1.0f, nullptr, 0, 0, 0);
         }
 
@@ -807,6 +810,7 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         CPlayerPedDataSAInterface* playerData = ped->pPlayerData;
         if (playerData)
         {
+            // CPedClothesDesc::GetIsWearingBalaclava
             bool wearingBalaclava = ((bool(__fastcall*)(CPedClothesDesc*, int))0x5A7950)(playerData->m_pClothes, 0);
             if (ped->moveState >= PedMoveState::Enum::PEDMOVE_JOG)
             {
