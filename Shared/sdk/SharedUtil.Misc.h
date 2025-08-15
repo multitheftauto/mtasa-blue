@@ -1728,10 +1728,13 @@ MTAEXPORT void GetLibMtaVersion(char* pBuffer, uint uiMaxSize);
  The function prevents a compilation error caused by using non-constant format strings and
  correctly forwards the arguments to std::format for formatting
 */
-template <class... _Types>
-__forceinline std::string mtaformat(const std::string_view fmt, _Types&&... _Args)
+namespace mtasa
 {
-    return std::vformat(fmt, std::make_format_args(_Args...));
+    template <class... _Types>
+    __forceinline std::string format(const std::string_view fmt, _Types&&... _Args)
+    {
+        return std::vformat(fmt, std::make_format_args(_Args...));
+    }
 }
 
 #endif
