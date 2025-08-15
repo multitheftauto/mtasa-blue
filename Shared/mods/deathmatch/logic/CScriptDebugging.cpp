@@ -70,24 +70,17 @@ void CScriptDebugging::LogPCallError(lua_State* luaVM, const SString& strRes, bo
 
 bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint8_t playerDebugLevel, std::uint8_t messageDebugLevel) const noexcept
 {
-    bool sufficientDebugLevel = false;
-
-    switch (messageDebugLevel)
+switch (messageDebugLevel)
     {
         case MESSAGE_TYPE_ERROR:
-            sufficientDebugLevel = (playerDebugLevel >= ERRORS_ONLY);
-            break;
+            return playerDebugLevel >= ERRORS_ONLY;
         case MESSAGE_TYPE_WARNING:
-            sufficientDebugLevel = (playerDebugLevel >= ERRORS_AND_WARNINGS);
-            break;
+            return playerDebugLevel >= ERRORS_AND_WARNINGS;
         case MESSAGE_TYPE_INFO:
         case MESSAGE_TYPE_CUSTOM:
         case MESSAGE_TYPE_DEBUG:
-            sufficientDebugLevel = (playerDebugLevel == ALL);
-            break;
+            return playerDebugLevel == ALL;
     }
-
-    return sufficientDebugLevel;
 }
 
 void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...)
