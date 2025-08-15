@@ -285,7 +285,18 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 
     // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
     if (bLoadEmbeddedCollisions)
+    {
+        // Vehicles have their collision loaded through the CollisionModel plugin, so we need to remove the current collision to prevent a memory leak.
+        // This needs to be done here before reading the stream data, because plugins are read in RpClumpStreamRead.
+        CModelInfo* modelInfo = pGame->GetModelInfo(usModelID);
+        if (modelInfo)
+        {
+            if (auto* modelInfoInterface = modelInfo->GetInterface())
+                ((void(__thiscall*)(CBaseModelInfoSAInterface*))0x4C4C40)(modelInfoInterface); // CBaseModelInfo::DeleteCollisionModel
+        }
+
         RpPrtStdGlobalDataSetStreamEmbedded((void*)pPool[usModelID]);
+    }
 
     // read the clump with all its extensions
     RpClump* pClump = RpClumpStreamRead(streamModel);
