@@ -6679,7 +6679,7 @@ bool CStaticFunctionDefinitions::GetGarageSize(unsigned char ucGarageID, float& 
         
         CVector vecPosition;
         pGarage->GetPosition(vecPosition);
-        fHeight = fHeight - vecPosition.fZ;
+        fHeight -= vecPosition.fZ;
         
         return true;
     }
