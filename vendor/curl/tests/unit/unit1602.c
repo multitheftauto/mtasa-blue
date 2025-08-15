@@ -21,36 +21,35 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
+
+#include <curlx.h>
 
 #include "hash.h"
 
-#include "memdebug.h" /* LAST include file */
+#include <memdebug.h> /* LAST include file */
 
-static void t1602_mydtor(void *p)
+static struct Curl_hash hash_static;
+
+static void mydtor(void *p)
 {
   int *ptr = (int *)p;
   free(ptr);
 }
 
-static CURLcode t1602_setup(struct Curl_hash *hash)
+static CURLcode unit_setup(void)
 {
-  Curl_hash_init(hash, 7, Curl_hash_str,
-                 curlx_str_key_compare, t1602_mydtor);
+  Curl_hash_init(&hash_static, 7, Curl_hash_str,
+                 curlx_str_key_compare, mydtor);
   return CURLE_OK;
 }
 
-static void t1602_stop(struct Curl_hash *hash)
+static void unit_stop(void)
 {
-  Curl_hash_destroy(hash);
+  Curl_hash_destroy(&hash_static);
 }
 
-static CURLcode test_unit1602(const char *arg)
-{
-  struct Curl_hash hash;
-
-  UNITTEST_BEGIN(t1602_setup(&hash))
-
+UNITTEST_START
   int *value;
   int *value2;
   int *nodep;
@@ -59,23 +58,23 @@ static CURLcode test_unit1602(const char *arg)
   int key = 20;
   int key2 = 25;
 
+
   value = malloc(sizeof(int));
   abort_unless(value != NULL, "Out of memory");
   *value = 199;
-  nodep = Curl_hash_add(&hash, &key, klen, value);
+  nodep = Curl_hash_add(&hash_static, &key, klen, value);
   if(!nodep)
     free(value);
   abort_unless(nodep, "insertion into hash failed");
-  Curl_hash_clean(&hash);
+  Curl_hash_clean(&hash_static);
 
   /* Attempt to add another key/value pair */
   value2 = malloc(sizeof(int));
   abort_unless(value2 != NULL, "Out of memory");
   *value2 = 204;
-  nodep = Curl_hash_add(&hash, &key2, klen, value2);
+  nodep = Curl_hash_add(&hash_static, &key2, klen, value2);
   if(!nodep)
     free(value2);
   abort_unless(nodep, "insertion into hash failed");
 
-  UNITTEST_END(t1602_stop(&hash))
-}
+UNITTEST_STOP

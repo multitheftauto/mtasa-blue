@@ -21,11 +21,22 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "vtls/x509asn1.h"
 
-#if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_MBEDTLS)
+static CURLcode unit_setup(void)
+{
+  return CURLE_OK;
+}
+
+static void unit_stop(void)
+{
+
+}
+
+#if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_SECTRANSP) || \
+  defined(USE_MBEDTLS)
 
 struct test_spec {
   const char *input;
@@ -33,34 +44,7 @@ struct test_spec {
   CURLcode exp_result;
 };
 
-static bool do_test(const struct test_spec *spec, size_t i,
-                    struct dynbuf *dbuf)
-{
-  CURLcode result;
-  const char *in = spec->input;
-
-  curlx_dyn_reset(dbuf);
-  result = Curl_x509_GTime2str(dbuf, in, in + strlen(in));
-  if(result != spec->exp_result) {
-    curl_mfprintf(stderr, "test %zu: expect result %d, got %d\n",
-                  i, spec->exp_result, result);
-    return FALSE;
-  }
-  else if(!result && strcmp(spec->exp_output, curlx_dyn_ptr(dbuf))) {
-    curl_mfprintf(stderr,
-                  "test %zu: input '%s', expected output '%s', got '%s'\n",
-                  i, in, spec->exp_output, curlx_dyn_ptr(dbuf));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-static CURLcode test_unit1656(const char *arg)
-{
-  UNITTEST_BEGIN_SIMPLE
-
-  static const struct test_spec test_specs[] = {
+static struct test_spec test_specs[] = {
   { "190321134340", "1903-21-13 43:40:00", CURLE_OK },
   { "", NULL, CURLE_BAD_FUNCTION_ARGUMENT },
   { "WTF", NULL, CURLE_BAD_FUNCTION_ARGUMENT },
@@ -87,8 +71,32 @@ static CURLcode test_unit1656(const char *arg)
   { "190321134340-3", "1903-21-13 43:40:00 UTC-3", CURLE_OK },
   { "19032113434017.0-04", "1903-21-13 43:40:17 UTC-04", CURLE_OK },
   { "19032113434017.01-01:10", "1903-21-13 43:40:17.01 UTC-01:10", CURLE_OK },
-  };
+};
 
+static bool do_test(struct test_spec *spec, size_t i, struct dynbuf *dbuf)
+{
+  CURLcode result;
+  const char *in = spec->input;
+
+  curlx_dyn_reset(dbuf);
+  result = Curl_x509_GTime2str(dbuf, in, in + strlen(in));
+  if(result != spec->exp_result) {
+    curl_mfprintf(stderr, "test %zu: expect result %d, got %d\n",
+                  i, spec->exp_result, result);
+    return FALSE;
+  }
+  else if(!result && strcmp(spec->exp_output, curlx_dyn_ptr(dbuf))) {
+    curl_mfprintf(stderr,
+                  "test %zu: input '%s', expected output '%s', got '%s'\n",
+                  i, in, spec->exp_output, curlx_dyn_ptr(dbuf));
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+UNITTEST_START
+{
   size_t i;
   struct dynbuf dbuf;
   bool all_ok = TRUE;
@@ -108,17 +116,15 @@ static CURLcode test_unit1656(const char *arg)
 
   curlx_dyn_free(&dbuf);
   curl_global_cleanup();
-
-  UNITTEST_END_SIMPLE
 }
+UNITTEST_STOP
 
 #else
 
-static CURLcode test_unit1656(const char *arg)
+UNITTEST_START
 {
-  UNITTEST_BEGIN_SIMPLE
-  puts("not tested since Curl_x509_GTime2str() is not built in");
-  UNITTEST_END_SIMPLE
+  puts("not tested since Curl_x509_GTime2str() is not built-in");
 }
+UNITTEST_STOP
 
 #endif

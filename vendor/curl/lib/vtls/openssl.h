@@ -68,8 +68,6 @@ struct ossl_ctx {
   X509*    server_cert;
   BIO_METHOD *bio_method;
   CURLcode io_result;       /* result of last BIO cfilter operation */
-  /* blocked writes need to retry with same length, remember it */
-  int      blocked_ssl_write_len;
 #ifndef HAVE_KEYLOG_CALLBACK
   /* Set to true once a valid keylog entry has been created to avoid dupes.
      This is a bool and not a bitfield because it is passed by address. */
@@ -139,14 +137,10 @@ CURLcode Curl_ossl_add_session(struct Curl_cfilter *cf,
  * ssl config verifypeer or -host is set. Otherwise all this is for
  * informational purposes only!
  */
-CURLcode Curl_ossl_check_peer_cert(struct Curl_cfilter *cf,
-                                   struct Curl_easy *data,
-                                   struct ossl_ctx *octx,
-                                   struct ssl_peer *peer);
-
-/* Report properties of a successful handshake */
-void Curl_ossl_report_handshake(struct Curl_easy *data,
-                                struct ossl_ctx *octx);
+CURLcode Curl_oss_check_peer_cert(struct Curl_cfilter *cf,
+                                  struct Curl_easy *data,
+                                  struct ossl_ctx *octx,
+                                  struct ssl_peer *peer);
 
 #endif /* USE_OPENSSL */
 #endif /* HEADER_CURL_SSLUSE_H */

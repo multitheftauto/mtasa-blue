@@ -537,8 +537,8 @@ static int compare_func(const void *a, const void *b)
 }
 
 UNITTEST CURLcode canon_path(const char *q, size_t len,
-                             struct dynbuf *new_path,
-                             bool do_uri_encode)
+                              struct dynbuf *new_path,
+                              bool do_uri_encode)
 {
   CURLcode result = CURLE_OK;
 
@@ -1149,4 +1149,4 @@ static bool should_urlencode(struct Curl_str *service_name)
   return true;
 }
 
-#endif /* !CURL_DISABLE_HTTP && !CURL_DISABLE_AWS */
+#endif /* !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_AWS) */

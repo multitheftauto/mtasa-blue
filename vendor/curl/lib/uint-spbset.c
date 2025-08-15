@@ -35,9 +35,6 @@
 #define CURL_UINT_SPBSET_MAGIC  0x70737362
 #endif
 
-/* Clear the bitset, making it empty. */
-UNITTEST void Curl_uint_spbset_clear(struct uint_spbset *bset);
-
 void Curl_uint_spbset_init(struct uint_spbset *bset)
 {
   memset(bset, 0, sizeof(*bset));
@@ -80,7 +77,7 @@ bool Curl_uint_spbset_empty(struct uint_spbset *bset)
   return TRUE;
 }
 
-UNITTEST void Curl_uint_spbset_clear(struct uint_spbset *bset)
+void Curl_uint_spbset_clear(struct uint_spbset *bset)
 {
   struct uint_spbset_chunk *next, *chunk;
 

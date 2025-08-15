@@ -21,8 +21,9 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
 #include "memdebug.h"
 
 struct chunk_data {
@@ -30,7 +31,8 @@ struct chunk_data {
   int print_content;
 };
 
-static long chunk_bgn(const void *f, void *ptr, int remains)
+static
+long chunk_bgn(const void *f, void *ptr, int remains)
 {
   const struct curl_fileinfo *finfo = f;
   struct chunk_data *ch_d = ptr;
@@ -46,7 +48,7 @@ static long chunk_bgn(const void *f, void *ptr, int remains)
       curl_mprintf(" (parsed => %o)", finfo->perm);
     curl_mprintf("\n");
   }
-  curl_mprintf("Size:         %" CURL_FORMAT_CURL_OFF_T "B\n", finfo->size);
+  curl_mprintf("Size:         %ldB\n", (long)finfo->size);
   if(finfo->strings.user)
     curl_mprintf("User:         %s\n", finfo->strings.user);
   if(finfo->strings.group)
@@ -72,8 +74,7 @@ static long chunk_bgn(const void *f, void *ptr, int remains)
   if(finfo->filetype == CURLFILETYPE_FILE) {
     ch_d->print_content = 1;
     curl_mprintf("Content:\n"
-                 "-------------------------------------------"
-                 "------------------\n");
+      "-------------------------------------------------------------\n");
   }
   if(strcmp(finfo->filename, "someothertext.txt") == 0) {
     curl_mprintf("# THIS CONTENT WAS SKIPPED IN CHUNK_BGN CALLBACK #\n");
@@ -82,7 +83,8 @@ static long chunk_bgn(const void *f, void *ptr, int remains)
   return CURL_CHUNK_BGN_FUNC_OK;
 }
 
-static long chunk_end(void *ptr)
+static
+long chunk_end(void *ptr)
 {
   struct chunk_data *ch_d = ptr;
   if(ch_d->print_content) {
@@ -96,7 +98,7 @@ static long chunk_end(void *ptr)
   return CURL_CHUNK_END_FUNC_OK;
 }
 
-static CURLcode test_lib576(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *handle = NULL;
   CURLcode res = CURLE_OK;

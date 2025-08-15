@@ -55,15 +55,14 @@
 #endif
 
 #include "urldata.h"
-#include "cfilters.h"
 #include "sendf.h"
 #include "hostip.h"
 #include "hash.h"
 #include "share.h"
 #include "url.h"
 #include "multiif.h"
+#include "inet_ntop.h"
 #include "curl_threads.h"
-#include "select.h"
 #include "strdup.h"
 
 #ifdef USE_ARES
@@ -160,7 +159,7 @@ addr_ctx_create(const char *hostname, int port,
   DEBUGASSERT(hints);
   addr_ctx->hints = *hints;
 #else
-  (void)hints;
+  (void) hints;
 #endif
 
   Curl_mutex_init(&addr_ctx->mutx);
@@ -173,7 +172,7 @@ addr_ctx_create(const char *hostname, int port,
     goto err_exit;
   }
 #endif
-  addr_ctx->sock_error = 0;
+  addr_ctx->sock_error = CURL_ASYNC_SUCCESS;
 
   /* Copying hostname string because original can be destroyed by parent
    * thread during gethostbyname execution.
@@ -204,7 +203,13 @@ err_exit:
  * For builds without ARES, but with USE_IPV6, create a resolver thread
  * and wait on it.
  */
-static CURL_THREAD_RETURN_T CURL_STDCALL getaddrinfo_thread(void *arg)
+static
+#if defined(CURL_WINDOWS_UWP) || defined(UNDER_CE)
+DWORD
+#else
+unsigned int
+#endif
+CURL_STDCALL getaddrinfo_thread(void *arg)
 {
   struct async_thrdd_addr_ctx *addr_ctx = arg;
   char service[12];
@@ -237,7 +242,7 @@ static CURL_THREAD_RETURN_T CURL_STDCALL getaddrinfo_thread(void *arg)
 #endif
       /* DNS has been resolved, signal client task */
       if(wakeup_write(addr_ctx->sock_pair[1], buf, sizeof(buf)) < 0) {
-        /* update sock_error to errno */
+        /* update sock_erro to errno */
         addr_ctx->sock_error = SOCKERRNO;
       }
     }
@@ -258,7 +263,13 @@ static CURL_THREAD_RETURN_T CURL_STDCALL getaddrinfo_thread(void *arg)
 /*
  * gethostbyname_thread() resolves a name and then exits.
  */
-static CURL_THREAD_RETURN_T CURL_STDCALL gethostbyname_thread(void *arg)
+static
+#if defined(CURL_WINDOWS_UWP) || defined(UNDER_CE)
+DWORD
+#else
+unsigned int
+#endif
+CURL_STDCALL gethostbyname_thread(void *arg)
 {
   struct async_thrdd_addr_ctx *addr_ctx = arg;
   bool all_gone;
@@ -368,14 +379,6 @@ static CURLcode async_rr_start(struct Curl_easy *data)
     thrdd->rr.channel = NULL;
     return CURLE_FAILED_INIT;
   }
-#ifdef CURLDEBUG
-  if(getenv("CURL_DNS_SERVER")) {
-    const char *servers = getenv("CURL_DNS_SERVER");
-    status = ares_set_servers_ports_csv(thrdd->rr.channel, servers);
-    if(status)
-      return CURLE_FAILED_INIT;
-  }
-#endif
 
   memset(&thrdd->rr.hinfo, 0, sizeof(thrdd->rr.hinfo));
   thrdd->rr.hinfo.port = -1;
@@ -383,7 +386,6 @@ static CURLcode async_rr_start(struct Curl_easy *data)
                     data->conn->host.name, ARES_CLASS_IN,
                     ARES_REC_TYPE_HTTPS,
                     async_thrdd_rr_done, data, NULL);
-  CURL_TRC_DNS(data, "Issued HTTPS-RR request for %s", data->conn->host.name);
   return CURLE_OK;
 }
 #endif
@@ -421,7 +423,6 @@ static bool async_thrdd_init(struct Curl_easy *data,
   data->state.async.done = FALSE;
   data->state.async.port = port;
   data->state.async.ip_version = ip_version;
-  free(data->state.async.hostname);
   data->state.async.hostname = strdup(hostname);
   if(!data->state.async.hostname)
     goto err_exit;
@@ -639,25 +640,33 @@ CURLcode Curl_async_is_resolved(struct Curl_easy *data,
   }
 }
 
-CURLcode Curl_async_pollset(struct Curl_easy *data, struct easy_pollset *ps)
+int Curl_async_getsock(struct Curl_easy *data, curl_socket_t *socks)
 {
   struct async_thrdd_ctx *thrdd = &data->state.async.thrdd;
-  CURLcode result = CURLE_OK;
+  int ret_val = 0;
+#if !defined(CURL_DISABLE_SOCKETPAIR) || defined(USE_HTTPSRR_ARES)
+  int socketi = 0;
+#else
+  (void)socks;
+#endif
 
 #ifdef USE_HTTPSRR_ARES
   if(thrdd->rr.channel) {
-    result = Curl_ares_pollset(data, thrdd->rr.channel, ps);
-    if(result)
-      return result;
+    ret_val = Curl_ares_getsock(data, thrdd->rr.channel, socks);
+    for(socketi = 0; socketi < (MAX_SOCKSPEREASYHANDLE - 1); socketi++)
+      if(!ARES_GETSOCK_READABLE(ret_val, socketi) &&
+         !ARES_GETSOCK_WRITABLE(ret_val, socketi))
+        break;
   }
 #endif
   if(!thrdd->addr)
-    return result;
+    return ret_val;
 
 #ifndef CURL_DISABLE_SOCKETPAIR
   if(thrdd->addr) {
     /* return read fd to client for polling the DNS resolution status */
-    result = Curl_pollset_add_in(data, ps, thrdd->addr->sock_pair[0]);
+    socks[socketi] = thrdd->addr->sock_pair[0];
+    ret_val |= GETSOCK_READSOCK(socketi);
   }
   else
 #endif
@@ -675,7 +684,7 @@ CURLcode Curl_async_pollset(struct Curl_easy *data, struct easy_pollset *ps)
     Curl_expire(data, milli, EXPIRE_ASYNC_NAME);
   }
 
-  return result;
+  return ret_val;
 }
 
 #ifndef HAVE_GETADDRINFO
@@ -732,8 +741,7 @@ struct Curl_addrinfo *Curl_async_getaddrinfo(struct Curl_easy *data,
 
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = pf;
-  hints.ai_socktype =
-    (Curl_conn_get_transport(data, data->conn) == TRNSPRT_TCP) ?
+  hints.ai_socktype = (data->conn->transport == TRNSPRT_TCP) ?
     SOCK_STREAM : SOCK_DGRAM;
 
   /* fire up a new resolver thread! */

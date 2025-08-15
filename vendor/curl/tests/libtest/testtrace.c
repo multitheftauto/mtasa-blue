@@ -21,18 +21,20 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "testtrace.h"
 
+#include "test.h"
+#include "testutil.h"
+#include "testtrace.h"
 #include "memdebug.h"
 
-struct libtest_trace_cfg debug_config;
+struct libtest_trace_cfg libtest_debug_config;
 
 static time_t epoch_offset; /* for test time tracing */
 static int    known_offset; /* for test time tracing */
 
-void debug_dump(const char *timebuf, const char *text,
-                FILE *stream, const unsigned char *ptr,
-                size_t size, bool nohex)
+static
+void libtest_debug_dump(const char *timebuf, const char *text, FILE *stream,
+                        const unsigned char *ptr, size_t size, int nohex)
 {
   size_t i;
   size_t c;
@@ -61,8 +63,9 @@ void debug_dump(const char *timebuf, const char *text,
 
     for(c = 0; (c < width) && (i + c < size); c++) {
       /* check for 0D0A; if found, skip past and start a new line of output */
-      if(nohex && (i + c + 1 < size) && ptr[i + c] == 0x0D &&
-         ptr[i + c + 1] == 0x0A) {
+      if(nohex &&
+         (i + c + 1 < size) && (ptr[i + c] == 0x0D) &&
+         (ptr[i + c + 1] == 0x0A)) {
         i += (c + 2 - width);
         break;
       }
@@ -70,8 +73,9 @@ void debug_dump(const char *timebuf, const char *text,
                     ((ptr[i + c] >= 0x20) && (ptr[i + c] < 0x80)) ?
                     ptr[i + c] : '.');
       /* check again for 0D0A, to avoid an extra \n if it's at width */
-      if(nohex && (i + c + 2 < size) && ptr[i + c + 1] == 0x0D &&
-         ptr[i + c + 2] == 0x0A) {
+      if(nohex &&
+         (i + c + 2 < size) && (ptr[i + c + 1] == 0x0D) &&
+         (ptr[i + c + 2] == 0x0A)) {
         i += (c + 3 - width);
         break;
       }
@@ -86,8 +90,10 @@ int libtest_debug_cb(CURL *handle, curl_infotype type,
 {
   struct libtest_trace_cfg *trace_cfg = userp;
   const char *text;
+  struct timeval tv;
   char timebuf[20];
   char *timestr;
+  time_t secs;
 
   (void)handle;
 
@@ -96,15 +102,12 @@ int libtest_debug_cb(CURL *handle, curl_infotype type,
 
   if(trace_cfg->tracetime) {
     struct tm *now;
-    struct curltime tv;
-    time_t secs;
-    tv = curlx_now();
+    tv = tutil_tvnow();
     if(!known_offset) {
       epoch_offset = time(NULL) - tv.tv_sec;
       known_offset = 1;
     }
     secs = epoch_offset + tv.tv_sec;
-    /* !checksrc! disable BANNEDFUNC 1 */
     now = localtime(&secs);  /* not thread safe but we don't care */
     curl_msnprintf(timebuf, sizeof(timebuf), "%02d:%02d:%02d.%06ld ",
                    now->tm_hour, now->tm_min, now->tm_sec, (long)tv.tv_usec);
@@ -112,7 +115,7 @@ int libtest_debug_cb(CURL *handle, curl_infotype type,
 
   switch(type) {
   case CURLINFO_TEXT:
-    curl_mfprintf(stderr, "%s== Info: %s", timestr, data);
+    curl_mfprintf(stderr, "%s== Info: %s", timestr, (char *)data);
     return 0;
   case CURLINFO_HEADER_OUT:
     text = "=> Send header";
@@ -136,101 +139,7 @@ int libtest_debug_cb(CURL *handle, curl_infotype type,
     return 0;
   }
 
-  debug_dump(timebuf, text, stderr, (const unsigned char *)data, size,
-             trace_cfg->nohex);
-  return 0;
-}
-
-static void log_line_start(FILE *log, const char *idsbuf, curl_infotype type)
-{
-  /*
-   * This is the trace look that is similar to what libcurl makes on its
-   * own.
-   */
-  static const char * const s_infotype[] = {
-    "* ", "< ", "> ", "{ ", "} ", "{ ", "} "
-  };
-  if(idsbuf && *idsbuf)
-    curl_mfprintf(log, "%s%s", idsbuf, s_infotype[type]);
-  else
-    fputs(s_infotype[type], log);
-}
-
-/* callback for CURLOPT_DEBUGFUNCTION (used in client tests) */
-int cli_debug_cb(CURL *handle, curl_infotype type,
-                 char *data, size_t size, void *userp)
-{
-  FILE *output = stderr;
-  static int newl = 0;
-  static int traced_data = 0;
-  char idsbuf[60];
-  curl_off_t xfer_id, conn_id;
-
-  (void)handle; /* not used */
-  (void)userp;
-
-  if(!curl_easy_getinfo(handle, CURLINFO_XFER_ID, &xfer_id) && xfer_id >= 0) {
-    if(!curl_easy_getinfo(handle, CURLINFO_CONN_ID, &conn_id) &&
-       conn_id >= 0) {
-      curl_msnprintf(idsbuf, sizeof(idsbuf),
-                     "[%" CURL_FORMAT_CURL_OFF_T "-"
-                      "%" CURL_FORMAT_CURL_OFF_T "] ", xfer_id, conn_id);
-    }
-    else {
-      curl_msnprintf(idsbuf, sizeof(idsbuf),
-                     "[%" CURL_FORMAT_CURL_OFF_T "-x] ", xfer_id);
-    }
-  }
-  else
-    idsbuf[0] = 0;
-
-  switch(type) {
-  case CURLINFO_HEADER_OUT:
-    if(size > 0) {
-      size_t st = 0;
-      size_t i;
-      for(i = 0; i < size - 1; i++) {
-        if(data[i] == '\n') { /* LF */
-          if(!newl) {
-            log_line_start(output, idsbuf, type);
-          }
-          (void)fwrite(data + st, i - st + 1, 1, output);
-          st = i + 1;
-          newl = 0;
-        }
-      }
-      if(!newl)
-        log_line_start(output, idsbuf, type);
-      (void)fwrite(data + st, i - st + 1, 1, output);
-    }
-    newl = (size && (data[size - 1] != '\n')) ? 1 : 0;
-    traced_data = 0;
-    break;
-  case CURLINFO_TEXT:
-  case CURLINFO_HEADER_IN:
-    if(!newl)
-      log_line_start(output, idsbuf, type);
-    (void)fwrite(data, size, 1, output);
-    newl = (size && (data[size - 1] != '\n')) ? 1 : 0;
-    traced_data = 0;
-    break;
-  case CURLINFO_DATA_OUT:
-  case CURLINFO_DATA_IN:
-  case CURLINFO_SSL_DATA_IN:
-  case CURLINFO_SSL_DATA_OUT:
-    if(!traced_data) {
-      if(!newl)
-        log_line_start(output, idsbuf, type);
-      curl_mfprintf(output, "[%zu bytes data]\n", size);
-      newl = 0;
-      traced_data = 1;
-    }
-    break;
-  default: /* nada */
-    newl = 0;
-    traced_data = 1;
-    break;
-  }
-
+  libtest_debug_dump(timebuf, text, stderr, (unsigned char *)data, size,
+                     trace_cfg->nohex);
   return 0;
 }

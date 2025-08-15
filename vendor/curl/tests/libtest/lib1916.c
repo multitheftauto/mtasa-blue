@@ -21,11 +21,12 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "warnless.h"
 #include "memdebug.h"
 
-static CURLcode test_lib1916(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;
@@ -38,13 +39,12 @@ static CURLcode test_lib1916(const char *URL)
   curl = curl_easy_init();
   if(curl) {
     curl_easy_setopt(curl, CURLOPT_URL, URL);
-    if(testnum == 1917) {
-      /* without any postfields set! */
-      curl_easy_setopt(curl, CURLOPT_POST, 1L);
-    }
-    else {
-      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
-    }
+#ifdef LIB1917
+    /* without any postfields set! */
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+#else
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
+#endif
     res = curl_easy_perform(curl);
     if(res) {
       curl_mprintf("res: %d\n", res);
