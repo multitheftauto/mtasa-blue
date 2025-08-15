@@ -25,8 +25,8 @@ public:
 
     bool Read(NetBitStreamInterface& stream) noexcept;
 
-    const std::uint8_t GetPropertyId() const noexcept { return m_propertyId; }
-    const bool         IsEnabled() const noexcept { return m_enabled; }
+    std::uint8_t GetPropertyId() const noexcept { return m_propertyId; }
+    bool         IsEnabled() const noexcept { return m_enabled; }
 
 private:
     std::uint8_t m_propertyId;
