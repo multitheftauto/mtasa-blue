@@ -3,6 +3,8 @@ project "DirectX9GUIRenderer"
 	kind "StaticLib"
 	targetname "DirectX9GUIRenderer"
 
+	cppdialect "C++20"
+
 	defines { "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING" }
 	
 	includedirs { 

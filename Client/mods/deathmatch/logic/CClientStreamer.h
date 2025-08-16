@@ -38,7 +38,7 @@ public:
     std::uint16_t                              GetDimension() const noexcept { return m_usDimension; }
 
 private:
-    void CreateSectors(std::list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight);
+    void CreateSectors(std::list<CClientStreamSectorRow*>* pList, const CVector2D& vecSize, const CVector2D& vecBottomLeft, const CVector2D& vecTopRight);
     void ConnectSector(CClientStreamSector* pSector);
     void ConnectRow(CClientStreamSectorRow* pRow);
 

@@ -257,7 +257,7 @@ int CLuaUtilDefs::GetUserdataType(lua_State* luaVM)
 
     if (argStream.NextIsUserData())
     {
-        SString strType;
+        std::string strType;
         if (iArgument == LUA_TLIGHTUSERDATA)
             strType = GetUserDataClassName(lua_touserdata(luaVM, 1), luaVM, false);
         else if (iArgument == LUA_TUSERDATA)

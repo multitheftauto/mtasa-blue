@@ -52,15 +52,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // No Windows error box during first load attempt
     DWORD   dwPrevMode = SetErrorMode(SEM_FAILCRITICALERRORS);
-    HMODULE hModule = LoadLibraryW(FromUTF8(strLoaderDllPathFilename));
+    HMODULE hModule = LoadLibraryW(FromUTF8(strLoaderDllPathFilename).c_str());
     DWORD   dwLoadLibraryError = GetLastError();
     SetErrorMode(dwPrevMode);
 
     if (!hModule)
     {
         // Retry using MTA current directory
-        SetCurrentDirectoryW(FromUTF8(strMTASAPath));
-        hModule = LoadLibraryW(FromUTF8(strLoaderDllPathFilename));
+        SetCurrentDirectoryW(FromUTF8(strMTASAPath).c_str());
+        hModule = LoadLibraryW(FromUTF8(strLoaderDllPathFilename).c_str());
         dwLoadLibraryError = GetLastError();
         if (hModule)
         {

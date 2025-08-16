@@ -4,6 +4,8 @@ project "GUI"
 	targetname "cgui"
 	targetdir(buildpath("mta"))
 
+	cppdialect "C++20"
+
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
 

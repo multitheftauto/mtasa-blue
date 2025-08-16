@@ -3,6 +3,8 @@ project "CEGUI"
 	kind "StaticLib"
 	targetname "CEGUI"
 
+	cppdialect "C++20"
+
 	pchheader "StdInc.h"
 	pchsource "src/StdInc.cpp"
 

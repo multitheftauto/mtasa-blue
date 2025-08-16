@@ -89,9 +89,14 @@ void CWorldSA::InstallHooks()
 DWORD CONTINUE_CWorld_FallenPeds = 0x00565CBA;
 DWORD CONTINUE_CWorld_FallenCars = 0x00565E8A;
 
+bool IsUnderWorldWarpEnabled()
+{
+    return pGame && pGame->IsUnderWorldWarpEnabled();
+}
+
 void _declspec(naked) HOOK_FallenPeds()
 {
-    if (pGame && pGame->IsUnderWorldWarpEnabled())
+    if (IsUnderWorldWarpEnabled())
     {
         _asm
         {
@@ -112,7 +117,7 @@ void _declspec(naked) HOOK_FallenPeds()
 
 void _declspec(naked) HOOK_FallenCars()
 {
-    if (pGame && pGame->IsUnderWorldWarpEnabled())
+    if (IsUnderWorldWarpEnabled())
     {
         _asm
         {
