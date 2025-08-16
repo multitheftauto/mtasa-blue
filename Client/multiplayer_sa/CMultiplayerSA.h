@@ -108,8 +108,6 @@ public:
     void SetExplosionHandler(ExplosionHandler* pExplosionHandler);
     void SetDamageHandler(DamageHandler* pDamageHandler);
     void SetDeathHandler(DeathHandler* pDeathHandler);
-    void SetProjectileHandler(ProjectileHandler* pProjectileHandler);
-    void SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler);
     void SetFireHandler(FireHandler* pFireHandler);
     void SetBreakTowLinkHandler(BreakTowLinkHandler* pBreakTowLinkHandler);
     void SetProcessCamHandler(ProcessCamHandler* pProcessCamHandler);

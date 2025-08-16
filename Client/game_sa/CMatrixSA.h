@@ -36,13 +36,37 @@ public:
 
     void ConvertToEulerAngles(float& x, float& y, float& z, std::int32_t flags);
     void ConvertFromEulerAngles(float x, float y, float z, std::int32_t flags);
+
+    void UpdateRwMatrix(RwMatrix* rwMatrix);
     void UpdateRW();
+
+    void SetTranslate(const CVector& position); // 0x59AF40 (CMatrix::Translate)
+
+    void RotateZ(float angle);
+
     void SetTranslateOnly(CVector position) { m_pos = position; }
+
+    CVector GetPosition() const noexcept { return m_pos; }
+    CVector GetRight() const noexcept { return m_right; }
+    CVector GetForward() const noexcept { return m_forward; }
+    CVector GetUp() const noexcept { return m_up; }
+
     void SetMatrix(const CVector& right, const CVector& forward, const CVector& up, const CVector& pos)
     {
         m_right = right;
         m_forward = forward;
         m_up = up;
         m_pos = pos;
+    }
+    
+    CMatrixSAInterface* operator=(const void* m)
+    {
+        RwMatrix* attachedMatrix = m_pAttachMatrix;
+        std::memcpy(this, m, 64);
+
+        if (attachedMatrix)
+            UpdateRwMatrix(attachedMatrix);
+
+        return this;
     }
 };
