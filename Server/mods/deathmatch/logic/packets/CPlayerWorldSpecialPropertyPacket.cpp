@@ -13,8 +13,5 @@
 
 bool CPlayerWorldSpecialPropertyPacket::Read(NetBitStreamInterface& stream) noexcept
 {
-    stream.ReadString(m_property);
-    stream.ReadBit(m_enabled);
-
-    return true;
+    return stream.Read(m_propertyId) && stream.ReadBit(m_enabled);
 }

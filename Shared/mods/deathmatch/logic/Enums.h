@@ -75,7 +75,7 @@ DECLARE_ENUM_CLASS(HmacAlgorithm);
 DECLARE_ENUM_CLASS(ZLibFormat);
 DECLARE_ENUM_CLASS(ZLibStrategy);
 
-enum class WorldSpecialProperty
+enum class WorldSpecialProperty : std::uint8_t
 {
     HOVERCARS,
     AIRCARS,
