@@ -112,7 +112,7 @@ CHandlingEntry* CHandlingManager::GetModelHandlingData(std::uint32_t model) noex
         }
         catch (const std::bad_alloc&)
         {
-            CLogger::ErrorPrintf("Failed alloc model handling entry, Model: %d\n", model);
+            CLogger::ErrorPrintf("Failed alloc model handling entry: %d\n", model);
             return nullptr;
         }
 
