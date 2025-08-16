@@ -59,6 +59,7 @@
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
 #include "packets/CPlayerWorldSpecialPropertyPacket.h"
+#include "packets/CPlayerGlitchRequestPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CLuaPacket.h"
 #include "../utils/COpenPortsTester.h"
@@ -1329,6 +1330,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_PLAYER_GLITCH_REQUEST:
+        {
+            Packet_PlayerGlitchRequest(static_cast<CPlayerGlitchRequestPacket&>(Packet));
+            return true;
+        }
+
         default:
             break;
     }
@@ -1480,6 +1487,12 @@ void CGame::InitialDataStream(CPlayer& Player)
     // Tell our scripts the player has joined
     CLuaArguments Arguments;
     Player.CallEvent("onPlayerJoin", Arguments);
+
+    // Send the joining player's own glitch states (if any were set before joining)
+    if (Player.IsJoined())
+    {
+        Player.SendAllPlayerGlitchStates();
+    }
 
     marker.Set("onPlayerJoin");
 
@@ -4185,6 +4198,33 @@ void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket&
     arguments.PushBoolean(enabled);
 
     player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
+}
+
+void CGame::Packet_PlayerGlitchRequest(CPlayerGlitchRequestPacket& packet) noexcept
+{
+    CPlayer* pPlayer = packet.GetSourcePlayer();
+    if (!pPlayer)
+        return;
+
+    const std::string& strGlitchName = packet.GetGlitchName();
+    const bool bEnabled = packet.IsEnabled();
+
+    
+    if (!IsGlitch(strGlitchName))
+        return;
+
+    
+    if (pPlayer->SetPlayerGlitchEnabled(strGlitchName, bEnabled))
+    {
+        
+        pPlayer->SendPlayerGlitchState(strGlitchName);
+
+        
+        CLuaArguments arguments;
+        arguments.PushString(strGlitchName);
+        arguments.PushBoolean(bEnabled);
+        pPlayer->CallEvent("onPlayerGlitchStateChange", arguments, nullptr);
+    }
 }
 
 void CGame::Packet_PlayerModInfo(CPlayerModInfoPacket& Packet)
