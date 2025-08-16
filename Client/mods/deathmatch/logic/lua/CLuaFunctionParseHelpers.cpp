@@ -980,6 +980,9 @@ ADD_ENUM(VehicleAudioSettingProperty::ENGINE_UPGRADE, "engine-upgrade")
 ADD_ENUM(VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-audio")
 IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
 
+IMPLEMENT_ENUM_BEGIN(VehicleFeatures::Enum)
+ADD_ENUM(VehicleFeatures::Enum::WATER_CANNON, "water_cannon")
+IMPLEMENT_ENUM_END("vehicle-features")
 
 //
 // CResource from userdata

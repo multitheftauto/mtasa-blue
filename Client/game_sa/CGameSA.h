@@ -19,6 +19,7 @@
 #include "CPlantManagerSA.h"
 #include "CRendererSA.h"
 #include "CVehicleAudioSettingsManagerSA.h"
+#include "CVehicleSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -321,6 +322,13 @@ public:
     void RestoreGameWorld();
 
     bool SetBuildingPoolSize(size_t size);
+
+    bool SetVehicleModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature, bool enabled) override { return CVehicleSA::SetModelSpecialFeatureEnabled(model, feature, enabled); };
+    bool IsVehicleModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature) const override { return CVehicleSA::IsModelSpecialFeatureEnabled(model, feature); };
+
+    ModelFeaturesArray GetModelSpecialFeatures(std::uint16_t model) const noexcept override { return CVehicleSA::GetModelSpecialFeatures(model); }
+
+    void ResetVehicleModelsSpecialFeatures() const noexcept override { CVehicleSA::ResetVehicleModelsSpecialFeatures(); };
 
 private:
     std::unique_ptr<CPools>           m_Pools;

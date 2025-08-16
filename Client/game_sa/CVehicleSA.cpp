@@ -33,6 +33,8 @@
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
+std::unordered_map<std::uint16_t, ModelFeaturesArray> CVehicleSA::m_modelSpecialFeatures = {};
+
 static BOOL m_bVehicleSunGlare = false;
 _declspec(naked) void DoVehicleSunGlare(void* this_)
 {
@@ -1543,9 +1545,9 @@ void CVehicleSA::SetGravity(const CVector* pvecGravity)
     m_vecGravity = *pvecGravity;
 }
 
-bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime)
+bool CVehicleSA::SpawnFlyingComponent(const CarNodes::Enum& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime)
 {
-    if (nodeIndex == eCarNodes::NONE)
+    if (nodeIndex == CarNodes::Enum::NONE)
         return false;
 
     DWORD nodesOffset = OFFSET_CAutomobile_Nodes;
@@ -1644,16 +1646,16 @@ void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_LF)];
+            pFrame = vehicle->m_aCarNodes[CarNodes::Enum::WHEEL_LF];
             break;
         case REAR_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_LB)];
+            pFrame = vehicle->m_aCarNodes[CarNodes::Enum::WHEEL_LB];
             break;
         case FRONT_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_RF)];
+            pFrame = vehicle->m_aCarNodes[CarNodes::Enum::WHEEL_RF];
             break;
         case REAR_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_RB)];
+            pFrame = vehicle->m_aCarNodes[CarNodes::Enum::WHEEL_RB];
             break;
         default:
             break;
@@ -1897,16 +1899,6 @@ bool CVehicleSA::SetOnFire(bool onFire)
     return true;
 }
 
-void CVehicleSA::StaticSetHooks()
-{
-    // Setup vehicle sun glare hook
-    HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
-
-    // Setup hooks to handle setVehicleRotorState function
-    HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
-    HookInstall(FUNC_CPlane_ProcessFlyingCarStuff, (DWORD)HOOK_CPlane_ProcessFlyingCarStuff, 5);
-}
-
 void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)
 {
     m_bVehicleSunGlare = bEnabled;
@@ -2002,6 +1994,12 @@ bool CVehicleSA::GetComponentPosition(const SString& vehicleComponent, CVector& 
         return true;
     }
     return false;
+}
+
+void CVehicleSA::SetComponentRotation(RwFrame* frame, eComponentRotationAxis axis, float angle, bool resetPosition)
+{
+    // CVehicle::SetComponentRotation
+    ((void(__stdcall*)(RwFrame*, eComponentRotationAxis, float, bool))0x6DBA30)(frame, axis, angle, resetPosition);
 }
 
 bool CVehicleSA::SetComponentScale(const SString& vehicleComponent, const CVector& vecScale)
@@ -2422,4 +2420,77 @@ void CVehicleSA::ReinitAudio()
 
     if (IsPassenger(pLocalPlayer) || GetDriver() == pLocalPlayer)
         audioInterface->SoundJoin();
+}
+
+bool CVehicleSA::SetSpecialFeatureEnabled(VehicleFeatures::Enum feature, bool enabled)
+{
+    CVehicleSAInterface* vehicleInterface = GetVehicleInterface();
+
+    switch (feature)
+    {
+        case WATER_CANNON:
+        {
+            if (vehicleInterface->m_vehicleClass != VehicleClass::AUTOMOBILE)
+                return false;
+
+            // The vehicle must have the misc_a component, which is the water cannon, otherwise it will crash in CAutomobile::PreRender during turret rotation.
+            if (!static_cast<CAutomobileSAInterface*>(vehicleInterface)->m_aCarNodes[CarNodes::Enum::MISC_A])
+                return false;
+        }
+    }
+
+    m_specialFeatures[feature] = enabled;
+    return true;
+}
+
+bool CVehicleSA::SetModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature, bool enabled)
+{
+    CModelInfo* modelInfo = pGame->GetModelInfo(model);
+    if (!modelInfo)
+        return false;
+
+    if (feature == VehicleFeatures::Enum::WATER_CANNON)
+    {
+        if (static_cast<VehicleClass>(modelInfo->GetVehicleType()) != VehicleClass::AUTOMOBILE)
+            return false;
+    }
+
+    m_modelSpecialFeatures[model][feature] = enabled;
+    return true;
+}
+
+bool CVehicleSA::IsModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature)
+{
+    auto it = m_modelSpecialFeatures.find(model);
+    return it == m_modelSpecialFeatures.end() ? false : it->second[feature];
+}
+
+ModelFeaturesArray CVehicleSA::GetModelSpecialFeatures(std::uint16_t model)
+{
+    auto it = m_modelSpecialFeatures.find(model);
+    return it != m_modelSpecialFeatures.end() ? it->second : ModelFeaturesArray{};
+}
+
+void CVehicleSA::ResetVehicleModelsSpecialFeatures() noexcept
+{
+    m_modelSpecialFeatures.clear();
+
+    ModelFeaturesArray firetruck{};
+    firetruck[VehicleFeatures::Enum::WATER_CANNON] = true;
+    m_modelSpecialFeatures[407] = firetruck;
+
+    ModelFeaturesArray swat{};
+    swat[VehicleFeatures::Enum::WATER_CANNON] = true;
+    swat[VehicleFeatures::Enum::TURRET] = true;
+    m_modelSpecialFeatures[601] = swat;
+}
+
+void CVehicleSA::StaticSetHooks()
+{
+    // Setup vehicle sun glare hook
+    HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
+
+    // Setup hooks to handle setVehicleRotorState function
+    HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
+    HookInstall(FUNC_CPlane_ProcessFlyingCarStuff, (DWORD)HOOK_CPlane_ProcessFlyingCarStuff, 5);
 }

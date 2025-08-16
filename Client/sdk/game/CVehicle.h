@@ -21,6 +21,8 @@
 
 #include "enums/VehicleDummies.h"
 #include "enums/ResizableVehicleWheelGroup.h"
+#include "enums/VehicleFeatures.h"
+#include "enums/CarNodes.h"
 
 class CAEVehicleAudioEntity;
 class CColModel;
@@ -90,6 +92,8 @@ struct SVehicleFrame
     bool                  bReadOnly;
     std::vector<RwFrame*> frameList;            // Frames from root to parent
 };
+
+using ModelFeaturesArray = std::array<bool, VehicleFeatures::Enum::MAX_FEATURES>;
 
 class CVehicle : public virtual CPhysical
 {
@@ -269,7 +273,7 @@ public:
     virtual SColor GetHeadLightColor() = 0;
     virtual void   SetHeadLightColor(const SColor color) = 0;
 
-    virtual bool     SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1) = 0;
+    virtual bool     SpawnFlyingComponent(const CarNodes::Enum& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1) = 0;
     virtual void     SetWheelVisibility(eWheelPosition wheel, bool bVisible) = 0;
     virtual CVector  GetWheelPosition(eWheelPosition wheel) = 0;
 
@@ -331,4 +335,9 @@ public:
 
     virtual const CVector* GetDummyPositions() const = 0;
     virtual void           ReinitAudio() = 0;
+
+    virtual void SetSpecialFeaturesEnabled(const ModelFeaturesArray& features) noexcept = 0;
+
+    virtual bool SetSpecialFeatureEnabled(VehicleFeatures::Enum feature, bool enabled) = 0;
+    virtual bool IsSpecialFeatureEnabled(VehicleFeatures::Enum feature) const noexcept = 0;
 };

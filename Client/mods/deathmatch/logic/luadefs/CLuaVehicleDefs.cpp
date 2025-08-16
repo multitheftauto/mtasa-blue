@@ -100,6 +100,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleRotorState", ArgumentParser<GetVehicleRotorState>},
         {"getVehicleModelAudioSettings", ArgumentParser<GetVehicleModelAudioSettings>},
         {"getVehicleAudioSettings", ArgumentParser<GetVehicleAudioSettings>},
+        {"isVehicleSpecialFeatureEnabled", ArgumentParser<IsVehicleSpecialFeatureEnabled>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -172,6 +173,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"resetVehicleModelAudioSettings", ArgumentParser<ResetVehicleModelAudioSettings>},
         {"setVehicleAudioSetting", ArgumentParser<SetVehicleAudioSetting>},
         {"resetVehicleAudioSettings", ArgumentParser<ResetVehicleAudioSettings>},
+        {"setVehicleSpecialFeatureEnabled", ArgumentParser<SetVehicleSpecialFeatureEnabled>},
     };
 
     // Add functions
@@ -262,6 +264,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<OOP_GetVehicleEntryPoints>);
     lua_classfunction(luaVM, "isSmokeTrailEnabled", "isVehicleSmokeTrailEnabled");
     lua_classfunction(luaVM, "getRotorState", "getVehicleRotorState");
+    lua_classfunction(luaVM, "isSpecialFeatureEnabled", "isVehicleSpecialFeatureEnabled");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -314,6 +317,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setRotorState", "setVehicleRotorState");
     lua_classfunction(luaVM, "resetAudioSettings", "resetVehicleAudioSettings");
     lua_classfunction(luaVM, "setAudioSetting", "setVehicleAudioSetting");
+    lua_classfunction(luaVM, "setSpecialFeatureEnabled", "setVehicleSpecialFeatureEnabled");
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
@@ -4313,11 +4317,11 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
 bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType,
                                                   std::optional<std::uint32_t> removalTime)
 {
-    auto partNodeIndex = static_cast<eCarNodes>(nodeIndex);
+    auto partNodeIndex = static_cast<CarNodes::Enum>(nodeIndex);
     auto collisionType = componentCollisionType.has_value() ? static_cast<eCarComponentCollisionTypes>(componentCollisionType.value())
                                                             : eCarComponentCollisionTypes::COL_NODE_PANEL;
 
-    if (nodeIndex < 1 || partNodeIndex >= eCarNodes::NUM_NODES)
+    if (nodeIndex < 1 || partNodeIndex >= CarNodes::Enum::NUM_NODES)
         throw std::invalid_argument("Invalid component index");
 
     if (collisionType >= eCarComponentCollisionTypes::COL_NODES_NUM)
@@ -4327,38 +4331,38 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
     {
         switch (partNodeIndex)
         {
-            case eCarNodes::WHEEL_RF:
-            case eCarNodes::WHEEL_RB:
-            case eCarNodes::WHEEL_LF:
-            case eCarNodes::WHEEL_LB:
+            case CarNodes::Enum::WHEEL_RF:
+            case CarNodes::Enum::WHEEL_RB:
+            case CarNodes::Enum::WHEEL_LF:
+            case CarNodes::Enum::WHEEL_LB:
             {
                 collisionType = eCarComponentCollisionTypes::COL_NODE_WHEEL;
                 break;
             }
-            case eCarNodes::DOOR_RF:
-            case eCarNodes::DOOR_RR:
-            case eCarNodes::DOOR_LF:
-            case eCarNodes::DOOR_LR:
+            case CarNodes::Enum::DOOR_RF:
+            case CarNodes::Enum::DOOR_RR:
+            case CarNodes::Enum::DOOR_LF:
+            case CarNodes::Enum::DOOR_LR:
             {
                 collisionType = eCarComponentCollisionTypes::COL_NODE_DOOR;
                 break;
             }
-            case eCarNodes::BUMP_FRONT:
-            case eCarNodes::BUMP_REAR:
-            case eCarNodes::WHEEL_LM:
-            case eCarNodes::WHEEL_RM:
+            case CarNodes::Enum::BUMP_FRONT:
+            case CarNodes::Enum::BUMP_REAR:
+            case CarNodes::Enum::WHEEL_LM:
+            case CarNodes::Enum::WHEEL_RM:
             {
                 collisionType = eCarComponentCollisionTypes::COL_NODE_BUMPER;
                 break;
             }
-            case eCarNodes::BOOT:
-            case eCarNodes::CHASSIS:
+            case CarNodes::Enum::BOOT:
+            case CarNodes::Enum::CHASSIS:
             {
                 collisionType = eCarComponentCollisionTypes::COL_NODE_BOOT;
                 break;
             }
-            case eCarNodes::BONNET:
-            case eCarNodes::WINDSCREEN:
+            case CarNodes::Enum::BONNET:
+            case CarNodes::Enum::WINDSCREEN:
             {
                 collisionType = eCarComponentCollisionTypes::COL_NODE_BONNET;
                 break;
@@ -4514,7 +4518,8 @@ bool CLuaVehicleDefs::ResetVehicleModelAudioSettings(const uint32_t uiModel)
     if (!CClientVehicleManager::IsStandardModel(uiModel))
         throw std::invalid_argument("Cannot change audio setting for allocated vechiles");
 
-     g_pGame->GetVehicleAudioSettingsManager()->ResetModelSettings(uiModel);
+    g_pGame->GetVehicleAudioSettingsManager()->ResetModelSettings(uiModel);
+    return true;
 }
 
 bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const VehicleAudioSettingProperty eProperty, float varValue)
@@ -4653,3 +4658,34 @@ std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleAudioSettings(
     return output;
 }
 
+bool CLuaVehicleDefs::SetVehicleSpecialFeatureEnabled(std::variant<std::uint16_t, CClientVehicle*> vehicle, VehicleFeatures::Enum feature, bool enabled) noexcept
+{
+    if (std::holds_alternative<CClientVehicle*>(vehicle))
+        return std::get<CClientVehicle*>(vehicle)->SetSpecialFeatureEnabled(feature, enabled);
+    else if (std::holds_alternative<std::uint16_t>(vehicle))
+    {
+        std::uint16_t model = std::get<std::uint16_t>(vehicle);
+        if (!CClientVehicleManager::IsValidModel(model))
+            return false;
+
+        return m_pVehicleManager->SetModelSpecialFeatureEnabled(model, feature, enabled);
+    }
+
+    return false;
+}
+
+bool CLuaVehicleDefs::IsVehicleSpecialFeatureEnabled(std::variant<std::uint16_t, CClientVehicle*> vehicle, VehicleFeatures::Enum feature) noexcept
+{
+    if (std::holds_alternative<CClientVehicle*>(vehicle))
+        return std::get<CClientVehicle*>(vehicle)->IsSpecialFeatureEnabled(feature);
+    else if (std::holds_alternative<std::uint16_t>(vehicle))
+    {
+        std::uint16_t model = std::get<std::uint16_t>(vehicle);
+        if (!CClientVehicleManager::IsValidModel(model))
+            return false;
+
+        return g_pGame->IsVehicleModelSpecialFeatureEnabled(model, feature);
+    }
+
+    return false;
+}
