@@ -641,6 +641,26 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         ((void(__thiscall*)(CPedSAInterface*, int, bool))0x5E5380)(ped, isLeftFoot ? 1 : 0, doWooble);
     };
 
+    auto DoFootstepForAnim = [DoFootstep, ComputeVolumeAndFreq](CAnimBlendAssociationSAInterface* anim, CPedSAInterface* ped, float stepInterval)
+    {
+        static bool  leftStep = true;
+        static float lastStepTime = 0.0f;
+
+        if (anim->fCurrentTime - lastStepTime >= stepInterval)
+        {
+            DoFootstep(ped, leftStep, true);
+
+            leftStep = !leftStep;
+            lastStepTime += stepInterval;
+        }
+
+        if (anim->fCurrentTime < lastStepTime)
+        {
+            lastStepTime = 0.0f;
+            leftStep = true;
+        }
+    };
+
     auto anim = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(ped->m_pRwObject);
     if (!anim)
         return;
@@ -665,7 +685,39 @@ void __fastcall CPedSA::PlayFootSteps(CPedSAInterface* ped)
         UpdateAnimBlend(assoc->GetInterface());
 
     if (!walkAnim || walkcycleBlend <= 0.5f || partialBlend >= 1.0f)
-        return;
+    {
+        // Custom bugfix GitHub Issue #4359
+        // Checking for the TASK_SIMPLE_NAMED_ANIM task is not sufficient, because it usually doesn’t exist in the following cases.
+        // The ped has moveState set to STANDING_STILL, and the walkAnim flag on animations is not set,
+        auto checkWalkingAnim = [&](const char* animName, float stepInterval) -> bool
+        {
+            auto assoc = pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->m_pRwObject, animName);
+            if (assoc)
+            {
+                DoFootstepForAnim(assoc->GetInterface(), ped, stepInterval);
+                return true;
+            }
+            return false;
+        };
+
+        if (checkWalkingAnim("cs_wuzi_pt1", 0.6f) || checkWalkingAnim("wuzi_walk", 0.5f))
+            return;
+
+        static constexpr const char* partialAnimsWithWalking[] = {"crry_prtial", "silence_reload"};
+        bool hasPartialAnimWithWalking = std::any_of(std::begin(partialAnimsWithWalking), std::end(partialAnimsWithWalking), [&](const char* name)
+            {
+                return pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->m_pRwObject, name);
+            });
+
+        if (!hasPartialAnimWithWalking)
+            return;
+
+        auto walkAssoc = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(ped->m_pRwObject);
+        UpdateAnimBlend(walkAssoc->GetInterface());
+
+        if (!walkAnim)
+            return;
+    }
 
     static constexpr float INITIAL_FOOT_LANDED_RATIO = 1.0f / 15.0f;
     static constexpr float DUCK_FOOTSTEP_MOVE_TIME = 6.0f / 30.0f;
