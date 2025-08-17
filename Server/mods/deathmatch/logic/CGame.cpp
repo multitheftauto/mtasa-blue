@@ -421,6 +421,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pASE);
     SAFE_RELEASE(m_pHqComms);
     CSimControl::Shutdown();
+    CThreadPool::getDefaultThreadPool().shutdown();
 
     // Clear our global pointer
     g_pGame = NULL;
@@ -1668,6 +1669,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
     m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
     m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
+    m_Events.AddEvent("onElementAttach", "attachSource, attachOffsetX, attachOffsetY, attachOffsetZ, attachOffsetRX, attachOffsetRY, attachOffsetRZ", nullptr, false);
+    m_Events.AddEvent("onElementDetach", "detachSource, detachWorldX, detachWorldY, detachWorldZ, detachWorldRX, detachWorldRY, detachWorldRZ", nullptr, false);
 
     // Radar area events
 
@@ -1698,7 +1701,7 @@ void CGame::AddBuiltInEvents()
 
     // Account events
     m_Events.AddEvent("onAccountDataChange", "account, key, value", NULL, false);
-
+    m_Events.AddEvent("onAccountNameChange", "account, previousName, newName", nullptr, false);
     m_Events.AddEvent("onAccountCreate", "account", NULL, false);
     m_Events.AddEvent("onAccountRemove", "account", NULL, false);
 

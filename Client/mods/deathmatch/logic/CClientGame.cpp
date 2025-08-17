@@ -2630,6 +2630,8 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
     m_Events.AddEvent("onClientElementDimensionChange", "oldDimension, newDimension", nullptr, false);
     m_Events.AddEvent("onClientElementInteriorChange", "oldInterior, newInterior", nullptr, false);
+    m_Events.AddEvent("onClientElementAttach", "attachSource, attachOffsetX, attachOffsetY, attachOffsetZ, attachOffsetRX, attachOffsetRY, attachOffsetRZ", nullptr, false);
+    m_Events.AddEvent("onClientElementDetach", "detachSource, detachWorldX, detachWorldY, detachWorldZ, detachWorldRX, detachWorldRY, detachWorldRZ", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -3549,9 +3551,9 @@ void CClientGame::StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReas
     g_pClientGame->DeathHandler(pKilledPed, ucDeathReason, ucBodyPart);
 }
 
-void CClientGame::StaticFireHandler(CFire* pFire)
+bool CClientGame::StaticFireHandler(CEntitySAInterface* target, CEntitySAInterface* creator)
 {
-    g_pClientGame->FireHandler(pFire);
+    return g_pClientGame->FireHandler(target, creator);
 }
 
 void CClientGame::StaticRender3DStuffHandler()
@@ -3811,10 +3813,22 @@ bool CClientGame::BreakTowLinkHandler(CVehicle* pTowedVehicle)
     return true;
 }
 
-void CClientGame::FireHandler(CFire* pFire)
+bool CClientGame::FireHandler(CEntitySAInterface* target, CEntitySAInterface* creator)
 {
-    // Disable spreading fires
-    pFire->SetNumGenerationsAllowed(0);
+    CClientEntity* creatorClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)creator);
+    CClientEntity* targetClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)target);
+
+    if (creatorClientEntity && targetClientEntity && IS_PLAYER(targetClientEntity) && IS_PLAYER(creatorClientEntity))
+    {
+        CClientPlayer* targetPlayer = static_cast<CClientPlayer*>(targetClientEntity);
+        CClientPlayer* creatorPlayer = static_cast<CClientPlayer*>(creatorClientEntity);
+
+        CClientTeam* targetPlayerTeam = targetPlayer->GetTeam();
+        if (targetPlayerTeam && targetPlayer->IsOnMyTeam(creatorPlayer) && !targetPlayerTeam->GetFriendlyFire() && creatorPlayer != targetPlayer)
+            return false;
+    }
+
+    return true;
 }
 
 void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)

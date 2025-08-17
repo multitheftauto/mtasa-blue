@@ -218,6 +218,25 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
                 else
                     BitStream.WriteBit(false);
             }
+
+            const SPlayerAnimData& animData = pPlayer->GetAnimationData();
+            bool                   animRuning = animData.IsAnimating();
+
+            BitStream.WriteBit(animRuning);
+            if (animRuning)
+            {
+                BitStream.WriteString(animData.blockName);
+                BitStream.WriteString(animData.animName);
+                BitStream.Write(animData.time);
+                BitStream.WriteBit(animData.loop);
+                BitStream.WriteBit(animData.updatePosition);
+                BitStream.WriteBit(animData.interruptable);
+                BitStream.WriteBit(animData.freezeLastFrame);
+                BitStream.Write(animData.blendTime);
+                BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
+                BitStream.Write(static_cast<double>(animData.startTime));
+                BitStream.Write(animData.speed);
+            }
         }
     }
 

@@ -139,7 +139,6 @@
   } FT_MemTableRec;
 
 
-#define FT_MEM_SIZE_MIN  7
 #define FT_MEM_SIZE_MAX  13845163
 
 #define FT_FILENAME( x )  ( (x) ? (x) : "unknown file" )

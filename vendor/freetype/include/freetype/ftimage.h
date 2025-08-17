@@ -443,7 +443,7 @@ FT_BEGIN_HEADER
    *   rasterizer; see the `tags` field in @FT_Outline.
    *
    *   Please refer to the description of the 'SCANTYPE' instruction in the
-   *   [OpenType specification](https://learn.microsoft.com/en-us/typography/opentype/spec/tt_instructions#scantype)
+   *   [OpenType specification](https://learn.microsoft.com/typography/opentype/spec/tt_instructions#scantype)
    *   how simple drop-outs, smart drop-outs, and stubs are defined.
    */
 #define FT_OUTLINE_NONE             0x0

@@ -31,8 +31,8 @@ public:
     bool          m_bChangePosition;
     bool          m_bForceClimb;
     bool          m_bInvalidClimb;
-    char          m_nHeightForAnim;
-    char          m_nHeightForPos;
+    eClimbHeights m_nHeightForAnim;
+    eClimbHeights m_nHeightForPos;
     unsigned char m_nSurfaceType;
     char          m_nFallAfterVault;
     float         m_fHandholdHeading;
@@ -49,6 +49,8 @@ public:
     CTaskSimpleClimbSA(){};
     CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight = CLIMB_GRAB,
                        const bool bForceClimb = false);
+
+    eClimbHeights GetHeightForPos() const override { return static_cast<const CTaskSimpleClimbSAInterface*>(GetInterface())->m_nHeightForPos; }
 };
 
 // ##############################################################################

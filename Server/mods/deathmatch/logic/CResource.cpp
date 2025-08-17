@@ -1276,8 +1276,8 @@ void CResource::DisplayInfo()            // duplicated for HTML
         {
             if (pIncludedResources->IsBadVersion())
             {
-                CLogger::LogPrintf("  %s .. BAD VERSION (not between %d and %d)\n", pIncludedResources->GetMinimumVersion(),
-                                   pIncludedResources->GetMaximumVersion());
+                CLogger::LogPrintf("  %s .. BAD VERSION (not between %d and %d)\n", pIncludedResources->GetName().c_str(),
+                                   pIncludedResources->GetMinimumVersion(), pIncludedResources->GetMaximumVersion());
             }
             else
             {
@@ -2248,7 +2248,7 @@ bool CResource::RemoveFile(const char* szName)
                 m_ResourceFiles.remove(pFileFound);
             }
             else
-                CLogger::LogPrintf("WARNING: Problems removing resource file from memory");
+                CLogger::LogPrintf("WARNING: Problems removing resource file from memory\n");
         }
 
         // Delete the file
@@ -2256,7 +2256,7 @@ bool CResource::RemoveFile(const char* szName)
         snprintf(szFullFilepath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str(), szName);
 
         if (File::Delete(szFullFilepath) != 0)
-            CLogger::LogPrintf("WARNING: Problems deleting the actual file, but was removed from resource");
+            CLogger::LogPrintf("WARNING: Problems deleting the actual file, but was removed from resource\n");
 
         // Delete the metafile
         pMetaFile->Write();

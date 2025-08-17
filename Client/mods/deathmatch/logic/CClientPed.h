@@ -66,17 +66,23 @@ enum eBodyPart
 enum eMovementState
 {
     MOVEMENTSTATE_UNKNOWN,
-    MOVEMENTSTATE_STAND,                // Standing still
-    MOVEMENTSTATE_WALK,                 // Walking
-    MOVEMENTSTATE_POWERWALK,            // Walking quickly
-    MOVEMENTSTATE_JOG,                  // Jogging
-    MOVEMENTSTATE_SPRINT,               // Sprinting
-    MOVEMENTSTATE_CROUCH,               // Crouching still
-    MOVEMENTSTATE_CRAWL,                // Crouch-moving
-    MOVEMENTSTATE_ROLL,                 // Crouch-rolling (Needs adding)
-    MOVEMENTSTATE_JUMP,                 // Jumping
-    MOVEMENTSTATE_FALL,                 // Falling
-    MOVEMENTSTATE_CLIMB                 // Climbing
+    MOVEMENTSTATE_STAND,                      // Standing still
+    MOVEMENTSTATE_WALK,                       // Walking
+    MOVEMENTSTATE_POWERWALK,                  // Walking quickly
+    MOVEMENTSTATE_JOG,                        // Jogging (Unused)
+    MOVEMENTSTATE_SPRINT,                     // Sprinting
+    MOVEMENTSTATE_CROUCH,                     // Crouching still
+    MOVEMENTSTATE_CRAWL,                      // Crouch-moving
+    MOVEMENTSTATE_ROLL,                       // Crouch-rolling
+    MOVEMENTSTATE_JUMP,                       // Jumping
+    MOVEMENTSTATE_FALL,                       // Falling
+    MOVEMENTSTATE_CLIMB,                      // Climbing
+    MOVEMENTSTATE_SWIM,                       // Swimming
+    MOVEMENTSTATE_WALK_TO_POINT,              // Entering vehicle (walking to the door)
+    MOVEMENTSTATE_ASCENT_JETPACK,             // Ascending with jetpack
+    MOVEMENTSTATE_DESCENT_JETPACK,            // Descending with jetpack
+    MOVEMENTSTATE_JETPACK,                    // Jetpack flying
+    MOVEMENTSTATE_HANGING,                    // Hanging from the whall during climbing task
 };
 
 enum eDeathAnims
@@ -129,17 +135,17 @@ struct SReplacedAnimation
 
 struct SAnimationCache
 {
-    std::string strName;
-    int         iTime{-1};
-    bool        bLoop{false};
-    bool        bUpdatePosition{false};
-    bool        bInterruptable{false};
-    bool        bFreezeLastFrame{true};
-    int         iBlend{250};
-    float       progress{0.0f};
-    float       speed{1.0f};
-    bool        progressWaitForStreamIn{false}; // for sync anim only
-    float       elapsedTime{0.0f}; // for sync anim only
+    std::string  strName;
+    int          iTime{-1};
+    bool         bLoop{false};
+    bool         bUpdatePosition{false};
+    bool         bInterruptable{false};
+    bool         bFreezeLastFrame{true};
+    int          iBlend{250};
+    float        progress{0.0f};
+    float        speed{1.0f};
+    bool         progressWaitForStreamIn{false};
+    std::int64_t startTime{0};
 };
 
 class CClientObject;
@@ -374,7 +380,7 @@ public:
 
     void SetInWater(bool bIsInWater) { m_bIsInWater = bIsInWater; };
     bool IsInWater();
-    bool IsOnGround();
+    bool IsOnGround(bool checkVehicles = false);
 
     bool          IsClimbing();
     bool          IsRadioOn() const noexcept { return m_bRadioOn; };
@@ -456,6 +462,10 @@ public:
 
     bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
+
+    // It checks whether the animation is still playing based on time, not on task execution.
+    bool IsAnimationInProgress();
+
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
                            bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
@@ -463,6 +473,7 @@ public:
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
     void                        RunAnimationFromCache();
+    void                        UpdateAnimationProgressAndSpeed();
 
     bool IsUsingGun();
 
