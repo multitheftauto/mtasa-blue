@@ -22,7 +22,7 @@
 #include "CHTTPD.h"
 #include "CStaticFunctionDefinitions.h"
 
-#define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
+#define SETTINGS_TEMPLATE_PATH "mtaserver.conf.template"
 
 extern CGame* g_pGame;
 
@@ -864,91 +864,90 @@ bool CMainConfig::AddMissingSettings()
     if (!g_pGame->IsUsingMtaServerConf())
         return false;
 
-    const SString templateFileName = PathJoin(g_pServerInterface->GetServerModPath(), "mtaserver.conf.template");
-
+    const std::string templateFileName = PathJoin(g_pServerInterface->GetServerModPath(), SETTINGS_TEMPLATE_PATH);
     if (!FileExists(templateFileName))
         return false;
 
-    CXMLFile* templateFile = g_pServerInterface->GetXML()->CreateXML(templateFileName);
-    CXMLNode* templateRootNode = templateFile && templateFile->Parse() ? templateFile->GetRootNode() : nullptr;
+    std::unique_ptr<CXMLFile> templateFile(g_pServerInterface->GetXML()->CreateXML(templateFileName.c_str()));
+    if (!templateFile || !templateFile->Parse())
+    {
+        CLogger::ErrorPrintf("Failed to parse template file: '%s'\n", templateFileName.c_str());
+        return false;
+    }
+
+    CXMLNode* templateRootNode = templateFile->GetRootNode();
     if (!templateRootNode)
     {
-        CLogger::ErrorPrintf("Can't parse '%s'\n", *templateFileName);
+        CLogger::ErrorPrintf("Template file '%s' has no root node\n", templateFileName.c_str());
         return false;
     }
 
     // Check that each item in the template also exists in the server config
-    bool      hasConfigChanged = false;
+    bool configChanged = false;
     CXMLNode* previousNode = nullptr;
+
     for (auto it = templateRootNode->ChildrenBegin(); it != templateRootNode->ChildrenEnd(); ++it)
     {
         CXMLNode* templateNode = *it;
-        SString   templateNodeTagName = templateNode->GetTagName();
+        const std::string& templateNodeName = templateNode->GetTagName();
 
+        // Skip certain optional nodes
+        if (templateNodeName == "resource" || templateNodeName == "module")
+            continue;
+        
         // Find node with exact same attributes
         CXMLAttributes& templateAttributes = templateNode->GetAttributes();
         CXMLNode*       foundNode = nullptr;
         for (auto it2 = m_pRootNode->ChildrenBegin(); it2 != m_pRootNode->ChildrenEnd(); ++it2)
         {
             CXMLNode* tempNode = *it2;
-            if (tempNode->GetTagName() != templateNodeTagName)
-            {
+            if (tempNode->GetTagName() != templateNodeName)
                 continue;
-            }
+            
             CXMLAttributes& attributes = tempNode->GetAttributes();
-            bool            attributesMatch = true;
-
+            bool attributesMatch = true;
+            
             for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
             {
                 CXMLAttribute* templateAttribute = *it3;
-                const SString& strKey = templateAttribute->GetName();
-                const SString& strValue = templateAttribute->GetValue();
+                const SString& attrName = templateAttribute->GetName();
 
-                CXMLAttribute* foundAttribute = attributes.Find(strKey);
-                if (!foundAttribute || foundAttribute->GetValue() != strValue)
+                // Don't check value attribute which is intended to be different
+                if (attrName == "value")
+                    continue;
+                
+                const SString& attrValue = templateAttribute->GetValue();
+        
+                CXMLAttribute* foundAttribute = attributes.Find(attrName);
+                if (!foundAttribute || foundAttribute->GetValue() != attrValue)
                 {
                     attributesMatch = false;
                     break;
                 }
             }
-
+        
             if (attributesMatch)
             {
                 foundNode = tempNode;
                 break;
             }
         }
-        // Create missing node if not found
+        
         if (!foundNode)
         {
-            CLogger::LogPrintf("Adding missing '%s' to mtaserver.conf\n", *templateNodeTagName);
-            SString value = templateNode->GetTagContent();
-            SString commentText = templateNode->GetCommentText();
-            foundNode = m_pRootNode->CreateSubNode(templateNodeTagName, previousNode);
-            foundNode->SetTagContent(value);
-            foundNode->SetCommentText(commentText, true);
+            const std::string templateNodeValue = templateNode->GetTagContent();
+            const SString templateNodeComment = templateNode->GetCommentText();
 
-            // Copy attributes from template node
-            CXMLAttributes& templateAttributes = templateNode->GetAttributes();
-            for (auto it = templateAttributes.ListBegin(); it != templateAttributes.ListEnd(); ++it)
-            {
-                CXMLAttribute* templateAttribute = *it;
-                const SString& attributeName = templateAttribute->GetName();
-                const SString& attributeValue = templateAttribute->GetValue();
+            foundNode = m_pRootNode->CreateSubNode(templateNodeName.c_str(), previousNode);
+            foundNode->SetTagContent(templateNodeValue.c_str());
+            foundNode->SetCommentText(templateNodeComment.c_str(), true);
 
-                CXMLAttribute* newAttribute = foundNode->GetAttributes().Create(attributeName);
-                if (newAttribute)
-                    newAttribute->SetValue(attributeValue);
-            }
-            hasConfigChanged = true;
+            CLogger::LogPrintf("Added missing '%s' setting to mtaserver.conf\n", templateNodeName.c_str());
+            configChanged = true;
         }
         previousNode = foundNode;
     }
-
-    // Clean up
-    g_pServerInterface->GetXML()->DeleteXML(templateFile);
-    FileDelete(templateFileName);
-    return hasConfigChanged;
+    return configChanged;
 }
 
 bool CMainConfig::IsValidPassword(const char* szPassword)
