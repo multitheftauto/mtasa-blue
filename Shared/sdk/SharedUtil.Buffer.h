@@ -253,6 +253,40 @@ namespace SharedUtil
             return true;
         }
 
+        bool ReadString(std::string& result, bool bByteLength = false, bool bDoesLengthIncludeLengthOfLength = false)
+        {
+            result = "";
+
+            // Get the length
+            ushort usLength = 0;
+            if (bByteLength)
+            {
+                uchar ucLength = 0;
+                if (!Read(ucLength))
+                    return false;
+                usLength = ucLength;
+            }
+            else if (!Read(usLength))
+                return false;
+
+            if (bDoesLengthIncludeLengthOfLength && usLength)
+                usLength -= bByteLength ? 1 : 2;
+
+            if (usLength)
+            {
+                // Check has enough data
+                if (!CanReadNumberOfBytes(usLength))
+                    return false;
+                // Read the data
+                CScopeAlloc<char> buffer(usLength);
+                if (!ReadBytes(buffer, usLength, false))
+                    return false;
+
+                result = std::string(buffer, usLength);
+            }
+            return true;
+        }
+
         bool ReadBuffer(CBuffer& outResult)
         {
             outResult.Clear();

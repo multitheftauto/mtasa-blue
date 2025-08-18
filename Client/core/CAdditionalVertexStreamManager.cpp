@@ -466,13 +466,13 @@ SAdditionalStreamInfo* CAdditionalVertexStreamManager::CreateAdditionalStreamInf
         declNew->Usage = D3DDECLUSAGE_NORMAL;
         declNew->UsageIndex = 0;
         if (FAILED(m_pDevice->CreateVertexDeclaration(elements, &info.pVertexDeclaration)))
-            return false;
+            return nullptr;
 
         // Create new stream
         info.Stride = sizeof(float) * 3;
         UINT Size2 = ConvertPTSize(state.decl.VertexBufferDesc1.Size);
         if (FAILED(m_pDevice->CreateVertexBuffer(Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &info.pStreamData, NULL)))
-            return false;
+            return nullptr;
 
         // Save info
         MapSet(m_AdditionalStreamInfoMap, state.stream1.pStreamData, info);

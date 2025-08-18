@@ -27,7 +27,7 @@ public:
     bool         Exists(const char* szCommand);
 
     bool Execute(const char* szCommandLine);
-    bool Execute(const char* szCommand, const char* szParameters, bool bHandleRemotely = false, bool bIsScriptedBind = false);
+    bool Execute(const char* command, const char* parametersIn, bool handleRemotely = false, bool isScriptedBind = false);
 
     void Delete(const char* szCommand);
     void DeleteAll();

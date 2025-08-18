@@ -23,7 +23,7 @@ class CClientStreamSector
     friend class CClientStreamSectorRow;
 
 public:
-    CClientStreamSector(CClientStreamSectorRow* pRow, CVector2D& vecBottomLeft, CVector2D& vecTopRight);
+    CClientStreamSector(CClientStreamSectorRow* pRow, const CVector2D& vecBottomLeft, const CVector2D& vecTopRight);
     ~CClientStreamSector();
 
     bool DoesContain(CVector& vecPosition);

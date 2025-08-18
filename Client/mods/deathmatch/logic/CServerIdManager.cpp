@@ -70,7 +70,7 @@ protected:
     bool                                  m_bClearedDefaultDirectory;
     std::map<CServerIdKey, CServerIdInfo> m_ServerIdMap;
     SString                               m_strServerIdLookupBaseDir;
-    SString                               m_strTempErrorDir;
+    std::string                           m_strTempErrorDir;
 };
 
 ///////////////////////////////////////////////////////////////

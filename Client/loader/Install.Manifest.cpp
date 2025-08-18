@@ -63,7 +63,7 @@ static void ParseManifestVersion1(std::ifstream& manifest, std::vector<ManifestF
         {
             uint32_t checksum{};
 
-            if (auto& [ptr, ec] = std::from_chars(line.data(), line.data() + space, checksum, 16); ec == std::errc{})
+            if (const auto& [ptr, ec] = std::from_chars(line.data(), line.data() + space, checksum, 16); ec == std::errc{})
             {
                 ManifestFile file{};
                 file.relativePath = line.substr(space + 1);

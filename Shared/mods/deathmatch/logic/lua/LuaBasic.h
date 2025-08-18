@@ -31,7 +31,7 @@ namespace lua
     // PopTrival should read a simple value of type T from the stack without extra type checks
     // If whatever is at that point in the stack is not convertible to T, the behavior is undefined
     template <typename T>
-    inline T PopPrimitive(lua_State* L, int& index);
+    T PopPrimitive(lua_State* L, int& index);
 
     // Push should push a value of type T to the Lua Stack
     // This will always increase the stack size by 1
