@@ -263,17 +263,14 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char
     if (!szText || !*szText)
         return false;
     
-    // If color coded, remove color codes for length check
     SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : szText;
     
-    // Check if text length is within limits
     if (strlen(textToProcess.c_str()) > MAX_OUTPUTCHATBOX_LENGTH) {
         return false;
     }
 
-    // Send as one message - let the chat box handle wrapping
     CLuaArguments Arguments;
-    Arguments.PushString(szText); // Always use original text for events
+    Arguments.PushString(szText);
     Arguments.PushNumber(ucRed);
     Arguments.PushNumber(ucGreen);
     Arguments.PushNumber(ucBlue);
