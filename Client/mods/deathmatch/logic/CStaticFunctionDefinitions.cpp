@@ -2402,7 +2402,7 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& ped, const std::string control, const bool state) noexcept
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return SetControlState(control.c_str(), state);
