@@ -260,21 +260,30 @@ bool CStaticFunctionDefinitions::ClearChatBox()
 
 bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded)
 {
-    if (strlen(szText) <= MAX_OUTPUTCHATBOX_LENGTH)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushString(szText);
-        Arguments.PushNumber(ucRed);
-        Arguments.PushNumber(ucGreen);
-        Arguments.PushNumber(ucBlue);
-
-        bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
-        if (!bCancelled)
-        {
-            m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
-            return true;
-        }
+    if (!szText || !*szText)
+        return false;
+    
+    // If color coded, remove color codes for length check
+    SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : szText;
+    
+    // Check if text length is within limits
+    if (strlen(textToProcess.c_str()) > MAX_OUTPUTCHATBOX_LENGTH) {
+        return false;
     }
+
+    // Send as one message - let the chat box handle wrapping
+    CLuaArguments Arguments;
+    Arguments.PushString(szText); // Always use original text for events
+    Arguments.PushNumber(ucRed);
+    Arguments.PushNumber(ucGreen);
+    Arguments.PushNumber(ucBlue);
+
+    bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
+    if (!bCancelled) {
+        m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
+        return true;
+    }
+    
     return false;
 }
 
@@ -1741,7 +1750,7 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept
+bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& ped, const std::string control, bool& state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return GetControlState(control.c_str(), state);
@@ -2396,13 +2405,15 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& ped, const std::string control, const bool state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return SetControlState(control.c_str(), state);
 
     if (ped.m_Pad.SetControlState(control.c_str(), state))
         return true;
+    
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby)
