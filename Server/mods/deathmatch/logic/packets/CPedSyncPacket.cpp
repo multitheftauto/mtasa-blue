@@ -75,16 +75,16 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
                 return false;
         }
 
-        if (ucFlags & 0x60)
-        {
-            if (!BitStream.ReadBit(Data.isReloadingWeapon))
-                return false;
-        }
-
         // In Water
         if (ucFlags & 0x40)
         {
             if (!BitStream.ReadBit(Data.bIsInWater))
+                return false;
+        }
+
+        if (ucFlags & 0x60)
+        {
+            if (!BitStream.ReadBit(Data.isReloadingWeapon))
                 return false;
         }
 
@@ -138,10 +138,10 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     if (Data.ucFlags & 0x20)
         BitStream.WriteBit(Data.bOnFire);
-    if (Data.ucFlags & 0x60)
-        BitStream.Write(Data.isReloadingWeapon);
     if (Data.ucFlags & 0x40)
         BitStream.Write(Data.bIsInWater);
+    if (Data.ucFlags & 0x60)
+        BitStream.Write(Data.isReloadingWeapon);
 
     return true;
 }

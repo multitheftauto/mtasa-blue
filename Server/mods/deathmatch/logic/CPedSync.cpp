@@ -287,9 +287,7 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
             pPed->SetInWater(Data.bIsInWater);
 
         if (Data.ucFlags & 0x60)
-        {
             pPed->SetReloadingWeapon(Data.isReloadingWeapon);
-        }
 
         if (Data.ucFlags & 0x80)
             pPed->SetAnimationData({});
