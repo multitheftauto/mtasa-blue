@@ -2409,8 +2409,6 @@ bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& ped, const std::
 
     if (ped.m_Pad.SetControlState(control.c_str(), state))
         return true;
-    
-    return false;
 }
 
 bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby)
