@@ -6119,6 +6119,21 @@ bool CClientPed::ReloadWeapon() noexcept
     if (!CanReloadWeapon() || (task && task->GetTaskType() == TASK_SIMPLE_USE_GUN))
         return false;
 
+    CLuaArguments args;
+    args.PushNumber(weapon->GetType());
+    args.PushNumber(weapon->GetAmmoInClip());
+    args.PushNumber(weapon->GetAmmoTotal());
+
+    bool result = false;
+
+    if (IS_PLAYER(this))
+        result = CallEvent("onClientPlayerWeaponReload", args, true);
+    else
+        result = CallEvent("onClientPedWeaponReload", args, true);
+
+    if (!result)
+        return false;
+
     weapon->SetState(WEAPONSTATE_RELOADING);
     return true;
 }
