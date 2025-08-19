@@ -339,7 +339,7 @@ int CLuaResourceDefs::addResourceConfig(lua_State* luaVM)
         iType = CResourceFile::RESOURCE_FILE_TYPE_CONFIG;
         if (strType != "server")
         {
-            CLogger::LogPrintf("WARNING: Unknown config file type specified for %s. Defaulting to 'server'", lua_tostring(luaVM, lua_upvalueindex(1)));
+            CLogger::LogPrintf("WARNING: Unknown config file type specified for %s. Defaulting to 'server'\n", lua_tostring(luaVM, lua_upvalueindex(1)));
         }
     }
 

@@ -241,6 +241,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_MovementStateNames[MOVEMENTSTATE_ASCENT_JETPACK] = "ascent_jetpack";
     m_MovementStateNames[MOVEMENTSTATE_DESCENT_JETPACK] = "descent_jetpack";
     m_MovementStateNames[MOVEMENTSTATE_JETPACK] = "jetpack_flying";
+    m_MovementStateNames[MOVEMENTSTATE_HANGING] = "hanging";
 
     // Create the player model
     if (m_bIsLocalPlayer)
@@ -2426,7 +2427,13 @@ eMovementState CClientPed::GetMovementState()
 
         // Check tasks
         if (strcmp(szSimpleTaskName, "TASK_SIMPLE_CLIMB") == 0) // Is he climbing?
+        {
+            CTaskSimpleClimb* climbingTask = dynamic_cast<CTaskSimpleClimb*>(GetTaskManager()->GetSimplestActiveTask());
+            if (climbingTask && climbingTask->GetHeightForPos() == eClimbHeights::CLIMB_GRAB)
+                return MOVEMENTSTATE_HANGING;
+
             return MOVEMENTSTATE_CLIMB;
+        }
         else if (strcmp(szComplexTaskName, "TASK_COMPLEX_JUMP") == 0) // Is he jumping?
             return MOVEMENTSTATE_JUMP;
         else if (strcmp(szSimpleTaskName, "TASK_SIMPLE_GO_TO_POINT") == 0) // Entering vehicle (walking to the doors)?
@@ -4666,12 +4673,20 @@ float CClientPed::GetDistanceFromGround()
     return (vecPosition.fZ - fGroundLevel);
 }
 
-bool CClientPed::IsOnGround()
+bool CClientPed::IsOnGround(bool checkVehicles)
 {
     CVector vecPosition;
     GetPosition(vecPosition);
     float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
-    return (vecPosition.fZ > fGroundLevel && (vecPosition.fZ - fGroundLevel) <= 1.0f);
+
+    if (DefinitelyLessThan(vecPosition.fZ, fGroundLevel))
+        return false;
+
+    bool isOnGround = DefinitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f) || EssentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f);
+    if (!isOnGround && checkVehicles && m_pPlayerPed)
+        return m_pPlayerPed->IsStandingOnEntity();
+
+    return isOnGround;
 }
 
 bool CClientPed::IsClimbing()
@@ -4987,10 +5002,7 @@ void CClientPed::DestroySatchelCharges(bool bBlow, bool bDestroy)
                 bool bCancelExplosion = !CallEvent("onClientExplosion", Arguments, true);
 
                 if (!bCancelExplosion)
-                {
                     m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
-                    g_pClientGame->SendExplosionSync(vecPosition, EXP_TYPE_GRENADE, this);
-                }
             }
             if (bDestroy)
             {
