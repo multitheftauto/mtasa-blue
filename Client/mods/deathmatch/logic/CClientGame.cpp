@@ -2328,46 +2328,45 @@ void CClientGame::ProcessServerControlBind(CControlFunctionBind* pBind)
 CClientEntity* CClientGame::CheckClientSideEntityClick(float fScreenX, float fScreenY)
 {
     if (!m_pMarkerManager)
-        return NULL;
+        return nullptr;
 
-    CClientMarker* pClosestMarker = NULL;
+    CCamera* pCamera = g_pGame->GetCamera();
+    CMatrix matCamera;
+    pCamera->GetMatrix(&matCamera);
+    CVector vecOrigin = matCamera.vPos;
+    
+    CVector vecTarget, vecScreen(fScreenX, fScreenY, 300.0f);
+    g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
+    
+    CVector vecRayDir = vecTarget - vecOrigin;
+    vecRayDir.Normalize();
+
+    CClientMarker* pClosestMarker = nullptr;
     float fClosestDist = 99999.9f;
 
-    CFastList<CClientMarker*>::const_iterator iter = m_pMarkerManager->m_Markers.begin();
-    for (; iter != m_pMarkerManager->m_Markers.end(); ++iter)
+    for (auto* pMarker : m_pMarkerManager->m_Markers)
     {
-        CClientMarker* pMarker = *iter;
-        if (pMarker && pMarker->IsStreamedIn() && pMarker->IsVisible())
-        {
-            CVector vecPosition;
-            pMarker->GetPosition(vecPosition);
-
-            CVector vecScreen;
-            g_pCore->GetGraphics()->CalcScreenCoors(&vecPosition, &vecScreen);
+        if (!pMarker || !pMarker->IsStreamedIn() || !pMarker->IsVisible())
+            continue;
             
-            if (pMarker->IsClientSideOnScreen())
-            {
-                CSphere boundingSphere = pMarker->GetWorldBoundingSphere();
-                
-                CVector vecEdgePos = boundingSphere.vecPosition;
-                vecEdgePos.fX += boundingSphere.fRadius;
-                
-                CVector vecCenterScreen, vecEdgeScreen;
-                g_pCore->GetGraphics()->CalcScreenCoors(&boundingSphere.vecPosition, &vecCenterScreen);
-                g_pCore->GetGraphics()->CalcScreenCoors(&vecEdgePos, &vecEdgeScreen);
-                
-                float fScreenRadius = abs(vecEdgeScreen.fX - vecCenterScreen.fX);
-                
-                float fDistX = vecCenterScreen.fX - fScreenX;
-                float fDistY = vecCenterScreen.fY - fScreenY;
-                float fDist = sqrt(fDistX * fDistX + fDistY * fDistY);
+        if (!pMarker->IsClientSideOnScreen())
+            continue;
 
-                if (fDist < fScreenRadius && fDist < fClosestDist)
-                {
-                    fClosestDist = fDist;
-                    pClosestMarker = pMarker;
-                }
-            }
+        CSphere boundingSphere = pMarker->GetWorldBoundingSphere();
+        
+        CVector vecToSphere = boundingSphere.vecPosition - vecOrigin;
+        float fProjection = vecToSphere.DotProduct(&vecRayDir);
+        
+        if (fProjection <= 0.0f)
+            continue;
+            
+        CVector vecClosestPoint = vecOrigin + vecRayDir * fProjection;
+        float fDistanceToRay = (boundingSphere.vecPosition - vecClosestPoint).Length();
+        
+        if (fDistanceToRay <= boundingSphere.fRadius && fProjection < fClosestDist)
+        {
+            fClosestDist = fProjection;
+            pClosestMarker = pMarker;
         }
     }
 
@@ -2441,7 +2440,11 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
 
                     CVector        vecCollision;
                     ElementID      CollisionEntityID = INVALID_ELEMENT_ID;
-                    CClientEntity* pCollisionEntity = NULL;
+                    CClientEntity* pCollisionEntity = nullptr;
+                    float          fObjectDistance = 99999.9f;
+                    
+                    CClientEntity* pClientSideEntity = CheckClientSideEntityClick(static_cast<float>(iX), static_cast<float>(iY));
+                    
                     if (bCollision && pColPoint)
                     {
                         vecCollision = pColPoint->GetPosition();
@@ -2451,6 +2454,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                             CClientEntity* pEntity = pPools->GetClientEntity((DWORD*)pGameEntity->GetInterface());
                             if (pEntity)
                             {
+                                fObjectDistance = (vecCollision - vecOrigin).Length();
                                 pCollisionEntity = pEntity;
                                 if (!pEntity->IsLocalEntity())
                                     CollisionEntityID = pEntity->GetID();
@@ -2464,18 +2468,21 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
 
                     // Destroy the colpoint so we don't get a leak
                     if (pColPoint)
-                    {
                         pColPoint->Destroy();
-                    }
 
-                    if (!pCollisionEntity)
+                    if (pClientSideEntity)
                     {
-                        CClientEntity* pClientSideEntity = CheckClientSideEntityClick((float)iX, (float)iY);
-                        if (pClientSideEntity)
+                        CVector vecMarkerPos;
+                        pClientSideEntity->GetPosition(vecMarkerPos);
+                        float fMarkerDistance = (vecMarkerPos - vecOrigin).Length();
+                        
+                        if (fMarkerDistance < fObjectDistance)
                         {
                             pCollisionEntity = pClientSideEntity;
                             if (!pClientSideEntity->IsLocalEntity())
                                 CollisionEntityID = pClientSideEntity->GetID();
+                            
+                            vecCollision = vecMarkerPos;
                         }
                     }
 
