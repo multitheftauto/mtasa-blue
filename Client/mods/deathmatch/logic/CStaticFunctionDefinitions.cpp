@@ -260,12 +260,12 @@ bool CStaticFunctionDefinitions::ClearChatBox()
 
 bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded)
 {
-    if (!szText || !*szText)
+    if (!szText || szText[0] == '\0')
         return false;
     
     SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : szText;
     
-    if (strlen(textToProcess.c_str()) > MAX_OUTPUTCHATBOX_LENGTH) {
+    if (textToProcess.length() > MAX_OUTPUTCHATBOX_LENGTH) {
         return false;
     }
 
