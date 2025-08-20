@@ -1076,6 +1076,9 @@ bool CStaticFunctionDefinitions::SetElementPosition(CClientEntity& Entity, const
 {
     RUN_CHILDREN(SetElementPosition(**iter, vecPosition))
 
+    if (!Entity.IsLocalEntity())
+        return false;
+
     if (bWarp)
         Entity.Teleport(vecPosition);
     else
@@ -1490,6 +1493,9 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CClientEntity& Entity, unsigned
 bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float fHealth)
 {
     RUN_CHILDREN(SetElementHealth(**iter, fHealth))
+
+    if (!Entity.IsLocalEntity())
+        return false;
 
     switch (Entity.GetType())
     {
@@ -2907,41 +2913,13 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optiona
         return false;
 
     CClientVehicle& vehicle = static_cast<CClientVehicle&>(Entity);
+    if (!vehicle.IsLocalEntity())
+        return false;
+
     VehicleBlowFlags blow;
-
+    
     blow.withExplosion = withExplosion.value_or(true);
-
-    if (vehicle.IsLocalEntity())
-    {
-        vehicle.Blow(blow);
-    }
-    else
-    {
-        CVector position;
-        vehicle.GetPosition(position);
-
-        const auto type = vehicle.GetType();
-        const auto state = (blow.withExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
-        eExplosionType explosion;
-
-        switch (type)
-        {
-            case CLIENTVEHICLE_CAR:
-                explosion = EXP_TYPE_CAR;
-                break;
-            case CLIENTVEHICLE_HELI:
-                explosion = EXP_TYPE_HELI;
-                break;
-            case CLIENTVEHICLE_BOAT:
-                explosion = EXP_TYPE_BOAT;
-                break;
-            default:
-                explosion = EXP_TYPE_CAR;
-        }
-
-        g_pClientGame->SendExplosionSync(position, explosion, &Entity, state);
-    }
-
+    vehicle.Blow(blow);
     return true;
 }
 
