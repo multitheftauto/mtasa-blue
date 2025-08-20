@@ -1337,8 +1337,8 @@ bool CClientEntity::IsOnScreen()
     
     if (GetType() == CCLIENTMARKER)
     {
-        CClientMarker* pMarker = static_cast<CClientMarker*>(this);
-        return pMarker->IsClientSideOnScreen();
+        CClientMarker* marker = static_cast<CClientMarker*>(this);
+        return marker->IsClientSideOnScreen();
     }
     
     return false;
