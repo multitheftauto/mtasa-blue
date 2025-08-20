@@ -697,7 +697,7 @@ SString CVideoModeManager::GetCurrentAdapterDeviceName()
     {
         // Ensure null termination for x86 safety
         monitorInfo.szDevice[sizeof(monitorInfo.szDevice) - 1] = '\0';
-        return SString(monitorInfo.szDevice);
+        return std::string(monitorInfo.szDevice);
     }
 
     return "";
