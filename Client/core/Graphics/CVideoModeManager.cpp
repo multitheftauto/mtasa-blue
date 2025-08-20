@@ -687,9 +687,18 @@ bool CVideoModeManager::GetCurrentAdapterRect(LPRECT pOutRect)
 ///////////////////////////////////////////////////////////////
 SString CVideoModeManager::GetCurrentAdapterDeviceName()
 {
-    MONITORINFOEX monitorInfo;
+    if (!m_hCurrentMonitor)
+        return "";
+
+    MONITORINFOEX monitorInfo{};
     monitorInfo.cbSize = sizeof(MONITORINFOEX);
-    if (GetMonitorInfo(m_hCurrentMonitor, &monitorInfo))
-        return monitorInfo.szDevice;
+
+    if (GetMonitorInfoA(m_hCurrentMonitor, &monitorInfo))
+    {
+        // Ensure null termination for x86 safety
+        monitorInfo.szDevice[sizeof(monitorInfo.szDevice) - 1] = '\0';
+        return SString(monitorInfo.szDevice);
+    }
+
     return "";
 }
