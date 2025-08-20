@@ -671,11 +671,29 @@ bool CVideoModeManager::GetRequiredDisplayResolution(int& iOutWidth, int& iOutHe
 ///////////////////////////////////////////////////////////////
 bool CVideoModeManager::GetCurrentAdapterRect(LPRECT pOutRect)
 {
-    MONITORINFOEX monitorInfo;
+    if (!pOutRect)
+        return false;
+
+    // Initialize to safe defaults
+    pOutRect->left = 0;
+    pOutRect->top = 0;
+    pOutRect->right = 1024;
+    pOutRect->bottom = 768;
+
+    if (!m_hCurrentMonitor)
+        return false;
+
+    MONITORINFOEX monitorInfo{};
     monitorInfo.cbSize = sizeof(MONITORINFOEX);
-    BOOL bResult = GetMonitorInfo(m_hCurrentMonitor, &monitorInfo);
-    *pOutRect = monitorInfo.rcMonitor;
-    return bResult != 0;
+
+    BOOL bResult = GetMonitorInfoA(m_hCurrentMonitor, &monitorInfo);
+    if (bResult)
+    {
+        *pOutRect = monitorInfo.rcMonitor;
+        return true;
+    }
+
+    return false;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -687,9 +705,18 @@ bool CVideoModeManager::GetCurrentAdapterRect(LPRECT pOutRect)
 ///////////////////////////////////////////////////////////////
 SString CVideoModeManager::GetCurrentAdapterDeviceName()
 {
-    MONITORINFOEX monitorInfo;
+    if (!m_hCurrentMonitor)
+        return "";
+
+    MONITORINFOEX monitorInfo{};
     monitorInfo.cbSize = sizeof(MONITORINFOEX);
-    if (GetMonitorInfo(m_hCurrentMonitor, &monitorInfo))
-        return monitorInfo.szDevice;
+
+    if (GetMonitorInfoA(m_hCurrentMonitor, &monitorInfo))
+    {
+        // Ensure null termination for x86 safety
+        monitorInfo.szDevice[sizeof(monitorInfo.szDevice) - 1] = '\0';
+        return std::string(monitorInfo.szDevice);
+    }
+
     return "";
 }
