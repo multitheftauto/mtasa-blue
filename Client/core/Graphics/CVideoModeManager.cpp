@@ -671,11 +671,29 @@ bool CVideoModeManager::GetRequiredDisplayResolution(int& iOutWidth, int& iOutHe
 ///////////////////////////////////////////////////////////////
 bool CVideoModeManager::GetCurrentAdapterRect(LPRECT pOutRect)
 {
-    MONITORINFOEX monitorInfo;
+    if (!pOutRect)
+        return false;
+
+    // Initialize to safe defaults
+    pOutRect->left = 0;
+    pOutRect->top = 0;
+    pOutRect->right = 1024;
+    pOutRect->bottom = 768;
+
+    if (!m_hCurrentMonitor)
+        return false;
+
+    MONITORINFOEX monitorInfo{};
     monitorInfo.cbSize = sizeof(MONITORINFOEX);
-    BOOL bResult = GetMonitorInfo(m_hCurrentMonitor, &monitorInfo);
-    *pOutRect = monitorInfo.rcMonitor;
-    return bResult != 0;
+
+    BOOL bResult = GetMonitorInfoA(m_hCurrentMonitor, &monitorInfo);
+    if (bResult)
+    {
+        *pOutRect = monitorInfo.rcMonitor;
+        return true;
+    }
+
+    return false;
 }
 
 ///////////////////////////////////////////////////////////////
