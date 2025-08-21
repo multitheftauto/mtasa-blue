@@ -280,7 +280,7 @@
 # if defined(__aarch32__) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC)
 #  if defined(__ARM_FEATURE_CRYPTO) || (CRYPTOPP_GCC_VERSION >= 40800) || \
       (CRYPTOPP_LLVM_CLANG_VERSION >= 30300) || (CRYPTOPP_APPLE_CLANG_VERSION >= 40300) || \
-      (CRYPTOPP_MSC_VERSION >= 1916))
+      (CRYPTOPP_MSC_VERSION >= 1916)
 #   define CRYPTOPP_ARM_AES_AVAILABLE 1
 #  endif  // Compilers
 # endif  // Platforms
@@ -292,7 +292,7 @@
 # if defined(__aarch32__) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC)
 #  if defined(__ARM_FEATURE_CRYPTO) || (CRYPTOPP_GCC_VERSION >= 40800) || \
       (CRYPTOPP_LLVM_CLANG_VERSION >= 30300) || (CRYPTOPP_APPLE_CLANG_VERSION >= 40300) || \
-      (CRYPTOPP_MSC_VERSION >= 1916))
+      (CRYPTOPP_MSC_VERSION >= 1916)
 #   define CRYPTOPP_ARM_PMULL_AVAILABLE 1
 #  endif  // Compilers
 # endif  // Platforms
@@ -304,7 +304,7 @@
 # if defined(__aarch32__) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC)
 #  if defined(__ARM_FEATURE_CRYPTO) || (CRYPTOPP_GCC_VERSION >= 40800) || \
       (CRYPTOPP_LLVM_CLANG_VERSION >= 30300) || (CRYPTOPP_APPLE_CLANG_VERSION >= 40300) || \
-      (CRYPTOPP_MSC_VERSION >= 1916))
+      (CRYPTOPP_MSC_VERSION >= 1916)
 #   define CRYPTOPP_ARM_SHA1_AVAILABLE 1
 #   define CRYPTOPP_ARM_SHA2_AVAILABLE 1
 #  endif  // Compilers

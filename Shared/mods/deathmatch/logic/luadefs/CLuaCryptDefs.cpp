@@ -62,7 +62,7 @@ std::variant<std::string, bool> CLuaCryptDefs::Hash(lua_State* const luaVM, Hash
         switch (hashFunction)
         {
             case HashFunctionType::MD5:
-                return SharedUtil::Hash<CryptoPP::Weak::MD5>(strSourceData).ToLower();
+                return SharedUtil::Hash<CryptoPP::MD5>(strSourceData).ToLower();
 
             case HashFunctionType::SHA1:
                 return SharedUtil::Hash<CryptoPP::SHA1>(strSourceData).ToLower();
@@ -106,7 +106,7 @@ std::variant<std::string, bool> CLuaCryptDefs::Hash(lua_State* const luaVM, Hash
                 switch (hmacAlgorithm)
                 {
                     case HmacAlgorithm::MD5:
-                        return SharedUtil::Hmac<CryptoPP::Weak::MD5>(strSourceData, key).ToLower();
+                        return SharedUtil::Hmac<CryptoPP::MD5>(strSourceData, key).ToLower();
 
                     case HmacAlgorithm::SHA1:
                         return SharedUtil::Hmac<CryptoPP::SHA1>(strSourceData, key).ToLower();

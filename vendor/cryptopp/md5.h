@@ -1,6 +1,5 @@
 #ifndef CRYPTOPP_MD5_H
 #define CRYPTOPP_MD5_H
-#define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 
 #include "iterhash.h"
 
@@ -11,7 +10,7 @@ namespace Weak1 {
 /// \brief MD5 message digest
 /// \sa <a href="http://www.cryptolounge.org/wiki/MD5">MD5</a>
 /// \since Crypto++ 1.0
-class Weak::MD5 : public IteratedHashWithStaticTransform<word32, LittleEndian, 64, 16, MD5>
+class MD5 : public IteratedHashWithStaticTransform<word32, LittleEndian, 64, 16, MD5>
 {
 public:
 	static void InitState(HashWordType *state);
