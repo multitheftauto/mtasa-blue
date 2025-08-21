@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-12 20:34+0000\n"
+"POT-Creation-Date: 2025-08-21 03:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -732,23 +732,23 @@ msgstr ""
 msgid "MTA Client verification failed!"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
 msgid "In a ditch"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
 msgid "En-route to hospital"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
 msgid "Meeting their maker"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5645
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5647
 msgid "Regretting their decisions"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5645
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5647
 msgid "Wasted"
 msgstr ""
 
