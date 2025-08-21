@@ -2518,12 +2518,6 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!pVehicle->IsLocalEntity())
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
         if (argStream.NextIsString())
         {
             SString strProperty;

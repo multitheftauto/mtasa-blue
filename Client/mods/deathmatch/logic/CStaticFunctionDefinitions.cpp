@@ -1076,8 +1076,11 @@ bool CStaticFunctionDefinitions::SetElementPosition(CClientEntity& Entity, const
 {
     RUN_CHILDREN(SetElementPosition(**iter, vecPosition))
 
-    if (!Entity.IsLocalEntity())
-        return false;
+    if (Entity.GetType() == CCLIENTVEHICLE)
+    {
+        if (!Entity.IsLocalEntity() && !static_cast<CDeathmatchVehicle&>(Entity).IsSyncing())
+            return false;
+    }
 
     if (bWarp)
         Entity.Teleport(vecPosition);
