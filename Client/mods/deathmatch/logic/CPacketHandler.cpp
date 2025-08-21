@@ -1412,7 +1412,8 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
             bitStream.Read(szMessage, iNumberOfBytesUsed);
             szMessage[iNumberOfBytesUsed] = 0;
             // actual limits enforced on the remote client, this is the maximum a string can be to be printed.
-            if (MbUTF8ToUTF16(szMessage).size() <=
+            SString textToProcess = bColorCoded ? RemoveColorCodes(szMessage) : szMessage;
+            if (MbUTF8ToUTF16(textToProcess).size() <=
                 MAX_CHATECHO_LENGTH + 6)            // Extra 6 characters to fix #7125 (Teamsay + long name + long message = too long message)
             {
                 // Strip it for bad characters
