@@ -97,15 +97,21 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
                 if (hProcess)
                 {
                     WCHAR szModuleName[MAX_PATH * 2] = {0};
-                    GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName));
+                    DWORD dwSize = GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName) - 1);
                     CloseHandle(hProcess);
-                    SString strModuleName = ToUTF8(szModuleName);
-                    if (FileExists(strModuleName))
+                    
+                    if (dwSize > 0)
                     {
-                        CloseHandle(hSnapshot);
-                        if (IsShortPathName(strModuleName))
-                            return GetSystemLongPathName(strModuleName);
-                        return strModuleName;
+                        // Ensure null termination
+                        szModuleName[std::min(dwSize, (DWORD)(NUMELMS(szModuleName) - 1))] = L'\0';
+                        SString strModuleName = ToUTF8(szModuleName);
+                        if (FileExists(strModuleName))
+                        {
+                            CloseHandle(hSnapshot);
+                            if (IsShortPathName(strModuleName))
+                                return GetSystemLongPathName(strModuleName);
+                            return strModuleName;
+                        }
                     }
                 }
             }
@@ -200,10 +206,13 @@ static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const 
         DWORD dwBufferSize;
         if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS)
         {
+
             CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
             if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
             {
-                szBuffer[dwBufferSize / sizeof(wchar_t)] = 0;
+                // Ensure null termination - dwBufferSize is in bytes, convert to wchar_t units
+                size_t wcharCount = dwBufferSize / sizeof(wchar_t);
+                szBuffer[wcharCount] = 0;
                 strOutResult = ToUTF8((wchar_t*)szBuffer);
                 bResult = true;
             }
@@ -365,7 +374,21 @@ SString SharedUtil::GetPostUpdateConnect()
     CArgMap argMap;
     argMap.SetFromString(strPostUpdateConnect);
     SString strHost = argMap.Get("host");
-    time_t  timeThen = (time_t)std::atoll(argMap.Get("time"));
+    SString strTimeString = argMap.Get("time");
+
+    time_t timeThen = 0;
+    if (!strTimeString.empty())
+    {
+        char* endptr;
+        long long result = strtoll(strTimeString.c_str(), &endptr, 10);
+        
+        // Check for valid conversion
+        if (endptr != strTimeString.c_str() && *endptr == '\0' && 
+            result >= 0 && result <= LLONG_MAX)
+        {
+            timeThen = static_cast<time_t>(result);
+        }
+    }
 
     // Expire after 5 mins
     double seconds = difftime(time(NULL), timeThen);
@@ -408,7 +431,21 @@ void SharedUtil::SetApplicationSettingInt(const SString& strPath, const SString&
 
 int SharedUtil::GetApplicationSettingInt(const SString& strPath, const SString& strName)
 {
-    return atoi(GetApplicationSetting(strPath, strName));
+    SString strValue = GetApplicationSetting(strPath, strName);
+    if (strValue.empty())
+        return 0;
+
+    char* endptr;
+    long result = strtol(strValue.c_str(), &endptr, 10);
+    
+    // Check for conversion errors
+    if (endptr == strValue.c_str() || *endptr != '\0')
+        return 0;  // Invalid conversion
+
+    if (result > INT_MAX || result < INT_MIN)
+        return 0;
+    
+    return static_cast<int>(result);
 }
 
 int SharedUtil::IncApplicationSettingInt(const SString& strPath, const SString& strName)
@@ -618,11 +655,15 @@ SString SharedUtil::GetClipboardText()
     {
         // Get the clipboard's data
         HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
-        void*  lockedData = GlobalLock(clipboardData);
-        if (lockedData)
-            data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
-
-        GlobalUnlock(clipboardData);
+        if (clipboardData)  // Check if handle is valid
+        {
+            void* lockedData = GlobalLock(clipboardData);
+            if (lockedData)
+            {
+                data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
+                GlobalUnlock(clipboardData);
+            }
+        }
         CloseClipboard();
     }
 
@@ -679,7 +720,8 @@ bool SharedUtil::ProcessPendingBrowseToSolution()
 
     ClearPendingBrowseToSolution();
 
-    SString strTitle("MTA: San Andreas %s   (CTRL+C to copy)", *strErrorCode);
+    SString strTitle;
+    strTitle.Format("MTA: San Andreas %s   (CTRL+C to copy)", strErrorCode.c_str());
     // Show message if set, ask question if required, and then launch URL
     if (iFlags & ASK_GO_ONLINE)
     {
@@ -769,8 +811,11 @@ void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLi
         SString strPathFilename = PathJoin(GetMTADataPath(), "report.log");
         MakeSureDirExists(strPathFilename);
 
-        SString strMessage("%u: %s %s [%s] - %s\n", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
-                           GetReportLogProcessTag().c_str(), strText.c_str());
+        SString strMessage;
+        strMessage.Format("%u: %s %s [%s] - ", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
+                          GetReportLogProcessTag().c_str());
+        strMessage += strText;
+        strMessage += "\n";
         FileAppend(strPathFilename, &strMessage.at(0), strMessage.length());
         OutputDebugLine(SStringX("[ReportLog] ") + strMessage);
     }
@@ -785,13 +830,18 @@ void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, c
     constexpr size_t BOILERPLATE_SIZE = 46;
     constexpr size_t MAX_EXCEPTION_NAME_SIZE = 64;
     constexpr size_t MAX_EXCEPTION_TEXT_SIZE = 256;
-    static char      szOutput[BOILERPLATE_SIZE + MAX_EXCEPTION_NAME_SIZE + MAX_EXCEPTION_TEXT_SIZE] = {0};
+    constexpr size_t TOTAL_BUFFER_SIZE = BOILERPLATE_SIZE + MAX_EXCEPTION_NAME_SIZE + MAX_EXCEPTION_TEXT_SIZE;
+    static char      szOutput[TOTAL_BUFFER_SIZE] = {0};
 
     SYSTEMTIME s = {0};
     GetSystemTime(&s);
 
-    sprintf_s(szOutput, "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute,
-              s.wSecond, MAX_EXCEPTION_NAME_SIZE, szExceptionName, MAX_EXCEPTION_TEXT_SIZE, szExceptionText);
+    // Use _snprintf_s to prevent buffer overflow and ensure null termination
+    int result = _snprintf_s(szOutput, TOTAL_BUFFER_SIZE, _TRUNCATE, 
+                            "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", 
+                            uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, 
+                            (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown", 
+                            (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
 
     OutputDebugString("[ReportLog] ");
     OutputDebugString(&szOutput[0]);
@@ -936,7 +986,7 @@ SString SharedUtil::GetSystemErrorMessage(uint uiError, bool bRemoveNewlines, bo
         strResult = strResult.Replace("\n", "").Replace("\r", "");
 
     if (bPrependCode)
-        strResult = SString("Error %u: %s", uiError, *strResult);
+        strResult.Format("Error %u: %s", uiError, strResult.c_str());
 
     return strResult;
 }
@@ -1516,15 +1566,20 @@ int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 // Translate a true ANSI string to the UTF-16 equivalent (reencode+convert)
 std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
+    if (input.empty())
+        return L"";
+        
     size_t len = mbstowcs(NULL, input.c_str(), input.length());
     if (len == (size_t)-1)
         return L"?";
-    wchar_t* wcsOutput = new wchar_t[len + 1];
-    mbstowcs(wcsOutput, input.c_str(), input.length());
-    wcsOutput[len] = 0;            // Null terminate the string
-    std::wstring strOutput(wcsOutput);
-    delete[] wcsOutput;
-    return strOutput;
+    
+    std::vector<wchar_t> wcsOutput(len + 1);  // Use vector for automatic cleanup
+    size_t result = mbstowcs(wcsOutput.data(), input.c_str(), len);
+    if (result == (size_t)-1 || result != len)
+        return L"?";
+    
+    wcsOutput[len] = 0;  // Null terminate the string
+    return std::wstring(wcsOutput.data());
 }
 
 // Check for BOM bytes
