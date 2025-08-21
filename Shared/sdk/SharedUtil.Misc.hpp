@@ -991,23 +991,6 @@ SString SharedUtil::GetSystemErrorMessage(uint uiError, bool bRemoveNewlines, bo
     return strResult;
 }
 
-#ifdef ExpandEnvironmentStringsForUser
-//
-// eg "%HOMEDRIVE%" -> "C:"
-//
-SString SharedUtil::ExpandEnvString(const SString& strInput)
-{
-    HANDLE hProcessToken;
-    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_IMPERSONATE | TOKEN_QUERY | TOKEN_DUPLICATE, &hProcessToken))
-        return strInput;
-
-    const static int iBufferSize = 32000;
-    char             envBuf[iBufferSize + 2];
-    ExpandEnvironmentStringsForUser(hProcessToken, strInput, envBuf, iBufferSize);
-    return envBuf;
-}
-#endif
-
 ///////////////////////////////////////////////////////////////
 //
 // MyShellExecute
@@ -1258,6 +1241,7 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
     struct FunctionLookup
     {
         FunctionPointer function;
+        HMODULE         module;
         bool            once;
     };
 
@@ -1267,11 +1251,11 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
     {
         lookup.once = true;
 
-        HMODULE ntdll = LoadLibraryA("ntdll.dll");
+        lookup.module = LoadLibraryA("ntdll.dll");
 
-        if (ntdll)
-            lookup.function = static_cast<FunctionPointer>(static_cast<void*>(GetProcAddress(ntdll, "NtQueryInformationThread")));
-        else
+        if (lookup.module)
+            lookup.function = static_cast<FunctionPointer>(static_cast<void*>(GetProcAddress(lookup.module, "NtQueryInformationThread")));
+        else 
             return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
     }
 
@@ -1876,17 +1860,27 @@ namespace SharedUtil
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
         using GetCurrentProcessorNumber_t = DWORD(WINAPI*)();
 
-        static auto FnGetCurrentProcessorNumber = ([]() -> GetCurrentProcessorNumber_t {
-            HMODULE kernel32 = LoadLibraryA("kernel32");
+        struct ProcessorNumberLookup
+        {
+            GetCurrentProcessorNumber_t function;
+            HMODULE                     module;
+            bool                        once;
+        };
 
-            if (kernel32)
-                return static_cast<GetCurrentProcessorNumber_t>(static_cast<void*>(GetProcAddress(kernel32, "GetCurrentProcessorNumber")));
+        static ProcessorNumberLookup lookup = {};
+																																		   
 
-            return nullptr;
-        })();
+        if (!lookup.once)
+        {
+            lookup.once = true;
+            lookup.module = LoadLibraryA("kernel32");
 
-        if (FnGetCurrentProcessorNumber)
-            return FnGetCurrentProcessorNumber();
+            if (lookup.module)
+                lookup.function = static_cast<GetCurrentProcessorNumber_t>(static_cast<void*>(GetProcAddress(lookup.module, "GetCurrentProcessorNumber")));
+        }
+
+        if (lookup.function)
+            return lookup.function();
 
         return _GetCurrentProcessorNumberXP();
 #elif defined(__APPLE__) && defined(__aarch64__)
@@ -2091,7 +2085,7 @@ namespace SharedUtil
             if (iter == m_StartLastMap.end())
                 return;
 
-            // If last of found range is after query last, then range is not obscured
+            // If last of found range is after or at query last, then range is not obscured
             if (iter->second > uiLast)
                 return;
 
@@ -2105,6 +2099,15 @@ namespace SharedUtil
         IterType iter = m_StartLastMap.lower_bound(uiPoint);
         // iter is on or after point - So it can't overlap the point
 
+        if (iter != m_StartLastMap.end())
+        {
+            // If last of found range is after or at query point, then range is overlapping
+            if (iter->first <= uiPoint && iter->second >= uiPoint)
+            {
+                result = iter;
+                return true;
+            }
+        }
         if (iter != m_StartLastMap.begin())
         {
             iter--;
