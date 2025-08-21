@@ -2721,6 +2721,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientPlayerRadioSwitch", "", NULL, false);
     m_Events.AddEvent("onClientPlayerDamage", "attacker, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false);
+    m_Events.AddEvent("onClientPlayerWeaponReload", "weapon, clip, ammo", nullptr, false);
     m_Events.AddEvent("onClientPlayerWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onClientPlayerChoke", "", NULL, false);
     m_Events.AddEvent("onClientPlayerVoiceStart", "", NULL, false);
@@ -2739,6 +2740,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientPedVehicleEnter", "vehicle, seat", NULL, false);
     m_Events.AddEvent("onClientPedVehicleExit", "vehicle, seat", NULL, false);
     m_Events.AddEvent("onClientPedWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false);
+    m_Events.AddEvent("onClientPedWeaponReload", "weapon, clip, ammo", nullptr, false);
     m_Events.AddEvent("onClientPedWasted", "", NULL, false);
     m_Events.AddEvent("onClientPedChoke", "", NULL, false);
     m_Events.AddEvent("onClientPedHeliKilled", "heli", NULL, false);
