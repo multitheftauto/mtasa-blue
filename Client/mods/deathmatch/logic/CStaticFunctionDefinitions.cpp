@@ -1498,9 +1498,6 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
 {
     RUN_CHILDREN(SetElementHealth(**iter, fHealth))
 
-    if (!Entity.IsLocalEntity())
-        return false;
-
     switch (Entity.GetType())
     {
         case CCLIENTPED:
@@ -1508,6 +1505,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            if (Ped.IsLocalPlayer())
+                return false;
 
             // Set the new health
             Ped.SetHealth(Clamp(0.0f, fHealth, Ped.GetMaxHealth()));
