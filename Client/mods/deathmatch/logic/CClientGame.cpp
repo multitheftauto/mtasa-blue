@@ -2447,7 +2447,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
 
                     CVector        vecCollision;
                     ElementID      CollisionEntityID = INVALID_ELEMENT_ID;
-                    CClientEntity* pCollisionEntity = nullptr;
+                    CClientEntity* collisionEntity = nullptr;
                     
                     if (bCollision && pColPoint)
                     {
@@ -2458,7 +2458,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                             CClientEntity* pEntity = pPools->GetClientEntity((DWORD*)pGameEntity->GetInterface());
                             if (pEntity)
                             {
-                                pCollisionEntity = pEntity;
+                                collisionEntity = pEntity;
                                 if (!pEntity->IsLocalEntity())
                                     CollisionEntityID = pEntity->GetID();
                             }
@@ -2511,23 +2511,23 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         if (std::isnan(vecCollision.fZ))
                             vecCollision.fZ = 0;
 
-                        float fMarkerDistance = 0.0f;
-                        CClientMarker* pClickedMarker = CheckMarkerClick(static_cast<float>(iX), static_cast<float>(iY), fMarkerDistance);
-                        if (pClickedMarker)
+                        float markerDistance = 0.0f;
+                        CClientMarker* clickedMarker = CheckMarkerClick(static_cast<float>(iX), static_cast<float>(iY), markerDistance);
+                        if (clickedMarker)
                         {
-                            CVector vecMarkerPosition;
-                            pClickedMarker->GetPosition(vecMarkerPosition);
+                            CVector markerPosition;
+                            clickedMarker->GetPosition(markerPosition);
                             
                             CLuaArguments MarkerArguments;
                             MarkerArguments.PushString(szButton);
                             MarkerArguments.PushString(szState);
                             MarkerArguments.PushNumber(vecCursorPosition.fX);
                             MarkerArguments.PushNumber(vecCursorPosition.fY);
-                            MarkerArguments.PushNumber(vecMarkerPosition.fX);
-                            MarkerArguments.PushNumber(vecMarkerPosition.fY);
-                            MarkerArguments.PushNumber(vecMarkerPosition.fZ);
-                            MarkerArguments.PushNumber(fMarkerDistance);
-                            pClickedMarker->CallEvent("onClientMarkerClick", MarkerArguments, false);
+                            MarkerArguments.PushNumber(markerPosition.fX);
+                            MarkerArguments.PushNumber(markerPosition.fY);
+                            MarkerArguments.PushNumber(markerPosition.fZ);
+                            MarkerArguments.PushNumber(markerDistance);
+                            clickedMarker->CallEvent("onClientMarkerClick", MarkerArguments, false);
                         }
 
                         // Call the event for the client
@@ -2539,8 +2539,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         Arguments.PushNumber(vecCollision.fX);
                         Arguments.PushNumber(vecCollision.fY);
                         Arguments.PushNumber(vecCollision.fZ);
-                        if (pCollisionEntity)
-                            Arguments.PushElement(pCollisionEntity);
+                        if (collisionEntity)
+                            Arguments.PushElement(collisionEntity);
                         else
                             Arguments.PushBoolean(false);
                         m_pRootEntity->CallEvent("onClientClick", Arguments, false);
@@ -2583,8 +2583,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                                 DoubleClickArguments.PushNumber(vecCollision.fX);
                                 DoubleClickArguments.PushNumber(vecCollision.fY);
                                 DoubleClickArguments.PushNumber(vecCollision.fZ);
-                                if (pCollisionEntity)
-                                    DoubleClickArguments.PushElement(pCollisionEntity);
+                                if (collisionEntity)
+                                    DoubleClickArguments.PushElement(collisionEntity);
                                 else
                                     DoubleClickArguments.PushBoolean(false);
                                 m_pRootEntity->CallEvent("onClientDoubleClick", DoubleClickArguments, false);
