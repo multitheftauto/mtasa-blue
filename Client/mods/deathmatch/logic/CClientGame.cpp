@@ -2339,7 +2339,8 @@ CClientMarker* CClientGame::CheckMarkerClick(float screenX, float screenY, float
     camera->GetMatrix(&cameraMatrix);
     CVector origin = cameraMatrix.vPos;
     
-    CVector target, screen(screenX, screenY, CLICK_RAY_DEPTH);
+    CVector target;
+    CVector screen(screenX, screenY, CLICK_RAY_DEPTH);
     g_pCore->GetGraphics()->CalcWorldCoors(&screen, &target);
     
     CVector rayDirection = target - origin;
