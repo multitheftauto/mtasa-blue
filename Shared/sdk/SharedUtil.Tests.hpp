@@ -789,7 +789,7 @@ void SharedUtil_Hash_Tests()
         switch (algorithm)
         {
             case HmacAlgorithm::MD5:
-                hmacResult = SharedUtil::Hmac<CryptoPP::Weak::MD5>(data, key);
+                hmacResult = SharedUtil::Hmac<CryptoPP::MD5>(data, key);
                 break;
             case HmacAlgorithm::SHA1:
                 hmacResult = SharedUtil::Hmac<CryptoPP::SHA1>(data, key);
