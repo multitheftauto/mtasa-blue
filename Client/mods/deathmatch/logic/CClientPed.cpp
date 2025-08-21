@@ -4682,7 +4682,7 @@ bool CClientPed::IsOnGround(bool checkVehicles)
     if (DefinitelyLessThan(vecPosition.fZ, fGroundLevel))
         return false;
 
-    bool isOnGround = DefinitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f) || EssentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f);
+    bool isOnGround = DefinitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f, 1e-4f) || EssentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f, 1e-4f);
     if (!isOnGround && checkVehicles && m_pPlayerPed)
         return m_pPlayerPed->IsStandingOnEntity();
 
