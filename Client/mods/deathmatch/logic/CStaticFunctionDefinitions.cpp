@@ -1079,7 +1079,7 @@ bool CStaticFunctionDefinitions::SetElementPosition(CClientEntity& Entity, const
     if (Entity.GetType() == CCLIENTVEHICLE)
     {
         CClientPed* driver = static_cast<CClientVehicle&>(Entity).GetOccupant(0);
-        if (!Entity.IsLocalEntity() && !static_cast<CDeathmatchVehicle&>(Entity).IsSyncing() && (driver && !driver->IsLocalPlayer()))
+        if (!Entity.IsLocalEntity() && !static_cast<CDeathmatchVehicle&>(Entity).IsSyncing() && (!driver || !driver->IsLocalPlayer()))
             return false;
     }
 
