@@ -546,35 +546,35 @@ void CClientMarker::SetIgnoreAlphaLimits(bool ignore)
     m_pMarker->SetIgnoreAlphaLimits(ignore);
 }
 
-bool CClientMarker::IsClientSideOnScreen()
+bool CClientMarker::IsClientSideOnScreen() noexcept
 {
     if (!IsStreamedIn() || !IsVisible())
         return false;
 
-    CVector vecPosition;
-    GetPosition(vecPosition);
+    CVector position;
+    GetPosition(position);
 
-    CVector vecScreen;
-    g_pCore->GetGraphics()->CalcScreenCoors(&vecPosition, &vecScreen);
+    CVector screen;
+    g_pCore->GetGraphics()->CalcScreenCoors(&position, &screen);
 
-    if (vecScreen.fZ <= CLIENT_MARKER_ONSCREEN_THRESHOLD)
+    if (screen.fZ <= CLIENT_MARKER_ONSCREEN_THRESHOLD)
         return false;
 
-    float fResWidth = static_cast<float>(g_pCore->GetGraphics()->GetViewportWidth());
-    float fResHeight = static_cast<float>(g_pCore->GetGraphics()->GetViewportHeight());
+    float resWidth = static_cast<float>(g_pCore->GetGraphics()->GetViewportWidth());
+    float resHeight = static_cast<float>(g_pCore->GetGraphics()->GetViewportHeight());
 
     CSphere boundingSphere = GetWorldBoundingSphere();
-    CVector vecEdgePos = boundingSphere.vecPosition;
-    vecEdgePos.fX += boundingSphere.fRadius;
+    CVector edgePos = boundingSphere.vecPosition;
+    edgePos.fX += boundingSphere.fRadius;
 
-    CVector vecEdgeScreen;
-    g_pCore->GetGraphics()->CalcScreenCoors(&vecEdgePos, &vecEdgeScreen);
+    CVector edgeScreen;
+    g_pCore->GetGraphics()->CalcScreenCoors(&edgePos, &edgeScreen);
 
-    if (vecEdgeScreen.fZ <= CLIENT_MARKER_ONSCREEN_THRESHOLD)
+    if (edgeScreen.fZ <= CLIENT_MARKER_ONSCREEN_THRESHOLD)
         return true;
 
-    float fScreenRadius = fabs(vecEdgeScreen.fX - vecScreen.fX);
+    float screenRadius = fabs(edgeScreen.fX - screen.fX);
 
-    return (vecScreen.fX + fScreenRadius) >= 0.0f && (vecScreen.fX - fScreenRadius) <= fResWidth &&
-           (vecScreen.fY + fScreenRadius) >= 0.0f && (vecScreen.fY - fScreenRadius) <= fResHeight;
+    return (screen.fX + screenRadius) >= 0.0f && (screen.fX - screenRadius) <= resWidth &&
+           (screen.fY + screenRadius) >= 0.0f && (screen.fY - screenRadius) <= resHeight;
 }

@@ -73,9 +73,9 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
-// Ray casting constants for marker click detection
-constexpr float MARKER_CLICK_RAY_DEPTH = 300.0f;     // Screen-to-world ray projection depth
-constexpr float MARKER_CLICK_MAX_DISTANCE = 99999.9f; // Maximum distance for closest marker comparison
+// Ray casting constants for click detection
+constexpr float CLICK_RAY_DEPTH = 300.0f;     // Screen-to-world ray projection depth
+constexpr float MAX_CLICK_DISTANCE = 6000.0f; // Maximum distance for closest marker comparison
 
 static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
 
@@ -2329,55 +2329,55 @@ void CClientGame::ProcessServerControlBind(CControlFunctionBind* pBind)
     m_pNetAPI->RPC(KEY_BIND, bitStream.pBitStream);
 }
 
-CClientMarker* CClientGame::CheckMarkerClick(float fScreenX, float fScreenY, float& fDistance)
+CClientMarker* CClientGame::CheckMarkerClick(float screenX, float screenY, float& distance) noexcept
 {
     if (!m_pMarkerManager)
         return nullptr;
 
-    CCamera* pCamera = g_pGame->GetCamera();
-    CMatrix matCamera;
-    pCamera->GetMatrix(&matCamera);
-    CVector vecOrigin = matCamera.vPos;
+    CCamera* camera = g_pGame->GetCamera();
+    CMatrix cameraMatrix;
+    camera->GetMatrix(&cameraMatrix);
+    CVector origin = cameraMatrix.vPos;
     
-    CVector vecTarget, vecScreen(fScreenX, fScreenY, MARKER_CLICK_RAY_DEPTH);
-    g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
+    CVector target, screen(screenX, screenY, CLICK_RAY_DEPTH);
+    g_pCore->GetGraphics()->CalcWorldCoors(&screen, &target);
     
-    CVector vecRayDir = vecTarget - vecOrigin;
-    vecRayDir.Normalize();
+    CVector rayDirection = target - origin;
+    rayDirection.Normalize();
 
-    CClientMarker* pClosestMarker = nullptr;
-    float fClosestDist = MARKER_CLICK_MAX_DISTANCE;
+    CClientMarker* closestMarker = nullptr;
+    float closestDistance = MAX_CLICK_DISTANCE;
 
-    for (auto* pMarker : m_pMarkerManager->m_Markers)
+    for (auto* marker : m_pMarkerManager->m_Markers)
     {
-        if (!pMarker || !pMarker->IsStreamedIn() || !pMarker->IsVisible())
+        if (!marker || !marker->IsStreamedIn() || !marker->IsVisible())
             continue;
             
-        if (!pMarker->IsClientSideOnScreen())
+        if (!marker->IsClientSideOnScreen())
             continue;
 
-        CSphere boundingSphere = pMarker->GetWorldBoundingSphere();
+        CSphere boundingSphere = marker->GetWorldBoundingSphere();
         
-        CVector vecToSphere = boundingSphere.vecPosition - vecOrigin;
-        float fProjection = vecToSphere.DotProduct(&vecRayDir);
+        CVector toSphere = boundingSphere.vecPosition - origin;
+        float projection = toSphere.DotProduct(&rayDirection);
         
-        if (fProjection <= 0.0f)
+        if (projection <= 0.0f)
             continue;
             
-        CVector vecClosestPoint = vecOrigin + vecRayDir * fProjection;
-        float fDistanceToRay = (boundingSphere.vecPosition - vecClosestPoint).Length();
+        CVector closestPoint = origin + rayDirection * projection;
+        float distanceToRay = (boundingSphere.vecPosition - closestPoint).Length();
         
-        if (fDistanceToRay <= boundingSphere.fRadius && fProjection < fClosestDist)
+        if (distanceToRay <= boundingSphere.fRadius && projection < closestDistance)
         {
-            fClosestDist = fProjection;
-            pClosestMarker = pMarker;
+            closestDistance = projection;
+            closestMarker = marker;
         }
     }
 
-    if (pClosestMarker)
-        fDistance = fClosestDist;
+    if (closestMarker)
+        distance = closestDistance;
     
-    return pClosestMarker;
+    return closestMarker;
 }
 
 bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -2429,7 +2429,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
 
                     CVector2D vecCursorPosition((float)iX, (float)iY);
 
-                    CVector vecOrigin, vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
+                    CVector vecOrigin, vecTarget, vecScreen((float)iX, (float)iY, CLICK_RAY_DEPTH);
                     g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
 
                     // Grab the camera position
@@ -2613,7 +2613,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                 CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
                 CVector2D vecCursorPosition(((float)iX) / vecResolution.fX, ((float)iY) / vecResolution.fY);
 
-                CVector vecTarget, vecScreen((float)iX, (float)iY, MARKER_CLICK_RAY_DEPTH);
+                CVector vecTarget, vecScreen((float)iX, (float)iY, CLICK_RAY_DEPTH);
                 g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
 
                 // Call the onClientCursorMove event
