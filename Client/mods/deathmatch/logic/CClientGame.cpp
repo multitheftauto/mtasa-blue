@@ -80,7 +80,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
     // Init the global var with ourself
     g_pClientGame = this;
-    
+
     // Packet handler
     m_pPacketHandler = new CPacketHandler();
 
