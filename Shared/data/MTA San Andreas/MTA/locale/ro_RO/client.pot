@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-22 08:58+0000\n"
-"PO-Revision-Date: 2025-08-22 09:06\n"
+"PO-Revision-Date: 2025-08-22 13:41\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2837,15 +2837,15 @@ msgstr "MTA:SA nu este compatibil cu Windows 'Safe Mode'.\n\n"
 
 #: Client/loader/MainFunctions.cpp:152
 msgid "Load failed. Please ensure that the file "
-msgstr ""
+msgstr "Încărcare eșuată. Asigură-te că fișierul "
 
 #: Client/loader/MainFunctions.cpp:189
 msgid "Loading core failed. Please ensure that the latest DirectX is correctly installed."
-msgstr ""
+msgstr "Încărcare core eșuată. Asigură-te că cea mai recentă versiune de DirectX este corect instalată."
 
 #: Client/loader/MainFunctions.cpp:219 Client/loader/MainFunctions.cpp:229
 msgid "Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible."
-msgstr ""
+msgstr "Încărcare traduceri eșuată. Asigură-te că MTA San Andreas 1.6\\MTA\\locale este accesibil."
 
 #: Client/loader/MainFunctions.cpp:256
 msgid "Are you having problems running MTA:SA?.\n\n"
@@ -2948,11 +2948,14 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
-msgstr ""
+msgstr "Calea către instalarea 'MTA:SA' sau 'GTA: San Andreas'\n"
+"conține un simbol ';' (punct și virgulă).\n\n"
+"Dacă întâmpini probleme în timp ce folosești MTA:SA,\n"
+"mută instalarea către o cale care nu conține acest simbol."
 
 #: Client/loader/MainFunctions.cpp:792
 msgid "Invalid installation paths detected."
-msgstr ""
+msgstr "A fost detectată o adresă de instalare nevalidă."
 
 #: Client/loader/MainFunctions.cpp:824
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -2981,21 +2984,22 @@ msgstr "Fișierul principal are un nume incorect (%s)"
 #: Client/loader/MainFunctions.cpp:899
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr ""
+msgstr "Fișierul de date %s lipsește. Posibilă activitate virus."
 
 #: Client/loader/MainFunctions.cpp:906
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr ""
+msgstr "Fișierul de date %s este modificat. Posibilă activitate virus."
 
 #: Client/loader/MainFunctions.cpp:920
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
-msgstr ""
+msgstr "Fișiere .asi prezente în dosarul de instalare.\n\n"
+"Șterge aceste fișiere .asi dacă întâmpini probleme."
 
 #: Client/loader/MainFunctions.cpp:1096
 msgid "Invalid game paths detected."
-msgstr ""
+msgstr "Au fost detectate adrese ale jocului nevalide."
 
 #: Client/loader/MainFunctions.cpp:1103
 msgid "Fix configuration issue"
@@ -3008,11 +3012,11 @@ msgstr "Remediați eroarea de elevație"
 #: Client/loader/MainFunctions.cpp:1146
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas. [%s]"
-msgstr ""
+msgstr "Grand Theft Auto: San Andreas nu a putut fi pornit. [%s]"
 
 #: Client/loader/MainFunctions.cpp:1184
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
-msgstr ""
+msgstr "Este posibil ca GTA: San Andreas să nu fi pornit corect. Dorești să închizi?"
 
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
