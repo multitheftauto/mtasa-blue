@@ -544,8 +544,8 @@ Integer CRT(const Integer &xp, const Integer &p, const Integer &xq, const Intege
 
 Integer ModularSquareRoot(const Integer &a, const Integer &p)
 {
-	// Callers must ensure p is prime, GH #1249
-	CRYPTOPP_ASSERT(IsPrime(p));
+	if (!IsPrime(p))
+		throw InvalidArgument("ModularSquareRoot: p must be a prime");
 
 	if (p%4 == 3)
 		return a_exp_b_mod_c(a, (p+1)/4, p);
