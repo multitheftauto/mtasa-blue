@@ -12,15 +12,17 @@
 #include "StdInc.h"
 #include "CLuaWaterDefs.h"
 #include "CWater.h"
+#include "CWaterManager.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaWaterDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createWater", CreateWater},
         {"setWaterLevel", SetWaterLevel},
-        {"resetWaterLevel", ResetWaterLevel},
+        {"resetWaterLevel", ArgumentParserWarn<false, ResetWaterLevel>},
         {"getWaterVertexPosition", GetWaterVertexPosition},
         {"setWaterVertexPosition", SetWaterVertexPosition},
         {"getWaterColor", GetWaterColor},
@@ -167,11 +169,42 @@ int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWaterDefs::ResetWaterLevel(lua_State* luaVM)
+bool CLuaWaterDefs::ResetWaterLevel(std::variant<std::monostate, bool, std::vector<CWater*>, CWater*> resetElements)
 {
-    CStaticFunctionDefinitions::ResetWorldWaterLevel();
-    lua_pushboolean(luaVM, true);
-    return 1;
+    CWaterManager* pWaterManager = g_pGame->GetWaterManager();
+
+    switch (resetElements.index())
+    {
+        case 0:
+            CStaticFunctionDefinitions::ResetWorldWaterLevel();
+            break;
+
+        case 1:
+        {
+            if (std::get<bool>(resetElements) == true)
+                pWaterManager->ResetAllElementWaterLevel();
+            else
+                CStaticFunctionDefinitions::ResetWorldWaterLevel();
+
+            break;
+        }
+
+        case 2:
+        {
+            auto& vecWaterElements = std::get<std::vector<CWater*>>(resetElements);
+            pWaterManager->ResetElementWaterLevel(vecWaterElements);
+            break;
+        }
+
+        case 3:
+        {
+            auto pWaterElement = std::get<CWater*>(resetElements);
+            pWaterManager->ResetElementWaterLevel(pWaterElement);
+            break;
+        }
+    }
+
+    return true;
 }
 
 int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)
