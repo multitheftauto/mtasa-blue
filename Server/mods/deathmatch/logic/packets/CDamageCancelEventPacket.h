@@ -25,6 +25,7 @@ public:
     bool Read(NetBitStreamInterface& bitStream) noexcept;
 
     ElementID   GetDamagedEntityID() const noexcept { return m_damagedEntityID; }
+    ElementID   GetAtackerEntityID() const noexcept { return m_atackerEntityID; }
     eWeaponType GetWeaponType() const noexcept { return m_weaponType; }
     float       GetDamage() const noexcept { return m_damage; }
     std::string GetResourceName() const noexcept { return m_resourceName; }
@@ -32,6 +33,7 @@ public:
 private:
     std::string m_resourceName{};
     ElementID   m_damagedEntityID;
+    ElementID   m_atackerEntityID{INVALID_ELEMENT_ID};
     float       m_damage;
     eWeaponType m_weaponType;
 };

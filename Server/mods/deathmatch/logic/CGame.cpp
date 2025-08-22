@@ -1657,7 +1657,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
     m_Events.AddEvent("onPlayerChangesWorldSpecialProperty", "property, enabled", nullptr, false);
     m_Events.AddEvent("onPlayerTeleport", "previousX, previousY, previousZ, currentX, currentY, currentZ", nullptr, false);
-    m_Events.AddEvent("onDamageEventCancelled", "damagedEntity, weapon, damage, resourceName", nullptr, false);
+    m_Events.AddEvent("onDamageEventCancelled", "attacker, damagedEntity, weapon, damage, resourceName", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -4224,7 +4224,14 @@ void CGame::Packet_CancelDamageEvent(CDamageCancelEventPacket& packet) noexcept
     if (!damagedEntity)
         return;
 
+    CElement* attackerEntity = CElementIDs::GetElement(packet.GetAtackerEntityID());
+
     CLuaArguments arguments;
+    if (attackerEntity)
+        arguments.PushElement(attackerEntity);
+    else
+        arguments.PushNil();
+
     arguments.PushElement(damagedEntity);
     arguments.PushNumber(packet.GetWeaponType());
     arguments.PushNumber(packet.GetDamage());

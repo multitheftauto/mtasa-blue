@@ -16,6 +16,9 @@ bool CDamageCancelEventPacket::Read(NetBitStreamInterface& bitStream) noexcept
 {
     bitStream.Read(m_damagedEntityID);
 
+    if (bitStream.ReadBit())
+        bitStream.Read(m_atackerEntityID);
+
     SWeaponTypeSync weaponType;
     bitStream.Read(&weaponType);
     m_weaponType = static_cast<eWeaponType>(weaponType.data.ucWeaponType);

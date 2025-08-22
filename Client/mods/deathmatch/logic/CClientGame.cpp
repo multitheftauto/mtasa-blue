@@ -4436,6 +4436,10 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 
                 bitStream->Write(pDamagedPed->GetID());
 
+                bitStream->WriteBit(pInflictingEntity != nullptr);
+                if (pInflictingEntity)
+                    bitStream->Write(pInflictingEntity->GetID());
+
                 SWeaponTypeSync weapon;
                 weapon.data.ucWeaponType = weaponUsed;
                 bitStream->Write(&weapon);
