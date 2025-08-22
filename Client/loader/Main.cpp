@@ -23,24 +23,63 @@
 #include <version.h>
 #include <memory>
 #include <algorithm>
+#include <cassert>
+
+#if __cplusplus >= 201703L
+    #define MAYBE_UNUSED [[maybe_unused]]
+#else
+    #define MAYBE_UNUSED
+#endif
 
 namespace {
-    // Constants
+    // Error codes enum for better maintainability
+    enum ErrorCode : int {
+        ERROR_NULL_INSTANCE = -1,
+        ERROR_NULL_INSTALL_MANAGER = -2,
+        ERROR_LAUNCH_EXCEPTION = -3,
+        ERROR_INSTALL_CONTINUE = -4
+    };
+    
+    // Command line constants
     constexpr size_t MAX_CMD_LINE_LENGTH = 4096;
-    constexpr int ERROR_NULL_INSTANCE = -1;
-    constexpr int ERROR_NULL_INSTALL_MANAGER = -2;
-    constexpr int ERROR_LAUNCH_EXCEPTION = -3;
-    constexpr int ERROR_INSTALL_CONTINUE = -4;
     
     // Report log IDs
     constexpr int LOG_ID_END = 1044;
     constexpr int LOG_ID_CONTINUE_EXCEPTION = 1045;
     constexpr int LOG_ID_LAUNCH_EXCEPTION = 1046;
+    
+    // Compile-time checks  
+    static_assert(MAX_CMD_LINE_LENGTH > 0, "Command line buffer size must be positive");
+    static_assert(MAX_CMD_LINE_LENGTH <= 65536, "Command line buffer size seems unreasonably large");
+    static_assert(sizeof(DWORD) >= sizeof(int), "DWORD must be at least as large as int");
 
     class Utf8FileHooksGuard {
+    private:
+        bool m_released = false;
+        
     public:
-        Utf8FileHooksGuard() { AddUtf8FileHooks(); }
-        ~Utf8FileHooksGuard() { RemoveUtf8FileHooks(); }
+        Utf8FileHooksGuard() { 
+            AddUtf8FileHooks(); 
+        }
+        
+        ~Utf8FileHooksGuard() noexcept { 
+            if (!m_released) {
+                RemoveUtf8FileHooks();
+            }
+        }
+        
+        // Called when we want to keep hooks active (early return with error)
+        void release() noexcept { 
+            m_released = true; 
+        }
+        
+        // Called when we want to remove hooks early (on GetInstallManager failure)
+        void removeNow() noexcept {
+            if (!m_released) {
+                RemoveUtf8FileHooks();
+                m_released = true;
+            }
+        }
         
         // Disable copy and move
         Utf8FileHooksGuard(const Utf8FileHooksGuard&) = delete;
@@ -49,8 +88,17 @@ namespace {
         Utf8FileHooksGuard& operator=(Utf8FileHooksGuard&&) = delete;
     };
 
-    inline void SafeCopyCommandLine(LPSTR lpCmdLine, char* safeCmdLine, size_t bufferSize) {
-        if (!lpCmdLine || !safeCmdLine || bufferSize == 0) {
+    inline void SafeCopyCommandLine(LPSTR lpCmdLine, char* safeCmdLine, size_t bufferSize) noexcept {
+        // Preconditions (only in debug builds)
+        assert(safeCmdLine != nullptr && "Destination buffer must not be null");
+        assert(bufferSize > 0 && "Buffer size must be positive");
+        
+        if (!safeCmdLine || bufferSize == 0) {
+            return;
+        }
+        
+        // If source is null, destination remains zero-initialized
+        if (!lpCmdLine) {
             return;
         }
         
@@ -61,7 +109,6 @@ namespace {
         safeCmdLine[cmdLineLen] = '\0';
     }
 
-
     inline DWORD GetSafeProcessId() noexcept {
         try {
             return GetCurrentProcessId();
@@ -71,67 +118,28 @@ namespace {
         }
     }
 
-    bool PerformInitialization(const char* safeCmdLine) {
+    CInstallManager* PerformEarlyInitialization(const char* safeCmdLine) {
         auto* pInstallManager = GetInstallManager();
         if (!pInstallManager) {
-            return false;
+            return nullptr;
         }
 
-        // Configure install manager
+        // Let install manager figure out what MTASA path to use
         pInstallManager->SetMTASAPathSource(safeCmdLine);
         
-        // Initialize logging
+        // Start logging.....now
         BeginEventLog();
         
-        // Start localization (non-critical, continue on failure)
+        // Start localization if possible
         InitLocalization(false);
         
-        // Handle installer commands
+        // Handle commands from the installer
         HandleSpecialLaunchOptions();
         
-        // Ensure single instance
+        // Check MTA is launched only once
         HandleDuplicateLaunching();
         
-        // Clear any pending operations
-        ClearPendingBrowseToSolution();
-        
-        // Validate GTA installation
-        ValidateGTAPath();
-        
-        return true;
-    }
-
-    void PerformPreLaunchSetup(HINSTANCE hInstance) {
-        // Ensure localization is fully initialized
-        InitLocalization(true);
-        
-        // Initialize monitoring systems
-        PreLaunchWatchDogs();
-        
-        // Handle custom configurations
-        HandleCustomStartMessage();
-        
-        #if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
-        ForbodenProgramsMessage();
-        #endif
-        
-        // Maintenance operations
-        CycleEventLog();
-        BsodDetectionPreLaunch();
-        MaybeShowCopySettingsDialog();
-        
-        // Check for conflicts
-        HandleIfGTAIsAlreadyRunning();
-		
-		// Maybe warn user if no anti-virus running
-        CheckAntiVirusStatus();
-        
-        // Show splash screen
-        ShowSplash(hInstance);
-        
-        // Verify integrity
-        CheckDataFiles();
-        CheckLibVersions();
+        return pInstallManager;
     }
 
     SString ContinueUpdateProcedure(CInstallManager* pInstallManager) {
@@ -148,13 +156,14 @@ namespace {
         }
     }
 
+	// Launch the game with exception handling
     int LaunchGameSafely(const SString& strCmdLine) {
         try {
             return LaunchGame(strCmdLine);
         }
         catch (...) {
             AddReportLog(LOG_ID_LAUNCH_EXCEPTION, "Exception in LaunchGame()");
-            return ERROR_LAUNCH_EXCEPTION;
+            return static_cast<int>(ERROR_LAUNCH_EXCEPTION);
         }
     }
 }
@@ -171,64 +180,106 @@ namespace {
 //         (Which may then call it again as admin)
 //
 ///////////////////////////////////////////////////////////////
-MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, 
-                        LPSTR lpCmdLine, int nCmdShow)
+MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPrevInstance, 
+                        LPSTR lpCmdLine, MAYBE_UNUSED int nCmdShow)
 {
-    // Validate critical parameters
+    // Silence unused parameter warnings for older compilers
+    #if __cplusplus < 201703L
+        (void)hPrevInstance;
+        (void)nCmdShow;
+    #endif
+
+    // Check for null parameters before use
     if (!hLauncherInstance) {
-        return ERROR_NULL_INSTANCE;
+        return static_cast<int>(ERROR_NULL_INSTANCE);
     }
+
+    char safeCmdLine[MAX_CMD_LINE_LENGTH] = {0};
+    SafeCopyCommandLine(lpCmdLine, safeCmdLine, sizeof(safeCmdLine));
 
     // RAII guard for UTF8 file hooks
     Utf8FileHooksGuard utf8Guard;
 
-    // Run debug tests if in debug mode
     #if defined(MTA_DEBUG)
     SharedUtil_Tests();
     #endif
 
-    // Prepare safe command line buffer
-    char safeCmdLine[MAX_CMD_LINE_LENGTH] = {0};
-    SafeCopyCommandLine(lpCmdLine, safeCmdLine, sizeof(safeCmdLine));
+    //
+    // Init
+    //
 
-    //
-    // Initialization Phase
-    //
-    if (!PerformInitialization(safeCmdLine)) {
-        return ERROR_NULL_INSTALL_MANAGER;
+    auto* pInstallManager = PerformEarlyInitialization(safeCmdLine);
+    if (!pInstallManager) {
+        // Remove hooks when install manager fails
+        utf8Guard.removeNow();
+        return static_cast<int>(ERROR_NULL_INSTALL_MANAGER);
     }
 
-    // Show initial splash screen
-    ShowSplash(hLauncherInstance);
-
-    //
-    // Update Phase
-    //
-    auto* pInstallManager = GetInstallManager();
-    const SString strCmdLine = ContinueUpdateProcedure(pInstallManager);
-
-    //
-    // Pre-Launch Phase
-    //
-    PerformPreLaunchSetup(hLauncherInstance);
-
-    //
-    // Launch Phase
-    //
-    const int iReturnCode = LaunchGameSafely(strCmdLine);
+    HINSTANCE hInstanceToUse = hLauncherInstance;
     
-    // Post-launch monitoring
+    // Show logo
+    ShowSplash(hInstanceToUse);
+
+    // Other init stuff
+    ClearPendingBrowseToSolution();
+
+    // Find GTA path to use
+    ValidateGTAPath();
+
+
+    // Continue any update procedure
+    SString strCmdLine = ContinueUpdateProcedure(pInstallManager);
+
+    // Ensure localization is started
+    InitLocalization(true);
+
+    // Setup/test various counters and flags for monitoring problems
+    PreLaunchWatchDogs();
+
+    // Stuff
+    HandleCustomStartMessage();
+
+    #if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
+    ForbodenProgramsMessage();
+    #endif
+
+    CycleEventLog();
+    BsodDetectionPreLaunch();
+    MaybeShowCopySettingsDialog();
+
+    // Make sure GTA is not running
+    HandleIfGTAIsAlreadyRunning();
+
+    // Maybe warn user if no anti-virus running
+    CheckAntiVirusStatus();
+
+    // Ensure logo is showing
+    ShowSplash(hInstanceToUse);
+
+    // Check MTA files look good
+    CheckDataFiles();
+    CheckLibVersions();
+
+    // Go for launch
+    // Initialize return code with safe default
+    int iReturnCode = 0;
+    iReturnCode = LaunchGameSafely(strCmdLine);
+
     PostRunWatchDogs(iReturnCode);
 
     //
-    // Cleanup Phase
+    // Quit
     //
+
     HandleOnQuitCommand();
+
+    // Maybe show help if trouble was encountered
     ProcessPendingBrowseToSolution();
 
-    // Log termination details
-    const DWORD currentPid = GetSafeProcessId();
-    AddReportLog(LOG_ID_END, SString("* End (0x%X)* pid:%d", iReturnCode, currentPid));
+    // Get current process ID for logging
+    DWORD currentPid = GetSafeProcessId();
 
+    AddReportLog(LOG_ID_END, SString("* End (0x%X)* pid:%d", iReturnCode, currentPid));
+    
     return iReturnCode;
 }
