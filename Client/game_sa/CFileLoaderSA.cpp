@@ -34,12 +34,18 @@ CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(SFileObjectInstance* obj)
     return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*, const char*))0x538090)(obj, nullptr);
 }
 
+CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(const char* szLine)
+{
+    // Delegate to the global function that does the actual work
+    return CFileLoader_LoadObjectInstance(szLine);
+}
+
 class CAtomicModelInfo
 {
 public:
-    void CAtomicModelInfo::DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfo*))(*(void***)this)[8])(this); }
+    void DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfo*))(*(void***)this)[8])(this); }
 
-    void CAtomicModelInfo::SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfo*, RpAtomic*))(*(void***)this)[15])(this, atomic); }
+    void SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfo*, RpAtomic*))(*(void***)this)[15])(this, atomic); }
 };
 
 class CDamagableModelInfo
@@ -70,9 +76,10 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
     // Copy `nodeName` into `outName` with `off` trimmed from the end
     // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
     const auto TerminatedCopy = [&](size_t off) {
-        dassert(nodeNameLen - off < OutBuffSize);
-        strncpy_s(outName, nodeName,
-                  std::min(nodeNameLen - off, OutBuffSize - 1));            // By providing `OutBuffSize - 1` it is ensured the array will be null terminated
+        dassert(nodeNameLen >= off && nodeNameLen - off < OutBuffSize);
+        const size_t copyLen = std::min(nodeNameLen - off, OutBuffSize - 1);
+        strncpy_s(outName, nodeName, copyLen);
+        outName[copyLen] = '\0';  // Ensure null termination
     };
 
     if (NodeNameEndsWith("_dam"))
@@ -90,7 +97,9 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
         else
         {
             dassert(nodeNameLen < OutBuffSize);
-            strncpy_s(outName, OutBuffSize, nodeName, OutBuffSize - 1);
+            const size_t copyLen = std::min(nodeNameLen, OutBuffSize - 1);
+            strncpy_s(outName, OutBuffSize, nodeName, copyLen);
+            outName[copyLen] = '\0';  // Ensure null termination
         }
     }
 }
@@ -172,7 +181,19 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     RwFrame*                   pOldFrame = reinterpret_cast<RwFrame*>(atomic->object.object.parent);
     char*                      frameNodeName = GetFrameNodeName(pOldFrame);
     bool                       bDamage = false;
-    GetNameAndDamage(frameNodeName, name, bDamage);
+
+    // Check for null pointers before using them
+    if (!frameNodeName)
+    {
+        // Handle case where frame node name is null
+        strcpy_s(name, sizeof(name), "unknown");
+        bDamage = false;
+    }
+    else
+    {
+        GetNameAndDamage(frameNodeName, name, bDamage);
+    }
+
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
     RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);
@@ -212,16 +233,34 @@ CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
     char                szModelName[24];
     SFileObjectInstance inst;
 
-    sscanf(szLine, "%d %s %d %f %f %f %f %f %f %f %d", &inst.modelID, szModelName, &inst.interiorID, &inst.position.fX, &inst.position.fY, &inst.position.fZ,
+    // Use safer scanf with width specifier to prevent buffer overflow
+    int result = sscanf(szLine, "%d %23s %d %f %f %f %f %f %f %f %d", &inst.modelID, szModelName, &inst.interiorID, &inst.position.fX, &inst.position.fY, &inst.position.fZ,
            &inst.rotation.fX, &inst.rotation.fY, &inst.rotation.fZ, &inst.rotation.fW, &inst.lod);
+    
+    // Check if all expected fields were parsed
+    if (result != 11) {
+        // Return null or handle error appropriately
+        return nullptr;
+    }
 
     /*
-       A quaternion is must be normalized. GTA is relying on an internal R* exporter and everything is OK,
+       A quaternion must be normalized. GTA is relying on an internal R* exporter and everything is OK,
        but custom exporters might not contain the normalization. And we must do it instead.
    */
     const float fLenSq = inst.rotation.LengthSquared();
     if (fLenSq > 0.0f && std::fabs(fLenSq - 1.0f) > std::numeric_limits<float>::epsilon())
-        inst.rotation /= std::sqrt(fLenSq);
+    {
+        const float fLength = std::sqrt(fLenSq);
+        inst.rotation /= fLength;
+    }
+    else if (fLenSq <= 0.0f)
+    {
+        // Handle degenerate case: set to identity quaternion
+        inst.rotation.fX = 0.0f;
+        inst.rotation.fY = 0.0f;
+        inst.rotation.fZ = 0.0f;
+        inst.rotation.fW = 1.0f;
+    }
 
     return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*))0x538090)(&inst);
 }
