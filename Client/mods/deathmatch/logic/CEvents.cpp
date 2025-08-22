@@ -147,8 +147,9 @@ void CEvents::PostEventPulse()
     m_CancelledList.pop_back();
 }
 
-void CEvents::CancelEvent(bool bCancelled)
+void CEvents::CancelEvent(bool bCancelled, const std::string& resourceName)
 {
+    m_eventCancellingResourceName = resourceName;
     m_bEventCancelled = bCancelled;
 }
 

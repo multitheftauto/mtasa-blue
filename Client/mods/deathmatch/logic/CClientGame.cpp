@@ -74,12 +74,13 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
 static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
+static constexpr int       CANCEL_DAMAGE_EVENT_INTERVAL = 1000;
 
 CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
     // Init the global var with ourself
     g_pClientGame = this;
-
+    
     // Packet handler
     m_pPacketHandler = new CPacketHandler();
 
@@ -4428,6 +4429,29 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             }
             pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
             pDamagedPed->GetGamePlayer()->SetArmor(fPreviousArmor);
+
+            if (GetTickCount64_() - m_lastCancelDamageEventTime_Ped >= CANCEL_DAMAGE_EVENT_INTERVAL && weaponUsed != eWeaponType::WEAPONTYPE_DROWNING)
+            {
+                NetBitStreamInterface* bitStream = g_pNet->AllocateNetBitStream();
+
+                bitStream->Write(pDamagedPed->GetID());
+
+                SWeaponTypeSync weapon;
+                weapon.data.ucWeaponType = weaponUsed;
+                bitStream->Write(&weapon);
+
+                SFloatSync<8, 10> damage;
+                damage.data.fValue = fDamage;
+                bitStream->Write(&damage);
+
+                bitStream->WriteString(m_pLuaManager->GetEvents()->GetEventCancellingResourceName());
+
+                g_pNet->SendPacket(PACKET_ID_CANCEL_DAMAGE_EVENT, bitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+                g_pNet->DeallocateNetBitStream(bitStream);
+
+                m_lastCancelDamageEventTime_Ped = GetTickCount64_();
+            }
+
             return false;
         }
 
@@ -4787,6 +4811,28 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         if (!pClientVehicle->CallEvent("onClientVehicleDamage", Arguments, true))
         {
             bAllowDamage = false;
+
+            if (GetTickCount64_() - m_lastCancelDamageEventTime_Vehicle >= CANCEL_DAMAGE_EVENT_INTERVAL)
+            {
+                NetBitStreamInterface* bitStream = g_pNet->AllocateNetBitStream();
+
+                bitStream->Write(pClientVehicle->GetID());
+
+                SWeaponTypeSync weapon;
+                weapon.data.ucWeaponType = weaponType;
+                bitStream->Write(&weapon);
+
+                SFloatSync<8, 10> damage;
+                damage.data.fValue = fLoss;
+                bitStream->Write(&damage);
+
+                bitStream->WriteString(m_pLuaManager->GetEvents()->GetEventCancellingResourceName());
+
+                g_pNet->SendPacket(PACKET_ID_CANCEL_DAMAGE_EVENT, bitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+                g_pNet->DeallocateNetBitStream(bitStream);
+
+                m_lastCancelDamageEventTime_Vehicle = GetTickCount64_();
+            }
         }
     }
 

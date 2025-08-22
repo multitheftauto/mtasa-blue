@@ -874,6 +874,8 @@ private:
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
     
     long long m_timeLastDiscordStateUpdate;
+    std::int64_t m_lastCancelDamageEventTime_Ped;
+    std::int64_t m_lastCancelDamageEventTime_Vehicle;
 };
 
 extern CClientGame* g_pClientGame;

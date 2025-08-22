@@ -270,7 +270,7 @@ int CLuaFunctionDefs::TriggerServerEvent(lua_State* luaVM)
 int CLuaFunctionDefs::CancelEvent(lua_State* luaVM)
 {
     // Cancel it
-    if (CStaticFunctionDefinitions::CancelEvent(true))
+    if (CStaticFunctionDefinitions::CancelEvent(true, m_pLuaManager->GetVirtualMachine(luaVM)))
     {
         lua_pushboolean(luaVM, true);
         return 1;

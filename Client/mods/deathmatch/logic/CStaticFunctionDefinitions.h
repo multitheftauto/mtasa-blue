@@ -35,7 +35,7 @@ public:
     static bool TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments);
     static bool TriggerLatentServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain,
                                          ushort usResourceNetId);
-    static bool CancelEvent(bool bCancel);
+    static bool CancelEvent(bool bCancel, CLuaMain* luaMain);
     static bool WasEventCancelled();
 
     // Misc funcs

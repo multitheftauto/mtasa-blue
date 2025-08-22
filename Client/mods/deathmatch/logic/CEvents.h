@@ -42,8 +42,10 @@ public:
     void PreEventPulse();
     void PostEventPulse();
 
-    void CancelEvent(bool bCancelled = true);
+    void CancelEvent(bool bCancelled = true, const std::string& resourceName = std::string());
     bool WasEventCancelled();
+
+    std::string GetEventCancellingResourceName() const noexcept { return m_eventCancellingResourceName; }
 
 private:
     void RemoveAllEvents();
@@ -52,4 +54,5 @@ private:
     std::vector<int>               m_CancelledList;
     bool                           m_bEventCancelled;
     bool                           m_bWasEventCancelled;
+    std::string                    m_eventCancellingResourceName{};
 };
