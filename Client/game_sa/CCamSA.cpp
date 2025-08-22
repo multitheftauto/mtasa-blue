@@ -28,7 +28,14 @@ CEntity* CCamSA::GetTargetEntity() const
 
 void CCamSA::SetTargetEntity(CEntity* pEntity)
 {
-    m_pInterface->CamTargetEntity = pEntity->GetInterface();
+    if (pEntity)
+    {
+        m_pInterface->CamTargetEntity = pEntity->GetInterface();
+    }
+    else
+    {
+        m_pInterface->CamTargetEntity = nullptr;
+    }
 }
 
 void CCamSA::GetDirection(float& fHorizontal, float& fVertical)

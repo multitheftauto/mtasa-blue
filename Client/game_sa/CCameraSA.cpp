@@ -77,11 +77,17 @@ void CCameraSA::RestoreWithJumpCut()
  */
 void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle)
 {
+    if (!entity)
+        return;
+        
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(entity);
     if (!pEntitySA)
         return;
 
     CEntitySAInterface* entityInterface = pEntitySA->GetInterface();
+    if (!entityInterface)
+        return;
+        
     CCameraSAInterface* cameraInterface = GetInterface();
     // __thiscall
 
@@ -99,6 +105,9 @@ void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
 
 void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
 {
+    if (!position)
+        return;
+        
     CCameraSAInterface* cameraInterface = GetInterface();
     // __thiscall
     CVector vecOffset;
@@ -210,7 +219,10 @@ CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 
 void CCameraSA::SetMatrix(CMatrix* matrix)
 {
-    CMatrix_Padded* pCamMatrix = GetInterface()->matrix;
+    if (!matrix)
+        return;
+        
+    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;
     if (pCamMatrix)
     {
         pCamMatrix->vFront = matrix->vFront;
@@ -446,7 +458,7 @@ float CCameraSA::GetShakeForce()
 
 void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
 {
-    static CCameraSAInterface* cameraInterface = GetInterface();
+    CCameraSAInterface* cameraInterface = GetInterface();
     if (radius <= 0.0f)
         return ResetShakeCamera();
 
