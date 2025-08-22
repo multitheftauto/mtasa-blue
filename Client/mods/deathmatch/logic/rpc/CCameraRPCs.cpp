@@ -42,6 +42,14 @@ void CCameraRPCs::SetCameraMatrix(NetBitStreamInterface& bitStream)
     bitStream.Read(fRoll);
     bitStream.Read(fFOV);
 
+    // Validate float values to prevent potential issues
+    if (!std::isfinite(fRoll) || !std::isfinite(fFOV) || 
+        !std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ) ||
+        !std::isfinite(vecLookAt.fX) || !std::isfinite(vecLookAt.fY) || !std::isfinite(vecLookAt.fZ))
+    {
+        return; // Invalid float values (NaN, infinity, etc.)
+    }
+
     // Validate camera pointer before use
     if (!m_pCamera)
         return;
@@ -74,6 +82,10 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
 
     CClientEntity* pEntity = CElementIDs::GetElement(targetID);
     if (!pEntity)
+        return;
+
+    // Check if entity is being deleted - critical memory safety check
+    if (pEntity->IsBeingDeleted())
         return;
 
     switch (pEntity->GetType())
