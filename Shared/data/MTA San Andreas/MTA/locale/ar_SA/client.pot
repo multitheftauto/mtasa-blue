@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-11 18:27+0000\n"
-"PO-Revision-Date: 2025-08-12 04:21\n"
+"POT-Creation-Date: 2025-08-21 03:00+0000\n"
+"PO-Revision-Date: 2025-08-21 21:03\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
 #: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
-#: Client/core/CVersionUpdater.cpp:2152 Client/core/CMainMenu.cpp:1222
+#: Client/core/CVersionUpdater.cpp:2152 Client/core/CMainMenu.cpp:1226
 #: Client/loader/Dialogs.cpp:37
 msgid "OK"
 msgstr "موافق"
@@ -51,7 +51,7 @@ msgstr "إلغاء"
 #: Client/core/CSettings.cpp:4777 Client/core/CSettings.cpp:4830
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1202
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1206
 #: Client/core/ServerBrowser/CServerInfo.cpp:481 Client/loader/Dialogs.cpp:35
 msgid "Yes"
 msgstr "نعم"
@@ -108,7 +108,7 @@ msgstr "تفعيل خريطة الرادار"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map in"
-msgstr "يصغر خريطة اللاعب"
+msgstr "تصغير خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map out"
@@ -132,7 +132,7 @@ msgstr "يحرك خريطة اللاعب إلى الغرب"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the player-map"
-msgstr "يُلحق خريطة اللاعب"
+msgstr "يربط خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces player-map opacity"
@@ -144,7 +144,7 @@ msgstr "يزيد وضوح خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles player-map help text"
-msgstr "يبدل نص مساعده خريطة اللاعب"
+msgstr "يبدّل عرض نص مساعدة خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
@@ -543,11 +543,11 @@ msgstr "يقاتل في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Throwing fists in"
-msgstr "يرمي القبضات في"
+msgstr "الاشتباك بالأيدي في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Blastin' fools in"
-msgstr "يطلق على الحمقي في"
+msgstr "تفجير الخصوم في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Shooting up"
@@ -555,7 +555,7 @@ msgstr "يطلق على"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Jetpacking in"
-msgstr "يركب الجت باك في"
+msgstr "التحليق بالسترة النفاثة في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Literally on fire in"
@@ -745,23 +745,23 @@ msgstr "قطع الاتصال: تم رفض الاتصال"
 msgid "MTA Client verification failed!"
 msgstr "فشل التحقق من العميل MTA!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
 msgid "In a ditch"
 msgstr "داخل خندق"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
 msgid "En-route to hospital"
 msgstr "في طريقه إلى المستشفى"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5644
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
 msgid "Meeting their maker"
 msgstr "ودع الحياة"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5645
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5647
 msgid "Regretting their decisions"
 msgstr "يندم على قراراته"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5645
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5647
 msgid "Wasted"
 msgstr "مات"
 
@@ -1402,7 +1402,7 @@ msgstr "العرض في المستكشف"
 #. Process affinity
 #: Client/core/CSettings.cpp:1222
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr "تعيين ارتباط المعالج CPU 0 لتحسين أداء اللعبة"
+msgstr "عيّن توافقيّة المعالج CPU 0 لتحسين أداء اللعبة"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1228 Client/core/CSettings.cpp:1231
@@ -1434,7 +1434,7 @@ msgstr "يلزم إعادة التشغيل"
 #: Client/core/CSettings.cpp:4829 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1201 Client/core/ServerBrowser/CServerInfo.cpp:481
+#: Client/core/CMainMenu.cpp:1205 Client/core/ServerBrowser/CServerInfo.cpp:481
 #: Client/loader/Dialogs.cpp:36
 msgid "No"
 msgstr "لا"
@@ -1829,7 +1829,7 @@ msgstr "إصلاح حركة الفأرة - قد يتطلب إعادة تشغيل
 
 #: Client/core/CSettings.cpp:5001
 msgid "CPU affinity:"
-msgstr "ارتباط المعالج التقارب CPU:"
+msgstr "تحديد معالج CPU:"
 
 #: Client/core/CSettings.cpp:5001
 msgid "Only change if you're having stability issues."
@@ -2064,26 +2064,26 @@ msgstr "إعادة الاتصال: لم يتم تجهيز الشبكة بعد، 
 msgid "reconnect: Bad port number"
 msgstr "إعادة الاتصال: رقم المنفذ خاطئ"
 
-#: Client/core/CCommandFuncs.cpp:321
+#: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
 msgstr "إعادة الاتصال: جاري الاتصال بـ %s:%u..."
 
-#: Client/core/CCommandFuncs.cpp:325
+#: Client/core/CCommandFuncs.cpp:329
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
 msgstr "إعادة الاتصال: تعذر الاتصال بـ %s:%u!"
 
-#: Client/core/CCommandFuncs.cpp:359
+#: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
 msgstr "تمت إعادة الاختصارات الافتراضية لـ GTA"
 
-#: Client/core/CCommandFuncs.cpp:373
+#: Client/core/CCommandFuncs.cpp:377
 msgid "Saved configuration file"
 msgstr "تم حفظ ملف الإعدادات"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:452
+#: Client/core/CCommandFuncs.cpp:456
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* الرقم التسلسلي (السيريال) الخاص بك هو : %s"
@@ -2112,17 +2112,17 @@ msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 msgstr "لن تتلقى MTA تحديثات على نظامي التشغيل XP و Vista بعد يوليو 2019.\n\n"
 "يرجى تحديث ويندوز للعب على أحدث الخوادم."
 
-#: Client/core/CMainMenu.cpp:1195
+#: Client/core/CMainMenu.cpp:1199
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "سيؤدي هذا الإجراء إلى قطع اتصالك بالخادم الحالي.\n\n"
 "هل أنت متأكد من رغبتك في قطع الاتصال؟"
 
-#: Client/core/CMainMenu.cpp:1199
+#: Client/core/CMainMenu.cpp:1203
 msgid "DISCONNECT WARNING"
 msgstr "تحذير انقطع الاتصال"
 
-#: Client/core/CMainMenu.cpp:1220
+#: Client/core/CMainMenu.cpp:1224
 msgid "INFORMATION"
 msgstr "معلومات"
 
@@ -3034,8 +3034,8 @@ msgstr "من المحتمل ألا تكون GTA: San Andreas قد اشتغلت �
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr "ابدأ Grand Theft Auto: San Andreas.\n"
-"تم وضع اللعبة في مجلد ' Program Files (x86)'."
+msgstr "ابدأ تشغيل لُعْبَة Grand Theft Auto: San Andreas.\n"
+"تحقق وضع اللعبة داخل مجلد 'ملفات البرامج (x86)'."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
@@ -3046,8 +3046,8 @@ msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
 msgstr "عذرًا، لم يتم العثور على اللعبة.\n"
-"قم بتشغيل لعبة Grand Theft Auto: San Andreas ثم اضغط إعادة المحاولة.\n"
-"تأكد من أن اللعبة موجودة في مجلد 'Program Files (x86)'.\n"
+"ابدأ تشغيل Grand Theft Auto: San Andreas ثم اضغط إعادة المحاولة.\n"
+"تحقق وضع اللعبة في مجلد 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
