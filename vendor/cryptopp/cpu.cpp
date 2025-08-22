@@ -22,7 +22,7 @@
 
 // For IsProcessorFeaturePresent on Microsoft Arm64 platforms,
 // https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-isprocessorfeaturepresent
-#if defined(_WIN32) && defined(_M_ARM64)
+#if defined(_WIN32) && (defined(_M_ARM64) || defined(_M_ARM64EC))
 # include <Windows.h>
 # include <processthreadsapi.h>
 #endif
@@ -145,6 +145,14 @@ inline bool IsVIA(const word32 output[4])
 		((output[1] /*EBX*/ == 0x32414956) &&
 		(output[2] /*ECX*/ == 0x32414956) &&
 		(output[3] /*EDX*/ == 0x32414956));
+}
+
+inline bool IsZhaoxin(const word32 output[4])
+{
+	// This is the "  Shanghai  " string.
+	return ((output[1] /*EBX*/ == 0x68532020) &&
+		(output[2] /*ECX*/ == 0x20206961) &&
+		(output[3] /*EDX*/ == 0x68676E61));
 }
 
 #endif  // X86, X32 and X64
@@ -694,14 +702,33 @@ void DetectX86Features()
 			}
 		}
 	}
-	else if (IsVIA(cpuid0))
+	else if (IsVIA(cpuid0) || IsZhaoxin(cpuid0))
 	{
+		CRYPTOPP_CONSTANT(RDRAND_FLAG = (1 << 30));
+		CRYPTOPP_CONSTANT(RDSEED_FLAG = (1 << 18));
+		CRYPTOPP_CONSTANT(ADX_FLAG = (1 << 19));
+		CRYPTOPP_CONSTANT(SHA_FLAG = (1 << 29));
+		CRYPTOPP_CONSTANT(AVX2_FLAG = (1 << 5));
+
 		// Two bits: available and enabled
 		CRYPTOPP_CONSTANT( RNG_FLAGS = (0x3 << 2));
 		CRYPTOPP_CONSTANT( ACE_FLAGS = (0x3 << 6));
 		CRYPTOPP_CONSTANT(ACE2_FLAGS = (0x3 << 8));
 		CRYPTOPP_CONSTANT( PHE_FLAGS = (0x3 << 10));
 		CRYPTOPP_CONSTANT( PMM_FLAGS = (0x3 << 12));
+
+		g_hasRDRAND = (cpuid1[ECX_REG] & RDRAND_FLAG) != 0;
+
+		if (cpuid0[EAX_REG] >= 7)
+		{
+			if (CpuId(7, 0, cpuid2))
+			{
+				g_hasRDSEED = (cpuid2[EBX_REG] & RDSEED_FLAG) != 0;
+				g_hasADX = (cpuid2[EBX_REG] & ADX_FLAG) != 0;
+				g_hasSHA = (cpuid2[EBX_REG] & SHA_FLAG) != 0;
+				g_hasAVX2 = (cpuid2[EBX_REG] & AVX2_FLAG) != 0;
+			}
+		}
 
 		CpuId(0xC0000000, 0, cpuid2);
 		word32 extendedFeatures = cpuid2[0];
@@ -716,9 +743,10 @@ void DetectX86Features()
 			g_hasPadlockPMM  = (cpuid2[EDX_REG] & PMM_FLAGS) != 0;
 		}
 
-		if (extendedFeatures >= 0xC0000005)
-		{
-			CpuId(0xC0000005, 0, cpuid2);
+		CpuId(0x80000000, 0, cpuid2);
+		extendedFeatures = cpuid2[EAX_REG];
+		if (extendedFeatures >= 0x80000005) {
+			CpuId(0x80000005, 0, cpuid2);
 			g_cacheLineSize = GETBYTE(cpuid2[ECX_REG], 0);
 		}
 	}
@@ -846,19 +874,24 @@ inline bool CPU_QueryARMv7()
 #if defined(__ANDROID__) && defined(__arm__)
 	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM) != 0) &&
 		((android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_ARMv7) != 0))
+# define LOCALRET true
 		return true;
 #elif defined(__linux__) && defined(__arm__)
 	if ((getauxval(AT_HWCAP) & HWCAP_ARMv7) != 0 ||
 	    (getauxval(AT_HWCAP) & HWCAP_NEON) != 0)
-		return true;
+# define LOCALRET true
 #elif defined(__APPLE__) && defined(__arm__)
 	// Apple hardware is ARMv7 or above.
 	return true;
-#elif defined(_WIN32) && defined(_M_ARM64)
+#elif defined(_WIN32) && (defined(_M_ARM64) || defined(_M_ARM64EC))
 	// Windows 10 ARM64 is only supported on Armv8a and above
-	return true;
+# define LOCALRET true
 #endif
-	return false;
+#ifndef LOCALRET
+# define LOCALRET false
+#endif
+	return LOCALRET;
+#undef LOCALRET
 }
 
 inline bool CPU_QueryNEON()
@@ -884,7 +917,7 @@ inline bool CPU_QueryNEON()
 	// Core feature set for Aarch32 and Aarch64.
 	if (IsAppleMachineARMv8())
 		return true;
-#elif defined(_WIN32) && defined(_M_ARM64)
+#elif defined(_WIN32) && (defined(_M_ARM64) || defined(_M_ARM64EC))
 	// Windows 10 ARM64 is only supported on Armv8a and above
 	if (IsProcessorFeaturePresent(PF_ARM_V8_INSTRUCTIONS_AVAILABLE) != 0)
 		return true;
@@ -912,7 +945,7 @@ inline bool CPU_QueryCRC32()
 	// M1 processor
 	if (IsAppleMachineARMv82())
 		return true;
-#elif defined(_WIN32) && defined(_M_ARM64)
+#elif defined(_WIN32) && (defined(_M_ARM64) || defined(_M_ARM64EC))
 	if (IsProcessorFeaturePresent(PF_ARM_V8_CRC32_INSTRUCTIONS_AVAILABLE) != 0)
 		return true;
 #endif
@@ -939,7 +972,7 @@ inline bool CPU_QueryPMULL()
 	// M1 processor
 	if (IsAppleMachineARMv82())
 		return true;
-#elif defined(_WIN32) && defined(_M_ARM64)
+#elif defined(_WIN32) && (defined(_M_ARM64) || defined(_M_ARM64EC))
 	if (IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE) != 0)
 		return true;
 #endif
@@ -966,7 +999,7 @@ inline bool CPU_QueryAES()
 	// M1 processor
 	if (IsAppleMachineARMv82())
 		return true;
-#elif defined(_WIN32) && defined(_M_ARM64)
+#elif defined(_WIN32) && (defined(_M_ARM64) || defined(_M_ARM64EC))
 	if (IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE) != 0)
 		return true;
 #endif
@@ -993,7 +1026,7 @@ inline bool CPU_QuerySHA1()
 	// M1 processor
 	if (IsAppleMachineARMv82())
 		return true;
-#elif defined(_WIN32) && defined(_M_ARM64)
+#elif defined(_WIN32) && (defined(_M_ARM64) || defined(_M_ARM64EC))
 	if (IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE) != 0)
 		return true;
 #endif
@@ -1020,7 +1053,7 @@ inline bool CPU_QuerySHA256()
 	// M1 processor
 	if (IsAppleMachineARMv82())
 		return true;
-#elif defined(_WIN32) && defined(_M_ARM64)
+#elif defined(_WIN32) && (defined(_M_ARM64) || defined(_M_ARM64EC))
 	if (IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE) != 0)
 		return true;
 #endif

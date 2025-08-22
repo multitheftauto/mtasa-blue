@@ -45,6 +45,7 @@
 #include "CRegistryManager.h"
 #include "CLatentTransferManager.h"
 #include "CCommandFile.h"
+#include "CWeaponNames.h"
 #include "packets/CVoiceEndPacket.h"
 #include "packets/CEntityAddPacket.h"
 #include "packets/CUpdateInfoPacket.h"
@@ -2505,59 +2506,77 @@ void CGame::Packet_Keysync(CKeysyncPacket& Packet)
     }
 }
 
-void CGame::Packet_Bulletsync(CBulletsyncPacket& Packet)
+void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
 {
-    // Grab the source player
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer && pPlayer->IsJoined())
-    {
-        // Early return when the player attempts to fire a weapon they do not have
-        if (!pPlayer->HasWeaponType(Packet.m_WeaponType))
-            return;
+    auto* player = packet.GetSourcePlayer();
+    if (!player || !player->IsJoined())
+        return;
 
-        // Relay to other players
-        RelayNearbyPacket(Packet);
+    const auto type = static_cast<std::uint8_t>(packet.m_weapon);
+    if (!player->HasWeaponType(type))
+        return;
 
-        // Call event
-        CLuaArguments Arguments;
-        Arguments.PushNumber(Packet.m_WeaponType);
-        Arguments.PushNumber(Packet.m_vecEnd.fX);
-        Arguments.PushNumber(Packet.m_vecEnd.fY);
-        Arguments.PushNumber(Packet.m_vecEnd.fZ);
+    const auto slot = CWeaponNames::GetSlotFromWeapon(type);
+    if (player->GetWeaponTotalAmmo(slot) <= 0)
+        return;
 
-        if (Packet.m_DamagedPlayerID == INVALID_ELEMENT_ID)
-        {
-            Arguments.PushNil();
-        }
-        else
-        {
-            Arguments.PushElement(CElementIDs::GetElement(Packet.m_DamagedPlayerID));
-        }
+    if (player->GetWeaponAmmoInClip(slot) <= 0)
+        return;
 
-        Arguments.PushNumber(Packet.m_vecStart.fX);
-        Arguments.PushNumber(Packet.m_vecStart.fY);
-        Arguments.PushNumber(Packet.m_vecStart.fZ);
-        pPlayer->CallEvent("onPlayerWeaponFire", Arguments);
-    }
+    const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
+    const auto level = player->GetPlayerStat(stat);
+    auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
+
+    const float distance = (packet.m_start - packet.m_end).LengthSquared();
+    const float range = stats->GetWeaponRange();
+    const float rangesq = range * range;
+
+    const float delta = std::fabs(distance - rangesq);
+    const float max = std::max(distance, rangesq);
+    if (delta > max * FLOAT_EPSILON)
+        return;
+
+    CLuaArguments args;
+    args.PushNumber(packet.m_weapon);
+    args.PushNumber(packet.m_end.fX);
+    args.PushNumber(packet.m_end.fY);
+    args.PushNumber(packet.m_end.fZ);
+
+    if (packet.m_damaged == INVALID_ELEMENT_ID)
+        args.PushNil();
+    else
+        args.PushElement(CElementIDs::GetElement(packet.m_damaged));
+
+    args.PushNumber(packet.m_start.fX);
+    args.PushNumber(packet.m_start.fY);
+    args.PushNumber(packet.m_start.fZ);
+
+    player->CallEvent("onPlayerWeaponFire", args);
 }
 
-void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& Packet)
+void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& packet)
 {
-    // Grab the source player
-    CPlayer*       pPlayer = Packet.GetSourcePlayer();
-    CCustomWeapon* pWeapon = Packet.GetWeapon();
-    if (pPlayer && pPlayer->IsJoined() && pPlayer == Packet.GetWeaponOwner())
-    {
-        // Tell our scripts the player has fired
-        CLuaArguments Arguments;
-        Arguments.PushElement(pPlayer);
+    auto* player = packet.GetSourcePlayer();
+    if (!player || !player->IsJoined())
+        return;
 
-        if (pWeapon->CallEvent("onWeaponFire", Arguments))
-        {
-            // Relay to other players
-            m_pPlayerManager->BroadcastOnlyJoined(Packet, pPlayer);
-        }
-    }
+    if (player != packet.GetWeaponOwner())
+        return;
+
+    auto* weapon = packet.GetWeapon();
+    if (weapon->GetAmmo() <= 0)
+        return;
+
+    if (weapon->GetClipAmmo() <= 0)
+        return;
+
+    CLuaArguments args;
+    args.PushElement(player);
+
+    if (!weapon->CallEvent("onWeaponFire", args))
+        return;
+
+    m_pPlayerManager->BroadcastOnlyJoined(packet, player);
 }
 
 void CGame::Packet_PedTask(CPedTaskPacket& Packet)
