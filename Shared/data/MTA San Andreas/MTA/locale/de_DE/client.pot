@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-22 08:58+0000\n"
-"PO-Revision-Date: 2025-08-22 09:05\n"
+"PO-Revision-Date: 2025-08-22 19:21\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -2830,15 +2830,15 @@ msgstr "MTA:SA ist nicht kompatibel mit dem 'abgesicherten Modus'.\n\n"
 
 #: Client/loader/MainFunctions.cpp:152
 msgid "Load failed. Please ensure that the file "
-msgstr ""
+msgstr "Ladevorgang fehlgeschlagen. Bitte Stelle sicher, dass die Datei "
 
 #: Client/loader/MainFunctions.cpp:189
 msgid "Loading core failed. Please ensure that the latest DirectX is correctly installed."
-msgstr ""
+msgstr "Laden des Kerns fehlgeschlagen. Bitte stelle sicher, dass DirectX aktuell und korrekt installiert ist."
 
 #: Client/loader/MainFunctions.cpp:219 Client/loader/MainFunctions.cpp:229
 msgid "Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible."
-msgstr ""
+msgstr "Laden der Lokalisierung fehlgeschlagen. Bitte stelle sicher, dass MTA San Andreas 1,6\\MTA\\locale zugänglich ist."
 
 #: Client/loader/MainFunctions.cpp:256
 msgid "Are you having problems running MTA:SA?.\n\n"
