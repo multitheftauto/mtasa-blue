@@ -21,33 +21,31 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "urldata.h"
 #include "uint-table.h"
 #include "curl_trc.h"
-#include "unitprotos.h"
 
 #define TBL_SIZE    100
 
-static CURLcode t3212_setup(struct uint_tbl *tbl)
+static struct uint_tbl tbl;
+
+static int dummy;
+
+static CURLcode unit_setup(void)
 {
-  Curl_uint_tbl_init(tbl, NULL);
-  return Curl_uint_tbl_resize(tbl, TBL_SIZE);
+  Curl_uint_tbl_init(&tbl, NULL);
+  return Curl_uint_tbl_resize(&tbl, TBL_SIZE);
 }
 
-static void t3212_stop(struct uint_tbl *tbl)
+static void unit_stop(void)
 {
-  Curl_uint_tbl_destroy(tbl);
+  Curl_uint_tbl_destroy(&tbl);
 }
 
-static CURLcode test_unit3212(const char *arg)
+static void check3212(void)
 {
-  struct uint_tbl tbl;
-  int dummy;
-
-  UNITTEST_BEGIN(t3212_setup(&tbl))
-
   unsigned int i, key, n;
   void *entry;
 
@@ -129,6 +127,10 @@ static CURLcode test_unit3212(const char *arg)
   Curl_uint_tbl_remove(&tbl, 17);
   fail_unless(Curl_uint_tbl_add(&tbl, &dummy, &key), "failed to add again");
   fail_unless(key == 17, "unexpected key assigned");
-
-  UNITTEST_END(t3212_stop(&tbl))
 }
+
+UNITTEST_START
+
+check3212();
+
+UNITTEST_STOP

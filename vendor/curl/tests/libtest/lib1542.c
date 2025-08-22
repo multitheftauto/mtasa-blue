@@ -30,12 +30,13 @@
  * first connection and open a second.
  */
 
-#include "first.h"
-
+#include "test.h"
+#include "testutil.h"
 #include "testtrace.h"
+#include "warnless.h"
 #include "memdebug.h"
 
-static CURLcode test_lib1542(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *easy = NULL;
   CURLcode res = CURLE_OK;
@@ -46,9 +47,9 @@ static CURLcode test_lib1542(const char *URL)
 
   easy_setopt(easy, CURLOPT_URL, URL);
 
-  debug_config.nohex = TRUE;
-  debug_config.tracetime = FALSE;
-  easy_setopt(easy, CURLOPT_DEBUGDATA, &debug_config);
+  libtest_debug_config.nohex = 1;
+  libtest_debug_config.tracetime = 0;
+  easy_setopt(easy, CURLOPT_DEBUGDATA, &libtest_debug_config);
   easy_setopt(easy, CURLOPT_DEBUGFUNCTION, libtest_debug_cb);
   easy_setopt(easy, CURLOPT_VERBOSE, 1L);
 
@@ -62,7 +63,7 @@ static CURLcode test_lib1542(const char *URL)
 
   /* CURLOPT_MAXLIFETIME_CONN is inclusive - the connection needs to be 2
    * seconds old */
-  curlx_wait_ms(2000);
+  sleep(2);
 
   res = curl_easy_perform(easy);
   if(res)

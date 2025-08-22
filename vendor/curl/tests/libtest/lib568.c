@@ -21,15 +21,27 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
-#include "testutil.h"
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
 #include "memdebug.h"
+
+/* build request url */
+static char *suburl(const char *base, int i)
+{
+  return curl_maprintf("%s%.4d", base, i);
+}
 
 /*
  * Test the Client->Server ANNOUNCE functionality (PUT style)
  */
-static CURLcode test_lib568(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode res;
   CURL *curl;
@@ -57,7 +69,7 @@ static CURLcode test_lib568(const char *URL)
 
   test_setopt(curl, CURLOPT_URL, URL);
 
-  stream_uri = tutil_suburl(URL, request++);
+  stream_uri = suburl(URL, request++);
   if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
@@ -98,7 +110,7 @@ static CURLcode test_lib568(const char *URL)
   sdpf = NULL;
 
   /* Make sure we can do a normal request now */
-  stream_uri = tutil_suburl(URL, request++);
+  stream_uri = suburl(URL, request++);
   if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
@@ -114,7 +126,7 @@ static CURLcode test_lib568(const char *URL)
 
   /* Now do a POST style one */
 
-  stream_uri = tutil_suburl(URL, request++);
+  stream_uri = suburl(URL, request++);
   if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
@@ -144,7 +156,7 @@ static CURLcode test_lib568(const char *URL)
   custom_headers = NULL;
 
   /* Make sure we can do a normal request now */
-  stream_uri = tutil_suburl(URL, request++);
+  stream_uri = suburl(URL, request++);
   if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;

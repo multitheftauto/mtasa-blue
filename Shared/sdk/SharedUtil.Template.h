@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __INTELLISENSE__
+    #pragma diag_suppress 842
+#endif
+
 #include <type_traits>
 #include <variant>
 

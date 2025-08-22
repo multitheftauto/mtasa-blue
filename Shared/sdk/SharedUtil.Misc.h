@@ -215,8 +215,6 @@ namespace SharedUtil
     SString UnescapeString(const SString& strText, char cSpecialChar = '#');
     SString EscapeURLArgument(const SString& strText);
 
-    SString ExpandEnvString(const SString& strInput);
-
     // Version string things
     bool    IsValidVersionString(const SString& strVersion);
     SString ExtractVersionStringBuildNumber(const SString& strVersion);
@@ -1661,7 +1659,7 @@ namespace SharedUtil
 
         virtual ~CRefedPointer() { SAFE_DELETE(pData); }
         CRefedPointer(const CRefedPointer<T>& other);
-        CRefedPointer<T>& operator=(const CRefedPointer<T>& other);
+        CRefedPointer<T>& operator*(const CRefedPointer<T>& other);
 
     public:
         CRefedPointer() { pData = new T(); }

@@ -260,21 +260,27 @@ bool CStaticFunctionDefinitions::ClearChatBox()
 
 bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded)
 {
-    if (strlen(szText) <= MAX_OUTPUTCHATBOX_LENGTH)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushString(szText);
-        Arguments.PushNumber(ucRed);
-        Arguments.PushNumber(ucGreen);
-        Arguments.PushNumber(ucBlue);
-
-        bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
-        if (!bCancelled)
-        {
-            m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
-            return true;
-        }
+    if (!szText || szText[0] == '\0')
+        return false;
+    
+    SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : szText;
+    
+    if (textToProcess.length() > MAX_OUTPUTCHATBOX_LENGTH) {
+        return false;
     }
+
+    CLuaArguments Arguments;
+    Arguments.PushString(szText);
+    Arguments.PushNumber(ucRed);
+    Arguments.PushNumber(ucGreen);
+    Arguments.PushNumber(ucBlue);
+
+    bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
+    if (!bCancelled) {
+        m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
+        return true;
+    }
+    
     return false;
 }
 
@@ -6676,6 +6682,11 @@ bool CStaticFunctionDefinitions::GetGarageSize(unsigned char ucGarageID, float& 
     if (pGarage)
     {
         pGarage->GetSize(fHeight, fWidth, fDepth);
+        
+        CVector vecPosition;
+        pGarage->GetPosition(vecPosition);
+        fHeight -= vecPosition.fZ;
+        
         return true;
     }
 

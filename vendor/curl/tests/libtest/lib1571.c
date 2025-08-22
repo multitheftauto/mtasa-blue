@@ -21,14 +21,15 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
-static CURLcode test_lib1571(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode res;
   CURL *curl;
+  int testno = atoi(libtest_arg2);
 
   if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
     curl_mfprintf(stderr, "curl_global_init() failed\n");
@@ -45,16 +46,15 @@ static CURLcode test_lib1571(const char *URL)
   test_setopt(curl, CURLOPT_HEADER, 1L);
   test_setopt(curl, CURLOPT_VERBOSE, 1L);
   test_setopt(curl, CURLOPT_URL, URL);
-  if((testnum == 1571) || (testnum == 1572) ||
-     (testnum == 1575) || (testnum == 1581)) {
+  if((testno == 1571) || (testno == 1575) || (testno == 1581)) {
     test_setopt(curl, CURLOPT_POSTFIELDS, "moo");
   }
-  if(testnum == 1581) {
-    test_setopt(curl, CURLOPT_POSTREDIR, CURL_REDIR_POST_301);
+  if(testno == 1581) {
+    test_setopt(curl, CURLOPT_POSTREDIR, (long)CURL_REDIR_POST_301);
   }
 
   test_setopt(curl, CURLOPT_CUSTOMREQUEST, "IGLOO");
-  if((testnum == 1574) || (testnum == 1575)) {
+  if((testno == 1574) || (testno == 1575)) {
     test_setopt(curl, CURLOPT_FOLLOWLOCATION, CURLFOLLOW_FIRSTONLY);
   }
   else {

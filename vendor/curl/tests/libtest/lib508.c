@@ -21,18 +21,20 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
-struct t508_WriteThis {
-  const char *readptr;
+static char testdata[]="this is what we post to the silly web server\n";
+
+struct WriteThis {
+  char *readptr;
   size_t sizeleft;
 };
 
-static size_t t508_read_cb(char *ptr, size_t size, size_t nmemb, void *userp)
+static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
 {
-  struct t508_WriteThis *pooh = (struct t508_WriteThis *)userp;
+  struct WriteThis *pooh = (struct WriteThis *)userp;
 
   if(size*nmemb < 1)
     return 0;
@@ -47,15 +49,12 @@ static size_t t508_read_cb(char *ptr, size_t size, size_t nmemb, void *userp)
   return 0;                         /* no more data left to deliver */
 }
 
-static CURLcode test_lib508(const char *URL)
+CURLcode test(char *URL)
 {
-  static const char testdata[] =
-    "this is what we post to the silly web server\n";
-
   CURL *curl;
   CURLcode res = CURLE_OK;
 
-  struct t508_WriteThis pooh;
+  struct WriteThis pooh;
 
   pooh.readptr = testdata;
   pooh.sizeleft = strlen(testdata);
@@ -82,7 +81,7 @@ static CURLcode test_lib508(const char *URL)
   test_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)pooh.sizeleft);
 
   /* we want to use our own read function */
-  test_setopt(curl, CURLOPT_READFUNCTION, t508_read_cb);
+  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 
   /* pointer to pass to our read function */
   test_setopt(curl, CURLOPT_READDATA, &pooh);

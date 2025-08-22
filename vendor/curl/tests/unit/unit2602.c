@@ -21,15 +21,24 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "urldata.h"
+#include "dynbuf.h"
 #include "dynhds.h"
 #include "curl_trc.h"
 
-static CURLcode test_unit2602(const char *arg)
+static CURLcode unit_setup(void)
 {
-  UNITTEST_BEGIN_SIMPLE
+  return CURLE_OK;
+}
+
+static void unit_stop(void)
+{
+}
+
+
+UNITTEST_START
 
   struct dynhds hds;
   struct dynbuf dbuf;
@@ -136,5 +145,4 @@ static CURLcode test_unit2602(const char *arg)
 
   Curl_dynhds_free(&hds);
 
-  UNITTEST_END_SIMPLE
-}
+UNITTEST_STOP

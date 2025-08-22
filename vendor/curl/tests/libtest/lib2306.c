@@ -21,9 +21,15 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
 
-static CURLcode test_lib2306(const char *URL)
+#include "test.h"
+#include "testtrace.h"
+
+#include <curl/curl.h>
+
+#define URL2 libtest_arg2
+
+CURLcode test(char *URL)
 {
   /* first a fine GET response, then a bad one */
   CURL *cl;
@@ -39,7 +45,7 @@ static CURLcode test_lib2306(const char *URL)
     goto test_cleanup;
 
   /* reuse handle, do a second transfer */
-  easy_setopt(cl, CURLOPT_URL, libtest_arg2);
+  easy_setopt(cl, CURLOPT_URL, URL2);
   res = curl_easy_perform(cl);
 
 test_cleanup:

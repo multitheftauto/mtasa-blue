@@ -24,7 +24,8 @@
  *
  ***************************************************************************/
 
-CURLcode config2setopts(struct OperationConfig *config,
+CURLcode config2setopts(struct GlobalConfig *global,
+                        struct OperationConfig *config,
                         struct per_transfer *per,
                         CURL *curl,
                         CURLSH *share);
