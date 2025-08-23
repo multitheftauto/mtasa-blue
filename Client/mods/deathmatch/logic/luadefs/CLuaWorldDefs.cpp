@@ -678,9 +678,9 @@ int CLuaWorldDefs::GetGarageSize(lua_State* luaVM)
 
         if (CStaticFunctionDefinitions::GetGarageSize(iGarageID, fHeight, fWidth, fDepth))
         {
-            lua_pushnumber(luaVM, fHeight);
             lua_pushnumber(luaVM, fWidth);
             lua_pushnumber(luaVM, fDepth);
+            lua_pushnumber(luaVM, fHeight);
             return 3;
         }
     }

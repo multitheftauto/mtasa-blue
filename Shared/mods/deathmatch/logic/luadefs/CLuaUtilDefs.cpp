@@ -227,7 +227,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
             lua_pushstring(luaVM, szToken);
             lua_settable(luaVM, -3);
 
-            szToken = strtok(NULL, strDelimiter);
+            szToken = strtok(nullptr, strDelimiter.c_str());
         }
 
         // Delete the text
