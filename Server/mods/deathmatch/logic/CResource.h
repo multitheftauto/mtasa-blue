@@ -34,6 +34,7 @@ class CXMLNode;
 class CAccount;
 class CLuaMain;
 class CResourceManager;
+class CResourceTranslationManager;
 class CChecksum;
 
 struct SVersion
@@ -330,6 +331,8 @@ public:
      */
     CResourceFile* GetResourceFile(const SString& relativePath) const;
 
+    CResourceTranslationManager* GetTranslationManager() const noexcept { return m_translationManager.get(); }
+
 public:
     static std::list<CResource*> m_StartedResources;
 
@@ -355,6 +358,8 @@ private:
     bool ReadIncludedHTML(CXMLNode* pRoot);
     bool ReadIncludedExports(CXMLNode* pRoot);
     bool ReadIncludedFiles(CXMLNode* pRoot);
+    bool ReadIncludedTranslations(CXMLNode* pRoot);
+    bool LoadTranslations();
     bool CreateVM(bool bEnableOOP);
     bool DestroyVM();
     void TidyUp();
@@ -447,4 +452,6 @@ private:
 
     uint                              m_uiFunctionRightCacheRevision = 0;
     CFastHashMap<lua_CFunction, bool> m_FunctionRightCacheMap;
+
+    std::unique_ptr<CResourceTranslationManager> m_translationManager;
 };

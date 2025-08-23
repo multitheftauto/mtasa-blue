@@ -13,6 +13,7 @@
 #define DECLARE_PROFILER_SECTION_CResource
 #include "profiler/SharedUtil.Profiler.h"
 #include "CServerIdManager.h"
+#include "CResourceTranslationItem.h"
 
 using namespace std;
 
@@ -83,6 +84,8 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     // Move this after the CreateVirtualMachine line and heads will roll
     m_bOOPEnabled = bEnableOOP;
     m_iDownloadPriorityGroup = 0;
+    
+    m_translationManager = std::make_unique<CResourceTranslationManager>(m_strResourceName.c_str());
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine(this, bEnableOOP);
     if (m_pLuaVM)
@@ -183,7 +186,18 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
         return NULL;
     }
 
-    CResourceFile* pResourceFile = new CResourceFile(this, resourceType, szFileName, strBuffer, uiDownloadSize, serverChecksum, bAutoDownload);
+    CResourceFile* pResourceFile = nullptr;
+    
+    if (resourceType == CDownloadableResource::RESOURCE_FILE_TYPE_TRANSLATION)
+    {
+        bool isPrimary = m_translationPrimaryFlags.find(szFileName) != m_translationPrimaryFlags.end();
+        pResourceFile = new CResourceTranslationItem(this, szFileName, strBuffer, uiDownloadSize, serverChecksum, isPrimary);
+    }
+    else
+    {
+        pResourceFile = new CResourceFile(this, resourceType, szFileName, strBuffer, uiDownloadSize, serverChecksum, bAutoDownload);
+    }
+    
     if (pResourceFile)
     {
         m_ResourceFiles.push_back(pResourceFile);
@@ -277,6 +291,8 @@ void CResource::Load()
             CLogger::LogPrintf("Failed to start resource item %s in %s\n", (*iterc)->GetName(), *m_strResourceName);
         }
     }
+
+    LoadTranslations();
 
     for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front())
     {
@@ -519,4 +535,26 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
     // Log to the server & client console
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);
     g_pCore->GetConsole()->Printf("Download error: %s", *strMessage);
+}
+
+bool CResource::LoadTranslations()
+{
+    for (CResourceFile* resourceFile : m_ResourceFiles)
+    {
+        if (resourceFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_TRANSLATION)
+        {
+            CResourceTranslationItem* translationItem = dynamic_cast<CResourceTranslationItem*>(resourceFile);
+            if (translationItem)
+            {
+                std::string fullPath = translationItem->GetName();
+                if (FileExists(fullPath.c_str()))
+                {
+                    std::string language = translationItem->GetLanguage();
+                    bool isPrimary = m_translationPrimaryFlags.find(language) != m_translationPrimaryFlags.end();
+                    m_translationManager->LoadTranslation(fullPath, isPrimary);
+                }
+            }
+        }
+    }
+    return true;
 }

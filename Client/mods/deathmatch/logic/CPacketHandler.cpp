@@ -22,6 +22,7 @@
 #include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
+#include "CResourceTranslationItem.h"
 
 using std::list;
 
@@ -5228,6 +5229,22 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                     pDownloadableResource = pResource->AddConfigFile(szParsedChunkData, uiDownloadSize, chunkChecksum);
 
                                     break;
+                                case CDownloadableResource::RESOURCE_FILE_TYPE_TRANSLATION:
+                                {
+                                    bool isPrimary = bitStream.ReadBit();
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_TRANSLATION,
+                                                                                       szParsedChunkData, uiDownloadSize, chunkChecksum, true);
+                                    if (pDownloadableResource && isPrimary)
+                                    {
+                                        CResourceTranslationItem* translationItem = dynamic_cast<CResourceTranslationItem*>(pDownloadableResource);
+                                        if (translationItem)
+                                        {
+                                            pResource->SetTranslationPrimary(translationItem->GetLanguage());
+                                        }
+                                    }
+
+                                    break;
+                                }
                                 default:
 
                                     break;

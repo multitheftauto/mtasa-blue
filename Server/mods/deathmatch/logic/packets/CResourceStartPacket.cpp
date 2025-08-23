@@ -14,6 +14,7 @@
 #include "CResourceClientScriptItem.h"
 #include "CResourceClientFileItem.h"
 #include "CResourceScriptItem.h"
+#include "CResourceTranslationItem.h"
 #include "CChecksum.h"
 #include "CResource.h"
 #include "CDummy.h"
@@ -74,7 +75,8 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
             if (((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG && m_pResource->IsClientConfigsOn()) ||
                 ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && m_pResource->IsClientScriptsOn() &&
                  static_cast<CResourceClientScriptItem*>(*iter)->IsNoClientCache() == false) ||
-                ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE && m_pResource->IsClientFilesOn()))
+                ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE && m_pResource->IsClientFilesOn()) ||
+                ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_TRANSLATION))
             {
                 // Write the Type of chunk to read (F - File, E - Exported Function)
                 BitStream.Write(static_cast<unsigned char>('F'));
@@ -111,6 +113,12 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
                     CResourceClientFileItem* pRCFItem = reinterpret_cast<CResourceClientFileItem*>(*iter);
                     // write bool whether to download or not
                     BitStream.WriteBit(pRCFItem->IsAutoDownload());
+                }
+                else if ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_TRANSLATION)
+                {
+                    CResourceTranslationItem* translationItem = dynamic_cast<CResourceTranslationItem*>(*iter);
+                    bool isPrimary = translationItem ? translationItem->IsPrimary() : false;
+                    BitStream.WriteBit(isPrimary);
                 }
             }
         }
