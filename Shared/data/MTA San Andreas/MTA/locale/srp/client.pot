@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-22 08:58+0000\n"
-"PO-Revision-Date: 2025-08-23 10:22\n"
+"PO-Revision-Date: 2025-08-23 11:17\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -2845,7 +2845,7 @@ msgstr "Učitavanje jezgra neuspešno. Molimo utvrdite da je najnoviji DirectX i
 
 #: Client/loader/MainFunctions.cpp:219 Client/loader/MainFunctions.cpp:229
 msgid "Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible."
-msgstr "Učitavanje lokalizacije neuspešno. Molimo utvrdite da je MTA San Andreas 1.6\\MTA\\locale pristupačan."
+msgstr "Učitavanje lokalizacije neuspešno. Molimo utvrdite da je MTA San Andreas 1,6\\MTA\\locale pristupačan."
 
 #: Client/loader/MainFunctions.cpp:256
 msgid "Are you having problems running MTA:SA?.\n\n"
@@ -2951,11 +2951,11 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 msgstr "Putanja za instalaciju 'MTA:SA' ili 'GTA: San Andreas'\n"
 "sadrži ';' (tačku-zarez).\n\n"
 "Ako imate problema sa pokretanjem MTA:SA,\n"
-"pomerite vašu instalaciju u lokaciju koja ne sadrži tačku-zarez."
+"pomerite vašu instalaciju(je) u lokaciju koja ne sadrži tačku-zarez."
 
 #: Client/loader/MainFunctions.cpp:792
 msgid "Invalid installation paths detected."
-msgstr ""
+msgstr "Nevažeća putanja za instalaciju pronađena."
 
 #: Client/loader/MainFunctions.cpp:824
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -2984,21 +2984,22 @@ msgstr "Glavna datoteka ima neispravno ime (%s)"
 #: Client/loader/MainFunctions.cpp:899
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr ""
+msgstr "Datoteka %s nedostaje. Moguća aktivnost virusa."
 
 #: Client/loader/MainFunctions.cpp:906
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr ""
+msgstr "Datoteka %s modifikovana. Moguća aktivnost virusa."
 
 #: Client/loader/MainFunctions.cpp:920
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
-msgstr ""
+msgstr ".asi datoteke su u instalacionom folderu.\n\n"
+"Uklonite ove .asi datoteke ako iskusite probleme."
 
 #: Client/loader/MainFunctions.cpp:1096
 msgid "Invalid game paths detected."
-msgstr ""
+msgstr "Nevažeće putanje za igru pronađene."
 
 #: Client/loader/MainFunctions.cpp:1103
 msgid "Fix configuration issue"
@@ -3011,11 +3012,11 @@ msgstr "Popravi grešku sa tražnjom povišenja"
 #: Client/loader/MainFunctions.cpp:1146
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas. [%s]"
-msgstr ""
+msgstr "Nije moguće pokretanje Grand Theft Auto: San Andreas. [%s]"
 
 #: Client/loader/MainFunctions.cpp:1184
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
-msgstr ""
+msgstr "GTA: San Andreas se nije ispravno pokrenuo. Da li želite da obustavite?"
 
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
