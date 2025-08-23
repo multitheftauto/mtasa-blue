@@ -66,6 +66,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (flags.data.animInterrupted)
             pSourcePlayer->SetAnimationData({});
 
+        pSourcePlayer->SetHanging(flags.data.hangingDuringClimb);
+
         // Contact element
         CElement* pContactElement = NULL;
         if (flags.data.bHasContact)
@@ -374,6 +376,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || pSourcePlayer->IsSyncingVelocity());
         flags.data.bStealthAiming = (pSourcePlayer->IsStealthAiming() == true);
         flags.data.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
+        flags.data.hangingDuringClimb = pSourcePlayer->IsHanging();
 
         CVector vecPosition = pSourcePlayer->GetPosition();
         if (pContactElement)

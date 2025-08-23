@@ -573,6 +573,7 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         bool bStealthAiming : 1;
         bool isReloadingWeapon : 1;
         bool animInterrupted : 1;
+        bool hangingDuringClimb : 1;
     } data;
 };
 
