@@ -108,6 +108,7 @@
 #include <errno.h>
 #if defined(_MSC_VER)  &&  _MSC_VER >= 1400
     #include <windows.h>
+    #include <string>
 #endif
 
 /* Indicates that d_type field is available in dirent structure */
@@ -779,7 +780,10 @@ dirent_mbstowcs_s(
 
 #if defined(_MSC_VER)  &&  _MSC_VER >= 1400
 
-    wcscpy_s(wcstr, sizeInWords, utf8_mbstowcs(mbstr).c_str());
+    std::wstring wideStr = utf8_mbstowcs(std::string(mbstr));
+    wcscpy_s(wcstr, sizeInWords, wideStr.c_str());
+    if (pReturnValue)
+        *pReturnValue = wideStr.length() + 1;
     error = 0;
 
 #else
@@ -829,7 +833,10 @@ dirent_wcstombs_s(
 
 #if defined(_MSC_VER)  &&  _MSC_VER >= 1400
 
-    strcpy_s(mbstr, sizeInBytes, utf8_wcstombs(wcstr).c_str());
+    std::string narrowStr = utf8_wcstombs(wcstr);
+    strcpy_s(mbstr, sizeInBytes, narrowStr.c_str());
+    if (pReturnValue)
+        *pReturnValue = narrowStr.length() + 1;
     error = 0;
 
 #else
