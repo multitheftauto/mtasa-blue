@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPoolsSA.h
  *  PURPOSE:     Header file for pools interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -98,6 +98,14 @@ public:
     B* AllocateAt(uint uiSlot)
     {
         m_pObjects[uiSlot] = B();
+        m_byteMap[uiSlot].bEmpty = false;
+        m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
+
+        return &m_pObjects[uiSlot];
+    }
+
+    B* AllocateAtNoInit(std::uint32_t uiSlot)
+    {
         m_byteMap[uiSlot].bEmpty = false;
         m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
 

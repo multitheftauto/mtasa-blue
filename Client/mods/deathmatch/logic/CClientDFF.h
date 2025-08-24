@@ -37,6 +37,7 @@ public:
 
     bool Load(bool isRaw, SString input);
 
+    bool AddClothingModel(const std::string& modelName);
     bool ReplaceModel(unsigned short usModel, bool bAlphaTransparency);
 
     bool HasReplaced(unsigned short usModel);
@@ -59,6 +60,7 @@ private:
     void UnloadDFF();
     void InternalRestoreModel(unsigned short usModel);
 
+    bool ReplaceClothes(ushort usModel);
     bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
     bool ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
     bool ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);

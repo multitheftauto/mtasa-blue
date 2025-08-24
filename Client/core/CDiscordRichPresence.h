@@ -5,7 +5,7 @@
  *  FILE:        core/CDiscordRichPresence.h
  *  PURPOSE:     Header file for discord rich presence
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once

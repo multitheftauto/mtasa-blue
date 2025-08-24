@@ -21,7 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef USE_BEARSSL
 
@@ -29,19 +29,20 @@
 
 #include "bearssl.h"
 #include "cipher_suite.h"
-#include "urldata.h"
-#include "sendf.h"
-#include "inet_pton.h"
+#include "../urldata.h"
+#include "../sendf.h"
+#include "../curlx/inet_pton.h"
 #include "vtls.h"
 #include "vtls_int.h"
-#include "connect.h"
-#include "select.h"
-#include "multiif.h"
-#include "curl_printf.h"
+#include "vtls_scache.h"
+#include "../connect.h"
+#include "../select.h"
+#include "../multiif.h"
+#include "../curl_printf.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
-#include "memdebug.h"
+#include "../curl_memory.h"
+#include "../memdebug.h"
 
 struct x509_context {
   const br_x509_class *vtable;
@@ -152,7 +153,7 @@ static CURLcode load_cafile(struct cafile_source *source,
     }
     else if(source->type == CAFILE_SOURCE_BLOB) {
       n = source->len;
-      p = (unsigned char *) source->data;
+      p = (const unsigned char *) source->data;
     }
     while(n) {
       pushed = br_pem_decoder_push(&pc, p, n);
@@ -337,7 +338,7 @@ static unsigned x509_end_chain(const br_x509_class **ctx)
 static const br_x509_pkey *x509_get_pkey(const br_x509_class *const *ctx,
                                          unsigned *usages)
 {
-  struct x509_context *x509 = (struct x509_context *)ctx;
+  struct x509_context *x509 = (struct x509_context *)CURL_UNCONST(ctx);
 
   if(!x509->verifypeer) {
     /* Nothing in the chain is verified, just return the public key of the
@@ -483,7 +484,7 @@ static const uint16_t ciphertable[] = {
   BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,        /* 0xCCA9 */
 };
 
-#define NUM_OF_CIPHERS (sizeof(ciphertable) / sizeof(ciphertable[0]))
+#define NUM_OF_CIPHERS CURL_ARRAYSIZE(ciphertable)
 
 static CURLcode bearssl_set_selected_ciphers(struct Curl_easy *data,
                                              br_ssl_engine_context *ssl_eng,
@@ -609,20 +610,19 @@ static CURLcode bearssl_connect_step1(struct Curl_cfilter *cf,
   br_ssl_engine_set_x509(&backend->ctx.eng, &backend->x509.vtable);
 
   if(ssl_config->primary.cache_session) {
-    void *sdata;
-    size_t slen;
-    const br_ssl_session_parameters *session;
+    struct Curl_ssl_session *sc_session = NULL;
 
-    CURL_TRC_CF(data, cf, "connect_step1, check session cache");
-    Curl_ssl_sessionid_lock(data);
-    if(!Curl_ssl_getsessionid(cf, data, &connssl->peer, &sdata, &slen, NULL) &&
-       slen == sizeof(*session)) {
-      session = sdata;
+    ret = Curl_ssl_scache_take(cf, data, connssl->peer.scache_key,
+                               &sc_session);
+    if(!ret && sc_session && sc_session->sdata && sc_session->sdata_len) {
+      const br_ssl_session_parameters *session;
+      session = (const br_ssl_session_parameters *)sc_session->sdata;
       br_ssl_engine_set_session_parameters(&backend->ctx.eng, session);
       session_set = 1;
       infof(data, "BearSSL: reusing session ID");
+      /* single use of sessions */
+      Curl_ssl_scache_return(cf, data, connssl->peer.scache_key, sc_session);
     }
-    Curl_ssl_sessionid_unlock(data);
   }
 
   if(connssl->alpn) {
@@ -729,7 +729,7 @@ static CURLcode bearssl_run_until(struct Curl_cfilter *cf,
       return CURLE_OK;
     if(state & BR_SSL_SENDREC) {
       buf = br_ssl_engine_sendrec_buf(&backend->ctx.eng, &len);
-      ret = Curl_conn_cf_send(cf->next, data, (char *)buf, len, FALSE,
+      ret = Curl_conn_cf_send(cf->next, data, (const char *)buf, len, FALSE,
                               &result);
       CURL_TRC_CF(data, cf, "ssl_send(len=%zu) -> %zd, %d", len, ret, result);
       if(ret <= 0) {
@@ -804,12 +804,6 @@ static CURLcode bearssl_connect_step2(struct Curl_cfilter *cf,
   return ret;
 }
 
-static void bearssl_session_free(void *sessionid, size_t idsize)
-{
-  (void)idsize;
-  free(sessionid);
-}
-
 static CURLcode bearssl_connect_step3(struct Curl_cfilter *cf,
                                       struct Curl_easy *data)
 {
@@ -832,17 +826,22 @@ static CURLcode bearssl_connect_step3(struct Curl_cfilter *cf,
   }
 
   if(ssl_config->primary.cache_session) {
+    struct Curl_ssl_session *sc_session;
     br_ssl_session_parameters *session;
 
     session = malloc(sizeof(*session));
     if(!session)
       return CURLE_OUT_OF_MEMORY;
     br_ssl_engine_get_session_parameters(&backend->ctx.eng, session);
-    Curl_ssl_sessionid_lock(data);
-    ret = Curl_ssl_set_sessionid(cf, data, &connssl->peer, NULL,
-                                 session, sizeof(*session),
-                                 bearssl_session_free);
-    Curl_ssl_sessionid_unlock(data);
+    ret = Curl_ssl_session_create((unsigned char *)session, sizeof(*session),
+                                  (int)session->version,
+                                  connssl->negotiated.alpn,
+                                  0, 0, &sc_session);
+    if(!ret) {
+      ret = Curl_ssl_scache_put(cf, data, connssl->peer.scache_key,
+                                sc_session);
+      /* took ownership of `sc_session` */
+    }
     if(ret)
       return ret;
   }
@@ -912,18 +911,14 @@ static ssize_t bearssl_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
   return applen;
 }
 
-static CURLcode bearssl_connect_common(struct Curl_cfilter *cf,
-                                       struct Curl_easy *data,
-                                       bool nonblocking,
-                                       bool *done)
+static CURLcode bearssl_connect(struct Curl_cfilter *cf,
+                                struct Curl_easy *data,
+                                bool *done)
 {
   CURLcode ret;
   struct ssl_connect_data *connssl = cf->ctx;
-  curl_socket_t sockfd = Curl_conn_cf_get_socket(cf, data);
-  timediff_t timeout_ms;
-  int what;
 
-  CURL_TRC_CF(data, cf, "connect_common(blocking=%d)", !nonblocking);
+  CURL_TRC_CF(data, cf, "connect()");
   /* check if the connection has already been established */
   if(ssl_connection_complete == connssl->state) {
     CURL_TRC_CF(data, cf, "connect_common, connected");
@@ -931,61 +926,18 @@ static CURLcode bearssl_connect_common(struct Curl_cfilter *cf,
     return CURLE_OK;
   }
 
+  *done = FALSE;
+  connssl->io_need = CURL_SSL_IO_NEED_NONE;
+
   if(ssl_connect_1 == connssl->connecting_state) {
     ret = bearssl_connect_step1(cf, data);
     if(ret)
       return ret;
   }
 
-  while(ssl_connect_2 == connssl->connecting_state) {
-    /* check allowed time left */
-    timeout_ms = Curl_timeleft(data, NULL, TRUE);
-
-    if(timeout_ms < 0) {
-      /* no need to continue if time already is up */
-      failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
-    }
-
-    /* if ssl is expecting something, check if it is available. */
-    if(connssl->io_need) {
-      curl_socket_t writefd = (connssl->io_need & CURL_SSL_IO_NEED_SEND) ?
-        sockfd : CURL_SOCKET_BAD;
-      curl_socket_t readfd = (connssl->io_need & CURL_SSL_IO_NEED_RECV) ?
-        sockfd : CURL_SOCKET_BAD;
-
-      CURL_TRC_CF(data, cf, "connect_common, check socket");
-      what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
-                               nonblocking ? 0 : timeout_ms);
-      CURL_TRC_CF(data, cf, "connect_common, check socket -> %d", what);
-      if(what < 0) {
-        /* fatal error */
-        failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
-        return CURLE_SSL_CONNECT_ERROR;
-      }
-      else if(0 == what) {
-        if(nonblocking) {
-          *done = FALSE;
-          return CURLE_OK;
-        }
-        else {
-          /* timeout */
-          failf(data, "SSL connection timeout");
-          return CURLE_OPERATION_TIMEDOUT;
-        }
-      }
-      /* socket is readable or writable */
-    }
-
-    /* Run transaction, and return to the caller if it failed or if this
-     * connection is done nonblocking and this loop would execute again. This
-     * permits the owner of a multi handle to abort a connection attempt
-     * before step2 has completed while ensuring that a client using select()
-     * or epoll() will always have a valid fdset to wait on.
-     */
-    connssl->io_need = CURL_SSL_IO_NEED_NONE;
+  if(ssl_connect_2 == connssl->connecting_state) {
     ret = bearssl_connect_step2(cf, data);
-    if(ret || (nonblocking && (ssl_connect_2 == connssl->connecting_state)))
+    if(ret)
       return ret;
   }
 
@@ -999,11 +951,6 @@ static CURLcode bearssl_connect_common(struct Curl_cfilter *cf,
     connssl->state = ssl_connection_complete;
     *done = TRUE;
   }
-  else
-    *done = FALSE;
-
-  /* Reset our connect state machine */
-  connssl->connecting_state = ssl_connect_1;
 
   return CURLE_OK;
 }
@@ -1043,28 +990,6 @@ static CURLcode bearssl_random(struct Curl_easy *data UNUSED_PARAM,
   br_hmac_drbg_generate(&ctx, entropy, length);
 
   return CURLE_OK;
-}
-
-static CURLcode bearssl_connect(struct Curl_cfilter *cf,
-                                struct Curl_easy *data)
-{
-  CURLcode ret;
-  bool done = FALSE;
-
-  ret = bearssl_connect_common(cf, data, FALSE, &done);
-  if(ret)
-    return ret;
-
-  DEBUGASSERT(done);
-
-  return CURLE_OK;
-}
-
-static CURLcode bearssl_connect_nonblocking(struct Curl_cfilter *cf,
-                                            struct Curl_easy *data,
-                                            bool *done)
-{
-  return bearssl_connect_common(cf, data, TRUE, done);
 }
 
 static void *bearssl_get_internals(struct ssl_connect_data *connssl,
@@ -1154,27 +1079,23 @@ const struct Curl_ssl Curl_ssl_bearssl = {
 
   sizeof(struct bearssl_ssl_backend_data),
 
-  Curl_none_init,                  /* init */
-  Curl_none_cleanup,               /* cleanup */
+  NULL,                            /* init */
+  NULL,                            /* cleanup */
   bearssl_version,                 /* version */
-  Curl_none_check_cxn,             /* check_cxn */
   bearssl_shutdown,                /* shutdown */
   bearssl_data_pending,            /* data_pending */
   bearssl_random,                  /* random */
-  Curl_none_cert_status_request,   /* cert_status_request */
+  NULL,                            /* cert_status_request */
   bearssl_connect,                 /* connect */
-  bearssl_connect_nonblocking,     /* connect_nonblocking */
   Curl_ssl_adjust_pollset,         /* adjust_pollset */
   bearssl_get_internals,           /* get_internals */
   bearssl_close,                   /* close_one */
-  Curl_none_close_all,             /* close_all */
-  Curl_none_set_engine,            /* set_engine */
-  Curl_none_set_engine_default,    /* set_engine_default */
-  Curl_none_engines_list,          /* engines_list */
-  Curl_none_false_start,           /* false_start */
+  NULL,                            /* close_all */
+  NULL,                            /* set_engine */
+  NULL,                            /* set_engine_default */
+  NULL,                            /* engines_list */
+  NULL,                            /* false_start */
   bearssl_sha256sum,               /* sha256sum */
-  NULL,                            /* associate_connection */
-  NULL,                            /* disassociate_connection */
   bearssl_recv,                    /* recv decrypted data */
   bearssl_send,                    /* send data to encrypt */
   NULL,                            /* get_channel_binding */

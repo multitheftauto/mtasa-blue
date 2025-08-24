@@ -5,13 +5,18 @@
  *  FILE:        game_sa/CPedSoundSA.h
  *  PURPOSE:     Header file for ped sound class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
 #include <game/CPedSound.h>
+#include "CAudioEngineSA.h"
+#include "CAEVehicleAudioEntitySA.h"
+#include "CAEWeaponAudioEntitySA.h"
+
+class CPedSAInterface;
 
 #define FUNC_CAEPedSound__GetVoice          0x4E3CD0        // 4E3CD0 ; public: static short __cdecl CAEPedSound::GetVoice(char *,short)
 #define FUNC_CAEPedSound__GetAudioPedType   0x4E3C60        // 4E3C60 ; public: static short __cdecl CAEPedSound::GetAudioPedType(char *)
@@ -30,13 +35,14 @@
 
 #define NUM_PED_VOICE_TYPES 5
 
-enum
+enum ePedVoiceType : std::uint16_t
 {
     PED_TYPE_GEN,
     PED_TYPE_EMG,
     PED_TYPE_PLAYER,
     PED_TYPE_GANG,
-    PED_TYPE_GFD
+    PED_TYPE_GFD,
+    PED_TYPE_SPC
 };
 
 #define NUM_GEN_VOICES     209
@@ -50,16 +56,68 @@ typedef struct
     char szName[20];
 } SPedVoiceName;
 
-class CPedSoundSAInterface
+// CAEPedSpeechAudioEntity
+class CPedSoundSAInterface : public CAEAudioEntity
 {
 public:
-    BYTE  ucPad1[0x92];
-    short m_sVoiceType;
-    short m_sVoiceID;
-    short m_bIsFemale;
-    BYTE  ucPad2[1];
-    bool  m_bDisabled;
+    CAESound*     sounds[5];
+    bool          isInitialised;
+    ePedVoiceType m_sVoiceType;
+    std::uint16_t m_sVoiceID;
+    std::uint16_t m_bIsFemale;
+    bool          m_bTalking;
+    bool          m_bDisabled;
+    bool          m_bDisabledSpeechForScripts;
+    bool          m_bIsFrontend;
+    bool          m_bIsForcedAudible;
+    CAESound*     m_sound;
+    std::int16_t  m_soundId;
+    std::int16_t  m_bankId;
+    std::int16_t  m_pedSpeechSlotIndex;
+    float         m_fVoiceVolume;
+    std::int16_t  m_sPhraseId;
+    std::uint32_t m_nextTimeCanSay[19];
 };
+static_assert(sizeof(CPedSoundSAInterface) == 0x100, "Invalid size for CPedSoundSAInterface");
+
+// CAEPedAudioEntity
+class CPedSoundEntitySAInterface : public CAEAudioEntity
+{
+public:
+    bool canAddEvent;
+
+    std::uint8_t  field_7D;
+    std::int16_t  sfxId;
+    std::uint32_t timeInMS;
+
+    float volume1;
+    float volume2;
+    float volume3;
+    float jetpackSoundSpeedMult;
+
+    CPedSAInterface* ped;
+
+    bool      jetpackSoundPlaying;
+    CAESound* jetpackSound1;
+    CAESound* jetpackSound2;
+    CAESound* jetpackSound3;
+
+    CAETwinLoopSoundEntity twinLoopSoundEntity;
+    CAESound*              field_150;
+
+    std::uint8_t field_154[4];
+    std::uint8_t field_158[4];
+};
+static_assert(sizeof(CPedSoundEntitySAInterface) == 0x15C, "Invalid size for CPedSoundEntitySAInterface");
+
+// CAEPedWeaponAudioEntity
+class CPedWeaponAudioEntitySAInterface : public CAEWeaponAudioEntitySAInterface
+{
+public:
+    bool m_bIsInitialised;
+    CPedSAInterface* m_ped;
+};
+static_assert(sizeof(CPedWeaponAudioEntitySAInterface) == 0xA8, "Invalid size for CPedWeaponAudioEntitySAInterface");
 
 class CPedSoundSA : public CPedSound
 {

@@ -128,10 +128,13 @@ void CClientBuilding::Create()
     if (m_bBeingDeleted)
         return;
 
-    CVector4D vRot4D;
-    ConvertZXYEulersToQuaternion(m_vRot, vRot4D);
+    m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &m_vRot, m_interior);
 
-    m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
+    if (!m_pBuilding)
+        return;
+
+	if (m_bDoubleSidedInit)
+		m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
 
     if (!m_usesCollision)
     {

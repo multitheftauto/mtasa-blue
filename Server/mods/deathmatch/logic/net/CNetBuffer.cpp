@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1215,10 +1215,7 @@ void CNetServerBuffer::ProcessPacket(unsigned char ucPacketID, const NetServerPl
     }
     else if (ucPacketID == PACKET_ID_PLAYER_BULLETSYNC)
     {
-        // See about handling the packet relaying here
         m_pSimPlayerManager->HandleBulletSync(Socket, BitStream);
-
-        // Reset bitstream pointer so game can also read the packet data
         BitStream->ResetReadPointer();
     }
     else if (ucPacketID == PACKET_ID_PED_TASK)

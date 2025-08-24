@@ -5,7 +5,7 @@
  *  FILE:        core/CServerImpl.h
  *  PURPOSE:     Server class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -28,6 +28,7 @@ class CServerImpl;
 
 typedef CXML* (*InitXMLInterface)(const char* szSaveFlagDirectory);
 typedef CNetServer* (*InitNetServerInterface)();
+typedef void (*ReleaseNetServerInterface)();
 
 #ifdef WIN32
 constexpr SHORT SCREEN_BUFFER_SIZE = 256;

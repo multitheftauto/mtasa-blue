@@ -64,7 +64,7 @@
    *    with the actual log message if set to true.
    *
    * 5. The flag `ft_timestamp_flag` prints time along with the actual log
-   *    message if set to ture.
+   *    message if set to true.
    *
    * 6. `ft_have_newline_char` is used to differentiate between a log
    *    message with and without a trailing newline character.

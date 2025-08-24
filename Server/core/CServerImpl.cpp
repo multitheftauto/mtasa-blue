@@ -5,7 +5,7 @@
  *  FILE:        core/CServerImpl.cpp
  *  PURPOSE:     Server class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -351,14 +351,16 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
         if (m_XMLLibrary.Load(PathJoin(m_strServerPath, SERVER_BIN_PATH, szXMLLibName)))
         {
-            // Grab the network interface
-            InitNetServerInterface pfnInitNetServerInterface = (InitNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface"));
-            InitXMLInterface       pfnInitXMLInterface = (InitXMLInterface)(m_XMLLibrary.GetProcedureAddress("InitXMLInterface"));
+            auto pfnInitNetServerInterface = (InitNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface"));
+            auto pfnReleaseNetServerInterface = (ReleaseNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("ReleaseNetServerInterface"));
+            auto pfnInitXMLInterface = (InitXMLInterface)(m_XMLLibrary.GetProcedureAddress("InitXMLInterface"));
+
             if (pfnInitNetServerInterface && pfnInitXMLInterface)
             {
                 // Call it to grab the network interface class
                 m_pNetwork = pfnInitNetServerInterface();
                 m_pXML = pfnInitXMLInterface(*m_strServerModPath);
+
                 if (m_pNetwork && m_pXML)
                 {
                     // Make the modmanager load our mod
@@ -366,6 +368,9 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
                     {
                         // Enter our mainloop
                         MainLoop();
+
+                        if (pfnReleaseNetServerInterface)
+                            pfnReleaseNetServerInterface();
                     }
                     else
                     {

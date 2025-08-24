@@ -12,8 +12,8 @@ index 7bd3cc1bb37..0e79c02e46a 100644
 +  SET(WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 +  SET(LINK_STATIC_RUNTIME_LIBRARIES ON CACHE BOOL "" FORCE)
  ELSEIF(APPLE)
-   # Version 3.12.4 is needed because the new build system of Xcode is not
-   # supported by cmake. 3.12.4 will force using the legacy build system.
+   IF(CMAKE_GENERATOR STREQUAL "Xcode")
+     SET(APPLE_XCODE 1)
 @@ -686,7 +691,7 @@ MESSAGE(STATUS "SIZEOF_VOIDP ${SIZEOF_VOIDP}")
  # even if we have configured for 64bit build....
  SET(CMAKE_SIZEOF_VOID_P ${SIZEOF_VOIDP})

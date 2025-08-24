@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPedSync.cpp
  *  PURPOSE:     Ped synchronization handler
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -124,6 +124,10 @@ void CPedSync::Packet_PedStartSync(NetBitStreamInterface& BitStream)
             float fHealth, fArmor;
             BitStream.Read(fHealth);
             BitStream.Read(fArmor);
+            
+            float cameraRotation{};
+            BitStream.Read(cameraRotation);
+            pPed->SetCameraRotation(cameraRotation);
 
             // Set data
             pPed->SetPosition(vecPosition);
@@ -179,51 +183,33 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             unsigned char ucFlags = 0;
             BitStream.Read(ucFlags);
 
+            std::uint8_t flags2{};
+            BitStream.Read(flags2);
+
             CVector vecPosition{ CVector::NoInit{} }, vecMoveSpeed{ CVector::NoInit{} };
             float   fRotation, fHealth, fArmor;
             bool    bOnFire;
             bool    bIsInWater;
+            float   cameraRotation;
 
-            if (BitStream.Can(eBitStreamVersion::PedSync_Revision))
-            {
-                // Read out the position
-                SPositionSync position(false);
-                if (ucFlags & 0x01)
-                    BitStream.Read(&position);
+            // Read out the position
+            SPositionSync position(false);
+            if (ucFlags & 0x01)
+                BitStream.Read(&position);
 
-                // And rotation
-                SPedRotationSync rotation;
-                if (ucFlags & 0x02)
-                    BitStream.Read(&rotation);
+            // And rotation
+            SPedRotationSync rotation;
+            if (ucFlags & 0x02)
+                BitStream.Read(&rotation);
 
-                // And the move speed
-                SVelocitySync velocity;
-                if (ucFlags & 0x04)
-                    BitStream.Read(&velocity);
+            // And the move speed
+            SVelocitySync velocity;
+            if (ucFlags & 0x04)
+                BitStream.Read(&velocity);
 
-                vecPosition = position.data.vecPosition;
-                fRotation = rotation.data.fRotation;
-                vecMoveSpeed = velocity.data.vecVelocity;
-            }
-            else
-            {
-                if (ucFlags & 0x01)
-                {
-                    BitStream.Read(vecPosition.fX);
-                    BitStream.Read(vecPosition.fY);
-                    BitStream.Read(vecPosition.fZ);
-                }
-
-                if (ucFlags & 0x02)
-                    BitStream.Read(fRotation);
-
-                if (ucFlags & 0x04)
-                {
-                    BitStream.Read(vecMoveSpeed.fX);
-                    BitStream.Read(vecMoveSpeed.fY);
-                    BitStream.Read(vecMoveSpeed.fZ);
-                }
-            }
+            vecPosition = position.data.vecPosition;
+            fRotation = rotation.data.fRotation;
+            vecMoveSpeed = velocity.data.vecVelocity;
 
             // And health with armour
             if (ucFlags & 0x08)
@@ -231,12 +217,19 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             if (ucFlags & 0x10)
                 BitStream.Read(fArmor);
 
+            if (flags2 & 0x01)
+            {
+                SCameraRotationSync camRotation;
+                BitStream.Read(&camRotation);
+                cameraRotation = camRotation.data.fRotation;
+            }
+
             // And the burning state
-            if (BitStream.Version() >= 0x04E && ucFlags & 0x20)
+            if (ucFlags & 0x20)
                 BitStream.ReadBit(bOnFire);
 
             // And the in water state
-            if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
+            if (ucFlags & 0x40)
                 BitStream.ReadBit(bIsInWater);
 
             // Grab the ped. Only update the sync if this packet is from the same context.
@@ -246,16 +239,18 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
                 if (ucFlags & 0x01)
                     pPed->SetTargetPosition(vecPosition, PED_SYNC_RATE);
                 if (ucFlags & 0x02)
-                    pPed->SetTargetRotation(PED_SYNC_RATE, fRotation, 0.0f);
+                    pPed->SetTargetRotation(PED_SYNC_RATE, fRotation, std::nullopt);
                 if (ucFlags & 0x04)
                     pPed->SetMoveSpeed(vecMoveSpeed);
                 if (ucFlags & 0x08)
                     pPed->LockHealth(fHealth);
                 if (ucFlags & 0x10)
                     pPed->LockArmor(fArmor);
-                if (BitStream.Version() >= 0x04E && ucFlags & 0x20)
+                if (flags2 & 0x01)
+                    pPed->SetTargetRotation(PED_SYNC_RATE, std::nullopt, cameraRotation);
+                if (ucFlags & 0x20)
                     pPed->SetOnFire(bOnFire);
-                if (BitStream.Version() >= 0x55 && ucFlags & 0x40)
+                if (ucFlags & 0x40)
                     pPed->SetInWater(bIsInWater);
             }
         }
@@ -307,13 +302,17 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         ucFlags |= 0x20;
     if (pPed->IsInWater() != pPed->m_LastSyncedData->bIsInWater)
         ucFlags |= 0x40;
-    if (pPed->IsReloadingWeapon() != pPed->m_LastSyncedData->isReloadingWeapon && pBitStream->Can(eBitStreamVersion::IsPedReloadingWeapon))
+    if (pPed->IsReloadingWeapon() != pPed->m_LastSyncedData->isReloadingWeapon)
         ucFlags |= 0x60;
     if (pPed->HasSyncedAnim() && (!pPed->IsRunningAnimation() || pPed->m_animationOverridedByClient))
         ucFlags |= 0x80;
 
+    std::uint8_t flags2{};
+    if (!IsNearlyEqual(pPed->GetCameraRotation(), pPed->m_LastSyncedData->cameraRotation))
+        flags2 |= 0x01;
+
     // Do we really have to sync this ped?
-    if (ucFlags == 0)
+    if (ucFlags == 0 && flags2 == 0)
         return;
 
     // Write the ped id
@@ -325,35 +324,24 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     // Write flags
     pBitStream->Write(ucFlags);
 
+    // Write flags 2
+    pBitStream->Write(flags2);
+
     // Write position if needed
     if (ucFlags & 0x01)
     {
-        if (pBitStream->Can(eBitStreamVersion::PedSync_Revision))
-        {
-            SPositionSync position(false);
-            position.data.vecPosition = vecPosition;
-            pBitStream->Write(&position);
-        }
-        else
-        {
-            pBitStream->Write(vecPosition.fX);
-            pBitStream->Write(vecPosition.fY);
-            pBitStream->Write(vecPosition.fZ);
-        }
+        SPositionSync position(false);
+        position.data.vecPosition = vecPosition;
+        pBitStream->Write(&position);
 
         pPed->m_LastSyncedData->vPosition = vecPosition;
     }
 
     if (ucFlags & 0x02)
     {
-        if (pBitStream->Can(eBitStreamVersion::PedSync_Revision))
-        {
-            SPedRotationSync rotation;
-            rotation.data.fRotation = pPed->GetCurrentRotation();
-            pBitStream->Write(&rotation);
-        }
-        else
-            pBitStream->Write(pPed->GetCurrentRotation());
+        SPedRotationSync rotation;
+        rotation.data.fRotation = pPed->GetCurrentRotation();
+        pBitStream->Write(&rotation);
 
         pPed->m_LastSyncedData->fRotation = pPed->GetCurrentRotation();
     }
@@ -361,17 +349,8 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     // Write velocity
     if (ucFlags & 0x04)
     {
-        if (pBitStream->Can(eBitStreamVersion::PedSync_Revision))
-        {
-            SVelocitySync velocity;
-            pBitStream->Write(&velocity);
-        }
-        else
-        {
-            pBitStream->Write(vecVelocity.fX);
-            pBitStream->Write(vecVelocity.fY);
-            pBitStream->Write(vecVelocity.fZ);
-        }
+        SVelocitySync velocity;
+        pBitStream->Write(&velocity);
 
         pPed->m_LastSyncedData->vVelocity = vecVelocity;
     }
@@ -389,19 +368,27 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         pPed->m_LastSyncedData->fArmour = pPed->GetArmor();
     }
 
-    if (ucFlags & 0x20 && pBitStream->Version() >= 0x04E)
+    if (flags2 & 0x01)
+    {
+        SCameraRotationSync camRotation;
+        camRotation.data.fRotation = pPed->GetCameraRotation();
+        pBitStream->Write(&camRotation);
+        pPed->m_LastSyncedData->cameraRotation = camRotation.data.fRotation;
+    }
+
+    if (ucFlags & 0x20)
     {
         pBitStream->WriteBit(pPed->IsOnFire());
         pPed->m_LastSyncedData->bOnFire = pPed->IsOnFire();
     }
 
-    if (ucFlags & 0x40 && pBitStream->Version() >= 0x55)
+    if (ucFlags & 0x40)
     {
         pBitStream->WriteBit(pPed->IsInWater());
         pPed->m_LastSyncedData->bIsInWater = pPed->IsInWater();
     }
 
-    if (ucFlags & 0x60 && pBitStream->Can(eBitStreamVersion::IsPedReloadingWeapon))
+    if (ucFlags & 0x60)
     {
         bool isReloadingWeapon = pPed->IsReloadingWeapon();
 
@@ -410,7 +397,7 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     }
 
     // The animation has been overwritten or interrupted by the client
-    if (ucFlags & 0x80 && pBitStream->Can(eBitStreamVersion::AnimationsSync))
+    if (ucFlags & 0x80)
     {
         pPed->SetHasSyncedAnim(false);
         pPed->m_animationOverridedByClient = false;

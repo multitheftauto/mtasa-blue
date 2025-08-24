@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -127,9 +127,9 @@ std::uint32_t CLuaTeamDefs::CountPlayersInTeam(CTeam* team) noexcept
     return team->CountPlayers();
 }
 
-bool CLuaTeamDefs::SetPlayerTeam(CPlayer* player, CTeam* team) noexcept
+bool CLuaTeamDefs::SetPlayerTeam(CPlayer* player, std::optional<CTeam*> team) noexcept
 {
-    return CStaticFunctionDefinitions::SetPlayerTeam(player, team);
+    return CStaticFunctionDefinitions::SetPlayerTeam(player, team.value_or(nullptr));
 }
 
 bool CLuaTeamDefs::SetTeamName(CTeam* team, const std::string name)

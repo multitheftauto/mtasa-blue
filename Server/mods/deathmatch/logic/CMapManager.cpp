@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CMapManager.cpp
  *  PURPOSE:     Map manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -593,6 +593,7 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
 
     // Update the player data
     Player.SetSpawned(true);
+    Player.SetTeleported(true);
     Player.SetHealth(Player.GetMaxHealth());
     Player.SetIsDead(false);
     Player.SetWearingGoggles(false);

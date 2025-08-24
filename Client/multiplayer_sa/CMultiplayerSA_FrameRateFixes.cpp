@@ -578,6 +578,118 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
     }
 }
 
+// Fixes invisible weapon particles (extinguisher, spraycan, flamethrower) at high FPS
+#define HOOKPOS_CWeapon_Update 0x73DC3D
+#define HOOKSIZE_CWeapon_Update 5
+static constexpr std::uintptr_t RETURN_CWeapon_Update = 0x073DC42;
+static void __declspec(naked) HOOK_CWeapon_Update()
+{
+    _asm
+    {
+        // Temp fix for camera
+        cmp [esi], 0x2B // CWeapon::m_eWeaponType
+        je skip
+
+        // timeStep / kOriginalTimeStep
+        fld ds:[0xB7CB5C] // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep
+
+        mov eax, [esi+10h] // m_timeToNextShootInMS
+        mov ebx, ds:[0xB7CB84] // CTimer::m_snTimeInMilliseconds
+
+        sub eax, ebx // m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds
+
+        push eax
+        fild dword ptr [esp]
+        add esp, 4
+
+        fmul st(0), st(1) // (m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds) * (timeStep / kOriginalTimeStep)
+        fadd st(0), ebx // + m_snTimeInMilliseconds
+        fistp [esi+10h]
+        fstp st(0)
+
+        mov eax, ebx
+
+        xor ebx, ebx
+        jmp RETURN_CWeapon_Update
+
+        skip:
+        mov eax, ds:[0xB7CB84]
+        jmp RETURN_CWeapon_Update
+    }
+}
+
+#define HOOKPOS_CPhysical__ApplyAirResistance  0x544D29
+#define HOOKSIZE_CPhysical__ApplyAirResistance 5
+static const unsigned int    RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
+static void _declspec(naked) HOOK_CPhysical__ApplyAirResistance()
+{
+    _asm {
+        fld ds:[0x862CD0]            // 0.99000001f
+        fld ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep            // 1.666f
+        mov eax, 0x822130            // powf
+        call eax
+
+        fld st(0)
+        fmul [esi+0x50]
+        fstp [esi+0x50]
+
+        fld st(0)
+        fmul [esi+0x54]
+        fstp [esi+0x54]
+
+        fmul [esi+0x58]
+        fstp [esi+0x58]
+        jmp RETURN_CPhysical__ApplyAirResistance
+    }
+}
+
+template <unsigned int returnAddress>
+static void _declspec(naked) HOOK_VehicleRapidStopFix()
+{
+    static unsigned int RETURN_VehicleRapidStopFix = returnAddress;
+    _asm {
+        fld ds:[0xC2B9CC]            // mod_HandlingManager.m_fWheelFriction
+        fmul ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep            // 1.666f
+        jmp RETURN_VehicleRapidStopFix
+    }
+}
+
+void CMultiplayerSA::SetRapidVehicleStopFixEnabled(bool enabled)
+{
+    if (m_isRapidVehicleStopFixEnabled == enabled)
+        return;
+
+    if (enabled)
+    {
+        EZHookInstall(CPhysical__ApplyAirResistance);
+
+        // CVehicle::ProcessWheel
+        HookInstall(0x6D6E69, (DWORD)HOOK_VehicleRapidStopFix<0x6D6E6F>, 6);
+        HookInstall(0x6D6EA8, (DWORD)HOOK_VehicleRapidStopFix<0x6D6EAE>, 6);
+
+        // CVehicle::ProcessBikeWheel
+        HookInstall(0x6D767F, (DWORD)HOOK_VehicleRapidStopFix<0x6D7685>, 6);
+        HookInstall(0x6D76AB, (DWORD)HOOK_VehicleRapidStopFix<0x6D76B1>, 6);
+        HookInstall(0x6D76CD, (DWORD)HOOK_VehicleRapidStopFix<0x6D76D3>, 6);
+    }
+    else
+    {
+        MemCpy((void*)HOOKPOS_CPhysical__ApplyAirResistance, "\xD9\x46\x50\xD8\x0D", 5);
+
+        MemCpy((void*)0x6D6E69, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+        MemCpy((void*)0x6D6EA8, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+
+        MemCpy((void*)0x6D767F, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+        MemCpy((void*)0x6D76AB, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+        MemCpy((void*)0x6D76CD, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+    }
+
+    m_isRapidVehicleStopFixEnabled = enabled;
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -619,4 +731,6 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CVehicle__AddExhaustParticles);
     EZHookInstall(CTaskSimpleSwim__ProcessEffects);
     EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
+
+    EZHookInstall(CWeapon_Update);
 }

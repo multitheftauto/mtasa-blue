@@ -5,7 +5,7 @@
  *  FILE:        gui/Main.cpp
  *  PURPOSE:     Graphical User Interface entry
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -31,6 +31,7 @@ MTAEXPORT CGUI* InitGUIInterface(IDirect3DDevice9* pDevice)
     // Create our GUI interface if not already done
     if (!g_pGUI)
     {
+        SetMemoryAllocationFailureHandler();
         g_pGUI = new CGUI_Impl(pDevice);
     }
 

@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp
  *  PORPOISE:    Home for the poke'n'hope crash fixes
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -189,7 +189,7 @@ void _declspec(naked) HOOK_CrashFix_Misc5()
 ////////////////////////////////////////////////////////////////////////
 // RpAnimBlend::FrameUpdateCallBackSkinnedWithVelocityExtraction
 //
-// Mantis #5465 (2/2) (https://web.archive.org/web/20160411120202/http://bugs.mtasa.com/view.php?id=5465)
+// Mantis #5465 (2/2) (https://web.archive.org/web/20160411120202/https://bugs.mtasa.com/view.php?id=5465)
 //
 // Null pointer to object in the BlendNodeArrays array of the AnimBlendUpdateData structure
 ////////////////////////////////////////////////////////////////////////
@@ -217,7 +217,7 @@ void _declspec(naked) HOOK_CrashFix_Misc6()
 ////////////////////////////////////////////////////////////////////////
 // CCollision::ProcessVerticalLine
 //
-// Mantis #5466 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5466)
+// Mantis #5466 (https://web.archive.org/web/20160401233418/https://bugs.mtasa.com/view.php?id=5466)
 //
 // Null colModel pointer
 ////////////////////////////////////////////////////////////////////////
@@ -245,7 +245,7 @@ void _declspec(naked) HOOK_CrashFix_Misc7()
 ////////////////////////////////////////////////////////////////////////
 // Get2DEffectAtomicCallback
 //
-// Mantis #5468  1/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
+// Mantis #5468  1/3 (https://web.archive.org/web/20160401233418/https://bugs.mtasa.com/view.php?id=5468)
 //
 // Null pointer atomic->geometry in the RpAtomic
 ////////////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ void _declspec(naked) HOOK_CrashFix_Misc8()
 ////////////////////////////////////////////////////////////////////////
 // CProjectileInfo::Update
 //
-// Mantis #5468 2/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
+// Mantis #5468 2/3 (https://web.archive.org/web/20160401233418/https://bugs.mtasa.com/view.php?id=5468)
 //
 // Null pointer projectile of type CObject* in the array CProjectileInfo::ms_apProjectile
 ////////////////////////////////////////////////////////////////////////
@@ -301,7 +301,7 @@ void _declspec(naked) HOOK_CrashFix_Misc9()
 ////////////////////////////////////////////////////////////////////////
 // CEntity::TransformFromObjectSpace
 //
-// Mantis #5468 3/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
+// Mantis #5468 3/3 (https://web.archive.org/web/20160401233418/https://bugs.mtasa.com/view.php?id=5468)
 //
 // Invalid pointer to a vector
 ////////////////////////////////////////////////////////////////////////
@@ -333,7 +333,7 @@ void _declspec(naked) HOOK_CrashFix_Misc10()
 ////////////////////////////////////////////////////////////////////////
 // RpAnimBlend::FrameUpdateCallBackSkinned
 //
-// Mantis #5576 (https://web.archive.org/web/20160408163600/http://bugs.mtasa.com/view.php?id=5576)
+// Mantis #5576 (https://web.archive.org/web/20160408163600/https://bugs.mtasa.com/view.php?id=5576)
 //
 // The crash likely occurs due to invalid data passed as the second argument
 ////////////////////////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ void _declspec(naked) HOOK_CrashFix_Misc11()
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::UncompressAnimation
 //
-// Mantis #5530 (https://web.archive.org/web/20160411114105/http://bugs.mtasa.com/view.php?id=5530)
+// Mantis #5530 (https://web.archive.org/web/20160411114105/https://bugs.mtasa.com/view.php?id=5530)
 //
 // Null pointer of type CAnimBlendHierarchy passed to the function
 ////////////////////////////////////////////////////////////////////////

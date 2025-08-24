@@ -1597,71 +1597,24 @@ bool CWeaponStatManager::LoadDefault(CWeaponStat* pDest, eWeaponType weaponType,
     return true;
 }
 
-unsigned short CWeaponStatManager::GetSkillStatIndex(eWeaponType eWeapon)
+eStats CWeaponStatManager::GetSkillStatIndex(eWeaponType weapon)
 {
-    switch (eWeapon)
+    switch (weapon)
     {
-        case WEAPONTYPE_PISTOL:
-        {
-            return 46;
-            break;
-        }
-        case WEAPONTYPE_PISTOL_SILENCED:
-        {
-            return 47;
-            break;
-        }
-        case WEAPONTYPE_DESERT_EAGLE:
-        {
-            return 48;
-            break;
-        }
-        case WEAPONTYPE_SHOTGUN:
-        {
-            return 49;
-            break;
-        }
-        case WEAPONTYPE_SAWNOFF_SHOTGUN:
-        {
-            return 50;
-            break;
-        }
-        case WEAPONTYPE_SPAS12_SHOTGUN:
-        {
-            return 51;
-            break;
-        }
-        case WEAPONTYPE_MICRO_UZI:
-        case WEAPONTYPE_TEC9:
-        {
-            return 52;
-            break;
-        }
-        case WEAPONTYPE_MP5:
-        {
-            return 53;
-            break;
-        }
-        case WEAPONTYPE_M4:
-        {
-            return 54;
-            break;
-        }
-        case WEAPONTYPE_AK47:
-        {
-            return 55;
-            break;
-        }
-        case WEAPONTYPE_SNIPERRIFLE:
-        case WEAPONTYPE_COUNTRYRIFLE:
-        {
-            return 56;
-            break;
-        }
-        default:
-        {
-            return 0;
-        }
+        case WEAPONTYPE_PISTOL:          return STAT_PISTOL_SKILL;
+        case WEAPONTYPE_PISTOL_SILENCED: return STAT_SILENCED_PISTOL_SKILL;
+        case WEAPONTYPE_DESERT_EAGLE:    return STAT_DESERT_EAGLE_SKILL;
+        case WEAPONTYPE_SHOTGUN:         return STAT_SHOTGUN_SKILL;
+        case WEAPONTYPE_SAWNOFF_SHOTGUN: return STAT_SAWN_OFF_SHOTGUN_SKILL;
+        case WEAPONTYPE_SPAS12_SHOTGUN:  return STAT_COMBAT_SHOTGUN_SKILL;
+        case WEAPONTYPE_MICRO_UZI:       return STAT_MACHINE_PISTOL_SKILL;
+        case WEAPONTYPE_MP5:             return STAT_SMG_SKILL;
+        case WEAPONTYPE_AK47:            return STAT_AK_47_SKILL;
+        case WEAPONTYPE_M4:              return STAT_M4_SKILL;
+        case WEAPONTYPE_TEC9:            return STAT_MACHINE_PISTOL_SKILL;
+        case WEAPONTYPE_COUNTRYRIFLE:    return STAT_RIFLE_SKILL;
+        case WEAPONTYPE_SNIPERRIFLE:     return STAT_RIFLE_SKILL;
+        default:                         return static_cast<eStats>(0);
     }
 }
 
@@ -1674,4 +1627,9 @@ float CWeaponStatManager::GetWeaponRangeFromSkillLevel(eWeaponType eWeapon, floa
         fWeaponRange = pWeaponStat->GetWeaponRange();
     }
     return fWeaponRange;
+}
+
+bool CWeaponStatManager::HasWeaponBulletSync(uint32_t weaponID) noexcept
+{
+    return weaponID >= 22 && weaponID <= 34;
 }

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CVehicleInOutPacket.cpp
  *  PURPOSE:     Vehicle enter/exit synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -76,17 +76,10 @@ CVehicleInOutPacket::~CVehicleInOutPacket()
 bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream)
 {
     m_PedID = INVALID_ELEMENT_ID;
-    if (BitStream.Can(eBitStreamVersion::PedEnterExit))
+    BitStream.Read(m_PedID);
+    if (m_PedID == INVALID_ELEMENT_ID)
     {
-        BitStream.Read(m_PedID);
-        if (m_PedID == INVALID_ELEMENT_ID)
-        {
-            return false;
-        }
-    }
-    else
-    {
-        m_PedID = GetSourcePlayer()->GetID();
+        return false;
     }
 
     // Read out the vehicle id

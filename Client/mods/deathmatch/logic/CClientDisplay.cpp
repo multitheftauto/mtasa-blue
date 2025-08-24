@@ -10,22 +10,11 @@
 
 #include <StdInc.h>
 
-CClientDisplay::CClientDisplay(CClientDisplayManager* pDisplayManager, unsigned long ulID)
+CClientDisplay::CClientDisplay(unsigned long ulID)
 {
-    m_pDisplayManager = pDisplayManager;
     m_ulID = ulID;
-
-    m_ulExpirationTime = 0;
     m_bVisible = true;
     m_Color = SColorRGBA(255, 255, 255, 255);
-
-    m_pDisplayManager->AddToList(this);
-}
-
-CClientDisplay::~CClientDisplay()
-{
-    // Remove us from the manager
-    m_pDisplayManager->RemoveFromList(this);
 }
 
 void CClientDisplay::SetColorAlpha(unsigned char ucAlpha)

@@ -3,6 +3,7 @@
 // Used by loader.rc
 //
 #define IDB_BITMAP1                     105
+#define IDB_BITMAP2                     106
 #define IDD_PROGRESS_DIALOG             111
 #define IDD_CRASHED_DIALOG              114
 #define IDD_D3DDLL_DIALOG               115

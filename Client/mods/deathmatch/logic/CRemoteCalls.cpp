@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CRemoteCalls.cpp
  *  PURPOSE:     Remote HTTP call (callRemote) class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -149,7 +149,7 @@ void CRemoteCall::MakeCall()
     // GetDomainFromURL requires protocol://, but curl does not (defaults to http)
     SString strDomain = g_pCore->GetWebCore()->GetDomainFromURL(m_strURL);
     if (strDomain.empty())
-        strDomain = g_pCore->GetWebCore()->GetDomainFromURL("http://" + m_strURL);
+        strDomain = g_pCore->GetWebCore()->GetDomainFromURL("https://" + m_strURL);
     // Bypass net module IP check if we are allowed to access the URL
     bool bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
     m_downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);

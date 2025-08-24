@@ -19,7 +19,7 @@ public:
     CCefApp() {}
     virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override { return this; };
 
-    // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnFocusedNodeChanged(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefDOMNode%3E)
+    // https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnFocusedNodeChanged(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefDOMNode%3E)
     virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) override
     {
         if (m_bHasInputFocus)
@@ -53,7 +53,7 @@ public:
         }
     }
 
-    // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnContextCreated(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefV8Context%3E)
+    // https://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnContextCreated(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefV8Context%3E)
     // //
     virtual void OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context) override
     {

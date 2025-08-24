@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CProjectileSA.cpp
  *  PURPOSE:     Projectile entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -107,15 +107,15 @@ bool CProjectileSA::CorrectPhysics()
 
                 // create a matrix variable
                 CMatrix attachedToMatrix;
-                if (pCollidedWithInterface->Placeable.matrix != NULL)
+                if (pCollidedWithInterface->matrix != NULL)
                 {
                     // get our matrix
-                    pCollidedWithInterface->Placeable.matrix->ConvertToMatrix(attachedToMatrix);
+                    pCollidedWithInterface->matrix->ConvertToMatrix(attachedToMatrix);
                 }
                 else
                 {
                     // get our matrix
-                    attachedToMatrix = CMatrix(pCollidedWithInterface->Placeable.m_transform.m_translate);
+                    attachedToMatrix = CMatrix(pCollidedWithInterface->m_transform.m_translate);
                 }
 
                 // transform our matrix into local (attached) space

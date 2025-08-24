@@ -5,7 +5,7 @@
  *  FILE:        sdk/CMatrix_Pad.h
  *  PURPOSE:     4x3 GTA padded matrix
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

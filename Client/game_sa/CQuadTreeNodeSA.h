@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CQuadTreeNodeSA.h
  *  PURPOSE:     Quad tree node class interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

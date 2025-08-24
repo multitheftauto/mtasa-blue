@@ -1,10 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/packets/CBulletsyncPacket.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -12,79 +11,68 @@
 #include "CBulletsyncPacket.h"
 #include "net/SyncStructures.h"
 #include "CPlayer.h"
+#include "CWeaponStatManager.h"
 
-CBulletsyncPacket::CBulletsyncPacket(CPlayer* pPlayer)
+CBulletsyncPacket::CBulletsyncPacket(CPlayer* player) : m_weapon(WEAPONTYPE_UNARMED), m_order(0), m_damage(0.0f), m_zone(0), m_damaged(INVALID_ELEMENT_ID)
 {
-    m_pSourceElement = pPlayer;
-    m_WeaponType = WEAPONTYPE_UNARMED;
-    m_ucOrderCounter = 0;
-    m_fDamage = 0;
-    m_ucHitZone = 0;
-    m_DamagedPlayerID = INVALID_ELEMENT_ID;
+    m_pSourceElement = player;
 }
 
-bool CBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
 {
-    // Got a player?
-    if (m_pSourceElement)
+    if (!m_pSourceElement)
+        return false;
+
+    char type = 0;
+    if (!stream.Read(type) || !CWeaponStatManager::HasWeaponBulletSync(type))
+        return false;
+
+    m_weapon = static_cast<eWeaponType>(type);
+
+    if (!stream.Read(reinterpret_cast<char*>(&m_start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&m_end), sizeof(CVector)))
+        return false;
+
+    if (!m_start.IsValid() || !m_end.IsValid())
+        return false;
+
+    if (!stream.Read(m_order))
+        return false;
+
+    if (stream.ReadBit())
     {
-        char cWeaponType;
-        BitStream.Read(cWeaponType);
-        m_WeaponType = (eWeaponType)cWeaponType;
-
-        BitStream.Read((char*)&m_vecStart, sizeof(CVector));
-        BitStream.Read((char*)&m_vecEnd, sizeof(CVector));
-
-        // Duplicate packet protection
-        if (!BitStream.Read(m_ucOrderCounter))
-            return false;
-
-        if (BitStream.ReadBit())
-        {
-            BitStream.Read(m_fDamage);
-            BitStream.Read(m_ucHitZone);
-            BitStream.Read(m_DamagedPlayerID);
-        }
-        return true;
+        stream.Read(m_damage);
+        stream.Read(m_zone);
+        stream.Read(m_damaged);
     }
 
-    return false;
+    return true;
 }
 
-// Note: Relays a previous Read()
-bool CBulletsyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
 {
-    // Got a player to write?
-    if (m_pSourceElement)
+    if (!m_pSourceElement)
+        return false;
+
+    auto* player = static_cast<CPlayer*>(m_pSourceElement);
+    auto  id = player->GetID();
+
+    stream.Write(id);
+    stream.Write(static_cast<char>(m_weapon));
+    stream.Write(reinterpret_cast<const char*>(&m_start), sizeof(CVector));
+    stream.Write(reinterpret_cast<const char*>(&m_end), sizeof(CVector));
+    stream.Write(m_order);
+
+    if (m_damage > 0.0f && m_damaged != INVALID_ELEMENT_ID)
     {
-        CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
-
-        // Write the source player id
-        ElementID PlayerID = pSourcePlayer->GetID();
-        BitStream.Write(PlayerID);
-
-        // Write the bulletsync data
-        BitStream.Write((char)m_WeaponType);
-        BitStream.Write((const char*)&m_vecStart, sizeof(CVector));
-        BitStream.Write((const char*)&m_vecEnd, sizeof(CVector));
-
-        // Duplicate packet protection
-        BitStream.Write(m_ucOrderCounter);
-
-        if (m_fDamage > 0 && m_DamagedPlayerID != INVALID_ELEMENT_ID)
-        {
-            BitStream.WriteBit(true);
-            BitStream.Write(m_fDamage);
-            BitStream.Write(m_ucHitZone);
-            BitStream.Write(m_DamagedPlayerID);
-        }
-        else
-        {
-            BitStream.WriteBit(false);
-        }
-
-        return true;
+        stream.WriteBit(true);
+        stream.Write(m_damage);
+        stream.Write(m_zone);
+        stream.Write(m_damaged);
+    }
+    else
+    {
+        stream.WriteBit(false);
     }
 
-    return false;
+    return true;
 }

@@ -6,7 +6,7 @@
 #  PURPOSE:     Generates a MediaWiki table for error codes from source code
 #  DEVELOPERS:  Dan Chowdhury <>
 #
-#  Multi Theft Auto is available from http://www.multitheftauto.com/
+#  Multi Theft Auto is available from https://www.multitheftauto.com/
 #
 ##############################################################################
 

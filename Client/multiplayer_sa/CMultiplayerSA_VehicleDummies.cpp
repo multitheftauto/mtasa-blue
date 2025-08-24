@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 #include "StdInc.h"
+#include <enums/VehicleType.h>
 
 static const uint32_t CModelInfo__ms_modelInfoPtrs = 0xA9B0C8;
 
@@ -54,8 +55,8 @@ static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleIn
 
     if (vehicleDummiesPositionArray != nullptr)
     {
-        *mainPosition = vehicleDummiesPositionArray[EXHAUST];
-        *secondaryPosition = vehicleDummiesPositionArray[EXHAUST_SECONDARY];
+        *mainPosition = vehicleDummiesPositionArray[static_cast<std::size_t>(VehicleDummies::EXHAUST)];
+        *secondaryPosition = vehicleDummiesPositionArray[static_cast<std::size_t>(VehicleDummies::EXHAUST_SECONDARY)];
 
         // NOTE(botder): Certain bike models (NRG-500, BF-400, FCR-900) actually use the secondary exhaust position
         //               and we can't abuse it for these models to position double exhausts here.
@@ -63,15 +64,15 @@ static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleIn
         bool    applyNegativeMainPosition = false;
         int16_t extras = vehicleInterface->m_upgrades[0];
 
-        if (vehicleInterface->m_nModelIndex == VT_NRG500)
+        if (static_cast<VehicleType>(vehicleInterface->m_nModelIndex) == VehicleType::VT_NRG500)
         {
             applyNegativeMainPosition = extras != 0 && extras != 1;
         }
-        else if (vehicleInterface->m_nModelIndex == VT_BF400)
+        else if (static_cast<VehicleType>(vehicleInterface->m_nModelIndex) == VehicleType::VT_BF400)
         {
             applyNegativeMainPosition = extras != 2;
         }
-        else if (vehicleInterface->m_nModelIndex == VT_FCR900)
+        else if (static_cast<VehicleType>(vehicleInterface->m_nModelIndex) == VehicleType::VT_FCR900)
         {
             applyNegativeMainPosition = extras != 1;
         }
@@ -307,11 +308,11 @@ static void __cdecl ApplySecondaryExhaustNitroPosition(CVehicleSAInterface* vehi
 
     if (vehicleDummiesPositionArray != nullptr)
     {
-        *secondaryExhaustPosition = vehicleDummiesPositionArray[EXHAUST_SECONDARY];
+        *secondaryExhaustPosition = vehicleDummiesPositionArray[(std::size_t)VehicleDummies::EXHAUST_SECONDARY];
 
         if (secondaryExhaustPosition->fX == 0.0 && secondaryExhaustPosition->fY == 0.0 && secondaryExhaustPosition->fZ == 0.0)
         {
-            *secondaryExhaustPosition = vehicleDummiesPositionArray[EXHAUST];
+            *secondaryExhaustPosition = vehicleDummiesPositionArray[(std::size_t)VehicleDummies::EXHAUST];
             secondaryExhaustPosition->fX *= -1.0f;
         }
     }

@@ -71,24 +71,6 @@ static inline spx_word32_t MAC16_32_Q15(spx_word32_t a, spx_word16_t x, spx_word
   return(res);
 }
 
-#undef MULT16_32_Q11
-static inline spx_word32_t MULT16_32_Q11(spx_word16_t x, spx_word32_t y) {
-  int res;
-  asm ("smulwb  %0,%1,%2;\n"
-              : "=&r"(res)
-               : "%r"(y<<5),"r"(x));
-  return(res);
-}
-
-#undef MAC16_32_Q11
-static inline spx_word32_t MAC16_32_Q11(spx_word32_t a, spx_word16_t x, spx_word32_t y) {
-  int res;
-  asm ("smlawb  %0,%1,%2,%3;\n"
-              : "=&r"(res)
-               : "%r"(y<<5),"r"(x),"r"(a));
-  return(res);
-}
-
 #undef DIV32_16
 static inline short DIV32_16(int a, int b)
 {

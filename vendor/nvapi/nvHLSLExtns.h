@@ -1,36 +1,28 @@
- /************************************************************************************************************************************\
-|*                                                                                                                                    *|
-|*     Copyright © 2012 NVIDIA Corporation.  All rights reserved.                                                                     *|
-|*                                                                                                                                    *|
-|*  NOTICE TO USER:                                                                                                                   *|
-|*                                                                                                                                    *|
-|*  This software is subject to NVIDIA ownership rights under U.S. and international Copyright laws.                                  *|
-|*                                                                                                                                    *|
-|*  This software and the information contained herein are PROPRIETARY and CONFIDENTIAL to NVIDIA                                     *|
-|*  and are being provided solely under the terms and conditions of an NVIDIA software license agreement.                             *|
-|*  Otherwise, you have no rights to use or access this software in any manner.                                                       *|
-|*                                                                                                                                    *|
-|*  If not covered by the applicable NVIDIA software license agreement:                                                               *|
-|*  NVIDIA MAKES NO REPRESENTATION ABOUT THE SUITABILITY OF THIS SOFTWARE FOR ANY PURPOSE.                                            *|
-|*  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY OF ANY KIND.                                                           *|
-|*  NVIDIA DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,                                                                     *|
-|*  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.                       *|
-|*  IN NO EVENT SHALL NVIDIA BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,                               *|
-|*  OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  WHETHER IN AN ACTION OF CONTRACT,                         *|
-|*  NEGLIGENCE OR OTHER TORTIOUS ACTION,  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOURCE CODE.            *|
-|*                                                                                                                                    *|
-|*  U.S. Government End Users.                                                                                                        *|
-|*  This software is a "commercial item" as that term is defined at 48 C.F.R. 2.101 (OCT 1995),                                       *|
-|*  consisting  of "commercial computer  software"  and "commercial computer software documentation"                                  *|
-|*  as such terms are  used in 48 C.F.R. 12.212 (SEPT 1995) and is provided to the U.S. Government only as a commercial end item.     *|
-|*  Consistent with 48 C.F.R.12.212 and 48 C.F.R. 227.7202-1 through 227.7202-4 (JUNE 1995),                                          *|
-|*  all U.S. Government End Users acquire the software with only those rights set forth herein.                                       *|
-|*                                                                                                                                    *|
-|*  Any use of this software in individual and commercial software must include,                                                      *|
-|*  in the user documentation and internal comments to the code,                                                                      *|
-|*  the above Disclaimer (as applicable) and U.S. Government End Users Notice.                                                        *|
-|*                                                                                                                                    *|
- \************************************************************************************************************************************/
+/*********************************************************************************************************\
+|*                                                                                                        *|
+|* SPDX-FileCopyrightText: Copyright (c) 2019-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
+|* SPDX-License-Identifier: MIT                                                                           *|
+|*                                                                                                        *|
+|* Permission is hereby granted, free of charge, to any person obtaining a                                *|
+|* copy of this software and associated documentation files (the "Software"),                             *|
+|* to deal in the Software without restriction, including without limitation                              *|
+|* the rights to use, copy, modify, merge, publish, distribute, sublicense,                               *|
+|* and/or sell copies of the Software, and to permit persons to whom the                                  *|
+|* Software is furnished to do so, subject to the following conditions:                                   *|
+|*                                                                                                        *|
+|* The above copyright notice and this permission notice shall be included in                             *|
+|* all copies or substantial portions of the Software.                                                    *|
+|*                                                                                                        *|
+|* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                             *|
+|* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                               *|
+|* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL                               *|
+|* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                             *|
+|* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING                                *|
+|* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER                                    *|
+|* DEALINGS IN THE SOFTWARE.                                                                              *|
+|*                                                                                                        *|
+|*                                                                                                        *|
+\*********************************************************************************************************/
 
 ////////////////////////// NVIDIA SHADER EXTENSIONS /////////////////
 
@@ -1743,6 +1735,115 @@ float2 NvRtMicroVertexBarycentrics(RaytracingAccelerationStructure AccelerationS
 #endif
 
 //----------------------------------------------------------------------------//
+//--------------------- DXR Cluster Geometry Extension -----------------------//
+//----------------------------------------------------------------------------//
+
+#if __SHADER_TARGET_MAJOR > 6 || (__SHADER_TARGET_MAJOR == 6 && __SHADER_TARGET_MINOR >= 3)
+
+uint NvRtGetClusterID()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_GET_CLUSTER_ID;
+    return g_NvidiaExt.IncrementCounter();
+}
+
+#endif
+
+#if __SHADER_TARGET_MAJOR > 6 || (__SHADER_TARGET_MAJOR == 6 && __SHADER_TARGET_MINOR >= 5)
+
+#define NvRtGetCandidateClusterID(rq) __NvRtGetCandidateClusterID(rq.RayFlags())
+
+#define NvRtGetCommittedClusterID(rq) __NvRtGetCommittedClusterID(rq.RayFlags())
+
+#define NvRtCandidateTriangleObjectPositions(rq) __NvRtCandidateTriangleObjectPositions(rq.RayFlags())
+
+#define NvRtCommittedTriangleObjectPositions(rq) __NvRtCommittedTriangleObjectPositions(rq.RayFlags())
+
+#endif
+
+//----------------------------------------------------------------------------//
+//--------------------- DXR Linear Swept Sphere Extension --------------------//
+//----------------------------------------------------------------------------//
+
+#if __SHADER_TARGET_MAJOR > 6 || (__SHADER_TARGET_MAJOR == 6 && __SHADER_TARGET_MINOR >= 3)
+
+float4 NvRtSphereObjectPositionAndRadius()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_SPHERE_OBJECT_POSITION_AND_RADIUS;
+
+    float4 ret;
+    ret[0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[3] = asfloat(g_NvidiaExt.IncrementCounter());
+    return ret;
+}
+
+float2x4 NvRtLssObjectPositionsAndRadii()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_LSS_OBJECT_POSITIONS_AND_RADII;
+
+    float2x4 ret;
+    ret[0][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[0][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[0][2] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[0][3] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][2] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][3] = asfloat(g_NvidiaExt.IncrementCounter());
+    return ret;
+}
+
+bool NvRtIsSphereHit()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_IS_SPHERE_HIT;
+    uint ret = g_NvidiaExt.IncrementCounter();
+    return ret != 0;
+}
+
+bool NvRtIsLssHit()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_IS_LSS_HIT;
+    uint ret = g_NvidiaExt.IncrementCounter();
+    return ret != 0;
+}
+
+#endif
+
+#if __SHADER_TARGET_MAJOR > 6 || (__SHADER_TARGET_MAJOR == 6 && __SHADER_TARGET_MINOR >= 5)
+
+#define NvRtCandidateIsNonOpaqueSphere(rq) __NvRtCandidateIsNonOpaqueSphere(rq.RayFlags())
+
+#define NvRtCandidateIsNonOpaqueLss(rq) __NvRtCandidateIsNonOpaqueLss(rq.RayFlags())
+
+#define NvRtCandidateLssHitParameter(rq) __NvRtCandidateLssHitParameter(rq.RayFlags())
+
+#define NvRtCandidateSphereObjectPositionAndRadius(rq) __NvRtCandidateSphereObjectPositionAndRadius(rq.RayFlags())
+
+#define NvRtCandidateLssObjectPositionsAndRadii(rq) __NvRtCandidateLssObjectPositionsAndRadii(rq.RayFlags())
+
+#define NvRtCandidateBuiltinPrimitiveRayT(rq) __NvRtCandidateBuiltinPrimitiveRayT(rq.RayFlags())
+
+#define NvRtCommittedIsSphere(rq) __NvRtCommittedIsSphere(rq.RayFlags())
+
+#define NvRtCommittedIsLss(rq) __NvRtCommittedIsLss(rq.RayFlags())
+
+#define NvRtCommittedLssHitParameter(rq) __NvRtCommittedLssHitParameter(rq.RayFlags())
+
+#define NvRtCommittedSphereObjectPositionAndRadius(rq) __NvRtCommittedSphereObjectPositionAndRadius(rq.RayFlags())
+
+#define NvRtCommittedLssObjectPositionsAndRadii(rq) __NvRtCommittedLssObjectPositionsAndRadii(rq.RayFlags())
+
+#define NvRtCommitNonOpaqueBuiltinPrimitiveHit(rq) __NvRtCommitNonOpaqueBuiltinPrimitiveHit(rq.RayFlags())
+
+#endif
+
+//----------------------------------------------------------------------------//
 //------------------------- DXR HitObject Extension --------------------------//
 //----------------------------------------------------------------------------//
 
@@ -1876,6 +1977,83 @@ struct NvHitObject {
         g_NvidiaExt[index].src0u.x = _handle;
         g_NvidiaExt[index].src0u.y = RootConstantOffsetInBytes;
         return g_NvidiaExt.IncrementCounter();
+    }
+
+    float4 GetSphereObjectPositionAndRadius()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_GET_SPHERE_OBJECT_POSITION_AND_RADIUS;
+        g_NvidiaExt[index].src0u.x = _handle;
+
+        float4 ret;
+        ret[0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[3] = asfloat(g_NvidiaExt.IncrementCounter());
+        return ret;
+    }
+
+    float2x4 GetLssObjectPositionsAndRadii()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_GET_LSS_OBJECT_POSITIONS_AND_RADII;
+        g_NvidiaExt[index].src0u.x = _handle;
+
+        float2x4 ret;
+        ret[0][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][3] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][3] = asfloat(g_NvidiaExt.IncrementCounter());
+        return ret;
+    }
+
+    bool IsSphereHit()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_IS_SPHERE_HIT;
+        g_NvidiaExt[index].src0u.x = _handle;
+        uint ret = g_NvidiaExt.IncrementCounter();
+        return ret != 0;
+    }
+
+    bool IsLssHit()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_IS_LSS_HIT;
+        g_NvidiaExt[index].src0u.x = _handle;
+        uint ret = g_NvidiaExt.IncrementCounter();
+        return ret != 0;
+    }
+
+    uint GetClusterID()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_GET_CLUSTER_ID;
+        g_NvidiaExt[index].src0u.x = _handle;
+        return g_NvidiaExt.IncrementCounter();
+    }
+
+    float3x3 GetTriangleObjectPositions()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_GET_TRIANGLE_OBJECT_POSITIONS;
+        g_NvidiaExt[index].src0u.x = _handle;
+
+        float3x3 ret;
+        ret[0][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[2][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[2][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[2][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        return ret;
     }
 };
 
@@ -2169,6 +2347,83 @@ struct NvHitObject {
         g_NvidiaExt[index].src0u.x = _handle;
         g_NvidiaExt[index].src0u.y = RootConstantOffsetInBytes;
         return g_NvidiaExt.IncrementCounter();
+    }
+
+    float4 GetSphereObjectPositionAndRadius()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_GET_SPHERE_OBJECT_POSITION_AND_RADIUS;
+        g_NvidiaExt[index].src0u.x = _handle;
+
+        float4 ret;
+        ret[0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[3] = asfloat(g_NvidiaExt.IncrementCounter());
+        return ret;
+    }
+
+    float2x4 GetLssObjectPositionsAndRadii()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_GET_LSS_OBJECT_POSITIONS_AND_RADII;
+        g_NvidiaExt[index].src0u.x = _handle;
+
+        float2x4 ret;
+        ret[0][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][3] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][3] = asfloat(g_NvidiaExt.IncrementCounter());
+        return ret;
+    }
+
+    bool IsSphereHit()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_IS_SPHERE_HIT;
+        g_NvidiaExt[index].src0u.x = _handle;
+        uint ret = g_NvidiaExt.IncrementCounter();
+        return ret != 0;
+    }
+
+    bool IsLssHit()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_IS_LSS_HIT;
+        g_NvidiaExt[index].src0u.x = _handle;
+        uint ret = g_NvidiaExt.IncrementCounter();
+        return ret != 0;
+    }
+
+    uint GetClusterID()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_GET_CLUSTER_ID;
+        g_NvidiaExt[index].src0u.x = _handle;
+        return g_NvidiaExt.IncrementCounter();
+    }
+
+    float3x3 GetTriangleObjectPositions()
+    {
+        uint index = g_NvidiaExt.IncrementCounter();
+        g_NvidiaExt[index].opcode = NV_EXTN_OP_HIT_OBJECT_GET_TRIANGLE_OBJECT_POSITIONS;
+        g_NvidiaExt[index].src0u.x = _handle;
+
+        float3x3 ret;
+        ret[0][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[0][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[1][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[2][0] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[2][1] = asfloat(g_NvidiaExt.IncrementCounter());
+        ret[2][2] = asfloat(g_NvidiaExt.IncrementCounter());
+        return ret;
     }
 };
 

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CDummyPoolSA.h
  *  PURPOSE:     Dummy pool class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -35,6 +35,7 @@ private:
 private:
     CPoolSAInterface<CEntitySAInterface>**  m_ppDummyPoolInterface;
 
-    using pool_backup_t = std::array<std::pair<bool, CEntitySAInterface>, MAX_DUMMIES_DEFAULT>;
+    using building_buffer_t = std::uint8_t[sizeof(CEntitySAInterface)];
+    using pool_backup_t = std::array<std::pair<bool, building_buffer_t>, MAX_DUMMIES_DEFAULT>;
     std::unique_ptr<pool_backup_t> m_pOriginalElementsBackup;
 };

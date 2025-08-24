@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCameraSA.h
  *  PURPOSE:     Header file for camera rendering class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -77,14 +77,9 @@ public:
 
 /*** END PURE R* CLASSES ***/
 
-class CCameraSAInterface
+class CCameraSAInterface : public CPlaceableSAInterface
 {
 public:
-    // CPlaceable
-    CPlaceableSAInterface Placeable;
-    std::uint8_t          specialPadding[4]; // Temporary padding due to incorrect CPlaceableSAInterface class
-    // End CPlaceable
-
     // move these out the class, have decided to set up a mirrored enumerated type thingy at the top
     bool          m_bAboveGroundTrainNodesLoaded;
     bool          m_bBelowGroundTrainNodesLoaded;
@@ -387,40 +382,42 @@ public:
     ~CCameraSA();
 
     CCameraSAInterface* GetInterface() { return internalInterface; };
-    void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
-    void                TakeControl(CVector* position, int CamSwitchStyle);
-    void                Restore();
-    void                RestoreWithJumpCut();
-    CMatrix*            GetMatrix(CMatrix* matrix);
-    void                SetMatrix(CMatrix* matrix);
-    void                Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
-    float               Find3rdPersonQuickAimPitch();
-    BYTE                GetActiveCam();
+    
+    // CCamera interface implementation
+    void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle) override;
+    void                TakeControl(CVector* position, int CamSwitchStyle) override;
+    void                Restore() override;
+    void                RestoreWithJumpCut() override;
+    CMatrix*            GetMatrix(CMatrix* matrix) override;
+    void                SetMatrix(CMatrix* matrix) override;
+    void                Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget) override;
+    float               Find3rdPersonQuickAimPitch() override;
+    BYTE                GetActiveCam() override;
+    CCam*               GetCam(BYTE bCameraID) override;
+    void                SetWidescreen(bool bWidescreen) override;
+    bool                GetWidescreen() override;
+    bool                IsFading() override;
+    int                 GetFadingDirection() override;
+    void                Fade(float fFadeOutTime, int iOutOrIn) override;
+    void                SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue) override;
+    float               GetCameraRotation() override;
+    RwMatrix*           GetLTM() override;
+    CEntity*            GetTargetEntity() override;
+    void                SetCameraClip(bool bObjects, bool bVehicles) override;
+    void                GetCameraClip(bool& bObjects, bool& bVehicles) override;
+    BYTE                GetCameraVehicleViewMode() override;
+    BYTE                GetCameraPedViewMode() override;
+    void                SetCameraVehicleViewMode(BYTE dwCamMode) override;
+    void                SetCameraPedViewMode(BYTE dwCamMode) override;
+    void                SetShakeForce(float fShakeForce) override;
+    float               GetShakeForce() override;
+    void                ShakeCamera(float radius, float x, float y, float z) noexcept override;
+    void                ResetShakeCamera() noexcept override;
+    std::uint8_t        GetTransitionState() override;
 
-    CCam*         GetCam(BYTE bCameraID);
+    // Additional overload not in base interface
     virtual CCam* GetCam(CCamSAInterface* camInterface);
-
-    void      SetWidescreen(bool bWidescreen);
-    bool      GetWidescreen();
-    bool      IsFading();
-    int       GetFadingDirection();
-    void      Fade(float fFadeOutTime, int iOutOrIn);
-    void      SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
-    float     GetCameraRotation();
-    RwMatrix* GetLTM();
-    CEntity*  GetTargetEntity();
-    void      SetCameraClip(bool bObjects, bool bVehicles);
-    void      GetCameraClip(bool& bObjects, bool& bVehicles);
-    BYTE      GetCameraVehicleViewMode();
-    BYTE      GetCameraPedViewMode();
-    void      SetCameraVehicleViewMode(BYTE dwCamMode);
-    void      SetCameraPedViewMode(BYTE dwCamMode);
+    
+    // Additional methods
     void      RestoreLastGoodState();
-    void      SetShakeForce(float fShakeForce);
-    float     GetShakeForce();
-
-    void ShakeCamera(float radius, float x, float y, float z) noexcept override;
-    void ResetShakeCamera() noexcept override;
-
-    std::uint8_t GetTransitionState();
 };

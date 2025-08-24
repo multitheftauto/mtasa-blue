@@ -14,13 +14,70 @@
     #include <Windows.h>
     #include <Psapi.h>
     #include <vector>
+    #include <new.h>
+    #include <array>
 #elif defined(__APPLE__)
     #include <mach/mach.h>
     #include <unistd.h>
+    #include <new>
 #else
     #include <fstream>
     #include <unistd.h>
     #include <sys/sysinfo.h>
+    #include <new>
+#endif
+
+#ifndef DECLSPEC_NOINLINE
+    #if defined(_WIN32)
+        #define DECLSPEC_NOINLINE __declspec(noinline)
+    #else
+        #define DECLSPEC_NOINLINE __attribute__((noinline))
+    #endif
+#endif
+
+#ifndef DECLSPEC_RETAIN
+    #if defined(_WIN32)
+        #define DECLSPEC_RETAIN
+    #else
+        #define DECLSPEC_RETAIN __attribute__((retain))
+    #endif
+#endif
+
+[[noreturn]] DECLSPEC_NOINLINE DECLSPEC_RETAIN static void OutOfMemory(size_t allocationSize)
+{
+#if defined(_WIN32)
+    std::array<ULONG_PTR, 3> arguments{allocationSize, INFINITE, INFINITE};
+
+    MEMORYSTATUSEX status{};
+    status.dwLength = sizeof(status);
+
+    if (GlobalMemoryStatusEx(&status))
+    {
+        arguments[1] = static_cast<ULONG_PTR>(status.ullAvailPageFile);
+        arguments[2] = static_cast<ULONG_PTR>(status.ullTotalPageFile);
+    }
+
+    RaiseException(CUSTOM_EXCEPTION_CODE_OOM, EXCEPTION_NONCONTINUABLE, arguments.size(), arguments.data());
+    ExitProcess(CUSTOM_EXCEPTION_CODE_OOM);
+#else
+    std::_Exit(CUSTOM_EXCEPTION_CODE_OOM);
+#endif
+}
+
+#if defined(_WIN32)
+int HandleMemoryAllocationFailure(size_t allocationSize)
+{
+    OutOfMemory(allocationSize);
+    __fastfail(CUSTOM_EXCEPTION_CODE_OOM);
+    return 0;
+}
+#else
+void HandleMemoryAllocationFailure()
+{
+    OutOfMemory(0);
+    std::set_new_handler(nullptr);
+    std::exit(CUSTOM_EXCEPTION_CODE_OOM);
+}
 #endif
 
 namespace SharedUtil
@@ -123,6 +180,16 @@ namespace SharedUtil
         if (out.residentMemorySize > out.sharedMemorySize)
             out.privateMemorySize = out.residentMemorySize - out.sharedMemorySize;
         return true;
+#endif
+    }
+
+    void SetMemoryAllocationFailureHandler()
+    {
+#if defined(_WIN32)
+        _set_new_handler(&HandleMemoryAllocationFailure);
+        // _set_new_mode(1 /* call _set_new_handler for malloc failure */);
+#else
+        std::set_new_handler(&HandleMemoryAllocationFailure);
 #endif
     }
 }            // namespace SharedUtil

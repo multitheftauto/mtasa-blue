@@ -5,7 +5,7 @@
  *  FILE:        sdk/CVector.h
  *  PURPOSE:     3D vector math implementation
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -192,6 +192,18 @@ public:
         }
 
         return false;
+    }
+
+    bool IsValid() const
+    {
+        const float values[3] = {fX, fY, fZ};
+        for (std::size_t i = 0; i < 3; ++i)
+        {
+            if (std::isnan(values[i]) || std::isinf(values[i]))
+                return false;
+        }
+
+        return true;
     }
 
     constexpr CVector operator+(const CVector& vecRight) const noexcept { return CVector(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ); }

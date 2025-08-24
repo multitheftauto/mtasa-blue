@@ -57,7 +57,7 @@ private:
     std::unique_ptr<SXMLString>        m_pXMLString = nullptr;
     CXMLNode*                          m_pXMLDocument = nullptr;
 
-    std::unique_ptr<CClientVectorGraphicDisplay> m_pVectorGraphicDisplay;
+    std::shared_ptr<CClientVectorGraphicDisplay> m_pVectorGraphicDisplay;
 
     std::variant<CLuaFunctionRef, bool> m_updateCallbackRef = false;
 

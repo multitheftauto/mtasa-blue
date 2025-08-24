@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,7 +30,7 @@ private:
     static std::uint32_t CountPlayersInTeam(CTeam* team) noexcept;
 
     // Team set funcs
-    static bool SetPlayerTeam(CPlayer* player, CTeam* team) noexcept;
+    static bool SetPlayerTeam(CPlayer* player, std::optional<CTeam*> team) noexcept;
     static bool SetTeamName(CTeam* team, const std::string name);
     static bool SetTeamColor(CTeam* team, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) noexcept;
     static bool SetTeamFriendlyFire(CTeam* team, const bool state) noexcept;

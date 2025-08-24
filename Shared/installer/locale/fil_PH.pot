@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-16 19:37\n"
+"POT-Creation-Date: 2025-04-08 22:41\n"
+"PO-Revision-Date: 2025-04-08 23:03\n"
 "Last-Translator: \n"
 "Language-Team: Filipino\n"
 "Language: fil_PH\n"
@@ -19,17 +19,17 @@ msgstr ""
 
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:205
-msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr "Ang bersyon ng MTA:SA na iyong na-download ay hindi sumusuporta sa Windows XP o Vista.  Mangyaring mag-download ng alternatibong bersyon mula sa www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
+msgstr ""
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
-msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
 msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
-msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
 msgstr ""
 
 #. WELCOME_TEXT
@@ -147,72 +147,72 @@ msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr "Ang kliyente ay ang program na pinapatakbo mo upang i-play sa isang Multi Theft Auto server"
 
 #. INST_CLIENTSERVER
-#: Shared/installer/nightly.nsi:441
+#: Shared/installer/nightly.nsi:444
 msgid "Client and Server"
 msgstr "Kliyente at Server"
 
 #. INST_SERVER
-#: Shared/installer/nightly.nsi:442
+#: Shared/installer/nightly.nsi:445
 msgid "Server only"
 msgstr "Server lang"
 
 #. INST_STARTMENU_GROUP
-#: Shared/installer/nightly.nsi:456
+#: Shared/installer/nightly.nsi:459
 msgid "Start menu group"
 msgstr "Simulan ang pangkat ng menu"
 
 #. INST_DESKTOP_ICON
-#: Shared/installer/nightly.nsi:457
+#: Shared/installer/nightly.nsi:460
 msgid "Desktop icon"
 msgstr "Icon sa desktop"
 
 #. INST_PROTOCOL
-#: Shared/installer/nightly.nsi:458
+#: Shared/installer/nightly.nsi:461
 msgid "Register mtasa:// protocol"
 msgstr "Magrehistro ng mtasa:// protocol"
 
 #. INST_GAMES_EXPLORER
-#: Shared/installer/nightly.nsi:459
+#: Shared/installer/nightly.nsi:462
 msgid "Add to Games Explorer"
 msgstr "Idagdag sa Games Explorer"
 
 #. INST_DIRECTX
-#: Shared/installer/nightly.nsi:460
+#: Shared/installer/nightly.nsi:463
 msgid "Install DirectX"
 msgstr "I-install ang DirectX"
 
 #. INST_SEC_CLIENT
-#: Shared/installer/nightly.nsi:494
+#: Shared/installer/nightly.nsi:497
 msgid "Game client"
 msgstr "Kliyente ng laro"
 
 #. INST_SEC_SERVER
-#: Shared/installer/nightly.nsi:495
+#: Shared/installer/nightly.nsi:498
 msgid "Dedicated server"
 msgstr "Nakalaang server"
 
 #. INST_SEC_CORE
-#: Shared/installer/nightly.nsi:496
+#: Shared/installer/nightly.nsi:499
 msgid "Core components"
 msgstr "Mga pangunahing bahagi"
 
 #. INST_SEC_GAME
-#: Shared/installer/nightly.nsi:497
+#: Shared/installer/nightly.nsi:500
 msgid "Game module"
 msgstr "Module ng laro"
 
 #. INFO_INPLACE_UPGRADE
-#: Shared/installer/nightly.nsi:499
+#: Shared/installer/nightly.nsi:502
 msgid "Performing in-place upgrade..."
 msgstr "Nagsasagawa ng in-place upgrade..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: Shared/installer/nightly.nsi:500
+#: Shared/installer/nightly.nsi:503
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "Nagsasagawa ng in-place upgrade..."
 
 #. MSGBOX_INVALID_GTASA
-#: Shared/installer/nightly.nsi:501
+#: Shared/installer/nightly.nsi:504
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
@@ -221,42 +221,42 @@ msgstr "Ang isang wastong bersyon ng Windows ng Grand Theft Auto: San Andreas ay
 "Mangyaring muling i-install kung may mga problema sa ibang pagkakataon."
 
 #. INST_SEC_CORE_RESOURCES
-#: Shared/installer/nightly.nsi:504
+#: Shared/installer/nightly.nsi:507
 msgid "Core Resources"
 msgstr "Mga Pangunahing Mapagkukunan"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: Shared/installer/nightly.nsi:505
+#: Shared/installer/nightly.nsi:508
 msgid "Optional Resources"
 msgstr "Opsyonal na Mga Mapagkukunan"
 
 #. INST_SEC_EDITOR
-#: Shared/installer/nightly.nsi:506
+#: Shared/installer/nightly.nsi:509
 msgid "Editor"
 msgstr "Editor"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:1001
+#: Shared/installer/nightly.nsi:985
 msgid "Development"
 msgstr "Pag-unlad"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1049
+#: Shared/installer/nightly.nsi:1033
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "Matagumpay na naalis si $(^Name) sa iyong computer."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1056
+#: Shared/installer/nightly.nsi:1040
 msgid "Uninstallation has failed!"
 msgstr "Nabigo ang pag-uninstall!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1064
+#: Shared/installer/nightly.nsi:1048
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "Sigurado ka bang gusto mong ganap na alisin ang $(^Name) at lahat ng bahagi nito?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1065
+#: Shared/installer/nightly.nsi:1049
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -265,32 +265,32 @@ msgstr "Ina-uninstall bago i-update?$\\r$\n"
 "Patakbuhin ang bagong installer upang mag-upgrade at mapanatili ang iyong mga setting."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1078
+#: Shared/installer/nightly.nsi:1062
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Gusto mo bang panatilihin ang iyong mga file ng data (tulad ng mga mapagkukunan, mga screenshot at configuration ng server)? Kung iki-click mo ang hindi, mawawala ang anumang mga mapagkukunan, configuration o screenshot na iyong ginawa."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1253
+#: Shared/installer/nightly.nsi:1245
 msgid "This installer requires admin access, try again"
 msgstr "Ang installer na ito ay nangangailangan ng admin access, subukang muli"
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1254
+#: Shared/installer/nightly.nsi:1246
 msgid "This uninstaller requires admin access, try again"
 msgstr "Ang uninstaller na ito ay nangangailangan ng admin access, subukang muli"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1255
+#: Shared/installer/nightly.nsi:1247
 msgid "Logon service not running, aborting!"
 msgstr "Ang serbisyo ng pag-logon ay hindi tumatakbo, ibinabagsak!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1256
+#: Shared/installer/nightly.nsi:1248
 msgid "Unable to elevate"
 msgstr "Hindi maiangat"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1852
+#: Shared/installer/nightly.nsi:1844
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -301,7 +301,7 @@ msgstr "Mayroon nang ibang pangunahing bersyon ng MTA ($1) sa landas na iyon.$\n
 " Sigurado ka bang gusto mong i-overwrite ang MTA $1 sa $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1856
+#: Shared/installer/nightly.nsi:1848
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -312,7 +312,7 @@ msgstr "Hindi ma-install ang MTA sa parehong direktoryo gaya ng GTA:SA.$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1859
+#: Shared/installer/nightly.nsi:1851
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -321,7 +321,7 @@ msgstr "Ang napiling direktoryo ay wala.$\n"
 "Mangyaring piliin ang direktoryo ng pag-install ng GTA:SA"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1861
+#: Shared/installer/nightly.nsi:1853
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -330,17 +330,17 @@ msgstr "Hindi mahanap ang GTA:SA na naka-install sa $GTA_DIR $\n"
 "Sigurado ka bang gusto mong magpatuloy ?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1979
+#: Shared/installer/nightly.nsi:1971
 msgid "Choose Install Location"
 msgstr "Piliin ang I-install ang Lokasyon"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1980
+#: Shared/installer/nightly.nsi:1972
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Piliin ang folder kung saan ii-install ang ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1981
+#: Shared/installer/nightly.nsi:1973
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -351,62 +351,62 @@ msgstr "Ang ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} ay mai-install sa sumusuno
 " I-click ang Susunod upang magpatuloy."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1983
+#: Shared/installer/nightly.nsi:1975
 msgid "Destination Folder"
 msgstr "Destination Folder"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1984
+#: Shared/installer/nightly.nsi:1976
 msgid "Browse..."
 msgstr "Mag-browse..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1985
+#: Shared/installer/nightly.nsi:1977
 msgid "Default"
 msgstr ""
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1986
+#: Shared/installer/nightly.nsi:1978
 msgid "Last used"
 msgstr "Huling ginamit"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1987
+#: Shared/installer/nightly.nsi:1979
 msgid "Custom"
 msgstr "Custom"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2165
+#: Shared/installer/nightly.nsi:2157
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Piliin ang folder upang i-install ang ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} sa:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2183
+#: Shared/installer/nightly.nsi:2175
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Babala: Mayroon nang ibang pangunahing bersyon ng MTA ($1) sa landas na iyon."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2184
+#: Shared/installer/nightly.nsi:2176
 msgid "Installation type:  Upgrade"
 msgstr "Uri ng pag-install: Mag-upgrade"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2418
+#: Shared/installer/nightly.nsi:2410
 msgid "Online update"
 msgstr "Online update"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2419
+#: Shared/installer/nightly.nsi:2411
 msgid "Checking for update information"
 msgstr "Sinusuri ang impormasyon sa pag-update"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2420
+#: Shared/installer/nightly.nsi:2412
 msgid "Checking for installer update information..."
 msgstr "Sinusuri ang impormasyon sa pag-update ng installer..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2421
+#: Shared/installer/nightly.nsi:2413
 msgid "Please ensure your firewall is not blocking"
 msgstr "Pakitiyak na hindi nakaharang ang iyong firewall"
 

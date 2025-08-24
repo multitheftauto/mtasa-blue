@@ -15,284 +15,171 @@ static const SPlayerClothingType g_clothesNames[PLAYER_CLOTHING_SLOTS] = {
     {"Right Lower Arm"}, {"Back Top"}, {"Left Chest"}, {"Right Chest"}, {"Stomach"},        {"Lower Back"},     {"Extra1"},
     {"Extra2"},          {"Extra3"},   {"Extra4"},     {"Suit"}};
 
-static const SPlayerClothing g_TorsoClothing[TORSO_CLOTHING_MAX + 1] = {{"player_torso", "torso"},
-                                                                        {"vestblack", "vest"},
-                                                                        {"vest", "vest"},
-                                                                        {"tshirt2horiz", "tshirt2"},
-                                                                        {"tshirtwhite", "tshirt"},
-                                                                        {"tshirtilovels", "tshirt"},
-                                                                        {"tshirtblunts", "tshirt"},
-                                                                        {"shirtbplaid", "shirtb"},
-                                                                        {"shirtbcheck", "shirtb"},
-                                                                        {"field", "field"},
-                                                                        {"tshirterisyell", "tshirt"},
-                                                                        {"tshirterisorn", "tshirt"},
-                                                                        {"trackytop2eris", "trackytop1"},
-                                                                        {"bbjackrim", "bbjack"},
-                                                                        {"bballjackrstar", "bbjack"},
-                                                                        {"baskballdrib", "baskball"},
-                                                                        {"baskballrim", "baskball"},
-                                                                        {"sixtyniners", "tshirt"},
-                                                                        {"bandits", "baseball"},
-                                                                        {"tshirtprored", "tshirt"},
-                                                                        {"tshirtproblk", "tshirt"},
-                                                                        {"trackytop1pro", "trackytop1"},
-                                                                        {"hockeytop", "sweat"},
-                                                                        {"bbjersey", "sleevt"},
-                                                                        {"shellsuit", "trackytop1"},
-                                                                        {"tshirtheatwht", "tshirt"},
-                                                                        {"tshirtbobomonk", "tshirt"},
-                                                                        {"tshirtbobored", "tshirt"},
-                                                                        {"tshirtbase5", "tshirt"},
-                                                                        {"tshirtsuburb", "tshirt"},
-                                                                        {"hoodyamerc", "hoodya"},
-                                                                        {"hoodyabase5", "hoodya"},
-                                                                        {"hoodyarockstar", "hoodya"},
-                                                                        {"wcoatblue", "wcoat"},
-                                                                        {"coach", "coach"},
-                                                                        {"coachsemi", "coach"},
-                                                                        {"sweatrstar", "sweat"},
-                                                                        {"hoodyAblue", "hoodyA"},
-                                                                        {"hoodyAblack", "hoodyA"},
-                                                                        {"hoodyAgreen", "hoodyA"},
-                                                                        {"sleevtbrown", "sleevt"},
-                                                                        {"shirtablue", "shirta"},
-                                                                        {"shirtayellow", "shirta"},
-                                                                        {"shirtagrey", "shirta"},
-                                                                        {"shirtbgang", "shirtb"},
-                                                                        {"tshirtzipcrm", "tshirt"},
-                                                                        {"tshirtzipgry", "tshirt"},
-                                                                        {"denimfade", "denim"},
-                                                                        {"bowling", "hawaii"},
-                                                                        {"hoodjackbeige", "hoodjack"},
-                                                                        {"baskballloc", "baskball"},
-                                                                        {"tshirtlocgrey", "tshirt"},
-                                                                        {"tshirtmaddgrey", "tshirt"},
-                                                                        {"tshirtmaddgrn", "tshirt"},
-                                                                        {"suit1grey", "suit1"},
-                                                                        {"suit1blk", "suit1"},
-                                                                        {"leather", "leather"},
-                                                                        {"painter", "painter"},
-                                                                        {"hawaiiwht", "hawaii"},
-                                                                        {"hawaiired", "hawaii"},
-                                                                        {"sportjack", "trackytop1"},
-                                                                        {"suit1red", "suit1"},
-                                                                        {"suit1blue", "suit1"},
-                                                                        {"suit1yellow", "suit1"},
-                                                                        {"suit2grn", "suit2"},
-                                                                        {"tuxedo", "suit2"},
-                                                                        {"suit1gang", "suit1"},
-                                                                        {"letter", "sleevt"},
-                                                                        {NULL, NULL}};
+SFixedArray<std::vector<SPlayerClothing>, PLAYER_CLOTHING_SLOTS> CClientPlayerClothes::m_DefaultClothes
+{
+    //Torso Clothing
+    std::vector<SPlayerClothing> {
+        {"player_torso", "torso"}, {"vestblack", "vest"}, {"vest", "vest"}, {"tshirt2horiz", "tshirt2"}, {"tshirtwhite", "tshirt"},
+        {"tshirtilovels", "tshirt"}, {"tshirtblunts", "tshirt"}, {"shirtbplaid", "shirtb"}, {"shirtbcheck", "shirtb"},
+        {"field", "field"}, {"tshirterisyell", "tshirt"}, {"tshirterisorn", "tshirt"}, {"trackytop2eris", "trackytop1"},
+        {"bbjackrim", "bbjack"}, {"bballjackrstar", "bbjack"}, {"baskballdrib", "baskball"}, {"baskballrim", "baskball"},
+        {"sixtyniners", "tshirt"}, {"bandits", "baseball"}, {"tshirtprored", "tshirt"}, {"tshirtproblk", "tshirt"},
+        {"trackytop1pro", "trackytop1"}, {"hockeytop", "sweat"}, {"bbjersey", "sleevt"}, {"shellsuit", "trackytop1"},
+        {"tshirtheatwht", "tshirt"}, {"tshirtbobomonk", "tshirt"}, {"tshirtbobored", "tshirt"}, {"tshirtbase5", "tshirt"},
+        {"tshirtsuburb", "tshirt"}, {"hoodyamerc", "hoodya"}, {"hoodyabase5", "hoodya"}, {"hoodyarockstar", "hoodya"},
+        {"wcoatblue", "wcoat"}, {"coach", "coach"}, {"coachsemi", "coach"}, {"sweatrstar", "sweat"}, {"hoodyAblue", "hoodyA"},
+        {"hoodyAblack", "hoodyA"}, {"hoodyAgreen", "hoodyA"}, {"sleevtbrown", "sleevt"}, {"shirtablue", "shirta"}, {"shirtayellow", "shirta"},
+        {"shirtagrey", "shirta"}, {"shirtbgang", "shirtb"}, {"tshirtzipcrm", "tshirt"}, {"tshirtzipgry", "tshirt"}, {"denimfade", "denim"},
+        {"bowling", "hawaii"}, {"hoodjackbeige", "hoodjack"}, {"baskballloc", "baskball"}, {"tshirtlocgrey", "tshirt"},
+        {"tshirtmaddgrey", "tshirt"}, {"tshirtmaddgrn", "tshirt"}, {"suit1grey", "suit1"}, {"suit1blk", "suit1"}, {"leather", "leather"},
+        {"painter", "painter"}, {"hawaiiwht", "hawaii"}, {"hawaiired", "hawaii"}, {"sportjack", "trackytop1"}, {"suit1red", "suit1"},
+        {"suit1blue", "suit1"}, {"suit1yellow", "suit1"}, {"suit2grn", "suit2"}, {"tuxedo", "suit2"}, {"suit1gang", "suit1"}, {"letter", "sleevt"}
+    },
 
-static const SPlayerClothing g_HairClothing[HAIR_CLOTHING_MAX + 1] = {{"player_face", "head"},    {"hairblond", "head"},
-                                                                      {"hairred", "head"},        {"hairblue", "head"},
-                                                                      {"hairgreen", "head"},      {"hairpink", "head"},
-                                                                      {"bald", "head"},           {"baldbeard", "head"},
-                                                                      {"baldtash", "head"},       {"baldgoatee", "head"},
-                                                                      {"highfade", "head"},       {"highafro", "highafro"},
-                                                                      {"wedge", "wedge"},         {"slope", "slope"},
-                                                                      {"jhericurl", "jheri"},     {"cornrows", "cornrows"},
-                                                                      {"cornrowsb", "cornrows"},  {"tramline", "tramline"},
-                                                                      {"groovecut", "groovecut"}, {"mohawk", "mohawk"},
-                                                                      {"mohawkblond", "mohawk"},  {"mohawkpink", "mohawk"},
-                                                                      {"mohawkbeard", "mohawk"},  {"afro", "afro"},
-                                                                      {"afrotash", "afro"},       {"afrobeard", "afro"},
-                                                                      {"afroblond", "afro"},      {"flattop", "flattop"},
-                                                                      {"elvishair", "elvishair"}, {"beard", "head"},
-                                                                      {"tash", "head"},           {"goatee", "head"},
-                                                                      {"afrogoatee", "afro"},     {NULL, NULL}};
+    //Hair Clothing
+    std::vector<SPlayerClothing> {
+        {"player_face", "head"}, {"hairblond", "head"}, {"hairred", "head"}, {"hairblue", "head"}, {"hairgreen", "head"}, {"hairpink", "head"},
+        {"bald", "head"}, {"baldbeard", "head"}, {"baldtash", "head"}, {"baldgoatee", "head"}, {"highfade", "head"}, {"highafro", "highafro"},
+        {"wedge", "wedge"}, {"slope", "slope"}, {"jhericurl", "jheri"}, {"cornrows", "cornrows"}, {"cornrowsb", "cornrows"}, {"tramline", "tramline"},
+        {"groovecut", "groovecut"}, {"mohawk", "mohawk"}, {"mohawkblond", "mohawk"}, {"mohawkpink", "mohawk"},
+        {"mohawkbeard", "mohawk"}, {"afro", "afro"}, {"afrotash", "afro"}, {"afrobeard", "afro"}, {"afroblond", "afro"}, {"flattop", "flattop"},
+        {"elvishair", "elvishair"}, {"beard", "head"}, {"tash", "head"}, {"goatee", "head"}, {"afrogoatee", "afro"}
+    },
 
-static const SPlayerClothing g_LegsClothing[LEGS_CLOTHING_MAX + 1] = {{"player_legs", "legs"},     {"worktrcamogrn", "worktr"},
-                                                                      {"worktrcamogry", "worktr"}, {"worktrgrey", "worktr"},
-                                                                      {"worktrkhaki", "worktr"},   {"tracktr", "tracktr"},
-                                                                      {"tracktreris", "tracktr"},  {"jeansdenim", "jeans"},
-                                                                      {"legsblack", "legs"},       {"legsheart", "legs"},
-                                                                      {"biegetr", "chinosb"},      {"tracktrpro", "tracktr"},
-                                                                      {"tracktrwhstr", "tracktr"}, {"tracktrblue", "tracktr"},
-                                                                      {"tracktrgang", "tracktr"},  {"bbshortwht", "boxingshort"},
-                                                                      {"boxshort", "boxingshort"}, {"bbshortred", "boxingshort"},
-                                                                      {"shellsuittr", "tracktr"},  {"shortsgrey", "shorts"},
-                                                                      {"shortskhaki", "shorts"},   {"chongergrey", "chonger"},
-                                                                      {"chongergang", "chonger"},  {"chongerred", "chonger"},
-                                                                      {"chongerblue", "chonger"},  {"shortsgang", "shorts"},
-                                                                      {"denimsgang", "jeans"},     {"denimsred", "jeans"},
-                                                                      {"chinosbiege", "chinosb"},  {"chinoskhaki", "chinosb"},
-                                                                      {"cutoffchinos", "shorts"},  {"cutoffchinosblue", "shorts"},
-                                                                      {"chinosblack", "chinosb"},  {"chinosblue", "chinosb"},
-                                                                      {"leathertr", "leathertr"},  {"leathertrchaps", "leathertr"},
-                                                                      {"suit1trgrey", "suit1tr"},  {"suit1trblk", "suit1tr"},
-                                                                      {"cutoffdenims", "shorts"},  {"suit1trred", "suit1tr"},
-                                                                      {"suit1trblue", "suit1tr"},  {"suit1tryellow", "suit1tr"},
-                                                                      {"suit1trgreen", "suit1tr"}, {"suit1trblk2", "suit1tr"},
-                                                                      {"suit1trgang", "suit1tr"},  {NULL, NULL}};
+    //Legs Clothing
+    std::vector<SPlayerClothing> {
+        {"player_legs", "legs"}, {"worktrcamogrn", "worktr"}, {"worktrcamogry", "worktr"}, {"worktrgrey", "worktr"},
+        {"worktrkhaki", "worktr"}, {"tracktr", "tracktr"}, {"tracktreris", "tracktr"}, {"jeansdenim", "jeans"},
+        {"legsblack", "legs"}, {"legsheart", "legs"}, {"biegetr", "chinosb"}, {"tracktrpro", "tracktr"},
+        {"tracktrwhstr", "tracktr"}, {"tracktrblue", "tracktr"}, {"tracktrgang", "tracktr"}, {"bbshortwht", "boxingshort"},
+        {"boxshort", "boxingshort"}, {"bbshortred", "boxingshort"}, {"shellsuittr", "tracktr"}, {"shortsgrey", "shorts"},
+        {"shortskhaki", "shorts"}, {"chongergrey", "chonger"}, {"chongergang", "chonger"}, {"chongerred", "chonger"},
+        {"chongerblue", "chonger"}, {"shortsgang", "shorts"}, {"denimsgang", "jeans"}, {"denimsred", "jeans"},
+        {"chinosbiege", "chinosb"}, {"chinoskhaki", "chinosb"}, {"cutoffchinos", "shorts"}, {"cutoffchinosblue", "shorts"},
+        {"chinosblack", "chinosb"}, {"chinosblue", "chinosb"}, {"leathertr", "leathertr"}, {"leathertrchaps", "leathertr"},
+        {"suit1trgrey", "suit1tr"}, {"suit1trblk", "suit1tr"}, {"cutoffdenims", "shorts"}, {"suit1trred", "suit1tr"},
+        {"suit1trblue", "suit1tr"}, {"suit1tryellow", "suit1tr"}, {"suit1trgreen", "suit1tr"}, {"suit1trblk2", "suit1tr"},
+        {"suit1trgang", "suit1tr"}
+    },
 
-static const SPlayerClothing g_ShoesClothing[SHOES_CLOTHING_MAX + 1] = {{"foot", "feet"},
-                                                                        {"cowboyboot2", "biker"},
-                                                                        {"bask2semi", "bask1"},
-                                                                        {"bask1eris", "bask1"},
-                                                                        {"sneakerbincgang", "sneaker"},
-                                                                        {"sneakerbincblu", "sneaker"},
-                                                                        {"sneakerbincblk", "sneaker"},
-                                                                        {"sandal", "flipflop"},
-                                                                        {"sandalsock", "flipflop"},
-                                                                        {"flipflop", "flipflop"},
-                                                                        {"hitop", "bask1"},
-                                                                        {"convproblk", "conv"},
-                                                                        {"convproblu", "conv"},
-                                                                        {"convprogrn", "conv"},
-                                                                        {"sneakerprored", "sneaker"},
-                                                                        {"sneakerproblu", "sneaker"},
-                                                                        {"sneakerprowht", "sneaker"},
-                                                                        {"bask1prowht", "bask1"},
-                                                                        {"bask1problk", "bask1"},
-                                                                        {"boxingshoe", "biker"},
-                                                                        {"convheatblk", "conv"},
-                                                                        {"convheatred", "conv"},
-                                                                        {"convheatorn", "conv"},
-                                                                        {"sneakerheatwht", "sneaker"},
-                                                                        {"sneakerheatgry", "sneaker"},
-                                                                        {"sneakerheatblk", "sneaker"},
-                                                                        {"bask2heatwht", "bask1"},
-                                                                        {"bask2heatband", "bask1"},
-                                                                        {"timbergrey", "bask1"},
-                                                                        {"timberred", "bask1"},
-                                                                        {"timberfawn", "bask1"},
-                                                                        {"timberhike", "bask1"},
-                                                                        {"cowboyboot", "biker"},
-                                                                        {"biker", "biker"},
-                                                                        {"snakeskin", "biker"},
-                                                                        {"shoedressblk", "shoe"},
-                                                                        {"shoedressbrn", "shoe"},
-                                                                        {"shoespatz", "shoe"},
-                                                                        {NULL, NULL}};
+    //Shoes Clothing
+    std::vector<SPlayerClothing> {
+        {"foot", "feet"}, {"cowboyboot2", "biker"}, {"bask2semi", "bask1"}, {"bask1eris", "bask1"}, {"sneakerbincgang", "sneaker"}, {"sneakerbincblu", "sneaker"},
+        {"sneakerbincblk", "sneaker"}, {"sandal", "flipflop"}, {"sandalsock", "flipflop"}, {"flipflop", "flipflop"}, {"hitop", "bask1"}, {"convproblk", "conv"},
+        {"convproblu", "conv"}, {"convprogrn", "conv"}, {"sneakerprored", "sneaker"}, {"sneakerproblu", "sneaker"}, {"sneakerprowht", "sneaker"},
+        {"bask1prowht", "bask1"}, {"bask1problk", "bask1"}, {"boxingshoe", "biker"}, {"convheatblk", "conv"}, {"convheatred", "conv"}, {"convheatorn", "conv"},
+        {"sneakerheatwht", "sneaker"}, {"sneakerheatgry", "sneaker"}, {"sneakerheatblk", "sneaker"}, {"bask2heatwht", "bask1"}, {"bask2heatband", "bask1"},
+        {"timbergrey", "bask1"}, {"timberred", "bask1"}, {"timberfawn", "bask1"}, {"timberhike", "bask1"}, {"cowboyboot", "biker"}, {"biker", "biker"},
+        {"snakeskin", "biker"}, {"shoedressblk", "shoe"}, {"shoedressbrn", "shoe"}, {"shoespatz", "shoe"}
+    },
 
-static const SPlayerClothing g_LeftUpperArmClothing[LEFT_UPPER_ARM_CLOTHING_MAX + 1] = {
-    {"4weed", "4WEED"}, {"4rip", "4RIP"}, {"4spider", "4SPIDER"}, {NULL, NULL}};
+    //Left Upper Arm Clothing
+    std::vector<SPlayerClothing> {
+        {"4weed", "4WEED"}, {"4rip", "4RIP"}, {"4spider", "4SPIDER"}
+    },
 
-static const SPlayerClothing g_LeftLowerArmClothing[LEFT_LOWER_ARM_CLOTHING_MAX + 1] = {
-    {"5gun", "5GUN"}, {"5cross", "5CROSS"}, {"5cross2", "5CROSS2"}, {"5cross3", "5CROSS3"}, {NULL, NULL}};
+    //Left Lower Arm Clothing
+    std::vector<SPlayerClothing> {
+        {"5gun", "5GUN"}, {"5cross", "5CROSS"}, {"5cross2", "5CROSS2"},
+        {"5cross3", "5CROSS3"}
+    },
 
-static const SPlayerClothing g_RightUpperArmClothing[RIGHT_UPPER_ARM_CLOTHING_MAX + 1] = {
-    {"6aztec", "6AZTEC"}, {"6crown", "6CROWN"}, {"6clown", "6CLOWN"}, {"6africa", "6AFRICA"}, {NULL, NULL}};
+    //Right Upper Arm Clothing
+    std::vector<SPlayerClothing> {
+        {"6aztec", "6AZTEC"}, {"6crown", "6CROWN"}, {"6clown", "6CLOWN"},
+        {"6africa", "6AFRICA"}
+    },
 
-static const SPlayerClothing g_RightLowerArmClothing[RIGHT_LOWER_ARM_CLOTHING_MAX + 1] = {
-    {"7cross", "7CROSS"}, {"7cross2", "7CROSS2"}, {"7cross3", "7CROSS3"}, {"7mary", "7MARY"}, {NULL, NULL}};
+    //Right LowerA rm Clothing
+    std::vector<SPlayerClothing> {
+        {"7cross", "7CROSS"}, {"7cross2", "7CROSS2"}, {"7cross3", "7CROSS3"},
+        {"7mary", "7MARY"}
+    },
 
-static const SPlayerClothing g_BackTopClothing[BACK_TOP_CLOTHING_MAX + 1] = {
-    {"8sa", "8SA"}, {"8sa2", "8SA2"}, {"8sa3", "8SA3"}, {"8westside", "8WESTSD"}, {"8santos", "8SANTOS"}, {"8poker", "8POKER"}, {"8gun", "8GUN"}, {NULL, NULL}};
+    //Back Top Clothing
+    std::vector<SPlayerClothing> {
+        {"8sa", "8SA"}, {"8sa2", "8SA2"}, {"8sa3", "8SA3"},
+        {"8westside", "8WESTSD"}, {"8santos", "8SANTOS"},
+        {"8poker", "8POKER"}, {"8gun", "8GUN"}
+    },
 
-static const SPlayerClothing g_LeftChestClothing[LEFT_CHEST_CLOTHING_MAX + 1] = {
-    {"9crown", "9CROWN"}, {"9gun", "9GUN"}, {"9gun2", "9GUN2"}, {"9homeboy", "9HOMBY"}, {"9bullet", "9BULLT"}, {"9rasta", "9RASTA"}, {NULL, NULL}};
+    //Left Chest Clothing
+    std::vector<SPlayerClothing> {
+        {"9crown", "9CROWN"}, {"9gun", "9GUN"}, {"9gun2", "9GUN2"},
+        {"9homeboy", "9HOMBY"}, {"9bullet", "9BULLT"},
+        {"9rasta", "9RASTA"}
+    },
 
-static const SPlayerClothing g_RightChestClothing[RIGHT_CHEST_CLOTHING_MAX + 1] = {
-    {"10ls", "10LS"}, {"10ls2", "10LS2"}, {"10ls3", "10LS3"}, {"10ls4", "10LS4"}, {"10ls5", "10LS5"}, {"10og", "10OG"}, {"10weed", "10WEED"}, {NULL, NULL}};
+    //Right Chest Clothing
+    std::vector<SPlayerClothing> {
+        {"10ls", "10LS"}, {"10ls2", "10LS2"}, {"10ls3", "10LS3"},
+        {"10ls4", "10LS4"}, {"10ls5", "10LS5"}, {"10og", "10OG"},
+        {"10weed", "10WEED"}
+    },
 
-static const SPlayerClothing g_StomachClothing[STOMACH_CLOTHING_MAX + 1] = {
-    {"11grove", "11GROVE"}, {"11grove2", "11GROV2"}, {"11grove3", "11GROV3"},   {"11dice", "11DICE"},
-    {"11dice2", "11DICE2"}, {"11jail", "11JAIL"},    {"11godsgift", "11GGIFT"}, {NULL, NULL}};
+    //Stomach Clothing
+    std::vector<SPlayerClothing> {
+        {"11grove", "11GROVE"}, {"11grove2", "11GROV2"}, {"11grove3", "11GROV3"}, {"11dice", "11DICE"},
+        {"11dice2", "11DICE2"}, {"11jail", "11JAIL"}, {"11godsgift", "11GGIFT"}
+    },
 
-static const SPlayerClothing g_LowerBackClothing[LOWER_BACK_CLOTHING_MAX + 1] = {{"12angels", "12ANGEL"},
-                                                                                 {"12mayabird", "12MAYBR"},
-                                                                                 {"12dagger", "12DAGER"},
-                                                                                 {"12bandit", "12BNDIT"},
-                                                                                 {"12cross7", "12CROSS"},
-                                                                                 {"12mayaface", "12MYFAC"},
-                                                                                 {NULL, NULL}};
+    //Lower Back Clothing
+    std::vector<SPlayerClothing> {
+        {"12angels", "12ANGEL"}, {"12mayabird", "12MAYBR"}, {"12dagger", "12DAGER"},
+        {"12bandit", "12BNDIT"}, {"12cross7", "12CROSS"}, {"12mayaface", "12MYFAC"},
+    },
 
-static const SPlayerClothing g_Extra1Clothing[EXTRA1_CLOTHING_MAX + 1] = {
-    {"dogtag", "neck"},    {"neckafrica", "neck"}, {"stopwatch", "neck"},  {"necksaints", "neck"}, {"neckhash", "neck"},   {"necksilver", "neck2"},
-    {"neckgold", "neck2"}, {"neckropes", "neck2"}, {"neckropeg", "neck2"}, {"neckls", "neck"},     {"neckdollar", "neck"}, {"neckcross", "neck"},
-    {NULL, NULL}};
+    //Extra1 Clothing
+    std::vector<SPlayerClothing> {
+        {"dogtag", "neck"}, {"neckafrica", "neck"}, {"stopwatch", "neck"}, {"necksaints", "neck"}, {"neckhash", "neck"}, {"necksilver", "neck2"},
+        {"neckgold", "neck2"}, {"neckropes", "neck2"}, {"neckropeg", "neck2"}, {"neckls", "neck"}, {"neckdollar", "neck"}, {"neckcross", "neck"}
+    },
 
-static const SPlayerClothing g_Extra2Clothing[EXTRA2_CLOTHING_MAX + 1] = {{"watchpink", "watch"},
-                                                                          {"watchyellow", "watch"},
-                                                                          {"watchpro", "watch"},
-                                                                          {"watchpro2", "watch"},
-                                                                          {"watchsub1", "watch"},
-                                                                          {"watchsub2", "watch"},
-                                                                          {"watchzip1", "watch"},
-                                                                          {"watchzip2", "watch"},
-                                                                          {"watchgno", "watch"},
-                                                                          {"watchgno2", "watch"},
-                                                                          {"watchcro", "watch"},
-                                                                          {"watchcro2", "watch"},
-                                                                          {NULL, NULL}};
+    //Extra2 Clothing
+    std::vector<SPlayerClothing> {
+        {"watchpink", "watch"}, {"watchyellow", "watch"}, {"watchpro", "watch"}, {"watchpro2", "watch"}, {"watchsub1", "watch"},
+        {"watchsub2", "watch"}, {"watchzip1", "watch"}, {"watchzip2", "watch"}, {"watchgno", "watch"}, {"watchgno2", "watch"},
+        {"watchcro", "watch"}, {"watchcro2", "watch"}
+    },
 
-static const SPlayerClothing g_Extra3Clothing[EXTRA3_CLOTHING_MAX + 1] = {
-    {"groucho", "grouchos"},        {"zorro", "zorromask"},         {"eyepatch", "eyepatch"},
-    {"glasses01", "glasses01"},     {"glasses04", "glasses04"},     {"bandred3", "bandmask"},
-    {"bandblue3", "bandmask"},      {"bandgang3", "bandmask"},      {"bandblack3", "bandmask"},
-    {"glasses01dark", "glasses01"}, {"glasses04dark", "glasses04"}, {"glasses03", "glasses03"},
-    {"glasses03red", "glasses03"},  {"glasses03blue", "glasses03"}, {"glasses03dark", "glasses03"},
-    {"glasses05dark", "glasses03"}, {"glasses05", "glasses03"},     {NULL, NULL}};
+    //Extra3 Clothing
+    std::vector<SPlayerClothing> {
+        {"groucho", "grouchos"}, {"zorro", "zorromask"}, {"eyepatch", "eyepatch"},
+        {"glasses01", "glasses01"}, {"glasses04", "glasses04"}, {"bandred3", "bandmask"},
+        {"bandblue3", "bandmask"}, {"bandgang3", "bandmask"}, {"bandblack3", "bandmask"},
+        {"glasses01dark", "glasses01"}, {"glasses04dark", "glasses04"}, {"glasses03", "glasses03"},
+        {"glasses03red", "glasses03"}, {"glasses03blue", "glasses03"}, {"glasses03dark", "glasses03"},
+        {"glasses05dark", "glasses03"}, {"glasses05", "glasses03"}
+    },
 
-static const SPlayerClothing g_Extra4Clothing[EXTRA4_CLOTHING_MAX + 1] = {{"bandred", "bandana"},
-                                                                          {"bandblue", "bandana"},
-                                                                          {"bandgang", "bandana"},
-                                                                          {"bandblack", "bandana"},
-                                                                          {"bandred2", "bandknots"},
-                                                                          {"bandblue2", "bandknots"},
-                                                                          {"bandblack2", "bandknots"},
-                                                                          {"bandgang2", "bandknots"},
-                                                                          {"capknitgrn", "capknit"},
-                                                                          {"captruck", "captruck"},
-                                                                          {"cowboy", "cowboy"},
-                                                                          {"hattiger", "cowboy"},
-                                                                          {"helmet", "helmet"},
-                                                                          {"moto", "moto"},
-                                                                          {"boxingcap", "boxingcap"},
-                                                                          {"hockey", "hockeymask"},
-                                                                          {"capgang", "cap"},
-                                                                          {"capgangback", "capback"},
-                                                                          {"capgangside", "capside"},
-                                                                          {"capgangover", "capovereye"},
-                                                                          {"capgangup", "caprimup"},
-                                                                          {"bikerhelmet", "bikerhelmet"},
-                                                                          {"capred", "cap"},
-                                                                          {"capredback", "capback"},
-                                                                          {"capredside", "capside"},
-                                                                          {"capredover", "capovereye"},
-                                                                          {"capredup", "caprimup"},
-                                                                          {"capblue", "cap"},
-                                                                          {"capblueback", "capback"},
-                                                                          {"capblueside", "capside"},
-                                                                          {"capblueover", "capovereye"},
-                                                                          {"capblueup", "caprimup"},
-                                                                          {"skullyblk", "skullycap"},
-                                                                          {"skullygrn", "skullycap"},
-                                                                          {"hatmancblk", "hatmanc"},
-                                                                          {"hatmancplaid", "hatmanc"},
-                                                                          {"capzip", "cap"},
-                                                                          {"capzipback", "capback"},
-                                                                          {"capzipside", "capside"},
-                                                                          {"capzipover", "capovereye"},
-                                                                          {"capzipup", "caprimup"},
-                                                                          {"beretred", "beret"},
-                                                                          {"beretblk", "beret"},
-                                                                          {"capblk", "cap"},
-                                                                          {"capblkback", "capback"},
-                                                                          {"capblkside", "capside"},
-                                                                          {"capblkover", "capovereye"},
-                                                                          {"capblkup", "caprimup"},
-                                                                          {"trilbydrk", "trilby"},
-                                                                          {"trilbylght", "trilby"},
-                                                                          {"bowler", "bowler"},
-                                                                          {"bowlerred", "bowler"},
-                                                                          {"bowlerblue", "bowler"},
-                                                                          {"bowleryellow", "bowler"},
-                                                                          {"boater", "boater"},
-                                                                          {"bowlergang", "bowler"},
-                                                                          {"boaterblk", "boater"},
-                                                                          {NULL, NULL}};
+    //Extra4 Clothing
+    std::vector<SPlayerClothing> {
+        {"bandred", "bandana"}, {"bandblue", "bandana"}, {"bandgang", "bandana"}, {"bandblack", "bandana"}, {"bandred2", "bandknots"},
+        {"bandblue2", "bandknots"}, {"bandblack2", "bandknots"}, {"bandgang2", "bandknots"}, {"capknitgrn", "capknit"}, {"captruck", "captruck"},
+        {"cowboy", "cowboy"}, {"hattiger", "cowboy"}, {"helmet", "helmet"}, {"moto", "moto"}, {"boxingcap", "boxingcap"}, {"hockey", "hockeymask"}, {"capgang", "cap"},
+        {"capgangback", "capback"}, {"capgangside", "capside"}, {"capgangover", "capovereye"}, {"capgangup", "caprimup"}, {"bikerhelmet", "bikerhelmet"},
+        {"capred", "cap"}, {"capredback", "capback"}, {"capredside", "capside"}, {"capredover", "capovereye"}, {"capredup", "caprimup"}, {"capblue", "cap"},
+        {"capblueback", "capback"}, {"capblueside", "capside"}, {"capblueover", "capovereye"}, {"capblueup", "caprimup"}, {"skullyblk", "skullycap"},
+        {"skullygrn", "skullycap"}, {"hatmancblk", "hatmanc"}, {"hatmancplaid", "hatmanc"}, {"capzip", "cap"}, {"capzipback", "capback"}, {"capzipside", "capside"},
+        {"capzipover", "capovereye"}, {"capzipup", "caprimup"}, {"beretred", "beret"}, {"beretblk", "beret"}, {"capblk", "cap"}, {"capblkback", "capback"},
+        {"capblkside", "capside"}, {"capblkover", "capovereye"}, {"capblkup", "caprimup"}, {"trilbydrk", "trilby"}, {"trilbylght", "trilby"},
+        {"bowler", "bowler"}, {"bowlerred", "bowler"}, {"bowlerblue", "bowler"}, {"bowleryellow", "bowler"}, {"boater", "boater"}, {"bowlergang", "bowler"},
+        {"boaterblk", "boater"}
+    },
 
-static const SPlayerClothing g_SuitClothing[SUIT_CLOTHING_MAX + 1] = {
-    {"gimpleg", "gimpleg"},     {"valet", "valet"},   {"countrytr", "countrytr"}, {"croupier", "valet"},  {"policetr", "policetr"},
-    {"balaclava", "balaclava"}, {"pimptr", "pimptr"}, {"garageleg", "garagetr"},  {"medictr", "medictr"}, {NULL, NULL}};
+    // Suit Clothing
+    std::vector<SPlayerClothing> {
+        {"gimpleg", "gimpleg"}, {"valet", "valet"}, {"countrytr", "countrytr"}, {"croupier", "valet"},
+        {"policetr", "policetr"}, {"balaclava", "balaclava"}, {"pimptr", "pimptr"},
+        {"garageleg", "garagetr"}, {"medictr", "medictr"}
+    }
+};
 
 // This represents GTA's 1 clothing block
-SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> CClientPlayerClothes::m_GlobalClothes;
-bool                                                       CClientPlayerClothes::m_bStaticInit = true;
+SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>          CClientPlayerClothes::m_GlobalClothes;
+SFixedArray<std::list<SPlayerClothing>, PLAYER_CLOTHING_SLOTS>      CClientPlayerClothes::m_NewClothes;
+bool                                                                CClientPlayerClothes::m_bStaticInit = true;
+bool                                                                CClientPlayerClothes::m_bHasClothesChanged = false;
 
 CClientPlayerClothes::CClientPlayerClothes(CClientPed* pPlayerModel)
 {
@@ -348,7 +235,7 @@ void CClientPlayerClothes::InternalAddClothes(const SPlayerClothing* pClothing, 
         {
             if (pClothing && !IsEmptyClothing(pClothing, ucType))
             {
-                pPlayerPed->SetClothesTextureAndModel(pClothing->szTexture, pClothing->szModel, ucType);
+                pPlayerPed->SetClothesTextureAndModel(pClothing->texture.c_str(), pClothing->model.c_str(), ucType);
             }
             else
             {
@@ -371,8 +258,8 @@ bool CClientPlayerClothes::RemoveClothes(unsigned char ucType, bool bRemoveFromM
         // Can we replace them with empty-type clothes (eg: player_torso)
         if (HasEmptyClothing(ucType))
         {
-            const SPlayerClothing* pGroup = GetClothingGroup(ucType);
-            m_Clothes[ucType] = &pGroup[0];
+            const std::vector<const SPlayerClothing*> pGroup = GetClothingGroup(ucType);
+            m_Clothes[ucType] = pGroup.at(0);
         }
         else
         {
@@ -384,6 +271,7 @@ bool CClientPlayerClothes::RemoveClothes(unsigned char ucType, bool bRemoveFromM
         {
             InternalAddClothes(NULL, ucType);
         }
+
         return true;
     }
     return false;
@@ -441,18 +329,15 @@ bool CClientPlayerClothes::HasEmptyClothing(unsigned char ucType)
 
 bool CClientPlayerClothes::IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType)
 {
-    if (pClothing)
-    {
-        if (ucType <= 3)
-        {
-            const SPlayerClothing* pGroup = GetClothingGroup(ucType);
-            if (pClothing == &pGroup[0])
-            {
-                return true;
-            }
-        }
-    }
-    return false;
+    if (!pClothing || ucType > 3) 
+        return false;
+
+    const std::vector<const SPlayerClothing*> pGroup = GetClothingGroup(ucType);
+
+    if (pGroup.empty())
+        return false;
+
+    return pClothing == pGroup.at(0);
 }
 
 const char* CClientPlayerClothes::GetClothingName(unsigned char ucType)
@@ -464,116 +349,163 @@ const char* CClientPlayerClothes::GetClothingName(unsigned char ucType)
     return NULL;
 }
 
-const SPlayerClothing* CClientPlayerClothes::GetClothingGroup(unsigned char ucType)
+std::vector<const SPlayerClothing*> CClientPlayerClothes::GetClothingGroup(unsigned char ucType)
 {
+    std::vector<const SPlayerClothing*> clothes;
+
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
-        switch (ucType)
+        for (auto& clothing : m_DefaultClothes[ucType])
         {
-            case 0:
-                return g_TorsoClothing;
-            case 1:
-                return g_HairClothing;
-            case 2:
-                return g_LegsClothing;
-            case 3:
-                return g_ShoesClothing;
-            case 4:
-                return g_LeftUpperArmClothing;
-            case 5:
-                return g_LeftLowerArmClothing;
-            case 6:
-                return g_RightUpperArmClothing;
-            case 7:
-                return g_RightLowerArmClothing;
-            case 8:
-                return g_BackTopClothing;
-            case 9:
-                return g_LeftChestClothing;
-            case 10:
-                return g_RightChestClothing;
-            case 11:
-                return g_StomachClothing;
-            case 12:
-                return g_LowerBackClothing;
-            case 13:
-                return g_Extra1Clothing;
-            case 14:
-                return g_Extra2Clothing;
-            case 15:
-                return g_Extra3Clothing;
-            case 16:
-                return g_Extra4Clothing;
-            case 17:
-                return g_SuitClothing;
+            clothes.push_back(&clothing);
+        }
+
+        for (auto& clothing : m_NewClothes[ucType])
+        {
+            clothes.push_back(&clothing);
         }
     }
 
-    return NULL;
+    return clothes;
 }
 
 const SPlayerClothing* CClientPlayerClothes::GetClothing(const char* szTexture, const char* szModel, unsigned char ucType)
 {
-    if (szTexture && szModel && ucType < PLAYER_CLOTHING_SLOTS)
+    if (!szTexture || !szModel || ucType >= PLAYER_CLOTHING_SLOTS)
+        return nullptr;
+
+    std::vector<const SPlayerClothing*> pGroup = GetClothingGroup(ucType);
+
+    if (pGroup.empty())
+        return nullptr;
+
+    for (const auto& clothing : pGroup)
     {
-        const SPlayerClothing* pGroup = GetClothingGroup(ucType);
-        int                    iMax = GetClothingGroupMax(ucType);
-        for (int i = 0; i < iMax; i++)
+        if (!stricmp(szTexture, clothing->texture.c_str()) && !stricmp(szModel, clothing->model.c_str()))
         {
-            const SPlayerClothing* pClothing = &pGroup[i];
-            if (!stricmp(szTexture, pClothing->szTexture) && !stricmp(szModel, pClothing->szModel))
-            {
-                return pClothing;
-            }
+            return clothing;
         }
     }
-    return NULL;
+
+    return nullptr;
 }
 
-const int CClientPlayerClothes::GetClothingGroupMax(unsigned char ucType)
+bool CClientPlayerClothes::IsValidModel(unsigned short usModel)
 {
-    if (ucType < PLAYER_CLOTHING_SLOTS)
+    return usModel >= CLOTHES_MODEL_ID_FIRST && usModel <= CLOTHES_MODEL_ID_LAST;
+}
+
+bool CClientPlayerClothes::AddClothingModel(const char* texture, const char* model, unsigned char clothingType)
+{
+    if (clothingType < PLAYER_CLOTHING_SLOTS)
     {
-        switch (ucType)
+        if (texture == nullptr || model == nullptr)
+            return false;
+
+        std::string textureFile = std::string(texture) + ".txd";
+
+        if (!g_pGame->GetRenderWare()->HasClothesFile(textureFile.c_str()))
+            return false;
+
+        std::string modelFile = std::string(model) + ".dff";
+
+        if (!g_pGame->GetRenderWare()->HasClothesFile(modelFile.c_str()))
+            return false;
+
+        auto& clothes = m_NewClothes[clothingType];
+
+        if (std::any_of(clothes.begin(), clothes.end(), [&](const SPlayerClothing& clothing) {
+            return !stricmp(texture, clothing.texture.c_str()) && !stricmp(model, clothing.model.c_str());
+        }))
         {
-            case 0:
-                return TORSO_CLOTHING_MAX;
-            case 1:
-                return HAIR_CLOTHING_MAX;
-            case 2:
-                return LEGS_CLOTHING_MAX;
-            case 3:
-                return SHOES_CLOTHING_MAX;
-            case 4:
-                return LEFT_UPPER_ARM_CLOTHING_MAX;
-            case 5:
-                return LEFT_LOWER_ARM_CLOTHING_MAX;
-            case 6:
-                return RIGHT_UPPER_ARM_CLOTHING_MAX;
-            case 7:
-                return RIGHT_LOWER_ARM_CLOTHING_MAX;
-            case 8:
-                return BACK_TOP_CLOTHING_MAX;
-            case 9:
-                return LEFT_CHEST_CLOTHING_MAX;
-            case 10:
-                return RIGHT_CHEST_CLOTHING_MAX;
-            case 11:
-                return STOMACH_CLOTHING_MAX;
-            case 12:
-                return LOWER_BACK_CLOTHING_MAX;
-            case 13:
-                return EXTRA1_CLOTHING_MAX;
-            case 14:
-                return EXTRA2_CLOTHING_MAX;
-            case 15:
-                return EXTRA3_CLOTHING_MAX;
-            case 16:
-                return EXTRA4_CLOTHING_MAX;
-            case 17:
-                return SUIT_CLOTHING_MAX;
+            return false;
         }
+
+        clothes.push_back({texture, model});
+        return true;
     }
 
-    return 0;
+    return false;
+}
+
+bool CClientPlayerClothes::RemoveClothingModel(const char* texture, const char* model, unsigned char clothingType)
+{
+    if (clothingType < PLAYER_CLOTHING_SLOTS)
+    {
+        if (texture == nullptr || model == nullptr)
+            return false;
+
+        auto& clothes = m_NewClothes[clothingType];
+
+        auto it = std::find_if(clothes.begin(), clothes.end(),[&](const SPlayerClothing& clothing) {
+            return !stricmp(texture, clothing.texture.c_str()) && !stricmp(model, clothing.model.c_str());
+        });
+
+        if (it == clothes.end())
+            return false;
+
+        clothes.erase(it);
+        m_bHasClothesChanged = true;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientPlayerClothes::HasClothesChanged()
+{
+    return m_bHasClothesChanged;
+}
+
+void CClientPlayerClothes::RefreshClothes()
+{
+    for (std::uint8_t clothingType = 0; clothingType < PLAYER_CLOTHING_SLOTS; clothingType++)
+    {
+       auto& clothes = m_NewClothes[clothingType];
+
+       if (clothes.empty() && !m_bHasClothesChanged)
+           continue;
+
+       bool                   hasInvalidClothing = false;
+       const SPlayerClothing* pCurrent = m_Clothes[clothingType];
+
+       if (!m_bHasClothesChanged)
+       {
+           for (auto clothing = clothes.begin(); clothing != clothes.end();)
+           {
+               std::string fileTXD = clothing->texture + ".txd";
+               std::string fileDFF = clothing->model + ".dff";
+
+               if (!g_pGame->GetRenderWare()->HasClothesFile(fileTXD.c_str()) || !g_pGame->GetRenderWare()->HasClothesFile(fileDFF.c_str()))
+               {
+                   if (pCurrent && (pCurrent->texture == clothing->texture || pCurrent->model == clothing->model))
+                   {
+                        hasInvalidClothing = true;
+                   }
+
+                   clothing = clothes.erase(clothing);
+               }
+               else
+                   ++clothing;
+           }
+       }
+
+       if (pCurrent && !hasInvalidClothing && m_bHasClothesChanged)
+       {
+           const SPlayerClothing* pClothing = GetClothing(pCurrent->texture.c_str(), pCurrent->model.c_str(), clothingType);
+
+           if (!pClothing)
+           {
+               hasInvalidClothing = true;
+           }
+       }
+
+       if (hasInvalidClothing)
+       {
+           RemoveClothes(clothingType, true);
+       }
+    }
+
+    m_bHasClothesChanged = false;
 }

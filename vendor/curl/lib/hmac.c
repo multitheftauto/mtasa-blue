@@ -26,14 +26,15 @@
 
 #include "curl_setup.h"
 
-#if (defined(USE_CURL_NTLM_CORE) && !defined(USE_WINDOWS_SSPI))         \
-  || !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH)
+#if (defined(USE_CURL_NTLM_CORE) && !defined(USE_WINDOWS_SSPI)) ||      \
+  !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH) ||   \
+  defined(USE_SSL)
 
 #include <curl/curl.h>
 
 #include "curl_hmac.h"
 #include "curl_memory.h"
-#include "warnless.h"
+#include "curlx/warnless.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"

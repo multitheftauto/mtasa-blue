@@ -5,7 +5,7 @@
  *  FILE:        core/CConnectManager.h
  *  PURPOSE:     Header file for connect manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -26,10 +26,14 @@ public:
 
     bool Abort();
 
+    bool WasQuickConnect() const noexcept { return m_quickConnect; }
+
     void DoPulse();
 
     void OnServerExists();
 
+    void SetQuickConnect(bool quick) noexcept { m_quickConnect = quick; }
+    
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 
     static bool StaticProcessPacket(unsigned char ucPacketID, class NetBitStreamInterface& bitStream);
@@ -59,4 +63,5 @@ private:
     bool             m_bNotifyServerBrowser;
 
     bool CheckNickProvided(const char* szNick);
+    bool m_quickConnect{false};
 };

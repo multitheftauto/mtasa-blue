@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPickupSA.cpp
  *  PURPOSE:     Pickup entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -41,14 +41,14 @@ CVector* CPickupSA::GetPosition(CVector* vecPosition)
     return vecPosition;
 }
 
-ePickupType CPickupSA::GetType()
+PickupType CPickupSA::GetType()
 {
-    return (ePickupType)GetInterface()->Type;
+    return (PickupType)GetInterface()->Type;
 }
 
-void CPickupSA::SetType(ePickupType type)
+void CPickupSA::SetType(PickupType type)
 {
-    GetInterface()->Type = type;
+    GetInterface()->Type = (BYTE)type;
 }
 
 float CPickupSA::GetCurrentValue()
@@ -86,12 +86,12 @@ void CPickupSA::SetModel(WORD wModelIndex)
     GetInterface()->MI = wModelIndex;
 }
 
-ePickupState CPickupSA::GetState()
+PickupState CPickupSA::GetState()
 {
-    return (ePickupState)GetInterface()->State;
+    return (PickupState)GetInterface()->State;
 }
 
-void CPickupSA::SetState(ePickupState bState)
+void CPickupSA::SetState(PickupState bState)
 {
     GetInterface()->State = (BYTE)bState;
 }

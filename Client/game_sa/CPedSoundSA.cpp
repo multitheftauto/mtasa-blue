@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPedSoundSA.cpp
  *  PURPOSE:     Ped sound
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,7 +30,7 @@ short CPedSoundSA::GetVoiceID()
 
 void CPedSoundSA::SetVoiceTypeID(short sVoiceType)
 {
-    m_pInterface->m_sVoiceType = sVoiceType;
+    m_pInterface->m_sVoiceType = static_cast<ePedVoiceType>(sVoiceType);
 }
 
 void CPedSoundSA::SetVoiceID(short sVoiceID)

@@ -23,7 +23,6 @@
  ***************************************************************************/
 
 #include "curl_setup.h"
-#include "strtoofft.h"
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -40,7 +39,9 @@
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
+#ifndef UNDER_CE
 #include <signal.h>
+#endif
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -176,9 +177,9 @@ static bool xfer_recv_shutdown_started(struct Curl_easy *data)
   int sockindex;
 
   if(!data || !data->conn)
-    return CURLE_FAILED_INIT;
+    return FALSE;
   if(data->conn->sockfd == CURL_SOCKET_BAD)
-    return CURLE_FAILED_INIT;
+    return FALSE;
   sockindex = (data->conn->sockfd == data->conn->sock[SECONDARYSOCKET]);
   return Curl_shutdown_started(data, sockindex);
 }
@@ -434,15 +435,6 @@ CURLcode Curl_sendrecv(struct Curl_easy *data, struct curltime *nowp)
     data->state.select_bits = 0;
   }
 
-#ifdef USE_HYPER
-  if(data->conn->datastream) {
-    result = data->conn->datastream(data, data->conn, &didwhat,
-                                    CURL_CSELECT_OUT|CURL_CSELECT_IN);
-    if(result || data->req.done)
-      goto out;
-  }
-  else {
-#endif
   /* We go ahead and do a read if we have a readable socket or if the stream
      was rewound (in which case we have data in a buffer) */
   if(k->keepon & KEEP_RECV) {
@@ -457,9 +449,6 @@ CURLcode Curl_sendrecv(struct Curl_easy *data, struct curltime *nowp)
     if(result)
       goto out;
   }
-#ifdef USE_HYPER
-  }
-#endif
 
   if(!didwhat) {
     /* Transfer wanted to send/recv, but nothing was possible. */
@@ -481,13 +470,13 @@ CURLcode Curl_sendrecv(struct Curl_easy *data, struct curltime *nowp)
         failf(data, "Operation timed out after %" FMT_TIMEDIFF_T
               " milliseconds with %" FMT_OFF_T " out of %"
               FMT_OFF_T " bytes received",
-              Curl_timediff(*nowp, data->progress.t_startsingle),
+              curlx_timediff(*nowp, data->progress.t_startsingle),
               k->bytecount, k->size);
       }
       else {
         failf(data, "Operation timed out after %" FMT_TIMEDIFF_T
               " milliseconds with %" FMT_OFF_T " bytes received",
-              Curl_timediff(*nowp, data->progress.t_startsingle),
+              curlx_timediff(*nowp, data->progress.t_startsingle),
               k->bytecount);
       }
       result = CURLE_OPERATION_TIMEDOUT;
@@ -538,22 +527,17 @@ void Curl_init_CONNECT(struct Curl_easy *data)
  */
 CURLcode Curl_pretransfer(struct Curl_easy *data)
 {
-  CURLcode result;
+  CURLcode result = CURLE_OK;
 
-  if(!data->state.url && !data->set.uh) {
+  if(!data->set.str[STRING_SET_URL] && !data->set.uh) {
     /* we cannot do anything without URL */
     failf(data, "No URL set");
     return CURLE_URL_MALFORMAT;
   }
 
-  /* since the URL may have been redirected in a previous use of this handle */
-  if(data->state.url_alloc) {
-    /* the already set URL is allocated, free it first! */
-    Curl_safefree(data->state.url);
-    data->state.url_alloc = FALSE;
-  }
-
-  if(!data->state.url && data->set.uh) {
+  /* CURLOPT_CURLU overrides CURLOPT_URL and the contents of the CURLU handle
+     is allowed to be changed by the user between transfers */
+  if(data->set.uh) {
     CURLUcode uc;
     free(data->set.str[STRING_SET_URL]);
     uc = curl_url_get(data->set.uh,
@@ -563,6 +547,14 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
       return CURLE_URL_MALFORMAT;
     }
   }
+
+  /* since the URL may have been redirected in a previous use of this handle */
+  if(data->state.url_alloc) {
+    Curl_safefree(data->state.url);
+    data->state.url_alloc = FALSE;
+  }
+
+  data->state.url = data->set.str[STRING_SET_URL];
 
   if(data->set.postfields && data->set.set_resume_from) {
     /* we cannot */
@@ -575,21 +567,14 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
   data->state.list_only = data->set.list_only;
 #endif
   data->state.httpreq = data->set.method;
-  data->state.url = data->set.str[STRING_SET_URL];
-
-  /* Init the SSL session ID cache here. We do it here since we want to do it
-     after the *_setopt() calls (that could specify the size of the cache) but
-     before any transfer takes place. */
-  result = Curl_ssl_initsessions(data, data->set.general_ssl.max_ssl_sessions);
-  if(result)
-    return result;
 
   data->state.requests = 0;
   data->state.followlocation = 0; /* reset the location-follow counter */
   data->state.this_is_a_follow = FALSE; /* reset this */
   data->state.errorbuf = FALSE; /* no error has occurred */
-  data->state.httpwant = data->set.httpwant;
-  data->state.httpversion = 0;
+#ifndef CURL_DISABLE_HTTP
+  Curl_http_neg_init(data, &data->state.http_neg);
+#endif
   data->state.authproblem = FALSE;
   data->state.authhost.want = data->set.httpauth;
   data->state.authproxy.want = data->set.proxyauth;
@@ -671,7 +656,7 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
    * protocol.
    */
   if(data->set.str[STRING_USERAGENT]) {
-    Curl_safefree(data->state.aptr.uagent);
+    free(data->state.aptr.uagent);
     data->state.aptr.uagent =
       aprintf("User-Agent: %s\r\n", data->set.str[STRING_USERAGENT]);
     if(!data->state.aptr.uagent)
@@ -793,7 +778,7 @@ static void xfer_setup(
   DEBUGASSERT((writesockindex <= 1) && (writesockindex >= -1));
   DEBUGASSERT(!shutdown || (sockindex == -1) || (writesockindex == -1));
 
-  if(conn->bits.multiplex || conn->httpversion >= 20 || want_send) {
+  if(Curl_conn_is_multiplex(conn, FIRSTSOCKET) || want_send) {
     /* when multiplexing, the read/write sockets need to be the same! */
     conn->sockfd = sockindex == -1 ?
       ((writesockindex == -1 ? CURL_SOCKET_BAD : conn->sock[writesockindex])) :
@@ -897,6 +882,11 @@ CURLcode Curl_xfer_write_resp(struct Curl_easy *data,
   return result;
 }
 
+bool Curl_xfer_write_is_paused(struct Curl_easy *data)
+{
+  return Curl_cwriter_is_paused(data);
+}
+
 CURLcode Curl_xfer_write_resp_hd(struct Curl_easy *data,
                                  const char *hd0, size_t hdlen, bool is_eos)
 {
@@ -984,9 +974,9 @@ bool Curl_xfer_is_blocked(struct Curl_easy *data)
   bool want_send = ((data)->req.keepon & KEEP_SEND);
   bool want_recv = ((data)->req.keepon & KEEP_RECV);
   if(!want_send)
-    return (want_recv && Curl_cwriter_is_paused(data));
+    return want_recv && Curl_cwriter_is_paused(data);
   else if(!want_recv)
-    return (want_send && Curl_creader_is_paused(data));
+    return want_send && Curl_creader_is_paused(data);
   else
     return Curl_creader_is_paused(data) && Curl_cwriter_is_paused(data);
 }

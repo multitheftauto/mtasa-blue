@@ -1,10 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/packets/CCustomWeaponBulletSyncPacket.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,58 +13,47 @@
 #include "CPlayer.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 
-CCustomWeaponBulletSyncPacket::CCustomWeaponBulletSyncPacket(CPlayer* pPlayer)
+CCustomWeaponBulletSyncPacket::CCustomWeaponBulletSyncPacket(CPlayer* player)
 {
-    m_pSourceElement = pPlayer;
-    m_pWeapon = NULL;
-    m_ucOrderCounter = 0;
+    m_pSourceElement = player;
 }
 
-bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
 {
-    // Got a player?
     if (m_pSourceElement)
-    {
-        ElementID WeaponID = INVALID_ELEMENT_ID;
-        BitStream.Read(WeaponID);
-        m_pWeapon = GetElementFromId<CCustomWeapon>(WeaponID);
+        return false;
 
-        BitStream.Read((char*)&m_vecStart, sizeof(CVector));
-        BitStream.Read((char*)&m_vecEnd, sizeof(CVector));
+    ElementID id = INVALID_ELEMENT_ID;
+    if (!stream.Read(id))
+        return false;
 
-        // Duplicate packet protection
-        if (!BitStream.Read(m_ucOrderCounter))
-            return false;
+    m_weapon = GetElementFromId<CCustomWeapon>(id);
 
-        return true;
-    }
+    if (!stream.Read(reinterpret_cast<char*>(&m_start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&m_end), sizeof(CVector)))
+        return false;
 
-    return false;
+    if (!m_start.IsValid() || !m_end.IsValid())
+        return false;
+
+    if (!stream.Read(m_order))
+        return false;
+
+    return true;
 }
 
-// Note: Relays a previous Read()
-bool CCustomWeaponBulletSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CCustomWeaponBulletSyncPacket::Write(NetBitStreamInterface& stream) const
 {
-    // Got a player to write?
-    if (m_pSourceElement)
-    {
-        CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
+    if (!m_pSourceElement)
+        return false;
 
-        // Write the source player id
-        ElementID PlayerID = pSourcePlayer->GetID();
-        BitStream.Write(PlayerID);
+    auto* player = static_cast<CPlayer*>(m_pSourceElement);
+    auto  id = player->GetID();
 
-        // Write the bulletsync data
-        ElementID WeaponID = m_pWeapon->GetID();
-        BitStream.Write(WeaponID);
-        BitStream.Write((const char*)&m_vecStart, sizeof(CVector));
-        BitStream.Write((const char*)&m_vecEnd, sizeof(CVector));
+    stream.Write(id);
+    stream.Write(m_weapon->GetID());
+    stream.Write(reinterpret_cast<const char*>(&m_start), sizeof(CVector));
+    stream.Write(reinterpret_cast<const char*>(&m_end), sizeof(CVector));
+    stream.Write(m_order);
 
-        // Duplicate packet protection
-        BitStream.Write(m_ucOrderCounter);
-
-        return true;
-    }
-
-    return false;
+    return true;
 }

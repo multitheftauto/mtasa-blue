@@ -1,56 +1,46 @@
+/*********************************************************************************************************\
+|*                                                                                                        *|
+|* SPDX-FileCopyrightText: Copyright (c) 2019-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
+|* SPDX-License-Identifier: MIT                                                                           *|
+|*                                                                                                        *|
+|* Permission is hereby granted, free of charge, to any person obtaining a                                *|
+|* copy of this software and associated documentation files (the "Software"),                             *|
+|* to deal in the Software without restriction, including without limitation                              *|
+|* the rights to use, copy, modify, merge, publish, distribute, sublicense,                               *|
+|* and/or sell copies of the Software, and to permit persons to whom the                                  *|
+|* Software is furnished to do so, subject to the following conditions:                                   *|
+|*                                                                                                        *|
+|* The above copyright notice and this permission notice shall be included in                             *|
+|* all copies or substantial portions of the Software.                                                    *|
+|*                                                                                                        *|
+|* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                             *|
+|* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                               *|
+|* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL                               *|
+|* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                             *|
+|* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING                                *|
+|* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER                                    *|
+|* DEALINGS IN THE SOFTWARE.                                                                              *|
+|*                                                                                                        *|
+|*                                                                                                        *|
+\*********************************************************************************************************/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Date: Jul 28, 2025 
+// File: nvapi.h
+//
+// NvAPI provides an interface to NVIDIA devices. This file contains the 
+// interface constants, structure definitions and function prototypes.
+//
+//   Target Profile: Open-Source
+//  Target Platform: windows
+//
+///////////////////////////////////////////////////////////////////////////////
 #include"nvapi_lite_salstart.h"
 #include"nvapi_lite_common.h"
 #include"nvapi_lite_sli.h"
 #include"nvapi_lite_surround.h"
 #include"nvapi_lite_stereo.h"
 #include"nvapi_lite_d3dext.h"
- /************************************************************************************************************************************\
-|*                                                                                                                                    *|
-|*     Copyright © 2012 NVIDIA Corporation.  All rights reserved.                                                                     *|
-|*                                                                                                                                    *|
-|*  NOTICE TO USER:                                                                                                                   *|
-|*                                                                                                                                    *|
-|*  This software is subject to NVIDIA ownership rights under U.S. and international Copyright laws.                                  *|
-|*                                                                                                                                    *|
-|*  This software and the information contained herein are PROPRIETARY and CONFIDENTIAL to NVIDIA                                     *|
-|*  and are being provided solely under the terms and conditions of an NVIDIA software license agreement.                             *|
-|*  Otherwise, you have no rights to use or access this software in any manner.                                                       *|
-|*                                                                                                                                    *|
-|*  If not covered by the applicable NVIDIA software license agreement:                                                               *|
-|*  NVIDIA MAKES NO REPRESENTATION ABOUT THE SUITABILITY OF THIS SOFTWARE FOR ANY PURPOSE.                                            *|
-|*  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY OF ANY KIND.                                                           *|
-|*  NVIDIA DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,                                                                     *|
-|*  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.                       *|
-|*  IN NO EVENT SHALL NVIDIA BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,                               *|
-|*  OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  WHETHER IN AN ACTION OF CONTRACT,                         *|
-|*  NEGLIGENCE OR OTHER TORTIOUS ACTION,  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOURCE CODE.            *|
-|*                                                                                                                                    *|
-|*  U.S. Government End Users.                                                                                                        *|
-|*  This software is a "commercial item" as that term is defined at 48 C.F.R. 2.101 (OCT 1995),                                       *|
-|*  consisting  of "commercial computer  software"  and "commercial computer software documentation"                                  *|
-|*  as such terms are  used in 48 C.F.R. 12.212 (SEPT 1995) and is provided to the U.S. Government only as a commercial end item.     *|
-|*  Consistent with 48 C.F.R.12.212 and 48 C.F.R. 227.7202-1 through 227.7202-4 (JUNE 1995),                                          *|
-|*  all U.S. Government End Users acquire the software with only those rights set forth herein.                                       *|
-|*                                                                                                                                    *|
-|*  Any use of this software in individual and commercial software must include,                                                      *|
-|*  in the user documentation and internal comments to the code,                                                                      *|
-|*  the above Disclaimer (as applicable) and U.S. Government End Users Notice.                                                        *|
-|*                                                                                                                                    *|
- \************************************************************************************************************************************/
- 
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Date: May 30, 2024 
-// File: nvapi.h
-//
-// NvAPI provides an interface to NVIDIA devices. This file contains the 
-// interface constants, structure definitions and function prototypes.
-//
-//   Target Profile: developer
-//  Target Platform: windows
-//
-///////////////////////////////////////////////////////////////////////////////
 #ifndef _NVAPI_H
 #define _NVAPI_H
 
@@ -83,7 +73,7 @@ extern "C" {
 //! Note: It is now mandatory to call NvAPI_Initialize before calling any other NvAPI.
 //! NvAPI_Unload should be called to unload the NVAPI Library.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -104,7 +94,7 @@ NVAPI_INTERFACE NvAPI_Initialize();
 //!   DESCRIPTION: Decrements the ref-counter and when it reaches ZERO, unloads NVAPI library.
 //!                This must be called in pairs with NvAPI_Initialize.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //!        If the client wants unload functionality, it is recommended to always call NvAPI_Initialize and NvAPI_Unload in pairs.
@@ -132,7 +122,7 @@ NVAPI_INTERFACE NvAPI_Unload();
 //
 //! This function converts an NvAPI error code into a null terminated string.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -154,7 +144,7 @@ NVAPI_INTERFACE NvAPI_GetErrorMessage(NvAPI_Status nr,NvAPI_ShortString szDesc);
 //!                format.
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -174,7 +164,7 @@ NVAPI_INTERFACE NvAPI_GetInterfaceVersionString(NvAPI_ShortString szDesc);
 //!               The contents of the string are human readable.  Do not assume a fixed  format.
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 450
@@ -211,6 +201,22 @@ typedef enum _NV_DP_LINK_RATE
     NV_EDP_4_32GBPS           = 0x10
 } NV_DP_LINK_RATE;
 
+typedef enum _NV_DP2X_LINK_RATE
+{
+    NV_DP2X_1_62Gbps          = 0x00A2,   //  162
+    NV_DP2X_2_16Gbps          = 0x00D8,   //  216
+    NV_DP2X_2_43Gbps          = 0x00F3,   //  243
+    NV_DP2X_2_50Gbps          = 0x00FA,   //  250
+    NV_DP2X_2_70Gbps          = 0x010E,   //  270
+    NV_DP2X_3_24Gbps          = 0x0144,   //  324
+    NV_DP2X_4_32Gbps          = 0x01B0,   //  432
+    NV_DP2X_5_40Gbps          = 0x021C,   //  540
+    NV_DP2X_6_75Gbps          = 0x02A3,   //  675
+    NV_DP2X_8_10Gbps          = 0x032A,   //  810
+    NV_DP2X_10_0Gbps          = 0x03E8,   // 1000
+    NV_DP2X_13_5Gbps          = 0x0546,   // 1350
+    NV_DP2X_20_0Gbps          = 0x07D0,   // 2000
+} NV_DP2X_LINK_RATE;
 
 //! \ingroup dispcontrol
 //! Used in NV_DISPLAY_PORT_INFO.
@@ -278,7 +284,7 @@ typedef enum _NV_DP_BPC
 //!  This function returns the EDID data for the specified GPU handle and connection bit mask.
 //!  displayOutputId should have exactly 1 bit set to indicate a single display. See \ref handles.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 85
@@ -695,7 +701,7 @@ typedef struct _NV_TIMING
 //!  \note Display PATH with this API is limited to single GPU. DUALVIEW across GPUs cannot be enabled with this API.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_DISP_SetDisplayConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 90
@@ -750,7 +756,7 @@ NVAPI_INTERFACE NvAPI_SetView(NvDisplayHandle hNvDisplay, NV_VIEW_TARGET_INFO *p
 //!   \note Display PATH with this API is limited to single GPU. DUALVIEW across GPUs cannot be enabled with this API.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_DISP_SetDisplayConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 95
@@ -854,7 +860,7 @@ typedef struct
 //!   \note Display PATH with this API is limited to single GPU. DUALVIEW across GPUs cannot be enabled with this API.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_DISP_SetDisplayConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 95
@@ -1334,7 +1340,7 @@ typedef NV_GPU_PERF_PSTATES20_INFO_V2   NV_GPU_PERF_PSTATES20_INFO;
 //!                build.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_SYS_GetDriverAndBranchVersion.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1392,7 +1398,7 @@ NVAPI_INTERFACE NvAPI_GetDisplayDriverVersion(NvDisplayHandle hNvDisplay, NV_DIS
 //!        context and calling MakeCurrent with it will result
 //!        in errors and undefined behavior.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1490,7 +1496,7 @@ typedef void (* NVAPI_OGLEXPERT_CALLBACK) (unsigned int categoryId, unsigned int
 
 
 //! \ingroup oglapi
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 NVAPI_INTERFACE NvAPI_OGL_ExpertModeSet(NvU32 expertDetailLevel,
                                         NvU32 expertReportMask,
@@ -1498,7 +1504,7 @@ NVAPI_INTERFACE NvAPI_OGL_ExpertModeSet(NvU32 expertDetailLevel,
                      NVAPI_OGLEXPERT_CALLBACK expertCallback);
 
 //! \addtogroup oglapi
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 NVAPI_INTERFACE NvAPI_OGL_ExpertModeGet(NvU32 *pExpertDetailLevel,
                                         NvU32 *pExpertReportMask,
@@ -1516,7 +1522,7 @@ NVAPI_INTERFACE NvAPI_OGL_ExpertModeGet(NvU32 *pExpertDetailLevel,
 //!  values are applied (i.e. these settings *do not* apply to
 //!  currently running applications).
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1540,14 +1546,14 @@ NVAPI_INTERFACE NvAPI_OGL_ExpertModeGet(NvU32 *pExpertDetailLevel,
 ///////////////////////////////////////////////////////////////////////////////
 
 //! \ingroup oglapi
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 NVAPI_INTERFACE NvAPI_OGL_ExpertModeDefaultsSet(NvU32 expertDetailLevel,
                                                 NvU32 expertReportMask,
                                                 NvU32 expertOutputMask);
 
 //! \addtogroup oglapi
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 NVAPI_INTERFACE NvAPI_OGL_ExpertModeDefaultsGet(NvU32 *pExpertDetailLevel,
                                                 NvU32 *pExpertReportMask,
@@ -1573,7 +1579,7 @@ NVAPI_INTERFACE NvAPI_OGL_ExpertModeDefaultsGet(NvU32 *pExpertDetailLevel,
 //!
 //!       For WDDM GPU handles please use NvAPI_EnumPhysicalGPUs()
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //!
@@ -1605,7 +1611,7 @@ NVAPI_INTERFACE NvAPI_EnumTCCPhysicalGPUs( NvPhysicalGpuHandle nvGPUHandle[NVAPI
 //!
 //! To detect if SLI rendering is enabled, use NvAPI_D3D_GetCurrentSLIState().
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1631,7 +1637,7 @@ NVAPI_INTERFACE NvAPI_EnumLogicalGPUs(NvLogicalGpuHandle nvGPUHandle[NVAPI_MAX_L
 //! If the display corresponds to more than one physical GPU, the first GPU returned
 //! is the one with the attached active output.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1653,7 +1659,7 @@ NVAPI_INTERFACE NvAPI_GetPhysicalGPUsFromDisplay(NvDisplayHandle hNvDisp, NvPhys
 //!
 //! At least one GPU must be present in the system and running an NVIDIA display driver.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1675,7 +1681,7 @@ NVAPI_INTERFACE NvAPI_GetPhysicalGPUFromUnAttachedDisplay(NvUnAttachedDisplayHan
 //! At least one GPU must be present in the system and running an NVIDIA display driver.
 //! hNvDisp can be NVAPI_DEFAULT_HANDLE or a handle enumerated from NvAPI_EnumNVidiaDisplayHandle().
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1695,7 +1701,7 @@ NVAPI_INTERFACE NvAPI_GetLogicalGPUFromDisplay(NvDisplayHandle hNvDisp, NvLogica
 //! This function returns the logical GPU handle associated with specified physical GPU handle.
 //! At least one GPU must be present in the system and running an NVIDIA display driver.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1717,7 +1723,7 @@ NVAPI_INTERFACE NvAPI_GetLogicalGPUFromPhysicalGPU(NvPhysicalGpuHandle hPhysical
 //!  The array hPhysicalGPU will be filled with physical GPU handle values.  The returned
 //!  gpuCount determines how many entries in the array are valid.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1781,7 +1787,7 @@ NVAPI_INTERFACE NvAPI_GetGPUIDfromPhysicalGPU(NvPhysicalGpuHandle hPhysicalGpu, 
 //!   DESCRIPTION: This function retrieves the number of Shader SubPipes on the GPU
 //!                On newer architectures, this corresponds to the number of SM units
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -1807,7 +1813,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetShaderSubPipeCount(NvPhysicalGpuHandle hPhysicalGpu
 //!   DESCRIPTION: Retrieves the total number of cores defined for a GPU.
 //!                Returns 0 on architectures that don't define GPU cores.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -1832,7 +1838,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetGpuCoreCount(NvPhysicalGpuHandle hPhysicalGpu,NvU32
 //!  This function returns set of all GPU-output identifiers as a bitmask.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_GPU_GetAllDisplayIds.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 85
@@ -1856,7 +1862,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetAllOutputs(NvPhysicalGpuHandle hPhysicalGpu,NvU32 *
 //! identifiers that are connected to display devices.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_GPU_GetConnectedDisplayIds.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -1882,7 +1888,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetConnectedOutputs(NvPhysicalGpuHandle hPhysicalGpu, 
 //!                 - If the queried GPU is not part of a valid SLI group.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_GPU_GetConnectedDisplayIds.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 170
@@ -1973,7 +1979,7 @@ typedef struct _NV_GPU_DISPLAYIDS
 //!
 //!             2) If pDisplayIdCount is greater than 0, allocate memory based on pDisplayIdCount. Then make a call NvAPI_GPU_GetConnectedDisplayIds to populate DisplayIds.
 //!                However, if pDisplayIdCount is 0, do not make this call.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \param [in]     hPhysicalGpu   - GPU selection
 //! \param [in]     flags          - One or more defines from NV_GPU_CONNECTED_IDS_FLAG_* as valid flags.
@@ -1996,8 +2002,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetConnectedDisplayIds(__in NvPhysicalGpuHandle hPhysi
 //
 //!   DESCRIPTION: This API returns display IDs for all possible outputs on the GPU.
 //!                For DPMST connector, it will return display IDs for all the video sinks in the topology. \n
-//! HOW TO USE: 1. The first call should be made to get the all display ID count. To get the display ID count, send in \n
-//!                  a) hPhysicalGpu    - a valid GPU handle(enumerated using NvAPI_EnumPhysicalGPUs()) as input,      \n
+//! HOW TO USE: 1. The first call should be made to get the all display ID count. To get the display ID count, send in         \n
+//!                  a) hPhysicalGpu    - a valid WDDM type GPU handle(enumerated using NvAPI_SYS_GetPhysicalGPUs()) as input, \n
 //!                  b) pDisplayIds     - NULL, as we just want to get the display ID count.                           \n
 //!                  c) pDisplayIdCount - a valid pointer to NvU32, whose value is set to ZERO.                        \n
 //!                If all parameters are correct and this call is successful, this call will return the display ID's count. \n
@@ -2012,7 +2018,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetConnectedDisplayIds(__in NvPhysicalGpuHandle hPhysi
 //!                less than the actual display ID count, it will overwrite the input and give the pDisplayIdCount as actual count and the
 //!                API will return NVAPI_INSUFFICIENT_BUFFER.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     hPhysicalGpu         GPU selection.
@@ -2048,7 +2054,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetAllDisplayIds(__in NvPhysicalGpuHandle hPhysicalGpu
 //!       output mask. On desktop systems the returned identifiers will match NvAPI_GPU_GetConnectedOutputs().
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_GPU_GetConnectedDisplayIds.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 95
@@ -2072,7 +2078,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetConnectedOutputsWithLidState(NvPhysicalGpuHandle hP
 //!                this function matches NvAPI_GPU_GetConnectedOutputsWithLidState().
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_GPU_GetConnectedDisplayIds.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 170
@@ -2095,7 +2101,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetConnectedSLIOutputsWithLidState(NvPhysicalGpuHandle
 //! \fn NvAPI_GPU_GetSystemType(NvPhysicalGpuHandle hPhysicalGpu, NV_SYSTEM_TYPE *pSystemType)
 //!  This function identifies whether the GPU is a notebook GPU or a desktop GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2134,7 +2140,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetSystemType(NvPhysicalGpuHandle hPhysicalGpu, NV_SYS
 //!  This function is the same as NvAPI_GPU_GetAllOutputs but returns only the set of GPU output
 //!  identifiers that are actively driving display devices.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 85
@@ -2162,10 +2168,12 @@ NVAPI_INTERFACE NvAPI_GPU_GetActiveOutputs(NvPhysicalGpuHandle hPhysicalGpu, NvU
 //!                - Quadro VX
 //!                - Tesla
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 100
+//!
+//! \requires Administrator privileges
 //!
 //! \retval  NVAPI_INVALID_ARGUMENT              pEDID is NULL; displayOutputId has 0 or > 1 bits set
 //! \retval  NVAPI_OK                           *pEDID data was applied to the requested displayOutputId.
@@ -2187,7 +2195,7 @@ NVAPI_INTERFACE NvAPI_GPU_SetEDID(NvPhysicalGpuHandle hPhysicalGpu, NvU32 displa
 //!  This function returns the output type. User can either specify both 'physical GPU handle and outputId (exactly 1 bit set - see \ref handles)' or
 //!  a valid displayId in the outputId parameter.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \Version Earliest supported ForceWare version: 82.61
@@ -2230,7 +2238,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetOutputType(NvPhysicalGpuHandle hPhysicalGpu, NvU32 
 //!
 //!  Use NvAPI_GPU_GetAllOutputs() to determine which outputs are candidates.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 85
@@ -2253,7 +2261,7 @@ NVAPI_INTERFACE NvAPI_GPU_ValidateOutputCombination(NvPhysicalGpuHandle hPhysica
 //
 //!  This function retrieves the full GPU name as an ASCII string - for example, "Quadro FX 1400".
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2273,7 +2281,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetFullName(NvPhysicalGpuHandle hPhysicalGpu, NvAPI_Sh
 //
 //!  This function returns the PCI identifiers associated with this GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2315,7 +2323,7 @@ typedef enum _NV_GPU_TYPE
 //!  DESCRIPTION: This function returns the GPU type (integrated or discrete).
 //!               See ::NV_GPU_TYPE.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2353,7 +2361,7 @@ typedef enum _NV_GPU_BUS_TYPE
 //
 //!  This function returns the type of bus associated with this GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2377,7 +2385,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetBusType(NvPhysicalGpuHandle hPhysicalGpu,NV_GPU_BUS
 //
 //!   DESCRIPTION: Returns the ID of the bus associated with this GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2401,7 +2409,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetBusId(NvPhysicalGpuHandle hPhysicalGpu, NvU32 *pBus
 //
 //!   DESCRIPTION: Returns the ID of the bus slot associated with this GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2427,7 +2435,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetBusSlotId(NvPhysicalGpuHandle hPhysicalGpu, NvU32 *
 //
 //!  This function returns the interrupt number associated with this GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2450,7 +2458,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetIRQ(NvPhysicalGpuHandle hPhysicalGpu,NvU32 *pIRQ);
 //
 //!  This function returns the revision of the video BIOS associated with this GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2473,7 +2481,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetVbiosRevision(NvPhysicalGpuHandle hPhysicalGpu,NvU3
 //
 //!  This function returns the OEM revision of the video BIOS associated with this GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2498,7 +2506,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetVbiosOEMRevision(NvPhysicalGpuHandle hPhysicalGpu,N
 //!  - xx numbers come from NvAPI_GPU_GetVbiosRevision() and
 //!  - yy comes from NvAPI_GPU_GetVbiosOEMRevision().
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2523,7 +2531,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetVbiosVersionString(NvPhysicalGpuHandle hPhysicalGpu
 //!  This function returns the AGP aperture in megabytes.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 455.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2543,7 +2551,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetAGPAperture(NvPhysicalGpuHandle hPhysicalGpu,NvU32 
 //!  This function returns the current AGP Rate (0 = AGP not present, 1 = 1x, 2 = 2x, etc.).
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 455.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2563,7 +2571,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetCurrentAGPRate(NvPhysicalGpuHandle hPhysicalGpu,NvU
 //!  This function returns the number of PCIE lanes being used for the PCIE interface
 //!  downstream from the GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2589,7 +2597,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetCurrentPCIEDownstreamWidth(NvPhysicalGpuHandle hPhy
 //!   This function returns the physical size of framebuffer in KB.  This does NOT include any
 //!   system RAM that may be dedicated for use by the GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2613,7 +2621,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetPhysicalFrameBufferSize(NvPhysicalGpuHandle hPhysic
 //!  This function returns the virtual size of framebuffer in KB.  This includes the physical RAM plus any
 //!  system RAM that has been dedicated for use by the GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2642,7 +2650,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetVirtualFrameBufferSize(NvPhysicalGpuHandle hPhysica
 //!  NV_GPU_WORKSTATION_FEATURE_TYPE_PROVIZ support from the API
 //!  NvAPI_GPU_QueryWorkstationFeatureSupport.
 //! \deprecated  Do not use this function - it is deprecated in release 460.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \since Release: 80
@@ -2671,7 +2679,7 @@ typedef NV_BOARD_INFO_V1    NV_BOARD_INFO;
 #define NV_BOARD_INFO_VER   NV_BOARD_INFO_VER1
 #endif
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -2706,7 +2714,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetBoardInfo(NvPhysicalGpuHandle hPhysicalGpu, NV_BOAR
 //
 //!  This function returns the width of the GPU's RAM memory bus.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -2760,6 +2768,7 @@ typedef enum _NV_GPU_ARCHITECTURE_ID
     NV_GPU_ARCHITECTURE_TU100 = 0x00000160,
     NV_GPU_ARCHITECTURE_GA100 = 0x00000170,
     NV_GPU_ARCHITECTURE_AD100 = 0x00000190,
+    NV_GPU_ARCHITECTURE_GB200 = 0x000001B0,
 
 }NV_GPU_ARCHITECTURE_ID;
 
@@ -2862,6 +2871,8 @@ typedef enum _NV_GPU_ARCH_IMPLEMENTATION_ID
     NV_GPU_ARCH_IMPLEMENTATION_AD103  = 0x00000003,
     NV_GPU_ARCH_IMPLEMENTATION_AD104  = 0x00000004,
 
+    NV_GPU_ARCH_IMPLEMENTATION_GB202        = 0x00000002,
+
 }NV_GPU_ARCH_IMPLEMENTATION_ID;
 
 typedef enum _NV_GPU_CHIP_REVISION
@@ -2914,7 +2925,7 @@ typedef NV_GPU_ARCH_INFO_V2 NV_GPU_ARCH_INFO;
 //!  This function retrieves the architecture, implementation and chip revision for the specified GPU .
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED       
@@ -3048,7 +3059,7 @@ typedef NV_I2C_INFO_V3                     NV_I2C_INFO;
 //!                 the combined format described in the I2C specification.  The register address will be written, followed by
 //!                 reading into the data buffer.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 85
@@ -3082,7 +3093,7 @@ NVAPI_INTERFACE NvAPI_I2CRead(NvPhysicalGpuHandle hPhysicalGpu, NV_I2C_INFO *pI2
 //!                 If a register address is specified (i.e. regAddrSize is positive), then the register address will be written
 //!                 and the data buffer will immediately follow without a restart.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 85
@@ -3111,7 +3122,7 @@ NVAPI_INTERFACE NvAPI_I2CWrite(NvPhysicalGpuHandle hPhysicalGpu, NV_I2C_INFO *pI
 //!   DESCRIPTION: This API configures the driver for a set of workstation features.
 //!                The driver can allocate the memory resources accordingly.
 //!
-//! SUPPORTED OS:  Windows 7
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \param [in]   hPhysicalGpu       Physical GPU Handle of the display adapter to be configured. GPU handles may be retrieved
@@ -3152,7 +3163,7 @@ NVAPI_INTERFACE NvAPI_GPU_WorkstationFeatureSetup(__in NvPhysicalGpuHandle hPhys
 //
 //!   DESCRIPTION: This API queries the current set of workstation features.
 //!
-//! SUPPORTED OS:  Windows 7
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \param [in]   hPhysicalGpu       Physical GPU Handle of the display adapter to be configured. GPU handles may be retrieved
@@ -3178,7 +3189,7 @@ NVAPI_INTERFACE NvAPI_GPU_WorkstationFeatureQuery(__in NvPhysicalGpuHandle hPhys
 //! \fn NvAPI_GPU_GetHDCPSupportStatus(NvPhysicalGpuHandle hPhysicalGpu, NV_GPU_GET_HDCP_SUPPORT_STATUS *pGetHDCPSupportStatus)
 //! DESCRIPTION: This function returns a GPU's HDCP support status.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -3347,7 +3358,7 @@ NVAPI_INTERFACE NvAPI_GPU_CudaEnumComputeCapableGpus(__inout NV_COMPUTE_GPU_TOPO
 //!                 - On call success:
 //!                 - Value contains the tachometer reading
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -3380,7 +3391,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetTachReading(NvPhysicalGpuHandle hPhysicalGPU, NvU32
 //!                                           NV_GPU_ECC_STATUS_INFO *pECCStatusInfo);
 //! DESCRIPTION:     This function returns ECC memory status information.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -3459,7 +3470,7 @@ typedef struct
 //!
 //! DESCRIPTION:     This function returns ECC memory error information.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -3494,7 +3505,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetECCErrorInfo(NvPhysicalGpuHandle hPhysicalGpu,
 //
 //! DESCRIPTION:     This function resets ECC memory error counters.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -3528,7 +3539,7 @@ NVAPI_INTERFACE NvAPI_GPU_ResetECCErrorInfo(NvPhysicalGpuHandle hPhysicalGpu, Nv
 //!                             NV_GPU_ECC_CONFIGURATION_INFO *pECCConfigurationInfo);
 //! DESCRIPTION:     This function returns ECC memory configuration information.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -3576,7 +3587,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetECCConfigurationInfo(NvPhysicalGpuHandle hPhysicalG
 //
 //! DESCRIPTION:     This function updates the ECC memory configuration setting.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -3628,11 +3639,46 @@ typedef struct
 typedef void(__cdecl *NVAPI_CALLBACK_QSYNCEVENT)(NV_QSYNC_EVENT_DATA qyncEventData, void *callbackParam);
 
 
+typedef struct _NV_DISPLAY_OUTPUT_MODE_CHANGE_EVENT_DATA
+{
+    NvU32 displayId;                                 //!< displayId of the display
+    NvU32 outputMode;                                //!< display output mode
+} NV_DISPLAY_OUTPUT_MODE_CHANGE_EVENT_DATA;
+
+//! Callback for Display Output Mode change events
+typedef void(__cdecl *NVAPI_CALLBACK_DISPLAY_OUTPUT_MODE_CHANGE_EVENT)(NV_DISPLAY_OUTPUT_MODE_CHANGE_EVENT_DATA* pEventData, void *callbackParam);
+
+typedef struct _NV_DISPLAY_COLORIMETRY_CHANGE_EVENT_DATA
+{
+    NvU32 displayId;                                //!< displayId of the monitor
+
+    float min_luminance;                            //!< min luminance, cd/m^2
+    float max_full_frame_luminance;                 //!< max 100% frame luminance, cd/m^2
+    float max_luminance;                            //!< max 10% frame luminance, cd/m^2
+
+    float hdrBrightnessLuminanceScalingFactor;      //!< HDR brightness luminance scaling factor applied by GPU on output pixels
+
+    float red_primary_x;                            //!< red primary chromaticity coordinate x
+    float red_primary_y;                            //!< red primary chromaticity coordinate y
+    float green_primary_x;                          //!< green primary chromaticity coordinate x
+    float green_primary_y;                          //!< green primary chromaticity coordinate y
+    float blue_primary_x;                           //!< blue primary chromaticity coordinate x
+    float blue_primary_y;                           //!< blue primary chromaticity coordinate y
+    float white_point_x;                            //!< white point chromaticity coordinate x
+    float white_point_y;                            //!< white point chromaticity coordinate y
+} NV_DISPLAY_COLORIMETRY_CHANGE_EVENT_DATA;
+
+//! Callback for Display Colorimetry change events
+typedef void(__cdecl *NVAPI_CALLBACK_DISPLAY_COLORIMETRY_CHANGE_EVENT)(NV_DISPLAY_COLORIMETRY_CHANGE_EVENT_DATA* pEventData, void *callbackParam);
+
+
 //! Enum for Event IDs
 typedef enum
 {
     NV_EVENT_TYPE_NONE = 0,
     NV_EVENT_TYPE_QSYNC = 6,
+    NV_EVENT_TYPE_DISPLAY_OUTPUT_MODE_CHANGE = 103,
+    NV_EVENT_TYPE_DISPLAY_COLORIMETRY_CHANGE = 104,
 } NV_EVENT_TYPE;
 
 //! Core NV_EVENT_REGISTER_CALLBACK structure declaration
@@ -3644,6 +3690,8 @@ typedef struct
     union
     {
         NVAPI_CALLBACK_QSYNCEVENT    nvQSYNCEventCallback;                     //!< Callback function pointer for QSYNC events
+        NVAPI_CALLBACK_DISPLAY_OUTPUT_MODE_CHANGE_EVENT    nvDisplayOutputModeChangeEventCallback;  //!< Callback function pointer for Display Output Mode change events
+        NVAPI_CALLBACK_DISPLAY_COLORIMETRY_CHANGE_EVENT    nvDisplayColorimetryChangeEventCallback; //!< Callback function pointer for Display Colorimetry change events
     }nvCallBackFunc;
 
 } NV_EVENT_REGISTER_CALLBACK, *PNV_EVENT_REGISTER_CALLBACK;
@@ -3724,7 +3772,7 @@ typedef NV_SCANOUT_INTENSITY_DATA_V2 NV_SCANOUT_INTENSITY_DATA;
 //
 //!   DESCRIPTION: This API enables and sets up per-pixel intensity feature on the specified display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   displayId              combined physical display and GPU identifier of the display to apply the intensity control.
@@ -3759,7 +3807,7 @@ typedef struct _NV_SCANOUT_INTENSITY_STATE_DATA
 //
 //!   DESCRIPTION: This API queries current state of the intensity feature on the specified display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId                       combined physical display and GPU identifier of the display to query the configuration.
@@ -3805,7 +3853,7 @@ typedef struct
 //
 //!   DESCRIPTION: This API enables and sets up the warping feature on the specified display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]    displayId               Combined physical display and GPU identifier of the display to apply the intensity control
@@ -3841,7 +3889,7 @@ typedef struct _NV_SCANOUT_WARPING_STATE_DATA
 //
 //!   DESCRIPTION: This API queries current state of the warping feature on the specified display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId                      combined physical display and GPU identifier of the display to query the configuration.
@@ -3862,11 +3910,12 @@ NVAPI_INTERFACE NvAPI_GPU_GetScanoutWarpingState(__in NvU32 displayId, __inout N
 
 typedef enum
 {
-    NV_GPU_SCANOUT_COMPOSITION_PARAMETER_WARPING_RESAMPLING_METHOD      = 0
+    NV_GPU_SCANOUT_COMPOSITION_PARAMETER_WARPING_RESAMPLING_METHOD      = 0,
+    NV_GPU_SCANOUT_COMPOSITION_PARAMETER_SCANOUT_INTENSITY_METHOD       = 1
 } NV_GPU_SCANOUT_COMPOSITION_PARAMETER;
 
-//! This enum defines a collection of possible scanout composition values that can be used to configure
-//! possible scanout composition settings.  (Currently the only parameter defined is the WARPING_RESAMPLING_METHOD).
+//! This enum defines a collection of scanout composition values that can be used to configure
+//! the supported scanout composition settings
 typedef enum
 {
     NV_GPU_SCANOUT_COMPOSITION_PARAMETER_SET_TO_DEFAULT = 0,                                  // Set parameter to default value.
@@ -3877,23 +3926,31 @@ typedef enum
     NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_WARPING_RESAMPLING_METHOD_BICUBIC_BSPLINE                = 0x103,
     NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_WARPING_RESAMPLING_METHOD_BICUBIC_ADAPTIVE_TRIANGULAR    = 0x104,
     NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_WARPING_RESAMPLING_METHOD_BICUBIC_ADAPTIVE_BELL_SHAPED   = 0x105,
-    NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_WARPING_RESAMPLING_METHOD_BICUBIC_ADAPTIVE_BSPLINE       = 0x106
+    NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_WARPING_RESAMPLING_METHOD_BICUBIC_ADAPTIVE_BSPLINE       = 0x106,
+    // SCANOUT_INTENSITY_METHOD section:
+    NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_SCANOUT_INTENSITY_NO_GAMMA                               = 0x200,
+    NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_SCANOUT_INTENSITY_COLOR_GAMMA                            = 0x201,
+    NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_SCANOUT_INTENSITY_COLOR_AND_OFFSET_GAMMA                 = 0x202,
 } NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE;
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION NAME: NvAPI_GPU_SetScanoutCompositionParameter
 //
 //!   DESCRIPTION: This API sets various parameters that configure the scanout composition feature on the specified display.
-//!                (currently there is only one configurable parameter defined: WARPING_RESAMPLING_METHOD,
-//!                 but this function is designed to support the addition of parameters as needed.)
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]    displayId               Combined physical display and GPU identifier of the display to apply the intensity control
 //! \param [in]    parameter               The scanout composition parameter to be set
 //! \param [in]    parameterValue          The data to be set for the specified parameter
-//! \param [in]    pContainer              Additional container for data associated with the specified parameter
+//! \param [in]    pContainer              Additional container for data associated with the specified parameter. If parameterValue
+//!                                        is WARPING_RESAMPLING_METHOD, pContainer is not in use. If parameterValue is SCANOUT_INTENSITY_METHOD,
+//!                                        pContainer is a pointer to a floating-point value, in the range of (0.0f, 5.0f], which specifies the
+//!                                        gamma vallue used in the gamma and degamma calculation. If pContainer data is NULL and parameterValue is
+//!                                        NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_SCANOUT_INTENSITY_COLOR_GAMMA or
+//!                                        NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE_SCANOUT_INTENSITY_COLOR_AND_OFFSET_GAMMA,
+//!                                        the default gamma value used in driver implementation is 2.2f
 //!
 //! \retval ::NVAPI_INVALID_ARGUMENT Invalid input parameters.
 //! \retval ::NVAPI_API_NOT_INITIALIZED NvAPI not initialized.
@@ -3914,7 +3971,7 @@ NVAPI_INTERFACE NvAPI_GPU_SetScanoutCompositionParameter(NvU32 displayId, NV_GPU
 //
 //!   DESCRIPTION: This API queries current state of one of the various scanout composition parameters on the specified display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId           combined physical display and GPU identifier of the display to query the configuration.
@@ -3942,7 +3999,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetScanoutCompositionParameter(__in NvU32 displayId, _
 //
 //!   DESCRIPTION: This API queries the desktop and scanout portion of the specified display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId          combined physical display and GPU identifier of the display to query the configuration.
@@ -3983,7 +4040,7 @@ typedef struct _NV_SCANOUT_INFORMATION
 //
 //!   DESCRIPTION: This API queries the desktop and scanout portion of the specified display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \since Release: 331
 //!
@@ -4006,7 +4063,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetScanoutConfigurationEx(__in NvU32 displayId, __inou
 //!                NvAPI_GetLogicalGPUFromPhysicalGPU can be used to get the logical GPU handle associated with specified physical GPU handle.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 520. Instead, use NvAPI_GPU_GetLogicalGpuInfo.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]    hPhysicalGpu   PhysicalGpu Handle
@@ -4059,7 +4116,7 @@ typedef NV_GPU_VIRTUALIZATION_INFO_V1     NV_GPU_VIRTUALIZATION_INFO;
 //!
 //!   DESCRIPTION: This API returns virtualization information of the GPU
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -4105,7 +4162,7 @@ typedef NV_LOGICAL_GPU_DATA_V1     NV_LOGICAL_GPU_DATA;
 //
 //!  This function is used to query Logical GPU information.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 421
@@ -4277,7 +4334,7 @@ typedef NV_LICENSABLE_FEATURES_V4     NV_LICENSABLE_FEATURES;
 //!   DESCRIPTION:   This function call identifies whether licenses are supported on this system and if
 //!                  they are supported, returns the details of the features that can be licensed.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -4321,10 +4378,20 @@ NVAPI_INTERFACE NvAPI_GPU_GetLicensableFeatures(__in NvPhysicalGpuHandle hPhysic
 #define NVAPI_NVLINK_CAPS_NVLINK_VERSION_INVALID             (0x00000000)
 #define NVAPI_NVLINK_CAPS_NVLINK_VERSION_1_0                 (0x00000001)
 #define NVAPI_NVLINK_CAPS_NVLINK_VERSION_2_0                 (0x00000002)
+#define NVAPI_NVLINK_CAPS_NVLINK_VERSION_2_2                 (0x00000004U)
+#define NVAPI_NVLINK_CAPS_NVLINK_VERSION_3_0                 (0x00000005U)
+#define NVAPI_NVLINK_CAPS_NVLINK_VERSION_3_1                 (0x00000006U)
+#define NVAPI_NVLINK_CAPS_NVLINK_VERSION_4_0                 (0x00000007U)
+#define NVAPI_NVLINK_CAPS_NVLINK_VERSION_5_0                 (0x00000008U)
 
 #define NVAPI_NVLINK_CAPS_NCI_VERSION_INVALID                (0x00000000)
 #define NVAPI_NVLINK_CAPS_NCI_VERSION_1_0                    (0x00000001)
 #define NVAPI_NVLINK_CAPS_NCI_VERSION_2_0                    (0x00000002)
+#define NVAPI_NVLINK_CAPS_NCI_VERSION_2_2                    (0x00000004U)
+#define NVAPI_NVLINK_CAPS_NCI_VERSION_3_0                    (0x00000005U)
+#define NVAPI_NVLINK_CAPS_NCI_VERSION_3_1                    (0x00000006U)
+#define NVAPI_NVLINK_CAPS_NCI_VERSION_4_0                    (0x00000007U)
+#define NVAPI_NVLINK_CAPS_NCI_VERSION_5_0                    (0x00000008U)
 
 typedef struct
 {
@@ -4347,7 +4414,7 @@ typedef NVLINK_GET_CAPS_V1 NVLINK_GET_CAPS;
 // FUNCTION NAME:    NvAPI_GPU_NVLINK_GetCaps
 //
 //! DESCRIPTION:     This function returns the NVLink capabilities supported by the GPU.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 361
@@ -4549,7 +4616,7 @@ typedef NVLINK_GET_STATUS_V2   NVLINK_GET_STATUS;
 // FUNCTION NAME:    NvAPI_GPU_NVLINK_GetStatus
 //
 //! DESCRIPTION:     This function returns the NVLink status.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 361
@@ -4570,6 +4637,112 @@ typedef NVLINK_GET_STATUS_V2   NVLINK_GET_STATUS;
 ///////////////////////////////////////////////////////////////////////////////
 NVAPI_INTERFACE NvAPI_GPU_NVLINK_GetStatus(__in NvPhysicalGpuHandle hPhysicalGpu, __inout NVLINK_GET_STATUS* statusParams);
 
+
+
+typedef struct _NV_ENCODER_STATISTICS_V1
+{
+    NvU32 version;                       //!< [in]  Structure version value.
+    NvU32 sessionsCount;                 //!< [out] Count of active encoder sessions.
+    NvU32 averageFps;                    //!< [out] Trailing average FPS of all active sessions.
+    NvU32 averageLatency;                //!< [out] Encode latency in milliseconds.
+} NV_ENCODER_STATISTICS_V1;
+
+typedef NV_ENCODER_STATISTICS_V1    NV_ENCODER_STATISTICS;
+
+#define NV_ENCODER_STATISTICS_VER1  MAKE_NVAPI_VERSION(NV_ENCODER_STATISTICS_V1, 1)
+#define NNV_ENCODER_STATISTICS_VER  NV_ENCODER_STATISTICS_VER1
+
+
+///////////////////////////////////////////////////////////////////////////////
+//!
+//! FUNCTION NAME: NvAPI_GPU_GetEncoderStatistics
+//!
+//!   DESCRIPTION: This API can be used to get encoder statistics for the specified Nvidia GPU.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
+//!
+//! \since Release: 384
+//!
+//! \param [in]     hPhysicalGpu        - Handle of the Nvidia GPU.
+//! \param [in,out] pEncoderStatistics  - Pointer to the structure containing encoder statistics data.
+//!
+//! RETURN STATUS: This API can return any of the error codes enumerated in #NvAPI_Status.
+//!                If there are return error codes with specific meaning for this API, they are listed below.
+//!                (None)
+//!
+//! \ingroup gpu
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_GPU_GetEncoderStatistics(__in NvPhysicalGpuHandle hPhysicalGpu, __inout NV_ENCODER_STATISTICS *pEncoderStatistics);
+
+
+typedef enum _NV_ENCODER_TYPE
+{
+    NV_ENCODER_H264,
+    NV_ENCODER_HEVC,
+
+    NV_ENCODER_UNKNOWN = 0xFFFFFFFF,
+}NV_ENCODER_TYPE;
+
+typedef struct _NV_ENCODER_PER_SESSION_INFO_V1
+{
+    NvU32             sessionId;                   //!< Unique session ID.
+    NvU32             processId;                   //!< Owning process ID.
+    NvU32             vgpuInstance;                //!< Owning vGPU instance ID (only valid on vGPU hosts, otherwise zero).
+    NV_ENCODER_TYPE   codecType;                   //!< Video encoder type.
+    NvU32             hResolution;                 //!< Current encode horizontal resolution.
+    NvU32             vResolution;                 //!< Current encode vertical resolution.
+    NvU32             averageEncodeFps;            //!< Moving average encode frames per second.
+    NvU32             averageEncodeLatency;        //!< Moving average encode latency in milliseconds.
+}NV_ENCODER_PER_SESSION_INFO_V1;
+
+#define NV_ENCODER_SESSION_INFO_MAX_ENTRIES_V1             0x200  //!< 512 entries.
+
+typedef struct _NV_ENCODER_SESSIONS_INFO_V1
+{
+    NvU32                          version;           //!< [in] Structure version value.
+
+    NvU32                          sessionsCount;     //!< [out] Count of active encoder sessions.
+    NV_ENCODER_PER_SESSION_INFO_V1 *pSessionInfo;     //!< [out] Array of session info. Caller should allocate memory for this field before making 
+                                                      //!< the NvAPI_GPU_GetEncoderSessionsInfo() call, memory allocated should be of 
+                                                      //!< size = sizeof(NV_ENCODER_PER_SESSION_INFO_V1) * NV_ENCODER_SESSION_INFO_MAX_ENTRIES_V1.
+} NV_ENCODER_SESSIONS_INFO_V1;
+
+typedef NV_ENCODER_SESSIONS_INFO_V1    NV_ENCODER_SESSIONS_INFO;
+
+#define NV_ENCODER_SESSIONS_INFO_VER1  MAKE_NVAPI_VERSION(NV_ENCODER_SESSIONS_INFO_V1, 1)
+#define NV_ENCODER_SESSIONS_INFO_VER   NV_ENCODER_SESSIONS_INFO_VER1
+
+
+///////////////////////////////////////////////////////////////////////////////
+//!
+//! FUNCTION NAME: NvAPI_GPU_GetEncoderSessionsInfo
+//!
+//!   DESCRIPTION: This API can be used to retrieve information about active encoder sessions on the specified GPU.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
+//!
+//! \since Release: 384
+//!
+//! \param [in]     hPhysicalGpu          - Handle of the Nvidia GPU.
+//! \param [in,out] pEncoderSessionsInfo  - Pointer to the structure containing information related to encoder sessions.
+//!
+//! RETURN STATUS: This API can return any of the error codes enumerated in #NvAPI_Status.
+//!                If there are return error codes with specific meaning for this API, they are listed below.
+//!                (None)
+//!
+//! \ingroup gpu
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_GPU_GetEncoderSessionsInfo(__in NvPhysicalGpuHandle hPhysicalGpu, __inout NV_ENCODER_SESSIONS_INFO *pEncoderSessionsInfo);
 
 typedef struct _NV_GPU_INFO_V1
 {
@@ -4600,7 +4773,7 @@ typedef NV_GPU_INFO_V2               NV_GPU_INFO;
 //
 //! DESCRIPTION: This API will return NVIDIA GPU related information.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -4736,7 +4909,7 @@ typedef enum _NVAPI_GPU_PERF_DECREASE
 //
 //! DESCRIPTION:   This function retrieves - in NvU32 variable - reasons for the current performance decrease.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \param [in]      hPhysicalGPU    (IN)    - GPU for which performance decrease is to be evaluated.
 //! \param [out]  pPerfDecrInfo    (OUT)    - Pointer to a NvU32 variable containing performance decrease info
@@ -4856,7 +5029,7 @@ typedef  NV_GPU_PERF_PSTATES_INFO_V2 NV_GPU_PERF_PSTATES_INFO;
 //!                  - P12 - Minimum idle power consumption
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 304. Instead, use NvAPI_GPU_GetPstates20.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     hPhysicalGPU       GPU selection.
@@ -4926,7 +5099,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetPstatesInfoEx(NvPhysicalGpuHandle hPhysicalGpu, NV_
 //!
 //! \since Release: 295
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   hPhysicalGPU  GPU selection
@@ -4946,7 +5119,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetPstates20(__in NvPhysicalGpuHandle hPhysicalGpu, __
 //
 //! DESCRIPTION:     This function retrieves the current performance state (P-State).
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 165
@@ -5003,7 +5176,7 @@ typedef struct
 //!                There are currently 4 domains for which GPU utilization and dynamic P-State thresholds can be retrieved:
 //!                   graphic engine (GPU), frame buffer (FB), video engine (VID), and bus interface (BUS).
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //!
@@ -5125,7 +5298,7 @@ typedef NV_GPU_THERMAL_SETTINGS_V2  NV_GPU_THERMAL_SETTINGS;
 //!  - To retrieve specific thermal sensor info, set the sensorIndex to the required thermal sensor index.
 //!  - To retrieve info for all sensors, set sensorIndex to NVAPI_THERMAL_TARGET_ALL.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -5219,7 +5392,7 @@ typedef NV_GPU_CLOCK_FREQUENCIES_V2 NV_GPU_CLOCK_FREQUENCIES;
 //!   Each domain's info is indexed in the array.  For example:
 //!   clkFreqs.domain[NVAPI_GPU_PUBLIC_CLOCK_MEMORY] holds the info for the MEMORY domain.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -5249,7 +5422,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetAllClockFrequencies(__in NvPhysicalGpuHandle hPhysi
 //!       the brightness of the LED on an SLI bridge, regardless of how many are physicaly attached.
 //!       You should enumerate thru the GPUs with this call to determine which GPU is managing the attribute.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -5319,7 +5492,7 @@ NVAPI_INTERFACE NvAPI_GPU_QueryIlluminationSupport(__inout NV_GPU_QUERY_ILLUMINA
 //!       You should enumerate thru the GPUs with the \ref NvAPI_GPU_QueryIlluminationSupport call to
 //!       determine which GPU is managing the attribute.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -5388,7 +5561,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetIllumination(NV_GPU_GET_ILLUMINATION_PARM *pIllumin
 //!       You should enumerate thru the GPUs with the \ref NvAPI_GPU_QueryIlluminationSupport call to
 //!       determine which GPU is managing the attribute.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -5642,7 +5815,7 @@ typedef NV_GPU_CLIENT_ILLUM_DEVICE_INFO_PARAMS_V1    NV_GPU_CLIENT_ILLUM_DEVICE_
 //! DESCRIPTION:   This API returns static information about illumination devices on the
 //!                given GPU.
 //
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -5740,7 +5913,7 @@ typedef NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_PARAMS_V1    NV_GPU_CLIENT_ILLUM_DEVI
 //! DESCRIPTION:   This API gets control parameters about illumination devices on the
 //!                given GPU.
 //
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -5764,7 +5937,7 @@ NVAPI_INTERFACE NvAPI_GPU_ClientIllumDevicesGetControl(__in NvPhysicalGpuHandle 
 //! DESCRIPTION:   This API sets control parameters about illumination devices on the
 //!                given GPU.
 //
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -5875,7 +6048,7 @@ typedef NV_GPU_CLIENT_ILLUM_ZONE_INFO_PARAMS_V1    NV_GPU_CLIENT_ILLUM_ZONE_INFO
 //! DESCRIPTION:   This API returns static information about illumination zones on the
 //!                given GPU.
 //
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -6324,7 +6497,7 @@ typedef NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_PARAMS_V1    NV_GPU_CLIENT_ILLUM_ZONE_C
 //! DESCRIPTION:    Accessor for control information about illumination zones on the
 //!                 given GPU.
 //
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -6348,7 +6521,7 @@ NVAPI_INTERFACE NvAPI_GPU_ClientIllumZonesGetControl(__in NvPhysicalGpuHandle hP
 //! DESCRIPTION:   Mutator for control information about illumination zones on the
 //!                given GPU.
 //
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -6372,7 +6545,7 @@ NVAPI_INTERFACE NvAPI_GPU_ClientIllumZonesSetControl(__in NvPhysicalGpuHandle hP
 //! DESCRIPTION:   This API registers the process for events. This API should be called for each eventcallback.
 //!                The handle returned to the client will be common across all eventCallbacks.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  eventCallback  Pointer to NV_EVENT_REGISTER_CALLBACK structure to call
@@ -6397,7 +6570,7 @@ NVAPI_INTERFACE NvAPI_Event_RegisterCallback(PNV_EVENT_REGISTER_CALLBACK eventCa
 //! DESCRIPTION:   This API unregister an event handle.
 //!                This API should be called only once per process(irrespective of the number of callbacks registered).
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]    hClient  Handle associated with this listeners
@@ -6423,7 +6596,7 @@ NVAPI_INTERFACE NvAPI_Event_UnregisterCallback(NvEventHandle hClient);
 //!                Note: Display handles can get invalidated on a modeset, so the calling applications need to
 //!                renum the handles after every modeset.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -6453,7 +6626,7 @@ NVAPI_INTERFACE NvAPI_EnumNvidiaDisplayHandle(NvU32 thisEnum, NvDisplayHandle *p
 //!                Note: Display handles can get invalidated on a modeset, so the calling applications need to
 //!                renum the handles after every modeset.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -6479,7 +6652,7 @@ NVAPI_INTERFACE NvAPI_EnumNvidiaUnAttachedDisplayHandle(NvU32 thisEnum, NvUnAtta
 //!
 //! At least one GPU must be present in the system and running an NVIDIA display driver.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -6498,7 +6671,7 @@ NVAPI_INTERFACE NvAPI_CreateDisplayFromUnAttachedDisplay(NvUnAttachedDisplayHand
 //!  This function returns the handle of the NVIDIA display that is associated
 //!  with the given display "name" (such as "\\.\DISPLAY1").
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -6518,7 +6691,7 @@ NVAPI_INTERFACE NvAPI_GetAssociatedNvidiaDisplayHandle(const char *szDisplayName
 //!   DESCRIPTION: This function returns the handle of an unattached NVIDIA display that is
 //!                associated with the given display name (such as "\\DISPLAY1").
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185
@@ -6539,7 +6712,7 @@ NVAPI_INTERFACE NvAPI_DISP_GetAssociatedUnAttachedNvidiaDisplayHandle(const char
 //
 //!  For a given NVIDIA display handle, this function returns a string (such as "\\.\DISPLAY1") to identify the display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -6557,7 +6730,7 @@ NVAPI_INTERFACE NvAPI_GetAssociatedNvidiaDisplayName(NvDisplayHandle NvDispHandl
 //
 //!  This function returns the display name given, for example, "\\DISPLAY1", using the unattached NVIDIA display handle
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 95
@@ -6576,7 +6749,7 @@ NVAPI_INTERFACE NvAPI_GetUnAttachedAssociatedDisplayName(NvUnAttachedDisplayHand
 //
 //!  This function enables hardware cursor support
 //!
-//! SUPPORTED OS:  Windows XP
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //!
@@ -6593,7 +6766,7 @@ NVAPI_INTERFACE NvAPI_EnableHWCursor(NvDisplayHandle hNvDisplay);
 //
 //! This function disables hardware cursor support
 //!
-//! SUPPORTED OS:  Windows XP
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \since Release: 80
@@ -6609,7 +6782,7 @@ NVAPI_INTERFACE NvAPI_DisableHWCursor(NvDisplayHandle hNvDisplay);
 //
 //!  This function gets the V-blank counter
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 80
@@ -6627,7 +6800,7 @@ NVAPI_INTERFACE NvAPI_GetVBlankCounter(NvDisplayHandle hNvDisplay, NvU32 *pCount
 //!  next OS modeset. The override is good for only one modeset (regardless whether it's deferred or immediate).
 //!
 //!
-//! SUPPORTED OS:  Windows XP
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \since Release: 80
@@ -6655,7 +6828,7 @@ NVAPI_INTERFACE NvAPI_SetRefreshRateOverride(NvDisplayHandle hNvDisplay, NvU32 o
 //
 //! This function gets the active outputId associated with the display handle.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 90
@@ -6732,7 +6905,7 @@ typedef struct _NV_DISPLAY_PORT_INFO_V1
 //! \fn NvAPI_GetDisplayPortInfo(__in_opt NvDisplayHandle hNvDisplay, __in NvU32 outputId, __inout NV_DISPLAY_PORT_INFO *pInfo)
 //! DESCRIPTION:     This function returns the current DisplayPort-related information on the specified device (monitor).
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 165
@@ -6758,7 +6931,7 @@ NVAPI_INTERFACE NvAPI_GetDisplayPortInfo(__in_opt NvDisplayHandle hNvDisplay, __
 //! \fn NvAPI_SetDisplayPort(NvDisplayHandle hNvDisplay, NvU32 outputId, NV_DISPLAY_PORT_CONFIG *pCfg)
 //! DESCRIPTION:     This function sets up DisplayPort-related configurations.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release:   165
@@ -6864,7 +7037,7 @@ typedef NV_HDMI_SUPPORT_INFO_V2    NV_HDMI_SUPPORT_INFO;
 #endif
 
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION NAME:   NvAPI_GetHDMISupportInfo
@@ -7362,7 +7535,7 @@ typedef struct
 //
 //! DESCRIPTION:     This API controls the InfoFrame values.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId         Monitor Identifier
@@ -7388,7 +7561,7 @@ NVAPI_INTERFACE NvAPI_Disp_InfoFrameControl(__in NvU32 displayId, __inout NV_INF
 //! \fn NvAPI_Disp_ColorControl(NvU32 displayId, NV_COLOR_DATA *pColorData)
 //! DESCRIPTION:    This API controls the Color values.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId         Monitor Identifier
@@ -7676,7 +7849,8 @@ typedef struct _NV_HDR_CAPABILITIES_V3
     NvU32 isDolbyVisionSupported                :1;                 //!< Dolby Vision Support. Boolean: 0 = not supported, 1 = supported;
     NvU32 isHdr10PlusSupported                  :1;                 //!< HDR10+ (Sink Side Tonemapping) is supported
     NvU32 isHdr10PlusGamingSupported            :1;                 //!< HDR10+ Gaming, a.k.a HDR10+ Source Side Tonemapping (SSTM), is supported
-    NvU32 reserved                              :24;
+    NvU32 isNvidiaCertifiedDisplay              :1;                 //!< Nvidia certified HDR display
+    NvU32 reserved                              :23;
 
     NV_STATIC_METADATA_DESCRIPTOR_ID static_metadata_descriptor_id; //!< Static Metadata Descriptor Id (0 for static metadata type 1)
 
@@ -7751,7 +7925,7 @@ typedef NV_HDR_CAPABILITIES_V3    NV_HDR_CAPABILITIES;
 //! \fn NvAPI_Disp_GetHdrCapabilities(NvU32 displayId, NV_HDR_CAPABILITIES  *pHdrCapabilities)
 //! DESCRIPTION:    This API gets High Dynamic Range (HDR) capabilities of the display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId           Monitor Identifier
@@ -7871,7 +8045,7 @@ typedef NV_HDR_COLOR_DATA_V2    NV_HDR_COLOR_DATA;
 //! \fn NvAPI_Disp_HdrColorControl(NvU32 displayId, NV_HDR_COLOR_DATA *pHdrColorData)
 //! DESCRIPTION:    This API configures High Dynamic Range (HDR) and Extended Dynamic Range (EDR) output.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId         Monitor Identifier
@@ -7896,7 +8070,7 @@ typedef enum _NV_COLORSPACE_TYPE
 //! \fn NvAPI_Disp_SetSourceColorSpace(__in NvU32 displayId, __in NV_SOURCE_COLORSPACE colorSpace)
 //! DESCRIPTION:    This API sets colorspace of the source identified by the process id of the caller
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 525
@@ -7918,7 +8092,7 @@ NVAPI_INTERFACE NvAPI_Disp_SetSourceColorSpace(__in NvU32 displayId, __in NV_COL
 //! \fn NvAPI_Disp_GetSourceColorSpace(__in NvU32 displayId, __inout NV_SOURCE_COLORSPACE* pColorSpace)
 //! DESCRIPTION:    This API gets colorspace of the source identified by the process id.
 //!                 Set sourcePID = NV_SOURCE_PID_CURRENT to use the process id of the caller.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 525
@@ -7966,7 +8140,7 @@ typedef NV_HDR_METADATA_V1 NV_HDR_METADATA;
 //! \fn NvAPI_Disp_SetSourceHdrMetadata(__in NvU32 displayId, __in NV_HDR_METADATA* pMetadata)
 //! DESCRIPTION:    This API sets HDR metadata of the source identified by the process id of the caller
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 525
@@ -7986,7 +8160,7 @@ NVAPI_INTERFACE NvAPI_Disp_SetSourceHdrMetadata(__in NvU32 displayId, __in NV_HD
 //! \fn NvAPI_NvAPI_Disp_GetSourceHdrMetadata(__in NvU32 displayId, __inout NV_HDR_METADATA* pMetadata)
 //! DESCRIPTION:    This API gets HDR metadata of the source identified by the process id of the caller
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 525
@@ -8015,7 +8189,7 @@ typedef enum _NV_DISPLAY_OUTPUT_MODE
 //! DESCRIPTION:    This API sets display output mode and returns the display output mode used by the OS before the API call.
 //!                 Only one application at a time can override OS display output mode.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 525
@@ -8037,7 +8211,7 @@ NVAPI_INTERFACE NvAPI_Disp_SetOutputMode(__in NvU32 displayId, __inout NV_DISPLA
 //! \fn NvAPI_Disp_GetOutputMode(__in NvU32 displayId, __inout NV_DISPLAY_OUTPUT_MODE* pDisplayMode)
 //! DESCRIPTION:    This API gets display output mode.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 525
@@ -8063,7 +8237,7 @@ typedef enum _NV_HDR_TONEMAPPING_METHOD
 //! \fn NvAPI_Disp_SetHdrToneMapping(__in NvU32 displayId, __in NV_HDR_TONEMAPPING_METHOD hdrTonemapping)
 //! DESCRIPTION:    This API sets HDR tonemapping method for the display
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 525
@@ -8083,7 +8257,7 @@ NVAPI_INTERFACE NvAPI_Disp_SetHdrToneMapping(__in NvU32 displayId, __in NV_HDR_T
 //! \fn NvAPI_Disp_GetHdrToneMapping(__in NvU32 displayId, __inout NV_HDR_TONEMAPPING_METHOD* pHdrTonemapping)
 //! DESCRIPTION:    This API gets HDR tonemapping method for the display.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 525
@@ -8096,6 +8270,50 @@ NVAPI_INTERFACE NvAPI_Disp_SetHdrToneMapping(__in NvU32 displayId, __in NV_HDR_T
 //
 ///////////////////////////////////////////////////////////////////////////////
 NVAPI_INTERFACE NvAPI_Disp_GetHdrToneMapping(__in NvU32 displayId, __inout NV_HDR_TONEMAPPING_METHOD* pHdrTonemapping);
+
+typedef struct _NV_DISPLAY_COLORIMETRY_V1
+{
+    NvU32    version;                               //!< Version of this structure
+
+    float min_luminance;                            //!< min luminance, cd/m^2
+    float max_full_frame_luminance;                 //!< max 100% frame luminance, cd/m^2
+    float max_luminance;                            //!< max 10% frame luminance, cd/m^2
+
+    float hdrBrightnessLuminanceScalingFactor;      //!< HDR brightness luminance scaling factor applied by GPU on output pixels
+
+    float red_primary_x;                            //!< red primary chromaticity coordinate x
+    float red_primary_y;                            //!< red primary chromaticity coordinate y
+    float green_primary_x;                          //!< green primary chromaticity coordinate x
+    float green_primary_y;                          //!< green primary chromaticity coordinate y
+    float blue_primary_x;                           //!< blue primary chromaticity coordinate x
+    float blue_primary_y;                           //!< blue primary chromaticity coordinate y
+    float white_point_x;                            //!< white point chromaticity coordinate x
+    float white_point_y;                            //!< white point chromaticity coordinate y
+} NV_DISPLAY_COLORIMETRY_V1;
+
+#define NV_DISPLAY_COLORIMETRY_VER1 MAKE_NVAPI_VERSION(NV_DISPLAY_COLORIMETRY_V1, 1)
+#define NV_DISPLAY_COLORIMETRY_VER NV_DISPLAY_COLORIMETRY_VER1
+typedef NV_DISPLAY_COLORIMETRY_V1 NV_DISPLAY_COLORIMETRY;
+
+///////////////////////////////////////////////////////////////////////////////
+// FUNCTION NAME:   NvAPI_Disp_GetColorimetry
+//
+//! \fn NvAPI_Disp_GetColorimetry(__in NvU32 displayId, __inout NV_DISPLAY_COLORIMETRY* pColorimetry)
+//! DESCRIPTION:    This API gets colorimetry parameters for the display.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release: 580
+//!
+//! \param [in]  displayId          display identifier
+//! \param [out] pColorimetry       display colorimetry
+//!
+//! \return    This API can return any of the error codes enumerated in #NvAPI_Status. If there are return error codes with
+//!            specific meaning for this API, they are listed below.
+//
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_Disp_GetColorimetry(__in NvU32 displayId, __inout NV_DISPLAY_COLORIMETRY* pColorimetry);
 //! @}
 
 //! \ingroup dispcontrol
@@ -8139,7 +8357,7 @@ typedef struct _NV_TIMING_INPUT
 //
 //! DESCRIPTION:  This function calculates the timing from the visible width/height/refresh-rate and timing type info.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -8164,7 +8382,7 @@ NVAPI_INTERFACE NvAPI_DISP_GetTiming( __in NvU32 displayId,__in NV_TIMING_INPUT 
 //! \fn NvAPI_DISP_GetMonitorCapabilities(NvU32 displayId, NV_MONITOR_CAPABILITIES *pMonitorCapabilities)
 //! DESCRIPTION:     This API returns the Monitor capabilities
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      displayId                Monitor Identifier
@@ -8282,7 +8500,7 @@ typedef NV_MONITOR_CAPABILITIES_V1 NV_MONITOR_CAPABILITIES;
 
 //! @}
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \ingroup dispcontrol
 NVAPI_INTERFACE NvAPI_DISP_GetMonitorCapabilities(__in NvU32 displayId, __inout NV_MONITOR_CAPABILITIES *pMonitorCapabilities);
@@ -8323,7 +8541,7 @@ typedef NV_MONITOR_COLOR_CAPS_V1 NV_MONITOR_COLOR_CAPS;
 //!                   than what was returned from first call, the API will return only the actual number of elements in the color
 //!                   capabilities array and the extra buffer will remain unused.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      displayId                  Monitor Identifier
@@ -8375,7 +8593,7 @@ typedef struct
 //! DESCRIPTION:    This API enumerates the custom timing specified by the enum index.
 //!                 The client should keep enumerating until it returns NVAPI_END_ENUMERATION.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -8406,7 +8624,7 @@ NVAPI_INTERFACE NvAPI_DISP_EnumCustomDisplay( __in NvU32 displayId, __in NvU32 i
 //!  - If the selected custom timings matches the existing source resolution on the primary.
 //!  Setting up a custom display on non-active but connected monitors is supported only for Win7 and above.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -8429,7 +8647,7 @@ NVAPI_INTERFACE NvAPI_DISP_TryCustomDisplay( __in_ecount(count) NvU32 *pDisplayI
 //
 //! DESCRIPTION:    This function deletes the custom display configuration, specified from the registry for  all the displays whose display IDs are passed.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -8454,7 +8672,7 @@ NVAPI_INTERFACE NvAPI_DISP_DeleteCustomDisplay( __in_ecount(count) NvU32 *pDispl
 //!                 This function should be called right after NvAPI_DISP_TryCustomDisplay() to save the custom display from the current
 //!                 hardware context. This function will not do anything if the custom display configuration is not tested on the hardware.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -8482,7 +8700,7 @@ NVAPI_INTERFACE NvAPI_DISP_SaveCustomDisplay( __in_ecount(count) NvU32 *pDisplay
 //!                 otherwise no action is taken. On Vista, NvAPI_DISP_RevertCustomDisplayTrial should be called with an active display that
 //!                 was affected during the NvAPI_DISP_TryCustomDisplay() call, per GPU.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -8506,7 +8724,7 @@ NVAPI_INTERFACE NvAPI_DISP_RevertCustomDisplayTrial( __in_ecount(count) NvU32* p
 //!       Use NvAPI_SYS_GetDisplayTopologies() to query views across GPUs.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_DISP_GetDisplayConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 85
@@ -8540,7 +8758,7 @@ NVAPI_INTERFACE NvAPI_GetView(NvDisplayHandle hNvDisplay, NV_VIEW_TARGET_INFO *p
 //!                       Use NvAPI_SYS_GetDisplayTopologies() to query views across GPUs.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_DISP_GetDisplayConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 165
@@ -8567,7 +8785,7 @@ NVAPI_INTERFACE NvAPI_GetViewEx(NvDisplayHandle hNvDisplay, NV_DISPLAY_PATH_INFO
 //
 //!  This API lets caller enumerate all the supported NVIDIA display views - nView and Dualview modes.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 85
@@ -8585,7 +8803,7 @@ NVAPI_INTERFACE NvAPI_GetViewEx(NvDisplayHandle hNvDisplay, NV_DISPLAY_PATH_INFO
 NVAPI_INTERFACE NvAPI_GetSupportedViews(NvDisplayHandle hNvDisplay, NV_TARGET_VIEW_MODE *pTargetViews, NvU32 *pViewCount);
 
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -8624,7 +8842,7 @@ NVAPI_INTERFACE NvAPI_DISP_GetDisplayIdByDisplayName(const char *displayName, Nv
 //!                               targetInfoCount. If sourceModeInfo is needed allocate memory or it can be initialized to NULL.
 //!             Third  Pass(Optional, only required if target information is required): Allocate memory for targetInfo with respect
 //!                               to number of targetInfoCount(from Second Pass).
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in,out]  pathInfoCount    Number of elements in pathInfo array, returns number of valid topologies, this cannot be null.
@@ -8660,7 +8878,7 @@ NVAPI_INTERFACE NvAPI_DISP_GetDisplayConfig(__inout NvU32 *pathInfoCount, __out_
 //!                  - If user doesn't provide sourceModeInfo then NVAPI just picks up some default sourceId's in incremental order.
 //!                  Note : NVAPI will not intelligently choose the sourceIDs for any configs that does not need a modeset.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      pathInfoCount   Number of supplied elements in pathInfo
@@ -8721,7 +8939,7 @@ typedef NV_EDID_DATA_V2 NV_EDID_DATA;
 //!                                   To only retrieve the EDID type, the user should send pEdidParams->pEDID as NULL and
 //!                                   pEdidParams->sizeOfEDID as 0.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 400
@@ -8744,10 +8962,10 @@ typedef struct _NV_GET_ADAPTIVE_SYNC_DATA_V1
                                           //!<         If default values from EDID are used, this parameter returns 0.
     NvU32  bDisableAdaptiveSync : 1;      //!< [out]   Indicates if adaptive sync is disabled on the display.
     NvU32  bDisableFrameSplitting : 1;    //!< [out]   Indicates if frame splitting is disabled on the display.
-    NvU32  reserved : 30;                 //!< reserved for future use.
+    NvU32  reserved : 30;                 //!<         reserved for future use.
     NvU32  lastFlipRefreshCount;          //!< [out]   Number of times the last flip was shown on the screen
     NvU64  lastFlipTimeStamp;             //!< [out]   Timestamp for the lastest flip on the screen
-    NvU32  reservedEx[4];                 //!< reserved for future use.
+    NvU32  reservedEx[4];                 //!<         reserved for future use.
 } NV_GET_ADAPTIVE_SYNC_DATA_V1;
 
 #define NV_GET_ADAPTIVE_SYNC_DATA_VER1  MAKE_NVAPI_VERSION(NV_GET_ADAPTIVE_SYNC_DATA_V1,1)
@@ -8781,11 +8999,14 @@ typedef struct _NV_SET_ADAPTIVE_SYNC_DATA_V1
 {
     NvU32  version ;                      //!< [in]    structure version
     NvU32  maxFrameInterval;              //!< [in]    maximum frame interval in micro seconds.
-                                          //!<         If maxFrameInterval is send as 0, default values from EDID will be used.
+                                          //!<         If maxFrameInterval is sent as 0, default values from EDID will be used.
     NvU32  bDisableAdaptiveSync : 1;      //!< [in]    Indicates if adaptive sync is disabled on the display.
     NvU32  bDisableFrameSplitting : 1;    //!< [in]    Indicates if Frame Splitting should be disabled.
-    NvU32  reserved : 30;                 //!< reserved for future use.
-    NvU32  reservedEx[7];                 //!< reserved for future use.
+    NvU32  reserved : 30;                 //!<         reserved for future use.
+    NvU32  reserved1;                     //!<         Ensure the alignment is 8 bytes and reserve it for future use.
+    NvU64  maxFrameIntervalNs;            //!< [in]    maximum frame interval in nano seconds.
+                                          //!<         If maxFrameIntervalNs is sent as 0, default values from EDID will be used.
+    NvU32  reservedEx[4];                 //!<         reserved for future use.
 } NV_SET_ADAPTIVE_SYNC_DATA_V1;
 
 #define NV_SET_ADAPTIVE_SYNC_DATA_VER1  MAKE_NVAPI_VERSION(NV_SET_ADAPTIVE_SYNC_DATA_V1,1)
@@ -8818,15 +9039,28 @@ NVAPI_INTERFACE NvAPI_DISP_SetAdaptiveSyncData(__in NvU32 displayId, __in NV_SET
 
 typedef struct _NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1
 {
-    NvU32  version ;                      //!< [in]    structure version
+    NvU32  version;                       //!< [in]    structure version
     NvU32  frameIntervalUs;               //!< [out]   frame interval in micro seconds if Virtual RR is currently applied
-    NvU32  reservedEx[8];                 //!< reserved for future use.
+    NvU32  rrx1k;                         //!< [out]   Refresh Rate * 1000
+    NvU32  bIsGamingVrr;                  //!< [out]   If the content is Gaming
+    NvU32  reservedEx[6];                 //!<         reserved for future use.
 } NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1;
 
-#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER1  MAKE_NVAPI_VERSION(_NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1,1)
-#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER   NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER1
+typedef struct _NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2
+{
+    NvU32  version;                       //!< [in]    structure version
+    NvU32  frameIntervalUs;               //!< [out]   frame interval in micro seconds if Virtual RR is currently applied. This variable is deprecated in V2 and should not be used.
+    NvU32  rrx1k;                         //!< [out]   Refresh Rate * 1000
+    NvU32  bIsGamingVrr;                  //!< [out]   If the content is Gaming
+    NvU64  frameIntervalNs;               //!< [out]   frame interval in nano seconds if Virtual RR is currently applied
+    NvU32  reservedEx[4];                 //!<         reserved for future use.
+} NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2;
 
-typedef NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1  NV_GET_VIRTUAL_REFRESH_RATE_DATA;
+#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER1  MAKE_NVAPI_VERSION(_NV_GET_VIRTUAL_REFRESH_RATE_DATA_V1,1)
+#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER2  MAKE_NVAPI_VERSION(_NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2,2)
+#define NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER   NV_GET_VIRTUAL_REFRESH_RATE_DATA_VER2
+
+typedef NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2  NV_GET_VIRTUAL_REFRESH_RATE_DATA;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -8852,15 +9086,28 @@ NVAPI_INTERFACE NvAPI_DISP_GetVirtualRefreshRateData(__in NvU32 displayId, __ino
 
 typedef struct _NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1
 {
-    NvU32  version ;                      //!< [in]   structure version
+    NvU32  version;                       //!< [in]   structure version
     NvU32  frameIntervalUs;               //!< [in]   frame interval in micro seconds if Virtual RR is currently applied
-    NvU32  reservedEx[8];                 //!< reserved for future use.
+    NvU32  rrx1k;                         //!< [in]   Refresh Rate * 1000
+    NvU32  bIsGamingVrr;                  //!< [in]   If the content is Gaming
+    NvU32  reservedEx[6];                 //!<        reserved for future use.
 } NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1;
 
-#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER1  MAKE_NVAPI_VERSION(_NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1,1)
-#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER   NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER1
+typedef struct _NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2
+{
+    NvU32  version;                       //!< [in]   structure version
+    NvU32  frameIntervalUs;               //!< [in]   frame interval in micro seconds if Virtual RR is currently applied. This variable is deprecated in V2 and should not be used.
+    NvU32  rrx1k;                         //!< [in]   Refresh Rate * 1000
+    NvU32  bIsGamingVrr;                  //!< [in]   If the content is Gaming
+    NvU64  frameIntervalNs;               //!< [in]   frame interval in nano seconds if Virtual RR is currently applied
+    NvU32  reservedEx[4];                 //!<        reserved for future use.
+} NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2;
 
-typedef NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1  NV_SET_VIRTUAL_REFRESH_RATE_DATA;
+#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER1  MAKE_NVAPI_VERSION(_NV_SET_VIRTUAL_REFRESH_RATE_DATA_V1,1)
+#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER2  MAKE_NVAPI_VERSION(_NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2,2)
+#define NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER   NV_SET_VIRTUAL_REFRESH_RATE_DATA_VER2
+
+typedef NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2  NV_SET_VIRTUAL_REFRESH_RATE_DATA;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -9247,10 +9494,14 @@ NVAPI_INTERFACE NvAPI_Disp_GetDisplayIdsFromTarget(__inout NV_TARGET_INFO_DATA* 
 
 typedef struct _NV_GET_VRR_INFO_V1
 {
-    NvU32               version;                          //!< [in]  Structure version
-    NvU32               bIsVRREnabled : 1;                //!< [out] Set if VRR Mode is currently enabled on given display.
-    NvU32               reserved      :31;                //!<       Reserved for future use.
-    NvU32               reservedEx[4];                    //!<       Reserved for future use
+    NvU32               version;                                    //!< [in]  Structure version
+    NvU32               bIsVRREnabled                    : 1;       //!< [out] Set if VRR Mode is currently active on given display.
+    NvU32               bIsVRRPossible                   : 1;       //!< [out] Set to true if VRR Mode is possible on the given display.
+    NvU32               bIsVRRRequested                  : 1;       //!< [out] Set to true if VRR Mode is requested for the given display.
+    NvU32               bIsVRRIndicatorEnabled           : 1;       //!< [out] Set to true if the VRR indicator is enabled. This can be done through the NVIDIA Control Panel.
+    NvU32               bIsDisplayInVRRMode              : 1;       //!< [out] Set to true if the display is in VRR Mode.
+    NvU32               reserved                         : 27;      //!<       Reserved for future use.
+    NvU32               reservedEx[4];                              //!<       Reserved for future use
 } NV_GET_VRR_INFO_V1;
 
 #define NV_GET_VRR_INFO_VER1  MAKE_NVAPI_VERSION(NV_GET_VRR_INFO_V1,1)
@@ -9599,7 +9850,7 @@ typedef struct
 //!                  enabled for the hardware. Once enabled, you should see valid topologies
 //!                  returned from this function.
 //!    
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185
@@ -9644,7 +9895,7 @@ NVAPI_INTERFACE NvAPI_Mosaic_GetSupportedTopoInfo(NV_MOSAIC_SUPPORTED_TOPO_INFO 
 //!                  an error will be returned (NVAPI_INCOMPATIBLE_STRUCT_VERSION).
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185
@@ -9675,7 +9926,7 @@ NVAPI_INTERFACE NvAPI_Mosaic_GetTopoGroup(NV_MOSAIC_TOPO_BRIEF *pTopoBrief, NV_M
 //! DESCRIPTION:     This API returns the X and Y overlap limits required if
 //!                  the given Mosaic topology and display settings are to be used.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185
@@ -9717,7 +9968,7 @@ NVAPI_INTERFACE NvAPI_Mosaic_GetOverlapLimits(NV_MOSAIC_TOPO_BRIEF *pTopoBrief, 
 //!                  topology was not set, and remains what it was before this
 //!                  function was called.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185
@@ -9766,7 +10017,7 @@ NVAPI_INTERFACE NvAPI_Mosaic_SetCurrentTopo(NV_MOSAIC_TOPO_BRIEF *pTopoBrief, NV
 //!                  If there isn't a current topology, then pTopoBrief->topo will
 //!                  be NV_MOSAIC_TOPO_NONE.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185
@@ -9804,7 +10055,7 @@ NVAPI_INTERFACE NvAPI_Mosaic_GetCurrentTopo(NV_MOSAIC_TOPO_BRIEF *pTopoBrief, NV
 //!                  To re-enable the Mosaic topology, call this function
 //!                  again with the enable parameter set to 1.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185
@@ -9956,7 +10207,7 @@ typedef NV_MOSAIC_GRID_TOPO_V2           NV_MOSAIC_GRID_TOPO;
 //!                  To revert to a single display, specify that display as a 1x1
 //!                  grid.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      pGridTopologies    The topology details to set.
@@ -10029,7 +10280,7 @@ typedef struct
 //!                  found, then it will skip the rest of the validation and return
 //!                  NVAPI_NO_ACTIVE_SLI_TOPOLOGY.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      setTopoFlags       Zero or more of the NVAPI_MOSAIC_SETDISPLAYTOPO_FLAG_*
@@ -10062,7 +10313,7 @@ NVAPI_INTERFACE NvAPI_Mosaic_ValidateDisplayGrids(__in NvU32 setTopoFlags,
 //
 //! DESCRIPTION:     Determines the set of available display modes for a given grid topology.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      pGridTopology         The grid topology to use.
@@ -10089,7 +10340,7 @@ NVAPI_INTERFACE NvAPI_Mosaic_EnumDisplayModes(__in NV_MOSAIC_GRID_TOPO *pGridTop
         __inout NvU32 *pDisplayCount);
 
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -10206,7 +10457,7 @@ typedef struct
 //
 //! DESCRIPTION:     This API returns all valid Mosaic topologies.
 //!
-//! SUPPORTED OS:  Windows XP
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \since Release: 177
@@ -10230,7 +10481,7 @@ NVAPI_INTERFACE NvAPI_GetSupportedMosaicTopologies(NV_MOSAIC_SUPPORTED_TOPOLOGIE
 //
 //! DESCRIPTION:     This API gets the current Mosaic topology.
 //!
-//! SUPPORTED OS:  Windows XP
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \since Release: 177
@@ -10256,7 +10507,7 @@ NVAPI_INTERFACE NvAPI_GetCurrentMosaicTopology(NV_MOSAIC_TOPOLOGY *pMosaicTopo, 
 //! DESCRIPTION:     This API sets the Mosaic topology, and enables it so that the
 //!                  Mosaic display settings are enumerated upon request.
 //!
-//! SUPPORTED OS:  Windows XP
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \since Release: 177
@@ -10283,7 +10534,7 @@ NVAPI_INTERFACE NvAPI_SetCurrentMosaicTopology(NV_MOSAIC_TOPOLOGY *pMosaicTopo);
 //!                  - If enabled, enumeration of display settings will include valid Mosaic resolutions.  
 //!                  - If disabled, enumeration of display settings will not include Mosaic resolutions.
 //!
-//! SUPPORTED OS:  Windows XP
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! \since Release: 177
@@ -10313,7 +10564,7 @@ NVAPI_INTERFACE NvAPI_EnableCurrentMosaicTopology(NvU32 enable);
 //!   DESCRIPTION: This API returns an array of Sync device handles. A Sync device handle represents a
 //!                single Sync device on the system.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -10392,7 +10643,7 @@ typedef NV_GSYNC_CAPABILITIES_V3 NV_GSYNC_CAPABILITIES;
 //!   DESCRIPTION: This API returns the capabilities of the Sync device.
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -10463,7 +10714,7 @@ typedef struct _NV_GSYNC_DISPLAY
 //!   DESCRIPTION: This API returns the topology for the specified Sync device.
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -10498,7 +10749,7 @@ NVAPI_INTERFACE NvAPI_GSync_GetTopology(__in NvGSyncDeviceHandle hNvGSyncDevice,
 //!   DESCRIPTION: Sets a new sync state for the displays in system.
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -10619,7 +10870,7 @@ typedef NV_GSYNC_CONTROL_PARAMS_V2 NV_GSYNC_CONTROL_PARAMS;
 //
 //!   DESCRIPTION: This API queries for sync control parameters as defined in NV_GSYNC_CONTROL_PARAMS.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -10644,7 +10895,7 @@ NVAPI_INTERFACE NvAPI_GSync_GetControlParameters(__in NvGSyncDeviceHandle hNvGSy
 //
 //!   DESCRIPTION: This API sets control parameters as defined in NV_SYNC_CONTROL_PARAMS.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -10680,7 +10931,7 @@ typedef enum _NVAPI_GSYNC_DELAY_TYPE
 //
 //!   DESCRIPTION: This API adjusts the skew and startDelay to the closest possible values. Use this API before calling NvAPI_GSync_SetControlParameters for skew or startDelay.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 319
@@ -10717,7 +10968,7 @@ typedef struct _NV_GSYNC_STATUS
 //
 //!   DESCRIPTION: This API queries the sync status of a GPU - timing, stereosync and sync signal availability.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -10790,7 +11041,7 @@ typedef NV_GSYNC_STATUS_PARAMS_V2 NV_GSYNC_STATUS_PARAMS;
 //
 //!   DESCRIPTION: This API queries for sync status parameters as defined in NV_GSYNC_STATUS_PARAMS.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 313
@@ -10825,7 +11076,7 @@ NVAPI_INTERFACE NvAPI_GSync_GetStatusParameters(NvGSyncDeviceHandle hNvGSyncDevi
 //! DESCRIPTION:    This API binds a resource (surface/texture) so that it can be retrieved
 //!                 internally by NVAPI.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \param [in]     pResource      surface/texture
 //!
@@ -10843,7 +11094,7 @@ NVAPI_INTERFACE NvAPI_D3D9_RegisterResource(IDirect3DResource9* pResource);
 //
 //! DESCRIPTION:     This API unbinds a resource (surface/texture) after use.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! 
 //! \param [in]     pResource    surface/texture
@@ -10875,7 +11126,7 @@ NVAPI_INTERFACE NvAPI_D3D9_UnregisterResource(IDirect3DResource9* pResource);
 //!                being used as a texture.  MSAA depth buffers are resolved with a point filter,
 //!                and non-depth MSAA surfaces are resolved with a linear filter.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]    pDev         The D3D device that owns the objects
@@ -10923,7 +11174,7 @@ NVAPI_INTERFACE NvAPI_D3D9_AliasSurfaceAsTexture(IDirect3DDevice9* pDev,
 //!                  The source and destination resources *must* be registered
 //!                  with NvAPI before being used with NvAPI_D3D9_StretchRectEx().
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     pDevice             The D3D device that owns the objects.
@@ -10959,7 +11210,7 @@ NVAPI_INTERFACE NvAPI_D3D9_StretchRectEx(IDirect3DDevice9 * pDevice,
 //!                  given color
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     pDevice             The D3D device that owns the objects.
@@ -10990,7 +11241,7 @@ NVAPI_INTERFACE NvAPI_D3D9_ClearRT(IDirect3DDevice9 * pDevice,
 
 
 #if defined(_D3D9_H_) && defined(__cplusplus)
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -11015,7 +11266,7 @@ NVAPI_INTERFACE NvAPI_D3D9_GetSurfaceHandle(IDirect3DSurface9 *pSurface,
 #endif //defined(_D3D9_H_) && defined(__cplusplus)
 
 #if defined(_D3D9_H_) && defined(__cplusplus)
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \addtogroup dxvidcontrol
 //! @{
@@ -11091,7 +11342,7 @@ NVAPI_INTERFACE NvAPI_D3D9_VideoSetStereoInfo(IDirect3DDevice9 *pDev,
 //!   DESCRIPTION: This function enables/disables the depth bounds test.
 //!
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //!   \param [in]  pDev         The device to set the depth bounds test
@@ -11129,7 +11380,7 @@ NVAPI_INTERFACE NvAPI_D3D10_SetDepthBoundsTest(ID3D10Device *pDev,
 //!
 //!                This function can be called from a different thread than the one calling immediate device setstate functions.  
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]        pDev         The device on which to query for support,
@@ -11166,7 +11417,7 @@ NVAPI_INTERFACE NvAPI_D3D11_IsNvShaderExtnOpCodeSupported(__in  IUnknown *pDev,
 //!
 //!                This function can be called from a different thread than the one calling immediate device setstate functions.  
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]        pDev         The device for which to set the extension slot
@@ -11203,7 +11454,7 @@ NVAPI_INTERFACE NvAPI_D3D11_SetNvShaderExtnSlot(__in IUnknown *pDev,
 //!
 //!                This function can be called from a different thread than the one calling immediate device setstate functions.  
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]        pDev         The device for which to set the extension slot
@@ -11239,7 +11490,7 @@ NVAPI_INTERFACE NvAPI_D3D12_SetNvShaderExtnSlotSpace(__in IUnknown *pDev,
 //!
 //!                This function can be called from a different thread than the one calling immediate device setstate functions.  
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //!
@@ -11280,7 +11531,7 @@ NVAPI_INTERFACE NvAPI_D3D12_SetNvShaderExtnSlotSpaceLocalThread(__in IUnknown *p
 //!
 //!                This function can be called from a different thread than the one calling immediate device setstate functions.  
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 387
@@ -11310,7 +11561,7 @@ NVAPI_INTERFACE NvAPI_D3D11_SetNvShaderExtnSlotLocalThread(__in IUnknown *pDev,
 //!                Applications must use this with caution otherwise this might cause data hazards when
 //!                multiple draw calls/compute shader launches are accessing same memory locations
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]        *pDeviceOrContext     pointer to D3D11 device, or D3D11 device context
@@ -11342,7 +11593,7 @@ NVAPI_INTERFACE NvAPI_D3D11_BeginUAVOverlapEx(__in  IUnknown *pDeviceOrContext, 
 //!                Applications must use this with caution otherwise this might cause data hazards when
 //!                multiple draw calls/compute shader launches are accessing same memory locations
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]        *pDeviceOrContext     pointer to D3D11 device, or D3D11 device context
@@ -11365,7 +11616,7 @@ NVAPI_INTERFACE NvAPI_D3D11_BeginUAVOverlap(__in  IUnknown *pDeviceOrContext);
 //!   DESCRIPTION: Re-enables driver synchronization between calls that access same UAVs
 //!                See NvAPI_D3D_BeginUAVOverlap for more details.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]        *pDeviceOrContext     pointer to D3D11 device, or D3D11 device context
@@ -11391,7 +11642,7 @@ NVAPI_INTERFACE NvAPI_D3D11_EndUAVOverlap(__in  IUnknown *pDeviceOrContext);
 //!                 pResource    The resource for which we want to retrieve a
 //!                              driver handle.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //!        OUTPUT:  phObject     Pointer to an NvAPI handle to be populated
@@ -11416,7 +11667,7 @@ NVAPI_INTERFACE NvAPI_D3D11_GetResourceHandle(ID3D11Device *pDev,
 //!   DESCRIPTION: Display an overlay that tracks the number of times the app presents per second, or,   
 //!      the number of frames-per-second (FPS)
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in] bool    Whether or not to enable the fps indicator.
@@ -11445,7 +11696,7 @@ NVAPI_INTERFACE NvAPI_D3D_SetFPSIndicatorState(IUnknown *pDev, NvU8 doEnable);
 //!                presentation, thus allowing the D3D driver to apply SwapGroup and SwapBarrier
 //!                functionality to that SwapChain.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]    pDevice     The IDirect3DDevice9 interface that is used to issue the Present, 
@@ -11488,7 +11739,7 @@ NVAPI_INTERFACE NvAPI_D3D9_Present(IDirect3DDevice9 *pDevice,
 //! \param [in]   pDevice            The caller provides the DX9 device that has access to the Quadro-Sync device
 //! \param [out]  pFrameCount        The caller provides the storage space where the framecount is stored.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                  *pFrameCount populated with framecount value.
@@ -11511,7 +11762,7 @@ NVAPI_INTERFACE NvAPI_D3D9_QueryFrameCount(IDirect3DDevice9 *pDevice,
 //!
 //! \param [in]   pDevice            The caller provides the DX9 device that has access to the Quadro-Sync device
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                   framecounter has been reset
@@ -11535,7 +11786,7 @@ NVAPI_INTERFACE NvAPI_D3D9_ResetFrameCount(IDirect3DDevice9 *pDevice);
 //! \param [out]  pMaxGroups           The caller provides the storage space where the number of available SwapGroups is stored.
 //! \param [out]  pMaxBarriers         The caller provides the storage space where the number of available SwapBarriers is stored.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                   the number of SwapGroups and SwapBarriers has been stored
@@ -11563,7 +11814,7 @@ NVAPI_INTERFACE NvAPI_D3D9_QueryMaxSwapGroup(IDirect3DDevice9 *pDevice,
 //! \param [out]  pSwapGroup         The caller provides the storage space where the current SwapGroup is stored.
 //! \param [out]  pSwapBarrier       The caller provides the storage space where the current SwapBarrier is stored.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                   the current SwapGroup and SwapBarrier has been stored
@@ -11598,7 +11849,7 @@ NVAPI_INTERFACE NvAPI_D3D9_QuerySwapGroup(IDirect3DDevice9 *pDevice,
 //!                                      A boolean value of false means the Present operation returns immediately and a value of true
 //!                                      means the Present operation is blocking.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                   the SwapChain joined/left the SwapGroup accordingly
@@ -11628,7 +11879,7 @@ NVAPI_INTERFACE NvAPI_D3D9_JoinSwapGroup(IDirect3DDevice9 *pDevice,
 //!                              - The SwapGroup will be bound to the SwapBarrier if the value of barrier is a positive 
 //!                                integer less than or equal to the maximum number of SwapBarriers queried by NvAPI_SwapGroup_QueryMaxSwapGroup.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                  the SwapGroup is bound to or released from the specified SwapBarrier
@@ -11666,7 +11917,7 @@ typedef enum
 //! \param [in]    pDevice    The caller provides the device and can be either IDirect3DDevice9 or ID3D10Device or ID3D10Device1 or ID3D11Device.
 //! \param [in]    vsyncMode  The caller specifies the NVAPI_VSYNC_MODE to be set.
 //!
-//! SUPPORTED OS:  Windows Vista
+//! SUPPORTED OS:  Do not use this function. It is not supported on Windows 10 and higher OS versions.
 //!
 //!
 //! RETURN STATUS: This API can return any of the error codes enumerated in #NvAPI_Status. 
@@ -11693,7 +11944,7 @@ NVAPI_INTERFACE NvAPI_D3D_SetVerticalSyncMode(__in IUnknown *pDevice, __in NVAPI
 //!                presentation, thus allowing the D3D driver to apply SwapGroup and SwapBarrier
 //!                functionality to that SwapChain.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     pDevice          The D3D device interface that is used to issue the Present operation, 
@@ -11731,7 +11982,7 @@ NVAPI_INTERFACE NvAPI_D3D1x_Present(IUnknown *pDevice,
 //!                                  pDevice can be either ID3D10Device or ID3D10Device1 or ID3D11Device or ID3D12Device.
 //! \param [out]   pFrameCount       The caller provides the storage space where the framecount is stored.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                   *pFrameCount populated with framecount value.
@@ -11755,7 +12006,7 @@ NVAPI_INTERFACE NvAPI_D3D1x_QueryFrameCount(IUnknown *pDevice,
 //! \param [in]    pDevice         The caller provides the D3D device that has access to the Quadro-Sync device,
 //!                                pDevice can be either ID3D10Device or ID3D10Device1 or ID3D11Device or ID3D12Device.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                   framecounter has been reset
@@ -11780,7 +12031,7 @@ NVAPI_INTERFACE NvAPI_D3D1x_ResetFrameCount(IUnknown *pDevice);
 //! \param [out]   pMaxGroups     The caller provides the storage space where the number of available SwapGroups is stored.
 //! \param [out]   pMaxBarriers   The caller provides the storage space where the number of available SwapBarriers is stored.
 //! 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                  the number of SwapGroups and SwapBarriers has been stored
@@ -11809,7 +12060,7 @@ NVAPI_INTERFACE NvAPI_D3D1x_QueryMaxSwapGroup(IUnknown *pDevice,
 //! \param [out]   pSwapGroup         The caller provides the storage space where the current SwapGroup is stored.
 //! \param [out]   pSwapBarrier       The caller provides the storage space where the current SwapBarrier is stored.
 //! 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                   the current SwapGroup and SwapBarrier has been stored
@@ -11844,7 +12095,7 @@ NVAPI_INTERFACE NvAPI_D3D1x_QuerySwapGroup(IUnknown *pDevice,
 //!                                  A boolean value of false means the Present operation returns immediately and a value of true
 //!                                  means the Present operation is blocking.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                   the SwapChain joined/left the SwapGroup accordingly
@@ -11874,7 +12125,7 @@ NVAPI_INTERFACE NvAPI_D3D1x_JoinSwapGroup(IUnknown *pDevice,
 //!                                      - If the value of barrier is zero, the SwapGroup releases the SwapBarrier.
 //!                                      - The SwapGroup will be bound to the SwapBarrier if the value of barrier is a positive 
 //!                                        integer less than or equal to the maximum number of SwapBarriers queried by NvAPI_D3D1x_QueryMaxSwapGroup.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \retval ::NVAPI_OK                  the SwapGroup is bound to the specified SwapBarrier
@@ -12175,7 +12426,7 @@ NVAPI_INTERFACE NvAPI_QueryPresentBarrierFrameStatistics(__in NvPresentBarrierCl
 NVAPI_INTERFACE NvAPI_D3D12_CreateDDisplayPresentBarrierClient(__in ID3D12Device *pDevice, __in NvU32 sourceId, __out NvPresentBarrierClientHandle *pPresentBarrierClient);
 #endif // defined(__cplusplus) && defined(__d3d12_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && (defined(__d3d11_h__) || defined(__d3d11_1_h__) || defined(__d3d12_h__))
 
@@ -12188,7 +12439,7 @@ enum NVAPI_QUAD_FILLMODE
 
 #endif //defined(__cplusplus) && (defined(__d3d11_h__) || defined(__d3d11_1_h__) || defined(__d3d12_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && (defined(__d3d11_h__) || defined(__d3d11_1_h__))
 
@@ -12250,7 +12501,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateRasterizerState(__in ID3D11Device *pDevice,
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && (defined(_D3D9_H_) || defined(__d3d11_h__) || defined(__d3d11_1_h__) || defined(__d3d12_h__))
@@ -12317,7 +12568,7 @@ NVAPI_INTERFACE NvAPI_D3D_ConfigureAnsel(__in IUnknown *pDevice,
 
 #endif //defined (__cplusplus) && (defined(_D3D9_H_) || defined(__d3d11_h__) || defined(__d3d11_1_h__) || defined(__d3d12_h__))
 
-//! SUPPORTED OS:  Windows 8 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_2_h__)
@@ -12604,7 +12855,7 @@ NVAPI_INTERFACE NvAPI_D3D12_ResolveSubresourceRegion(
 
 #endif //defined(__cplusplus) && defined(__d3d12_h__)
 
-//! SUPPORTED OS:  Windows 8 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_2_h__)
@@ -12639,7 +12890,7 @@ NVAPI_INTERFACE NvAPI_D3D11_TiledTexture2DArrayGetDesc(__in  ID3D11Texture2D    
 
 #endif //defined(__cplusplus) && defined(__d3d11_2_h__)
 
-//! SUPPORTED OS:  Windows 8 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_2_h__)
@@ -12690,7 +12941,7 @@ NVAPI_INTERFACE NvAPI_D3D11_UpdateTileMappings(
 
 #endif //defined(__cplusplus) && defined(__d3d11_2_h__)
 
-//! SUPPORTED OS:  Windows 8 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_2_h__)
@@ -12734,7 +12985,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CopyTileMappings(
 
 #endif //defined(__cplusplus) && defined(__d3d11_2_h__)
 
-//! SUPPORTED OS:  Windows 8 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_2_h__)
@@ -12770,7 +13021,7 @@ NVAPI_INTERFACE NvAPI_D3D11_TiledResourceBarrier(
 
 #endif //defined(__cplusplus) && defined(__d3d11_2_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && (defined(__d3d11_h__) || defined(__d3d11_1_h__))
@@ -12831,7 +13082,7 @@ typedef enum _NV_SWIZZLE_OFFSET
 
 #endif //defined (__cplusplus) && (defined(__d3d11_h__) || defined(__d3d12_h__)) && (!defined(CINTERFACE))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && (defined(__d3d11_h__) || defined(__d3d12_h__)) && (!defined(CINTERFACE))
@@ -12952,7 +13203,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateGeometryShaderEx_2(__in ID3D11Device *pDevice,
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE) ) 
@@ -13033,7 +13284,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateVertexShaderEx(__in ID3D11Device *pDevice, __i
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE) ) 
@@ -13105,7 +13356,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateHullShaderEx(__in ID3D11Device *pDevice, __in 
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE) ) 
@@ -13186,7 +13437,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateDomainShaderEx(__in ID3D11Device *pDevice, __i
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE) ) 
@@ -13257,7 +13508,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreatePixelShaderEx_2(__in ID3D11Device *pDevice, __
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && (defined(__d3d11_h__) || defined(__d3d12_h__)) && (!defined(CINTERFACE))
@@ -13352,7 +13603,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateFastGeometryShaderExplicit(__in ID3D11Device *
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE) ) 
@@ -13396,7 +13647,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateFastGeometryShader(__in ID3D11Device *pDevice,
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__) && (!defined(CINTERFACE))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined (__cplusplus) && defined(__d3d11_h__)
@@ -15382,7 +15633,7 @@ NVAPI_INTERFACE NvAPI_D3D12_GetOptimalThreadCountForMesh(__in  ID3D12Device *pDe
 //! \param [in]    NVDX_ObjectHandle   The handle of primary surface
 //! \param [out]   pIsGsyncCapable     if G-Sync can be enabled, *pIsGsyncCapable is true.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! RETURN STATUS: This API can return any of the error codes enumerated in #NvAPI_Status. 
@@ -15407,7 +15658,7 @@ NVAPI_INTERFACE NvAPI_D3D_IsGSyncCapable(__in IUnknown *pDeviceOrContext, __in N
 //! \param [in]    NVDX_ObjectHandle   The handle of primary surface
 //! \param [out]   pIsGsyncActive      if G-Sync is active, *pisGsyncActive is true.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! RETURN STATUS: This API can return any of the error codes enumerated in #NvAPI_Status. 
@@ -15418,9 +15669,8 @@ NVAPI_INTERFACE NvAPI_D3D_IsGSyncCapable(__in IUnknown *pDeviceOrContext, __in N
 NVAPI_INTERFACE NvAPI_D3D_IsGSyncActive(__in IUnknown *pDeviceOrContext, __in NVDX_ObjectHandle primarySurface, __out BOOL *pIsGsyncActive);
 #endif //if defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d11_h__)
 
-
-
-//! SUPPORTED OS:  Windows 7 and higher
+//! \ingroup dx
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && ( defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__) || defined(__d3d12_h__)) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -15441,7 +15691,7 @@ NVAPI_INTERFACE NvAPI_D3D1x_DisableShaderDiskCache(IUnknown *pDevice);
 
 #endif //defined (__cplusplus) && ( defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__) || defined(__d3d12_h__)) 
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -15467,7 +15717,7 @@ typedef struct _NV_MULTIGPU_CAPS_V1
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 
@@ -15495,7 +15745,7 @@ typedef PNV_MULTIGPU_CAPS_V2    PNV_MULTIGPU_CAPS;
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 //! \ingroup dx
@@ -15509,7 +15759,7 @@ NVAPI_INTERFACE NvAPI_D3D11_MultiGPU_GetCaps(__inout PNV_MULTIGPU_CAPS pMultiGPU
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -15527,7 +15777,7 @@ NVAPI_INTERFACE NvAPI_D3D11_MultiGPU_Init(__in bool bEnable);
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -15560,13 +15810,13 @@ NVAPI_INTERFACE NvAPI_D3D11_MultiGPU_Init(__in bool bEnable);
 #define NVAPI_COPY_ASYNCHRONOUSLY                    1
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 #define NVAPI_COPY_P2P_READ                          2
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 
@@ -15711,7 +15961,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateMultiGPUDevice(__in ID3D11Device *pDevice, __i
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used to query the support of Single Pass Stereo HW feature
 //! \ingroup dx 
@@ -15747,7 +15997,7 @@ typedef NV_QUERY_SINGLE_PASS_STEREO_SUPPORT_PARAMS_V1                 NV_QUERY_S
 //
 //!   DESCRIPTION: Queries the support of Single Pass Stereo feature on current setup and returns appropriate boolean value.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     pDevice                                 The ID3D11Device to use.
@@ -15776,7 +16026,7 @@ NVAPI_INTERFACE NvAPI_D3D_QuerySinglePassStereoSupport(__in IUnknown *pDevice,
 //!         One must call NvAPI_D3D_QuerySinglePassStereoSupport() to confirm that the current setup
 //!         supports Single Pass Stereo before calling this set-function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  pDevOrContext                  The ID3D11Device or ID3D11DeviceContext to use.
@@ -15854,7 +16104,7 @@ NVAPI_INTERFACE NvAPI_D3D12_SetSinglePassStereoMode(__in ID3D12GraphicsCommandLi
 
 #endif // defined(__cplusplus) && ( defined(__d3d12_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used to query the support of MultiView HW feature
 //! \ingroup dx 
@@ -15880,7 +16130,7 @@ typedef NV_QUERY_MULTIVIEW_SUPPORT_PARAMS_V1                    NV_QUERY_MULTIVI
 //
 //!   DESCRIPTION: Queries the support of MultiView feature on current setup and returns appropriate boolean value.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since          Release: 410
@@ -15899,7 +16149,7 @@ NVAPI_INTERFACE NvAPI_D3D_QueryMultiViewSupport(__in IUnknown *pDevice,
 
 #endif //defined(__cplusplus) && (defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used for setting the Mode for MultiView HW Feature.
 //! \ingroup dx 
@@ -15927,7 +16177,7 @@ typedef NV_MULTIVIEW_PARAMS_V1                                       NV_MULTIVIE
 //!         One must call NvAPI_D3D_QueryMultiViewSupport() to confirm that the current setup
 //!         supports MultiView before calling this set-function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since          Release: 410
@@ -15945,7 +16195,7 @@ NVAPI_INTERFACE NvAPI_D3D_SetMultiViewMode(__in IUnknown *pDevOrContext, __in NV
 
 #endif //defined(__cplusplus) && defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used to query the support of Lens Matched Shading HW feature
 //! \ingroup dx 
@@ -15966,7 +16216,7 @@ typedef NV_QUERY_MODIFIED_W_SUPPORT_PARAMS_V1               NV_QUERY_MODIFIED_W_
 //
 //!   DESCRIPTION: Queries the support of Modified W feature on current setup and returns appropriate boolean value.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     pDevice                             The ID3D11Device to use.
@@ -15982,7 +16232,7 @@ NVAPI_INTERFACE NvAPI_D3D_QueryModifiedWSupport(__in IUnknown *pDev,
                                             __inout NV_QUERY_MODIFIED_W_SUPPORT_PARAMS *pQueryModifiedWSupportedParams);
 #endif //defined(__cplusplus) && (defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #define NV_MODIFIED_W_MAX_VIEWPORTS    16
 
@@ -16022,7 +16272,7 @@ typedef NV_MODIFIED_W_PARAMS_V1      NV_MODIFIED_W_PARAMS;
 //!         One must call NvAPI_D3D_QueryModifiedWSupport() to confirm that the current setup
 //!         supports Modified-W before calling this set-function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  pDevOrContext                  The ID3D11Device or ID3D11DeviceContext to use.
@@ -16134,7 +16384,7 @@ typedef NV_D3D_LATELATCH_OBJECT_DESC_V1    NV_D3D_LATELATCH_OBJECT_DESC;
 //
 //! DESCRIPTION: Creates a Late Latch Object interface
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 384
@@ -16173,7 +16423,7 @@ typedef NV_QUERY_LATELATCH_SUPPORT_PARAMS_V1               NV_QUERY_LATELATCH_SU
 //
 //!   DESCRIPTION: Queries the support of DX11 Late Latch feature on current setup.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 384
@@ -16200,7 +16450,7 @@ NVAPI_INTERFACE NvAPI_D3D_QueryLateLatchSupport(__in IUnknown *pDevice,
 //!   DESCRIPTION: Tells NvAPI about a D3D device. This must be called prior to using any DX1x
 //!                deferred-context calls.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  pDev                           The ID3D10Device or ID3D11Device to use.
@@ -16226,7 +16476,7 @@ NVAPI_INTERFACE NvAPI_D3D_RegisterDevice(__in IUnknown *pDev);
 //!                that draw count and perform the DrawInstancedIndirect operation each time, incrementing the buffer offset
 //!                by the supplied stride each time.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]        *pDevContext11                  Pointer to D3D11 device context (IC or DC)
@@ -16262,7 +16512,7 @@ NVAPI_INTERFACE NvAPI_D3D11_MultiDrawInstancedIndirect(__in ID3D11DeviceContext 
 //!                that draw count and perform the DrawIndexedInstancedIndirect operation each time, incrementing the buffer offset
 //!                by the supplied stride each time.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]        *pDevContext11                  Pointer to D3D11 device context (IC or DC)
@@ -16287,7 +16537,7 @@ NVAPI_INTERFACE NvAPI_D3D11_MultiDrawIndexedInstancedIndirect(__in ID3D11DeviceC
 
 #endif //defined (__cplusplus) && (defined(__d3d11_h__) || defined(__d3d11_1_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && ( defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d10_1_h__) ||defined(__d3d11_h__) )
 ///////////////////////////////////////////////////////////////////////////////
@@ -16492,7 +16742,7 @@ typedef NV_D3D1x_GRAPHICS_CAPS_V2    NV_D3D1x_GRAPHICS_CAPS;
 //
 //! DESCRIPTION: Get the graphics capabilities for current hardware/software setup
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 410
@@ -16602,7 +16852,7 @@ typedef NV_D3D11_EXCLUSIVE_SCISSOR_RECT_DESC_V1      NV_D3D11_EXCLUSIVE_SCISSOR_
 //!              will be excluded from rendering unlike regular Scissor Rects. These are
 //!              orthogonal with Regular Scissor Rects.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 410
@@ -16682,7 +16932,7 @@ typedef NV_D3D11_VIEWPORT_SHADING_RATE_DESC_V1      NV_D3D11_VIEWPORT_SHADING_RA
 //
 //! DESCRIPTION: Sets Pixel Shading Rates and Enables/Disables per-viewport Variable Pixel Shading Rate feature
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 410
@@ -16771,7 +17021,7 @@ typedef ID3D11NvShadingRateResourceView_V1    ID3D11NvShadingRateResourceView;
 //
 //! DESCRIPTION: Creates Shading Rate Resource View by taking ID3D11Resource as an input Shading Rate Surface.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 410
@@ -16807,7 +17057,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateShadingRateResourceView(__in  ID3D11Device *pD
 //
 //! DESCRIPTION: Sets Shading Rate Resource View
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 410
@@ -16900,7 +17150,7 @@ typedef NV_PIXEL_SHADING_RATE_SAMPLE_ORDER_TABLE_V1     NV_PIXEL_SHADING_RATE_SA
 //
 //! DESCRIPTION: Get the Sample Order for Variable Shading Rate
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 410
@@ -16929,7 +17179,7 @@ NVAPI_INTERFACE NvAPI_D3D11_RSGetPixelShadingRateSampleOrder(__in IUnknown *pCon
 //
 //! DESCRIPTION: Set the Sample Order for Variable Shading Rate
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 410
@@ -16950,7 +17200,7 @@ NVAPI_INTERFACE NvAPI_D3D11_RSSetPixelShadingRateSampleOrder(__in IUnknown *pCon
 
 #endif // defined(__cplusplus) && (defined(__d3d11_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined(__cplusplus) && (defined(__d3d11_h__))
@@ -17139,7 +17389,7 @@ typedef NV_VRS_HELPER_INIT_PARAMS_V1     NV_VRS_HELPER_INIT_PARAMS;
 #define NV_VRS_HELPER_INIT_PARAMS_VER1   MAKE_NVAPI_VERSION(NV_VRS_HELPER_INIT_PARAMS_V1, 1)
 #define NV_VRS_HELPER_INIT_PARAMS_VER    NV_VRS_HELPER_INIT_PARAMS_VER1
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -17304,7 +17554,7 @@ typedef NV_GAZE_HANDLER_INIT_PARAMS_V1     NV_GAZE_HANDLER_INIT_PARAMS;
 
 #endif // defined(__cplusplus) && (defined(__d3d11_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 #if defined(__cplusplus) && (defined(__d3d11_h__))
@@ -17336,7 +17586,7 @@ NVAPI_INTERFACE NvAPI_D3D_InitializeNvGazeHandler(__in    IUnknown *pDevice,
 
 #endif // defined(__cplusplus) && (defined(__d3d11_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 
@@ -17519,7 +17769,7 @@ typedef struct _NV_SMP_ASSIST_REMAPCBDATA_V1
 
 typedef NV_SMP_ASSIST_REMAPCBDATA_V1 NV_SMP_ASSIST_REMAPCBDATA;
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 typedef struct _NV_SMP_ASSIST_GET_CONSTANTS_V3
@@ -17561,7 +17811,7 @@ typedef struct _NV_SMP_ASSIST_GET_CONSTANTS_V3
 typedef NV_SMP_ASSIST_GET_CONSTANTS_V3          NV_SMP_ASSIST_GET_CONSTANTS;
 #define NV_SMP_ASSIST_GET_CONSTANTS_VER         NV_SMP_ASSIST_GET_CONSTANTS_VER3
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 typedef struct _NV_SMP_ASSIST_SETUP_PARAMS_V1
@@ -17600,7 +17850,7 @@ typedef NV_SMP_ASSIST_UPDATE_INSTANCEDSTEREO_DATA_PARAMS_V1          NV_SMP_ASSI
 #define NV_SMP_ASSIST_UPDATE_INSTANCEDSTEREO_DATA_PARAMS_VER1        MAKE_NVAPI_VERSION(NV_SMP_ASSIST_UPDATE_INSTANCEDSTEREO_DATA_PARAMS_V1, 1)
 #define NV_SMP_ASSIST_UPDATE_INSTANCEDSTEREO_DATA_PARAMS_VER         NV_SMP_ASSIST_UPDATE_INSTANCEDSTEREO_DATA_PARAMS_VER1
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 DECLARE_INTERFACE(ID3DNvSMPAssist_V1)
@@ -17627,7 +17877,7 @@ typedef ID3DNvSMPAssist_V1     ID3DNvSMPAssist;
 #define ID3DNVSMPASSIST_VER1   MAKE_NVAPI_VERSION(ID3DNvSMPAssist_V1, 1)
 #define ID3DNVSMPASSIST_VER    ID3DNVSMPASSIST_VER1
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 
 typedef struct _NV_SMP_ASSIST_INITIALIZE_PARAMS_V1
@@ -17668,7 +17918,7 @@ NVAPI_INTERFACE NvAPI_D3D_InitializeSMPAssist(__in IUnknown *pDevice, __inout NV
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 #if defined (__cplusplus) && defined(__d3d11_h__) 
 //! \ingroup dx
@@ -17684,7 +17934,7 @@ typedef NV_QUERY_SMP_ASSIST_SUPPORT_PARAMS_V1          NV_QUERY_SMP_ASSIST_SUPPO
 #define NV_QUERY_SMP_ASSIST_SUPPORT_PARAMS_VER1        MAKE_NVAPI_VERSION(NV_QUERY_SMP_ASSIST_SUPPORT_PARAMS_V1, 1)
 #define NV_QUERY_SMP_ASSIST_SUPPORT_PARAMS_VER         NV_QUERY_SMP_ASSIST_SUPPORT_PARAMS_VER1
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \ingroup dx
 ///////////////////////////////////////////////////////////////////////////////
@@ -17710,7 +17960,7 @@ NVAPI_INTERFACE NvAPI_D3D_QuerySMPAssistSupport(__in IUnknown *pDev, __inout NV_
 
 
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used to get sleep status
 //! \ingroup dx
@@ -17720,7 +17970,9 @@ typedef struct _NV_GET_SLEEP_STATUS_PARAMS
     NvBool bLowLatencyMode;                               //!< (OUT) Is low latency mode enabled?
     NvBool bFsVrr;                                        //!< (OUT) Is fullscreen VRR enabled?
     NvBool bCplVsyncOn;                                   //!< (OUT) Is Control Panel overriding VSYNC ON?
-    NvU8   rsvd[126];                                     //!< (IN) Reserved. Must be set to 0s.
+    NvU32  sleepIntervalUs;                               //!< (OUT) Latest sleep interval in microseconds.
+    NvBool bUseGameSleep;                                 //!< (OUT) Is NvAPI_D3D_Sleep() being called?
+    NvU8   rsvd[121];                                     //!< (IN) Reserved. Must be set to 0s.
 } NV_GET_SLEEP_STATUS_PARAMS_V1;
 
 typedef NV_GET_SLEEP_STATUS_PARAMS_V1            NV_GET_SLEEP_STATUS_PARAMS;
@@ -17745,7 +17997,7 @@ typedef NV_GET_SLEEP_STATUS_PARAMS_V1            NV_GET_SLEEP_STATUS_PARAMS;
 //! \since Release: 455
 //! \param [in] pDev                          The target device.
 //! \param [in] pGetSleepStatusParams         Sleep status params.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \return This API can return any of the error codes enumerated in #NvAPI_Status.
@@ -17756,7 +18008,7 @@ typedef NV_GET_SLEEP_STATUS_PARAMS_V1            NV_GET_SLEEP_STATUS_PARAMS;
 NVAPI_INTERFACE NvAPI_D3D_GetSleepStatus(__in IUnknown *pDev, __in NV_GET_SLEEP_STATUS_PARAMS *pGetSleepStatusParams);
 #endif //defined(__cplusplus) && (defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__) || defined(__d3d12_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used to set sleep mode
 //! \ingroup dx
@@ -17801,7 +18053,7 @@ typedef NV_SET_SLEEP_MODE_PARAMS_V1            NV_SET_SLEEP_MODE_PARAMS;
 //! \since Release: 455
 //! \param [in] pDev                          The target device.
 //! \param [in] pSetSleepModeParams           Sleep mode params.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \return This API can return any of the error codes enumerated in #NvAPI_Status.
@@ -17832,7 +18084,7 @@ NVAPI_INTERFACE NvAPI_D3D_SetSleepMode(__in IUnknown *pDev, __in NV_SET_SLEEP_MO
 //!
 //! \since Release: 455
 //! \param [in] pDev                          The target device.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \return This API can return any of the error codes enumerated in #NvAPI_Status.
@@ -17884,7 +18136,7 @@ typedef NV_SET_REFLEX_SYNC_PARAMS_V1            NV_SET_REFLEX_SYNC_PARAMS;
 NVAPI_INTERFACE NvAPI_D3D_SetReflexSync(__in IUnknown *pDev, __in NV_SET_REFLEX_SYNC_PARAMS *pSetReflexSyncParams);
 #endif //defined(__cplusplus) && (defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__) || defined(__d3d12_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used to get latency report.
 //! \ingroup dx
@@ -17935,7 +18187,7 @@ typedef NV_LATENCY_RESULT_PARAMS_V1            NV_LATENCY_RESULT_PARAMS;
 //! \since Release: 455
 //! \param [in] pDev                          The target device
 //! \param [in] pGetLatencyParams             The latency result structure.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \return This API can return any of the error codes enumerated in #NvAPI_Status.
@@ -17946,7 +18198,7 @@ typedef NV_LATENCY_RESULT_PARAMS_V1            NV_LATENCY_RESULT_PARAMS;
 NVAPI_INTERFACE NvAPI_D3D_GetLatency(__in IUnknown *pDev, __out NV_LATENCY_RESULT_PARAMS *pGetLatencyParams);
 #endif //defined(__cplusplus) && (defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__) || defined(__d3d12_h__))
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used define latency marker type
 //! \ingroup dx
@@ -17967,7 +18219,7 @@ typedef enum
     OUT_OF_BAND_PRESENT_END        = 12,
 } NV_LATENCY_MARKER_TYPE;
 
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used set latency markers
 //! \ingroup dx
@@ -18004,9 +18256,9 @@ typedef NV_LATENCY_MARKER_PARAMS_V1            NV_LATENCY_MARKER_PARAMS;
 //!   but must strictly increment from that point forward for consistent results.
 //!
 //! \since Release: 455
-//! \param [in] pDev                          The target device
-//! \param [in] pSetLatencyMarkerParams       The latency marker structure
-//! SUPPORTED OS:  Windows 7 and higher
+//! \param [in] pDev                          Pointer to the target device
+//! \param [in] pSetLatencyMarkerParams       Pointer to the latency marker structure
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \return This API can return any of the error codes enumerated in #NvAPI_Status.
@@ -18019,7 +18271,7 @@ NVAPI_INTERFACE NvAPI_D3D_SetLatencyMarker(__in IUnknown *pDev, __in NV_LATENCY_
 
 //! SUPPORTED OS:  Windows 10 and higher
 //!
-//! Used in NvAPI_D3D12_SetAsyncFrameMarker
+//! Used in NvAPI_D3D12_SetAsyncFrameMarker and NvAPI_D3D11_SetAsyncFrameMarker
 //! \ingroup dx
 typedef struct _NV_ASYNC_FRAME_MARKER_PARAMS_V1
 {
@@ -18027,7 +18279,8 @@ typedef struct _NV_ASYNC_FRAME_MARKER_PARAMS_V1
     NvU64  frameID;
     NV_LATENCY_MARKER_TYPE markerType;
     NvU64  presentFrameID;
-    NvU8   rsvd[56];
+    NvBool vendorInternal;
+    NvU8   rsvd[55];
 } NV_ASYNC_FRAME_MARKER_PARAMS_V1;
 
 typedef NV_ASYNC_FRAME_MARKER_PARAMS_V1     NV_ASYNC_FRAME_MARKER_PARAMS;
@@ -18042,8 +18295,8 @@ typedef NV_ASYNC_FRAME_MARKER_PARAMS_V1     NV_ASYNC_FRAME_MARKER_PARAMS;
 //!   DESCRIPTION: Set an async frame marker for present and out-of-band render tracking.
 //!
 //! \since Release: 520
-//! \param [in] pCommandQueue               The D3D12CommandQueue
-//! \param [in] pSetAsyncFrameMarkerParams  The async frame marker structure
+//! \param [in] pCommandQueue               Pointer to the D3D12CommandQueue
+//! \param [in] pSetAsyncFrameMarkerParams  Pointer to the async frame marker structure
 //! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
@@ -18055,6 +18308,27 @@ typedef NV_ASYNC_FRAME_MARKER_PARAMS_V1     NV_ASYNC_FRAME_MARKER_PARAMS;
 NVAPI_INTERFACE NvAPI_D3D12_SetAsyncFrameMarker(__in ID3D12CommandQueue *pCommandQueue, __in NV_ASYNC_FRAME_MARKER_PARAMS* pSetAsyncFrameMarkerParams);
 #endif //defined(__cplusplus) && (defined(__d3d12_h__))
 
+#if defined(__cplusplus) && (defined(__d3d11_h__))
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_D3D11_SetAsyncFrameMarker
+//
+//!   DESCRIPTION: Set an async frame marker for present and out-of-band render tracking.
+//!
+//! \since Release: 565
+//! \param [in] pDevice                     Pointer to the target device
+//! \param [in] pSetAsyncFrameMarkerParams  Pointer to the async frame marker structure
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_D3D11_SetAsyncFrameMarker(__in IUnknown *pDevice, __in NV_ASYNC_FRAME_MARKER_PARAMS* pSetAsyncFrameMarkerParams);
+#endif //defined(__cplusplus) && (defined(__d3d11_h__))
+
 //! SUPPORTED OS:  Windows 10 and higher
 //!
 //! Used in NvAPI_D3D12_NotifyOutOfBandCommandQueue
@@ -18064,6 +18338,7 @@ typedef enum
     OUT_OF_BAND_RENDER  = 0,
     OUT_OF_BAND_PRESENT = 1,
     OUT_OF_BAND_IGNORE  = 2,
+    OUT_OF_BAND_RENDER_PRESENT = 3,
 } NV_OUT_OF_BAND_CQ_TYPE;
 
 #if defined(__cplusplus) && defined(__d3d12_h__)
@@ -18110,6 +18385,28 @@ NVAPI_INTERFACE NvAPI_D3D12_SetCreateCommandQueueLowLatencyHint(__in ID3D12Devic
 #endif //defined(__cplusplus) && defined(__d3d12_h__))
 
 #if defined (__cplusplus) && defined(__d3d12_h__)
+
+// Experimental API for internal use. DO NOT USE!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+typedef struct NVAPI_D3D12_CREATE_CUBIN_SHADER_PARAMS
+{
+    size_t              structSizeIn;
+    size_t              structSizeOut;
+
+    ID3D12Device*       pDevice;
+    const void*         pCubin;
+    NvU32               size;
+    NvU32               blockX;
+    NvU32               blockY; 
+    NvU32               blockZ; 
+    NvU32               dynSharedMemBytes;
+    const char*         pShaderName;
+    NvU32               flags;
+    NVDX_ObjectHandle   hShader;
+} NVAPI_D3D12_CREATE_CUBIN_SHADER_PARAMS;
+
+NVAPI_INTERFACE NvAPI_D3D12_CreateCubinComputeShaderExV2(__inout NVAPI_D3D12_CREATE_CUBIN_SHADER_PARAMS* pParams);
 
 // Experimental API for internal use. DO NOT USE!
 //! SUPPORTED OS:  Windows 10 and higher
@@ -18167,6 +18464,46 @@ NVAPI_INTERFACE NvAPI_D3D12_DestroyCubinComputeShader(__in  ID3D12Device*       
 #endif //defined(__cplusplus) && defined(__d3d12_h__)
 
 #if defined(__d3d12_h__)
+// Experimental API for internal use. DO NOT USE!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+
+typedef struct NVAPI_D3D12_GET_CUDA_MERGED_TEXTURE_SAMPLER_OBJECT_PARAMS
+{
+    size_t                       structSizeIn;
+    size_t                       structSizeOut;
+
+    ID3D12Device*                pDevice;
+    D3D12_CPU_DESCRIPTOR_HANDLE  texDesc;
+    D3D12_CPU_DESCRIPTOR_HANDLE  smpDesc;
+    NvU64                        textureHandle;
+} NVAPI_D3D12_GET_CUDA_MERGED_TEXTURE_SAMPLER_OBJECT_PARAMS;
+
+NVAPI_INTERFACE NvAPI_D3D12_GetCudaMergedTextureSamplerObject(__inout NVAPI_D3D12_GET_CUDA_MERGED_TEXTURE_SAMPLER_OBJECT_PARAMS* pParams);
+
+// Experimental API for internal use. DO NOT USE!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+typedef enum _NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_TYPE
+{
+    NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_SURFACE = 0,
+    NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_TEXTURE = 1,
+    NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_SAMPLER = 2,
+} NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_TYPE;
+
+typedef struct NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_PARAMS
+{
+    size_t                                                  structSizeIn;
+    size_t                                                  structSizeOut;
+
+    ID3D12Device*                                           pDevice;
+    NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_TYPE type;
+    D3D12_CPU_DESCRIPTOR_HANDLE                             desc;
+    NvU64                                                   handle;
+} NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_PARAMS;
+
+NVAPI_INTERFACE NvAPI_D3D12_GetCudaIndependentDescriptorObject(__inout NVAPI_D3D12_GET_CUDA_INDEPENDENT_DESCRIPTOR_OBJECT_PARAMS* pParams);
+
 // Experimental API for internal use. DO NOT USE!
 //! SUPPORTED OS:  Windows 10 and higher
 //!
@@ -18273,6 +18610,31 @@ NVAPI_INTERFACE NvAPI_D3D12_DestroyCuFunction(__in  ID3D12Device*       pDevice,
 #endif //if defined (__cplusplus) && defined(__d3d12_h__)
 
 
+// Experimental API for internal use. DO NOT USE!
+#if defined (__cplusplus) && defined(__d3d11_h__)
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+typedef struct NVAPI_D3D11_CREATE_CUBIN_SHADER_PARAMS
+{
+    size_t              structSizeIn;
+    size_t              structSizeOut;
+
+    ID3D11Device*       pDevice;
+    const void*         pCubin;
+    NvU32               size;
+    NvU32               blockX;
+    NvU32               blockY; 
+    NvU32               blockZ; 
+    NvU32               dynSharedMemBytes;
+    const char*         pShaderName;
+    NvU32               flags;
+    NVDX_ObjectHandle   hShader;
+} NVAPI_D3D11_CREATE_CUBIN_SHADER_PARAMS;
+
+NVAPI_INTERFACE NvAPI_D3D11_CreateCubinComputeShaderExV2(__inout NVAPI_D3D11_CREATE_CUBIN_SHADER_PARAMS* pParams);
+
+#endif //if defined (__cplusplus) && defined(__d3d11_h__)
+
 #if defined (__cplusplus) && defined(__d3d11_h__)
 
 // Experimental API for internal use. DO NOT USE!
@@ -18342,6 +18704,73 @@ NVAPI_INTERFACE NvAPI_D3D11_IsFatbinPTXSupported(__in  ID3D11Device *pDevice,
 // Experimental API for internal use. DO NOT USE!
 //! SUPPORTED OS:  Windows 10 and higher
 //!
+typedef enum _NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_TYPE
+{
+    NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_SURFACE = 0,
+    NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_TEXTURE = 1,
+    NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_SAMPLER = 2,
+
+} NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_TYPE;
+
+typedef struct _NVAPI_D3D11_GET_CUDA_VIEW_OBJECT
+{
+    union
+    {
+        struct
+        {
+            const D3D11_UNORDERED_ACCESS_VIEW_DESC*  pUavDesc;
+            ID3D11UnorderedAccessView*               pUAV;
+        } uav;
+        struct
+        {
+            const D3D11_SHADER_RESOURCE_VIEW_DESC*   pSrvDesc;
+            ID3D11ShaderResourceView*                pSRV;
+        } srv;
+        struct
+        {
+            const D3D11_SAMPLER_DESC*                pSamplerDesc;
+            ID3D11SamplerState*                      pSampler;
+        } sampler;
+    };
+} NVAPI_D3D11_GET_CUDA_VIEW_OBJECT;
+
+typedef struct NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_PARAMS
+{
+    size_t                                             structSizeIn;
+    size_t                                             structSizeOut;
+
+    ID3D11Device*                                      pDevice;
+    ID3D11Resource*                                    pResource;
+    NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_TYPE  type;
+    NVAPI_D3D11_GET_CUDA_VIEW_OBJECT                   desc;
+    NvU64                                              handle;
+} NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_PARAMS;
+
+NVAPI_INTERFACE NvAPI_D3D11_GetCudaIndependentViewObject(__inout NVAPI_D3D11_GET_CUDA_INDEPENDENT_VIEW_OBJECT_PARAMS* pParams);
+
+
+// Experimental API for internal use. DO NOT USE!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+
+typedef struct NVAPI_D3D11_GET_CUDA_MERGED_TEXTURE_SAMPLER_OBJECT_PARAMS
+{
+    size_t                              structSizeIn;
+    size_t                              structSizeOut;
+
+    ID3D11Device*                       pDevice;
+    ID3D11Resource*                     pResource;
+    NVAPI_D3D11_GET_CUDA_VIEW_OBJECT    texDesc;
+    NVAPI_D3D11_GET_CUDA_VIEW_OBJECT    samplerDesc;
+    NvU64                               handle;
+} NVAPI_D3D11_GET_CUDA_MERGED_TEXTURE_SAMPLER_OBJECT_PARAMS;
+
+NVAPI_INTERFACE NvAPI_D3D11_GetCudaMergedTextureSamplerObject(__inout NVAPI_D3D11_GET_CUDA_MERGED_TEXTURE_SAMPLER_OBJECT_PARAMS* pParams);
+
+
+// Experimental API for internal use. DO NOT USE!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
 NVAPI_INTERFACE NvAPI_D3D11_CreateUnorderedAccessView(__in   ID3D11Device*                            pDevice,
                                                       __in   ID3D11Resource*                          pResource,
                                                       __in   const D3D11_UNORDERED_ACCESS_VIEW_DESC*  pDesc,
@@ -18364,7 +18793,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateSamplerState(__in   ID3D11Device*             
                                                __in   const D3D11_SAMPLER_DESC*              pSamplerDesc,
                                                __out  ID3D11SamplerState**                   ppSamplerState,
                                                __out  NvU32*                                 pDriverHandle);
-                                                  
+
 // Experimental API for internal use. DO NOT USE!
 //! SUPPORTED OS:  Windows 10 and higher
 //!
@@ -18415,6 +18844,50 @@ typedef enum _NVAPI_D3D12_RAYTRACING_DISPLACEMENT_MICROMAP_CAPS
     NVAPI_D3D12_RAYTRACING_DISPLACEMENT_MICROMAP_CAP_STANDARD = NV_BIT(0)  //!< Standard Displacement Micromap support is available
 } NVAPI_D3D12_RAYTRACING_DISPLACEMENT_MICROMAP_CAPS;
 
+//! Flags specifying raytracing Cluster Operation support.
+//! Additional flags will be added as support becomes available.
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_CLUSTER_OPERATIONS_CAPS
+{
+    NVAPI_D3D12_RAYTRACING_CLUSTER_OPERATIONS_CAP_NONE     = 0x0,       //!< Cluster Operations support is not available.
+                                                                        //!< The application must not attempt to use any Cluster Operations entrypoints or flags.
+    NVAPI_D3D12_RAYTRACING_CLUSTER_OPERATIONS_CAP_STANDARD = NV_BIT(0)  //!< Standard Cluster Operations support is available
+} NVAPI_D3D12_RAYTRACING_CLUSTER_OPERATIONS_CAPS;
+
+//! Flags specifying raytracing Partitioned TLAS support.
+//! Additional flags will be added as support becomes available.
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_CAPS
+{
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_CAP_NONE     = 0x0,       //!< Partitioned TLAS support is not available.
+                                                                      //!< The application must not attempt to use any Partitioned TLAS entrypoints or flags.
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_CAP_STANDARD = NV_BIT(0)  //!< Standard Partitioned TLAS support is available
+} NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_CAPS;
+
+//! Flags specifying raytracing sphere support.
+//! Additional flags will be added as support becomes available.
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_SPHERES_CAP
+{
+    NVAPI_D3D12_RAYTRACING_SPHERES_CAP_NONE     = 0x0,       //!< Sphere primitive support is not available.
+                                                             //!< The application must not attempt to use any sphere geometry.
+    NVAPI_D3D12_RAYTRACING_SPHERES_CAP_STANDARD = NV_BIT(0)  //!< Standard sphere primitive support is available
+} NVAPI_D3D12_RAYTRACING_SPHERES_CAPS;
+
+//! Flags specifying raytracing linear swept sphere (LSS) support.
+//! Additional flags will be added as support becomes available.
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_LINEAR_SWEPT_SPHERES_CAP
+{
+    NVAPI_D3D12_RAYTRACING_LINEAR_SWEPT_SPHERES_CAP_NONE     = 0x0,       //!< Linear swept sphere primitive support is not available.
+                                                                          //!< The application must not attempt to use any linear swept sphere geometry.
+    NVAPI_D3D12_RAYTRACING_LINEAR_SWEPT_SPHERES_CAP_STANDARD = NV_BIT(0)  //!< Standard linear swept sphere primitive support is available
+} NVAPI_D3D12_RAYTRACING_LINEAR_SWEPT_SPHERES_CAPS;
+
 //! List of Raytracing CAPS types that can be queried.
 //!
 //! \ingroup dx
@@ -18423,6 +18896,10 @@ typedef enum _NVAPI_D3D12_RAYTRACING_CAPS_TYPE
     NVAPI_D3D12_RAYTRACING_CAPS_TYPE_THREAD_REORDERING      =  0,
     NVAPI_D3D12_RAYTRACING_CAPS_TYPE_OPACITY_MICROMAP       =  1,
     NVAPI_D3D12_RAYTRACING_CAPS_TYPE_DISPLACEMENT_MICROMAP  =  2,
+    NVAPI_D3D12_RAYTRACING_CAPS_TYPE_CLUSTER_OPERATIONS     =  3,
+    NVAPI_D3D12_RAYTRACING_CAPS_TYPE_PARTITIONED_TLAS       =  4,
+    NVAPI_D3D12_RAYTRACING_CAPS_TYPE_SPHERES                =  5,
+    NVAPI_D3D12_RAYTRACING_CAPS_TYPE_LINEAR_SWEPT_SPHERES   =  6,
     NVAPI_D3D12_RAYTRACING_CAPS_TYPE_INVALID                = -1
 } NVAPI_D3D12_RAYTRACING_CAPS_TYPE;
 
@@ -18718,6 +19195,7 @@ typedef NVAPI_GET_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PREBUILD_INFO_PARAMS_V1
 //!
 //! SUPPORTED OS:  Windows 10 and higher
 //!
+//! \deprecated  Do not use this function - it is deprecated in release 570.
 //!
 //! \since Release: 525
 //!
@@ -18729,6 +19207,7 @@ typedef NVAPI_GET_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PREBUILD_INFO_PARAMS_V1
 //!
 //! \ingroup dx 
 ///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 570.")
 NVAPI_INTERFACE NvAPI_D3D12_GetRaytracingDisplacementMicromapArrayPrebuildInfo(
     __in    ID3D12Device5* pDevice,
     __inout NVAPI_GET_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PREBUILD_INFO_PARAMS* pParams);
@@ -18859,17 +19338,18 @@ NVAPI_INTERFACE NvAPI_D3D12_GetRaytracingOpacityMicromapArrayPrebuildInfo(
 #if defined(__cplusplus) && defined(__d3d12_h__) && defined(__ID3D12Device5_INTERFACE_DEFINED__)
 
 //! Pipeline creation state flags.
+//! Support should only be enabled for the specific features that are present, since they may incur a small penalty on traversal performance overall.
+//! If the pipeline is not created with the correct primitive support, and that primitive type is encountered during traversal, behavior is undefined.
 //!
 //! \ingroup dx
 typedef enum _NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS
 {
-    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_NONE               = 0,         //!< [in] No pipeline flags.
-    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_OMM_SUPPORT = NV_BIT(0), //!< [in] Change whether raytracing pipelines are created with support for Opacity Micromaps.
-                                                                              //!<      If a triangle with an OMM is encountered during traversal and the pipeline was not created with support for them, behavior is undefined.
-                                                                              //!<      Support should only be enabled if there are OMMs present, since it may incur a small penalty on traversal performance overall.
-    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_DMM_SUPPORT = NV_BIT(1), //!< [in] Change whether raytracing pipelines are created with support for Displacement Micromaps.
-                                                                              //!<      If a triangle with a DMM is encountered during traversal and the pipeline was not created with support for them, behavior is undefined.
-                                                                              //!<      Support should only be enabled if there are DMMs present, since it may incur a small penalty on traversal performance overall.
+    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_NONE                   = 0,         //!< [in] No pipeline flags.
+    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_OMM_SUPPORT     = NV_BIT(0), //!< [in] Change whether raytracing pipelines are created with support for Opacity Micromaps.
+    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_DMM_SUPPORT     = NV_BIT(1), //!< [in] Change whether raytracing pipelines are created with support for Displacement Micromaps.
+    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_CLUSTER_SUPPORT = NV_BIT(2), //!< [in] Change whether raytracing pipelines are created with support for Clustered BLAS.
+    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_SPHERE_SUPPORT  = NV_BIT(3), //!< [in] Change whether raytracing pipelines are created with support for Spheres.
+    NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS_ENABLE_LSS_SUPPORT     = NV_BIT(4), //!< [in] Change whether raytracing pipelines are created with support for Linear Swept Spheres (LSS).
 } NVAPI_D3D12_PIPELINE_CREATION_STATE_FLAGS;
 
 //! State used when creating new pipelines.
@@ -18982,28 +19462,26 @@ NVAPI_INTERFACE NvAPI_D3D12_CheckDriverMatchingIdentifierEx(
 typedef enum _NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS_EX
 {
     // D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS flags
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE_EX                            = 0x0,       //!< No options specified for the acceleration structure build.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE_EX                    = NV_BIT(0), //!< Allow the acceleration structure to later be updated (via the flag #NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE_EX), rather than always requiring a full rebuild.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_COMPACTION_EX                = NV_BIT(1), //!< Allow for the acceleration structure to later be compacted.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_TRACE_EX               = NV_BIT(2), //!< Favorize higher raytracing performance at the cost of longer build times.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_BUILD_EX               = NV_BIT(3), //!< Favorize faster build times at the cost of lower raytracing performance.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_MINIMIZE_MEMORY_EX                 = NV_BIT(4), //!< Minimize the memory footprint of the produced acceleration structure, potentially at the cost of longer build time or lower raytracing performance.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE_EX                  = NV_BIT(5), //!< Instead of rebuilding the acceleration structure from scratch, the existing acceleration structure will be updated.
-                                                                                                             //!< Added behaviour: If #NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_OMM_UPDATE_EX is specified, OMM references may be changed along with positions when an update is performed.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE_EX                            = 0x0,        //!< No options specified for the acceleration structure build.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE_EX                    = NV_BIT(0),  //!< Allow the acceleration structure to later be updated (via the flag #NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE_EX), rather than always requiring a full rebuild.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_COMPACTION_EX                = NV_BIT(1),  //!< Allow for the acceleration structure to later be compacted.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_TRACE_EX               = NV_BIT(2),  //!< Favorize higher raytracing performance at the cost of longer build times.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_BUILD_EX               = NV_BIT(3),  //!< Favorize faster build times at the cost of lower raytracing performance.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_MINIMIZE_MEMORY_EX                 = NV_BIT(4),  //!< Minimize the memory footprint of the produced acceleration structure, potentially at the cost of longer build time or lower raytracing performance.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE_EX                  = NV_BIT(5),  //!< Instead of rebuilding the acceleration structure from scratch, the existing acceleration structure will be updated.
+                                                                                                              //!< Added behaviour: If #NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_OMM_UPDATE_EX is specified, OMM references may be changed along with positions when an update is performed.
 
     // NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS_EX specific flags
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_OMM_UPDATE_EX                = NV_BIT(6), //!< The acceleration structure (AS) supports updating OMM contents (base OMM Array and/or indices).
-                                                                                                             //!< Specifying this flag may result in larger AS size and may reduce traversal performance.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_DISABLE_OMMS_EX              = NV_BIT(7), //!< Only applicable for BLAS builds. If enabled, any instances referencing this BLAS are allowed to disable the OMM test through the #NVAPI_D3D12_RAYTRACING_INSTANCE_FLAG_DISABLE_OMMS_EX flag.
-                                                                                                             //!< Specifying this build flag may result in some reductions in traversal performance.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_OMM_OPACITY_STATES_UPDATE_EX = NV_BIT(8), //!< The acceleration structure (AS) supports updating OMM data (encoded opacity values).
-                                                                                                             //!< Specifying this flag may reduce traversal performance.
-    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_DATA_ACCESS_EX               = NV_BIT(9), //!< Allows triangle and micro-triangle data to be accessed through the BLAS via shader intrinsics.
-
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_OMM_UPDATE_EX                = NV_BIT(6),  //!< The acceleration structure (AS) supports updating OMM contents (base OMM Array and/or indices).
+                                                                                                              //!< Specifying this flag may result in larger AS size and may reduce traversal performance.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_DISABLE_OMMS_EX              = NV_BIT(7),  //!< Only applicable for BLAS builds. If enabled, any instances referencing this BLAS are allowed to disable the OMM test through the #NVAPI_D3D12_RAYTRACING_INSTANCE_FLAG_DISABLE_OMMS_EX flag.
+                                                                                                              //!< Specifying this build flag may result in some reductions in traversal performance.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_OMM_OPACITY_STATES_UPDATE_EX = NV_BIT(8),  //!< The acceleration structure (AS) supports updating OMM data (encoded opacity values).
+                                                                                                              //!< Specifying this flag may reduce traversal performance.
+    NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_DATA_ACCESS_EX               = NV_BIT(9),  //!< Allows triangle and micro-triangle data to be accessed through the BLAS via shader intrinsics.
 } NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS_EX;
 
 //! This enum extends \c D3D12_RAYTRACING_GEOMETRY_TYPE with additional values.
-//! Only new values are fully described below; for more information on the other values, please check Microsoft's DirectX Raytracing Specification.
 //!
 //! \ingroup dx
 typedef enum _NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_EX
@@ -19017,6 +19495,10 @@ typedef enum _NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_EX
                                                                               //!< The basic triangle type and this OMM-enabled type geometries may be mixed in the same BLAS build.
     NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_DMM_TRIANGLES_EX              = 0x3, //!< Triangle geometry with attached DMM data.
                                                                               //!< This geometry cannot be mixed with other geometry types in the same BLAS.
+    NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_SPHERES_EX                    = 0x4, //!< This geometry contains sphere primitives.
+                                                                              //!< Cannot be mixed with other geometry types in the same BLAS.
+    NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_LSS_EX                        = 0x5, //!< This geometry contains linear swept sphere primitives.
+                                                                              //!< Cannot be mixed with other geometry types in the same BLAS.
 
 } NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_EX;
 
@@ -19029,7 +19511,11 @@ typedef enum _NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_SPECIAL_INDEX
     NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_TRANSPARENT         = -1, //!< Uniform transparent OMM state.
     NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_OPAQUE              = -2, //!< Uniform opaque OMM state.
     NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_TRANSPARENT = -3, //!< Uniform unknown-transparent OMM state.
-    NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_OPAQUE      = -4  //!< Uniform unknown-opaque OMM state.
+    NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_OPAQUE      = -4, //!< Uniform unknown-opaque OMM state.
+
+    NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_SPECIAL_INDEX_CLUSTER_SKIP_OMM          = -5, //!< Don't apply any OMM for triangle. Reverts to using the geometry supplied opaque/non-opaque state. This special index is only available for the opacity micromap index buffer supplied to
+                                                                                          //!< NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_TRIANGLE_TEMPLATE_ARGS and NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_TRIANGLE_CLUSTER_ARGS.
+                                                                                          //!< This state does _not_ require the AS to be built with NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_CLUSTER_FLAG_ALLOW_DISABLE_OMMS, as that only applies to the instance flag.
 } NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_SPECIAL_INDEX;
 
 //! Geometry descriptor attachment with Opacity Micromaps.
@@ -19106,8 +19592,69 @@ typedef struct _NVAPI_D3D12_RAYTRACING_GEOMETRY_OMM_TRIANGLES_DESC
     NVAPI_D3D12_RAYTRACING_GEOMETRY_OMM_ATTACHMENT_DESC ommAttachment; //!< Opacity Micromap attachment descriptor.
 } NVAPI_D3D12_RAYTRACING_GEOMETRY_OMM_TRIANGLES_DESC;
 
+//! Sphere geometry descriptor.
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_GEOMETRY_SPHERES_DESC
+{
+    NvU32                                       vertexCount;          //!< The largest valid index plus one.
+    NvU32                                       indexCount;           //!< Number of indices in index buffer.
+
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE        vertexPositionBuffer; //!< Vertex position buffer and stride.
+    DXGI_FORMAT                                 vertexPositionFormat; //!< Supports the same formats as the triangle vertex buffers.
+
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE        vertexRadiusBuffer;   //!< Vertex radius buffer and stride. Radii must be 0 or greater. The stride can be set to 0 to set a constant radius for all primitives in the geometry.
+    DXGI_FORMAT                                 vertexRadiusFormat;   //!< Supported formats are `DXGI_FORMAT_R32_FLOAT` and `DXGI_FORMAT_R16_FLOAT`.
+
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE        indexBuffer;          //!< Indices to positions and radii, one entry per sphere primitive. May be set to NULL to use the list of positions and radii from vertexPositionBuffer and vertexRadiusBuffer.
+    DXGI_FORMAT                                 indexFormat;          //!< Supported formats are `DXGI_FORMAT_R32_UINT`, `DXGI_FORMAT_R16_UINT`, `DXGI_FORMAT_R8_UINT`.
+
+} NVAPI_D3D12_RAYTRACING_GEOMETRY_SPHERES_DESC;
+
+//! Describes the endcap enable/disable behavior of LSS primitives.
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_LSS_ENDCAP_MODE
+{
+    NVAPI_D3D12_RAYTRACING_LSS_ENDCAP_MODE_NONE    = 0, //!< None of the primitives have endcaps enabled. Only midsections may be intersected.
+    NVAPI_D3D12_RAYTRACING_LSS_ENDCAP_MODE_CHAINED = 1, //!< The last primitive in each chain has both endcaps enabled. Preceding primitives within chains only have their first endcap enabled.
+
+} NVAPI_D3D12_RAYTRACING_LSS_ENDCAP_MODE;
+
+//! Describes how LSS primitives are constructed from vertex and index buffer inputs.
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_LSS_PRIMITIVE_FORMAT
+{
+    NVAPI_D3D12_RAYTRACING_LSS_PRIMITIVE_FORMAT_LIST                = 0, //!< Each LSS primitive is defined by a pair of vertices. The index buffer is optional for this format.
+    NVAPI_D3D12_RAYTRACING_LSS_PRIMITIVE_FORMAT_SUCCESSIVE_IMPLICIT = 1, //!< Each LSS is defined by two successive vertices (k, k + 1), where k is the entry in the index buffer. This format requires an index buffer to be supplied in the geometry descriptor.
+
+} NVAPI_D3D12_RAYTRACING_LSS_PRIMITIVE_FORMAT;
+
+//! Linear Swept Sphere (LSS) geometry descriptor.
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_GEOMETRY_LSS_DESC
+{
+    NvU32                                       vertexCount;          //!< The largest valid index plus one.
+    NvU32                                       indexCount;           //!< Number of indices in index buffer.
+    NvU32                                       primitiveCount;       //!< Specifies the total number of primitives (including inactive ones).
+
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE        vertexPositionBuffer; //!< Vertex position buffer and stride.
+    DXGI_FORMAT                                 vertexPositionFormat; //!< Supports the same formats as the triangle vertex buffers.
+
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE        vertexRadiusBuffer;   //!< Vertex radius buffer and stride. Radii must be 0 or greater. The stride can be set to 0 to set a constant radius for all primitives in the geometry.
+    DXGI_FORMAT                                 vertexRadiusFormat;   //!< Supported formats are `DXGI_FORMAT_R32_FLOAT` and `DXGI_FORMAT_R16_FLOAT`.
+
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE        indexBuffer;          //!< Indices to positions and radii, one entry per sphere primitive. May be set to NULL to use the list of positions and radii from vertexPositionBuffer and vertexRadiusBuffer.
+    DXGI_FORMAT                                 indexFormat;          //!< Supported formats are `DXGI_FORMAT_R32_UINT`, `DXGI_FORMAT_R16_UINT`, `DXGI_FORMAT_R8_UINT`.
+
+    NVAPI_D3D12_RAYTRACING_LSS_ENDCAP_MODE      endcapMode;           //!< Specifies which endcaps are enabled and disabled over collections of LSS primitives within the geometry.
+    NVAPI_D3D12_RAYTRACING_LSS_PRIMITIVE_FORMAT primitiveFormat;      //!< Selects how input buffers are to be interpreted to construct LSS primitives.
+
+} NVAPI_D3D12_RAYTRACING_GEOMETRY_LSS_DESC;
+
 //! This structure extends \c D3D12_RAYTRACING_GEOMETRY_DESC by supporting additional geometry types.
-//! Only new members are fully described below; for more information on the other members, please check Microsoft's DirectX Raytracing Specification.
 //!
 //! \ingroup dx
 typedef struct _NVAPI_D3D12_RAYTRACING_GEOMETRY_DESC_EX
@@ -19124,11 +19671,14 @@ typedef struct _NVAPI_D3D12_RAYTRACING_GEOMETRY_DESC_EX
                                                                          //!< Otherwise, this parameter is unused (space repurposed in a union).
         NVAPI_D3D12_RAYTRACING_GEOMETRY_DMM_TRIANGLES_DESC dmmTriangles; //!< Describes micro-triangle geometry, if \c type is #NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_DMM_TRIANGLES_EX.
                                                                          //!< Otherwise, this parameter is unused (space repurposed in a union).
+        NVAPI_D3D12_RAYTRACING_GEOMETRY_SPHERES_DESC       spheres;      //!< Describes sphere geometry if \c type is #NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_SPHERE_EX.
+                                                                         //!< Otherwise, this parameter is unused (space repurposed in a union).
+        NVAPI_D3D12_RAYTRACING_GEOMETRY_LSS_DESC           lss;          //!< Describes linear swept sphere geometry if \c type is #NVAPI_D3D12_RAYTRACING_GEOMETRY_TYPE_LSS_EX.
+                                                                         //!< Otherwise, this parameter is unused (space repurposed in a union).
     };
 } NVAPI_D3D12_RAYTRACING_GEOMETRY_DESC_EX;
 
 //! This enum extends \c D3D12_RAYTRACING_INSTANCE_FLAGS with additional values.
-//! Only new values are fully described below; for more information on the other values, please check Microsoft's DirectX Raytracing Specification.
 //!
 //! \ingroup dx
 typedef enum _NVAPI_D3D12_RAYTRACING_INSTANCE_FLAGS_EX
@@ -19425,6 +19975,7 @@ typedef NVAPI_BUILD_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PARAMS_V1            
 //!
 //! SUPPORTED OS:  Windows 10 and higher
 //!
+//! \deprecated  Do not use this function - it is deprecated in release 570.
 //!
 //! \since Release: 525
 //!
@@ -19438,6 +19989,7 @@ typedef NVAPI_BUILD_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PARAMS_V1            
 //!
 //! \ingroup dx 
 ///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 570.")
 NVAPI_INTERFACE NvAPI_D3D12_BuildRaytracingDisplacementMicromapArray(
     __in ID3D12GraphicsCommandList4* pCommandList,
     __in NVAPI_BUILD_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PARAMS* pParams);
@@ -19467,6 +20019,7 @@ typedef NVAPI_RELOCATE_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PARAMS_V1         
 //!
 //! SUPPORTED OS:  Windows 10 and higher
 //!
+//! \deprecated  Do not use this function - it is deprecated in release 570.
 //!
 //! \since Release: 525
 //!
@@ -19478,6 +20031,7 @@ typedef NVAPI_RELOCATE_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PARAMS_V1         
 //!
 //! \ingroup dx 
 ///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 570.")
 NVAPI_INTERFACE NvAPI_D3D12_RelocateRaytracingDisplacementMicromapArray(
     __in ID3D12GraphicsCommandList4* pCommandList,
     __in const NVAPI_RELOCATE_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_PARAMS* pParams);
@@ -19508,6 +20062,7 @@ typedef NVAPI_EMIT_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_POSTBUILD_INFO_PARAMS_
 //!
 //! SUPPORTED OS:  Windows 10 and higher
 //!
+//! \deprecated  Do not use this function - it is deprecated in release 570.
 //!
 //! \since Release: 525
 //!
@@ -19519,6 +20074,7 @@ typedef NVAPI_EMIT_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_POSTBUILD_INFO_PARAMS_
 //!
 //! \ingroup dx 
 ///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 570.")
 NVAPI_INTERFACE NvAPI_D3D12_EmitRaytracingDisplacementMicromapArrayPostbuildInfo(
     __in ID3D12GraphicsCommandList4* pCommandList,
     __in const NVAPI_EMIT_RAYTRACING_DISPLACEMENT_MICROMAP_ARRAY_POSTBUILD_INFO_PARAMS* pParams);
@@ -19663,7 +20219,6 @@ typedef enum _NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_STATE
 #define NVAPI_D3D12_RAYTRACING_OPACITY_MICROMAP_OC1_MAX_SUBDIVISION_LEVEL 12
 
 //! A list of flags that can be given to the \c TraceRay() function in HLSL.
-//! Only new or modified values are fully described below; for more information on the other values, please check Microsoft's DirectX Raytracing Specification.
 //!
 //! \ingroup dx
 typedef enum _NVAPI_RAY_FLAGS_EX
@@ -19797,6 +20352,864 @@ NVAPI_INTERFACE NvAPI_D3D12_CreateCommittedRDMABuffer(
         __out void **ppRDMAAddress);
 
 #endif //defined(__cplusplus) && defined(__d3d12_h__)
+
+#if defined(__cplusplus) && (defined(__d3d12_h__))
+
+//! Underlying component types of a cooperative vector or matrix
+//! \ingroup dx
+typedef enum NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE {
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT16      = 0,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT32      = 1,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT64      = 2,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_SINT8        = 3,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_SINT16       = 4,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_SINT32       = 5,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_SINT64       = 6,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_UINT8        = 7,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_UINT16       = 8,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_UINT32       = 9,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_UINT64       = 10,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_SINT8_PACKED = 11,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_UINT8_PACKED = 12,
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT_E4M3   = 13,  
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT_E5M2   = 14, 
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_INVALID      = 0x7FFFFFFF
+} NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE;
+
+//! Device or Host address descriptor to specify source/destination addresses. Both source and destination must either be on host or both on device.
+//! \ingroup dx
+typedef struct NVAPI_DEVICE_OR_HOST_ADDRESS
+{
+    NvBool bIsDeviceAlloc;                          //!< [in] Is false if allocation is on CPU, true otherwise. The value of this also decides whether conversion will happen on host or device. 
+    union 
+    {
+        D3D12_GPU_VIRTUAL_ADDRESS deviceAddress;    //!< [in] GPU VA of allocation
+        void*                     pHostAddress;     //!< [in] Pointer to host allocation
+    };
+} NVAPI_DEVICE_OR_HOST_ADDRESS;
+
+//! Possible cooperative vector matrix layouts
+//! \ingroup dx
+typedef enum NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT {
+    NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT_ROW_MAJOR           = 0,
+    NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT_COLUMN_MAJOR        = 1,
+    NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT_INFERENCING_OPTIMAL = 2,
+    NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT_TRAINING_OPTIMAL    = 3,
+    NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT_INVALID             = 0x7FFFFFFF
+} NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT;
+
+//! Structure specifying a request to convert the layout and type of a cooperative vector matrix
+//! \ingroup dx
+typedef struct _NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_V1
+{    
+    NvU32                                   version;                //!< [in]    Struct version.
+    size_t                                  srcSize;                //!< [in]    Is the length in bytes of srcData
+    NVAPI_DEVICE_OR_HOST_ADDRESS            srcData;                //!< [in]    Is either `NULL` when calling the command to query the required size of the destination or a pointer to the source data in the source layout.
+    size_t*                                 pDstSize;               //!< [inout] Is a pointer to an integer storing the number of bytes required or requested to convert.
+    NVAPI_DEVICE_OR_HOST_ADDRESS            dstData;                //!< [inout] Is either `NULL` when calling the command to query the required size of the destination or a pointer to the destination data.
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE srcComponentType;       //!< [in]    Is the type of a source matrix element
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE dstComponentType;       //!< [in]    Is the type of a destination matrix element.
+    NvU32                                   numRows;                //!< [in]    Is the number of rows in the matrix.
+    NvU32                                   numColumns;             //!< [in]    Is the number of columns in the matrix.
+    NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT  srcLayout;              //!< [in]    Is the layout of the source matrix.
+    size_t                                  srcStride;              //!< [in]    Is the number of bytes between a consecutive row or column (depending on srcLayout) of the source matrix, if it is row-major or column-major.
+    NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT  dstLayout;              //!< [in]    Is the layout the matrix is converted to.
+    size_t                                  dstStride;              //!< [in]    Is the number of bytes between a consecutive row or column (depending on dstLayout) of the destination matrix if it is row-major or column-major.
+} NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_V1;
+
+typedef NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_V1 NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC;
+
+//! Macro for deriving version of NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC
+#define NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_VER1 MAKE_NVAPI_VERSION(NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_V1,1)
+#define NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_VER  NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_D3D12_ConvertCooperativeVectorMatrix
+//
+//!   DESCRIPTION: Queries the size of a cooperative vector matrix or converts a matrix to another layout and type. Performs a single conversion using descriptor pointed to by pDesc.
+//!                For multiple conversions in a single API call, use NvAPI_D3D12_ConvertCooperativeVectorMatrixMultiple.
+//!                If both the source (src) and destination (dst) allocations reside on the host, the conversion is run on the host. 
+//!                Conversely, if both allocations are on the device, the conversion is run on the device.
+//!                Note that conversions between host and device allocations (and vice versa) are not supported.
+//!                If pDstData is `NULL`, then the number of bytes required to store the converted matrix is returned in pDstSize.
+//!                Otherwise, pDstSize must point to a variable set by the user to the number of bytes in pDstData, and on return the
+//!                variable is overwritten with the number of bytes actually written to pDstData.
+//!                pSrcData can be `NULL` when pDstData is `NULL`. If pDstSize is less than the number of bytes required to store the
+//!                converted matrix, no bytes will be written, and NVAPI_INSUFFICIENT_BUFFER will be returned instead of NVAPI_OK, to indicate that not enough space was provided.
+//!                The size of the destination is only a function of the destination layout information, and does not depend on the source layout information.                
+//!                If srcLayout is row-major or column-major, then srcStride should be greater than the length of a row/column, and a multiple of the element size.
+//!                If dstLayout is row-major or column-major, then dstStride should be greater than the length of a row/column, and a multiple of the element size.
+//!                If srcComponentType is not a supported MatrixInterpretation value as reported by NvAPI_D3D12_GetPhysicalDeviceCooperativeVectorProperties() then srcComponentType should be `NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT32`.
+//!                If dstComponentType is not a supported MatrixInterpretation value as reported by NvAPI_D3D12_GetPhysicalDeviceCooperativeVectorProperties() then dstComponentType should be `NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT32`.
+//!                If srcComponentType and dstComponentType are not equal, then one should be `NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT32`  or `NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT16` and the other should be a lower-precision floating-point type. 
+//!                If dstComponentType is `NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT_E4M3` or `NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE_FLOAT_E5M2`, then dstLayout should be `NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT_INFERENCING_OPTIMAL` or `NVAPI_COOPERATIVE_VECTOR_MATRIX_LAYOUT_TRAINING_OPTIMAL`.
+//!
+//! \since Release: 570
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! \param [in] pDevice       Pointer to the ID3D12Device created by application.
+//! \param [in] pCommandList  Pointer to ID3D12GraphicsCommandList for device side conversion. Ignored if host side conversion is desired.
+//! \param [in] pDesc         Pointer to NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC created by app
+//!
+//! \retval NVAPI_OK                          Conversion done succesfully.          
+//! \retval NVAPI_API_NOT_INITIALIZED         NvAPI was not yet initialized.
+//! \retval NVAPI_INVALID_POINTER             pDevice and/or pDesc is NULL.
+//! \retval NVAPI_INVALID_COMBINATION         Either src and dst data are both not on CPU/GPU or both are on GPU but pCommandList is NULL.
+//! \retval NVAPI_INSUFFICIENT_BUFFER         Destination size passed was not enough for the conversion result.
+//! \retval NVAPI_INCOMPATIBLE_STRUCT_VERSION Incompatible structure version of pDesc.
+//! \retval NVAPI_ERROR                       Generic error.
+//! \retval NVAPI_OUT_OF_MEMORY               Internal allocation failed.
+//!
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_D3D12_ConvertCooperativeVectorMatrix(__in ID3D12Device *pDevice, __in ID3D12GraphicsCommandList* pCommandList, __in NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC const* const pDesc);
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_D3D12_ConvertCooperativeVectorMatrixMultiple
+//
+//!   DESCRIPTION: Queries the size of a cooperative vector matrix or converts a matrix to another layout and type.
+//!                Can perform multiple conversions in a single API call. The number of descriptors pointed to by pDesc is specified using descCount. 
+//!                Function returns error if any of the conversions fail and does not process further conversions.
+//!                Behavior is same as NvAPI_D3D12_ConvertCooperativeVectorMatrix if descCount is equal to 1.
+//!                If both the source (src) and destination (dst) allocations reside on the host, the conversion is run on the host. 
+//!                See NvAPI_D3D12_ConvertCooperativeVectorMatrix documentation for valid usage.
+//!
+//! \since Release: 570
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! \param [in] pDevice       Pointer to the ID3D12Device created by application.
+//! \param [in] pCommandList  Pointer to ID3D12GraphicsCommandList for device side conversion. Ignored if host side conversion is desired.
+//! \param [in] pDesc         Pointer to NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC created by app.
+//! \param [in] desCount      Specifies the count of NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC descriptors pointed to by pDesc. Must be greater than 0.
+//!
+//! \retval NVAPI_OK                          Conversion done succesfully.          
+//! \retval NVAPI_API_NOT_INITIALIZED         NvAPI was not yet initialized.
+//! \retval NVAPI_INVALID_POINTER             pDevice and/or pDesc is NULL.
+//! \retval NVAPI_INVALID_ARGUMENT            descCount is 0.
+//! \retval NVAPI_INVALID_COMBINATION         Either src and dst data are both not on CPU/GPU or both are on GPU but pCommandList is NULL.
+//! \retval NVAPI_INSUFFICIENT_BUFFER         Destination size passed was not enough for the conversion result.
+//! \retval NVAPI_INCOMPATIBLE_STRUCT_VERSION Incompatible structure version of pDesc.
+//! \retval NVAPI_ERROR                       Generic error.
+//! \retval NVAPI_OUT_OF_MEMORY               Internal allocation failed.
+//!
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_D3D12_ConvertCooperativeVectorMatrixMultiple(__in ID3D12Device *pDevice, __in ID3D12GraphicsCommandList* pCommandList, __in NVAPI_CONVERT_COOPERATIVE_VECTOR_MATRIX_DESC const* const pDesc, __in NvU32 descCount);
+
+//! Each structure describes a single supported combination of types for a matrix-vector multiply (or multiply-add) operation
+//! \ingroup dx
+typedef struct _NVAPI_COOPERATIVE_VECTOR_PROPERTIES_V1
+{
+    NvU32                                       version;                //!< [out] Struct version. App must verify the value returned by API.
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE     inputType;              //!< [out] Is the component type of vector Input, of type NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE.
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE     inputInterpretation;    //!< [out] Is the value of InputInterpretation, of type NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE.
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE     matrixInterpretation;   //!< [out] Is the value of MatrixInterpretation, of type NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE.
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE     biasInterpretation;     //!< [out] Is the value of BiasInterpretation, of type NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE.
+    NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE     resultType;             //!< [out] Is the component type of Result Type, of type NVAPI_COOPERATIVE_VECTOR_COMPONENT_TYPE.
+    bool                                        transpose;              //!< [out] Is a boolean indicating whether opaque layout matrices with this combination of input and output types supports transposition.
+}NVAPI_COOPERATIVE_VECTOR_PROPERTIES_V1;
+
+typedef NVAPI_COOPERATIVE_VECTOR_PROPERTIES_V1 NVAPI_COOPERATIVE_VECTOR_PROPERTIES;
+
+//! Macro for deriving version of NVAPI_COOPERATIVE_VECTOR_PROPERTIES
+#define NVAPI_COOPERATIVE_VECTOR_PROPERTIES_VER1  MAKE_NVAPI_VERSION(NVAPI_COOPERATIVE_VECTOR_PROPERTIES_V1,1)
+#define NVAPI_COOPERATIVE_VECTOR_PROPERTIES_VER   NVAPI_COOPERATIVE_VECTOR_PROPERTIES_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_D3D12_GetPhysicalDeviceCooperativeVectorProperties
+//
+//!   DESCRIPTION: Enumerates supported cooperative vector types combinations. 
+//!                If pProperties is `NULL`, then the number of cooperative vector properties available is returned in pPropertyCount.
+//!                Otherwise, pPropertyCount must point to a variable set by the user to the number of elements in the pProperties array, 
+//!                and on return the variable is overwritten with the number of structures actually written to pProperties. 
+//!                If pPropertyCount is less than the number of cooperative vector properties available, at most pPropertyCount structures will be
+//!                written, and status will be NVAPI_INSUFFICIENT_BUFFER to indicate that not all the available cooperative vector properties were returned.
+//!
+//! \since Release: 570
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! \param [in]    pDevice       Pointer to the ID3D12Device created by application.
+//! \param [inout] propertyCount Number of cooperative vector properties available or queried
+//! \param [inout] pProperties   Is either `NULL` or a pointer to an array of NVAPI_COOPERATIVE_VECTOR_PROPERTIES structures.
+//!
+//! \retval NVAPI_OK                          Properties returned succesfully
+//! \retval NVAPI_API_NOT_INITIALIZED         NvAPI was not yet initialized.
+//! \retval NVAPI_INSUFFICIENT_BUFFER         Not an error but all supported properties could not be written into as propertyCount was insufficient.
+//! \retval NVAPI_INVALID_POINTER             pDevice is NULL.
+//! \retval NVAPI_ERROR                       Generic error.
+//! \retval NVAPI_OUT_OF_MEMORY               Internal allocation failed.
+//!
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_D3D12_GetPhysicalDeviceCooperativeVectorProperties(__in ID3D12Device *pDevice, __inout NvU32 *pPropertyCount, __inout NVAPI_COOPERATIVE_VECTOR_PROPERTIES* pProperties);
+#endif //defined(__cplusplus) && (defined(__d3d12_h__))
+
+#if defined(__cplusplus) && defined(__d3d12_h__) && defined(__ID3D12Device5_INTERFACE_DEFINED__)
+
+//! \ingroup dx
+#define NVAPI_D3D12_RAYTRACING_CLAS_BYTE_ALIGNMENT 128                    //!< The alignment required for storage of CLAS objects
+
+//! \ingroup dx
+#define NVAPI_D3D12_RAYTRACING_CLUSTER_TEMPLATE_BYTE_ALIGNMENT 32         //!< The alignment required for storage of Cluster Templates objects
+
+//! \ingroup dx
+#define NVAPI_D3D12_RAYTRACING_CLUSTER_TEMPLATE_BOUNDS_BYTE_ALIGNMENT 32  //!< The alignment required for the optional AABB provided to Cluster Template builds
+
+//! \ingroup dx
+#define NVAPI_D3D12_RAYTRACING_MAXIMUM_GEOMETRY_INDEX 16777215            //!< The maximum supported geometry index for use with cluster objects
+
+//! Enumeration listing permitted flag values for NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUTS
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAGS
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAG_NONE                   = 0x0,        //!< No option specified for the multi indirect cluster operation
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAG_FAST_TRACE             = NV_BIT(0),  //!< Indicates that the operation should optimize results for trace performance at the cost of build performance
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAG_FAST_BUILD             = NV_BIT(1),  //!< Indicates that the operation should optimize results for build performance at the cost of trace performance
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAG_NO_OVERLAP             = NV_BIT(2),  //!< For cluster operations that permit input/output overlap this indicates that no such overlap exists, invalid to use when inputs and outputs are overlapping
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAG_ALLOW_OMM              = NV_BIT(3),  //!< Specifies that the operation will interact with Cluster BLAS, CLAS or Templates that reference OMMs. All Operation Types & Modes require this field to be set correctly when interacting (building or consuming) objects that contain OMMs.
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAGS;
+
+//! Enumeration listing permitted geometry flag values for Clusters
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_CLUSTER_FLAGS
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_CLUSTER_FLAG_NONE                            = 0x0,        //!< No option specified for the argument of this cluster
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_CLUSTER_FLAG_ALLOW_DISABLE_OMMS              = NV_BIT(0),  //!< If set, any instances referencing a Cluster BLAS containing this CLAS are allowed to disable the OMM test through the `NVAPI_D3D12_RAYTRACING_INSTANCE_FLAG_DISABLE_OMMS` flag.
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_CLUSTER_FLAGS;
+
+//! Enumeration listing permitted geometry flag values for Cluster Geometry
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_FLAGS
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_FLAG_NONE                           = 0x0,         //!< No option specified for the argument of this cluster geometry
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_FLAG_CULL_DISABLE                   = NV_BIT(29),  //!< Disables front and back face culling for affected triangles, see D3D12_RAYTRACING_INSTANCE_FLAG_TRIANGLE_CULL_DISABLE 
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_FLAG_NO_DUPLICATE_ANYHIT_INVOCATION = NV_BIT(30),  //!< Same behavior as D3D12_RAYTRACING_GEOMETRY_FLAG_NO_DUPLICATE_ANYHIT_INVOCATION for non-cluster Geometry
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_FLAG_OPAQUE                         = NV_BIT(31),  //!< Same behavior as D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE for non-cluster Geometry
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_FLAGS;
+
+//! Enumeration listing possible values for Cluster Operation types
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_MOVE_CLUSTER_OBJECT                     = 0, //!< Copies/moves CLAS, Cluster BLAS or Templates, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_MOVES_DESC as desc. Alignment requirement depends on the type of object moved.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_BLAS_FROM_CLAS                    = 1, //!< Constructs Cluster BLAS from arrays of CLAS addresses, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_CLAS_DESC as desc. Alignment of Cluster BLAS is a multiple of D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BYTE_ALIGNMENT.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLAS_FROM_TRIANGLES               = 2, //!< Constructs CLAS from triangle data, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC as desc. Alignment of CLAS is a multiple of NVAPI_D3D12_RAYTRACING_CLAS_BYTE_ALIGNMENT.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLUSTER_TEMPLATES_FROM_TRIANGLES  = 3, //!< Constructs Cluster Templates from triangle data, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC as desc. Alignment of Cluster Templates is a multiple of NVAPI_D3D12_RAYTRACING_CLUSTER_TEMPLATE_BYTE_ALIGNMENT.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_INSTANTIATE_CLUSTER_TEMPLATES           = 4, //!< Instantiates Cluster Templates to create CLAS results, use NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC as desc. Alignment of CLAS is a multiple of NVAPI_D3D12_RAYTRACING_CLAS_BYTE_ALIGNMENT.
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE;
+
+//! Specifies the index format to use for cluster operations.
+//! The values are chosen to match Vulkan's style of index size (in bytes) for the appropriate format
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT
+{
+  NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT_8BIT  = 1,  //!< Use 8-bit indices
+  NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT_16BIT = 2,  //!< Use 16-bit indices
+  NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT_32BIT = 4,  //!< Use 32-bit indices
+} NVAPI_3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT;
+
+//! Enumeration listing possible values for the Cluster Operation mode
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_IMPLICIT_DESTINATIONS   = 0, //!< User provides total buffer space, driver places results within, returns VAs and actual sizes
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_EXPLICIT_DESTINATIONS   = 1, //!< User provides individual target VAs, driver places them there, returns actual sizes
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_GET_SIZES               = 2, //!< Driver returns maximum sizes per element, results may only be used with NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_EXPLICIT_DESTINATIONS
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE;
+
+//! Desc used for operation type NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_BLAS_FROM_CLAS
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_CLAS_DESC
+{
+    NvU32                       maxTotalClasCount;  //!< The maximum total number of CLAS used by all BLAS that will be built by one call (reuse of the same CLAS counts multiple times)
+    NvU32                       maxClasCountPerArg; //!< The maximum number of CLAS used by an individual Arg (equivalent to a BLAS being built). Maximum supported value is D3D12_RAYTRACING_MAXIMUM_PRIMITIVE_COUNT.
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_CLAS_DESC;
+
+//! Desc used for operation type either NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLAS_FROM_TRIANGLES, NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLUSTER_TEMPLATES_FROM_TRIANGLES or NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_INSTANTIATE_CLUSTER_TEMPLATES
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC
+{
+    NvU32                       vertexFormat;                   //!< A value of `DXGI_FORMAT` describing the vertex format used in the vertex buffer passed for the cluster operation. For a list of supported vertex formats, see D3D12_RAYTRACING_GEOMETRY_TRIANGLES_DESC::VertexFormat
+    NvU32                       maxGeometryIndexValue;          //!< The maximum value of any geometry index that will occur in the results of the cluster operation (including instanced CLAS from templates constructed by it). Maximum supported value is NVAPI_D3D12_RAYTRACING_MAXIMUM_GEOMETRY_INDEX.
+    NvU32                       maxUniqueGeometryCountPerArg;   //!< The maximum value number of unique geometry index values that will occur in each individual result of the cluster operation. A value of 0 is treated as a value of 1. Maximum supported value is 256.
+    NvU32                       maxTriangleCountPerArg;         //!< The maximum number of triangles that will occur in each individual result of the cluster operation. Maximum supported value is 256.
+    NvU32                       maxVertexCountPerArg;           //!< The maximum number of vertices that will occur in each individual result of the cluster operation. Maximum supported value is 256.
+    NvU32                       maxTotalTriangleCount;          //!< The maximum total value of summing up the number of triangles that will occur in each individual result of the cluster operation.
+    NvU32                       maxTotalVertexCount;            //!< The maximum total value of summing up the number of vertices that will occur in each individual result of the cluster operation.
+    NvU32                       minPositionTruncateBitCount;    //!< The minimum number of bits that will be truncated from vertex positions in the arguments of this cluster operation. Maximum supported value is 32.
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC;
+
+//! Enumeration listing the possible types used by NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_MOVES_DESC
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MOVE_TYPE
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MOVE_TYPE_BOTTOM_LEVEL_ACCELERATION_STRUCTURE  = 0, //!< The moved objects are Clustered BLAS
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MOVE_TYPE_CLUSTER_LEVEL_ACCELERATION_STRUCTURE = 1, //!< The moved objects are CLAS
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MOVE_TYPE_TEMPLATE                             = 2, //!< The moved objects are Cluster Templates
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MOVE_TYPE;
+
+//! Desc used for operation type NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_MOVE_CLUSTER_OBJECT
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MOVES_DESC 
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MOVE_TYPE   type;          //!< Determines the type of object to be copied/moved by this cluster operation
+    NvU32                                                               maxBytesMoved; //!< Determines the maximum total number of bytes copied/moved by the operation (maximum sum of sizes of all copied/moved objects)
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_MOVES_DESC;
+
+//! Inputs describing the configuration of a cluster operation, used to determine the memory requirement for the operation
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUTS
+{
+    NvU32                                                                  maxArgCount; //!< Represents the maximum number of arguments to process
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAGS          flags;       //!< Flags to modify the operation
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE           type;        //!< The type of multi indirect operation to execute
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE           mode;        //!< The operation mode executed
+ 
+    //!< Different arguments depending on type, see NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE for details
+    union
+    {
+        NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_CLAS_DESC      clasDesc;      //!< Use when type is equal to NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_BLAS_FROM_CLAS
+        NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC trianglesDesc; //!< Use when type is equal to one of: NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLAS_FROM_TRIANGLES, NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLUSTER_TEMPLATES_FROM_TRIANGLES, NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_INSTANTIATE_CLUSTER_TEMPLATES
+        NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_MOVES_DESC     movesDesc;     //!< Use when type is equal to NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_MOVE_CLUSTER_OBJECT
+    };
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUTS;
+
+//! Structure describing the memory requirement of a cluster operation
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO
+{
+    NvU64 resultDataMaxSizeInBytes; //!< Allocated size required to hold the result of the multi indirect operation based on the specified inputs. 
+                                    //!< For NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_EXPLICIT_DESTINATIONS this will be one per object.
+                                    //!< For NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_IMPLICIT_DESTINATIONS this will be for all objects in the given call.
+                                    //!< For NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_GET_SIZES always 0.
+    NvU64 scratchDataSizeInBytes;   //!< Scratch storage on GPU required during multi indirect operation based on the specified inputs.
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO;
+
+//! Parameter structure for NvAPI_D3D12_GetRaytracingMultiIndirectClusterOperationRequirementsInfo
+//!
+//! \ingroup dx
+typedef struct _NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_V1
+{
+    NvU32                                                                       version; //!< [in]  Structure version; it should be set to #NVAPI_GET_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_PREBUILD_INFO_PARAMS_VER.
+    const NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUTS*       pInput;  //!< [in]  Description of the multi indirect operation.
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO*  pInfo;   //!< [out] Result of the query.
+} NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_V1;
+#define NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_VER1          MAKE_NVAPI_VERSION(NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_V1, 1)
+typedef NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_V1            NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS;
+#define NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_VER           NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_D3D12_GetRaytracingMultiIndirectClusterOperationRequirementsInfo
+//
+//! DESCRIPTION: Function call used to determine the memory requirements for a future call to NvAPI_D3D12_RaytracingExecuteMultiIndirectClusterOperation
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release: 560
+//!
+//! \param [in]     pDevice              The D3D device that owns the command list the future call to NvAPI_D3D12_RaytracingExecuteMultiIndirectClusterOperation will be made from
+//! \param [in]     pParams              API parameters
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \retval ::NVAPI_OK                   Completed request
+//! \retval ::NVAPI_INVALID_POINTER      A null pointer was passed as pDevice, pParams, pParams->pInput 
+//!                                      or pParams->pInfo argument
+//! \retval ::NVAPI_INVALID_ARGUMENT     The pParams->pInfo parameter was set in an invalid way
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_D3D12_GetRaytracingMultiIndirectClusterOperationRequirementsInfo(
+    __in    ID3D12Device5* pDevice,
+    __inout const NVAPI_GET_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_REQUIREMENTS_INFO_PARAMS* pParams);
+
+//! Argument structure used on device for operation type NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_BLAS_FROM_CLAS
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_CLUSTER_ARGS
+{
+    NvU32                     clusterCount; //!< [in] The size of the array referenced by clusterVAs. Must be less than or equal to NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_CLAS_DESC::maxClasCountPerArg
+    NvU32                     reserved;     //!< [in] Reserved, must be 0
+    D3D12_GPU_VIRTUAL_ADDRESS clusterVAs;   //!< [in] Address of an array of D3D12_GPU_VIRTUAL_ADDRESS holding valid addresses of CLAS previously constructed. 8 byte stride/alignment.
+} NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_CLUSTER_ARGS;
+
+//! Argument structure used on device for operation type NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLAS_FROM_TRIANGLES
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_TRIANGLE_CLUSTER_ARGS
+{
+    NvU32                        clusterId;                         //!< [in] The user specified cluster Id to encode in the CLAS.
+    NvU32                        clusterFlags;                      //!< [in] Values of NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_CLUSTER_FLAGS to use as Cluster Flags.
+    NvU32                        triangleCount : 9;                 //!< [in] The number of triangles used by the CLAS (max NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC::maxTriangleCountPerArg).
+    NvU32                        vertexCount : 9;                   //!< [in] The number of vertices used by the CLAS (max NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC::maxVertexCountPerArg).
+    NvU32                        positionTruncateBitCount : 6;      //!< [in] The number of bits to truncate from the position values (min NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC::minPositionTruncateBitCount).
+    NvU32                        indexFormat : 4;                   //!< [in] The index format to use for the indexBuffer, see NVAPI_3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT for possible values.
+    NvU32                        opacityMicromapIndexFormat : 4;    //!< [in] The index format to use for the opacityMicromapIndexBuffer, see NVAPI_3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT for possible values.
+    NvU32                        baseGeometryIndexAndFlags;         //!< [in] The base geometry index (lower 24 bit) and base geometry flags (NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_FLAGS), see geometryIndexBuffer.
+    NvU16                        indexBufferStride;                 //!< [in] The stride of the elements of indexBuffer, in bytes. If set to 0, will use index size as stride.
+    NvU16                        vertexBufferStride;                //!< [in] The stride of the elements of vertexBuffer, in bytes. If set to 0, will use vertex size as stride.
+    NvU16                        geometryIndexAndFlagsBufferStride; //!< [in] The stride of the elements of geometryIndexBuffer, in bytes. If set to 0, will use 4 byte size as stride.
+    NvU16                        opacityMicromapIndexBufferStride;  //!< [in] The stride of the elements of opacityMicromapIndexBuffer, in bytes. If set to 0, will use index size as stride.
+    D3D12_GPU_VIRTUAL_ADDRESS    indexBuffer;                       //!< [in] The index buffer to construct the CLAS. The memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+    D3D12_GPU_VIRTUAL_ADDRESS    vertexBuffer;                      //!< [in] The vertex buffer to construct the CLAS. The memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+    D3D12_GPU_VIRTUAL_ADDRESS    geometryIndexAndFlagsBuffer;       //!< [in] (optional) Address of an array of 32-bit geometry indices and geometry flags with size equal to the triangle count.
+                                                                    //!< Each 32-bit value is organized the same as baseGeometryIndexAndFlags.
+                                                                    //!< If non-zero, the geometry indices of the CLAS triangles will be equal to the lower 24-bit of geometryIndexBuffer[triangleIndex] + baseGeometryIndex.
+                                                                    //!< If non-zero, the geometry flags for each triangle will be the bitwise OR of the flags in the upper 8 bits of baseGeometryIndex and geometryIndexBuffer[triangleIndex].
+                                                                    //!< Otherwise all triangles will have a geometry index equal to baseGeometryIndexAndFlags.
+                                                                    //!< The number of unique elements may not exceed NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC::maxUniqueGeometryCountPerArg.
+                                                                    //!< If used, the memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+    D3D12_GPU_VIRTUAL_ADDRESS    opacityMicromapArray;              //!< [in] (optional) Address of a valid OMM array, if used NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAG_ALLOW_OMM must be set on this and all other cluster operation calls interacting with the object(s) constructed.
+    D3D12_GPU_VIRTUAL_ADDRESS    opacityMicromapIndexBuffer;        //!< [in] (optional) Address of an array of indices into the OMM array. Note that an additional OMM special index is reserved and can be used to turn off OMM for specific triangles.
+} NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_TRIANGLE_CLUSTER_ARGS;
+
+//! Argument structure used on device for operation type NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_BUILD_CLUSTER_TEMPLATES_FROM_TRIANGLES
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_TRIANGLE_TEMPLATE_ARGS
+{
+    NvU32                        clusterId;                         //!< [in] The user specified cluster Id to encode in the cluster template.
+    NvU32                        clusterFlags;                      //!< [in] Values of NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_CLUSTER_FLAGS to use as Cluster Flags.
+    NvU32                        triangleCount : 9;                 //!< [in] The number of triangles used by the cluster template (max NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC::maxTriangleCountPerArg).
+    NvU32                        vertexCount : 9;                   //!< [in] The number of vertices used by the cluster template (max NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC::maxTriangleCountPerArg).
+    NvU32                        positionTruncateBitCount : 6;      //!< [in] The number of bits to truncate from the position values (min NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC::minPositionTruncateBitCount).
+    NvU32                        indexFormat : 4;                   //!< [in] The index format to use for the indexBuffer, see NVAPI_3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT for possible values.
+    NvU32                        opacityMicromapIndexFormat : 4;    //!< [in] The index format to use for the opacityMicromapIndexBuffer, see NVAPI_3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INDEX_FORMAT for possible values.
+    NvU32                        baseGeometryIndexAndFlags;         //!< [in] The base geometry index (lower 24 bit) and base geometry flags (NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_GEOMETRY_FLAGS), see geometryIndexBuffer.
+    NvU16                        indexBufferStride;                 //!< [in] The stride of the elements of indexBuffer, in bytes. If set to 0, will use index size as stride.
+    NvU16                        vertexBufferStride;                //!< [in] The stride of the elements of vertexBuffer, in bytes. If set to 0, will use vertex size as stride.
+    NvU16                        geometryIndexAndFlagsBufferStride; //!< [in] The stride of the elements of geometryIndexBuffer, in bytes. If set to 0, will use 4 byte size as stride.
+    NvU16                        opacityMicromapIndexBufferStride;  //!< [in] The stride of the elements of opacityMicromapIndexBuffer, in bytes. If set to 0, will use index size as stride.
+    D3D12_GPU_VIRTUAL_ADDRESS    indexBuffer;                       //!< [in] The index buffer to construct the cluster template. The memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+    D3D12_GPU_VIRTUAL_ADDRESS    vertexBuffer;                      //!< [in] (optional) The vertex buffer to optimize the cluster template, the vertices will not be stored in the cluster template. If used, the memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+    D3D12_GPU_VIRTUAL_ADDRESS    geometryIndexAndFlagsBuffer;       //!< [in] (optional) Address of an array of 32-bit geometry indices and geometry flags with size equal to the triangle count.
+                                                                    //!< Each 32-bit value is organized the same as baseGeometryIndexAndFlags.
+                                                                    //!< If non-zero, the geometry indices of the CLAS triangles will be equal to the lower 24-bit of geometryIndexBuffer[triangleIndex] + baseGeometryIndex + geometryIndexOffset.
+                                                                    //!< If non-zero, the geometry flags for each triangle will be the bitwise OR of the flags in the upper 8 bits of baseGeometryIndex and geometryIndexBuffer[triangleIndex].
+                                                                    //!< Otherwise all triangles will have a geometry index equal to baseGeometryIndexAndFlags + geometryIndexOffset.
+                                                                    //!< The number of unique elements may not exceed NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUT_TRIANGLES_DESC::maxUniqueGeometryCountPerArg.
+                                                                    //!< If used, the memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+    D3D12_GPU_VIRTUAL_ADDRESS    opacityMicromapArray;              //!< [in] (optional) Address of a valid OMM array, if used NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_FLAG_ALLOW_OMM must be set on this and all other cluster operation calls interacting with the object(s) constructed.
+    D3D12_GPU_VIRTUAL_ADDRESS    opacityMicromapIndexBuffer;        //!< [in] (optional) Address of an array of indices into the OMM array. Note that an additional OMM special index is reserved and can be used to turn off OMM for specific triangles.
+    D3D12_GPU_VIRTUAL_ADDRESS    instantiationBoundingBoxLimit;     //!< [in] (optional) Pointer to 6 floats with alignment NVAPI_D3D12_RAYTRACING_CLUSTER_TEMPLATE_BOUNDS_BYTE_ALIGNMENT representing the limits of the positions of any vertices the template will ever be instantiated with. If used, the memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+} NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_TRIANGLE_TEMPLATE_ARGS;
+
+//! Argument structure used on device for operation type NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_INSTANTIATE_CLUSTER_TEMPLATES
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_INSTANTIATE_TEMPLATE_ARGS
+{
+    NvU32                                clusterIdOffset;      //!< [in] The offset added to the clusterId stored in the Cluster template to calculate the final clusterId that will be written to the instantiated CLAS
+    NvU32                                geometryIndexOffset;  //!< [in] The offset added to the geometry index stored for each triangle in the Cluster template to calculate the final geometry index that will be written to the triangles of the instantiated CLAS, the resulting value may not exceed maxGeometryIndexValue both of this call, and the call used to construct the original cluster template referenced
+    D3D12_GPU_VIRTUAL_ADDRESS            clusterTemplate;      //!< [in] Address of a previously built cluster template to be instantiated.
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE vertexBuffer;         //!< [in] Vertex buffer with stride to use to fetch the vertex positions used for instantiation. May be NULL only when used with NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_GET_SIZES, which will cause the maximum size for all possible vertex inputs to be returned. If used, the memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+} NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_INSTANTIATE_TEMPLATE_ARGS;
+
+//! Argument structure used on device for operation type NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_TYPE_MOVE_CLUSTER_OBJECT
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_MOVE_ARGS
+{
+    D3D12_GPU_VIRTUAL_ADDRESS            srcAccelerationStructure;  //!< [in] The address of the object to copy/move. The source object will not become clobbered unless the destinations of the call overlap with it.
+} NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_MOVE_ARGS;
+
+
+//! Enumeration listing permitted address resolution flag values for NvAPI_D3D12_RaytracingMultiIndirectClusterOperation
+//! Unless flags are set, each address in NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_DESC will point directly to the data value or array of data values
+//! By setting these flags the behavior is changed (one flag per field) for the field to be interpreted as containing the address of a piece of memory holding the address to the data value or array of data values.
+//! If used, the memory for any intermediate references must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE. The requirements for the final argument contents remain unchanged.
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAGS
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAG_NONE                                 = 0x0,         //!< Interpret all addresses as direct references to the destination data
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAG_INDIRECTED_BATCH_RESULT              = NV_BIT(0),   //!< Interpret the batchResultData as containing the device address of a D3D12_GPU_VIRTUAL_ADDRESS containing the address of data
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAG_INDIRECTED_BATCH_SCRATCH             = NV_BIT(1),   //!< Interpret the batchScratchData as containing the device address of a D3D12_GPU_VIRTUAL_ADDRESS containing the address of data
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAG_INDIRECTED_DESTINATION_ADDRESS_ARRAY = NV_BIT(2),   //!< Interpret the destinationAddressArray as containing the device address of a D3D12_GPU_VIRTUAL_ADDRESS containing the address of data
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAG_INDIRECTED_RESULT_SIZE_ARRAY         = NV_BIT(3),   //!< Interpret the resultSizeArray as containing the device address of a D3D12_GPU_VIRTUAL_ADDRESS containing the address of data
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAG_INDIRECTED_INDIRECT_ARG_ARRAY        = NV_BIT(4),   //!< Interpret the indirectArgArray as containing the device address of a D3D12_GPU_VIRTUAL_ADDRESS containing the address of data
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAG_INDIRECTED_INDIRECT_ARG_COUNT        = NV_BIT(5),   //!< Interpret the indirectArgCount as containing the device address of a D3D12_GPU_VIRTUAL_ADDRESS containing the address of data
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAGS;
+
+//! Describes the parameters for a call to NvAPI_D3D12_RaytracingExecuteMultiIndirectClusterOperation
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_DESC
+{
+    NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_INPUTS inputs;                  //!< [in] The inputs previously used with NvAPI_D3D12_GetRaytracingMultiIndirectClusterOperationRequirementsInfo to determine the memory requirement for the operation
+    NvU32                                                          addressResolutionFlags;  //!< [in] Flags to control the resolution of address references by this structure (NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_ADDRESS_RESOLUTION_FLAGS)
+    D3D12_GPU_VIRTUAL_ADDRESS                                      batchResultData;         //!< [out] If inputs.mode is equal to NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_IMPLICIT_DESTINATIONS this must point to an memory that is sufficient for resultDataMaxSizeInBytes, otherwise ignored. If set, must be in D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE state, and aligned depending on the object type being processed.
+    D3D12_GPU_VIRTUAL_ADDRESS                                      batchScratchData;        //!< [in] Must point to memory that is sufficient for scratchDataSizeInBytes, with alignment of D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BYTE_ALIGNMENT and in D3D12_RESOURCE_STATE_UNORDERED_ACCESS state. May be NULL only if scratchDataSizeInBytes was 0
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE                           destinationAddressArray; //!< [inout] Address and stride of an array of D3D12_GPU_VIRTUAL_ADDRESS. If inputs.mode is NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_IMPLICIT_DESTINATIONS this will be filled out by the call, otherwise if inputs.mode is NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_EXPLICIT_DESTINATIONS each element of the array must contain the destination address with sufficient memory for either resultDataMaxSizeInBytes or a previous call with NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_GET_SIZES.
+                                                                                            //!< The array must be in D3D12_RESOURCE_STATE_UNORDERED_ACCESS state. If inputs.mode is NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_EXPLICIT_DESTINATIONS the addresses referenced by the array must be in D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE state.
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE                           resultSizeArray;         //!< [out] Address and stride of an array of 32bit values. If inputs.mode is equal to NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_MODE_EXPLICIT_DESTINATIONS, will be populated by the call with the projected sizes of each result object based on the provided input. Otherwise, this field is optional and will be populated with the sizes of the objects written to destinationAddressArray. Must be in D3D12_RESOURCE_STATE_UNORDERED_ACCESS state.
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE                           indirectArgArray;        //!< [in] Address and stride of an array of type determined by inputs.type, see NVAPI_D3D12_RAYTRACING_ACCELERATION_STRUCTURE_MULTI_INDIRECT_*_ARGS. Structures must be tightly packed and aligned to the default C structure alignment of the structures. The memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+    D3D12_GPU_VIRTUAL_ADDRESS                                      indirectArgCount;        //!< [in] Determines the argument count, if 0 the value of inputs.maxArgCount will be used instead. If non-zero, the arrays in destinationAddressArray, resultSizeArray and indirectArgArray must all be equal to the argument count. The memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+} NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_DESC;
+
+//! Parameters given to NvAPI_D3D12_RaytracingMultiIndirectClusterOperation().
+//!
+//! \ingroup dx
+typedef struct _NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS_V1
+{
+    NvU32                                                                        version;               //!< [in] Structure version; it should be set to #NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS_VER.
+    const NVAPI_D3D12_RAYTRACING_MULTI_INDIRECT_CLUSTER_OPERATION_DESC*          pDesc;                 //!< [in] Description of the multi indirect operation.
+} NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS_V1;
+#define NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS_VER1          MAKE_NVAPI_VERSION(NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS_V1, 1)
+typedef NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS_V1            NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS;
+#define NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS_VER           NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_D3D12_RaytracingExecuteMultiIndirectClusterOperation
+//
+//! DESCRIPTION: Execute a multi indirect cluster operation
+//!              The CPU-side input buffers are not referenced after this call.
+//!              The GPU-side input resources are not referenced after the build has concluded after <tt>ExecuteCommandList()</tt>.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release: 560
+//!
+//! \param [in]     pCommandList         DX command list
+//! \param [in]     pParams              API parameters
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \retval ::NVAPI_OK                   Completed request
+//! \retval ::NVAPI_INVALID_POINTER      A null pointer was passed as command list, pParams or a required field within the pParams argument
+//! \retval ::NVAPI_INVALID_ARGUMENT     The pParams parameter was set in an invalid way
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_D3D12_RaytracingExecuteMultiIndirectClusterOperation(
+    __in ID3D12GraphicsCommandList4* pCommandList,
+    __in const NVAPI_RAYTRACING_EXECUTE_MULTI_INDIRECT_CLUSTER_OPERATION_PARAMS* pParams);
+
+//! Enumeration listing permitted flag values for NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_INPUTS
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAGS
+{
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_NONE                         = 0x0,        //!< No option specified for the the partitioned TLAS
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_FAST_TRACE                   = NV_BIT(0),  //!< Optimize the Partitioned TLAS for fast trace performance, mutually exclusive with NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_FAST_BUILD
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_FAST_BUILD                   = NV_BIT(1),  //!< Optimize the Partitioned TLAS for fast update/build performance, mutually exclusive with NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_FAST_TRACE
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_ENABLE_PARTITION_TRANSLATION = NV_BIT(2),  //!< Enable the partition translation feature of the Partitioned TLAS
+} NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAGS;
+
+//! Inputs describing the configuration of a Partitioned TLAS, used to determine the memory requirement structure and updates
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_INPUTS
+{
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAGS                           flags;                             //!< See NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAGS
+    NvU32                                                                   instanceCount;                     //!< The instance count of the Partitioned TLAS. Maximum supported value is 2^24.
+    NvU32                                                                   maxInstancePerPartitionCount;      //!< The maximum number of instances that will ever be referenced by any single partition (excluding the global partition) of the Partitioned TLAS. Maximum supported value is 2^24.
+    NvU32                                                                   partitionCount;                    //!< The number of partitions of the Partitioned TLAS. Maximum supported value is 2^24.
+    NvU32                                                                   maxInstanceInGlobalPartitionCount; //!< The maximum number of instances that will ever be referenced by the global partition of the Partitioned TLAS. Maximum supported value is 2^24.
+} NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_INPUTS;
+
+//! Structure describing the memory requirement of a Partitioned TLAS
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO
+{
+    NvU64 resultDataMaxSizeInBytes; //!< Size of the resulting Partitioned TLAS in bytes based on the specified inputs
+    NvU64 scratchDataSizeInBytes;   //!< Scratch storage on GPU required during builds/updates of the Partitioned TLAS based on the specified inputs
+} NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO;
+
+//! Parameter structure for NvAPI_D3D12_GetRaytracingPartitionedTlasIndirectPrebuildInfo
+//!
+//! \ingroup dx
+typedef struct _NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS_V1
+{
+    NvU32                                                                 version; //!< [in]  Structure version; it should be set to #NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS_VER.
+    const NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_INPUTS*  pInput;  //!< [in]  Description of the partitioned TLAS build
+    NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO* pInfo;   //!< [out] Result of the query.
+} NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS_V1;
+#define NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS_VER1          MAKE_NVAPI_VERSION(NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS_V1, 1)
+typedef NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS_V1            NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS;
+#define NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS_VER           NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_D3D12_GetRaytracingPartitionedTlasIndirectPrebuildInfo
+//
+//! DESCRIPTION: Function call used to determine the memory requirements for a Partitioned TLAS
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release: 560
+//!
+//! \param [in]     pDevice              The D3D device that will own the Partitioned TLAS
+//! \param [in,out] pParams              API parameters
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \retval ::NVAPI_OK                   Completed request
+//! \retval ::NVAPI_INVALID_POINTER      A null pointer was passed as device or pParams argument
+//! \retval ::NVAPI_INVALID_ARGUMENT     The pParams parameter was set in an invalid way
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_D3D12_GetRaytracingPartitionedTlasIndirectPrebuildInfo(
+    __in    ID3D12Device5* pDevice,
+    __inout const NVAPI_GET_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PREBUILD_INFO_PARAMS* pParams);
+
+//! Enumeration listing permitted instance flag values for NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_INSTANCE
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAGS
+{
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_NONE                            = 0x0,        //!< [in] No options specified.
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_TRIANGLE_CULL_DISABLE           = NV_BIT(0),  //!< [in] Identical to D3D12_RAYTRACING_INSTANCE_FLAG_TRIANGLE_CULL_DISABLE
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_TRIANGLE_FRONT_COUNTERCLOCKWISE = NV_BIT(1),  //!< [in] Identical to D3D12_RAYTRACING_INSTANCE_FLAG_TRIANGLE_FRONT_COUNTERCLOCKWISE
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_FORCE_OPAQUE                    = NV_BIT(2),  //!< [in] Identical to D3D12_RAYTRACING_INSTANCE_FLAG_FORCE_OPAQUE
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_FORCE_NON_OPAQUE                = NV_BIT(3),  //!< [in] Identical to D3D12_RAYTRACING_INSTANCE_FLAG_FORCE_NON_OPAQUE
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_ENABLE_EXPLICIT_AABB            = NV_BIT(4),  //!< [in] Enables the usage of explicitly provided partition-space (if partition translation is enabled) or world-space bounds, reduces cost of NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_UPDATE_PARTITION for affected instances
+} NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAGS;
+
+//! Enumeration listing special reserved values for partition indices
+//!
+//! \ingroup dx
+typedef enum _NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_PARTITION_INDEX
+{
+    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_PARTITION_INDEX_GLOBAL_PARTITION  = 0xffffffff, //!< [in] Used to select the global partition for a partition write operation
+} NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_PARTITION_INDEX;
+
+//! Type determining what the type of an operation to apply to a partitioned TLAS, determines which argument structure is used
+//!
+//! \ingroup dx
+enum NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_TYPE
+{
+    NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_WRITE_INSTANCE   = 0, //!< [in] Write instance data, use with NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_INSTANCE
+    NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_UPDATE_INSTANCE  = 1, //!< [in] Update instance data, use with NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_UPDATE_INSTANCE
+    NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_WRITE_PARTITION  = 2, //!< [in] Write partition data, use with NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_PARTITION
+};
+
+//! Argument structure for operation type NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_WRITE_INSTANCE
+//!
+//! \ingroup dx
+struct NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_INSTANCE
+{
+    NvF32                      transform[3][4];                          //!< [in] Identical to Transform in D3D12_RAYTRACING_INSTANCE_DESC, except if set to all zero or if any value is NaN the instance is considered degenerate and will not be added to the resulting accelerations structure.
+    NvF32                      userAABB[6];                              //!< [in] 6 floating point values representing the min/max bounds of a world or partition space bounds of the vertices of the acceleration structure, ignored if NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_ENABLE_EXPLICIT_AABB is not set
+    NvU32                      instanceID;                               //!< [in] Identical to InstanceID in D3D12_RAYTRACING_INSTANCE_DESC
+    NvU32                      instanceMask;                             //!< [in] Identical to InstanceMask in D3D12_RAYTRACING_INSTANCE_DESC
+    NvU32                      instanceContributionToHitGroupIndex;      //!< [in] Identical to InstanceContributionToHitGroupIndex in D3D12_RAYTRACING_INSTANCE_DESC
+    NvU32                      instanceFlags;                            //!< [in] See NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAGS
+    NvU32                      instanceIndex;                            //!< [in] Select which instance to write with this argument struct, must be less than the instanceCount of the Partitioned TLAS. Each partition index may only be referenced by one instance write or update argument for each build call.
+    NvU32                      partitionIndex;                           //!< [in] Select the partition the instance is part of. Must be less than the partitionCount of the Partitioned TLAS.
+    D3D12_GPU_VIRTUAL_ADDRESS  accelerationStructure;                    //!< [in] Acceleration structure to set, see AccelerationStructure in D3D12_RAYTRACING_INSTANCE_DESC. If NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_ENABLE_EXPLICIT_AABB was used, the existing bounds must cover the assigned acceleration structure (after transform is applied)
+                                                                         //!< When NULL the instance is inactive but still included in the build, it will not participate in any trace operations but may become active again when a non-NULL accelerationStructure is assigned to it.
+};
+
+//! Argument structure for operation type NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_UPDATE_INSTANCE
+//!
+//! \ingroup dx
+struct NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_UPDATE_INSTANCE
+{
+    NvU32                      instanceIndex;                            //!< [in] Select which instance to update with this argument struct, must be less than the instanceCount of the Partitioned TLAS. Each partition index may only be referenced by one instance write or update argument for each build call.
+    NvU32                      instanceContributionToHitGroupIndex;      //!< [in] Identical to InstanceContributionToHitGroupIndex in D3D12_RAYTRACING_INSTANCE_DESC
+    D3D12_GPU_VIRTUAL_ADDRESS  accelerationStructure;                    //!< [in] New acceleration structure to set, see AccelerationStructure in D3D12_RAYTRACING_INSTANCE_DESC. If NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_INSTANCE_FLAG_ENABLE_EXPLICIT_AABB was used, the existing bounds must cover the newly assigned acceleration structure (after transform is applied)
+                                                                         //!< When NULL the instance is inactive but still included in the build, it will not participate in any trace operations but may become active again when a non-NULL accelerationStructure is assigned to it.
+};
+
+//! Argument structure for operation type NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_WRITE_PARTITION
+//!
+//! \ingroup dx
+typedef struct NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_PARTITION
+{
+    NvU32                                partitionIndex;          //!< [in] Select which partition to write with this argument struct, must be either less than partition count or equal to NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_PARTITION_INDEX_GLOBAL_PARTITION. Each partition index may only be referenced by one argument for each build call.
+    NvF32                                partitionTranslation[3]; //!< [in] The partition translation, all instances within this partition are translated by the X, Y, Z coordinates provided by this vector
+} NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_PARTITION;
+
+//! Describes an individual operation described by a type and array of parameters to apply as a modification to a Partitioned TLAS
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP
+{
+    NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_TYPE  type;   //!< [in] Identify the type of operation to apply, determines the type of the array referenced by data. See NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_TYPE. Each type may only be referenced once by each call to NvAPI_D3D12_BuildRaytracingPartitionedTlasIndirect
+    NvU32                                                  count;  //!< [in] The number of elements of the argument array referenced by data
+    D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE                   data;   //!< [in] The address and stride of a device array of argument structures determined by type. Must be aligned based on C structure alignment requirements of the referenced structure.
+} NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP;
+
+//! Describes the parameters for building a Partitioned TLAS
+//!
+//! \ingroup dx
+typedef struct _NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_DESC
+{
+    NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_INPUTS      inputs;                           //!< [in] The inputs previously used with NvAPI_D3D12_GetRaytracingPartitionedTlasIndirectPrebuildInfo to determine the memory requirement for the Partitioned TLAS
+    D3D12_GPU_VIRTUAL_ADDRESS                                          srcAccelerationStructureData;     //!< [in] Either 0 to construct a new Partitioned TLAS or the pointer to a previously constructed Partitioned TLAS, all its content will be inherited. If set, must be in state D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE and aligned to D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BYTE_ALIGNMENT.
+    D3D12_GPU_VIRTUAL_ADDRESS                                          destAccelerationStructureData;    //!< [in] The destination address to construct the new Partitioned TLAS, if it overlaps with the srcAccelerationStructureData address, the previous Partitioned TLAS will become invalid. Must have enough memory as determined by NvAPI_D3D12_GetRaytracingPartitionedTlasIndirectPrebuildInfo. Must be in state D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE and aligned to D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BYTE_ALIGNMENT.
+    D3D12_GPU_VIRTUAL_ADDRESS                                          scratchAccelerationStructureData; //!< [in] Address of scratch memory used during the build call, size must be determined by NvAPI_D3D12_GetRaytracingPartitionedTlasIndirectPrebuildInfo. Must be in state D3D12_RESOURCE_STATE_UNORDERED_ACCESS and aligned to D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BYTE_ALIGNMENT.
+    D3D12_GPU_VIRTUAL_ADDRESS                                          indirectOpCount;                  //!< [in] Address of device memory containing the 32-bit unsigned integer containing the size of the indirectOps array. The memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+    D3D12_GPU_VIRTUAL_ADDRESS                                          indirectOps;                      //!< [in] Address of device memory containing the array of NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP with size equal to the value referenced by indirectOpCount. The memory pointed to must be in state D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE.
+} NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_DESC; 
+
+//! Parameters given to NvAPI_D3D12_BuildRaytracingPartitionedTlasIndirect().
+//!
+//! \ingroup dx
+typedef struct _NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS_V1
+{
+    NvU32                                                                              version;               //!< [in] Structure version; it should be set to #NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS_VER.
+    const NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_DESC*                 pDesc;                 //!< [in] Description of the Partitioned TLAS build.
+} NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS_V1;
+#define NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS_VER1          MAKE_NVAPI_VERSION(NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS_V1, 1)
+typedef NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS_V1            NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS;
+#define NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS_VER           NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_D3D12_BuildRaytracingPartitionedTlasIndirect
+//
+//! DESCRIPTION: Builds a Partitioned TLAS
+//!              The CPU-side input buffers are not referenced after this call.
+//!              The GPU-side input resources are not referenced after the build has concluded after <tt>ExecuteCommandList()</tt>.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release: 560
+//!
+//! \param [in]     pCommandList         DX command list
+//! \param [in]     pParams              API parameters
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \retval ::NVAPI_OK                   Completed request
+//! \retval ::NVAPI_INVALID_POINTER      A null pointer was passed as command list or pParams argument
+//! \retval ::NVAPI_INVALID_ARGUMENT     The pParams parameter was set in an invalid way
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_D3D12_BuildRaytracingPartitionedTlasIndirect(
+    __in ID3D12GraphicsCommandList4* pCommandList,
+    __in const NVAPI_BUILD_RAYTRACING_PARTITIONED_TLAS_INDIRECT_PARAMS* pParams);
+
+#endif // defined(__cplusplus) && defined(__d3d12_h__) && defined(__ID3D12Device5_INTERFACE_DEFINED__)
+
+//-----------------------------------------------------------------------------
+// NGX APIs
+//-----------------------------------------------------------------------------
+
+typedef enum {
+    NV_NGX_DLSS_OVERRIDE_FLAG_INITIALIZED       = NV_BIT(0),
+    NV_NGX_DLSS_OVERRIDE_FLAG_ENABLED           = NV_BIT(1),
+    NV_NGX_DLSS_OVERRIDE_FLAG_DLL_EXISTS        = NV_BIT(2),
+    NV_NGX_DLSS_OVERRIDE_FLAG_DLL_LOADED        = NV_BIT(3),
+    NV_NGX_DLSS_OVERRIDE_FLAG_DLL_SELECTED      = NV_BIT(4),
+    NV_NGX_DLSS_OVERRIDE_FLAG_PRESET            = NV_BIT(5),
+    NV_NGX_DLSS_OVERRIDE_FLAG_PERF_MODE         = NV_BIT(6),
+    NV_NGX_DLSS_OVERRIDE_FLAG_SCALING_RATIO     = NV_BIT(7),
+    NV_NGX_DLSS_OVERRIDE_FLAG_OPTIMAL_SETTINGS  = NV_BIT(8),
+    NV_NGX_DLSS_OVERRIDE_FLAG_CREATED           = NV_BIT(9),
+    NV_NGX_DLSS_OVERRIDE_FLAG_EVALUATE          = NV_BIT(10),
+
+    NV_NGX_DLSS_OVERRIDE_FLAG_SR_DLAA_MODE      = NV_BIT(14),
+    NV_NGX_DLSS_OVERRIDE_FLAG_FG_MULTI_FRAME    = NV_BIT(15),
+
+    NV_NGX_DLSS_OVERRIDE_FLAG_ERR_FAILED        = NV_BIT(16),
+    NV_NGX_DLSS_OVERRIDE_FLAG_ERR_DENIED        = NV_BIT(17),
+    NV_NGX_DLSS_OVERRIDE_FLAG_ERR_DRS           = NV_BIT(18),
+    NV_NGX_DLSS_OVERRIDE_FLAG_ERR_NOT_FOUND     = NV_BIT(19),
+    NV_NGX_DLSS_OVERRIDE_FLAG_ERR_DLL_LOAD      = NV_BIT(20),
+} NV_NGX_DLSS_OVERRIDE_BITFIELD;
+
+#define NV_NGX_DLSS_OVERRIDE_FEATURE_INDEX_SR       1
+#define NV_NGX_DLSS_OVERRIDE_FEATURE_INDEX_RR       2
+#define NV_NGX_DLSS_OVERRIDE_FEATURE_INDEX_FG       3
+
+typedef struct _NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1
+{
+    NvU32  version;                 //!< [in] Structure version
+    NvU32  processIdentifier;       //!< [in] Process Identifier
+    NvU64  feedbackMaskSR;          //!< [out] Feedback bits for Super Resolution
+    NvU64  feedbackMaskRR;          //!< [out] Feedback bits for Ray Reconstruction
+    NvU64  feedbackMaskFG;          //!< [out] Feedback bits for Frame Generation
+    NvF32  scalingRatio;            //!< [out] Scaling Ratio
+    NvU32  performanceMode;         //!< [out] Performance Mode
+    NvU32  renderPreset;            //!< [out] Render Preset for SR/RR
+    NvU32  frameGenerationCount;    //!< [out] FG Override Frame Count Target
+    NvU64  reserved[2];             //!< Reserved for future use. Must be zero.
+} NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1;
+
+#define NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_VER1  MAKE_NVAPI_VERSION(NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1, 1)
+#define NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_VER   NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_VER1
+typedef NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1    NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS;
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_NGX_GetNGXOverrideState
+//
+//! DESCRIPTION: This API returns the current state of NGX Override for a given process.
+//!
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//!
+//! \since Release: 570
+//!
+//! \param [inout]   pGetOverrideStateParams  //!< [inout] Sets listening version and PID returns state flags for active features
+//!
+//! \return  This API can return any of the error codes enumerated in #NvAPI_Status.
+//!
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_NGX_GetNGXOverrideState(__inout NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS* pGetOverrideStateParams);
+
+typedef struct _NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_V1
+{
+    NvU32  version;                 //!< [in] Structure version
+    NvU32  processIdentifier;       //!< [in] Process identifier of caller
+    NvU32  feature;                 //!< [in] DLSS feature ID
+    NvU64  feedbackMask;            //!< [in] Feedback bits for DLSS feature
+    NvU64  reserved[4];             //!< Reserved for future use. Must be zero.
+} NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_V1;
+
+#define NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_VER1  MAKE_NVAPI_VERSION(NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_V1, 1)
+#define NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_VER   NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_VER1
+typedef NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_V1    NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS;
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_NGX_SetNGXOverrideState
+//
+//! DESCRIPTION: This API sets the state of NGX Override from a filtered process.
+//!
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//!
+//! \since Release: 570
+//!
+//! \param [in]   pSetOverrideStateParams  //!< [in] Sets the override state using a preselected PID
+//!
+//! \return  This API can return any of the error codes enumerated in #NvAPI_Status.
+//!
+//! \ingroup dx
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_NGX_SetNGXOverrideState(__in NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS* pSetOverrideStateParams);
+
 
 //! SUPPORTED OS:  Windows 10 and higher
 //!
@@ -20821,7 +22234,7 @@ typedef struct _NV_VIO_TOPOLOGY
 //!   Description: This API determine the graphics adapter video I/O capabilities.
 //!  
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -20846,7 +22259,7 @@ NVAPI_INTERFACE NvAPI_VIO_GetCapabilities(NvVioHandle     hVioHandle,
 //!                operations are application exclusive.
 //!  
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -20871,7 +22284,7 @@ NVAPI_INTERFACE NvAPI_VIO_Open(NvVioHandle       hVioHandle,
 //!                OpenGL handle releases the device.
 //!  
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -20891,7 +22304,7 @@ NVAPI_INTERFACE NvAPI_VIO_Close(NvVioHandle       hVioHandle,
 //!   Description: This API gets the Video I/O LED status.
 //!  
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -20912,7 +22325,7 @@ NVAPI_INTERFACE NvAPI_VIO_Status(NvVioHandle     hVioHandle,
 //!   Description: This API detects the Video I/O incoming sync video format.
 //!  
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -20933,7 +22346,7 @@ NVAPI_INTERFACE NvAPI_VIO_SyncFormatDetect(NvVioHandle hVioHandle,
 //!   Description: This API gets the graphics-to-video configuration.
 //!  
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -20954,7 +22367,7 @@ NVAPI_INTERFACE NvAPI_VIO_GetConfig(NvVioHandle        hVioHandle,
 //!   Description: This API sets the graphics-to-video configuration.
 //!  
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -20975,7 +22388,7 @@ NVAPI_INTERFACE NvAPI_VIO_SetConfig(NvVioHandle            hVioHandle,
 //!   Description: This API sets the colorspace conversion parameters.
 //!  
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_VIO_SetConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -20995,7 +22408,7 @@ NVAPI_INTERFACE NvAPI_VIO_SetCSC(NvVioHandle           hVioHandle,
 //!   Description: This API gets the colorspace conversion parameters.
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_VIO_GetConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21015,7 +22428,7 @@ NVAPI_INTERFACE NvAPI_VIO_GetCSC(NvVioHandle           hVioHandle,
 //!   Description: This API sets the gamma conversion parameters.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_VIO_SetConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21036,7 +22449,7 @@ NVAPI_INTERFACE NvAPI_VIO_SetGamma(NvVioHandle           hVioHandle,
 //!   Description: This API gets the gamma conversion parameters.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_VIO_GetConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21056,7 +22469,7 @@ NVAPI_INTERFACE NvAPI_VIO_GetGamma(NvVioHandle           hVioHandle,
 //!   Description: This API sets the sync delay parameters.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_VIO_SetConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21077,7 +22490,7 @@ NVAPI_INTERFACE NvAPI_VIO_SetSyncDelay(NvVioHandle            hVioHandle,
 //!   Description: This API gets the sync delay parameters.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 290. Instead, use NvAPI_VIO_GetConfig.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21138,7 +22551,7 @@ typedef NVVIOPCIINFO_V1                                         NVVIOPCIINFO;
 //                  pVioPCIInfo    (OUT)    - PCI information of the attached SDI capture card.
 //
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //
 //! \retval :: NVAPI_NOT_SUPPORTED   API is not supported 
@@ -21154,7 +22567,7 @@ NVAPI_INTERFACE NvAPI_VIO_GetPCIInfo(__in NvVioHandle hVioHandle,
 //!   Description: This API determines if Video I/O is running.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21174,7 +22587,7 @@ NVAPI_INTERFACE NvAPI_VIO_IsRunning(NvVioHandle   hVioHandle);
 //!              This API should be called for NVVIOOWNERTYPE_DESKTOP only and will not work for OGL applications.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21194,7 +22607,7 @@ NVAPI_INTERFACE NvAPI_VIO_Start(NvVioHandle     hVioHandle);
 //!              This API should be called for NVVIOOWNERTYPE_DESKTOP only and will not work for OGL applications.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21214,7 +22627,7 @@ NVAPI_INTERFACE NvAPI_VIO_Stop(NvVioHandle     hVioHandle);
 //!   Description: This API checks whether modes are compatible in frame lock mode.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21240,7 +22653,7 @@ NVAPI_INTERFACE NvAPI_VIO_IsFrameLockModeCompatible(NvVioHandle              hVi
 //!   Description: This API enumerate all VIO devices connected to the system.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21263,7 +22676,7 @@ NVAPI_INTERFACE NvAPI_VIO_EnumDevices(NvVioHandle       hVioHandle[NVAPI_MAX_VIO
 //!   Description: This API queries the valid SDI topologies.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21283,7 +22696,7 @@ NVAPI_INTERFACE NvAPI_VIO_QueryTopology(NV_VIO_TOPOLOGY   *pNvVIOTopology);
 //!   Description: This API enumerates signal formats supported by Video I/O.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21306,7 +22719,7 @@ NVAPI_INTERFACE NvAPI_VIO_EnumSignalFormats(NvVioHandle              hVioHandle,
 //!   Description: This API enumerates data formats supported by Video I/O.
 //! 
 //! \deprecated  Do not use this function - it is deprecated in release 440.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 190
@@ -21356,7 +22769,7 @@ NVAPI_INTERFACE NvAPI_VIO_EnumDataFormats(NvVioHandle            hVioHandle,
 //! HOW TO USE:    When there is a need for an application to have default stereo parameter values,
 //!                use this function to create a key to store the values.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21402,7 +22815,7 @@ NVAPI_INTERFACE NvAPI_Stereo_CreateConfigurationProfileRegistryKey(NV_STEREO_REG
 //!                If there is no configuration profile registry key prior to the function call,
 //!                the function does nothing and does not report an error.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21433,7 +22846,7 @@ NVAPI_INTERFACE NvAPI_Stereo_DeleteConfigurationProfileRegistryKey(NV_STEREO_REG
 //!                If the value does not exist under the application's registry key,
 //!                the value will be created under the key.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21479,7 +22892,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetConfigurationProfileValue(NV_STEREO_REGISTRY_PRO
 //! DESCRIPTION:   This API removes the given value from the application's configuration profile registry key.
 //!                If there is no such value, the function does nothing and does not report an error.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21541,7 +22954,7 @@ typedef NVAPI_STEREO_CAPS_V1    NVAPI_STEREO_CAPS;
 //!               stereo. For HDMI 1.4, it is the app's responsibility to change the resolution/refresh rate to one that is
 //!               3D compatible. For 120Hz, the driver will ALWAYS force 120Hz anyway.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 304
@@ -21572,7 +22985,7 @@ NVAPI_INTERFACE NvAPI_Stereo_GetStereoSupport(__in NvMonitorHandle hMonitor, __o
 //!
 //! WHEN TO USE:   After the stereo handle for device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21598,7 +23011,7 @@ NVAPI_INTERFACE NvAPI_Stereo_DecreaseSeparation(StereoHandle stereoHandle);
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21626,7 +23039,7 @@ NVAPI_INTERFACE NvAPI_Stereo_IncreaseSeparation(StereoHandle stereoHandle);
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21652,7 +23065,7 @@ NVAPI_INTERFACE NvAPI_Stereo_DecreaseConvergence(StereoHandle stereoHandle);
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21679,7 +23092,7 @@ NVAPI_INTERFACE NvAPI_Stereo_IncreaseConvergence(StereoHandle stereoHandle);
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21719,7 +23132,7 @@ NVAPI_INTERFACE NvAPI_Stereo_GetFrustumAdjustMode(StereoHandle stereoHandle, NV_
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21750,7 +23163,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetFrustumAdjustMode(StereoHandle stereoHandle, NV_
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21780,7 +23193,7 @@ NVAPI_INTERFACE NvAPI_Stereo_CaptureJpegImage(StereoHandle stereoHandle, NvU32 q
 //!                Very generically:
 //!                Create Device->Create Stereo Handle->InitActivation->Reset Device
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \since Release: 302
 //!
@@ -21816,7 +23229,7 @@ NVAPI_INTERFACE NvAPI_Stereo_InitActivation(__in StereoHandle hStereoHandle, __i
 //! DESCRIPTION:   This API allows an application to trigger creation of a stereo desktop, 
 //!				   in case the creation was stopped on application launch. 
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! \since Release: 302
 //!
@@ -21841,7 +23254,7 @@ NVAPI_INTERFACE NvAPI_Stereo_Trigger_Activation(__in StereoHandle hStereoHandle)
 //!
 //! WHEN TO USE:   After the stereo handle for the device interface is created via successfull call to the appropriate NvAPI_Stereo_CreateHandleFrom() function.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21888,7 +23301,7 @@ NVAPI_INTERFACE NvAPI_Stereo_CapturePngImage(StereoHandle stereoHandle);
 //!                - dstZ == 0,
 //!                - SrcBox: left=top=front==0; right==SrcWidth; bottom==SrcHeight; back==1;
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185
@@ -21932,7 +23345,7 @@ NVAPI_INTERFACE NvAPI_Stereo_ReverseStereoBlitControl(StereoHandle hStereoHandle
 //!                NvAPI_Stereo_CreateHandleFrom() function.
 //!                
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 180
@@ -21991,7 +23404,7 @@ NVAPI_INTERFACE NvAPI_Stereo_SetNotificationMessage(StereoHandle hStereoHandle, 
 //!
 //! \since Release: 285
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     hStereoHandle      Stereo handle that corresponds to the device interface.
@@ -22029,7 +23442,7 @@ NVAPI_INTERFACE NvAPI_D3D1x_CreateSwapChain(StereoHandle hStereoHandle,
 //!
 //! \since Release: 285
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      hStereoHandle            Stereo handle that corresponds to the device interface.
@@ -22053,6 +23466,391 @@ NVAPI_INTERFACE NvAPI_D3D9_CreateSwapChain(StereoHandle hStereoHandle,
 
 
 
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+#if defined(__cplusplus) && defined(_WINNT_)
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_Vulkan_InitLowLatencyDevice
+//
+// !!** DEPRECATED, please use VK_NV_low_latency2 instead **!!
+//! \deprecated  Do not use this function - it is deprecated in release 565.
+//
+//!   DESCRIPTION: This function has to be used to initialize a Vulkan device
+//!   as a low latency device. The driver initializes a set of parameters to
+//!   be used in subsequent low latency API calls for this device.
+//!   The returned NV_VULKAN_LOW_LATENCY_DEVICE_PARAMS has to be passed into
+//!   any low latency API call as a parameter to ensure use of these parameters.
+//!
+//! \since Release: 455
+//! \param [in] vkDevice                      The Vulkan device handle
+//! \param [out] signalDemaphoreHandle        pointer to a VkSemaphore handle that is signalling in Sleep
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup oglapi
+///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 565.")
+NVAPI_INTERFACE NvAPI_Vulkan_InitLowLatencyDevice(__in HANDLE vkDevice, __out HANDLE *signalSemaphoreHandle);
+#endif // defined(__cplusplus) && defined(_WINNT_)
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+#if defined(__cplusplus) && defined(_WINNT_)
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_Vulkan_DestroyLowLatencyDevice
+//
+// !!** DEPRECATED, please use VK_NV_low_latency2 instead **!!
+//! \deprecated  Do not use this function - it is deprecated in release 565.
+//
+//!   DESCRIPTION: This function releases the set of low latency device
+//!   parameters.
+//!
+//! \since Release: 455
+//! \param [in] vkDevice                      The Vulkan device handle
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup oglapi
+///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 565.")
+NVAPI_INTERFACE NvAPI_Vulkan_DestroyLowLatencyDevice(__in HANDLE vkDevice);
+#endif // defined(__cplusplus) && defined(_WINNT_)
+
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! Used to get sleep status
+//! \ingroup oglapi
+typedef struct _NV_VULKAN_GET_SLEEP_STATUS_PARAMS
+{
+    NvU32  version;                                       //!< (IN) Structure version
+    NvBool bLowLatencyMode;                               //!< (OUT) Is low latency mode enabled?
+    NvU8   rsvd[128];                                     //!< (IN) Reserved. Must be set to 0s.
+} NV_VULKAN_GET_SLEEP_STATUS_PARAMS_V1;
+
+typedef NV_VULKAN_GET_SLEEP_STATUS_PARAMS_V1            NV_VULKAN_GET_SLEEP_STATUS_PARAMS;
+#define NV_VULKAN_GET_SLEEP_STATUS_PARAMS_VER1          MAKE_NVAPI_VERSION(NV_VULKAN_GET_SLEEP_STATUS_PARAMS_V1, 1)
+#define NV_VULKAN_GET_SLEEP_STATUS_PARAMS_VER           NV_VULKAN_GET_SLEEP_STATUS_PARAMS_VER1
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+#if defined(__cplusplus) && defined(_WINNT_)
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_Vulkan_GetSleepStatus
+//
+// !!** DEPRECATED, please use VK_NV_low_latency2 instead **!!
+//! \deprecated  Do not use this function - it is deprecated in release 565.
+//
+//!   DESCRIPTION: This function can be used to get the latest sleep status.
+//!   bLowLatencyMode indicates whether low latency mode is currently
+//!   enabled in the driver.
+//!   Note that it may not always reflect the previously requested sleep mode,
+//!   as the feature may not be available on the platform, or the setting has
+//!   been overridden by the control panel, for example.
+//!
+//! \since Release: 455
+//! \param [in] vkDevice                      The Vulkan device handle
+//! \param [inout] pGetSleepStatusParams      Sleep status params.
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup oglapi
+///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 565.")
+NVAPI_INTERFACE NvAPI_Vulkan_GetSleepStatus(__in HANDLE vkDevice, __inout NV_VULKAN_GET_SLEEP_STATUS_PARAMS *pGetSleepStatusParams);
+#endif // defined(__cplusplus) && defined(_WINNT_)
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! Used to set sleep mode
+//! \ingroup oglapi
+#if defined(__cplusplus) && defined(_WINNT_)
+typedef struct _NV_VULKAN_SET_SLEEP_MODE_PARAMS
+{
+    NvU32  version;                                       //!< (IN) Structure version
+    NvBool bLowLatencyMode;                               //!< (IN) Low latency mode enable/disable.
+    NvBool bLowLatencyBoost;                              //!< (IN) Request maximum GPU clock frequency regardless of workload.
+    NvU32  minimumIntervalUs;                             //!< (IN) Minimum frame interval in microseconds. 0 = no frame rate limit. 
+    NvU8   rsvd[32];                                      //!< (IN) Reserved. Must be set to 0s.
+} NV_VULKAN_SET_SLEEP_MODE_PARAMS_V1;
+
+typedef NV_VULKAN_SET_SLEEP_MODE_PARAMS_V1            NV_VULKAN_SET_SLEEP_MODE_PARAMS;
+#define NV_VULKAN_SET_SLEEP_MODE_PARAMS_VER1          MAKE_NVAPI_VERSION(NV_VULKAN_SET_SLEEP_MODE_PARAMS_V1, 1)
+#define NV_VULKAN_SET_SLEEP_MODE_PARAMS_VER           NV_VULKAN_SET_SLEEP_MODE_PARAMS_VER1
+#endif // defined(__cplusplus) && defined(_WINNT_)
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+#if defined(__cplusplus) && defined(_WINNT_)
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_Vulkan_SetSleepMode
+//
+// !!** DEPRECATED, please use VK_NV_low_latency2 instead **!!
+//! \deprecated  Do not use this function - it is deprecated in release 565.
+//
+//!   DESCRIPTION: This function can be used to update sleep mode dynamically.
+//!   The settings are not dependent to each other, meaning low latency mode
+//!   can be enabled/disabled regardless of whether minimum interval is set or
+//!   not. The former is to intelligently lower latency without impacting frame
+//!   rate. The later is to limit frame rate (e.g. minimumIntervalUs = 10000
+//!   limits frame rate to 100 FPS). They work well separately and/or together.
+//!   Note that minimumIntervalUs usage is not limited to lowering latency, so
+//!   feel free to use it to limit frame rate for menu, cut scenes, etc.
+//!   Note that low latency mode can be enabled, and/or minimum interval can
+//!   be set, even without using NvAPI_D3D_Sleep(). However, without it, the
+//!   sleep to achieve these features would happen at a less optimal point,
+//!   resulting in higher overall latency.
+//!   The bLowLatencyBoost will request the GPU run at max clocks even in 
+//!   scenarios where it is idle most of the frame and would normally try
+//!   to save power.  This can decrease latency in CPU-limited scenarios.
+//!   While this function can be called as often as needed, it is not
+//!   necessary nor recommended to call this too frequently (e.g. every frame),
+//!   as the settings persist for the target device.
+//!
+//! \since Release: 455
+//! \param [in] vkDevice                      The Vulkan device handle
+//! \param [in] pSetSleepModeParams           Sleep mode params.
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup oglapi
+///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 565.")
+NVAPI_INTERFACE NvAPI_Vulkan_SetSleepMode(__in HANDLE vkDevice, __in NV_VULKAN_SET_SLEEP_MODE_PARAMS *pSetSleepModeParams);
+#endif // defined(__cplusplus) && defined(_WINNT_)
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+#if defined(__cplusplus) && defined(_WINNT_)
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_Vulkan_Sleep
+//
+// !!** DEPRECATED, please use VK_NV_low_latency2 instead **!!
+//! \deprecated  Do not use this function - it is deprecated in release 565.
+//
+//!   DESCRIPTION: It is recommended to call this function at the very start of
+//!   each frame (e.g. before input sampling). If there is a need to sleep,
+//!   due to frame rate limit and/or low latency features, for example,
+//!   this call provides an entry point for the driver to sleep at the most
+//!   optimal spot to achieve the lowest latency.
+//!   It is recommended to call this function even when low latency mode is
+//!   disabled and minimum interval is 0. Other features, such as Maximum Frame
+//!   Rate setting, could be enabled in the control panel to benefit from this.
+//!   It is OK to start (or stop) using this function at any time. However,
+//!   when using this function, it must be called exactly once on each frame.
+//!   If this function is not called, after several frames, the driver would
+//!   fallback to sleep at its less optimal spot.
+//!
+//! \since Release: 455
+//! \param [in] vkDevice                      The Vulkan device handle
+//! \param [in] signalValue                   Value that will be signalled in signalDemaphoreHandle semaphore at Sleep
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup oglapi
+///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 565.")
+NVAPI_INTERFACE NvAPI_Vulkan_Sleep(__in HANDLE vkDevice, __in NvU64 signalValue);
+#endif // defined(__cplusplus) && defined(_WINNT_)
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! Used to get latency report.
+//! \ingroup oglapi
+typedef struct _NV_VULKAN_LATENCY_RESULT_PARAMS
+{
+    NvU32  version;                                       //!< (IN) Structure version
+    struct vkFrameReport {
+        NvU64 frameID;
+        NvU64 inputSampleTime;
+        NvU64 simStartTime;
+        NvU64 simEndTime;
+        NvU64 renderSubmitStartTime;
+        NvU64 renderSubmitEndTime;
+        NvU64 presentStartTime;
+        NvU64 presentEndTime;
+        NvU64 driverStartTime;
+        NvU64 driverEndTime;
+        NvU64 osRenderQueueStartTime;
+        NvU64 osRenderQueueEndTime;
+        NvU64 gpuRenderStartTime;
+        NvU64 gpuRenderEndTime;
+        NvU8  rsvd[128];
+    } frameReport[64];
+    NvU8  rsvd[32];
+} NV_VULKAN_LATENCY_RESULT_PARAMS_V1;
+
+typedef NV_VULKAN_LATENCY_RESULT_PARAMS_V1            NV_VULKAN_LATENCY_RESULT_PARAMS;
+#define NV_VULKAN_LATENCY_RESULT_PARAMS_VER1          MAKE_NVAPI_VERSION(NV_VULKAN_LATENCY_RESULT_PARAMS_V1, 1)
+#define NV_VULKAN_LATENCY_RESULT_PARAMS_VER           NV_VULKAN_LATENCY_RESULT_PARAMS_VER1
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+#if defined(__cplusplus) && defined(_WINNT_)
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_Vulkan_GetLatency
+//
+// !!** DEPRECATED, please use VK_NV_low_latency2 instead **!!
+//! \deprecated  Do not use this function - it is deprecated in release 565.
+//
+//!   DESCRIPTION: Get a latency report including the timestamps of the 
+//!   application latency markers set with NvAPI_Vulkan_SetLatencyMarker as well
+//!   as driver, OS queue and graphics hardware times.  Requires calling
+//!   NvAPI_Vulkan_SetLatencyMarker with incrementing frameID for valid results.
+//!   Rendering for at least 90 frames is recommended to properly fill out the
+//!   structure.  The newest completed frame is at the end (element 63) and
+//!   is preceeded by older frames.  If not enough frames are valid then all
+//!   frames are returned with all zeroes.
+//!
+//! \since Release: 455
+//! \param [in] vkDevice                      The Vulkan device handle
+//! \param [inout] pGetLatencyParams          The latency result structure.
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup oglapi
+///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 565.")
+NVAPI_INTERFACE NvAPI_Vulkan_GetLatency(__in HANDLE vkDevice, __inout NV_VULKAN_LATENCY_RESULT_PARAMS* pGetLatencyParams);
+#endif // defined(__cplusplus) && defined(_WINNT_)
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! Used define latency marker type
+//! \ingroup oglapi
+typedef enum
+{
+    VULKAN_SIMULATION_START        =         0,
+    VULKAN_SIMULATION_END          =         1,
+    VULKAN_RENDERSUBMIT_START      =         2,
+    VULKAN_RENDERSUBMIT_END        =         3,
+    VULKAN_PRESENT_START           =         4,
+    VULKAN_PRESENT_END             =         5,
+    VULKAN_INPUT_SAMPLE            =         6,
+    VULKAN_TRIGGER_FLASH           =         7,
+    VULKAN_PC_LATENCY_PING         =         8,
+    VULKAN_OUT_OF_BAND_RENDERSUBMIT_START =  9,
+    VULKAN_OUT_OF_BAND_RENDERSUBMIT_END   = 10,
+    VULKAN_OUT_OF_BAND_PRESENT_START      = 11,
+    VULKAN_OUT_OF_BAND_PRESENT_END        = 12,
+} NV_VULKAN_LATENCY_MARKER_TYPE;
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! Used set latency markers
+//! \ingroup oglapi
+typedef struct _NV_VULKAN_LATENCY_MARKER_PARAMS
+{
+    NvU32  version;                                       //!< (IN) Structure version
+    NvU64  frameID;
+    NV_VULKAN_LATENCY_MARKER_TYPE markerType;
+    NvU8   rsvd[64];
+} NV_VULKAN_LATENCY_MARKER_PARAMS_V1;
+
+typedef NV_VULKAN_LATENCY_MARKER_PARAMS_V1            NV_VULKAN_LATENCY_MARKER_PARAMS;
+#define NV_VULKAN_LATENCY_MARKER_PARAMS_VER1          MAKE_NVAPI_VERSION(NV_VULKAN_LATENCY_MARKER_PARAMS_V1, 1)
+#define NV_VULKAN_LATENCY_MARKER_PARAMS_VER           NV_VULKAN_LATENCY_MARKER_PARAMS_VER1
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+#if defined(__cplusplus) && defined(_WINNT_)
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_Vulkan_SetLatencyMarker
+//
+// !!** DEPRECATED, please use VK_NV_low_latency2 instead **!!
+//! \deprecated  Do not use this function - it is deprecated in release 565.
+//
+//!   DESCRIPTION: Set a latency marker to be tracked by the
+//!   NvAPI_Vulkan_GetLatency function. SIMULATION_START must be the first marker
+//!   sent in a frame, after the previous frame's Sleep call (if used).
+//!   INPUT_SAMPLE may be sent to record the moment user input was sampled and
+//!   should come between SIMULATION_START and SIMULATION_END.
+//!   RENDERSUBMIT_START should come before any Vulkan API calls are made for
+//!   the given frame and RENDERSUBMIT_END should come before calling Present.
+//!   PRESENT_START and END should wrap the Present call to inform the driver
+//!   of a present block done by the OS before the driver receives the Present.
+//!   TRIGGER_FLASH tells the driver to render its flash indicator for latency
+//!   testing, typically driven by a mouse click.
+//!   The frameID can start at an abitrary moment in the application lifetime
+//!   but must strictly increment from that point forward for consistent results.
+
+//!
+//! \since Release: 455
+//! \param [in] vkDevice                      The Vulkan device handle
+//! \param [in] pSetLatencyMarkerParams       The latency marker structure
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup oglapi
+///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 565.")
+NVAPI_INTERFACE NvAPI_Vulkan_SetLatencyMarker(__in HANDLE vkDevice, __in NV_VULKAN_LATENCY_MARKER_PARAMS* pSetLatencyMarkerParams);
+#endif // defined(__cplusplus) && defined(_WINNT_)
+
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! Used in NvAPI_Vulkan_NotifyOutOfBandVkQueue
+//! \ingroup oglapi
+typedef enum
+{
+    VULKAN_OUT_OF_BAND_QUEUE_TYPE_RENDER  = 0,
+    VULKAN_OUT_OF_BAND_QUEUE_TYPE_PRESENT = 1,
+} NV_VULKAN_OUT_OF_BAND_QUEUE_TYPE;
+
+#if defined(__cplusplus) && defined(_WINNT_)
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_Vulkan_NotifyOutOfBandVkQueue
+//
+// !!** DEPRECATED, please use VK_NV_low_latency2 instead **!!
+//! \deprecated  Do not use this function - it is deprecated in release 565.
+//
+//!   DESCRIPTION: Notifies the driver that this command queue runs out of band
+//!                from the application's frame cadence.
+//!
+//! \since Release: 520
+//! \param [in] vkDevice           The Vulkan device handle
+//! \param [in] queueHandle        The VkQueue
+//! \param [in] queueType          The type of out of band VkQueue
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \return This API can return any of the error codes enumerated in #NvAPI_Status.
+//!         If there are return error codes with specific meaning for this API, they are listed below.
+//!
+//! \ingroup oglapi
+///////////////////////////////////////////////////////////////////////////////
+__nvapi_deprecated_function("Do not use this function - it is deprecated in release 565.")
+NVAPI_INTERFACE NvAPI_Vulkan_NotifyOutOfBandVkQueue(__in HANDLE vkDevice, __in HANDLE queueHandle, __in NV_VULKAN_OUT_OF_BAND_QUEUE_TYPE queueType);
+#endif // defined(__cplusplus) && defined(_WINNT_)
 
 
 //! \addtogroup drsapi
@@ -22267,7 +24065,7 @@ typedef NVDRS_PROFILE_V1         NVDRS_PROFILE;
 //
 //!   DESCRIPTION: This API allocates memory and initializes the session.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [out]  *phSession Return pointer to the session handle.
@@ -22285,7 +24083,7 @@ NVAPI_INTERFACE NvAPI_DRS_CreateSession(NvDRSSessionHandle *phSession);
 //
 //!   DESCRIPTION: This API frees the allocation: cleanup of NvDrsSession.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in] hSession Input to the session handle.
@@ -22302,7 +24100,7 @@ NVAPI_INTERFACE NvAPI_DRS_DestroySession(NvDRSSessionHandle hSession);
 //
 //!   DESCRIPTION: This API loads and parses the settings data.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in] hSession  Input to the session handle.
@@ -22320,7 +24118,7 @@ NVAPI_INTERFACE NvAPI_DRS_LoadSettings(NvDRSSessionHandle hSession);
 //
 //!   DESCRIPTION: This API saves the settings data to the system.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in] hSession  Input to the session handle.
@@ -22337,7 +24135,7 @@ NVAPI_INTERFACE NvAPI_DRS_SaveSettings(NvDRSSessionHandle hSession);
 //
 //!   DESCRIPTION: This API loads settings from the given file path.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession Input to the session handle
@@ -22355,7 +24153,7 @@ NVAPI_INTERFACE NvAPI_DRS_LoadSettingsFromFile(NvDRSSessionHandle hSession, NvAP
 //
 //!   DESCRIPTION: This API saves settings to the given file path.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession  Input to the session handle.
@@ -22377,7 +24175,7 @@ NVAPI_INTERFACE NvAPI_DRS_SaveSettingsToFile(NvDRSSessionHandle hSession, NvAPI_
 //
 //!   DESCRIPTION: This API creates an empty profile.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession        Input to the session handle.
@@ -22397,7 +24195,7 @@ NVAPI_INTERFACE NvAPI_DRS_CreateProfile(NvDRSSessionHandle hSession, NVDRS_PROFI
 //
 //!   DESCRIPTION: This API deletes a profile or sets it back to a predefined value.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in] hSession  Input to the session handle.
@@ -22416,7 +24214,7 @@ NVAPI_INTERFACE NvAPI_DRS_DeleteProfile(NvDRSSessionHandle hSession, NvDRSProfil
 //
 //!   DESCRIPTION: This API sets the current global profile in the driver.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in] hSession                Input to the session handle.
@@ -22436,7 +24234,7 @@ NVAPI_INTERFACE NvAPI_DRS_SetCurrentGlobalProfile(NvDRSSessionHandle hSession, N
 //
 //!   DESCRIPTION: This API returns the handle to the current global profile.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   hSession     Input to the session handle.
@@ -22455,7 +24253,7 @@ NVAPI_INTERFACE NvAPI_DRS_GetCurrentGlobalProfile(NvDRSSessionHandle hSession, N
 //
 //!   DESCRIPTION: This API gets information about the given profile. User needs to specify the name of the Profile.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession       Input to the session handle.
@@ -22477,7 +24275,7 @@ NVAPI_INTERFACE NvAPI_DRS_GetProfileInfo(NvDRSSessionHandle hSession, NvDRSProfi
 //!                used to update the profile. Neither the name, number of settings or applications
 //!                or other profile information can be changed with this function. 
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession       Input to the session handle.
@@ -22498,7 +24296,7 @@ NVAPI_INTERFACE NvAPI_DRS_SetProfileInfo(NvDRSSessionHandle hSession, NvDRSProfi
 //
 //!   DESCRIPTION: This API finds a profile in the current session.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   hSession      Input to the session handle.
@@ -22519,7 +24317,7 @@ NVAPI_INTERFACE NvAPI_DRS_FindProfileByName(NvDRSSessionHandle hSession, NvAPI_U
 //
 //!   DESCRIPTION: This API enumerates through all the profiles in the session.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   hSession        Input to the session handle.
@@ -22540,7 +24338,7 @@ NVAPI_INTERFACE NvAPI_DRS_EnumProfiles(NvDRSSessionHandle hSession, NvU32 index,
 //
 //!   DESCRIPTION: This API obtains the number of profiles in the current session object.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession       Input to the session handle.
@@ -22560,7 +24358,7 @@ NVAPI_INTERFACE NvAPI_DRS_GetNumProfiles(NvDRSSessionHandle hSession, NvU32 *num
 //
 //!   DESCRIPTION: This API adds an executable name to a profile.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession       Input to the session handle.
@@ -22581,7 +24379,7 @@ NVAPI_INTERFACE NvAPI_DRS_CreateApplication(NvDRSSessionHandle hSession, NvDRSPr
 //
 //!   DESCRIPTION: This API removes an executable from a profile.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   hSession  - Input to the session handle.
@@ -22604,7 +24402,7 @@ NVAPI_INTERFACE NvAPI_DRS_DeleteApplicationEx(NvDRSSessionHandle hSession, NvDRS
 //
 //!   DESCRIPTION: This API removes an executable name from a profile.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSessionPARAMETERS   Input to the session handle.
@@ -22629,7 +24427,7 @@ NVAPI_INTERFACE NvAPI_DRS_DeleteApplication(NvDRSSessionHandle hSession, NvDRSPr
 //!                This function is better used to retrieve application information from a previous
 //!                enumeration.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   hSession       Input to the session handle.
@@ -22654,7 +24452,7 @@ NVAPI_INTERFACE NvAPI_DRS_GetApplicationInfo(NvDRSSessionHandle hSession, NvDRSP
 //
 //!   DESCRIPTION: This API enumerates all the applications in a given profile from the starting index to the maximum length.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      hSession         Input to the session handle.
@@ -22679,7 +24477,7 @@ NVAPI_INTERFACE NvAPI_DRS_EnumApplications(NvDRSSessionHandle hSession, NvDRSPro
 //!                If a fully qualified path is provided, this function will always return the profile
 //!                the driver will apply upon running the application (on the path provided).
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      hSession       Input to the hSession handle
@@ -22704,7 +24502,7 @@ NVAPI_INTERFACE NvAPI_DRS_FindApplicationByName(__in NvDRSSessionHandle hSession
 //
 //!   DESCRIPTION: This API adds/modifies a setting to a profile.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession     Input to the session handle.
@@ -22724,7 +24522,7 @@ NVAPI_INTERFACE NvAPI_DRS_SetSetting(NvDRSSessionHandle hSession, NvDRSProfileHa
 //
 //!   DESCRIPTION: This API gets information about the given setting.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   hSession   Input to the session handle.
@@ -22746,7 +24544,7 @@ NVAPI_INTERFACE NvAPI_DRS_GetSetting(NvDRSSessionHandle hSession, NvDRSProfileHa
 //
 //!   DESCRIPTION: This API enumerates all the settings of a given profile from startIndex to the maximum length.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      hSession        Input to the session handle.
@@ -22769,7 +24567,7 @@ NVAPI_INTERFACE NvAPI_DRS_EnumSettings(NvDRSSessionHandle hSession, NvDRSProfile
 //
 //!   DESCRIPTION: This API enumerates all the Ids of all the settings recognized by NVAPI.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [out]    pSettingIds     User-provided array of length *pMaxCount that NVAPI will fill with IDs.
@@ -22789,7 +24587,7 @@ NVAPI_INTERFACE NvAPI_DRS_EnumAvailableSettingIds(NvU32 *pSettingIds, NvU32 *pMa
 //
 //!   DESCRIPTION: This API enumerates all available setting values for a given setting.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]      settingId          Input settingId.
@@ -22809,7 +24607,7 @@ NVAPI_INTERFACE NvAPI_DRS_EnumAvailableSettingValues(NvU32 settingId, NvU32 *pMa
 //
 //!   DESCRIPTION: This API gets the binary ID of a setting given the setting name.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]   settingName  Input Unicode settingName.
@@ -22830,7 +24628,7 @@ NVAPI_INTERFACE NvAPI_DRS_GetSettingIdFromName(NvAPI_UnicodeString settingName, 
 //
 //!   DESCRIPTION: This API gets the setting name given the binary ID.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  settingId        Input settingId.
@@ -22851,7 +24649,7 @@ NVAPI_INTERFACE NvAPI_DRS_GetSettingNameFromId(NvU32 settingId, NvAPI_UnicodeStr
 //
 //!   DESCRIPTION: This API deletes a setting or sets it back to predefined value.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession            Input to the session handle.
@@ -22871,7 +24669,7 @@ NVAPI_INTERFACE NvAPI_DRS_DeleteProfileSetting(NvDRSSessionHandle hSession, NvDR
 //
 //!   DESCRIPTION: This API restores the whole system to predefined(default) values.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession  Input to the session handle.
@@ -22891,7 +24689,7 @@ NVAPI_INTERFACE NvAPI_DRS_RestoreAllDefaults(NvDRSSessionHandle hSession);
 //!                Any and all user specified modifications will be removed. 
 //!                If the whole profile was set by the user, the profile will be removed.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession  Input to the session handle.
@@ -22912,7 +24710,7 @@ NVAPI_INTERFACE NvAPI_DRS_RestoreProfileDefault(NvDRSSessionHandle hSession, NvD
 //
 //!   DESCRIPTION: This API restores the given profile setting to predefined(default) values.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession  Input to the session handle.
@@ -22932,7 +24730,7 @@ NVAPI_INTERFACE NvAPI_DRS_RestoreProfileDefaultSetting(NvDRSSessionHandle hSessi
 //
 //!   DESCRIPTION: Returns the handle to the current global profile.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]  hSession    Input to the session handle.
@@ -23022,7 +24820,7 @@ typedef struct
 //
 //!  This function returns information about the system's chipset.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 95
@@ -23057,7 +24855,7 @@ typedef struct
 //
 //! DESCRIPTION: This function returns the current lid and dock information.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 177
@@ -23081,7 +24879,7 @@ NVAPI_INTERFACE NvAPI_SYS_GetLidAndDockInfo(NV_LID_DOCK_PARAMS *pLidAndDock);
 //! DESCRIPTION:     This API converts a Physical GPU handle and output ID to a
 //!                  display ID.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     hPhysicalGpu   Handle to the physical GPU
@@ -23105,7 +24903,7 @@ NVAPI_INTERFACE NvAPI_SYS_GetDisplayIdFromGpuAndOutputId(NvPhysicalGpuHandle hPh
 //
 //! DESCRIPTION:     This API converts a display ID to a Physical GPU handle and output ID.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \param [in]     displayId       Display ID of display to retrieve 
@@ -23135,7 +24933,7 @@ NVAPI_INTERFACE NvAPI_SYS_GetGpuAndOutputIdFromDisplayId(NvU32 displayId, NvPhys
 //!
 //! \since Release: 313
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! PARAMETERS:      displayId(IN)     - Display ID of display to retrieve 
@@ -23207,7 +25005,7 @@ typedef NV_DISPLAY_DRIVER_INFO_V2               NV_DISPLAY_DRIVER_INFO;
 //!              Note that out of the driver types - Studio, Game Ready, RTX Production Branch, RTX New Feature Branch - only one driver type can be available in system.
 //!              If NVAPI is unable to get the information of particular driver type, we report all flags as 0 (Unknown).
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 396
@@ -23508,6 +25306,217 @@ typedef NV_GPU_CLIENT_UTILIZATION_PERIODIC_CALLBACK_SETTINGS_V1    NV_GPU_CLIENT
 ///////////////////////////////////////////////////////////////////////////////
 NVAPI_INTERFACE NvAPI_GPU_ClientRegisterForUtilizationSampleUpdates(__in NvPhysicalGpuHandle hPhysicalGpu, __in NV_GPU_CLIENT_UTILIZATION_PERIODIC_CALLBACK_SETTINGS* pCallbackSettings);
 
+
+/*!
+ * Enumeration of different RISE content types.
+ */
+typedef enum _NV_RISE_CONTENT_TYPE
+{
+    NV_RISE_CONTENT_TYPE_INVALID                  = 0,
+    NV_RISE_CONTENT_TYPE_TEXT                     = 1,
+    NV_RISE_CONTENT_TYPE_GRAPH                    = 2,
+    NV_RISE_CONTENT_TYPE_CUSTOM_BEHAVIOR          = 3,
+    NV_RISE_CONTENT_TYPE_CUSTOM_BEHAVIOR_RESULT   = 4,
+    NV_RISE_CONTENT_TYPE_INSTALLING               = 5,
+    NV_RISE_CONTENT_TYPE_PROGRESS_UPDATE          = 6,
+    NV_RISE_CONTENT_TYPE_READY                    = 7,
+    NV_RISE_CONTENT_TYPE_DOWNLOAD_REQUEST         = 8,
+    NV_RISE_CONTENT_TYPE_UPDATE_INFO              = 9,
+} NV_RISE_CONTENT_TYPE;
+
+/*!
+ * Data passed back to callback.
+ */
+typedef struct _NV_RISE_CALLBACK_DATA_V1
+{
+    /*!
+     * Super struct.
+     */
+    NV_CLIENT_CALLBACK_SETTINGS_SUPER_V1 super;
+
+    /*!
+     * RISE type of content
+     */
+    NV_RISE_CONTENT_TYPE contentType;
+
+    /*!
+     * RISE content.
+     */
+    NvAPI_String content;
+
+    /*!
+     * Is this the last in the batch?
+     */
+    NvBool completed;
+
+} NV_RISE_CALLBACK_DATA_V1;
+
+/*!
+ * Callback for RISE update callbacks.
+ */
+typedef void (__cdecl *NV_RISE_CALLBACK_V1)(NV_RISE_CALLBACK_DATA_V1 *pData);
+
+/*!
+ * Data required to register an update callback from the RISE.
+ */
+typedef struct _NV_RISE_CALLBACK_SETTINGS_V1
+{
+    /*!
+     * [in] Structure Version, must always be first.
+     */
+    NvU32 version;
+
+    /*!
+     * [in] Generic callback parameter which will be passed to the callback.
+     */
+    NV_CLIENT_CALLBACK_SETTINGS_SUPER_V1 super;
+
+    /*!
+     * [in] Callback. Pass in NULL or nullptr to indicate request to unregister.
+     */
+    NV_RISE_CALLBACK_V1 callback;
+
+    /*!
+     * Reserved, must be set to zero by client.
+     */
+    NvU8  reserved[32];
+
+} NV_RISE_CALLBACK_SETTINGS_V1;
+
+#define NV_RISE_CALLBACK_SETTINGS_VER1  MAKE_NVAPI_VERSION(NV_RISE_CALLBACK_SETTINGS_V1, 1)
+typedef NV_RISE_CALLBACK_SETTINGS_V1    NV_RISE_CALLBACK_SETTINGS;
+#define NV_RISE_CALLBACK_SETTINGS_VER   NV_RISE_CALLBACK_SETTINGS_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_RegisterRiseCallback
+//
+//! \fn NvAPI_RegisterRiseCallback()
+//! \code
+//!   DESCRIPTION: Registers a callback for RISE to invoke an interaction
+//!                back to the RISE client.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release r570
+//!
+//! \return        NVAPI_OK                          - Registration was successful
+//!                NVAPI_API_NOT_INITIALIZED         - NVAPI not initialized
+//!                NVAPI_INCOMPATIBLE_STRUCT_VERSION - Invalid structure version specified
+//!                NVAPI_ERROR                       - Unknown underlying error
+//!
+//! \endcode
+//! \ingroup nvtopps
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_RegisterRiseCallback(__in NV_RISE_CALLBACK_SETTINGS* pCallbackSettings);
+
+
+/*!
+ * Request contents sent to RISE.
+ */
+typedef struct _NV_REQUEST_RISE_SETTINGS_V1
+{
+    /*!
+     * [in] Structure Version, must always be first.
+     */
+    NvU32 version;
+
+    /*!
+     * RISE type of content
+     */
+    NV_RISE_CONTENT_TYPE contentType;
+
+    /*!
+     * RISE request content.
+     */
+    NvAPI_String content;
+
+    /*!
+     * Is the request fully sent?
+     */
+    NvBool completed;
+
+    /*!
+     * Reserved, must be set to zero by client.
+     */
+    NvU8  reserved[32];
+} NV_REQUEST_RISE_SETTINGS_V1;
+
+#define NV_REQUEST_RISE_SETTINGS_VER1  			 MAKE_NVAPI_VERSION(NV_REQUEST_RISE_SETTINGS_V1, 1)
+typedef NV_REQUEST_RISE_SETTINGS_V1    			 NV_REQUEST_RISE_SETTINGS;
+#define NV_REQUEST_RISE_SETTINGS_VER   			 NV_REQUEST_RISE_SETTINGS_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_RequestRise
+//
+//! \fn NvAPI_RequestRise()
+//! \code
+//!   DESCRIPTION: Request RISE assistance. Callback must be registered via
+//                 NvAPI_RegisterRiseCallback.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release r570
+//!
+//! \return        NVAPI_OK                          - Registration was successful
+//!                NVAPI_API_NOT_INITIALIZED         - NVAPI not initialized
+//!                NVAPI_INCOMPATIBLE_STRUCT_VERSION - Invalid structure version specified
+//!                NVAPI_INVALID_CONFIGURATION       - Invalid software environment configuration
+//!                NVAPI_ERROR                       - Unknown underlying error
+//!
+//! \endcode
+//! \ingroup nvtopps
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_RequestRise(__in NV_REQUEST_RISE_SETTINGS* requestContent);
+
+
+/*!
+ * Request contents sent to RISE.
+ */
+typedef struct _NV_UNINSTALL_RISE_SETTINGS_V1
+{
+    /*!
+     * [in] Structure Version, must always be first.
+     */
+    NvU32 version;
+
+    /*!
+     * Reserved, must be set to zero by client.
+     */
+    NvU8  reserved[32];
+} NV_UNINSTALL_RISE_SETTINGS_V1;
+
+#define NV_UNINSTALL_RISE_SETTINGS_VER1  			 MAKE_NVAPI_VERSION(NV_UNINSTALL_RISE_SETTINGS_V1, 1)
+typedef NV_UNINSTALL_RISE_SETTINGS_V1    			 NV_UNINSTALL_RISE_SETTINGS;
+#define NV_UNINSTALL_RISE_SETTINGS_VER   			 NV_UNINSTALL_RISE_SETTINGS_VER1
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_UninstallRise
+//
+//! \fn NvAPI_UninstallRise()
+//! \code
+//!   DESCRIPTION: Uninstalls RISE from the machine. Fails if any clients are
+//                 registered via NvAPI_RegisterRiseCallback.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//!
+//! \since Release r570
+//!
+//! \return        NVAPI_OK                          - Registration was successful
+//!                NVAPI_API_NOT_INITIALIZED         - NVAPI not initialized
+//!                NVAPI_INCOMPATIBLE_STRUCT_VERSION - Invalid structure version specified
+//!                NVAPI_INVALID_CONFIGURATION       - Invalid software environment configuration
+//!                NVAPI_ERROR                       - Unknown underlying error
+//!
+//! \endcode
+//! \ingroup nvtopps
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_UninstallRise(__in NV_UNINSTALL_RISE_SETTINGS* requestContent);
 
 
 

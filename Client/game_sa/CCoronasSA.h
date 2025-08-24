@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCoronasSA.cpp
  *  PURPOSE:     Header file for corona entity manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -39,7 +39,7 @@ public:
     CRegisteredCorona* CreateCorona(DWORD Identifier, CVector* position);
     CRegisteredCorona* FindFreeCorona();
     CRegisteredCorona* FindCorona(DWORD Identifier);
-    RwTexture*         GetTexture(eCoronaType type);
+    RwTexture*         GetTexture(CoronaType type);
 
     void DisableSunAndMoon(bool bDisabled);
 

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaPedDefs.cpp
  *  PURPOSE:     Lua ped definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,7 +24,7 @@ void CLuaPedDefs::LoadFunctions()
 
         // Ped get functions
         {"getPedWeaponSlot", GetPedWeaponSlot},
-        {"getPedArmor", GetPedArmor},
+        {"getPedArmor", ArgumentParserWarn<false, GetPedArmor>},
         {"getPedRotation", GetPedRotation},
         {"isPedChoking", IsPedChoking},
         {"isPedDead", IsPedDead},
@@ -51,7 +51,7 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedReloadingWeapon", ArgumentParser<IsPedReloadingWeapon>},
 
         // Ped set functions
-        {"setPedArmor", SetPedArmor},
+        {"setPedArmor", ArgumentParserWarn<false, SetPedArmor>},
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"killPed", KillPed},
         {"setPedRotation", SetPedRotation},
@@ -638,27 +638,12 @@ int CLuaPedDefs::GetPedTotalAmmo(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedArmor(lua_State* luaVM)
+float CLuaPedDefs::GetPedArmor(CPed* const ped)
 {
-    CPed* pPed;
+    float armor;
+    CStaticFunctionDefinitions::GetPedArmor(ped, armor);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        float fArmor;
-        if (CStaticFunctionDefinitions::GetPedArmor(pPed, fArmor))
-        {
-            lua_pushnumber(luaVM, fArmor);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return armor;
 }
 
 int CLuaPedDefs::GetPedOccupiedVehicle(lua_State* luaVM)
@@ -1018,30 +1003,15 @@ int CLuaPedDefs::GetPedContactElement(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
+bool CLuaPedDefs::SetPedArmor(CPed* const ped, const float armor)
 {
-    CElement* pElement;
-    float     fArmor;
+    if (armor < 0.0f)
+        throw std::invalid_argument("Armor must be greater than or equal to 0");
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(fArmor);
+    if (armor > 100.0f)
+        throw std::invalid_argument("Armor must be less than or equal to 100");
 
-    if (!argStream.HasErrors())
-    {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-        if (CStaticFunctionDefinitions::SetPedArmor(pElement, fArmor))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetPedArmor(ped, armor);
 }
 
 int CLuaPedDefs::KillPed(lua_State* luaVM)

@@ -26,7 +26,7 @@
 #endif
 
 
-// see Include/shared/winapifamily.h in the Windows Kit
+/* see Include/shared/winapifamily.h in the Windows Kit */
 #if defined(WINAPI_FAMILY_PARTITION) && (!(defined(IOWIN32_USING_WINRT_API)))
 
 #if !defined(WINAPI_FAMILY_ONE_PARTITION)

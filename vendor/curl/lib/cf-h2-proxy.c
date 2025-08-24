@@ -32,7 +32,7 @@
 #include "connect.h"
 #include "curl_trc.h"
 #include "bufq.h"
-#include "dynbuf.h"
+#include "curlx/dynbuf.h"
 #include "dynhds.h"
 #include "http1.h"
 #include "http2.h"
@@ -619,7 +619,7 @@ static int proxy_h2_fr_print(const nghttp2_frame *frame,
                        frame->hd.flags & NGHTTP2_FLAG_ACK);
     case NGHTTP2_GOAWAY: {
       char scratch[128];
-      size_t s_len = sizeof(scratch)/sizeof(scratch[0]);
+      size_t s_len = CURL_ARRAYSIZE(scratch);
       size_t len = (frame->goaway.opaque_data_len < s_len) ?
         frame->goaway.opaque_data_len : s_len-1;
       if(len)
@@ -865,7 +865,9 @@ static int tunnel_recv_callback(nghttp2_session *session, uint8_t flags,
   if(nwritten < 0) {
     if(result != CURLE_AGAIN)
       return NGHTTP2_ERR_CALLBACK_FAILURE;
+#ifdef DEBUGBUILD
     nwritten = 0;
+#endif
   }
   DEBUGASSERT((size_t)nwritten == len);
   return 0;
@@ -1088,7 +1090,7 @@ out:
 
 static CURLcode cf_h2_proxy_connect(struct Curl_cfilter *cf,
                                     struct Curl_easy *data,
-                                    bool blocking, bool *done)
+                                    bool *done)
 {
   struct cf_h2_proxy_ctx *ctx = cf->ctx;
   CURLcode result = CURLE_OK;
@@ -1103,7 +1105,7 @@ static CURLcode cf_h2_proxy_connect(struct Curl_cfilter *cf,
 
   /* Connect the lower filters first */
   if(!cf->next->connected) {
-    result = Curl_conn_cf_connect(cf->next, data, blocking, done);
+    result = Curl_conn_cf_connect(cf->next, data, done);
     if(result || !*done)
       return result;
   }
@@ -1406,7 +1408,7 @@ static ssize_t cf_h2_proxy_send(struct Curl_cfilter *cf,
   ssize_t nwritten;
   CURLcode result;
 
-  (void)eos; /* TODO, maybe useful for blocks? */
+  (void)eos;
   if(ctx->tunnel.state != H2_TUNNEL_ESTABLISHED) {
     *err = CURLE_SEND_ERROR;
     return -1;

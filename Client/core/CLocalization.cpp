@@ -5,7 +5,7 @@
  *  FILE:        core/CLanguage.cpp
  *  PURPOSE:     Automatically load required language and localize MTA text according to locale
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,6 +14,14 @@
 #define MTA_LOCALE_TEXTDOMAIN       "client"
 // TRANSLATORS: Replace with your language native name
 #define NATIVE_LANGUAGE_NAME _td("English")
+
+struct NativeLanguageName
+{
+    std::string locale;
+    std::string name;
+} g_nativeLanguageNames[] = {
+    #include "languages.generated.h"
+};
 
 CLocalization::CLocalization(const SString& strLocale, const SString& strLocalePath)
 {
@@ -95,12 +103,23 @@ CLanguage* CLocalization::GetLanguage(SString strLocale)
 SString CLocalization::GetLanguageNativeName(SString strLocale)
 {
     strLocale = ValidateLocale(strLocale);
+
+    // Try to find the native language name in our sorted compile-time array first, using binary search.
+    auto begin = g_nativeLanguageNames;
+    auto end = g_nativeLanguageNames + _countof(g_nativeLanguageNames);
+    auto iter = std::lower_bound(begin, end, strLocale, [](const NativeLanguageName& a, const std::string& b) { return a.locale < b; });
+
+    if (iter != end && iter->locale == strLocale)
+        return iter->name;
+
+    // If not found, we fall back to the loading the language file and using the name from there.
     SString strNativeName = GetLanguage(strLocale)->Translate(NATIVE_LANGUAGE_NAME);
     if (strNativeName == "English" && strLocale != "en_US")
     {
         // If native name not available, use English version
         strNativeName = GetLanguage(strLocale)->GetName();
     }
+
     return strNativeName;
 }
 

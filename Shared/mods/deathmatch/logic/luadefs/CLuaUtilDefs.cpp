@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Shared/mods/logic/luadefs/CLuaUtilDefs.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -227,7 +227,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
             lua_pushstring(luaVM, szToken);
             lua_settable(luaVM, -3);
 
-            szToken = strtok(NULL, strDelimiter);
+            szToken = strtok(nullptr, strDelimiter.c_str());
         }
 
         // Delete the text

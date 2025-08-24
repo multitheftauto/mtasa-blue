@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPedSync.cpp
  *  PURPOSE:     Ped entity synchronization class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -82,7 +82,7 @@ void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist)
 
 void CPedSync::UpdateAllSyncer()
 {
-    auto currentTick = GetTickCount64_();
+    auto currentTimestamp = GetTimestamp();
 
     // Update all the ped's sync states
     for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); iter++)
@@ -91,7 +91,7 @@ void CPedSync::UpdateAllSyncer()
         const SPlayerAnimData& animData = (*iter)->GetAnimationData();
         if (animData.IsAnimating())
         {
-            float deltaTime = currentTick - animData.startedTick;
+            float deltaTime = static_cast<float>(currentTimestamp - animData.startTime);
             if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
                 (*iter)->SetAnimationData({});
         }
@@ -276,6 +276,9 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
 
         if (Data.ucFlags & 0x10)
             pPed->SetArmor(Data.fArmor);
+
+        if (Data.flags2 & 0x01)
+            pPed->SetCameraRotation(Data.cameraRotation);
 
         if (Data.ucFlags & 0x20)
             pPed->SetOnFire(Data.bOnFire);

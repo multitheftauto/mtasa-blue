@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CObjectRespawner.cpp
  *  PURPOSE:     Manager for objects to be respawned
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

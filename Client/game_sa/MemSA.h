@@ -5,7 +5,7 @@
  *  FILE:        game_sa/MemSA.h
  *  PURPOSE:     C memory functions in SA
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

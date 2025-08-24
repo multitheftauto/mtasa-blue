@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResourceChecker.h
  *  PURPOSE:     Resource file content checker/validator/upgrader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -65,7 +65,6 @@ protected:
                                          bool bClientScript);
     void CheckLuaSourceForIssues(std::string strLuaSource, const std::string& strFileName, const std::string& strResourceName, bool bClientScript,
                                  bool bCompiledScript, ECheckerModeType checkerMode, std::string* pstrOutResult = NULL);
-    long FindLuaIdentifier(const char* szLuaSource, long* plOutLength, long* plLineNumber);
     bool UpgradeLuaFunctionName(const std::string& strFunctionName, bool bClientScript, std::string& strOutUpgraded);
     void IssueLuaFunctionNameWarnings(const std::string& strFunctionName, const std::string& strFileName, const std::string& strResourceName,
                                       bool bClientScript, unsigned long ulLineNumber);

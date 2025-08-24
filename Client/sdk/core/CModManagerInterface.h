@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/core/CModManagerInterface.h
  *  PURPOSE:     Game mod manager interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -20,12 +20,11 @@ class CClientBase;
 class CModManagerInterface
 {
 public:
-    virtual void RequestLoad(const char* szModName, const char* szArguments) = 0;
-    virtual void RequestLoadDefault(const char* szArguments) = 0;
+    virtual void RequestLoad(const char* arguments) = 0;
     virtual void RequestUnload() = 0;
 
-    virtual bool         IsLoaded() = 0;
-    virtual CClientBase* GetCurrentMod() = 0;
+    virtual bool         IsLoaded() const = 0;
+    virtual CClientBase* GetClient() = 0;
 
     virtual bool TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const = 0;
 

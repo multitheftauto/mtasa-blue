@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CMonsterTruckSA.cpp
  *  PURPOSE:     Monster truck vehicle entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

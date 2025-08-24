@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CHudSA.h
  *  PURPOSE:     Header file for HUD display class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -46,10 +46,14 @@
 
 #define FUNC_CStats_GetFatAndMuscleModifier 0x559AF0
 #define FUNC_CSprite2d_DrawBarChart         0x728640
-#define FUNC_CSprie2d_Draw                  0x728350
+#define FUNC_CSprite2d_Draw                  0x728350
 #define FUNC_CSprite_RenderOneXLUSprite     0x70D000
 
+#define FUNC_CRadar_DrawMap         0x586B00
+#define FUNC_CRadar_DrawBlips       0x588050
+
 #define CODE_ShowMoney              0x58F47D
+#define CODE_ShowRadarAltimeter     0x58A5A6
 
 #define VAR_CTheScripts_bDrawCrossHair 0xA44490
 #define VAR_RSGlobal                   0xC17040

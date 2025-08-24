@@ -5,7 +5,7 @@
  *  FILE:        sdk/xml/CXMLAttributes.h
  *  PURPOSE:     XML attributes container interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

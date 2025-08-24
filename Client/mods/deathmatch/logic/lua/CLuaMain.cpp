@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaMain.cpp
  *  PURPOSE:     Lua main
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -220,7 +220,7 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
     uint        uiSize;
     if (!g_pNet->DeobfuscateScript(cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename))
     {
-        SString strMessage("%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename);
+        SString strMessage("%s is invalid. Please re-compile at https://luac.multitheftauto.com/", *strNiceFilename);
         g_pClientGame->GetScriptDebugging()->LogError(m_luaVM, "Loading script failed: %s", *strMessage);
         g_pClientGame->TellServerSomethingImportant(1003, SString("CLIENT SCRIPT ERROR: %s", *strMessage));
         return false;

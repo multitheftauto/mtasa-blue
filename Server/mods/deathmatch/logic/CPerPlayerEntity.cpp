@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPerPlayerEntity.cpp
  *  PURPOSE:     Per-player entity linking class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -240,24 +240,34 @@ void CPerPlayerEntity::DestroyEntity(CPlayer* pPlayer)
 void CPerPlayerEntity::BroadcastOnlyVisible(const CPacket& Packet)
 {
     // Are we synced? (if not we're not visible to anybody)
-    if (m_bIsSynced)
+    if (!m_bIsSynced)
+        return;
+
+    CPlayerManager* playerManager = g_pGame->GetPlayerManager();
+    CSendList       sendList;
+
+    for (std::set<CPlayer*>::iterator iter = m_Players.begin(); iter != m_Players.end(); /*manual increment*/)
     {
-        CPlayerManager* pPlayerManager = g_pGame->GetPlayerManager();
-        for (std::set<CPlayer*>::iterator iter = m_Players.begin(); iter != m_Players.end();)
+        CPlayer* player = *iter;
+
+        if (!playerManager->Exists(player))
         {
-            if (!pPlayerManager->Exists(*iter))
-            {
-                // Why does this happen?
-                // CLogger::ErrorPrintf( "CPerPlayerEntity removed invalid player from list: %08x", *iter );
-                m_Players.erase(iter++);
-            }
-            else
-                ++iter;
+            // Why does this happen?
+            // CLogger::ErrorPrintf("CPerPlayerEntity removed invalid player from list: %08x", player);
+            iter = m_Players.erase(iter);
+        }
+        else
+        {
+            ++iter;
+
+            if (player->IsLeavingServer())
+                continue;
         }
 
-        // Send it to all players we're visible to
-        CPlayerManager::Broadcast(Packet, m_Players);
+        sendList.push_back(player);
     }
+
+    CPlayerManager::Broadcast(Packet, sendList);
 }
 
 void CPerPlayerEntity::RemoveIdenticalEntries(std::set<CPlayer*>& List1, std::set<CPlayer*>& List2)

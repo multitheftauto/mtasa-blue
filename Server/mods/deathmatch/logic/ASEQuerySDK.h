@@ -1,6 +1,6 @@
 /*
 ASE Query & Reporting SDK           Copyright (C) 2003 UDP Soft Ltd
-http://www.udpsoft.com/eye/         All Rights Reserved
+https://www.udpsoft.com/eye/         All Rights Reserved
 
 Enables reporting to the ASE master server and responding to server
 browser queries.

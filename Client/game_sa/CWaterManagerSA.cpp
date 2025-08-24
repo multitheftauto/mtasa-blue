@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWaterManagerSA.cpp
  *  PURPOSE:     Control the lakes and seas
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -523,7 +523,7 @@ void CWaterManagerSA::GetZonesContaining(const CVector& v1, const CVector& v2, c
     }
 }
 
-// Uses http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
+// Uses https://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
 void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVector& endPos, std::vector<CWaterZoneSA*>& vecOut)
 {
     vecOut.clear();

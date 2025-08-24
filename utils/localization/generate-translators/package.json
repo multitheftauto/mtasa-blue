@@ -1,0 +1,24 @@
+{
+  "name": "@multitheftauto/generate-translators",
+  "version": "1.0.0",
+  "author": "Multi Theft Auto",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "compile": "npx tsc",
+    "dev": "npx tsc -w",
+    "ci": "npx tsc && node dist/index.js"
+  },
+  "dependencies": {
+    "@crowdin/crowdin-api-client": "^1.41.2",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "@types/yargs": "^17.0.33",
+    "typescript": "^5.8.2"
+  }
+}

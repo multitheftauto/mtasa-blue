@@ -51,12 +51,12 @@ Var ServerExePath
 Var UninstallExePath
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
-!define GUID "{119D0ADB-56AF-4C85-9037-26564C0ACD57}"
+!define GUID "{8A7FC5C7-0023-4CD7-B1D6-89073CFD838F}"
 
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "6"
+    !define MINOR_VER "7"
     !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
@@ -202,9 +202,9 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 
 ;@INSERT_TRANSLATIONS@
 
-LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
+LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
+LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
+LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access may be requested for Vista and up]\n\n\
@@ -674,7 +674,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libGLESv2.dll"
         File "${FILES_ROOT}\mta\vk_swiftshader.dll"
         File "${FILES_ROOT}\mta\vulkan-1.dll"
-        File "${FILES_ROOT}\mta\snapshot_blob.bin"
         File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
 
         File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
@@ -2517,7 +2516,7 @@ Function TryToSendInfo
         StrCpy $NetDone 1
     ${Else}
         # Check if anything else is contactable
-        StrCpy $0 "http://www.google.com/"
+        StrCpy $0 "https://www.google.com/"
         StrCpy $1 1000
         Call DoSendInfo
         ${If} $0 == 1

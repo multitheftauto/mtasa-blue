@@ -1,36 +1,29 @@
-/************************************************************************************************************************************\
-|*                                                                                                                                    *|
-|*     Copyright © 2012 NVIDIA Corporation.  All rights reserved.                                                                     *|
-|*                                                                                                                                    *|
-|*  NOTICE TO USER:                                                                                                                   *|
-|*                                                                                                                                    *|
-|*  This software is subject to NVIDIA ownership rights under U.S. and international Copyright laws.                                  *|
-|*                                                                                                                                    *|
-|*  This software and the information contained herein are PROPRIETARY and CONFIDENTIAL to NVIDIA                                     *|
-|*  and are being provided solely under the terms and conditions of an NVIDIA software license agreement.                             *|
-|*  Otherwise, you have no rights to use or access this software in any manner.                                                       *|
-|*                                                                                                                                    *|
-|*  If not covered by the applicable NVIDIA software license agreement:                                                               *|
-|*  NVIDIA MAKES NO REPRESENTATION ABOUT THE SUITABILITY OF THIS SOFTWARE FOR ANY PURPOSE.                                            *|
-|*  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY OF ANY KIND.                                                           *|
-|*  NVIDIA DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,                                                                     *|
-|*  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.                       *|
-|*  IN NO EVENT SHALL NVIDIA BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,                               *|
-|*  OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  WHETHER IN AN ACTION OF CONTRACT,                         *|
-|*  NEGLIGENCE OR OTHER TORTIOUS ACTION,  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOURCE CODE.            *|
-|*                                                                                                                                    *|
-|*  U.S. Government End Users.                                                                                                        *|
-|*  This software is a "commercial item" as that term is defined at 48 C.F.R. 2.101 (OCT 1995),                                       *|
-|*  consisting  of "commercial computer  software"  and "commercial computer software documentation"                                  *|
-|*  as such terms are  used in 48 C.F.R. 12.212 (SEPT 1995) and is provided to the U.S. Government only as a commercial end item.     *|
-|*  Consistent with 48 C.F.R.12.212 and 48 C.F.R. 227.7202-1 through 227.7202-4 (JUNE 1995),                                          *|
-|*  all U.S. Government End Users acquire the software with only those rights set forth herein.                                       *|
-|*                                                                                                                                    *|
-|*  Any use of this software in individual and commercial software must include,                                                      *|
-|*  in the user documentation and internal comments to the code,                                                                      *|
-|*  the above Disclaimer (as applicable) and U.S. Government End Users Notice.                                                        *|
-|*                                                                                                                                    *|
- \************************************************************************************************************************************/
+/*********************************************************************************************************\
+|*                                                                                                        *|
+|* SPDX-FileCopyrightText: Copyright (c) 2019-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.  *|
+|* SPDX-License-Identifier: MIT                                                                           *|
+|*                                                                                                        *|
+|* Permission is hereby granted, free of charge, to any person obtaining a                                *|
+|* copy of this software and associated documentation files (the "Software"),                             *|
+|* to deal in the Software without restriction, including without limitation                              *|
+|* the rights to use, copy, modify, merge, publish, distribute, sublicense,                               *|
+|* and/or sell copies of the Software, and to permit persons to whom the                                  *|
+|* Software is furnished to do so, subject to the following conditions:                                   *|
+|*                                                                                                        *|
+|* The above copyright notice and this permission notice shall be included in                             *|
+|* all copies or substantial portions of the Software.                                                    *|
+|*                                                                                                        *|
+|* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                             *|
+|* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                               *|
+|* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL                               *|
+|* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                             *|
+|* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING                                *|
+|* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER                                    *|
+|* DEALINGS IN THE SOFTWARE.                                                                              *|
+|*                                                                                                        *|
+|*                                                                                                        *|
+\*********************************************************************************************************/
+
 #pragma once
 #include"nvapi_lite_salstart.h"
 #pragma pack(push,8)
@@ -53,6 +46,12 @@ extern "C" {
 #endif
 #endif
 
+#define NV_U8_MAX       (+255U)
+#define NV_U16_MAX      (+65535U)
+#define NV_S32_MAX      (+2147483647)
+#define NV_U32_MIN      (0U)
+#define NV_U32_MAX      (+4294967295U)
+#define NV_U64_MAX      (+18446744073709551615ULL)
 
 /* 64-bit types for compilers that support them, plus some obsolete variants */
 #if defined(__GNUC__) || defined(__arm) || defined(__IAR_SYSTEMS_ICC__) || defined(__ghs__) || defined(_WIN64)
@@ -63,6 +62,16 @@ typedef unsigned __int64   NvU64; /* 0 to 18446744073709551615  */
 typedef __int64            NvS64; /* -9223372036854775808 to 9223372036854775807  */
 #endif
 
+#ifndef NVAPI_USE_STDINT
+#define NVAPI_USE_STDINT 0
+#endif
+
+#if NVAPI_USE_STDINT
+typedef uint32_t           NvV32; /* "void": enumerated or multiple fields   */
+typedef uint32_t           NvU32; /* 0 to 4294967295                         */
+typedef  int32_t           NvS32; /* -2147483648 to 2147483647               */
+
+#else
 // mac os 32-bit still needs this
 #if (defined(macintosh) || defined(__APPLE__)) && !defined(__LP64__)
 typedef signed long        NvS32; /* -2147483648 to 2147483647  */   
@@ -70,16 +79,19 @@ typedef signed long        NvS32; /* -2147483648 to 2147483647  */
 typedef signed int         NvS32; /* -2147483648 to 2147483647 */  
 #endif
 
-#if !(NVOS_IS_UNIX ||  (defined(__unix)))
+#if !((defined(NV_UNIX)) ||  (defined(__unix)))
 // mac os 32-bit still needs this
 #if ( (defined(macintosh) && defined(__LP64__) && (__NVAPI_RESERVED0__)) || \
       (!defined(macintosh) && defined(__NVAPI_RESERVED0__)) ) 
+typedef unsigned int       NvU32; /* 0 to 4294967295                         */
+#elif defined(__clang__)
 typedef unsigned int       NvU32; /* 0 to 4294967295                         */
 #else
 typedef unsigned long      NvU32; /* 0 to 4294967295                         */
 #endif
 #else
 typedef unsigned int       NvU32; /* 0 to 4294967295                         */
+#endif
 #endif
 
 typedef unsigned long    temp_NvU32; /* 0 to 4294967295                         */
@@ -99,6 +111,7 @@ typedef double           NvF64;
  */
 #define NvF32TONvU32(_pData) *(NvU32 *)(_pData)
 
+#define NVAPI_SDK_VERSION 58087
 /* Boolean type */
 typedef NvU8 NvBool;
 #define NV_TRUE           ((NvBool)(0 == 0))
@@ -418,7 +431,7 @@ typedef enum _NvAPI_Status
 //
 //!   DESCRIPTION: This API returns display driver version and driver-branch string.
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //! 
 //! \param [out]  pDriverVersion         Contains the driver version after successful return.
@@ -502,7 +515,7 @@ typedef NV_DISPLAY_DRIVER_MEMORY_INFO_V3 NV_DISPLAY_DRIVER_MEMORY_INFO;
 //!                If the GPU is in TCC Mode, only dedicatedVideoMemory will be returned in pMemoryInfo (NV_DISPLAY_DRIVER_MEMORY_INFO).
 //!
 //! \deprecated  Do not use this function - it is deprecated in release 520. Instead, use NvAPI_GPU_GetMemoryInfoEx.
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! TCC_SUPPORTED
@@ -535,7 +548,7 @@ typedef struct
                                                //!< Typically used with integrated GPUs that do not have dedicated video memory.
     NvU64   sharedSystemMemory;                //!< Size(in bytes) of shared system memory that driver is allowed to commit for surfaces across all allocations.
                                                //!< On discrete GPUs, it is used to utilize system memory for various operations. It does not need to be reserved during boot.
-                                               //!< It may be used by both GPU and CPU, and has an “on-demand” type of usage.
+                                               //!< It may be used by both GPU and CPU, and has an "on-demand" type of usage.
     NvU64   curAvailableDedicatedVideoMemory;  //!< Size(in bytes) of the current available physical framebuffer for allocating video memory surfaces.
     NvU64   dedicatedVideoMemoryEvictionsSize; //!< Size(in bytes) of the total size of memory released as a result of the evictions.
     NvU64   dedicatedVideoMemoryEvictionCount; //!< Indicates the number of eviction events that caused an allocation to be removed from dedicated video memory to free GPU
@@ -604,7 +617,7 @@ NVAPI_INTERFACE NvAPI_GPU_GetMemoryInfoEx(NvPhysicalGpuHandle hPhysicalGpu, NV_G
 //!
 //!       For GPU handles in TCC MODE please use NvAPI_EnumTCCPhysicalGPUs()
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \par Introduced in
@@ -635,7 +648,7 @@ static const NVDX_ObjectHandle NVDX_OBJECT_NONE = 0;
 //!                         we want the NvAPI handle
 //! \param [out]  pHandle   A handle to the resource
 //!
-//! SUPPORTED OS:  Windows 7 and higher
+//! SUPPORTED OS:  Windows 10 and higher
 //!
 //!
 //! \since Release: 185

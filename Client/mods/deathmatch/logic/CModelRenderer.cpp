@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CModelRenderer.cpp
  *  PURPOSE:     3D models renderer
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

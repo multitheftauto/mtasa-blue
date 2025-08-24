@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CElement.cpp
  *  PURPOSE:     Base entity (element) class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1019,7 +1019,8 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
     }
 
     // Call it on all our children
-    for (CElement* pElement : *GetChildrenListSnapshot())
+    CElementListSnapshotRef childrenList = GetChildrenListSnapshot();
+	for (CElement* pElement : *childrenList)
     {
         if (!pElement->IsBeingDeleted())
         {

@@ -16,13 +16,11 @@ class CClientTextDisplay;
 #include "CClientDisplayManager.h"
 #include <gui/CGUI.h>
 
-class CClientTextDisplay : public CClientDisplay
+class CClientTextDisplay final : public CClientDisplay
 {
-    friend class CClientDisplayManager;
-
 public:
-    CClientTextDisplay(CClientDisplayManager* pDisplayManager, int ID = 0xFFFFFFFF);
-    ~CClientTextDisplay();
+    CClientTextDisplay(int ID = 0xFFFFFFFF);
+    ~CClientTextDisplay() = default;
 
     eDisplayType GetType() { return DISPLAY_TEXT; }
 
@@ -34,24 +32,24 @@ public:
     void SetColorAlpha(unsigned char ucAlpha);
     void SetShadowAlpha(unsigned char ucShadowAlpha);
 
-    float GetScale() { return m_fScale; };
+    float GetScale() const { return m_fScale; };
     void  SetScale(float fScale);
 
-    unsigned long GetFormat() { return m_ulFormat; };
+    unsigned long GetFormat() const { return m_ulFormat; };
     void          SetFormat(unsigned long ulFormat);
 
     void SetVisible(bool bVisible);
 
     void Render();
 
-    static void SetGlobalScale(float fScale) { m_fGlobalScale = fScale; }
+    static void SetGlobalScale(float fScale) { m_fGlobalScale = fScale; };
 
 private:
     SString m_strCaption;
     float   m_fScale;
 
     unsigned long m_ulFormat;
-    unsigned char m_ucShadowAlpha;
+    unsigned char m_ucShadowAlpha{};
 
     static float m_fGlobalScale;
 };

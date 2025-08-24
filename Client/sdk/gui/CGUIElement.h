@@ -5,7 +5,7 @@
  *  FILE:        sdk/gui/CGUIElement.h
  *  PURPOSE:     Base element (widget) interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -383,6 +383,14 @@ LUA_API const char *lua_tolstring (lua_State *L, int idx, size_t *len) {
   return svalue(o);
 }
 
+LUA_API unsigned (lua_tostringhash) (lua_State *L, int idx) {
+    StkId o = index2adr(L, idx);
+    if (!ttisstring(o))
+        return NULL;
+
+    return tsvalue(o)->hash;
+}
+
 
 LUA_API size_t lua_objlen (lua_State *L, int idx) {
   StkId o = index2adr(L, idx);

@@ -144,7 +144,7 @@ static inline spx_word16_t spx_sqrt(spx_word32_t x)
    int k;
    spx_word32_t rt;
    k = spx_ilog4(x)-6;
-   x = VSHR32(x, (k<<1));
+   x = VSHR32(x, (int)((unsigned)k<<1));
    rt = ADD16(C0, MULT16_16_Q14(x, ADD16(C1, MULT16_16_Q14(x, ADD16(C2, MULT16_16_Q14(x, (C3)))))));
    rt = VSHR32(rt,7-k);
    return rt;

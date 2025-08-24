@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CBuildingSA.h
  *  PURPOSE:     Header file for game building class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -27,4 +27,8 @@ public:
     CBuildingSAInterface* GetBuildingInterface() { return static_cast<CBuildingSAInterface*>(GetInterface()); };
 
     void SetLod(CBuilding* pLod) override;
+
+    void AllocateMatrix();
+    void ReallocateMatrix();
+    void RemoveAllocatedMatrix();
 };

@@ -22,6 +22,7 @@
 #include <freetype/internal/ftobjs.h>
 #include <freetype/ftmodapi.h>
 
+#include "ft-hb.h"
 
 FT_BEGIN_HEADER
 
@@ -39,6 +40,11 @@ FT_BEGIN_HEADER
     AF_Script     default_script;
     FT_Bool       no_stem_darkening;
     FT_Int        darken_params[8];
+
+#if defined( FT_CONFIG_OPTION_USE_HARFBUZZ )         && \
+    defined( FT_CONFIG_OPTION_USE_HARFBUZZ_DYNAMIC )
+    ft_hb_funcs_t*  hb_funcs;
+#endif
 
   } AF_ModuleRec, *AF_Module;
 

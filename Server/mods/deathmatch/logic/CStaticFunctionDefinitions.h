@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.h
  *  PURPOSE:     Lua static function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -130,8 +130,8 @@ public:
     static bool               GetPlayerNametagColor(CPlayer* pPlayer, unsigned char& ucR, unsigned char& ucG, unsigned char& ucB);
     static bool               IsPlayerNametagShowing(CPlayer* pPlayer, bool& bShowing);
     static const std::string& GetPlayerSerial(CPlayer* pPlayer, uint uiIndex);
-    static const std::string& GetPlayerUserName(CPlayer* pPlayer);
-    static const std::string& GetPlayerCommunityID(CPlayer* pPlayer);
+    static std::string        GetPlayerUserName(CPlayer* pPlayer);
+    static std::string        GetPlayerCommunityID(CPlayer* pPlayer);
     static bool               GetPlayerBlurLevel(CPlayer* pPlayer, unsigned char& ucLevel);
     static bool               GetPlayerName(CElement* pElement, SString& strOutName);
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
@@ -163,7 +163,7 @@ public:
 
     // Ped get funcs
     static CPed*     CreatePed(CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true);
-    static bool      GetPedArmor(CPed* pPed, float& fArmor);
+    static bool      GetPedArmor(CPed* const ped, float& armor);
     static bool      GetPedRotation(CPed* pPed, float& fRotation);
     static bool      IsPedDead(CPed* pPed, bool& bDead);
     static bool      IsPedDucked(CPed* pPed, bool& bDucked);
@@ -193,7 +193,7 @@ public:
     static bool      GetOriginalWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable);
 
     // Ped set funcs
-    static bool SetPedArmor(CElement* pElement, float fArmor);
+    static bool SetPedArmor(CElement* pElement, float armor);
     static bool KillPed(CElement* pElement, CElement* pKiller = NULL, unsigned char ucKillerWeapon = 0xFF, unsigned char ucBodyPart = 0xFF,
                         bool bStealth = false);
     static bool SetPedRotation(CElement* pElement, float fRotation, bool bNewWay);
@@ -705,6 +705,7 @@ public:
     // Account set funcs
     static CAccount* AddAccount(const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError);
     static bool      RemoveAccount(CAccount* pAccount);
+    static bool      SetAccountSerial(CAccount* account, const std::string& serial) noexcept;
     static bool      SetAccountName(CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError);
     static bool      SetAccountPassword(CAccount* pAccount, SString szPassword, CAccountPassword::EAccountPasswordType ePasswordType);
     static bool      SetAccountData(CAccount* pAccount, const char* szKey, CLuaArgument* pArgument);

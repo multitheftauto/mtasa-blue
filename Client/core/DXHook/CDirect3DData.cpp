@@ -5,7 +5,7 @@
  *  FILE:        core/CDirect3DData.cpp
  *  PURPOSE:     Direct3D related data storage class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

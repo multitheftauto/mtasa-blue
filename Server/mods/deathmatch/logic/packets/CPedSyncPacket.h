@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPedSyncPacket.h
  *  PURPOSE:     Ped synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,6 +23,7 @@ public:
     {
         ElementID           ID;
         unsigned char       ucFlags;
+        std::uint8_t        flags2;
         unsigned char       ucSyncTimeContext;
         SPositionSync       position;
         SPedRotationSync    rotation;
@@ -32,6 +33,7 @@ public:
         bool                bOnFire;
         bool                bIsInWater;
         bool                isReloadingWeapon;
+        float               cameraRotation;
 
         bool ReadSpatialData(NetBitStreamInterface& BitStream);
         // Backward compatibility

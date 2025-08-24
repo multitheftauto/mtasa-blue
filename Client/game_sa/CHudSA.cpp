@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CHudSA.cpp
  *  PURPOSE:     HUD display
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -122,6 +122,9 @@ void CHudSA::InitComponentList()
         {1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3},
         {1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3},
         {1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3},
+        {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawMap, 1, 0xCC, 0xC3},
+        {1, HUD_RADAR_BLIPS, 1, FUNC_CRadar_DrawBlips, 1, 0xCC, 0xC3},
+        {1, HUD_RADAR_ALTIMETER, 1, CODE_ShowRadarAltimeter, 2, 0xCC, 0xEB30},
         {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
         {1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3},
         {1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3},
@@ -327,7 +330,7 @@ bool CHudSA::IsCrosshairVisible()
         CTaskSimpleUseGun* taskUseGun = playerPed->GetPedIntelligence()->GetTaskUseGun();
         if ((!taskUseGun || !taskUseGun->GetSkipAim()) && (cameraViewMode == MODE_AIMWEAPON || cameraViewMode == MODE_AIMWEAPON_FROMCAR || cameraViewMode == MODE_AIMWEAPON_ATTACHED))
         {
-            if (playerPed->GetPedState() != PED_ENTER_CAR && playerPed->GetPedState() != PED_CARJACK)
+            if (playerPed->GetPedState() != PedState::PED_ENTER_CAR && playerPed->GetPedState() != PedState::PED_CARJACK)
             {
                 if ((weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_M4) || weaponType == WEAPONTYPE_TEC9 || weaponType == WEAPONTYPE_COUNTRYRIFLE || weaponType == WEAPONTYPE_MINIGUN || weaponType == WEAPONTYPE_FLAMETHROWER)
                     simpleAiming = cameraViewMode != MODE_AIMWEAPON || camera->GetTransitionState() == 0;
@@ -837,7 +840,7 @@ void __fastcall CHudSA::RenderWeaponIcon_Sprite(void* sprite, void*, CRect* rect
         color->a = properties.fillColorSecondary.a;
 
     // Call CSprite2d::Draw
-    ((void(__thiscall*)(void*, CRect*, RwColor*))FUNC_CSprie2d_Draw)(sprite, rect, color);
+    ((void(__thiscall*)(void*, CRect*, RwColor*))FUNC_CSprite2d_Draw)(sprite, rect, color);
 }
 
 void CHudSA::RenderWeaponIcon_XLU(CVector pos, CVector2D halfSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint16_t intensity, float rhw, std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir)
