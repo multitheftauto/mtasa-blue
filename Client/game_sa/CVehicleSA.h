@@ -222,7 +222,8 @@ class CAutoPilot
     BYTE pad[56];
 };
 
-enum class eComponentRotationAxis
+// CVehicle::SetComponentRotation (0x6DBA30) expect int (4 bytes)
+enum class eComponentRotationAxis : std::uint32_t
 {
     AXIS_X,
     AXIS_Y,
