@@ -2916,13 +2916,44 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optiona
         return false;
 
     CClientVehicle& vehicle = static_cast<CClientVehicle&>(Entity);
-    if (!vehicle.IsLocalEntity())
-        return false;
-
     VehicleBlowFlags blow;
-    
     blow.withExplosion = withExplosion.value_or(true);
-    vehicle.Blow(blow);
+
+    if (vehicle.IsLocalEntity())
+    {
+        vehicle.Blow(blow);
+    }
+    else
+    {
+        CClientPed* driver = vehicle.GetOccupant(0);
+        if (!static_cast<CDeathmatchVehicle&>(vehicle).IsSyncing() && (!driver || !driver->IsLocalPlayer()))
+            return false;
+
+        CVector position;
+        vehicle.GetPosition(position);
+
+        const auto     type = vehicle.GetType();
+        const auto     state = (blow.withExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
+        eExplosionType explosion;
+
+        switch (type)
+        {
+            case CLIENTVEHICLE_CAR:
+                explosion = EXP_TYPE_CAR;
+                break;
+            case CLIENTVEHICLE_HELI:
+                explosion = EXP_TYPE_HELI;
+                break;
+            case CLIENTVEHICLE_BOAT:
+                explosion = EXP_TYPE_BOAT;
+                break;
+            default:
+                explosion = EXP_TYPE_CAR;
+        }
+
+        g_pClientGame->SendExplosionSync(position, explosion, &Entity, state);
+    }
+
     return true;
 }
 
