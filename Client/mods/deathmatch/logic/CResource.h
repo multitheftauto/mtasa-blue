@@ -106,11 +106,12 @@ public:
     const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
     bool               IsOOPEnabled() { return m_bOOPEnabled; }
     void               HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
-    bool               IsWaitingForInitialDownloads();
-    int                GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
-    void               SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
+    bool                 IsWaitingForInitialDownloads();
+    int                  GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
+    void                 SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
 
 private:
+    SString GetServerCacheId();
     unsigned short       m_usNetID;
     uint                 m_uiScriptID;
     SString              m_strResourceName;
