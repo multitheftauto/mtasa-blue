@@ -74,7 +74,6 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
 static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
-static constexpr int       CANCEL_DAMAGE_EVENT_INTERVAL = 1000;
 
 CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
@@ -4430,30 +4429,65 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
             pDamagedPed->GetGamePlayer()->SetArmor(fPreviousArmor);
 
-            if (GetTickCount64_() - m_lastCancelDamageEventTime_Ped >= CANCEL_DAMAGE_EVENT_INTERVAL && weaponUsed != eWeaponType::WEAPONTYPE_DROWNING)
+            if (GetTickCount64_() - pDamagedPed->m_lastEventDamageCancelledTime >= g_TickRateSettings.cancelledDamageInterval)
             {
-                NetBitStreamInterface* bitStream = g_pNet->AllocateNetBitStream();
+                bool sendPacket = true;
 
-                bitStream->Write(pDamagedPed->GetID());
+                if (!m_triggerEventDamageCancelledForDamageEveryFrame)
+                {
+                    switch (weaponUsed)
+                    {
+                        case WEAPONTYPE_TEARGAS:
+                        case WEAPONTYPE_SPRAYCAN:
+                        case WEAPONTYPE_EXTINGUISHER:
+                        case WEAPONTYPE_FLAMETHROWER:
+                        case WEAPONTYPE_MOLOTOV:
+                        case WEAPONTYPE_DROWNING:
+                        case WEAPONTYPE_MINIGUN:
+                        case WEAPONTYPE_RUNOVERBYCAR:
+                        {
+                            sendPacket = false;
+                            break;
+                        }
+                        case WEAPONTYPE_CHAINSAW:
+                        {
+                            if (pInflictingEntity && pInflictingEntity->GetType() == eClientEntityType::CCLIENTPED || pInflictingEntity->GetType() == eClientEntityType::CCLIENTPLAYER)
+                            {
+                                CClientPed* attackerPed = static_cast<CClientPed*>(pInflictingEntity);
+                                if (!attackerPed->m_pPlayerPed || !attackerPed->m_pPlayerPed->IsPedCuttingWithChainsaw())
+                                    sendPacket = false;
+                            }
 
-                bitStream->WriteBit(pInflictingEntity != nullptr);
-                if (pInflictingEntity)
-                    bitStream->Write(pInflictingEntity->GetID());
+                            break;
+                        }
+                    }
+                }
 
-                SWeaponTypeSync weapon;
-                weapon.data.ucWeaponType = weaponUsed;
-                bitStream->Write(&weapon);
+                if (sendPacket)
+                {
+                    NetBitStreamInterface* bitStream = g_pNet->AllocateNetBitStream();
 
-                SFloatSync<8, 10> damage;
-                damage.data.fValue = fDamage;
-                bitStream->Write(&damage);
+                    bitStream->Write(pDamagedPed->GetID());
 
-                bitStream->WriteString(m_pLuaManager->GetEvents()->GetEventCancellingResourceName());
+                    bitStream->WriteBit(pInflictingEntity != nullptr);
+                    if (pInflictingEntity)
+                        bitStream->Write(pInflictingEntity->GetID());
 
-                g_pNet->SendPacket(PACKET_ID_CANCEL_DAMAGE_EVENT, bitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-                g_pNet->DeallocateNetBitStream(bitStream);
+                    SWeaponTypeSync weapon;
+                    weapon.data.ucWeaponType = weaponUsed;
+                    bitStream->Write(&weapon);
 
-                m_lastCancelDamageEventTime_Ped = GetTickCount64_();
+                    SFloatSync<8, 10> damage;
+                    damage.data.fValue = fDamage;
+                    bitStream->Write(&damage);
+
+                    bitStream->WriteString(m_pLuaManager->GetEvents()->GetEventCancellingResourceName());
+
+                    g_pNet->SendPacket(PACKET_ID_CANCEL_DAMAGE_EVENT, bitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+                    g_pNet->DeallocateNetBitStream(bitStream);
+
+                    pDamagedPed->m_lastEventDamageCancelledTime = GetTickCount64_();
+                }
             }
 
             return false;
@@ -4816,11 +4850,15 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         {
             bAllowDamage = false;
 
-            if (GetTickCount64_() - m_lastCancelDamageEventTime_Vehicle >= CANCEL_DAMAGE_EVENT_INTERVAL)
+            if (m_triggerEventDamageCancelledForVehicles && GetTickCount64_() - pClientVehicle->m_lastEventDamageCancelledTime >= g_TickRateSettings.cancelledDamageInterval)
             {
                 NetBitStreamInterface* bitStream = g_pNet->AllocateNetBitStream();
 
                 bitStream->Write(pClientVehicle->GetID());
+
+                bitStream->WriteBit(pClientAttacker != nullptr);
+                if (pClientAttacker)
+                    bitStream->Write(pClientAttacker->GetID());
 
                 SWeaponTypeSync weapon;
                 weapon.data.ucWeaponType = weaponType;
@@ -4835,7 +4873,7 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
                 g_pNet->SendPacket(PACKET_ID_CANCEL_DAMAGE_EVENT, bitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
                 g_pNet->DeallocateNetBitStream(bitStream);
 
-                m_lastCancelDamageEventTime_Vehicle = GetTickCount64_();
+                pClientVehicle->m_lastEventDamageCancelledTime = GetTickCount64_();
             }
         }
     }

@@ -664,6 +664,12 @@ public:
     void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
     void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
+    void SetEventDamageCancelledSettings(bool calledForVehicles, bool calledForDmgEveryFrame) noexcept
+    {
+        m_triggerEventDamageCancelledForVehicles = calledForVehicles;
+        m_triggerEventDamageCancelledForDamageEveryFrame = calledForDmgEveryFrame;
+    }
+
 private:
     eStatus       m_Status;
     eServerType   m_ServerType;
@@ -874,8 +880,9 @@ private:
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
     
     long long m_timeLastDiscordStateUpdate;
-    std::int64_t m_lastCancelDamageEventTime_Ped;
-    std::int64_t m_lastCancelDamageEventTime_Vehicle;
+
+    bool m_triggerEventDamageCancelledForVehicles;
+    bool m_triggerEventDamageCancelledForDamageEveryFrame;
 };
 
 extern CClientGame* g_pClientGame;

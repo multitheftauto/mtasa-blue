@@ -740,6 +740,7 @@ public:
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
     bool                                     m_shouldRecreate{false};
+    std::int64_t                             m_lastEventDamageCancelledTime{0};
 
     bool             m_bBulletImpactData;
     CClientEntityPtr m_pBulletImpactEntity;

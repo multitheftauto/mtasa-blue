@@ -475,6 +475,8 @@ public:
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 
+    bool IsPedCuttingWithChainsaw() const override;
+
     static void StaticSetHooks();
 
 private:
