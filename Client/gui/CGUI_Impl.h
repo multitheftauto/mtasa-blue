@@ -142,9 +142,14 @@ public:
 
     void        SetCursorEnabled(bool bEnabled);
     bool        IsCursorEnabled();
-    void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false);
-    void        SetCurrentServerCursorAlpha(float fAlpha);
+    void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false) override;
+    void        SetCurrentServerCursorAlpha(float fAlpha) override;
     float       GetCurrentServerCursorAlpha();
+    void        SetCursorColor(float r, float g, float b, float alpha) noexcept override;
+    void        GetCursorColor(float& r, float& g, float& b, float& alpha) noexcept override;
+    void        ResetMenuCursorColor() noexcept override;
+    void        RestoreCurrentServerCursorColor() noexcept override;
+    void        ResetCursorColorVariables() noexcept override;
     eCursorType GetCursorType();
 
     void                    AddChild(CGUIElement_Impl* pChild);
@@ -311,7 +316,10 @@ private:
 
     CEGUI::DefaultWindow* m_pTop;
     const CEGUI::Image*   m_pCursor;
-    float                 m_fCurrentServerCursorAlpha;
+    float                 CurrentServerCursorAlpha = {255.0f};
+    float                 CurrentServerCursorRed   = {255.0f};
+    float                 CurrentServerCursorGreen = {255.0f};
+    float                 CurrentServerCursorBlue  =  {255.0f};
 
     CGUIFont_Impl* m_pDefaultFont;
     CGUIFont_Impl* m_pSmallFont;
