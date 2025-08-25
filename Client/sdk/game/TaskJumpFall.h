@@ -12,6 +12,7 @@
 #pragma once
 
 #include "Task.h"
+#include "CPed.h"
 
 enum eClimbHeights : std::int8_t;
 
@@ -21,6 +22,15 @@ public:
     virtual ~CTaskSimpleClimb(){};
 
     virtual eClimbHeights GetHeightForPos() const = 0;
+
+    static class CEntitySAInterface* TestForClimb(CPed* ped, CVector& climbPos, float& climbAngle, int& surfaceType, bool launch)
+    {
+        if (!ped)
+            return nullptr;
+
+        // CTaskSimpleClimb::TestForClimb
+        return ((class CEntitySAInterface*(__cdecl*)(class CPedSAInterface*, CVector*, float*, int*, bool))0x6803A0)(ped->GetPedInterface(), &climbPos, &climbAngle, &surfaceType, launch);
+    }
 };
 
 class CTaskSimpleJetPack : public virtual CTaskSimple
