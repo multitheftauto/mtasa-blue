@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-22 08:58+0000\n"
-"PO-Revision-Date: 2025-08-22 09:06\n"
+"POT-Creation-Date: 2025-08-25 08:35+0000\n"
+"PO-Revision-Date: 2025-08-25 09:32\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -595,9 +595,9 @@ msgstr "主選單"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1340
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 #: Client/core/DXHook/CDirect3DHook9.cpp:127 Client/game_sa/CGameSA.cpp:262
-#: Client/game_sa/CGameSA.cpp:273 Client/loader/MainFunctions.cpp:610
-#: Client/loader/MainFunctions.cpp:625 Client/loader/MainFunctions.cpp:628
-#: Client/loader/MainFunctions.cpp:858 Client/loader/CInstallManager.cpp:563
+#: Client/game_sa/CGameSA.cpp:273 Client/loader/MainFunctions.cpp:784
+#: Client/loader/MainFunctions.cpp:805 Client/loader/MainFunctions.cpp:809
+#: Client/loader/MainFunctions.cpp:1119 Client/loader/CInstallManager.cpp:563
 #: Client/loader/CInstallManager.cpp:572
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:143
@@ -1086,7 +1086,7 @@ msgid "DPI aware"
 msgstr "DPI感知"
 
 #: Client/core/CSettings.cpp:692 Client/core/CSettings.cpp:1038
-#: Client/loader/MainFunctions.cpp:332
+#: Client/loader/MainFunctions.cpp:399
 msgid "Fullscreen mode:"
 msgstr "全螢幕模式:"
 
@@ -1095,7 +1095,7 @@ msgid "Standard"
 msgstr "標準"
 
 #: Client/core/CSettings.cpp:700 Client/core/CSettings.cpp:1660
-#: Client/loader/MainFunctions.cpp:332
+#: Client/loader/MainFunctions.cpp:399
 msgid "Borderless window"
 msgstr "無邊框視窗化"
 
@@ -2657,8 +2657,8 @@ msgstr "請使用 mtasa:// protocol!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/core/ServerBrowser/CServerInfo.cpp:319 Client/game_sa/CGameSA.cpp:269
-#: Client/loader/MainFunctions.cpp:511 Client/loader/MainFunctions.cpp:517
-#: Client/loader/MainFunctions.cpp:1185
+#: Client/loader/MainFunctions.cpp:650 Client/loader/MainFunctions.cpp:657
+#: Client/loader/MainFunctions.cpp:1449
 msgid "Information"
 msgstr "資訊"
 
@@ -2810,39 +2810,31 @@ msgstr "安装更新..."
 msgid "Extracting files..."
 msgstr "解開檔案中..."
 
-#: Client/loader/MainFunctions.cpp:72
+#: Client/loader/MainFunctions.cpp:54
+msgid "Invalid module path detected.\n"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:81
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "檔版本不匹配錯誤。如果您遇到問題，請重新安裝 MTA:SA。\n"
 
-#: Client/loader/MainFunctions.cpp:78
+#: Client/loader/MainFunctions.cpp:89
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "某些檔是缺掉的。如果您遇到問題，請重新安裝 MTA:SA。\n"
 
-#: Client/loader/MainFunctions.cpp:87
+#: Client/loader/MainFunctions.cpp:100
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA無法在安全模式下執行。\n\n"
 "請重新啟動您的電腦。\n"
 
-#: Client/loader/MainFunctions.cpp:152
-msgid "Load failed. Please ensure that the file "
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:189
-msgid "Loading core failed. Please ensure that the latest DirectX is correctly installed."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:219 Client/loader/MainFunctions.cpp:229
-msgid "Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:256
+#: Client/loader/MainFunctions.cpp:305
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "你運行MTA:SA時有任何問題?\n\n"
 "你想要回溯至較早的版本嗎?"
 
-#: Client/loader/MainFunctions.cpp:281
+#: Client/loader/MainFunctions.cpp:333
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -2850,38 +2842,38 @@ msgstr "啟動 MTA:SA時似乎有些問題，\n"
 "重設GTA的設定有時有助於修復這些問題.\n\n"
 "你想要現在重設GTA的設定嗎?"
 
-#: Client/loader/MainFunctions.cpp:294
+#: Client/loader/MainFunctions.cpp:348
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "GTA的設定已被重設.\n\n"
 "請按「確定」以繼續。"
 
-#: Client/loader/MainFunctions.cpp:297
+#: Client/loader/MainFunctions.cpp:353
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "無法刪除文件: '%s'"
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:303
+#: Client/loader/MainFunctions.cpp:361
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "你運行MTA:SA時遇到任何問題?\n\n"
 "你希望看看線上的幫助嗎?"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:331
+#: Client/loader/MainFunctions.cpp:398
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "您是否在運行MTA:SA時遇到任何問題？\n\n"
 "您想要變更為以下的設定嗎？"
 
-#: Client/loader/MainFunctions.cpp:370
+#: Client/loader/MainFunctions.cpp:470
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "您是否在運行MTA:SA時遇到任何問題？\n\n"
 "試關閉以下程式以免影響GTA和MTA："
 
-#: Client/loader/MainFunctions.cpp:400
+#: Client/loader/MainFunctions.cpp:503
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -2889,20 +2881,20 @@ msgstr "警告\n\n"
 "MTA:SA 已檢測到不尋常的活動\n"
 "請運行病毒掃描，以確保您的系統是安全的\n\n"
 
-#: Client/loader/MainFunctions.cpp:403
+#: Client/loader/MainFunctions.cpp:506
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "檢測到的檔是: %s\n"
 
-#: Client/loader/MainFunctions.cpp:510
+#: Client/loader/MainFunctions.cpp:649
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "另一個GTA:SA正在運行，啟動MTA:SA前需要先終止它。你想要現在這麼做嗎?"
 
-#: Client/loader/MainFunctions.cpp:516
+#: Client/loader/MainFunctions.cpp:656
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "無法終止GTA:SA，若這問題仍然存在，請重新啟動你的電腦。"
 
-#: Client/loader/MainFunctions.cpp:605
+#: Client/loader/MainFunctions.cpp:779
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -2912,94 +2904,85 @@ msgstr "重啟MTA:SA時有故障\n\n"
 "停止「gta_sa.exe」及「Multi Theft Auto.exe」的處理程序\n\n\n"
 "再嘗試啟動 MTA:SA嗎?"
 
-#: Client/loader/MainFunctions.cpp:623
+#: Client/loader/MainFunctions.cpp:803
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "另一個MTA正在運行。\n\n"
 "若這問題仍然存在，請重新啟動你的電腦"
 
-#: Client/loader/MainFunctions.cpp:626
+#: Client/loader/MainFunctions.cpp:807
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "另一個MTA正在運行。\n\n"
 "你想要終止它嗎?"
 
-#: Client/loader/MainFunctions.cpp:651
+#: Client/loader/MainFunctions.cpp:839
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "註冊表項遺失，請重新安裝MTA:SA。"
 
-#: Client/loader/MainFunctions.cpp:654
+#: Client/loader/MainFunctions.cpp:845
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "該安裝GTA:SA的路徑包含不受支持的(Unicode)字符，請移動你安裝的GTA:SA到一個兼容並只包含標準的ASCII字符的路徑，以及重新安裝MTA:SA。"
 
-#: Client/loader/MainFunctions.cpp:664
+#: Client/loader/MainFunctions.cpp:858
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:792
+#: Client/loader/MainFunctions.cpp:1041
 msgid "Invalid installation paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:824
+#: Client/loader/MainFunctions.cpp:1076
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "載入失敗，請確保最新的數據文件已被正確安裝。"
 
-#: Client/loader/MainFunctions.cpp:831
+#: Client/loader/MainFunctions.cpp:1085
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "載入失敗，請確保 %s 已被正確安裝。"
 
-#: Client/loader/MainFunctions.cpp:838
+#: Client/loader/MainFunctions.cpp:1094
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "載入失敗，無法找到 gta_sa.exe 在 %s 裏。"
 
-#: Client/loader/MainFunctions.cpp:849
+#: Client/loader/MainFunctions.cpp:1108
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "載入失敗，%s 存在於GTA目錄，請先刪除再繼續。"
 
-#: Client/loader/MainFunctions.cpp:857
+#: Client/loader/MainFunctions.cpp:1118
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "主文件有一個不正確的名稱 (%s)"
 
-#: Client/loader/MainFunctions.cpp:899
+#: Client/loader/MainFunctions.cpp:1165
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:906
+#: Client/loader/MainFunctions.cpp:1173
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:920
+#: Client/loader/MainFunctions.cpp:1197
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1096
+#: Client/loader/MainFunctions.cpp:1352
 msgid "Invalid game paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1103
+#: Client/loader/MainFunctions.cpp:1360
 msgid "Fix configuration issue"
 msgstr "修復配置問題"
 
-#: Client/loader/MainFunctions.cpp:1141
-msgid "Fix elevation required error"
-msgstr "修復權限需求錯誤"
-
-#: Client/loader/MainFunctions.cpp:1146
-#, c-format
-msgid "Could not start Grand Theft Auto: San Andreas. [%s]"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:1184
+#: Client/loader/MainFunctions.cpp:1449
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr ""
 
