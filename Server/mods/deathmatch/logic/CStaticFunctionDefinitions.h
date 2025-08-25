@@ -629,6 +629,8 @@ public:
     static bool SetGarageOpen(unsigned char ucGarageID, bool bIsOpen);
     static bool SetGlitchEnabled(const std::string& strGlitchName, bool bEnabled);
     static bool IsGlitchEnabled(const std::string& strGlitchName, bool& bEnabled);
+    static bool SetPlayerGlitchEnabled(CPlayer* pPlayer, const std::string& strGlitchName, bool bEnabled);
+    static bool IsPlayerGlitchEnabled(CPlayer* pPlayer, const std::string& strGlitchName, bool& bEnabled);
     static bool GetJetpackWeaponEnabled(eWeaponType weaponType, bool& bEnabled);
     static bool SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     static bool SetCloudsEnabled(bool bEnabled);
