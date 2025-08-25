@@ -16,6 +16,11 @@ extern CClientGame* g_pClientGame;
 #define M_PI 3.14159265358979323846
 #endif
 
+// Threshold for determining if a marker is considered on-screen.
+// The value 0.1f represents the minimum depth (Z value in screen coordinates) at which a marker is visible.
+// Markers with a screen Z value below this threshold are considered off-screen.
+constexpr float CLIENT_MARKER_ONSCREEN_THRESHOLD = 0.1f;
+
 unsigned int CClientMarker::m_uiStreamedInMarkers = 0;
 
 CClientMarker::CClientMarker(CClientManager* pManager, ElementID ID, int iMarkerType) : ClassInit(this), CClientStreamElement(pManager->GetMarkerStreamer(), ID)
@@ -322,7 +327,7 @@ void CClientMarker::SetSize(float fSize)
             break;
         }
     }
-   
+
     m_pMarker->SetSize(fSize);
 }
 
@@ -539,4 +544,37 @@ CSphere CClientMarker::GetWorldBoundingSphere()
 void CClientMarker::SetIgnoreAlphaLimits(bool ignore)
 {
     m_pMarker->SetIgnoreAlphaLimits(ignore);
+}
+
+bool CClientMarker::IsClientSideOnScreen() noexcept
+{
+    if (!IsStreamedIn() || !IsVisible())
+        return false;
+
+    CVector position;
+    GetPosition(position);
+
+    CVector screen;
+    g_pCore->GetGraphics()->CalcScreenCoors(&position, &screen);
+
+    if (screen.fZ <= CLIENT_MARKER_ONSCREEN_THRESHOLD)
+        return false;
+
+    float resWidth = static_cast<float>(g_pCore->GetGraphics()->GetViewportWidth());
+    float resHeight = static_cast<float>(g_pCore->GetGraphics()->GetViewportHeight());
+
+    CSphere boundingSphere = GetWorldBoundingSphere();
+    CVector edgePos = boundingSphere.vecPosition;
+    edgePos.fX += boundingSphere.fRadius;
+
+    CVector edgeScreen;
+    g_pCore->GetGraphics()->CalcScreenCoors(&edgePos, &edgeScreen);
+
+    if (edgeScreen.fZ <= CLIENT_MARKER_ONSCREEN_THRESHOLD)
+        return true;
+
+    float screenRadius = fabs(edgeScreen.fX - screen.fX);
+
+    return (screen.fX + screenRadius) >= 0.0f && (screen.fX - screenRadius) <= resWidth &&
+           (screen.fY + screenRadius) >= 0.0f && (screen.fY - screenRadius) <= resHeight;
 }
