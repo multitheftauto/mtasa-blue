@@ -250,3 +250,33 @@ struct pad_func_with_func<Func, FuncB>
                                                      std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args) == 0>::type>
 {
 };
+
+
+// Removes noexcept(true) from a function type 
+template <typename T>
+struct remove_noexcept
+{
+    using type = T;
+};
+template <typename R, typename... P>
+struct remove_noexcept<R(P...) noexcept>
+{
+    using type = R(P...);
+};
+template <typename T>
+using remove_noexcept_t = typename remove_noexcept<T>::type;
+
+// Removes noexcept(true) from a function
+template <auto T>
+struct remove_noexcept_fn
+{
+    constexpr static auto func = T;
+};
+template <typename Ret, typename... Args, Ret(Func)(Args...) noexcept>
+struct remove_noexcept_fn<Func>
+{
+    using func_t = Ret (*)(Args...);
+    constexpr static func_t func = Func;
+};
+template <auto Func>
+constexpr auto remove_noexcept_fn_v = remove_noexcept_fn<Func>::func;
