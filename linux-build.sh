@@ -5,6 +5,10 @@
 : ${BUILD_ARCHITECTURE:=x64}
 : ${BUILD_CONFIG:=release}
 : ${PREMAKE_FILE:=premake5.lua}
+: ${GCC_PREFIX:=}
+: ${AR:=ar}
+: ${CC:=gcc}
+: ${CXX:=g++}
 
 # Find premake binary location
 if [ "$(uname)" == "Darwin" ]; then
@@ -16,10 +20,6 @@ fi
 # Number of cores
 if [ "$(uname)" == "Darwin" ]; then
     NUM_CORES=$(sysctl -n hw.ncpu)
-    : ${GCC_PREFIX:=}
-    : ${AR:=ar}
-    : ${CC:=gcc}
-    : ${CXX:=g++}
 else
     NUM_CORES=$(grep -c ^processor /proc/cpuinfo)
 fi
@@ -55,31 +55,15 @@ esac
 case $BUILD_ARCHITECTURE in
     32|x86)
         CONFIG=${BUILD_CONFIG}_x86
-        : ${GCC_PREFIX:=i386-linux-gnu-}
-        : ${AR:=x86_64-linux-gnu-gcc-ar-10}
-        : ${CC:=x86_64-linux-gnu-gcc-10}
-        : ${CXX:=x86_64-linux-gnu-g++-10}
     ;;
     64|x64)
         CONFIG=${BUILD_CONFIG}_x64
-        : ${GCC_PREFIX:=x86_64-linux-gnu-}
-        : ${AR:=x86_64-linux-gnu-gcc-ar-10}
-        : ${CC:=x86_64-linux-gnu-gcc-10}
-        : ${CXX:=x86_64-linux-gnu-g++-10}
     ;;
     arm)
         CONFIG=${BUILD_CONFIG}_${BUILD_ARCHITECTURE}
-        : ${GCC_PREFIX:=arm-linux-gnueabihf-}
-        : ${AR:=arm-linux-gnueabihf-ar}
-        : ${CC:=arm-linux-gnueabihf-gcc-10}
-        : ${CXX:=arm-linux-gnueabihf-g++-10}
     ;;
     arm64)
         CONFIG=${BUILD_CONFIG}_${BUILD_ARCHITECTURE}
-        : ${GCC_PREFIX:=aarch64-linux-gnu-}
-        : ${AR:=aarch64-linux-gnu-gcc-ar-10}
-        : ${CC:=aarch64-linux-gnu-gcc-10}
-        : ${CXX:=aarch64-linux-gnu-g++-10}
     ;;
     *)
         echo "Error: Invalid build architecture" >&2
