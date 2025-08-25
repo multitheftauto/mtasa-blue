@@ -40,11 +40,30 @@ public:
     void Clear();
     
     bool HasTranslations() const noexcept { return !m_translationFiles.empty(); }
+    
+    // Global translation support
+    void AddGlobalTranslationProvider(const std::string& providerResourceName);
+    std::vector<std::string> GetGlobalProviders() const noexcept { return m_globalProviders; }
+    void RemoveAllGlobalProviders() noexcept;
+    bool IsGlobalProvider() const noexcept { return m_isGlobalProvider; }
+    void SetAsGlobalProvider(bool isProvider = true) noexcept { m_isGlobalProvider = isProvider; }
+    
+    // Enhanced lookup with global fallback
+    std::string GetLocalTranslation(const std::string& msgid, const std::string& language) const;
+    std::string GetTranslationWithGlobalFallback(const std::string& msgid, const std::string& language) const;
 
 private:
     std::string ExtractLanguageFromPath(const std::string& filePath) const;
+    bool ValidatePoFile(const std::string& filePath);
     void LogWarning(const std::string& message) const;
     void LogError(const std::string& message) const;
+    
+    // TinyGetText logging callbacks
+    static std::string ConformTranslationPath(const std::string& message);
+    static void TinyGetTextErrorCallback(const std::string& message);
+    static void TinyGetTextWarningCallback(const std::string& message);
+    static void SetupTinyGetTextLogging();
+    static void CleanupTinyGetTextLogging();
 
 private:
     std::string m_primaryLanguage;
@@ -54,4 +73,8 @@ private:
     std::string m_resourceName;
     
     std::unordered_map<void*, std::string> m_playerLanguages;
+    
+    // Global translation support
+    bool m_isGlobalProvider = false;
+    std::vector<std::string> m_globalProviders;
 };

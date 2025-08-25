@@ -23,6 +23,7 @@
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
 #include "CResourceTranslationItem.h"
+#include "CGlobalTranslationItem.h"
 
 using std::list;
 
@@ -5245,6 +5246,13 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
                                     break;
                                 }
+                                case CDownloadableResource::RESOURCE_FILE_TYPE_GLOBAL_TRANSLATION:
+                                {
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_GLOBAL_TRANSLATION,
+                                                                                       szParsedChunkData, uiDownloadSize, chunkChecksum, true);
+
+                                    break;
+                                }
                                 default:
 
                                     break;
@@ -5290,6 +5298,16 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
             if (bFatalError)
             {
                 break;
+            }
+        }
+
+        // Read the global translation provider flag from server
+        bool isGlobalProvider = false;
+        if (bitStream.ReadBit(isGlobalProvider) && isGlobalProvider)
+        {
+            if (pResource->GetTranslationManager())
+            {
+                pResource->GetTranslationManager()->SetAsGlobalProvider(true);
             }
         }
 

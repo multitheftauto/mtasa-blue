@@ -20,4 +20,7 @@ public:
 private:
     LUA_DECLARE(GetTranslation);
     LUA_DECLARE(GetAvailableTranslations);
+    LUA_DECLARE(GetGlobalTranslationProviders);
+    LUA_DECLARE(IsResourceGlobalTranslationProvider);
+    LUA_DECLARE(GetResourceGlobalTranslationProviders);
 };

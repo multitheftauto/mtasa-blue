@@ -9,23 +9,75 @@
 
 #include "StdInc.h"
 #include "CResourceTranslationManager.h"
+#include "CGlobalTranslationManager.h"
 #include "dictionary_manager.hpp"
 #include "language.hpp"
 #include "po_parser.hpp"
 #include "CLogger.h"
+#include "CScriptDebugging.h"
+#include "../../../vendor/tinygettext/log.hpp"
+#include <thread>
+#include <mutex>
+#ifdef MTA_CLIENT
+    #include "CClientGame.h"
+    #include "CResourceManager.h"
+    #include "CResource.h"
+#else
+    #include "CGame.h"
+    #include "CResourceManager.h"
+    #include "CResource.h"
+#endif
 #include <filesystem>
 #include <algorithm>
 #include <fstream>
 #include <set>
 
+static bool s_tinyGetTextLoggingInitialized = false;
+static std::mutex s_loggingMutex;
+
 CResourceTranslationManager::CResourceTranslationManager(const std::string& resourceName, const std::string& charset)
     : m_resourceName(resourceName)
 {
+    std::lock_guard<std::mutex> lock(s_loggingMutex);
+    if (!s_tinyGetTextLoggingInitialized)
+    {
+        SetupTinyGetTextLogging();
+        s_tinyGetTextLoggingInitialized = true;
+    }
 }
 
 CResourceTranslationManager::~CResourceTranslationManager()
 {
     Clear();
+}
+
+bool CResourceTranslationManager::ValidatePoFile(const std::string& filePath)
+{
+    std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+    if (!file.is_open())
+    {
+        LogError("Cannot open translation file: " + filePath);
+        return false;
+    }
+    
+    std::streampos fileSize = file.tellg();
+    if (fileSize == 0)
+    {
+        LogError("Translation file is empty: " + filePath);
+        return false;
+    }
+    
+    file.seekg(-1, std::ios::end);
+    char lastChar;
+    file.read(&lastChar, 1);
+    
+    if (lastChar != '\n')
+    {
+        LogError("Translation file must end with a newline: " + filePath);
+        return false;
+    }
+    
+    return true;
 }
 
 bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, bool isPrimary)
@@ -43,6 +95,9 @@ bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, b
         return false;
     }
 
+    if (!ValidatePoFile(filePath))
+        return false;
+
     tinygettext::Language lang = tinygettext::Language::from_name(language);
     if (!lang)
     {
@@ -51,7 +106,6 @@ bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, b
     }
 
     try {
-        // Create a new separate dictionary for each language instead of reusing the same one
         auto dictionary = std::make_unique<tinygettext::Dictionary>();
         
         std::ifstream file(filePath, std::ios::binary);
@@ -64,7 +118,7 @@ bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, b
         tinygettext::POParser::parse(filePath, file, *dictionary);
         
         m_translationFiles[language] = filePath;
-        m_dictionaries[language] = dictionary.release(); // Transfer ownership
+        m_dictionaries[language] = dictionary.release();
         
         if (isPrimary)
         {
@@ -92,6 +146,17 @@ std::string CResourceTranslationManager::GetTranslation(const std::string& msgid
     if (msgid.empty())
         return msgid;
 
+    if (!m_globalProviders.empty())
+        return GetTranslationWithGlobalFallback(msgid, language);
+    
+    return GetLocalTranslation(msgid, language);
+}
+
+std::string CResourceTranslationManager::GetLocalTranslation(const std::string& msgid, const std::string& language) const
+{
+    if (msgid.empty())
+        return msgid;
+
     std::string targetLanguage = language.empty() ? m_primaryLanguage : language;
     
     if (targetLanguage.empty())
@@ -114,8 +179,43 @@ std::string CResourceTranslationManager::GetTranslation(const std::string& msgid
     if (dictIt == m_dictionaries.end() || !dictIt->second)
         return msgid;
         
-    std::string translation = dictIt->second->translate(msgid);
+    std::string translation = dictIt->second->translate_silent(msgid);
     return translation.empty() ? msgid : translation;
+}
+
+std::string CResourceTranslationManager::GetTranslationWithGlobalFallback(const std::string& msgid, const std::string& language) const
+{
+    thread_local std::set<std::string> currentResourceStack;
+    
+    if (currentResourceStack.find(m_resourceName) != currentResourceStack.end())
+        return msgid;
+    
+    currentResourceStack.insert(m_resourceName);
+    
+    struct StackGuard {
+        std::set<std::string>& stack;
+        std::string resourceName;
+        StackGuard(std::set<std::string>& s, const std::string& r) : stack(s), resourceName(r) {}
+        ~StackGuard() { stack.erase(resourceName); }
+    } guard(currentResourceStack, m_resourceName);
+    
+    std::string localTranslation = GetLocalTranslation(msgid, language);
+    if (!localTranslation.empty() && localTranslation != msgid)
+        return localTranslation;
+    
+    std::string globalTranslation = CGlobalTranslationManager::GetSingleton()
+        .GetGlobalTranslation(m_globalProviders, msgid, language);
+    if (!globalTranslation.empty() && globalTranslation != msgid)
+        return globalTranslation;
+    
+    if (!language.empty() && language != m_primaryLanguage)
+    {
+        std::string primaryTranslation = GetLocalTranslation(msgid, m_primaryLanguage);
+        if (!primaryTranslation.empty() && primaryTranslation != msgid)
+            return primaryTranslation;
+    }
+    
+    return msgid;
 }
 
 std::vector<std::string> CResourceTranslationManager::GetAvailableLanguages() const
@@ -188,17 +288,9 @@ void CResourceTranslationManager::SetClientLanguage(const std::string& language)
         return;
     }
 
-    LogWarning("SetClientLanguage called with: '" + language + "'");
-    LogWarning("Available languages: " + std::to_string(m_translationFiles.size()));
-    for (const auto& pair : m_translationFiles)
-    {
-        LogWarning("  - " + pair.first);
-    }
-
     if (m_translationFiles.find(language) != m_translationFiles.end())
     {
         m_clientLanguage = language;
-        LogWarning("Client language set to: '" + m_clientLanguage + "'");
     }
     else 
     {
@@ -206,10 +298,6 @@ void CResourceTranslationManager::SetClientLanguage(const std::string& language)
         if (!m_primaryLanguage.empty())
         {
             m_clientLanguage = m_primaryLanguage;
-        }
-        else
-        {
-            LogWarning("No primary language set, keeping current: '" + m_clientLanguage + "'");
         }
     }
 }
@@ -222,7 +310,6 @@ std::string CResourceTranslationManager::GetClientLanguage() const
     if (!m_primaryLanguage.empty())
         return m_primaryLanguage;
     
-    // If no primary language, return first available language
     if (!m_translationFiles.empty())
         return m_translationFiles.begin()->first;
     
@@ -233,16 +320,39 @@ void CResourceTranslationManager::Clear()
 {
     m_translationFiles.clear();
     
-    // Clean up owned dictionaries
     for (auto& pair : m_dictionaries)
-    {
         delete pair.second;
-    }
-    m_dictionaries.clear();
     
+    m_dictionaries.clear();
     m_primaryLanguage.clear();
     m_clientLanguage.clear();
     m_playerLanguages.clear();
+    
+    RemoveAllGlobalProviders();
+}
+
+void CResourceTranslationManager::AddGlobalTranslationProvider(const std::string& providerResourceName)
+{
+    if (providerResourceName.empty())
+    {
+        LogError("AddGlobalTranslationProvider called with empty provider name");
+        return;
+    }
+    
+    auto it = std::find(m_globalProviders.begin(), m_globalProviders.end(), providerResourceName);
+    if (it != m_globalProviders.end())
+    {
+        LogWarning("Global translation provider '" + providerResourceName + "' is already registered for this resource. "
+                   "Duplicate <global-translation> tags in meta.xml?");
+        return;
+    }
+    
+    m_globalProviders.push_back(providerResourceName);
+}
+
+void CResourceTranslationManager::RemoveAllGlobalProviders() noexcept
+{
+    m_globalProviders.clear();
 }
 
 std::string CResourceTranslationManager::ExtractLanguageFromPath(const std::string& filePath) const
@@ -251,12 +361,115 @@ std::string CResourceTranslationManager::ExtractLanguageFromPath(const std::stri
     return path.stem().string();
 }
 
+std::string CResourceTranslationManager::ConformTranslationPath(const std::string& message)
+{
+    std::string result = message;
+    
+    size_t resourcesPos = result.find("/resources/");
+    if (resourcesPos == std::string::npos)
+    {
+        resourcesPos = result.find("\\resources\\");
+        if (resourcesPos == std::string::npos)
+            return result;
+    }
+    
+    size_t startPos = resourcesPos + 11;
+    if (startPos >= result.length())
+        return result;
+    
+    std::string resourceRelativePath = result.substr(startPos);
+    
+    for (char& c : resourceRelativePath)
+    {
+        if (c == '\\')
+            c = '/';
+    }
+    
+    return resourceRelativePath;
+}
+
+void CResourceTranslationManager::TinyGetTextErrorCallback(const std::string& message)
+{
+#ifdef MTA_CLIENT
+    CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+    CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+    
+    SLuaDebugInfo debugInfo;
+    debugInfo.infoType = DEBUG_INFO_NONE;
+    debugInfo.strShortSrc = "[TinyGetText]";
+    
+    std::string cleanMessage = message;
+    if (!cleanMessage.empty() && cleanMessage.back() == '\n')
+        cleanMessage.pop_back();
+    
+    cleanMessage = ConformTranslationPath(cleanMessage);
+    
+    pScriptDebugging->LogError(debugInfo, "%s", cleanMessage.c_str());
+}
+
+void CResourceTranslationManager::TinyGetTextWarningCallback(const std::string& message)
+{
+#ifdef MTA_CLIENT
+    CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+    CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+    
+    SLuaDebugInfo debugInfo;
+    debugInfo.infoType = DEBUG_INFO_NONE;
+    debugInfo.strShortSrc = "[TinyGetText]";
+    
+    std::string cleanMessage = message;
+    if (!cleanMessage.empty() && cleanMessage.back() == '\n')
+        cleanMessage.pop_back();
+    
+    cleanMessage = ConformTranslationPath(cleanMessage);
+    
+    pScriptDebugging->LogWarning(debugInfo, "%s", cleanMessage.c_str());
+}
+
+void CResourceTranslationManager::SetupTinyGetTextLogging()
+{
+    tinygettext::Log::set_log_info_callback(nullptr);
+    tinygettext::Log::set_log_warning_callback(TinyGetTextWarningCallback);
+    tinygettext::Log::set_log_error_callback(TinyGetTextErrorCallback);
+}
+
+void CResourceTranslationManager::CleanupTinyGetTextLogging()
+{
+    tinygettext::Log::set_log_info_callback(nullptr);
+    tinygettext::Log::set_log_warning_callback(nullptr);
+    tinygettext::Log::set_log_error_callback(nullptr);
+}
+
 void CResourceTranslationManager::LogWarning(const std::string& message) const
 {
-    CLogger::LogPrintf("[%s] %s\n", m_resourceName.c_str(), message.c_str());
+#ifdef MTA_CLIENT
+    CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+    CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+    
+    SLuaDebugInfo debugInfo;
+    debugInfo.infoType = DEBUG_INFO_NONE;
+    debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
+    
+    pScriptDebugging->LogWarning(debugInfo, "%s", message.c_str());
 }
 
 void CResourceTranslationManager::LogError(const std::string& message) const
 {
-    CLogger::ErrorPrintf("[%s] %s\n", m_resourceName.c_str(), message.c_str());
+#ifdef MTA_CLIENT
+    CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+    CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+    
+    SLuaDebugInfo debugInfo;
+    debugInfo.infoType = DEBUG_INFO_NONE;
+    debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
+    
+    pScriptDebugging->LogError(debugInfo, "%s", message.c_str());
 }

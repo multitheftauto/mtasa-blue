@@ -15,6 +15,7 @@
 #include "CResourceClientFileItem.h"
 #include "CResourceScriptItem.h"
 #include "CResourceTranslationItem.h"
+#include "CResourceTranslationManager.h"
 #include "CChecksum.h"
 #include "CResource.h"
 #include "CDummy.h"
@@ -76,7 +77,8 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
                 ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && m_pResource->IsClientScriptsOn() &&
                  static_cast<CResourceClientScriptItem*>(*iter)->IsNoClientCache() == false) ||
                 ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE && m_pResource->IsClientFilesOn()) ||
-                ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_TRANSLATION))
+                ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_TRANSLATION) ||
+                ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_GLOBAL_TRANSLATION))
             {
                 // Write the Type of chunk to read (F - File, E - Exported Function)
                 BitStream.Write(static_cast<unsigned char>('F'));
@@ -144,6 +146,10 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
                 }
             }
         }
+
+        // Write global translation provider flag
+        bool isGlobalProvider = m_pResource->GetTranslationManager() && m_pResource->GetTranslationManager()->IsGlobalProvider();
+        BitStream.WriteBit(isGlobalProvider);
 
         return true;
     }

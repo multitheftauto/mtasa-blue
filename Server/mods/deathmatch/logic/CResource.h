@@ -359,6 +359,7 @@ private:
     bool ReadIncludedExports(CXMLNode* pRoot);
     bool ReadIncludedFiles(CXMLNode* pRoot);
     bool ReadIncludedTranslations(CXMLNode* pRoot);
+    bool ReadIncludedGlobalTranslations(CXMLNode* pRoot);
     bool LoadTranslations();
     bool CreateVM(bool bEnableOOP);
     bool DestroyVM();

@@ -23,7 +23,9 @@
 #include "CResourceScriptItem.h"
 #include "CResourceClientScriptItem.h"
 #include "CResourceTranslationItem.h"
+#include "CGlobalTranslationItem.h"
 #include "CResourceTranslationManager.h"
+#include "CGlobalTranslationManager.h"
 #include "CAccessControlListManager.h"
 #include "CScriptDebugging.h"
 #include "CMapManager.h"
@@ -276,7 +278,8 @@ bool CResource::Load()
 
             // Read everything that's included. If one of these fail, delete the XML we created and return
             if (!ReadIncludedResources(pRoot) || !ReadIncludedMaps(pRoot) || !ReadIncludedFiles(pRoot) || !ReadIncludedScripts(pRoot) ||
-                !ReadIncludedHTML(pRoot) || !ReadIncludedExports(pRoot) || !ReadIncludedConfigs(pRoot) || !ReadIncludedTranslations(pRoot))
+                !ReadIncludedHTML(pRoot) || !ReadIncludedExports(pRoot) || !ReadIncludedConfigs(pRoot) || !ReadIncludedTranslations(pRoot) ||
+                !ReadIncludedGlobalTranslations(pRoot))
             {
                 delete pMetaFile;
                 g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
@@ -915,7 +918,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && StartOptions.bConfigs) ||
             (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && StartOptions.bScripts) ||
             (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && StartOptions.bClientScripts) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && StartOptions.bHTML))
+            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && StartOptions.bHTML) ||
+            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_GLOBAL_TRANSLATION))
         {
             // Start. Failed?
             if (!pResourceFile->Start())
@@ -1054,6 +1058,12 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     // Sort by priority, for start grouping on the client
     m_StartedResources.sort([](CResource* a, CResource* b) { return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup; });
 
+    // Register as global translation provider if marked as such
+    if (m_translationManager && m_translationManager->IsGlobalProvider())
+    {
+        CGlobalTranslationManager::GetSingleton().RegisterProvider(m_strResourceName.c_str(), m_translationManager.get());
+    }
+
     return true;
 }
 
@@ -1110,6 +1120,12 @@ bool CResource::Stop(bool bManualStop)
 
     // Tell the modules we are stopping
     g_pGame->GetLuaManager()->GetLuaModuleManager()->ResourceStopping(m_pVM->GetVirtualMachine());
+
+    // Unregister global translation provider if this resource was one
+    if (m_translationManager && m_translationManager->IsGlobalProvider())
+    {
+        CGlobalTranslationManager::GetSingleton().UnregisterProvider(m_strResourceName.c_str());
+    }
 
     // Remove us from the running resources list
     m_StartedResources.remove(this);
@@ -3368,6 +3384,48 @@ bool CResource::ReadIncludedTranslations(CXMLNode* pRoot)
         else
         {
             CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+        }
+    }
+
+    return true;
+}
+
+bool CResource::ReadIncludedGlobalTranslations(CXMLNode* pRoot)
+{
+    int i = 0;
+
+    // Check for global-translation-provider tag (marks this resource as a provider)
+    if (pRoot->FindSubNode("global-translation-provider", 0))
+    {
+        if (m_translationManager)
+        {
+            m_translationManager->SetAsGlobalProvider(true);
+        }
+    }
+
+    // Loop through global-translation nodes (consumer tags)
+    for (CXMLNode* pGlobalTranslation = pRoot->FindSubNode("global-translation", i); pGlobalTranslation != nullptr; 
+         pGlobalTranslation = pRoot->FindSubNode("global-translation", ++i))
+    {
+        CXMLAttributes& Attributes = pGlobalTranslation->GetAttributes();
+        CXMLAttribute* pSrc = Attributes.Find("src");
+
+        if (pSrc)
+        {
+            std::string strProviderResource = pSrc->GetValue();
+
+            if (!strProviderResource.empty())
+            {
+                m_ResourceFiles.push_back(new CGlobalTranslationItem(this, strProviderResource.c_str(), &Attributes));
+            }
+            else
+            {
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'global-translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+            }
+        }
+        else
+        {
+            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'global-translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
         }
     }
 

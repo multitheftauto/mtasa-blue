@@ -35,6 +35,7 @@ public:
         RESOURCE_FILE_TYPE_HTML,
         RESOURCE_FILE_TYPE_CLIENT_FILE,
         RESOURCE_FILE_TYPE_TRANSLATION,
+        RESOURCE_FILE_TYPE_GLOBAL_TRANSLATION,
         RESOURCE_FILE_TYPE_NONE,
     };            // TODO: sort all client-side enums and use >= (instead of each individual type) on comparisons that use this enum?
 

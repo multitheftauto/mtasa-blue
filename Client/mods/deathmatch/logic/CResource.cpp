@@ -14,6 +14,8 @@
 #include "profiler/SharedUtil.Profiler.h"
 #include "CServerIdManager.h"
 #include "CResourceTranslationItem.h"
+#include "CGlobalTranslationItem.h"
+#include "CGlobalTranslationManager.h"
 
 using namespace std;
 
@@ -193,6 +195,10 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
         bool isPrimary = m_translationPrimaryFlags.find(szFileName) != m_translationPrimaryFlags.end();
         pResourceFile = new CResourceTranslationItem(this, szFileName, strBuffer, uiDownloadSize, serverChecksum, isPrimary);
     }
+    else if (resourceType == CDownloadableResource::RESOURCE_FILE_TYPE_GLOBAL_TRANSLATION)
+    {
+        pResourceFile = new CGlobalTranslationItem(this, szFileName, uiDownloadSize, serverChecksum);
+    }
     else
     {
         pResourceFile = new CResourceFile(this, resourceType, szFileName, strBuffer, uiDownloadSize, serverChecksum, bAutoDownload);
@@ -344,6 +350,12 @@ void CResource::Load()
     m_bActive = true;
     m_bStarting = false;
 
+    // Register as global translation provider if marked as such
+    if (m_translationManager && m_translationManager->IsGlobalProvider())
+    {
+        CGlobalTranslationManager::GetSingleton().RegisterProvider(m_strResourceName.c_str(), m_translationManager.get());
+    }
+
     // Did we get a resource root entity?
     if (m_pResourceEntity)
     {
@@ -369,6 +381,13 @@ void CResource::Stop()
 {
     m_bStarting = false;
     m_bStopping = true;
+    
+    // Unregister global translation provider if this resource was one
+    if (m_translationManager && m_translationManager->IsGlobalProvider())
+    {
+        CGlobalTranslationManager::GetSingleton().UnregisterProvider(m_strResourceName.c_str());
+    }
+    
     CLuaArguments Arguments;
     Arguments.PushResource(this);
     m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);
@@ -553,6 +572,24 @@ bool CResource::LoadTranslations()
                     bool isPrimary = m_translationPrimaryFlags.find(language) != m_translationPrimaryFlags.end();
                     m_translationManager->LoadTranslation(fullPath, isPrimary);
                 }
+            }
+        }
+        else if (resourceFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_GLOBAL_TRANSLATION)
+        {
+            CGlobalTranslationItem* globalTranslationItem = dynamic_cast<CGlobalTranslationItem*>(resourceFile);
+            if (globalTranslationItem)
+            {
+                globalTranslationItem->Start();
+            }
+            else
+            {
+                CScriptDebugging* scriptDebugging = g_pClientGame->GetScriptDebugging();
+                SLuaDebugInfo debugInfo;
+                debugInfo.infoType = DEBUG_INFO_NONE;
+                debugInfo.strShortSrc = SString("[Resource: %s]", m_strResourceName.c_str());
+                
+                scriptDebugging->LogError(debugInfo,
+                    "Failed to cast resource file to CGlobalTranslationItem");
             }
         }
     }
