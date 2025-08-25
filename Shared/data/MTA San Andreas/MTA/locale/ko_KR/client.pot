@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-22 08:58+0000\n"
-"PO-Revision-Date: 2025-08-22 09:06\n"
+"POT-Creation-Date: 2025-08-25 08:35+0000\n"
+"PO-Revision-Date: 2025-08-25 09:32\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -595,9 +595,9 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1340
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1389
 #: Client/core/DXHook/CDirect3DHook9.cpp:127 Client/game_sa/CGameSA.cpp:262
-#: Client/game_sa/CGameSA.cpp:273 Client/loader/MainFunctions.cpp:610
-#: Client/loader/MainFunctions.cpp:625 Client/loader/MainFunctions.cpp:628
-#: Client/loader/MainFunctions.cpp:858 Client/loader/CInstallManager.cpp:563
+#: Client/game_sa/CGameSA.cpp:273 Client/loader/MainFunctions.cpp:784
+#: Client/loader/MainFunctions.cpp:805 Client/loader/MainFunctions.cpp:809
+#: Client/loader/MainFunctions.cpp:1119 Client/loader/CInstallManager.cpp:563
 #: Client/loader/CInstallManager.cpp:572
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:143
@@ -1086,7 +1086,7 @@ msgid "DPI aware"
 msgstr "DPI aware"
 
 #: Client/core/CSettings.cpp:692 Client/core/CSettings.cpp:1038
-#: Client/loader/MainFunctions.cpp:332
+#: Client/loader/MainFunctions.cpp:399
 msgid "Fullscreen mode:"
 msgstr "전체 화면 모드:"
 
@@ -1095,7 +1095,7 @@ msgid "Standard"
 msgstr "기본"
 
 #: Client/core/CSettings.cpp:700 Client/core/CSettings.cpp:1660
-#: Client/loader/MainFunctions.cpp:332
+#: Client/loader/MainFunctions.cpp:399
 msgid "Borderless window"
 msgstr "경계 없는 창 모드"
 
@@ -2653,8 +2653,8 @@ msgstr "Mtasa:// 프로토콜을 사용하십시오!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1363
 #: Client/core/ServerBrowser/CServerInfo.cpp:319 Client/game_sa/CGameSA.cpp:269
-#: Client/loader/MainFunctions.cpp:511 Client/loader/MainFunctions.cpp:517
-#: Client/loader/MainFunctions.cpp:1185
+#: Client/loader/MainFunctions.cpp:650 Client/loader/MainFunctions.cpp:657
+#: Client/loader/MainFunctions.cpp:1449
 msgid "Information"
 msgstr "정보"
 
@@ -2806,39 +2806,31 @@ msgstr "업데이트 설치 중..."
 msgid "Extracting files..."
 msgstr "파일을 추출하는 중..."
 
-#: Client/loader/MainFunctions.cpp:72
+#: Client/loader/MainFunctions.cpp:54
+msgid "Invalid module path detected.\n"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:81
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "파일 버전이 일치하지 않습니다. 문제가 발생하면 MTA:SA를 다시 설치하십시오.\n"
 
-#: Client/loader/MainFunctions.cpp:78
+#: Client/loader/MainFunctions.cpp:89
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "일부 파일이 없습니다. 문제가 발생하면 MTA:SA를 다시 설치하십시오.\n"
 
-#: Client/loader/MainFunctions.cpp:87
+#: Client/loader/MainFunctions.cpp:100
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA는 Windows '안전 모드'와 호환되지 않습니다.\n\n"
 "PC를 다시 시작하십시오.\n"
 
-#: Client/loader/MainFunctions.cpp:152
-msgid "Load failed. Please ensure that the file "
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:189
-msgid "Loading core failed. Please ensure that the latest DirectX is correctly installed."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:219 Client/loader/MainFunctions.cpp:229
-msgid "Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:256
+#: Client/loader/MainFunctions.cpp:305
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
 "이전 버전으로 되돌리시겠습니까?"
 
-#: Client/loader/MainFunctions.cpp:281
+#: Client/loader/MainFunctions.cpp:333
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -2846,38 +2838,38 @@ msgstr "MTA:SA를 시작하는 데 문제가 있는 것 같습니다.\n"
 "GTA 설정을 재설정하면 이 문제가 해결될 수 있습니다.\n\n"
 "지금 GTA 설정을 재설정하시겠습니까?"
 
-#: Client/loader/MainFunctions.cpp:294
+#: Client/loader/MainFunctions.cpp:348
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "GTA 설정이 재설정되었습니다.\n\n"
 "계속하려면 확인을 누르십시오."
 
-#: Client/loader/MainFunctions.cpp:297
+#: Client/loader/MainFunctions.cpp:353
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "'%s' 파일을 삭제할 수 없습니다."
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:303
+#: Client/loader/MainFunctions.cpp:361
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
 "온라인 도움말을 보시겠습니까?"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:331
+#: Client/loader/MainFunctions.cpp:398
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
 "다음 설정을 변경하시겠습니까?"
 
-#: Client/loader/MainFunctions.cpp:370
+#: Client/loader/MainFunctions.cpp:470
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
 "GTA 및 MTA에 대해 다음 제품을 비활성화해 보십시오:"
 
-#: Client/loader/MainFunctions.cpp:400
+#: Client/loader/MainFunctions.cpp:503
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -2885,20 +2877,20 @@ msgstr "경고문\n\n"
 "MTA:SA가 비정상적인 활동을 감지했습니다.\n"
 "바이러스 검사를 실행하여 시스템이 안전한지 확인하십시오.\n\n"
 
-#: Client/loader/MainFunctions.cpp:403
+#: Client/loader/MainFunctions.cpp:506
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "탐지된 파일: %s\n"
 
-#: Client/loader/MainFunctions.cpp:510
+#: Client/loader/MainFunctions.cpp:649
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "GTA 인스턴스: GTA: San Andreas가 이미 실행 중입니다. MTA:SA를 시작하기 전에 종료해야 합니다. 지금하시겠습니까?"
 
-#: Client/loader/MainFunctions.cpp:516
+#: Client/loader/MainFunctions.cpp:656
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "GTA: San Andreas를 종료할 수 없습니다. 문제가 지속되면 컴퓨터를 다시 시작하십시오."
 
-#: Client/loader/MainFunctions.cpp:605
+#: Client/loader/MainFunctions.cpp:779
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -2908,94 +2900,85 @@ msgstr "MTA:SA를 다시 시작하는 동안 문제가 발생했습니다.\n\n"
 "gta_sa.exe' 및 'Multi Treft Auto.exe' 프로세스를 중지하십시오.\n\n\n"
 "MTA:SA를 다시 시작하시겠습니까?"
 
-#: Client/loader/MainFunctions.cpp:623
+#: Client/loader/MainFunctions.cpp:803
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "다른 MTA 인스턴스가 이미 실행 중입니다.\n\n"
 "이 문제가 지속되면 컴퓨터를 다시 시작하십시오."
 
-#: Client/loader/MainFunctions.cpp:626
+#: Client/loader/MainFunctions.cpp:807
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "다른 MTA 인스턴스가 이미 실행 중입니다.\n\n"
 "종료하시겠습니까?"
 
-#: Client/loader/MainFunctions.cpp:651
+#: Client/loader/MainFunctions.cpp:839
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "레지스트리 항목이 없습니다. Multi Theft Auto: San Andreas를 다시 설치하십시오."
 
-#: Client/loader/MainFunctions.cpp:654
+#: Client/loader/MainFunctions.cpp:845
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "GTA: San Andreas 설치 경로에 지원되지 않는(유니코드) 문자가 포함되어 있습니다. Grand Theft Auto: San Andreas 설치를 표준 ASCII 문자만 포함된 호환되는 경로로 이동하고 Multi Theft Auto: San Andreas를 다시 설치하십시오."
 
-#: Client/loader/MainFunctions.cpp:664
+#: Client/loader/MainFunctions.cpp:858
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:792
+#: Client/loader/MainFunctions.cpp:1041
 msgid "Invalid installation paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:824
+#: Client/loader/MainFunctions.cpp:1076
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "로드에 실패했습니다. 최신 데이터 파일이 올바르게 설치되었는지 확인하십시오."
 
-#: Client/loader/MainFunctions.cpp:831
+#: Client/loader/MainFunctions.cpp:1085
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "로드에 실패했습니다. %s이(가) 올바르게 설치되었는지 확인하십시오."
 
-#: Client/loader/MainFunctions.cpp:838
+#: Client/loader/MainFunctions.cpp:1094
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "로드에 실패했습니다. %s에서 gta_sa.exe를 찾을 수 없습니다."
 
-#: Client/loader/MainFunctions.cpp:849
+#: Client/loader/MainFunctions.cpp:1108
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "로드에 실패했습니다. %s이(가) GTA 디렉토리에 있습니다. 계속하기 전에 삭제하십시오."
 
-#: Client/loader/MainFunctions.cpp:857
+#: Client/loader/MainFunctions.cpp:1118
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "주 파일의 이름(%s)이 잘못되었습니다."
 
-#: Client/loader/MainFunctions.cpp:899
+#: Client/loader/MainFunctions.cpp:1165
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:906
+#: Client/loader/MainFunctions.cpp:1173
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:920
+#: Client/loader/MainFunctions.cpp:1197
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1096
+#: Client/loader/MainFunctions.cpp:1352
 msgid "Invalid game paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1103
+#: Client/loader/MainFunctions.cpp:1360
 msgid "Fix configuration issue"
 msgstr "구성 문제 해결"
 
-#: Client/loader/MainFunctions.cpp:1141
-msgid "Fix elevation required error"
-msgstr "고도 수정이 필요한 오류"
-
-#: Client/loader/MainFunctions.cpp:1146
-#, c-format
-msgid "Could not start Grand Theft Auto: San Andreas. [%s]"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:1184
+#: Client/loader/MainFunctions.cpp:1449
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr ""
 
