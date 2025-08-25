@@ -20,6 +20,7 @@
 #include "CProjectileInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 #include "CFireManagerSA.h"
+#include "CAnimManagerSA.h"
 
 extern CGameSA* pGame;
 
@@ -574,6 +575,25 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
         // Push satchel into the array. There is no need to check the counter because for satchels it restarts until the player detonates the charges
         satchelsList.emplace_back(projectileInterface, &projectileInterface->m_vecAttachedOffset, &projectileInterface->m_vecAttachedRotation);
     }
+}
+
+bool CPedSA::IsPedCuttingWithChainsaw() const
+{
+    if (GetPedIntelligence()->GetTaskManager()->GetActiveTask()->GetTaskType() == TASK_SIMPLE_FIGHT)
+    {
+        CPedSAInterface* gamePed = GetPedInterface();
+
+        if (gamePed->weaponAudioEntity.m_chainsawState == eChainsawState::CUTTING)
+        {
+            auto cuttingAnim = pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(gamePed->m_pRwObject, "csaw_g");
+            if (!cuttingAnim)
+                cuttingAnim = pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(gamePed->m_pRwObject, "csaw_part");
+
+            return cuttingAnim != nullptr;
+        }
+    }
+
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////

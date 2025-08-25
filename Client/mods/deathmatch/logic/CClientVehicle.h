@@ -760,4 +760,6 @@ public:
 
     std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
     bool                                     m_copyDummyPositions = true;
+
+    std::int64_t m_lastEventDamageCancelledTime{0};
 };
