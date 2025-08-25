@@ -28,8 +28,12 @@ namespace SharedUtil
     }
 }            // namespace SharedUtil
 
-#define PRId64  "lld"
-#define PRIx64  "llx"
+#ifndef PRId64
+    #define PRId64  "lld"
+#endif
+#ifndef PRIx64
+    #define PRIx64  "llx"
+#endif
 
 // Crazy thing
 #define LOCAL_FUNCTION_START    struct local {
