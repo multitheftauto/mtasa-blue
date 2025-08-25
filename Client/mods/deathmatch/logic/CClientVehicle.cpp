@@ -213,6 +213,9 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
 
     m_pSoundSettingsEntry = nullptr;
+
+    // Init firetruck & swatvan watercannon
+    m_specialFeatures = g_pGame->GetModelSpecialFeatures(m_usModel);
 }
 
 CClientVehicle::~CClientVehicle()
@@ -2941,6 +2944,8 @@ void CClientVehicle::Create()
             }
         }
 
+        m_pVehicle->SetSpecialFeaturesEnabled(m_specialFeatures);
+
         // We've just been streamed in
         m_bJustStreamedIn = true;
 
@@ -5117,7 +5122,7 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
-bool CClientVehicle::SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime)
+bool CClientVehicle::SpawnFlyingComponent(const CarNodes::Enum& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime)
 {
     if (!m_pVehicle)
         return false;
@@ -5154,3 +5159,35 @@ void CClientVehicle::ResetAudioSettings()
     ApplyAudioSettings();
 }
 
+bool CClientVehicle::SetSpecialFeatureEnabled(const VehicleFeatures::Enum& feature, bool enabled)
+{
+    if (m_pVehicle)
+    {
+        if (!m_pVehicle->SetSpecialFeatureEnabled(feature, enabled))
+            return false;
+    }
+    else
+    {
+        // Anti-crash checks
+        switch (feature)
+        {
+            case VehicleFeatures::Enum::WATER_CANNON:
+            {
+                if (m_ComponentData.find("misc_a") == m_ComponentData.end())
+                    return false;
+
+                break;
+            }
+            case VehicleFeatures::Enum::TURRET:
+            {
+                if (m_ComponentData.find("misc_a") == m_ComponentData.end() || m_ComponentData.find("misc_b") == m_ComponentData.end())
+                    return false;
+
+                break;
+            }
+        }
+    }
+
+    m_specialFeatures[feature] = enabled;
+    return true;
+}

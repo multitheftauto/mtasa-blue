@@ -17,6 +17,7 @@
 #include "Common.h"
 #include "CWeaponInfo.h"
 #include "enums/SystemState.h"
+#include "enums/VehicleFeatures.h"
 
 class C3DMarkers;
 class CAEAudioHardware;
@@ -288,4 +289,10 @@ public:
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
 
+    virtual bool SetVehicleModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature, bool enabled) = 0;
+    virtual bool IsVehicleModelSpecialFeatureEnabled(std::uint16_t model, VehicleFeatures::Enum feature) const = 0;
+
+    virtual std::array<bool, VehicleFeatures::Enum::MAX_FEATURES> GetModelSpecialFeatures(std::uint16_t model) const noexcept = 0;
+
+    virtual void ResetVehicleModelsSpecialFeatures() const noexcept = 0;
 };

@@ -101,6 +101,7 @@ DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(taskType);
 DECLARE_ENUM(eEntityType);
 DECLARE_ENUM_CLASS(VehicleAudioSettingProperty);
+DECLARE_ENUM(VehicleFeatures::Enum);
 
 class CRemoteCall;
 

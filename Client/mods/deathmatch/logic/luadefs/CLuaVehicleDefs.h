@@ -199,4 +199,7 @@ public:
 
     static bool SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state);
     static bool IsSmokeTrailEnabled(CClientVehicle* vehicle) noexcept;
+
+    static bool SetVehicleSpecialFeatureEnabled(std::variant<std::uint16_t, CClientVehicle*> vehicle, VehicleFeatures::Enum feature, bool enabled) noexcept;
+    static bool IsVehicleSpecialFeatureEnabled(std::variant<std::uint16_t, CClientVehicle*> vehicle, VehicleFeatures::Enum feature) noexcept;
 };

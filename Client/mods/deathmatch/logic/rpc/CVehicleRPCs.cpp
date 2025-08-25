@@ -668,7 +668,7 @@ void CVehicleRPCs::SpawnVehicleFlyingComponent(CClientEntity* const sourceEntity
     std::int32_t removalTime;
 
     if (bitStream.Read(nodeIndex) && bitStream.Read(collisionType) && bitStream.Read(removalTime))
-        vehicle->SpawnFlyingComponent(static_cast<eCarNodes>(nodeIndex), static_cast<eCarComponentCollisionTypes>(collisionType), removalTime);
+        vehicle->SpawnFlyingComponent(static_cast<CarNodes::Enum>(nodeIndex), static_cast<eCarComponentCollisionTypes>(collisionType), removalTime);
 }
 
 void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream)
