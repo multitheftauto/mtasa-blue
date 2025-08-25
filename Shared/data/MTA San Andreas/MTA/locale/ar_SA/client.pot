@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-25 08:35+0000\n"
-"PO-Revision-Date: 2025-08-25 09:31\n"
+"PO-Revision-Date: 2025-08-25 17:49\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -2840,7 +2840,7 @@ msgstr "جاري استخراج الملفات..."
 
 #: Client/loader/MainFunctions.cpp:54
 msgid "Invalid module path detected.\n"
-msgstr ""
+msgstr "تم اكتشاف مسار وحدة غير صالح."
 
 #: Client/loader/MainFunctions.cpp:81
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
