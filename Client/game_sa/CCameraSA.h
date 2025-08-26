@@ -414,6 +414,9 @@ public:
     void                ShakeCamera(float radius, float x, float y, float z) noexcept override;
     void                ResetShakeCamera() noexcept override;
     std::uint8_t        GetTransitionState() override;
+    bool                IsInTransition() override;
+    float               GetTransitionFOV() override;
+    bool                GetTransitionMatrix(CMatrix& matrix) override;
 
     // Additional overload not in base interface
     virtual CCam* GetCam(CCamSAInterface* camInterface);

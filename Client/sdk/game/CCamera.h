@@ -148,4 +148,7 @@ public:
     virtual void ResetShakeCamera() noexcept = 0;
 
     virtual std::uint8_t GetTransitionState() = 0;
+    virtual bool         IsInTransition() = 0;
+    virtual float        GetTransitionFOV() = 0;
+    virtual bool         GetTransitionMatrix(CMatrix& matrix) = 0;
 };

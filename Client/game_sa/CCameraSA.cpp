@@ -15,6 +15,9 @@
 #include <mutex>
 #include <cmath>
 
+// Camera constants
+constexpr float DEFAULT_FOV = 70.0f;
+
 extern CGameSA* pGame;
 
 static std::mutex s_cameraClipMutex;
@@ -565,4 +568,50 @@ void CCameraSA::ResetShakeCamera() noexcept
 std::uint8_t CCameraSA::GetTransitionState()
 {
     return GetInterface()->m_uiTransitionState;
+}
+
+bool CCameraSA::IsInTransition()
+{
+    return GetTransitionState() != 0;
+}
+
+float CCameraSA::GetTransitionFOV()
+{
+    CCameraSAInterface* pInterface = GetInterface();
+    return pInterface ? pInterface->FOVDuringInter : DEFAULT_FOV;
+}
+
+bool CCameraSA::GetTransitionMatrix(CMatrix& matrix)
+{
+    CCameraSAInterface* pInterface = GetInterface();
+    if (!pInterface || !IsInTransition())
+        return false;
+    
+    CVector source = pInterface->SourceDuringInter;
+    CVector target = pInterface->TargetDuringInter;
+    CVector up = pInterface->UpDuringInter;
+    
+    CVector forward = target - source;
+    if (forward.Length() < FLOAT_EPSILON)
+        forward = CVector(0.0f, 1.0f, 0.0f);
+    else
+        forward.Normalize();
+    
+    CVector right = CVector(forward.fY, -forward.fX, 0.0f);
+    if (right.Length() < FLOAT_EPSILON)
+        right = CVector(1.0f, 0.0f, 0.0f);
+    else
+        right.Normalize();
+    
+    CVector correctedUp = right;
+    correctedUp.CrossProduct(&forward);
+    correctedUp.Normalize();
+    
+    matrix.vPos = source;
+    matrix.vFront = forward;
+    matrix.vRight = -right;
+    matrix.vUp = correctedUp;
+    matrix.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
+    
+    return true;
 }
