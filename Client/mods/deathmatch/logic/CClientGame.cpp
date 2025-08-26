@@ -73,6 +73,10 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
+// Ray casting constants for click detection
+constexpr float CLICK_RAY_DEPTH = 300.0f;     // Screen-to-world ray projection depth
+constexpr float MAX_CLICK_DISTANCE = 6000.0f; // Maximum distance for closest marker comparison
+
 static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
 
 CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
@@ -2325,6 +2329,58 @@ void CClientGame::ProcessServerControlBind(CControlFunctionBind* pBind)
     m_pNetAPI->RPC(KEY_BIND, bitStream.pBitStream);
 }
 
+CClientMarker* CClientGame::CheckMarkerClick(float screenX, float screenY, float& distance) noexcept
+{
+    if (!m_pMarkerManager)
+        return nullptr;
+
+    CCamera* camera = g_pGame->GetCamera();
+    CMatrix cameraMatrix;
+    camera->GetMatrix(&cameraMatrix);
+    CVector origin = cameraMatrix.vPos;
+    
+    CVector target;
+    CVector screen(screenX, screenY, CLICK_RAY_DEPTH);
+    g_pCore->GetGraphics()->CalcWorldCoors(&screen, &target);
+    
+    CVector rayDirection = target - origin;
+    rayDirection.Normalize();
+
+    CClientMarker* closestMarker = nullptr;
+    float closestDistance = MAX_CLICK_DISTANCE;
+
+    for (auto* marker : m_pMarkerManager->m_Markers)
+    {
+        if (!marker || !marker->IsStreamedIn() || !marker->IsVisible())
+            continue;
+            
+        if (!marker->IsClientSideOnScreen())
+            continue;
+
+        CSphere boundingSphere = marker->GetWorldBoundingSphere();
+        
+        CVector toSphere = boundingSphere.vecPosition - origin;
+        float projection = toSphere.DotProduct(&rayDirection);
+        
+        if (projection <= 0.0f)
+            continue;
+            
+        CVector closestPoint = origin + rayDirection * projection;
+        float distanceToRay = (boundingSphere.vecPosition - closestPoint).Length();
+        
+        if (distanceToRay <= boundingSphere.fRadius && projection < closestDistance)
+        {
+            closestDistance = projection;
+            closestMarker = marker;
+        }
+    }
+
+    if (closestMarker)
+        distance = closestDistance;
+    
+    return closestMarker;
+}
+
 bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     bool bCursorForcedVisible = g_pCore->IsCursorForcedVisible();
@@ -2374,7 +2430,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
 
                     CVector2D vecCursorPosition((float)iX, (float)iY);
 
-                    CVector vecOrigin, vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
+                    CVector vecOrigin, vecTarget, vecScreen((float)iX, (float)iY, CLICK_RAY_DEPTH);
                     g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
 
                     // Grab the camera position
@@ -2392,7 +2448,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
 
                     CVector        vecCollision;
                     ElementID      CollisionEntityID = INVALID_ELEMENT_ID;
-                    CClientEntity* pCollisionEntity = NULL;
+                    CClientEntity* collisionEntity = nullptr;
+                    
                     if (bCollision && pColPoint)
                     {
                         vecCollision = pColPoint->GetPosition();
@@ -2402,7 +2459,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                             CClientEntity* pEntity = pPools->GetClientEntity((DWORD*)pGameEntity->GetInterface());
                             if (pEntity)
                             {
-                                pCollisionEntity = pEntity;
+                                collisionEntity = pEntity;
                                 if (!pEntity->IsLocalEntity())
                                     CollisionEntityID = pEntity->GetID();
                             }
@@ -2415,9 +2472,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
 
                     // Destroy the colpoint so we don't get a leak
                     if (pColPoint)
-                    {
                         pColPoint->Destroy();
-                    }
 
                     const char* szButton = NULL;
                     const char* szState = NULL;
@@ -2457,6 +2512,25 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         if (std::isnan(vecCollision.fZ))
                             vecCollision.fZ = 0;
 
+                        float markerDistance = 0.0f;
+                        CClientMarker* clickedMarker = CheckMarkerClick(static_cast<float>(iX), static_cast<float>(iY), markerDistance);
+                        if (clickedMarker)
+                        {
+                            CVector markerPosition;
+                            clickedMarker->GetPosition(markerPosition);
+                            
+                            CLuaArguments MarkerArguments;
+                            MarkerArguments.PushString(szButton);
+                            MarkerArguments.PushString(szState);
+                            MarkerArguments.PushNumber(vecCursorPosition.fX);
+                            MarkerArguments.PushNumber(vecCursorPosition.fY);
+                            MarkerArguments.PushNumber(markerPosition.fX);
+                            MarkerArguments.PushNumber(markerPosition.fY);
+                            MarkerArguments.PushNumber(markerPosition.fZ);
+                            MarkerArguments.PushNumber(markerDistance);
+                            clickedMarker->CallEvent("onClientMarkerClick", MarkerArguments, false);
+                        }
+
                         // Call the event for the client
                         CLuaArguments Arguments;
                         Arguments.PushString(szButton);
@@ -2466,8 +2540,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         Arguments.PushNumber(vecCollision.fX);
                         Arguments.PushNumber(vecCollision.fY);
                         Arguments.PushNumber(vecCollision.fZ);
-                        if (pCollisionEntity)
-                            Arguments.PushElement(pCollisionEntity);
+                        if (collisionEntity)
+                            Arguments.PushElement(collisionEntity);
                         else
                             Arguments.PushBoolean(false);
                         m_pRootEntity->CallEvent("onClientClick", Arguments, false);
@@ -2510,8 +2584,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                                 DoubleClickArguments.PushNumber(vecCollision.fX);
                                 DoubleClickArguments.PushNumber(vecCollision.fY);
                                 DoubleClickArguments.PushNumber(vecCollision.fZ);
-                                if (pCollisionEntity)
-                                    DoubleClickArguments.PushElement(pCollisionEntity);
+                                if (collisionEntity)
+                                    DoubleClickArguments.PushElement(collisionEntity);
                                 else
                                     DoubleClickArguments.PushBoolean(false);
                                 m_pRootEntity->CallEvent("onClientDoubleClick", DoubleClickArguments, false);
@@ -2540,7 +2614,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                 CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
                 CVector2D vecCursorPosition(((float)iX) / vecResolution.fX, ((float)iY) / vecResolution.fY);
 
-                CVector vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
+                CVector vecTarget, vecScreen((float)iX, (float)iY, CLICK_RAY_DEPTH);
                 g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
 
                 // Call the onClientCursorMove event
@@ -2741,6 +2815,7 @@ void CClientGame::AddBuiltInEvents()
     // Marker events
     m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", nullptr, false);
     m_Events.AddEvent("onClientMarkerLeave", "entity, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientMarkerClick", "button, state, screenX, screenY, worldX, worldY, worldZ, distance", nullptr, false);
 
     m_Events.AddEvent("onClientPlayerMarkerHit", "marker, matchingDimension", nullptr, false);
     m_Events.AddEvent("onClientPlayerMarkerLeave", "marker, matchingDimension", nullptr, false);
