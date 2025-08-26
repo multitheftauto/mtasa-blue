@@ -11,7 +11,9 @@
 
 #pragma once
 
-#define     MAX_JUMPCODE_SIZE           20
+#define MAX_JUMPCODE_SIZE           20
+
+#include "gamesa_init.h"
 
 template <typename T>
 void* FunctionPointerToVoidP(T func)
@@ -23,6 +25,8 @@ void* FunctionPointerToVoidP(T func)
     } c = {func};
     return c.b;
 }
+
+BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
 
 void HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction);
 
@@ -41,8 +45,6 @@ bool HookInstall(DWORD dwInstallAddress, T dwHookHandler, int iJmpCodeSize = 5)
         return false;
     }
 }
-
-BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
 
 // Auto detect requirement of US/EU hook installation
 #define EZHookInstall(type) \

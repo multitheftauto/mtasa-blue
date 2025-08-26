@@ -194,7 +194,7 @@ DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
 
 void CScreenShot::StartSaveThread()
 {
-    HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, NULL, CREATE_SUSPENDED, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)static_cast<void*>(ThreadProc), NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot thread.");

@@ -1704,15 +1704,25 @@ void CMultiplayerSA::DisablePadHandler(bool bDisabled)
 
 void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
 {
-    settings.ucIntensity = *(int*)0x8D50E8;
-    settings.ucRandomShift = *(int*)0xC402C0;
-    settings.usSpeedMin = *(int*)0x8D50EC;
-    settings.usSpeedMax = *(int*)0x8D50F0;
-    settings.sScanSizeX = *(int*)0xC40304;
-    settings.sScanSizeY = *(int*)0xC40308;
-    settings.usRenderSizeX = *(int*)0xC4030C;
-    settings.usRenderSizeY = *(int*)0xC40310;
-    settings.bInsideBuilding = *(bool*)0xC402BA;
+    int*  CPostEffects__m_HeatHazeFXIntensity = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXIntensity)>(0x8D50E8);
+    int*  CPostEffects__m_HeatHazeFXRandomShift = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRandomShift)>(0xC402C0);
+    int*  CPostEffects__m_HeatHazeFXSpeedMin = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMin)>(0xC402C0);
+    int*  CPostEffects__m_HeatHazeFXSpeedMax = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMax)>(0x8D50F0);
+    int*  CPostEffects__m_HeatHazeFXScanSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeX)>(0xC40304);
+    int*  CPostEffects__m_HeatHazeFXScanSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeY)>(0xC40308);
+    int*  CPostEffects__m_HeatHazeFXRenderSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRenderSizeX)>(0xC4030C);
+    int*  CPostEffects__m_HeatHazeFXRenderSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRenderSizeY)>(0xC40310);
+    bool* CPostEffects__m_bHeatHazeFX = reinterpret_cast<decltype(CPostEffects__m_bHeatHazeFX)>(0xC402BA);
+
+    settings.ucIntensity = static_cast<uchar>(*CPostEffects__m_HeatHazeFXIntensity);
+    settings.ucRandomShift = static_cast<uchar>(*CPostEffects__m_HeatHazeFXRandomShift);
+    settings.usSpeedMin = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMin);
+    settings.usSpeedMax = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMax);
+    settings.sScanSizeX = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeY);
+    settings.sScanSizeY = static_cast<short>(*CPostEffects__m_HeatHazeFXSpeedMax);
+    settings.usRenderSizeX = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeX);
+    settings.usRenderSizeY = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeY);
+    settings.bInsideBuilding = *CPostEffects__m_bHeatHazeFX;
 }
 
 void CMultiplayerSA::ResetColorFilter()
@@ -2229,7 +2239,7 @@ void CMultiplayerSA::ResetSky()
 
 void CMultiplayerSA::SetMoonSize(int iSize)
 {
-    MemPutFast<BYTE>(0x8D4B60, iSize);
+    MemPutFast(0x8D4B60, static_cast<BYTE>(iSize));
 }
 
 int CMultiplayerSA::GetMoonSize()
@@ -6221,7 +6231,7 @@ bool CheckRemovedModelNoSet()
     if (pBuildingRemoval)
     {
         // Is the model in question even removed?
-        if (pBuildingRemoval->IsModelRemoved(pEntityWorldAdd->m_nModelIndex))
+        if (pBuildingRemoval->IsModelRemoved(static_cast<uint16_t>(pEntityWorldAdd->m_nModelIndex)))
         {
             // is the replaced model in the spherical radius of any building removal
             if (pGameInterface->GetBuildingRemoval()->IsRemovedModelInRadius(pEntityWorldAdd))
@@ -7389,8 +7399,12 @@ static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, C
         SColor colors[4];
         pVehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
 
-        RwColor color = {colors[0].R * pVehicleInterface->m_fLighting, colors[0].G * pVehicleInterface->m_fLighting,
-                         colors[0].B * pVehicleInterface->m_fLighting, 0xFF};
+        RwColor color = {
+            static_cast<unsigned char>(colors[0].R * pVehicleInterface->m_fLighting),
+            static_cast<unsigned char>(colors[0].G * pVehicleInterface->m_fLighting),
+            static_cast<unsigned char>(colors[0].B * pVehicleInterface->m_fLighting),
+            0xFF
+        };
 
         // Fx_c::AddDebris
         ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(CLASS_CFx, vecPosition, color, 0.06f, count / 100 + 1);

@@ -884,8 +884,8 @@ void CheckAntiVirusStatus()
     static const auto WscGetHealth = []() -> decltype(&WscGetSecurityProviderHealth) {
         if (HMODULE wscapi = LoadLibraryW(L"Wscapi.dll"))
         {
-            return reinterpret_cast<decltype(&WscGetSecurityProviderHealth)>(
-                GetProcAddress(wscapi, "WscGetSecurityProviderHealth"));
+            auto function = static_cast<void*>(GetProcAddress(wscapi, "WscGetSecurityProviderHealth"));
+            return reinterpret_cast<decltype(&WscGetSecurityProviderHealth)>(function);
         }
         return nullptr;
     }();

@@ -95,7 +95,7 @@ void CAudioEngineSA::StopRadio()
 
 void CAudioEngineSA::StartRadio(unsigned int station)
 {
-    m_ucRadioChannel = station;
+    m_ucRadioChannel = static_cast<unsigned char>(station);
     m_bRadioOn = true;
 
     // Make sure we have the correct muted state

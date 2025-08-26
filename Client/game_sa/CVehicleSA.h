@@ -27,7 +27,7 @@
 
 class CFxSystemSAInterface;
 class CTrainSAInterface;
-class CColModelSAInterface;
+struct CColModelSAInterface;
 struct RwTexture;
 
 #define SIZEOF_CHELI                            2584

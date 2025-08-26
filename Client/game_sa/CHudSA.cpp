@@ -518,7 +518,11 @@ SHudComponentData& CHudSA::GetHudComponentRef(const eHudComponent& component) co
             return componentProperties.weaponIcon;
         case HUD_WANTED:
             return componentProperties.wanted;
+        default:
+            break;
     }
+
+    return componentProperties.hpBar;
 }
 
 void CHudSA::ResetComponentPlacement(const eHudComponent& component, bool resetSize) noexcept
@@ -623,8 +627,8 @@ void CHudSA::RenderHealthBar(int x, int y)
     // Save default position once
     if (!componentProperties.hpBar.placement.setDefaultXY)
     {
-        componentProperties.hpBar.placement.x = x;
-        componentProperties.hpBar.placement.y = y;
+        componentProperties.hpBar.placement.x = static_cast<float>(x);
+        componentProperties.hpBar.placement.y = static_cast<float>(y);
         componentProperties.hpBar.placement.setDefaultXY = true;
     }
 
@@ -638,8 +642,8 @@ void CHudSA::RenderHealthBar(int x, int y)
     float barWidth = useCustomSize ? componentProperties.hpBar.placement.customWidth : componentProperties.hpBar.placement.width;
 
     // Calc bar width depending on MAX_HEALTH stat
-    double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
-    float  totalWidth = (barWidth * maxHealth) / statModifier;
+    float statModifier = ((float(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
+    float totalWidth = (barWidth * maxHealth) / statModifier;
 
     float posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + x);
     float posY = useCustomPosition ? componentProperties.hpBar.placement.customY : y;
@@ -662,13 +666,13 @@ void CHudSA::RenderBreathBar(int x, int y)
     // Save default position once
     if (!componentProperties.breathBar.placement.setDefaultXY)
     {
-        componentProperties.breathBar.placement.x = x;
-        componentProperties.breathBar.placement.y = y;
+        componentProperties.breathBar.placement.x = static_cast<float>(x);
+        componentProperties.breathBar.placement.y = static_cast<float>(y);
         componentProperties.breathBar.placement.setDefaultXY = true;
     }
 
     // Calc bar width depending on AIR_IN_LUNG stat
-    double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(8);
+    float statModifier = ((float(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(8);
 
     // Use custom position/size?
     bool useCustomPosition = componentProperties.breathBar.placement.useCustomPosition;
@@ -696,8 +700,8 @@ void CHudSA::RenderArmorBar(int x, int y)
     // Save default position once
     if (!componentProperties.armorBar.placement.setDefaultXY)
     {
-        componentProperties.armorBar.placement.x = x;
-        componentProperties.armorBar.placement.y = y;
+        componentProperties.armorBar.placement.x = static_cast<float>(x);
+        componentProperties.armorBar.placement.y = static_cast<float>(y);
         componentProperties.armorBar.placement.setDefaultXY = true;
     }
 

@@ -1757,8 +1757,8 @@ void CCore::UpdateRecentlyPlayed()
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
-        pRecentList->Remove(Address, uiPort);
-        pRecentList->AddUnique(Address, uiPort, true);
+        pRecentList->Remove(Address, static_cast<ushort>(uiPort));
+        pRecentList->AddUnique(Address, static_cast<ushort>(uiPort), true);
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())

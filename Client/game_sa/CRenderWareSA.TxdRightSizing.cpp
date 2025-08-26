@@ -204,9 +204,9 @@ RwTexture* CRenderWareSA::RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit
     header.RasterFormat.rasterFormat = (pRaster->format & 0x0f)
                                        << 8;            // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
     header.RasterFormat.d3dFormat = pD3DRaster->format;
-    header.RasterFormat.width = uiReqWidth;
-    header.RasterFormat.height = uiReqHeight;
-    header.RasterFormat.depth = pRaster->depth;
+    header.RasterFormat.width = static_cast<unsigned short>(uiReqWidth);
+    header.RasterFormat.height = static_cast<unsigned short>(uiReqHeight);
+    header.RasterFormat.depth = static_cast<unsigned char>(pRaster->depth);
     header.RasterFormat.numLevels = 1;
     header.RasterFormat.rasterType = pRaster->type;            // dxt1 = 4 / dxt3 = 4
     header.RasterFormat.alpha = bHasAlpha;

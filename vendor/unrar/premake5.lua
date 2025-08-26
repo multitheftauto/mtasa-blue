@@ -2,6 +2,9 @@ project "unrar"
 	language "C++"
 	kind "StaticLib"
 	targetname "unrar"
+	disablewarnings {
+		"4996", -- use of symbol with __declspec(deprecated)
+	}
 
 	defines { "RARDLL" }
 
