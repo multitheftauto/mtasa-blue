@@ -16,6 +16,7 @@
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
 #include "version.h"
+
 #ifdef WIN32
     #include <ctime>
     #include <windows.h>
@@ -34,6 +35,10 @@
     #ifndef RUSAGE_THREAD
         #define    RUSAGE_THREAD    1        /* only the calling thread */
     #endif
+#endif
+
+#if __cplusplus >= 201703L // C++17
+    #include <filesystem>
 #endif
 
 #if defined(__APPLE__) && !defined(__aarch64__)
@@ -1516,6 +1521,18 @@ char* SharedUtil::Trim(char* szText)
 
     return static_cast<char*>(memmove(szOriginal, szText, uiLen + 1));
 }
+
+#if __cplusplus >= 201703L // C++17
+std::string SharedUtil::UTF8FilePath(const std::filesystem::path& input)
+{
+#ifdef __cpp_lib_char8_t
+    std::u8string raw = input.u8string();
+    return std::string{ std::begin(raw), std::end(raw) };
+#else
+    return input.u8string();
+#endif
+}
+#endif
 
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
 std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)

@@ -22,6 +22,16 @@
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.Map.h"
 
+#if __cplusplus >= 201703L // C++17
+namespace std
+{
+    namespace filesystem
+    {
+        class path;
+    }
+}
+#endif
+
 namespace SharedUtil
 {
     class CArgMap;
@@ -227,6 +237,10 @@ namespace SharedUtil
     //
     // string stuff
     //
+
+#if __cplusplus >= 201703L // C++17
+    std::string UTF8FilePath(const std::filesystem::path& input);
+#endif
 
     std::wstring MbUTF8ToUTF16(const SString& s);
 

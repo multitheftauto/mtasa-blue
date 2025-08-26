@@ -1345,7 +1345,7 @@ int LaunchGame(SString strCmdLine)
 
     const SString strGTAPath    = GetGTAPath();
     const SString strMTASAPath  = GetMTASAPath();
-    const SString strGTAEXEPath = GetGameExecutablePath().u8string();
+    const SString strGTAEXEPath = UTF8FilePath(GetGameExecutablePath());
 
     if (!ValidatePath(strGTAPath) || !ValidatePath(strMTASAPath) || !ValidatePath(strGTAEXEPath))
     {

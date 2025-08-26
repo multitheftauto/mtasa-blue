@@ -35,7 +35,7 @@ public:
 
     // Get without needing caller temp variable
     template <class T>
-    T GetValue(const std::string& strVariable, const T& defaultValue = 0)
+    T GetValue(const std::string& strVariable, const T& defaultValue = {})
     {
         T value = defaultValue;
         Get(strVariable, value);
