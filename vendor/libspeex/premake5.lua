@@ -37,7 +37,8 @@ project "libspeex"
 		-- These files are in libspeex and libspeexdsp
 		"libspeexdsp/kiss_fft.c",
 		"libspeexdsp/kiss_fftr.c",
-		"libspeexdsp/smallft.c"
+		"libspeexdsp/smallft.c",
+		"libspeexdsp/fftwrap.c",
 	}
 
 	filter "architecture:not x86"
