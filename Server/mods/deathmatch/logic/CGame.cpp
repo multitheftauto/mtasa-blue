@@ -1672,6 +1672,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
     m_Events.AddEvent("onElementAttach", "attachSource, attachOffsetX, attachOffsetY, attachOffsetZ, attachOffsetRX, attachOffsetRY, attachOffsetRZ", nullptr, false);
     m_Events.AddEvent("onElementDetach", "detachSource, detachWorldX, detachWorldY, detachWorldZ, detachWorldRX, detachWorldRY, detachWorldRZ", nullptr, false);
+    m_Events.AddEvent("onElementPositionChange", "oldX, oldY, oldZ, newX, newY, newZ", nullptr, false);
 
     // Radar area events
 

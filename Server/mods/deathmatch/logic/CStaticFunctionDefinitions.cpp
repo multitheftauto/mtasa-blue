@@ -1305,6 +1305,9 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
         player->SetTeleported(true);
     }
 
+    // Get element old position
+    CVector elementOldPosition = pElement->GetPosition();
+
     // Update our position for that entity.
     pElement->SetPosition(vecPosition);
 
@@ -1347,6 +1350,9 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     // By listening to this event, anti-cheat scripts can safely ignore server-initiated position changes.
     CLuaArguments Arguments;
     Arguments.PushElement(pElement);
+    Arguments.PushNumber(elementOldPosition.fX);
+    Arguments.PushNumber(elementOldPosition.fY);
+    Arguments.PushNumber(elementOldPosition.fZ);
     Arguments.PushNumber(vecPosition.fX);
     Arguments.PushNumber(vecPosition.fY);
     Arguments.PushNumber(vecPosition.fZ);
