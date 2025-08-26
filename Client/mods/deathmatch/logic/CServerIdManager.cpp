@@ -188,7 +188,8 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
     ms_ServerIdMap = m_ServerIdMap;
 
     // Start save thread
-    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerIdManagerImpl::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(static_cast<void*>(CServerIdManagerImpl::StaticThreadProc)),
+                                  NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         g_pCore->GetConsole()->Printf("Could not create server-ids save thread.");
@@ -266,7 +267,7 @@ SString CServerIdManagerImpl::GetConnectionPrivateDirectory(bool bPreviousVer)
 
     // If ServerId is invalid, use the temp dir
     if (strServerId.length() < 10)
-        return bPreviousVer ? "" : m_strTempErrorDir;
+        return bPreviousVer ? SStringX("") : m_strTempErrorDir;
 
     // Otherwise fetch the server unique dir
     const CServerIdInfo& info = GetServerIdInfo(strServerId);

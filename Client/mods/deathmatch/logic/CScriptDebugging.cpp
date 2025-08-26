@@ -122,7 +122,8 @@ void CScriptDebugging::UpdateLogOutput()
     SLogLine line;
     while (m_DuplicateLineFilter.PopOutputLine(line))
     {
-        bool sufficientDebugLevel = CheckForSufficientDebugLevel(m_uiLogFileLevel, line.uiMinimumDebugLevel);
+        bool sufficientDebugLevel = CheckForSufficientDebugLevel(static_cast<std::uint8_t>(m_uiLogFileLevel),
+                                                                 static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
 
         if (sufficientDebugLevel)
         {
@@ -139,7 +140,7 @@ void CScriptDebugging::UpdateLogOutput()
         if (localPlayer)
             clientDebugLevel = localPlayer->GetPlayerScriptDebugLevel();
         
-        bool shouldDisplayInConsole = CheckForSufficientDebugLevel(clientDebugLevel, line.uiMinimumDebugLevel);
+        bool shouldDisplayInConsole = CheckForSufficientDebugLevel(clientDebugLevel, static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
         if (shouldDisplayInConsole)
             g_pCore->DebugEchoColor(line.strText, line.ucRed, line.ucGreen, line.ucBlue);
     }

@@ -107,10 +107,9 @@ bool CLuaVectorGraphicDefs::SetSize(CClientVectorGraphic* vectorGraphic, CVector
     if (size.fX > 4096 || size.fY > 4096)
         throw std::invalid_argument("A vector graphic cannot exceed 4096x4096 in size.");
 
-    int intSizeX = static_cast<int>(size.fX);
-    int intSizeY = static_cast<int>(size.fY);
-
-    vectorGraphicItem->Resize(CVector2D(intSizeX, intSizeY));
+    size.fX = fabsf(size.fX);
+    size.fY = fabsf(size.fY);
+    vectorGraphicItem->Resize(size);
 
     vectorGraphic->GetDisplay()->Update();
     return true;
