@@ -132,16 +132,16 @@ CVehicle::~CVehicle()
             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
             {
                 // Does it have an occupant and is the occupant the requesting ped?
-                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
-                if (pPed == GetOccupant(ucOccupiedSeat))
+                unsigned int occupiedSeat = pPed->GetOccupiedVehicleSeat();
+                if (pPed == GetOccupant(occupiedSeat))
                 {
                     // Mark the ped/vehicle as empty
-                    SetOccupant(NULL, ucOccupiedSeat);
+                    SetOccupant(NULL, occupiedSeat);
                     pPed->SetOccupiedVehicle(NULL, 0);
                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                     // Tell everyone he has exited the vehicle
-                    CVehicleInOutPacket Reply(pPed->GetID(), GetID(), ucOccupiedSeat, CGame::VEHICLE_NOTIFY_OUT_RETURN);
+                    CVehicleInOutPacket Reply(pPed->GetID(), GetID(), static_cast<unsigned char>(occupiedSeat), CGame::VEHICLE_NOTIFY_OUT_RETURN);
                     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Reply);
                 }
             }
@@ -312,7 +312,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
         uchar ucValues[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         char* sz1 = strtok(szTemp, ", ");
         if (sz1)
-            ucValues[0] = atoi(sz1);
+            ucValues[0] = static_cast<uchar>(atoi(sz1));
 
         int i;
         for (i = 1; i < 12; i++)
@@ -320,7 +320,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
             char* szn = strtok(NULL, ", ");
             if (!szn)
                 break;
-            ucValues[i] = atoi(szn);
+            ucValues[i] = static_cast<uchar>(atoi(szn));
         }
 
         if (i == 3 || i == 6 || i == 9 || i == 12)
@@ -804,7 +804,7 @@ void CVehicle::GenerateRegPlate()
             }
 
             // Put it in the plate
-            m_szRegPlate[i] = iChar;
+            m_szRegPlate[i] = static_cast<char>(iChar);
         }
     }
 
@@ -887,7 +887,7 @@ void CVehicle::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEn
 }
 void CVehicle::RemoveVehicleSirens()
 {
-    for (int i = 0; i <= 7; i++)
+    for (unsigned char i = 0; i <= 7; i++)
     {
         m_tSirenBeaconInfo.m_tSirenInfo[i] = SSirenBeaconInfo();
         SetVehicleSirenPosition(i, CVector(0, 0, 0));

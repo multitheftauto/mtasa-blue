@@ -421,10 +421,10 @@ void CPerfStatFunctionTimingImpl::GetStats(CPerfStatResult* pResult, const std::
             row[c++] = SString("%2.0f ms", prev5s.fPeakMs);
             row[c++] = SString("%2.0f ms (%s)", prev5s.fResBiggestMs, *prev5s.strResBiggestMsName);
 
-            row[c++] = prev5s.uiTotalBytes < 10 ? "" : SString("%s", *CPerfStatManager::GetScaledByteString(prev5s.uiTotalBytes));
-            // row[c++] = prev5s.uiPeakBytes < 10 ? "" : SString ( "%s ", *CPerfStatManager::GetScaledByteString( prev5s.uiPeakBytes ) );
+            row[c++] = prev5s.uiTotalBytes < 10 ? SStringX("") : SString("%s", *CPerfStatManager::GetScaledByteString(prev5s.uiTotalBytes));
+            // row[c++] = prev5s.uiPeakBytes < 10 ? SStringX("") : SString ( "%s ", *CPerfStatManager::GetScaledByteString( prev5s.uiPeakBytes ) );
             row[c++] = prev5s.uiResBiggestBytes < 10
-                           ? ""
+                           ? SStringX("")
                            : SString("%s (%s)", *CPerfStatManager::GetScaledByteString(prev5s.uiResBiggestBytes), *prev5s.strResBiggestBytesName);
         }
 
@@ -434,10 +434,10 @@ void CPerfStatFunctionTimingImpl::GetStats(CPerfStatResult* pResult, const std::
         row[c++] = SString("%2.0f ms", prev60s.fPeakMs);
         row[c++] = SString("%2.0f ms (%s)", prev60s.fResBiggestMs, *prev60s.strResBiggestMsName);
 
-        row[c++] = prev60s.uiTotalBytes < 10 ? "" : SString("%s ", *CPerfStatManager::GetScaledByteString(prev60s.uiTotalBytes));
-        // row[c++] = prev60s.uiPeakBytes < 10 ? "" : SString ( "%s ", *CPerfStatManager::GetScaledByteString( prev60s.uiPeakBytes ) );
+        row[c++] = prev60s.uiTotalBytes < 10 ? SStringX("") : SString("%s ", *CPerfStatManager::GetScaledByteString(prev60s.uiTotalBytes));
+        // row[c++] = prev60s.uiPeakBytes < 10 ? SStringX("") : SString ( "%s ", *CPerfStatManager::GetScaledByteString( prev60s.uiPeakBytes ) );
         row[c++] = prev60s.uiResBiggestBytes < 10
-                       ? ""
+                       ? SStringX("")
                        : SString("%s (%s)", *CPerfStatManager::GetScaledByteString(prev60s.uiResBiggestBytes), *prev60s.strResBiggestBytesName);
     }
 }

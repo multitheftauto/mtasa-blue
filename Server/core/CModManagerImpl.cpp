@@ -74,7 +74,7 @@ bool CModManagerImpl::Load(const char* szModName, int iArgumentCount, char* szAr
     }
 
     // Grab the initialization procedure
-    InitServer* pfnInitServer = (InitServer*)(m_Library.GetProcedureAddress("InitServer"));
+    InitServer* pfnInitServer = (InitServer*)(static_cast<void*>(m_Library.GetProcedureAddress("InitServer")));
     if (!pfnInitServer)
     {
         // Unload the library

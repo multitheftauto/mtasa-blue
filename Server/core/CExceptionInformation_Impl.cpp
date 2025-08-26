@@ -113,7 +113,7 @@ bool CExceptionInformation_Impl::GetModule(char* szOutputBuffer, int nOutputName
      * See if we're able to use GetModuleHandleExA.  According to Microsoft,
      * this API is only available on Windows XP and Vista.
      */
-    _pfnGetModuleHandleExA pfnGetModuleHandleExA = (_pfnGetModuleHandleExA)GetProcAddress(hKern32, "GetModuleHandleExA");
+    _pfnGetModuleHandleExA pfnGetModuleHandleExA = (_pfnGetModuleHandleExA)static_cast<void*>(GetProcAddress(hKern32, "GetModuleHandleExA"));
 
     /*
      * TODO:  Possibly use our own code to do this for other systems.
