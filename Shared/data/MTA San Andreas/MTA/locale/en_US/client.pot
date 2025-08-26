@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-25 08:35+0000\n"
+"POT-Creation-Date: 2025-08-26 05:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2840,20 +2840,20 @@ msgstr ""
 msgid "Extracting files..."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:54
+#: Client/loader/MainFunctions.cpp:82
 msgid "Invalid module path detected.\n"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:81
+#: Client/loader/MainFunctions.cpp:109
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:89
+#: Client/loader/MainFunctions.cpp:117
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:100
+#: Client/loader/MainFunctions.cpp:128
 msgid ""
 "MTA:SA is not compatible with Windows 'Safe Mode'.\n"
 "\n"
