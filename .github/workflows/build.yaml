@@ -56,6 +56,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Update PATH
+        run: echo "PATH=$(brew --prefix gcc@15)/bin:$PATH" >> $GITHUB_ENV
+
       - name: Install MySQL
         run: brew install mysql
         continue-on-error: true
