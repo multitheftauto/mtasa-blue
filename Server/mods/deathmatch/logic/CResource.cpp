@@ -3982,7 +3982,18 @@ bool CResource::LoadTranslations()
             bool isPrimary = pTranslationItem->IsPrimary();
             if (!m_translationManager->LoadTranslation(strFullPath, isPrimary))
             {
-                m_strFailureReason = SString("Failed to load translation file '%s' for resource '%s'", pTranslationItem->GetName(), m_strResourceName.c_str());
+                // Use detailed error message from translation manager if available
+                std::string detailedError = m_translationManager->GetLastError();
+                if (!detailedError.empty())
+                {
+                    m_strFailureReason = SString("Failed to load translation file '%s' for resource '%s' (%s)", 
+                                                pTranslationItem->GetName(), m_strResourceName.c_str(), detailedError.c_str());
+                }
+                else
+                {
+                    m_strFailureReason = SString("Failed to load translation file '%s' for resource '%s'", 
+                                                pTranslationItem->GetName(), m_strResourceName.c_str());
+                }
                 return false;
             }
         }

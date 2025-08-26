@@ -55,55 +55,50 @@ bool CResourceTranslationManager::ValidatePoFile(const std::string& filePath)
 {
     std::ifstream file(filePath, std::ios::binary | std::ios::ate);
     if (!file.is_open())
-    {
-        LogError("Cannot open translation file: " + filePath);
         return false;
-    }
     
     std::streampos fileSize = file.tellg();
     if (fileSize == 0)
-    {
-        LogError("Translation file is empty: " + filePath);
         return false;
-    }
     
     file.seekg(-1, std::ios::end);
     char lastChar;
     file.read(&lastChar, 1);
     
     if (lastChar != '\n')
-    {
-        LogError("Translation file must end with a newline: " + filePath);
         return false;
-    }
     
     return true;
 }
 
 bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, bool isPrimary)
 {
-    std::string language = ExtractLanguageFromPath(filePath);
-    if (language.empty())
+    m_lastError.clear();
+    
+    std::string extractedLanguage = ExtractLanguageFromPath(filePath);
+    if (extractedLanguage.empty())
     {
-        LogError("Could not determine language from file path: " + filePath);
+        m_lastError = "Could not determine language from file path: " + filePath;
         return false;
     }
 
+    std::string validatedLanguage = ValidateLanguageWithCore(extractedLanguage);
+    if (validatedLanguage.empty())
+    {
+        m_lastError = "Invalid language code '" + extractedLanguage + "'";
+        return false;
+    }
+    
+    std::string language = validatedLanguage;
+
     if (!std::filesystem::exists(filePath))
     {
-        LogError("Translation file not found: " + filePath);
+        m_lastError = "Translation file not found: " + filePath;
         return false;
     }
 
     if (!ValidatePoFile(filePath))
         return false;
-
-    tinygettext::Language lang = tinygettext::Language::from_name(language);
-    if (!lang)
-    {
-        LogError("Invalid language code '" + language + "' extracted from: " + filePath);
-        return false;
-    }
 
     try {
         auto dictionary = std::make_unique<tinygettext::Dictionary>();
@@ -111,7 +106,7 @@ bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, b
         std::ifstream file(filePath, std::ios::binary);
         if (!file.is_open())
         {
-            LogError("Could not open translation file: " + filePath);
+            m_lastError = "Could not open translation file: " + filePath;
             return false;
         }
         
@@ -136,7 +131,7 @@ bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, b
     }
     catch (const std::exception& e)
     {
-        LogError("Exception loading translation file '" + filePath + "': " + e.what());
+        m_lastError = "Exception loading translation file '" + filePath + "': " + e.what();
         return false;
     }
 }
@@ -238,13 +233,40 @@ void CResourceTranslationManager::SetPlayerLanguage(void* player, const std::str
     if (!player || language.empty())
         return;
 
-    if (m_translationFiles.find(language) != m_translationFiles.end())
+    std::string validatedLanguage = ValidateLanguageWithCore(language);
+    if (validatedLanguage.empty())
     {
-        m_playerLanguages[player] = language;
+#ifdef MTA_CLIENT
+        CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+        CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+        SLuaDebugInfo debugInfo;
+        debugInfo.infoType = DEBUG_INFO_NONE;
+        debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
+        
+        pScriptDebugging->LogError(debugInfo, "Invalid language '%s' - use standard locale format (e.g., en_US, es_ES)", 
+                                  language.c_str());
+        return;
+    }
+
+    if (m_translationFiles.find(validatedLanguage) != m_translationFiles.end())
+    {
+        m_playerLanguages[player] = validatedLanguage;
     }
     else
     {
-        LogWarning("Language '" + language + "' not available for player, using primary language '" + m_primaryLanguage + "'");
+#ifdef MTA_CLIENT
+        CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+        CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+        SLuaDebugInfo debugInfo;
+        debugInfo.infoType = DEBUG_INFO_NONE;
+        debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
+        
+        pScriptDebugging->LogWarning(debugInfo, "Language '%s' not available for player, using primary language '%s'", 
+                                    validatedLanguage.c_str(), m_primaryLanguage.c_str());
         if (!m_primaryLanguage.empty())
             m_playerLanguages[player] = m_primaryLanguage;
     }
@@ -256,7 +278,6 @@ std::string CResourceTranslationManager::GetPlayerLanguage(void* player) const
     {
         if (!m_primaryLanguage.empty())
             return m_primaryLanguage;
-        // If no primary language, return first available language
         if (!m_translationFiles.empty())
             return m_translationFiles.begin()->first;
         return "";
@@ -266,7 +287,6 @@ std::string CResourceTranslationManager::GetPlayerLanguage(void* player) const
     if (it != m_playerLanguages.end())
         return it->second;
 
-    // Fallback to primary language or first available language
     if (!m_primaryLanguage.empty())
         return m_primaryLanguage;
     if (!m_translationFiles.empty())
@@ -284,17 +304,53 @@ void CResourceTranslationManager::SetClientLanguage(const std::string& language)
 {
     if (language.empty())
     {
-        LogWarning("SetClientLanguage called with empty language");
+#ifdef MTA_CLIENT
+        CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+        CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+        SLuaDebugInfo debugInfo;
+        debugInfo.infoType = DEBUG_INFO_NONE;
+        debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
+        
+        pScriptDebugging->LogWarning(debugInfo, "setCurrentTranslationLanguage called with empty language code");
         return;
     }
 
-    if (m_translationFiles.find(language) != m_translationFiles.end())
+    std::string validatedLanguage = ValidateLanguageWithCore(language);
+    if (validatedLanguage.empty())
     {
-        m_clientLanguage = language;
+#ifdef MTA_CLIENT
+        CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+        CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+        SLuaDebugInfo debugInfo;
+        debugInfo.infoType = DEBUG_INFO_NONE;
+        debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
+        
+        pScriptDebugging->LogError(debugInfo, "Invalid language '%s' - use standard locale format (e.g., en_US, es_ES)", 
+                                  language.c_str());
+        return;
+    }
+
+    if (m_translationFiles.find(validatedLanguage) != m_translationFiles.end())
+    {
+        m_clientLanguage = validatedLanguage;
     }
     else 
     {
-        LogWarning("Language '" + language + "' not found, falling back to primary: '" + m_primaryLanguage + "'");
+#ifdef MTA_CLIENT
+        CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
+#else
+        CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
+#endif
+        SLuaDebugInfo debugInfo;
+        debugInfo.infoType = DEBUG_INFO_NONE;
+        debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
+        
+        pScriptDebugging->LogWarning(debugInfo, "Language '%s' not available, falling back to primary language '%s'", 
+                                    validatedLanguage.c_str(), m_primaryLanguage.c_str());
         if (!m_primaryLanguage.empty())
         {
             m_clientLanguage = m_primaryLanguage;
@@ -334,18 +390,11 @@ void CResourceTranslationManager::Clear()
 void CResourceTranslationManager::AddGlobalTranslationProvider(const std::string& providerResourceName)
 {
     if (providerResourceName.empty())
-    {
-        LogError("AddGlobalTranslationProvider called with empty provider name");
         return;
-    }
     
     auto it = std::find(m_globalProviders.begin(), m_globalProviders.end(), providerResourceName);
     if (it != m_globalProviders.end())
-    {
-        LogWarning("Global translation provider '" + providerResourceName + "' is already registered for this resource. "
-                   "Duplicate <global-translation> tags in meta.xml?");
         return;
-    }
     
     m_globalProviders.push_back(providerResourceName);
 }
@@ -360,6 +409,40 @@ std::string CResourceTranslationManager::ExtractLanguageFromPath(const std::stri
     std::filesystem::path path(filePath);
     return path.stem().string();
 }
+
+std::string CResourceTranslationManager::ValidateLanguageWithCore(const std::string& language) const
+{
+    if (language.empty())
+        return "";
+    
+    std::string normalizedLanguage = language;
+    
+    if (normalizedLanguage == "en")
+        normalizedLanguage = "en_US";
+    else if (normalizedLanguage == "fi")
+        normalizedLanguage = "fi_FI";
+    else if (normalizedLanguage == "az")
+        normalizedLanguage = "az_AZ";
+    else if (normalizedLanguage == "ka")
+        normalizedLanguage = "ka_GE";
+    
+    tinygettext::Language lang = tinygettext::Language::from_name(normalizedLanguage);
+    if (!lang)
+    {
+        lang = tinygettext::Language::from_name("en_US");
+        if (!lang)
+        {
+            return "";
+        }
+        
+        return "";
+    }
+    
+    std::string result = lang.str();
+    
+    return result;
+}
+
 
 std::string CResourceTranslationManager::ConformTranslationPath(const std::string& message)
 {
@@ -442,34 +525,4 @@ void CResourceTranslationManager::CleanupTinyGetTextLogging()
     tinygettext::Log::set_log_info_callback(nullptr);
     tinygettext::Log::set_log_warning_callback(nullptr);
     tinygettext::Log::set_log_error_callback(nullptr);
-}
-
-void CResourceTranslationManager::LogWarning(const std::string& message) const
-{
-#ifdef MTA_CLIENT
-    CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
-#else
-    CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
-#endif
-    
-    SLuaDebugInfo debugInfo;
-    debugInfo.infoType = DEBUG_INFO_NONE;
-    debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
-    
-    pScriptDebugging->LogWarning(debugInfo, "%s", message.c_str());
-}
-
-void CResourceTranslationManager::LogError(const std::string& message) const
-{
-#ifdef MTA_CLIENT
-    CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
-#else
-    CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
-#endif
-    
-    SLuaDebugInfo debugInfo;
-    debugInfo.infoType = DEBUG_INFO_NONE;
-    debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
-    
-    pScriptDebugging->LogError(debugInfo, "%s", message.c_str());
 }

@@ -51,12 +51,14 @@ public:
     // Enhanced lookup with global fallback
     std::string GetLocalTranslation(const std::string& msgid, const std::string& language) const;
     std::string GetTranslationWithGlobalFallback(const std::string& msgid, const std::string& language) const;
+    
+    // Error handling
+    std::string GetLastError() const noexcept { return m_lastError; }
 
 private:
     std::string ExtractLanguageFromPath(const std::string& filePath) const;
+    std::string ValidateLanguageWithCore(const std::string& language) const;
     bool ValidatePoFile(const std::string& filePath);
-    void LogWarning(const std::string& message) const;
-    void LogError(const std::string& message) const;
     
     // TinyGetText logging callbacks
     static std::string ConformTranslationPath(const std::string& message);
@@ -77,4 +79,7 @@ private:
     // Global translation support
     bool m_isGlobalProvider = false;
     std::vector<std::string> m_globalProviders;
+    
+    // Error handling
+    mutable std::string m_lastError;
 };
