@@ -7,9 +7,6 @@ project "Loader"
 		"4996", -- use of symbol with __declspec(deprecated)
 	}
 
-	filter "system:windows"
-		linkoptions { "/SAFESEH:NO" }
-
 	includedirs {
 		"../../Shared/sdk",
 		"../sdk",
