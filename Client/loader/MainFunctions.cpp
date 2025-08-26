@@ -17,6 +17,34 @@
 #include <array>
 #include <locale.h>
 
+// Function must be at the start to fix odd compile error (Didn't happen locally but does in build server)
+namespace
+{
+    bool ValidatePath(const SString& path)
+    {
+        if (path.empty() || path.length() >= MAX_PATH)            // >= instead of > to leave room for null terminator
+            return false;
+
+        if (path.Contains("..") || path.Contains("..\\") || path.Contains("../"))
+            return false;
+        
+        // Check for null bytes
+        if (path.find('\0') != SString::npos)
+            return false;
+        
+        if (path.Contains(":") && !path.BeginsWith("C:\\") && !path.BeginsWith("D:\\") && 
+            !path.BeginsWith("E:\\") && !path.BeginsWith("F:\\") && !path.BeginsWith("G:\\"))
+            return false;
+        
+        // Check for special characters
+        if (path.Contains("\\\\?\\") || path.Contains("\\\\.\\")||            // Device namespace paths
+            path.Contains("%") || path.Contains("$"))
+            return false;
+        
+        return true;
+    }
+}
+
 //////////////////////////////////////////////////////////
 //
 // CheckLibVersions
@@ -130,34 +158,6 @@ public:
 
 // Global localization interface
 CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
-
-// Helper functions
-namespace
-{
-    bool ValidatePath(const SString& path)
-    {
-        if (path.empty() || path.length() >= MAX_PATH)            // >= instead of > to leave room for null terminator
-            return false;
-
-        if (path.Contains("..") || path.Contains("..\\") || path.Contains("../"))
-            return false;
-        
-        // Check for null bytes
-        if (path.find('\0') != SString::npos)
-            return false;
-        
-        if (path.Contains(":") && !path.BeginsWith("C:\\") && !path.BeginsWith("D:\\") && 
-            !path.BeginsWith("E:\\") && !path.BeginsWith("F:\\") && !path.BeginsWith("G:\\"))
-            return false;
-        
-        // Check for special characters
-        if (path.Contains("\\\\?\\") || path.Contains("\\\\.\\")||            // Device namespace paths
-            path.Contains("%") || path.Contains("$"))
-            return false;
-        
-        return true;
-    }
-}
 
 //////////////////////////////////////////////////////////
 //
