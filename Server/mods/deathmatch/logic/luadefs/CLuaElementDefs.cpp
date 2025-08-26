@@ -2451,12 +2451,12 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaElementDefs::IsElementOnFire(CElement* element) noexcept
+bool CLuaElementDefs::IsElementOnFire(CElement* element)
 {
     return element->IsOnFire();
 }
 
-bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire) noexcept
+bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire)
 {
     return CStaticFunctionDefinitions::SetElementOnFire(element, onFire);
 }
