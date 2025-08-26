@@ -10,6 +10,7 @@
 
 #include <StdInc.h>
 #include <game/CCam.h>
+#include "../../game_sa/CCameraSA.h"
 
 #define PI_2 6.283185307179586476925286766559f
 
@@ -606,6 +607,9 @@ bool CClientCamera::ProcessFixedCamera(CCam* pCam)
 //
 CMatrix CClientCamera::GetGtaMatrix() const
 {
+    if (IsInCameraTransition())
+        return GetInterpolatedCameraMatrix();
+
     CCam* pCam = m_pCamera->GetCam(m_pCamera->GetActiveCam());
 
     CMatrix matResult;
@@ -643,4 +647,66 @@ void CClientCamera::ShakeCamera(float radius, float x, float y, float z) noexcep
 void CClientCamera::ResetShakeCamera() noexcept
 {
     m_pCamera->ResetShakeCamera();
+}
+
+bool CClientCamera::IsInCameraTransition() const
+{
+    if (!m_pCamera)
+        return false;
+    
+    return m_pCamera->GetTransitionState() != 0;
+}
+
+CMatrix CClientCamera::GetInterpolatedCameraMatrix() const
+{
+    if (!m_pCamera)
+        return CMatrix();
+    
+    CCameraSAInterface* pCameraInterface = static_cast<CCameraSA*>(m_pCamera)->GetInterface();
+    if (!pCameraInterface)
+        return CMatrix();
+    
+    CVector source = pCameraInterface->SourceDuringInter;
+    CVector target = pCameraInterface->TargetDuringInter;
+    CVector up = pCameraInterface->UpDuringInter;
+    
+    CMatrix matrix;
+    CVector forward = target - source;
+    if (forward.Length() < FLOAT_EPSILON)
+        forward = CVector(0.0f, 1.0f, 0.0f);
+    else
+        forward.Normalize();
+    
+    CVector right = CVector(forward.fY, -forward.fX, 0.0f);
+    if (right.Length() < FLOAT_EPSILON)
+        right = CVector(1.0f, 0.0f, 0.0f);
+    else
+        right.Normalize();
+    
+    CVector correctedUp = right;
+    correctedUp.CrossProduct(&forward);
+    correctedUp.Normalize();
+    
+    matrix.vPos = source;
+    matrix.vFront = forward;
+    matrix.vRight = -right;
+    matrix.vUp = correctedUp;
+    matrix.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
+    
+    return matrix;
+}
+
+float CClientCamera::GetAccurateFOV() const
+{
+    if (!m_pCamera)
+        return 70.0f;
+    
+    CCameraSAInterface* pCameraInterface = static_cast<CCameraSA*>(m_pCamera)->GetInterface();
+    if (!pCameraInterface)
+        return 70.0f;
+    
+    if (IsInCameraTransition())
+        return pCameraInterface->FOVDuringInter;
+    
+    return *(float*)0x8D5038;
 }

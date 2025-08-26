@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CAnimManager.h>
+#include <game/CCam.h>
 #include <game/CClock.h>
 #include <game/CColPoint.h>
 #include <game/CFireManager.h>
@@ -5007,7 +5008,16 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& 
 {
     m_pCamera->GetPosition(vecPosition);
     m_pCamera->GetFixedTarget(vecLookAt, &fRoll);
-    fFOV = m_pCamera->GetFOV();
+    
+    fFOV = m_pCamera->GetAccurateFOV();
+    
+    if (!m_pCamera->IsInFixedMode() && fRoll == 0.0f)
+    {
+        CVector rotation;
+        m_pCamera->GetRotationDegrees(rotation);
+        fRoll = rotation.fZ;
+    }
+    
     return true;
 }
 
