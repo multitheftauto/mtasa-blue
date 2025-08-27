@@ -14,6 +14,7 @@
 #include <future>
 #include <vector>
 #include <algorithm>
+#include <type_traits>
 #include "SharedUtil.Misc.h"
 
 namespace SharedUtil
@@ -49,7 +50,11 @@ namespace SharedUtil
         template <typename Func, typename... Args>
         auto enqueue(Func&& f, Args&&... args)
         {
+#if __cplusplus < 201703L // C++17
+            using ReturnT = std::result_of_t<Func, Args...>;
+#else
             using ReturnT = std::invoke_result_t<Func, Args...>;
+#endif
             auto  ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
             auto* task = new std::packaged_task<ReturnT()>(ff);
 

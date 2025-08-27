@@ -1029,7 +1029,7 @@ void CClientGame::DoPulsePostFrame()
                     bool useZoneName = true;
 
                     const eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
-                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : _("Walking around ");
+                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType) : _("Walking around ");
 
                     if (task && task->IsValid())
                     {
@@ -1072,7 +1072,7 @@ void CClientGame::DoPulsePostFrame()
                         const int stateCount = taskStates.size();
                         if (stateCount > 0)
                         {
-                            std::srand(GetTickCount64_());
+                            std::srand(static_cast<unsigned int>(GetTickCount64_()));
                             const int  index = (std::rand() % stateCount);
                             const auto& taskState = taskStates[index];
 
@@ -3216,19 +3216,19 @@ void CClientGame::UpdateMimics()
                 CClientVehicle* pMimicVehicle = pMimic->GetOccupiedVehicle();
                 if (pVehicle)
                 {
-                    unsigned int uiModel;
-                    CVector      vecPosition, vecRotationDegrees;
-                    CVector      vecMoveSpeed, vecMoveSpeedMeters, vecTurnSpeed, vecVelocity;
-                    float        fHealth;
+                    unsigned short modelId;
+                    CVector        vecPosition, vecRotationDegrees;
+                    CVector        vecMoveSpeed, vecMoveSpeedMeters, vecTurnSpeed, vecVelocity;
+                    float          fHealth;
 
-                    uiModel = pVehicle->GetModel();
+                    modelId = pVehicle->GetModel();
                     pVehicle->GetPosition(vecPosition);
                     pVehicle->GetRotationDegrees(vecRotationDegrees);
                     pVehicle->GetMoveSpeed(vecMoveSpeed);
                     pVehicle->GetTurnSpeed(vecTurnSpeed);
                     fHealth = pVehicle->GetHealth();
 
-                    if (pMimicVehicle && pMimicVehicle->GetModel() != uiModel)
+                    if (pMimicVehicle && pMimicVehicle->GetModel() != modelId)
                     {
                         delete pMimicVehicle;
                         pMimicVehicle = NULL;
@@ -3238,7 +3238,7 @@ void CClientGame::UpdateMimics()
 
                     if (pMimicVehicle == NULL)
                     {
-                        pMimicVehicle = new CDeathmatchVehicle(m_pManager, m_pUnoccupiedVehicleSync, INVALID_ELEMENT_ID, uiModel, 0, 0);
+                        pMimicVehicle = new CDeathmatchVehicle(m_pManager, m_pUnoccupiedVehicleSync, INVALID_ELEMENT_ID, modelId, 0, 0);
                         pMimicVehicle->SetPosition(vecPosition);
 
                         const SSlotStates& usUpgrades = pVehicle->GetUpgrades()->GetSlotStates();
@@ -3276,7 +3276,7 @@ void CClientGame::UpdateMimics()
                     CClientVehicle* pMimicTrailer = NULL;
                     while (pTrailer)
                     {
-                        uiModel = pTrailer->GetModel();
+                        modelId = pTrailer->GetModel();
                         pTrailer->GetPosition(vecPosition);
                         pTrailer->GetRotationDegrees(vecRotationDegrees);
                         pTrailer->GetMoveSpeed(vecMoveSpeed);
@@ -3285,7 +3285,7 @@ void CClientGame::UpdateMimics()
 
                         pMimicTrailer = DynamicCast<CClientVehicle>(CElementIDs::GetElement(static_cast<ElementID>(450 + uiMimicIndex + uiTrailerLoop)));
 
-                        if (pMimicTrailer && pMimicTrailer->GetModel() != uiModel)
+                        if (pMimicTrailer && pMimicTrailer->GetModel() != modelId)
                         {
                             delete pMimicTrailer;
                             pMimicTrailer = NULL;
@@ -3294,7 +3294,7 @@ void CClientGame::UpdateMimics()
                         if (!pMimicTrailer)
                         {
                             pMimicTrailer = new CDeathmatchVehicle(m_pManager, m_pUnoccupiedVehicleSync,
-                                                                   static_cast<ElementID>(450 + uiMimicIndex + uiTrailerLoop), uiModel, 0, 0);
+                                                                   static_cast<ElementID>(450 + uiMimicIndex + uiTrailerLoop), modelId, 0, 0);
                             pMimicVehicle->SetTowedVehicle(pMimicTrailer);
                         }
 
@@ -6352,8 +6352,8 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
 
-        ushort usPartNumber = i;
-        ushort usBytesThisPart = std::min(uiBytesRemaining, uiBytesPerPart);
+        auto usPartNumber = static_cast<ushort>(i);
+        auto usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
         assert(usBytesThisPart != 0);
 
         pBitStream->Write((uchar)EPlayerScreenShotResult::SUCCESS);
@@ -6545,7 +6545,7 @@ void CClientGame::OutputServerInfo()
         SString     strEnabledGlitches;
         const char* szGlitchNames[] = {"Quick reload",         "Fast fire",  "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint",
                                        "Bad driveby hitboxes", "Quick stand", "Kickout of vehicle on model replace"};
-        for (uint i = 0; i < NUM_GLITCHES; i++)
+        for (unsigned char i = 0; i < NUM_GLITCHES; i++)
         {
             if (IsGlitchEnabled(i))
             {
@@ -6799,8 +6799,9 @@ void CClientGame::RestreamWorld()
 
     for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
     {
-        g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
+        g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(uiModelID));
     }
+
     m_pManager->GetObjectManager()->RestreamAllObjects();
     m_pManager->GetVehicleManager()->RestreamAllVehicles();
     m_pManager->GetPedManager()->RestreamAllPeds();

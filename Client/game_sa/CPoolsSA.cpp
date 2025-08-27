@@ -988,10 +988,10 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
             break;
     }
     if (iPtr)
-        MemPut<int>(iPtr, iValue);
+        MemPut(iPtr, iValue);
 
     if (cPtr)
-        MemPut<char>(cPtr, iValue);
+        MemPut(cPtr, static_cast<char>(iValue));
 }
 
 int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)

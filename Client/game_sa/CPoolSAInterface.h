@@ -50,8 +50,8 @@ public:
 
     uint GetFreeSlot()
     {
-        bool bLooped = false;
-        uint index = m_nFirstFree + 1;
+        bool         bLooped = false;
+        std::int32_t index = m_nFirstFree + 1;
 
         while (true)
         {
@@ -124,7 +124,7 @@ public:
 
     std::int32_t Size() const noexcept { return m_nSize; };
     bool IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
-    bool IsContains(uint index) const
+    bool IsContains(std::int32_t index) const
     {
         if (m_nSize <= index)
             return false;
@@ -133,11 +133,11 @@ public:
 
     B* GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
 
-    uint GetObjectIndex(B* pObject) { return ((DWORD)pObject - (DWORD)m_pObjects) / sizeof(B); }
+    std::int32_t GetObjectIndex(B* pObject) { return ((DWORD)pObject - (DWORD)m_pObjects) / sizeof(B); }
 
-    uint32_t GetObjectIndexSafe(B* pObject)
+    std::int32_t GetObjectIndexSafe(B* pObject)
     {
-        uint32_t index = GetObjectIndex(pObject);
+        std::int32_t index = GetObjectIndex(pObject);
         return index > m_nSize ? UINT_MAX : index;
     }
 };

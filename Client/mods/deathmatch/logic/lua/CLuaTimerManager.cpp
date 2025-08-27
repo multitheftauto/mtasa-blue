@@ -157,5 +157,5 @@ CLuaTimer* CLuaTimerManager::AddTimer(const CLuaFunctionRef& iLuaFunction, CTick
         return pLuaTimer;
     }
 
-    return false;
+    return nullptr;
 }

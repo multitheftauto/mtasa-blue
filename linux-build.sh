@@ -1,27 +1,27 @@
 #!/bin/bash -e
 
 # Set variable defaults
-: ${BUILD_OS:=linux}
-: ${BUILD_ARCHITECTURE:=x64}
 : ${BUILD_CONFIG:=release}
 : ${PREMAKE_FILE:=premake5.lua}
-: ${GCC_PREFIX:=}
-: ${AR:=ar}
-: ${CC:=gcc}
-: ${CXX:=g++}
 
-# Find premake binary location
 if [ "$(uname)" == "Darwin" ]; then
-    PREMAKE5=utils/premake5-macos
+    cores=$(sysctl -n hw.ncpu)
+    : ${NUM_CORES:=$cores}
+    : ${PREMAKE5:=utils/premake5-macos}
+    : ${BUILD_OS:=macosx}
+    : ${BUILD_ARCHITECTURE:=arm64}
+    : ${AR:=ar}
+    : ${CC:=clang}
+    : ${CXX:=clang++}
 else
-    PREMAKE5=utils/premake5
-fi
-
-# Number of cores
-if [ "$(uname)" == "Darwin" ]; then
-    NUM_CORES=$(sysctl -n hw.ncpu)
-else
-    NUM_CORES=$(grep -c ^processor /proc/cpuinfo)
+    cores=$(grep -c ^processor /proc/cpuinfo)
+    : ${NUM_CORES:=$cores}
+    : ${PREMAKE5:=utils/premake5}
+    : ${BUILD_OS:=linux}
+    : ${BUILD_ARCHITECTURE:=x64}
+    : ${AR:=ar}
+    : ${CC:=gcc}
+    : ${CXX:=g++}
 fi
 
 # Read script arguments

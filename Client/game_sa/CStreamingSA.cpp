@@ -351,7 +351,7 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     pItemInfo->archiveId = usStreamID;
     pItemInfo->offsetInBlocks = uiOffset;
     pItemInfo->sizeInBlocks = usSize;
-    pItemInfo->nextInImg = uiNextInImg;
+    pItemInfo->nextInImg = static_cast<uint16_t>(uiNextInImg);
 }
 
 CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)

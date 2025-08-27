@@ -177,10 +177,13 @@ void CModelCacheManagerImpl::PreLoad()
         {
             if (bSlowMethod)
                 SetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID, i);
-            AddModelRefCount(i);
+            
+            AddModelRefCount(static_cast<ushort>(i));
+
             if (bSlowMethod)
                 m_pGame->GetStreaming()->LoadAllRequestedModels(false);
         }
+
         m_pGame->GetStreaming()->LoadAllRequestedModels(false);
     }
     WatchDogCompletedSection(WD_SECTION_PRELOAD_UPGRADES);

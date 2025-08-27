@@ -840,11 +840,11 @@ void CResourceManager::ProcessQueue()
         }
         else if (sItem.eQueue == QUEUE_REFRESH)
         {
-            Refresh(false, sItem.pResource ? sItem.pResource->GetName() : "");
+            Refresh(false, sItem.pResource ? sItem.pResource->GetName() : SStringX(""));
         }
         else if (sItem.eQueue == QUEUE_REFRESHALL)
         {
-            Refresh(true, sItem.pResource ? sItem.pResource->GetName() : "");
+            Refresh(true, sItem.pResource ? sItem.pResource->GetName() : SStringX(""));
         }
     }
 }

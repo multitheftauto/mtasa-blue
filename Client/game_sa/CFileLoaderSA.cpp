@@ -51,7 +51,7 @@ public:
 class CDamagableModelInfo
 {
 public:
-    void CDamagableModelInfo::SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CDamagableModelInfo*, RpAtomic*))0x4C48D0)(this, atomic); }
+    void SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CDamagableModelInfo*, RpAtomic*))0x4C48D0)(this, atomic); }
 };
 
 static char* GetFrameNodeName(RwFrame* frame)

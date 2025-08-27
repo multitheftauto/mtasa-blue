@@ -106,10 +106,10 @@ bool CClientVariables::Get(const std::string& strVariable, CColor& val)
     try
     {
         ss >> iR >> iG >> iB >> iA;
-        val.R = iR;
-        val.G = iG;
-        val.B = iB;
-        val.A = iA;
+        val.R = static_cast<unsigned char>(iR);
+        val.G = static_cast<unsigned char>(iG);
+        val.B = static_cast<unsigned char>(iB);
+        val.A = static_cast<unsigned char>(iA);
     }
     catch (...)
     {

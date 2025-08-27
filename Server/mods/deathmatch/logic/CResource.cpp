@@ -517,7 +517,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
         }
 
         pResourceFile->SetLastChecksum(std::get<CChecksum>(checksumOrError));
-        pResourceFile->SetLastFileSizeHint(FileSize(strPath));
+        pResourceFile->SetLastFileSizeHint(static_cast<uint>(FileSize(strPath)));
 
         // Check if file is blocked
         char szHashResult[33];
@@ -2541,7 +2541,7 @@ HttpStatusCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpRespons
 std::string Unescape(std::string_view sv)
 {
     // Converts a character to a hexadecimal value
-    auto toHex = [](char c) {
+    auto toHex = [](char c) -> unsigned char {
         if (c >= '0' && c <= '9')
             return c - '0';
         if (c >= 'a' && c <= 'f')
@@ -2870,7 +2870,7 @@ static HttpStatusCode ParseLuaHttpRouterResponse(CLuaArguments& luaResponse, Htt
         {
             if (std::string_view body; argValue->TryGetString(body))
             {
-                if (body.size() <= std::numeric_limits<int>::max())
+                if (body.size() <= (size_t)std::numeric_limits<int>::max())
                 {
                     hasBody = true;
                     httpResponse.SetBody(body.data(), body.size());
