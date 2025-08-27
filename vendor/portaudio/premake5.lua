@@ -3,8 +3,6 @@ project "portaudio"
 	kind "StaticLib"
 	targetname "portaudio"
 
-	disablewarnings { "4996" }
-
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.c",
@@ -16,6 +14,9 @@ project "portaudio"
 		"*.h",
 		"*.c"
 	}
+
+	filter "system:windows"
+		disablewarnings { "4996" }
 
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }

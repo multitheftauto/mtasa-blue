@@ -3,12 +3,6 @@ project "libspeex"
 	kind "StaticLib"
 	targetname "libspeex"
 
-	disablewarnings {
-		"4244", -- warning C4244: '=': conversion from '?' to '?', possible loss of data
-		"4305", -- warning C4305: 'initializing': truncation from '?' to '?'
-		"4018", -- warning C4018: '<': signed/unsigned mismatch
-	}
-
 	defines {
 		"HAVE_CONFIG_H"
 	}
@@ -40,6 +34,13 @@ project "libspeex"
 		"libspeexdsp/smallft.c",
 		"libspeexdsp/fftwrap.c",
 	}
+
+	filter "system:windows"
+		disablewarnings {
+			"4244", -- warning C4244: '=': conversion from '?' to '?', possible loss of data
+			"4305", -- warning C4305: 'initializing': truncation from '?' to '?'
+			"4018", -- warning C4018: '<': signed/unsigned mismatch
+		}
 
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }

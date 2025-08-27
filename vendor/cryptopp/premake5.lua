@@ -218,6 +218,6 @@ project "cryptopp"
 			"cpuid64.asm"
 		}
 
-	filter { "system:windows" }
+	filter "system:windows"
 		linkoptions { "/ignore:4221" }
 		disablewarnings { "4005" }
