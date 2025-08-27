@@ -56,12 +56,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set environment variables
-        run: |
-          echo "AR=$(xcrun --find ar)" >> $GITHUB_ENV
-          echo "CC=$(xcrun --find clang)" >> $GITHUB_ENV
-          echo "CXX=$(xcrun --find clang++)" >> $GITHUB_ENV
-
       - name: Install MySQL
         run: brew install mysql
         continue-on-error: true
