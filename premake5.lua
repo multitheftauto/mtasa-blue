@@ -26,7 +26,7 @@ workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 
 	if os.host() == "macosx" then
-		platforms { "x64", "arm64" }
+		platforms { "arm64" }
 	elseif os.host() == "windows" then
 		platforms { "x86", "x64", "arm64" }
 	else
