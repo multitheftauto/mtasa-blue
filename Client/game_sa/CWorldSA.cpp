@@ -727,8 +727,8 @@ int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutT
             {
                 SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
 
-                float fDistance = sqrt(pow(vecPosition.fZ - railNode.sZ * 0.125f, 2) + pow(vecPosition.fY - railNode.sY * 0.125f, 2) +
-                                       pow(vecPosition.fX - railNode.sX * 0.125f, 2));
+                float fDistance = sqrtf(powf(vecPosition.fZ - railNode.sZ * 0.125f, 2) + powf(vecPosition.fY - railNode.sY * 0.125f, 2) +
+                                       powf(vecPosition.fX - railNode.sX * 0.125f, 2));
                 if (fDistance < fMinDistance)
                 {
                     fMinDistance = fDistance;

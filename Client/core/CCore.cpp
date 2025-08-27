@@ -61,13 +61,13 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
         const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
 
         if (fs::is_regular_file(inLaunchDir, ec))
-            return Win32LoadLibraryA(inLaunchDir.u8string().c_str());
+            return Win32LoadLibraryA(UTF8FilePath(inLaunchDir).c_str());
 
         // Try to load enbhelper.dll from the GTA install directory second.
         const fs::path inGTADir = g_gtaDirectory / "enbseries" / "enbhelper.dll";
 
         if (fs::is_regular_file(inGTADir, ec))
-            return Win32LoadLibraryA(inGTADir.u8string().c_str());
+            return Win32LoadLibraryA(UTF8FilePath(inGTADir).c_str());
 
         return nullptr;
     }
@@ -1757,8 +1757,8 @@ void CCore::UpdateRecentlyPlayed()
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
-        pRecentList->Remove(Address, uiPort);
-        pRecentList->AddUnique(Address, uiPort, true);
+        pRecentList->Remove(Address, static_cast<ushort>(uiPort));
+        pRecentList->AddUnique(Address, static_cast<ushort>(uiPort), true);
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())

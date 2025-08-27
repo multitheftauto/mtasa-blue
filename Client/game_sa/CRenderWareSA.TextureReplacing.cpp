@@ -268,7 +268,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             assert(currentTextures.empty());
 
             int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
-            assert(refsCount > 0, "Should have at least one TXD reference here");
+            assert(refsCount > 0 && "Should have at least one TXD reference here");
         #endif
             // Remove info
             CTxdStore_RemoveRef(pInfo->usTxdId);

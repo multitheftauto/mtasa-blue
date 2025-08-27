@@ -20,11 +20,11 @@ public:
     CTxdPoolSA();
     ~CTxdPoolSA() = default;
 
-    std::uint32_t AllocateTextureDictonarySlot(std::uint32_t uiSlotID, std::string& strTxdName);
-    void          RemoveTextureDictonarySlot(std::uint32_t uiTxdId);
-    bool          IsFreeTextureDictonarySlot(std::uint32_t uiTxdId);
+    std::uint32_t AllocateTextureDictonarySlot(std::uint32_t uiSlotID, std::string& strTxdName) override;
+    void          RemoveTextureDictonarySlot(std::uint32_t uiTxdId) override;
+    bool          IsFreeTextureDictonarySlot(std::uint32_t uiTxdId) override;
 
-    std::uint16_t GetFreeTextureDictonarySlot();
+    std::uint32_t GetFreeTextureDictonarySlot() override;
 
 private:
     CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;

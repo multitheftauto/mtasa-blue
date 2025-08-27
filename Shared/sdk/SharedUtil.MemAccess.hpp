@@ -14,7 +14,7 @@ namespace SharedUtil
     bool ismemset(const void* pInAddr, int cValue, uint uiAmount)
     {
         const uchar* pAddr = (const uchar*)pInAddr;
-        uchar        ucValue = cValue;
+        auto         ucValue = (uchar)cValue;
         for (uint i = 0; i < uiAmount; i++)
             if (pAddr[i] != ucValue)
                 return false;

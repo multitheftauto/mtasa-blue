@@ -89,5 +89,5 @@ public:
     // Exported methods
     void SetWantedLevel(DWORD dwWantedLevel);
     void SetWantedLevelNoFlash(DWORD dwWantedLevel);
-    char GetWantedLevel() { return internalInterface->m_WantedLevel; };
+    char GetWantedLevel() { return static_cast<char>(internalInterface->m_WantedLevel); };
 };

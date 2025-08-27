@@ -77,7 +77,7 @@ void CRenderWareSA::ClothesAddReplacement(char* pFileData, size_t fileSize, usho
     {
         MapSet(ms_ReplacementClothesFileDataMap, usFileId, pFileData);
         MapSet(ms_OriginalStreamingSizesMap, usFileId, g_clothesDirectory->GetModelStreamingSize(usFileId));
-        g_clothesDirectory->SetModelStreamingSize(usFileId, GetSizeInBlocks(fileSize));
+        g_clothesDirectory->SetModelStreamingSize(usFileId, static_cast<std::uint16_t>(GetSizeInBlocks(fileSize)));
 
         clothesReplacementChanged = true;
     }
@@ -145,7 +145,7 @@ bool CRenderWareSA::ClothesAddFile(const char* fileData, std::size_t fileSize, c
         return false;
 
     DirectoryInfoSA entry{};
-    entry.m_streamingSize = GetSizeInBlocks(fileSize);
+    entry.m_streamingSize = static_cast<std::uint16_t>(GetSizeInBlocks(fileSize));
 
     std::size_t nameSize = sizeof(entry.m_name) - 1;
     std::strncpy(entry.m_name, fileName, nameSize);
@@ -185,6 +185,8 @@ bool CRenderWareSA::ClothesRemoveFile(char* fileData)
         else
             ++iter;
     }
+
+    return clothesReplacementChanged;
 }
 
 ////////////////////////////////////////////////////////////////

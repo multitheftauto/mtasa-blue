@@ -400,7 +400,7 @@ void CResource::Stop()
         {
             discord->ResetDiscordData();
             discord->SetPresenceState(_("In-game"), false);
-            discord->SetPresenceStartTimestamp(time(nullptr));
+            discord->SetPresenceStartTimestamp(static_cast<unsigned long>(time(nullptr)));
             discord->UpdatePresence();
         }
     }
