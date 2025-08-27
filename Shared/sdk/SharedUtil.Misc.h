@@ -23,13 +23,28 @@
 #include "SharedUtil.Map.h"
 
 #if __cplusplus >= 201703L // C++17
-namespace std
-{
-    namespace filesystem
-    {
-        class path;
-    }
-}
+    #ifndef __GLIBCXX__
+        namespace std
+        {
+            namespace filesystem
+            {
+                class path;
+            }
+        }
+    #else
+        namespace std
+        {
+            namespace filesystem
+            {
+                inline namespace __cxx11 __attribute__((__abi_tag__("cxx11"))) {}
+                inline _GLIBCXX_BEGIN_NAMESPACE_CXX11
+
+                class path;
+
+                _GLIBCXX_END_NAMESPACE_CXX11
+            }
+        }
+    #endif
 #endif
 
 namespace SharedUtil
