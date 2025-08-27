@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include <game/CAnimManager.h>
-#include <game/CCam.h>
 #include <game/CClock.h>
 #include <game/CColPoint.h>
 #include <game/CFireManager.h>

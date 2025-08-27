@@ -15,8 +15,6 @@
 #include <mutex>
 #include <cmath>
 
-// Camera constants
-constexpr float DEFAULT_FOV = 70.0f;
 
 extern CGameSA* pGame;
 
@@ -565,31 +563,31 @@ void CCameraSA::ResetShakeCamera() noexcept
     GetInterface()->m_fCamShakeForce = 0.0f;
 }
 
-std::uint8_t CCameraSA::GetTransitionState()
+std::uint8_t CCameraSA::GetTransitionState() const
 {
     return GetInterface()->m_uiTransitionState;
 }
 
-bool CCameraSA::IsInTransition()
+bool CCameraSA::IsInTransition() const
 {
     return GetTransitionState() != 0;
 }
 
-float CCameraSA::GetTransitionFOV()
+float CCameraSA::GetTransitionFOV() const
 {
-    CCameraSAInterface* pInterface = GetInterface();
-    return pInterface ? pInterface->FOVDuringInter : DEFAULT_FOV;
+    CCameraSAInterface* cameraInterface = GetInterface();
+    return cameraInterface ? cameraInterface->FOVDuringInter : DEFAULT_FOV;
 }
 
-bool CCameraSA::GetTransitionMatrix(CMatrix& matrix)
+bool CCameraSA::GetTransitionMatrix(CMatrix& matrix) const
 {
-    CCameraSAInterface* pInterface = GetInterface();
-    if (!pInterface || !IsInTransition())
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface || !IsInTransition())
         return false;
     
-    CVector source = pInterface->SourceDuringInter;
-    CVector target = pInterface->TargetDuringInter;
-    CVector up = pInterface->UpDuringInter;
+    CVector source = cameraInterface->SourceDuringInter;
+    CVector target = cameraInterface->TargetDuringInter;
+    CVector up = cameraInterface->UpDuringInter;
     
     CVector forward = target - source;
     if (forward.Length() < FLOAT_EPSILON)

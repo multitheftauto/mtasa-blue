@@ -14,8 +14,7 @@
 #define PI_2 6.283185307179586476925286766559f
 
 // Camera FOV constants
-constexpr float DEFAULT_FOV = 70.0f;
-constexpr std::uintptr_t VAR_CurrentCameraFOV = 0x8D5038; // CCamera::CurrentFOV
+constexpr const std::uintptr_t VAR_CurrentCameraFOV = 0x8D5038; // CCamera::CurrentFOV
 
 CClientCamera::CClientCamera(CClientManager* pManager) : ClassInit(this), CClientEntity(INVALID_ELEMENT_ID)
 {

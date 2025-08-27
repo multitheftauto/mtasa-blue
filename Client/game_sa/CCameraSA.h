@@ -381,7 +381,7 @@ public:
     CCameraSA(CCameraSAInterface* cameraInterface);
     ~CCameraSA();
 
-    CCameraSAInterface* GetInterface() { return internalInterface; };
+    CCameraSAInterface* GetInterface() const { return internalInterface; };
     
     // CCamera interface implementation
     void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle) override;
@@ -413,10 +413,10 @@ public:
     float               GetShakeForce() override;
     void                ShakeCamera(float radius, float x, float y, float z) noexcept override;
     void                ResetShakeCamera() noexcept override;
-    std::uint8_t        GetTransitionState() override;
-    bool                IsInTransition() override;
-    float               GetTransitionFOV() override;
-    bool                GetTransitionMatrix(CMatrix& matrix) override;
+    std::uint8_t        GetTransitionState() const override;
+    bool                IsInTransition() const override;
+    float               GetTransitionFOV() const override;
+    bool                GetTransitionMatrix(CMatrix& matrix) const override;
 
     // Additional overload not in base interface
     virtual CCam* GetCam(CCamSAInterface* camInterface);
