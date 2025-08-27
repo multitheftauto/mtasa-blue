@@ -10968,6 +10968,7 @@ bool CStaticFunctionDefinitions::SendSyncIntervals(CPlayer* pPlayer)
         BitStream.pBitStream->Write(g_TickRateSettings.iKeySyncAnalogMove);
         BitStream.pBitStream->Write(g_TickRateSettings.iPedSyncerDistance);
         BitStream.pBitStream->Write(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+        BitStream.pBitStream->Write(g_TickRateSettings.cancelledDamageInterval);
 
         pPlayer->Send(CLuaPacket(SET_SYNC_INTERVALS, *BitStream.pBitStream));
     };

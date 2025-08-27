@@ -60,6 +60,7 @@
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
 #include "packets/CPlayerWorldSpecialPropertyPacket.h"
+#include "packets/CDamageCancelEventPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CLuaPacket.h"
 #include "../utils/COpenPortsTester.h"
@@ -1330,6 +1331,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_CANCEL_DAMAGE_EVENT:
+        {
+            Packet_CancelDamageEvent(static_cast<CDamageCancelEventPacket&>(Packet));
+            return true;
+        }
+
         default:
             break;
     }
@@ -1651,6 +1658,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
     m_Events.AddEvent("onPlayerChangesWorldSpecialProperty", "property, enabled", nullptr, false);
     m_Events.AddEvent("onPlayerTeleport", "previousX, previousY, previousZ, currentX, currentY, currentZ", nullptr, false);
+    m_Events.AddEvent("onDamageEventCancelled", "attacker, damagedEntity, weapon, damage, resourceName", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -4207,6 +4215,34 @@ void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket&
     player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
 }
 
+void CGame::Packet_CancelDamageEvent(CDamageCancelEventPacket& packet) noexcept
+{
+    CPlayer* player = packet.GetSourcePlayer();
+    if (!player)
+        return;
+
+    CElement* damagedEntity = CElementIDs::GetElement(packet.GetDamagedEntityID());
+    if (!damagedEntity)
+        return;
+
+    CElement* attackerEntity = CElementIDs::GetElement(packet.GetAtackerEntityID());
+
+    CLuaArguments arguments;
+    if (attackerEntity)
+        arguments.PushElement(attackerEntity);
+    else
+        arguments.PushNil();
+
+    arguments.PushElement(damagedEntity);
+    arguments.PushNumber(packet.GetWeaponType());
+    arguments.PushNumber(packet.GetDamage());
+
+    const std::string& resourceName = packet.GetResourceName();
+    arguments.PushString(resourceName);
+
+    player->CallEvent("onDamageEventCancelled", arguments, nullptr);
+}
+
 void CGame::Packet_PlayerModInfo(CPlayerModInfoPacket& Packet)
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
@@ -4722,8 +4758,10 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
     uchar ucAllowDrivebyAnimFix = true;
     uchar ucAllowShotgunDamageFix = true;
 
+    const SEVentDamageCancelledSettings& damageCancelledSettings = m_pMainConfig->GetEventDamageCancelledSettings();
+
     CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs,
-                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix);
+                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix, damageCancelledSettings.triggerOnVehicleDamage == 1, damageCancelledSettings.triggerForDamageCalledEveryFrame == 1);
     if (pPlayer)
         pPlayer->Send(packet);
     else

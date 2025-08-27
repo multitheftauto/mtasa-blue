@@ -5482,6 +5482,14 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
     uchar ucAllowShotgunDamageFix = 0;
     bitStream.Read(ucAllowShotgunDamageFix);
 
+    bool triggerEventDamageCancelledForVehicles;
+    bitStream.ReadBit(triggerEventDamageCancelledForVehicles);
+
+    bool triggerEventDamageCancelledForDamageEveryFrame;
+    bitStream.ReadBit(triggerEventDamageCancelledForDamageEveryFrame);
+
+    g_pClientGame->SetEventDamageCancelledSettings(triggerEventDamageCancelledForVehicles, triggerEventDamageCancelledForDamageEveryFrame);
+
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = (ucUseAltPulseOrder != 0);
     miscGameSettings.bAllowFastSprintFix = (ucAllowFastSprintFix != 0);

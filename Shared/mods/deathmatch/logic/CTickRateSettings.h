@@ -27,6 +27,7 @@ public:
         iUnoccupiedVehicleSyncerDistance = 130;
         iVehicleContactSyncRadius = 30;
         playerTeleportAlert = 100;
+        cancelledDamageInterval = 1000;
     }
 
     int iPureSync;
@@ -43,6 +44,7 @@ public:
     int iUnoccupiedVehicleSyncerDistance;
     int iVehicleContactSyncRadius;
     int playerTeleportAlert;
+    int cancelledDamageInterval;
 };
 
 extern CTickRateSettings g_TickRateSettings;
