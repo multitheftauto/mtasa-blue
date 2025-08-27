@@ -63,7 +63,7 @@ protected:
     void                 SaveServerIdMap(bool bWait = false);
     const CServerIdInfo& GetServerIdInfo(const SString& strServerId);
     bool                 LoadServerIdMap();
-    static DWORD         StaticThreadProc(LPVOID lpdwThreadParam);
+    static DWORD WINAPI  StaticThreadProc(LPVOID lpdwThreadParam);
     static void          StaticSaveServerIdMap();
 
     bool                                  m_bListChanged;
@@ -188,7 +188,7 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
     ms_ServerIdMap = m_ServerIdMap;
 
     // Start save thread
-    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(static_cast<void*>(CServerIdManagerImpl::StaticThreadProc)),
+    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerIdManagerImpl::StaticThreadProc),
                                   NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
@@ -213,7 +213,7 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
 // SaveServerIdMap thread
 //
 ///////////////////////////////////////////////////////////////
-DWORD CServerIdManagerImpl::StaticThreadProc(LPVOID lpdwThreadParam)
+DWORD WINAPI CServerIdManagerImpl::StaticThreadProc(LPVOID lpdwThreadParam)
 {
     StaticSaveServerIdMap();
     ms_bIsSaving = false;

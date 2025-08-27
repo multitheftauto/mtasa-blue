@@ -65,9 +65,9 @@ public:
     ~CServerCache();
 
 protected:
-    bool         LoadServerCache();
-    static DWORD StaticThreadProc(LPVOID lpdwThreadParam);
-    static void  StaticSaveServerCache();
+    bool                LoadServerCache();
+    static DWORD WINAPI StaticThreadProc(LPVOID lpdwThreadParam);
+    static void         StaticSaveServerCache();
 
     bool                              m_bListChanged;
     std::map<CCachedKey, CCachedInfo> m_ServerCachedMap;
@@ -211,7 +211,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         ms_ServerCachedMap = m_ServerCachedMap;
 
         // Start save thread
-        HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)static_cast<void*>(CServerCache::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
+        HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerCache::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
         if (!hThread)
         {
             CCore::GetSingleton().GetConsole()->Printf("Could not create server cache thread.");
@@ -238,7 +238,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
 // SaveServerCache thread
 //
 ///////////////////////////////////////////////////////////////
-DWORD CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
+DWORD WINAPI CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
 {
     StaticSaveServerCache();
     ms_bIsSaving = false;

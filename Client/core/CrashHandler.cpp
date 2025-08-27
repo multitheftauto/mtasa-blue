@@ -86,7 +86,7 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
     }
     else
     {
-        if (TRUE == IsBadCodePtr((FARPROC)static_cast<void*>(pFn)))
+        if (TRUE == IsBadCodePtr(reinterpret_cast<FARPROC>(static_cast<void*>(pFn))))
         {
             return (FALSE);
         }
@@ -157,7 +157,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
             // it got unloaded. If some other function loaded
             // back into the same address, however, there isn't much
             // I can do.
-            if (FALSE == IsBadCodePtr((FARPROC)static_cast<void*>(g_pfnCallBack)))
+            if (FALSE == IsBadCodePtr(reinterpret_cast<FARPROC>(static_cast<void*>(g_pfnCallBack))))
             {
                 lRet = g_pfnCallBack(pExPtrs);
             }

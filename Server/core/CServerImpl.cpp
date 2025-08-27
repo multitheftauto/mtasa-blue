@@ -331,7 +331,8 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     {
         // Network module compatibility check
         typedef unsigned long (*PFNCHECKCOMPATIBILITY)(unsigned long, unsigned long*);
-        auto pfnCheckCompatibility = reinterpret_cast<PFNCHECKCOMPATIBILITY>(static_cast<void*>(m_NetworkLibrary.GetProcedureAddress("CheckCompatibility")));
+        #pragma warning(suppress: 4191)
+        auto pfnCheckCompatibility = reinterpret_cast<PFNCHECKCOMPATIBILITY>(m_NetworkLibrary.GetProcedureAddress("CheckCompatibility"));
         if (!pfnCheckCompatibility || !pfnCheckCompatibility(MTA_DM_SERVER_NET_MODULE_VERSION, (unsigned long*)MTASA_VERSION_TYPE))
         {
             // net.dll doesn't like our version number
@@ -351,9 +352,12 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
         if (m_XMLLibrary.Load(PathJoin(m_strServerPath, SERVER_BIN_PATH, szXMLLibName)))
         {
-            auto pfnInitNetServerInterface = (InitNetServerInterface)(static_cast<void*>(m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface")));
-            auto pfnReleaseNetServerInterface = (ReleaseNetServerInterface)(static_cast<void*>(m_NetworkLibrary.GetProcedureAddress("ReleaseNetServerInterface")));
-            auto pfnInitXMLInterface = (InitXMLInterface)(static_cast<void*>(m_XMLLibrary.GetProcedureAddress("InitXMLInterface")));
+            #pragma warning(push)
+            #pragma warning(disable: 4191)
+            auto pfnInitNetServerInterface = (InitNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface"));
+            auto pfnReleaseNetServerInterface = (ReleaseNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("ReleaseNetServerInterface"));
+            auto pfnInitXMLInterface = (InitXMLInterface)(m_XMLLibrary.GetProcedureAddress("InitXMLInterface"));
+            #pragma warning(pop)
 
             if (pfnInitNetServerInterface && pfnInitXMLInterface)
             {
