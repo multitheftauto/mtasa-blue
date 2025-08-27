@@ -26,9 +26,9 @@ std::unordered_map<std::string, std::string> GetFriendlyMonitorNamesForDevicePat
     if (!user32Lib)
         return monitorNames;
 
-    auto* getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes");
-    auto* queryDisplayConfig = (decltype(QueryDisplayConfig)*)GetProcAddress(user32Lib, "QueryDisplayConfig");
-    auto* displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo");
+    auto* getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)static_cast<void*>(GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes"));
+    auto* queryDisplayConfig = (decltype(QueryDisplayConfig)*)static_cast<void*>(GetProcAddress(user32Lib, "QueryDisplayConfig"));
+    auto* displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)static_cast<void*>(GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo"));
     if (!getDisplayConfigBufferSizes || !queryDisplayConfig || !displayConfigGetDeviceInfo)
     {
         FreeLibrary(user32Lib);

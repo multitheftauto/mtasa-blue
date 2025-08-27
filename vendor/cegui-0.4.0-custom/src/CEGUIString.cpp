@@ -57,7 +57,7 @@ bool String::grow(size_type new_size)
 {
     // check for too big
     if (max_size() <= new_size)
-        std::length_error("Resulting CEGUI::String would be too big");
+        throw std::length_error("Resulting CEGUI::String would be too big");
 
     // increase, as we always null-terminate the buffer.
     ++new_size;

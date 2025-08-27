@@ -330,9 +330,7 @@ class CompilationUnit {
   // ByteReader, and a Dwarf2Handler class to call callbacks in.
   CompilationUnit(const string& path, const SectionMap& sections, uint64 offset,
                   ByteReader* reader, Dwarf2Handler* handler);
-  virtual ~CompilationUnit() {
-    if (abbrevs_) delete abbrevs_;
-  }
+  virtual ~CompilationUnit();
 
   // Initialize a compilation unit from a .dwo or .dwp file.
   // In this case, we need the .debug_addr section from the

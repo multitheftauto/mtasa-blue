@@ -1054,14 +1054,14 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
             pServer->iRowIndex = iIndex;
         }
 
-        const SString strVersion = !bIncludeOtherVersions ? "" : pServer->strVersion;
+        const SString strVersion = !bIncludeOtherVersions ? SStringX("") : pServer->strVersion;
         const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
         const SString strVerified = pServer->isStatusVerified ? "" : "*";
-        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
+        const SString strPlayers = pServer->nMaxPlayers == 0 ? SStringX("") : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
         const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
 
-        const SString strPing = pServer->nPing == 9999 ? "" : SString("%d", pServer->nPing);
+        const SString strPing = pServer->nPing == 9999 ? SStringX("") : SString("%d", pServer->nPing);
         const SString strPingSortKey = SString("%04d-", pServer->nPing) + pServer->strTieBreakSortKey;
 
         // The row index could change at any point here if list sorting is enabled
@@ -1724,7 +1724,7 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
                 {
                     iPort = atoi(pPortAttribute->GetValue().c_str());
                     if (iPort > 0)
-                        pList->AddUnique(Address, iPort);
+                        pList->AddUnique(Address, static_cast<ushort>(iPort));
                 }
             }
         }

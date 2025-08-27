@@ -47,7 +47,7 @@ namespace
         SString                    m_strReport;
         std::map<SString, SString> m_FileMD5Map;
 
-        CIncludeManager::CIncludeManager(const SString& strRootPath, const SString& strCurrentPath)
+        CIncludeManager(const SString& strRootPath, const SString& strCurrentPath)
         {
             m_strRootPath = strRootPath;
             m_strCurrentPath = strCurrentPath;
@@ -228,7 +228,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 
-    SString         strMetaPath = bIsRawData ? "" : strFile.Right(strFile.length() - strRootPath.length());
+    SString         strMetaPath = bIsRawData ? SStringX("") : strFile.Right(strFile.length() - strRootPath.length());
     CIncludeManager IncludeManager(strRootPath, ExtractPath(strMetaPath));
     LPD3DXBUFFER    pBufferErrors = NULL;
     if (bIsRawData)

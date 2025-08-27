@@ -139,7 +139,7 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                 }
             }
             else
-                reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(dwPanel, breakGlass, spawnFlyingComponent);
+                reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
         }
     }
 }

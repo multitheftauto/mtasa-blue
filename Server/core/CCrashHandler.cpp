@@ -215,7 +215,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
     if (hDll)
     {
         // Grab the MiniDumpWriteDump proc address
-        MINIDUMPWRITEDUMP pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(hDll, "MiniDumpWriteDump"));
+        auto pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(static_cast<void*>(GetProcAddress(hDll, "MiniDumpWriteDump")));
         if (pDump)
         {
             // Grab the current time

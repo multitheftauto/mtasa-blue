@@ -815,8 +815,8 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
         CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
 
     // Store vanilla TXD ID
-    if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
-        ms_DefaultTxdIDMap[m_dwModelID] = m_pInterface->usTextureDictionary;
+    if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
+        ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = m_pInterface->usTextureDictionary;
 
     // Set new TXD and increase ref of it
     m_pInterface->usTextureDictionary = usID;
@@ -827,11 +827,11 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 
 void CModelInfoSA::ResetTextureDictionaryID()
 {
-    const auto it = ms_DefaultTxdIDMap.find(m_dwModelID);
+    const auto it = ms_DefaultTxdIDMap.find(static_cast<unsigned short>(m_dwModelID));
     if (it == ms_DefaultTxdIDMap.end()) {
         return;
     }
-    SetTextureDictionaryID(it->second);
+    SetTextureDictionaryID(static_cast<unsigned short>(it->second));
     ms_DefaultTxdIDMap.erase(it); // Only erase after calling the function above [otherwise gets reinserted]
 }
 
@@ -1734,7 +1734,7 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
 }
 
-void CModelInfoSA::MakePedModel(char* szTexture)
+void CModelInfoSA::MakePedModel(const char* szTexture)
 {
     // Create a new CPedModelInfo
     CPedModelInfoSA pedModelInfo;
