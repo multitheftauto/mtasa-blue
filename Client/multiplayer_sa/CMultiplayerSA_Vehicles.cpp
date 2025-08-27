@@ -35,7 +35,7 @@ static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 #define HOOKSIZE_CDamageManager__ProgressDoorDamage        7
 static DWORD CONTINUE_CDamageManager__ProgressDoorDamage = 0x6C2327;
 
-static void _declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
+static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 {
     _asm
     {

@@ -29,7 +29,7 @@ namespace
 #define HOOKSIZE_CVehicle_DoTailLightEffect_Mid         6
 #define HOOKCHECK_CVehicle_DoTailLightEffect_Mid        0x0F
 DWORD RETURN_CVehicle_DoTailLightEffect_Mid = 0x006E18EB;
-void _declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
+void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
 {
     _asm
     {
@@ -57,7 +57,7 @@ behind_corona:
 #define HOOKCHECK_CVehicle_DoTailLightEffect_Mid2       0x8B
 DWORD RETURN_CVehicle_DoTailLightEffect_Mid2 = 0x006E19F0;
 DWORD RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona = 0x006E1A32;
-void _declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
+void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
 {
     _asm
     {

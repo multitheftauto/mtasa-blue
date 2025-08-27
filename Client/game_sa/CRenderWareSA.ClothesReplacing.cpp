@@ -285,7 +285,7 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
 #define HOOKSIZE_CStreaming_RequestModel_Mid            5
 DWORD RETURN_CStreaming_RequestModel_MidA = 0x0408960;
 DWORD RETURN_CStreaming_RequestModel_MidB = 0x0408990;
-void _declspec(naked) HOOK_CStreaming_RequestModel_Mid()
+void __declspec(naked) HOOK_CStreaming_RequestModel_Mid()
 {
     _asm
     {

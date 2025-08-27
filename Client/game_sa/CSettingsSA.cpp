@@ -368,7 +368,7 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
 }
 
 // Hooked from 0x49EA50
-void _declspec(naked) HOOK_GetFxQuality()
+void __declspec(naked) HOOK_GetFxQuality()
 {
     _asm
     {
@@ -388,7 +388,7 @@ void _declspec(naked) HOOK_GetFxQuality()
 }
 
 // Hook to discover what vehicle will be calling GetFxQuality
-void _declspec(naked) HOOK_StoreShadowForVehicle()
+void __declspec(naked) HOOK_StoreShadowForVehicle()
 {
     _asm
     {
@@ -969,7 +969,7 @@ __declspec(noinline) int OnMY_SelectDevice()
 DWORD RETURN_SelectDeviceSingle = 0x0746273;
 DWORD RETURN_SelectDeviceMultiHide = 0x074622C;
 DWORD RETURN_SelectDeviceMultiShow = 0x0746227;
-void _declspec(naked) HOOK_SelectDevice()
+void __declspec(naked) HOOK_SelectDevice()
 {
     _asm
     {

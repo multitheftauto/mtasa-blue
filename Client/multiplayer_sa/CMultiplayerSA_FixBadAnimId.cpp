@@ -95,7 +95,7 @@ void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHie
 #define HOOKPOS_GetAnimHierarchyFromSkinClump        0x734A5D
 #define HOOKSIZE_GetAnimHierarchyFromSkinClump       7
 DWORD RETURN_GetAnimHierarchyFromSkinClump = 0x734A64;
-void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
+void __declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 {
     _asm
     {

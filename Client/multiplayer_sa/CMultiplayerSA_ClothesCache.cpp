@@ -343,7 +343,7 @@ void _cdecl OnCClothesBuilderCreateSkinnedClumpPost(RpClump* pRpClumpResult, RpC
 #define HOOKPOS_CClothesBuilderCreateSkinnedClump        0x5A69D0
 #define HOOKSIZE_CClothesBuilderCreateSkinnedClump       6
 DWORD RETURN_CClothesBuilderCreateSkinnedClump = 0x5A69D6;
-void _declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
+void __declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
 {
     _asm
     {

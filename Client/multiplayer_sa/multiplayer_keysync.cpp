@@ -501,7 +501,7 @@ struct CSavedRegs
 };
 static CSavedRegs PlayerPed__ProcessControl_Saved;
 
-VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
+VOID __declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
     // Assumes no reentrancy
     _asm
@@ -539,7 +539,7 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
     }
 }
 
-void _declspec(naked) CPlayerPed__ProcessControl_Abort()
+void __declspec(naked) CPlayerPed__ProcessControl_Abort()
 {
     _asm
     {
@@ -566,7 +566,7 @@ void _declspec(naked) CPlayerPed__ProcessControl_Abort()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
+VOID __declspec(naked) HOOK_CAutomobile__ProcessControl()
 {
     _asm
     {
@@ -595,7 +595,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
+VOID __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 {
     _asm
     {
@@ -624,7 +624,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
+VOID __declspec(naked) HOOK_CTrailer__ProcessControl()
 {
     _asm
     {
@@ -653,7 +653,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
+VOID __declspec(naked) HOOK_CQuadBike__ProcessControl()
 {
     _asm
     {
@@ -682,7 +682,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CPlane__ProcessControl()
+VOID __declspec(naked) HOOK_CPlane__ProcessControl()
 {
     _asm
     {
@@ -711,7 +711,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CBmx__ProcessControl()
+VOID __declspec(naked) HOOK_CBmx__ProcessControl()
 {
     _asm
     {
@@ -740,7 +740,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CTrain__ProcessControl()
+VOID __declspec(naked) HOOK_CTrain__ProcessControl()
 {
     _asm
     {
@@ -769,7 +769,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CBoat__ProcessControl()
+VOID __declspec(naked) HOOK_CBoat__ProcessControl()
 {
     _asm
     {
@@ -798,7 +798,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CBike__ProcessControl()
+VOID __declspec(naked) HOOK_CBike__ProcessControl()
 {
     _asm
     {
@@ -827,7 +827,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CHeli__ProcessControl()
+VOID __declspec(naked) HOOK_CHeli__ProcessControl()
 {
     _asm
     {

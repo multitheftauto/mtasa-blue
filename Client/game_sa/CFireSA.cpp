@@ -237,7 +237,7 @@ static void AbortFireTask(CEntitySAInterface* entityOnFire, DWORD returnAddress)
 #define HOOKPOS_CFire_Extinguish 0x539429
 #define HOOKSIZE_CFire_Extinguish 6
 static constexpr std::uintptr_t CONTINUE_CFire_Extinguish = 0x53942F;
-static void _declspec(naked) HOOK_CFire_Extinguish()
+static void __declspec(naked) HOOK_CFire_Extinguish()
 {
     _asm
     {

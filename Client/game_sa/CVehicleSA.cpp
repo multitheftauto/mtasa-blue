@@ -42,7 +42,7 @@ _declspec(naked) void DoVehicleSunGlare(void* this_)
     }
 }
 
-void _declspec(naked) HOOK_Vehicle_PreRender(void)
+void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
     _asm {
         mov    ecx, m_bVehicleSunGlare
@@ -94,7 +94,7 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
 static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;
 static constexpr DWORD RETURN_CHeli_ProcessFlyingCarStuff = 0x6C5404;
-static void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
+static void __declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
 {
     _asm
     {
@@ -117,7 +117,7 @@ static void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
 
 static constexpr DWORD CONTINUE_CPlane_ProcessFlyingCarStuff = 0x6CB7D7;
 static constexpr DWORD RETURN_CPlane_ProcessFlyingCarStuff = 0x6CC482;
-static void _declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
+static void __declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
 {
     _asm
     {

@@ -48,7 +48,7 @@ void OnMY_CallIdle_Post(RwGeometry* pGeometry, DWORD calledFrom)
 #define HOOKSIZE_CallIdle                        5
 DWORD RETURN_CallIdle = 0x53ECC2;
 DWORD DO_CallIdle = 0x53E920;
-void _declspec(naked) HOOK_CallIdle()
+void __declspec(naked) HOOK_CallIdle()
 {
     _asm
     {
@@ -114,7 +114,7 @@ void OnMY_CEntity_Render_Post()
 #define HOOKPOS_CEntity_Render                         0x534310
 #define HOOKSIZE_CEntity_Render                        6
 DWORD RETURN_CEntity_Render = 0x534317;
-void _declspec(naked) HOOK_CEntity_Render()
+void __declspec(naked) HOOK_CEntity_Render()
 {
     _asm
     {
@@ -167,7 +167,7 @@ void OnMY_CEntity_RenderOneNonRoad_Post(CEntitySAInterface* pEntity)
 #define HOOKPOS_CEntity_RenderOneNonRoad                         0x553260
 #define HOOKSIZE_CEntity_RenderOneNonRoad                        5
 DWORD RETURN_CEntity_RenderOneNonRoad = 0x553265;
-void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
+void __declspec(naked) HOOK_CEntity_RenderOneNonRoad()
 {
     _asm
     {
@@ -214,7 +214,7 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(CPedSAInterface* pEntity)
 #define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid                0x733080
 #define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid               6
 DWORD RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
-void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
+void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
 {
     _asm
     {
@@ -245,7 +245,7 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 // Hook info
 #define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_End                0x73314D
 #define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End               5
-void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
+void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 {
     _asm
     {
@@ -271,7 +271,7 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 #define HOOKPOS_Check_NoOfVisibleLods                         0x5534F9
 #define HOOKSIZE_Check_NoOfVisibleLods                        6
 DWORD RETURN_Check_NoOfVisibleLods = 0x5534FF;
-void _declspec(naked) HOOK_Check_NoOfVisibleLods()
+void __declspec(naked) HOOK_Check_NoOfVisibleLods()
 {
     _asm
     {
@@ -295,7 +295,7 @@ limit:
 #define HOOKPOS_Check_NoOfVisibleEntities                         0x55352D
 #define HOOKSIZE_Check_NoOfVisibleEntities                        6
 DWORD RETURN_Check_NoOfVisibleEntities = 0x553533;
-void _declspec(naked) HOOK_Check_NoOfVisibleEntities()
+void __declspec(naked) HOOK_Check_NoOfVisibleEntities()
 {
     _asm
     {
@@ -323,7 +323,7 @@ void OnMY_WinLoop()
 #define HOOKPOS_WinLoop                            0x748A93
 #define HOOKSIZE_WinLoop                           5
 DWORD RETURN_WinLoop = 0x748A98;
-void _declspec(naked) HOOK_WinLoop()
+void __declspec(naked) HOOK_WinLoop()
 {
     _asm
     {
@@ -346,7 +346,7 @@ void _declspec(naked) HOOK_WinLoop()
 #define HOOKPOS_CTimer_Update               0x561B10
 #define HOOKSIZE_CTimer_Update              6
 static const DWORD CONTINUE_CTimer_Update = 0x561B16;
-static void _declspec(naked) HOOK_CTimer_Update()
+static void __declspec(naked) HOOK_CTimer_Update()
 {
     _asm
     {
@@ -401,7 +401,7 @@ bool OnMY_psGrabScreen_ShouldUseRect()
 #define HOOKSIZE_psGrabScreen                       5
 DWORD RETURN_psGrabScreen_YesChange = 0x745311;
 DWORD RETURN_psGrabScreen_NoChange = 0x745336;
-void _declspec(naked) HOOK_psGrabScreen()
+void __declspec(naked) HOOK_psGrabScreen()
 {
     _asm
     {
@@ -445,7 +445,7 @@ void OnMY_CClouds_RenderSkyPolys()
 #define HOOKPOS_CClouds_RenderSkyPolys              0x714650
 #define HOOKSIZE_CClouds_RenderSkyPolys             5
 DWORD RETURN_CClouds_RenderSkyPolys = 0x714655;
-void _declspec(naked) HOOK_CClouds_RenderSkyPolys()
+void __declspec(naked) HOOK_CClouds_RenderSkyPolys()
 {
     _asm
     {
@@ -500,7 +500,7 @@ float OnMY_RwCameraSetNearClipPlane(DWORD dwCalledFrom, void* pUnknown, float fD
 #define HOOKPOS_RwCameraSetNearClipPlane            0x7EE1D0
 #define HOOKSIZE_RwCameraSetNearClipPlane           5
 DWORD RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
-void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
+void __declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
     _asm
     {
@@ -531,7 +531,7 @@ void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
 #define HOOKPOS_RenderEffects_HeliLight                           0x53E1B9
 #define HOOKSIZE_RenderEffects_HeliLight                          5
 DWORD RETURN_RenderEffects_HeliLight = 0x53E1BE;
-void _declspec(naked) HOOK_RenderEffects_HeliLight()
+void __declspec(naked) HOOK_RenderEffects_HeliLight()
 {
     _asm
     {
@@ -690,7 +690,7 @@ bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
 
 #define HOOKPOS_CVisibilityPlugins_RenderPedCB                        0x7335B0
 #define HOOKSIZE_CVisibilityPlugins_RenderPedCB                       5
-void _declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
+void __declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 {
     _asm
     {
@@ -720,7 +720,7 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 #define HOOKSIZE_CRenderer_EverythingBarRoads                        5
 DWORD RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
 DWORD DO_CRenderer_EverythingBarRoads = 0x7EE180;
-void _declspec(naked) HOOK_CRenderer_EverythingBarRoads()
+void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
 {
     _asm
     {

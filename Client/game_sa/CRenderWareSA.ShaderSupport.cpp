@@ -85,7 +85,7 @@ __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 }
 
 // called from streaming on TXD create
-void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
+void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 {
     _asm
     {
@@ -118,7 +118,7 @@ __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 }
 
 // called from streaming on TXD destroy
-void _declspec(naked) HOOK_CTxdStore_RemoveTxd()
+void __declspec(naked) HOOK_CTxdStore_RemoveTxd()
 {
     _asm
     {
@@ -690,7 +690,7 @@ __declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTextur
 #define HOOKPOS_RwTextureSetName     0x7F38A0
 #define HOOKSIZE_RwTextureSetName    9
 DWORD RETURN_RwTextureSetName = 0x7F38A9;
-void _declspec(naked) HOOK_RwTextureSetName()
+void __declspec(naked) HOOK_RwTextureSetName()
 {
     _asm
     {
@@ -724,7 +724,7 @@ __declspec(noinline) void OnMY_RwTextureDestroy_Mid(RwTexture* pTexture)
 #define HOOKPOS_RwTextureDestroy_Mid     0x07F3834
 #define HOOKSIZE_RwTextureDestroy_Mid    5
 DWORD RETURN_RwTextureDestroy_Mid = 0x07F3839;
-void _declspec(naked) HOOK_RwTextureDestroy_Mid()
+void __declspec(naked) HOOK_RwTextureDestroy_Mid()
 {
     _asm
     {
@@ -768,7 +768,7 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 #define HOOKPOS_RwIm3DRenderIndexedPrimitive     0x07EF550
 #define HOOKSIZE_RwIm3DRenderIndexedPrimitive    5
 DWORD RETURN_RwIm3DRenderIndexedPrimitive = 0x07EF555;
-void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
+void __declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
 {
     _asm
     {
@@ -817,7 +817,7 @@ __declspec(noinline) void OnMY_RwIm3DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 #define HOOKPOS_RwIm3DRenderPrimitive    0x07EF6B0
 #define HOOKSIZE_RwIm3DRenderPrimitive   6
 DWORD RETURN_RwIm3DRenderPrimitive = 0x07EF6B6;
-void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
+void __declspec(naked) HOOK_RwIm3DRenderPrimitive()
 {
     _asm
     {
@@ -866,7 +866,7 @@ __declspec(noinline) void OnMY_RwIm2DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 #define HOOKPOS_RwIm2DRenderIndexedPrimitive     0x0734EA1
 #define HOOKSIZE_RwIm2DRenderIndexedPrimitive    5
 DWORD RETURN_RwIm2DRenderIndexedPrimitive = 0x0403927;
-void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
+void __declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 {
     _asm
     {
@@ -917,7 +917,7 @@ __declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 #define HOOKPOS_RwIm2DRenderPrimitive                0x0734E90
 #define HOOKSIZE_RwIm2DRenderPrimitive               5
 DWORD RETURN_RwIm2DRenderPrimitive = 0x0734E95;
-void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
+void __declspec(naked) HOOK_RwIm2DRenderPrimitive()
 {
     _asm
     {

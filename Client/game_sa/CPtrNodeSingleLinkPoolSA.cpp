@@ -40,7 +40,7 @@ static CPtrNodeSingleLinkPoolSA::pool_item_t* __cdecl HOOK_SingleLinkNodeDestruc
 constexpr std::uint32_t      HOOKPOS_CPtrListSingleLink_Flush = 0x55243B;
 constexpr std::size_t        HOOKSIZE_CPtrListSingleLink_Flush = 6;
 constexpr std::uint32_t      CONTINUE_CPtrListSingleLink_Flush = 0x55245B;
-static void _declspec(naked) HOOK_CPtrListSingleLink_Flush()
+static void __declspec(naked) HOOK_CPtrListSingleLink_Flush()
 {
     __asm {
         mov edi, ecx ; save register

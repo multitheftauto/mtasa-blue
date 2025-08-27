@@ -61,7 +61,7 @@ void OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart(CVehicleSAInterface* p
 #define HOOKPOS_CAutomobile_CustomCarPlate_BeforeRenderingStart                         0x006A2F00
 #define HOOKSIZE_CAutomobile_CustomCarPlate_BeforeRenderingStart                        7
 DWORD RETURN_CAutomobile_CustomCarPlate_BeforeRenderingStart = 0x006A2F07;
-void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
+void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
 {
     _asm
     {
@@ -116,7 +116,7 @@ void OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop(CVehicleModelInfoSAInter
 #define HOOKPOS_CAutomobile_CustomCarPlate_AfterRenderingStop                         0x006A2F30
 #define HOOKSIZE_CAutomobile_CustomCarPlate_AfterRenderingStop                        7
 DWORD RETURN_CAutomobile_CustomCarPlate_AfterRenderingStop = 0x006A2F37;
-void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
+void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
 {
     _asm
     {
@@ -152,7 +152,7 @@ void OnMY_CCustomCarPlateMgr_SetupMaterialPlateTexture(struct RpMaterial* a, cha
 #define HOOKPOS_CCustomCarPlateMgr_SetupMaterialPlateTexture                         0x006FE020
 #define HOOKSIZE_CCustomCarPlateMgr_SetupMaterialPlateTexture                        5
 DWORD RETURN_CCustomCarPlateMgr_SetupMaterialPlateTexture = 0x006FE025;
-void _declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
+void __declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
 {
     _asm
     {
@@ -196,7 +196,7 @@ void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post()
 #define HOOKPOS_CVehicleModelInfo_SetCarCustomPlate                         0x004C9450
 #define HOOKSIZE_CVehicleModelInfo_SetCarCustomPlate                        6
 DWORD RETURN_CVehicleModelInfo_SetCarCustomPlate = 0x004C9456;
-void _declspec(naked) HOOK_CVehicleModelInfo_SetCarCustomPlate()
+void __declspec(naked) HOOK_CVehicleModelInfo_SetCarCustomPlate()
 {
     _asm
     {
@@ -232,7 +232,7 @@ inner:
 #define HOOKPOS_CCustomCarPlateMgr_CreatePlateTexture                         0x006FDEA0
 #define HOOKSIZE_CCustomCarPlateMgr_CreatePlateTexture                        5
 DWORD RETURN_CCustomCarPlateMgr_CreatePlateTexture = 0x006FDEA5;
-void _declspec(naked) HOOK_CCustomCarPlateMgr_CreatePlateTexture()
+void __declspec(naked) HOOK_CCustomCarPlateMgr_CreatePlateTexture()
 {
     _asm
     {

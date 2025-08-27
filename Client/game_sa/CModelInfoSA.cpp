@@ -1892,7 +1892,7 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 #define HOOKPOS_NodeNameStreamRead                         0x072FA68
 #define HOOKSIZE_NodeNameStreamRead                        15
 DWORD RETURN_NodeNameStreamRead = 0x072FA77;
-void _declspec(naked) HOOK_NodeNameStreamRead()
+void __declspec(naked) HOOK_NodeNameStreamRead()
 {
     _asm
     {

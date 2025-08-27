@@ -501,7 +501,7 @@ __declspec(noinline) void _cdecl DoCameraCollisionDetectionPokes()
         MemPutFast<char>(VAR_CameraClipVehicles, 0);
 }
 
-void _declspec(naked) HOOK_Camera_CollisionDetection()
+void __declspec(naked) HOOK_Camera_CollisionDetection()
 {
     _asm
     {

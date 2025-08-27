@@ -318,7 +318,7 @@ CVector*              pTempVec;
 bool*                 pSkipAim;
 CRemoteDataStorageSA* pTempRemote;
 
-VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
+VOID __declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
 {
     // We can use EAX
     _asm
@@ -344,7 +344,7 @@ static CPed* GetTargetingPed()
     return pClientEntity ? pClientEntity->pEntity : nullptr;
 }
 
-VOID _declspec(naked) HOOK_SkipAim()
+VOID __declspec(naked) HOOK_SkipAim()
 {
     // We can use ECX
     // Return to 0x62AEED for normal aiming
@@ -416,7 +416,7 @@ VOID _declspec(naked) HOOK_SkipAim()
 
 float* pTargetVector;
 
-VOID _declspec(naked) HOOK_IKChainManager_PointArm()
+VOID __declspec(naked) HOOK_IKChainManager_PointArm()
 {
     // We can use edx
     _asm
@@ -476,7 +476,7 @@ VOID _declspec(naked) HOOK_IKChainManager_PointArm()
     }
 }
 
-VOID _declspec(naked) HOOK_IKChainManager_LookAt()
+VOID __declspec(naked) HOOK_IKChainManager_LookAt()
 {
     // We can use eax
     _asm
@@ -540,7 +540,7 @@ VOID _declspec(naked) HOOK_IKChainManager_LookAt()
     }
 }
 
-VOID _declspec(naked) HOOK_CWeapon__Fire()
+VOID __declspec(naked) HOOK_CWeapon__Fire()
 {
     _asm
     {
@@ -591,7 +591,7 @@ VOID _declspec(naked) HOOK_CWeapon__Fire()
     }
 }
 
-VOID _declspec(naked) HOOK_CWeapon__PostFire()
+VOID __declspec(naked) HOOK_CWeapon__PostFire()
 {
     _asm
     {
@@ -612,7 +612,7 @@ VOID _declspec(naked) HOOK_CWeapon__PostFire()
     }
 }
 
-VOID _declspec(naked) HOOK_CWeapon__PostFire2()            // handles the FALSE exit point at 0x074241E
+VOID __declspec(naked) HOOK_CWeapon__PostFire2()            // handles the FALSE exit point at 0x074241E
 {
     _asm
     {
@@ -631,7 +631,7 @@ VOID _declspec(naked) HOOK_CWeapon__PostFire2()            // handles the FALSE 
 }
 
 static const DWORD CWeapon_DoBulletImpact_RET = 0x73B557;
-void _declspec(naked) HOOK_CWeapon_DoBulletImpact()
+void __declspec(naked) HOOK_CWeapon_DoBulletImpact()
 {
     _asm
     {
@@ -657,7 +657,7 @@ void _declspec(naked) HOOK_CWeapon_DoBulletImpact()
     }
 }
 
-VOID _declspec(naked) HOOK_CTaskSimpleGangDriveBy__PlayerTarget()
+VOID __declspec(naked) HOOK_CTaskSimpleGangDriveBy__PlayerTarget()
 {
     // Replacement code
     _asm
@@ -684,7 +684,7 @@ VOID _declspec(naked) HOOK_CTaskSimpleGangDriveBy__PlayerTarget()
     }
 }
 
-VOID _declspec(naked) HOOK_CPedIK__PointGunInDirection()
+VOID __declspec(naked) HOOK_CPedIK__PointGunInDirection()
 {
     _asm
     {
@@ -719,7 +719,7 @@ VOID _declspec(naked) HOOK_CPedIK__PointGunInDirection()
 // This hook prevents remote players always hitting local players if both players are targeting with sniper.
 // This was because it then used the FireSniper mode rather than FireInstantHit so it appeared that the local
 // player was shooting himself!
-void _declspec(naked) HOOK_CWeapon__Fire_Sniper()
+void __declspec(naked) HOOK_CWeapon__Fire_Sniper()
 {
     /*
     007424A6   8B4424 14        MOV EAX,DWORD PTR SS:[ESP+14]
@@ -786,7 +786,7 @@ bool ProcessDamageEvent(CEventDamageSAInterface* event, CPedSAInterface* affects
 
 CPedSAInterface*         affectsPed = 0;
 CEventDamageSAInterface* event = 0;
-void _declspec(naked) HOOK_CEventDamage__AffectsPed()
+void __declspec(naked) HOOK_CEventDamage__AffectsPed()
 {
     /*
     004B35A0   83EC 0C          SUB ESP,0C
@@ -841,7 +841,7 @@ void _declspec(naked) HOOK_CEventDamage__AffectsPed()
 static constexpr std::uintptr_t SKIP_CFireManager_StartFire = 0x53A0C5;
 static constexpr std::uintptr_t RETURN_CFireManager_StartFire = 0x53A056;
 
-static void _declspec(naked) HOOK_CFireManager__StartFire()
+static void __declspec(naked) HOOK_CFireManager__StartFire()
 {
     _asm
     {
@@ -969,7 +969,7 @@ void ProcessProjectile()
 
 // CProjectileInfo::AddProjectile(class CEntity * owner,enum eWeaponType weapon type
 // ,class CVector origin?,float 0?,class CVector * direction,class CEntity * target)
-void _declspec(naked) HOOK_CProjectileInfo__AddProjectile()
+void __declspec(naked) HOOK_CProjectileInfo__AddProjectile()
 {
     _asm
     {
@@ -1014,7 +1014,7 @@ void _declspec(naked) HOOK_CProjectileInfo__AddProjectile()
     }
 }
 
-void _declspec(naked) HOOK_CProjectile__CProjectile()
+void __declspec(naked) HOOK_CProjectile__CProjectile()
 {
     _asm
     {
@@ -1110,7 +1110,7 @@ void OnMy_CWeapon_FireInstantHit_Mid(CEntitySAInterface* pEntity, CVector* pvecN
 #define HOOKPOS_CWeapon_FireInstantHit_Mid                         0x740B89
 #define HOOKSIZE_CWeapon_FireInstantHit_Mid                        5
 DWORD RETURN_CWeapon_FireInstantHit_Mid = 0x740B8E;
-void _declspec(naked) HOOK_CWeapon_FireInstantHit_Mid()
+void __declspec(naked) HOOK_CWeapon_FireInstantHit_Mid()
 {
     _asm
     {
@@ -1191,7 +1191,7 @@ void OnMy_CWeapon_FireSniper_Mid(CEntitySAInterface* pEntity, CVector* pvecEndHi
 #define HOOKPOS_CWeapon_FireSniper_Mid                         0x73AE31
 #define HOOKSIZE_CWeapon_FireSniper_Mid                        5
 DWORD RETURN_CWeapon_FireSniper_Mid = 0x73AE39;
-void _declspec(naked) HOOK_CWeapon_FireSniper_Mid()
+void __declspec(naked) HOOK_CWeapon_FireSniper_Mid()
 {
     _asm
     {
@@ -1276,7 +1276,7 @@ void _cdecl DoFireInstantHitPokes()
 
 DWORD dwFunc_CWeapon_FireInstantHit_ret = 0x740B6E;
 DWORD dwFunc_CWorld_ProcessLineOfSight = 0x56BA00;
-void _declspec(naked) HOOK_CWeapon_FireInstantHit()
+void __declspec(naked) HOOK_CWeapon_FireInstantHit()
 {
     /* CWeapon::FireInstantHit->CWorld::ProcessLineOfSight
     00740B42  push        1
@@ -1365,7 +1365,7 @@ DWORD dwFunc_CWeapon_FireInstantHit_CameraMode_ret = 0x7403C7;
 DWORD dwAddr_FireInstantHit_CameraMode = 0x740389;
 DWORD dwAddr_FireInstantHit_CameraMode_2 = 0x740373;
 short sFireInstantHit_CameraMode_camMode = 0;
-void _declspec(naked) HOOK_CWeapon_FireInstantHit_CameraMode()
+void __declspec(naked) HOOK_CWeapon_FireInstantHit_CameraMode()
 {
     /* CWeapon::FireInstantHit->'CameraMode switch'
     0074036D  cmp         ax,35h (53)   ** <hook>
@@ -1435,7 +1435,7 @@ bool             FireInstantHit_IsPlayer()
 
 DWORD RETURN_CWeapon_FireInstantHit_IsPlayer = 0x740353;
 DWORD FUNC_CPlayer_IsPed = 0x5DF8F0;
-void _declspec(naked) HOOK_CWeapon_FireInstantHit_IsPlayer()
+void __declspec(naked) HOOK_CWeapon_FireInstantHit_IsPlayer()
 {
     /*
     0074034C  call        005DF8F0          <hook>
@@ -1480,7 +1480,7 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_IsPlayer()
 }
 
 #if false
-VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
+VOID __declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
 {
     /*
     0046FB36  |. 5D             POP EBP
@@ -1559,7 +1559,7 @@ VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
     }
 }
 
-VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
+VOID __declspec(naked) HOOK_CWeapon__FireShotgun()
 {
     // this is used to store and replace the CrossProduct
     /*
@@ -1651,7 +1651,7 @@ void CEventVehicleExplosion_NotifyDeathmatch()
     }
 }
 
-void _declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
+void __declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
 {
     _asm
     {

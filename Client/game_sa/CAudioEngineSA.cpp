@@ -423,7 +423,7 @@ __declspec(noinline) bool _cdecl IsAmbientSoundGeneralEnabled()
 }
 
 // Hook for manual ambient sound pause
-void _declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
+void __declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
 {
     _asm
     {
@@ -511,7 +511,7 @@ __declspec(noinline) bool _cdecl On_CAESoundManager_RequestNewSound(CAESound* pA
     return g_pAudioSA->OnWorldSound(pAESound);
 }
 
-void _declspec(naked) HOOK_CAESoundManager_RequestNewSound()
+void __declspec(naked) HOOK_CAESoundManager_RequestNewSound()
 {
     _asm
     {

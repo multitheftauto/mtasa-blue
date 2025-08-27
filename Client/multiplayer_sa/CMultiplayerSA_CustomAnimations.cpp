@@ -73,7 +73,7 @@ CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(eAnimGroup animGroup
     return &pAnimGroupArray[(int)animGroup];
 }
 
-void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
+void __declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
 {
     _asm
     {
@@ -98,7 +98,7 @@ void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
     }
 }
 
-void _declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
+void __declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
 {
     _asm
     {
@@ -142,7 +142,7 @@ CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpC
     return pAnimAssociationInterface;
 }
 
-void _declspec(naked) HOOK_CAnimManager_AddAnimation()
+void __declspec(naked) HOOK_CAnimManager_AddAnimation()
 {
     _asm
     {
@@ -184,7 +184,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
     }
 }
 
-void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
+void __declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 {
      _asm
      {
@@ -226,7 +226,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
      }
 }
 
-void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
+void __declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
 {
     _asm
     {

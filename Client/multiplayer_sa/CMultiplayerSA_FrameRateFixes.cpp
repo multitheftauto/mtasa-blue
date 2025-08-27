@@ -19,7 +19,7 @@ constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 #define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim 0x61E4F2
 #define HOOKSIZE_CTaskSimpleUseGun__SetMoveAnim 0x6
 const unsigned int RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
-void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
+void __declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 {
     _asm {
         fld ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
@@ -37,7 +37,7 @@ void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 #define HOOKPOS_CCamera__Process 0x52C723
 #define HOOKSIZE_CCamera__Process 0x12
 static const unsigned int RETURN_CCamera__Process = 0x52C735;
-static void _declspec(naked) HOOK_CCamera__Process()
+static void __declspec(naked) HOOK_CCamera__Process()
 {
     _asm {
         fld ds:[0x858C80]           // 5.0f
@@ -53,7 +53,7 @@ static void _declspec(naked) HOOK_CCamera__Process()
 #define HOOKPOS_CHeli__ProcessFlyingCarStuff 0x6C4F13
 #define HOOKSIZE_CHeli__ProcessFlyingCarStuff 0x2A
 static const unsigned int RETURN_CHeli__ProcessFlyingCarStuff = 0x6C4F3D;
-static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
+static void __declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
 {
     _asm {
         mov ax, [esi+0x22]
@@ -80,7 +80,7 @@ static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
 #define HOOKPOS_CClouds__MovingFog_Update 0x716BA6
 #define HOOKSIZE_CClouds__MovingFog_Update 0x16
 static const unsigned int RETURN_CClouds__MovingFog_Update = 0x716BBC;
-static void _declspec(naked) HOOK_CClouds__MovingFog_Update()
+static void __declspec(naked) HOOK_CClouds__MovingFog_Update()
 {
     _asm {
         fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
@@ -100,7 +100,7 @@ static void _declspec(naked) HOOK_CClouds__MovingFog_Update()
 #define HOOKPOS_CFallingGlassPane__Update_A 0x71AABF
 #define HOOKSIZE_CFallingGlassPane__Update_A 0x6
 static const unsigned int RETURN_CFallingGlassPane__Update_A = 0x71AAC5;
-static void _declspec(naked) HOOK_CFallingGlassPane__Update_A()
+static void __declspec(naked) HOOK_CFallingGlassPane__Update_A()
 {
     _asm {
         fld [esp+0x28]
@@ -123,7 +123,7 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_A()
 #define HOOKPOS_CFallingGlassPane__Update_B 0x71AAEA
 #define HOOKSIZE_CFallingGlassPane__Update_B 0x6
 static const unsigned int RETURN_CFallingGlassPane__Update_B = 0x71AAF0;
-static void _declspec(naked) HOOK_CFallingGlassPane__Update_B()
+static void __declspec(naked) HOOK_CFallingGlassPane__Update_B()
 {
     _asm {
         fld [eax]
@@ -148,7 +148,7 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_B()
 #define HOOKPOS_CFallingGlassPane__Update_C 0x71AB29
 #define HOOKSIZE_CFallingGlassPane__Update_C 0x6
 static const unsigned int RETURN_CFallingGlassPane__Update_C = 0x71AB2F;
-static void _declspec(naked) HOOK_CFallingGlassPane__Update_C()
+static void __declspec(naked) HOOK_CFallingGlassPane__Update_C()
 {
     _asm {
         fld [eax]
@@ -172,7 +172,7 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_C()
 // Ensure that CTimer::CurrentFrame is updated only every 33+ milliseconds.
 #define HOOKPOS_CTimer__Update 0x561C5D
 #define HOOKSIZE_CTimer__Update 0xE
-static void _declspec(naked) HOOK_CTimer__Update()
+static void __declspec(naked) HOOK_CTimer__Update()
 {
     _asm {
         add esp, 0x4
@@ -200,7 +200,7 @@ static void _declspec(naked) HOOK_CTimer__Update()
 #define HOOKPOS_BreakObject_c__Update 0x59E420
 #define HOOKSIZE_BreakObject_c__Update 0xB
 static const unsigned int RETURN_BreakObject_c__Update = 0x59E42B;
-static void _declspec(naked) HOOK_BreakObject_c__Update()
+static void __declspec(naked) HOOK_BreakObject_c__Update()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -222,7 +222,7 @@ static void _declspec(naked) HOOK_BreakObject_c__Update()
 #define HOOKSIZE_CWaterCannon__Update_OncePerFrame 0x5
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame = 0x72A2A0;
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_SKIP = 0x72A2BB;
-static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
+static void __declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -243,7 +243,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
 #define HOOKSIZE_CPlayerInfo__Process 0x6
 static const unsigned int RETURN_CPlayerInfo__Process = 0x5700FB;
 static const unsigned int RETURN_CPlayerInfo__Process_SKIP = 0x57015B;
-static void _declspec(naked) HOOK_CPlayerInfo__Process()
+static void __declspec(naked) HOOK_CPlayerInfo__Process()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -263,7 +263,7 @@ static void _declspec(naked) HOOK_CPlayerInfo__Process()
 #define HOOKSIZE_CProjectileInfo__Update 0x5
 static const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
 static const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
-static void _declspec(naked) HOOK_CProjectileInfo__Update()
+static void __declspec(naked) HOOK_CProjectileInfo__Update()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -283,7 +283,7 @@ static void _declspec(naked) HOOK_CProjectileInfo__Update()
 #define HOOKPOS_CVehicle__AddWheelDirtAndWater 0x6D2D50
 #define HOOKSIZE_CVehicle__AddWheelDirtAndWater 0x6
 static const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
-static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
+static void __declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -305,7 +305,7 @@ static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
 #define HOOKSIZE_CPlane__PreRender 0x6
 static const unsigned int RETURN_CPlane__PreRender = 0x6CA93D;
 static const unsigned int RETURN_CPlane__PreRender_SKIP = 0x6CAA93;
-static void _declspec(naked) HOOK_CPlane__PreRender()
+static void __declspec(naked) HOOK_CPlane__PreRender()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -325,7 +325,7 @@ static void _declspec(naked) HOOK_CPlane__PreRender()
 #define HOOKSIZE_CWaterCannon__Update_OncePerFrame_PushPedFix 0x6
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix = 0x72A381;
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP = 0x72A38E;
-static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
+static void __declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -345,7 +345,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
 #define HOOKSIZE_CWaterCannon__Render_FxFix 0x5
 static const unsigned int RETURN_CWaterCannon__Render_FxFix = 0x729440;
 static const unsigned int RETURN_CWaterCannon__Render_FxFix_SKIP = 0x7294EE;
-static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
+static void __declspec(naked) HOOK_CWaterCannon__Render_FxFix()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -363,7 +363,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
 #define HOOKSIZE_CPed__PreRenderAfterTest 0x6
 static const unsigned int RETURN_CPed__PreRenderAfterTest = 0x5E7187;
 static const unsigned int RETURN_CPed__PreRenderAfterTest_SKIP = 0x5E722D;
-static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
+static void __declspec(naked) HOOK_CPed__PreRenderAfterTest()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -382,7 +382,7 @@ static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
 #define HOOKPOS_cBuoyancy__AddSplashParticles 0x6C34E0
 #define HOOKSIZE_cBuoyancy__AddSplashParticles 0x6
 static const unsigned int RETURN_cBuoyancy__AddSplashParticles = 0x6C34E6;
-static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
+static void __declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -401,7 +401,7 @@ static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
 #define HOOKPOS_CWeather__AddRain 0x72AAA8
 #define HOOKSIZE_CWeather__AddRain 0x6
 static const unsigned int RETURN_CWeather__AddRain = 0x72AAAE;
-static void _declspec(naked) HOOK_CWeather__AddRain()
+static void __declspec(naked) HOOK_CWeather__AddRain()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -423,7 +423,7 @@ static void _declspec(naked) HOOK_CWeather__AddRain()
 #define HOOKSIZE_CPlane__ProcessFlyingCarStuff 0x6
 static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff = 0x6CBE51;
 static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff_SKIP = 0x6CC0D9;
-static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
+static void __declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -443,7 +443,7 @@ static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
 #define HOOKSIZE_CAutomobile__UpdateWheelMatrix 0x5
 static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix = 0x6AA78F;
 static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix_SKIP = 0x6AAAD0;
-static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
+static void __declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -462,7 +462,7 @@ static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
 #define HOOKPOS_CVehicle__DoBoatSplashes 0x6DD130
 #define HOOKSIZE_CVehicle__DoBoatSplashes 0x6
 static const unsigned int RETURN_CVehicle__DoBoatSplashes = 0x6DD136;
-static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
+static void __declspec(naked) HOOK_CVehicle__DoBoatSplashes()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -481,7 +481,7 @@ static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
 #define HOOKPOS_CVehicle__AddWaterSplashParticles 0x6DDF60
 #define HOOKSIZE_CVehicle__AddWaterSplashParticles 0x6
 static const unsigned int RETURN_CVehicle__AddWaterSplashParticles = 0x6DDF66;
-static void _declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
+static void __declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -501,7 +501,7 @@ static void _declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
 #define HOOKSIZE_CPlane__ProcessControl 0x5
 static const unsigned int RETURN_CPlane__ProcessControl = 0x6C939F;
 static const unsigned int RETURN_CPlane__ProcessControl_SKIP = 0x6C9463;
-static void _declspec(naked) HOOK_CPlane__ProcessControl()
+static void __declspec(naked) HOOK_CPlane__ProcessControl()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -521,7 +521,7 @@ static void _declspec(naked) HOOK_CPlane__ProcessControl()
 #define HOOKPOS_CVehicle__AddExhaustParticles 0x6DE240
 #define HOOKSIZE_CVehicle__AddExhaustParticles 0x6
 static const unsigned int RETURN_CVehicle__AddExhaustParticles = 0x6DE246;
-static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
+static void __declspec(naked) HOOK_CVehicle__AddExhaustParticles()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -541,7 +541,7 @@ static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
 #define HOOKSIZE_CTaskSimpleSwim__ProcessEffects 0x6
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects = 0x68AD41;
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects_SKIP = 0x68AFDB;
-static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
+static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -562,7 +562,7 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
 #define HOOKSIZE_CTaskSimpleSwim__ProcessEffectsBubbleFix 0x7
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix = 0x68AC38;
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP = 0x68AD36;
-static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
+static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -622,7 +622,7 @@ static void __declspec(naked) HOOK_CWeapon_Update()
 #define HOOKPOS_CPhysical__ApplyAirResistance  0x544D29
 #define HOOKSIZE_CPhysical__ApplyAirResistance 5
 static const unsigned int    RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
-static void _declspec(naked) HOOK_CPhysical__ApplyAirResistance()
+static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
 {
     _asm {
         fld ds:[0x862CD0]            // 0.99000001f
@@ -646,7 +646,7 @@ static void _declspec(naked) HOOK_CPhysical__ApplyAirResistance()
 }
 
 template <unsigned int returnAddress>
-static void _declspec(naked) HOOK_VehicleRapidStopFix()
+static void __declspec(naked) HOOK_VehicleRapidStopFix()
 {
     static unsigned int RETURN_VehicleRapidStopFix = returnAddress;
     _asm {

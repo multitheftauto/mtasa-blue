@@ -61,7 +61,7 @@ void      OnMy_CClothesDeleteRwObject()
 #define HOOKPOS_CClothesDeleteRwObject                          0x5A8243
 #define HOOKSIZE_CClothesDeleteRwObject                         5
 DWORD RETURN_CClothesDeleteRwObject = 0x5A8248;
-void _declspec(naked) HOOK_CClothesDeleteRwObject()
+void __declspec(naked) HOOK_CClothesDeleteRwObject()
 {
     _asm
     {
@@ -98,7 +98,7 @@ void OnMy_PostCPedDress()
 #define HOOKPOS_PostCPedDress                           0x5A835C
 #define HOOKSIZE_PostCPedDress                          5
 DWORD RETURN_PostCPedDress = 0x5A8361;
-void _declspec(naked) HOOK_PostCPedDress()
+void __declspec(naked) HOOK_PostCPedDress()
 {
     _asm
     {

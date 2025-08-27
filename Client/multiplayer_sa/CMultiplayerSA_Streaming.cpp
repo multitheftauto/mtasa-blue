@@ -26,7 +26,7 @@ void OnModelLoaded(uint32_t uiModelID)
 #define HOOKPOS_CStreaming__ConvertBufferToObject  0x40CB88
 #define HOOKSIZE_CStreaming__ConvertBufferToObject 9
 
-static void _declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
+static void __declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
 {
     _asm {
         push    esi

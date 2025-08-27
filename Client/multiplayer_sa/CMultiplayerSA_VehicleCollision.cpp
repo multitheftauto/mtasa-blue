@@ -60,7 +60,7 @@ void TriggerVehicleCollisionEvent()
 #define HOOKSIZE_CAutomobile_ProcessControl_VehicleDamage              6
 static const DWORD CONTINUE_CAutomobile_ProcessControl_VehicleDamage = 0x6B1F41;
 
-static void _declspec(naked) HOOK_CAutomobile_ProcessControl_VehicleDamage()
+static void __declspec(naked) HOOK_CAutomobile_ProcessControl_VehicleDamage()
 {
     _asm
     {
@@ -93,7 +93,7 @@ static void _declspec(naked) HOOK_CAutomobile_ProcessControl_VehicleDamage()
 #define HOOKSIZE_CBike_ProcessControl_VehicleDamage              6
 static const DWORD CONTINUE_CBike_ProcessControl_VehicleDamage = 0x6B9AAB;
 
-static void _declspec(naked) HOOK_CBike_ProcessControl_VehicleDamage()
+static void __declspec(naked) HOOK_CBike_ProcessControl_VehicleDamage()
 {
     _asm
     {
@@ -127,7 +127,7 @@ static void _declspec(naked) HOOK_CBike_ProcessControl_VehicleDamage()
 static const DWORD CONTINUE_CBoat_ProcessControl_VehicleDamage = 0x6F1869;
 static const DWORD FUNC_CVehicle_ProcessCarAlarm = 0x6D21F0;
 
-static void _declspec(naked) HOOK_CBoat_ProcessControl_VehicleDamage()
+static void __declspec(naked) HOOK_CBoat_ProcessControl_VehicleDamage()
 {
     _asm
     {
@@ -159,7 +159,7 @@ static void _declspec(naked) HOOK_CBoat_ProcessControl_VehicleDamage()
 #define HOOKSIZE_CTrain_ProcessControl_VehicleDamage              5
 static const DWORD CONTINUE_CTrain_ProcessControl_VehicleDamage = 0x6F86C0;
 
-static void _declspec(naked) HOOK_CTrain_ProcessControl_VehicleDamage()
+static void __declspec(naked) HOOK_CTrain_ProcessControl_VehicleDamage()
 {
     _asm
     {

@@ -53,7 +53,7 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 #define HOOKPOS_PreCreateDevice             0x007F675B
 #define HOOKSIZE_PreCreateDevice            6
 DWORD RETURN_PreCreateDevice = 0x07F6781;
-void _declspec(naked) HOOK_PreCreateDevice()
+void __declspec(naked) HOOK_PreCreateDevice()
 {
     _asm
     {
@@ -108,7 +108,7 @@ HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
 #define HOOKSIZE_PostCreateDevice           6
 DWORD RETURN_PostCreateDevice = 0x07F678A;
 DWORD RETURN_PostCreateDeviceB = 0x07F6799;
-void _declspec(naked) HOOK_PostCreateDevice()
+void __declspec(naked) HOOK_PostCreateDevice()
 {
     _asm
     {

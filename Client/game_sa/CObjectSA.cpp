@@ -27,7 +27,7 @@ static void CObject_PreRender(CObjectSAInterface* objectInterface)
 }
 
 const std::uintptr_t RETURN_CCObject_PreRender = 0x59FD56;
-static void _declspec(naked) HOOK_CCObject_PreRender()
+static void __declspec(naked) HOOK_CCObject_PreRender()
 {
     __asm
     {

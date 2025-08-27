@@ -331,7 +331,7 @@ void GetVehicleSirenType()
         dwSirenType2 = 5;
     }
 }
-void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
+void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
 {
     _asm
     {
@@ -562,7 +562,7 @@ bool ProcessVehicleSirenPosition()
     return false;
 }
 
-void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle()
+void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle()
 {
     _asm
     {
@@ -626,7 +626,7 @@ void TestSirenTypeDualDefaultFix()
         GetVehicleSirenType();
     }
 }
-void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
+void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
 {
     _asm
     {
@@ -650,7 +650,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
     }
 }
 
-void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed()
+void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed()
 {
     _asm
     {
@@ -711,7 +711,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed()
     }
 }
 
-void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue()
+void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue()
 {
     _asm
     {
@@ -789,7 +789,7 @@ bool TestVehicleForSiren()
     return true;
 }
 
-void _declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
+void __declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
 {
     _asm
     {
@@ -841,7 +841,7 @@ bool SirenCheckCameraPosition()
     // Only visible from the front
     return false;
 }
-void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
+void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
 {
     _asm
     {
@@ -887,7 +887,7 @@ bool DisableVehicleSiren()
     }
     return false;
 }
-void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
+void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
 {
     _asm
     {
@@ -913,7 +913,7 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
     }
 }
 DWORD CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
-void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1()
+void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1()
 {
     _asm
     {
@@ -928,7 +928,7 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1()
         jmp RETN_CVehicleAudio_ProcessSirenSound1
     }
 }
-void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2()
+void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2()
 {
     _asm
     {
@@ -943,7 +943,7 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2()
         jmp RETN_CVehicleAudio_ProcessSirenSound2
     }
 }
-void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound3()
+void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound3()
 {
     _asm
     {
@@ -961,7 +961,7 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound3()
 
 DWORD RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1 = 0x6BD4DB;
 
-void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue()
+void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue()
 {
     _asm
     {
@@ -1015,7 +1015,7 @@ void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue()
     }
 }
 
-void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed()
+void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed()
 {
     _asm
     {
@@ -1070,7 +1070,7 @@ void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed()
     }
 }
 DWORD RETN_CMotorbike_ProcessStuff_TestVehicleModel2 = 0x6BD41B;
-void _declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel()
+void __declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel()
 {
     _asm
     {
@@ -1097,7 +1097,7 @@ void _declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel()
     }
 }
 DWORD dwValue = 0x858B4C;
-void _declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights()
+void __declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights()
 {
     _asm
     {
@@ -1149,7 +1149,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights()
     }
 }
 
-void _declspec(naked) HOOK_CVehicle_ProcessStuff_StartPointLightCode()
+void __declspec(naked) HOOK_CVehicle_ProcessStuff_StartPointLightCode()
 {
     _asm
     {
@@ -1198,7 +1198,7 @@ bool                 TriggerTheEvent()
     return false;
 }
 
-void _declspec(naked) HOOK_CEventHitByWaterCannon()
+void __declspec(naked) HOOK_CEventHitByWaterCannon()
 {
     _asm
     {
@@ -1273,7 +1273,7 @@ bool AllowJetPack()
     return false;
 }
 
-void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput()
+void __declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput()
 {
     _asm
     {
@@ -1298,7 +1298,7 @@ void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput()
     }
 }
 
-void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire()
+void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire()
 {
     _asm
     {
@@ -1339,7 +1339,7 @@ bool             CWorld_Remove_FallenPedsCheck()
     return false;
 }
 
-void _declspec(naked) HOOK_CWorld_RemoveFallenPeds()
+void __declspec(naked) HOOK_CWorld_RemoveFallenPeds()
 {
     // If it's going to skip the code anyway just do it otherwise check if he's in a vehicle as the vehicle will be respawned anyway and he will be warped with
     // it.
@@ -1387,7 +1387,7 @@ bool                 CWorld_Remove_FallenVehiclesCheck()
 
 DWORD HOOK_CWorld_RemoveFallenCars_Cont1 = 0x565F57;
 
-void _declspec(naked) HOOK_CWorld_RemoveFallenCars()
+void __declspec(naked) HOOK_CWorld_RemoveFallenCars()
 {
     // If the vehicle fell through the map give it another try to respawn.
     _asm
@@ -1453,7 +1453,7 @@ void                       CVehicleModelInterface_SetClump()
     }
 }
 
-void _declspec(naked) HOOK_CVehicleModelInterface_SetClump()
+void __declspec(naked) HOOK_CVehicleModelInterface_SetClump()
 {
     // Grab our currently loading clump
     // Get our Handling ID because that's all that's in the interface
@@ -1476,7 +1476,7 @@ void _declspec(naked) HOOK_CVehicleModelInterface_SetClump()
     }
 }
 
-void _declspec(naked) HOOK_CBoat_ApplyDamage()
+void __declspec(naked) HOOK_CBoat_ApplyDamage()
 {
     _asm
     {
@@ -1497,7 +1497,7 @@ boatCanBeDamaged:
 }
 
 // fixes a crash where a vehicle is the source of a tear gas projectile.
-void _declspec(naked) HOOK_CProjectile_FixTearGasCrash()
+void __declspec(naked) HOOK_CProjectile_FixTearGasCrash()
 {
     _asm
     {
@@ -1561,7 +1561,7 @@ bool IsPlayerPedLocal()
 }
 
 // makes sure remote player tyre smoke isn't processed when tyre smoke is in the "off" position
-void _declspec(naked) HOOK_CMultiplayerSA_ToggleTyreSmoke()
+void __declspec(naked) HOOK_CMultiplayerSA_ToggleTyreSmoke()
 {
     _asm
     {
@@ -1654,7 +1654,7 @@ void UpdateExplosionLocation()
     }
 }
 
-void _declspec(naked) HOOK_CProjectile_FixExplosionLocation()
+void __declspec(naked) HOOK_CProjectile_FixExplosionLocation()
 {
     _asm
     {
@@ -1677,7 +1677,7 @@ skip:
 }
 
 DWORD CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom = 0;
-void _declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
+void __declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
 {
     _asm
     {

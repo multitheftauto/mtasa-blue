@@ -151,7 +151,7 @@ void __cdecl CAnimBlendAssoc_destructor(CAnimBlendAssociationSAInterface* pThis)
 }
 
 DWORD RETURN_CAnimBlendAssoc_destructor = 0x4CECF6;
-void _declspec(naked) HOOK_CAnimBlendAssoc_destructor()
+void __declspec(naked) HOOK_CAnimBlendAssoc_destructor()
 {
     _asm
     {
@@ -181,7 +181,7 @@ void _cdecl OnCObjectDestructor(DWORD calledFrom, CObjectSAInterface* pObject)
 #define HOOKPOS_CObjectDestructor        0x59F667
 #define HOOKSIZE_CObjectDestructor       6
 DWORD RETURN_CObjectDestructor = 0x59F66D;
-void _declspec(naked) HOOK_CObjectDestructor()
+void __declspec(naked) HOOK_CObjectDestructor()
 {
     _asm
     {
@@ -210,7 +210,7 @@ void _cdecl OnVehicleDestructor(DWORD calledFrom, CVehicleSAInterface* pVehicle)
 #define HOOKPOS_CVehicleDestructor           0x6E2B40
 #define HOOKSIZE_CVehicleDestructor          7
 DWORD RETURN_CVehicleDestructor = 0x401355;
-void _declspec(naked) HOOK_CVehicleDestructor()
+void __declspec(naked) HOOK_CVehicleDestructor()
 {
     _asm
     {
@@ -239,7 +239,7 @@ void _cdecl OnCPlayerPedDestructor(DWORD calledFrom, CPedSAInterface* pPlayerPed
 #define HOOKPOS_CPlayerPedDestructor        0x6093B7
 #define HOOKSIZE_CPlayerPedDestructor       6
 DWORD RETURN_CPlayerPedDestructor = 0x6093BD;
-void _declspec(naked) HOOK_CPlayerPedDestructor()
+void __declspec(naked) HOOK_CPlayerPedDestructor()
 {
     _asm
     {
@@ -268,7 +268,7 @@ void _cdecl OnCProjectileDestructor(DWORD calledFrom, CEntitySAInterface* pProje
 #define HOOKPOS_CProjectileDestructor        0x5A40E0
 #define HOOKSIZE_CProjectileDestructor       6
 DWORD RETURN_CProjectileDestructor = 0x5A40E6;
-void _declspec(naked) HOOK_CProjectileDestructor()
+void __declspec(naked) HOOK_CProjectileDestructor()
 {
     _asm
     {
@@ -305,7 +305,7 @@ void _cdecl OnCPhysicalDestructor(DWORD calledFrom, CPhysicalSAInterface* pEntit
 #define HOOKPOS_CPhysicalDestructor        0x0542457
 #define HOOKSIZE_CPhysicalDestructor       6
 DWORD RETURN_CPhysicalDestructor = 0x054245D;
-void _declspec(naked) HOOK_CPhysicalDestructor()
+void __declspec(naked) HOOK_CPhysicalDestructor()
 {
     _asm
     {
@@ -332,7 +332,7 @@ void _cdecl OnCEntityDestructor(DWORD calledFrom, CEntitySAInterface* pEntity)
 #define HOOKPOS_CEntityDestructor        0x535E97
 #define HOOKSIZE_CEntityDestructor       6
 DWORD RETURN_CEntityDestructor = 0x535E9D;
-void _declspec(naked) HOOK_CEntityDestructor()
+void __declspec(naked) HOOK_CEntityDestructor()
 {
     _asm
     {
@@ -362,7 +362,7 @@ void cdecl OnCEntityAddMid1(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
 #define HOOKSIZE_CEntityAddMid1       5
 #define HOOKCHECK_CEntityAddMid1      0xE8
 DWORD RETURN_CEntityAddMid1 = 0x534900;
-void _declspec(naked) HOOK_CEntityAddMid1()
+void __declspec(naked) HOOK_CEntityAddMid1()
 {
     _asm
     {
@@ -393,7 +393,7 @@ void cdecl OnCEntityAddMid2(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
 #define HOOKSIZE_CEntityAddMid2       5
 #define HOOKCHECK_CEntityAddMid2      0xE8
 DWORD RETURN_CEntityAddMid2 = 0x534A15;
-void _declspec(naked) HOOK_CEntityAddMid2()
+void __declspec(naked) HOOK_CEntityAddMid2()
 {
     _asm
     {
@@ -427,7 +427,7 @@ void cdecl OnCEntityAddMid3(SStreamSectorEntryDouble** ppStreamEntryList, CEntit
 #define HOOKSIZE_CEntityAddMid3       5
 #define HOOKCHECK_CEntityAddMid3      0xE8
 DWORD RETURN_CEntityAddMid3 = 0x534AA7;
-void _declspec(naked) HOOK_CEntityAddMid3()
+void __declspec(naked) HOOK_CEntityAddMid3()
 {
     _asm
     {
@@ -456,7 +456,7 @@ void cdecl OnCEntityRemovePost(CEntitySAInterface* pEntity)
 #define HOOKSIZE_CEntityRemove       5
 #define HOOKCHECK_CEntityRemove      0x83
 DWORD RETURN_CEntityRemove = 0x534AE5;
-void _declspec(naked) HOOK_CEntityRemove()
+void __declspec(naked) HOOK_CEntityRemove()
 {
     _asm
     {
@@ -493,7 +493,7 @@ void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, ushort usModelId)
 #define HOOKPOS_CStreamingRemoveModel        0x4089A0
 #define HOOKSIZE_CStreamingRemoveModel       5
 DWORD RETURN_CStreamingRemoveModel = 0x4089A5;
-void _declspec(naked) HOOK_CStreamingRemoveModel()
+void __declspec(naked) HOOK_CStreamingRemoveModel()
 {
     _asm
     {
@@ -522,7 +522,7 @@ void _cdecl OnCTaskSimpleRunNamedAnimDestructor(class CTaskSimpleRunNamedAnimSAI
 #define HOOKPOS_CTaskSimpleRunNamedAnimDestructor        0x61BEF0
 #define HOOKSIZE_CTaskSimpleRunNamedAnimDestructor       8
 DWORD RETURN_CTaskSimpleRunNamedAnim = 0x61BEF8;
-void _declspec(naked) HOOK_CTaskSimpleRunNamedAnimDestructor()
+void __declspec(naked) HOOK_CTaskSimpleRunNamedAnimDestructor()
 {
     _asm
     {

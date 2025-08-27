@@ -262,7 +262,7 @@ __declspec(noinline) void OnMY_Task_Operator_Delete(CTaskSAInterface* pTaskInter
     pGame->GetTaskManagementSystem()->RemoveTask(pTempTaskInterface);
 }
 
-void _declspec(naked) HOOK_CTask_Operator_Delete()
+void __declspec(naked) HOOK_CTask_Operator_Delete()
 {
     _asm
         {

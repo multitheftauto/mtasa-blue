@@ -897,7 +897,7 @@ void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
 }
 
 static constexpr std::uintptr_t CONTINUE_RenderWanted = 0x58DFD8;
-static void _declspec(naked) HOOK_RenderWanted()
+static void __declspec(naked) HOOK_RenderWanted()
 {
     _asm
     {
