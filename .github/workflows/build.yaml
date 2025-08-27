@@ -56,8 +56,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Update PATH
-        run: echo "PATH=$(brew --prefix gcc@15)/bin:$PATH" >> $GITHUB_ENV
+      - name: Set environment variables for GCC 15
+        run: |
+          echo "CC=$(brew --prefix gcc@15)/bin/gcc-15" >> $GITHUB_ENV
+          echo "CXX=$(brew --prefix gcc@15)/bin/g++-15" >> $GITHUB_ENV
+          echo "AR=$(brew --prefix gcc@15)/bin/gcc-ar-15" >> $GITHUB_ENV
 
       - name: Install MySQL
         run: brew install mysql
