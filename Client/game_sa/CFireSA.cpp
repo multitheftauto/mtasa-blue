@@ -26,7 +26,7 @@ void CFireSA::Extinguish()
 {
     DWORD dwFunction = FUNC_Extinguish;
     DWORD dwPointer = (DWORD)internalInterface;
-    _asm
+    __asm
     {
         mov     ecx, dwPointer
         call    dwFunction
@@ -184,7 +184,7 @@ void CFireSA::Ignite()
     CVector* vecPosition = GetPosition();
     DWORD    dwFunc = FUNC_CreateFxSysForStrength;
     DWORD    dwThis = (DWORD)internalInterface;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    0
@@ -239,7 +239,7 @@ static void AbortFireTask(CEntitySAInterface* entityOnFire, DWORD returnAddress)
 static constexpr std::uintptr_t CONTINUE_CFire_Extinguish = 0x53942F;
 static void __declspec(naked) HOOK_CFire_Extinguish()
 {
-    _asm
+    __asm
     {
         mov [eax+730h], edi
 

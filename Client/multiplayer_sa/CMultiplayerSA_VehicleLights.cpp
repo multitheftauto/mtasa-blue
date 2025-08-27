@@ -31,7 +31,7 @@ namespace
 DWORD RETURN_CVehicle_DoTailLightEffect_Mid = 0x006E18EB;
 void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
 {
-    _asm
+    __asm
     {
         // Save result of comparing camera and corona direction
         mov     eax, 0
@@ -59,7 +59,7 @@ DWORD RETURN_CVehicle_DoTailLightEffect_Mid2 = 0x006E19F0;
 DWORD RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona = 0x006E1A32;
 void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
 {
-    _asm
+    __asm
     {
         movzx   eax, byte ptr [esp+0Fh]
         test    al, al

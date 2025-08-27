@@ -37,7 +37,7 @@ static DWORD CONTINUE_CDamageManager__ProgressDoorDamage = 0x6C2327;
 
 static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 {
-    _asm
+    __asm
     {
         pushad
         mov     ecx, [esp + 08h]        // CAutomobileSAInterface*

@@ -89,7 +89,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 {
     DWORD CObjectCreate = FUNC_CObject_Create;
     DWORD dwObjectPtr = 0;
-    _asm
+    __asm
     {
         push    1
         push    dwModel
@@ -165,7 +165,7 @@ void CObjectSA::Explode()
     DWORD dwFunc = FUNC_CObject_Explode;
     DWORD dwThis = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -179,7 +179,7 @@ void CObjectSA::Break()
 
     float fHitVelocity = 1000.0f;            // has no direct influence, but should be high enough to trigger the break (effect)
 
-    _asm
+    __asm
     {
         push    32h // most cases: between 30 and 37
         push    0 // colliding entity. To ignore it, we can set it to 0
@@ -197,7 +197,7 @@ void CObjectSA::Break()
         float fZ = 0.0f;
         dwFunc = FUNC_CGlass_WindowRespondsToCollision;
 
-        _asm
+        __asm
         {
             push 0
             push fZ
@@ -261,7 +261,7 @@ bool CObjectSA::IsGlass()
     DWORD dwThis = (DWORD)GetInterface();
     bool  bResult;
 
-    _asm
+    __asm
     {
         push dwThis
         call dwFunc

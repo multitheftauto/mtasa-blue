@@ -21,7 +21,7 @@
 static constexpr std::uintptr_t RETURN_CWorld_TriggerExplosion = 0x56B836;
 static void __declspec(naked) HOOK_CWorld_TriggerExplosion()
 {
-    _asm
+    __asm
     {
         mov [esp+1Ch-8h], eax
         mov [esp+1Ch-10h], ecx
@@ -44,7 +44,7 @@ static constexpr std::uintptr_t RETURN_CWorld_TriggerExplosionSectorList = 0x567
 static constexpr std::uintptr_t SKIP_CWorld_TriggerExplosionSectorList = 0x568473;
 static void __declspec(naked) HOOK_CWorld_TriggerExplosionSectorList()
 {
-    _asm
+    __asm
     {
         // check entity->m_nScanCode == CWorld::ms_nCurrentScanCode
         mov ecx, dword ptr ds:[0xB7CD78]

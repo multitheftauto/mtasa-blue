@@ -23,7 +23,7 @@ void CPedModelInfo_DeleteRwObject(CBaseModelInfoSAInterface* pModelInfo)
 {
     DWORD                      dwFunction = FUNC_CPedModelInfo_DeleteRwObject;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
-    _asm
+    __asm
     {
         mov     ecx, pInterface
         call    dwFunction
@@ -34,7 +34,7 @@ void CPedModelInfo_SetClump(CBaseModelInfoSAInterface* pModelInfo, RwObject* pSa
 {
     DWORD                      dwFunction = FUNC_CPedModelInfo_SetClump;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
-    _asm
+    __asm
     {
         push    pSavedRwObject
         mov     ecx, pInterface
@@ -63,7 +63,7 @@ void      OnMy_CClothesDeleteRwObject()
 DWORD RETURN_CClothesDeleteRwObject = 0x5A8248;
 void __declspec(naked) HOOK_CClothesDeleteRwObject()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMy_CClothesDeleteRwObject
@@ -100,7 +100,7 @@ void OnMy_PostCPedDress()
 DWORD RETURN_PostCPedDress = 0x5A8361;
 void __declspec(naked) HOOK_PostCPedDress()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMy_PostCPedDress

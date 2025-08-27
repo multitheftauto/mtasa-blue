@@ -30,7 +30,7 @@ void OnEnterCrashZone(uint uiId);
 
 void __declspec(naked) CrashAverted()
 {
-    _asm
+    __asm
     {
         pushfd
         pushad
@@ -53,7 +53,7 @@ void __declspec(naked) CrashAverted()
 DWORD RETURN_CrashFix_Misc1 = 0x5D9A74;
 void __declspec(naked) HOOK_CrashFix_Misc1()
 {
-    _asm
+    __asm
     {
         mov     eax,dword ptr [esp+18h]
         test    eax,eax
@@ -82,7 +82,7 @@ DWORD RETURN_CrashFix_Misc2 = 0x6B18B9;
 DWORD RETURN_CrashFix_Misc2B = 0x6B3775;
 void __declspec(naked) HOOK_CrashFix_Misc2()
 {
-    _asm
+    __asm
     {
         test    eax,eax
         je      cont        // Skip much code if eax is zero (vehicle has no colmodel)
@@ -116,7 +116,7 @@ void __declspec(naked) HOOK_CrashFix_Misc2()
 DWORD RETURN_CrashFix_Misc3 = 0x645FDF;
 void __declspec(naked) HOOK_CrashFix_Misc3()
 {
-    _asm
+    __asm
     {
         test    ecx,ecx
         je      cont        // Skip much code if ecx is zero (invalid m_veh in CTaskSimpleCarOpenDoorFromOutside)
@@ -141,7 +141,7 @@ DWORD RETURN_CrashFix_Misc4 = 0x4F02D7;
 DWORD RETURN_CrashFix_Misc4B = 0x4F0B07;
 void __declspec(naked) HOOK_CrashFix_Misc4()
 {
-    _asm
+    __asm
     {
         test    ecx,ecx
         je      cont        // Skip much code if ecx is zero (avoid divide by zero in soundmanager::service)
@@ -168,7 +168,7 @@ DWORD RETURN_CrashFix_Misc5 = 0x5DF950;
 DWORD RETURN_CrashFix_Misc5B = 0x5DFCC4;
 void __declspec(naked) HOOK_CrashFix_Misc5()
 {
-    _asm {
+    __asm {
         mov edi, dword ptr[ARRAY_ModelInfo]
         mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
@@ -199,7 +199,7 @@ DWORD RETURN_CrashFix_Misc6 = 0x4D1755;
 DWORD RETURN_CrashFix_Misc6B = 0x4D1A44;
 void __declspec(naked) HOOK_CrashFix_Misc6()
 {
-    _asm
+    __asm
     {
         test    ecx, ecx
         je      cont        // Skip much code if ecx is zero (ped has no anim something)
@@ -227,7 +227,7 @@ DWORD RETURN_CrashFix_Misc7 = 0x417BFD;
 DWORD RETURN_CrashFix_Misc7B = 0x417BFF;
 void __declspec(naked) HOOK_CrashFix_Misc7()
 {
-    _asm
+    __asm
     {
         test    ecx, ecx
         je      cont        // Skip much code if ecx is zero (no colmodel)
@@ -255,7 +255,7 @@ DWORD RETURN_CrashFix_Misc8 = 0x734862;
 DWORD RETURN_CrashFix_Misc8B = 0x734871;
 void __declspec(naked) HOOK_CrashFix_Misc8()
 {
-    _asm
+    __asm
     {
         test    ecx, ecx
         je      cont        // Skip much code if ecx is zero (no 2d effect plugin)
@@ -283,7 +283,7 @@ DWORD RETURN_CrashFix_Misc9 = 0x738B6A;
 DWORD RETURN_CrashFix_Misc9B = 0x73983A;
 void __declspec(naked) HOOK_CrashFix_Misc9()
 {
-    _asm
+    __asm
     {
         test    esi, esi
         je      cont        // Skip much code if esi is zero (invalid projectile)
@@ -311,7 +311,7 @@ DWORD RETURN_CrashFix_Misc10 = 0x533504;
 DWORD RETURN_CrashFix_Misc10B = 0x533539;
 void __declspec(naked) HOOK_CrashFix_Misc10()
 {
-    _asm
+    __asm
     {
         cmp     ecx, 0x80
         jb      cont  // Skip much code if ecx is small (invalid vector pointer)
@@ -343,7 +343,7 @@ DWORD RETURN_CrashFix_Misc11 = 0x4D2C67;
 DWORD RETURN_CrashFix_Misc11B = 0x4D2E03;
 void __declspec(naked) HOOK_CrashFix_Misc11()
 {
-    _asm
+    __asm
     {
         test    ecx, ecx
         je      cont  // Skip much code if ecx is zero (invalid anim somthing)
@@ -371,7 +371,7 @@ DWORD RETURN_CrashFix_Misc12 = 0x4D41CA;
 DWORD RETURN_CrashFix_Misc12B = 0x4D4222;
 void __declspec(naked) HOOK_CrashFix_Misc12()
 {
-    _asm
+    __asm
     {
         test    edi, edi
         je      cont  // Skip much code if edi is zero (invalid anim somthing)
@@ -397,7 +397,7 @@ DWORD RETURN_CrashFix_Misc13 = 0x4D4654;
 DWORD RETURN_CrashFix_Misc13B = 0x4D4764;
 void __declspec(naked) HOOK_CrashFix_Misc13()
 {
-    _asm
+    __asm
     {
         cmp     eax, 0x2480
         jb      cont  // Skip much code if eax is less than 0x480 (invalid anim)
@@ -422,7 +422,7 @@ void __declspec(naked) HOOK_CrashFix_Misc13()
 DWORD RETURN_CrashFix_Misc14 = 0x4DD4BB;
 void __declspec(naked) HOOK_CrashFix_Misc14()
 {
-    _asm
+    __asm
     {
         mov     eax, dword ptr ds:[0BD00F8h]
         cmp     eax, 0
@@ -467,7 +467,7 @@ void _cdecl DoWait(HANDLE hHandle)
 DWORD RETURN_FreezeFix_Misc15 = 0x156CDB4;
 void __declspec(naked) HOOK_FreezeFix_Misc15()
 {
-    _asm
+    __asm
     {
         pop eax
         pop edx
@@ -492,7 +492,7 @@ void __declspec(naked) HOOK_FreezeFix_Misc15()
 DWORD RETURN_CrashFix_Misc16 = 0x5E581B;
 void __declspec(naked) HOOK_CrashFix_Misc16()
 {
-    _asm
+    __asm
     {
         cmp     eax, 0
         je      cont  // Skip much code if eax is zero ( RpAnimBlendClumpGetFirstAssociation returns NULL )
@@ -521,7 +521,7 @@ DWORD RETURN_CrashFix_Misc17 = 0x7F1214;
 DWORD RETURN_CrashFix_Misc17B = 0x7F1236;
 void __declspec(naked) HOOK_CrashFix_Misc17()
 {
-    _asm
+    __asm
     {
         cmp     eax, 0
         je      cont  // Skip much code if eax is zero
@@ -547,7 +547,7 @@ void __declspec(naked) HOOK_CrashFix_Misc17()
 DWORD RETURN_CrashFix_Misc18 = 0x4C7DB4;
 void __declspec(naked) HOOK_CrashFix_Misc18()
 {
-    _asm
+    __asm
     {
         cmp     ebp, 0
         je      cont  // Skip much code if ebp is zero
@@ -582,7 +582,7 @@ DWORD RETURN_CrashFix_Misc19 = 0x7F0BFD;
 DWORD RETURN_CrashFix_Misc19B = 0x7F0C20;
 void __declspec(naked) HOOK_CrashFix_Misc19()
 {
-    _asm
+    __asm
     {
         cmp     esi, 0
         je      cont  // Skip much code if esi is zero
@@ -610,7 +610,7 @@ void __declspec(naked) HOOK_CrashFix_Misc19()
 DWORD RETURN_CrashFix_Misc20 = 0x54F3B6;
 void __declspec(naked) HOOK_CrashFix_Misc20()
 {
-    _asm
+    __asm
     {
         cmp     ecx, 0
         je      cont        // Skip much code if ecx is zero
@@ -661,7 +661,7 @@ bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAss
 DWORD RETURN_CrashFix_Misc21 = 0x648EE7;
 void __declspec(naked) HOOK_CrashFix_Misc21()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -694,7 +694,7 @@ void __declspec(naked) HOOK_CrashFix_Misc21()
 DWORD RETURN_CrashFix_Misc22 = 0x4CEF25;
 void __declspec(naked) HOOK_CrashFix_Misc22()
 {
-    _asm
+    __asm
     {
         mov         edx,dword ptr [edi+0Ch]
 
@@ -743,7 +743,7 @@ void __declspec(naked) HOOK_CrashFix_Misc22()
 DWORD RETURN_CrashFix_Misc23 = 0x6E3D17;
 void __declspec(naked) HOOK_CrashFix_Misc23()
 {
-    _asm
+    __asm
     {
         // Ensure door index is reasonable
         mov     edx, [esp+8]
@@ -774,7 +774,7 @@ void __declspec(naked) HOOK_CrashFix_Misc23()
 DWORD RETURN_CrashFix_Misc24 = 0x7F0DCE;
 void __declspec(naked) HOOK_CrashFix_Misc24()
 {
-    _asm
+    __asm
     {
         cmp     ebp, 0x480
         jb      cont  // Skip code if ebp is low
@@ -802,7 +802,7 @@ void __declspec(naked) HOOK_CrashFix_Misc24()
 DWORD RETURN_CrashFix_Misc25 = 0x64602B;
 void __declspec(naked) HOOK_CrashFix_Misc25()
 {
-    _asm
+    __asm
     {
         // Check for zero pointer to vehicle
         mov     eax, [esi+0x10]
@@ -834,7 +834,7 @@ void __declspec(naked) HOOK_CrashFix_Misc25()
 DWORD RETURN_CrashFix_Misc26 = 0x739FA6;
 void __declspec(naked) HOOK_CrashFix_Misc26()
 {
-    _asm
+    __asm
     {
         // Check for incorrect pointer
         cmp     ebx, 130h
@@ -867,7 +867,7 @@ void __declspec(naked) HOOK_CrashFix_Misc26()
 DWORD RETURN_CrashFix_Misc27 = 0x637802;
 void __declspec(naked) HOOK_CrashFix_Misc27()
 {
-    _asm
+    __asm
     {
         // Execute replaced code
         cmp     byte ptr [edi+484h], 2
@@ -897,7 +897,7 @@ DWORD RETURN_CrashFix_Misc28 = 0x44A503;
 DWORD RETURN_CrashFix_Misc28B = 0x44A650;
 void __declspec(naked) HOOK_CrashFix_Misc28()
 {
-    _asm
+    __asm
     {
         // Execute replaced code
         mov     eax, [esi+170h]
@@ -928,7 +928,7 @@ DWORD RETURN_CrashFix_Misc29 = 0x4E0231;
 DWORD RETURN_CrashFix_Misc29B = 0x4E0227;
 void __declspec(naked) HOOK_CrashFix_Misc29()
 {
-    _asm
+    __asm
     {
         // Execute replaced code
         movsx   eax,word ptr [esp+8]
@@ -960,7 +960,7 @@ DWORD RETURN_CrashFix_Misc30 = 0x4CEBEF;
 DWORD RETURN_CrashFix_Misc30B = 0x4CEBF5;
 void __declspec(naked) HOOK_CrashFix_Misc30()
 {
-    _asm
+    __asm
     {
         // Check for incorrect pointer
         cmp     ecx, 0
@@ -1026,7 +1026,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
         RwFrame* pNewFrameResult = NULL;
         uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
         DWORD    dwFunc = 0x4C53C0;            // CClumpModelInfo::GetFrameFromId
-        _asm
+        __asm
         {
             push    uiNewId
             push    pClump
@@ -1058,7 +1058,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
 DWORD RETURN_CClumpModelInfo_GetFrameFromId = 0x4C53C7;
 void __declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId()
 {
-    _asm
+    __asm
     {
         push    [esp+4*2]
         push    [esp+4*2]
@@ -1137,7 +1137,7 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 DWORD RETURN_CEntity_GetBoundRect = 0x534136;
 void __declspec(naked) HOOK_CEntity_GetBoundRect()
 {
-    _asm
+    __asm
     {
         pushad
         push    esi
@@ -1178,7 +1178,7 @@ void OnMY_CVehicle_AddUpgrade_Post()
 DWORD RETURN_CVehicle_AddUpgrade = 0x6DFA26;
 void __declspec(naked) HOOK_CVehicle_AddUpgrade()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -1226,7 +1226,7 @@ void __declspec(naked) HOOK_TrainCrossingBarrierCrashFix()
     TrainCrossingFix_ReturnAddress = ReturnAddress;
     TrainCrossingFix_InvalidReturnAddress = InvalidReturnAddress;
 
-    _asm
+    __asm
     {
         test eax, eax // Check if pLinkedBarrierPost exists
         jz jmp_invalid // Skip the barrier stuff
@@ -1251,7 +1251,7 @@ void __declspec(naked) HOOK_ResetFurnitureObjectCounter()
 {
     *(int*)0xBB3A18 = 0;            // InteriorManager_c::ms_objectCounter
 
-    _asm
+    __asm
     {
         // original instruction
         mov eax, fs:[0]
@@ -1282,7 +1282,7 @@ void OnMY_CVolumetricShadowMgr_Render_Post()
 DWORD RETURN_CVolumetricShadowMgr_Render = 0x7113B8;
 void __declspec(naked) HOOK_CVolumetricShadowMgr_Render()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMY_CVolumetricShadowMgr_Render_Pre
@@ -1326,7 +1326,7 @@ void OnMY_CVolumetricShadowMgr_Update_Post()
 DWORD RETURN_CVolumetricShadowMgr_Update = 0x711D95;
 void __declspec(naked) HOOK_CVolumetricShadowMgr_Update()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMY_CVolumetricShadowMgr_Update_Pre
@@ -1374,7 +1374,7 @@ void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 DWORD RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
 void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
-    _asm
+    __asm
     {
         pushad
         push    eax
@@ -1409,7 +1409,7 @@ void  OnMY_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 
 void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 {
-    _asm
+    __asm
     {
         test eax, eax
         jz invalid_vehicle
@@ -1466,7 +1466,7 @@ void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
 DWORD RETURN_printf = 0x821989;
 void __declspec(naked) HOOK_printf()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*1]
@@ -1493,7 +1493,7 @@ void __declspec(naked) HOOK_printf()
 DWORD RETURN_RwMatrixMultiply = 0x7F18B6;
 void __declspec(naked) HOOK_RwMatrixMultiply()
 {
-    _asm
+    __asm
     {
         mov     eax, [esp+0Ch]
         cmp     eax, 0x480
@@ -1549,7 +1549,7 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
 DWORD RETURN_CAnimBlendNode_GetCurrentTranslation = 0x4CFCBB;
 void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
 {
-    _asm
+    __asm
     {
         // if end key frame index is greater than 10,000 then return
         cmp     eax, 0x2710
@@ -1604,7 +1604,7 @@ bool __cdecl OnMY_CStreaming_AreAnimsUsedByRequestedModels(int modelID)
 #define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels               7
 void __declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 {
-    _asm
+    __asm
     {
         push    [esp + 4]
         call    OnMY_CStreaming_AreAnimsUsedByRequestedModels
@@ -1669,7 +1669,7 @@ static void _cdecl WrapTrainRailDistance(CTrainSAInterface* train)
 
 static void __declspec(naked) HOOK_CTrain__ProcessControl()
 {
-    _asm
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -1701,7 +1701,7 @@ static void _cdecl LOG_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSub
 
 static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask()
 {
-    _asm
+    __asm
     {
         test    eax, eax
         jz      returnZeroTaskLocation
@@ -1742,7 +1742,7 @@ static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6D04;
 
 static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
 {
-    _asm
+    __asm
     {
         test    eax, eax
         jnz     continueLoadingColorLineLocation
@@ -1776,7 +1776,7 @@ static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6D04;
 
 static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 {
-    _asm
+    __asm
     {
         test    eax, eax
         jnz     continueLoadingColorLineLocation
@@ -1815,7 +1815,7 @@ static DWORD CONTINUE_CPlaceName__Process = 0x571F3F;
 
 static void __declspec(naked) HOOK_CPlaceName__Process()
 {
-    _asm
+    __asm
     {
         pushad
         mov     ecx, [eax + 46Ch]
@@ -1860,7 +1860,7 @@ static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0
 static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
 static void __declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 {
-    _asm {
+    __asm {
         mov eax, [edx*4+0xA9B0C8]   // CModelInfo::ms_modelInfoPtrs
         test eax, eax
         jz skip
@@ -1898,7 +1898,7 @@ static DWORD CONTINUE_RpClumpForAllAtomics = 0x749B76;
 
 static void __declspec(naked) HOOK_RpClumpForAllAtomics()
 {
-    _asm
+    __asm
     {
         mov     eax, [esp+4]    // RpClump* clump
         test    eax, eax
@@ -1926,7 +1926,7 @@ static DWORD CONTINUE_RpAnimBlendClumpGetFirstAssociation = 0x4D6A76;
 
 static void __declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
 {
-    _asm
+    __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
         test    eax, eax
@@ -1954,7 +1954,7 @@ static DWORD CONTINUE_CAnimManager__BlendAnimation = 0x4D4617;
 
 static void __declspec(naked) HOOK_CAnimManager__BlendAnimation()
 {
-    _asm
+    __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
         test    eax, eax
@@ -2017,7 +2017,7 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
 
 static void __declspec(naked) HOOK_FxSystemBP_c__Load()
 {
-    _asm
+    __asm
     {
         pushad
         push    ebp
@@ -2049,7 +2049,7 @@ static void __declspec(naked) HOOK_FxSystemBP_c__Load()
 
 static void __declspec(naked) HOOK_FxPrim_c__Enable()
 {
-    _asm
+    __asm
     {
         test    ecx, ecx
         jz      returnFromFunction
@@ -2074,7 +2074,7 @@ static constexpr DWORD CONTINUE_CFire_ProcessFire = 0x53A705;
 static constexpr DWORD SKIP_CFire_ProcessFire = 0x53A69C;
 static void __declspec(naked) HOOK_CFire_ProcessFire()
 {
-    _asm
+    __asm
     {
         test byte ptr [esi], 1 // If the "active" flag has been set to 0, we skip processing attached entities
         jz skip

@@ -72,7 +72,7 @@ namespace
     void CPtrListSingleLink_Remove(SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pCheckEntity)
     {
         DWORD dwFunc = FUNC_CPtrListSingleLink_Remove;
-        _asm
+        __asm
         {
             mov     ecx, ppStreamEntryList
             push    pCheckEntity
@@ -97,7 +97,7 @@ namespace
     void CPtrListDoubleLink_Remove(SStreamSectorEntryDouble** ppStreamEntryList, CEntitySAInterface* pCheckEntity)
     {
         DWORD dwFunc = FUNC_CPtrListDoubleLink_Remove;
-        _asm
+        __asm
         {
             mov     ecx, ppStreamEntryList
             push    pCheckEntity
@@ -153,7 +153,7 @@ void __cdecl CAnimBlendAssoc_destructor(CAnimBlendAssociationSAInterface* pThis)
 DWORD RETURN_CAnimBlendAssoc_destructor = 0x4CECF6;
 void __declspec(naked) HOOK_CAnimBlendAssoc_destructor()
 {
-    _asm
+    __asm
     {
         push    ecx
 
@@ -183,7 +183,7 @@ void _cdecl OnCObjectDestructor(DWORD calledFrom, CObjectSAInterface* pObject)
 DWORD RETURN_CObjectDestructor = 0x59F66D;
 void __declspec(naked) HOOK_CObjectDestructor()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -212,7 +212,7 @@ void _cdecl OnVehicleDestructor(DWORD calledFrom, CVehicleSAInterface* pVehicle)
 DWORD RETURN_CVehicleDestructor = 0x401355;
 void __declspec(naked) HOOK_CVehicleDestructor()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -241,7 +241,7 @@ void _cdecl OnCPlayerPedDestructor(DWORD calledFrom, CPedSAInterface* pPlayerPed
 DWORD RETURN_CPlayerPedDestructor = 0x6093BD;
 void __declspec(naked) HOOK_CPlayerPedDestructor()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -270,7 +270,7 @@ void _cdecl OnCProjectileDestructor(DWORD calledFrom, CEntitySAInterface* pProje
 DWORD RETURN_CProjectileDestructor = 0x5A40E6;
 void __declspec(naked) HOOK_CProjectileDestructor()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -293,7 +293,7 @@ void _cdecl OnCPhysicalDestructor(DWORD calledFrom, CPhysicalSAInterface* pEntit
     {
         AddReportLog(8640, SString("Removing CPhysical type %d from moving list", pEntity->nType));
         DWORD dwFunc = FUNC_CPhysical_RemoveFromMovingList;
-        _asm
+        __asm
         {
             mov     ecx, pEntity
             call    dwFunc
@@ -307,7 +307,7 @@ void _cdecl OnCPhysicalDestructor(DWORD calledFrom, CPhysicalSAInterface* pEntit
 DWORD RETURN_CPhysicalDestructor = 0x054245D;
 void __declspec(naked) HOOK_CPhysicalDestructor()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -334,7 +334,7 @@ void _cdecl OnCEntityDestructor(DWORD calledFrom, CEntitySAInterface* pEntity)
 DWORD RETURN_CEntityDestructor = 0x535E9D;
 void __declspec(naked) HOOK_CEntityDestructor()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -364,7 +364,7 @@ void cdecl OnCEntityAddMid1(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
 DWORD RETURN_CEntityAddMid1 = 0x534900;
 void __declspec(naked) HOOK_CEntityAddMid1()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -395,7 +395,7 @@ void cdecl OnCEntityAddMid2(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
 DWORD RETURN_CEntityAddMid2 = 0x534A15;
 void __declspec(naked) HOOK_CEntityAddMid2()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -429,7 +429,7 @@ void cdecl OnCEntityAddMid3(SStreamSectorEntryDouble** ppStreamEntryList, CEntit
 DWORD RETURN_CEntityAddMid3 = 0x534AA7;
 void __declspec(naked) HOOK_CEntityAddMid3()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -458,7 +458,7 @@ void cdecl OnCEntityRemovePost(CEntitySAInterface* pEntity)
 DWORD RETURN_CEntityRemove = 0x534AE5;
 void __declspec(naked) HOOK_CEntityRemove()
 {
-    _asm
+    __asm
     {
         push    [esp+4*1]
         call inner
@@ -495,7 +495,7 @@ void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, ushort usModelId)
 DWORD RETURN_CStreamingRemoveModel = 0x4089A5;
 void __declspec(naked) HOOK_CStreamingRemoveModel()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*1]
@@ -524,7 +524,7 @@ void _cdecl OnCTaskSimpleRunNamedAnimDestructor(class CTaskSimpleRunNamedAnimSAI
 DWORD RETURN_CTaskSimpleRunNamedAnim = 0x61BEF8;
 void __declspec(naked) HOOK_CTaskSimpleRunNamedAnimDestructor()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx

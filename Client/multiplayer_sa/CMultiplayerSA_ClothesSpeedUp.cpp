@@ -129,7 +129,7 @@ DWORD RETURN_CallCStreamingInfoAddToListA = 0x408967;
 DWORD RETURN_CallCStreamingInfoAddToListB = 0x408990;
 void __declspec(naked) HOOK_CallCStreamingInfoAddToList()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -189,7 +189,7 @@ DWORD RETURN_CStreamingLoadRequestedModels = 0x15670A5;
 DWORD RETURN_CStreamingLoadRequestedModelsB = 0x156711B;
 void __declspec(naked) HOOK_CStreamingLoadRequestedModels()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -236,7 +236,7 @@ static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;     // r
 void __declspec(naked) HOOK_LoadingPlayerImgDir()
 {
     // hook from 005A69E3 5 bytes
-    _asm
+    __asm
     {
         pushad
         call    IsPlayerImgDirLoaded

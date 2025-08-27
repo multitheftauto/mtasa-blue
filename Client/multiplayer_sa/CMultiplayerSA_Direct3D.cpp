@@ -55,7 +55,7 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 DWORD RETURN_PreCreateDevice = 0x07F6781;
 void __declspec(naked) HOOK_PreCreateDevice()
 {
-    _asm
+    __asm
     {
         // Run replaced code
         mov     ecx,dword ptr ds:[0C97C20h]
@@ -110,7 +110,7 @@ DWORD RETURN_PostCreateDevice = 0x07F678A;
 DWORD RETURN_PostCreateDeviceB = 0x07F6799;
 void __declspec(naked) HOOK_PostCreateDevice()
 {
-    _asm
+    __asm
     {
         // Replaced code
         pushad

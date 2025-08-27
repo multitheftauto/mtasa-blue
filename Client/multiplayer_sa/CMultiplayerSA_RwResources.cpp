@@ -36,7 +36,7 @@ void OnMY_RwTextureCreate_Post(RwTexture* pTexture, DWORD calledFrom)
 DWORD RETURN_RwTextureCreate = 0x7F37C5;
 void __declspec(naked) HOOK_RwTextureCreate()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -80,7 +80,7 @@ void OnMY_RwTextureDestroy(RwTexture* pTexture, DWORD calledFrom)
 DWORD RETURN_RwTextureDestroy = 0x7F3825;
 void __declspec(naked) HOOK_RwTextureDestroy()
 {
-    _asm
+    __asm
     {
         push    esi
         mov         esi,dword ptr [esp+8]
@@ -111,7 +111,7 @@ void OnMY_RwRasterCreate(DWORD calledFrom)
 DWORD RETURN_RwRasterCreate = 0x7FB235;
 void __declspec(naked) HOOK_RwRasterCreate()
 {
-    _asm
+    __asm
     {
         mov         eax,dword ptr ds:[00C97B24h]
 
@@ -141,7 +141,7 @@ void OnMY_RwRasterDestroy(DWORD calledFrom)
 DWORD RETURN_RwRasterDestroy = 0x7FB025;
 void __declspec(naked) HOOK_RwRasterDestroy()
 {
-    _asm
+    __asm
     {
         push    esi
         mov         esi,dword ptr [esp+8]
@@ -175,7 +175,7 @@ void OnMY_RwGeometryCreate_Post(RwGeometry* pGeometry, DWORD calledFrom)
 DWORD RETURN_RwGeometryCreate = 0x74CA97;
 void __declspec(naked) HOOK_RwGeometryCreate()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -222,7 +222,7 @@ void OnMY_RwGeometryDestroy(DWORD calledFrom, RwGeometry* pGeometry)
 DWORD RETURN_RwGeometryDestroy = 0x74CCC5;
 void __declspec(naked) HOOK_RwGeometryDestroy()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*1]

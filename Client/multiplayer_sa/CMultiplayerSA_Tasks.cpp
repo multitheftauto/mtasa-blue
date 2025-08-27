@@ -28,7 +28,7 @@ static constexpr std::uintptr_t RETURN_CTaskSimplePlayerOnFoot__MakeAbortable = 
 static constexpr std::uintptr_t SKIP_CTaskSimplePlayerOnFoot__MakeAbortable = 0x685855;
 static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
 {
-    _asm
+    __asm
     {
         // return false and keep task alive
         call dword ptr [eax+8]

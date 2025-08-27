@@ -89,7 +89,7 @@ void OnMY_CRenderer_SetupEntityVisibility_Post(int result, CEntitySAInterface* p
 DWORD RETURN_CRenderer_SetupEntityVisibility = 0x554238;
 void __declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
 {
-    _asm
+    __asm
     {
 ////////////////////
         pushad
@@ -149,7 +149,7 @@ DWORD RETURN_CWorldScan_ScanWorlda = 0x555563;
 DWORD RETURN_CWorldScan_ScanWorldb = 0x72CAE0;
 void __declspec(naked) HOOK_CWorldScan_ScanWorld()
 {
-    _asm
+    __asm
     {
         call    second
         jmp     RETURN_CWorldScan_ScanWorlda   // 555563
@@ -190,7 +190,7 @@ int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre(CBaseModelInfoSAInter
 DWORD RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha = 0x732505;
 void __declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*3]

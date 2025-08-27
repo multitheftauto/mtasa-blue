@@ -277,7 +277,7 @@ DWORD RETURN_CEventHandler_ComputeDamageResponse_Mid = 0x4C0598;
 DWORD CTaskSimpleBeHit_constructor = FUNC_CTaskSimpleBeHit__Constructor;
 void __declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*3]

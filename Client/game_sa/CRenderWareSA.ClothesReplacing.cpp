@@ -287,7 +287,7 @@ DWORD RETURN_CStreaming_RequestModel_MidA = 0x0408960;
 DWORD RETURN_CStreaming_RequestModel_MidB = 0x0408990;
 void __declspec(naked) HOOK_CStreaming_RequestModel_Mid()
 {
-    _asm
+    __asm
     {
         pushad
         push    esi

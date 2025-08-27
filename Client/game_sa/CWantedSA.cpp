@@ -42,7 +42,7 @@ void CWantedSA::SetWantedLevel(DWORD dwWantedLevel)
 {
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_SetWantedLevel;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    dwWantedLevel

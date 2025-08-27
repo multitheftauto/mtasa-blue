@@ -35,7 +35,7 @@ static const DWORD CONTINUE_CPed_DoFootLanded = 0x5E5386;
 
 void __declspec(naked) HOOK_CPed_DoFootLanded()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp + 32 + 4]

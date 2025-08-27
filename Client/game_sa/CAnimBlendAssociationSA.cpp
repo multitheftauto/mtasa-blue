@@ -32,7 +32,7 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(CAnimBlen
 {
     DWORD DwFunc = 0x4CF080;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
-    _asm
+    __asm
     {
         mov     ecx, DwThisInterface
         push    staticAssociationByReference
@@ -44,7 +44,7 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(RpClump* 
 {
     DWORD DwFunc = 0x4CEFC0;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
-    _asm
+    __asm
     {
         mov     ecx, DwThisInterface
         push    pAnimHierarchy
@@ -76,7 +76,7 @@ void CAnimBlendAssociationSA::Init(RpClump* pClump, CAnimBlendHierarchySAInterfa
 {
     DWORD DwFunc = 0x4CED50;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
-    _asm
+    __asm
     {
         mov     ecx, DwThisInterface
         push    pAnimHierarchy
@@ -89,7 +89,7 @@ void CAnimBlendAssociationSA::AllocateAnimBlendNodeArray(int iCount)
 {
     DWORD DwFunc = 0x4CE9F0;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
-    _asm
+    __asm
     {
         mov     ecx, DwThisInterface
         push    iCount
@@ -101,7 +101,7 @@ void CAnimBlendAssociationSA::FreeAnimBlendNodeArray()
 {
     DWORD DwFunc = 0x4CEA40;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
-    _asm
+    __asm
     {
         mov     ecx, DwThisInterface
         call    DwFunc
@@ -124,7 +124,7 @@ void CAnimBlendAssociationSA::SetCurrentProgress(float fProgress)
 
     DWORD DwFunc = 0x4CEA80;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
-    _asm
+    __asm
     {
         mov     ecx, DwThisInterface
         push    fTime

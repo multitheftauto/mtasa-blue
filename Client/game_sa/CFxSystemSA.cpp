@@ -43,7 +43,7 @@ void CFxSystemSA::PlayAndKill()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_FxSystem_c__PlayAndKill;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -168,7 +168,7 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post()
 DWORD RETURN_FxSystem_c_Update_MidA = 0x04AAF75;
 void __declspec(naked) HOOK_FxSystem_c_Update_MidA()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -236,7 +236,7 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post()
 DWORD RETURN_FxSystem_c_Update_MidB = 0x04AB224;
 void __declspec(naked) HOOK_FxSystem_c_Update_MidB()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx

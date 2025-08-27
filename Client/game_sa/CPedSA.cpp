@@ -592,7 +592,7 @@ static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
 static void __declspec(naked) HOOK_CPed_PreRenderAfterTest()
 {
-    _asm
+    __asm
     {
         // Replaced code
         sub esp,70h
@@ -631,7 +631,7 @@ static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
 static void __declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
 {
-    _asm
+    __asm
     {
         // Check what to do
         movzx eax, byte ptr g_onlyUpdateRotations

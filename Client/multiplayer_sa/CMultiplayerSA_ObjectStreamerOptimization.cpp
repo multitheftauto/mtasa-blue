@@ -17,7 +17,7 @@ static unsigned int CPtrNodeDoubleLinkPool_UsedSpaces = 0;
 #define HOOKSIZE_CEntryInfoNodePool__New 0x5
 static void __declspec(naked) HOOK_CEntryInfoNodePool__New()
 {
-    _asm {
+    __asm {
         inc CEntryInfoNodePool_UsedSpaces
 
         lea eax, [ecx+eax*4]
@@ -31,7 +31,7 @@ static void __declspec(naked) HOOK_CEntryInfoNodePool__New()
 static const unsigned int RETURN_CEntryInfoNode__operator_delete = 0x536DF7;
 static void __declspec(naked) HOOK_CEntryInfoNode__operator_delete()
 {
-    _asm {
+    __asm {
         dec CEntryInfoNodePool_UsedSpaces
 
         lea eax, [ecx+edx]
@@ -45,7 +45,7 @@ static void __declspec(naked) HOOK_CEntryInfoNode__operator_delete()
 static const unsigned int RETURN_CEntryInfoList__Flush = 0x536E71;
 static void __declspec(naked) HOOK_CEntryInfoList__Flush()
 {
-    _asm {
+    __asm {
         dec CEntryInfoNodePool_UsedSpaces
 
         or bl, 0x80
@@ -58,7 +58,7 @@ static void __declspec(naked) HOOK_CEntryInfoList__Flush()
 #define HOOKSIZE_CPtrNodeDoubleLinkPool__New 0x6
 static void __declspec(naked) HOOK_CPtrNodeDoubleLinkPool__New()
 {
-    _asm {
+    __asm {
         inc CPtrNodeDoubleLinkPool_UsedSpaces
 
         lea eax, [ecx+eax*4]
@@ -72,7 +72,7 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLinkPool__New()
 static const unsigned int RETURN_CPtrNodeDoubleLink__operator_delete = 0x5523F6;
 static void __declspec(naked) HOOK_CPtrNodeDoubleLink__operator_delete()
 {
-    _asm {
+    __asm {
         dec CPtrNodeDoubleLinkPool_UsedSpaces
 
         lea eax, [ecx+edx]
@@ -86,7 +86,7 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLink__operator_delete()
 static const unsigned int RETURN_CPtrListDoubleLink__Flush = 0x5524D0;
 static void __declspec(naked) HOOK_CPtrListDoubleLink__Flush()
 {
-    _asm {
+    __asm {
         dec CPtrNodeDoubleLinkPool_UsedSpaces
 
         or bl, 0x80

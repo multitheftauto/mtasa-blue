@@ -63,7 +63,7 @@ void OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart(CVehicleSAInterface* p
 DWORD RETURN_CAutomobile_CustomCarPlate_BeforeRenderingStart = 0x006A2F07;
 void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*1]
@@ -118,7 +118,7 @@ void OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop(CVehicleModelInfoSAInter
 DWORD RETURN_CAutomobile_CustomCarPlate_AfterRenderingStop = 0x006A2F37;
 void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*1]
@@ -154,7 +154,7 @@ void OnMY_CCustomCarPlateMgr_SetupMaterialPlateTexture(struct RpMaterial* a, cha
 DWORD RETURN_CCustomCarPlateMgr_SetupMaterialPlateTexture = 0x006FE025;
 void __declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -198,7 +198,7 @@ void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post()
 DWORD RETURN_CVehicleModelInfo_SetCarCustomPlate = 0x004C9456;
 void __declspec(naked) HOOK_CVehicleModelInfo_SetCarCustomPlate()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -234,7 +234,7 @@ inner:
 DWORD RETURN_CCustomCarPlateMgr_CreatePlateTexture = 0x006FDEA5;
 void __declspec(naked) HOOK_CCustomCarPlateMgr_CreatePlateTexture()
 {
-    _asm
+    __asm
     {
         // Skip our code if not processing a VehicleModelInfo
         cmp     ms_pProcessingVehicleModelInfo, 0
