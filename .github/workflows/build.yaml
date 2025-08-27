@@ -70,7 +70,7 @@ jobs:
         run: brew link --overwrite mysql
 
       - name: Run Build
-        run: ./linux-build.sh --os=macosx
+        run: ./linux-build.sh
 
   linux:
     strategy:
