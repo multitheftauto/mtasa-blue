@@ -55,10 +55,8 @@ COPY compat /compat
 
 RUN set -ex ;\
     mkdir -p /compat/x64 /compat/x86 ;\
-    objcopy --redefine-syms=/compat/glibc_version_x64.redef "$(gcc      --print-file-name=libstdc++.a)"   /compat/x64/libstdc++.a      ;\
-    objcopy --redefine-syms=/compat/glibc_version_x86.redef "$(gcc -m32 --print-file-name=libstdc++.a)"   /compat/x86/libstdc++.a      ;\
-    objcopy --redefine-syms=/compat/glibc_version_x64.redef "/usr/lib/x86_64-linux-gnu/libmysqlclient.a"  /compat/x64/libmysqlclient.a ;\
-    objcopy --redefine-syms=/compat/glibc_version_x86.redef "/usr/lib/i386-linux-gnu/libmysqlclient.a"    /compat/x86/libmysqlclient.a
+    objcopy --redefine-syms=/compat/glibc_version_x64.redef "$(gcc      --print-file-name=libstdc++.a)"   /compat/x64/libstdc++.a ;\
+    objcopy --redefine-syms=/compat/glibc_version_x86.redef "$(gcc -m32 --print-file-name=libstdc++.a)"   /compat/x86/libstdc++.a 
 
 VOLUME  /build
 WORKDIR /build
