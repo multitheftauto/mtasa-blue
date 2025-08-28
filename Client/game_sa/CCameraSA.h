@@ -381,7 +381,7 @@ public:
     CCameraSA(CCameraSAInterface* cameraInterface);
     ~CCameraSA();
 
-    CCameraSAInterface* GetInterface() const { return internalInterface; };
+    CCameraSAInterface* GetInterface() const noexcept { return internalInterface; }
     
     // CCamera interface implementation
     void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle) override;

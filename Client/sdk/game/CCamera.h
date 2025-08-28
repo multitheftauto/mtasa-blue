@@ -18,7 +18,7 @@ class CCam;
 struct RwMatrix;
 
 // Camera constants
-constexpr float DEFAULT_FOV = 70.0f;
+constexpr const float DEFAULT_FOV = 70.0f;
 
 enum eCamMode
 {

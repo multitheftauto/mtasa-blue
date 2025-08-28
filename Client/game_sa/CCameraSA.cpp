@@ -15,7 +15,6 @@
 #include <mutex>
 #include <cmath>
 
-
 extern CGameSA* pGame;
 
 static std::mutex s_cameraClipMutex;
