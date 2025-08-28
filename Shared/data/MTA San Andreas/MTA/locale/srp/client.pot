@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-25 08:35+0000\n"
-"PO-Revision-Date: 2025-08-25 09:31\n"
+"POT-Creation-Date: 2025-08-27 22:33+0000\n"
+"PO-Revision-Date: 2025-08-28 07:53\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -608,7 +608,7 @@ msgstr "Glavni meni"
 #: Client/loader/MainFunctions.cpp:1119 Client/loader/CInstallManager.cpp:563
 #: Client/loader/CInstallManager.cpp:572
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:143
+#: Shared/sdk/SharedUtil.Misc.hpp:148
 msgid "Error"
 msgstr "Greška"
 
@@ -1993,7 +1993,7 @@ msgstr "\n\n"
 "Čekam odgovor - %-3d"
 
 #. Unknown command
-#: Client/core/CCommands.cpp:223
+#: Client/core/CCommands.cpp:224
 msgid "Unknown command or cvar: "
 msgstr "Nepoznata komanda ili cvar:"
 
@@ -2005,7 +2005,7 @@ msgstr "Osa za ubrzavanje"
 msgid "Brake Axis"
 msgstr "Osa za kočenje"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:730
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:735
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Da li želite potražiti pomoć online u vezi ovog problema ?"
 
@@ -2821,19 +2821,19 @@ msgstr "Instaliranje nadogradnje..."
 msgid "Extracting files..."
 msgstr "Raspakivanje datoteka..."
 
-#: Client/loader/MainFunctions.cpp:54
+#: Client/loader/MainFunctions.cpp:82
 msgid "Invalid module path detected.\n"
-msgstr ""
+msgstr "Nevažeća putanja za modul pronađena.\n"
 
-#: Client/loader/MainFunctions.cpp:81
+#: Client/loader/MainFunctions.cpp:109
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Neusklađena verzija datoteke. Ponovo instalirajte MTA:SA ukoliko budete imali problem.\n"
 
-#: Client/loader/MainFunctions.cpp:89
+#: Client/loader/MainFunctions.cpp:117
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Neke datoteke nedostaju. Ponovo instalirajte MTA:SA ukoliko budete imali problem.\n"
 
-#: Client/loader/MainFunctions.cpp:100
+#: Client/loader/MainFunctions.cpp:128
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA nije kompatibilan sa Windows 'Safe Mode'.\n\n"
@@ -3360,11 +3360,11 @@ msgstr "Greška u protokolu (%u). Ukoliko se ovaj problem nastavi, molimo prover
 msgid "Connection error"
 msgstr "Greška pri priključivanju"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:143
+#: Shared/sdk/SharedUtil.Misc.hpp:148
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto nije pravilno instaliran, molimo vas da ga ponovo instalirate."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:744
+#: Shared/sdk/SharedUtil.Misc.hpp:749
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Vaš pretraživač će upravo prikazati stranicu sa informacijama o pomoći.\n\n"
