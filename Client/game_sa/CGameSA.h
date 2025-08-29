@@ -19,6 +19,7 @@
 #include "CPlantManagerSA.h"
 #include "CRendererSA.h"
 #include "CVehicleAudioSettingsManagerSA.h"
+#include "C2DEffectsSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -175,6 +176,7 @@ public:
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
+    C2DEffects*               Get2DFXEffects() const noexcept override { return m_p2DFXEffects.get(); }
 
     CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept override
     {
@@ -183,6 +185,7 @@ public:
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
+    CModelInfo*                     GetModelInfo(CBaseModelInfoSAInterface* baseModelInfo);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
     uint32_t GetBaseIDforDFF() override { return 0; }
@@ -302,6 +305,7 @@ public:
     void         ResetAlphaTransparencies();
     void         DisableVSync();
     void         ResetModelTimes();
+    void         Reset2DFXEffects() const override;
 
     void  OnPedContextChange(CPed* pPedContext);
     CPed* GetPedContext();
@@ -361,6 +365,7 @@ private:
     CBuildingRemoval*                 m_pBuildingRemoval;
 
     std::unique_ptr<CVehicleAudioSettingsManagerSA> m_pVehicleAudioSettingsManager;
+    std::unique_ptr<C2DEffectsSA>                   m_p2DFXEffects;
 
     std::unique_ptr<CRendererSA>    m_pRenderer;
 

@@ -224,6 +224,10 @@ public:
         ResolveReferences();
         RemoveShadows();
     }
+
+    void TransformFromObjectSpace(CVector* outVector, CVector* offset) {
+        ((void(__thiscall*)(CEntitySAInterface*, CVector*, CVector*))0x5334F0)(this, outVector, offset);
+    }
 };
 
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");

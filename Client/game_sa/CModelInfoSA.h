@@ -15,6 +15,9 @@
 #include <game/CModelInfo.h>
 #include "CRenderWareSA.h"
 #include "game/RenderWare.h"
+#include "C2DEffectSAInterface.h"
+#include "game/C2DEffects.h"
+#include <unordered_set>
 
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
@@ -159,7 +162,7 @@ public:
     unsigned char  ucAlpha : 8;                         // +12
 
     unsigned char  ucNumOf2DEffects : 8;            // +13
-    unsigned short usUnknown : 16;                  // +14     Something with 2d effects
+    std::int16_t   s2DEffectIndex;             // +14     Something with 2d effects
 
     unsigned short usDynamicIndex : 16;            // +16
 
@@ -232,6 +235,11 @@ public:
     // +726 = Word array as referenced in CVehicleModelInfo::GetVehicleUpgrade(int)
     // +762 = Array of WORD containing something relative to paintjobs
     // +772 = Anim file index
+
+    C2DEffectSAInterface* Get2dEffect(std::uint32_t index)
+    {
+        return ((C2DEffectSAInterface*(__thiscall*)(CBaseModelInfoSAInterface*, std::uint32_t))0x4C4C70)(this, index);
+    }
 };
 static_assert(sizeof(CBaseModelInfoSAInterface) == 0x20, "Invalid size for CBaseModelInfoSAInterface");
 
@@ -355,6 +363,13 @@ protected:
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     static std::map<unsigned short, int>                                         ms_DefaultTxdIDMap;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
+
+    static std::unordered_set<std::uint32_t>           ms_modified2DFXModels;
+    std::vector<std::unique_ptr<C2DEffectSAInterface>> m_custom2DFXEffects;
+    std::unordered_set<std::uint32_t>                  m_removedGame2DFXIndices;
+    std::unordered_map<std::uint32_t, S2DEffectData>   m_modifiedPropertiesGame2DFXIndices;
+    std::unordered_map<std::uint32_t, S2DEffectData>   m_originalModel2DFXProperties;
+    std::unordered_map<std::uint32_t, RwColor>         m_roadsignEffectsColors;
 
 public:
     CModelInfoSA();
@@ -497,8 +512,31 @@ public:
 
     static bool IsVehicleModel(std::uint32_t model) noexcept;
 
+    // 2dfx functions
+    bool Add2DFXEffect(const e2dEffectType& effectType, const CVector& position, const S2DEffectData& effectProperties) override;
+    bool Remove2DFXEffect(std::uint32_t index, bool keepIndex = true, CEntitySAInterface* entity = nullptr) override;
+    void Restore2DFXEffect(std::uint32_t index) override;
+    bool Reset2DFXEffectProperties(std::uint32_t index) override;
+    void Reset2DFXProperty(std::uint32_t index, const e2dEffectProperty& property) override;
+
+    C2DEffectSAInterface* Get2DFXEffectByIndex(std::uint32_t index) const override;
+    C2DEffectSAInterface* Get2DFXEffect(CBaseModelInfoSAInterface* modelInfo, RpGeometry* geometry, std::uint32_t numPluginEffects, std::uint32_t index) override;
+    std::uint32_t         Get2DFXEffectsCount(bool includeCustomEffects = true) const override { return m_pInterface ? (includeCustomEffects ? m_pInterface->ucNumOf2DEffects : m_pInterface->ucNumOf2DEffects - m_custom2DFXEffects.size()) : 0; }
+
+    static void StaticReset2DFXEffects();
+
 private:
     void CopyStreamingInfoFromModel(ushort usCopyFromModelID);
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
     void SetModelSpecialType(eModelSpecialType eType, bool bState);
+
+    // 2dfx functions
+    void On2DFXEffectsLoaded(CEntitySAInterface* entity) override;
+    void Reset2DFXEffects() override;
+    void Store2DFXProperties(std::uint32_t index, const e2dEffectProperty& property) override;
+    void Store2DFXDefaultProperties(std::uint32_t index) override;
+    void Store2DFXRoadsignColor(std::uint32_t index, const RwColor& color) override {m_roadsignEffectsColors[index] = RwColor{color.r, color.g, color.b, color.a}; }
+    bool IsCustom2DFXEffect(C2DEffectSAInterface* effect) override;
+    RwColor GetStored2DFXRoadsignColor(std::uint32_t index) const override;
+    std::uint32_t Get2DFXEffectIndex(C2DEffectSAInterface* effect) const override;
 };

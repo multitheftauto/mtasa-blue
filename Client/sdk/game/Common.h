@@ -11,6 +11,7 @@
 
 #pragma once
 #include <stdint.h>
+#include <cstdint>
 
 // Limits for MTA
 #define MAX_VEHICLES_MTA                    64          // Real limit is 110
@@ -62,3 +63,116 @@
 #define WEAPONTYPE_FORCE_FINISH_ANIM (0x040000)  // force the anim to finish player after aim/fire rather than blending out
 #define WEAPONTYPE_EXPANDS          (0x080000)  //
 #define WEAPONTYPE_CHAINGUN WEAPONTYPE_MINIGUN
+
+enum class e2dEffectType : std::uint8_t
+{
+    LIGHT = 0,
+    PARTICLE,
+    UNKNOWN,
+    ATTRACTOR,
+    SUN_GLARE,
+    FURNITURE,
+    ENEX,
+    ROADSIGN,
+    TRIGGER_POINT,
+    COVER_POINT,
+    ESCALATOR,
+
+    NONE,
+};
+
+enum class e2dCoronaFlashType : std::uint8_t
+{
+    DEFAULT = 0,
+    RANDOM,
+    RANDOM_WHEN_WET,
+    ANIM_SPEED_4X,
+    ANIM_SPEED_2X,
+    ANIM_SPEED_1X,
+    WARNLIGHT, // Used on model nt_roadblockci
+    TRAFFICLIGHT,
+    TRAINCROSSING,
+    BRIDGE, // Unused in SA, always false (CBridge::ShouldLightsBeFlashing)
+    ONLY_RAIN,
+    ON5_OFF5,
+    ON6_OFF4,
+    ON4_OFF6,
+};
+
+enum class e2dEffectProperty
+{
+    // light properties
+    FAR_CLIP_DISTANCE = 0,
+    LIGHT_RANGE,
+    CORONA_SIZE,
+    SHADOW_SIZE,
+    SHADOW_MULT,
+    FLASH_TYPE,
+    CORONA_REFLECTION,
+    FLARE_TYPE,
+    SHADOW_DISTANCE,
+    OFFSET,
+    COLOR, // for light & roadsign
+    CORONA_NAME,
+    SHADOW_NAME,
+    FLAGS, // for light & roadsign
+
+    // particle properties
+    PRT_NAME,
+
+    // roadsign properties
+    SIZE,
+    ROT,
+    TEXT_1,
+    TEXT_2,
+    TEXT_3,
+    TEXT_4,
+
+    // escalator properties
+    BOTTOM,
+    TOP,
+    END,
+    DIRECTION,
+
+    POSITION,
+};
+
+enum class e2dAttractorType : std::int8_t
+{
+    UNDEFINED = -1,
+    ATM = 0,
+    SEAT,
+    STOP,
+    PIZZA,
+    SHELTER,
+    TRIGGER_SCRIPT,
+    LOOK_AT,
+    SCRIPTED,
+    PARK,
+    STEP,
+};
+
+enum class e2dEffectFlags
+{
+    // light flags
+    CHECK_OBSTACLES,
+    FOG_TYPE,
+    FOG_TYPE2, // Unused in SA code
+    WITHOUT_CORONA, // Unused in SA code
+    ONLY_LONG_DISTANCE,
+    AT_DAY,
+    AT_NIGHT,
+    BLINKING1,
+
+    // light flags2
+    ONLY_FROM_BELOW,
+    BLINKING2,
+    UPDATE_HEIGHT_ABOVE_GROUND,
+    CHECK_DIRECTION,
+    BLINKING3,
+
+    // roadsign flags
+    LINES_NUM,
+    CHARACTERS_PER_LINE,
+    TEXT_COLOR, // Overrided by our own implementation (C2DEffectsSA::SetRoadsignTextColor)
+};

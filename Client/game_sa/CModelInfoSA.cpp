@@ -19,6 +19,7 @@
 #include "CPedSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include "CFxSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -35,6 +36,7 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::unordered_set<std::uint32_t>                                     CModelInfoSA::ms_modified2DFXModels;
 
 union tIdeFlags
 {
@@ -1751,7 +1753,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->s2DEffectIndex = -1;
     m_pInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
@@ -1768,7 +1770,7 @@ void CModelInfoSA::MakeObjectDamageableModel(std::uint16_t baseModel)
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CDamageableModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->s2DEffectIndex = -1;
     m_pInterface->usDynamicIndex = 65535;
     m_pInterface->m_damagedAtomic = nullptr;
 
@@ -1786,7 +1788,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CTimeModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->s2DEffectIndex = -1;
     m_pInterface->usDynamicIndex = 65535;
     m_pInterface->timeInfo.m_wOtherTimeModel = 0;
 
@@ -1803,7 +1805,7 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
     MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     pNewInterface->usNumberOfRefs = 0;
     pNewInterface->pRwObject = nullptr;
-    pNewInterface->usUnknown = 65535;
+    pNewInterface->s2DEffectIndex = -1;
     pNewInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = pNewInterface;
@@ -1821,7 +1823,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->pVisualInfo = nullptr;
-    m_pInterface->usUnknown = 65535;
+    m_pInterface->s2DEffectIndex = -1;
     m_pInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
@@ -1864,58 +1866,6 @@ void CModelInfoSA::DeallocateModel(void)
 
     ppModelInfo[m_dwModelID] = nullptr;
     *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
-}
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// Hook for NodeNameStreamRead
-//
-// Ignore extra characters in dff frame name
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest, uint uiSize)
-{
-    // Calc sizes
-    const uint uiMaxBufferSize = 24;
-    uint       uiAmountToRead = std::min(uiMaxBufferSize - 1, uiSize);
-    uint       uiAmountToSkip = uiSize - uiAmountToRead;
-
-    // Read good bit
-    RwStreamRead(stream, pDest, uiAmountToRead);
-    pDest[uiAmountToRead] = 0;
-
-    // Skip bad bit (this might not be required)
-    if (uiAmountToSkip > 0)
-        RwStreamSkip(stream, uiAmountToSkip);
-}
-
-// Hook info
-#define HOOKPOS_NodeNameStreamRead                         0x072FA68
-#define HOOKSIZE_NodeNameStreamRead                        15
-DWORD RETURN_NodeNameStreamRead = 0x072FA77;
-void _declspec(naked) HOOK_NodeNameStreamRead()
-{
-    _asm
-    {
-        pushad
-        push    edi
-        push    esi
-        push    ebx
-        call    OnMY_NodeNameStreamRead
-        add     esp, 4*3
-        popad
-
-        jmp     RETURN_NodeNameStreamRead
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// Setup hooks
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void CModelInfoSA::StaticSetHooks()
-{
-    EZHookInstall(NodeNameStreamRead);
 }
 
 // Recursive RwFrame children searching function
@@ -2160,4 +2110,452 @@ bool CModelInfoSA::ForceUnload()
 bool CVehicleModelInfoSAInterface::IsComponentDamageable(int componentIndex) const
 {
     return pVisualInfo->m_maskComponentDamagable & (1 << componentIndex);
+}
+
+void CModelInfoSA::On2DFXEffectsLoaded(CEntitySAInterface* entity)
+{
+    // Destroy the removed effects
+    for (std::uint32_t index : m_removedGame2DFXIndices)
+        Remove2DFXEffect(index, false, entity);
+
+    // Apply the saved properties and recreate the effect if necessary
+    for (std::size_t i = 0; i < Get2DFXEffectsCount(); i++)
+    {
+        C2DEffectSAInterface* effect = Get2DFXEffectByIndex(i);
+        if (!effect)
+            continue;
+
+        auto it = m_modifiedPropertiesGame2DFXIndices.find(i);
+        bool modifiedGameEffect = it != m_modifiedPropertiesGame2DFXIndices.end();
+        if (modifiedGameEffect)
+            pGame->Get2DFXEffects()->Set2DFXProperties(effect, it->second);
+
+        // Re-create effect
+        bool custom = IsCustom2DFXEffect(effect);
+        if (modifiedGameEffect || custom)
+        {
+            // For custom effects, we need to recreate the roadsign effect
+            // to preserve the text color
+            if (effect->type != e2dEffectType::LIGHT && ((custom && effect->type == e2dEffectType::ROADSIGN) || !custom))
+                pGame->Get2DFXEffects()->ReInitEffect(effect, m_dwModelID, false, entity);
+        }
+    }
+}
+
+void CModelInfoSA::Reset2DFXEffects()
+{
+    m_removedGame2DFXIndices.clear();
+
+    // Destroy all custom effects from memory & update counter
+    std::size_t customCount = m_custom2DFXEffects.size();
+    std::size_t startIndex = ppModelInfo[m_dwModelID]->ucNumOf2DEffects - customCount;
+    for (std::size_t i = 0; i < customCount; ++i)
+        Remove2DFXEffect(startIndex + customCount - 1 - i, false);
+
+    m_custom2DFXEffects.clear();
+    m_modifiedPropertiesGame2DFXIndices.clear();
+    m_roadsignEffectsColors.clear();
+    m_originalModel2DFXProperties.clear();
+}
+
+void CModelInfoSA::Store2DFXProperties(std::uint32_t index, const e2dEffectProperty& property)
+{
+    C2DEffectSAInterface* effect = Get2DFXEffectByIndex(index);
+    if (!effect)
+        return;
+
+    // Save model as modified
+    ms_modified2DFXModels.insert(m_dwModelID);
+
+    // Only store properties of game effects,
+    // because custom effects retain their properties after a restream
+    if (IsCustom2DFXEffect(effect))
+        return;
+
+    // Init new properties data
+    auto it = m_modifiedPropertiesGame2DFXIndices.find(index);
+    if (it == m_modifiedPropertiesGame2DFXIndices.end())
+    {
+        S2DEffectData& data = pGame->Get2DFXEffects()->Get2DFXPropertiesData(m_dwModelID, index);
+        m_modifiedPropertiesGame2DFXIndices[index] = std::move(data);
+    }
+    else // Update existing data
+    {
+        S2DEffectData& data = it->second;
+        S2DEffectData& currentData = pGame->Get2DFXEffects()->Get2DFXPropertiesData(m_dwModelID, index);
+        pGame->Get2DFXEffects()->UpdatePropertiesData(data, currentData, property);
+    }
+}
+
+void CModelInfoSA::Store2DFXDefaultProperties(std::uint32_t index) 
+{
+    C2DEffectSAInterface* effect = Get2DFXEffectByIndex(index);
+    if (!effect)
+        return;
+
+    // Only store properties of game effects
+    if (IsCustom2DFXEffect(effect))
+        return;
+
+    if (m_originalModel2DFXProperties.find(index) == m_originalModel2DFXProperties.end())
+    {
+        S2DEffectData& data = pGame->Get2DFXEffects()->Get2DFXPropertiesData(m_dwModelID, index);
+        m_originalModel2DFXProperties[index] = std::move(data);
+    }
+}
+
+bool CModelInfoSA::IsCustom2DFXEffect(C2DEffectSAInterface* effect)
+{
+    auto it = std::find_if(
+        m_custom2DFXEffects.begin(),
+        m_custom2DFXEffects.end(),
+        [effect](const std::unique_ptr<C2DEffectSAInterface>& ptr) {
+            return ptr.get() == effect;
+        }
+    );
+
+    return it != m_custom2DFXEffects.end();
+}
+
+RwColor CModelInfoSA::GetStored2DFXRoadsignColor(std::uint32_t index) const
+{
+    auto it = m_roadsignEffectsColors.find(index);
+    return it != m_roadsignEffectsColors.end() ? it->second : RwColor{255, 255, 255, 255};
+}
+
+std::uint32_t CModelInfoSA::Get2DFXEffectIndex(C2DEffectSAInterface* effect) const
+{
+    if (!effect)
+        return 0;
+
+    for (std::size_t i = 0; i < Get2DFXEffectsCount(effect); i++)
+    {
+        C2DEffectSAInterface* e = Get2DFXEffectByIndex(i);
+        if (!e)
+            continue;
+
+        if (e == effect)
+            return i;
+    }
+
+    return 0;
+}
+
+bool CModelInfoSA::Add2DFXEffect(const e2dEffectType& effectType, const CVector& position, const S2DEffectData& effectProperties)
+{
+    CBaseModelInfoSAInterface* modelInterface = GetInterface();
+    if (!modelInterface)
+        return false;
+
+    // Allocate new effect
+    auto effectInterface = std::make_unique<C2DEffectSAInterface>();
+    effectInterface->position = position;
+    effectInterface->type = effectType;
+
+    // Increase counter
+    if (modelInterface->ucNumOf2DEffects < 0)
+        modelInterface->ucNumOf2DEffects = 1;
+    else
+        modelInterface->ucNumOf2DEffects++;
+
+    // Set properties & store roadsign text color
+    pGame->Get2DFXEffects()->Set2DFXProperties(effectInterface.get(), effectProperties);
+    if (effectType == e2dEffectType::ROADSIGN)
+        Store2DFXRoadsignColor(modelInterface->ucNumOf2DEffects - 1, RwColor{effectProperties.color.R, effectProperties.color.G, effectProperties.color.B, effectProperties.color.A});
+
+    // We need to place the effect in the array first, because
+    // InitEffect for roadsign calls Get2DFXEffectIndex,
+    // so the effect must already exist as a custom one at that point
+    // Otherwise, the roadsign will lose its custom text color
+    auto* effectPtr = effectInterface.get();
+    m_custom2DFXEffects.push_back(std::move(effectInterface));
+    pGame->Get2DFXEffects()->InitEffect(effectPtr, m_dwModelID);
+
+    // Save model as modified
+    ms_modified2DFXModels.insert(m_dwModelID);
+    return true;
+}
+
+bool CModelInfoSA::Remove2DFXEffect(std::uint32_t index, bool keepIndex, CEntitySAInterface* entity)
+{
+    C2DEffectSAInterface* effect = Get2DFXEffectByIndex(index);
+    if (!effect)
+        return false;
+
+    // We need iterator here
+    auto it = std::find_if(
+        m_custom2DFXEffects.begin(),
+        m_custom2DFXEffects.end(),
+        [effect](const std::unique_ptr<C2DEffectSAInterface>& ptr) {
+            return ptr.get() == effect;
+        }
+    );
+
+    bool isCustomEffect = it != m_custom2DFXEffects.end();
+    if (keepIndex && !isCustomEffect)
+        m_removedGame2DFXIndices.insert(index);
+
+    // Destroy visual 2dfx effect
+    pGame->Get2DFXEffects()->DeInitEffect(effect, m_dwModelID, isCustomEffect, entity);
+
+    // Clear all properties
+    auto properties_it = m_modifiedPropertiesGame2DFXIndices.find(index);
+    if (properties_it != m_modifiedPropertiesGame2DFXIndices.end())
+        m_modifiedPropertiesGame2DFXIndices.erase(properties_it);
+
+    auto originalprop_it = m_originalModel2DFXProperties.find(index);
+    if (originalprop_it != m_originalModel2DFXProperties.end())
+        m_originalModel2DFXProperties.erase(originalprop_it);
+
+    // Clear text color for roadsign
+    if (effect->type == e2dEffectType::ROADSIGN)
+    {
+        auto it = m_roadsignEffectsColors.find(index);
+        if (it != m_roadsignEffectsColors.end())
+            m_roadsignEffectsColors.erase(it);
+    }
+    
+    if (isCustomEffect)
+    {
+        // Delete effect from memory & decrease counter
+        m_custom2DFXEffects.erase(it);
+        ppModelInfo[m_dwModelID]->ucNumOf2DEffects--;
+    }
+    else
+        ms_modified2DFXModels.insert(m_dwModelID); // Save as modified
+
+    return true;
+}
+
+void CModelInfoSA::Restore2DFXEffect(std::uint32_t index)
+{
+    auto removed_it = m_removedGame2DFXIndices.find(index);
+    if (removed_it == m_removedGame2DFXIndices.end())
+        return;
+
+    m_removedGame2DFXIndices.erase(removed_it);
+    pGame->Get2DFXEffects()->ReInitEffect(m_dwModelID, index);
+}
+
+bool CModelInfoSA::Reset2DFXEffectProperties(std::uint32_t index)
+{
+    C2DEffectSAInterface* effect = Get2DFXEffectByIndex(index);
+    if (!effect)
+        return false;
+
+    if (IsCustom2DFXEffect(effect))
+        return false;
+
+    auto properties_it = m_modifiedPropertiesGame2DFXIndices.find(index);
+    if (properties_it != m_modifiedPropertiesGame2DFXIndices.end())
+    {
+        auto originalprop_it = m_originalModel2DFXProperties.find(index);
+        if (originalprop_it != m_originalModel2DFXProperties.end())
+        {
+            if (effect->type == e2dEffectType::ROADSIGN)
+            {
+                auto textColor_it = m_roadsignEffectsColors.find(index);
+                if (textColor_it != m_roadsignEffectsColors.end())
+                    m_roadsignEffectsColors.erase(textColor_it);
+            }
+
+            pGame->Get2DFXEffects()->Set2DFXProperties(effect, originalprop_it->second);
+            if (effect->type != e2dEffectType::LIGHT)
+                pGame->Get2DFXEffects()->ReInitEffect(m_dwModelID, index);
+
+            m_originalModel2DFXProperties.erase(originalprop_it);
+            return true;
+        }
+
+        m_modifiedPropertiesGame2DFXIndices.erase(properties_it);
+    }
+
+    return false;
+}
+
+void CModelInfoSA::Reset2DFXProperty(std::uint32_t index, const e2dEffectProperty& property)
+{
+    C2DEffectSAInterface* effect = Get2DFXEffectByIndex(index);
+    if (!effect)
+        return;
+
+    if (IsCustom2DFXEffect(effect))
+        return;
+
+    auto it = m_originalModel2DFXProperties.find(index);
+    if (it == m_originalModel2DFXProperties.end())
+        return;
+
+    if (effect->type == e2dEffectType::ROADSIGN && property == e2dEffectProperty::COLOR)
+    {
+        auto textColor_it = m_roadsignEffectsColors.find(index);
+        if (textColor_it != m_roadsignEffectsColors.end())
+            m_roadsignEffectsColors.erase(textColor_it);
+    }
+
+    // Reset modified property to original
+    auto modified_it = m_modifiedPropertiesGame2DFXIndices.find(index);
+    if (modified_it != m_modifiedPropertiesGame2DFXIndices.end())
+    {
+        pGame->Get2DFXEffects()->UpdatePropertiesData(modified_it->second, it->second, property);
+
+        // If all properties are the same
+        if (modified_it->second == it->second)
+            m_modifiedPropertiesGame2DFXIndices.erase(modified_it);
+    }
+
+    pGame->Get2DFXEffects()->Reset2DFXProperty(m_dwModelID, index, property, it->second);
+
+    // We don't need the original properties for this index anymore
+    if (modified_it == m_modifiedPropertiesGame2DFXIndices.end())
+        m_originalModel2DFXProperties.erase(it);
+
+    if (effect->type != e2dEffectType::LIGHT)
+        pGame->Get2DFXEffects()->ReInitEffect(effect, m_dwModelID, false);
+}
+
+C2DEffectSAInterface* CModelInfoSA::Get2DFXEffectByIndex(std::uint32_t index) const
+{
+    if (!ppModelInfo[m_dwModelID])
+        return nullptr;
+
+    // Index out of bounds
+    if (index > ppModelInfo[m_dwModelID]->ucNumOf2DEffects - 1)
+        return nullptr;
+
+    return ppModelInfo[m_dwModelID]->Get2dEffect(index);
+}
+
+C2DEffectSAInterface* CModelInfoSA::Get2DFXEffect(CBaseModelInfoSAInterface* modelInfo, RpGeometry* geometry, std::uint32_t numPluginEffects, std::uint32_t index)
+{
+    if (!geometry)
+        numPluginEffects = 0;
+
+    // C2dfxInfoStore d2fxModels
+    static auto* storedEffects = reinterpret_cast<C2DEffectInfoStoreSAInterface*>(0xB4C2D8);
+
+    std::uint32_t numCustomEffects = m_custom2DFXEffects.size();
+    std::uint32_t numStoredEffects = modelInfo->ucNumOf2DEffects - numPluginEffects - numCustomEffects;
+
+    C2DEffectSAInterface* result = nullptr;
+
+    if (index < numStoredEffects)
+        result = &storedEffects->objects[index + modelInfo->s2DEffectIndex];
+    else if (index < numStoredEffects + numPluginEffects)
+    {
+        auto* pluginEffectData = *RWPLUGINOFFSET(C2DEffectPluginDataSAInterface*, geometry, *reinterpret_cast<int*>(0xC3A1E0)); // g2dEffectPluginOffset
+        result = &pluginEffectData->objects[index - numStoredEffects];
+    }
+    else
+        result = m_custom2DFXEffects[index - numPluginEffects - numStoredEffects].get();
+
+    // Return null for "removed" effects
+    if (result && m_removedGame2DFXIndices.find(index) != m_removedGame2DFXIndices.end())
+        return nullptr;
+
+    return result;
+}
+
+void CModelInfoSA::StaticReset2DFXEffects()
+{
+    // Reset all modified models
+    for (std::uint32_t model : ms_modified2DFXModels)
+    {
+        CModelInfo* modelInfo = pGame->GetModelInfo(model);
+        if (modelInfo)
+            modelInfo->Reset2DFXEffects();
+    }
+
+    ms_modified2DFXModels.clear();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook for CBaseModelInfo:Get2dEffect
+//
+// Handle custom 2dfx's
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static C2DEffectSAInterface* StaticGet2dEffect(CBaseModelInfoSAInterface* modelInfo, RpGeometry* geometry, std::uint32_t numPluginEffects, std::uint32_t index)
+{
+    CModelInfo* ourModelInfo = pGame->GetModelInfo(modelInfo);
+    if (!ourModelInfo)
+        return nullptr;
+
+    return ourModelInfo->Get2DFXEffect(modelInfo, geometry, numPluginEffects, index);
+}
+
+#define HOOKPOS_Get2dEffect 0x4C4CDC
+#define HOOKSIZE_Get2dEffect 10
+static void __declspec(naked) HOOK_Get2dEffect()
+{
+    _asm
+    {
+        push esi
+        push eax
+        push edi
+        push ebx
+        call StaticGet2dEffect
+        add esp, 16
+
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        retn 4
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook for NodeNameStreamRead
+//
+// Ignore extra characters in dff frame name
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+__declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest, uint uiSize)
+{
+    // Calc sizes
+    const uint uiMaxBufferSize = 24;
+    uint       uiAmountToRead = std::min(uiMaxBufferSize - 1, uiSize);
+    uint       uiAmountToSkip = uiSize - uiAmountToRead;
+
+    // Read good bit
+    RwStreamRead(stream, pDest, uiAmountToRead);
+    pDest[uiAmountToRead] = 0;
+
+    // Skip bad bit (this might not be required)
+    if (uiAmountToSkip > 0)
+        RwStreamSkip(stream, uiAmountToSkip);
+}
+
+// Hook info
+#define HOOKPOS_NodeNameStreamRead  0x072FA68
+#define HOOKSIZE_NodeNameStreamRead 15
+DWORD RETURN_NodeNameStreamRead = 0x072FA77;
+void _declspec(naked) HOOK_NodeNameStreamRead()
+{
+    _asm
+    {
+        pushad
+        push    edi
+        push    esi
+        push    ebx
+        call    OnMY_NodeNameStreamRead
+        add     esp, 4*3
+        popad
+
+        jmp     RETURN_NodeNameStreamRead
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CModelInfoSA::StaticSetHooks()
+{
+    EZHookInstall(NodeNameStreamRead);
+    EZHookInstall(Get2dEffect);
 }

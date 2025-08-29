@@ -148,6 +148,7 @@ CGameSA::CGameSA()
         m_pPlantManager = new CPlantManagerSA();
         m_pBuildingRemoval = new CBuildingRemovalSA();
         m_pVehicleAudioSettingsManager = std::make_unique<CVehicleAudioSettingsManagerSA>();
+        m_p2DFXEffects = std::make_unique<C2DEffectsSA>();
 
         m_pRenderer = std::make_unique<CRendererSA>();
 
@@ -365,6 +366,28 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
         }
         return nullptr;
     }
+    return nullptr;
+}
+
+CModelInfo* CGameSA::GetModelInfo(CBaseModelInfoSAInterface* baseModelInfo)
+{
+    static std::unordered_map<CBaseModelInfoSAInterface*, CModelInfoSA*> s_cache;
+
+    auto it = s_cache.find(baseModelInfo);
+    if (it != s_cache.end())
+        return it->second;
+
+    const std::size_t count = GetCountOfAllFileIDs();
+    for (std::size_t i = 0; i < count; i++)
+    {
+        CModelInfoSA* modelInfo = &ModelInfo[i];
+        if (modelInfo->IsValid() && modelInfo->GetInterface() == baseModelInfo)
+        {
+            s_cache[baseModelInfo] = modelInfo;
+            return modelInfo;
+        }
+    }
+
     return nullptr;
 }
 
@@ -1145,6 +1168,11 @@ void CGameSA::ResetModelTimes()
 void CGameSA::ResetAlphaTransparencies()
 {
     CModelInfoSA::StaticResetAlphaTransparencies();
+}
+
+void CGameSA::Reset2DFXEffects() const
+{
+    CModelInfoSA::StaticReset2DFXEffects();
 }
 
 // Disable VSync by forcing what normally happends at the end of the loading screens
