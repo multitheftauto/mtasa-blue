@@ -32,6 +32,21 @@ class FxSystem_c;
 #define FUNC_CFx_TriggerFootSplash         0x4a1150
 #define FUNC_FXSystem_c_AddParticle        0x4AA440
 
+struct FxPrtMult_c
+{
+    struct
+    {
+        float red;
+        float green;
+        float blue;
+        float alpha;
+    } m_color;
+
+    float m_fSize;
+    float unk;
+    float m_fLife;
+};
+
 class CFxSAInterface
 {
 public:
@@ -61,6 +76,8 @@ class CFxSA : public CFx
 public:
     CFxSA(CFxSAInterface* pInterface) { m_pInterface = pInterface; }
 
+    CFxSAInterface* GetInterface() noexcept { return m_pInterface; }
+
     void AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
     void AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
     void AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, unsigned char ucBlurIf0, float fSpread,
@@ -80,19 +97,4 @@ public:
 
 private:
     CFxSAInterface* m_pInterface;
-
-    struct FxPrtMult_c
-    {
-        struct
-        {
-            float red;
-            float green;
-            float blue;
-            float alpha;
-        } m_color;
-
-        float m_fSize;
-        float unk;
-        float m_fLife;
-    };
 };
