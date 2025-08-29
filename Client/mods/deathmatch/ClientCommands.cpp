@@ -108,8 +108,17 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
 
             while (iss >> arguments)
             {
-                LuaTable.PushNumber(++i);
-                LuaTable.PushString(arguments.c_str());
+                ++i;
+                if (stricmp(szCommand, "connect") == 0 && i == 4)
+                {
+                    LuaTable.PushNumber(i);
+                    LuaTable.PushString("***");
+                }
+                else
+                {
+                    LuaTable.PushNumber(i);
+                    LuaTable.PushString(arguments.c_str());
+                }
             }
             Arguments.PushString(szCommand);
             Arguments.PushTable(&LuaTable);
