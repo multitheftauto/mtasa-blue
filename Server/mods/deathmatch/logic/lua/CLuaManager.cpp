@@ -43,6 +43,7 @@
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 #include "luadefs/CLuaCompatibilityDefs.h"
+#include "luadefs/CLuaTranslationDefs.h"
 
 extern CGame* g_pGame;
 
@@ -216,6 +217,7 @@ void CLuaManager::LoadCFunctions()
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
     CLuaGenericDefs::LoadFunctions();
+    CLuaTranslationDefs::LoadFunctions();
     // Backward compatibility functions at the end, so the new function name is used in ACL
     CLuaCompatibilityDefs::LoadFunctions();
 }
