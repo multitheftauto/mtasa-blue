@@ -6532,13 +6532,6 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
-    {
-        return false;
-    }
-
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
     {
@@ -6746,13 +6739,6 @@ bool CClientPed::ExitVehicle()
 {
     // Are we local player or ped we are syncing
     if (!IsSyncing() && !IsLocalPlayer() && !IsLocalEntity())
-    {
-        return false;
-    }
-
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
     {
         return false;
     }
