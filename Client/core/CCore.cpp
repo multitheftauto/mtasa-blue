@@ -1905,11 +1905,24 @@ void CCore::SetCurrentRefreshRate(uint value)
 //
 void CCore::EnsureFrameRateLimitApplied()
 {
-    if (!m_bDoneFrameRateLimit)
+    // NOTE(pxd): Do NOT call ApplyFrameRateLimit() from the Present path
+    // Forcing it here skews frame pacing and causes frames to complete too early/late
+    //
+    // Correct approach:
+    //   - Queue the desired rate
+    //   - Let the timer hook (OnGameTimerUpdate) apply it
+    //
+    // Caveat: The Main Menu does not run through the timer hook,
+    // so frame limiting there is ineffective. Might require a separate path
+    //
+    // ApplyFrameRateLimit(); // intentionally not called here
+
+    // Publish the target to the timer hook
+    if (m_uiFrameRateLimit > 0 && !m_bQueuedFrameRateValid)
     {
-        ApplyFrameRateLimit();
+        m_uiQueuedFrameRate = m_uiFrameRateLimit;
+        m_bQueuedFrameRateValid = true;
     }
-    m_bDoneFrameRateLimit = false;
 }
 
 //
@@ -1922,17 +1935,20 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
     TIMING_CHECKPOINT("-CallIdle1");
     ms_TimingCheckpoints.EndTimingCheckpoints();
 
-    // Frame rate limit stuff starts here
+    // NOTE(pxd): This function no longer directly enforces frame limiting.
+    // It only *queues* the target rate, which is later enforced by ApplyQueuedFrameRateLimit().
+    //
+    // Reason:
+    //   - Frame pacing needs to happen in a consistent place (OnGameTimerUpdate),
+    //     not scattered across code paths.
+    //
+    // Old behavior (calling ApplyQueuedFrameRateLimit() immediately) was removed
+    // to avoid double-enforcing or misaligned frame pacing.
+
     m_bDoneFrameRateLimit = true;
-
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
-
     if (uiUseRate > 0)
     {
-        // Apply previous frame rate if is hasn't been done yet
-        ApplyQueuedFrameRateLimit();
-
-        // Limit is usually applied in OnGameTimerUpdate
         m_uiQueuedFrameRate = uiUseRate;
         m_bQueuedFrameRateValid = true;
     }
@@ -1948,23 +1964,127 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 //
 void CCore::ApplyQueuedFrameRateLimit()
 {
-    if (m_bQueuedFrameRateValid)
-    {
-        m_bQueuedFrameRateValid = false;
-        // Calc required time in ms between frames
-        const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
+    // NOTE(pxd): This is the *only* place where frame limiting is enforced.
+    // Called from OnGameTimerUpdate, after a frame is produced.
+    //
+    // Responsibilities:
+    //   - Sleep/yield/spin until the correct frame boundary is reached
+    //   - Adaptively calibrate OS sleep/yield overhead
+    //   - Advance target timestamp for next frame
+    //
+    // Key idea: Always aim for precise pacing without wasting CPU cycles.
 
-        while (true)
+    if (!m_bQueuedFrameRateValid)
+        return;
+    m_bQueuedFrameRateValid = false;
+
+    static LARGE_INTEGER s_frequency = {0};
+    static LARGE_INTEGER s_nextFrameTime = {0};
+    static bool          s_initialized = false;
+
+    // Adaptive timing calibration
+    static double s_sleepOverhead = 0.5;            // Start conservative
+    static double s_yieldOverhead = 0.1;            // Yield overhead estimate
+    static int    s_calibrationCount = 0;
+    static double s_recentOverheads[10] = {0};  // Rolling average
+
+    // Initialize high-precision timer
+    if (!s_initialized)
+    {
+        QueryPerformanceFrequency(&s_frequency);
+        LARGE_INTEGER now;
+        QueryPerformanceCounter(&now);
+
+        LONGLONG targetInterval = s_frequency.QuadPart / m_uiQueuedFrameRate;
+        s_nextFrameTime.QuadPart = now.QuadPart + targetInterval;
+        s_initialized = true;
+        return;
+    }
+
+    LARGE_INTEGER now, sleepStart;
+    QueryPerformanceCounter(&now);
+
+    LONGLONG remaining_ticks = s_nextFrameTime.QuadPart - now.QuadPart;
+
+    if (remaining_ticks > 0)
+    {
+        double remaining_ms = (double)remaining_ticks * 1000.0 / s_frequency.QuadPart;
+
+        // Adaptive sleep with learned overhead compensation
+        if (remaining_ms > s_sleepOverhead + 0.5)
         {
-            // See if we need to wait
-            double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
-            if (dSpare <= 0.0)
-                break;
-            if (dSpare >= 10.0)
-                Sleep(1);
+            QueryPerformanceCounter(&sleepStart);
+
+            // Sleep for predicted safe duration
+            DWORD sleepTime = static_cast<DWORD>(remaining_ms - s_sleepOverhead);
+            Sleep(sleepTime);
+
+            // Measure actual sleep overhead for calibration
+            LARGE_INTEGER sleepEnd;
+            QueryPerformanceCounter(&sleepEnd);
+            double actualSleep = (double)(sleepEnd.QuadPart - sleepStart.QuadPart) * 1000.0 / s_frequency.QuadPart;
+            double overhead = actualSleep - sleepTime;
+
+            // Update overhead estimate (rolling average)
+            s_recentOverheads[s_calibrationCount % 10] = overhead;
+            s_calibrationCount++;
+
+            if (s_calibrationCount >= 10)
+            {
+                double avgOverhead = 0;
+                for (int i = 0; i < 10; i++)
+                    avgOverhead += s_recentOverheads[i];
+                s_sleepOverhead = avgOverhead / 10.0;
+
+                // Clamp overhead to reasonable bounds
+                s_sleepOverhead = max(0.1, min(2.0, s_sleepOverhead));
+            }
         }
-        m_FrameRateTimer.Reset();
-        TIMING_GRAPH("Limiter");
+        // Smart yield for medium waits
+        else if (remaining_ms > s_yieldOverhead + 0.05)
+        {
+            Sleep(0);            // Yield thread
+        }
+
+        // Minimal spinlock - only for final precision
+        QueryPerformanceCounter(&now);
+        if (now.QuadPart < s_nextFrameTime.QuadPart)
+        {
+            // Use CPU pause hints and check less frequently if wait is longer
+            LONGLONG finalRemaining = s_nextFrameTime.QuadPart - now.QuadPart;
+            double   finalMs = (double)finalRemaining * 1000.0 / s_frequency.QuadPart;
+
+            if (finalMs > 0.02)
+            {            // >20μs remaining
+                // Slower polling for longer waits to reduce CPU usage
+                do
+                {
+                    for (int i = 0; i < 10; i++)
+                        _mm_pause();            // Batch pauses
+                    QueryPerformanceCounter(&now);
+                } while (now.QuadPart < s_nextFrameTime.QuadPart);
+            }
+            else
+            {
+                // Ultra-tight loop for final microseconds
+                do
+                {
+                    _mm_pause();
+                    QueryPerformanceCounter(&now);
+                } while (now.QuadPart < s_nextFrameTime.QuadPart);
+            }
+        }
+    }
+
+    // Calculate next frame target
+    LONGLONG targetInterval = s_frequency.QuadPart / m_uiQueuedFrameRate;
+    s_nextFrameTime.QuadPart += targetInterval;
+
+    // Handle frame drops or rate changes
+    QueryPerformanceCounter(&now);
+    if (s_nextFrameTime.QuadPart <= now.QuadPart)
+    {
+        s_nextFrameTime.QuadPart = now.QuadPart + targetInterval;
     }
 }
 
