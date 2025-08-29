@@ -31,6 +31,7 @@
 #include <game/TaskJumpFall.h>
 #include <game/TaskPhysicalResponse.h>
 #include <game/TaskAttack.h>
+#include <game/TaskSimpleSwim.h>
 #include "enums/VehicleType.h"
 
 using std::list;
@@ -7216,4 +7217,32 @@ void CClientPed::SetSyncing(bool bIsSyncing)
         // Reset vehicle in/out stuff in case the ped was entering/exiting
         ResetVehicleInOut();
     }
+}
+
+CTaskSimpleSwim* CClientPed::GetSwimmingTask() const
+{
+    if (!m_pPlayerPed)
+        return nullptr;
+
+    CTask* simplestTask = const_cast<CTaskManager*>(GetTaskManager())->GetSimplestActiveTask();
+    if (!simplestTask || simplestTask->GetTaskType() != TASK_SIMPLE_SWIM)
+        return nullptr;
+
+    auto* swimmingTask = dynamic_cast<CTaskSimpleSwim*>(simplestTask);
+    return swimmingTask;
+}
+
+void CClientPed::RunSwimTask() const
+{
+    if (!m_pPlayerPed || GetSwimmingTask())
+        return;
+
+    CTaskComplexInWater* inWaterTask = g_pGame->GetTasks()->CreateTaskComplexInWater();
+    if (!inWaterTask)
+        return;
+
+    // Set physical flags (bTouchingWater, bSubmergedInWater)
+    m_pPlayerPed->SetInWaterFlags(true);
+
+    inWaterTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP, true);
 }

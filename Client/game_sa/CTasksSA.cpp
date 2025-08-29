@@ -160,6 +160,13 @@ CTaskSimpleRunNamedAnim* CTasksSA::CreateTaskSimpleRunNamedAnim(const char* pAni
     return pTask;
 }
 
+CTaskComplexInWater* CTasksSA::CreateTaskComplexInWater()
+{
+    CTaskComplexInWaterSA* task = NewTask<CTaskComplexInWaterSA>();
+    m_pTaskManagementSystem->AddTask(task);
+    return task;
+}
+
 CTaskComplexDie* CTasksSA::CreateTaskComplexDie(const eWeaponType eMeansOfDeath, const AssocGroupId animGroup, const AnimationId anim, const float fBlendDelta,
                                                 const float fAnimSpeed, const bool bBeingKilledByStealth, const bool bFallingToDeath, const int iFallToDeathDir,
                                                 const bool bFallToDeathOverRailing)
