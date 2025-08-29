@@ -4621,17 +4621,13 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CPlayer* pPlayer, CVector& vecP
     assert(pPlayer);
 
     CPlayerCamera* pCamera = pPlayer->GetCamera();
-
-    // Only allow this if we're in fixed mode?
-    if (pCamera->GetMode() == CAMERAMODE_FIXED)
-    {
-        pCamera->GetPosition(vecPosition);
-        pCamera->GetLookAt(vecLookAt);
-        fRoll = pCamera->GetRoll();
-        fFOV = pCamera->GetFOV();
-        return true;
-    }
-    return false;
+    
+    pCamera->GetPosition(vecPosition);
+    pCamera->GetLookAt(vecLookAt);
+    fRoll = pCamera->GetRoll();
+    fFOV = pCamera->GetFOV();
+    
+    return true;
 }
 
 CElement* CStaticFunctionDefinitions::GetCameraTarget(CPlayer* pPlayer)

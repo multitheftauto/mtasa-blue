@@ -82,6 +82,10 @@ public:
 
     void UnreferencePlayer(CClientPlayer* pPlayer);
 
+    bool    IsInCameraTransition() const;
+    CMatrix GetInterpolatedCameraMatrix() const;
+    float   GetAccurateFOV() const;
+
 private:
     CClientCamera(CClientManager* pManager);
     ~CClientCamera();
