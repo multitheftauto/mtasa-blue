@@ -981,6 +981,9 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
     pPlayer->SetOnFire(flags.data.bIsOnFire);
     pPlayer->SetStealthAiming(flags.data.bStealthAiming);
 
+    if (flags.data.bIsInWater && !pPlayer->IsInWater())
+        pPlayer->RunSwimTask();
+
     // Remember now as the last puresync time
     pPlayer->SetLastPuresyncTime(CClientTime::GetTime());
     pPlayer->SetLastPuresyncPosition(position.data.vecPosition);
