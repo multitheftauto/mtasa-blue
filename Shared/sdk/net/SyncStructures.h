@@ -544,7 +544,7 @@ struct SPlayerPuresyncFlags : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 14
+        BITCOUNT = 15
     };
 
     bool Read(NetBitStreamInterface& stream)
