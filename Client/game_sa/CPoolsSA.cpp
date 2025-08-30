@@ -504,7 +504,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
-    _asm {
+    __asm {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
         call    dwFunction
@@ -1073,7 +1073,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             mov     ecx, [ecx]

@@ -243,7 +243,7 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
     if (!bOnRestart)
     {
         DWORD dwFunc = FUNC_SetAntiAliasing;
-        _asm
+        __asm
         {
             push    uiAntiAliasing
             call    dwFunc
@@ -267,7 +267,7 @@ void CSettingsSA::SetMipMappingEnabled(bool bEnable)
 
 void CSettingsSA::Save()
 {
-    _asm
+    __asm
     {
         mov ecx, CLASS_CMenuManager
         mov eax, FUNC_CMenuManager_Save
@@ -368,9 +368,11 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
 }
 
 // Hooked from 0x49EA50
-void _declspec(naked) HOOK_GetFxQuality()
+static void __declspec(naked) HOOK_GetFxQuality()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         mov     eax, [ecx+054h]            // Current FxQuality setting
@@ -388,9 +390,11 @@ void _declspec(naked) HOOK_GetFxQuality()
 }
 
 // Hook to discover what vehicle will be calling GetFxQuality
-void _declspec(naked) HOOK_StoreShadowForVehicle()
+static void __declspec(naked) HOOK_StoreShadowForVehicle()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Hooked from 0x70BDA0  5 bytes
         mov     eax, [esp+4]            // Get vehicle
@@ -969,9 +973,11 @@ __declspec(noinline) int OnMY_SelectDevice()
 DWORD RETURN_SelectDeviceSingle = 0x0746273;
 DWORD RETURN_SelectDeviceMultiHide = 0x074622C;
 DWORD RETURN_SelectDeviceMultiShow = 0x0746227;
-void _declspec(naked) HOOK_SelectDevice()
+static void __declspec(naked) HOOK_SelectDevice()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         call    OnMY_SelectDevice
@@ -981,14 +987,14 @@ void _declspec(naked) HOOK_SelectDevice()
         jl      single
         jz      multishow
 
-                // multhide
+        // multhide
         mov     eax, 1
         jmp     RETURN_SelectDeviceMultiHide
 
-multishow:
+        multishow:
         jmp     RETURN_SelectDeviceMultiShow
 
-single:
+        single:
         jmp     RETURN_SelectDeviceSingle
     }
 }

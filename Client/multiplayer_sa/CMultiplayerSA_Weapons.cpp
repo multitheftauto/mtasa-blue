@@ -54,9 +54,11 @@ void OnMY_CWeapon_GenerateDamageEvent(DWORD calledFrom, CPedSAInterface* pPed, C
 #define HOOKPOS_CWeapon_GenerateDamageEvent                         0x73A530
 #define HOOKSIZE_CWeapon_GenerateDamageEvent                        7
 DWORD RETURN_CWeapon_GenerateDamageEvent = 0x73A537;
-void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
+static void __declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -105,7 +107,7 @@ void ResetShotInfoArray()
 
 void Call_CShotInfo_Update()
 {
-    _asm
+    __asm
     {
         call inner
         jmp  done
@@ -142,9 +144,11 @@ void OnMY_CShotInfo_Update()
 }
 
 // The hook goes here
-void _declspec(naked) HOOK_CShotInfo_Update()
+static void __declspec(naked) HOOK_CShotInfo_Update()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         call    OnMY_CShotInfo_Update
@@ -183,9 +187,11 @@ int OnMY_Fx_AddBulletImpact(int iType)
 #define HOOKSIZE_Fx_AddBulletImpact                        5
 DWORD RETURN_Fx_AddBulletImpact = 0x049F3ED;
 
-void _declspec(naked) HOOK_Fx_AddBulletImpact()
+static void __declspec(naked) HOOK_Fx_AddBulletImpact()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    eax
@@ -210,9 +216,11 @@ void _declspec(naked) HOOK_Fx_AddBulletImpact()
 #define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC 0x733123
 #define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC 5
 static constexpr DWORD CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC = 0x733128;
-static void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
+static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov eax, 5DF4E0h
         call eax // call CPed::ResetGunFlashAlpha

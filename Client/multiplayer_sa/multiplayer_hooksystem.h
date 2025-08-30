@@ -13,6 +13,20 @@
 
 #pragma once
 
+#pragma warning(disable : 4102) // unreferenced label
+
+// This macro adds an unreferenced label to your '__declspec(naked)' hook functions, to
+// point to the value of __LOCAL_SIZE, which will be examined by an external tool after
+// compilation, and it must be zero.
+// 
+// NOTE: This was copied from game_sa. Check the comment there for more details.
+#define MTA_VERIFY_HOOK_LOCAL_SIZE                     \
+{                                                      \
+    __asm {              push   eax                };  \
+    __asm { _localSize:  mov    eax, __LOCAL_SIZE  };  \
+    __asm {              pop    eax                };  \
+}
+
 VOID  HookInstallMethod(DWORD dwInstallAddress, DWORD dwHookFunction);
 VOID  HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction);
 BOOL  HookInstall(DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize);

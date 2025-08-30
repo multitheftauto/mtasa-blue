@@ -42,7 +42,7 @@ CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA(const int iDuration)
     DWORD dwFunc = FUNC_CTaskComplexUseMobilePhone__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    iDuration
@@ -60,7 +60,7 @@ CTaskSimpleRunAnimSA::CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const A
     DWORD dwFunc = FUNC_CTaskSimpleRunAnim__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bHoldLastFrame
@@ -84,7 +84,7 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA(const char* pAnimName, cons
     DWORD dwFunc = FUNC_CTaskSimpleRunNamedAnim__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bHoldLastFrame
@@ -111,7 +111,7 @@ CTaskComplexDieSA::CTaskComplexDieSA(const eWeaponType eMeansOfDeath, const Asso
     DWORD dwFunc = FUNC_CTaskComplexDie__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bFallToDeathOverRailing
@@ -137,7 +137,7 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, con
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetPedInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    animGroup
@@ -155,7 +155,7 @@ CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
     DWORD dwFunc = FUNC_CTaskSimpleDead__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bUnk2
@@ -173,7 +173,7 @@ CTaskSimpleBeHitSA::CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBod
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPedAttacker->GetPedInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    weaponId
@@ -196,7 +196,7 @@ CTaskComplexSunbatheSA::CTaskComplexSunbatheSA(CObject* pTowel, const bool bStar
     if (pTowel)
         dwObjectInterface = (DWORD)pTowel->GetObjectInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bStartStanding
@@ -222,7 +222,7 @@ CTaskSimplePlayerOnFootSA::CTaskSimplePlayerOnFootSA()
     DWORD dwFunc = (DWORD)FUNC_CTASKSimplePlayerOnFoot__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -240,7 +240,7 @@ CTaskComplexFacialSA::CTaskComplexFacialSA()
     DWORD dwFunc = (DWORD)FUNC_CTASKComplexFacial__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc

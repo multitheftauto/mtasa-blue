@@ -19,7 +19,7 @@ void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, fl
     CVector* pvecDirection = &vecDirection;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddBlood;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    fBrightness
@@ -36,7 +36,7 @@ void CFxSA::AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, flo
     CVector* pvecDirection = &vecDirection;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddWood;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    fBrightness
@@ -55,7 +55,7 @@ void CFxSA::AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce,
     float    fX = vecAcrossLine.fX, fY = vecAcrossLine.fY, fZ = vecAcrossLine.fZ;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddSparks;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    fLife
@@ -78,7 +78,7 @@ void CFxSA::AddTyreBurst(CVector& vecPosition, CVector& vecDirection)
     CVector* pvecDirection = &vecDirection;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddTyreBurst;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    pvecDirection
@@ -93,7 +93,7 @@ void CFxSA::AddBulletImpact(CVector& vecPosition, CVector& vecDirection, int iSm
     CVector* pvecDirection = &vecDirection;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddBulletImpact;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    fSmokeIntensity
@@ -111,7 +111,7 @@ void CFxSA::AddPunchImpact(CVector& vecPosition, CVector& vecDirection, int i)
     CVector* pvecDirection = &vecDirection;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddPunchImpact;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    i
@@ -127,7 +127,7 @@ void CFxSA::AddDebris(CVector& vecPosition, RwColor& rwColor, float fDebrisScale
     RwColor* pColor = &rwColor;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddDebris;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    iCount
@@ -144,7 +144,7 @@ void CFxSA::AddGlass(CVector& vecPosition, RwColor& rwColor, float fDebrisScale,
     RwColor* pColor = &rwColor;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddGlass;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    iCount
@@ -160,7 +160,7 @@ void CFxSA::TriggerWaterHydrant(CVector& vecPosition)
     CVector* pvecPosition = &vecPosition;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerWaterHydrant;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    pvecPosition
@@ -175,7 +175,7 @@ void CFxSA::TriggerGunshot(CEntity* pEntity, CVector& vecPosition, CVector& vecD
     CVector* pvecDirection = &vecDirection;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerGunshot;
-        _asm
+        __asm
     {
         mov     ecx, dwThis
         push    bIncludeSparks
@@ -192,7 +192,7 @@ void CFxSA::TriggerTankFire(CVector& vecPosition, CVector& vecDirection)
     CVector* pvecDirection = &vecDirection;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerTankFire;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    pvecDirection
@@ -206,7 +206,7 @@ void CFxSA::TriggerWaterSplash(CVector& vecPosition)
     CVector* pvecPosition = &vecPosition;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerWaterSplash;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    pvecPosition
@@ -219,7 +219,7 @@ void CFxSA::TriggerBulletSplash(CVector& vecPosition)
     CVector* pvecPosition = &vecPosition;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerBulletSplash;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    pvecPosition
@@ -232,7 +232,7 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     CVector* pvecPosition = &vecPosition;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerFootSplash;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    pvecPosition
