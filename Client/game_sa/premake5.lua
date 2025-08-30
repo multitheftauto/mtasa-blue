@@ -4,9 +4,16 @@ project "Game SA"
 	targetname "game_sa"
 	targetdir(buildpath("mta"))
 
-	-- HACK(Jusonex): Temp fix for ebp not being set in naked functions
-	-- More information on this in multiplayer_sa's premake5.lua
-	cppdialect "C++14"
+	-- DO NOT REMOVE OR TURN THIS OPTION ON
+	-- By turning this feature off, our code will be compiled with '/Zi' instead of '/ZI'.
+	-- By enabling 'Edit and Continue' the compiler expects us to allocate enough stack space
+	-- using __LOCAL_SIZE to ensure enough local space within __declspec(naked) functions for
+	-- this feature. Our hook functions will never support this feature, because most of the
+	-- time our hook functions don't have proper epilog code and neither prolog code.
+	-- This is especially important for our post-build checking of __LOCAL_SIZE.
+	-- https://learn.microsoft.com/en-us/cpp/cpp/considerations-for-writing-prolog-epilog-code
+	-- https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format
+	editandcontinue "Off"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
@@ -33,6 +40,10 @@ project "Game SA"
 		"**.h",
 		"**.hpp",
 		"**.cpp"
+	}
+
+	postbuildcommands {
+		"%[%{!wks.location}/../utils/hookcheck.exe] %[%{!cfg.buildtarget.abspath}]"
 	}
 
 	filter "architecture:not x86"

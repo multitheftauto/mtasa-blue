@@ -899,22 +899,24 @@ void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
 static constexpr std::uintptr_t CONTINUE_RenderWanted = 0x58DFD8;
 static void __declspec(naked) HOOK_RenderWanted()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
-        cmp ebp, edi
-        jle empty
+        cmp     ebp, edi
+        jle     empty
 
-        push 0
-        jmp render
+        push    0
+        jmp     render
 
         empty:
-        push 1
+        push    1
 
         render:
-        call CHudSA::RenderWanted
-        add esp,4
+        call    CHudSA::RenderWanted
+        add     esp, 4
 
-        jmp CONTINUE_RenderWanted
+        jmp     CONTINUE_RenderWanted
     }
 }
 

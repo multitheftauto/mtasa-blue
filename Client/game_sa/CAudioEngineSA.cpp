@@ -413,31 +413,29 @@ void CAudioEngineSA::UpdateAmbientSoundSettings()
         MemPut<BYTE>(0x507814, 0x33);            // No gunfire
 }
 
-__declspec(noinline) bool _cdecl IsAmbientSoundGeneralEnabled()
+static bool IsAmbientSoundGeneralEnabled()
 {
-    if (pGame)
-    {
-        return pGame->GetAudioEngine()->IsAmbientSoundEnabled(AMBIENT_SOUND_GENERAL);
-    }
-    return false;
+    return pGame && pGame->GetAudioEngine()->IsAmbientSoundEnabled(AMBIENT_SOUND_GENERAL);
 }
 
 // Hook for manual ambient sound pause
-void __declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
+static void __declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
-        // Hooked from 004D6E21  6 bytes
-        call IsAmbientSoundGeneralEnabled
-        test al, al
-        jnz skip
-        mov     dword ptr [esp+08h], 0      // Pause
-    skip:
+        push    esi
+        call    IsAmbientSoundGeneralEnabled
+        test    al, al
+        jnz     continueWithOriginalCode
+        mov     dword ptr [esp+8], 0      // Pause by setting 0.0f for the last argument to CAEAudioHardware::SetChannelFrequencyScalingFactor
 
-        // orig
-        mov     edi, [esp+08h]
+        continueWithOriginalCode:
+        pop     esi
+        mov     edi, [esp+8]
         xor     ecx, ecx
-        jmp     RETURN_CAEAmbienceTrackManager_CheckForPause  // 4D6E27
+        jmp     RETURN_CAEAmbienceTrackManager_CheckForPause
     }
 }
 
@@ -506,33 +504,34 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Return false to skip sound
-__declspec(noinline) bool _cdecl On_CAESoundManager_RequestNewSound(CAESound* pAESound)
+static bool _cdecl OnRequestNewSound(CAESound* pAESound)
 {
     return g_pAudioSA->OnWorldSound(pAESound);
 }
 
-void __declspec(naked) HOOK_CAESoundManager_RequestNewSound()
+static void __declspec(naked) HOOK_CAESoundManager_RequestNewSound()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
         push    [esp+32+4*1]
-        call    On_CAESoundManager_RequestNewSound
-        add     esp, 4*1
-        cmp     al, 0
-        jz      skip
+        call    OnRequestNewSound
+        add     esp, 4
+        test    al, al
         popad
+        jnz     continueWithOriginalCode
 
-        // Continue with standard code
+        // Skip playing sound
+        xor     eax, eax
+        retn    4
+
+        continueWithOriginalCode:
         push    esi
         push    edi
         xor     esi, esi
         jmp     RETURN_CAESoundManager_RequestNewSound
-
-skip:   // Skip playing sound
-        popad
-        xor     eax, eax
-        retn    4
     }
 }
 

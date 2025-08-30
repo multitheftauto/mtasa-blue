@@ -157,19 +157,17 @@ static void __cdecl RenderTargetArrow(CCheckpointSAInterface* pCheckpoint)
 }
 
 #define HOOKPOS_CCheckpoint__Render  0x725E56
-#define HOOKSIZE_CCheckpoint__Render 0x5
-static constexpr std::uint32_t RETURN_CCheckpoint__Render = 0x725E5B;
+#define HOOKSIZE_CCheckpoint__Render 5
+static constexpr intptr_t RETURN_CCheckpoint__Render = 0x725E5B;
 static void __declspec(naked) HOOK_CCheckpoint__Render()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
-        pushad
-        // vvv
-        push esi
-        call RenderTargetArrow
-        add esp, 4
-        // ^^^
-        popad
+        push    esi
+        call    RenderTargetArrow
+        add     esp, 4
 
         jmp RETURN_CCheckpoint__Render
     }

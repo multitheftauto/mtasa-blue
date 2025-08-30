@@ -275,8 +275,10 @@ __declspec(noinline) void _cdecl OnCEventHandler_ComputeDamageResponse_Mid(CPedS
 #define HOOKSIZE_CEventHandler_ComputeDamageResponse_Mid       5
 DWORD RETURN_CEventHandler_ComputeDamageResponse_Mid = 0x4C0598;
 DWORD CTaskSimpleBeHit_constructor = FUNC_CTaskSimpleBeHit__Constructor;
-void __declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
+static void __declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad

@@ -368,8 +368,10 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
 }
 
 // Hooked from 0x49EA50
-void __declspec(naked) HOOK_GetFxQuality()
+static void __declspec(naked) HOOK_GetFxQuality()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -388,8 +390,10 @@ void __declspec(naked) HOOK_GetFxQuality()
 }
 
 // Hook to discover what vehicle will be calling GetFxQuality
-void __declspec(naked) HOOK_StoreShadowForVehicle()
+static void __declspec(naked) HOOK_StoreShadowForVehicle()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         // Hooked from 0x70BDA0  5 bytes
@@ -969,8 +973,10 @@ __declspec(noinline) int OnMY_SelectDevice()
 DWORD RETURN_SelectDeviceSingle = 0x0746273;
 DWORD RETURN_SelectDeviceMultiHide = 0x074622C;
 DWORD RETURN_SelectDeviceMultiShow = 0x0746227;
-void __declspec(naked) HOOK_SelectDevice()
+static void __declspec(naked) HOOK_SelectDevice()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -981,14 +987,14 @@ void __declspec(naked) HOOK_SelectDevice()
         jl      single
         jz      multishow
 
-                // multhide
+        // multhide
         mov     eax, 1
         jmp     RETURN_SelectDeviceMultiHide
 
-multishow:
+        multishow:
         jmp     RETURN_SelectDeviceMultiShow
 
-single:
+        single:
         jmp     RETURN_SelectDeviceSingle
     }
 }

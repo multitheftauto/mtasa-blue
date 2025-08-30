@@ -77,58 +77,56 @@ bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
     return false;
 }
 
-void HOOK_FallenPeds();
-void HOOK_FallenCars();
-
-void CWorldSA::InstallHooks()
-{
-    HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
-    HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
-}
-
 DWORD CONTINUE_CWorld_FallenPeds = 0x00565CBA;
 DWORD CONTINUE_CWorld_FallenCars = 0x00565E8A;
 
-void __declspec(naked) HOOK_FallenPeds()
+static bool IsUnderWorldWarpEnabled()
 {
-    if (pGame && pGame->IsUnderWorldWarpEnabled())
+    return pGame && pGame->IsUnderWorldWarpEnabled();
+}
+
+static void __declspec(naked) HOOK_FallenPeds()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-        __asm
-        {
-            sub esp, 2Ch
-            push ebx
-            mov ebx, ds:0B74490h
-            jmp CONTINUE_CWorld_FallenPeds
-        }
-    }
-    else
-    {
-        __asm
-        {
-            ret
-        }
+        call    IsUnderWorldWarpEnabled
+        test    al, al
+        jnz     continueWithOriginalCode
+        ret
+
+        continueWithOriginalCode:
+        sub     esp, 2Ch
+        push    ebx
+        mov     ebx, ds:0B74490h
+        jmp     CONTINUE_CWorld_FallenPeds
     }
 }
 
-void __declspec(naked) HOOK_FallenCars()
+static void __declspec(naked) HOOK_FallenCars()
 {
-    if (pGame && pGame->IsUnderWorldWarpEnabled())
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-        __asm
-        {
-            sub esp, 2Ch
-            push ebx
-            mov ebx, ds:0B74494h
-            jmp CONTINUE_CWorld_FallenCars
-        }
+        call    IsUnderWorldWarpEnabled
+        test    al, al
+        jnz     continueWithOriginalCode
+        ret
+
+        continueWithOriginalCode:
+        sub     esp, 2Ch
+        push    ebx
+        mov     ebx, ds:0B74494h
+        jmp     CONTINUE_CWorld_FallenCars
     }
-    else
-    {
-        __asm
-        {
-            ret
-        }
-    }
+}
+
+void CWorldSA::InstallHooks()
+{
+    HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 10);
+    HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 10);
 }
 
 void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)

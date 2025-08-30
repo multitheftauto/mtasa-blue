@@ -34,25 +34,23 @@ extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
-_declspec(naked) void DoVehicleSunGlare(void* this_)
-{
-    __asm {
-        mov eax, FUNC_CVehicle_DoSunGlare
-        jmp eax
-    }
-}
 
-void __declspec(naked) HOOK_Vehicle_PreRender(void)
+static void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
-    __asm {
-        mov    ecx, m_bVehicleSunGlare
-        cmp    ecx, 0
-        jle    noglare
-        mov    ecx, esi
-        call DoVehicleSunGlare
-    noglare:
-        mov [esp+0D4h], edi
-        push 6ABD04h
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
+        mov     ecx, m_bVehicleSunGlare
+        cmp     ecx, 0
+        jle     noglare
+        mov     ecx, esi
+        mov     eax, FUNC_CVehicle_DoSunGlare
+        jmp     eax
+
+        noglare:
+        mov     [esp+0D4h], edi
+        push    6ABD04h
         retn
     }
 }
@@ -96,22 +94,23 @@ static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;
 static constexpr DWORD RETURN_CHeli_ProcessFlyingCarStuff = 0x6C5404;
 static void __declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
-        mov esi, ecx
-        mov al, [esi+36h]
+        mov     esi, ecx
+        mov     al, [esi+36h]
 
         pushad
-        call CanProcessFlyingCarStuff
-        test al, al
-        jz skip
-
+        call    CanProcessFlyingCarStuff
+        test    al, al
         popad
-        jmp CONTINUE_CHeli_ProcessFlyingCarStuff
+
+        jz      skip
+        jmp     CONTINUE_CHeli_ProcessFlyingCarStuff
 
         skip:
-        popad
-        jmp RETURN_CHeli_ProcessFlyingCarStuff
+        jmp     RETURN_CHeli_ProcessFlyingCarStuff
     }
 }
 
@@ -119,23 +118,24 @@ static constexpr DWORD CONTINUE_CPlane_ProcessFlyingCarStuff = 0x6CB7D7;
 static constexpr DWORD RETURN_CPlane_ProcessFlyingCarStuff = 0x6CC482;
 static void __declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
-        push esi
-        mov esi, ecx
-        fnstsw ax
+        push    esi
+        mov     esi, ecx
+        fnstsw  ax
 
         pushad
-        call CanProcessFlyingCarStuff
-        test al, al
-        jz skip
-
+        call    CanProcessFlyingCarStuff
+        test    al, al
         popad
-        jmp CONTINUE_CPlane_ProcessFlyingCarStuff
+
+        jz      skip
+        jmp     CONTINUE_CPlane_ProcessFlyingCarStuff
 
         skip:
-        popad
-        jmp RETURN_CPlane_ProcessFlyingCarStuff
+        jmp     RETURN_CPlane_ProcessFlyingCarStuff
     }
 }
 

@@ -443,8 +443,10 @@ __declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAI
 #define HOOKPOS_CPlayerPed_ProcessAnimGroups_Mid        0x0609A44
 #define HOOKSIZE_CPlayerPed_ProcessAnimGroups_Mid       6
 DWORD RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
-void __declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
+static void __declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -495,8 +497,10 @@ __declspec(noinline) int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqM
 #define HOOKPOS_CClothes_GetDefaultPlayerMotionGroup        0x05A81B0
 #define HOOKSIZE_CClothes_GetDefaultPlayerMotionGroup       5
 DWORD RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
-void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
+static void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     eax, 0x05A7FB0      // CClothes::GetPlayerMotionGroupToLoad
@@ -505,7 +509,7 @@ void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
         pushad
         push    eax
         call    OnCClothes_GetDefaultPlayerMotionGroup
-        mov     [esp+0],eax         // Put temp
+        mov     [esp+0], eax        // Put temp
         add     esp, 4*1
         popad
 

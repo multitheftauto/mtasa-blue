@@ -166,8 +166,10 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post()
 #define HOOKPOS_FxSystem_c_Update_MidA              0x04AAF70
 #define HOOKSIZE_FxSystem_c_Update_MidA             5
 DWORD RETURN_FxSystem_c_Update_MidA = 0x04AAF75;
-void __declspec(naked) HOOK_FxSystem_c_Update_MidA()
+static void __declspec(naked) HOOK_FxSystem_c_Update_MidA()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -234,8 +236,10 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post()
 #define HOOKPOS_FxSystem_c_Update_MidB             0x04AB21D
 #define HOOKSIZE_FxSystem_c_Update_MidB            7
 DWORD RETURN_FxSystem_c_Update_MidB = 0x04AB224;
-void __declspec(naked) HOOK_FxSystem_c_Update_MidB()
+static void __declspec(naked) HOOK_FxSystem_c_Update_MidB()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad

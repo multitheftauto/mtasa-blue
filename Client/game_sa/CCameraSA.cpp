@@ -487,7 +487,7 @@ void CCameraSA::GetCameraClip(bool& bObjects, bool& bVehicles)
     bVehicles = bCameraClipVehicles;
 }
 
-__declspec(noinline) void _cdecl DoCameraCollisionDetectionPokes()
+static void _cdecl DoCameraCollisionDetectionPokes()
 {
     if (!bCameraClipObjects)
     {
@@ -501,17 +501,20 @@ __declspec(noinline) void _cdecl DoCameraCollisionDetectionPokes()
         MemPutFast<char>(VAR_CameraClipVehicles, 0);
 }
 
-void __declspec(naked) HOOK_Camera_CollisionDetection()
+static void __declspec(naked) HOOK_Camera_CollisionDetection()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
-        call DoCameraCollisionDetectionPokes
+        call    DoCameraCollisionDetectionPokes
         popad
-        sub         esp,24h
-        push        ebx
-        push        ebp
-        jmp         RETURN_Camera_CollisionDetection
+
+        sub     esp, 24h
+        push    ebx
+        push    ebp
+        jmp     RETURN_Camera_CollisionDetection
     }
 }
 
