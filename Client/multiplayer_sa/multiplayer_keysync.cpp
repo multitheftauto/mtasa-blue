@@ -501,8 +501,10 @@ struct CSavedRegs
 };
 static CSavedRegs PlayerPed__ProcessControl_Saved;
 
-VOID __declspec(naked) HOOK_CPlayerPed__ProcessControl()
+static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     // Assumes no reentrancy
     __asm
     {
@@ -539,8 +541,10 @@ VOID __declspec(naked) HOOK_CPlayerPed__ProcessControl()
     }
 }
 
-void __declspec(naked) CPlayerPed__ProcessControl_Abort()
+static void __declspec(naked) CPlayerPed__ProcessControl_Abort()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         // restore stuff
@@ -566,8 +570,10 @@ void __declspec(naked) CPlayerPed__ProcessControl_Abort()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CAutomobile__ProcessControl()
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -595,8 +601,10 @@ VOID __declspec(naked) HOOK_CAutomobile__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
+static void __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -624,8 +632,10 @@ VOID __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CTrailer__ProcessControl()
+static void __declspec(naked) HOOK_CTrailer__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -653,8 +663,10 @@ VOID __declspec(naked) HOOK_CTrailer__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CQuadBike__ProcessControl()
+static void __declspec(naked) HOOK_CQuadBike__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -682,8 +694,10 @@ VOID __declspec(naked) HOOK_CQuadBike__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CPlane__ProcessControl()
+static void __declspec(naked) HOOK_CPlane__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -711,8 +725,10 @@ VOID __declspec(naked) HOOK_CPlane__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CBmx__ProcessControl()
+static void __declspec(naked) HOOK_CBmx__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -740,8 +756,10 @@ VOID __declspec(naked) HOOK_CBmx__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CTrain__ProcessControl()
+static void __declspec(naked) HOOK_CTrain__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -769,8 +787,10 @@ VOID __declspec(naked) HOOK_CTrain__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CBoat__ProcessControl()
+static void __declspec(naked) HOOK_CBoat__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -798,8 +818,10 @@ VOID __declspec(naked) HOOK_CBoat__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CBike__ProcessControl()
+static void __declspec(naked) HOOK_CBike__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx
@@ -827,8 +849,10 @@ VOID __declspec(naked) HOOK_CBike__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID __declspec(naked) HOOK_CHeli__ProcessControl()
+static void __declspec(naked) HOOK_CHeli__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         mov     dwCurrentVehicle, ecx

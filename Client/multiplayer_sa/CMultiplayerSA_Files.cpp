@@ -48,8 +48,10 @@ void OnMY_Rtl_fopen_Post(FILE* fh, DWORD calledFrom, const char* szFilename, con
 #define HOOKPOS_Rtl_fopen                            0x8232D8
 #define HOOKSIZE_Rtl_fopen                           6
 DWORD RETURN_Rtl_fopen = 0x8232DE;
-void __declspec(naked) HOOK_Rtl_fopen()
+static void __declspec(naked) HOOK_Rtl_fopen()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         push    [esp+4*3]
@@ -92,8 +94,10 @@ void OnMY_Rtl_fclose(DWORD calledFrom, FILE* fh)
 #define HOOKPOS_Rtl_fclose                            0x82318B
 #define HOOKSIZE_Rtl_fclose                           6
 DWORD RETURN_Rtl_fclose = 0x823192;
-void __declspec(naked) HOOK_Rtl_fclose()
+static void __declspec(naked) HOOK_Rtl_fclose()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad

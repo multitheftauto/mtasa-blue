@@ -29,8 +29,10 @@ namespace
 #define HOOKSIZE_CVehicle_DoTailLightEffect_Mid         6
 #define HOOKCHECK_CVehicle_DoTailLightEffect_Mid        0x0F
 DWORD RETURN_CVehicle_DoTailLightEffect_Mid = 0x006E18EB;
-void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
+static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         // Save result of comparing camera and corona direction
@@ -57,8 +59,10 @@ behind_corona:
 #define HOOKCHECK_CVehicle_DoTailLightEffect_Mid2       0x8B
 DWORD RETURN_CVehicle_DoTailLightEffect_Mid2 = 0x006E19F0;
 DWORD RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona = 0x006E1A32;
-void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
+static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         movzx   eax, byte ptr [esp+0Fh]

@@ -57,6 +57,8 @@ static void HandleWaterCannonHit(CVehicleSAInterface* pGameVehicle, CColPointSAI
 
 static void __declspec(naked) HOOK_CWaterCannon__Render()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad

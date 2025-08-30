@@ -30,6 +30,7 @@
 // https://developercommunity.visualstudio.com/t/stack-access-broken-in-naked-function/549628
 // 
 // IMPORTANT: We can't use static_assert because __LOCAL_SIZE is not a compile-time constant.
+//            If you're going to change this macro, then copy your changes to the copy in multiplayer_sa.
 #define MTA_VERIFY_HOOK_LOCAL_SIZE                     \
 {                                                      \
     __asm {              push   eax                };  \

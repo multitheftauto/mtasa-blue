@@ -33,8 +33,10 @@ static void __cdecl DoFootLanded(CPedSAInterface* pPedSAInterface, short footId,
 #define HOOKSIZE_CPed_DoFootLanded              6
 static const DWORD CONTINUE_CPed_DoFootLanded = 0x5E5386;
 
-void __declspec(naked) HOOK_CPed_DoFootLanded()
+static void __declspec(naked) HOOK_CPed_DoFootLanded()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad

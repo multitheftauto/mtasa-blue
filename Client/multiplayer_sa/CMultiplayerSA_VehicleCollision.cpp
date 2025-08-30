@@ -62,6 +62,8 @@ static const DWORD CONTINUE_CAutomobile_ProcessControl_VehicleDamage = 0x6B1F41;
 
 static void __declspec(naked) HOOK_CAutomobile_ProcessControl_VehicleDamage()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -95,6 +97,8 @@ static const DWORD CONTINUE_CBike_ProcessControl_VehicleDamage = 0x6B9AAB;
 
 static void __declspec(naked) HOOK_CBike_ProcessControl_VehicleDamage()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -129,6 +133,8 @@ static const DWORD FUNC_CVehicle_ProcessCarAlarm = 0x6D21F0;
 
 static void __declspec(naked) HOOK_CBoat_ProcessControl_VehicleDamage()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -161,6 +167,8 @@ static const DWORD CONTINUE_CTrain_ProcessControl_VehicleDamage = 0x6F86C0;
 
 static void __declspec(naked) HOOK_CTrain_ProcessControl_VehicleDamage()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad

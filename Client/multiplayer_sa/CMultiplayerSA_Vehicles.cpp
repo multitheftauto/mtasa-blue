@@ -37,6 +37,8 @@ static DWORD CONTINUE_CDamageManager__ProgressDoorDamage = 0x6C2327;
 
 static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad

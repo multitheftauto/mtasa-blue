@@ -48,6 +48,8 @@ static const DWORD CONTINUE_CObject_Init = 0x59F8DC;
 
 static void __declspec(naked) HOOK_CObject_Init()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -87,6 +89,8 @@ static const DWORD CONTINUE_CObject_Destructor = 0x59F709;
 
 static void __declspec(naked) HOOK_CObject_Destructor()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad

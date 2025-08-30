@@ -73,8 +73,11 @@ CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(eAnimGroup animGroup
     return &pAnimGroupArray[(int)animGroup];
 }
 
-void __declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
+#define HOOKPOS_CAnimBlendAssociation_SetCurrentTime 0x4CEA80
+static void __declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -98,8 +101,11 @@ void __declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
     }
 }
 
-void __declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
+#define HOOKPOS_RpAnimBlendClumpUpdateAnimations            0x4D34F0
+static void __declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -142,8 +148,11 @@ CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpC
     return pAnimAssociationInterface;
 }
 
-void __declspec(naked) HOOK_CAnimManager_AddAnimation()
+#define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
+static void __declspec(naked) HOOK_CAnimManager_AddAnimation()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         lea     edx, [esp + 8]  // animationGroupID address
@@ -184,8 +193,11 @@ void __declspec(naked) HOOK_CAnimManager_AddAnimation()
     }
 }
 
-void __declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
+#define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
+static void __declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
      __asm
      {
          lea     edx, [esp + 12] // animationGroup address
@@ -226,8 +238,11 @@ void __declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
      }
 }
 
-void __declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
+#define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
+static void __declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
         pushad
@@ -300,4 +315,20 @@ void __declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
         call    FUNC_UncompressAnimation
         jmp    RETURN_CAnimManager_BlendAnimation_Hierarchy
     }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::InitHooks_CustomAnimations
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::InitHooks_CustomAnimations()
+{
+    HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
+    HookInstall(HOOKPOS_RpAnimBlendClumpUpdateAnimations, (DWORD)HOOK_RpAnimBlendClumpUpdateAnimations, 8);
+    HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
+    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
 }

@@ -28,7 +28,10 @@ void OnModelLoaded(uint32_t uiModelID)
 
 static void __declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
 {
-    __asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         push    esi
         call    OnModelLoaded
         pop esi
