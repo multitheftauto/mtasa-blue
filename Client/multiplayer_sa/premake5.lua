@@ -34,7 +34,7 @@ project "Multiplayer SA"
 	}
 
 	postbuildcommands {
-		"%[%{!wks.location}/../utils/hookcheck.exe] %[%{!cfg.buildtarget.abspath}]"
+		"%[%{!wks.location}/../utils/hookcheck.exe] %[$(TargetPath)]"
 	}
 
 	filter "architecture:not x86"
