@@ -681,14 +681,15 @@ namespace Security
             return nullptr;
         }
 
+#if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
         if (!VerifyFileSignature(strDllPath))
         {
             SString strError = "SecureLoadLibrary: Invalid or missing digital signature";
             AddReportLog(SecurityConstants::REPORT_CODE_INVALID_SIGNATURE, strError);
-#ifndef MTA_DEBUG
+
             return nullptr;
-#endif
         }
+#endif
 
         HMODULE hModule = nullptr;
         bool    bHasLock = false;
@@ -826,8 +827,8 @@ int WINAPI WinMain(HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance
         return 1;
     }
 
-// Anti-debugging check (only in release builds)
-#ifndef MTA_DEBUG
+#if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
+    // Anti-debugging check (only in release builds)
     if (Security::IsDebuggerPresent())
     {
         Security::CleanupSecurity();
