@@ -96,7 +96,7 @@
 namespace mtasa
 {
     template <class... _Types>
-    constexpr std::string format(const std::string_view fmt, _Types&&... _Args)
+    inline std::string format(const std::string_view fmt, _Types&&... _Args)
     {
         return std::vformat(fmt, std::make_format_args(_Args...));
     }
