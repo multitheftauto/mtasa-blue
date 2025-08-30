@@ -3872,25 +3872,26 @@ static void SetObjectAlpha()
     }
 }
 
-DWORD dwCObjectRenderRet = 0;
-static void __declspec(naked) HOOK_CObject_PostRender()
+static void CObjectRenderWithTiming(CObjectSAInterface* object)
 {
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    dwAlphaEntity = reinterpret_cast<DWORD>(object);
 
-    __asm
+    SetObjectAlpha();
+    TIMING_CHECKPOINT("+ObjRndr");
     {
-        pushad
+        if (bObjectIsAGangTag)
+        {
+            void(__cdecl * CTagManager__RenderTagForPC)(RpAtomic*) = reinterpret_cast<decltype(CTagManager__RenderTagForPC)>(0x49CE40);
+            CTagManager__RenderTagForPC(reinterpret_cast<RpAtomic*>(object->m_pRwObject));
+        }
+        else
+        {
+            void(__fastcall * CObject__Render)(CObjectSAInterface*) = reinterpret_cast<decltype(CObject__Render)>(0x534310);
+            CObject__Render(object);
+        }
     }
-
     TIMING_CHECKPOINT("-ObjRndr");
     RestoreAlphaValues();
-
-    __asm
-    {
-        popad
-        mov         edx, dwCObjectRenderRet
-        jmp         edx
-    }
 }
 
 // Note: This hook is also called for world objects (light poles, wooden fences, etc).
@@ -3900,47 +3901,10 @@ static void __declspec(naked) HOOK_CObject_Render()
 
     __asm
     {
-        mov         dwAlphaEntity, ecx
-        pushad
-    }
-
-    TIMING_CHECKPOINT("+ObjRndr");
-    SetObjectAlpha();
-
-    __asm
-    {
-        popad
-        mov         edx, [esp]
-        mov         dwCObjectRenderRet, edx
-        mov         edx, HOOK_CObject_PostRender
-        mov         [esp], edx
-        pushad
-    }
-
-    if (bObjectIsAGangTag) goto render_a_tag;
-
-    __asm
-    {
-        popad
-        jmp         FUNC_CEntity_Render
-    }
-
-render_a_tag:
-    __asm
-    {
-        popad
-        // We simulate here the header of the CEntity::Render function
-        // but then go straight to CTagManager::RenderTagForPC.
-        push        ecx
-        push        esi
-        mov         eax, [esi+0x18]
-        test        eax, eax
-        jz          no_clump
-        mov         eax, 0x534331
-        jmp         eax
-    no_clump:
-        mov         eax, 0x5343EB
-        jmp         eax
+        push    ecx
+        call    CObjectRenderWithTiming
+        add     esp, 4
+        retn
     }
 }
 
@@ -4055,23 +4019,25 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         pushad
         mov     al, [esp+0x8C]
         mov     ucChokingWeaponType, al
-    }
 
-    if (m_pChokingHandler && m_pChokingHandler(ucChokingWeaponType) == false) goto dont_choke;
+        mov     ebx, [m_pChokingHandler]
+        test    ebx, ebx
+        jz      continueWithOriginalCode
 
-    __asm
-    {
+        push    eax
+        call    ebx
+        add     esp, 4
+        test    al, al
+        popad
+
+        jnz     continueWithOriginalCode
+        jmp     dwChokingDontchoke
+    
+        continueWithOriginalCode:
         popad
         mov     ecx, [edi]
         mov     eax, [ecx+0x47C]
         jmp     dwChokingChoke
-    }
-
-dont_choke:
-    __asm
-    {
-        popad
-        jmp     dwChokingDontchoke
     }
 }
 
@@ -5135,6 +5101,22 @@ static void __declspec(naked) HOOK_ApplyCarBlowHop()
 
 // ---------------------------------------------------
 
+static void Pre_CGame_Process()
+{
+    TIMING_CHECKPOINT("+CWorld_Process");
+
+    if (m_pPreWorldProcessHandler)
+        m_pPreWorldProcessHandler();
+}
+
+static void Post_CGame_Process()
+{
+    if (m_pPostWorldProcessHandler)
+        m_pPostWorldProcessHandler();
+
+    TIMING_CHECKPOINT("-CWorld_Process");
+}
+
 DWORD CALL_CWorld_Process = 0x5684a0;
 static void __declspec(naked) HOOK_CGame_Process()
 {
@@ -5143,26 +5125,12 @@ static void __declspec(naked) HOOK_CGame_Process()
     __asm
     {
         pushad
-    }
-
-    TIMING_CHECKPOINT("+CWorld_Process");
-    if (m_pPreWorldProcessHandler)
-        m_pPreWorldProcessHandler();
-
-    __asm
-    {
+        call    Pre_CGame_Process
         popad
         call    CALL_CWorld_Process
         mov     ecx, 0B72978h
         pushad
-    }
-
-    if (m_pPostWorldProcessHandler) m_pPostWorldProcessHandler();
-
-    TIMING_CHECKPOINT("-CWorld_Process");
-
-    __asm
-    {
+        call    Post_CGame_Process
         popad
         jmp     RETURN_CGame_Process;
     }
@@ -5181,28 +5149,38 @@ void __cdecl HandleIdle()
     m_pIdleHandler();
 }
 
+static void CGameProcessWithTiming()
+{
+    TIMING_CHECKPOINT("+CGame_Process");
+    {
+        void(__cdecl * CGame__Process)() = reinterpret_cast<decltype(CGame__Process)>(0x53BEE0);
+        CGame__Process();
+    }
+    TIMING_CHECKPOINT("-CGame_Process");
+}
+
+static void IdleWithTiming()
+{
+    TIMING_CHECKPOINT("+Idle");
+    {
+        if (m_pIdleHandler)
+            HandleIdle();
+    }
+    TIMING_CHECKPOINT("-Idle");
+}
+
 DWORD CALL_CGame_Process = 0x53BEE0;
 static void __declspec(naked) HOOK_Idle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-    TIMING_CHECKPOINT("+CGame_Process");
     __asm
     {
-        call    CALL_CGame_Process
         pushad
-    }
-
-    TIMING_CHECKPOINT("-CGame_Process");
-
-    TIMING_CHECKPOINT("+Idle");
-    if (m_pIdleHandler)
-        HandleIdle();
-    TIMING_CHECKPOINT("-Idle");
-
-    __asm
-    {
+        call    CGameProcessWithTiming
+        call    IdleWithTiming
         popad
+
         mov     ecx, 0B6BC90h
         jmp     RETURN_Idle
     }
@@ -6587,20 +6565,8 @@ void                RemovePointerToBuilding()
     }
 }
 
-DWORD dwCWorldRemove = 0x563280;
-// Call to CWorld::Remove in CPopulation::ConvertToDummyObject this is called just before deleting a CObject so we remove the CObject while we are there and
-// remove the new dummy if we need to do so before returning
-static void __declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
+static void RemovePointerToBuildingWithTiming()
 {
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    __asm
-    {
-        pushad
-        mov pBuildingRemove, esi
-        mov pBuildingAdd, edi
-        mov pLODInterface, edi
-    }
     TIMING_CHECKPOINT("+RemovePointerToBuilding");
     RemovePointerToBuilding();
     StorePointerToBuilding();
@@ -6611,12 +6577,28 @@ static void __declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObjec
         RemoveObjectIfNeeded();
 
     TIMING_CHECKPOINT("-RemovePointerToBuilding");
+}
+
+DWORD dwCWorldRemove = 0x563280;
+// Call to CWorld::Remove in CPopulation::ConvertToDummyObject this is called just before deleting a CObject so we remove the CObject while we are there and
+// remove the new dummy if we need to do so before returning
+static void __declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
+        pushad
+        mov     pBuildingRemove, esi
+        mov     pBuildingAdd, edi
+        mov     pLODInterface, edi
+        call    RemovePointerToBuildingWithTiming
         popad
-        jmp dwCWorldRemove
+
+        jmp     dwCWorldRemove
     }
 }
+
 // if it's replaced get rid of it
 void RemoveDummyIfReplaced()
 {
@@ -6631,6 +6613,15 @@ void RemoveDummyIfReplaced()
     }
 }
 
+static bool CheckForRemovalWithTiming()
+{
+    TIMING_CHECKPOINT("+CheckForRemoval");
+    StorePointerToBuilding();
+    bool result = CheckForRemoval();
+    TIMING_CHECKPOINT("-CheckForRemoval");
+    return result;
+}
+
 // Function that handles dummy -> object so we can cancel this process if need be
 static void __declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
 {
@@ -6639,31 +6630,19 @@ static void __declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
     __asm
     {
         pushad
-        mov pLODInterface, edi
-        mov pBuildingAdd, edi
-    }
+        mov     pLODInterface, edi
+        mov     pBuildingAdd, edi
 
-    TIMING_CHECKPOINT("+CheckForRemoval");
-    StorePointerToBuilding();
-    if (CheckForRemoval())
-    {
-        TIMING_CHECKPOINT("-CheckForRemoval");
-        __asm
-        {
-            popad
-            jmp JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject
-        }
-    }
-    else
-    {
-        TIMING_CHECKPOINT("-CheckForRemoval");
-        __asm
-        {
-            popad
-            push edi
-            call CALL_CWorld_Add_CPopulation_ConvertToDummyObject
-            jmp JMP_RETN_Called_CPopulation_ConvertToDummyObject
-        }
+        call    CheckForRemovalWithTiming
+        test    al, al
+        popad
+        jz      continueWithOriginalCode
+        jmp     JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject
+
+        continueWithOriginalCode:
+        push    edi
+        call    CALL_CWorld_Add_CPopulation_ConvertToDummyObject
+        jmp     JMP_RETN_Called_CPopulation_ConvertToDummyObject
     }
 }
 
