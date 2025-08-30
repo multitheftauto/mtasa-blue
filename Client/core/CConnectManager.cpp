@@ -150,11 +150,14 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     OpenServerFirewall(m_Address, CServerBrowser::GetSingletonPtr()->FindServerHttpPort(m_strHost, m_usPort), true);
 
     // Display the status box
-    SString strBuffer(_("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort);
+    std::string formatConnecting;
     if (m_bReconnect)
-        strBuffer = SString(_("Reconnecting to %s:%u ..."), m_strHost.c_str(), m_usPort);
-    CCore::GetSingleton().ShowMessageBox(_("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick);
-    WriteDebugEvent(SString("Connecting to %s:%u ...", m_strHost.c_str(), m_usPort));
+        formatConnecting = mtasa::format(_("Reconnecting to {}:{} ..."), m_strHost, m_usPort);
+    else
+        formatConnecting = mtasa::format(_("Connecting to {}:{} ..."), m_strHost, m_usPort);
+
+    CCore::GetSingleton().ShowMessageBox(_("CONNECTING"), formatConnecting.c_str(), MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick);
+    WriteDebugEvent(std::format("Connecting to {}:{} ...", m_strHost, m_usPort));
 
     return true;
 }

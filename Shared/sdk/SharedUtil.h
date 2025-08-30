@@ -85,3 +85,21 @@
 #define strnicmp strncasecmp
 #endif
 #endif
+
+// Ensure that the C++ version is at least C++20
+#if __cplusplus >= 202002L
+
+/*
+ The function prevents a compilation error caused by using non-constant format strings and
+ correctly forwards the arguments to std::format for formatting
+*/
+namespace mtasa
+{
+    template <class... _Types>
+    __forceinline std::string format(const std::string_view fmt, _Types&&... _Args)
+    {
+        return std::vformat(fmt, std::make_format_args(_Args...));
+    }
+}
+
+#endif
