@@ -358,7 +358,7 @@ namespace Security
     }
 
     // Clean path helper
-    [[nodiscard]] std::wstring CleanPathSegments(const std::wstring& path) noexcept
+    [[nodiscard]] std::wstring CleanPathSegments(const std::wstring& path)
     {
         std::wstring cleanPath;
         cleanPath.reserve(path.length());
@@ -395,7 +395,7 @@ namespace Security
     }
 
     // Validate environment variables for security
-    bool ValidateEnvironment() noexcept
+    bool ValidateEnvironment()
     {
         // Check for dangerous environment variables
         constexpr const wchar_t* dangerousVars[] = {L"LD_PRELOAD", L"LD_LIBRARY_PATH", L"_NT_SYMBOL_PATH", L"_NT_ALT_SYMBOL_PATH",
@@ -450,7 +450,7 @@ namespace Security
     }
 
     // Verify digital signature of a file
-    [[nodiscard]] bool VerifyFileSignature(const SString& strFilePath) noexcept
+    [[nodiscard]] bool VerifyFileSignature(const SString& strFilePath)
     {
         const std::wstring wstrFilePath = FromUTF8(strFilePath);
 
@@ -509,7 +509,7 @@ namespace Security
     }
 
     // Enhanced path validation with canonicalization
-    [[nodiscard]] bool IsValidPath(const SString& strPath) noexcept
+    [[nodiscard]] bool IsValidPath(const SString& strPath)
     {
         if (strPath.empty() || strPath.length() > SecurityConstants::MAX_PATH_LENGTH)
             return false;
@@ -658,14 +658,14 @@ namespace Security
     }
 
     // Secure DLL loading with file locking
-    [[nodiscard]] HMODULE SecureLoadLibraryWithLockImpl(const SString& strDllPath, DWORD dwFlags) noexcept
+    [[nodiscard]] HMODULE SecureLoadLibraryWithLockImpl(const SString& strDllPath, DWORD dwFlags)
     {
         // Convert to wide string and call the SEH-safe helper
         std::wstring widePath = FromUTF8(strDllPath);
         return LoadLibraryWithLock(widePath.c_str(), dwFlags);
     }
 
-    [[nodiscard]] HMODULE SecureLoadLibrary(const SString& strDllPath, const SString& strDllName) noexcept
+    [[nodiscard]] HMODULE SecureLoadLibrary(const SString& strDllPath, const SString& strDllName)
     {
         if (!IsValidPath(strDllPath) || !IsValidDllName(strDllName))
         {
