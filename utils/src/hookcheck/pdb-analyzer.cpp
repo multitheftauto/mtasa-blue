@@ -243,6 +243,7 @@ void PdbAnalyzer::AnalyzeFunction(IDiaSymbol* functionSymbol)
     newFunction.VirtualAddress = virtualAddress;
     newFunction.IsStatic = isStatic;
     newFunction.HasInlineAssembly = hasInlineAssembly;
+    SysFreeString(name);
 
     AttachLocation(functionSymbol, newFunction);
     NormalizePath(newFunction.SourceFile);
