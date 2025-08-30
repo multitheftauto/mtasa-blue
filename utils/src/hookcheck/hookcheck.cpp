@@ -159,7 +159,7 @@ int wmain(int argc, wchar_t* argv[])
             using enum PdbAnalyzer::LoadError;
 
             case DiaSdkNotFound:
-                message = L"Failed to create DIA data source. Is DIA SDK installed?";
+                message = L"Failed to create DIA data source";
                 break;
             case PdbNotLoadable:
                 message = L"Failed to load the PDB file";

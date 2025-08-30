@@ -42,6 +42,9 @@ project "hookcheck"
     if errc ~= 0 then error("DIA SDK not found") end
     print("[+] Using ".. diaSdkRoot)
 
+    includedirs { path.join(diaSdkRoot, "include") }
+    libdirs { path.join(diaSdkRoot, "lib", "amd64") }
+
     -- Copy all *.dll files in <VS>/DIA SDK/bin/amd64 to the build directory
     runtimeDlls = os.matchfiles(path.join(diaSdkRoot, "bin", "amd64", "*.dll"))
     for i = 1, #runtimeDlls do
@@ -51,5 +54,10 @@ project "hookcheck"
         postbuildcommands(runtimeDlls)
     end
 
-    includedirs { path.join(diaSdkRoot, "include") }
-    libdirs { path.join(diaSdkRoot, "lib", "amd64") }
+    -- Make the source code independent of the version inside the DLL name
+    msdiaDll = os.matchfiles(path.join(diaSdkRoot, "bin", "amd64", "msdia*.dll"))
+    msdiaDll = msdiaDll[1]
+    if not msdiaDll then error("msdia*.dll not found") end
+    msdiaDll = path.getname(msdiaDll)
+    defines { "MSDIA_DLL=" .. ("%q"):format(msdiaDll) }
+    print("[+] Using ".. msdiaDll)

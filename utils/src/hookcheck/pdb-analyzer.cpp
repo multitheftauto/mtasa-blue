@@ -20,6 +20,7 @@
 #include <array>
 
 #include <dia2.h>
+#include <diacreate.h>
 
 #pragma comment(lib, "diaguids.lib")
 
@@ -151,7 +152,7 @@ auto PdbAnalyzer::LoadPdb(const std::wstring& pdb) -> std::pair<LoadError, HRESU
 {
     using enum LoadError;
 
-    HRESULT hr = CoCreateInstance(CLSID_DiaSource, nullptr, CLSCTX_INPROC_SERVER, IID_IDiaDataSource, (void**)&m_dataSource);
+    HRESULT hr = NoRegCoCreate(L"" MSDIA_DLL, CLSID_DiaSource, IID_IDiaDataSource, (void**)&m_dataSource);
 
     if (FAILED(hr))
         return std::make_pair(DiaSdkNotFound, hr);

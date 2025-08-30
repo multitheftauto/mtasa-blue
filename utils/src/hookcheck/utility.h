@@ -19,32 +19,34 @@ using HRESULT = long;
 
 void Trim(std::wstring& input);
 
-template <typename...Args>
+template <typename... Args>
 void PrintLn(const std::wformat_string<Args...> fmt, Args&&... args)
 {
     std::wcout << std::format(fmt, std::forward<Args>(args)...) << std::endl;
 }
 
-template <typename...Args>
+template <typename... Args>
 void PrintWarningLn(const std::wformat_string<Args...> fmt, Args&&... args)
 {
     std::wcerr << L"Warning: " << std::format(fmt, std::forward<Args>(args)...) << std::endl;
 }
 
-template <typename...Args>
+template <typename... Args>
 void PrintErrorLn(const std::wformat_string<Args...> fmt, Args&&... args)
 {
     std::wcerr << L"Error: " << std::format(fmt, std::forward<Args>(args)...) << std::endl;
 }
 
-template <typename...Args>
+template <typename... Args>
 void PrintWarningLn(const HRESULT hr, const std::wformat_string<Args...> fmt, Args&&... args)
 {
-    std::wcerr << std::format(L"Warning (0x{:08x}): ", hr) << std::format(fmt, std::forward<Args>(args)...) << std::endl;
+    std::wcerr << std::format(L"Warning (0x{:08x}): ", static_cast<unsigned long>(hr))
+               << std::format(fmt, std::forward<Args>(args)...) << std::endl;
 }
 
-template <typename...Args>
+template <typename... Args>
 void PrintErrorLn(const HRESULT hr, const std::wformat_string<Args...> fmt, Args&&... args)
 {
-    std::wcerr << std::format(L"Error (0x{:08x}): ", hr) << std::format(fmt, std::forward<Args>(args)...) << std::endl;
+    std::wcerr << std::format(L"Error (0x{:08x}): ", static_cast<unsigned long>(hr))
+               << std::format(fmt, std::forward<Args>(args)...) << std::endl;
 }
