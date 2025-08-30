@@ -56,6 +56,7 @@ public:
     void                Init_13();
     void                InitHooks_13();
     void                InitMemoryCopies_13();
+    void                InitHooks_CustomAnimations();
     void                InitHooks_ClothesSpeedUp();
     void                InitHooks_FixBadAnimId();
     void                InitHooks_HookDestructors();

@@ -1,0 +1,24 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        utils/src/hookcheck/utility.cpp
+ *  PURPOSE:     Implementation for utility functions, for example for formatted output.
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#include "utility.h"
+
+void Trim(std::wstring& input)
+{
+    if (input.empty())
+        return;
+
+    if (size_t position = input.find_first_not_of(L" \r\n\t\0"); position != std::string_view::npos && position > 0)
+        input = input.substr(position);
+
+    if (size_t position = input.find_last_not_of(L" \r\n\t\0"); position != std::string_view::npos)
+        input = input.substr(0, position + 1);
+}
