@@ -245,8 +245,15 @@ void PdbAnalyzer::AnalyzeFunction(IDiaSymbol* functionSymbol)
     newFunction.HasInlineAssembly = hasInlineAssembly;
 
     AttachLocation(functionSymbol, newFunction);
+    NormalizePath(newFunction.SourceFile);
+
+    if (newFunction.SourceFile.empty())
+    {
+        m_functions.pop_back();
+        return;
+    }
+
     AttachLabels(functionSymbol, newFunction);
-    SysFreeString(name);
 }
 
 void PdbAnalyzer::AttachLocation(IDiaSymbol* functionSymbol, Function& attachTo)

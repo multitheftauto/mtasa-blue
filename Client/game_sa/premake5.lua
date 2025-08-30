@@ -43,7 +43,7 @@ project "Game SA"
 	}
 
 	postbuildcommands {
-		"%[%{!wks.location}/../utils/hookcheck.exe] %[$(TargetPath)]"
+		"%[%{!wks.location}/../utils/hookcheck.exe] -dll:%[$(TargetPath)] -ignore:\\vendor\\"
 	}
 
 	filter "architecture:not x86"

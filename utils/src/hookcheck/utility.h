@@ -19,6 +19,8 @@ using HRESULT = long;
 
 void Trim(std::wstring& input);
 
+void NormalizePath(std::wstring& input);
+
 template <typename... Args>
 void PrintLn(const std::wformat_string<Args...> fmt, Args&&... args)
 {
