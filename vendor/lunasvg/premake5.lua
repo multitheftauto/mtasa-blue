@@ -1,6 +1,5 @@
 project "lunasvg"
 	language "C++"
-	cppdialect "C++17"
 	kind "StaticLib"
 	targetname "lunasvg"
 	targetdir(buildpath("mta"))
