@@ -21,7 +21,7 @@ exit /b 1
 :SetupEnv
 echo Found Visual Studio environment setup batch file:
 echo ^>^> %VSDEVCMD%
-call "%VSDEVCMD%" -arch=arm64 -host_arch=amd64 >NUL
+call "%VSDEVCMD%" -arch=amd64 -host_arch=amd64 >NUL
 
 where MSBuild.exe >NUL 2>&1
 if %ERRORLEVEL% == 0 goto :Build
