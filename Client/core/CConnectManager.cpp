@@ -152,9 +152,9 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     // Display the status box
     std::string message;
     if (m_bReconnect)
-        message = mtasa::format(_("Reconnecting to {}:{} ..."), m_strHost, m_usPort);
+        message = mtasa::format(_("Reconnecting to {0}:{1} ..."), m_strHost, m_usPort);
     else
-        message = mtasa::format(_("Connecting to {}:{} ..."), m_strHost, m_usPort);
+        message = mtasa::format(_("Connecting to {0}:{1} ..."), m_strHost, m_usPort);
 
     CCore::GetSingleton().ShowMessageBox(_("CONNECTING"), message.c_str(), MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick);
     WriteDebugEvent(std::format("Connecting to {}:{} ...", m_strHost, m_usPort));
