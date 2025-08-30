@@ -885,7 +885,7 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
         }
         case eHudComponentProperty::BLINKING_HP_VALUE:
         {
-            if (!component != HUD_HEALTH)
+            if (component != HUD_HEALTH)
                 return false;
 
             hud->SetHealthBarBlinkingValue(10.0f);
