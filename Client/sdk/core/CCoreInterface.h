@@ -100,7 +100,7 @@ public:
     virtual void EnableChatInput(char* szCommand, DWORD dwColor) = 0;
     virtual bool IsChatInputEnabled() = 0;
     virtual bool IsSettingsVisible() = 0;
-    virtual bool IsMenuVisible() = 0;
+    virtual bool IsMenuVisible() const noexcept = 0;
     virtual bool IsCursorForcedVisible() = 0;
     virtual bool IsCursorControlsToggled() = 0;
     virtual void CallSetCursorPos(int X, int Y) = 0;
