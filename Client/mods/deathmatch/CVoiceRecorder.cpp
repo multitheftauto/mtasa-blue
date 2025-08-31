@@ -101,7 +101,7 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     if (iBitRate)
         speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_BITRATE, &iBitRate);
 
-    m_pOutgoingBuffer = (char*)malloc(m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT);
+    m_pOutgoingBuffer = (unsigned char*)malloc(m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT);
     m_uiOutgoingReadIndex = 0;
     m_uiOutgoingWriteIndex = 0;
 
@@ -247,9 +247,9 @@ void CVoiceRecorder::DoPulse()
 {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    char*        pInputBuffer;
-    char         bufTempOutput[2048];
-    unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
+    unsigned char* pInputBuffer;
+    unsigned char  audioBuffer[2048]{};
+    unsigned int   uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
 
     // Only send every 100 ms
     if (CClientTime::GetTime() - m_ulTimeOfLastSend > 100 && m_VoiceState != VOICESTATE_AWAITING_INPUT)
@@ -280,8 +280,8 @@ void CVoiceRecorder::DoPulse()
                 {
                     unsigned t;
                     for (t = 0; t < uiSpeexBlockSize; t++)
-                        bufTempOutput[t] = m_pOutgoingBuffer[t % uiTotalBufferSize];
-                    pInputBuffer = bufTempOutput;
+                        audioBuffer[t] = m_pOutgoingBuffer[t % uiTotalBufferSize];
+                    pInputBuffer = audioBuffer;
                 }
                 else
                     pInputBuffer = m_pOutgoingBuffer + m_uiOutgoingReadIndex;
@@ -296,9 +296,9 @@ void CVoiceRecorder::DoPulse()
 
                 m_bIsSendingVoiceData = true;
 
-                unsigned int uiBytesWritten = speex_bits_write(&speexBits, bufTempOutput, 2048);
+                unsigned int audioBufferLength = speex_bits_write(&speexBits, reinterpret_cast<char*>(audioBuffer), 2048);
 
-                g_pClientGame->GetLocalPlayer()->GetVoice()->DecodeAndBuffer(bufTempOutput, uiBytesWritten);
+                g_pClientGame->GetLocalPlayer()->GetVoice()->DecodeAndBuffer(audioBuffer, audioBufferLength);
 
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
                 if (pBitStream)
@@ -307,8 +307,8 @@ void CVoiceRecorder::DoPulse()
 
                     if (pLocalPlayer)
                     {
-                        pBitStream->Write((unsigned short)uiBytesWritten);                  // size of buffer / voice data
-                        pBitStream->Write((char*)bufTempOutput, uiBytesWritten);            // voice data
+                        pBitStream->Write((unsigned short)audioBufferLength);
+                        pBitStream->Write(reinterpret_cast<char*>(audioBuffer), audioBufferLength);
 
                         g_pNet->SendPacket(PACKET_ID_VOICE_DATA, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED,
                                            PACKET_ORDERING_VOICE);
