@@ -5403,24 +5403,26 @@ void CPacketHandler::Packet_DestroySatchels(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
 {
-    unsigned short usPacketSize;
+    unsigned short voiceBufferLength;
     ElementID      PlayerID;
+
     if (bitStream.Read(PlayerID))
     {
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get(PlayerID);
-        if (pPlayer && bitStream.Read(usPacketSize))
-        {
-            char* pBuf = new char[usPacketSize];
 
-            if (bitStream.Read(pBuf, usPacketSize))
+        if (pPlayer && bitStream.Read(voiceBufferLength) && voiceBufferLength <= 2048)
+        {
+            const auto voiceBuffer = new unsigned char[voiceBufferLength];
+
+            if (bitStream.Read(reinterpret_cast<char*>(voiceBuffer), voiceBufferLength))
             {
                 if (pPlayer->GetVoice())
                 {
-                    pPlayer->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize);
+                    pPlayer->GetVoice()->DecodeAndBuffer(voiceBuffer, voiceBufferLength);
                 }
             }
 
-            delete[] pBuf;
+            delete[] voiceBuffer;
         }
     }
 }

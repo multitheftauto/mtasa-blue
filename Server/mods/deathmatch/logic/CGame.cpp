@@ -3859,9 +3859,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
 
     if (m_pMainConfig->IsVoiceEnabled())            // Shouldn't really be receiving voice packets at all if voice is disabled
     {
-        usDataLength = Packet.GetDataLength();
-
-        if (usDataLength > 0)
+        if (!Packet.IsEmpty())
         {
             CPlayer* pPlayer = Packet.GetSourcePlayer();
 
@@ -3890,9 +3888,6 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                 if (pPlayer->GetVoiceState() ==
                     VOICESTATE_TRANSMITTING)            // If we reach here, and we're still in idle state, then the event was cancelled
                 {
-                    const unsigned char* pBuffer = Packet.GetData();
-                    CVoiceDataPacket     VoicePacket(pPlayer, pBuffer, usDataLength);
-
                     // Make list of players to send the voice packet to
                     std::set<CPlayer*> playerSendMap;
 
@@ -3935,7 +3930,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                     }
 
                     // Send to all players in the send list
-                    CPlayerManager::Broadcast(VoicePacket, playerSendMap);
+                    CPlayerManager::Broadcast(Packet, playerSendMap);
                 }
             }
         }
