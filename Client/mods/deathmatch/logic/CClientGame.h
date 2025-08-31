@@ -471,6 +471,8 @@ public:
 
     void OnWindowFocusChange(bool state);
 
+    void OnChatboxLayoutChange();
+
 private:
     // CGUI Callbacks
     bool OnKeyDown(CGUIKeyEventArgs Args);
