@@ -292,13 +292,13 @@ int CLuaPedDefs::GetPedWeaponSlot(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::ReloadPedWeapon(lua_State* vm, CPed* const ped) noexcept
+bool CLuaPedDefs::ReloadPedWeapon(lua_State* vm, CPed* const ped)
 {
     LogWarningIfPlayerHasNotJoinedYet(vm, ped);
     return CStaticFunctionDefinitions::ReloadPedWeapon(ped);
 }
 
-bool CLuaPedDefs::IsPedReloadingWeapon(CPed* const ped) noexcept
+bool CLuaPedDefs::IsPedReloadingWeapon(CPed* const ped)
 {
     return ped->IsReloadingWeapon();
 }

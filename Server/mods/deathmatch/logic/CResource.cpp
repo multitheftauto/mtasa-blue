@@ -362,6 +362,23 @@ void CResource::Reload()
     Load();
 }
 
+bool CResource::CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter)
+{
+    if (playerStartCounter != m_startCounter || m_eState != EResourceState::Running)
+        return false;
+
+    if (m_isRunningForPlayer.contains(player))
+        return false;
+
+    m_isRunningForPlayer.insert(player);
+    return true;
+}
+
+void CResource::OnPlayerQuit(CPlayer& Player)
+{
+    m_isRunningForPlayer.erase(&Player);
+}
+
 CResource::~CResource()
 {
     CIdArray::PushUniqueId(this, EIdClass::RESOURCE, m_uiScriptID);
@@ -517,7 +534,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
         }
 
         pResourceFile->SetLastChecksum(std::get<CChecksum>(checksumOrError));
-        pResourceFile->SetLastFileSizeHint(FileSize(strPath));
+        pResourceFile->SetLastFileSizeHint(static_cast<uint>(FileSize(strPath)));
 
         // Check if file is blocked
         char szHashResult[33];
@@ -1017,6 +1034,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
         return false;
     }
 
+    m_startCounter = std::max<unsigned int>(m_startCounter + 1, 1); // We consider zero to be an invalid start counter.
     m_bStartedManually = bManualStart;
 
     // Remember the client files state
@@ -1028,7 +1046,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
     // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
     g_pGame->GetMapManager()->BroadcastResourceElements(m_pResourceElement, m_pDefaultElementGroup);
-    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStartPacket(m_strResourceName.c_str(), this));
+    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStartPacket(m_strResourceName, this, m_startCounter));
     SendNoClientCacheScripts();
     m_bClientSync = true;
 
@@ -1173,6 +1191,9 @@ bool CResource::Stop(bool bManualStop)
 
     // Broadcast the packet to joined players
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
+
+    // Clear the list of players where this resource is running
+    std::exchange(m_isRunningForPlayer, {});
 
     OnResourceStateChange("loaded");
     m_eState = EResourceState::Loaded;
@@ -2541,7 +2562,7 @@ HttpStatusCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpRespons
 std::string Unescape(std::string_view sv)
 {
     // Converts a character to a hexadecimal value
-    auto toHex = [](char c) {
+    auto toHex = [](char c) -> unsigned char {
         if (c >= '0' && c <= '9')
             return c - '0';
         if (c >= 'a' && c <= 'f')
@@ -2870,7 +2891,7 @@ static HttpStatusCode ParseLuaHttpRouterResponse(CLuaArguments& luaResponse, Htt
         {
             if (std::string_view body; argValue->TryGetString(body))
             {
-                if (body.size() <= std::numeric_limits<int>::max())
+                if (body.size() <= (size_t)std::numeric_limits<int>::max())
                 {
                     hasBody = true;
                     httpResponse.SetBody(body.data(), body.size());
@@ -3312,8 +3333,7 @@ bool CResource::CheckState()
 
 void CResource::OnPlayerJoin(CPlayer& Player)
 {
-    // do the player join crap
-    Player.Send(CResourceStartPacket(m_strResourceName.c_str(), this));
+    Player.Send(CResourceStartPacket(m_strResourceName.c_str(), this, m_startCounter));
     SendNoClientCacheScripts(&Player);
 }
 

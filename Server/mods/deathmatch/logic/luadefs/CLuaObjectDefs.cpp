@@ -319,17 +319,17 @@ bool CLuaObjectDefs::BreakObject(CObject* const pObject)
     return CStaticFunctionDefinitions::BreakObject(pObject);
 }
 
-bool CLuaObjectDefs::RespawnObject(CObject* const pObject) noexcept
+bool CLuaObjectDefs::RespawnObject(CObject* const pObject)
 {
     return CStaticFunctionDefinitions::RespawnObject(pObject);
 }
 
-bool CLuaObjectDefs::ToggleObjectRespawn(CObject* const pObject, const bool bRespawn) noexcept
+bool CLuaObjectDefs::ToggleObjectRespawn(CObject* const pObject, const bool bRespawn)
 {
     return CStaticFunctionDefinitions::ToggleObjectRespawn(pObject, bRespawn);
 }
 
-bool CLuaObjectDefs::IsObjectRespawnable(CObject* const pObject) noexcept
+bool CLuaObjectDefs::IsObjectRespawnable(CObject* const pObject)
 {
     return pObject->IsRespawnEnabled();
 }

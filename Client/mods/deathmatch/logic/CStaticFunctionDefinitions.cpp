@@ -263,7 +263,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char
     if (!szText || szText[0] == '\0')
         return false;
     
-    SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : szText;
+    SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : SStringX(szText);
     
     if (textToProcess.length() > MAX_OUTPUTCHATBOX_LENGTH) {
         return false;
@@ -1747,7 +1747,7 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept
+bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& ped, const std::string& control, bool& state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return GetControlState(control.c_str(), state);
@@ -2402,13 +2402,12 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& ped, const std::string& control, const bool state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return SetControlState(control.c_str(), state);
 
-    if (ped.m_Pad.SetControlState(control.c_str(), state))
-        return true;
+    return ped.m_Pad.SetControlState(control.c_str(), state);
 }
 
 bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby)
@@ -2961,7 +2960,7 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CClientVehicle& Vehicl
 
 bool CStaticFunctionDefinitions::GetVehicleCurrentGear(CClientVehicle& Vehicle, unsigned short& currentGear)
 {
-    currentGear = Vehicle.GetCurrentGear();
+    currentGear = static_cast<unsigned short>(Vehicle.GetCurrentGear());
     return true;
 }
 
@@ -4833,7 +4832,8 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
     assert(szType);
 
     // Grab the type id
-    unsigned char ucType = CClientMarker::StringToType(szType);
+    auto ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
+
     if (ucType != CClientMarker::MARKER_INVALID)
     {
         // Create the marker
@@ -4878,7 +4878,7 @@ bool CStaticFunctionDefinitions::SetMarkerType(CClientEntity& Entity, const char
     RUN_CHILDREN(SetMarkerType(**iter, szType))
 
     // Grab the new type ID
-    unsigned char ucType = CClientMarker::StringToType(szType);
+    const auto ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
     if (ucType != CClientMarker::MARKER_INVALID)
     {
         // Is this a marker?
@@ -5007,7 +5007,16 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& 
 {
     m_pCamera->GetPosition(vecPosition);
     m_pCamera->GetFixedTarget(vecLookAt, &fRoll);
-    fFOV = m_pCamera->GetFOV();
+    
+    fFOV = m_pCamera->GetAccurateFOV();
+    
+    if (!m_pCamera->IsInFixedMode() && fRoll == 0.0f)
+    {
+        CVector rotation;
+        m_pCamera->GetRotationDegrees(rotation);
+        fRoll = rotation.fZ;
+    }
+    
     return true;
 }
 
@@ -6403,7 +6412,8 @@ void CStaticFunctionDefinitions::GUILabelSetColor(CClientEntity& Entity, int iR,
         if (IS_CGUIELEMENT_LABEL(&GUIElement))
         {
             // Set the label color
-            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetTextColor(iR, iG, iB);
+            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetTextColor(static_cast<unsigned char>(iR), static_cast<unsigned char>(iG),
+                                                                               static_cast<unsigned char>(iB));
         }
     }
 }

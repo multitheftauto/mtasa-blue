@@ -1,7 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CBulletsyncPacket.cpp
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
@@ -12,10 +13,174 @@
 #include "net/SyncStructures.h"
 #include "CPlayer.h"
 #include "CWeaponStatManager.h"
+#include "CElementIDs.h"
+#include "CElement.h"
 
-CBulletsyncPacket::CBulletsyncPacket(CPlayer* player) : m_weapon(WEAPONTYPE_UNARMED), m_order(0), m_damage(0.0f), m_zone(0), m_damaged(INVALID_ELEMENT_ID)
+CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
+    : m_weapon(WEAPONTYPE_UNARMED)
+    , m_start()
+    , m_end()
+    , m_order(0)
+    , m_damage(0.0f)
+    , m_zone(0)
+    , m_damaged(INVALID_ELEMENT_ID)
 {
     m_pSourceElement = player;
+}
+
+bool CBulletsyncPacket::IsValidVector(const CVector& vec) noexcept
+{
+    if (!vec.IsValid())
+        return false;
+        
+    if (IsNaN(vec.fX))
+        return false;
+        
+    if (IsNaN(vec.fY))
+        return false;
+        
+    if (IsNaN(vec.fZ))
+        return false;
+        
+    return true;
+}
+
+bool CBulletsyncPacket::ValidateVectorBounds(const CVector& vec) const noexcept
+{
+    if (vec.fX < -MAX_WORLD_COORD || vec.fX > MAX_WORLD_COORD)
+        return false;
+    if (vec.fY < -MAX_WORLD_COORD || vec.fY > MAX_WORLD_COORD)
+        return false;
+    if (vec.fZ < -MAX_WORLD_COORD || vec.fZ > MAX_WORLD_COORD)
+        return false;
+    return true;
+}
+
+bool CBulletsyncPacket::IsValidWeaponId(unsigned char weaponId) noexcept
+{
+    return CWeaponStatManager::HasWeaponBulletSync(static_cast<uint32_t>(weaponId));
+}
+
+bool CBulletsyncPacket::ValidateTrajectory() const noexcept
+{
+    const float dx = m_end.fX - m_start.fX;
+    const float dy = m_end.fY - m_start.fY;
+    const float dz = m_end.fZ - m_start.fZ;
+    
+    const float movementSq = (dx * dx) + (dy * dy) + (dz * dz);
+    
+    if (IsNaN(movementSq))
+        return false;
+        
+    if (movementSq < MIN_DISTANCE_SQ)
+        return false;
+        
+    if (movementSq > MAX_DISTANCE_SQ)
+        return false;
+        
+    return true;
+}
+
+void CBulletsyncPacket::ResetDamageData() noexcept
+{
+    m_damage = 0.0f;
+    m_zone = 0;
+    m_damaged = INVALID_ELEMENT_ID;
+}
+
+bool CBulletsyncPacket::ReadWeaponAndPositions(NetBitStreamInterface& stream)
+{
+    unsigned char type = 0;
+    if (!stream.Read(type))
+        return false;
+
+    if (!IsValidWeaponId(type))
+        return false;
+
+    m_weapon = static_cast<eWeaponType>(type);
+
+    if (!stream.Read(reinterpret_cast<char*>(&m_start), sizeof(CVector)))
+        return false;
+        
+    if (!stream.Read(reinterpret_cast<char*>(&m_end), sizeof(CVector)))
+        return false;
+    
+    if (!IsValidVector(m_start))
+        return false;
+        
+    if (!IsValidVector(m_end))
+        return false;
+    
+    if (!ValidateVectorBounds(m_start))
+        return false;
+        
+    if (!ValidateVectorBounds(m_end))
+        return false;
+        
+    if (!ValidateTrajectory())
+        return false;
+        
+    return true;
+}
+
+bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
+{
+    if (!stream.ReadBit())
+    {
+        ResetDamageData();
+        return true;
+    }
+
+    stream.Read(m_damage);
+    stream.Read(m_zone);
+    stream.Read(m_damaged);
+
+    if (IsNaN(m_damage))
+    {
+        ResetDamageData();
+        return false;
+    }
+    
+    if (m_damage < 0.0f || m_damage > MAX_DAMAGE)
+    {
+        ResetDamageData();
+        return false;
+    }
+    
+    if (m_zone > MAX_BODY_ZONE)
+    {
+        ResetDamageData();
+        return false;
+    }
+    
+    if (m_damaged == 0)
+    {
+        ResetDamageData();
+        return false;
+    }
+    
+    // Validate that target element exists
+    if (m_damaged != INVALID_ELEMENT_ID)
+    {
+        CElement* pElement = CElementIDs::GetElement(m_damaged);
+        if (!pElement)
+        {
+            ResetDamageData();
+            return false;
+        }
+        
+        // Check element type is valid for damage
+        auto elementType = pElement->GetType();
+        if (elementType != CElement::PLAYER && 
+            elementType != CElement::PED && 
+            elementType != CElement::VEHICLE)
+        {
+            ResetDamageData();
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
@@ -23,28 +188,51 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
     if (!m_pSourceElement)
         return false;
 
-    char type = 0;
-    if (!stream.Read(type) || !CWeaponStatManager::HasWeaponBulletSync(type))
+    CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
+    if (pPlayer)
+    {
+        // Check if player is spawned and alive
+        if (!pPlayer->IsSpawned() || pPlayer->IsDead())
+            return false;
+            
+        // Check player position is reasonable relative to bullet start
+        const CVector& playerPos = pPlayer->GetPosition();
+        const float maxShootDistance = 50.0f; // Max distance from player to bullet start
+        
+        // This check will be done after we read positions
+    }
+        
+    if (!ReadWeaponAndPositions(stream))
         return false;
-
-    m_weapon = static_cast<eWeaponType>(type);
-
-    if (!stream.Read(reinterpret_cast<char*>(&m_start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&m_end), sizeof(CVector)))
-        return false;
-
-    if (!m_start.IsValid() || !m_end.IsValid())
-        return false;
-
+    
+    // Now validate player position relative to shot origin
+    if (pPlayer)
+    {
+        const CVector& playerPos = pPlayer->GetPosition();
+        float dx = m_start.fX - playerPos.fX;
+        float dy = m_start.fY - playerPos.fY;
+        float dz = m_start.fZ - playerPos.fZ;
+        float distSq = dx*dx + dy*dy + dz*dz;
+        
+        const float maxShootDistanceSq = 50.0f * 50.0f;
+        if (distSq > maxShootDistanceSq)
+            return false;
+            
+        // Check if player has this weapon
+        if (!pPlayer->HasWeaponType(static_cast<unsigned char>(m_weapon)))
+            return false;
+            
+        // Check if weapon has ammo
+        if (pPlayer->GetWeaponAmmoInClip(static_cast<unsigned char>(m_weapon)) == 0)
+            return false;
+    }
+        
     if (!stream.Read(m_order))
         return false;
-
-    if (stream.ReadBit())
-    {
-        stream.Read(m_damage);
-        stream.Read(m_zone);
-        stream.Read(m_damaged);
-    }
-
+        
+    if (!ReadOptionalDamage(stream))
+        return false;
+        
     return true;
 }
 
@@ -53,25 +241,51 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
     if (!m_pSourceElement)
         return false;
 
-    auto* player = static_cast<CPlayer*>(m_pSourceElement);
-    auto  id = player->GetID();
+    const auto* pPlayer = static_cast<const CPlayer*>(m_pSourceElement);
+    if (!pPlayer)
+        return false;
+        
+    const ElementID id = pPlayer->GetID();
+    
+    if (id == INVALID_ELEMENT_ID)
+        return false;
+        
+    if (id == 0)
+        return false;
+
+    if (!IsValidVector(m_start))
+        return false;
+        
+    if (!IsValidVector(m_end))
+        return false;
+        
+    if (!ValidateVectorBounds(m_start))
+        return false;
+        
+    if (!ValidateVectorBounds(m_end))
+        return false;
+        
+    if (!ValidateTrajectory())
+        return false;
+
+    const unsigned char weaponType = static_cast<unsigned char>(m_weapon);
+    if (!IsValidWeaponId(weaponType))
+        return false;
 
     stream.Write(id);
-    stream.Write(static_cast<char>(m_weapon));
+    stream.Write(weaponType);
     stream.Write(reinterpret_cast<const char*>(&m_start), sizeof(CVector));
     stream.Write(reinterpret_cast<const char*>(&m_end), sizeof(CVector));
     stream.Write(m_order);
 
-    if (m_damage > 0.0f && m_damaged != INVALID_ELEMENT_ID)
+    const bool hasDamage = (m_damage > EPSILON) && (m_damaged != INVALID_ELEMENT_ID);
+    stream.WriteBit(hasDamage);
+    
+    if (hasDamage)
     {
-        stream.WriteBit(true);
         stream.Write(m_damage);
         stream.Write(m_zone);
         stream.Write(m_damaged);
-    }
-    else
-    {
-        stream.WriteBit(false);
     }
 
     return true;

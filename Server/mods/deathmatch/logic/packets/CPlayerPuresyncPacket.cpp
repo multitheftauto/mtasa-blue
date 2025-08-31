@@ -93,7 +93,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
 
             if (radius > -1 && 
-                (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), radius) ||
+                (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), static_cast<float>(radius)) ||
                     pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
             {
                 pContactElement = nullptr;
@@ -230,11 +230,11 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             SWeaponSlotSync slot;
             if (!BitStream.Read(&slot))
                 return false;
-            unsigned int uiSlot = slot.data.uiSlot;
+            auto ucSlot = static_cast<unsigned char>(slot.data.uiSlot);
 
             // Set weapon slot
             if (bWeaponCorrect)
-                pSourcePlayer->SetWeaponSlot(uiSlot);
+                pSourcePlayer->SetWeaponSlot(ucSlot);
             else
             {
                 // remove invalid weapon data to prevent this from being relayed to other players
@@ -242,14 +242,14 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 slot.data.uiSlot = 0;
             }
 
-            if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
+            if (CWeaponNames::DoesSlotHaveAmmo(ucSlot))
             {
                 // Read out the ammo states
                 SWeaponAmmoSync ammo(ucUseWeaponType, true, true);
                 if (!BitStream.Read(&ammo))
                     return false;
 
-                float fWeaponRange = pSourcePlayer->GetWeaponRangeFromSlot(uiSlot);
+                float fWeaponRange = pSourcePlayer->GetWeaponRangeFromSlot(ucSlot);
 
                 // Read out the aim data
                 SWeaponAimSync sync(fWeaponRange, (ControllerState.RightShoulder1 || ControllerState.ButtonCircle));
@@ -304,7 +304,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             if (!BitStream.Read(&bodyPart))
                 return false;
 
-            pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart);
+            pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
         }
 
         // If we know the player's dead, make sure the health we send on is 0
@@ -352,7 +352,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
 
         ElementID               PlayerID = pSourcePlayer->GetID();
-        unsigned short          usLatency = pSourcePlayer->GetPing();
+        auto                    usLatency = static_cast<unsigned short>(pSourcePlayer->GetPing());
         const CControllerState& ControllerState = pSourcePlayer->GetPad()->GetCurrentControllerState();
         CElement*               pContactElement = pSourcePlayer->GetContactElement();
 

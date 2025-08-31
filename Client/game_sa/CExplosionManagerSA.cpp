@@ -40,7 +40,7 @@ CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity
     CExplosion* explosion = CExplosionManagerSA::FindFreeExplosion();
     bool        bReturn;
     DWORD       dwFunc = FUNC_CExplosion_AddExplosion;
-    _asm
+    __asm
     {
         push    bNoDamage
         push    fCamShake

@@ -1196,7 +1196,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     // Replace any path in the error message with our own one
     SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
     strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
-    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, strStatus);
+    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : strFile, strStatus);
     m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     lua_pushboolean(luaVM, false);
     return 1;

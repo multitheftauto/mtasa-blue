@@ -21,7 +21,7 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTar
     DWORD dwFunc = FUNC_CTaskSimpleClimb__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bForceClimb
@@ -47,7 +47,7 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     DWORD dwFunc = FUNC_CTaskSimpleJetPack__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    0               // pTargetEnt - ignored for simplicity's sake (we really don't need it)

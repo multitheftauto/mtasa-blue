@@ -20,18 +20,22 @@ public:
     {
         pBitStream = g_pNetServer->AllocateNetServerBitStream(0, pData, uiDataSize, bCopyData);
     }
-    ~CBitStream() { g_pNetServer->DeallocateNetServerBitStream((NetBitStreamInterface*)pBitStream); };
-    NetBitStreamInterfaceNoVersion* operator->() { return pBitStream; }
 
-    NetBitStreamInterfaceNoVersion* pBitStream;
+    ~CBitStream() { g_pNetServer->DeallocateNetServerBitStream((NetBitStreamInterface*)pBitStream); };
+
+    NetBitStreamInterface* operator->() { return pBitStream; }
+
+    NetBitStreamInterface* pBitStream;
 };
 
 // Use this if Version() is required - Make sure the player is the once receiving/sending the data
 class CPlayerBitStream
 {
 public:
-    CPlayerBitStream(class CPlayer* pPlayer);            //  { pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() ); };
+    CPlayerBitStream(class CPlayer* pPlayer);
+
     ~CPlayerBitStream() { g_pNetServer->DeallocateNetServerBitStream((NetBitStreamInterface*)pBitStream); };
+
     NetBitStreamInterface* operator->() { return pBitStream; }
 
     NetBitStreamInterface* pBitStream;

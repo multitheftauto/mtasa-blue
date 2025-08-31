@@ -6,7 +6,6 @@ project "Client Core"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
-		linkoptions { "/SAFESEH:NO" }
 		buildoptions { "-Zm130" }
 
 	filter {}

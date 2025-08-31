@@ -1508,7 +1508,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     else
     {
         // Passenger seat
-        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
+        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, static_cast<unsigned char>(uiSeat));
         if (ucSeat != 0 && ucSeat != 0xFF)
         {
             if (m_pPlayerPed)
@@ -4538,7 +4538,7 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
             }
         }
 
-        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
+        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, static_cast<unsigned char>(uiSeat));
         if (ucSeat != 0 && ucSeat != 0xFF)
         {
             if (m_pPlayerPed)
@@ -6532,13 +6532,6 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
-    {
-        return false;
-    }
-
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
     {
@@ -6682,11 +6675,11 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 
         // Set the vehicle id we're about to enter
         m_VehicleInOutID = pVehicle->GetID();
-        m_ucVehicleInOutSeat = uiSeat;
+        m_ucVehicleInOutSeat = static_cast<unsigned char>(uiSeat);
         m_bIsJackingVehicle = false;
 
         // Make ped enter vehicle
-        GetIntoVehicle(pVehicle, uiSeat, uiDoor);
+        GetIntoVehicle(pVehicle, uiSeat, static_cast<unsigned char>(uiDoor));
 
         // Remember that this ped is working on entering a vehicle
         SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
@@ -6750,13 +6743,6 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
-    {
-        return false;
-    }
-
     // Get our occupied vehicle
     CClientVehicle* pOccupiedVehicle = GetOccupiedVehicle();
     if (!pOccupiedVehicle)
@@ -6791,14 +6777,15 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    std::int8_t targetDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+    const int rawDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+    auto      targetDoor = static_cast<std::int8_t>(rawDoor);
 
     // If it's a local entity, we can just exit the vehicle
     if (IsLocalEntity())
     {
         // Set the vehicle id and the seat we're about to exit from
         m_VehicleInOutID = pOccupiedVehicle->GetID();
-        m_ucVehicleInOutSeat = GetOccupiedVehicleSeat();
+        m_ucVehicleInOutSeat = static_cast<unsigned char>(GetOccupiedVehicleSeat());
 
         // Call the onClientVehicleStartExit event for the ped
         // Check if it is cancelled before making the ped exit the vehicle

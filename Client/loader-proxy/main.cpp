@@ -103,7 +103,7 @@ BOOL OnLibraryAttach()
     ApplyDpiAwareness();
 
     // Replace the first called imported procedure from the executable.
-    FARPROC procedure = SetImportProcAddress("kernel32.dll", "GetVersionExA", reinterpret_cast<FARPROC>(MyGetVersionExA));
+    FARPROC procedure = SetImportProcAddress("kernel32.dll", "GetVersionExA", reinterpret_cast<FARPROC>(static_cast<void*>(MyGetVersionExA)));
 
     if (!procedure)
     {
@@ -111,7 +111,7 @@ BOOL OnLibraryAttach()
         return FALSE;
     }
 
-    Win32GetVersionExA = reinterpret_cast<decltype(Win32GetVersionExA)>(procedure);
+    Win32GetVersionExA = reinterpret_cast<decltype(Win32GetVersionExA)>(static_cast<void*>(procedure));
     return TRUE;
 }
 
@@ -252,14 +252,16 @@ VOID OnGameLaunch()
 
     ApplyDirectoryInformation(g_netc, mtaRootDirectory.wstring(), gtaDirectory.wstring());
 
-    void (*InitNetRev)(const char*, const char*, const char*) = reinterpret_cast<decltype(InitNetRev)>(GetProcAddress(g_netc, "InitNetRev"));
+    void (*InitNetRev)(const char*, const char*, const char*) = nullptr;
+    InitNetRev = reinterpret_cast<decltype(InitNetRev)>(static_cast<void*>(GetProcAddress(g_netc, "InitNetRev")));
 
     if (InitNetRev)
     {
         InitNetRev(GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion());
     }
 
-    bool (*CheckService)(unsigned int) = reinterpret_cast<decltype(CheckService)>(GetProcAddress(g_netc, "CheckService"));
+    bool (*CheckService)(unsigned int) = nullptr;
+    CheckService = reinterpret_cast<decltype(CheckService)>(static_cast<void*>(GetProcAddress(g_netc, "CheckService")));
 
     if (!CheckService)
     {
@@ -300,7 +302,8 @@ VOID OnGameLaunch()
     ApplyDirectoryInformation(g_core, mtaRootDirectory.wstring(), gtaDirectory.wstring());
 
     // Initialize and run the core.
-    int (*InitializeCore)() = reinterpret_cast<decltype(InitializeCore)>(GetProcAddress(g_core, "InitializeCore"));
+    int (*InitializeCore)() = nullptr;
+    InitializeCore = reinterpret_cast<decltype(InitializeCore)>(static_cast<void*>(GetProcAddress(g_core, "InitializeCore")));
 
     if (!InitializeCore)
     {
@@ -327,7 +330,7 @@ BOOL WINAPI MyGetVersionExA(LPOSVERSIONINFOA versionInfo)
     BOOL result = Win32GetVersionExA(versionInfo);
 
     // Restore the function pointer we've overriden to get here.
-    SetImportProcAddress("kernel32.dll", "GetVersionExA", reinterpret_cast<FARPROC>(Win32GetVersionExA));
+    SetImportProcAddress("kernel32.dll", "GetVersionExA", reinterpret_cast<FARPROC>(static_cast<void*>(Win32GetVersionExA)));
 
     // Run our startup code.
     OnGameLaunch();
@@ -598,9 +601,12 @@ auto GetSystemErrorMessage(DWORD errorCode) -> std::wstring
 void ApplyDpiAwareness()
 {
     // Minimum version: Windows 10, version 1607
-    static BOOL(WINAPI * Win32SetProcessDpiAwarenessContext)(DPI_AWARENESS_CONTEXT value) = ([] {
+    static BOOL(WINAPI * Win32SetProcessDpiAwarenessContext)(DPI_AWARENESS_CONTEXT value) = ([]() -> decltype(Win32SetProcessDpiAwarenessContext) {
         HMODULE user32 = LoadLibraryW(L"user32");
-        return user32 ? reinterpret_cast<decltype(Win32SetProcessDpiAwarenessContext)>(GetProcAddress(user32, "SetProcessDpiAwarenessContext")) : nullptr;
+        if (!user32)
+            return nullptr;
+        auto function = static_cast<void*>(GetProcAddress(user32, "SetProcessDpiAwarenessContext"));
+        return reinterpret_cast<decltype(Win32SetProcessDpiAwarenessContext)>(function);
     })();
 
     if (Win32SetProcessDpiAwarenessContext)
@@ -610,9 +616,12 @@ void ApplyDpiAwareness()
     }
 
     // Minimum version: Windows 8.1
-    static HRESULT(WINAPI * Win32SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS value) = ([] {
+    static HRESULT(WINAPI * Win32SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS value) = ([]() -> decltype(Win32SetProcessDpiAwareness) {
         HMODULE shcore = LoadLibraryW(L"shcore");
-        return shcore ? reinterpret_cast<decltype(Win32SetProcessDpiAwareness)>(GetProcAddress(shcore, "SetProcessDpiAwareness")) : nullptr;
+        if (!shcore)
+            return nullptr;
+        auto function = static_cast<void*>(GetProcAddress(shcore, "SetProcessDpiAwareness"));
+        return reinterpret_cast<decltype(Win32SetProcessDpiAwareness)>(function);
     })();
 
     if (Win32SetProcessDpiAwareness)
@@ -634,7 +643,8 @@ void ApplyDpiAwareness()
 void ApplyDirectoryInformation(HMODULE library, const std::wstring& mtaDirectory, const std::wstring& gtaDirectory)
 {
     // Set the path to the Multi Theft Auto directory.
-    void (*SetMTADirectory)(const wchar_t*, size_t) = reinterpret_cast<decltype(SetMTADirectory)>(GetProcAddress(library, "SetMTADirectory"));
+    void (*SetMTADirectory)(const wchar_t*, size_t) = nullptr;
+    SetMTADirectory = reinterpret_cast<decltype(SetMTADirectory)>(static_cast<void*>(GetProcAddress(library, "SetMTADirectory")));
 
     if (SetMTADirectory)
     {
@@ -642,7 +652,8 @@ void ApplyDirectoryInformation(HMODULE library, const std::wstring& mtaDirectory
     }
 
     // Set the path to the GTA: San Andreas directory.
-    void (*SetGTADirectory)(const wchar_t*, size_t) = reinterpret_cast<decltype(SetGTADirectory)>(GetProcAddress(library, "SetGTADirectory"));
+    void (*SetGTADirectory)(const wchar_t*, size_t) = nullptr;
+    SetGTADirectory = reinterpret_cast<decltype(SetGTADirectory)>(static_cast<void*>(GetProcAddress(library, "SetGTADirectory")));
 
     if (SetGTADirectory)
     {

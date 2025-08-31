@@ -339,7 +339,7 @@ void Splash::UpdateLoadingBar()
     const long long numUpdates = elapsed / UPDATE_RATE_IN_MS;
     m_barLastUpdate += std::chrono::milliseconds(numUpdates * UPDATE_RATE_IN_MS);
 
-    m_barX += PIXELS_PER_UPDATE * numUpdates;
+    m_barX += PIXELS_PER_UPDATE * static_cast<int>(numUpdates);
 
     if (m_barX >= m_width)
         m_barX = 0;

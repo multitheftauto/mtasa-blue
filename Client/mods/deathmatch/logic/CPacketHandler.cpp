@@ -1229,7 +1229,7 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
                 pKillerPed->StealthKill(pPed);
             }
             // Kill our ped in the correct way
-            pPed->Kill((eWeaponType)weapon.data.ucWeaponType, bodyPart.data.uiBodypart, bStealth, false, animGroup, animID);
+            pPed->Kill((eWeaponType)weapon.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart), bStealth, false, animGroup, animID);
 
             // Local player triggers himself when sending the death packet to the server, this one will be delayed by network delay so disable it unless it's
             // sent by the server. if we were not already dead on the network trigger it anyway because this is also called by KillPed server side and that will
@@ -1638,22 +1638,22 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
         {
             bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
 
-            for (unsigned int i = 0; i < MAX_DOORS; ++i)
+            for (unsigned char i = 0; i < MAX_DOORS; ++i)
             {
                 if (damage.data.bDoorStatesChanged[i])
                     pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
             }
-            for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+            for (unsigned char i = 0; i < MAX_WHEELS; ++i)
             {
                 if (damage.data.bWheelStatesChanged[i])
                     pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
             }
-            for (unsigned int i = 0; i < MAX_PANELS; ++i)
+            for (unsigned char i = 0; i < MAX_PANELS; ++i)
             {
                 if (damage.data.bPanelStatesChanged[i])
                     pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i], flyingComponents);
             }
-            for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+            for (unsigned char i = 0; i < MAX_LIGHTS; ++i)
             {
                 if (damage.data.bLightStatesChanged[i])
                     pVehicle->SetLightStatus(i, damage.data.ucLightStates[i]);
@@ -1709,9 +1709,9 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
 #ifdef MTA_DEBUG
                 if (pPed->IsLocalPlayer() || pPed->IsSyncing())
                 {
-                    char* actions[] = {"request_in_confirmed", "notify_in_return",        "notify_in_abort_return", "request_out_confirmed",
-                                       "notify_out_return",    "notify_out_abort_return", "notify_fell_off_return", "request_jack_confirmed",
-                                       "notify_jack_return",   "attempt_failed"};
+                    const char* actions[] = {"request_in_confirmed", "notify_in_return",        "notify_in_abort_return", "request_out_confirmed",
+                                             "notify_out_return",    "notify_out_abort_return", "notify_fell_off_return", "request_jack_confirmed",
+                                             "notify_jack_return",   "attempt_failed"};
                     g_pCore->GetConsole()->Printf("* Packet_InOut: %s", actions[ucAction]);
                 }
 #endif
@@ -3351,13 +3351,13 @@ retry:
 
                     bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
                     // Setup our damage model
-                    for (int i = 0; i < MAX_DOORS; i++)
+                    for (unsigned char i = 0; i < MAX_DOORS; i++)
                         pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
-                    for (int i = 0; i < MAX_WHEELS; i++)
+                    for (unsigned char i = 0; i < MAX_WHEELS; i++)
                         pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
-                    for (int i = 0; i < MAX_PANELS; i++)
+                    for (unsigned char i = 0; i < MAX_PANELS; i++)
                         pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i], flyingComponents);
-                    for (int i = 0; i < MAX_LIGHTS; i++)
+                    for (unsigned char i = 0; i < MAX_LIGHTS; i++)
                         pVehicle->SetLightStatus(i, damage.data.ucLightStates[i]);
                     pVehicle->ResetDamageModelSync();
 
@@ -3551,7 +3551,7 @@ retry:
                         bitStream.Read(ucSirenType);
 
                         pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
-                        for (int i = 0; i < ucSirenCount; i++)
+                        for (unsigned char i = 0; i < ucSirenCount; i++)
                         {
                             SVehicleSirenSync sirenData;
                             bitStream.Read(&sirenData);
@@ -3559,7 +3559,7 @@ retry:
                             pVehicle->SetVehicleSirenColour(i, sirenData.data.m_colSirenColour);
                             pVehicle->SetVehicleSirenMinimumAlpha(i, sirenData.data.m_dwSirenMinAlpha);
                             pVehicle->SetVehicleFlags(sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck,
-                                                        sirenData.data.m_bEnableSilent);
+                                                      sirenData.data.m_bEnableSilent);
                         }
                     }
                     // If the vehicle has sirens, set the siren state
@@ -5023,8 +5023,9 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         uiTotalSizeProcessed = 0;
 
     /*
-     * unsigned char (1)   - resource name size
+     * unsigned char (1)    - resource name size
      * unsigned char (x)    - resource name
+     * unsigned int  (4)    - start counter
      * unsigned short (2)   - resource id
      * unsigned short (2)   - resource entity id
      * unsigned short (2)   - resource dynamic entity id
@@ -5079,6 +5080,10 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         return;
     }
 
+    // Start counter
+    unsigned int startCounter{};
+    bitStream.Read(startCounter);
+
     // Resource ID
     unsigned short usResourceID;
     bitStream.Read(usResourceID);
@@ -5122,6 +5127,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     {
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
+        pResource->SetStartCounter(startCounter);
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
@@ -5403,24 +5409,26 @@ void CPacketHandler::Packet_DestroySatchels(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
 {
-    unsigned short usPacketSize;
+    unsigned short voiceBufferLength;
     ElementID      PlayerID;
+
     if (bitStream.Read(PlayerID))
     {
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get(PlayerID);
-        if (pPlayer && bitStream.Read(usPacketSize))
-        {
-            char* pBuf = new char[usPacketSize];
 
-            if (bitStream.Read(pBuf, usPacketSize))
+        if (pPlayer && bitStream.Read(voiceBufferLength) && voiceBufferLength <= 2048)
+        {
+            const auto voiceBuffer = new unsigned char[voiceBufferLength];
+
+            if (bitStream.Read(reinterpret_cast<char*>(voiceBuffer), voiceBufferLength))
             {
                 if (pPlayer->GetVoice())
                 {
-                    pPlayer->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize);
+                    pPlayer->GetVoice()->DecodeAndBuffer(voiceBuffer, voiceBufferLength);
                 }
             }
 
-            delete[] pBuf;
+            delete[] voiceBuffer;
         }
     }
 }

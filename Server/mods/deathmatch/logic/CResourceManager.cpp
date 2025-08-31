@@ -543,6 +543,14 @@ void CResourceManager::OnPlayerJoin(CPlayer& Player)
     }
 }
 
+void CResourceManager::OnPlayerQuit(CPlayer& Player)
+{
+    for (CResource* resource : CResource::m_StartedResources)
+    {
+        resource->OnPlayerQuit(Player);
+    }
+}
+
 //
 // Add resource <-> luaVM lookup mapping
 //
@@ -840,11 +848,11 @@ void CResourceManager::ProcessQueue()
         }
         else if (sItem.eQueue == QUEUE_REFRESH)
         {
-            Refresh(false, sItem.pResource ? sItem.pResource->GetName() : "");
+            Refresh(false, sItem.pResource ? sItem.pResource->GetName() : SStringX(""));
         }
         else if (sItem.eQueue == QUEUE_REFRESHALL)
         {
-            Refresh(true, sItem.pResource ? sItem.pResource->GetName() : "");
+            Refresh(true, sItem.pResource ? sItem.pResource->GetName() : SStringX(""));
         }
     }
 }

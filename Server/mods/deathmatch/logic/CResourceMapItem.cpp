@@ -45,7 +45,7 @@ CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName
     m_pWaterManager = g_pGame->GetWaterManager();
     m_pEvents = g_pGame->GetEvents();
     m_pElementGroup = nullptr;
-    m_iDimension = iDimension;
+    m_dimension = static_cast<unsigned short>(iDimension);
     m_type = RESOURCE_FILE_TYPE_MAP;
     m_pMapElement = nullptr;
 }
@@ -208,7 +208,7 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
     pNode->SetTypeName(strTagName);
 
     if (!pNode->GetDimension())
-        pNode->SetDimension(m_iDimension);
+        pNode->SetDimension(m_dimension);
 
     if (m_pElementGroup)
         m_pElementGroup->Add(pNode);
