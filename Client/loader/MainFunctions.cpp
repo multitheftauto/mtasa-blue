@@ -32,10 +32,6 @@ namespace
         if (path.find('\0') != SString::npos)
             return false;
         
-        if (path.Contains(":") && !path.BeginsWith("C:\\") && !path.BeginsWith("D:\\") && 
-            !path.BeginsWith("E:\\") && !path.BeginsWith("F:\\") && !path.BeginsWith("G:\\"))
-            return false;
-        
         // Check for special characters
         if (path.Contains("\\\\?\\") || path.Contains("\\\\.\\")||            // Device namespace paths
             path.Contains("%") || path.Contains("$"))
@@ -1458,36 +1454,24 @@ int LaunchGame(SString strCmdLine)
 
         // Wait for game to exit
         WriteDebugEvent("Loader - Wait for game to exit");
-        DWORD totalWaitTime = 0;
-
-        while (status == WAIT_TIMEOUT && totalWaitTime < 3600000)            // 1 hour max wait
+        while (status == WAIT_TIMEOUT)
         {
             status = WaitForSingleObject(piLoadee.hProcess, 1500);
-            totalWaitTime += 1500;
 
-            // Detect if stuck on quit
+            // If core is closing and gta_sa.exe process memory usage is not changing, terminate
             CStuckProcessDetector detector(piLoadee.hProcess, 5000);
             while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("Q0"))            // Gets closed when quit is detected as frozen
             {
                 if (detector.UpdateIsStuck())
                 {
                     WriteDebugEvent("Detected stuck process at quit");
-                    #ifndef MTA_DEBUG
-                        TerminateProcess(piLoadee.hProcess, 1);
-                        status = WAIT_FAILED;
-                        break;
-                    #endif
-                }
-                status = WaitForSingleObject(piLoadee.hProcess, 1000);            // 1 second timeout
-                totalWaitTime += 1000;
-
-                if (totalWaitTime >= 3600000)            // 1 hour max wait
-                {
-                    WriteDebugEvent("Maximum wait time exceeded");
+                #ifndef MTA_DEBUG
                     TerminateProcess(piLoadee.hProcess, 1);
                     status = WAIT_FAILED;
                     break;
+                #endif
                 }
+                status = WaitForSingleObject(piLoadee.hProcess, 1000);
             }
         }
 
