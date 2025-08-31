@@ -13,6 +13,9 @@
 
 #define PI_2 6.283185307179586476925286766559f
 
+// Camera FOV constants
+constexpr const std::uintptr_t VAR_CurrentCameraFOV = 0x8D5038; // CCamera::CurrentFOV
+
 CClientCamera::CClientCamera(CClientManager* pManager) : ClassInit(this), CClientEntity(INVALID_ELEMENT_ID)
 {
     CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientCamera"), &m_pFocusedPlayer, &m_pFocusedEntity, NULL);
@@ -27,7 +30,7 @@ CClientCamera::CClientCamera(CClientManager* pManager) : ClassInit(this), CClien
     m_bInvalidated = false;
     m_bFixed = false;
     m_fRoll = 0.0f;
-    m_fFOV = 70.0f;
+    m_fFOV = DEFAULT_FOV;
     SetTypeName("camera");
 
     m_pCamera = g_pGame->GetCamera();
@@ -359,7 +362,7 @@ void CClientCamera::SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoot
     }
 
     m_fRoll = 0.0f;
-    m_fFOV = 70.0f;
+    m_fFOV = DEFAULT_FOV;
 }
 
 void CClientCamera::SetFocus(CClientPlayer* pPlayer, eCamMode eMode, bool bSmoothTransition)
@@ -387,7 +390,7 @@ void CClientCamera::SetFocus(CClientPlayer* pPlayer, eCamMode eMode, bool bSmoot
     // Store the player we focused
     m_pFocusedPlayer = pPlayer;
     m_fRoll = 0.0f;
-    m_fFOV = 70.0f;
+    m_fFOV = DEFAULT_FOV;
     m_bFixed = false;
 }
 
@@ -427,7 +430,7 @@ void CClientCamera::Reset()
     m_pFocusedGameEntity = NULL;
     m_bFixed = false;
     m_fRoll = 0.0f;
-    m_fFOV = 70.0f;
+    m_fFOV = DEFAULT_FOV;
 }
 
 void CClientCamera::SetFocusToLocalPlayerImpl()
@@ -542,7 +545,7 @@ void CClientCamera::ToggleCameraFixedMode(bool bEnabled)
         SetFocusToLocalPlayer();
 
         m_fRoll = 0.0f;
-        m_fFOV = 70.0f;
+        m_fFOV = DEFAULT_FOV;
     }
 }
 
@@ -606,6 +609,9 @@ bool CClientCamera::ProcessFixedCamera(CCam* pCam)
 //
 CMatrix CClientCamera::GetGtaMatrix() const
 {
+    if (IsInCameraTransition())
+        return GetInterpolatedCameraMatrix();
+
     CCam* pCam = m_pCamera->GetCam(m_pCamera->GetActiveCam());
 
     CMatrix matResult;
@@ -643,4 +649,29 @@ void CClientCamera::ShakeCamera(float radius, float x, float y, float z) noexcep
 void CClientCamera::ResetShakeCamera() noexcept
 {
     m_pCamera->ResetShakeCamera();
+}
+
+bool CClientCamera::IsInCameraTransition() const
+{
+    return m_pCamera ? m_pCamera->IsInTransition() : false;
+}
+
+CMatrix CClientCamera::GetInterpolatedCameraMatrix() const
+{
+    CMatrix matrix;
+    if (m_pCamera && m_pCamera->GetTransitionMatrix(matrix))
+        return matrix;
+    
+    return CMatrix();
+}
+
+float CClientCamera::GetAccurateFOV() const
+{
+    if (!m_pCamera)
+        return DEFAULT_FOV;
+    
+    if (IsInCameraTransition())
+        return m_pCamera->GetTransitionFOV();
+    
+    return *(float*)VAR_CurrentCameraFOV;
 }
