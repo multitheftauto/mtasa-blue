@@ -565,7 +565,53 @@ void CCameraSA::ResetShakeCamera() noexcept
     GetInterface()->m_fCamShakeForce = 0.0f;
 }
 
-std::uint8_t CCameraSA::GetTransitionState()
+std::uint8_t CCameraSA::GetTransitionState() const
 {
     return GetInterface()->m_uiTransitionState;
+}
+
+bool CCameraSA::IsInTransition() const
+{
+    return GetTransitionState() != 0;
+}
+
+float CCameraSA::GetTransitionFOV() const
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    return cameraInterface ? cameraInterface->FOVDuringInter : DEFAULT_FOV;
+}
+
+bool CCameraSA::GetTransitionMatrix(CMatrix& matrix) const
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface || !IsInTransition())
+        return false;
+    
+    CVector source = cameraInterface->SourceDuringInter;
+    CVector target = cameraInterface->TargetDuringInter;
+    CVector up = cameraInterface->UpDuringInter;
+    
+    CVector forward = target - source;
+    if (forward.Length() < FLOAT_EPSILON)
+        forward = CVector(0.0f, 1.0f, 0.0f);
+    else
+        forward.Normalize();
+    
+    CVector right = CVector(forward.fY, -forward.fX, 0.0f);
+    if (right.Length() < FLOAT_EPSILON)
+        right = CVector(1.0f, 0.0f, 0.0f);
+    else
+        right.Normalize();
+    
+    CVector correctedUp = right;
+    correctedUp.CrossProduct(&forward);
+    correctedUp.Normalize();
+    
+    matrix.vPos = source;
+    matrix.vFront = forward;
+    matrix.vRight = -right;
+    matrix.vUp = correctedUp;
+    matrix.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
+    
+    return true;
 }
