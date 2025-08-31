@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <array>
 #include <format>
+#include <vector>
+#include <optional>
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -36,34 +38,78 @@ int wmain(int argc, wchar_t* argv[])
 {
     SetConsoleOutputCP(CP_UTF8);
 
-    if (argc < 2)
+    struct Arguments
     {
-        PrintLn(L"Usage: " TOOL_NAME L" <dll_path> [<label:" DEFAULT_LABEL L">]");
+        std::optional<std::wstring> dll;
+        std::optional<std::wstring> label;
+        std::vector<std::wstring>   ignore;
+    } arguments;
+
+    for (int i = 1; i < argc; ++i)
+    {
+        std::wstring_view arg = argv[i];
+
+        if (arg.length() < 2 || !arg.starts_with(L'-'))
+            continue;
+
+        std::wstring key;
+        std::wstring value;
+
+        if (const size_t pos = arg.find_first_of(L':', 1); pos != std::wstring_view::npos && pos > 1)
+        {
+            key = arg.substr(1, pos - 1);
+            value = arg.substr(pos + 1);
+        }
+        else
+        {
+            key = arg.substr(1);
+        }
+
+        Trim(key);
+        Trim(value);
+
+        if (key.empty())
+            continue;
+
+        if (!_wcsnicmp(key.c_str(), L"dll", key.size()))
+        {
+            if (!value.empty() && !arguments.dll.has_value())
+                arguments.dll = value;
+
+            continue;
+        }
+
+        if (!_wcsnicmp(key.c_str(), L"label", key.size()))
+        {
+            if (!value.empty() && !arguments.label.has_value())
+                arguments.label = value;
+
+            continue;
+        }
+
+        if (!_wcsnicmp(key.c_str(), L"ignore", key.size()))
+        {
+            if (!value.empty())
+                arguments.ignore.emplace_back(value);
+
+            continue;
+        }
+    }
+
+    if (!arguments.dll.has_value())
+    {
+        PrintLn(L"Usage: " TOOL_NAME L" -dll:<path> [-label:" DEFAULT_LABEL L"] [-ignore:<path>]");
         return 1;
     }
 
-    const fs::path dllFilePath = fs::absolute(argv[1]);
-    std::wstring   labelName = (argc >= 3) ? argv[2] : (L"" DEFAULT_LABEL);
+    const fs::path dllFilePath = fs::absolute(arguments.dll.value());
+    std::wstring   labelName = arguments.label.value_or(L"" DEFAULT_LABEL);
 
     if (!fs::exists(dllFilePath) || !fs::is_regular_file(dllFilePath))
     {
-        PrintErrorLn(L"{} is not a regular file", dllFilePath.wstring());
+        PrintErrorLn(L"DLL file '{}' does not exist or is not readable", dllFilePath.wstring());
         return 1;
     }
-
-    Trim(labelName);
-
-    if (labelName.empty())
-    {
-        PrintWarningLn(L"'label' program argument is empty, using " DEFAULT_LABEL);
-        labelName = (L"" DEFAULT_LABEL);
-    }
-
-#ifdef MTA_DEBUG
-    PrintLn(L"[~] " TOOL_NAME L" " TOOL_VERSION);
-    PrintLn(L"[~] Label: '{}'", labelName);
-    PrintLn(L"[~] DLL:   '{}'", dllFilePath.wstring());
-#endif
 
     DllAnalyzer dll;
 
@@ -133,7 +179,13 @@ int wmain(int argc, wchar_t* argv[])
     }
 
 #ifdef MTA_DEBUG
-    PrintLn(L"[~] PDB:   '{}'", pdbFilePath.wstring());
+    PrintLn(L"[~] " TOOL_NAME L" " TOOL_VERSION);
+    PrintLn(L"[~] Label:  '{}'", labelName);
+    PrintLn(L"[~] DLL:    '{}'", dllFilePath.wstring());
+    PrintLn(L"[~] PDB:    '{}'", pdbFilePath.wstring());
+
+    for (const std::wstring& ignore : arguments.ignore)
+        PrintLn(L"[~] Ignore: '{}'", ignore);
 #endif
 
     if (!fs::exists(pdbFilePath) || !fs::is_regular_file(pdbFilePath))
@@ -184,10 +236,39 @@ int wmain(int argc, wchar_t* argv[])
         return 1;
     }
 
-    const std::vector<PdbAnalyzer::Function>& functions = pdb.GetFunctions();
+    std::vector<PdbAnalyzer::Function>& functions = pdb.GetFunctions();
 
     if (functions.empty())
         return 0;
+
+    const auto ContainsIgnore = [&ignored = arguments.ignore](const PdbAnalyzer::Function& f)
+    {
+        for (const std::wstring& ignore : ignored)
+        {
+            if (StrStrIW(f.SourceFile.c_str(), ignore.c_str()) != nullptr)
+                return true;
+        }
+
+        return false;
+    };
+
+    functions.erase(std::remove_if(std::begin(functions), std::end(functions), ContainsIgnore), std::end(functions));
+
+    const auto SortBySource = [](const PdbAnalyzer::Function& lhs, const PdbAnalyzer::Function& rhs)
+    {
+        const auto compare =
+            std::lexicographical_compare_three_way(std::begin(lhs.SourceFile), std::end(lhs.SourceFile), std::begin(rhs.SourceFile), std::end(rhs.SourceFile),
+                                                   [](wchar_t a, wchar_t b) { return std::tolower(a) <=> std::tolower(b); });
+
+        if (std::is_lt(compare))
+            return true;
+        if (std::is_gt(compare))
+            return false;
+
+        return lhs.SourceLine < rhs.SourceLine;
+    };
+
+    std::sort(std::begin(functions), std::end(functions), SortBySource);
 
     int exitCode = 0;
 
@@ -199,6 +280,9 @@ int wmain(int argc, wchar_t* argv[])
         const bool hasLabel = label != std::end(function.Labels);
 
         std::vector<std::wstring> problems;
+
+        if (!hasLabel && !fs::is_regular_file(function.SourceFile))
+            continue;
 
         if (function.Name.starts_with(L"std::") || function.Name.starts_with(L'_'))
         {
@@ -246,19 +330,8 @@ int wmain(int argc, wchar_t* argv[])
         if (problems.empty())
             continue;
 
-        if (function.SourceFile.empty())
-        {
-            PrintLn(L"");
-            PrintLn(L"[>] {}", function.Name);
-
-            for (const std::wstring& problem : problems)
-                PrintLn(L"[-] {}", problem);
-        }
-        else
-        {
-            for (const std::wstring& problem : problems)
-                PrintLn(L"{}({}): {}", function.SourceFile, function.SourceLine, problem);
-        }
+        for (const std::wstring& problem : problems)
+            PrintLn(L"{}({}): {}", function.SourceFile, function.SourceLine, problem);
     }
 
     return exitCode;

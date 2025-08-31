@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "utility.h"
+#include <filesystem>
 
 void Trim(std::wstring& input)
 {
@@ -21,4 +22,17 @@ void Trim(std::wstring& input)
 
     if (size_t position = input.find_last_not_of(L" \r\n\t\0"); position != std::string_view::npos)
         input = input.substr(0, position + 1);
+}
+
+void NormalizePath(std::wstring& input)
+{
+    if (input.empty())
+        return;
+
+    std::error_code ec{};
+
+    if (const auto canon = std::filesystem::canonical(input, ec); !ec)
+        input = canon.wstring();
+
+    std::replace(input.begin(), input.end(), L'/', L'\\');
 }
