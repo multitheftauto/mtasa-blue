@@ -22,9 +22,6 @@ project "Loader Proxy"
 		"../../Shared/sdk",
 	}
 
-	filter "system:windows"
-		linkoptions { "/SAFESEH:NO" }
-
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 

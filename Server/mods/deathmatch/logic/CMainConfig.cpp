@@ -21,6 +21,7 @@
 #include "CConsoleCommands.h"
 #include "CHTTPD.h"
 #include "CStaticFunctionDefinitions.h"
+#include "CLanBroadcast.h"
 
 #define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
 
@@ -1332,7 +1333,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
     }
     else if (strName == "fpslimit")
     {
-        return CStaticFunctionDefinitions::SetFPSLimit(atoi(strValue), bSave);
+        return CStaticFunctionDefinitions::SetFPSLimit(static_cast<unsigned short>(atoi(strValue)), bSave);
     }
     else if (strName == "networkencryption")
     {

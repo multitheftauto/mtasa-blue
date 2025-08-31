@@ -702,8 +702,8 @@ bool CPixelsManager::SetPlainDimensions(CPixels& pixels, uint uiWidth, uint uiHe
     {
         // Fixup plain format tail
         WORD* pPlainTail = (WORD*)(pData + uiDataSize - SIZEOF_PLAIN_TAIL);
-        pPlainTail[0] = uiWidth;
-        pPlainTail[1] = uiHeight;
+        pPlainTail[0] = static_cast<WORD>(uiWidth);
+        pPlainTail[1] = static_cast<WORD>(uiHeight);
         return true;
     }
 
