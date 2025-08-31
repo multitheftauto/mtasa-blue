@@ -5,7 +5,7 @@ if exist "%VSWHERE%" goto :FindVisualStudio
 exit /b 1
 
 :FindVisualStudio
-for /f "usebackq tokens=*" %%i in (`call "%VSWHERE%" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do (
+for /f "usebackq tokens=*" %%i in (`call "%VSWHERE%" -products * -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do (
     set VSDIR=%%i
 )
 

@@ -8,7 +8,7 @@ pause
 exit /b 1
 
 :FindVisualStudio
-for /f "usebackq tokens=*" %%i in (`call "%VSWHERE%" -latest -requires Microsoft.Component.MSBuild -find "**\VsDevCmd.bat"`) do (
+for /f "usebackq tokens=*" %%i in (`call "%VSWHERE%" -products * -latest -requires Microsoft.Component.MSBuild -find "**\VsDevCmd.bat"`) do (
     set VSDEVCMD=%%i
 )
 
