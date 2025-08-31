@@ -91,7 +91,7 @@ CORE_API int InitializeCore()
         return 4;
 
     // Group our processes and windows under a single taskbar button
-    SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto");
+    SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto " MTA_STR(MTASA_VERSION_MAJOR) L"." MTA_STR(MTASA_VERSION_MINOR));
 
     WriteDebugEvent(SString("ModuleFileName: %s", *GetLaunchPathFilename()));
 

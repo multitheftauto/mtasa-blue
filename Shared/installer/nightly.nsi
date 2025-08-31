@@ -53,7 +53,6 @@ Var UninstallExePath
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
 !define GUID "{8A7FC5C7-0023-4CD7-B1D6-89073CFD838F}"
 
-
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
     !define MINOR_VER "7"
@@ -61,6 +60,8 @@ Var UninstallExePath
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
+
+!define APPLICATION_ID "Multi Theft Auto ${0.0}"
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
@@ -390,6 +391,12 @@ Function .onInstSuccess
 			Push $ClientExePath
 			Push $StartMenuClientShortcutPath
 			Call MTACreateShortсut
+		${EndIf}
+		${If} ${FileExists} $StartMenuClientShortcutPath
+			ApplicationID::Set "$StartMenuClientShortcutPath" "${APPLICATION_ID}"
+			${If} ${Errors}
+				${LogText} "Error setting Application ID for client shortcut"
+			${EndIf}
 		${EndIf}
 		# Either update or create Server shortcut
 		${If} ${FileExists} $StartMenuServerShortcutPath

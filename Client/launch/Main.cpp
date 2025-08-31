@@ -863,7 +863,7 @@ int WINAPI WinMain(HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance
     }
 
     // Group processes under single taskbar button
-    static_cast<void>(::SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto"));
+    SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto " MTA_STR(MTASA_VERSION_MAJOR) L"." MTA_STR(MTASA_VERSION_MINOR));
 
     // Load the loader.dll
     SString strLoaderDllFilename;
