@@ -237,6 +237,47 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CWaterLevel::TestLineAgainstWater
+//
+// Limit the values to world bounds, because the water level does not exceed it.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static void CLAMP_CWaterLevel_TestLineAgainstWater(float values[6])
+{
+    for (int i = 0; i < 6; ++i)
+        values[i] = Clamp(-3000.0f, values[i], 3000.0f);
+}
+
+#define HOOKPOS_CWaterLevel_TestLineAgainstWater  0x6E61B0
+#define HOOKSIZE_CWaterLevel_TestLineAgainstWater 10
+static constexpr DWORD       CONTINUE_CWaterLevel_TestLineAgainstWater = 0x6E61BA;
+static void _declspec(naked) HOOK_CWaterLevel_TestLineAgainstWater()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
+        // [esp+4]  from.x
+        // [esp+8]  from.y
+        // [esp+12] from.z
+        // [esp+16] to.x
+        // [esp+20] to.y
+        // [esp+24] to.z
+        pushad
+        lea     eax, [esp+32+4]
+        push    eax
+        call    CLAMP_CWaterLevel_TestLineAgainstWater
+        add     esp, 4
+        popad
+
+        fld     [esp+0Ch]
+        sub     esp, 88h
+        jmp CONTINUE_CWaterLevel_TestLineAgainstWater
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Weapons
 //
 // Setup hooks
@@ -248,4 +289,5 @@ void CMultiplayerSA::InitHooks_Weapons()
     EZHookInstall(CShotInfo_Update);
     EZHookInstall(Fx_AddBulletImpact);
     EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC);
+    EZHookInstall(CWaterLevel_TestLineAgainstWater);
 }
