@@ -1555,6 +1555,9 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
 
         Player.CallEvent("onPlayerQuit", Arguments);
 
+        // Tell the resource manager
+        m_pResourceManager->OnPlayerQuit(Player);
+
         // Tell the map manager
         m_pMapManager->OnPlayerQuit(Player);
 
@@ -4172,17 +4175,16 @@ void CGame::Packet_PlayerNetworkStatus(CPlayerNetworkStatusPacket& Packet)
 
 void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
 {
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer)
-    {
-        CResource* pResource = Packet.GetResource();
-        if (pResource)
-        {
-            CLuaArguments Arguments;
-            Arguments.PushResource(pResource);
-            pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
-        }
-    }
+    CPlayer*     sourcePlayer = Packet.GetSourcePlayer();
+    CResource*   resource = Packet.GetResource();
+    unsigned int playerStartCounter = Packet.GetStartCounter();
+
+    if (!sourcePlayer || !resource || !resource->CanPlayerTriggerResourceStart(sourcePlayer, playerStartCounter))
+        return;
+
+    CLuaArguments Arguments;
+    Arguments.PushResource(resource);
+    sourcePlayer->CallEvent("onPlayerResourceStart", Arguments, nullptr);
 }
 
 void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket& packet) noexcept

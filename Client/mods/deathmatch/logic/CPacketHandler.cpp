@@ -5023,8 +5023,9 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         uiTotalSizeProcessed = 0;
 
     /*
-     * unsigned char (1)   - resource name size
+     * unsigned char (1)    - resource name size
      * unsigned char (x)    - resource name
+     * unsigned int  (4)    - start counter
      * unsigned short (2)   - resource id
      * unsigned short (2)   - resource entity id
      * unsigned short (2)   - resource dynamic entity id
@@ -5079,6 +5080,10 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         return;
     }
 
+    // Start counter
+    unsigned int startCounter{};
+    bitStream.Read(startCounter);
+
     // Resource ID
     unsigned short usResourceID;
     bitStream.Read(usResourceID);
@@ -5122,6 +5127,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     {
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
+        pResource->SetStartCounter(startCounter);
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
