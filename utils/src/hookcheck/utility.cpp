@@ -12,6 +12,10 @@
 #include "utility.h"
 #include <filesystem>
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 void Trim(std::wstring& input)
 {
     if (input.empty())
@@ -35,4 +39,13 @@ void NormalizePath(std::wstring& input)
         input = canon.wstring();
 
     std::replace(input.begin(), input.end(), L'/', L'\\');
+}
+
+auto ToWideString(const char* input) -> std::wstring
+{
+    int length = MultiByteToWideChar(CP_UTF8, 0, input, -1, nullptr, 0);
+    std::wstring wide(length, L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, input, -1, &wide[0], length);
+    Trim(wide);
+    return wide;
 }
