@@ -339,7 +339,7 @@ namespace Security
             return true;
 
         // Method 3: PEB.BeingDebugged flag
-        BOOL isDebugged = FALSE;
+        BYTE isDebugged = FALSE;
         if (ReadPEBField(0x02, isDebugged) && isDebugged)
             return true;
 
