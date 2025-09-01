@@ -27,6 +27,7 @@
 #include "CVehicleManager.h"
 #include "CHandlingManager.h"
 #include "CGame.h"
+#include <luadefs/CLuaElementDefs.h>
 
 //
 // Temporary helper functions for fixing crashes on pre r6459 clients.
@@ -1140,6 +1141,19 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     CLogger::LogPrintf("not sending this element - id: %i\n", pElement->GetType());
                 }
             }
+        }
+
+        auto& pair = CLuaElementDefs::elements;            // Static vector of ElementPair
+
+        BitStream.WriteCompressed(pair.size());            // Get the size of the vector and write it to the bitstream
+        printf("Server: CLuaElementDefs::elements size: %zu\n", pair.size());
+
+        for (const auto& data : pair)
+        {
+            printf("SetElementCollidableWith called: %p %p %d\n", data.element1, data.element2, data.canCollide);
+            BitStream.Write(data.element1->GetID());
+            BitStream.Write(data.element2->GetID());
+            BitStream.WriteBit(data.canCollide);
         }
 
         // Success
