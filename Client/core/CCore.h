@@ -42,8 +42,6 @@ class CDiscordInterface;
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
 
-#include <enums/ReportLogID.h>
-
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
