@@ -19,6 +19,7 @@
 #include <malloc.h>              // For _malloca
 #include <string>                // For std::wstring
 #include <intrin.h>              // For __readfsdword, __readgsqword
+#include <version.h>
 
 // Link to the required libraries
 #pragma comment(lib, "psapi.lib")
