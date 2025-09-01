@@ -10,11 +10,19 @@
 
 #pragma once
 
+#include <cstdint>
 #include <list>
 #include <unordered_set>
 
 #define MAX_REGISTERED_COMMAND_LENGTH 64
 #define MAX_REGISTERED_COMMANDHANDLER_LENGTH 64
+
+enum class MultiCommandHandlerPolicy : std::uint8_t
+{
+    BLOCK = 0,
+    WARN = 1,
+    ALLOW = 2
+};
 
 class CRegisteredCommands
 {
