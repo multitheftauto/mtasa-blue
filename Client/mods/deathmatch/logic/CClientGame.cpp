@@ -1161,7 +1161,7 @@ void CClientGame::DoPulses()
             SString strPrefix = (uiInform == 2) ? "AC" : (uiInform == 1) ? "VF" : "SD";
             SString strMessageCombo = SString("%s #%d %s", *strPrefix, uiLevel, strMessage.c_str()).TrimEnd(" ");
             m_llLastTransgressionTime = GetTickCount64_();
-            AddReportLog(3100, strMessageCombo + SString(" (%d)", uiInform));
+            AddReportLog(ReportLogID::GAME_PLAYER_TRANSGRESSION, strMessageCombo + SString(" (%d)", uiInform));
 
             if (uiInform > 0)
             {
@@ -1175,7 +1175,7 @@ void CClientGame::DoPulses()
             else
             {
                 // Otherwise, disconnect here
-                AddReportLog(7105, SString("Core - Kicked (%s)", *strMessageCombo));
+                AddReportLog(ReportLogID::GAME_KICKED, SString("Core - Kicked (%s)", *strMessageCombo));
                 g_pCore->ShowMessageBox(_("Error") + _E("CD05"), SString(_("You were kicked from the game ( %s )"), *strMessageCombo),
                                         MB_BUTTON_OK | MB_ICON_ERROR);
                 g_pCore->GetModManager()->RequestUnload();
@@ -3977,7 +3977,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if ((DWORD)pAnimAssocGroupInterface < 0x250)
     {
         g_pCore->LogEvent(542, "AssocGroupCopyAnimationHandler", "Interface is corrupt",
-                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), ReportLogID::CORRUPT_ANIM_ASSOC_GROUP_INTERFACE);
     }
 
     auto pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
@@ -3985,7 +3985,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if ((DWORD)pAnimAssocGroup->GetInterface() < 0x250)
     {
         g_pCore->LogEvent(543, "AssocGroupCopyAnimationHandler", "GetAnimBlendAssocGroup corrupted the interface",
-                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), ReportLogID::INVALID_ANIM_ASSOC_GROUP_INTERFACE);
     }
 
     eAnimGroup iGroupID = pAnimAssocGroup->GetGroupID();
@@ -3993,7 +3993,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if (iGroupID == eAnimGroup::ANIM_GROUP_NONE || pAnimAssocGroup->GetAnimBlock() == nullptr)
     {
         g_pCore->LogEvent(544, "AssocGroupCopyAnimationHandler", "pAnimAssocGroupInterface was invalid (animation block is null?)",
-                          SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
+                          SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), ReportLogID::ANIM_ASSOC_GROUP_INTERFACE_NULL_BLOCK);
         return false;
     }
 
@@ -4300,13 +4300,13 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
                 {
                     if (g_iDamageEventLimit == 0)
                     {
-                        AddReportLog(5501, SString("2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed));
+                        AddReportLog(ReportLogID::BULLETSYNC_DMG, SString("2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed));
                         return false;
                     }
                     g_iDamageEventLimit--;
                     if (!bBulletSyncWeapon)
                     {
-                        AddReportLog(5502, SString("BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed));
+                        AddReportLog(ReportLogID::BULLETSYNC_NOWEAPON, SString("BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed));
                         return false;
                     }
                 }
@@ -4314,7 +4314,7 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
                 {
                     if (bBulletSyncWeapon)
                     {
-                        AddReportLog(5503, SString("not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed));
+                        AddReportLog(ReportLogID::BULLETSYNC_WEAPON_NOSYNC, SString("not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed));
                         return false;
                     }
                 }
@@ -6613,20 +6613,20 @@ void CClientGame::OutputServerInfo()
 // Report misc important warnings/errors to the current server
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::TellServerSomethingImportant(uint uiId, const SString& strMessage, uint uiSendLimitForThisId)
+void CClientGame::TellServerSomethingImportant(ReportLogID id, const SString& strMessage, uint uiSendLimitForThisId)
 {
     g_pCore->GetConsole()->Print(strMessage);
-    AddReportLog(3400 + uiId, strMessage + g_pNet->GetConnectedServer(true), 10);
+    AddReportLog(static_cast<ReportLogID>(std::to_underlying(ReportLogID::SERVER_IMPORTANT_MSG) + std::to_underlying(id)), strMessage + g_pNet->GetConnectedServer(true), 10);
 
     if (uiSendLimitForThisId)
     {
-        uint& uiCount = MapGet(m_SentMessageIds, uiId);
+        uint& uiCount = MapGet(m_SentMessageIds, id);
         if (uiCount++ >= uiSendLimitForThisId)
             return;
     }
 
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-    pBitStream->WriteString(SString("%d,%s", uiId, *strMessage));
+    pBitStream->WriteString(SString("%d,%s", id, *strMessage));
     g_pNet->SendPacket(PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE);
     g_pNet->DeallocateNetBitStream(pBitStream);
 }
@@ -6698,7 +6698,7 @@ void CClientGame::SetFileCacheRoot()
     {
         // Not sharing, so use current mod directory
         m_strFileCacheRoot = GetModRoot();
-        AddReportLog(7410, SString("CClientGame::SetFileCacheRoot - Not shared '%s'", *m_strFileCacheRoot));
+        AddReportLog(ReportLogID::GAME_FILECACHE_ROOT_NOSHARED, SString("CClientGame::SetFileCacheRoot - Not shared '%s'", *m_strFileCacheRoot));
     }
     else
     {
@@ -6718,7 +6718,7 @@ void CClientGame::SetFileCacheRoot()
                     FileDelete(strTestFileName);
                     // Use shared directory
                     m_strFileCacheRoot = strFileCachePath;
-                    AddReportLog(7411, SString("CClientGame::SetFileCacheRoot - Is shared '%s'", *m_strFileCacheRoot));
+                    AddReportLog(ReportLogID::GAME_FILECACHE_ROOT_SHARED, SString("CClientGame::SetFileCacheRoot - Is shared '%s'", *m_strFileCacheRoot));
                     return;
                 }
             }
@@ -6729,9 +6729,9 @@ void CClientGame::SetFileCacheRoot()
         SetCommonRegistryValue("", "File Cache Path", m_strFileCacheRoot);
 
         if (strFileCachePath.empty())
-            AddReportLog(7412, SString("CClientGame::SetFileCacheRoot - Initial setting '%s'", *m_strFileCacheRoot));
+            AddReportLog(ReportLogID::GAME_FILECACHE_ROOT_INIT, SString("CClientGame::SetFileCacheRoot - Initial setting '%s'", *m_strFileCacheRoot));
         else
-            AddReportLog(7413, SString("CClientGame::SetFileCacheRoot - Change shared from '%s' to '%s'", *strFileCachePath, *m_strFileCacheRoot));
+            AddReportLog(ReportLogID::GAME_FILECACHE_ROOT_MODIFY, SString("CClientGame::SetFileCacheRoot - Change shared from '%s' to '%s'", *strFileCachePath, *m_strFileCacheRoot));
     }
 }
 

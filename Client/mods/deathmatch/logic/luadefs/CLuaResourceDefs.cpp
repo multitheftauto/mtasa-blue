@@ -435,7 +435,7 @@ int CLuaResourceDefs::LoadString(lua_State* luaVM)
             SString strMessage("argument 1 is invalid. Please re-compile at https://luac.multitheftauto.com/", 0);
             argStream.SetCustomError(strMessage);
             cpBuffer = NULL;
-            g_pClientGame->TellServerSomethingImportant(1004, argStream.GetFullErrorMessage(), 3);
+            g_pClientGame->TellServerSomethingImportant(ReportLogID::DEOBFUSCATION_LOADSTRING_FAIL, argStream.GetFullErrorMessage(), 3);
         }
 
         if (!argStream.HasErrors())
@@ -515,7 +515,7 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
             SString strMessage("argument 2 is invalid. Please re-compile at https://luac.multitheftauto.com/", 0);
             argStream.SetCustomError(strMessage);
             cpBuffer = NULL;
-            g_pClientGame->TellServerSomethingImportant(1005, argStream.GetFullErrorMessage(), 3);
+            g_pClientGame->TellServerSomethingImportant(ReportLogID::DEOBFUSCATION_LOAD_FAIL, argStream.GetFullErrorMessage(), 3);
         }
 
         if (!argStream.HasErrors())

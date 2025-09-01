@@ -85,7 +85,7 @@ CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFile, const SStrin
         {
             strReport += SString("[effects cur:%d created:%d dest:%d]", g_pDeviceState->MemoryState.Effect.iCurrentCount,
                                  g_pDeviceState->MemoryState.Effect.iCreatedCount, g_pDeviceState->MemoryState.Effect.iDestroyedCount);
-            AddReportLog(7544, SString("NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFile));
+            AddReportLog(ReportLogID::D3D_EFFECT_TEMPLATE_CREATED, SString("NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFile));
         }
         if (!pEffectTemplate)
             return NULL;

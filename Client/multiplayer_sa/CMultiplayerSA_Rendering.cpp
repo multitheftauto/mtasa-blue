@@ -83,7 +83,7 @@ bool IsEntityRenderable(CEntitySAInterface* pEntity)
     bool bHasRwObject = (pEntity->m_pRwObject != nullptr);
     if (bIsPlaceable || !bHasRwObject)
     {
-        AddReportLog(8645, SString("Error in render list: IsPlaceable:%d HasRwObject:%d", bIsPlaceable, bHasRwObject));
+        AddReportLog(ReportLogID::ENTITY_RENDER_NO_RWOBJECT, SString("Error in render list: IsPlaceable:%d HasRwObject:%d", bIsPlaceable, bHasRwObject));
     }
     return !bIsPlaceable && bHasRwObject;
 }

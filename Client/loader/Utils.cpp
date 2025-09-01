@@ -961,7 +961,7 @@ Return Value:
 void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason)
 {
     HideSplash();
-    AddReportLog(7115, SString("Loader - Request to elevate privileges (%s)", *strReason));
+    AddReportLog(ReportLogID::LOADER_ELEVATED_PRIVILEGE_REQUEST, SString("Loader - Request to elevate privileges (%s)", *strReason));
     MessageBoxUTF8(NULL, SString(_("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *strReason),
                    "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
     ReleaseSingleInstanceMutex();
@@ -1164,7 +1164,7 @@ bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
         if (NtTerminateProcess_)
         {
             success = NtTerminateProcess_(dwProcessID, uiExitCode);
-            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, success));
+            AddReportLog(ReportLogID::TERMINATE_PROCESS_CHECKSERVICE, SString("TerminateProcess %d result: %d", dwProcessID, success));
         }
     }
 
@@ -1262,7 +1262,7 @@ bool CheckService(uint uiStage)
         if (pfnCheckService)
         {
             bool bResult = pfnCheckService(uiStage);
-            AddReportLog(8070, SString("CheckService %d result: %d", uiStage, bResult));
+            AddReportLog(ReportLogID::TERMINATE_PROCESS_CHECKSERVICE, SString("CheckService %d result: %d", uiStage, bResult));
             return bResult;
         }
     }
@@ -1779,7 +1779,7 @@ void ForbodenProgramsMessage()
         strMessage += "\n\n";
         strMessage += SString::Join("\n", foundList);
         DisplayErrorMessageBox(strMessage, _E("CL39"), "forboden-programs");
-        WriteDebugEventAndReport(6550, SString("Showed forboden programs list (%s)", *SString::Join(",", foundList)));
+        WriteDebugEventAndReport(ReportLogID::FORBODEN_PROGRAM_DETECTED, SString("Showed forboden programs list (%s)", *SString::Join(",", foundList)));
     }
 }
 
@@ -1890,10 +1890,10 @@ void LogSettings()
 // Write to logile.txt and report.log
 //
 //////////////////////////////////////////////////////////
-void WriteDebugEventAndReport(uint uiId, const SString& strText)
+void WriteDebugEventAndReport(ReportLogID id, const SString& strText)
 {
     WriteDebugEvent(strText);
-    AddReportLog(uiId, strText);
+    AddReportLog(id, strText);
 }
 
 //////////////////////////////////////////////////////////

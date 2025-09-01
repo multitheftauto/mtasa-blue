@@ -734,7 +734,7 @@ void AddLaunchLog(const char* format, ...)
     message.vFormat(format, arguments);
     va_end(arguments);
 
-    AddReportLog(5720, message);
+    AddReportLog(ReportLogID::LOADER_PROXY_LAUNCH_LOG, message);
 }
 
 /**

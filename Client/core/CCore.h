@@ -42,6 +42,8 @@ class CDiscordInterface;
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
 
+#include <enums/ReportLogID.h>
+
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
@@ -252,7 +254,7 @@ public:
     void                 OnDeviceRestore();
     void                 OnCrashAverted(uint uiId);
     void                 OnEnterCrashZone(uint uiId);
-    void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
+    void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, ReportLogID addReportLogId = ReportLogID::NONE);
     bool                 GetDebugIdEnabled(uint uiDebugId);
     EDiagnosticDebugType GetDiagnosticDebug();
     void                 SetDiagnosticDebug(EDiagnosticDebugType value);
