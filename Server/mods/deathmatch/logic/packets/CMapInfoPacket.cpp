@@ -16,6 +16,7 @@
 #include "CBuildingRemoval.h"
 #include "CBuildingRemovalManager.h"
 #include <net/SyncStructures.h>
+#include <luadefs/CLuaElementDefs.h>
 
 CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherBlendingTo, unsigned char ucBlendedWeatherHour, unsigned char ucClockHour,
                                unsigned char ucClockMin, unsigned long ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
@@ -356,6 +357,20 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
 
     bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled();
     BitStream.WriteBit(bOcclusionsEnabled);
+
+    auto& pair = CLuaElementDefs::elements;            // Static vector of ElementPair
+
+    BitStream.WriteCompressed(pair.size());            // Get the size of the vector and write it to the bitstream
+    printf("Server: CLuaElementDefs::elements size: %zu\n", pair.size());
+
+
+        for (const auto& data:pair)
+    {
+        printf("SetElementCollidableWith called: %p %p %d\n", data.element1, data.element2, data.canCollide);
+        BitStream.Write(data.element1->GetID());
+        BitStream.Write(data.element2->GetID());
+        BitStream.WriteBit(data.canCollide);
+    }
 
     return true;
 }

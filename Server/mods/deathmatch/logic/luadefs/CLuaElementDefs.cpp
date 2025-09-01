@@ -11,6 +11,9 @@
 
 #include "StdInc.h"
 #include "CLuaElementDefs.h"
+
+std::vector<CLuaElementDefs::ElementPair> CLuaElementDefs::elements;
+
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
 #include "CDummy.h"
@@ -2464,5 +2467,8 @@ bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire) noexcept
 
  bool CLuaElementDefs::SetElementCollidableWith(CElement* element, CElement* withElement, bool canCollide)
 {
-    return CStaticFunctionDefinitions::SetElementCollidableWith(element, withElement, canCollide);
+   
+     elements.push_back({element, withElement, canCollide});                                                   // Store the pair in the vector
+     return CStaticFunctionDefinitions::SetElementCollidableWith(element, withElement, canCollide);            // Set collision state
+  
 }
