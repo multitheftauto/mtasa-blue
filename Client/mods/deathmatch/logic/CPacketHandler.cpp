@@ -5490,6 +5490,10 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
     uchar ucAllowShotgunDamageFix = 0;
     bitStream.Read(ucAllowShotgunDamageFix);
 
+    uchar allowMultiCommandHandlers = 1;
+    bitStream.Read(allowMultiCommandHandlers);
+    g_pClientGame->SetAllowMultiCommandHandlers(static_cast<MultiCommandHandlerPolicy>(allowMultiCommandHandlers));
+
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = (ucUseAltPulseOrder != 0);
     miscGameSettings.bAllowFastSprintFix = (ucAllowFastSprintFix != 0);
