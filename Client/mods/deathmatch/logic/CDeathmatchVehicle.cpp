@@ -13,8 +13,8 @@
 #include "net/SyncStructures.h"
 
 CDeathmatchVehicle::CDeathmatchVehicle(CClientManager* pManager, CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel,
-                                       unsigned char ucVariant, unsigned char ucVariant2)
-    : ClassInit(this), CClientVehicle(pManager, ID, usVehicleModel, ucVariant, ucVariant2)
+                                       unsigned char ucVariant, unsigned char ucVariant2, bool damageable)
+    : ClassInit(this), CClientVehicle(pManager, ID, usVehicleModel, ucVariant, ucVariant2, damageable)
 {
     m_pUnoccupiedVehicleSync = pUnoccupiedVehicleSync;
     GetInitialDoorStates(m_ucLastDoorStates);

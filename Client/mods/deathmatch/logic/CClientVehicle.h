@@ -160,7 +160,7 @@ class CClientVehicle : public CClientStreamElement
 
 protected:            // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
                       // cleaned up.
-    CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2);
+    CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2, bool damageable = false);
 
 public:
     ~CClientVehicle();
@@ -627,6 +627,7 @@ protected:
     bool                                   m_bCanBeDamaged;
     bool                                   m_bScriptCanBeDamaged;
     bool                                   m_bSyncUnoccupiedDamage;
+    bool                                   m_localCanBeDamaged{false};
     bool                                   m_bTyresCanBurst;
     SFixedArray<unsigned char, MAX_DOORS>  m_ucDoorStates;
     SFixedArray<unsigned char, MAX_WHEELS> m_ucWheelStates;
