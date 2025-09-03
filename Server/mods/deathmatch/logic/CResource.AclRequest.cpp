@@ -123,9 +123,6 @@ bool CResource::HasAutoPermissions(CXMLNode* pNodeAclRequest)
 ///////////////////////////////////////////////////////////////
 void CResource::RefreshAutoPermissions(CXMLNode* pNodeAclRequest)
 {
-    // Check if permissions already active
-    if (HasAutoPermissions(pNodeAclRequest))
-        return;
 
     // Ensure group and acl exist
     CAccessControlListGroup* pAutoGroup = g_pGame->GetACLManager()->AddGroup(GetAutoGroupName());
@@ -371,4 +368,54 @@ bool CResource::FindAclRequest(SAclRequest& result)
     }
 
     return pAclRight->GetAttributeValue("pending") != "";
+}
+
+std::string CResource::CalculateACLRequestFingerprint()
+{
+    std::string strPath;
+    if (!GetFilePath("meta.xml", strPath))
+        return "";
+
+    CXMLFile* pMetaFile = g_pServerInterface->GetXML()->CreateXML(strPath.c_str());
+    if (!pMetaFile || !pMetaFile->Parse())
+    {
+        delete pMetaFile;
+        return "";
+    }
+
+    CXMLNode* pRoot = pMetaFile->GetRootNode();
+    if (!pRoot)
+    {
+        delete pMetaFile;
+        return "";
+    }
+
+    std::string strFingerprint;
+    CXMLNode* pNodeAclRequest = pRoot->FindSubNode("aclrequest", 0);
+    
+    if (pNodeAclRequest)
+    {
+        for (uint uiIndex = 0; true; uiIndex++)
+        {
+            CXMLNode* pNodeRight = pNodeAclRequest->FindSubNode("right", uiIndex);
+            if (!pNodeRight)
+                break;
+
+            std::string strName = pNodeRight->GetAttributeValue("name");
+            std::string strAccess = pNodeRight->GetAttributeValue("access");
+            
+            if (!strFingerprint.empty())
+                strFingerprint += ";";
+            strFingerprint += strName + ":" + strAccess;
+        }
+    }
+    
+    delete pMetaFile;
+    return strFingerprint;
+}
+
+bool CResource::HasACLRequestsChanged()
+{
+    std::string strCurrentFingerprint = CalculateACLRequestFingerprint();
+    return strCurrentFingerprint != m_strACLRequestFingerprint;
 }
