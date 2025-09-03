@@ -382,7 +382,7 @@ public:
     void        ProcessServerControlBind(CControlFunctionBind* pBind);
 
     bool ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    CClientMarker* CheckMarkerClick(float screenX, float screenY, float& distance) noexcept;
+    CClientMarker* GetClickedMarker(const CVector& vecOrigin, const CVector& vecTarget, float& fDistance) const;
     bool AreCursorEventsEnabled() { return m_bCursorEventsEnabled; }
     void SetCursorEventsEnabled(bool bCursorEventsEnabled) { m_bCursorEventsEnabled = bCursorEventsEnabled; }
 

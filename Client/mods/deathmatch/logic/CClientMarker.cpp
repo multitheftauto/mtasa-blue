@@ -546,7 +546,7 @@ void CClientMarker::SetIgnoreAlphaLimits(bool ignore)
     m_pMarker->SetIgnoreAlphaLimits(ignore);
 }
 
-bool CClientMarker::IsClientSideOnScreen() noexcept
+bool CClientMarker::IsClientSideOnScreen()
 {
     if (!IsStreamedIn() || !IsVisible())
         return false;

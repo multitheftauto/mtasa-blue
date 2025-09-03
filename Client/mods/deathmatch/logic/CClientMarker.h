@@ -77,7 +77,7 @@ public:
 
     static bool IsLimitReached();
 
-    bool IsClientSideOnScreen() noexcept;
+    bool IsClientSideOnScreen();
 
     CClientColShape* GetColShape() { return m_pCollision; }
 

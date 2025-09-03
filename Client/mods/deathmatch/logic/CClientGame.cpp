@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <limits>
 #include <net/SyncStructures.h>
 #include <game/C3DMarkers.h>
 #include <game/CAnimBlendAssocGroup.h>
@@ -2330,23 +2331,13 @@ void CClientGame::ProcessServerControlBind(CControlFunctionBind* pBind)
     m_pNetAPI->RPC(KEY_BIND, bitStream.pBitStream);
 }
 
-CClientMarker* CClientGame::CheckMarkerClick(float screenX, float screenY, float& distance) noexcept
+CClientMarker* CClientGame::GetClickedMarker(const CVector& vecOrigin, const CVector& vecTarget, float& fDistance) const
 {
     if (!m_pMarkerManager)
         return nullptr;
 
-    CCamera* camera = g_pGame->GetCamera();
-    CMatrix cameraMatrix;
-    camera->GetMatrix(&cameraMatrix);
-    CVector origin = cameraMatrix.vPos;
-    
-    CVector target;
-    CVector screen(screenX, screenY, CLICK_RAY_DEPTH);
-    g_pCore->GetGraphics()->CalcWorldCoors(&screen, &target);
-    
-    CVector rayDirection = target - origin;
+    CVector rayDirection = (vecTarget - vecOrigin);
     rayDirection.Normalize();
-
     CClientMarker* closestMarker = nullptr;
     float closestDistance = MAX_CLICK_DISTANCE;
 
@@ -2358,16 +2349,16 @@ CClientMarker* CClientGame::CheckMarkerClick(float screenX, float screenY, float
         if (!marker->IsClientSideOnScreen())
             continue;
 
-        CSphere boundingSphere = marker->GetWorldBoundingSphere();
+        const CSphere boundingSphere = marker->GetWorldBoundingSphere();
         
-        CVector toSphere = boundingSphere.vecPosition - origin;
-        float projection = toSphere.DotProduct(&rayDirection);
+        const CVector toSphere = boundingSphere.vecPosition - vecOrigin;
+        const float projection = toSphere.DotProduct(&rayDirection);
         
         if (projection <= 0.0f)
             continue;
             
-        CVector closestPoint = origin + rayDirection * projection;
-        float distanceToRay = (boundingSphere.vecPosition - closestPoint).Length();
+        const CVector closestPoint = vecOrigin + rayDirection * projection;
+        const float distanceToRay = (boundingSphere.vecPosition - closestPoint).Length();
         
         if (distanceToRay <= boundingSphere.fRadius && projection < closestDistance)
         {
@@ -2377,7 +2368,7 @@ CClientMarker* CClientGame::CheckMarkerClick(float screenX, float screenY, float
     }
 
     if (closestMarker)
-        distance = closestDistance;
+        fDistance = closestDistance;
     
     return closestMarker;
 }
@@ -2450,10 +2441,14 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                     CVector        vecCollision;
                     ElementID      CollisionEntityID = INVALID_ELEMENT_ID;
                     CClientEntity* collisionEntity = nullptr;
+                    float          closestDistance = std::numeric_limits<float>::max();
                     
+                    // Check standard entity collision distance
                     if (bCollision && pColPoint)
                     {
                         vecCollision = pColPoint->GetPosition();
+                        closestDistance = (vecCollision - vecOrigin).Length();
+                        
                         if (pGameEntity)
                         {
                             CPools*        pPools = g_pGame->GetPools();
@@ -2466,8 +2461,23 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                             }
                         }
                     }
-                    else
+
+                    // Check marker collision and compare distances
+                    float markerDistance = std::numeric_limits<float>::max();
+                    CClientMarker* clickedMarker = GetClickedMarker(vecOrigin, vecTarget, markerDistance);
+                    
+                    // Use marker if it's closer than any entity collision
+                    if (clickedMarker && markerDistance < closestDistance)
                     {
+                        collisionEntity = clickedMarker;
+                        if (!clickedMarker->IsLocalEntity())
+                            CollisionEntityID = clickedMarker->GetID();
+                        clickedMarker->GetPosition(vecCollision);
+                        closestDistance = markerDistance;
+                    }
+                    else if (!bCollision || !pColPoint)
+                    {
+                        // No entity collision found, use target position
                         vecCollision = vecTarget;
                     }
 
@@ -2512,25 +2522,6 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                             vecCollision.fY = 0;
                         if (std::isnan(vecCollision.fZ))
                             vecCollision.fZ = 0;
-
-                        float markerDistance = 0.0f;
-                        CClientMarker* clickedMarker = CheckMarkerClick(static_cast<float>(iX), static_cast<float>(iY), markerDistance);
-                        if (clickedMarker)
-                        {
-                            CVector markerPosition;
-                            clickedMarker->GetPosition(markerPosition);
-                            
-                            CLuaArguments MarkerArguments;
-                            MarkerArguments.PushString(szButton);
-                            MarkerArguments.PushString(szState);
-                            MarkerArguments.PushNumber(vecCursorPosition.fX);
-                            MarkerArguments.PushNumber(vecCursorPosition.fY);
-                            MarkerArguments.PushNumber(markerPosition.fX);
-                            MarkerArguments.PushNumber(markerPosition.fY);
-                            MarkerArguments.PushNumber(markerPosition.fZ);
-                            MarkerArguments.PushNumber(markerDistance);
-                            clickedMarker->CallEvent("onClientMarkerClick", MarkerArguments, false);
-                        }
 
                         // Call the event for the client
                         CLuaArguments Arguments;
@@ -2816,7 +2807,6 @@ void CClientGame::AddBuiltInEvents()
     // Marker events
     m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", nullptr, false);
     m_Events.AddEvent("onClientMarkerLeave", "entity, matchingDimension", nullptr, false);
-    m_Events.AddEvent("onClientMarkerClick", "button, state, screenX, screenY, worldX, worldY, worldZ, distance", nullptr, false);
 
     m_Events.AddEvent("onClientPlayerMarkerHit", "marker, matchingDimension", nullptr, false);
     m_Events.AddEvent("onClientPlayerMarkerLeave", "marker, matchingDimension", nullptr, false);
