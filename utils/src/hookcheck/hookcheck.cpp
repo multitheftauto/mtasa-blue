@@ -35,6 +35,7 @@
 namespace fs = std::filesystem;
 
 int wmain(int argc, wchar_t* argv[])
+try
 {
     SetConsoleOutputCP(CP_UTF8);
 
@@ -102,10 +103,12 @@ int wmain(int argc, wchar_t* argv[])
         return 1;
     }
 
-    const fs::path dllFilePath = fs::absolute(arguments.dll.value());
+    std::error_code ec{};
+
+    const fs::path dllFilePath = fs::absolute(arguments.dll.value(), ec);
     std::wstring   labelName = arguments.label.value_or(L"" DEFAULT_LABEL);
 
-    if (!fs::exists(dllFilePath) || !fs::is_regular_file(dllFilePath))
+    if (!fs::exists(dllFilePath, ec) || !fs::is_regular_file(dllFilePath, ec))
     {
         PrintErrorLn(L"DLL file '{}' does not exist or is not readable", dllFilePath.wstring());
         return 1;
@@ -175,7 +178,7 @@ int wmain(int argc, wchar_t* argv[])
     }
     else
     {
-        pdbFilePath = fs::absolute(filePath);
+        pdbFilePath = fs::absolute(filePath, ec);
     }
 
 #ifdef MTA_DEBUG
@@ -188,7 +191,7 @@ int wmain(int argc, wchar_t* argv[])
         PrintLn(L"[~] Ignore: '{}'", ignore);
 #endif
 
-    if (!fs::exists(pdbFilePath) || !fs::is_regular_file(pdbFilePath))
+    if (!fs::exists(pdbFilePath, ec) || !fs::is_regular_file(pdbFilePath, ec))
     {
         PrintErrorLn(L"{} is not a regular file", pdbFilePath.wstring());
         return 1;
@@ -281,7 +284,7 @@ int wmain(int argc, wchar_t* argv[])
 
         std::vector<std::wstring> problems;
 
-        if (!hasLabel && !fs::is_regular_file(function.SourceFile))
+        if (!hasLabel && !fs::is_regular_file(function.SourceFile, ec))
             continue;
 
         if (function.Name.starts_with(L"std::") || function.Name.starts_with(L'_'))
@@ -335,4 +338,28 @@ int wmain(int argc, wchar_t* argv[])
     }
 
     return exitCode;
+}
+catch (const fs::filesystem_error& ex)
+{
+    HRESULT hr = S_OK;
+
+    if (ex.code())
+    {
+        if (ex.code().category() == std::system_category())
+        {
+            hr = HRESULT_FROM_WIN32(ex.code().value());
+        }
+        else
+        {
+            hr = E_FAIL;
+        }
+    }
+
+    PrintErrorLn(hr, L"A filesystem exception was thrown: {}", ToWideString(ex.what()));
+    return -1;
+}
+catch (const std::exception& ex)
+{
+    PrintErrorLn(L"An exception was thrown: {}", ToWideString(ex.what()));
+    return -1;
 }

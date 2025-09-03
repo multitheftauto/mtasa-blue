@@ -19,6 +19,7 @@
 #include <malloc.h>              // For _malloca
 #include <string>                // For std::wstring
 #include <intrin.h>              // For __readfsdword, __readgsqword
+#include <version.h>
 
 // Link to the required libraries
 #pragma comment(lib, "psapi.lib")
@@ -338,7 +339,7 @@ namespace Security
             return true;
 
         // Method 3: PEB.BeingDebugged flag
-        BOOL isDebugged = FALSE;
+        BYTE isDebugged = FALSE;
         if (ReadPEBField(0x02, isDebugged) && isDebugged)
             return true;
 
@@ -863,7 +864,7 @@ int WINAPI WinMain(HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance
     }
 
     // Group processes under single taskbar button
-    static_cast<void>(::SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto"));
+    SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto " MTA_STR(MTASA_VERSION_MAJOR) L"." MTA_STR(MTASA_VERSION_MINOR));
 
     // Load the loader.dll
     SString strLoaderDllFilename;

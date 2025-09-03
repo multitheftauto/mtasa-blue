@@ -21,6 +21,9 @@ void Trim(std::wstring& input);
 
 void NormalizePath(std::wstring& input);
 
+[[nodiscard]]
+auto ToWideString(const char* input) -> std::wstring;
+
 template <typename... Args>
 void PrintLn(const std::wformat_string<Args...> fmt, Args&&... args)
 {

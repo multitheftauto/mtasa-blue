@@ -341,6 +341,7 @@ void CResource::Load()
         {
             // Write resource net ID
             pBitStream->Write(GetNetID());
+            pBitStream->Write(GetStartCounter());
             g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
