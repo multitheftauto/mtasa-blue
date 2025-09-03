@@ -54,6 +54,14 @@ int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
     return iResult;
 }
 
+void CVisibilityPluginsSA::SetAtomicId(RpAtomic* atomic, int id)
+{
+    if (!atomic)
+        return;
+
+    ((void(__cdecl*)(RpAtomic*, int))FUNC_CVisibilityPlugins_SetAtomicId)(atomic, id);
+}
+
 bool CVisibilityPluginsSA::InsertEntityIntoEntityList(void* entity, float distance, void* callback)
 {
     return ((bool(_cdecl*)(void*, float, void*))FUNC_CVisibilityPlugins_InsertEntityIntoEntityList)(entity, distance, callback);
