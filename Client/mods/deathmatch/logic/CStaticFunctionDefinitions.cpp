@@ -2858,7 +2858,7 @@ bool CStaticFunctionDefinitions::IsTrainChainEngine(CClientVehicle& Vehicle, boo
 }
 
 CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
-                                                          const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool damageable)
+                                                          const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
 {
     if (CClientVehicleManager::IsValidModel(usModel) && (ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
     {
@@ -2867,7 +2867,7 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, u
         if (ucVariant2 == 255 && ucVariant == 255)
             CClientVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
-        CClientVehicle* pVehicle = new CDeathmatchVehicle(m_pManager, NULL, INVALID_ELEMENT_ID, usModel, ucVariation, ucVariation2, damageable);
+        CClientVehicle* pVehicle = new CDeathmatchVehicle(m_pManager, NULL, INVALID_ELEMENT_ID, usModel, ucVariation, ucVariation2);
 
         pVehicle->SetParent(Resource.GetResourceDynamicEntity());
         pVehicle->SetPosition(vecPosition);

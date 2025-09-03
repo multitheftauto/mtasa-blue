@@ -35,7 +35,7 @@ std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  10
 
-CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2, bool damageable)
+CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2)
     : ClassInit(this), CClientStreamElement(pManager->GetVehicleStreamer(), ID)
 {
     CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientVehicle"), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink,
@@ -135,9 +135,8 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     memset(&m_ucLightStates[0], 0, sizeof(m_ucLightStates));
     m_bCanBeDamaged = true;
     m_bSyncUnoccupiedDamage = false;
-    m_bScriptCanBeDamaged = true;
+    m_bScriptCanBeDamaged = !IsLocalEntity();
     m_bTyresCanBurst = true;
-    m_localCanBeDamaged = damageable;
     m_ucOverrideLights = 0;
     m_pTowedVehicle = NULL;
     m_pTowedByVehicle = NULL;
@@ -1178,7 +1177,7 @@ void CClientVehicle::CalcAndUpdateCanBeDamagedFlag()
         bCanBeDamaged = true;
 
     if (IsLocalEntity())
-        bCanBeDamaged = m_localCanBeDamaged;
+        bCanBeDamaged = m_bScriptCanBeDamaged;
 
     // Script override
     if (!m_bScriptCanBeDamaged)
@@ -1223,7 +1222,7 @@ void CClientVehicle::CalcAndUpdateTyresCanBurstFlag()
         bTyresCanBurst = true;
 
     if (IsLocalEntity())
-        bTyresCanBurst = m_localCanBeDamaged;
+        bTyresCanBurst = m_bScriptCanBeDamaged;
 
     // Script override
     if (!m_bScriptCanBeDamaged)

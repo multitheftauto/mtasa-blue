@@ -1532,7 +1532,6 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
     unsigned char    ucVariant = 255;
     unsigned char    ucVariant2 = 255;
     SString          strRegPlate = "";
-    bool             damageable = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
     argStream.ReadVector3D(vecPosition);
@@ -1540,7 +1539,6 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
     argStream.ReadString(strRegPlate, "");
     argStream.ReadNumber(ucVariant, 255);
     argStream.ReadNumber(ucVariant2, 255);
-    argStream.ReadBool(damageable, false);
 
     if (!argStream.HasErrors())
     {
@@ -1552,8 +1550,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
             {
                 // Create the vehicle and return its handle
                 CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle(*pResource, usModel, vecPosition, vecRotation,
-                                                                                     strRegPlate == "" ? NULL : strRegPlate.c_str(), ucVariant, ucVariant2,
-                                                                                     damageable);
+                                                                                     strRegPlate == "" ? NULL : strRegPlate.c_str(), ucVariant, ucVariant2);
                 if (pVehicle)
                 {
                     CElementGroup* pGroup = pResource->GetElementGroup();
