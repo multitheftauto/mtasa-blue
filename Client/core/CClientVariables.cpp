@@ -277,7 +277,6 @@ void CClientVariables::LoadDefaults()
     DEFAULT("debugfile", _S(""));                                        // debug filename
     DEFAULT("console_pos", CVector2D(0, 0));                             // console position
     DEFAULT("console_size", CVector2D(200, 200));                        // console size
-    DEFAULT("serverbrowser_size", CVector2D(720.0f, 495.0f));            // serverbrowser size
     DEFAULT("fps_limit", 100);                                           // frame limiter
     DEFAULT("chat_font", 2);                                             // chatbox font type
     DEFAULT("chat_lines", 10);                                           // chatbox lines
