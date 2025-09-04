@@ -365,6 +365,11 @@ public:
     unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
     unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
+    //Framerate Fixing Property
+    void  FramerateFixingSetPhysicsTimeStep(float timestep) override;
+    float FramerateFixingGetPhysicsTimeStep() override;
+
+
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
     static char* ms_PlayerImgCachePtr;
@@ -390,7 +395,6 @@ private:
     float               m_fShadowsOffset;
 
     bool m_isRapidVehicleStopFixEnabled{false};
-
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
         Vector3D                    * GetLocalShotOriginVector();*/

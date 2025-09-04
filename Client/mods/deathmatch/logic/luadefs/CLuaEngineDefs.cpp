@@ -150,6 +150,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
+        {"engineFramerateFixingSetProperty", ArgumentParser<EngineFramerateFixingSetProperty>},
+        {"engineFramerateFixingGetProperty", ArgumentParser<EngineFramerateFixingGetProperty>},
+        {"engineFramerateFixingResetProperties", ArgumentParser<EngineFramerateFixingResetProperties>},
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -198,6 +201,11 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
     lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
     lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
+
+    lua_classfunction(luaVM, "framerateFixingSetProperty", "engineFramerateFixingSetProperty");
+    lua_classfunction(luaVM, "framerateFixingGetProperty", "engineFramerateFixingGetProperty");
+    lua_classfunction(luaVM, "framerateFixingResetProperties", "engineFramerateFixingResetProperties");
+
 
     lua_registerstaticclass(luaVM, "Engine");
 
@@ -2601,4 +2609,36 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 
     if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
+}
+
+
+bool CLuaEngineDefs::EngineFramerateFixingResetProperties()
+{
+    g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(0);   //use default, Should we reset this when player disconnects?
+    return true;
+}
+
+bool CLuaEngineDefs::EngineFramerateFixingSetProperty(std::string strPropertyName, float timestep)
+{
+    if (strPropertyName.compare("vehicle_physics") == 0)
+    {
+        g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(timestep);
+    }
+    else
+    {
+        throw std::invalid_argument("Unsupported property name at argument 1");
+    }
+    return true;
+}
+
+float CLuaEngineDefs::EngineFramerateFixingGetProperty(std::string strPropertyName)
+{
+    if (strPropertyName.compare("vehicle_physics") == 0)
+    {
+        return g_pMultiplayer->FramerateFixingGetPhysicsTimeStep();
+    }
+    else
+    {
+        throw std::invalid_argument("Unsupported property name at argument 1");
+    }
 }

@@ -12,8 +12,11 @@
 
 static bool         bWouldBeNewFrame = false;
 static unsigned int nLastFrameTime = 0;
-
 constexpr float kOriginalTimeStep = 50.0f / 30.0f;
+
+//
+static float kPhysicTimeStep = kOriginalTimeStep;
+
 
 // Fixes player movement issue while aiming and walking on high FPS.
 #define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim 0x61E4F2
@@ -714,7 +717,7 @@ static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
     {
         fld ds:[0x862CD0]            // 0.99000001f
         fld ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep            // 1.666f
+        fdiv kPhysicTimeStep            // 1.666f
         mov eax, 0x822130            // powf
         call eax
 
@@ -742,9 +745,21 @@ static void __declspec(naked) HOOK_VehicleRapidStopFix()
     {
         fld ds:[0xC2B9CC]            // mod_HandlingManager.m_fWheelFriction
         fmul ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep            // 1.666f
+        fdiv kPhysicTimeStep            // 1.666f
         jmp RETURN_VehicleRapidStopFix
     }
+}
+
+void CMultiplayerSA::FramerateFixingSetPhysicsTimeStep(float timestep){
+    // Just change time step, will be automatically applied when related hook is installed
+    // If time step is not set, kOriginalTimeStep will be used as default;
+    if (timestep == 0)
+        timestep = kOriginalTimeStep;
+    kPhysicTimeStep = timestep;
+}
+
+float CMultiplayerSA::FramerateFixingGetPhysicsTimeStep(){
+    return kPhysicTimeStep;
 }
 
 void CMultiplayerSA::SetRapidVehicleStopFixEnabled(bool enabled)
