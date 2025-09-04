@@ -409,7 +409,7 @@ public:
     void ClearDamageData() noexcept {
         m_DamagerID = INVALID_ELEMENT_ID;
         m_ucDamageWeapon = WEAPONTYPE_INVALID;
-        m_ucDamageBodyPiece = PED_PIECE_UNKNOWN;
+        m_ucDamageBodyPiece = BODYPART_INVALID;
         m_ulDamageTime = 0;
         m_bServerProcessedDeath = true;
     }
@@ -423,7 +423,7 @@ public:
         if (!pLocalPlayer) {
             m_DamagerID = INVALID_ELEMENT_ID;
             m_ucDamageWeapon = WEAPONTYPE_INVALID;
-            m_ucDamageBodyPiece = PED_PIECE_UNKNOWN;
+            m_ucDamageBodyPiece = BODYPART_INVALID;
             m_ulDamageTime = CClientTime::GetTime();
             m_bServerProcessedDeath = false;
             return;
@@ -654,7 +654,7 @@ private:
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
 
-    // Helper method to get current weapon type
+    // Helper method to get current weapon type with error handling
     unsigned char TryGetCurrentWeapon(const CClientPlayer* pPlayer) const noexcept;
 
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -811,7 +811,7 @@ private:
     unsigned char  m_ucDamageBodyPiece;
     unsigned long  m_ulDamageTime;
     bool           m_bDamageSent;
-    bool           m_bServerProcessedDeath = false;
+    bool           m_bServerProcessedDeath = false;  // Flag to track server-processed deaths
 
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;

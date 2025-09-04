@@ -39,6 +39,7 @@
 #include <game/CVehicleAudioSettingsManager.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
+#include "CClientPed.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -103,7 +104,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_TargetedPlayerID = INVALID_ELEMENT_ID;
     m_pDamageEntity = NULL;
     m_DamagerID = INVALID_ELEMENT_ID;
-    m_ucDamageBodyPiece = WEAPONTYPE_INVALID;
+    m_ucDamageBodyPiece = BODYPART_INVALID;
     m_ucDamageWeapon = WEAPONTYPE_INVALID;
     m_ulDamageTime = 0;
     m_bDamageSent = true;
@@ -1459,7 +1460,7 @@ void CClientGame::DoPulses()
         {
             m_DamagerID = INVALID_ELEMENT_ID;
             m_ucDamageWeapon = WEAPONTYPE_INVALID;
-            m_ucDamageBodyPiece = WEAPONTYPE_INVALID;
+            m_ucDamageBodyPiece = BODYPART_INVALID;
         }
         // Check if we need to trigger death event
         if (!m_pLocalPlayer->IsDeadOnNetwork() && m_pLocalPlayer->GetHealth() == 0.0f)
@@ -2012,7 +2013,7 @@ void CClientGame::UpdateFireKey()
                                 {
                                     if (pTargetPed->IsLocalEntity())
                                     {
-                                        CStaticFunctionDefinitions::KillPed(*pTargetPed, m_pLocalPlayer, 4 /*WEAPONTYPE_KNIFE*/, 9 /*BODYPART_HEAD*/, true);
+                                        CStaticFunctionDefinitions::KillPed(*pTargetPed, m_pLocalPlayer, WEAPONTYPE_KNIFE, BODYPART_HEAD, true);
                                         return;
                                     }
 
@@ -5620,7 +5621,7 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
                 Arguments.PushNumber(ucWeapon);
             else
                 Arguments.PushBoolean(false);
-            if (ucBodyPiece != WEAPONTYPE_INVALID)
+            if (ucBodyPiece != BODYPART_INVALID)
                 Arguments.PushNumber(ucBodyPiece);
             else
                 Arguments.PushBoolean(false);
