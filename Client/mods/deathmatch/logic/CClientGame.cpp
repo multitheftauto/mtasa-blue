@@ -6477,20 +6477,26 @@ bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
     // Audio events without a game entity could default to the root element, but the
     // best approach is to avoid spamming the event with the barely notable sounds (without a source).
     // Warning: Canceling sounds emitted by an audio entity (like vehicles do) will cause massive spam
+    CClientEntity* pEntity = nullptr;
+    
     if (event.pGameEntity)
     {
-        CPools*        pPools = g_pGame->GetPools();
-        CClientEntity* pEntity = pPools->GetClientEntity((DWORD*)event.pGameEntity);
-        if (pEntity)
-        {
-            CLuaArguments Arguments;
-            Arguments.PushNumber(event.uiGroup);
-            Arguments.PushNumber(event.uiIndex);
-            Arguments.PushNumber(event.vecPosition.fX);
-            Arguments.PushNumber(event.vecPosition.fY);
-            Arguments.PushNumber(event.vecPosition.fZ);
-            return pEntity->CallEvent("onClientWorldSound", Arguments, true);
-        }
+        CPools* pPools = g_pGame->GetPools();
+        pEntity = pPools->GetClientEntity((DWORD*)event.pGameEntity);
+    }
+    
+    if (!pEntity)
+        pEntity = GetRootEntity();
+    
+    if (pEntity)
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(event.uiGroup);
+        Arguments.PushNumber(event.uiIndex);
+        Arguments.PushNumber(event.vecPosition.fX);
+        Arguments.PushNumber(event.vecPosition.fY);
+        Arguments.PushNumber(event.vecPosition.fZ);
+        return pEntity->CallEvent("onClientWorldSound", Arguments, true);
     }
 
     return true;
