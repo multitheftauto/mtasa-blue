@@ -405,6 +405,44 @@ public:
                        AnimationId animId = 15);
     void SendPedWastedPacket(CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF,
                              AssocGroupId animGroup = 0, AnimationId animID = 15);
+    
+    void ClearDamageData() noexcept {
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = WEAPONTYPE_INVALID;
+        m_ucDamageBodyPiece = PED_PIECE_UNKNOWN;
+        m_ulDamageTime = 0;
+        m_bServerProcessedDeath = true;
+    }
+    
+    void ResetDeathProcessingFlag() noexcept {
+        m_bServerProcessedDeath = false;
+    }
+    
+    void SetScriptedDeathData() noexcept {
+        const auto* pLocalPlayer = GetLocalPlayer();
+        if (!pLocalPlayer) {
+            m_DamagerID = INVALID_ELEMENT_ID;
+            m_ucDamageWeapon = WEAPONTYPE_INVALID;
+            m_ucDamageBodyPiece = PED_PIECE_UNKNOWN;
+            m_ulDamageTime = CClientTime::GetTime();
+            m_bServerProcessedDeath = false;
+            return;
+        }
+        
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = TryGetCurrentWeapon(pLocalPlayer);
+        m_ucDamageBodyPiece = BODYPART_TORSO;
+        m_ulDamageTime = CClientTime::GetTime();
+        m_bServerProcessedDeath = false;
+    }
+    
+    void SetExplosionDamageData() noexcept {
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = WEAPONTYPE_EXPLOSION;
+        m_ucDamageBodyPiece = BODYPART_TORSO;
+        m_ulDamageTime = CClientTime::GetTime();
+        m_bServerProcessedDeath = false;
+    }
 
     CClientGUIElement* GetClickedGUIElement() { return m_pClickedGUIElement; }
     void               SetClickedGUIElement(CClientGUIElement* pElement) { m_pClickedGUIElement = NULL; }
@@ -616,6 +654,9 @@ private:
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
 
+    // Helper method to get current weapon type
+    unsigned char TryGetCurrentWeapon(const CClientPlayer* pPlayer) const noexcept;
+
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool        ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -770,6 +811,7 @@ private:
     unsigned char  m_ucDamageBodyPiece;
     unsigned long  m_ulDamageTime;
     bool           m_bDamageSent;
+    bool           m_bServerProcessedDeath = false;
 
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
