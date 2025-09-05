@@ -466,7 +466,14 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
                 if (pPed->IsHealthLocked())
                     pPed->LockHealth(fHealth);
                 else
+                {
                     pPed->SetHealth(fHealth);
+                    // If server sets health to 0 for local player, mark as server-processed death
+                    // to prevent DoWastedCheck from firing with stale local damage data
+                    if (fHealth == 0.0f && pPed->IsLocalPlayer()) {
+                        g_pClientGame->ClearDamageData();
+                    }
+                }
                 break;
             }
 

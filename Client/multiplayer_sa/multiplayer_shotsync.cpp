@@ -1691,7 +1691,9 @@ void CEventVehicleExplosion_NotifyDeathmatch()
         CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
 
         if (pPed)
-            m_pDeathHandler(pPed, 63, 3);
+        {
+            m_pDeathHandler(pPed, WEAPONTYPE_EXPLOSION, 3);
+        }
     }
 }
 
