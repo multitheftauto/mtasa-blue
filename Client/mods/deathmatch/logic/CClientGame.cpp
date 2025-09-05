@@ -108,7 +108,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_ucDamageWeapon = WEAPONTYPE_INVALID;
     m_ulDamageTime = 0;
     m_bDamageSent = true;
-    m_bServerProcessedDeath = false;
+    m_serverProcessedDeath = false;
     m_bShowNetstat = false;
     m_bShowFPS = false;
     m_bHudAreaNameDisabled = false;
@@ -1467,7 +1467,7 @@ void CClientGame::DoPulses()
         {
             // Only call DoWastedCheck if server hasn't already processed this death
             // This prevents duplicate events when server processes death via unified context system
-            if (!m_bServerProcessedDeath) {
+            if (!m_serverProcessedDeath) {
                 DoWastedCheck(m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece);
             }
         }
@@ -4513,7 +4513,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
                     GetDeathAnim(pDamagedPed, pEvent, animGroup, animID);
 
                     // Check if we're dead
-                    if (!m_bServerProcessedDeath) {
+                    if (!m_serverProcessedDeath) {
                         DoWastedCheck(damagerID, weaponUsed, hitZone, animGroup, animID);
                     }
                 }
@@ -7180,13 +7180,11 @@ void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 // Returns actual weapon type or WEAPONTYPE_UNARMED as fallback
 //
 //////////////////////////////////////////////////////////////////
-unsigned char CClientGame::TryGetCurrentWeapon(const CClientPlayer* pPlayer) const noexcept
+std::uint8_t CClientGame::TryGetCurrentWeapon(CClientPlayer* player)
 {
-    if (!pPlayer)
+    if (!player)
         return WEAPONTYPE_UNARMED;
         
-    // Remove const to call non-const method
-    auto* player = const_cast<CClientPlayer*>(pPlayer);
-    const auto weaponType = player->GetCurrentWeaponType();
-    return (weaponType != WEAPONTYPE_INVALID) ? static_cast<unsigned char>(weaponType) : WEAPONTYPE_UNARMED;
+    eWeaponType weaponType = player->GetCurrentWeaponType();
+    return (weaponType != WEAPONTYPE_INVALID) ? static_cast<std::uint8_t>(weaponType) : WEAPONTYPE_UNARMED;
 }

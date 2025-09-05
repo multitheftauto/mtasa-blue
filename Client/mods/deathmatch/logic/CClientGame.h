@@ -411,29 +411,29 @@ public:
         m_ucDamageWeapon = WEAPONTYPE_INVALID;
         m_ucDamageBodyPiece = BODYPART_INVALID;
         m_ulDamageTime = 0;
-        m_bServerProcessedDeath = true;
+        m_serverProcessedDeath = true;
     }
     
     void ResetDeathProcessingFlag() noexcept {
-        m_bServerProcessedDeath = false;
+        m_serverProcessedDeath = false;
     }
     
-    void SetScriptedDeathData() noexcept {
-        const auto* pLocalPlayer = GetLocalPlayer();
-        if (!pLocalPlayer) {
+    void SetScriptedDeathData() {
+        auto* localPlayer = GetLocalPlayer();
+        if (!localPlayer) {
             m_DamagerID = INVALID_ELEMENT_ID;
             m_ucDamageWeapon = WEAPONTYPE_INVALID;
             m_ucDamageBodyPiece = BODYPART_INVALID;
             m_ulDamageTime = CClientTime::GetTime();
-            m_bServerProcessedDeath = false;
+            m_serverProcessedDeath = false;
             return;
         }
         
         m_DamagerID = INVALID_ELEMENT_ID;
-        m_ucDamageWeapon = TryGetCurrentWeapon(pLocalPlayer);
+        m_ucDamageWeapon = TryGetCurrentWeapon(localPlayer);
         m_ucDamageBodyPiece = BODYPART_TORSO;
         m_ulDamageTime = CClientTime::GetTime();
-        m_bServerProcessedDeath = false;
+        m_serverProcessedDeath = false;
     }
     
     void SetExplosionDamageData() noexcept {
@@ -441,7 +441,7 @@ public:
         m_ucDamageWeapon = WEAPONTYPE_EXPLOSION;
         m_ucDamageBodyPiece = BODYPART_TORSO;
         m_ulDamageTime = CClientTime::GetTime();
-        m_bServerProcessedDeath = false;
+        m_serverProcessedDeath = false;
     }
 
     CClientGUIElement* GetClickedGUIElement() { return m_pClickedGUIElement; }
@@ -655,7 +655,7 @@ private:
     void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
 
     // Helper method to get current weapon type with error handling
-    unsigned char TryGetCurrentWeapon(const CClientPlayer* pPlayer) const noexcept;
+    std::uint8_t TryGetCurrentWeapon(CClientPlayer* player);
 
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool        ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -811,7 +811,7 @@ private:
     unsigned char  m_ucDamageBodyPiece;
     unsigned long  m_ulDamageTime;
     bool           m_bDamageSent;
-    bool           m_bServerProcessedDeath = false;  // Flag to track server-processed deaths
+    bool           m_serverProcessedDeath{false}; // Flag to track server-processed deaths
 
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
