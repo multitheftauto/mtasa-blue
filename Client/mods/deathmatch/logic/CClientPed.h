@@ -61,6 +61,7 @@ enum eBodyPart
     BODYPART_LEFT_LEG = 7,
     BODYPART_RIGHT_LEG = 8,
     BODYPART_HEAD = 9,
+    BODYPART_INVALID = 255,
 };
 
 enum eMovementState

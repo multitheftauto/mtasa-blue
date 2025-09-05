@@ -1143,6 +1143,11 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
 
         // He's no longer dead
         pPlayer->SetDeadOnNetwork(false);
+        
+        // Reset death processing flag for new life
+        if (pPlayer->IsLocalPlayer()) {
+            g_pClientGame->ResetDeathProcessingFlag();
+        }
 
         // Reset weapons
         pPlayer->RemoveAllWeapons();
@@ -1222,6 +1227,12 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
             }
             // Update our sync-time context
             pPed->SetSyncTimeContext(ucTimeContext);
+            
+            // Clear stale damage data if this is the local player
+            // This prevents DoWastedCheck from firing with stale data when server processes death
+            if (pPed->IsLocalPlayer()) {
+                g_pClientGame->ClearDamageData();
+            }
 
             // To at least here needs to be done on the local player to avoid desync
             // Caz: Issue 8148 - Desync when calling spawnPlayer from an event handler remotely triggered from within onClientPlayerWasted
