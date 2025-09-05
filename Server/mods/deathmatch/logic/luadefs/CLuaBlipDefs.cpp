@@ -66,28 +66,28 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, 
     return radarMarker;
 }
 
-auto CLuaBlipDefs::GetBlipIcon(CBlip* radarMarker)
+auto CLuaBlipDefs::GetBlipIcon(CBlip* radarMarker) noexcept
 {
     return radarMarker->m_ucIcon;
 }
 
-auto CLuaBlipDefs::GetBlipSize(CBlip* radarMarker)
+auto CLuaBlipDefs::GetBlipSize(CBlip* radarMarker) noexcept
 {
     return radarMarker->m_ucSize;
 }
 
-auto CLuaBlipDefs::GetBlipColor(CBlip* radarMarker)
+auto CLuaBlipDefs::GetBlipColor(CBlip* radarMarker) noexcept
 {
     SColor color = radarMarker->GetColor();
     return CLuaMultiReturn<float, float, float, float>{color.R, color.G, color.B, color.A};
 }
 
-auto CLuaBlipDefs::GetBlipOrdering(CBlip* radarMarker)
+auto CLuaBlipDefs::GetBlipOrdering(CBlip* radarMarker) noexcept
 {
     return radarMarker->m_sOrdering;
 }
 
-auto CLuaBlipDefs::GetBlipVisibleDistance(CBlip* radarMarker)
+auto CLuaBlipDefs::GetBlipVisibleDistance(CBlip* radarMarker) noexcept
 {
     return radarMarker->m_usVisibleDistance;
 }

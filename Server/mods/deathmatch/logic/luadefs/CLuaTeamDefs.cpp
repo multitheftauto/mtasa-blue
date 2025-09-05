@@ -101,7 +101,7 @@ std::string CLuaTeamDefs::GetTeamName(CTeam* team)
     return team->GetTeamName();
 }
 
-CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> CLuaTeamDefs::GetTeamColor(CTeam* team)
+CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> CLuaTeamDefs::GetTeamColor(CTeam* team) noexcept
 {
     std::uint8_t red;
     std::uint8_t green;
@@ -112,7 +112,7 @@ CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t> CLuaTeamDefs::GetTeamC
     return {red, green, blue};
 }
 
-bool CLuaTeamDefs::GetTeamFriendlyFire(CTeam* team)
+bool CLuaTeamDefs::GetTeamFriendlyFire(CTeam* team) noexcept
 {
     return team->GetFriendlyFire();
 }
@@ -122,12 +122,12 @@ std::vector<CPlayer*> CLuaTeamDefs::GetPlayersInTeam(CTeam* team)
     return team->GetPlayers();
 }
 
-std::uint32_t CLuaTeamDefs::CountPlayersInTeam(CTeam* team)
+std::uint32_t CLuaTeamDefs::CountPlayersInTeam(CTeam* team) noexcept
 {
     return team->CountPlayers();
 }
 
-bool CLuaTeamDefs::SetPlayerTeam(CPlayer* player, std::optional<CTeam*> team)
+bool CLuaTeamDefs::SetPlayerTeam(CPlayer* player, std::optional<CTeam*> team) noexcept
 {
     return CStaticFunctionDefinitions::SetPlayerTeam(player, team.value_or(nullptr));
 }
@@ -137,12 +137,12 @@ bool CLuaTeamDefs::SetTeamName(CTeam* team, const std::string name)
     return CStaticFunctionDefinitions::SetTeamName(team, name.c_str());
 }
 
-bool CLuaTeamDefs::SetTeamColor(CTeam* team, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue)
+bool CLuaTeamDefs::SetTeamColor(CTeam* team, const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) noexcept
 {
     return CStaticFunctionDefinitions::SetTeamColor(team, red, green, blue);
 }
 
-bool CLuaTeamDefs::SetTeamFriendlyFire(CTeam* team, const bool state)
+bool CLuaTeamDefs::SetTeamFriendlyFire(CTeam* team, const bool state) noexcept
 {
     return CStaticFunctionDefinitions::SetTeamFriendlyFire(team, state);
 }
