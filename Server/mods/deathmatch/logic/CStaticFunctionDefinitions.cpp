@@ -5442,8 +5442,7 @@ bool CStaticFunctionDefinitions::GetTrainSpeed(CVehicle* pVehicle, float& fSpeed
     if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
         return false;
 
-    const CVector& vecVelocity = pVehicle->GetVelocity();
-    fSpeed = vecVelocity.Length();
+    fSpeed = pVehicle->GetTrainSpeed();
     return true;
 }
 
@@ -7330,6 +7329,7 @@ bool CStaticFunctionDefinitions::SetTrainSpeed(CVehicle* pVehicle, float fSpeed)
     vecVelocity.Normalize();
     vecVelocity *= fSpeed;
     pVehicle->SetVelocity(vecVelocity);
+    pVehicle->SetTrainSpeed(fSpeed);
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(fSpeed);
