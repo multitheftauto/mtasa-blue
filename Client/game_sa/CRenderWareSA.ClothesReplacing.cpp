@@ -219,14 +219,15 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
     if (ms_ReplacementClothesFileDataMap.empty() && ms_ClothesFileDataMap.empty())
         return false;
 
-    // Initialze lookup map if needed
-    static std::map<std::uint32_t, int>         blockOffsetToFileIdMap;
-    static std::map<std::uint32_t, std::string> blockOffsetToFileNameMap;
-    if (blockOffsetToFileIdMap.empty())
+    static std::map<std::uint32_t, int>     blockOffsetToFileIdMap;
+    std::map<std::uint32_t, std::string>    blockOffsetToFileNameMap;
+
+    if (blockOffsetToFileIdMap.empty() || ms_ClothesFileDataMap.size() > 0)
     {
         // Check is player.img dir has been loaded by GTA
         SPlayerImgItemArray* pItemArray = (SPlayerImgItemArray*)0x00BC12C0;
-        std::uint32_t        maxArraySize = 542 + ms_ClothesFileDataMap.size();
+        std::uint32_t        defaultArraySize = 542;
+        std::uint32_t        maxArraySize = defaultArraySize + ms_ClothesFileDataMap.size();
 
         if (!pItemArray->pItems || pItemArray->uiArraySize != maxArraySize)
             return false;
@@ -234,7 +235,10 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
         for (std::uint32_t i = 0; i < pItemArray->uiArraySize; i++)
         {
             SPlayerImgItem* pImgItem = &pItemArray->pItems[i];
-            MapSet(blockOffsetToFileIdMap, pImgItem->uiBlockOffset, i);
+
+            if (i < defaultArraySize)
+                MapSet(blockOffsetToFileIdMap, pImgItem->uiBlockOffset, i);
+
             MapSet(blockOffsetToFileNameMap, pImgItem->uiBlockOffset, pImgItem->szName);
         }
     }
