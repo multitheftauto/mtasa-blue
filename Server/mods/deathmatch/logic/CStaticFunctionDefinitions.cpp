@@ -11250,6 +11250,36 @@ bool CStaticFunctionDefinitions::IsGlitchEnabled(const std::string& strGlitchNam
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPlayerGlitchEnabled(CPlayer* pPlayer, const std::string& strGlitchName, bool bEnabled)
+{
+    assert(pPlayer);
+
+    if (g_pGame->IsGlitch(strGlitchName))
+    {
+        
+        if (pPlayer->SetPlayerGlitchEnabled(strGlitchName, bEnabled))
+        {
+            
+            pPlayer->SendPlayerGlitchState(strGlitchName);
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool CStaticFunctionDefinitions::IsPlayerGlitchEnabled(CPlayer* pPlayer, const std::string& strGlitchName, bool& bEnabled)
+{
+    assert(pPlayer);
+
+    if (g_pGame->IsGlitch(strGlitchName))
+    {
+        bEnabled = pPlayer->IsPlayerGlitchEnabled(strGlitchName);
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
 {
     return g_pGame->IsWorldSpecialPropertyEnabled(property);

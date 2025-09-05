@@ -142,6 +142,26 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     m_Glitches[GLITCH_VEHICLE_RAPID_STOP] = false;
+
+    
+    for (int i = 0; i < NUM_GLITCHES; i++)
+    {
+        m_PlayerGlitches[i] = false;
+        m_bHasPlayerGlitchOverride[i] = false;
+    }
+
+    
+    m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
+    m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
+    m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
+    m_GlitchNames["crouchbug"] = GLITCH_CROUCHBUG;
+    m_GlitchNames["highcloserangedamage"] = GLITCH_CLOSEDAMAGE;
+    m_GlitchNames["hitanim"] = GLITCH_HITANIM;
+    m_GlitchNames["fastsprint"] = GLITCH_FASTSPRINT;
+    m_GlitchNames["baddrivebyhitbox"] = GLITCH_BADDRIVEBYHITBOX;
+    m_GlitchNames["quickstand"] = GLITCH_QUICKSTAND;
+    m_GlitchNames["kickoutofvehicle_onmodelreplace"] = GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE;
+    m_GlitchNames["vehicle_rapid_stop"] = GLITCH_VEHICLE_RAPID_STOP;
     g_pMultiplayer->SetRapidVehicleStopFixEnabled(true);
 
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
@@ -6016,12 +6036,9 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
     if (ucGlitch < NUM_GLITCHES && bEnabled != m_Glitches[ucGlitch])
     {
         m_Glitches[ucGlitch] = bEnabled;
-        if (ucGlitch == GLITCH_QUICKRELOAD)
-            g_pMultiplayer->DisableQuickReload(!bEnabled);
-        if (ucGlitch == GLITCH_CLOSEDAMAGE)
-            g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
-        if (ucGlitch == GLITCH_VEHICLE_RAPID_STOP)
-            g_pMultiplayer->SetRapidVehicleStopFixEnabled(!bEnabled);
+        
+        // Calculate and apply effective state
+        ApplyEffectiveGlitchState(ucGlitch);
         return true;
     }
     return false;
@@ -6030,6 +6047,83 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
 bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
 {
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
+}
+
+bool CClientGame::RequestPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled)
+{
+    // Find the glitch index for validation
+    auto it = m_GlitchNames.find(strGlitchName);
+    if (it == m_GlitchNames.end())
+        return false;
+
+    unsigned char ucGlitch = it->second;
+    if (ucGlitch >= NUM_GLITCHES)
+        return false;
+
+    // Send request to server (don't apply locally yet)
+    if (auto stream = g_pNet->AllocateNetBitStream())
+    {
+        stream->Write(strGlitchName);
+        stream->WriteBit(bEnabled);
+        g_pNet->SendPacket(PACKET_ID_PLAYER_GLITCH_REQUEST, stream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(stream);
+    }
+
+    return true;
+}
+
+bool CClientGame::SetPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled)
+{
+    auto it = m_GlitchNames.find(strGlitchName);
+    if (it == m_GlitchNames.end())
+        return false;
+
+    unsigned char ucGlitch = it->second;
+    if (ucGlitch >= NUM_GLITCHES)
+        return false;
+
+    // Check if state is actually changing
+    if (m_bHasPlayerGlitchOverride[ucGlitch] && m_PlayerGlitches[ucGlitch] == bEnabled)
+        return true;
+
+    // Set per-player override
+    m_PlayerGlitches[ucGlitch] = bEnabled;
+    m_bHasPlayerGlitchOverride[ucGlitch] = true;
+
+    // Apply effective state to game engine
+    ApplyEffectiveGlitchState(ucGlitch);
+    return true;
+}
+
+bool CClientGame::IsPlayerGlitchEnabled(const std::string& strGlitchName)
+{
+    auto it = m_GlitchNames.find(strGlitchName);
+    if (it == m_GlitchNames.end())
+        return false;
+
+    unsigned char ucGlitch = it->second;
+    if (ucGlitch >= NUM_GLITCHES)
+        return false;
+
+    if (m_bHasPlayerGlitchOverride[ucGlitch])
+        return m_PlayerGlitches[ucGlitch];
+    
+    return m_Glitches[ucGlitch];
+}
+
+void CClientGame::ApplyEffectiveGlitchState(unsigned char ucGlitch)
+{
+    if (ucGlitch >= NUM_GLITCHES)
+        return;
+
+    bool bEffectiveState = m_bHasPlayerGlitchOverride[ucGlitch] ? m_PlayerGlitches[ucGlitch] : m_Glitches[ucGlitch];
+
+    if (ucGlitch == GLITCH_QUICKRELOAD)
+        g_pMultiplayer->DisableQuickReload(!bEffectiveState);
+    else if (ucGlitch == GLITCH_CLOSEDAMAGE)
+        g_pMultiplayer->DisableCloseRangeDamage(!bEffectiveState);
+    else if (ucGlitch == GLITCH_VEHICLE_RAPID_STOP)
+        g_pMultiplayer->SetRapidVehicleStopFixEnabled(!bEffectiveState);
 }
 
 bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, const bool enabled) noexcept
