@@ -78,6 +78,7 @@ public:
     void Packet_PlayerNetworkStatus(NetBitStreamInterface& bitStream);
     void Packet_EntityAdd(NetBitStreamInterface& bitStream);
     void Packet_EntityRemove(NetBitStreamInterface& bitStream);
+    void Packet_EntityRemoveTree(NetBitStreamInterface& bitStream);
     void Packet_PickupHideShow(NetBitStreamInterface& bitStream);
     void Packet_PickupHitConfirm(NetBitStreamInterface& bitStream);
     void Packet_Lua(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
@@ -113,6 +114,10 @@ public:
     std::vector<int>       m_EntityAddReadOffsetStore;
     NetBitStreamInterface* m_pEntityAddBitStream;
     uint                   m_uiEntityAddNumEntities;
+
+private:
+    void RemoveEntityTree(class CClientEntity* rootEntity);
+    void CollectEntityTree(class CClientEntity* entity, std::vector<class CClientEntity*>& entities);
 
     std::list<std::shared_ptr<CClientTextDisplay>> m_displayTextList;
 };
