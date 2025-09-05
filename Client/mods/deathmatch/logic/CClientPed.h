@@ -564,6 +564,8 @@ public:
     void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; }
     bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; }
 
+    void RunClimbingTask();
+
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
     CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer);
