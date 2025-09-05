@@ -124,7 +124,7 @@ CTaskSimpleChoking* CTasksSA::CreateTaskSimpleChoking(CPed* pAttacker, bool bIsT
     return pTask;
 }
 
-CTaskSimpleClimb* CTasksSA::CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
+CTaskSimpleClimb* CTasksSA::CreateTaskSimpleClimb(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight,
                                                   const bool bForceClimb)
 {
     CTaskSimpleClimbSA* pTask = NewTask<CTaskSimpleClimbSA>(pClimbEnt, vecTarget, fHeading, nSurfaceType, nHeight, bForceClimb);
