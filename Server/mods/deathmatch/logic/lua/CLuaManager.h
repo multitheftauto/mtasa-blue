@@ -22,6 +22,7 @@ class CLuaManager;
 // Predeclarations
 class CBlipManager;
 class CEvents;
+class CLuaTimer;
 class CMapManager;
 class CObjectManager;
 class CPlayerManager;
@@ -51,6 +52,8 @@ public:
     void DoPulse();
 
     void LoadCFunctions();
+
+    CLuaTimer* FindTimerGlobally(unsigned long scriptID) const noexcept;
 
 private:
     CBlipManager*              m_pBlipManager;
