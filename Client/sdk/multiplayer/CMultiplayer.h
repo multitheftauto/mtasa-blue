@@ -466,7 +466,7 @@ public:
     virtual DWORD      GetLastAnimArrayAddress() = 0;
 
     virtual void        FramerateFixingSetPhysicsTimeStep(float timestep) = 0;
-    virtual float       FramerateFixingGetPhysicsTimeStep() = 0;
+    virtual float       FramerateFixingGetPhysicsTimeStep() const noexcept = 0;
 
 
     virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;

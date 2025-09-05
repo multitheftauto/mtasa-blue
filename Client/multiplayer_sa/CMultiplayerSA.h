@@ -367,7 +367,7 @@ public:
 
     //Framerate Fixing Property
     void  FramerateFixingSetPhysicsTimeStep(float timestep) override;
-    float FramerateFixingGetPhysicsTimeStep() override;
+    float FramerateFixingGetPhysicsTimeStep() const noexcept override;
 
 
     CVector      m_vecAkimboTarget;

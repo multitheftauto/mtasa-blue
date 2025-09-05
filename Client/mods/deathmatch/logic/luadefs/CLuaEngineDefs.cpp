@@ -15,6 +15,7 @@
 #include <game/CStreaming.h>
 #include <game/CPtrNodeSingleLinkPool.h>
 #include <lua/CLuaFunctionParser.h>
+#include <lua/CLuaFunctionParseHelpers.h>
 #include "CLuaEngineDefs.h"
 #include <enums/VehicleType.h>
 
@@ -2612,33 +2613,27 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 }
 
 
-bool CLuaEngineDefs::EngineFramerateFixingResetProperties()
+void CLuaEngineDefs::EngineFramerateFixingResetProperties()
 {
     g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(0);   //use default, Should we reset this when player disconnects?
-    return true;
 }
 
-bool CLuaEngineDefs::EngineFramerateFixingSetProperty(std::string strPropertyName, float timestep)
+void CLuaEngineDefs::EngineFramerateFixingSetProperty(eFramerateFixingProperty propertyName, float timestep)
 {
-    if (strPropertyName.compare("vehicle_physics") == 0)
+    switch (propertyName)
     {
-        g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(timestep);
+        case eFramerateFixingProperty::FFP_VEHICLE_PHYSICS:
+            g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(timestep);
+            break;
     }
-    else
-    {
-        throw std::invalid_argument("Unsupported property name at argument 1");
-    }
-    return true;
 }
 
-float CLuaEngineDefs::EngineFramerateFixingGetProperty(std::string strPropertyName)
+std::variant <bool, float> CLuaEngineDefs::EngineFramerateFixingGetProperty(eFramerateFixingProperty propertyName)
 {
-    if (strPropertyName.compare("vehicle_physics") == 0)
+    switch (propertyName)
     {
-        return g_pMultiplayer->FramerateFixingGetPhysicsTimeStep();
+        case eFramerateFixingProperty::FFP_VEHICLE_PHYSICS:
+            return g_pMultiplayer->FramerateFixingGetPhysicsTimeStep();
     }
-    else
-    {
-        throw std::invalid_argument("Unsupported property name at argument 1");
-    }
+    return false;
 }

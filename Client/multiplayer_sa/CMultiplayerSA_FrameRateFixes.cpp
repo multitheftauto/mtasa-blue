@@ -717,7 +717,7 @@ static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
     {
         fld ds:[0x862CD0]            // 0.99000001f
         fld ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
-        fdiv kPhysicTimeStep            // 1.666f
+        fdiv kPhysicTimeStep  // 1.666f
         mov eax, 0x822130            // powf
         call eax
 
@@ -750,7 +750,8 @@ static void __declspec(naked) HOOK_VehicleRapidStopFix()
     }
 }
 
-void CMultiplayerSA::FramerateFixingSetPhysicsTimeStep(float timestep){
+void CMultiplayerSA::FramerateFixingSetPhysicsTimeStep(float timestep)
+{
     // Just change time step, will be automatically applied when related hook is installed
     // If time step is not set, kOriginalTimeStep will be used as default;
     if (timestep == 0)
@@ -758,9 +759,11 @@ void CMultiplayerSA::FramerateFixingSetPhysicsTimeStep(float timestep){
     kPhysicTimeStep = timestep;
 }
 
-float CMultiplayerSA::FramerateFixingGetPhysicsTimeStep(){
+float CMultiplayerSA::FramerateFixingGetPhysicsTimeStep() const noexcept
+{
     return kPhysicTimeStep;
 }
+
 
 void CMultiplayerSA::SetRapidVehicleStopFixEnabled(bool enabled)
 {
