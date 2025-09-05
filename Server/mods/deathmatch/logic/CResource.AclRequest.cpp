@@ -379,13 +379,13 @@ std::string CResource::CalculateACLRequestFingerprint()
     std::unique_ptr<CXMLFile> metaFile(g_pServerInterface->GetXML()->CreateXML(strPath.c_str()));
     if (!metaFile || !metaFile->Parse())
     {
-        return "";
+        return {};
     }
 
     CXMLNode* root = metaFile->GetRootNode();
     if (!root)
     {
-        return "";
+        return {};
     }
 
     std::ostringstream fingerprint;
@@ -404,6 +404,7 @@ std::string CResource::CalculateACLRequestFingerprint()
 
             if (uiIndex > 0)
                 fingerprint << ";";
+                
             fingerprint << strName << ":" << strAccess;
         }
     }

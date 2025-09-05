@@ -347,7 +347,7 @@ protected:
     void RefreshAutoPermissions(CXMLNode* pNodeAclRequest);
 
     void CommitAclRequest(const SAclRequest& request);
-    bool FindAclRequest(SAclRequest& request);
+    bool FindAclRequest(SAclRequest& result);
 
     std::string CalculateACLRequestFingerprint();
     bool        HasACLRequestsChanged();
