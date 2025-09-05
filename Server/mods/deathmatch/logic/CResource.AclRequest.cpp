@@ -374,44 +374,41 @@ std::string CResource::CalculateACLRequestFingerprint()
 {
     std::string strPath;
     if (!GetFilePath("meta.xml", strPath))
-        return "";
+        return {};
 
-    CXMLFile* pMetaFile = g_pServerInterface->GetXML()->CreateXML(strPath.c_str());
-    if (!pMetaFile || !pMetaFile->Parse())
+    std::unique_ptr<CXMLFile> metaFile(g_pServerInterface->GetXML()->CreateXML(strPath.c_str()));
+    if (!metaFile || !metaFile->Parse())
     {
-        delete pMetaFile;
         return "";
     }
 
-    CXMLNode* pRoot = pMetaFile->GetRootNode();
-    if (!pRoot)
+    CXMLNode* root = metaFile->GetRootNode();
+    if (!root)
     {
-        delete pMetaFile;
         return "";
     }
 
-    std::string strFingerprint;
-    CXMLNode* pNodeAclRequest = pRoot->FindSubNode("aclrequest", 0);
+    std::ostringstream fingerprint;
+    CXMLNode* nodeAclRequest = root->FindSubNode("aclrequest", 0);
     
-    if (pNodeAclRequest)
+    if (nodeAclRequest)
     {
-        for (uint uiIndex = 0; true; uiIndex++)
+        for (std::uint8_t uiIndex = 0; true; uiIndex++)
         {
-            CXMLNode* pNodeRight = pNodeAclRequest->FindSubNode("right", uiIndex);
-            if (!pNodeRight)
+            CXMLNode* nodeRight = nodeAclRequest->FindSubNode("right", uiIndex);
+            if (!nodeRight)
                 break;
 
-            std::string strName = pNodeRight->GetAttributeValue("name");
-            std::string strAccess = pNodeRight->GetAttributeValue("access");
-            
-            if (!strFingerprint.empty())
-                strFingerprint += ";";
-            strFingerprint += strName + ":" + strAccess;
+            std::string strName = nodeRight->GetAttributeValue("name");
+            std::string strAccess = nodeRight->GetAttributeValue("access");
+
+            if (uiIndex > 0)
+                fingerprint << ";";
+            fingerprint << strName << ":" << strAccess;
         }
     }
     
-    delete pMetaFile;
-    return strFingerprint;
+    return fingerprint.str();
 }
 
 bool CResource::HasACLRequestsChanged()
