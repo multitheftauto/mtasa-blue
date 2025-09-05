@@ -12,11 +12,12 @@
 
 static bool         bWouldBeNewFrame = false;
 static unsigned int nLastFrameTime = 0;
+
+// The global constant timestep for framerate fixing.
 constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 
-//
+// The timestep for vehicle physics framerate fixing is adjustable by script.
 static float kPhysicTimeStep = kOriginalTimeStep;
-
 
 // Fixes player movement issue while aiming and walking on high FPS.
 #define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim 0x61E4F2
@@ -756,6 +757,7 @@ void CMultiplayerSA::FramerateFixingSetPhysicsTimeStep(float timestep)
     // If time step is not set, kOriginalTimeStep will be used as default;
     if (timestep == 0)
         timestep = kOriginalTimeStep;
+
     kPhysicTimeStep = timestep;
 }
 
@@ -763,7 +765,6 @@ float CMultiplayerSA::FramerateFixingGetPhysicsTimeStep() const noexcept
 {
     return kPhysicTimeStep;
 }
-
 
 void CMultiplayerSA::SetRapidVehicleStopFixEnabled(bool enabled)
 {

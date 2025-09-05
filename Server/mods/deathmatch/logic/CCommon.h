@@ -1068,11 +1068,6 @@ enum eStats
     STAT_MAYBE_WU_ZI_MEETING = 342
 };
 
-enum class eFramerateFixingProperty
-{
-    FFP_VEHICLE_PHYSICS = 0
-};
-
 #include "json.h"
 // Prettify toJSON (see mantis #9210)
 enum eJSONPrettyType

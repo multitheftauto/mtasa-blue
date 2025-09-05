@@ -98,8 +98,8 @@ public:
     static void EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option);
 
     static void EngineFramerateFixingResetProperties();
-    static void  EngineFramerateFixingSetProperty(eFramerateFixingProperty propertyName, float timestep);
-    static std::variant<bool, float> EngineFramerateFixingGetProperty(eFramerateFixingProperty propertyName);
+    static void  EngineFramerateFixingSetProperty(FramerateFixingProperty propertyName, float timestep);
+    static std::variant<bool, float> EngineFramerateFixingGetProperty(FramerateFixingProperty propertyName);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

@@ -369,7 +369,6 @@ public:
     void  FramerateFixingSetPhysicsTimeStep(float timestep) override;
     float FramerateFixingGetPhysicsTimeStep() const noexcept override;
 
-
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
     static char* ms_PlayerImgCachePtr;

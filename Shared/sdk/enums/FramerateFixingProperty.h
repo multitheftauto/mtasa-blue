@@ -11,7 +11,7 @@
 
 #pragma once
 
-enum class eFramerateFixingProperty
+enum class FramerateFixingProperty
 {
     FFP_VEHICLE_PHYSICS
 };

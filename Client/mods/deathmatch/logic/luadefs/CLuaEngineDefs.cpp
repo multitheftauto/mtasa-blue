@@ -207,7 +207,6 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "framerateFixingGetProperty", "engineFramerateFixingGetProperty");
     lua_classfunction(luaVM, "framerateFixingResetProperties", "engineFramerateFixingResetProperties");
 
-
     lua_registerstaticclass(luaVM, "Engine");
 
     // `EngineStreaming` class
@@ -2618,21 +2617,21 @@ void CLuaEngineDefs::EngineFramerateFixingResetProperties()
     g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(0);   //use default, Should we reset this when player disconnects?
 }
 
-void CLuaEngineDefs::EngineFramerateFixingSetProperty(eFramerateFixingProperty propertyName, float timestep)
+void CLuaEngineDefs::EngineFramerateFixingSetProperty(FramerateFixingProperty propertyName, float timestep)
 {
     switch (propertyName)
     {
-        case eFramerateFixingProperty::FFP_VEHICLE_PHYSICS:
+        case FramerateFixingProperty::FFP_VEHICLE_PHYSICS:
             g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(timestep);
             break;
     }
 }
 
-std::variant <bool, float> CLuaEngineDefs::EngineFramerateFixingGetProperty(eFramerateFixingProperty propertyName)
+std::variant <bool, float> CLuaEngineDefs::EngineFramerateFixingGetProperty(FramerateFixingProperty propertyName)
 {
     switch (propertyName)
     {
-        case eFramerateFixingProperty::FFP_VEHICLE_PHYSICS:
+        case FramerateFixingProperty::FFP_VEHICLE_PHYSICS:
             return g_pMultiplayer->FramerateFixingGetPhysicsTimeStep();
     }
     return false;

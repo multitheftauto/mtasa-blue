@@ -102,7 +102,7 @@ DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(taskType);
 DECLARE_ENUM(eEntityType);
 DECLARE_ENUM_CLASS(VehicleAudioSettingProperty);
-DECLARE_ENUM_CLASS(eFramerateFixingProperty);
+DECLARE_ENUM_CLASS(FramerateFixingProperty);
 
 class CRemoteCall;
 
