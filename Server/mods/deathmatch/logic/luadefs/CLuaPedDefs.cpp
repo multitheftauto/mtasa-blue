@@ -781,9 +781,9 @@ int CLuaPedDefs::IsPedInVehicle(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CVehicle* pVehicle = CStaticFunctionDefinitions::GetPedOccupiedVehicle(pPed);
-        bool bInVehicle = (pVehicle != NULL) && (pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE);
-        lua_pushboolean(luaVM, bInVehicle);
+        CVehicle* vehicle = CStaticFunctionDefinitions::GetPedOccupiedVehicle(pPed);
+        bool inVehicle = vehicle && pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE;
+        lua_pushboolean(luaVM, inVehicle);
         return 1;
     }
     else
