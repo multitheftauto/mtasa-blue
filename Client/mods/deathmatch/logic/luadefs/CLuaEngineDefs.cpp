@@ -2611,7 +2611,6 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
 }
 
-
 void CLuaEngineDefs::EngineFramerateFixingResetProperties()
 {
     g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(0);   //use default, Should we reset this when player disconnects?
