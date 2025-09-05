@@ -4384,22 +4384,22 @@ void CPacketHandler::Packet_EntityRemoveTree(NetBitStreamInterface& bitStream)
         if (!bitStream.Read(rootID))
             return;
 
-        CClientEntity* pRootEntity = CElementIDs::GetElement(rootID);
-        if (pRootEntity)
+        CClientEntity* rootEntity = CElementIDs::GetElement(rootID);
+        if (rootEntity)
         {
-            if (pRootEntity->GetType() == CCLIENTPLAYER)
+            if (rootEntity->GetType() == CCLIENTPLAYER)
             {
-                RaiseProtocolError(45);
+                RaiseProtocolError(45); // Same as individual entity removal - cannot remove players
                 return;
             }
-            rootElements.push_back(pRootEntity);
+            rootElements.push_back(rootEntity);
         }
     }
 
     // Delete each tree hierarchically
-    for (auto* pRootEntity : rootElements)
+    for (auto* rootEntity : rootElements)
     {
-        RemoveEntityTree(pRootEntity);
+        RemoveEntityTree(rootEntity);
     }
 }
 
@@ -4424,28 +4424,28 @@ void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
 
             if (entity->GetType() == CCLIENTVEHICLE)
             {
-                for (auto* pPed : listOfPeds)
+                for (auto* ped : listOfPeds)
                 {
-                    if (pPed->m_VehicleInOutID == entityID)
-                        pPed->ResetVehicleInOut();
+                    if (ped->m_VehicleInOutID == entityID)
+                        ped->ResetVehicleInOut();
 
-                    if (pPed->m_bNoNewVehicleTask && pPed->m_NoNewVehicleTaskReasonID == entityID)
+                    if (ped->m_bNoNewVehicleTask && ped->m_NoNewVehicleTaskReasonID == entityID)
                     {
-                        pPed->m_bNoNewVehicleTask = false;
-                        pPed->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
+                        ped->m_bNoNewVehicleTask = false;
+                        ped->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
                     }
                 }
             }
             else
             {
                 auto* removedPed = static_cast<CClientPed*>(entity);
-                for (auto* pPed : listOfPeds)
+                for (auto* ped : listOfPeds)
                 {
-                    if (pPed->m_bIsGettingJacked && pPed->m_pGettingJackedBy == removedPed)
+                    if (ped->m_bIsGettingJacked && ped->m_pGettingJackedBy == removedPed)
                     {
-                        pPed->ResetVehicleInOut();
-                        pPed->RemoveFromVehicle(false);
-                        pPed->SetVehicleInOutState(VEHICLE_INOUT_NONE);
+                        ped->ResetVehicleInOut();
+                        ped->RemoveFromVehicle(false);
+                        ped->SetVehicleInOutState(VEHICLE_INOUT_NONE);
                     }
                 }
             }

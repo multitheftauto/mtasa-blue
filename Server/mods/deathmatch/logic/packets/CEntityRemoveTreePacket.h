@@ -11,7 +11,6 @@
 
 #include "CPacket.h"
 #include <vector>
-#include <cstddef>
 
 class CEntityRemoveTreePacket final : public CPacket
 {

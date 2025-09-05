@@ -116,8 +116,8 @@ public:
     uint                   m_uiEntityAddNumEntities;
 
 private:
-    void RemoveEntityTree(class CClientEntity* rootEntity);
-    void CollectEntityTree(class CClientEntity* entity, std::vector<class CClientEntity*>& entities);
+    void RemoveEntityTree(CClientEntity* rootEntity);
+    void CollectEntityTree(CClientEntity* entity, std::vector<CClientEntity*>& entities);
 
     std::list<std::shared_ptr<CClientTextDisplay>> m_displayTextList;
 };
