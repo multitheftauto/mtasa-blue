@@ -7203,3 +7203,36 @@ void CClientPed::SetSyncing(bool bIsSyncing)
         ResetVehicleInOut();
     }
 }
+
+void CClientPed::RunClimbingTask()
+{
+    if (!m_pPlayerPed)
+        return;
+
+    CVector climbPos;
+    float   climbAngle;
+    int     surfaceType;
+
+    CEntitySAInterface* climbEntity = CTaskSimpleClimb::TestForClimb(m_pPlayerPed, climbPos, climbAngle, surfaceType, true);
+
+    // If a ped is in the air, its rotation is inverted (see GetRotationDegressNew, GetRotationRadiansNew)
+    if (!IsOnGround() && !climbEntity)
+    {
+        CVector rot;
+        GetRotationDegrees(rot);
+
+        rot.fZ += 180.0f;
+        SetRotationDegrees(rot);
+
+        climbEntity = CTaskSimpleClimb::TestForClimb(m_pPlayerPed, climbPos, climbAngle, surfaceType, true);
+    }
+
+    if (!climbEntity)
+        return;
+
+    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, surfaceType, eClimbHeights::CLIMB_GRAB, false);
+    if (!climbTask)
+        return;
+
+    climbTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY, true);
+}
