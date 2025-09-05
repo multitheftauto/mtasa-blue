@@ -751,13 +751,14 @@ static void __declspec(naked) HOOK_VehicleRapidStopFix()
     }
 }
 
+void CMultiplayerSA::FramerateFixingResetPhysicsTimeStep()
+{
+    kPhysicTimeStep = kOriginalTimeStep;
+}
+
 void CMultiplayerSA::FramerateFixingSetPhysicsTimeStep(float timestep)
 {
     // Just change time step, will be automatically applied when related hook is installed
-    // If time step is not set, kOriginalTimeStep will be used as default;
-    if (timestep == 0)
-        timestep = kOriginalTimeStep;
-
     kPhysicTimeStep = timestep;
 }
 

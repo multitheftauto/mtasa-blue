@@ -465,6 +465,7 @@ public:
     virtual eAnimID    GetLastStaticAnimationID() = 0;
     virtual DWORD      GetLastAnimArrayAddress() = 0;
 
+    virtual void        FramerateFixingResetPhysicsTimeStep() = 0;
     virtual void        FramerateFixingSetPhysicsTimeStep(float timestep) = 0;
     virtual float       FramerateFixingGetPhysicsTimeStep() const noexcept = 0;
 

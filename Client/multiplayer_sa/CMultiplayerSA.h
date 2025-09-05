@@ -366,6 +366,7 @@ public:
     unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
     //Framerate Fixing Property
+    void  FramerateFixingResetPhysicsTimeStep() override;
     void  FramerateFixingSetPhysicsTimeStep(float timestep) override;
     float FramerateFixingGetPhysicsTimeStep() const noexcept override;
 

@@ -2613,7 +2613,7 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 
 void CLuaEngineDefs::EngineFramerateFixingResetProperties()
 {
-    g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(0);   //use default, Should we reset this when player disconnects?
+    g_pMultiplayer->FramerateFixingResetPhysicsTimeStep();
 }
 
 void CLuaEngineDefs::EngineFramerateFixingSetProperty(FramerateFixingProperty propertyName, float timestep)
