@@ -24,11 +24,11 @@ private:
     static std::variant<CBlip*, bool> CreateBlipAttachedTo(lua_State* luaVM, CElement* entity, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance, std::optional<CElement*> visibleTo);
 
     // Get functions
-    static auto      GetBlipIcon(CBlip* radarMarker);
-    static auto      GetBlipSize(CBlip* radarMarker);
-    static auto      GetBlipColor(CBlip* radarMarker);
-    static auto      GetBlipOrdering(CBlip* radarMarker);
-    static auto      GetBlipVisibleDistance(CBlip* radarMarker);
+    static auto      GetBlipIcon(CBlip* radarMarker) noexcept;
+    static auto      GetBlipSize(CBlip* radarMarker) noexcept;
+    static auto      GetBlipColor(CBlip* radarMarker) noexcept;
+    static auto      GetBlipOrdering(CBlip* radarMarker) noexcept;
+    static auto      GetBlipVisibleDistance(CBlip* radarMarker) noexcept;
 
     // Set functions
     static bool SetBlipIcon(CElement* radarMarker, std::uint8_t icon);
