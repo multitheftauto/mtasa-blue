@@ -468,7 +468,6 @@ public:
     virtual void        FramerateFixingSetPhysicsTimeStep(float timestep) = 0;
     virtual float       FramerateFixingGetPhysicsTimeStep() const noexcept = 0;
 
-
     virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
     virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
 };
