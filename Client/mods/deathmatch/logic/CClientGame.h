@@ -405,6 +405,44 @@ public:
                        AnimationId animId = 15);
     void SendPedWastedPacket(CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF,
                              AssocGroupId animGroup = 0, AnimationId animID = 15);
+    
+    void ClearDamageData() noexcept {
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = WEAPONTYPE_INVALID;
+        m_ucDamageBodyPiece = BODYPART_INVALID;
+        m_ulDamageTime = 0;
+        m_serverProcessedDeath = true;
+    }
+    
+    void ResetDeathProcessingFlag() noexcept {
+        m_serverProcessedDeath = false;
+    }
+    
+    void SetScriptedDeathData() {
+        auto* localPlayer = GetLocalPlayer();
+        if (!localPlayer) {
+            m_DamagerID = INVALID_ELEMENT_ID;
+            m_ucDamageWeapon = WEAPONTYPE_INVALID;
+            m_ucDamageBodyPiece = BODYPART_INVALID;
+            m_ulDamageTime = CClientTime::GetTime();
+            m_serverProcessedDeath = false;
+            return;
+        }
+        
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = TryGetCurrentWeapon(localPlayer);
+        m_ucDamageBodyPiece = BODYPART_TORSO;
+        m_ulDamageTime = CClientTime::GetTime();
+        m_serverProcessedDeath = false;
+    }
+    
+    void SetExplosionDamageData() noexcept {
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = WEAPONTYPE_EXPLOSION;
+        m_ucDamageBodyPiece = BODYPART_TORSO;
+        m_ulDamageTime = CClientTime::GetTime();
+        m_serverProcessedDeath = false;
+    }
 
     CClientGUIElement* GetClickedGUIElement() { return m_pClickedGUIElement; }
     void               SetClickedGUIElement(CClientGUIElement* pElement) { m_pClickedGUIElement = NULL; }
@@ -616,6 +654,9 @@ private:
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
 
+    // Helper method to get current weapon type with error handling
+    std::uint8_t TryGetCurrentWeapon(CClientPlayer* player);
+
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool        ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -770,6 +811,7 @@ private:
     unsigned char  m_ucDamageBodyPiece;
     unsigned long  m_ulDamageTime;
     bool           m_bDamageSent;
+    bool           m_serverProcessedDeath{false}; // Flag to track server-processed deaths
 
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
