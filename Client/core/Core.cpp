@@ -49,7 +49,7 @@ BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID)
 
             if (g_pCore)
             {
-                AddReportLog(7102, "Core - PROCESS_DETACH");
+                AddReportLog(ReportLogID::CORE_PROCESS_DETACH, "Core - PROCESS_DETACH");
 
                 delete g_pCore;
                 g_pCore = nullptr;

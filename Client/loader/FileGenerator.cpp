@@ -183,7 +183,7 @@ bool FileGenerator::IsPatchBase(const fs::path& filePath)
     if (IsErrorCodeLoggable(ec))
     {
         const uintmax_t fileSize = GetFileSize(filePath);
-        AddReportLog(5053, SString("IsPatchBase: Incorrect file '%ls' (err: %d, size: %ju, hash: %s)", filePath.wstring().c_str(), ec.value(), fileSize,
+        AddReportLog(ReportLogID::FILEGEN_PATCH_FAIL, SString("IsPatchBase: Incorrect file '%ls' (err: %d, size: %ju, hash: %s)", filePath.wstring().c_str(), ec.value(), fileSize,
                                    GetFileHashString(hash).c_str()));
     }
 
@@ -201,7 +201,7 @@ bool FileGenerator::IsPatchDiff(const fs::path& filePath)
     if (IsErrorCodeLoggable(ec))
     {
         const uintmax_t fileSize = GetFileSize(filePath);
-        AddReportLog(5053, SString("IsPatchDiff: Incorrect file '%ls' (err: %d, size: %ju, hash: %s)", filePath.wstring().c_str(), ec.value(), fileSize,
+        AddReportLog(ReportLogID::FILEGEN_PATCH_FAIL, SString("IsPatchDiff: Incorrect file '%ls' (err: %d, size: %ju, hash: %s)", filePath.wstring().c_str(), ec.value(), fileSize,
                                    GetFileHashString(hash).c_str()));
     }
 

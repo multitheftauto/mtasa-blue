@@ -779,7 +779,7 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
     else if (bLinkRequiresErrorCode)
         strTroubleLink = "";            // No link if no error code
 
-    AddReportLog(7100, SString("Core - NetError (%s) (%s)", *strTitle, *strMessage));
+    AddReportLog(ReportLogID::CORE_NET_ERROR, SString("Core - NetError (%s) (%s)", *strTitle, *strMessage));
     ShowErrorMessageBox(strTitle, strMessage, strTroubleLink);
 }
 
@@ -906,7 +906,7 @@ void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
     SString strDllDirectory = GetSystemDllDirectory();
     if (CalcMTASAPath("mta").CompareI(strDllDirectory) == false)
     {
-        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath("mta")));
+        AddReportLog(ReportLogID::DLL_DIR_FAIL, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath("mta")));
         SetDllDirectory(CalcMTASAPath("mta"));
     }
 
@@ -1457,7 +1457,7 @@ void CCore::Quit(bool bInstantly)
 {
     if (bInstantly)
     {
-        AddReportLog(7101, "Core - Quit");
+        AddReportLog(ReportLogID::CORE_QUIT, "Core - Quit");
         // Show that we are quiting (for the crash dump filename)
         SetApplicationSettingInt("last-server-ip", 1);
 
@@ -2155,10 +2155,10 @@ void CCore::OnEnterCrashZone(uint uiId)
 //
 // LogEvent
 //
-void CCore::LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId)
+void CCore::LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, ReportLogID addReportLogId)
 {
-    if (uiAddReportLogId)
-        AddReportLog(uiAddReportLogId, SString("%s - %s", szContext, szBody));
+    if (addReportLogId != ReportLogID::NONE)
+        AddReportLog(addReportLogId, SString("%s - %s", szContext, szBody));
 
     if (GetDebugIdEnabled(uiDebugId))
     {

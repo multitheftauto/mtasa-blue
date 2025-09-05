@@ -1378,7 +1378,7 @@ bool CGraphics::LoadStandardDXFonts()
         {
             SString strFileMd5 = GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPathFilename);
             uint    uiFileSize = (uint)FileSize(strPathFilename);
-            AddReportLog(9442, SString("Problem with AddFontResourceEx [MD5:%s Size:%d] %s ", *strFileMd5, uiFileSize, *strPathFilename));
+            AddReportLog(ReportLogID::GRAPHICS_FONTRESOURCE_EX_FAIL, SString("Problem with AddFontResourceEx [MD5:%s Size:%d] %s ", *strFileMd5, uiFileSize, *strPathFilename));
             if (!FileExists(strPathFilename))
             {
                 BrowseToSolution("mta-datafiles-missing", EXIT_GAME_FIRST | ASK_GO_ONLINE, "Error loading MTA font " + m_FontResourceNames[i]);

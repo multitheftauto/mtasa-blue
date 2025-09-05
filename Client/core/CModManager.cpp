@@ -148,7 +148,7 @@ bool CModManager::TryStart()
 
     if (CalcMTASAPath("mta").CompareI(dllSearchPath) == false)
     {
-        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *dllSearchPath, *CalcMTASAPath("mta")));
+        AddReportLog(ReportLogID::DLL_DIR_FAIL, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *dllSearchPath, *CalcMTASAPath("mta")));
         SetDllDirectory(CalcMTASAPath("mta"));
     }
 

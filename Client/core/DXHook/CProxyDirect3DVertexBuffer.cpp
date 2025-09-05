@@ -123,17 +123,17 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
         struct
         {
             const char* szText;
-            uint        uiReportId;
+            ReportLogID uiReportId;
             uint        uiLogEventId;
         } info;
         if (hr == D3D_OK)
-            info = {"result NULL", 8621, 621};
+            info = {"result NULL", ReportLogID::D3D_LOCK_VERTEXBUFFER_NULL, 621};
         else if (hr == STATUS_ARRAY_BOUNDS_EXCEEDED)
-            info = {"offset out of range", 8622, 622};
+            info = {"offset out of range", ReportLogID::D3D_LOCK_VERTEXBUFFER_OOR, 622};
         else if (hr == STATUS_ACCESS_VIOLATION)
-            info = {"access violation", 8623, 623};
+            info = {"access violation", ReportLogID::D3D_LOCK_VERTEXBUFFER_AV, 623};
         else
-            info = {"fail", 8620, 620};
+            info = {"fail", ReportLogID::D3D_LOCK_VERTEXBUFFER_FAIL, 620};
 
         SString strMessage("Lock VertexBuffer [%s] hr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x", info.szText, hr, m_iMemUsed,
                            m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags);

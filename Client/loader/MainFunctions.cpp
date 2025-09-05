@@ -340,12 +340,12 @@ void HandleResetSettings()
 
             if (!FileExists(strSettingsFilename))
             {
-                AddReportLog(4053, "Deleted gta_sa.set");
+                AddReportLog(ReportLogID::LOADER_DELETED_GTA_SETTINGS, "Deleted gta_sa.set");
                 MessageBoxUTF8(NULL, _("GTA settings have been reset.\n\nPress OK to continue."), "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
             }
             else
             {
-                AddReportLog(5054, SString("Delete gta_sa.set failed with '%s'", *strSettingsFilename));
+                AddReportLog(ReportLogID::LOADER_DELETE_GTA_SETTINGS_FAIL, SString("Delete gta_sa.set failed with '%s'", *strSettingsFilename));
                 MessageBoxUTF8(NULL, SString(_("File could not be deleted: '%s'"), *strSettingsFilename), "Error" + _E("CL09"),
                                MB_OK | MB_ICONWARNING | MB_TOPMOST);
             }
@@ -372,7 +372,7 @@ void HandleResetSettings()
 //////////////////////////////////////////////////////////
 void HandleNotUsedMainMenu()
 {
-    AddReportLog(9310, "Loader - HandleNotUsedMainMenu");
+    AddReportLog(ReportLogID::LOADER_HANDLE_NOTUSED_MAINMENU, "Loader - HandleNotUsedMainMenu");
 
     // Check current display mode in coreconfig.xml
     {
@@ -384,7 +384,7 @@ void HandleNotUsedMainMenu()
 
         if (strFullscreenStyle == "1")
         {
-            AddReportLog(9315, "Loader - HandleNotUsedMainMenu - Already Borderless window");
+            AddReportLog(ReportLogID::LOADER_HANDLE_NOTUSED_MAINMENU_BORDERLESS_IS, "Loader - HandleNotUsedMainMenu - Already Borderless window");
         }
         else if (!strWindowed.empty() && !strFullscreenStyle.empty())
         {
@@ -400,16 +400,16 @@ void HandleNotUsedMainMenu()
                     // Change to borderless window mode
                     strCoreConfig = strCoreConfig.Replace("<display_fullscreen_style>0", "<display_fullscreen_style>1");
                     FileSave(strCoreConfigFilename, strCoreConfig);
-                    AddReportLog(9311, "Loader - HandleNotUsedMainMenu - User change to Borderless window");
+                    AddReportLog(ReportLogID::LOADER_HANDLE_NOTUSED_MAINMENU_CHANGE, "Loader - HandleNotUsedMainMenu - User change to Borderless window");
                 }
                 else
                 {
-                    AddReportLog(9313, "Loader - HandleNotUsedMainMenu - User said no");
+                    AddReportLog(ReportLogID::LOADER_HANDLE_NOTUSED_MAINMENU_USER_NO, "Loader - HandleNotUsedMainMenu - User said no");
                 }
             }
             else
             {
-                AddReportLog(9314, "Loader - HandleNotUsedMainMenu - Mode not fullscreen standard");
+                AddReportLog(ReportLogID::LOADER_HANDLE_NOTUSED_MAINMENU_NOT_FSCREEN, "Loader - HandleNotUsedMainMenu - Mode not fullscreen standard");
             }
         }
         else
@@ -417,7 +417,7 @@ void HandleNotUsedMainMenu()
             // If no valid settings file yet, do the change without asking
             strCoreConfig = "<mainconfig><settings><display_fullscreen_style>1</display_fullscreen_style></settings></mainconfig>";
             FileSave(strCoreConfigFilename, strCoreConfig);
-            AddReportLog(9312, "Loader - HandleNotUsedMainMenu - Set Borderless window");
+            AddReportLog(ReportLogID::LOADER_HANDLE_NOTUSED_MAINMENU_BORDERLESS_SET, "Loader - HandleNotUsedMainMenu - Set Borderless window");
         }
     }
 
@@ -1461,18 +1461,32 @@ int LaunchGame(SString strCmdLine)
 
             // If core is closing and gta_sa.exe process memory usage is not changing, terminate
             CStuckProcessDetector detector(piLoadee.hProcess, 5000);
-            while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("Q0"))            // Gets closed when quit is detected as frozen
+            while (status == WAIT_TIMEOUT)
             {
-                if (detector.UpdateIsStuck())
+                status = WaitForSingleObject(piLoadee.hProcess, 1500);
+
+                // If core is closing and gta_sa.exe process memory usage is not changing, terminate
+                CStuckProcessDetector detector(piLoadee.hProcess, 5000);
+                while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("Q0"))            // Gets closed when quit is detected as frozen
                 {
-                    WriteDebugEvent("Detected stuck process at quit");
-                #ifndef MTA_DEBUG
-                    TerminateProcess(piLoadee.hProcess, 1);
-                    status = WAIT_FAILED;
-                    break;
-                #endif
+                    if (detector.UpdateIsStuck())
+                    {
+                        WriteDebugEvent("Detected stuck process at quit");
+#ifndef MTA_DEBUG
+                        TerminateProcess(piLoadee.hProcess, 1);
+                        status = WAIT_FAILED;
+                        break;
+#endif
+                    }
+                    status = WaitForSingleObject(piLoadee.hProcess, 1000);
                 }
-                status = WaitForSingleObject(piLoadee.hProcess, 1000);
+            }
+
+            BsodDetectionOnGameEnd();
+
+            if (!GetExitCodeProcess(piLoadee.hProcess, &dwExitCode))
+            {
+                dwExitCode = static_cast<DWORD>(-1);
             }
         }
 
@@ -1484,7 +1498,7 @@ int LaunchGame(SString strCmdLine)
         }
     }
 
-    AddReportLog(7104, "Loader - Finishing");
+    AddReportLog(ReportLogID::LOADER_FINISH, "Loader - Finishing");
     WriteDebugEvent("Loader - Finishing");
     EndD3DStuff();
 

@@ -139,7 +139,7 @@ void CResourceFileDownloadManager::DoPulse()
     {
         // Throw the error and disconnect
         g_pCore->GetConsole()->Printf(_("Download error: %s"), *m_strLastHTTPError);
-        AddReportLog(7106, SString("Game - HTTPError (%s)", *m_strLastHTTPError));
+        AddReportLog(ReportLogID::GAME_HTTPERROR, SString("Game - HTTPError (%s)", *m_strLastHTTPError));
 
         g_pCore->GetModManager()->RequestUnload();
         g_pCore->ShowMessageBox(_("Error") + _E("CD20"), *m_strLastHTTPError, MB_BUTTON_OK | MB_ICON_ERROR);            // HTTP Error
@@ -318,7 +318,7 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
                 // Was re-added - Add size again to total.
                 AddDownloadSize(pResourceFile->GetDownloadSize());
                 SString strMessage("External HTTP file mismatch (Retrying this file with internal HTTP) [%s]", *ConformResourcePath(pResourceFile->GetName()));
-                g_pClientGame->TellServerSomethingImportant(1011, strMessage, 3);
+                g_pClientGame->TellServerSomethingImportant(ReportLogID::HTTP_FILE_MISMATCH, strMessage, 3);
                 return;
             }
         }
@@ -343,7 +343,7 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
                 AddDownloadSize(pResourceFile->GetDownloadSize());
                 SString strMessage("External HTTP file download error:[%d] %s (Disabling External HTTP) [%s]", result.iErrorCode, *strHTTPError,
                                    *ConformResourcePath(pResourceFile->GetName()));
-                g_pClientGame->TellServerSomethingImportant(1012, strMessage, 3);
+                g_pClientGame->TellServerSomethingImportant(ReportLogID::HTTP_DOWNLOAD_ERROR, strMessage, 3);
                 return;
             }
         }

@@ -447,7 +447,7 @@ void _cdecl DoWait(HANDLE hHandle)
     DWORD dwResult = WaitForSingleObject(hHandle, dwWait);
     if (dwResult == WAIT_TIMEOUT)
     {
-        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait));
+        AddReportLog(ReportLogID::WAIT_FOR_SINGLE_OBJECT_TIMED_OUT, SString("WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait));
         // This thread lock bug in GTA will have to be fixed one day.
         // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
 #if 0
@@ -650,7 +650,7 @@ bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAss
 {
     if (pTask->VTBL != (TaskVTBL*)VTBL_CTaskSimpleCarFallOut)
     {
-        AddReportLog(8530, SString("IsTaskSimpleCarFallOutValid fail - pTask->VTBL: %08x", pTask->VTBL), 5);
+        AddReportLog(ReportLogID::TASK_SIMPLE_FALLOUT_VFTBL, SString("IsTaskSimpleCarFallOutValid fail - pTask->VTBL: %08x", pTask->VTBL), 5);
         return false;
     }
 
@@ -661,7 +661,7 @@ bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAss
         if (!pVehicle)
         {
             // Task looks valid, but vehicle is not recognised by MTA
-            AddReportLog(8531, SString("IsTaskSimpleCarFallOutValid invalid vehicle ptr - pTask->pVehicle: %08x", pTask->pVehicle), 5);
+            AddReportLog(ReportLogID::TASK_SIMPLE_FALLOUT_VEHPTR, SString("IsTaskSimpleCarFallOutValid invalid vehicle ptr - pTask->pVehicle: %08x", pTask->pVehicle), 5);
             pTask->pVehicle = NULL;
             return true;
         }
@@ -1072,7 +1072,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
         if (pNewFrameResult)
         {
             SString strMsg("No frame for vehicle:%d  frameId:%d  (replaced with:%d  calledfrom:%08x)", iModelId, id, uiNewId, calledFrom);
-            AddReportLog(5412, SString("GetFrameFromId - %s", *strMsg));
+            AddReportLog(ReportLogID::VEHICLE_MODEL_FRAME_FIX, SString("GetFrameFromId - %s", *strMsg));
             LogEvent(5412, "Model frame warning", "GetFrameFromId", strMsg);
             return pNewFrameResult;
         }
@@ -1080,7 +1080,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
 
     // Couldn't find a replacement frame id
     SString strMsg("No frame for vehicle:%d  frameId:%d  (calledfrom:%08x)", iModelId, id, calledFrom);
-    AddReportLog(5413, SString("GetFrameFromId - %s", *strMsg));
+    AddReportLog(ReportLogID::VEHICLE_MODEL_FRAME_FAIL, SString("GetFrameFromId - %s", *strMsg));
     LogEvent(5413, "Model frame error", "GetFrameFromId", strMsg);
 
     return NULL;
@@ -1141,7 +1141,7 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
     if (!pModelInfo)
     {
         // Crash will occur at offset 00134131
-        LogEvent(814, "Model info missing", "CEntity_GetBoundRect", SString("No info for model:%d", usModelId), 5414);
+        LogEvent(814, "Model info missing", "CEntity_GetBoundRect", SString("No info for model:%d", usModelId), ReportLogID::MODEL_NO_MODEL_INFO);
         CArgMap argMap;
         argMap.Set("id", usModelId);
         argMap.Set("reason", "info");
@@ -1157,7 +1157,7 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
             SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
                                pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel, pStreamingInfo->flg,
                                pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks, pStreamingInfo->loadState);
-            LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
+            LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), ReportLogID::MODEL_NO_COL_INFO);
             CArgMap argMap;
             argMap.Set("id", usModelId);
             argMap.Set("reason", "collision");
@@ -1407,7 +1407,7 @@ void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
     if (pModelInfo->GetInterface()->pRwObject == NULL)
     {
         // Crash will occur at offset 00349b7b
-        LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
+        LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), ReportLogID::MODEL_NOT_LOADED);
         CArgMap argMap;
         argMap.Set("id", uiModelId);
         argMap.Set("reason", "createanim");
@@ -1493,7 +1493,7 @@ void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
     }
 
     SString strContext("GTALOG Called from 0x%08x", dwCalledFrom);
-    LogEvent(6311, "printf", strContext, strMessage, 6311);
+    LogEvent(6311, "printf", strContext, strMessage, ReportLogID::GTA_PRINTF);
 
     // Check for known issues
     if (strMessage == "Error subrastering")
@@ -1596,7 +1596,7 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
                 pAnimHier = %p | HierHash = %u | SequenceExistsInHierarchy: %s",
                      pInterface->m_endKeyFrameId, pAnimAssoc, pAnimAssoc->sAnimGroup, pAnimAssoc->sAnimID, pAnimSequence, pAnimSequence->m_boneId,
                      pAnimSequence->m_hash, pAnimHierarchy, pAnimHierarchy->uiHashKey, bSequenceExistsInHierarchy ? "Yes" : "No"),
-             588);
+             ReportLogID::ANIM_TRANSLATION_FAIL);
 }
 
 // Hook info
@@ -1914,13 +1914,13 @@ static void LOG_CWorld__FindObjectsKindaCollidingSectorList(unsigned int modelId
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[modelId];
     if (!pModelInfo)
     {
-        LogEvent(840, "Model info missing", "CWorld__FindObjectsKindaCollidingSectorList", SString("Corrupt model: %d", modelId), 5601);
+        LogEvent(840, "Model info missing", "CWorld__FindObjectsKindaCollidingSectorList", SString("Corrupt model: %d", modelId), ReportLogID::OBJECT_MODEL_NO_COL_OR_INFO);
         return;
     }
 
     if (!pModelInfo->pColModel)
     {
-        LogEvent(840, "Col model missing", "CWorld__FindObjectsKindaCollidingSectorList", SString("Corrupt col model: %d", modelId), 5601);
+        LogEvent(840, "Col model missing", "CWorld__FindObjectsKindaCollidingSectorList", SString("Corrupt col model: %d", modelId), ReportLogID::OBJECT_MODEL_NO_COL_OR_INFO);
     }
 }
 

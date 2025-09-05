@@ -43,11 +43,6 @@ namespace {
     // Command line constants
     constexpr size_t MAX_CMD_LINE_LENGTH = 4096;
     
-    // Report log IDs
-    constexpr int LOG_ID_END = 1044;
-    constexpr int LOG_ID_CONTINUE_EXCEPTION = 1045;
-    constexpr int LOG_ID_LAUNCH_EXCEPTION = 1046;
-    
     // Compile-time checks  
     static_assert(MAX_CMD_LINE_LENGTH > 0, "Command line buffer size must be positive");
     static_assert(MAX_CMD_LINE_LENGTH <= 65536, "Command line buffer size seems unreasonably large");
@@ -151,7 +146,7 @@ namespace {
             return pInstallManager->Continue();
         }
         catch (...) {
-            AddReportLog(LOG_ID_CONTINUE_EXCEPTION, "Exception in InstallManager::Continue()");
+            AddReportLog(ReportLogID::INSTALL_MGR_CONTINUE_EXCEPTION, "Exception in InstallManager::Continue()");
             return SString();
         }
     }
@@ -162,7 +157,7 @@ namespace {
             return LaunchGame(strCmdLine);
         }
         catch (...) {
-            AddReportLog(LOG_ID_LAUNCH_EXCEPTION, "Exception in LaunchGame()");
+            AddReportLog(ReportLogID::INSTALL_MGR_LAUNCHGAME_EXCEPTION, "Exception in LaunchGame()");
             return static_cast<int>(ERROR_LAUNCH_EXCEPTION);
         }
     }
@@ -279,7 +274,7 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPre
     // Get current process ID for logging
     DWORD currentPid = GetSafeProcessId();
 
-    AddReportLog(LOG_ID_END, SString("* End (0x%X)* pid:%d", iReturnCode, currentPid));
+    AddReportLog(ReportLogID::LOADER_DOMAIN_FINISH, SString("* End (0x%X)* pid:%d", iReturnCode, currentPid));
     
     return iReturnCode;
 }

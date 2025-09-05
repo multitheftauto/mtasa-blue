@@ -432,7 +432,7 @@ bool CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
     // otherwise it will crash (offset 0x3c51a8).
     if (!GetAnimHierarchyFromClump(pNew))
     {
-        LogEvent(851, "Model not replaced", "CRenderWareSA::ReplacePedModel", SString("No anim hierarchy for ped model:%d", usModelID), 5421);
+        LogEvent(851, "Model not replaced", "CRenderWareSA::ReplacePedModel", SString("No anim hierarchy for ped model:%d", usModelID), ReportLogID::PED_NO_ANIM_HIERARCHY);
         return false;
     }
 

@@ -46,7 +46,7 @@
 #endif
 
 CCriticalSection     CRefCountable::ms_CS;
-std::map<uint, uint> ms_ReportAmountMap;
+std::map<ReportLogID, uint> ms_ReportAmountMap;
 SString              ms_strProductRegistryPath;
 SString              ms_strProductCommonDataDir;
 SString              ms_strProductVersion;
@@ -54,9 +54,9 @@ SString              ms_strProductVersion;
 struct SReportLine
 {
     SString strText;
-    uint    uiId;
+    ReportLogID    id;
     void    operator+=(const char* szAppend) { strText += szAppend; }
-    bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
+    bool    operator==(const SReportLine& other) const { return strText == other.strText && id == other.id; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 
@@ -352,7 +352,7 @@ bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SS
             strShowCmd = vecParts[4];
             return true;
         }
-        AddReportLog(4000, SString("OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str(), strVersion.c_str()));
+        AddReportLog(ReportLogID::ON_RESTART_CMD_FAIL, SString("OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str(), strVersion.c_str()));
     }
     return false;
 }
@@ -680,7 +680,7 @@ SString SharedUtil::GetClipboardText()
 //
 void SharedUtil::BrowseToSolution(const SString& strType, int iFlags, const SString& strMessageBoxMessage, const SString& strErrorCode)
 {
-    AddReportLog(3200, SString("Trouble %s", *strType));
+    AddReportLog(ReportLogID::TROUBLE, SString("Trouble %s", *strType));
 
     // Put args into a string and save in the registry
     CArgMap argMap;
@@ -796,28 +796,28 @@ static SString GetReportLogHeaderText()
     return strResult.TrimEnd(" ") + "]";
 }
 
-void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLimit)
+void SharedUtil::AddReportLog(ReportLogID id, const SString& strText, uint uiAmountLimit)
 {
     if (uiAmountLimit)
     {
-        uint& uiAmount = MapGet(ms_ReportAmountMap, uiId);
+        uint& uiAmount = MapGet(ms_ReportAmountMap, id);
         if (uiAmount++ >= uiAmountLimit)
             return;
     }
 
-    ms_ReportLineFilter.AddLine({strText, uiId});
+    ms_ReportLineFilter.AddLine({strText, id});
 
     SReportLine line;
     while (ms_ReportLineFilter.PopOutputLine(line))
     {
         const SString& strText = line.strText;
-        uint           uiId = line.uiId;
+        ReportLogID    id = line.id;
 
         SString strPathFilename = PathJoin(GetMTADataPath(), "report.log");
         MakeSureDirExists(strPathFilename);
 
         SString strMessage;
-        strMessage.Format("%u: %s %s [%s] - ", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
+        strMessage.Format("%u: %s %s [%s] - ", id, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
                           GetReportLogProcessTag().c_str());
         strMessage += strText;
         strMessage += "\n";

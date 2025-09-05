@@ -275,7 +275,7 @@ bool CClientObjectManager::IsHardObjectLimitReached()
                 m_iEntryInfoNodeEntries, MAX_ENTRY_INFO_NODES_MTA,
                 m_iPointerNodeDoubleLinkEntries, MAX_POINTER_DOUBLE_LINKS_MTA);
             g_pCore->GetConsole()->Echo(strMessage);
-            AddReportLog(7430, strMessage);
+            AddReportLog(ReportLogID::OBJECTS_LIMIT_REACHED, strMessage);
         }
         return true;
     }

@@ -111,7 +111,7 @@ HRESULT CProxyDirect3DIndexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, void
         SString strMessage("Lock IndexBuffer fail: hr:%x Length:%x Usage:%x Format:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x", hr, m_iMemUsed,
                            m_dwUsage, m_format, m_pool, OffsetToLock, SizeToLock, Flags);
         WriteDebugEvent(strMessage);
-        AddReportLog(8625, strMessage);
+        AddReportLog(ReportLogID::D3D_LOCK_INDEXBUFFER_FAIL, strMessage);
         CCore::GetSingleton().LogEvent(625, "Lock IndexBuffer", "", strMessage);
     }
     else if (*ppbData == NULL)
@@ -119,7 +119,7 @@ HRESULT CProxyDirect3DIndexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, void
         SString strMessage("Lock IndexBuffer result NULL: hr:%x Length:%x Usage:%x Format:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x", hr, m_iMemUsed,
                            m_dwUsage, m_format, m_pool, OffsetToLock, SizeToLock, Flags);
         WriteDebugEvent(strMessage);
-        AddReportLog(8626, strMessage);
+        AddReportLog(ReportLogID::D3D_LOCK_INDEXBUFFER_NULL, strMessage);
         CCore::GetSingleton().LogEvent(626, "Lock IndexBuffer NULL", "", strMessage);
     }
     return hr;

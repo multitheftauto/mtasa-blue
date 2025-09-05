@@ -356,25 +356,25 @@ namespace
             m_strTempFileName = MakeUniquePath(PathJoin(GetMTADataPath(), "temp", "buffer.xml"));
             if (!FileSave(m_strTempFileName, &data[0], uiSize))
             {
-                AddReportLog(2501, SString("CXMLBuffer::SetFromBuffer: Could not save %s", m_strTempFileName.c_str()));
+                AddReportLog(ReportLogID::VER_UPD_XML_SAVE_FAIL, SString("CXMLBuffer::SetFromBuffer: Could not save %s", m_strTempFileName.c_str()));
                 return NULL;
             }
 
             m_pXMLFile = CCore::GetSingleton().GetXML()->CreateXML(m_strTempFileName);
             if (!m_pXMLFile)
             {
-                AddReportLog(2502, SString("CXMLBuffer::SetFromBuffer: Could not CreateXML %s", m_strTempFileName.c_str()));
+                AddReportLog(ReportLogID::VER_UPD_XML_CREATE_FAIL, SString("CXMLBuffer::SetFromBuffer: Could not CreateXML %s", m_strTempFileName.c_str()));
                 return NULL;
             }
             if (!m_pXMLFile->Parse())
             {
-                AddReportLog(2503, SString("CXMLBuffer::SetFromBuffer: Could not parse %s", m_strTempFileName.c_str()));
+                AddReportLog(ReportLogID::VER_UPD_XML_PARSE_FAIL, SString("CXMLBuffer::SetFromBuffer: Could not parse %s", m_strTempFileName.c_str()));
                 return NULL;
             }
             m_pRoot = m_pXMLFile->GetRootNode();
             if (!m_pRoot)
             {
-                AddReportLog(2504, SString("CXMLBuffer::SetFromBuffer: No root node in %s", m_strTempFileName.c_str()));
+                AddReportLog(ReportLogID::VER_UPD_XML_MISSING_ROOT, SString("CXMLBuffer::SetFromBuffer: No root node in %s", m_strTempFileName.c_str()));
                 return NULL;
             }
 

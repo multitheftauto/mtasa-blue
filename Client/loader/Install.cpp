@@ -164,13 +164,13 @@ static bool ProcessArchive(const std::string& archivePath, std::vector<ManifestF
             if (errorCode == ERAR_END_ARCHIVE)
                 break;
 
-            AddReportLog(5055, SString("ProcessArchive: Failed to read header (index: %zu, error: %d, archive: '%s')", i, errorCode, archivePath.c_str()));
+            AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("ProcessArchive: Failed to read header (index: %zu, error: %d, archive: '%s')", i, errorCode, archivePath.c_str()));
             return false;
         }
 
         if (int errorCode = RARProcessFile(archiveHandle.get(), fileOperation, nullptr, nullptr); errorCode != ERAR_SUCCESS)
         {
-            AddReportLog(5055, SString("ProcessArchive: Failed to process '%s' (index: %zu, error: %d, archive: %s)", header.FileName, i, errorCode,
+            AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("ProcessArchive: Failed to process '%s' (index: %zu, error: %d, archive: %s)", header.FileName, i, errorCode,
                                        archivePath.c_str()));
             return false;
         }
@@ -360,7 +360,7 @@ static auto GetUpdateFiles(const SString& sourceRoot, const SString& archivePath
     }
 
     if (files.empty())
-        AddReportLog(5055, SString("GetUpdateFiles: Found no files (source: %d)", filesSource));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("GetUpdateFiles: Found no files (source: %d)", filesSource));
 
     return files;
 }
@@ -387,7 +387,7 @@ static auto GetBackupFiles(const SString& backupRoot) -> std::vector<ManifestFil
     }
 
     if (files.empty())
-        AddReportLog(5055, SString("GetBackupFiles: Found no files (source: %d)", filesSource));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("GetBackupFiles: Found no files (source: %d)", filesSource));
 
     return files;
 }
@@ -468,7 +468,7 @@ static auto RunRollback(std::vector<InstallableFile>& files) -> size_t
         if (disasterCounter <= 5)
         {
             bool exists = FileExists(file.targetFile.absolutePath);
-            AddReportLog(5055, SString("RunRollback: Unable to restore backup from '%s' to '%s' (exists: %d, attempts: %d, checksums: %d)",
+            AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunRollback: Unable to restore backup from '%s' to '%s' (exists: %d, attempts: %d, checksums: %d)",
                                        file.backupFile.c_str(), file.targetFile.c_str(), exists, attempts, checksums));
         }
     }
@@ -481,7 +481,7 @@ static auto RunRollback(std::vector<InstallableFile>& files) -> size_t
                                disasterCounter, files.size()),
                        "MTA: San Andreas", MB_OK | MB_ICONERROR | MB_TOPMOST);
 
-        AddReportLog(5055, SString("RunRollback: Rollback failed for %zu out of %zu files", disasterCounter, files.size()));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunRollback: Rollback failed for %zu out of %zu files", disasterCounter, files.size()));
         OutputDebugLine(SString("RunRollback: Rollback failed for %zu out of %zu files", disasterCounter, files.size()));
     }
 
@@ -503,12 +503,12 @@ static bool CompletePendingRollback(const SString& sourceRoot, const SString& ta
 
     if (FileExists(hintFile))
     {
-        AddReportLog(5055, SString("CompletePendingRollback: Hint file was not deleted: '%s'", hintFile.c_str()));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("CompletePendingRollback: Hint file was not deleted: '%s'", hintFile.c_str()));
     }
 
     if (!DirectoryExists(backupRoot))
     {
-        AddReportLog(5055, SString("CompletePendingRollback: Backup directory does not exist: '%s'", backupRoot.c_str()));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("CompletePendingRollback: Backup directory does not exist: '%s'", backupRoot.c_str()));
         return false;
     }
 
@@ -540,7 +540,7 @@ static bool CompletePendingRollback(const SString& sourceRoot, const SString& ta
 
     if (files.empty())
     {
-        AddReportLog(5055, SString("CompletePendingRollback: Rollback is obsolete (%zu files skipped)", backupFiles.size()));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("CompletePendingRollback: Rollback is obsolete (%zu files skipped)", backupFiles.size()));
         return true;
     }
 
@@ -552,7 +552,7 @@ static bool CompletePendingRollback(const SString& sourceRoot, const SString& ta
         deleteBackupRoot.Release();
 
         bool hasHint = FileSave(PathJoin(sourceRoot, ROLLBACK_NAME), backupRoot);
-        AddReportLog(5055,
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL,
                      SString("CompletePendingRollback: %zu out of %zu files may be corrupt after rollback (hint: %d)", disasterCounter, files.size(), hasHint));
         return false;
     }
@@ -579,7 +579,7 @@ static int RunInstall()
 
     if (!FileExists(archivePath))
     {
-        AddReportLog(5055, SString("RunInstall: Source archive does not exist: '%s' (source: '%s')", archivePath.c_str(), sourceRoot.c_str()));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: Source archive does not exist: '%s' (source: '%s')", archivePath.c_str(), sourceRoot.c_str()));
         archivePath = "";
     }
 
@@ -587,14 +587,14 @@ static int RunInstall()
 
     if (!DirectoryExists(targetRoot))
     {
-        AddReportLog(5055, SString("RunInstall: MTA directory does not exist: '%s'", targetRoot.c_str()));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: MTA directory does not exist: '%s'", targetRoot.c_str()));
         return 1;
     }
 
     // Check if we have to complete a pending rollback.
     if (!CompletePendingRollback(sourceRoot, targetRoot))
     {
-        AddReportLog(5055, SStringX("RunInstall: Rollback has failed"));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SStringX("RunInstall: Rollback has failed"));
         return 2;
     }
 
@@ -609,7 +609,7 @@ static int RunInstall()
 
     if (backupRoot.empty())
     {
-        AddReportLog(5055, SStringX("RunInstall: Unable to create writable backup directory"));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SStringX("RunInstall: Unable to create writable backup directory"));
         return 3;
     }
 
@@ -656,7 +656,7 @@ static int RunInstall()
         {
             if (FileExists(file.targetFile.absolutePath))
             {
-                AddReportLog(5055, SString("RunInstall: Target file '%s' exists but has no checksum", file.targetFile.absolutePath.c_str()));
+                AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: Target file '%s' exists but has no checksum", file.targetFile.absolutePath.c_str()));
                 return 5;
             }
 
@@ -683,7 +683,7 @@ static int RunInstall()
             {
                 if (!FileExists(file.targetFile.absolutePath))
                 {
-                    AddReportLog(5055, SString("RunInstall: Target file '%s' is missing (attempts: %d)", file.relativePath.c_str(), attempts));
+                    AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: Target file '%s' is missing (attempts: %d)", file.relativePath.c_str(), attempts));
                     break;
                 }
 
@@ -704,7 +704,7 @@ static int RunInstall()
             uint64_t targetSize = FileSize(file.targetFile.absolutePath);
             bool     backupExists = FileExists(file.backupFile.absolutePath);
             uint64_t backupSize = FileSize(file.backupFile.absolutePath);
-            AddReportLog(5055, SString("RunInstall: Unable to create backup of '%s' (attempts: %d, checksums: %d, target: %d [size:%llu hash:%08x], backup: %d "
+            AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: Unable to create backup of '%s' (attempts: %d, checksums: %d, target: %d [size:%llu hash:%08x], backup: %d "
                                        "[size:%llu hash:%08x])",
                                        file.relativePath.c_str(), attempts, checksums, targetExists, targetSize, file.targetFile.checksum.value_or(0),
                                        backupExists, backupSize, file.backupFile.checksum.value_or(0)));
@@ -756,7 +756,7 @@ static int RunInstall()
             {
                 if (!FileExists(file.sourceFile.absolutePath))
                 {
-                    AddReportLog(5055, SString("RunInstall: Source file '%s' is missing (attempts: %d)", file.relativePath.c_str(), attempts));
+                    AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: Source file '%s' is missing (attempts: %d)", file.relativePath.c_str(), attempts));
                     break;
                 }
 
@@ -791,7 +791,7 @@ static int RunInstall()
             file.targetFile.ComputeChecksum();
 
             bool exists = FileExists(file.sourceFile.absolutePath);
-            AddReportLog(5055, SString("RunInstall: Unable to install '%s' (exists: %d, attempts: %d, checksums: %d)", file.relativePath.c_str(), exists,
+            AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: Unable to install '%s' (exists: %d, attempts: %d, checksums: %d)", file.relativePath.c_str(), exists,
                                        attempts, checksums));
             requiresRollback = true;
             break;
@@ -810,7 +810,7 @@ static int RunInstall()
             deleteBackupRoot.Release();
 
             bool hasHint = FileSave(PathJoin(sourceRoot, ROLLBACK_NAME), backupRoot);
-            AddReportLog(5055, SString("RunInstall: %zu out of %zu files may be corrupt after rollback (hint: %d)", disasterCounter, files.size(), hasHint));
+            AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: %zu out of %zu files may be corrupt after rollback (hint: %d)", disasterCounter, files.size(), hasHint));
         }
     };
 
@@ -830,7 +830,7 @@ static int RunInstall()
 
         if (!exists || !checksum)
         {
-            AddReportLog(5055, SString("RunInstall: Verification failed for '%s' (exists: %d, checksum: %d)", file.targetFile.c_str(), exists, checksum));
+            AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("RunInstall: Verification failed for '%s' (exists: %d, checksum: %d)", file.targetFile.c_str(), exists, checksum));
             requiresRollback = true;
             break;
         }
@@ -855,7 +855,7 @@ bool InstallFiles(bool showProgressWindow)
 
     if (int failureStep = RunInstall(); failureStep > 0)
     {
-        AddReportLog(5055, SString("InstallFiles: Installation ended on step %d", failureStep));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("InstallFiles: Installation ended on step %d", failureStep));
         OutputDebugLine(SString("InstallFiles: Installation ended on step %d", failureStep));
     }
     else
@@ -877,20 +877,20 @@ bool ExtractFiles(const std::string& archivePath, bool withManifest)
 
     if (!ExtractArchiveFiles(archivePath, files, ARCHIVE_PASSWORD))
     {
-        AddReportLog(5055, SString("ExtractFiles: Failed to extract '%s'", archivePath.c_str()));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SString("ExtractFiles: Failed to extract '%s'", archivePath.c_str()));
         return false;
     }
 
     if (files.empty())
     {
-        AddReportLog(5055, SStringX("ExtractFiles: File extraction yielded zero files"));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SStringX("ExtractFiles: File extraction yielded zero files"));
         return false;
     }
 
     if (withManifest && !GenerateManifestFile(".", files))
     {
         // This is not a fatal error. We have fallback methods to work without a manifest.
-        AddReportLog(5055, SStringX("ExtractFiles: Failed to generate manifest"));
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, SStringX("ExtractFiles: Failed to generate manifest"));
     }
 
     return true;
@@ -960,7 +960,7 @@ SString CheckOnRestartCommand()
         }
         else
         {
-            AddReportLog(5052, SString("CheckOnRestartCommand: Unknown restart command %s", strOperation.c_str()));
+            AddReportLog(ReportLogID::CHECK_ON_RESTART_CMD_UNKNOWN, SString("CheckOnRestartCommand: Unknown restart command %s", strOperation.c_str()));
         }
     }
 

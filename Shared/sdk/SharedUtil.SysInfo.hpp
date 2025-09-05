@@ -118,7 +118,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 
     if (FAILED(hres))
     {
-        AddReportLog(9130, SString("QueryWMI - Failed to create IWbemLocator object. Error code = %x (%s)", hres, *strQuery));
+        AddReportLog(ReportLogID::QUERYWMI_FAIL, SString("QueryWMI - Failed to create IWbemLocator object. Error code = %x (%s)", hres, *strQuery));
         return false;
     }
 
@@ -144,7 +144,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     if (FAILED(hres))
     {
         pLoc->Release();
-        AddReportLog(9135, SString("QueryWMI - Could not connect. Error code = %x (%s)", hres, *strQuery));
+        AddReportLog(ReportLogID::QUERYWMI_CONNECT_FAIL, SString("QueryWMI - Could not connect. Error code = %x (%s)", hres, *strQuery));
         return false;
     }
 
@@ -165,7 +165,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     {
         pSvc->Release();
         pLoc->Release();
-        AddReportLog(9136, SString("QueryWMI - Could not set proxy blanket. Error code = %x (%s)", hres, *strQuery));
+        AddReportLog(ReportLogID::QUERYWMI_PROXY_FAIL, SString("QueryWMI - Could not set proxy blanket. Error code = %x (%s)", hres, *strQuery));
         return false;
     }
 
@@ -179,7 +179,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     {
         pSvc->Release();
         pLoc->Release();
-        AddReportLog(9137, SString("QueryWMI - Query failed. Error code = %x (%s)", hres, *strQuery));
+        AddReportLog(ReportLogID::QUERYWMI_QUERY_FAIL, SString("QueryWMI - Query failed. Error code = %x (%s)", hres, *strQuery));
         return false;
     }
 
@@ -203,7 +203,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 
         if (hr == STATUS_ACCESS_VIOLATION)
         {
-            AddReportLog(9130, SString("QueryWMI pEnumerator->Next returned STATUS_ACCESS_VIOLATION for %s", *strQuery));
+            AddReportLog(ReportLogID::QUERYWMI_FAIL, SString("QueryWMI pEnumerator->Next returned STATUS_ACCESS_VIOLATION for %s", *strQuery));
             break;
         }
 
@@ -214,13 +214,13 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 
         if (hr != WBEM_S_NO_ERROR)
         {
-            AddReportLog(9131, SString("QueryWMI pEnumerator->Next returned %08x for %s", hr, *strQuery));
+            AddReportLog(ReportLogID::QUERYWMI_ENUMERATOR_FAIL, SString("QueryWMI pEnumerator->Next returned %08x for %s", hr, *strQuery));
             break;
         }
 
         if (pclsObj == NULL)
         {
-            AddReportLog(9132, SString("QueryWMI pclsObj == NULL returned %08x for %s", hr, *strQuery));
+            AddReportLog(ReportLogID::QUERYWMI_PCLSOBJ_FAIL, SString("QueryWMI pclsObj == NULL returned %08x for %s", hr, *strQuery));
             break;
         }
 
@@ -248,7 +248,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
             }
             else
             {
-                AddReportLog(9133, SString("QueryWMI pclsObj->Get returned %08x for key %d in %s", hr, i, *strQuery));
+                AddReportLog(ReportLogID::QUERYWMI_PCLSOBJ_RESULT, SString("QueryWMI pclsObj->Get returned %08x for key %d in %s", hr, i, *strQuery));
             }
 
             outResult.back().insert(outResult.back().end(), strValue);

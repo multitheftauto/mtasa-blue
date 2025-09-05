@@ -407,13 +407,13 @@ void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
             }
             if (!IsLoaded())
             {
-                AddReportLog(6641, SString("Blocking load fail: %d (%s)", m_dwModelID, szTag));
+                AddReportLog(ReportLogID::MODEL_INFO_LOAD_FAIL, SString("Blocking load fail: %d (%s)", m_dwModelID, szTag));
                 LogEvent(641, "Blocking load fail", "", SString("%d (%s)", m_dwModelID, szTag));
                 dassert(0);
             }
             else
             {
-                AddReportLog(6642, SString("Blocking load: %d (%s) (Took %d attempts)", m_dwModelID, szTag, iCount));
+                AddReportLog(ReportLogID::MODEL_INFO_LOAD_SUCCESS, SString("Blocking load: %d (%s) (Took %d attempts)", m_dwModelID, szTag, iCount));
                 LogEvent(642, "Blocking load", "", SString("%d (%s) (Took %d attempts)", m_dwModelID, szTag, iCount));
             }
         }

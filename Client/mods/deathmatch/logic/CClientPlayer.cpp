@@ -269,7 +269,7 @@ void CClientPlayer::DischargeWeapon(eWeaponType weaponType, const CVector& vecSt
         if (weaponType != GetCurrentWeaponType())
         {
             GiveWeapon(weaponType, 99, true);
-            AddReportLog(5432, SString("DischargeWeapon adding missing weapon %d (%s)", weaponType, GetNick()), 30);
+            AddReportLog(ReportLogID::REMOT_WEAPON_TYPE_MISMATCH, SString("DischargeWeapon adding missing weapon %d (%s)", weaponType, GetNick()), 30);
         }
 
         // Check weapon matches and is enabled for bullet sync
@@ -328,7 +328,7 @@ void CClientPlayer::DischargeWeapon(eWeaponType weaponType, const CVector& vecSt
 
                 SString strMessage("Applied %0.2f damage to %s (from %s) due to network interruption", fBackupDamage, pBackupDamagedPlayer->GetNick(),
                                    GetNick());
-                g_pClientGame->TellServerSomethingImportant(1010, strMessage);
+                g_pClientGame->TellServerSomethingImportant(ReportLogID::APPLY_DAMAGE_NET_FIX, strMessage);
             }
         }
     }

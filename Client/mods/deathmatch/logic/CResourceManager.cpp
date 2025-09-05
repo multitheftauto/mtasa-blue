@@ -242,7 +242,7 @@ void CResourceManager::OnFileModifedByScript(const SString& strInFilename, const
     {
         pResourceFile->SetModifedByScript(true);
         SString strMessage("Resource file modifed by script (%s): %s ", *strReason, *ConformResourcePath(strInFilename));
-        AddReportLog(7059, strMessage + g_pNet->GetConnectedServer(true), 10);
+        AddReportLog(ReportLogID::RESOURCE_FILE_MODIFY, strMessage + g_pNet->GetConnectedServer(true), 10);
     }
 }
 
@@ -277,13 +277,13 @@ void CResourceManager::ValidateResourceFile(const SString& strInFilename, const 
                 if (pResourceFile->IsDownloaded())
                 {
                     strMessage = "Resource file unexpected change: " + strMessage;
-                    g_pClientGame->TellServerSomethingImportant(1007, strMessage);
+                    g_pClientGame->TellServerSomethingImportant(ReportLogID::RESOURCE_LOAD_FAIL, strMessage);
                     g_pClientGame->GetScriptDebugging()->LogWarning(NULL, strMessage);
                 }
                 else if (pResourceFile->IsAutoDownload())
                 {
                     strMessage = "Attempt to load resource file before it is ready: " + strMessage;
-                    g_pClientGame->TellServerSomethingImportant(1008, strMessage);
+                    g_pClientGame->TellServerSomethingImportant(ReportLogID::RESOURCE_NOT_READY_LOAD, strMessage);
                 }
             }
         }

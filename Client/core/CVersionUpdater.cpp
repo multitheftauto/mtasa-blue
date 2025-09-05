@@ -805,8 +805,8 @@ SString CVersionUpdater::GetResumableSaveLocation(const SString& strFilename, co
         const SString strSaveLocation = *iter;
         if (FileExists(strSaveLocation) && FileAppend(strSaveLocation, "") && FileSize(strSaveLocation) < iFilesize)
         {
-            AddReportLog(
-                5008, SString("GetResumableSaveLocation: Will resume download at %d/%d for %s", (int)FileSize(strSaveLocation), iFilesize, *strSaveLocation));
+            AddReportLog(ReportLogID::VER_UPD_RESUMABLE_EXISTS, SString("GetResumableSaveLocation: Will resume download at %d/%d for %s",
+                                                                        (int)FileSize(strSaveLocation), iFilesize, *strSaveLocation));
             return strSaveLocation;
         }
     }
@@ -820,7 +820,7 @@ SString CVersionUpdater::GetResumableSaveLocation(const SString& strFilename, co
         if (FileSave(strSaveLocation, ""))
         {
             FileDelete(strSaveLocation);
-            AddReportLog(5009, SString("GetResumableSaveLocation: New download of %d for %s", iFilesize, *strSaveLocation));
+            AddReportLog(ReportLogID::VER_UPD_RESUMABLE_NEW, SString("GetResumableSaveLocation: New download of %d for %s", iFilesize, *strSaveLocation));
             return strSaveLocation;
         }
     }
@@ -2344,7 +2344,7 @@ void CVersionUpdater::_ProcessPatchFileQuery()
             SString playerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
                                   MTASA_VERSION_BUILD, netRev, netRel);
 
-            AddReportLog(5061, SString("Processing patch file '%s' [%s, %s] with '%s' (version: %s) from '%s'", m_JobInfo.strFilename.c_str(),
+            AddReportLog(ReportLogID::VER_UPD_RESPONSE, SString("Processing patch file '%s' [%s, %s] with '%s' (version: %s) from '%s'", m_JobInfo.strFilename.c_str(),
                                        m_JobInfo.iFilesize.ToString().c_str(), m_JobInfo.strMD5.c_str(), m_JobInfo.strStatus.c_str(), playerVersion.c_str(),
                                        m_strLastQueryURL.c_str()));
         }
@@ -2581,7 +2581,7 @@ void CVersionUpdater::_ProcessPatchFileDownload()
             if (m_JobInfo.serverList.size())
                 ListRemoveIndex(m_JobInfo.serverList, m_JobInfo.iCurrent--);
             m_ConditionMap.SetCondition("Download", "Fail", "Checksum");
-            AddReportLog(5003, SString("DoPollDownload: Checksum wrong for %s (Want:%d-%s Got:%d-%s)", m_JobInfo.strFilename.c_str(), (int)m_JobInfo.iFilesize,
+            AddReportLog(ReportLogID::VER_UPD_POLLDOWNLOAD_CHECKSUM_FAIL, SString("DoPollDownload: Checksum wrong for %s (Want:%d-%s Got:%d-%s)", m_JobInfo.strFilename.c_str(), (int)m_JobInfo.iFilesize,
                                        m_JobInfo.strMD5.c_str(), uiSize, szMD5));
             return;
         }
@@ -2590,7 +2590,7 @@ void CVersionUpdater::_ProcessPatchFileDownload()
     // Check signature
     if (!CCore::GetSingleton().GetNetwork()->VerifySignature(pData, uiSize))
     {
-        AddReportLog(5006, SString("DoPollDownload: Signature wrong for %s (MD5: %s)", m_JobInfo.strFilename.c_str(), m_JobInfo.strMD5.c_str()));
+        AddReportLog(ReportLogID::VER_UPD_POLLDOWNLOAD_SIGNATURE_FAIL, SString("DoPollDownload: Signature wrong for %s (MD5: %s)", m_JobInfo.strFilename.c_str(), m_JobInfo.strMD5.c_str()));
         m_ConditionMap.SetCondition("Download", "Fail", "Checksum");
         return;
     }
@@ -2614,7 +2614,7 @@ void CVersionUpdater::_ProcessPatchFileDownload()
                 break;
             }
 
-            AddReportLog(5004, SString("DoPollDownload: Unable to use the path %s", strSaveLocation.c_str()));
+            AddReportLog(ReportLogID::VER_UPD_POLLDOWNLOAD_PATH_FAIL, SString("DoPollDownload: Unable to use the path %s", strSaveLocation.c_str()));
         }
     }
 
@@ -2623,14 +2623,14 @@ void CVersionUpdater::_ProcessPatchFileDownload()
         if (m_JobInfo.serverList.size())
             ListRemoveIndex(m_JobInfo.serverList, m_JobInfo.iCurrent--);
         m_ConditionMap.SetCondition("Download", "Fail", "Saving");
-        AddReportLog(5005, SString("DoPollDownload: Unable to save the file %s (size %d)", m_JobInfo.strFilename.c_str(), uiSize));
+        AddReportLog(ReportLogID::VER_UPD_POLLDOWNLOAD_SAVE_FAIL, SString("DoPollDownload: Unable to save the file %s (size %d)", m_JobInfo.strFilename.c_str(), uiSize));
         return;
     }
     ////////////////////////
 
     m_JobInfo.strSaveLocation = strPathFilename;
     m_ConditionMap.SetCondition("Download", "Ok");
-    AddReportLog(2007, SString("DoPollDownload: Downloaded %s", m_JobInfo.strSaveLocation.c_str()));
+    AddReportLog(ReportLogID::VER_UPD_POLLDOWNLOAD_SUCCESS, SString("DoPollDownload: Downloaded %s", m_JobInfo.strSaveLocation.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2678,14 +2678,14 @@ void CVersionUpdater::_StartDownload()
                     CMD5Hasher::ConvertToHex(md5Result, szMD5);
                     if (m_JobInfo.strMD5 != szMD5)
                     {
-                        AddReportLog(5807, SString("StartDownload: Cached file reuse - Size correct, but md5 did not match (%s)", *strPathFilename));
+                        AddReportLog(ReportLogID::VER_UPD_STARTDOWNLOAD_CHECKSUM_FAIL, SString("StartDownload: Cached file reuse - Size correct, but md5 did not match (%s)", *strPathFilename));
                         continue;
                     }
 
                     // Check signature
                     if (!CCore::GetSingleton().GetNetwork()->VerifySignature(buffer.GetData(), buffer.GetSize()))
                     {
-                        AddReportLog(5808, SString("StartDownload: Cached file reuse - Size and md5 correct, but signature incorrect (%s)", *strPathFilename));
+                        AddReportLog(ReportLogID::VER_UPD_STARTDOWNLOAD_SIGNATURE_FAIL, SString("StartDownload: Cached file reuse - Size and md5 correct, but signature incorrect (%s)", *strPathFilename));
                         continue;
                     }
 
@@ -2693,7 +2693,7 @@ void CVersionUpdater::_StartDownload()
                     m_JobInfo.strSaveLocation = strPathFilename;
                     m_ConditionMap.SetCondition("ProcessResponse", "");
                     m_ConditionMap.SetCondition("Download", "Ok");
-                    AddReportLog(5809, SString("StartDownload: Cached file reuse - Size, md5 and signature correct (%s)", *strPathFilename));
+                    AddReportLog(ReportLogID::VER_UPD_STARTDOWNLOAD_SUCCESS, SString("StartDownload: Cached file reuse - Size, md5 and signature correct (%s)", *strPathFilename));
                     return;
                 }
             }
@@ -3332,7 +3332,7 @@ int CVersionUpdater::DoPollDownload()
         if ((m_JobInfo.downloadStatus == EDownloadStatus::Failure) || m_JobInfo.iIdleTimeLeft < 0)
         {
             GetHTTP()->Reset();
-            AddReportLog(4002, SString("DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_strLastQueryURL.c_str(), m_JobInfo.iDownloadResultCode,
+            AddReportLog(ReportLogID::VER_UPD_POLLDOWNLOAD_FAIL, SString("DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_strLastQueryURL.c_str(), m_JobInfo.iDownloadResultCode,
                                        m_JobInfo.iIdleTime));
 
             m_ConditionMap.SetCondition("Download", "Fail");
@@ -3352,12 +3352,12 @@ int CVersionUpdater::DoPollDownload()
     if (!m_JobInfo.downloadBuffer.empty())
     {
         m_ConditionMap.SetCondition("Download", "Ok");
-        AddReportLog(2005, SString("DoPollDownload: Downloaded %d bytes from %s", m_JobInfo.downloadBuffer.size(), m_strLastQueryURL.c_str()));
+        AddReportLog(ReportLogID::VER_UPD_POLLDOWNLOAD_RESPONSE, SString("DoPollDownload: Downloaded %d bytes from %s", m_JobInfo.downloadBuffer.size(), m_strLastQueryURL.c_str()));
         return RES_OK;
     }
 
     m_ConditionMap.SetCondition("Download", "Fail");
-    AddReportLog(5007, SString("DoPollDownload: Fail for %s", m_strLastQueryURL.c_str()));
+    AddReportLog(ReportLogID::VER_UPD_POLLDOWNLOAD_URL_FAIL, SString("DoPollDownload: Fail for %s", m_strLastQueryURL.c_str()));
     return RES_FAIL;
 }
 

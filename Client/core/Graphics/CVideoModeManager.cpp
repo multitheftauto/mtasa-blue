@@ -349,14 +349,14 @@ void CVideoModeManager::OnLoseFocus()
                 SString deviceName = GetCurrentAdapterDeviceName();
                 if (!EnumDisplaySettingsA(deviceName.c_str(), ENUM_REGISTRY_SETTINGS, &dmScreenSettings))
                 {
-                    AddReportLog(7340, SString("EnumDisplaySettings failed for %s", deviceName.c_str()));
+                    AddReportLog(ReportLogID::VIDEO_ENUMSETTINGS_FAIL, SString("EnumDisplaySettings failed for %s", deviceName.c_str()));
                     return;
                 }
 
                 int iChangeResult = ChangeDisplaySettingsExA(deviceName.c_str(), &dmScreenSettings, nullptr, CDS_RESET, nullptr);
                 if (iChangeResult != DISP_CHANGE_SUCCESSFUL)
                 {
-                    AddReportLog(7341, SString("ChangeDisplaySettingsEx failed for %s (%d)", deviceName.c_str(), iChangeResult));
+                    AddReportLog(ReportLogID::VIDEO_DISPLAYSETTINGS_FAIL, SString("ChangeDisplaySettingsEx failed for %s (%d)", deviceName.c_str(), iChangeResult));
                     return;
                 }
             }

@@ -2389,7 +2389,7 @@ void CClientPed::ValidateRemoteWeapons()
         if (m_WeaponTypes[i] != slotWeaponType)
         {
             SString strPlayerName = ((CClientPlayer*)this)->GetNick();
-            AddReportLog(5430, SString("Mismatch in slot %d  Wanted type:%d  Got type:%d (%s)", i, m_WeaponTypes[i], slotWeaponType, *strPlayerName), 30);
+            AddReportLog(ReportLogID::REMOTE_WEAPON_SLOT_MISMATCH, SString("Mismatch in slot %d  Wanted type:%d  Got type:%d (%s)", i, m_WeaponTypes[i], slotWeaponType, *strPlayerName), 30);
             bMismatch = true;
         }
     }
@@ -5845,7 +5845,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
         {
             SString strMessage("%s %d (%s)", pBlock->GetName(), pBlock->GetIndex(), szAnimName);
             g_pCore->LogEvent(543, "Blocking anim load fail", "", strMessage);
-            AddReportLog(5431, SString("Failed to load animation %s", *strMessage));
+            AddReportLog(ReportLogID::LOAD_ANIMATION_FAIL, SString("Failed to load animation %s", *strMessage));
             /*
                         // TODO: unload unreferenced blocks later on
                         g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );

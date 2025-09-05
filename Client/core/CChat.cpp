@@ -222,7 +222,7 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
             if (m_iReportCount < 5)
             {
                 m_iReportCount++;
-                AddReportLog(6532, SString("Chat rt chatSize:%2.0f %2.0f   rtsize:%d %d   card:%s", chatSize.fX, chatSize.fY, iRenderTargetSizeX,
+                AddReportLog(ReportLogID::CHAT_RT_FAIL, SString("Chat rt chatSize:%2.0f %2.0f   rtsize:%d %d   card:%s", chatSize.fX, chatSize.fY, iRenderTargetSizeX,
                                            iRenderTargetSizeY, g_pDeviceState->AdapterState.Name.c_str()));
             }
         }
