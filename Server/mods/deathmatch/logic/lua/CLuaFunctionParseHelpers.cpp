@@ -316,12 +316,11 @@ CXMLNode* UserDataCast(CXMLNode* ptr, lua_State* luaState)
 //
 CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
 {
-    if (CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaState); luaMain != nullptr)
-    {
-        return luaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-
-    return nullptr;
+    CLuaManager* luaManager = g_pGame->GetLuaManager();
+    if (!luaManager)
+        return nullptr;
+        
+    return luaManager->FindTimerGlobally(reinterpret_cast<unsigned long>(ptr));
 }
 
 //
