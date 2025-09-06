@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayer.cpp
  *  PURPOSE:     Player ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1121,8 +1121,9 @@ void CPlayer::SetPlayerStat(unsigned short usStat, float fValue)
 // Calculate weapon range using efficient stuffs
 float CPlayer::GetWeaponRangeFromSlot(uint uiSlot)
 {
-    eWeaponType eWeapon = static_cast<eWeaponType>(GetWeaponType(uiSlot));
-    float       fSkill = GetPlayerStat(CWeaponStatManager::GetSkillStatIndex(eWeapon));
+    unsigned char ucSlot = (uiSlot > 0xff) ? 0xff : static_cast<unsigned char>(uiSlot);
+    eWeaponType   eWeapon = static_cast<eWeaponType>(GetWeaponType(ucSlot));
+    float         fSkill = GetPlayerStat(CWeaponStatManager::GetSkillStatIndex(eWeapon));
 
     if (fSkill != m_fWeaponRangeLastSkill || eWeapon != m_eWeaponRangeLastWeapon ||
         CWeaponStat::GetAllWeaponStatsRevision() != m_uiWeaponRangeLastStatsRevision)

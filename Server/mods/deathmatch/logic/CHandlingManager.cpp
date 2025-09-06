@@ -36,8 +36,8 @@ CHandlingManager::CHandlingManager()
         m_OriginalEntries[i] = std::make_unique<CHandlingEntry>(&m_OriginalHandlingData[i]);
     }
 
-    // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
-    // http://projectcerbera.com/gta/sa/tutorials/handling
+    // https://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
+    // https://projectcerbera.com/gta/sa/tutorials/handling
 
     m_HandlingNames["mass"] = HANDLING_MASS;                                                             // works (mass > 0)
     m_HandlingNames["turnMass"] = HANDLING_TURNMASS;                                                     // works

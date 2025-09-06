@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -172,6 +172,27 @@ struct CLuaFunctionParserBase
         return T{};
     }
 
+    // Check if lua table is array (std::vector) or map
+    bool IsArray(lua_State* L, int index)
+    {
+        if (!lua_istable(L, index))
+            return false;
+
+        lua_pushnil(L);
+        while (lua_next(L, index < 0 ? (index - 1) : index))
+        {
+            if (!lua_isnumber(L, -2))
+            {
+                lua_pop(L, 2);
+                return false;
+            }
+
+            lua_pop(L, 1);
+        }
+
+        return true;
+    }
+
     // Special type matcher for variants. Returns -1 if the type does not match
     // returns n if the nth type of the variant matches
     template <typename T>
@@ -241,7 +262,7 @@ struct CLuaFunctionParserBase
 
         // std::vector is used for arrays built from tables
         else if constexpr (is_2specialization<T, std::vector>::value)
-            return iArgument == LUA_TTABLE;
+            return iArgument == LUA_TTABLE && IsArray(L, index);
 
         // std::unordered_map<k,v> is used for maps built from tables
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
@@ -299,7 +320,17 @@ struct CLuaFunctionParserBase
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
-            return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
+        {
+            if (iArgument != LUA_TUSERDATA && iArgument != LUA_TLIGHTUSERDATA)
+                return false;
+
+            using class_t = std::remove_pointer_t<T>;
+            int tempIndex{index};
+            void* pValue = lua::PopPrimitive<void*>(L, tempIndex);                
+            auto result = iArgument == LUA_TLIGHTUSERDATA ? UserDataCast((class_t*)pValue, L) :
+                UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
+            return result != nullptr;
+        }
 
         // dummy type is used as overload extension if one overload has fewer arguments
         // thus it is only allowed if there are no further args on the Lua side
@@ -455,7 +486,7 @@ struct CLuaFunctionParserBase
             using param = typename is_2specialization<T, std::vector>::param1_t;
             T vecData;
             lua_pushnil(L); /* first key */
-            while (lua_next(L, index) != 0)
+            while (lua_next(L, index < 0 ? (index - 1) : index) != 0)
             {
                 if (!TypeMatch<param>(L, -1))
                 {
@@ -477,7 +508,7 @@ struct CLuaFunctionParserBase
             using value_t = typename is_5specialization<T, std::unordered_map>::param2_t;
             T map;
             lua_pushnil(L); /* first key */
-            while (lua_next(L, index) != 0)
+            while (lua_next(L, index < 0 ? (index - 1) : index) != 0)
             {
                 if (!TypeMatch<value_t>(L, -1) || !TypeMatch<key_t>(L, -2))
                 {

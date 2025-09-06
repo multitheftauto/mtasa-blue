@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CModelInfoSA.h
  *  PURPOSE:     Header file for entity model information handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -349,7 +349,7 @@ protected:
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, unsigned short>                                       ms_ModelDefaultFlagsMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
     static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
@@ -435,14 +435,14 @@ public:
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
     CVector      GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
-    CVector      GetVehicleDummyDefaultPosition(eVehicleDummies eDummy) override;
-    CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
-    bool         GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const override;
-    void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
+    CVector      GetVehicleDummyDefaultPosition(VehicleDummies eDummy) override;
+    CVector      GetVehicleDummyPosition(VehicleDummies eDummy) override;
+    bool         GetVehicleDummyPositions(std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)>& positions) const override;
+    void         SetVehicleDummyPosition(VehicleDummies eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
-    float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) override;
-    void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) override;
+    float        GetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup) override;
+    void         SetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup, float fWheelSize) override;
     void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) override;
     static void  ResetAllVehiclesWheelSizes();
 
@@ -470,7 +470,7 @@ public:
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
-    void         MakePedModel(char* szTexture);
+    void         MakePedModel(const char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;
     void         MakeVehicleAutomobile(ushort usBaseModelID);

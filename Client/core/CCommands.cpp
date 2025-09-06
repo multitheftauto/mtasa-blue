@@ -5,7 +5,7 @@
  *  FILE:        core/CCommands.cpp
  *  PURPOSE:     Management for dynamically added commands
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -85,6 +85,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 {
     // Copy szParametersIn so the contents can be changed
     char* szParameters = NULL;
+    char empyParameters[1] = { 0 };
     if (szParametersIn)
     {
         size_t sizeParameters = strlen(szParametersIn) + 1;
@@ -115,7 +116,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                 }
                 if (szParameters == NULL)
                 {
-                    szParameters = "";
+                    szParameters = empyParameters;
                 }
             }
         }

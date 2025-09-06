@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.File.hpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include "SharedUtil.File.h"
@@ -14,7 +14,10 @@
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Buffer.h"
 #include <algorithm>
-#include <filesystem>
+
+#if __cplusplus >= 201703L // C++17
+    #include <filesystem>
+#endif
 
 #ifdef _WIN32
     #ifndef NOMINMAX

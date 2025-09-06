@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CCameraRPCs.cpp
  *  PURPOSE:     Camera remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -22,82 +22,110 @@ void CCameraRPCs::LoadFunctions()
 
 void CCameraRPCs::SetCameraMatrix(NetBitStreamInterface& bitStream)
 {
-    if (bitStream.Version() >= 0x5E)
-    {
-        uchar ucTimeContext;
-        if (bitStream.Read(ucTimeContext))
-            m_pCamera->SetSyncTimeContext(ucTimeContext);
-    }
+    uchar ucTimeContext;
+    if (!bitStream.Read(ucTimeContext))
+        return;
+        
+    if (m_pCamera)
+        m_pCamera->SetSyncTimeContext(ucTimeContext);
 
     CVector vecPosition, vecLookAt;
     float   fRoll = 0.0f;
     float   fFOV = 70.0f;
-    if (bitStream.Read(vecPosition.fX) && bitStream.Read(vecPosition.fY) && bitStream.Read(vecPosition.fZ) && bitStream.Read(vecLookAt.fX) &&
-        bitStream.Read(vecLookAt.fY) && bitStream.Read(vecLookAt.fZ))
+    
+    if (!bitStream.Read(vecPosition.fX) || !bitStream.Read(vecPosition.fY) || !bitStream.Read(vecPosition.fZ) || 
+        !bitStream.Read(vecLookAt.fX) || !bitStream.Read(vecLookAt.fY) || !bitStream.Read(vecLookAt.fZ))
     {
-        bitStream.Read(fRoll);
-        bitStream.Read(fFOV);
-
-        if (!m_pCamera->IsInFixedMode())
-            m_pCamera->ToggleCameraFixedMode(true);
-
-        // Put the camera there
-        m_pCamera->SetPosition(vecPosition);
-        m_pCamera->SetFixedTarget(vecLookAt, fRoll);
-        m_pCamera->SetFOV(fFOV);
+        return; // Invalid data
     }
+
+    bitStream.Read(fRoll);
+    bitStream.Read(fFOV);
+
+    // Validate float values to prevent potential issues
+    if (!std::isfinite(fRoll) || !std::isfinite(fFOV) || 
+        !std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ) ||
+        !std::isfinite(vecLookAt.fX) || !std::isfinite(vecLookAt.fY) || !std::isfinite(vecLookAt.fZ))
+    {
+        return; // Invalid float values (NaN, infinity, etc.)
+    }
+
+    // Validate camera pointer before use
+    if (!m_pCamera)
+        return;
+
+    if (!m_pCamera->IsInFixedMode())
+        m_pCamera->ToggleCameraFixedMode(true);
+
+    // Put the camera there
+    m_pCamera->SetPosition(vecPosition);
+    m_pCamera->SetFixedTarget(vecLookAt, fRoll);
+    m_pCamera->SetFOV(fFOV);
 }
 
 void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
 {
-    if (bitStream.Version() >= 0x5E)
-    {
-        uchar ucTimeContext;
-        if (bitStream.Read(ucTimeContext))
-            m_pCamera->SetSyncTimeContext(ucTimeContext);
-    }
+    uchar ucTimeContext;
+    if (!bitStream.Read(ucTimeContext))
+        return;
+        
+    if (m_pCamera)
+        m_pCamera->SetSyncTimeContext(ucTimeContext);
 
     ElementID targetID;
-    if (bitStream.Read(targetID))
+    if (!bitStream.Read(targetID))
+        return;
+
+    // Validate camera pointer
+    if (!m_pCamera)
+        return;
+
+    CClientEntity* pEntity = CElementIDs::GetElement(targetID);
+    if (!pEntity)
+        return;
+
+    // Check if entity is being deleted - critical memory safety check
+    if (pEntity->IsBeingDeleted())
+        return;
+
+    switch (pEntity->GetType())
     {
-        CClientEntity* pEntity = CElementIDs::GetElement(targetID);
-        if (pEntity)
+        case CCLIENTPLAYER:
         {
-            switch (pEntity->GetType())
+            CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pEntity);
+            if (pPlayer->IsLocalPlayer())
             {
-                case CCLIENTPLAYER:
-                {
-                    CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pEntity);
-                    if (pPlayer->IsLocalPlayer())
-                    {
-                        // Return the focus to the local player
-                        m_pCamera->SetFocusToLocalPlayer();
-                    }
-                    else
-                    {
-                        // Put the focus on that player
-                        m_pCamera->SetFocus(pPlayer, MODE_CAM_ON_A_STRING, false);
-                    }
-                    break;
-                }
-                case CCLIENTPED:
-                case CCLIENTVEHICLE:
-                {
-                    m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
-                    break;
-                }
-                default:
-                    return;
+                // Return the focus to the local player
+                m_pCamera->SetFocusToLocalPlayer();
             }
+            else
+            {
+                // Put the focus on that player
+                m_pCamera->SetFocus(pPlayer, MODE_CAM_ON_A_STRING, false);
+            }
+            break;
         }
+        case CCLIENTPED:
+        case CCLIENTVEHICLE:
+        {
+            m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
+            break;
+        }
+        default:
+            // Invalid entity type for camera target
+            return;
     }
 }
 
 void CCameraRPCs::SetCameraInterior(NetBitStreamInterface& bitStream)
 {
-    // Read out the camera mode
+    // Read out the camera interior
     unsigned char ucInterior;
-    if (bitStream.Read(ucInterior))
+    if (!bitStream.Read(ucInterior))
+        return;
+
+    // Validate game pointer before use
+    if (g_pGame && g_pGame->GetWorld())
     {
         g_pGame->GetWorld()->SetCurrentArea(ucInterior);
     }
@@ -107,26 +135,41 @@ void CCameraRPCs::FadeCamera(NetBitStreamInterface& bitStream)
 {
     unsigned char ucFadeIn;
     float         fFadeTime = 1.0f;
-    if (bitStream.Read(ucFadeIn) && bitStream.Read(fFadeTime))
-    {
-        g_pClientGame->SetInitiallyFadedOut(false);
+    
+    if (!bitStream.Read(ucFadeIn) || !bitStream.Read(fFadeTime))
+        return;
 
-        if (ucFadeIn)
+    // Validate pointers before use
+    if (!m_pCamera || !g_pClientGame)
+        return;
+
+    g_pClientGame->SetInitiallyFadedOut(false);
+
+    if (ucFadeIn)
+    {
+        m_pCamera->FadeIn(fFadeTime);
+        
+        // Validate game and HUD pointers
+        if (g_pGame && g_pGame->GetHud())
         {
-            m_pCamera->FadeIn(fFadeTime);
             g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, !g_pClientGame->GetHudAreaNameDisabled());
         }
-        else
-        {
-            unsigned char ucRed = 0;
-            unsigned char ucGreen = 0;
-            unsigned char ucBlue = 0;
+    }
+    else
+    {
+        unsigned char ucRed = 0;
+        unsigned char ucGreen = 0;
+        unsigned char ucBlue = 0;
 
-            if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue))
-            {
-                m_pCamera->FadeOut(fFadeTime, ucRed, ucGreen, ucBlue);
-                g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
-            }
+        if (!bitStream.Read(ucRed) || !bitStream.Read(ucGreen) || !bitStream.Read(ucBlue))
+            return;
+
+        m_pCamera->FadeOut(fFadeTime, ucRed, ucGreen, ucBlue);
+        
+        // Validate game and HUD pointers
+        if (g_pGame && g_pGame->GetHud())
+        {
+            g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
         }
     }
 }

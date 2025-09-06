@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Client/mods/deathmatch/logic/CClientIFP.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -453,7 +453,7 @@ void CClientIFP::InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarch
 {
     pAnimationHierarchy->Initialize();
     pAnimationHierarchy->SetName(strAnimationName);
-    pAnimationHierarchy->SetNumSequences(iSequences);
+    pAnimationHierarchy->SetNumSequences(static_cast<unsigned short>(iSequences));
     pAnimationHierarchy->SetAnimationBlockID(-1);
     pAnimationHierarchy->SetRunningCompressed(m_kbAllKeyFramesCompressed);
 }

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CColModelSA.cpp
  *  PURPOSE:     Collision model entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,7 +17,7 @@ CColModelSA::CColModelSA()
     m_pInterface = new CColModelSAInterface;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CColModel_Constructor;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -37,7 +37,7 @@ CColModelSA::~CColModelSA()
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CColModel_Destructor;
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc

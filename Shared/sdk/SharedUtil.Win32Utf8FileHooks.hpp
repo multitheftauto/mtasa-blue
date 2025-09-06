@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Win32Utf8FileHooks.hpp
  *  PURPOSE:     Hooks for making Windows file functions use UTF8 strings
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -107,7 +107,7 @@ namespace SharedUtil
     {
     #ifdef UTF8_FILE_HOOKS_PERSONALITY_Core
         static SString gtaDirCP = ToACP(g_gtaDirectory);
-        static SString gtaDirUTF8 = g_gtaDirectory.u8string();
+        static SString gtaDirUTF8 = UTF8FilePath(g_gtaDirectory);
         if (strOriginal.BeginsWithI(gtaDirCP))
         {
             SString tail = strOriginal.SubStr(gtaDirCP.length());

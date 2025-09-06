@@ -5,7 +5,7 @@
  *  FILE:        core/CLanguage.cpp
  *  PURPOSE:     Automatically load required language and localize MTA text according to locale
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

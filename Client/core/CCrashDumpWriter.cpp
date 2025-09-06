@@ -5,7 +5,7 @@
  *  FILE:        core/CCrashDumpWriter.cpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -291,6 +291,8 @@ void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
 
         // For the crash dialog
         SetApplicationSetting("diagnostics", "last-crash-info", strInfo);
+        SetApplicationSetting("diagnostics", "last-crash-module", pExceptionInformation->GetModulePathName());
+        SetApplicationSettingInt("diagnostics", "last-crash-code", pExceptionInformation->GetCode());
         WriteDebugEvent(strInfo.Replace("\n", " "));
     }
 }
@@ -325,7 +327,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     if (hDll)
     {
         // Grab the MiniDumpWriteDump proc address
-        MINIDUMPWRITEDUMP pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(hDll, "MiniDumpWriteDump"));
+        auto pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(static_cast<void*>(GetProcAddress(hDll, "MiniDumpWriteDump")));
         if (!pDump)
             AddReportLog(9202, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump");
 

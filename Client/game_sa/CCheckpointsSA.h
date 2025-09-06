@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCheckpointsSA.h
  *  PURPOSE:     Header file for checkpoint entity manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

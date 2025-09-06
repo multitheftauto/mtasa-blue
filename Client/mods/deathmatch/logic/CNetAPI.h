@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CNetAPI.h
  *  PURPOSE:     Header for net API class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -49,9 +49,8 @@ public:
 
     void AddInterpolation(const CVector& vecPosition);
     bool GetInterpolation(CVector& vecPosition, unsigned short usLatency);
-    void SendBulletSyncFire(eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fDamage, uchar ucHitZone,
-                            CClientPlayer* pRemoteDamagedPlayer);
-    void SendBulletSyncCustomWeaponFire(CClientWeapon* pWeapon, const CVector& vecStart, const CVector& vecEnd);
+    void SendBulletSyncFire(eWeaponType weapon, const CVector& start, const CVector& end, float damage, std::uint8_t zone, CClientPlayer* damaged);
+    void SendBulletSyncCustomWeaponFire(CClientWeapon* weapon, const CVector& start, const CVector& end);
     bool IsNetworkTrouble() { return m_bIsNetworkTrouble; }
 
     static bool IsWeaponIDAkimbo(unsigned char ucWeaponID);
@@ -64,8 +63,8 @@ private:
     void ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStream);
     void WriteKeysync(CClientPed* pPed, NetBitStreamInterface& BitStream);
 
-    void ReadBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStream);
-    void ReadWeaponBulletsync(CClientPlayer* pWeapon, NetBitStreamInterface& BitStream);
+    void ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& stream);
+    void ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface& stream);
 
     void ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStream);
     void WritePlayerPuresync(CClientPlayer* pPed, NetBitStreamInterface& BitStream);

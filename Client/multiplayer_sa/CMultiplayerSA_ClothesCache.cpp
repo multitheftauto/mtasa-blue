@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA_ClothesCache.cpp.cpp
  *  PORPOISE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -343,9 +343,11 @@ void _cdecl OnCClothesBuilderCreateSkinnedClumpPost(RpClump* pRpClumpResult, RpC
 #define HOOKPOS_CClothesBuilderCreateSkinnedClump        0x5A69D0
 #define HOOKSIZE_CClothesBuilderCreateSkinnedClump       6
 DWORD RETURN_CClothesBuilderCreateSkinnedClump = 0x5A69D6;
-void _declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
+static void __declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*5]

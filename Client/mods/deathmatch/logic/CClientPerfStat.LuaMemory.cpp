@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CClientPerfStat.LuaMemory.cpp
  *  PURPOSE:     Performance stats manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -297,15 +297,15 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
         int WebBrowserCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetWebBrowserCount();
         int VectorGraphicCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetVectorGraphicCount();
         TextItemCount = std::max(TextItemCount - 4, 0);            // Remove count for radar items
-        row[c++] = !TextItemCount ? "-" : SString("%d", TextItemCount);
-        row[c++] = !DxFontCount ? "-" : SString("%d", DxFontCount);
-        row[c++] = !GuiFontCount ? "-" : SString("%d", GuiFontCount);
-        row[c++] = !TextureCount ? "-" : SString("%d", TextureCount);
-        row[c++] = !ShaderCount ? "-" : SString("%d", ShaderCount);
-        row[c++] = !RenderTargetCount ? "-" : SString("%d", RenderTargetCount);
-        row[c++] = !ScreenSourceCount ? "-" : SString("%d", ScreenSourceCount);
-        row[c++] = !WebBrowserCount ? "-" : SString("%d", WebBrowserCount);
-        row[c++] = !VectorGraphicCount ? "-" : SString("%d", VectorGraphicCount);
+        row[c++] = !TextItemCount ? SStringX("-") : SString("%d", TextItemCount);
+        row[c++] = !DxFontCount ? SStringX("-") : SString("%d", DxFontCount);
+        row[c++] = !GuiFontCount ? SStringX("-") : SString("%d", GuiFontCount);
+        row[c++] = !TextureCount ? SStringX("-") : SString("%d", TextureCount);
+        row[c++] = !ShaderCount ? SStringX("-") : SString("%d", ShaderCount);
+        row[c++] = !RenderTargetCount ? SStringX("-") : SString("%d", RenderTargetCount);
+        row[c++] = !ScreenSourceCount ? SStringX("-") : SString("%d", ScreenSourceCount);
+        row[c++] = !WebBrowserCount ? SStringX("-") : SString("%d", WebBrowserCount);
+        row[c++] = !VectorGraphicCount ? SStringX("-") : SString("%d", VectorGraphicCount);
     }
 
     // For each VM
@@ -333,9 +333,9 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
 
         row[c++] = SString("%d KB", LuaMainMemory.Current);
         row[c++] = SString("%d KB", LuaMainMemory.Max);
-        row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : SString("%d", LuaMainMemory.OpenXMLFiles);
-        row[c++] = !LuaMainMemory.Refs ? "-" : SString("%d", LuaMainMemory.Refs);
-        row[c++] = !LuaMainMemory.TimerCount ? "-" : SString("%d", LuaMainMemory.TimerCount);
-        row[c++] = !LuaMainMemory.ElementCount ? "-" : SString("%d", LuaMainMemory.ElementCount);
+        row[c++] = !LuaMainMemory.OpenXMLFiles ? SStringX("-") : SString("%d", LuaMainMemory.OpenXMLFiles);
+        row[c++] = !LuaMainMemory.Refs ? SStringX("-") : SString("%d", LuaMainMemory.Refs);
+        row[c++] = !LuaMainMemory.TimerCount ? SStringX("-") : SString("%d", LuaMainMemory.TimerCount);
+        row[c++] = !LuaMainMemory.ElementCount ? SStringX("-") : SString("%d", LuaMainMemory.ElementCount);
     }
 }

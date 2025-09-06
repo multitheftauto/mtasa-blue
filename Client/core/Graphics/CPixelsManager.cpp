@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -702,8 +702,8 @@ bool CPixelsManager::SetPlainDimensions(CPixels& pixels, uint uiWidth, uint uiHe
     {
         // Fixup plain format tail
         WORD* pPlainTail = (WORD*)(pData + uiDataSize - SIZEOF_PLAIN_TAIL);
-        pPlainTail[0] = uiWidth;
-        pPlainTail[1] = uiHeight;
+        pPlainTail[0] = static_cast<WORD>(uiWidth);
+        pPlainTail[1] = static_cast<WORD>(uiHeight);
         return true;
     }
 

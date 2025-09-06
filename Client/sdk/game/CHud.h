@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CHud.h
  *  PURPOSE:     HUD interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -31,6 +31,9 @@ enum eHudComponent
     HUD_ALL,
     HUD_VITAL_STATS,
     HUD_HELP_TEXT,
+    HUD_RADAR_MAP,
+    HUD_RADAR_BLIPS,
+    HUD_RADAR_ALTIMETER,
 };
 
 enum class eHudComponentProperty

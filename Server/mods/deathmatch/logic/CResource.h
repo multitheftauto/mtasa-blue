@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.h
  *  PURPOSE:     Resource handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -153,6 +153,8 @@ public:
 
     void Reload();
 
+    bool CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter);
+
     // Get a resource default setting
     bool GetDefaultSetting(const char* szName, char* szValue, size_t sizeBuffer);
 
@@ -268,6 +270,7 @@ public:
     uint GetScriptID() const noexcept { return m_uiScriptID; }
 
     void OnPlayerJoin(CPlayer& Player);
+    void OnPlayerQuit(CPlayer& Player);
     void SendNoClientCacheScripts(CPlayer* pPlayer = nullptr);
 
     void OnResourceStateChange(const char* state) noexcept;
@@ -394,6 +397,9 @@ private:
     CDummy*        m_pResourceDynamicElementRoot = nullptr;
     CElementGroup* m_pDefaultElementGroup = nullptr;            // stores elements created by scripts in this resource
     CLuaMain*      m_pVM = nullptr;
+
+    unsigned int                 m_startCounter{};
+    std::unordered_set<CPlayer*> m_isRunningForPlayer;
 
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;            // we store them here temporarily, then read them once all the resources are loaded

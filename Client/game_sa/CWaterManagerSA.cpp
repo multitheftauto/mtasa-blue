@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWaterManagerSA.cpp
  *  PURPOSE:     Control the lakes and seas
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -397,56 +397,65 @@ void CWaterManagerSA::RelocatePools()
 // creating gaps. These hooks make SA skip empty pool slots.
 
 DWORD dwHook6E9E23continue = 0x6E9E29;
-void __declspec(naked) Hook6E9E23()
+static void __declspec(naked) Hook6E9E23()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-check:
-        mov eax, dword ptr [edi]
-        test eax, eax
-        jnz cont
-        add edi, 0xA        // sizeof(CWaterQuadSAInterface)
-        jmp check
-cont:
-        movsx eax, word ptr [edi]
-        lea ebx, [eax+4*eax]
-        jmp dwHook6E9E23continue
+        check:
+        mov     eax, dword ptr [edi]
+        test    eax, eax
+        jnz     cont
+        add     edi, 0xA        // sizeof(CWaterQuadSAInterface)
+        jmp     check
+        
+        cont:
+        movsx   eax, word ptr [edi]
+        lea     ebx, [eax+4*eax]
+        jmp     dwHook6E9E23continue
     }
 }
 
 DWORD dwHook6EFCD7continue = 0x6EFCDD;
 DWORD dwHook6EFCD7skip = 0x6EFE5E;
-void __declspec(naked) Hook6EFCD7()
+static void __declspec(naked) Hook6EFCD7()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-        mov eax, dword ptr [esi-4]
-        test eax, eax
-        jz check
-        jmp dwHook6EFCD7skip
-check:
-        add esi, 0xA        // sizeof(CWaterQuadSAInterface)
-        mov eax, dword ptr [esi-4]
-        test eax, eax
-        jz check
-        jmp dwHook6EFCD7continue
+        mov     eax, dword ptr [esi-4]
+        test    eax, eax
+        jz      check
+        jmp     dwHook6EFCD7skip
+
+        check:
+        add     esi, 0xA        // sizeof(CWaterQuadSAInterface)
+        mov     eax, dword ptr [esi-4]
+        test    eax, eax
+        jz      check
+        jmp     dwHook6EFCD7continue
     }
 }
 
 DWORD dwHook6EFBD8continue = 0x6EFBDE;
-void __declspec(naked) Hook6EFBD8()
+static void __declspec(naked) Hook6EFBD8()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-check:
-        mov eax, 0x6EFC27
-        mov eax, dword ptr [eax]
-        mov eax, dword ptr [eax+8*esi]
-        test eax, eax
-        jnz cont
-        inc esi
-        jmp check
-cont:
+        check:
+        mov     eax, 0x6EFC27
+        mov     eax, dword ptr [eax]
+        mov     eax, dword ptr [eax+8*esi]
+        test    eax, eax
+        jnz     cont
+        inc     esi
+        jmp     check
+
+        cont:
         jmp dwHook6EFBD8continue
     }
 }
@@ -523,7 +532,7 @@ void CWaterManagerSA::GetZonesContaining(const CVector& v1, const CVector& v2, c
     }
 }
 
-// Uses http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
+// Uses https://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
 void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVector& endPos, std::vector<CWaterZoneSA*>& vecOut)
 {
     vecOut.clear();

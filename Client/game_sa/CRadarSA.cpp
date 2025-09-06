@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CRadarSA.cpp
  *  PURPOSE:     Game radar
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -63,7 +63,7 @@ void CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const
     unsigned long abgr = color.A << 24 | color.B << 16 | color.G << 8 | color.R;
     CRect         myRect(fX1, fY2, fX2, fY1);
     DWORD         dwFunc = FUNC_DrawAreaOnRadar;
-    _asm
+    __asm
     {
         push    eax
 

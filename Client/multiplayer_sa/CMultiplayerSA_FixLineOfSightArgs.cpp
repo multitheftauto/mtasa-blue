@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        multiplayer_sa/CMultiplayerSA_HookDestructors.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -51,9 +51,11 @@ void _cdecl OnCWorld_ProcessLineOfSight(CVector* pvecStart, CVector* pvecEnd)
 #define HOOKPOS_CWorld_ProcessLineOfSight        0x56BA00
 #define HOOKSIZE_CWorld_ProcessLineOfSight       12
 DWORD RETURN_CWorld_ProcessLineOfSight = 0x56BA0C;
-void _declspec(naked) HOOK_CWorld_ProcessLineOfSight()
+static void __declspec(naked) HOOK_CWorld_ProcessLineOfSight()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -84,9 +86,11 @@ void _cdecl OnCWorld_GetIsLineOfSightClear(CVector* pvecStart, CVector* pvecEnd)
 #define HOOKPOS_CWorld_GetIsLineOfSightClear        0x56A490
 #define HOOKSIZE_CWorld_GetIsLineOfSightClear       12
 DWORD RETURN_CWorld_GetIsLineOfSightClear = 0x56A49C;
-void _declspec(naked) HOOK_CWorld_GetIsLineOfSightClear()
+static void __declspec(naked) HOOK_CWorld_GetIsLineOfSightClear()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*2]

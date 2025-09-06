@@ -19,6 +19,8 @@
 #include <game/CHandlingEntry.h>
 #include <game/CHandlingManager.h>
 #include <game/CStreaming.h>
+#include <game/CVehicleAudioSettingsManager.h>
+#include <enums/VehicleType.h>
 
 using std::list;
 
@@ -55,7 +57,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_pModelInfo = g_pGame->GetModelInfo(usModel);
 
     // Apply handling
-    std::uint16_t usHandlingModelID = m_usModel;
+    std::uint32_t usHandlingModelID = m_usModel;
     if (m_usModel < 400 || m_usModel > 611)
         usHandlingModelID = m_pModelInfo->GetParentID();
 
@@ -209,6 +211,8 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     // We've not changed the wheel scale
     m_bWheelScaleChanged = false;
     m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
+
+    m_pSoundSettingsEntry = nullptr;
 }
 
 CClientVehicle::~CClientVehicle()
@@ -810,13 +814,13 @@ void CClientVehicle::Fix()
     GetInitialDoorStates(ucDoorStates);
 
     bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
-    for (int i = 0; i < MAX_DOORS; i++)
+    for (unsigned char i = 0; i < MAX_DOORS; i++)
         SetDoorStatus(i, ucDoorStates[i], flyingComponents);
-    for (int i = 0; i < MAX_PANELS; i++)
+    for (unsigned char i = 0; i < MAX_PANELS; i++)
         SetPanelStatus(i, 0, flyingComponents);
-    for (int i = 0; i < MAX_LIGHTS; i++)
+    for (unsigned char i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
-    for (int i = 0; i < MAX_WHEELS; i++)
+    for (unsigned char i = 0; i < MAX_WHEELS; i++)
         SetWheelStatus(i, 0);
 
     // These components get a funny rotation when calling Fix() (unknown reason)
@@ -1053,7 +1057,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Reset handling to fit the vehicle
         if (IsLocalEntity() || !(usModel < 400 || usModel > 611))
         {
-            std::uint16_t usHandlingModelID = usModel;
+            std::uint32_t usHandlingModelID = usModel;
             if (usHandlingModelID < 400 || usHandlingModelID > 611)
                 usHandlingModelID = m_pModelInfo->GetParentID();
 
@@ -1086,7 +1090,10 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
 
         SetSirenOrAlarmActive(false);
 
-        // clear our component data to regenerate it
+        // Cache current component visibility and clear data so it can be regenerated.
+        m_ComponentVisibilityBackup.clear();
+        for (const auto& pair : m_ComponentData)
+            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
         m_ComponentData.clear();
 
         // Reset stored dummy positions
@@ -1114,9 +1121,12 @@ void CClientVehicle::SetVariant(unsigned char ucVariant, unsigned char ucVariant
     m_ucVariation = ucVariant;
     m_ucVariation2 = ucVariant2;
 
-    // clear our component data to regenerate it
+    // Cache visibility so component state survives variant changes
+    m_ComponentVisibilityBackup.clear();
+    for (const auto& pair : m_ComponentData)
+        m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
+    // Clear component data to regenerate it on next create
     m_ComponentData.clear();
-
     ReCreate();
 }
 
@@ -1312,7 +1322,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
     {
         usPropertyValue = m_pVehicle->GetAdjustablePropertyValue();
         // If it's a Hydra invert it with 5000 (as 0 is "forward"), so we can maintain a standard of 0 being "normal"
-        if (m_usModel == VT_HYDRA)
+        if (static_cast<VehicleType>(m_usModel) == VehicleType::VT_HYDRA)
             usPropertyValue = 5000 - usPropertyValue;
     }
     else
@@ -1326,7 +1336,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
 
 void CClientVehicle::SetAdjustablePropertyValue(unsigned short usValue)
 {
-    if (m_usModel == VT_HYDRA)
+    if (static_cast<VehicleType>(m_usModel) == VehicleType::VT_HYDRA)
         usValue = 5000 - usValue;
 
     _SetAdjustablePropertyValue(usValue);
@@ -1354,8 +1364,10 @@ void CClientVehicle::_SetAdjustablePropertyValue(unsigned short usValue)
 
 bool CClientVehicle::HasMovingCollision()
 {
-    return (m_usModel == VT_FORKLIFT || m_usModel == VT_FIRELA || m_usModel == VT_ANDROM || m_usModel == VT_DUMPER || m_usModel == VT_DOZER ||
-            m_usModel == VT_PACKER);
+    auto model = static_cast<VehicleType>(m_usModel);
+
+    return (model == VehicleType::VT_FORKLIFT || model == VehicleType::VT_FIRELA || model == VehicleType::VT_ANDROM || model == VehicleType::VT_DUMPER ||
+            model == VehicleType::VT_DOZER || model == VehicleType::VT_PACKER);
 }
 
 unsigned char CClientVehicle::GetDoorStatus(unsigned char ucDoor)
@@ -2458,8 +2470,10 @@ void CClientVehicle::StreamOut()
 
 bool CClientVehicle::DoCheckHasLandingGear()
 {
-    return (m_usModel == VT_ANDROM || m_usModel == VT_AT400 || m_usModel == VT_NEVADA || m_usModel == VT_RUSTLER || m_usModel == VT_SHAMAL ||
-            m_usModel == VT_HYDRA || m_usModel == VT_STUNT);
+    auto model = static_cast<VehicleType>(m_usModel);
+
+    return (model == VehicleType::VT_ANDROM || model == VehicleType::VT_AT400 || model == VehicleType::VT_NEVADA || model == VehicleType::VT_RUSTLER || model == VehicleType::VT_SHAMAL || model == VehicleType::VT_HYDRA ||
+            model == VehicleType::VT_STUNT);
 }
 
 void CClientVehicle::Create()
@@ -2488,6 +2502,18 @@ void CClientVehicle::Create()
         // each vehicle spawned of this model type (i.e. after AddVehicle below)
         if (!m_strRegPlate.empty())
             m_pModelInfo->SetCustomCarPlateText(m_strRegPlate.c_str());
+
+        // Prepare audio settings
+        if (m_pSoundSettingsEntry)
+            g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(m_pSoundSettingsEntry.get());
+        else
+        {
+            std::uint32_t modelId = m_usModel;
+            if (!CClientVehicleManager::IsStandardModel(modelId))
+                modelId = g_pGame->GetModelInfo(m_usModel)->GetParentID();
+
+            g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(modelId);
+        }
 
         // Create the vehicle
         if (CClientVehicleManager::IsTrainModel(m_usModel))
@@ -2609,7 +2635,6 @@ void CClientVehicle::Create()
         m_pVehicle->SetOverrideLights(m_ucOverrideLights);
         m_pVehicle->SetRemap(static_cast<unsigned int>(m_ucPaintjob));
         m_pVehicle->SetBodyDirtLevel(m_fDirtLevel);
-        m_pVehicle->SetEngineOn(m_bEngineOn);
         m_pVehicle->SetAreaCode(m_ucInterior);
         m_pVehicle->SetSmokeTrailEnabled(m_bSmokeTrail);
         m_pVehicle->SetGravity(&m_vecGravity);
@@ -2655,12 +2680,14 @@ void CClientVehicle::Create()
             m_pVehicle->SetTurretRotation(m_fTurretHorizontal, m_fTurretVertical);
         }
 
-        for (int i = 0; i < MAX_WHEELS; i++)
+        for (unsigned char i = 0; i < MAX_WHEELS; i++)
             SetWheelStatus(i, m_ucWheelStates[i], true);
 
         // Eventually warp driver back in
         if (m_pDriver)
             m_pDriver->WarpIntoVehicle(this, 0);
+
+        m_pVehicle->SetEngineOn(m_bEngineOn);
 
         // Warp the passengers back in
         for (unsigned int i = 0; i < 8; i++)
@@ -2838,6 +2865,22 @@ void CClientVehicle::Create()
                 }
             }
         }
+
+        // Merge saved visibility data from previous variant/handling updates
+        if (!m_ComponentVisibilityBackup.empty())
+        {
+            for (const auto& pair : m_ComponentVisibilityBackup)
+            {
+                auto it = m_ComponentData.find(pair.first);
+                if (it != m_ComponentData.end())
+                {
+                    it->second.m_bVisible = pair.second;
+                    SetComponentVisible(pair.first, pair.second);
+                }
+            }
+            m_ComponentVisibilityBackup.clear();
+        }
+            
         // Grab our component data
         std::map<SString, SVehicleComponentData>::iterator iter = m_ComponentData.begin();
         // Loop through our component data
@@ -2888,13 +2931,13 @@ void CClientVehicle::Create()
         if (m_copyDummyPositions)
         {
             const CVector* positions = m_pVehicle->GetDummyPositions();
-            std::copy(positions, positions + VEHICLE_DUMMY_COUNT, m_dummyPositions.begin());
+            std::copy(positions, positions + static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT), m_dummyPositions.begin());
         }
         else
         {
-            for (size_t i = 0; i < VEHICLE_DUMMY_COUNT; ++i)
+            for (size_t i = 0; i < static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT); ++i)
             {
-                m_pVehicle->SetDummyPosition(static_cast<eVehicleDummies>(i), m_dummyPositions[i]);
+                m_pVehicle->SetDummyPosition(static_cast<VehicleDummies>(i), m_dummyPositions[i]);
             }
         }
 
@@ -2957,14 +3000,14 @@ void CClientVehicle::Destroy()
             // Grab the damage model
             CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
 
-            for (int i = 0; i < MAX_DOORS; i++)
+            for (unsigned char i = 0; i < MAX_DOORS; i++)
                 m_ucDoorStates[i] = pDamageManager->GetDoorStatus(static_cast<eDoors>(i));
-            for (int i = 0; i < MAX_PANELS; i++)
+            for (unsigned char i = 0; i < MAX_PANELS; i++)
                 m_ucPanelStates[i] = pDamageManager->GetPanelStatus(static_cast<ePanels>(i));
-            for (int i = 0; i < MAX_LIGHTS; i++)
+            for (unsigned char i = 0; i < MAX_LIGHTS; i++)
                 m_ucLightStates[i] = pDamageManager->GetLightStatus(static_cast<eLights>(i));
         }
-        for (int i = 0; i < MAX_WHEELS; i++)
+        for (unsigned char i = 0; i < MAX_WHEELS; i++)
             m_ucWheelStates[i] = GetWheelStatus(i);
 
         // Remove the driver from the vehicle
@@ -3069,6 +3112,13 @@ void CClientVehicle::ReCreate()
 
 void CClientVehicle::ModelRequestCallback(CModelInfo* pModelInfo)
 {
+    // The model loading may take a while and there's a chance of vehicle being moved to other dimension.
+    if (!IsVisibleInAllDimensions() && GetDimension() != m_pStreamer->GetDimension())
+    {
+        NotifyUnableToCreate();
+        return;
+    }
+
     // Create the vehicle. The model is now loaded.
     Create();
 }
@@ -3287,7 +3337,7 @@ bool CClientVehicle::IsTowableBy(CClientVehicle* towingVehicle)
 
 bool CClientVehicle::SetWinchType(eWinchType winchType)
 {
-    if (GetModel() == VT_LEVIATHN)            // Leviathan
+    if (static_cast<VehicleType>(GetModel()) == VehicleType::VT_LEVIATHN)            // Leviathan
     {
         if (m_pVehicle)
         {
@@ -3582,25 +3632,25 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (m_usModel)
+    switch (static_cast<VehicleType>(m_usModel))
     {
-        case VT_BAGGAGE:
-        case VT_BANDITO:
-        case VT_BFINJECT:
-        case VT_CADDY:
-        case VT_DOZER:
-        case VT_FORKLIFT:
-        case VT_KART:
-        case VT_MOWER:
-        case VT_QUAD:
-        case VT_RCBANDIT:
-        case VT_RCCAM:
-        case VT_RCGOBLIN:
-        case VT_RCRAIDER:
-        case VT_RCTIGER:
-        case VT_TRACTOR:
-        case VT_VORTEX:
-        case VT_BLOODRA:
+        case VehicleType::VT_BAGGAGE:
+        case VehicleType::VT_BANDITO:
+        case VehicleType::VT_BFINJECT:
+        case VehicleType::VT_CADDY:
+        case VehicleType::VT_DOZER:
+        case VehicleType::VT_FORKLIFT:
+        case VehicleType::VT_KART:
+        case VehicleType::VT_MOWER:
+        case VehicleType::VT_QUAD:
+        case VehicleType::VT_RCBANDIT:
+        case VehicleType::VT_RCCAM:
+        case VehicleType::VT_RCGOBLIN:
+        case VehicleType::VT_RCRAIDER:
+        case VehicleType::VT_RCTIGER:
+        case VehicleType::VT_TRACTOR:
+        case VehicleType::VT_VORTEX:
+        case VehicleType::VT_BLOODRA:
             memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
 
             // Keep the bonet and boot intact
@@ -3902,15 +3952,15 @@ bool CClientVehicle::HasRadio()
 
 bool CClientVehicle::HasPoliceRadio()
 {
-    switch (m_usModel)
+    switch (static_cast<VehicleType>(m_usModel))
     {
-        case VT_COPCARLA:
-        case VT_COPCARSF:
-        case VT_COPCARVG:
-        case VT_COPCARRU:
-        case VT_POLMAV:
-        case VT_COPBIKE:
-        case VT_SWATVAN:
+        case VehicleType::VT_COPCARLA:
+        case VehicleType::VT_COPCARSF:
+        case VehicleType::VT_COPCARVG:
+        case VehicleType::VT_COPCARRU:
+        case VehicleType::VT_POLMAV:
+        case VehicleType::VT_COPBIKE:
+        case VehicleType::VT_SWATVAN:
             return true;
             break;
         default:
@@ -4903,22 +4953,39 @@ bool CClientVehicle::OnVehicleFallThroughMap()
     return false;
 }
 
-bool CClientVehicle::GetDummyPosition(eVehicleDummies dummy, CVector& position) const
+const CVehicleAudioSettingsEntry& CClientVehicle::GetAudioSettings() const noexcept
 {
-    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    if (m_pSoundSettingsEntry)
+        return *m_pSoundSettingsEntry.get();
+    else
+        return g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData(m_usModel);
+}
+
+CVehicleAudioSettingsEntry& CClientVehicle::GetOrCreateAudioSettings()
+{
+    if (!m_pSoundSettingsEntry)
+        m_pSoundSettingsEntry = g_pGame->GetVehicleAudioSettingsManager()->CreateVehicleAudioSettingsData(m_usModel);
+
+    return *m_pSoundSettingsEntry.get();
+}
+
+
+bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) const
+{
+    if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
-        position = m_dummyPositions[dummy];
+        position = m_dummyPositions[(std::size_t)dummy];
         return true;
     }
 
     return false;
 }
 
-bool CClientVehicle::SetDummyPosition(eVehicleDummies dummy, const CVector& position)
+bool CClientVehicle::SetDummyPosition(VehicleDummies dummy, const CVector& position)
 {
-    if (dummy >= 0 && dummy < VEHICLE_DUMMY_COUNT)
+    if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
-        m_dummyPositions[dummy] = position;
+        m_dummyPositions[(std::size_t)dummy] = position;
         m_copyDummyPositions = false;
 
         return m_pVehicle ? m_pVehicle->SetDummyPosition(dummy, position) : true;
@@ -4931,14 +4998,14 @@ bool CClientVehicle::ResetDummyPositions()
 {
     if (m_pVehicle)
     {
-        std::array<CVector, VEHICLE_DUMMY_COUNT> positions;
+        std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> positions;
 
         if (!m_pModelInfo->GetVehicleDummyPositions(positions))
             return false;
 
         for (size_t i = 0; i < positions.size(); ++i)
         {
-            SetDummyPosition(static_cast<eVehicleDummies>(i), positions[i]);
+            SetDummyPosition(static_cast<VehicleDummies>(i), positions[i]);
         }
 
         return true;
@@ -5043,7 +5110,7 @@ void CClientVehicle::ResetWheelScale()
     // The calculation of the default wheel scale is based on original GTA code at functions
     // 0x6E3290 (CVehicle::AddVehicleUpgrade) and 0x6DF930 (CVehicle::RemoveVehicleUpgrade)
     if (m_pUpgrades->GetSlotState(12) != 0)
-        m_fWheelScale = m_pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::FRONT_AXLE);
+        m_fWheelScale = m_pModelInfo->GetVehicleWheelSize(ResizableVehicleWheelGroup::FRONT_AXLE);
     else
         m_fWheelScale = 1.0f;
 
@@ -5071,3 +5138,19 @@ CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
 
     return entryPoint;
 }
+
+void CClientVehicle::ApplyAudioSettings()
+{
+    if (!m_pVehicle)
+        return;
+
+    g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(&GetAudioSettings());
+    m_pVehicle->ReinitAudio();
+}
+
+void CClientVehicle::ResetAudioSettings()
+{
+    m_pSoundSettingsEntry = nullptr;
+    ApplyAudioSettings();
+}
+

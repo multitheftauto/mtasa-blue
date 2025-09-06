@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        multiplayer_sa/CMultiplayerSA_Direct3D.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -53,9 +53,11 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 #define HOOKPOS_PreCreateDevice             0x007F675B
 #define HOOKSIZE_PreCreateDevice            6
 DWORD RETURN_PreCreateDevice = 0x07F6781;
-void _declspec(naked) HOOK_PreCreateDevice()
+static void __declspec(naked) HOOK_PreCreateDevice()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Run replaced code
         mov     ecx,dword ptr ds:[0C97C20h]
@@ -108,9 +110,11 @@ HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
 #define HOOKSIZE_PostCreateDevice           6
 DWORD RETURN_PostCreateDevice = 0x07F678A;
 DWORD RETURN_PostCreateDeviceB = 0x07F6799;
-void _declspec(naked) HOOK_PostCreateDevice()
+static void __declspec(naked) HOOK_PostCreateDevice()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Replaced code
         pushad

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CTasksSA.h
  *  PURPOSE:     Header file for task creation class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -70,7 +70,7 @@ public:
     CTaskSimpleDuck*      CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck = 0, unsigned short nUseShotsWhizzingEvents = -1);
     CTaskSimpleChoking*   CreateTaskSimpleChoking(CPed* pAttacker, bool bIsTearGas);
 
-    CTaskSimpleClimb* CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight = CLIMB_GRAB,
+    CTaskSimpleClimb* CreateTaskSimpleClimb(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight = CLIMB_GRAB,
                                             const bool bForceClimb = false);
     CTaskSimpleJetPack* CreateTaskSimpleJetpack(const CVector* pVecTargetPos = NULL, float fCruiseHeight = 10.0f, int nHoverTime = 0);
 

@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/bitstream.h
  *  PURPOSE:     Network bitstream interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -28,13 +28,27 @@
 #endif
 
 struct ISyncStructure;
-class NetBitStreamInterface;
 
-class NetBitStreamInterfaceNoVersion : public CRefCountable
+// eBitStreamVersion allows us to track what BitStream version is being used without placing magic numbers everywhere.
+// It also helps us know what code branches can be removed when we increment a major version of MTA.
+// Make sure you only add new items to the end of the list, above the "Latest" entry.
+enum class eBitStreamVersion : unsigned short
+{
+    Unk = 0x030,
+
+    // DESCRIPTION
+    // YYYY-MM-DD
+    // Name,
+
+    // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
+    // Make sure you only add things above this comment.
+    Next,
+    Latest = Next - 1,
+};
+
+class NetBitStreamInterface : public CRefCountable
 {
 public:
-    virtual operator NetBitStreamInterface&() = 0;
-
     virtual int  GetReadOffsetAsBits() = 0;
     virtual void SetReadOffsetAsBits(int iOffset) = 0;
 
@@ -127,6 +141,10 @@ public:
     virtual void AlignReadToByteBoundary() const = 0;
 
     virtual unsigned char* GetData() const = 0;
+
+    virtual unsigned short Version() const = 0;
+
+    bool Can(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(Version()) >= query; }
 
     // Force long types to use 4 bytes
     bool Read(unsigned long& e)
@@ -392,246 +410,6 @@ public:
 
         return bResult;
     }
-};
-
-// eBitStreamVersion allows us to track what BitStream version is being used without placing magic numbers everywhere.
-// It also helps us know what code branches can be removed when we increment a major version of MTA.
-// Make sure you only add new items to the end of the list, above the "Latest" entry.
-enum class eBitStreamVersion : unsigned short
-{
-    Unk = 0x062,
-
-    //
-    // 1.5.0 UNSTABLE - 2015-01-17
-    //
-
-    // Add "quickstand" to setGlitchEnabled
-    // 2015-07-13 0x063 209837dcdc30d267519abc12e1361a1d18cd1553
-    QuickStandGlitch,
-
-    //
-    // 1.5.0 RC RELEASED - 2015-07-15
-    //
-
-    //
-    // 1.5.1 RELEASED - 2015-11-05
-    //
-
-    // Update fix #9038 (bugged shotgun with bullet sync) to only work if all connected clients support it
-    // 2015-10-17 0x064 edbc6d37a734914b7349c693edf9a087a5a78a3d
-    ShotgunDamageFix,
-
-    //
-    // 1.5.2 RELEASED - 2016-01-24
-    //
-
-    // Add blend parameter to setPedAnimation (#62)
-    // 2016-09-05 0x065 f51983c3e3385b4de8d754e11efe329acaee9301
-    SetPedAnimation_Blend,
-
-    // Update net module version
-    // 2016-09-24 0x066 3de7e5bd2d425747617a24350f2974e02cddc6dc
-    NetUpdate_0x09E,
-
-    //
-    // 1.5.3 RELEASED - 2016-10-20
-    //
-
-    // Fix player nametag unicode characters missing on player join
-    // 2016-12-09 0x067 2e582453b476c1183bd9fae5363a7cffdb531834
-    UnicodeNametags,
-
-    // Add -1 parameter to setElementDimension (only to objects) (#111)
-    // 2017-02-22 0x068 2e319aa823929360da9e1f48c7eb233f1d6f29e5
-    DimensionOmnipresence,
-
-    // Add support for more special detections
-    // 2017-02-26 0x069 9b6187b3c2eaa655624254f8d83acb35b31243e7
-    MoreSpecialDetections_Nice69,
-
-    // Add option to enable fakelag command for testing sync issues
-    // 2017-03-08 0x06A a99fa0afa3b55e84f15aed335ab542520f39126d
-    FakeLagCommand,
-
-    //
-    // 1.5.4 RELEASED - 2017-04-17
-    //
-
-    // Add player element for onClientChatMessage (#138)
-    // 2017-07-04 0x06B 8c7095599c6d54784692bf93a1e6c7f56392c323
-    OnClientChatMessage_PlayerSource,
-
-    //
-    // 1.5.5 RELEASED - 2017-08-07
-    //
-
-    // Add bShallow argument for server-side water as well (#240)
-    // 2018-08-05 0x06C 1321b538559efe6d70deb5b784c2d392d52658f5
-    Water_bShallow_ServerSide,
-
-    //
-    // 1.5.6 RELEASED - 2018-09-07
-    // 1.5.7 RELEASED - 2019-08-31
-    //
-
-    // Add option to disable spawning components by setVehicleDoorState
-    // 2019-10-11 0x06D e79d97195439f70ac66ece1859152b4c4896af31
-    SetVehicleDoorState_SpawnFlyingComponent,
-
-    // Increment BitStream version for Discord update (#1330)
-    // 2020-03-27 0x06E a0ce68f284487ba636e839b06c103bc2442d95e0
-    Discord_InitialImplementation,
-
-    // Add analog control sync for accelerate and brake_reverse (#1164)
-    // 2020-04-02 0x06F 41e36cc67520dded2a5203727a726c4261c65e31
-    AnalogControlSync_AccelBrakeReverse,
-
-    //
-    // 1.5.8 RELEASED - 2020-10-11
-    //
-
-    // setWaterLevel: add bIncludeWorldSeaLevel and bIncludeOutsideWorldLevel
-    // 2020-11-03 0x70
-    SetWaterLevel_ChangeOutsideWorldLevel,
-
-    // Implement entering/exiting/jacking for peds #1748
-    // 2020-11-10 0x71
-    PedEnterExit,
-
-    // Add height for colpolygon (#1908)
-    // 2021-01-16 0x72
-    SetColPolygonHeight,
-
-    // Support for vehicle blow without explosion and blow state synchronisation
-    // 2021-02-26 0x73
-    VehicleBlowStateSupport,
-
-    // Implement messageType parameter to onClientChatMessage (#1020)
-    // 2021-05-15 0x74
-    OnClientChatMessage_MessageType,
-
-    // Add serverside event "onPlayerResourceStart" (#2150)
-    // 2021-08-30 0x75
-    OnPlayerResourceStart,
-
-    //
-    // 1.5.9 RELEASED - 2021-10-01
-    //
-
-    // Remove "old" Discord implementation (#2499)
-    // 2022-01-16 0x76
-    Discord_Cleanup,
-
-    //
-    // 1.6.0 RELEASED - 2023-04-07
-    //
-
-    CEntityAddPacket_ObjectBreakable,
-
-    // Add serverside setWorldSpecialPropertyEnabled
-    // 2023-08-17
-    WorldSpecialProperties,
-
-    // Add "fireballdestruct" to setWorldSpecialPropertyEnabled
-    // 2023-09-09
-    WorldSpecialProperty_FireballDestruct,
-
-    // Send server name to player in CPlayerJoinCompletePacket
-    // 2023-10-12
-    CPlayerJoinCompletePacket_ServerName,
-
-    // Add "roadsignstext" to setWorldSpecialPropertyEnabled
-    // 2024-05-17
-    WorldSpecialProperty_RoadSignsText,
-
-    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
-    // 2024-05-23
-    WorldSpecialProperty_ExtendedWaterCannons,
-
-    // Add breakObject to serverside as well
-    // 2024-05-31
-    BreakObject_Serverside,   
-    
-    // Ped syncronization revision
-    // 2024-06-16
-    PedSync_Revision,
-
-    // Add "tunnelweatherblend" to setWorldSpecialPropertyEnabled
-    // 2024-06-30
-    WorldSpecialProperty_TunnelWeatherBlend,
-
-    // Checkpoint & arrow alpha fix
-    // 2024-07-03
-    Marker_IgnoreAlphaLimits,
-
-    // Add "setMarkerTargetArrowProperties"
-    // 2024-07-05
-    SetMarkerTargetArrowProperties,
-
-    // Add respawnObject and toggleObjectRespawn to serverside
-    // 2024-09-04
-    RespawnObject_Serverside,
-
-    // Add check_duplicate_serials
-    // 2024-09-04
-    CheckDuplicateSerials,
-
-    // Add ignorefirestate special world property
-    // 2024-11-07
-    WorldSpecialProperty_IgnoreFireState,
-
-    // Fix iPedSyncerDistance and iUnoccupiedVehicleSyncerDistance sync
-    // 2024-11-22
-    FixSyncerDistance,
-
-    // Add onPlayerChangesWorldSpecialProperty
-    // 2024-11-26
-    WorldSpecialPropertyEvent,
-
-    // Add setElementOnFire function
-    // 2024-12-30
-    SetElementOnFire,
-
-    // Add "spawnFlyingComponent" to setVehiclePanelState
-    // 2024-12-31
-    SetVehiclePanelState_SpawnFlyingComponent,
-
-    // Ped animations synchronization
-    // 2025-01-01
-    AnimationsSync,
-
-    // Add server side isPedReloadingWeapon
-    // 2025-01-09
-    IsPedReloadingWeapon,
-
-    // Add "flyingcomponents" to setWorldSpecialPropertyEnabled
-    // 2025-01-10
-    WorldSpecialProperty_FlyingComponents,
-
-    // Ped's camera synchronization
-    // 2025-01-29
-    PedSync_CameraRotation,
-
-    // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
-    // Make sure you only add things above this comment.
-    Next,
-    Latest = Next - 1,
-};
-
-class NetBitStreamInterface : public NetBitStreamInterfaceNoVersion
-{
-    NetBitStreamInterface(const NetBitStreamInterface&);
-    const NetBitStreamInterface& operator=(const NetBitStreamInterface&);
-
-protected:
-    NetBitStreamInterface() { DEBUG_CREATE_COUNT("NetBitStreamInterface"); }
-    virtual ~NetBitStreamInterface() { DEBUG_DESTROY_COUNT("NetBitStreamInterface"); }
-
-public:
-    virtual                operator NetBitStreamInterface&() { return *this; }
-    virtual unsigned short Version() const = 0;
-
-    bool Can(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(Version()) >= query; }
 };
 
 // Interface for all sync structures

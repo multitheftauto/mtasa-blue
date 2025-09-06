@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Hash.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -49,7 +49,8 @@ enum class StringEncodeFunction
     AES128,
     RSA,
     BASE64,
-    BASE32
+    BASE32,
+    ZLIB,
 };
 
 enum class KeyPairAlgorithm
@@ -65,6 +66,22 @@ enum class HmacAlgorithm
     SHA256,
     SHA384,
     SHA512,
+};
+
+enum class ZLibFormat
+{
+    ZRAW = -15,
+    ZLIB = 15,
+    GZIP = 31,
+};
+
+enum class ZLibStrategy
+{
+    DEFAULT,
+    FILTERED,
+    HUFFMAN_ONLY,
+    RLE,
+    FIXED,
 };
 
 namespace SharedUtil

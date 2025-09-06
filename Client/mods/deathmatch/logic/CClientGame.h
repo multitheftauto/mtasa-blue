@@ -6,7 +6,7 @@
  *  FILE:        mods/deathmatch/logic/CClientGame.h
  *  PURPOSE:     Header for client game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -53,6 +53,7 @@ class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
 class CServerInfo;
+class CFire;
 enum class eAnimID;
 
 struct SVehExtrapolateSettings
@@ -129,8 +130,12 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
-        POINTLIGHTS,
+        _DATABASE_CONNECTION, // server only
+        TRAIN_TRACK,
+        ROOT,
         UNKNOWN,
+        BUILDING,
+        POINTLIGHTS,
     };
 
     enum
@@ -188,6 +193,7 @@ public:
         QUIT_CONNECTION_DESYNC,
         QUIT_TIMEOUT,
     };
+    
     enum
     {
         GLITCH_QUICKRELOAD,
@@ -200,6 +206,7 @@ public:
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
+        GLITCH_VEHICLE_RAPID_STOP,
         NUM_GLITCHES
     };
 
@@ -398,6 +405,44 @@ public:
                        AnimationId animId = 15);
     void SendPedWastedPacket(CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF,
                              AssocGroupId animGroup = 0, AnimationId animID = 15);
+    
+    void ClearDamageData() noexcept {
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = WEAPONTYPE_INVALID;
+        m_ucDamageBodyPiece = BODYPART_INVALID;
+        m_ulDamageTime = 0;
+        m_serverProcessedDeath = true;
+    }
+    
+    void ResetDeathProcessingFlag() noexcept {
+        m_serverProcessedDeath = false;
+    }
+    
+    void SetScriptedDeathData() {
+        auto* localPlayer = GetLocalPlayer();
+        if (!localPlayer) {
+            m_DamagerID = INVALID_ELEMENT_ID;
+            m_ucDamageWeapon = WEAPONTYPE_INVALID;
+            m_ucDamageBodyPiece = BODYPART_INVALID;
+            m_ulDamageTime = CClientTime::GetTime();
+            m_serverProcessedDeath = false;
+            return;
+        }
+        
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = TryGetCurrentWeapon(localPlayer);
+        m_ucDamageBodyPiece = BODYPART_TORSO;
+        m_ulDamageTime = CClientTime::GetTime();
+        m_serverProcessedDeath = false;
+    }
+    
+    void SetExplosionDamageData() noexcept {
+        m_DamagerID = INVALID_ELEMENT_ID;
+        m_ucDamageWeapon = WEAPONTYPE_EXPLOSION;
+        m_ucDamageBodyPiece = BODYPART_TORSO;
+        m_ulDamageTime = CClientTime::GetTime();
+        m_serverProcessedDeath = false;
+    }
 
     CClientGUIElement* GetClickedGUIElement() { return m_pClickedGUIElement; }
     void               SetClickedGUIElement(CClientGUIElement* pElement) { m_pClickedGUIElement = NULL; }
@@ -421,6 +466,9 @@ public:
 
     void SetWeaponRenderEnabled(bool enabled);
     bool IsWeaponRenderEnabled() const;
+
+    void SetVehicleEngineAutoStartEnabled(bool enabled);
+    bool IsVehicleEngineAutoStartEnabled() const;
 
     void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
@@ -461,6 +509,9 @@ public:
     void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
+    
+    void SetAllowMultiCommandHandlers(MultiCommandHandlerPolicy policy) noexcept { m_allowMultiCommandHandlers = policy; }
+    MultiCommandHandlerPolicy GetAllowMultiCommandHandlers() const noexcept { return m_allowMultiCommandHandlers; }
 
 private:
     // CGUI Callbacks
@@ -514,7 +565,7 @@ private:
 
     static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     static void                              StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-    static void                              StaticFireHandler(CFire* pFire);
+    static bool                              StaticFireHandler(CEntitySAInterface* target, CEntitySAInterface* creator);
     static bool                              StaticBreakTowLinkHandler(CVehicle* pTowedVehicle);
     static void                              StaticDrawRadarAreasHandler();
     static void                              StaticRender3DStuffHandler();
@@ -565,7 +616,7 @@ private:
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-    void                              FireHandler(CFire* pFire);
+    bool                              FireHandler(CEntitySAInterface* target, CEntitySAInterface* creator);
     bool                              BreakTowLinkHandler(CVehicle* pTowedVehicle);
     void                              DrawRadarAreasHandler();
     void                              Render3DStuffHandler();
@@ -603,6 +654,9 @@ private:
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
 
+    // Helper method to get current weapon type with error handling
+    std::uint8_t TryGetCurrentWeapon(CClientPlayer* player);
+
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool        ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -620,7 +674,7 @@ public:
     bool VerifySADataFiles(int iEnableClientChecks = 0);
     void DebugElementRender();
 
-    void SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin = NULL);
+    void SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin = nullptr, std::optional<VehicleBlowState> vehicleBlowState = std::nullopt);
     void SendFireSync(CFire* pFire);
     void SendProjectileSync(CClientProjectile* pProjectile);
 
@@ -757,6 +811,7 @@ private:
     unsigned char  m_ucDamageBodyPiece;
     unsigned long  m_ulDamageTime;
     bool           m_bDamageSent;
+    bool           m_serverProcessedDeath{false}; // Flag to track server-processed deaths
 
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
@@ -863,6 +918,8 @@ private:
     AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
     // Key is the task and value is the CClientPed*
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
+    
+    MultiCommandHandlerPolicy m_allowMultiCommandHandlers;
     
     long long m_timeLastDiscordStateUpdate;
 };

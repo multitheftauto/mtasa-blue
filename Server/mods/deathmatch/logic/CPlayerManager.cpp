@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayerManager.cpp
  *  PURPOSE:     Player ped entity manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

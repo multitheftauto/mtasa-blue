@@ -1070,7 +1070,7 @@
         if ( theta == FT_ANGLE_PI2 )
           theta = -rotate;
 
-        phi    = stroker->angle_in + theta + rotate;
+        phi = stroker->angle_in + theta + rotate;
 
         FT_Vector_From_Polar( &sigma, stroker->miter_limit, theta );
 

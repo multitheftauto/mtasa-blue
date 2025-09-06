@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Client/mods/deathmatch/logic/CClientIFP.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,6 +13,7 @@
 #include "CClientEntity.h"
 #include "CFileReader.h"
 #include "CIFPAnimations.h"
+#include <game/CAnimBlendSequence.h>
 
 class CAnimBlendSequence;
 

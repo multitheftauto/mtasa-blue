@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CAccountPassword.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -132,7 +132,7 @@ SString CAccountPassword::GenerateSalt()
 {
     char randomData[16];
     g_pNetServer->GenerateRandomData(randomData, sizeof(randomData));
-    randomData[8] = rand();
+    randomData[8] = static_cast<char>(rand());
 
     SString strSalt = ConvertDataToHexString(randomData, sizeof(randomData));
 

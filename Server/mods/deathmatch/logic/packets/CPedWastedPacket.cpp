@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPedWastedPacket.cpp
  *  PURPOSE:     Ped wasted state packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -49,7 +49,7 @@ bool CPedWastedPacket::Read(NetBitStreamInterface& BitStream)
         BitStream.Read(&bodyPart) && BitStream.Read(&pos) && BitStream.Read(m_PedID))
     {
         m_ucKillerWeapon = weapon.data.ucWeaponType;
-        m_ucBodyPart = bodyPart.data.uiBodypart;
+        m_ucBodyPart = static_cast<unsigned char>(bodyPart.data.uiBodypart);
         m_vecPosition = pos.data.vecPosition;
 
         SWeaponAmmoSync ammo(m_ucKillerWeapon, true, false);

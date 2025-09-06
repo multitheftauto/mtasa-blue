@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskCarSA.cpp
  *  PURPOSE:     Car game tasks
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -43,7 +43,7 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTarget
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
-        _asm
+        __asm
         {
             mov     ecx, dwThisInterface
             push    dwVehiclePtr
@@ -71,7 +71,7 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* p
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
-        _asm
+        __asm
         {
             push    edx
             xor     edx, edx
@@ -104,7 +104,7 @@ CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTarg
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
-        _asm
+        __asm
         {
             mov     ecx, dwThisInterface
             push    dwVehiclePtr
@@ -138,7 +138,7 @@ CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const i
         if (iTargetDoor >= 0 && iTargetDoor <= 5)
             dwDoorIdx = s_iCarNodeIndexes[iTargetDoor];
 
-        _asm
+        __asm
         {
             mov     ecx, dwThisInterface
             push    ebx

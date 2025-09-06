@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CBoatHandlingEntrySA.cpp
  *  PURPOSE:     Vehicle flying handling data entry
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

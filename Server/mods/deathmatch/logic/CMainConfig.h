@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CMainConfig.h
  *  PURPOSE:     XML-based main configuration file parser class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -147,9 +147,11 @@ public:
     void                            OnTickRateChange();
     void                            OnAseSettingChange();
     void                            OnPlayerTriggeredEventIntervalChange();
+    void                            OnAllowMultiCommandHandlersChange();
 
     int GetPlayerTriggeredEventInterval() const { return m_iPlayerTriggeredEventIntervalMs; }
     int GetMaxPlayerTriggeredEventsPerInterval() const { return m_iMaxPlayerTriggeredEventsPerInterval; }
+    int GetAllowMultiCommandHandlers() const noexcept { return m_allowMultiCommandHandlers; }
 
 private:
     void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, const char* szConsoleHelpText);
@@ -235,4 +237,5 @@ private:
     bool                       m_elementDataWhitelisted;
     bool                       m_checkDuplicateSerials;
     int                        m_checkResourceClientFiles;
+    int                        m_allowMultiCommandHandlers;
 };

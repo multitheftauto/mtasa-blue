@@ -26,7 +26,7 @@ workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 
 	if os.host() == "macosx" then
-		platforms { "x64", "arm64" }
+		platforms { "arm64" }
 	elseif os.host() == "windows" then
 		platforms { "x86", "x64", "arm64" }
 	else
@@ -42,7 +42,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 
-	cppdialect "C++17"
+	cppdialect "C++23"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
@@ -66,7 +66,7 @@ workspace "MTASA"
 	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} \"%{wks.location}../Bin/"..p.."/\"" end
 
 	if GLIBC_COMPAT then
-		filter { "system:linux" }
+		filter { "system:linux", "platforms:x86 or x64" }
 			includedirs "/compat"
 			linkoptions "-static-libstdc++ -static-libgcc"
 			forceincludes  { "glibc_version.h" }
@@ -115,7 +115,7 @@ workspace "MTASA"
 		preferredtoolarchitecture "x86_64"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
-		buildoptions { "/Zc:__cplusplus" }
+		buildoptions { "/Zc:__cplusplus", "/permissive-" }
 		includedirs {
 			path.join(dxdir, "Include")
 		}

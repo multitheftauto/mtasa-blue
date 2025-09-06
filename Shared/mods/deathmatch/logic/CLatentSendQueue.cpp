@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -97,8 +97,7 @@ void CLatentSendQueue::DoPulse(int iTimeMsBetweenCalls)
             pBitStream->Write(activeTx.usCategory);
             pBitStream->Write(activeTx.bufferRef->GetSize());
             pBitStream->Write(activeTx.uiRate);
-            if (pBitStream->Version() >= 0x31)
-                pBitStream->Write(activeTx.usResourceNetId);
+            pBitStream->Write(activeTx.usResourceNetId);
             activeTx.bSendStarted = true;
         }
         else if (activeTx.bufferRef->GetSize() == activeTx.uiReadPosition)

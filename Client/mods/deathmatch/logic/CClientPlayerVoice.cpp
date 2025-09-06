@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CVoiceRecorder.cpp
  *  PURPOSE:     Remote player voice chat playback
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -118,8 +118,11 @@ void CClientPlayerVoice::DoPulse()
     }
 }
 
-void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten)
+void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsigned int voiceBufferLength)
 {
+    if (!voiceBuffer || !voiceBufferLength || voiceBufferLength > 2048)
+        return;
+
     m_Mutex.lock();
 
     if (!m_bVoiceActive)
@@ -143,7 +146,7 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
     SpeexBits speexBits;
     speex_bits_init(&speexBits);
 
-    speex_bits_read_from(&speexBits, (char*)(pBuffer), bytesWritten);
+    speex_bits_read_from(&speexBits, reinterpret_cast<const char*>(voiceBuffer), voiceBufferLength);
     speex_decode_int(m_pSpeexDecoderState, &speexBits, (spx_int16_t*)pTempBuffer);
 
     speex_bits_destroy(&speexBits);
@@ -396,6 +399,20 @@ bool CClientPlayerVoice::IsFxEffectEnabled(uint uiFxEffect)
         return false;
 
     return m_EnabledEffects[uiFxEffect] ? true : false;
+}
+
+bool CClientPlayerVoice::SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+{
+    if (IsFxEffectEnabled(uiFxEffect))
+        return BASS_FXSetParameters(m_FxEffects[uiFxEffect], params);
+    return false;
+}
+
+bool CClientPlayerVoice::GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+{
+    if (IsFxEffectEnabled(uiFxEffect))
+        return BASS_FXGetParameters(m_FxEffects[uiFxEffect], params);
+    return false;
 }
 
 bool CClientPlayerVoice::GetPan(float& fPan)

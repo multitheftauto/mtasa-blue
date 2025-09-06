@@ -5,7 +5,7 @@
  *  FILE:        core/CGraphics.cpp
  *  PURPOSE:     General graphics subsystem
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -735,7 +735,7 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
             ulFormat |= DT_WORDBREAK;
 
         // Calculate the size of the text
-        RECT rect = {0, 0, fWidth / fScaleX, 0};
+        RECT rect = {0, 0, static_cast<LONG>(fWidth / fScaleX), 0};
         pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
 
         vecSize.fX = (rect.right - rect.left) * fScaleX;

@@ -6,13 +6,14 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaCameraDefs.cpp
  *  PURPOSE:     Lua camera definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include <game/CPlayerInfo.h>
 #include <game/CSettings.h>
+#include <game/CCam.h>
 #include <lua/CLuaFunctionParser.h>
 
 #define MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20979"
@@ -215,10 +216,11 @@ int CLuaCameraDefs::SetCameraFieldOfView(lua_State* luaVM)
 {
     float            fFOV;
     eFieldOfViewMode eMode;
+    bool             instant;
     CScriptArgReader argStream(luaVM);
-
     argStream.ReadEnumString(eMode);
     argStream.ReadNumber(fFOV);
+    argStream.ReadBool(instant, false);
 
     if (!argStream.HasErrors())
     {
@@ -231,11 +233,17 @@ int CLuaCameraDefs::SetCameraFieldOfView(lua_State* luaVM)
             }
 
             if (eMode == FOV_MODE_PLAYER)
-                g_pGame->GetSettings()->SetFieldOfViewPlayer(fFOV, true);
+            {
+                g_pGame->GetSettings()->SetFieldOfViewPlayer(fFOV, true, instant);
+            }
             else if (eMode == FOV_MODE_VEHICLE)
-                g_pGame->GetSettings()->SetFieldOfViewVehicle(fFOV, true);
+            {
+                g_pGame->GetSettings()->SetFieldOfViewVehicle(fFOV, true, instant);
+            }
             else if (eMode == FOV_MODE_VEHICLE_MAX)
-                g_pGame->GetSettings()->SetFieldOfViewVehicleMax(fFOV, true);
+            {
+                g_pGame->GetSettings()->SetFieldOfViewVehicleMax(fFOV, true, instant);
+            }
             else
             {
                 argStream.m_iIndex = 1;
@@ -473,7 +481,7 @@ bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)
         throw std::invalid_argument("Invalid range (0-255)");
 
     CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
-    pPlayerInfo->SetCamDrunkLevel(drunkLevel);
+    pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(drunkLevel));
 
     return true;
 }

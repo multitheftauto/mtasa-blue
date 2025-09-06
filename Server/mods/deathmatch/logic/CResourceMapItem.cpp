@@ -20,6 +20,7 @@
 #include "CWaterManager.h"
 #include "CMarkerManager.h"
 #include "CVehicleManager.h"
+#include "CBuildingManager.h"
 #include "CBlipManager.h"
 #include "Enums.h"
 #include "lua/CLuaFunctionParseHelpers.h"
@@ -34,6 +35,7 @@ CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName
     m_pMarkerManager = g_pGame->GetMarkerManager();
     m_pBlipManager = g_pGame->GetBlipManager();
     m_pObjectManager = g_pGame->GetObjectManager();
+    m_pBuildingManager = g_pGame->GetBuildingManager();
     m_pPickupManager = g_pGame->GetPickupManager();
     m_pPlayerManager = g_pGame->GetPlayerManager();
     m_pRadarAreaManager = g_pGame->GetRadarAreaManager();
@@ -43,7 +45,7 @@ CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName
     m_pWaterManager = g_pGame->GetWaterManager();
     m_pEvents = g_pGame->GetEvents();
     m_pElementGroup = nullptr;
-    m_iDimension = iDimension;
+    m_dimension = static_cast<unsigned short>(iDimension);
     m_type = RESOURCE_FILE_TYPE_MAP;
     m_pMapElement = nullptr;
 }
@@ -188,6 +190,11 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
             pNode = m_pWaterManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
+        case CElement::BUILDING:
+        {
+            pNode = m_pBuildingManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
+        }
         default:
         {
             pNode = m_pGroups->CreateFromXML(pParent, Node, m_pEvents);
@@ -201,7 +208,7 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
     pNode->SetTypeName(strTagName);
 
     if (!pNode->GetDimension())
-        pNode->SetDimension(m_iDimension);
+        pNode->SetDimension(m_dimension);
 
     if (m_pElementGroup)
         m_pElementGroup->Add(pNode);
@@ -226,45 +233,25 @@ void CResourceMapItem::LinkupElements()
         }
     }
 
-    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
+    auto linkupElementsInManager = [pRootElement](auto* pManager)
     {
-        CPlayer* const pPlayer = *iter;
-        const char*    szAttachToID = pPlayer->GetAttachToID();
-
-        if (szAttachToID[0])
+        for (auto iter = pManager->IterBegin(); iter != pManager->IterEnd(); ++iter)
         {
-            CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
+            auto*       pIterElement = *iter;
+            const char* szAttachToID = pIterElement->GetAttachToID();
 
-            if (pElement && !pElement->IsAttachedToElement(pPlayer))
-                pPlayer->AttachTo(pElement);
+            if (szAttachToID[0])
+            {
+                CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
+
+                if (pElement && !pElement->IsAttachedToElement(pIterElement))
+                    pIterElement->AttachTo(pElement);
+            }
         }
-    }
+    };
 
-    for (auto iter = m_pObjectManager->IterBegin(); iter != m_pObjectManager->IterEnd(); ++iter)
-    {
-        CObject* const pObject = *iter;
-        const char*    szAttachToID = pObject->GetAttachToID();
-
-        if (szAttachToID[0])
-        {
-            CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
-
-            if (pElement && !pElement->IsAttachedToElement(pObject))
-                pObject->AttachTo(pElement);
-        }
-    }
-
-    for (auto iter = m_pBlipManager->IterBegin(); iter != m_pBlipManager->IterEnd(); ++iter)
-    {
-        CBlip* const pBlip = *iter;
-        const char*  szAttachToID = pBlip->GetAttachToID();
-
-        if (szAttachToID[0])
-        {
-            CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
-
-            if (pElement && !pElement->IsAttachedToElement(pBlip))
-                pBlip->AttachTo(pElement);
-        }
-    }
+    linkupElementsInManager(m_pPlayerManager);
+    linkupElementsInManager(m_pObjectManager);
+    linkupElementsInManager(m_pBlipManager);
+    linkupElementsInManager(m_pBuildingManager);
 }

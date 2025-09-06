@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.h
  *  PURPOSE:     Resource object class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -110,9 +110,13 @@ public:
     int                GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
     void               SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
 
+    void         SetStartCounter(unsigned int startCounter) { m_startCounter = startCounter; }
+    unsigned int GetStartCounter() const noexcept { return m_startCounter; }
+
 private:
     unsigned short       m_usNetID;
     uint                 m_uiScriptID;
+    unsigned int         m_startCounter{};
     SString              m_strResourceName;
     CLuaMain*            m_pLuaVM;
     CLuaManager*         m_pLuaManager;

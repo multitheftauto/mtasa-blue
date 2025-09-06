@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CAccount.h
  *  PURPOSE:     User account class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -97,10 +97,12 @@ public:
     SSerialUsage*              GetSerialUsage(const SString& strSerial);
     bool                       IsIpAuthorized(const SString& strIp);
     bool                       IsSerialAuthorized(const SString& strSerial);
+    bool                       IsValidSerial(const std::string& serial) const noexcept;
     bool                       AddSerialForAuthorization(const SString& strSerial, const SString& strIp);
     bool                       AuthorizeSerial(const SString& strSerial, const SString& strWho);
     bool                       RemoveSerial(const SString& strSerial);
     void                       RemoveUnauthorizedSerials();
+    bool                       SetAccountSerial(const std::string& serial) noexcept;
 
     CClient* GetClient() const { return m_pClient; }
     void     SetClient(CClient* pClient);

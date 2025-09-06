@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaManager.cpp
  *  PURPOSE:     Lua virtual machine manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -22,6 +22,7 @@
 #include "luadefs/CLuaACLDefs.h"
 #include "luadefs/CLuaBanDefs.h"
 #include "luadefs/CLuaBlipDefs.h"
+#include "luadefs/CLuaBuildingDefs.h"
 #include "luadefs/CLuaColShapeDefs.h"
 #include "luadefs/CLuaDatabaseDefs.h"
 #include "luadefs/CLuaMarkerDefs.h"
@@ -191,6 +192,7 @@ void CLuaManager::LoadCFunctions()
     CLuaAccountDefs::LoadFunctions();
     CLuaBanDefs::LoadFunctions();
     CLuaBlipDefs::LoadFunctions();
+    CLuaBuildingDefs::LoadFunctions();
     CLuaCameraDefs::LoadFunctions();
     CLuaColShapeDefs::LoadFunctions();
     CLuaDatabaseDefs::LoadFunctions();

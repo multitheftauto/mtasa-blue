@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaElementDefs.cpp
  *  PURPOSE:     Lua element definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1540,14 +1540,14 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
 {
     //  bool setElementData ( element theElement, string key, var value, [var syncMode = true] )
     CElement*    pElement;
-    SString      strKey;
+    CStringName  key;
     CLuaArgument value;
     ESyncType    syncType = ESyncType::BROADCAST;
     std::optional<eCustomDataClientTrust> clientTrust{};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
     argStream.ReadLuaArgument(value);
 
     if (argStream.NextIsBool())
@@ -1571,15 +1571,15 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+        if (key->length() > MAX_CUSTOMDATA_NAME_LENGTH)
         {
             // Warn and truncate if key is too long
             m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
                                                          *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-            strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+            key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
-        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType, clientTrust))
+        if (CStaticFunctionDefinitions::SetElementData(pElement, key.ToCString(), value, syncType, clientTrust))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1596,25 +1596,25 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
 {
     //  bool removeElementData ( element theElement, string key )
     CElement* pElement;
-    SString   strKey;
+    CStringName key;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
 
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+        if (key->length() > MAX_CUSTOMDATA_NAME_LENGTH)
         {
             // Warn and truncate if key is too long
             m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
                                                          *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-            strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+            key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
-        if (CStaticFunctionDefinitions::RemoveElementData(pElement, strKey))
+        if (CStaticFunctionDefinitions::RemoveElementData(pElement, key.ToCString()))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1631,19 +1631,19 @@ int CLuaElementDefs::addElementDataSubscriber(lua_State* luaVM)
 {
     //  bool addElementDataSubscriber ( element theElement, string key, player thePlayer )
     CElement* pElement;
-    SString   strKey;
+    CStringName key;
     CPlayer*  pPlayer;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
     argStream.ReadUserData(pPlayer);
 
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        if (CStaticFunctionDefinitions::AddElementDataSubscriber(pElement, strKey, pPlayer))
+        if (CStaticFunctionDefinitions::AddElementDataSubscriber(pElement, key.ToCString(), pPlayer))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1660,19 +1660,19 @@ int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
 {
     //  bool removeElementDataSubscriber ( element theElement, string key, player thePlayer )
     CElement* pElement;
-    SString   strKey;
+    CStringName key;
     CPlayer*  pPlayer;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
     argStream.ReadUserData(pPlayer);
 
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        if (CStaticFunctionDefinitions::RemoveElementDataSubscriber(pElement, strKey, pPlayer))
+        if (CStaticFunctionDefinitions::RemoveElementDataSubscriber(pElement, key.ToCString(), pPlayer))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1689,19 +1689,19 @@ int CLuaElementDefs::hasElementDataSubscriber(lua_State* luaVM)
 {
     //  bool hasElementDataSubscriber ( element theElement, string key, player thePlayer )
     CElement* pElement;
-    SString   strKey;
+    CStringName key;
     CPlayer*  pPlayer;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
+    argStream.ReadStringName(key);
     argStream.ReadUserData(pPlayer);
 
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        bool bResult = CStaticFunctionDefinitions::HasElementDataSubscriber(pElement, strKey, pPlayer);
+        bool bResult = CStaticFunctionDefinitions::HasElementDataSubscriber(pElement, key.ToCString(), pPlayer);
         lua_pushboolean(luaVM, bResult);
         return 1;
     }

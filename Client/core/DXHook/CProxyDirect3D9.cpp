@@ -5,7 +5,7 @@
  *  FILE:        core/CProxyDirect3D9.cpp
  *  PURPOSE:     Direct3D 9 function hooking proxy
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

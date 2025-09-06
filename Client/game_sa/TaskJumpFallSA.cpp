@@ -5,14 +5,14 @@
  *  FILE:        game_sa/TaskJumpFallSA.cpp
  *  PURPOSE:     Jump and fall game tasks
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "TaskJumpFallSA.h"
 
-CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
+CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight,
                                        const bool bForceClimb)
 {
     CreateTaskInterface(sizeof(CTaskSimpleClimbSAInterface));
@@ -21,7 +21,7 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTar
     DWORD dwFunc = FUNC_CTaskSimpleClimb__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bForceClimb
@@ -47,7 +47,7 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     DWORD dwFunc = FUNC_CTaskSimpleJetPack__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    0               // pTargetEnt - ignored for simplicity's sake (we really don't need it)

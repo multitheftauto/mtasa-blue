@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CIplStore.h
  *  PURPOSE:     Game IPL store interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPedModelInfoSA.cpp
  *  PURPOSE:     Modelinfo for ped entities
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -29,7 +29,7 @@ void CPedModelInfoSA::SetMotionAnimGroup(AssocGroupId animGroup)
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = (DWORD)FUNC_SetMotionAnimGroup;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    animGroup

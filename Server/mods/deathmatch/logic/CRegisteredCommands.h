@@ -5,18 +5,26 @@
  *  FILE:        mods/deathmatch/logic/CRegisteredCommands.h
  *  PURPOSE:     Registered (lua) command manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
 #include "lua/CLuaFunctionRef.h"
+#include <cstdint>
 #include <list>
 #include <unordered_set>
 
 #define MAX_REGISTERED_COMMAND_LENGTH 64
 #define MAX_REGISTERED_COMMANDHANDLER_LENGTH 64
+
+enum class MultiCommandHandlerPolicy : std::uint8_t
+{
+    BLOCK = 0,
+    WARN = 1,
+    ALLOW = 2
+};
 
 class CRegisteredCommands
 {

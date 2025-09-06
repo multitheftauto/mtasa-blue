@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskJumpFallSA.h
  *  PURPOSE:     Jump and fall game tasks
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -31,13 +31,13 @@ public:
     bool          m_bChangePosition;
     bool          m_bForceClimb;
     bool          m_bInvalidClimb;
-    char          m_nHeightForAnim;
-    char          m_nHeightForPos;
+    eClimbHeights m_nHeightForAnim;
+    eClimbHeights m_nHeightForPos;
     unsigned char m_nSurfaceType;
     char          m_nFallAfterVault;
     float         m_fHandholdHeading;
     CVector       m_vecHandholdPos;
-    CEntity*      m_pClimbEnt;
+    CEntitySAInterface*      m_pClimbEnt;
 
     short                  m_nGetToPosCounter;
     CAnimBlendAssociation* m_pAnim;
@@ -47,8 +47,10 @@ class CTaskSimpleClimbSA : public virtual CTaskSimpleSA, public virtual CTaskSim
 {
 public:
     CTaskSimpleClimbSA(){};
-    CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight = CLIMB_GRAB,
+    CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight = CLIMB_GRAB,
                        const bool bForceClimb = false);
+
+    eClimbHeights GetHeightForPos() const override { return static_cast<const CTaskSimpleClimbSAInterface*>(GetInterface())->m_nHeightForPos; }
 };
 
 // ##############################################################################

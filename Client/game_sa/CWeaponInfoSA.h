@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWeaponInfoSA.h
  *  PURPOSE:     Header file for weapon type information class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -109,7 +109,7 @@ public:
     void  SetFlag(DWORD flag) { m_pInterface->m_nFlags |= flag; }
     void  ClearFlag(DWORD flag) { m_pInterface->m_nFlags &= ~flag; }
     bool  IsFlagSet(DWORD flag) { return ((m_pInterface->m_nFlags & flag) > 0 ? true : false); }
-    short GetFlags() { return m_pInterface->m_nFlags; }
+    int   GetFlags() { return m_pInterface->m_nFlags; }
 
     eWeaponModel GetModel() { return (eWeaponModel)m_pInterface->m_modelId; }
     eWeaponModel GetModel2() { return (eWeaponModel)m_pInterface->m_modelId2; }

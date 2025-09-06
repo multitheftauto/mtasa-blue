@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CEventDamageSA.cpp
  *  PURPOSE:     Damage event
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -27,7 +27,7 @@ CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType w
     DWORD dwEntityInterface = (DWORD)pEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_Constructor;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    b_4
@@ -57,7 +57,7 @@ CEventDamageSA::~CEventDamageSA()
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CEventDamage_Destructor;
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
@@ -83,7 +83,7 @@ bool CEventDamageSA::HasKilledPed()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_HasKilledPed;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -97,7 +97,7 @@ float CEventDamageSA::GetDamageApplied()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_GetDamageApplied;
     float fReturn = 0.0f;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -111,7 +111,7 @@ AssocGroupId CEventDamageSA::GetAnimGroup()
     DWORD        dwThis = (DWORD)m_pInterface;
     DWORD        dwFunc = FUNC_CEventDamage_GetAnimGroup;
     AssocGroupId animGroup = 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -125,7 +125,7 @@ AnimationId CEventDamageSA::GetAnimId()
     DWORD       dwThis = (DWORD)m_pInterface;
     DWORD       dwFunc = FUNC_CEventDamage_GetAnimId;
     AnimationId animID = 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -139,7 +139,7 @@ bool CEventDamageSA::GetAnimAdded()
     bool  bReturn;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_GetAnimAdded;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -153,7 +153,7 @@ void CEventDamageSA::ComputeDeathAnim(CPed* pPed, bool bUnk)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDeathAnim;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    bUnk
@@ -167,7 +167,7 @@ void CEventDamageSA::ComputeDamageAnim(CPed* pPed, bool bUnk)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDamageAnim;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    bUnk
@@ -182,7 +182,7 @@ bool CEventDamageSA::AffectsPed(CPed* pPed)
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_AffectsPed;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    dwPedInterface

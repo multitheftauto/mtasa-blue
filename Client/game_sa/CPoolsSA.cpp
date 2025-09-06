@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPoolsSA.cpp
  *  PURPOSE:     Game entity pools
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,6 +24,9 @@
 #include "CTrailerSA.h"
 #include "CTrainSA.h"
 #include "CWorldSA.h"
+
+#include "enums/VehicleClass.h"
+#include <new>
 
 extern CGameSA* pGame;
 
@@ -240,7 +243,7 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
-        pObject = new CObjectSA(dwModelID, bBreakingDisabled);
+        pObject = new (std::nothrow) CObjectSA(dwModelID, bBreakingDisabled);
 
         if (pObject && AddObjectToPool(pClientObject, pObject))
         {
@@ -501,7 +504,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
-    _asm {
+    __asm {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
         call    dwFunction
@@ -985,10 +988,10 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
             break;
     }
     if (iPtr)
-        MemPut<int>(iPtr, iValue);
+        MemPut(iPtr, iValue);
 
     if (cPtr)
-        MemPut<char>(cPtr, iValue);
+        MemPut(cPtr, static_cast<char>(iValue));
 }
 
 int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
@@ -1070,7 +1073,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             mov     ecx, [ecx]

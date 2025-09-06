@@ -78,6 +78,9 @@ ADD_ENUM(HUD_MONEY, "money")
 ADD_ENUM(HUD_VEHICLE_NAME, "vehicle_name")
 ADD_ENUM(HUD_AREA_NAME, "area_name")
 ADD_ENUM(HUD_RADAR, "radar")
+ADD_ENUM(HUD_RADAR_MAP, "radar_map")
+ADD_ENUM(HUD_RADAR_BLIPS, "radar_blips")
+ADD_ENUM(HUD_RADAR_ALTIMETER, "radar_altimeter")
 ADD_ENUM(HUD_CLOCK, "clock")
 ADD_ENUM(HUD_RADIO, "radio")
 ADD_ENUM(HUD_WANTED, "wanted")
@@ -271,6 +274,7 @@ ADD_ENUM(CElement::WATER, "water")
 ADD_ENUM(CElement::DATABASE_CONNECTION, "db-connection")
 ADD_ENUM(CElement::ROOT, "root")
 ADD_ENUM(CElement::UNKNOWN, "unknown")
+ADD_ENUM(CElement::BUILDING, "building")
 IMPLEMENT_ENUM_END_DEFAULTS("element-type", CElement::UNKNOWN, "unknown")
 
 IMPLEMENT_ENUM_BEGIN(CAccountPassword::EAccountPasswordType)
@@ -592,9 +596,9 @@ void MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         {
             if (pResource->GetMinServerRequirement() < szVersionReq)
             {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
                 argStream.SetVersionWarning(szVersionReq, "server", szReason);
-                #endif
+#endif
             }
         }
     }

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPedIntelligenceSA.cpp
  *  PURPOSE:     Ped entity AI logic
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -40,7 +40,7 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
     DWORD dwThis = (DWORD)internalInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CPedIntelligence_TestForStealthKill;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    bUnk

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CVisibilityPluginsSA.cpp
  *  PURPOSE:     RenderWare entity visibility plugin
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,7 +17,7 @@
 void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
     DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
-    _asm
+    __asm
     {
         push    iAlpha
         push    pClump
@@ -44,7 +44,7 @@ int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
 {
     DWORD dwFunc = FUNC_CVisibilityPlugins_GetAtomicId;
     int   iResult = 0;
-    _asm
+    __asm
     {
         push    pAtomic
         call    dwFunc

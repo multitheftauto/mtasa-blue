@@ -5,7 +5,7 @@
  *  FILE:        core/CMainMenu.cpp
  *  PURPOSE:     2D Main menu graphical user interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -447,7 +447,7 @@ void CMainMenu::Update()
 
     // Get the game interface and the system state
     CGame*       pGame = CCore::GetSingleton().GetGame();
-    eSystemState SystemState = pGame->GetSystemState();
+    SystemState  systemState = pGame->GetSystemState();
 
     m_Credits.Update();
     m_Settings.Update();
@@ -650,7 +650,7 @@ void CMainMenu::Update()
     }
 
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
-    if ((SystemState == 7 || SystemState == 9) && !m_bIsIngame)
+    if ((systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME) && !m_bIsIngame)
     {
         if (!m_bStarted)
         {
@@ -671,11 +671,11 @@ void CMainMenu::Update()
     }
 
     // If we're visible
-    if (m_bIsVisible && SystemState != 8)
+    if (m_bIsVisible && systemState != SystemState::GS_INIT_PLAYING_GAME)
     {
         // If we're at the game's mainmenu, or ingame when m_bIsIngame is true show the background
-        if (SystemState == 7 ||                          // GS_FRONTEND
-            SystemState == 9 && !m_bIsIngame)            // GS_PLAYING_GAME
+        if (systemState == SystemState::GS_FRONTEND ||
+            systemState == SystemState::GS_PLAYING_GAME && !m_bIsIngame)
         {
             if (m_ucFade == FADE_INVISIBLE)
                 Show(false);
@@ -842,6 +842,17 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
             case MENU_ITEM_MAP_EDITOR:
                 AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
                 return true;
+            case MENU_ITEM_DISCONNECT:
+                if (g_pCore->GetCVars()->GetValue("ask_before_disconnect", true))
+                {
+                    AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
+                    return true;
+                }
+     
+                break;
+            case MENU_ITEM_QUICK_CONNECT:
+                AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
+                return true;
             default:
                 break;
         }
@@ -863,7 +874,7 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
     switch (m_pHoveredItem->menuType)
     {
         case MENU_ITEM_DISCONNECT:
-            OnDisconnectButtonClick(pElement);
+            OnDisconnectButtonClick();
             break;
         case MENU_ITEM_QUICK_CONNECT:
             OnQuickConnectButtonClick(pElement, Args.button == LeftButton);
@@ -906,7 +917,8 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
             ShowNetworkNotReadyWindow();
             return true;
         }
-
+        
+        g_pCore->GetConnectManager()->SetQuickConnect(true);
         g_pCore->GetCommands()->Execute("reconnect", "");
     }
     else
@@ -948,7 +960,7 @@ void CMainMenu::HideServerInfo()
     m_ServerInfo.Hide();
 }
 
-bool CMainMenu::OnDisconnectButtonClick(CGUIElement* pElement)
+bool CMainMenu::OnDisconnectButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
@@ -1250,6 +1262,12 @@ void CMainMenu::WantsToDisconnectCallBack(void* pData, uint uiButton)
                 break;
             case MENU_ITEM_MAP_EDITOR:
                 OnEditorButtonClick();
+                break;
+            case MENU_ITEM_DISCONNECT:
+                OnDisconnectButtonClick();
+                break;
+            case MENU_ITEM_QUICK_CONNECT:
+                OnQuickConnectButtonClick(nullptr, true);
                 break;
             default:
                 break;

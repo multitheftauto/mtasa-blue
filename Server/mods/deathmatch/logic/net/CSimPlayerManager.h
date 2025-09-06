@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -25,7 +25,7 @@ public:
     bool        HandlePlayerPureSync(const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream);
     bool        HandleVehiclePureSync(const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream);
     bool        HandleKeySync(const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream);
-    bool        HandleBulletSync(const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream);
+    bool        HandleBulletSync(const NetServerPlayerID& socket, NetBitStreamInterface* stream);
     bool        HandlePedTaskPacket(const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream);
     CSimPlayer* Get(const NetServerPlayerID& PlayerSocket);
     void        Broadcast(const CSimPacket& Packet, const std::multimap<ushort, CSimPlayer*>& sendList);

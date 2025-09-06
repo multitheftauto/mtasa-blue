@@ -5,7 +5,7 @@
  *  FILE:        sdk/Platform.cpp
  *  PURPOSE:     Platform-specific defines and methods
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

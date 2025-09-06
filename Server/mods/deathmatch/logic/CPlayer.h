@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayer.h
  *  PURPOSE:     Player ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -214,12 +214,6 @@ public:
     const std::string& GetSerial(uint uiIndex = 0) { return m_strSerials[uiIndex % NUMELMS(m_strSerials)]; }
     void               SetSerial(const std::string& strSerial, uint uiIndex) { m_strSerials[uiIndex % NUMELMS(m_strSerials)] = strSerial; }
 
-    const std::string& GetSerialUser() { return m_strSerialUser; };
-    void               SetSerialUser(const std::string& strUser) { m_strSerialUser = strUser; };
-
-    const std::string& GetCommunityID() { return m_strCommunityID; };
-    void               SetCommunityID(const std::string& strID) { m_strCommunityID = strID; };
-
     unsigned char GetBlurLevel() { return m_ucBlurLevel; }
     void          SetBlurLevel(unsigned char ucBlurLevel) { m_ucBlurLevel = ucBlurLevel; }
 
@@ -420,8 +414,6 @@ private:
     bool          m_bNametagShowing;
 
     std::string m_strSerials[2];
-    std::string m_strSerialUser;
-    std::string m_strCommunityID;
 
     unsigned char m_ucBlurLevel;
 

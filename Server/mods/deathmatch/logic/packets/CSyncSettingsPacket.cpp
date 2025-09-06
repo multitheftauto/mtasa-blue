@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/packets/CSyncSettingsPacket.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,7 +15,7 @@
 
 CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
                                          short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
-                                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix)
+                                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, std::uint8_t multiCommandHandlerPolicy)
 {
     m_weaponTypesUsingBulletSync = weaponTypesUsingBulletSync;
     m_ucVehExtrapolateEnabled = ucVehExtrapolateEnabled;
@@ -26,6 +26,7 @@ CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponType
     m_ucAllowFastSprintFix = ucAllowFastSprintFix;
     m_ucAllowDrivebyAnimationFix = ucAllowDrivebyAnimationFix;
     m_ucAllowShotgunDamageFix = ucAllowShotgunDamageFix;
+    m_multiCommandHandlerPolicy = multiCommandHandlerPolicy;
 }
 
 bool CSyncSettingsPacket::Read(NetBitStreamInterface& BitStream)
@@ -43,33 +44,15 @@ bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write((uchar)*iter);
     }
 
-    if (BitStream.Version() >= 0x35)
-    {
-        BitStream.Write(m_ucVehExtrapolateEnabled);
-        BitStream.Write(m_sVehExtrapolateBaseMs);
-        BitStream.Write(m_sVehExtrapolatePercent);
-        BitStream.Write(m_sVehExtrapolateMaxMs);
-    }
-
-    if (BitStream.Version() >= 0x3D)
-    {
-        BitStream.Write(m_ucUseAltPulseOrder);
-    }
-
-    if (BitStream.Version() >= 0x58)
-    {
-        BitStream.Write(m_ucAllowFastSprintFix);
-    }
-
-    if (BitStream.Version() >= 0x59)
-    {
-        BitStream.Write(m_ucAllowDrivebyAnimationFix);
-    }
-
-    if (BitStream.Can(eBitStreamVersion::ShotgunDamageFix))
-    {
-        BitStream.Write(m_ucAllowShotgunDamageFix);
-    }
+    BitStream.Write(m_ucVehExtrapolateEnabled);
+    BitStream.Write(m_sVehExtrapolateBaseMs);
+    BitStream.Write(m_sVehExtrapolatePercent);
+    BitStream.Write(m_sVehExtrapolateMaxMs);
+    BitStream.Write(m_ucUseAltPulseOrder);
+    BitStream.Write(m_ucAllowFastSprintFix);
+    BitStream.Write(m_ucAllowDrivebyAnimationFix);
+    BitStream.Write(m_ucAllowShotgunDamageFix);
+    BitStream.Write(m_multiCommandHandlerPolicy);
 
     return true;
 }

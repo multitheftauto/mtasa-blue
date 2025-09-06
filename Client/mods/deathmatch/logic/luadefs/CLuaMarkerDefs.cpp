@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaMarkerDefs.cpp
  *  PURPOSE:     Lua marker definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -260,7 +260,7 @@ int CLuaMarkerDefs::GetMarkerIcon(lua_State* luaVM)
         if (pCheckpoint)
         {
             SString strMarkerIcon;
-            CClientCheckpoint::IconToString(pCheckpoint->GetIcon(), strMarkerIcon);
+            CClientCheckpoint::IconToString(static_cast<unsigned char>(pCheckpoint->GetIcon()), strMarkerIcon);
             lua_pushstring(luaVM, strMarkerIcon);
             return 1;
         }

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaModule.cpp
  *  PURPOSE:     Lua module extension class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -117,14 +117,14 @@ int CLuaModule::_LoadModule()
 
     // Find the initialisation function
 #ifdef WIN32
-    pfnInitFunc = (InitModuleFunc)(GetProcAddress(m_hModule, "InitModule"));
+    pfnInitFunc = reinterpret_cast<InitModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "InitModule")));
     if (pfnInitFunc == NULL)
     {
         CLogger::LogPrintf("MODULE: Unable to initialize %s!\n", *PathJoin(SERVER_BIN_PATH_MOD, "modules", m_szShortFileName));
         return 2;
     }
 #else
-    pfnInitFunc = (InitModuleFunc)(dlsym(m_hModule, "InitModule"));
+    pfnInitFunc = reinterpret_cast<InitModuleFunc>(dlsym(m_hModule, "InitModule"));
     if (dlerror() != NULL)
     {
         CLogger::LogPrintf("MODULE: Unable to initialize %s (%s)!\n", *PathJoin(SERVER_BIN_PATH_MOD, "modules", m_szShortFileName), dlerror());
@@ -135,35 +135,35 @@ int CLuaModule::_LoadModule()
     // Initialise
     m_FunctionInfo.szFileName = m_szShortFileName;
 #ifdef WIN32
-    m_FunctionInfo.DoPulse = (DefaultModuleFunc)(GetProcAddress(m_hModule, "DoPulse"));
+    m_FunctionInfo.DoPulse = reinterpret_cast<DefaultModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "DoPulse")));
     if (m_FunctionInfo.DoPulse == NULL)
         return 3;
-    m_FunctionInfo.ShutdownModule = (DefaultModuleFunc)(GetProcAddress(m_hModule, "ShutdownModule"));
+    m_FunctionInfo.ShutdownModule = reinterpret_cast<DefaultModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "ShutdownModule")));
     if (m_FunctionInfo.ShutdownModule == NULL)
         return 4;
-    m_FunctionInfo.RegisterFunctions = (RegisterModuleFunc)(GetProcAddress(m_hModule, "RegisterFunctions"));
+    m_FunctionInfo.RegisterFunctions = reinterpret_cast<RegisterModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "RegisterFunctions")));
     if (m_FunctionInfo.RegisterFunctions == NULL)
         return 5;
 
-    m_FunctionInfo.ResourceStopping = (RegisterModuleFunc)(GetProcAddress(m_hModule, "ResourceStopping"));
+    m_FunctionInfo.ResourceStopping = reinterpret_cast<RegisterModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "ResourceStopping")));
     // No error for backward compatibility
     // if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
-    m_FunctionInfo.ResourceStopped = (RegisterModuleFunc)(GetProcAddress(m_hModule, "ResourceStopped"));
+    m_FunctionInfo.ResourceStopped = reinterpret_cast<RegisterModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "ResourceStopped")));
     // if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
 #else
-    m_FunctionInfo.DoPulse = (DefaultModuleFunc)(dlsym(m_hModule, "DoPulse"));
+    m_FunctionInfo.DoPulse = reinterpret_cast<DefaultModuleFunc>(dlsym(m_hModule, "DoPulse"));
     if (m_FunctionInfo.DoPulse == NULL)
         return 3;
-    m_FunctionInfo.ShutdownModule = (DefaultModuleFunc)(dlsym(m_hModule, "ShutdownModule"));
+    m_FunctionInfo.ShutdownModule = reinterpret_cast<DefaultModuleFunc>(dlsym(m_hModule, "ShutdownModule"));
     if (m_FunctionInfo.ShutdownModule == NULL)
         return 4;
-    m_FunctionInfo.RegisterFunctions = (RegisterModuleFunc)(dlsym(m_hModule, "RegisterFunctions"));
+    m_FunctionInfo.RegisterFunctions = reinterpret_cast<RegisterModuleFunc>(dlsym(m_hModule, "RegisterFunctions"));
     if (m_FunctionInfo.RegisterFunctions == NULL)
         return 5;
 
-    m_FunctionInfo.ResourceStopping = (RegisterModuleFunc)(dlsym(m_hModule, "ResourceStopping"));
+    m_FunctionInfo.ResourceStopping = reinterpret_cast<RegisterModuleFunc>(dlsym(m_hModule, "ResourceStopping"));
     // if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
-    m_FunctionInfo.ResourceStopped = (RegisterModuleFunc)(dlsym(m_hModule, "ResourceStopped"));
+    m_FunctionInfo.ResourceStopped = reinterpret_cast<RegisterModuleFunc>(dlsym(m_hModule, "ResourceStopped"));
     // if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
 #endif
     // Run initialisation function

@@ -5,7 +5,7 @@
  *  FILE:        core/CProxyDirect3DDevice9.cpp
  *  PURPOSE:     Direct3D 9 device function hooking proxy
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -117,6 +117,7 @@ ULONG CProxyDirect3DDevice9::Release()
         // Call event handler
         CDirect3DEvents9::OnDirect3DDeviceDestroy(m_pDevice);
         delete this;
+        return ulRefCount - 1;
     }
 
     return m_pDevice->Release();

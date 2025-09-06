@@ -5,7 +5,7 @@
  *  FILE:        SharedUtil.Misc.hpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -167,8 +167,8 @@ void SharedUtil::CycleFile(const SString& strPathFilename, uint uiCycleThreshKB,
             // Rename older files .1 .2 etc
             uint    uiNew = uiNumBackups - 1 - i;
             uint    uiOld = uiNumBackups - i;
-            SString strFilenameNewer = strPathFilename + (uiNew ? SString(".%d", uiNew) : "");
-            SString strFilenameOlder = strPathFilename + (uiOld ? SString(".%d", uiOld) : "");
+            SString strFilenameNewer = strPathFilename + (uiNew ? SString(".%d", uiNew) : SStringX(""));
+            SString strFilenameOlder = strPathFilename + (uiOld ? SString(".%d", uiOld) : SStringX(""));
 
             FileDelete(strFilenameOlder);
             FileRename(strFilenameNewer, strFilenameOlder);

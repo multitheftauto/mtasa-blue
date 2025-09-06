@@ -5,16 +5,19 @@
  *  FILE:        game_sa/CCameraSA.cpp
  *  PURPOSE:     Camera rendering
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "CCameraSA.h"
 #include "CGameSA.h"
+#include <mutex>
+#include <cmath>
 
 extern CGameSA* pGame;
 
+static std::mutex s_cameraClipMutex;
 static bool   bCameraClipObjects;
 static bool   bCameraClipVehicles;
 
@@ -28,11 +31,42 @@ void  HOOK_Camera_CollisionDetection();
 
 CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
 {
+    if (!cameraInterface)
+    {
+        internalInterface = nullptr;
+        // Initialize all camera pointers to null
+        for (int i = 0; i < MAX_CAMS; i++)
+            Cams[i] = nullptr;
+        return;
+    }
+    
     internalInterface = cameraInterface;
+    
     for (int i = 0; i < MAX_CAMS; i++)
-        Cams[i] = new CCamSA(&internalInterface->Cams[i]);
-    bCameraClipObjects = true;
-    bCameraClipVehicles = true;
+    {
+        try {
+            Cams[i] = new CCamSA(&internalInterface->Cams[i]);
+        }
+        catch (...)
+        {
+            // Clean up on failure
+            for (int j = 0; j < i; j++)
+            {
+                delete Cams[j];
+                Cams[j] = nullptr;
+            }
+            internalInterface = nullptr;
+            throw;
+        }
+    }
+    
+    // Thread-safe initialization
+    {
+        std::lock_guard<std::mutex> lock(s_cameraClipMutex);
+        bCameraClipObjects = true;
+        bCameraClipVehicles = true;
+    }
+    
     HookInstall(HOOKPOS_Camera_CollisionDetection, (DWORD)HOOK_Camera_CollisionDetection, 5);
 }
 
@@ -40,7 +74,11 @@ CCameraSA::~CCameraSA()
 {
     for (int i = 0; i < MAX_CAMS; i++)
     {
-        delete Cams[i];
+        if (Cams[i])
+        {
+            delete Cams[i];
+            Cams[i] = nullptr;
+        }
     }
 }
 
@@ -48,7 +86,7 @@ void CCameraSA::Restore()
 {
     DWORD               dwFunc = FUNC_Restore;
     CCameraSAInterface* cameraInterface = GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -59,13 +97,13 @@ void CCameraSA::RestoreWithJumpCut()
 {
     CCameraSAInterface* cameraInterface = GetInterface();
     DWORD               dwFunc = 0x50BD40;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
     }
     dwFunc = 0x50BAB0;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -77,16 +115,26 @@ void CCameraSA::RestoreWithJumpCut()
  */
 void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle)
 {
+    if (!entity)
+        return;
+        
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(entity);
     if (!pEntitySA)
         return;
 
     CEntitySAInterface* entityInterface = pEntitySA->GetInterface();
+    if (!entityInterface)
+        return;
+        
     CCameraSAInterface* cameraInterface = GetInterface();
-    // __thiscall
+    if (!cameraInterface)
+        return;
+
+    if (CamSwitchStyle < 0 || CamSwitchStyle > 10)
+        return;
 
     DWORD CCamera__TakeControl = FUNC_TakeControl;
-    _asm
+    __asm
     {
         mov ecx, cameraInterface
         push 1
@@ -99,6 +147,9 @@ void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
 
 void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
 {
+    if (!position)
+        return;
+        
     CCameraSAInterface* cameraInterface = GetInterface();
     // __thiscall
     CVector vecOffset;
@@ -106,7 +157,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         vecOffset.fY = 0.5f;
         vecOffset.fX = 0.5f;*/
     /*  DWORD dwFunc = 0x50BEC0;
-        _asm
+        __asm
         {
             mov ecx, cameraInterface
             lea     eax, vecOffset
@@ -116,7 +167,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         }*/
 
     DWORD CCamera__TakeControlNoEntity = FUNC_TakeControlNoEntity;
-    _asm
+    __asm
         {
         mov ecx, cameraInterface
         push 1
@@ -126,7 +177,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         }
 
     DWORD dwFunc = 0x50BEC0;
-    _asm
+    __asm
     {
         mov ecx, cameraInterface
         lea     eax, vecOffset
@@ -187,7 +238,17 @@ void CCameraSA::RestoreLastGoodState()
 
 CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 {
-    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;            // ->matrix;
+    if (!matrix)
+        return nullptr;
+        
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface)
+    {
+        *matrix = CMatrix();
+        return matrix;
+    }
+    
+    CMatrix_Padded* pCamMatrix = &cameraInterface->m_cameraMatrix;
     if (pCamMatrix)
     {
         matrix->vFront = pCamMatrix->vFront;
@@ -210,7 +271,10 @@ CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 
 void CCameraSA::SetMatrix(CMatrix* matrix)
 {
-    CMatrix_Padded* pCamMatrix = GetInterface()->matrix;
+    if (!matrix)
+        return;
+        
+    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;
     if (pCamMatrix)
     {
         pCamMatrix->vFront = matrix->vFront;
@@ -222,12 +286,27 @@ void CCameraSA::SetMatrix(CMatrix* matrix)
 
 void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget)
 {
+    if (!vecGunMuzzle || !vecSource || !vecTarget)
+        return;
+    
+    // Validate float parameter to prevent NaN/infinity issues
+    if (!std::isfinite(fDistance) || fDistance < 0.0f)
+        return;
+        
     float               fOriginX = vecGunMuzzle->fX;
     float               fOriginY = vecGunMuzzle->fY;
     float               fOriginZ = vecGunMuzzle->fZ;
+
+    if (!std::isfinite(fOriginX) || !std::isfinite(fOriginY) || !std::isfinite(fOriginZ))
+        return;
+        
     DWORD               dwFunc = FUNC_Find3rdPersonCamTargetVector;
     CCameraSAInterface* cameraInterface = GetInterface();
-    _asm
+
+    if (!cameraInterface)
+        return;
+        
+    __asm
     {
         mov     ecx, cameraInterface
         push    vecTarget
@@ -245,7 +324,7 @@ float CCameraSA::Find3rdPersonQuickAimPitch()
     float               fReturn;
     DWORD               dwFunc = FUNC_Find3rdPersonQuickAimPitch;
     CCameraSAInterface* cameraInterface = GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -297,7 +376,7 @@ bool CCameraSA::IsFading()
     DWORD               dwFunc = FUNC_GetFading;
     CCameraSAInterface* cameraInterface = GetInterface();
     bool                bRet = false;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -311,7 +390,7 @@ int CCameraSA::GetFadingDirection()
     DWORD               dwFunc = FUNC_GetFadingDirection;
     CCameraSAInterface* cameraInterface = GetInterface();
     int                 dwRet = false;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -322,9 +401,19 @@ int CCameraSA::GetFadingDirection()
 
 void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
 {
+    if (!std::isfinite(fFadeOutTime) || fFadeOutTime < 0.0f || fFadeOutTime > 60.0f)
+        return;
+        
+    if (iOutOrIn < 0 || iOutOrIn > 1)
+        return;
+        
     DWORD               dwFunc = FUNC_Fade;
     CCameraSAInterface* cameraInterface = GetInterface();
-    _asm
+    
+    if (!cameraInterface)
+        return;
+        
+    __asm
     {
         mov     ecx, cameraInterface
         push    iOutOrIn
@@ -340,7 +429,7 @@ void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigne
     DWORD               dwRed = ucRed;
     DWORD               dwGreen = ucGreen;
     DWORD               dwBlue = ucBlue;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         push    dwBlue
@@ -357,8 +446,18 @@ float CCameraSA::GetCameraRotation()
 
 RwMatrix* CCameraSA::GetLTM()
 {
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface)
+        return nullptr;
+        
+    if (!cameraInterface->m_pRwCamera)
+        return nullptr;
+        
+    if (!cameraInterface->m_pRwCamera->object.object.parent)
+        return nullptr;
+
     // RwFrameGetLTM
-    return ((RwMatrix*(_cdecl*)(void*))0x7F0990)(GetInterface()->m_pRwCamera->object.object.parent);
+    return ((RwMatrix*(_cdecl*)(void*))0x7F0990)(cameraInterface->m_pRwCamera->object.object.parent);
 }
 
 CEntity* CCameraSA::GetTargetEntity()
@@ -374,17 +473,21 @@ CEntity* CCameraSA::GetTargetEntity()
 
 void CCameraSA::SetCameraClip(bool bObjects, bool bVehicles)
 {
+    // Thread-safe access to static variables
+    std::lock_guard<std::mutex> lock(s_cameraClipMutex);
     bCameraClipObjects = bObjects;
     bCameraClipVehicles = bVehicles;
 }
 
 void CCameraSA::GetCameraClip(bool& bObjects, bool& bVehicles)
 {
+    // Thread-safe access to static variables
+    std::lock_guard<std::mutex> lock(s_cameraClipMutex);
     bObjects = bCameraClipObjects;
     bVehicles = bCameraClipVehicles;
 }
 
-__declspec(noinline) void _cdecl DoCameraCollisionDetectionPokes()
+static void _cdecl DoCameraCollisionDetectionPokes()
 {
     if (!bCameraClipObjects)
     {
@@ -398,17 +501,20 @@ __declspec(noinline) void _cdecl DoCameraCollisionDetectionPokes()
         MemPutFast<char>(VAR_CameraClipVehicles, 0);
 }
 
-void _declspec(naked) HOOK_Camera_CollisionDetection()
+static void __declspec(naked) HOOK_Camera_CollisionDetection()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
-        call DoCameraCollisionDetectionPokes
+        call    DoCameraCollisionDetectionPokes
         popad
-        sub         esp,24h
-        push        ebx
-        push        ebp
-        jmp         RETURN_Camera_CollisionDetection
+
+        sub     esp, 24h
+        push    ebx
+        push    ebp
+        jmp     RETURN_Camera_CollisionDetection
     }
 }
 
@@ -446,7 +552,7 @@ float CCameraSA::GetShakeForce()
 
 void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
 {
-    static CCameraSAInterface* cameraInterface = GetInterface();
+    CCameraSAInterface* cameraInterface = GetInterface();
     if (radius <= 0.0f)
         return ResetShakeCamera();
 
@@ -459,7 +565,53 @@ void CCameraSA::ResetShakeCamera() noexcept
     GetInterface()->m_fCamShakeForce = 0.0f;
 }
 
-std::uint8_t CCameraSA::GetTransitionState()
+std::uint8_t CCameraSA::GetTransitionState() const
 {
     return GetInterface()->m_uiTransitionState;
+}
+
+bool CCameraSA::IsInTransition() const
+{
+    return GetTransitionState() != 0;
+}
+
+float CCameraSA::GetTransitionFOV() const
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    return cameraInterface ? cameraInterface->FOVDuringInter : DEFAULT_FOV;
+}
+
+bool CCameraSA::GetTransitionMatrix(CMatrix& matrix) const
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface || !IsInTransition())
+        return false;
+    
+    CVector source = cameraInterface->SourceDuringInter;
+    CVector target = cameraInterface->TargetDuringInter;
+    CVector up = cameraInterface->UpDuringInter;
+    
+    CVector forward = target - source;
+    if (forward.Length() < FLOAT_EPSILON)
+        forward = CVector(0.0f, 1.0f, 0.0f);
+    else
+        forward.Normalize();
+    
+    CVector right = CVector(forward.fY, -forward.fX, 0.0f);
+    if (right.Length() < FLOAT_EPSILON)
+        right = CVector(1.0f, 0.0f, 0.0f);
+    else
+        right.Normalize();
+    
+    CVector correctedUp = right;
+    correctedUp.CrossProduct(&forward);
+    correctedUp.Normalize();
+    
+    matrix.vPos = source;
+    matrix.vFront = forward;
+    matrix.vRight = -right;
+    matrix.vUp = correctedUp;
+    matrix.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
+    
+    return true;
 }

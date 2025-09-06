@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAERadioTrackManagerSA.cpp
  *  PURPOSE:     Audio entity radio track manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -16,7 +16,7 @@ BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
 {
     DWORD dwFunc = FUNC_GetCurrentRadioStationID;
     BYTE  bReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         call    dwFunc
@@ -30,7 +30,7 @@ BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()
 {
     DWORD dwFunc = FUNC_IsVehicleRadioActive;
     BYTE  bReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         call    dwFunc
@@ -45,7 +45,7 @@ char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
     DWORD dwFunc = FUNC_GetRadioStationName;
     char* cReturn = 0;
     DWORD dwStationID = bStationID;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         push    dwStationID
@@ -60,7 +60,7 @@ bool CAERadioTrackManagerSA::IsRadioOn()
 {
     DWORD dwFunc = FUNC_IsRadioOn;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         call    dwFunc
@@ -73,7 +73,7 @@ bool CAERadioTrackManagerSA::IsRadioOn()
 void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
 {
     DWORD dwFunc = FUNC_SetBassSetting;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         push    0x3F800000 // 1.0f
@@ -85,7 +85,7 @@ void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
 void CAERadioTrackManagerSA::Reset()
 {
     DWORD dwFunc = FUNC_Reset;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         call    dwFunc
@@ -97,7 +97,7 @@ void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
     DWORD dwFunc = FUNC_StartRadio;
     DWORD dwStationID = bStationID;
     DWORD dwUnknown = bUnknown;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         push    0

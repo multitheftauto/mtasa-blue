@@ -52,7 +52,7 @@ jobs:
 
   macOS:
     name: macOS
-    runs-on: macOS-13
+    runs-on: macOS-15
     steps:
       - uses: actions/checkout@v4
 
@@ -64,23 +64,18 @@ jobs:
         run: brew link --overwrite mysql
 
       - name: Run Build
-        run: ./linux-build.sh --os=macosx
+        run: ./linux-build.sh
 
   linux:
     strategy:
       matrix:
         architecture: [x64, arm64]
-        include:
-        - architecture: x64
-          image-tag: latest
-        - architecture: arm64
-          image-tag: arm64
     name: linux-${{ matrix.architecture }}
     runs-on: ubuntu-latest
     container:
-      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
+      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Run Build
-        run: ./linux-build.sh --arch=${{ matrix.architecture }}
+        run: /docker-entrypoint.sh --arch=${{ matrix.architecture }}

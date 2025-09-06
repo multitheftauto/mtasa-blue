@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CGame.h
  *  PURPOSE:     Server game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -76,6 +76,7 @@ class CMainConfig;
 class CMapManager;
 class CMarkerManager;
 class CObjectManager;
+class CBuildingManager;
 class CPacket;
 class CPacketTranslator;
 class CLatentTransferManager;
@@ -105,6 +106,7 @@ class CWaterManager;
 class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
+class CVehicleSoundSettingsManager;
 
 class CCustomWeaponManager;
 class COpenPortsTester;
@@ -194,6 +196,7 @@ public:
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
+        GLITCH_VEHICLE_RAPID_STOP,
         NUM_GLITCHES
     };
 
@@ -220,6 +223,7 @@ public:
     CMapManager*                        GetMapManager() { return m_pMapManager; }
     CPlayerManager*                     GetPlayerManager() { return m_pPlayerManager; }
     CObjectManager*                     GetObjectManager() { return m_pObjectManager; }
+    CBuildingManager*                   GetBuildingManager() const noexcept { return m_pBuildingManager; }
     CVehicleManager*                    GetVehicleManager() { return m_pVehicleManager; }
     CTeamManager*                       GetTeamManager() { return m_pTeamManager; }
     CUnoccupiedVehicleSync*             GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
@@ -500,9 +504,9 @@ private:
     void Packet_VehicleDamageSync(class CVehicleDamageSyncPacket& Packet);
     void Packet_VehiclePuresync(class CVehiclePuresyncPacket& Packet);
     void Packet_Keysync(class CKeysyncPacket& Packet);
-    void Packet_Bulletsync(class CBulletsyncPacket& Packet);
+    void Packet_Bulletsync(class CBulletsyncPacket& packet);
     void Packet_PedTask(class CPedTaskPacket& Packet);
-    void Packet_WeaponBulletsync(class CCustomWeaponBulletSyncPacket& Packet);
+    void Packet_WeaponBulletsync(class CCustomWeaponBulletSyncPacket& packet);
     void Packet_Vehicle_InOut(class CVehicleInOutPacket& Packet);
     void Packet_VehicleTrailer(class CVehicleTrailerPacket& Packet);
     void Packet_LuaEvent(class CLuaEventPacket& Packet);
@@ -523,7 +527,7 @@ private:
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
     void ProcessClientTriggeredEventSpam();
-    void RegisterClientTriggeredEventUsage(CPlayer* pPlayer);
+    void RegisterClientTriggeredEventUsage(CPlayer* pPlayer, const char* szEventName);
 
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
@@ -536,6 +540,7 @@ private:
     CGroups*                          m_pGroups;
     CColManager*                      m_pColManager;
     CObjectManager*                   m_pObjectManager;
+    CBuildingManager*                 m_pBuildingManager;
     CPickupManager*                   m_pPickupManager;
     CPlayerManager*                   m_pPlayerManager;
     CRadarAreaManager*                m_pRadarAreaManager;
@@ -683,6 +688,7 @@ private:
     {
         long long m_llTicks = 0;
         uint32_t  m_uiCounter = 0;
+        std::string m_strLastEventName;
     };
 
     std::map<CPlayer*, ClientTriggeredEventsInfo> m_mapClientTriggeredEvents;

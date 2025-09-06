@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPlayerPedSA.cpp
  *  PURPOSE:     Player ped entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -36,7 +36,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
 
     DWORD dwPedPointer = 0;
-    _asm
+    __asm
     {
         push    SIZEOF_CPLAYERPED
         call    CPedOperatorNew
@@ -162,7 +162,7 @@ void CPlayerPedSA::SetInitialState()
     DWORD dwUnknown = 1;
     DWORD dwFunction = FUNC_SetInitialState;
     DWORD dwThis = (DWORD)m_pInterface;
-    _asm
+    __asm
     {
         push    dwUnknown
         mov     ecx, dwThis
@@ -293,7 +293,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
 
     DWORD dwThis = (DWORD)pedInterface;
     DWORD dwFunc = FUNC_CPlayerPed_ReApplyMoveAnims;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -443,9 +443,11 @@ __declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAI
 #define HOOKPOS_CPlayerPed_ProcessAnimGroups_Mid        0x0609A44
 #define HOOKSIZE_CPlayerPed_ProcessAnimGroups_Mid       6
 DWORD RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
-void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
+static void __declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    eax
@@ -495,9 +497,11 @@ __declspec(noinline) int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqM
 #define HOOKPOS_CClothes_GetDefaultPlayerMotionGroup        0x05A81B0
 #define HOOKSIZE_CClothes_GetDefaultPlayerMotionGroup       5
 DWORD RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
-void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
+static void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     eax, 0x05A7FB0      // CClothes::GetPlayerMotionGroupToLoad
         call    eax
@@ -505,7 +509,7 @@ void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
         pushad
         push    eax
         call    OnCClothes_GetDefaultPlayerMotionGroup
-        mov     [esp+0],eax         // Put temp
+        mov     [esp+0], eax        // Put temp
         add     esp, 4*1
         popad
 

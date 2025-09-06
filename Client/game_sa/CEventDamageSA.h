@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CEventDamageSA.h
  *  PURPOSE:     Header file for damage event class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

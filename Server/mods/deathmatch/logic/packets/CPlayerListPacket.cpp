@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPlayerListPacket.cpp
  *  PURPOSE:     Player list packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -116,11 +116,8 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Version info
-        if (BitStream.Version() >= 0x34)
-        {
-            BitStream.Write(pPlayer->GetBitStreamVersion());
-            BitStream.Write(pPlayer->GetPlayerVersion().GetBuildNumber());
-        }
+        BitStream.Write(pPlayer->GetBitStreamVersion());
+        BitStream.Write(pPlayer->GetPlayerVersion().GetBuildNumber());
 
         // Flags
         bool bInVehicle = (pPlayer->GetOccupiedVehicle() != NULL);
@@ -139,12 +136,6 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         if (szNametagText)
             ucNametagTextLength = static_cast<unsigned char>(strlen(szNametagText));
 
-        if (!BitStream.Can(eBitStreamVersion::UnicodeNametags))
-        {
-            // Old client version has a fixed buffer of 22 characters
-            ucNametagTextLength = std::min<uchar>(ucNametagTextLength, 22);
-        }
-
         BitStream.Write(ucNametagTextLength);
         if (ucNametagTextLength > 0)
             BitStream.Write(szNametagText, ucNametagTextLength);
@@ -160,11 +151,8 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Move anim
-        if (BitStream.Version() > 0x4B)
-        {
-            uchar ucMoveAnim = pPlayer->GetMoveAnim();
-            BitStream.Write(ucMoveAnim);
-        }
+        uchar ucMoveAnim = pPlayer->GetMoveAnim();
+        BitStream.Write(ucMoveAnim);
 
         // Always send extra info (Was: "Write spawn info if he's spawned")
         if (true)
@@ -217,7 +205,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(pPlayer->GetInterior());
 
             // Write the weapons of the player weapon slots
-            for (unsigned int i = 0; i < 16; ++i)
+            for (unsigned char i = 0; i < 16; ++i)
             {
                 CWeapon* pWeapon = pPlayer->GetWeapon(i);
                 if (pWeapon && pWeapon->ucType != 0)
@@ -229,6 +217,25 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
                 }
                 else
                     BitStream.WriteBit(false);
+            }
+
+            const SPlayerAnimData& animData = pPlayer->GetAnimationData();
+            bool                   animRuning = animData.IsAnimating();
+
+            BitStream.WriteBit(animRuning);
+            if (animRuning)
+            {
+                BitStream.WriteString(animData.blockName);
+                BitStream.WriteString(animData.animName);
+                BitStream.Write(animData.time);
+                BitStream.WriteBit(animData.loop);
+                BitStream.WriteBit(animData.updatePosition);
+                BitStream.WriteBit(animData.interruptable);
+                BitStream.WriteBit(animData.freezeLastFrame);
+                BitStream.Write(animData.blendTime);
+                BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
+                BitStream.Write(static_cast<double>(animData.startTime));
+                BitStream.Write(animData.speed);
             }
         }
     }

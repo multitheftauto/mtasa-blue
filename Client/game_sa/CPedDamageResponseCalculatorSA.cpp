@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPedDamageResponseSA.cpp
  *  PURPOSE:     ped damage response
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,7 +23,7 @@ CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CEntity* pEntity,
     DWORD dwEntityInterface = (DWORD)pEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CPedDamageResponseCalculator_Constructor;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    b_1
@@ -47,7 +47,7 @@ CPedDamageResponseCalculatorSA::~CPedDamageResponseCalculatorSA()
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CPedDamageResponseCalculator_Destructor;
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
@@ -62,7 +62,7 @@ void CPedDamageResponseCalculatorSA::ComputeDamageResponse(CPed* pPed, CPedDamag
     DWORD dwResponseInterface = (DWORD)pDamageResponse->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CPedDamageResponseCalculator_ComputeDamageResponse;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    bSpeak

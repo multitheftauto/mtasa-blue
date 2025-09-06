@@ -5,7 +5,7 @@
  *  FILE:        core/CDirect3DEvents9.cpp
  *  PURPOSE:     Handler implementations for Direct3D 9 events
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

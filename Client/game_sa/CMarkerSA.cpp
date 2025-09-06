@@ -5,18 +5,19 @@
  *  FILE:        game_sa/CMarkerSA.cpp
  *  PURPOSE:     Marker entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include <CVector.h>
 #include "CMarkerSA.h"
+#include <enums/RadarSprite.h>
 
 void CMarkerSA::Init()
 {
     internalInterface->position = CVector(0, 0, 0);
-    internalInterface->BlipType = (BYTE)MARKER_TYPE_COORDS;
+    internalInterface->BlipType = (BYTE)MarkerType::MARKER_TYPE_COORDS;
     internalInterface->bBlipRemain = false;
     //  internalInterface->nColour = MARKER_COLOR_BLUE;
     //  internalInterface->bBright = TRUE;
@@ -27,8 +28,8 @@ void CMarkerSA::Init()
     internalInterface->PoolIndex = 0;
     internalInterface->nBlipScale = 2;
     internalInterface->bBlipFade = false;
-    internalInterface->nBlipDisplayFlag = MARKER_DISPLAY_BLIPONLY;
-    internalInterface->nBlipSprite = RADAR_SPRITE_NONE;
+    internalInterface->nBlipDisplayFlag = (BYTE)MarkerDisplay::MARKER_DISPLAY_BLIPONLY;
+    internalInterface->nBlipSprite = (BYTE)RadarSprite::RADAR_SPRITE_NONE;
     #define COORD_BLIP_APPEARANCE_NORMAL 0
     internalInterface->nCoordBlipAppearance = COORD_BLIP_APPEARANCE_NORMAL;
     internalInterface->pEntryExit = nullptr;
@@ -38,20 +39,20 @@ void CMarkerSA::Init()
  * Set the sprite used for this marker
  * @param wSprite a valid eMarkerSprite value. MARKER_SPRITE_NONE for the default sprite.
  */
-void CMarkerSA::SetSprite(eMarkerSprite Sprite = (eMarkerSprite)MARKER_SPRITE_NONE)
+void CMarkerSA::SetSprite(MarkerSprite Sprite = MarkerSprite::MARKER_SPRITE_NONE)
 {
-    if (Sprite >= MARKER_SPRITE_NONE && Sprite <= MARKER_SPRITE_SPRAY)
+    if (Sprite >= MarkerSprite::MARKER_SPRITE_NONE && Sprite <= MarkerSprite::MARKER_SPRITE_SPRAY)
     {
-        internalInterface->nBlipSprite = Sprite;
+        internalInterface->nBlipSprite = (BYTE)Sprite;
     }
 }
 
 /**
  * Sets how the marker is displayed in-game
  */
-void CMarkerSA::SetDisplay(eMarkerDisplay wDisplay)
+void CMarkerSA::SetDisplay(MarkerDisplay wDisplay)
 {
-    internalInterface->nBlipDisplayFlag = wDisplay;
+    internalInterface->nBlipDisplayFlag = (BYTE)wDisplay;
 }
 
 /**
@@ -68,19 +69,19 @@ void CMarkerSA::SetScale(WORD wScale = MARKER_SCALE_NORMAL)
  * Sets the color of the marker when MARKER_SPRITE_NONE is used
  * @param color eMarkerColor containing a valid colour id
  */
-void CMarkerSA::SetColor(eMarkerColor color)
+void CMarkerSA::SetColor(MarkerColor color)
 {
-    if (color >= MARKER_COLOR_PLUM && color <= MARKER_COLOR_DARK_TURQUOISE)
+    if (color >= MarkerColor::MARKER_COLOR_PLUM && color <= MarkerColor::MARKER_COLOR_DARK_TURQUOISE)
     {
-        if (color >= MARKER_COLOR_RED && color <= MARKER_COLOR_DARK_TURQUOISE)
+        if (color >= MarkerColor::MARKER_COLOR_RED && color <= MarkerColor::MARKER_COLOR_DARK_TURQUOISE)
         {
             internalInterface->bBright = 1;
-            internalInterface->nColour = color - MARKER_COLOR_RED;
+            internalInterface->nColour = static_cast<DWORD>(color) - static_cast<DWORD>(MarkerColor::MARKER_COLOR_RED);
         }
         else
         {
             internalInterface->bBright = 0;
-            internalInterface->nColour = color;
+            internalInterface->nColour = static_cast<DWORD>(color);
         }
     }
 }
@@ -100,15 +101,15 @@ void CMarkerSA::SetColor(const SharedUtil::SColor color)
  */
 void CMarkerSA::Remove()
 {
-    internalInterface->BlipType = MARKER_TYPE_UNUSED;
-    internalInterface->nBlipDisplayFlag = MARKER_DISPLAY_NEITHER;
-    internalInterface->nBlipSprite = MARKER_SPRITE_NONE;
+    internalInterface->BlipType = (BYTE)MarkerType::MARKER_TYPE_UNUSED;
+    internalInterface->nBlipDisplayFlag = (BYTE)MarkerDisplay::MARKER_DISPLAY_NEITHER;
+    internalInterface->nBlipSprite = (BYTE)MarkerSprite::MARKER_SPRITE_NONE;
     internalInterface->bTrackingBlip = false;
 }
 
 bool CMarkerSA::IsActive()
 {
-    return internalInterface->BlipType != MARKER_TYPE_UNUSED;
+    return internalInterface->BlipType != (BYTE)MarkerType::MARKER_TYPE_UNUSED;
 }
 
 void CMarkerSA::SetPosition(CVector* vecPosition)

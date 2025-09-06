@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -174,7 +174,7 @@ int CLuaWorldDefs::CreateExplosion(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::CreateExplosion(vecPosition, iType, bMakeSound, fCamShake, bDamaging))
+        if (CStaticFunctionDefinitions::CreateExplosion(vecPosition, static_cast<unsigned char>(iType), bMakeSound, fCamShake, bDamaging))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -622,7 +622,7 @@ int CLuaWorldDefs::IsGarageOpen(lua_State* luaVM)
     {
         bool bIsOpen;
 
-        if (CStaticFunctionDefinitions::IsGarageOpen(iGarageID, bIsOpen))
+        if (CStaticFunctionDefinitions::IsGarageOpen(static_cast<unsigned char>(iGarageID), bIsOpen))
         {
             lua_pushboolean(luaVM, bIsOpen);
             return 1;
@@ -647,7 +647,7 @@ int CLuaWorldDefs::GetGaragePosition(lua_State* luaVM)
     {
         CVector vecPosition;
 
-        if (CStaticFunctionDefinitions::GetGaragePosition(iGarageID, vecPosition))
+        if (CStaticFunctionDefinitions::GetGaragePosition(static_cast<unsigned char>(iGarageID), vecPosition))
         {
             lua_pushnumber(luaVM, vecPosition.fX);
             lua_pushnumber(luaVM, vecPosition.fY);
@@ -676,11 +676,11 @@ int CLuaWorldDefs::GetGarageSize(lua_State* luaVM)
         float fWidth;
         float fHeight;
 
-        if (CStaticFunctionDefinitions::GetGarageSize(iGarageID, fHeight, fWidth, fDepth))
+        if (CStaticFunctionDefinitions::GetGarageSize(static_cast<unsigned char>(iGarageID), fHeight, fWidth, fDepth))
         {
-            lua_pushnumber(luaVM, fHeight);
             lua_pushnumber(luaVM, fWidth);
             lua_pushnumber(luaVM, fDepth);
+            lua_pushnumber(luaVM, fHeight);
             return 3;
         }
     }
@@ -706,7 +706,7 @@ int CLuaWorldDefs::GetGarageBoundingBox(lua_State* luaVM)
         float fFront;
         float fBack;
 
-        if (CStaticFunctionDefinitions::GetGarageBoundingBox(iGarageID, fLeft, fRight, fFront, fBack))
+        if (CStaticFunctionDefinitions::GetGarageBoundingBox(static_cast<unsigned char>(iGarageID), fLeft, fRight, fFront, fBack))
         {
             lua_pushnumber(luaVM, fLeft);
             lua_pushnumber(luaVM, fRight);
@@ -1069,7 +1069,7 @@ int CLuaWorldDefs::SetGarageOpen(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetGarageOpen(iGarageID, bOpen))
+        if (CStaticFunctionDefinitions::SetGarageOpen(static_cast<unsigned char>(iGarageID), bOpen))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1126,7 +1126,8 @@ int CLuaWorldDefs::RemoveWorldBuilding(lua_State* luaVM)
             if (pResource)
             {
                 uint uiAmount;
-                CStaticFunctionDefinitions::RemoveWorldBuilding(iModelToRemove, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior, uiAmount);
+                CStaticFunctionDefinitions::RemoveWorldBuilding(static_cast<unsigned short>(iModelToRemove), fRadius, vecPosition.fX,
+                                                                vecPosition.fY, vecPosition.fZ, cInterior, uiAmount);
 
                 lua_pushboolean(luaVM, true);
                 lua_pushnumber(luaVM, uiAmount);
@@ -1182,7 +1183,8 @@ int CLuaWorldDefs::RestoreWorldBuilding(lua_State* luaVM)
             if (pResource)
             {
                 uint uiAmount;
-                CStaticFunctionDefinitions::RestoreWorldBuilding(iModelToRestore, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior, uiAmount);
+                CStaticFunctionDefinitions::RestoreWorldBuilding(static_cast<unsigned short>(iModelToRestore), fRadius, vecPosition.fX,
+                                                                 vecPosition.fY, vecPosition.fZ, cInterior, uiAmount);
 
                 lua_pushboolean(luaVM, true);
                 lua_pushnumber(luaVM, uiAmount);
@@ -1276,9 +1278,6 @@ bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(const WorldSpecialProperty pr
     if (!m_pClientGame->SetWorldSpecialProperty(property, enabled))
         return false;
 
-    if (!g_pNet->CanServerBitStream(eBitStreamVersion::WorldSpecialPropertyEvent))
-        return true;
-
     if (auto stream = g_pNet->AllocateNetBitStream())
     {
         stream->WriteString(EnumToString(property));
@@ -1360,7 +1359,7 @@ int CLuaWorldDefs::SetTrafficLightState(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::SetTrafficLightState(iState))
+            if (CStaticFunctionDefinitions::SetTrafficLightState(static_cast<unsigned char>(iState)))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1855,7 +1854,8 @@ int CLuaWorldDefs::SetSunColor(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        g_pMultiplayer->SetSunColor(iCoreRed, iCoreGreen, iCoreBlue, iCoronaRed, iCoronaGreen, iCoronaBlue);
+        g_pMultiplayer->SetSunColor(static_cast<unsigned char>(iCoreRed), static_cast<unsigned char>(iCoreGreen), static_cast<unsigned char>(iCoreBlue),
+                                    static_cast<unsigned char>(iCoronaRed), static_cast<unsigned char>(iCoronaGreen), static_cast<unsigned char>(iCoronaBlue));
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2096,172 +2096,172 @@ bool CLuaWorldDefs::ResetCoronaReflectionsEnabled()
     return true;
 }
 
-std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::GetWorldProperty(eWorldProperty property)
+std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::GetWorldProperty(WorldProperty property)
 {
     switch (property)
     {
-        case eWorldProperty::AMBIENT_COLOR:
+        case WorldProperty::AMBIENT_COLOR:
         {
             float red, green, blue;
             g_pMultiplayer->GetAmbientColor(red, green, blue);
             return std::make_tuple((int16)(red * 255), (int16)(green * 255), (int16)(blue * 255));
         }
-        case eWorldProperty::AMBIENT_OBJ_COLOR:
+        case WorldProperty::AMBIENT_OBJ_COLOR:
         {
             float red, green, blue;
             g_pMultiplayer->GetAmbientObjectColor(red, green, blue);
             return std::make_tuple((int16)(red * 255), (int16)(green * 255), (int16)(blue * 255));
         }
-        case eWorldProperty::DIRECTIONAL_COLOR:
+        case WorldProperty::DIRECTIONAL_COLOR:
         {
             float red, green, blue;
             g_pMultiplayer->GetDirectionalColor(red, green, blue);
             return std::make_tuple((int16)(red * 255), (int16)(green * 255), (int16)(blue * 255));
         }
-        case eWorldProperty::SPRITE_SIZE:
+        case WorldProperty::SPRITE_SIZE:
             return g_pMultiplayer->GetSpriteSize();
-        case eWorldProperty::SPRITE_BRIGHTNESS:
+        case WorldProperty::SPRITE_BRIGHTNESS:
             return g_pMultiplayer->GetSpriteBrightness();
-        case eWorldProperty::POLE_SHADOW_STRENGTH:
+        case WorldProperty::POLE_SHADOW_STRENGTH:
             return (float)g_pMultiplayer->GetPoleShadowStrength();
-        case eWorldProperty::SHADOW_STRENGTH:
+        case WorldProperty::SHADOW_STRENGTH:
             return (float)g_pMultiplayer->GetShadowStrength();
-        case eWorldProperty::SHADOWS_OFFSET:
+        case WorldProperty::SHADOWS_OFFSET:
             return g_pMultiplayer->GetShadowsOffset();
-        case eWorldProperty::LIGHTS_ON_GROUND:
+        case WorldProperty::LIGHTS_ON_GROUND:
             return g_pMultiplayer->GetLightsOnGroundBrightness();
-        case eWorldProperty::LOW_CLOUDS_COLOR:
+        case WorldProperty::LOW_CLOUDS_COLOR:
         {
             int16 red, green, blue;
             g_pMultiplayer->GetLowCloudsColor(red, green, blue);
             return std::make_tuple(red, green, blue);
         }
-        case eWorldProperty::BOTTOM_CLOUDS_COLOR:
+        case WorldProperty::BOTTOM_CLOUDS_COLOR:
         {
             int16 red, green, blue;
             g_pMultiplayer->GetBottomCloudsColor(red, green, blue);
             return std::make_tuple(red, green, blue);
         }
-        case eWorldProperty::CLOUDS_ALPHA1:
+        case WorldProperty::CLOUDS_ALPHA1:
             return g_pMultiplayer->GetCloudsAlpha1();
-        case eWorldProperty::ILLUMINATION:
+        case WorldProperty::ILLUMINATION:
             return g_pMultiplayer->GetIllumination();
-        case eWorldProperty::WEATHER_WET_ROADS:
+        case WorldProperty::WEATHER_WET_ROADS:
             return g_pGame->GetWeather()->GetWetRoads();
-        case eWorldProperty::WEATHER_FOGGYNESS:
+        case WorldProperty::WEATHER_FOGGYNESS:
             return g_pGame->GetWeather()->GetFoggyness();
-        case eWorldProperty::WEATHER_FOG:
+        case WorldProperty::WEATHER_FOG:
             return g_pGame->GetWeather()->GetFog();
-        case eWorldProperty::WEATHER_RAIN_FOG:
+        case WorldProperty::WEATHER_RAIN_FOG:
             return g_pGame->GetWeather()->GetRainFog();
-        case eWorldProperty::WEATHER_WATER_FOG:
+        case WorldProperty::WEATHER_WATER_FOG:
             return g_pGame->GetWeather()->GetWaterFog();
-        case eWorldProperty::WEATHER_SANDSTORM:
+        case WorldProperty::WEATHER_SANDSTORM:
             return g_pGame->GetWeather()->GetSandstorm();
-        case eWorldProperty::WEATHER_RAINBOW:
+        case WorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->GetRainbow();
     }
     return false;
 }
 
-bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3)
+bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3)
 {
     if (arg2.has_value() && arg3.has_value())
     {
         switch (property)
         {
-            case eWorldProperty::AMBIENT_COLOR:
+            case WorldProperty::AMBIENT_COLOR:
                 return g_pMultiplayer->SetAmbientColor(arg1 / 255, arg2.value() / 255, arg3.value() / 255);
-            case eWorldProperty::AMBIENT_OBJ_COLOR:
+            case WorldProperty::AMBIENT_OBJ_COLOR:
                 return g_pMultiplayer->SetAmbientObjectColor(arg1 / 255, arg2.value() / 255, arg3.value() / 255);
-            case eWorldProperty::DIRECTIONAL_COLOR:
+            case WorldProperty::DIRECTIONAL_COLOR:
                 return g_pMultiplayer->SetDirectionalColor(arg1 / 255, arg2.value() / 255, arg3.value() / 255);
-            case eWorldProperty::LOW_CLOUDS_COLOR:
+            case WorldProperty::LOW_CLOUDS_COLOR:
                 return g_pMultiplayer->SetLowCloudsColor((int16)arg1, (int16)arg2.value(), (int16)arg3.value());
-            case eWorldProperty::BOTTOM_CLOUDS_COLOR:
+            case WorldProperty::BOTTOM_CLOUDS_COLOR:
                 return g_pMultiplayer->SetBottomCloudsColor((int16)arg1, (int16)arg2.value(), (int16)arg3.value());
         }
         return false;
     }
     switch (property)
     {
-        case eWorldProperty::SPRITE_SIZE:
+        case WorldProperty::SPRITE_SIZE:
             return g_pMultiplayer->SetSpriteSize(arg1);
-        case eWorldProperty::SPRITE_BRIGHTNESS:
+        case WorldProperty::SPRITE_BRIGHTNESS:
             return g_pMultiplayer->SetSpriteBrightness(arg1);
-        case eWorldProperty::POLE_SHADOW_STRENGTH:
-            return g_pMultiplayer->SetPoleShadowStrength(arg1);
-        case eWorldProperty::SHADOW_STRENGTH:
-            return g_pMultiplayer->SetShadowStrength(arg1);
-        case eWorldProperty::SHADOWS_OFFSET:
+        case WorldProperty::POLE_SHADOW_STRENGTH:
+            return g_pMultiplayer->SetPoleShadowStrength(static_cast<int16_t>(arg1));
+        case WorldProperty::SHADOW_STRENGTH:
+            return g_pMultiplayer->SetShadowStrength(static_cast<int16_t>(arg1));
+        case WorldProperty::SHADOWS_OFFSET:
             return g_pMultiplayer->SetShadowsOffset(arg1);
-        case eWorldProperty::LIGHTS_ON_GROUND:
+        case WorldProperty::LIGHTS_ON_GROUND:
             return g_pMultiplayer->SetLightsOnGroundBrightness(arg1);
-        case eWorldProperty::CLOUDS_ALPHA1:
+        case WorldProperty::CLOUDS_ALPHA1:
             return g_pMultiplayer->SetCloudsAlpha1(arg1);
-        case eWorldProperty::ILLUMINATION:
+        case WorldProperty::ILLUMINATION:
             return g_pMultiplayer->SetIllumination(arg1);
-        case eWorldProperty::WEATHER_WET_ROADS:
+        case WorldProperty::WEATHER_WET_ROADS:
             return g_pGame->GetWeather()->SetWetRoads(arg1);
-        case eWorldProperty::WEATHER_FOGGYNESS:
+        case WorldProperty::WEATHER_FOGGYNESS:
             return g_pGame->GetWeather()->SetFoggyness(arg1);
-        case eWorldProperty::WEATHER_FOG:
+        case WorldProperty::WEATHER_FOG:
             return g_pGame->GetWeather()->SetFog(arg1);
-        case eWorldProperty::WEATHER_RAIN_FOG:
+        case WorldProperty::WEATHER_RAIN_FOG:
             return g_pGame->GetWeather()->SetRainFog(arg1);
-        case eWorldProperty::WEATHER_WATER_FOG:
+        case WorldProperty::WEATHER_WATER_FOG:
             return g_pGame->GetWeather()->SetWaterFog(arg1);
-        case eWorldProperty::WEATHER_SANDSTORM:
+        case WorldProperty::WEATHER_SANDSTORM:
             return g_pGame->GetWeather()->SetSandstorm(arg1);
-        case eWorldProperty::WEATHER_RAINBOW:
+        case WorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->SetRainbow(arg1);
     }
     return false;
 }
 
-bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
+bool CLuaWorldDefs::ResetWorldProperty(WorldProperty property)
 {
     switch (property)
     {
-        case eWorldProperty::AMBIENT_COLOR:
+        case WorldProperty::AMBIENT_COLOR:
             return g_pMultiplayer->ResetAmbientColor();
-        case eWorldProperty::AMBIENT_OBJ_COLOR:
+        case WorldProperty::AMBIENT_OBJ_COLOR:
             return g_pMultiplayer->ResetAmbientObjectColor();
-        case eWorldProperty::DIRECTIONAL_COLOR:
+        case WorldProperty::DIRECTIONAL_COLOR:
             return g_pMultiplayer->ResetDirectionalColor();
-        case eWorldProperty::SPRITE_SIZE:
+        case WorldProperty::SPRITE_SIZE:
             return g_pMultiplayer->ResetSpriteSize();
-        case eWorldProperty::SPRITE_BRIGHTNESS:
+        case WorldProperty::SPRITE_BRIGHTNESS:
             return g_pMultiplayer->ResetSpriteBrightness();
-        case eWorldProperty::POLE_SHADOW_STRENGTH:
+        case WorldProperty::POLE_SHADOW_STRENGTH:
             return g_pMultiplayer->ResetPoleShadowStrength();
-        case eWorldProperty::SHADOW_STRENGTH:
+        case WorldProperty::SHADOW_STRENGTH:
             return g_pMultiplayer->ResetShadowStrength();
-        case eWorldProperty::SHADOWS_OFFSET:
+        case WorldProperty::SHADOWS_OFFSET:
             return g_pMultiplayer->ResetShadowsOffset();
-        case eWorldProperty::LIGHTS_ON_GROUND:
+        case WorldProperty::LIGHTS_ON_GROUND:
             return g_pMultiplayer->ResetLightsOnGroundBrightness();
-        case eWorldProperty::LOW_CLOUDS_COLOR:
+        case WorldProperty::LOW_CLOUDS_COLOR:
             return g_pMultiplayer->ResetLowCloudsColor();
-        case eWorldProperty::BOTTOM_CLOUDS_COLOR:
+        case WorldProperty::BOTTOM_CLOUDS_COLOR:
             return g_pMultiplayer->ResetBottomCloudsColor();
-        case eWorldProperty::CLOUDS_ALPHA1:
+        case WorldProperty::CLOUDS_ALPHA1:
             return g_pMultiplayer->ResetCloudsAlpha1();
-        case eWorldProperty::ILLUMINATION:
+        case WorldProperty::ILLUMINATION:
             return g_pMultiplayer->ResetIllumination();
-        case eWorldProperty::WEATHER_WET_ROADS:
+        case WorldProperty::WEATHER_WET_ROADS:
             return g_pGame->GetWeather()->ResetWetRoads();
-        case eWorldProperty::WEATHER_FOGGYNESS:
+        case WorldProperty::WEATHER_FOGGYNESS:
             return g_pGame->GetWeather()->ResetFoggyness();
-        case eWorldProperty::WEATHER_FOG:
+        case WorldProperty::WEATHER_FOG:
             return g_pGame->GetWeather()->ResetFog();
-        case eWorldProperty::WEATHER_RAIN_FOG:
+        case WorldProperty::WEATHER_RAIN_FOG:
             return g_pGame->GetWeather()->ResetRainFog();
-        case eWorldProperty::WEATHER_WATER_FOG:
+        case WorldProperty::WEATHER_WATER_FOG:
             return g_pGame->GetWeather()->ResetWaterFog();
-        case eWorldProperty::WEATHER_SANDSTORM:
+        case WorldProperty::WEATHER_SANDSTORM:
             return g_pGame->GetWeather()->ResetSandstorm();
-        case eWorldProperty::WEATHER_RAINBOW:
+        case WorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->ResetRainbow();
     }
     return false;

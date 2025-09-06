@@ -6,7 +6,6 @@ project "Client Core"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
-		linkoptions { "/SAFESEH:NO" }
 		buildoptions { "-Zm130" }
 
 	filter {}
@@ -47,7 +46,7 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi", "dwmapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "discord-rpc",
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "discord-rpc", "wintrust", "crypt32",
 	}
 
 	defines {

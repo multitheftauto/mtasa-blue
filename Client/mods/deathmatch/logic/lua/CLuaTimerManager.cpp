@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/logic/lua/CLuaTimerManager.cpp
  *  PURPOSE:     Lua timer manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -157,5 +157,5 @@ CLuaTimer* CLuaTimerManager::AddTimer(const CLuaFunctionRef& iLuaFunction, CTick
         return pLuaTimer;
     }
 
-    return false;
+    return nullptr;
 }

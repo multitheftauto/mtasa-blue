@@ -242,7 +242,7 @@
     FT_ULong  read_bytes;
 
 
-    FT_TRACE7(( "FT_Stream_EnterFrame: %ld bytes\n", count ));
+    FT_TRACE7(( "FT_Stream_EnterFrame: %lu bytes\n", count ));
 
     /* check for nested frame access */
     FT_ASSERT( stream && stream->cursor == 0 );

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CColShape.cpp
  *  PURPOSE:     Base shaped collision entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
