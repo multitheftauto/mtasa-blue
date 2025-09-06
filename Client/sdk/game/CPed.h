@@ -307,4 +307,6 @@ public:
     virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
 
     virtual void Say(const ePedSpeechContext& speechId, float probability) = 0;
+
+    virtual void SetInWaterFlags(bool inWater) = 0;
 };
