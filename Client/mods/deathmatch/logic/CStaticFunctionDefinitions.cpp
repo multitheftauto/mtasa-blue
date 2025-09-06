@@ -31,6 +31,7 @@
 #include <game/TaskBasic.h>
 #include <enums/VehicleType.h>
 #include <enums/HandlingProperty.h>
+#include <numbers>
 
 using std::list;
 
