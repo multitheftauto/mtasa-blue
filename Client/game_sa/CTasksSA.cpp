@@ -124,7 +124,7 @@ CTaskSimpleChoking* CTasksSA::CreateTaskSimpleChoking(CPed* pAttacker, bool bIsT
     return pTask;
 }
 
-CTaskSimpleClimb* CTasksSA::CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
+CTaskSimpleClimb* CTasksSA::CreateTaskSimpleClimb(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight,
                                                   const bool bForceClimb)
 {
     CTaskSimpleClimbSA* pTask = NewTask<CTaskSimpleClimbSA>(pClimbEnt, vecTarget, fHeading, nSurfaceType, nHeight, bForceClimb);
@@ -282,9 +282,11 @@ __declspec(noinline) void _cdecl OnCEventHandler_ComputeDamageResponse_Mid(CPedS
 #define HOOKSIZE_CEventHandler_ComputeDamageResponse_Mid       5
 DWORD RETURN_CEventHandler_ComputeDamageResponse_Mid = 0x4C0598;
 DWORD CTaskSimpleBeHit_constructor = FUNC_CTaskSimpleBeHit__Constructor;
-void _declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
+static void __declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*3]

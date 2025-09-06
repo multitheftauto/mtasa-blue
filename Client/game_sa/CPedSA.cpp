@@ -600,30 +600,32 @@ void CPedSA::SetInWaterFlags(bool inWater)
 #define HOOKSIZE_CPed_PreRenderAfterTest 15
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
-static void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
+static void __declspec(naked) HOOK_CPed_PreRenderAfterTest()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Replaced code
-        sub esp,70h
-        push ebx
-        push ebp
-        push esi
-        mov ebp, ecx
-        mov ecx, dword ptr [ebp+47Ch]
-        push edi
+        sub     esp, 70h
+        push    ebx
+        push    ebp
+        push    esi
+        mov     ebp, ecx
+        mov     ecx, dword ptr [ebp+47Ch]
+        push    edi
 
         // Check what to do
-        mov eax, [ebp+474h] // Load m_nThirdPedFlags
-        test eax, 400h // check bCalledPreRender flag
-        jnz skip_rotation_update
+        mov     eax, [ebp+474h] // Load m_nThirdPedFlags
+        test    eax, 400h // check bCalledPreRender flag
+        jnz     skip_rotation_update
 
         // Run code at start of CPed::PreRenderAfterTest
-        jmp RETURN_CPed_PreRenderAfterTest
+        jmp     RETURN_CPed_PreRenderAfterTest
 
-skip_rotation_update:
+        skip_rotation_update:
         // Skip code at start of CPed::PreRenderAfterTest
-        jmp RETURN_CPed_PreRenderAfterTestSkip
+        jmp     RETURN_CPed_PreRenderAfterTestSkip
     }
 }
 
@@ -639,23 +641,25 @@ skip_rotation_update:
 #define HOOKSIZE_CPed_PreRenderAfterTest_Mid 5
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
-static void _declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
+static void __declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Check what to do
-        movzx eax, byte ptr g_onlyUpdateRotations
-        test eax, eax
-        jnz skip_tail
+        movzx   eax, byte ptr g_onlyUpdateRotations
+        test    eax, eax
+        jnz     skip_tail
 
         // Replaced code
-        mov al, byte ptr ds:[00B7CB89h]
+        mov     al, byte ptr ds:[00B7CB89h]
         // Run code at mid of CPed::PreRenderAfterTest
-        jmp RETURN_CPed_PreRenderAfterTest_Mid
+        jmp     RETURN_CPed_PreRenderAfterTest_Mid
 
-skip_tail:
+        skip_tail:
         // Skip code at mid of CPed::PreRenderAfterTest
-        jmp RETURN_CPed_PreRenderAfterTest_MidSkip
+        jmp     RETURN_CPed_PreRenderAfterTest_MidSkip
     }
 }
 

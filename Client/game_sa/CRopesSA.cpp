@@ -23,7 +23,7 @@ int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
     CVector* pvecPosition = const_cast<CVector*>(&vecPosition);
     // First Push @ 0x558D1D is the duration.
     MemPut((void*)(dwDurationAddress), dwDuration);
-    _asm
+    __asm
     {
         push    pvecPosition
         call    dwFunc

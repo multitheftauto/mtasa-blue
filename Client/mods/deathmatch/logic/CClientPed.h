@@ -62,6 +62,7 @@ enum eBodyPart
     BODYPART_LEFT_LEG = 7,
     BODYPART_RIGHT_LEG = 8,
     BODYPART_HEAD = 9,
+    BODYPART_INVALID = 255,
 };
 
 enum eMovementState
@@ -564,8 +565,9 @@ public:
     void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; }
     bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; }
 
-    CTaskSimpleSwim* GetSwimmingTask() const;
+    void RunClimbingTask();
 
+    CTaskSimpleSwim* GetSwimmingTask() const;
     void RunSwimTask() const;
 
 protected:

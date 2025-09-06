@@ -118,8 +118,11 @@ void CClientPlayerVoice::DoPulse()
     }
 }
 
-void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten)
+void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsigned int voiceBufferLength)
 {
+    if (!voiceBuffer || !voiceBufferLength || voiceBufferLength > 2048)
+        return;
+
     m_Mutex.lock();
 
     if (!m_bVoiceActive)
@@ -143,7 +146,7 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
     SpeexBits speexBits;
     speex_bits_init(&speexBits);
 
-    speex_bits_read_from(&speexBits, (char*)(pBuffer), bytesWritten);
+    speex_bits_read_from(&speexBits, reinterpret_cast<const char*>(voiceBuffer), voiceBufferLength);
     speex_decode_int(m_pSpeexDecoderState, &speexBits, (spx_int16_t*)pTempBuffer);
 
     speex_bits_destroy(&speexBits);

@@ -47,6 +47,15 @@
     #endif
 #endif
 
+#ifdef WIN32
+// Forward declare basic windows types to avoid including windows.h here
+struct HWND__;
+    #ifndef _WINDOWS_
+typedef HWND__* HWND;
+typedef unsigned int UINT;
+    #endif
+#endif
+
 namespace SharedUtil
 {
     class CArgMap;
@@ -79,9 +88,7 @@ namespace SharedUtil
     // Output a UTF8 encoded messagebox
     // Used in the Win32 Client only
     //
-    #ifdef _WINDOWS_
     int MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType);
-    #endif
 
     //
     // Return full path and filename of parent exe

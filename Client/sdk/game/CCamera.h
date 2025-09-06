@@ -17,6 +17,9 @@ class CMatrix;
 class CCam;
 struct RwMatrix;
 
+// Camera constants
+constexpr const float DEFAULT_FOV = 70.0f;
+
 enum eCamMode
 {
     MODE_NONE = 0,
@@ -147,5 +150,8 @@ public:
     virtual void ShakeCamera(float radius, float x, float y, float z) noexcept = 0;
     virtual void ResetShakeCamera() noexcept = 0;
 
-    virtual std::uint8_t GetTransitionState() = 0;
+    virtual std::uint8_t GetTransitionState() const = 0;
+    virtual bool         IsInTransition() const = 0;
+    virtual float        GetTransitionFOV() const = 0;
+    virtual bool         GetTransitionMatrix(CMatrix& matrix) const = 0;
 };

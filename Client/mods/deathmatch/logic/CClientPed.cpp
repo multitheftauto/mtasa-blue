@@ -6533,13 +6533,6 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
-    {
-        return false;
-    }
-
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
     {
@@ -6747,13 +6740,6 @@ bool CClientPed::ExitVehicle()
 {
     // Are we local player or ped we are syncing
     if (!IsSyncing() && !IsLocalPlayer() && !IsLocalEntity())
-    {
-        return false;
-    }
-
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
     {
         return false;
     }
@@ -7219,6 +7205,39 @@ void CClientPed::SetSyncing(bool bIsSyncing)
     }
 }
 
+void CClientPed::RunClimbingTask()
+{
+    if (!m_pPlayerPed)
+        return;
+
+    CVector climbPos;
+    float   climbAngle;
+    int     surfaceType;
+
+    CEntitySAInterface* climbEntity = CTaskSimpleClimb::TestForClimb(m_pPlayerPed, climbPos, climbAngle, surfaceType, true);
+
+    // If a ped is in the air, its rotation is inverted (see GetRotationDegressNew, GetRotationRadiansNew)
+    if (!IsOnGround() && !climbEntity)
+    {
+        CVector rot;
+        GetRotationDegrees(rot);
+
+        rot.fZ += 180.0f;
+        SetRotationDegrees(rot);
+
+        climbEntity = CTaskSimpleClimb::TestForClimb(m_pPlayerPed, climbPos, climbAngle, surfaceType, true);
+    }
+
+    if (!climbEntity)
+        return;
+
+    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, surfaceType, eClimbHeights::CLIMB_GRAB, false);
+    if (!climbTask)
+        return;
+
+    climbTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY, true);
+}
+
 CTaskSimpleSwim* CClientPed::GetSwimmingTask() const
 {
     if (!m_pPlayerPed)
@@ -7246,3 +7265,4 @@ void CClientPed::RunSwimTask() const
 
     inWaterTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP, true);
 }
+  

@@ -29,6 +29,7 @@
 #include <game/CTaskManager.h>
 #include <game/CWanted.h>
 #include <game/CWeapon.h>
+#include <game/CWeaponInfo.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
 #include <game/Task.h>
@@ -38,6 +39,7 @@
 #include <game/CVehicleAudioSettingsManager.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
+#include "CClientPed.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -102,10 +104,11 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_TargetedPlayerID = INVALID_ELEMENT_ID;
     m_pDamageEntity = NULL;
     m_DamagerID = INVALID_ELEMENT_ID;
-    m_ucDamageBodyPiece = 0xFF;
-    m_ucDamageWeapon = 0xFF;
+    m_ucDamageBodyPiece = BODYPART_INVALID;
+    m_ucDamageWeapon = WEAPONTYPE_INVALID;
     m_ulDamageTime = 0;
     m_bDamageSent = true;
+    m_serverProcessedDeath = false;
     m_bShowNetstat = false;
     m_bShowFPS = false;
     m_bHudAreaNameDisabled = false;
@@ -120,6 +123,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
+    m_allowMultiCommandHandlers = MultiCommandHandlerPolicy::WARN;
 
     m_bIsPlayingBack = false;
     m_bFirstPlaybackFrame = false;
@@ -409,7 +413,7 @@ CClientGame::~CClientGame()
     m_bBeingDeleted = true;
     // Remove active projectile references to local player
     if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
-        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());    
+        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());
 
     // Stop all explosions. Unfortunately this doesn't fix the crash
     // if a vehicle is destroyed while it explodes.
@@ -1024,7 +1028,7 @@ void CClientGame::DoPulsePostFrame()
                     }
 
                     auto taskManager = pLocalPlayer->GetTaskManager();
-                    auto task = taskManager->GetActiveTask();                    
+                    auto task = taskManager->GetActiveTask();
                     auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
                     bool useZoneName = true;
 
@@ -1078,7 +1082,7 @@ void CClientGame::DoPulsePostFrame()
 
                             discordState = taskState.strState;
                             useZoneName = taskState.bUseZone;
-                        }                                       
+                        }
 
                         if (useZoneName)
                         {
@@ -1455,10 +1459,18 @@ void CClientGame::DoPulses()
         if (CClientTime::GetTime() - m_ulDamageTime > 2000)
         {
             m_DamagerID = INVALID_ELEMENT_ID;
-            m_ucDamageWeapon = 0xFF;
-            m_ucDamageBodyPiece = 0xFF;
+            m_ucDamageWeapon = WEAPONTYPE_INVALID;
+            m_ucDamageBodyPiece = BODYPART_INVALID;
         }
-        DoWastedCheck(m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece);
+        // Check if we need to trigger death event
+        if (!m_pLocalPlayer->IsDeadOnNetwork() && m_pLocalPlayer->GetHealth() == 0.0f)
+        {
+            // Only call DoWastedCheck if server hasn't already processed this death
+            // This prevents duplicate events when server processes death via unified context system
+            if (!m_serverProcessedDeath) {
+                DoWastedCheck(m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece);
+            }
+        }
     }
 
     // Game hacks, restore certain variables
@@ -2001,7 +2013,7 @@ void CClientGame::UpdateFireKey()
                                 {
                                     if (pTargetPed->IsLocalEntity())
                                     {
-                                        CStaticFunctionDefinitions::KillPed(*pTargetPed, m_pLocalPlayer, 4 /*WEAPONTYPE_KNIFE*/, 9 /*BODYPART_HEAD*/, true);
+                                        CStaticFunctionDefinitions::KillPed(*pTargetPed, m_pLocalPlayer, WEAPONTYPE_KNIFE, BODYPART_HEAD, true);
                                         return;
                                     }
 
@@ -4501,7 +4513,9 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
                     GetDeathAnim(pDamagedPed, pEvent, animGroup, animID);
 
                     // Check if we're dead
-                    DoWastedCheck(damagerID, weaponUsed, hitZone, animGroup, animID);
+                    if (!m_serverProcessedDeath) {
+                        DoWastedCheck(damagerID, weaponUsed, hitZone, animGroup, animID);
+                    }
                 }
 
                 // Allow GTA to kill us if we've fell to our death
@@ -4569,6 +4583,14 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
     if (!pKilledPed)
         return;
 
+    // For local player in vehicle explosions, set damage data for consistent client events
+    if (IS_PLAYER(pKilledPed) && pKilledPed->IsLocalPlayer() && ucDeathReason == WEAPONTYPE_EXPLOSION)
+    {
+        // Set explosion damage data so DoWastedCheck uses correct parameters
+        SetExplosionDamageData();
+        return; // Local player death is handled by DoWastedCheck
+    }
+    
     // Not required for remote players. Local player is handled in DoPulses->DoWastedCheck
     if (IS_PLAYER(pKilledPed))
         return;
@@ -5595,11 +5617,11 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
                 Arguments.PushElement(pKiller);
             else
                 Arguments.PushBoolean(false);
-            if (ucWeapon != 0xFF)
+            if (ucWeapon != WEAPONTYPE_INVALID)
                 Arguments.PushNumber(ucWeapon);
             else
                 Arguments.PushBoolean(false);
-            if (ucBodyPiece != 0xFF)
+            if (ucBodyPiece != BODYPART_INVALID)
                 Arguments.PushNumber(ucBodyPiece);
             else
                 Arguments.PushBoolean(false);
@@ -6476,20 +6498,26 @@ bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
     // Audio events without a game entity could default to the root element, but the
     // best approach is to avoid spamming the event with the barely notable sounds (without a source).
     // Warning: Canceling sounds emitted by an audio entity (like vehicles do) will cause massive spam
+    CClientEntity* pEntity = nullptr;
+    
     if (event.pGameEntity)
     {
-        CPools*        pPools = g_pGame->GetPools();
-        CClientEntity* pEntity = pPools->GetClientEntity((DWORD*)event.pGameEntity);
-        if (pEntity)
-        {
-            CLuaArguments Arguments;
-            Arguments.PushNumber(event.uiGroup);
-            Arguments.PushNumber(event.uiIndex);
-            Arguments.PushNumber(event.vecPosition.fX);
-            Arguments.PushNumber(event.vecPosition.fY);
-            Arguments.PushNumber(event.vecPosition.fZ);
-            return pEntity->CallEvent("onClientWorldSound", Arguments, true);
-        }
+        CPools* pPools = g_pGame->GetPools();
+        pEntity = pPools->GetClientEntity((DWORD*)event.pGameEntity);
+    }
+    
+    if (!pEntity)
+        pEntity = GetRootEntity();
+    
+    if (pEntity)
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(event.uiGroup);
+        Arguments.PushNumber(event.uiIndex);
+        Arguments.PushNumber(event.vecPosition.fX);
+        Arguments.PushNumber(event.vecPosition.fY);
+        Arguments.PushNumber(event.vecPosition.fZ);
+        return pEntity->CallEvent("onClientWorldSound", Arguments, true);
     }
 
     return true;
@@ -7142,4 +7170,21 @@ void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
     {
         g_pGame->GetAudioEngine()->StartRadio(dwStationID);
     }
+}
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::TryGetCurrentWeapon
+//
+// Helper method to get current weapon type with error handling
+// Returns actual weapon type or WEAPONTYPE_UNARMED as fallback
+//
+//////////////////////////////////////////////////////////////////
+std::uint8_t CClientGame::TryGetCurrentWeapon(CClientPlayer* player)
+{
+    if (!player)
+        return WEAPONTYPE_UNARMED;
+        
+    eWeaponType weaponType = player->GetCurrentWeaponType();
+    return (weaponType != WEAPONTYPE_INVALID) ? static_cast<std::uint8_t>(weaponType) : WEAPONTYPE_UNARMED;
 }

@@ -981,9 +981,12 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
     pPlayer->SetOnFire(flags.data.bIsOnFire);
     pPlayer->SetStealthAiming(flags.data.bStealthAiming);
 
+    if (flags.data.hangingDuringClimb && pPlayer->GetMovementState() != eMovementState::MOVEMENTSTATE_HANGING && pPlayer->GetMovementState() != eMovementState::MOVEMENTSTATE_CLIMB)
+        pPlayer->RunClimbingTask();
+
     if (flags.data.bIsInWater && !pPlayer->IsInWater())
         pPlayer->RunSwimTask();
-
+  
     // Remember now as the last puresync time
     pPlayer->SetLastPuresyncTime(CClientTime::GetTime());
     pPlayer->SetLastPuresyncPosition(position.data.vecPosition);
@@ -1115,6 +1118,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.bStealthAiming = (pPlayerModel->IsStealthAiming() == true);
     flags.data.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
     flags.data.animInterrupted = pPlayerModel->HasSyncedAnim() && (!pPlayerModel->IsRunningAnimation() || pPlayerModel->m_animationOverridedByClient);
+    flags.data.hangingDuringClimb = pPlayerModel->GetMovementState() == eMovementState::MOVEMENTSTATE_HANGING;
 
     // The animation has been overwritten or interrupted by the client
     if (flags.data.animInterrupted)

@@ -15,7 +15,7 @@
 
 CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
                                          short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
-                                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix)
+                                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, std::uint8_t multiCommandHandlerPolicy)
 {
     m_weaponTypesUsingBulletSync = weaponTypesUsingBulletSync;
     m_ucVehExtrapolateEnabled = ucVehExtrapolateEnabled;
@@ -26,6 +26,7 @@ CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponType
     m_ucAllowFastSprintFix = ucAllowFastSprintFix;
     m_ucAllowDrivebyAnimationFix = ucAllowDrivebyAnimationFix;
     m_ucAllowShotgunDamageFix = ucAllowShotgunDamageFix;
+    m_multiCommandHandlerPolicy = multiCommandHandlerPolicy;
 }
 
 bool CSyncSettingsPacket::Read(NetBitStreamInterface& BitStream)
@@ -51,5 +52,7 @@ bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_ucAllowFastSprintFix);
     BitStream.Write(m_ucAllowDrivebyAnimationFix);
     BitStream.Write(m_ucAllowShotgunDamageFix);
+    BitStream.Write(m_multiCommandHandlerPolicy);
+
     return true;
 }
