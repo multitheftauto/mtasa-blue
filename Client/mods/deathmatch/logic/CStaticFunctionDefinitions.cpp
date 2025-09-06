@@ -5033,7 +5033,7 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& 
         float cosRoll = worldUp.DotProduct(&projectedUp);
         float sinRoll = cameraRight.DotProduct(&worldUp);
         
-        fRoll = atan2(sinRoll, cosRoll) * (180.0f / 3.14159265359f);
+        fRoll = std::atan2(sinRoll, cosRoll) * (180.0f / std::numbers::pi_v<float>);
     }
     
     return true;
