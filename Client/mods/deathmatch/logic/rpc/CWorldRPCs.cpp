@@ -213,7 +213,7 @@ void CWorldRPCs::ResetMapInfo(NetBitStreamInterface& bitStream)
 void CWorldRPCs::SetFPSLimit(NetBitStreamInterface& bitStream)
 {
     short sFPSLimit;
-    bitStream.Read(sFPSLimit); // See also: Client\mods\deathmatch\logic\CPacketHandler.cpp:2368
+    bitStream.Read(sFPSLimit); // See also: Client\mods\deathmatch\logic\CPacketHandler.cpp:2366
     CStaticFunctionDefinitions::SetServerFPSLimit(sFPSLimit);
 }
 
