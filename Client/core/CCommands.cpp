@@ -179,32 +179,12 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                     CCore::GetSingleton().GetFPSLimiter()->SetUserDefinedFPS(fpsVal);
                 }
 
-                // HACK: Foul dirty hack to force vsync (Awaiting PR)
+                // HACK: Foul dirty hack to force vsync (Rework on #4427)
                 if (key == "vsync")
                 {
                     bool bVSync;
                     CVARS_GET("vsync", bVSync);
-                    if (!bVSync)
-                    {
-                        OutputDebugLine("VSync disabled, removing fps_limit display refresh rate");
-                        CCore::GetSingleton().GetFPSLimiter()->SetDisplayRefreshRate(0);
-                    }
-                    else
-                    {
-                        // HACK: (pxd) Get refresh rate from Direct3D? Should this go elsewhere?
-                        D3DDISPLAYMODE DisplayMode;
-                        IDirect3D9*    pD3D9 = CProxyDirect3D9::StaticGetDirect3D();
-                        if (pD3D9 && pD3D9->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &DisplayMode) == D3D_OK)            // Query current display mode
-                        {
-                            OutputDebugLine(SString("VSync enabled, setting fps_limit to display refresh rate %d Hz", DisplayMode.RefreshRate));
-                            CCore::GetSingleton().GetFPSLimiter()->SetDisplayRefreshRate(DisplayMode.RefreshRate);
-                        }
-                        else
-                        {
-                            OutputDebugLine("VSync enabled, but failed to get display refresh rate, defaulting to 60 Hz");
-                            CCore::GetSingleton().GetFPSLimiter()->SetDisplayRefreshRate(60);
-                        }
-                    }
+                    CCore::GetSingleton().GetFPSLimiter()->SetDisplayVSync(bVSync);
                 }
             }
             else

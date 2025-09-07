@@ -49,7 +49,10 @@ namespace FPSLimiter
         m_data.serverEnforcedFPS = 0;
         m_data.clientEnforcedFPS = 0;
         m_data.userDefinedFPS = 0;
-        // m_data.displayRefreshRate = 0; // We do not reset display refresh rate
+
+        bool bVSync;
+        CVARS_GET("vsync", bVSync);
+        m_data.displayRefreshRate = bVSync ? GetDisplayRefreshRate() : 0;
         CalculateCurrentFPSLimit();
     }
 
@@ -86,7 +89,7 @@ namespace FPSLimiter
         if (m_data.displayRefreshRate > FPS_LIMIT_MIN && m_data.displayRefreshRate < minFPS)
         {
             minFPS = m_data.displayRefreshRate;
-            enforcer = EnforcerType::RefreshRate;
+            enforcer = EnforcerType::VSync;
         }
 
         // If the lowest matches the active target, return its enforcer
@@ -115,15 +118,27 @@ namespace FPSLimiter
         CalculateCurrentFPSLimit();
     }
 
-    void FPSLimiter::SetDisplayRefreshRate(std::uint32_t refreshRate)
+    void FPSLimiter::SetDisplayVSync(bool enabled)
     {
-        m_data.displayRefreshRate = ValidateFPS(refreshRate);
+        m_data.displayRefreshRate = enabled ? GetDisplayRefreshRate() : 0;
         CalculateCurrentFPSLimit();
     }
 
 #pragma endregion Interface
 
 #pragma region Internal
+
+    std::uint32_t FPSLimiter::GetDisplayRefreshRate()
+    {
+        D3DDISPLAYMODE DisplayMode;
+        IDirect3D9*    pD3D9 = CProxyDirect3D9::StaticGetDirect3D();
+        if (pD3D9 && pD3D9->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &DisplayMode) == D3D_OK)
+        {
+            return ValidateFPS(DisplayMode.RefreshRate);
+        }
+        // Fallback to 60 Hz if unable to get refresh rate
+        return 60;
+    }
 
     // Priority: Server > Client > User > None
     void FPSLimiter::CalculateCurrentFPSLimit()
@@ -154,10 +169,6 @@ namespace FPSLimiter
 
         m_data.activeFPSTarget = minFPS;
 
-        std::stringstream ss;
-        ss << "FPSLimiter: Calculated active FPS limit: " << m_data.activeFPSTarget;
-        OutputDebugLine(ss.str().c_str());
-
         // If limit changed, reset frame timing
         if (oldLimit != m_data.activeFPSTarget)
         {
@@ -168,13 +179,9 @@ namespace FPSLimiter
             OnFPSLimitChange();
         }
 
-        ss.clear();
-        ss << "FPSLimiter: Calculated current FPS limit : " << m_data.activeFPSTarget
-           << " (Server: " << m_data.serverEnforcedFPS
-           << ", Client: " << m_data.clientEnforcedFPS
-           << ", User: " << m_data.userDefinedFPS
-           << ", Display: " << m_data.displayRefreshRate
-           << ") Enforcer: " << EnumToString(GetEnforcer());
+        std::stringstream ss;
+        ss << "FPSLimiter: FPS limit changed to " << (m_data.activeFPSTarget == 0 ? "unlimited" : std::to_string(m_data.activeFPSTarget));
+        ss << " (Enforced by: " << EnumToString(GetEnforcer()) << ")";
 
         auto* pConsole = CCore::GetSingleton().GetConsole();
         if (pConsole)
@@ -262,7 +269,11 @@ namespace FPSLimiter
                 HMODULE ntdll = GetModuleHandleA("ntdll.dll");
                 if (ntdll)
                 {
-                    NtSetTimerResolution setRes = reinterpret_cast<NtSetTimerResolution>(GetProcAddress(ntdll, "NtSetTimerResolution"));
+                    auto proc = GetProcAddress(ntdll, "NtSetTimerResolution");
+#pragma warning(push)
+#pragma warning(suppress : 4191)
+                    auto setRes = reinterpret_cast<NtSetTimerResolution>(proc);
+#pragma warning(pop)
                     if (setRes)
                     {
                         ULONG actualRes;
@@ -355,6 +366,14 @@ namespace FPSLimiter
     }
 
 #pragma endregion Events
+
+    IMPLEMENT_ENUM_BEGIN(EnforcerType)
+    ADD_ENUM(EnforcerType::None, "none")
+    ADD_ENUM(EnforcerType::VSync, "vsync")
+    ADD_ENUM(EnforcerType::UserDefined, "user-defined")
+    ADD_ENUM(EnforcerType::Client, "client")
+    ADD_ENUM(EnforcerType::Server, "server")
+    IMPLEMENT_ENUM_END("EnforcerType");
 
 };            // namespace FPSLimiter
 

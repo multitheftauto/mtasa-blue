@@ -55,10 +55,12 @@ namespace FPSLimiter
         void SetServerEnforcedFPS(std::uint32_t frameRateLimit);
         void SetClientEnforcedFPS(std::uint32_t frameRateLimit);
         void SetUserDefinedFPS(std::uint32_t frameRateLimit);
-        void SetDisplayRefreshRate(std::uint32_t refreshRate);
+        void SetDisplayVSync(bool enabled);
 
     public:
         // Internal
+        std::uint32_t GetDisplayRefreshRate();
+
         void CalculateCurrentFPSLimit();
         void SetFrameRateThrottle();
 

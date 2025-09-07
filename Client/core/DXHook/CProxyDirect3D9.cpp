@@ -833,13 +833,6 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
         strMessage += SString("Direct3D CreateDevice error: %08x", hResult);
         BrowseToSolution("d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage);
     }
-    else
-    {
-        // Get current refresh rate
-        D3DDISPLAYMODE DisplayMode;
-        if (pDirect3D->GetAdapterDisplayMode(Adapter, &DisplayMode) == D3D_OK)
-            CCore::GetSingleton().GetFPSLimiter()->SetDisplayRefreshRate(DisplayMode.RefreshRate);
-    }
 
     return hResult;
 }

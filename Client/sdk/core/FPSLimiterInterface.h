@@ -22,10 +22,10 @@ namespace FPSLimiter
     enum class EnforcerType : std::uint8_t
     {
         None = 0,                   // No frame rate limit enforced (unlimited FPS)
-        RefreshRate = 1,            // Frame rate limit set to display refresh rate
-        UserDefined = 2,            // Frame rate limit set by the user via settings menu or console variable
-        Client = 3,                 // Frame rate limit enforced by the client (e.g., script)
-        Server = 4                  // Frame rate limit enforced by the server
+        VSync = 1,                  // Frame rate limited by display refresh rate
+        UserDefined = 2,            // Frame rate limited by the user via settings menu or console variable
+        Client = 3,                 // Frame rate limited by the client script
+        Server = 4                  // Frame rate limited by the server script
     };
     DECLARE_ENUM(EnforcerType);
 
@@ -49,7 +49,7 @@ namespace FPSLimiter
         virtual void SetServerEnforcedFPS(std::uint32_t frameRateLimit) = 0;            // Set the server-enforced frame rate limit (0 = no limit)
         virtual void SetClientEnforcedFPS(std::uint32_t frameRateLimit) = 0;            // Set the client-enforced frame rate limit (0 = no limit)
         virtual void SetUserDefinedFPS(std::uint32_t frameRateLimit) = 0;               // Set the user-defined frame rate limit (0 = no limit)
-        virtual void SetDisplayRefreshRate(std::uint32_t refreshRate) = 0;              // Set the display refresh rate to cap FPS (0 = no cap)
+        virtual void SetDisplayVSync(bool enabled) = 0;                                 // Set the display refresh rate to cap FPS (0 = no cap)
 
         virtual void OnFPSLimitChange() = 0;            // Event handler called when the active frame rate limit changes
         virtual void OnFrameStart() = 0;                // Event handler called at the start of each frame
