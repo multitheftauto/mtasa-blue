@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-// #include "FPSLimiter.h"
 
 template <>
 CClientVariables* CSingleton<CClientVariables>::m_pSingleton = NULL;

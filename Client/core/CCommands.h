@@ -42,14 +42,6 @@ public:
 
 private:
     void ExecuteHandler(PFNCOMMAND pfnHandler, const char* szParameters);
-    bool ParseCommand(const char* szCommand, const char* szParametersIn, bool bIsScriptedBind, std::string& outCommand, std::string& outParameters);
-    bool ExecuteBuiltInCommand(const char* szCommand, const char* szParameters, bool bIsScriptedBind);
-    bool ExecuteCVarCommand(const std::string& fullCommand, bool bIsScriptedBind);
-    bool GetCVarValue(const std::string& key);
-    bool SetCVarValue(const std::string& fullCommand, size_t equalPos);
-    void HandleSpecialCVars(const std::string& key, const std::string& value);
-    void HandleNickCommand(const char* szCommand, const char* szParameters, bool bIsScriptedBind);
-    bool ExecuteExternalHandler(const char* szCommand, const char* szParameters, bool bHandleRemotely, bool bIsScriptedBind);
 
     std::list<COMMANDENTRY*> m_CommandList;
     pfnExecuteCommandHandler m_pfnExecuteHandler;
