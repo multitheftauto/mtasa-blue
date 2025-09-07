@@ -188,6 +188,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CScreenShot::CheckForScreenShot(false);
 
     TIMING_CHECKPOINT("-OnPresent2");
+
+    TIMING_CHECKPOINT("");            // End of frame for profiler
 }
 
 #define SAVE_RENDERSTATE_AND_SET( reg, value ) \

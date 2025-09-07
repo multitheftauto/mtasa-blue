@@ -843,6 +843,8 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
     DebugElementRender();
 }
 
+// TODO: (pxd) Refactor this function to reduce its size and complexity
+// Pulse subsystems on post frame
 void CClientGame::DoPulsePostFrame()
 {
     TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
@@ -1024,7 +1026,7 @@ void CClientGame::DoPulsePostFrame()
 
                     if (zoneName == "Unknown")
                     {
-                        zoneName = _("Area 51");
+                        zoneName = _("Area 51");            // Easter egg!
                     }
 
                     auto taskManager = pLocalPlayer->GetTaskManager();
@@ -1033,7 +1035,7 @@ void CClientGame::DoPulsePostFrame()
                     bool useZoneName = true;
 
                     const eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
-                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType) : _("Walking around ");
+                    std::string              discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType) : _("Walking around ");
 
                     if (task && task->IsValid())
                     {
@@ -1049,7 +1051,7 @@ void CClientGame::DoPulsePostFrame()
                         }
 
                         // Check for non-matching sub/secondary tasks and remove them
-                        for (auto it = taskStates.begin(); it != taskStates.end(); )
+                        for (auto it = taskStates.begin(); it != taskStates.end();)
                         {
                             const STaskState& taskState = (*it);
 
@@ -1077,7 +1079,7 @@ void CClientGame::DoPulsePostFrame()
                         if (stateCount > 0)
                         {
                             std::srand(static_cast<unsigned int>(GetTickCount64_()));
-                            const int  index = (std::rand() % stateCount);
+                            const int   index = (std::rand() % stateCount);
                             const auto& taskState = taskStates[index];
 
                             discordState = taskState.strState;
@@ -1107,6 +1109,7 @@ void CClientGame::DoPulsePostFrame()
 
     m_pPlayerMap->DoRender();
     m_pManager->DoRender();
+
     DoPulses();
 
     // If we're supposed to show netstat, draw them infront of everything else
@@ -1114,15 +1117,19 @@ void CClientGame::DoPulsePostFrame()
     {
         m_pNetworkStats->Draw();
     }
+
+    TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame");
 }
 
+// TODO: (pxd) Refactor this function to reduce its size and complexity
+// Pulse subsystems on post frame: Part 2
 void CClientGame::DoPulses()
 {
-    TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame");
+    auto defer = [&]() {
+        TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame2");
+    };
 
-    g_pCore->ApplyFrameRateLimit();
-
-    TIMING_CHECKPOINT("+CClientGame::DoPulses");
+    TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame2");
 
     m_BuiltCollisionMapThisFrame = false;
 
@@ -1182,7 +1189,7 @@ void CClientGame::DoPulses()
                 g_pCore->ShowMessageBox(_("Error") + _E("CD05"), SString(_("You were kicked from the game ( %s )"), *strMessageCombo),
                                         MB_BUTTON_OK | MB_ICON_ERROR);
                 g_pCore->GetModManager()->RequestUnload();
-                return;
+                return defer();
             }
         }
     }
@@ -1261,7 +1268,7 @@ void CClientGame::DoPulses()
                 {
                     g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD06"), _("Error connecting to server."));
                     g_pCore->GetModManager()->RequestUnload();
-                    return;
+                    return defer();
                 }
             }
 
@@ -1271,7 +1278,7 @@ void CClientGame::DoPulses()
                 // Show timeout message and disconnect
                 g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD07"), _("Connecting to local server timed out. See console for details."));
                 g_pCore->GetModManager()->RequestUnload();
-                return;
+                return defer();
             }
         }
     }
@@ -1332,7 +1339,7 @@ void CClientGame::DoPulses()
         if (m_bErrorStartingLocal)
         {
             g_pCore->GetModManager()->RequestUnload();
-            return;
+            return defer();
         }
 
         // Timed out?
@@ -1340,7 +1347,7 @@ void CClientGame::DoPulses()
         {
             g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD08"), _("Connection timed out"), "connect-timed-out", true);
             g_pCore->GetModManager()->RequestUnload();
-            return;
+            return defer();
         }
     }
     else if (m_Status == CClientGame::STATUS_JOINED)
@@ -1377,7 +1384,7 @@ void CClientGame::DoPulses()
             {
                 g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD09"), _("Connection with the server was lost"));
                 g_pCore->GetModManager()->RequestUnload();
-                return;
+                return defer();
             }
             else
             {
@@ -1497,7 +1504,7 @@ void CClientGame::DoPulses()
     // Collect async task scheduler results
     m_pAsyncTaskScheduler->CollectResults();
 
-    TIMING_CHECKPOINT("-CClientGame::DoPulses");
+    return defer();
 }
 
 // Extrapolation test

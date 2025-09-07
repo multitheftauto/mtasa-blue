@@ -7044,19 +7044,21 @@ bool CStaticFunctionDefinitions::SetMoonSize(int iSize)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetFPSLimit(int iLimit)
+bool CStaticFunctionDefinitions::SetClientFPSLimit(int iFPS)
 {
-    if (iLimit == 0 || (iLimit >= 25 && iLimit <= std::numeric_limits<short>::max()))
-    {
-        g_pCore->SetClientScriptFrameRateLimit(iLimit);
-        return true;
-    }
-    return false;
+    g_pCore->GetFPSLimiter()->SetClientEnforcedFPS(iFPS);
+    return true;
 }
 
-bool CStaticFunctionDefinitions::GetFPSLimit(int& iLimit)
+bool CStaticFunctionDefinitions::GetFPSLimit(int& iFPS) 
 {
-    iLimit = g_pCore->GetFrameRateLimit();
+    iFPS = g_pCore->GetFPSLimiter()->GetFPSTarget();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetServerFPSLimit(int iFPS)
+{
+    g_pCore->GetFPSLimiter()->SetServerEnforcedFPS(iFPS);
     return true;
 }
 

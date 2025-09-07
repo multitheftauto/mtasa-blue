@@ -2010,7 +2010,7 @@ int CLuaWorldDefs::SetFPSLimit(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetFPSLimit(iLimit))
+        if (CStaticFunctionDefinitions::SetClientFPSLimit(iLimit))
         {
             lua_pushboolean(luaVM, true);
             return 1;

@@ -28,8 +28,9 @@
 class CClientVariables : public CCVarsInterface, public CSingleton<CClientVariables>
 {
     // Sanity macros   << Who ever did this is idiot
-    #define SAN     if(!m_pStorage) return
-    #define SANGET  if(!Node(strVariable)) return false
+    // TODO: (pxd) Remove these macros and ODR violations
+    #define SAN     if(!m_pStorage) { OutputDebugLine("CClientVariables::Get: m_pStorage is NULL"); return; }
+    #define SANGET  if(!Node(strVariable)) { OutputDebugLine(SString("CClientVariables::Get: Node for cvar %s is NULL", strVariable.c_str())); return false; }
 
 public:
     CClientVariables();
@@ -119,7 +120,7 @@ public:
     bool Exists(const std::string& strVariable);
 
     bool Load();
-    bool IsLoaded() { return m_bLoaded; }
+    bool IsLoaded() { return m_bLoaded; }            // TODO: (pxd) Remove if unused? Seems unused
     int  GetRevision() { return m_iRevision; }
     void ValidateValues();
 
@@ -127,7 +128,7 @@ private:
     CXMLNode* Node(const std::string& strVariable);
     void      LoadDefaults();
 
-    bool      m_bLoaded;
+    bool      m_bLoaded;            // TODO: (pxd) Remove if unused? Seems unused
     CXMLNode* m_pStorage;
     int       m_iRevision;
 };

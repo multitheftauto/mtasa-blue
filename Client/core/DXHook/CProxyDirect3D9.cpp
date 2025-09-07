@@ -191,7 +191,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     // Redraw, we avoid possible problems with the fact that it won't replace the icon somewhere
     InvalidateRect(hFocusWindow, nullptr, TRUE);
     UpdateWindow(hFocusWindow);
-    
+
     // Detect if second call to CreateDevice
     if (CreateDeviceSecondCallCheck(hResult, m_pDevice, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface))
     {
@@ -838,7 +838,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
         // Get current refresh rate
         D3DDISPLAYMODE DisplayMode;
         if (pDirect3D->GetAdapterDisplayMode(Adapter, &DisplayMode) == D3D_OK)
-            CCore::GetSingleton().SetCurrentRefreshRate(DisplayMode.RefreshRate);
+            CCore::GetSingleton().GetFPSLimiter()->SetDisplayRefreshRate(DisplayMode.RefreshRate);
     }
 
     return hResult;

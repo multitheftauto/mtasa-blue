@@ -96,6 +96,8 @@ public:
     void OnPreScreenshot();
     void OnPostScreenshot();
 
+    void OnFPSLimitChange(int newFPS);
+
     bool SetGlobalAudioVolume(float fVolume);
 
     bool        UpdateListsFromMaster();

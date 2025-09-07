@@ -73,7 +73,6 @@ bool CCommands::Exists(const char* szCommand)
 
 bool CCommands::Execute(const char* szCommandLine)
 {
-    // Parse out the command name and command line
     string strCmd;
     string strCmdLine;
     CLocalGUI::GetSingleton().GetConsole()->GetCommandInfo(szCommandLine, strCmd, strCmdLine);
@@ -83,160 +82,221 @@ bool CCommands::Execute(const char* szCommandLine)
 
 bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool bHandleRemotely, bool bIsScriptedBind)
 {
-    // Copy szParametersIn so the contents can be changed
-    char* szParameters = NULL;
-    char empyParameters[1] = { 0 };
-    if (szParametersIn)
-    {
-        size_t sizeParameters = strlen(szParametersIn) + 1;
-        szParameters = static_cast<char*>(alloca(sizeParameters));
-        memcpy(szParameters, szParametersIn, sizeParameters);
-    }
+    std::string command;
+    std::string parameters;
+    if (!ParseCommand(szCommand, szParametersIn, bIsScriptedBind, command, parameters))
+        return false;
 
-    // HACK: if its a 'chatboxsay' command, use the next parameter
-    // Is the command "say" and the arguments start with /? (command comes from the chatbox)
-    if (!bIsScriptedBind && !stricmp(szCommand, "chatboxsay"))
-    {
-        if (szParameters)
-        {
-            // His line starts with '/'?
-            if (*szParameters == '/')
-            {
-                // Copy the characters after the slash to the 0 terminator to a seperate buffer
-                char szBuffer[256];
-                strncpy(szBuffer, szParameters + 1, 256);
-                szBuffer[255] = 0;
+    if (ExecuteBuiltInCommand(command.c_str(), parameters.c_str(), bIsScriptedBind))
+        return true;
 
-                // Split it into command and arguments
-                szCommand = strtok(szBuffer, " ");
-                szParameters = strtok(NULL, "\0");
-                if (szCommand == NULL)
-                {
-                    return false;
-                }
-                if (szParameters == NULL)
-                {
-                    szParameters = empyParameters;
-                }
-            }
-        }
-        else
-            return false;
-    }
+    if (ExecuteCVarCommand(command + " " + parameters, bIsScriptedBind))
+        return true;
 
-    // Grab the command
-    tagCOMMANDENTRY* pEntry = Get(szCommand);
-    bool             wasHandled = false;
-    if (pEntry)
-    {
-        // If its a core command, or if its enabled
-        if (!pEntry->bModCommand || pEntry->bEnabled)
-        {
-            // Execute it
-            if (!bIsScriptedBind || pEntry->bAllowScriptedBind)
-                ExecuteHandler(pEntry->pfnCmdFunc, szParameters);
+    // Handle nick command
+    // TODO: Make a proper builtin command entry for this
+    HandleNickCommand(command.c_str(), parameters.c_str(), bIsScriptedBind);
 
-            wasHandled = true;
-        }
-    }
-
-    // Recompose the original command text
-    std::string val = std::string(szCommand) + " " + std::string(szParameters ? szParameters : "");
-
-    // Is it a cvar? (syntax: cvar[ = value])
-    if (!wasHandled)
-    {
-        // Check to see if '=' exists
-        unsigned int nOpIndex = val.find('=');
-        std::string  key = val.substr(0, nOpIndex);
-
-        // Check to see if ' =' exists
-        if (val.find(" =") != std::string::npos)
-        {
-            key = val.substr(0, nOpIndex - 1);
-        }
-
-        TrimWhiteSpace(key);
-
-        // Handle the cvar if it exists
-        if (CClientVariables::GetSingleton().Exists(key) && !bIsScriptedBind)
-        {
-            std::stringstream ss;
-
-            // Determine whether this is an atomic get or set query
-            if (nOpIndex != std::string::npos)
-            {
-                // (set) some_cvar=value
-                val = val.substr(nOpIndex + 1);
-                TrimWhiteSpace(val);
-                CVARS_SET(key, val);
-
-                // HACK: recalculate frame rate limit on cvar change
-                if (key == "fps_limit" && m_FpsLimitTimer.Get() >= 500 && CCore::GetSingleton().IsConnected())
-                {
-                    CCore::GetSingleton().RecalculateFrameRateLimit(-1, true);
-                    m_FpsLimitTimer.Reset();
-                }
-            }
-            else
-            {
-                // (get) some_cvar
-                CVARS_GET(key, val);
-            }
-            ss << key << " = " << val;
-            val = ss.str();
-            CCore::GetSingleton().GetConsole()->Print(val.c_str());
-            return true;
-        }
-    }
-
-    // HACK: if its a 'nick' command, save it here
-    bool bIsNickCommand = !stricmp(szCommand, "nick");
-    if (!wasHandled && bIsNickCommand && szParameters && !bIsScriptedBind)
-    {
-        if (CCore::GetSingleton().IsValidNick(szParameters))
-        {
-            CVARS_SET("nick", std::string(szParameters));
-
-            if (!CCore::GetSingleton().IsConnected())
-            {
-                CCore::GetSingleton().GetConsole()->Printf("nick: You are now known as %s", szParameters);
-            }
-        }
-        else if (!CCore::GetSingleton().IsConnected())
-        {
-            CCore::GetSingleton().GetConsole()->Print("nick: Chosen nickname contains illegal characters");
-        }
-    }
-
-    // Try to execute the handler
-    if (m_pfnExecuteHandler)
-    {
-        bool bAllowScriptedBind = (!pEntry || pEntry->bAllowScriptedBind);
-        if (m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, wasHandled, bIsScriptedBind, bAllowScriptedBind))
-            return true;
-    }
-
-    if (wasHandled)
+    // Try external handler
+    if (ExecuteExternalHandler(command.c_str(), parameters.c_str(), bHandleRemotely, bIsScriptedBind))
         return true;
 
     // Unknown command
-    val = _("Unknown command or cvar: ") + szCommand;
-    if (!bIsScriptedBind && !bIsNickCommand && pEntry == nullptr)
-        CCore::GetSingleton().GetConsole()->Print(val.c_str());
+    if (!bIsScriptedBind)
+    {
+        std::string error = _("Unknown command or cvar: ") + command;
+        CCore::GetSingleton().GetConsole()->Print(error.c_str());
+    }
     return false;
+}
+
+bool CCommands::ParseCommand(const char* szCommand, const char* szParametersIn, bool bIsScriptedBind, std::string& outCommand, std::string& outParameters)
+{
+    outCommand = szCommand;
+    outParameters = szParametersIn ? szParametersIn : "";
+
+    // Handle chatboxsay command transformation
+    if (!bIsScriptedBind && !stricmp(szCommand, "chatboxsay"))
+    {
+        if (!szParametersIn || *szParametersIn != '/')
+            return false;
+
+        std::string buffer = szParametersIn + 1;            // Skip the '/'
+        size_t      spacePos = buffer.find(' ');
+
+        if (spacePos == std::string::npos)
+        {
+            outCommand = buffer;
+            outParameters = "";
+        }
+        else
+        {
+            outCommand = buffer.substr(0, spacePos);
+            outParameters = buffer.substr(spacePos + 1);
+        }
+
+        if (outCommand.empty())
+            return false;
+    }
+
+    return true;
+}
+
+bool CCommands::ExecuteBuiltInCommand(const char* szCommand, const char* szParameters, bool bIsScriptedBind)
+{
+    tagCOMMANDENTRY* pEntry = Get(szCommand);
+    if (!pEntry)
+        return false;
+
+    // Check if command is enabled and allowed
+    if (pEntry->bModCommand && !pEntry->bEnabled)
+        return false;
+
+    if (bIsScriptedBind && !pEntry->bAllowScriptedBind)
+        return false;
+
+    ExecuteHandler(pEntry->pfnCmdFunc, szParameters);
+    return true;
+}
+
+bool CCommands::ExecuteCVarCommand(const std::string& fullCommand, bool bIsScriptedBind)
+{
+    if (bIsScriptedBind)
+        return false;
+
+    size_t equalPos = fullCommand.find('=');
+
+    if (equalPos == std::string::npos)
+    {
+        return GetCVarValue(fullCommand);
+    }
+    else
+    {
+        return SetCVarValue(fullCommand, equalPos);
+    }
+}
+
+bool CCommands::GetCVarValue(const std::string& key)
+{
+    std::string trimmedKey = key;
+    TrimWhiteSpace(trimmedKey);
+
+    if (!CClientVariables::GetSingleton().Exists(trimmedKey))
+        return false;
+
+    std::string value;
+    CVARS_GET(trimmedKey, value);
+
+    std::stringstream ss;
+    ss << trimmedKey << " = " << value;
+    CCore::GetSingleton().GetConsole()->Print(ss.str().c_str());
+    return true;
+}
+
+bool CCommands::SetCVarValue(const std::string& fullCommand, size_t equalPos)
+{
+    std::string key = fullCommand.substr(0, equalPos);
+    std::string value = fullCommand.substr(equalPos + 1);
+
+    // Handle space before '='
+    size_t spaceEqualPos = fullCommand.find(" =");
+    if (spaceEqualPos != std::string::npos)
+    {
+        key = fullCommand.substr(0, spaceEqualPos);
+        value = fullCommand.substr(spaceEqualPos + 2);
+    }
+
+    TrimWhiteSpace(key);
+    TrimWhiteSpace(value);
+
+    if (!CClientVariables::GetSingleton().Exists(key))
+        return false;
+
+    CVARS_SET(key, value);
+    HandleSpecialCVars(key, value);
+
+    std::stringstream ss;
+    ss << key << " = " << value;
+    CCore::GetSingleton().GetConsole()->Print(ss.str().c_str());
+    return true;
+}
+
+void CCommands::HandleSpecialCVars(const std::string& key, const std::string& value)
+{
+    if (key == "fps_limit")
+    {
+        int fpsVal = 0;
+        CVARS_GET("fps_limit", fpsVal);
+        CCore::GetSingleton().GetFPSLimiter()->SetUserDefinedFPS(fpsVal);
+    }
+
+    if (key == "vsync")
+    {
+        bool vsyncVal = false;
+        CVARS_GET("vsync", vsyncVal);
+        if (vsyncVal)
+        {
+            // HACK: (pxd) Get refresh rate from Direct3D? Should this go elsewhere?
+            D3DDISPLAYMODE DisplayMode;
+            IDirect3D9*    pD3D9 = CProxyDirect3D9::StaticGetDirect3D();
+            if (pD3D9 && pD3D9->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &DisplayMode) == D3D_OK)            // Query current display mode
+            {
+                OutputDebugLine(SString("VSync enabled, setting fps_limit to display refresh rate %d Hz", DisplayMode.RefreshRate));
+                CCore::GetSingleton().GetFPSLimiter()->SetDisplayRefreshRate(DisplayMode.RefreshRate);
+            }
+            else
+            {
+                OutputDebugLine("VSync enabled, but failed to get display refresh rate, defaulting to 60 Hz");
+                CCore::GetSingleton().GetFPSLimiter()->SetDisplayRefreshRate(60);
+            }
+        }
+        else
+        {
+            OutputDebugLine("VSync disabled, removing fps_limit display refresh rate");
+            CCore::GetSingleton().GetFPSLimiter()->SetDisplayRefreshRate(0);
+        }
+    }
+}
+
+void CCommands::HandleNickCommand(const char* szCommand, const char* szParameters, bool bIsScriptedBind)
+{
+    if (stricmp(szCommand, "nick") != 0 || !szParameters || bIsScriptedBind)
+        return;
+
+    if (CCore::GetSingleton().IsValidNick(szParameters))
+    {
+        CVARS_SET("nick", std::string(szParameters));
+
+        if (!CCore::GetSingleton().IsConnected())
+        {
+            CCore::GetSingleton().GetConsole()->Printf("nick: You are now known as %s", szParameters);
+        }
+    }
+    else if (!CCore::GetSingleton().IsConnected())
+    {
+        CCore::GetSingleton().GetConsole()->Print("nick: Chosen nickname contains illegal characters");
+    }
+}
+
+bool CCommands::ExecuteExternalHandler(const char* szCommand, const char* szParameters, bool bHandleRemotely, bool bIsScriptedBind)
+{
+    if (!m_pfnExecuteHandler)
+        return false;
+
+    tagCOMMANDENTRY* pEntry = Get(szCommand);
+    bool             bAllowScriptedBind = (!pEntry || pEntry->bAllowScriptedBind);
+    bool             wasHandled = (pEntry != nullptr);
+
+    return m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, wasHandled, bIsScriptedBind, bAllowScriptedBind);
 }
 
 void CCommands::Delete(const char* szCommand)
 {
-    // Find the entry we're looking for
     list<COMMANDENTRY*>::iterator iter = m_CommandList.begin();
     while (iter != m_CommandList.end())
     {
-        // Check to see if this is the variable
         if (stricmp(szCommand, (*iter)->szCommandName) == 0)
         {
-            // It is, so remove it
             delete *iter;
             iter = m_CommandList.erase(iter);
         }
@@ -247,7 +307,6 @@ void CCommands::Delete(const char* szCommand)
 
 void CCommands::DeleteAll()
 {
-    // Delete all the commands
     list<COMMANDENTRY*>::iterator iter = m_CommandList.begin();
     for (; iter != m_CommandList.end(); iter++)
     {
@@ -255,17 +314,14 @@ void CCommands::DeleteAll()
     }
     m_CommandList.clear();
 
-    // Re-register our commands
     CCore::GetSingleton().RegisterCommands();
 }
 
 tagCOMMANDENTRY* CCommands::Get(const char* szCommand, bool bCheckIfMod, bool bModCommand)
 {
-    // Find the entry we're looking for
     list<COMMANDENTRY*>::iterator iter = m_CommandList.begin();
     for (; iter != m_CommandList.end(); iter++)
     {
-        // Check to see if this is the variable
         if (stricmp(szCommand, (*iter)->szCommandName) == 0)
         {
             if (!bCheckIfMod || (bModCommand == (*iter)->bModCommand))
@@ -275,7 +331,6 @@ tagCOMMANDENTRY* CCommands::Get(const char* szCommand, bool bCheckIfMod, bool bM
         }
     }
 
-    // Couldn't find it
     return NULL;
 }
 

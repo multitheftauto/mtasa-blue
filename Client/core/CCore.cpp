@@ -56,7 +56,7 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
     if (!StrCmpIA("enbseries\\enbhelper.dll", fileName))
     {
         std::error_code ec;
-        
+
         // Try to load enbhelper.dll from our custom launch directory first.
         const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
 
@@ -146,10 +146,6 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
-    // No initial fps limit
-    m_bDoneFrameRateLimit = false;
-    m_uiFrameRateLimit = 0;
-    m_uiServerFrameRateLimit = 0;
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
@@ -157,7 +153,9 @@ CCore::CCore()
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
     m_timeDiscordAppLastUpdate = 0;
-    m_CurrentRefreshRate = 60;
+
+    // Initialize FPS limiter
+    m_pFPSLimiter = new FPSLimiter::FPSLimiter();
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
@@ -179,6 +177,9 @@ CCore::~CCore()
 
     // Destroy tray icon
     delete m_pTrayIcon;
+
+    // Destroy FPS limiter
+    delete m_pFPSLimiter;
 
     // This will set the GTA volume to the GTA volume value in the settings,
     // and is not affected by the master volume setting.
@@ -1347,7 +1348,7 @@ void CCore::OnModUnload()
     m_pKeyBinds->RemoveAllControlFunctions();
 
     // Reset client script frame rate limit
-    m_uiClientScriptFrameRateLimit = 0;
+    GetFPSLimiter()->SetClientEnforcedFPS(FPSLimiter::FPS_LIMIT_UNLIMITED);
 
     // Clear web whitelist
     if (m_pWebCore)
@@ -1772,8 +1773,8 @@ void CCore::OnPostColorFilterRender()
 {
     if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
         return;
-    
-    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().EnteringMTARenderZone();
 
     CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
     CGraphics::GetSingleton().DrawLine3DPostFXQueue();
@@ -1831,261 +1832,16 @@ void CCore::ApplyCoreInitSettings()
 //
 void CCore::OnGameTimerUpdate()
 {
-    ApplyQueuedFrameRateLimit();
+    // NOTE: (pxd) We are handling the frame limiting updates
+    // earlier in the callpath (CModManager::DoPulsePreFrame, CModManager::DoPulsePostFrame)
 }
 
-//
-// Recalculate FPS limit to use
-//
-// Uses client rate from config
-// Uses client rate from script
-// Uses server rate from argument, or last time if not supplied
-//
-void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToConsole)
+void CCore::OnFPSLimitChange(uint32_t uiFPS)
 {
-    // Save rate from server if valid
-    if (uiServerFrameRateLimit != -1)
-        m_uiServerFrameRateLimit = uiServerFrameRateLimit;
+    // TODO: (pxd) Notify the mod manager maybe? If not remove this comment
 
-    // Start with value set by the server
-    m_uiFrameRateLimit = m_uiServerFrameRateLimit;
-
-    // Apply client config setting
-    uint uiClientConfigRate;
-    g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
-    if (uiClientConfigRate > 0)
-        uiClientConfigRate = std::max(45U, uiClientConfigRate);
-    // Lowest wins (Although zero is highest)
-    if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
-        m_uiFrameRateLimit = uiClientConfigRate;
-
-    // Apply client script setting
-    uint uiClientScriptRate = m_uiClientScriptFrameRateLimit;
-    // Lowest wins (Although zero is highest)
-    if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
-        m_uiFrameRateLimit = uiClientScriptRate;
-
-    if (!IsConnected())
-        m_uiFrameRateLimit = m_CurrentRefreshRate;
-
-    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
-    if (m_uiFrameRateLimit == 0)
-    {
-        m_bQueuedFrameRateValid = false;
-        GetGraphStats()->RemoveTimingPoint("Limiter");
-    }
-
-    // Print new limits to the console
-    if (bLogToConsole)
-    {
-        SString strStatus("Server FPS limit: %d", m_uiServerFrameRateLimit);
-        if (m_uiFrameRateLimit != m_uiServerFrameRateLimit)
-            strStatus += SString(" (Using %d)", m_uiFrameRateLimit);
-        CCore::GetSingleton().GetConsole()->Print(strStatus);
-    }
-}
-
-//
-// Change client rate as set by script
-//
-void CCore::SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit)
-{
-    m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
-    RecalculateFrameRateLimit(-1, false);
-}
-
-void CCore::SetCurrentRefreshRate(uint value)
-{
-    m_CurrentRefreshRate = value;
-    RecalculateFrameRateLimit(-1, false);
-}
-
-//
-// Make sure the frame rate limit has been applied since the last call
-//
-void CCore::EnsureFrameRateLimitApplied()
-{
-    // NOTE(pxd): Do NOT call ApplyFrameRateLimit() from the Present path
-    // Forcing it here skews frame pacing and causes frames to complete too early/late
-    //
-    // Correct approach:
-    //   - Queue the desired rate
-    //   - Let the timer hook (OnGameTimerUpdate) apply it
-    //
-    // Caveat: The Main Menu does not run through the timer hook,
-    // so frame limiting there is ineffective. Might require a separate path
-    //
-    // ApplyFrameRateLimit(); // intentionally not called here
-
-    // Publish the target to the timer hook
-    if (m_uiFrameRateLimit > 0 && !m_bQueuedFrameRateValid)
-    {
-        m_uiQueuedFrameRate = m_uiFrameRateLimit;
-        m_bQueuedFrameRateValid = true;
-    }
-}
-
-//
-// Do FPS limiting
-//
-// This is called once a frame even if minimized
-//
-void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
-{
-    TIMING_CHECKPOINT("-CallIdle1");
-    ms_TimingCheckpoints.EndTimingCheckpoints();
-
-    // NOTE(pxd): This function no longer directly enforces frame limiting.
-    // It only *queues* the target rate, which is later enforced by ApplyQueuedFrameRateLimit().
-    //
-    // Reason:
-    //   - Frame pacing needs to happen in a consistent place (OnGameTimerUpdate),
-    //     not scattered across code paths.
-    //
-    // Old behavior (calling ApplyQueuedFrameRateLimit() immediately) was removed
-    // to avoid double-enforcing or misaligned frame pacing.
-
-    m_bDoneFrameRateLimit = true;
-    uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
-    if (uiUseRate > 0)
-    {
-        m_uiQueuedFrameRate = uiUseRate;
-        m_bQueuedFrameRateValid = true;
-    }
-
-    DoReliablePulse();
-
-    TIMING_GRAPH("FrameEnd");
-    TIMING_GRAPH("");
-}
-
-//
-// Frame rate limit (wait) is done here.
-//
-void CCore::ApplyQueuedFrameRateLimit()
-{
-    // NOTE(pxd): This is the *only* place where frame limiting is enforced.
-    // Called from OnGameTimerUpdate, after a frame is produced.
-    //
-    // Responsibilities:
-    //   - Sleep/yield/spin until the correct frame boundary is reached
-    //   - Adaptively calibrate OS sleep/yield overhead
-    //   - Advance target timestamp for next frame
-    //
-    // Key idea: Always aim for precise pacing without wasting CPU cycles.
-
-    if (!m_bQueuedFrameRateValid)
-        return;
-    m_bQueuedFrameRateValid = false;
-
-    static LARGE_INTEGER s_frequency = {0};
-    static LARGE_INTEGER s_nextFrameTime = {0};
-    static bool          s_initialized = false;
-
-    // Adaptive timing calibration
-    static double s_sleepOverhead = 0.5;            // Start conservative
-    static double s_yieldOverhead = 0.1;            // Yield overhead estimate
-    static int    s_calibrationCount = 0;
-    static double s_recentOverheads[10] = {0};  // Rolling average
-
-    // Initialize high-precision timer
-    if (!s_initialized)
-    {
-        QueryPerformanceFrequency(&s_frequency);
-        LARGE_INTEGER now;
-        QueryPerformanceCounter(&now);
-
-        LONGLONG targetInterval = s_frequency.QuadPart / m_uiQueuedFrameRate;
-        s_nextFrameTime.QuadPart = now.QuadPart + targetInterval;
-        s_initialized = true;
-        return;
-    }
-
-    LARGE_INTEGER now, sleepStart;
-    QueryPerformanceCounter(&now);
-
-    LONGLONG remaining_ticks = s_nextFrameTime.QuadPart - now.QuadPart;
-
-    if (remaining_ticks > 0)
-    {
-        double remaining_ms = (double)remaining_ticks * 1000.0 / s_frequency.QuadPart;
-
-        // Adaptive sleep with learned overhead compensation
-        if (remaining_ms > s_sleepOverhead + 0.5)
-        {
-            QueryPerformanceCounter(&sleepStart);
-
-            // Sleep for predicted safe duration
-            DWORD sleepTime = static_cast<DWORD>(remaining_ms - s_sleepOverhead);
-            Sleep(sleepTime);
-
-            // Measure actual sleep overhead for calibration
-            LARGE_INTEGER sleepEnd;
-            QueryPerformanceCounter(&sleepEnd);
-            double actualSleep = (double)(sleepEnd.QuadPart - sleepStart.QuadPart) * 1000.0 / s_frequency.QuadPart;
-            double overhead = actualSleep - sleepTime;
-
-            // Update overhead estimate (rolling average)
-            s_recentOverheads[s_calibrationCount % 10] = overhead;
-            s_calibrationCount++;
-
-            if (s_calibrationCount >= 10)
-            {
-                double avgOverhead = 0;
-                for (int i = 0; i < 10; i++)
-                    avgOverhead += s_recentOverheads[i];
-                s_sleepOverhead = avgOverhead / 10.0;
-
-                // Clamp overhead to reasonable bounds
-                s_sleepOverhead = max(0.1, min(2.0, s_sleepOverhead));
-            }
-        }
-        // Smart yield for medium waits
-        else if (remaining_ms > s_yieldOverhead + 0.05)
-        {
-            Sleep(0);            // Yield thread
-        }
-
-        // Minimal spinlock - only for final precision
-        QueryPerformanceCounter(&now);
-        if (now.QuadPart < s_nextFrameTime.QuadPart)
-        {
-            // Use CPU pause hints and check less frequently if wait is longer
-            LONGLONG finalRemaining = s_nextFrameTime.QuadPart - now.QuadPart;
-            double   finalMs = (double)finalRemaining * 1000.0 / s_frequency.QuadPart;
-
-            if (finalMs > 0.02)
-            {            // >20μs remaining
-                // Slower polling for longer waits to reduce CPU usage
-                do
-                {
-                    for (int i = 0; i < 10; i++)
-                        _mm_pause();            // Batch pauses
-                    QueryPerformanceCounter(&now);
-                } while (now.QuadPart < s_nextFrameTime.QuadPart);
-            }
-            else
-            {
-                // Ultra-tight loop for final microseconds
-                do
-                {
-                    _mm_pause();
-                    QueryPerformanceCounter(&now);
-                } while (now.QuadPart < s_nextFrameTime.QuadPart);
-            }
-        }
-    }
-
-    // Calculate next frame target
-    LONGLONG targetInterval = s_frequency.QuadPart / m_uiQueuedFrameRate;
-    s_nextFrameTime.QuadPart += targetInterval;
-
-    // Handle frame drops or rate changes
-    QueryPerformanceCounter(&now);
-    if (s_nextFrameTime.QuadPart <= now.QuadPart)
-    {
-        s_nextFrameTime.QuadPart = now.QuadPart + targetInterval;
-    }
+    // Update core's webcore FPS limit
+    GetWebCore()->OnFPSLimitChange(uiFPS);
 }
 
 //
@@ -2140,7 +1896,7 @@ void CCore::OnDeviceRestore()
 void CCore::OnPreFxRender()
 {
     if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        return;    
+        return;
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
@@ -2155,7 +1911,7 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    CGraphics::GetSingleton().EnteringMTARenderZone();    
+    CGraphics::GetSingleton().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
@@ -2516,7 +2272,8 @@ SString CCore::GetBlueCopyrightString()
 
 // Set streaming memory size override [See `engineStreamingSetMemorySize`]
 // Use `0` to turn it off, and thus restore the value to the `cvar` setting
-void CCore::SetCustomStreamingMemory(size_t sizeBytes) {
+void CCore::SetCustomStreamingMemory(size_t sizeBytes)
+{
     // NOTE: The override is applied to the game in `CClientGame::DoPulsePostFrame`
     // There's no specific reason we couldn't do it here, but we wont
     m_CustomStreamingMemoryLimitBytes = sizeBytes;

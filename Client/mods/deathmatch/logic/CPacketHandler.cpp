@@ -1137,7 +1137,7 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
 
         // He's no longer dead
         pPlayer->SetDeadOnNetwork(false);
-        
+
         // Reset death processing flag for new life
         if (pPlayer->IsLocalPlayer()) {
             g_pClientGame->ResetDeathProcessingFlag();
@@ -1221,7 +1221,7 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
             }
             // Update our sync-time context
             pPed->SetSyncTimeContext(ucTimeContext);
-            
+
             // Clear stale damage data if this is the local player
             // This prevents DoWastedCheck from firing with stale data when server processes death
             if (pPed->IsLocalPlayer()) {
@@ -2362,9 +2362,13 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Apply world sea level (to world sea level water only)
     g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fSeaLevel, nullptr, false, true, false);
 
-    unsigned short usFPSLimit = 36;
-    bitStream.ReadCompressed(usFPSLimit);
-    g_pCore->RecalculateFrameRateLimit(usFPSLimit);
+    auto readAndSetFPSLimit = [&]()
+    {
+        unsigned short usFPSLimit = 36; // Default to 36
+        bitStream.ReadCompressed(usFPSLimit); // See also: Client\mods\deathmatch\logic\rpc\CWorldRPCs.cpp:216
+        g_pCore->GetFPSLimiter()->SetServerEnforcedFPS(usFPSLimit);
+    };
+    readAndSetFPSLimit();
 
     // Read out the garage door states
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();
@@ -3266,7 +3270,7 @@ retry:
                     // Read out the vehicle model
                     std::uint16_t usModel = 0xFFFF;
                     bitStream.Read(usModel);
-                    
+
                     if (!CClientVehicleManager::IsValidModel(usModel))
                     {
                         RaiseEntityAddError(39);

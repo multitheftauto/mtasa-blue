@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+// #include "FPSLimiter.h"
 
 template <>
 CClientVariables* CSingleton<CClientVariables>::m_pSingleton = NULL;
@@ -234,7 +235,20 @@ void CClientVariables::ValidateValues()
 
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
-    ClampValue("fps_limit", 0, std::numeric_limits<short>::max());
+
+    // fps_limit is either 0 (no limit) or valid clamp range FPS_LIMIT_MIN, FPS_LIMIT_MAX so this won't work:
+    // ClampValue("fps_limit", 0, std::numeric_limits<short>::max());
+    // So do it with our specialized FPS validation function
+    {
+        // Re-validate fps_limit cvar to ensure it's within valid range
+        // This is to catch users manually editing the config file with invalid values
+        // We don't clamp it here as we want to allow 0 (unlimited)
+        uint uiTemp;
+        CVARS_GET("fps_limit", uiTemp);
+        uiTemp = FPSLimiter::ValidateFPS(uiTemp);
+        CVARS_SET("fps_limit", uiTemp);
+    }
+
     ClampValue("chat_font", 0, 3);
     ClampValue("chat_lines", 3, 62);
     ClampValue("chat_color", CColor(0, 0, 0, 0), CColor(255, 255, 255, 255));
@@ -261,9 +275,10 @@ void CClientVariables::ValidateValues()
 
 void CClientVariables::LoadDefaults()
 {
-    #define DEFAULT(__x,__y)    if(!Exists(__x)) \
-                                Set(__x,__y)
-    #define _S(__x)             std::string(__x)
+#define DEFAULT(__x, __y) \
+    if (!Exists(__x)) \
+    Set(__x, __y)
+#define _S(__x) std::string(__x)
 
     if (!Exists("nick"))
     {
@@ -279,6 +294,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("console_size", CVector2D(200, 200));                        // console size
     DEFAULT("serverbrowser_size", CVector2D(720.0f, 495.0f));            // serverbrowser size
     DEFAULT("fps_limit", 100);                                           // frame limiter
+    DEFAULT("vsync", true);                                              // vsync
     DEFAULT("chat_font", 2);                                             // chatbox font type
     DEFAULT("chat_lines", 10);                                           // chatbox lines
     DEFAULT("chat_color", CColor(0, 0, 0, 0));                           // chatbox background color
@@ -379,4 +395,11 @@ void CClientVariables::LoadDefaults()
 #if 0
     DEFAULT ( "streaming_memory",           50 );                           // Streaming memory
 #endif
+
+#undef DEFAULT
+#undef _S
+
+    ValidateValues();            // Paranoid validation of all cvar values
+
+    m_bLoaded = true;            // We have loaded at least the defaults
 }

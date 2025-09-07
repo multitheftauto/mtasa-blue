@@ -479,6 +479,14 @@ void CWebCore::OnPostScreenshot()
     }
 }
 
+void CWebCore::OnFPSLimitChange(int iFPS)
+{
+    for (auto& pWebView : m_WebViews)
+    {
+        pWebView->GetCefBrowser()->GetHost()->SetWindowlessFrameRate(iFPS);
+    }
+}
+
 void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (!m_pFocusedWebView ||

@@ -213,8 +213,8 @@ void CWorldRPCs::ResetMapInfo(NetBitStreamInterface& bitStream)
 void CWorldRPCs::SetFPSLimit(NetBitStreamInterface& bitStream)
 {
     short sFPSLimit;
-    bitStream.Read(sFPSLimit);
-    g_pCore->RecalculateFrameRateLimit(sFPSLimit);
+    bitStream.Read(sFPSLimit); // See also: Client\mods\deathmatch\logic\CPacketHandler.cpp:2368
+    CStaticFunctionDefinitions::SetServerFPSLimit(sFPSLimit);
 }
 
 void CWorldRPCs::SetGarageOpen(NetBitStreamInterface& bitStream)
