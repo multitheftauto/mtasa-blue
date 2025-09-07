@@ -399,7 +399,4 @@ void CClientVariables::LoadDefaults()
 #undef DEFAULT
 #undef _S
 
-    ValidateValues();            // Paranoid validation of all cvar values
-
-    m_bLoaded = true;            // We have loaded at least the defaults
 }
