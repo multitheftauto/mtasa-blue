@@ -314,7 +314,7 @@ void SwitchContext(CPed* thePed)
 
                     // Disable mouse look if they are not in a fight task and not aiming (strafing)
                     // Fix GitHub Issue #395
-                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && thePed->GetPedIntelligence()->GetFightTask() && data->m_pad.NewState.RightShoulder1 != 0)
+                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && data->m_pad.NewState.RightShoulder1 != 0 && thePed->GetPedIntelligence()->GetFightTask())
                         bDisableMouseLook = false;
 
                     // Disable mouse look if they're underwater (Ped vertical rotation when diving)
