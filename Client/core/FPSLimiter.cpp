@@ -153,7 +153,10 @@ namespace FPSLimiter
             minFPS = FPS_LIMIT_UNLIMITED;
 
         m_data.activeFPSTarget = minFPS;
-        OutputDebugLine(std::string("FPSLimiter: Calculated active FPS limit: %d", m_data.activeFPSTarget));
+
+        std::stringstream ss;
+        ss << "FPSLimiter: Calculated active FPS limit: " << m_data.activeFPSTarget;
+        OutputDebugLine(ss.str().c_str());
 
         // If limit changed, reset frame timing
         if (oldLimit != m_data.activeFPSTarget)
@@ -165,20 +168,19 @@ namespace FPSLimiter
             OnFPSLimitChange();
         }
 
-        std::stringstream ss;
+        ss.clear();
         ss << "FPSLimiter: Calculated current FPS limit : " << m_data.activeFPSTarget
            << " (Server: " << m_data.serverEnforcedFPS
            << ", Client: " << m_data.clientEnforcedFPS
            << ", User: " << m_data.userDefinedFPS
            << ", Display: " << m_data.displayRefreshRate
            << ") Enforcer: " << EnumToString(GetEnforcer());
-        std::string msg = ss.str();
 
         auto* pConsole = CCore::GetSingleton().GetConsole();
         if (pConsole)
-            CCore::GetSingleton().GetConsole()->Print(msg);
+            CCore::GetSingleton().GetConsole()->Print(ss.str().c_str());
 
-        OutputDebugLine(msg);
+        OutputDebugLine(ss.str().c_str());
     }
 
     void FPSLimiter::SetFrameRateThrottle()
@@ -260,7 +262,7 @@ namespace FPSLimiter
                 HMODULE ntdll = GetModuleHandleA("ntdll.dll");
                 if (ntdll)
                 {
-                    NtSetTimerResolution setRes = static_cast<NtSetTimerResolution>(GetProcAddress(ntdll, "NtSetTimerResolution"));
+                    NtSetTimerResolution setRes = reinterpret_cast<NtSetTimerResolution>(GetProcAddress(ntdll, "NtSetTimerResolution"));
                     if (setRes)
                     {
                         ULONG actualRes;
