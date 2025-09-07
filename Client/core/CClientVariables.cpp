@@ -236,13 +236,7 @@ void CClientVariables::ValidateValues()
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
 
-    // fps_limit is either 0 (no limit) or valid clamp range FPS_LIMIT_MIN, FPS_LIMIT_MAX so this won't work:
-    // ClampValue("fps_limit", 0, std::numeric_limits<short>::max());
-    // So do it with our specialized FPS validation function
-    {
-        // Re-validate fps_limit cvar to ensure it's within valid range
-        // This is to catch users manually editing the config file with invalid values
-        // We don't clamp it here as we want to allow 0 (unlimited)
+    { // Special case, 0 or clamped range. Provided by ValidateFPS.
         uint uiTemp;
         CVARS_GET("fps_limit", uiTemp);
         uiTemp = FPSLimiter::ValidateFPS(uiTemp);

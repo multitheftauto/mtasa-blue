@@ -17,7 +17,8 @@
 namespace FPSLimiter
 {
 
-    FPSLimiter::FPSLimiter(uint32_t initialPreferredFPS) : m_data{0, 0, ValidateFPS(initialPreferredFPS), ValidateFPS(initialPreferredFPS), 0, 0, false, false}
+    FPSLimiter::FPSLimiter(std::uint32_t initialPreferredFPS)
+        : m_data{0, 0, ValidateFPS(initialPreferredFPS), ValidateFPS(initialPreferredFPS), 0, 0, false, false}
     {
         // Initialize timing
         QueryPerformanceFrequency(&m_frequency);
@@ -52,7 +53,7 @@ namespace FPSLimiter
         CalculateCurrentFPSLimit();
     }
 
-    uint32_t FPSLimiter::GetFPSTarget() const noexcept
+    std::uint32_t FPSLimiter::GetFPSTarget() const noexcept
     {
         return m_data.activeFPSTarget;
     }
@@ -64,8 +65,8 @@ namespace FPSLimiter
             return EnforcerType::None;
 
         // Find which source provided the lowest FPS (the active target)
-        uint32_t     minFPS = std::numeric_limits<uint32_t>::max();            // Set to max for comparison
-        EnforcerType enforcer = EnforcerType::None;
+        std::uint32_t minFPS = std::numeric_limits<std::uint32_t>::max();            // Set to max for comparison
+        EnforcerType  enforcer = EnforcerType::None;
 
         if (m_data.serverEnforcedFPS > FPS_LIMIT_MIN && m_data.serverEnforcedFPS < minFPS)
         {
@@ -96,25 +97,25 @@ namespace FPSLimiter
         return EnforcerType::None;
     }
 
-    void FPSLimiter::SetServerEnforcedFPS(uint32_t frameRateLimit)
+    void FPSLimiter::SetServerEnforcedFPS(std::uint32_t frameRateLimit)
     {
         m_data.serverEnforcedFPS = ValidateFPS(frameRateLimit);
         CalculateCurrentFPSLimit();
     }
 
-    void FPSLimiter::SetClientEnforcedFPS(uint32_t frameRateLimit)
+    void FPSLimiter::SetClientEnforcedFPS(std::uint32_t frameRateLimit)
     {
         m_data.clientEnforcedFPS = ValidateFPS(frameRateLimit);
         CalculateCurrentFPSLimit();
     }
 
-    void FPSLimiter::SetUserDefinedFPS(uint32_t frameRateLimit)
+    void FPSLimiter::SetUserDefinedFPS(std::uint32_t frameRateLimit)
     {
         m_data.userDefinedFPS = ValidateFPS(frameRateLimit);
         CalculateCurrentFPSLimit();
     }
 
-    void FPSLimiter::SetDisplayRefreshRate(uint32_t refreshRate)
+    void FPSLimiter::SetDisplayRefreshRate(std::uint32_t refreshRate)
     {
         m_data.displayRefreshRate = ValidateFPS(refreshRate);
         CalculateCurrentFPSLimit();
@@ -124,33 +125,11 @@ namespace FPSLimiter
 
 #pragma region Internal
 
-    SString EnforcerTypeToString(EnforcerType enforcer)
-    {
-        switch (enforcer)
-        {
-            case EnforcerType::None:
-                return "None";
-            case EnforcerType::RefreshRate:
-                return "RefreshRate";
-            case EnforcerType::UserDefined:
-                return "UserDefined";
-            case EnforcerType::Client:
-                return "Client";
-            case EnforcerType::Server:
-                return "Server";
-            default:
-                return "Unknown";
-        }
-    }
-
     // Priority: Server > Client > User > None
     void FPSLimiter::CalculateCurrentFPSLimit()
     {
         OutputDebugLine("FPSLimiter: Calculating current FPS limit...");
-        uint32_t oldLimit = m_data.activeFPSTarget;
-
-        EnforcerType oldEnforcer = GetEnforcer();
-        EnforcerType newEnforcer = oldEnforcer;
+        std::uint32_t oldLimit = m_data.activeFPSTarget;
 
         if (m_data.hasPendingLimit)
         {
@@ -159,7 +138,7 @@ namespace FPSLimiter
         }
 
         // Find the minimum FPS among all enforced limits (excluding unlimited and below minimum)
-        uint32_t minFPS = std::numeric_limits<uint32_t>::max();
+        std::uint32_t minFPS = std::numeric_limits<std::uint32_t>::max();
 
         if (m_data.serverEnforcedFPS > FPS_LIMIT_MIN && m_data.serverEnforcedFPS < minFPS)
             minFPS = m_data.serverEnforcedFPS;
@@ -170,13 +149,11 @@ namespace FPSLimiter
         if (m_data.displayRefreshRate > FPS_LIMIT_MIN && m_data.displayRefreshRate < minFPS)
             minFPS = m_data.displayRefreshRate;
 
-        if (minFPS == std::numeric_limits<uint32_t>::max())
+        if (minFPS == std::numeric_limits<std::uint32_t>::max())
             minFPS = FPS_LIMIT_UNLIMITED;
 
         m_data.activeFPSTarget = minFPS;
-        OutputDebugLine(SString("FPSLimiter: Calculated active FPS limit: %d", m_data.activeFPSTarget));
-
-        newEnforcer = GetEnforcer();
+        OutputDebugLine(std::string("FPSLimiter: Calculated active FPS limit: %d", m_data.activeFPSTarget));
 
         // If limit changed, reset frame timing
         if (oldLimit != m_data.activeFPSTarget)
@@ -188,12 +165,9 @@ namespace FPSLimiter
             OnFPSLimitChange();
         }
 
-        SString oldEnforcerStr = EnforcerTypeToString(oldEnforcer);
-
-        // Print detailed info to console about the change
-        SString msg("FPSLimiter: Calculated current FPS limit : %d (Server: %d, Client: %d, User: %d, Display: %d) Enforcer: %s", m_data.activeFPSTarget,
-                    m_data.serverEnforcedFPS, m_data.clientEnforcedFPS, m_data.userDefinedFPS, m_data.displayRefreshRate,
-                    EnforcerTypeToString(newEnforcer).c_str());
+        std::string  msg("FPSLimiter: Calculated current FPS limit : %d (Server: %d, Client: %d, User: %d, Display: %d) Enforcer: %s", m_data.activeFPSTarget,
+                         m_data.serverEnforcedFPS, m_data.clientEnforcedFPS, m_data.userDefinedFPS, m_data.displayRefreshRate,
+                         EnumToString(GetEnforcer()).c_str());
 
         auto* pConsole = CCore::GetSingleton().GetConsole();
         if (pConsole)
@@ -205,12 +179,7 @@ namespace FPSLimiter
     void FPSLimiter::SetFrameRateThrottle()
     {
         TIMING_GRAPH("LimiterStart");
-        // OutputDebugLine("FPSLimiter: +SetFrameRateThrottle");
-        auto defer = [&]()
-        {
-            // OutputDebugLine("FPSLimiter: -SetFrameRateThrottle");
-            TIMING_GRAPH("LimiterEnd");
-        };
+        auto defer = [&]() { TIMING_GRAPH("LimiterEnd"); };
 
         if (m_data.activeFPSTarget == FPS_LIMIT_UNLIMITED)
         {
@@ -224,22 +193,21 @@ namespace FPSLimiter
 
         m_data.appliedThisFrame = true;
 
-        // Use RDTSC for higher precision timing
-        uint64_t currentTSC = __rdtsc();
+        std::uint64_t currentTSC = __rdtsc();
 
         // Initialize TSC frequency on first use
         static double tscFrequency = 0.0;
         if (tscFrequency == 0.0)
         {
             LARGE_INTEGER start, end;
-            uint64_t      tscStart = __rdtsc();
+            std::uint64_t tscStart = __rdtsc();
             QueryPerformanceCounter(&start);
             Sleep(10);            // Short calibration period
             QueryPerformanceCounter(&end);
-            uint64_t tscEnd = __rdtsc();
+            std::uint64_t tscEnd = __rdtsc();
 
-            double qpcTicks = (double)(end.QuadPart - start.QuadPart);
-            double tscTicks = (double)(tscEnd - tscStart);
+            double qpcTicks = static_cast<double>(end.QuadPart - start.QuadPart);
+            double tscTicks = static_cast<double>(tscEnd - tscStart);
             tscFrequency = (tscTicks / qpcTicks) * m_frequency.QuadPart;
         }
 
@@ -247,18 +215,15 @@ namespace FPSLimiter
         const double targetFrameTime = tscFrequency / m_data.activeFPSTarget;
 
         // Calculate elapsed time since last frame
-        double elapsedTicks = (double)(currentTSC - m_lastFrameTSC);
+        double elapsedTicks = static_cast<double>(currentTSC - m_lastFrameTSC);
         double elapsedMs = (elapsedTicks * 1000.0) / tscFrequency;
         double targetFrameTimeMs = (targetFrameTime * 1000.0) / tscFrequency;
 
         // RDTSC spin wait - reusable for all spin scenarios
-        auto rdtscSpinWait = [&](uint64_t targetTSC) -> uint64_t // , const char* context) -> uint64_t
+        auto rdtscSpinWait = [&](std::uint64_t targetTSC) -> std::uint64_t
         {
-            uint64_t lastMeasuredTSC = __rdtsc();
-            uint64_t remaining = targetTSC - lastMeasuredTSC;
-            // OutputDebugLine(SString("FPSLimiter: Starting %s RDTSC spin wait, remaining %llu TSC (%.2f ms)", context, remaining,
-            //                       (double)remaining * 1000.0 / tscFrequency));
-            // Adaptive polling based on remaining time
+            std::uint64_t lastMeasuredTSC = __rdtsc();
+            std::uint64_t remaining = targetTSC - lastMeasuredTSC;
             if (remaining > 10000)            // > ~3us at 3GHz
             {
                 // Long wait: check every ~1000 cycles
@@ -277,8 +242,6 @@ namespace FPSLimiter
                 lastMeasuredTSC = __rdtsc();
             } while (lastMeasuredTSC < targetTSC);
 
-            // OutputDebugLine(SString("FPSLimiter: Finished %s RDTSC spin at %llu TSC, expected %llu TSC, overshoot %lld TSC", context, lastMeasuredTSC,
-            //                       targetTSC, (lastMeasuredTSC - targetTSC)));
             return lastMeasuredTSC;
         };
 
@@ -292,7 +255,7 @@ namespace FPSLimiter
                 HMODULE ntdll = GetModuleHandleA("ntdll.dll");
                 if (ntdll)
                 {
-                    NtSetTimerResolution setRes = (NtSetTimerResolution)GetProcAddress(ntdll, "NtSetTimerResolution");
+                    NtSetTimerResolution setRes = static_cast<NtSetTimerResolution>(GetProcAddress(ntdll, "NtSetTimerResolution"));
                     if (setRes)
                     {
                         ULONG actualRes;
@@ -303,7 +266,7 @@ namespace FPSLimiter
             }
         };
 
-        uint64_t frameEndTSC = currentTSC;
+        std::uint64_t frameEndTSC = currentTSC;
 
         // If we need to wait
         if (elapsedTicks < targetFrameTime)
@@ -312,7 +275,7 @@ namespace FPSLimiter
             double waitTimeMs = (waitTicks * 1000.0) / tscFrequency;
 
             // Target TSC is ideal frame end time (no drift accumulation)
-            uint64_t targetTSC = m_lastFrameTSC + (uint64_t)targetFrameTime;
+            std::uint64_t targetTSC = m_lastFrameTSC + static_cast<std::uint64_t>(targetFrameTime);
 
             if (waitTimeMs > 2.0)
             {
@@ -330,67 +293,35 @@ namespace FPSLimiter
                     if (timerWaitMs > 0.5)
                     {
                         LARGE_INTEGER dueTime;
-                        dueTime.QuadPart = -1LL * (LONGLONG)(timerWaitMs * 10000.0);
-
-                        // OutputDebugLine(SString("FPSLimiter: Precision wait for %.2f ms (timer: %.2f ms)", waitTimeMs, timerWaitMs));
+                        dueTime.QuadPart = -1LL * static_cast<LONGLONG>(timerWaitMs * 10000.0);
 
                         if (SetWaitableTimer(m_hTimer, &dueTime, 0, nullptr, nullptr, FALSE))
                         {
                             WaitForSingleObject(m_hTimer, INFINITE);
-                            frameEndTSC = rdtscSpinWait(targetTSC);//, "precision finish");
-
-                            // uint64_t postTimerTSC = __rdtsc();
-                            // int64_t  overshoot = (int64_t)(postTimerTSC - targetTSC);
-                            // double   overshootMs = (double)overshoot * 1000.0 / tscFrequency;
-                            // OutputDebugLine(SString("FPSLimiter: Finished precision wait finished at %llu TSC, expected %llu TSC, overshoot %lld TSC (%.2f ms)",
-                            //                        postTimerTSC, targetTSC, overshoot, overshootMs));
+                            frameEndTSC = rdtscSpinWait(targetTSC);
                         }
                         else
                         {
-                            // OutputDebugLine("FPSLimiter: SetWaitableTimer failed, falling back to RDTSC spin");
-                            frameEndTSC = rdtscSpinWait(targetTSC);//, "fallback");
+                            frameEndTSC = rdtscSpinWait(targetTSC);
                         }
                     }
                     else
                     {
-                        frameEndTSC = rdtscSpinWait(targetTSC);//, "short timer");
+                        frameEndTSC = rdtscSpinWait(targetTSC);
                     }
                 }
             }
             else if (waitTimeMs > 0.05)
             {
-                frameEndTSC = rdtscSpinWait(targetTSC);//, "short");
+                frameEndTSC = rdtscSpinWait(targetTSC);
             }
         }
 
-        // Calculate final frame timing for logging
-        // double actualFrameTimeTicks = (double)(frameEndTSC - currentTSC);
-        // double actualFrameTimeMs = (actualFrameTimeTicks * 1000.0) / tscFrequency;
-        // double actualFPS = actualFrameTimeTicks > 0 ? tscFrequency / actualFrameTimeTicks : 0;
-
-        // OutputDebugLine(SString("FPSLimiter: Target: %.1f FPS (%.2f ms), Elapsed: %.2f ms, After wait: %.2f ms (%.1f FPS)", (double)m_data.activeFPSTarget,
-        //                        targetFrameTimeMs, elapsedMs, actualFrameTimeMs, actualFPS));
-
-        // Advance last-frame TSC by the ideal frame interval to avoid accumulating drift.
-        // If we're already late, anchor to actual end time so we don't schedule in the past.
+        // Adjust last frame TSC to maintain consistent frame pacing
         if (elapsedTicks >= targetFrameTime)
             m_lastFrameTSC = frameEndTSC;
         else
-            m_lastFrameTSC += (uint64_t)targetFrameTime;
-
-        // Log if we're significantly off target
-        // double frameDelta = actualFrameTimeMs - targetFrameTimeMs;
-        // if (abs(frameDelta) > 0.5)            // More than 0.5ms off
-        // {
-        //     if (frameDelta > 0)
-        //     {
-        //         // OutputDebugLine(SString("FPSLimiter: Overshot target by %.2f ms", frameDelta));
-        //     }
-        //     else
-        //     {
-        //         // OutputDebugLine(SString("FPSLimiter: Undershot target by %.2f ms", -frameDelta));
-        //     }
-        // }
+            m_lastFrameTSC += static_cast<std::uint64_t>(targetFrameTime);
 
         return defer();
     }
@@ -420,21 +351,21 @@ namespace FPSLimiter
 
 };            // namespace FPSLimiter
 
-uint32_t FPSLimiter::ValidateFPS(uint32_t uiFPS)
+std::uint32_t FPSLimiter::ValidateFPS(std::uint32_t uiFPS)
 {
     if (uiFPS == FPS_LIMIT_UNLIMITED)
         return FPS_LIMIT_UNLIMITED;
     if (uiFPS < FPS_LIMIT_MIN)
     {
 #if MTA_DEBUG
-        // OutputDebugLine(SString("FPSLimiter: FPS %d is below minimum %d, clamping to %d", uiFPS, FPS_LIMIT_MIN, FPS_LIMIT_MIN));
+        // OutputDebugLine(std::string("FPSLimiter: FPS %d is below minimum %d, clamping to %d", uiFPS, FPS_LIMIT_MIN, FPS_LIMIT_MIN));
 #endif
         return FPS_LIMIT_MIN;
     }
     if (uiFPS > FPS_LIMIT_MAX)
     {
 #if MTA_DEBUG
-        // OutputDebugLine(SString("FPSLimiter: FPS %d is above maximum %d, clamping to %d", uiFPS, FPS_LIMIT_MAX, FPS_LIMIT_MAX));
+        // OutputDebugLine(std::string("FPSLimiter: FPS %d is above maximum %d, clamping to %d", uiFPS, FPS_LIMIT_MAX, FPS_LIMIT_MAX));
 #endif
         return FPS_LIMIT_MAX;
     }

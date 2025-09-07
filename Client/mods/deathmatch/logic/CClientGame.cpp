@@ -1026,7 +1026,7 @@ void CClientGame::DoPulsePostFrame()
 
                     if (zoneName == "Unknown")
                     {
-                        zoneName = _("Area 51");            // Easter egg!
+                        zoneName = _("Area 51");
                     }
 
                     auto taskManager = pLocalPlayer->GetTaskManager();
@@ -4597,7 +4597,7 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
         SetExplosionDamageData();
         return; // Local player death is handled by DoWastedCheck
     }
-    
+
     // Not required for remote players. Local player is handled in DoPulses->DoWastedCheck
     if (IS_PLAYER(pKilledPed))
         return;
@@ -6506,16 +6506,16 @@ bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
     // best approach is to avoid spamming the event with the barely notable sounds (without a source).
     // Warning: Canceling sounds emitted by an audio entity (like vehicles do) will cause massive spam
     CClientEntity* pEntity = nullptr;
-    
+
     if (event.pGameEntity)
     {
         CPools* pPools = g_pGame->GetPools();
         pEntity = pPools->GetClientEntity((DWORD*)event.pGameEntity);
     }
-    
+
     if (!pEntity)
         pEntity = GetRootEntity();
-    
+
     if (pEntity)
     {
         CLuaArguments Arguments;
@@ -7191,7 +7191,7 @@ std::uint8_t CClientGame::TryGetCurrentWeapon(CClientPlayer* player)
 {
     if (!player)
         return WEAPONTYPE_UNARMED;
-        
+
     eWeaponType weaponType = player->GetCurrentWeaponType();
     return (weaponType != WEAPONTYPE_INVALID) ? static_cast<std::uint8_t>(weaponType) : WEAPONTYPE_UNARMED;
 }

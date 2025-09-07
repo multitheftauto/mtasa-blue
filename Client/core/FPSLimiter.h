@@ -19,7 +19,7 @@ namespace FPSLimiter
     class FPSLimiter : public FPSLimiterInterface
     {
     public:
-        FPSLimiter(uint32_t initialPreferredFPS = FPS_LIMIT_DEFAULT);
+        FPSLimiter(std::uint32_t initialPreferredFPS = FPS_LIMIT_DEFAULT);
         ~FPSLimiter();
 
     private:
@@ -32,14 +32,14 @@ namespace FPSLimiter
     private:
         struct FPSLimiterData
         {
-            uint32_t serverEnforcedFPS;            // Maximum FPS enforced by the server (0 = no limit)
-            uint32_t clientEnforcedFPS;            // Maximum FPS enforced by the client (0 = no limit)
-            uint32_t userDefinedFPS;               // Maximum FPS defined by the user using settings or console variable (0 = no limit)
+            std::uint32_t serverEnforcedFPS;            // Maximum FPS enforced by the server (0 = no limit)
+            std::uint32_t clientEnforcedFPS;            // Maximum FPS enforced by the client (0 = no limit)
+            std::uint32_t userDefinedFPS;               // Maximum FPS defined by the user using settings or console variable (0 = no limit)
 
-            uint32_t activeFPSTarget;             // Currently active FPS target (0 = no limit)
-            uint32_t pendingFPSTarget;            // Pending FPS target to apply at the start of the next frame
+            std::uint32_t activeFPSTarget;             // Currently active FPS target (0 = no limit)
+            std::uint32_t pendingFPSTarget;            // Pending FPS target to apply at the start of the next frame
 
-            uint32_t displayRefreshRate;            // Default refresh rate of the display to cap FPS when no other limits are set (0 = no cap)
+            std::uint32_t displayRefreshRate;            // Default refresh rate of the display to cap FPS when no other limits are set (0 = no cap)
 
             bool appliedThisFrame;
             bool hasPendingLimit;
@@ -49,13 +49,13 @@ namespace FPSLimiter
         // API
         void Reset();
 
-        uint32_t     GetFPSTarget() const noexcept;
-        EnforcerType GetEnforcer() const noexcept;
+        std::uint32_t GetFPSTarget() const noexcept;
+        EnforcerType  GetEnforcer() const noexcept;
 
-        void SetServerEnforcedFPS(uint32_t frameRateLimit);
-        void SetClientEnforcedFPS(uint32_t frameRateLimit);
-        void SetUserDefinedFPS(uint32_t frameRateLimit);
-        void SetDisplayRefreshRate(uint32_t refreshRate);
+        void SetServerEnforcedFPS(std::uint32_t frameRateLimit);
+        void SetClientEnforcedFPS(std::uint32_t frameRateLimit);
+        void SetUserDefinedFPS(std::uint32_t frameRateLimit);
+        void SetDisplayRefreshRate(std::uint32_t refreshRate);
 
     public:
         // Internal
@@ -75,6 +75,6 @@ namespace FPSLimiter
     };
 
     // Validates and clamps the given FPS value to be within defined bounds
-    uint32_t ValidateFPS(uint32_t uiFPS);
+    std::uint32_t ValidateFPS(std::uint32_t uiFPS);
 
 }            // namespace FPSLimiter
