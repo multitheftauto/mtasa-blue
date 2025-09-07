@@ -155,7 +155,7 @@ CCore::CCore()
     m_timeDiscordAppLastUpdate = 0;
 
     // Initialize FPS limiter
-    m_pFPSLimiter = new FPSLimiter::FPSLimiter();
+    m_pFPSLimiter = std::make_unique<FPSLimiter::FPSLimiter>();
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
@@ -178,8 +178,7 @@ CCore::~CCore()
     // Destroy tray icon
     delete m_pTrayIcon;
 
-    // Destroy FPS limiter
-    delete m_pFPSLimiter;
+    m_pFPSLimiter.reset();
 
     // This will set the GTA volume to the GTA volume value in the settings,
     // and is not affected by the master volume setting.

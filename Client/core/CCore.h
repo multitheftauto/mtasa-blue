@@ -108,7 +108,7 @@ public:
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
     CSteamClient*                      GetSteamClient() { return m_steamClient.get(); }
-    FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() { return m_pFPSLimiter; }
+    FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() { return m_pFPSLimiter.get(); }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -223,7 +223,7 @@ public:
     void InitiateDataFilesFix() { m_pLocalGUI->InitiateDataFilesFix(); }
 
     // FPS Limiter
-    void OnFPSLimitChange(uint32_t uiFPS); // Called when FPS limit changes
+    void OnFPSLimitChange(uint32_t uiFPS);            // Called when FPS limit changes
 
     void DoReliablePulse();
 
@@ -308,13 +308,13 @@ private:
     CModelCacheManager* m_pModelCacheManager;
 
     // Instances (put new classes here!)
-    CXMLFile*                             m_pConfigFile;
-    CClientVariables                      m_ClientVariables;
-    CWebCoreInterface*                    m_pWebCore = nullptr;
-    CTrayIcon*                            m_pTrayIcon;
-    std::unique_ptr<CSteamClient>         m_steamClient;
-    std::shared_ptr<CDiscordRichPresence> m_pDiscordRichPresence;
-    FPSLimiter::FPSLimiter*               m_pFPSLimiter;
+    CXMLFile*                               m_pConfigFile;
+    CClientVariables                        m_ClientVariables;
+    CWebCoreInterface*                      m_pWebCore = nullptr;
+    CTrayIcon*                              m_pTrayIcon;
+    std::unique_ptr<CSteamClient>           m_steamClient;
+    std::shared_ptr<CDiscordRichPresence>   m_pDiscordRichPresence;
+    std::unique_ptr<FPSLimiter::FPSLimiter> m_pFPSLimiter;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;
