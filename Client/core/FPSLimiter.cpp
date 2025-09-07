@@ -165,9 +165,14 @@ namespace FPSLimiter
             OnFPSLimitChange();
         }
 
-        std::string  msg("FPSLimiter: Calculated current FPS limit : %d (Server: %d, Client: %d, User: %d, Display: %d) Enforcer: %s", m_data.activeFPSTarget,
-                         m_data.serverEnforcedFPS, m_data.clientEnforcedFPS, m_data.userDefinedFPS, m_data.displayRefreshRate,
-                         EnumToString(GetEnforcer()).c_str());
+        std::stringstream ss;
+        ss << "FPSLimiter: Calculated current FPS limit : " << m_data.activeFPSTarget
+           << " (Server: " << m_data.serverEnforcedFPS
+           << ", Client: " << m_data.clientEnforcedFPS
+           << ", User: " << m_data.userDefinedFPS
+           << ", Display: " << m_data.displayRefreshRate
+           << ") Enforcer: " << EnumToString(GetEnforcer());
+        std::string msg = ss.str();
 
         auto* pConsole = CCore::GetSingleton().GetConsole();
         if (pConsole)
