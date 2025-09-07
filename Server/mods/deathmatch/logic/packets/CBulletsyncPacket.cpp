@@ -15,6 +15,7 @@
 #include "CWeaponStatManager.h"
 #include "CElementIDs.h"
 #include "CElement.h"
+#include "CWeaponNames.h"
 
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
     : m_weapon(WEAPONTYPE_UNARMED)
@@ -222,10 +223,14 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         if (!pPlayer->HasWeaponType(static_cast<unsigned char>(m_weapon)))
             return false;
             
+  
         // Check if weapon has ammo
-        if (pPlayer->GetWeaponAmmoInClip(static_cast<unsigned char>(m_weapon)) == 0)
+        unsigned char ucSlot = CWeaponNames::GetSlotFromWeapon(static_cast<unsigned char>(m_weapon));
+        CWeapon* pWeapon = pPlayer->GetWeapon(ucSlot);
+        if (!pWeapon || pWeapon->usAmmo <= 0)
             return false;
     }
+     
         
     if (!stream.Read(m_order))
         return false;
