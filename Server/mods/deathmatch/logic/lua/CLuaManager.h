@@ -53,7 +53,7 @@ public:
 
     void LoadCFunctions();
 
-    CLuaTimer* FindTimerGlobally(unsigned long scriptID) const noexcept;
+    CLuaTimer* FindTimerGlobally(unsigned long scriptID) const;
 
 private:
     CBlipManager*              m_pBlipManager;

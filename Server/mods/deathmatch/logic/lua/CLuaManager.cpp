@@ -185,7 +185,7 @@ CResource* CLuaManager::GetVirtualMachineResource(lua_State* luaVM)
     return NULL;
 }
 
-CLuaTimer* CLuaManager::FindTimerGlobally(unsigned long scriptID) const noexcept
+CLuaTimer* CLuaManager::FindTimerGlobally(unsigned long scriptID) const
 {
     // First check if timer exists in global ID system
     CLuaTimer* luaTimer = static_cast<CLuaTimer*>(CIdArray::FindEntry(scriptID, EIdClass::TIMER));
