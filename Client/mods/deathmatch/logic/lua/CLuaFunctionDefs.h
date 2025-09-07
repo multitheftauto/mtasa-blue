@@ -17,6 +17,7 @@ class CLuaFunctionDefinitions;
 #include "CLuaTimerManager.h"
 
 class CRegisteredCommands;
+struct CommandExecutionResult;
 
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 

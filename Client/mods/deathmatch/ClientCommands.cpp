@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "logic/CRegisteredCommands.h"
 #include <game/CWeapon.h>
 #include <game/CTaskManager.h>
 #include <game/Task.h>
@@ -57,7 +58,12 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
         strClumpedCommandUTF = strClumpedCommandUTF.substr(0, MAX_COMMAND_LENGTH);
         strClumpedCommand = UTF16ToMbUTF8(strClumpedCommandUTF);
 
-        g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments);
+        CommandExecutionResult commandResult = g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments, false);
+        
+        if (commandResult.wasCancelled)
+        {
+            return true;
+        }
 
         // Call the onClientConsole event
         CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
@@ -108,7 +114,7 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
 
         // Call our comand-handlers for core-executed commands too, if allowed
         if (bAllowScriptedBind)
-            g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments);
+            g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments, false);
     }
     return false;
 }

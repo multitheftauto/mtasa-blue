@@ -150,13 +150,36 @@ bool CRegisteredCommands::CommandExists(const char* szKey, CLuaMain* pLuaMain)
     return GetCommand(szKey, pLuaMain) != nullptr;
 }
 
-bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArguments)
+CommandExecutionResult CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArguments, bool executedByFunction)
 {
     assert(szKey);
 
+    CommandExecutionResult result;
+
+    CLuaArguments arguments;
+    arguments.PushString(szKey);
+    
+    if (szArguments && *szArguments)
+    {
+        const std::string_view argsView{szArguments};
+        std::istringstream stream{std::string{argsView}};
+        
+        for (std::string arg; stream >> arg;)
+        {
+            arguments.PushString(arg.c_str());
+        }
+    }
+    
+    arguments.PushBoolean(executedByFunction);
+    
+    g_pClientGame->GetRootEntity()->CallEvent("onClientCommand", arguments, true);
+    result.wasCancelled = g_pClientGame->GetEvents()->WasEventCancelled();
+    
+    if (result.wasCancelled)
+        return result;
+
     // Call the handler for every virtual machine that matches the given key
     int  iCompareResult;
-    bool bHandled = false;
     m_bIteratingList = true;
     list<SCommand*>::const_iterator iter = m_Commands.begin();
     for (; iter != m_Commands.end(); iter++)
@@ -171,14 +194,13 @@ bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArgume
         {
             // Call it
             CallCommandHandler((*iter)->pLuaMain, (*iter)->iLuaFunction, (*iter)->strKey, szArguments);
-            bHandled = true;
+            result.wasExecuted = true;
         }
     }
     m_bIteratingList = false;
     TakeOutTheTrash();
 
-    // Return whether some handler was called or not
-    return bHandled;
+    return result;
 }
 
 CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand(const char* szKey, class CLuaMain* pLuaMain)
