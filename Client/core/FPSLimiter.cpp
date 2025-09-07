@@ -64,7 +64,7 @@ namespace FPSLimiter
             return EnforcerType::None;
 
         // Find which source provided the lowest FPS (the active target)
-        uint32_t     minFPS = UINT32_MAX;            // Set to max for comparison
+        uint32_t     minFPS = std::numeric_limits<uint32_t>::max();            // Set to max for comparison
         EnforcerType enforcer = EnforcerType::None;
 
         if (m_data.serverEnforcedFPS > FPS_LIMIT_MIN && m_data.serverEnforcedFPS < minFPS)
@@ -159,7 +159,7 @@ namespace FPSLimiter
         }
 
         // Find the minimum FPS among all enforced limits (excluding unlimited and below minimum)
-        uint32_t minFPS = UINT32_MAX;
+        uint32_t minFPS = std::numeric_limits<uint32_t>::max();
 
         if (m_data.serverEnforcedFPS > FPS_LIMIT_MIN && m_data.serverEnforcedFPS < minFPS)
             minFPS = m_data.serverEnforcedFPS;
@@ -170,7 +170,7 @@ namespace FPSLimiter
         if (m_data.displayRefreshRate > FPS_LIMIT_MIN && m_data.displayRefreshRate < minFPS)
             minFPS = m_data.displayRefreshRate;
 
-        if (minFPS == UINT32_MAX)
+        if (minFPS == std::numeric_limits<uint32_t>::max())
             minFPS = FPS_LIMIT_UNLIMITED;
 
         m_data.activeFPSTarget = minFPS;
