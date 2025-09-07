@@ -380,10 +380,11 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Setup default states for Rich Presence
     g_vehicleTypePrefixes = {
-        _("Flying a UFO around"),      _("Cruising around"),            _("Riding the waves of"),
-        _("Riding the train in"),      _("Flying around"),              _("Flying around"),
-        _("Riding around"),            _("Monster truckin' around"),    _("Quaddin' around"),
-        _("Bunny hopping around"),     _("Doing weird stuff in")
+
+        _("Flying a UFO around"), _("Cruising around"),      _("Riding the waves of"), _("Riding the train in"),
+        _("Flying around"),       _("Flying around"),        _("Riding around"),       _("Monster truckin' around"),
+        _("Quaddin' around"),     _("Bunny hopping around"), _("Doing weird stuff in")
+
     };
 
     g_playerTaskStates = {
@@ -843,8 +844,6 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
     DebugElementRender();
 }
 
-// TODO: (pxd) Refactor this function to reduce its size and complexity
-// Pulse subsystems on post frame
 void CClientGame::DoPulsePostFrame()
 {
     TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
@@ -1109,7 +1108,6 @@ void CClientGame::DoPulsePostFrame()
 
     m_pPlayerMap->DoRender();
     m_pManager->DoRender();
-
     DoPulses();
 
     // If we're supposed to show netstat, draw them infront of everything else
@@ -1117,19 +1115,14 @@ void CClientGame::DoPulsePostFrame()
     {
         m_pNetworkStats->Draw();
     }
-
-    TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame");
 }
 
-// TODO: (pxd) Refactor this function to reduce its size and complexity
-// Pulse subsystems on post frame: Part 2
 void CClientGame::DoPulses()
 {
-    auto defer = [&]() {
-        TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame2");
-    };
+    TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame");
 
-    TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame2");
+    // TODO: (pxd) Useless, cleanup checkpoints on #4428
+    TIMING_CHECKPOINT("+CClientGame::DoPulses");
 
     m_BuiltCollisionMapThisFrame = false;
 
@@ -1189,7 +1182,7 @@ void CClientGame::DoPulses()
                 g_pCore->ShowMessageBox(_("Error") + _E("CD05"), SString(_("You were kicked from the game ( %s )"), *strMessageCombo),
                                         MB_BUTTON_OK | MB_ICON_ERROR);
                 g_pCore->GetModManager()->RequestUnload();
-                return defer();
+                return;
             }
         }
     }
@@ -1268,7 +1261,7 @@ void CClientGame::DoPulses()
                 {
                     g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD06"), _("Error connecting to server."));
                     g_pCore->GetModManager()->RequestUnload();
-                    return defer();
+                    return;
                 }
             }
 
@@ -1278,7 +1271,7 @@ void CClientGame::DoPulses()
                 // Show timeout message and disconnect
                 g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD07"), _("Connecting to local server timed out. See console for details."));
                 g_pCore->GetModManager()->RequestUnload();
-                return defer();
+                return;
             }
         }
     }
@@ -1339,7 +1332,7 @@ void CClientGame::DoPulses()
         if (m_bErrorStartingLocal)
         {
             g_pCore->GetModManager()->RequestUnload();
-            return defer();
+            return;
         }
 
         // Timed out?
@@ -1347,7 +1340,7 @@ void CClientGame::DoPulses()
         {
             g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD08"), _("Connection timed out"), "connect-timed-out", true);
             g_pCore->GetModManager()->RequestUnload();
-            return defer();
+            return;
         }
     }
     else if (m_Status == CClientGame::STATUS_JOINED)
@@ -1384,7 +1377,7 @@ void CClientGame::DoPulses()
             {
                 g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD09"), _("Connection with the server was lost"));
                 g_pCore->GetModManager()->RequestUnload();
-                return defer();
+                return;
             }
             else
             {
@@ -1474,7 +1467,8 @@ void CClientGame::DoPulses()
         {
             // Only call DoWastedCheck if server hasn't already processed this death
             // This prevents duplicate events when server processes death via unified context system
-            if (!m_serverProcessedDeath) {
+            if (!m_serverProcessedDeath)
+            {
                 DoWastedCheck(m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece);
             }
         }
@@ -1504,7 +1498,7 @@ void CClientGame::DoPulses()
     // Collect async task scheduler results
     m_pAsyncTaskScheduler->CollectResults();
 
-    return defer();
+    TIMING_CHECKPOINT("-CClientGame::DoPulses");
 }
 
 // Extrapolation test
@@ -2649,8 +2643,10 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
     m_Events.AddEvent("onClientElementDimensionChange", "oldDimension, newDimension", nullptr, false);
     m_Events.AddEvent("onClientElementInteriorChange", "oldInterior, newInterior", nullptr, false);
-    m_Events.AddEvent("onClientElementAttach", "attachSource, attachOffsetX, attachOffsetY, attachOffsetZ, attachOffsetRX, attachOffsetRY, attachOffsetRZ", nullptr, false);
-    m_Events.AddEvent("onClientElementDetach", "detachSource, detachWorldX, detachWorldY, detachWorldZ, detachWorldRX, detachWorldRY, detachWorldRZ", nullptr, false);
+    m_Events.AddEvent("onClientElementAttach", "attachSource, attachOffsetX, attachOffsetY, attachOffsetZ, attachOffsetRX, attachOffsetRY, attachOffsetRZ",
+                      nullptr, false);
+    m_Events.AddEvent("onClientElementDetach", "detachSource, detachWorldX, detachWorldY, detachWorldZ, detachWorldRX, detachWorldRY, detachWorldRZ", nullptr,
+                      false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -4520,7 +4516,8 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
                     GetDeathAnim(pDamagedPed, pEvent, animGroup, animID);
 
                     // Check if we're dead
-                    if (!m_serverProcessedDeath) {
+                    if (!m_serverProcessedDeath)
+                    {
                         DoWastedCheck(damagerID, weaponUsed, hitZone, animGroup, animID);
                     }
                 }
@@ -4595,7 +4592,7 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
     {
         // Set explosion damage data so DoWastedCheck uses correct parameters
         SetExplosionDamageData();
-        return; // Local player death is handled by DoWastedCheck
+        return;            // Local player death is handled by DoWastedCheck
     }
 
     // Not required for remote players. Local player is handled in DoPulses->DoWastedCheck
@@ -4618,7 +4615,8 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
 }
 
 bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag,
-                                          float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity, bool isProjectile)
+                                          float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity,
+                                          bool isProjectile)
 {
     if (pCollidingVehicle && pCollidedWith)
     {
@@ -4633,7 +4631,8 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
             }
 
             CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
-            CClientEntity*  pCollidedWithClientEntity = !isProjectile ? pPools->GetClientEntity((DWORD*)pCollidedWith) : m_pManager->GetProjectileManager()->Get(pCollidedWith);
+            CClientEntity*  pCollidedWithClientEntity =
+                !isProjectile ? pPools->GetClientEntity((DWORD*)pCollidedWith) : m_pManager->GetProjectileManager()->Get(pCollidedWith);
 
             CLuaArguments Arguments;
             if (pCollidedWithClientEntity)
@@ -4682,8 +4681,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
                                 // Write the vehicle ID
                                 pBitStream->Write(pVehicleClientEntity->GetID());
                                 // Send!
-                                g_pNet->SendPacket(PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM,
-                                                    PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+                                g_pNet->SendPacket(PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
                                 // Reset our push time
                                 pClientVehicle->ResetLastPushTime();
                             }
@@ -5672,8 +5670,9 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             if (discord && discord->IsDiscordRPCEnabled() && discord->IsDiscordCustomDetailsDisallowed())
             {
                 static const std::vector<std::string> states{
-                    _("In a ditch"), _("En-route to hospital"), _("Meeting their maker"),
-                    _("Regretting their decisions"), _("Wasted")
+
+                    _("In a ditch"), _("En-route to hospital"), _("Meeting their maker"), _("Regretting their decisions"), _("Wasted")
+
                 };
 
                 const std::string& state = states[rand() % states.size()];
@@ -6578,8 +6577,21 @@ void CClientGame::OutputServerInfo()
 
     {
         SString     strEnabledGlitches;
-        const char* szGlitchNames[] = {"Quick reload",         "Fast fire",  "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint",
-                                       "Bad driveby hitboxes", "Quick stand", "Kickout of vehicle on model replace"};
+        const char* szGlitchNames[] = {
+
+            "Quick reload",
+            "Fast fire",
+            "Fast move",
+            "Crouch bug",
+            "Close damage",
+            "Hit anim",
+            "Fast sprint",
+            "Bad driveby hitboxes",
+            "Quick stand",
+            "Kickout of vehicle on model replace"
+
+        };
+
         for (unsigned char i = 0; i < NUM_GLITCHES; i++)
         {
             if (IsGlitchEnabled(i))
