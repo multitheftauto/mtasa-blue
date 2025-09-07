@@ -49,8 +49,8 @@ namespace FPSLimiter
         // API
         void Reset();
 
-        uint32_t     GetFPSTarget();
-        EnforcerType GetEnforcer();
+        uint32_t     GetFPSTarget() const noexcept;
+        EnforcerType GetEnforcer() const noexcept;
 
         void SetServerEnforcedFPS(uint32_t frameRateLimit);
         void SetClientEnforcedFPS(uint32_t frameRateLimit);

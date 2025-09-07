@@ -42,8 +42,8 @@ namespace FPSLimiter
     public:
         virtual void Reset() = 0;            // Reset all frame rate limits to default (unlimited)
 
-        virtual uint32_t     GetFPSTarget() = 0;            // Get the current active frame rate limit (0 = no limit)
-        virtual EnforcerType GetEnforcer() = 0;             // Get who is enforcing the current frame rate limit (as uint8_t from EnforcerType)
+        virtual uint32_t     GetFPSTarget() const noexcept = 0;            // Get the current active frame rate limit (0 = no limit)
+        virtual EnforcerType GetEnforcer() const noexcept = 0;             // Get who is enforcing the current frame rate limit (as uint8_t from EnforcerType)
 
         virtual void SetServerEnforcedFPS(uint32_t frameRateLimit) = 0;            // Set the server-enforced frame rate limit (0 = no limit)
         virtual void SetClientEnforcedFPS(uint32_t frameRateLimit) = 0;            // Set the client-enforced frame rate limit (0 = no limit)

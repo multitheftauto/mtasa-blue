@@ -52,12 +52,12 @@ namespace FPSLimiter
         CalculateCurrentFPSLimit();
     }
 
-    uint32_t FPSLimiter::GetFPSTarget()
+    uint32_t FPSLimiter::GetFPSTarget() const noexcept
     {
         return m_data.activeFPSTarget;
     }
 
-    EnforcerType FPSLimiter::GetEnforcer()
+    EnforcerType FPSLimiter::GetEnforcer() const noexcept
     {
         // If unlimited, no enforcer
         if (m_data.activeFPSTarget == FPS_LIMIT_UNLIMITED)
