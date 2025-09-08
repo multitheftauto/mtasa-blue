@@ -235,12 +235,13 @@ void CClientVariables::ValidateValues()
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
 
-    { // Special case, 0 or clamped range. Provided by ValidateFPS.
-        uint uiTemp;
-        CVARS_GET("fps_limit", uiTemp);
-        uiTemp = FPSLimiter::ValidateFPS(uiTemp);
-        CVARS_SET("fps_limit", uiTemp);
-    }
+    // CVars need a better API for this (Issue #4427)
+    int temp;
+    CVARS_GET("fps_limit", temp);
+    std::uint16_t fps = static_cast<std::uint16_t>(temp);
+    FPSLimits::IsValidAndSetValid(fps, fps);
+    CVARS_SET("fps_limit", fps);
+
 
     ClampValue("chat_font", 0, 3);
     ClampValue("chat_lines", 3, 62);

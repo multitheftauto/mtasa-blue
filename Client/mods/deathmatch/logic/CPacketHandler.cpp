@@ -2362,9 +2362,9 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Apply world sea level (to world sea level water only)
     g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fSeaLevel, nullptr, false, true, false);
 
-    unsigned short usFPSLimit = 36; // Default to 36
-    bitStream.ReadCompressed(usFPSLimit); // See also: Client\mods\deathmatch\logic\rpc\CWorldRPCs.cpp:216
-    g_pCore->GetFPSLimiter()->SetServerEnforcedFPS(usFPSLimit);
+    std::uint16_t fps = 36; // Default to 36
+    bitStream.ReadCompressed(fps);
+    CStaticFunctionDefinitions::SetServerFPSLimit(fps);
 
     // Read out the garage door states
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();

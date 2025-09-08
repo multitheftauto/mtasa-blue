@@ -182,9 +182,9 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                 // HACK: Foul dirty hack to force vsync (Rework on #4427)
                 if (key == "vsync")
                 {
-                    bool bVSync;
-                    CVARS_GET("vsync", bVSync);
-                    CCore::GetSingleton().GetFPSLimiter()->SetDisplayVSync(bVSync);
+                    bool vSync;
+                    CVARS_GET("vsync", vSync);
+                    CCore::GetSingleton().GetFPSLimiter()->SetDisplayVSync(vSync);
                 }
             }
             else

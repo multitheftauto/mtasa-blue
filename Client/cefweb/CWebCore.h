@@ -96,7 +96,7 @@ public:
     void OnPreScreenshot();
     void OnPostScreenshot();
 
-    void OnFPSLimitChange(int newFPS);
+    void OnFPSLimitChange(std::uint16_t fps) override;
 
     bool SetGlobalAudioVolume(float fVolume);
 

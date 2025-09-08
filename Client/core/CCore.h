@@ -108,7 +108,7 @@ public:
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
     CSteamClient*                      GetSteamClient() { return m_steamClient.get(); }
-    FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() { return m_pFPSLimiter.get(); }
+    FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() const noexcept { return m_pFPSLimiter.get(); }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -223,7 +223,7 @@ public:
     void InitiateDataFilesFix() { m_pLocalGUI->InitiateDataFilesFix(); }
 
     // FPS Limiter
-    void OnFPSLimitChange(uint32_t uiFPS);            // Called when FPS limit changes
+    void OnFPSLimitChange(std::uint16_t fps);
 
     void DoReliablePulse();
 

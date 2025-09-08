@@ -639,9 +639,9 @@ public:
     static bool SetMoonSize(int iSize);
 
     // FPS Limiter
-    static bool GetFPSLimit(int& iLimit);
-    static bool SetClientFPSLimit(int iFPS);
-    static bool SetServerFPSLimit(int iFPS);
+    static void GetFPSLimit(std::uint16_t& fps) noexcept;
+    static void SetClientFPSLimit(std::uint16_t fps);
+    static void SetServerFPSLimit(std::uint16_t fps);
 
     static bool ResetAllSurfaceInfo();
     static bool ResetSurfaceInfo(short sSurfaceID);

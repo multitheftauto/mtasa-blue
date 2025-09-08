@@ -84,8 +84,8 @@ public:
 
     virtual void OnPreScreenshot() = 0;
     virtual void OnPostScreenshot() = 0;
-    
-    virtual void OnFPSLimitChange(int iFPS) = 0;
+
+    virtual void OnFPSLimitChange(std::uint16_t fps) = 0;
 
     virtual bool SetGlobalAudioVolume(float fVolume) = 0;
 

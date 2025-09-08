@@ -79,17 +79,10 @@ void CModManager::DoPulsePostFrame()
 {
     auto handleStateChange = [&]()
     {
-        switch (m_state)
-        {
-            case State::PendingStart:
-                Start();
-                break;
-            case State::PendingStop:
-                Stop();
-                break;
-            default:
-                break;
-        }
+        if (m_state == State::PendingStart)
+            Start();
+        else if (m_state == State::PendingStop)
+            Stop();
     };
 
     TIMING_GRAPH("+DoPulsePostFrame");

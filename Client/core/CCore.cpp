@@ -1347,7 +1347,7 @@ void CCore::OnModUnload()
     m_pKeyBinds->RemoveAllControlFunctions();
 
     // Reset client script frame rate limit
-    GetFPSLimiter()->SetClientEnforcedFPS(FPSLimiter::FPS_LIMIT_UNLIMITED);
+    GetFPSLimiter()->SetClientEnforcedFPS(FPSLimits::FPS_UNLIMITED);
 
     // Clear web whitelist
     if (m_pWebCore)
@@ -1835,12 +1835,9 @@ void CCore::OnGameTimerUpdate()
     // earlier in the callpath (CModManager::DoPulsePreFrame, CModManager::DoPulsePostFrame)
 }
 
-void CCore::OnFPSLimitChange(uint32_t uiFPS)
+void CCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    // TODO: (pxd) Notify the mod manager maybe? If not remove this comment
-
-    // Update core's webcore FPS limit
-    GetWebCore()->OnFPSLimitChange(uiFPS);
+    GetWebCore()->OnFPSLimitChange(fps);            // Update core's webcore FPS limit
 }
 
 //

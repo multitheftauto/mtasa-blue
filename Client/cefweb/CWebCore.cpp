@@ -479,11 +479,11 @@ void CWebCore::OnPostScreenshot()
     }
 }
 
-void CWebCore::OnFPSLimitChange(int iFPS)
+void CWebCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    for (auto& pWebView : m_WebViews)
+    for (auto& webView : m_WebViews)
     {
-        pWebView->GetCefBrowser()->GetHost()->SetWindowlessFrameRate(iFPS);
+        webView->GetCefBrowser()->GetHost()->SetWindowlessFrameRate(fps);
     }
 }
 

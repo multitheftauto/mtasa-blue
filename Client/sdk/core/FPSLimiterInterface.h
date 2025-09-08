@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.7
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/core/FPSLimiterInterface.h
  *  PURPOSE:     Frame rate limiter interface
@@ -13,8 +13,6 @@
  *****************************************************************************/
 
 #pragma once
-
-#include <cstdint>
 
 namespace FPSLimiter
 {
@@ -29,12 +27,6 @@ namespace FPSLimiter
     };
     DECLARE_ENUM(EnforcerType);
 
-    // Frame rate limit values (kept as constexpr for numerical flexibility)
-    constexpr std::uint32_t FPS_LIMIT_MAX = 1000;               // Maximum allowed frame rate limit
-    constexpr std::uint32_t FPS_LIMIT_MIN = 25;                 // Minimum allowed frame rate limit
-    constexpr std::uint32_t FPS_LIMIT_DEFAULT = 60;             // Default frame rate limit
-    constexpr std::uint32_t FPS_LIMIT_UNLIMITED = 0;            // Unlimited frame rate (no limit)
-
     class FPSLimiterInterface
     {
     public:
@@ -43,12 +35,12 @@ namespace FPSLimiter
     public:
         virtual void Reset() = 0;            // Reset all frame rate limits to default (unlimited)
 
-        virtual std::uint32_t GetFPSTarget() const noexcept = 0;            // Get the current active frame rate limit (0 = no limit)
+        virtual std::uint16_t GetFPSTarget() const noexcept = 0;            // Get the current active frame rate limit (0 = no limit)
         virtual EnforcerType  GetEnforcer() const noexcept = 0;             // Get who is enforcing the current frame rate limit (as uint8_t from EnforcerType)
 
-        virtual void SetServerEnforcedFPS(std::uint32_t frameRateLimit) = 0;            // Set the server-enforced frame rate limit (0 = no limit)
-        virtual void SetClientEnforcedFPS(std::uint32_t frameRateLimit) = 0;            // Set the client-enforced frame rate limit (0 = no limit)
-        virtual void SetUserDefinedFPS(std::uint32_t frameRateLimit) = 0;               // Set the user-defined frame rate limit (0 = no limit)
+        virtual void SetServerEnforcedFPS(std::uint16_t fps) = 0;            // Set the server-enforced frame rate limit (0 = no limit)
+        virtual void SetClientEnforcedFPS(std::uint16_t fps) = 0;            // Set the client-enforced frame rate limit (0 = no limit)
+        virtual void SetUserDefinedFPS(std::uint16_t fps) = 0;               // Set the user-defined frame rate limit (0 = no limit)
         virtual void SetDisplayVSync(bool enabled) = 0;                                 // Set the display refresh rate to cap FPS (0 = no cap)
 
         virtual void OnFPSLimitChange() = 0;            // Event handler called when the active frame rate limit changes

@@ -12,14 +12,13 @@
 #pragma once
 
 #include <core/FPSLimiterInterface.h>
-#include <CSingleton.h>
 
 namespace FPSLimiter
 {
     class FPSLimiter : public FPSLimiterInterface
     {
     public:
-        FPSLimiter(std::uint32_t initialPreferredFPS = FPS_LIMIT_DEFAULT);
+        FPSLimiter();
         ~FPSLimiter();
 
     private:
@@ -29,54 +28,40 @@ namespace FPSLimiter
         FPSLimiter(FPSLimiter&&) = delete;
         FPSLimiter& operator=(FPSLimiter&&) = delete;
 
-    private:
-        struct FPSLimiterData
-        {
-            std::uint32_t serverEnforcedFPS;            // Maximum FPS enforced by the server (0 = no limit)
-            std::uint32_t clientEnforcedFPS;            // Maximum FPS enforced by the client (0 = no limit)
-            std::uint32_t userDefinedFPS;               // Maximum FPS defined by the user using settings or console variable (0 = no limit)
-
-            std::uint32_t activeFPSTarget;             // Currently active FPS target (0 = no limit)
-            std::uint32_t pendingFPSTarget;            // Pending FPS target to apply at the start of the next frame
-
-            std::uint32_t displayRefreshRate;            // Default refresh rate of the display to cap FPS when no other limits are set (0 = no cap)
-
-            bool appliedThisFrame;
-            bool hasPendingLimit;
-        };
-
     public:
         // API
         void Reset();
 
-        std::uint32_t GetFPSTarget() const noexcept;
-        EnforcerType  GetEnforcer() const noexcept;
+        std::uint16_t GetFPSTarget() const noexcept override { return m_fpsTarget; }
+        EnforcerType  GetEnforcer() const noexcept override;
 
-        void SetServerEnforcedFPS(std::uint32_t frameRateLimit);
-        void SetClientEnforcedFPS(std::uint32_t frameRateLimit);
-        void SetUserDefinedFPS(std::uint32_t frameRateLimit);
-        void SetDisplayVSync(bool enabled);
+        void SetServerEnforcedFPS(std::uint16_t fps) override;
+        void SetClientEnforcedFPS(std::uint16_t fps) override;
+        void SetUserDefinedFPS(std::uint16_t fps) override;
+        void SetDisplayVSync(bool enabled) override;
 
-    public:
+        void OnFPSLimitChange() override;            // Event handler called when the active frame rate limit changes
+        void OnFrameStart() override;                // Event handler called at the start of each frame
+        void OnFrameEnd() override;                  // Event handler called at the end of each frame
+
+    private:
         // Internal
-        std::uint32_t GetDisplayRefreshRate();
+        std::uint16_t GetDisplayRefreshRate();
 
         void CalculateCurrentFPSLimit();
         void SetFrameRateThrottle();
 
-        void OnFrameStart();
-        void OnFrameEnd();
-        void OnFPSLimitChange();
-
     private:
-        FPSLimiterData m_data;
-        LARGE_INTEGER  m_frequency = {0};
-        LARGE_INTEGER  m_lastFrameTime = {0};
-        uint64_t       m_lastFrameTSC = 0;
-        HANDLE         m_hTimer = nullptr;
+        // Member data
+        LARGE_INTEGER m_frequency;
+        LARGE_INTEGER m_lastFrameTime;
+        std::uint64_t m_lastFrameTSC;
+        HANDLE        m_hTimer;
+        std::uint16_t m_serverEnforcedFps;             // Maximum FPS enforced by the server
+        std::uint16_t m_clientEnforcedFps;             // Maximum FPS enforced by the client
+        std::uint16_t m_userDefinedFps;                // Maximum FPS defined by the user (see `fps_limit` cvar)
+        std::uint16_t m_displayRefreshRate;            // Refresh rate of the display aka VSync (see `vsync` cvar)
+        std::uint16_t m_fpsTarget;                     // Currently target FPS limit (0 = no limit)
+        bool          m_appliedThisFrame;              // Whether the FPS limit was applied in the current frame
     };
-
-    // Validates and clamps the given FPS value to be within defined bounds
-    std::uint32_t ValidateFPS(std::uint32_t uiFPS);
-
 }            // namespace FPSLimiter

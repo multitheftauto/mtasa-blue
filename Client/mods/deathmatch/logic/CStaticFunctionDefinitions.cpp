@@ -7044,22 +7044,19 @@ bool CStaticFunctionDefinitions::SetMoonSize(int iSize)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetClientFPSLimit(int iFPS)
+void CStaticFunctionDefinitions::SetClientFPSLimit(std::uint16_t fps)
 {
-    g_pCore->GetFPSLimiter()->SetClientEnforcedFPS(iFPS);
-    return true;
+    g_pCore->GetFPSLimiter()->SetClientEnforcedFPS(fps);
 }
 
-bool CStaticFunctionDefinitions::GetFPSLimit(int& iFPS) 
+void CStaticFunctionDefinitions::GetFPSLimit(std::uint16_t& fps) noexcept
 {
-    iFPS = g_pCore->GetFPSLimiter()->GetFPSTarget();
-    return true;
+    fps = g_pCore->GetFPSLimiter()->GetFPSTarget();
 }
 
-bool CStaticFunctionDefinitions::SetServerFPSLimit(int iFPS)
+void CStaticFunctionDefinitions::SetServerFPSLimit(std::uint16_t fps)
 {
-    g_pCore->GetFPSLimiter()->SetServerEnforcedFPS(iFPS);
-    return true;
+    g_pCore->GetFPSLimiter()->SetServerEnforcedFPS(fps);
 }
 
 bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction,
