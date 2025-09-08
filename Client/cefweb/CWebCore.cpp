@@ -481,6 +481,7 @@ void CWebCore::OnPostScreenshot()
 
 void CWebCore::OnFPSLimitChange(std::uint16_t fps)
 {
+    dassert(g_pCore->GetNetwork() != nullptr);            // Ensure network module is loaded
     for (auto& webView : m_WebViews)
     {
         webView->GetCefBrowser()->GetHost()->SetWindowlessFrameRate(fps);

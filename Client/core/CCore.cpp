@@ -1837,7 +1837,8 @@ void CCore::OnGameTimerUpdate()
 
 void CCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    GetWebCore()->OnFPSLimitChange(fps);            // Update core's webcore FPS limit
+    if (m_pNet != nullptr)            // We have to wait for the network module to be loaded
+        GetWebCore()->OnFPSLimitChange(fps);
 }
 
 //
