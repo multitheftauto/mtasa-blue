@@ -156,30 +156,6 @@ CommandExecutionResult CRegisteredCommands::ProcessCommand(const char* szKey, co
 
     CommandExecutionResult result;
 
-    CLuaArguments arguments;
-    arguments.PushString(szKey);
-    arguments.PushBoolean(executedByFunction);
-    
-    if (szArguments && *szArguments)
-    {
-        std::istringstream stream{szArguments};
-        
-        for (std::string arg; stream >> arg;)
-        {
-            arguments.PushString(arg.c_str());
-        }
-    }
-    
-    CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
-    if (localPlayer)
-    {
-        localPlayer->CallEvent("onClientCommand", arguments, false);
-    }
-    result.wasCancelled = g_pClientGame->GetEvents()->WasEventCancelled();
-    
-    if (result.wasCancelled)
-        return result;
-
     // Call the handler for every virtual machine that matches the given key
     int  iCompareResult;
     m_bIteratingList = true;
