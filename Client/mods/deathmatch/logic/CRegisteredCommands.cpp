@@ -158,11 +158,11 @@ CommandExecutionResult CRegisteredCommands::ProcessCommand(const char* szKey, co
 
     CLuaArguments arguments;
     arguments.PushString(szKey);
+    arguments.PushBoolean(executedByFunction);
     
     if (szArguments && *szArguments)
     {
-        const std::string_view argsView{szArguments};
-        std::istringstream stream{std::string{argsView}};
+        std::istringstream stream{szArguments};
         
         for (std::string arg; stream >> arg;)
         {
@@ -170,9 +170,11 @@ CommandExecutionResult CRegisteredCommands::ProcessCommand(const char* szKey, co
         }
     }
     
-    arguments.PushBoolean(executedByFunction);
-    
-    g_pClientGame->GetRootEntity()->CallEvent("onClientCommand", arguments, true);
+    CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
+    if (localPlayer)
+    {
+        localPlayer->CallEvent("onClientCommand", arguments, false);
+    }
     result.wasCancelled = g_pClientGame->GetEvents()->WasEventCancelled();
     
     if (result.wasCancelled)
