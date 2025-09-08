@@ -6798,7 +6798,7 @@ bool CClientPed::ExitVehicle()
             return false;
 
         // Make ped exit vehicle
-        GetOutOfVehicle(targetDoor);
+        GetOutOfVehicle(m_ucVehicleInOutSeat);
 
         // Remember that this ped is working on leaving a vehicle
         SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
@@ -6913,6 +6913,7 @@ void CClientPed::UpdateVehicleInOut()
 
             m_bIsGettingOutOfVehicle = false;
             m_VehicleInOutID = INVALID_ELEMENT_ID;
+            RemoveFromVehicle();
             SetVehicleInOutState(VEHICLE_INOUT_NONE);
         }
 
