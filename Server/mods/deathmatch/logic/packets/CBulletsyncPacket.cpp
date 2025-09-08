@@ -15,6 +15,7 @@
 #include "CWeaponStatManager.h"
 #include "CElementIDs.h"
 #include "CElement.h"
+#include "CWeaponNames.h"
 
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
     : m_weapon(WEAPONTYPE_UNARMED)
@@ -68,13 +69,13 @@ bool CBulletsyncPacket::ValidateTrajectory() const noexcept
     const float dz = m_end.fZ - m_start.fZ;
     
     const float movementSq = (dx * dx) + (dy * dy) + (dz * dz);
-    
+        
     if (IsNaN(movementSq))
         return false;
-        
+
     if (movementSq < MIN_DISTANCE_SQ)
         return false;
-        
+
     if (movementSq > MAX_DISTANCE_SQ)
         return false;
         
@@ -104,13 +105,13 @@ bool CBulletsyncPacket::ReadWeaponAndPositions(NetBitStreamInterface& stream)
         
     if (!stream.Read(reinterpret_cast<char*>(&m_end), sizeof(CVector)))
         return false;
-    
+        
     if (!IsValidVector(m_start))
         return false;
-        
+
     if (!IsValidVector(m_end))
         return false;
-    
+        
     if (!ValidateVectorBounds(m_start))
         return false;
         
@@ -158,7 +159,7 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
         ResetDamageData();
         return false;
     }
-    
+
     // Validate that target element exists
     if (m_damaged != INVALID_ELEMENT_ID)
     {
@@ -171,8 +172,8 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
         
         // Check element type is valid for damage
         auto elementType = pElement->GetType();
-        if (elementType != CElement::PLAYER && 
-            elementType != CElement::PED && 
+        if (elementType != CElement::PLAYER &&
+            elementType != CElement::PED &&
             elementType != CElement::VEHICLE)
         {
             ResetDamageData();
@@ -187,14 +188,14 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
 {
     if (!m_pSourceElement)
         return false;
-
+            
     CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
     if (pPlayer)
     {
         // Check if player is spawned and alive
         if (!pPlayer->IsSpawned() || pPlayer->IsDead())
             return false;
-            
+
         // Check player position is reasonable relative to bullet start
         const CVector& playerPos = pPlayer->GetPosition();
         const float maxShootDistance = 50.0f; // Max distance from player to bullet start
@@ -204,7 +205,7 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         
     if (!ReadWeaponAndPositions(stream))
         return false;
-    
+
     // Now validate player position relative to shot origin
     if (pPlayer)
     {
@@ -212,18 +213,20 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         float dx = m_start.fX - playerPos.fX;
         float dy = m_start.fY - playerPos.fY;
         float dz = m_start.fZ - playerPos.fZ;
-        float distSq = dx*dx + dy*dy + dz*dz;
+        float distSq = dx * dx + dy * dy + dz * dz;
         
         const float maxShootDistanceSq = 50.0f * 50.0f;
         if (distSq > maxShootDistanceSq)
             return false;
             
         // Check if player has this weapon
-        if (!pPlayer->HasWeaponType(static_cast<unsigned char>(m_weapon)))
+        if (!pPlayer->HasWeaponType(static_cast<std::uint8_t>(m_weapon)))
             return false;
-            
+           
         // Check if weapon has ammo
-        if (pPlayer->GetWeaponAmmoInClip(static_cast<unsigned char>(m_weapon)) == 0)
+        const auto type = static_cast<std::uint8_t>(m_weapon);
+        const auto slot = CWeaponNames::GetSlotFromWeapon(type);
+        if (pPlayer->GetWeaponTotalAmmo(slot) <= 0)
             return false;
     }
         
@@ -232,7 +235,7 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         
     if (!ReadOptionalDamage(stream))
         return false;
-        
+
     return true;
 }
 
@@ -244,21 +247,21 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
     const auto* pPlayer = static_cast<const CPlayer*>(m_pSourceElement);
     if (!pPlayer)
         return false;
-        
+
     const ElementID id = pPlayer->GetID();
     
     if (id == INVALID_ELEMENT_ID)
         return false;
-        
+
     if (id == 0)
         return false;
 
     if (!IsValidVector(m_start))
         return false;
-        
+
     if (!IsValidVector(m_end))
         return false;
-        
+
     if (!ValidateVectorBounds(m_start))
         return false;
         
