@@ -225,10 +225,9 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
             
   
         // Check if weapon has ammo
-        unsigned char ucSlot = CWeaponNames::GetSlotFromWeapon(static_cast<unsigned char>(m_weapon));
-        CWeapon* pWeapon = pPlayer->GetWeapon(ucSlot);
-        if (!pWeapon || pWeapon->usAmmo <= 0)
-            return false;
+        std::uint8_t weaponSlot = CWeaponNames::GetSlotFromWeapon(static_cast<std::uint8_t>(m_weapon));
+           if (pPlayer->GetWeaponTotalAmmo(static_cast<std::uint8_t>(m_weapon)) <= 0)
+           return false;
     }
      
         
