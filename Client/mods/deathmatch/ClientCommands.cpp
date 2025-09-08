@@ -60,11 +60,11 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
 
         CommandExecutionResult commandResult = g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments, false);
         
+        // If command was cancelled by onClientCommand event, block it completely
         if (commandResult.wasCancelled)
         {
-            return true;
+            return true; // Command was handled (cancelled), don't show unknown message
         }
-
         // Call the onClientConsole event
         CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
 
