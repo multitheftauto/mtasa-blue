@@ -37,12 +37,12 @@ public:
     const char* GetName() const noexcept { return m_strName; }
     const char* GetShortName() const noexcept { return m_strNameShort; }
 
-    CResource* GetResource() const noexcept { return m_pResource; }
-    std::uint32_t GetHandlerId() const noexcept { return m_handlerId; }
+    CResource* GetResource() const noexcept { return resource; }
+    std::uint32_t GetHandlerId() const noexcept { return handlerId; }
 
-    void SetComplete() noexcept { m_bComplete = true; }
-    bool GetComplete() const noexcept { return m_bComplete; }
-    bool IsCancelled() const noexcept { return m_bCancelled; }
+    void SetComplete() noexcept { complete = true; }
+    bool GetComplete() const noexcept { return complete; }
+    bool IsCancelled() const noexcept { return cancelled; }
 
     void CallFinished(bool bSuccess);
     bool Cancel();
@@ -53,16 +53,16 @@ protected:
     SString m_strName;
     SString m_strNameShort;
 
-    CResource* m_pResource;
-    CResource* m_pRequestResource;
+    CResource* resource;
+    CResource* requestResource;
 
-    bool m_bComplete;
-    bool m_bBeingDeleted;
-    bool m_bCancelled;
+    bool complete;
+    bool beingDeleted;
+    bool cancelled;
 
-    std::uint32_t m_handlerId;
-    CNetHTTPDownloadManagerInterface* m_pHTTPManager;
-    EDownloadModeType m_downloadMode;
+    std::uint32_t handlerId;
+    CNetHTTPDownloadManagerInterface* httpManager;
+    EDownloadMode::EDownloadModeType downloadMode;
 
     CChecksum m_LastClientChecksum;
     CChecksum m_ServerChecksum;

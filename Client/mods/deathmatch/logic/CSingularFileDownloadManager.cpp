@@ -74,10 +74,8 @@ bool CSingularFileDownloadManager::AbortDownload(std::uint32_t handlerId)
         return false;
 
     const bool success = pDownload->Cancel();
-    if (success)
-    {
-        RemoveDownload(pDownload);
-    }
+    // Always remove from tracking, regardless of cancel success
+    RemoveDownload(pDownload);
     return success;
 }
 
