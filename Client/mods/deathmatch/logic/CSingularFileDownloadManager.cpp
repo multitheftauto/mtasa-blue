@@ -73,8 +73,10 @@ bool CSingularFileDownloadManager::AbortDownload(std::uint32_t handlerId)
     if (!pDownload)
         return false;
 
+    if (pDownload->GetComplete() || pDownload->IsCancelled())
+        return false;
+
     const bool success = pDownload->Cancel();
-    // Always remove from tracking, regardless of cancel success
     RemoveDownload(pDownload);
     return success;
 }
@@ -84,12 +86,7 @@ void CSingularFileDownloadManager::RemoveDownload(CSingularFileDownload* pDownlo
     if (!pDownload)
         return;
 
-    // Remove from handler map
     m_HandlerMap.erase(pDownload->GetHandlerId());
-
-    // Remove from downloads list
     m_Downloads.remove(pDownload);
-
-    // Delete the download object
-    delete pDownload;
+    pDownload->MarkForDeletion();
 }

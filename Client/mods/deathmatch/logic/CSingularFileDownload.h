@@ -46,6 +46,7 @@ public:
 
     void CallFinished(bool bSuccess);
     bool Cancel();
+    void MarkForDeletion();
 
     CChecksum GenerateClientChecksum();
 

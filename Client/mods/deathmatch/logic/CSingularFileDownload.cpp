@@ -96,11 +96,16 @@ bool CSingularFileDownload::Cancel()
     resource = nullptr;
     requestResource = nullptr;
 
-    // Cancel the actual HTTP download
     if (!httpManager || downloadMode == EDownloadMode::NONE)
-        return false;
+        return true;
 
-    return httpManager->CancelDownload(this, DownloadFinishedCallBack);
+    const bool httpCancelSuccess = httpManager->CancelDownload(this, DownloadFinishedCallBack);
+    return httpCancelSuccess;
+}
+
+void CSingularFileDownload::MarkForDeletion()
+{
+    beingDeleted = true;
 }
 
 bool CSingularFileDownload::DoesClientAndServerChecksumMatch()
