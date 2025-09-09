@@ -1139,6 +1139,11 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
 
         // He's no longer dead
         pPlayer->SetDeadOnNetwork(false);
+        
+        // Reset death processing flag for new life
+        if (pPlayer->IsLocalPlayer()) {
+            g_pClientGame->ResetDeathProcessingFlag();
+        }
 
         // Reset weapons
         pPlayer->RemoveAllWeapons();
@@ -1218,6 +1223,12 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
             }
             // Update our sync-time context
             pPed->SetSyncTimeContext(ucTimeContext);
+            
+            // Clear stale damage data if this is the local player
+            // This prevents DoWastedCheck from firing with stale data when server processes death
+            if (pPed->IsLocalPlayer()) {
+                g_pClientGame->ClearDamageData();
+            }
 
             // To at least here needs to be done on the local player to avoid desync
             // Caz: Issue 8148 - Desync when calling spawnPlayer from an event handler remotely triggered from within onClientPlayerWasted
@@ -5025,8 +5036,9 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         uiTotalSizeProcessed = 0;
 
     /*
-     * unsigned char (1)   - resource name size
+     * unsigned char (1)    - resource name size
      * unsigned char (x)    - resource name
+     * unsigned int  (4)    - start counter
      * unsigned short (2)   - resource id
      * unsigned short (2)   - resource entity id
      * unsigned short (2)   - resource dynamic entity id
@@ -5081,6 +5093,10 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         return;
     }
 
+    // Start counter
+    unsigned int startCounter{};
+    bitStream.Read(startCounter);
+
     // Resource ID
     unsigned short usResourceID;
     bitStream.Read(usResourceID);
@@ -5124,6 +5140,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     {
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
+        pResource->SetStartCounter(startCounter);
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
@@ -5438,24 +5455,26 @@ void CPacketHandler::Packet_DestroySatchels(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
 {
-    unsigned short usPacketSize;
+    unsigned short voiceBufferLength;
     ElementID      PlayerID;
+
     if (bitStream.Read(PlayerID))
     {
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get(PlayerID);
-        if (pPlayer && bitStream.Read(usPacketSize))
-        {
-            char* pBuf = new char[usPacketSize];
 
-            if (bitStream.Read(pBuf, usPacketSize))
+        if (pPlayer && bitStream.Read(voiceBufferLength) && voiceBufferLength <= 2048)
+        {
+            const auto voiceBuffer = new unsigned char[voiceBufferLength];
+
+            if (bitStream.Read(reinterpret_cast<char*>(voiceBuffer), voiceBufferLength))
             {
                 if (pPlayer->GetVoice())
                 {
-                    pPlayer->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize);
+                    pPlayer->GetVoice()->DecodeAndBuffer(voiceBuffer, voiceBufferLength);
                 }
             }
 
-            delete[] pBuf;
+            delete[] voiceBuffer;
         }
     }
 }
@@ -5516,6 +5535,10 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
 
     uchar ucAllowShotgunDamageFix = 0;
     bitStream.Read(ucAllowShotgunDamageFix);
+
+    uchar allowMultiCommandHandlers = 1;
+    bitStream.Read(allowMultiCommandHandlers);
+    g_pClientGame->SetAllowMultiCommandHandlers(static_cast<MultiCommandHandlerPolicy>(allowMultiCommandHandlers));
 
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = (ucUseAltPulseOrder != 0);

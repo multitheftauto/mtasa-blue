@@ -85,17 +85,19 @@ __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 }
 
 // called from streaming on TXD create
-void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
+static void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Hooked from 731D55  6 bytes
 
         // eax - txd id
         pushad
-        push eax
-        call OnStreamingAddedTxd
-        add esp, 4
+        push    eax
+        call    OnStreamingAddedTxd
+        add     esp, 4
         popad
 
         // orig
@@ -118,17 +120,19 @@ __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 }
 
 // called from streaming on TXD destroy
-void _declspec(naked) HOOK_CTxdStore_RemoveTxd()
+static void __declspec(naked) HOOK_CTxdStore_RemoveTxd()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Hooked from 731E90  6 bytes
 
         // esi - txd id + 20000
         pushad
-        push esi
-        call OnStreamingRemoveTxd
-        add esp, 4
+        push    esi
+        call    OnStreamingRemoveTxd
+        add     esp, 4
         popad
 
         // orig
@@ -690,9 +694,11 @@ __declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTextur
 #define HOOKPOS_RwTextureSetName     0x7F38A0
 #define HOOKSIZE_RwTextureSetName    9
 DWORD RETURN_RwTextureSetName = 0x7F38A9;
-void _declspec(naked) HOOK_RwTextureSetName()
+static void __declspec(naked) HOOK_RwTextureSetName()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -724,9 +730,11 @@ __declspec(noinline) void OnMY_RwTextureDestroy_Mid(RwTexture* pTexture)
 #define HOOKPOS_RwTextureDestroy_Mid     0x07F3834
 #define HOOKSIZE_RwTextureDestroy_Mid    5
 DWORD RETURN_RwTextureDestroy_Mid = 0x07F3839;
-void _declspec(naked) HOOK_RwTextureDestroy_Mid()
+static void __declspec(naked) HOOK_RwTextureDestroy_Mid()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi
@@ -768,9 +776,11 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 #define HOOKPOS_RwIm3DRenderIndexedPrimitive     0x07EF550
 #define HOOKSIZE_RwIm3DRenderIndexedPrimitive    5
 DWORD RETURN_RwIm3DRenderIndexedPrimitive = 0x07EF555;
-void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
+static void __declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -781,7 +791,7 @@ void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
         push    [esp+4*3]
         push    [esp+4*3]
         push    [esp+4*3]
-        call inner
+        call    inner
         add     esp, 4*3
 
         pushad
@@ -790,7 +800,8 @@ void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
         add     esp, 4*1
         popad
         retn
-inner:
+
+        inner:
         mov     eax, ds:0x0C9C078
         jmp     RETURN_RwIm3DRenderIndexedPrimitive
     }
@@ -817,9 +828,11 @@ __declspec(noinline) void OnMY_RwIm3DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 #define HOOKPOS_RwIm3DRenderPrimitive    0x07EF6B0
 #define HOOKSIZE_RwIm3DRenderPrimitive   6
 DWORD RETURN_RwIm3DRenderPrimitive = 0x07EF6B6;
-void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
+static void __declspec(naked) HOOK_RwIm3DRenderPrimitive()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -830,7 +843,7 @@ void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
         push    [esp+4*3]
         push    [esp+4*3]
         push    [esp+4*3]
-        call inner
+        call    inner
         add     esp, 4*3
 
         pushad
@@ -839,7 +852,8 @@ void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
         add     esp, 4*1
         popad
         retn
-inner:
+
+        inner:
         mov     ecx, ds:0x0C97B24
         jmp     RETURN_RwIm3DRenderPrimitive
     }
@@ -866,9 +880,11 @@ __declspec(noinline) void OnMY_RwIm2DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 #define HOOKPOS_RwIm2DRenderIndexedPrimitive     0x0734EA1
 #define HOOKSIZE_RwIm2DRenderIndexedPrimitive    5
 DWORD RETURN_RwIm2DRenderIndexedPrimitive = 0x0403927;
-void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
+static void __declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -881,7 +897,7 @@ void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
         push    [esp+4*5]
         push    [esp+4*5]
         push    [esp+4*5]
-        call inner
+        call    inner
         add     esp, 4*5
 
         pushad
@@ -891,7 +907,7 @@ void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
         popad
         retn
 
-inner:
+        inner:
         jmp     RETURN_RwIm2DRenderIndexedPrimitive
     }
 }
@@ -917,9 +933,11 @@ __declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 #define HOOKPOS_RwIm2DRenderPrimitive                0x0734E90
 #define HOOKSIZE_RwIm2DRenderPrimitive               5
 DWORD RETURN_RwIm2DRenderPrimitive = 0x0734E95;
-void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
+static void __declspec(naked) HOOK_RwIm2DRenderPrimitive()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -930,7 +948,7 @@ void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
         push    [esp+4*3]
         push    [esp+4*3]
         push    [esp+4*3]
-        call inner
+        call    inner
         add     esp, 4*3
 
         pushad
@@ -940,7 +958,7 @@ void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
         popad
         retn
 
-inner:
+        inner:
         mov     eax, ds:0x0C97B24
         jmp     RETURN_RwIm2DRenderPrimitive
     }

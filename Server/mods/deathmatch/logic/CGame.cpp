@@ -1556,6 +1556,9 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
 
         Player.CallEvent("onPlayerQuit", Arguments);
 
+        // Tell the resource manager
+        m_pResourceManager->OnPlayerQuit(Player);
+
         // Tell the map manager
         m_pMapManager->OnPlayerQuit(Player);
 
@@ -3860,9 +3863,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
 
     if (m_pMainConfig->IsVoiceEnabled())            // Shouldn't really be receiving voice packets at all if voice is disabled
     {
-        usDataLength = Packet.GetDataLength();
-
-        if (usDataLength > 0)
+        if (!Packet.IsEmpty())
         {
             CPlayer* pPlayer = Packet.GetSourcePlayer();
 
@@ -3891,9 +3892,6 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                 if (pPlayer->GetVoiceState() ==
                     VOICESTATE_TRANSMITTING)            // If we reach here, and we're still in idle state, then the event was cancelled
                 {
-                    const unsigned char* pBuffer = Packet.GetData();
-                    CVoiceDataPacket     VoicePacket(pPlayer, pBuffer, usDataLength);
-
                     // Make list of players to send the voice packet to
                     std::set<CPlayer*> playerSendMap;
 
@@ -3936,7 +3934,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                     }
 
                     // Send to all players in the send list
-                    CPlayerManager::Broadcast(VoicePacket, playerSendMap);
+                    CPlayerManager::Broadcast(Packet, playerSendMap);
                 }
             }
         }
@@ -4178,17 +4176,16 @@ void CGame::Packet_PlayerNetworkStatus(CPlayerNetworkStatusPacket& Packet)
 
 void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
 {
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer)
-    {
-        CResource* pResource = Packet.GetResource();
-        if (pResource)
-        {
-            CLuaArguments Arguments;
-            Arguments.PushResource(pResource);
-            pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
-        }
-    }
+    CPlayer*     sourcePlayer = Packet.GetSourcePlayer();
+    CResource*   resource = Packet.GetResource();
+    unsigned int playerStartCounter = Packet.GetStartCounter();
+
+    if (!sourcePlayer || !resource || !resource->CanPlayerTriggerResourceStart(sourcePlayer, playerStartCounter))
+        return;
+
+    CLuaArguments Arguments;
+    Arguments.PushResource(resource);
+    sourcePlayer->CallEvent("onPlayerResourceStart", Arguments, nullptr);
 }
 
 void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket& packet) noexcept
@@ -4722,9 +4719,10 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
     uchar ucAllowFastSprintFix = true;
     uchar ucAllowDrivebyAnimFix = true;
     uchar ucAllowShotgunDamageFix = true;
+    std::uint8_t multiCommandHandlerPolicy = static_cast<std::uint8_t>(m_pMainConfig->GetAllowMultiCommandHandlers());
 
     CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs,
-                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix);
+                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix, multiCommandHandlerPolicy);
     if (pPlayer)
         pPlayer->Send(packet);
     else

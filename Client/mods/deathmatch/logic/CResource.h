@@ -115,9 +115,13 @@ public:
     int                GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
     void               SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
 
+    void         SetStartCounter(unsigned int startCounter) { m_startCounter = startCounter; }
+    unsigned int GetStartCounter() const noexcept { return m_startCounter; }
+
 private:
     unsigned short       m_usNetID;
     uint                 m_uiScriptID;
+    unsigned int         m_startCounter{};
     SString              m_strResourceName;
     CLuaMain*            m_pLuaVM;
     CLuaManager*         m_pLuaManager;

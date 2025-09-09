@@ -154,6 +154,8 @@ public:
 
     void Reload();
 
+    bool CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter);
+
     // Get a resource default setting
     bool GetDefaultSetting(const char* szName, char* szValue, size_t sizeBuffer);
 
@@ -269,6 +271,7 @@ public:
     uint GetScriptID() const noexcept { return m_uiScriptID; }
 
     void OnPlayerJoin(CPlayer& Player);
+    void OnPlayerQuit(CPlayer& Player);
     void SendNoClientCacheScripts(CPlayer* pPlayer = nullptr);
 
     void OnResourceStateChange(const char* state) noexcept;
@@ -347,7 +350,10 @@ protected:
     void RefreshAutoPermissions(CXMLNode* pNodeAclRequest);
 
     void CommitAclRequest(const SAclRequest& request);
-    bool FindAclRequest(SAclRequest& request);
+    bool FindAclRequest(SAclRequest& result);
+
+    std::string CalculateACLRequestFingerprint();
+    bool        HasACLRequestsChanged();
 
 private:
     bool CheckState();            // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
@@ -401,6 +407,9 @@ private:
     CElementGroup* m_pDefaultElementGroup = nullptr;            // stores elements created by scripts in this resource
     CLuaMain*      m_pVM = nullptr;
 
+    unsigned int                 m_startCounter{};
+    std::unordered_set<CPlayer*> m_isRunningForPlayer;
+
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;            // we store them here temporarily, then read them once all the resources are loaded
     std::list<CResourceFile*>      m_ResourceFiles;
@@ -450,6 +459,7 @@ private:
     SString     m_strMinServerReason;
 
     CChecksum m_metaChecksum;            // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
+    std::string m_strACLRequestFingerprint;
 
     uint                              m_uiFunctionRightCacheRevision = 0;
     CFastHashMap<lua_CFunction, bool> m_FunctionRightCacheMap;
