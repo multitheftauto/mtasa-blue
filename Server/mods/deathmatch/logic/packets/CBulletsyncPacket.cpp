@@ -16,7 +16,6 @@
 #include "CElementIDs.h"
 #include "CElement.h"
 #include "CWeaponNames.h"
-#include <cstdint>
 
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
     : m_weapon(WEAPONTYPE_UNARMED)
@@ -225,7 +224,9 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
             return false;
            
         // Check if weapon has ammo
-        if (pPlayer->GetWeaponTotalAmmo(static_cast<std::uint8_t>(m_weapon)) <= 0)
+        const auto type = static_cast<std::uint8_t>(m_weapon);
+        const auto slot = CWeaponNames::GetSlotFromWeapon(type);
+        if (pPlayer->GetWeaponTotalAmmo(slot) <= 0)
             return false;
     }
         
