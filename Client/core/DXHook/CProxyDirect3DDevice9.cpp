@@ -289,6 +289,13 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 {
     WriteDebugEvent("CProxyDirect3DDevice9::Reset");
 
+    // Validate input parameters
+    if (!pPresentationParameters)
+    {
+        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Invalid presentation parameters");
+        return D3DERR_INVALIDCALL;
+    }
+
     // Save presentation parameters
     D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
 
@@ -302,17 +309,31 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Call the real reset routine.
     hResult = DoResetDevice(m_pDevice, pPresentationParameters, presentationParametersOrig);
 
-    // Store actual present parameters used
-    IDirect3DSwapChain9* pSwapChain;
-    m_pDevice->GetSwapChain(0, &pSwapChain);
-    pSwapChain->GetPresentParameters(&g_pDeviceState->CreationState.PresentationParameters);
-    SAFE_RELEASE(pSwapChain);
+    if (SUCCEEDED(hResult))
+    {
+        // Store actual present parameters used
+        IDirect3DSwapChain9* pSwapChain = nullptr;
+        HRESULT hrSwapChain = m_pDevice->GetSwapChain(0, &pSwapChain);
+        if (SUCCEEDED(hrSwapChain) && pSwapChain)
+        {
+            pSwapChain->GetPresentParameters(&g_pDeviceState->CreationState.PresentationParameters);
+            SAFE_RELEASE(pSwapChain);
+        }
+        else
+        {
+            WriteDebugEvent(SString("Warning: Failed to get swap chain for parameter storage: %08x", hrSwapChain));
+        }
 
-    // Store device creation parameters as well
-    m_pDevice->GetCreationParameters(&g_pDeviceState->CreationState.CreationParameters);
+        // Store device creation parameters as well
+        HRESULT hrCreationParams = m_pDevice->GetCreationParameters(&g_pDeviceState->CreationState.CreationParameters);
+        if (FAILED(hrCreationParams))
+        {
+            WriteDebugEvent(SString("Warning: Failed to get creation parameters: %08x", hrCreationParams));
+        }
 
-    g_pCore->LogEvent(7123, "Direct3D", "Direct3DDevice9::Reset", "Success");
-    GetVideoModeManager()->PostReset(pPresentationParameters);
+        // Only perform post-reset operations on successful reset
+        g_pCore->LogEvent(7123, "Direct3D", "Direct3DDevice9::Reset", "Success");
+        GetVideoModeManager()->PostReset(pPresentationParameters);
 
     // Update our data.
     m_pData->StoreViewport(0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
@@ -335,6 +356,11 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     const D3DDEVICE_CREATION_PARAMETERS& parameters = g_pDeviceState->CreationState.CreationParameters;
 
     WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x", parameters.AdapterOrdinal, parameters.DeviceType, parameters.BehaviorFlags));
+    }
+    else
+    {
+        WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset failed with HRESULT: %08x", hResult));
+    }
 
     return hResult;
 }
