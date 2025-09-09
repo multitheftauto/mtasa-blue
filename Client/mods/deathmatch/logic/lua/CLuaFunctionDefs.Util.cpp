@@ -372,6 +372,14 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        // Validate that the file input is not empty
+        if (strFileInput.empty())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Expected non-empty string, got empty string");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         // Grab our VM
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
@@ -416,10 +424,27 @@ int CLuaFunctionDefs::AbortDownload(lua_State* luaVM)
     //  bool abortDownload(number handlerId)
     std::uint32_t handlerId = 0;
     CScriptArgReader argStream(luaVM);
+    
+    // Check if argument is a number first
+    if (!argStream.NextIsNumber())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, SString("Expected number, got %s", lua_typename(luaVM, lua_type(luaVM, 1))));
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    
     argStream.ReadNumber(handlerId);
 
     if (!argStream.HasErrors())
     {
+        // Validate that handlerId is positive
+        if (handlerId <= 0)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, SString("Expected positive value, got %d", handlerId));
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         if (g_pClientGame->GetSingularFileDownloadManager())
         {
             const bool success = g_pClientGame->GetSingularFileDownloadManager()->AbortDownload(handlerId);
