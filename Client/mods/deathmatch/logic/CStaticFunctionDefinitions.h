@@ -20,6 +20,9 @@ class CStaticFunctionDefinitions;
 #include "enums/WeaponProperty.h"
 #include "enums/ObjectProperty.h"
 
+// Forward declarations
+class CSingularFileDownload;
+
 class CStaticFunctionDefinitions
 {
 public:
@@ -39,7 +42,7 @@ public:
     static bool WasEventCancelled();
 
     // Misc funcs
-    static bool DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum = CChecksum());
+    static CSingularFileDownload* DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum = CChecksum());
 
     // Output funcs
     static bool OutputConsole(const char* szText);

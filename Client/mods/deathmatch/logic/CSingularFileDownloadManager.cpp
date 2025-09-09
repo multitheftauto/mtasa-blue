@@ -12,7 +12,7 @@
 #include <StdInc.h>
 using std::list;
 
-CSingularFileDownloadManager::CSingularFileDownloadManager()
+CSingularFileDownloadManager::CSingularFileDownloadManager() : m_nextHandlerId(1)
 {
 }
 
@@ -25,38 +25,73 @@ CSingularFileDownloadManager::~CSingularFileDownloadManager()
 CSingularFileDownload* CSingularFileDownloadManager::AddFile(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL,
                                                              CResource* pRequestResource, CChecksum checksum)
 {
-    CSingularFileDownload* pFile = new CSingularFileDownload(pResource, szName, szNameShort, strHTTPURL, pRequestResource, checksum);
+    const std::uint32_t handlerId = m_nextHandlerId++;
+    auto* pFile = new CSingularFileDownload(pResource, szName, szNameShort, strHTTPURL, pRequestResource, checksum, handlerId);
     m_Downloads.push_back(pFile);
-    return NULL;
+    m_HandlerMap[handlerId] = pFile;
+    return pFile;
 }
 
 void CSingularFileDownloadManager::CancelResourceDownloads(CResource* pResource)
 {
-    list<CSingularFileDownload*>::const_iterator iter = m_Downloads.begin();
-    for (; iter != m_Downloads.end(); ++iter)
+    for (const auto& pDownload : m_Downloads)
     {
-        if ((*iter)->GetResource() == pResource)
-            (*iter)->Cancel();
+        if (pDownload->GetResource() == pResource)
+            pDownload->Cancel();
     }
 }
 
 void CSingularFileDownloadManager::ClearList()
 {
-    list<CSingularFileDownload*>::const_iterator iter = m_Downloads.begin();
-    for (; iter != m_Downloads.end(); ++iter)
+    for (const auto& pDownload : m_Downloads)
     {
-        delete *iter;
+        delete pDownload;
     }
     m_Downloads.clear();
+    m_HandlerMap.clear();
 }
 
 bool CSingularFileDownloadManager::AllComplete()
 {
-    list<CSingularFileDownload*>::const_iterator iter = m_Downloads.begin();
-    for (; iter != m_Downloads.end(); ++iter)
+    for (const auto& pDownload : m_Downloads)
     {
-        if (!(*iter)->GetComplete())
+        if (!pDownload->GetComplete())
             return false;
     }
     return true;
+}
+
+CSingularFileDownload* CSingularFileDownloadManager::FindDownloadByHandler(std::uint32_t handlerId) const
+{
+    const auto it = m_HandlerMap.find(handlerId);
+    return (it != m_HandlerMap.end()) ? it->second : nullptr;
+}
+
+bool CSingularFileDownloadManager::AbortDownload(std::uint32_t handlerId)
+{
+    auto* pDownload = FindDownloadByHandler(handlerId);
+    if (!pDownload)
+        return false;
+
+    const bool success = pDownload->Cancel();
+    if (success)
+    {
+        RemoveDownload(pDownload);
+    }
+    return success;
+}
+
+void CSingularFileDownloadManager::RemoveDownload(CSingularFileDownload* pDownload)
+{
+    if (!pDownload)
+        return;
+
+    // Remove from handler map
+    m_HandlerMap.erase(pDownload->GetHandlerId());
+
+    // Remove from downloads list
+    m_Downloads.remove(pDownload);
+
+    // Delete the download object
+    delete pDownload;
 }

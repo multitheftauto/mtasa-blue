@@ -390,10 +390,12 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
                 {
                     if (strcmp(strMetaPath, (*iter)->GetShortName()) == 0)
                     {
-                        if (CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, (*iter)->GetServerChecksum()))
+                        CSingularFileDownload* pDownload = CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, (*iter)->GetServerChecksum());
+                        if (pDownload)
                         {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
+                            lua_pushuserdata(luaVM, pDownload);
+                            lua_pushnumber(luaVM, pDownload->GetHandlerId());
+                            return 2;
                         }
                     }
                 }
@@ -405,6 +407,31 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
             }
         }
     }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::AbortDownload(lua_State* luaVM)
+{
+    //  bool abortDownload(number handlerId)
+    std::uint32_t handlerId = 0;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(handlerId);
+
+    if (!argStream.HasErrors())
+    {
+        if (g_pClientGame->GetSingularFileDownloadManager())
+        {
+            const bool success = g_pClientGame->GetSingularFileDownloadManager()->AbortDownload(handlerId);
+            lua_pushboolean(luaVM, success);
+            return 1;
+        }
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

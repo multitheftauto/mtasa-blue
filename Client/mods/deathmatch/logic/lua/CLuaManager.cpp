@@ -199,6 +199,7 @@ void CLuaManager::LoadCFunctions()
         // Util functions
         {"getValidPedModels", CLuaFunctionDefs::GetValidPedModels},
         {"downloadFile", CLuaFunctionDefs::DownloadFile},
+        {"abortDownload", CLuaFunctionDefs::AbortDownload},
 
         // Input functions
         {"bindKey", CLuaFunctionDefs::BindKey},
