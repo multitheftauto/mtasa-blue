@@ -378,7 +378,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     HRESULT hCoopLevel = m_pDevice->TestCooperativeLevel();
     if (hCoopLevel == D3DERR_DEVICELOST)
     {
-        WriteDebugEvent("Reset: Device still lost, cannot reset yet");
+        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Device still lost, cannot reset yet");
         return hCoopLevel;
     }
     else if (hCoopLevel != D3DERR_DEVICENOTRESET && hCoopLevel != D3D_OK)
