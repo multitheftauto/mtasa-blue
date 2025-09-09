@@ -1515,10 +1515,11 @@ void CGraphics::DrawTexture(CTextureItem* pTexture, float fX, float fY, float fS
     D3DXVECTOR2 scaling(fScaleX * fFileWidth / fCutWidth, fScaleY * fFileHeight / fCutHeight);
     D3DXVECTOR2 rotationCenter(fFileWidth * fScaleX * fCenterX, fFileHeight * fScaleX * fCenterY);
     D3DXVECTOR2 position(fX - fFileWidth * fScaleX * fCenterX, fY - fFileHeight * fScaleY * fCenterY);
-    D3DXMatrixTransformation2D(&matrix, NULL, NULL, &scaling, &rotationCenter, DegreesToRadians(fRotation), &position);
+    const D3DXVECTOR2* pRotationCenter = fRotation != 0.0f ? &rotationCenter : NULL;
+    D3DXMatrixTransformation2D(&matrix, NULL, NULL, &scaling, pRotationCenter, DegreesToRadians(fRotation), &position);
     CheckModes(EDrawMode::DX_SPRITE, m_ActiveBlendMode);
     m_pDXSprite->SetTransform(&matrix);
-    m_pDXSprite->Draw((IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, /*ModifyColorForBlendMode (*/ dwColor /*, blendMode )*/);
+    m_pDXSprite->Draw((IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, dwColor);
     EndDrawBatch();
 }
 
@@ -1763,7 +1764,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             D3DXVECTOR2  scaling(Item.Text.fScaleX, Item.Text.fScaleY);
             D3DXVECTOR2  translation(fPosFracX * Item.Text.fScaleX, fPosFracY * Item.Text.fScaleY);            // Sub-pixel positioning
             D3DXVECTOR2  rotcenter(Item.Text.fRotationCenterX, Item.Text.fRotationCenterY);
-            D3DXVECTOR2* pRotcenter = Item.Text.fRotation ? &rotcenter : NULL;
+            const D3DXVECTOR2* pRotcenter = Item.Text.fRotation != 0.0f ? &rotcenter : NULL;
             D3DXMatrixTransformation2D(&matrix, NULL, 0.0f, &scaling, pRotcenter, DegreesToRadians(Item.Text.fRotation), &translation);
             CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
             m_pDXSprite->SetTransform(&matrix);
@@ -1789,7 +1790,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
                 const float       fCutWidth = cutImagePos.right - cutImagePos.left;
                 const float       fCutHeight = cutImagePos.bottom - cutImagePos.top;
                 const D3DXVECTOR2 scaling(Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight);
-                const D3DXVECTOR2 rotationCenter(Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY);
+                const D3DXVECTOR2 rotationCenter(fFileWidth * 0.5f + Item.Texture.fRotCenOffX, fFileHeight * 0.5f + Item.Texture.fRotCenOffY);
                 const D3DXVECTOR2 position(Item.Texture.fX, Item.Texture.fY);
                 const D3DXVECTOR2* pRotationCenter = Item.Texture.fRotation ? &rotationCenter : NULL;
                 D3DXMATRIX         matrix;
@@ -2003,9 +2004,23 @@ void CGraphics::MaybeLeavingMTARenderZone()
 ////////////////////////////////////////////////////////////////
 void CGraphics::SaveGTARenderStates()
 {
+    // Prevent GPU driver hang by checking device state before creating state blocks
+    if (m_pDevice->TestCooperativeLevel() != D3D_OK)
+    {
+        WriteDebugEvent("CGraphics::SaveGTARenderStates - Device not cooperative, skipping state block creation");
+        return;
+    }
+
     SAFE_RELEASE(m_pSavedStateBlock);
-    // Create a state block.
-    m_pDevice->CreateStateBlock(D3DSBT_ALL, &m_pSavedStateBlock);
+    
+    // Add error handling for state block creation
+    HRESULT hr = m_pDevice->CreateStateBlock(D3DSBT_ALL, &m_pSavedStateBlock);
+    if (FAILED(hr))
+    {
+        WriteDebugEvent(SString("CGraphics::SaveGTARenderStates - Failed to create state block: %08x", hr));
+        m_pSavedStateBlock = nullptr;
+        return;
+    }
 
     // Make sure linear sampling is enabled
     m_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -2025,6 +2040,14 @@ void CGraphics::SaveGTARenderStates()
 ////////////////////////////////////////////////////////////////
 void CGraphics::RestoreGTARenderStates()
 {
+    // Check device state before attempting to restore
+    if (m_pDevice->TestCooperativeLevel() != D3D_OK)
+    {
+        WriteDebugEvent("CGraphics::RestoreGTARenderStates - Device not cooperative, skipping state restoration");
+        SAFE_RELEASE(m_pSavedStateBlock);
+        return;
+    }
+
     // Restore these transforms to fix various weird stuff
     m_pDevice->SetTransform(D3DTS_PROJECTION, &g_pDeviceState->TransformState.PROJECTION);
     m_pDevice->SetTransform(D3DTS_WORLD, &g_pDeviceState->TransformState.WORLD);
@@ -2033,7 +2056,12 @@ void CGraphics::RestoreGTARenderStates()
     // Restore the render states
     if (m_pSavedStateBlock)
     {
-        m_pSavedStateBlock->Apply();
+        // Error handling for state block apply
+        HRESULT hr = m_pSavedStateBlock->Apply();
+        if (FAILED(hr))
+        {
+            WriteDebugEvent(SString("RestoreGTARenderStates: Failed to apply state block: %08x", hr));
+        }
         SAFE_RELEASE(m_pSavedStateBlock);
     }
 }

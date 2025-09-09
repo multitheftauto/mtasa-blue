@@ -187,7 +187,24 @@ ULONG CProxyDirect3DDevice9::Release()
 /*** IDirect3DDevice9 methods ***/
 HRESULT CProxyDirect3DDevice9::TestCooperativeLevel()
 {
-    return m_pDevice->TestCooperativeLevel();
+    HRESULT hResult = m_pDevice->TestCooperativeLevel();
+    
+    // Log device state transitions for debugging GPU driver issues
+    static HRESULT lastResult = D3D_OK;
+    if (hResult != lastResult)
+    {
+        WriteDebugEvent(SString("CProxyDirect3DDevice9::TestCooperativeLevel - Device state changed: %08x -> %08x", lastResult, hResult));
+        lastResult = hResult;
+        
+        // Additional safety for when transitioning to/from lost states
+        if (hResult == D3DERR_DEVICELOST || hResult == D3DERR_DEVICENOTRESET)
+        {
+            // Give the driver a moment to stabilize
+            Sleep(1);
+        }
+    }
+    
+    return hResult;
 }
 
 UINT CProxyDirect3DDevice9::GetAvailableTextureMem()
@@ -356,6 +373,19 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         WriteDebugEvent("CProxyDirect3DDevice9::Reset - Invalid presentation parameters");
         return D3DERR_INVALIDCALL;
     }
+    
+    // Check cooperative level before attempting reset
+    HRESULT hCoopLevel = m_pDevice->TestCooperativeLevel();
+    if (hCoopLevel == D3DERR_DEVICELOST)
+    {
+        WriteDebugEvent("Reset: Device still lost, cannot reset yet");
+        return hCoopLevel;
+    }
+    else if (hCoopLevel != D3DERR_DEVICENOTRESET && hCoopLevel != D3D_OK)
+    {
+        WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset - Device in unexpected state: %08x", hCoopLevel));
+        return hCoopLevel;
+    }
 
     // Save presentation parameters
     D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
@@ -367,6 +397,9 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Call our event handler.
     CDirect3DEvents9::OnInvalidate(m_pDevice);
 
+    // Give GPU driver time to complete any pending operations
+    Sleep(1);
+    
     // Call the real reset routine.
     hResult = DoResetDevice(m_pDevice, pPresentationParameters, presentationParametersOrig);
 
@@ -408,8 +441,13 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Update our data.
     m_pData->StoreViewport(0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
 
-    // Call our event handler.
-    CDirect3DEvents9::OnRestore(m_pDevice);
+        // Ensure scene state is properly restored
+        // Call our event handler.
+        CDirect3DEvents9::OnRestore(m_pDevice);
+        
+        // Additional sync point for GPU driver
+        m_pDevice->BeginScene();
+        m_pDevice->EndScene();
 
     WriteDebugEvent(SString("    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d", pPresentationParameters->BackBufferWidth,
                             pPresentationParameters->BackBufferHeight, pPresentationParameters->BackBufferFormat, pPresentationParameters->BackBufferCount));
