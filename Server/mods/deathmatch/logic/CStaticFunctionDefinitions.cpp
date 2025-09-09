@@ -9110,6 +9110,8 @@ bool CStaticFunctionDefinitions::UnbindKey(CPlayer* pPlayer, const char* szKey, 
         (pControl && (bSuccess = pKeyBinds->RemoveControlFunction(szKey, pLuaMain, bCheckHitState, bHitState, iLuaFunction)) &&
          !pKeyBinds->ControlFunctionExists(szKey, NULL, bCheckHitState, bHitState)))
     {
+        // Only send UNBIND_KEY RPC if there are no more function bindings for this key
+        // This allows user command bindings to persist
         unsigned char ucKeyLength = static_cast<unsigned char>(strlen(szKey));
 
         CBitStream bitStream;
