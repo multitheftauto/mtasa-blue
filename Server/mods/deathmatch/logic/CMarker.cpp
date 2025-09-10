@@ -428,7 +428,7 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
     {
         CColTube* pShape = static_cast<CColTube*>(m_pCollision);
         pShape->SetRadius(m_fSize);
-        pShape->SetHeight(m_fSize);
+        pShape->SetHeight(m_fSize <= 1.5 ? m_fSize + 1 : m_fSize);
     }
     else
     {
