@@ -318,7 +318,17 @@ void CClientMarker::SetSize(float fSize)
         {
             CClientColTube* pShape = static_cast<CClientColTube*>(m_pCollision);
             pShape->SetRadius(fSize);
-            pShape->SetHeight(fSize);
+
+            if (fSize <= 1.5)
+            {
+             pShape->SetHeight(fSize+1);
+            }
+            else
+            {
+             pShape->SetHeight(fSize);
+            }
+
+            
             break;
         }
     }
