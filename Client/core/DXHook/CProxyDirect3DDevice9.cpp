@@ -21,17 +21,8 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 {
     WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x (device: %08x)", this, pDevice));
 
-    // Set wrapped device - DO NOT AddRef here since we'll do it in AddRef method
+    // Set our wrapped device.
     m_pDevice = pDevice;
-    
-    // Initialize reference count to 1 (the creator holds a reference)
-    m_ulRefCount = 1;
-    
-    // Now add a reference to the underlying device to match initial ref count
-    if (m_pDevice)
-    {
-        m_pDevice->AddRef();
-    }
 
     // Get CDirect3DData pointer.
     m_pData = CDirect3DData::GetSingletonPtr();
@@ -48,18 +39,12 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
     int iAdapter = creationParameters.AdapterOrdinal;
 
     IDirect3D9* pD3D9 = CProxyDirect3D9::StaticGetDirect3D();
-    bool bNeedRelease = false;
     if (!pD3D9)
-    {
         m_pDevice->GetDirect3D(&pD3D9);
-        bNeedRelease = true; // GetDirect3D increments reference count
-    }
 
-    if (pD3D9)
-    {
-        D3DADAPTER_IDENTIFIER9 adaptIdent;
-        ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
-        pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
+    D3DADAPTER_IDENTIFIER9 adaptIdent;
+    ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
+    pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
 
     int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
 
@@ -73,25 +58,6 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
     // Get video card name
     //
     g_pDeviceState->AdapterState.Name = adaptIdent.Description;
-
-        // Clipping is required for some graphic configurations
-        g_pDeviceState->AdapterState.bRequiresClipping = SStringX(adaptIdent.Description).Contains("Intel");
-
-        // Release D3D9 interface if we obtained it via GetDirect3D
-        if (bNeedRelease)
-        {
-            SAFE_RELEASE(pD3D9);
-        }
-    }
-    else
-    {
-        WriteDebugEvent("Warning: Could not obtain IDirect3D9 interface for adapter info");
-        
-        // Set default values
-        g_pDeviceState->AdapterState.InstalledMemoryKB = m_pDevice->GetAvailableTextureMem() / 1024;
-        g_pDeviceState->AdapterState.Name = "Unknown";
-        g_pDeviceState->AdapterState.bRequiresClipping = false;
-    }
 
     //
     // Get max anisotropic setting
@@ -108,6 +74,9 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
             g_pDeviceState->AdapterState.MaxAnisotropicSetting++;
     }
 
+    // Clipping is required for some graphic configurations
+    g_pDeviceState->AdapterState.bRequiresClipping = SStringX(adaptIdent.Description).Contains("Intel");
+
     WriteDebugEvent(SString("*** Using adapter: %s (Mem:%d KB, MaxAnisotropy:%d)", (const char*)g_pDeviceState->AdapterState.Name,
                             g_pDeviceState->AdapterState.InstalledMemoryKB, g_pDeviceState->AdapterState.MaxAnisotropicSetting));
 
@@ -122,89 +91,42 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 {
     WriteDebugEvent(SString("CProxyDirect3DDevice9::~CProxyDirect3DDevice9 %08x", this));
-    
-    // Release our reference to the wrapped device
-    // Note: We don't check m_ulRefCount here because destructor is only called
-    // when Release() determined the count reached 0
-    if (m_pDevice)
-    {
-        m_pDevice->Release();
-        m_pDevice = nullptr;
-    }
-    
-    if (g_pProxyDevice == this)
-    {
-        g_pDeviceState = NULL;
-        g_pProxyDevice = NULL;
-    }
+    g_pDeviceState = NULL;
+    g_pProxyDevice = NULL;
 }
 
 /*** IUnknown methods ***/
 HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
 {
-    if (!ppvObj)
-        return E_POINTER;
-        
-    *ppvObj = nullptr;
-    
-    // Check if its for IUnknown or IDirect3DDevice9
-    if (riid == IID_IUnknown || riid == IID_IDirect3DDevice9)
-    {
-        *ppvObj = static_cast<IDirect3DDevice9*>(this);
-        AddRef();
-        return S_OK;
-    }
-    
-    // For any other interface, forward to underlying device
-    // But this means the caller gets the underlying device, not our proxy
     return m_pDevice->QueryInterface(riid, ppvObj);
 }
 
 ULONG CProxyDirect3DDevice9::AddRef()
 {
-    // Only increment proxy reference count
-    // We keep a single reference to the underlying device throughout the lifetime
-    return InterlockedIncrement(&m_ulRefCount);
+    return m_pDevice->AddRef();
 }
 
 ULONG CProxyDirect3DDevice9::Release()
 {
-    // Only decrement proxy reference count  
-    ULONG ulNewRefCount = InterlockedDecrement(&m_ulRefCount);
-    
-    if (ulNewRefCount == 0)
+    // Check if will be final release
+    m_pDevice->AddRef();
+    ULONG ulRefCount = m_pDevice->Release();
+    if (ulRefCount == 1)
     {
         WriteDebugEvent("Releasing IDirect3DDevice9 Proxy...");
         // Call event handler
         CDirect3DEvents9::OnDirect3DDeviceDestroy(m_pDevice);
         delete this;
-        return 0;
+        return ulRefCount - 1;
     }
 
-    return ulNewRefCount;
+    return m_pDevice->Release();
 }
 
 /*** IDirect3DDevice9 methods ***/
 HRESULT CProxyDirect3DDevice9::TestCooperativeLevel()
 {
-    HRESULT hResult = m_pDevice->TestCooperativeLevel();
-    
-    // Log device state transitions for debugging GPU driver issues
-    static HRESULT lastResult = D3D_OK;
-    if (hResult != lastResult)
-    {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::TestCooperativeLevel - Device state changed: %08x -> %08x", lastResult, hResult));
-        lastResult = hResult;
-        
-        // Additional safety for when transitioning to/from lost states
-        if (hResult == D3DERR_DEVICELOST || hResult == D3DERR_DEVICENOTRESET)
-        {
-            // Give the driver a moment to stabilize
-            Sleep(1);
-        }
-    }
-    
-    return hResult;
+    return m_pDevice->TestCooperativeLevel();
 }
 
 UINT CProxyDirect3DDevice9::GetAvailableTextureMem()
@@ -373,19 +295,6 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         WriteDebugEvent("CProxyDirect3DDevice9::Reset - Invalid presentation parameters");
         return D3DERR_INVALIDCALL;
     }
-    
-    // Check cooperative level before attempting reset
-    HRESULT hCoopLevel = m_pDevice->TestCooperativeLevel();
-    if (hCoopLevel == D3DERR_DEVICELOST)
-    {
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Device still lost, cannot reset yet");
-        return hCoopLevel;
-    }
-    else if (hCoopLevel != D3DERR_DEVICENOTRESET && hCoopLevel != D3D_OK)
-    {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset - Device in unexpected state: %08x", hCoopLevel));
-        return hCoopLevel;
-    }
 
     // Save presentation parameters
     D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
@@ -397,9 +306,6 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Call our event handler.
     CDirect3DEvents9::OnInvalidate(m_pDevice);
 
-    // Give GPU driver time to complete any pending operations
-    Sleep(1);
-    
     // Call the real reset routine.
     hResult = DoResetDevice(m_pDevice, pPresentationParameters, presentationParametersOrig);
 
@@ -408,24 +314,15 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         // Store actual present parameters used
         IDirect3DSwapChain9* pSwapChain = nullptr;
         HRESULT hrSwapChain = m_pDevice->GetSwapChain(0, &pSwapChain);
-        if (SUCCEEDED(hrSwapChain))
+        if (SUCCEEDED(hrSwapChain) && pSwapChain)
         {
-            if (pSwapChain)
-            {
-                pSwapChain->GetPresentParameters(&g_pDeviceState->CreationState.PresentationParameters);
-            }
-            else
-            {
-                WriteDebugEvent("Warning: GetSwapChain succeeded but returned null swap chain");
-            }
+            pSwapChain->GetPresentParameters(&g_pDeviceState->CreationState.PresentationParameters);
+            SAFE_RELEASE(pSwapChain);
         }
         else
         {
             WriteDebugEvent(SString("Warning: Failed to get swap chain for parameter storage: %08x", hrSwapChain));
         }
-        
-        // Always release the swap chain if it was obtained, regardless of success/failure
-        SAFE_RELEASE(pSwapChain);
 
         // Store device creation parameters as well
         HRESULT hrCreationParams = m_pDevice->GetCreationParameters(&g_pDeviceState->CreationState.CreationParameters);
@@ -441,13 +338,8 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Update our data.
     m_pData->StoreViewport(0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
 
-        // Ensure scene state is properly restored
-        // Call our event handler.
-        CDirect3DEvents9::OnRestore(m_pDevice);
-        
-        // Additional sync point for GPU driver
-        m_pDevice->BeginScene();
-        m_pDevice->EndScene();
+    // Call our event handler.
+    CDirect3DEvents9::OnRestore(m_pDevice);
 
     WriteDebugEvent(SString("    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d", pPresentationParameters->BackBufferWidth,
                             pPresentationParameters->BackBufferHeight, pPresentationParameters->BackBufferFormat, pPresentationParameters->BackBufferCount));
