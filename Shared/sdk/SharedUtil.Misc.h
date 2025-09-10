@@ -22,6 +22,15 @@
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.Map.h"
 
+#ifdef WIN32
+// Forward declare basic windows types to avoid including windows.h here
+struct HWND__;
+    #ifndef _WINDOWS_
+typedef HWND__* HWND;
+typedef unsigned int UINT;
+    #endif
+#endif
+
 namespace SharedUtil
 {
     class CArgMap;
@@ -1718,3 +1727,4 @@ using namespace SharedUtil;
 //
 typedef void(FUNC_GetMtaVersion)(char* pBuffer, uint uiMaxSize);
 MTAEXPORT void GetLibMtaVersion(char* pBuffer, uint uiMaxSize);
+
