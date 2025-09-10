@@ -211,6 +211,7 @@ static_assert(sizeof(CPedAcquaintanceSAInterface) == 0x14, "Invalid size for CPe
 
 class CPedStatSAInterface
 {
+public:
     std::uint32_t id;
     char          name[24];
     float         fleedDistance;
@@ -474,6 +475,8 @@ public:
     PedState           GetPedState() const override { return static_cast<PedState>(GetPedInterface()->pedState); }
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
+
+    static void __fastcall PlayFootSteps(CPedSAInterface* ped);
 
     static void StaticSetHooks();
 
