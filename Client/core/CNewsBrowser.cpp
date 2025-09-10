@@ -281,7 +281,7 @@ CGUIWindow* CNewsBrowser::LoadLayoutAndImages(CGUIElement* pParent, const SNewsI
     // Make sure we have the layout filename
     if (newsItem.strLayoutFilename.empty())
     {
-        AddReportLog(3302, SString("CNewsBrowser::LoadLayout: Problem loading %s", *newsItem.strContentFullDir));
+        AddReportLog(ReportLogID::NEWS_LAYOUT_FAIL, SString("CNewsBrowser::LoadLayout: Problem loading %s", *newsItem.strContentFullDir));
         return NULL;
     }
 
@@ -290,8 +290,8 @@ CGUIWindow* CNewsBrowser::LoadLayoutAndImages(CGUIElement* pParent, const SNewsI
     {
         if (!pManager->LoadImageset(newsItem.imagesetFilenameList[i]))
         {
-            AddReportLog(
-                3303, SString("CNewsBrowser::LoadLayout: Problem with LoadImageset [%s] %s", *newsItem.strContentFullDir, *newsItem.imagesetFilenameList[i]));
+            AddReportLog(ReportLogID::NEWS_LAYOUT_IMAGESET_FAIL, SString("CNewsBrowser::LoadLayout: Problem with LoadImageset [%s] %s",
+                                                                         *newsItem.strContentFullDir, *newsItem.imagesetFilenameList[i]));
             return NULL;
         }
     }
@@ -300,7 +300,7 @@ CGUIWindow* CNewsBrowser::LoadLayoutAndImages(CGUIElement* pParent, const SNewsI
     CGUIWindow* pWindow = pManager->LoadLayout(pParent, newsItem.strLayoutFilename);
     if (!pWindow)
     {
-        AddReportLog(3304, SString("CNewsBrowser::LoadLayout: Problem with LoadLayout [%s] %s", *newsItem.strContentFullDir, *newsItem.strLayoutFilename));
+        AddReportLog(ReportLogID::NEW_LAYOUT_LOAD_FAIL, SString("CNewsBrowser::LoadLayout: Problem with LoadLayout [%s] %s", *newsItem.strContentFullDir, *newsItem.strLayoutFilename));
         return NULL;
     }
     return pWindow;

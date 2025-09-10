@@ -103,7 +103,7 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
         SString strMessage("D3DXCheckVersion FAILED (D3D_SDK_VERSION: %d  D3DX_SDK_VERSION: %d  SDKVersion: %d)", D3D_SDK_VERSION, D3DX_SDK_VERSION,
                            SDKVersion);
         WriteDebugEvent(strMessage);
-        AddReportLog(9640, strMessage);
+        AddReportLog(ReportLogID::D3D_VERSION_FAIL, strMessage);
     }
     else
     {

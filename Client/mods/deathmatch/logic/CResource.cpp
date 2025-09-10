@@ -518,6 +518,6 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
     SString strMessage = SString("HTTP server file mismatch! (%s) %s [%s]", GetName(), *strFilename, *errorMessage);
 
     // Log to the server & client console
-    g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);
+    g_pClientGame->TellServerSomethingImportant(bScript ? ReportLogID::DOWNLOAD_SCRIPT_ERROR : ReportLogID::DOWNLOAD_FILE_ERROR, strMessage, 4);
     g_pCore->GetConsole()->Printf("Download error: %s", *strMessage);
 }

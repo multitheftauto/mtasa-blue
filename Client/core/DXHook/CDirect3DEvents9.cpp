@@ -733,7 +733,7 @@ HRESULT CDirect3DEvents9::CreateVertexBuffer(IDirect3DDevice9* pDevice, UINT Len
         {
             SString strMessage("CreateVertexBuffer fail: hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool);
             WriteDebugEvent(strMessage);
-            AddReportLog(8610, strMessage);
+            AddReportLog(ReportLogID::D3D_VERTEXBUFFER_FAIL, strMessage);
             CCore::GetSingleton().LogEvent(610, "CreateVertexBuffer", "", strMessage);
             return hr;
         }
@@ -768,7 +768,7 @@ HRESULT CDirect3DEvents9::CreateIndexBuffer(IDirect3DDevice9* pDevice, UINT Leng
         {
             SString strMessage("CreateIndexBuffer fail: hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool);
             WriteDebugEvent(strMessage);
-            AddReportLog(8611, strMessage);
+            AddReportLog(ReportLogID::D3D_INDEXBUFFER_FAIL, strMessage);
             CCore::GetSingleton().LogEvent(611, "CreateIndexBuffer", "", strMessage);
             return hr;
         }
@@ -803,7 +803,7 @@ HRESULT CDirect3DEvents9::CreateTexture(IDirect3DDevice9* pDevice, UINT Width, U
         {
             SString strMessage("CreateTexture fail: hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool);
             WriteDebugEvent(strMessage);
-            AddReportLog(8612, strMessage);
+            AddReportLog(ReportLogID::D3D_TEXTURE_FAIL, strMessage);
             CCore::GetSingleton().LogEvent(612, "CreateTexture", "", strMessage);
             return hr;
         }
@@ -910,7 +910,7 @@ HRESULT CDirect3DEvents9::CreateVertexDeclaration(IDirect3DDevice9* pDevice, CON
 
         SString strMessage("CreateVertexDecl fail: hr:%x %s", hr, *strStatus);
         WriteDebugEvent(strMessage);
-        AddReportLog(8613, strMessage);
+        AddReportLog(ReportLogID::D3D_VERTEXDECL_FAIL, strMessage);
         CCore::GetSingleton().LogEvent(613, "CreateVertexDecl", "", strMessage);
         return hr;
     }

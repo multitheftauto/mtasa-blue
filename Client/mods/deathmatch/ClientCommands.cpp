@@ -149,7 +149,7 @@ void COMMAND_Help(const char* szCmdLine)
 void COMMAND_Disconnect(const char* szCmdLine)
 {
     g_pCore->RemoveMessageBox();
-    AddReportLog(7110, "Game - COMMAND_Disconnect");
+    AddReportLog(ReportLogID::GAME_CMD_DISCONNECT, "Game - COMMAND_Disconnect");
     g_pCore->GetModManager()->RequestUnload();
 }
 

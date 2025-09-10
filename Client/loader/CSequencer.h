@@ -82,14 +82,14 @@ public:
     }
 
     // Debug
-    void Log(const SString& strMessage) { AddReportLog(1071, strMessage); }
+    void Log(const SString& strMessage) { AddReportLog(ReportLogID::SEQUENCER_LOG, strMessage); }
 
     // Functions
     void AddFunction(const SString& strName, PFNVOIDVOID pfnCmdFunc) { MapSet(m_FunctionMap, strName, pfnCmdFunc); }
 
     void CallFunction(const SString& strName)
     {
-        AddReportLog(1070, SString("CallFunction: %s", *strName));
+        AddReportLog(ReportLogID::SEQUENCER_CALL_FUNC, SString("CallFunction: %s", *strName));
         if (PFNVOIDVOID* pfnCmdFunc = MapFind(m_FunctionMap, strName))
             SetVariable("LastResult", (m_pOuter->**pfnCmdFunc)());
         else

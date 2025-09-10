@@ -252,7 +252,7 @@ public:
     void                 OnDeviceRestore();
     void                 OnCrashAverted(uint uiId);
     void                 OnEnterCrashZone(uint uiId);
-    void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
+    void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, ReportLogID addReportLogId = ReportLogID::NONE);
     bool                 GetDebugIdEnabled(uint uiDebugId);
     EDiagnosticDebugType GetDiagnosticDebug();
     void                 SetDiagnosticDebug(EDiagnosticDebugType value);

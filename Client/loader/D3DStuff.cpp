@@ -80,7 +80,7 @@ bool NvOptimusDetect()
 
     NvAPI_GetInterfaceVersionString(szDesc);
     NvAPI_SYS_GetDriverAndBranchVersion(&uiDriverVersion, szBuildBranchString);
-    WriteDebugEventAndReport(7460, SString("NvAPI - InterfaceVersion:'%s' DriverVersion:%d.%d Branch:'%s'", szDesc, uiDriverVersion / 100,
+    WriteDebugEventAndReport(ReportLogID::NVIDIA_OPTIMUS_DETECTED, SString("NvAPI - InterfaceVersion:'%s' DriverVersion:%d.%d Branch:'%s'", szDesc, uiDriverVersion / 100,
                                            uiDriverVersion % 100, szBuildBranchString));
 
     // Get all the Physical GPU Handles
@@ -108,7 +108,7 @@ bool NvOptimusDetect()
             bFoundOptimus = true;
             strStatus += " FoundOptimus";
         }
-        WriteDebugEventAndReport(7461, strStatus);
+        WriteDebugEventAndReport(ReportLogID::NVIDIA_OPTIMUS_GPU_RESULT, strStatus);
     }
 
     return bFoundOptimus;

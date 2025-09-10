@@ -257,7 +257,7 @@ SString CInstallManager::Continue()
     // Initial report line
     DWORD   dwProcessId = GetCurrentProcessId();
     SString GotPathFrom = (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far") ? "registry" : "module location";
-    AddReportLog(1041, SString("* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetLaunchPathFilename().c_str(), GotPathFrom.c_str(),
+    AddReportLog(ReportLogID::INSTALL_MGR_LAUNCH, SString("* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetLaunchPathFilename().c_str(), GotPathFrom.c_str(),
                                GetMTASAPath().c_str()));
 
     // Run sequencer
@@ -272,7 +272,7 @@ SString CInstallManager::Continue()
     for (int i = 0; i < m_pSequencer->GetVariableInt("_argc"); i++)
         strCommandLineOut += m_pSequencer->GetVariable(SString("_arg_%d", i)) + " ";
 
-    AddReportLog(1060, SString("CInstallManager::Continue - return %s", *strCommandLineOut));
+    AddReportLog(ReportLogID::INSTALL_MGR_LAUNCH_FINISH, SString("CInstallManager::Continue - return %s", *strCommandLineOut));
     return *strCommandLineOut.TrimEnd(" ");
 }
 
@@ -285,7 +285,7 @@ SString CInstallManager::Continue()
 //////////////////////////////////////////////////////////
 void CInstallManager::RestoreSequencerFromSnapshot(const SString& strText)
 {
-    AddReportLog(1061, SString("CInstallManager::RestoreSequencerState %s", *strText));
+    AddReportLog(ReportLogID::INSTALL_MGR_SEQ_STATE, SString("CInstallManager::RestoreSequencerState %s", *strText));
     std::vector<SString> parts;
     strText.Split(" ", parts);
 
@@ -338,7 +338,7 @@ SString CInstallManager::GetLauncherPathFilename()
 {
     SString strLocation = m_pSequencer->GetVariable(INSTALL_LOCATION);
     SString strResult = PathJoin(strLocation == "far" ? GetSystemCurrentDirectory() : GetMTASAPath(), MTA_EXE_NAME);
-    AddReportLog(1062, SString("GetLauncherPathFilename %s", *strResult));
+    AddReportLog(ReportLogID::INSTALL_MGR_GET_PATH, SString("GetLauncherPathFilename %s", *strResult));
     return strResult;
 }
 
@@ -392,7 +392,7 @@ SString CInstallManager::_ChangeFromAdmin()
     if (IsUserAdmin() && IsBlockingUserProcess())
     {
         SendStringToUserProcess(GetSequencerSnapshot());
-        AddReportLog(1003, SString("CInstallManager::_ChangeToAdmin - exit(0) %s", ""));
+        AddReportLog(ReportLogID::INSTALL_MGR_CHANGEFROMADMIN, SString("CInstallManager::_ChangeToAdmin - exit(0) %s", ""));
         ClearIsBlockingUserProcess();
         ExitProcess(0);
     }
@@ -471,7 +471,7 @@ SString CInstallManager::_CheckOnRestartCommand()
     }
     else if (!strResult.Contains("no update"))
     {
-        AddReportLog(4047, SString("_CheckOnRestartCommand: CheckOnRestartCommand returned %s", strResult.c_str()));
+        AddReportLog(ReportLogID::ON_RESTART_CMD_RESULT, SString("_CheckOnRestartCommand: CheckOnRestartCommand returned %s", strResult.c_str()));
     }
 
     return "no_action";
@@ -536,9 +536,9 @@ SString CInstallManager::_InstallFiles()
     if (!InstallFiles(m_pSequencer->GetVariable(HIDE_PROGRESS) != "yes"))
     {
         if (!IsUserAdmin())
-            AddReportLog(3048, SString("_InstallFiles: Install - trying as admin %s", ""));
+            AddReportLog(ReportLogID::INSTALL_MGR_AS_ADMIN, SString("_InstallFiles: Install - trying as admin %s", ""));
         else
-            AddReportLog(5049, SString("_InstallFiles: Couldn't install files %s", ""));
+            AddReportLog(ReportLogID::INSTALL_MGR_FAIL, SString("_InstallFiles: Couldn't install files %s", ""));
 
         m_strAdminReason = _("Install updated MTA:SA files");
         return "fail";
@@ -546,7 +546,7 @@ SString CInstallManager::_InstallFiles()
     else
     {
         UpdateMTAVersionApplicationSetting();
-        AddReportLog(2050, SString("_InstallFiles: ok %s", ""));
+        AddReportLog(ReportLogID::INSTALL_MGR_INSTALL_SUCCESS, SString("_InstallFiles: ok %s", ""));
         return "ok";
     }
 }
@@ -639,7 +639,7 @@ SString CInstallManager::_PrepareLaunchLocation()
             {
                 const uintmax_t sourceSize = GetFileSize(sourcePath);
                 const uintmax_t targetSize = GetFileSize(targetPath);
-                AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
+                AddReportLog(ReportLogID::INSTALL_MGR_GTA_DLL, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
                                            sourceSize, targetSize, isAdmin));
             }
         }
@@ -657,7 +657,7 @@ SString CInstallManager::_PrepareLaunchLocation()
             {
                 const uintmax_t sourceSize = GetFileSize(sourcePath);
                 const uintmax_t targetSize = GetFileSize(targetPath);
-                AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
+                AddReportLog(ReportLogID::INSTALL_MGR_GTA_DLL, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
                                            sourceSize, targetSize, isAdmin));
             }
 
@@ -775,7 +775,7 @@ SString CInstallManager::_ProcessGtaDllCheck()
         if (IsErrorCodeLoggable(ec1) || IsErrorCodeLoggable(ec2))
         {
             const uintmax_t fileSize = GetFileSize(dependecyPath);
-            AddReportLog(3052, SString("_ProcessGtaDllCheck: GenerateFile failed (err-1: %d, err-2: %d, size: %ju, admin: %d)", ec1.value(), ec2.value(),
+            AddReportLog(ReportLogID::INSTALL_MGR_GTA_DLL, SString("_ProcessGtaDllCheck: GenerateFile failed (err-1: %d, err-2: %d, size: %ju, admin: %d)", ec1.value(), ec2.value(),
                                        fileSize, isAdmin));
         }
 
@@ -820,7 +820,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
             if (IsErrorCodeLoggable(ec))
             {
                 const uintmax_t fileSize = GetFileSize(gtaExePath);
-                AddReportLog(3052, SString("_ProcessGtaVersionCheck: Loading #1 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+                AddReportLog(ReportLogID::INSTALL_MGR_GTA_DLL, SString("_ProcessGtaVersionCheck: Loading #1 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
             }
 
             ec.clear();
@@ -831,7 +831,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
             if (IsErrorCodeLoggable(ec))
             {
                 const uintmax_t fileSize = GetFileSize(gtaExePath);
-                AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+                AddReportLog(ReportLogID::INSTALL_MGR_GTA_DLL, SString("_ProcessGtaVersionCheck: GenerateFile failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
             }
 
             if (isAdmin)
@@ -856,7 +856,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
             if (IsErrorCodeLoggable(ec))
             {
                 const uintmax_t fileSize = GetFileSize(gtaExePath);
-                AddReportLog(3052, SString("_ProcessGtaVersionCheck: Loading #2 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+                AddReportLog(ReportLogID::INSTALL_MGR_GTA_DLL, SString("_ProcessGtaVersionCheck: Loading #2 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
             }
 
             if (isAdmin)
@@ -879,7 +879,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         if (IsErrorCodeLoggable(ec))
         {
             const uintmax_t fileSize = GetFileSize(gtaExePath);
-            AddReportLog(3052, SString("_ProcessGtaVersionCheck: ApplyPatches failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            AddReportLog(ReportLogID::INSTALL_MGR_GTA_DLL, SString("_ProcessGtaVersionCheck: ApplyPatches failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
         }
 
         if (isAdmin)
@@ -1367,11 +1367,11 @@ SString CInstallManager::_InstallNewsItems()
         if (FileExists(PathJoin(strTargetDir, "files.xml")))
         {
             SetApplicationSettingInt("news-updated", 1);
-            AddReportLog(2051, SString("InstallNewsItems ok for '%s'", *strDate));
+            AddReportLog(ReportLogID::INSTALL_MGR_INSTALL_NEWS_SUCCESS, SString("InstallNewsItems ok for '%s'", *strDate));
         }
         else
         {
-            AddReportLog(4048, SString("InstallNewsItems failed with '%s' '%s' '%s'", *strDate, *strFileLocation, *strTargetDir));
+            AddReportLog(ReportLogID::INSTALL_MGR_INSTALL_NEWS_FAIL, SString("InstallNewsItems failed with '%s' '%s' '%s'", *strDate, *strFileLocation, *strTargetDir));
         }
     }
     return "ok";

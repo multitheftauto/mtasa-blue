@@ -667,7 +667,7 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
         g_pCore->ShowErrorMessageBox(_("Disconnected") + strErrorCode, strReason, strTroubleLink);
     }
 
-    AddReportLog(7107, SString("Game - Disconnected (%s) (%s)", *strErrorCode, *strReason.Replace("\n", " ")));
+    AddReportLog(ReportLogID::GAME_DISCONNECT, SString("Game - Disconnected (%s) (%s)", *strErrorCode, *strReason.Replace("\n", " ")));
 
     // Terminate the mod (disconnect first in case there were more packets after this one)
     g_pClientGame->m_bGracefulDisconnect = true;
@@ -5191,7 +5191,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                         if (strChunkData.empty())
                         {
                             bFatalError = true;
-                            AddReportLog(2081, "Empty");
+                            AddReportLog(ReportLogID::RESOURCESTART_FATAL_ERROR, "Empty");
                             break;
                         }
                         const char* szParsedChunkData = strChunkData.c_str();
@@ -5210,7 +5210,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                         if (strResFilePath.rfind(strResPath, 0) != 0)
                         {
                             bFatalError = true;
-                            AddReportLog(2081, SString("Path %s (expected %s)", strResFilePath.c_str(), strResPath.c_str()));
+                            AddReportLog(ReportLogID::RESOURCESTART_FATAL_ERROR, SString("Path %s (expected %s)", strResFilePath.c_str(), strResPath.c_str()));
                         }
                         else
                         {
@@ -5260,7 +5260,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                 if (FileExists(strName))
                                 {
                                     SString strMessage("Unable to delete old file %s", *ConformResourcePath(strName));
-                                    g_pClientGame->TellServerSomethingImportant(1009, strMessage);
+                                    g_pClientGame->TellServerSomethingImportant(ReportLogID::RESOURCESTART_DELETE_FILE_FAIL, strMessage);
                                 }
 
                                 // Is it downloadable now?
@@ -5620,7 +5620,7 @@ void CPacketHandler::RaiseEntityAddError(uint uiCode)
 {
     SString strLine("ProtocolError %d", uiCode);
     WriteDebugEvent(strLine);
-    AddReportLog(8331, strLine);
+    AddReportLog(ReportLogID::ENTITY_ADD_PROTOCOL_ERROR, strLine);
 
     NetBitStreamInterface& bitStream = *m_pEntityAddBitStream;
     for (uint i = std::max(0, (int)m_EntityAddReadOffsetStore.size() - 5); i < m_EntityAddReadOffsetStore.size(); i++)
@@ -5630,7 +5630,7 @@ void CPacketHandler::RaiseEntityAddError(uint uiCode)
 
         SString strLine("%d/%d Offset:%-6d %s", i, m_uiEntityAddNumEntities, m_EntityAddReadOffsetStore[i], *strStatus);
         WriteDebugEvent(strLine);
-        AddReportLog(8332, strLine);
+        AddReportLog(ReportLogID::ENTITY_ADD_ERROR_OFFSET, strLine);
     }
     RaiseProtocolError(uiCode);
 }

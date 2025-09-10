@@ -22,6 +22,8 @@
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.Map.h"
 
+#include "enums/ReportLogID.h"
+
 #if __cplusplus >= 201703L // C++17
     #ifndef __GLIBCXX__
         namespace std
@@ -132,7 +134,7 @@ namespace SharedUtil
     //
     // For tracking results of new features
     //
-    void    AddReportLog(uint uiId, const SString& strText, uint uiAmountLimit = 0);
+    void    AddReportLog(ReportLogID id, const SString& strText, uint uiAmountLimit = 0);
     void    AddExceptionReportLog(uint uiId, const char* szExceptionName, const char* szExceptionText);
     void    SetReportLogContents(const SString& strText);
     SString GetReportLogContents();

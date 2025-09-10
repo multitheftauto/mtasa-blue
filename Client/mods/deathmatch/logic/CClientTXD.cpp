@@ -243,7 +243,7 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
             strOutFilename = strShrunkFilename;
             FileAppend(strShrunkFilename, SStringX("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 12));
             FileAppend(strShrunkFilename, GenerateSha256HexStringFromFile(strShrunkFilename));
-            AddReportLog(9400, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8),
+            AddReportLog(ReportLogID::TXD_SHRUNK, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8),
                                        (uint)FileSize(m_strFilename) / 1024, (uint)FileSize(strShrunkFilename) / 1024));
         }
         else

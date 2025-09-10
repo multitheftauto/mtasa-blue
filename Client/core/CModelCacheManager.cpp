@@ -159,7 +159,7 @@ void CModelCacheManagerImpl::PreLoad()
     // Crashed during previous PreLoad?
     if (WatchDogIsSectionOpen(WD_SECTION_PRELOAD_UPGRADES))
     {
-        AddReportLog(8545, SString("PreLoad Upgrades - Crash detect - bSlowMethod:%d  iLowestUnsafeUpgrade:%d", bSlowMethod, iLowestUnsafeUpgrade));
+        AddReportLog(ReportLogID::PRELOAD_UPGRADE_CACHE_CRASH, SString("PreLoad Upgrades - Crash detect - bSlowMethod:%d  iLowestUnsafeUpgrade:%d", bSlowMethod, iLowestUnsafeUpgrade));
         iLowestUnsafeUpgrade = GetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID);
         bSlowMethod = 1;
         SetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, iLowestUnsafeUpgrade);
@@ -193,7 +193,7 @@ void CModelCacheManagerImpl::PreLoad()
     int iPrevHiScore = GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_HISCORE);
     SetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_HISCORE, iLowestUnsafeUpgrade);
     if (iPrevHiScore > iLowestUnsafeUpgrade)
-        AddReportLog(8544, SString("PreLoad Upgrades - LowestUnsafeUpgrade fallen from %d to %d", iPrevHiScore, iLowestUnsafeUpgrade));
+        AddReportLog(ReportLogID::PRELOAD_UPGRADE_FALLEN, SString("PreLoad Upgrades - LowestUnsafeUpgrade fallen from %d to %d", iPrevHiScore, iLowestUnsafeUpgrade));
 
     CTickCount deltaTicks = CTickCount::Now() - startTicks;
     OutputDebugLine(SString("CModelCacheManagerImpl::PreLoad completed in %d ms", deltaTicks.ToInt()));

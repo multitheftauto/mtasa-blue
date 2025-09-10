@@ -222,7 +222,7 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
     {
         SString strMessage("%s is invalid. Please re-compile at https://luac.multitheftauto.com/", *strNiceFilename);
         g_pClientGame->GetScriptDebugging()->LogError(m_luaVM, "Loading script failed: %s", *strMessage);
-        g_pClientGame->TellServerSomethingImportant(1003, SString("CLIENT SCRIPT ERROR: %s", *strMessage));
+        g_pClientGame->TellServerSomethingImportant(ReportLogID::INSTALL_MGR_CHANGEFROMADMIN, SString("CLIENT SCRIPT ERROR: %s", *strMessage));
         return false;
     }
 
@@ -564,7 +564,7 @@ int CLuaMain::OnUndump(const char* p, size_t n)
     if (strExpectedHash != strGotHash)
     {
         // I was not expecting that
-        AddReportLog(7555, SString("Unexpected undump hash for buffer size %d. Got:%s Expected:%s", n, *strExpectedHash, *strGotHash));
+        AddReportLog(ReportLogID::LUA_UNDUMP_HASH_FAIL, SString("Unexpected undump hash for buffer size %d. Got:%s Expected:%s", n, *strExpectedHash, *strGotHash));
         return 0;
     }
     return 1;

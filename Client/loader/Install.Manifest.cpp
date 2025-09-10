@@ -96,7 +96,7 @@ bool ParseManifestFile(const SString& sourceRoot, std::vector<ManifestFile>& fil
     else
     {
         SString message("ParseManifestFile: Version '%s' is not supported", version.c_str());
-        AddReportLog(5055, message);
+        AddReportLog(ReportLogID::LOADER_INSTALL_FAIL, message);
         return false;
     }
 }

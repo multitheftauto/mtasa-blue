@@ -302,7 +302,7 @@ void _cdecl OnCPhysicalDestructor(DWORD calledFrom, CPhysicalSAInterface* pEntit
     // This should be null
     if (pEntity->m_pMovingList)
     {
-        AddReportLog(8640, SString("Removing CPhysical type %d from moving list", pEntity->nType));
+        AddReportLog(ReportLogID::PHYSICAL_MOVINGLIST_FIX, SString("Removing CPhysical type %d from moving list", pEntity->nType));
         DWORD dwFunc = FUNC_CPhysical_RemoveFromMovingList;
         __asm
         {

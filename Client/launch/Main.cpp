@@ -147,16 +147,6 @@ namespace SecurityConstants
 #endif
 
     constexpr size_t STACK_ALLOC_LIMIT = 65536U;            // Stack allocation limit
-
-    // Report log codes
-    constexpr UINT REPORT_CODE_INVALID_PATH = 5716U;
-    constexpr UINT REPORT_CODE_FILE_NOT_EXIST = 5717U;
-    constexpr UINT REPORT_CODE_INVALID_SIGNATURE = 5718U;
-    constexpr UINT REPORT_CODE_LOAD_FAILED = 5719U;
-    constexpr UINT REPORT_CODE_ELEVATED_PRIVILEGE = 5750U;
-    constexpr UINT REPORT_CODE_LOAD_ERROR = 5711U;
-    constexpr UINT REPORT_CODE_MISSING_EXPORT = 5714U;
-    constexpr UINT REPORT_CODE_EXCEPTION = 5751U;
 }            // namespace SecurityConstants
 
 // Critical section for thread safety
@@ -671,14 +661,14 @@ namespace Security
         if (!IsValidPath(strDllPath) || !IsValidDllName(strDllName))
         {
             SString strError = "SecureLoadLibrary: Invalid path or DLL name";
-            AddReportLog(SecurityConstants::REPORT_CODE_INVALID_PATH, strError);
+            AddReportLog(ReportLogID::LOADER_INVALID_DLL_PATH, strError);
             return nullptr;
         }
 
         if (!FileExists(strDllPath))
         {
             SString strError = "SecureLoadLibrary: DLL file does not exist";
-            AddReportLog(SecurityConstants::REPORT_CODE_FILE_NOT_EXIST, strError);
+            AddReportLog(ReportLogID::LOADER_DLL_NOT_EXISTS, strError);
             return nullptr;
         }
 
@@ -686,7 +676,7 @@ namespace Security
         if (!VerifyFileSignature(strDllPath))
         {
             SString strError = "SecureLoadLibrary: Invalid or missing digital signature";
-            AddReportLog(SecurityConstants::REPORT_CODE_INVALID_SIGNATURE, strError);
+            AddReportLog(ReportLogID::LOADER_DLL_INVALID_SIGNATURE, strError);
 
             return nullptr;
         }
@@ -733,7 +723,7 @@ namespace Security
             SString     strError;
             if (!strError.Format("SecureLoadLibrary: LoadLibrary failed with error %lu", dwError).empty())
             {
-                AddReportLog(SecurityConstants::REPORT_CODE_LOAD_FAILED, strError);
+                AddReportLog(ReportLogID::LOADER_LOADLIBRARY_FAIL, strError);
             }
         }
 
@@ -762,7 +752,7 @@ namespace Security
         if (bIsElevated)
         {
             SString strWarning = "Warning: Running with elevated privileges";
-            AddReportLog(SecurityConstants::REPORT_CODE_ELEVATED_PRIVILEGE, strWarning);
+            AddReportLog(ReportLogID::LOADER_ELEVATED_PRIVILEGE, strWarning);
         }
     }
 
@@ -975,7 +965,7 @@ int WINAPI WinMain(HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance
                 strMessage = "Install Windows Update KB2533623 for improved security";
             }
 
-            AddReportLog(SecurityConstants::REPORT_CODE_LOAD_ERROR, strMessage);
+            AddReportLog(ReportLogID::LOADER_MODULE_LOAD_FAIL, strMessage);
             BrowseToSolution("loader-dll-not-loadable", ASK_GO_ONLINE, strMessage);
             Security::CleanupSecurity();
             return 1;
@@ -1002,7 +992,7 @@ int WINAPI WinMain(HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance
                 if (iResult == -1)
                 {
                     SString strError = "Exception in DoWinMain";
-                    AddReportLog(SecurityConstants::REPORT_CODE_EXCEPTION, strError);
+                    AddReportLog(ReportLogID::LOADER_EXCEPTION, strError);
                     iReturnCode = 1;
                 }
                 else
@@ -1020,7 +1010,7 @@ int WINAPI WinMain(HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance
         else
         {
             SString strError = "Failed to find DoWinMain in loader DLL";
-            AddReportLog(SecurityConstants::REPORT_CODE_MISSING_EXPORT, strError);
+            AddReportLog(ReportLogID::LOADER_MODULE_MAIN_FAIL, strError);
             BrowseToSolution("loader-dll-missing-export", ASK_GO_ONLINE, strError);
             iReturnCode = 1;
         }

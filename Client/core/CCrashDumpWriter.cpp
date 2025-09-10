@@ -138,7 +138,7 @@ void CCrashDumpWriter::UpdateCounters()
 {
     if (ms_uiInvalidParameterCount > ms_uiInvalidParameterCountLogged && ms_uiInvalidParameterCountLogged < 10)
     {
-        AddReportLog(9206, SString("InvalidParameterCount changed from %d to %d", ms_uiInvalidParameterCountLogged, ms_uiInvalidParameterCount));
+        AddReportLog(ReportLogID::INVALID_PARAMETER_COUNT, SString("InvalidParameterCount changed from %d to %d", ms_uiInvalidParameterCountLogged, ms_uiInvalidParameterCount));
         ms_uiInvalidParameterCountLogged = ms_uiInvalidParameterCount;
     }
 }
@@ -321,7 +321,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     }
 
     if (!hDll)
-        AddReportLog(9201, "CCrashDumpWriter::DumpMiniDump - Could not load DBGHELP.DLL");
+        AddReportLog(ReportLogID::DBGHELP_FAIL, "CCrashDumpWriter::DumpMiniDump - Could not load DBGHELP.DLL");
 
     // We could load a dll?
     if (hDll)
@@ -329,14 +329,14 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
         // Grab the MiniDumpWriteDump proc address
         auto pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(static_cast<void*>(GetProcAddress(hDll, "MiniDumpWriteDump")));
         if (!pDump)
-            AddReportLog(9202, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump");
+            AddReportLog(ReportLogID::DBGHELP_MINIDUMPWRITEDUMP_FAIL, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump");
 
         if (pDump)
         {
             // Create the file
             HANDLE hFile = CreateFile(CalcMTASAPath("mta\\core.dmp"), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
             if (hFile == INVALID_HANDLE_VALUE)
-                AddReportLog(9203, SString("CCrashDumpWriter::DumpMiniDump - Could not create '%s'", *CalcMTASAPath("mta\\core.dmp")));
+                AddReportLog(ReportLogID::CREATE_DMP_FAIL, SString("CCrashDumpWriter::DumpMiniDump - Could not create '%s'", *CalcMTASAPath("mta\\core.dmp")));
 
             if (hFile != INVALID_HANDLE_VALUE)
             {
@@ -351,7 +351,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                                      (MINIDUMP_TYPE)(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo, NULL, NULL);
 
                 if (!bResult)
-                    AddReportLog(9204, SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed (%08x)", GetLastError()));
+                    AddReportLog(ReportLogID::DMP_MINIDUMPWRITEDUMP_FAIL, SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed (%08x)", GetLastError()));
                 else
                     WriteDebugEvent("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump succeeded");
 
@@ -498,7 +498,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     {
         CVARS_SET("volumetric_shadows", false);
         CCore::GetSingleton().SaveConfig();
-        AddReportLog(9205, "Disabled volumetric shadows");
+        AddReportLog(ReportLogID::DISABLE_VOLUMETRIC_SHADOWS, "Disabled volumetric shadows");
     }
 
     CNet* pNet = CCore::GetSingleton().GetNetwork();
@@ -529,7 +529,7 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
         pExceptionInformation->GetEIP(), pExceptionInformation->GetEFlags(), pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
         pExceptionInformation->GetSS(), pExceptionInformation->GetES(), pExceptionInformation->GetFS(), pExceptionInformation->GetGS());
 
-    AddReportLog(3120, strMessage);
+    AddReportLog(ReportLogID::CRASH_INFO, strMessage);
 
     // Try relaunch with crashed flag
     SString strMTASAPath = GetMTASABaseDir();
