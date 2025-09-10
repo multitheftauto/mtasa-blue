@@ -993,7 +993,6 @@ void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVerti
         m_pMaterialPrimitive3DBatcherPreGUI->AddPrimitive(eType, pMaterial, pVecVertices);
     else
         m_pMaterialPrimitive3DBatcherPostFX->AddPrimitive(eType, pMaterial, pVecVertices);
-    
 }
 
 void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
@@ -1515,11 +1514,10 @@ void CGraphics::DrawTexture(CTextureItem* pTexture, float fX, float fY, float fS
     D3DXVECTOR2 scaling(fScaleX * fFileWidth / fCutWidth, fScaleY * fFileHeight / fCutHeight);
     D3DXVECTOR2 rotationCenter(fFileWidth * fScaleX * fCenterX, fFileHeight * fScaleX * fCenterY);
     D3DXVECTOR2 position(fX - fFileWidth * fScaleX * fCenterX, fY - fFileHeight * fScaleY * fCenterY);
-    const D3DXVECTOR2* pRotationCenter = fRotation != 0.0f ? &rotationCenter : NULL;
-    D3DXMatrixTransformation2D(&matrix, NULL, NULL, &scaling, pRotationCenter, DegreesToRadians(fRotation), &position);
+    D3DXMatrixTransformation2D(&matrix, NULL, NULL, &scaling, &rotationCenter, DegreesToRadians(fRotation), &position);
     CheckModes(EDrawMode::DX_SPRITE, m_ActiveBlendMode);
     m_pDXSprite->SetTransform(&matrix);
-    m_pDXSprite->Draw((IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, dwColor);
+    m_pDXSprite->Draw((IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, /*ModifyColorForBlendMode (*/ dwColor /*, blendMode )*/);
     EndDrawBatch();
 }
 
@@ -1764,7 +1762,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             D3DXVECTOR2  scaling(Item.Text.fScaleX, Item.Text.fScaleY);
             D3DXVECTOR2  translation(fPosFracX * Item.Text.fScaleX, fPosFracY * Item.Text.fScaleY);            // Sub-pixel positioning
             D3DXVECTOR2  rotcenter(Item.Text.fRotationCenterX, Item.Text.fRotationCenterY);
-            const D3DXVECTOR2* pRotcenter = Item.Text.fRotation != 0.0f ? &rotcenter : NULL;
+            D3DXVECTOR2* pRotcenter = Item.Text.fRotation ? &rotcenter : NULL;
             D3DXMatrixTransformation2D(&matrix, NULL, 0.0f, &scaling, pRotcenter, DegreesToRadians(Item.Text.fRotation), &translation);
             CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
             m_pDXSprite->SetTransform(&matrix);
@@ -1790,7 +1788,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
                 const float       fCutWidth = cutImagePos.right - cutImagePos.left;
                 const float       fCutHeight = cutImagePos.bottom - cutImagePos.top;
                 const D3DXVECTOR2 scaling(Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight);
-                const D3DXVECTOR2 rotationCenter(fFileWidth * 0.5f + Item.Texture.fRotCenOffX, fFileHeight * 0.5f + Item.Texture.fRotCenOffY);
+                const D3DXVECTOR2 rotationCenter(Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY);
                 const D3DXVECTOR2 position(Item.Texture.fX, Item.Texture.fY);
                 const D3DXVECTOR2* pRotationCenter = Item.Texture.fRotation ? &rotationCenter : NULL;
                 D3DXMATRIX         matrix;
@@ -2012,7 +2010,7 @@ void CGraphics::SaveGTARenderStates()
     }
 
     SAFE_RELEASE(m_pSavedStateBlock);
-    
+
     // Add error handling for state block creation
     HRESULT hr = m_pDevice->CreateStateBlock(D3DSBT_ALL, &m_pSavedStateBlock);
     if (FAILED(hr))
@@ -2489,7 +2487,7 @@ namespace
 
         // Initial octahedron
         static SFixedArray<CVector, 6>     vecPoints = {CVector(0, 0, 1),  CVector(0, 0, -1), CVector(-1, -1, 0),
-                                                    CVector(1, -1, 0), CVector(1, 1, 0),  CVector(-1, 1, 0)};
+                                                        CVector(1, -1, 0), CVector(1, 1, 0),  CVector(-1, 1, 0)};
         static const SFixedArray<WORD, 24> indices = {0, 3, 4, 0, 4, 5, 0, 5, 2, 0, 2, 3, 1, 4, 3, 1, 5, 4, 1, 2, 5, 1, 3, 2};
 
         for (uint i = 0; i < NUMELMS(vecPoints); i++)
