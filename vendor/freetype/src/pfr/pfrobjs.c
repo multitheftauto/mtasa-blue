@@ -4,7 +4,7 @@
  *
  *   FreeType PFR object methods (body).
  *
- * Copyright (C) 2002-2024 by
+ * Copyright (C) 2002-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -326,7 +326,7 @@
     FT_ULong     gps_offset;
 
 
-    FT_TRACE1(( "pfr_slot_load: glyph index %d\n", gindex ));
+    FT_TRACE1(( "pfr_slot_load: glyph index %u\n", gindex ));
 
     if ( gindex > 0 )
       gindex--;
