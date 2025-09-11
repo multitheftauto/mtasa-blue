@@ -3,7 +3,7 @@
 #
 
 
-# Copyright (C) 1996-2024 by
+# Copyright (C) 1996-2025 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -300,7 +300,7 @@ do-dist: distclean refdoc
 	rm -rf $(TOP_DIR)/builds/unix/autom4te.cache
 
 	rm -rf $(GNU_CONFIG_DESTDIR)
-	git clone https://git.savannah.gnu.org/git/config.git $(GNU_CONFIG_DESTDIR)
+	git clone --depth=1 $(GNU_CONFIG_GIT_URL) $(GNU_CONFIG_DESTDIR)
 	cp $(CONFIG_GUESS) $(TOP_DIR)/builds/unix
 	cp $(CONFIG_SUB) $(TOP_DIR)/builds/unix
 
