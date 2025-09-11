@@ -1771,14 +1771,12 @@ void CSettings::PopulateResolutionComboBox()
     if (resolutions.empty())
         return;
 
-    // Sort resolutions by total pixels (descending), then by width, then by depth
+    // Sort resolutions by width (descending), then by height, then by depth
     std::sort(resolutions.begin(), resolutions.end(), [](const ResolutionData& a, const ResolutionData& b) {
-        int pixelCountA = a.getPixelCount();
-        int pixelCountB = b.getPixelCount();
-        if (pixelCountA != pixelCountB)
-            return pixelCountA > pixelCountB;
         if (a.width != b.width)
             return a.width > b.width;
+        if (a.height != b.height)
+            return a.height > b.height;
         return a.depth > b.depth;
     });
 
