@@ -4,7 +4,7 @@
  *
  *   TrueType character mapping table (cmap) support (body).
  *
- * Copyright (C) 2002-2024 by
+ * Copyright (C) 2002-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -3792,7 +3792,7 @@
       return FT_THROW( Invalid_Table );
 
     /* Version 1.8.3 of the OpenType specification contains the following */
-    /* (https://docs.microsoft.com/en-us/typography/opentype/spec/cmap):  */
+    /* (https://learn.microsoft.com/typography/opentype/spec/cmap):       */
     /*                                                                    */
     /*   The 'cmap' table version number remains at 0x0000 for fonts that */
     /*   make use of the newer subtable formats.                          */
@@ -3803,7 +3803,7 @@
     p += 2;
 
     num_cmaps = TT_NEXT_USHORT( p );
-    FT_TRACE4(( "tt_face_build_cmaps: %d cmaps\n", num_cmaps ));
+    FT_TRACE4(( "tt_face_build_cmaps: %u cmaps\n", num_cmaps ));
 
     limit = table + face->cmap_size;
     for ( ; num_cmaps > 0 && p + 8 <= limit; num_cmaps-- )

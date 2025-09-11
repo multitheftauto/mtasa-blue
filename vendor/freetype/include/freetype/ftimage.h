@@ -5,7 +5,7 @@
  *   FreeType glyph image formats and default raster interface
  *   (specification).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -443,7 +443,7 @@ FT_BEGIN_HEADER
    *   rasterizer; see the `tags` field in @FT_Outline.
    *
    *   Please refer to the description of the 'SCANTYPE' instruction in the
-   *   [OpenType specification](https://learn.microsoft.com/en-us/typography/opentype/spec/tt_instructions#scantype)
+   *   [OpenType specification](https://learn.microsoft.com/typography/opentype/spec/tt_instructions#scantype)
    *   how simple drop-outs, smart drop-outs, and stubs are defined.
    */
 #define FT_OUTLINE_NONE             0x0

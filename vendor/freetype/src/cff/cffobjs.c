@@ -4,7 +4,7 @@
  *
  *   OpenType objects manager (body).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -653,7 +653,7 @@
         {
           s = cff_index_get_sid_string( cff, idx );
           if ( s )
-            FT_TRACE4(( "  %5d %s\n", idx, s ));
+            FT_TRACE4(( "  %5u %s\n", idx, s ));
         }
 
         /* In Multiple Master CFFs, two SIDs hold the Normalize Design  */
@@ -668,7 +668,7 @@
           FT_PtrDist  l;
 
 
-          FT_TRACE4(( "  %5d ", idx + 390 ));
+          FT_TRACE4(( "  %5u ", idx + 390 ));
           for ( l = 0; l < s1len; l++ )
             FT_TRACE4(( "%c", s1[l] ));
           FT_TRACE4(( "\n" ));
@@ -683,7 +683,7 @@
           FT_PtrDist  l;
 
 
-          FT_TRACE4(( "  %5d ", cff->num_strings + 390 ));
+          FT_TRACE4(( "  %5u ", cff->num_strings + 390 ));
           for ( l = 0; l < s1len; l++ )
             FT_TRACE4(( "%c", s1[l] ));
           FT_TRACE4(( "\n" ));
