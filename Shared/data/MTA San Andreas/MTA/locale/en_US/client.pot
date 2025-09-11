@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-05 13:26+0000\n"
+"POT-Creation-Date: 2025-09-10 23:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2808,12 +2808,12 @@ msgid ""
 msgstr ""
 
 #. Create the window
-#: Client/core/CNewsBrowser.cpp:153
+#: Client/core/CNewsBrowser.cpp:154
 msgid "NEWS"
 msgstr ""
 
 #. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+#: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
 msgid "Visit latest news article"
 msgstr ""
 
