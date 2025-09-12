@@ -36,17 +36,25 @@ BYTE  RESTORE_Bytes_PreCreateDevice[6];
 void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD* BehaviorFlags,
                               D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
-    // Unpatch
-    MemCpy((PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice);
+    // Safely unpatch with validation
+    if (RESTORE_Addr_PreCreateDevice && 
+        RESTORE_Size_PreCreateDevice > 0 && 
+        RESTORE_Size_PreCreateDevice <= sizeof(RESTORE_Bytes_PreCreateDevice))
+    {
+        MemCpy((PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice);
+    }
 
-    // g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
-    ms_pDirect3D = pDirect3D;
-    ms_Adapter = Adapter;
-    ms_DeviceType = DeviceType;
-    ms_hFocusWindow = hFocusWindow;
-    ms_BehaviorFlags = *BehaviorFlags;
-    ms_pPresentationParameters = pPresentationParameters;
-    ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
+    // Validate critical parameters before dereferencing
+    if (BehaviorFlags && pPresentationParameters)
+    {
+        ms_pDirect3D = pDirect3D;
+        ms_Adapter = Adapter;
+        ms_DeviceType = DeviceType;
+        ms_hFocusWindow = hFocusWindow;
+        ms_BehaviorFlags = *BehaviorFlags;
+        ms_pPresentationParameters = pPresentationParameters;
+        ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
+    }
 }
 
 // Hook info
@@ -57,30 +65,35 @@ void _declspec(naked) HOOK_PreCreateDevice()
 {
     _asm
     {
-        // Run replaced code
-        mov     ecx,dword ptr ds:[0C97C20h]
-        push    0C97C28h
-        push    0C9C040h
-        push    eax
-        mov     eax,dword ptr ds:[00C97C1Ch]
+        // Run replaced code - these pushes create the original function parameters
+        mov     ecx,dword ptr ds:[0C97C20h]        // pDirect3D
+        push    0C97C28h                           // ppReturnedDeviceInterface
+        push    0C9C040h                           // pPresentationParameters  
+        push    eax                                // BehaviorFlags (original eax)
+        mov     eax,dword ptr ds:[00C97C1Ch]       
         mov     edx,  [ecx]
-        push    eax
+        push    eax                                // hFocusWindow
         mov     eax,dword ptr ds:[008E2428h]
-        push    eax
+        push    eax                                // DeviceType
 
-        mov     eax, ds:0x0C97C24       // __RwD3DAdapterIndex
-        push    eax
-        push    ecx
+        mov     eax, ds:0x0C97C24                  // __RwD3DAdapterIndex
+        push    eax                                // Adapter
+        push    ecx                                // pDirect3D
 
-        pushad
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        lea     eax,[esp+32+4*6]    // Turn BehaviorFlags into a pointer so we can modify it
-        push    eax
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
+        // Now we have 7 parameters on stack (28 bytes)
+        // Stack layout: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
+
+        pushad  // Save all registers (32 bytes)
+        
+        // Pass parameters to OnPreCreateDevice - stack offset is now 32 (pushad) + 28 (pushes) = 60
+        push    [esp+60+24]                        // ppReturnedDeviceInterface
+        push    [esp+60+20]                        // pPresentationParameters
+        lea     eax,[esp+60+16]                    // BehaviorFlags as pointer
+        push    eax                                
+        push    [esp+60+12]                        // hFocusWindow
+        push    [esp+60+8]                         // DeviceType
+        push    [esp+60+4]                         // Adapter
+        push    [esp+60+0]                         // pDirect3D
         call    OnPreCreateDevice
         add     esp, 4*7
         popad
@@ -99,8 +112,12 @@ void _declspec(naked) HOOK_PreCreateDevice()
 ////////////////////////////////////////////////////////////////
 HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
 {
-    return g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
-                                       ms_ppReturnedDeviceInterface);
+    if (g_pCore)
+    {
+        return g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
+                                           ms_ppReturnedDeviceInterface);
+    }
+    return hResult;
 }
 
 // Hook info
