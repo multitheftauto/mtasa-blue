@@ -425,14 +425,14 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
 
     __asm
     {
-        push    esi
+        pushad
         call    IsAmbientSoundGeneralEnabled
         test    al, al
+        popad
         jnz     continueWithOriginalCode
         mov     dword ptr [esp+8], 0      // Pause by setting 0.0f for the last argument to CAEAudioHardware::SetChannelFrequencyScalingFactor
 
         continueWithOriginalCode:
-        pop     esi
         mov     edi, [esp+8]
         xor     ecx, ecx
         jmp     RETURN_CAEAmbienceTrackManager_CheckForPause
