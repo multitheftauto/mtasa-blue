@@ -42,9 +42,9 @@ public:
     virtual bool GetRequiredDisplayResolution(int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex) override;
     virtual int  GetFullScreenStyle() override { return m_iCurrentFullscreenStyle; }
     virtual bool IsDisplayModeWindowed() override;
+    virtual bool IsDisplayModeFullScreenWindow() override;
 
     bool    IsDisplayModeFullScreen();
-    bool    IsDisplayModeFullScreenWindow();
     bool    GetCurrentAdapterRect(LPRECT pOutRect);
     SString GetCurrentAdapterDeviceName();
 
