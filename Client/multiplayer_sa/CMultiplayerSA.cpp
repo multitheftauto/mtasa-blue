@@ -4016,21 +4016,25 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
 
     __asm
     {
-        pushad
-        mov     al, [esp+0x8C]
+        // Get weapon type before pushad to avoid stack offset corruption
+        mov     al, [esp+0x8]
         mov     ucChokingWeaponType, al
+        
+        pushad
 
         mov     ebx, [m_pChokingHandler]
         test    ebx, ebx
         jz      continueWithOriginalCode
 
+        // Push weapon type as parameter
+        movzx   eax, ucChokingWeaponType
         push    eax
         call    ebx
         add     esp, 4
         test    al, al
-        popad
 
         jnz     continueWithOriginalCode
+        popad
         jmp     dwChokingDontchoke
     
         continueWithOriginalCode:
