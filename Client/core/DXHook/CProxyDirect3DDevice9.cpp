@@ -15,6 +15,7 @@
 bool                                    g_bInGTAScene = false;
 CProxyDirect3DDevice9*                  g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
+SGammaState                             g_GammaState;
 
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
@@ -122,6 +123,22 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 {
     WriteDebugEvent(SString("CProxyDirect3DDevice9::~CProxyDirect3DDevice9 %08x", this));
+    
+    // Reset gamma state when device is destroyed
+    if (g_pProxyDevice == this)
+    {
+        // Restore original gamma if we had stored it
+        if (g_GammaState.bOriginalGammaStored && m_pDevice)
+        {
+            m_pDevice->SetGammaRamp(g_GammaState.lastSwapChain, 0, &g_GammaState.originalGammaRamp);
+            WriteDebugEvent("Restored original gamma ramp on device destruction");
+        }
+        
+        // Reset gamma state
+        g_GammaState.bOriginalGammaStored = false;
+        g_GammaState.bLastWasBorderless = false;
+        ZeroMemory(&g_GammaState.originalGammaRamp, sizeof(g_GammaState.originalGammaRamp));
+    }
     
     // Release our reference to the wrapped device
     // Note: We don't check m_ulRefCount here because destructor is only called
@@ -357,6 +374,24 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         return D3DERR_INVALIDCALL;
     }
 
+    // Reset gamma state since display mode might change
+    g_GammaState.bOriginalGammaStored = false;
+    g_GammaState.bLastWasBorderless = false;
+    ZeroMemory(&g_GammaState.originalGammaRamp, sizeof(g_GammaState.originalGammaRamp));
+    WriteDebugEvent("Reset gamma state due to device reset");
+    
+    // Check cooperative level before attempting reset
+    HRESULT hCoopLevel = m_pDevice->TestCooperativeLevel();
+    if (hCoopLevel == D3DERR_DEVICELOST)
+    {
+        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Device still lost, cannot reset yet");
+        return hCoopLevel;
+    }
+    else if (hCoopLevel != D3DERR_DEVICENOTRESET && hCoopLevel != D3D_OK)
+    {
+        WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset - Device in unexpected state: %08x", hCoopLevel));
+        return hCoopLevel;
+    }
     // Save presentation parameters
     D3DPRESENT_PARAMETERS presentationParametersOrig = *pPresentationParameters;
 
@@ -435,6 +470,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     return hResult;
 }
 
+
 HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion)
 {
     CDirect3DEvents9::OnPresent(m_pDevice);
@@ -470,12 +506,99 @@ HRESULT CProxyDirect3DDevice9::SetDialogBoxMode(BOOL bEnableDialogs)
 
 VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3DGAMMARAMP* pRamp)
 {
-    m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
+    // Validate inputs first
+    if (!pRamp)
+    {
+        WriteDebugEvent("CProxyDirect3DDevice9::SetGammaRamp - Invalid gamma ramp pointer");
+        return;
+    }
+
+    // Validate swap chain index
+    if (iSwapChain >= GetNumberOfSwapChains())
+    {
+        WriteDebugEvent(SString("CProxyDirect3DDevice9::SetGammaRamp - Invalid swap chain index: %d", iSwapChain));
+        return;
+    }
+
+    // Get current display mode state - use a timeout to avoid race conditions during mode transitions
+    CVideoModeManagerInterface* pVideoModeManager = GetVideoModeManager();
+    if (!pVideoModeManager)
+    {
+        // Fallback to original behavior if video mode manager is unavailable
+        m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
+        return;
+    }
+
+    bool bIsBorderlessMode = pVideoModeManager->IsDisplayModeWindowed() || pVideoModeManager->IsDisplayModeFullScreenWindow();
+
+    // Store original gamma ramp on first call or mode change
+    if (!g_GammaState.bOriginalGammaStored || g_GammaState.lastSwapChain != iSwapChain || g_GammaState.bLastWasBorderless != bIsBorderlessMode)
+    {
+        if (!bIsBorderlessMode || !g_GammaState.bOriginalGammaStored)
+        {
+            // In fullscreen mode or first time - this is likely the original gamma
+            g_GammaState.originalGammaRamp = *pRamp;
+            g_GammaState.bOriginalGammaStored = true;
+            g_GammaState.lastSwapChain = iSwapChain;
+        }
+        g_GammaState.bLastWasBorderless = bIsBorderlessMode;
+    }
+
+    if (bIsBorderlessMode)
+    {
+        // Apply brightness and contrast adjustment to match fullscreen mode
+        D3DGAMMARAMP adjustedRamp = *pRamp;
+
+        // Use lighter gamma correction to prevent darkening effect
+        // and optimize brightness boost for better visibility
+        const float fGammaCorrection = 1.0f / 1.3f;
+        const float fBrightnessBoost = 1.4f;
+
+        for (int i = 0; i < 256; i++)
+        {
+            // Convert to normalized float (0.0 - 1.0)
+            float fRed = static_cast<float>(pRamp->red[i]) / 65535.0f;
+            float fGreen = static_cast<float>(pRamp->green[i]) / 65535.0f;
+            float fBlue = static_cast<float>(pRamp->blue[i]) / 65535.0f;
+
+            // Clamp input values to valid range
+            fRed = std::max(0.0f, std::min(1.0f, fRed));
+            fGreen = std::max(0.0f, std::min(1.0f, fGreen));
+            fBlue = std::max(0.0f, std::min(1.0f, fBlue));
+
+            // Apply gentler gamma correction first
+            fRed = powf(fRed, fGammaCorrection);
+            fGreen = powf(fGreen, fGammaCorrection);
+            fBlue = powf(fBlue, fGammaCorrection);
+
+            // Then apply balanced brightness boost
+            fRed = std::min(1.0f, fRed * fBrightnessBoost);
+            fGreen = std::min(1.0f, fGreen * fBrightnessBoost);
+            fBlue = std::min(1.0f, fBlue * fBrightnessBoost);
+
+            // Convert back to WORD values with proper rounding
+            adjustedRamp.red[i] = static_cast<WORD>(fRed * 65535.0f + 0.5f);
+            adjustedRamp.green[i] = static_cast<WORD>(fGreen * 65535.0f + 0.5f);
+            adjustedRamp.blue[i] = static_cast<WORD>(fBlue * 65535.0f + 0.5f);
+        }
+
+        // Set the adjusted gamma ramp
+        m_pDevice->SetGammaRamp(iSwapChain, Flags, &adjustedRamp);
+        
+        WriteDebugEvent("Applied gamma adjustment for borderless windowed mode");
+    }
+    else
+    {
+        // In exclusive fullscreen mode, use the original gamma ramp
+        m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
+        
+        WriteDebugEvent("Applied original gamma ramp for fullscreen mode");
+    }
 }
 
 VOID CProxyDirect3DDevice9::GetGammaRamp(UINT iSwapChain, D3DGAMMARAMP* pRamp)
 {
-    m_pDevice->GetGammaRamp(iSwapChain, pRamp);
+    return m_pDevice->GetGammaRamp(iSwapChain, pRamp);
 }
 
 HRESULT CProxyDirect3DDevice9::CreateTexture(UINT Width, UINT Height, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DTexture9** ppTexture,
