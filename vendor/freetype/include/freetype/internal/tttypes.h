@@ -5,7 +5,7 @@
  *   Basic SFNT/TrueType type definitions and interface (specification
  *   only).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -930,8 +930,8 @@ FT_BEGIN_HEADER
    *   resolution and scaling independent parts of a TrueType font resource.
    *
    * @note:
-   *   The TT_Face structure is also used as a 'parent class' for the
-   *   OpenType-CFF class (T2_Face).
+   *   The TT_Face structure is also used for CFF support; see file
+   *   `cffotypes.h`.
    */
   typedef struct TT_FaceRec_*  TT_Face;
 

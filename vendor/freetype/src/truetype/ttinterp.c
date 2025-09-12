@@ -4,7 +4,7 @@
  *
  *   TrueType bytecode interpreter (body).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -27,14 +27,13 @@
 #include <freetype/ftdriver.h>
 #include <freetype/ftmm.h>
 
+#ifdef TT_USE_BYTECODE_INTERPRETER
+
 #include "ttinterp.h"
 #include "tterrors.h"
 #ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
 #include "ttgxvar.h"
 #endif
-
-
-#ifdef TT_USE_BYTECODE_INTERPRETER
 
 
   /**************************************************************************
@@ -7521,6 +7520,12 @@
     exec->GS         = size->GS;
     exec->func_round = (TT_Round_Func)Round_To_Grid;
     Compute_Funcs( exec );
+
+#ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
+    /* Reset IUP tracking bits in the backward compatibility mode. */
+    /* See `ttinterp.h' for details.                               */
+    exec->backward_compatibility &= ~0x3;
+#endif
 
     /* some glyphs leave something on the stack, */
     /* so we clean it before a new execution.    */

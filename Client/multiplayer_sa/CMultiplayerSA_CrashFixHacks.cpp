@@ -1572,22 +1572,37 @@ cont:
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInterface)
 {
-    // Crash will occur at offset 0xCFCD6
+    if (!pInterface)
+        return;
+
+	// Crash will occur at offset 0x000CFCD6
     OnCrashAverted(32);
     CAnimBlendAssociationSAInterface* pAnimAssoc = pInterface->pAnimBlendAssociation;
-    CAnimBlendSequenceSAInterface*    pAnimSequence = pInterface->pAnimSequence;
-    CAnimBlendHierarchySAInterface*   pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
+    if (!pAnimAssoc)
+        return;
 
-    bool                           bSequenceExistsInHierarchy = false;
-    CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
-    for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
+    CAnimBlendSequenceSAInterface* pAnimSequence = pInterface->pAnimSequence;
+    if (!pAnimSequence)
+        return;
+
+    CAnimBlendHierarchySAInterface* pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
+    if (!pAnimHierarchy)
+        return;
+
+    bool bSequenceExistsInHierarchy = false;
+
+    if (pAnimHierarchy->pSequences && pAnimHierarchy->usNumSequences > 0 && pAnimHierarchy->usNumSequences < 1000)
     {
-        if (pAnimHierSequence == pAnimSequence)
+        CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
+        for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
         {
-            bSequenceExistsInHierarchy = true;
-            break;
+            if (pAnimHierSequence == pAnimSequence)
+            {
+                bSequenceExistsInHierarchy = true;
+                break;
+            }
+            pAnimHierSequence++;
         }
-        pAnimHierSequence++;
     }
 
     LogEvent(588, "GetCurrentTranslation", "Incorrect endKeyFrameIndex",
@@ -1608,30 +1623,30 @@ static void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     __asm
-    {
-        // if end key frame index is greater than 10,000 then return
+        {
+            // if end key frame index is greater than 10,000 then return
         cmp     eax, 0x2710
         jg      altcode
 
+             // Normal path - execute original code
         push    ebx
         mov     bl, [edx + 4]
         shr     bl, 1
         jmp     RETURN_CAnimBlendNode_GetCurrentTranslation
 
-        // do alternate code
-        altcode :
+             // Crash prevention path
+        altcode:
+         // Save registers before logging
         pushad
-        push    ebp // this
+        push    ebp            // Pass 'this' pointer
         call    OnMY_CAnimBlendNode_GetCurrentTranslation
-        add     esp, 4 * 1
+        add     esp, 4
         popad
 
-        pop     edi
-        pop     esi
-        pop     ebp
-        add     esp, 18h
+             // Return safely without executing original buggy code
+             // The function expects 8 bytes of parameters
         retn    8
-    }
+        }
 }
 
 ////////////////////////////////////////////////////////////////////////

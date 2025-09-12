@@ -4,7 +4,7 @@
  *
  *   FreeType variation font interface (specification).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -439,8 +439,8 @@ FT_BEGIN_HEADER
    *
    *   [Since 2.9] If `num_coords` is larger than zero, this function sets
    *   the @FT_FACE_FLAG_VARIATION bit in @FT_Face's `face_flags` field
-   *   (i.e., @FT_IS_VARIATION will return true).  If `num_coords` is zero,
-   *   this bit flag gets unset.
+   *   (i.e., @FT_IS_VARIATION returns true).  If `num_coords` is zero, this
+   *   bit flag gets unset.
    */
   FT_EXPORT( FT_Error )
   FT_Set_MM_Design_Coordinates( FT_Face   face,
@@ -486,11 +486,11 @@ FT_BEGIN_HEADER
    *
    *   [Since 2.9] If `num_coords` is larger than zero, this function sets
    *   the @FT_FACE_FLAG_VARIATION bit in @FT_Face's `face_flags` field
-   *   (i.e., @FT_IS_VARIATION will return true).  If `num_coords` is zero,
-   *   this bit flag gets unset.
+   *   (i.e., @FT_IS_VARIATION returns true).  If `num_coords` is zero, this
+   *   bit flag gets unset.
    *
    *   [Since 2.14] This function also sets the @FT_FACE_FLAG_VARIATION bit
-   *   in @FT_Face's `face_flags` field (i.e., @FT_IS_VARIATION will return
+   *   in @FT_Face's `face_flags` field (i.e., @FT_IS_VARIATION returns
    *   true) if any of the provided coordinates is different from the face's
    *   default value for the corresponding axis, that is, the set up face is
    *   not at its default position.
@@ -578,11 +578,11 @@ FT_BEGIN_HEADER
    *
    *   [Since 2.9] If `num_coords` is larger than zero, this function sets
    *   the @FT_FACE_FLAG_VARIATION bit in @FT_Face's `face_flags` field
-   *   (i.e., @FT_IS_VARIATION will return true).  If `num_coords` is zero,
-   *   this bit flag gets unset.
+   *   (i.e., @FT_IS_VARIATION returns true).  If `num_coords` is zero, this
+   *   bit flag gets unset.
    *
    *   [Since 2.14] This function also sets the @FT_FACE_FLAG_VARIATION bit
-   *   in @FT_Face's `face_flags` field (i.e., @FT_IS_VARIATION will return
+   *   in @FT_Face's `face_flags` field (i.e., @FT_IS_VARIATION returns
    *   true) if any of the provided coordinates is different from the face's
    *   default value for the corresponding axis, that is, the set up face is
    *   not at its default position.
@@ -695,8 +695,8 @@ FT_BEGIN_HEADER
    *
    *   If `len` is larger than zero, this function sets the
    *   @FT_FACE_FLAG_VARIATION bit in @FT_Face's `face_flags` field (i.e.,
-   *   @FT_IS_VARIATION will return true).  If `len` is zero, this bit flag
-   *   is unset and the weight vector array is reset to the default values.
+   *   @FT_IS_VARIATION returns true).  If `len` is zero, this bit flag is
+   *   unset and the weight vector array is reset to the default values.
    *
    *   The Adobe documentation also states that the values in the
    *   `WeightVector` array must total 1.0 +/-~0.001.  In practice this does

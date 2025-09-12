@@ -4,7 +4,7 @@
  *
  *   Signed Distance Field support for bitmap fonts (body only).
  *
- * Copyright (C) 2020-2024 by
+ * Copyright (C) 2020-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * Written by Anuj Verma.
@@ -849,9 +849,9 @@
                     FT_Int  width )
   {
 #if USE_SQUARED_DISTANCES
-    FT_16D16 edge_threshold = ONE / 4;
+    FT_16D16      edge_threshold = ONE / 4;
 #else
-    FT_16D16 edge_threshold = ONE / 2;
+    FT_16D16      edge_threshold = ONE / 2;
 #endif
     ED*           to_check;
     FT_16D16      dist;

@@ -4,7 +4,7 @@
  *
  *   TrueType bytecode interpreter (specification).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -401,7 +401,6 @@ FT_BEGIN_HEADER
   extern const TT_GraphicsState  tt_default_graphics_state;
 
 
-#ifdef TT_USE_BYTECODE_INTERPRETER
   FT_LOCAL( void )
   TT_Set_CodeRange( TT_ExecContext  exec,
                     FT_Int          range,
@@ -411,7 +410,6 @@ FT_BEGIN_HEADER
   FT_LOCAL( void )
   TT_Clear_CodeRange( TT_ExecContext  exec,
                       FT_Int          range );
-#endif /* TT_USE_BYTECODE_INTERPRETER */
 
 
   /**************************************************************************
@@ -438,7 +436,6 @@ FT_BEGIN_HEADER
   TT_New_Context( TT_Driver  driver );
 
 
-#ifdef TT_USE_BYTECODE_INTERPRETER
   FT_LOCAL( void )
   TT_Done_Context( TT_ExecContext  exec );
 
@@ -454,7 +451,6 @@ FT_BEGIN_HEADER
   FT_LOCAL( FT_Error )
   TT_Run_Context( TT_ExecContext  exec,
                   TT_Size         size );
-#endif /* TT_USE_BYTECODE_INTERPRETER */
 
 
   /**************************************************************************
