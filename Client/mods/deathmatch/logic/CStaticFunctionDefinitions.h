@@ -637,8 +637,11 @@ public:
     static bool SetBirdsEnabled(bool bEnabled);
     static bool GetBirdsEnabled();
     static bool SetMoonSize(int iSize);
-    static bool SetFPSLimit(int iLimit);
-    static bool GetFPSLimit(int& iLimit);
+
+    // FPS Limiter
+    static void GetFPSLimit(std::uint16_t& fps) noexcept;
+    static void SetClientFPSLimit(std::uint16_t fps);
+    static void SetServerFPSLimit(std::uint16_t fps);
 
     static bool ResetAllSurfaceInfo();
     static bool ResetSurfaceInfo(short sSurfaceID);

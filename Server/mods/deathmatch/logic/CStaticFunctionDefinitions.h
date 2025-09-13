@@ -590,7 +590,7 @@ public:
     static bool GetGravity(float& fGravity);
     static bool GetGameSpeed(float& fSpeed);
     static bool GetWaveHeight(float& fHeight);
-    static bool GetFPSLimit(unsigned short& usLimit);
+    static void GetFPSLimit(std::uint16_t& fps) noexcept;
     static bool GetMinuteDuration(unsigned long& ulDuration);
     static bool IsGarageOpen(unsigned char ucGarageID, bool& bIsOpen);
     static bool GetTrafficLightState(unsigned char& ucState);
@@ -624,7 +624,7 @@ public:
     static bool GetHeatHaze(SHeatHazeSettings& heatHazeSettings);
     static bool SetHeatHaze(const SHeatHazeSettings& heatHazeSettings);
     static bool ResetHeatHaze();
-    static bool SetFPSLimit(unsigned short usLimit, bool bSave);
+    static bool SetFPSLimit(std::uint16_t fps, bool save);
     static bool SetMinuteDuration(unsigned long ulDuration);
     static bool SetGarageOpen(unsigned char ucGarageID, bool bIsOpen);
     static bool SetGlitchEnabled(const std::string& strGlitchName, bool bEnabled);

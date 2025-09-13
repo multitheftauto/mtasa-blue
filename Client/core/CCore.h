@@ -41,6 +41,7 @@ class CDiscordInterface;
 #include <ijsify.h>
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
+#include <FPSLimiter.h>
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -107,6 +108,7 @@ public:
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
     CSteamClient*                      GetSteamClient() { return m_steamClient.get(); }
+    FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() const noexcept { return m_pFPSLimiter.get(); }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -220,13 +222,9 @@ public:
     bool IsOptionalUpdateInfoRequired(const char* szHost) { return m_pLocalGUI->IsOptionalUpdateInfoRequired(szHost); }
     void InitiateDataFilesFix() { m_pLocalGUI->InitiateDataFilesFix(); }
 
-    uint GetFrameRateLimit() { return m_uiFrameRateLimit; }
-    void RecalculateFrameRateLimit(uint uiServerFrameRateLimit = -1, bool bLogToConsole = true);
-    void ApplyFrameRateLimit(uint uiOverrideRate = -1);
-    void ApplyQueuedFrameRateLimit();
-    void EnsureFrameRateLimitApplied();
-    void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit);
-    void SetCurrentRefreshRate(uint value);
+    // FPS Limiter
+    void OnFPSLimitChange(std::uint16_t fps);
+
     void DoReliablePulse();
 
     bool IsTimingCheckpoints();
@@ -310,12 +308,13 @@ private:
     CModelCacheManager* m_pModelCacheManager;
 
     // Instances (put new classes here!)
-    CXMLFile*                             m_pConfigFile;
-    CClientVariables                      m_ClientVariables;
-    CWebCoreInterface*                    m_pWebCore = nullptr;
-    CTrayIcon*                            m_pTrayIcon;
-    std::unique_ptr<CSteamClient>         m_steamClient;
-    std::shared_ptr<CDiscordRichPresence> m_pDiscordRichPresence;
+    CXMLFile*                               m_pConfigFile;
+    CClientVariables                        m_ClientVariables;
+    CWebCoreInterface*                      m_pWebCore = nullptr;
+    CTrayIcon*                              m_pTrayIcon;
+    std::unique_ptr<CSteamClient>           m_steamClient;
+    std::shared_ptr<CDiscordRichPresence>   m_pDiscordRichPresence;
+    std::unique_ptr<FPSLimiter::FPSLimiter> m_pFPSLimiter;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;
@@ -369,14 +368,6 @@ private:
     bool m_bQuitOnPulse;
     bool m_bDestroyMessageBox;
 
-    bool                 m_bDoneFrameRateLimit;
-    uint                 m_uiServerFrameRateLimit;
-    uint                 m_uiClientScriptFrameRateLimit;
-    uint                 m_uiFrameRateLimit;
-    CElapsedTimeHD       m_FrameRateTimer;
-    uint                 m_uiQueuedFrameRate;
-    bool                 m_bQueuedFrameRateValid;
-    uint                 m_CurrentRefreshRate;
     bool                 m_requestNewNickname{false};
     EDiagnosticDebugType m_DiagnosticDebug;
 

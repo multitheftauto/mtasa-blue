@@ -102,8 +102,8 @@ public:
     int                         GetBackupAmount() { return m_iBackupAmount; }
     void                        NotifyDidBackup();
     bool                        ShouldCompactInternalDatabases();
-    unsigned short              GetFPSLimit() { return m_usFPSLimit; };
-    bool                        SetFPSLimit(unsigned short usFPS, bool bSave);
+    std::uint16_t               GetFPSLimit() const noexcept { return m_fpsLimit; };
+    bool                        SetFPSLimit(std::uint16_t fps, bool save);
     int                         GetPendingWorkToDoSleepTime();
     int                         GetNoWorkToDoSleepTime();
     int                         GetServerLogicFpsLimit() { return m_iServerLogicFpsLimit; };
@@ -193,7 +193,7 @@ private:
     unsigned int               m_uiScriptDebugLogLevel;
     std::string                m_strAccessControlListFile;
     bool                       m_bVerifySerials;
-    unsigned short             m_usFPSLimit;
+    std::uint16_t              m_fpsLimit;
     int                        m_bDontBroadcastLan;
     std::set<SString>          m_DisableComboACMap;
     std::map<SString, SString> m_RulesForASEMap;

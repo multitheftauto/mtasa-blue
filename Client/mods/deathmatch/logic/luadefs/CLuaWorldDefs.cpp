@@ -2003,21 +2003,19 @@ int CLuaWorldDefs::ResetMoonSize(lua_State* luaVM)
 int CLuaWorldDefs::SetFPSLimit(lua_State* luaVM)
 {
     // bool setFPSLimit ( int fpsLimit )
-    int iLimit;
+    std::uint16_t fps;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iLimit);
+    CScriptArgReader argReader(luaVM);
+    argReader.ReadNumber(fps);
 
-    if (!argStream.HasErrors())
+    if (!argReader.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetFPSLimit(iLimit))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        CStaticFunctionDefinitions::SetClientFPSLimit(fps);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        m_pScriptDebugging->LogCustom(luaVM, argReader.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -2025,14 +2023,12 @@ int CLuaWorldDefs::SetFPSLimit(lua_State* luaVM)
 
 int CLuaWorldDefs::GetFPSLimit(lua_State* luaVM)
 {
-    int iLimit;
-    if (CStaticFunctionDefinitions::GetFPSLimit(iLimit))
-    {
-        lua_pushnumber(luaVM, iLimit);
-        return 1;
-    }
+    // int getFPSLimit ()
+    std::uint16_t fps;
 
-    lua_pushboolean(luaVM, false);
+    CStaticFunctionDefinitions::GetFPSLimit(fps);
+
+    lua_pushnumber(luaVM, fps);
     return 1;
 }
 

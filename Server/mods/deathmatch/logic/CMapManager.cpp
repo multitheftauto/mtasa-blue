@@ -473,7 +473,7 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
     unsigned char ucBlendedWeatherHour = m_pBlendedWeather->GetBlendedStopHour();
 
     // FPS Limit
-    unsigned short usFPSLimit = g_pGame->GetConfig()->GetFPSLimit();
+    std::uint16_t fps = g_pGame->GetConfig()->GetFPSLimit();
 
     // Garage states
     const SGarageStates& garageStates = g_pGame->GetGarageStates();
@@ -524,7 +524,7 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
     // Send the packet to the given player
     Player.Send(CMapInfoPacket(ucCurrentWeather, ucWeatherBlendingTo, ucBlendedWeatherHour, ucClockHour, ucClockMin, ulMinuteDuration, bNametagsEnabled,
                                bRadarEnabled, fGravity, fGameSpeed, fWaveHeight, worldWaterLevelInfo, bHasSkyGradient, garageStates, ucTopRed, ucTopGreen,
-                               ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue, bHasHeatHaze, heatHazeSettings, usFPSLimit, bCloudsEnabled,
+                               ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue, bHasHeatHaze, heatHazeSettings, fps, bCloudsEnabled,
                                fJetpackMaxHeight, bOverrideWaterColor, ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha, bInteriorSoundsEnabled,
                                bOverrideRainLevel, fRainLevel, bOverrideSunSize, fSunSize, bOverrideSunColor, ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG,
                                ucCoronaB, bOverrideWindVelocity, fWindVelX, fWindVelY, fWindVelZ, bOverrideFarClipDistance, fFarClip, bOverrideFogDistance,

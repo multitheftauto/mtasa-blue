@@ -22,7 +22,7 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
                                float fWaveHeight, const SWorldWaterLevelInfo& worldWaterLevelInfo, bool bHasSkyGradient, const SGarageStates& garageStates,
                                unsigned char ucSkyGradientTR, unsigned char ucSkyGradientTG, unsigned char ucSkyGradientTB, unsigned char ucSkyGradientBR,
                                unsigned char ucSkyGradientBG, unsigned char ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
-                               unsigned short usFPSLimit, bool bCloudsEnabled, float fJetpackMaxHeight, bool bOverrideWaterColor, unsigned char ucWaterRed,
+                               unsigned short fps, bool bCloudsEnabled, float fJetpackMaxHeight, bool bOverrideWaterColor, unsigned char ucWaterRed,
                                unsigned char ucWaterGreen, unsigned char ucWaterBlue, unsigned char ucWaterAlpha, bool bInteriorSoundsEnabled,
                                bool bOverrideRainLevel, float fRainLevel, bool bOverrideSunSize, float fSunSize, bool bOverrideSunColor,
                                unsigned char ucSunCoreR, unsigned char ucSunCoreG, unsigned char ucSunCoreB, unsigned char ucSunCoronaR,
@@ -52,7 +52,7 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
     m_ucSkyGradientBB = ucSkyGradientBB;
     m_bHasHeatHaze = bHasHeatHaze;
     m_HeatHazeSettings = heatHazeSettings;
-    m_usFPSLimit = usFPSLimit;
+    m_fpsLimit = fps;
     m_bCloudsEnabled = bCloudsEnabled;
     m_fJetpackMaxHeight = fJetpackMaxHeight;
     m_bOverrideWaterColor = bOverrideWaterColor;
@@ -147,7 +147,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     {
         BitStream.Write(m_WorldWaterLevelInfo.fOutsideLevel);
     }
-    BitStream.WriteCompressed(m_usFPSLimit);
+    BitStream.WriteCompressed(m_fpsLimit);
 
     // Write the garage states
     for (unsigned char i = 0; i < MAX_GARAGES; i++)
