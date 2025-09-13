@@ -412,18 +412,9 @@ void CResource::ShowCursor(bool bShow, bool bToggleControls)
         m_bShowingCursor = bShow;
     }
 
-    // Always update cursor and controls state when cursor should be visible
-    if (m_iShowingCursor > 0)
-    {
-        g_pCore->ForceCursorVisible(true, bToggleControls);
-        g_pClientGame->SetCursorEventsEnabled(true);
-    }
-    else
-    {
-        // Hide cursor if no resources want it visible
-        g_pCore->ForceCursorVisible(false, bToggleControls);
-        g_pClientGame->SetCursorEventsEnabled(false);
-    }
+    // Always update cursor and controls state regardless of cursor visibility change
+    g_pCore->ForceCursorVisible(m_iShowingCursor > 0, bToggleControls);
+    g_pClientGame->SetCursorEventsEnabled(m_iShowingCursor > 0);
 }
 
 SString CResource::GetResourceDirectoryPath(eAccessType accessType, const SString& strMetaPath)
