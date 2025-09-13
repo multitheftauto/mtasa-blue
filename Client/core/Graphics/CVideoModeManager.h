@@ -37,6 +37,7 @@ public:
     virtual bool GetRequiredDisplayResolution(int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex) = 0;
     virtual int  GetFullScreenStyle() = 0;
     virtual bool IsDisplayModeWindowed() = 0;
+    virtual bool IsDisplayModeFullScreenWindow() = 0;
 };
 
 CVideoModeManagerInterface* GetVideoModeManager();
