@@ -1077,6 +1077,13 @@ bool CStaticFunctionDefinitions::SetElementPosition(CClientEntity& Entity, const
 {
     RUN_CHILDREN(SetElementPosition(**iter, vecPosition))
 
+    if (Entity.GetType() == CCLIENTVEHICLE)
+    {
+        CClientPed* driver = static_cast<CClientVehicle&>(Entity).GetOccupant(0);
+        if (!Entity.IsLocalEntity() && !static_cast<CDeathmatchVehicle&>(Entity).IsSyncing() && (!driver || !driver->IsLocalPlayer()))
+            return false;
+    }
+
     if (bWarp)
         Entity.Teleport(vecPosition);
     else
@@ -1499,6 +1506,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            if (Ped.IsLocalPlayer())
+                return false;
 
             // If setting health to 0 for local player, clear stale damage data
             // and set proper scripted death parameters for DoWastedCheck
@@ -2914,7 +2923,6 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optiona
 
     CClientVehicle& vehicle = static_cast<CClientVehicle&>(Entity);
     VehicleBlowFlags blow;
-
     blow.withExplosion = withExplosion.value_or(true);
 
     if (vehicle.IsLocalEntity())
@@ -2923,11 +2931,15 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optiona
     }
     else
     {
+        CClientPed* driver = vehicle.GetOccupant(0);
+        if (!static_cast<CDeathmatchVehicle&>(vehicle).IsSyncing() && (!driver || !driver->IsLocalPlayer()))
+            return false;
+
         CVector position;
         vehicle.GetPosition(position);
 
-        const auto type = vehicle.GetType();
-        const auto state = (blow.withExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
+        const auto     type = vehicle.GetType();
+        const auto     state = (blow.withExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
         eExplosionType explosion;
 
         switch (type)
