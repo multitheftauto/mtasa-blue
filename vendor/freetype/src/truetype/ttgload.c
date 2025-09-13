@@ -4,7 +4,7 @@
  *
  *   TrueType Glyph Loader (body).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -1181,8 +1181,6 @@
   {
     FT_Error     error;
     FT_Outline*  outline = &loader->gloader->base.outline;
-    FT_Stream    stream = loader->stream;
-    FT_UShort    n_ins;
     FT_UInt      i;
 
 
@@ -1201,8 +1199,10 @@
 #ifdef TT_USE_BYTECODE_INTERPRETER
 
     {
-      TT_ExecContext  exec = loader->exec;
+      TT_ExecContext  exec   = loader->exec;
       FT_Memory       memory = exec->memory;
+      FT_Stream       stream = loader->stream;
+      FT_UShort       n_ins;
 
 
       if ( exec->glyphSize )

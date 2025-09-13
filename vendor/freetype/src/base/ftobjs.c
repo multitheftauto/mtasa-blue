@@ -4,7 +4,7 @@
  *
  *   The FreeType private base classes (body).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -905,7 +905,6 @@
     FT_Library    library;
     FT_Bool       autohint = FALSE;
     FT_Module     hinter;
-    TT_Face       ttface = (TT_Face)face;
 
 
     if ( !face || !face->size || !face->glyph )
@@ -983,6 +982,7 @@
       {
         FT_Render_Mode  mode = FT_LOAD_TARGET_MODE( load_flags );
         FT_Bool         is_light_type1;
+        TT_Face         ttface = (TT_Face)face;
 
 
         /* only the new Adobe engine (for both CFF and Type 1) is `light'; */
@@ -5030,9 +5030,9 @@
   static void
   Destroy_Module( FT_Module  module )
   {
-    FT_Memory         memory  = module->memory;
-    FT_Module_Class*  clazz   = module->clazz;
-    FT_Library        library = module->library;
+    const FT_Module_Class*  clazz   = module->clazz;
+    FT_Library              library = module->library;
+    FT_Memory               memory  = module->memory;
 
 
     if ( library && library->auto_hinter == module )
@@ -5111,9 +5111,9 @@
       goto Exit;
 
     /* base initialization */
+    module->clazz   = clazz;
     module->library = library;
     module->memory  = memory;
-    module->clazz   = (FT_Module_Class*)clazz;
 
     /* check whether the module is a renderer - this must be performed */
     /* before the normal module initialization                         */
