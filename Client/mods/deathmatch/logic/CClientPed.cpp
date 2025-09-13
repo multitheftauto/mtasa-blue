@@ -2014,6 +2014,13 @@ void CClientPed::SetFrozen(bool bFrozen)
             if (m_pPlayerPed)
             {
                 m_pPlayerPed->GetMatrix(&m_matFrozen);
+                
+                CVector vecFrozenRotation = m_matFrozen.GetRotation();
+                
+                if (vecFrozenRotation.fX == 0.0f && vecFrozenRotation.fY == 0.0f && vecFrozenRotation.fZ == 0.0f)
+                {
+                    m_matFrozen.SetRotation(m_Matrix.GetRotation());
+                }
             }
             else
             {
@@ -3326,6 +3333,12 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
 
 float CClientPed::GetCurrentRotation()
 {
+    if (IsFrozen())
+    {
+        CVector vecRotation = m_matFrozen.GetRotation();
+        return vecRotation.fZ;
+    }
+    
     if (m_pPlayerPed)
     {
         return m_pPlayerPed->GetCurrentRotation();
