@@ -3,28 +3,17 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        launch/Main.cpp
- *  PURPOSE:     Unchanging .exe that doesn't change (but it did)
+ *  PURPOSE:     Unchanging .exe that doesn't change
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <windows.h>
-#include <psapi.h>               // For GetModuleInformation
-#include <shlwapi.h>             // For PathCanonicalize
-#include <strsafe.h>             // For safe string operations
-#include <wintrust.h>            // For WinVerifyTrust
-#include <softpub.h>             // For WINTRUST_ACTION_GENERIC_VERIFY_V2
-#include <malloc.h>              // For _malloca
-#include <string>                // For std::wstring
-#include <intrin.h>              // For __readfsdword, __readgsqword
 #include <version.h>
-
-// Link to the required libraries
-#pragma comment(lib, "psapi.lib")
-#pragma comment(lib, "shlwapi.lib")
-#pragma comment(lib, "wintrust.lib")
+#include <expected>
+#include <string_view>
+#include <format>
 
 /*
     IMPORTANT
@@ -37,1001 +26,437 @@
     (set flag.new_client_exe on the build server to generate new exe)
 */
 
-// Enable security features at compile time
-#ifdef _MSC_VER
-    #pragma strict_gs_check(on)
-
-    #if defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64)
-        #pragma comment(linker, "/guard:cf")
-    #endif
-
-    #if defined(_M_IX86)
-        #pragma check_stack(on)
-    #endif
-#endif
-
-// Ensure proper struct packing for x86/x64 compatibility
-#pragma pack(push, 8)
-
-// Define constants for older SDKs
-#ifndef LOAD_WITH_ALTERED_SEARCH_PATH
-    #define LOAD_WITH_ALTERED_SEARCH_PATH 0x00000008
-#endif
-
-#ifndef LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR
-    #define LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR 0x00000100
-#endif
-
-#ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
-    #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
-#endif
-
-#ifndef PROCESS_DEP_ENABLE
-    #define PROCESS_DEP_ENABLE 0x00000001
-#endif
-
-#ifndef TRUST_E_NOSIGNATURE
-    #define TRUST_E_NOSIGNATURE ((HRESULT)0x800B0100L)
-#endif
-
-#ifndef MAXULONG_PTR
-    #if defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64)
-        #define MAXULONG_PTR 0xffffffffffffffffULL
-    #else
-        #define MAXULONG_PTR 0xffffffffUL
-    #endif
-#endif
-
-// Forward declare process mitigation types for Windows 8+ features
-// These are conditionally used at runtime if available
-struct PROCESS_MITIGATION_ASLR_POLICY_LOCAL
-{
-    union
-    {
-        DWORD Flags;
-        struct
-        {
-            DWORD EnableBottomUpRandomization : 1;
-            DWORD EnableForceRelocateImages : 1;
-            DWORD EnableHighEntropy : 1;
-            DWORD DisallowStrippedImages : 1;
-            DWORD ReservedFlags : 28;
-        };
+namespace mta::launcher {
+ 
+    enum class LoadResult : std::uint32_t {
+        Success = 0,
+        PathError = 1,
+        LoadError = 2,
+        FunctionError = 3
     };
-};
 
-struct PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY_LOCAL
-{
-    union
-    {
-        DWORD Flags;
-        struct
-        {
-            DWORD EnableControlFlowGuard : 1;
-            DWORD EnableExportSuppression : 1;
-            DWORD StrictMode : 1;
-            DWORD ReservedFlags : 29;
-        };
+    constexpr const char* DEBUG_LOADER_DLL = "loader_d.dll";
+    constexpr const char* RELEASE_LOADER_DLL = "loader.dll";
+    constexpr const char* DOWINMAIN_FUNCTION = "DoWinMain";
+
+    [[nodiscard]] std::expected<std::wstring_view, LoadResult> 
+    ValidateUTF8Conversion(const wchar_t* converted_path, const SString& original_path) {
+        if (!converted_path || std::wcslen(converted_path) == 0) [[unlikely]] {
+            AddReportLog(5723, std::format("Launcher Main: Failed to convert DLL path to Unicode: '{}'", original_path.c_str()));
+            return std::unexpected(LoadResult::PathError);
+        }
+        return std::wstring_view{converted_path};
+    }
+
+    struct DirectoryState {
+        bool changed = false;
+        bool dll_directory_changed = false;
     };
-};
 
-struct PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY_LOCAL
-{
-    union
-    {
-        DWORD Flags;
-        struct
-        {
-            DWORD RaiseExceptionOnInvalidHandleReference : 1;
-            DWORD HandleExceptionsPermanentlyEnabled : 1;
-            DWORD ReservedFlags : 30;
-        };
+    [[nodiscard]] std::expected<HMODULE, DWORD> 
+    LoadLibraryWithFallback(const std::wstring_view& dll_path, 
+                           const SString& dll_filename,
+                           const SString& mta_path, 
+                           const SString& original_directory,
+                           DirectoryState& dir_state) {
+        
+        // First attempt - try loading from calculated path without changing directories
+        HMODULE module = LoadLibraryW(dll_path.data());
+        DWORD error = GetLastError();
+        
+        if (module) [[likely]] {
+            return module;
+        }
+
+        // Check if the DLL file actually exists before trying to change directories
+        SString dll_path_str = ToUTF8(std::wstring(dll_path));
+        if (!FileExists(dll_path_str)) {
+            AddReportLog(5717, std::format("Launcher Main: DLL file does not exist: '{}'", dll_path_str.c_str()));
+            return std::unexpected(error);
+        }
+
+        // Only proceed with directory changes if the MTA directory exists
+        if (!DirectoryExists(mta_path)) {
+            AddReportLog(5717, std::format("Launcher Main: MTA directory does not exist: '{}'", mta_path.c_str()));
+            return std::unexpected(error);
+        }
+
+        if (original_directory.empty()) {
+            AddReportLog(5716, "Launcher Main: Original directory is empty, cannot safely change directory");
+            return std::unexpected(error);
+        }
+
+        // Validate UTF8 conversions before directory operations
+        WString mta_path_wstring = FromUTF8(mta_path);
+        WString dll_filename_wstring = FromUTF8(dll_filename);
+        
+        if (mta_path_wstring.empty() || dll_filename_wstring.empty()) [[unlikely]] {
+            AddReportLog(5724, std::format("Launcher Main: Failed to convert paths to Unicode: MTA='{}', DLL='{}'", 
+                        mta_path.c_str(), dll_filename.c_str()));
+            return std::unexpected(error);
+        }
+
+        const wchar_t* mta_path_wide = mta_path_wstring.c_str();
+        const wchar_t* dll_filename_wide = dll_filename_wstring.c_str();
+
+        // Try loading with SetDllDirectory first without changing current directory
+        if (SetDllDirectoryW(mta_path_wide)) {
+            dir_state.dll_directory_changed = true;
+            
+            module = LoadLibraryW(dll_filename_wide);
+            if (module) [[likely]] {
+                AddReportLog(5712, std::format("Launcher Main: LoadLibrary '{}' succeeded with SetDllDirectory to '{}'", 
+                            dll_filename.c_str(), mta_path.c_str()));
+                return module;
+            }
+        }
+
+        // If that didn't work, try changing both current directory and DLL search directory
+        if (!SetCurrentDirectoryW(mta_path_wide)) {
+            DWORD directory_error = GetLastError();
+            AddReportLog(5718, std::format("Launcher Main: Failed to change directory to: '{}' (error: {})", 
+                        mta_path.c_str(), directory_error));
+            return std::unexpected(error);
+        }
+
+        dir_state.changed = true;
+        
+        module = LoadLibraryW(dll_filename_wide);
+        DWORD second_attempt_error = GetLastError();
+        
+        if (module) [[likely]] {
+            AddReportLog(5712, std::format("Launcher Main: LoadLibrary '{}' succeeded on change to directory '{}'", 
+                        dll_filename.c_str(), mta_path.c_str()));
+            return module;
+        }
+
+        return std::unexpected(second_attempt_error);
+    }
+
+    // Helper function for error mode management
+    class ErrorModeGuard {
+        DWORD prev_mode;
+    public:
+        explicit ErrorModeGuard(DWORD mode) : prev_mode(SetErrorMode(mode)) {}
+        ~ErrorModeGuard() { SetErrorMode(prev_mode); }
+        
+        // Delete copy operations for RAII safety
+        ErrorModeGuard(const ErrorModeGuard&) = delete;
+        ErrorModeGuard& operator=(const ErrorModeGuard&) = delete;
+        ErrorModeGuard(ErrorModeGuard&&) = delete;
+        ErrorModeGuard& operator=(ErrorModeGuard&&) = delete;
     };
-};
 
-// Security constants
-namespace SecurityConstants
+    // Function for executing DoWinMain (with fallback to old approach)
+    [[nodiscard]] std::expected<int, LoadResult> 
+    ExecuteDoWinMain(HMODULE module, HINSTANCE instance, HINSTANCE prev_instance, 
+                    LPSTR cmd_line, int show_cmd, const SString& dll_filename) noexcept {
+        
+        using DoWinMainFunc = int(*)(HINSTANCE, HINSTANCE, LPSTR, int);
+
+        FARPROC proc_address = GetProcAddress(module, DOWINMAIN_FUNCTION);
+        
+        if (!proc_address) [[unlikely]] {
+            DWORD error = GetLastError();
+            AddReportLog(5713, std::format("Launcher Main: GetProcAddress failed for DoWinMain in '{}' (error: {})", 
+                        dll_filename.c_str(), error));
+            return std::unexpected(LoadResult::FunctionError);
+        }
+
+        auto do_win_main = reinterpret_cast<DoWinMainFunc>(proc_address);
+
+        // Use old approach for maximum compatibility
+        int result = 1; // Default error result
+        
+        // Store original error mode to restore after function call
+        DWORD prev_error_mode = SetErrorMode(SEM_FAILCRITICALERRORS);
+        
+        // Call DoWinMain directly
+        try {
+            result = do_win_main(instance, prev_instance, cmd_line, show_cmd);
+        } catch (...) {
+
+            AddReportLog(5722, "Launcher Main: Exception occurred during DoWinMain execution");
+            SetErrorMode(prev_error_mode);
+            return std::unexpected(LoadResult::FunctionError);
+        }
+        
+        SetErrorMode(prev_error_mode);
+        return result;
+    }
+
+    class DirectoryRestorer {
+        DirectoryState& state;
+        SString original_directory;
+
+    public:
+        DirectoryRestorer(DirectoryState& dir_state, const SString& orig_dir) 
+            : state(dir_state), original_directory(orig_dir) {}
+
+        ~DirectoryRestorer() {
+            // Restore DLL directory if it was changed
+            if (state.dll_directory_changed) {
+                // Reset DLL directory to system default cuz we can't retrieve the original DLL directory
+                // (Windows API provides no GetDllDirectory function to save the original state)
+                SetDllDirectoryW(nullptr);
+            }
+
+            // Restore original directory if it was changed
+            if (state.changed && !original_directory.empty()) {
+                WString original_directory_wstring = FromUTF8(original_directory);
+                if (!original_directory_wstring.empty()) {
+                    if (!SetCurrentDirectoryW(original_directory_wstring.c_str())) {
+                        AddReportLog(5721, std::format("Launcher Main: Failed to restore original directory: '{}' (error: {})", 
+                                    original_directory.c_str(), GetLastError()));
+                    }
+                } else {
+                    AddReportLog(5729, std::format("Launcher Main: Failed to convert original directory to Unicode: '{}'", 
+                                original_directory.c_str()));
+                }
+            }
+        }
+
+        // Delete copy operations for RAII safety
+        DirectoryRestorer(const DirectoryRestorer&) = delete;
+        DirectoryRestorer& operator=(const DirectoryRestorer&) = delete;
+        DirectoryRestorer(DirectoryRestorer&&) = delete;
+        DirectoryRestorer& operator=(DirectoryRestorer&&) = delete;
+    };
+
+    // RAII module guard
+    class ModuleGuard {
+        HMODULE& module_ref;
+    public:
+        explicit ModuleGuard(HMODULE& module) : module_ref(module) {}
+        ~ModuleGuard() {
+            if (module_ref) {
+                FreeLibrary(module_ref);
+                module_ref = nullptr;
+            }
+        }
+        
+        ModuleGuard(const ModuleGuard&) = delete;
+        ModuleGuard& operator=(const ModuleGuard&) = delete;
+        ModuleGuard(ModuleGuard&&) = delete;
+        ModuleGuard& operator=(ModuleGuard&&) = delete;
+    };
+
+} // namespace mta::launcher
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    constexpr size_t MAX_PATH_LENGTH = 260U;
-    constexpr size_t MAX_FILENAME_LENGTH = 255U;
-    constexpr size_t MAX_CMDLINE_LENGTH = 32768U;
-    constexpr DWORD  MAX_MODULE_SIZE = 100U * 1024U * 1024U;
-    constexpr DWORD  MIN_MODULE_SIZE = 1024U;
-    constexpr DWORD  CRITICAL_SECTION_SPIN_COUNT = 0x00000400;
-    constexpr DWORD  PEB_DEBUG_FLAGS = 0x70;            // FLG_HEAP_ENABLE_TAIL_CHECK | FLG_HEAP_ENABLE_FREE_CHECK | FLG_HEAP_VALIDATE_PARAMETERS
-
-#if defined(_M_IX86) || (defined(_WIN32) && !defined(_WIN64))
-    constexpr DWORD MAX_ENV_VAR_LENGTH = 8192U;            // 8KB for x86
-#else
-    constexpr DWORD MAX_ENV_VAR_LENGTH = 32767U;            // 32KB for x64
-#endif
-
-    constexpr size_t STACK_ALLOC_LIMIT = 65536U;            // Stack allocation limit
-
-    // Report log codes
-    constexpr UINT REPORT_CODE_INVALID_PATH = 5716U;
-    constexpr UINT REPORT_CODE_FILE_NOT_EXIST = 5717U;
-    constexpr UINT REPORT_CODE_INVALID_SIGNATURE = 5718U;
-    constexpr UINT REPORT_CODE_LOAD_FAILED = 5719U;
-    constexpr UINT REPORT_CODE_ELEVATED_PRIVILEGE = 5750U;
-    constexpr UINT REPORT_CODE_LOAD_ERROR = 5711U;
-    constexpr UINT REPORT_CODE_MISSING_EXPORT = 5714U;
-    constexpr UINT REPORT_CODE_EXCEPTION = 5751U;
-}            // namespace SecurityConstants
-
-// Critical section for thread safety
-namespace
-{
-#if defined(_M_IX86)
-    __declspec(align(8)) CRITICAL_SECTION g_DllLoadCS = {};
-#else
-    CRITICAL_SECTION g_DllLoadCS = {};
-#endif
-    volatile LONG g_lSecurityInitialized = 0;
-    volatile LONG g_lCriticalSectionInitialized = 0;
-}            // anonymous namespace
-
-// Helper to get heap termination flag
-[[nodiscard]] inline constexpr HEAP_INFORMATION_CLASS GetHeapTerminationOnCorruption() noexcept
-{
-    return static_cast<HEAP_INFORMATION_CLASS>(1);
-}
-
-// RAII wrapper for heap memory
-class HeapMemory final
-{
-public:
-    explicit HeapMemory(size_t size) noexcept : m_pMemory(::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, size)) {}
-
-    ~HeapMemory() noexcept
-    {
-        if (m_pMemory != nullptr)
-        {
-            static_cast<void>(::HeapFree(::GetProcessHeap(), 0, m_pMemory));
-        }
-    }
-
-    HeapMemory(const HeapMemory&) = delete;
-    HeapMemory& operator=(const HeapMemory&) = delete;
-    HeapMemory(HeapMemory&&) = delete;
-    HeapMemory& operator=(HeapMemory&&) = delete;
-
-    [[nodiscard]] void*       Get() noexcept { return m_pMemory; }
-    [[nodiscard]] const void* Get() const noexcept { return m_pMemory; }
-    [[nodiscard]] bool        IsValid() const noexcept { return m_pMemory != nullptr; }
-
-private:
-    void* m_pMemory;
-};
-
-namespace Security
-{
-    // Forward declarations
-    void CleanupSecurity() noexcept;
-
-    // Enable DEP for process
-    void EnableDEP() noexcept
-    {
-        typedef BOOL(WINAPI * PFN_SetProcessDEPPolicy)(DWORD);
-        const HMODULE hKernel32 = ::GetModuleHandleW(L"kernel32.dll");
-        if (hKernel32 != nullptr)
-        {
-            const auto pfnSetDEP = reinterpret_cast<PFN_SetProcessDEPPolicy>(static_cast<void*>(::GetProcAddress(hKernel32, "SetProcessDEPPolicy")));
-            if (pfnSetDEP != nullptr)
-            {
-                static_cast<void>(pfnSetDEP(PROCESS_DEP_ENABLE));
-            }
-        }
-    }
-
-    // Enable process mitigation policies (Windows 8+ only)
-    void EnableMitigationPolicies() noexcept
-    {
-        typedef BOOL(WINAPI * PFN_SetProcessMitigationPolicy)(INT, PVOID, SIZE_T);
-        const HMODULE hKernel32 = ::GetModuleHandleW(L"kernel32.dll");
-        if (hKernel32 == nullptr)
-            return;
-
-        const auto pfnSetMitigation =
-            reinterpret_cast<PFN_SetProcessMitigationPolicy>(static_cast<void*>(::GetProcAddress(hKernel32, "SetProcessMitigationPolicy")));
-        if (pfnSetMitigation == nullptr)
-            return;            // Windows 7 and earlier don't have this function
-
-        // Use local structures to avoid SDK conflicts
-        // ProcessControlFlowGuardPolicy = 7
-        {
-            PROCESS_MITIGATION_CONTROL_FLOW_GUARD_POLICY_LOCAL cfgPolicy = {};
-            cfgPolicy.EnableControlFlowGuard = TRUE;
-            cfgPolicy.StrictMode = TRUE;
-            static_cast<void>(pfnSetMitigation(7, &cfgPolicy, sizeof(cfgPolicy)));
-        }
-
-        // ProcessASLRPolicy = 1
-        {
-            PROCESS_MITIGATION_ASLR_POLICY_LOCAL aslrPolicy = {};
-            aslrPolicy.EnableBottomUpRandomization = TRUE;
-            aslrPolicy.EnableForceRelocateImages = TRUE;
-#if defined(_M_X64) || defined(_WIN64) || defined(_M_AMD64)
-            aslrPolicy.EnableHighEntropy = TRUE;
-#endif
-            static_cast<void>(pfnSetMitigation(1, &aslrPolicy, sizeof(aslrPolicy)));
-        }
-
-        // ProcessStrictHandleCheckPolicy = 3
-        {
-            PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY_LOCAL handlePolicy = {};
-            handlePolicy.RaiseExceptionOnInvalidHandleReference = TRUE;
-            handlePolicy.HandleExceptionsPermanentlyEnabled = TRUE;
-            static_cast<void>(pfnSetMitigation(3, &handlePolicy, sizeof(handlePolicy)));
-        }
-    }
-
-    // Initialize security context
-    bool InitializeSecurity() noexcept
-    {
-        // Ensure single initialization with interlocked operation
-        if (::InterlockedCompareExchange(&g_lSecurityInitialized, 1L, 0L) != 0L)
-            return true;            // Already initialized
-
-        // Initialize critical section
-        if (::InterlockedCompareExchange(&g_lCriticalSectionInitialized, 1L, 0L) == 0L)
-        {
-            // Use InitializeCriticalSectionAndSpinCount for better reliability
-            if (!::InitializeCriticalSectionAndSpinCount(&g_DllLoadCS, SecurityConstants::CRITICAL_SECTION_SPIN_COUNT))
-            {
-                static_cast<void>(::InterlockedExchange(&g_lCriticalSectionInitialized, 0L));
-                static_cast<void>(::InterlockedExchange(&g_lSecurityInitialized, 0L));
-                return false;
-            }
-        }
-
-        // Enable security features
-        EnableDEP();
-        static_cast<void>(::HeapSetInformation(nullptr, GetHeapTerminationOnCorruption(), nullptr, 0));
-        EnableMitigationPolicies();
-
-        return true;
-    }
-
-    // Cleanup security context
-    void CleanupSecurity() noexcept
-    {
-        if (::InterlockedCompareExchange(&g_lCriticalSectionInitialized, 0L, 1L) == 1L)
-        {
-            ::DeleteCriticalSection(&g_DllLoadCS);
-        }
-        static_cast<void>(::InterlockedExchange(&g_lSecurityInitialized, 0L));
-    }
-
-    // Read PEB field safely
-    template <typename T>
-    [[nodiscard]] bool ReadPEBField(size_t offset, T& value) noexcept
-    {
-        __try
-        {
-#if defined(_M_X64) || defined(_WIN64) || defined(_M_AMD64)
-            const auto pPEB = __readgsqword(0x60);
-            value = *reinterpret_cast<const T*>(pPEB + offset);
-#elif defined(_M_IX86) || (defined(_WIN32) && !defined(_WIN64))
-            const auto pPEB = __readfsdword(0x30);
-            value = *reinterpret_cast<const T*>(static_cast<ULONG_PTR>(pPEB) + offset);
-#else
-            return false;
-#endif
-            return true;
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-            return false;
-        }
-    }
-
-    // Detect debugging attempts
-    [[nodiscard]] bool IsDebuggerPresent() noexcept
-    {
-        // Method 1: IsDebuggerPresent API
-        if (::IsDebuggerPresent())
-            return true;
-
-        // Method 2: CheckRemoteDebuggerPresent
-        BOOL bDebuggerPresent = FALSE;
-        if (::CheckRemoteDebuggerPresent(::GetCurrentProcess(), &bDebuggerPresent) && bDebuggerPresent)
-            return true;
-
-        // Method 3: PEB.BeingDebugged flag
-        BYTE isDebugged = FALSE;
-        if (ReadPEBField(0x02, isDebugged) && isDebugged)
-            return true;
-
-        // Method 4: NtGlobalFlag
-        DWORD ntGlobalFlag = 0;
-#if defined(_M_X64) || defined(_WIN64) || defined(_M_AMD64)
-        constexpr size_t NtGlobalFlagOffset = 0xBC;
-#else
-        constexpr size_t NtGlobalFlagOffset = 0x68;
-#endif
-
-        constexpr DWORD DEBUG_FLAGS = SecurityConstants::PEB_DEBUG_FLAGS;
-        if (ReadPEBField(NtGlobalFlagOffset, ntGlobalFlag) && (ntGlobalFlag & DEBUG_FLAGS) != 0)
-            return true;
-
-        return false;
-    }
-
-    // Clean path helper
-    [[nodiscard]] std::wstring CleanPathSegments(const std::wstring& path)
-    {
-        std::wstring cleanPath;
-        cleanPath.reserve(path.length());
-
-        size_t start = 0;
-        size_t end = path.find(L';');
-
-        while (end != std::wstring::npos)
-        {
-            const std::wstring segment = path.substr(start, end - start);
-            if (!segment.empty() && segment != L"." && segment != L".\\")
-            {
-                if (!cleanPath.empty())
-                    cleanPath += L';';
-                cleanPath += segment;
-            }
-            start = end + 1;
-            end = path.find(L';', start);
-        }
-
-        // Handle last segment
-        if (start < path.length())
-        {
-            const std::wstring segment = path.substr(start);
-            if (!segment.empty() && segment != L"." && segment != L".\\")
-            {
-                if (!cleanPath.empty())
-                    cleanPath += L';';
-                cleanPath += segment;
-            }
-        }
-
-        return cleanPath;
-    }
-
-    // Validate environment variables for security
-    bool ValidateEnvironment()
-    {
-        // Check for dangerous environment variables
-        constexpr const wchar_t* dangerousVars[] = {L"LD_PRELOAD", L"LD_LIBRARY_PATH", L"_NT_SYMBOL_PATH", L"_NT_ALT_SYMBOL_PATH",
-                                                    L"_NT_DEBUGGER_EXTENSION_PATH"};
-
-        for (const auto* var : dangerousVars)
-        {
-            if (::GetEnvironmentVariableW(var, nullptr, 0) > 0)
-            {
-                static_cast<void>(::SetEnvironmentVariableW(var, nullptr));
-            }
-        }
-
-        // Validate PATH doesn't contain current directory
-        // Check for integer overflow in buffer size calculation
-        if (SecurityConstants::MAX_ENV_VAR_LENGTH > SIZE_MAX / sizeof(wchar_t))
-            return false;
-
-        const size_t bufferSize = SecurityConstants::MAX_ENV_VAR_LENGTH * sizeof(wchar_t);
-
-        if (bufferSize > SecurityConstants::STACK_ALLOC_LIMIT)
-        {
-            HeapMemory heapMem(bufferSize);
-            if (!heapMem.IsValid())
-                return false;
-
-            auto*       pathBuffer = static_cast<wchar_t*>(heapMem.Get());
-            const DWORD pathLen = ::GetEnvironmentVariableW(L"PATH", pathBuffer, SecurityConstants::MAX_ENV_VAR_LENGTH);
-            if (pathLen > 0 && pathLen < SecurityConstants::MAX_ENV_VAR_LENGTH)
-            {
-                const std::wstring cleanPath = CleanPathSegments(pathBuffer);
-                static_cast<void>(::SetEnvironmentVariableW(L"PATH", cleanPath.c_str()));
-            }
-        }
-        else
-        {
-            auto* pathBuffer = static_cast<wchar_t*>(_malloca(bufferSize));
-            if (pathBuffer == nullptr)
-                return false;
-
-            const DWORD pathLen = ::GetEnvironmentVariableW(L"PATH", pathBuffer, SecurityConstants::MAX_ENV_VAR_LENGTH);
-            if (pathLen > 0 && pathLen < SecurityConstants::MAX_ENV_VAR_LENGTH)
-            {
-                const std::wstring cleanPath = CleanPathSegments(pathBuffer);
-                static_cast<void>(::SetEnvironmentVariableW(L"PATH", cleanPath.c_str()));
-            }
-
-            _freea(pathBuffer);
-        }
-
-        return true;
-    }
-
-    // Verify digital signature of a file
-    [[nodiscard]] bool VerifyFileSignature(const SString& strFilePath)
-    {
-        const std::wstring wstrFilePath = FromUTF8(strFilePath);
-
-        WINTRUST_FILE_INFO fileInfo = {};
-        fileInfo.cbStruct = sizeof(WINTRUST_FILE_INFO);
-        fileInfo.pcwszFilePath = wstrFilePath.c_str();
-
-        GUID guidAction = WINTRUST_ACTION_GENERIC_VERIFY_V2;
-
-        WINTRUST_DATA winTrustData = {};
-        winTrustData.cbStruct = sizeof(WINTRUST_DATA);
-        winTrustData.dwUIChoice = WTD_UI_NONE;
-        winTrustData.fdwRevocationChecks = WTD_REVOKE_NONE;
-        winTrustData.dwUnionChoice = WTD_CHOICE_FILE;
-        winTrustData.pFile = &fileInfo;
-        winTrustData.dwStateAction = WTD_STATEACTION_VERIFY;
-        winTrustData.dwProvFlags = WTD_SAFER_FLAG;
-
-        const LONG lStatus = ::WinVerifyTrust(nullptr, &guidAction, &winTrustData);
-
-        // Clean up
-        winTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
-        static_cast<void>(::WinVerifyTrust(nullptr, &guidAction, &winTrustData));
-
-#ifdef MTA_DEBUG
-        return (lStatus == ERROR_SUCCESS || lStatus == TRUST_E_NOSIGNATURE);
-#else
-        return (lStatus == ERROR_SUCCESS);
-#endif
-    }
-
-    // Validate and sanitize command line
-    [[nodiscard]] bool ValidateCommandLine(LPSTR lpCmdLine) noexcept
-    {
-        if (lpCmdLine == nullptr)
-            return true;
-
-        size_t        len = 0;
-        const HRESULT hr = ::StringCchLengthA(lpCmdLine, SecurityConstants::MAX_CMDLINE_LENGTH + 1, &len);
-
-        if (FAILED(hr) || len > SecurityConstants::MAX_CMDLINE_LENGTH)
-            return false;
-
-        // Check for dangerous characters
-        constexpr char dangerous[] = {'\r', '\n'};
-        for (size_t i = 0; i < len; ++i)
-        {
-            for (const char ch : dangerous)
-            {
-                if (lpCmdLine[i] == ch)
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    // Enhanced path validation with canonicalization
-    [[nodiscard]] bool IsValidPath(const SString& strPath)
-    {
-        if (strPath.empty() || strPath.length() > SecurityConstants::MAX_PATH_LENGTH)
-            return false;
-
-        const std::wstring widePath = FromUTF8(strPath);
-
-        wchar_t canonicalPath[MAX_PATH + 1] = {};
-        if (!::PathCanonicalizeW(canonicalPath, widePath.c_str()))
-            return false;
-
-        const SString strCanonical = ToUTF8(canonicalPath);
-
-        // Check for path traversal patterns
-        if (strCanonical.Contains("../") || strCanonical.Contains("..\\"))
-            return false;
-
-        // Check for alternative data streams
-        const size_t colonPos = strCanonical.find(':');
-        if (colonPos != SString::npos && colonPos != 1)
-            return false;
-
-        // Check for invalid characters
-        constexpr const char* invalidChars = "<>\"|?*";
-        for (size_t i = 0; invalidChars[i] != '\0'; ++i)
-        {
-            if (strPath.find(invalidChars[i]) != SString::npos)
-                return false;
-        }
-
-        // Check for reserved names
-        constexpr const char* reservedNames[] = {"CON",  "PRN",  "AUX",  "NUL",  "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
-                                                 "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"};
-
-        const SString strFilename = ExtractFilename(strPath);
-        const SString strNameOnly = ExtractBeforeExtension(strFilename);
-
-        for (const auto* reserved : reservedNames)
-        {
-            if (strNameOnly.CompareI(reserved))
-                return false;
-        }
-
-        return true;
-    }
-
-    [[nodiscard]] bool IsValidDllName(const SString& strDllName) noexcept
-    {
-        if (strDllName.empty() || strDllName.length() > SecurityConstants::MAX_FILENAME_LENGTH)
-            return false;
-
-        if (!strDllName.EndsWithI(".dll"))
-            return false;
-
-        if (strDllName.Contains("/") || strDllName.Contains("\\"))
-            return false;
-
-        // Whitelist for launcher - only validate loader DLLs
-        // The loader will handle validation of other MTA modules
-        constexpr const char* allowedDlls[] = {"loader.dll", "loader_d.dll"};
-        for (const auto* dll : allowedDlls)
-        {
-            if (strDllName.CompareI(dll))
-                return true;
-        }
-
-        return false;
-    }
-
-    [[nodiscard]] bool ValidateModuleIntegrity(HMODULE hModule) noexcept
-    {
-        if (hModule == nullptr || hModule == INVALID_HANDLE_VALUE)
-            return false;
-
-        MODULEINFO moduleInfo = {};
-
-        if (!::GetModuleInformation(::GetCurrentProcess(), hModule, &moduleInfo, sizeof(moduleInfo)))
-            return false;
-
-        if (moduleInfo.lpBaseOfDll == nullptr || moduleInfo.SizeOfImage == 0)
-            return false;
-
-        if (moduleInfo.SizeOfImage > SecurityConstants::MAX_MODULE_SIZE || moduleInfo.SizeOfImage < SecurityConstants::MIN_MODULE_SIZE)
-            return false;
-
-        MEMORY_BASIC_INFORMATION mbi = {};
-
-        const SIZE_T querySize = ::VirtualQuery(moduleInfo.lpBaseOfDll, &mbi, sizeof(mbi));
-        if (querySize == 0)
-            return false;
-
-        if (mbi.State != MEM_COMMIT || mbi.Type != MEM_IMAGE)
-            return false;
-
-        return true;
-    }
-
-    // Verify file attributes
-    [[nodiscard]] bool VerifyFileAttributes(HANDLE hFile) noexcept
-    {
-        LARGE_INTEGER fileSize = {};
-        if (!::GetFileSizeEx(hFile, &fileSize))
-            return false;
-
-        if (fileSize.QuadPart < 0)
-            return false;
-
-#if !defined(_WIN64) && !defined(_M_X64) && !defined(_M_AMD64)
-        if (fileSize.HighPart != 0)
-            return false;
-#endif
-
-        const auto ullFileSize = static_cast<ULONGLONG>(fileSize.QuadPart);
-        if (ullFileSize > SecurityConstants::MAX_MODULE_SIZE || ullFileSize < SecurityConstants::MIN_MODULE_SIZE)
-            return false;
-
-        BY_HANDLE_FILE_INFORMATION fileInfo = {};
-        if (!::GetFileInformationByHandle(hFile, &fileInfo))
-            return false;
-
-        if ((fileInfo.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
-            return false;
-
-        return true;
-    }
-
-    // Helper function with no C++ objects for SEH compatibility
-    static HMODULE LoadLibraryWithLock(const wchar_t* pwszPath, DWORD dwFlags) noexcept
-    {
-        if (pwszPath == nullptr)
-            return nullptr;
-
-        HANDLE hFile = ::CreateFileW(pwszPath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-        if (hFile == INVALID_HANDLE_VALUE)
-            return nullptr;
-
-        BOOL bValidFile = VerifyFileAttributes(hFile);
-        ::CloseHandle(hFile);
-
-        if (!bValidFile)
-            return nullptr;
-
-        // Load the library
-        // The digital signature check provides the main security guarantee
-        return ::LoadLibraryExW(pwszPath, nullptr, dwFlags);
-    }
-
-    // Secure DLL loading with file locking
-    [[nodiscard]] HMODULE SecureLoadLibraryWithLockImpl(const SString& strDllPath, DWORD dwFlags)
-    {
-        // Convert to wide string and call the SEH-safe helper
-        std::wstring widePath = FromUTF8(strDllPath);
-        return LoadLibraryWithLock(widePath.c_str(), dwFlags);
-    }
-
-    [[nodiscard]] HMODULE SecureLoadLibrary(const SString& strDllPath, const SString& strDllName)
-    {
-        if (!IsValidPath(strDllPath) || !IsValidDllName(strDllName))
-        {
-            SString strError = "SecureLoadLibrary: Invalid path or DLL name";
-            AddReportLog(SecurityConstants::REPORT_CODE_INVALID_PATH, strError);
-            return nullptr;
-        }
-
-        if (!FileExists(strDllPath))
-        {
-            SString strError = "SecureLoadLibrary: DLL file does not exist";
-            AddReportLog(SecurityConstants::REPORT_CODE_FILE_NOT_EXIST, strError);
-            return nullptr;
-        }
-
-#if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
-        if (!VerifyFileSignature(strDllPath))
-        {
-            SString strError = "SecureLoadLibrary: Invalid or missing digital signature";
-            AddReportLog(SecurityConstants::REPORT_CODE_INVALID_SIGNATURE, strError);
-
-            return nullptr;
-        }
-#endif
-
-        HMODULE hModule = nullptr;
-        bool    bHasLock = false;
-
-        if (::InterlockedCompareExchange(&g_lCriticalSectionInitialized, 1L, 1L) == 1L)
-        {
-            ::EnterCriticalSection(&g_DllLoadCS);
-            bHasLock = true;
-        }
-
-        const bool bHasKB2533623 = (::GetProcAddress(::GetModuleHandleW(L"kernel32.dll"), "AddDllDirectory") != nullptr);
-
-        if (bHasKB2533623)
-        {
-            // Try standard approach first for compatibility
-            hModule = SecureLoadLibraryWithLockImpl(strDllPath, LOAD_WITH_ALTERED_SEARCH_PATH);
-
-            if (hModule == nullptr)
-            {
-                // Fall back to secure search if standard fails
-                hModule = SecureLoadLibraryWithLockImpl(strDllPath, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
-            }
-        }
-        else
-        {
-            static_cast<void>(::SetDllDirectoryW(L""));
-            hModule = SecureLoadLibraryWithLockImpl(strDllPath, LOAD_WITH_ALTERED_SEARCH_PATH);
-        }
-
-        static_cast<void>(::SetDllDirectoryW(nullptr));
-
-        if (bHasLock)
-        {
-            ::LeaveCriticalSection(&g_DllLoadCS);
-        }
-
-        if (hModule == nullptr)
-        {
-            const DWORD dwError = ::GetLastError();
-            SString     strError;
-            if (!strError.Format("SecureLoadLibrary: LoadLibrary failed with error %lu", dwError).empty())
-            {
-                AddReportLog(SecurityConstants::REPORT_CODE_LOAD_FAILED, strError);
-            }
-        }
-
-        return hModule;
-    }
-
-    // Check if running with appropriate privileges
-    void ValidateProcessPrivileges() noexcept
-    {
-        HANDLE hToken = nullptr;
-
-        if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &hToken))
-            return;
-
-        TOKEN_ELEVATION elevation = {};
-        DWORD           dwSize = sizeof(elevation);
-
-        BOOL bIsElevated = FALSE;
-        if (::GetTokenInformation(hToken, TokenElevation, &elevation, dwSize, &dwSize))
-        {
-            bIsElevated = elevation.TokenIsElevated;
-        }
-
-        static_cast<void>(::CloseHandle(hToken));
-
-        if (bIsElevated)
-        {
-            SString strWarning = "Warning: Running with elevated privileges";
-            AddReportLog(SecurityConstants::REPORT_CODE_ELEVATED_PRIVILEGE, strWarning);
-        }
-    }
-
-    // Validate function pointer is within module bounds
-    [[nodiscard]] bool ValidateFunctionPointer(HMODULE hModule, const void* pFunction) noexcept
-    {
-        if (hModule == nullptr || pFunction == nullptr)
-            return false;
-
-        MODULEINFO moduleInfo = {};
-
-        if (!::GetModuleInformation(::GetCurrentProcess(), hModule, &moduleInfo, sizeof(moduleInfo)))
-            return false;
-
-        const auto pModuleStart = reinterpret_cast<ULONG_PTR>(moduleInfo.lpBaseOfDll);
-        const auto pFunc = reinterpret_cast<ULONG_PTR>(pFunction);
-        const auto ullModuleSize = static_cast<ULONG_PTR>(moduleInfo.SizeOfImage);
-
-        if (ullModuleSize > MAXULONG_PTR - pModuleStart)
-            return false;
-
-        const auto pModuleEnd = pModuleStart + ullModuleSize;
-
-        return (pFunc >= pModuleStart && pFunc < pModuleEnd);
-    }
-}            // namespace Security
-
-// Type definition for DoWinMain function
-typedef int(WINAPI* PFNDOWINMAIN)(HINSTANCE, HINSTANCE, LPSTR, int);
-
-// Helper function for calling DoWinMain with SEH (no C++ objects)
-static int CallDoWinMainSafe(PFNDOWINMAIN pfnDoWinMain, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) noexcept
-{
-    __try
-    {
-        return pfnDoWinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        return -1;            // Special error code for exception
-    }
-}
-
-///////////////////////////////////////////////////////////////
-//
-// WinMain
-//
-//
-//
-///////////////////////////////////////////////////////////////
-int WINAPI WinMain(HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-    // Initialize security subsystem
-    if (!Security::InitializeSecurity())
-    {
-        return 1;
-    }
-
-    // Validate environment for security
-    if (!Security::ValidateEnvironment())
-    {
-        Security::CleanupSecurity();
-        return 1;
-    }
-
-#if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
-    // Anti-debugging check (only in release builds)
-    if (Security::IsDebuggerPresent())
-    {
-        Security::CleanupSecurity();
-        return 1;
-    }
-#endif
-
-    // Validate process privileges
-    Security::ValidateProcessPrivileges();
-
-    // Validate command line early
-    if (!Security::ValidateCommandLine(lpCmdLine))
-    {
-        Security::CleanupSecurity();
-        return 1;
-    }
-
-    // Detect KB2533623 early for security setup
-    const bool bHasKB2533623 = (::GetProcAddress(::GetModuleHandleW(L"kernel32.dll"), "AddDllDirectory") != nullptr);
-
-    // Set DLL directory to empty string to remove current directory from search
-    // but don't use SetDefaultDllDirectories as it affects the entire process permanently
-    static_cast<void>(::SetDllDirectoryW(L""));
-
-    // Check Windows version
-    if (!IsWindowsXPSP3OrGreater())
-    {
-        SString strError = "This version of MTA requires Windows XP SP3 or later";
-        BrowseToSolution("launch-xpsp3-check", ASK_GO_ONLINE, strError);
-        Security::CleanupSecurity();
-        return 1;
-    }
-
-    // Group processes under single taskbar button
+    using namespace mta::launcher;
+    
+    // Group our processes and windows under a single taskbar button
     SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto " MTA_STR(MTASA_VERSION_MAJOR) L"." MTA_STR(MTASA_VERSION_MINOR));
 
-    // Load the loader.dll
-    SString strLoaderDllFilename;
+
+    SString loader_dll_filename;
 #ifdef MTA_DEBUG
-    strLoaderDllFilename = "loader_d.dll";
+    loader_dll_filename = DEBUG_LOADER_DLL;
 #else
-    strLoaderDllFilename = "loader.dll";
+    loader_dll_filename = RELEASE_LOADER_DLL;
 #endif
 
-    if (!Security::IsValidDllName(strLoaderDllFilename))
-    {
-        SString strError = "Invalid loader DLL configuration";
-        BrowseToSolution("loader-dll-invalid-name", ASK_GO_ONLINE, strError);
-        Security::CleanupSecurity();
-        return 1;
+    // Path operations
+    auto mta_path_result = PathJoin(GetLaunchPath(), "mta");
+    if (mta_path_result.empty()) [[unlikely]] {
+        AddReportLog(5714, "Launcher Main: Failed to determine MTA path");
+        return static_cast<int>(LoadResult::PathError);
     }
 
-    // Build paths
-    SString       strMTAFolder = "mta";
-    const SString strMTASAPath = PathJoin(GetLaunchPath(), strMTAFolder);
-    const SString strLoaderDllPathFilename = PathJoin(strMTASAPath, strLoaderDllFilename);
-
-    // Validate paths
-    if (!Security::IsValidPath(strMTASAPath) || !Security::IsValidPath(strLoaderDllPathFilename))
-    {
-        SString strError = "Security validation failed";
-        BrowseToSolution("loader-dll-path-error", ASK_GO_ONLINE, strError);
-        Security::CleanupSecurity();
-        return 1;
-    }
-
-    // Canonicalize and validate path traversal
-    wchar_t szCanonicalMTAPath[MAX_PATH + 1] = {};
-    wchar_t szCanonicalDllPath[MAX_PATH + 1] = {};
-
-    if (!::PathCanonicalizeW(szCanonicalMTAPath, FromUTF8(strMTASAPath)) || !::PathCanonicalizeW(szCanonicalDllPath, FromUTF8(strLoaderDllPathFilename)))
-    {
-        SString strError = "Path canonicalization failed";
-        BrowseToSolution("loader-dll-canonicalize-error", ASK_GO_ONLINE, strError);
-        Security::CleanupSecurity();
-        return 1;
-    }
-
-    // Ensure DLL is within MTA directory
-    const SString strNormalizedMTAPath = ToUTF8(szCanonicalMTAPath);
-    const SString strNormalizedDllPath = ToUTF8(szCanonicalDllPath);
-
-    if (!strNormalizedDllPath.BeginsWithI(strNormalizedMTAPath))
-    {
-        SString strError = "Security violation detected";
-        BrowseToSolution("loader-dll-path-traversal", ASK_GO_ONLINE, strError);
-        Security::CleanupSecurity();
-        return 1;
-    }
-
-    // Load DLL securely
-    HMODULE hModule = Security::SecureLoadLibrary(strLoaderDllPathFilename, strLoaderDllFilename);
-
-    if (hModule != nullptr)
-    {
-        if (!Security::ValidateModuleIntegrity(hModule))
-        {
-            static_cast<void>(::FreeLibrary(hModule));
-            hModule = nullptr;
-        }
-    }
-    else
-    {
-        const DWORD dwLoadLibraryError = ::GetLastError();
-
-        // Fallback: Change directory and try relative path
-        if (Security::IsValidPath(strMTASAPath) && DirectoryExists(strMTASAPath))
-        {
-            wchar_t     szPreviousDir[MAX_PATH + 1] = {};
-            const DWORD dwPrevDirLen = ::GetCurrentDirectoryW(MAX_PATH, szPreviousDir);
-
-            if (dwPrevDirLen > 0 && dwPrevDirLen <= MAX_PATH)
-            {
-                if (::SetCurrentDirectoryW(FromUTF8(strMTASAPath)))
-                {
-                    hModule = Security::SecureLoadLibrary(strLoaderDllFilename, strLoaderDllFilename);
-
-                    if (hModule != nullptr && !Security::ValidateModuleIntegrity(hModule))
-                    {
-                        static_cast<void>(::FreeLibrary(hModule));
-                        hModule = nullptr;
-                    }
-
-                    static_cast<void>(::SetCurrentDirectoryW(szPreviousDir));
-                }
+    // Debug: Log the actual paths being used
+    auto launch_path = GetLaunchPath();
+    AddReportLog(5725, std::format("Launcher Main: Launch path: '{}', MTA path: '{}'", launch_path.c_str(), mta_path_result.c_str()));
+    
+    // Check if MTA directory exists, if not, try alternative locations
+    if (!DirectoryExists(mta_path_result)) {
+        // Build complex paths step by step to avoid PathJoin argument limits
+        std::vector<SString> alternative_paths;
+        SString up_one = PathJoin(launch_path, "..");
+        SString repo_root = PathJoin(up_one, "..");
+        SString current_dir = GetSystemCurrentDirectory();
+        SString current_up_one = PathJoin(current_dir, "..");
+        
+        alternative_paths.push_back(PathJoin(up_one, "Bin", "mta"));                      // Up to repo root, then Bin/mta  
+        alternative_paths.push_back(PathJoin(repo_root, "Bin", "mta"));                   // Up from Build dir to repo root, then Bin/mta
+        alternative_paths.push_back(PathJoin(up_one, "Output", "mta"));                   // Up one level, then Output/mta
+        alternative_paths.push_back(PathJoin(repo_root, "Output", "mta"));                // Up from Build dir to repo root, then Output/mta
+        alternative_paths.push_back(PathJoin(current_dir, "mta"));                        // Current working directory
+        alternative_paths.push_back(PathJoin(current_dir, "Bin", "mta"));                 // Current working directory + Bin
+        alternative_paths.push_back(PathJoin(current_up_one, "Bin", "mta"));              // Up from current + Bin
+        alternative_paths.push_back(PathJoin(ExtractPath(launch_path), "mta"));           // Parent directory of launcher
+        
+        for (const auto& alt_path : alternative_paths) {
+            SString normalized_path = PathConform(alt_path);  // Normalize the path
+            if (DirectoryExists(normalized_path)) {
+                AddReportLog(5726, std::format("Launcher Main: Found alternative MTA path: '{}'", normalized_path.c_str()));
+                mta_path_result = normalized_path;
+                break;
             }
         }
-
-        if (hModule == nullptr)
-        {
-            SString strMessage = "Failed to load loader DLL";
-
-            if (dwLoadLibraryError == ERROR_MOD_NOT_FOUND)
-            {
-                strMessage = "Missing dependencies or corrupted installation";
+        
+        // If still not found, log all attempted paths for further investigation
+        if (!DirectoryExists(mta_path_result)) {
+            AddReportLog(5730, "Launcher Main: MTA directory not found in any location. Attempted paths:");
+            for (const auto& alt_path : alternative_paths) {
+                SString normalized_path = PathConform(alt_path);
+                AddReportLog(5731, std::format("  - '{}'", normalized_path.c_str()));
             }
-            else if (dwLoadLibraryError == ERROR_ACCESS_DENIED)
-            {
-                strMessage = "Access denied. Check file permissions";
-            }
-            else if (dwLoadLibraryError == ERROR_INVALID_PARAMETER && !bHasKB2533623)
-            {
-                strMessage = "Install Windows Update KB2533623 for improved security";
-            }
-
-            AddReportLog(SecurityConstants::REPORT_CODE_LOAD_ERROR, strMessage);
-            BrowseToSolution("loader-dll-not-loadable", ASK_GO_ONLINE, strMessage);
-            Security::CleanupSecurity();
-            return 1;
         }
     }
 
-    // Process result
-    int iReturnCode = 0;
-
-    if (hModule != nullptr)
-    {
-        const FARPROC fpDoWinMain = ::GetProcAddress(hModule, "DoWinMain");
-
-#pragma warning(push)
-#pragma warning(disable : 4191)            // 'reinterpret_cast': unsafe conversion from 'FARPROC'
-        const auto pfnDoWinMain = reinterpret_cast<PFNDOWINMAIN>(fpDoWinMain);
-#pragma warning(pop)
-
-        if (pfnDoWinMain != nullptr)
-        {
-            if (Security::ValidateFunctionPointer(hModule, reinterpret_cast<const void*>(pfnDoWinMain)))
-            {
-                int iResult = CallDoWinMainSafe(pfnDoWinMain, hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-                if (iResult == -1)
-                {
-                    SString strError = "Exception in DoWinMain";
-                    AddReportLog(SecurityConstants::REPORT_CODE_EXCEPTION, strError);
-                    iReturnCode = 1;
-                }
-                else
-                {
-                    iReturnCode = iResult;
-                }
-            }
-            else
-            {
-                SString strError = "Security violation detected";
-                BrowseToSolution("loader-dll-code-injection", ASK_GO_ONLINE, strError);
-                iReturnCode = 1;
+    auto loader_dll_path_result = PathJoin(mta_path_result, loader_dll_filename);
+    if (loader_dll_path_result.empty()) [[unlikely]] {
+        AddReportLog(5715, std::format("Launcher Main: Failed to construct loader DLL path: base='{}', file='{}'", 
+                    mta_path_result.c_str(), loader_dll_filename.c_str()));
+        return static_cast<int>(LoadResult::PathError);
+    }
+    
+    // Check if the DLL file actually exists
+    if (!FileExists(loader_dll_path_result)) {
+        AddReportLog(5727, std::format("Launcher Main: Loader DLL does not exist at expected path: '{}'", loader_dll_path_result.c_str()));
+        
+        // Create intermediate path variables to avoid PathJoin argument limits
+        std::vector<SString> dll_search_paths;
+        SString launch_mta = PathJoin(launch_path, "mta");
+        SString up_one = PathJoin(launch_path, "..");
+        SString repo_root = PathJoin(up_one, "..");
+        SString current_dir = GetSystemCurrentDirectory();
+        SString current_up = PathJoin(current_dir, "..");
+        
+        // Same directory as launcher
+        dll_search_paths.push_back(PathJoin(launch_path, loader_dll_filename));
+        
+        // Expected location: launch_path/mta/
+        dll_search_paths.push_back(PathJoin(launch_mta, loader_dll_filename));
+        
+        // Up one, then Bin
+        dll_search_paths.push_back(PathJoin(PathJoin(up_one, "Bin"), loader_dll_filename));
+        
+        // Up one, then Bin/mta
+        dll_search_paths.push_back(PathJoin(PathJoin(up_one, "Bin", "mta"), loader_dll_filename));
+        
+        // Up from Build to repo root, then Bin
+        dll_search_paths.push_back(PathJoin(PathJoin(repo_root, "Bin"), loader_dll_filename));
+        
+        // Up from Build to repo root, then Bin/mta  
+        dll_search_paths.push_back(PathJoin(PathJoin(repo_root, "Bin", "mta"), loader_dll_filename));
+        
+        // Up one, then Output
+        dll_search_paths.push_back(PathJoin(PathJoin(up_one, "Output"), loader_dll_filename));
+        
+        // Up one, then Output/mta
+        dll_search_paths.push_back(PathJoin(PathJoin(up_one, "Output", "mta"), loader_dll_filename));
+        
+        // Up from Build to repo root, then Output
+        dll_search_paths.push_back(PathJoin(PathJoin(repo_root, "Output"), loader_dll_filename));
+        
+        // Up from Build to repo root, then Output/mta
+        dll_search_paths.push_back(PathJoin(PathJoin(repo_root, "Output", "mta"), loader_dll_filename));
+        
+        // Current working directory
+        dll_search_paths.push_back(PathJoin(current_dir, loader_dll_filename));
+        
+        // Current working directory + mta
+        dll_search_paths.push_back(PathJoin(PathJoin(current_dir, "mta"), loader_dll_filename));
+        
+        // Current working directory + Bin
+        dll_search_paths.push_back(PathJoin(PathJoin(current_dir, "Bin"), loader_dll_filename));
+        
+        // Current working directory + Bin/mta
+        dll_search_paths.push_back(PathJoin(PathJoin(current_dir, "Bin", "mta"), loader_dll_filename));
+        
+        // Up from current + Bin
+        dll_search_paths.push_back(PathJoin(PathJoin(current_up, "Bin"), loader_dll_filename));
+        
+        // Up from current + Bin/mta
+        dll_search_paths.push_back(PathJoin(PathJoin(current_up, "Bin", "mta"), loader_dll_filename));
+        
+        bool found_dll = false;
+        for (const auto& search_path : dll_search_paths) {
+            SString normalized_path = PathConform(search_path);
+            if (FileExists(normalized_path)) {
+                AddReportLog(5728, std::format("Launcher Main: Found loader DLL at alternative location: '{}'", normalized_path.c_str()));
+                loader_dll_path_result = normalized_path;
+                mta_path_result = ExtractPath(normalized_path);  // Update MTA path to match
+                found_dll = true;
+                break;
             }
         }
-        else
-        {
-            SString strError = "Failed to find DoWinMain in loader DLL";
-            AddReportLog(SecurityConstants::REPORT_CODE_MISSING_EXPORT, strError);
-            BrowseToSolution("loader-dll-missing-export", ASK_GO_ONLINE, strError);
-            iReturnCode = 1;
+        
+        // If still not found, log all attempted DLL paths for debugging
+        if (!found_dll) {
+            AddReportLog(5732, "Launcher Main: Loader DLL not found in any location. Tried paths:");
+            for (const auto& search_path : dll_search_paths) {
+                SString normalized_path = PathConform(search_path);
+                AddReportLog(5733, std::format("  - '{}'", normalized_path.c_str()));
+            }
+            
+            // Also suggest building the Loader project
+            AddReportLog(5734, "Launcher Main: Build the 'Loader' project to create the missing loader_d.dll file");
         }
-
-        static_cast<void>(::FreeLibrary(hModule));
     }
 
-    Security::CleanupSecurity();
+    // RAII for error mode management
+    ErrorModeGuard error_mode_guard(SEM_FAILCRITICALERRORS);
+    auto original_directory = GetSystemCurrentDirectory();
+    
+    DirectoryState dir_state{};
+    DirectoryRestorer directory_restorer{dir_state, original_directory};
 
-    return iReturnCode;
+    // Validate UTF8 conversion before first LoadLibrary attempt
+    WString loader_dll_path_wstring = FromUTF8(loader_dll_path_result);
+    auto validation_result = ValidateUTF8Conversion(loader_dll_path_wstring.c_str(), loader_dll_path_result);
+    
+    if (!validation_result) [[unlikely]] {
+        return static_cast<int>(validation_result.error());
+    }
+
+    auto load_result = LoadLibraryWithFallback(
+        validation_result.value(),
+        loader_dll_filename,
+        mta_path_result,
+        original_directory,
+        dir_state
+    );
+
+    if (!load_result) [[unlikely]] {
+        // Failed to load the library
+        DWORD load_library_error = load_result.error();
+        auto error_message = GetSystemErrorMessage(load_library_error);
+        auto message = std::format("Failed to load: '{}'\n\n{}", 
+                                 loader_dll_path_result.c_str(), error_message.c_str());
+        
+        // Add to report log for debugging
+        AddReportLog(5711, message);
+
+        // Validate that the file actually exists before showing missing VC Redist message
+        if (FileExists(loader_dll_path_result)) {
+            // Error could be due to missing VC Redist or dependency issues
+            // Online help page will have VC Redist download link.
+            BrowseToSolution("loader-dll-not-loadable", ASK_GO_ONLINE, message);
+        } else {
+            // The DLL file itself doesn't exist
+            auto missing_file_message = std::format("Missing required file: '{}'", 
+                                                   loader_dll_path_result.c_str());
+            AddReportLog(5720, missing_file_message);
+            BrowseToSolution("loader-dll-missing", ASK_GO_ONLINE, missing_file_message);
+        }
+
+        return static_cast<int>(LoadResult::LoadError);
+    }
+
+    HMODULE module = load_result.value();
+    ModuleGuard module_guard{module};
+
+    auto execution_result = ExecuteDoWinMain(
+        module, hInstance, hPrevInstance, lpCmdLine, nCmdShow, loader_dll_filename
+    );
+
+    if (execution_result) [[likely]] {
+        return execution_result.value();
+    } else {
+        return static_cast<int>(execution_result.error());
+    }
 }
-
-// Restore default packing
-#pragma pack(pop)

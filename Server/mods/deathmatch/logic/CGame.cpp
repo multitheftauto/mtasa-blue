@@ -2705,7 +2705,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
             // Ignore if the wrong length
             if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
             {
-                CLogger::ErrorPrintf("Received oversized custom data name from %s (%s)", Packet.GetSourcePlayer()->GetNick(),
+                CLogger::ErrorPrintf("Received oversized custom data name from %s (%s)\n", Packet.GetSourcePlayer()->GetNick(),
                                      *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
                 return;
             }
@@ -2719,7 +2719,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                                                                                            : clientChangesMode == eCustomDataClientTrust::ALLOW;
             if (!changesAllowed)
             {
-                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)", Packet.GetSourcePlayer()->GetNick(),
+                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", Packet.GetSourcePlayer()->GetNick(),
                                      szName);
 
                 CLuaArguments arguments;
