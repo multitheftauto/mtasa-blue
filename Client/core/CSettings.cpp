@@ -1692,16 +1692,6 @@ struct ResolutionData
     int depth;
     int vidMode;
     bool isWidescreen;
-    
-    bool operator==(const ResolutionData& other) const
-    {
-        return width == other.width && height == other.height && depth == other.depth;
-    }
-    
-    int getPixelCount() const
-    {
-        return width * height;
-    }
 };
 
 //
@@ -1757,7 +1747,7 @@ void CSettings::PopulateResolutionComboBox()
         bool bDuplicate = false;
         for (const auto& existing : resolutions)
         {
-            if (existing == resData)
+            if (existing.width == resData.width && existing.height == resData.height && existing.depth == resData.depth)
             {
                 bDuplicate = true;
                 break;
