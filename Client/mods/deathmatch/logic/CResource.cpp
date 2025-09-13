@@ -114,7 +114,23 @@ CResource::~CResource()
 
     // Remove all keybinds on this VM
     g_pClientGame->GetScriptKeyBinds()->RemoveAllKeys(m_pLuaVM);
-    g_pCore->GetKeyBinds()->SetAllCommandsActive(m_strResourceName, false);
+    
+    // Remove all resource-specific command bindings while preserving user bindings
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
+    pKeyBinds->SetAllCommandsActive(m_strResourceName, false);
+    
+    // Additional cleanup: remove any remaining resource bindings that weren't caught by SetAllCommandsActive
+    for (auto& bind : *pKeyBinds)
+    {
+        if (bind->type == KeyBindType::COMMAND)
+        {
+            auto commandBind = static_cast<CCommandBind*>(bind.get());
+            if (commandBind->context == BindingContext::RESOURCE && commandBind->resource == m_strResourceName)
+            {
+                pKeyBinds->Remove(commandBind);
+            }
+        }
+    }
 
     // Destroy the txd root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceTXDRoot);
