@@ -912,7 +912,7 @@ bool CMainConfig::AddMissingSettings()
                 CXMLAttribute* templateAttribute = *it3;
                 const SString& attrName = templateAttribute->GetName();
 
-                // Don't check value attribute which is intended to be different
+                // Don't check value attribute which is intended to be customized by the server
                 if (attrName == "value")
                     continue;
                 
@@ -941,6 +941,12 @@ bool CMainConfig::AddMissingSettings()
             foundNode = m_pRootNode->CreateSubNode(templateNodeName.c_str(), previousNode);
             foundNode->SetTagContent(templateNodeValue.c_str());
             foundNode->SetCommentText(templateNodeComment.c_str(), true);
+
+            for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
+            {
+                CXMLAttribute* templateAttribute = *it3;
+                foundNode->GetAttributes().Create(*templateAttribute);
+            }
 
             CLogger::LogPrintf("Added missing '%s' setting to mtaserver.conf\n", templateNodeName.c_str());
             configChanged = true;
