@@ -2,12 +2,17 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:
- *  PURPOSE:
+ *  FILE:        core/CProxyDirect3DVertexBuffer.h
+ *  PURPOSE:     Direct3D 9 vertex buffer function hooking proxy
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
+
+#pragma once
+
+#include <d3d9.h>
+#include "CProxyDirect3DDevice9.h"  // Include full definition for SResourceMemory
 
 DEFINE_GUID(CProxyDirect3DVertexBuffer_GUID, 0x128A025E, 0x0100, 0x04F1, 0x40, 0x60, 0x53, 0x19, 0x44, 0x56, 0x59, 0x42);
 
@@ -29,7 +34,7 @@ public:
     HRESULT __stdcall FreePrivateData(REFGUID refguid) { return m_pOriginal->FreePrivateData(refguid); }
     DWORD __stdcall SetPriority(DWORD PriorityNew) { return m_pOriginal->SetPriority(PriorityNew); }
     DWORD __stdcall GetPriority() { return m_pOriginal->GetPriority(); }
-    void __stdcall PreLoad() { return m_pOriginal->PreLoad(); }
+    void __stdcall PreLoad() { m_pOriginal->PreLoad(); }
     D3DRESOURCETYPE __stdcall GetType() { return m_pOriginal->GetType(); }
 
     /*** IDirect3DVertexBuffer9 methods ***/
