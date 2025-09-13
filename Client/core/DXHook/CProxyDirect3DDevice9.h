@@ -161,6 +161,7 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
 private:
     IDirect3DDevice9* m_pDevice;
     CDirect3DData*    m_pData;
+    ULONG             m_ulRefCount;
 
 public:
     //
@@ -556,3 +557,19 @@ public:
 
 extern CProxyDirect3DDevice9*                  g_pProxyDevice;
 extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;
+
+// Add gamma state management
+struct SGammaState
+{
+    volatile bool     bOriginalGammaStored;
+    volatile bool     bLastWasBorderless;
+    D3DGAMMARAMP      originalGammaRamp;
+    volatile UINT     lastSwapChain;
+    
+    SGammaState() : bOriginalGammaStored(false), bLastWasBorderless(false), lastSwapChain(0)
+    {
+        ZeroMemory(&originalGammaRamp, sizeof(originalGammaRamp));
+    }
+};
+
+extern SGammaState g_GammaState;
