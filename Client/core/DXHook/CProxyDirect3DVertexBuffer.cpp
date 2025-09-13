@@ -2,8 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:
- *  PURPOSE:
+ *  FILE:        core/CProxyDirect3DVertexBuffer.cpp
+ *  PURPOSE:     Direct3D 9 vertex buffer function hooking proxy
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
@@ -86,15 +86,10 @@ HRESULT CProxyDirect3DVertexBuffer::QueryInterface(REFIID riid, void** ppvObj)
 ULONG CProxyDirect3DVertexBuffer::Release()
 {
     // Call original function
-    ULONG count = m_pOriginal->Release();
-
-    if (count == 0)
-    {
-        // now, the Original Object has deleted itself, so do we here
-        delete this;            // destructor will be called automatically
-    }
-
-    return count;
+    ULONG ulRefCount = m_pOriginal->Release();
+    if (ulRefCount == 0)
+        delete this;
+    return ulRefCount;
 }
 
 /////////////////////////////////////////////////////////////
