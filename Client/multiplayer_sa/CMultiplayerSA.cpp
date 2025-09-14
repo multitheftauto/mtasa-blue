@@ -4016,21 +4016,25 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
 
     __asm
     {
-        pushad
-        mov     al, [esp+0x8C]
+        // Get weapon type before pushad to avoid stack offset corruption
+        mov     al, [esp+0x8]
         mov     ucChokingWeaponType, al
+        
+        pushad
 
         mov     ebx, [m_pChokingHandler]
         test    ebx, ebx
         jz      continueWithOriginalCode
 
+        // Push weapon type as parameter
+        movzx   eax, ucChokingWeaponType
         push    eax
         call    ebx
         add     esp, 4
         test    al, al
-        popad
 
         jnz     continueWithOriginalCode
+        popad
         jmp     dwChokingDontchoke
     
         continueWithOriginalCode:
@@ -6050,46 +6054,77 @@ static void __declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
 // Hack fix for now is to validate each matrix before it is used
 void _cdecl CheckMatrix(float* pMatrix)
 {
-    // Peek at IEEE 754 float data to quickly check if any element is outside range of -2 to 2 or is NaN
-    int* p = (int*)pMatrix;
-    int  RotBits = p[0] | p[1] | p[2] | p[4] | p[5] | p[6] | p[8] | p[9] | p[10];
+    if (!pMatrix)
+        return;
 
-    int PosBits = p[12] | p[13] | p[14];
+    // Proper alignment for x86 performance
+    if (reinterpret_cast<uintptr_t>(pMatrix) % alignof(float) != 0)
+        return;
 
-    // If rotational part is outside -2 to 2 range, then flag fix
+    union FloatIntUnion
+    {
+        float    f;
+        uint32_t i;
+    };
+
+    // Fast bit manipulation for performance
+    uint32_t* p = reinterpret_cast<uint32_t*>(pMatrix);
+    uint32_t  RotBits = p[0] | p[1] | p[2] | p[4] | p[5] | p[6] | p[8] | p[9] | p[10];
+    uint32_t  PosBits = p[12] | p[13] | p[14];
+
+    // Range check
     bool bFix = (RotBits & 0x40000000) != 0;
 
-    // If positional part is outside -2 to 2 range, then do further check for -10 to 10 range
-    if (PosBits & 0x40000000)
+    // Position validation
+    if (!bFix && (PosBits & 0x40000000))
     {
-        for (uint i = 12; i < 15; i++)
+        for (uint32_t i = 12; i < 15; i++)
         {
             float f = pMatrix[i];
-            if (f < -10 || f > 10 || std::isnan(f))
+            if (f < -10.0f || f > 10.0f || std::isnan(f))
+            {
                 bFix = true;
+                break;
+            }
         }
     }
 
-    // Fix if required
+    // Additional NaN/Infinity check only if needed
+    if (!bFix)
+    {
+        // Only check the elements that matter for animation matrices
+        uint32_t indices[] = {0, 1, 2, 4, 5, 6, 8, 9, 10};
+        for (uint32_t i = 0; i < 9; i++)
+        {
+            float f = pMatrix[indices[i]];
+            if (std::isnan(f) || std::isinf(f))
+            {
+                bFix = true;
+                break;
+            }
+        }
+    }
+
     if (bFix)
     {
+        // Use 0.0f scale to disable corrupted animations
         float scale = 0.0f;
 
         pMatrix[0] = scale;
-        pMatrix[1] = 0;
-        pMatrix[2] = 0;
-
-        pMatrix[4] = 0;
+        pMatrix[1] = 0.0f;
+        pMatrix[2] = 0.0f;
+        pMatrix[4] = 0.0f;
         pMatrix[5] = scale;
-        pMatrix[6] = 0;
+        pMatrix[6] = 0.0f;
+        pMatrix[8] = 0.0f;
+        pMatrix[9] = 0.0f;
+        pMatrix[10] = scale; // This one was missing for a long time (pre-Sept 2025)
+        pMatrix[12] = 0.0f;
+        pMatrix[13] = 0.0f;
+        pMatrix[14] = 1.0f;
 
-        pMatrix[7] = 0;
-        pMatrix[8] = 0;
-        pMatrix[10] = scale;
-
-        pMatrix[12] = 0;
-        pMatrix[13] = 0;
-        pMatrix[14] = 1;
+        // For x86 cache efficiency
+        std::atomic_thread_fence(std::memory_order_release);
     }
 }
 
