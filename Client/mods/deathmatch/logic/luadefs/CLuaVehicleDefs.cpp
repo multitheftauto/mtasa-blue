@@ -49,6 +49,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehiclePaintjob", GetVehiclePaintjob},
         {"getVehiclePlateText", GetVehiclePlateText},
         {"getVehicleWheelStates", GetVehicleWheelStates},
+        {"getVehicleWheelState", GetVehicleWheelState},
         {"isVehicleWheelOnGround", IsVehicleWheelCollided},
         {"isVehicleDamageProof", IsVehicleDamageProof},
         {"isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable},
@@ -223,6 +224,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getPaintjob", "getVehiclePaintjob");
     lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
+    lua_classfunction(luaVM, "getWheelState", "getVehicleWheelState");
     lua_classfunction(luaVM, "isWheelOnGround", "isVehicleWheelOnGround");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getVariant", "getVehicleVariant");
@@ -972,6 +974,48 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
         lua_pushnumber(luaVM, ucFrontRight);
         lua_pushnumber(luaVM, ucRearRight);
         return 4;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleWheelState(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle = nullptr;
+    unsigned char    ucWheel = 0;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadNumber(ucWheel);
+
+    if (!argStream.HasErrors() && pVehicle)
+    {
+        unsigned char ucState = 0;
+        
+        switch (ucWheel)
+        {
+        case 1:
+            ucState = pVehicle->GetWheelStatus(FRONT_LEFT_WHEEL);
+            break;
+        case 2:
+            ucState = pVehicle->GetWheelStatus(REAR_LEFT_WHEEL);
+            break;
+        case 3:
+            ucState = pVehicle->GetWheelStatus(FRONT_RIGHT_WHEEL);
+            break;
+        case 4:
+            ucState = pVehicle->GetWheelStatus(REAR_RIGHT_WHEEL);
+            break;
+        default:
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        lua_pushnumber(luaVM, ucState);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

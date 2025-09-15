@@ -48,6 +48,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleCompatibleUpgrades", GetVehicleCompatibleUpgrades},
         {"getVehicleDoorState", GetVehicleDoorState},
         {"getVehicleWheelStates", GetVehicleWheelStates},
+        {"getVehicleWheelState", GetVehicleWheelState},
         {"getVehicleLightState", GetVehicleLightState},
         {"getVehiclePanelState", GetVehiclePanelState},
         {"getVehicleOverrideLights", GetVehicleOverrideLights},
@@ -202,6 +203,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getUpgrades", "getVehicleUpgrades");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
+    lua_classfunction(luaVM, "getWheelState", "getVehicleWheelState");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getHandling", "getVehicleHandling");
     lua_classfunction(luaVM, "getRespawnPosition", "getVehicleRespawnPosition");
@@ -1311,6 +1313,31 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
             lua_pushnumber(luaVM, ucFrontRight);
             lua_pushnumber(luaVM, ucRearRight);
             return 4;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleWheelState(lua_State* luaVM)
+{
+    CVehicle* pVehicle;
+    unsigned char ucWheel = 0;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadNumber(ucWheel);
+
+    if (!argStream.HasErrors() && pVehicle)
+    {
+        unsigned char ucState;
+        if (CStaticFunctionDefinitions::GetVehicleWheelState(pVehicle, ucWheel, ucState))
+        {
+            lua_pushnumber(luaVM, ucState);
+            return 1;
         }
     }
     else

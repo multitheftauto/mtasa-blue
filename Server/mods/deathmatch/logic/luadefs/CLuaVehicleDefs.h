@@ -46,6 +46,7 @@ public:
     LUA_DECLARE(GetVehicleCompatibleUpgrades);
     LUA_DECLARE(GetVehicleDoorState);
     LUA_DECLARE(GetVehicleWheelStates);
+    LUA_DECLARE(GetVehicleWheelState);
     LUA_DECLARE(GetVehicleLightState);
     LUA_DECLARE(GetVehiclePanelState);
     LUA_DECLARE(GetVehicleOverrideLights);

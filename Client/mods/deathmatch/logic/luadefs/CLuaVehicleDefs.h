@@ -43,6 +43,7 @@ public:
     LUA_DECLARE(GetVehicleUpgradeSlotName);
     LUA_DECLARE(GetVehicleCompatibleUpgrades);
     LUA_DECLARE(GetVehicleWheelStates);
+    LUA_DECLARE(GetVehicleWheelState);
     LUA_DECLARE(IsVehicleWheelCollided);
     LUA_DECLARE(GetVehicleDoorState);
     LUA_DECLARE(GetVehicleLightState);

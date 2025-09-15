@@ -5284,6 +5284,31 @@ bool CStaticFunctionDefinitions::GetVehicleWheelStates(CVehicle* pVehicle, unsig
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleWheelState(CVehicle* pVehicle, unsigned char& ucWheel, unsigned char& ucState)
+{
+    assert(pVehicle);
+
+    switch(ucWheel)
+    {
+        case 1:
+            ucState = pVehicle->m_ucWheelStates[FRONT_LEFT_WHEEL];
+            break;
+        case 2:
+            ucState = pVehicle->m_ucWheelStates[REAR_LEFT_WHEEL];
+            break;
+        case 3:
+            ucState = pVehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL];
+            break;
+        case 4:
+            ucState = pVehicle->m_ucWheelStates[REAR_RIGHT_WHEEL];
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetVehicleLightState(CVehicle* pVehicle, unsigned char ucLight, unsigned char& ucState)
 {
     assert(pVehicle);
