@@ -14,6 +14,7 @@
 #include <net/CNet.h>
 #include "gamesa_init.h"
 #include "CGameSA.h"
+#include "SharedUtil.Memory.h"
 #define DECLARE_PROFILER_SECTION_gamesa_init
 #include "profiler/SharedUtil.Profiler.h"
 
@@ -29,6 +30,8 @@ MTAEXPORT CGame* GetGameInterface(CCoreInterface* pCore)
 {
     g_pNet = pCore->GetNetwork();
     assert(g_pNet);
+
+    SetMemoryAllocationFailureHandler();
 
     pGame = new CGameSA;
     g_pCore = pCore;

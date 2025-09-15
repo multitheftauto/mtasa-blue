@@ -22,20 +22,14 @@ bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteBit(m_bColorCoded);
 
     // Write the client's ID
-    if (BitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
-    {
-        BitStream.Write(GetSourceElement() ? GetSourceElement()->GetID() : INVALID_ELEMENT_ID);
-    }
+    BitStream.Write(GetSourceElement() ? GetSourceElement()->GetID() : INVALID_ELEMENT_ID);
 
     // Too short?
     size_t sizeMessage = m_strMessage.length();
     if (sizeMessage >= MIN_CHATECHO_LENGTH)
     {
-        if (BitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
-        {
-            // Write the message type
-            BitStream.Write(m_ucMessageType);
-        }
+        // Write the message type
+        BitStream.Write(m_ucMessageType);
 
         // Write the string
         BitStream.Write(m_strMessage.c_str(), sizeMessage);

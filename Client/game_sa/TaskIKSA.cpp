@@ -31,7 +31,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, 
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     float fEffectorX = effectorVec.fX, fEffectorY = effectorVec.fY, fEffectorZ = effectorVec.fZ;
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    blendTime
@@ -65,7 +65,7 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, i
     if (pEntity)
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    m_priority
@@ -157,7 +157,7 @@ CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int tim
     if (pEntity)
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    priority

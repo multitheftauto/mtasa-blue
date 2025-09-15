@@ -85,7 +85,7 @@ void CVehicleRPCs::BlowVehicle(CClientEntity* pSource, NetBitStreamInterface& bi
 
     if (bitStream.Read(syncTimeContext))
     {
-        if (bitStream.Can(eBitStreamVersion::VehicleBlowStateSupport) && !bitStream.ReadBit(withExplosion))
+        if (!bitStream.ReadBit(withExplosion))
         {
             return;
         }
@@ -319,11 +319,8 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                     {
                         bool spawnFlyingComponent = true;
 
-                        if (bitStream.Can(eBitStreamVersion::SetVehicleDoorState_SpawnFlyingComponent))
-                        {
-                            if (!bitStream.ReadBit(spawnFlyingComponent))
-                                break;
-                        }
+                        if (!bitStream.ReadBit(spawnFlyingComponent))
+                            break;
 
                         pVehicle->SetDoorStatus(ucDoor, ucState, spawnFlyingComponent);
                     }
@@ -354,11 +351,8 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                     {
                         bool spawnFlyingComponent = true;
                         bool breakGlass = false;
-                        if (bitStream.Can(eBitStreamVersion::SetVehiclePanelState_SpawnFlyingComponent))
-                        {
-                            bitStream.ReadBit(spawnFlyingComponent);
-                            bitStream.ReadBit(breakGlass);
-                        }
+                        bitStream.ReadBit(spawnFlyingComponent);
+                        bitStream.ReadBit(breakGlass);
 
                         pVehicle->SetPanelStatus(ucPanel, ucState, spawnFlyingComponent, breakGlass);
                     }
@@ -456,7 +450,7 @@ void CVehicleRPCs::SetVehicleWheelStates(CClientEntity* pSource, NetBitStreamInt
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
         if (pVehicle)
         {
-            for (int i = 0; i < MAX_WHEELS; i++)
+            for (unsigned char i = 0; i < MAX_WHEELS; i++)
                 pVehicle->SetWheelStatus(i, ucWheelStates[i], false);
         }
     }

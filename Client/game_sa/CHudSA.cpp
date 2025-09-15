@@ -122,6 +122,9 @@ void CHudSA::InitComponentList()
         {1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3},
         {1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3},
         {1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3},
+        {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawMap, 1, 0xCC, 0xC3},
+        {1, HUD_RADAR_BLIPS, 1, FUNC_CRadar_DrawBlips, 1, 0xCC, 0xC3},
+        {1, HUD_RADAR_ALTIMETER, 1, CODE_ShowRadarAltimeter, 2, 0xCC, 0xEB30},
         {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
         {1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3},
         {1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3},
@@ -515,7 +518,11 @@ SHudComponentData& CHudSA::GetHudComponentRef(const eHudComponent& component) co
             return componentProperties.weaponIcon;
         case HUD_WANTED:
             return componentProperties.wanted;
+        default:
+            break;
     }
+
+    return componentProperties.hpBar;
 }
 
 void CHudSA::ResetComponentPlacement(const eHudComponent& component, bool resetSize) noexcept
@@ -620,8 +627,8 @@ void CHudSA::RenderHealthBar(int x, int y)
     // Save default position once
     if (!componentProperties.hpBar.placement.setDefaultXY)
     {
-        componentProperties.hpBar.placement.x = x;
-        componentProperties.hpBar.placement.y = y;
+        componentProperties.hpBar.placement.x = static_cast<float>(x);
+        componentProperties.hpBar.placement.y = static_cast<float>(y);
         componentProperties.hpBar.placement.setDefaultXY = true;
     }
 
@@ -635,8 +642,8 @@ void CHudSA::RenderHealthBar(int x, int y)
     float barWidth = useCustomSize ? componentProperties.hpBar.placement.customWidth : componentProperties.hpBar.placement.width;
 
     // Calc bar width depending on MAX_HEALTH stat
-    double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
-    float  totalWidth = (barWidth * maxHealth) / statModifier;
+    float statModifier = ((float(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
+    float totalWidth = (barWidth * maxHealth) / statModifier;
 
     float posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + x);
     float posY = useCustomPosition ? componentProperties.hpBar.placement.customY : y;
@@ -659,13 +666,13 @@ void CHudSA::RenderBreathBar(int x, int y)
     // Save default position once
     if (!componentProperties.breathBar.placement.setDefaultXY)
     {
-        componentProperties.breathBar.placement.x = x;
-        componentProperties.breathBar.placement.y = y;
+        componentProperties.breathBar.placement.x = static_cast<float>(x);
+        componentProperties.breathBar.placement.y = static_cast<float>(y);
         componentProperties.breathBar.placement.setDefaultXY = true;
     }
 
     // Calc bar width depending on AIR_IN_LUNG stat
-    double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(8);
+    float statModifier = ((float(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(8);
 
     // Use custom position/size?
     bool useCustomPosition = componentProperties.breathBar.placement.useCustomPosition;
@@ -693,8 +700,8 @@ void CHudSA::RenderArmorBar(int x, int y)
     // Save default position once
     if (!componentProperties.armorBar.placement.setDefaultXY)
     {
-        componentProperties.armorBar.placement.x = x;
-        componentProperties.armorBar.placement.y = y;
+        componentProperties.armorBar.placement.x = static_cast<float>(x);
+        componentProperties.armorBar.placement.y = static_cast<float>(y);
         componentProperties.armorBar.placement.setDefaultXY = true;
     }
 
@@ -890,24 +897,26 @@ void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
 }
 
 static constexpr std::uintptr_t CONTINUE_RenderWanted = 0x58DFD8;
-static void _declspec(naked) HOOK_RenderWanted()
+static void __declspec(naked) HOOK_RenderWanted()
 {
-    _asm
-    {
-        cmp ebp, edi
-        jle empty
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-        push 0
-        jmp render
+    __asm
+    {
+        cmp     ebp, edi
+        jle     empty
+
+        push    0
+        jmp     render
 
         empty:
-        push 1
+        push    1
 
         render:
-        call CHudSA::RenderWanted
-        add esp,4
+        call    CHudSA::RenderWanted
+        add     esp, 4
 
-        jmp CONTINUE_RenderWanted
+        jmp     CONTINUE_RenderWanted
     }
 }
 

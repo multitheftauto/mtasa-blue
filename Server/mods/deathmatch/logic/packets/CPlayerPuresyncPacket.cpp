@@ -61,9 +61,12 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         pSourcePlayer->SetAkimboArmUp(flags.data.bAkimboTargetUp);
         pSourcePlayer->SetOnFire(flags.data.bIsOnFire);
         pSourcePlayer->SetStealthAiming(flags.data.bStealthAiming);
+        pSourcePlayer->SetReloadingWeapon(flags.data.isReloadingWeapon);
 
-        if (BitStream.Can(eBitStreamVersion::IsPedReloadingWeapon))
-            pSourcePlayer->SetReloadingWeapon(flags.data2.isReloadingWeapon);
+        if (flags.data.animInterrupted)
+            pSourcePlayer->SetAnimationData({});
+
+        pSourcePlayer->SetHanging(flags.data.hangingDuringClimb);
 
         // Contact element
         CElement* pContactElement = NULL;
@@ -92,7 +95,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
 
             if (radius > -1 && 
-                (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), radius) ||
+                (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), static_cast<float>(radius)) ||
                     pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
             {
                 pContactElement = nullptr;
@@ -101,6 +104,13 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
         }
 
+        // If the client reported contact but the element doesn't exist anymore,
+        // the coordinates become invalid as they are relative to that element.
+        if (positionRead && pContactElement == nullptr && flags.data.bHasContact)
+        {
+            position.data.vecPosition = pSourcePlayer->GetPosition();
+        }
+        
         CElement* pPreviousContactElement = pSourcePlayer->GetContactElement();
         pSourcePlayer->SetContactElement(pContactElement);
 
@@ -222,11 +232,11 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             SWeaponSlotSync slot;
             if (!BitStream.Read(&slot))
                 return false;
-            unsigned int uiSlot = slot.data.uiSlot;
+            auto ucSlot = static_cast<unsigned char>(slot.data.uiSlot);
 
             // Set weapon slot
             if (bWeaponCorrect)
-                pSourcePlayer->SetWeaponSlot(uiSlot);
+                pSourcePlayer->SetWeaponSlot(ucSlot);
             else
             {
                 // remove invalid weapon data to prevent this from being relayed to other players
@@ -234,14 +244,14 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 slot.data.uiSlot = 0;
             }
 
-            if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
+            if (CWeaponNames::DoesSlotHaveAmmo(ucSlot))
             {
                 // Read out the ammo states
                 SWeaponAmmoSync ammo(ucUseWeaponType, true, true);
                 if (!BitStream.Read(&ammo))
                     return false;
 
-                float fWeaponRange = pSourcePlayer->GetWeaponRangeFromSlot(uiSlot);
+                float fWeaponRange = pSourcePlayer->GetWeaponRangeFromSlot(ucSlot);
 
                 // Read out the aim data
                 SWeaponAimSync sync(fWeaponRange, (ControllerState.RightShoulder1 || ControllerState.ButtonCircle));
@@ -296,7 +306,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             if (!BitStream.Read(&bodyPart))
                 return false;
 
-            pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart);
+            pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
         }
 
         // If we know the player's dead, make sure the health we send on is 0
@@ -344,7 +354,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
 
         ElementID               PlayerID = pSourcePlayer->GetID();
-        unsigned short          usLatency = pSourcePlayer->GetPing();
+        auto                    usLatency = static_cast<unsigned short>(pSourcePlayer->GetPing());
         const CControllerState& ControllerState = pSourcePlayer->GetPad()->GetCurrentControllerState();
         CElement*               pContactElement = pSourcePlayer->GetContactElement();
 
@@ -365,9 +375,8 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         flags.data.bHasAWeapon = (ucWeaponSlot != 0);
         flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || pSourcePlayer->IsSyncingVelocity());
         flags.data.bStealthAiming = (pSourcePlayer->IsStealthAiming() == true);
-
-        if (pSourcePlayer->CanBitStream(eBitStreamVersion::IsPedReloadingWeapon))
-            flags.data2.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
+        flags.data.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
+        flags.data.hangingDuringClimb = pSourcePlayer->IsHanging();
 
         CVector vecPosition = pSourcePlayer->GetPosition();
         if (pContactElement)

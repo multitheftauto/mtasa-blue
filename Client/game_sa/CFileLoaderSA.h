@@ -3,6 +3,7 @@
 #include "CVector.h"
 #include "CVector4D.h"
 
+// Forward declarations
 class CEntitySAInterface;
 struct RpAtomic;
 struct RpClump;
@@ -29,11 +30,14 @@ public:
     CFileLoaderSA();
     ~CFileLoaderSA();
 
-    static CEntitySAInterface* LoadObjectInstance(SFileObjectInstance*);
+    // Two overloads for different use cases
+    static CEntitySAInterface* LoadObjectInstance(SFileObjectInstance* obj);
+    static CEntitySAInterface* LoadObjectInstance(const char* szLine);
 
     static void StaticSetHooks();
 };
 
+// Global functions that are hooked/called by the game
 bool                CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId);
 RpAtomic*           CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo);
 CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine);

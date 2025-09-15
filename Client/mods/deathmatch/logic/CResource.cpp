@@ -258,7 +258,7 @@ void CResource::Load()
         m_pResourceTXDRoot->SetParent(m_pResourceEntity);
     }
 
-    CLogger::LogPrintf("> Starting resource '%s'", *m_strResourceName);
+    CLogger::LogPrintf("> Starting resource '%s'\n", *m_strResourceName);
 
     // Flag resource files as readable
     for (std::list<CResourceConfigItem*>::iterator iter = m_ConfigFiles.begin(); iter != m_ConfigFiles.end(); ++iter)
@@ -339,14 +339,10 @@ void CResource::Load()
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         if (pBitStream)
         {
-            if (pBitStream->Can(eBitStreamVersion::OnPlayerResourceStart))
-            {
-                // Write resource net ID
-                pBitStream->Write(GetNetID());
-
-                g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-            }
-
+            // Write resource net ID
+            pBitStream->Write(GetNetID());
+            pBitStream->Write(GetStartCounter());
+            g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }
@@ -370,7 +366,7 @@ void CResource::Stop()
         {
             discord->ResetDiscordData();
             discord->SetPresenceState(_("In-game"), false);
-            discord->SetPresenceStartTimestamp(time(nullptr));
+            discord->SetPresenceStartTimestamp(static_cast<unsigned long>(time(nullptr)));
             discord->UpdatePresence();
         }
     }

@@ -308,9 +308,9 @@ typedef struct {
 	float fPitchShift;						// A factor value which is between 0.5 (one octave down) and 2 (one octave up) (1 won't change the pitch) [1 default]
 											// (fSemitones is not in use, fPitchShift has a priority over fSemitones)
 	float fSemitones;						// Semitones (0 won't change the pitch) [0 default]
-	long  lFFTsize;							// Defines the FFT frame size used for the processing. Typical values are 1024, 2048 and 4096 [2048 default]
+	int  lFFTsize;							// Defines the FFT frame size used for the processing. Typical values are 1024, 2048 and 4096 [2048 default]
 											// It may be any value <= 8192 but it MUST be a power of 2
-	long  lOsamp;							// Is the STFT oversampling factor which also determines the overlap between adjacent STFT frames [8 default]
+	int  lOsamp;							// Is the STFT oversampling factor which also determines the overlap between adjacent STFT frames [8 default]
 											// It should at least be 4 for moderate scaling ratios. A value of 32 is recommended for best quality (better quality = higher CPU usage)
 	int   lChannel;							// BASS_BFX_CHANxxx flag/s
 } BASS_BFX_PITCHSHIFT;
@@ -357,7 +357,8 @@ enum {
 	BASS_ATTRIB_TEMPO_OPTION_SEQUENCE_MS,				// 82 default, 0 = automatic
 	BASS_ATTRIB_TEMPO_OPTION_SEEKWINDOW_MS,				// 28 default, 0 = automatic
 	BASS_ATTRIB_TEMPO_OPTION_OVERLAP_MS,				// 8  default
-	BASS_ATTRIB_TEMPO_OPTION_PREVENT_CLICK				// TRUE / FALSE (default)
+	BASS_ATTRIB_TEMPO_OPTION_PREVENT_CLICK,				// TRUE / FALSE (default)
+	BASS_ATTRIB_TEMPO_OPTION_OLDPOS
 };
 
 // tempo algorithm flags

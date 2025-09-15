@@ -238,7 +238,7 @@ namespace SharedUtil
             if (ulDist < ulBestDist)
             {
                 ulBestDist = ulDist;
-                ucBestMatch = i;
+                ucBestMatch = static_cast<uchar>(i);
             }
         }
         return ucBestMatch;

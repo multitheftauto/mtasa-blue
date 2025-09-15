@@ -158,7 +158,7 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     m_pLabelVersionTag->SetTextColor(255, 255, 255);
     m_pLabelVersionTag->SetZOrderingEnabled(false);
     m_pLabelVersionTag->MoveToBack();
-    if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
+    if (MTASA_VERSION_TYPE < VERSION_TYPE_UNTESTED)
         m_pLabelVersionTag->SetAlwaysOnTop(true);
 
     // Create mainmenu
@@ -700,9 +700,21 @@ bool CLocalGUI::InputGoesToGUI()
     if (!pGUI)
         return false;
 
-    // Here we're supposed to check if things like menues are up, console is up or the chatbox is expecting input
-    // If the console is visible OR the chat is expecting input OR the mainmenu is visible
-    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
+    bool shouldShowCursorForGUI = false;
+    if (pGUI->GetGUIInputEnabled())
+    {
+        eInputMode inputMode = pGUI->GetGUIInputMode();
+        if (inputMode == INPUTMODE_NO_BINDS_ON_EDIT)
+        {
+            shouldShowCursorForGUI = true;
+        }
+        else if (inputMode == INPUTMODE_NO_BINDS)
+        {
+            shouldShowCursorForGUI = false;
+        }
+    }
+    
+    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || shouldShowCursorForGUI ||
             !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
 }
 

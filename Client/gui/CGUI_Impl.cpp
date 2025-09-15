@@ -810,8 +810,11 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                     // Open the clipboard
                     OpenClipboard(NULL);
 
-                    // Get the clipboard's data and put it into a char array
-                    const wchar_t* ClipboardBuffer = reinterpret_cast<const wchar_t*>(GetClipboardData(CF_UNICODETEXT));
+                    // Get the clipboard's data and lock it
+                    HANDLE        hClipData = GetClipboardData(CF_UNICODETEXT);
+                    const wchar_t* ClipboardBuffer = nullptr;
+                    if (hClipData)
+                        ClipboardBuffer = static_cast<const wchar_t*>(GlobalLock(hClipData));
 
                     // Check to make sure we have valid data.
                     if (ClipboardBuffer)
@@ -828,6 +831,8 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                             // Don't paste if we're read only
                             if (WndEdit->isReadOnly())
                             {
+                                if (hClipData)
+                                    GlobalUnlock(hClipData);
                                 CloseClipboard();
                                 return true;
                             }
@@ -843,6 +848,8 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                             // Don't paste if we're read only
                             if (WndEdit->isReadOnly())
                             {
+                                if (hClipData)
+                                    GlobalUnlock(hClipData);
                                 CloseClipboard();
                                 return true;
                             }
@@ -947,6 +954,9 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                         }
                     }
 
+                    if (hClipData)
+                        GlobalUnlock(hClipData);
+                    
                     // Close the clipboard
                     CloseClipboard();
                 }

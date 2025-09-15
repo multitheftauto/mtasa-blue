@@ -56,6 +56,7 @@ public:
     void                Init_13();
     void                InitHooks_13();
     void                InitMemoryCopies_13();
+    void                InitHooks_CustomAnimations();
     void                InitHooks_ClothesSpeedUp();
     void                InitHooks_FixBadAnimId();
     void                InitHooks_HookDestructors();
@@ -336,6 +337,9 @@ public:
     bool IsVehicleEngineAutoStartEnabled() const noexcept override;
     void SetVehicleEngineAutoStartEnabled(bool enabled) override;
 
+    bool IsRapidVehicleStopFixEnabled() const noexcept override { return m_isRapidVehicleStopFixEnabled; };
+    void SetRapidVehicleStopFixEnabled(bool enabled) override;
+
     void SetPedTargetingMarkerEnabled(bool bEnable);
     bool IsPedTargetingMarkerEnabled();
     bool IsConnected();
@@ -384,6 +388,8 @@ private:
     eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
+
+    bool m_isRapidVehicleStopFixEnabled{false};
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

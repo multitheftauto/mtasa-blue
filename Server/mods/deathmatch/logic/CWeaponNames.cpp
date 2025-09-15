@@ -34,10 +34,10 @@ SWeaponName WeaponNames[] = {{"Fist"},
                              {"Poolstick"},
                              {"Katana"},
                              {"Chainsaw"},
-                             {"Dildo"},
+                             {"Purple Dildo"},
                              {"Dildo"},
                              {"Vibrator"},
-                             {"Vibrator"},
+                             {"Silver Vibrator"},
                              {"Flower"},
                              {"Cane"},
                              {"Grenade"},
@@ -109,7 +109,7 @@ unsigned char CWeaponNames::GetWeaponID(const char* szName)
     {
         if (stricmp(szName, WeaponNames[i].szName) == 0)
         {
-            return i;
+            return static_cast<unsigned char>(i);
         }
     }
 

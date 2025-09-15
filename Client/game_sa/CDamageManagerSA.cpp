@@ -53,7 +53,7 @@ void CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnF
                 DWORD dwThis = (DWORD)internalEntityInterface;
                 int   iCarNodeIndex = s_iCarNodeIndexes[bDoor];
                 DWORD dwDoor = (DWORD)bDoor;
-                _asm
+                __asm
                 {
                     mov     ecx, dwThis
                     push    dwDoor
@@ -68,7 +68,7 @@ void CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnF
                 DWORD dwThis = (DWORD)internalEntityInterface;
                 DWORD dwDoor = (DWORD)bDoor;
                 bool  bQuiet = !spawnFlyingComponent;
-                _asm
+                __asm
                 {
                     mov     ecx, dwThis
                     push    bQuiet
@@ -112,7 +112,7 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
             DWORD dwThis = (DWORD)internalInterface;
             DWORD dwPanel = bPanel;
             DWORD dwStatus = bPanelStatus;
-            _asm
+            __asm
             {
                 mov     ecx, dwThis
                 push    dwStatus
@@ -130,7 +130,7 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                 if (carNodeIndex < 0)
                     return;
 
-                _asm
+                __asm
                 {
                     mov     ecx, dwThis
                     push    dwPanel
@@ -139,7 +139,7 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                 }
             }
             else
-                reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(dwPanel, breakGlass, spawnFlyingComponent);
+                reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
         }
     }
 }
@@ -171,7 +171,7 @@ void CDamageManagerSA::SetLightStatus(BYTE bLight, BYTE bLightStatus)
     DWORD dwPointer = (DWORD)internalInterface;
     DWORD dwLight = bLight;
     DWORD dwStatus = bLightStatus;
-    _asm
+    __asm
     {
         mov     ecx, dwPointer
         push    dwStatus
@@ -191,7 +191,7 @@ BYTE CDamageManagerSA::GetLightStatus(BYTE bLight)
     DWORD dwPointer = (DWORD)internalInterface;
     BYTE  bReturn = 0;
     DWORD dwLight = bLight;
-    _asm
+    __asm
     {
         mov     ecx, dwPointer
         push    dwLight
@@ -211,7 +211,7 @@ void CDamageManagerSA::SetAeroplaneCompStatus(BYTE CompID, BYTE Status)
     DWORD dwFunction = FUNC_SetAeroplaneCompStatus;
     DWORD dwPointer = (DWORD)internalInterface;
     DWORD dwPannel = CompID;
-    _asm
+    __asm
     {
         mov     ecx, dwPointer
         push    Status
@@ -226,7 +226,7 @@ BYTE CDamageManagerSA::GetAeroplaneCompStatus(BYTE CompID)
     DWORD dwPointer = (DWORD)internalInterface;
     BYTE  bReturn = 0;
     DWORD dwPannel = CompID;
-    _asm
+    __asm
     {
         mov     ecx, dwPointer
         push    dwPannel
@@ -240,7 +240,7 @@ void CDamageManagerSA::FuckCarCompletely(bool bKeepWheels)
 {
     DWORD dwFunc = FUNC_FuckCarCompletely;
     DWORD dwPointer = (DWORD)internalInterface;
-    _asm
+    __asm
     {
         mov     ecx, dwPointer
         push    bKeepWheels

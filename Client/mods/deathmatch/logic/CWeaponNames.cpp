@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "SharedUtil.Misc.h"
 
 using namespace std;
 
@@ -33,10 +34,10 @@ static const SWeaponName _WeaponNames[] = {{"Fist"},
                                            {"Poolstick"},
                                            {"Katana"},
                                            {"Chainsaw"},
-                                           {"Dildo"},
+                                           {"Purple Dildo"},
                                            {"Dildo"},
                                            {"Vibrator"},
-                                           {"Vibrator"},
+                                           {"Silver Vibrator"},
                                            {"Flower"},
                                            {"Cane"},
                                            {"Grenade"},
@@ -97,7 +98,7 @@ unsigned char CWeaponNames::GetWeaponID(const char* szName)
         return 0xFF;
 
     // Look for it in our table
-    for (unsigned int i = 0; i < NUMELMS(WeaponNames); i++)
+    for (unsigned char i = 0; i < NUMELMS(WeaponNames); i++)
     {
         if (stricmp(szName, WeaponNames[i].szName) == 0)
         {

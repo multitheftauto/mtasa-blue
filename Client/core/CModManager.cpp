@@ -182,7 +182,8 @@ bool CModManager::TryStart()
         return false;
     }
 
-    CClientBase*(__cdecl * InitClient)() = reinterpret_cast<decltype(InitClient)>(GetProcAddress(library, "InitClient"));
+    CClientBase* (__cdecl * InitClient)() = nullptr;
+    InitClient = reinterpret_cast<decltype(InitClient)>(static_cast<void*>(GetProcAddress(library, "InitClient")));
 
     if (InitClient == nullptr)
     {

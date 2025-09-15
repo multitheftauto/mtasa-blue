@@ -39,8 +39,8 @@ disabled_codes: [
   # re-enable the "invalid variable name XXX" messages.
   "C0103",
 
-  # A custom command with one output doesn't really need a comment because
-  # the default "generating XXX" is a good message already.
+  # TODO:
+  # Add brief COMMENT arguments to the `add_custom_target` commands.
   "C0113",
 ]
 
@@ -82,10 +82,10 @@ keyword_pattern: "[A-Z][0-9A-Z_]+"
 # before considering the loop a parser
 max_conditionals_custom_parser: 2
 
-# Require at least this many newlines between statements
+# Require at least this many newlines between statements;
+# require no more than this many newlines between statements;
+# etc.
 min_statement_spacing: 1
-
-# Require no more than this many newlines between statements
 max_statement_spacing: 2
 max_returns: 6
 max_branches: 12

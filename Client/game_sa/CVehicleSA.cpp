@@ -34,25 +34,23 @@ extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
-_declspec(naked) void DoVehicleSunGlare(void* this_)
-{
-    _asm {
-        mov eax, FUNC_CVehicle_DoSunGlare
-        jmp eax
-    }
-}
 
-void _declspec(naked) HOOK_Vehicle_PreRender(void)
+static void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
-    _asm {
-        mov    ecx, m_bVehicleSunGlare
-        cmp    ecx, 0
-        jle    noglare
-        mov    ecx, esi
-        call DoVehicleSunGlare
-    noglare:
-        mov [esp+0D4h], edi
-        push 6ABD04h
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
+        mov     ecx, m_bVehicleSunGlare
+        cmp     ecx, 0
+        jle     noglare
+        mov     ecx, esi
+        mov     eax, FUNC_CVehicle_DoSunGlare
+        jmp     eax
+
+        noglare:
+        mov     [esp+0D4h], edi
+        push    6ABD04h
         retn
     }
 }
@@ -94,48 +92,50 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
 static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;
 static constexpr DWORD RETURN_CHeli_ProcessFlyingCarStuff = 0x6C5404;
-static void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
+static void __declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-        mov esi, ecx
-        mov al, [esi+36h]
+        mov     esi, ecx
+        mov     al, [esi+36h]
 
         pushad
-        call CanProcessFlyingCarStuff
-        test al, al
-        jz skip
-
+        call    CanProcessFlyingCarStuff
+        test    al, al
         popad
-        jmp CONTINUE_CHeli_ProcessFlyingCarStuff
+
+        jz      skip
+        jmp     CONTINUE_CHeli_ProcessFlyingCarStuff
 
         skip:
-        popad
-        jmp RETURN_CHeli_ProcessFlyingCarStuff
+        jmp     RETURN_CHeli_ProcessFlyingCarStuff
     }
 }
 
 static constexpr DWORD CONTINUE_CPlane_ProcessFlyingCarStuff = 0x6CB7D7;
 static constexpr DWORD RETURN_CPlane_ProcessFlyingCarStuff = 0x6CC482;
-static void _declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
+static void __declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-        push esi
-        mov esi, ecx
-        fnstsw ax
+        push    esi
+        mov     esi, ecx
+        fnstsw  ax
 
         pushad
-        call CanProcessFlyingCarStuff
-        test al, al
-        jz skip
-
+        call    CanProcessFlyingCarStuff
+        test    al, al
         popad
-        jmp CONTINUE_CPlane_ProcessFlyingCarStuff
+
+        jz      skip
+        jmp     CONTINUE_CPlane_ProcessFlyingCarStuff
 
         skip:
-        popad
-        jmp RETURN_CPlane_ProcessFlyingCarStuff
+        jmp     RETURN_CPlane_ProcessFlyingCarStuff
     }
 }
 
@@ -319,7 +319,7 @@ CVehicleSA::~CVehicleSA()
 
             DWORD dwThis = (DWORD)m_pInterface;
             DWORD dwFunc = 0x6D2460;            // CVehicle::ExtinguishCarFire
-            _asm
+            __asm
             {
                 mov     ecx, dwThis
                 call    dwFunc
@@ -342,7 +342,7 @@ void CVehicleSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -556,7 +556,7 @@ void CVehicleSA::SetDerailed(bool bDerailed)
 
                 // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
                 DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
-                _asm
+                __asm
                 {
                     mov     ecx, dwThis
                         call    dwFunc
@@ -677,7 +677,7 @@ void CVehicleSA::SetRailTrack(BYTE ucTrackID)
         if (!IsDerailed())
         {
             DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
-            _asm
+            __asm
             {
                 mov ecx, pInterf
                 call dwFunc
@@ -701,7 +701,7 @@ void CVehicleSA::SetTrainPosition(float fPosition, bool bRecalcOnRailDistance)
         if (bRecalcOnRailDistance && !IsDerailed())
         {
             DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
-            _asm
+            __asm
             {
                 mov ecx, pInterface
                 call dwFunc
@@ -768,7 +768,7 @@ void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
         DWORD dwThis = (DWORD)m_pInterface;
 
         DWORD dwFunc = FUNC_CVehicle_AddVehicleUpgrade;
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             push    dwModelID
@@ -782,7 +782,7 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CVehicle_RemoveVehicleUpgrade;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    dwModelID
@@ -819,7 +819,7 @@ DWORD CVehicleSA::GetBaseVehicleType()
     DWORD dwFunc = FUNC_CVehicle_GetBaseVehicleType;
     DWORD dwReturn = 0;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -866,7 +866,7 @@ bool CVehicleSA::IsUpsideDown()
     DWORD dwFunc = FUNC_CVehicle_IsUpsideDown;
     bool  bReturn = false;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -882,7 +882,7 @@ void CVehicleSA::SetEngineOn(bool bEngineOn)
     DWORD dwEngineOn = (DWORD)bEngineOn;
     DWORD dwFunc = FUNC_CVehicle_SetEngineOn;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    dwEngineOn
@@ -939,7 +939,7 @@ void CVehicleSA::PlaceBikeOnRoadProperly()
     DWORD dwFunc = FUNC_Bike_PlaceOnRoadProperly;
     DWORD dwBike = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwBike
         call    dwFunc
@@ -951,7 +951,7 @@ void CVehicleSA::PlaceAutomobileOnRoadProperly()
     DWORD dwFunc = FUNC_Automobile_PlaceOnRoadProperly;
     DWORD dwAutomobile = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwAutomobile
         call    dwFunc
@@ -1008,7 +1008,7 @@ void CVehicleSA::GetTurretRotation(float* fHorizontal, float* fVertical)
     DWORD vehicleInterface = (DWORD)GetInterface();
     float fHoriz = 0.0f;
     float fVert = 0.0f;
-    _asm
+    __asm
     {
         mov     eax, vehicleInterface
         add     eax, 0x94C
@@ -1027,7 +1027,7 @@ void CVehicleSA::SetTurretRotation(float fHorizontal, float fVertical)
     //*(float *)(this->GetInterface() + 2380) = fHorizontal;
     //*(float *)(this->GetInterface() + 2384) = fVertical;
     DWORD vehicleInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     eax, vehicleInterface
         add     eax, 0x94C
@@ -1136,7 +1136,7 @@ void CVehicleSA::Fix()
 
         if (dwFunc)
         {
-            _asm
+            __asm
             {
                 mov     ecx, dwThis
                 call    dwFunc
@@ -1235,7 +1235,7 @@ void CVehicleSA::PickupEntityWithWinch(CEntity* pEntity)
         DWORD dwThis = (DWORD)GetInterface();
         DWORD dwEntityInterface = (DWORD)pEntitySA->GetInterface();
 
-        _asm
+        __asm
         {
             push    dwEntityInterface
             mov     ecx, dwThis
@@ -1249,7 +1249,7 @@ void CVehicleSA::ReleasePickedUpEntityWithWinch()
     DWORD dwFunc = FUNC_CVehicle_ReleasePickedUpEntityWithWinch;
     DWORD dwThis = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -1261,7 +1261,7 @@ void CVehicleSA::SetRopeHeightForHeli(float fRopeHeight)
     DWORD dwFunc = FUNC_CVehicle_SetRopeHeightForHeli;
     DWORD dwThis = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         push    fRopeHeight
         mov     ecx, dwThis
@@ -1275,7 +1275,7 @@ CPhysical* CVehicleSA::QueryPickedUpEntityWithWinch()
     DWORD dwThis = (DWORD)GetInterface();
 
     CPhysicalSAInterface* phys;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -1294,7 +1294,7 @@ void CVehicleSA::SetRemap(int iRemap)
 {
     DWORD dwFunc = FUNC_CVehicle__SetRemap;
     DWORD dwThis = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    iRemap
@@ -1307,7 +1307,7 @@ int CVehicleSA::GetRemapIndex()
     DWORD dwFunc = FUNC_CVehicle__GetRemapIndex;
     DWORD dwThis = (DWORD)GetInterface();
     int   iReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -1320,7 +1320,7 @@ void CVehicleSA::SetRemapTexDictionary(int iRemapTextureDictionary)
 {
     DWORD dwFunc = FUNC_CVehicle__SetRemapTexDictionary;
     DWORD dwThis = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    iRemapTextureDictionary
@@ -1478,7 +1478,7 @@ void CVehicleSA::SetTaxiLightOn(bool bLightOn)
     DWORD dwState = (DWORD)bLightOn;
     DWORD dwFunc = FUNC_CAutomobile_SetTaxiLight;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    dwState
@@ -1739,7 +1739,7 @@ bool CVehicleSA::UpdateMovingCollision(float fAngle)
     bool  bReturn;
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CAutomobile__UpdateMovingCollision;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    fAngle
@@ -1925,7 +1925,7 @@ namespace
         if (matrixPadded)
         {
             DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
-            _asm
+            __asm
             {
                 push    iUnknown
                 push    fZ
@@ -1942,7 +1942,7 @@ namespace
         if (matrixPadded)
         {
             DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
-            _asm
+            __asm
             {
                 push    iUnknown
                 push    fZ
@@ -2372,7 +2372,7 @@ bool CVehicleSA::SetPlateText(const SString& strText)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CVehicle_CustomCarPlate_TextureCreate;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    pVehicleModelInfo
@@ -2401,7 +2401,7 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     }
     bool bReturn = false;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    ucWindow

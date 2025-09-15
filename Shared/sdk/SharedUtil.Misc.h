@@ -22,6 +22,40 @@
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.Map.h"
 
+#if __cplusplus >= 201703L // C++17
+    #ifndef __GLIBCXX__
+        namespace std
+        {
+            namespace filesystem
+            {
+                class path;
+            }
+        }
+    #else
+        namespace std
+        {
+            namespace filesystem
+            {
+                inline namespace __cxx11 __attribute__((__abi_tag__("cxx11"))) {}
+                inline _GLIBCXX_BEGIN_NAMESPACE_CXX11
+
+                class path;
+
+                _GLIBCXX_END_NAMESPACE_CXX11
+            }
+        }
+    #endif
+#endif
+
+#ifdef WIN32
+// Forward declare basic windows types to avoid including windows.h here
+struct HWND__;
+    #ifndef _WINDOWS_
+typedef HWND__* HWND;
+typedef unsigned int UINT;
+    #endif
+#endif
+
 namespace SharedUtil
 {
     class CArgMap;
@@ -54,9 +88,7 @@ namespace SharedUtil
     // Output a UTF8 encoded messagebox
     // Used in the Win32 Client only
     //
-    #ifdef _WINDOWS_
     int MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType);
-    #endif
 
     //
     // Return full path and filename of parent exe
@@ -215,8 +247,6 @@ namespace SharedUtil
     SString UnescapeString(const SString& strText, char cSpecialChar = '#');
     SString EscapeURLArgument(const SString& strText);
 
-    SString ExpandEnvString(const SString& strInput);
-
     // Version string things
     bool    IsValidVersionString(const SString& strVersion);
     SString ExtractVersionStringBuildNumber(const SString& strVersion);
@@ -229,6 +259,10 @@ namespace SharedUtil
     //
     // string stuff
     //
+
+#if __cplusplus >= 201703L // C++17
+    std::string UTF8FilePath(const std::filesystem::path& input);
+#endif
 
     std::wstring MbUTF8ToUTF16(const SString& s);
 
@@ -1661,7 +1695,7 @@ namespace SharedUtil
 
         virtual ~CRefedPointer() { SAFE_DELETE(pData); }
         CRefedPointer(const CRefedPointer<T>& other);
-        CRefedPointer<T>& operator=(const CRefedPointer<T>& other);
+        CRefedPointer<T>& operator*(const CRefedPointer<T>& other);
 
     public:
         CRefedPointer() { pData = new T(); }

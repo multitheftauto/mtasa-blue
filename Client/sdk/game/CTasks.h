@@ -52,7 +52,7 @@ class CVehicle;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
-enum eClimbHeights
+enum eClimbHeights : std::int8_t
 {
     CLIMB_NOT_READY = 0,
     CLIMB_GRAB,
@@ -86,8 +86,8 @@ public:
                                                      unsigned short nUseShotsWhizzingEvents = -1) = 0;
     virtual CTaskSimpleChoking* CreateTaskSimpleChoking(CPed* pAttacker, bool bIsTearGas) = 0;
 
-    virtual CTaskSimpleClimb*   CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType,
-                                                      char nHeight = CLIMB_GRAB, const bool bForceClimb = false) = 0;
+    virtual CTaskSimpleClimb*   CreateTaskSimpleClimb(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType,
+                                                      eClimbHeights nHeight = CLIMB_GRAB, const bool bForceClimb = false) = 0;
     virtual CTaskSimpleJetPack* CreateTaskSimpleJetpack(const CVector* pVecTargetPos = NULL, float fCruiseHeight = 10.0f, int nHoverTime = 0) = 0;
 
     virtual CTaskSimpleRunAnim* CreateTaskSimpleRunAnim(const AssocGroupId animGroup, const AnimationId animID, const float fBlendDelta, const int iTaskType,

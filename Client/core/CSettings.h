@@ -158,6 +158,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxAllowExternalSounds;
     CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
     CGUICheckBox*  m_pCheckBoxAllowDiscordRPC;
+    CGUICheckBox*  m_pCheckBoxAllowSteamClient = nullptr;
     CGUICheckBox*  m_pCheckBoxAlwaysShowTransferBox;
     CGUICheckBox*  m_pCheckBoxGrass;
     CGUICheckBox*  m_pCheckBoxHeatHaze;
