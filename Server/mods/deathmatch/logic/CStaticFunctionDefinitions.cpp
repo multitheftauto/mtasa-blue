@@ -4823,6 +4823,18 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
 
                 unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon(ucWeaponID);
                 unsigned char ucPreviousWeaponID = pPed->GetWeaponType(ucWeaponSlot);
+                
+                CLuaArguments arguments;
+                arguments.PushNumber(ucWeaponID);
+                arguments.PushNumber(usAmmo);
+                arguments.PushNumber(ucWeaponSlot);
+                if (IS_PLAYER(pElement))
+                    if (!pPed->CallEvent("onPlayerWeaponGiven", arguments))
+                        return false;
+                else
+                    if (!pPed->CallEvent("onPedWeaponGiven", arguments))
+                        return false;
+
                 pPed->SetWeaponType(ucWeaponID, ucWeaponSlot);
                 if (bSetAsCurrent)
                     pPed->SetWeaponSlot(ucWeaponSlot);
@@ -4878,6 +4890,17 @@ bool CStaticFunctionDefinitions::TakeWeapon(CElement* pElement, unsigned char uc
             {
                 CBitStream BitStream;
 
+                CLuaArguments arguments;
+                arguments.PushNumber(ucWeaponID);
+                arguments.PushNumber(usAmmo);
+                arguments.PushNumber(ucWeaponSlot);
+                if (IS_PLAYER(pElement))
+                    if (!pPed->CallEvent("onPlayerWeaponTaken", arguments))
+                        return false;
+                else
+                    if (!pPed->CallEvent("onPedWeaponTaken", arguments))
+                        return false;
+
                 SWeaponTypeSync weaponType;
                 weaponType.data.ucWeaponType = ucWeaponID;
                 BitStream.pBitStream->Write(&weaponType);
@@ -4928,14 +4951,43 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
-            CBitStream BitStream;
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, TAKE_ALL_WEAPONS, *BitStream.pBitStream));
 
             for (unsigned char ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ucWeaponSlot)
             {
-                pPed->SetWeaponType(0, ucWeaponSlot);
-                pPed->SetWeaponAmmoInClip(0, ucWeaponSlot);
-                pPed->SetWeaponTotalAmmo(0, ucWeaponSlot);
+                unsigned char ucWeaponID = pPed->GetWeaponType(ucWeaponSlot);
+                unsigned char ucAmmo = pPed->GetWeaponTotalAmmo(ucWeaponSlot);
+                if (ucWeaponID > 0)
+                {
+                    CLuaArguments arguments;
+                    arguments.PushNumber(ucWeaponID);
+                    arguments.PushNumber(ucAmmo);
+                    arguments.PushNumber(ucWeaponSlot);
+
+                    bool bTake = true;
+                    if (IS_PLAYER(pElement))
+                    {
+                        if (!pPed->CallEvent("onPlayerWeaponTaken", arguments))
+                            bTake = false;
+                    }
+                    else
+                    {
+                        if (!pPed->CallEvent("onPedWeaponTaken", arguments))
+                            bTake = false;
+                    }
+
+                    if (bTake)
+                    {
+                        CBitStream      BitStream;
+                        SWeaponTypeSync weaponType;
+                        weaponType.data.ucWeaponType = ucWeaponID;
+                        BitStream.pBitStream->Write(&weaponType);
+                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, TAKE_WEAPON, *BitStream.pBitStream));
+
+                        pPed->SetWeaponType(0, ucWeaponSlot);
+                        pPed->SetWeaponAmmoInClip(0, ucWeaponSlot);
+                        pPed->SetWeaponTotalAmmo(0, ucWeaponSlot);
+                    }
+                }
             }
 
             return true;
