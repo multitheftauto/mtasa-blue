@@ -101,6 +101,8 @@ private:
     bool            m_bVisibleInAllDimensions = false;
     bool            m_bRespawnable;
 
+    void NotifyMovementComplete();
+
 protected:
     bool m_bCollisionsEnabled;
 
