@@ -982,7 +982,11 @@ void CSettings::CreateGUI()
 
     m_pButtonBrowserBlacklistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
     m_pButtonBrowserBlacklistRemove->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + m_pGridBrowserBlacklist->GetSize().fY + 5.0f));
-    m_pButtonBrowserBlacklistRemove->SetSize(CVector2D(140.0f, 22.0f));
+    m_pButtonBrowserBlacklistRemove->SetSize(CVector2D(145.0f, 22.0f));
+
+    m_pButtonBrowserBlacklistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
+    m_pButtonBrowserBlacklistRemoveAll->SetPosition(CVector2D(vecTemp.fX + 155.0f, vecTemp.fY + m_pGridBrowserBlacklist->GetSize().fY + 5.0f));
+    m_pButtonBrowserBlacklistRemoveAll->SetSize(CVector2D(145.0f, 22.0f));
 
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);            // Reset vecTemp
 
@@ -1017,7 +1021,11 @@ void CSettings::CreateGUI()
 
     m_pButtonBrowserWhitelistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
     m_pButtonBrowserWhitelistRemove->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + m_pGridBrowserWhitelist->GetSize().fY + 5.0f));
-    m_pButtonBrowserWhitelistRemove->SetSize(CVector2D(140.0f, 22.0f));
+    m_pButtonBrowserWhitelistRemove->SetSize(CVector2D(145.0f, 22.0f));
+
+    m_pButtonBrowserWhitelistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
+    m_pButtonBrowserWhitelistRemoveAll->SetPosition(CVector2D(vecTemp.fX + 155.0f, vecTemp.fY + m_pGridBrowserWhitelist->GetSize().fY + 5.0f));
+    m_pButtonBrowserWhitelistRemoveAll->SetSize(CVector2D(145.0f, 22.0f));
 
     /**
      *  Advanced tab
@@ -1317,10 +1325,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
+    m_pButtonBrowserBlacklistRemoveAll->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemoveAll, this));
     m_pEditBrowserBlacklistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddFocused, this));
     m_pEditBrowserBlacklistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddDefocused, this));
     m_pButtonBrowserWhitelistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistAdd, this));
     m_pButtonBrowserWhitelistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemove, this));
+    m_pButtonBrowserWhitelistRemoveAll->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemoveAll, this));
     m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
     m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
     m_pProcessAffinityCheckbox->SetClickHandler(GUI_CALLBACK(&CSettings::OnAffinityClick, this));
@@ -4870,6 +4880,16 @@ bool CSettings::OnBrowserBlacklistRemove(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnBrowserBlacklistRemoveAll(CGUIElement* pElement)
+{
+    if (m_pGridBrowserBlacklist->GetRowCount() > 0)
+    {
+        m_pGridBrowserBlacklist->Clear();
+        m_bBrowserListsChanged = true;
+    }
+    return true;
+}
+
 bool CSettings::OnBrowserBlacklistDomainAddFocused(CGUIElement* pElement)
 {
     m_pLabelBrowserBlacklistAdd->SetVisible(false);
@@ -4913,6 +4933,17 @@ bool CSettings::OnBrowserWhitelistRemove(CGUIElement* pElement)
     if (iSelectedRow > -1)
     {
         m_pGridBrowserWhitelist->RemoveRow(iSelectedRow);
+        m_bBrowserListsChanged = true;
+    }
+
+    return true;
+}
+
+bool CSettings::OnBrowserWhitelistRemoveAll(CGUIElement* pElement)
+{
+    if (m_pGridBrowserWhitelist->GetRowCount() > 0)
+    {
+        m_pGridBrowserWhitelist->Clear();
         m_bBrowserListsChanged = true;
     }
 
