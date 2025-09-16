@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-16 12:51+0000\n"
-"PO-Revision-Date: 2025-09-16 12:53\n"
+"PO-Revision-Date: 2025-09-16 13:52\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -3250,7 +3250,7 @@ msgstr "Porneşte căutarea"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:260
 msgid "Delete from recent"
-msgstr ""
+msgstr "Șterge din recente"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:301
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
