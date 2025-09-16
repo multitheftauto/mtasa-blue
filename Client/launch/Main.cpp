@@ -3,17 +3,30 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        launch/Main.cpp
- *  PURPOSE:     Unchanging .exe that doesn't change
+ *  PURPOSE:     Launcher
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <version.h>
-#include <expected>
-#include <string_view>
-#include <format>
+
+// C++ STL
+#include <array>               // std::array for safe command buffer
+#include <bit>                 // std::bit_cast for safe function pointer conversion
+#include <expected>            // std::expected/std::unexpected for error handling
+#include <format>              // std::format for string formatting
+#include <ranges>              // std::ranges::copy/copy_n for safe copying
+#include <span>                // std::span for memory view with bounds checking
+#include <string_view>         // std::string_view for string parameters and constants
+#include <type_traits>         // std::is_trivially_copyable_v for compile-time checks
+#include <utility>             // std::forward for perfect forwarding
+
+// C STL
+#include <cstring>             // std::strlen for C string length
+
+// Platform-specific headers
+#include <psapi.h>             // GetModuleInformation, MODULEINFO
 
 /*
     IMPORTANT
@@ -26,437 +39,351 @@
     (set flag.new_client_exe on the build server to generate new exe)
 */
 
-namespace mta::launcher {
- 
-    enum class LoadResult : std::uint32_t {
-        Success = 0,
-        PathError = 1,
-        LoadError = 2,
+namespace mta::launcher
+{
+    enum class LoadResult : std::uint32_t
+    {
+        Success       = 0,
+        PathError     = 1,
+        LoadError     = 2,
         FunctionError = 3
     };
 
-    constexpr const char* DEBUG_LOADER_DLL = "loader_d.dll";
-    constexpr const char* RELEASE_LOADER_DLL = "loader.dll";
-    constexpr const char* DOWINMAIN_FUNCTION = "DoWinMain";
-
-    [[nodiscard]] std::expected<std::wstring_view, LoadResult> 
-    ValidateUTF8Conversion(const wchar_t* converted_path, const SString& original_path) {
-        if (!converted_path || std::wcslen(converted_path) == 0) [[unlikely]] {
-            AddReportLog(5723, std::format("Launcher Main: Failed to convert DLL path to Unicode: '{}'", original_path.c_str()));
-            return std::unexpected(LoadResult::PathError);
-        }
-        return std::wstring_view{converted_path};
-    }
-
-    struct DirectoryState {
-        bool changed = false;
-        bool dll_directory_changed = false;
+    enum class DllLoadError : std::uint32_t
+    {
+        FileNotFound = 1,
+        InvalidPath  = 2,
+        LoadFailed   = 3
     };
 
-    [[nodiscard]] std::expected<HMODULE, DWORD> 
-    LoadLibraryWithFallback(const std::wstring_view& dll_path, 
-                           const SString& dll_filename,
-                           const SString& mta_path, 
-                           const SString& original_directory,
-                           DirectoryState& dir_state) {
+    // concepts for type safety
+    template <std::size_t N>
+    concept ValidBufferSize = N > 0 && N <= 65536;
+
+#ifdef MTA_DEBUG
+    constexpr std::string_view LOADER_DLL = "loader_d.dll";
+#else
+    constexpr std::string_view LOADER_DLL = "loader.dll";
+#endif
+
+    // RAII wrapper for preserving GetLastError
+    class [[nodiscard]] LastErrorPreserver
+    {
+        DWORD saved_error_;
+
+public:
+        LastErrorPreserver() noexcept : saved_error_(GetLastError())
+        {
+        }
         
-        // First attempt - try loading from calculated path without changing directories
-        HMODULE module = LoadLibraryW(dll_path.data());
-        DWORD error = GetLastError();
+        ~LastErrorPreserver() noexcept
+        {
+            SetLastError(saved_error_);
+        }
         
-        if (module) [[likely]] {
-            return module;
-        }
-
-        // Check if the DLL file actually exists before trying to change directories
-        SString dll_path_str = ToUTF8(std::wstring(dll_path));
-        if (!FileExists(dll_path_str)) {
-            AddReportLog(5717, std::format("Launcher Main: DLL file does not exist: '{}'", dll_path_str.c_str()));
-            return std::unexpected(error);
-        }
-
-        // Only proceed with directory changes if the MTA directory exists
-        if (!DirectoryExists(mta_path)) {
-            AddReportLog(5717, std::format("Launcher Main: MTA directory does not exist: '{}'", mta_path.c_str()));
-            return std::unexpected(error);
-        }
-
-        if (original_directory.empty()) {
-            AddReportLog(5716, "Launcher Main: Original directory is empty, cannot safely change directory");
-            return std::unexpected(error);
-        }
-
-        // Validate UTF8 conversions before directory operations
-        WString mta_path_wstring = FromUTF8(mta_path);
-        WString dll_filename_wstring = FromUTF8(dll_filename);
-        
-        if (mta_path_wstring.empty() || dll_filename_wstring.empty()) [[unlikely]] {
-            AddReportLog(5724, std::format("Launcher Main: Failed to convert paths to Unicode: MTA='{}', DLL='{}'", 
-                        mta_path.c_str(), dll_filename.c_str()));
-            return std::unexpected(error);
-        }
-
-        const wchar_t* mta_path_wide = mta_path_wstring.c_str();
-        const wchar_t* dll_filename_wide = dll_filename_wstring.c_str();
-
-        // Try loading with SetDllDirectory first without changing current directory
-        if (SetDllDirectoryW(mta_path_wide)) {
-            dir_state.dll_directory_changed = true;
-            
-            module = LoadLibraryW(dll_filename_wide);
-            if (module) [[likely]] {
-                AddReportLog(5712, std::format("Launcher Main: LoadLibrary '{}' succeeded with SetDllDirectory to '{}'", 
-                            dll_filename.c_str(), mta_path.c_str()));
-                return module;
-            }
-        }
-
-        // If that didn't work, try changing both current directory and DLL search directory
-        if (!SetCurrentDirectoryW(mta_path_wide)) {
-            DWORD directory_error = GetLastError();
-            AddReportLog(5718, std::format("Launcher Main: Failed to change directory to: '{}' (error: {})", 
-                        mta_path.c_str(), directory_error));
-            return std::unexpected(error);
-        }
-
-        dir_state.changed = true;
-        
-        module = LoadLibraryW(dll_filename_wide);
-        DWORD second_attempt_error = GetLastError();
-        
-        if (module) [[likely]] {
-            AddReportLog(5712, std::format("Launcher Main: LoadLibrary '{}' succeeded on change to directory '{}'", 
-                        dll_filename.c_str(), mta_path.c_str()));
-            return module;
-        }
-
-        return std::unexpected(second_attempt_error);
-    }
-
-    // Helper function for error mode management
-    class ErrorModeGuard {
-        DWORD prev_mode;
-    public:
-        explicit ErrorModeGuard(DWORD mode) : prev_mode(SetErrorMode(mode)) {}
-        ~ErrorModeGuard() { SetErrorMode(prev_mode); }
-        
-        // Delete copy operations for RAII safety
-        ErrorModeGuard(const ErrorModeGuard&) = delete;
-        ErrorModeGuard& operator=(const ErrorModeGuard&) = delete;
-        ErrorModeGuard(ErrorModeGuard&&) = delete;
-        ErrorModeGuard& operator=(ErrorModeGuard&&) = delete;
+        LastErrorPreserver(const LastErrorPreserver&)            = delete;
+        LastErrorPreserver& operator=(const LastErrorPreserver&) = delete;
+        LastErrorPreserver(LastErrorPreserver&&)                 = delete;
+        LastErrorPreserver& operator=(LastErrorPreserver&&)      = delete;
     };
 
-    // Function for executing DoWinMain (with fallback to old approach)
-    [[nodiscard]] std::expected<int, LoadResult> 
-    ExecuteDoWinMain(HMODULE module, HINSTANCE instance, HINSTANCE prev_instance, 
-                    LPSTR cmd_line, int show_cmd, const SString& dll_filename) noexcept {
-        
-        using DoWinMainFunc = int(*)(HINSTANCE, HINSTANCE, LPSTR, int);
+    // RAII scope_exit with perfect forwarding
+    template <typename F>
+    struct [[nodiscard]] scope_exit
+    {
+        F f;
 
-        FARPROC proc_address = GetProcAddress(module, DOWINMAIN_FUNCTION);
-        
-        if (!proc_address) [[unlikely]] {
-            DWORD error = GetLastError();
-            AddReportLog(5713, std::format("Launcher Main: GetProcAddress failed for DoWinMain in '{}' (error: {})", 
-                        dll_filename.c_str(), error));
-            return std::unexpected(LoadResult::FunctionError);
-        }
-
-        auto do_win_main = reinterpret_cast<DoWinMainFunc>(proc_address);
-
-        // Use old approach for maximum compatibility
-        int result = 1; // Default error result
-        
-        // Store original error mode to restore after function call
-        DWORD prev_error_mode = SetErrorMode(SEM_FAILCRITICALERRORS);
-        
-        // Call DoWinMain directly
-        try {
-            result = do_win_main(instance, prev_instance, cmd_line, show_cmd);
-        } catch (...) {
-
-            AddReportLog(5722, "Launcher Main: Exception occurred during DoWinMain execution");
-            SetErrorMode(prev_error_mode);
-            return std::unexpected(LoadResult::FunctionError);
+        explicit scope_exit(F&& func) noexcept : f(std::forward<F>(func))
+        {
         }
         
-        SetErrorMode(prev_error_mode);
-        return result;
+        ~scope_exit() noexcept
+        {
+            f();
+        }
+
+        scope_exit(const scope_exit&)            = delete;
+        scope_exit& operator=(const scope_exit&) = delete;
+        scope_exit(scope_exit&&)                 = delete;
+        scope_exit& operator=(scope_exit&&)      = delete;
+    };
+
+    template <typename F>
+    constexpr auto make_scope_exit(F&& f) noexcept
+    {
+        return scope_exit<F>{std::forward<F>(f)};
     }
 
-    class DirectoryRestorer {
-        DirectoryState& state;
-        SString original_directory;
+    // DLL directory guard with error preservation and optimized allocation
+    class [[nodiscard]] DllDirectoryGuard
+    {
+        std::wstring original_dir;
+        bool         changed = false;
 
-    public:
-        DirectoryRestorer(DirectoryState& dir_state, const SString& orig_dir) 
-            : state(dir_state), original_directory(orig_dir) {}
-
-        ~DirectoryRestorer() {
-            // Restore DLL directory if it was changed
-            if (state.dll_directory_changed) {
-                // Reset DLL directory to system default cuz we can't retrieve the original DLL directory
-                // (Windows API provides no GetDllDirectory function to save the original state)
-                SetDllDirectoryW(nullptr);
-            }
-
-            // Restore original directory if it was changed
-            if (state.changed && !original_directory.empty()) {
-                WString original_directory_wstring = FromUTF8(original_directory);
-                if (!original_directory_wstring.empty()) {
-                    if (!SetCurrentDirectoryW(original_directory_wstring.c_str())) {
-                        AddReportLog(5721, std::format("Launcher Main: Failed to restore original directory: '{}' (error: {})", 
-                                    original_directory.c_str(), GetLastError()));
-                    }
-                } else {
-                    AddReportLog(5729, std::format("Launcher Main: Failed to convert original directory to Unicode: '{}'", 
-                                original_directory.c_str()));
+public:
+        DllDirectoryGuard()
+        {
+            LastErrorPreserver error_guard;
+            DWORD              len = GetDllDirectoryW(0, nullptr);
+            if (len > 0)
+            {
+                try
+                {
+                    original_dir.resize_and_overwrite(len, [](wchar_t* buf, std::size_t n) -> std::size_t {
+                        DWORD copied = GetDllDirectoryW(static_cast<DWORD>(n), buf);
+                        return copied < n ? copied : 0;
+                    });
+                }
+                catch (...)
+                {
+                    original_dir.resize(len);
+                    if (GetDllDirectoryW(len, original_dir.data()) == 0)
+                        original_dir.clear();
                 }
             }
         }
 
-        // Delete copy operations for RAII safety
-        DirectoryRestorer(const DirectoryRestorer&) = delete;
-        DirectoryRestorer& operator=(const DirectoryRestorer&) = delete;
-        DirectoryRestorer(DirectoryRestorer&&) = delete;
-        DirectoryRestorer& operator=(DirectoryRestorer&&) = delete;
-    };
-
-    // RAII module guard
-    class ModuleGuard {
-        HMODULE& module_ref;
-    public:
-        explicit ModuleGuard(HMODULE& module) : module_ref(module) {}
-        ~ModuleGuard() {
-            if (module_ref) {
-                FreeLibrary(module_ref);
-                module_ref = nullptr;
+        [[nodiscard]] bool SetDirectory(const wchar_t* path) noexcept
+        {
+            if (SetDllDirectoryW(path))
+            {
+                changed = true;
+                return true;
             }
+            return false;
         }
-        
-        ModuleGuard(const ModuleGuard&) = delete;
-        ModuleGuard& operator=(const ModuleGuard&) = delete;
-        ModuleGuard(ModuleGuard&&) = delete;
-        ModuleGuard& operator=(ModuleGuard&&) = delete;
+
+        ~DllDirectoryGuard() noexcept
+        {
+            if (changed)
+                SetDllDirectoryW(original_dir.empty() ? nullptr : original_dir.c_str());
+        }
+
+        DllDirectoryGuard(const DllDirectoryGuard&)            = delete;
+        DllDirectoryGuard& operator=(const DllDirectoryGuard&) = delete;
+        DllDirectoryGuard(DllDirectoryGuard&&)                 = delete;
+        DllDirectoryGuard& operator=(DllDirectoryGuard&&)      = delete;
     };
 
-} // namespace mta::launcher
+    // COM initialization with error handling
+    [[nodiscard]] std::expected<void, HRESULT> InitializeCOM() noexcept
+    {
+        HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+        if (FAILED(hr))
+            return std::unexpected(hr);
+        return {};
+    }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+    // Library loading with optimized string conversion
+    [[nodiscard]] std::expected<HMODULE, DllLoadError> LoadLibrarySafe(const SString& dll_path, std::string_view dll_name, const SString& mta_path)
+    {
+        WString dll_path_w = FromUTF8(dll_path);
+        if (dll_path_w.empty()) [[unlikely]]
+            return std::unexpected(DllLoadError::InvalidPath);
+
+        if (HMODULE module = LoadLibraryW(dll_path_w.c_str()))
+            return module;
+
+        DllDirectoryGuard dll_guard;
+        WString           mta_path_w = FromUTF8(mta_path);
+        std::wstring      dll_name_w;
+        try
+        {
+            dll_name_w.resize_and_overwrite(dll_name.size() * 2, [&dll_name](wchar_t* buf, std::size_t n) -> std::size_t {
+                SString temp{dll_name.data(), dll_name.size()};
+                WString wide = FromUTF8(temp);
+                if (wide.empty())
+                    return 0;
+                std::size_t len = std::min(n, wide.length());
+                std::ranges::copy_n(wide.c_str(), len, buf);
+                return len;
+            });
+        }
+        catch (...)
+        {
+            SString temp{dll_name.data(), dll_name.size()};
+            WString wide = FromUTF8(temp);
+            dll_name_w.assign(wide.begin(), wide.end());
+        }
+
+        if (mta_path_w.empty() || dll_name_w.empty()) [[unlikely]]
+            return std::unexpected(DllLoadError::InvalidPath);
+
+        if (!dll_guard.SetDirectory(mta_path_w.c_str()))
+            return std::unexpected(DllLoadError::LoadFailed);
+
+        if (HMODULE module = LoadLibraryW(dll_name_w.c_str()))
+            return module;
+
+        return std::unexpected(DllLoadError::LoadFailed);
+    }
+
+    // Function execution with bounds checking and secure conversion
+    [[nodiscard]] std::expected<int, LoadResult> ExecuteDoWinMain(HMODULE module, HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
+    {
+        using DoWinMainFunc = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
+
+        if (!module) [[unlikely]]
+            return std::unexpected(LoadResult::FunctionError);
+
+        FARPROC proc = GetProcAddress(module, "DoWinMain");
+        if (!proc) [[unlikely]]
+        {
+            AddReportLog(5713, "Launcher Main: DoWinMain function not found");
+            return std::unexpected(LoadResult::FunctionError);
+        }
+
+        // Validate function pointer within module bounds
+        MODULEINFO info{};
+        if (!GetModuleInformation(GetCurrentProcess(), module, &info, sizeof(info)))
+            return std::unexpected(LoadResult::FunctionError);
+
+        std::span<const std::byte> module_span{static_cast<const std::byte*>(info.lpBaseOfDll), info.SizeOfImage};
+        auto                       func_ptr = reinterpret_cast<const std::byte*>(proc);
+
+        if (func_ptr < module_span.data() || func_ptr >= (module_span.data() + module_span.size()))
+        {
+            AddReportLog(5713, "Launcher Main: Function pointer outside module bounds");
+            return std::unexpected(LoadResult::FunctionError);
+        }
+
+        // Command line handling
+        constexpr std::size_t     MAX_CMD = 8192;
+        static_assert(ValidBufferSize<MAX_CMD>);
+
+        std::array<char, MAX_CMD> safe_cmd{};
+        if (cmd)
+        {
+            auto src_view = std::string_view{cmd, std::min(std::strlen(cmd), MAX_CMD - 1)};
+            std::ranges::copy(src_view, safe_cmd.begin());
+        }
+
+        // Function pointer conversion with safety checks
+        static_assert(sizeof(FARPROC) == sizeof(DoWinMainFunc), "Function pointer size mismatch");
+        static_assert(alignof(FARPROC) == alignof(DoWinMainFunc), "Function pointer alignment mismatch");
+        static_assert(std::is_trivially_copyable_v<FARPROC>, "FARPROC must be trivially copyable for bit_cast");
+        static_assert(std::is_trivially_copyable_v<DoWinMainFunc>, "DoWinMainFunc must be trivially copyable for bit_cast");
+
+        auto do_win_main = std::bit_cast<DoWinMainFunc>(proc);
+        if (!do_win_main) [[unlikely]]
+            return std::unexpected(LoadResult::FunctionError);
+
+        try
+        {
+            return do_win_main(inst, prev, safe_cmd.data(), show);
+        }
+        catch (...)
+        {
+            AddReportLog(5722, "Launcher Main: Exception in DoWinMain");
+            return std::unexpected(LoadResult::FunctionError);
+        }
+    }
+
+    // Path validation
+    [[nodiscard]] constexpr bool ValidatePathSafety(std::string_view path) noexcept
+    {
+        return path.find("..") == std::string_view::npos && path.find("//") == std::string_view::npos;
+    }
+
+    // Path discovery with validation
+    [[nodiscard]] std::expected<SString, LoadResult> FindMtaPath(const SString& launch_path)
+    {
+        if (!ValidatePathSafety(launch_path)) [[unlikely]]
+        {
+            AddReportLog(5731, std::format("Launcher Main: Invalid launch path: '{}'", launch_path));
+            return std::unexpected(LoadResult::PathError);
+        }
+
+        SString mta_path = PathJoin(launch_path, "mta");
+        if (!ValidatePathSafety(mta_path)) [[unlikely]]
+            return std::unexpected(LoadResult::PathError);
+
+        if (DirectoryExists(mta_path))
+            return mta_path;
+
+        SString parent = PathJoin(launch_path, "..");
+        if (!ValidatePathSafety(parent)) [[unlikely]]
+            return std::unexpected(LoadResult::PathError);
+
+        SString alt = PathJoin(parent, "mta");
+
+        if (ValidatePathSafety(alt) && DirectoryExists(alt))
+            return alt;
+
+        AddReportLog(5730, std::format("Launcher Main: MTA directory not found from: '{}'", launch_path));
+        return std::unexpected(LoadResult::PathError);
+    }
+}            // namespace mta::launcher
+
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
     using namespace mta::launcher;
-    
-    // Group our processes and windows under a single taskbar button
-    SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto " MTA_STR(MTASA_VERSION_MAJOR) L"." MTA_STR(MTASA_VERSION_MINOR));
 
+    // Configure silent error handling
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
 
-    SString loader_dll_filename;
-#ifdef MTA_DEBUG
-    loader_dll_filename = DEBUG_LOADER_DLL;
-#else
-    loader_dll_filename = RELEASE_LOADER_DLL;
-#endif
-
-    // Path operations
-    auto mta_path_result = PathJoin(GetLaunchPath(), "mta");
-    if (mta_path_result.empty()) [[unlikely]] {
-        AddReportLog(5714, "Launcher Main: Failed to determine MTA path");
-        return static_cast<int>(LoadResult::PathError);
+    // COM initialization
+    auto com_result = InitializeCOM();
+    if (!com_result) [[unlikely]]
+    {
+        AddReportLog(5737, std::format("Launcher Main: COM initialization failed (hr=0x{:08X})", static_cast<DWORD>(com_result.error())));
     }
 
-    // Debug: Log the actual paths being used
-    auto launch_path = GetLaunchPath();
-    AddReportLog(5725, std::format("Launcher Main: Launch path: '{}', MTA path: '{}'", launch_path.c_str(), mta_path_result.c_str()));
-    
-    // Check if MTA directory exists, if not, try alternative locations
-    if (!DirectoryExists(mta_path_result)) {
-        // Build complex paths step by step to avoid PathJoin argument limits
-        std::vector<SString> alternative_paths;
-        SString up_one = PathJoin(launch_path, "..");
-        SString repo_root = PathJoin(up_one, "..");
-        SString current_dir = GetSystemCurrentDirectory();
-        SString current_up_one = PathJoin(current_dir, "..");
-        
-        alternative_paths.push_back(PathJoin(up_one, "Bin", "mta"));                      // Up to repo root, then Bin/mta  
-        alternative_paths.push_back(PathJoin(repo_root, "Bin", "mta"));                   // Up from Build dir to repo root, then Bin/mta
-        alternative_paths.push_back(PathJoin(up_one, "Output", "mta"));                   // Up one level, then Output/mta
-        alternative_paths.push_back(PathJoin(repo_root, "Output", "mta"));                // Up from Build dir to repo root, then Output/mta
-        alternative_paths.push_back(PathJoin(current_dir, "mta"));                        // Current working directory
-        alternative_paths.push_back(PathJoin(current_dir, "Bin", "mta"));                 // Current working directory + Bin
-        alternative_paths.push_back(PathJoin(current_up_one, "Bin", "mta"));              // Up from current + Bin
-        alternative_paths.push_back(PathJoin(ExtractPath(launch_path), "mta"));           // Parent directory of launcher
-        
-        for (const auto& alt_path : alternative_paths) {
-            SString normalized_path = PathConform(alt_path);  // Normalize the path
-            if (DirectoryExists(normalized_path)) {
-                AddReportLog(5726, std::format("Launcher Main: Found alternative MTA path: '{}'", normalized_path.c_str()));
-                mta_path_result = normalized_path;
+    auto com_cleanup = make_scope_exit([]() noexcept { CoUninitialize(); });
+
+    // Set taskbar grouping
+    [[maybe_unused]] HRESULT hr = SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto " MTA_STR(MTASA_VERSION_MAJOR) L"." MTA_STR(MTASA_VERSION_MINOR));
+
+    // Path discovery
+    SString launch_path     = GetLaunchPath();
+    auto    mta_path_result = FindMtaPath(launch_path);
+
+    if (!mta_path_result) [[unlikely]]
+    {
+        return std::to_underlying(mta_path_result.error());
+    }
+
+    SString mta_path = mta_path_result.value();
+    SString dll_path = PathJoin(mta_path, SString{LOADER_DLL.data(), LOADER_DLL.size()});
+
+    AddReportLog(5725, std::format("Launcher Main: Launch: '{}', MTA: '{}'", launch_path, mta_path));
+
+    // DLL loading
+    auto module_result = LoadLibrarySafe(dll_path, LOADER_DLL, mta_path);
+
+    if (!module_result) [[unlikely]]
+    {
+        DWORD   error = GetLastError();
+        SString msg   = std::format("Launcher Main: Failed to load: '{}'\n\n{}", dll_path, GetSystemErrorMessage(error));
+        AddReportLog(5711, msg);
+
+        // Pattern matching
+        switch (module_result.error())
+        {
+            case DllLoadError::FileNotFound:
+                AddReportLog(5734, "Launcher Main: Build the 'Loader' project to create loader_d.dll");
+                BrowseToSolution("loader-dll-missing", ASK_GO_ONLINE, msg);
                 break;
-            }
-        }
-        
-        // If still not found, log all attempted paths for further investigation
-        if (!DirectoryExists(mta_path_result)) {
-            AddReportLog(5730, "Launcher Main: MTA directory not found in any location. Attempted paths:");
-            for (const auto& alt_path : alternative_paths) {
-                SString normalized_path = PathConform(alt_path);
-                AddReportLog(5731, std::format("  - '{}'", normalized_path.c_str()));
-            }
-        }
-    }
-
-    auto loader_dll_path_result = PathJoin(mta_path_result, loader_dll_filename);
-    if (loader_dll_path_result.empty()) [[unlikely]] {
-        AddReportLog(5715, std::format("Launcher Main: Failed to construct loader DLL path: base='{}', file='{}'", 
-                    mta_path_result.c_str(), loader_dll_filename.c_str()));
-        return static_cast<int>(LoadResult::PathError);
-    }
-    
-    // Check if the DLL file actually exists
-    if (!FileExists(loader_dll_path_result)) {
-        AddReportLog(5727, std::format("Launcher Main: Loader DLL does not exist at expected path: '{}'", loader_dll_path_result.c_str()));
-        
-        // Create intermediate path variables to avoid PathJoin argument limits
-        std::vector<SString> dll_search_paths;
-        SString launch_mta = PathJoin(launch_path, "mta");
-        SString up_one = PathJoin(launch_path, "..");
-        SString repo_root = PathJoin(up_one, "..");
-        SString current_dir = GetSystemCurrentDirectory();
-        SString current_up = PathJoin(current_dir, "..");
-        
-        // Same directory as launcher
-        dll_search_paths.push_back(PathJoin(launch_path, loader_dll_filename));
-        
-        // Expected location: launch_path/mta/
-        dll_search_paths.push_back(PathJoin(launch_mta, loader_dll_filename));
-        
-        // Up one, then Bin
-        dll_search_paths.push_back(PathJoin(PathJoin(up_one, "Bin"), loader_dll_filename));
-        
-        // Up one, then Bin/mta
-        dll_search_paths.push_back(PathJoin(PathJoin(up_one, "Bin", "mta"), loader_dll_filename));
-        
-        // Up from Build to repo root, then Bin
-        dll_search_paths.push_back(PathJoin(PathJoin(repo_root, "Bin"), loader_dll_filename));
-        
-        // Up from Build to repo root, then Bin/mta  
-        dll_search_paths.push_back(PathJoin(PathJoin(repo_root, "Bin", "mta"), loader_dll_filename));
-        
-        // Up one, then Output
-        dll_search_paths.push_back(PathJoin(PathJoin(up_one, "Output"), loader_dll_filename));
-        
-        // Up one, then Output/mta
-        dll_search_paths.push_back(PathJoin(PathJoin(up_one, "Output", "mta"), loader_dll_filename));
-        
-        // Up from Build to repo root, then Output
-        dll_search_paths.push_back(PathJoin(PathJoin(repo_root, "Output"), loader_dll_filename));
-        
-        // Up from Build to repo root, then Output/mta
-        dll_search_paths.push_back(PathJoin(PathJoin(repo_root, "Output", "mta"), loader_dll_filename));
-        
-        // Current working directory
-        dll_search_paths.push_back(PathJoin(current_dir, loader_dll_filename));
-        
-        // Current working directory + mta
-        dll_search_paths.push_back(PathJoin(PathJoin(current_dir, "mta"), loader_dll_filename));
-        
-        // Current working directory + Bin
-        dll_search_paths.push_back(PathJoin(PathJoin(current_dir, "Bin"), loader_dll_filename));
-        
-        // Current working directory + Bin/mta
-        dll_search_paths.push_back(PathJoin(PathJoin(current_dir, "Bin", "mta"), loader_dll_filename));
-        
-        // Up from current + Bin
-        dll_search_paths.push_back(PathJoin(PathJoin(current_up, "Bin"), loader_dll_filename));
-        
-        // Up from current + Bin/mta
-        dll_search_paths.push_back(PathJoin(PathJoin(current_up, "Bin", "mta"), loader_dll_filename));
-        
-        bool found_dll = false;
-        for (const auto& search_path : dll_search_paths) {
-            SString normalized_path = PathConform(search_path);
-            if (FileExists(normalized_path)) {
-                AddReportLog(5728, std::format("Launcher Main: Found loader DLL at alternative location: '{}'", normalized_path.c_str()));
-                loader_dll_path_result = normalized_path;
-                mta_path_result = ExtractPath(normalized_path);  // Update MTA path to match
-                found_dll = true;
+            case DllLoadError::InvalidPath:
+            case DllLoadError::LoadFailed:
+                BrowseToSolution("loader-dll-not-loadable", ASK_GO_ONLINE, msg);
                 break;
-            }
-        }
-        
-        // If still not found, log all attempted DLL paths for debugging
-        if (!found_dll) {
-            AddReportLog(5732, "Launcher Main: Loader DLL not found in any location. Tried paths:");
-            for (const auto& search_path : dll_search_paths) {
-                SString normalized_path = PathConform(search_path);
-                AddReportLog(5733, std::format("  - '{}'", normalized_path.c_str()));
-            }
-            
-            // Also suggest building the Loader project
-            AddReportLog(5734, "Launcher Main: Build the 'Loader' project to create the missing loader_d.dll file");
-        }
-    }
-
-    // RAII for error mode management
-    ErrorModeGuard error_mode_guard(SEM_FAILCRITICALERRORS);
-    auto original_directory = GetSystemCurrentDirectory();
-    
-    DirectoryState dir_state{};
-    DirectoryRestorer directory_restorer{dir_state, original_directory};
-
-    // Validate UTF8 conversion before first LoadLibrary attempt
-    WString loader_dll_path_wstring = FromUTF8(loader_dll_path_result);
-    auto validation_result = ValidateUTF8Conversion(loader_dll_path_wstring.c_str(), loader_dll_path_result);
-    
-    if (!validation_result) [[unlikely]] {
-        return static_cast<int>(validation_result.error());
-    }
-
-    auto load_result = LoadLibraryWithFallback(
-        validation_result.value(),
-        loader_dll_filename,
-        mta_path_result,
-        original_directory,
-        dir_state
-    );
-
-    if (!load_result) [[unlikely]] {
-        // Failed to load the library
-        DWORD load_library_error = load_result.error();
-        auto error_message = GetSystemErrorMessage(load_library_error);
-        auto message = std::format("Failed to load: '{}'\n\n{}", 
-                                 loader_dll_path_result.c_str(), error_message.c_str());
-        
-        // Add to report log for debugging
-        AddReportLog(5711, message);
-
-        // Validate that the file actually exists before showing missing VC Redist message
-        if (FileExists(loader_dll_path_result)) {
-            // Error could be due to missing VC Redist or dependency issues
-            // Online help page will have VC Redist download link.
-            BrowseToSolution("loader-dll-not-loadable", ASK_GO_ONLINE, message);
-        } else {
-            // The DLL file itself doesn't exist
-            auto missing_file_message = std::format("Missing required file: '{}'", 
-                                                   loader_dll_path_result.c_str());
-            AddReportLog(5720, missing_file_message);
-            BrowseToSolution("loader-dll-missing", ASK_GO_ONLINE, missing_file_message);
         }
 
-        return static_cast<int>(LoadResult::LoadError);
+        return std::to_underlying(LoadResult::LoadError);
     }
 
-    HMODULE module = load_result.value();
-    ModuleGuard module_guard{module};
+    HMODULE module = module_result.value();
 
-    auto execution_result = ExecuteDoWinMain(
-        module, hInstance, hPrevInstance, lpCmdLine, nCmdShow, loader_dll_filename
-    );
+    // RAII module cleanup
+    auto module_cleanup = make_scope_exit([module]() noexcept {
+        if (module)
+            FreeLibrary(module);
+    });
 
-    if (execution_result) [[likely]] {
-        return execution_result.value();
-    } else {
-        return static_cast<int>(execution_result.error());
-    }
+    // Execution with concepts
+    auto exec_result = ExecuteDoWinMain(module, hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+
+    return exec_result.value_or(std::to_underlying(LoadResult::FunctionError));
 }
