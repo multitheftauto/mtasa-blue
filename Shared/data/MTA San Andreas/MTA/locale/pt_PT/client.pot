@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-11 02:30+0000\n"
-"PO-Revision-Date: 2025-09-16 08:45\n"
+"PO-Revision-Date: 2025-09-16 09:44\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -31,7 +31,9 @@ msgstr "À procura do GTA: San Andreas"
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
+msgstr "Infelizmente o jogo não foi encontrado.\n"
+"Inicie o Grand Theft Auto: San Andreas e clique em tentar novamente.\n"
+"Certifique-se de que o jogo está na pasta 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -347,7 +349,7 @@ msgstr "** O crash foi causado por uma falha de driver gráfico **\n\n"
 
 #: Client/loader/CInstallManager.cpp:441
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr ""
+msgstr "** Memória insuficiente - esta falha foi causada por memória livre insuficiente ou fragmentada. **"
 
 #: Client/loader/CInstallManager.cpp:543
 msgid "Install updated MTA:SA files"
@@ -470,7 +472,7 @@ msgstr "Atualizar configurações de compatibilidade"
 
 #: Client/loader/MainFunctions.cpp:560
 msgid "Invalid module path detected.\n"
-msgstr ""
+msgstr "Caminho do módulo inválido detetado.\n"
 
 #: Client/loader/MainFunctions.cpp:584
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
@@ -604,11 +606,13 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
-msgstr ""
+msgstr "O caminho para a sua instalação do 'MTA:SA' ou 'GTA: San Andreas' contém um ';' (ponto e vírgula).\n\n"
+"Se tiver problemas ao executar o MTA:SA,\n"
+"mova a(s) sua(s) instalações para um caminho que não contenha ponto e vírgula."
 
 #: Client/loader/MainFunctions.cpp:1547
 msgid "Invalid installation paths detected."
-msgstr ""
+msgstr "Foram detetados caminhos de instalação inválidos."
 
 #: Client/loader/MainFunctions.cpp:1580
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -637,21 +641,22 @@ msgstr "O ficheiro principal tem um nome incorreto (%s)"
 #: Client/loader/MainFunctions.cpp:1654
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr ""
+msgstr "Ficheiro de dados %s em falta. Possível atividade de vírus."
 
 #: Client/loader/MainFunctions.cpp:1661
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr ""
+msgstr "Ficheiro de dados %s modificado. Possível atividade de vírus."
 
 #: Client/loader/MainFunctions.cpp:1684
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
-msgstr ""
+msgstr "Existem ficheiros .asi no diretório de instalação.\n\n"
+"Remova esses ficheiros .asi se tiver problemas."
 
 #: Client/loader/MainFunctions.cpp:1838
 msgid "Invalid game paths detected."
-msgstr ""
+msgstr "Caminhos de jogos inválidos detetados."
 
 #: Client/loader/MainFunctions.cpp:1846
 msgid "Fix configuration issue"
@@ -659,7 +664,7 @@ msgstr "Corrigir problema de configuração"
 
 #: Client/loader/MainFunctions.cpp:1938
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
-msgstr ""
+msgstr "O GTA: San Andreas pode não ter sido iniciado corretamente. Quer encerrá-lo?"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -728,47 +733,47 @@ msgstr "estação de rádio anterior"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the player-map view"
-msgstr ""
+msgstr "ativa a visualização do mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map in"
-msgstr ""
+msgstr "amplia o mapa do jogador (zoom)"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map out"
-msgstr ""
+msgstr "afaste o mapa do jogador (zoom-out)"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map north"
-msgstr ""
+msgstr "move o mapa do jogador para norte"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map south"
-msgstr ""
+msgstr "move o mapa do jogador para sul"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map east"
-msgstr ""
+msgstr "move o mapa do jogador para este"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map west"
-msgstr ""
+msgstr "move o mapa do jogador para oeste"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the player-map"
-msgstr ""
+msgstr "prende o mapa ao jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces player-map opacity"
-msgstr ""
+msgstr "reduz a opacidade do mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases player-map opacity"
-msgstr ""
+msgstr "aumenta a opacidade do mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles player-map help text"
-msgstr ""
+msgstr "ativa/desativa o texto de ajuda do mapa do jogador"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
@@ -803,25 +808,25 @@ msgstr "(Modo de desenvolvimento) mostra os ids dos sons do ambiente no painel d
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr ""
+msgstr "Mudar modo: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
+msgstr "Zoom: %s/%s     Movimento: %s, %s, %s, %s     Opacidade: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
+msgstr "Mapa: %s     Texto de ajuda: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr ""
+msgstr "A Seguir Jogador"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr ""
+msgstr "Movimento Livre"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -1249,7 +1254,7 @@ msgstr "Desconectado: Verificação do serial falhou"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial already in use"
-msgstr ""
+msgstr "Desconectado: Serial já em uso"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 #, c-format
@@ -1376,11 +1381,11 @@ msgstr "Tem a certeza que deseja utilizar esta resolução de ecrã?"
 
 #: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
 msgid "Failed initialization game_sa"
-msgstr ""
+msgstr "Falha na inicialização game_sa"
 
 #: Client/game_sa/CGameSA.cpp:258
 msgid "Memory allocations failed"
-msgstr ""
+msgstr "Falha na alocação de memória"
 
 #: Client/core/CScreenShot.cpp:117
 #, c-format
@@ -1745,16 +1750,16 @@ msgstr "Permitir conexão ao Discord Rich Presence (mostrar atividade personaliz
 
 #: Client/core/CSettings.cpp:409
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr ""
+msgstr "Permitir o estado do jogo GTA:SA na Steam"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:415
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
+msgstr "Guardar fotos tiradas pela câmara (arma) na pasta GTA San Andreas User Files"
 
 #: Client/core/CSettings.cpp:420
 msgid "Ask before disconnecting from server using main menu"
-msgstr ""
+msgstr "Confirmar antes de desconectar do servidor usando o menu principal"
 
 #: Client/core/CSettings.cpp:425
 msgid "Use customized GTA:SA files"
@@ -1770,16 +1775,16 @@ msgstr "Opacidade:"
 
 #: Client/core/CSettings.cpp:458
 msgid "Image resolution:"
-msgstr ""
+msgstr "Resolução da imagem:"
 
 #: Client/core/CSettings.cpp:465
 msgid "1024 x 1024 (Default)"
-msgstr ""
+msgstr "1024 x 1024 (Por defeito)"
 
 #. index 0
 #: Client/core/CSettings.cpp:466
 msgid "2048 x 2048"
-msgstr ""
+msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
@@ -2035,7 +2040,7 @@ msgstr "Permitir Javascript em websites remotos"
 
 #: Client/core/CSettings.cpp:950
 msgid "Enable GPU rendering"
-msgstr ""
+msgstr "Ativar renderização por GPU"
 
 #: Client/core/CSettings.cpp:954
 msgid "Custom blacklist"
@@ -2190,7 +2195,7 @@ msgstr "Mostrar no Explorador"
 #. Process affinity
 #: Client/core/CSettings.cpp:1222
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
+msgstr "Alterar a afinidade da CPU 0 para melhorar o desempenho do jogo"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1228 Client/core/CSettings.cpp:1231
@@ -2521,7 +2526,8 @@ msgstr "FUNCIONALIDADE EXPERIMENTAL"
 #: Client/core/CSettings.cpp:4822
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr ""
+msgstr "Não é recomendado desativar esta opção, a menos que esteja a enfrentar problemas de desempenho.\n\n"
+"Tem a certeza de que deseja desativá-la?"
 
 #: Client/core/CSettings.cpp:4958
 msgid "Please enter a nickname"
@@ -2595,11 +2601,11 @@ msgstr "Correção de movimento do rato - Pode precisar reiniciar o PC"
 
 #: Client/core/CSettings.cpp:5001
 msgid "CPU affinity:"
-msgstr ""
+msgstr "Afinidade CPU:"
 
 #: Client/core/CSettings.cpp:5001
 msgid "Only change if you're having stability issues."
-msgstr ""
+msgstr "Mude apenas se estiver com problemas de estabilidade."
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -2684,7 +2690,8 @@ msgstr "O servidor diz que uma atualização é recomendada, mas não é essenci
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr ""
+msgstr "Atualmente, não há atualizações disponíveis.\n\n"
+"Consulte www.multitheftauto.com"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -2762,7 +2769,7 @@ msgstr "* São %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "connect: A rede não está pronta, aguarde um momento"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -2788,21 +2795,21 @@ msgstr "connect: Falhou a desativação do mod atual"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
+msgstr "reconnect: A rede não está pronta, aguarde um momento"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr ""
+msgstr "reconnect: Número de porta incorreto"
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
+msgstr "reconnect: A ligar a %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:329
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
+msgstr "reconnect: Não foi possível ligar a %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
@@ -2840,7 +2847,7 @@ msgstr "AVISO DE DESCONEXÃO"
 
 #: Client/core/CMainMenu.cpp:1224
 msgid "INFORMATION"
-msgstr ""
+msgstr "INFORMAÇÃO"
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:735
 msgid "Do you want to see some on-line help about this problem ?"
@@ -2975,7 +2982,7 @@ msgstr "A conectar a %s:%u ..."
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr ""
+msgstr "A re-conectar a %s:%u ..."
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
@@ -3331,7 +3338,7 @@ msgstr "Problema com o driver de gráficos"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Erro fatal (%u). Se este problema persistir, verifique multitheftauto.com para apoio."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3340,7 +3347,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Erro do protocolo (%u). Se este problema persistir, verifique multitheftauto.com para apoio."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
