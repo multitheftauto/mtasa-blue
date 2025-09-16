@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-31 21:10+0000\n"
-"PO-Revision-Date: 2025-09-01 04:41\n"
+"POT-Creation-Date: 2025-09-16 12:51+0000\n"
+"PO-Revision-Date: 2025-09-16 12:53\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -158,7 +158,7 @@ msgid "Quit"
 msgstr "خروج"
 
 #: Client/loader/Dialogs.cpp:39
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+#: Client/core/ServerBrowser/CServerBrowser.cpp:558
 msgid "Help"
 msgstr "مساعدة"
 
@@ -364,20 +364,20 @@ msgstr "تعذر تحديث بسبب تعارض الملفات. الرجاء إ�
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
 #: Client/loader/CInstallManager.cpp:563 Client/loader/CInstallManager.cpp:572
-#: Client/loader/MainFunctions.cpp:780 Client/loader/MainFunctions.cpp:801
-#: Client/loader/MainFunctions.cpp:805 Client/loader/MainFunctions.cpp:1115
+#: Client/loader/MainFunctions.cpp:1283 Client/loader/MainFunctions.cpp:1305
+#: Client/loader/MainFunctions.cpp:1310 Client/loader/MainFunctions.cpp:1618
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:651
-#: Client/mods/deathmatch/logic/CClientGame.cpp:719
-#: Client/mods/deathmatch/logic/CClientGame.cpp:743
-#: Client/mods/deathmatch/logic/CClientGame.cpp:765
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1178
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1374
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1423
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1435
+#: Client/mods/deathmatch/logic/CClientGame.cpp:655
+#: Client/mods/deathmatch/logic/CClientGame.cpp:723
+#: Client/mods/deathmatch/logic/CClientGame.cpp:747
+#: Client/mods/deathmatch/logic/CClientGame.cpp:769
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1182
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1341
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1427
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1439
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Client/core/CSettings.cpp:2993 Client/core/CSettings.cpp:4301
 #: Client/core/CSettings.cpp:4329 Client/core/CSettings.cpp:4940
@@ -386,10 +386,10 @@ msgstr "تعذر تحديث بسبب تعارض الملفات. الرجاء إ�
 #: Client/core/CConnectManager.cpp:271 Client/core/CConnectManager.cpp:329
 #: Client/core/CConnectManager.cpp:415 Client/core/CConnectManager.cpp:422
 #: Client/core/CConnectManager.cpp:432 Client/core/CGUI.cpp:93
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1263
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1342
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1391
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:148
@@ -470,31 +470,31 @@ msgstr "تحديث إعدادات التثبيت"
 msgid "Update compatibility settings"
 msgstr "تحديث إعدادات التوافق"
 
-#: Client/loader/MainFunctions.cpp:78
+#: Client/loader/MainFunctions.cpp:560
 msgid "Invalid module path detected.\n"
 msgstr "تم الكشف عن مسارات غير صحيحة للعبة."
 
-#: Client/loader/MainFunctions.cpp:105
+#: Client/loader/MainFunctions.cpp:584
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "إصدار الملف لا يتطابق. أعد تثبيت MTA: SA إن كنت تواجه مشاكل.\n"
 
-#: Client/loader/MainFunctions.cpp:113
+#: Client/loader/MainFunctions.cpp:592
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "بعض الملفات مفقودة. أعد تثبيت MTA:SA إذا واجهت مشاكل.\n"
 
-#: Client/loader/MainFunctions.cpp:124
+#: Client/loader/MainFunctions.cpp:602
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA غير متوافقة مع \"وضع الأمان\" في الويندوز.\n\n"
 "الرجاء إعادة تشغيل جهازك.\n"
 
-#: Client/loader/MainFunctions.cpp:301
+#: Client/loader/MainFunctions.cpp:799
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "هل تواجه مشاكل في تشغيل MTA؟ \n\n"
 "هل تريد العودة إلى إصدار سابق؟"
 
-#: Client/loader/MainFunctions.cpp:329
+#: Client/loader/MainFunctions.cpp:827
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -502,48 +502,48 @@ msgstr "يبدو أن هناك مشكلة خلال تشغيل MTA:SA.\n"
 "إعادة تعيين الإعدادات قد يكون الحل بعض الأحيان.\n\n"
 "هل تريد إعادة تهيئة إعدادات GTA الآن؟"
 
-#: Client/loader/MainFunctions.cpp:344
+#: Client/loader/MainFunctions.cpp:842
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "تمت إعادة تعيين إعدادات GTA.\n\n"
 "اضغط حسنا للاستمرار."
 
-#: Client/loader/MainFunctions.cpp:349
+#: Client/loader/MainFunctions.cpp:847
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "لم يتم حذف الملف '%s' تعذر ذلك."
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:357
+#: Client/loader/MainFunctions.cpp:855
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "هل لديك مشاكل في تشغيل MTA:SA؟.\n\n"
 "هل تريد رؤية بعض المعلومات المساعدة على الإنترنت؟"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:394
+#: Client/loader/MainFunctions.cpp:892
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "هل تواجه مشاكل في تشغيل MTA:SA؟.\n\n"
 "هل تود تغيير الإعداد التالي؟"
 
-#: Client/loader/MainFunctions.cpp:395 Client/core/CSettings.cpp:692
+#: Client/loader/MainFunctions.cpp:893 Client/core/CSettings.cpp:692
 #: Client/core/CSettings.cpp:1038
 msgid "Fullscreen mode:"
 msgstr "وضع ملء الشاشة:"
 
-#: Client/loader/MainFunctions.cpp:395 Client/core/CSettings.cpp:700
+#: Client/loader/MainFunctions.cpp:893 Client/core/CSettings.cpp:700
 #: Client/core/CSettings.cpp:1660
 msgid "Borderless window"
 msgstr "نافذة بلا حدود"
 
-#: Client/loader/MainFunctions.cpp:466
+#: Client/loader/MainFunctions.cpp:962
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "هل تواجه مشاكل في تشغيل MTA:SA؟\n\n"
 "جرب تعطيل جميع منتجات GTA و MTA التالية:"
 
-#: Client/loader/MainFunctions.cpp:499
+#: Client/loader/MainFunctions.cpp:997
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -551,27 +551,27 @@ msgstr "تحذير\n\n"
 "MTA:SA كشفت عن نشاطات غير اعتيادية.\n"
 "الرجاء تشغيل فحص مكافحة الفيروسات للتأكد من أمان جهازك.\n\n"
 
-#: Client/loader/MainFunctions.cpp:502
+#: Client/loader/MainFunctions.cpp:1000
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "الملف المكتشف هو: %s\n"
 
-#: Client/loader/MainFunctions.cpp:645
+#: Client/loader/MainFunctions.cpp:1143
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "يوجد نسخة تعمل من جراند تيڤت أوتو: سان أندرياس بالفعل قيد العمل. يجب أن يتم إنهاؤها قبل تشغيل MTA:SA. هل تريد فعل ذلك الآن؟"
 
-#: Client/loader/MainFunctions.cpp:646 Client/loader/MainFunctions.cpp:653
-#: Client/loader/MainFunctions.cpp:1445 Client/game_sa/CGameSA.cpp:269
+#: Client/loader/MainFunctions.cpp:1144 Client/loader/MainFunctions.cpp:1151
+#: Client/loader/MainFunctions.cpp:1938 Client/game_sa/CGameSA.cpp:269
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1365
 msgid "Information"
 msgstr "معلومات"
 
-#: Client/loader/MainFunctions.cpp:652
+#: Client/loader/MainFunctions.cpp:1150
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "هناك مشكلة في إيقاف GTA: San Andreas. إذا تكررت المشكلة، الرجاء إعادة تشغيل جهاز الكمبيوتر."
 
-#: Client/loader/MainFunctions.cpp:775
+#: Client/loader/MainFunctions.cpp:1278
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -581,27 +581,27 @@ msgstr "توجد مشاكل في أثناء إعادة تشغيل MTA:SA\n\n"
 "أوقف عملية 'gta_sa.exe' و 'Multi Theft Auto.exe'\n\n\n"
 "إعادة محاولة تشغيل MTA:SA؟"
 
-#: Client/loader/MainFunctions.cpp:799
+#: Client/loader/MainFunctions.cpp:1303
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "لعبة MTA تعمل مسبقًا بالفعل.\n\n"
 "إذا تكررت المشكلة يرجى اعادة تشغيل الكمبيوتر"
 
-#: Client/loader/MainFunctions.cpp:803
+#: Client/loader/MainFunctions.cpp:1308
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "لعبة MTA تعمل مسبقًا بالفعل.\n\n"
 "هل تريد إيقافها؟"
 
-#: Client/loader/MainFunctions.cpp:835
+#: Client/loader/MainFunctions.cpp:1340
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "مدخلات الرجستري (محرر التسجيل) مفقودة. يرجى إعادة تثبيت ملتي تيڤت أوتو: سان أندرياس."
 
-#: Client/loader/MainFunctions.cpp:841
+#: Client/loader/MainFunctions.cpp:1345
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "المسار المثبت فيه لعبة GTA: San Andreas يحتوي على حروف غير مدعومة (Unicode). الرجاء نقل تثبيت GTA: San Andreas لمسار متوافق يحتوي على حروف (ASCII) فقط وإعادة تثبيت Multi Theft Auto: San Andreas من جديد."
 
-#: Client/loader/MainFunctions.cpp:854
+#: Client/loader/MainFunctions.cpp:1358
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
@@ -611,59 +611,59 @@ msgstr "مسار تثبيت لعبتك 'MTA:SA' أو 'GTA: San Andreas'\n"
 "إذا واجهت مشكلات عند تشغيل MTA:SA،\n"
 "انقل التثبيت إلى مسار لا يحتوي على فاصلة منقوطة."
 
-#: Client/loader/MainFunctions.cpp:1037
+#: Client/loader/MainFunctions.cpp:1547
 msgid "Invalid installation paths detected."
 msgstr "تم اكتشاف مسارات تثبيت غير صالحة."
 
-#: Client/loader/MainFunctions.cpp:1072
+#: Client/loader/MainFunctions.cpp:1580
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "فشل التشغيل. يرجى التأكد من تثبيت أحدث ملفات البيانات بشكل صحيح."
 
-#: Client/loader/MainFunctions.cpp:1081
+#: Client/loader/MainFunctions.cpp:1589
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "فشل التشغيل. الرجاء التأكد من تثبيت %s بشكل صحيح."
 
-#: Client/loader/MainFunctions.cpp:1090
+#: Client/loader/MainFunctions.cpp:1596
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "فشل التشغيل. تعذر إيجاد ملف gta_sa.exe في %s."
 
-#: Client/loader/MainFunctions.cpp:1104
+#: Client/loader/MainFunctions.cpp:1607
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "فشل التشغيل. %s موجود في مجلد GTA . يرجى حذفه قبل المتابعة"
 
-#: Client/loader/MainFunctions.cpp:1114
+#: Client/loader/MainFunctions.cpp:1617
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "الملف الرئيسي يحمل اسم خاطئ (%s)"
 
-#: Client/loader/MainFunctions.cpp:1161
+#: Client/loader/MainFunctions.cpp:1654
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr "ملف البيانات %s مفقود. قد يكون هناك نشاط فيروسي محتمل."
 
-#: Client/loader/MainFunctions.cpp:1169
+#: Client/loader/MainFunctions.cpp:1661
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr "تم تعديل ملف البيانات %s. قد يكون هناك نشاط فيروسي محتمل."
 
-#: Client/loader/MainFunctions.cpp:1193
+#: Client/loader/MainFunctions.cpp:1684
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
 msgstr "تم العثور على ملفات .asi في مجلد التثبيت.\n\n"
 "أزل هذه الملفات .asi إذا واجهت مشكلات."
 
-#: Client/loader/MainFunctions.cpp:1348
+#: Client/loader/MainFunctions.cpp:1838
 msgid "Invalid game paths detected."
 msgstr "تم الكشف عن مسارات غير صحيحة للعبة."
 
-#: Client/loader/MainFunctions.cpp:1356
+#: Client/loader/MainFunctions.cpp:1846
 msgid "Fix configuration issue"
 msgstr "إصلاح مشاكل الإعدادات"
 
-#: Client/loader/MainFunctions.cpp:1445
+#: Client/loader/MainFunctions.cpp:1938
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr "قد تكون لُعْبَة GTA: San Andreas لم تشتغل بالشكل الصحيح. هل تريد إنهاءها؟"
 
@@ -836,7 +836,7 @@ msgid "Download error: %s"
 msgstr "خطأ خلال التنزيل: %s"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:368
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1097
 #: Client/core/CSettings.cpp:3573 Client/core/CCore.cpp:674
 msgid "In-game"
 msgstr "في اللعبة"
@@ -921,253 +921,253 @@ msgstr "%s من %s"
 msgid "Disconnect to cancel download"
 msgstr "اقطع الاتصال حتى تلغي التحميل"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
+#: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Flying a UFO around"
 msgstr "يقود جسم طائر مجهول حول"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
+#: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Cruising around"
 msgstr "يتجول حول"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
+#: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Riding the waves of"
 msgstr "يركب أمواج"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Riding the train in"
 msgstr "يركب القطار في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Flying around"
 msgstr "يحلق حول"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:381
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Riding around"
 msgstr "يقود حول"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:381
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Monster truckin' around"
 msgstr "يقود شاحنة الوحش حول"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:381
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Quaddin' around"
 msgstr "يقود دراجة رباعية حول"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:382
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Bunny hopping around"
 msgstr "يقفز كالأرنب حول"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:382
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Doing weird stuff in"
 msgstr "يقوم بأشياء غريبة في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Climbing around in"
 msgstr "يتسلق في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:387
-#: Client/mods/deathmatch/logic/CClientGame.cpp:388
+#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+#: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Doing a drive-by in"
 msgstr "يطلق نار من مركبة متحركة في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:389
+#: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Blub blub..."
 msgstr "بلوب بلوب..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:390
+#: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Breathing water"
 msgstr "يتنفس الماء"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+#: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Drowning in"
 msgstr "يغرق في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:392
+#: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Ducking for cover in"
 msgstr "ينحني للتغطية في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:393
+#: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Fighting in"
 msgstr "يقاتل في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+#: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Throwing fists in"
 msgstr "الاشتباك بالأيدي في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:395
+#: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Blastin' fools in"
 msgstr "تفجير الخصوم في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:396
+#: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Shooting up"
 msgstr "إطلاق النار"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:397
+#: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Jetpacking in"
 msgstr "التحليق بالسترة النفاثة في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:398
+#: Client/mods/deathmatch/logic/CClientGame.cpp:402
 msgid "Literally on fire in"
 msgstr "حرفيًا يحترق في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:399
+#: Client/mods/deathmatch/logic/CClientGame.cpp:403
 msgid "Burning up in"
 msgstr "يحترق في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:400
+#: Client/mods/deathmatch/logic/CClientGame.cpp:404
 msgid "Swimming in"
 msgstr "يسبح في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:401
+#: Client/mods/deathmatch/logic/CClientGame.cpp:405
 msgid "Floating around in"
 msgstr "يطفو في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:402
+#: Client/mods/deathmatch/logic/CClientGame.cpp:406
 msgid "Being chased by a shark"
 msgstr "تتم مطاردته من قبل سمك القرش"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:403
+#: Client/mods/deathmatch/logic/CClientGame.cpp:407
 msgid "Choking to death in"
 msgstr "يختنق حتى الموت في"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:543
+#: Client/mods/deathmatch/logic/CClientGame.cpp:547
 #: Client/core/CSettings.cpp:3569 Client/core/CMainMenu.cpp:303
 #: Client/core/CCore.cpp:674
 msgid "Main menu"
 msgstr "القائمة الرئيسية"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:651
-#: Client/mods/deathmatch/logic/CClientGame.cpp:743
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
+#: Client/mods/deathmatch/logic/CClientGame.cpp:655
+#: Client/mods/deathmatch/logic/CClientGame.cpp:747
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1342
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "اسم غير صحيح! الرجاء الذهاب إلى الإعدادات ووضع اسم جديد!"
 
 #. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:667
+#: Client/mods/deathmatch/logic/CClientGame.cpp:671
 #: Client/core/CConnectManager.cpp:156
 msgid "CONNECTING"
 msgstr "جاري الاتصال"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:667
+#: Client/mods/deathmatch/logic/CClientGame.cpp:671
 msgid "Entering the game ..."
 msgstr "جاري الدخول إلى اللعبة ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:719
+#: Client/mods/deathmatch/logic/CClientGame.cpp:723
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "غير متصل؛ يرجى استخدم 'الاتصال السريع' أو استخدم الأمر connect للاتصال بخادم."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:765
+#: Client/mods/deathmatch/logic/CClientGame.cpp:769
 msgid "Could not start the local server. See console for details."
 msgstr "تعذر بدء تشغيل الخادم المحلي، افتح وحدة التحكم console للحصول على التفاصيل."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:775
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
+#: Client/mods/deathmatch/logic/CClientGame.cpp:779
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
 msgid "Local Server"
 msgstr "خادم محلي"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:775
+#: Client/mods/deathmatch/logic/CClientGame.cpp:779
 msgid "Starting local server ..."
 msgstr "جاري تشغيل خادم محلي ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1023
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1027
 msgid "Area 51"
 msgstr "منطقة 51"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1032
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1036
 msgid "Walking around "
 msgstr "يتجول في "
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1178
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1182
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "تم طردك من اللعبة ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
 msgid "Connecting to local server..."
 msgstr "جاري الاتصال بالخادم المحلي..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
 msgid "Error connecting to server."
 msgstr "خطأ خلال الاتصال بالخادم."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
 msgid "Connecting to local server timed out. See console for details."
 msgstr "انتهت مهلة الاتصال بالخادم المحلي. انظر إلى Console لمزيد من التفاصيل."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1341
 #: Client/core/CConnectManager.cpp:271
 msgid "Connection timed out"
 msgstr "انتهت مهلة الاتصال"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1374
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
 msgid "Connection with the server was lost"
 msgstr "لقد فقد الاتصال بالخادم"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1385
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
 msgid "Disconnected: unknown protocol error"
 msgstr "قطع الاتصال: خطأ في بروتوكول غير معروف"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
 #: Client/core/CConnectManager.cpp:293
 msgid "Disconnected: disconnected remotely"
 msgstr "قطع الاتصال: قطع الاتصال عن بعد"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
 #: Client/core/CConnectManager.cpp:297
 msgid "Disconnected: connection lost remotely"
 msgstr "قطع الاتصال: فقد الاتصال عن بعد"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
 #: Client/core/CConnectManager.cpp:301
 msgid "Disconnected: you are banned from this server"
 msgstr "قطع الاتصال: أنت محظور من الدخول إلى هذا الخادم"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
 msgid "Disconnected: the server is currently full"
 msgstr "قطع الاتصال: الخادم ممتلئ حاليًا"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
 #: Client/core/CConnectManager.cpp:308
 msgid "Disconnected: disconnected from the server"
 msgstr "قطع الاتصال: قطع الاتصال من الخادم"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
 #: Client/core/CConnectManager.cpp:312
 msgid "Disconnected: connection to the server was lost"
 msgstr "قطع الاتصال: تم فقد الاتصال بالخادم"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1417
 msgid "Disconnected: invalid password specified"
 msgstr "قطع الاتصال: كلمة المرور المدخلة غير صحيحة"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1417
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1421
 #: Client/core/CConnectManager.cpp:319
 msgid "Disconnected: connection was refused"
 msgstr "قطع الاتصال: تم رفض الاتصال"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1435
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1439
 msgid "MTA Client verification failed!"
 msgstr "فشل التحقق من العميل MTA!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5668
 msgid "In a ditch"
 msgstr "داخل خندق"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5668
 msgid "En-route to hospital"
 msgstr "في طريقه إلى المستشفى"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5646
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5668
 msgid "Meeting their maker"
 msgstr "ودع الحياة"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5647
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5669
 msgid "Regretting their decisions"
 msgstr "يندم على قراراته"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5647
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5669
 msgid "Wasted"
 msgstr "مات"
 
@@ -2766,12 +2766,12 @@ msgstr "\n\n"
 "بإنتظار إستجابة من الخادم  -  %-3d"
 
 #. Create the window
-#: Client/core/CNewsBrowser.cpp:153
+#: Client/core/CNewsBrowser.cpp:154
 msgid "NEWS"
 msgstr "الأخبار"
 
 #. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+#: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
 msgid "Visit latest news article"
 msgstr "زيارة مقال آخر الأخبار"
 
@@ -3106,7 +3106,7 @@ msgstr "زمن الإستجابة:"
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+#: Client/core/ServerBrowser/CServerBrowser.cpp:480
 msgid "Player list"
 msgstr "قائمة اللاعبين"
 
@@ -3229,120 +3229,125 @@ msgid "HELP"
 msgstr "مساعدة"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:252
+#: Client/core/ServerBrowser/CServerBrowser.cpp:253
 msgid "Refresh"
 msgstr "تحديث"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:253
+#: Client/core/ServerBrowser/CServerBrowser.cpp:254
 msgid "Add Favorite"
 msgstr "أضف إلى المفضلة"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:254
-#: Client/core/ServerBrowser/CServerBrowser.cpp:301
-#: Client/core/ServerBrowser/CServerBrowser.cpp:372
+#: Client/core/ServerBrowser/CServerBrowser.cpp:255
+#: Client/core/ServerBrowser/CServerBrowser.cpp:303
+#: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Connect"
 msgstr "إتصال"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:255
+#: Client/core/ServerBrowser/CServerBrowser.cpp:256
 msgid "Server information"
 msgstr "معلومات الخادم"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:256
+#: Client/core/ServerBrowser/CServerBrowser.cpp:257
 msgid "Search servers"
 msgstr "البحث عن الخوادم"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:257
+#: Client/core/ServerBrowser/CServerBrowser.cpp:258
 msgid "Search players"
 msgstr "البحث عن لاعبين"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:258
+#: Client/core/ServerBrowser/CServerBrowser.cpp:259
 msgid "Start search"
 msgstr "إبدء البحث"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:299
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
+#: Client/core/ServerBrowser/CServerBrowser.cpp:213
+#: Client/core/ServerBrowser/CServerBrowser.cpp:260
+msgid "Delete from recent"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:301
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1682
 msgid "Search players..."
 msgstr "بحث عن اللاعبين..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:422
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
+#: Client/core/ServerBrowser/CServerBrowser.cpp:424
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
 msgid "Search servers..."
 msgstr "البحث عن خوادم"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:453
+#: Client/core/ServerBrowser/CServerBrowser.cpp:455
 msgid "Name"
 msgstr "الاسم"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:454
+#: Client/core/ServerBrowser/CServerBrowser.cpp:456
 msgid "Players"
 msgstr "اللاعبين"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:455
+#: Client/core/ServerBrowser/CServerBrowser.cpp:457
 msgid "Ping"
 msgstr "التأخير"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:456
+#: Client/core/ServerBrowser/CServerBrowser.cpp:458
 msgid "Gamemode"
 msgstr "نوع اللعب"
 
 #. Include label
-#: Client/core/ServerBrowser/CServerBrowser.cpp:486
+#: Client/core/ServerBrowser/CServerBrowser.cpp:488
 msgid "Include:"
 msgstr "يتضمن:"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:492
+#: Client/core/ServerBrowser/CServerBrowser.cpp:494
 msgid "Empty"
 msgstr "فارغ"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:498
+#: Client/core/ServerBrowser/CServerBrowser.cpp:500
 msgid "Full"
 msgstr "ممتلئ"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:504
+#: Client/core/ServerBrowser/CServerBrowser.cpp:506
 msgid "Locked"
 msgstr "مقفل"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:516
+#: Client/core/ServerBrowser/CServerBrowser.cpp:518
 msgid "Offline"
 msgstr "غير متّصل"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:529
+#: Client/core/ServerBrowser/CServerBrowser.cpp:531
 msgid "Other Versions"
 msgstr "إصدارات أخرى"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:550
+#: Client/core/ServerBrowser/CServerBrowser.cpp:552
 msgid "Back"
 msgstr "الخلف"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:741
+#: Client/core/ServerBrowser/CServerBrowser.cpp:743
 msgid "Loading..."
 msgstr "جاري التحميل..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1223
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2150
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1225
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2152
 msgid "  ..loading.."
 msgstr "    ..جاري التحميل.."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1263
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1391
 msgid "No address specified!"
 msgstr "لا يوجد عنوان محدد!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1276
 msgid "Unknown protocol"
 msgstr "بروتوكول غير معروف"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1276
 msgid "Please use the mtasa:// protocol!"
 msgstr "الرجاء إستخدام بروتوكول mtasa://!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1365
 msgid "You have to select a server to connect to."
 msgstr "يجب إختيار خادم للإتصال به."
 
