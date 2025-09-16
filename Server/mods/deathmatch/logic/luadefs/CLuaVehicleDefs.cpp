@@ -48,7 +48,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleCompatibleUpgrades", GetVehicleCompatibleUpgrades},
         {"getVehicleDoorState", GetVehicleDoorState},
         {"getVehicleWheelStates", GetVehicleWheelStates},
-        {"getVehicleWheelState", GetVehicleWheelState},
+        {"getVehicleWheelState", ArgumentParser<GetVehicleWheelState>},
         {"getVehicleLightState", GetVehicleLightState},
         {"getVehiclePanelState", GetVehiclePanelState},
         {"getVehicleOverrideLights", GetVehicleOverrideLights},
@@ -1322,29 +1322,14 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::GetVehicleWheelState(lua_State* luaVM)
+std::variant<unsigned char, bool> CLuaVehicleDefs::GetVehicleWheelState(CVehicle* vehicle, unsigned char wheelIndex)
 {
-    CVehicle* pVehicle;
-    unsigned char ucWheel = 0;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-    argStream.ReadNumber(ucWheel);
-
-    if (!argStream.HasErrors() && pVehicle)
+    unsigned char wheelState
+    if (CStaticFunctionDefinitions::GetVehicleWheelState(vehicle, wheelIndex, wheelState))
     {
-        unsigned char ucState;
-        if (CStaticFunctionDefinitions::GetVehicleWheelState(pVehicle, ucWheel, ucState))
-        {
-            lua_pushnumber(luaVM, ucState);
-            return 1;
-        }
+        return wheelState;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
 int CLuaVehicleDefs::GetVehicleLightState(lua_State* luaVM)

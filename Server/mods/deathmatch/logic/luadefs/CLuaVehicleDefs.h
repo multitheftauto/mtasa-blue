@@ -46,7 +46,7 @@ public:
     LUA_DECLARE(GetVehicleCompatibleUpgrades);
     LUA_DECLARE(GetVehicleDoorState);
     LUA_DECLARE(GetVehicleWheelStates);
-    LUA_DECLARE(GetVehicleWheelState);
+    static std::variant<unsigned char, bool> GetVehicleWheelState(CVehicle* vehicle, unsigned char wheelIndex);
     LUA_DECLARE(GetVehicleLightState);
     LUA_DECLARE(GetVehiclePanelState);
     LUA_DECLARE(GetVehicleOverrideLights);

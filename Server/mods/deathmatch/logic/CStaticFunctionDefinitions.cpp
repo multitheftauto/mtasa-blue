@@ -5284,23 +5284,23 @@ bool CStaticFunctionDefinitions::GetVehicleWheelStates(CVehicle* pVehicle, unsig
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleWheelState(CVehicle* pVehicle, unsigned char& ucWheel, unsigned char& ucState)
+bool CStaticFunctionDefinitions::GetVehicleWheelState(CVehicle* vehicle, unsigned char wheelIndex, unsigned char& wheelState)
 {
-    assert(pVehicle);
+    assert(vehicle);
 
-    switch(ucWheel)
+    switch(wheelIndex)
     {
         case 1:
-            ucState = pVehicle->m_ucWheelStates[FRONT_LEFT_WHEEL];
+            wheelState = vehicle->m_ucWheelStates[FRONT_LEFT_WHEEL];
             break;
         case 2:
-            ucState = pVehicle->m_ucWheelStates[REAR_LEFT_WHEEL];
+            wheelState = vehicle->m_ucWheelStates[REAR_LEFT_WHEEL];
             break;
         case 3:
-            ucState = pVehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL];
+            wheelState = vehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL];
             break;
         case 4:
-            ucState = pVehicle->m_ucWheelStates[REAR_RIGHT_WHEEL];
+            wheelState = vehicle->m_ucWheelStates[REAR_RIGHT_WHEEL];
             break;
         default:
             return false;

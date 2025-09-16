@@ -49,7 +49,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehiclePaintjob", GetVehiclePaintjob},
         {"getVehiclePlateText", GetVehiclePlateText},
         {"getVehicleWheelStates", GetVehicleWheelStates},
-        {"getVehicleWheelState", GetVehicleWheelState},
+        {"getVehicleWheelState", ArgumentParser<GetVehicleWheelState>},
         {"isVehicleWheelOnGround", IsVehicleWheelCollided},
         {"isVehicleDamageProof", IsVehicleDamageProof},
         {"isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable},
@@ -982,47 +982,22 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::GetVehicleWheelState(lua_State* luaVM)
+std::variant<unsigned char, bool> CLuaVehicleDefs::GetVehicleWheelState(CClientVehicle* vehicle, unsigned char wheelIndex)
 {
-    CClientVehicle*  pVehicle = nullptr;
-    unsigned char    ucWheel = 0;
+    if (!vehicle)
+        return std::nullopt;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-    argStream.ReadNumber(ucWheel);
-
-    if (!argStream.HasErrors() && pVehicle)
+    switch (wheelIndex)
     {
-        unsigned char ucState = 0;
-        
-        switch (ucWheel)
-        {
-        case 1:
-            ucState = pVehicle->GetWheelStatus(FRONT_LEFT_WHEEL);
-            break;
-        case 2:
-            ucState = pVehicle->GetWheelStatus(REAR_LEFT_WHEEL);
-            break;
-        case 3:
-            ucState = pVehicle->GetWheelStatus(FRONT_RIGHT_WHEEL);
-            break;
-        case 4:
-            ucState = pVehicle->GetWheelStatus(REAR_RIGHT_WHEEL);
-            break;
-        default:
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        lua_pushnumber(luaVM, ucState);
-        return 1;
+        case 1: return vehicle->GetWheelStatus(FRONT_LEFT_WHEEL);
+        case 2: return vehicle->GetWheelStatus(REAR_LEFT_WHEEL);
+        case 3: return vehicle->GetWheelStatus(FRONT_RIGHT_WHEEL);
+        case 4: return vehicle->GetWheelStatus(REAR_RIGHT_WHEEL);
+    default:
+        return std::nullopt;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
+
 
 int CLuaVehicleDefs::IsVehicleWheelCollided(lua_State* luaVM)
 {
