@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-11 02:30+0000\n"
-"PO-Revision-Date: 2025-09-16 09:44\n"
+"POT-Creation-Date: 2025-09-16 12:51+0000\n"
+"PO-Revision-Date: 2025-09-16 12:53\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -158,7 +158,7 @@ msgid "Quit"
 msgstr "Quitter"
 
 #: Client/loader/Dialogs.cpp:39
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+#: Client/core/ServerBrowser/CServerBrowser.cpp:558
 msgid "Help"
 msgstr "Aide"
 
@@ -387,10 +387,10 @@ msgstr "Impossible de mettre à jour à cause de conflits de fichier. Veuillez f
 #: Client/core/CConnectManager.cpp:271 Client/core/CConnectManager.cpp:329
 #: Client/core/CConnectManager.cpp:415 Client/core/CConnectManager.cpp:422
 #: Client/core/CConnectManager.cpp:432 Client/core/CGUI.cpp:93
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1263
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1342
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1391
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:148
@@ -564,7 +564,7 @@ msgstr "Une instance de GTA: San Andreas est déjà en cours d'exécution, et do
 #: Client/loader/MainFunctions.cpp:1144 Client/loader/MainFunctions.cpp:1151
 #: Client/loader/MainFunctions.cpp:1938 Client/game_sa/CGameSA.cpp:269
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1365
 msgid "Information"
 msgstr "Information"
 
@@ -1038,8 +1038,8 @@ msgstr "Menu principal"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:655
 #: Client/mods/deathmatch/logic/CClientGame.cpp:747
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1285
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1342
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Pseudonyme invalide! Allez dans Paramètres pour le changer!"
 
@@ -3091,7 +3091,7 @@ msgstr "Latence:"
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+#: Client/core/ServerBrowser/CServerBrowser.cpp:480
 msgid "Player list"
 msgstr "Liste des joueurs"
 
@@ -3206,120 +3206,125 @@ msgid "HELP"
 msgstr "AIDE"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:252
+#: Client/core/ServerBrowser/CServerBrowser.cpp:253
 msgid "Refresh"
 msgstr "Actualiser"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:253
+#: Client/core/ServerBrowser/CServerBrowser.cpp:254
 msgid "Add Favorite"
 msgstr "Ajouter aux Favoris"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:254
-#: Client/core/ServerBrowser/CServerBrowser.cpp:301
-#: Client/core/ServerBrowser/CServerBrowser.cpp:372
+#: Client/core/ServerBrowser/CServerBrowser.cpp:255
+#: Client/core/ServerBrowser/CServerBrowser.cpp:303
+#: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Connect"
 msgstr "Connexion"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:255
+#: Client/core/ServerBrowser/CServerBrowser.cpp:256
 msgid "Server information"
 msgstr "Information du serveur"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:256
+#: Client/core/ServerBrowser/CServerBrowser.cpp:257
 msgid "Search servers"
 msgstr "Rechercher des serveurs"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:257
+#: Client/core/ServerBrowser/CServerBrowser.cpp:258
 msgid "Search players"
 msgstr "Rechercher des joueurs"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:258
+#: Client/core/ServerBrowser/CServerBrowser.cpp:259
 msgid "Start search"
 msgstr "Démarrer la recherche"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:299
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
+#: Client/core/ServerBrowser/CServerBrowser.cpp:213
+#: Client/core/ServerBrowser/CServerBrowser.cpp:260
+msgid "Delete from recent"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:301
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1682
 msgid "Search players..."
 msgstr "Rechercher des joueurs..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:422
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
+#: Client/core/ServerBrowser/CServerBrowser.cpp:424
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
 msgid "Search servers..."
 msgstr "Rechercher des serveurs..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:453
+#: Client/core/ServerBrowser/CServerBrowser.cpp:455
 msgid "Name"
 msgstr "Nom"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:454
+#: Client/core/ServerBrowser/CServerBrowser.cpp:456
 msgid "Players"
 msgstr "Joueurs"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:455
+#: Client/core/ServerBrowser/CServerBrowser.cpp:457
 msgid "Ping"
 msgstr "Latence"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:456
+#: Client/core/ServerBrowser/CServerBrowser.cpp:458
 msgid "Gamemode"
 msgstr "Mode de jeu"
 
 #. Include label
-#: Client/core/ServerBrowser/CServerBrowser.cpp:486
+#: Client/core/ServerBrowser/CServerBrowser.cpp:488
 msgid "Include:"
 msgstr "Inclure:"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:492
+#: Client/core/ServerBrowser/CServerBrowser.cpp:494
 msgid "Empty"
 msgstr "Vide"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:498
+#: Client/core/ServerBrowser/CServerBrowser.cpp:500
 msgid "Full"
 msgstr "Plein"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:504
+#: Client/core/ServerBrowser/CServerBrowser.cpp:506
 msgid "Locked"
 msgstr "Verrouillé"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:516
+#: Client/core/ServerBrowser/CServerBrowser.cpp:518
 msgid "Offline"
 msgstr "Hors ligne"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:529
+#: Client/core/ServerBrowser/CServerBrowser.cpp:531
 msgid "Other Versions"
 msgstr "Autres versions"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:550
+#: Client/core/ServerBrowser/CServerBrowser.cpp:552
 msgid "Back"
 msgstr "Retour"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:741
+#: Client/core/ServerBrowser/CServerBrowser.cpp:743
 msgid "Loading..."
 msgstr "Chargement..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1223
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2150
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1225
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2152
 msgid "  ..loading.."
 msgstr "  ..chargement.."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1263
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1391
 msgid "No address specified!"
 msgstr "Adresse non spécifiée!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1276
 msgid "Unknown protocol"
 msgstr "Protocole inconnu"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1276
 msgid "Please use the mtasa:// protocol!"
 msgstr "Veuillez utiliser le protocole mtasa:// !"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1365
 msgid "You have to select a server to connect to."
 msgstr "Vous devez sélectionner un serveur auquel se connecter."
 
