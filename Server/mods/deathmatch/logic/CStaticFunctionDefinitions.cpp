@@ -4828,12 +4828,8 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
                 arguments.PushNumber(ucWeaponID);
                 arguments.PushNumber(usAmmo);
                 arguments.PushNumber(ucWeaponSlot);
-                if (IS_PLAYER(pElement))
-                    if (!pPed->CallEvent("onPlayerWeaponGiven", arguments))
-                        return false;
-                else
-                    if (!pPed->CallEvent("onPedWeaponGiven", arguments))
-                        return false;
+                if (!pPed->CallEvent(IS_PLAYER(pElement) ? "onPlayerWeaponGiven" : "onPedWeaponGiven", arguments))
+                    return false;
 
                 pPed->SetWeaponType(ucWeaponID, ucWeaponSlot);
                 if (bSetAsCurrent)
@@ -4963,19 +4959,11 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
                     arguments.PushNumber(ucAmmo);
                     arguments.PushNumber(ucWeaponSlot);
 
-                    bool bTake = true;
-                    if (IS_PLAYER(pElement))
-                    {
-                        if (!pPed->CallEvent("onPlayerWeaponTaken", arguments))
-                            bTake = false;
-                    }
-                    else
-                    {
-                        if (!pPed->CallEvent("onPedWeaponTaken", arguments))
-                            bTake = false;
-                    }
+                    bool shouldTake = true;
+                    if (!pPed->CallEvent(IS_PLAYER(pElement) ? "onPlayerWeaponTaken" : "onPedWeaponTaken", arguments))
+                        shouldTake = false;
 
-                    if (bTake)
+                    if (shouldTake)
                     {
                         CBitStream      BitStream;
                         SWeaponTypeSync weaponType;
