@@ -251,3 +251,14 @@ class CTaskComplexFacialSA : public virtual CTaskComplexSA, public virtual CTask
 public:
     CTaskComplexFacialSA();
 };
+
+class CTaskComplexInWaterSAInterface : public CTaskComplexSAInterface
+{
+public:
+};
+
+class CTaskComplexInWaterSA : public virtual CTaskComplexSA, public virtual CTaskComplexInWater
+{
+public:
+    CTaskComplexInWaterSA();
+};
