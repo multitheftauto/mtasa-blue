@@ -47,16 +47,20 @@ void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
 bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 {
     int modelId = pModel->GetModelID();
+
     if (m_Models[modelId] != nullptr)
     {
         CResource* parentResource = m_Models[modelId]->GetParentResource();
+
         if (parentResource)
-            parentResource->GetResourceModelStreamer()->FullyReleaseModel(modelId);
+            parentResource->GetResourceModelStreamer()->FullyReleaseModel(static_cast<std::uint16_t>(modelId));
+
         m_Models[modelId]->RestoreEntitiesUsingThisModel();
         m_Models[modelId] = nullptr;
         m_modelCount--;
         return true;
     }
+
     return false;
 }
 
@@ -76,9 +80,11 @@ int CClientModelManager::GetFirstFreeModelID(void)
 
 int CClientModelManager::GetFreeTxdModelID()
 {
-    std::uint16_t usTxdId = g_pGame->GetPools()->GetTxdPool().GetFreeTextureDictonarySlot();
+    std::uint32_t usTxdId = g_pGame->GetPools()->GetTxdPool().GetFreeTextureDictonarySlot();
+
     if (usTxdId == -1)
         return INVALID_MODEL_ID;
+
     return MAX_MODEL_DFF_ID + usTxdId;
 }
 

@@ -462,8 +462,8 @@ void* Font::loadGlyph ( unsigned long glyphID, bool bCacheSize ) //Only use this
     {
         // Record size info for this character
         SCharSize item;
-        item.width = glyph->bitmap.width;
-        item.height = glyph->bitmap.rows;
+        item.width = (ushort)glyph->bitmap.width;
+        item.height = (ushort)glyph->bitmap.rows;
         item.offsetX = (float)(glyph->metrics.horiBearingX >> 6);
         item.horz_advance = (float)(glyph->advance.x >> 6);
         MapSet ( d_sizes_map, glyphID, item );
@@ -618,9 +618,9 @@ void Font::drawGlyphToBuffer(void* glyph, argb_t* buffer, uint buf_width)
     FT_GlyphSlot thisGlyph = (FT_GlyphSlot)glyph;
 	FT_Bitmap* glyph_bitmap = &thisGlyph->bitmap;
 
-	for (int i = 0; i < glyph_bitmap->rows; ++i)
+	for (int i = 0; i < (int)glyph_bitmap->rows; ++i)
 	{
-		for (int j = 0; j < glyph_bitmap->width; ++j)
+		for (int j = 0; j < (int)glyph_bitmap->width; ++j)
 		{
 			switch (glyph_bitmap->pixel_mode)
 			{

@@ -21,6 +21,7 @@
 #include "CConsoleCommands.h"
 #include "CHTTPD.h"
 #include "CStaticFunctionDefinitions.h"
+#include "CLanBroadcast.h"
 
 #define SETTINGS_TEMPLATE_PATH "mtaserver.conf.template"
 
@@ -81,6 +82,7 @@ CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
     m_bSyncMapElementData = true;
     m_elementDataWhitelisted = false;
     m_checkDuplicateSerials = true;
+    m_allowMultiCommandHandlers = 1;
 }
 
 bool CMainConfig::Load()
@@ -539,6 +541,8 @@ bool CMainConfig::Load()
 
     GetBoolean(m_pRootNode, "elementdata_whitelisted", m_elementDataWhitelisted);
     GetBoolean(m_pRootNode, "check_duplicate_serials", m_checkDuplicateSerials);
+    GetInteger(m_pRootNode, "allow_multi_command_handlers", m_allowMultiCommandHandlers);
+    m_allowMultiCommandHandlers = Clamp(0, m_allowMultiCommandHandlers, 2);
 
     ApplyNetOptions();
 
@@ -912,7 +916,7 @@ bool CMainConfig::AddMissingSettings()
                 CXMLAttribute* templateAttribute = *it3;
                 const SString& attrName = templateAttribute->GetName();
 
-                // Don't check value attribute which is intended to be different
+                // Don't check value attribute which is intended to be customized by the server
                 if (attrName == "value")
                     continue;
                 
@@ -941,6 +945,12 @@ bool CMainConfig::AddMissingSettings()
             foundNode = m_pRootNode->CreateSubNode(templateNodeName.c_str(), previousNode);
             foundNode->SetTagContent(templateNodeValue.c_str());
             foundNode->SetCommentText(templateNodeComment.c_str(), true);
+
+            for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
+            {
+                CXMLAttribute* templateAttribute = *it3;
+                foundNode->GetAttributes().Create(*templateAttribute);
+            }
 
             CLogger::LogPrintf("Added missing '%s' setting to mtaserver.conf\n", templateNodeName.c_str());
             configChanged = true;
@@ -1331,7 +1341,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
     }
     else if (strName == "fpslimit")
     {
-        return CStaticFunctionDefinitions::SetFPSLimit(atoi(strValue), bSave);
+        return CStaticFunctionDefinitions::SetFPSLimit(static_cast<unsigned short>(atoi(strValue)), bSave);
     }
     else if (strName == "networkencryption")
     {
@@ -1530,6 +1540,7 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 50, 1000, 5000, "player_triggered_event_interval", &m_iPlayerTriggeredEventIntervalMs, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
         {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
         {true, true, 0, 1, 1, "resource_client_file_checks", &m_checkResourceClientFiles, nullptr},
+        {true, true, 0, 1, 2, "allow_multi_command_handlers", &m_allowMultiCommandHandlers, &CMainConfig::OnAllowMultiCommandHandlersChange},
     };
 
     static std::vector<SIntSetting> settingsList;
@@ -1577,6 +1588,11 @@ void CGame::ApplyAseSetting()
 void CMainConfig::OnPlayerTriggeredEventIntervalChange()
 {
     g_pGame->ApplyPlayerTriggeredEventIntervalChange();
+}
+
+void CMainConfig::OnAllowMultiCommandHandlersChange()
+{
+    g_pGame->SendSyncSettings();
 }
 
 void CGame::ApplyPlayerTriggeredEventIntervalChange()

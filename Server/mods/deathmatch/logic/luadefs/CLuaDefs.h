@@ -96,7 +96,7 @@ protected:
     template <auto ReturnOnError, auto T>
     static inline int ArgumentParserWarn(lua_State* L)
     {
-        return CLuaFunctionParser<false, ReturnOnError, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<false, ReturnOnError, remove_noexcept_fn_v<T>>()(L, m_pScriptDebugging);
     }
 
     // Special case for overloads
@@ -106,8 +106,8 @@ protected:
     {
         // Pad functions to have the same number of parameters by
         // filling both up to the larger number of parameters with dummy_type arguments
-        using PaddedFunctionA = pad_func_with_func<FunctionA, FunctionB>;
-        using PaddedFunctionB = pad_func_with_func<FunctionB, FunctionA>;
+        using PaddedFunctionA = pad_func_with_func<remove_noexcept_fn_v<FunctionA>, remove_noexcept_fn_v<FunctionB>>;
+        using PaddedFunctionB = pad_func_with_func<remove_noexcept_fn_v<FunctionB>, remove_noexcept_fn_v<FunctionA>>;
         // Combine functions
         using Overload = CLuaOverloadParser<PaddedFunctionA::Call, PaddedFunctionB::Call>;
 
@@ -118,7 +118,7 @@ protected:
     template <auto T>
     static inline int ArgumentParser(lua_State* L)
     {
-        return CLuaFunctionParser<true, nullptr, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<true, nullptr, remove_noexcept_fn_v<T>>()(L, m_pScriptDebugging);
     }
 
     // Special case for overloads
@@ -128,8 +128,8 @@ protected:
     {
         // Pad functions to have the same number of parameters by
         // filling both up to the larger number of parameters with dummy_type arguments
-        using PaddedFunctionA = pad_func_with_func<FunctionA, FunctionB>;
-        using PaddedFunctionB = pad_func_with_func<FunctionB, FunctionA>;
+        using PaddedFunctionA = pad_func_with_func<remove_noexcept_fn_v<FunctionA>, remove_noexcept_fn_v<FunctionB>>;
+        using PaddedFunctionB = pad_func_with_func<remove_noexcept_fn_v<FunctionB>, remove_noexcept_fn_v<FunctionA>>;
         // Combine functions
         using Overload = CLuaOverloadParser<PaddedFunctionA::Call, PaddedFunctionB::Call>;
 

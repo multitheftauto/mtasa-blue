@@ -31,6 +31,7 @@
 #include <game/TaskBasic.h>
 #include <enums/VehicleType.h>
 #include <enums/HandlingProperty.h>
+#include <numbers>
 
 using std::list;
 
@@ -260,21 +261,27 @@ bool CStaticFunctionDefinitions::ClearChatBox()
 
 bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded)
 {
-    if (strlen(szText) <= MAX_OUTPUTCHATBOX_LENGTH)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushString(szText);
-        Arguments.PushNumber(ucRed);
-        Arguments.PushNumber(ucGreen);
-        Arguments.PushNumber(ucBlue);
-
-        bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
-        if (!bCancelled)
-        {
-            m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
-            return true;
-        }
+    if (!szText || szText[0] == '\0')
+        return false;
+    
+    SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : SStringX(szText);
+    
+    if (textToProcess.length() > MAX_OUTPUTCHATBOX_LENGTH) {
+        return false;
     }
+
+    CLuaArguments Arguments;
+    Arguments.PushString(szText);
+    Arguments.PushNumber(ucRed);
+    Arguments.PushNumber(ucGreen);
+    Arguments.PushNumber(ucBlue);
+
+    bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
+    if (!bCancelled) {
+        m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
+        return true;
+    }
+    
     return false;
 }
 
@@ -1493,6 +1500,12 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
 
+            // If setting health to 0 for local player, clear stale damage data
+            // and set proper scripted death parameters for DoWastedCheck
+            if (fHealth == 0.0f && Ped.IsLocalPlayer() && Ped.GetHealth() > 0.0f) {
+                g_pClientGame->SetScriptedDeathData();
+            }
+
             // Set the new health
             Ped.SetHealth(Clamp(0.0f, fHealth, Ped.GetMaxHealth()));
             return true;
@@ -1741,7 +1754,7 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept
+bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& ped, const std::string& control, bool& state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return GetControlState(control.c_str(), state);
@@ -2396,13 +2409,12 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& ped, const std::string& control, const bool state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return SetControlState(control.c_str(), state);
 
-    if (ped.m_Pad.SetControlState(control.c_str(), state))
-        return true;
+    return ped.m_Pad.SetControlState(control.c_str(), state);
 }
 
 bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby)
@@ -2955,7 +2967,7 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CClientVehicle& Vehicl
 
 bool CStaticFunctionDefinitions::GetVehicleCurrentGear(CClientVehicle& Vehicle, unsigned short& currentGear)
 {
-    currentGear = Vehicle.GetCurrentGear();
+    currentGear = static_cast<unsigned short>(Vehicle.GetCurrentGear());
     return true;
 }
 
@@ -4827,7 +4839,8 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
     assert(szType);
 
     // Grab the type id
-    unsigned char ucType = CClientMarker::StringToType(szType);
+    auto ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
+
     if (ucType != CClientMarker::MARKER_INVALID)
     {
         // Create the marker
@@ -4872,7 +4885,7 @@ bool CStaticFunctionDefinitions::SetMarkerType(CClientEntity& Entity, const char
     RUN_CHILDREN(SetMarkerType(**iter, szType))
 
     // Grab the new type ID
-    unsigned char ucType = CClientMarker::StringToType(szType);
+    const auto ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
     if (ucType != CClientMarker::MARKER_INVALID)
     {
         // Is this a marker?
@@ -5001,7 +5014,29 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& 
 {
     m_pCamera->GetPosition(vecPosition);
     m_pCamera->GetFixedTarget(vecLookAt, &fRoll);
-    fFOV = m_pCamera->GetFOV();
+    
+    fFOV = m_pCamera->GetAccurateFOV();
+    
+    if (fRoll == 0.0f)
+    {
+        // Calculate roll from camera matrix when not directly available
+        CMatrix matrix;
+        m_pCamera->GetMatrix(matrix);
+        
+        CVector worldUp(0.0f, 0.0f, 1.0f);
+        CVector cameraUp = matrix.vUp;
+        CVector cameraRight = matrix.vRight;
+        
+        // Project camera up vector onto plane perpendicular to camera front
+        CVector projectedUp = cameraUp - matrix.vFront * cameraUp.DotProduct(&matrix.vFront);
+        projectedUp.Normalize();
+        
+        float cosRoll = worldUp.DotProduct(&projectedUp);
+        float sinRoll = cameraRight.DotProduct(&worldUp);
+        
+        fRoll = std::atan2(sinRoll, cosRoll) * (180.0f / std::numbers::pi_v<float>);
+    }
+    
     return true;
 }
 
@@ -6397,7 +6432,8 @@ void CStaticFunctionDefinitions::GUILabelSetColor(CClientEntity& Entity, int iR,
         if (IS_CGUIELEMENT_LABEL(&GUIElement))
         {
             // Set the label color
-            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetTextColor(iR, iG, iB);
+            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetTextColor(static_cast<unsigned char>(iR), static_cast<unsigned char>(iG),
+                                                                               static_cast<unsigned char>(iB));
         }
     }
 }

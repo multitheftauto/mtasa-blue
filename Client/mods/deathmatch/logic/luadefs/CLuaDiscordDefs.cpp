@@ -138,7 +138,7 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 
 bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 {
-    unsigned long ulSecondsSinceEpoch = time(nullptr) + ulTime;
+    auto ulSecondsSinceEpoch = static_cast<unsigned long>(time(nullptr)) + ulTime;
 
     if (ulTime == 0)
         ulSecondsSinceEpoch = 0;
@@ -157,7 +157,7 @@ bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 
 bool CLuaDiscordDefs::SetEndTime(unsigned long ulTime)
 {
-    unsigned long ulSecondsSinceEpoch = time(nullptr) + ulTime;
+    auto ulSecondsSinceEpoch = static_cast<unsigned long>(time(nullptr)) + ulTime;
 
     if (ulTime == 0)
         ulSecondsSinceEpoch = 0;

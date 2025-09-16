@@ -327,7 +327,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     if (hDll)
     {
         // Grab the MiniDumpWriteDump proc address
-        MINIDUMPWRITEDUMP pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(hDll, "MiniDumpWriteDump"));
+        auto pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(static_cast<void*>(GetProcAddress(hDll, "MiniDumpWriteDump")));
         if (!pDump)
             AddReportLog(9202, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump");
 
