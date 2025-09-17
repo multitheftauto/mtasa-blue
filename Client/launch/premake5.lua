@@ -1,5 +1,6 @@
 project "Client Launcher"
 	language "C++"
+	cppdialect "C++23"
 	kind "WindowedApp"
 	targetname "Multi Theft Auto"
 	targetdir(buildpath("."))
