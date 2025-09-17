@@ -184,7 +184,7 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
                 // Add the resource
                 Load(!info.bIsDir, info.strAbsPath, info.strName);
             }
-            else if (pResource && pResource->HasResourceChanged())
+            else if (bRefreshAll && pResource && pResource->HasResourceChanged())
             {
                 if (g_pServerInterface->IsRequestingExit())
                     return false;
