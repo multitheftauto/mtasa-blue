@@ -212,7 +212,8 @@ public:
         if (!dll_guard.SetDirectory(mta_path_w.c_str()))
             return std::unexpected(DllLoadError::LoadFailed);
 
-        if (HMODULE module = LoadLibraryW(dll_name_w.c_str()))
+        std::wstring full_path_w = std::wstring(mta_path_w.c_str()) + L"\\" + dll_name_w;
+        if (HMODULE module = LoadLibraryW(full_path_w.c_str()))
             return module;
 
         return std::unexpected(DllLoadError::LoadFailed);
