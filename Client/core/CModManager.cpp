@@ -122,6 +122,8 @@ void CModManager::Unload()
 
 bool CModManager::Start()
 {
+    if (m_library != nullptr || m_client != nullptr)
+        Stop();
     dassert(m_state == State::PendingStart);
     dassert(m_library == nullptr);
     dassert(m_client == nullptr);
