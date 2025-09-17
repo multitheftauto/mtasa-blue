@@ -4890,12 +4890,8 @@ bool CStaticFunctionDefinitions::TakeWeapon(CElement* pElement, unsigned char uc
                 arguments.PushNumber(ucWeaponID);
                 arguments.PushNumber(usAmmo);
                 arguments.PushNumber(ucWeaponSlot);
-                if (IS_PLAYER(pElement))
-                    if (!pPed->CallEvent("onPlayerWeaponTaken", arguments))
-                        return false;
-                else
-                    if (!pPed->CallEvent("onPedWeaponTaken", arguments))
-                        return false;
+                if (!pPed->CallEvent(IS_PLAYER(pElement) ? "onPlayerWeaponTaken" : "onPedWeaponTaken", arguments))
+                    return false;
 
                 SWeaponTypeSync weaponType;
                 weaponType.data.ucWeaponType = ucWeaponID;
