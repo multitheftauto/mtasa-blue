@@ -798,6 +798,12 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     // CVehicle::ProcessBoatControl
     MemPut(0x6DC23F, &kOriginalTimeStep);
 
+    // Fixes climbing over certain objects killing player on high FPS or low game speed.
+    // GitHub Issue #602
+    MemPut(0x6811E9, &kOriginalTimeStep);
+    MemPut(0x68128A, &kOriginalTimeStep);
+    MemPut(0x68131B, &kOriginalTimeStep);
+
     // CTimer::m_FrameCounter fixes
     EZHookInstall(CTimer__Update);
 
