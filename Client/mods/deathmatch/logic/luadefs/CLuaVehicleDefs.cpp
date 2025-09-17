@@ -998,7 +998,6 @@ std::variant<unsigned char, bool> CLuaVehicleDefs::GetVehicleWheelState(CClientV
     }
 }
 
-
 int CLuaVehicleDefs::IsVehicleWheelCollided(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = nullptr;
