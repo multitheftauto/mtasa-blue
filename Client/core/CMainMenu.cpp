@@ -632,7 +632,7 @@ void CMainMenu::Update()
             m_bIsVisible = false;            // Make cursor disappear faster
             m_bCursorAlphaReset = false;
         }
-            
+
 
         // If the fade is complete
         if (m_fFader <= 0)
@@ -777,7 +777,7 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
         m_Settings.SetIsModLoaded(bIsIngame);
 
         // Reset frame rate limit
-        CCore::GetSingleton().RecalculateFrameRateLimit(-1, false);
+        CCore::GetSingleton().GetFPSLimiter()->Reset();
 
         m_ulMoveStartTick = GetTickCount32();
         if (bIsIngame)
@@ -848,7 +848,7 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
                     AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
                     return true;
                 }
-     
+
                 break;
             case MENU_ITEM_QUICK_CONNECT:
                 AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
@@ -917,7 +917,7 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
             ShowNetworkNotReadyWindow();
             return true;
         }
-        
+
         g_pCore->GetConnectManager()->SetQuickConnect(true);
         g_pCore->GetCommands()->Execute("reconnect", "");
     }

@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 #define TIMING_GRAPH(name) \
     GetGraphStats()->AddTimingPoint( name );
 
