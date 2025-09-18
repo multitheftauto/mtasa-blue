@@ -32,7 +32,7 @@ public:
                             float fWaveHeight, const SWorldWaterLevelInfo& worldWaterLevelInfo, bool bHasSkyGradient, const SGarageStates& garageStates,
                             unsigned char ucSkyGradientTR, unsigned char ucSkyGradientTG, unsigned char ucSkyGradientTB, unsigned char ucSkyGradientBR,
                             unsigned char ucSkyGradientBG, unsigned char ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
-                            unsigned short usFPSLimit = 36, bool bCloudsEnabled = true, float fJetpackMaxHeight = 100, bool bOverrideWaterColor = false,
+                            unsigned short fps = FPSLimits::FPS_MIN, bool bCloudsEnabled = true, float fJetpackMaxHeight = 100, bool bOverrideWaterColor = false,
                             unsigned char ucWaterRed = 0, unsigned char ucWaterGreen = 0, unsigned char ucWaterBlue = 0, unsigned char ucWaterAlpha = 0,
                             bool bInteriorSoundsEnabled = true, bool bOverrideRainLevel = false, float fRainLevel = 0, bool bOverrideSunSize = false,
                             float fSunSize = 0, bool bOverrideSunColor = false, unsigned char ucSunCoreR = 0, unsigned char ucSunCoreG = 0,
@@ -64,7 +64,7 @@ private:
     unsigned char        m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
     bool                 m_bHasHeatHaze;
     SHeatHazeSettings    m_HeatHazeSettings;
-    unsigned short       m_usFPSLimit;
+    std::uint16_t        m_fpsLimit;
     const SGarageStates* m_pGarageStates;
     bool                 m_bCloudsEnabled;
     float                m_fJetpackMaxHeight;
