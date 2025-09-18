@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        multiplayer_sa/CMultiplayerSA.cpp
+ *  FILE:        multiplayer_sa/CMultiplayerSA_1.3.cpp
  *  PURPOSE:     Multiplayer module class 1.3
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
@@ -141,6 +141,8 @@ void HOOK_CBoat_ApplyDamage();
 void HOOK_CProjectile_FixTearGasCrash();
 void HOOK_CProjectile_FixExplosionLocation();
 void HOOK_CPed_RemoveWeaponWhenEnteringVehicle();
+void* __cdecl HOOK_CMemoryMgr_MallocAlign(int size, int alignment, int nHint);
+void __cdecl HOOK_CMemoryMgr_FreeAlign(void* ptr);
 
 void CMultiplayerSA::Init_13()
 {
@@ -213,6 +215,7 @@ void CMultiplayerSA::InitHooks_13()
     InitHooks_VehicleDummies();
     InitHooks_Vehicles();
     InitHooks_Rendering();
+    InitHooks_FixMallocAlign();
 }
 
 void CMultiplayerSA::InitMemoryCopies_13()
