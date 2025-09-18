@@ -54,7 +54,7 @@ void CWebView::Initialise()
 {
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit();
+    browserSettings.windowless_frame_rate = g_pCore->GetFPSLimiter()->GetFPSTarget();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
     browserSettings.javascript_dom_paste = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
