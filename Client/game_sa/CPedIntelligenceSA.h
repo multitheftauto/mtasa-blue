@@ -55,4 +55,5 @@ public:
     bool                         TestForStealthKill(CPed* pPed, bool bUnk);
     CTaskSAInterface*            SetTaskDuckSecondary(unsigned short nLengthOfDuck);
     CTaskSimpleUseGun*           GetTaskUseGun();
+    CTaskSimpleFight*            GetFightTask();
 };
