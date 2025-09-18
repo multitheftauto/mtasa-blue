@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-18 03:07+0000\n"
-"PO-Revision-Date: 2025-09-18 04:02\n"
+"PO-Revision-Date: 2025-09-18 05:10\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -1931,7 +1931,7 @@ msgstr "Mip Mapping"
 
 #: Client/core/CSettings.cpp:713
 msgid "V-Sync"
-msgstr ""
+msgstr "V-Sync"
 
 #: Client/core/CSettings.cpp:781 Client/core/CSettings.cpp:1571
 msgid "Low"
