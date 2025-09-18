@@ -2135,6 +2135,11 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return;
+
         uint uiLast = uiStart + uiLength - 1;
 
         // Make a hole
@@ -2150,34 +2155,68 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return;
+
         uint uiLast = uiStart + uiLength - 1;
 
         RemoveObscuredRanges(uiStart, uiLast);
-
         IterType iterOverlap;
         if (GetRangeOverlappingPoint(uiStart, iterOverlap))
         {
             uint uiOverlapPrevLast = iterOverlap->second;
 
-            // Modify overlapping range last point
-            uint uiNewLast = uiStart - 1;
-            iterOverlap->second = uiNewLast;
-
-            if (uiOverlapPrevLast > uiLast)
+            // Modify overlapping range last point with underflow check
+            if (uiStart > 0)
             {
-                // Need to add range after hole
-                uint uiNewStart = uiLast + 1;
-                m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                uint uiNewLast = uiStart - 1;
+                iterOverlap->second = uiNewLast;
+
+                if (uiOverlapPrevLast > uiLast)
+                {
+                    // Need to add range after hole
+                    // Check for overflow when calculating uiLast + 1
+                    if (uiLast < UINT_MAX)
+                    {
+                        uint uiNewStart = uiLast + 1;
+                        m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                    }
+                }
+            }
+            else
+            {
+                // Special case: uiStart is 0, remove the range entirely
+                m_StartLastMap.erase(iterOverlap);
+                if (uiOverlapPrevLast > uiLast)
+                {
+                    // Check for overflow when calculating uiLast + 1
+                    if (uiLast < UINT_MAX)
+                    {
+                        uint uiNewStart = uiLast + 1;
+                        m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                    }
+                }
             }
         }
 
         if (GetRangeOverlappingPoint(uiLast, iterOverlap))
         {
             // Modify overlapping range start point
-            uint uiNewStart = uiLast + 1;
-            uint uiOldLast = iterOverlap->second;
-            m_StartLastMap.erase(iterOverlap);
-            m_StartLastMap[uiNewStart] = uiOldLast;
+            // Check for overflow when calculating uiLast + 1
+            if (uiLast < UINT_MAX)
+            {
+                uint uiNewStart = uiLast + 1;
+                uint uiOldLast = iterOverlap->second;
+                m_StartLastMap.erase(iterOverlap);
+                m_StartLastMap[uiNewStart] = uiOldLast;
+            }
+            else
+            {
+                // If uiLast == UINT_MAX, we can't create a range after it, just remove the overlapping range
+                m_StartLastMap.erase(iterOverlap);
+            }
         }
     }
 
@@ -2186,6 +2225,11 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return false;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return false;
+
         uint uiLast = uiStart + uiLength - 1;
 
         IterType iter = m_StartLastMap.lower_bound(uiStart);
