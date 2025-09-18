@@ -41,7 +41,7 @@ class CDiscordInterface;
 #include <ijsify.h>
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
-#include <FPSLimiter.h>
+#include "FPSLimiter.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
