@@ -282,8 +282,9 @@ namespace memory
         catch (...)
         {
             // Ignore exceptions in free - standard behavior
+            }
         }
-    }
+    }            // namespace memory
 }            // namespace mta
 
 // Hook constants
