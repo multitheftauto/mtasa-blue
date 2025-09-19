@@ -43,6 +43,7 @@ public:
 
     // Misc functions
     LUA_DECLARE(DownloadFile);
+    LUA_DECLARE(AbortDownload);
 
     // Output functions
     LUA_DECLARE(OutputConsole);
