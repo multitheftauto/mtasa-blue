@@ -1014,6 +1014,9 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
 
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
+        if (!pElement->SetCustomData(szName, Variable, syncType))
+            return false; // The server cancelled the change in onElementDataChange
+
         if (syncType != ESyncType::LOCAL)
         {
             // Tell our clients to update their data
@@ -1034,8 +1037,6 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
         if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
             m_pPlayerManager->ClearElementData(pElement, szName);
 
-        // Set its custom data
-        pElement->SetCustomData(szName, Variable, syncType);
         return true;
     }
     return false;
@@ -1050,6 +1051,9 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const cha
     // Check it exists
     if (pElement->GetCustomData(szName, false))
     {
+        if (!pElement->DeleteCustomData(szName))
+            return false; // The server cancelled the change in onElementDataChange
+
         // Tell our clients to update their data
         unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
         CBitStream     BitStream;
@@ -1061,8 +1065,6 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const cha
         // Clean up after the data removal
         m_pPlayerManager->ClearElementData(pElement, szName);
 
-        // Delete here
-        pElement->DeleteCustomData(szName);
         return true;
     }
 
