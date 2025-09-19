@@ -3509,6 +3509,9 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->GetVehicleAudioSettingsManager()->ResetAudioSettingsData();
 
+    // Reset framerate fixing property
+    g_pMultiplayer->FramerateFixingResetPhysicsTimeStep();
+
     // Tell doggy we got the game running
     WatchDogCompletedSection("L1");
 }

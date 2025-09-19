@@ -15,6 +15,7 @@
 #include <game/CStreaming.h>
 #include <game/CPtrNodeSingleLinkPool.h>
 #include <lua/CLuaFunctionParser.h>
+#include <lua/CLuaFunctionParseHelpers.h>
 #include "CLuaEngineDefs.h"
 #include <enums/VehicleType.h>
 
@@ -150,6 +151,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
+        {"engineFramerateFixingSetProperty", ArgumentParser<EngineFramerateFixingSetProperty>},
+        {"engineFramerateFixingGetProperty", ArgumentParser<EngineFramerateFixingGetProperty>},
+        {"engineFramerateFixingResetProperties", ArgumentParser<EngineFramerateFixingResetProperties>},
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -198,6 +202,10 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
     lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
     lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
+
+    lua_classfunction(luaVM, "framerateFixingSetProperty", "engineFramerateFixingSetProperty");
+    lua_classfunction(luaVM, "framerateFixingGetProperty", "engineFramerateFixingGetProperty");
+    lua_classfunction(luaVM, "framerateFixingResetProperties", "engineFramerateFixingResetProperties");
 
     lua_registerstaticclass(luaVM, "Engine");
 
@@ -2601,4 +2609,29 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 
     if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
+}
+
+void CLuaEngineDefs::EngineFramerateFixingResetProperties()
+{
+    g_pMultiplayer->FramerateFixingResetPhysicsTimeStep();
+}
+
+void CLuaEngineDefs::EngineFramerateFixingSetProperty(FramerateFixingProperty propertyName, float timestep)
+{
+    switch (propertyName)
+    {
+        case FramerateFixingProperty::FFP_VEHICLE_PHYSICS:
+            g_pMultiplayer->FramerateFixingSetPhysicsTimeStep(timestep);
+            break;
+    }
+}
+
+std::variant <bool, float> CLuaEngineDefs::EngineFramerateFixingGetProperty(FramerateFixingProperty propertyName)
+{
+    switch (propertyName)
+    {
+        case FramerateFixingProperty::FFP_VEHICLE_PHYSICS:
+            return g_pMultiplayer->FramerateFixingGetPhysicsTimeStep();
+    }
+    return false;
 }
