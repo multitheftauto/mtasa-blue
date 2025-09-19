@@ -11,7 +11,9 @@
 
 #include "StdInc.h"
 
-namespace mta::memory
+namespace mta
+{
+namespace memory
 {
     constexpr bool is_power_of_two(std::size_t value) noexcept
     {
@@ -22,7 +24,7 @@ namespace mta::memory
 
     // Safe aligned memory allocation replacement for CMemoryMgr::MallocAlign
     // Must match original GTA:SA behavior exactly - stores original pointer at result-4
-    [[nodiscard]] void* SafeMallocAlign(std::size_t size, std::size_t alignment) noexcept
+    void* SafeMallocAlign(std::size_t size, std::size_t alignment) noexcept
     {
         // Validate alignment FIRST to prevent undefined behavior in calculations
         if (alignment == 0 || !is_power_of_two(alignment) || alignment > 8192)
@@ -116,7 +118,7 @@ namespace mta::memory
     }
 
     // VirtualAlloc implementation for large allocations
-    [[nodiscard]] void* SafeMallocAlignVirtual(std::size_t size, std::size_t alignment) noexcept
+    void* SafeMallocAlignVirtual(std::size_t size, std::size_t alignment) noexcept
     {
         // Validate parameters first to prevent undefined behavior
         if (alignment == 0 || !is_power_of_two(alignment) || alignment > 8192)
@@ -282,7 +284,7 @@ namespace mta::memory
             // Ignore exceptions in free - standard behavior
         }
     }
-}            // namespace mta::memory
+}            // namespace mta
 
 // Hook constants
 #define HOOKPOS_CMemoryMgr_MallocAlign  0x72F4C0
