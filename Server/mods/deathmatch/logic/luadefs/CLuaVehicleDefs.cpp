@@ -48,6 +48,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleCompatibleUpgrades", GetVehicleCompatibleUpgrades},
         {"getVehicleDoorState", GetVehicleDoorState},
         {"getVehicleWheelStates", GetVehicleWheelStates},
+        {"getVehicleWheelState", ArgumentParser<GetVehicleWheelState>},
         {"getVehicleLightState", GetVehicleLightState},
         {"getVehiclePanelState", GetVehiclePanelState},
         {"getVehicleOverrideLights", GetVehicleOverrideLights},
@@ -202,6 +203,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getUpgrades", "getVehicleUpgrades");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
+    lua_classfunction(luaVM, "getWheelState", "getVehicleWheelState");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getHandling", "getVehicleHandling");
     lua_classfunction(luaVM, "getRespawnPosition", "getVehicleRespawnPosition");
@@ -1318,6 +1320,16 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<unsigned char, bool> CLuaVehicleDefs::GetVehicleWheelState(CVehicle* vehicle, unsigned char wheelIndex)
+{
+    unsigned char wheelState
+    if (CStaticFunctionDefinitions::GetVehicleWheelState(vehicle, wheelIndex, wheelState))
+    {
+        return wheelState;
+    }
+    return false;
 }
 
 int CLuaVehicleDefs::GetVehicleLightState(lua_State* luaVM)
