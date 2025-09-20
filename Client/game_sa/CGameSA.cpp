@@ -1209,3 +1209,25 @@ CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsign
 
     return nullptr;
 }
+
+bool CGameSA::IsVehicleWheelAlignmentOnExitEnabled() const noexcept
+{
+    return *(std::uint8_t*)0x6B5579 == 0x89;
+}
+
+void CGameSA::SetVehicleWheelAlignmentOnExitEnabled(bool enabled) noexcept
+{
+    if (IsVehicleWheelAlignmentOnExitEnabled() == enabled)
+        return;
+
+    if (!enabled)
+    {
+        MemSet((void*)0x6B5579, 0x90, 6);
+        MemSet((void*)0x6B568A, 0x90, 6);
+    }
+    else
+    {
+        MemCpy((void*)0x6B5579, "\x89\xBE\x94\x04\x00\x00", 6);
+        MemCpy((void*)0x6B568A, "\x89\xBE\x94\x04\x00\x00", 6);
+    }
+}

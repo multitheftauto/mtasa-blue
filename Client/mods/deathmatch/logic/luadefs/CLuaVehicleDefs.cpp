@@ -100,6 +100,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleRotorState", ArgumentParser<GetVehicleRotorState>},
         {"getVehicleModelAudioSettings", ArgumentParser<GetVehicleModelAudioSettings>},
         {"getVehicleAudioSettings", ArgumentParser<GetVehicleAudioSettings>},
+        {"isVehicleWheelAlignmentOnExitEnabled", ArgumentParser<IsVehicleWheelAlignmentOnExitEnabled>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -172,6 +173,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"resetVehicleModelAudioSettings", ArgumentParser<ResetVehicleModelAudioSettings>},
         {"setVehicleAudioSetting", ArgumentParser<SetVehicleAudioSetting>},
         {"resetVehicleAudioSettings", ArgumentParser<ResetVehicleAudioSettings>},
+        {"setVehicleWheelAlignmentOnExitEnabled", ArgumentParser<SetVehicleWheelAlignmentOnExitEnabled>},
     };
 
     // Add functions
@@ -4700,5 +4702,15 @@ std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleAudioSettings(
     output["horn-volume-delta"] = pEntry.GetHornVolumeDelta();
 
     return output;
+}
+
+bool CLuaVehicleDefs::IsVehicleWheelAlignmentOnExitEnabled() noexcept
+{
+    return g_pGame->IsVehicleWheelAlignmentOnExitEnabled();
+}
+
+void CLuaVehicleDefs::SetVehicleWheelAlignmentOnExitEnabled(bool enabled) noexcept
+{
+    g_pGame->SetVehicleWheelAlignmentOnExitEnabled(enabled);
 }
 

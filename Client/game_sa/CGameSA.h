@@ -322,6 +322,9 @@ public:
 
     bool SetBuildingPoolSize(size_t size);
 
+    bool IsVehicleWheelAlignmentOnExitEnabled() const noexcept override;
+    void SetVehicleWheelAlignmentOnExitEnabled(bool enabled) noexcept override;
+
 private:
     std::unique_ptr<CPools>           m_Pools;
     CPlayerInfo*                      m_pPlayerInfo;

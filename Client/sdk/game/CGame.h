@@ -287,5 +287,7 @@ public:
     virtual void RestoreGameWorld() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
-
+    
+    virtual bool IsVehicleWheelAlignmentOnExitEnabled() const noexcept = 0;
+    virtual void SetVehicleWheelAlignmentOnExitEnabled(bool enabled) noexcept = 0;
 };

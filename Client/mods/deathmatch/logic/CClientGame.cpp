@@ -3466,6 +3466,8 @@ void CClientGame::Event_OnIngame()
     // Reset weapon render
     g_pGame->SetWeaponRenderEnabled(true);
 
+    g_pGame->SetVehicleWheelAlignmentOnExitEnabled(true);
+
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
 
