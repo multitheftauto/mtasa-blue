@@ -335,8 +335,6 @@ public:
 
 public:
     static std::list<CResource*> m_StartedResources;
-
-protected:
     SString             GetAutoGroupName();
     SString             GetAutoAclName();
     CAccessControlList* GetAutoAcl();
@@ -349,8 +347,7 @@ protected:
     void CommitAclRequest(const SAclRequest& request);
     bool FindAclRequest(SAclRequest& result);
 
-    std::string CalculateACLRequestFingerprint();
-    bool        HasACLRequestsChanged();
+protected:
 
 private:
     bool CheckState();            // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
@@ -453,7 +450,6 @@ private:
     SString     m_strMinServerReason;
 
     CChecksum m_metaChecksum;            // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
-    std::string m_strACLRequestFingerprint;
 
     uint                              m_uiFunctionRightCacheRevision = 0;
     CFastHashMap<lua_CFunction, bool> m_FunctionRightCacheMap;
