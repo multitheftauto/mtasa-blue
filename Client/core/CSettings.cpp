@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <algorithm>
-#include <vector>
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
 #include <game/CSettings.h>
@@ -1149,6 +1147,7 @@ void CSettings::CreateGUI()
     m_pDebugSettingCombo->AddItem("#0000 Lua trace")->SetData((void*)EDiagnosticDebug::LUA_TRACE_0000);
     m_pDebugSettingCombo->AddItem("#0000 Resize always")->SetData((void*)EDiagnosticDebug::RESIZE_ALWAYS_0000);
     m_pDebugSettingCombo->AddItem("#0000 Resize never")->SetData((void*)EDiagnosticDebug::RESIZE_NEVER_0000);
+    m_pDebugSettingCombo->AddItem("#0000 Memory allocation debug")->SetData((void*)EDiagnosticDebug::BAD_ALLOC);
     m_pDebugSettingCombo->SetReadOnly(true);
     vecTemp.fY += fLineHeight;
 
@@ -1694,15 +1693,6 @@ void CSettings::UpdateVideoTab()
     m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
-struct ResolutionData
-{
-    int width;
-    int height;
-    int depth;
-    int vidMode;
-    bool isWidescreen;
-};
-
 //
 // PopulateResolutionComboBox
 //
@@ -1716,86 +1706,47 @@ void CSettings::PopulateResolutionComboBox()
     bool bShowUnsafeResolutions = m_pCheckBoxShowUnsafeResolutions->GetSelected();
 
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
-    if (!gameSettings)
-        return;
 
     VideoMode vidModemInfo;
     int       vidMode, numVidModes;
-    std::vector<ResolutionData> resolutions;
 
-    if (!m_pComboResolution)
-        return;
-        
     m_pComboResolution->Clear();
     numVidModes = gameSettings->GetNumVideoModes();
 
     for (vidMode = 0; vidMode < numVidModes; vidMode++)
     {
-        if (!gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode))
-            continue;
+        gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
 
         // Remove resolutions that will make the gui unusable
         if (vidModemInfo.width < 640 || vidModemInfo.height < 480)
+            continue;
+
+        // Check resolution hasn't already been added
+        bool bDuplicate = false;
+        for (int i = 1; i < vidMode; i++)
+        {
+            VideoMode info;
+            gameSettings->GetVideoModeInfo(&info, i);
+            if (info.width == vidModemInfo.width && info.height == vidModemInfo.height && info.depth == vidModemInfo.depth)
+                bDuplicate = true;
+        }
+        if (bDuplicate)
             continue;
 
         // Check resolution is below desktop res unless that is allowed
         if (gameSettings->IsUnsafeResolution(vidModemInfo.width, vidModemInfo.height) && !bShowUnsafeResolutions)
             continue;
 
-        if (!(vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE))
-            continue;
+        SString strMode("%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth);
 
-        ResolutionData resData;
-        resData.width = vidModemInfo.width;
-        resData.height = vidModemInfo.height;
-        resData.depth = vidModemInfo.depth;
-        resData.vidMode = vidMode;
-        resData.isWidescreen = (vidModemInfo.flags & rwVIDEOMODE_XBOX_WIDESCREEN) != 0;
+        if (vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE)
+            m_pComboResolution->AddItem(strMode)->SetData((void*)vidMode);
 
-        // Check resolution hasn't already been added
-        bool bDuplicate = false;
-        for (const auto& existing : resolutions)
-        {
-            if (existing.width == resData.width && existing.height == resData.height && existing.depth == resData.depth)
-            {
-                bDuplicate = true;
-                break;
-            }
-        }
-        
-        if (!bDuplicate)
-            resolutions.push_back(resData);
-    }
+        VideoMode currentInfo;
+        gameSettings->GetVideoModeInfo(&currentInfo, iNextVidMode);
 
-    if (resolutions.empty())
-        return;
-
-    // Sort resolutions by width (descending), then by height, then by depth
-    std::sort(resolutions.begin(), resolutions.end(), [](const ResolutionData& a, const ResolutionData& b) {
-        if (a.width != b.width)
-            return a.width > b.width;
-        if (a.height != b.height)
-            return a.height > b.height;
-        return a.depth > b.depth;
-    });
-
-    SString selectedText;
-    VideoMode currentInfo;
-    if (gameSettings->GetVideoModeInfo(&currentInfo, iNextVidMode))
-    {
-        for (const auto& res : resolutions)
-        {
-            SString strMode("%d x %d x %d", res.width, res.height, res.depth);
-            CGUIListItem* pItem = m_pComboResolution->AddItem(strMode);
-            if (pItem)
-                pItem->SetData((void*)res.vidMode);
-
-            if (currentInfo.width == res.width && currentInfo.height == res.height && currentInfo.depth == res.depth)
-                selectedText = strMode;
-        }
-
-        if (!selectedText.empty())
-            m_pComboResolution->SetText(selectedText);
+        if (currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth)
+            m_pComboResolution->SetText(strMode);
     }
 }
 
