@@ -1773,6 +1773,8 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
                     return "#0000 Resize always";
                 case EDiagnosticDebug::RESIZE_NEVER_0000:
                     return "#0000 Resize never";
+                case EDiagnosticDebug::BAD_ALLOC:
+                    return "#0000 Memory allocation debug";
                 default:
                     return "Default";
             }
