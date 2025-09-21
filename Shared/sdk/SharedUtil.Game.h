@@ -90,25 +90,6 @@ namespace SharedUtil
         bool   bInsideBuilding;
     };
 
-    namespace EDiagnosticDebug
-    {
-        enum EDiagnosticDebugType
-        {
-            NONE,
-            GRAPHICS_6734,
-            BIDI_6778,
-            D3D_6732,
-            LOG_TIMING_0000,
-            JOYSTICK_0000,
-            LUA_TRACE_0000,
-            RESIZE_ALWAYS_0000,
-            RESIZE_NEVER_0000,
-            MAX,
-        };
-    };
-
-    using EDiagnosticDebug::EDiagnosticDebugType;
-
     // Common strings for SetApplicationSetting
     #define DIAG_PRELOAD_UPGRADES_SLOW          "diagnostics", "preloading-upgrades-slow"
     #define DIAG_PRELOAD_UPGRADE_ATTEMPT_ID     "diagnostics", "preloading-upgrade-attempt-id"
@@ -132,4 +113,25 @@ namespace SharedUtil
     #define WD_COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME       "CR1"               // Counts consecutive crashes before the online game starts
     #define WD_COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN    "CR2"               // Counts consecutive crashes before the loading screen is shown
     #define WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU    "CR3"               // Counts consecutive crashes before the main menu is used
+
+    // Diagnostic debugging types for advanced debugging features
+    namespace EDiagnosticDebug
+    {
+        enum EDiagnosticDebugType
+        {
+            NONE = 0,
+            GRAPHICS_6734,
+            BIDI_6778,
+            D3D_6732,
+            LOG_TIMING_0000,
+            JOYSTICK_0000,
+            LUA_TRACE_0000,
+            RESIZE_ALWAYS_0000,
+            RESIZE_NEVER_0000,
+            BAD_ALLOC,            // Memory allocation failure debugging
+            MAX,                  // Keep this as the last item for combo box sizing
+        };
+    }
+    using EDiagnosticDebug::EDiagnosticDebugType;
+
 }            // namespace SharedUtil
