@@ -26,7 +26,6 @@
 #include "CDiscordInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
-#include "SharedUtil.Game.h"
 
 typedef bool (*pfnProcessMessage)(HWND, UINT, WPARAM, LPARAM);
 
