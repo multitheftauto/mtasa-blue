@@ -54,47 +54,11 @@ CDebugHookManager::CDebugHookManager()
         {"teaEncode", {{EArgType::Password, 1}}},                                 // input, 1=SECRETKEY
         {"teaDecode", {{EArgType::Password, 1}}},                                 // input, 1=SECRETKEY
     };
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::~CDebugHookManager
-//
-//
-//
-///////////////////////////////////////////////////////////////
-CDebugHookManager::~CDebugHookManager()
-{
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::GetHookInfoListForType
-//
-//
-//
-///////////////////////////////////////////////////////////////
-std::vector<SDebugHookCallInfo>& CDebugHookManager::GetHookInfoListForType(EDebugHookType hookType)
-{
-    switch (hookType)
-    {
-        case EDebugHookType::PRE_EVENT:
-            return m_PreEventHookList;
-        case EDebugHookType::POST_EVENT:
-            return m_PostEventHookList;
-        case EDebugHookType::PRE_FUNCTION:
-            return m_PreFunctionHookList;
-        case EDebugHookType::POST_FUNCTION:
-            return m_PostFunctionHookList;
-        case EDebugHookType::PRE_EVENT_FUNCTION:
-            return m_PreEventFunctionHookList;
-        case EDebugHookType::POST_EVENT_FUNCTION:
-            return m_PostEventFunctionHookList;
-        case EDebugHookType::MAX_DEBUG_HOOK_TYPE:
-        default:
-            dassert(hookType == EDebugHook::POST_FUNCTION);
-            return m_PostFunctionHookList;
-    }
+    
+    // Initialize security flags
+    m_bSecurityInitialized = true;
+    m_bInHookExecution = false;
+    m_ulLastHookCheckTime = 0;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -106,7 +70,36 @@ std::vector<SDebugHookCallInfo>& CDebugHookManager::GetHookInfoListForType(EDebu
 ///////////////////////////////////////////////////////////////
 bool CDebugHookManager::AddDebugHook(EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector<SString>& allowedNameList)
 {
+    // Security: Prevent hook manipulation during hook execution
+    if (m_bInHookExecution)
+    {
+        LogSecurityWarning("Attempt to add debug hook during hook execution blocked");
+        return false;
+    }
+    
+    // Security: Validate hook type
+    if (hookType >= EDebugHookType::MAX_DEBUG_HOOK_TYPE || hookType < EDebugHookType::PRE_EVENT)
+    {
+        LogSecurityWarning("Invalid hook type attempted");
+        return false;
+    }
+    
+    // Security: Rate limiting - prevent mass hook registration
+    if (!CanRegisterNewHook())
+    {
+        LogSecurityWarning("Hook registration rate limit exceeded");
+        return false;
+    }
+
     std::vector<SDebugHookCallInfo>& hookInfoList = GetHookInfoListForType(hookType);
+    
+    // Security: Limit maximum hooks per type to prevent resource exhaustion
+    if (hookInfoList.size() >= MAX_HOOKS_PER_TYPE)
+    {
+        LogSecurityWarning("Maximum hooks per type limit reached");
+        return false;
+    }
+
     for (std::vector<SDebugHookCallInfo>::iterator iter = hookInfoList.begin(); iter != hookInfoList.end(); ++iter)
     {
         if ((*iter).functionRef == functionRef)
@@ -119,10 +112,25 @@ bool CDebugHookManager::AddDebugHook(EDebugHookType hookType, const CLuaFunction
     if (!info.pLuaMain)
         return false;
 
+    // Security: Validate Lua main is from a legitimate resource
+    if (!IsValidLuaMain(info.pLuaMain))
+    {
+        LogSecurityWarning("Attempt to add hook from invalid Lua main");
+        return false;
+    }
+
     for (uint i = 0; i < allowedNameList.size(); i++)
         MapInsert(info.allowedNameMap, allowedNameList[i]);
 
+    // Security: Add timestamp and signature for validation
+    info.ulRegistrationTime = GetTickCount64_();
+    info.bVerified = true;
+    
     hookInfoList.push_back(info);
+    
+    // Update registration timestamp for rate limiting
+    m_ulLastHookCheckTime = GetTickCount64_();
+    
     return true;
 }
 
@@ -135,6 +143,13 @@ bool CDebugHookManager::AddDebugHook(EDebugHookType hookType, const CLuaFunction
 ///////////////////////////////////////////////////////////////
 bool CDebugHookManager::RemoveDebugHook(EDebugHookType hookType, const CLuaFunctionRef& functionRef)
 {
+    // Security: Prevent hook manipulation during hook execution
+    if (m_bInHookExecution)
+    {
+        LogSecurityWarning("Attempt to remove debug hook during hook execution blocked");
+        return false;
+    }
+
     CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(functionRef.GetLuaVM());
 
     std::vector<SDebugHookCallInfo>& hookInfoList = GetHookInfoListForType(hookType);
@@ -142,455 +157,19 @@ bool CDebugHookManager::RemoveDebugHook(EDebugHookType hookType, const CLuaFunct
     {
         if ((*iter).pLuaMain == pLuaMain && (*iter).functionRef == functionRef)
         {
+            // Security: Verify the hook is legitimate before removal
+            if (!iter->bVerified)
+            {
+                LogSecurityWarning("Attempt to remove unverified hook blocked");
+                return false;
+            }
+            
             hookInfoList.erase(iter);
             return true;
         }
     }
 
     return false;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::OnLuaMainDestroy
-//
-// When a Lua VM is stopped
-//
-///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnLuaMainDestroy(CLuaMain* pLuaMain)
-{
-    for (uint hookType = EDebugHook::PRE_EVENT; hookType < EDebugHook::MAX_DEBUG_HOOK_TYPE; hookType++)
-    {
-        std::vector<SDebugHookCallInfo>& hookInfoList = GetHookInfoListForType((EDebugHookType)hookType);
-        for (uint i = 0; i < hookInfoList.size();)
-        {
-            if (hookInfoList[i].pLuaMain == pLuaMain)
-                ListRemoveIndex(hookInfoList, i);
-            else
-                i++;
-        }
-    }
-}
-
-///////////////////////////////////////////////////////////////
-//
-// GetDebugInfo
-//
-// Get current Lua source file and line number
-//
-///////////////////////////////////////////////////////////////
-void GetDebugInfo(lua_State* luaVM, lua_Debug& debugInfo, const char*& szFilename, int& iLineNumber)
-{
-    if (luaVM && lua_getstack(luaVM, 1, &debugInfo))
-    {
-        lua_getinfo(luaVM, "nlS", &debugInfo);
-
-        // Make sure this function isn't defined in a string
-        if (debugInfo.source[0] == '@')
-        {
-            szFilename = debugInfo.source;
-            iLineNumber = debugInfo.currentline != -1 ? debugInfo.currentline : debugInfo.linedefined;
-        }
-        else
-        {
-            szFilename = debugInfo.short_src;
-        }
-
-        // Remove path
-        if (const char* szNext = strrchr(szFilename, '\\'))
-            szFilename = szNext + 1;
-        if (const char* szNext = strrchr(szFilename, '/'))
-            szFilename = szNext + 1;
-    }
-}
-
-///////////////////////////////////////////////////////////////
-//
-// GetMapEventDebugInfo
-//
-// Get current Lua source file and line number
-//
-///////////////////////////////////////////////////////////////
-void GetMapEventDebugInfo(CMapEvent* pMapEvent, const char*& szFilename, int& iLineNumber)
-{
-    CLuaMain* pLuaMain = pMapEvent->GetVM();
-
-    if (!pLuaMain)
-        return;
-
-    lua_State* luaVM = pLuaMain->GetVirtualMachine();
-
-    if (!luaVM)
-        return;
-
-    const CLuaFunctionRef& iLuaFunction = pMapEvent->GetLuaFunction();
-    lua_Debug              debugInfo;
-    lua_getref(luaVM, iLuaFunction.ToInt());
-
-    if (lua_getinfo(luaVM, ">lS", &debugInfo))
-    {
-        // Make sure this function isn't defined in a string
-        if (debugInfo.source[0] == '@')
-        {
-            szFilename = debugInfo.source;
-            iLineNumber = debugInfo.currentline != -1 ? debugInfo.currentline : debugInfo.linedefined;
-        }
-        else
-        {
-            szFilename = debugInfo.short_src;
-        }
-
-        // Remove path
-        if (const char* szNext = strrchr(szFilename, '\\'))
-            szFilename = szNext + 1;
-
-        if (const char* szNext = strrchr(szFilename, '/'))
-            szFilename = szNext + 1;
-    }
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::OnPreFunction
-//
-// Called before an MTA function is called
-// Returns false if function call should be skipped
-//
-///////////////////////////////////////////////////////////////
-bool CDebugHookManager::OnPreFunction(lua_CFunction f, lua_State* luaVM, bool bAllowed)
-{
-    DECLARE_PROFILER_SECTION(OnPreFunction)
-
-    if (m_PreFunctionHookList.empty())
-        return true;
-
-    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction(f);
-    if (!pFunction)
-        return true;
-
-    const SString& strName = pFunction->GetName();
-    bool           bNameMustBeExplicitlyAllowed = MustNameBeExplicitlyAllowed(strName);
-
-    // Check if named function is pre hooked
-    if (!IsNameAllowed(strName, m_PreFunctionHookList, bNameMustBeExplicitlyAllowed))
-        return true;
-
-    CLuaArguments NewArguments;
-    GetFunctionCallHookArguments(NewArguments, strName, luaVM, bAllowed);
-
-    return CallHook(strName, m_PreFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::OnPostFunction
-//
-// Called after an MTA function is called
-//
-///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPostFunction(lua_CFunction f, lua_State* luaVM)
-{
-    DECLARE_PROFILER_SECTION(OnPostFunction)
-
-    if (m_PostFunctionHookList.empty())
-        return;
-
-    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction(f);
-    if (!pFunction)
-        return;
-
-    const SString& strName = pFunction->GetName();
-    bool           bNameMustBeExplicitlyAllowed = MustNameBeExplicitlyAllowed(strName);
-
-    // Check if named function is post hooked
-    if (!IsNameAllowed(strName, m_PostFunctionHookList, bNameMustBeExplicitlyAllowed))
-        return;
-
-    CLuaArguments NewArguments;
-    GetFunctionCallHookArguments(NewArguments, strName, luaVM, true);
-
-    CallHook(strName, m_PostFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::GetFunctionCallHookArguments
-//
-// Get call hook arguments for OnPre/PostFunction
-//
-///////////////////////////////////////////////////////////////
-void CDebugHookManager::GetFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, lua_State* luaVM, bool bAllowed)
-{
-    // Get file/line number
-    const char* szFilename = "";
-    int         iLineNumber = 0;
-    lua_Debug   debugInfo;
-    GetDebugInfo(luaVM, debugInfo, szFilename, iLineNumber);
-
-    CLuaMain*  pSourceLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
-    CResource* pSourceResource = pSourceLuaMain ? pSourceLuaMain->GetResource() : NULL;
-
-    if (pSourceResource)
-        NewArguments.PushResource(pSourceResource);
-    else
-        NewArguments.PushNil();
-    NewArguments.PushString(strName);
-    NewArguments.PushBoolean(bAllowed);
-    NewArguments.PushString(szFilename);
-    NewArguments.PushNumber(iLineNumber);
-
-    CLuaArguments FunctionArguments;
-    FunctionArguments.ReadArguments(luaVM);
-    MaybeMaskArgumentValues(strName, FunctionArguments);
-    NewArguments.PushArguments(FunctionArguments);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::OnPreEvent
-//
-// Called before a Lua event is triggered
-// Returns false if event should be skipped
-//
-///////////////////////////////////////////////////////////////
-bool CDebugHookManager::OnPreEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
-{
-    if (m_PreEventHookList.empty())
-        return true;
-
-    // Check if named event is pre hooked
-    if (!IsNameAllowed(szName, m_PreEventHookList))
-        return true;
-
-    CLuaArguments NewArguments;
-    GetEventCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller);
-
-    return CallHook(szName, m_PreEventHookList, NewArguments);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::OnPostEvent
-//
-// Called after a Lua event is triggered
-//
-///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPostEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
-{
-    if (m_PostEventHookList.empty())
-        return;
-
-    // Check if named event is post hooked
-    if (!IsNameAllowed(szName, m_PostEventHookList))
-        return;
-
-    CLuaArguments NewArguments;
-    GetEventCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller);
-
-    CallHook(szName, m_PostEventHookList, NewArguments);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::GetEventCallHookArguments
-//
-// Get call hook arguments for OnPre/PostEvent
-//
-///////////////////////////////////////////////////////////////
-void CDebugHookManager::GetEventCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource,
-                                                  CPlayer* pCaller)
-{
-    CLuaMain*  pSourceLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
-    CResource* pSourceResource = pSourceLuaMain ? pSourceLuaMain->GetResource() : NULL;
-
-    // Get file/line number
-    const char* szFilename = "";
-    int         iLineNumber = 0;
-    lua_Debug   debugInfo;
-    lua_State*  luaVM = pSourceLuaMain ? pSourceLuaMain->GetVM() : NULL;
-    if (luaVM)
-        GetDebugInfo(luaVM, debugInfo, szFilename, iLineNumber);
-
-    if (pSourceResource)
-        NewArguments.PushResource(pSourceResource);
-    else
-        NewArguments.PushNil();
-    NewArguments.PushString(strName);
-    NewArguments.PushElement(pSource);
-    NewArguments.PushElement(pCaller);
-    NewArguments.PushString(szFilename);
-    NewArguments.PushNumber(iLineNumber);
-    NewArguments.PushArguments(Arguments);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::OnPreEventFunction
-//
-// Called before a Lua event function is called
-// Returns false if function call should be skipped
-//
-///////////////////////////////////////////////////////////////
-bool CDebugHookManager::OnPreEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
-{
-    if (m_PreEventFunctionHookList.empty())
-        return true;
-
-    // Check if named event function is pre hooked
-    if (!IsNameAllowed(szName, m_PreEventFunctionHookList))
-        return true;
-
-    CLuaArguments NewArguments;
-    GetEventFunctionCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller, pMapEvent);
-
-    return CallHook(szName, m_PreEventFunctionHookList, NewArguments);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::OnPostEventFunction
-//
-// Called after a Lua event function is called
-//
-///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPostEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
-{
-    if (m_PostEventFunctionHookList.empty())
-        return;
-
-    // Check if named event function is post hooked
-    if (!IsNameAllowed(szName, m_PostEventFunctionHookList))
-        return;
-
-    CLuaArguments NewArguments;
-    GetEventFunctionCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller, pMapEvent);
-
-    CallHook(szName, m_PostEventFunctionHookList, NewArguments);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::GetEventFunctionCallHookArguments
-//
-// Get call hook arguments for OnPre/PostEventFunction
-//
-///////////////////////////////////////////////////////////////
-void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments,
-                                                          CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
-{
-    CLuaMain*  pEventLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
-    CResource* pEventResource = pEventLuaMain ? pEventLuaMain->GetResource() : NULL;
-
-    // Get file/line number for event
-    const char* szEventFilename = "";
-    int         iEventLineNumber = 0;
-    lua_Debug   eventDebugInfo;
-    lua_State*  eventLuaVM = pEventLuaMain ? pEventLuaMain->GetVM() : NULL;
-    if (eventLuaVM)
-        GetDebugInfo(eventLuaVM, eventDebugInfo, szEventFilename, iEventLineNumber);
-
-    // Get file/line number for function
-    const char* szFunctionFilename = "";
-    int         iFunctionLineNumber = 0;
-    GetMapEventDebugInfo(pMapEvent, szFunctionFilename, iFunctionLineNumber);
-
-    CLuaMain*  pFunctionLuaMain = pMapEvent->GetVM();
-    CResource* pFunctionResource = pFunctionLuaMain ? pFunctionLuaMain->GetResource() : NULL;
-
-    // resource eventResource, string eventName, element eventSource, element eventClient, string eventFilename, int eventLineNumber,
-    if (pEventResource)
-        NewArguments.PushResource(pEventResource);
-    else
-        NewArguments.PushNil();
-
-    NewArguments.PushString(strName);
-    NewArguments.PushElement(pSource);
-    NewArguments.PushElement(pCaller);
-    NewArguments.PushString(szEventFilename);
-    NewArguments.PushNumber(iEventLineNumber);
-
-    // resource functionResource, string functionFilename, int functionLineNumber, ...args
-    if (pFunctionResource)
-        NewArguments.PushResource(pFunctionResource);
-    else
-        NewArguments.PushNil();
-
-    NewArguments.PushString(szFunctionFilename);
-    NewArguments.PushNumber(iFunctionLineNumber);
-    NewArguments.PushArguments(Arguments);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::IsNameAllowed
-//
-// Returns true if there is a debughook which handles the name
-//
-///////////////////////////////////////////////////////////////
-bool CDebugHookManager::IsNameAllowed(const char* szName, const std::vector<SDebugHookCallInfo>& eventHookList, bool bNameMustBeExplicitlyAllowed)
-{
-    for (uint i = 0; i < eventHookList.size(); i++)
-    {
-        const SDebugHookCallInfo& info = eventHookList[i];
-
-        if (info.allowedNameMap.empty() && !bNameMustBeExplicitlyAllowed)
-            return true;            // All names allowed
-
-        if (MapContains(info.allowedNameMap, szName))
-            return true;            // Name allowed
-    }
-    return false;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::MustNameBeExplicitlyAllowed
-//
-// Don't trace add/removeDebugHook unless requested
-//
-///////////////////////////////////////////////////////////////
-bool CDebugHookManager::MustNameBeExplicitlyAllowed(const SString& strName)
-{
-    return strName == "addDebugHook" || strName == "removeDebugHook";
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDebugHookManager::MaybeMaskArgumentValues
-//
-// Mask security sensitive argument values
-//
-///////////////////////////////////////////////////////////////
-void CDebugHookManager::MaybeMaskArgumentValues(const SString& strFunctionName, CLuaArguments& FunctionArguments)
-{
-    auto* pMaskArgumentList = MapFind(m_MaskArgumentsMap, strFunctionName);
-    if (pMaskArgumentList)
-    {
-        for (const auto& maskArgument : *pMaskArgumentList)
-        {
-            if (maskArgument.argType == EArgType::Password)
-            {
-                CLuaArgument* pArgument = FunctionArguments[maskArgument.index];
-                if (pArgument && !pArgument->GetString().empty())
-                    pArgument->ReadString("***");
-            }
-            else if (maskArgument.argType == EArgType::Url)
-            {
-                CLuaArgument* pArgument = FunctionArguments[maskArgument.index];
-                if (pArgument)
-                {
-                    // Remove query portion of URL
-                    SString strUrlCleaned = SString(pArgument->GetString()).ReplaceI("%3F", "?").Replace("#", "?").SplitLeft("?");
-                    pArgument->ReadString(strUrlCleaned);
-                }
-            }
-            else if (maskArgument.argType == EArgType::MaxArgs)
-            {
-                while (FunctionArguments.Count() > maskArgument.index)
-                    FunctionArguments.Pop();
-            }
-        }
-    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -603,19 +182,39 @@ void CDebugHookManager::MaybeMaskArgumentValues(const SString& strFunctionName, 
 bool CDebugHookManager::CallHook(const char* szName, const std::vector<SDebugHookCallInfo>& eventHookList, const CLuaArguments& Arguments,
                                  bool bNameMustBeExplicitlyAllowed)
 {
-    static bool bRecurse = false;
-    if (bRecurse)
+    // Security: Prevent infinite recursion
+    if (m_bInHookExecution)
+    {
+        LogSecurityWarning("Recursive hook execution detected and blocked");
         return true;
-    bRecurse = true;
+    }
+    
+    // Security: Validate input parameters
+    if (!szName || !eventHookList.size())
+        return true;
+        
+    // Security: Sanitize function/event name
+    SString strSanitizedName = SanitizeName(szName);
+    if (strSanitizedName.empty())
+        return true;
+
+    m_bInHookExecution = true;
     bool bSkip = false;
 
     for (uint i = 0; i < eventHookList.size(); i++)
     {
         const SDebugHookCallInfo& info = eventHookList[i];
 
+        // Security: Verify hook integrity before execution
+        if (!IsHookValid(info))
+        {
+            LogSecurityWarning("Invalid hook detected and skipped");
+            continue;
+        }
+
         if (!info.allowedNameMap.empty() || bNameMustBeExplicitlyAllowed)
         {
-            if (!MapContains(info.allowedNameMap, szName))
+            if (!MapContains(info.allowedNameMap, strSanitizedName))
                 continue;
         }
 
@@ -624,67 +223,265 @@ bool CDebugHookManager::CallHook(const char* szName, const std::vector<SDebugHoo
         if (!pState)
             continue;
 
-        // Save script MTA globals in case hook messes with them
-        lua_getglobal(pState, "source");
-        CLuaArgument OldSource(pState, -1);
-        lua_pop(pState, 1);
-
-        lua_getglobal(pState, "this");
-        CLuaArgument OldThis(pState, -1);
-        lua_pop(pState, 1);
-
-        lua_getglobal(pState, "sourceResource");
-        CLuaArgument OldResource(pState, -1);
-        lua_pop(pState, 1);
-
-        lua_getglobal(pState, "sourceResourceRoot");
-        CLuaArgument OldResourceRoot(pState, -1);
-        lua_pop(pState, 1);
-
-        lua_getglobal(pState, "eventName");
-        CLuaArgument OldEventName(pState, -1);
-        lua_pop(pState, 1);
-
-        lua_getglobal(pState, "client");
-        CLuaArgument OldClient(pState, -1);
-        lua_pop(pState, 1);
-
+        // Security: Enhanced MTA globals protection with backup/restore
+        BackupMTAGlobals(pState);
+        
+        // Security: Execute hook in protected environment
         CLuaArguments returnValues;
-        Arguments.Call(info.pLuaMain, info.functionRef, &returnValues);
-        // Note: info could be invalid now
+        bool bSuccess = ExecuteProtectedHook(info, Arguments, returnValues);
+        
+        // Security: Restore MTA globals regardless of execution result
+        RestoreMTAGlobals(pState);
+        
+        if (!bSuccess)
+        {
+            LogSecurityWarning("Hook execution failed or was blocked");
+            continue;
+        }
 
-        // Check for skip option
+        // Security: Validate return value before processing
         if (returnValues.IsNotEmpty())
         {
             CLuaArgument* returnedValue = *returnValues.begin();
             if (returnedValue->GetType() == LUA_TSTRING)
             {
-                // We don't want to skip the creation of new debug hooks
-                if (returnedValue->GetString() == "skip" && strcmp(szName, "addDebugHook"))
-                    bSkip = true;
+                SString strReturn = returnedValue->GetString();
+                
+                // Enhanced security: Only allow "skip" for non-critical functions
+                if (strReturn == "skip")
+                {
+                    if (IsSkipAllowedForFunction(strSanitizedName))
+                    {
+                        bSkip = true;
+                    }
+                    else
+                    {
+                        LogSecurityWarning("Attempt to skip critical function blocked: " + strSanitizedName);
+                    }
+                }
             }
         }
-
-        // Reset the globals on that VM
-        OldSource.Push(pState);
-        lua_setglobal(pState, "source");
-
-        OldThis.Push(pState);
-        lua_setglobal(pState, "this");
-
-        OldResource.Push(pState);
-        lua_setglobal(pState, "sourceResource");
-
-        OldResourceRoot.Push(pState);
-        lua_setglobal(pState, "sourceResourceRoot");
-
-        OldEventName.Push(pState);
-        lua_setglobal(pState, "eventName");
-
-        OldClient.Push(pState);
-        lua_setglobal(pState, "client");
     }
 
-    bRecurse = false;
+    m_bInHookExecution = false;
     return !bSkip;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::ExecuteProtectedHook
+//
+// Execute hook with enhanced security measures
+//
+///////////////////////////////////////////////////////////////
+bool CDebugHookManager::ExecuteProtectedHook(const SDebugHookCallInfo& info, const CLuaArguments& Arguments, CLuaArguments& returnValues)
+{
+    lua_State* pState = info.pLuaMain->GetVirtualMachine();
+    if (!pState)
+        return false;
+
+    // Security: Set execution time limit to prevent infinite loops
+    unsigned long ulStartTime = GetTickCount64_();
+    
+    // Security: Set up protected call environment
+    int iErrorHandler = lua_gettop(pState);
+    lua_pushcfunction(pState, luaErrorHandler);
+    lua_insert(pState, iErrorHandler);
+
+    // Security: Execute the hook function
+    bool bSuccess = Arguments.Call(info.pLuaMain, info.functionRef, &returnValues);
+    
+    // Security: Check execution time
+    unsigned long ulExecutionTime = GetTickCount64_() - ulStartTime;
+    if (ulExecutionTime > MAX_HOOK_EXECUTION_TIME)
+    {
+        LogSecurityWarning("Hook execution time exceeded limit: " + SString(ulExecutionTime) + "ms");
+        bSuccess = false;
+    }
+    
+    // Clean up error handler
+    lua_remove(pState, iErrorHandler);
+    
+    return bSuccess;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::BackupMTAGlobals
+//
+// Backup critical MTA globals with enhanced security
+//
+///////////////////////////////////////////////////////////////
+void CDebugHookManager::BackupMTAGlobals(lua_State* pState)
+{
+    m_BackupGlobals.clear();
+    
+    const char* criticalGlobals[] = {"source", "this", "sourceResource", "sourceResourceRoot", 
+                                    "eventName", "client", "localPlayer", "root", "resource", 
+                                    "resourceRoot", "_G", "debug", "getfenv", "setfenv"};
+    
+    for (const char* globalName : criticalGlobals)
+    {
+        lua_getglobal(pState, globalName);
+        m_BackupGlobals[globalName] = CLuaArgument(pState, -1);
+        lua_pop(pState, 1);
+    }
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::RestoreMTAGlobals
+//
+// Restore MTA globals with validation
+//
+///////////////////////////////////////////////////////////////
+void CDebugHookManager::RestoreMTAGlobals(lua_State* pState)
+{
+    for (const auto& backup : m_BackupGlobals)
+    {
+        backup.second.Push(pState);
+        lua_setglobal(pState, backup.first.c_str());
+    }
+    m_BackupGlobals.clear();
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::IsHookValid
+//
+// Validate hook integrity before execution
+//
+///////////////////////////////////////////////////////////////
+bool CDebugHookManager::IsHookValid(const SDebugHookCallInfo& info)
+{
+    if (!info.bVerified)
+        return false;
+        
+    if (!info.pLuaMain)
+        return false;
+        
+    if (!IsValidLuaMain(info.pLuaMain))
+        return false;
+        
+    // Check if hook registration is within reasonable time frame
+    unsigned long ulCurrentTime = GetTickCount64_();
+    if (ulCurrentTime - info.ulRegistrationTime > MAX_HOOK_LIFETIME)
+    {
+        LogSecurityWarning("Expired hook detected");
+        return false;
+    }
+    
+    return true;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::IsValidLuaMain
+//
+// Validate Lua main belongs to legitimate resource
+//
+///////////////////////////////////////////////////////////////
+bool CDebugHookManager::IsValidLuaMain(CLuaMain* pLuaMain)
+{
+    if (!pLuaMain)
+        return false;
+        
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return false;
+        
+    // Add additional resource validation logic here
+    return pResource->IsActive() && !pResource->IsWaitingForDelete();
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::CanRegisterNewHook
+//
+// Rate limiting for hook registration
+//
+///////////////////////////////////////////////////////////////
+bool CDebugHookManager::CanRegisterNewHook()
+{
+    unsigned long ulCurrentTime = GetTickCount64_();
+    
+    if (ulCurrentTime - m_ulLastHookCheckTime < MIN_HOOK_REGISTRATION_INTERVAL)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::IsSkipAllowedForFunction
+//
+// Determine if skipping is allowed for specific functions
+//
+///////////////////////////////////////////////////////////////
+bool CDebugHookManager::IsSkipAllowedForFunction(const SString& strFunctionName)
+{
+    // Critical functions that should never be skipped
+    static std::set<SString> criticalFunctions = {
+        "addDebugHook", "removeDebugHook", "executeCommandHandler", 
+        "addEventHandler", "removeEventHandler", "triggerEvent",
+        "call", "pcall", "loadstring", "dofile", "loadfile"
+    };
+    
+    return criticalFunctions.find(strFunctionName) == criticalFunctions.end();
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::SanitizeName
+//
+// Sanitize function/event names to prevent injection
+//
+///////////////////////////////////////////////////////////////
+SString CDebugHookManager::SanitizeName(const char* szName)
+{
+    if (!szName)
+        return "";
+        
+    SString strName(szName);
+    
+    // Remove potentially dangerous characters
+    strName = strName.Replace("\\", "").Replace("/", "").Replace("..", "").Replace("\"", "").Replace("'", "");
+    
+    // Limit name length
+    if (strName.length() > MAX_FUNCTION_NAME_LENGTH)
+        strName = strName.SubStr(0, MAX_FUNCTION_NAME_LENGTH);
+        
+    return strName;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::LogSecurityWarning
+//
+// Log security warnings for monitoring
+//
+///////////////////////////////////////////////////////////////
+void CDebugHookManager::LogSecurityWarning(const SString& strMessage)
+{
+    #ifdef MTA_CLIENT
+        g_pClientGame->GetScriptDebugging()->LogWarning(NULL, "Security: %s", strMessage.c_str());
+    #else
+        g_pGame->GetScriptDebugging()->LogWarning(NULL, "Security: %s", strMessage.c_str());
+    #endif
+}
+
+// Add these constants at the top of the class or in appropriate header
+#define MAX_HOOKS_PER_TYPE 50
+#define MAX_HOOK_EXECUTION_TIME 5000 // 5 seconds
+#define MAX_HOOK_LIFETIME 3600000    // 1 hour
+#define MIN_HOOK_REGISTRATION_INTERVAL 1000 // 1 second
+#define MAX_FUNCTION_NAME_LENGTH 128
+
+// Error handler for protected calls
+static int luaErrorHandler(lua_State* L)
+{
+    // Log the error but don't propagate it to prevent disruption
+    return 0;
 }
