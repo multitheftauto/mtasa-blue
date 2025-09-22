@@ -988,7 +988,7 @@ std::optional<unsigned char> CLuaVehicleDefs::GetVehicleWheelState(CClientVehicl
         return std::nullopt;
 
     if (wheelIndex >= MAX_WHEELS)
-        return std::nullopt
+        return std::nullopt;
     
     return vehicle->GetWheelStatus(static_cast<eWheelPosition>(wheelIndex));
 }
