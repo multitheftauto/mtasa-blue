@@ -10529,10 +10529,9 @@ bool CStaticFunctionDefinitions::GetWaveHeight(float& fHeight)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetFPSLimit(unsigned short& usLimit)
+void CStaticFunctionDefinitions::GetFPSLimit(std::uint16_t& fps) noexcept
 {
-    usLimit = g_pGame->GetConfig()->GetFPSLimit();
-    return true;
+    fps = g_pGame->GetConfig()->GetFPSLimit();
 }
 
 bool CStaticFunctionDefinitions::GetMinuteDuration(unsigned long& ulDuration)
@@ -11138,18 +11137,16 @@ bool CStaticFunctionDefinitions::SetWaveHeight(float fHeight)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetFPSLimit(unsigned short usLimit, bool bSave)
+bool CStaticFunctionDefinitions::SetFPSLimit(std::uint16_t fps, bool save)
 {
-    if (g_pGame->GetConfig()->SetFPSLimit(usLimit, bSave))
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write((short)usLimit);
-        m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_FPS_LIMIT, *BitStream.pBitStream));
+    if(!g_pGame->GetConfig()->SetFPSLimit(fps, save))
+        return false;
 
-        return true;
-    }
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(static_cast<std::uint16_t>(fps));
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_FPS_LIMIT, *BitStream.pBitStream));
 
-    return false;
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetMinuteDuration(unsigned long ulDuration)

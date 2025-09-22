@@ -87,6 +87,7 @@
 #define DEFAULT_AIRCRAFT_MAXHEIGHT   800
 #define DEFAULT_AIRCRAFT_MAXVELOCITY 1.5f
 #define DEFAULT_MINUTE_DURATION      1000
+#define NUM_CLIENT_EVENT_ERROR_GAP   1000
 
 #ifndef WIN32
     #include <limits.h>
@@ -2677,7 +2678,12 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
             }
 
         }
-            else
+        else
+        {
+            // Limit this error to prevent debug / log files being flooded.
+            static std::uint64_t s_lastClientEventErrorLog = 0;
+            auto now = GetTickCount64_();
+            if (now - s_lastClientEventErrorLog > NUM_CLIENT_EVENT_ERROR_GAP)
             {
                 CLuaArguments arguments;
                 arguments.PushString(szName);
@@ -2685,7 +2691,9 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
                 arguments.PushBoolean(false);
                 pCaller->CallEvent("onPlayerTriggerInvalidEvent", arguments);
                 m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName);
+                s_lastClientEventErrorLog = now;
             }
+        }
 
         RegisterClientTriggeredEventUsage(pCaller, szName);
     }
