@@ -77,6 +77,7 @@ public:
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
+    void                InitHooks_FixMallocAlign();
     void                InitHooks_FrameRateFixes();
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();

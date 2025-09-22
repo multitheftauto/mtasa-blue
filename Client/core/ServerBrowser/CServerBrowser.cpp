@@ -210,7 +210,7 @@ CServerBrowser::CServerBrowser()
     m_pGeneralHelpWindow->SetDeactivateHandler(GUI_CALLBACK(&CServerBrowser::OnGeneralHelpDeactivate, this));
 
     float fMaxLeft = pManager->CGUI_GetMaxTextExtent("default-normal", _("Refresh"), _("Add Favorite"), _("Connect"), _("Server information"));
-    float fMaxRight = pManager->CGUI_GetMaxTextExtent("default-normal", _("Search servers"), _("Search players"), _("Start search"));
+    float fMaxRight = pManager->CGUI_GetMaxTextExtent("default-normal", _("Search servers"), _("Search players"), _("Start search"), _("Delete from recent"));
 
     CVector2D generalHelpSize(80 + fMaxLeft + 80 + fMaxRight, 160);
     CVector2D generalHelpPos = helpButtonPos - generalHelpSize + CVector2D(helpButtonSize.fX, 0);
@@ -233,6 +233,7 @@ CServerBrowser::CServerBrowser()
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 0 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-servers.png"},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 1 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-players.png"},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 2 + 5, 16, 16, "cgui\\images\\serverbrowser\\search.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 3 + 5, 16, 16, "cgui\\images\\serverbrowser\\trashcan.png"},
         };
 
         for (uint i = 0; i < NUMELMS(iconInfoList); i++)
@@ -256,6 +257,7 @@ CServerBrowser::CServerBrowser()
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 0, _("Search servers")},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 1, _("Search players")},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 2, _("Start search")},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 3, _("Delete from recent")},
         };
 
         for (uint i = 0; i < NUMELMS(helpInfoList); i++)
