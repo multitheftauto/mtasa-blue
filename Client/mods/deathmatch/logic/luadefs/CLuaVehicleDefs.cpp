@@ -982,20 +982,15 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
     return 1;
 }
 
-std::variant<unsigned char, bool> CLuaVehicleDefs::GetVehicleWheelState(CClientVehicle* vehicle, unsigned char wheelIndex)
+std::optional<unsigned char> CLuaVehicleDefs::GetVehicleWheelState(CClientVehicle* vehicle, unsigned char wheelIndex)
 {
     if (!vehicle)
         return std::nullopt;
 
-    switch (wheelIndex)
-    {
-        case 1: return vehicle->GetWheelStatus(FRONT_LEFT_WHEEL);
-        case 2: return vehicle->GetWheelStatus(REAR_LEFT_WHEEL);
-        case 3: return vehicle->GetWheelStatus(FRONT_RIGHT_WHEEL);
-        case 4: return vehicle->GetWheelStatus(REAR_RIGHT_WHEEL);
-    default:
-        return std::nullopt;
-    }
+    if (wheelIndex >= MAX_WHEELS)
+        return std::nullopt
+    
+    return vehicle->GetWheelStatus(static_cast<eWheelPosition>(wheelIndex));
 }
 
 int CLuaVehicleDefs::IsVehicleWheelCollided(lua_State* luaVM)

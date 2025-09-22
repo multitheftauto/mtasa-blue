@@ -5288,24 +5288,10 @@ bool CStaticFunctionDefinitions::GetVehicleWheelState(CVehicle* vehicle, unsigne
 {
     assert(vehicle);
 
-    switch(wheelIndex)
-    {
-        case 1:
-            wheelState = vehicle->m_ucWheelStates[FRONT_LEFT_WHEEL];
-            break;
-        case 2:
-            wheelState = vehicle->m_ucWheelStates[REAR_LEFT_WHEEL];
-            break;
-        case 3:
-            wheelState = vehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL];
-            break;
-        case 4:
-            wheelState = vehicle->m_ucWheelStates[REAR_RIGHT_WHEEL];
-            break;
-        default:
-            return false;
-    }
-
+    if (wheelIndex >= MAX_WHEELS)
+        return false;
+    
+    wheelState = vehicle->m_ucWheelStates[static_cast<eWheelPosition>(wheelIndex)];
     return true;
 }
 
