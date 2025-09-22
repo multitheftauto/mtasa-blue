@@ -4805,6 +4805,15 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
             if (pPed->IsSpawned())
             {
                 unsigned char ucCurrentWeapon = pPed->GetWeaponType();
+                unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon(ucWeaponID);
+
+                CLuaArguments arguments;
+                arguments.PushNumber(ucWeaponID);
+                arguments.PushNumber(usAmmo);
+                arguments.PushNumber(ucWeaponSlot);
+                if (!pPed->CallEvent(IS_PLAYER(pElement) ? "onPlayerWeaponGiven" : "onPedWeaponGiven", arguments))
+                    return false;
+
                 if (ucCurrentWeapon != ucWeaponID && bSetAsCurrent)
                 {
                     // Call our weapon switch command
@@ -4821,15 +4830,7 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
                         bSetAsCurrent = false;
                 }
 
-                unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon(ucWeaponID);
                 unsigned char ucPreviousWeaponID = pPed->GetWeaponType(ucWeaponSlot);
-                
-                CLuaArguments arguments;
-                arguments.PushNumber(ucWeaponID);
-                arguments.PushNumber(usAmmo);
-                arguments.PushNumber(ucWeaponSlot);
-                if (!pPed->CallEvent(IS_PLAYER(pElement) ? "onPlayerWeaponGiven" : "onPedWeaponGiven", arguments))
-                    return false;
 
                 pPed->SetWeaponType(ucWeaponID, ucWeaponSlot);
                 if (bSetAsCurrent)
@@ -4884,15 +4885,14 @@ bool CStaticFunctionDefinitions::TakeWeapon(CElement* pElement, unsigned char uc
             // Just because it's the same slot doesn't mean it's the same weapon -_- - Caz
             if (pPed->IsSpawned() && pPed->GetWeapon(ucWeaponSlot) && pPed->GetWeaponType(ucWeaponSlot) == ucWeaponID)
             {
-                CBitStream BitStream;
-
                 CLuaArguments arguments;
                 arguments.PushNumber(ucWeaponID);
                 arguments.PushNumber(usAmmo);
                 arguments.PushNumber(ucWeaponSlot);
                 if (!pPed->CallEvent(IS_PLAYER(pElement) ? "onPlayerWeaponTaken" : "onPedWeaponTaken", arguments))
                     return false;
-
+            
+                CBitStream BitStream;
                 SWeaponTypeSync weaponType;
                 weaponType.data.ucWeaponType = ucWeaponID;
                 BitStream.pBitStream->Write(&weaponType);
