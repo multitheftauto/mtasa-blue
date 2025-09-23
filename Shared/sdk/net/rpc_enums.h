@@ -101,6 +101,7 @@ enum eElementRPCFunctions
 
     GIVE_WEAPON,
     TAKE_WEAPON,
+    TAKE_WEAPONS,
     TAKE_ALL_WEAPONS,
     SET_WEAPON_AMMO,
     SET_WEAPON_SLOT,

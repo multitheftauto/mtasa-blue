@@ -4943,11 +4943,13 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            std::vector<std::tuple<unsigned char, unsigned char, unsigned char>> weapons;
 
             for (unsigned char ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ucWeaponSlot)
             {
                 unsigned char ucWeaponID = pPed->GetWeaponType(ucWeaponSlot);
                 unsigned char ucAmmo = pPed->GetWeaponTotalAmmo(ucWeaponSlot);
+
                 if (ucWeaponID > 0)
                 {
                     CLuaArguments arguments;
@@ -4961,17 +4963,30 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
 
                     if (shouldTake)
                     {
-                        CBitStream      BitStream;
-                        SWeaponTypeSync weaponType;
-                        weaponType.data.ucWeaponType = ucWeaponID;
-                        BitStream.pBitStream->Write(&weaponType);
-                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, TAKE_WEAPON, *BitStream.pBitStream));
+                        weapons.push_back({ucWeaponID, ucAmmo, ucWeaponSlot});
 
                         pPed->SetWeaponType(0, ucWeaponSlot);
                         pPed->SetWeaponAmmoInClip(0, ucWeaponSlot);
                         pPed->SetWeaponTotalAmmo(0, ucWeaponSlot);
                     }
                 }
+            }
+
+            if (!weapons.empty())
+            {
+                CBitStream    BitStream;
+                unsigned char weaponsTaken = (unsigned char)weapons.size();
+
+                BitStream.pBitStream->Write(weaponsTaken);
+
+                for (auto& w : weapons)
+                {
+                    BitStream.pBitStream->Write(std::get<0>(w));
+                    BitStream.pBitStream->Write(std::get<1>(w));
+                    BitStream.pBitStream->Write(std::get<2>(w));
+                }
+
+                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, TAKE_WEAPONS, *BitStream.pBitStream));
             }
 
             return true;
