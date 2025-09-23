@@ -275,7 +275,13 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
     }
 
     // Get matrix, and it's inverse
-    c.entity->matrix->ConvertToMatrix(c.entMat);
+    if (c.entity->matrix)
+        c.entity->matrix->ConvertToMatrix(c.entMat);
+    else
+    {
+        c.entMat.SetPosition(c.entity->m_transform.m_translate);
+        c.entMat.SetRotation(CVector{0.0f, 0.0f, c.entity->m_transform.m_heading});
+    }
     c.entInvMat = c.entMat.Inverse();
 
     // ...to transform the line origin and end into object space
