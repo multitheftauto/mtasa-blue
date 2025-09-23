@@ -982,13 +982,13 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
     return 1;
 }
 
-std::optional<unsigned char> CLuaVehicleDefs::GetVehicleWheelState(CClientVehicle* vehicle, unsigned char wheelIndex)
+std::variant<unsigned char, bool> CLuaVehicleDefs::GetVehicleWheelState(CClientVehicle* vehicle, std::uint8_t wheelIndex)
 {
     if (!vehicle)
-        return std::nullopt;
+        return false;
 
     if (wheelIndex >= MAX_WHEELS)
-        return std::nullopt;
+        return false;
     
     return vehicle->GetWheelStatus(static_cast<eWheelPosition>(wheelIndex));
 }

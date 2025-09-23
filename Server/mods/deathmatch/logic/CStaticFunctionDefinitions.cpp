@@ -5284,7 +5284,7 @@ bool CStaticFunctionDefinitions::GetVehicleWheelStates(CVehicle* pVehicle, unsig
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleWheelState(CVehicle* vehicle, unsigned char wheelIndex, unsigned char& wheelState)
+bool CStaticFunctionDefinitions::GetVehicleWheelState(CVehicle* vehicle, std::uint8_t wheelIndex, std::uint8_t& wheelState)
 {
     assert(vehicle);
 

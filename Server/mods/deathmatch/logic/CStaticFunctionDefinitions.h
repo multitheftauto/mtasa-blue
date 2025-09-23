@@ -264,7 +264,7 @@ public:
     static bool  GetVehicleDoorState(CVehicle* pVehicle, unsigned char ucDoor, unsigned char& ucState);
     static bool  GetVehicleWheelStates(CVehicle* pVehicle, unsigned char& ucFrontLeft, unsigned char& ucRearLeft, unsigned char& ucFrontRight,
                                        unsigned char& ucRearRight);
-    static bool  GetVehicleWheelState(CVehicle* vehicle, unsigned char wheelIndex, unsigned char& wheelState);
+    static bool  GetVehicleWheelState(CVehicle* vehicle, std::uint8_t wheelIndex, std::uint8_t& wheelState);
     static bool  GetVehicleLightState(CVehicle* pVehicle, unsigned char ucLight, unsigned char& ucState);
     static bool  GetVehiclePanelState(CVehicle* pVehicle, unsigned char ucPanel, unsigned char& ucState);
     static bool  GetVehicleOverrideLights(CVehicle* pVehicle, unsigned char& ucLights);

@@ -1322,9 +1322,9 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
     return 1;
 }
 
-std::variant<unsigned char, bool> CLuaVehicleDefs::GetVehicleWheelState(CVehicle* vehicle, unsigned char wheelIndex)
+std::variant<std::uint8_t, bool> CLuaVehicleDefs::GetVehicleWheelState(CVehicle* vehicle, std::uint8_t wheelIndex)
 {
-    unsigned char wheelState;
+    std::uint8_t wheelState;
     if (CStaticFunctionDefinitions::GetVehicleWheelState(vehicle, wheelIndex, wheelState))
     {
         return wheelState;
