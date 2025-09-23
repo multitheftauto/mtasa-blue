@@ -262,6 +262,13 @@ public:
     bool GetTeleported() const noexcept { return m_teleported; }
     void SetTeleported(bool state) noexcept { m_teleported = state; }
 
+    bool                SetPlayerGlitchEnabled(const std::string& strGlitchName, bool bEnabled);
+    bool                IsPlayerGlitchEnabled(const std::string& strGlitchName) const;
+    bool                HasPlayerGlitchOverride(const std::string& strGlitchName) const;
+    void                SendPlayerGlitchState(const std::string& strGlitchName) const;
+    void                SendAllPlayerGlitchStates(CPlayer* pTarget = nullptr) const;
+    void                ResetPlayerGlitchOverrides();
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -342,7 +349,9 @@ public:
 
 private:
     SLightweightSyncData m_lightweightSyncData;
-
+    SFixedArray<bool, NUM_GLITCHES>               m_PlayerGlitches;
+    SFixedArray<bool, NUM_GLITCHES>               m_bHasPlayerGlitchOverride;
+    
     void WriteCameraModePacket();
     void WriteCameraPositionPacket();
 
