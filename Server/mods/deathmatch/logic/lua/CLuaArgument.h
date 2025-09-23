@@ -45,6 +45,7 @@ public:
     void ReadNumber(double dNumber);
     void ReadString(const std::string& string);
     void ReadString(const std::string_view& string);
+    void ReadString(CStringName string);
     void ReadString(const char* string);
     void ReadElement(CElement* pElement);
     void ReadElementID(ElementID ID);

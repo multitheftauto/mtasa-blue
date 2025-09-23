@@ -2885,7 +2885,7 @@ retry:
                         CLuaArgument Argument;
                         Argument.ReadFromBitStream(bitStream);
 
-                        pCustomData->Set(strName, Argument);
+                        pCustomData->Set(CStringName{strName}, Argument);
                     }
                     else
                     {

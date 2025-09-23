@@ -11,6 +11,7 @@
 #pragma once
 
 #include "lua/CLuaArgument.h"
+#include "CStringName.h"
 
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
 
@@ -25,14 +26,14 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
+    SCustomData* Get(CStringName name);
+    void         Set(CStringName name, const CLuaArgument& Variable, bool bSynchronized = true);
 
-    bool Delete(const char* szName);
+    bool Delete(CStringName name);
 
-    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
+    std::unordered_map<CStringName, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
+    std::unordered_map<CStringName, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
 
 private:
-    std::map<std::string, SCustomData> m_Data;
+    std::unordered_map<CStringName, SCustomData> m_Data;
 };

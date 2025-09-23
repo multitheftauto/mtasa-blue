@@ -339,6 +339,13 @@ void CLuaArgument::ReadString(const std::string_view& string)
     m_strString = string;
 }
 
+void CLuaArgument::ReadString(CStringName string)
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string.ToString();
+}
+
 void CLuaArgument::ReadString(const char* string)
 {
     m_iType = LUA_TSTRING;

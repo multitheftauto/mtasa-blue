@@ -16,6 +16,7 @@ class CClientEntity;
 #include "CClientCommon.h"
 #include <core/CClientEntityBase.h>
 #include "logic/CClientEntityRefManager.h"
+#include "CStringName.h"
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
@@ -201,14 +202,14 @@ public:
     void      SetID(ElementID ID);
 
     CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
-    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = nullptr);
+    CLuaArgument*  GetCustomData(CStringName name, bool bInheritData, bool* pbIsSynced = nullptr);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
-    bool           GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
-    bool           GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
-    bool           GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);
-    bool           GetCustomDataBool(const char* szKey, bool& bOut, bool bInheritData);
-    void           SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
-    void           DeleteCustomData(const char* szName);
+    bool           GetCustomDataString(CStringName name, SString& strOut, bool bInheritData);
+    bool           GetCustomDataFloat(CStringName name, float& fOut, bool bInheritData);
+    bool           GetCustomDataInt(CStringName name, int& iOut, bool bInheritData);
+    bool           GetCustomDataBool(CStringName name, bool& bOut, bool bInheritData);
+    void           SetCustomData(CStringName name, const CLuaArgument& Variable, bool bSynchronized = true);
+    void           DeleteCustomData(CStringName name);
 
     virtual bool GetMatrix(CMatrix& matrix) const;
     virtual bool SetMatrix(const CMatrix& matrix);

@@ -44,28 +44,28 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(const char* szName) const;
-    SCustomData* GetSynced(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
+    SCustomData* Get(CStringName name) const;
+    SCustomData* GetSynced(CStringName name);
+    void         Set(CStringName name, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
-    bool Delete(const char* szName);
+    bool Delete(CStringName name);
 
-    void SetClientChangesMode(const char* szName, eCustomDataClientTrust mode);
+    void SetClientChangesMode(CStringName name, eCustomDataClientTrust mode);
 
     unsigned short CountOnlySynchronized();
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
-    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
+    std::unordered_map<CStringName, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
+    std::unordered_map<CStringName, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
 
-    std::map<std::string, SCustomData>::const_iterator SyncedIterBegin() { return m_SyncedData.begin(); }
-    std::map<std::string, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
+    std::unordered_map<CStringName, SCustomData>::const_iterator SyncedIterBegin() { return m_SyncedData.begin(); }
+    std::unordered_map<CStringName, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
 
 private:
-    bool DeleteSynced(const char* szName);
-    void UpdateSynced(const char* szName, const CLuaArgument& Variable, ESyncType syncType);
+    bool DeleteSynced(CStringName name);
+    void UpdateSynced(CStringName name, const CLuaArgument& Variable, ESyncType syncType);
 
-    std::map<std::string, SCustomData> m_Data;
-    std::map<std::string, SCustomData> m_SyncedData;
+    std::unordered_map<CStringName, SCustomData> m_Data;
+    std::unordered_map<CStringName, SCustomData> m_SyncedData;
 };
