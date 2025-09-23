@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <vector>
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
 #include <game/CSettings.h>
@@ -695,19 +697,27 @@ void CSettings::CreateGUI()
 
     m_pFullscreenStyleCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabVideo, ""));
     m_pFullscreenStyleCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
+    m_pFullscreenStyleCombo->GetPosition(vecTemp, false);
     m_pFullscreenStyleCombo->SetSize(CVector2D(200, 95.0f));
+    m_pFullscreenStyleCombo->GetSize(vecSize);
     m_pFullscreenStyleCombo->AddItem(_("Standard"))->SetData((void*)FULLSCREEN_STANDARD);
     m_pFullscreenStyleCombo->AddItem(_("Borderless window"))->SetData((void*)FULLSCREEN_BORDERLESS);
     m_pFullscreenStyleCombo->AddItem(_("Borderless keep res"))->SetData((void*)FULLSCREEN_BORDERLESS_KEEP_RES);
     m_pFullscreenStyleCombo->SetReadOnly(true);
-    vecTemp.fY += 4;
 
     m_pCheckBoxMipMapping = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Mip Mapping"), true));
 #ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
-    m_pCheckBoxMipMapping->SetPosition(CVector2D(vecTemp.fX + 340.0f, vecTemp.fY + 45.0f));
+    m_pCheckBoxMipMapping->SetPosition(CVector2D(vecTemp.fX + vecSize.fX, vecTemp.fY + 45.0f));
     m_pCheckBoxMipMapping->SetSize(CVector2D(224.0f, 16.0f));
     m_pCheckBoxMipMapping->SetVisible(false);
 #endif
+
+    m_pCheckBoxVSync = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("V-Sync"), true));
+    m_pCheckBoxVSync->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
+    m_pCheckBoxVSync->AutoSize(NULL, 20.0f);
+
+    // Reset position to leftmost
+    m_pFullscreenStyleLabel->GetPosition(vecTemp, false);
 
     vecTemp.fY -= 5;
     m_pFieldOfViewLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("FOV:")));
@@ -1322,6 +1332,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
+    m_pCheckBoxVSync->SetClickHandler(GUI_CALLBACK(&CSettings::OnVSyncClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
@@ -1693,6 +1704,15 @@ void CSettings::UpdateVideoTab()
     m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
+struct ResolutionData
+{
+    int width;
+    int height;
+    int depth;
+    int vidMode;
+    bool isWidescreen;
+};
+
 //
 // PopulateResolutionComboBox
 //
@@ -1706,47 +1726,86 @@ void CSettings::PopulateResolutionComboBox()
     bool bShowUnsafeResolutions = m_pCheckBoxShowUnsafeResolutions->GetSelected();
 
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    if (!gameSettings)
+        return;
 
     VideoMode vidModemInfo;
     int       vidMode, numVidModes;
+    std::vector<ResolutionData> resolutions;
 
+    if (!m_pComboResolution)
+        return;
+        
     m_pComboResolution->Clear();
     numVidModes = gameSettings->GetNumVideoModes();
 
     for (vidMode = 0; vidMode < numVidModes; vidMode++)
     {
-        gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
+        if (!gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode))
+            continue;
 
         // Remove resolutions that will make the gui unusable
         if (vidModemInfo.width < 640 || vidModemInfo.height < 480)
-            continue;
-
-        // Check resolution hasn't already been added
-        bool bDuplicate = false;
-        for (int i = 1; i < vidMode; i++)
-        {
-            VideoMode info;
-            gameSettings->GetVideoModeInfo(&info, i);
-            if (info.width == vidModemInfo.width && info.height == vidModemInfo.height && info.depth == vidModemInfo.depth)
-                bDuplicate = true;
-        }
-        if (bDuplicate)
             continue;
 
         // Check resolution is below desktop res unless that is allowed
         if (gameSettings->IsUnsafeResolution(vidModemInfo.width, vidModemInfo.height) && !bShowUnsafeResolutions)
             continue;
 
-        SString strMode("%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth);
+        if (!(vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE))
+            continue;
 
-        if (vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE)
-            m_pComboResolution->AddItem(strMode)->SetData((void*)vidMode);
+        ResolutionData resData;
+        resData.width = vidModemInfo.width;
+        resData.height = vidModemInfo.height;
+        resData.depth = vidModemInfo.depth;
+        resData.vidMode = vidMode;
+        resData.isWidescreen = (vidModemInfo.flags & rwVIDEOMODE_XBOX_WIDESCREEN) != 0;
 
-        VideoMode currentInfo;
-        gameSettings->GetVideoModeInfo(&currentInfo, iNextVidMode);
+        // Check resolution hasn't already been added
+        bool bDuplicate = false;
+        for (const auto& existing : resolutions)
+        {
+            if (existing.width == resData.width && existing.height == resData.height && existing.depth == resData.depth)
+            {
+                bDuplicate = true;
+                break;
+            }
+        }
+        
+        if (!bDuplicate)
+            resolutions.push_back(resData);
+    }
 
-        if (currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth)
-            m_pComboResolution->SetText(strMode);
+    if (resolutions.empty())
+        return;
+
+    // Sort resolutions by width (descending), then by height, then by depth
+    std::sort(resolutions.begin(), resolutions.end(), [](const ResolutionData& a, const ResolutionData& b) {
+        if (a.width != b.width)
+            return a.width > b.width;
+        if (a.height != b.height)
+            return a.height > b.height;
+        return a.depth > b.depth;
+    });
+
+    SString selectedText;
+    VideoMode currentInfo;
+    if (gameSettings->GetVideoModeInfo(&currentInfo, iNextVidMode))
+    {
+        for (const auto& res : resolutions)
+        {
+            SString strMode("%d x %d x %d", res.width, res.height, res.depth);
+            CGUIListItem* pItem = m_pComboResolution->AddItem(strMode);
+            if (pItem)
+                pItem->SetData((void*)res.vidMode);
+
+            if (currentInfo.width == res.width && currentInfo.height == res.height && currentInfo.depth == res.depth)
+                selectedText = strMode;
+        }
+
+        if (!selectedText.empty())
+            m_pComboResolution->SetText(selectedText);
     }
 }
 
@@ -3579,7 +3638,7 @@ void CSettings::SaveData()
             const char* state = _("Main menu");
 
             if (g_pCore->IsConnected())
-            {                
+            {
                 state = _("In-game");
 
                 const SString& serverName = g_pCore->GetLastConnectedServerName();
@@ -4801,6 +4860,15 @@ static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
         auto const checkBox = reinterpret_cast<CGUICheckBox*>(userdata);
         checkBox->SetSelected(false);
     }
+}
+
+//
+// OnVSyncClick
+//
+bool CSettings::OnVSyncClick(CGUIElement* pElement)
+{
+    CCore::GetSingleton().GetFPSLimiter()->SetDisplayVSync(m_pCheckBoxVSync->GetSelected());
+    return true;
 }
 
 static void CPUAffinityQuestionCallBack(void* userdata, unsigned int button)

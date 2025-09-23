@@ -195,6 +195,7 @@ protected:
     CGUILabel*     m_pAdvancedSettingDescriptionLabel;
     CGUILabel*     m_pFullscreenStyleLabel;
     CGUIComboBox*  m_pFullscreenStyleCombo;
+    CGUICheckBox*  m_pCheckBoxVSync;
     CGUILabel*     m_pPriorityLabel;
     CGUIComboBox*  m_pPriorityCombo;
     CGUILabel*     m_pPlayerMapImageLabel;
@@ -410,6 +411,7 @@ protected:
     bool ShowUnsafeResolutionsClick(CGUIElement* pElement);
     bool OnWindowedClick(CGUIElement* pElement);
     bool OnDPIAwareClick(CGUIElement* pElement);
+    bool OnVSyncClick(CGUIElement* pElement);
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
