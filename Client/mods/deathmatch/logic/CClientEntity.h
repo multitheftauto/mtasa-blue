@@ -84,6 +84,7 @@ enum eClientEntityType
 
 class CEntity;
 class CClientColShape;
+class CClientMarker;
 class CClientPed;
 class CCustomData;
 class CElementGroup;
