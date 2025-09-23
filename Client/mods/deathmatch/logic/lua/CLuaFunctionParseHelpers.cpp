@@ -981,6 +981,10 @@ ADD_ENUM(VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-
 IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
 
 
+IMPLEMENT_ENUM_CLASS_BEGIN(FramerateFixingProperty)
+ADD_ENUM(FramerateFixingProperty::FFP_VEHICLE_PHYSICS, "vehicle_physics")
+IMPLEMENT_ENUM_END("framerate-fixing-property")
+
 //
 // CResource from userdata
 //
