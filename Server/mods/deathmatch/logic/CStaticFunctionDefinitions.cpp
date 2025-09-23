@@ -4975,7 +4975,7 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
             if (!weapons.empty())
             {
                 CBitStream    BitStream;
-                unsigned char weaponsTaken = (unsigned char)weapons.size();
+                std::size_t weaponsTaken = (std::size_t)weapons.size();
 
                 BitStream.pBitStream->Write(weaponsTaken);
 

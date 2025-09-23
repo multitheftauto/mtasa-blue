@@ -188,7 +188,7 @@ void CWeaponRPCs::TakeWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
 
 void CWeaponRPCs::TakeWeapons(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char count = 0;
+    std::uint8_t count = 0;
     if (!bitStream.Read(count))
         return;
 
@@ -196,23 +196,23 @@ void CWeaponRPCs::TakeWeapons(CClientEntity* pSource, NetBitStreamInterface& bit
     if (!pPed)
         return;
 
-    for (int i = 0; i < count; i++)
+    for (std::uint8_t i = 0; i < count; i++)
     {
-        unsigned char ucWeaponID, ucAmmo, ucSlot;
-        if (!bitStream.Read(ucWeaponID)) continue;
-        if (!bitStream.Read(ucAmmo)) continue;
-        if (!bitStream.Read(ucSlot)) continue;
+        unsigned char weaponID, ammo, slot;
+        if (!bitStream.Read(weaponID)) continue;
+        if (!bitStream.Read(ammo)) continue;
+        if (!bitStream.Read(slot)) continue;
 
-        if (!CClientPickupManager::IsValidWeaponID(ucWeaponID))
+        if (!CClientPickupManager::IsValidWeaponID(weaponID))
             continue;
 
         if (pPed->IsLocalPlayer())
         {
-            pPed->RemoveWeapon(static_cast<eWeaponType>(ucWeaponID));
+            pPed->RemoveWeapon(static_cast<eWeaponType>(weaponID));
         }
         else
         {
-            CWeapon* pPlayerWeapon = pPed->GetWeapon((eWeaponType)ucWeaponID);
+            CWeapon* pPlayerWeapon = pPed->GetWeapon((eWeaponType)weaponID);
             if (pPlayerWeapon)
             {
                 pPlayerWeapon->SetAmmoInClip(0);
