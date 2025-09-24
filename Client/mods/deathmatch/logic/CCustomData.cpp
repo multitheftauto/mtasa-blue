@@ -21,7 +21,7 @@ void CCustomData::Copy(CCustomData* pCustomData)
     }
 }
 
-SCustomData* CCustomData::Get(CStringName name)
+SCustomData* CCustomData::Get(const CStringName& name)
 {
     assert(name);
 
@@ -32,7 +32,7 @@ SCustomData* CCustomData::Get(CStringName name)
     return NULL;
 }
 
-void CCustomData::Set(CStringName name, const CLuaArgument& Variable, bool bSynchronized)
+void CCustomData::Set(const CStringName& name, const CLuaArgument& Variable, bool bSynchronized)
 {
     assert(name);
 
@@ -54,7 +54,7 @@ void CCustomData::Set(CStringName name, const CLuaArgument& Variable, bool bSync
     }
 }
 
-bool CCustomData::Delete(CStringName name)
+bool CCustomData::Delete(const CStringName& name)
 {
     // Find the item and delete it
     auto it = m_Data.find(name);

@@ -508,7 +508,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
     }
 }
 
-CLuaArgument* CElement::GetCustomData(CStringName name, bool bInheritData, ESyncType* pSyncType, eCustomDataClientTrust* clientChangesMode)
+CLuaArgument* CElement::GetCustomData(const CStringName& name, bool bInheritData, ESyncType* pSyncType, eCustomDataClientTrust* clientChangesMode)
 {
     assert(name);
 
@@ -550,7 +550,7 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
     return table;
 }
 
-bool CElement::GetCustomDataString(CStringName name, char* pOut, size_t sizeBuffer, bool bInheritData)
+bool CElement::GetCustomDataString(const CStringName& name, char* pOut, size_t sizeBuffer, bool bInheritData)
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData(name, bInheritData);
@@ -589,7 +589,7 @@ bool CElement::GetCustomDataString(CStringName name, char* pOut, size_t sizeBuff
     return false;
 }
 
-bool CElement::GetCustomDataInt(CStringName name, int& iOut, bool bInheritData)
+bool CElement::GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData)
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData(name, bInheritData);
@@ -627,7 +627,7 @@ bool CElement::GetCustomDataInt(CStringName name, int& iOut, bool bInheritData)
     return false;
 }
 
-bool CElement::GetCustomDataFloat(CStringName name, float& fOut, bool bInheritData)
+bool CElement::GetCustomDataFloat(const CStringName& name, float& fOut, bool bInheritData)
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData(name, bInheritData);
@@ -654,7 +654,7 @@ bool CElement::GetCustomDataFloat(CStringName name, float& fOut, bool bInheritDa
     return false;
 }
 
-bool CElement::GetCustomDataBool(CStringName name, bool& bOut, bool bInheritData)
+bool CElement::GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData)
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData(name, bInheritData);
@@ -709,7 +709,7 @@ bool CElement::GetCustomDataBool(CStringName name, bool& bOut, bool bInheritData
     return false;
 }
 
-void CElement::SetCustomData(CStringName name, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
+void CElement::SetCustomData(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
 {
     assert(name);
     if (name->length() > MAX_CUSTOMDATA_NAME_LENGTH)
@@ -741,7 +741,7 @@ void CElement::SetCustomData(CStringName name, const CLuaArgument& Variable, ESy
     }
 }
 
-void CElement::DeleteCustomData(CStringName name)
+void CElement::DeleteCustomData(const CStringName& name)
 {
     // Grab the old variable
     SCustomData* pData = m_CustomData.Get(name);

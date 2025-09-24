@@ -26,10 +26,10 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(CStringName name);
-    void         Set(CStringName name, const CLuaArgument& Variable, bool bSynchronized = true);
+    SCustomData* Get(const CStringName& name);
+    void         Set(const CStringName& name, const CLuaArgument& Variable, bool bSynchronized = true);
 
-    bool Delete(CStringName name);
+    bool Delete(const CStringName& name);
 
     std::unordered_map<CStringName, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
     std::unordered_map<CStringName, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }

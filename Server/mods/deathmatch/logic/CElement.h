@@ -139,15 +139,15 @@ public:
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
     CCustomData&   GetCustomDataManager() { return m_CustomData; }
-    CLuaArgument*  GetCustomData(CStringName name, bool bInheritData, ESyncType* pSyncType = nullptr, eCustomDataClientTrust* clientChangesMode = nullptr);
+    CLuaArgument*  GetCustomData(const CStringName& name, bool bInheritData, ESyncType* pSyncType = nullptr, eCustomDataClientTrust* clientChangesMode = nullptr);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
-    bool           GetCustomDataString(CStringName name, char* pOut, size_t sizeBuffer, bool bInheritData);
-    bool           GetCustomDataInt(CStringName name, int& iOut, bool bInheritData);
-    bool           GetCustomDataFloat(CStringName name, float& fOut, bool bInheritData);
-    bool           GetCustomDataBool(CStringName name, bool& bOut, bool bInheritData);
-    void           SetCustomData(CStringName name, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
+    bool           GetCustomDataString(const CStringName& name, char* pOut, size_t sizeBuffer, bool bInheritData);
+    bool           GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData);
+    bool           GetCustomDataFloat(const CStringName& name, float& fOut, bool bInheritData);
+    bool           GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData);
+    void           SetCustomData(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
                                  bool bTriggerEvent = true);
-    void           DeleteCustomData(CStringName name);
+    void           DeleteCustomData(const CStringName& name);
     void           SendAllCustomData(CPlayer* pPlayer);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);

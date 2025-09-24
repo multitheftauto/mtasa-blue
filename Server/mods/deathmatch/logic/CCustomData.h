@@ -44,13 +44,13 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(CStringName name) const;
-    SCustomData* GetSynced(CStringName name);
-    void         Set(CStringName name, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
+    SCustomData* Get(const CStringName& name) const;
+    SCustomData* GetSynced(const CStringName& name);
+    void         Set(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
-    bool Delete(CStringName name);
+    bool Delete(const CStringName& name);
 
-    void SetClientChangesMode(CStringName name, eCustomDataClientTrust mode);
+    void SetClientChangesMode(const CStringName& name, eCustomDataClientTrust mode);
 
     unsigned short CountOnlySynchronized();
 
@@ -63,8 +63,8 @@ public:
     std::unordered_map<CStringName, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
 
 private:
-    bool DeleteSynced(CStringName name);
-    void UpdateSynced(CStringName name, const CLuaArgument& Variable, ESyncType syncType);
+    bool DeleteSynced(const CStringName& name);
+    void UpdateSynced(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType);
 
     std::unordered_map<CStringName, SCustomData> m_Data;
     std::unordered_map<CStringName, SCustomData> m_SyncedData;

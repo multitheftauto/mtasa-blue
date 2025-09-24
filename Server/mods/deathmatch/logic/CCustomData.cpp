@@ -21,7 +21,7 @@ void CCustomData::Copy(CCustomData* pCustomData)
     }
 }
 
-SCustomData* CCustomData::Get(CStringName name) const
+SCustomData* CCustomData::Get(const CStringName& name) const
 {
     assert(name);
 
@@ -32,7 +32,7 @@ SCustomData* CCustomData::Get(CStringName name) const
     return NULL;
 }
 
-SCustomData* CCustomData::GetSynced(CStringName name)
+SCustomData* CCustomData::GetSynced(const CStringName& name)
 {
     assert(name);
 
@@ -43,7 +43,7 @@ SCustomData* CCustomData::GetSynced(CStringName name)
     return NULL;
 }
 
-bool CCustomData::DeleteSynced(CStringName name)
+bool CCustomData::DeleteSynced(const CStringName& name)
 {
     // Find the item and delete it
     auto iter = m_SyncedData.find(name);
@@ -57,7 +57,7 @@ bool CCustomData::DeleteSynced(CStringName name)
     return false;
 }
 
-void CCustomData::UpdateSynced(CStringName name, const CLuaArgument& Variable, ESyncType syncType)
+void CCustomData::UpdateSynced(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType)
 {
     if (syncType == ESyncType::BROADCAST)
     {
@@ -81,7 +81,7 @@ void CCustomData::UpdateSynced(CStringName name, const CLuaArgument& Variable, E
     }
 }
 
-void CCustomData::Set(CStringName name, const CLuaArgument& Variable, ESyncType syncType)
+void CCustomData::Set(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(name);
 
@@ -106,7 +106,7 @@ void CCustomData::Set(CStringName name, const CLuaArgument& Variable, ESyncType 
     }
 }
 
-bool CCustomData::Delete(CStringName name)
+bool CCustomData::Delete(const CStringName& name)
 {
     // Find the item and delete it
     auto it = m_Data.find(name);
@@ -121,7 +121,7 @@ bool CCustomData::Delete(CStringName name)
     return false;
 }
 
-void CCustomData::SetClientChangesMode(CStringName name, eCustomDataClientTrust mode)
+void CCustomData::SetClientChangesMode(const CStringName& name, eCustomDataClientTrust mode)
 {
     SCustomData& pData = m_Data[name];
     pData.clientChangesMode = mode;

@@ -202,14 +202,14 @@ public:
     void      SetID(ElementID ID);
 
     CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
-    CLuaArgument*  GetCustomData(CStringName name, bool bInheritData, bool* pbIsSynced = nullptr);
+    CLuaArgument*  GetCustomData(const CStringName& name, bool bInheritData, bool* pbIsSynced = nullptr);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
-    bool           GetCustomDataString(CStringName name, SString& strOut, bool bInheritData);
-    bool           GetCustomDataFloat(CStringName name, float& fOut, bool bInheritData);
-    bool           GetCustomDataInt(CStringName name, int& iOut, bool bInheritData);
-    bool           GetCustomDataBool(CStringName name, bool& bOut, bool bInheritData);
-    void           SetCustomData(CStringName name, const CLuaArgument& Variable, bool bSynchronized = true);
-    void           DeleteCustomData(CStringName name);
+    bool           GetCustomDataString(const CStringName& name, SString& strOut, bool bInheritData);
+    bool           GetCustomDataFloat(const CStringName& name, float& fOut, bool bInheritData);
+    bool           GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData);
+    bool           GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData);
+    void           SetCustomData(const CStringName& name, const CLuaArgument& Variable, bool bSynchronized = true);
+    void           DeleteCustomData(const CStringName& name);
 
     virtual bool GetMatrix(CMatrix& matrix) const;
     virtual bool SetMatrix(const CMatrix& matrix);

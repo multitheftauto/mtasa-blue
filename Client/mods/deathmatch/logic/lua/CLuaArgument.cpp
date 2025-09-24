@@ -334,7 +334,7 @@ void CLuaArgument::ReadString(const std::string_view& string)
     m_strString = std::string{string};
 }
 
-void CLuaArgument::ReadString(CStringName string)
+void CLuaArgument::ReadString(const CStringName& string)
 {
     m_iType = LUA_TSTRING;
     DeleteTableData();

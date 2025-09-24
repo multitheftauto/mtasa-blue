@@ -279,7 +279,7 @@ void CClientEntity::SetID(ElementID ID)
     }
 }
 
-CLuaArgument* CClientEntity::GetCustomData(CStringName name, bool bInheritData, bool* pbIsSynced)
+CLuaArgument* CClientEntity::GetCustomData(const CStringName& name, bool bInheritData, bool* pbIsSynced)
 {
     assert(name);
 
@@ -315,7 +315,7 @@ CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
     return table;
 }
 
-bool CClientEntity::GetCustomDataString(CStringName name, SString& strOut, bool bInheritData)
+bool CClientEntity::GetCustomDataString(const CStringName& name, SString& strOut, bool bInheritData)
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData(name, bInheritData);
@@ -350,7 +350,7 @@ bool CClientEntity::GetCustomDataString(CStringName name, SString& strOut, bool 
     return false;
 }
 
-bool CClientEntity::GetCustomDataInt(CStringName name, int& iOut, bool bInheritData)
+bool CClientEntity::GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData)
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData(name, bInheritData);
@@ -388,7 +388,7 @@ bool CClientEntity::GetCustomDataInt(CStringName name, int& iOut, bool bInheritD
     return false;
 }
 
-bool CClientEntity::GetCustomDataFloat(CStringName name, float& fOut, bool bInheritData)
+bool CClientEntity::GetCustomDataFloat(const CStringName& name, float& fOut, bool bInheritData)
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData(name, bInheritData);
@@ -415,7 +415,7 @@ bool CClientEntity::GetCustomDataFloat(CStringName name, float& fOut, bool bInhe
     return false;
 }
 
-bool CClientEntity::GetCustomDataBool(CStringName name, bool& bOut, bool bInheritData)
+bool CClientEntity::GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData)
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData(name, bInheritData);
@@ -470,7 +470,7 @@ bool CClientEntity::GetCustomDataBool(CStringName name, bool& bOut, bool bInheri
     return false;
 }
 
-void CClientEntity::SetCustomData(CStringName name, const CLuaArgument& Variable, bool bSynchronized)
+void CClientEntity::SetCustomData(const CStringName& name, const CLuaArgument& Variable, bool bSynchronized)
 {
     assert(name);
     if (name->length() > MAX_CUSTOMDATA_NAME_LENGTH)
@@ -499,7 +499,7 @@ void CClientEntity::SetCustomData(CStringName name, const CLuaArgument& Variable
     CallEvent("onClientElementDataChange", Arguments, true);
 }
 
-void CClientEntity::DeleteCustomData(CStringName name)
+void CClientEntity::DeleteCustomData(const CStringName& name)
 {
     // Grab the old variable
     SCustomData* pData = m_pCustomData->Get(name);

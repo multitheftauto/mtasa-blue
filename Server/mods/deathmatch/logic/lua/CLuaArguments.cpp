@@ -372,7 +372,7 @@ CLuaArgument* CLuaArguments::PushString(const std::string_view& string)
     return arg;
 }
 
-CLuaArgument* CLuaArguments::PushString(CStringName string)
+CLuaArgument* CLuaArguments::PushString(const CStringName& string)
 {
     CLuaArgument* arg = new CLuaArgument();
     arg->ReadString(string);
