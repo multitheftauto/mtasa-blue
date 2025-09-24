@@ -4943,7 +4943,7 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
-            std::vector<std::tuple<unsigned char, unsigned char, unsigned char>> weapons;
+            std::vector<unsigned char> weapons;
 
             for (unsigned char ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ucWeaponSlot)
             {
@@ -4963,7 +4963,7 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
 
                     if (shouldTake)
                     {
-                        weapons.push_back({ucWeaponID, ucAmmo, ucWeaponSlot});
+                        weapons.push_back(ucWeaponID);
 
                         pPed->SetWeaponType(0, ucWeaponSlot);
                         pPed->SetWeaponAmmoInClip(0, ucWeaponSlot);
@@ -4975,15 +4975,13 @@ bool CStaticFunctionDefinitions::TakeAllWeapons(CElement* pElement)
             if (!weapons.empty())
             {
                 CBitStream    BitStream;
-                std::size_t weaponsTaken = (std::size_t)weapons.size();
+                std::uint32_t weaponsTaken = (std::uint32_t)weapons.size();
 
                 BitStream.pBitStream->Write(weaponsTaken);
 
-                for (auto& w : weapons)
+                for (auto& weaponID : weapons)
                 {
-                    BitStream.pBitStream->Write(std::get<0>(w));
-                    BitStream.pBitStream->Write(std::get<1>(w));
-                    BitStream.pBitStream->Write(std::get<2>(w));
+                    BitStream.pBitStream->Write(weaponID);
                 }
 
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, TAKE_WEAPONS, *BitStream.pBitStream));

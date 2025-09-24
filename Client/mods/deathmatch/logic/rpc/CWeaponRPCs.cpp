@@ -188,7 +188,7 @@ void CWeaponRPCs::TakeWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
 
 void CWeaponRPCs::TakeWeapons(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    std::uint8_t count = 0;
+    std::uint32_t count = 0;
     if (!bitStream.Read(count))
         return;
 
@@ -196,12 +196,11 @@ void CWeaponRPCs::TakeWeapons(CClientEntity* pSource, NetBitStreamInterface& bit
     if (!pPed)
         return;
 
-    for (std::uint8_t i = 0; i < count; i++)
+    for (std::uint32_t i = 0; i < count; i++)
     {
-        unsigned char weaponID, ammo, slot;
-        if (!bitStream.Read(weaponID)) continue;
-        if (!bitStream.Read(ammo)) continue;
-        if (!bitStream.Read(slot)) continue;
+        unsigned char weaponID;
+        if (!bitStream.Read(weaponID))
+            return;
 
         if (!CClientPickupManager::IsValidWeaponID(weaponID))
             continue;
