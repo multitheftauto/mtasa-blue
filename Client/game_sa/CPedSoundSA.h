@@ -107,6 +107,12 @@ public:
 
     std::uint8_t field_154[4];
     std::uint8_t field_158[4];
+
+    void AddAudioEvent(AudioEvents::Enum audioEventID, float volume, float freq, CEntitySAInterface* targetEntity, std::uint32_t surfaceId, int somethingWithFightTask, int maxVolumeDuringFightTask)
+    {
+        if (canAddEvent)
+            ((void(__thiscall*)(CPedSoundEntitySAInterface*, int, float, float, CEntitySAInterface*, int, int, int))0x4E2BB0)(this, audioEventID, volume, freq, targetEntity, surfaceId, somethingWithFightTask, maxVolumeDuringFightTask);
+    }
 };
 static_assert(sizeof(CPedSoundEntitySAInterface) == 0x15C, "Invalid size for CPedSoundEntitySAInterface");
 
