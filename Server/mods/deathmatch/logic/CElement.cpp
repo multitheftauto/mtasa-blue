@@ -709,22 +709,24 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
+bool CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
 {
     assert(szName);
     if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
         CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return;
+        return false;
     }
 
-    // Grab the old variable
+    // Grab the old variable and sync type
     CLuaArgument       oldVariable;
+    ESyncType          oldSyncType = ESyncType::LOCAL;
     const SCustomData* pData = m_CustomData.Get(szName);
     if (pData)
     {
         oldVariable = pData->Variable;
+        oldSyncType = pData->syncType;
     }
 
     // Set the new data
@@ -737,18 +739,27 @@ void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, E
         Arguments.PushString(szName);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(Variable);
-        CallEvent("onElementDataChange", Arguments, pClient);
+        if (!CallEvent("onElementDataChange", Arguments, pClient))
+        {
+            // Event was cancelled, restore previous value
+            if (pData)
+                m_CustomData.Set(szName, oldVariable, oldSyncType);
+            else
+                m_CustomData.Delete(szName);
+            return false;
+        }
     }
+    return true;
 }
 
-void CElement::DeleteCustomData(const char* szName)
+bool CElement::DeleteCustomData(const char* szName)
 {
     // Grab the old variable
     SCustomData* pData = m_CustomData.Get(szName);
     if (pData)
     {
-        CLuaArgument oldVariable;
-        oldVariable = pData->Variable;
+        CLuaArgument oldVariable = pData->Variable;
+        ESyncType    oldSyncType = pData->syncType;
 
         // Delete the custom data
         m_CustomData.Delete(szName);
@@ -758,8 +769,15 @@ void CElement::DeleteCustomData(const char* szName)
         Arguments.PushString(szName);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
-        CallEvent("onElementDataChange", Arguments);
+        if (!CallEvent("onElementDataChange", Arguments))
+        {
+            // Event was cancelled, restore previous value
+            m_CustomData.Set(szName, oldVariable, oldSyncType);
+            return false;
+        }
+        return true;
     }
+    return false;
 }
 
 // Used to send the root element data when a player joins
