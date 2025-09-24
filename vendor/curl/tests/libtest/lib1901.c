@@ -21,19 +21,25 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
+#include "warnless.h"
 #include "memdebug.h"
 
-static size_t t1901_read_cb(char *ptr, size_t size, size_t nmemb, void *stream)
+
+
+static const char *chunks[]={
+  "one",
+  "two",
+  "three",
+  "four",
+  NULL
+};
+
+
+static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *stream)
 {
-  static const char *chunks[] = {
-    "one",
-    "two",
-    "three",
-    "four",
-    NULL
-  };
   static int ix = 0;
   (void)size;
   (void)nmemb;
@@ -47,7 +53,7 @@ static size_t t1901_read_cb(char *ptr, size_t size, size_t nmemb, void *stream)
   return 0;
 }
 
-static CURLcode test_lib1901(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;
@@ -61,7 +67,7 @@ static CURLcode test_lib1901(const char *URL)
        ignores it */
     easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 4L);
     easy_setopt(curl, CURLOPT_POSTFIELDS, NULL);
-    easy_setopt(curl, CURLOPT_READFUNCTION, t1901_read_cb);
+    easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
     easy_setopt(curl, CURLOPT_POST, 1L);
     easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);

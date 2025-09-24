@@ -15,13 +15,13 @@ namespace MemSA
 {
     size_t msize(const void* p)
     {
-        using gta_msize = size_t (*__cdecl)(const void*);
+        using gta_msize = size_t (__cdecl*)(const void*);
         return ((gta_msize)0x828C4A)(p);
     };
 
     void* malloc(size_t count)
     {
-        using gta_malloc = void* (*__cdecl)(size_t a1);
+        using gta_malloc = void* (__cdecl*)(size_t a1);
         return ((gta_malloc)0x824257)(count);
     };
 
@@ -33,7 +33,7 @@ namespace MemSA
 
     void free(void* p)
     {
-        using gta_free = void (*__cdecl)(void* p);
+        using gta_free = void (__cdecl*)(void* p);
         return ((gta_free)0x82413F)(p);
     };
 }

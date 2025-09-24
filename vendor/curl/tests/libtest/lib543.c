@@ -23,11 +23,11 @@
  ***************************************************************************/
 /* Based on Alex Fishman's bug report on September 30, 2007 */
 
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
-static CURLcode test_lib543(const char *URL)
+CURLcode test(char *URL)
 {
   static const unsigned char a[] = {
       0x9c, 0x26, 0x4b, 0x3d, 0x49, 0x4, 0xa1, 0x1,

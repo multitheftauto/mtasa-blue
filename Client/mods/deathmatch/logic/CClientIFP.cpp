@@ -453,7 +453,7 @@ void CClientIFP::InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarch
 {
     pAnimationHierarchy->Initialize();
     pAnimationHierarchy->SetName(strAnimationName);
-    pAnimationHierarchy->SetNumSequences(iSequences);
+    pAnimationHierarchy->SetNumSequences(static_cast<unsigned short>(iSequences));
     pAnimationHierarchy->SetAnimationBlockID(-1);
     pAnimationHierarchy->SetRunningCompressed(m_kbAllKeyFramesCompressed);
 }

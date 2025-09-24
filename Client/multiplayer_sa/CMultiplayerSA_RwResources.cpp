@@ -34,9 +34,11 @@ void OnMY_RwTextureCreate_Post(RwTexture* pTexture, DWORD calledFrom)
 #define HOOKPOS_RwTextureCreate                            0x7F37C0
 #define HOOKSIZE_RwTextureCreate                           5
 DWORD RETURN_RwTextureCreate = 0x7F37C5;
-void _declspec(naked) HOOK_RwTextureCreate()
+static void __declspec(naked) HOOK_RwTextureCreate()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -78,9 +80,11 @@ void OnMY_RwTextureDestroy(RwTexture* pTexture, DWORD calledFrom)
 #define HOOKPOS_RwTextureDestroy                            0x7F3820
 #define HOOKSIZE_RwTextureDestroy                           5
 DWORD RETURN_RwTextureDestroy = 0x7F3825;
-void _declspec(naked) HOOK_RwTextureDestroy()
+static void __declspec(naked) HOOK_RwTextureDestroy()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         push    esi
         mov         esi,dword ptr [esp+8]
@@ -109,9 +113,11 @@ void OnMY_RwRasterCreate(DWORD calledFrom)
 #define HOOKPOS_RwRasterCreate                            0x7FB230
 #define HOOKSIZE_RwRasterCreate                           5
 DWORD RETURN_RwRasterCreate = 0x7FB235;
-void _declspec(naked) HOOK_RwRasterCreate()
+static void __declspec(naked) HOOK_RwRasterCreate()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov         eax,dword ptr ds:[00C97B24h]
 
@@ -139,9 +145,11 @@ void OnMY_RwRasterDestroy(DWORD calledFrom)
 #define HOOKPOS_RwRasterDestroy                            0x7FB020
 #define HOOKSIZE_RwRasterDestroy                           5
 DWORD RETURN_RwRasterDestroy = 0x7FB025;
-void _declspec(naked) HOOK_RwRasterDestroy()
+static void __declspec(naked) HOOK_RwRasterDestroy()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         push    esi
         mov         esi,dword ptr [esp+8]
@@ -173,9 +181,11 @@ void OnMY_RwGeometryCreate_Post(RwGeometry* pGeometry, DWORD calledFrom)
 #define HOOKPOS_RwGeometryCreate                            0x74CA90
 #define HOOKSIZE_RwGeometryCreate                           7
 DWORD RETURN_RwGeometryCreate = 0x74CA97;
-void _declspec(naked) HOOK_RwGeometryCreate()
+static void __declspec(naked) HOOK_RwGeometryCreate()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -220,9 +230,11 @@ void OnMY_RwGeometryDestroy(DWORD calledFrom, RwGeometry* pGeometry)
 #define HOOKPOS_RwGeometryDestroy                            0x74CCC0
 #define HOOKSIZE_RwGeometryDestroy                           5
 DWORD RETURN_RwGeometryDestroy = 0x74CCC5;
-void _declspec(naked) HOOK_RwGeometryDestroy()
+static void __declspec(naked) HOOK_RwGeometryDestroy()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*1]

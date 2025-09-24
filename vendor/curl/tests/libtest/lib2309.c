@@ -21,7 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+
+#include "test.h"
+#include "testtrace.h"
+
+#include <curl/curl.h>
 
 static size_t cb_ignore(char *buffer, size_t size, size_t nmemb, void *userp)
 {
@@ -32,7 +36,7 @@ static size_t cb_ignore(char *buffer, size_t size, size_t nmemb, void *userp)
   return CURL_WRITEFUNC_ERROR;
 }
 
-static CURLcode test_lib2309(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl;
   CURL *curldupe;
@@ -45,7 +49,7 @@ static CURLcode test_lib2309(const char *URL)
     curl_easy_setopt(curl, CURLOPT_URL, URL);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(curl, CURLOPT_PROXY, libtest_arg3);
-    curl_easy_setopt(curl, CURLOPT_NETRC, CURL_NETRC_REQUIRED);
+    curl_easy_setopt(curl, CURLOPT_NETRC, (long)CURL_NETRC_REQUIRED);
     curl_easy_setopt(curl, CURLOPT_NETRC_FILE, libtest_arg2);
 
     curldupe = curl_easy_duphandle(curl);

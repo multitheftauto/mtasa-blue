@@ -29,7 +29,7 @@
  * because this implies that the data has been sent completely to the server.
  */
 
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
@@ -40,6 +40,7 @@ struct cb_data {
   size_t remaining_bytes;
 };
 
+
 static void reset_data(struct cb_data *data, CURL *curl)
 {
   data->easy_handle = curl;
@@ -48,9 +49,11 @@ static void reset_data(struct cb_data *data, CURL *curl)
   data->remaining_bytes = 3;
 }
 
-static size_t t1533_read_cb(char *ptr, size_t size, size_t nitems, void *userp)
+
+static size_t read_callback(char *ptr, size_t size, size_t nitems,
+                            void *userdata)
 {
-  struct cb_data *data = (struct cb_data *)userp;
+  struct cb_data *data = (struct cb_data *)userdata;
 
   /* wait until the server has sent all response headers */
   if(data->response_received) {
@@ -72,9 +75,11 @@ static size_t t1533_read_cb(char *ptr, size_t size, size_t nitems, void *userp)
   }
 }
 
-static size_t t1533_write_cb(char *ptr, size_t size, size_t nmemb, void *userp)
+
+static size_t write_callback(char *ptr, size_t size, size_t nmemb,
+                             void *userdata)
 {
-  struct cb_data *data = (struct cb_data *)userp;
+  struct cb_data *data = (struct cb_data *)userdata;
   size_t totalsize = nmemb * size;
 
   /* unused parameter */
@@ -91,6 +96,7 @@ static size_t t1533_write_cb(char *ptr, size_t size, size_t nmemb, void *userp)
 
   return totalsize;
 }
+
 
 static CURLcode perform_and_check_connections(CURL *curl,
                                               const char *description,
@@ -123,7 +129,7 @@ static CURLcode perform_and_check_connections(CURL *curl,
 }
 
 
-static CURLcode test_lib1533(const char *URL)
+CURLcode test(char *URL)
 {
   struct cb_data data;
   CURL *curl = NULL;
@@ -149,9 +155,9 @@ static CURLcode test_lib1533(const char *URL)
   test_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
               (curl_off_t)data.remaining_bytes);
   test_setopt(curl, CURLOPT_VERBOSE, 1L);
-  test_setopt(curl, CURLOPT_READFUNCTION, t1533_read_cb);
+  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
   test_setopt(curl, CURLOPT_READDATA, &data);
-  test_setopt(curl, CURLOPT_WRITEFUNCTION, t1533_write_cb);
+  test_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
   test_setopt(curl, CURLOPT_WRITEDATA, &data);
 
   result = perform_and_check_connections(curl,

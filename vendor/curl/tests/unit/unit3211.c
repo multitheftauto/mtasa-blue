@@ -21,14 +21,34 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "urldata.h"
 #include "uint-bset.h"
 #include "curl_trc.h"
 
+static CURLcode unit_setup(void)
+{
+  return CURLE_OK;
+}
+
+static unsigned int s1[] = {  /* spread numbers, some at slot edges */
+  0, 1, 4, 17, 63, 64, 65, 66,
+  90, 99,
+};
+static unsigned int s2[] = { /* set with all bits in slot1 set */
+  64, 65, 66, 67, 68, 69, 70, 71,
+  72, 73, 74, 75, 76, 77, 78, 79,
+  80, 81, 82, 83, 84, 85, 86, 87,
+  88, 89, 90, 91, 92, 93, 94, 95,
+  96, 97, 98, 99, 100, 101, 102, 103,
+  104, 105, 106, 107, 108, 109, 110, 111,
+  112, 113, 114, 115, 116, 117, 118, 119,
+  120, 121, 122, 123, 124, 125, 126, 127,
+};
+
 static void check_set(const char *name, unsigned int capacity,
-                      const unsigned int *s, size_t slen)
+                      unsigned int *s, size_t slen)
 {
   struct uint_bset bset;
   size_t i, j;
@@ -106,41 +126,28 @@ static void check_set(const char *name, unsigned int capacity,
     fail_unless(Curl_uint_bset_contains(&bset, s[i]), "unexpectedly lost");
 
   fail_unless(!Curl_uint_bset_resize(&bset, capacity/2), "resize half failed");
-  /* halved the size, what numbers remain in set? */
+  /* halfed the size, what numbers remain in set? */
   c = Curl_uint_bset_capacity(&bset);
   n = 0;
   for(i = 0; i < slen; ++i) {
     if(s[i] < c)
       ++n;
   }
-  fail_unless(n == Curl_uint_bset_count(&bset), "set count(halved) wrong");
+  fail_unless(n == Curl_uint_bset_count(&bset), "set count(halfed) wrong");
   for(i = 0; i < n; i++)  /* still present after resize half */
     fail_unless(Curl_uint_bset_contains(&bset, s[i]), "unexpectedly lost");
 
   Curl_uint_bset_destroy(&bset);
 }
 
-static CURLcode test_unit3211(const char *arg)
+static void unit_stop(void)
 {
-  UNITTEST_BEGIN_SIMPLE
+}
 
-  static const unsigned int s1[] = {  /* spread numbers, some at slot edges */
-    0, 1, 4, 17, 63, 64, 65, 66,
-    90, 99,
-  };
-  static const unsigned int s2[] = { /* set with all bits in slot1 set */
-    64, 65, 66, 67, 68, 69, 70, 71,
-    72, 73, 74, 75, 76, 77, 78, 79,
-    80, 81, 82, 83, 84, 85, 86, 87,
-    88, 89, 90, 91, 92, 93, 94, 95,
-    96, 97, 98, 99, 100, 101, 102, 103,
-    104, 105, 106, 107, 108, 109, 110, 111,
-    112, 113, 114, 115, 116, 117, 118, 119,
-    120, 121, 122, 123, 124, 125, 126, 127,
-  };
+
+UNITTEST_START
 
   check_set("s1", 100, s1, CURL_ARRAYSIZE(s1));
   check_set("s2", 1000, s2, CURL_ARRAYSIZE(s2));
 
-  UNITTEST_END_SIMPLE
-}
+UNITTEST_STOP

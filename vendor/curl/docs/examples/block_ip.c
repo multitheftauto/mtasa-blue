@@ -155,7 +155,7 @@ static struct ip *ip_list_append(struct ip *list, const char *data)
     ip->maskbits = 128;
 #endif
 
-  if(inet_pton(ip->family, ip->str, &ip->netaddr) != 1) {
+  if(1 != inet_pton(ip->family, ip->str, &ip->netaddr)) {
     free(ip->str);
     free(ip);
     return NULL;

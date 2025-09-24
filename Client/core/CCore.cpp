@@ -56,18 +56,18 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
     if (!StrCmpIA("enbseries\\enbhelper.dll", fileName))
     {
         std::error_code ec;
-        
+
         // Try to load enbhelper.dll from our custom launch directory first.
         const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
 
         if (fs::is_regular_file(inLaunchDir, ec))
-            return Win32LoadLibraryA(inLaunchDir.u8string().c_str());
+            return Win32LoadLibraryA(UTF8FilePath(inLaunchDir).c_str());
 
         // Try to load enbhelper.dll from the GTA install directory second.
         const fs::path inGTADir = g_gtaDirectory / "enbseries" / "enbhelper.dll";
 
         if (fs::is_regular_file(inGTADir, ec))
-            return Win32LoadLibraryA(inGTADir.u8string().c_str());
+            return Win32LoadLibraryA(UTF8FilePath(inGTADir).c_str());
 
         return nullptr;
     }
@@ -146,10 +146,6 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
-    // No initial fps limit
-    m_bDoneFrameRateLimit = false;
-    m_uiFrameRateLimit = 0;
-    m_uiServerFrameRateLimit = 0;
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
@@ -157,7 +153,9 @@ CCore::CCore()
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
     m_timeDiscordAppLastUpdate = 0;
-    m_CurrentRefreshRate = 60;
+
+    // Initialize FPS limiter
+    m_pFPSLimiter = std::make_unique<FPSLimiter::FPSLimiter>();
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
@@ -179,6 +177,8 @@ CCore::~CCore()
 
     // Destroy tray icon
     delete m_pTrayIcon;
+
+    m_pFPSLimiter.reset();
 
     // This will set the GTA volume to the GTA volume value in the settings,
     // and is not affected by the master volume setting.
@@ -1347,7 +1347,7 @@ void CCore::OnModUnload()
     m_pKeyBinds->RemoveAllControlFunctions();
 
     // Reset client script frame rate limit
-    m_uiClientScriptFrameRateLimit = 0;
+    GetFPSLimiter()->SetClientEnforcedFPS(FPSLimits::FPS_UNLIMITED);
 
     // Clear web whitelist
     if (m_pWebCore)
@@ -1757,8 +1757,8 @@ void CCore::UpdateRecentlyPlayed()
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
-        pRecentList->Remove(Address, uiPort);
-        pRecentList->AddUnique(Address, uiPort, true);
+        pRecentList->Remove(Address, static_cast<ushort>(uiPort));
+        pRecentList->AddUnique(Address, static_cast<ushort>(uiPort), true);
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())
@@ -1772,8 +1772,8 @@ void CCore::OnPostColorFilterRender()
 {
     if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
         return;
-    
-    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().EnteringMTARenderZone();
 
     CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
     CGraphics::GetSingleton().DrawLine3DPostFXQueue();
@@ -1831,141 +1831,14 @@ void CCore::ApplyCoreInitSettings()
 //
 void CCore::OnGameTimerUpdate()
 {
-    ApplyQueuedFrameRateLimit();
+    // NOTE: (pxd) We are handling the frame limiting updates
+    // earlier in the callpath (CModManager::DoPulsePreFrame, CModManager::DoPulsePostFrame)
 }
 
-//
-// Recalculate FPS limit to use
-//
-// Uses client rate from config
-// Uses client rate from script
-// Uses server rate from argument, or last time if not supplied
-//
-void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToConsole)
+void CCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    // Save rate from server if valid
-    if (uiServerFrameRateLimit != -1)
-        m_uiServerFrameRateLimit = uiServerFrameRateLimit;
-
-    // Start with value set by the server
-    m_uiFrameRateLimit = m_uiServerFrameRateLimit;
-
-    // Apply client config setting
-    uint uiClientConfigRate;
-    g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
-    if (uiClientConfigRate > 0)
-        uiClientConfigRate = std::max(45U, uiClientConfigRate);
-    // Lowest wins (Although zero is highest)
-    if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
-        m_uiFrameRateLimit = uiClientConfigRate;
-
-    // Apply client script setting
-    uint uiClientScriptRate = m_uiClientScriptFrameRateLimit;
-    // Lowest wins (Although zero is highest)
-    if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
-        m_uiFrameRateLimit = uiClientScriptRate;
-
-    if (!IsConnected())
-        m_uiFrameRateLimit = m_CurrentRefreshRate;
-
-    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
-    if (m_uiFrameRateLimit == 0)
-    {
-        m_bQueuedFrameRateValid = false;
-        GetGraphStats()->RemoveTimingPoint("Limiter");
-    }
-
-    // Print new limits to the console
-    if (bLogToConsole)
-    {
-        SString strStatus("Server FPS limit: %d", m_uiServerFrameRateLimit);
-        if (m_uiFrameRateLimit != m_uiServerFrameRateLimit)
-            strStatus += SString(" (Using %d)", m_uiFrameRateLimit);
-        CCore::GetSingleton().GetConsole()->Print(strStatus);
-    }
-}
-
-//
-// Change client rate as set by script
-//
-void CCore::SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit)
-{
-    m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
-    RecalculateFrameRateLimit(-1, false);
-}
-
-void CCore::SetCurrentRefreshRate(uint value)
-{
-    m_CurrentRefreshRate = value;
-    RecalculateFrameRateLimit(-1, false);
-}
-
-//
-// Make sure the frame rate limit has been applied since the last call
-//
-void CCore::EnsureFrameRateLimitApplied()
-{
-    if (!m_bDoneFrameRateLimit)
-    {
-        ApplyFrameRateLimit();
-    }
-    m_bDoneFrameRateLimit = false;
-}
-
-//
-// Do FPS limiting
-//
-// This is called once a frame even if minimized
-//
-void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
-{
-    TIMING_CHECKPOINT("-CallIdle1");
-    ms_TimingCheckpoints.EndTimingCheckpoints();
-
-    // Frame rate limit stuff starts here
-    m_bDoneFrameRateLimit = true;
-
-    uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
-
-    if (uiUseRate > 0)
-    {
-        // Apply previous frame rate if is hasn't been done yet
-        ApplyQueuedFrameRateLimit();
-
-        // Limit is usually applied in OnGameTimerUpdate
-        m_uiQueuedFrameRate = uiUseRate;
-        m_bQueuedFrameRateValid = true;
-    }
-
-    DoReliablePulse();
-
-    TIMING_GRAPH("FrameEnd");
-    TIMING_GRAPH("");
-}
-
-//
-// Frame rate limit (wait) is done here.
-//
-void CCore::ApplyQueuedFrameRateLimit()
-{
-    if (m_bQueuedFrameRateValid)
-    {
-        m_bQueuedFrameRateValid = false;
-        // Calc required time in ms between frames
-        const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
-
-        while (true)
-        {
-            // See if we need to wait
-            double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
-            if (dSpare <= 0.0)
-                break;
-            if (dSpare >= 10.0)
-                Sleep(1);
-        }
-        m_FrameRateTimer.Reset();
-        TIMING_GRAPH("Limiter");
-    }
+    if (m_pNet != nullptr)            // We have to wait for the network module to be loaded
+        GetWebCore()->OnFPSLimitChange(fps);
 }
 
 //
@@ -2020,7 +1893,7 @@ void CCore::OnDeviceRestore()
 void CCore::OnPreFxRender()
 {
     if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        return;    
+        return;
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
@@ -2035,7 +1908,7 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    CGraphics::GetSingleton().EnteringMTARenderZone();    
+    CGraphics::GetSingleton().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
@@ -2396,7 +2269,8 @@ SString CCore::GetBlueCopyrightString()
 
 // Set streaming memory size override [See `engineStreamingSetMemorySize`]
 // Use `0` to turn it off, and thus restore the value to the `cvar` setting
-void CCore::SetCustomStreamingMemory(size_t sizeBytes) {
+void CCore::SetCustomStreamingMemory(size_t sizeBytes)
+{
     // NOTE: The override is applied to the game in `CClientGame::DoPulsePostFrame`
     // There's no specific reason we couldn't do it here, but we wont
     m_CustomStreamingMemoryLimitBytes = sizeBytes;

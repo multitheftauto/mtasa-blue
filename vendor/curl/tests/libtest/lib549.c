@@ -26,11 +26,11 @@
  * argv3 = non-zero means ASCII transfer
  */
 
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
-static CURLcode test_lib549(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode res;
   CURL *curl;

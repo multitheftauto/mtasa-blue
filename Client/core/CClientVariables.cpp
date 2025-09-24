@@ -106,10 +106,10 @@ bool CClientVariables::Get(const std::string& strVariable, CColor& val)
     try
     {
         ss >> iR >> iG >> iB >> iA;
-        val.R = iR;
-        val.G = iG;
-        val.B = iB;
-        val.A = iA;
+        val.R = static_cast<unsigned char>(iR);
+        val.G = static_cast<unsigned char>(iG);
+        val.B = static_cast<unsigned char>(iB);
+        val.A = static_cast<unsigned char>(iA);
     }
     catch (...)
     {
@@ -234,7 +234,15 @@ void CClientVariables::ValidateValues()
 
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
-    ClampValue("fps_limit", 0, std::numeric_limits<short>::max());
+
+    // CVars need a better API for this (Issue #4427)
+    int temp;
+    CVARS_GET("fps_limit", temp);
+    std::uint16_t fps = static_cast<std::uint16_t>(temp);
+    FPSLimits::IsValidAndSetValid(fps, fps);
+    CVARS_SET("fps_limit", fps);
+
+
     ClampValue("chat_font", 0, 3);
     ClampValue("chat_lines", 3, 62);
     ClampValue("chat_color", CColor(0, 0, 0, 0), CColor(255, 255, 255, 255));
@@ -261,9 +269,10 @@ void CClientVariables::ValidateValues()
 
 void CClientVariables::LoadDefaults()
 {
-    #define DEFAULT(__x,__y)    if(!Exists(__x)) \
-                                Set(__x,__y)
-    #define _S(__x)             std::string(__x)
+#define DEFAULT(__x, __y) \
+    if (!Exists(__x)) \
+    Set(__x, __y)
+#define _S(__x) std::string(__x)
 
     if (!Exists("nick"))
     {
@@ -279,6 +288,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("console_size", CVector2D(200, 200));                        // console size
     DEFAULT("serverbrowser_size", CVector2D(720.0f, 495.0f));            // serverbrowser size
     DEFAULT("fps_limit", 100);                                           // frame limiter
+    DEFAULT("vsync", true);                                              // vsync
     DEFAULT("chat_font", 2);                                             // chatbox font type
     DEFAULT("chat_lines", 10);                                           // chatbox lines
     DEFAULT("chat_color", CColor(0, 0, 0, 0));                           // chatbox background color
@@ -379,4 +389,8 @@ void CClientVariables::LoadDefaults()
 #if 0
     DEFAULT ( "streaming_memory",           50 );                           // Streaming memory
 #endif
+
+#undef DEFAULT
+#undef _S
+
 }

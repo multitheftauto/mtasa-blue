@@ -23,7 +23,7 @@ CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const
     DWORD dwFunc = FUNC_CTaskSimpleGangDriveBy__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bSeatRHS
@@ -46,7 +46,7 @@ CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarg
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
     float fTargetX = vecTarget.fX, fTargetY = vecTarget.fY, fTargetZ = vecTarget.fZ;
     DWORD dwBurstLength = nBurstLength;
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bAimImmediate
@@ -73,7 +73,7 @@ bool CTaskSimpleUseGunSA::SetPedPosition(CPed* pPed)
 
     BYTE currentWeaponSlot = dwPedInterface->bCurrentWeaponSlot;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
@@ -88,7 +88,7 @@ void CTaskSimpleUseGunSA::FireGun(CPed* pPed, bool bFlag)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_FireGun;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bFlag
@@ -104,7 +104,7 @@ bool CTaskSimpleUseGunSA::ControlGun(CPed* pPed, CEntity* pTargetEntity, char nC
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    nCommand
@@ -121,7 +121,7 @@ bool CTaskSimpleUseGunSA::ControlGunMove(CVector2D* pMoveVec)
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ControlGunMove;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    pMoveVec
@@ -139,7 +139,7 @@ void CTaskSimpleUseGunSA::Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecT
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
     float fTargetX = vecTarget.fX, fTargetY = vecTarget.fY, fTargetZ = vecTarget.fZ;
     DWORD dwBurstLength = nBurstLength;
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    dwBurstLength
@@ -158,7 +158,7 @@ int CTaskSimpleUseGunSA::GetTaskType()
     int   iReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetTaskType;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -175,7 +175,7 @@ bool CTaskSimpleUseGunSA::MakeAbortable(CPed* pPed, int iPriority, CEvent const*
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_MakeAbortable;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    pEvent
@@ -193,7 +193,7 @@ bool CTaskSimpleUseGunSA::ProcessPed(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ProcessPed;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
@@ -208,7 +208,7 @@ void CTaskSimpleUseGunSA::AbortIK(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_AbortIK;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
@@ -221,7 +221,7 @@ void CTaskSimpleUseGunSA::AimGun(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_AimGun;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
@@ -234,7 +234,7 @@ void CTaskSimpleUseGunSA::ClearAnim(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ClearAnim;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
@@ -247,7 +247,7 @@ signed char CTaskSimpleUseGunSA::GetCurrentCommand()
     signed char bReturn;
     DWORD       dwFunc = FUNC_CTaskSimpleUseGun_GetCurrentCommand;
     DWORD       dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -261,7 +261,7 @@ bool CTaskSimpleUseGunSA::GetDoneFiring()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetDoneFiring;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -275,7 +275,7 @@ bool CTaskSimpleUseGunSA::GetIsFinished()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsFinished;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -289,7 +289,7 @@ bool CTaskSimpleUseGunSA::IsLineOfSightBlocked()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_IsLineOfSightBlocked;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -303,7 +303,7 @@ bool CTaskSimpleUseGunSA::GetIsFiring()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsFiring;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -317,7 +317,7 @@ bool CTaskSimpleUseGunSA::GetIsReloading()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsReloading;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -331,7 +331,7 @@ bool CTaskSimpleUseGunSA::GetSkipAim()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetSkipAim;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -345,7 +345,7 @@ bool CTaskSimpleUseGunSA::PlayerPassiveControlGun()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_PlayerPassiveControlGun;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
@@ -359,7 +359,7 @@ void CTaskSimpleUseGunSA::RemoveStanceAnims(CPed* pPed, float f)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_RemoveStanceAnims;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    f
@@ -374,7 +374,7 @@ bool CTaskSimpleUseGunSA::RequirePistolWhip(CPed* pPed, CEntity* pTargetEntity)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ControlGun;
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
-    _asm
+    __asm
     {
         push    dwTargetEntity
         push    dwPedInterface
@@ -388,7 +388,7 @@ void CTaskSimpleUseGunSA::SetBurstLength(short a)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_SetBurstLength;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    a
@@ -401,7 +401,7 @@ void CTaskSimpleUseGunSA::SetMoveAnim(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_SetMoveAnim;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
@@ -414,7 +414,7 @@ void CTaskSimpleUseGunSA::StartAnim(class CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_StartAnim;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
@@ -426,7 +426,7 @@ void CTaskSimpleUseGunSA::StartCountDown(unsigned char a, bool b)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_StartCountDown;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    b
@@ -443,7 +443,7 @@ CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, uns
     DWORD dwFunc = FUNC_CTaskSimpleFight__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    nIdlePeriod

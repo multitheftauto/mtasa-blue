@@ -46,7 +46,7 @@ bool CDeathmatchVehicle::SyncDamageModel()
     bool               bChanges = false;
 
     // Copy current door states to the sync structure and mark those that changed
-    for (unsigned int i = 0; i < MAX_DOORS; ++i)
+    for (unsigned char i = 0; i < MAX_DOORS; ++i)
     {
         damage.data.ucDoorStates[i] = GetDoorStatus(i);
         if (damage.data.ucDoorStates[i] != m_ucLastDoorStates[i])
@@ -58,7 +58,7 @@ bool CDeathmatchVehicle::SyncDamageModel()
             damage.data.bDoorStatesChanged[i] = false;
     }
     // Copy current wheel states to the sync structure and mark those that changed
-    for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+    for (unsigned char i = 0; i < MAX_WHEELS; ++i)
     {
         damage.data.ucWheelStates[i] = GetWheelStatus(i);
         if (damage.data.ucWheelStates[i] != m_ucLastWheelStates[i])
@@ -70,7 +70,7 @@ bool CDeathmatchVehicle::SyncDamageModel()
             damage.data.bWheelStatesChanged[i] = false;
     }
     // Copy current panel states to the sync structure and mark those that changed
-    for (unsigned int i = 0; i < MAX_PANELS; ++i)
+    for (unsigned char i = 0; i < MAX_PANELS; ++i)
     {
         damage.data.ucPanelStates[i] = GetPanelStatus(i);
         if (damage.data.ucPanelStates[i] != m_ucLastPanelStates[i])
@@ -82,7 +82,7 @@ bool CDeathmatchVehicle::SyncDamageModel()
             damage.data.bPanelStatesChanged[i] = false;
     }
     // Copy current light states to the sync structure and mark those that changed
-    for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+    for (unsigned char i = 0; i < MAX_LIGHTS; ++i)
     {
         damage.data.ucLightStates[i] = GetLightStatus(i);
         if (damage.data.ucLightStates[i] != m_ucLastLightStates[i])
@@ -124,12 +124,12 @@ bool CDeathmatchVehicle::SyncDamageModel()
 
 void CDeathmatchVehicle::ResetDamageModelSync()
 {
-    for (int i = 0; i < MAX_DOORS; i++)
+    for (unsigned char i = 0; i < MAX_DOORS; i++)
         m_ucLastDoorStates[i] = GetDoorStatus(i);
-    for (int i = 0; i < MAX_WHEELS; i++)
+    for (unsigned char i = 0; i < MAX_WHEELS; i++)
         m_ucLastWheelStates[i] = GetWheelStatus(i);
-    for (int i = 0; i < MAX_PANELS; i++)
+    for (unsigned char i = 0; i < MAX_PANELS; i++)
         m_ucLastPanelStates[i] = GetPanelStatus(i);
-    for (int i = 0; i < MAX_LIGHTS; i++)
+    for (unsigned char i = 0; i < MAX_LIGHTS; i++)
         m_ucLastLightStates[i] = GetLightStatus(i);
 }

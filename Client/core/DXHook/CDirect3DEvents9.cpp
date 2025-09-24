@@ -76,6 +76,21 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
 {
     WriteDebugEvent("CDirect3DEvents9::OnInvalidate");
 
+    // Ensure device is in a valid state before invalidation
+    // For example, Nvidia drivers can hang if device operations are attempted during invalid states
+    if (pDevice->TestCooperativeLevel() == D3DERR_DEVICELOST)
+    {
+        WriteDebugEvent("OnInvalidate: Device already lost, skipping operations");
+        return;
+    }
+
+    // Flush any pending operations before invalidation
+    g_pCore->GetGraphics()->GetRenderItemManager()->SaveReadableDepthBuffer();
+    g_pCore->GetGraphics()->GetRenderItemManager()->FlushNonAARenderTarget();
+    
+    // Force completion of all GPU operations
+    pDevice->EndScene(); // Ensure we're not in scene during invalidation
+    
     // Invalidate the VMR9 Manager
     // CVideoManager::GetSingleton ().OnLostDevice ();
 
@@ -188,6 +203,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CScreenShot::CheckForScreenShot(false);
 
     TIMING_CHECKPOINT("-OnPresent2");
+
+    TIMING_CHECKPOINT("");            // End of frame for profiler
 }
 
 #define SAVE_RENDERSTATE_AND_SET( reg, value ) \

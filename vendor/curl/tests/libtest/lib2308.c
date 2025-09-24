@@ -21,7 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+
+#include "test.h"
+#include "testtrace.h"
+
+#include <curl/curl.h>
 
 static size_t cb_curl(char *buffer, size_t size, size_t nmemb, void *userp)
 {
@@ -32,7 +36,7 @@ static size_t cb_curl(char *buffer, size_t size, size_t nmemb, void *userp)
   return CURL_WRITEFUNC_ERROR;
 }
 
-static CURLcode test_lib2308(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;

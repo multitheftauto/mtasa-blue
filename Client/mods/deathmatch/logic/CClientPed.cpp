@@ -1508,7 +1508,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     else
     {
         // Passenger seat
-        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
+        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, static_cast<unsigned char>(uiSeat));
         if (ucSeat != 0 && ucSeat != 0xFF)
         {
             if (m_pPlayerPed)
@@ -2014,6 +2014,13 @@ void CClientPed::SetFrozen(bool bFrozen)
             if (m_pPlayerPed)
             {
                 m_pPlayerPed->GetMatrix(&m_matFrozen);
+                
+                CVector vecFrozenRotation = m_matFrozen.GetRotation();
+                
+                if (vecFrozenRotation.fX == 0.0f && vecFrozenRotation.fY == 0.0f && vecFrozenRotation.fZ == 0.0f)
+                {
+                    m_matFrozen.SetRotation(m_Matrix.GetRotation());
+                }
             }
             else
             {
@@ -3326,6 +3333,12 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
 
 float CClientPed::GetCurrentRotation()
 {
+    if (IsFrozen())
+    {
+        CVector vecRotation = m_matFrozen.GetRotation();
+        return vecRotation.fZ;
+    }
+    
     if (m_pPlayerPed)
     {
         return m_pPlayerPed->GetCurrentRotation();
@@ -4538,7 +4551,7 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
             }
         }
 
-        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
+        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, static_cast<unsigned char>(uiSeat));
         if (ucSeat != 0 && ucSeat != 0xFF)
         {
             if (m_pPlayerPed)
@@ -4682,7 +4695,7 @@ bool CClientPed::IsOnGround(bool checkVehicles)
     if (DefinitelyLessThan(vecPosition.fZ, fGroundLevel))
         return false;
 
-    bool isOnGround = DefinitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f) || EssentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f);
+    bool isOnGround = DefinitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f, 1e-4f) || EssentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f, 1e-4f);
     if (!isOnGround && checkVehicles && m_pPlayerPed)
         return m_pPlayerPed->IsStandingOnEntity();
 
@@ -6119,6 +6132,21 @@ bool CClientPed::ReloadWeapon() noexcept
     if (!CanReloadWeapon() || (task && task->GetTaskType() == TASK_SIMPLE_USE_GUN))
         return false;
 
+    CLuaArguments args;
+    args.PushNumber(weapon->GetType());
+    args.PushNumber(weapon->GetAmmoInClip());
+    args.PushNumber(weapon->GetAmmoTotal());
+
+    bool result = false;
+
+    if (IS_PLAYER(this))
+        result = CallEvent("onClientPlayerWeaponReload", args, true);
+    else
+        result = CallEvent("onClientPedWeaponReload", args, true);
+
+    if (!result)
+        return false;
+
     weapon->SetState(WEAPONSTATE_RELOADING);
     return true;
 }
@@ -6517,13 +6545,6 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
-    {
-        return false;
-    }
-
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
     {
@@ -6667,11 +6688,11 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 
         // Set the vehicle id we're about to enter
         m_VehicleInOutID = pVehicle->GetID();
-        m_ucVehicleInOutSeat = uiSeat;
+        m_ucVehicleInOutSeat = static_cast<unsigned char>(uiSeat);
         m_bIsJackingVehicle = false;
 
         // Make ped enter vehicle
-        GetIntoVehicle(pVehicle, uiSeat, uiDoor);
+        GetIntoVehicle(pVehicle, uiSeat, static_cast<unsigned char>(uiDoor));
 
         // Remember that this ped is working on entering a vehicle
         SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
@@ -6735,13 +6756,6 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
-    {
-        return false;
-    }
-
     // Get our occupied vehicle
     CClientVehicle* pOccupiedVehicle = GetOccupiedVehicle();
     if (!pOccupiedVehicle)
@@ -6776,14 +6790,15 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    std::int8_t targetDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+    const int rawDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+    auto      targetDoor = static_cast<std::int8_t>(rawDoor);
 
     // If it's a local entity, we can just exit the vehicle
     if (IsLocalEntity())
     {
         // Set the vehicle id and the seat we're about to exit from
         m_VehicleInOutID = pOccupiedVehicle->GetID();
-        m_ucVehicleInOutSeat = GetOccupiedVehicleSeat();
+        m_ucVehicleInOutSeat = static_cast<unsigned char>(GetOccupiedVehicleSeat());
 
         // Call the onClientVehicleStartExit event for the ped
         // Check if it is cancelled before making the ped exit the vehicle
@@ -6796,7 +6811,7 @@ bool CClientPed::ExitVehicle()
             return false;
 
         // Make ped exit vehicle
-        GetOutOfVehicle(targetDoor);
+        GetOutOfVehicle(m_ucVehicleInOutSeat);
 
         // Remember that this ped is working on leaving a vehicle
         SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
@@ -6911,6 +6926,7 @@ void CClientPed::UpdateVehicleInOut()
 
             m_bIsGettingOutOfVehicle = false;
             m_VehicleInOutID = INVALID_ELEMENT_ID;
+            RemoveFromVehicle();
             SetVehicleInOutState(VEHICLE_INOUT_NONE);
         }
 
@@ -7200,4 +7216,37 @@ void CClientPed::SetSyncing(bool bIsSyncing)
         // Reset vehicle in/out stuff in case the ped was entering/exiting
         ResetVehicleInOut();
     }
+}
+
+void CClientPed::RunClimbingTask()
+{
+    if (!m_pPlayerPed)
+        return;
+
+    CVector climbPos;
+    float   climbAngle;
+    int     surfaceType;
+
+    CEntitySAInterface* climbEntity = CTaskSimpleClimb::TestForClimb(m_pPlayerPed, climbPos, climbAngle, surfaceType, true);
+
+    // If a ped is in the air, its rotation is inverted (see GetRotationDegressNew, GetRotationRadiansNew)
+    if (!IsOnGround() && !climbEntity)
+    {
+        CVector rot;
+        GetRotationDegrees(rot);
+
+        rot.fZ += 180.0f;
+        SetRotationDegrees(rot);
+
+        climbEntity = CTaskSimpleClimb::TestForClimb(m_pPlayerPed, climbPos, climbAngle, surfaceType, true);
+    }
+
+    if (!climbEntity)
+        return;
+
+    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, surfaceType, eClimbHeights::CLIMB_GRAB, false);
+    if (!climbTask)
+        return;
+
+    climbTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY, true);
 }

@@ -136,7 +136,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_ucWeaponType = pPlayer->GetWeaponType();
     pSim->m_usVehicleModel = pVehicle ? pVehicle->GetModel() : 0;
     pSim->m_ucSyncTimeContext = pPlayer->GetSyncTimeContext();
-    pSim->m_ucOccupiedVehicleSeat = pPlayer->GetOccupiedVehicleSeat();
+    pSim->m_ucOccupiedVehicleSeat = static_cast<unsigned char>(pPlayer->GetOccupiedVehicleSeat());
     pSim->m_fWeaponRange = pPlayer->GetWeaponRangeFromSlot();
     pSim->m_bVehicleHasHydraulics = pVehicle ? pVehicle->GetUpgrades()->HasUpgrade(1087) : false;
     pSim->m_bVehicleIsPlaneOrHeli = pVehicle ? pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI : false;
@@ -332,41 +332,34 @@ bool CSimPlayerManager::HandleKeySync(const NetServerPlayerID& Socket, NetBitStr
     return true;
 }
 
-///////////////////////////////////////////////////////////////
-//
-// CSimPlayerManager::HandleBulletSync
-//
-// Thread:              sync
-// CS should be locked: no
-//
-///////////////////////////////////////////////////////////////
-bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream)
+bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& socket, NetBitStreamInterface* stream)
 {
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PLAYER_BULLETSYNC))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();
 
-    // Grab the source player
-    CSimPlayer* pSourceSimPlayer = Get(Socket);
-
-    // Check is good for bullet sync
-    if (pSourceSimPlayer && pSourceSimPlayer->IsJoined())
+    auto* player = Get(socket);
+    if (!player || !player->IsJoined())
     {
-        // Read the incoming packet data
-        CSimBulletsyncPacket* pPacket = new CSimBulletsyncPacket(pSourceSimPlayer->m_PlayerID);
-
-        if (pPacket->Read(*BitStream))
-        {
-            // Relay it to nearbyers, if the player really has this weapon
-            if (pSourceSimPlayer->m_pRealPlayer->HasWeaponType(pPacket->m_Cache.weaponType))
-            {
-                Broadcast(*pPacket, pSourceSimPlayer->GetPuresyncSendList());
-            }
-        }
-
-        delete pPacket;
+        UnlockSimSystem();
+        return true;
     }
+
+    auto packet = std::make_unique<CSimBulletsyncPacket>(player->m_PlayerID);
+    if (!packet->Read(*stream))
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    if (!player->m_pRealPlayer->HasWeaponType(packet->m_cache.weapon))
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    Broadcast(*packet, player->GetPuresyncSendList());
 
     UnlockSimSystem();
     return true;

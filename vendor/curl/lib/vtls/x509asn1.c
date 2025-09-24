@@ -24,21 +24,23 @@
 
 #include "../curl_setup.h"
 
-#if defined(USE_GNUTLS) || defined(USE_WOLFSSL) || defined(USE_SCHANNEL) || \
+#if defined(USE_GNUTLS) || defined(USE_WOLFSSL) ||      \
+  defined(USE_SCHANNEL) || defined(USE_SECTRANSP) ||    \
   defined(USE_MBEDTLS) || defined(USE_RUSTLS)
 
-#if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_MBEDTLS) || \
-  defined(USE_WOLFSSL) || defined(USE_RUSTLS)
+#if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_SECTRANSP) || \
+  defined(USE_MBEDTLS) || defined(USE_WOLFSSL) || defined(USE_RUSTLS)
 #define WANT_PARSEX509 /* uses Curl_parseX509() */
 #endif
 
-#if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_MBEDTLS) || \
-  defined(USE_RUSTLS)
+#if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_SECTRANSP) || \
+  defined(USE_MBEDTLS) || defined(USE_RUSTLS)
 #define WANT_EXTRACT_CERTINFO /* uses Curl_extract_certinfo() */
 #endif
 
 #include <curl/curl.h>
 #include "../urldata.h"
+#include "../strcase.h"
 #include "../curl_ctype.h"
 #include "hostcheck.h"
 #include "vtls.h"
@@ -261,7 +263,7 @@ static const struct Curl_OID *searchOID(const char *oid)
 {
   const struct Curl_OID *op;
   for(op = OIDtable; op->numoid; op++)
-    if(!strcmp(op->numoid, oid) || curl_strequal(op->textoid, oid))
+    if(!strcmp(op->numoid, oid) || strcasecompare(op->textoid, oid))
       return op;
 
   return NULL;
@@ -589,7 +591,7 @@ CURLcode Curl_x509_GTime2str(struct dynbuf *store,
  * Return error code.
  */
 static CURLcode UTime2str(struct dynbuf *store,
-                          const char *beg, const char *end)
+                             const char *beg, const char *end)
 {
   const char *tzp;
   size_t tzl;
@@ -859,7 +861,7 @@ int Curl_parseX509(struct Curl_X509certificate *cert,
   if(!getASN1Element(&cert->subjectPublicKey, ccp,
                      cert->subjectPublicKeyInfo.end))
     return -1;
-  /* Get optional issuerUniqueID, subjectUniqueID and extensions. */
+  /* Get optional issuerUiqueID, subjectUniqueID and extensions. */
   cert->issuerUniqueID.tag = cert->subjectUniqueID.tag = 0;
   cert->extensions.tag = elem.tag = 0;
   cert->issuerUniqueID.header = cert->subjectUniqueID.header = NULL;
@@ -988,7 +990,7 @@ static int do_pubkey(struct Curl_easy *data, int certnum,
 
   /* Generate all information records for the public key. */
 
-  if(curl_strequal(algo, "ecPublicKey")) {
+  if(strcasecompare(algo, "ecPublicKey")) {
     /*
      * ECC public key is all the data, a value of type BIT STRING mapped to
      * OCTET STRING and should not be parsed as an ASN.1 value.
@@ -1010,7 +1012,7 @@ static int do_pubkey(struct Curl_easy *data, int certnum,
   if(!getASN1Element(&pk, pubkey->beg + 1, pubkey->end))
     return 1;
 
-  if(curl_strequal(algo, "rsaEncryption")) {
+  if(strcasecompare(algo, "rsaEncryption")) {
     const char *q;
     size_t len;
 
@@ -1045,7 +1047,7 @@ static int do_pubkey(struct Curl_easy *data, int certnum,
     if(do_pubkey_field(data, certnum, "rsa(e)", &elem))
       return 1;
   }
-  else if(curl_strequal(algo, "dsa")) {
+  else if(strcasecompare(algo, "dsa")) {
     p = getASN1Element(&elem, param->beg, param->end);
     if(p) {
       if(do_pubkey_field(data, certnum, "dsa(p)", &elem))
@@ -1063,7 +1065,7 @@ static int do_pubkey(struct Curl_easy *data, int certnum,
       }
     }
   }
-  else if(curl_strequal(algo, "dhpublicnumber")) {
+  else if(strcasecompare(algo, "dhpublicnumber")) {
     p = getASN1Element(&elem, param->beg, param->end);
     if(p) {
       if(do_pubkey_field(data, certnum, "dh(p)", &elem))
@@ -1275,5 +1277,5 @@ done:
 
 #endif /* WANT_EXTRACT_CERTINFO */
 
-#endif /* USE_GNUTLS or USE_WOLFSSL or USE_SCHANNEL or USE_MBEDTLS or
-          USE_RUSTLS */
+#endif /* USE_GNUTLS or USE_WOLFSSL or USE_SCHANNEL or USE_SECTRANSP
+          or USE_MBEDTLS or USE_RUSTLS */
