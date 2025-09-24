@@ -192,8 +192,8 @@ void CWeaponRPCs::TakeWeapons(CClientEntity* pSource, NetBitStreamInterface& bit
     if (!bitStream.Read(count))
         return;
 
-    CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
-    if (!pPed)
+    CClientPed* ped = m_pPedManager->Get(pSource->GetID(), true);
+    if (!ped)
         return;
 
     for (std::uint32_t i = 0; i < count; i++)
@@ -205,17 +205,17 @@ void CWeaponRPCs::TakeWeapons(CClientEntity* pSource, NetBitStreamInterface& bit
         if (!CClientPickupManager::IsValidWeaponID(weaponID))
             continue;
 
-        if (pPed->IsLocalPlayer())
+        if (ped->IsLocalPlayer())
         {
-            pPed->RemoveWeapon(static_cast<eWeaponType>(weaponID));
+            ped->RemoveWeapon(static_cast<eWeaponType>(weaponID));
         }
         else
         {
-            CWeapon* pPlayerWeapon = pPed->GetWeapon((eWeaponType)weaponID);
-            if (pPlayerWeapon)
+            CWeapon* playerWeapon = ped->GetWeapon(static_cast<eWeaponType>(weaponID));
+            if (playerWeapon)
             {
-                pPlayerWeapon->SetAmmoInClip(0);
-                pPlayerWeapon->SetAmmoTotal(0);
+                playerWeapon->SetAmmoInClip(0);
+                playerWeapon->SetAmmoTotal(0);
             }
         }
     }
