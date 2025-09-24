@@ -1762,6 +1762,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
 
             if (pPed->IsDead() && fHealth > 0.0f)
                 pPed->SetIsDead(false);
+            else if (fHealth <= 0.0f && !pPed->IsDead())
+                KillPed(pElement, nullptr, 0xFF, 0xFF, false);
 
             break;
         }
