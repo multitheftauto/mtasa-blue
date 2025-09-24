@@ -14,7 +14,10 @@
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Buffer.h"
 #include <algorithm>
-#include <filesystem>
+
+#if __cplusplus >= 201703L // C++17
+    #include <filesystem>
+#endif
 
 #ifdef _WIN32
     #ifndef NOMINMAX

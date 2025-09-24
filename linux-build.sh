@@ -1,27 +1,27 @@
 #!/bin/bash -e
 
 # Set variable defaults
-: ${BUILD_OS:=linux}
-: ${BUILD_ARCHITECTURE:=x64}
 : ${BUILD_CONFIG:=release}
 : ${PREMAKE_FILE:=premake5.lua}
 
-# Find premake binary location
 if [ "$(uname)" == "Darwin" ]; then
-    PREMAKE5=utils/premake5-macos
+    cores=$(sysctl -n hw.ncpu)
+    : ${NUM_CORES:=$cores}
+    : ${PREMAKE5:=utils/premake5-macos}
+    : ${BUILD_OS:=macosx}
+    : ${BUILD_ARCHITECTURE:=arm64}
+    : ${AR:=ar}
+    : ${CC:=clang}
+    : ${CXX:=clang++}
 else
-    PREMAKE5=utils/premake5
-fi
-
-# Number of cores
-if [ "$(uname)" == "Darwin" ]; then
-    NUM_CORES=$(sysctl -n hw.ncpu)
-    : ${GCC_PREFIX:=}
+    cores=$(grep -c ^processor /proc/cpuinfo)
+    : ${NUM_CORES:=$cores}
+    : ${PREMAKE5:=utils/premake5}
+    : ${BUILD_OS:=linux}
+    : ${BUILD_ARCHITECTURE:=x64}
     : ${AR:=ar}
     : ${CC:=gcc}
     : ${CXX:=g++}
-else
-    NUM_CORES=$(grep -c ^processor /proc/cpuinfo)
 fi
 
 # Read script arguments
@@ -55,31 +55,15 @@ esac
 case $BUILD_ARCHITECTURE in
     32|x86)
         CONFIG=${BUILD_CONFIG}_x86
-        : ${GCC_PREFIX:=i386-linux-gnu-}
-        : ${AR:=x86_64-linux-gnu-gcc-ar-10}
-        : ${CC:=x86_64-linux-gnu-gcc-10}
-        : ${CXX:=x86_64-linux-gnu-g++-10}
     ;;
     64|x64)
         CONFIG=${BUILD_CONFIG}_x64
-        : ${GCC_PREFIX:=x86_64-linux-gnu-}
-        : ${AR:=x86_64-linux-gnu-gcc-ar-10}
-        : ${CC:=x86_64-linux-gnu-gcc-10}
-        : ${CXX:=x86_64-linux-gnu-g++-10}
     ;;
     arm)
         CONFIG=${BUILD_CONFIG}_${BUILD_ARCHITECTURE}
-        : ${GCC_PREFIX:=arm-linux-gnueabihf-}
-        : ${AR:=arm-linux-gnueabihf-ar}
-        : ${CC:=arm-linux-gnueabihf-gcc-10}
-        : ${CXX:=arm-linux-gnueabihf-g++-10}
     ;;
     arm64)
         CONFIG=${BUILD_CONFIG}_${BUILD_ARCHITECTURE}
-        : ${GCC_PREFIX:=aarch64-linux-gnu-}
-        : ${AR:=aarch64-linux-gnu-gcc-ar-10}
-        : ${CC:=aarch64-linux-gnu-gcc-10}
-        : ${CXX:=aarch64-linux-gnu-g++-10}
     ;;
     *)
         echo "Error: Invalid build architecture" >&2

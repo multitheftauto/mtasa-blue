@@ -37,7 +37,7 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
     if (!IsValid())
         return;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    ebx
@@ -99,7 +99,7 @@ void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTear
     // Call the func
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CTaskSimpleChoking__UpdateChoke;
-    _asm
+    __asm
     {
         mov         ecx, dwThisInterface
         push        bIsTearGas

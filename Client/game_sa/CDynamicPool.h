@@ -84,6 +84,8 @@ public:
         {
             assert(false && "Could not allocate a memory for CDynamicPoolPart");
         }
+
+        return nullptr;
     }
 
     void RemoveItem(PoolObjT* item)

@@ -61,6 +61,7 @@ enum eBodyPart
     BODYPART_LEFT_LEG = 7,
     BODYPART_RIGHT_LEG = 8,
     BODYPART_HEAD = 9,
+    BODYPART_INVALID = 255,
 };
 
 enum eMovementState
@@ -380,7 +381,7 @@ public:
 
     void SetInWater(bool bIsInWater) { m_bIsInWater = bIsInWater; };
     bool IsInWater();
-    bool IsOnGround();
+    bool IsOnGround(bool checkVehicles = false);
 
     bool          IsClimbing();
     bool          IsRadioOn() const noexcept { return m_bRadioOn; };
@@ -562,6 +563,8 @@ public:
 
     void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; }
     bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; }
+
+    void RunClimbingTask();
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.

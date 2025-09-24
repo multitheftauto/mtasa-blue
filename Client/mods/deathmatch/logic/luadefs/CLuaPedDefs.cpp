@@ -914,13 +914,15 @@ int CLuaPedDefs::IsPedOnGround(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
+    bool             checkVehicles = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
+    argStream.ReadBool(checkVehicles, false);
 
     if (!argStream.HasErrors())
     {
         // Find out whether he's on the ground or not and return it
-        bool bOnGround = pPed->IsOnGround();
+        bool bOnGround = pPed->IsOnGround(checkVehicles);
         lua_pushboolean(luaVM, bOnGround);
         return 1;
     }
@@ -1929,7 +1931,7 @@ bool CLuaPedDefs::SetPedFightingStyle(CClientEntity* const entity, const unsigne
     if (style < 4 || style > 16)
         throw std::invalid_argument("Style can only be between 4 and 16");
 
-    return CStaticFunctionDefinitions::SetPedFightingStyle(*entity, style);
+    return CStaticFunctionDefinitions::SetPedFightingStyle(*entity, static_cast<unsigned char>(style));
 }
 
 int CLuaPedDefs::SetPedLookAt(lua_State* luaVM)

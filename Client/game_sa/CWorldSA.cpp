@@ -77,58 +77,56 @@ bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
     return false;
 }
 
-void HOOK_FallenPeds();
-void HOOK_FallenCars();
-
-void CWorldSA::InstallHooks()
-{
-    HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
-    HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
-}
-
 DWORD CONTINUE_CWorld_FallenPeds = 0x00565CBA;
 DWORD CONTINUE_CWorld_FallenCars = 0x00565E8A;
 
-void _declspec(naked) HOOK_FallenPeds()
+static bool IsUnderWorldWarpEnabled()
 {
-    if (pGame && pGame->IsUnderWorldWarpEnabled())
+    return pGame && pGame->IsUnderWorldWarpEnabled();
+}
+
+static void __declspec(naked) HOOK_FallenPeds()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-        _asm
-        {
-            sub esp, 2Ch
-            push ebx
-            mov ebx, ds:0B74490h
-            jmp CONTINUE_CWorld_FallenPeds
-        }
-    }
-    else
-    {
-        _asm
-        {
-            ret
-        }
+        call    IsUnderWorldWarpEnabled
+        test    al, al
+        jnz     continueWithOriginalCode
+        ret
+
+        continueWithOriginalCode:
+        sub     esp, 2Ch
+        push    ebx
+        mov     ebx, ds:0B74490h
+        jmp     CONTINUE_CWorld_FallenPeds
     }
 }
 
-void _declspec(naked) HOOK_FallenCars()
+static void __declspec(naked) HOOK_FallenCars()
 {
-    if (pGame && pGame->IsUnderWorldWarpEnabled())
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
-        _asm
-        {
-            sub esp, 2Ch
-            push ebx
-            mov ebx, ds:0B74494h
-            jmp CONTINUE_CWorld_FallenCars
-        }
+        call    IsUnderWorldWarpEnabled
+        test    al, al
+        jnz     continueWithOriginalCode
+        ret
+
+        continueWithOriginalCode:
+        sub     esp, 2Ch
+        push    ebx
+        mov     ebx, ds:0B74494h
+        jmp     CONTINUE_CWorld_FallenCars
     }
-    else
-    {
-        _asm
-        {
-            ret
-        }
-    }
+}
+
+void CWorldSA::InstallHooks()
+{
+    HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 10);
+    HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 10);
 }
 
 void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
@@ -145,7 +143,7 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
         }
         DWORD dwEntity = (DWORD)pEntitySA->GetInterface();
         DWORD dwFunction = FUNC_Add;
-        _asm
+        __asm
         {
             push    dwEntity
             call    dwFunction
@@ -162,7 +160,7 @@ void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
         SString strMessage("Caller: %i ", CallerId);
         LogEvent(506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage);
     }
-    _asm
+    __asm
     {
         push    entityInterface
         call    dwFunction
@@ -184,7 +182,7 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
         }
         DWORD dwEntity = (DWORD)pInterface;
         DWORD dwFunction = FUNC_Remove;
-        _asm
+        __asm
         {
             push    dwEntity
             call    dwFunction
@@ -201,7 +199,7 @@ void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId
         LogEvent(507, "CWorld::Remove ( CEntitySAInterface * ) Crash", "", strMessage);
     }
     DWORD dwFunction = FUNC_Remove;
-    _asm
+    __asm
     {
         push    entityInterface
         call    dwFunction
@@ -218,7 +216,7 @@ void CWorldSA::RemoveReferencesToDeletedObject(CEntitySAInterface* entity)
 {
     DWORD dwFunc = FUNC_RemoveReferencesToDeletedObject;
     DWORD dwEntity = (DWORD)entity;
-    _asm
+    __asm
     {
         push    dwEntity
         call    dwFunc
@@ -239,7 +237,7 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
     float* pfY = &fY;
     float* pfZ = &fZ;
     int    iUnknown = 21;
-    _asm
+    __asm
     {
         push    iUnknown
             push    pfZ
@@ -427,7 +425,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
     // bool bIgnoreSomeObjectsForCamera = false,    bool bShootThroughStuff = false
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, flags.bCheckCarTires);
 
-    _asm
+    __asm
     {
         push    flags.bShootThroughStuff
         push    flags.bIgnoreSomeObjectsForCamera
@@ -562,7 +560,7 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
     float fX = vecPosition->fX;
     float fY = vecPosition->fY;
     float fZ = vecPosition->fZ;
-    _asm
+    __asm
     {
         push    0
         push    0
@@ -590,7 +588,7 @@ bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd
     // bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false,
     // bool bIgnoreSomeObjectsForCamera = false
 
-    _asm
+    __asm
     {
         push    flags.bIgnoreSomeObjectsForCamera
         push    flags.bSeeThroughStuff
@@ -612,7 +610,7 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
 {
     DWORD dwFunc = FUNC_HasCollisionBeenLoaded;
     bool  bRet = false;
-    _asm
+    __asm
     {
         push    0
         push    vecPosition
@@ -633,7 +631,7 @@ void CWorldSA::SetCurrentArea(DWORD dwArea)
     MemPutFast<DWORD>(VAR_currArea, dwArea);
 
     DWORD dwFunc = FUNC_RemoveBuildingsNotInArea;
-    _asm
+    __asm
     {
         push    dwArea
         call    dwFunc
@@ -697,7 +695,7 @@ void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, i
 {
     DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition;            // __cdecl
 
-    _asm
+    __asm
     {
         push pOutVecPosition
         push iTrackId
@@ -727,8 +725,8 @@ int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutT
             {
                 SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
 
-                float fDistance = sqrt(pow(vecPosition.fZ - railNode.sZ * 0.125f, 2) + pow(vecPosition.fY - railNode.sY * 0.125f, 2) +
-                                       pow(vecPosition.fX - railNode.sX * 0.125f, 2));
+                float fDistance = sqrtf(powf(vecPosition.fZ - railNode.sZ * 0.125f, 2) + powf(vecPosition.fY - railNode.sY * 0.125f, 2) +
+                                       powf(vecPosition.fX - railNode.sX * 0.125f, 2));
                 if (fDistance < fMinDistance)
                 {
                     fMinDistance = fDistance;

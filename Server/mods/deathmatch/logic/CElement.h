@@ -97,7 +97,7 @@ public:
     void         SetIsBeingDeleted(bool bBeingDeleted) { m_bIsBeingDeleted = bBeingDeleted; };
     virtual void Unlink() = 0;
 
-    ElementID GetID() { return m_ID; };
+    ElementID GetID() const { return m_ID; };
 
     virtual const CVector& GetPosition();
     virtual void           SetPosition(const CVector& vecPosition);

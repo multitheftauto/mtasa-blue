@@ -174,7 +174,7 @@ int CLuaWorldDefs::CreateExplosion(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::CreateExplosion(vecPosition, iType, bMakeSound, fCamShake, bDamaging))
+        if (CStaticFunctionDefinitions::CreateExplosion(vecPosition, static_cast<unsigned char>(iType), bMakeSound, fCamShake, bDamaging))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -622,7 +622,7 @@ int CLuaWorldDefs::IsGarageOpen(lua_State* luaVM)
     {
         bool bIsOpen;
 
-        if (CStaticFunctionDefinitions::IsGarageOpen(iGarageID, bIsOpen))
+        if (CStaticFunctionDefinitions::IsGarageOpen(static_cast<unsigned char>(iGarageID), bIsOpen))
         {
             lua_pushboolean(luaVM, bIsOpen);
             return 1;
@@ -647,7 +647,7 @@ int CLuaWorldDefs::GetGaragePosition(lua_State* luaVM)
     {
         CVector vecPosition;
 
-        if (CStaticFunctionDefinitions::GetGaragePosition(iGarageID, vecPosition))
+        if (CStaticFunctionDefinitions::GetGaragePosition(static_cast<unsigned char>(iGarageID), vecPosition))
         {
             lua_pushnumber(luaVM, vecPosition.fX);
             lua_pushnumber(luaVM, vecPosition.fY);
@@ -676,11 +676,11 @@ int CLuaWorldDefs::GetGarageSize(lua_State* luaVM)
         float fWidth;
         float fHeight;
 
-        if (CStaticFunctionDefinitions::GetGarageSize(iGarageID, fHeight, fWidth, fDepth))
+        if (CStaticFunctionDefinitions::GetGarageSize(static_cast<unsigned char>(iGarageID), fHeight, fWidth, fDepth))
         {
-            lua_pushnumber(luaVM, fHeight);
             lua_pushnumber(luaVM, fWidth);
             lua_pushnumber(luaVM, fDepth);
+            lua_pushnumber(luaVM, fHeight);
             return 3;
         }
     }
@@ -706,7 +706,7 @@ int CLuaWorldDefs::GetGarageBoundingBox(lua_State* luaVM)
         float fFront;
         float fBack;
 
-        if (CStaticFunctionDefinitions::GetGarageBoundingBox(iGarageID, fLeft, fRight, fFront, fBack))
+        if (CStaticFunctionDefinitions::GetGarageBoundingBox(static_cast<unsigned char>(iGarageID), fLeft, fRight, fFront, fBack))
         {
             lua_pushnumber(luaVM, fLeft);
             lua_pushnumber(luaVM, fRight);
@@ -1069,7 +1069,7 @@ int CLuaWorldDefs::SetGarageOpen(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetGarageOpen(iGarageID, bOpen))
+        if (CStaticFunctionDefinitions::SetGarageOpen(static_cast<unsigned char>(iGarageID), bOpen))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1126,7 +1126,8 @@ int CLuaWorldDefs::RemoveWorldBuilding(lua_State* luaVM)
             if (pResource)
             {
                 uint uiAmount;
-                CStaticFunctionDefinitions::RemoveWorldBuilding(iModelToRemove, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior, uiAmount);
+                CStaticFunctionDefinitions::RemoveWorldBuilding(static_cast<unsigned short>(iModelToRemove), fRadius, vecPosition.fX,
+                                                                vecPosition.fY, vecPosition.fZ, cInterior, uiAmount);
 
                 lua_pushboolean(luaVM, true);
                 lua_pushnumber(luaVM, uiAmount);
@@ -1182,7 +1183,8 @@ int CLuaWorldDefs::RestoreWorldBuilding(lua_State* luaVM)
             if (pResource)
             {
                 uint uiAmount;
-                CStaticFunctionDefinitions::RestoreWorldBuilding(iModelToRestore, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior, uiAmount);
+                CStaticFunctionDefinitions::RestoreWorldBuilding(static_cast<unsigned short>(iModelToRestore), fRadius, vecPosition.fX,
+                                                                 vecPosition.fY, vecPosition.fZ, cInterior, uiAmount);
 
                 lua_pushboolean(luaVM, true);
                 lua_pushnumber(luaVM, uiAmount);
@@ -1357,7 +1359,7 @@ int CLuaWorldDefs::SetTrafficLightState(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::SetTrafficLightState(iState))
+            if (CStaticFunctionDefinitions::SetTrafficLightState(static_cast<unsigned char>(iState)))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1852,7 +1854,8 @@ int CLuaWorldDefs::SetSunColor(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        g_pMultiplayer->SetSunColor(iCoreRed, iCoreGreen, iCoreBlue, iCoronaRed, iCoronaGreen, iCoronaBlue);
+        g_pMultiplayer->SetSunColor(static_cast<unsigned char>(iCoreRed), static_cast<unsigned char>(iCoreGreen), static_cast<unsigned char>(iCoreBlue),
+                                    static_cast<unsigned char>(iCoronaRed), static_cast<unsigned char>(iCoronaGreen), static_cast<unsigned char>(iCoronaBlue));
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2000,21 +2003,19 @@ int CLuaWorldDefs::ResetMoonSize(lua_State* luaVM)
 int CLuaWorldDefs::SetFPSLimit(lua_State* luaVM)
 {
     // bool setFPSLimit ( int fpsLimit )
-    int iLimit;
+    std::uint16_t fps;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iLimit);
+    CScriptArgReader argReader(luaVM);
+    argReader.ReadNumber(fps);
 
-    if (!argStream.HasErrors())
+    if (!argReader.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetFPSLimit(iLimit))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        CStaticFunctionDefinitions::SetClientFPSLimit(fps);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        m_pScriptDebugging->LogCustom(luaVM, argReader.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -2022,14 +2023,12 @@ int CLuaWorldDefs::SetFPSLimit(lua_State* luaVM)
 
 int CLuaWorldDefs::GetFPSLimit(lua_State* luaVM)
 {
-    int iLimit;
-    if (CStaticFunctionDefinitions::GetFPSLimit(iLimit))
-    {
-        lua_pushnumber(luaVM, iLimit);
-        return 1;
-    }
+    // int getFPSLimit ()
+    std::uint16_t fps;
 
-    lua_pushboolean(luaVM, false);
+    CStaticFunctionDefinitions::GetFPSLimit(fps);
+
+    lua_pushnumber(luaVM, fps);
     return 1;
 }
 
@@ -2187,9 +2186,9 @@ bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::op
         case WorldProperty::SPRITE_BRIGHTNESS:
             return g_pMultiplayer->SetSpriteBrightness(arg1);
         case WorldProperty::POLE_SHADOW_STRENGTH:
-            return g_pMultiplayer->SetPoleShadowStrength(arg1);
+            return g_pMultiplayer->SetPoleShadowStrength(static_cast<int16_t>(arg1));
         case WorldProperty::SHADOW_STRENGTH:
-            return g_pMultiplayer->SetShadowStrength(arg1);
+            return g_pMultiplayer->SetShadowStrength(static_cast<int16_t>(arg1));
         case WorldProperty::SHADOWS_OFFSET:
             return g_pMultiplayer->SetShadowsOffset(arg1);
         case WorldProperty::LIGHTS_ON_GROUND:

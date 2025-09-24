@@ -386,7 +386,7 @@ LUA_API const char *lua_tolstring (lua_State *L, int idx, size_t *len) {
 LUA_API unsigned (lua_tostringhash) (lua_State *L, int idx) {
     StkId o = index2adr(L, idx);
     if (!ttisstring(o))
-        return NULL;
+        return 0;
 
     return tsvalue(o)->hash;
 }

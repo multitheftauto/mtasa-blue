@@ -167,7 +167,7 @@ CVectorGraphicItem* CRenderItemManager::CreateVectorGraphic(uint width, uint hei
     }
 
     UpdateMemoryUsage();
-
+    
     return pVectorItem;
 }
 
@@ -723,7 +723,7 @@ void CRenderItemManager::UpdateMemoryUsage()
             continue;
         int iMemoryKBUsed = pRenderItem->GetVideoMemoryKBUsed();
 
-        if (pRenderItem->IsA(CFileTextureItem::GetClassId()))
+        if (pRenderItem->IsA(CFileTextureItem::GetClassId()) || pRenderItem->IsA(CVectorGraphicItem::GetClassId()))
             m_iTextureMemoryKBUsed += iMemoryKBUsed;
         else if (pRenderItem->IsA(CRenderTargetItem::GetClassId()) || pRenderItem->IsA(CScreenSourceItem::GetClassId()))
             m_iRenderTargetMemoryKBUsed += iMemoryKBUsed;
@@ -1181,6 +1181,19 @@ void CRenderItemManager::SaveReadableDepthBuffer()
     {
         m_bUsingReadableDepthBuffer = false;
 
+        // Ensure device operations are synchronous for GPU driver (especially Nvidia) compatibility
+        IDirect3DSurface9* pCurrentDepthSurface = nullptr;
+        if (SUCCEEDED(m_pDevice->GetDepthStencilSurface(&pCurrentDepthSurface)))
+        {
+            // Force GPU to complete any pending depth buffer operations
+            D3DLOCKED_RECT lockedRect;
+            if (SUCCEEDED(pCurrentDepthSurface->LockRect(&lockedRect, nullptr, D3DLOCK_READONLY | D3DLOCK_DONOTWAIT)))
+            {
+                pCurrentDepthSurface->UnlockRect();
+            }
+            SAFE_RELEASE(pCurrentDepthSurface);
+        }
+
         if (m_pNonAADepthSurface2)
         {
             // If using AA hacks, change to the other depth buffer we created
@@ -1196,6 +1209,11 @@ void CRenderItemManager::SaveReadableDepthBuffer()
                 SAFE_RELEASE(m_pSavedSceneDepthSurface);
             }
         }
+        
+        // Additional sync point for GPU driver
+        // Force immediate execution of depth buffer state changes
+        m_pDevice->BeginScene();
+        m_pDevice->EndScene();
     }
 }
 

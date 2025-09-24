@@ -28,7 +28,7 @@ public:
     ZERO_ON_NEW
     CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder);
     ~CClientPlayerVoice();
-    void DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten);
+    void DecodeAndBuffer(const unsigned char* voiceBuffer, unsigned int voiceBufferLength);
     void DoPulse();
 
     bool m_bVoiceActive;
