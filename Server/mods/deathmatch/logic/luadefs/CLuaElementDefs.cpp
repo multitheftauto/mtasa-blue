@@ -1579,7 +1579,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
             key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
-        if (CStaticFunctionDefinitions::SetElementData(pElement, key.ToCString(), value, syncType, clientTrust))
+        if (CStaticFunctionDefinitions::SetElementData(pElement, key, value, syncType, clientTrust))
         {
             lua_pushboolean(luaVM, true);
             return 1;

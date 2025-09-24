@@ -56,7 +56,7 @@ public:
 
     static bool IsValidPlayerModel(unsigned short model);
 
-    void ClearElementData(CElement* pElement, const std::string& name);
+    void ClearElementData(CElement* pElement, CStringName name);
     void ClearElementData(CElement* pElement);
 
     void               ResetAll();
