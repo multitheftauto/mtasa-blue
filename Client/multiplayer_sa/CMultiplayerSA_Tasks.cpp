@@ -26,9 +26,11 @@ static bool __IsIgnoreFireStateEnabled()
 #define HOOKSIZE_CTaskSimplePlayerOnFoot__MakeAbortable 6
 static constexpr std::uintptr_t RETURN_CTaskSimplePlayerOnFoot__MakeAbortable = 0x68585F;
 static constexpr std::uintptr_t SKIP_CTaskSimplePlayerOnFoot__MakeAbortable = 0x685855;
-static void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
+static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // return false and keep task alive
         call dword ptr [eax+8]

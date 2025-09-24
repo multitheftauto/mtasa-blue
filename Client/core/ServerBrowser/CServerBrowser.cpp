@@ -210,7 +210,7 @@ CServerBrowser::CServerBrowser()
     m_pGeneralHelpWindow->SetDeactivateHandler(GUI_CALLBACK(&CServerBrowser::OnGeneralHelpDeactivate, this));
 
     float fMaxLeft = pManager->CGUI_GetMaxTextExtent("default-normal", _("Refresh"), _("Add Favorite"), _("Connect"), _("Server information"));
-    float fMaxRight = pManager->CGUI_GetMaxTextExtent("default-normal", _("Search servers"), _("Search players"), _("Start search"));
+    float fMaxRight = pManager->CGUI_GetMaxTextExtent("default-normal", _("Search servers"), _("Search players"), _("Start search"), _("Delete from recent"));
 
     CVector2D generalHelpSize(80 + fMaxLeft + 80 + fMaxRight, 160);
     CVector2D generalHelpPos = helpButtonPos - generalHelpSize + CVector2D(helpButtonSize.fX, 0);
@@ -233,6 +233,7 @@ CServerBrowser::CServerBrowser()
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 0 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-servers.png"},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 1 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-players.png"},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 2 + 5, 16, 16, "cgui\\images\\serverbrowser\\search.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 3 + 5, 16, 16, "cgui\\images\\serverbrowser\\trashcan.png"},
         };
 
         for (uint i = 0; i < NUMELMS(iconInfoList); i++)
@@ -256,6 +257,7 @@ CServerBrowser::CServerBrowser()
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 0, _("Search servers")},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 1, _("Search players")},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 2, _("Start search")},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 3, _("Delete from recent")},
         };
 
         for (uint i = 0; i < NUMELMS(helpInfoList); i++)
@@ -1054,14 +1056,14 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
             pServer->iRowIndex = iIndex;
         }
 
-        const SString strVersion = !bIncludeOtherVersions ? "" : pServer->strVersion;
+        const SString strVersion = !bIncludeOtherVersions ? SStringX("") : pServer->strVersion;
         const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
         const SString strVerified = pServer->isStatusVerified ? "" : "*";
-        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
+        const SString strPlayers = pServer->nMaxPlayers == 0 ? SStringX("") : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
         const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
 
-        const SString strPing = pServer->nPing == 9999 ? "" : SString("%d", pServer->nPing);
+        const SString strPing = pServer->nPing == 9999 ? SStringX("") : SString("%d", pServer->nPing);
         const SString strPingSortKey = SString("%04d-", pServer->nPing) + pServer->strTieBreakSortKey;
 
         // The row index could change at any point here if list sorting is enabled
@@ -1724,7 +1726,7 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
                 {
                     iPort = atoi(pPortAttribute->GetValue().c_str());
                     if (iPort > 0)
-                        pList->AddUnique(Address, iPort);
+                        pList->AddUnique(Address, static_cast<ushort>(iPort));
                 }
             }
         }

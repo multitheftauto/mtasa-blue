@@ -120,7 +120,7 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
   if(!passwdp)
     passwdp = "";
 
-#ifdef USE_WINDOWS_SSPI
+#if defined(USE_WINDOWS_SSPI)
   have_chlg = !!digest->input_token;
 #else
   have_chlg = !!digest->nonce;

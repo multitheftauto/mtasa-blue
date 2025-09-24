@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 #pragma once
+
+#define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include <cryptopp/base64.h>
 #include <cryptopp/base32.h>
 #include <cryptopp/aes.h>

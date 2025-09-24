@@ -135,9 +135,9 @@ static bool cookie_tailmatch(const char *cookie_domain,
   if(hostname_len < cookie_domain_len)
     return FALSE;
 
-  if(!curl_strnequal(cookie_domain,
-                     hostname + hostname_len-cookie_domain_len,
-                     cookie_domain_len))
+  if(!strncasecompare(cookie_domain,
+                      hostname + hostname_len-cookie_domain_len,
+                      cookie_domain_len))
     return FALSE;
 
   /*
@@ -167,13 +167,13 @@ static bool pathmatch(const char *cookie_path, const char *uri_path)
 
   /* cookie_path must not have last '/' separator. ex: /sample */
   cookie_path_len = strlen(cookie_path);
-  if(cookie_path_len == 1) {
+  if(1 == cookie_path_len) {
     /* cookie_path must be '/' */
     return TRUE;
   }
 
   /* #-fragments are already cut off! */
-  if(strlen(uri_path) == 0 || uri_path[0] != '/')
+  if(0 == strlen(uri_path) || uri_path[0] != '/')
     uri_path = "/";
 
   /*
@@ -296,9 +296,9 @@ static char *sanitize_cookie_path(const char *cookie_path)
     /* Let cookie-path be the default-path. */
     return strdup("/");
 
-  /* remove trailing slash when path is non-empty */
+  /* remove trailing slash */
   /* convert /hoge/ to /hoge */
-  if(len > 1 && cookie_path[len - 1] == '/')
+  if(len && cookie_path[len - 1] == '/')
     len--;
 
   return Curl_memdup0(cookie_path, len);
@@ -409,7 +409,7 @@ static void remove_expired(struct CookieInfo *ci)
 /* Make sure domain contains a dot or is localhost. */
 static bool bad_domain(const char *domain, size_t len)
 {
-  if((len == 9) && curl_strnequal(domain, "localhost", 9))
+  if((len == 9) && strncasecompare(domain, "localhost", 9))
     return FALSE;
   else {
     /* there must be a dot present, but that dot must not be a trailing dot */
@@ -815,7 +815,7 @@ parse_netscape(struct Cookie *co,
        * domain can access the variable. Set TRUE when the cookie says
        * .example.com and to false when the domain is complete www.example.com
        */
-      co->tailmatch = !!curl_strnequal(ptr, "TRUE", len);
+      co->tailmatch = !!strncasecompare(ptr, "TRUE", len);
       break;
     case 2:
       /* The file format allows the path field to remain not filled in */
@@ -842,7 +842,7 @@ parse_netscape(struct Cookie *co,
       FALLTHROUGH();
     case 3:
       co->secure = FALSE;
-      if(curl_strnequal(ptr, "TRUE", len)) {
+      if(strncasecompare(ptr, "TRUE", len)) {
         if(secure || ci->running)
           co->secure = TRUE;
         else
@@ -859,9 +859,9 @@ parse_netscape(struct Cookie *co,
         return CERR_OUT_OF_MEMORY;
       else {
         /* For Netscape file format cookies we check prefix on the name */
-        if(curl_strnequal("__Secure-", co->name, 9))
+        if(strncasecompare("__Secure-", co->name, 9))
           co->prefix_secure = TRUE;
-        else if(curl_strnequal("__Host-", co->name, 7))
+        else if(strncasecompare("__Host-", co->name, 7))
           co->prefix_host = TRUE;
       }
       break;
@@ -872,7 +872,7 @@ parse_netscape(struct Cookie *co,
       break;
     }
   }
-  if(fields == 6) {
+  if(6 == fields) {
     /* we got a cookie with blank contents, fix it */
     co->value = strdup("");
     if(!co->value)
@@ -881,7 +881,7 @@ parse_netscape(struct Cookie *co,
       fields++;
   }
 
-  if(fields != 7)
+  if(7 != fields)
     /* we did not find the sufficient number of fields */
     return CERR_FIELDS;
 
@@ -917,7 +917,7 @@ is_public_suffix(struct Curl_easy *data,
         Curl_psl_release(data);
       }
       else
-        infof(data, "libpsl problem, rejecting cookie for safety");
+        infof(data, "libpsl problem, rejecting cookie for satety");
     }
 
     if(!acceptable) {
@@ -954,7 +954,7 @@ replace_existing(struct Curl_easy *data,
       bool matching_domains = FALSE;
 
       if(clist->domain && co->domain) {
-        if(curl_strequal(clist->domain, co->domain))
+        if(strcasecompare(clist->domain, co->domain))
           /* The domains are identical */
           matching_domains = TRUE;
       }
@@ -965,7 +965,7 @@ replace_existing(struct Curl_easy *data,
          clist->spath && co->spath && /* both have paths */
          clist->secure && !co->secure && !secure) {
         size_t cllen;
-        const char *sep = NULL;
+        const char *sep;
 
         /*
          * A non-secure cookie may not overlay an existing secure cookie.
@@ -974,15 +974,14 @@ replace_existing(struct Curl_easy *data,
          * "/loginhelper" is ok.
          */
 
-        DEBUGASSERT(clist->spath[0]);
-        if(clist->spath[0])
-          sep = strchr(clist->spath + 1, '/');
+        sep = strchr(clist->spath + 1, '/');
+
         if(sep)
           cllen = sep - clist->spath;
         else
           cllen = strlen(clist->spath);
 
-        if(curl_strnequal(clist->spath, co->spath, cllen)) {
+        if(strncasecompare(clist->spath, co->spath, cllen)) {
           infof(data, "cookie '%s' for domain '%s' dropped, would "
                 "overlay an existing cookie", co->name, co->domain);
           return CERR_BAD_SECURE;
@@ -994,7 +993,7 @@ replace_existing(struct Curl_easy *data,
       /* the names are identical */
 
       if(clist->domain && co->domain) {
-        if(curl_strequal(clist->domain, co->domain) &&
+        if(strcasecompare(clist->domain, co->domain) &&
           (clist->tailmatch == co->tailmatch))
           /* The domains are identical */
           replace_old = TRUE;
@@ -1006,7 +1005,7 @@ replace_existing(struct Curl_easy *data,
         /* the domains were identical */
 
         if(clist->spath && co->spath &&
-           !curl_strequal(clist->spath, co->spath))
+           !strcasecompare(clist->spath, co->spath))
           replace_old = FALSE;
         else if(!clist->spath != !co->spath)
           replace_old = FALSE;
@@ -1338,7 +1337,7 @@ int Curl_cookie_getlist(struct Curl_easy *data,
       if(!co->domain ||
          (co->tailmatch && !is_ip &&
           cookie_tailmatch(co->domain, strlen(co->domain), host)) ||
-         ((!co->tailmatch || is_ip) && curl_strequal(host, co->domain)) ) {
+         ((!co->tailmatch || is_ip) && strcasecompare(host, co->domain)) ) {
         /*
          * the right part of the host matches the domain stuff in the
          * cookie data

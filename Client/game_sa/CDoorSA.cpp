@@ -24,7 +24,7 @@ float CDoorSA::GetAngleOpenRatio()
 
     if (dwPointer != 0)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwPointer
             call    dwFunction
@@ -47,7 +47,7 @@ bool CDoorSA::IsClosed()
 
     if (dwPointer != 0)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwPointer
             call    dwFunction
@@ -71,7 +71,7 @@ bool CDoorSA::IsFullyOpen()
 
     if (dwPointer != 0)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwPointer
             call    dwFunction
@@ -94,7 +94,7 @@ void CDoorSA::Open(float fOpenRatio)
 
     if (dwPointer != 0)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwPointer
             push    fOpenRatio

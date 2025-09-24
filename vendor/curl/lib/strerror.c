@@ -317,7 +317,36 @@ curl_easy_strerror(CURLcode error)
     return "ECH attempted but failed";
 
     /* error codes not used by current libcurl */
-  default:
+  case CURLE_OBSOLETE20:
+  case CURLE_OBSOLETE24:
+  case CURLE_OBSOLETE29:
+  case CURLE_OBSOLETE32:
+  case CURLE_OBSOLETE34:
+  case CURLE_OBSOLETE40:
+  case CURLE_OBSOLETE41:
+  case CURLE_OBSOLETE44:
+  case CURLE_OBSOLETE46:
+  case CURLE_OBSOLETE50:
+  case CURLE_OBSOLETE51:
+  case CURLE_OBSOLETE57:
+  case CURLE_OBSOLETE62:
+  case CURLE_OBSOLETE75:
+  case CURLE_OBSOLETE76:
+
+    /* error codes used by curl tests */
+  case CURLE_RESERVED115:
+  case CURLE_RESERVED116:
+  case CURLE_RESERVED117:
+  case CURLE_RESERVED118:
+  case CURLE_RESERVED119:
+  case CURLE_RESERVED120:
+  case CURLE_RESERVED121:
+  case CURLE_RESERVED122:
+  case CURLE_RESERVED123:
+  case CURLE_RESERVED124:
+  case CURLE_RESERVED125:
+  case CURLE_RESERVED126:
+  case CURL_LAST:
     break;
   }
   /*
@@ -809,7 +838,7 @@ const char *Curl_strerror(int err, char *buf, size_t buflen)
   * storage is supplied via 'strerrbuf' and 'buflen' to hold the generated
   * message string, or EINVAL if 'errnum' is not a valid error number.
   */
-  if(strerror_r(err, buf, buflen)) {
+  if(0 != strerror_r(err, buf, buflen)) {
     if('\0' == buf[0])
       curl_msnprintf(buf, buflen, "Unknown error %d", err);
   }

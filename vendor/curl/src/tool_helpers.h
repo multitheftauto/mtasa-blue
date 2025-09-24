@@ -26,7 +26,11 @@
 #include "tool_setup.h"
 
 const char *param2text(ParameterError error);
-int SetHTTPrequest(HttpReq req, HttpReq *store);
-void customrequest_helper(HttpReq req, char *method);
+
+int SetHTTPrequest(struct OperationConfig *config, HttpReq req,
+                   HttpReq *store);
+
+void customrequest_helper(struct OperationConfig *config, HttpReq req,
+                          char *method);
 
 #endif /* HEADER_CURL_TOOL_HELPERS_H */

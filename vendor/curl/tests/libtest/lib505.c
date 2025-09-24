@@ -21,7 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
+
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
 
 #include "memdebug.h"
 
@@ -32,7 +36,7 @@
  * Example based on source code provided by Erick Nuwendam. Thanks!
  */
 
-static CURLcode test_lib505(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curl;
   CURLcode res = CURLE_OK;
@@ -42,9 +46,8 @@ static CURLcode test_lib505(const char *URL)
   struct curl_slist *hl;
 
   struct curl_slist *headerlist = NULL;
-
-  static const char *buf_1 = "RNFR 505";
-  static const char *buf_2 = "RNTO 505-forreal";
+  const char *buf_1 = "RNFR 505";
+  const char *buf_2 = "RNTO 505-forreal";
 
   if(!libtest_arg2) {
     curl_mfprintf(stderr, "Usage: <url> <file-to-upload>\n");

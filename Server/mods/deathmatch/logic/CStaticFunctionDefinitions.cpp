@@ -1762,6 +1762,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
 
             if (pPed->IsDead() && fHealth > 0.0f)
                 pPed->SetIsDead(false);
+            else if (fHealth <= 0.0f && !pPed->IsDead())
+                KillPed(pElement, nullptr, 0xFF, 0xFF, false);
 
             break;
         }
@@ -2452,7 +2454,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(eWeaponProperty eProperty, eW
             case WEAPON_DAMAGE:
             {
                 if (sData >= -10000 && sData <= 10000)
-                    pWeaponInfo->SetDamagePerHit(sData);
+                    pWeaponInfo->SetDamagePerHit(static_cast<short>(sData));
                 else
                     return false;
                 break;
@@ -2460,7 +2462,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(eWeaponProperty eProperty, eW
             case WEAPON_MAX_CLIP_AMMO:
             {
                 if (sData >= 0 && sData <= 1000)
-                    pWeaponInfo->SetMaximumClipAmmo(sData);
+                    pWeaponInfo->SetMaximumClipAmmo(static_cast<short>(sData));
                 else
                     return false;
                 break;
@@ -3339,7 +3341,7 @@ bool CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(CElement* pElement, u
         {
             CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-            if (pPlayer->SetScriptDebugLevel(uiLevel))
+            if (pPlayer->SetScriptDebugLevel(static_cast<uint8_t>(uiLevel)))
                 return SetPlayerDebuggerVisible(pElement, uiLevel != 0);
         }
     }
@@ -3854,7 +3856,7 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
                 pPed->CallEvent("onPedWasted", Arguments);
             }
 
-            for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+            for (unsigned char slot = 0; slot < WEAPON_SLOTS; ++slot)
             {
                 pPed->SetWeaponType(0, slot);
                 pPed->SetWeaponAmmoInClip(0, slot);
@@ -4346,8 +4348,8 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CElement* pElement)
         CPed* pPed = static_cast<CPed*>(pElement);
 
         // Grab his occupied vehicle
-        CVehicle*     pVehicle = pPed->GetOccupiedVehicle();
-        unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+        CVehicle* pVehicle = pPed->GetOccupiedVehicle();
+        auto      ucOccupiedSeat = static_cast<unsigned char>(pPed->GetOccupiedVehicleSeat());
         if (pVehicle)
         {
             CLuaArguments Arguments;
@@ -4621,17 +4623,13 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CPlayer* pPlayer, CVector& vecP
     assert(pPlayer);
 
     CPlayerCamera* pCamera = pPlayer->GetCamera();
-
-    // Only allow this if we're in fixed mode?
-    if (pCamera->GetMode() == CAMERAMODE_FIXED)
-    {
-        pCamera->GetPosition(vecPosition);
-        pCamera->GetLookAt(vecLookAt);
-        fRoll = pCamera->GetRoll();
-        fFOV = pCamera->GetFOV();
-        return true;
-    }
-    return false;
+    
+    pCamera->GetPosition(vecPosition);
+    pCamera->GetLookAt(vecLookAt);
+    fRoll = pCamera->GetRoll();
+    fFOV = pCamera->GetFOV();
+    
+    return true;
 }
 
 CElement* CStaticFunctionDefinitions::GetCameraTarget(CPlayer* pPlayer)
@@ -4842,7 +4840,7 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
                     uiTotalAmmo = usAmmo;            // Otherwise ammo is not shared, so replace
 
                 uiTotalAmmo = std::min(0xFFFFU, uiTotalAmmo);
-                pPed->SetWeaponTotalAmmo(uiTotalAmmo, ucWeaponSlot);
+                pPed->SetWeaponTotalAmmo(static_cast<unsigned short>(uiTotalAmmo), ucWeaponSlot);
 
                 CBitStream BitStream;
 
@@ -5446,8 +5444,7 @@ bool CStaticFunctionDefinitions::GetTrainSpeed(CVehicle* pVehicle, float& fSpeed
     if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
         return false;
 
-    const CVector& vecVelocity = pVehicle->GetVelocity();
-    fSpeed = vecVelocity.Length();
+    fSpeed = pVehicle->GetTrainSpeed();
     return true;
 }
 
@@ -6770,13 +6767,13 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates(CElement* pElement, int i
                 (iRearRight != -1 && iRearRight != pVehicle->m_ucWheelStates[REAR_RIGHT_WHEEL]))
             {
                 if (iFrontLeft != -1)
-                    pVehicle->m_ucWheelStates[FRONT_LEFT_WHEEL] = iFrontLeft;
+                    pVehicle->m_ucWheelStates[FRONT_LEFT_WHEEL] = static_cast<unsigned char>(iFrontLeft);
                 if (iRearLeft != -1)
-                    pVehicle->m_ucWheelStates[REAR_LEFT_WHEEL] = iRearLeft;
+                    pVehicle->m_ucWheelStates[REAR_LEFT_WHEEL] = static_cast<unsigned char>(iRearLeft);
                 if (iFrontRight != -1)
-                    pVehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL] = iFrontRight;
+                    pVehicle->m_ucWheelStates[FRONT_RIGHT_WHEEL] = static_cast<unsigned char>(iFrontRight);
                 if (iRearRight != -1)
-                    pVehicle->m_ucWheelStates[REAR_RIGHT_WHEEL] = iRearRight;
+                    pVehicle->m_ucWheelStates[REAR_RIGHT_WHEEL] = static_cast<unsigned char>(iRearRight);
 
                 CBitStream BitStream;
                 BitStream.pBitStream->Write((const char*)&pVehicle->m_ucWheelStates[0], MAX_WHEELS);
@@ -7334,6 +7331,7 @@ bool CStaticFunctionDefinitions::SetTrainSpeed(CVehicle* pVehicle, float fSpeed)
     vecVelocity.Normalize();
     vecVelocity *= fSpeed;
     pVehicle->SetVelocity(vecVelocity);
+    pVehicle->SetTrainSpeed(fSpeed);
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(fSpeed);
@@ -7541,7 +7539,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
             handling.data.fTurnMass = pNewEntry->GetTurnMass();
             handling.data.fDragCoeff = pNewEntry->GetDragCoeff();
             handling.data.vecCenterOfMass = pNewEntry->GetCenterOfMass();
-            handling.data.ucPercentSubmerged = pNewEntry->GetPercentSubmerged();
+            handling.data.ucPercentSubmerged = static_cast<unsigned char>(pNewEntry->GetPercentSubmerged());
             handling.data.fTractionMultiplier = pNewEntry->GetTractionMultiplier();
             handling.data.ucDriveType = pNewEntry->GetCarDriveType();
             handling.data.ucEngineType = pNewEntry->GetCarEngineType();
@@ -7767,7 +7765,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
     assert(szType);
 
     // Grab the type id
-    unsigned char ucType = CMarkerManager::StringToType(szType);
+    auto ucType = static_cast<unsigned char>(CMarkerManager::StringToType(szType));
     if (ucType != CMarker::TYPE_INVALID)
     {
         // Create the marker
@@ -7858,7 +7856,7 @@ bool CStaticFunctionDefinitions::SetMarkerType(CElement* pElement, const char* s
     if (IS_MARKER(pElement))
     {
         // Grab the marker type
-        unsigned char ucType = CMarkerManager::StringToType(szType);
+        auto ucType = static_cast<unsigned char>(CMarkerManager::StringToType(szType));
         if (ucType != CMarker::TYPE_INVALID)
         {
             // Set the new type
@@ -10367,7 +10365,7 @@ bool CStaticFunctionDefinitions::SetMaxPlayers(unsigned int uiMax)
     if (uiMax > m_pMainConfig->GetHardMaxPlayers())
         return false;
     m_pMainConfig->SetSoftMaxPlayers(uiMax);
-    g_pNetServer->SetMaximumIncomingConnections(uiMax);
+    g_pNetServer->SetMaximumIncomingConnections(static_cast<unsigned short>(uiMax));
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CServerInfoSyncPacket(SERVER_INFO_FLAG_MAX_PLAYERS));
     return true;
 }
@@ -10497,10 +10495,9 @@ bool CStaticFunctionDefinitions::GetWaveHeight(float& fHeight)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetFPSLimit(unsigned short& usLimit)
+void CStaticFunctionDefinitions::GetFPSLimit(std::uint16_t& fps) noexcept
 {
-    usLimit = g_pGame->GetConfig()->GetFPSLimit();
-    return true;
+    fps = g_pGame->GetConfig()->GetFPSLimit();
 }
 
 bool CStaticFunctionDefinitions::GetMinuteDuration(unsigned long& ulDuration)
@@ -11106,18 +11103,16 @@ bool CStaticFunctionDefinitions::SetWaveHeight(float fHeight)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetFPSLimit(unsigned short usLimit, bool bSave)
+bool CStaticFunctionDefinitions::SetFPSLimit(std::uint16_t fps, bool save)
 {
-    if (g_pGame->GetConfig()->SetFPSLimit(usLimit, bSave))
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write((short)usLimit);
-        m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_FPS_LIMIT, *BitStream.pBitStream));
+    if(!g_pGame->GetConfig()->SetFPSLimit(fps, save))
+        return false;
 
-        return true;
-    }
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(static_cast<std::uint16_t>(fps));
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_FPS_LIMIT, *BitStream.pBitStream));
 
-    return false;
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetMinuteDuration(unsigned long ulDuration)

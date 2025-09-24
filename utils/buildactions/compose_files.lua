@@ -11,10 +11,10 @@ local WINDOWS = os.host() == "windows"
 newaction {
 	trigger = "compose_files",
 	description = "Composes files that are required for building the installer",
-	
+
 	execute = function()
 		os.mkdir(OUTPUT_DIR)
-		
+
 		-- Copy data files
 		if WINDOWS then
 			os.copydir(DATA_DIR.."/MTA", OUTPUT_DIR.."/MTA")
@@ -25,9 +25,9 @@ newaction {
 
 		-- Copy configs
 		os.copydir("Server/mods/deathmatch", OUTPUT_DIR.."/server/mods/deathmatch", "*.conf")
-		os.copydir("Server/mods/deathmatch", OUTPUT_DIR.."/server/mods/deathmatch", "mtaserver.conf.template")
+		makeconfigtemplate(OUTPUT_DIR.."/server/mods/deathmatch/mtaserver.conf", OUTPUT_DIR.."/server/mods/deathmatch/mtaserver.conf.template")
 		os.copydir("Server/mods/deathmatch", OUTPUT_DIR.."/server/mods/deathmatch", "*.xml")
-		
+
 		-- Copy compiled binaries
 		if WINDOWS then
 			os.copydir(BIN_DIR, OUTPUT_DIR, "**.exe")

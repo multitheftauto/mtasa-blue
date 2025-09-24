@@ -27,6 +27,8 @@
 #include <unistd.h>
 #endif
 
+#include <curlx.h>
+
 #include "tool_cfgable.h"
 #include "tool_doswin.h"
 #include "tool_msgs.h"
@@ -34,9 +36,8 @@
 #include "tool_cb_wrt.h"
 #include "tool_operate.h"
 #include "tool_libinfo.h"
-#include "tool_strdup.h"
 
-#include "memdebug.h" /* keep this as LAST include */
+#include <memdebug.h> /* keep this as LAST include */
 
 static char *parse_filename(const char *ptr, size_t len);
 
@@ -57,7 +58,7 @@ static char *parse_filename(const char *ptr, size_t len);
 
 #ifdef LINK
 static void write_linked_location(CURL *curl, const char *location,
-                                  size_t loclen, FILE *stream);
+    size_t loclen, FILE *stream);
 #endif
 
 int tool_write_headers(struct HdrCbData *hdrcbdata, FILE *stream)
@@ -82,6 +83,7 @@ fail:
 /*
 ** callback for CURLOPT_HEADERFUNCTION
 */
+
 size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
   struct per_transfer *per = userdata;
@@ -99,7 +101,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
 
 #ifdef DEBUGBUILD
   if(size * nmemb > (size_t)CURL_MAX_HTTP_HEADER) {
-    warnf("Header data exceeds write limit");
+    warnf(per->config->global, "Header data exceeds single call write limit");
     return CURL_WRITEFUNC_ERROR;
   }
 #endif
@@ -120,7 +122,8 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
       return rc;
     /* flush the stream to send off what we got earlier */
     if(fflush(heads->stream)) {
-      errorf("Failed writing headers to %s", per->config->headerfile);
+      errorf(per->config->global, "Failed writing headers to %s",
+             per->config->headerfile);
       return CURL_WRITEFUNC_ERROR;
     }
   }
@@ -285,11 +288,11 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
     if(!outs->stream && !tool_create_output_file(outs, per->config))
       return CURL_WRITEFUNC_ERROR;
 
-    if(global->isatty &&
+    if(hdrcbdata->global->isatty &&
 #ifdef _WIN32
        tool_term_has_bold &&
 #endif
-       global->styled_output)
+       hdrcbdata->global->styled_output)
       value = memchr(ptr, ':', cb);
     if(value) {
       size_t namelen = value - ptr;
@@ -322,9 +325,12 @@ static char *parse_filename(const char *ptr, size_t len)
   char *q;
   char  stop = '\0';
 
-  copy = memdup0(ptr, len);
+  /* simple implementation of strndup() */
+  copy = malloc(len + 1);
   if(!copy)
     return NULL;
+  memcpy(copy, ptr, len);
+  copy[len] = '\0';
 
   p = copy;
   if(*p == '\'' || *p == '"') {
@@ -398,9 +404,9 @@ static char *parse_filename(const char *ptr, size_t len)
  * should not be needed but the real world returns plenty of relative
  * URLs here.
  */
-static void write_linked_location(CURL *curl, const char *location,
-                                  size_t loclen, FILE *stream)
-{
+static
+void write_linked_location(CURL *curl, const char *location, size_t loclen,
+                           FILE *stream) {
   /* This would so simple if CURLINFO_REDIRECT_URL were available here */
   CURLU *u = NULL;
   char *copyloc = NULL, *locurl = NULL, *scheme = NULL, *finalurl = NULL;
@@ -435,9 +441,11 @@ static void write_linked_location(CURL *curl, const char *location,
     goto locout;
 
   /* Create a null-terminated and whitespace-stripped copy of Location: */
-  copyloc = memdup0(loc, llen);
+  copyloc = malloc(llen + 1);
   if(!copyloc)
     goto locout;
+  memcpy(copyloc, loc, llen);
+  copyloc[llen] = 0;
 
   /* The original URL to use as a base for a relative redirect URL */
   if(curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &locurl))

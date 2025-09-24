@@ -21,15 +21,19 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
+#include "warnless.h"
 #include "memdebug.h"
+
+#define TEST_HANG_TIMEOUT 60 * 1000
 
 /*
  * Get a single URL without select().
  */
 
-static CURLcode test_lib751(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *easies[1000];
   CURLM *m;
@@ -63,7 +67,7 @@ static CURLcode test_lib751(const char *URL)
 
     mres = curl_multi_add_handle(m, e);
     if(mres != CURLM_OK) {
-      curl_mfprintf(stderr, "MULTI ERROR: %s\n", curl_multi_strerror(mres));
+      printf("MULTI ERROR: %s\n", curl_multi_strerror(mres));
       res = CURLE_FAILED_INIT;
       goto test_cleanup;
     }
@@ -72,7 +76,7 @@ static CURLcode test_lib751(const char *URL)
 test_cleanup:
 
   if(res)
-    curl_mfprintf(stderr, "ERROR: %s\n", curl_easy_strerror(res));
+    printf("ERROR: %s\n", curl_easy_strerror(res));
 
   for(i = 0; i < 1000; i++) {
     if(easies[i]) {

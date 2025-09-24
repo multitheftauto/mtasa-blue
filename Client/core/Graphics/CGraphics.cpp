@@ -735,7 +735,7 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
             ulFormat |= DT_WORDBREAK;
 
         // Calculate the size of the text
-        RECT rect = {0, 0, fWidth / fScaleX, 0};
+        RECT rect = {0, 0, static_cast<LONG>(fWidth / fScaleX), 0};
         pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
 
         vecSize.fX = (rect.right - rect.left) * fScaleX;
@@ -993,7 +993,6 @@ void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVerti
         m_pMaterialPrimitive3DBatcherPreGUI->AddPrimitive(eType, pMaterial, pVecVertices);
     else
         m_pMaterialPrimitive3DBatcherPostFX->AddPrimitive(eType, pMaterial, pVecVertices);
-    
 }
 
 void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
@@ -2003,9 +2002,23 @@ void CGraphics::MaybeLeavingMTARenderZone()
 ////////////////////////////////////////////////////////////////
 void CGraphics::SaveGTARenderStates()
 {
+    // Prevent GPU driver hang by checking device state before creating state blocks
+    if (m_pDevice->TestCooperativeLevel() != D3D_OK)
+    {
+        WriteDebugEvent("CGraphics::SaveGTARenderStates - Device not cooperative, skipping state block creation");
+        return;
+    }
+
     SAFE_RELEASE(m_pSavedStateBlock);
-    // Create a state block.
-    m_pDevice->CreateStateBlock(D3DSBT_ALL, &m_pSavedStateBlock);
+
+    // Add error handling for state block creation
+    HRESULT hr = m_pDevice->CreateStateBlock(D3DSBT_ALL, &m_pSavedStateBlock);
+    if (FAILED(hr))
+    {
+        WriteDebugEvent(SString("CGraphics::SaveGTARenderStates - Failed to create state block: %08x", hr));
+        m_pSavedStateBlock = nullptr;
+        return;
+    }
 
     // Make sure linear sampling is enabled
     m_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -2025,6 +2038,14 @@ void CGraphics::SaveGTARenderStates()
 ////////////////////////////////////////////////////////////////
 void CGraphics::RestoreGTARenderStates()
 {
+    // Check device state before attempting to restore
+    if (m_pDevice->TestCooperativeLevel() != D3D_OK)
+    {
+        WriteDebugEvent("CGraphics::RestoreGTARenderStates - Device not cooperative, skipping state restoration");
+        SAFE_RELEASE(m_pSavedStateBlock);
+        return;
+    }
+
     // Restore these transforms to fix various weird stuff
     m_pDevice->SetTransform(D3DTS_PROJECTION, &g_pDeviceState->TransformState.PROJECTION);
     m_pDevice->SetTransform(D3DTS_WORLD, &g_pDeviceState->TransformState.WORLD);
@@ -2033,7 +2054,12 @@ void CGraphics::RestoreGTARenderStates()
     // Restore the render states
     if (m_pSavedStateBlock)
     {
-        m_pSavedStateBlock->Apply();
+        // Error handling for state block apply
+        HRESULT hr = m_pSavedStateBlock->Apply();
+        if (FAILED(hr))
+        {
+            WriteDebugEvent(SString("RestoreGTARenderStates: Failed to apply state block: %08x", hr));
+        }
         SAFE_RELEASE(m_pSavedStateBlock);
     }
 }
@@ -2461,7 +2487,7 @@ namespace
 
         // Initial octahedron
         static SFixedArray<CVector, 6>     vecPoints = {CVector(0, 0, 1),  CVector(0, 0, -1), CVector(-1, -1, 0),
-                                                    CVector(1, -1, 0), CVector(1, 1, 0),  CVector(-1, 1, 0)};
+                                                        CVector(1, -1, 0), CVector(1, 1, 0),  CVector(-1, 1, 0)};
         static const SFixedArray<WORD, 24> indices = {0, 3, 4, 0, 4, 5, 0, 5, 2, 0, 2, 3, 1, 4, 3, 1, 5, 4, 1, 2, 5, 1, 3, 2};
 
         for (uint i = 0; i < NUMELMS(vecPoints); i++)

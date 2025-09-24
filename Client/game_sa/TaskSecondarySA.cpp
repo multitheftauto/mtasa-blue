@@ -24,7 +24,7 @@ CTaskSimpleDuckSA::CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, unsigned sh
     if (!IsValid())
         return;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    ebx

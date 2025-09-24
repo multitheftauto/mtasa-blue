@@ -24,7 +24,7 @@
 
 #include "../curl_setup.h"
 
-#ifdef USE_SSH
+#if defined(USE_SSH)
 
 #include "curl_path.h"
 #include <curl/curl.h>
@@ -80,12 +80,6 @@ CURLcode Curl_getworkingpath(struct Curl_easy *data,
 
       if(curlx_dyn_addn(&npath, &working_path[copyfrom],
                         working_path_len - copyfrom)) {
-        free(working_path);
-        return CURLE_OUT_OF_MEMORY;
-      }
-    }
-    else {
-      if(curlx_dyn_add(&npath, "/")) {
         free(working_path);
         return CURLE_OUT_OF_MEMORY;
       }

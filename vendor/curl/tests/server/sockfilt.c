@@ -21,7 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "server_setup.h"
 
 /* Purpose
  *
@@ -85,8 +85,35 @@
  * it!
  */
 
+#ifndef UNDER_CE
+#include <signal.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#ifdef HAVE_NETINET_IN6_H
+#include <netinet/in6.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
+#ifdef HAVE_NETDB_H
+#include <netdb.h>
+#endif
+
+#include <curlx.h> /* from the private lib dir */
+#include "inet_pton.h"
+#include "util.h"
+#include "server_sockaddr.h"
+#include "timediff.h"
+
+#include "tool_binmode.h"
+
+/* include memdebug.h last */
+#include <memdebug.h>
+
 /* buffer is this excessively large only to be able to support things like
-   test 1003 which tests exceedingly large server response lines */
+  test 1003 which tests exceedingly large server response lines */
 #define BUFFER_SIZE 17010
 
 static bool verbose = FALSE;
@@ -369,7 +396,7 @@ static void lograw(unsigned char *buffer, ssize_t len)
  * *buffer_len is the amount of data in the buffer (output)
  */
 static bool read_data_block(unsigned char *buffer, ssize_t maxlen,
-                            ssize_t *buffer_len)
+    ssize_t *buffer_len)
 {
   if(!read_stdin(buffer, 5))
     return FALSE;
@@ -554,7 +581,6 @@ static unsigned int WINAPI select_ws_wait_thread(void *lpParameter)
 
   return 0;
 }
-
 static HANDLE select_ws_wait(HANDLE handle, HANDLE signal, HANDLE abort)
 {
   typedef uintptr_t curl_win_thread_handle_t;
@@ -579,7 +605,6 @@ static HANDLE select_ws_wait(HANDLE handle, HANDLE signal, HANDLE abort)
   }
   return NULL;
 }
-
 struct select_ws_data {
   int fd;                /* provided file descriptor  (indexed by nfd) */
   long wsastate;         /* internal pre-select state (indexed by nfd) */
@@ -588,7 +613,6 @@ struct select_ws_data {
   HANDLE signal;         /* internal thread signal    (indexed by nth) */
   HANDLE thread;         /* internal thread handle    (indexed by nth) */
 };
-
 static int select_ws(int nfds, fd_set *readfds, fd_set *writefds,
                      fd_set *exceptfds, struct timeval *tv)
 {
@@ -965,12 +989,12 @@ static bool juggle(curl_socket_t *sockfdp,
   FD_ZERO(&fds_write);
   FD_ZERO(&fds_err);
 
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warith-conversion"
 #endif
   FD_SET((curl_socket_t)fileno(stdin), &fds_read);
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic pop
 #endif
 
@@ -981,12 +1005,12 @@ static bool juggle(curl_socket_t *sockfdp,
     /* server mode */
     sockfd = listenfd;
     /* there's always a socket to wait for */
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warith-conversion"
 #endif
     FD_SET(sockfd, &fds_read);
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic pop
 #endif
     maxfd = (int)sockfd;
@@ -1002,12 +1026,12 @@ static bool juggle(curl_socket_t *sockfdp,
     }
     else {
       /* there's always a socket to wait for */
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warith-conversion"
 #endif
       FD_SET(sockfd, &fds_read);
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic pop
 #endif
       maxfd = (int)sockfd;
@@ -1019,12 +1043,12 @@ static bool juggle(curl_socket_t *sockfdp,
     sockfd = *sockfdp;
     /* sockfd turns CURL_SOCKET_BAD when our connection has been closed */
     if(CURL_SOCKET_BAD != sockfd) {
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warith-conversion"
 #endif
       FD_SET(sockfd, &fds_read);
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic pop
 #endif
       maxfd = (int)sockfd;
@@ -1120,9 +1144,6 @@ static bool juggle(curl_socket_t *sockfdp,
       if(!read_data_block(buffer, sizeof(buffer), &buffer_len))
         return FALSE;
 
-      if(buffer_len < 0)
-        return FALSE;
-
       if(*mode == PASSIVE_LISTEN) {
         logmsg("*** We are disconnected!");
         if(!disc_handshake())
@@ -1209,7 +1230,150 @@ static bool juggle(curl_socket_t *sockfdp,
 #endif
 }
 
-static int test_sockfilt(int argc, char *argv[])
+static curl_socket_t sockfilt_sockdaemon(curl_socket_t sock,
+                                         unsigned short *listenport,
+                                         bool bind_only)
+{
+  /* passive daemon style */
+  srvr_sockaddr_union_t listener;
+  int flag;
+  int rc;
+  int totdelay = 0;
+  int maxretr = 10;
+  int delay = 20;
+  int attempt = 0;
+  int error = 0;
+
+  do {
+    attempt++;
+    flag = 1;
+    rc = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
+         (void *)&flag, sizeof(flag));
+    if(rc) {
+      error = SOCKERRNO;
+      logmsg("setsockopt(SO_REUSEADDR) failed with error (%d) %s",
+             error, sstrerror(error));
+      if(maxretr) {
+        rc = wait_ms(delay);
+        if(rc) {
+          /* should not happen */
+          error = SOCKERRNO;
+          logmsg("wait_ms() failed with error (%d) %s",
+                 error, sstrerror(error));
+          sclose(sock);
+          return CURL_SOCKET_BAD;
+        }
+        if(got_exit_signal) {
+          logmsg("signalled to die, exiting...");
+          sclose(sock);
+          return CURL_SOCKET_BAD;
+        }
+        totdelay += delay;
+        delay *= 2; /* double the sleep for next attempt */
+      }
+    }
+  } while(rc && maxretr--);
+
+  if(rc) {
+    logmsg("setsockopt(SO_REUSEADDR) failed %d times in %d ms. Error (%d) %s",
+           attempt, totdelay, error, strerror(error));
+    logmsg("Continuing anyway...");
+  }
+
+  /* When the specified listener port is zero, it is actually a
+     request to let the system choose a non-zero available port. */
+
+#ifdef USE_IPV6
+  if(!use_ipv6) {
+#endif
+    memset(&listener.sa4, 0, sizeof(listener.sa4));
+    listener.sa4.sin_family = AF_INET;
+    listener.sa4.sin_addr.s_addr = INADDR_ANY;
+    listener.sa4.sin_port = htons(*listenport);
+    rc = bind(sock, &listener.sa, sizeof(listener.sa4));
+#ifdef USE_IPV6
+  }
+  else {
+    memset(&listener.sa6, 0, sizeof(listener.sa6));
+    listener.sa6.sin6_family = AF_INET6;
+    listener.sa6.sin6_addr = in6addr_any;
+    listener.sa6.sin6_port = htons(*listenport);
+    rc = bind(sock, &listener.sa, sizeof(listener.sa6));
+  }
+#endif /* USE_IPV6 */
+  if(rc) {
+    error = SOCKERRNO;
+    logmsg("Error binding socket on port %hu (%d) %s",
+           *listenport, error, sstrerror(error));
+    sclose(sock);
+    return CURL_SOCKET_BAD;
+  }
+
+  if(!*listenport) {
+    /* The system was supposed to choose a port number, figure out which
+       port we actually got and update the listener port value with it. */
+    curl_socklen_t la_size;
+    srvr_sockaddr_union_t localaddr;
+#ifdef USE_IPV6
+    if(!use_ipv6)
+#endif
+      la_size = sizeof(localaddr.sa4);
+#ifdef USE_IPV6
+    else
+      la_size = sizeof(localaddr.sa6);
+#endif
+    memset(&localaddr.sa, 0, (size_t)la_size);
+    if(getsockname(sock, &localaddr.sa, &la_size) < 0) {
+      error = SOCKERRNO;
+      logmsg("getsockname() failed with error (%d) %s",
+             error, sstrerror(error));
+      sclose(sock);
+      return CURL_SOCKET_BAD;
+    }
+    switch(localaddr.sa.sa_family) {
+    case AF_INET:
+      *listenport = ntohs(localaddr.sa4.sin_port);
+      break;
+#ifdef USE_IPV6
+    case AF_INET6:
+      *listenport = ntohs(localaddr.sa6.sin6_port);
+      break;
+#endif
+    default:
+      break;
+    }
+    if(!*listenport) {
+      /* Real failure, listener port shall not be zero beyond this point. */
+      logmsg("Apparently getsockname() succeeded, with listener port zero.");
+      logmsg("A valid reason for this failure is a binary built without");
+      logmsg("proper network library linkage. This might not be the only");
+      logmsg("reason, but double check it before anything else.");
+      sclose(sock);
+      return CURL_SOCKET_BAD;
+    }
+  }
+
+  /* bindonly option forces no listening */
+  if(bind_only) {
+    logmsg("instructed to bind port without listening");
+    return sock;
+  }
+
+  /* start accepting connections */
+  rc = listen(sock, 5);
+  if(0 != rc) {
+    error = SOCKERRNO;
+    logmsg("listen() failed with error (%d) %s",
+           error, sstrerror(error));
+    sclose(sock);
+    return CURL_SOCKET_BAD;
+  }
+
+  return sock;
+}
+
+
+int main(int argc, char *argv[])
 {
   srvr_sockaddr_union_t me;
   curl_socket_t sock = CURL_SOCKET_BAD;
@@ -1259,16 +1423,16 @@ static int test_sockfilt(int argc, char *argv[])
     }
     else if(!strcmp("--ipv6", argv[arg])) {
 #ifdef USE_IPV6
-      socket_domain = AF_INET6;
       ipv_inuse = "IPv6";
+      use_ipv6 = TRUE;
 #endif
       arg++;
     }
     else if(!strcmp("--ipv4", argv[arg])) {
       /* for completeness, we support this option as well */
 #ifdef USE_IPV6
-      socket_domain = AF_INET;
       ipv_inuse = "IPv4";
+      use_ipv6 = FALSE;
 #endif
       arg++;
     }
@@ -1332,13 +1496,20 @@ static int test_sockfilt(int argc, char *argv[])
     return 2;
 #endif
 
-  CURLX_SET_BINMODE(stdin);
-  CURLX_SET_BINMODE(stdout);
-  CURLX_SET_BINMODE(stderr);
+  CURL_SET_BINMODE(stdin);
+  CURL_SET_BINMODE(stdout);
+  CURL_SET_BINMODE(stderr);
 
   install_signal_handlers(false);
 
-  sock = socket(socket_domain, SOCK_STREAM, 0);
+#ifdef USE_IPV6
+  if(!use_ipv6)
+#endif
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+#ifdef USE_IPV6
+  else
+    sock = socket(AF_INET6, SOCK_STREAM, 0);
+#endif
 
   if(CURL_SOCKET_BAD == sock) {
     error = SOCKERRNO;
@@ -1350,33 +1521,31 @@ static int test_sockfilt(int argc, char *argv[])
   if(server_connectport) {
     /* Active mode, we should connect to the given port number */
     mode = ACTIVE;
-    switch(socket_domain) {
-      case AF_INET:
-        memset(&me.sa4, 0, sizeof(me.sa4));
-        me.sa4.sin_family = AF_INET;
-        me.sa4.sin_port = htons(server_connectport);
-        me.sa4.sin_addr.s_addr = INADDR_ANY;
-        if(!addr)
-          addr = "127.0.0.1";
-        curlx_inet_pton(AF_INET, addr, &me.sa4.sin_addr);
-
-        rc = connect(sock, &me.sa, sizeof(me.sa4));
-        break;
 #ifdef USE_IPV6
-      case AF_INET6:
-        memset(&me.sa6, 0, sizeof(me.sa6));
-        me.sa6.sin6_family = AF_INET6;
-        me.sa6.sin6_port = htons(server_connectport);
-        if(!addr)
-          addr = "::1";
-        curlx_inet_pton(AF_INET6, addr, &me.sa6.sin6_addr);
+    if(!use_ipv6) {
+#endif
+      memset(&me.sa4, 0, sizeof(me.sa4));
+      me.sa4.sin_family = AF_INET;
+      me.sa4.sin_port = htons(server_connectport);
+      me.sa4.sin_addr.s_addr = INADDR_ANY;
+      if(!addr)
+        addr = "127.0.0.1";
+      curlx_inet_pton(AF_INET, addr, &me.sa4.sin_addr);
 
-        rc = connect(sock, &me.sa, sizeof(me.sa6));
-        break;
-#endif /* USE_IPV6 */
-      default:
-        rc = 1;
+      rc = connect(sock, &me.sa, sizeof(me.sa4));
+#ifdef USE_IPV6
     }
+    else {
+      memset(&me.sa6, 0, sizeof(me.sa6));
+      me.sa6.sin6_family = AF_INET6;
+      me.sa6.sin6_port = htons(server_connectport);
+      if(!addr)
+        addr = "::1";
+      curlx_inet_pton(AF_INET6, addr, &me.sa6.sin6_addr);
+
+      rc = connect(sock, &me.sa, sizeof(me.sa6));
+    }
+#endif /* USE_IPV6 */
     if(rc) {
       error = SOCKERRNO;
       logmsg("Error connecting to port %hu (%d) %s",
@@ -1389,7 +1558,7 @@ static int test_sockfilt(int argc, char *argv[])
   }
   else {
     /* passive daemon style */
-    sock = sockdaemon(sock, &server_port, NULL, s_bind_only);
+    sock = sockfilt_sockdaemon(sock, &server_port, s_bind_only);
     if(CURL_SOCKET_BAD == sock) {
       write_stdout("FAIL\n", 5);
       goto sockfilt_cleanup;

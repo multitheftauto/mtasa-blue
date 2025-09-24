@@ -429,7 +429,6 @@ public:
     void ResetInterpolation();
 
     void Interpolate();
-    void UpdateKeysync();
 
     void GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates);
 
@@ -700,7 +699,7 @@ protected:
             float         fLastAlpha;
             unsigned long ulStartTime;
             unsigned long ulFinishTime;
-        } pos;
+        } pos{};
 
         struct
         {
@@ -712,8 +711,8 @@ protected:
             float         fLastAlpha;
             unsigned long ulStartTime;
             unsigned long ulFinishTime;
-        } rot;
-    } m_interp;
+        } rot{};
+    } m_interp{};
 
     unsigned long m_ulIllegalTowBreakTime;
 

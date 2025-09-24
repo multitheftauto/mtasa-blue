@@ -585,7 +585,7 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
 
     // Determine connection type
     SString* pstrType = MapFind(m_ConnectionTypeMap, hConnection);
-    SString  strType = pstrType ? *pstrType : "";
+    SString  strType = pstrType ? *pstrType : SStringX("");
 
     if (strType == "sqlite")
         return InsertQueryArgumentsSqlite(strQuery, pArgs);
@@ -608,7 +608,7 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
 {
     // Determine connection type
     SString* pstrType = MapFind(m_ConnectionTypeMap, hConnection);
-    SString  strType = pstrType ? *pstrType : "";
+    SString  strType = pstrType ? *pstrType : SStringX("");
 
     if (strType == "sqlite")
         return InsertQueryArgumentsSqlite(szQuery, vl);

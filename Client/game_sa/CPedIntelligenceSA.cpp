@@ -40,7 +40,7 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
     DWORD dwThis = (DWORD)internalInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CPedIntelligence_TestForStealthKill;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    bUnk

@@ -35,7 +35,7 @@ CElement* CColCircle::Clone(bool* bAddEntity, CResource* pResource)
 bool CColCircle::DoHitDetection(const CVector& vecNowPosition)
 {
     // Do a simple distance check between now position and our position
-    return IsPointNearPoint2D(vecNowPosition, m_vecPosition, m_fRadius);
+    return IsPointNearPoint2D(vecNowPosition, GetPosition(), m_fRadius);
 }
 
 bool CColCircle::ReadSpecialData(const int iLine)

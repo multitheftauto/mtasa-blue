@@ -100,8 +100,12 @@ static const char *start_options[] = {
   "(*ANY)",
   "" };
 
-void RE::Init(const string& pat, const RE_Options* options) {
-  pattern_ = pat;
+void RE::Init(const string* pat, const RE_Options* options) {
+  if (pat) {
+    pattern_ = new std::string(*pat);
+  } else {
+    pattern_ = new std::string();
+  }
   if (options == NULL) {
     options_ = default_options;
   } else {
@@ -121,6 +125,7 @@ void RE::Cleanup() {
   if (re_full_ != NULL)         (*pcre_free)(re_full_);
   if (re_partial_ != NULL)      (*pcre_free)(re_partial_);
   if (error_ != &empty_string)  delete error_;
+  if (pattern_ != NULL)         delete pattern_;
 }
 
 
@@ -150,7 +155,7 @@ pcre* RE::Compile(Anchor anchor) {
   int eoffset;
   pcre* re;
   if (anchor != ANCHOR_BOTH) {
-    re = pcre_compile(pattern_.c_str(), pcre_options,
+    re = pcre_compile(pattern_->c_str(), pcre_options,
                       &compile_error, &eoffset, NULL);
   } else {
     // Tack a '\z' at the end of RE.  Parenthesize it first so that
@@ -169,13 +174,13 @@ pcre* RE::Compile(Anchor anchor) {
 
     string wrapped = "";
 
-    if (pattern_.c_str()[0] == '(' && pattern_.c_str()[1] == '*') {
+    if (pattern_->c_str()[0] == '(' && pattern_->c_str()[1] == '*') {
       int kk, klen, kmat;
       for (;;) {   // Loop for any number of leading items
 
         for (kk = 0; start_options[kk][0] != 0; kk++) {
           klen = strlen(start_options[kk]);
-          kmat = strncmp(pattern_.c_str(), start_options[kk], klen);
+          kmat = strncmp(pattern_->c_str(), start_options[kk], klen);
           if (kmat >= 0) break;
         }
         if (kmat != 0) break;  // Not found
@@ -183,22 +188,22 @@ pcre* RE::Compile(Anchor anchor) {
         // If the item ended in "=" we must copy digits up to ")".
 
         if (start_options[kk][klen-1] == '=') {
-          while (isdigit(pattern_.c_str()[klen])) klen++;
-          if (pattern_.c_str()[klen] != ')') break;  // Syntax error
+          while (isdigit(pattern_->c_str()[klen])) klen++;
+          if (pattern_->c_str()[klen] != ')') break;  // Syntax error
           klen++;
         }
 
         // Move the item from the pattern to the start of the wrapped string.
 
-        wrapped += pattern_.substr(0, klen);
-        pattern_.erase(0, klen);
+        wrapped += pattern_->substr(0, klen);
+        pattern_->erase(0, klen);
       }
     }
 
     // Wrap the rest of the pattern.
 
     wrapped += "(?:";  // A non-counting grouping operator
-    wrapped += pattern_;
+    wrapped += *pattern_;
     wrapped += ")\\z";
     re = pcre_compile(wrapped.c_str(), pcre_options,
                       &compile_error, &eoffset, NULL);
@@ -606,7 +611,7 @@ int RE::TryMatch(const StringPiece& text,
     return 0;
   } else if (rc < 0) {
     //fprintf(stderr, "Unexpected return code: %d when matching '%s'\n",
-    //        re, pattern_.c_str());
+    //        re, pattern_->c_str());
     return 0;
   } else if (rc == 0) {
     // pcre_exec() returns 0 as a special case when the number of

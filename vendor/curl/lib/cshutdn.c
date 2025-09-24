@@ -40,6 +40,7 @@
 #include "sigpipe.h"
 #include "connect.h"
 #include "select.h"
+#include "strcase.h"
 #include "curlx/strparse.h"
 
 /* The last 3 #include files should be in this order */
@@ -52,6 +53,12 @@ static void cshutdn_run_conn_handler(struct Curl_easy *data,
                                      struct connectdata *conn)
 {
   if(!conn->bits.shutdown_handler) {
+
+    /* Cleanup NTLM connection-related data */
+    Curl_http_auth_cleanup_ntlm(conn);
+
+    /* Cleanup NEGOTIATE connection-related data */
+    Curl_http_auth_cleanup_negotiate(conn);
 
     if(conn->handler && conn->handler->disconnect) {
       /* Some disconnect handlers do a blocking wait on server responses.
@@ -114,8 +121,8 @@ static void cshutdn_run_once(struct Curl_easy *data,
 }
 
 void Curl_cshutdn_run_once(struct Curl_easy *data,
-                           struct connectdata *conn,
-                           bool *done)
+                      struct connectdata *conn,
+                      bool *done)
 {
   DEBUGASSERT(!data->conn);
   Curl_attach_connection(data, conn);
@@ -212,8 +219,8 @@ bool Curl_cshutdn_close_oldest(struct Curl_easy *data,
 #define NUM_POLLS_ON_STACK 10
 
 static CURLcode cshutdn_wait(struct cshutdn *cshutdn,
-                             struct Curl_easy *data,
-                             int timeout_ms)
+                               struct Curl_easy *data,
+                               int timeout_ms)
 {
   struct pollfd a_few_on_stack[NUM_POLLS_ON_STACK];
   struct curl_pollfds cpfds;
@@ -234,7 +241,7 @@ out:
 
 
 static void cshutdn_perform(struct cshutdn *cshutdn,
-                            struct Curl_easy *data)
+                              struct Curl_easy *data)
 {
   struct Curl_llist_node *e = Curl_llist_head(&cshutdn->list);
   struct Curl_llist_node *enext;
@@ -395,8 +402,8 @@ size_t Curl_cshutdn_dest_count(struct Curl_easy *data,
 
 
 static CURLMcode cshutdn_update_ev(struct cshutdn *cshutdn,
-                                   struct Curl_easy *data,
-                                   struct connectdata *conn)
+                                     struct Curl_easy *data,
+                                     struct connectdata *conn)
 {
   CURLMcode mresult;
 
@@ -411,8 +418,8 @@ static CURLMcode cshutdn_update_ev(struct cshutdn *cshutdn,
 
 
 void Curl_cshutdn_add(struct cshutdn *cshutdn,
-                      struct connectdata *conn,
-                      size_t conns_in_pool)
+                        struct connectdata *conn,
+                        size_t conns_in_pool)
 {
   struct Curl_easy *data = cshutdn->multi->admin;
   size_t max_total = (cshutdn->multi->max_total_connections > 0) ?
@@ -444,8 +451,8 @@ void Curl_cshutdn_add(struct cshutdn *cshutdn,
 
 
 static void cshutdn_multi_socket(struct cshutdn *cshutdn,
-                                 struct Curl_easy *data,
-                                 curl_socket_t s)
+                                   struct Curl_easy *data,
+                                   curl_socket_t s)
 {
   struct Curl_llist_node *e;
   struct connectdata *conn;
@@ -486,25 +493,19 @@ void Curl_cshutdn_setfds(struct cshutdn *cshutdn,
 {
   if(Curl_llist_head(&cshutdn->list)) {
     struct Curl_llist_node *e;
-    struct easy_pollset ps;
 
-    Curl_pollset_init(&ps);
     for(e = Curl_llist_head(&cshutdn->list); e;
         e = Curl_node_next(e)) {
+      struct easy_pollset ps;
       unsigned int i;
       struct connectdata *conn = Curl_node_elem(e);
-      CURLcode result;
-
-      Curl_pollset_reset(&ps);
+      memset(&ps, 0, sizeof(ps));
       Curl_attach_connection(data, conn);
-      result = Curl_conn_adjust_pollset(data, conn, &ps);
+      Curl_conn_adjust_pollset(data, conn, &ps);
       Curl_detach_connection(data);
 
-      if(result)
-        continue;
-
-      for(i = 0; i < ps.n; i++) {
-#ifdef __DJGPP__
+      for(i = 0; i < ps.num; i++) {
+#if defined(__DJGPP__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warith-conversion"
 #endif
@@ -512,7 +513,7 @@ void Curl_cshutdn_setfds(struct cshutdn *cshutdn,
           FD_SET(ps.sockets[i], read_fd_set);
         if(ps.actions[i] & CURL_POLL_OUT)
           FD_SET(ps.sockets[i], write_fd_set);
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
 #pragma GCC diagnostic pop
 #endif
         if((ps.actions[i] & (CURL_POLL_OUT | CURL_POLL_IN)) &&
@@ -520,7 +521,6 @@ void Curl_cshutdn_setfds(struct cshutdn *cshutdn,
           *maxfd = (int)ps.sockets[i];
       }
     }
-    Curl_pollset_cleanup(&ps);
   }
 }
 
@@ -535,21 +535,17 @@ unsigned int Curl_cshutdn_add_waitfds(struct cshutdn *cshutdn,
     struct Curl_llist_node *e;
     struct easy_pollset ps;
     struct connectdata *conn;
-    CURLcode result;
 
-    Curl_pollset_init(&ps);
     for(e = Curl_llist_head(&cshutdn->list); e;
         e = Curl_node_next(e)) {
       conn = Curl_node_elem(e);
-      Curl_pollset_reset(&ps);
+      memset(&ps, 0, sizeof(ps));
       Curl_attach_connection(data, conn);
-      result = Curl_conn_adjust_pollset(data, conn, &ps);
+      Curl_conn_adjust_pollset(data, conn, &ps);
       Curl_detach_connection(data);
 
-      if(!result)
-        need += Curl_waitfds_add_ps(cwfds, &ps);
+      need += Curl_waitfds_add_ps(cwfds, &ps);
     }
-    Curl_pollset_cleanup(&ps);
   }
   return need;
 }
@@ -565,24 +561,20 @@ CURLcode Curl_cshutdn_add_pollfds(struct cshutdn *cshutdn,
     struct easy_pollset ps;
     struct connectdata *conn;
 
-    Curl_pollset_init(&ps);
     for(e = Curl_llist_head(&cshutdn->list); e;
         e = Curl_node_next(e)) {
       conn = Curl_node_elem(e);
-      Curl_pollset_reset(&ps);
+      memset(&ps, 0, sizeof(ps));
       Curl_attach_connection(data, conn);
-      result = Curl_conn_adjust_pollset(data, conn, &ps);
+      Curl_conn_adjust_pollset(data, conn, &ps);
       Curl_detach_connection(data);
 
-      if(!result)
-        result = Curl_pollfds_add_ps(cpfds, &ps);
+      result = Curl_pollfds_add_ps(cpfds, &ps);
       if(result) {
-        Curl_pollset_cleanup(&ps);
         Curl_pollfds_cleanup(cpfds);
         goto out;
       }
     }
-    Curl_pollset_cleanup(&ps);
   }
 out:
   return result;

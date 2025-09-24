@@ -18,5 +18,5 @@ public:
     virtual void          RemoveTextureDictonarySlot(std::uint32_t uiTxdID) = 0;
     virtual bool          IsFreeTextureDictonarySlot(std::uint32_t uiTxdID) = 0;
 
-    virtual std::uint16_t GetFreeTextureDictonarySlot() = 0;
+    virtual std::uint32_t GetFreeTextureDictonarySlot() = 0;
 };
