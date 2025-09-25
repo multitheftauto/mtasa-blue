@@ -64,6 +64,11 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
         return false;
 
     unsigned short usModel = m_pVehicle->GetModel();
+    auto*          modelInfo = g_pGame->GetModelInfo(usModel);
+
+    if (modelInfo && modelInfo->GetParentID() != 0)
+        usModel = modelInfo->GetParentID();
+
     // Wheels should be compatible with any vehicle which have wheels, except
     // bike/bmx (they're buggy). Vortex is technically a car, but it has no
     // wheels.
@@ -361,8 +366,12 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     // Allow slot 2 to be upgraded regardless of ID and then check it has the required part
     if (GetSlotFromUpgrade(us, ucSlot) && (bReturn || ucSlot == 2))
     {
+        
         // Get our model supported upgrades
-        SVehicleSupportedUpgrades supportedUpgrades = m_pVehicle->GetModelInfo()->GetVehicleSupportedUpgrades();
+        auto* info = g_pGame->GetModelInfo(usModel);
+        modelInfo = info ? info : m_pVehicle->GetModelInfo();
+        SVehicleSupportedUpgrades supportedUpgrades = modelInfo->GetVehicleSupportedUpgrades();
+
         // Initialisation happens when we load the clump which is done when we require a specific model rather than in bulk
         if (supportedUpgrades.m_bInitialised == true)
         {
