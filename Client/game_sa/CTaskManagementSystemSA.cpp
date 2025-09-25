@@ -22,6 +22,7 @@
 #include "TaskPhysicalResponseSA.h"
 #include "TaskSA.h"
 #include "TaskSecondarySA.h"
+#include "TaskSimpleSwimSA.h"
 
 extern CGameSA* pGame;
 
@@ -180,6 +181,9 @@ CTaskSA* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskI
             break;
         case TASK_COMPLEX_SUNBATHE:
             pTaskSA = new CTaskComplexSunbatheSA;
+            break;
+        case TASK_SIMPLE_SWIM:
+            pTaskSA = new CTaskSimpleSwimSA;
             break;
 
         // Car accessories
