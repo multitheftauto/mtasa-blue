@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 03:07+0000\n"
-"PO-Revision-Date: 2025-09-18 04:02\n"
+"POT-Creation-Date: 2025-09-23 14:04+0000\n"
+"PO-Revision-Date: 2025-09-26 19:23\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -117,10 +117,10 @@ msgstr "Molimo vas prekinite sledeći program pre nego što nastavite:"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:35 Client/core/CSettings.cpp:1443
-#: Client/core/CSettings.cpp:1467 Client/core/CSettings.cpp:4633
-#: Client/core/CSettings.cpp:4707 Client/core/CSettings.cpp:4737
-#: Client/core/CSettings.cpp:4786 Client/core/CSettings.cpp:4848
+#: Client/loader/Dialogs.cpp:35 Client/core/CSettings.cpp:1445
+#: Client/core/CSettings.cpp:1469 Client/core/CSettings.cpp:4683
+#: Client/core/CSettings.cpp:4757 Client/core/CSettings.cpp:4787
+#: Client/core/CSettings.cpp:4836 Client/core/CSettings.cpp:4898
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CMainMenu.cpp:1206 Client/core/CQuestionBox.cpp:195
@@ -129,10 +129,10 @@ msgstr "Molimo vas prekinite sledeći program pre nego što nastavite:"
 msgid "Yes"
 msgstr "Da"
 
-#: Client/loader/Dialogs.cpp:36 Client/core/CSettings.cpp:1442
-#: Client/core/CSettings.cpp:1466 Client/core/CSettings.cpp:4632
-#: Client/core/CSettings.cpp:4706 Client/core/CSettings.cpp:4736
-#: Client/core/CSettings.cpp:4785 Client/core/CSettings.cpp:4847
+#: Client/loader/Dialogs.cpp:36 Client/core/CSettings.cpp:1444
+#: Client/core/CSettings.cpp:1468 Client/core/CSettings.cpp:4682
+#: Client/core/CSettings.cpp:4756 Client/core/CSettings.cpp:4786
+#: Client/core/CSettings.cpp:4835 Client/core/CSettings.cpp:4897
 #: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
 #: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
 #: Client/core/CMainMenu.cpp:1205 Client/core/CQuestionBox.cpp:194
@@ -142,8 +142,8 @@ msgstr "Ne"
 
 #. Create buttons
 #. OK button
-#: Client/loader/Dialogs.cpp:37 Client/core/CSettings.cpp:128
-#: Client/core/CSettings.cpp:4979 Client/core/CVersionUpdater.cpp:1607
+#: Client/loader/Dialogs.cpp:37 Client/core/CSettings.cpp:130
+#: Client/core/CSettings.cpp:5029 Client/core/CVersionUpdater.cpp:1607
 #: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
 #: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
@@ -165,7 +165,7 @@ msgstr "Pomoć"
 #. Cancel button
 #: Client/loader/Dialogs.cpp:40
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CSettings.cpp:133 Client/core/CSettings.cpp:4978
+#: Client/core/CSettings.cpp:135 Client/core/CSettings.cpp:5028
 #: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
 #: Client/core/CVersionUpdater.cpp:1841 Client/gui/CGUIMessageBox_Impl.cpp:68
 msgid "Cancel"
@@ -365,8 +365,8 @@ msgstr "Nije uspelo ažuriranje zbog konflikta fajlova. Molimo vas isključite d
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
 #: Client/loader/CInstallManager.cpp:563 Client/loader/CInstallManager.cpp:572
-#: Client/loader/MainFunctions.cpp:1283 Client/loader/MainFunctions.cpp:1305
-#: Client/loader/MainFunctions.cpp:1310 Client/loader/MainFunctions.cpp:1618
+#: Client/loader/MainFunctions.cpp:766 Client/loader/MainFunctions.cpp:787
+#: Client/loader/MainFunctions.cpp:791 Client/loader/MainFunctions.cpp:1101
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:724
@@ -380,8 +380,8 @@ msgstr "Nije uspelo ažuriranje zbog konflikta fajlova. Molimo vas isključite d
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1427
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1439
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
-#: Client/core/CSettings.cpp:3002 Client/core/CSettings.cpp:4310
-#: Client/core/CSettings.cpp:4338 Client/core/CSettings.cpp:4958
+#: Client/core/CSettings.cpp:3052 Client/core/CSettings.cpp:4360
+#: Client/core/CSettings.cpp:4388 Client/core/CSettings.cpp:5008
 #: Client/core/CCore.cpp:1272 Client/core/CConnectManager.cpp:86
 #: Client/core/CConnectManager.cpp:117 Client/core/CConnectManager.cpp:133
 #: Client/core/CConnectManager.cpp:271 Client/core/CConnectManager.cpp:329
@@ -471,31 +471,31 @@ msgstr "Ažuriranje podešavanja instaliranja"
 msgid "Update compatibility settings"
 msgstr "Ažuriraj opcije kompatibilnosti"
 
-#: Client/loader/MainFunctions.cpp:560
+#: Client/loader/MainFunctions.cpp:64
 msgid "Invalid module path detected.\n"
 msgstr "Nevažeća putanja za modul pronađena.\n"
 
-#: Client/loader/MainFunctions.cpp:584
+#: Client/loader/MainFunctions.cpp:91
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Neusklađena verzija datoteke. Ponovo instalirajte MTA:SA ukoliko budete imali problem.\n"
 
-#: Client/loader/MainFunctions.cpp:592
+#: Client/loader/MainFunctions.cpp:99
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Neke datoteke nedostaju. Ponovo instalirajte MTA:SA ukoliko budete imali problem.\n"
 
-#: Client/loader/MainFunctions.cpp:602
+#: Client/loader/MainFunctions.cpp:110
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA nije kompatibilan sa Windows 'Safe Mode'.\n\n"
 "Molimo vas ponovo pokrenite vaš računar.\n"
 
-#: Client/loader/MainFunctions.cpp:799
+#: Client/loader/MainFunctions.cpp:287
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "Da li imate problema u pokretanju MTA:SA?\n\n"
 "Da li želite da se vratite na stariju verziju?"
 
-#: Client/loader/MainFunctions.cpp:827
+#: Client/loader/MainFunctions.cpp:315
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -503,48 +503,48 @@ msgstr "Izgleda da ima problema u pokretanju MTA:SA.\n"
 "Resetovanje Podešavanja GTA ponekad reši ovaj problem.\n\n"
 "Da li želite da resetujete GTA podešavanja sada?"
 
-#: Client/loader/MainFunctions.cpp:842
+#: Client/loader/MainFunctions.cpp:330
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "GTA podešavanja su resetovana.\n\n"
 "Kliknite OK da nastavite."
 
-#: Client/loader/MainFunctions.cpp:847
+#: Client/loader/MainFunctions.cpp:335
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "Fajl nije mogao biti izbrisan: '%s'"
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:855
+#: Client/loader/MainFunctions.cpp:343
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "Da li imate problema sa MTA:SA?\n\n"
 "Da li želite online pomoć?"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:892
+#: Client/loader/MainFunctions.cpp:380
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "Da li imate problem sa pokretanjem MTA:SA?.\n\n"
 "Da li želite da izmenite sledeće postavke?"
 
-#: Client/loader/MainFunctions.cpp:893 Client/core/CSettings.cpp:692
-#: Client/core/CSettings.cpp:1046
+#: Client/loader/MainFunctions.cpp:381 Client/core/CSettings.cpp:694
+#: Client/core/CSettings.cpp:1048
 msgid "Fullscreen mode:"
 msgstr "Preko celog ekrana:"
 
-#: Client/loader/MainFunctions.cpp:893 Client/core/CSettings.cpp:702
-#: Client/core/CSettings.cpp:1669
+#: Client/loader/MainFunctions.cpp:381 Client/core/CSettings.cpp:704
+#: Client/core/CSettings.cpp:1671
 msgid "Borderless window"
 msgstr "Prozor bez ivice"
 
-#: Client/loader/MainFunctions.cpp:962
+#: Client/loader/MainFunctions.cpp:452
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "Da li imate problem sa pokretanjem MTA:SA?.\n\n"
 "Pokušajte da onemogućite sledeće produkte za GTA i MTA:"
 
-#: Client/loader/MainFunctions.cpp:997
+#: Client/loader/MainFunctions.cpp:485
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -552,27 +552,27 @@ msgstr "UPOZORENJE\n\n"
 "MTA:SA je otkrio neuobičajenu aktivnost.\n"
 "Molimo vas pokrenite skeniranje virusa da se uverite da je vaš sistem bezbedan.\n\n"
 
-#: Client/loader/MainFunctions.cpp:1000
+#: Client/loader/MainFunctions.cpp:488
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "Otkrivena datoteka je: %s\n"
 
-#: Client/loader/MainFunctions.cpp:1143
+#: Client/loader/MainFunctions.cpp:631
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "GTA: San Andreas je vec pokrenut. Morate ga iskljuciti pre nego sto mozete da ukljucite MTA:SA. Da li zelite to odmah da uradite?"
 
-#: Client/loader/MainFunctions.cpp:1144 Client/loader/MainFunctions.cpp:1151
-#: Client/loader/MainFunctions.cpp:1938 Client/game_sa/CGameSA.cpp:269
+#: Client/loader/MainFunctions.cpp:632 Client/loader/MainFunctions.cpp:639
+#: Client/loader/MainFunctions.cpp:1431 Client/game_sa/CGameSA.cpp:269
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1365
 msgid "Information"
 msgstr "Informacije"
 
-#: Client/loader/MainFunctions.cpp:1150
+#: Client/loader/MainFunctions.cpp:638
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "Nemoguće iskljuciti GTA: San Andreas. Ako se problem ponovo pojavi, molimo vas restartujte vas kumpjuter."
 
-#: Client/loader/MainFunctions.cpp:1278
+#: Client/loader/MainFunctions.cpp:761
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -582,27 +582,27 @@ msgstr "Imamo teškoće u restartovanju MTA:SA\n\n"
 "izaustavite 'gta_sa.exe' i 'Multi Theft Auto.exe' procese\n\n\n"
 "Da li da pokušamo da otvorimo MTA:SA ponovo?"
 
-#: Client/loader/MainFunctions.cpp:1303
+#: Client/loader/MainFunctions.cpp:785
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "Još jedan prozor MTA već radi.\n\n"
 "Ako se problem nastavi, restartujte vaš kompjuter"
 
-#: Client/loader/MainFunctions.cpp:1308
+#: Client/loader/MainFunctions.cpp:789
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "Još jedan prozor MTA već radi.\n\n"
 "Da li želite da ga isključite?"
 
-#: Client/loader/MainFunctions.cpp:1340
+#: Client/loader/MainFunctions.cpp:821
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "Neki podaci nedostaju. Molimo vas ponovo instalirajte Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:1345
+#: Client/loader/MainFunctions.cpp:827
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "Lokacija gde je vas GTA: San Andreas instaliran koristi nepodrzane (unikod) znakove. Molimo vas da pomerite vasu Grand Theft Auto: San Andreas instalaciju na lokaciju sa podrzanim znakovima i ponovo instalirate Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:1358
+#: Client/loader/MainFunctions.cpp:840
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
@@ -612,59 +612,59 @@ msgstr "Putanja za instalaciju 'MTA:SA' ili 'GTA: San Andreas'\n"
 "Ako imate problema sa pokretanjem MTA:SA,\n"
 "pomerite vašu instalaciju(je) u lokaciju koja ne sadrži tačku-zarez."
 
-#: Client/loader/MainFunctions.cpp:1547
+#: Client/loader/MainFunctions.cpp:1023
 msgid "Invalid installation paths detected."
 msgstr "Nevažeća putanja za instalaciju pronađena."
 
-#: Client/loader/MainFunctions.cpp:1580
+#: Client/loader/MainFunctions.cpp:1058
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Neuspelo učitavanje. Molimo vas uverite se da su najnovije datoteke podataka ispravno instalirane."
 
-#: Client/loader/MainFunctions.cpp:1589
+#: Client/loader/MainFunctions.cpp:1067
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Neuspelo učitavanje. Molimo vas uverite se da je %s ispravno instaliran."
 
-#: Client/loader/MainFunctions.cpp:1596
+#: Client/loader/MainFunctions.cpp:1076
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Neuspelo učitavanje. Nismo uspeli da pronađemo gta_sa.exe u %s."
 
-#: Client/loader/MainFunctions.cpp:1607
+#: Client/loader/MainFunctions.cpp:1090
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Neuspelo učitavanje. %s postoji u GTA direktorijumu. Molimo vas obrišite ga pre nego što nastavite."
 
-#: Client/loader/MainFunctions.cpp:1617
+#: Client/loader/MainFunctions.cpp:1100
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Glavna datoteka ima neispravno ime (%s)"
 
-#: Client/loader/MainFunctions.cpp:1654
+#: Client/loader/MainFunctions.cpp:1147
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr "Datoteka %s nedostaje. Moguća aktivnost virusa."
 
-#: Client/loader/MainFunctions.cpp:1661
+#: Client/loader/MainFunctions.cpp:1155
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr "Datoteka %s modifikovana. Moguća aktivnost virusa."
 
-#: Client/loader/MainFunctions.cpp:1684
+#: Client/loader/MainFunctions.cpp:1179
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
 msgstr ".asi datoteke su u instalacionom folderu.\n\n"
 "Uklonite ove .asi datoteke ako iskusite probleme."
 
-#: Client/loader/MainFunctions.cpp:1838
+#: Client/loader/MainFunctions.cpp:1334
 msgid "Invalid game paths detected."
 msgstr "Nevažeće putanje za igru pronađene."
 
-#: Client/loader/MainFunctions.cpp:1846
+#: Client/loader/MainFunctions.cpp:1342
 msgid "Fix configuration issue"
 msgstr "Popravi problem sa konfiguracijom"
 
-#: Client/loader/MainFunctions.cpp:1938
+#: Client/loader/MainFunctions.cpp:1431
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr "GTA: San Andreas se nije ispravno pokrenuo. Da li želite da obustavite?"
 
@@ -684,7 +684,7 @@ msgstr "NIKADA NE UNOSITE OSETLJIVE PODATKE DA BISTE IH ZAŠTITILI OD KRAĐE"
 msgid "Remember decision"
 msgstr "Zapamti odluku"
 
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:1016
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:1018
 msgid "Allow"
 msgstr "Dozvoli"
 
@@ -838,7 +838,7 @@ msgstr "Greška prilikom preuzimanja: %s"
 
 #: Client/mods/deathmatch/logic/CResource.cpp:368
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1098
-#: Client/core/CSettings.cpp:3582 Client/core/CCore.cpp:674
+#: Client/core/CSettings.cpp:3632 Client/core/CCore.cpp:674
 msgid "In-game"
 msgstr "U igri"
 
@@ -850,8 +850,8 @@ msgstr "HOSTUJ IGRU"
 #. * Webbrowser tab
 #. *
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-#: Client/core/CSettings.cpp:475 Client/core/CSettings.cpp:942
-#: Client/core/CSettings.cpp:2079
+#: Client/core/CSettings.cpp:477 Client/core/CSettings.cpp:944
+#: Client/core/CSettings.cpp:2129
 msgid "General"
 msgstr "Opšte"
 
@@ -1032,7 +1032,7 @@ msgid "Choking to death in"
 msgstr "Guši se do smrti u"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:548
-#: Client/core/CSettings.cpp:3578 Client/core/CMainMenu.cpp:303
+#: Client/core/CSettings.cpp:3628 Client/core/CMainMenu.cpp:303
 #: Client/core/CCore.cpp:674
 msgid "Main menu"
 msgstr "Glavni meni"
@@ -1427,13 +1427,13 @@ msgstr "Unapred"
 msgid "Backwards"
 msgstr "Unazad"
 
-#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2301
-#: Client/core/CSettings.cpp:2329
+#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2351
+#: Client/core/CSettings.cpp:2379
 msgid "Left"
 msgstr "Levo"
 
-#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2303
-#: Client/core/CSettings.cpp:2330
+#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2353
+#: Client/core/CSettings.cpp:2380
 msgid "Right"
 msgstr "Desno"
 
@@ -1608,797 +1608,797 @@ msgid "Brake Axis"
 msgstr "Osa za kočenje"
 
 #. Create window (with frame) if it will fit inside the screen resolution
-#: Client/core/CSettings.cpp:85
+#: Client/core/CSettings.cpp:87
 msgid "SETTINGS"
 msgstr "PODEŠAVANJA"
 
-#: Client/core/CSettings.cpp:117
+#: Client/core/CSettings.cpp:119
 msgid "Multiplayer"
 msgstr "Multiplejer"
 
-#: Client/core/CSettings.cpp:118
+#: Client/core/CSettings.cpp:120
 msgid "Video"
 msgstr "Video"
 
-#: Client/core/CSettings.cpp:119
+#: Client/core/CSettings.cpp:121
 msgid "Audio"
 msgstr "Zvuk"
 
-#: Client/core/CSettings.cpp:120
+#: Client/core/CSettings.cpp:122
 msgid "Binds"
 msgstr "Bindovi"
 
-#: Client/core/CSettings.cpp:121
+#: Client/core/CSettings.cpp:123
 msgid "Controls"
 msgstr "Kontrole"
 
-#: Client/core/CSettings.cpp:122
+#: Client/core/CSettings.cpp:124
 msgid "Interface"
 msgstr "Interfejs"
 
-#: Client/core/CSettings.cpp:123
+#: Client/core/CSettings.cpp:125
 msgid "Web Browser"
 msgstr "Web Browser"
 
-#: Client/core/CSettings.cpp:124
+#: Client/core/CSettings.cpp:126
 msgid "Advanced"
 msgstr "Napredno"
 
-#: Client/core/CSettings.cpp:148 Client/core/CSettings.cpp:339
-#: Client/core/CSettings.cpp:650 Client/core/CSettings.cpp:927
+#: Client/core/CSettings.cpp:150 Client/core/CSettings.cpp:341
+#: Client/core/CSettings.cpp:652 Client/core/CSettings.cpp:929
 msgid "Load defaults"
 msgstr "Učitaj podrazumevano"
 
 #. *
 #. *  Controls tab
 #. *
-#: Client/core/CSettings.cpp:158 Client/core/CSettings.cpp:182
+#: Client/core/CSettings.cpp:160 Client/core/CSettings.cpp:184
 msgid "Mouse sensitivity:"
 msgstr "Osetljivost miša:"
 
 #. VerticalAimSensitivity
-#: Client/core/CSettings.cpp:158 Client/core/CSettings.cpp:200
+#: Client/core/CSettings.cpp:160 Client/core/CSettings.cpp:202
 msgid "Vertical aim sensitivity:"
 msgstr "Osetljivost vertikalnog nišanjenja:"
 
 #. Mouse Options
-#: Client/core/CSettings.cpp:161
+#: Client/core/CSettings.cpp:163
 msgid "Mouse options"
 msgstr "Opcije miša"
 
-#: Client/core/CSettings.cpp:168
+#: Client/core/CSettings.cpp:170
 msgid "Invert mouse vertically"
 msgstr "Obrtanje miša vertikalno"
 
-#: Client/core/CSettings.cpp:172
+#: Client/core/CSettings.cpp:174
 msgid "Steer with mouse"
 msgstr "Upravljanje mišem"
 
-#: Client/core/CSettings.cpp:176
+#: Client/core/CSettings.cpp:178
 msgid "Fly with mouse"
 msgstr "Letenje mišem"
 
 #. Joypad options
-#: Client/core/CSettings.cpp:218
+#: Client/core/CSettings.cpp:220
 msgid "Joypad options"
 msgstr "Opcije za džojstik"
 
-#: Client/core/CSettings.cpp:231
+#: Client/core/CSettings.cpp:233
 msgid "Standard controls (Mouse + Keyboard)"
 msgstr "Standardne kontrole (Miš + Tastatura)"
 
-#: Client/core/CSettings.cpp:238
+#: Client/core/CSettings.cpp:240
 msgid "Classic controls (Joypad)"
 msgstr "Klasične kontrole (Džojstik)"
 
-#: Client/core/CSettings.cpp:275
+#: Client/core/CSettings.cpp:277
 msgid "Dead Zone"
 msgstr "Mrtva Zona"
 
-#: Client/core/CSettings.cpp:280
+#: Client/core/CSettings.cpp:282
 msgid "Saturation"
 msgstr "Zasićenost"
 
-#: Client/core/CSettings.cpp:286
+#: Client/core/CSettings.cpp:288
 msgid "Use the 'Binds' tab for joypad buttons."
 msgstr "Koristite 'Binds' pločicu za dugmiće na džojstiku."
 
-#: Client/core/CSettings.cpp:325
+#: Client/core/CSettings.cpp:327
 msgid "Left Stick"
 msgstr "Levi štapić"
 
-#: Client/core/CSettings.cpp:331
+#: Client/core/CSettings.cpp:333
 msgid "Right Stick"
 msgstr "Desni štapić"
 
-#: Client/core/CSettings.cpp:346
+#: Client/core/CSettings.cpp:348
 msgid "DESCRIPTION"
 msgstr "OPIS"
 
-#: Client/core/CSettings.cpp:347
+#: Client/core/CSettings.cpp:349
 msgid "KEY"
 msgstr "DUGME"
 
-#: Client/core/CSettings.cpp:349
+#: Client/core/CSettings.cpp:351
 msgid "ALT. KEY"
 msgstr "ALT. DUGME"
 
 #. *
 #. *    Multiplayer tab
 #. *
-#: Client/core/CSettings.cpp:354 Client/core/CSettings.cpp:357
+#: Client/core/CSettings.cpp:356 Client/core/CSettings.cpp:359
 msgid "Nick:"
 msgstr "Nadimak:"
 
-#: Client/core/CSettings.cpp:379
+#: Client/core/CSettings.cpp:381
 msgid "Save server passwords"
 msgstr "Sačuvaj passworde servera"
 
-#: Client/core/CSettings.cpp:384
+#: Client/core/CSettings.cpp:386
 msgid "Auto-refresh server browser"
 msgstr "Auto-osveži brauzer servera"
 
-#: Client/core/CSettings.cpp:389
+#: Client/core/CSettings.cpp:391
 msgid "Allow screen upload"
 msgstr "Dozvoli upload ekrana"
 
-#: Client/core/CSettings.cpp:394
+#: Client/core/CSettings.cpp:396
 msgid "Allow external sounds"
 msgstr "Dozvoli spoljne zvukove"
 
-#: Client/core/CSettings.cpp:399
+#: Client/core/CSettings.cpp:401
 msgid "Always show download window"
 msgstr "Uvek pokaži prozor preuzimanja"
 
-#: Client/core/CSettings.cpp:404
+#: Client/core/CSettings.cpp:406
 msgid "Allow connecting with Discord Rich Presence"
 msgstr "Omogući vezivanje sa Discord Rich Presence"
 
-#: Client/core/CSettings.cpp:409
+#: Client/core/CSettings.cpp:411
 msgid "Allow GTA:SA ingame status on Steam"
 msgstr "Omogući GTA:SA u igri status na Steamu"
 
 #. Enable camera photos getting saved to documents folder
-#: Client/core/CSettings.cpp:415
+#: Client/core/CSettings.cpp:417
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
 msgstr "Sačuvaj slike slikane sa kamerom u GTA San Andreas User Files folder"
 
-#: Client/core/CSettings.cpp:420
+#: Client/core/CSettings.cpp:422
 msgid "Ask before disconnecting from server using main menu"
 msgstr "Pitaj pre isključivanja sa servera kroz glavni meni"
 
-#: Client/core/CSettings.cpp:425
+#: Client/core/CSettings.cpp:427
 msgid "Use customized GTA:SA files"
 msgstr "Koristi prilagođene GTA:SA datoteke"
 
-#: Client/core/CSettings.cpp:430
+#: Client/core/CSettings.cpp:432
 msgid "Map rendering options"
 msgstr "Opcije za renderovanje mape"
 
-#: Client/core/CSettings.cpp:438
+#: Client/core/CSettings.cpp:440
 msgid "Opacity:"
 msgstr "Providnost:"
 
-#: Client/core/CSettings.cpp:458
+#: Client/core/CSettings.cpp:460
 msgid "Image resolution:"
 msgstr "Rezolucija slike:"
 
-#: Client/core/CSettings.cpp:465
+#: Client/core/CSettings.cpp:467
 msgid "1024 x 1024 (Default)"
 msgstr "1024 x 1024 (Podrazumevano)"
 
 #. index 0
-#: Client/core/CSettings.cpp:466
+#: Client/core/CSettings.cpp:468
 msgid "2048 x 2048"
 msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
 #. *
-#: Client/core/CSettings.cpp:472 Client/core/CSettings.cpp:481
+#: Client/core/CSettings.cpp:474 Client/core/CSettings.cpp:483
 msgid "Master volume:"
 msgstr "Glavna jačina zvuka:"
 
-#: Client/core/CSettings.cpp:472 Client/core/CSettings.cpp:500
+#: Client/core/CSettings.cpp:474 Client/core/CSettings.cpp:502
 msgid "Radio volume:"
 msgstr "Jačina radija:"
 
-#: Client/core/CSettings.cpp:472 Client/core/CSettings.cpp:519
+#: Client/core/CSettings.cpp:474 Client/core/CSettings.cpp:521
 msgid "SFX volume:"
 msgstr "Jačina zvučnih efekata:"
 
-#: Client/core/CSettings.cpp:472 Client/core/CSettings.cpp:538
+#: Client/core/CSettings.cpp:474 Client/core/CSettings.cpp:540
 msgid "MTA volume:"
 msgstr "Jačina MTA:"
 
-#: Client/core/CSettings.cpp:473 Client/core/CSettings.cpp:557
+#: Client/core/CSettings.cpp:475 Client/core/CSettings.cpp:559
 msgid "Voice volume:"
 msgstr "Jačina glasa:"
 
-#: Client/core/CSettings.cpp:473 Client/core/CSettings.cpp:598
+#: Client/core/CSettings.cpp:475 Client/core/CSettings.cpp:600
 msgid "Play mode:"
 msgstr "Mod igre:"
 
-#: Client/core/CSettings.cpp:576
+#: Client/core/CSettings.cpp:578
 msgid "Radio options"
 msgstr "Radio opcije"
 
-#: Client/core/CSettings.cpp:582
+#: Client/core/CSettings.cpp:584
 msgid "Radio Equalizer"
 msgstr "Ekvilajzer Radija"
 
-#: Client/core/CSettings.cpp:587
+#: Client/core/CSettings.cpp:589
 msgid "Radio Auto-tune"
 msgstr "Auto-tjun Radija"
 
-#: Client/core/CSettings.cpp:592
+#: Client/core/CSettings.cpp:594
 msgid "Usertrack options"
 msgstr "Opcije korisničkih pesama"
 
-#: Client/core/CSettings.cpp:606 Client/core/CSettings.cpp:3160
+#: Client/core/CSettings.cpp:608 Client/core/CSettings.cpp:3210
 msgid "Radio"
 msgstr "Radio"
 
-#: Client/core/CSettings.cpp:607 Client/core/CSettings.cpp:3162
+#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:3212
 msgid "Random"
 msgstr "Nasumično"
 
-#: Client/core/CSettings.cpp:608 Client/core/CSettings.cpp:3164
+#: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:3214
 msgid "Sequential"
 msgstr "U sekvencama"
 
-#: Client/core/CSettings.cpp:611
+#: Client/core/CSettings.cpp:613
 msgid "Automatic Media Scan"
 msgstr "Automatski sken medija"
 
-#: Client/core/CSettings.cpp:618
+#: Client/core/CSettings.cpp:620
 msgid "Mute options"
 msgstr "Opcije isključivanja zvuka"
 
-#: Client/core/CSettings.cpp:624
+#: Client/core/CSettings.cpp:626
 msgid "Mute All sounds when minimized"
 msgstr "Isključi sve zvukove kada se spusti prozor"
 
-#: Client/core/CSettings.cpp:629
+#: Client/core/CSettings.cpp:631
 msgid "Mute Radio sounds when minimized"
 msgstr "Isključiti zvuk radija kada je prozor spušten"
 
-#: Client/core/CSettings.cpp:634
+#: Client/core/CSettings.cpp:636
 msgid "Mute SFX sounds when minimized"
 msgstr "Isključi zvuk zvučnih efekata kada je prozor spušten"
 
-#: Client/core/CSettings.cpp:639
+#: Client/core/CSettings.cpp:641
 msgid "Mute MTA sounds when minimized"
 msgstr "Isključi zvuk MTA kada je prozor spušten"
 
-#: Client/core/CSettings.cpp:644
+#: Client/core/CSettings.cpp:646
 msgid "Mute Voice sounds when minimized"
 msgstr "Isključi zvuk glasa kada je prozor spušten"
 
 #. *
 #. *  Video tab
 #. *
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:666
+#: Client/core/CSettings.cpp:662 Client/core/CSettings.cpp:668
 msgid "Resolution:"
 msgstr "Rezolucija:"
 
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:721
+#: Client/core/CSettings.cpp:662 Client/core/CSettings.cpp:723
 msgid "FOV:"
 msgstr "Vidno polje:"
 
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:737
+#: Client/core/CSettings.cpp:662 Client/core/CSettings.cpp:739
 msgid "Draw Distance:"
 msgstr "Udaljenost crtanja:"
 
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:755
+#: Client/core/CSettings.cpp:662 Client/core/CSettings.cpp:757
 msgid "Brightness:"
 msgstr "Osvetljenje:"
 
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:773
+#: Client/core/CSettings.cpp:662 Client/core/CSettings.cpp:775
 msgid "FX Quality:"
 msgstr "Kvalitet zvučnih efekata:"
 
-#: Client/core/CSettings.cpp:661 Client/core/CSettings.cpp:787
+#: Client/core/CSettings.cpp:663 Client/core/CSettings.cpp:789
 msgid "Anisotropic filtering:"
 msgstr "Anizotropsko filtriranje:"
 
-#: Client/core/CSettings.cpp:661 Client/core/CSettings.cpp:814
+#: Client/core/CSettings.cpp:663 Client/core/CSettings.cpp:816
 msgid "Anti-aliasing:"
 msgstr "Umekšanje:"
 
-#: Client/core/CSettings.cpp:661 Client/core/CSettings.cpp:828
+#: Client/core/CSettings.cpp:663 Client/core/CSettings.cpp:830
 msgid "Aspect Ratio:"
 msgstr "Odnos razmere:"
 
-#: Client/core/CSettings.cpp:678
+#: Client/core/CSettings.cpp:680
 msgid "Windowed"
 msgstr "Prozor"
 
-#: Client/core/CSettings.cpp:684
+#: Client/core/CSettings.cpp:686
 msgid "DPI aware"
 msgstr "DPI svestan"
 
-#: Client/core/CSettings.cpp:701 Client/core/CSettings.cpp:1667
+#: Client/core/CSettings.cpp:703 Client/core/CSettings.cpp:1669
 msgid "Standard"
 msgstr "Standardno"
 
-#: Client/core/CSettings.cpp:703 Client/core/CSettings.cpp:1671
+#: Client/core/CSettings.cpp:705 Client/core/CSettings.cpp:1673
 msgid "Borderless keep res"
 msgstr "Rezolucija bez ivice"
 
-#: Client/core/CSettings.cpp:706
+#: Client/core/CSettings.cpp:708
 msgid "Mip Mapping"
 msgstr "Mapiranje Mipa"
 
-#: Client/core/CSettings.cpp:713
+#: Client/core/CSettings.cpp:715
 msgid "V-Sync"
-msgstr ""
+msgstr "V-Sync"
 
-#: Client/core/CSettings.cpp:781 Client/core/CSettings.cpp:1571
+#: Client/core/CSettings.cpp:783 Client/core/CSettings.cpp:1573
 msgid "Low"
 msgstr "Nisko"
 
-#: Client/core/CSettings.cpp:782 Client/core/CSettings.cpp:1573
+#: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1575
 msgid "Medium"
 msgstr "Srednje"
 
-#: Client/core/CSettings.cpp:783 Client/core/CSettings.cpp:1129
-#: Client/core/CSettings.cpp:1575 Client/core/CSettings.cpp:3218
+#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1131
+#: Client/core/CSettings.cpp:1577 Client/core/CSettings.cpp:3268
 msgid "High"
 msgstr "Visoko"
 
-#: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1577
+#: Client/core/CSettings.cpp:786 Client/core/CSettings.cpp:1579
 msgid "Very high"
 msgstr "Vrlo visoko"
 
-#: Client/core/CSettings.cpp:799 Client/core/CSettings.cpp:822
-#: Client/core/CSettings.cpp:1060 Client/core/CSettings.cpp:1114
-#: Client/core/CSettings.cpp:1250 Client/core/CSettings.cpp:1581
-#: Client/core/CSettings.cpp:3225 Client/core/CSettings.cpp:3257
-#: Client/core/CSettings.cpp:3303 Client/core/CSettings.cpp:4378
+#: Client/core/CSettings.cpp:801 Client/core/CSettings.cpp:824
+#: Client/core/CSettings.cpp:1062 Client/core/CSettings.cpp:1116
+#: Client/core/CSettings.cpp:1252 Client/core/CSettings.cpp:1583
+#: Client/core/CSettings.cpp:3275 Client/core/CSettings.cpp:3307
+#: Client/core/CSettings.cpp:3353 Client/core/CSettings.cpp:4428
 msgid "Off"
 msgstr "Isključeno"
 
-#: Client/core/CSettings.cpp:823 Client/core/CSettings.cpp:1583
+#: Client/core/CSettings.cpp:825 Client/core/CSettings.cpp:1585
 msgid "1x"
 msgstr "1x"
 
-#: Client/core/CSettings.cpp:824 Client/core/CSettings.cpp:1585
+#: Client/core/CSettings.cpp:826 Client/core/CSettings.cpp:1587
 msgid "2x"
 msgstr "2x"
 
-#: Client/core/CSettings.cpp:825 Client/core/CSettings.cpp:1587
+#: Client/core/CSettings.cpp:827 Client/core/CSettings.cpp:1589
 msgid "3x"
 msgstr "3x"
 
-#: Client/core/CSettings.cpp:838 Client/core/CSettings.cpp:1062
-#: Client/core/CSettings.cpp:1593 Client/core/CSettings.cpp:3227
+#: Client/core/CSettings.cpp:840 Client/core/CSettings.cpp:1064
+#: Client/core/CSettings.cpp:1595 Client/core/CSettings.cpp:3277
 msgid "Auto"
 msgstr "Automatski"
 
-#: Client/core/CSettings.cpp:839 Client/core/CSettings.cpp:1595
+#: Client/core/CSettings.cpp:841 Client/core/CSettings.cpp:1597
 msgid "4:3"
 msgstr "4:3"
 
-#: Client/core/CSettings.cpp:840 Client/core/CSettings.cpp:1597
+#: Client/core/CSettings.cpp:842 Client/core/CSettings.cpp:1599
 msgid "16:10"
 msgstr "16:10"
 
-#: Client/core/CSettings.cpp:841 Client/core/CSettings.cpp:1599
+#: Client/core/CSettings.cpp:843 Client/core/CSettings.cpp:1601
 msgid "16:9"
 msgstr "16:9"
 
-#: Client/core/CSettings.cpp:844
+#: Client/core/CSettings.cpp:846
 msgid "HUD Match Aspect Ratio"
 msgstr "HUD poklopiti sa odnosom širine i visine"
 
-#: Client/core/CSettings.cpp:850
+#: Client/core/CSettings.cpp:852
 msgid "Volumetric Shadows"
 msgstr "Količina senki"
 
-#: Client/core/CSettings.cpp:854
+#: Client/core/CSettings.cpp:856
 msgid "Grass effect"
 msgstr "Efekat trave"
 
-#: Client/core/CSettings.cpp:858
+#: Client/core/CSettings.cpp:860
 msgid "Heat haze"
 msgstr "Izmaglica topline"
 
-#: Client/core/CSettings.cpp:862
+#: Client/core/CSettings.cpp:864
 msgid "Tyre Smoke etc"
 msgstr "Dimljenje guma itd"
 
-#: Client/core/CSettings.cpp:866
+#: Client/core/CSettings.cpp:868
 msgid "Dynamic ped shadows"
 msgstr "Dinamične senke pešaka"
 
-#: Client/core/CSettings.cpp:870
+#: Client/core/CSettings.cpp:872
 msgid "Motion blur"
 msgstr "Pokretno zamućenje"
 
-#: Client/core/CSettings.cpp:874
+#: Client/core/CSettings.cpp:876
 msgid "Corona rain reflections"
 msgstr "Corona kišne reflekcije"
 
-#: Client/core/CSettings.cpp:879
+#: Client/core/CSettings.cpp:881
 msgid "Full Screen Minimize"
 msgstr "Smanjenje celog ekrana"
 
-#: Client/core/CSettings.cpp:891
+#: Client/core/CSettings.cpp:893
 msgid "Enable Device Selection Dialog"
 msgstr "Uključi dijalog za odabiranje uredjaja"
 
-#: Client/core/CSettings.cpp:903
+#: Client/core/CSettings.cpp:905
 msgid "Show unsafe resolutions"
 msgstr "Pokaži nepouzdane rezolucije"
 
-#: Client/core/CSettings.cpp:915
+#: Client/core/CSettings.cpp:917
 msgid "Render vehicles always in high detail"
 msgstr "Render vozila uvek u visokim detaljima"
 
-#: Client/core/CSettings.cpp:919
+#: Client/core/CSettings.cpp:921
 msgid "Render peds always in high detail"
 msgstr "Render pešaka uvek u visokim detaljima"
 
-#: Client/core/CSettings.cpp:948
+#: Client/core/CSettings.cpp:950
 msgid "Enable remote websites"
 msgstr "Omogućiti udaljene web stranice"
 
-#: Client/core/CSettings.cpp:953
+#: Client/core/CSettings.cpp:955
 msgid "Enable Javascript on remote websites"
 msgstr "Omogućiti Javascript na udaljenim web stranicama"
 
-#: Client/core/CSettings.cpp:958
+#: Client/core/CSettings.cpp:960
 msgid "Enable GPU rendering"
 msgstr "Uključi render grafičkom karticom"
 
-#: Client/core/CSettings.cpp:962
+#: Client/core/CSettings.cpp:964
 msgid "Custom blacklist"
 msgstr "Prilagođena lista zabrana"
 
-#: Client/core/CSettings.cpp:973 Client/core/CSettings.cpp:1008
+#: Client/core/CSettings.cpp:975 Client/core/CSettings.cpp:1010
 msgid "Enter a domain e.g. google.com"
 msgstr "Unesite domen, npr. google.com"
 
-#: Client/core/CSettings.cpp:981
+#: Client/core/CSettings.cpp:983
 msgid "Block"
 msgstr "Blokiraj"
 
-#: Client/core/CSettings.cpp:989 Client/core/CSettings.cpp:1024
+#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1026
 msgid "Domain"
 msgstr "Domen"
 
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1026
+#: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1028
 msgid "Remove domain"
 msgstr "Ukloni domen"
 
 #. Reset vecTemp
-#: Client/core/CSettings.cpp:997
+#: Client/core/CSettings.cpp:999
 msgid "Custom whitelist"
 msgstr "Prilagođena lista odobrenja"
 
 #. Misc section label
-#: Client/core/CSettings.cpp:1039
+#: Client/core/CSettings.cpp:1041
 msgid "Misc"
 msgstr "Razno"
 
 #. Fast clothes loading
-#: Client/core/CSettings.cpp:1045 Client/core/CSettings.cpp:1053
-#: Client/core/CSettings.cpp:4997
+#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:1055
+#: Client/core/CSettings.cpp:5047
 msgid "Fast CJ clothes loading:"
 msgstr "Brzo učitavanje CJ-eve odeće:"
 
 #. Browser scan speed
-#: Client/core/CSettings.cpp:1045 Client/core/CSettings.cpp:1067
-#: Client/core/CSettings.cpp:4999
+#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:1069
+#: Client/core/CSettings.cpp:5049
 msgid "Browser speed:"
 msgstr "Brzina brauzera:"
 
 #. Single download
-#: Client/core/CSettings.cpp:1045 Client/core/CSettings.cpp:1081
-#: Client/core/CSettings.cpp:5001
+#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:1083
+#: Client/core/CSettings.cpp:5051
 msgid "Single connection:"
 msgstr "Jedna konekcija:"
 
 #. Packet tag
-#: Client/core/CSettings.cpp:1045 Client/core/CSettings.cpp:1094
-#: Client/core/CSettings.cpp:5003
+#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:1096
+#: Client/core/CSettings.cpp:5053
 msgid "Packet tag:"
 msgstr "Paket tag:"
 
 #. Progress animation
-#: Client/core/CSettings.cpp:1046 Client/core/CSettings.cpp:1107
-#: Client/core/CSettings.cpp:5005
+#: Client/core/CSettings.cpp:1048 Client/core/CSettings.cpp:1109
+#: Client/core/CSettings.cpp:5055
 msgid "Progress animation:"
 msgstr "Animacija napredka:"
 
 #. Process priority
-#: Client/core/CSettings.cpp:1046 Client/core/CSettings.cpp:1120
-#: Client/core/CSettings.cpp:4995
+#: Client/core/CSettings.cpp:1048 Client/core/CSettings.cpp:1122
+#: Client/core/CSettings.cpp:5045
 msgid "Process priority:"
 msgstr "Važnost procesa:"
 
 #. Debug setting
-#: Client/core/CSettings.cpp:1046 Client/core/CSettings.cpp:1134
-#: Client/core/CSettings.cpp:5007
+#: Client/core/CSettings.cpp:1048 Client/core/CSettings.cpp:1136
+#: Client/core/CSettings.cpp:5057
 msgid "Debug setting:"
 msgstr "Podešavanja debuga:"
 
 #. Streaming memory
-#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:1157
-#: Client/core/CSettings.cpp:5009
+#: Client/core/CSettings.cpp:1049 Client/core/CSettings.cpp:1159
+#: Client/core/CSettings.cpp:5059
 msgid "Streaming memory:"
 msgstr "Tekuća memorija:"
 
 #. Update build type
-#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:1264
+#: Client/core/CSettings.cpp:1049 Client/core/CSettings.cpp:1266
 msgid "Update build type:"
 msgstr "Unapredjivanje tipa gradje:"
 
 #. UpdateAutoInstall
-#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:1243
+#: Client/core/CSettings.cpp:1049 Client/core/CSettings.cpp:1245
 msgid "Install important updates:"
 msgstr "Instaliraj bitne nadogradnje:"
 
-#: Client/core/CSettings.cpp:1061 Client/core/CSettings.cpp:1089
-#: Client/core/CSettings.cpp:1102 Client/core/CSettings.cpp:3229
-#: Client/core/CSettings.cpp:3245 Client/core/CSettings.cpp:3252
+#: Client/core/CSettings.cpp:1063 Client/core/CSettings.cpp:1091
+#: Client/core/CSettings.cpp:1104 Client/core/CSettings.cpp:3279
+#: Client/core/CSettings.cpp:3295 Client/core/CSettings.cpp:3302
 msgid "On"
 msgstr "Uključeno"
 
-#: Client/core/CSettings.cpp:1074 Client/core/CSettings.cpp:3234
+#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:3284
 msgid "Very slow"
 msgstr "Vrlo sporo"
 
-#: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:1088
-#: Client/core/CSettings.cpp:1101 Client/core/CSettings.cpp:1115
-#: Client/core/CSettings.cpp:1141 Client/core/CSettings.cpp:1153
-#: Client/core/CSettings.cpp:1251 Client/core/CSettings.cpp:1271
-#: Client/core/CSettings.cpp:3236 Client/core/CSettings.cpp:3243
-#: Client/core/CSettings.cpp:3250 Client/core/CSettings.cpp:3259
-#: Client/core/CSettings.cpp:3296
+#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:1090
+#: Client/core/CSettings.cpp:1103 Client/core/CSettings.cpp:1117
+#: Client/core/CSettings.cpp:1143 Client/core/CSettings.cpp:1155
+#: Client/core/CSettings.cpp:1253 Client/core/CSettings.cpp:1273
+#: Client/core/CSettings.cpp:3286 Client/core/CSettings.cpp:3293
+#: Client/core/CSettings.cpp:3300 Client/core/CSettings.cpp:3309
+#: Client/core/CSettings.cpp:3346
 msgid "Default"
 msgstr "Podrazumevano"
 
-#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:3238
+#: Client/core/CSettings.cpp:1078 Client/core/CSettings.cpp:3288
 msgid "Fast"
 msgstr "Brzo"
 
-#: Client/core/CSettings.cpp:1127 Client/core/CSettings.cpp:3214
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:3264
 msgid "Normal"
 msgstr "Normalan"
 
-#: Client/core/CSettings.cpp:1128 Client/core/CSettings.cpp:3216
+#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:3266
 msgid "Above normal"
 msgstr "Iznad normale"
 
-#: Client/core/CSettings.cpp:1164
+#: Client/core/CSettings.cpp:1166
 msgid "Min"
 msgstr "Minimalno"
 
-#: Client/core/CSettings.cpp:1177
+#: Client/core/CSettings.cpp:1179
 msgid "Max"
 msgstr "Maksimalno"
 
 #. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1184
+#: Client/core/CSettings.cpp:1186
 msgid "Windows 8 compatibility:"
 msgstr "Windows 8 kompatibilnost:"
 
-#: Client/core/CSettings.cpp:1188
+#: Client/core/CSettings.cpp:1190
 msgid "16-bit color"
 msgstr "16-bitna boja"
 
-#: Client/core/CSettings.cpp:1193
+#: Client/core/CSettings.cpp:1195
 msgid "Mouse fix"
 msgstr "Popravka miša"
 
 #. Cache path info
-#: Client/core/CSettings.cpp:1211
+#: Client/core/CSettings.cpp:1213
 msgid "Client resource files:"
 msgstr "Datoteka Klijent resursa:"
 
-#: Client/core/CSettings.cpp:1215
+#: Client/core/CSettings.cpp:1217
 msgid "Show in Explorer"
 msgstr "Prikaži u Exploreru"
 
 #. Process affinity
-#: Client/core/CSettings.cpp:1230
+#: Client/core/CSettings.cpp:1232
 msgid "Set CPU 0 affinity to improve game performance"
 msgstr "Podesi CPU 0 prioritet za poboljšanje performanse igre"
 
 #. Auto updater section label
-#: Client/core/CSettings.cpp:1236 Client/core/CSettings.cpp:1239
+#: Client/core/CSettings.cpp:1238 Client/core/CSettings.cpp:1241
 msgid "Auto updater"
 msgstr "Auto unapredjivanje"
 
 #. Check for updates
-#: Client/core/CSettings.cpp:1277
+#: Client/core/CSettings.cpp:1279
 msgid "Check for update now"
 msgstr "Proveri za najnoviju verziju sada"
 
-#: Client/core/CSettings.cpp:1436
+#: Client/core/CSettings.cpp:1438
 msgid "Some settings will be changed when you next start MTA"
 msgstr "Neke opcije biće promenjene prilikom sledećeg pokretanja MTA"
 
-#: Client/core/CSettings.cpp:1437
+#: Client/core/CSettings.cpp:1439
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
 "Da li želite da restartujete sada?"
 
-#: Client/core/CSettings.cpp:1440
+#: Client/core/CSettings.cpp:1442
 msgid "RESTART REQUIRED"
 msgstr "RESTARTOVANJE NEOPHODNO"
 
-#: Client/core/CSettings.cpp:1460
+#: Client/core/CSettings.cpp:1462
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr "Neke opcije biće promenjene kada se isključite sa trenutnog servera"
 
-#: Client/core/CSettings.cpp:1461
+#: Client/core/CSettings.cpp:1463
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
 "Da li želite da restartujete sada?"
 
-#: Client/core/CSettings.cpp:1464
+#: Client/core/CSettings.cpp:1466
 msgid "DISCONNECT REQUIRED"
 msgstr "NEOPHODNO ISKLJUČENJE"
 
 #. Update the joystick name
-#: Client/core/CSettings.cpp:1796
+#: Client/core/CSettings.cpp:1846
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "Džojstik nije detektovan - Proverite konekciju i restartujte igricu"
 
-#: Client/core/CSettings.cpp:1993
+#: Client/core/CSettings.cpp:2043
 msgid "Binding axis"
 msgstr "Bindovanje osa"
 
-#: Client/core/CSettings.cpp:1993
+#: Client/core/CSettings.cpp:2043
 msgid "Move an axis to bind, or escape to clear"
 msgstr "Pomerite osu da bindujete, ili escape da očistite"
 
-#: Client/core/CSettings.cpp:2070
+#: Client/core/CSettings.cpp:2120
 msgid "Language:"
 msgstr "Jezik:"
 
-#: Client/core/CSettings.cpp:2070
+#: Client/core/CSettings.cpp:2120
 msgid "Skin:"
 msgstr "Tema:"
 
-#: Client/core/CSettings.cpp:2070
+#: Client/core/CSettings.cpp:2120
 msgid "Presets:"
 msgstr "Pretpodešavanja:"
 
-#: Client/core/CSettings.cpp:2119
+#: Client/core/CSettings.cpp:2169
 msgid "Chat"
 msgstr "Ćaskanje"
 
-#: Client/core/CSettings.cpp:2136
+#: Client/core/CSettings.cpp:2186
 msgid "Load"
 msgstr "Učitaj"
 
-#: Client/core/CSettings.cpp:2148
+#: Client/core/CSettings.cpp:2198
 msgid "Colors"
 msgstr "Boje"
 
-#: Client/core/CSettings.cpp:2149
+#: Client/core/CSettings.cpp:2199
 msgid "Layout"
 msgstr "Raspored"
 
-#: Client/core/CSettings.cpp:2150 Client/core/CSettings.cpp:2396
+#: Client/core/CSettings.cpp:2200 Client/core/CSettings.cpp:2446
 msgid "Options"
 msgstr "Opcije"
 
-#: Client/core/CSettings.cpp:2156
+#: Client/core/CSettings.cpp:2206
 msgid "Chat Background"
 msgstr "Pozadina ćaskanja"
 
-#: Client/core/CSettings.cpp:2156
+#: Client/core/CSettings.cpp:2206
 msgid "Chat Text"
 msgstr "Tekst ćaskanja"
 
-#: Client/core/CSettings.cpp:2156
+#: Client/core/CSettings.cpp:2206
 msgid "Input Background"
 msgstr "Pozadina unosa"
 
-#: Client/core/CSettings.cpp:2156
+#: Client/core/CSettings.cpp:2206
 msgid "Input Text"
 msgstr "Tekst ulaza"
 
-#: Client/core/CSettings.cpp:2179
+#: Client/core/CSettings.cpp:2229
 msgid "Lines:"
 msgstr "Redovi:"
 
-#: Client/core/CSettings.cpp:2179
+#: Client/core/CSettings.cpp:2229
 msgid "Scale:"
 msgstr "Razmera:"
 
-#: Client/core/CSettings.cpp:2179
+#: Client/core/CSettings.cpp:2229
 msgid "Width:"
 msgstr "Širina:"
 
-#: Client/core/CSettings.cpp:2182
+#: Client/core/CSettings.cpp:2232
 msgid "Size"
 msgstr "Veličina"
 
-#: Client/core/CSettings.cpp:2231
+#: Client/core/CSettings.cpp:2281
 msgid "after"
 msgstr "posle"
 
-#: Client/core/CSettings.cpp:2231
+#: Client/core/CSettings.cpp:2281
 msgid "for"
 msgstr "za"
 
-#: Client/core/CSettings.cpp:2231
+#: Client/core/CSettings.cpp:2281
 msgid "sec"
 msgstr "sek."
 
-#: Client/core/CSettings.cpp:2234
+#: Client/core/CSettings.cpp:2284
 msgid "Fading"
 msgstr "Nestajanje"
 
-#: Client/core/CSettings.cpp:2240
+#: Client/core/CSettings.cpp:2290
 msgid "Fade out old lines"
 msgstr "Postepeno gubljenje starih redova"
 
-#: Client/core/CSettings.cpp:2280
+#: Client/core/CSettings.cpp:2330
 msgid "Horizontal:"
 msgstr "Horizontalno:"
 
-#: Client/core/CSettings.cpp:2280
+#: Client/core/CSettings.cpp:2330
 msgid "Vertical:"
 msgstr "Vertikalno:"
 
-#: Client/core/CSettings.cpp:2280
+#: Client/core/CSettings.cpp:2330
 msgid "Text-Align:"
 msgstr "Poravnavanje teksta:"
 
-#: Client/core/CSettings.cpp:2280
+#: Client/core/CSettings.cpp:2330
 msgid "X-Offset:"
 msgstr "X-Odstupanje:"
 
-#: Client/core/CSettings.cpp:2281
+#: Client/core/CSettings.cpp:2331
 msgid "Y-Offset:"
 msgstr "Y-Odstupanje:"
 
-#: Client/core/CSettings.cpp:2287
+#: Client/core/CSettings.cpp:2337
 msgid "Position"
 msgstr "Pozicija"
 
-#: Client/core/CSettings.cpp:2302 Client/core/CSettings.cpp:2316
+#: Client/core/CSettings.cpp:2352 Client/core/CSettings.cpp:2366
 msgid "Center"
 msgstr "Sredina"
 
-#: Client/core/CSettings.cpp:2315
+#: Client/core/CSettings.cpp:2365
 msgid "Top"
 msgstr "Vrh"
 
-#: Client/core/CSettings.cpp:2317
+#: Client/core/CSettings.cpp:2367
 msgid "Bottom"
 msgstr "Dno"
 
-#: Client/core/CSettings.cpp:2365
+#: Client/core/CSettings.cpp:2415
 msgid "Font"
 msgstr "Font"
 
-#: Client/core/CSettings.cpp:2402
+#: Client/core/CSettings.cpp:2452
 msgid "Hide background when not typing"
 msgstr "Sakrivanje pozadine dok ne kucate"
 
-#: Client/core/CSettings.cpp:2407
+#: Client/core/CSettings.cpp:2457
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "Završi nadimak koristeći \"Tab\" dugme"
 
-#: Client/core/CSettings.cpp:2412
+#: Client/core/CSettings.cpp:2462
 msgid "Allow server to flash the window"
 msgstr "Dozvoli serveru da blica taskbar ikonicu"
 
-#: Client/core/CSettings.cpp:2417
+#: Client/core/CSettings.cpp:2467
 msgid "Allow tray balloon notifications"
 msgstr "Dozvoli windows notifikacije"
 
-#: Client/core/CSettings.cpp:2422
+#: Client/core/CSettings.cpp:2472
 msgid "Chat text black/white outline"
 msgstr "crno/beli ocrt za tekst ćaskanja"
 
@@ -2406,83 +2406,83 @@ msgstr "crno/beli ocrt za tekst ćaskanja"
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:2671 Client/core/CSettings.cpp:2678
+#: Client/core/CSettings.cpp:2721 Client/core/CSettings.cpp:2728
 msgid "Press a key to bind, or escape to clear"
 msgstr "Pritisnite dugme da bindujete, ili escape da očistite"
 
-#: Client/core/CSettings.cpp:2672
+#: Client/core/CSettings.cpp:2722
 msgid "Binding a primary key"
 msgstr "Bindovanje primarnog dugmeta"
 
-#: Client/core/CSettings.cpp:2679
+#: Client/core/CSettings.cpp:2729
 msgid "Binding a secondary key"
 msgstr "Bindovanje sekundarnog dugmeta"
 
-#: Client/core/CSettings.cpp:2755
+#: Client/core/CSettings.cpp:2805
 msgid "GTA GAME CONTROLS"
 msgstr "KONTROLE IGRE GTA"
 
-#: Client/core/CSettings.cpp:2757
+#: Client/core/CSettings.cpp:2807
 msgid "MULTIPLAYER CONTROLS"
 msgstr "KONTROLE MULTIPLAYERA"
 
-#: Client/core/CSettings.cpp:3002 Client/core/CSettings.cpp:4958
+#: Client/core/CSettings.cpp:3052 Client/core/CSettings.cpp:5008
 msgid "Your nickname contains invalid characters!"
 msgstr "Vaše korisničko ime sadrži nedozvoljene znake!"
 
-#: Client/core/CSettings.cpp:3922
+#: Client/core/CSettings.cpp:3972
 msgid "Red:"
 msgstr "Crvena:"
 
-#: Client/core/CSettings.cpp:3922
+#: Client/core/CSettings.cpp:3972
 msgid "Green:"
 msgstr "Zelena:"
 
-#: Client/core/CSettings.cpp:3922
+#: Client/core/CSettings.cpp:3972
 msgid "Blue:"
 msgstr "Plava:"
 
-#: Client/core/CSettings.cpp:3922
+#: Client/core/CSettings.cpp:3972
 msgid "Transparency:"
 msgstr "Providnost:"
 
-#: Client/core/CSettings.cpp:3925
+#: Client/core/CSettings.cpp:3975
 msgid "Color"
 msgstr "Boja"
 
-#: Client/core/CSettings.cpp:4002
+#: Client/core/CSettings.cpp:4052
 msgid "Preview"
 msgstr "Probni prikaz"
 
-#: Client/core/CSettings.cpp:4310
+#: Client/core/CSettings.cpp:4360
 msgid "Please disconnect before changing language"
 msgstr "Molimo vas isključite se pre promene jezika"
 
-#: Client/core/CSettings.cpp:4338
+#: Client/core/CSettings.cpp:4388
 msgid "Please disconnect before changing skin"
 msgstr "Molimo vas diskonektujte se pre promene skina"
 
-#: Client/core/CSettings.cpp:4626
+#: Client/core/CSettings.cpp:4676
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "Volumetričke senke mogu usporiti neke sisteme.\n\n"
 "Da li ste sigurni da želite da ih uključite?"
 
-#: Client/core/CSettings.cpp:4630
+#: Client/core/CSettings.cpp:4680
 msgid "PERFORMANCE WARNING"
 msgstr "UPOZORENJE O PERFORMANSI"
 
-#: Client/core/CSettings.cpp:4650
+#: Client/core/CSettings.cpp:4700
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "Upload ekrana je neophodan za neke servere zbog anti-varanja.\n\n"
 "(Ćaskanje i GUI nisu slikani za upload)\n"
 
-#: Client/core/CSettings.cpp:4652
+#: Client/core/CSettings.cpp:4702
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "INFORMACIJE ZA UPLOAD EKRANA"
 
-#: Client/core/CSettings.cpp:4667
+#: Client/core/CSettings.cpp:4717
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
@@ -2490,11 +2490,11 @@ msgstr "Neke skripte mogu puštati zvukove, kao na primer radio, sa interneta.\n
 "Isključivanje ovog podešavanja može smanjiti\n"
 "potrošnju protoka podataka.\n"
 
-#: Client/core/CSettings.cpp:4670
+#: Client/core/CSettings.cpp:4720
 msgid "EXTERNAL SOUNDS"
 msgstr "SPOLJAŠNJI ZVUKOVI"
 
-#: Client/core/CSettings.cpp:4699
+#: Client/core/CSettings.cpp:4749
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
@@ -2502,11 +2502,11 @@ msgstr "Izgleda da imate Rich Presence vezivanje opciju uključenu.\n"
 "Da li želite da dozvolite servere da delete njihove podatke?\n\n"
 "Ovo podrazumeva tvoj jedinstveni broj."
 
-#: Client/core/CSettings.cpp:4704
+#: Client/core/CSettings.cpp:4754
 msgid "CONSENT TO ALLOW DATA SHARING"
 msgstr "SAGLASNOST ZA DOZVOLU DELJENJA PODATAKA"
 
-#: Client/core/CSettings.cpp:4728
+#: Client/core/CSettings.cpp:4778
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -2516,11 +2516,11 @@ msgstr "Neke datoteke u vašem GTA:SA direktorijumu su izmenjene.\n"
 "Međutim, IZMENJENE GTA:SA DATOTEKE SU BLOKIRANE OD STRANE MNOGIH SERVERA\n\n"
 "Da li ste sigurni da želite da ih koristite?"
 
-#: Client/core/CSettings.cpp:4734 Client/core/CVersionUpdater.cpp:2081
+#: Client/core/CSettings.cpp:4784 Client/core/CVersionUpdater.cpp:2081
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "IZMENJENE GTA:SA DATOTEKE"
 
-#: Client/core/CSettings.cpp:4777
+#: Client/core/CSettings.cpp:4827
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -2529,91 +2529,91 @@ msgstr "Omogućavanje DPI svesnosti je eksperimentalna odlika i preporučujemo j
 "Možete iskusiti problema sa grafikom ako omogućite ovu opciju.\n\n"
 "Da li ste sigurni da želite da omogućite ovu opciju?"
 
-#: Client/core/CSettings.cpp:4783 Client/core/CSettings.cpp:4838
+#: Client/core/CSettings.cpp:4833 Client/core/CSettings.cpp:4888
 msgid "EXPERIMENTAL FEATURE"
 msgstr "EKSPERIMENTALNA ODLIKA"
 
-#: Client/core/CSettings.cpp:4840
+#: Client/core/CSettings.cpp:4890
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
 msgstr "Isključivanje ove opcije nije preporučeno osim ako imate problema sa performansama.\n\n"
 "Da li ste sigurni da želite da isključite?"
 
-#: Client/core/CSettings.cpp:4976
+#: Client/core/CSettings.cpp:5026
 msgid "Please enter a nickname"
 msgstr "Molimo vas unesite korisničko ime"
 
-#: Client/core/CSettings.cpp:4977
+#: Client/core/CSettings.cpp:5027
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "Molimo vas unesite nadimak koji će biti korišćen u igri. \n"
 "Ovo će biti vaše ime kada se konektujete i igrate na serveru"
 
-#: Client/core/CSettings.cpp:4995
+#: Client/core/CSettings.cpp:5045
 msgid "Very experimental feature."
 msgstr "Vrlo eksperimentalni dodatak."
 
-#: Client/core/CSettings.cpp:4997
+#: Client/core/CSettings.cpp:5047
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "Zaustavlja stopiranja sa varijacijama CJ-a (Koristi 65MB više RAM-a)"
 
-#: Client/core/CSettings.cpp:4999
+#: Client/core/CSettings.cpp:5049
 msgid "Older routers may require a slower scan speed."
 msgstr "Stariji ruteri možda traže sporiju brzinu skeniranja."
 
-#: Client/core/CSettings.cpp:5001
+#: Client/core/CSettings.cpp:5051
 msgid "Switch on to use only one connection when downloading."
 msgstr "Uključite da koristite samo jednu konekciju prilikom skidanja."
 
-#: Client/core/CSettings.cpp:5003
+#: Client/core/CSettings.cpp:5053
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "Tagujte mrežne pakete da pomognete ISP-ovima da identifikuju MTA protok."
 
-#: Client/core/CSettings.cpp:5005
+#: Client/core/CSettings.cpp:5055
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Okretajući krug animacija na donjem delu ekrana"
 
-#: Client/core/CSettings.cpp:5007
+#: Client/core/CSettings.cpp:5057
 msgid "Select default always. (This setting is not saved)"
 msgstr "Uvek koristi normalna podešavanja. (Ovo podešavanje nije sačuvano)"
 
-#: Client/core/CSettings.cpp:5009
+#: Client/core/CSettings.cpp:5059
 msgid "Maximum is usually best"
 msgstr "Maksimalno je obično najbolje"
 
-#: Client/core/CSettings.cpp:5011 Client/core/CSettings.cpp:5013
+#: Client/core/CSettings.cpp:5061 Client/core/CSettings.cpp:5063
 msgid "Auto updater:"
 msgstr "Automatsko ažuriranje:"
 
-#: Client/core/CSettings.cpp:5011
+#: Client/core/CSettings.cpp:5061
 msgid "Select default unless you like filling out bug reports."
 msgstr "Izaberite normalno podešavanje ako ne volite da ispunjavate izveštaje o bagovima."
 
-#: Client/core/CSettings.cpp:5013
+#: Client/core/CSettings.cpp:5063
 msgid "Select default to automatically install important updates."
 msgstr "Odaberite podrazumevano da automatski instalirate bitne nadogradnje."
 
-#: Client/core/CSettings.cpp:5015
+#: Client/core/CSettings.cpp:5065
 msgid "16-bit color:"
 msgstr "16-bitna boja:"
 
-#: Client/core/CSettings.cpp:5015
+#: Client/core/CSettings.cpp:5065
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "Omogući 16-bitni režim boja - Zahteva ponovno pokretanje MTA"
 
-#: Client/core/CSettings.cpp:5017
+#: Client/core/CSettings.cpp:5067
 msgid "Mouse fix:"
 msgstr "Popravka miša:"
 
-#: Client/core/CSettings.cpp:5017
+#: Client/core/CSettings.cpp:5067
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Popravka pokretanja miša - Možda zahteva ponovno pokretanje računara"
 
-#: Client/core/CSettings.cpp:5019
+#: Client/core/CSettings.cpp:5069
 msgid "CPU affinity:"
 msgstr "CPU afinitet:"
 
-#: Client/core/CSettings.cpp:5019
+#: Client/core/CSettings.cpp:5069
 msgid "Only change if you're having stability issues."
 msgstr "Menjajte samo ako imate problema sa stabilnošću."
 
@@ -3255,7 +3255,7 @@ msgstr "Pokreni pretragu"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:260
 msgid "Delete from recent"
-msgstr ""
+msgstr "Izbriši iz nedavnih"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:301
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
