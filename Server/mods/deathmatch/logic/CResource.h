@@ -136,6 +136,7 @@ enum class EResourceState : unsigned char
 // It's a process-like environment for scripts, maps, images and other files.
 class CResource : public EHS
 {
+    friend class CResourceManager;  // Allow CResourceManager access to protected members
     using KeyValueMap = CFastHashMap<SString, SString>;
 
 public:
@@ -335,6 +336,8 @@ public:
 
 public:
     static std::list<CResource*> m_StartedResources;
+
+protected:
     SString             GetAutoGroupName();
     SString             GetAutoAclName();
     CAccessControlList* GetAutoAcl();
@@ -346,8 +349,6 @@ public:
 
     void CommitAclRequest(const SAclRequest& request);
     bool FindAclRequest(SAclRequest& result);
-
-protected:
 
 private:
     bool CheckState();            // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
