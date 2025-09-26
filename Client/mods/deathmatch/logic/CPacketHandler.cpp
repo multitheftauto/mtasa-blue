@@ -3027,8 +3027,7 @@ retry:
                             return;
                         }
 
-                        if (bitStream.ReadBit())
-                            pObject->SetDoubleSided(true);
+                        pObject->SetDoubleSided(bitStream.ReadBit());
 
                         pObject->SetBreakable(bitStream.ReadBit());
 

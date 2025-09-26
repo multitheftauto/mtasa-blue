@@ -6797,47 +6797,54 @@ bool CClientGame::TriggerBrowserRequestResultEvent(const std::unordered_set<SStr
     return GetRootEntity()->CallEvent("onClientBrowserWhitelistChange", Arguments, false);
 }
 
-void CClientGame::RestreamModel(unsigned short usModel)
+bool CClientGame::RestreamModel(std::uint16_t model)
 {
     // Is this a vehicle ID?
-    if (CClientVehicleManager::IsValidModel(usModel))
+    if (CClientVehicleManager::IsValidModel(model))
     {
         // Stream the vehicles of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
-        m_pManager->GetVehicleManager()->RestreamVehicles(usModel);
-    }
+        m_pManager->GetVehicleManager()->RestreamVehicles(model);
 
+        return true;
+    }
     // Is this an object ID?
-    else if (CClientObjectManager::IsValidModel(usModel))
+    else if (CClientObjectManager::IsValidModel(model))
     {
-        if (CClientPedManager::IsValidWeaponModel(usModel))
+        if (CClientPedManager::IsValidWeaponModel(model))
         {
             // Stream the weapon of that model out so we have no
             // loaded when we do the restore. The streamer will
             // eventually stream them back in with async loading.
-            m_pManager->GetPedManager()->RestreamWeapon(usModel);
-            m_pManager->GetPickupManager()->RestreamPickups(usModel);
+            m_pManager->GetPedManager()->RestreamWeapon(model);
+            m_pManager->GetPickupManager()->RestreamPickups(model);
         }
         // Stream the objects of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
-        m_pManager->GetObjectManager()->RestreamObjects(usModel);
-        g_pGame->GetModelInfo(usModel)->RestreamIPL();
+        m_pManager->GetObjectManager()->RestreamObjects(model);
+        g_pGame->GetModelInfo(model)->RestreamIPL();
+
+        return true;
     }
     // Is this an ped ID?
-    else if (CClientPlayerManager::IsValidModel(usModel))
+    else if (CClientPlayerManager::IsValidModel(model))
     {
         // Stream the ped of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
-        m_pManager->GetPedManager()->RestreamPeds(usModel);
-    }
-    else
+        m_pManager->GetPedManager()->RestreamPeds(model);
 
-        // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
-        if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
-            m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+        return true;
+    }
+    // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
+    else if (CClientObjectManager::IsValidModel(model) && CVehicleUpgrades::IsUpgrade(model))
+    {
+        m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(model);
+        return true;
+    }
+    return false;
 }
 
 void CClientGame::RestreamWorld()
@@ -6856,6 +6863,55 @@ void CClientGame::RestreamWorld()
 
     g_pGame->GetStreaming()->RemoveBigBuildings();
     g_pGame->GetStreaming()->ReinitStreaming();
+}
+
+void CClientGame::Restream(std::optional<RestreamOption> option)
+{
+    if (!option.has_value())
+        option = RestreamOption::ALL;
+
+    if (option == RestreamOption::ALL || option == RestreamOption::VEHICLES)
+    {
+        for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::VEHICLE))
+        {
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+        }
+
+        m_pManager->GetVehicleManager()->RestreamAllVehicles();
+    }
+    
+    if (option == RestreamOption::ALL || option == RestreamOption::PEDS)
+    {
+        for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED))
+        {
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+        }
+
+        m_pManager->GetPedManager()->RestreamAllPeds();
+    }
+
+    if (option == RestreamOption::ALL || option == RestreamOption::OBJECTS)
+    {
+        static constexpr eClientModelType restreamTypes[] = {eClientModelType::OBJECT, eClientModelType::OBJECT_DAMAGEABLE, eClientModelType::TIMED_OBJECT,
+                                                             eClientModelType::CLUMP};
+
+        for (eClientModelType type : restreamTypes)
+        {
+            for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(type))
+            {
+                g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+            }
+        }
+
+        m_pManager->GetObjectManager()->RestreamAllObjects();
+        m_pManager->GetPickupManager()->RestreamAllPickups();
+    }
+
+    if (option == RestreamOption::ALL)
+    {
+        g_pGame->GetStreaming()->RemoveBigBuildings();
+        g_pGame->GetStreaming()->ReinitStreaming();
+    }
 }
 
 void CClientGame::ReinitMarkers()
