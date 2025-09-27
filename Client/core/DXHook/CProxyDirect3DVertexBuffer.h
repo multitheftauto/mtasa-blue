@@ -12,6 +12,8 @@
 #pragma once
 
 #include <d3d9.h>
+#include <vector>
+#include <cstdint>
 #include "CProxyDirect3DDevice9.h"  // Include full definition for SResourceMemory
 
 DEFINE_GUID(CProxyDirect3DVertexBuffer_GUID, 0x128A025E, 0x0100, 0x04F1, 0x40, 0x60, 0x53, 0x19, 0x44, 0x56, 0x59, 0x42);
@@ -39,7 +41,7 @@ public:
 
     /*** IDirect3DVertexBuffer9 methods ***/
     HRESULT __stdcall Lock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags);
-    HRESULT __stdcall Unlock() { return m_pOriginal->Unlock(); }
+    HRESULT __stdcall Unlock();
     HRESULT __stdcall GetDesc(D3DVERTEXBUFFER_DESC* pDesc) { return m_pOriginal->GetDesc(pDesc); }
 
     // CProxyDirect3DVertexBuffer
@@ -49,6 +51,22 @@ public:
     IDirect3DVertexBuffer9* GetOriginal() { return m_pOriginal; }
     HRESULT                 DoLock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags);
 
+private:
+    struct SFallbackLock
+    {
+        bool                          active = false;
+        UINT                          offset = 0;
+        UINT                          size = 0;
+        DWORD                         flags = 0;
+        std::vector<std::uint8_t>     buffer;
+    };
+
+    UINT     ClampLockSize(UINT OffsetToLock, UINT SizeToLock) const;
+    HRESULT  LockInternal(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags);
+    HRESULT  TryRecoverLock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags, HRESULT originalHr);
+    HRESULT  ActivateFallbackLock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags, HRESULT originalHr);
+    void     ClearFallbackLock();
+
 protected:
     IDirect3DVertexBuffer9*                 m_pOriginal;
     uint                                    m_iMemUsed;
@@ -56,4 +74,5 @@ protected:
     DWORD                                   m_dwFVF;
     D3DPOOL                                 m_pool;
     CProxyDirect3DDevice9::SResourceMemory& m_stats;
+    SFallbackLock                           m_fallbackLock;
 };
