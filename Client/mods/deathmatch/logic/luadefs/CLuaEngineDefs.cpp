@@ -150,6 +150,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
+        {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
+        {"engineRestream", ArgumentParser<EngineRestream>},
+
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2601,4 +2604,14 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 
     if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
+}
+
+bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
+{
+    return g_pClientGame->RestreamModel(modelId);
+}
+
+void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
+{
+    g_pClientGame->Restream(option);
 }

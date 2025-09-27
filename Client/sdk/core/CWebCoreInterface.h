@@ -85,6 +85,8 @@ public:
     virtual void OnPreScreenshot() = 0;
     virtual void OnPostScreenshot() = 0;
 
+    virtual void OnFPSLimitChange(std::uint16_t fps) = 0;
+
     virtual bool SetGlobalAudioVolume(float fVolume) = 0;
 
     virtual void WriteCustomList(const SString& strListName, const std::vector<SString>& customList, bool bReset = true) = 0;
