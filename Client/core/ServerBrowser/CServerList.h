@@ -222,6 +222,7 @@ public:
     CQueryReceiver queryReceiver;
 
     std::vector<SString> vecPlayers;
+    std::unordered_map<SString, SString> rules;
 
     void Query();
 
