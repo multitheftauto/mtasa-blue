@@ -455,6 +455,8 @@ public:
 
     virtual void GetRwResourceStats(SRwResourceStats& outStats) = 0;
     virtual void GetClothesCacheStats(SClothesCacheStats& outStats) = 0;
+    virtual void ResetClothingCacheTime() = 0;
+    virtual bool SetClothingCacheTime(std::uint32_t timeInMs) = 0;
     virtual void SetIsMinimizedAndNotConnected(bool bIsMinimizedAndNotConnected) = 0;
     virtual void SetMirrorsEnabled(bool bEnabled) = 0;
 
