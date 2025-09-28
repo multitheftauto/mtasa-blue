@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
@@ -421,8 +421,26 @@ bool CMultiplayerSA::SetClothingCacheTime(std::uint32_t timeInMs)
     if (timeInMs == ms_clumpStore.m_minCacheTime)
         return false;
 
-    ms_clumpStore.savedClumpList.clear();
+    for (auto it = ms_clumpStore.savedClumpList.begin(); it != ms_clumpStore.savedClumpList.end();)
+    {
+        CClumpStore::SSavedClumpInfo& info = *it;
+
+#ifdef CLOTHES_REF_TEST
+        RpGeometry* pGeometry = ((RpAtomic*)((info.pClump->atomics.root.next) - 0x8))->geometry;
+        pGeometry->refs -= 20;
+#endif
+        RpClumpDestroy(info.pClump);
+
+        if (info.bUnused)
+            ms_clumpStore.m_Stats.uiNumUnused--;
+
+        ms_clumpStore.m_Stats.uiNumRemoved++;
+
+        it = ms_clumpStore.savedClumpList.erase(it);
+    }
+
     ms_clumpStore.m_minCacheTime = timeInMs;
+    ms_clumpStore.m_Stats.uiNumTotal = ms_clumpStore.savedClumpList.size();
 
     return true;
 }
