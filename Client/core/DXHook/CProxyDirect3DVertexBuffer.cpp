@@ -46,8 +46,10 @@ CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer(IDirect3DDevice9* InD3DDe
 /////////////////////////////////////////////////////////////
 CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer()
 {
-    CAdditionalVertexStreamManager::GetSingleton()->OnVertexBufferDestroy(m_pOriginal);
-    CVertexStreamBoundingBoxManager::GetSingleton()->OnVertexBufferDestroy(m_pOriginal);
+    if (CAdditionalVertexStreamManager* pManager = CAdditionalVertexStreamManager::GetExistingSingleton())
+        pManager->OnVertexBufferDestroy(m_pOriginal);
+    if (CVertexStreamBoundingBoxManager* pBoundingBoxManager = CVertexStreamBoundingBoxManager::GetExistingSingleton())
+        pBoundingBoxManager->OnVertexBufferDestroy(m_pOriginal);
 
     m_stats.iCurrentCount--;
     m_stats.iCurrentBytes -= m_iMemUsed;
@@ -105,8 +107,10 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
 
     if ((Flags & D3DLOCK_READONLY) == 0)
     {
-        CAdditionalVertexStreamManager::GetSingleton()->OnVertexBufferRangeInvalidated(m_pOriginal, OffsetToLock, SizeToLock);
-        CVertexStreamBoundingBoxManager::GetSingleton()->OnVertexBufferRangeInvalidated(m_pOriginal, OffsetToLock, SizeToLock);
+        if (CAdditionalVertexStreamManager* pManager = CAdditionalVertexStreamManager::GetExistingSingleton())
+            pManager->OnVertexBufferRangeInvalidated(m_pOriginal, OffsetToLock, SizeToLock);
+        if (CVertexStreamBoundingBoxManager* pBoundingBoxManager = CVertexStreamBoundingBoxManager::GetExistingSingleton())
+            pBoundingBoxManager->OnVertexBufferRangeInvalidated(m_pOriginal, OffsetToLock, SizeToLock);
     }
 
     *ppbData = NULL;
