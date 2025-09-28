@@ -1024,7 +1024,7 @@ void CheckDataFiles()
     }
 
     // No-op known incompatible/broken d3d9.dll versions from the launch directory
-	// By using file version we account for variants as well. Function is extendable in theory, but meant for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
+	// By using file version we account for variants as well. The array is extendable, but primarily for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
     {
         struct SIncompatibleVersion
         {
@@ -1034,9 +1034,13 @@ void CheckDataFiles()
             int iRelease;
         };
 
-        static const SIncompatibleVersion incompatibleVersions[] = {
-            {6, 3, 9600, 17415}, // This d3d9.dll always crashes the user @ 0x0001F4B3 (CreateSurfaceLH). Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
-        };
+        static const SIncompatibleVersion incompatibleVersions[] = {
+            // The below entry (D3D9.dll 6.3.9600.17415) always crashes the user @ 0x0002A733 (CreateSurfaceLH).
+            // Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
+            {6, 3, 9600, 17415},
+            // The below entry (D3D9.dll 0.3.1.3) is a fully incompatible, modified ENB version ("DirectX 2.0") that crashes the user.
+            {0, 3, 1, 3},
+        };
 
         static bool bChecked = false;
         if (!bChecked)
