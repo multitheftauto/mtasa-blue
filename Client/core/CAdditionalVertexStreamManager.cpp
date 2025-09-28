@@ -94,7 +94,7 @@ CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton()
     return ms_Singleton;
 }
 
-CAdditionalVertexStreamManager* const& CAdditionalVertexStreamManager::GetExistingSingleton() noexcept
+CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetExistingSingleton() noexcept
 {
     return ms_Singleton;
 }
