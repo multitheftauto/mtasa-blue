@@ -1036,7 +1036,7 @@ void CheckDataFiles()
         };
 
         static const SIncompatibleVersion incompatibleVersions[] = {
-            {6, 3, 9600, 17415}, // This d3d9.dll always crashes the user @ 0x0002A733 (CreateSurfaceLH). Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
+            {6, 3, 9600, 17415}, // This d3d9.dll always crashes the user @ 0x0001F4B3 (CreateSurfaceLH). Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
         };
 
         static bool bChecked = false;
