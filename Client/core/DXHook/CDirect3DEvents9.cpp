@@ -80,33 +80,41 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
 {
     WriteDebugEvent("CDirect3DEvents9::OnInvalidate");
 
-    // Ensure device is in a valid state before invalidation
-    // For example, Nvidia drivers can hang if device operations are attempted during invalid states
-    if (pDevice->TestCooperativeLevel() == D3DERR_DEVICELOST)
+    const HRESULT hrCooperativeLevel = pDevice->TestCooperativeLevel();
+    const bool    bDeviceOperational = (hrCooperativeLevel == D3D_OK);
+    const bool    bDeviceTemporarilyLost =
+        (hrCooperativeLevel == D3DERR_DEVICELOST || hrCooperativeLevel == D3DERR_DEVICENOTRESET);
+
+    if (!bDeviceOperational && !bDeviceTemporarilyLost)
+        WriteDebugEvent(SString("OnInvalidate: unexpected cooperative level %08x", hrCooperativeLevel));
+
+    if (bDeviceOperational)
     {
-        WriteDebugEvent("OnInvalidate: Device already lost, skipping operations");
-        return;
+        // Flush any pending operations before invalidation while the device still accepts work
+        g_pCore->GetGraphics()->GetRenderItemManager()->SaveReadableDepthBuffer();
+        g_pCore->GetGraphics()->GetRenderItemManager()->FlushNonAARenderTarget();
+
+        if (g_bInMTAScene || g_bInGTAScene)
+        {
+            const HRESULT hrEndScene = pDevice->EndScene();
+            if (FAILED(hrEndScene))
+                WriteDebugEvent(SString("OnInvalidate: EndScene failed: %08x", hrEndScene));
+        }
+
+        CloseActiveShader();
+    }
+    else
+    {
+        if (g_bInMTAScene || g_bInGTAScene)
+            WriteDebugEvent("OnInvalidate: device lost, skipping EndScene and pending GPU work");
+
+        // Prevent reuse of partially configured shader state across device resets without touching the lost device
+        CloseActiveShader(false);
     }
 
-    // Flush any pending operations before invalidation
-    g_pCore->GetGraphics()->GetRenderItemManager()->SaveReadableDepthBuffer();
-    g_pCore->GetGraphics()->GetRenderItemManager()->FlushNonAARenderTarget();
-    
-    // Force completion of all GPU operations if a scene is currently active
-    if (g_bInMTAScene || g_bInGTAScene)
-    {
-        const HRESULT hrEndScene = pDevice->EndScene();
-        if (SUCCEEDED(hrEndScene))
-        {
-            g_bInMTAScene = false;
-            g_bInGTAScene = false;
-        }
-        else
-        {
-            WriteDebugEvent(SString("OnInvalidate: EndScene failed: %08x", hrEndScene));
-        }
-    }
-    
+    g_bInMTAScene = false;
+    g_bInGTAScene = false;
+
     // Invalidate the VMR9 Manager
     // CVideoManager::GetSingleton ().OnLostDevice ();
 
@@ -591,26 +599,43 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 // Finish the active shader if there is one
 //
 /////////////////////////////////////////////////////////////
-void CDirect3DEvents9::CloseActiveShader()
+void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
 {
     if (!g_pActiveShader)
         return;
 
     ID3DXEffect* pD3DEffect = g_pActiveShader->m_pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+    IDirect3DDevice9* pDevice = g_pGraphics ? g_pGraphics->GetDevice() : nullptr;
+    HRESULT            hrCooperativeLevel = D3D_OK;
+    if (pDevice)
+        hrCooperativeLevel = pDevice->TestCooperativeLevel();
 
-    pD3DEffect->EndPass();
+    bool bAllowDeviceWork = bDeviceOperational;
+    if (hrCooperativeLevel == D3D_OK)
+        bAllowDeviceWork = true;
+    else if (hrCooperativeLevel == D3DERR_DEVICELOST || hrCooperativeLevel == D3DERR_DEVICENOTRESET)
+        bAllowDeviceWork = false;
 
-    g_pActiveShader->m_pShaderInstance->m_pEffectWrap->End();
-    g_pActiveShader = NULL;
+    if (pD3DEffect)
+    {
+        HRESULT hrEndPass = pD3DEffect->EndPass();
+        if (FAILED(hrEndPass) && hrEndPass != D3DERR_DEVICELOST && hrEndPass != D3DERR_DEVICENOTRESET)
+            WriteDebugEvent(SString("CloseActiveShader: EndPass failed: %08x", hrEndPass));
+    }
 
-    // We didn't get the effect to save the shader state, clear some things here
-    IDirect3DDevice9* pDevice = g_pGraphics->GetDevice();
-    pDevice->SetVertexShader(NULL);
-    pDevice->SetPixelShader(NULL);
+    // When the device is lost we intentionally skip touching the GPU beyond the required End call; the effect will be reset later.
+    g_pActiveShader->m_pShaderInstance->m_pEffectWrap->End(bAllowDeviceWork);
+    g_pActiveShader = nullptr;
 
-    // Unset additional vertex stream
     if (CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton())
         pAdditionalStreamManager->MaybeUnsetAdditionalVertexStream();
+
+    if (bAllowDeviceWork && pDevice)
+    {
+        // We didn't get the effect to save the shader state, clear some things here
+        pDevice->SetVertexShader(nullptr);
+        pDevice->SetPixelShader(nullptr);
+    }
 }
 
 /////////////////////////////////////////////////////////////

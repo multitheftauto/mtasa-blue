@@ -290,15 +290,21 @@ void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream()
     if (!m_pDevice)
         return;
 
-    HRESULT hr;
     if (m_pOldVertexDeclaration)
     {
-        // Set prev declaration
-        hr = g_pProxyDevice->SetVertexDeclaration(m_pOldVertexDeclaration);
-        SAFE_RELEASE(m_pOldVertexDeclaration);
+        HRESULT hr = m_pDevice->TestCooperativeLevel();
+        const bool bDeviceOperational = (hr == D3D_OK);
 
-        // Unset additional stream
-        hr = m_pDevice->SetStreamSource(2, nullptr, 0, 0);
+        if (bDeviceOperational)
+        {
+            // Set prev declaration
+            g_pProxyDevice->SetVertexDeclaration(m_pOldVertexDeclaration);
+
+            // Unset additional stream
+            m_pDevice->SetStreamSource(2, nullptr, 0, 0);
+        }
+
+        SAFE_RELEASE(m_pOldVertexDeclaration);
     }
 }
 

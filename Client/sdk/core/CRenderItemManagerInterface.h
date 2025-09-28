@@ -332,7 +332,7 @@ class CEffectWrap : public CRenderItem
     virtual void OnLostDevice();
     virtual void OnResetDevice();
     HRESULT      Begin(UINT* pPasses, DWORD Flags, bool bWorldRender = true);
-    HRESULT      End();
+    HRESULT      End(bool bDeviceOperational = true);
     bool         ApplyCommonHandles();
     bool         ApplyMappedHandles();
 
