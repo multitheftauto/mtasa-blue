@@ -13,6 +13,9 @@
 #include <game/CSettings.h>
 #include "CRenderItem.EffectCloner.h"
 
+extern bool g_bInMTAScene;
+extern bool g_bInGTAScene;
+
 // Type of vertex used to emulate StretchRect for SwiftShader bug
 struct SRTVertex
 {
@@ -1241,9 +1244,15 @@ void CRenderItemManager::SaveReadableDepthBuffer()
         }
         
         // Additional sync point for GPU driver
-        // Force immediate execution of depth buffer state changes
-        m_pDevice->BeginScene();
-        m_pDevice->EndScene();
+        // Force immediate execution of depth buffer state changes when we can safely begin a scene
+        if (!g_bInMTAScene && !g_bInGTAScene)
+        {
+            const HRESULT hBeginScene = m_pDevice->BeginScene();
+            if (SUCCEEDED(hBeginScene))
+            {
+                m_pDevice->EndScene();
+            }
+        }
     }
 }
 
