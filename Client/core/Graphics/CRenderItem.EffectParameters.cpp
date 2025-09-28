@@ -397,15 +397,37 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
 // Ensures secondary render targets are unset
 //
 ////////////////////////////////////////////////////////////////
-HRESULT CEffectParameters::End()
+HRESULT CEffectParameters::End(bool bDeviceOperational)
 {
+    if (!m_pD3DEffect)
+        return D3D_OK;
+
     HRESULT hResult = m_pD3DEffect->End();
-    for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
+
+    if (!m_SecondaryRenderTargetList.empty())
     {
-        LPDIRECT3DDEVICE9 pDevice;
+        LPDIRECT3DDEVICE9 pDevice = nullptr;
         m_pD3DEffect->GetDevice(&pDevice);
-        pDevice->SetRenderTarget(i + 1, NULL);
+
+        if (pDevice)
+        {
+            bool bCanTouchDevice = bDeviceOperational;
+            if (!bCanTouchDevice)
+            {
+                const HRESULT hrCooperativeLevel = pDevice->TestCooperativeLevel();
+                bCanTouchDevice = (hrCooperativeLevel == D3D_OK);
+            }
+
+            if (bCanTouchDevice)
+            {
+                for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
+                    pDevice->SetRenderTarget(i + 1, nullptr);
+            }
+
+            SAFE_RELEASE(pDevice);
+        }
     }
+
     return hResult;
 }
 
