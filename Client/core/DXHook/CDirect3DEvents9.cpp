@@ -95,15 +95,15 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     // Force completion of all GPU operations if a scene is currently active
     if (g_bInMTAScene || g_bInGTAScene)
     {
-        const HRESULT hEndScene = pDevice->EndScene();
-        if (SUCCEEDED(hEndScene))
+        const HRESULT hrEndScene = pDevice->EndScene();
+        if (SUCCEEDED(hrEndScene))
         {
             g_bInMTAScene = false;
             g_bInGTAScene = false;
         }
         else
         {
-            WriteDebugEvent(SString("OnInvalidate: EndScene failed: %08x", hEndScene));
+            WriteDebugEvent(SString("OnInvalidate: EndScene failed: %08x", hrEndScene));
         }
     }
     
@@ -138,10 +138,10 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
-    const HRESULT hBeginScene = pDevice->BeginScene();
-    if (FAILED(hBeginScene))
+    const HRESULT hrBeginScene = pDevice->BeginScene();
+    if (FAILED(hrBeginScene))
     {
-        WriteDebugEvent(SString("OnPresent: BeginScene failed: %08x", hBeginScene));
+        WriteDebugEvent(SString("OnPresent: BeginScene failed: %08x", hrBeginScene));
         g_bInMTAScene = false;
         return;
     }

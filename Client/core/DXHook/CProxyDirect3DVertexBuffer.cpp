@@ -66,7 +66,7 @@ CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer()
 /////////////////////////////////////////////////////////////
 HRESULT CProxyDirect3DVertexBuffer::QueryInterface(REFIID riid, void** ppvObj)
 {
-    *ppvObj = NULL;
+    *ppvObj = nullptr;
 
     // Looking for me?
     if (riid == CProxyDirect3DVertexBuffer_GUID)
@@ -113,11 +113,11 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
             pBoundingBoxManager->OnVertexBufferRangeInvalidated(m_pOriginal, OffsetToLock, SizeToLock);
     }
 
-    *ppbData = NULL;
+    *ppbData = nullptr;
     HRESULT hr = DoLock(OffsetToLock, SizeToLock, ppbData, Flags);
     HRESULT originalHr = hr;
 
-    if (SUCCEEDED(hr) && *ppbData == NULL)
+    if (SUCCEEDED(hr) && *ppbData == nullptr)
     {
         hr = D3DERR_INVALIDCALL;
     }
