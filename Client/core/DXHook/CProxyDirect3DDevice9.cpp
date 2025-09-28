@@ -610,8 +610,6 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
 
         // Set the adjusted gamma ramp
         m_pDevice->SetGammaRamp(iSwapChain, Flags, &adjustedRamp);
-        
-        WriteDebugEvent("Applied gamma adjustment for borderless windowed mode");
     }
     else
     {
