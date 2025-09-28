@@ -1035,10 +1035,10 @@ void CheckDataFiles()
         };
 
         static const SIncompatibleVersion incompatibleVersions[] = {
-            // The below entry (D3D9.dll 6.3.9600.17415) always crashes the user @ 0x0002A733 (CreateSurfaceLH).
+            // The below entry (D3D9.dll 6.3.9600.17415) always crashes the user @ 0x0001F4B3 (CreateSurfaceLH).
             // Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
             {6, 3, 9600, 17415},
-            // The below entry (D3D9.dll 0.3.1.3) is a fully incompatible, modified ENB version ("DirectX 2.0") that crashes the user.
+            // The below entry (D3D9.dll 0.3.1.3) is a fully incompatible, modified ENB version ("DirectX 2.0") that crashes the user @ 0002A733
             {0, 3, 1, 3},
         };
 
