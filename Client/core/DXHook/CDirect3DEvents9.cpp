@@ -73,6 +73,7 @@ void CDirect3DEvents9::OnBeginScene(IDirect3DDevice9* pDevice)
 
 bool CDirect3DEvents9::OnEndScene(IDirect3DDevice9* pDevice)
 {
+    CloseActiveShader();
     return true;
 }
 
@@ -94,22 +95,22 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
         g_pCore->GetGraphics()->GetRenderItemManager()->SaveReadableDepthBuffer();
         g_pCore->GetGraphics()->GetRenderItemManager()->FlushNonAARenderTarget();
 
+        // Ensure any in-progress effect passes are wrapped up before ending the scene
+        CloseActiveShader();
+
         if (g_bInMTAScene || g_bInGTAScene)
         {
             const HRESULT hrEndScene = pDevice->EndScene();
             if (FAILED(hrEndScene))
                 WriteDebugEvent(SString("OnInvalidate: EndScene failed: %08x", hrEndScene));
         }
-
-        CloseActiveShader();
     }
     else
     {
+        CloseActiveShader(false);
+
         if (g_bInMTAScene || g_bInGTAScene)
             WriteDebugEvent("OnInvalidate: device lost, skipping EndScene and pending GPU work");
-
-        // Prevent reuse of partially configured shader state across device resets without touching the lost device
-        CloseActiveShader(false);
     }
 
     g_bInMTAScene = false;
@@ -218,6 +219,9 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CGraphics::GetSingleton().DidRenderScene();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
+
+    // Finalize any lingering shader passes before wrapping the scene
+    CloseActiveShader();
 
     // End the scene that we started.
     if (g_bInMTAScene)

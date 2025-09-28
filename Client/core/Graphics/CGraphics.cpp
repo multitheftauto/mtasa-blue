@@ -2005,7 +2005,6 @@ void CGraphics::SaveGTARenderStates()
     // Prevent GPU driver hang by checking device state before creating state blocks
     if (m_pDevice->TestCooperativeLevel() != D3D_OK)
     {
-        WriteDebugEvent("CGraphics::SaveGTARenderStates - Device not cooperative, skipping state block creation");
         return;
     }
 
@@ -2041,7 +2040,6 @@ void CGraphics::RestoreGTARenderStates()
     // Check device state before attempting to restore
     if (m_pDevice->TestCooperativeLevel() != D3D_OK)
     {
-        WriteDebugEvent("CGraphics::RestoreGTARenderStates - Device not cooperative, skipping state restoration");
         SAFE_RELEASE(m_pSavedStateBlock);
         return;
     }
