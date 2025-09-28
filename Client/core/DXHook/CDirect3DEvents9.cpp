@@ -22,6 +22,7 @@
 #include "Graphics/CRenderItem.EffectTemplate.h"
 
 bool g_bInMTAScene = false;
+extern bool g_bInGTAScene;
 
 // Other variables
 static uint                 ms_RequiredAnisotropicLevel = 1;
@@ -91,8 +92,20 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     g_pCore->GetGraphics()->GetRenderItemManager()->SaveReadableDepthBuffer();
     g_pCore->GetGraphics()->GetRenderItemManager()->FlushNonAARenderTarget();
     
-    // Force completion of all GPU operations
-    pDevice->EndScene(); // Ensure we're not in scene during invalidation
+    // Force completion of all GPU operations if a scene is currently active
+    if (g_bInMTAScene || g_bInGTAScene)
+    {
+        const HRESULT hEndScene = pDevice->EndScene();
+        if (SUCCEEDED(hEndScene))
+        {
+            g_bInMTAScene = false;
+            g_bInGTAScene = false;
+        }
+        else
+        {
+            WriteDebugEvent(SString("OnInvalidate: EndScene failed: %08x", hEndScene));
+        }
+    }
     
     // Invalidate the VMR9 Manager
     // CVideoManager::GetSingleton ().OnLostDevice ();
@@ -125,8 +138,15 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
-    if (pDevice->BeginScene() == D3D_OK)
-        g_bInMTAScene = true;
+    const HRESULT hBeginScene = pDevice->BeginScene();
+    if (FAILED(hBeginScene))
+    {
+        WriteDebugEvent(SString("OnPresent: BeginScene failed: %08x", hBeginScene));
+        g_bInMTAScene = false;
+        return;
+    }
+
+    g_bInMTAScene = true;
 
     // Reset samplers on first call
     static bool bDoneReset = false;
@@ -192,8 +212,11 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CGraphics::GetSingleton().LeavingMTARenderZone();
 
     // End the scene that we started.
-    pDevice->EndScene();
-    g_bInMTAScene = false;
+    if (g_bInMTAScene)
+    {
+        pDevice->EndScene();
+        g_bInMTAScene = false;
+    }
 
     // Update incase settings changed
     int iAnisotropic;
@@ -345,6 +368,8 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
             pDevice->SetVertexShader(pOriginalVertexShader);
             pDevice->SetPixelShader(NULL);
         }
+
+        SAFE_RELEASE(pOriginalVertexShader);
     }
 
     return D3D_OK;
@@ -532,6 +557,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
                 // Make this the active shader for possible reuse
                 dassert(dwFlags == D3DXFX_DONOTSAVESHADERSTATE);
                 g_pActiveShader = pShaderItem;
+                SAFE_RELEASE(pOriginalVertexShader);
                 return D3D_OK;
             }
 
@@ -549,6 +575,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         // Unset additional vertex stream
         if (CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton())
             pAdditionalStreamManager->MaybeUnsetAdditionalVertexStream();
+
+        SAFE_RELEASE(pOriginalVertexShader);
     }
 
     return D3D_OK;
