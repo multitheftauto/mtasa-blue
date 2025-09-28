@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CAdditionalVertexStreamManager.h"
 
-CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::ms_Singleton = NULL;
+CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::ms_Singleton = nullptr;
 
 namespace
 {
@@ -69,7 +69,7 @@ CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager()
 {
     SAFE_RELEASE(m_pOldVertexDeclaration);
 
-    for (std::map<void*, SAdditionalStreamInfo>::iterator iter = m_AdditionalStreamInfoMap.begin(); iter != m_AdditionalStreamInfoMap.end(); ++iter)
+    for (auto iter = m_AdditionalStreamInfoMap.begin(); iter != m_AdditionalStreamInfoMap.end(); ++iter)
     {
         SAdditionalStreamInfo& info = iter->second;
         SAFE_RELEASE(info.pStreamData);
@@ -77,7 +77,7 @@ CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager()
     }
 
     m_AdditionalStreamInfoMap.clear();
-    m_pDevice = NULL;
+    m_pDevice = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton()
     return ms_Singleton;
 }
 
-CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetExistingSingleton()
+CAdditionalVertexStreamManager* const& CAdditionalVertexStreamManager::GetExistingSingleton() noexcept
 {
     return ms_Singleton;
 }
@@ -104,7 +104,7 @@ void CAdditionalVertexStreamManager::DestroySingleton()
     if (ms_Singleton)
     {
         delete ms_Singleton;
-        ms_Singleton = NULL;
+        ms_Singleton = nullptr;
     }
 }
 
@@ -227,7 +227,7 @@ void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream()
         SAFE_RELEASE(m_pOldVertexDeclaration);
 
         // Unset additional stream
-        hr = m_pDevice->SetStreamSource(2, NULL, 0, 0);
+        hr = m_pDevice->SetStreamSource(2, nullptr, 0, 0);
     }
 }
 
@@ -254,7 +254,7 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
     sourceArray.resize(ReadSize);
     uchar* pSourceArrayBytes = &sourceArray[0];
     {
-        void* pVertexBytesPT = NULL;
+        void* pVertexBytesPT = nullptr;
         if (FAILED(pStreamDataPT->Lock(ReadOffsetStart, ReadSize, &pVertexBytesPT, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
             return false;
         memcpy(pSourceArrayBytes, pVertexBytesPT, ReadSize);
@@ -290,7 +290,7 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
         indexArray.resize(ReadSize);
         uchar* pIndexArrayBytes = &indexArray[0];
         {
-            void* pIndexBytes = NULL;
+            void* pIndexBytes = nullptr;
             if (FAILED(state.pIndexData->Lock(state.args.startIndex * 2, numIndices * 2, &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
                 return false;
             memcpy(pIndexArrayBytes, pIndexBytes, numIndices * 2);
@@ -372,7 +372,7 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
 
     // Set the dest bytes
     {
-        void* pVertexBytesN = NULL;
+        void* pVertexBytesN = nullptr;
         if (FAILED(pStreamDataN->Lock(WriteOffsetStart, WriteSize, &pVertexBytesN, D3DLOCK_NOSYSLOCK)))
             return false;
         memcpy(pVertexBytesN, pDestArrayBytes, WriteSize);
@@ -407,7 +407,7 @@ bool CAdditionalVertexStreamManager::UpdateCurrentStateInfo(SCurrentStateInfo& s
 
     // Get vertex stream
     if (FAILED(m_pDevice->GetStreamSource(1, &state.stream1.pStreamData, &state.stream1.OffsetInBytes, &state.stream1.Stride)))
-        return NULL;
+        return false;
 
     // Get vertex stream desc
     if (state.stream1.pStreamData)
@@ -505,7 +505,7 @@ SAdditionalStreamInfo* CAdditionalVertexStreamManager::CreateAdditionalStreamInf
         // Create new stream
         info.Stride = sizeof(float) * 3;
         UINT Size2 = ConvertPTSize(state.decl.VertexBufferDesc1.Size);
-        if (FAILED(m_pDevice->CreateVertexBuffer(Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &info.pStreamData, NULL)))
+        if (FAILED(m_pDevice->CreateVertexBuffer(Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &info.pStreamData, nullptr)))
         {
             SAFE_RELEASE(info.pVertexDeclaration);
             return nullptr;
