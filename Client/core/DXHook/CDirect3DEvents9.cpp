@@ -57,6 +57,9 @@ void CDirect3DEvents9::OnDirect3DDeviceDestroy(IDirect3DDevice9* pDevice)
     // Destroy the GUI elements
     CLocalGUI::GetSingleton().DestroyObjects();
 
+    CAdditionalVertexStreamManager::DestroySingleton();
+    CVertexStreamBoundingBoxManager::DestroySingleton();
+
     // De-initialize the GUI manager (destroying is done on Exit)
     CCore::GetSingleton().DeinitGUI();
 }
@@ -491,8 +494,11 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         if (pShaderInstance->m_pEffectWrap->m_pEffectTemplate->m_bRequiresNormals)
         {
             // Find/create/set additional vertex stream
-            CAdditionalVertexStreamManager::GetSingleton()->MaybeSetAdditionalVertexStream(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices,
-                                                                                           startIndex, primCount);
+            if (CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton())
+            {
+                pAdditionalStreamManager->MaybeSetAdditionalVertexStream(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex,
+                                                                          primCount);
+            }
         }
 
         // Apply custom parameters
@@ -543,7 +549,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         }
 
         // Unset additional vertex stream
-        CAdditionalVertexStreamManager::GetSingleton()->MaybeUnsetAdditionalVertexStream();
+        if (CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton())
+            pAdditionalStreamManager->MaybeUnsetAdditionalVertexStream();
     }
 
     return D3D_OK;
@@ -574,7 +581,8 @@ void CDirect3DEvents9::CloseActiveShader()
     pDevice->SetPixelShader(NULL);
 
     // Unset additional vertex stream
-    CAdditionalVertexStreamManager::GetSingleton()->MaybeUnsetAdditionalVertexStream();
+    if (CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton())
+        pAdditionalStreamManager->MaybeUnsetAdditionalVertexStream();
 }
 
 /////////////////////////////////////////////////////////////
