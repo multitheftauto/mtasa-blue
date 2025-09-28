@@ -1117,20 +1117,50 @@ void CRenderItemManager::PreDrawWorld()
         assert(!m_pNonAADepthSurface2);
 
         const D3DPRESENT_PARAMETERS& pp = g_pDeviceState->CreationState.PresentationParameters;
+        HRESULT hr = D3D_OK;
         if (!m_bIsSwiftShader)
-            m_pDevice->CreateRenderTarget(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false,
-                                          &m_pNonAARenderTarget, NULL);
+        {
+            hr = m_pDevice->CreateRenderTarget(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false,
+                                               &m_pNonAARenderTarget, NULL);
+            if (FAILED(hr) || !m_pNonAARenderTarget)
+            {
+                SAFE_RELEASE(m_pNonAARenderTarget);
+                hr = FAILED(hr) ? hr : E_FAIL;
+            }
+        }
         else
         {
             // Render target texture is needed when emulating StretchRect
-            m_pDevice->CreateTexture(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_RENDERTARGET, pp.BackBufferFormat, D3DPOOL_DEFAULT,
-                                     &m_pNonAARenderTargetTexture, NULL);
-            if (m_pNonAARenderTargetTexture)
-                m_pNonAARenderTargetTexture->GetSurfaceLevel(0, &m_pNonAARenderTarget);
+            hr = m_pDevice->CreateTexture(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_RENDERTARGET, pp.BackBufferFormat, D3DPOOL_DEFAULT,
+                                          &m_pNonAARenderTargetTexture, NULL);
+            if (FAILED(hr) || !m_pNonAARenderTargetTexture)
+            {
+                SAFE_RELEASE(m_pNonAARenderTargetTexture);
+                hr = FAILED(hr) ? hr : E_FAIL;
+            }
+            else
+            {
+                hr = m_pNonAARenderTargetTexture->GetSurfaceLevel(0, &m_pNonAARenderTarget);
+                if (FAILED(hr) || !m_pNonAARenderTarget)
+                {
+                    SAFE_RELEASE(m_pNonAARenderTarget);
+                    SAFE_RELEASE(m_pNonAARenderTargetTexture);
+                    hr = FAILED(hr) ? hr : E_FAIL;
+                }
+            }
         }
 
-        m_pDevice->CreateDepthStencilSurface(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.AutoDepthStencilFormat, D3DMULTISAMPLE_NONE, 0, true,
-                                             &m_pNonAADepthSurface2, NULL);
+        if (SUCCEEDED(hr))
+        {
+            hr = m_pDevice->CreateDepthStencilSurface(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.AutoDepthStencilFormat, D3DMULTISAMPLE_NONE, 0,
+                                                      true, &m_pNonAADepthSurface2, NULL);
+            if (FAILED(hr) || !m_pNonAADepthSurface2)
+            {
+                SAFE_RELEASE(m_pNonAADepthSurface2);
+                SAFE_RELEASE(m_pNonAARenderTarget);
+                SAFE_RELEASE(m_pNonAARenderTargetTexture);
+            }
+        }
     }
 
     // Set depth buffer and maybe render target
