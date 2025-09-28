@@ -67,6 +67,17 @@ CAdditionalVertexStreamManager::CAdditionalVertexStreamManager()
 ///////////////////////////////////////////////////////////////
 CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager()
 {
+    SAFE_RELEASE(m_pOldVertexDeclaration);
+
+    for (std::map<void*, SAdditionalStreamInfo>::iterator iter = m_AdditionalStreamInfoMap.begin(); iter != m_AdditionalStreamInfoMap.end(); ++iter)
+    {
+        SAdditionalStreamInfo& info = iter->second;
+        SAFE_RELEASE(info.pStreamData);
+        SAFE_RELEASE(info.pVertexDeclaration);
+    }
+
+    m_AdditionalStreamInfoMap.clear();
+    m_pDevice = NULL;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -81,6 +92,20 @@ CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton()
     if (!ms_Singleton)
         ms_Singleton = new CAdditionalVertexStreamManager();
     return ms_Singleton;
+}
+
+CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetExistingSingleton()
+{
+    return ms_Singleton;
+}
+
+void CAdditionalVertexStreamManager::DestroySingleton()
+{
+    if (ms_Singleton)
+    {
+        delete ms_Singleton;
+        ms_Singleton = NULL;
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -105,6 +130,9 @@ void CAdditionalVertexStreamManager::OnDeviceCreate(IDirect3DDevice9* pDevice)
 bool CAdditionalVertexStreamManager::MaybeSetAdditionalVertexStream(D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices,
                                                                     UINT startIndex, UINT primCount)
 {
+    if (!m_pDevice)
+        return false;
+
     // Cache info
     SCurrentStateInfo state;
 
@@ -188,6 +216,9 @@ void CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo
 ///////////////////////////////////////////////////////////////
 void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream()
 {
+    if (!m_pDevice)
+        return;
+
     HRESULT hr;
     if (m_pOldVertexDeclaration)
     {
@@ -360,6 +391,9 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
 /////////////////////////////////////////////////////////////
 bool CAdditionalVertexStreamManager::UpdateCurrentStateInfo(SCurrentStateInfo& state)
 {
+    if (!m_pDevice)
+        return false;
+
     // Get vertex declaration
     if (FAILED(m_pDevice->GetVertexDeclaration(&state.decl.pVertexDeclaration)))
         return false;
@@ -466,13 +500,16 @@ SAdditionalStreamInfo* CAdditionalVertexStreamManager::CreateAdditionalStreamInf
         declNew->Usage = D3DDECLUSAGE_NORMAL;
         declNew->UsageIndex = 0;
         if (FAILED(m_pDevice->CreateVertexDeclaration(elements, &info.pVertexDeclaration)))
-            return false;
+            return nullptr;
 
         // Create new stream
         info.Stride = sizeof(float) * 3;
         UINT Size2 = ConvertPTSize(state.decl.VertexBufferDesc1.Size);
         if (FAILED(m_pDevice->CreateVertexBuffer(Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &info.pStreamData, NULL)))
-            return false;
+        {
+            SAFE_RELEASE(info.pVertexDeclaration);
+            return nullptr;
+        }
 
         // Save info
         MapSet(m_AdditionalStreamInfoMap, state.stream1.pStreamData, info);
@@ -515,3 +552,4 @@ void CAdditionalVertexStreamManager::OnVertexBufferRangeInvalidated(IDirect3DVer
         pAdditionalInfo->ConvertedRanges.UnsetRange(Offset, Size);
     }
 }
+
