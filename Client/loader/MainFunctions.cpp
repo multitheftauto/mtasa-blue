@@ -1023,6 +1023,98 @@ void CheckDataFiles()
         ExitProcess(EXIT_ERROR);
     }
 
+    // No-op known incompatible/broken d3d9.dll versions from the launch directory
+	// By using file version we account for variants as well. Function is extendable in theory, but meant for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
+    {
+        struct SIncompatibleVersion
+        {
+            int iMajor;
+            int iMinor;
+            int iBuild;
+            int iRelease;
+        };
+
+        static const SIncompatibleVersion incompatibleVersions[] = {
+            {6, 3, 9600, 17415}, // This d3d9.dll always crashes the user @ 0x0002A733 (CreateSurfaceLH). Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
+        };
+
+        static bool bChecked = false;
+        if (!bChecked)
+        {
+            bChecked = true;
+
+			// Check all 3 game roots
+            const std::vector<SString> directoriesToCheck = {
+                GetLaunchPath(), // MTA installation folder root
+                strGTAPath, // Real GTA:SA installation folder root. As chosen by DiscoverGTAPath()
+                PathJoin(GetMTADataPath(), "GTA San Andreas"), // Proxy-mirror that MTA uses for core GTA data files (C:\ProgramData\MTA San Andreas All\<MTA major version>\GTA San Andreas)
+            };
+
+            for (const SString& directory : directoriesToCheck)
+            {
+                if (directory.empty())
+                    continue;
+                if (!ValidatePath(directory))
+                    continue;
+
+                const SString strD3dModuleFilename = PathJoin(directory, "d3d9.dll");
+                if (!ValidatePath(strD3dModuleFilename) || !FileExists(strD3dModuleFilename))
+                    continue;
+
+                SharedUtil::SLibVersionInfo versionInfo = {};
+                if (!SharedUtil::GetLibVersionInfo(strD3dModuleFilename, &versionInfo))
+                    continue;
+
+                bool bIsIncompatible = false;
+                for (const SIncompatibleVersion& entry : incompatibleVersions)
+                {
+                    if (versionInfo.GetFileVersionMajor() == entry.iMajor &&
+                        versionInfo.GetFileVersionMinor() == entry.iMinor &&
+                        versionInfo.GetFileVersionBuild() == entry.iBuild &&
+                        versionInfo.GetFileVersionRelease() == entry.iRelease)
+                    {
+                        bIsIncompatible = true;
+                        break;
+                    }
+                }
+
+                if (!bIsIncompatible)
+                    continue;
+
+                const SString strBackupModuleFilename = PathJoin(directory, "d3d9.bak.incompatible");
+                const WString wideSourcePath = FromUTF8(strD3dModuleFilename);
+                const WString wideBackupPath = FromUTF8(strBackupModuleFilename);
+
+                if (FileExists(strBackupModuleFilename))
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                    DeleteFileW(wideBackupPath.c_str());
+                }
+
+                SetFileAttributesW(wideSourcePath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                bool bRenamed = MoveFileExW(wideSourcePath.c_str(), wideBackupPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+                if (!bRenamed)
+                {
+                    if (!CopyFileW(wideSourcePath.c_str(), wideBackupPath.c_str(), FALSE))
+                        continue;
+
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                    if (!DeleteFileW(wideSourcePath.c_str()))
+                        continue;
+
+                    bRenamed = true;
+                }
+
+                if (bRenamed)
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                }
+            }
+        }
+    }
+
     // Check for essential MTA files
     static const char* dataFiles[] = {
         "MTA\\cgui\\images\\background_logo.png",
