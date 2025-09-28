@@ -14,30 +14,30 @@
 
 void CCustomData::Copy(CCustomData* pCustomData)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
+    auto iter = pCustomData->IterBegin();
     for (; iter != pCustomData->IterEnd(); iter++)
     {
-        Set(iter->first.c_str(), iter->second.Variable);
+        Set(iter->first, iter->second.Variable);
     }
 }
 
-SCustomData* CCustomData::Get(const char* szName)
+SCustomData* CCustomData::Get(const CStringName& name)
 {
-    assert(szName);
+    assert(name);
 
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    auto it = m_Data.find(name);
     if (it != m_Data.end())
         return &it->second;
 
     return NULL;
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+void CCustomData::Set(const CStringName& name, const CLuaArgument& Variable, bool bSynchronized)
 {
-    assert(szName);
+    assert(name);
 
     // Grab the item with the given name
-    SCustomData* pData = Get(szName);
+    SCustomData* pData = Get(name);
     if (pData)
     {
         // Update existing
@@ -50,14 +50,14 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSy
         SCustomData newData;
         newData.Variable = Variable;
         newData.bSynchronized = bSynchronized;
-        m_Data[szName] = newData;
+        m_Data[name] = newData;
     }
 }
 
-bool CCustomData::Delete(const char* szName)
+bool CCustomData::Delete(const CStringName& name)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    auto it = m_Data.find(name);
     if (it != m_Data.end())
     {
         m_Data.erase(it);
