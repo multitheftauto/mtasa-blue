@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-27 11:04+0000\n"
+"POT-Creation-Date: 2025-09-28 06:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -214,7 +214,7 @@ msgid ""
 msgstr ""
 
 #: Client/loader/MainFunctions.cpp:632 Client/loader/MainFunctions.cpp:639
-#: Client/loader/MainFunctions.cpp:1431
+#: Client/loader/MainFunctions.cpp:1523
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1365
 #: Client/game_sa/CGameSA.cpp:269
@@ -243,7 +243,7 @@ msgstr ""
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
 #: Client/loader/MainFunctions.cpp:766 Client/loader/MainFunctions.cpp:787
-#: Client/loader/MainFunctions.cpp:791 Client/loader/MainFunctions.cpp:1101
+#: Client/loader/MainFunctions.cpp:791 Client/loader/MainFunctions.cpp:1193
 #: Client/loader/CInstallManager.cpp:563 Client/loader/CInstallManager.cpp:572
 #: Client/core/CConnectManager.cpp:86 Client/core/CConnectManager.cpp:117
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
@@ -315,59 +315,59 @@ msgstr ""
 msgid "Invalid installation paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1058
+#: Client/loader/MainFunctions.cpp:1150
 msgid ""
 "Load failed. Please ensure that the latest data files have been installed "
 "correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1067
+#: Client/loader/MainFunctions.cpp:1159
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1076
+#: Client/loader/MainFunctions.cpp:1168
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1090
+#: Client/loader/MainFunctions.cpp:1182
 #, c-format
 msgid ""
 "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1100
+#: Client/loader/MainFunctions.cpp:1192
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1147
+#: Client/loader/MainFunctions.cpp:1239
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1155
+#: Client/loader/MainFunctions.cpp:1247
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1179
+#: Client/loader/MainFunctions.cpp:1271
 msgid ""
 ".asi files are in the installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1334
+#: Client/loader/MainFunctions.cpp:1426
 msgid "Invalid game paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1342
+#: Client/loader/MainFunctions.cpp:1434
 msgid "Fix configuration issue"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1431
+#: Client/loader/MainFunctions.cpp:1523
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr ""
 
