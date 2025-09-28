@@ -45,7 +45,7 @@ public:
     static HRESULT SetVertexDeclaration(IDirect3DDevice9* pDevice, IDirect3DVertexDeclaration9* pDecl);
     static void    CheckForScreenShot();
     static ERenderFormat DiscoverReadableDepthFormat(IDirect3DDevice9* pDevice, D3DMULTISAMPLE_TYPE multisampleType, bool bWindowed);
-    static void          CloseActiveShader();
+    static void          CloseActiveShader(bool bDeviceOperational = true);
 
     static IDirect3DVertexBuffer9* GetRealVertexBuffer(IDirect3DVertexBuffer9* pVertexBuffer);
     static IDirect3DIndexBuffer9*  GetRealIndexBuffer(IDirect3DIndexBuffer9* pIndexBuffer);

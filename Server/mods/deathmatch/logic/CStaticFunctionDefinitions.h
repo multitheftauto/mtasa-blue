@@ -51,7 +51,7 @@ public:
     static CElement*      GetElementByIndex(const char* szType, unsigned int uiIndex);
     static CElement*      GetElementChild(CElement* pElement, unsigned int uiIndex);
     static bool           GetElementChildrenCount(CElement* pElement, unsigned int& uiCount);
-    static CLuaArgument*  GetElementData(CElement* pElement, const char* szName, bool bInherit);
+    static CLuaArgument*  GetElementData(CElement* pElement, CStringName name, bool bInherit);
     static CLuaArguments* GetAllElementData(CElement* pElement, CLuaArguments* table);
     static CElement*      GetElementParent(CElement* pElement);
     static bool           GetElementMatrix(CElement* pElement, CMatrix& matrix);
@@ -83,12 +83,12 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType,
+    static bool SetElementData(CElement* pElement, CStringName name, const CLuaArgument& Variable, ESyncType syncType,
                                std::optional<eCustomDataClientTrust> clientTrust);
-    static bool RemoveElementData(CElement* pElement, const char* szName);
-    static bool AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
-    static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
-    static bool HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool RemoveElementData(CElement* pElement, CStringName name);
+    static bool AddElementDataSubscriber(CElement* pElement, CStringName name, CPlayer* pPlayer);
+    static bool RemoveElementDataSubscriber(CElement* pElement, CStringName name, CPlayer* pPlayer);
+    static bool HasElementDataSubscriber(CElement* pElement, CStringName name, CPlayer* pPlayer);
     static bool SetElementParent(CElement* pElement, CElement* pParent);
     static bool SetElementMatrix(CElement* pElement, const CMatrix& matrix);
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);
@@ -590,7 +590,7 @@ public:
     static bool GetGravity(float& fGravity);
     static bool GetGameSpeed(float& fSpeed);
     static bool GetWaveHeight(float& fHeight);
-    static bool GetFPSLimit(unsigned short& usLimit);
+    static void GetFPSLimit(std::uint16_t& fps) noexcept;
     static bool GetMinuteDuration(unsigned long& ulDuration);
     static bool IsGarageOpen(unsigned char ucGarageID, bool& bIsOpen);
     static bool GetTrafficLightState(unsigned char& ucState);
@@ -624,7 +624,7 @@ public:
     static bool GetHeatHaze(SHeatHazeSettings& heatHazeSettings);
     static bool SetHeatHaze(const SHeatHazeSettings& heatHazeSettings);
     static bool ResetHeatHaze();
-    static bool SetFPSLimit(unsigned short usLimit, bool bSave);
+    static bool SetFPSLimit(std::uint16_t fps, bool save);
     static bool SetMinuteDuration(unsigned long ulDuration);
     static bool SetGarageOpen(unsigned char ucGarageID, bool bIsOpen);
     static bool SetGlitchEnabled(const std::string& strGlitchName, bool bEnabled);

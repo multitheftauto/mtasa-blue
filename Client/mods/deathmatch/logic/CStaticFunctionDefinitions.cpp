@@ -1026,13 +1026,13 @@ bool CStaticFunctionDefinitions::SetElementID(CClientEntity& Entity, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const char* szName, CLuaArgument& Variable, bool bSynchronize)
+bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, CStringName name, CLuaArgument& Variable, bool bSynchronize)
 {
-    assert(szName);
-    assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
+    assert(name);
+    assert(name->length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
     bool          bIsSynced;
-    CLuaArgument* pCurrentVariable = Entity.GetCustomData(szName, false, &bIsSynced);
+    CLuaArgument* pCurrentVariable = Entity.GetCustomData(name, false, &bIsSynced);
     if (!pCurrentVariable || Variable != *pCurrentVariable || bIsSynced != bSynchronize)
     {
         if (bSynchronize && !Entity.IsLocalEntity())
@@ -1040,9 +1040,9 @@ bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const cha
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
             // Write element ID, name length and the name. Also write the variable.
             pBitStream->Write(Entity.GetID());
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+            unsigned short usNameLength = static_cast<unsigned short>(name->length());
             pBitStream->WriteCompressed(usNameLength);
-            pBitStream->Write(szName, usNameLength);
+            pBitStream->Write(name.ToCString(), usNameLength);
             Variable.WriteToBitStream(*pBitStream);
 
             // Send the packet and deallocate
@@ -1051,14 +1051,14 @@ bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const cha
         }
 
         // Set its custom data
-        Entity.SetCustomData(szName, Variable, bSynchronize);
+        Entity.SetCustomData(name, Variable, bSynchronize);
         return true;
     }
 
     return false;
 }
 
-bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, const char* szName)
+bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, CStringName name)
 {
     // TODO
     return false;
@@ -7044,20 +7044,19 @@ bool CStaticFunctionDefinitions::SetMoonSize(int iSize)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetFPSLimit(int iLimit)
+void CStaticFunctionDefinitions::SetClientFPSLimit(std::uint16_t fps)
 {
-    if (iLimit == 0 || (iLimit >= 25 && iLimit <= std::numeric_limits<short>::max()))
-    {
-        g_pCore->SetClientScriptFrameRateLimit(iLimit);
-        return true;
-    }
-    return false;
+    g_pCore->GetFPSLimiter()->SetClientEnforcedFPS(fps);
 }
 
-bool CStaticFunctionDefinitions::GetFPSLimit(int& iLimit)
+void CStaticFunctionDefinitions::GetFPSLimit(std::uint16_t& fps) noexcept
 {
-    iLimit = g_pCore->GetFrameRateLimit();
-    return true;
+    fps = g_pCore->GetFPSLimiter()->GetFPSTarget();
+}
+
+void CStaticFunctionDefinitions::SetServerFPSLimit(std::uint16_t fps)
+{
+    g_pCore->GetFPSLimiter()->SetServerEnforcedFPS(fps);
 }
 
 bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction,
