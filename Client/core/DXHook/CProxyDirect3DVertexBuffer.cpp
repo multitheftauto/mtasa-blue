@@ -111,9 +111,15 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
 
     *ppbData = NULL;
     HRESULT hr = DoLock(OffsetToLock, SizeToLock, ppbData, Flags);
+    HRESULT originalHr = hr;
+
+    if (SUCCEEDED(hr) && *ppbData == NULL)
+    {
+        hr = D3DERR_INVALIDCALL;
+    }
 
     // Report problems
-    if (FAILED(hr) || *ppbData == NULL)
+    if (FAILED(hr))
     {
         struct
         {
@@ -121,7 +127,7 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
             uint        uiReportId;
             uint        uiLogEventId;
         } info;
-        if (hr == D3D_OK)
+        if (hr == D3DERR_INVALIDCALL && originalHr == D3D_OK)
             info = {"result NULL", 8621, 621};
         else if (hr == STATUS_ARRAY_BOUNDS_EXCEEDED)
             info = {"offset out of range", 8622, 622};
@@ -130,8 +136,8 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
         else
             info = {"fail", 8620, 620};
 
-        SString strMessage("Lock VertexBuffer [%s] hr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x", info.szText, hr, m_iMemUsed,
-                           m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags);
+        SString strMessage("Lock VertexBuffer [%s] hr:%x origHr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x", info.szText, hr,
+                           originalHr, m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags);
         WriteDebugEvent(strMessage);
         AddReportLog(info.uiReportId, strMessage);
         CCore::GetSingleton().LogEvent(info.uiLogEventId, "Lock VertexBuffer", "", strMessage);
