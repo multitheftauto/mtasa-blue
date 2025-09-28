@@ -59,6 +59,8 @@ CVertexStreamBoundingBoxManager::CVertexStreamBoundingBoxManager()
 ///////////////////////////////////////////////////////////////
 CVertexStreamBoundingBoxManager::~CVertexStreamBoundingBoxManager()
 {
+    m_StreamBoundsInfoMap.clear();
+    m_pDevice = NULL;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -73,6 +75,20 @@ CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::GetSingleton()
     if (!ms_Singleton)
         ms_Singleton = new CVertexStreamBoundingBoxManager();
     return ms_Singleton;
+}
+
+CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::GetExistingSingleton()
+{
+    return ms_Singleton;
+}
+
+void CVertexStreamBoundingBoxManager::DestroySingleton()
+{
+    if (ms_Singleton)
+    {
+        delete ms_Singleton;
+        ms_Singleton = NULL;
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -97,6 +113,9 @@ void CVertexStreamBoundingBoxManager::OnDeviceCreate(IDirect3DDevice9* pDevice)
 float CVertexStreamBoundingBoxManager::GetDistanceSqToGeometry(D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices,
                                                                UINT startIndex, UINT primCount)
 {
+    if (!m_pDevice)
+        return 0.f;
+
     // Cache info
     SCurrentStateInfo2 state;
 
@@ -314,6 +333,9 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox(SCurrentSta
 /////////////////////////////////////////////////////////////
 bool CVertexStreamBoundingBoxManager::CheckCanDoThis(SCurrentStateInfo2& state)
 {
+    if (!m_pDevice)
+        return false;
+
     // Only tri-lists and tri-strips
     if (state.args.PrimitiveType != D3DPT_TRIANGLESTRIP && state.args.PrimitiveType != D3DPT_TRIANGLELIST)
         return false;
