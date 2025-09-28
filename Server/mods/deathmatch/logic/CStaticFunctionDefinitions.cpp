@@ -66,6 +66,7 @@
 #include "packets/CConsoleEchoPacket.h"
 #include "packets/CChatClearPacket.h"
 #include "packets/CElementRPCPacket.h"
+#include "packets/CVehicleInOutPacket.h"
 #include "version.h"
 #include <net/rpc_enums.h>
 
@@ -4352,6 +4353,28 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CElement* pElement)
         auto      ucOccupiedSeat = static_cast<unsigned char>(pPed->GetOccupiedVehicleSeat());
         if (pVehicle)
         {
+            unsigned int uiVehicleAction = pPed->GetVehicleAction();
+            
+            // Handle mid-enter/exit states
+            if (uiVehicleAction == CPed::VEHICLEACTION_ENTERING || uiVehicleAction == CPed::VEHICLEACTION_JACKING)
+            {
+                pVehicle->SetOccupant(nullptr, ucOccupiedSeat);
+                pPed->SetOccupiedVehicle(nullptr, 0);
+                pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+                
+                if (uiVehicleAction == CPed::VEHICLEACTION_JACKING)
+                    pPed->SetJackingVehicle(nullptr);
+
+                // Clean up client handshake
+                if (IS_PLAYER(pPed))
+                {
+                    CVehicleInOutPacket Reply(pPed->GetID(), pVehicle->GetID(), ucOccupiedSeat, CGame::VEHICLE_NOTIFY_IN_ABORT_RETURN);
+                    m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                }
+                
+                return true;
+            }
+            
             CLuaArguments Arguments;
             Arguments.PushElement(pVehicle);                 // vehicle
             Arguments.PushNumber(ucOccupiedSeat);            // seat
@@ -4371,8 +4394,8 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CElement* pElement)
             pVehicle->CallEvent("onVehicleExit", Arguments2);
 
             // Remove him from the vehicle
-            pVehicle->SetOccupant(NULL, ucOccupiedSeat);
-            pPed->SetOccupiedVehicle(NULL, 0);
+            pVehicle->SetOccupant(nullptr, ucOccupiedSeat);
+            pPed->SetOccupiedVehicle(nullptr, 0);
             pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
             // Tell the players
