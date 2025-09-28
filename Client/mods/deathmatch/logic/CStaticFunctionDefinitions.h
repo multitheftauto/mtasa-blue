@@ -85,8 +85,8 @@ public:
     static CClientDummy* CreateElement(CResource& Resource, const char* szTypeName, const char* szID);
     static bool          DestroyElement(CClientEntity& Entity);
     static bool          SetElementID(CClientEntity& Entity, const char* szID);
-    static bool          SetElementData(CClientEntity& Entity, const char* szName, CLuaArgument& Variable, bool bSynchronize);
-    static bool          RemoveElementData(CClientEntity& Entity, const char* szName);
+    static bool          SetElementData(CClientEntity& Entity, CStringName name, CLuaArgument& Variable, bool bSynchronize);
+    static bool          RemoveElementData(CClientEntity& Entity, CStringName name);
     static bool          SetElementMatrix(CClientEntity& Entity, const CMatrix& matrix);
     static bool          SetElementPosition(CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true);
     static bool          SetElementRotation(CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
