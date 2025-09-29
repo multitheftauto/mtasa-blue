@@ -120,6 +120,8 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
             pBoundingBoxManager->OnVertexBufferRangeInvalidated(m_pOriginal, OffsetToLock, SizeToLock);
     }
 
+    SharedUtil::CAutoCSLock fallbackGuard(m_fallbackCS);
+
     if (m_bFallbackActive)
     {
         m_bFallbackActive = false;
@@ -258,10 +260,13 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
 /////////////////////////////////////////////////////////////
 HRESULT CProxyDirect3DVertexBuffer::Unlock()
 {
+    SharedUtil::CAutoCSLock fallbackGuard(m_fallbackCS);
+
     if (!m_bFallbackActive)
         return m_pOriginal->Unlock();
 
     HRESULT copyResult = D3D_OK;
+    bool    bShouldRetryLater = false;
 
     if ((m_fallbackFlags & D3DLOCK_READONLY) == 0 && m_fallbackSize > 0)
     {
@@ -282,7 +287,16 @@ HRESULT CProxyDirect3DVertexBuffer::Unlock()
 
             if (SUCCEEDED(lockHr) && pReal != nullptr)
             {
-                memcpy(pReal, m_fallbackStorage.data(), size);
+                if (size > 0 && size <= m_fallbackStorage.size())
+                {
+                    memcpy(pReal, m_fallbackStorage.data(), size);
+                }
+                else
+                {
+                    WriteDebugEvent(SString("Unlock VertexBuffer: fallback copy size mismatch (size:%x storage:%x)", size, m_fallbackStorage.size()));
+                    copyResult = D3DERR_INVALIDCALL;
+                }
+
                 HRESULT unlockHr = m_pOriginal->Unlock();
                 if (FAILED(unlockHr))
                     copyResult = unlockHr;
@@ -295,17 +309,30 @@ HRESULT CProxyDirect3DVertexBuffer::Unlock()
                 WriteDebugEvent(SString("Unlock VertexBuffer: failed to copy fallback data (lockHr:%x offset:%x size:%x flags:%08x)", lockHr, offset, size,
                                            writeFlags));
                 copyResult = FAILED(lockHr) ? lockHr : D3DERR_INVALIDCALL;
+                bShouldRetryLater = true;
             }
         }
+        else
+        {
+            bShouldRetryLater = true;
+        }
+    }
+    else if (m_fallbackSize == 0)
+    {
+        // No bytes were mapped, keep fallback around in case caller retries
+        bShouldRetryLater = true;
     }
 
-    WriteDebugEvent(SString("Unlock VertexBuffer: fallback completed (offset:%x size:%x flags:%08x result:%x)", m_fallbackOffset, m_fallbackSize,
-                             m_fallbackFlags, copyResult));
+    WriteDebugEvent(SString("Unlock VertexBuffer: fallback completed (offset:%x size:%x flags:%08x retryLater:%u result:%x)", m_fallbackOffset, m_fallbackSize,
+                             m_fallbackFlags, static_cast<uint>(bShouldRetryLater), copyResult));
 
-    m_bFallbackActive = false;
-    m_fallbackOffset = 0;
-    m_fallbackSize = 0;
-    m_fallbackFlags = 0;
+    m_bFallbackActive = bShouldRetryLater ? m_bFallbackActive : false;
+    if (!m_bFallbackActive)
+    {
+        m_fallbackOffset = 0;
+        m_fallbackSize = 0;
+        m_fallbackFlags = 0;
+    }
 
     return copyResult;
 }
