@@ -31,6 +31,34 @@ static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 // To reuse shader setups between calls to DrawIndexedPrimitive
 CShaderItem* g_pActiveShader = NULL;
 
+namespace
+{
+    bool IsDeviceOperational(IDirect3DDevice9* pDevice, bool* pbTemporarilyLost = nullptr)
+    {
+        if (pbTemporarilyLost)
+            *pbTemporarilyLost = false;
+
+        if (!pDevice)
+            return false;
+
+        const HRESULT hr = pDevice->TestCooperativeLevel();
+        if (hr == D3D_OK)
+            return true;
+
+        if (hr == D3DERR_DEVICELOST || hr == D3DERR_DEVICENOTRESET)
+        {
+            if (pbTemporarilyLost)
+                *pbTemporarilyLost = true;
+        }
+        else
+        {
+            WriteDebugEvent(SString("IsDeviceOperational: unexpected cooperative level %08x", hr));
+        }
+
+        return false;
+    }
+}
+
 void CDirect3DEvents9::OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice)
 {
     WriteDebugEvent("CDirect3DEvents9::OnDirect3DDeviceCreate");
@@ -358,23 +386,79 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
 
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+        bool             bEffectDeviceTemporarilyLost = false;
+        bool             bEffectDeviceOperational = true;
+        if (pD3DEffect)
+        {
+            IDirect3DDevice9* pEffectDevice = nullptr;
+            if (SUCCEEDED(pD3DEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
+            {
+                bEffectDeviceOperational = IsDeviceOperational(pEffectDevice, &bEffectDeviceTemporarilyLost);
+                SAFE_RELEASE(pEffectDevice);
+            }
+        }
+
+        if (!bEffectDeviceOperational)
+        {
+            SAFE_RELEASE(pOriginalVertexShader);
+            if (!bIsLayer && !bEffectDeviceTemporarilyLost)
+                return DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
+            return D3D_OK;
+        }
 
         DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint  uiNumPasses = 0;
-        pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
+        HRESULT hrBegin = pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
+        if (FAILED(hrBegin) || uiNumPasses == 0)
+        {
+            if (FAILED(hrBegin) && hrBegin != D3DERR_DEVICELOST && hrBegin != D3DERR_DEVICENOTRESET)
+                WriteDebugEvent(SString("DrawPrimitiveShader: Begin failed %08x", hrBegin));
 
+            SAFE_RELEASE(pOriginalVertexShader);
+            if (!bIsLayer && hrBegin != D3DERR_DEVICELOST && hrBegin != D3DERR_DEVICENOTRESET)
+                return DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
+            return D3D_OK;
+        }
+
+        bool bCompletedAnyPass = false;
+        bool bEncounteredDeviceLoss = false;
         for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
         {
-            pD3DEffect->BeginPass(uiPass);
+            HRESULT hrBeginPass = pD3DEffect->BeginPass(uiPass);
+            if (FAILED(hrBeginPass))
+            {
+                if (hrBeginPass != D3DERR_DEVICELOST && hrBeginPass != D3DERR_DEVICENOTRESET)
+                    WriteDebugEvent(SString("DrawPrimitiveShader: BeginPass %u failed %08x", uiPass, hrBeginPass));
+                else
+                    bEncounteredDeviceLoss = true;
+                break;
+            }
 
             // Apply original vertex shader if original draw was using it (i.e. for ped animation)
             if (pOriginalVertexShader)
                 pDevice->SetVertexShader(pOriginalVertexShader);
 
-            DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
-            pD3DEffect->EndPass();
+            HRESULT hrDraw = DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
+            if (hrDraw == D3DERR_DEVICELOST || hrDraw == D3DERR_DEVICENOTRESET)
+                bEncounteredDeviceLoss = true;
+
+            HRESULT hrEndPass = pD3DEffect->EndPass();
+            if (FAILED(hrEndPass))
+            {
+                if (hrEndPass != D3DERR_DEVICELOST && hrEndPass != D3DERR_DEVICENOTRESET)
+                    WriteDebugEvent(SString("DrawPrimitiveShader: EndPass %u failed %08x", uiPass, hrEndPass));
+                else
+                    bEncounteredDeviceLoss = true;
+                break;
+            }
+
+            if (SUCCEEDED(hrDraw))
+                bCompletedAnyPass = true;
         }
-        pShaderInstance->m_pEffectWrap->End();
+
+        HRESULT hrEnd = pShaderInstance->m_pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
+        if (FAILED(hrEnd) && hrEnd != D3DERR_DEVICELOST && hrEnd != D3DERR_DEVICENOTRESET)
+            WriteDebugEvent(SString("DrawPrimitiveShader: End failed %08x", hrEnd));
 
         // If we didn't get the effect to save the shader state, clear some things here
         if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
@@ -384,6 +468,9 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
         }
 
         SAFE_RELEASE(pOriginalVertexShader);
+
+        if (!bCompletedAnyPass && !bIsLayer && !bEncounteredDeviceLoss)
+            return DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
     }
 
     return D3D_OK;
@@ -513,12 +600,41 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
             dassert(pShaderItem == g_pActiveShader);
             g_pDeviceState->FrameStats.iNumShadersReuseSetup++;
 
-            // Transfer any state changes to the active shader
+            // Transfer any state changes to the active shader, but ensure the device still accepts work
             CShaderInstance* pShaderInstance = g_pActiveShader->m_pShaderInstance;
-            bool             bChanged = pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
+            ID3DXEffect*     pActiveEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+
+            bool bDeviceTemporarilyLost = false;
+            bool bDeviceOperational = true;
+            if (pActiveEffect)
+            {
+                IDirect3DDevice9* pEffectDevice = nullptr;
+                if (SUCCEEDED(pActiveEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
+                {
+                    bDeviceOperational = IsDeviceOperational(pEffectDevice, &bDeviceTemporarilyLost);
+                    SAFE_RELEASE(pEffectDevice);
+                }
+            }
+
+            if (!bDeviceOperational)
+            {
+                CloseActiveShader(false);
+                return D3D_OK;
+            }
+
+            bool bChanged = pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
             bChanged |= pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
             if (bChanged)
-                pShaderInstance->m_pEffectWrap->m_pD3DEffect->CommitChanges();
+            {
+                HRESULT hrCommit = pShaderInstance->m_pEffectWrap->m_pD3DEffect->CommitChanges();
+                if (FAILED(hrCommit))
+                {
+                    if (hrCommit != D3DERR_DEVICELOST && hrCommit != D3DERR_DEVICENOTRESET)
+                        WriteDebugEvent(SString("DrawIndexedPrimitiveShader: CommitChanges failed %08x", hrCommit));
+                    CloseActiveShader(false);
+                    return D3D_OK;
+                }
+            }
 
             return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
         }
@@ -528,14 +644,11 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
 
         // Add normal stream if shader wants it
-        if (pShaderInstance->m_pEffectWrap->m_pEffectTemplate->m_bRequiresNormals)
+        CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton();
+        if (pShaderInstance->m_pEffectWrap->m_pEffectTemplate->m_bRequiresNormals && pAdditionalStreamManager)
         {
             // Find/create/set additional vertex stream
-            if (CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton())
-            {
-                pAdditionalStreamManager->MaybeSetAdditionalVertexStream(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex,
-                                                                          primCount);
-            }
+            pAdditionalStreamManager->MaybeSetAdditionalVertexStream(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
         }
 
         // Apply custom parameters
@@ -551,22 +664,68 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+        bool             bEffectDeviceTemporarilyLost = false;
+        bool             bEffectDeviceOperational = true;
+        if (pD3DEffect)
+        {
+            IDirect3DDevice9* pEffectDevice = nullptr;
+            if (SUCCEEDED(pD3DEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
+            {
+                bEffectDeviceOperational = IsDeviceOperational(pEffectDevice, &bEffectDeviceTemporarilyLost);
+                SAFE_RELEASE(pEffectDevice);
+            }
+        }
+
+        if (!bEffectDeviceOperational)
+        {
+            SAFE_RELEASE(pOriginalVertexShader);
+            if (pAdditionalStreamManager)
+                pAdditionalStreamManager->MaybeUnsetAdditionalVertexStream();
+            if (!bEffectDeviceTemporarilyLost && !bIsLayer)
+                return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+            return D3D_OK;
+        }
 
         DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint  uiNumPasses = 0;
-        pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
+        HRESULT hrBegin = pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
+        if (FAILED(hrBegin) || uiNumPasses == 0)
+        {
+            if (FAILED(hrBegin) && hrBegin != D3DERR_DEVICELOST && hrBegin != D3DERR_DEVICENOTRESET)
+                WriteDebugEvent(SString("DrawIndexedPrimitiveShader: Begin failed %08x", hrBegin));
 
+            SAFE_RELEASE(pOriginalVertexShader);
+            if (pAdditionalStreamManager)
+                pAdditionalStreamManager->MaybeUnsetAdditionalVertexStream();
+
+            if (hrBegin != D3DERR_DEVICELOST && hrBegin != D3DERR_DEVICENOTRESET && !bIsLayer)
+                return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+            return D3D_OK;
+        }
+
+        bool bCompletedAnyPass = false;
+        bool bEncounteredDeviceLoss = false;
         for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
         {
-            pD3DEffect->BeginPass(uiPass);
+            HRESULT hrBeginPass = pD3DEffect->BeginPass(uiPass);
+            if (FAILED(hrBeginPass))
+            {
+                if (hrBeginPass != D3DERR_DEVICELOST && hrBeginPass != D3DERR_DEVICENOTRESET)
+                    WriteDebugEvent(SString("DrawIndexedPrimitiveShader: BeginPass %u failed %08x", uiPass, hrBeginPass));
+                else
+                    bEncounteredDeviceLoss = true;
+                break;
+            }
 
             // Apply original vertex shader if original draw was using it (i.e. for ped animation)
             if (pOriginalVertexShader)
                 pDevice->SetVertexShader(pOriginalVertexShader);
 
-            DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+            HRESULT hrDraw = DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+            if (hrDraw == D3DERR_DEVICELOST || hrDraw == D3DERR_DEVICENOTRESET)
+                bEncounteredDeviceLoss = true;
 
-            if (uiNumPasses == 1 && bCanBecomeActiveShader && pOriginalVertexShader == NULL && g_pCore->IsRenderingGrass())
+            if (uiNumPasses == 1 && bCanBecomeActiveShader && pOriginalVertexShader == NULL && g_pCore->IsRenderingGrass() && SUCCEEDED(hrDraw))
             {
                 // Make this the active shader for possible reuse
                 dassert(dwFlags == D3DXFX_DONOTSAVESHADERSTATE);
@@ -575,9 +734,23 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
                 return D3D_OK;
             }
 
-            pD3DEffect->EndPass();
+            HRESULT hrEndPass = pD3DEffect->EndPass();
+            if (FAILED(hrEndPass))
+            {
+                if (hrEndPass != D3DERR_DEVICELOST && hrEndPass != D3DERR_DEVICENOTRESET)
+                    WriteDebugEvent(SString("DrawIndexedPrimitiveShader: EndPass %u failed %08x", uiPass, hrEndPass));
+                else
+                    bEncounteredDeviceLoss = true;
+                break;
+            }
+
+            if (SUCCEEDED(hrDraw))
+                bCompletedAnyPass = true;
         }
-        pShaderInstance->m_pEffectWrap->End();
+
+        HRESULT hrEnd = pShaderInstance->m_pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
+        if (FAILED(hrEnd) && hrEnd != D3DERR_DEVICELOST && hrEnd != D3DERR_DEVICENOTRESET)
+            WriteDebugEvent(SString("DrawIndexedPrimitiveShader: End failed %08x", hrEnd));
 
         // If we didn't get the effect to save the shader state, clear some things here
         if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
@@ -587,10 +760,13 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         }
 
         // Unset additional vertex stream
-        if (CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton())
+        if (pAdditionalStreamManager)
             pAdditionalStreamManager->MaybeUnsetAdditionalVertexStream();
 
         SAFE_RELEASE(pOriginalVertexShader);
+
+        if (!bCompletedAnyPass && !bEncounteredDeviceLoss && !bIsLayer)
+            return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
     }
 
     return D3D_OK;
@@ -610,15 +786,14 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
 
     ID3DXEffect* pD3DEffect = g_pActiveShader->m_pShaderInstance->m_pEffectWrap->m_pD3DEffect;
     IDirect3DDevice9* pDevice = g_pGraphics ? g_pGraphics->GetDevice() : nullptr;
-    HRESULT            hrCooperativeLevel = D3D_OK;
-    if (pDevice)
-        hrCooperativeLevel = pDevice->TestCooperativeLevel();
 
     bool bAllowDeviceWork = bDeviceOperational;
-    if (hrCooperativeLevel == D3D_OK)
-        bAllowDeviceWork = true;
-    else if (hrCooperativeLevel == D3DERR_DEVICELOST || hrCooperativeLevel == D3DERR_DEVICENOTRESET)
-        bAllowDeviceWork = false;
+    if (pDevice)
+    {
+        bool bDeviceTemporarilyLost = false;
+        if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost))
+            bAllowDeviceWork = !bDeviceTemporarilyLost && bDeviceOperational;
+    }
 
     if (pD3DEffect)
     {
