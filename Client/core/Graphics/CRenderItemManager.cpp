@@ -64,13 +64,9 @@ HRESULT CRenderItemManager::GetDeviceCooperativeLevel(const char* szContext, boo
     if (hrCoopLevel == D3D_OK)
         return hrCoopLevel;
 
-    if (bLogLost)
+    if (bLogLost) // Expand (without log spam) later
     {
-        const char* szContextLabel = szContext ? szContext : "DeviceCheck";
-        if (hrCoopLevel == D3DERR_DEVICELOST || hrCoopLevel == D3DERR_DEVICENOTRESET)
-            WriteDebugEvent(SString("CRenderItemManager::%s skipped due to device state: %08x", szContextLabel, hrCoopLevel));
-        else
-            WriteDebugEvent(SString("CRenderItemManager::%s unexpected cooperative level: %08x", szContextLabel, hrCoopLevel));
+        (void)szContext;
     }
 
     return hrCoopLevel;
