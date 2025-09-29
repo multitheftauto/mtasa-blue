@@ -12,6 +12,8 @@
 #pragma once
 
 #include <d3d9.h>
+#include <cstdint>
+#include <vector>
 #include "CProxyDirect3DDevice9.h"  // Include full definition for SResourceMemory
 
 DEFINE_GUID(CProxyDirect3DVertexBuffer_GUID, 0x128A025E, 0x0100, 0x04F1, 0x40, 0x60, 0x53, 0x19, 0x44, 0x56, 0x59, 0x42);
@@ -39,7 +41,7 @@ public:
 
     /*** IDirect3DVertexBuffer9 methods ***/
     HRESULT __stdcall Lock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags);
-    HRESULT __stdcall Unlock() { return m_pOriginal->Unlock(); }
+    HRESULT __stdcall Unlock();
     HRESULT __stdcall GetDesc(D3DVERTEXBUFFER_DESC* pDesc) { return m_pOriginal->GetDesc(pDesc); }
 
     // CProxyDirect3DVertexBuffer
@@ -56,4 +58,10 @@ protected:
     DWORD                                   m_dwFVF;
     D3DPOOL                                 m_pool;
     CProxyDirect3DDevice9::SResourceMemory& m_stats;
+
+    bool                 m_bFallbackActive;
+    UINT                 m_fallbackOffset;
+    UINT                 m_fallbackSize;
+    DWORD                m_fallbackFlags;
+    std::vector<uint8_t> m_fallbackStorage;
 };
