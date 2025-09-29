@@ -183,10 +183,10 @@ public:
     virtual void           PreDrawWorld() = 0;
     virtual void           SetDepthBufferFormat(ERenderFormat depthBufferFormat) = 0;
     virtual ERenderFormat  GetDepthBufferFormat() = 0;
-    virtual void           SaveReadableDepthBuffer() = 0;
-    virtual void           FlushNonAARenderTarget() = 0;
-    virtual void           HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
-                                             int Filter) = 0;
+    virtual void     SaveReadableDepthBuffer() = 0;
+    virtual void     FlushNonAARenderTarget() = 0;
+    virtual HRESULT  HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface,
+                                       CONST RECT* pDestRect, int Filter) = 0;
 };
 
 ////////////////////////////////////////////////////////////////

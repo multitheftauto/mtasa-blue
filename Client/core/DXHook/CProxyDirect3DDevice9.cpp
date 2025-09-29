@@ -254,7 +254,7 @@ BOOL CProxyDirect3DDevice9::ShowCursor(BOOL bShow)
 
 HRESULT CProxyDirect3DDevice9::CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DSwapChain9** pSwapChain)
 {
-    return m_pDevice->CreateAdditionalSwapChain(pPresentationParameters, pSwapChain);
+    return CDirect3DEvents9::CreateAdditionalSwapChainGuarded(m_pDevice, pPresentationParameters, pSwapChain);
 }
 
 HRESULT CProxyDirect3DDevice9::GetSwapChain(UINT iSwapChain, IDirect3DSwapChain9** pSwapChain)
@@ -473,10 +473,24 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 
 HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion)
 {
-    CDirect3DEvents9::OnPresent(m_pDevice);
-
     // Reset frame stat counters
     memset(&DeviceState.FrameStats, 0, sizeof(DeviceState.FrameStats));
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCoopLevel = D3DERR_INVALIDCALL;
+    if (!CDirect3DEvents9::IsDeviceOperational(m_pDevice, &bDeviceTemporarilyLost, &hrCoopLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            WriteDebugEvent(SString("CProxyDirect3DDevice9::Present skipped due to device state: %08x", hrCoopLevel));
+        else if (hrCoopLevel != D3D_OK)
+            WriteDebugEvent(SString("CProxyDirect3DDevice9::Present unexpected cooperative level: %08x", hrCoopLevel));
+        else
+            WriteDebugEvent("CProxyDirect3DDevice9::Present invalid device state");
+
+        return (hrCoopLevel != D3D_OK) ? hrCoopLevel : D3DERR_INVALIDCALL;
+    }
+
+    CDirect3DEvents9::OnPresent(m_pDevice);
 
     // A fog flicker fix for some ATI cards
     D3DMATRIX projMatrix;
@@ -484,7 +498,7 @@ HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDes
     m_pDevice->SetTransform(D3DTS_PROJECTION, &projMatrix);
 
     TIMING_GRAPH("Present");
-    HRESULT hr = m_pDevice->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+    HRESULT hr = CDirect3DEvents9::PresentGuarded(m_pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
     TIMING_GRAPH("PostPresent");
     return hr;
 }
@@ -608,13 +622,13 @@ HRESULT CProxyDirect3DDevice9::CreateTexture(UINT Width, UINT Height, UINT Level
 HRESULT CProxyDirect3DDevice9::CreateVolumeTexture(UINT Width, UINT Height, UINT Depth, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
                                                    IDirect3DVolumeTexture9** ppVolumeTexture, HANDLE* pSharedHandle)
 {
-    return m_pDevice->CreateVolumeTexture(Width, Height, Depth, Levels, Usage, Format, Pool, ppVolumeTexture, pSharedHandle);
+    return CDirect3DEvents9::CreateVolumeTextureGuarded(m_pDevice, Width, Height, Depth, Levels, Usage, Format, Pool, ppVolumeTexture, pSharedHandle);
 }
 
 HRESULT CProxyDirect3DDevice9::CreateCubeTexture(UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
                                                  IDirect3DCubeTexture9** ppCubeTexture, HANDLE* pSharedHandle)
 {
-    return m_pDevice->CreateCubeTexture(EdgeLength, Levels, Usage, Format, Pool, ppCubeTexture, pSharedHandle);
+    return CDirect3DEvents9::CreateCubeTextureGuarded(m_pDevice, EdgeLength, Levels, Usage, Format, Pool, ppCubeTexture, pSharedHandle);
 }
 
 HRESULT CProxyDirect3DDevice9::CreateVertexBuffer(UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool, IDirect3DVertexBuffer9** ppVertexBuffer,
@@ -632,57 +646,56 @@ HRESULT CProxyDirect3DDevice9::CreateIndexBuffer(UINT Length, DWORD Usage, D3DFO
 HRESULT CProxyDirect3DDevice9::CreateRenderTarget(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality,
                                                   BOOL Lockable, IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
 {
-    return m_pDevice->CreateRenderTarget(Width, Height, Format, MultiSample, MultisampleQuality, Lockable, ppSurface, pSharedHandle);
+    return CDirect3DEvents9::CreateRenderTargetGuarded(m_pDevice, Width, Height, Format, MultiSample, MultisampleQuality, Lockable, ppSurface, pSharedHandle);
 }
 
 HRESULT CProxyDirect3DDevice9::CreateDepthStencilSurface(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality,
                                                          BOOL Discard, IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
 {
-    return m_pDevice->CreateDepthStencilSurface(Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
+    return CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(m_pDevice, Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
 }
 
 HRESULT CProxyDirect3DDevice9::UpdateSurface(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestinationSurface,
                                              CONST POINT* pDestPoint)
 {
-    return m_pDevice->UpdateSurface(pSourceSurface, pSourceRect, pDestinationSurface, pDestPoint);
+    return CDirect3DEvents9::UpdateSurfaceGuarded(m_pDevice, pSourceSurface, pSourceRect, pDestinationSurface, pDestPoint);
 }
 
 HRESULT CProxyDirect3DDevice9::UpdateTexture(IDirect3DBaseTexture9* pSourceTexture, IDirect3DBaseTexture9* pDestinationTexture)
 {
-    return m_pDevice->UpdateTexture(pSourceTexture, pDestinationTexture);
+    return CDirect3DEvents9::UpdateTextureGuarded(m_pDevice, pSourceTexture, pDestinationTexture);
 }
 
 HRESULT CProxyDirect3DDevice9::GetRenderTargetData(IDirect3DSurface9* pRenderTarget, IDirect3DSurface9* pDestSurface)
 {
-    return m_pDevice->GetRenderTargetData(pRenderTarget, pDestSurface);
+    return CDirect3DEvents9::GetRenderTargetDataGuarded(m_pDevice, pRenderTarget, pDestSurface);
 }
 
 HRESULT CProxyDirect3DDevice9::GetFrontBufferData(UINT iSwapChain, IDirect3DSurface9* pDestSurface)
 {
-    return m_pDevice->GetFrontBufferData(iSwapChain, pDestSurface);
+    return CDirect3DEvents9::GetFrontBufferDataGuarded(m_pDevice, iSwapChain, pDestSurface);
 }
 
 HRESULT CProxyDirect3DDevice9::StretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                            D3DTEXTUREFILTERTYPE Filter)
 {
-    CGraphics::GetSingleton().GetRenderItemManager()->HandleStretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter);
-    return D3D_OK;
+    return CGraphics::GetSingleton().GetRenderItemManager()->HandleStretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter);
 }
 
 HRESULT CProxyDirect3DDevice9::ColorFill(IDirect3DSurface9* pSurface, CONST RECT* pRect, D3DCOLOR color)
 {
-    return m_pDevice->ColorFill(pSurface, pRect, color);
+    return CDirect3DEvents9::ColorFillGuarded(m_pDevice, pSurface, pRect, color);
 }
 
 HRESULT CProxyDirect3DDevice9::CreateOffscreenPlainSurface(UINT Width, UINT Height, D3DFORMAT Format, D3DPOOL Pool, IDirect3DSurface9** ppSurface,
                                                            HANDLE* pSharedHandle)
 {
-    return m_pDevice->CreateOffscreenPlainSurface(Width, Height, Format, Pool, ppSurface, pSharedHandle);
+    return CDirect3DEvents9::CreateOffscreenPlainSurfaceGuarded(m_pDevice, Width, Height, Format, Pool, ppSurface, pSharedHandle);
 }
 
 HRESULT CProxyDirect3DDevice9::SetRenderTarget(DWORD RenderTargetIndex, IDirect3DSurface9* pRenderTarget)
 {
-    return m_pDevice->SetRenderTarget(RenderTargetIndex, pRenderTarget);
+    return CDirect3DEvents9::SetRenderTargetGuarded(m_pDevice, RenderTargetIndex, pRenderTarget);
 }
 
 HRESULT CProxyDirect3DDevice9::GetRenderTarget(DWORD RenderTargetIndex, IDirect3DSurface9** ppRenderTarget)
@@ -692,7 +705,7 @@ HRESULT CProxyDirect3DDevice9::GetRenderTarget(DWORD RenderTargetIndex, IDirect3
 
 HRESULT CProxyDirect3DDevice9::SetDepthStencilSurface(IDirect3DSurface9* pNewZStencil)
 {
-    return m_pDevice->SetDepthStencilSurface(pNewZStencil);
+    return CDirect3DEvents9::SetDepthStencilSurfaceGuarded(m_pDevice, pNewZStencil);
 }
 
 HRESULT CProxyDirect3DDevice9::GetDepthStencilSurface(IDirect3DSurface9** ppZStencilSurface)
@@ -748,7 +761,7 @@ HRESULT CProxyDirect3DDevice9::Clear(DWORD Count, CONST D3DRECT* pRects, DWORD F
     if (Flags & D3DCLEAR_ZBUFFER)
         CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
 
-    return m_pDevice->Clear(Count, pRects, Flags, Color, Z, Stencil);
+    return CDirect3DEvents9::ClearGuarded(m_pDevice, Count, pRects, Flags, Color, Z, Stencil);
 }
 
 HRESULT CProxyDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State, CONST D3DMATRIX* pMatrix)
@@ -982,21 +995,21 @@ HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitive(D3DPRIMITIVETYPE PrimitiveTy
 HRESULT CProxyDirect3DDevice9::DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, UINT PrimitiveCount, CONST void* pVertexStreamZeroData,
                                                UINT VertexStreamZeroStride)
 {
-    return m_pDevice->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+    return CDirect3DEvents9::DrawPrimitiveUPGuarded(m_pDevice, PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
 }
 
 HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, UINT MinVertexIndex, UINT NumVertices, UINT PrimitiveCount,
                                                       CONST void* pIndexData, D3DFORMAT IndexDataFormat, CONST void* pVertexStreamZeroData,
                                                       UINT VertexStreamZeroStride)
 {
-    return m_pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData,
-                                             VertexStreamZeroStride);
+    return CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(m_pDevice, PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData,
+                                                          IndexDataFormat, pVertexStreamZeroData, VertexStreamZeroStride);
 }
 
 HRESULT CProxyDirect3DDevice9::ProcessVertices(UINT SrcStartIndex, UINT DestIndex, UINT VertexCount, IDirect3DVertexBuffer9* pDestBuffer,
                                                IDirect3DVertexDeclaration9* pVertexDecl, DWORD Flags)
 {
-    return m_pDevice->ProcessVertices(SrcStartIndex, DestIndex, VertexCount, pDestBuffer, pVertexDecl, Flags);
+    return CDirect3DEvents9::ProcessVerticesGuarded(m_pDevice, SrcStartIndex, DestIndex, VertexCount, pDestBuffer, pVertexDecl, Flags);
 }
 
 HRESULT CProxyDirect3DDevice9::CreateVertexDeclaration(CONST D3DVERTEXELEMENT9* pVertexElements, IDirect3DVertexDeclaration9** ppDecl)
@@ -1156,12 +1169,12 @@ HRESULT CProxyDirect3DDevice9::GetPixelShaderConstantB(UINT StartRegister, BOOL*
 
 HRESULT CProxyDirect3DDevice9::DrawRectPatch(UINT Handle, CONST float* pNumSegs, CONST D3DRECTPATCH_INFO* pRectPatchInfo)
 {
-    return m_pDevice->DrawRectPatch(Handle, pNumSegs, pRectPatchInfo);
+    return CDirect3DEvents9::DrawRectPatchGuarded(m_pDevice, Handle, pNumSegs, pRectPatchInfo);
 }
 
 HRESULT CProxyDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float* pNumSegs, CONST D3DTRIPATCH_INFO* pTriPatchInfo)
 {
-    return m_pDevice->DrawTriPatch(Handle, pNumSegs, pTriPatchInfo);
+    return CDirect3DEvents9::DrawTriPatchGuarded(m_pDevice, Handle, pNumSegs, pTriPatchInfo);
 }
 
 HRESULT CProxyDirect3DDevice9::DeletePatch(UINT Handle)
