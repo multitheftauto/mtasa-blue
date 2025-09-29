@@ -367,25 +367,43 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
         CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
     }
 
-    for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
+    LPDIRECT3DDEVICE9 pDevice = nullptr;
+    m_pD3DEffect->GetDevice(&pDevice);
+
+    bool bCanBindRenderTargets = (pDevice != nullptr);
+    if (pDevice)
     {
-        D3DXHANDLE             hTexture = m_SecondaryRenderTargetList[i];
-        IDirect3DBaseTexture9* pD3DTexture = NULL;
-        HRESULT                hr = m_pD3DEffect->GetTexture(hTexture, &pD3DTexture);
-        if (hr == D3D_OK && pD3DTexture && pD3DTexture->GetType() == D3DRTYPE_TEXTURE)
+        const HRESULT hrCooperativeLevel = pDevice->TestCooperativeLevel();
+        if (hrCooperativeLevel != D3D_OK)
         {
-            IDirect3DSurface9* pD3DSurface = NULL;
-            HRESULT            hr = ((IDirect3DTexture9*)pD3DTexture)->GetSurfaceLevel(0, &pD3DSurface);
-            if (hr == D3D_OK && pD3DSurface)
-            {
-                LPDIRECT3DDEVICE9 pDevice;
-                m_pD3DEffect->GetDevice(&pDevice);
-                pDevice->SetRenderTarget(i + 1, pD3DSurface);
-                SAFE_RELEASE(pD3DSurface);
-            }
-            SAFE_RELEASE(pD3DTexture);
+            bCanBindRenderTargets = false;
+            if (hrCooperativeLevel != D3DERR_DEVICELOST && hrCooperativeLevel != D3DERR_DEVICENOTRESET)
+                WriteDebugEvent(SString("CEffectParameters::Begin: unexpected cooperative level %08x", hrCooperativeLevel));
         }
     }
+
+    if (bCanBindRenderTargets)
+    {
+        for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
+        {
+            D3DXHANDLE             hTexture = m_SecondaryRenderTargetList[i];
+            IDirect3DBaseTexture9* pD3DTexture = nullptr;
+            HRESULT                hr = m_pD3DEffect->GetTexture(hTexture, &pD3DTexture);
+            if (hr == D3D_OK && pD3DTexture && pD3DTexture->GetType() == D3DRTYPE_TEXTURE)
+            {
+                IDirect3DSurface9* pD3DSurface = nullptr;
+                HRESULT            hrSurface = ((IDirect3DTexture9*)pD3DTexture)->GetSurfaceLevel(0, &pD3DSurface);
+                if (hrSurface == D3D_OK && pD3DSurface)
+                {
+                    pDevice->SetRenderTarget(i + 1, pD3DSurface);
+                    SAFE_RELEASE(pD3DSurface);
+                }
+                SAFE_RELEASE(pD3DTexture);
+            }
+        }
+    }
+
+    SAFE_RELEASE(pDevice);
     return m_pD3DEffect->Begin(pPasses, Flags);
 }
 
@@ -397,15 +415,37 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
 // Ensures secondary render targets are unset
 //
 ////////////////////////////////////////////////////////////////
-HRESULT CEffectParameters::End()
+HRESULT CEffectParameters::End(bool bDeviceOperational)
 {
+    if (!m_pD3DEffect)
+        return D3D_OK;
+
     HRESULT hResult = m_pD3DEffect->End();
-    for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
+
+    if (!m_SecondaryRenderTargetList.empty())
     {
-        LPDIRECT3DDEVICE9 pDevice;
+        LPDIRECT3DDEVICE9 pDevice = nullptr;
         m_pD3DEffect->GetDevice(&pDevice);
-        pDevice->SetRenderTarget(i + 1, NULL);
+
+        if (pDevice)
+        {
+            bool bCanTouchDevice = bDeviceOperational;
+            if (!bCanTouchDevice)
+            {
+                const HRESULT hrCooperativeLevel = pDevice->TestCooperativeLevel();
+                bCanTouchDevice = (hrCooperativeLevel == D3D_OK);
+            }
+
+            if (bCanTouchDevice)
+            {
+                for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
+                    pDevice->SetRenderTarget(i + 1, nullptr);
+            }
+
+            SAFE_RELEASE(pDevice);
+        }
     }
+
     return hResult;
 }
 
