@@ -21,6 +21,7 @@
 #include "CProxyDirect3DVertexDeclaration.h"
 #include "Graphics/CRenderItem.EffectTemplate.h"
 
+
 bool g_bInMTAScene = false;
 extern bool g_bInGTAScene;
 
@@ -31,32 +32,37 @@ static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 // To reuse shader setups between calls to DrawIndexedPrimitive
 CShaderItem* g_pActiveShader = NULL;
 
-namespace
+bool CDirect3DEvents9::IsDeviceOperational(IDirect3DDevice9* pDevice, bool* pbTemporarilyLost, HRESULT* pHrCooperativeLevel)
 {
-    bool IsDeviceOperational(IDirect3DDevice9* pDevice, bool* pbTemporarilyLost = nullptr)
+    if (pHrCooperativeLevel)
+        *pHrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (pbTemporarilyLost)
+        *pbTemporarilyLost = false;
+
+    if (!pDevice)
     {
-        if (pbTemporarilyLost)
-            *pbTemporarilyLost = false;
-
-        if (!pDevice)
-            return false;
-
-        const HRESULT hr = pDevice->TestCooperativeLevel();
-        if (hr == D3D_OK)
-            return true;
-
-        if (hr == D3DERR_DEVICELOST || hr == D3DERR_DEVICENOTRESET)
-        {
-            if (pbTemporarilyLost)
-                *pbTemporarilyLost = true;
-        }
-        else
-        {
-            WriteDebugEvent(SString("IsDeviceOperational: unexpected cooperative level %08x", hr));
-        }
-
+        if (pHrCooperativeLevel)
+            *pHrCooperativeLevel = D3DERR_INVALIDCALL;
         return false;
     }
+
+    const HRESULT hr = pDevice->TestCooperativeLevel();
+    if (pHrCooperativeLevel)
+        *pHrCooperativeLevel = hr;
+    if (hr == D3D_OK)
+        return true;
+
+    if (hr == D3DERR_DEVICELOST || hr == D3DERR_DEVICENOTRESET)
+    {
+        if (pbTemporarilyLost)
+            *pbTemporarilyLost = true;
+    }
+    else
+    {
+        WriteDebugEvent(SString("IsDeviceOperational: unexpected cooperative level %08x", hr));
+    }
+
+    return false;
 }
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice)
@@ -877,6 +883,58 @@ int  FilerException(uint ExceptionCode)
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
+namespace
+{
+void WriteDebugEventFormatted(const char* format, HRESULT value)
+{
+    char buffer[160];
+    _snprintf_s(buffer, _countof(buffer), _TRUNCATE, format, value);
+    WriteDebugEvent(buffer);
+}
+
+HRESULT CallSetRenderTargetWithGuard(IDirect3DDevice9* pDevice, DWORD renderTargetIndex, IDirect3DSurface9* pRenderTarget)
+{
+    HRESULT hr = D3D_OK;
+    __try
+    {
+        hr = pDevice->SetRenderTarget(renderTargetIndex, pRenderTarget);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 15 * 1000000);
+    }
+    return hr;
+}
+
+HRESULT CallSetDepthStencilSurfaceWithGuard(IDirect3DDevice9* pDevice, IDirect3DSurface9* pNewZStencil)
+{
+    HRESULT hr = D3D_OK;
+    __try
+    {
+        hr = pDevice->SetDepthStencilSurface(pNewZStencil);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 16 * 1000000);
+    }
+    return hr;
+}
+
+HRESULT CallCreateAdditionalSwapChainWithGuard(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DSwapChain9** pSwapChain)
+{
+    HRESULT hr = D3D_OK;
+    __try
+    {
+        hr = pDevice->CreateAdditionalSwapChain(pPresentationParameters, pSwapChain);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 17 * 1000000);
+    }
+    return hr;
+}
+}
+
 /////////////////////////////////////////////////////////////
 //
 // DrawPrimitiveGuarded
@@ -888,6 +946,19 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
+
+    bool     bDeviceTemporarilyLost = false;
+    HRESULT  hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
 
     HRESULT hr = D3D_OK;
 
@@ -929,6 +1000,19 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawIndexedPrimitive(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
 
+    bool     bDeviceTemporarilyLost = false;
+    HRESULT  hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
     HRESULT hr = D3D_OK;
 
     // Check vertices used will be within the supplied vertex buffer bounds
@@ -946,6 +1030,772 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 2 * 1000000);
     }
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// DrawPrimitiveUPGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawPrimitiveUPGuarded(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, UINT PrimitiveCount,
+                                                 CONST void* pVertexStreamZeroData, UINT VertexStreamZeroStride)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 3 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// DrawIndexedPrimitiveUPGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, UINT MinVertexIndex, UINT NumVertices,
+                                                        UINT PrimitiveCount, CONST void* pIndexData, D3DFORMAT IndexDataFormat,
+                                                        CONST void* pVertexStreamZeroData, UINT VertexStreamZeroStride)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat,
+                                               pVertexStreamZeroData, VertexStreamZeroStride);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat,
+                                             pVertexStreamZeroData, VertexStreamZeroStride);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 4 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// DrawRectPatchGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawRectPatchGuarded(IDirect3DDevice9* pDevice, UINT Handle, CONST float* pNumSegs, CONST D3DRECTPATCH_INFO* pRectPatchInfo)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->DrawRectPatch(Handle, pNumSegs, pRectPatchInfo);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->DrawRectPatch(Handle, pNumSegs, pRectPatchInfo);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 6 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// DrawTriPatchGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawTriPatchGuarded(IDirect3DDevice9* pDevice, UINT Handle, CONST float* pNumSegs, CONST D3DTRIPATCH_INFO* pTriPatchInfo)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->DrawTriPatch(Handle, pNumSegs, pTriPatchInfo);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->DrawTriPatch(Handle, pNumSegs, pTriPatchInfo);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 7 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// ProcessVerticesGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::ProcessVerticesGuarded(IDirect3DDevice9* pDevice, UINT SrcStartIndex, UINT DestIndex, UINT VertexCount,
+                                                 IDirect3DVertexBuffer9* pDestBuffer, IDirect3DVertexDeclaration9* pVertexDecl, DWORD Flags)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->ProcessVertices(SrcStartIndex, DestIndex, VertexCount, pDestBuffer, pVertexDecl, Flags);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->ProcessVertices(SrcStartIndex, DestIndex, VertexCount, pDestBuffer, pVertexDecl, Flags);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 8 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// ClearGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::ClearGuarded(IDirect3DDevice9* pDevice, DWORD Count, CONST D3DRECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->Clear(Count, pRects, Flags, Color, Z, Stencil);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->Clear(Count, pRects, Flags, Color, Z, Stencil);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 9 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// ColorFillGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::ColorFillGuarded(IDirect3DDevice9* pDevice, IDirect3DSurface9* pSurface, CONST RECT* pRect, D3DCOLOR color)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->ColorFill(pSurface, pRect, color);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->ColorFill(pSurface, pRect, color);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 10 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// UpdateSurfaceGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::UpdateSurfaceGuarded(IDirect3DDevice9* pDevice, IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect,
+                                               IDirect3DSurface9* pDestinationSurface, CONST POINT* pDestPoint)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->UpdateSurface(pSourceSurface, pSourceRect, pDestinationSurface, pDestPoint);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->UpdateSurface(pSourceSurface, pSourceRect, pDestinationSurface, pDestPoint);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 11 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// UpdateTextureGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::UpdateTextureGuarded(IDirect3DDevice9* pDevice, IDirect3DBaseTexture9* pSourceTexture,
+                                               IDirect3DBaseTexture9* pDestinationTexture)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->UpdateTexture(pSourceTexture, pDestinationTexture);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->UpdateTexture(pSourceTexture, pDestinationTexture);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 12 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// GetRenderTargetDataGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::GetRenderTargetDataGuarded(IDirect3DDevice9* pDevice, IDirect3DSurface9* pRenderTarget,
+                                                     IDirect3DSurface9* pDestSurface)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->GetRenderTargetData(pRenderTarget, pDestSurface);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->GetRenderTargetData(pRenderTarget, pDestSurface);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 13 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// GetFrontBufferDataGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::GetFrontBufferDataGuarded(IDirect3DDevice9* pDevice, UINT iSwapChain, IDirect3DSurface9* pDestSurface)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->GetFrontBufferData(iSwapChain, pDestSurface);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->GetFrontBufferData(iSwapChain, pDestSurface);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 14 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// SetRenderTargetGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::SetRenderTargetGuarded(IDirect3DDevice9* pDevice, DWORD RenderTargetIndex, IDirect3DSurface9* pRenderTarget)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->SetRenderTarget(RenderTargetIndex, pRenderTarget);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            WriteDebugEventFormatted("CDirect3DEvents9::SetRenderTargetGuarded skipped due to device state: %08x", hrCooperativeLevel);
+        else if (hrCooperativeLevel != D3D_OK)
+            WriteDebugEventFormatted("CDirect3DEvents9::SetRenderTargetGuarded unexpected cooperative level: %08x", hrCooperativeLevel);
+        else
+            WriteDebugEvent("CDirect3DEvents9::SetRenderTargetGuarded invalid device state");
+
+        return (hrCooperativeLevel != D3D_OK) ? hrCooperativeLevel : D3DERR_INVALIDCALL;
+    }
+
+    return CallSetRenderTargetWithGuard(pDevice, RenderTargetIndex, pRenderTarget);
+}
+
+/////////////////////////////////////////////////////////////
+//
+// SetDepthStencilSurfaceGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::SetDepthStencilSurfaceGuarded(IDirect3DDevice9* pDevice, IDirect3DSurface9* pNewZStencil)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->SetDepthStencilSurface(pNewZStencil);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            WriteDebugEventFormatted("CDirect3DEvents9::SetDepthStencilSurfaceGuarded skipped due to device state: %08x", hrCooperativeLevel);
+        else if (hrCooperativeLevel != D3D_OK)
+            WriteDebugEventFormatted("CDirect3DEvents9::SetDepthStencilSurfaceGuarded unexpected cooperative level: %08x", hrCooperativeLevel);
+        else
+            WriteDebugEvent("CDirect3DEvents9::SetDepthStencilSurfaceGuarded invalid device state");
+
+        return (hrCooperativeLevel != D3D_OK) ? hrCooperativeLevel : D3DERR_INVALIDCALL;
+    }
+
+    return CallSetDepthStencilSurfaceWithGuard(pDevice, pNewZStencil);
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CreateAdditionalSwapChainGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateAdditionalSwapChainGuarded(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters,
+                                                           IDirect3DSwapChain9** pSwapChain)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->CreateAdditionalSwapChain(pPresentationParameters, pSwapChain);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            WriteDebugEventFormatted("CDirect3DEvents9::CreateAdditionalSwapChainGuarded skipped due to device state: %08x", hrCooperativeLevel);
+        else if (hrCooperativeLevel != D3D_OK)
+            WriteDebugEventFormatted("CDirect3DEvents9::CreateAdditionalSwapChainGuarded unexpected cooperative level: %08x", hrCooperativeLevel);
+        else
+            WriteDebugEvent("CDirect3DEvents9::CreateAdditionalSwapChainGuarded invalid device state");
+
+        return (hrCooperativeLevel != D3D_OK) ? hrCooperativeLevel : D3DERR_INVALIDCALL;
+    }
+
+    return CallCreateAdditionalSwapChainWithGuard(pDevice, pPresentationParameters, pSwapChain);
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CreateVolumeTextureGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateVolumeTextureGuarded(IDirect3DDevice9* pDevice, UINT Width, UINT Height, UINT Depth, UINT Levels, DWORD Usage,
+                                                     D3DFORMAT Format, D3DPOOL Pool, IDirect3DVolumeTexture9** ppVolumeTexture,
+                                                     HANDLE* pSharedHandle)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->CreateVolumeTexture(Width, Height, Depth, Levels, Usage, Format, Pool, ppVolumeTexture, pSharedHandle);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->CreateVolumeTexture(Width, Height, Depth, Levels, Usage, Format, Pool, ppVolumeTexture, pSharedHandle);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 18 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CreateCubeTextureGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateCubeTextureGuarded(IDirect3DDevice9* pDevice, UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format,
+                                                   D3DPOOL Pool, IDirect3DCubeTexture9** ppCubeTexture, HANDLE* pSharedHandle)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->CreateCubeTexture(EdgeLength, Levels, Usage, Format, Pool, ppCubeTexture, pSharedHandle);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->CreateCubeTexture(EdgeLength, Levels, Usage, Format, Pool, ppCubeTexture, pSharedHandle);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 19 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CreateRenderTargetGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateRenderTargetGuarded(IDirect3DDevice9* pDevice, UINT Width, UINT Height, D3DFORMAT Format,
+                                                    D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, BOOL Lockable,
+                                                    IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->CreateRenderTarget(Width, Height, Format, MultiSample, MultisampleQuality, Lockable, ppSurface, pSharedHandle);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->CreateRenderTarget(Width, Height, Format, MultiSample, MultisampleQuality, Lockable, ppSurface, pSharedHandle);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 20 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CreateDepthStencilSurfaceGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(IDirect3DDevice9* pDevice, UINT Width, UINT Height, D3DFORMAT Format,
+                                                           D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, BOOL Discard,
+                                                           IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->CreateDepthStencilSurface(Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->CreateDepthStencilSurface(Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 21 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CreateOffscreenPlainSurfaceGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateOffscreenPlainSurfaceGuarded(IDirect3DDevice9* pDevice, UINT Width, UINT Height, D3DFORMAT Format, D3DPOOL Pool,
+                                                             IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
+{
+    if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
+        return pDevice->CreateOffscreenPlainSurface(Width, Height, Format, Pool, ppSurface, pSharedHandle);
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->CreateOffscreenPlainSurface(Width, Height, Format, Pool, ppSurface, pSharedHandle);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 22 * 1000000);
+    }
+
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// PresentGuarded
+//
+// Catch access violations and device-loss states
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::PresentGuarded(IDirect3DDevice9* pDevice, CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride,
+                                         CONST RGNDATA* pDirtyRegion)
+{
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
+    {
+        if (bDeviceTemporarilyLost)
+            return hrCooperativeLevel;
+
+        if (hrCooperativeLevel != D3D_OK)
+            return hrCooperativeLevel;
+
+        return D3DERR_INVALIDCALL;
+    }
+
+    HRESULT hr = D3D_OK;
+
+    __try
+    {
+        hr = pDevice->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+    }
+    __except (FilerException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 5 * 1000000);
+    }
+
     return hr;
 }
 
