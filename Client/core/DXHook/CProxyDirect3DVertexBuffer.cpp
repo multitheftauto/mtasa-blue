@@ -116,14 +116,15 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
     *ppbData = nullptr;
     HRESULT hr = DoLock(OffsetToLock, SizeToLock, ppbData, Flags);
     HRESULT originalHr = hr;
+    bool    bPointerNull = false;
 
-    if (SUCCEEDED(hr) && *ppbData == nullptr)
+    if (SUCCEEDED(hr))
     {
-        hr = D3DERR_INVALIDCALL;
+        bPointerNull = (*ppbData == nullptr);
     }
 
     // Report problems
-    if (FAILED(hr))
+    if (FAILED(hr) || bPointerNull)
     {
         struct
         {
@@ -131,17 +132,19 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
             uint        uiReportId;
             uint        uiLogEventId;
         } info;
-        if (hr == D3DERR_INVALIDCALL && originalHr == D3D_OK)
+        HRESULT reportHr = FAILED(hr) ? hr : D3DERR_INVALIDCALL;
+        if (bPointerNull && originalHr == D3D_OK)
             info = {"result NULL", 8621, 621};
-        else if (hr == STATUS_ARRAY_BOUNDS_EXCEEDED)
+        else if (reportHr == STATUS_ARRAY_BOUNDS_EXCEEDED)
             info = {"offset out of range", 8622, 622};
-        else if (hr == STATUS_ACCESS_VIOLATION)
+        else if (reportHr == STATUS_ACCESS_VIOLATION)
             info = {"access violation", 8623, 623};
         else
             info = {"fail", 8620, 620};
 
-        SString strMessage("Lock VertexBuffer [%s] hr:%x origHr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x", info.szText, hr,
-                           originalHr, m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags);
+        SString strMessage("Lock VertexBuffer [%s] hr:%x origHr:%x returnHr:%x pointerNull:%u Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x",
+                           info.szText, reportHr, originalHr, hr, static_cast<uint>(bPointerNull), m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock,
+                           Flags);
         WriteDebugEvent(strMessage);
         AddReportLog(info.uiReportId, strMessage);
         CCore::GetSingleton().LogEvent(info.uiLogEventId, "Lock VertexBuffer", "", strMessage);
