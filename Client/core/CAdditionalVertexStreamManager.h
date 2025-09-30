@@ -84,7 +84,7 @@ public:
     void OnVertexBufferRangeInvalidated(IDirect3DVertexBuffer9* pStreamData, uint Offset, uint Size);
 
     static CAdditionalVertexStreamManager* GetSingleton();
-    static CAdditionalVertexStreamManager* GetExistingSingleton() noexcept;
+    static CAdditionalVertexStreamManager* GetExistingSingleton();
     static void DestroySingleton();
 
 protected:

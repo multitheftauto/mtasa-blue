@@ -22,9 +22,8 @@
 #include "Graphics/CRenderItem.EffectTemplate.h"
 
 
-bool                g_bInMTAScene = false;
+std::atomic<bool>   g_bInMTAScene{false};
 extern std::atomic<bool> g_bInGTAScene;
-void ResetGTASceneState();
 void ResetGTASceneState();
 
 // Other variables
@@ -154,6 +153,10 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     if (!bDeviceOperational && !bDeviceTemporarilyLost)
         WriteDebugEvent(SString("OnInvalidate: unexpected cooperative level %08x", hrCooperativeLevel));
 
+    const bool bInMTAScene = g_bInMTAScene.load(std::memory_order_acquire);
+    const bool bInGTAScene = g_bInGTAScene.load(std::memory_order_acquire);
+    const bool bInAnyScene = bInMTAScene || bInGTAScene;
+
     if (bDeviceOperational)
     {
         // Flush any pending operations before invalidation while the device still accepts work
@@ -163,7 +166,7 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
         // Ensure any in-progress effect passes are wrapped up before ending the scene
         CloseActiveShader();
 
-    if (g_bInMTAScene || g_bInGTAScene.load(std::memory_order_acquire))
+        if (bInAnyScene)
         {
             const HRESULT hrEndScene = pDevice->EndScene();
             if (FAILED(hrEndScene))
@@ -174,11 +177,13 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     {
         CloseActiveShader(false);
 
-    if (g_bInMTAScene || g_bInGTAScene.load(std::memory_order_acquire))
+        if (bInAnyScene)
+        {
             WriteDebugEvent("OnInvalidate: device lost, skipping EndScene and pending GPU work");
+        }
     }
 
-    g_bInMTAScene = false;
+    g_bInMTAScene.store(false, std::memory_order_release);
     ResetGTASceneState();
 
     // Invalidate the VMR9 Manager
@@ -216,11 +221,11 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     if (FAILED(hrBeginScene))
     {
         WriteDebugEvent(SString("OnPresent: BeginScene failed: %08x", hrBeginScene));
-        g_bInMTAScene = false;
+    g_bInMTAScene.store(false, std::memory_order_release);
         return;
     }
 
-    g_bInMTAScene = true;
+    g_bInMTAScene.store(true, std::memory_order_release);
 
     // Reset samplers on first call
     static bool bDoneReset = false;
@@ -289,10 +294,10 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CloseActiveShader();
 
     // End the scene that we started.
-    if (g_bInMTAScene)
+    if (g_bInMTAScene.load(std::memory_order_acquire))
     {
         pDevice->EndScene();
-        g_bInMTAScene = false;
+    g_bInMTAScene.store(false, std::memory_order_release);
     }
 
     // Update incase settings changed
@@ -883,7 +888,7 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
 
 /////////////////////////////////////////////////////////////
 //
-// AreVertexStreamsAreBigEnough
+// AreVertexStreamsBigEnough
 //
 // Occasionally, GTA tries to draw water/clouds/something with a vertex buffer that is
 // too small (which causes problems for some graphics drivers).
@@ -891,7 +896,7 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
 // This function checks the sizes are valid
 //
 /////////////////////////////////////////////////////////////
-bool AreVertexStreamsAreBigEnough(IDirect3DDevice9* pDevice, uint viMinBased, uint viMaxBased)
+bool AreVertexStreamsBigEnough(IDirect3DDevice9* pDevice, uint viMinBased, uint viMaxBased)
 {
     // Check each stream used
     for (uint i = 0; i < NUMELMS(g_pDeviceState->VertexDeclState.bUsesStreamAtIndex); i++)
@@ -925,19 +930,22 @@ bool AreVertexStreamsAreBigEnough(IDirect3DDevice9* pDevice, uint viMinBased, ui
 
 /////////////////////////////////////////////////////////////
 //
-// FilerException
+// FilterException
 //
 // Check if exception should be handled by us
 //
 /////////////////////////////////////////////////////////////
-uint uiLastExceptionCode = 0;
-int  FilerException(uint ExceptionCode)
+thread_local uint uiLastExceptionCode = 0;
+int             FilterException(uint exceptionCode)
 {
-    uiLastExceptionCode = ExceptionCode;
-    if (ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
+    uiLastExceptionCode = exceptionCode;
+    if (exceptionCode == EXCEPTION_ACCESS_VIOLATION)
         return EXCEPTION_EXECUTE_HANDLER;
-    if (ExceptionCode == 0xE06D7363)
+    if (exceptionCode == 0xE06D7363)
+    {
+        WriteDebugEvent("FilterException: caught Microsoft C++ exception");
         return EXCEPTION_EXECUTE_HANDLER;
+    }
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
@@ -957,7 +965,7 @@ HRESULT CallSetRenderTargetWithGuard(IDirect3DDevice9* pDevice, DWORD renderTarg
     {
         hr = pDevice->SetRenderTarget(renderTargetIndex, pRenderTarget);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 15 * 1000000);
     }
@@ -971,7 +979,7 @@ HRESULT CallSetDepthStencilSurfaceWithGuard(IDirect3DDevice9* pDevice, IDirect3D
     {
         hr = pDevice->SetDepthStencilSurface(pNewZStencil);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 16 * 1000000);
     }
@@ -985,7 +993,7 @@ HRESULT CallCreateAdditionalSwapChainWithGuard(IDirect3DDevice9* pDevice, D3DPRE
     {
         hr = pDevice->CreateAdditionalSwapChain(pPresentationParameters, pSwapChain);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 17 * 1000000);
     }
@@ -1030,7 +1038,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
         uint viMinBased = StartVertex;
         uint viMaxBased = NumVertices + StartVertex;
 
-        if (!AreVertexStreamsAreBigEnough(pDevice, viMinBased, viMaxBased))
+    if (!AreVertexStreamsBigEnough(pDevice, viMinBased, viMaxBased))
             return hr;
     }
 
@@ -1038,7 +1046,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
     {
         hr = pDevice->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 1 * 1000000);
     }
@@ -1077,14 +1085,14 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
     uint viMinBased = MinVertexIndex + BaseVertexIndex;
     uint viMaxBased = MinVertexIndex + NumVertices + BaseVertexIndex;
 
-    if (!AreVertexStreamsAreBigEnough(pDevice, viMinBased, viMaxBased))
+    if (!AreVertexStreamsBigEnough(pDevice, viMinBased, viMaxBased))
         return hr;
 
     __try
     {
         hr = pDevice->DrawIndexedPrimitive(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 2 * 1000000);
     }
@@ -1123,7 +1131,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveUPGuarded(IDirect3DDevice9* pDevice, D3DP
     {
         hr = pDevice->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 3 * 1000000);
     }
@@ -1166,7 +1174,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(IDirect3DDevice9* pDevic
         hr = pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat,
                                              pVertexStreamZeroData, VertexStreamZeroStride);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 4 * 1000000);
     }
@@ -1205,7 +1213,7 @@ HRESULT CDirect3DEvents9::DrawRectPatchGuarded(IDirect3DDevice9* pDevice, UINT H
     {
         hr = pDevice->DrawRectPatch(Handle, pNumSegs, pRectPatchInfo);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 6 * 1000000);
     }
@@ -1244,7 +1252,7 @@ HRESULT CDirect3DEvents9::DrawTriPatchGuarded(IDirect3DDevice9* pDevice, UINT Ha
     {
         hr = pDevice->DrawTriPatch(Handle, pNumSegs, pTriPatchInfo);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 7 * 1000000);
     }
@@ -1284,7 +1292,7 @@ HRESULT CDirect3DEvents9::ProcessVerticesGuarded(IDirect3DDevice9* pDevice, UINT
     {
         hr = pDevice->ProcessVertices(SrcStartIndex, DestIndex, VertexCount, pDestBuffer, pVertexDecl, Flags);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 8 * 1000000);
     }
@@ -1323,7 +1331,7 @@ HRESULT CDirect3DEvents9::ClearGuarded(IDirect3DDevice9* pDevice, DWORD Count, C
     {
         hr = pDevice->Clear(Count, pRects, Flags, Color, Z, Stencil);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 9 * 1000000);
     }
@@ -1362,7 +1370,7 @@ HRESULT CDirect3DEvents9::ColorFillGuarded(IDirect3DDevice9* pDevice, IDirect3DS
     {
         hr = pDevice->ColorFill(pSurface, pRect, color);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 10 * 1000000);
     }
@@ -1402,7 +1410,7 @@ HRESULT CDirect3DEvents9::UpdateSurfaceGuarded(IDirect3DDevice9* pDevice, IDirec
     {
         hr = pDevice->UpdateSurface(pSourceSurface, pSourceRect, pDestinationSurface, pDestPoint);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 11 * 1000000);
     }
@@ -1442,7 +1450,7 @@ HRESULT CDirect3DEvents9::UpdateTextureGuarded(IDirect3DDevice9* pDevice, IDirec
     {
         hr = pDevice->UpdateTexture(pSourceTexture, pDestinationTexture);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 12 * 1000000);
     }
@@ -1482,7 +1490,7 @@ HRESULT CDirect3DEvents9::GetRenderTargetDataGuarded(IDirect3DDevice9* pDevice, 
     {
         hr = pDevice->GetRenderTargetData(pRenderTarget, pDestSurface);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 13 * 1000000);
     }
@@ -1521,7 +1529,7 @@ HRESULT CDirect3DEvents9::GetFrontBufferDataGuarded(IDirect3DDevice9* pDevice, U
     {
         hr = pDevice->GetFrontBufferData(iSwapChain, pDestSurface);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 14 * 1000000);
     }
@@ -1650,7 +1658,7 @@ HRESULT CDirect3DEvents9::CreateVolumeTextureGuarded(IDirect3DDevice9* pDevice, 
     {
         hr = pDevice->CreateVolumeTexture(Width, Height, Depth, Levels, Usage, Format, Pool, ppVolumeTexture, pSharedHandle);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 18 * 1000000);
     }
@@ -1690,7 +1698,7 @@ HRESULT CDirect3DEvents9::CreateCubeTextureGuarded(IDirect3DDevice9* pDevice, UI
     {
         hr = pDevice->CreateCubeTexture(EdgeLength, Levels, Usage, Format, Pool, ppCubeTexture, pSharedHandle);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 19 * 1000000);
     }
@@ -1731,7 +1739,7 @@ HRESULT CDirect3DEvents9::CreateRenderTargetGuarded(IDirect3DDevice9* pDevice, U
     {
         hr = pDevice->CreateRenderTarget(Width, Height, Format, MultiSample, MultisampleQuality, Lockable, ppSurface, pSharedHandle);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 20 * 1000000);
     }
@@ -1772,7 +1780,7 @@ HRESULT CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(IDirect3DDevice9* pDe
     {
         hr = pDevice->CreateDepthStencilSurface(Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 21 * 1000000);
     }
@@ -1812,7 +1820,7 @@ HRESULT CDirect3DEvents9::CreateOffscreenPlainSurfaceGuarded(IDirect3DDevice9* p
     {
         hr = pDevice->CreateOffscreenPlainSurface(Width, Height, Format, Pool, ppSurface, pSharedHandle);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 22 * 1000000);
     }
@@ -1849,7 +1857,7 @@ HRESULT CDirect3DEvents9::PresentGuarded(IDirect3DDevice9* pDevice, CONST RECT* 
     {
         hr = pDevice->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
     }
-    __except (FilerException(GetExceptionCode()))
+    __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 5 * 1000000);
     }
@@ -2051,7 +2059,28 @@ IDirect3DBaseTexture9* CDirect3DEvents9::GetRealTexture(IDirect3DBaseTexture9* p
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::CreateVertexDeclaration(IDirect3DDevice9* pDevice, CONST D3DVERTEXELEMENT9* pVertexElements, IDirect3DVertexDeclaration9** ppDecl)
 {
-    HRESULT hr;
+    if (!pDevice)
+    {
+        WriteDebugEvent("CreateVertexDeclaration: pDevice is null");
+        return D3DERR_INVALIDCALL;
+    }
+
+    if (!pVertexElements)
+    {
+        WriteDebugEvent("CreateVertexDeclaration: pVertexElements is null");
+        return D3DERR_INVALIDCALL;
+    }
+
+    if (!ppDecl)
+    {
+        WriteDebugEvent("CreateVertexDeclaration: ppDecl is null");
+        return D3DERR_INVALIDCALL;
+    }
+
+    *ppDecl = nullptr;
+
+    HRESULT                          hr = D3D_OK;
+    IDirect3DVertexDeclaration9*     pOriginalDecl = nullptr;
 
     hr = pDevice->CreateVertexDeclaration(pVertexElements, ppDecl);
     if (FAILED(hr))
@@ -2074,8 +2103,15 @@ HRESULT CDirect3DEvents9::CreateVertexDeclaration(IDirect3DDevice9* pDevice, CON
         return hr;
     }
 
+    pOriginalDecl = *ppDecl;
+    if (!pOriginalDecl)
+    {
+        WriteDebugEvent("CreateVertexDeclaration: driver returned a null declaration");
+        return D3DERR_INVALIDCALL;
+    }
+
     // Create proxy
-    *ppDecl = new CProxyDirect3DVertexDeclaration(pDevice, *ppDecl, pVertexElements);
+    *ppDecl = new CProxyDirect3DVertexDeclaration(pDevice, pOriginalDecl, pVertexElements);
     return hr;
 }
 
