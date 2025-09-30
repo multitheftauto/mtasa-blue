@@ -101,6 +101,7 @@ HRESULT CProxyDirect3DVertexDeclaration::QueryInterface(REFIID riid, void** ppvO
     if (riid == CProxyDirect3DVertexDeclaration_GUID)
     {
         *ppvObj = this;
+        AddRef();
         return S_OK;
     }
 
