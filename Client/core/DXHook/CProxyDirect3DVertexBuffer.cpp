@@ -79,6 +79,7 @@ HRESULT CProxyDirect3DVertexBuffer::QueryInterface(REFIID riid, void** ppvObj)
     if (riid == CProxyDirect3DVertexBuffer_GUID)
     {
         *ppvObj = this;
+        AddRef();
         return S_OK;
     }
 
