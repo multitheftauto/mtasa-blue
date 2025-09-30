@@ -22,8 +22,9 @@
 #include "Graphics/CRenderItem.EffectTemplate.h"
 
 
-bool g_bInMTAScene = false;
-extern bool g_bInGTAScene;
+bool                g_bInMTAScene = false;
+extern std::atomic<bool> g_bInGTAScene;
+void ResetGTASceneState();
 void ResetGTASceneState();
 
 // Other variables
@@ -162,7 +163,7 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
         // Ensure any in-progress effect passes are wrapped up before ending the scene
         CloseActiveShader();
 
-        if (g_bInMTAScene || g_bInGTAScene)
+    if (g_bInMTAScene || g_bInGTAScene.load(std::memory_order_acquire))
         {
             const HRESULT hrEndScene = pDevice->EndScene();
             if (FAILED(hrEndScene))
@@ -173,7 +174,7 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     {
         CloseActiveShader(false);
 
-        if (g_bInMTAScene || g_bInGTAScene)
+    if (g_bInMTAScene || g_bInGTAScene.load(std::memory_order_acquire))
             WriteDebugEvent("OnInvalidate: device lost, skipping EndScene and pending GPU work");
     }
 
