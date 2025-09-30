@@ -86,10 +86,15 @@ bool CDirect3DEvents9::IsDeviceOperational(IDirect3DDevice9* pDevice, bool* pbTe
     {
         if (pbTemporarilyLost)
             *pbTemporarilyLost = true;
+        return false;
     }
-    else
+
+    const bool bSceneActive = g_bInMTAScene.load(std::memory_order_acquire) || g_bInGTAScene.load(std::memory_order_acquire);
+    if (hr == D3DERR_INVALIDCALL && bSceneActive)
     {
-        WriteDebugEvent(SString("IsDeviceOperational: unexpected cooperative level %08x", hr));
+        if (pHrCooperativeLevel)
+            *pHrCooperativeLevel = D3D_OK;
+        return true;
     }
 
     return false;
