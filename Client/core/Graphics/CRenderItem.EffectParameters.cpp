@@ -10,6 +10,10 @@
 #include "StdInc.h"
 #include "CRenderItem.EffectParameters.h"
 
+#include <cctype>
+#include <cstdlib>
+#include <limits>
+
 IMPLEMENT_ENUM_BEGIN(EStateGroup)
 ADD_ENUM(STATE_GROUP_RENDER, "renderState")
 ADD_ENUM(STATE_GROUP_STAGE, "stageState")
@@ -361,6 +365,9 @@ const SRegisterInfo BigRegisterInfoList[] = {
 ////////////////////////////////////////////////////////////////
 HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
 {
+    if (!m_pD3DEffect)
+        return D3DERR_INVALIDCALL;
+
     if (m_bUsesDepthBuffer && !bWorldRender)
     {
         // Ensure readable depth buffer is ready to be read
@@ -389,17 +396,20 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
             D3DXHANDLE             hTexture = m_SecondaryRenderTargetList[i];
             IDirect3DBaseTexture9* pD3DTexture = nullptr;
             HRESULT                hr = m_pD3DEffect->GetTexture(hTexture, &pD3DTexture);
-            if (hr == D3D_OK && pD3DTexture && pD3DTexture->GetType() == D3DRTYPE_TEXTURE)
+            if (SUCCEEDED(hr) && pD3DTexture)
             {
-                IDirect3DSurface9* pD3DSurface = nullptr;
-                HRESULT            hrSurface = ((IDirect3DTexture9*)pD3DTexture)->GetSurfaceLevel(0, &pD3DSurface);
-                if (hrSurface == D3D_OK && pD3DSurface)
+                if (pD3DTexture->GetType() == D3DRTYPE_TEXTURE)
                 {
-                    pDevice->SetRenderTarget(i + 1, pD3DSurface);
-                    SAFE_RELEASE(pD3DSurface);
+                    IDirect3DSurface9* pD3DSurface = nullptr;
+                    HRESULT            hrSurface = ((IDirect3DTexture9*)pD3DTexture)->GetSurfaceLevel(0, &pD3DSurface);
+                    if (hrSurface == D3D_OK && pD3DSurface)
+                    {
+                        pDevice->SetRenderTarget(i + 1, pD3DSurface);
+                        SAFE_RELEASE(pD3DSurface);
+                    }
                 }
-                SAFE_RELEASE(pD3DTexture);
             }
+            SAFE_RELEASE(pD3DTexture);
         }
     }
 
@@ -462,8 +472,14 @@ bool CEffectParameters::ApplyCommonHandles()
     if (!m_bUsesCommonHandles)
         return false;
 
-    LPDIRECT3DDEVICE9 pDevice;
-    m_pD3DEffect->GetDevice(&pDevice);
+    if (!m_pD3DEffect)
+        return false;
+
+    assert(g_pDeviceState);
+
+    LPDIRECT3DDEVICE9 pDevice = nullptr;
+    if (FAILED(m_pD3DEffect->GetDevice(&pDevice)) || !pDevice)
+        return false;
 
     D3DXMATRIX matWorld, matView, matProjection;
     pDevice->GetTransform(D3DTS_WORLD, &matWorld);
@@ -609,6 +625,7 @@ bool CEffectParameters::ApplyCommonHandles()
     if (m_CommonHandles.hProjectionMainScene)
         m_pD3DEffect->SetMatrix(m_CommonHandles.hProjectionMainScene, (D3DXMATRIX*)&g_pDeviceState->MainSceneState.TransformState.PROJECTION);
 
+    SAFE_RELEASE(pDevice);
     return true;
 };
 
@@ -618,6 +635,35 @@ void BOUNDS_CHECK(const void* ptr, int ptrsize, const void* bufstart, int bufsiz
     assert(ptr >= bufstart);
     // ptr+ptrsize should not be after bufstart+bufsize
     assert((uchar*)ptr + ptrsize <= (uchar*)bufstart + bufsize);
+}
+
+static SString TrimAsciiWhitespace(const SString& value)
+{
+    size_t start = 0;
+    size_t end = value.length();
+
+    while (start < end && std::isspace(static_cast<unsigned char>(value[start])))
+        ++start;
+
+    while (end > start && std::isspace(static_cast<unsigned char>(value[end - 1])))
+        --end;
+
+    return value.substr(start, end - start);
+}
+
+static bool DoesStateGroupUseStageIndex(EStateGroup stateGroup)
+{
+    switch (stateGroup)
+    {
+        case STATE_GROUP_STAGE:
+        case STATE_GROUP_SAMPLER:
+        case STATE_GROUP_TEXTURE:
+        case STATE_GROUP_LIGHT:
+        case STATE_GROUP_LIGHT_ENABLE:
+            return true;
+        default:
+            return false;
+    }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -632,6 +678,11 @@ bool CEffectParameters::ApplyMappedHandles()
 {
     if (!m_bUsesMappedHandles)
         return false;
+
+    if (!m_pD3DEffect)
+        return false;
+
+    assert(g_pDeviceState);
 
     //////////////////////////////////////////
     //
@@ -888,6 +939,9 @@ const std::set<D3DXHANDLE>& CEffectParameters::GetModifiedParameters()
 ////////////////////////////////////////////////////////////////
 void CEffectParameters::RestoreParametersDefaultValue(const std::vector<D3DXHANDLE>& parameterList)
 {
+    if (!m_pD3DEffect)
+        return;
+
     for (auto hParameter : parameterList)
     {
         std::vector<char>* pBuffer = MapFind(m_defaultValues, hParameter);
@@ -906,6 +960,9 @@ void CEffectParameters::RestoreParametersDefaultValue(const std::vector<D3DXHAND
 ////////////////////////////////////////////////////////////////
 void CEffectParameters::ReadParameterHandles()
 {
+    if (!m_pD3DEffect)
+        return;
+
     D3DXEFFECT_DESC EffectDesc;
     m_pD3DEffect->GetDesc(&EffectDesc);
 
@@ -957,12 +1014,21 @@ void CEffectParameters::ReadParameterHandles()
 ////////////////////////////////////////////////////////////////
 SString CEffectParameters::GetAnnotationNameAndValue(D3DXHANDLE hParameter, uint uiIndex, SString& strOutValue)
 {
+    if (!m_pD3DEffect)
+        return "";
+
     D3DXHANDLE         hAnnotation = m_pD3DEffect->GetAnnotation(hParameter, uiIndex);
+    if (!hAnnotation)
+        return "";
+
     D3DXPARAMETER_DESC AnnotDesc;
-    m_pD3DEffect->GetParameterDesc(hAnnotation, &AnnotDesc);
-    LPCSTR szAnnotValue;
-    if (SUCCEEDED(m_pD3DEffect->GetString(hAnnotation, &szAnnotValue)))
+    if (FAILED(m_pD3DEffect->GetParameterDesc(hAnnotation, &AnnotDesc)) || !AnnotDesc.Name)
+        return "";
+
+    LPCSTR szAnnotValue = nullptr;
+    if (SUCCEEDED(m_pD3DEffect->GetString(hAnnotation, &szAnnotValue)) && szAnnotValue)
         strOutValue = szAnnotValue;
+
     return AnnotDesc.Name;
 }
 
@@ -975,6 +1041,9 @@ SString CEffectParameters::GetAnnotationNameAndValue(D3DXHANDLE hParameter, uint
 ////////////////////////////////////////////////////////////////
 bool CEffectParameters::TryParseSpecialParameter(D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc)
 {
+    if (!m_pD3DEffect)
+        return false;
+
     // Use semantic if it exists
     SString strName = ParameterDesc.Semantic ? ParameterDesc.Semantic : ParameterDesc.Name;
     if (strName.CompareI("CUSTOMFLAGS"))
@@ -1029,6 +1098,9 @@ bool CEffectParameters::IsSecondaryRenderTarget(D3DXHANDLE hParameter, const D3D
 ////////////////////////////////////////////////////////////////
 bool CEffectParameters::AddStandardParameter(D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc)
 {
+    if (!m_pD3DEffect)
+        return false;
+
     // Use semantic if it exists
     SString strName = ParameterDesc.Semantic ? ParameterDesc.Semantic : ParameterDesc.Name;
     // Add to correct lookup map
@@ -1053,8 +1125,10 @@ bool CEffectParameters::AddStandardParameter(D3DXHANDLE hParameter, const D3DXPA
     {
         std::vector<char> buffer;
         buffer.resize(ParameterDesc.Bytes);
-        m_pD3DEffect->GetValue(hParameter, buffer.data(), buffer.size());
-        MapSet(m_defaultValues, hParameter, buffer);
+        if (SUCCEEDED(m_pD3DEffect->GetValue(hParameter, buffer.data(), buffer.size())))
+        {
+            MapSet(m_defaultValues, hParameter, buffer);
+        }
     }
     return true;
 }
@@ -1082,8 +1156,57 @@ bool CEffectParameters::TryMappingParameterToRegister(D3DXHANDLE hParameter, con
         }
 
         // Extract prepended stage number, if any
-        int     iStage = atoi(strAnnotValue);
-        SString strName = strAnnotValue.SplitRight(",", NULL, -1);
+        SString strStagePart;
+        SString strName;
+        const bool bHasStagePart = strAnnotValue.Split(",", &strStagePart, &strName, -1);
+        if (!bHasStagePart)
+            strName = strAnnotValue;
+
+        strName = TrimAsciiWhitespace(strName);
+        strStagePart = TrimAsciiWhitespace(strStagePart);
+
+        if (strName.empty())
+            continue;
+
+        int iStage = 0;
+        const bool bGroupUsesStage = DoesStateGroupUseStageIndex(stateGroup);
+        if (bHasStagePart)
+        {
+            if (!bGroupUsesStage)
+            {
+                // Stage index supplied where it is not expected
+                continue;
+            }
+
+            if (strStagePart.empty())
+                continue;
+
+            char* pParseEnd = nullptr;
+            const long parsedStage = strtol(strStagePart.c_str(), &pParseEnd, 10);
+            if (!pParseEnd || *pParseEnd != '\0')
+                continue;
+
+            if (parsedStage < 0 || parsedStage > std::numeric_limits<int>::max())
+                continue;
+
+            iStage = static_cast<int>(parsedStage);
+        }
+        else if (!bGroupUsesStage)
+        {
+            iStage = 0;
+        }
+
+        if (bGroupUsesStage)
+        {
+            const int kMaxFixedStageCount = 8;
+            if (iStage < 0 || iStage >= kMaxFixedStageCount)
+                continue;
+        }
+        else if (bHasStagePart)
+        {
+            // Already handled above, but keep guard for readability
+            continue;
+        }
 
         // Find D3D register line for this group+name
         const SRegisterInfo* pRegsiterInfo = GetRegisterInfo(stateGroup, strName);
