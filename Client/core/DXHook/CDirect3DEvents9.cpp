@@ -24,6 +24,7 @@
 
 bool g_bInMTAScene = false;
 extern bool g_bInGTAScene;
+void ResetGTASceneState();
 
 // Other variables
 static uint                 ms_RequiredAnisotropicLevel = 1;
@@ -177,7 +178,7 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     }
 
     g_bInMTAScene = false;
-    g_bInGTAScene = false;
+    ResetGTASceneState();
 
     // Invalidate the VMR9 Manager
     // CVideoManager::GetSingleton ().OnLostDevice ();
@@ -2098,9 +2099,13 @@ HRESULT CDirect3DEvents9::SetVertexDeclaration(IDirect3DDevice9* pDevice, IDirec
             pDecl = pProxy->GetOriginal();
 
             // Update state info
-            CProxyDirect3DDevice9::SD3DVertexDeclState* pInfo = MapFind(g_pProxyDevice->m_VertexDeclMap, pProxy);
-            if (pInfo)
-                g_pDeviceState->VertexDeclState = *pInfo;
+            CScopedActiveProxyDevice proxyDevice;
+            if (proxyDevice)
+            {
+                CProxyDirect3DDevice9::SD3DVertexDeclState* pInfo = MapFind(proxyDevice->m_VertexDeclMap, pProxy);
+                if (pInfo)
+                    g_pDeviceState->VertexDeclState = *pInfo;
+            }
 
             SAFE_RELEASE(pProxy);
         }
