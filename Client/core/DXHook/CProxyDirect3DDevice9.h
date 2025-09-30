@@ -565,6 +565,16 @@ extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;
 // GTA scene tracking helpers
 void ResetGTASceneState();
 
+enum class ESceneOwner
+{
+    None,
+    GTA,
+    MTA,
+};
+
+bool BeginSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner);
+bool EndSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner);
+
 CProxyDirect3DDevice9* AcquireActiveProxyDevice();
 void                   ReleaseActiveProxyDevice(CProxyDirect3DDevice9* pProxyDevice);
 
