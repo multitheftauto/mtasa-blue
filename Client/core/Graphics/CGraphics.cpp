@@ -21,7 +21,7 @@
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
 extern std::atomic<bool>   g_bInGTAScene;
-extern bool   g_bInMTAScene;
+extern std::atomic<bool>   g_bInMTAScene;
 
 using namespace std;
 
@@ -2143,7 +2143,8 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     if (m_LastLostDeviceTimer.Get() < 1000)
         return;
 
-    const bool bWasInScene = g_bInGTAScene.load(std::memory_order_acquire) || g_bInMTAScene;
+    const bool bWasInScene = g_bInGTAScene.load(std::memory_order_acquire) ||
+                             g_bInMTAScene.load(std::memory_order_acquire);
     bool       bInScene = bWasInScene;
 
     // Skip of not in a scene and not forced with always flag

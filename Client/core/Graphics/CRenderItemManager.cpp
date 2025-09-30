@@ -13,7 +13,7 @@
 #include <game/CSettings.h>
 #include "CRenderItem.EffectCloner.h"
 
-extern bool g_bInMTAScene;
+extern std::atomic<bool> g_bInMTAScene;
 extern std::atomic<bool> g_bInGTAScene;
 
 // Type of vertex used to emulate StretchRect for SwiftShader bug
@@ -449,9 +449,16 @@ void CRenderItemManager::UpdateBackBufferCopy()
 
     // Copy back buffer into our private render target
     D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
-    HRESULT              hr = m_pDevice->StretchRect(pD3DBackBufferSurface, nullptr, m_pBackBufferCopy->m_pD3DRenderTargetSurface, nullptr, FilterType);
-
-    m_uiBackBufferCopyRevision++;
+    const HRESULT hr =
+        m_pDevice->StretchRect(pD3DBackBufferSurface, nullptr, m_pBackBufferCopy->m_pD3DRenderTargetSurface, nullptr, FilterType);
+    if (SUCCEEDED(hr))
+    {
+        ++m_uiBackBufferCopyRevision;
+    }
+    else
+    {
+        WriteDebugEvent(SString("CRenderItemManager::UpdateBackBufferCopy: StretchRect failed: %08x", hr));
+    }
 
     // Clean up
     SAFE_RELEASE(pD3DBackBufferSurface);
@@ -1356,7 +1363,8 @@ void CRenderItemManager::SaveReadableDepthBuffer()
         
         // Additional sync point for GPU driver
         // Force immediate execution of depth buffer state changes when we can safely begin a scene
-    if (bDeviceReady && !g_bInMTAScene && !g_bInGTAScene.load(std::memory_order_acquire))
+    if (bDeviceReady && !g_bInMTAScene.load(std::memory_order_acquire) &&
+        !g_bInGTAScene.load(std::memory_order_acquire))
         {
             const HRESULT hBeginScene = m_pDevice->BeginScene();
             if (SUCCEEDED(hBeginScene))
