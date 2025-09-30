@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CAdditionalVertexStreamManager.h"
 #include <limits>
+#include <mutex>
 
 CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::ms_Singleton = nullptr;
 
@@ -75,6 +76,8 @@ namespace
         STriKey key = {a, b, c};
         return key;
     }
+
+    std::mutex g_singletonMutex;
 }            // namespace
 
 ///////////////////////////////////////////////////////////////
@@ -119,23 +122,26 @@ CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager()
 ///////////////////////////////////////////////////////////////
 CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton()
 {
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
     if (!ms_Singleton)
         ms_Singleton = new CAdditionalVertexStreamManager();
     return ms_Singleton;
 }
 
-CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetExistingSingleton() noexcept
+CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetExistingSingleton()
 {
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
     return ms_Singleton;
 }
 
 void CAdditionalVertexStreamManager::DestroySingleton()
 {
-    if (ms_Singleton)
-    {
-        delete ms_Singleton;
-        ms_Singleton = nullptr;
-    }
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
+    if (!ms_Singleton)
+        return;
+
+    delete ms_Singleton;
+    ms_Singleton = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////
