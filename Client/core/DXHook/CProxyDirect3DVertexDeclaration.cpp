@@ -24,7 +24,7 @@ CProxyDirect3DVertexDeclaration::CProxyDirect3DVertexDeclaration(IDirect3DDevice
 {
     m_pOriginal = pOriginal;
 
-    CProxyDirect3DDevice9::SD3DVertexDeclState info;
+    CProxyDirect3DDevice9::SD3DVertexDeclState info{};
 
     // Calc and cache info
     for (uint i = 0; i < MAXD3DDECLLENGTH; i++)
