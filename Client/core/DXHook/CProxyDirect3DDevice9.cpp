@@ -42,6 +42,7 @@ void ReplaceInterface(T*& destination, T* source)
 }
 std::mutex               g_proxyDeviceMutex;
 std::mutex               g_gammaStateMutex;
+std::mutex               g_deviceStateMutex;
 std::atomic<uint64_t>    g_proxyRegistrationCounter{0};
 std::mutex               g_sceneStateMutex;
 uint32_t                 g_gtaSceneActiveCount = 0;
@@ -50,7 +51,7 @@ uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance);
 bool      UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registrationId);
 }
 
-bool                                    g_bInGTAScene = false;
+std::atomic<bool>                       g_bInGTAScene{false};
 CProxyDirect3DDevice9*                  g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 SGammaState                             g_GammaState;
@@ -59,7 +60,7 @@ void IncrementGTASceneState()
 {
     std::lock_guard<std::mutex> lock(g_sceneStateMutex);
     ++g_gtaSceneActiveCount;
-    g_bInGTAScene = true;
+    g_bInGTAScene.store(true, std::memory_order_release);
 }
 
 void DecrementGTASceneState()
@@ -67,14 +68,14 @@ void DecrementGTASceneState()
     std::lock_guard<std::mutex> lock(g_sceneStateMutex);
     if (g_gtaSceneActiveCount > 0)
         --g_gtaSceneActiveCount;
-    g_bInGTAScene = (g_gtaSceneActiveCount > 0);
+    g_bInGTAScene.store(g_gtaSceneActiveCount > 0, std::memory_order_release);
 }
 
 void ResetGTASceneState()
 {
     std::lock_guard<std::mutex> lock(g_sceneStateMutex);
     g_gtaSceneActiveCount = 0;
-    g_bInGTAScene = false;
+    g_bInGTAScene.store(false, std::memory_order_release);
 }
 
 // Proxy constructor and destructor.
@@ -215,6 +216,8 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 
     if (bWasRegistered)
     {
+        ResetGTASceneState();
+
         std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
         if (g_GammaState.bOriginalGammaStored)
         {
@@ -540,7 +543,11 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         {
             if (pSwapChain)
             {
-                pSwapChain->GetPresentParameters(&g_pDeviceState->CreationState.PresentationParameters);
+                std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+                if (g_pDeviceState)
+                {
+                    pSwapChain->GetPresentParameters(&g_pDeviceState->CreationState.PresentationParameters);
+                }
             }
             else
             {
@@ -556,7 +563,18 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     ReleaseInterface(pSwapChain);
 
         // Store device creation parameters as well
-        HRESULT hrCreationParams = m_pDevice->GetCreationParameters(&g_pDeviceState->CreationState.CreationParameters);
+        HRESULT hrCreationParams = D3D_OK;
+        {
+            std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+            if (g_pDeviceState)
+            {
+                hrCreationParams = m_pDevice->GetCreationParameters(&g_pDeviceState->CreationState.CreationParameters);
+            }
+            else
+            {
+                hrCreationParams = D3DERR_INVALIDCALL;
+            }
+        }
         if (FAILED(hrCreationParams))
         {
             WriteDebugEvent(SString("Warning: Failed to get creation parameters: %08x", hrCreationParams));
@@ -596,9 +614,15 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     WriteDebugEvent(SString("    FullScreen_RefreshRateInHz:%d  PresentationInterval:0x%08x", pPresentationParameters->FullScreen_RefreshRateInHz,
                             pPresentationParameters->PresentationInterval));
 
-    const D3DDEVICE_CREATION_PARAMETERS& parameters = g_pDeviceState->CreationState.CreationParameters;
-
-    WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x", parameters.AdapterOrdinal, parameters.DeviceType, parameters.BehaviorFlags));
+    {
+        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+        if (g_pDeviceState)
+        {
+            const D3DDEVICE_CREATION_PARAMETERS& parameters = g_pDeviceState->CreationState.CreationParameters;
+            WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x", parameters.AdapterOrdinal, parameters.DeviceType,
+                                    parameters.BehaviorFlags));
+        }
+    }
     }
     else
     {
@@ -887,12 +911,13 @@ HRESULT CProxyDirect3DDevice9::EndScene()
     {
         // Call real routine.
         HRESULT hResult = m_pDevice->EndScene();
-    DecrementGTASceneState();
 
         CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
+        DecrementGTASceneState();
         return hResult;
     }
 
+    DecrementGTASceneState();
     return D3D_OK;
 }
 
@@ -1399,7 +1424,10 @@ uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance)
     std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
     const uint64_t registrationId = g_proxyRegistrationCounter.fetch_add(1, std::memory_order_relaxed) + 1;
     g_pProxyDevice = instance;
-    g_pDeviceState = instance ? &instance->DeviceState : nullptr;
+    {
+        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+        g_pDeviceState = instance ? &instance->DeviceState : nullptr;
+    }
     return registrationId;
 }
 
@@ -1413,7 +1441,10 @@ bool UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registratio
         return false;
 
     g_pProxyDevice = nullptr;
-    g_pDeviceState = nullptr;
+    {
+        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+        g_pDeviceState = nullptr;
+    }
     return true;
 }
 }        // namespace
