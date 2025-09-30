@@ -12,10 +12,12 @@
 #include "StdInc.h"
 #include <algorithm>
 #include <atomic>
+#include <cmath>
 #include <mutex>
 #include <game/CSettings.h>
 
 class CProxyDirect3DDevice9;
+extern std::atomic<bool> g_bInMTAScene;
 
 namespace
 {
@@ -46,6 +48,7 @@ std::mutex               g_deviceStateMutex;
 std::atomic<uint64_t>    g_proxyRegistrationCounter{0};
 std::mutex               g_sceneStateMutex;
 uint32_t                 g_gtaSceneActiveCount = 0;
+uint64_t                 g_activeProxyRegistrationId = 0;
 
 uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance);
 bool      UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registrationId);
@@ -233,7 +236,10 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 
     if (bRestoreGamma && m_pDevice)
     {
-        m_pDevice->SetGammaRamp(lastSwapChain, 0, &originalGammaRamp);
+        IDirect3DDevice9* pDevice = m_pDevice;
+        pDevice->AddRef();
+        pDevice->SetGammaRamp(lastSwapChain, 0, &originalGammaRamp);
+        pDevice->Release();
         WriteDebugEvent("Restored original gamma ramp on device destruction");
     }
 
@@ -474,6 +480,41 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
     return hResult;
 }
 
+static bool WaitForGpuIdle(IDirect3DDevice9* pDevice)
+{
+    if (!pDevice)
+        return false;
+
+    IDirect3DQuery9* pEventQuery = nullptr;
+    const HRESULT    hrCreate = pDevice->CreateQuery(D3DQUERYTYPE_EVENT, &pEventQuery);
+    if (FAILED(hrCreate) || !pEventQuery)
+        return false;
+
+    bool bCompleted = false;
+    if (SUCCEEDED(pEventQuery->Issue(D3DISSUE_END)))
+    {
+        constexpr int kMaxAttempts = 16;
+        for (int attempt = 0; attempt < kMaxAttempts; ++attempt)
+        {
+            const HRESULT hrData = pEventQuery->GetData(nullptr, 0, D3DGETDATA_FLUSH);
+            if (hrData == S_OK)
+            {
+                bCompleted = true;
+                break;
+            }
+            if (hrData == D3DERR_DEVICELOST)
+            {
+                break;
+            }
+
+            Sleep(0);
+        }
+    }
+
+    pEventQuery->Release();
+    return bCompleted;
+}
+
 HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
     WriteDebugEvent("CProxyDirect3DDevice9::Reset");
@@ -528,7 +569,12 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Release cached state so lingering references can't block Reset on default-pool resources
     ReleaseCachedResources();
 
-    // Give GPU driver time to complete any pending operations
+    // Give GPU driver time to complete any pending operations. We keep the light Sleep as a
+    // conservative fallback but first rely on an event query, as recommended in Microsoft's GPU
+    // synchronization guidance, to ensure outstanding commands finish.
+    if (!WaitForGpuIdle(m_pDevice))
+        WriteDebugEvent("CProxyDirect3DDevice9::Reset - WaitForGpuIdle timed out or failed");
+
     Sleep(1);
     
     // Call the real reset routine.
@@ -538,36 +584,26 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     {
         // Store actual present parameters used
         IDirect3DSwapChain9* pSwapChain = nullptr;
-        HRESULT hrSwapChain = m_pDevice->GetSwapChain(0, &pSwapChain);
-        if (SUCCEEDED(hrSwapChain))
-        {
-            if (pSwapChain)
-            {
-                std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
-                if (g_pDeviceState)
-                {
-                    pSwapChain->GetPresentParameters(&g_pDeviceState->CreationState.PresentationParameters);
-                }
-            }
-            else
-            {
-                WriteDebugEvent("Warning: GetSwapChain succeeded but returned null swap chain");
-            }
-        }
-        else
+        HRESULT              hrSwapChain = m_pDevice->GetSwapChain(0, &pSwapChain);
+        if (FAILED(hrSwapChain))
         {
             WriteDebugEvent(SString("Warning: Failed to get swap chain for parameter storage: %08x", hrSwapChain));
         }
-        
-    // Always release the swap chain if it was obtained, regardless of success/failure
-    ReleaseInterface(pSwapChain);
+        else if (!pSwapChain)
+        {
+            WriteDebugEvent("Warning: GetSwapChain succeeded but returned null swap chain");
+        }
 
-        // Store device creation parameters as well
+        // Store device creation parameters as well, keeping both updates atomic relative to device state changes
         HRESULT hrCreationParams = D3D_OK;
         {
             std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
             if (g_pDeviceState)
             {
+                if (SUCCEEDED(hrSwapChain) && pSwapChain)
+                {
+                    pSwapChain->GetPresentParameters(&g_pDeviceState->CreationState.PresentationParameters);
+                }
                 hrCreationParams = m_pDevice->GetCreationParameters(&g_pDeviceState->CreationState.CreationParameters);
             }
             else
@@ -575,6 +611,10 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
                 hrCreationParams = D3DERR_INVALIDCALL;
             }
         }
+
+        // Always release the swap chain if it was obtained, regardless of success/failure
+        ReleaseInterface(pSwapChain);
+
         if (FAILED(hrCreationParams))
         {
             WriteDebugEvent(SString("Warning: Failed to get creation parameters: %08x", hrCreationParams));
@@ -599,8 +639,14 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         CDirect3DEvents9::OnRestore(m_pDevice);
         
         // Additional sync point for GPU driver
-        m_pDevice->BeginScene();
-        m_pDevice->EndScene();
+        if (!BeginSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
+        {
+            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to begin scene for driver sync");
+        }
+        else if (!EndSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
+        {
+            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to end scene for driver sync");
+        }
 
     WriteDebugEvent(SString("    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d", pPresentationParameters->BackBufferWidth,
                             pPresentationParameters->BackBufferHeight, pPresentationParameters->BackBufferFormat, pPresentationParameters->BackBufferCount));
@@ -712,9 +758,9 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
         std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
         if (!g_GammaState.bOriginalGammaStored || g_GammaState.lastSwapChain != iSwapChain || g_GammaState.bLastWasBorderless != bIsBorderlessMode)
         {
-            if (!bIsBorderlessMode || !g_GammaState.bOriginalGammaStored)
+            if (!g_GammaState.bOriginalGammaStored)
             {
-                // In fullscreen mode or first time - this is likely the original gamma
+                // Capture the original gamma only once per session
                 g_GammaState.originalGammaRamp = *pRamp;
                 g_GammaState.bOriginalGammaStored = true;
                 g_GammaState.lastSwapChain = iSwapChain;
@@ -732,6 +778,12 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
         // and optimize brightness boost for better visibility
         const float fGammaCorrection = 1.0f / 1.3f;
         const float fBrightnessBoost = 1.4f;
+
+        const auto convertNormalizedToGammaWord = [](float normalized) -> WORD {
+            const float scaled = std::clamp(normalized * 65535.0f, 0.0f, 65535.0f);
+            const float rounded = std::floor(scaled + 0.5f);
+            return static_cast<WORD>(rounded);
+        };
 
         for (int i = 0; i < 256; i++)
         {
@@ -756,9 +808,9 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
             fBlue = std::min(1.0f, fBlue * fBrightnessBoost);
 
             // Convert back to WORD values with proper rounding
-            adjustedRamp.red[i] = static_cast<WORD>(fRed * 65535.0f + 0.5f);
-            adjustedRamp.green[i] = static_cast<WORD>(fGreen * 65535.0f + 0.5f);
-            adjustedRamp.blue[i] = static_cast<WORD>(fBlue * 65535.0f + 0.5f);
+            adjustedRamp.red[i] = convertNormalizedToGammaWord(fRed);
+            adjustedRamp.green[i] = convertNormalizedToGammaWord(fGreen);
+            adjustedRamp.blue[i] = convertNormalizedToGammaWord(fBlue);
         }
 
         // Set the adjusted gamma ramp
@@ -1424,6 +1476,7 @@ uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance)
     std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
     const uint64_t registrationId = g_proxyRegistrationCounter.fetch_add(1, std::memory_order_relaxed) + 1;
     g_pProxyDevice = instance;
+    g_activeProxyRegistrationId = registrationId;
     {
         std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
         g_pDeviceState = instance ? &instance->DeviceState : nullptr;
@@ -1437,10 +1490,11 @@ bool UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registratio
     if (g_pProxyDevice != instance)
         return false;
 
-    if (g_proxyRegistrationCounter.load(std::memory_order_relaxed) != registrationId)
+    if (g_activeProxyRegistrationId != registrationId)
         return false;
 
     g_pProxyDevice = nullptr;
+    g_activeProxyRegistrationId = 0;
     {
         std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
         g_pDeviceState = nullptr;
@@ -1461,6 +1515,54 @@ void ReleaseActiveProxyDevice(CProxyDirect3DDevice9* pProxyDevice)
 {
     if (pProxyDevice)
         pProxyDevice->Release();
+}
+
+bool BeginSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner)
+{
+    if (!pDevice || owner == ESceneOwner::None)
+        return false;
+
+    const HRESULT hr = pDevice->BeginScene();
+    if (FAILED(hr))
+    {
+        WriteDebugEvent(SString("BeginSceneWithoutProxy failed: %08x", hr));
+        return false;
+    }
+
+    if (owner == ESceneOwner::GTA)
+    {
+        IncrementGTASceneState();
+    }
+    else if (owner == ESceneOwner::MTA)
+    {
+        g_bInMTAScene.store(true, std::memory_order_release);
+    }
+
+    return true;
+}
+
+bool EndSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner)
+{
+    if (!pDevice || owner == ESceneOwner::None)
+        return false;
+
+    const HRESULT hr = pDevice->EndScene();
+    if (FAILED(hr))
+    {
+        WriteDebugEvent(SString("EndSceneWithoutProxy failed: %08x", hr));
+        return false;
+    }
+
+    if (owner == ESceneOwner::GTA)
+    {
+        DecrementGTASceneState();
+    }
+    else if (owner == ESceneOwner::MTA)
+    {
+        g_bInMTAScene.store(false, std::memory_order_release);
+    }
+
+    return true;
 }
 
 CScopedActiveProxyDevice::CScopedActiveProxyDevice()
