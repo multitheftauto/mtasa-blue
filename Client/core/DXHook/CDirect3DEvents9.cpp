@@ -32,6 +32,35 @@ static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 // To reuse shader setups between calls to DrawIndexedPrimitive
 CShaderItem* g_pActiveShader = NULL;
 
+namespace
+{
+struct SResolvedShaderState
+{
+    CShaderInstance* pInstance = nullptr;
+    CEffectWrap*     pEffectWrap = nullptr;
+    ID3DXEffect*     pEffect = nullptr;
+};
+
+bool TryResolveShaderState(CShaderItem* pShaderItem, SResolvedShaderState& outState)
+{
+    if (!pShaderItem)
+        return false;
+
+    CShaderInstance* pInstance = pShaderItem->m_pShaderInstance;
+    if (!pInstance)
+        return false;
+
+    CEffectWrap* pEffectWrap = pInstance->m_pEffectWrap;
+    if (!pEffectWrap)
+        return false;
+
+    outState.pInstance = pInstance;
+    outState.pEffectWrap = pEffectWrap;
+    outState.pEffect = pEffectWrap->m_pD3DEffect;
+    return true;
+}
+}
+
 bool CDirect3DEvents9::IsDeviceOperational(IDirect3DDevice9* pDevice, bool* pbTemporarilyLost, HRESULT* pHrCooperativeLevel)
 {
     if (pHrCooperativeLevel)
@@ -377,31 +406,37 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
     else
     {
         // Yes shader for this texture
-        CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
+        SResolvedShaderState shaderState;
+        if (!TryResolveShaderState(pShaderItem, shaderState) || !shaderState.pEffect)
+        {
+            if (!bIsLayer)
+                return DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
+            return D3D_OK;
+        }
+
+        CShaderInstance* pShaderInstance = shaderState.pInstance;
+        CEffectWrap*     pEffectWrap = shaderState.pEffectWrap;
+        ID3DXEffect*     pD3DEffect = shaderState.pEffect;
 
         // Apply custom parameters
         pShaderInstance->ApplyShaderParameters();
         // Apply common parameters
-        pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
+        pEffectWrap->ApplyCommonHandles();
         // Apply mapped parameters
-        pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
+        pEffectWrap->ApplyMappedHandles();
 
         // Remember vertex shader if original draw was using it
         IDirect3DVertexShader9* pOriginalVertexShader = NULL;
         pDevice->GetVertexShader(&pOriginalVertexShader);
 
         // Do shader passes
-        ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
-        bool             bEffectDeviceTemporarilyLost = false;
-        bool             bEffectDeviceOperational = true;
-        if (pD3DEffect)
+        bool bEffectDeviceTemporarilyLost = false;
+        bool bEffectDeviceOperational = true;
+        IDirect3DDevice9* pEffectDevice = nullptr;
+        if (SUCCEEDED(pD3DEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
         {
-            IDirect3DDevice9* pEffectDevice = nullptr;
-            if (SUCCEEDED(pD3DEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
-            {
-                bEffectDeviceOperational = IsDeviceOperational(pEffectDevice, &bEffectDeviceTemporarilyLost);
-                SAFE_RELEASE(pEffectDevice);
-            }
+            bEffectDeviceOperational = IsDeviceOperational(pEffectDevice, &bEffectDeviceTemporarilyLost);
+            SAFE_RELEASE(pEffectDevice);
         }
 
         if (!bEffectDeviceOperational)
@@ -414,7 +449,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
 
         DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint  uiNumPasses = 0;
-        HRESULT hrBegin = pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
+    HRESULT hrBegin = pEffectWrap->Begin(&uiNumPasses, dwFlags);
         if (FAILED(hrBegin) || uiNumPasses == 0)
         {
             if (FAILED(hrBegin) && hrBegin != D3DERR_DEVICELOST && hrBegin != D3DERR_DEVICENOTRESET)
@@ -462,7 +497,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
                 bCompletedAnyPass = true;
         }
 
-        HRESULT hrEnd = pShaderInstance->m_pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
+    HRESULT hrEnd = pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
         if (FAILED(hrEnd) && hrEnd != D3DERR_DEVICELOST && hrEnd != D3DERR_DEVICENOTRESET)
             WriteDebugEvent(SString("DrawPrimitiveShader: End failed %08x", hrEnd));
 
@@ -603,23 +638,30 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         // See if we should use the previously setup shader
         if (g_pActiveShader)
         {
+            SResolvedShaderState activeState;
+            if (!TryResolveShaderState(g_pActiveShader, activeState) || !activeState.pEffect)
+            {
+                CloseActiveShader(false);
+                if (!bIsLayer)
+                    return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+                return D3D_OK;
+            }
+
             dassert(pShaderItem == g_pActiveShader);
             g_pDeviceState->FrameStats.iNumShadersReuseSetup++;
 
             // Transfer any state changes to the active shader, but ensure the device still accepts work
-            CShaderInstance* pShaderInstance = g_pActiveShader->m_pShaderInstance;
-            ID3DXEffect*     pActiveEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+            CShaderInstance* pShaderInstance = activeState.pInstance;
+            CEffectWrap*     pActiveEffectWrap = activeState.pEffectWrap;
+            ID3DXEffect*     pActiveEffect = activeState.pEffect;
 
             bool bDeviceTemporarilyLost = false;
             bool bDeviceOperational = true;
-            if (pActiveEffect)
+            IDirect3DDevice9* pEffectDevice = nullptr;
+            if (SUCCEEDED(pActiveEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
             {
-                IDirect3DDevice9* pEffectDevice = nullptr;
-                if (SUCCEEDED(pActiveEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
-                {
-                    bDeviceOperational = IsDeviceOperational(pEffectDevice, &bDeviceTemporarilyLost);
-                    SAFE_RELEASE(pEffectDevice);
-                }
+                bDeviceOperational = IsDeviceOperational(pEffectDevice, &bDeviceTemporarilyLost);
+                SAFE_RELEASE(pEffectDevice);
             }
 
             if (!bDeviceOperational)
@@ -628,11 +670,11 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
                 return D3D_OK;
             }
 
-            bool bChanged = pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
-            bChanged |= pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
+            bool bChanged = pActiveEffectWrap->ApplyCommonHandles();
+            bChanged |= pActiveEffectWrap->ApplyMappedHandles();
             if (bChanged)
             {
-                HRESULT hrCommit = pShaderInstance->m_pEffectWrap->m_pD3DEffect->CommitChanges();
+                HRESULT hrCommit = pActiveEffect->CommitChanges();
                 if (FAILED(hrCommit))
                 {
                     if (hrCommit != D3DERR_DEVICELOST && hrCommit != D3DERR_DEVICENOTRESET)
@@ -647,11 +689,21 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         g_pDeviceState->FrameStats.iNumShadersFullSetup++;
 
         // Yes shader for this texture
-        CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
+        SResolvedShaderState shaderState;
+        if (!TryResolveShaderState(pShaderItem, shaderState) || !shaderState.pEffect)
+        {
+            if (!bIsLayer)
+                return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+            return D3D_OK;
+        }
+
+        CShaderInstance* pShaderInstance = shaderState.pInstance;
+        CEffectWrap*     pEffectWrap = shaderState.pEffectWrap;
+        ID3DXEffect*     pD3DEffect = shaderState.pEffect;
 
         // Add normal stream if shader wants it
         CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton();
-        if (pShaderInstance->m_pEffectWrap->m_pEffectTemplate->m_bRequiresNormals && pAdditionalStreamManager)
+        if (pEffectWrap->m_pEffectTemplate->m_bRequiresNormals && pAdditionalStreamManager)
         {
             // Find/create/set additional vertex stream
             pAdditionalStreamManager->MaybeSetAdditionalVertexStream(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
@@ -660,26 +712,22 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         // Apply custom parameters
         pShaderInstance->ApplyShaderParameters();
         // Apply common parameters
-        pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
+        pEffectWrap->ApplyCommonHandles();
         // Apply mapped parameters
-        pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
+        pEffectWrap->ApplyMappedHandles();
 
         // Remember vertex shader if original draw was using it
         IDirect3DVertexShader9* pOriginalVertexShader = NULL;
         pDevice->GetVertexShader(&pOriginalVertexShader);
 
         // Do shader passes
-        ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
-        bool             bEffectDeviceTemporarilyLost = false;
-        bool             bEffectDeviceOperational = true;
-        if (pD3DEffect)
+        bool bEffectDeviceTemporarilyLost = false;
+        bool bEffectDeviceOperational = true;
+        IDirect3DDevice9* pEffectDevice = nullptr;
+        if (SUCCEEDED(pD3DEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
         {
-            IDirect3DDevice9* pEffectDevice = nullptr;
-            if (SUCCEEDED(pD3DEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
-            {
-                bEffectDeviceOperational = IsDeviceOperational(pEffectDevice, &bEffectDeviceTemporarilyLost);
-                SAFE_RELEASE(pEffectDevice);
-            }
+            bEffectDeviceOperational = IsDeviceOperational(pEffectDevice, &bEffectDeviceTemporarilyLost);
+            SAFE_RELEASE(pEffectDevice);
         }
 
         if (!bEffectDeviceOperational)
@@ -694,7 +742,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 
         DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint  uiNumPasses = 0;
-        HRESULT hrBegin = pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
+    HRESULT hrBegin = pEffectWrap->Begin(&uiNumPasses, dwFlags);
         if (FAILED(hrBegin) || uiNumPasses == 0)
         {
             if (FAILED(hrBegin) && hrBegin != D3DERR_DEVICELOST && hrBegin != D3DERR_DEVICENOTRESET)
@@ -735,6 +783,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
             {
                 // Make this the active shader for possible reuse
                 dassert(dwFlags == D3DXFX_DONOTSAVESHADERSTATE);
+                pShaderItem->AddRef();
                 g_pActiveShader = pShaderItem;
                 SAFE_RELEASE(pOriginalVertexShader);
                 return D3D_OK;
@@ -754,7 +803,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
                 bCompletedAnyPass = true;
         }
 
-        HRESULT hrEnd = pShaderInstance->m_pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
+    HRESULT hrEnd = pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
         if (FAILED(hrEnd) && hrEnd != D3DERR_DEVICELOST && hrEnd != D3DERR_DEVICENOTRESET)
             WriteDebugEvent(SString("DrawIndexedPrimitiveShader: End failed %08x", hrEnd));
 
@@ -787,10 +836,15 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 /////////////////////////////////////////////////////////////
 void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
 {
-    if (!g_pActiveShader)
+    CShaderItem* pShaderItem = g_pActiveShader;
+    g_pActiveShader = nullptr;
+    if (!pShaderItem)
         return;
 
-    ID3DXEffect* pD3DEffect = g_pActiveShader->m_pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+    SResolvedShaderState shaderState;
+    bool                 bHasShaderState = TryResolveShaderState(pShaderItem, shaderState);
+
+    ID3DXEffect* pD3DEffect = bHasShaderState ? shaderState.pEffect : nullptr;
     IDirect3DDevice9* pDevice = g_pGraphics ? g_pGraphics->GetDevice() : nullptr;
 
     bool bAllowDeviceWork = bDeviceOperational;
@@ -809,8 +863,8 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
     }
 
     // When the device is lost we intentionally skip touching the GPU beyond the required End call; the effect will be reset later.
-    g_pActiveShader->m_pShaderInstance->m_pEffectWrap->End(bAllowDeviceWork);
-    g_pActiveShader = nullptr;
+    if (bHasShaderState)
+        shaderState.pEffectWrap->End(bAllowDeviceWork);
 
     if (CAdditionalVertexStreamManager* pAdditionalStreamManager = CAdditionalVertexStreamManager::GetExistingSingleton())
         pAdditionalStreamManager->MaybeUnsetAdditionalVertexStream();
@@ -821,6 +875,8 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
         pDevice->SetVertexShader(nullptr);
         pDevice->SetPixelShader(nullptr);
     }
+
+    pShaderItem->Release();
 }
 
 /////////////////////////////////////////////////////////////
@@ -1925,7 +1981,10 @@ IDirect3DVertexBuffer9* CDirect3DEvents9::GetRealVertexBuffer(IDirect3DVertexBuf
 
         // If so, use the original vertex buffer
         if (pProxy)
+        {
             pStreamData = pProxy->GetOriginal();
+            SAFE_RELEASE(pProxy);
+        }
     }
 
     return pStreamData;
@@ -1948,7 +2007,10 @@ IDirect3DIndexBuffer9* CDirect3DEvents9::GetRealIndexBuffer(IDirect3DIndexBuffer
 
         // If so, use the original index buffer
         if (pProxy)
+        {
             pIndexData = pProxy->GetOriginal();
+            SAFE_RELEASE(pProxy);
+        }
     }
     return pIndexData;
 }
@@ -1970,7 +2032,10 @@ IDirect3DBaseTexture9* CDirect3DEvents9::GetRealTexture(IDirect3DBaseTexture9* p
 
         // If so, use the original texture
         if (pProxy)
+        {
             pTexture = pProxy->GetOriginal();
+            SAFE_RELEASE(pProxy);
+        }
     }
     return pTexture;
 }
@@ -2036,6 +2101,8 @@ HRESULT CDirect3DEvents9::SetVertexDeclaration(IDirect3DDevice9* pDevice, IDirec
             CProxyDirect3DDevice9::SD3DVertexDeclState* pInfo = MapFind(g_pProxyDevice->m_VertexDeclMap, pProxy);
             if (pInfo)
                 g_pDeviceState->VertexDeclState = *pInfo;
+
+            SAFE_RELEASE(pProxy);
         }
     }
 
@@ -2054,26 +2121,33 @@ ERenderFormat CDirect3DEvents9::DiscoverReadableDepthFormat(IDirect3DDevice9* pD
     IDirect3D9* pD3D = NULL;
     pDevice->GetDirect3D(&pD3D);
 
-    // Formats to check for
-    ERenderFormat checkList[] = {RFORMAT_INTZ, RFORMAT_DF24, RFORMAT_DF16, RFORMAT_RAWZ};
+    ERenderFormat discoveredFormat = RFORMAT_UNKNOWN;
 
-    D3DDISPLAYMODE displayMode;
-    if (pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode) == D3D_OK)
+    if (pD3D)
     {
-        for (uint i = 0; i < NUMELMS(checkList); i++)
+        // Formats to check for
+        ERenderFormat checkList[] = {RFORMAT_INTZ, RFORMAT_DF24, RFORMAT_DF16, RFORMAT_RAWZ};
+
+        D3DDISPLAYMODE displayMode;
+        if (pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode) == D3D_OK)
         {
-            D3DFORMAT DepthFormat = (D3DFORMAT)checkList[i];
+            for (uint i = 0; i < NUMELMS(checkList); i++)
+            {
+                D3DFORMAT DepthFormat = (D3DFORMAT)checkList[i];
 
-            // Can use this format?
-            if (D3D_OK != pD3D->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, displayMode.Format, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, DepthFormat))
-                continue;
+                // Can use this format?
+                if (D3D_OK != pD3D->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, displayMode.Format, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, DepthFormat))
+                    continue;
 
-            // Don't check for compatibility with multisampling, as we turn AA off when using readable depth buffer
+                // Don't check for compatibility with multisampling, as we turn AA off when using readable depth buffer
 
-            // Found a working format
-            return checkList[i];
+                // Found a working format
+                discoveredFormat = checkList[i];
+                break;
+            }
         }
     }
 
-    return RFORMAT_UNKNOWN;
+    SAFE_RELEASE(pD3D);
+    return discoveredFormat;
 }
