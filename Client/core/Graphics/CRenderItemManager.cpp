@@ -11,6 +11,7 @@
 #include <game/CGame.h>
 #include <game/CRenderWare.h>
 #include <game/CSettings.h>
+#include "DXHook/CProxyDirect3DDevice9.h"
 #include "CRenderItem.EffectCloner.h"
 
 extern std::atomic<bool> g_bInMTAScene;
@@ -1366,10 +1367,13 @@ void CRenderItemManager::SaveReadableDepthBuffer()
     if (bDeviceReady && !g_bInMTAScene.load(std::memory_order_acquire) &&
         !g_bInGTAScene.load(std::memory_order_acquire))
         {
-            const HRESULT hBeginScene = m_pDevice->BeginScene();
-            if (SUCCEEDED(hBeginScene))
+            if (!BeginSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
             {
-                m_pDevice->EndScene();
+                WriteDebugEvent("CRenderItemManager::SaveReadableDepthBuffer - BeginSceneWithoutProxy failed");
+            }
+            else if (!EndSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
+            {
+                WriteDebugEvent("CRenderItemManager::SaveReadableDepthBuffer - EndSceneWithoutProxy failed");
             }
         }
     }
