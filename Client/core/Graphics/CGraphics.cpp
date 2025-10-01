@@ -1837,6 +1837,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             const sDrawQueuePrimitiveMaterial primitive = Item.PrimitiveMaterial;
             CheckModes(EDrawMode::PRIMITIVE_MATERIAL, Item.blendMode);
             m_pPrimitiveMaterialBatcher->AddPrimitive(primitive.eType, primitive.pMaterial, primitive.pVecVertices);
+            RemoveQueueRef(primitive.pMaterial);
             break;
         }
     }
@@ -1873,9 +1874,25 @@ void CGraphics::ClearDrawQueue(std::vector<sDrawQueueItem>& Queue)
     {
         const sDrawQueueItem& item = *iter;
         if (item.eType == QUEUE_TEXTURE || item.eType == QUEUE_SHADER)
+        {
             RemoveQueueRef(item.Texture.pMaterial);
+        }
+        else if (item.eType == QUEUE_PRIMITIVEMATERIAL)
+        {
+            if (item.PrimitiveMaterial.pMaterial)
+                RemoveQueueRef(item.PrimitiveMaterial.pMaterial);
+            // Flush any queued geometry that never reached the batcher
+            delete item.PrimitiveMaterial.pVecVertices;
+        }
+        else if (item.eType == QUEUE_PRIMITIVE)
+        {
+            // Prevent per-primitive allocations from leaking when we clear the queue early
+            delete item.Primitive.pVecVertices;
+        }
         else if (item.eType == QUEUE_TEXT)
+        {
             RemoveQueueRef(item.Text.pDXFont);
+        }
     }
     Queue.clear();
 }
