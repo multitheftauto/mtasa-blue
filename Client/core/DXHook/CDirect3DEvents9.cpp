@@ -16,6 +16,7 @@
 #include "CProxyDirect3DVertexBuffer.h"
 #include "CProxyDirect3DIndexBuffer.h"
 #include "CProxyDirect3DTexture.h"
+#include "CProxyDirect3DDevice9.h"
 #include "CAdditionalVertexStreamManager.h"
 #include "CVertexStreamBoundingBoxManager.h"
 #include "CProxyDirect3DVertexDeclaration.h"
@@ -173,9 +174,9 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
 
         if (bInAnyScene)
         {
-            const HRESULT hrEndScene = pDevice->EndScene();
-            if (FAILED(hrEndScene))
-                WriteDebugEvent(SString("OnInvalidate: EndScene failed: %08x", hrEndScene));
+            const ESceneOwner owner = bInMTAScene ? ESceneOwner::MTA : (bInGTAScene ? ESceneOwner::GTA : ESceneOwner::None);
+            if (owner != ESceneOwner::None && !EndSceneWithoutProxy(pDevice, owner))
+                WriteDebugEvent("OnInvalidate: EndSceneWithoutProxy failed");
         }
     }
     else
@@ -222,15 +223,11 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
-    const HRESULT hrBeginScene = pDevice->BeginScene();
-    if (FAILED(hrBeginScene))
+    if (!BeginSceneWithoutProxy(pDevice, ESceneOwner::MTA))
     {
-        WriteDebugEvent(SString("OnPresent: BeginScene failed: %08x", hrBeginScene));
-    g_bInMTAScene.store(false, std::memory_order_release);
+        WriteDebugEvent("OnPresent: BeginSceneWithoutProxy failed");
         return;
     }
-
-    g_bInMTAScene.store(true, std::memory_order_release);
 
     // Reset samplers on first call
     static bool bDoneReset = false;
@@ -301,8 +298,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     // End the scene that we started.
     if (g_bInMTAScene.load(std::memory_order_acquire))
     {
-        pDevice->EndScene();
-    g_bInMTAScene.store(false, std::memory_order_release);
+        if (!EndSceneWithoutProxy(pDevice, ESceneOwner::MTA))
+            WriteDebugEvent("OnPresent: EndSceneWithoutProxy failed");
     }
 
     // Update incase settings changed
