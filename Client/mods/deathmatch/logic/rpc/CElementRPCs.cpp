@@ -96,7 +96,7 @@ void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface&
         CLuaArgument Argument;
         if (bitStream.ReadStringCharacters(strName, usNameLength) && Argument.ReadFromBitStream(bitStream))
         {
-            pSource->SetCustomData(strName, Argument);
+            pSource->SetCustomData(CStringName{strName}, Argument);
         }
     }
 }
@@ -114,7 +114,7 @@ void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterfa
         if (bitStream.ReadStringCharacters(strName, usNameLength) && bitStream.ReadBit(bRecursive))
         {
             // Remove that name
-            pSource->DeleteCustomData(strName);
+            pSource->DeleteCustomData(CStringName{strName});
         }
     }
 }
