@@ -963,6 +963,7 @@ bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UIN
     if (pPresentationParameters->BackBufferWidth == 0)
     {
         WriteDebugEvent(SString(" Passing through call #%d to CreateDevice because size is invalid", uiCreateCount));
+        hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
         return true;
     }
 
@@ -972,6 +973,7 @@ bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UIN
         SString strMessage(" Passing through call #%d to CreateDevice because not main thread", uiCreateCount);
         WriteDebugEvent(strMessage);
         AddReportLog(8627, strMessage);
+        hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
         return true;
     }
 
