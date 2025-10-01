@@ -566,13 +566,15 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         WriteDebugEvent("CProxyDirect3DDevice9::Reset - Invalid presentation parameters");
         return D3DERR_INVALIDCALL;
     }
-    
-    // Reset gamma state since display mode might change
+
+    // Preserve existing gamma snapshot so we can restore it if the reset fails.
+    SGammaState previousGammaState;
+    bool        gammaStateCleared = false;
     {
         std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
-        g_GammaState.bOriginalGammaStored = false;
-        g_GammaState.bLastWasBorderless = false;
-        ZeroMemory(&g_GammaState.originalGammaRamp, sizeof(g_GammaState.originalGammaRamp));
+        previousGammaState = g_GammaState;
+        g_GammaState = SGammaState();
+        gammaStateCleared = true;
     }
     WriteDebugEvent("Reset gamma state due to device reset");
     
@@ -686,9 +688,13 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         {
             WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to begin scene for driver sync");
         }
-        else if (!EndSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
+        else
         {
-            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to end scene for driver sync");
+            if (!EndSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
+            {
+                WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to end scene for driver sync");
+                g_bInMTAScene.store(false, std::memory_order_release);
+            }
         }
 
     WriteDebugEvent(SString("    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d", pPresentationParameters->BackBufferWidth,
@@ -716,6 +722,12 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     else
     {
         WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset failed with HRESULT: %08x", hResult));
+        if (gammaStateCleared)
+        {
+            std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
+            g_GammaState = previousGammaState;
+            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Restored prior gamma state after failed reset");
+        }
     }
 
     return hResult;
@@ -819,8 +831,8 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
 
         // Use lighter gamma correction to prevent darkening effect
         // and optimize brightness boost for better visibility
-        const float fGammaCorrection = 1.0f / 1.3f;
-        const float fBrightnessBoost = 1.4f;
+        const float fGammaCorrection = 0.4f;  // Equivalent to 1.0f / 1.3f
+        const float fBrightnessBoost = 0.7f;
 
         const auto convertNormalizedToGammaWord = [](float normalized) -> WORD {
             const float scaled = std::clamp(normalized * 65535.0f, 0.0f, 65535.0f);
@@ -1597,6 +1609,14 @@ bool EndSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner)
     if (FAILED(hr))
     {
         WriteDebugEvent(SString("EndSceneWithoutProxy failed: %08x", hr));
+        if (owner == ESceneOwner::GTA)
+        {
+            ResetGTASceneState();
+        }
+        else if (owner == ESceneOwner::MTA)
+        {
+            g_bInMTAScene.store(false, std::memory_order_release);
+        }
         return false;
     }
 
