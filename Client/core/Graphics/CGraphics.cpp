@@ -2144,12 +2144,49 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     if (m_LastLostDeviceTimer.Get() < 1000)
         return;
 
-    const bool bWasInScene = g_bInGTAScene.load(std::memory_order_acquire) ||
-                             g_bInMTAScene.load(std::memory_order_acquire);
-    bool       bInScene = bWasInScene;
+    const auto determineOwner = []() -> ESceneOwner {
+        if (g_bInMTAScene.load(std::memory_order_acquire))
+            return ESceneOwner::MTA;
+        if (g_bInGTAScene.load(std::memory_order_acquire))
+            return ESceneOwner::GTA;
+        return ESceneOwner::None;
+    };
 
-    // Skip of not in a scene and not forced with always flag
-    if (!bInScene && !g_pCore->GetDummyProgressUpdateAlways())
+    const ESceneOwner originalOwner = determineOwner();
+    ESceneOwner       currentOwner = originalOwner;
+
+    auto inScene = [&]() { return currentOwner != ESceneOwner::None; };
+
+    auto endCurrentScene = [&](const char* context) -> bool {
+        if (!inScene())
+            return true;
+        if (!EndSceneWithoutProxy(m_pDevice, currentOwner))
+        {
+            SString msg;
+            msg.Format("%s: EndSceneWithoutProxy failed for owner %d", context, static_cast<int>(currentOwner));
+            WriteDebugEvent(msg);
+            return false;
+        }
+        currentOwner = ESceneOwner::None;
+        return true;
+    };
+
+    auto beginSceneAs = [&](ESceneOwner owner, const char* context) -> bool {
+        if (owner == ESceneOwner::None)
+            return true;
+        if (!BeginSceneWithoutProxy(m_pDevice, owner))
+        {
+            SString msg;
+            msg.Format("%s: BeginSceneWithoutProxy failed for owner %d", context, static_cast<int>(owner));
+            WriteDebugEvent(msg);
+            return false;
+        }
+        currentOwner = owner;
+        return true;
+    };
+
+    // Skip if not in a scene and not forced with always flag
+    if (!inScene() && !g_pCore->GetDummyProgressUpdateAlways())
         return;
 
     // Check if disabled
@@ -2177,10 +2214,10 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     {
         if (bPreserveBackbuffer)
         {
-            if (bInScene)
+            if (inScene())
             {
-                m_pDevice->EndScene();
-                bInScene = false;
+                if (!endCurrentScene("CGraphics::DrawProgressMessage (preserve setup)"))
+                    break;
             }
 
             // Get backbuffer surface
@@ -2237,10 +2274,10 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
                 break;
         }
 
-        if (!bInScene)
+        if (!inScene())
         {
-            m_pDevice->BeginScene();
-            bInScene = true;
+            if (!beginSceneAs(ESceneOwner::MTA, "CGraphics::DrawProgressMessage (draw setup)"))
+                break;
         }
 
         // Draw progress graphics on backbuffer surface
@@ -2281,8 +2318,11 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
 
         if (bPreserveBackbuffer)
         {
-            m_pDevice->EndScene();
-            bInScene = false;
+            if (inScene())
+            {
+                if (!endCurrentScene("CGraphics::DrawProgressMessage (pre-present)"))
+                    break;
+            }
 
             // Flip backbuffer onto front buffer
             SAFE_RELEASE(pD3DBackBufferSurface);
@@ -2296,8 +2336,8 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
                 break;
             hr = m_pDevice->StretchRect(m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT);
 
-            m_pDevice->BeginScene();
-            bInScene = true;
+            if (!beginSceneAs(ESceneOwner::MTA, "CGraphics::DrawProgressMessage (post-present)"))
+                break;
         }
     } while (false);
 
@@ -2305,14 +2345,15 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     SAFE_RELEASE(pTempFrontBufferData);
     SAFE_RELEASE(pD3DBackBufferSurface);
 
-    // Ensure scene status is restored
-    if (bInScene != bWasInScene)
+    // Ensure scene status is restored to its original owner
+    if (currentOwner != originalOwner)
     {
-        if (bWasInScene)
-            m_pDevice->BeginScene();
-        else
-            m_pDevice->EndScene();
-        bInScene = bWasInScene;
+        bool restorePossible = true;
+        if (currentOwner != ESceneOwner::None)
+            restorePossible = endCurrentScene("CGraphics::DrawProgressMessage (restore current)");
+
+        if (restorePossible && originalOwner != ESceneOwner::None && currentOwner != originalOwner)
+            beginSceneAs(originalOwner, "CGraphics::DrawProgressMessage (restore original)");
     }
 
     //
