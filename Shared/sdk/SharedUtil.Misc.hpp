@@ -11,14 +11,34 @@
 
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Time.h"
+#include <cstdint>
+#include <limits>
 #include <map>
+
+#if defined(_WIN32) || defined(WIN32)
+    #define SHAREDUTIL_PLATFORM_WINDOWS 1
+#endif
+
+#if defined(__linux__) || defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    #include <fstream>
+    #include <string>
+    #include <sstream>
+    #include <cerrno>
+    #include <cstdlib>
+#endif
+
+#if defined(__APPLE__) || defined(APPLE_x64) || defined(APPLE_arm64)
+    #include <mach/mach.h>
+    #include <mach/mach_vm.h>
+#endif
+
 #include "UTF8.h"
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
 #include "version.h"
-#ifdef WIN32
-    #include <ctime>
+#if defined(SHAREDUTIL_PLATFORM_WINDOWS)
     #include <windows.h>
+    #include <ctime>
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
@@ -165,6 +185,121 @@ bool SharedUtil::IsGTAProcess()
 {
     SString strLaunchPathFilename = GetLaunchPathFilename();
     return strLaunchPathFilename.EndsWithI("gta_sa.exe");
+}
+
+bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
+{
+    // Guard against null or overflow before touching platform APIs
+    if (!ptr || size == 0) return false;
+
+    const uintptr_t start = reinterpret_cast<uintptr_t>(ptr);
+    constexpr uintptr_t maxAddress = std::numeric_limits<uintptr_t>::max();
+    if (size > maxAddress - start) return false;
+
+    const uintptr_t end = start + size;
+
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
+    constexpr DWORD readableMask = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+    for (uintptr_t current = start; current < end;)
+    {
+        MEMORY_BASIC_INFORMATION mbi{};
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0) return false;
+
+        const uintptr_t regionStart = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+        const uintptr_t regionSize = static_cast<uintptr_t>(mbi.RegionSize);
+        const uintptr_t regionEnd = regionStart + regionSize;
+        const DWORD protection = mbi.Protect;
+        if (regionSize == 0 || current < regionStart || regionStart > maxAddress - regionSize || regionEnd <= current || mbi.State != MEM_COMMIT ||
+            (protection & PAGE_GUARD) || (protection & readableMask) == 0)
+            return false;
+
+        current = regionEnd;
+    }
+
+    return true;
+#elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long), "Unexpected uintptr_t size");
+
+    std::ifstream maps("/proc/self/maps");
+    if (!maps.is_open())
+        return false;
+
+    const auto parseAddress = [maxAddress](const std::string& token, uintptr_t& out) -> bool {
+        errno = 0;
+        char* endPtr = nullptr;
+        unsigned long long value = std::strtoull(token.c_str(), &endPtr, 16);
+        if (errno != 0 || endPtr == token.c_str() || *endPtr != '\0' || value > maxAddress)
+            return false;
+        out = static_cast<uintptr_t>(value);
+        return true;
+    };
+
+    uintptr_t coverage = start;
+    bool coveringRange = false;
+    for (std::string line; std::getline(maps, line);)
+    {
+        if (line.empty()) continue;
+        std::istringstream iss(line);
+        std::string range, perms;
+        if (!(iss >> range >> perms)) continue;
+        const size_t dashPos = range.find('-');
+        if (dashPos == std::string::npos) continue;
+    uintptr_t regionStart = 0;
+    uintptr_t regionEnd = 0;
+    if (!parseAddress(range.substr(0, dashPos), regionStart) || !parseAddress(range.substr(dashPos + 1), regionEnd)) continue;
+        if (regionEnd <= regionStart || regionEnd <= coverage) continue;
+        if (coveringRange)
+        {
+            if (regionStart > coverage) return false;
+        }
+        else if (regionStart > coverage || coverage >= regionEnd)
+        {
+            continue;
+        }
+        else coveringRange = true;
+
+        if (perms.empty() || perms[0] != 'r') return false;
+        coverage = regionEnd;
+        if (coverage >= end) return true;
+    }
+
+    return false;
+#elif defined(APPLE_x64) || defined(APPLE_arm64)
+    mach_vm_address_t queryAddress = static_cast<mach_vm_address_t>(start);
+    const mach_vm_address_t targetEnd = static_cast<mach_vm_address_t>(end);
+    constexpr mach_vm_address_t maxAddressMac = std::numeric_limits<mach_vm_address_t>::max();
+    vm_region_basic_info_data_64_t info;
+    mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+    mach_port_t objectName = MACH_PORT_NULL;
+
+    while (queryAddress < targetEnd)
+    {
+        mach_vm_size_t regionSize = 0;
+        infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+        mach_vm_address_t regionAddress = queryAddress;
+        kern_return_t kr = mach_vm_region(mach_task_self(), &regionAddress, &regionSize, VM_REGION_BASIC_INFO_64,
+                                          reinterpret_cast<vm_region_info_t>(&info), &infoCount, &objectName);
+        if (objectName != MACH_PORT_NULL)
+        {
+            mach_port_deallocate(mach_task_self(), objectName);
+            objectName = MACH_PORT_NULL;
+        }
+
+        if (kr != KERN_SUCCESS || regionSize == 0 || queryAddress < regionAddress || (info.protection & VM_PROT_READ) == 0 ||
+            regionAddress > maxAddressMac - static_cast<mach_vm_address_t>(regionSize))
+            return false;
+
+        const mach_vm_address_t regionEnd = regionAddress + static_cast<mach_vm_address_t>(regionSize);
+        if (regionEnd <= queryAddress)
+            return false;
+
+        queryAddress = regionEnd;
+    }
+
+    return true;
+#else
+    return false;
+#endif
 }
 
 //
@@ -1067,7 +1202,7 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 
 #endif  // MTA_CLIENT
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 #define _WIN32_WINNT_WIN8                   0x0602
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1110,7 +1245,7 @@ bool SharedUtil::IsWindows8OrGreater()
 {
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
 }
-#endif  // WIN32
+#endif  // SHAREDUTIL_PLATFORM_WINDOWS
 
 static uchar ToHexChar(uchar c)
 {
@@ -1171,7 +1306,7 @@ SString SharedUtil::EscapeURLArgument(const SString& strArg)
 //
 // Cross platform critical section
 //
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 
 SharedUtil::CCriticalSection::CCriticalSection()
 {
@@ -1232,7 +1367,7 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformationClass, PVOID ThreadInformation, ULONG ThreadInformationLength,
                                          PULONG ReturnLength)
 {
@@ -1358,7 +1493,7 @@ DWORD SharedUtil::GetMainThreadId()
 //
 bool SharedUtil::IsMainThread()
 {
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     DWORD mainThreadID = GetMainThreadId();
     DWORD currentThreadID = GetCurrentThreadId();
     return mainThreadID == currentThreadID;
@@ -1371,7 +1506,7 @@ bool SharedUtil::IsMainThread()
 //
 // Expiry stuff
 //
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     #include <time.h>
 
 int SharedUtil::GetBuildAge()
@@ -1517,6 +1652,7 @@ char* SharedUtil::Trim(char* szText)
     return static_cast<char*>(memmove(szOriginal, szText, uiLen + 1));
 }
 
+
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
 std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)
 {
@@ -1637,7 +1773,7 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
     char    cPathSep;
 
     // Handle which path sep char
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     if (!bConvertToUnixPathSep)
     {
         cPathSep = '\\';
@@ -1820,7 +1956,7 @@ namespace SharedUtil
             outList.push_back(iter->first);
     }
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     ///////////////////////////////////////////////////////////////////////////
     //
     // GetCurrentProcessorNumberXP for the current thread, especially for Windows XP
@@ -1856,7 +1992,7 @@ namespace SharedUtil
     ///////////////////////////////////////////////////////////////////////////
     DWORD _GetCurrentProcessorNumber()
     {
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
         using GetCurrentProcessorNumber_t = DWORD(WINAPI*)();
 
@@ -1919,7 +2055,7 @@ namespace SharedUtil
     {
         outUserTime = 0;
         outKernelTime = 0;
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
         FILETIME CreationTime, ExitTime, KernelTime, UserTime;
         if (GetThreadTimes(GetCurrentThread(), &CreationTime, &ExitTime, &KernelTime, &UserTime))
         {

@@ -87,6 +87,9 @@ namespace SharedUtil
     // Returns true if current process is GTA (i.e not MTA process)
     bool IsGTAProcess();
 
+    // Returns true if the pointer points to committed, readable memory
+    bool IsReadablePointer(const void* ptr, size_t size);
+
     //
     // Run ShellExecute with these parameters after exit
     //
