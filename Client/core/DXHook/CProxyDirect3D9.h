@@ -48,5 +48,6 @@ public:
     static IDirect3D9* StaticGetDirect3D();
 
 private:
-    IDirect3D9* m_pDevice;
+    IDirect3D9*  m_pDevice;
+    volatile LONG m_lRefCount;
 };

@@ -1789,7 +1789,7 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
                 key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::SetElementData(*pEntity, key.ToCString(), value, bSynchronize))
+            if (CStaticFunctionDefinitions::SetElementData(*pEntity, key, value, bSynchronize))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1828,7 +1828,7 @@ int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
                 key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, key.ToCString()))
+            if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, key))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;

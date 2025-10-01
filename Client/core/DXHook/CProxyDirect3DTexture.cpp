@@ -63,6 +63,7 @@ HRESULT CProxyDirect3DTexture::QueryInterface(REFIID riid, void** ppvObj)
     if (riid == CProxyDirect3DTexture_GUID)
     {
         *ppvObj = this;
+        AddRef();
         return S_OK;
     }
 

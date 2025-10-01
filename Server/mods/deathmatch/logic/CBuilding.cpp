@@ -21,7 +21,7 @@ CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CE
 {
     // Init
     m_iType = CElement::BUILDING;
-    SetTypeName("buidling");
+    SetTypeName("building");
 
     m_pBuildingManager = pBuildingManager;
     m_model = 0xFFFF;
@@ -38,7 +38,7 @@ CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLo
 {
     // Init
     m_iType = CElement::BUILDING;
-    SetTypeName("buidling");
+    SetTypeName("building");
 
     m_pBuildingManager = Copy.m_pBuildingManager;
     m_model = Copy.m_model;

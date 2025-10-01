@@ -242,6 +242,7 @@ bool CScreenGrabber::GetBackBufferPixels(uint uiSizeX, uint uiSizeY, CBuffer& bu
     if (!m_pScreenShotTemp)
     {
         strOutError = "No ScreenShotTemp";
+        SAFE_RELEASE(pD3DBackBufferSurface);
         return false;
     }
 
@@ -251,6 +252,7 @@ bool CScreenGrabber::GetBackBufferPixels(uint uiSizeX, uint uiSizeY, CBuffer& bu
     if (FAILED(hr))
     {
         strOutError = SString("StretchRect failed (0x%08x)", hr);
+        SAFE_RELEASE(pD3DBackBufferSurface);
         return false;
     }
 
@@ -260,6 +262,7 @@ bool CScreenGrabber::GetBackBufferPixels(uint uiSizeX, uint uiSizeY, CBuffer& bu
     if (!m_pScreenShotTemp->ReadPixels(buffer, strOutError))
     {
         dassert(!strOutError.empty());
+        SAFE_RELEASE(pD3DBackBufferSurface);
         return false;
     }
 

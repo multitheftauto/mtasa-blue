@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CSettings.h>
+#include "DXHook/CProxyDirect3DDevice9.h"
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
@@ -20,8 +21,8 @@
 #include "CMaterialPrimitive3DBatcher.h"
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
-extern bool   g_bInGTAScene;
-extern bool   g_bInMTAScene;
+extern std::atomic<bool>   g_bInGTAScene;
+extern std::atomic<bool>   g_bInMTAScene;
 
 using namespace std;
 
@@ -2005,7 +2006,6 @@ void CGraphics::SaveGTARenderStates()
     // Prevent GPU driver hang by checking device state before creating state blocks
     if (m_pDevice->TestCooperativeLevel() != D3D_OK)
     {
-        WriteDebugEvent("CGraphics::SaveGTARenderStates - Device not cooperative, skipping state block creation");
         return;
     }
 
@@ -2041,7 +2041,6 @@ void CGraphics::RestoreGTARenderStates()
     // Check device state before attempting to restore
     if (m_pDevice->TestCooperativeLevel() != D3D_OK)
     {
-        WriteDebugEvent("CGraphics::RestoreGTARenderStates - Device not cooperative, skipping state restoration");
         SAFE_RELEASE(m_pSavedStateBlock);
         return;
     }
@@ -2145,7 +2144,8 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     if (m_LastLostDeviceTimer.Get() < 1000)
         return;
 
-    const bool bWasInScene = g_bInGTAScene || g_bInMTAScene;
+    const bool bWasInScene = g_bInGTAScene.load(std::memory_order_acquire) ||
+                             g_bInMTAScene.load(std::memory_order_acquire);
     bool       bInScene = bWasInScene;
 
     // Skip of not in a scene and not forced with always flag

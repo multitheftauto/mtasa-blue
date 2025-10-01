@@ -59,6 +59,8 @@ CVertexStreamBoundingBoxManager::CVertexStreamBoundingBoxManager()
 ///////////////////////////////////////////////////////////////
 CVertexStreamBoundingBoxManager::~CVertexStreamBoundingBoxManager()
 {
+    m_StreamBoundsInfoMap.clear();
+    m_pDevice = NULL;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -73,6 +75,20 @@ CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::GetSingleton()
     if (!ms_Singleton)
         ms_Singleton = new CVertexStreamBoundingBoxManager();
     return ms_Singleton;
+}
+
+CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::GetExistingSingleton()
+{
+    return ms_Singleton;
+}
+
+void CVertexStreamBoundingBoxManager::DestroySingleton()
+{
+    if (ms_Singleton)
+    {
+        delete ms_Singleton;
+        ms_Singleton = NULL;
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -97,6 +113,9 @@ void CVertexStreamBoundingBoxManager::OnDeviceCreate(IDirect3DDevice9* pDevice)
 float CVertexStreamBoundingBoxManager::GetDistanceSqToGeometry(D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices,
                                                                UINT startIndex, UINT primCount)
 {
+    if (!m_pDevice)
+        return 0.f;
+
     // Cache info
     SCurrentStateInfo2 state;
 
@@ -203,12 +222,31 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox(SCurrentSta
 
     const uint StridePT = state.stream.Stride;
 
+    if (StridePT == 0)
+        return false;
+
     uint NumVerts = ReadSize / StridePT;
 
+    if (NumVerts == 0)
+        return false;
+
+    if ((ReadSize % StridePT) != 0)
+        return false;
+
     // Adjust for the offset in the stream
+    if (ReadSize < state.stream.elementOffset)
+        return false;
+
     ReadOffsetStart += state.stream.elementOffset;
     ReadSize -= state.stream.elementOffset;
-    if (ReadSize < 1)
+    if (ReadSize == 0)
+        return false;
+
+    const UINT bufferSize = state.decl.VertexBufferDesc.Size;
+    if (ReadOffsetStart > bufferSize)
+        return false;
+
+    if (ReadSize > bufferSize - ReadOffsetStart)
         return false;
 
     // Get the source vertex bytes
@@ -226,12 +264,20 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox(SCurrentSta
     // Compute bounds
     {
         // Get index data
-        if (FAILED(m_pDevice->GetIndices(&state.pIndexData)))
+        if (FAILED(m_pDevice->GetIndices(&state.pIndexData)) || !state.pIndexData)
             return false;
 
         // Get index buffer desc
         D3DINDEXBUFFER_DESC IndexBufferDesc;
         state.pIndexData->GetDesc(&IndexBufferDesc);
+
+        uint indexStride = 0;
+        if (IndexBufferDesc.Format == D3DFMT_INDEX16)
+            indexStride = sizeof(WORD);
+        else if (IndexBufferDesc.Format == D3DFMT_INDEX32)
+            indexStride = sizeof(DWORD);
+        else
+            return false;
 
         uint numIndices = state.args.primCount + 2;
         uint step = 1;
@@ -240,17 +286,35 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox(SCurrentSta
             numIndices = state.args.primCount * 3;
             step = 3;
         }
-        assert(IndexBufferDesc.Size >= (numIndices + state.args.startIndex) * 2);
 
-        // Get index buffer data
-        std::vector<uchar> indexArray;
-        indexArray.resize(numIndices * 2);
-        uchar* pIndexArrayBytes = &indexArray[0];
+        size_t startByte = static_cast<size_t>(state.args.startIndex) * indexStride;
+        size_t requiredBytes = static_cast<size_t>(numIndices) * indexStride;
+        if (startByte > IndexBufferDesc.Size)
+            return false;
+
+        if (requiredBytes > IndexBufferDesc.Size - startByte)
+            return false;
+
+        std::vector<uint32_t> indices(numIndices);
         {
             void* pIndexBytes = NULL;
-            if (FAILED(state.pIndexData->Lock(state.args.startIndex * 2, numIndices * 2, &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
+            if (FAILED(state.pIndexData->Lock(static_cast<UINT>(startByte), static_cast<UINT>(requiredBytes), &pIndexBytes,
+                                              D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
                 return false;
-            memcpy(pIndexArrayBytes, pIndexBytes, numIndices * 2);
+
+            if (indexStride == sizeof(WORD))
+            {
+                const WORD* pSrc = static_cast<const WORD*>(pIndexBytes);
+                for (uint i = 0; i < numIndices; ++i)
+                    indices[i] = pSrc[i];
+            }
+            else
+            {
+                const DWORD* pSrc = static_cast<const DWORD*>(pIndexBytes);
+                for (uint i = 0; i < numIndices; ++i)
+                    indices[i] = pSrc[i];
+            }
+
             state.pIndexData->Unlock();
         }
 
@@ -263,9 +327,9 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox(SCurrentSta
         for (uint i = 0; i < numIndices - 2; i += step)
         {
             // Get triangle vertex indici
-            WORD v0 = ((WORD*)pIndexArrayBytes)[i];
-            WORD v1 = ((WORD*)pIndexArrayBytes)[i + 1];
-            WORD v2 = ((WORD*)pIndexArrayBytes)[i + 2];
+            uint32_t v0 = indices[i];
+            uint32_t v1 = indices[i + 1];
+            uint32_t v2 = indices[i + 2];
 
             if (v0 >= NumVerts || v1 >= NumVerts || v2 >= NumVerts)
                 continue;            // vert index out of range
@@ -314,6 +378,9 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox(SCurrentSta
 /////////////////////////////////////////////////////////////
 bool CVertexStreamBoundingBoxManager::CheckCanDoThis(SCurrentStateInfo2& state)
 {
+    if (!m_pDevice)
+        return false;
+
     // Only tri-lists and tri-strips
     if (state.args.PrimitiveType != D3DPT_TRIANGLESTRIP && state.args.PrimitiveType != D3DPT_TRIANGLELIST)
         return false;

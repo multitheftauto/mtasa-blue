@@ -95,7 +95,7 @@ class CEffectParameters : public CRenderItem
     bool                        ApplyCommonHandles();
     bool                        ApplyMappedHandles();
     HRESULT                     Begin(UINT* pPasses, DWORD Flags, bool bWorldRender = true);
-    HRESULT                     End();
+    HRESULT                     End(bool bDeviceOperational = true);
     void                        NotifyModifiedParameter(D3DXHANDLE hParameter);
     const std::set<D3DXHANDLE>& GetModifiedParameters();
     void                        RestoreParametersDefaultValue(const std::vector<D3DXHANDLE>& parameterList);
