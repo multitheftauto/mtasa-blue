@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CSettings.h>
+#include <memory>
 #include "DXHook/CProxyDirect3DDevice9.h"
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
@@ -52,36 +53,82 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_ActiveBlendMode = EBlendMode::BLEND;
     m_CurDrawMode = EDrawMode::NONE;
     m_CurBlendMode = EBlendMode::BLEND;
+        std::unique_ptr<CRenderItemManager>         renderItemManager(new CRenderItemManager());
+        std::unique_ptr<CTileBatcher>               tileBatcher(new CTileBatcher());
+        std::unique_ptr<CLine3DBatcher>             line3DPreGUI(new CLine3DBatcher(true));
+        std::unique_ptr<CLine3DBatcher>             line3DPostFX(new CLine3DBatcher(true));
+        std::unique_ptr<CLine3DBatcher>             line3DPostGUI(new CLine3DBatcher(false));
+        std::unique_ptr<CMaterialLine3DBatcher>     materialLinePreGUI(new CMaterialLine3DBatcher(true));
+        std::unique_ptr<CMaterialLine3DBatcher>     materialLinePostFX(new CMaterialLine3DBatcher(true));
+        std::unique_ptr<CMaterialLine3DBatcher>     materialLinePostGUI(new CMaterialLine3DBatcher(false));
+        std::unique_ptr<CPrimitive3DBatcher>        primitive3DPreGUI(new CPrimitive3DBatcher(true));
+        std::unique_ptr<CPrimitive3DBatcher>        primitive3DPostFX(new CPrimitive3DBatcher(true));
+        std::unique_ptr<CPrimitive3DBatcher>        primitive3DPostGUI(new CPrimitive3DBatcher(false));
+        std::unique_ptr<CMaterialPrimitive3DBatcher> materialPrimitivePreGUI(new CMaterialPrimitive3DBatcher(true, this));
+        std::unique_ptr<CMaterialPrimitive3DBatcher> materialPrimitivePostFX(new CMaterialPrimitive3DBatcher(true, this));
+        std::unique_ptr<CMaterialPrimitive3DBatcher> materialPrimitivePostGUI(new CMaterialPrimitive3DBatcher(false, this));
+        std::unique_ptr<CPrimitiveBatcher>          primitiveBatcher(new CPrimitiveBatcher());
+        std::unique_ptr<CPrimitiveMaterialBatcher>  primitiveMaterialBatcher(new CPrimitiveMaterialBatcher(this));
+        std::unique_ptr<CScreenGrabberInterface>    screenGrabber(NewScreenGrabber());
+        std::unique_ptr<CPixelsManagerInterface>    pixelsManager(NewPixelsManager());
+        std::unique_ptr<CAspectRatioConverter>      aspectRatioConverter(new CAspectRatioConverter());
 
-    m_pRenderItemManager = new CRenderItemManager();
-    m_pTileBatcher = new CTileBatcher();
-    m_pLine3DBatcherPreGUI = new CLine3DBatcher(true);
-    m_pLine3DBatcherPostFX = new CLine3DBatcher(true);
-    m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
-    m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
-    m_pMaterialLine3DBatcherPostFX = new CMaterialLine3DBatcher(true);
-    m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
-    m_pPrimitive3DBatcherPreGUI = new CPrimitive3DBatcher(true);
-    m_pPrimitive3DBatcherPostFX = new CPrimitive3DBatcher(true);
-    m_pPrimitive3DBatcherPostGUI = new CPrimitive3DBatcher(false);
-    m_pMaterialPrimitive3DBatcherPreGUI = new CMaterialPrimitive3DBatcher(true, this);
-    m_pMaterialPrimitive3DBatcherPostFX = new CMaterialPrimitive3DBatcher(true, this);
-    m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
-    m_pPrimitiveBatcher = new CPrimitiveBatcher();
-    m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
-
-    m_pScreenGrabber = NewScreenGrabber();
-    m_pPixelsManager = NewPixelsManager();
-    m_LastLostDeviceTimer.SetMaxIncrement(250);
-    m_pAspectRatioConverter = new CAspectRatioConverter();
+        m_pRenderItemManager = renderItemManager.release();
+        m_pTileBatcher = tileBatcher.release();
+        m_pLine3DBatcherPreGUI = line3DPreGUI.release();
+        m_pLine3DBatcherPostFX = line3DPostFX.release();
+        m_pLine3DBatcherPostGUI = line3DPostGUI.release();
+        m_pMaterialLine3DBatcherPreGUI = materialLinePreGUI.release();
+        m_pMaterialLine3DBatcherPostFX = materialLinePostFX.release();
+        m_pMaterialLine3DBatcherPostGUI = materialLinePostGUI.release();
+        m_pPrimitive3DBatcherPreGUI = primitive3DPreGUI.release();
+        m_pPrimitive3DBatcherPostFX = primitive3DPostFX.release();
+        m_pPrimitive3DBatcherPostGUI = primitive3DPostGUI.release();
+        m_pMaterialPrimitive3DBatcherPreGUI = materialPrimitivePreGUI.release();
+        m_pMaterialPrimitive3DBatcherPostFX = materialPrimitivePostFX.release();
+        m_pMaterialPrimitive3DBatcherPostGUI = materialPrimitivePostGUI.release();
+        m_pPrimitiveBatcher = primitiveBatcher.release();
+        m_pPrimitiveMaterialBatcher = primitiveMaterialBatcher.release();
+        m_pScreenGrabber = screenGrabber.release();
+        m_pPixelsManager = pixelsManager.release();
+        m_pAspectRatioConverter = aspectRatioConverter.release();
 }
 
 CGraphics::~CGraphics()
 {
     if (m_pLineInterface)
+    {
         m_pLineInterface->Release();
+        m_pLineInterface = nullptr;
+    }
+
+    // Ensure queued draw items release their allocations before we tear down batchers
+    ClearDrawQueue(m_PreGUIQueue);
+    ClearDrawQueue(m_PostGUIQueue);
+
+    if (m_pPrimitiveBatcher)
+        m_pPrimitiveBatcher->ClearQueue();
+    if (m_pPrimitiveMaterialBatcher)
+        m_pPrimitiveMaterialBatcher->ClearQueue();
+    if (m_pPrimitive3DBatcherPreGUI)
+        m_pPrimitive3DBatcherPreGUI->ClearQueue();
+    if (m_pPrimitive3DBatcherPostFX)
+        m_pPrimitive3DBatcherPostFX->ClearQueue();
+    if (m_pPrimitive3DBatcherPostGUI)
+        m_pPrimitive3DBatcherPostGUI->ClearQueue();
+    if (m_pMaterialPrimitive3DBatcherPreGUI)
+        m_pMaterialPrimitive3DBatcherPreGUI->ClearQueue();
+    if (m_pMaterialPrimitive3DBatcherPostFX)
+        m_pMaterialPrimitive3DBatcherPostFX->ClearQueue();
+    if (m_pMaterialPrimitive3DBatcherPostGUI)
+        m_pMaterialPrimitive3DBatcherPostGUI->ClearQueue();
 
     DestroyStandardDXFonts();
+
+    SAFE_RELEASE(m_pDXSprite);
+    SAFE_RELEASE(m_pSavedStateBlock);
+    SAFE_RELEASE(m_pSavedFrontBufferData);
+    SAFE_RELEASE(m_pTempBackBufferData);
 
     SAFE_RELEASE(m_ProgressSpinnerTexture);
     SAFE_RELEASE(m_RectangleEdgeTexture);
@@ -1435,13 +1482,13 @@ bool CGraphics::CreateStandardDXFontWithCustomScale(eFontType fontType, float fS
 bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality,
                                      ID3DXFont** ppD3DXFont)
 {
-    int iLoaded = AddFontResourceEx(strFontPath.c_str(), FR_PRIVATE, 0);
+    int  iLoaded = AddFontResourceEx(strFontPath.c_str(), FR_PRIVATE, 0);
+    bool bFontResourceAdded = (iLoaded > 0);
 
     int iWeight = bBold ? FW_BOLD : FW_NORMAL;
     *ppD3DXFont = NULL;
 
     bool bSuccess = true;
-    // Normal size
     if (!SUCCEEDED(D3DXCreateFont(m_pDevice, uiHeight, 0, iWeight, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ulQuality, DEFAULT_PITCH | FF_DONTCARE,
                                   strFontName.c_str(), ppD3DXFont)))
     {
@@ -1449,7 +1496,18 @@ bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFon
         bSuccess = false;
     }
 
-    return bSuccess && (iLoaded == 1);
+    if (!bSuccess && bFontResourceAdded)
+    {
+        RemoveFontResourceEx(strFontPath.c_str(), FR_PRIVATE, 0);
+    }
+
+    if (!bFontResourceAdded)
+    {
+        SAFE_RELEASE(*ppD3DXFont);
+        return false;
+    }
+
+    return bSuccess;
 }
 
 bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont)
