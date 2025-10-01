@@ -2885,7 +2885,7 @@ retry:
                         CLuaArgument Argument;
                         Argument.ReadFromBitStream(bitStream);
 
-                        pCustomData->Set(strName, Argument);
+                        pCustomData->Set(CStringName{strName}, Argument);
                     }
                     else
                     {
@@ -3027,8 +3027,7 @@ retry:
                             return;
                         }
 
-                        if (bitStream.ReadBit())
-                            pObject->SetDoubleSided(true);
+                        pObject->SetDoubleSided(bitStream.ReadBit());
 
                         pObject->SetBreakable(bitStream.ReadBit());
 

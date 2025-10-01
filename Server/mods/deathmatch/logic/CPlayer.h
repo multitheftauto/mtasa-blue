@@ -23,6 +23,7 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 #include "packets/CPlayerStatsPacket.h"
+#include "CStringName.h"
 class CKeyBinds;
 class CPlayerCamera;
 enum class eVehicleAimDirection : unsigned char;
@@ -104,10 +105,10 @@ public:
     bool IsJoined() { return m_bIsJoined; }
     void SetJoined() { m_bIsJoined = true; }
 
-    bool SubscribeElementData(CElement* pElement, const std::string& strName);
-    bool UnsubscribeElementData(CElement* pElement, const std::string& strName);
+    bool SubscribeElementData(CElement* pElement, CStringName name);
+    bool UnsubscribeElementData(CElement* pElement, CStringName name);
     bool UnsubscribeElementData(CElement* pElement);
-    bool IsSubscribed(CElement* pElement, const std::string& strName) const;
+    bool IsSubscribed(CElement* pElement, CStringName name) const;
 
     float GetCameraRotation() { return m_fCameraRotation; };
     void  SetCameraRotation(float fRotation) { m_fCameraRotation = fRotation; };
@@ -432,7 +433,7 @@ private:
 
     std::map<std::string, std::string> m_AnnounceValues;
 
-    std::set<std::pair<CElement*, std::string>> m_DataSubscriptions;
+    std::set<std::pair<CElement*, CStringName>> m_DataSubscriptions;
 
     uint m_uiWeaponIncorrectCount;
 
