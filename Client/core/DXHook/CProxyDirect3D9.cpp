@@ -936,6 +936,30 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     if (!UsingAltD3DSetup())
         return D3D_OK;
 
+    if (!ppReturnedDeviceInterface)
+    {
+        AddReportLog(8744, SString("CCore::OnPostCreateDevice - missing ppReturnedDeviceInterface pointer"));
+        return hResult;
+    }
+
+    if (!SharedUtil::IsReadablePointer(ppReturnedDeviceInterface, sizeof(*ppReturnedDeviceInterface)))
+    {
+        AddReportLog(8745, SString("CCore::OnPostCreateDevice - invalid ppReturnedDeviceInterface pointer %p", ppReturnedDeviceInterface));
+        return hResult;
+    }
+
+    if (!*ppReturnedDeviceInterface)
+    {
+        AddReportLog(8746, SString("CCore::OnPostCreateDevice - ppReturnedDeviceInterface dereferenced to nullptr"));
+        return hResult;
+    }
+
+    if (!SharedUtil::IsReadablePointer(*ppReturnedDeviceInterface, sizeof(void*)))
+    {
+        AddReportLog(8747, SString("CCore::OnPostCreateDevice - invalid IDirect3DDevice9 pointer %p (via %p)", *ppReturnedDeviceInterface, ppReturnedDeviceInterface));
+        return hResult;
+    }
+
     //
     // - Allow create device with no changes
     // - Check caps and report diff with GTA caps
