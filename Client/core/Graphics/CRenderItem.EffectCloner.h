@@ -46,6 +46,7 @@ class CEffectCloner
 {
 public:
     CEffectCloner(CRenderItemManager* pManager);
+    ~CEffectCloner();
     void         DoPulse();
     CEffectWrap* CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
                                  const EffectMacroList& macros);
