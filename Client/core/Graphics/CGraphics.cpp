@@ -2335,6 +2335,11 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
             if (FAILED(hr))
                 break;
             hr = m_pDevice->StretchRect(m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT);
+            if (FAILED(hr))
+            {
+                WriteDebugEvent("CGraphics::DrawProgressMessage: StretchRect restore failed");
+                break;
+            }
 
             if (!beginSceneAs(ESceneOwner::MTA, "CGraphics::DrawProgressMessage (post-present)"))
                 break;
@@ -2353,7 +2358,19 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
             restorePossible = endCurrentScene("CGraphics::DrawProgressMessage (restore current)");
 
         if (restorePossible && originalOwner != ESceneOwner::None && currentOwner != originalOwner)
-            beginSceneAs(originalOwner, "CGraphics::DrawProgressMessage (restore original)");
+        {
+            if (!beginSceneAs(originalOwner, "CGraphics::DrawProgressMessage (restore original)"))
+            {
+                if (originalOwner == ESceneOwner::GTA)
+                {
+                    ResetGTASceneState();
+                }
+                else if (originalOwner == ESceneOwner::MTA)
+                {
+                    g_bInMTAScene.store(false, std::memory_order_release);
+                }
+            }
+        }
     }
 
     //
