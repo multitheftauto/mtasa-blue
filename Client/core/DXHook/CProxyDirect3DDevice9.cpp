@@ -19,6 +19,8 @@
 class CProxyDirect3DDevice9;
 extern std::atomic<bool> g_bInMTAScene;
 
+void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters);
+
 namespace
 {
 template <typename T>
@@ -669,6 +671,8 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         {
             WriteDebugEvent("CProxyDirect3DDevice9::Reset - Skipping PostReset because video mode manager is unavailable");
         }
+
+        ApplyBorderlessColorCorrection(this, *pPresentationParameters);
 
     // Update our data.
     m_pData->StoreViewport(0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
