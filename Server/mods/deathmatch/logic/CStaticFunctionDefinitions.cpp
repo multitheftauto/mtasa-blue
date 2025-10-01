@@ -1015,7 +1015,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, CStringName 
 
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
-        if (!pElement->SetCustomData(szName, Variable, syncType))
+        if (!pElement->SetCustomData(name, Variable, syncType))
             return false; // The server cancelled the change in onElementDataChange
 
         if (syncType != ESyncType::LOCAL)
@@ -1052,7 +1052,7 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, CStringNa
     // Check it exists
     if (pElement->GetCustomData(name, false))
     {
-        if (!pElement->DeleteCustomData(szName))
+        if (!pElement->DeleteCustomData(name))
             return false; // The server cancelled the change in onElementDataChange
 
         // Tell our clients to update their data

@@ -716,7 +716,7 @@ bool CElement::SetCustomData(const CStringName& name, const CLuaArgument& Variab
     {
         // Don't allow it to be set if the name is too long
         CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(name.ToCString()).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return;
+        return false;
     }
 
     // Grab the old variable and sync type
@@ -743,9 +743,9 @@ bool CElement::SetCustomData(const CStringName& name, const CLuaArgument& Variab
         {
             // Event was cancelled, restore previous value
             if (pData)
-                m_CustomData.Set(szName, oldVariable, oldSyncType);
+                m_CustomData.Set(name, oldVariable, oldSyncType);
             else
-                m_CustomData.Delete(szName);
+                m_CustomData.Delete(name);
             return false;
         }
     }
@@ -772,7 +772,7 @@ bool CElement::DeleteCustomData(const CStringName& name)
         if (!CallEvent("onElementDataChange", Arguments))
         {
             // Event was cancelled, restore previous value
-            m_CustomData.Set(szName, oldVariable, oldSyncType);
+            m_CustomData.Set(name, oldVariable, oldSyncType);
             return false;
         }
         return true;
