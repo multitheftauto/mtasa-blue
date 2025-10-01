@@ -105,6 +105,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
 std::vector<IDirect3D9*> ms_CreatedDirect3D9List;
 bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
+void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters);
 
 CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
     : m_pDevice(nullptr)
@@ -454,24 +455,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     if (SUCCEEDED(hResult) && *ppReturnedDeviceInterface)
     {
         // Check if we're in borderless mode
-        bool bIsBorderlessMode = pPresentationParameters->Windowed == TRUE;
-
-        if (bIsBorderlessMode)
-        {
-            // Enable sRGB correction for borderless mode to compensate for DWM composition
-            CProxyDirect3DDevice9* pProxyDevice = static_cast<CProxyDirect3DDevice9*>(*ppReturnedDeviceInterface);
-
-            // Set initial render states for proper color handling
-            pProxyDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, TRUE);
-
-            // Configure samplers for sRGB texture reading
-            for (DWORD i = 0; i < 8; i++)
-            {
-                pProxyDevice->SetSamplerState(i, D3DSAMP_SRGBTEXTURE, TRUE);
-            }
-
-            WriteDebugEvent("Applied sRGB color correction for borderless mode");
-        }
+        ApplyBorderlessColorCorrection(static_cast<CProxyDirect3DDevice9*>(*ppReturnedDeviceInterface), *pPresentationParameters);
     }
 
     return hResult;
@@ -548,6 +532,41 @@ namespace
 
     uint ms_uiCreationAttempts = 0;
 }            // namespace
+
+void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters)
+{
+    if (!proxyDevice)
+        return;
+
+    bool bBorderless = false;
+    if (CVideoModeManagerInterface* videoModeManager = GetVideoModeManager())
+    {
+        bBorderless = videoModeManager->IsDisplayModeWindowed() || videoModeManager->IsDisplayModeFullScreenWindow();
+    }
+    else
+    {
+        bBorderless = (presentationParameters.Windowed != 0);
+    }
+
+    if (!bBorderless)
+    {
+        proxyDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
+        for (DWORD sampler = 0; sampler < 8; ++sampler)
+        {
+            proxyDevice->SetSamplerState(sampler, D3DSAMP_SRGBTEXTURE, FALSE);
+        }
+        WriteDebugEvent("Cleared sRGB color correction for non-borderless mode");
+        return;
+    }
+
+    proxyDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, TRUE);
+    for (DWORD sampler = 0; sampler < 8; ++sampler)
+    {
+        proxyDevice->SetSamplerState(sampler, D3DSAMP_SRGBTEXTURE, TRUE);
+    }
+
+    WriteDebugEvent("Applied sRGB color correction for borderless mode");
+}
 
 ////////////////////////////////////////////////
 //
@@ -958,21 +977,28 @@ bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UIN
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
     static uint uiCreateCount = 0;
+    static IDirect3D9* lastTrackedInterface = nullptr;
+
+    if (!IsMainThread())
+    {
+        SString strMessage;
+        strMessage = " Passing through CreateDevice because not main thread";
+        WriteDebugEvent(strMessage);
+        AddReportLog(8627, strMessage);
+        hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
+        return true;
+    }
+
+    if (pDirect3D != lastTrackedInterface)
+    {
+        lastTrackedInterface = pDirect3D;
+        uiCreateCount = 0;
+    }
 
     // Also check for invalid size
     if (pPresentationParameters->BackBufferWidth == 0)
     {
         WriteDebugEvent(SString(" Passing through call #%d to CreateDevice because size is invalid", uiCreateCount));
-        hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
-        return true;
-    }
-
-    // Also check for calls from other threads
-    if (!IsMainThread())
-    {
-        SString strMessage(" Passing through call #%d to CreateDevice because not main thread", uiCreateCount);
-        WriteDebugEvent(strMessage);
-        AddReportLog(8627, strMessage);
         hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
         return true;
     }
@@ -1084,6 +1110,8 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
 
             WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s", parameters.AdapterOrdinal, parameters.DeviceType,
                                     parameters.BehaviorFlags, ReadableDepthFormat ? std::string((char*)&ReadableDepthFormat, 4).c_str() : "None"));
+
+            ApplyBorderlessColorCorrection(static_cast<CProxyDirect3DDevice9*>(*ppReturnedDeviceInterface), *pPresentationParameters);
         }
     }
 
@@ -1353,6 +1381,8 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         WriteDebugEvent("   Used creation parameters:");
         WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s", parameters.AdapterOrdinal, parameters.DeviceType,
                                 parameters.BehaviorFlags, ReadableDepthFormat ? std::string((char*)&ReadableDepthFormat, 4).c_str() : "None"));
+
+    ApplyBorderlessColorCorrection(static_cast<CProxyDirect3DDevice9*>(*ppReturnedDeviceInterface), *pPresentationParameters);
     }
 
     bool bDetectOptimus = (GetModuleHandle("nvd3d9wrap.dll") != NULL);
