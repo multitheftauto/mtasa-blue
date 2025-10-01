@@ -22,22 +22,61 @@ extern std::atomic<bool> g_bInMTAScene;
 namespace
 {
 template <typename T>
-void ReleaseInterface(T*& pointer)
+bool IsValidComInterfacePointer(T* pointer)
+{
+    if (!pointer)
+        return true;
+
+    if (!SharedUtil::IsReadablePointer(pointer, sizeof(void*)))
+        return false;
+
+    void* const* vtablePtr = reinterpret_cast<void* const*>(pointer);
+    void* const  vtable = *vtablePtr;
+    if (!vtable)
+        return false;
+
+    constexpr size_t requiredBytes = sizeof(void*) * 3;  // QueryInterface, AddRef, Release
+    return SharedUtil::IsReadablePointer(vtable, requiredBytes);
+}
+
+template <typename T>
+void ReleaseInterface(T*& pointer, const char* context = nullptr)
 {
     if (pointer)
     {
-        pointer->Release();
+        if (IsValidComInterfacePointer(pointer))
+        {
+            pointer->Release();
+        }
+        else
+        {
+        SString label;
+        label = context ? context : "ReleaseInterface";
+            SString message;
+            message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), pointer);
+            AddReportLog(8750, message, 5);
+        }
         pointer = nullptr;
     }
 }
 
 template <typename T>
-void ReplaceInterface(T*& destination, T* source)
+void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
 {
     if (destination == source)
         return;
 
-    ReleaseInterface(destination);
+    if (source && !IsValidComInterfacePointer(source))
+    {
+    SString label;
+    label = context ? context : "ReplaceInterface";
+        SString message;
+        message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
+        AddReportLog(8751, message, 5);
+        return;
+    }
+
+    ReleaseInterface(destination, context);
     destination = source;
     if (destination)
         destination->AddRef();
@@ -1126,7 +1165,11 @@ HRESULT CProxyDirect3DDevice9::SetTexture(DWORD Stage, IDirect3DBaseTexture9* pT
 {
     CDirect3DEvents9::CloseActiveShader();
     if (Stage < NUMELMS(DeviceState.TextureState))
-        ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture);
+    {
+        SString context;
+        context.Format("SetTexture stage %u", Stage);
+        ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture, context.c_str());
+    }
     return m_pDevice->SetTexture(Stage, CDirect3DEvents9::GetRealTexture(pTexture));
 }
 
