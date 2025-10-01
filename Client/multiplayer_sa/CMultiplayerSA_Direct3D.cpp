@@ -20,6 +20,7 @@ namespace
     DWORD                  ms_BehaviorFlags = 0;
     D3DPRESENT_PARAMETERS* ms_pPresentationParameters = NULL;
     IDirect3DDevice9**     ms_ppReturnedDeviceInterface = NULL;
+    bool                   ms_hasDeviceArgs = false;
 }            // namespace
 
 DWORD RESTORE_Addr_PreCreateDevice;
@@ -45,7 +46,7 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
     }
 
     // Validate critical parameters before dereferencing
-    if (BehaviorFlags && pPresentationParameters)
+    if (BehaviorFlags && pPresentationParameters && ppReturnedDeviceInterface)
     {
         ms_pDirect3D = pDirect3D;
         ms_Adapter = Adapter;
@@ -54,6 +55,12 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
         ms_BehaviorFlags = *BehaviorFlags;
         ms_pPresentationParameters = pPresentationParameters;
         ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
+        ms_hasDeviceArgs = true;
+    }
+    else
+    {
+        ms_hasDeviceArgs = false;
+        AddReportLog(8740, SString("OnPreCreateDevice: missing device arguments for alt startup path"));
     }
 }
 
@@ -112,12 +119,36 @@ void _declspec(naked) HOOK_PreCreateDevice()
 ////////////////////////////////////////////////////////////////
 HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
 {
-    if (g_pCore)
+    if (!g_pCore)
     {
-        return g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
-                                           ms_ppReturnedDeviceInterface);
+        ms_hasDeviceArgs = false;
+        return hResult;
     }
-    return hResult;
+
+    if (!ms_hasDeviceArgs)
+    {
+        AddReportLog(8741, SString("OnPostCreateDevice: device arguments were not captured; skipping alt startup logic"));
+        return hResult;
+    }
+
+    if (!SharedUtil::IsReadablePointer(ms_ppReturnedDeviceInterface, sizeof(*ms_ppReturnedDeviceInterface)))
+    {
+        AddReportLog(8742, SString("OnPostCreateDevice: invalid device pointer reference %p", ms_ppReturnedDeviceInterface));
+        ms_hasDeviceArgs = false;
+        return hResult;
+    }
+
+    if (!SharedUtil::IsReadablePointer(ms_pPresentationParameters, sizeof(*ms_pPresentationParameters)))
+    {
+        AddReportLog(8743, SString("OnPostCreateDevice: invalid presentation parameters pointer %p", ms_pPresentationParameters));
+        ms_hasDeviceArgs = false;
+        return hResult;
+    }
+
+    HRESULT result = g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
+                                                 ms_ppReturnedDeviceInterface);
+    ms_hasDeviceArgs = false;
+    return result;
 }
 
 // Hook info
