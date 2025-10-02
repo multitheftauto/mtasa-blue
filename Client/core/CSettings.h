@@ -128,9 +128,15 @@ protected:
     // Keep these protected so we can access them in the event handlers of CClientGame
     CGUIElement*  m_pWindow;
     CGUITabPanel* m_pTabs;
+    CGUITab*      m_pTabMultiplayer;
+    CGUITab*      m_pTabVideo;
     CGUITab*      m_pTabInterface;
     CGUITab*      m_pTabBrowser;
     CGUITab*      m_pTabPostFX;
+    CGUITab*      m_pTabAudio;
+    CGUITab*      m_pTabBinds;
+    CGUITab*      m_pTabControls;
+    CGUITab*      m_pTabAdvanced;
     CGUIButton*   m_pButtonOK;
     CGUIButton*   m_pButtonCancel;
     CGUILabel*    m_pLabelNick;
@@ -470,6 +476,7 @@ private:
     void SetSFXVolume(float fVolume);
     void RefreshBorderlessDisplayCalibration();
     void UpdateBorderlessAdjustmentControls();
+    void ResetGuiPointers();
 
     unsigned int m_uiCaptureKey;
     bool         m_bCaptureKey;
