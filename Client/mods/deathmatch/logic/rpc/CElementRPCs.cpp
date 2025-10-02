@@ -96,7 +96,7 @@ void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface&
         CLuaArgument Argument;
         if (bitStream.ReadStringCharacters(strName, usNameLength) && Argument.ReadFromBitStream(bitStream))
         {
-            pSource->SetCustomData(strName, Argument);
+            pSource->SetCustomData(CStringName{strName}, Argument);
         }
     }
 }
@@ -114,7 +114,7 @@ void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterfa
         if (bitStream.ReadStringCharacters(strName, usNameLength) && bitStream.ReadBit(bRecursive))
         {
             // Remove that name
-            pSource->DeleteCustomData(strName);
+            pSource->DeleteCustomData(CStringName{strName});
         }
     }
 }
@@ -313,32 +313,90 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
 void CElementRPCs::AttachElements(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     ElementID usAttachedToID;
-    CVector   vecPosition, vecRotation;
-    if (bitStream.Read(usAttachedToID) && bitStream.Read(vecPosition.fX) && bitStream.Read(vecPosition.fY) && bitStream.Read(vecPosition.fZ) &&
-        bitStream.Read(vecRotation.fX) && bitStream.Read(vecRotation.fY) && bitStream.Read(vecRotation.fZ))
+
+    CVector vecPosition;
+    CVector vecRotation;
+
+    if (!(bitStream.Read(usAttachedToID) && bitStream.Read(vecPosition.fX) && bitStream.Read(vecPosition.fY) && bitStream.Read(vecPosition.fZ) &&
+          bitStream.Read(vecRotation.fX) && bitStream.Read(vecRotation.fY) && bitStream.Read(vecRotation.fZ)))
     {
-        CClientEntity* pAttachedToEntity = CElementIDs::GetElement(usAttachedToID);
-        if (pAttachedToEntity)
-        {
-            pSource->SetAttachedOffsets(vecPosition, vecRotation);
-            pSource->AttachTo(pAttachedToEntity);
-        }
+        return;
     }
+
+    CClientEntity* pAttachedToEntity = CElementIDs::GetElement(usAttachedToID);
+    if (!pAttachedToEntity)
+    {
+        return;
+    }
+
+    ConvertRadiansToDegrees(vecRotation);
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(pAttachedToEntity);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!pSource->CallEvent("onClientElementAttach", Arguments, true))
+    {
+        return;
+    }
+
+    ConvertDegreesToRadians(vecRotation);
+
+    pSource->SetAttachedOffsets(vecPosition, vecRotation);
+    pSource->AttachTo(pAttachedToEntity);
 }
 
 void CElementRPCs::DetachElements(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     unsigned char ucTimeContext;
-    if (bitStream.Read(ucTimeContext))
+    if (!bitStream.Read(ucTimeContext))
     {
-        pSource->SetSyncTimeContext(ucTimeContext);
-        pSource->AttachTo(NULL);
+        return;
+    }
 
-        CVector vecPosition;
-        if (bitStream.Read(vecPosition.fX) && bitStream.Read(vecPosition.fY) && bitStream.Read(vecPosition.fZ))
-        {
-            pSource->SetPosition(vecPosition);
-        }
+    ElementID usAttachedToID;
+    CClientEntity* pAttachedToEntity = CElementIDs::GetElement(usAttachedToID);
+
+    CVector vecPosition;
+    CVector vecRotation;
+
+    bitStream.Read(vecPosition.fX);
+    bitStream.Read(vecPosition.fY);
+    bitStream.Read(vecPosition.fZ);
+    bitStream.Read(vecRotation.fX);
+    bitStream.Read(vecRotation.fY);
+    bitStream.Read(vecRotation.fZ);
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(pAttachedToEntity);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!pSource->CallEvent("onClientElementDetach", Arguments, true))
+    {
+        return;
+    }
+
+    pSource->SetSyncTimeContext(ucTimeContext);
+    pSource->AttachTo(NULL);
+
+    if (vecPosition.fX != 0.0f || vecPosition.fY != 0.0f || vecPosition.fZ != 0.0f)
+    {
+        pSource->SetPosition(vecPosition);
+    }
+
+    if (vecRotation.fX != 0.0f || vecRotation.fY != 0.0f || vecRotation.fZ != 0.0f)
+    {
+        pSource->SetRotationDegrees(vecRotation);
     }
 }
 
@@ -408,7 +466,14 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
                 if (pPed->IsHealthLocked())
                     pPed->LockHealth(fHealth);
                 else
+                {
                     pPed->SetHealth(fHealth);
+                    // If server sets health to 0 for local player, mark as server-processed death
+                    // to prevent DoWastedCheck from firing with stale local damage data
+                    if (fHealth == 0.0f && pPed->IsLocalPlayer()) {
+                        g_pClientGame->ClearDamageData();
+                    }
+                }
                 break;
             }
 

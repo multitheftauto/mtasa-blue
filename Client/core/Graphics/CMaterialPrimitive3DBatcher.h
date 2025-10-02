@@ -26,6 +26,7 @@ class CMaterialPrimitive3DBatcher
 {
 public:
     CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* pGraphics);
+    ~CMaterialPrimitive3DBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
     void AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices);

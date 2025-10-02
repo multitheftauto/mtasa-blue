@@ -1085,6 +1085,7 @@ void CResourceChecker::CheckVersionRequirements(const string& strIdentifierName,
     static CHashMap<SString, CMtaVersion> clientFunctionMap;
     static CHashMap<SString, CMtaVersion> serverFunctionMap;
 
+#if 0
     // Check if lookup maps need initializing
     if (clientFunctionMap.empty())
     {
@@ -1094,6 +1095,7 @@ void CResourceChecker::CheckVersionRequirements(const string& strIdentifierName,
         for (uint i = 0; i < NUMELMS(serverFunctionInitList); i++)
             MapSet(serverFunctionMap, serverFunctionInitList[i].functionName, CMtaVersion(serverFunctionInitList[i].minMtaVersion));
     }
+#endif
 
     // Select client or server check
     const CHashMap<SString, CMtaVersion>& functionMap = bClientScript ? clientFunctionMap : serverFunctionMap;

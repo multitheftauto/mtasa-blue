@@ -52,7 +52,7 @@ bool CPlayerWastedPacket::Read(NetBitStreamInterface& BitStream)
         if (BitStream.Read(&ammo))
         {
             m_vecPosition = pos.data.vecPosition;
-            m_ucBodyPart = bodyPart.data.uiBodypart;
+            m_ucBodyPart = static_cast<unsigned char>(bodyPart.data.uiBodypart);
             m_ucKillerWeapon = weapon.data.ucWeaponType;
             m_usAmmo = ammo.data.usTotalAmmo;
             return true;

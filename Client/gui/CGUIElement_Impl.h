@@ -90,7 +90,7 @@ public:
     void         SetParent(CGUIElement* pParent);
     CGUIElement* GetParent();
 
-    CEGUI::Window* GetWindow();
+    CEGUI::Window* GetWindow() const { return m_pWindow; }
 
     void ForceRedraw();
 

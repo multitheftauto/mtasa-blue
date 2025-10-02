@@ -9,13 +9,15 @@ project "CEFLauncher"
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
+		["Resources/*"] = {"*.rc", "**.ico", "**.xml", "**.manifest"},
 		["*"] = "premake5.lua"
 	}
 
 	files {
 		"premake5.lua",
 		"*.h",
-		"*.cpp"
+		"*.cpp",
+		"*.manifest",
 	}
 
 	filter "architecture:not x86"

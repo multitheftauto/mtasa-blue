@@ -16,9 +16,9 @@ CScriptDebugging::CScriptDebugging(CLuaManager* pLuaManager)
 {
     m_pLuaManager = pLuaManager;
     m_uiLogFileLevel = 0;
-    m_pLogFile = NULL;
+    m_pLogFile = nullptr;
     m_bTriggeringMessageEvent = false;
-    m_flushTimerHandle = NULL;
+    m_flushTimerHandle = nullptr;
 }
 
 CScriptDebugging::~CScriptDebugging()
@@ -33,13 +33,13 @@ CScriptDebugging::~CScriptDebugging()
         fprintf(m_pLogFile, "INFO: Logging to this file ended\n");
 
         // if we have a flush timer
-        if (m_flushTimerHandle != NULL)
+        if (m_flushTimerHandle)
         {
             // delete our flush timer
-            DeleteTimerQueueTimer(NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
+            DeleteTimerQueueTimer(nullptr, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
         fclose(m_pLogFile);
-        m_pLogFile = NULL;
+        m_pLogFile = nullptr;
     }
 }
 
@@ -52,7 +52,7 @@ void CScriptDebugging::LogBadLevel(lua_State* luaVM, unsigned int uiRequiredLeve
 void CALLBACK TimerProc(void* lpParametar, BOOLEAN TimerOrWaitFired)
 {
     // Got a logfile?
-    if (CScriptDebugging::m_pLogFile != NULL)
+    if (CScriptDebugging::m_pLogFile)
     {
         // flush our log file
         fflush((FILE*)CScriptDebugging::m_pLogFile);
@@ -68,13 +68,13 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
     {
         fprintf(m_pLogFile, "INFO: Logging to this file ended\n");
         // if we have a flush timer
-        if (m_flushTimerHandle != NULL)
+        if (m_flushTimerHandle)
         {
             // delete our flush timer
-            DeleteTimerQueueTimer(NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
+            DeleteTimerQueueTimer(nullptr, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
         fclose(m_pLogFile);
-        m_pLogFile = NULL;
+        m_pLogFile = nullptr;
     }
 
     // Apply log size limit
@@ -102,38 +102,47 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
         // round 37.5 to 38 because we can't have half a message
         // 8 * 256 bytes = 6004B
         // round 6004 up to the nearest divisible by 1024 = 6144
-        // we have our buffer size.
-        setvbuf(pFile, NULL, _IOFBF, 6144);
+        setvbuf(pFile, nullptr, _IOFBF, 6144);
 
         // Set the new pointer and level and return true
         m_uiLogFileLevel = uiLevel;
         m_pLogFile = pFile;
 
         // Create a timer
-        ::CreateTimerQueueTimer(&m_flushTimerHandle, NULL, TimerProc, NULL, 50, 50, WT_EXECUTEINTIMERTHREAD);
+        ::CreateTimerQueueTimer(&m_flushTimerHandle, nullptr, TimerProc, nullptr, 50, 50, WT_EXECUTEINTIMERTHREAD);
         return true;
     }
 
     return false;
 }
 
+
 void CScriptDebugging::UpdateLogOutput()
 {
     SLogLine line;
     while (m_DuplicateLineFilter.PopOutputLine(line))
     {
-        // Log it to the file if enough level
-        bool sufficientDebugLevel = CheckForSufficientDebugLevel(m_uiLogFileLevel, line.uiMinimumDebugLevel);
+        bool sufficientDebugLevel = CheckForSufficientDebugLevel(static_cast<std::uint8_t>(m_uiLogFileLevel),
+                                                                 static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
 
         if (sufficientDebugLevel)
         {
             PrintLog(line.strText);
         }
+        
     #ifdef MTA_DEBUG
         if (!g_pCore->IsDebugVisible())
             return;
     #endif
-        g_pCore->DebugEchoColor(line.strText, line.ucRed, line.ucGreen, line.ucBlue);
+        
+        std::uint8_t clientDebugLevel = 0;
+        auto* localPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
+        if (localPlayer)
+            clientDebugLevel = localPlayer->GetPlayerScriptDebugLevel();
+        
+        bool shouldDisplayInConsole = CheckForSufficientDebugLevel(clientDebugLevel, static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
+        if (shouldDisplayInConsole)
+            g_pCore->DebugEchoColor(line.strText, line.ucRed, line.ucGreen, line.ucBlue);
     }
 }
 

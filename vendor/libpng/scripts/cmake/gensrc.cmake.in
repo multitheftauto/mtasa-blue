@@ -21,8 +21,8 @@ set(DFA_XTRA "@DFA_XTRA@")
 set(PNG_PREFIX "@PNG_PREFIX@")
 set(PNGLIB_VERSION "@PNGLIB_VERSION@")
 
-if(OUTPUT STREQUAL "scripts/pnglibconf.c")
-  # Generate scripts/pnglibconf.c
+if(OUTPUT MATCHES "(scripts/pnglibconf\\.c)\$")
+  # Generate "${BINDIR}/scripts/pnglibconf.c"
 
   file(REMOVE "${BINDIR}/pnglibconf.tf6" "${BINDIR}/pnglibconf.tf7")
 
@@ -49,8 +49,8 @@ if(OUTPUT STREQUAL "scripts/pnglibconf.c")
   file(MAKE_DIRECTORY "${BINDIR}/scripts")
   file(RENAME "pnglibconf.tf7" "${BINDIR}/scripts/pnglibconf.c")
 
-elseif(OUTPUT STREQUAL "pnglibconf.c")
-  # Generate pnglibconf.c
+elseif(OUTPUT MATCHES "(pnglibconf\\.c)\$")
+  # Generate "${BINDIR}/pnglibconf.c"
 
   file(REMOVE "${BINDIR}/pnglibconf.tf4" "${BINDIR}/pnglibconf.tf5")
 
@@ -76,10 +76,10 @@ elseif(OUTPUT STREQUAL "pnglibconf.c")
   file(MAKE_DIRECTORY "${BINDIR}/scripts")
   file(RENAME "pnglibconf.tf5" "${BINDIR}/pnglibconf.c")
 
-elseif(OUTPUT STREQUAL "pnglibconf.h")
-  # Generate pnglibconf.h
+elseif(OUTPUT MATCHES "(pnglibconf\\.h)\$")
+  # Generate "${BINDIR}/pnglibconf.h"
 
-  file(REMOVE "${BINDIR}/${OUTPUT}")
+  file(REMOVE "${OUTPUT}")
   if(PNG_PREFIX)
     file(REMOVE "pnglibconf.tf8")
 
@@ -95,20 +95,21 @@ elseif(OUTPUT STREQUAL "pnglibconf.h")
       message(FATAL_ERROR "Failed to generate pnglibconf.tf8")
     endif()
 
-    file(RENAME "pnglibconf.tf8" "${BINDIR}/${OUTPUT}")
+    file(RENAME "pnglibconf.tf8" "${OUTPUT}")
   else()
-    execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${BINDIR}/pnglibconf.out"
-                                                       "${BINDIR}/${OUTPUT}"
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "pnglibconf.out"
+                                                       "${OUTPUT}"
+                    WORKING_DIRECTORY "${BINDIR}"
                     RESULT_VARIABLE COPY_FAIL)
     if(COPY_FAIL)
       message(FATAL_ERROR "Failed to create pnglibconf.h")
     endif()
   endif()
 
-elseif(OUTPUT STREQUAL "pngprefix.h")
-  # Generate pngprefix.h
+elseif(OUTPUT MATCHES "(pngprefix\\.h)\$")
+  # Generate "${BINDIR}/pngprefix.h"
 
-  file(REMOVE "${BINDIR}/${OUTPUT}")
+  file(REMOVE "${OUTPUT}")
 
   if(PNG_PREFIX)
     file(REMOVE "pngprefix.tf1")
@@ -122,12 +123,12 @@ elseif(OUTPUT STREQUAL "pngprefix.h")
       message(FATAL_ERROR "Failed to generate pngprefix.tf1")
     endif()
 
-    file(RENAME "pngprefix.tf1" "${BINDIR}/${OUTPUT}")
+    file(RENAME "pngprefix.tf1" "${OUTPUT}")
   else()
-    file(WRITE "${BINDIR}/${OUTPUT}" "/* No libpng symbol prefix configured. */")
+    file(WRITE "${OUTPUT}" "/* No libpng symbol prefix configured. */")
   endif()
 
-elseif(OUTPUT STREQUAL "scripts/pnglibconf.h.prebuilt")
+elseif(OUTPUT MATCHES "(scripts/pnglibconf\\.h\\.prebuilt)\$")
   # Generate scripts/pnglibconf.h.prebuilt (fails build)
 
   message(STATUS "Attempting to build scripts/pnglibconf.h.prebuilt")

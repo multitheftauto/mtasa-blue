@@ -179,5 +179,9 @@ eFontStyle CFontSA::GetFontStyle()
             return eFontStyle::FONT_PRICEDOWN;
         case 2:
             return eFontStyle::FONT_MENU;
+        default:
+            break;
     }
+
+    return eFontStyle::FONT_PRICEDOWN;
 }

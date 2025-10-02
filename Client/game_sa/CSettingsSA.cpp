@@ -16,6 +16,8 @@
 #include "CGameSA.h"
 #include "CHudSA.h"
 #include "CSettingsSA.h"
+#include "CCameraSA.h"
+#include "CCamSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -148,7 +150,7 @@ unsigned int CSettingsSA::GetUsertrackMode()
 
 void CSettingsSA::SetUsertrackMode(unsigned int uiMode)
 {
-    m_pInterface->ucUsertrackMode = uiMode;
+    m_pInterface->ucUsertrackMode = static_cast<unsigned char>(uiMode);
 }
 
 bool CSettingsSA::IsUsertrackAutoScan()
@@ -215,7 +217,7 @@ unsigned int CSettingsSA::GetFXQuality()
 
 void CSettingsSA::SetFXQuality(unsigned int fxQualityId)
 {
-    MemPutFast<BYTE>(VAR_ucFxQuality, fxQualityId);
+    MemPutFast(VAR_ucFxQuality, static_cast<BYTE>(fxQualityId));
 }
 
 float CSettingsSA::GetMouseSensitivity()
@@ -241,7 +243,7 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
     if (!bOnRestart)
     {
         DWORD dwFunc = FUNC_SetAntiAliasing;
-        _asm
+        __asm
         {
             push    uiAntiAliasing
             call    dwFunc
@@ -265,7 +267,7 @@ void CSettingsSA::SetMipMappingEnabled(bool bEnable)
 
 void CSettingsSA::Save()
 {
-    _asm
+    __asm
     {
         mov ecx, CLASS_CMenuManager
         mov eax, FUNC_CMenuManager_Save
@@ -366,9 +368,11 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
 }
 
 // Hooked from 0x49EA50
-void _declspec(naked) HOOK_GetFxQuality()
+static void __declspec(naked) HOOK_GetFxQuality()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         mov     eax, [ecx+054h]            // Current FxQuality setting
@@ -386,9 +390,11 @@ void _declspec(naked) HOOK_GetFxQuality()
 }
 
 // Hook to discover what vehicle will be calling GetFxQuality
-void _declspec(naked) HOOK_StoreShadowForVehicle()
+static void __declspec(naked) HOOK_StoreShadowForVehicle()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Hooked from 0x70BDA0  5 bytes
         mov     eax, [esp+4]            // Get vehicle
@@ -525,36 +531,73 @@ void CSettingsSA::ResetFieldOfViewFromScript()
     UpdateFieldOfViewFromSettings();
 }
 
-void CSettingsSA::SetFieldOfViewPlayer(float fAngle, bool bFromScript)
+static std::pair<CCam*, unsigned int> GetActiveCamPlusMode()
+{
+    CCam* cam = pGame->GetCamera()->GetCam(pGame->GetCamera()->GetActiveCam());
+
+    if (cam == nullptr)
+        return std::make_pair(cam, MODE_NONE);
+
+    return std::make_pair(cam, cam->GetMode());
+}
+
+void CSettingsSA::SetFieldOfViewPlayer(float fAngle, bool bFromScript, bool instant)
 {
     if (!bFromScript && ms_bFOVPlayerFromScript)
         return;
+
     ms_bFOVPlayerFromScript = bFromScript;
     ms_fFOV = fAngle;
+
+    // CCam::Process_FollowPed_SA
     MemPut<void*>(0x0522F3A, &ms_fFOV);
     MemPut<void*>(0x0522F5D, &ms_fFOV);
     MemPut<float>(0x0522F7A, ms_fFOV);
+
+    if (instant)
+    {
+        const auto pair = GetActiveCamPlusMode();
+
+        if (pair.second == MODE_FOLLOWPED)
+            pair.first->SetFOV(fAngle);
+    }
 }
 
-void CSettingsSA::SetFieldOfViewVehicle(float fAngle, bool bFromScript)
+void CSettingsSA::SetFieldOfViewVehicle(float fAngle, bool bFromScript, bool instant)
 {
     if (!bFromScript && ms_bFOVVehicleFromScript)
         return;
+
     ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCar = fAngle;
+
+    // CCam::Process_FollowCar_SA
     MemPut<void*>(0x0524B76, &ms_fFOVCar);
     MemPut<void*>(0x0524B9A, &ms_fFOVCar);
     MemPut<void*>(0x0524BA2, &ms_fFOVCar);
     MemPut<void*>(0x0524BD3, &ms_fFOVCar);
     MemPut<float>(0x0524BE4, ms_fFOVCar);
+
+    if (instant)
+    {
+        const auto pair = GetActiveCamPlusMode();
+
+        if (pair.second == MODE_BEHINDCAR || pair.second == MODE_CAM_ON_A_STRING || pair.second == MODE_BEHINDBOAT)
+            pair.first->SetFOV(fAngle);
+    }
 }
 
-void CSettingsSA::SetFieldOfViewVehicleMax(float fAngle, bool bFromScript)
+void CSettingsSA::SetFieldOfViewVehicleMax(float fAngle, bool bFromScript, bool instant)
 {
+    (void)instant;
+
     if (!bFromScript && ms_bFOVVehicleFromScript)
         return;
+
     ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCarMax = fAngle;
+
+    // CCam::Process_FollowCar_SA
     MemPut<void*>(0x0524BB4, &ms_fFOVCarMax);
     MemPut<float>(0x0524BC5, ms_fFOVCarMax);
 }
@@ -930,9 +973,11 @@ __declspec(noinline) int OnMY_SelectDevice()
 DWORD RETURN_SelectDeviceSingle = 0x0746273;
 DWORD RETURN_SelectDeviceMultiHide = 0x074622C;
 DWORD RETURN_SelectDeviceMultiShow = 0x0746227;
-void _declspec(naked) HOOK_SelectDevice()
+static void __declspec(naked) HOOK_SelectDevice()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         call    OnMY_SelectDevice
@@ -942,14 +987,14 @@ void _declspec(naked) HOOK_SelectDevice()
         jl      single
         jz      multishow
 
-                // multhide
+        // multhide
         mov     eax, 1
         jmp     RETURN_SelectDeviceMultiHide
 
-multishow:
+        multishow:
         jmp     RETURN_SelectDeviceMultiShow
 
-single:
+        single:
         jmp     RETURN_SelectDeviceSingle
     }
 }

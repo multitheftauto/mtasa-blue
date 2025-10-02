@@ -22,6 +22,8 @@ extern "C" _declspec(dllexport) CWebCoreInterface* InitWebCoreInterface(CCoreInt
     // Ensure main thread identification is consistent
     IsMainThread();
 
+    SetMemoryAllocationFailureHandler();
+
     CWebCore* pWebCore = new CWebCore;
     return pWebCore;
 }

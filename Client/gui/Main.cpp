@@ -31,6 +31,7 @@ MTAEXPORT CGUI* InitGUIInterface(IDirect3DDevice9* pDevice)
     // Create our GUI interface if not already done
     if (!g_pGUI)
     {
+        SetMemoryAllocationFailureHandler();
         g_pGUI = new CGUI_Impl(pDevice);
     }
 

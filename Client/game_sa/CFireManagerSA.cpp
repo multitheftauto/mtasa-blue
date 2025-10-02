@@ -38,7 +38,7 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
     float fZ = vecPosition.fZ;
     DWORD dwFunction = FUNC_ExtinguishPoint;
 
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CFireManager
         push    fRadius

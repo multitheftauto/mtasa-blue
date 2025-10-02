@@ -54,6 +54,7 @@ void CLuaFileDefs::LoadFunctions()
         {"fileIsEOF", fileIsEOF},
         {"fileSetPos", fileSetPos},
         {"fileGetContents", ArgumentParser<fileGetContents>},
+        {"fileGetHash", ArgumentParser<fileGetHash>},
     };
 
     // Add functions
@@ -89,6 +90,7 @@ void CLuaFileDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSize", "fileGetSize");
     lua_classfunction(luaVM, "getPath", "fileGetPath");
     lua_classfunction(luaVM, "getContents", "fileGetContents");
+    lua_classfunction(luaVM, "getHash", "fileGetHash");
     lua_classfunction(luaVM, "isEOF", "fileIsEOF");
 
     lua_classfunction(luaVM, "setPos", "fileSetPos");
@@ -856,6 +858,142 @@ std::optional<std::string> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFi
     }
 
     return {};
+}
+
+template <typename, typename = std::void_t<>>
+struct HasSetKeyMethod : std::false_type
+{
+};
+
+template <typename T>
+struct HasSetKeyMethod<T, std::void_t<decltype(std::declval<T>().SetKey(std::declval<const CryptoPP::byte*>(), std::declval<size_t>()))>> : std::true_type
+{
+};
+
+template <typename HashAlgorithmT>
+static std::string ComputeScriptFileHash(CScriptFile* scriptFile, std::string_view key = {})
+{
+    HashAlgorithmT hash{};
+
+    if constexpr (HasSetKeyMethod<HashAlgorithmT>::value)
+    {
+        if (!key.empty())
+            hash.SetKey(reinterpret_cast<const CryptoPP::byte*>(key.data()), key.size());
+    }
+
+    std::array<unsigned char, 4096> buffer{};
+
+    while (!scriptFile->IsEOF())
+    {
+        const long bytesRead = scriptFile->ReadToBuffer(buffer.data(), static_cast<unsigned long>(buffer.size()));
+
+        if (bytesRead < 1)
+            break;
+
+        hash.Update(buffer.data(), static_cast<size_t>(bytesRead));
+    }
+
+    std::string digest;
+    digest.resize(hash.DigestSize());
+    hash.Final(reinterpret_cast<CryptoPP::byte*>(digest.data()));
+
+    SString                result;
+    CryptoPP::StringSource source(digest, true, new CryptoPP::HexEncoder(new CryptoPP::StringSink(result)));
+
+    return result.ToLower();
+}
+
+std::optional<std::string> CLuaFileDefs::fileGetHash(lua_State* const luaVM, CScriptFile* scriptFile, HashFunctionType hashFunction,
+                                                     std::optional<std::unordered_map<std::string, std::string>> options)
+{
+    // string|nil fileGetHash ( file theFile, string algorithm [, table options ] )
+
+    std::string result;
+
+    const long oldPosition = scriptFile->GetPointer();
+    scriptFile->SetPointer(0);
+
+    try
+    {
+        switch (hashFunction)
+        {
+            case HashFunctionType::MD5:
+                result = ComputeScriptFileHash<CryptoPP::Weak::MD5>(scriptFile);
+                break;
+            case HashFunctionType::SHA1:
+                result = ComputeScriptFileHash<CryptoPP::SHA1>(scriptFile);
+                break;
+            case HashFunctionType::SHA224:
+                result = ComputeScriptFileHash<CryptoPP::SHA224>(scriptFile);
+                break;
+            case HashFunctionType::SHA256:
+                result = ComputeScriptFileHash<CryptoPP::SHA256>(scriptFile);
+                break;
+            case HashFunctionType::SHA384:
+                result = ComputeScriptFileHash<CryptoPP::SHA384>(scriptFile);
+                break;
+            case HashFunctionType::SHA512:
+                result = ComputeScriptFileHash<CryptoPP::SHA512>(scriptFile);
+                break;
+            case HashFunctionType::HMAC:
+            {
+                if (!options.has_value())
+                    throw std::invalid_argument("Invalid value for fields 'key' and 'algorithm'");
+
+                std::unordered_map<std::string, std::string>& optionsMap = options.value();
+
+                std::string&  key = optionsMap["key"];
+                std::string&  algorithm = optionsMap["algorithm"];
+                HmacAlgorithm hmacAlgorithm;
+
+                if (key.empty())
+                    throw std::invalid_argument("Invalid value for field 'key'");
+
+                if (algorithm.empty() || !StringToEnum(algorithm, hmacAlgorithm))
+                    throw std::invalid_argument("Invalid value for field 'algorithm'");
+                
+                switch (hmacAlgorithm)
+                {
+                    case HmacAlgorithm::MD5:
+                        result = ComputeScriptFileHash<CryptoPP::HMAC<CryptoPP::Weak::MD5>>(scriptFile, key);
+                        break;
+                    case HmacAlgorithm::SHA1:
+                        result = ComputeScriptFileHash<CryptoPP::HMAC<CryptoPP::SHA1>>(scriptFile, key);
+                        break;
+                    case HmacAlgorithm::SHA224:
+                        result = ComputeScriptFileHash<CryptoPP::HMAC<CryptoPP::SHA224>>(scriptFile, key);
+                        break;
+                    case HmacAlgorithm::SHA256:
+                        result = ComputeScriptFileHash<CryptoPP::HMAC<CryptoPP::SHA256>>(scriptFile, key);
+                        break;
+                    case HmacAlgorithm::SHA384:
+                        result = ComputeScriptFileHash<CryptoPP::HMAC<CryptoPP::SHA384>>(scriptFile, key);
+                        break;
+                    case HmacAlgorithm::SHA512:
+                        result = ComputeScriptFileHash<CryptoPP::HMAC<CryptoPP::SHA512>>(scriptFile, key);
+                        break;
+                    default:
+                        throw std::invalid_argument("Invalid hmac algorithm");
+                }
+
+                break;
+            }
+            default:
+                throw std::invalid_argument("Unknown hash algorithm");
+        }
+    }
+    catch (std::exception& ex)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, ex.what());
+        result.clear();
+    }
+
+    scriptFile->SetPointer(oldPosition);
+
+    if (result.empty())
+        return {};
+
+    return result;
 }
 
 int CLuaFileDefs::fileGetPos(lua_State* luaVM)

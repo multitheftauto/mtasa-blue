@@ -595,7 +595,8 @@ newimage(Image *image)
    memset(image, 0, sizeof *image);
 }
 
-/* Reset the image to be read again - only needs to rewind the FILE* at present.
+/* Reset the image to be read again - only needs to rewind the FILE object at
+ * present.
  */
 static void
 resetimage(Image *image)

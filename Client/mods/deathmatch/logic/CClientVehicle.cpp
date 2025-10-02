@@ -57,7 +57,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_pModelInfo = g_pGame->GetModelInfo(usModel);
 
     // Apply handling
-    std::uint16_t usHandlingModelID = m_usModel;
+    std::uint32_t usHandlingModelID = m_usModel;
     if (m_usModel < 400 || m_usModel > 611)
         usHandlingModelID = m_pModelInfo->GetParentID();
 
@@ -814,13 +814,13 @@ void CClientVehicle::Fix()
     GetInitialDoorStates(ucDoorStates);
 
     bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
-    for (int i = 0; i < MAX_DOORS; i++)
+    for (unsigned char i = 0; i < MAX_DOORS; i++)
         SetDoorStatus(i, ucDoorStates[i], flyingComponents);
-    for (int i = 0; i < MAX_PANELS; i++)
+    for (unsigned char i = 0; i < MAX_PANELS; i++)
         SetPanelStatus(i, 0, flyingComponents);
-    for (int i = 0; i < MAX_LIGHTS; i++)
+    for (unsigned char i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
-    for (int i = 0; i < MAX_WHEELS; i++)
+    for (unsigned char i = 0; i < MAX_WHEELS; i++)
         SetWheelStatus(i, 0);
 
     // These components get a funny rotation when calling Fix() (unknown reason)
@@ -1057,7 +1057,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Reset handling to fit the vehicle
         if (IsLocalEntity() || !(usModel < 400 || usModel > 611))
         {
-            std::uint16_t usHandlingModelID = usModel;
+            std::uint32_t usHandlingModelID = usModel;
             if (usHandlingModelID < 400 || usHandlingModelID > 611)
                 usHandlingModelID = m_pModelInfo->GetParentID();
 
@@ -1090,7 +1090,10 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
 
         SetSirenOrAlarmActive(false);
 
-        // clear our component data to regenerate it
+        // Cache current component visibility and clear data so it can be regenerated.
+        m_ComponentVisibilityBackup.clear();
+        for (const auto& pair : m_ComponentData)
+            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
         m_ComponentData.clear();
 
         // Reset stored dummy positions
@@ -1118,9 +1121,12 @@ void CClientVehicle::SetVariant(unsigned char ucVariant, unsigned char ucVariant
     m_ucVariation = ucVariant;
     m_ucVariation2 = ucVariant2;
 
-    // clear our component data to regenerate it
+    // Cache visibility so component state survives variant changes
+    m_ComponentVisibilityBackup.clear();
+    for (const auto& pair : m_ComponentData)
+        m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
+    // Clear component data to regenerate it on next create
     m_ComponentData.clear();
-
     ReCreate();
 }
 
@@ -2629,7 +2635,6 @@ void CClientVehicle::Create()
         m_pVehicle->SetOverrideLights(m_ucOverrideLights);
         m_pVehicle->SetRemap(static_cast<unsigned int>(m_ucPaintjob));
         m_pVehicle->SetBodyDirtLevel(m_fDirtLevel);
-        m_pVehicle->SetEngineOn(m_bEngineOn);
         m_pVehicle->SetAreaCode(m_ucInterior);
         m_pVehicle->SetSmokeTrailEnabled(m_bSmokeTrail);
         m_pVehicle->SetGravity(&m_vecGravity);
@@ -2675,12 +2680,14 @@ void CClientVehicle::Create()
             m_pVehicle->SetTurretRotation(m_fTurretHorizontal, m_fTurretVertical);
         }
 
-        for (int i = 0; i < MAX_WHEELS; i++)
+        for (unsigned char i = 0; i < MAX_WHEELS; i++)
             SetWheelStatus(i, m_ucWheelStates[i], true);
 
         // Eventually warp driver back in
         if (m_pDriver)
             m_pDriver->WarpIntoVehicle(this, 0);
+
+        m_pVehicle->SetEngineOn(m_bEngineOn);
 
         // Warp the passengers back in
         for (unsigned int i = 0; i < 8; i++)
@@ -2858,6 +2865,22 @@ void CClientVehicle::Create()
                 }
             }
         }
+
+        // Merge saved visibility data from previous variant/handling updates
+        if (!m_ComponentVisibilityBackup.empty())
+        {
+            for (const auto& pair : m_ComponentVisibilityBackup)
+            {
+                auto it = m_ComponentData.find(pair.first);
+                if (it != m_ComponentData.end())
+                {
+                    it->second.m_bVisible = pair.second;
+                    SetComponentVisible(pair.first, pair.second);
+                }
+            }
+            m_ComponentVisibilityBackup.clear();
+        }
+            
         // Grab our component data
         std::map<SString, SVehicleComponentData>::iterator iter = m_ComponentData.begin();
         // Loop through our component data
@@ -2977,14 +3000,14 @@ void CClientVehicle::Destroy()
             // Grab the damage model
             CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
 
-            for (int i = 0; i < MAX_DOORS; i++)
+            for (unsigned char i = 0; i < MAX_DOORS; i++)
                 m_ucDoorStates[i] = pDamageManager->GetDoorStatus(static_cast<eDoors>(i));
-            for (int i = 0; i < MAX_PANELS; i++)
+            for (unsigned char i = 0; i < MAX_PANELS; i++)
                 m_ucPanelStates[i] = pDamageManager->GetPanelStatus(static_cast<ePanels>(i));
-            for (int i = 0; i < MAX_LIGHTS; i++)
+            for (unsigned char i = 0; i < MAX_LIGHTS; i++)
                 m_ucLightStates[i] = pDamageManager->GetLightStatus(static_cast<eLights>(i));
         }
-        for (int i = 0; i < MAX_WHEELS; i++)
+        for (unsigned char i = 0; i < MAX_WHEELS; i++)
             m_ucWheelStates[i] = GetWheelStatus(i);
 
         // Remove the driver from the vehicle

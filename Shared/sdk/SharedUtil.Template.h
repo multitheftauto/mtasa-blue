@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __INTELLISENSE__
+    #pragma diag_suppress 842
+#endif
+
 #include <type_traits>
 #include <variant>
 
@@ -246,3 +250,38 @@ struct pad_func_with_func<Func, FuncB>
                                                      std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args) == 0>::type>
 {
 };
+
+// Removes noexcept(true) from a function type
+template <typename T>
+struct remove_noexcept
+{
+    using type = T;
+};
+
+template <typename R, typename... Args>
+struct remove_noexcept<R(Args...) noexcept>
+{
+    using type = R(Args...);
+};
+
+template <typename T>
+using remove_noexcept_t = typename remove_noexcept<T>::type;
+
+// Removes noexcept(true) from a function
+template <typename T>
+struct remove_noexcept_fn;
+
+template <typename R, typename... Args>
+struct remove_noexcept_fn<R (*)(Args...) noexcept>
+{
+    using type = R (*)(Args...);
+};
+
+template <typename R, typename... Args>
+struct remove_noexcept_fn<R (*)(Args...)>
+{
+    using type = R (*)(Args...);
+};
+
+template <auto Func>
+constexpr auto remove_noexcept_fn_v = static_cast<typename remove_noexcept_fn<decltype(Func)>::type>(Func);

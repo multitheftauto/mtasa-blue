@@ -50,7 +50,7 @@
 #define STDERR stdout
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_47 Your_png_h_is_not_version_1_6_47;
+typedef png_libpng_version_1_6_50 Your_png_h_is_not_version_1_6_50;
 
 /* Ensure that all version numbers in png.h are consistent with one another. */
 #if (PNG_LIBPNG_VER != PNG_LIBPNG_VER_MAJOR * 10000 + \
@@ -60,7 +60,7 @@ typedef png_libpng_version_1_6_47 Your_png_h_is_not_version_1_6_47;
                                  PNG_LIBPNG_VER_MINOR) || \
     (PNG_LIBPNG_VER_SHAREDLIB != PNG_LIBPNG_VER_SONUM) || \
     (PNG_LIBPNG_VER_SHAREDLIB != PNG_LIBPNG_VER_DLLNUM)
-#  error "Inconsistent version numbers in png.h"
+#  error Inconsistent version numbers in "png.h"
 #endif
 
 /* In version 1.6.1, we added support for the configure test harness, which
@@ -103,10 +103,6 @@ typedef png_libpng_version_1_6_47 Your_png_h_is_not_version_1_6_47;
 #  define PNG_ZBUF_SIZE 8192
 #endif
 
-#ifndef PNG_STDIO_SUPPORTED
-typedef FILE * png_FILE_p;
-#endif
-
 #ifndef PNG_DEBUG
 #  define PNG_DEBUG 0
 #endif
@@ -120,7 +116,7 @@ typedef FILE * png_FILE_p;
 #  define pngtest_debug1(m, p1)     ((void)0)
 #  define pngtest_debug2(m, p1, p2) ((void)0)
 #else /* PNG_DEBUG < 0 */
-#  error "Bad PNG_DEBUG value"
+#  error Bad PNG_DEBUG value
 #endif
 
 /* Turn on CPU timing
@@ -403,7 +399,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, size_t length)
     */
    io_ptr = png_get_io_ptr(png_ptr);
    if (io_ptr != NULL)
-      check = fread(data, 1, length, (png_FILE_p)io_ptr);
+      check = fread(data, 1, length, (FILE *)io_ptr);
 
    if (check != length)
       png_error(png_ptr, "Read Error");
@@ -437,7 +433,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, size_t length)
    if (png_ptr == NULL)
       png_error(png_ptr, "pngtest_write_data: bad png_ptr");
 
-   check = fwrite(data, 1, length, (png_FILE_p)png_get_io_ptr(png_ptr));
+   check = fwrite(data, 1, length, (FILE *)png_get_io_ptr(png_ptr));
 
    if (check != length)
       png_error(png_ptr, "Write Error");
@@ -858,8 +854,8 @@ pngtest_check_text_support(png_structp png_ptr, png_textp text_ptr,
 static int
 test_one_file(const char *inname, const char *outname)
 {
-   static png_FILE_p fpin;
-   static png_FILE_p fpout;  /* "static" prevents setjmp corruption */
+   static FILE *fpin;
+   static FILE *fpout;  /* "static" prevents setjmp corruption */
    pngtest_error_parameters error_parameters;
    png_structp read_ptr;
    png_infop read_info_ptr, end_info_ptr;

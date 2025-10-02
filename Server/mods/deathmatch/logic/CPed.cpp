@@ -369,14 +369,12 @@ bool CPed::HasWeaponType(unsigned char ucWeaponType)
 
 float CPed::GetMaxHealth()
 {
-    // TODO: Verify this formula
-
     // Grab his player health stat
     float fStat = GetPlayerStat(24 /*MAX_HEALTH*/);
 
     // Do a linear interpolation to get how much health this would allow
-    // Assumes: 100 health = 569 stat, 200 health = 1000 stat.
-    float fMaxHealth = 100.0f + (100.0f / 431.0f * (fStat - 569.0f));
+    // Assumes: 100 health = 569 stat, 176 health = 1000 stat.
+    float fMaxHealth = fStat * 0.176f;
 
     // Return the max health. Make sure it can't be below 1
     if (fMaxHealth < 1.0f)
@@ -479,22 +477,22 @@ void CPed::SetSyncer(CPlayer* pPlayer)
         {
             case VEHICLEACTION_ENTERING:
             {
-                CVehicle*     pVehicle = GetOccupiedVehicle();
-                unsigned char ucOccupiedSeat = static_cast<unsigned char>(GetOccupiedVehicleSeat());
+                CVehicle*    pVehicle = GetOccupiedVehicle();
+                unsigned int occupiedSeat = GetOccupiedVehicleSeat();
                 // Does it have an occupant and is the occupant us?
-                if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
+                if (pVehicle && (this == pVehicle->GetOccupant(occupiedSeat)))
                 {
                     // Warp us into vehicle
-                    CStaticFunctionDefinitions::WarpPedIntoVehicle(this, pVehicle, ucOccupiedSeat);
+                    CStaticFunctionDefinitions::WarpPedIntoVehicle(this, pVehicle, occupiedSeat);
                 }
             }
 
             case VEHICLEACTION_EXITING:
             {
-                CVehicle*     pVehicle = GetOccupiedVehicle();
-                unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
+                CVehicle*    pVehicle = GetOccupiedVehicle();
+                unsigned int occupiedSeat = GetOccupiedVehicleSeat();
                 // Does it have an occupant and is the occupant us?
-                if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
+                if (pVehicle && (this == pVehicle->GetOccupant(occupiedSeat)))
                 {
                     // Warp us out of vehicle
                     CStaticFunctionDefinitions::RemovePedFromVehicle(this);

@@ -15,6 +15,7 @@
 #include "profiler/SharedUtil.Profiler.h"
 #define UTF8_FILE_HOOKS_PERSONALITY_Core
 #include "SharedUtil.Win32Utf8FileHooks.hpp"
+#include "SharedUtil.Memory.h"
 
 #define CORE_API extern "C" __declspec(dllexport)
 
@@ -90,9 +91,11 @@ CORE_API int InitializeCore()
         return 4;
 
     // Group our processes and windows under a single taskbar button
-    SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto");
+    SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto " MTA_STR(MTASA_VERSION_MAJOR) L"." MTA_STR(MTASA_VERSION_MINOR));
 
     WriteDebugEvent(SString("ModuleFileName: %s", *GetLaunchPathFilename()));
+
+    SetMemoryAllocationFailureHandler();
 
     g_pCore = new CCore();
     return 0;

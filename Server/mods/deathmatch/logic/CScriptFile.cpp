@@ -200,6 +200,14 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
     return fread(outBuffer.data(), 1, ulSize, m_pFile);
 }
 
+long CScriptFile::ReadToBuffer(unsigned char* buffer, unsigned long bufferSize)
+{
+    if (!m_pFile)
+        return -1;
+
+    return fread(buffer, 1, bufferSize, m_pFile);
+}
+
 long CScriptFile::Write(unsigned long ulSize, const char* pData)
 {
     if (!m_pFile)

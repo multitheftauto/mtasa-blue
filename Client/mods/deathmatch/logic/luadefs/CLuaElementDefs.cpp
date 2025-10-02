@@ -14,8 +14,6 @@
 #include <lua/CLuaFunctionParser.h>
 using std::list;
 
-#define MIN_CLIENT_REQ_LOD_FOR_BUILDING "1.6.0-9.22470"
-
 void CLuaElementDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -1791,7 +1789,7 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
                 key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::SetElementData(*pEntity, key.ToCString(), value, bSynchronize))
+            if (CStaticFunctionDefinitions::SetElementData(*pEntity, key, value, bSynchronize))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1830,7 +1828,7 @@ int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
                 key = key->substr(0, MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, key.ToCString()))
+            if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, key))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -2102,7 +2100,7 @@ int CLuaElementDefs::SetElementInterior(lua_State* luaVM)
             }
 
             // Set the interior
-            if (CStaticFunctionDefinitions::SetElementInterior(*pEntity, uiInterior, bSetPosition, vecPosition))
+            if (CStaticFunctionDefinitions::SetElementInterior(*pEntity, static_cast<unsigned char>(uiInterior), bSetPosition, vecPosition))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -2513,10 +2511,6 @@ int CLuaElementDefs::GetLowLodElement(lua_State* luaVM)
 bool CLuaElementDefs::SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity, std::optional<CClientEntity*> pLowLodEntity)
 {
     //  bool setLowLODElement ( element theElement [, element lowLowElement ] )
-
-    if (pEntity->GetType() == CCLIENTBUILDING)
-        MinClientReqCheck(luaVM, MIN_CLIENT_REQ_LOD_FOR_BUILDING, "target is building");
-
     return CStaticFunctionDefinitions::SetLowLodElement(*pEntity, pLowLodEntity.value_or(nullptr));
 }
 

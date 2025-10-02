@@ -264,6 +264,10 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
 #if !defined(DISABLE_VBR) && !defined(DISABLE_FLOAT_API)
    case SPEEX_SET_VBR_QUALITY:
       st->vbr_quality = (*(float*)ptr);
+      if (st->vbr_quality < 0)
+          st->vbr_quality = 0;
+      else if (st->vbr_quality > 10)
+          st->vbr_quality = 10;
       break;
    case SPEEX_GET_VBR_QUALITY:
       (*(float*)ptr) = st->vbr_quality;

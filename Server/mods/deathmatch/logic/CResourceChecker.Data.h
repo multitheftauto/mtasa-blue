@@ -15,6 +15,7 @@ namespace
     // Minimum version requirements for functions/events
     //
 
+#if 0 // Activate the counterpart in CResourceChecker::CheckVersionRequirements when you add items to these lists
     struct SVersionItem
     {
         SString functionName;
@@ -22,56 +23,15 @@ namespace
     };
 
     SVersionItem clientFunctionInitList[] = {
-        // Features added in 1.6.0
-        {"getAllElementData", "1.6.0-9.21695"},
-        {"engineLoadIMG", "1.6.0-9.21695"},
-        {"engineImageLinkDFF", "1.6.0-9.21695"},
-        {"engineImageLinkTXD", "1.6.0-9.21695"},
-        {"engineRestoreDFFImage", "1.6.0-9.21695"},
-        {"engineRestoreTXDImage", "1.6.0-9.21695"},
-        {"engineAddImage", "1.6.0-9.21695"},
-        {"engineRemoveImage", "1.6.0-9.21695"},
-        {"engineImageGetFilesCount", "1.6.0-9.21695"},
-        {"engineImageGetFiles", "1.6.0-9.21695"},
-        {"engineImageGetFile", "1.6.0-9.21695"},
-        {"engineGetModelTXDID", "1.6.0-9.21695"},
-        {"engineSetModelFlags", "1.6.0-9.21695"},
-        {"engineGetModelFlags", "1.6.0-9.21695"},
-        {"engineResetModelFlags", "1.6.0-9.21695"},
-        {"engineGetModelFlag", "1.6.0-9.21695"},
-        {"engineSetModelFlag", "1.6.0-9.21695"},
-        {"fileGetContents", "1.6.0-9.21938"},
-        {"engineStreamingSetModelCacheLimits", "1.6.0-9.21946"},
-        {"engineStreamingRestoreBufferSize", "1.6.0-9.22195"},
-        {"createBuilding", "1.6.0-9.22410"},
-        {"restoreAllGameBuildings", "1.6.0-9.22420"},
-        {"removeAllGameBuildings", "1.6.0-9.22420"},
-        {"pathListDir", "1.6.0-9.22470"},
-        {"pathIsFile", "1.6.0-9.22470"},
-        {"pathIsDirectory", "1.6.0-9.22470"},
-        {"engineGetPoolCapacity", "1.6.0-9.22471"},
-        {"engineGetPoolDefaultCapacity", "1.6.0-9.22471"},
-        {"engineGetPoolUsedCapacity", "1.6.0-9.22471"},
-        {"engineSetPoolCapacity", "1.6.0-9.22471"},
+        // Features added in 1.7.0
+        // {"name", "1.7.0-9.bbbbb"},
     };
 
     SVersionItem serverFunctionInitList[] = {
-        // Features added in 1.6.0
-        {"isObjectBreakable", "1.6.0-9.21765"},
-        {"setObjectBreakable", "1.6.0-9.21765"},
-        {"fileGetContents", "1.6.0-9.21938"},
-        {"isWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
-        {"setWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
-        {"onResourceStateChange", "1.6.0-9.22430"},
-        {"isObjectMoving", "1.6.0-9.22457"},
-        {"onPlayerTriggerInvalidEvent", "1.6.0-9.22459"},
-        {"pathListDir", "1.6.0-9.22470"},
-        {"pathIsFile", "1.6.0-9.22470"},
-        {"pathIsDirectory", "1.6.0-9.22470"},
-        {"onAccountCreate", "1.6.0-9.22470"},
-        {"onAccountRemove", "1.6.0-9.22470"},
-        {"getAccountType", "1.6.0-9.22470"},
+        // Features added in 1.7.0
+        // {"name", "1.7.0-9.bbbbb"},
     };
+#endif
 
     //
     // Deprecated function/events

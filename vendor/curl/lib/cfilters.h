@@ -24,7 +24,7 @@
  *
  ***************************************************************************/
 
-#include "timediff.h"
+#include "curlx/timediff.h"
 
 struct Curl_cfilter;
 struct Curl_easy;
@@ -369,6 +369,11 @@ bool Curl_conn_cf_needs_flush(struct Curl_cfilter *cf,
  */
 CURLcode Curl_conn_connect(struct Curl_easy *data, int sockindex,
                            bool blocking, bool *done);
+
+/**
+ * Check if a filter chain at `sockindex` for connection `conn` exists.
+ */
+bool Curl_conn_is_setup(struct connectdata *conn, int sockindex);
 
 /**
  * Check if the filter chain at `sockindex` for connection `conn` is

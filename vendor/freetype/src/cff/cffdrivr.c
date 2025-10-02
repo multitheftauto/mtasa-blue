@@ -4,7 +4,7 @@
  *
  *   OpenType font driver implementation (body).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, Werner Lemberg, and Dominik Röttsches.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -121,7 +121,20 @@
     kerning->y = 0;
 
     if ( sfnt )
-      kerning->x = sfnt->get_kerning( cffface, left_glyph, right_glyph );
+    {
+      /* Use 'kern' table if available since that can be faster; otherwise */
+      /* use GPOS kerning pairs if available.                              */
+      if ( cffface->kern_avail_bits )
+        kerning->x = sfnt->get_kerning( cffface,
+                                        left_glyph,
+                                        right_glyph );
+#ifdef TT_CONFIG_OPTION_GPOS_KERNING
+      else if ( cffface->num_gpos_lookups_kerning )
+        kerning->x = sfnt->get_gpos_kerning( cffface,
+                                             left_glyph,
+                                             right_glyph );
+#endif
+    }
 
     return FT_Err_Ok;
   }
@@ -168,7 +181,7 @@
     CFF_Size       cffsize = (CFF_Size)size;
 
 
-    FT_TRACE1(( "cff_glyph_load: glyph index %d\n", glyph_index ));
+    FT_TRACE1(( "cff_glyph_load: glyph index %u\n", glyph_index ));
 
     /* now load the glyph outline if necessary */
     error = cff_slot_load( cffslot, cffsize, glyph_index, load_flags );
@@ -242,7 +255,7 @@
                                                     &dummy,
                                                     &aw );
 
-      FT_TRACE5(( "  idx %d: advance %s %d font unit%s\n",
+      FT_TRACE5(( "  idx %u: advance %s %d font unit%s\n",
                   start + nn,
                   horz ? "width" : "height",
                   aw,

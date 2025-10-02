@@ -95,13 +95,6 @@ typedef unsigned int curl_prot_t;
    in the API */
 #define CURLPROTO_MASK   (0x3ffffff)
 
-#define DICT_MATCH "/MATCH:"
-#define DICT_MATCH2 "/M:"
-#define DICT_MATCH3 "/FIND:"
-#define DICT_DEFINE "/DEFINE:"
-#define DICT_DEFINE2 "/D:"
-#define DICT_DEFINE3 "/LOOKUP:"
-
 #define CURL_DEFAULT_USER "anonymous"
 #define CURL_DEFAULT_PASSWORD "ftp@example.com"
 
@@ -152,16 +145,15 @@ typedef unsigned int curl_prot_t;
 #include <netinet/in6.h>
 #endif
 
-#include "timeval.h"
+#include "curlx/timeval.h"
 
 #include <curl/curl.h>
 
 #include "http_chunks.h" /* for the structs and enum stuff */
 #include "hostip.h"
 #include "hash.h"
-#include "hash_offt.h"
 #include "splay.h"
-#include "dynbuf.h"
+#include "curlx/dynbuf.h"
 #include "dynhds.h"
 #include "request.h"
 #include "netrc.h"
@@ -183,7 +175,6 @@ typedef ssize_t (Curl_recv)(struct Curl_easy *data,   /* transfer */
 
 #include "mime.h"
 #include "imap.h"
-#include "pop3.h"
 #include "smtp.h"
 #include "ftp.h"
 #include "file.h"
@@ -273,6 +264,7 @@ struct ssl_primary_config {
   char *clientcert;
   char *cipher_list;     /* list of ciphers to use */
   char *cipher_list13;   /* list of TLS 1.3 cipher suites to use */
+  char *signature_algorithms; /* list of signature algorithms to use */
   char *pinned_key;
   char *CRLfile;         /* CRL to check certificate revocation */
   struct curl_blob *cert_blob;
@@ -283,8 +275,8 @@ struct ssl_primary_config {
   char *password; /* TLS password (for, e.g., SRP) */
 #endif
   char *curves;          /* list of curves to use */
-  unsigned char ssl_options;  /* the CURLOPT_SSL_OPTIONS bitmask */
   unsigned int version_max; /* max supported version the client wants to use */
+  unsigned char ssl_options;  /* the CURLOPT_SSL_OPTIONS bitmask */
   unsigned char version;    /* what version the client wants to use */
   BIT(verifypeer);       /* set TRUE if this is desired */
   BIT(verifyhost);       /* set TRUE if CN/SAN must match hostname */
@@ -563,21 +555,6 @@ struct hostname {
 #define CURL_WANT_RECV(data) \
   (((data)->req.keepon & KEEP_RECVBITS) == KEEP_RECV)
 
-#if defined(CURLRES_ASYNCH) || !defined(CURL_DISABLE_DOH)
-#define USE_CURL_ASYNC
-struct Curl_async {
-  struct Curl_dns_entry *dns;
-#ifdef CURLRES_ASYNCH
-  struct thread_data thdata;
-  void *resolver; /* resolver state, if it is used in the URL state -
-                     ares_channel e.g. */
-#endif
-  int port;
-  BIT(done);  /* set TRUE when the lookup is complete */
-};
-
-#endif
-
 #define FIRSTSOCKET     0
 #define SECONDARYSOCKET 1
 
@@ -742,8 +719,6 @@ struct proxy_info {
   char *passwd;  /* proxy password string, allocated */
 };
 
-struct ldapconninfo;
-
 #define TRNSPRT_TCP 3
 #define TRNSPRT_UDP 4
 #define TRNSPRT_QUIC 5
@@ -764,18 +739,19 @@ struct connectdata {
      handle is still used by one or more easy handles and can only used by any
      other easy handle without careful consideration (== only for
      multiplexing) and it cannot be used by another multi handle! */
-#define CONN_INUSE(c) Curl_llist_count(&(c)->easyq)
+#define CONN_INUSE(c) (!Curl_uint_spbset_empty(&(c)->xfers_attached))
+#define CONN_ATTACHED(c) Curl_uint_spbset_count(&(c)->xfers_attached)
 
   /**** Fields set when inited and not modified again */
   curl_off_t connection_id; /* Contains a unique number to make it easier to
                                track the connections in the log output */
   char *destination; /* string carrying normalized hostname+port+scope */
 
-  /* 'dns_entry' is the particular host we use. This points to an entry in the
-     DNS cache and it will not get pruned while locked. It gets unlocked in
-     multi_done(). This entry will be NULL if the connection is reused as then
-     there is no name resolve done. */
-  struct Curl_dns_entry *dns_entry;
+  /* `meta_hash` is a general key-value store for implementations
+   * with the lifetime of the connection.
+   * Elements need to be added with their own destructor to be invoked when
+   * the connection is cleaned up (see Curl_hash_add2()).*/
+  struct Curl_hash meta_hash;
 
   /* 'remote_addr' is the particular IP we connected to. it is owned, set
    * and NULLed by the connected socket filter (if there is one). */
@@ -851,7 +827,14 @@ struct connectdata {
   struct kerberos5data krb5;  /* variables into the structure definition, */
 #endif                        /* however, some of them are ftp specific. */
 
-  struct Curl_llist easyq;    /* List of easy handles using this connection */
+  struct uint_spbset xfers_attached; /* mids of attached transfers */
+  /* A connection cache from a SHARE might be used in several multi handles.
+   * We MUST not reuse connections that are running in another multi,
+   * for concurrency reasons. That multi might run in another thread.
+   * `attached_multi` is set by the first transfer attached and cleared
+   * when the last one is detached.
+   * NEVER call anything on this multi, just check for equality. */
+  struct Curl_multi *attached_multi;
 
   /*************** Request - specific items ************/
 #if defined(USE_WINDOWS_SSPI) && defined(SECPKG_ATTR_ENDPOINT_BINDINGS)
@@ -879,46 +862,6 @@ struct connectdata {
   struct negotiatedata negotiate; /* state data for host Negotiate auth */
   struct negotiatedata proxyneg; /* state data for proxy Negotiate auth */
 #endif
-
-  union {
-#ifndef CURL_DISABLE_FTP
-    struct ftp_conn ftpc;
-#endif
-#ifdef USE_SSH
-    struct ssh_conn sshc;
-#endif
-#ifndef CURL_DISABLE_TFTP
-    struct tftp_state_data *tftpc;
-#endif
-#ifndef CURL_DISABLE_IMAP
-    struct imap_conn imapc;
-#endif
-#ifndef CURL_DISABLE_POP3
-    struct pop3_conn pop3c;
-#endif
-#ifndef CURL_DISABLE_SMTP
-    struct smtp_conn smtpc;
-#endif
-#ifndef CURL_DISABLE_RTSP
-    struct rtsp_conn rtspc;
-#endif
-#ifndef CURL_DISABLE_SMB
-    struct smb_conn smbc;
-#endif
-#ifdef USE_LIBRTMP
-    void *rtmp;
-#endif
-#ifdef USE_OPENLDAP
-    struct ldapconninfo *ldapc;
-#endif
-#ifndef CURL_DISABLE_MQTT
-    struct mqtt_conn mqtt;
-#endif
-#ifndef CURL_DISABLE_WEBSOCKETS
-    struct websocket *ws;
-#endif
-    unsigned int unused:1; /* avoids empty union */
-  } proto;
 
 #ifdef USE_UNIX_SOCKETS
   char *unix_domain_socket;
@@ -1035,9 +978,6 @@ struct Progress {
   curl_off_t current_speed; /* uses the currently fastest transfer */
   curl_off_t earlydata_sent;
 
-  int width; /* screen width at download start */
-  int flags; /* see progress.h */
-
   timediff_t timespent;
 
   timediff_t t_postqueue;
@@ -1059,7 +999,11 @@ struct Progress {
 
   curl_off_t speeder[ CURR_TIME ];
   struct curltime speeder_time[ CURR_TIME ];
-  int speeder_c;
+  unsigned char speeder_c;
+  BIT(hide);
+  BIT(ul_size_known);
+  BIT(dl_size_known);
+  BIT(headers_out); /* when the headers have been written */
   BIT(callback);  /* set when progress callback is used */
   BIT(is_t_startransfer_set);
 };
@@ -1208,6 +1152,8 @@ struct UrlState {
 #endif
   struct auth authhost;  /* auth details for host */
   struct auth authproxy; /* auth details for proxy */
+
+  struct Curl_dns_entry *dns[2]; /* DNS to connect FIRST/SECONDARY */
 #ifdef USE_CURL_ASYNC
   struct Curl_async async;  /* asynchronous name resolver data */
 #endif
@@ -1215,10 +1161,13 @@ struct UrlState {
 #if defined(USE_OPENSSL)
   /* void instead of ENGINE to avoid bleeding OpenSSL into this header */
   void *engine;
-  /* this is just a flag -- we do not need to reference the provider in any
-   * way as OpenSSL takes care of that */
-  BIT(provider);
-  BIT(provider_failed);
+  /* void instead of OSSL_PROVIDER */
+  void *provider;
+  void *baseprov;
+  void *libctx;
+  char *propq; /* for a provider */
+
+  BIT(provider_loaded);
 #endif /* USE_OPENSSL */
   struct curltime expiretime; /* set this with Curl_expire() only */
   struct Curl_tree timenode; /* for the splay stuff */
@@ -1493,6 +1442,7 @@ enum dupstring {
 #endif
   STRING_ECH_CONFIG,            /* CURLOPT_ECH_CONFIG */
   STRING_ECH_PUBLIC,            /* CURLOPT_ECH_PUBLIC */
+  STRING_SSL_SIGNATURE_ALGORITHMS, /* CURLOPT_SSL_SIGNATURE_ALGORITHMS */
 
   /* -- end of null-terminated strings -- */
 
@@ -1519,10 +1469,6 @@ enum dupblob {
   BLOB_LAST
 };
 
-/* callback that gets called when this easy handle is completed within a multi
-   handle. Only used for internally created transfers, like for example
-   DoH. */
-typedef int (*multidone_func)(struct Curl_easy *easy, CURLcode result);
 
 struct UserDefined {
   FILE *err;         /* the stderr user data goes here */
@@ -1678,10 +1624,6 @@ struct UserDefined {
                                                   before resolver start */
   void *resolver_start_client; /* pointer to pass to resolver start callback */
   long upkeep_interval_ms;      /* Time between calls for connection upkeep. */
-  multidone_func fmultidone;
-#ifndef CURL_DISABLE_DOH
-  curl_off_t dohfor_mid; /* this is a DoH request for that transfer */
-#endif
   CURLU *uh; /* URL handle for the current parsed URL */
 #ifndef CURL_DISABLE_HTTP
   void *trailer_data; /* pointer to pass to trailer data callback */
@@ -1776,7 +1718,6 @@ struct UserDefined {
                             us */
   BIT(wildcard_enabled); /* enable wildcard matching */
 #endif
-  BIT(hide_progress);    /* do not use the progress meter */
   BIT(http_fail_on_error);  /* fail on HTTP error codes >= 400 */
   BIT(http_keep_sending_on_error); /* for HTTP status codes >= 300 */
   BIT(http_transfer_encoding); /* request compressed HTTP transfer-encoding */
@@ -1831,6 +1772,7 @@ struct UserDefined {
   BIT(http09_allowed); /* allow HTTP/0.9 responses */
 #ifndef CURL_DISABLE_WEBSOCKETS
   BIT(ws_raw_mode);
+  BIT(ws_no_auto_pong);
 #endif
 };
 
@@ -1840,14 +1782,11 @@ struct UserDefined {
 #define IS_MIME_POST(a) FALSE
 #endif
 
-struct Names {
-  struct Curl_hash *hostcache;
-  enum {
-    HCACHE_NONE,    /* not pointing to anything */
-    HCACHE_MULTI,   /* points to a shared one in the multi handle */
-    HCACHE_SHARED   /* points to a shared one in a shared object */
-  } hostcachetype;
-};
+/* callback that gets called when a sub easy (data->master_mid set) is
+   DONE. Called on the master easy. */
+typedef void multi_sub_xfer_done_cb(struct Curl_easy *master_easy,
+                                    struct Curl_easy *sub_easy,
+                                    CURLcode result);
 
 /*
  * The 'connectdata' struct MUST have all the connection oriented stuff as we
@@ -1873,18 +1812,17 @@ struct Curl_easy {
   /* once an easy handle is added to a multi, either explicitly by the
    * libcurl application or implicitly during `curl_easy_perform()`,
    * a unique identifier inside this one multi instance. */
-  curl_off_t mid;
+  unsigned int mid;
+  unsigned int master_mid; /* if set, this transfer belongs to a master */
+  multi_sub_xfer_done_cb *sub_xfer_done;
 
   struct connectdata *conn;
-  struct Curl_llist_node multi_queue; /* for multihandle list management */
-  struct Curl_llist_node conn_queue; /* list per connectdata */
 
   CURLMstate mstate;  /* the handle's state */
   CURLcode result;   /* previous result */
 
   struct Curl_message msg; /* A single posted message. */
 
-  struct Names dns;
   struct Curl_multi *multi;    /* if non-NULL, points to the multi handle
                                   struct to which this "belongs" when used by
                                   the multi interface */
@@ -1892,6 +1830,13 @@ struct Curl_easy {
                                     struct to which this "belongs" when used
                                     by the easy interface */
   struct Curl_share *share;    /* Share, handles global variable mutexing */
+
+  /* `meta_hash` is a general key-value store for implementations
+   * with the lifetime of the easy handle.
+   * Elements need to be added with their own destructor to be invoked when
+   * the easy handle is cleaned up (see Curl_hash_add2()).*/
+  struct Curl_hash meta_hash;
+
 #ifdef USE_LIBPSL
   struct PslCache *psl;        /* The associated PSL cache. */
 #endif

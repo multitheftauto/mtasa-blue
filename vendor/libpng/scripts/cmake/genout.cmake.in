@@ -1,7 +1,7 @@
 # genout.cmake.in
 # Generate .out from .c with awk (generic), based upon the automake logic.
 
-# Copyright (c) 2022-2024 Cosmin Truta
+# Copyright (c) 2022-2025 Cosmin Truta
 # Copyright (c) 2016 Glenn Randers-Pehrson
 # Written by Roger Leigh, 2016
 #
@@ -16,6 +16,7 @@
 set(SRCDIR "@CMAKE_CURRENT_SOURCE_DIR@")
 set(BINDIR "@CMAKE_CURRENT_BINARY_DIR@")
 
+set(APPLE "@APPLE@")
 set(AWK "@AWK@")
 set(CMAKE_C_COMPILER "@CMAKE_C_COMPILER@")
 set(CMAKE_C_FLAGS @CMAKE_C_FLAGS@)

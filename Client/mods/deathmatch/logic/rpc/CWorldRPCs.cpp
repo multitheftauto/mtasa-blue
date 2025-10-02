@@ -212,9 +212,9 @@ void CWorldRPCs::ResetMapInfo(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetFPSLimit(NetBitStreamInterface& bitStream)
 {
-    short sFPSLimit;
-    bitStream.Read(sFPSLimit);
-    g_pCore->RecalculateFrameRateLimit(sFPSLimit);
+    std::uint16_t fps;
+    bitStream.Read(fps);
+    CStaticFunctionDefinitions::SetServerFPSLimit(fps);
 }
 
 void CWorldRPCs::SetGarageOpen(NetBitStreamInterface& bitStream)
@@ -368,12 +368,9 @@ void CWorldRPCs::SetAircraftMaxVelocity(NetBitStreamInterface& bitStream)
 {
     float fVelocity;
 
-    if (bitStream.Version() >= 0x3E)
+    if (bitStream.Read(fVelocity))
     {
-        if (bitStream.Read(fVelocity))
-        {
-            g_pGame->GetWorld()->SetAircraftMaxVelocity(fVelocity);
-        }
+        g_pGame->GetWorld()->SetAircraftMaxVelocity(fVelocity);
     }
 }
 
@@ -525,14 +522,7 @@ void CWorldRPCs::SetWeaponProperty(NetBitStreamInterface& bitStream)
             case WeaponProperty::WEAPON_FLAGS:
             {
                 int iData = 0;
-                if (bitStream.Version() < 0x57)
-                {
-                    bitStream.Read(sData);
-                    iData = sData;
-                }
-                else
-                    bitStream.Read(iData);
-
+                bitStream.Read(iData);
                 pWeaponInfo->ToggleFlagBits(iData);
                 break;
             }
@@ -579,12 +569,8 @@ void CWorldRPCs::RemoveWorldModel(NetBitStreamInterface& bitStream)
     unsigned short usModel = 0;
     float          fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
     char           cInterior = -1;
-    if (bitStream.Read(usModel) && bitStream.Read(fRadius) && bitStream.Read(fX) && bitStream.Read(fY) && bitStream.Read(fZ))
+    if (bitStream.Read(usModel) && bitStream.Read(fRadius) && bitStream.Read(fX) && bitStream.Read(fY) && bitStream.Read(fZ) && bitStream.Read(cInterior))
     {
-        if (bitStream.Version() >= 0x039)
-        {
-            bitStream.Read(cInterior);
-        }
         g_pGame->GetBuildingRemoval()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 }
@@ -594,12 +580,8 @@ void CWorldRPCs::RestoreWorldModel(NetBitStreamInterface& bitStream)
     unsigned short usModel = 0;
     float          fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
     char           cInterior = -1;
-    if (bitStream.Read(usModel) && bitStream.Read(fRadius) && bitStream.Read(fX) && bitStream.Read(fY) && bitStream.Read(fZ))
+    if (bitStream.Read(usModel) && bitStream.Read(fRadius) && bitStream.Read(fX) && bitStream.Read(fY) && bitStream.Read(fZ) && bitStream.Read(cInterior))
     {
-        if (bitStream.Version() >= 0x039)
-        {
-            bitStream.Read(cInterior);
-        }
         g_pGame->GetBuildingRemoval()->RestoreBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 }
@@ -619,12 +601,8 @@ void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)
     bitStream.Read(g_TickRateSettings.iObjectSync);
     bitStream.Read(g_TickRateSettings.iKeySyncRotation);
     bitStream.Read(g_TickRateSettings.iKeySyncAnalogMove);
-
-    if (bitStream.Can(eBitStreamVersion::FixSyncerDistance))
-    {
-        bitStream.Read(g_TickRateSettings.iPedSyncerDistance);
-        bitStream.Read(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
-    }
+    bitStream.Read(g_TickRateSettings.iPedSyncerDistance);
+    bitStream.Read(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
 }
 
 void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)

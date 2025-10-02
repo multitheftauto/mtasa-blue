@@ -51,16 +51,17 @@ Var ServerExePath
 Var UninstallExePath
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
-!define GUID "{119D0ADB-56AF-4C85-9037-26564C0ACD57}"
-
+!define GUID "{8A7FC5C7-0023-4CD7-B1D6-89073CFD838F}"
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "6"
+    !define MINOR_VER "7"
     !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
+
+!define APPLICATION_ID "Multi Theft Auto ${0.0}"
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
@@ -390,6 +391,12 @@ Function .onInstSuccess
 			Push $ClientExePath
 			Push $StartMenuClientShortcutPath
 			Call MTACreateShortсut
+		${EndIf}
+		${If} ${FileExists} $StartMenuClientShortcutPath
+			ApplicationID::Set "$StartMenuClientShortcutPath" "${APPLICATION_ID}"
+			${If} ${Errors}
+				${LogText} "Error setting Application ID for client shortcut"
+			${EndIf}
 		${EndIf}
 		# Either update or create Server shortcut
 		${If} ${FileExists} $StartMenuServerShortcutPath
@@ -857,6 +864,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libcrypto-3.dll"
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libssl-3.dll"
         !endif
+        File "${SERVER_FILES_ROOT}\mods\deathmatch\mtaserver.conf.template"
 
         ;Only overwrite the following files if previous versions were bugged and explicitly need replacing
         !insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"

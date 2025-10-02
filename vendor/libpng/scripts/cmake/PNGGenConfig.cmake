@@ -18,21 +18,21 @@ function(generate_chk)
   set(options)
   set(oneValueArgs INPUT OUTPUT)
   set(multiValueArgs DEPENDS)
-  cmake_parse_arguments(_GC "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-  if(NOT _GC_INPUT)
+  cmake_parse_arguments(_GENCHK "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  if(NOT _GENCHK_INPUT)
     message(FATAL_ERROR "generate_chk: Missing INPUT argument")
   endif()
-  if(NOT _GC_OUTPUT)
+  if(NOT _GENCHK_OUTPUT)
     message(FATAL_ERROR "generate_chk: Missing OUTPUT argument")
   endif()
 
   # Run genchk.cmake to generate the .chk file.
-  add_custom_command(OUTPUT "${_GC_OUTPUT}"
+  add_custom_command(OUTPUT "${_GENCHK_OUTPUT}"
                      COMMAND "${CMAKE_COMMAND}"
-                             "-DINPUT=${_GC_INPUT}"
-                             "-DOUTPUT=${_GC_OUTPUT}"
+                             "-DINPUT=${_GENCHK_INPUT}"
+                             "-DOUTPUT=${_GENCHK_OUTPUT}"
                              -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/genchk.cmake"
-                     DEPENDS "${_GC_INPUT}" ${_GC_DEPENDS}
+                     DEPENDS "${_GENCHK_INPUT}" ${_GENCHK_DEPENDS}
                      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
 
@@ -42,21 +42,21 @@ function(generate_out)
   set(options)
   set(oneValueArgs INPUT OUTPUT)
   set(multiValueArgs DEPENDS)
-  cmake_parse_arguments(_GO "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-  if(NOT _GO_INPUT)
+  cmake_parse_arguments(_GENOUT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  if(NOT _GENOUT_INPUT)
     message(FATAL_ERROR "generate_out: Missing INPUT argument")
   endif()
-  if(NOT _GO_OUTPUT)
+  if(NOT _GENOUT_OUTPUT)
     message(FATAL_ERROR "generate_out: Missing OUTPUT argument")
   endif()
 
   # Run genout.cmake to generate the .out file.
-  add_custom_command(OUTPUT "${_GO_OUTPUT}"
+  add_custom_command(OUTPUT "${_GENOUT_OUTPUT}"
                      COMMAND "${CMAKE_COMMAND}"
-                             "-DINPUT=${_GO_INPUT}"
-                             "-DOUTPUT=${_GO_OUTPUT}"
+                             "-DINPUT=${_GENOUT_INPUT}"
+                             "-DOUTPUT=${_GENOUT_OUTPUT}"
                              -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/genout.cmake"
-                     DEPENDS "${_GO_INPUT}" ${_GO_DEPENDS}
+                     DEPENDS "${_GENOUT_INPUT}" ${_GENOUT_DEPENDS}
                      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
 
@@ -66,17 +66,17 @@ function(generate_source)
   set(options)
   set(oneValueArgs OUTPUT)
   set(multiValueArgs DEPENDS)
-  cmake_parse_arguments(_GSO "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-  if(NOT _GSO_OUTPUT)
+  cmake_parse_arguments(_GENSRC "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  if(NOT _GENSRC_OUTPUT)
     message(FATAL_ERROR "generate_source: Missing OUTPUT argument")
   endif()
 
   # Run gensrc.cmake to generate the source file.
-  add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${_GSO_OUTPUT}"
+  add_custom_command(OUTPUT "${_GENSRC_OUTPUT}"
                      COMMAND "${CMAKE_COMMAND}"
-                             "-DOUTPUT=${_GSO_OUTPUT}"
+                             "-DOUTPUT=${_GENSRC_OUTPUT}"
                              -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/gensrc.cmake"
-                     DEPENDS ${_GSO_DEPENDS}
+                     DEPENDS ${_GENSRC_DEPENDS}
                      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
 
@@ -86,19 +86,19 @@ function(generate_copy)
   set(options)
   set(oneValueArgs INPUT OUTPUT)
   set(multiValueArgs DEPENDS)
-  cmake_parse_arguments(_GCO "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-  if(NOT _GCO_INPUT)
+  cmake_parse_arguments(_GENCPY "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  if(NOT _GENCPY_INPUT)
     message(FATAL_ERROR "generate_copy: Missing INPUT argument")
   endif()
-  if(NOT _GCO_OUTPUT)
+  if(NOT _GENCPY_OUTPUT)
     message(FATAL_ERROR "generate_copy: Missing OUTPUT argument")
   endif()
 
   # Make a forced file copy, overwriting any pre-existing output file.
-  add_custom_command(OUTPUT "${_GCO_OUTPUT}"
+  add_custom_command(OUTPUT "${_GENCPY_OUTPUT}"
                      COMMAND "${CMAKE_COMMAND}"
-                             -E remove "${_GCO_OUTPUT}"
+                             -E remove "${_GENCPY_OUTPUT}"
                      COMMAND "${CMAKE_COMMAND}"
-                             -E copy "${_GCO_INPUT}" "${_GCO_OUTPUT}"
-                     DEPENDS "${source}" ${_GCO_DEPENDS})
+                             -E copy "${_GENCPY_INPUT}" "${_GENCPY_OUTPUT}"
+                     DEPENDS "${_GENCPY_INPUT}" ${_GENCPY_DEPENDS})
 endfunction()

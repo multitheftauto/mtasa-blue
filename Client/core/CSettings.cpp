@@ -10,9 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <vector>
+#include "../gui/GuiCleanup.h"
+#include "../gui/CGUIElement_Impl.h"
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
 #include <game/CSettings.h>
+#include "CSteamClient.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 
 using namespace std;
 
@@ -26,14 +32,304 @@ extern CCore*              g_pCore;
 extern SBindableGTAControl g_bcControls[];
 extern SBindableKey        g_bkKeys[];
 
+namespace
+{
+constexpr float kBorderlessGammaMin = 0.5f;
+constexpr float kBorderlessGammaMax = 2.0f;
+constexpr float kBorderlessGammaDefault = 0.95f;
+constexpr float kBorderlessBrightnessMin = 0.5f;
+constexpr float kBorderlessBrightnessMax = 2.0f;
+constexpr float kBorderlessBrightnessDefault = 1.03f;
+constexpr float kBorderlessContrastMin = 0.5f;
+constexpr float kBorderlessContrastMax = 2.0f;
+constexpr float kBorderlessContrastDefault = 1.0f;
+constexpr float kBorderlessSaturationMin = 0.5f;
+constexpr float kBorderlessSaturationMax = 2.0f;
+constexpr float kBorderlessSaturationDefault = 1.0f;
+
+constexpr float kSettingsContentWidth = 680.0f;
+constexpr float kSettingsExtendedContentWidth = 820.0f;
+constexpr float kSettingsBaseContentHeight = 480.0f;
+constexpr float kSettingsExtendedContentHeight = 520.0f;
+constexpr float kSettingsWindowFrameHorizontal = 18.0f;            // 9px left + 9px right
+constexpr float kSettingsWindowFrameVertical = 22.0f;              // 20px top + 2px bottom
+constexpr float kSettingsBottomButtonAreaHeight = 38.0f;
+constexpr float kPostFxCheckboxOffset = 24.0f;
+
+float NormalizeSliderValue(float value, float minValue, float maxValue)
+{
+    if (maxValue <= minValue)
+        return 0.0f;
+    return std::clamp((value - minValue) / (maxValue - minValue), 0.0f, 1.0f);
+}
+
+float DenormalizeSliderValue(float position, float minValue, float maxValue)
+{
+    position = std::clamp(position, 0.0f, 1.0f);
+    return minValue + position * (maxValue - minValue);
+}
+}
+
+void CSettings::ResetGuiPointers()
+{
+    m_pWindow = NULL;
+    m_pTabs = NULL;
+    m_pTabMultiplayer = NULL;
+    m_pTabVideo = NULL;
+    m_pTabInterface = NULL;
+    m_pTabBrowser = NULL;
+    m_pTabPostFX = NULL;
+    m_pTabAudio = NULL;
+    m_pTabBinds = NULL;
+    m_pTabControls = NULL;
+    m_pTabAdvanced = NULL;
+    m_pButtonOK = NULL;
+    m_pButtonCancel = NULL;
+    m_pLabelNick = NULL;
+    m_pButtonGenerateNick = NULL;
+    m_pButtonGenerateNickIcon = NULL;
+    m_pEditNick = NULL;
+    m_pSavePasswords = NULL;
+    m_pAutoRefreshBrowser = NULL;
+
+    m_pVideoGeneralLabel = NULL;
+    m_pVideoResolutionLabel = NULL;
+    m_pComboResolution = NULL;
+    m_pCheckBoxMipMapping = NULL;
+    m_pCheckBoxWindowed = NULL;
+    m_pCheckBoxDPIAware = NULL;
+    m_pCheckBoxHudMatchAspectRatio = NULL;
+    m_pCheckBoxMinimize = NULL;
+    m_pMapRenderingLabel = NULL;
+    m_pComboFxQuality = NULL;
+    m_pFXQualityLabel = NULL;
+    m_pComboAspectRatio = NULL;
+    m_pAspectRatioLabel = NULL;
+    m_pCheckBoxVolumetricShadows = NULL;
+    m_pCheckBoxDeviceSelectionDialog = NULL;
+    m_pCheckBoxShowUnsafeResolutions = NULL;
+    m_pCheckBoxAllowScreenUpload = NULL;
+    m_pCheckBoxAllowExternalSounds = NULL;
+    m_pCheckBoxCustomizedSAFiles = NULL;
+    m_pCheckBoxAllowDiscordRPC = NULL;
+    m_pCheckBoxAllowSteamClient = NULL;
+    m_pCheckBoxAlwaysShowTransferBox = NULL;
+    m_pCheckBoxGrass = NULL;
+    m_pCheckBoxHeatHaze = NULL;
+    m_pCheckBoxTyreSmokeParticles = NULL;
+    m_pCheckBoxHighDetailVehicles = NULL;
+    m_pCheckBoxHighDetailPeds = NULL;
+    m_pCheckBoxBlur = NULL;
+    m_pCheckBoxCoronaReflections = NULL;
+    m_pCheckBoxDynamicPedShadows = NULL;
+    m_pFieldOfViewLabel = NULL;
+    m_pFieldOfView = NULL;
+    m_pFieldOfViewValueLabel = NULL;
+    m_pDrawDistanceLabel = NULL;
+    m_pDrawDistance = NULL;
+    m_pDrawDistanceValueLabel = NULL;
+    m_pBrightnessLabel = NULL;
+    m_pBrightness = NULL;
+    m_pBrightnessValueLabel = NULL;
+    m_pBorderlessGammaToggle = NULL;
+    m_pBorderlessGammaLabel = NULL;
+    m_pBorderlessGamma = NULL;
+    m_pBorderlessGammaValueLabel = NULL;
+    m_pBorderlessBrightnessToggle = NULL;
+    m_pBorderlessBrightnessLabel = NULL;
+    m_pBorderlessBrightness = NULL;
+    m_pBorderlessBrightnessValueLabel = NULL;
+    m_pBorderlessContrastToggle = NULL;
+    m_pBorderlessContrastLabel = NULL;
+    m_pBorderlessContrast = NULL;
+    m_pBorderlessContrastValueLabel = NULL;
+    m_pBorderlessSaturationToggle = NULL;
+    m_pBorderlessSaturationLabel = NULL;
+    m_pBorderlessSaturation = NULL;
+    m_pBorderlessSaturationValueLabel = NULL;
+    m_pCheckBoxApplyBorderless = NULL;
+    m_pCheckBoxApplyFullscreen = NULL;
+    m_pAnisotropicLabel = NULL;
+    m_pAnisotropic = NULL;
+    m_pAnisotropicValueLabel = NULL;
+    m_pComboAntiAliasing = NULL;
+    m_pAntiAliasingLabel = NULL;
+    m_pMapAlphaLabel = NULL;
+    m_pMapAlpha = NULL;
+    m_pMapAlphaValueLabel = NULL;
+    m_pStreamingMemoryLabel = NULL;
+    m_pStreamingMemory = NULL;
+    m_pStreamingMemoryMinLabel = NULL;
+    m_pStreamingMemoryMaxLabel = NULL;
+    m_pStreamingMemoryLabelInfo = NULL;
+    m_pVideoDefButton = NULL;
+
+    m_pAdvancedSettingDescriptionLabel = NULL;
+    m_pFullscreenStyleLabel = NULL;
+    m_pFullscreenStyleCombo = NULL;
+    m_pCheckBoxVSync = NULL;
+    m_pPriorityLabel = NULL;
+    m_pPriorityCombo = NULL;
+    m_pPlayerMapImageLabel = NULL;
+    m_pPlayerMapImageCombo = NULL;
+    m_pFastClothesLabel = NULL;
+    m_pFastClothesCombo = NULL;
+    m_pAudioGeneralLabel = NULL;
+    m_pUserTrackGeneralLabel = NULL;
+    m_pBrowserSpeedLabel = NULL;
+    m_pBrowserSpeedCombo = NULL;
+    m_pSingleDownloadLabel = NULL;
+    m_pSingleDownloadCombo = NULL;
+    m_pPacketTagLabel = NULL;
+    m_pPacketTagCombo = NULL;
+    m_pProgressAnimationLabel = NULL;
+    m_pProgressAnimationCombo = NULL;
+    m_pDebugSettingLabel = NULL;
+    m_pDebugSettingCombo = NULL;
+    m_pWin8Label = NULL;
+    m_pWin8ColorCheckBox = NULL;
+    m_pWin8MouseCheckBox = NULL;
+    m_pPhotoSavingCheckbox = NULL;
+    m_pCheckBoxAskBeforeDisconnect = NULL;
+    m_pProcessAffinityCheckbox = NULL;
+    m_pUpdateBuildTypeLabel = NULL;
+    m_pUpdateBuildTypeCombo = NULL;
+    m_pUpdateAutoInstallLabel = NULL;
+    m_pUpdateAutoInstallCombo = NULL;
+    m_pButtonUpdate = NULL;
+    m_pAdvancedMiscLabel = NULL;
+    m_pAdvancedUpdaterLabel = NULL;
+    m_pCachePathLabel = NULL;
+    m_pCachePathValue = NULL;
+    m_pCachePathShowButton = NULL;
+
+    m_pLabelMasterVolume = NULL;
+    m_pLabelRadioVolume = NULL;
+    m_pLabelSFXVolume = NULL;
+    m_pLabelMTAVolume = NULL;
+    m_pLabelVoiceVolume = NULL;
+    m_pLabelMasterVolumeValue = NULL;
+    m_pLabelRadioVolumeValue = NULL;
+    m_pLabelSFXVolumeValue = NULL;
+    m_pLabelMTAVolumeValue = NULL;
+    m_pLabelVoiceVolumeValue = NULL;
+    m_pAudioMasterVolume = NULL;
+    m_pAudioRadioVolume = NULL;
+    m_pAudioSFXVolume = NULL;
+    m_pAudioMTAVolume = NULL;
+    m_pAudioVoiceVolume = NULL;
+    m_pAudioRadioLabel = NULL;
+    m_pCheckBoxAudioEqualizer = NULL;
+    m_pCheckBoxAudioAutotune = NULL;
+    m_pAudioMuteLabel = NULL;
+    m_pCheckBoxMuteMaster = NULL;
+    m_pCheckBoxMuteSFX = NULL;
+    m_pCheckBoxMuteRadio = NULL;
+    m_pCheckBoxMuteMTA = NULL;
+    m_pCheckBoxMuteVoice = NULL;
+    m_pAudioUsertrackLabel = NULL;
+    m_pCheckBoxUserAutoscan = NULL;
+    m_pLabelUserTrackMode = NULL;
+    m_pComboUsertrackMode = NULL;
+    m_pAudioDefButton = NULL;
+
+    m_pBindsList = NULL;
+    m_pBindsDefButton = NULL;
+
+    m_pJoypadName = NULL;
+    m_pJoypadUnderline = NULL;
+    m_pEditDeadzone = NULL;
+    m_pEditSaturation = NULL;
+    m_pJoypadLabels.clear();
+    m_pJoypadButtons.clear();
+
+    m_pSelectedBind = NULL;
+
+    m_pControlsMouseLabel = NULL;
+    m_pInvertMouse = NULL;
+    m_pSteerWithMouse = NULL;
+    m_pFlyWithMouse = NULL;
+    m_pLabelMouseSensitivity = NULL;
+    m_pMouseSensitivity = NULL;
+    m_pLabelMouseSensitivityValue = NULL;
+    m_pLabelVerticalAimSensitivity = NULL;
+    m_pVerticalAimSensitivity = NULL;
+    m_pLabelVerticalAimSensitivityValue = NULL;
+
+    m_pControlsJoypadLabel = NULL;
+    m_pControlsInputTypePane = NULL;
+    m_pStandardControls = NULL;
+    m_pClassicControls = NULL;
+
+    m_pInterfaceLanguageSelector = NULL;
+    m_pInterfaceSkinSelector = NULL;
+    m_pInterfaceLoadSkin = NULL;
+
+    m_pChatPresets = NULL;
+    m_pChatLoadPreset = NULL;
+
+    for (int i = 0; i < Chat::ColorType::MAX; ++i)
+    {
+        m_pChatRed[i] = NULL;
+        m_pChatGreen[i] = NULL;
+        m_pChatBlue[i] = NULL;
+        m_pChatAlpha[i] = NULL;
+        m_pChatRedValue[i] = NULL;
+        m_pChatGreenValue[i] = NULL;
+        m_pChatBlueValue[i] = NULL;
+        m_pChatAlphaValue[i] = NULL;
+        m_pChatColorPreview[i] = NULL;
+    }
+
+    m_pPaneChatFont = NULL;
+    for (int i = 0; i < Chat::Font::MAX; ++i)
+        m_pRadioChatFont[i] = NULL;
+
+    m_pChatHorizontalCombo = NULL;
+    m_pChatVerticalCombo = NULL;
+    m_pChatTextAlignCombo = NULL;
+    m_pChatOffsetX = NULL;
+    m_pChatOffsetY = NULL;
+    m_pChatLines = NULL;
+    m_pChatScaleX = NULL;
+    m_pChatScaleY = NULL;
+    m_pChatWidth = NULL;
+    m_pChatCssBackground = NULL;
+    m_pChatNickCompletion = NULL;
+    m_pChatCssText = NULL;
+    m_pChatTextBlackOutline = NULL;
+    m_pChatLineLife = NULL;
+    m_pChatLineFadeout = NULL;
+    m_pFlashWindow = NULL;
+    m_pTrayBalloon = NULL;
+
+    m_pLabelBrowserGeneral = NULL;
+    m_pCheckBoxRemoteBrowser = NULL;
+    m_pCheckBoxRemoteJavascript = NULL;
+    m_pLabelBrowserCustomBlacklist = NULL;
+    m_pEditBrowserBlacklistAdd = NULL;
+    m_pLabelBrowserBlacklistAdd = NULL;
+    m_pButtonBrowserBlacklistAdd = NULL;
+    m_pGridBrowserBlacklist = NULL;
+    m_pButtonBrowserBlacklistRemove = NULL;
+    m_pLabelBrowserCustomWhitelist = NULL;
+    m_pEditBrowserWhitelistAdd = NULL;
+    m_pLabelBrowserWhitelistAdd = NULL;
+    m_pButtonBrowserWhitelistAdd = NULL;
+    m_pGridBrowserWhitelist = NULL;
+    m_pButtonBrowserWhitelistRemove = NULL;
+    m_pCheckBoxBrowserGPUEnabled = NULL;
+}
+
 CSettings::CSettings()
 {
+    ResetGuiPointers();
+
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     m_fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
     m_fSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
 
     m_iMaxAnisotropic = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
-    m_pWindow = NULL;
     m_bBrowserListsChanged = false;
     m_bBrowserListsLoadEnabled = false;
     CreateGUI();
@@ -56,7 +352,7 @@ void CSettings::CreateGUI()
     if (m_pWindow)
         DestroyGUI();
 
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabAdvanced;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabPostFX, *pTabAudio, *pTabBinds, *pTabControls, *pTabAdvanced;
     CGUI*    pManager = g_pCore->GetGUI();
 
     // Init
@@ -70,13 +366,27 @@ void CSettings::CreateGUI()
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
 
-    CVector2D contentSize(640, 480);
-    float     fBottomButtonAreaHeight = 38;
+    const float fBottomButtonAreaHeight = kSettingsBottomButtonAreaHeight;
+    CVector2D   contentSize(kSettingsContentWidth, kSettingsBaseContentHeight);
+    const float availableContentWidth = resolution.fX - kSettingsWindowFrameHorizontal;
+    if (availableContentWidth >= kSettingsContentWidth)
+        contentSize.fX = std::min(kSettingsExtendedContentWidth, availableContentWidth);
+    else if (availableContentWidth > 0.0f)
+        contentSize.fX = availableContentWidth;
+
+    const float availableContentHeight = resolution.fY - kSettingsWindowFrameVertical;
+    if (availableContentHeight >= kSettingsBaseContentHeight)
+        contentSize.fY = std::min(kSettingsExtendedContentHeight, availableContentHeight);
+    else if (availableContentHeight > 0.0f)
+        contentSize.fY = std::max(availableContentHeight, fBottomButtonAreaHeight + 1.0f);
+
+    contentSize.fX = std::max(contentSize.fX, 0.0f);
+    contentSize.fY = std::max(contentSize.fY, fBottomButtonAreaHeight + 1.0f);
+
     CVector2D tabPanelPosition;
-    CVector2D tabPanelSize = contentSize - CVector2D(0, fBottomButtonAreaHeight);
 
     // Window size is content size plus window frame edge dims
-    CVector2D windowSize = contentSize + CVector2D(9 + 9, 20 + 2);
+    CVector2D windowSize = contentSize + CVector2D(kSettingsWindowFrameHorizontal, kSettingsWindowFrameVertical);
 
     if (windowSize.fX <= resolution.fX && windowSize.fY <= resolution.fY)
     {
@@ -101,6 +411,8 @@ void CSettings::CreateGUI()
         pFiller->SetZOrderingEnabled(false);
         pFiller->SetAlwaysOnTop(true);
         pFiller->MoveToBack();
+        contentSize.fX = std::min(contentSize.fX, resolution.fX);
+        contentSize.fY = std::min(contentSize.fY, resolution.fY);
         pFiller->SetPosition((resolution - contentSize) / 2);
         pFiller->SetSize(contentSize);
         m_pWindow = pFiller;
@@ -110,17 +422,19 @@ void CSettings::CreateGUI()
     // Create the tab panel and necessary tabs
     m_pTabs = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pWindow));
     m_pTabs->SetPosition(tabPanelPosition);
+    const CVector2D tabPanelSize = CVector2D(contentSize.fX, std::max(0.0f, contentSize.fY - fBottomButtonAreaHeight));
     m_pTabs->SetSize(tabPanelSize);
     m_pTabs->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnTabChanged, this));
 
-    pTabMultiplayer = m_pTabs->CreateTab(_("Multiplayer"));
-    pTabVideo = m_pTabs->CreateTab(_("Video"));
-    pTabAudio = m_pTabs->CreateTab(_("Audio"));
-    pTabBinds = m_pTabs->CreateTab(_("Binds"));
-    pTabControls = m_pTabs->CreateTab(_("Controls"));
+    pTabMultiplayer = m_pTabMultiplayer = m_pTabs->CreateTab(_("Multiplayer"));
+    pTabVideo = m_pTabVideo = m_pTabs->CreateTab(_("Video"));
+    pTabPostFX = m_pTabPostFX = m_pTabs->CreateTab(_("PostFX"));
+    pTabAudio = m_pTabAudio = m_pTabs->CreateTab(_("Audio"));
+    pTabBinds = m_pTabBinds = m_pTabs->CreateTab(_("Binds"));
+    pTabControls = m_pTabControls = m_pTabs->CreateTab(_("Controls"));
     m_pTabInterface = m_pTabs->CreateTab(_("Interface"));
     m_pTabBrowser = m_pTabs->CreateTab(_("Web Browser"));
-    pTabAdvanced = m_pTabs->CreateTab(_("Advanced"));
+    pTabAdvanced = m_pTabAdvanced = m_pTabs->CreateTab(_("Advanced"));
 
     // Create buttons
     //  OK button
@@ -404,6 +718,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxAllowSteamClient = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow GTA:SA ingame status on Steam"), false));
+    m_pCheckBoxAllowSteamClient->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowSteamClient->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowSteamClient->AutoSize(NULL, 20.0f);
 
     // Enable camera photos getting saved to documents folder
     m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
@@ -689,19 +1008,27 @@ void CSettings::CreateGUI()
 
     m_pFullscreenStyleCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabVideo, ""));
     m_pFullscreenStyleCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
+    m_pFullscreenStyleCombo->GetPosition(vecTemp, false);
     m_pFullscreenStyleCombo->SetSize(CVector2D(200, 95.0f));
+    m_pFullscreenStyleCombo->GetSize(vecSize);
     m_pFullscreenStyleCombo->AddItem(_("Standard"))->SetData((void*)FULLSCREEN_STANDARD);
     m_pFullscreenStyleCombo->AddItem(_("Borderless window"))->SetData((void*)FULLSCREEN_BORDERLESS);
     m_pFullscreenStyleCombo->AddItem(_("Borderless keep res"))->SetData((void*)FULLSCREEN_BORDERLESS_KEEP_RES);
     m_pFullscreenStyleCombo->SetReadOnly(true);
-    vecTemp.fY += 4;
 
     m_pCheckBoxMipMapping = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Mip Mapping"), true));
 #ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
-    m_pCheckBoxMipMapping->SetPosition(CVector2D(vecTemp.fX + 340.0f, vecTemp.fY + 45.0f));
+    m_pCheckBoxMipMapping->SetPosition(CVector2D(vecTemp.fX + vecSize.fX, vecTemp.fY + 45.0f));
     m_pCheckBoxMipMapping->SetSize(CVector2D(224.0f, 16.0f));
     m_pCheckBoxMipMapping->SetVisible(false);
 #endif
+
+    m_pCheckBoxVSync = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("V-Sync"), true));
+    m_pCheckBoxVSync->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
+    m_pCheckBoxVSync->AutoSize(NULL, 20.0f);
+
+    // Reset position to leftmost
+    m_pFullscreenStyleLabel->GetPosition(vecTemp, false);
 
     vecTemp.fY -= 5;
     m_pFieldOfViewLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("FOV:")));
@@ -916,6 +1243,106 @@ void CSettings::CreateGUI()
     m_pVideoDefButton->GetSize(vecSize);
     m_pVideoDefButton->SetPosition(CVector2D(vecTemp.fX - vecSize.fX - 12.0f, 387));
     m_pVideoDefButton->SetZOrderingEnabled(false);
+
+    /**
+     *  PostFX tab
+     **/
+    CVector2D postFxPos(12.0f, 12.0f);
+    const float postFxRowHeight = 28.0f;
+    const float postFxSliderWidth = 220.0f;
+    const float postFxValueColumnPadding = 10.0f;
+    const float postFxCheckboxColumnX = postFxPos.fX;
+    const float postFxLabelColumnX = postFxCheckboxColumnX + kPostFxCheckboxOffset;
+    const float postFxLabelIndent =
+        pManager->CGUI_GetMaxTextExtent("default-normal", _("Gamma:"), _("Brightness:"), _("Contrast:"), _("Saturation:")) + 5.0f;
+    const float postFxSliderColumnX = postFxLabelColumnX + postFxLabelIndent;
+    const float postFxValueColumnX = postFxSliderColumnX + postFxSliderWidth + postFxValueColumnPadding;
+
+    m_pBorderlessGammaToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
+    m_pBorderlessGammaToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
+    m_pBorderlessGammaToggle->AutoSize(nullptr, 20.0f);
+
+    m_pBorderlessGammaLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, _("Gamma:")));
+    m_pBorderlessGammaLabel->SetPosition(CVector2D(postFxLabelColumnX, postFxPos.fY + 2.0f));
+    m_pBorderlessGammaLabel->AutoSize();
+
+    m_pBorderlessGamma = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, m_pTabPostFX));
+    m_pBorderlessGamma->SetPosition(CVector2D(postFxSliderColumnX, postFxPos.fY));
+    m_pBorderlessGamma->SetSize(CVector2D(postFxSliderWidth, 20.0f));
+    m_pBorderlessGamma->SetProperty("StepSize", "0.01");
+
+    m_pBorderlessGammaValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
+    m_pBorderlessGammaValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
+    m_pBorderlessGammaValueLabel->AutoSize("2.00");
+
+    postFxPos.fY += postFxRowHeight;
+
+    m_pBorderlessBrightnessToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
+    m_pBorderlessBrightnessToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
+    m_pBorderlessBrightnessToggle->AutoSize(nullptr, 20.0f);
+
+    m_pBorderlessBrightnessLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, _("Brightness:")));
+    m_pBorderlessBrightnessLabel->SetPosition(CVector2D(postFxLabelColumnX, postFxPos.fY + 2.0f));
+    m_pBorderlessBrightnessLabel->AutoSize();
+
+    m_pBorderlessBrightness = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, m_pTabPostFX));
+    m_pBorderlessBrightness->SetPosition(CVector2D(postFxSliderColumnX, postFxPos.fY));
+    m_pBorderlessBrightness->SetSize(CVector2D(postFxSliderWidth, 20.0f));
+    m_pBorderlessBrightness->SetProperty("StepSize", "0.01");
+
+    m_pBorderlessBrightnessValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
+    m_pBorderlessBrightnessValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
+    m_pBorderlessBrightnessValueLabel->AutoSize("2.00x");
+
+    postFxPos.fY += postFxRowHeight;
+
+    m_pBorderlessContrastToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
+    m_pBorderlessContrastToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
+    m_pBorderlessContrastToggle->AutoSize(nullptr, 20.0f);
+
+    m_pBorderlessContrastLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, _("Contrast:")));
+    m_pBorderlessContrastLabel->SetPosition(CVector2D(postFxLabelColumnX, postFxPos.fY + 2.0f));
+    m_pBorderlessContrastLabel->AutoSize();
+
+    m_pBorderlessContrast = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, m_pTabPostFX));
+    m_pBorderlessContrast->SetPosition(CVector2D(postFxSliderColumnX, postFxPos.fY));
+    m_pBorderlessContrast->SetSize(CVector2D(postFxSliderWidth, 20.0f));
+    m_pBorderlessContrast->SetProperty("StepSize", "0.01");
+
+    m_pBorderlessContrastValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
+    m_pBorderlessContrastValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
+    m_pBorderlessContrastValueLabel->AutoSize("2.00x");
+
+    postFxPos.fY += postFxRowHeight;
+
+    m_pBorderlessSaturationToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
+    m_pBorderlessSaturationToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
+    m_pBorderlessSaturationToggle->AutoSize(nullptr, 20.0f);
+
+    m_pBorderlessSaturationLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, _("Saturation:")));
+    m_pBorderlessSaturationLabel->SetPosition(CVector2D(postFxLabelColumnX, postFxPos.fY + 2.0f));
+    m_pBorderlessSaturationLabel->AutoSize();
+
+    m_pBorderlessSaturation = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, m_pTabPostFX));
+    m_pBorderlessSaturation->SetPosition(CVector2D(postFxSliderColumnX, postFxPos.fY));
+    m_pBorderlessSaturation->SetSize(CVector2D(postFxSliderWidth, 20.0f));
+    m_pBorderlessSaturation->SetProperty("StepSize", "0.01");
+
+    m_pBorderlessSaturationValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
+    m_pBorderlessSaturationValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
+    m_pBorderlessSaturationValueLabel->AutoSize("2.00x");
+
+    postFxPos.fY += postFxRowHeight + 8.0f;
+
+    m_pCheckBoxApplyBorderless = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Apply adjustments in windowed mode")));
+    m_pCheckBoxApplyBorderless->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
+    m_pCheckBoxApplyBorderless->AutoSize(nullptr, 20.0f);
+
+    postFxPos.fY += 22.0f;
+
+    m_pCheckBoxApplyFullscreen = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Apply adjustments in fullscreen mode")));
+    m_pCheckBoxApplyFullscreen->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
+    m_pCheckBoxApplyFullscreen->AutoSize(nullptr, 20.0f);
 
     /**
      * Interface/chat Tab
@@ -1297,6 +1724,16 @@ void CSettings::CreateGUI()
     m_pFieldOfView->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnFieldOfViewChanged, this));
     m_pDrawDistance->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnDrawDistanceChanged, this));
     m_pBrightness->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnBrightnessChanged, this));
+    m_pBorderlessGamma->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnBorderlessGammaChanged, this));
+    m_pBorderlessBrightness->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnBorderlessBrightnessChanged, this));
+    m_pBorderlessContrast->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnBorderlessContrastChanged, this));
+    m_pBorderlessSaturation->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnBorderlessSaturationChanged, this));
+    m_pBorderlessGammaToggle->SetClickHandler(GUI_CALLBACK(&CSettings::OnBorderlessGammaToggleClicked, this));
+    m_pBorderlessBrightnessToggle->SetClickHandler(GUI_CALLBACK(&CSettings::OnBorderlessBrightnessToggleClicked, this));
+    m_pBorderlessContrastToggle->SetClickHandler(GUI_CALLBACK(&CSettings::OnBorderlessContrastToggleClicked, this));
+    m_pBorderlessSaturationToggle->SetClickHandler(GUI_CALLBACK(&CSettings::OnBorderlessSaturationToggleClicked, this));
+    m_pCheckBoxApplyBorderless->SetClickHandler(GUI_CALLBACK(&CSettings::OnBorderlessApplyBorderlessClicked, this));
+    m_pCheckBoxApplyFullscreen->SetClickHandler(GUI_CALLBACK(&CSettings::OnBorderlessApplyFullscreenClicked, this));
     m_pAnisotropic->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnAnisotropicChanged, this));
     m_pMouseSensitivity->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnMouseSensitivityChanged, this));
     m_pVerticalAimSensitivity->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnVerticalAimSensitivityChanged, this));
@@ -1308,6 +1745,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
+    m_pCheckBoxVSync->SetClickHandler(GUI_CALLBACK(&CSettings::OnVSyncClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
@@ -1398,11 +1836,35 @@ void CSettings::CreateGUI()
 
 void CSettings::DestroyGUI()
 {
-    // Destroy
-    delete m_pButtonCancel;
-    delete m_pButtonOK;
-    delete m_pWindow;
-    m_pWindow = NULL;
+    if (!m_pWindow)
+    {
+        RemoveAllKeyBindSections();
+        m_bBrowserListsChanged = false;
+        m_bBrowserListsLoadEnabled = false;
+        m_pSelectedBind = NULL;
+        ResetGuiPointers();
+        return;
+    }
+
+    CEGUI::Window* pRootWindow = nullptr;
+    if (CGUIElement_Impl* pWindowImpl = dynamic_cast<CGUIElement_Impl*>(m_pWindow))
+        pRootWindow = pWindowImpl->GetWindow();
+    if (pRootWindow)
+    {
+        // Bottom-up pass that mirrors the CEGUI tree ownership.
+    DestroyGuiWindowRecursive(pRootWindow);
+    }
+    else
+    {
+        SAFE_DELETE(m_pWindow);
+    }
+
+    RemoveAllKeyBindSections();
+    m_bBrowserListsChanged = false;
+    m_bBrowserListsLoadEnabled = false;
+    m_pSelectedBind = NULL;
+
+    ResetGuiPointers();
 }
 
 void RestartCallBack(void* ptr, unsigned int uiButton)
@@ -1536,6 +1998,8 @@ void CSettings::UpdateVideoTab()
     m_pDrawDistance->SetScrollPosition((gameSettings->GetDrawDistance() - 0.925f) / 0.8749f);
     m_pBrightness->SetScrollPosition((float)gameSettings->GetBrightness() / 384);
 
+    UpdatePostFxTab();
+
     // DPI aware
     bool processDPIAware = false;
     CVARS_GET("process_dpi_aware", processDPIAware);
@@ -1561,14 +2025,14 @@ void CSettings::UpdateVideoTab()
     else if (FxQuality == 3)
         m_pComboFxQuality->SetText(_("Very high"));
 
-    char AntiAliasing = gameSettings->GetAntiAliasing();
-    if (AntiAliasing == 1)
+    auto antiAliasing = static_cast<char>(gameSettings->GetAntiAliasing());
+    if (antiAliasing == 1)
         m_pComboAntiAliasing->SetText(_("Off"));
-    else if (AntiAliasing == 2)
+    else if (antiAliasing == 2)
         m_pComboAntiAliasing->SetText(_("1x"));
-    else if (AntiAliasing == 3)
+    else if (antiAliasing == 3)
         m_pComboAntiAliasing->SetText(_("2x"));
-    else if (AntiAliasing == 4)
+    else if (antiAliasing == 4)
         m_pComboAntiAliasing->SetText(_("3x"));
 
     // Aspect ratio
@@ -1677,6 +2141,15 @@ void CSettings::UpdateVideoTab()
     m_pPlayerMapImageCombo->SetSelectedItemByIndex(iVar);
 }
 
+struct ResolutionData
+{
+    int width;
+    int height;
+    int depth;
+    int vidMode;
+    bool isWidescreen;
+};
+
 //
 // PopulateResolutionComboBox
 //
@@ -1690,47 +2163,86 @@ void CSettings::PopulateResolutionComboBox()
     bool bShowUnsafeResolutions = m_pCheckBoxShowUnsafeResolutions->GetSelected();
 
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    if (!gameSettings)
+        return;
 
     VideoMode vidModemInfo;
     int       vidMode, numVidModes;
+    std::vector<ResolutionData> resolutions;
 
+    if (!m_pComboResolution)
+        return;
+        
     m_pComboResolution->Clear();
     numVidModes = gameSettings->GetNumVideoModes();
 
     for (vidMode = 0; vidMode < numVidModes; vidMode++)
     {
-        gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
+        if (!gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode))
+            continue;
 
         // Remove resolutions that will make the gui unusable
         if (vidModemInfo.width < 640 || vidModemInfo.height < 480)
-            continue;
-
-        // Check resolution hasn't already been added
-        bool bDuplicate = false;
-        for (int i = 1; i < vidMode; i++)
-        {
-            VideoMode info;
-            gameSettings->GetVideoModeInfo(&info, i);
-            if (info.width == vidModemInfo.width && info.height == vidModemInfo.height && info.depth == vidModemInfo.depth)
-                bDuplicate = true;
-        }
-        if (bDuplicate)
             continue;
 
         // Check resolution is below desktop res unless that is allowed
         if (gameSettings->IsUnsafeResolution(vidModemInfo.width, vidModemInfo.height) && !bShowUnsafeResolutions)
             continue;
 
-        SString strMode("%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth);
+        if (!(vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE))
+            continue;
 
-        if (vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE)
-            m_pComboResolution->AddItem(strMode)->SetData((void*)vidMode);
+        ResolutionData resData;
+        resData.width = vidModemInfo.width;
+        resData.height = vidModemInfo.height;
+        resData.depth = vidModemInfo.depth;
+        resData.vidMode = vidMode;
+        resData.isWidescreen = (vidModemInfo.flags & rwVIDEOMODE_XBOX_WIDESCREEN) != 0;
 
-        VideoMode currentInfo;
-        gameSettings->GetVideoModeInfo(&currentInfo, iNextVidMode);
+        // Check resolution hasn't already been added
+        bool bDuplicate = false;
+        for (const auto& existing : resolutions)
+        {
+            if (existing.width == resData.width && existing.height == resData.height && existing.depth == resData.depth)
+            {
+                bDuplicate = true;
+                break;
+            }
+        }
+        
+        if (!bDuplicate)
+            resolutions.push_back(resData);
+    }
 
-        if (currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth)
-            m_pComboResolution->SetText(strMode);
+    if (resolutions.empty())
+        return;
+
+    // Sort resolutions by width (descending), then by height, then by depth
+    std::sort(resolutions.begin(), resolutions.end(), [](const ResolutionData& a, const ResolutionData& b) {
+        if (a.width != b.width)
+            return a.width > b.width;
+        if (a.height != b.height)
+            return a.height > b.height;
+        return a.depth > b.depth;
+    });
+
+    SString selectedText;
+    VideoMode currentInfo;
+    if (gameSettings->GetVideoModeInfo(&currentInfo, iNextVidMode))
+    {
+        for (const auto& res : resolutions)
+        {
+            SString strMode("%d x %d x %d", res.width, res.height, res.depth);
+            CGUIListItem* pItem = m_pComboResolution->AddItem(strMode);
+            if (pItem)
+                pItem->SetData((void*)res.vidMode);
+
+            if (currentInfo.width == res.width && currentInfo.height == res.height && currentInfo.depth == res.depth)
+                selectedText = strMode;
+        }
+
+        if (!selectedText.empty())
+            m_pComboResolution->SetText(selectedText);
     }
 }
 
@@ -1763,6 +2275,67 @@ void CSettings::ProcessJoypad()
     GetJoystickManager()->SetSaturation(atoi(m_pEditSaturation->GetText().c_str()));
 
     GetJoystickManager()->SaveToXML();
+}
+
+void CSettings::UpdatePostFxTab()
+{
+    bool applyWindowed = false;
+    bool applyFullscreen = false;
+    bool gammaEnabled = false;
+    bool brightnessEnabled = false;
+    bool contrastEnabled = false;
+    bool saturationEnabled = false;
+    float gammaValue = kBorderlessGammaDefault;
+    float brightnessValue = kBorderlessBrightnessDefault;
+    float contrastValue = kBorderlessContrastDefault;
+    float saturationValue = kBorderlessSaturationDefault;
+
+    CVARS_GET("borderless_apply_windowed", applyWindowed);
+    CVARS_GET("borderless_apply_fullscreen", applyFullscreen);
+    CVARS_GET("borderless_gamma_enabled", gammaEnabled);
+    CVARS_GET("borderless_brightness_enabled", brightnessEnabled);
+    CVARS_GET("borderless_contrast_enabled", contrastEnabled);
+    CVARS_GET("borderless_saturation_enabled", saturationEnabled);
+    CVARS_GET("borderless_gamma_power", gammaValue);
+    CVARS_GET("borderless_brightness_scale", brightnessValue);
+    CVARS_GET("borderless_contrast_scale", contrastValue);
+    CVARS_GET("borderless_saturation_scale", saturationValue);
+
+    if (m_pBorderlessGammaToggle)
+        m_pBorderlessGammaToggle->SetSelected(gammaEnabled);
+    if (m_pBorderlessBrightnessToggle)
+        m_pBorderlessBrightnessToggle->SetSelected(brightnessEnabled);
+    if (m_pBorderlessContrastToggle)
+        m_pBorderlessContrastToggle->SetSelected(contrastEnabled);
+    if (m_pBorderlessSaturationToggle)
+        m_pBorderlessSaturationToggle->SetSelected(saturationEnabled);
+
+    if (m_pBorderlessGamma)
+        m_pBorderlessGamma->SetScrollPosition(NormalizeSliderValue(gammaValue, kBorderlessGammaMin, kBorderlessGammaMax));
+    if (m_pBorderlessGammaValueLabel)
+        m_pBorderlessGammaValueLabel->SetText(SString("%.2f", gammaValue).c_str());
+
+    if (m_pBorderlessBrightness)
+        m_pBorderlessBrightness->SetScrollPosition(NormalizeSliderValue(brightnessValue, kBorderlessBrightnessMin, kBorderlessBrightnessMax));
+    if (m_pBorderlessBrightnessValueLabel)
+        m_pBorderlessBrightnessValueLabel->SetText(SString("%.2fx", brightnessValue).c_str());
+
+    if (m_pBorderlessContrast)
+        m_pBorderlessContrast->SetScrollPosition(NormalizeSliderValue(contrastValue, kBorderlessContrastMin, kBorderlessContrastMax));
+    if (m_pBorderlessContrastValueLabel)
+        m_pBorderlessContrastValueLabel->SetText(SString("%.2fx", contrastValue).c_str());
+
+    if (m_pBorderlessSaturation)
+        m_pBorderlessSaturation->SetScrollPosition(NormalizeSliderValue(saturationValue, kBorderlessSaturationMin, kBorderlessSaturationMax));
+    if (m_pBorderlessSaturationValueLabel)
+        m_pBorderlessSaturationValueLabel->SetText(SString("%.2fx", saturationValue).c_str());
+
+    if (m_pCheckBoxApplyBorderless)
+        m_pCheckBoxApplyBorderless->SetSelected(applyWindowed);
+    if (m_pCheckBoxApplyFullscreen)
+        m_pCheckBoxApplyFullscreen->SetSelected(applyFullscreen);
+
+    UpdateBorderlessAdjustmentControls();
 }
 
 //
@@ -1877,6 +2450,16 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("blur", true);
     CVARS_SET("corona_reflections", false);
     CVARS_SET("dynamic_ped_shadows", false);
+    CVARS_SET("borderless_gamma_power", kBorderlessGammaDefault);
+    CVARS_SET("borderless_brightness_scale", kBorderlessBrightnessDefault);
+    CVARS_SET("borderless_contrast_scale", kBorderlessContrastDefault);
+    CVARS_SET("borderless_saturation_scale", kBorderlessSaturationDefault);
+    CVARS_SET("borderless_gamma_enabled", false);
+    CVARS_SET("borderless_brightness_enabled", false);
+    CVARS_SET("borderless_contrast_enabled", false);
+    CVARS_SET("borderless_saturation_enabled", false);
+    CVARS_SET("borderless_apply_windowed", false);
+    CVARS_SET("borderless_apply_fullscreen", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
@@ -1902,8 +2485,57 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 
     // Update the GUI
     UpdateVideoTab();
+    RefreshBorderlessDisplayCalibration();
 
     return true;
+}
+
+void CSettings::RefreshBorderlessDisplayCalibration()
+{
+    CScopedActiveProxyDevice scopedProxy;
+    if (!scopedProxy)
+        return;
+
+    scopedProxy->ApplyBorderlessPresentationTuning();
+}
+
+void CSettings::UpdateBorderlessAdjustmentControls()
+{
+    const bool applyAdjustments = (m_pCheckBoxApplyBorderless && m_pCheckBoxApplyBorderless->GetSelected()) ||
+                                  (m_pCheckBoxApplyFullscreen && m_pCheckBoxApplyFullscreen->GetSelected());
+
+    const bool gammaEnabled = applyAdjustments && (!m_pBorderlessGammaToggle || m_pBorderlessGammaToggle->GetSelected());
+    const bool brightnessEnabled = applyAdjustments && (!m_pBorderlessBrightnessToggle || m_pBorderlessBrightnessToggle->GetSelected());
+    const bool contrastEnabled = applyAdjustments && (!m_pBorderlessContrastToggle || m_pBorderlessContrastToggle->GetSelected());
+    const bool saturationEnabled = applyAdjustments && (!m_pBorderlessSaturationToggle || m_pBorderlessSaturationToggle->GetSelected());
+
+    if (m_pBorderlessGamma)
+        m_pBorderlessGamma->SetEnabled(gammaEnabled);
+    if (m_pBorderlessGammaLabel)
+        m_pBorderlessGammaLabel->SetEnabled(gammaEnabled);
+    if (m_pBorderlessGammaValueLabel)
+        m_pBorderlessGammaValueLabel->SetEnabled(gammaEnabled);
+
+    if (m_pBorderlessBrightness)
+        m_pBorderlessBrightness->SetEnabled(brightnessEnabled);
+    if (m_pBorderlessBrightnessLabel)
+        m_pBorderlessBrightnessLabel->SetEnabled(brightnessEnabled);
+    if (m_pBorderlessBrightnessValueLabel)
+        m_pBorderlessBrightnessValueLabel->SetEnabled(brightnessEnabled);
+
+    if (m_pBorderlessContrast)
+        m_pBorderlessContrast->SetEnabled(contrastEnabled);
+    if (m_pBorderlessContrastLabel)
+        m_pBorderlessContrastLabel->SetEnabled(contrastEnabled);
+    if (m_pBorderlessContrastValueLabel)
+        m_pBorderlessContrastValueLabel->SetEnabled(contrastEnabled);
+
+    if (m_pBorderlessSaturation)
+        m_pBorderlessSaturation->SetEnabled(saturationEnabled);
+    if (m_pBorderlessSaturationLabel)
+        m_pBorderlessSaturationLabel->SetEnabled(saturationEnabled);
+    if (m_pBorderlessSaturationValueLabel)
+        m_pBorderlessSaturationValueLabel->SetEnabled(saturationEnabled);
 }
 
 void CSettings::ResetGTAVolume()
@@ -3085,6 +3717,14 @@ void CSettings::LoadData()
     CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
     m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
+    // Allow connecting with the local Steam client
+    bool allowSteamClient = false;
+    CVARS_GET("allow_steam_client", allowSteamClient);
+    m_pCheckBoxAllowSteamClient->SetSelected(allowSteamClient);
+
+    if (allowSteamClient)
+        g_pCore->GetSteamClient()->Connect();
+
     bool bAskBeforeDisconnect;
     CVARS_GET("ask_before_disconnect", bAskBeforeDisconnect);
     m_pCheckBoxAskBeforeDisconnect->SetSelected(bAskBeforeDisconnect);
@@ -3475,6 +4115,27 @@ void CSettings::SaveData()
     gameSettings->SetAntiAliasing(iAntiAliasing, true);
     gameSettings->SetDrawDistance((m_pDrawDistance->GetScrollPosition() * 0.875f) + 0.925f);
     gameSettings->SetBrightness(m_pBrightness->GetScrollPosition() * 384);
+
+    const float borderlessGamma = DenormalizeSliderValue(m_pBorderlessGamma->GetScrollPosition(), kBorderlessGammaMin, kBorderlessGammaMax);
+    CVARS_SET("borderless_gamma_power", borderlessGamma);
+
+    const float borderlessBrightness = DenormalizeSliderValue(m_pBorderlessBrightness->GetScrollPosition(), kBorderlessBrightnessMin, kBorderlessBrightnessMax);
+    CVARS_SET("borderless_brightness_scale", borderlessBrightness);
+
+    const float borderlessContrast = DenormalizeSliderValue(m_pBorderlessContrast->GetScrollPosition(), kBorderlessContrastMin, kBorderlessContrastMax);
+    CVARS_SET("borderless_contrast_scale", borderlessContrast);
+
+    const float borderlessSaturation = DenormalizeSliderValue(m_pBorderlessSaturation->GetScrollPosition(), kBorderlessSaturationMin, kBorderlessSaturationMax);
+    CVARS_SET("borderless_saturation_scale", borderlessSaturation);
+
+    CVARS_SET("borderless_gamma_enabled", m_pBorderlessGammaToggle->GetSelected());
+    CVARS_SET("borderless_brightness_enabled", m_pBorderlessBrightnessToggle->GetSelected());
+    CVARS_SET("borderless_contrast_enabled", m_pBorderlessContrastToggle->GetSelected());
+    CVARS_SET("borderless_saturation_enabled", m_pBorderlessSaturationToggle->GetSelected());
+    CVARS_SET("borderless_apply_windowed", m_pCheckBoxApplyBorderless->GetSelected());
+    CVARS_SET("borderless_apply_fullscreen", m_pCheckBoxApplyFullscreen->GetSelected());
+    RefreshBorderlessDisplayCalibration();
+
     gameSettings->SetMouseSensitivity(m_pMouseSensitivity->GetScrollPosition());
     gameSettings->SetMipMappingEnabled(m_pCheckBoxMipMapping->GetSelected());
     SetApplicationSettingInt("customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0);
@@ -3555,7 +4216,7 @@ void CSettings::SaveData()
             const char* state = _("Main menu");
 
             if (g_pCore->IsConnected())
-            {                
+            {
                 state = _("In-game");
 
                 const SString& serverName = g_pCore->GetLastConnectedServerName();
@@ -3565,6 +4226,12 @@ void CSettings::SaveData()
             discord->SetPresenceState(state, false);
         }
     }
+
+    // Allow connecting with the local Steam client
+    bool allowSteamClient = m_pCheckBoxAllowSteamClient->GetSelected();
+    CVARS_SET("allow_steam_client", allowSteamClient);
+    if (allowSteamClient)
+        g_pCore->GetSteamClient()->Connect();
 
     bool bAskBeforeDisconnect = m_pCheckBoxAskBeforeDisconnect->GetSelected();
     CVARS_SET("ask_before_disconnect", bAskBeforeDisconnect);
@@ -4094,10 +4761,10 @@ void CSettings::LoadChatColorFromString(eChatColorType eType, const string& strC
     try
     {
         ss >> iR >> iG >> iB >> iA;
-        pColor.R = iR;
-        pColor.G = iG;
-        pColor.B = iB;
-        pColor.A = iA;
+        pColor.R = static_cast<unsigned char>(iR);
+        pColor.G = static_cast<unsigned char>(iG);
+        pColor.B = static_cast<unsigned char>(iB);
+        pColor.A = static_cast<unsigned char>(iA);
         SetChatColorValues(eType, pColor);
     }
     catch (...)
@@ -4335,6 +5002,98 @@ bool CSettings::OnBrightnessChanged(CGUIElement* pElement)
     int iBrightness = (m_pBrightness->GetScrollPosition()) * 100;
 
     m_pBrightnessValueLabel->SetText(SString("%i%%", iBrightness).c_str());
+    return true;
+}
+
+bool CSettings::OnBorderlessGammaChanged(CGUIElement* pElement)
+{
+    const float gammaValue = DenormalizeSliderValue(m_pBorderlessGamma->GetScrollPosition(), kBorderlessGammaMin, kBorderlessGammaMax);
+    m_pBorderlessGammaValueLabel->SetText(SString("%.2f", gammaValue).c_str());
+    CVARS_SET("borderless_gamma_power", gammaValue);
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessBrightnessChanged(CGUIElement* pElement)
+{
+    const float brightnessValue = DenormalizeSliderValue(m_pBorderlessBrightness->GetScrollPosition(), kBorderlessBrightnessMin, kBorderlessBrightnessMax);
+    m_pBorderlessBrightnessValueLabel->SetText(SString("%.2fx", brightnessValue).c_str());
+    CVARS_SET("borderless_brightness_scale", brightnessValue);
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessContrastChanged(CGUIElement* pElement)
+{
+    const float contrastValue = DenormalizeSliderValue(m_pBorderlessContrast->GetScrollPosition(), kBorderlessContrastMin, kBorderlessContrastMax);
+    m_pBorderlessContrastValueLabel->SetText(SString("%.2fx", contrastValue).c_str());
+    CVARS_SET("borderless_contrast_scale", contrastValue);
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessSaturationChanged(CGUIElement* pElement)
+{
+    const float saturationValue = DenormalizeSliderValue(m_pBorderlessSaturation->GetScrollPosition(), kBorderlessSaturationMin, kBorderlessSaturationMax);
+    m_pBorderlessSaturationValueLabel->SetText(SString("%.2fx", saturationValue).c_str());
+    CVARS_SET("borderless_saturation_scale", saturationValue);
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessGammaToggleClicked(CGUIElement* pElement)
+{
+    const bool enabled = m_pBorderlessGammaToggle->GetSelected();
+    CVARS_SET("borderless_gamma_enabled", enabled);
+    UpdateBorderlessAdjustmentControls();
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessBrightnessToggleClicked(CGUIElement* pElement)
+{
+    const bool enabled = m_pBorderlessBrightnessToggle->GetSelected();
+    CVARS_SET("borderless_brightness_enabled", enabled);
+    UpdateBorderlessAdjustmentControls();
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessContrastToggleClicked(CGUIElement* pElement)
+{
+    const bool enabled = m_pBorderlessContrastToggle->GetSelected();
+    CVARS_SET("borderless_contrast_enabled", enabled);
+    UpdateBorderlessAdjustmentControls();
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessSaturationToggleClicked(CGUIElement* pElement)
+{
+    const bool enabled = m_pBorderlessSaturationToggle->GetSelected();
+    CVARS_SET("borderless_saturation_enabled", enabled);
+    UpdateBorderlessAdjustmentControls();
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessApplyBorderlessClicked(CGUIElement* pElement)
+{
+    const bool applyBorderless = m_pCheckBoxApplyBorderless->GetSelected();
+    CVARS_SET("borderless_apply_windowed", applyBorderless);
+
+    UpdateBorderlessAdjustmentControls();
+    RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnBorderlessApplyFullscreenClicked(CGUIElement* pElement)
+{
+    const bool applyFullscreen = m_pCheckBoxApplyFullscreen->GetSelected();
+    CVARS_SET("borderless_apply_fullscreen", applyFullscreen);
+
+    UpdateBorderlessAdjustmentControls();
+    RefreshBorderlessDisplayCalibration();
     return true;
 }
 
@@ -4771,6 +5530,15 @@ static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
         auto const checkBox = reinterpret_cast<CGUICheckBox*>(userdata);
         checkBox->SetSelected(false);
     }
+}
+
+//
+// OnVSyncClick
+//
+bool CSettings::OnVSyncClick(CGUIElement* pElement)
+{
+    CCore::GetSingleton().GetFPSLimiter()->SetDisplayVSync(m_pCheckBoxVSync->GetSelected());
+    return true;
 }
 
 static void CPUAffinityQuestionCallBack(void* userdata, unsigned int button)

@@ -26,7 +26,10 @@ CClientStreamer::CClientStreamer(StreamerLimitReachedFunction* pLimitReachedFunc
     m_pLimitReachedFunc = pLimitReachedFunc;
 
     // Create our main world sectors covering the mainland
-    CreateSectors(&m_WorldRows, CVector2D(m_fSectorSize, m_fRowSize), CVector2D(-WORLD_SIZE, -WORLD_SIZE), CVector2D(WORLD_SIZE, WORLD_SIZE));
+    CVector2D size(m_fSectorSize, m_fRowSize);
+    CVector2D bottomLeft(-WORLD_SIZE, -WORLD_SIZE);
+    CVector2D topRight(WORLD_SIZE, WORLD_SIZE);
+    CreateSectors(&m_WorldRows, size, bottomLeft, topRight);
 
     // Find our row and sector
     m_pRow = FindOrCreateRow(m_vecPosition);
@@ -53,35 +56,45 @@ CClientStreamer::~CClientStreamer()
     m_ExtraRows.clear();
 }
 
-void CClientStreamer::CreateSectors(list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight)
+void CClientStreamer::CreateSectors(std::list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight)
 {
     // Creates our sectors within rows, filling up our rectangle, connecting each sector and row
     CClientStreamSector *   pCurrent = NULL, *pPrevious = NULL, *pPreviousRowSector = NULL;
     CClientStreamSectorRow *pCurrentRow = NULL, *pPreviousRow = NULL;
     float                   fX = vecBottomLeft.fX, fY = vecBottomLeft.fY;
+
     while (fY < vecTopRight.fY)
     {
         pCurrentRow = new CClientStreamSectorRow(fY, fY + vecSize.fY, m_fSectorSize, m_fRowSize);
-        pList->push_back(pCurrentRow);
         pCurrentRow->m_pBottom = pPreviousRow;
+        pList->push_back(pCurrentRow);
+
         if (pPreviousRow)
             pPreviousRow->m_pTop = pCurrentRow;
+
         while (fX < vecTopRight.fX)
         {
+            CVector2D bottomLeft(fX, fY);
+            CVector2D topRight(fX + vecSize.fX, fY + vecSize.fY);
+
             pPrevious = pCurrent;
-            pCurrent = new CClientStreamSector(pCurrentRow, CVector2D(fX, fY), CVector2D(fX + vecSize.fX, fY + vecSize.fY));
+            pCurrent = new CClientStreamSector(pCurrentRow, bottomLeft, topRight);
             pCurrentRow->Add(pCurrent);
             pCurrent->m_pLeft = pPrevious;
+
             if (pPrevious)
                 pPrevious->m_pRight = pCurrent;
+
             if (pPreviousRowSector)
             {
                 pCurrent->m_pBottom = pPreviousRowSector;
                 pPreviousRowSector->m_pTop = pCurrent;
                 pPreviousRowSector = pPreviousRowSector->m_pRight;
             }
+
             fX += vecSize.fX;
         }
+
         pPrevious = NULL;
         pCurrent = NULL;
         pPreviousRow = pCurrentRow;

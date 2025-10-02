@@ -107,20 +107,22 @@ __declspec(noinline) void DumpHandlingData(tHandlingDataSA* pData)
 
 static __declspec(naked) void Hook_Calculate()
 {
-    tHandlingDataSA* pData;
-    DWORD dwHandlingData;
-    _asm
-    {
-        mov         eax, [esp+4]
-        mov         dwHandlingData, eax
-    }
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-    pData = reinterpret_cast<tHandlingDataSA*>(dwHandlingData);
-    DumpHandlingData(pData);
-
-    _asm
+    __asm
     {
-        ret         4
+        mov     eax, [esp+4]
+
+        push    ecx     // As in the original code
+        push    eax     // We use this value to pop it into ecx later
+
+        push    eax
+        call    DumpHandlingData
+        add     esp, 4
+
+        pop     ecx     // adapted from original code: mov ecx, [esp+4+arg_0]
+        mov     eax, 6F5085h
+        jmp     eax
     }
 }
 
@@ -151,7 +153,7 @@ CHandlingManagerSA::CHandlingManagerSA()
     }
 
 #if DUMP_HANDLING_DATA
-    HookInstall(Func_Calculate, (DWORD)Hook_Calculate, 11);
+    HookInstall(Func_Calculate, (DWORD)Hook_Calculate, 5);
 #endif
 
     m_HandlingNames["mass"] = HandlingProperty::HANDLING_MASS;                                                             // works (mass > 0)

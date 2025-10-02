@@ -104,6 +104,9 @@ ADD_ENUM(HUD_MONEY, "money")
 ADD_ENUM(HUD_VEHICLE_NAME, "vehicle_name")
 ADD_ENUM(HUD_AREA_NAME, "area_name")
 ADD_ENUM(HUD_RADAR, "radar")
+ADD_ENUM(HUD_RADAR_MAP, "radar_map")
+ADD_ENUM(HUD_RADAR_BLIPS, "radar_blips")
+ADD_ENUM(HUD_RADAR_ALTIMETER, "radar_altimeter")
 ADD_ENUM(HUD_CLOCK, "clock")
 ADD_ENUM(HUD_RADIO, "radio")
 ADD_ENUM(HUD_WANTED, "wanted")
@@ -943,6 +946,13 @@ ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
 ADD_ENUM(PreloadAreaOption::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("preload-area-option")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(RestreamOption)
+ADD_ENUM(RestreamOption::ALL, "world")
+ADD_ENUM(RestreamOption::VEHICLES, "vehicles")
+ADD_ENUM(RestreamOption::PEDS, "peds")
+ADD_ENUM(RestreamOption::OBJECTS, "objects")
+IMPLEMENT_ENUM_CLASS_END("restream-option")
+
 
 IMPLEMENT_ENUM_CLASS_BEGIN(taskType)
 ADD_ENUM(taskType::PRIMARY_TASK, "primary")
@@ -1272,10 +1282,10 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         {
             if (pResource->GetMinClientReq() < szVersionReq)
             {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
                 if (szReason)
                     argStream.SetVersionWarning(szVersionReq, "client", szReason);
-                #endif
+#endif
                 return false;
             }
         }
@@ -1299,11 +1309,11 @@ void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* s
     
     if (pResource->GetMinClientReq() < szVersionReq)
     {
-        #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
         SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client %s because %s)",
                                 szVersionReq, szReason);
         throw std::invalid_argument(err);
-        #endif
+#endif
     }
     
 }

@@ -429,7 +429,6 @@ public:
     void ResetInterpolation();
 
     void Interpolate();
-    void UpdateKeysync();
 
     void GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates);
 
@@ -700,7 +699,7 @@ protected:
             float         fLastAlpha;
             unsigned long ulStartTime;
             unsigned long ulFinishTime;
-        } pos;
+        } pos{};
 
         struct
         {
@@ -712,8 +711,8 @@ protected:
             float         fLastAlpha;
             unsigned long ulStartTime;
             unsigned long ulFinishTime;
-        } rot;
-    } m_interp;
+        } rot{};
+    } m_interp{};
 
     unsigned long m_ulIllegalTowBreakTime;
 
@@ -754,6 +753,8 @@ public:
     SLastSyncedVehData*                      m_LastSyncedData;
     SSirenInfo                               m_tSirenBeaconInfo;
     std::map<SString, SVehicleComponentData> m_ComponentData;
+    // Store visibility state when the component map is regenerated
+    std::map<SString, bool>                  m_ComponentVisibilityBackup;
     bool                                     m_bAsyncLoadingDisabled;
 
     std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;

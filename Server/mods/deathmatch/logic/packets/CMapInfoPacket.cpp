@@ -22,7 +22,7 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
                                float fWaveHeight, const SWorldWaterLevelInfo& worldWaterLevelInfo, bool bHasSkyGradient, const SGarageStates& garageStates,
                                unsigned char ucSkyGradientTR, unsigned char ucSkyGradientTG, unsigned char ucSkyGradientTB, unsigned char ucSkyGradientBR,
                                unsigned char ucSkyGradientBG, unsigned char ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
-                               unsigned short usFPSLimit, bool bCloudsEnabled, float fJetpackMaxHeight, bool bOverrideWaterColor, unsigned char ucWaterRed,
+                               unsigned short fps, bool bCloudsEnabled, float fJetpackMaxHeight, bool bOverrideWaterColor, unsigned char ucWaterRed,
                                unsigned char ucWaterGreen, unsigned char ucWaterBlue, unsigned char ucWaterAlpha, bool bInteriorSoundsEnabled,
                                bool bOverrideRainLevel, float fRainLevel, bool bOverrideSunSize, float fSunSize, bool bOverrideSunColor,
                                unsigned char ucSunCoreR, unsigned char ucSunCoreG, unsigned char ucSunCoreB, unsigned char ucSunCoronaR,
@@ -52,7 +52,7 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
     m_ucSkyGradientBB = ucSkyGradientBB;
     m_bHasHeatHaze = bHasHeatHaze;
     m_HeatHazeSettings = heatHazeSettings;
-    m_usFPSLimit = usFPSLimit;
+    m_fpsLimit = fps;
     m_bCloudsEnabled = bCloudsEnabled;
     m_fJetpackMaxHeight = fJetpackMaxHeight;
     m_bOverrideWaterColor = bOverrideWaterColor;
@@ -142,15 +142,12 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     {
         BitStream.Write(m_WorldWaterLevelInfo.fNonSeaLevel);
     }
-    if (BitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideWorldLevel))
+    BitStream.WriteBit(m_WorldWaterLevelInfo.bOutsideLevelSet);
+    if (m_WorldWaterLevelInfo.bOutsideLevelSet)
     {
-        BitStream.WriteBit(m_WorldWaterLevelInfo.bOutsideLevelSet);
-        if (m_WorldWaterLevelInfo.bOutsideLevelSet)
-        {
-            BitStream.Write(m_WorldWaterLevelInfo.fOutsideLevel);
-        }
+        BitStream.Write(m_WorldWaterLevelInfo.fOutsideLevel);
     }
-    BitStream.WriteCompressed(m_usFPSLimit);
+    BitStream.WriteCompressed(m_fpsLimit);
 
     // Write the garage states
     for (unsigned char i = 0; i < MAX_GARAGES; i++)
@@ -166,38 +163,36 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     funBugs.data.bFastMove = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTMOVE);
     funBugs.data.bCrouchBug = g_pGame->IsGlitchEnabled(CGame::GLITCH_CROUCHBUG);
     funBugs.data.bCloseRangeDamage = g_pGame->IsGlitchEnabled(CGame::GLITCH_CLOSEDAMAGE);
-    funBugs.data2.bHitAnim = g_pGame->IsGlitchEnabled(CGame::GLITCH_HITANIM);
-    funBugs.data3.bFastSprint = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTSPRINT);
-    funBugs.data4.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled(CGame::GLITCH_BADDRIVEBYHITBOX);
-    funBugs.data5.bQuickStand = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKSTAND);
+    funBugs.data.bHitAnim = g_pGame->IsGlitchEnabled(CGame::GLITCH_HITANIM);
+    funBugs.data.bFastSprint = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTSPRINT);
+    funBugs.data.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled(CGame::GLITCH_BADDRIVEBYHITBOX);
+    funBugs.data.bQuickStand = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKSTAND);
+    funBugs.data.vehicleRapidStop = g_pGame->IsGlitchEnabled(CGame::GLITCH_VEHICLE_RAPID_STOP);
     BitStream.Write(&funBugs);
 
     // Write world special properties states
-    if (BitStream.Can(eBitStreamVersion::WorldSpecialProperties))
-    {
-        SWorldSpecialPropertiesStateSync wsProps;
-        wsProps.data.hovercars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::HOVERCARS);
-        wsProps.data.aircars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::AIRCARS);
-        wsProps.data.extrabunny = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRABUNNY);
-        wsProps.data.extrajump = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAJUMP);
-        wsProps.data.randomfoliage = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::RANDOMFOLIAGE);
-        wsProps.data.snipermoon = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::SNIPERMOON);
-        wsProps.data.extraairresistance = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAAIRRESISTANCE);
-        wsProps.data.underworldwarp = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::UNDERWORLDWARP);
-        wsProps.data.vehiclesunglare = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLESUNGLARE);
-        wsProps.data.coronaztest = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::CORONAZTEST);
-        wsProps.data.watercreatures = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::WATERCREATURES);
-        wsProps.data.burnflippedcars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::BURNFLIPPEDCARS);
-        wsProps.data2.fireballdestruct = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT);
-        wsProps.data3.roadsignstext = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT);
-        wsProps.data4.extendedwatercannons = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS);
-        wsProps.data5.tunnelweatherblend = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND);
-        wsProps.data6.ignoreFireState = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE);
-        wsProps.data7.flyingcomponents = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS);
-        wsProps.data8.vehicleburnexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS);
-        wsProps.data9.vehicleEngineAutoStart = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART);
-        BitStream.Write(&wsProps);
-    }
+    SWorldSpecialPropertiesStateSync wsProps;
+    wsProps.data.hovercars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::HOVERCARS);
+    wsProps.data.aircars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::AIRCARS);
+    wsProps.data.extrabunny = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRABUNNY);
+    wsProps.data.extrajump = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAJUMP);
+    wsProps.data.randomfoliage = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::RANDOMFOLIAGE);
+    wsProps.data.snipermoon = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::SNIPERMOON);
+    wsProps.data.extraairresistance = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAAIRRESISTANCE);
+    wsProps.data.underworldwarp = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::UNDERWORLDWARP);
+    wsProps.data.vehiclesunglare = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLESUNGLARE);
+    wsProps.data.coronaztest = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::CORONAZTEST);
+    wsProps.data.watercreatures = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::WATERCREATURES);
+    wsProps.data.burnflippedcars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::BURNFLIPPEDCARS);
+    wsProps.data.fireballdestruct = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT);
+    wsProps.data.roadsignstext = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT);
+    wsProps.data.extendedwatercannons = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS);
+    wsProps.data.tunnelweatherblend = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::TUNNELWEATHERBLEND);
+    wsProps.data.ignoreFireState = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE);
+    wsProps.data.flyingcomponents = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS);
+    wsProps.data.vehicleburnexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS);
+    wsProps.data.vehicleEngineAutoStart = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART);
+    BitStream.Write(&wsProps);
 
     BitStream.Write(m_fJetpackMaxHeight);
 
@@ -221,13 +216,10 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     }
 
     // Moon size
-    if (BitStream.Version() >= 0x40)
+    BitStream.WriteBit(m_bOverrideMoonSize);
+    if (m_bOverrideMoonSize)
     {
-        BitStream.WriteBit(m_bOverrideMoonSize);
-        if (m_bOverrideMoonSize)
-        {
-            BitStream.Write(m_iMoonSize);
-        }
+        BitStream.Write(m_iMoonSize);
     }
 
     // Sun size
@@ -273,19 +265,15 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     }
 
     BitStream.Write(m_fAircraftMaxHeight);
+    BitStream.Write(m_fAircraftMaxVelocity);
 
-    if (BitStream.Version() >= 0x3E)
-        BitStream.Write(m_fAircraftMaxVelocity);
-
-    if (BitStream.Version() >= 0x30)
+    for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
     {
-        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
-        {
-            bool bEnabled;
-            bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
-            BitStream.WriteBit(bEnabled);
-        }
+        bool bEnabled;
+        bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
+        BitStream.WriteBit(bEnabled);
     }
+
     for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         sWeaponPropertySync WeaponProperty;
@@ -310,10 +298,8 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
 
         WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
         BitStream.Write(&WeaponProperty);
-        if (BitStream.Version() >= 0x30)
-        {
-            BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
-        }
+
+        BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
     }
 
     for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
@@ -343,19 +329,15 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
             WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
             BitStream.Write(&WeaponProperty);
         }
-        if (BitStream.Version() >= 0x36)
-        {
-            BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
-        }
+
+        BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
     }
-    if (BitStream.Version() >= 0x30)
+
+    for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
     {
-        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
-        {
-            bool bEnabled;
-            bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
-            BitStream.WriteBit(bEnabled);
-        }
+        bool bEnabled;
+        bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
+        BitStream.WriteBit(bEnabled);
     }
 
     multimap<unsigned short, CBuildingRemoval*>::const_iterator iter = g_pGame->GetBuildingRemovalManager()->IterBegin();
@@ -368,18 +350,12 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(pBuildingRemoval->GetPosition().fX);
         BitStream.Write(pBuildingRemoval->GetPosition().fY);
         BitStream.Write(pBuildingRemoval->GetPosition().fZ);
-        if (BitStream.Version() >= 0x039)
-        {
-            BitStream.Write(pBuildingRemoval->GetInterior());
-        }
+        BitStream.Write(pBuildingRemoval->GetInterior());
     }
     BitStream.WriteBit(false);
 
-    if (BitStream.Version() >= 0x25)
-    {
-        bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled();
-        BitStream.WriteBit(bOcclusionsEnabled);
-    }
+    bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled();
+    BitStream.WriteBit(bOcclusionsEnabled);
 
     return true;
 }

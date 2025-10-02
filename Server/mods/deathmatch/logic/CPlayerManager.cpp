@@ -351,7 +351,7 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short model)
     }
 }
 
-void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
+void CPlayerManager::ClearElementData(CElement* pElement, CStringName name)
 {
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)

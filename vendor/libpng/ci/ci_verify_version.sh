@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail -o posix
 
-# Copyright (c) 2019-2024 Cosmin Truta.
+# Copyright (c) 2019-2025 Cosmin Truta.
 #
 # Use, modification and distribution are subject to the MIT License.
 # Please see the accompanying file LICENSE_MIT.txt
@@ -12,33 +12,43 @@ set -o errexit -o pipefail -o posix
 source "$(dirname "$0")/lib/ci.lib.sh"
 cd "$CI_TOPLEVEL_DIR"
 
-function ci_init_shellify {
-    [[ -f $CI_SCRIPT_DIR/ci_shellify.sh ]] || {
-        ci_err_internal "missing script: '$CI_SCRIPT_DIR/ci_shellify.sh'"
-    }
-}
+# Declare the global environments collected from various sources.
+declare CI_ENV_LIBPNG_VER        # collected from png.h
+declare CI_ENV_AUTOCONF_VER      # collected from configure.ac
+declare CI_ENV_CMAKE_VER         # collected from CMakeLists.txt
+declare CI_ENV_LIBPNGCONFIG_VER  # collected from scripts/libpng-config-head.in
 
 function ci_run_shellify {
+    local my_script my_result
+    my_script="$CI_SCRIPT_DIR/libexec/ci_shellify_${1#--}.sh"
+    shift 1
+    [[ -f $my_script ]] || {
+        ci_err_internal "missing script: '$my_script'"
+    }
     ci_info "shellifying:" "$@"
-    local my_result
-    "$BASH" "$CI_SCRIPT_DIR/ci_shellify.sh" "$@"
+    "$BASH" "$my_script" "$@"
     echo "$my_result" | "$BASH" --posix || ci_err "bad shellify output"
     echo "$my_result"
 }
 
-function ci_verify_version {
+function ci_init_version_verification {
     ci_info "## START OF VERIFICATION ##"
-    local my_env_libpng_ver my_env_autoconf_ver my_env_cmake_ver my_expect
-    ci_init_shellify
-    my_env_libpng_ver="$(ci_run_shellify png.h)"
-    echo "$my_env_libpng_ver"
-    my_env_autoconf_ver="$(ci_run_shellify configure.ac)"
-    echo "$my_env_autoconf_ver"
-    my_env_cmake_ver="$(ci_run_shellify CMakeLists.txt)"
-    echo "$my_env_cmake_ver"
-    ci_info "## VERIFYING: png.h version definitions ##"
-    eval "$my_env_libpng_ver"
-    local my_expect="${PNG_LIBPNG_VER_MAJOR}.${PNG_LIBPNG_VER_MINOR}.${PNG_LIBPNG_VER_RELEASE}"
+    CI_ENV_LIBPNG_VER="$(ci_run_shellify --c png.h)"
+    echo "$CI_ENV_LIBPNG_VER"
+    CI_ENV_AUTOCONF_VER="$(ci_run_shellify --autoconf configure.ac)"
+    echo "$CI_ENV_AUTOCONF_VER"
+    CI_ENV_CMAKE_VER="$(ci_run_shellify --cmake CMakeLists.txt)"
+    echo "$CI_ENV_CMAKE_VER"
+    CI_ENV_LIBPNGCONFIG_VER="$(ci_run_shellify --shell scripts/libpng-config-head.in)"
+    echo "$CI_ENV_LIBPNGCONFIG_VER"
+}
+
+# shellcheck disable=SC2154
+function ci_do_version_verification {
+    local my_expect
+    ci_info "## VERIFYING: version definitions in 'png.h' ##"
+    eval "$CI_ENV_LIBPNG_VER"
+    my_expect="${PNG_LIBPNG_VER_MAJOR}.${PNG_LIBPNG_VER_MINOR}.${PNG_LIBPNG_VER_RELEASE}"
     if [[ "$PNG_LIBPNG_VER_STRING" == "$my_expect"* ]]
     then
         ci_info "matched: \$PNG_LIBPNG_VER_STRING == $my_expect*"
@@ -77,7 +87,7 @@ function ci_verify_version {
     else
         ci_err "mismatched: \$PNG_LIBPNG_VER_BUILD != [01]"
     fi
-    ci_info "## VERIFYING: png.h build definitions ##"
+    ci_info "## VERIFYING: build definitions in 'png.h' ##"
     my_expect="${PNG_LIBPNG_VER_MAJOR}.${PNG_LIBPNG_VER_MINOR}.${PNG_LIBPNG_VER_RELEASE}"
     if [[ "$PNG_LIBPNG_VER_STRING" == "$my_expect" ]]
     then
@@ -110,19 +120,19 @@ function ci_verify_version {
     else
         ci_err "unexpected: \$PNG_LIBPNG_VER_STRING == '$PNG_LIBPNG_VER_STRING'"
     fi
-    ci_info "## VERIFYING: png.h type definitions ##"
+    ci_info "## VERIFYING: type definitions in 'png.h' ##"
     my_expect="$(echo "png_libpng_version_${PNG_LIBPNG_VER_STRING}" | tr . _)"
     ci_spawn grep -w -e "$my_expect" png.h
-    ci_info "## VERIFYING: configure.ac version definitions ##"
-    eval "$my_env_autoconf_ver"
+    ci_info "## VERIFYING: version definitions in 'configure.ac' ##"
+    eval "$CI_ENV_AUTOCONF_VER"
     if [[ "$PNGLIB_VERSION" == "$PNG_LIBPNG_VER_STRING" ]]
     then
         ci_info "matched: \$PNGLIB_VERSION == \$PNG_LIBPNG_VER_STRING"
     else
         ci_err "mismatched: \$PNGLIB_VERSION != \$PNG_LIBPNG_VER_STRING"
     fi
-    ci_info "## VERIFYING: CMakeLists.txt version definitions ##"
-    eval "$my_env_cmake_ver"
+    ci_info "## VERIFYING: version definitions in 'CMakeLists.txt' ##"
+    eval "$CI_ENV_CMAKE_VER"
     if [[ "$PNGLIB_VERSION" == "$PNG_LIBPNG_VER_STRING" && "$PNGLIB_SUBREVISION" == 0 ]]
     then
         ci_info "matched: \$PNGLIB_VERSION == \$PNG_LIBPNG_VER_STRING"
@@ -133,8 +143,26 @@ function ci_verify_version {
     else
         ci_err "mismatched: \$PNGLIB_VERSION != \$PNG_LIBPNG_VER_STRING"
     fi
+    ci_info "## VERIFYING: version definitions in 'scripts/libpng-config-head.in' ##"
+    eval "$CI_ENV_LIBPNGCONFIG_VER"
+    if [[ "$version" == "$PNG_LIBPNG_VER_STRING" ]]
+    then
+        ci_info "matched: \$version == \$PNG_LIBPNG_VER_STRING"
+    else
+        ci_err "mismatched: \$version != \$PNG_LIBPNG_VER_STRING"
+    fi
+}
+
+function ci_finish_version_verification {
     ci_info "## END OF VERIFICATION ##"
-    ci_info "success!"
+    # Relying on "set -o errexit" to not reach here in case of error.
+    ci_info "## SUCCESS ##"
+}
+
+function ci_verify_version {
+    ci_init_version_verification
+    ci_do_version_verification
+    ci_finish_version_verification
 }
 
 function usage {

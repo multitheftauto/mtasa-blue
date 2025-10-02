@@ -11,14 +11,35 @@
 
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Time.h"
+#include <cstdint>
+#include <limits>
 #include <map>
+
+#if defined(_WIN32) || defined(WIN32)
+    #define SHAREDUTIL_PLATFORM_WINDOWS 1
+#endif
+
+#if defined(__linux__) || defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    #include <fstream>
+    #include <string>
+    #include <sstream>
+    #include <cerrno>
+    #include <cstdlib>
+#endif
+
+#if defined(__APPLE__) || defined(APPLE_x64) || defined(APPLE_arm64)
+    #include <mach/mach.h>
+    #include <mach/mach_vm.h>
+#endif
+
 #include "UTF8.h"
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
 #include "version.h"
-#ifdef WIN32
-    #include <ctime>
+
+#if defined(SHAREDUTIL_PLATFORM_WINDOWS)
     #include <windows.h>
+    #include <ctime>
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
@@ -34,6 +55,10 @@
     #ifndef RUSAGE_THREAD
         #define    RUSAGE_THREAD    1        /* only the calling thread */
     #endif
+#endif
+
+#if __cplusplus >= 201703L // C++17
+    #include <filesystem>
 #endif
 
 #if defined(__APPLE__) && !defined(__aarch64__)
@@ -97,15 +122,21 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
                 if (hProcess)
                 {
                     WCHAR szModuleName[MAX_PATH * 2] = {0};
-                    GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName));
+                    DWORD dwSize = GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName) - 1);
                     CloseHandle(hProcess);
-                    SString strModuleName = ToUTF8(szModuleName);
-                    if (FileExists(strModuleName))
+                    
+                    if (dwSize > 0)
                     {
-                        CloseHandle(hSnapshot);
-                        if (IsShortPathName(strModuleName))
-                            return GetSystemLongPathName(strModuleName);
-                        return strModuleName;
+                        // Ensure null termination
+                        szModuleName[std::min(dwSize, (DWORD)(NUMELMS(szModuleName) - 1))] = L'\0';
+                        SString strModuleName = ToUTF8(szModuleName);
+                        if (FileExists(strModuleName))
+                        {
+                            CloseHandle(hSnapshot);
+                            if (IsShortPathName(strModuleName))
+                                return GetSystemLongPathName(strModuleName);
+                            return strModuleName;
+                        }
                     }
                 }
             }
@@ -161,6 +192,121 @@ bool SharedUtil::IsGTAProcess()
     return strLaunchPathFilename.EndsWithI("gta_sa.exe");
 }
 
+bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
+{
+    // Guard against null or overflow before touching platform APIs
+    if (!ptr || size == 0) return false;
+
+    const uintptr_t start = reinterpret_cast<uintptr_t>(ptr);
+    constexpr uintptr_t maxAddress = std::numeric_limits<uintptr_t>::max();
+    if (size > maxAddress - start) return false;
+
+    const uintptr_t end = start + size;
+
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
+    constexpr DWORD readableMask = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+    for (uintptr_t current = start; current < end;)
+    {
+        MEMORY_BASIC_INFORMATION mbi{};
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0) return false;
+
+        const uintptr_t regionStart = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+        const uintptr_t regionSize = static_cast<uintptr_t>(mbi.RegionSize);
+        const uintptr_t regionEnd = regionStart + regionSize;
+        const DWORD protection = mbi.Protect;
+        if (regionSize == 0 || current < regionStart || regionStart > maxAddress - regionSize || regionEnd <= current || mbi.State != MEM_COMMIT ||
+            (protection & PAGE_GUARD) || (protection & readableMask) == 0)
+            return false;
+
+        current = regionEnd;
+    }
+
+    return true;
+#elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long), "Unexpected uintptr_t size");
+
+    std::ifstream maps("/proc/self/maps");
+    if (!maps.is_open())
+        return false;
+
+    const auto parseAddress = [maxAddress](const std::string& token, uintptr_t& out) -> bool {
+        errno = 0;
+        char* endPtr = nullptr;
+        unsigned long long value = std::strtoull(token.c_str(), &endPtr, 16);
+        if (errno != 0 || endPtr == token.c_str() || *endPtr != '\0' || value > maxAddress)
+            return false;
+        out = static_cast<uintptr_t>(value);
+        return true;
+    };
+
+    uintptr_t coverage = start;
+    bool coveringRange = false;
+    for (std::string line; std::getline(maps, line);)
+    {
+        if (line.empty()) continue;
+        std::istringstream iss(line);
+        std::string range, perms;
+        if (!(iss >> range >> perms)) continue;
+        const size_t dashPos = range.find('-');
+        if (dashPos == std::string::npos) continue;
+    uintptr_t regionStart = 0;
+    uintptr_t regionEnd = 0;
+    if (!parseAddress(range.substr(0, dashPos), regionStart) || !parseAddress(range.substr(dashPos + 1), regionEnd)) continue;
+        if (regionEnd <= regionStart || regionEnd <= coverage) continue;
+        if (coveringRange)
+        {
+            if (regionStart > coverage) return false;
+        }
+        else if (regionStart > coverage || coverage >= regionEnd)
+        {
+            continue;
+        }
+        else coveringRange = true;
+
+        if (perms.empty() || perms[0] != 'r') return false;
+        coverage = regionEnd;
+        if (coverage >= end) return true;
+    }
+
+    return false;
+#elif defined(APPLE_x64) || defined(APPLE_arm64)
+    mach_vm_address_t queryAddress = static_cast<mach_vm_address_t>(start);
+    const mach_vm_address_t targetEnd = static_cast<mach_vm_address_t>(end);
+    constexpr mach_vm_address_t maxAddressMac = std::numeric_limits<mach_vm_address_t>::max();
+    vm_region_basic_info_data_64_t info;
+    mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+    mach_port_t objectName = MACH_PORT_NULL;
+
+    while (queryAddress < targetEnd)
+    {
+        mach_vm_size_t regionSize = 0;
+        infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+        mach_vm_address_t regionAddress = queryAddress;
+        kern_return_t kr = mach_vm_region(mach_task_self(), &regionAddress, &regionSize, VM_REGION_BASIC_INFO_64,
+                                          reinterpret_cast<vm_region_info_t>(&info), &infoCount, &objectName);
+        if (objectName != MACH_PORT_NULL)
+        {
+            mach_port_deallocate(mach_task_self(), objectName);
+            objectName = MACH_PORT_NULL;
+        }
+
+        if (kr != KERN_SUCCESS || regionSize == 0 || queryAddress < regionAddress || (info.protection & VM_PROT_READ) == 0 ||
+            regionAddress > maxAddressMac - static_cast<mach_vm_address_t>(regionSize))
+            return false;
+
+        const mach_vm_address_t regionEnd = regionAddress + static_cast<mach_vm_address_t>(regionSize);
+        if (regionEnd <= queryAddress)
+            return false;
+
+        queryAddress = regionEnd;
+    }
+
+    return true;
+#else
+    return false;
+#endif
+}
+
 //
 // Write a registry string value
 //
@@ -200,10 +346,13 @@ static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const 
         DWORD dwBufferSize;
         if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS)
         {
+
             CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
             if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
             {
-                szBuffer[dwBufferSize / sizeof(wchar_t)] = 0;
+                // Ensure null termination - dwBufferSize is in bytes, convert to wchar_t units
+                size_t wcharCount = dwBufferSize / sizeof(wchar_t);
+                szBuffer[wcharCount] = 0;
                 strOutResult = ToUTF8((wchar_t*)szBuffer);
                 bResult = true;
             }
@@ -365,7 +514,21 @@ SString SharedUtil::GetPostUpdateConnect()
     CArgMap argMap;
     argMap.SetFromString(strPostUpdateConnect);
     SString strHost = argMap.Get("host");
-    time_t  timeThen = (time_t)std::atoll(argMap.Get("time"));
+    SString strTimeString = argMap.Get("time");
+
+    time_t timeThen = 0;
+    if (!strTimeString.empty())
+    {
+        char* endptr;
+        long long result = strtoll(strTimeString.c_str(), &endptr, 10);
+        
+        // Check for valid conversion
+        if (endptr != strTimeString.c_str() && *endptr == '\0' && 
+            result >= 0 && result <= LLONG_MAX)
+        {
+            timeThen = static_cast<time_t>(result);
+        }
+    }
 
     // Expire after 5 mins
     double seconds = difftime(time(NULL), timeThen);
@@ -408,7 +571,21 @@ void SharedUtil::SetApplicationSettingInt(const SString& strPath, const SString&
 
 int SharedUtil::GetApplicationSettingInt(const SString& strPath, const SString& strName)
 {
-    return atoi(GetApplicationSetting(strPath, strName));
+    SString strValue = GetApplicationSetting(strPath, strName);
+    if (strValue.empty())
+        return 0;
+
+    char* endptr;
+    long result = strtol(strValue.c_str(), &endptr, 10);
+    
+    // Check for conversion errors
+    if (endptr == strValue.c_str() || *endptr != '\0')
+        return 0;  // Invalid conversion
+
+    if (result > INT_MAX || result < INT_MIN)
+        return 0;
+    
+    return static_cast<int>(result);
 }
 
 int SharedUtil::IncApplicationSettingInt(const SString& strPath, const SString& strName)
@@ -618,11 +795,15 @@ SString SharedUtil::GetClipboardText()
     {
         // Get the clipboard's data
         HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
-        void*  lockedData = GlobalLock(clipboardData);
-        if (lockedData)
-            data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
-
-        GlobalUnlock(clipboardData);
+        if (clipboardData)  // Check if handle is valid
+        {
+            void* lockedData = GlobalLock(clipboardData);
+            if (lockedData)
+            {
+                data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
+                GlobalUnlock(clipboardData);
+            }
+        }
         CloseClipboard();
     }
 
@@ -679,7 +860,8 @@ bool SharedUtil::ProcessPendingBrowseToSolution()
 
     ClearPendingBrowseToSolution();
 
-    SString strTitle("MTA: San Andreas %s   (CTRL+C to copy)", *strErrorCode);
+    SString strTitle;
+    strTitle.Format("MTA: San Andreas %s   (CTRL+C to copy)", strErrorCode.c_str());
     // Show message if set, ask question if required, and then launch URL
     if (iFlags & ASK_GO_ONLINE)
     {
@@ -769,8 +951,11 @@ void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLi
         SString strPathFilename = PathJoin(GetMTADataPath(), "report.log");
         MakeSureDirExists(strPathFilename);
 
-        SString strMessage("%u: %s %s [%s] - %s\n", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
-                           GetReportLogProcessTag().c_str(), strText.c_str());
+        SString strMessage;
+        strMessage.Format("%u: %s %s [%s] - ", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
+                          GetReportLogProcessTag().c_str());
+        strMessage += strText;
+        strMessage += "\n";
         FileAppend(strPathFilename, &strMessage.at(0), strMessage.length());
         OutputDebugLine(SStringX("[ReportLog] ") + strMessage);
     }
@@ -785,13 +970,18 @@ void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, c
     constexpr size_t BOILERPLATE_SIZE = 46;
     constexpr size_t MAX_EXCEPTION_NAME_SIZE = 64;
     constexpr size_t MAX_EXCEPTION_TEXT_SIZE = 256;
-    static char      szOutput[BOILERPLATE_SIZE + MAX_EXCEPTION_NAME_SIZE + MAX_EXCEPTION_TEXT_SIZE] = {0};
+    constexpr size_t TOTAL_BUFFER_SIZE = BOILERPLATE_SIZE + MAX_EXCEPTION_NAME_SIZE + MAX_EXCEPTION_TEXT_SIZE;
+    static char      szOutput[TOTAL_BUFFER_SIZE] = {0};
 
     SYSTEMTIME s = {0};
     GetSystemTime(&s);
 
-    sprintf_s(szOutput, "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute,
-              s.wSecond, MAX_EXCEPTION_NAME_SIZE, szExceptionName, MAX_EXCEPTION_TEXT_SIZE, szExceptionText);
+    // Use _snprintf_s to prevent buffer overflow and ensure null termination
+    int result = _snprintf_s(szOutput, TOTAL_BUFFER_SIZE, _TRUNCATE, 
+                            "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", 
+                            uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, 
+                            (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown", 
+                            (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
 
     OutputDebugString("[ReportLog] ");
     OutputDebugString(&szOutput[0]);
@@ -936,27 +1126,10 @@ SString SharedUtil::GetSystemErrorMessage(uint uiError, bool bRemoveNewlines, bo
         strResult = strResult.Replace("\n", "").Replace("\r", "");
 
     if (bPrependCode)
-        strResult = SString("Error %u: %s", uiError, *strResult);
+        strResult.Format("Error %u: %s", uiError, strResult.c_str());
 
     return strResult;
 }
-
-#ifdef ExpandEnvironmentStringsForUser
-//
-// eg "%HOMEDRIVE%" -> "C:"
-//
-SString SharedUtil::ExpandEnvString(const SString& strInput)
-{
-    HANDLE hProcessToken;
-    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_IMPERSONATE | TOKEN_QUERY | TOKEN_DUPLICATE, &hProcessToken))
-        return strInput;
-
-    const static int iBufferSize = 32000;
-    char             envBuf[iBufferSize + 2];
-    ExpandEnvironmentStringsForUser(hProcessToken, strInput, envBuf, iBufferSize);
-    return envBuf;
-}
-#endif
 
 ///////////////////////////////////////////////////////////////
 //
@@ -1034,7 +1207,7 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 
 #endif  // MTA_CLIENT
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 #define _WIN32_WINNT_WIN8                   0x0602
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1077,7 +1250,7 @@ bool SharedUtil::IsWindows8OrGreater()
 {
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
 }
-#endif  // WIN32
+#endif  // SHAREDUTIL_PLATFORM_WINDOWS
 
 static uchar ToHexChar(uchar c)
 {
@@ -1138,7 +1311,7 @@ SString SharedUtil::EscapeURLArgument(const SString& strArg)
 //
 // Cross platform critical section
 //
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 
 SharedUtil::CCriticalSection::CCriticalSection()
 {
@@ -1199,7 +1372,7 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformationClass, PVOID ThreadInformation, ULONG ThreadInformationLength,
                                          PULONG ReturnLength)
 {
@@ -1208,6 +1381,7 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
     struct FunctionLookup
     {
         FunctionPointer function;
+        HMODULE         module;
         bool            once;
     };
 
@@ -1217,11 +1391,11 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
     {
         lookup.once = true;
 
-        HMODULE ntdll = LoadLibraryA("ntdll.dll");
+        lookup.module = LoadLibraryA("ntdll.dll");
 
-        if (ntdll)
-            lookup.function = static_cast<FunctionPointer>(static_cast<void*>(GetProcAddress(ntdll, "NtQueryInformationThread")));
-        else
+        if (lookup.module)
+            lookup.function = static_cast<FunctionPointer>(static_cast<void*>(GetProcAddress(lookup.module, "NtQueryInformationThread")));
+        else 
             return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
     }
 
@@ -1324,7 +1498,7 @@ DWORD SharedUtil::GetMainThreadId()
 //
 bool SharedUtil::IsMainThread()
 {
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     DWORD mainThreadID = GetMainThreadId();
     DWORD currentThreadID = GetCurrentThreadId();
     return mainThreadID == currentThreadID;
@@ -1337,7 +1511,7 @@ bool SharedUtil::IsMainThread()
 //
 // Expiry stuff
 //
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     #include <time.h>
 
 int SharedUtil::GetBuildAge()
@@ -1483,6 +1657,18 @@ char* SharedUtil::Trim(char* szText)
     return static_cast<char*>(memmove(szOriginal, szText, uiLen + 1));
 }
 
+#if __cplusplus >= 201703L // C++17
+std::string SharedUtil::UTF8FilePath(const std::filesystem::path& input)
+{
+#ifdef __cpp_lib_char8_t
+    std::u8string raw = input.u8string();
+    return std::string{ std::begin(raw), std::end(raw) };
+#else
+    return input.u8string();
+#endif
+}
+#endif
+
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
 std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)
 {
@@ -1516,15 +1702,20 @@ int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 // Translate a true ANSI string to the UTF-16 equivalent (reencode+convert)
 std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
+    if (input.empty())
+        return L"";
+        
     size_t len = mbstowcs(NULL, input.c_str(), input.length());
     if (len == (size_t)-1)
         return L"?";
-    wchar_t* wcsOutput = new wchar_t[len + 1];
-    mbstowcs(wcsOutput, input.c_str(), input.length());
-    wcsOutput[len] = 0;            // Null terminate the string
-    std::wstring strOutput(wcsOutput);
-    delete[] wcsOutput;
-    return strOutput;
+    
+    std::vector<wchar_t> wcsOutput(len + 1);  // Use vector for automatic cleanup
+    size_t result = mbstowcs(wcsOutput.data(), input.c_str(), len);
+    if (result == (size_t)-1 || result != len)
+        return L"?";
+    
+    wcsOutput[len] = 0;  // Null terminate the string
+    return std::wstring(wcsOutput.data());
 }
 
 // Check for BOM bytes
@@ -1598,7 +1789,7 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
     char    cPathSep;
 
     // Handle which path sep char
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     if (!bConvertToUnixPathSep)
     {
         cPathSep = '\\';
@@ -1781,7 +1972,7 @@ namespace SharedUtil
             outList.push_back(iter->first);
     }
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     ///////////////////////////////////////////////////////////////////////////
     //
     // GetCurrentProcessorNumberXP for the current thread, especially for Windows XP
@@ -1817,21 +2008,31 @@ namespace SharedUtil
     ///////////////////////////////////////////////////////////////////////////
     DWORD _GetCurrentProcessorNumber()
     {
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
         using GetCurrentProcessorNumber_t = DWORD(WINAPI*)();
 
-        static auto FnGetCurrentProcessorNumber = ([]() -> GetCurrentProcessorNumber_t {
-            HMODULE kernel32 = LoadLibraryA("kernel32");
+        struct ProcessorNumberLookup
+        {
+            GetCurrentProcessorNumber_t function;
+            HMODULE                     module;
+            bool                        once;
+        };
 
-            if (kernel32)
-                return static_cast<GetCurrentProcessorNumber_t>(static_cast<void*>(GetProcAddress(kernel32, "GetCurrentProcessorNumber")));
+        static ProcessorNumberLookup lookup = {};
+																																		   
 
-            return nullptr;
-        })();
+        if (!lookup.once)
+        {
+            lookup.once = true;
+            lookup.module = LoadLibraryA("kernel32");
 
-        if (FnGetCurrentProcessorNumber)
-            return FnGetCurrentProcessorNumber();
+            if (lookup.module)
+                lookup.function = static_cast<GetCurrentProcessorNumber_t>(static_cast<void*>(GetProcAddress(lookup.module, "GetCurrentProcessorNumber")));
+        }
+
+        if (lookup.function)
+            return lookup.function();
 
         return _GetCurrentProcessorNumberXP();
 #elif defined(__APPLE__) && defined(__aarch64__)
@@ -1870,7 +2071,7 @@ namespace SharedUtil
     {
         outUserTime = 0;
         outKernelTime = 0;
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
         FILETIME CreationTime, ExitTime, KernelTime, UserTime;
         if (GetThreadTimes(GetCurrentThread(), &CreationTime, &ExitTime, &KernelTime, &UserTime))
         {
@@ -1950,6 +2151,11 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return;
+
         uint uiLast = uiStart + uiLength - 1;
 
         // Make a hole
@@ -1965,34 +2171,68 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return;
+
         uint uiLast = uiStart + uiLength - 1;
 
         RemoveObscuredRanges(uiStart, uiLast);
-
         IterType iterOverlap;
         if (GetRangeOverlappingPoint(uiStart, iterOverlap))
         {
             uint uiOverlapPrevLast = iterOverlap->second;
 
-            // Modify overlapping range last point
-            uint uiNewLast = uiStart - 1;
-            iterOverlap->second = uiNewLast;
-
-            if (uiOverlapPrevLast > uiLast)
+            // Modify overlapping range last point with underflow check
+            if (uiStart > 0)
             {
-                // Need to add range after hole
-                uint uiNewStart = uiLast + 1;
-                m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                uint uiNewLast = uiStart - 1;
+                iterOverlap->second = uiNewLast;
+
+                if (uiOverlapPrevLast > uiLast)
+                {
+                    // Need to add range after hole
+                    // Check for overflow when calculating uiLast + 1
+                    if (uiLast < UINT_MAX)
+                    {
+                        uint uiNewStart = uiLast + 1;
+                        m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                    }
+                }
+            }
+            else
+            {
+                // Special case: uiStart is 0, remove the range entirely
+                m_StartLastMap.erase(iterOverlap);
+                if (uiOverlapPrevLast > uiLast)
+                {
+                    // Check for overflow when calculating uiLast + 1
+                    if (uiLast < UINT_MAX)
+                    {
+                        uint uiNewStart = uiLast + 1;
+                        m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                    }
+                }
             }
         }
 
         if (GetRangeOverlappingPoint(uiLast, iterOverlap))
         {
             // Modify overlapping range start point
-            uint uiNewStart = uiLast + 1;
-            uint uiOldLast = iterOverlap->second;
-            m_StartLastMap.erase(iterOverlap);
-            m_StartLastMap[uiNewStart] = uiOldLast;
+            // Check for overflow when calculating uiLast + 1
+            if (uiLast < UINT_MAX)
+            {
+                uint uiNewStart = uiLast + 1;
+                uint uiOldLast = iterOverlap->second;
+                m_StartLastMap.erase(iterOverlap);
+                m_StartLastMap[uiNewStart] = uiOldLast;
+            }
+            else
+            {
+                // If uiLast == UINT_MAX, we can't create a range after it, just remove the overlapping range
+                m_StartLastMap.erase(iterOverlap);
+            }
         }
     }
 
@@ -2001,6 +2241,11 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return false;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return false;
+
         uint uiLast = uiStart + uiLength - 1;
 
         IterType iter = m_StartLastMap.lower_bound(uiStart);
@@ -2036,7 +2281,7 @@ namespace SharedUtil
             if (iter == m_StartLastMap.end())
                 return;
 
-            // If last of found range is after query last, then range is not obscured
+            // If last of found range is after or at query last, then range is not obscured
             if (iter->second > uiLast)
                 return;
 
@@ -2050,6 +2295,15 @@ namespace SharedUtil
         IterType iter = m_StartLastMap.lower_bound(uiPoint);
         // iter is on or after point - So it can't overlap the point
 
+        if (iter != m_StartLastMap.end())
+        {
+            // If last of found range is after or at query point, then range is overlapping
+            if (iter->first <= uiPoint && iter->second >= uiPoint)
+            {
+                result = iter;
+                return true;
+            }
+        }
         if (iter != m_StartLastMap.begin())
         {
             iter--;

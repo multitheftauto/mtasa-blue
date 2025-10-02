@@ -134,13 +134,20 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += powerpc/powerpc_init.c\
         powerpc/filter_vsx_intrinsics.c
 endif
 
+if PNG_RISCV_RVV
+noinst_LTLIBRARIES= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv.la
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv_la_SOURCES = riscv/riscv_init.c\
+        riscv/filter_rvv_intrinsics.c
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv_la_CFLAGS = -march=rv64gv
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LIBADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv.la
+endif
+
 if PNG_LOONGARCH_LSX
 noinst_LTLIBRARIES= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@lsx.la
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@lsx_la_SOURCES = loongarch/loongarch_lsx_init.c\
 	loongarch/filter_lsx_intrinsics.c
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@lsx_la_CFLAGS = -mlsx
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LIBADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@lsx.la
-# libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@lsx.la
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
@@ -161,6 +168,10 @@ else
 #   Only restricted exports when possible
   libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -export-symbols libpng.sym
   libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.sym
+endif
+
+if PNG_RISCV_RVV
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES += libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@rvv.la
 endif
 
 if PNG_LOONGARCH_LSX
