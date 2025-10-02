@@ -44,10 +44,12 @@ constexpr float kBorderlessSaturationMax = 2.0f;
 constexpr float kBorderlessSaturationDefault = 1.0f;
 
 constexpr float kSettingsContentWidth = 680.0f;
+constexpr float kSettingsExtendedContentWidth = 820.0f;
 constexpr float kSettingsBaseContentHeight = 480.0f;
 constexpr float kSettingsExtendedContentHeight = 520.0f;
 constexpr float kSettingsWindowFrameHorizontal = 18.0f;            // 9px left + 9px right
 constexpr float kSettingsWindowFrameVertical = 22.0f;              // 20px top + 2px bottom
+constexpr float kSettingsBottomButtonAreaHeight = 38.0f;
 constexpr float kPostFxCheckboxOffset = 24.0f;
 
 float NormalizeSliderValue(float value, float minValue, float maxValue)
@@ -108,14 +110,24 @@ void CSettings::CreateGUI()
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
 
-    CVector2D contentSize(kSettingsContentWidth, kSettingsBaseContentHeight);
+    const float fBottomButtonAreaHeight = kSettingsBottomButtonAreaHeight;
+    CVector2D   contentSize(kSettingsContentWidth, kSettingsBaseContentHeight);
+    const float availableContentWidth = resolution.fX - kSettingsWindowFrameHorizontal;
+    if (availableContentWidth >= kSettingsContentWidth)
+        contentSize.fX = std::min(kSettingsExtendedContentWidth, availableContentWidth);
+    else if (availableContentWidth > 0.0f)
+        contentSize.fX = availableContentWidth;
+
     const float availableContentHeight = resolution.fY - kSettingsWindowFrameVertical;
     if (availableContentHeight >= kSettingsBaseContentHeight)
         contentSize.fY = std::min(kSettingsExtendedContentHeight, availableContentHeight);
+    else if (availableContentHeight > 0.0f)
+        contentSize.fY = std::max(availableContentHeight, fBottomButtonAreaHeight + 1.0f);
 
-    float     fBottomButtonAreaHeight = 38;
+    contentSize.fX = std::max(contentSize.fX, 0.0f);
+    contentSize.fY = std::max(contentSize.fY, fBottomButtonAreaHeight + 1.0f);
+
     CVector2D tabPanelPosition;
-    CVector2D tabPanelSize = contentSize - CVector2D(0, fBottomButtonAreaHeight);
 
     // Window size is content size plus window frame edge dims
     CVector2D windowSize = contentSize + CVector2D(kSettingsWindowFrameHorizontal, kSettingsWindowFrameVertical);
@@ -143,6 +155,8 @@ void CSettings::CreateGUI()
         pFiller->SetZOrderingEnabled(false);
         pFiller->SetAlwaysOnTop(true);
         pFiller->MoveToBack();
+        contentSize.fX = std::min(contentSize.fX, resolution.fX);
+        contentSize.fY = std::min(contentSize.fY, resolution.fY);
         pFiller->SetPosition((resolution - contentSize) / 2);
         pFiller->SetSize(contentSize);
         m_pWindow = pFiller;
@@ -152,6 +166,7 @@ void CSettings::CreateGUI()
     // Create the tab panel and necessary tabs
     m_pTabs = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pWindow));
     m_pTabs->SetPosition(tabPanelPosition);
+    const CVector2D tabPanelSize = CVector2D(contentSize.fX, std::max(0.0f, contentSize.fY - fBottomButtonAreaHeight));
     m_pTabs->SetSize(tabPanelSize);
     m_pTabs->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnTabChanged, this));
 
