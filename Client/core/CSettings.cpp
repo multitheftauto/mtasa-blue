@@ -165,7 +165,6 @@ void CSettings::ResetGuiPointers()
     m_pAdvancedSettingDescriptionLabel = NULL;
     m_pFullscreenStyleLabel = NULL;
     m_pFullscreenStyleCombo = NULL;
-    m_pCheckBoxVSync = NULL;
     m_pPriorityLabel = NULL;
     m_pPriorityCombo = NULL;
     m_pPlayerMapImageLabel = NULL;
