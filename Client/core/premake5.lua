@@ -14,6 +14,7 @@ project "Client Core"
 			"../../Shared/sdk",
 			".",
 			"../sdk",
+			"../../vendor/cegui-0.4.0-custom/include",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
 			"../../vendor/jpeg-9f",

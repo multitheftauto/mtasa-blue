@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <vector>
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
 #include <game/CSettings.h>
@@ -66,14 +68,266 @@ float DenormalizeSliderValue(float position, float minValue, float maxValue)
 }
 }
 
+void CSettings::ResetGuiPointers()
+{
+    m_pWindow = NULL;
+    m_pTabs = NULL;
+    m_pTabMultiplayer = NULL;
+    m_pTabVideo = NULL;
+    m_pTabInterface = NULL;
+    m_pTabBrowser = NULL;
+    m_pTabPostFX = NULL;
+    m_pTabAudio = NULL;
+    m_pTabBinds = NULL;
+    m_pTabControls = NULL;
+    m_pTabAdvanced = NULL;
+    m_pButtonOK = NULL;
+    m_pButtonCancel = NULL;
+    m_pLabelNick = NULL;
+    m_pButtonGenerateNick = NULL;
+    m_pButtonGenerateNickIcon = NULL;
+    m_pEditNick = NULL;
+    m_pSavePasswords = NULL;
+    m_pAutoRefreshBrowser = NULL;
+
+    m_pVideoGeneralLabel = NULL;
+    m_pVideoResolutionLabel = NULL;
+    m_pComboResolution = NULL;
+    m_pCheckBoxMipMapping = NULL;
+    m_pCheckBoxWindowed = NULL;
+    m_pCheckBoxDPIAware = NULL;
+    m_pCheckBoxHudMatchAspectRatio = NULL;
+    m_pCheckBoxMinimize = NULL;
+    m_pMapRenderingLabel = NULL;
+    m_pComboFxQuality = NULL;
+    m_pFXQualityLabel = NULL;
+    m_pComboAspectRatio = NULL;
+    m_pAspectRatioLabel = NULL;
+    m_pCheckBoxVolumetricShadows = NULL;
+    m_pCheckBoxDeviceSelectionDialog = NULL;
+    m_pCheckBoxShowUnsafeResolutions = NULL;
+    m_pCheckBoxAllowScreenUpload = NULL;
+    m_pCheckBoxAllowExternalSounds = NULL;
+    m_pCheckBoxCustomizedSAFiles = NULL;
+    m_pCheckBoxAllowDiscordRPC = NULL;
+    m_pCheckBoxAllowSteamClient = NULL;
+    m_pCheckBoxAlwaysShowTransferBox = NULL;
+    m_pCheckBoxGrass = NULL;
+    m_pCheckBoxHeatHaze = NULL;
+    m_pCheckBoxTyreSmokeParticles = NULL;
+    m_pCheckBoxHighDetailVehicles = NULL;
+    m_pCheckBoxHighDetailPeds = NULL;
+    m_pCheckBoxBlur = NULL;
+    m_pCheckBoxCoronaReflections = NULL;
+    m_pCheckBoxDynamicPedShadows = NULL;
+    m_pFieldOfViewLabel = NULL;
+    m_pFieldOfView = NULL;
+    m_pFieldOfViewValueLabel = NULL;
+    m_pDrawDistanceLabel = NULL;
+    m_pDrawDistance = NULL;
+    m_pDrawDistanceValueLabel = NULL;
+    m_pBrightnessLabel = NULL;
+    m_pBrightness = NULL;
+    m_pBrightnessValueLabel = NULL;
+    m_pBorderlessGammaToggle = NULL;
+    m_pBorderlessGammaLabel = NULL;
+    m_pBorderlessGamma = NULL;
+    m_pBorderlessGammaValueLabel = NULL;
+    m_pBorderlessBrightnessToggle = NULL;
+    m_pBorderlessBrightnessLabel = NULL;
+    m_pBorderlessBrightness = NULL;
+    m_pBorderlessBrightnessValueLabel = NULL;
+    m_pBorderlessContrastToggle = NULL;
+    m_pBorderlessContrastLabel = NULL;
+    m_pBorderlessContrast = NULL;
+    m_pBorderlessContrastValueLabel = NULL;
+    m_pBorderlessSaturationToggle = NULL;
+    m_pBorderlessSaturationLabel = NULL;
+    m_pBorderlessSaturation = NULL;
+    m_pBorderlessSaturationValueLabel = NULL;
+    m_pCheckBoxApplyBorderless = NULL;
+    m_pCheckBoxApplyFullscreen = NULL;
+    m_pAnisotropicLabel = NULL;
+    m_pAnisotropic = NULL;
+    m_pAnisotropicValueLabel = NULL;
+    m_pComboAntiAliasing = NULL;
+    m_pAntiAliasingLabel = NULL;
+    m_pMapAlphaLabel = NULL;
+    m_pMapAlpha = NULL;
+    m_pMapAlphaValueLabel = NULL;
+    m_pStreamingMemoryLabel = NULL;
+    m_pStreamingMemory = NULL;
+    m_pStreamingMemoryMinLabel = NULL;
+    m_pStreamingMemoryMaxLabel = NULL;
+    m_pStreamingMemoryLabelInfo = NULL;
+    m_pVideoDefButton = NULL;
+
+    m_pAdvancedSettingDescriptionLabel = NULL;
+    m_pFullscreenStyleLabel = NULL;
+    m_pFullscreenStyleCombo = NULL;
+    m_pCheckBoxVSync = NULL;
+    m_pPriorityLabel = NULL;
+    m_pPriorityCombo = NULL;
+    m_pPlayerMapImageLabel = NULL;
+    m_pPlayerMapImageCombo = NULL;
+    m_pFastClothesLabel = NULL;
+    m_pFastClothesCombo = NULL;
+    m_pAudioGeneralLabel = NULL;
+    m_pUserTrackGeneralLabel = NULL;
+    m_pBrowserSpeedLabel = NULL;
+    m_pBrowserSpeedCombo = NULL;
+    m_pSingleDownloadLabel = NULL;
+    m_pSingleDownloadCombo = NULL;
+    m_pPacketTagLabel = NULL;
+    m_pPacketTagCombo = NULL;
+    m_pProgressAnimationLabel = NULL;
+    m_pProgressAnimationCombo = NULL;
+    m_pDebugSettingLabel = NULL;
+    m_pDebugSettingCombo = NULL;
+    m_pWin8Label = NULL;
+    m_pWin8ColorCheckBox = NULL;
+    m_pWin8MouseCheckBox = NULL;
+    m_pPhotoSavingCheckbox = NULL;
+    m_pCheckBoxAskBeforeDisconnect = NULL;
+    m_pProcessAffinityCheckbox = NULL;
+    m_pUpdateBuildTypeLabel = NULL;
+    m_pUpdateBuildTypeCombo = NULL;
+    m_pUpdateAutoInstallLabel = NULL;
+    m_pUpdateAutoInstallCombo = NULL;
+    m_pButtonUpdate = NULL;
+    m_pAdvancedMiscLabel = NULL;
+    m_pAdvancedUpdaterLabel = NULL;
+    m_pCachePathLabel = NULL;
+    m_pCachePathValue = NULL;
+    m_pCachePathShowButton = NULL;
+
+    m_pLabelMasterVolume = NULL;
+    m_pLabelRadioVolume = NULL;
+    m_pLabelSFXVolume = NULL;
+    m_pLabelMTAVolume = NULL;
+    m_pLabelVoiceVolume = NULL;
+    m_pLabelMasterVolumeValue = NULL;
+    m_pLabelRadioVolumeValue = NULL;
+    m_pLabelSFXVolumeValue = NULL;
+    m_pLabelMTAVolumeValue = NULL;
+    m_pLabelVoiceVolumeValue = NULL;
+    m_pAudioMasterVolume = NULL;
+    m_pAudioRadioVolume = NULL;
+    m_pAudioSFXVolume = NULL;
+    m_pAudioMTAVolume = NULL;
+    m_pAudioVoiceVolume = NULL;
+    m_pAudioRadioLabel = NULL;
+    m_pCheckBoxAudioEqualizer = NULL;
+    m_pCheckBoxAudioAutotune = NULL;
+    m_pAudioMuteLabel = NULL;
+    m_pCheckBoxMuteMaster = NULL;
+    m_pCheckBoxMuteSFX = NULL;
+    m_pCheckBoxMuteRadio = NULL;
+    m_pCheckBoxMuteMTA = NULL;
+    m_pCheckBoxMuteVoice = NULL;
+    m_pAudioUsertrackLabel = NULL;
+    m_pCheckBoxUserAutoscan = NULL;
+    m_pLabelUserTrackMode = NULL;
+    m_pComboUsertrackMode = NULL;
+    m_pAudioDefButton = NULL;
+
+    m_pBindsList = NULL;
+    m_pBindsDefButton = NULL;
+
+    m_pJoypadName = NULL;
+    m_pJoypadUnderline = NULL;
+    m_pEditDeadzone = NULL;
+    m_pEditSaturation = NULL;
+    m_pJoypadLabels.clear();
+    m_pJoypadButtons.clear();
+
+    m_pSelectedBind = NULL;
+
+    m_pControlsMouseLabel = NULL;
+    m_pInvertMouse = NULL;
+    m_pSteerWithMouse = NULL;
+    m_pFlyWithMouse = NULL;
+    m_pLabelMouseSensitivity = NULL;
+    m_pMouseSensitivity = NULL;
+    m_pLabelMouseSensitivityValue = NULL;
+    m_pLabelVerticalAimSensitivity = NULL;
+    m_pVerticalAimSensitivity = NULL;
+    m_pLabelVerticalAimSensitivityValue = NULL;
+
+    m_pControlsJoypadLabel = NULL;
+    m_pControlsInputTypePane = NULL;
+    m_pStandardControls = NULL;
+    m_pClassicControls = NULL;
+
+    m_pInterfaceLanguageSelector = NULL;
+    m_pInterfaceSkinSelector = NULL;
+    m_pInterfaceLoadSkin = NULL;
+
+    m_pChatPresets = NULL;
+    m_pChatLoadPreset = NULL;
+
+    for (int i = 0; i < Chat::ColorType::MAX; ++i)
+    {
+        m_pChatRed[i] = NULL;
+        m_pChatGreen[i] = NULL;
+        m_pChatBlue[i] = NULL;
+        m_pChatAlpha[i] = NULL;
+        m_pChatRedValue[i] = NULL;
+        m_pChatGreenValue[i] = NULL;
+        m_pChatBlueValue[i] = NULL;
+        m_pChatAlphaValue[i] = NULL;
+        m_pChatColorPreview[i] = NULL;
+    }
+
+    m_pPaneChatFont = NULL;
+    for (int i = 0; i < Chat::Font::MAX; ++i)
+        m_pRadioChatFont[i] = NULL;
+
+    m_pChatHorizontalCombo = NULL;
+    m_pChatVerticalCombo = NULL;
+    m_pChatTextAlignCombo = NULL;
+    m_pChatOffsetX = NULL;
+    m_pChatOffsetY = NULL;
+    m_pChatLines = NULL;
+    m_pChatScaleX = NULL;
+    m_pChatScaleY = NULL;
+    m_pChatWidth = NULL;
+    m_pChatCssBackground = NULL;
+    m_pChatNickCompletion = NULL;
+    m_pChatCssText = NULL;
+    m_pChatTextBlackOutline = NULL;
+    m_pChatLineLife = NULL;
+    m_pChatLineFadeout = NULL;
+    m_pFlashWindow = NULL;
+    m_pTrayBalloon = NULL;
+
+    m_pLabelBrowserGeneral = NULL;
+    m_pCheckBoxRemoteBrowser = NULL;
+    m_pCheckBoxRemoteJavascript = NULL;
+    m_pLabelBrowserCustomBlacklist = NULL;
+    m_pEditBrowserBlacklistAdd = NULL;
+    m_pLabelBrowserBlacklistAdd = NULL;
+    m_pButtonBrowserBlacklistAdd = NULL;
+    m_pGridBrowserBlacklist = NULL;
+    m_pButtonBrowserBlacklistRemove = NULL;
+    m_pLabelBrowserCustomWhitelist = NULL;
+    m_pEditBrowserWhitelistAdd = NULL;
+    m_pLabelBrowserWhitelistAdd = NULL;
+    m_pButtonBrowserWhitelistAdd = NULL;
+    m_pGridBrowserWhitelist = NULL;
+    m_pButtonBrowserWhitelistRemove = NULL;
+    m_pCheckBoxBrowserGPUEnabled = NULL;
+}
+
 CSettings::CSettings()
 {
+    ResetGuiPointers();
+
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     m_fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
     m_fSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
 
     m_iMaxAnisotropic = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
-    m_pWindow = NULL;
     m_bBrowserListsChanged = false;
     m_bBrowserListsLoadEnabled = false;
     CreateGUI();
@@ -170,16 +424,15 @@ void CSettings::CreateGUI()
     m_pTabs->SetSize(tabPanelSize);
     m_pTabs->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnTabChanged, this));
 
-    pTabMultiplayer = m_pTabs->CreateTab(_("Multiplayer"));
-    pTabVideo = m_pTabs->CreateTab(_("Video"));
-    pTabPostFX = m_pTabs->CreateTab(_("PostFX"));
-    m_pTabPostFX = pTabPostFX;
-    pTabAudio = m_pTabs->CreateTab(_("Audio"));
-    pTabBinds = m_pTabs->CreateTab(_("Binds"));
-    pTabControls = m_pTabs->CreateTab(_("Controls"));
+    pTabMultiplayer = m_pTabMultiplayer = m_pTabs->CreateTab(_("Multiplayer"));
+    pTabVideo = m_pTabVideo = m_pTabs->CreateTab(_("Video"));
+    pTabPostFX = m_pTabPostFX = m_pTabs->CreateTab(_("PostFX"));
+    pTabAudio = m_pTabAudio = m_pTabs->CreateTab(_("Audio"));
+    pTabBinds = m_pTabBinds = m_pTabs->CreateTab(_("Binds"));
+    pTabControls = m_pTabControls = m_pTabs->CreateTab(_("Controls"));
     m_pTabInterface = m_pTabs->CreateTab(_("Interface"));
     m_pTabBrowser = m_pTabs->CreateTab(_("Web Browser"));
-    pTabAdvanced = m_pTabs->CreateTab(_("Advanced"));
+    pTabAdvanced = m_pTabAdvanced = m_pTabs->CreateTab(_("Advanced"));
 
     // Create buttons
     //  OK button
@@ -1572,11 +1825,25 @@ void CSettings::CreateGUI()
 
 void CSettings::DestroyGUI()
 {
-    // Destroy
-    delete m_pButtonCancel;
-    delete m_pButtonOK;
-    delete m_pWindow;
-    m_pWindow = NULL;
+    if (!m_pWindow)
+    {
+        RemoveAllKeyBindSections();
+        m_bBrowserListsChanged = false;
+        m_bBrowserListsLoadEnabled = false;
+        m_pSelectedBind = NULL;
+        ResetGuiPointers();
+        return;
+    }
+
+    g_pCore->GetGUI()->DestroyElementRecursive(m_pWindow);
+    m_pWindow = nullptr;
+
+    RemoveAllKeyBindSections();
+    m_bBrowserListsChanged = false;
+    m_bBrowserListsLoadEnabled = false;
+    m_pSelectedBind = NULL;
+
+    ResetGuiPointers();
 }
 
 void RestartCallBack(void* ptr, unsigned int uiButton)
