@@ -12,8 +12,6 @@
 #include "StdInc.h"
 #include <algorithm>
 #include <vector>
-#include "../gui/GuiCleanup.h"
-#include "../gui/CGUIElement_Impl.h"
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
 #include <game/CSettings.h>
@@ -1837,18 +1835,8 @@ void CSettings::DestroyGUI()
         return;
     }
 
-    CEGUI::Window* pRootWindow = nullptr;
-    if (CGUIElement_Impl* pWindowImpl = dynamic_cast<CGUIElement_Impl*>(m_pWindow))
-        pRootWindow = pWindowImpl->GetWindow();
-    if (pRootWindow)
-    {
-        // Bottom-up pass that mirrors the CEGUI tree ownership.
-    DestroyGuiWindowRecursive(pRootWindow);
-    }
-    else
-    {
-        SAFE_DELETE(m_pWindow);
-    }
+    g_pCore->GetGUI()->DestroyElementRecursive(m_pWindow);
+    m_pWindow = nullptr;
 
     RemoveAllKeyBindSections();
     m_bBrowserListsChanged = false;

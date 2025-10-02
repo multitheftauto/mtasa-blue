@@ -15,9 +15,18 @@
 
 using std::list;
 
-void CGUI_Impl::DestroyWindowRecursive(CEGUI::Window* pWindow)
+void CGUI_Impl::DestroyElementRecursive(CGUIElement* pElement)
 {
-    DestroyGuiWindowRecursive(pWindow);
+    if (!pElement)
+        return;
+
+    if (auto* pImpl = dynamic_cast<CGUIElement_Impl*>(pElement))
+    {
+        DestroyGuiWindowRecursive(pImpl->GetWindow());
+        return;
+    }
+
+    delete pElement;
 }
 
 #define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>

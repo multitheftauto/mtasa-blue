@@ -83,8 +83,6 @@ public:
     static CEGUI::String GetUTFString(const char* szInput);
     static CEGUI::String GetUTFString(const std::string& strInput);
     static CEGUI::String GetUTFString(const CEGUI::String& strInput);            // Not defined
-    static void          DestroyWindowRecursive(CEGUI::Window* pWindow);
-
     //
     CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags);
 
@@ -277,6 +275,7 @@ public:
     void RemoveFromRedrawQueue(CGUIElement* pWindow);
 
     void        CleanDeadPool();
+    void        DestroyElementRecursive(CGUIElement* pElement);
     CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename);
     bool        LoadImageset(const SString& strFilename);
 
