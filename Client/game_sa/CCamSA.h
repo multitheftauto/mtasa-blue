@@ -165,19 +165,19 @@ public:
     CCamSA(CCamSAInterface* pInterface) { m_pInterface = pInterface; }
     CCamSAInterface* GetInterface() { return m_pInterface; }
 
-    CVector*     GetFront() const override { return &m_pInterface->Front; }
-    CVector*     GetUp() const override { return &m_pInterface->Up; }
-    CVector*     GetSource() const override { return &m_pInterface->Source; }
-    unsigned int GetMode() const override { return m_pInterface->Mode; }
-    float        GetFOV() const override { return m_pInterface->FOV; }
-    void         SetFOV(float fFOV) override { m_pInterface->FOV = fFOV; }
-    void         GetDirection(float& fHorizontal, float& fVertical) override;
-    void         SetDirection(float fHorizontal, float fVertical) override;
+    CVector*     GetFront() const { return &m_pInterface->Front; }
+    CVector*     GetUp() const { return &m_pInterface->Up; }
+    CVector*     GetSource() const { return &m_pInterface->Source; }
+    unsigned int GetMode() const { return m_pInterface->Mode; }
+    float        GetFOV() const { return m_pInterface->FOV; }
+    void         SetFOV(float fFOV) { m_pInterface->FOV = fFOV; }
+    void         GetDirection(float& fHorizontal, float& fVertical);
+    void         SetDirection(float fHorizontal, float fVertical);
 
-    CVector* GetFixedModeSource() const override { return &m_pInterface->m_cvecCamFixedModeSource; }
-    CVector* GetFixedModeVector() const override { return &m_pInterface->m_cvecCamFixedModeVector; }
-    CVector* GetTargetHistoryPos() const override { return m_pInterface->m_aTargetHistoryPos; }
+    CVector* GetFixedModeSource() const { return &m_pInterface->m_cvecCamFixedModeSource; }
+    CVector* GetFixedModeVector() const { return &m_pInterface->m_cvecCamFixedModeVector; }
+    CVector* GetTargetHistoryPos() const { return m_pInterface->m_aTargetHistoryPos; }
 
-    CEntity* GetTargetEntity() const override;
+    CEntity* GetTargetEntity() const;
     void     SetTargetEntity(CEntity* pEntity) override;
 };
