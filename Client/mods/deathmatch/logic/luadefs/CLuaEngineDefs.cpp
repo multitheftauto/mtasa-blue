@@ -2595,12 +2595,9 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
 }
 
-bool CLuaEngineDefs::EngineIsModelValid(uint uiModelId)
+bool CLuaEngineDefs::EngineIsModelValid(std::uint32_t uiModelId)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
 
-    if (uiModelId >= 20000 || !pModelInfo)
-        return false;
-
-    return true;
+    return (modelId < 20000 && modelInfo);
 }
