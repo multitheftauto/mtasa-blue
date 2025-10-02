@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <vector>
+#include "../gui/GuiCleanup.h"
+#include "../gui/CGUIElement_Impl.h"
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
 #include <game/CSettings.h>
@@ -238,6 +242,8 @@ void CSettings::ResetGuiPointers()
     m_pEditSaturation = NULL;
     m_pJoypadLabels.clear();
     m_pJoypadButtons.clear();
+
+    m_pSelectedBind = NULL;
 
     m_pControlsMouseLabel = NULL;
     m_pInvertMouse = NULL;
@@ -1826,259 +1832,28 @@ void CSettings::DestroyGUI()
         RemoveAllKeyBindSections();
         m_bBrowserListsChanged = false;
         m_bBrowserListsLoadEnabled = false;
+        m_pSelectedBind = NULL;
         ResetGuiPointers();
         return;
     }
 
-    // Buttons, edits, checkboxes, and labels allocated during CreateGUI / CreateInterfaceTabGUI.
-    SAFE_DELETE(m_pButtonCancel);
-    SAFE_DELETE(m_pButtonOK);
-    SAFE_DELETE(m_pLabelNick);
-    SAFE_DELETE(m_pButtonGenerateNick);
-    SAFE_DELETE(m_pButtonGenerateNickIcon);
-    SAFE_DELETE(m_pEditNick);
-    SAFE_DELETE(m_pSavePasswords);
-    SAFE_DELETE(m_pAutoRefreshBrowser);
-
-    SAFE_DELETE(m_pVideoGeneralLabel);
-    SAFE_DELETE(m_pVideoResolutionLabel);
-    SAFE_DELETE(m_pComboResolution);
-    SAFE_DELETE(m_pCheckBoxMipMapping);
-    SAFE_DELETE(m_pCheckBoxWindowed);
-    SAFE_DELETE(m_pCheckBoxDPIAware);
-    SAFE_DELETE(m_pCheckBoxHudMatchAspectRatio);
-    SAFE_DELETE(m_pCheckBoxMinimize);
-    SAFE_DELETE(m_pMapRenderingLabel);
-    SAFE_DELETE(m_pComboFxQuality);
-    SAFE_DELETE(m_pFXQualityLabel);
-    SAFE_DELETE(m_pComboAspectRatio);
-    SAFE_DELETE(m_pAspectRatioLabel);
-    SAFE_DELETE(m_pCheckBoxVolumetricShadows);
-    SAFE_DELETE(m_pCheckBoxDeviceSelectionDialog);
-    SAFE_DELETE(m_pCheckBoxShowUnsafeResolutions);
-    SAFE_DELETE(m_pCheckBoxAllowScreenUpload);
-    SAFE_DELETE(m_pCheckBoxAllowExternalSounds);
-    SAFE_DELETE(m_pCheckBoxCustomizedSAFiles);
-    SAFE_DELETE(m_pCheckBoxAllowDiscordRPC);
-    SAFE_DELETE(m_pCheckBoxAllowSteamClient);
-    SAFE_DELETE(m_pCheckBoxAlwaysShowTransferBox);
-    SAFE_DELETE(m_pCheckBoxGrass);
-    SAFE_DELETE(m_pCheckBoxHeatHaze);
-    SAFE_DELETE(m_pCheckBoxTyreSmokeParticles);
-    SAFE_DELETE(m_pCheckBoxHighDetailVehicles);
-    SAFE_DELETE(m_pCheckBoxHighDetailPeds);
-    SAFE_DELETE(m_pCheckBoxBlur);
-    SAFE_DELETE(m_pCheckBoxCoronaReflections);
-    SAFE_DELETE(m_pCheckBoxDynamicPedShadows);
-    SAFE_DELETE(m_pFieldOfViewLabel);
-    SAFE_DELETE(m_pFieldOfView);
-    SAFE_DELETE(m_pFieldOfViewValueLabel);
-    SAFE_DELETE(m_pDrawDistanceLabel);
-    SAFE_DELETE(m_pDrawDistance);
-    SAFE_DELETE(m_pDrawDistanceValueLabel);
-    SAFE_DELETE(m_pBrightnessLabel);
-    SAFE_DELETE(m_pBrightness);
-    SAFE_DELETE(m_pBrightnessValueLabel);
-    SAFE_DELETE(m_pBorderlessGammaToggle);
-    SAFE_DELETE(m_pBorderlessGammaLabel);
-    SAFE_DELETE(m_pBorderlessGamma);
-    SAFE_DELETE(m_pBorderlessGammaValueLabel);
-    SAFE_DELETE(m_pBorderlessBrightnessToggle);
-    SAFE_DELETE(m_pBorderlessBrightnessLabel);
-    SAFE_DELETE(m_pBorderlessBrightness);
-    SAFE_DELETE(m_pBorderlessBrightnessValueLabel);
-    SAFE_DELETE(m_pBorderlessContrastToggle);
-    SAFE_DELETE(m_pBorderlessContrastLabel);
-    SAFE_DELETE(m_pBorderlessContrast);
-    SAFE_DELETE(m_pBorderlessContrastValueLabel);
-    SAFE_DELETE(m_pBorderlessSaturationToggle);
-    SAFE_DELETE(m_pBorderlessSaturationLabel);
-    SAFE_DELETE(m_pBorderlessSaturation);
-    SAFE_DELETE(m_pBorderlessSaturationValueLabel);
-    SAFE_DELETE(m_pCheckBoxApplyBorderless);
-    SAFE_DELETE(m_pCheckBoxApplyFullscreen);
-    SAFE_DELETE(m_pAnisotropicLabel);
-    SAFE_DELETE(m_pAnisotropic);
-    SAFE_DELETE(m_pAnisotropicValueLabel);
-    SAFE_DELETE(m_pComboAntiAliasing);
-    SAFE_DELETE(m_pAntiAliasingLabel);
-    SAFE_DELETE(m_pMapAlphaLabel);
-    SAFE_DELETE(m_pMapAlpha);
-    SAFE_DELETE(m_pMapAlphaValueLabel);
-    SAFE_DELETE(m_pStreamingMemoryLabel);
-    SAFE_DELETE(m_pStreamingMemory);
-    SAFE_DELETE(m_pStreamingMemoryMinLabel);
-    SAFE_DELETE(m_pStreamingMemoryMaxLabel);
-    SAFE_DELETE(m_pStreamingMemoryLabelInfo);
-    SAFE_DELETE(m_pVideoDefButton);
-
-    SAFE_DELETE(m_pAdvancedSettingDescriptionLabel);
-    SAFE_DELETE(m_pFullscreenStyleLabel);
-    SAFE_DELETE(m_pFullscreenStyleCombo);
-    SAFE_DELETE(m_pCheckBoxVSync);
-    SAFE_DELETE(m_pPriorityLabel);
-    SAFE_DELETE(m_pPriorityCombo);
-    SAFE_DELETE(m_pPlayerMapImageLabel);
-    SAFE_DELETE(m_pPlayerMapImageCombo);
-    SAFE_DELETE(m_pFastClothesLabel);
-    SAFE_DELETE(m_pFastClothesCombo);
-    SAFE_DELETE(m_pAudioGeneralLabel);
-    SAFE_DELETE(m_pUserTrackGeneralLabel);
-    SAFE_DELETE(m_pBrowserSpeedLabel);
-    SAFE_DELETE(m_pBrowserSpeedCombo);
-    SAFE_DELETE(m_pSingleDownloadLabel);
-    SAFE_DELETE(m_pSingleDownloadCombo);
-    SAFE_DELETE(m_pPacketTagLabel);
-    SAFE_DELETE(m_pPacketTagCombo);
-    SAFE_DELETE(m_pProgressAnimationLabel);
-    SAFE_DELETE(m_pProgressAnimationCombo);
-    SAFE_DELETE(m_pDebugSettingLabel);
-    SAFE_DELETE(m_pDebugSettingCombo);
-    SAFE_DELETE(m_pWin8Label);
-    SAFE_DELETE(m_pWin8ColorCheckBox);
-    SAFE_DELETE(m_pWin8MouseCheckBox);
-    SAFE_DELETE(m_pPhotoSavingCheckbox);
-    SAFE_DELETE(m_pCheckBoxAskBeforeDisconnect);
-    SAFE_DELETE(m_pProcessAffinityCheckbox);
-    SAFE_DELETE(m_pUpdateBuildTypeLabel);
-    SAFE_DELETE(m_pUpdateBuildTypeCombo);
-    SAFE_DELETE(m_pUpdateAutoInstallLabel);
-    SAFE_DELETE(m_pUpdateAutoInstallCombo);
-    SAFE_DELETE(m_pButtonUpdate);
-    SAFE_DELETE(m_pAdvancedMiscLabel);
-    SAFE_DELETE(m_pAdvancedUpdaterLabel);
-    SAFE_DELETE(m_pCachePathLabel);
-    SAFE_DELETE(m_pCachePathValue);
-    SAFE_DELETE(m_pCachePathShowButton);
-
-    SAFE_DELETE(m_pLabelMasterVolume);
-    SAFE_DELETE(m_pLabelRadioVolume);
-    SAFE_DELETE(m_pLabelSFXVolume);
-    SAFE_DELETE(m_pLabelMTAVolume);
-    SAFE_DELETE(m_pLabelVoiceVolume);
-    SAFE_DELETE(m_pLabelMasterVolumeValue);
-    SAFE_DELETE(m_pLabelRadioVolumeValue);
-    SAFE_DELETE(m_pLabelSFXVolumeValue);
-    SAFE_DELETE(m_pLabelMTAVolumeValue);
-    SAFE_DELETE(m_pLabelVoiceVolumeValue);
-    SAFE_DELETE(m_pAudioMasterVolume);
-    SAFE_DELETE(m_pAudioRadioVolume);
-    SAFE_DELETE(m_pAudioSFXVolume);
-    SAFE_DELETE(m_pAudioMTAVolume);
-    SAFE_DELETE(m_pAudioVoiceVolume);
-    SAFE_DELETE(m_pAudioRadioLabel);
-    SAFE_DELETE(m_pCheckBoxAudioEqualizer);
-    SAFE_DELETE(m_pCheckBoxAudioAutotune);
-    SAFE_DELETE(m_pAudioMuteLabel);
-    SAFE_DELETE(m_pCheckBoxMuteMaster);
-    SAFE_DELETE(m_pCheckBoxMuteSFX);
-    SAFE_DELETE(m_pCheckBoxMuteRadio);
-    SAFE_DELETE(m_pCheckBoxMuteMTA);
-    SAFE_DELETE(m_pCheckBoxMuteVoice);
-    SAFE_DELETE(m_pAudioUsertrackLabel);
-    SAFE_DELETE(m_pCheckBoxUserAutoscan);
-    SAFE_DELETE(m_pLabelUserTrackMode);
-    SAFE_DELETE(m_pComboUsertrackMode);
-    SAFE_DELETE(m_pAudioDefButton);
-
-    SAFE_DELETE(m_pBindsList);
-    SAFE_DELETE(m_pBindsDefButton);
-
-    for (CGUILabel* pLabel : m_pJoypadLabels)
-        SAFE_DELETE(pLabel);
-    m_pJoypadLabels.clear();
-    for (CGUIButton* pButton : m_pJoypadButtons)
-        SAFE_DELETE(pButton);
-    m_pJoypadButtons.clear();
-
-    SAFE_DELETE(m_pJoypadName);
-    SAFE_DELETE(m_pJoypadUnderline);
-    SAFE_DELETE(m_pEditDeadzone);
-    SAFE_DELETE(m_pEditSaturation);
-
-    SAFE_DELETE(m_pControlsMouseLabel);
-    SAFE_DELETE(m_pInvertMouse);
-    SAFE_DELETE(m_pSteerWithMouse);
-    SAFE_DELETE(m_pFlyWithMouse);
-    SAFE_DELETE(m_pLabelMouseSensitivity);
-    SAFE_DELETE(m_pMouseSensitivity);
-    SAFE_DELETE(m_pLabelMouseSensitivityValue);
-    SAFE_DELETE(m_pLabelVerticalAimSensitivity);
-    SAFE_DELETE(m_pVerticalAimSensitivity);
-    SAFE_DELETE(m_pLabelVerticalAimSensitivityValue);
-
-    SAFE_DELETE(m_pControlsJoypadLabel);
-    SAFE_DELETE(m_pControlsInputTypePane);
-    SAFE_DELETE(m_pStandardControls);
-    SAFE_DELETE(m_pClassicControls);
-
-    SAFE_DELETE(m_pInterfaceLanguageSelector);
-    SAFE_DELETE(m_pInterfaceSkinSelector);
-    SAFE_DELETE(m_pInterfaceLoadSkin);
-
-    SAFE_DELETE(m_pChatPresets);
-    SAFE_DELETE(m_pChatLoadPreset);
-
-    for (int i = 0; i < Chat::ColorType::MAX; ++i)
+    CEGUI::Window* pRootWindow = nullptr;
+    if (CGUIElement_Impl* pWindowImpl = dynamic_cast<CGUIElement_Impl*>(m_pWindow))
+        pRootWindow = pWindowImpl->GetWindow();
+    if (pRootWindow)
     {
-        SAFE_DELETE(m_pChatRed[i]);
-        SAFE_DELETE(m_pChatGreen[i]);
-        SAFE_DELETE(m_pChatBlue[i]);
-        SAFE_DELETE(m_pChatAlpha[i]);
-        SAFE_DELETE(m_pChatRedValue[i]);
-        SAFE_DELETE(m_pChatGreenValue[i]);
-        SAFE_DELETE(m_pChatBlueValue[i]);
-        SAFE_DELETE(m_pChatAlphaValue[i]);
-        SAFE_DELETE(m_pChatColorPreview[i]);
+        // Bottom-up pass that mirrors the CEGUI tree ownership.
+    DestroyGuiWindowRecursive(pRootWindow);
     }
-
-    SAFE_DELETE(m_pPaneChatFont);
-    for (int i = 0; i < Chat::Font::MAX; ++i)
-        SAFE_DELETE(m_pRadioChatFont[i]);
-
-    SAFE_DELETE(m_pChatHorizontalCombo);
-    SAFE_DELETE(m_pChatVerticalCombo);
-    SAFE_DELETE(m_pChatTextAlignCombo);
-    SAFE_DELETE(m_pChatOffsetX);
-    SAFE_DELETE(m_pChatOffsetY);
-    SAFE_DELETE(m_pChatLines);
-    SAFE_DELETE(m_pChatScaleX);
-    SAFE_DELETE(m_pChatScaleY);
-    SAFE_DELETE(m_pChatWidth);
-    SAFE_DELETE(m_pChatCssBackground);
-    SAFE_DELETE(m_pChatNickCompletion);
-    SAFE_DELETE(m_pChatCssText);
-    SAFE_DELETE(m_pChatTextBlackOutline);
-    SAFE_DELETE(m_pChatLineLife);
-    SAFE_DELETE(m_pChatLineFadeout);
-    SAFE_DELETE(m_pFlashWindow);
-    SAFE_DELETE(m_pTrayBalloon);
-
-    SAFE_DELETE(m_pLabelBrowserGeneral);
-    SAFE_DELETE(m_pCheckBoxRemoteBrowser);
-    SAFE_DELETE(m_pCheckBoxRemoteJavascript);
-    SAFE_DELETE(m_pLabelBrowserCustomBlacklist);
-    SAFE_DELETE(m_pEditBrowserBlacklistAdd);
-    SAFE_DELETE(m_pLabelBrowserBlacklistAdd);
-    SAFE_DELETE(m_pButtonBrowserBlacklistAdd);
-    SAFE_DELETE(m_pGridBrowserBlacklist);
-    SAFE_DELETE(m_pButtonBrowserBlacklistRemove);
-    SAFE_DELETE(m_pLabelBrowserCustomWhitelist);
-    SAFE_DELETE(m_pEditBrowserWhitelistAdd);
-    SAFE_DELETE(m_pLabelBrowserWhitelistAdd);
-    SAFE_DELETE(m_pButtonBrowserWhitelistAdd);
-    SAFE_DELETE(m_pGridBrowserWhitelist);
-    SAFE_DELETE(m_pButtonBrowserWhitelistRemove);
-    SAFE_DELETE(m_pCheckBoxBrowserGPUEnabled);
-
-    SAFE_DELETE(m_pTabs);
+    else
+    {
+        SAFE_DELETE(m_pWindow);
+    }
 
     RemoveAllKeyBindSections();
     m_bBrowserListsChanged = false;
     m_bBrowserListsLoadEnabled = false;
-
-    SAFE_DELETE(m_pWindow);
-    m_pWindow = NULL;
+    m_pSelectedBind = NULL;
 
     ResetGuiPointers();
 }
