@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-01 11:12+0000\n"
+"POT-Creation-Date: 2025-10-01 20:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -251,7 +251,7 @@ msgstr ""
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
 #: Client/core/CSettings.cpp:3052 Client/core/CSettings.cpp:4360
 #: Client/core/CSettings.cpp:4388 Client/core/CSettings.cpp:5008
-#: Client/core/CCore.cpp:1272 Client/core/CGUI.cpp:93
+#: Client/core/CCore.cpp:1310 Client/core/CGUI.cpp:93
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1263
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1285
@@ -491,7 +491,7 @@ msgstr ""
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1068 Client/core/CCore.cpp:811
+#: Client/loader/CInstallManager.cpp:1068 Client/core/CCore.cpp:835
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr ""
@@ -1866,13 +1866,13 @@ msgstr ""
 msgid "Your nickname contains invalid characters!"
 msgstr ""
 
-#: Client/core/CSettings.cpp:3628 Client/core/CCore.cpp:674
+#: Client/core/CSettings.cpp:3628 Client/core/CCore.cpp:698
 #: Client/core/CMainMenu.cpp:303
 #: Client/mods/deathmatch/logic/CClientGame.cpp:548
 msgid "Main menu"
 msgstr ""
 
-#: Client/core/CSettings.cpp:3632 Client/core/CCore.cpp:674
+#: Client/core/CSettings.cpp:3632 Client/core/CCore.cpp:698
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1098
 #: Client/mods/deathmatch/logic/CResource.cpp:368
 msgid "In-game"
@@ -2065,110 +2065,110 @@ msgstr ""
 msgid "Only change if you're having stability issues."
 msgstr ""
 
-#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:129
+#: Client/core/CCore.cpp:837 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
 msgstr ""
 
-#: Client/core/CCore.cpp:934
+#: Client/core/CCore.cpp:958
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr ""
 
-#: Client/core/CCore.cpp:966
+#: Client/core/CCore.cpp:990
 #, c-format
 msgid "%s module is incorrect!"
 msgstr ""
 
-#: Client/core/CCore.cpp:1272
+#: Client/core/CCore.cpp:1310
 msgid "Error executing URL"
 msgstr ""
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1367
+#: Client/core/CCore.cpp:1405
 msgid "this help screen"
 msgstr ""
 
-#: Client/core/CCore.cpp:1368 Client/core/CCore.cpp:1369
+#: Client/core/CCore.cpp:1406 Client/core/CCore.cpp:1407
 msgid "exits the application"
 msgstr ""
 
-#: Client/core/CCore.cpp:1370
+#: Client/core/CCore.cpp:1408
 msgid "shows the version"
 msgstr ""
 
-#: Client/core/CCore.cpp:1371
+#: Client/core/CCore.cpp:1409
 msgid "shows the time"
 msgstr ""
 
-#: Client/core/CCore.cpp:1372
+#: Client/core/CCore.cpp:1410
 msgid "shows the hud"
 msgstr ""
 
-#: Client/core/CCore.cpp:1373
+#: Client/core/CCore.cpp:1411
 msgid "shows all the binds"
 msgstr ""
 
-#: Client/core/CCore.cpp:1374
+#: Client/core/CCore.cpp:1412
 msgid "shows your serial"
 msgstr ""
 
-#: Client/core/CCore.cpp:1383
+#: Client/core/CCore.cpp:1421
 msgid "connects to a server (host port nick pass)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1384
+#: Client/core/CCore.cpp:1422
 msgid "connects to a previous server"
 msgstr ""
 
-#: Client/core/CCore.cpp:1385
+#: Client/core/CCore.cpp:1423
 msgid "binds a key (key control)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1386
+#: Client/core/CCore.cpp:1424
 msgid "unbinds a key (key)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1387
+#: Client/core/CCore.cpp:1425
 msgid "copies the default gta controls"
 msgstr ""
 
-#: Client/core/CCore.cpp:1388
+#: Client/core/CCore.cpp:1426
 msgid "outputs a screenshot"
 msgstr ""
 
-#: Client/core/CCore.cpp:1389
+#: Client/core/CCore.cpp:1427
 msgid "immediately saves the config"
 msgstr ""
 
-#: Client/core/CCore.cpp:1391
+#: Client/core/CCore.cpp:1429
 msgid "clears the debug view"
 msgstr ""
 
-#: Client/core/CCore.cpp:1392
+#: Client/core/CCore.cpp:1430
 msgid "scrolls the chatbox upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1393
+#: Client/core/CCore.cpp:1431
 msgid "scrolls the chatbox downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1394
+#: Client/core/CCore.cpp:1432
 msgid "scrolls the debug view upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1395
+#: Client/core/CCore.cpp:1433
 msgid "scrolls the debug view downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1398
+#: Client/core/CCore.cpp:1436
 msgid "shows the memory statistics"
 msgstr ""
 
-#: Client/core/CCore.cpp:1399
+#: Client/core/CCore.cpp:1437
 msgid "shows the frame timing graph"
 msgstr ""
 
-#: Client/core/CCore.cpp:1403
+#: Client/core/CCore.cpp:1441
 msgid "for developers: reload news"
 msgstr ""
 
