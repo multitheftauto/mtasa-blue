@@ -548,14 +548,28 @@ void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3
         bBorderless = (presentationParameters.Windowed != 0);
     }
 
-    if (!bBorderless)
+    float gammaPower = 1.0f;
+    float brightnessScale = 1.0f;
+    float contrastScale = 1.0f;
+    float saturationScale = 1.0f;
+    bool  applyWindowed = true;
+    bool  applyFullscreen = false;
+    BorderlessGamma::FetchSettings(gammaPower, brightnessScale, contrastScale, saturationScale, applyWindowed, applyFullscreen);
+
+    const bool adjustmentsEnabled = bBorderless ? applyWindowed : applyFullscreen;
+    const bool hasAdjustments = adjustmentsEnabled && BorderlessGamma::ShouldApplyAdjustments(gammaPower, brightnessScale, contrastScale, saturationScale);
+
+    if (!hasAdjustments)
     {
         proxyDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
         for (DWORD sampler = 0; sampler < 8; ++sampler)
         {
             proxyDevice->SetSamplerState(sampler, D3DSAMP_SRGBTEXTURE, FALSE);
         }
-        WriteDebugEvent("Cleared sRGB color correction for non-borderless mode");
+        if (bBorderless)
+            WriteDebugEvent("Cleared sRGB color correction for windowed/borderless mode");
+        else
+            WriteDebugEvent("Cleared sRGB color correction for fullscreen mode");
         return;
     }
 
@@ -564,8 +578,6 @@ void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3
     {
         proxyDevice->SetSamplerState(sampler, D3DSAMP_SRGBTEXTURE, TRUE);
     }
-
-    WriteDebugEvent("Applied sRGB color correction for borderless mode");
 }
 
 ////////////////////////////////////////////////
