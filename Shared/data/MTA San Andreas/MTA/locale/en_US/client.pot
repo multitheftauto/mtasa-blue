@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-02 20:31+0000\n"
+"POT-Creation-Date: 2025-10-02 20:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -524,7 +524,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:1902 Client/core/CSettings.cpp:5351
 #: Client/core/CSettings.cpp:5425 Client/core/CSettings.cpp:5455
 #: Client/core/CSettings.cpp:5504 Client/core/CSettings.cpp:5566
-#: Client/core/CMainMenu.cpp:1206 Client/core/CQuestionBox.cpp:195
+#: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:195
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
@@ -536,7 +536,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:1901 Client/core/CSettings.cpp:5350
 #: Client/core/CSettings.cpp:5424 Client/core/CSettings.cpp:5454
 #: Client/core/CSettings.cpp:5503 Client/core/CSettings.cpp:5565
-#: Client/core/CMainMenu.cpp:1205 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1236 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
 msgid "No"
 msgstr ""
@@ -549,7 +549,7 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
 #: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
 #: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:439
-#: Client/core/CSettings.cpp:5697 Client/core/CMainMenu.cpp:1226
+#: Client/core/CSettings.cpp:5697 Client/core/CMainMenu.cpp:1257
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
 msgstr ""
@@ -2210,18 +2210,18 @@ msgid ""
 "Upgrade Windows to play on the latest servers."
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1199
+#: Client/core/CMainMenu.cpp:1230
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
 "Are you sure you want to disconnect?"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1203
+#: Client/core/CMainMenu.cpp:1234
 msgid "DISCONNECT WARNING"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1224
+#: Client/core/CMainMenu.cpp:1255
 msgid "INFORMATION"
 msgstr ""
 
