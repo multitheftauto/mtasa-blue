@@ -402,6 +402,12 @@ CMainMenu::~CMainMenu()
         m_pDisconnect = nullptr;
     }
 
+    delete m_pLanguageSelector;
+    m_pLanguageSelector = nullptr;
+
+    delete m_pNewsBrowser;
+    m_pNewsBrowser = nullptr;
+
     destroyElement(m_pMenuArea);
     destroyElement(m_pLogo);
     destroyElement(m_pLatestNews);
@@ -411,11 +417,6 @@ CMainMenu::~CMainMenu()
     destroyElement(m_pBackground);
     destroyElement(m_pFiller);
     destroyElement(m_pFiller2);
-
-    delete m_pLanguageSelector;
-    m_pLanguageSelector = nullptr;
-    delete m_pNewsBrowser;
-    m_pNewsBrowser = nullptr;
 }
 
 void CMainMenu::SetMenuVerticalPosition(int iPosY)
@@ -729,6 +730,16 @@ void CMainMenu::Update()
     m_ServerBrowser.Update();
     m_ServerInfo.DoPulse();
     m_pLanguageSelector->DoPulse();
+
+    if (m_pLanguageSelector)
+    {
+        SString strPendingLocale;
+        if (m_pLanguageSelector->ConsumePendingLocale(strPendingLocale))
+        {
+            CVARS_SET("locale", strPendingLocale);
+            SetApplicationSetting("locale", strPendingLocale);
+        }
+    }
 }
 
 void CMainMenu::Show(bool bOverlay)

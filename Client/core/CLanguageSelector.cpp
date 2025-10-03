@@ -55,17 +55,22 @@ CLanguageSelector::CLanguageSelector(CGUIElement* pMainMenuCanvas)
 ///////////////////////////////////////////////////////////////
 CLanguageSelector::~CLanguageSelector()
 {
-    SAFE_DELETE(m_pButtonWindow);
-    SAFE_DELETE(m_pListWindow);
-    SAFE_DELETE(m_ButtonItem.pContainerPane);
-    SAFE_DELETE(m_ButtonItem.pIcon);
-    SAFE_DELETE(m_ButtonItem.pLabel);
-    for (CLangListItem& item : m_ListItems)
-    {
-        SAFE_DELETE(item.pContainerPane);
-        SAFE_DELETE(item.pIcon);
-        SAFE_DELETE(item.pLabel);
-    }
+    CGUI* pGUI = g_pCore ? g_pCore->GetGUI() : nullptr;
+
+    auto destroyElement = [pGUI](auto*& element) {
+        if (!element)
+            return;
+
+        if (pGUI)
+            pGUI->DestroyElementRecursive(element);
+        element = nullptr;
+    };
+
+    destroyElement(m_pListWindow);
+    destroyElement(m_pButtonWindow);
+
+    m_ButtonItem = CLangListItem();
+    m_ListItems.clear();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -118,18 +123,17 @@ void CLanguageSelector::CreateGUI(CGUIElement* pMainMenuCanvas)
         pLabel->SetZOrderingEnabled(false);
         pLabel->SetText(g_pLocalization->GetLanguageNativeName());
 
-        CLangListItem m_ButtonItem;
-        m_ButtonItem.strLocale = "";
-        m_ButtonItem.pContainerPane = pContainerPane;
-        m_ButtonItem.pIcon = pIcon;
-        m_ButtonItem.vecIconInitialPos = pIcon->GetPosition();
-        m_ButtonItem.vecIconInitialSize = pIcon->GetSize();
-        m_ButtonItem.pLabel = pLabel;
-        m_ButtonItem.vecLabelInitialPos = pLabel->GetPosition();
-        m_ButtonItem.vecLabelInitialSize = pLabel->GetSize();
-        m_ButtonItem.pContainerPane->SetMouseButtonDownHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonClick, this));
-        m_ButtonItem.pContainerPane->SetMouseEnterHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonEnter, this));
-        m_ButtonItem.pContainerPane->SetMouseLeaveHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonLeave, this));
+    m_ButtonItem.strLocale = "";
+    m_ButtonItem.pContainerPane = pContainerPane;
+    m_ButtonItem.pIcon = pIcon;
+    m_ButtonItem.vecIconInitialPos = pIcon->GetPosition();
+    m_ButtonItem.vecIconInitialSize = pIcon->GetSize();
+    m_ButtonItem.pLabel = pLabel;
+    m_ButtonItem.vecLabelInitialPos = pLabel->GetPosition();
+    m_ButtonItem.vecLabelInitialSize = pLabel->GetSize();
+    m_ButtonItem.pContainerPane->SetMouseButtonDownHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonClick, this));
+    m_ButtonItem.pContainerPane->SetMouseEnterHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonEnter, this));
+    m_ButtonItem.pContainerPane->SetMouseLeaveHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonLeave, this));
     }
 
     //
@@ -263,6 +267,16 @@ void CLanguageSelector::DoPulse()
     }
 }
 
+bool CLanguageSelector::ConsumePendingLocale(SString& outLocale)
+{
+    if (m_strPendingLocale.empty())
+        return false;
+
+    outLocale = m_strPendingLocale;
+    m_strPendingLocale.clear();
+    return true;
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CLanguageSelector::SetLanguageListVisible
@@ -383,9 +397,13 @@ bool CLanguageSelector::OnListItemClick(CGUIElement* pElement)
         SString strNewLocale = pItem->strLocale;
         if (strNewLocale != strPrevLocale)
         {
-            // Locale change
-            CVARS_SET("locale", strNewLocale);
-            SetApplicationSetting("locale", strNewLocale);
+            // Defer locale change to avoid destroying GUI during callback stack
+            m_strPendingLocale = strNewLocale;
+
+            // Update button label immediately so user sees their selection
+            m_ButtonItem.strLocale = strNewLocale;
+            if (m_ButtonItem.pLabel)
+                m_ButtonItem.pLabel->SetText(g_pLocalization->GetLanguageNativeName(strNewLocale));
         }
     }
     return true;
