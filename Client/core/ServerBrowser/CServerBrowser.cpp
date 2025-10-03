@@ -274,7 +274,8 @@ CServerBrowser::~CServerBrowser()
 {
     // Save options now and disable selection handler
     SaveOptions();
-    m_pPanel->SetSelectionHandler(nullptr);
+    if (m_pPanel)
+        m_pPanel->SetSelectionHandler(GUI_CALLBACK());
 
     // Delete the Tabs
     DeleteTab(ServerBrowserTypes::INTERNET);
@@ -282,13 +283,35 @@ CServerBrowser::~CServerBrowser()
     DeleteTab(ServerBrowserTypes::FAVOURITES);
     DeleteTab(ServerBrowserTypes::RECENTLY_PLAYED);
 
-    // Unload the icon
-    m_pLockedIcon->Clear();
-    for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
-        m_pSearchIcons[i]->Clear();
+    if (m_pGeneralHelpWindow)
+    {
+    m_pGeneralHelpWindow->SetVisible(false);
+    m_pGeneralHelpWindow->SetDeactivateHandler(GUI_CALLBACK());  // Avoid callbacks during destruction
+    }
 
-    // Delete the GUI items
-    delete m_pTopWindow;
+    if (m_pLockedIcon)
+    {
+        m_pLockedIcon->Clear();
+        SAFE_DELETE(m_pLockedIcon);
+    }
+
+    for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
+    {
+        if (m_pSearchIcons[i])
+        {
+            m_pSearchIcons[i]->Clear();
+            SAFE_DELETE(m_pSearchIcons[i]);
+        }
+    }
+
+    SAFE_DELETE(m_pQuickConnectHelpWindow);
+    SAFE_DELETE(m_pGeneralHelpWindow);
+
+    CGUIElement* pTopWindow = m_pTopWindow;
+    m_pTopWindow = nullptr;
+    m_pPanel = nullptr;
+    m_pFrame = nullptr;
+    SAFE_DELETE(pTopWindow);
 }
 
 void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
@@ -591,43 +614,204 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
 
 void CServerBrowser::DeleteTab(ServerBrowserType type)
 {
-    delete m_pButtonConnect[type];
-    delete m_pButtonRefresh[type];
+    if (m_pButtonConnect[type])
+    {
+        m_pButtonConnect[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonConnect[type];
+        m_pButtonConnect[type] = nullptr;
+    }
 
-    delete m_pEditAddress[type];
-    delete m_pComboSearchType[type];
+    if (m_pButtonRefresh[type])
+    {
+        m_pButtonRefresh[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonRefresh[type];
+        m_pButtonRefresh[type] = nullptr;
+    }
+
+    if (m_pEditAddress[type])
+    {
+        m_pEditAddress[type]->SetTextAcceptedHandler(GUI_CALLBACK());
+        m_pEditAddress[type]->SetTextChangedHandler(GUI_CALLBACK());
+        m_pEditAddress[type]->SetActivateHandler(GUI_CALLBACK());
+        m_pEditAddress[type]->SetDeactivateHandler(GUI_CALLBACK());
+        delete m_pEditAddress[type];
+        m_pEditAddress[type] = nullptr;
+    }
+
+    if (m_pComboSearchType[type])
+    {
+        m_pComboSearchType[type]->SetSelectionHandler(GUI_CALLBACK());
+        delete m_pComboSearchType[type];
+        m_pComboSearchType[type] = nullptr;
+    }
+
     delete m_pSearchTypeIcon[type];
+    m_pSearchTypeIcon[type] = nullptr;
+
     delete m_pServerSearchIcon[type];
+    m_pServerSearchIcon[type] = nullptr;
+
     delete m_pButtonInfoIcon[type];
+    m_pButtonInfoIcon[type] = nullptr;
+
     delete m_pButtonConnectIcon[type];
+    m_pButtonConnectIcon[type] = nullptr;
 
-    // Remove handler to prevent unwanted events during delete
-    m_pComboAddressHistory[type]->SetDropListRemoveHandler(NULL);
-    delete m_pComboAddressHistory[type];
+    if (m_pComboAddressHistory[type])
+    {
+        m_pComboAddressHistory[type]->SetSelectionHandler(GUI_CALLBACK());
+        m_pComboAddressHistory[type]->SetDropListRemoveHandler(GUI_CALLBACK());
+        delete m_pComboAddressHistory[type];
+        m_pComboAddressHistory[type] = nullptr;
+    }
 
-    delete m_pAddressFavoriteIcon[type];
+    if (m_pLabelAddressDescription[type])
+    {
+        delete m_pLabelAddressDescription[type];
+        m_pLabelAddressDescription[type] = nullptr;
+    }
+
+    if (m_pAddressFavoriteIcon[type])
+    {
+        m_pAddressFavoriteIcon[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pAddressFavoriteIcon[type];
+        m_pAddressFavoriteIcon[type] = nullptr;
+    }
+
     if (type == ServerBrowserTypes::RECENTLY_PLAYED)
-        delete m_pRemoveFromRecentIcon[type];
-    delete m_pEditSearch[type];
+    {
+        if (m_pRemoveFromRecentIcon[type])
+        {
+            m_pRemoveFromRecentIcon[type]->SetClickHandler(GUI_CALLBACK());
+            delete m_pRemoveFromRecentIcon[type];
+            m_pRemoveFromRecentIcon[type] = nullptr;
+        }
+    }
+
+    if (m_pEditSearch[type])
+    {
+        m_pEditSearch[type]->SetTextChangedHandler(GUI_CALLBACK());
+        m_pEditSearch[type]->SetActivateHandler(GUI_CALLBACK());
+        m_pEditSearch[type]->SetDeactivateHandler(GUI_CALLBACK());
+        delete m_pEditSearch[type];
+        m_pEditSearch[type] = nullptr;
+    }
+
+    if (m_pLabelSearchDescription[type])
+    {
+        delete m_pLabelSearchDescription[type];
+        m_pLabelSearchDescription[type] = nullptr;
+    }
+
     delete m_pButtonRefreshIcon[type];
+    m_pButtonRefreshIcon[type] = nullptr;
 
     delete m_pLabelInclude[type];
-    delete m_pIncludeEmpty[type];
-    delete m_pIncludeFull[type];
-    delete m_pIncludeLocked[type];
-    delete m_pIncludeOtherVersions[type];
+    m_pLabelInclude[type] = nullptr;
+
+    if (m_pIncludeEmpty[type])
+    {
+        m_pIncludeEmpty[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pIncludeEmpty[type];
+        m_pIncludeEmpty[type] = nullptr;
+    }
+
+    if (m_pIncludeFull[type])
+    {
+        m_pIncludeFull[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pIncludeFull[type];
+        m_pIncludeFull[type] = nullptr;
+    }
+
+    if (m_pIncludeLocked[type])
+    {
+        m_pIncludeLocked[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pIncludeLocked[type];
+        m_pIncludeLocked[type] = nullptr;
+    }
+
+    if (m_pIncludeOtherVersions[type])
+    {
+        m_pIncludeOtherVersions[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pIncludeOtherVersions[type];
+        m_pIncludeOtherVersions[type] = nullptr;
+    }
 
     if (m_pIncludeOffline[type])
     {
+        m_pIncludeOffline[type]->SetClickHandler(GUI_CALLBACK());
         delete m_pIncludeOffline[type];
+        m_pIncludeOffline[type] = nullptr;
+    }
+
+    if (m_pLabelPassword[type])
+    {
+        delete m_pLabelPassword[type];
+        m_pLabelPassword[type] = nullptr;
+    }
+
+    if (m_pEditPassword[type])
+    {
+        m_pEditPassword[type]->SetTextAcceptedHandler(GUI_CALLBACK());
+        m_pEditPassword[type]->SetTextChangedHandler(GUI_CALLBACK());
+        delete m_pEditPassword[type];
+        m_pEditPassword[type] = nullptr;
     }
 
     delete m_pServerPlayerList[type];
+    m_pServerPlayerList[type] = nullptr;
 
     delete m_pServerListStatus[type];
+    m_pServerListStatus[type] = nullptr;
 
-    delete m_pServerList[type];
-    delete m_pTab[type];
+    if (m_pServerPlayerListLabel[type])
+    {
+        delete m_pServerPlayerListLabel[type];
+        m_pServerPlayerListLabel[type] = nullptr;
+    }
+
+    if (m_pButtonInfo[type])
+    {
+        m_pButtonInfo[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonInfo[type];
+        m_pButtonInfo[type] = nullptr;
+    }
+
+    if (m_pButtonBack[type])
+    {
+        m_pButtonBack[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonBack[type];
+        m_pButtonBack[type] = nullptr;
+    }
+
+    if (m_pButtonFavourites[type])
+    {
+        m_pButtonFavourites[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonFavourites[type];
+        m_pButtonFavourites[type] = nullptr;
+    }
+
+    if (m_pButtonGeneralHelp[type])
+    {
+        m_pButtonGeneralHelp[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonGeneralHelp[type];
+        m_pButtonGeneralHelp[type] = nullptr;
+    }
+
+    if (m_pServerList[type])
+    {
+        m_pServerList[type]->SetEnterKeyHandler(GUI_CALLBACK());
+        m_pServerList[type]->SetDoubleClickHandler(GUI_CALLBACK());
+        m_pServerList[type]->SetKeyDownHandler(GUI_CALLBACK_KEY());
+        delete m_pServerList[type];
+        m_pServerList[type] = nullptr;
+    }
+
+    if (m_pTab[type])
+    {
+        delete m_pTab[type];
+        m_pTab[type] = nullptr;
+    }
 }
 
 ServerBrowserType CServerBrowser::GetCurrentServerBrowserTypeForSave()
