@@ -23,6 +23,7 @@
 #include "CWater.h"
 #include "CBuilding.h"
 #include "CPlayerCamera.h"
+#include <cmath>
 #include "CElementDeleter.h"
 #include "CMainConfig.h"
 #include "CRegistry.h"
@@ -52,6 +53,7 @@
 #include "CVehicleNames.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "Utils.h"
+#include "CameraScriptShared.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "packets/CLuaPacket.h"
 #include "packets/CElementRPCPacket.h"
@@ -4646,6 +4648,8 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CPlayer* pPlayer, CVector& vecP
     assert(pPlayer);
 
     CPlayerCamera* pCamera = pPlayer->GetCamera();
+    if (!pCamera)
+        return false;
     
     pCamera->GetPosition(vecPosition);
     pCamera->GetLookAt(vecLookAt);
@@ -4659,60 +4663,88 @@ CElement* CStaticFunctionDefinitions::GetCameraTarget(CPlayer* pPlayer)
 {
     assert(pPlayer);
     CPlayerCamera* pCamera = pPlayer->GetCamera();
+    if (!pCamera)
+        return nullptr;
 
     // Only allow this if we're targeting a player
     if (pCamera->GetMode() == CAMERAMODE_PLAYER)
     {
         return pCamera->GetTarget();
     }
-    return NULL;
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::GetCameraInterior(CPlayer* pPlayer, unsigned char& ucInterior)
 {
     assert(pPlayer);
-    ucInterior = pPlayer->GetCamera()->GetInterior();
+    CPlayerCamera* pCamera = pPlayer->GetCamera();
+    if (!pCamera)
+        return false;
+
+    ucInterior = pCamera->GetInterior();
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetCameraMatrix(CElement* pElement, const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV)
 {
     assert(pElement);
-    RUN_CHILDREN(SetCameraMatrix(*iter, vecPosition, pvecLookAt, fRoll, fFOV))
+    CVector sanitizedPosition = vecPosition;
+    if (!CameraScriptShared::IsFiniteVector(sanitizedPosition))
+        return false;
+
+    CVector sanitizedLookAt;
+    CVector* pSanitizedLookAt = nullptr;
+    if (pvecLookAt)
+    {
+        sanitizedLookAt = *pvecLookAt;
+        if (!CameraScriptShared::IsFiniteVector(sanitizedLookAt))
+            return false;
+        pSanitizedLookAt = &sanitizedLookAt;
+    }
+
+    const float sanitizedFOV = CameraScriptShared::SanitizeFOV(fFOV);
+    const float sanitizedRoll = CameraScriptShared::NormalizeRoll(fRoll);
+
+    RUN_CHILDREN(SetCameraMatrix(*iter, sanitizedPosition, pSanitizedLookAt, sanitizedRoll, sanitizedFOV))
 
     if (IS_PLAYER(pElement))
     {
         CPlayer*       pPlayer = static_cast<CPlayer*>(pElement);
         CPlayerCamera* pCamera = pPlayer->GetCamera();
+        if (!pCamera)
+            return false;
 
         pCamera->SetMode(CAMERAMODE_FIXED);
-        if (pvecLookAt)
-            pCamera->SetMatrix(vecPosition, *pvecLookAt);
+        if (pSanitizedLookAt)
+            pCamera->SetMatrix(sanitizedPosition, *pSanitizedLookAt);
         else
-            pCamera->SetPosition(vecPosition);
+            pCamera->SetPosition(sanitizedPosition);
 
         CVector vecLookAt;
-        if (pvecLookAt)
-            vecLookAt = *pvecLookAt;
+        if (pSanitizedLookAt)
+            vecLookAt = *pSanitizedLookAt;
         else
             pCamera->GetLookAt(vecLookAt);
 
-        pCamera->SetRoll(fRoll);
-        pCamera->SetFOV(fFOV);
+        if (!CameraScriptShared::IsFiniteVector(vecLookAt))
+            vecLookAt = sanitizedPosition + CVector(0.0f, 1.0f, 0.0f);
+
+        pCamera->SetRoll(sanitizedRoll);
+        pCamera->SetFOV(sanitizedFOV);
 
         // Tell the player
         CBitStream BitStream;
         BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
-        BitStream.pBitStream->Write(vecPosition.fX);
-        BitStream.pBitStream->Write(vecPosition.fY);
-        BitStream.pBitStream->Write(vecPosition.fZ);
+        BitStream.pBitStream->Write(sanitizedPosition.fX);
+        BitStream.pBitStream->Write(sanitizedPosition.fY);
+        BitStream.pBitStream->Write(sanitizedPosition.fZ);
         BitStream.pBitStream->Write(vecLookAt.fX);
         BitStream.pBitStream->Write(vecLookAt.fY);
         BitStream.pBitStream->Write(vecLookAt.fZ);
-        if (fRoll != 0.0f || fFOV != 70.0f)
+        if (sanitizedRoll != 0.0f || sanitizedFOV != CameraScriptShared::kDefaultFOV)
         {
-            BitStream.pBitStream->Write(fRoll);
-            BitStream.pBitStream->Write(fFOV);
+            BitStream.pBitStream->Write(sanitizedRoll);
+            BitStream.pBitStream->Write(sanitizedFOV);
         }
         pPlayer->Send(CLuaPacket(SET_CAMERA_MATRIX, *BitStream.pBitStream));
 
@@ -4731,6 +4763,8 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
     {
         CPlayer*       pPlayer = static_cast<CPlayer*>(pElement);
         CPlayerCamera* pCamera = pPlayer->GetCamera();
+        if (!pCamera)
+            return false;
 
         // If we don't have a target, change it to the player
         if (!pTarget)
@@ -4771,6 +4805,8 @@ bool CStaticFunctionDefinitions::SetCameraInterior(CElement* pElement, unsigned 
     {
         CPlayer*       pPlayer = static_cast<CPlayer*>(pElement);
         CPlayerCamera* pCamera = pPlayer->GetCamera();
+        if (!pCamera)
+            return false;
 
         if (pCamera->GetInterior() != ucInterior)
         {
