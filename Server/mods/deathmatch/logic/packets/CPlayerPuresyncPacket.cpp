@@ -36,8 +36,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
 
         // Only read this packet if it matches the current time context that
-        // player is in.
-        if (!pSourcePlayer->CanUpdateSync(ucTimeContext))
+        // player is in. Allow position updates for dead players
+        if (!pSourcePlayer->CanUpdateSync(ucTimeContext) && !pSourcePlayer->IsDead())
         {
             return false;
         }
