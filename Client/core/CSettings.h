@@ -103,6 +103,7 @@ public:
     void UpdateAudioTab();
 
     void UpdateVideoTab();
+    void UpdatePostFxTab();
     void PopulateResolutionComboBox();
     void UpdateFullScreenComboBoxEnabled();
 
@@ -127,8 +128,15 @@ protected:
     // Keep these protected so we can access them in the event handlers of CClientGame
     CGUIElement*  m_pWindow;
     CGUITabPanel* m_pTabs;
+    CGUITab*      m_pTabMultiplayer;
+    CGUITab*      m_pTabVideo;
     CGUITab*      m_pTabInterface;
     CGUITab*      m_pTabBrowser;
+    CGUITab*      m_pTabPostFX;
+    CGUITab*      m_pTabAudio;
+    CGUITab*      m_pTabBinds;
+    CGUITab*      m_pTabControls;
+    CGUITab*      m_pTabAdvanced;
     CGUIButton*   m_pButtonOK;
     CGUIButton*   m_pButtonCancel;
     CGUILabel*    m_pLabelNick;
@@ -177,6 +185,24 @@ protected:
     CGUILabel*     m_pBrightnessLabel;
     CGUIScrollBar* m_pBrightness;
     CGUILabel*     m_pBrightnessValueLabel;
+    CGUICheckBox*  m_pBorderlessGammaToggle;
+    CGUILabel*     m_pBorderlessGammaLabel;
+    CGUIScrollBar* m_pBorderlessGamma;
+    CGUILabel*     m_pBorderlessGammaValueLabel;
+    CGUICheckBox*  m_pBorderlessBrightnessToggle;
+    CGUILabel*     m_pBorderlessBrightnessLabel;
+    CGUIScrollBar* m_pBorderlessBrightness;
+    CGUILabel*     m_pBorderlessBrightnessValueLabel;
+    CGUICheckBox*  m_pBorderlessContrastToggle;
+    CGUILabel*     m_pBorderlessContrastLabel;
+    CGUIScrollBar* m_pBorderlessContrast;
+    CGUILabel*     m_pBorderlessContrastValueLabel;
+    CGUICheckBox*  m_pBorderlessSaturationToggle;
+    CGUILabel*     m_pBorderlessSaturationLabel;
+    CGUIScrollBar* m_pBorderlessSaturation;
+    CGUILabel*     m_pBorderlessSaturationValueLabel;
+    CGUICheckBox*  m_pCheckBoxApplyBorderless;
+    CGUICheckBox*  m_pCheckBoxApplyFullscreen;
     CGUILabel*     m_pAnisotropicLabel;
     CGUIScrollBar* m_pAnisotropic;
     CGUILabel*     m_pAnisotropicValueLabel;
@@ -364,6 +390,16 @@ protected:
     bool OnFieldOfViewChanged(CGUIElement* pElement);
     bool OnDrawDistanceChanged(CGUIElement* pElement);
     bool OnBrightnessChanged(CGUIElement* pElement);
+    bool OnBorderlessGammaChanged(CGUIElement* pElement);
+    bool OnBorderlessBrightnessChanged(CGUIElement* pElement);
+    bool OnBorderlessContrastChanged(CGUIElement* pElement);
+    bool OnBorderlessSaturationChanged(CGUIElement* pElement);
+    bool OnBorderlessGammaToggleClicked(CGUIElement* pElement);
+    bool OnBorderlessBrightnessToggleClicked(CGUIElement* pElement);
+    bool OnBorderlessContrastToggleClicked(CGUIElement* pElement);
+    bool OnBorderlessSaturationToggleClicked(CGUIElement* pElement);
+    bool OnBorderlessApplyBorderlessClicked(CGUIElement* pElement);
+    bool OnBorderlessApplyFullscreenClicked(CGUIElement* pElement);
     bool OnAnisotropicChanged(CGUIElement* pElement);
     bool OnMapAlphaChanged(CGUIElement* pElement);
     bool OnMasterVolumeChanged(CGUIElement* pElement);
@@ -442,6 +478,9 @@ private:
     void ResetGTAVolume();
     void SetRadioVolume(float fVolume);
     void SetSFXVolume(float fVolume);
+    void RefreshBorderlessDisplayCalibration();
+    void UpdateBorderlessAdjustmentControls();
+    void ResetGuiPointers();
 
     unsigned int m_uiCaptureKey;
     bool         m_bCaptureKey;

@@ -326,11 +326,6 @@ CGUIElement* CGUIElement_Impl::GetParent()
     return m_pParent;
 }
 
-CEGUI::Window* CGUIElement_Impl::GetWindow()
-{
-    return m_pWindow;
-}
-
 void CGUIElement_Impl::CorrectEdges()
 {
     CEGUI::Point currentPoint = m_pWindow->getPosition(CEGUI::Absolute);

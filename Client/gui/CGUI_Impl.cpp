@@ -10,9 +10,24 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "GuiCleanup.h"
 #include "CEGUIExceptions.h"
 
 using std::list;
+
+void CGUI_Impl::DestroyElementRecursive(CGUIElement* pElement)
+{
+    if (!pElement)
+        return;
+
+    if (auto* pImpl = dynamic_cast<CGUIElement_Impl*>(pElement))
+    {
+        DestroyGuiWindowRecursive(pImpl->GetWindow());
+        return;
+    }
+
+    delete pElement;
+}
 
 #define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>
 #define CGUI_MTA_DEFAULT_FONT_BOLD  "tahomabd.ttf"      // %WINDIR%/font/<...>
