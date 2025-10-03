@@ -49,7 +49,7 @@ void CLuaGUIDefs::LoadFunctions()
         {"isMainMenuActive", GUIIsMainMenuActive},
         {"isMTAWindowActive", GUIIsMTAWindowActive},
         {"isTransferBoxActive", GUIIsTransferBoxActive},
-        {"isLoadingCircleActive", ArgumentParser<GUIIsCircleBoxActive>},
+        {"isLoadingCircleActive", ArgumentParser<GUIIsLoadingCircleActive>},
 
         {"setChatboxCharacterLimit", ArgumentParser<GUISetChatboxCharacterLimit>},
         {"getChatboxCharacterLimit", ArgumentParser<GUIGetChatboxCharacterLimit>},
@@ -241,6 +241,7 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isMainMenuActive", "isMainMenuActive");
     lua_classfunction(luaVM, "isMTAWindowActive", "isMTAWindowActive");
     lua_classfunction(luaVM, "isTransferBoxActive", "isTransferBoxActive");
+    lua_classfunction(luaVM, "isLoadingCircleActive", "isLoadingCircleActive");
     lua_classfunction(luaVM, "isInputEnabled", "guiGetInputEnabled");
     lua_classfunction(luaVM, "getInputMode", "guiGetInputMode");
     lua_classfunction(luaVM, "getCursorType", "guiGetCursorType");
@@ -700,7 +701,7 @@ int CLuaGUIDefs::GUIIsTransferBoxActive(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaGUIDefs::GUIIsCircleBoxActive()
+bool CLuaGUIDefs::GUIIsLoadingCircleActive()
 {
     return g_pCore->GetGraphics()->IsLoadingCircleActive();
 }
