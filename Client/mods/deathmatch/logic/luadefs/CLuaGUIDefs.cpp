@@ -49,6 +49,7 @@ void CLuaGUIDefs::LoadFunctions()
         {"isMainMenuActive", GUIIsMainMenuActive},
         {"isMTAWindowActive", GUIIsMTAWindowActive},
         {"isTransferBoxActive", GUIIsTransferBoxActive},
+        {"isLoadingCircleActive", ArgumentParser<GUIIsCircleBoxActive>},
 
         {"setChatboxCharacterLimit", ArgumentParser<GUISetChatboxCharacterLimit>},
         {"getChatboxCharacterLimit", ArgumentParser<GUIGetChatboxCharacterLimit>},
@@ -697,6 +698,11 @@ int CLuaGUIDefs::GUIIsTransferBoxActive(lua_State* luaVM)
 {
     lua_pushboolean(luaVM, g_pClientGame->GetTransferBox()->IsVisible());
     return 1;
+}
+
+bool CLuaGUIDefs::GUIIsCircleBoxActive()
+{
+    return g_pCore->GetGraphics()->IsLoadingCircleActive();
 }
 
 int CLuaGUIDefs::GUICreateWindow(lua_State* luaVM)

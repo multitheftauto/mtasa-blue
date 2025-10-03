@@ -201,6 +201,9 @@ public:
     void DrawProgressMessage(bool bPreserveBackbuffer = true);
     void DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning);
 
+    void SetLoadingCircleActive(bool state) noexcept { m_bProgressVisible = state; };
+    bool IsLoadingCircleActive() const noexcept { return m_bProgressVisible; }
+
 private:
     void       OnDeviceCreate(IDirect3DDevice9* pDevice);
     void       OnDeviceInvalidate(IDirect3DDevice9* pDevice);
@@ -386,7 +389,7 @@ private:
     CElapsedTime                            m_FirstDrawnProgressTimer;
     CElapsedTime                            m_LastDrawnProgressTimer;
     CElapsedTime                            m_LastLostDeviceTimer;
-    bool                                    m_bProgressVisible;
+    bool                                    m_bProgressVisible{false};
     CElapsedTime                            m_ProgressAnimTimer;
     uint                                    m_uiProgressAnimFrame;
     std::map<SString, SCustomScaleFontInfo> m_CustomScaleFontMap;

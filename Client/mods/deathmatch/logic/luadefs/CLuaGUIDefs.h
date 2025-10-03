@@ -162,6 +162,8 @@ public:
     static bool GUISetChatboxCharacterLimit(int charLimit);
     static int  GUIGetChatboxCharacterLimit();
 
+    static bool GUIIsCircleBoxActive();
+
 private:
     static void AddGuiElementClass(lua_State* luaVM);
     static void AddGuiFontClass(lua_State* luaVM);

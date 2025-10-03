@@ -197,4 +197,6 @@ public:
     // Texture data manipulation
     virtual bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
                                    CBuffer& outBuffer) = 0;
+
+    virtual bool IsLoadingCircleActive() const noexcept = 0;
 };

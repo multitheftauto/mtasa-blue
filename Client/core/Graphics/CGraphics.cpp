@@ -2147,11 +2147,11 @@ void CGraphics::RestoreGTARenderStates()
 ////////////////////////////////////////////////////////////////
 void CGraphics::DidRenderScene()
 {
-    if (m_bProgressVisible)
+    if (IsLoadingCircleActive())
     {
         // Min display time before turning off spinner
         if (m_FirstDrawnProgressTimer.Get() > DUMMY_PROGRESS_MIN_DISPLAY_TIME)
-            m_bProgressVisible = false;
+            SetLoadingCircleActive(false);
         else
             DrawProgressMessage(false);
     }
@@ -2173,13 +2173,13 @@ void CGraphics::DidRenderScene()
 ////////////////////////////////////////////////////////////////
 void CGraphics::SetProgressMessage(const SString& strMessage)
 {
-    if (!m_bProgressVisible)
+    if (!IsLoadingCircleActive())
     {
         if (m_LastRenderedSceneTimer.Get() < DUMMY_PROGRESS_INITIAL_DELAY)
             return;
 
         // Enable progress drawing
-        m_bProgressVisible = true;
+        SetLoadingCircleActive(true);
         m_FirstDrawnProgressTimer.Reset();
     }
 
