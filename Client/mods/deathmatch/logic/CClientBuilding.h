@@ -55,6 +55,7 @@ public:
     bool SetLowLodBuilding(CClientBuilding* pLod = nullptr);
     bool IsLod() const noexcept { return m_pHighBuilding != nullptr; };
 
+    float GetDistanceFromCentreOfMassToBaseOfModel();
 
 private:
     CClientBuilding* GetHighLodBuilding() const { return m_pHighBuilding; }; 

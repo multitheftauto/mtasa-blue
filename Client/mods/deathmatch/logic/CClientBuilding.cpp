@@ -191,3 +191,8 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
     }
     return true;
 }
+
+float CClientBuilding::GetDistanceFromCentreOfMassToBaseOfModel()
+{
+    return m_pBuilding ? m_pBuilding->GetDistanceFromCentreOfMassToBaseOfModel() : 0.0f;
+}
