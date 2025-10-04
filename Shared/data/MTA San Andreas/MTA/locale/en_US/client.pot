@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04 13:59+0000\n"
+"POT-Creation-Date: 2025-10-04 19:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -252,7 +252,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:3816 Client/core/CSettings.cpp:5181
 #: Client/core/CSettings.cpp:5209 Client/core/CSettings.cpp:5921
 #: Client/core/CCore.cpp:1310 Client/core/CGUI.cpp:94
-#: Client/core/DXHook/CDirect3DHook9.cpp:127
+#: Client/core/DXHook/CDirect3DHook9.cpp:128
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1514
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1536
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1593
@@ -271,7 +271,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1439
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:178
+#: Shared/sdk/SharedUtil.Misc.hpp:187
 msgid "Error"
 msgstr ""
 
@@ -2431,7 +2431,7 @@ msgid ""
 "not be loaded, please reinstall MTA."
 msgstr ""
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1174
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1183
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr ""
 
@@ -2477,7 +2477,7 @@ msgstr ""
 msgid "Brake Axis"
 msgstr ""
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:124
+#: Client/core/DXHook/CDirect3DHook9.cpp:125
 msgid ""
 "Could not initialize Direct3D9.\n"
 "\n"
@@ -3456,11 +3456,11 @@ msgstr ""
 msgid "Connection error"
 msgstr ""
 
-#: Shared/sdk/SharedUtil.Misc.hpp:178
+#: Shared/sdk/SharedUtil.Misc.hpp:187
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr ""
 
-#: Shared/sdk/SharedUtil.Misc.hpp:1188
+#: Shared/sdk/SharedUtil.Misc.hpp:1197
 msgid ""
 "Your browser will now display a web page with some help infomation.\n"
 "\n"
