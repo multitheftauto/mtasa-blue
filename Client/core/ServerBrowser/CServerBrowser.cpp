@@ -61,6 +61,69 @@ CServerBrowser::CServerBrowser()
     m_BeforeTempServerBrowserType = ServerBrowserTypes::INTERNET;
     m_llLastGeneralHelpTime = 0;
 
+    m_pFrame = nullptr;
+    m_pTopWindow = nullptr;
+    m_pPanel = nullptr;
+    m_pLockedIcon = nullptr;
+    m_pQuickConnectHelpWindow = nullptr;
+    m_pGeneralHelpWindow = nullptr;
+
+    for (unsigned int i = 0; i < SearchTypes::MAX_SEARCH_TYPES; ++i)
+    {
+        m_pSearchIcons[i] = nullptr;
+        m_szSearchTypePath[i] = nullptr;
+    }
+
+    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; ++i)
+    {
+        m_pTab[i] = nullptr;
+        m_pServerList[i] = nullptr;
+        m_pServerListRevision[i] = 0;
+        m_pServerPlayerListLabel[i] = nullptr;
+        m_pServerPlayerList[i] = nullptr;
+        m_pEditServerSearch[i] = nullptr;
+        m_pServerSearchIcon[i] = nullptr;
+        m_pLabelInclude[i] = nullptr;
+        m_pIncludeEmpty[i] = nullptr;
+        m_pIncludeFull[i] = nullptr;
+        m_pIncludeLocked[i] = nullptr;
+        m_pIncludeOffline[i] = nullptr;
+        m_pIncludeOtherVersions[i] = nullptr;
+        m_pButtonConnect[i] = nullptr;
+        m_pButtonConnectIcon[i] = nullptr;
+        m_pButtonRefresh[i] = nullptr;
+        m_pButtonRefreshIcon[i] = nullptr;
+        m_pButtonInfo[i] = nullptr;
+        m_pButtonInfoIcon[i] = nullptr;
+        m_pButtonFavourites[i] = nullptr;
+        m_pEditAddress[i] = nullptr;
+        m_pLabelAddressDescription[i] = nullptr;
+        m_pComboAddressHistory[i] = nullptr;
+        m_pSearchTypeIcon[i] = nullptr;
+        m_pAddressFavoriteIcon[i] = nullptr;
+        m_pRemoveFromRecentIcon[i] = nullptr;
+        m_pComboSearchType[i] = nullptr;
+        m_pEditSearch[i] = nullptr;
+        m_pLabelSearchDescription[i] = nullptr;
+        m_pLabelPassword[i] = nullptr;
+        m_pEditPassword[i] = nullptr;
+        m_pServerListStatus[i] = nullptr;
+        m_pButtonBack[i] = nullptr;
+        m_pButtonGeneralHelp[i] = nullptr;
+        m_iSelectedServer[i] = -1;
+        m_hVersion[i] = CGUIHandle();
+        m_hLocked[i] = CGUIHandle();
+        m_hName[i] = CGUIHandle();
+        m_hPing[i] = CGUIHandle();
+        m_hPlayers[i] = CGUIHandle();
+        m_hHost[i] = CGUIHandle();
+        m_hGame[i] = CGUIHandle();
+        m_hMap[i] = CGUIHandle();
+        m_hPlayerName[i] = CGUIHandle();
+        m_FlashSearchBox[i].uiCount = 0;
+        m_FlashSearchBox[i].uiNextTime = 0;
+    }
+
     // Do some initial math
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
     bool      bCreateFrame = true;
@@ -501,6 +564,10 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pServerPlayerList[type]->SetIgnoreTextSpacer(true);
     // Player List Columns
     m_hPlayerName[type] = m_pServerPlayerList[type]->AddColumn(_("Player list"), 0.75f);
+
+    // Create a companion label now so the destructor can safely clean it up later.
+    m_pServerPlayerListLabel[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTab[type], ""));
+    m_pServerPlayerListLabel[type]->SetVisible(false);
 
     // Filters
     float fLineHeight = SB_BACK_BUTTON_SIZE_Y / 2;
