@@ -350,7 +350,10 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     #endif
 
     // Set dark titlebar if needed
-    BOOL darkTitleBar = GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme") == "\x0";
+    int themeStatus = 0;
+    const SString appsUseLightTheme =
+        GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme", &themeStatus);
+    const BOOL darkTitleBar = (themeStatus > 0) ? (appsUseLightTheme.ToInt() == 0) : FALSE;
     DwmSetWindowAttribute(hFocusWindow, DWMWA_USE_IMMERSIVE_DARK_MODE, &darkTitleBar, sizeof(darkTitleBar));
 
     // Update icon
