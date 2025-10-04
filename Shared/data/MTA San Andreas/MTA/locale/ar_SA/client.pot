@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04 07:19+0000\n"
-"PO-Revision-Date: 2025-10-04 11:39\n"
+"POT-Creation-Date: 2025-10-04 19:52+0000\n"
+"PO-Revision-Date: 2025-10-04 20:50\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -204,7 +204,7 @@ msgstr "يوجد نسخة تعمل من جراند تيڤت أوتو: سان أ�
 #: Client/loader/MainFunctions.cpp:632 Client/loader/MainFunctions.cpp:639
 #: Client/loader/MainFunctions.cpp:1527
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1549
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1616
 #: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr "معلومات"
@@ -237,11 +237,11 @@ msgstr "توجد مشاكل في أثناء إعادة تشغيل MTA:SA\n\n"
 #: Client/core/CSettings.cpp:3816 Client/core/CSettings.cpp:5181
 #: Client/core/CSettings.cpp:5209 Client/core/CSettings.cpp:5921
 #: Client/core/CCore.cpp:1310 Client/core/CGUI.cpp:94
-#: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1447
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1469
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1526
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1575
+#: Client/core/DXHook/CDirect3DHook9.cpp:128
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1514
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1536
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1593
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1642
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:724
@@ -256,7 +256,7 @@ msgstr "توجد مشاكل في أثناء إعادة تشغيل MTA:SA\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1439
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:178
+#: Shared/sdk/SharedUtil.Misc.hpp:187
 msgid "Error"
 msgstr "خطأ"
 
@@ -523,7 +523,7 @@ msgid "Quit"
 msgstr "خروج"
 
 #: Client/loader/Dialogs.cpp:39
-#: Client/core/ServerBrowser/CServerBrowser.cpp:581
+#: Client/core/ServerBrowser/CServerBrowser.cpp:648
 msgid "Help"
 msgstr "مساعدة"
 
@@ -984,7 +984,7 @@ msgstr "الفيديو"
 
 #: Client/core/CSettings.cpp:550
 msgid "PostFX"
-msgstr ""
+msgstr "التأثيرات"
 
 #: Client/core/CSettings.cpp:551
 msgid "Audio"
@@ -1305,7 +1305,7 @@ msgstr "رسم الخرائط"
 
 #: Client/core/CSettings.cpp:1177
 msgid "V-Sync"
-msgstr ""
+msgstr "V-Sync"
 
 #: Client/core/CSettings.cpp:1254 Client/core/CSettings.cpp:2218
 msgid "Low"
@@ -1416,23 +1416,23 @@ msgstr "عرض الشخصيات دائمًا بتفاصيل عالية"
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1436
 msgid "Gamma:"
-msgstr ""
+msgstr "غاما:"
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1476
 msgid "Contrast:"
-msgstr ""
+msgstr "التباين:"
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1496
 msgid "Saturation:"
-msgstr ""
+msgstr "التشبع:"
 
 #: Client/core/CSettings.cpp:1512
 msgid "Apply adjustments in windowed mode"
-msgstr ""
+msgstr "تطبيق التعديلات في وضع النافذة"
 
 #: Client/core/CSettings.cpp:1518
 msgid "Apply adjustments in fullscreen mode"
-msgstr ""
+msgstr "تطبيق التعديلات في وضع ملء الشاشة"
 
 #: Client/core/CSettings.cpp:1548
 msgid "Enable remote websites"
@@ -2370,7 +2370,7 @@ msgstr "زر تحكم المجموعة للخلف"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "الشخصية التي قمت بإختيارها لا يمكن تحميلها, والشخصية الأساسية لا يمكن تحميلها أيضاً, الرجاء إعادة تثبيت MTA."
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1174
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1183
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "هل تريد أن ترى بعض المساعدة على الإنترنت عن هذه المشكلة؟"
 
@@ -2415,7 +2415,7 @@ msgstr "تسريع المحور"
 msgid "Brake Axis"
 msgstr "مكابح المحور"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:124
+#: Client/core/DXHook/CDirect3DHook9.cpp:125
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
@@ -2532,7 +2532,7 @@ msgstr "زمن الإستجابة:"
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
-#: Client/core/ServerBrowser/CServerBrowser.cpp:503
+#: Client/core/ServerBrowser/CServerBrowser.cpp:566
 msgid "Player list"
 msgstr "قائمة اللاعبين"
 
@@ -2570,29 +2570,29 @@ msgid "Querying..."
 msgstr "جاري الإستعلام..."
 
 #. Create the window
-#: Client/core/ServerBrowser/CServerBrowser.cpp:85
+#: Client/core/ServerBrowser/CServerBrowser.cpp:148
 msgid "SERVER BROWSER"
 msgstr "مستعرض الخوادم"
 
 #. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+#: Client/core/ServerBrowser/CServerBrowser.cpp:196
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:90
 msgid "Internet"
 msgstr "الإنترنت"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:134
+#: Client/core/ServerBrowser/CServerBrowser.cpp:197
 msgid "Local"
 msgstr "محلي"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:135
+#: Client/core/ServerBrowser/CServerBrowser.cpp:198
 msgid "Favourites"
 msgstr "المفضلة"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:136
+#: Client/core/ServerBrowser/CServerBrowser.cpp:199
 msgid "Recent"
 msgstr "المستخدمة حديثاً"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:191
+#: Client/core/ServerBrowser/CServerBrowser.cpp:254
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
@@ -2600,137 +2600,137 @@ msgstr "للإتصال السريع:\n\n"
 "ادخل عنوان الـ IP والمنفذ في شريط العنوان.\n"
 "أو أختر خادم من قائمة الخوادم المستخدمة حدياً وإضغط على 'إتصال'"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:203
+#: Client/core/ServerBrowser/CServerBrowser.cpp:266
 msgid "HELP"
 msgstr "مساعدة"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:253
+#: Client/core/ServerBrowser/CServerBrowser.cpp:275
+#: Client/core/ServerBrowser/CServerBrowser.cpp:316
 msgid "Refresh"
 msgstr "تحديث"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:254
+#: Client/core/ServerBrowser/CServerBrowser.cpp:275
+#: Client/core/ServerBrowser/CServerBrowser.cpp:317
 msgid "Add Favorite"
 msgstr "أضف إلى المفضلة"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:255
-#: Client/core/ServerBrowser/CServerBrowser.cpp:326
-#: Client/core/ServerBrowser/CServerBrowser.cpp:397
+#: Client/core/ServerBrowser/CServerBrowser.cpp:275
+#: Client/core/ServerBrowser/CServerBrowser.cpp:318
+#: Client/core/ServerBrowser/CServerBrowser.cpp:389
+#: Client/core/ServerBrowser/CServerBrowser.cpp:460
 msgid "Connect"
 msgstr "إتصال"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:256
+#: Client/core/ServerBrowser/CServerBrowser.cpp:275
+#: Client/core/ServerBrowser/CServerBrowser.cpp:319
 msgid "Server information"
 msgstr "معلومات الخادم"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:257
+#: Client/core/ServerBrowser/CServerBrowser.cpp:276
+#: Client/core/ServerBrowser/CServerBrowser.cpp:320
 msgid "Search servers"
 msgstr "البحث عن الخوادم"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:258
+#: Client/core/ServerBrowser/CServerBrowser.cpp:276
+#: Client/core/ServerBrowser/CServerBrowser.cpp:321
 msgid "Search players"
 msgstr "البحث عن لاعبين"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:259
+#: Client/core/ServerBrowser/CServerBrowser.cpp:276
+#: Client/core/ServerBrowser/CServerBrowser.cpp:322
 msgid "Start search"
 msgstr "إبدء البحث"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:260
+#: Client/core/ServerBrowser/CServerBrowser.cpp:276
+#: Client/core/ServerBrowser/CServerBrowser.cpp:323
 msgid "Delete from recent"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:324
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1866
+#: Client/core/ServerBrowser/CServerBrowser.cpp:387
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1933
 msgid "Search players..."
 msgstr "بحث عن اللاعبين..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:447
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1864
+#: Client/core/ServerBrowser/CServerBrowser.cpp:510
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1931
 msgid "Search servers..."
 msgstr "البحث عن خوادم"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+#: Client/core/ServerBrowser/CServerBrowser.cpp:541
 msgid "Name"
 msgstr "الاسم"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:479
+#: Client/core/ServerBrowser/CServerBrowser.cpp:542
 msgid "Players"
 msgstr "اللاعبين"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:480
+#: Client/core/ServerBrowser/CServerBrowser.cpp:543
 msgid "Ping"
 msgstr "التأخير"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:481
+#: Client/core/ServerBrowser/CServerBrowser.cpp:544
 msgid "Gamemode"
 msgstr "نوع اللعب"
 
 #. Include label
-#: Client/core/ServerBrowser/CServerBrowser.cpp:511
+#: Client/core/ServerBrowser/CServerBrowser.cpp:578
 msgid "Include:"
 msgstr "يتضمن:"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:517
+#: Client/core/ServerBrowser/CServerBrowser.cpp:584
 msgid "Empty"
 msgstr "فارغ"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:523
+#: Client/core/ServerBrowser/CServerBrowser.cpp:590
 msgid "Full"
 msgstr "ممتلئ"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:529
+#: Client/core/ServerBrowser/CServerBrowser.cpp:596
 msgid "Locked"
 msgstr "مقفل"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:541
+#: Client/core/ServerBrowser/CServerBrowser.cpp:608
 msgid "Offline"
 msgstr "غير متّصل"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:554
+#: Client/core/ServerBrowser/CServerBrowser.cpp:621
 msgid "Other Versions"
 msgstr "إصدارات أخرى"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:575
+#: Client/core/ServerBrowser/CServerBrowser.cpp:642
 msgid "Back"
 msgstr "الخلف"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:927
+#: Client/core/ServerBrowser/CServerBrowser.cpp:994
 msgid "Loading..."
 msgstr "جاري التحميل..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1409
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2336
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1476
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2403
 msgid "  ..loading.."
 msgstr "    ..جاري التحميل.."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1447
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1575
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1514
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1642
 msgid "No address specified!"
 msgstr "لا يوجد عنوان محدد!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1460
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1527
 msgid "Unknown protocol"
 msgstr "بروتوكول غير معروف"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1460
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1527
 msgid "Please use the mtasa:// protocol!"
 msgstr "الرجاء إستخدام بروتوكول mtasa://!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1469
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1526
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1536
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1593
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:748
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "اسم غير صحيح! الرجاء الذهاب إلى الإعدادات ووضع اسم جديد!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1549
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1616
 msgid "You have to select a server to connect to."
 msgstr "يجب إختيار خادم للإتصال به."
 
@@ -3411,11 +3411,11 @@ msgstr "خطأ بروتوكول (%u). إذا استمرت هذه المشكلة�
 msgid "Connection error"
 msgstr "خطأ في الاتصال."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:178
+#: Shared/sdk/SharedUtil.Misc.hpp:187
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "لم يتم تثبيت Multi Theft Auto بشكل صحيح، الرجاء إعادة التثبيت."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:1188
+#: Shared/sdk/SharedUtil.Misc.hpp:1197
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "سوف يعرض المتصفح الآن صفحة ويب مع بعض المعلومات للمساعدة.\n\n"
