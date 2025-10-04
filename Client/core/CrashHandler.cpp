@@ -16,6 +16,7 @@
 #include "StdInc.h"
 #include "CrashHandler.h"
 #include <SharedUtil.Detours.h>
+#include <SharedUtil.Misc.h>
 #include <exception>
 #include <new>
 #include <process.h>
@@ -568,25 +569,27 @@ static void InstallSehHandler() noexcept
         return;
     }
 
-    auto setUnhandled = reinterpret_cast<decltype(&SetUnhandledExceptionFilter)>(GetProcAddress(kernelModule, "SetUnhandledExceptionFilter"));
-    if (setUnhandled == nullptr)
+    if (decltype(&SetUnhandledExceptionFilter) setUnhandled = nullptr;
+        SharedUtil::TryGetProcAddress(kernelModule, "SetUnhandledExceptionFilter", setUnhandled))
     {
-        SafeDebugOutput("CrashHandler: WARNING - Failed to resolve SetUnhandledExceptionFilter address\n");
-        return;
-    }
+        g_kernelSetUnhandledExceptionFilterTrampoline = setUnhandled;
 
-    g_kernelSetUnhandledExceptionFilterTrampoline = setUnhandled;
-
-    if (SharedUtil::DetourFunction(g_kernelSetUnhandledExceptionFilterTrampoline, reinterpret_cast<void*>(RedirectedSetUnhandledExceptionFilter)))
-    {
-        g_pfnKernelSetUnhandledExceptionFilter.store(g_kernelSetUnhandledExceptionFilterTrampoline, std::memory_order_release);
-        SafeDebugOutput("CrashHandler: SEH detour protection installed\n");
+        if (SharedUtil::DetourFunction(g_kernelSetUnhandledExceptionFilterTrampoline, reinterpret_cast<void*>(RedirectedSetUnhandledExceptionFilter)))
+        {
+            g_pfnKernelSetUnhandledExceptionFilter.store(g_kernelSetUnhandledExceptionFilterTrampoline, std::memory_order_release);
+            SafeDebugOutput("CrashHandler: SEH detour protection installed\n");
+        }
+        else
+        {
+            SafeDebugOutput("CrashHandler: WARNING - SEH detour protection FAILED (non-critical)\n");
+            g_pfnKernelSetUnhandledExceptionFilter.store(nullptr, std::memory_order_release);
+            g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
+        }
     }
     else
     {
-        SafeDebugOutput("CrashHandler: WARNING - SEH detour protection FAILED (non-critical)\n");
-        g_pfnKernelSetUnhandledExceptionFilter.store(nullptr, std::memory_order_release);
-        g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
+        SafeDebugOutput("CrashHandler: WARNING - Failed to resolve SetUnhandledExceptionFilter address\n");
+        return;
     }
 }
 
