@@ -23,6 +23,7 @@
 #include <atomic>
 #include <array>
 #include <algorithm>
+#include <cctype>
 #include <mutex>
 #include <signal.h>
 #include <intrin.h>  // For _ReturnAddress()
@@ -507,6 +508,20 @@ static void InstallVectoredHandler() noexcept
     }
 }
 
+static bool TryReadEnvBool(const char* name, bool& outValue) noexcept
+{
+    std::array<char, 8> buffer{};
+    DWORD                length = GetEnvironmentVariableA(name, buffer.data(), static_cast<DWORD>(buffer.size()));
+
+    if (length == 0 || length >= buffer.size())
+        return false;
+
+    const unsigned char rawChar = static_cast<unsigned char>(buffer[0]);
+    const char           indicator = static_cast<char>(std::tolower(rawChar));
+    outValue = !(indicator == '0' || indicator == 'f' || indicator == 'n');
+    return true;
+}
+
 static void InstallSehHandler() noexcept
 {
     std::lock_guard<std::mutex> lock(g_handlerStateMutex);
@@ -522,6 +537,23 @@ static void InstallSehHandler() noexcept
 
     std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
     SAFE_DEBUG_PRINT(szDebug, "%sSEH installed, previous filter at 0x%p\n", DEBUG_PREFIX_CRASH, static_cast<const void*>(previousFilter));
+
+    bool disableDetour = false;
+    bool forceDetour = false;
+    const bool hasDisableFlag = TryReadEnvBool("MTA_DISABLE_SEH_DETOUR", disableDetour);
+    TryReadEnvBool("MTA_FORCE_SEH_DETOUR", forceDetour);
+
+    if (hasDisableFlag && disableDetour && !forceDetour)
+    {
+        SafeDebugOutput("CrashHandler: SEH detour protection disabled by environment\n");
+        return;
+    }
+
+    if (!forceDetour && IsDebuggerPresent() == FALSE)
+    {
+        SafeDebugOutput("CrashHandler: SEH detour protection skipped\n");
+        return;
+    }
 
     if (g_pfnKernelSetUnhandledExceptionFilter.load(std::memory_order_acquire) != nullptr)
     {
