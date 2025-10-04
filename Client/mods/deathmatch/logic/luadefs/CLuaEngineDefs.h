@@ -82,6 +82,7 @@ public:
     static bool                                            EngineRestreamWorld();
     static bool                                            EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
+    static bool                                            EngineIsModelValid(uint uiModelID);
 
     static size_t EngineGetPoolCapacity(ePools pool);
     static size_t EngineGetPoolDefaultCapacity(ePools pool);
