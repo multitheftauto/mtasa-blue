@@ -730,16 +730,6 @@ void CMainMenu::Update()
     m_ServerBrowser.Update();
     m_ServerInfo.DoPulse();
     m_pLanguageSelector->DoPulse();
-
-    if (m_pLanguageSelector)
-    {
-        SString strPendingLocale;
-        if (m_pLanguageSelector->ConsumePendingLocale(strPendingLocale))
-        {
-            CVARS_SET("locale", strPendingLocale);
-            SetApplicationSetting("locale", strPendingLocale);
-        }
-    }
 }
 
 void CMainMenu::Show(bool bOverlay)

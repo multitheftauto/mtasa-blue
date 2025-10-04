@@ -61,16 +61,18 @@ CLanguageSelector::~CLanguageSelector()
         if (!element)
             return;
 
-        if (pGUI)
-            pGUI->DestroyElementRecursive(element);
+        auto* elementToDestroy = element;
         element = nullptr;
+        if (pGUI)
+            pGUI->DestroyElementRecursive(elementToDestroy);
     };
+
+    // Ensure callbacks see a safe state even if destruction triggers them re-entrantly
+    m_ButtonItem = CLangListItem();
+    m_ListItems.clear();
 
     destroyElement(m_pListWindow);
     destroyElement(m_pButtonWindow);
-
-    m_ButtonItem = CLangListItem();
-    m_ListItems.clear();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -230,6 +232,9 @@ CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, cons
 ///////////////////////////////////////////////////////////////
 void CLanguageSelector::DoPulse()
 {
+    if (!m_pButtonWindow)
+        return;
+
     if (CLocalGUI::GetSingleton().GetMainMenu()->GetIsIngame())
     {
         // Can't change locale when connected, so hide
@@ -245,12 +250,12 @@ void CLanguageSelector::DoPulse()
     fDeltaSeconds = Clamp(0.01f, fDeltaSeconds, 0.10f);
 
     // Update current language button mouseover effect
-    m_bListWasVisible = m_pListWindow->IsVisible();
+    m_bListWasVisible = m_pListWindow && m_pListWindow->IsVisible();
     m_pButtonWindow->SetAlpha((m_bMouseOverButton || m_bListWasVisible) ? 1.f : 0.5f);
     m_pButtonWindow->SetVisible(true);
 
     // Animate list items if list is visible
-    if (m_bListWasVisible)
+    if (m_bListWasVisible && m_pListWindow)
     {
         for (CLangListItem& item : m_ListItems)
         {
@@ -267,16 +272,6 @@ void CLanguageSelector::DoPulse()
     }
 }
 
-bool CLanguageSelector::ConsumePendingLocale(SString& outLocale)
-{
-    if (m_strPendingLocale.empty())
-        return false;
-
-    outLocale = m_strPendingLocale;
-    m_strPendingLocale.clear();
-    return true;
-}
-
 ///////////////////////////////////////////////////////////////
 //
 // CLanguageSelector::SetLanguageListVisible
@@ -286,6 +281,9 @@ bool CLanguageSelector::ConsumePendingLocale(SString& outLocale)
 ///////////////////////////////////////////////////////////////
 void CLanguageSelector::SetLanguageListVisible(bool bVisible)
 {
+    if (!m_pListWindow)
+        return;
+
     if (bVisible)
     {
         m_pListWindow->BringToFront();
@@ -294,7 +292,6 @@ void CLanguageSelector::SetLanguageListVisible(bool bVisible)
     }
     m_pListWindow->SetVisible(bVisible);
 }
-
 ///////////////////////////////////////////////////////////////
 //
 // CLanguageSelector::GetListItemByIndex
@@ -393,12 +390,11 @@ bool CLanguageSelector::OnListItemClick(CGUIElement* pElement)
     if (pItem)
     {
         SetLanguageListVisible(false);
-        SString strPrevLocale = CVARS_GET_VALUE<SString>("locale");
-        SString strNewLocale = pItem->strLocale;
+        const SString strPrevLocale = CVARS_GET_VALUE<SString>("locale");
+        const SString strNewLocale = pItem->strLocale;
         if (strNewLocale != strPrevLocale)
         {
-            // Defer locale change to avoid destroying GUI during callback stack
-            m_strPendingLocale = strNewLocale;
+            CLocalGUI::GetSingleton().RequestLocaleChange(strNewLocale);
 
             // Update button label immediately so user sees their selection
             m_ButtonItem.strLocale = strNewLocale;

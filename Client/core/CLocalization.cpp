@@ -78,7 +78,18 @@ void CLocalization::SetCurrentLanguage(SString strLocale)
 
     // Update our locale setting with full country code, now that we've matched it
     if (g_pCore)
-        CVARS_SET("locale", strLocale);
+    {
+        SString strCurrentLocale = CVARS_GET_VALUE<SString>("locale");
+        if (strCurrentLocale != strLocale)
+            CVARS_SET("locale", strLocale);
+    }
+
+    SString strStoredLocale = GetApplicationSetting("locale");
+    if (strStoredLocale != strLocale)
+        SetApplicationSetting("locale", strLocale);
+
+    if (m_pCurrentLang && m_pCurrentLang->GetCode() == strLocale)
+        return;
 
     m_pCurrentLang = GetLanguage(strLocale);
 }

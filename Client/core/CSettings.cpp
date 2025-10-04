@@ -54,6 +54,9 @@ constexpr float kPostFxCheckboxOffset = 24.0f;
 constexpr float kSettingsTabHorizontalPadding = 20.0f;
 constexpr float kSliderValueReserve = 80.0f;
 constexpr float kSettingsSliderExtraAllowance = 0.0f;
+constexpr float kSettingsSliderMinWidth = 32.0f;
+constexpr float kSliderLabelSpacing = 6.0f;
+constexpr float kSliderLeftSpacing = 6.0f;
 constexpr float kBrowserColumnSpacing = 18.0f;
 constexpr float kBrowserColumnMinWidth = 240.0f;
 
@@ -68,6 +71,110 @@ float DenormalizeSliderValue(float position, float minValue, float maxValue)
 {
     position = std::clamp(position, 0.0f, 1.0f);
     return minValue + position * (maxValue - minValue);
+}
+
+float ComputeSliderWidth(float tabWidth, float sliderX, float preferredWidth, float reservedWidth = kSliderValueReserve)
+{
+    const float totalAvailable = std::max(0.0f, tabWidth - sliderX);
+        if (totalAvailable <= 0.0f) {
+            return 0.0f;
+        }
+
+    const float clampedReserve = std::clamp(reservedWidth, 0.0f, totalAvailable);
+    const float spaceForSlider = totalAvailable - clampedReserve;
+
+    float width = 0.0f;
+    if (spaceForSlider >= preferredWidth)
+    {
+        width = std::min(spaceForSlider, preferredWidth + kSettingsSliderExtraAllowance);
+    }
+    else if (spaceForSlider > 0.0f)
+    {
+        width = spaceForSlider;
+    }
+    else
+    {
+        width = std::min(preferredWidth, totalAvailable);
+    }
+
+    if (width > 0.0f && width < kSettingsSliderMinWidth)
+        width = std::min(std::max(width, kSettingsSliderMinWidth), totalAvailable);
+
+    return width;
+}
+
+void FinalizeSliderRow(float tabWidth,
+                       CGUIScrollBar* slider,
+                       CGUILabel* valueLabel,
+                       float preferredWidth,
+                       float labelSpacing = kSliderLabelSpacing,
+                       CGUILabel* textLabel = nullptr)
+{
+    if (!slider)
+        return;
+
+    CVector2D sliderPos;
+    slider->GetPosition(sliderPos);
+
+    if (textLabel)
+    {
+        CVector2D textPos;
+        textLabel->GetPosition(textPos);
+        CVector2D textSize;
+        textLabel->GetSize(textSize);
+        const float minSliderX = textPos.fX + textSize.fX + kSliderLeftSpacing;
+        if (sliderPos.fX < minSliderX)
+        {
+            sliderPos.fX = minSliderX;
+            slider->SetPosition(CVector2D(sliderPos.fX, sliderPos.fY));
+        }
+    }
+
+    float reservedWidth = 0.0f;
+    CVector2D labelSize;
+    if (valueLabel)
+    {
+        valueLabel->GetSize(labelSize);
+        reservedWidth = std::max(0.0f, labelSize.fX + labelSpacing);
+    }
+    else
+    {
+        reservedWidth = std::max(0.0f, labelSpacing);
+    }
+
+    const float maxSliderStart = std::max(0.0f, tabWidth - reservedWidth - kSettingsSliderMinWidth);
+    if (sliderPos.fX > maxSliderStart)
+    {
+        sliderPos.fX = maxSliderStart;
+        slider->SetPosition(CVector2D(sliderPos.fX, sliderPos.fY));
+    }
+
+    float targetWidth = ComputeSliderWidth(tabWidth, sliderPos.fX, preferredWidth, reservedWidth);
+    if (targetWidth <= 0.0f)
+        targetWidth = std::max(0.0f, tabWidth - sliderPos.fX - reservedWidth);
+
+    CVector2D sliderSize;
+    slider->GetSize(sliderSize);
+    if (sliderSize.fY <= 0.0f)
+        sliderSize.fY = 20.0f;
+    sliderSize.fX = targetWidth;
+    slider->SetSize(sliderSize);
+
+    if (!valueLabel)
+        return;
+
+    if (labelSize.fX <= 0.0f)
+        valueLabel->GetSize(labelSize);
+
+    CVector2D labelPos;
+    valueLabel->GetPosition(labelPos);
+    labelPos.fX = sliderPos.fX + targetWidth + labelSpacing;
+
+    const float maxLabelX = std::max(0.0f, tabWidth - labelSize.fX);
+    if (labelPos.fX > maxLabelX)
+        labelPos.fX = maxLabelX;
+
+    valueLabel->SetPosition(labelPos);
 }
 }
 
@@ -427,14 +534,6 @@ void CSettings::CreateGUI()
     m_pTabs->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnTabChanged, this));
 
     const float tabHorizontalPadding = kSettingsTabHorizontalPadding;
-    const auto computeSliderWidth = [&](float sliderX, float minWidth, float reservedWidth = kSliderValueReserve) {
-        const float available = std::max(0.0f, tabPanelSize.fX - sliderX - reservedWidth);
-        if (available <= 0.0f)
-            return 0.0f;
-        if (available >= minWidth)
-            return std::min(available, minWidth + kSettingsSliderExtraAllowance);
-        return available;
-    };
     const auto placeBottomRightButton = [&](CGUIButton* button) {
         if (!button)
             return;
@@ -526,14 +625,16 @@ void CSettings::CreateGUI()
     m_pMouseSensitivity = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabControls));
     m_pMouseSensitivity->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pMouseSensitivity->GetPosition(vecTemp);
-    const float mouseSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D mouseSliderPos = vecTemp;
+    const float mouseSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mouseSliderPos.fX, 160.0f);
     m_pMouseSensitivity->SetSize(CVector2D(mouseSliderWidth, 20.0f));
     m_pMouseSensitivity->GetSize(vecSize);
     m_pMouseSensitivity->SetProperty("StepSize", "0.01");
 
     m_pLabelMouseSensitivityValue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, "0%"));
-    m_pLabelMouseSensitivityValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pLabelMouseSensitivityValue->SetPosition(CVector2D(mouseSliderPos.fX + vecSize.fX + kSliderLabelSpacing, mouseSliderPos.fY));
     m_pLabelMouseSensitivityValue->AutoSize("100%");
+    FinalizeSliderRow(tabPanelSize.fX, m_pMouseSensitivity, m_pLabelMouseSensitivityValue, 160.0f, kSliderLabelSpacing, m_pLabelMouseSensitivity);
     vecTemp.fX = 16;
     vecTemp.fY += 24.f;
 
@@ -545,14 +646,16 @@ void CSettings::CreateGUI()
     m_pVerticalAimSensitivity = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabControls));
     m_pVerticalAimSensitivity->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pVerticalAimSensitivity->GetPosition(vecTemp);
-    const float verticalSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D verticalSliderPos = vecTemp;
+    const float verticalSliderWidth = ComputeSliderWidth(tabPanelSize.fX, verticalSliderPos.fX, 160.0f);
     m_pVerticalAimSensitivity->SetSize(CVector2D(verticalSliderWidth, 20.0f));
     m_pVerticalAimSensitivity->GetSize(vecSize);
     m_pVerticalAimSensitivity->SetProperty("StepSize", "0.01");
 
     m_pLabelVerticalAimSensitivityValue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, "0%"));
-    m_pLabelVerticalAimSensitivityValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pLabelVerticalAimSensitivityValue->SetPosition(CVector2D(verticalSliderPos.fX + vecSize.fX + kSliderLabelSpacing, verticalSliderPos.fY));
     m_pLabelVerticalAimSensitivityValue->AutoSize("100%");
+    FinalizeSliderRow(tabPanelSize.fX, m_pVerticalAimSensitivity, m_pLabelVerticalAimSensitivityValue, 160.0f, kSliderLabelSpacing, m_pLabelVerticalAimSensitivity);
     vecTemp.fY += 30.f;
 
     vecTemp.fX = 16;
@@ -785,15 +888,17 @@ void CSettings::CreateGUI()
     m_pMapAlpha = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabMultiplayer));
     m_pMapAlpha->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pMapAlpha->GetPosition(vecTemp, false);
-    const float mapAlphaSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D mapAlphaSliderPos = vecTemp;
+    const float mapAlphaSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mapAlphaSliderPos.fX, 160.0f);
     m_pMapAlpha->SetSize(CVector2D(mapAlphaSliderWidth, 20.0f));
     m_pMapAlpha->GetSize(vecSize);
     m_pMapAlpha->SetProperty("StepSize", "0.01");
 
     m_pMapAlphaValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, "0%"));
-    m_pMapAlphaValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pMapAlphaValueLabel->SetPosition(CVector2D(mapAlphaSliderPos.fX + vecSize.fX + kSliderLabelSpacing, mapAlphaSliderPos.fY));
     m_pMapAlphaValueLabel->GetPosition(vecTemp, false);
     m_pMapAlphaValueLabel->AutoSize("100%");
+    FinalizeSliderRow(tabPanelSize.fX, m_pMapAlpha, m_pMapAlphaValueLabel, 160.0f, kSliderLabelSpacing, m_pMapAlphaLabel);
 
     m_pMapAlphaLabel->GetPosition(vecTemp, false);
     vecTemp.fY += 24.0f;
@@ -829,16 +934,18 @@ void CSettings::CreateGUI()
     m_pAudioMasterVolume = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabAudio));
     m_pAudioMasterVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioMasterVolume->GetPosition(vecTemp, false);
-    const float masterSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D masterSliderPos = vecTemp;
+    const float masterSliderWidth = ComputeSliderWidth(tabPanelSize.fX, masterSliderPos.fX, 160.0f);
     m_pAudioMasterVolume->SetSize(CVector2D(masterSliderWidth, 20.0f));
     m_pAudioMasterVolume->GetSize(vecSize, false);
     m_pAudioMasterVolume->SetProperty("StepSize", "0.01");
 
     m_pLabelMasterVolumeValue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, "0%"));
-    m_pLabelMasterVolumeValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pLabelMasterVolumeValue->SetPosition(CVector2D(masterSliderPos.fX + vecSize.fX + kSliderLabelSpacing, masterSliderPos.fY));
     m_pLabelMasterVolumeValue->GetPosition(vecTemp, false);
     m_pLabelMasterVolumeValue->AutoSize("100%");
     m_pLabelMasterVolumeValue->GetSize(vecSize, false);
+    FinalizeSliderRow(tabPanelSize.fX, m_pAudioMasterVolume, m_pLabelMasterVolumeValue, 160.0f, kSliderLabelSpacing, m_pLabelMasterVolume);
 
     vecTemp.fX = 11;
     m_pLabelRadioVolume = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Radio volume:")));
@@ -849,16 +956,18 @@ void CSettings::CreateGUI()
     m_pAudioRadioVolume = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabAudio));
     m_pAudioRadioVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioRadioVolume->GetPosition(vecTemp, false);
-    const float radioSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D radioSliderPos = vecTemp;
+    const float radioSliderWidth = ComputeSliderWidth(tabPanelSize.fX, radioSliderPos.fX, 160.0f);
     m_pAudioRadioVolume->SetSize(CVector2D(radioSliderWidth, 20.0f));
     m_pAudioRadioVolume->GetSize(vecSize, false);
     m_pAudioRadioVolume->SetProperty("StepSize", "0.01");
 
     m_pLabelRadioVolumeValue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, "0%"));
-    m_pLabelRadioVolumeValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pLabelRadioVolumeValue->SetPosition(CVector2D(radioSliderPos.fX + vecSize.fX + kSliderLabelSpacing, radioSliderPos.fY));
     m_pLabelRadioVolumeValue->GetPosition(vecTemp, false);
     m_pLabelRadioVolumeValue->AutoSize("100%");
     m_pLabelRadioVolumeValue->GetSize(vecSize, false);
+    FinalizeSliderRow(tabPanelSize.fX, m_pAudioRadioVolume, m_pLabelRadioVolumeValue, 160.0f, kSliderLabelSpacing, m_pLabelRadioVolume);
 
     vecTemp.fX = 11;
     m_pLabelSFXVolume = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("SFX volume:")));
@@ -869,16 +978,18 @@ void CSettings::CreateGUI()
     m_pAudioSFXVolume = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabAudio));
     m_pAudioSFXVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioSFXVolume->GetPosition(vecTemp, false);
-    const float sfxSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D sfxSliderPos = vecTemp;
+    const float sfxSliderWidth = ComputeSliderWidth(tabPanelSize.fX, sfxSliderPos.fX, 160.0f);
     m_pAudioSFXVolume->SetSize(CVector2D(sfxSliderWidth, 20.0f));
     m_pAudioSFXVolume->GetSize(vecSize, false);
     m_pAudioSFXVolume->SetProperty("StepSize", "0.01");
 
     m_pLabelSFXVolumeValue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, "0%"));
-    m_pLabelSFXVolumeValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pLabelSFXVolumeValue->SetPosition(CVector2D(sfxSliderPos.fX + vecSize.fX + kSliderLabelSpacing, sfxSliderPos.fY));
     m_pLabelSFXVolumeValue->GetPosition(vecTemp, false);
     m_pLabelSFXVolumeValue->AutoSize("100%");
     m_pLabelSFXVolumeValue->GetSize(vecSize, false);
+    FinalizeSliderRow(tabPanelSize.fX, m_pAudioSFXVolume, m_pLabelSFXVolumeValue, 160.0f, kSliderLabelSpacing, m_pLabelSFXVolume);
 
     vecTemp.fX = 11;
     m_pLabelMTAVolume = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("MTA volume:")));
@@ -889,16 +1000,18 @@ void CSettings::CreateGUI()
     m_pAudioMTAVolume = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabAudio));
     m_pAudioMTAVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioMTAVolume->GetPosition(vecTemp, false);
-    const float mtaSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D mtaSliderPos = vecTemp;
+    const float mtaSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mtaSliderPos.fX, 160.0f);
     m_pAudioMTAVolume->SetSize(CVector2D(mtaSliderWidth, 20.0f));
     m_pAudioMTAVolume->GetSize(vecSize, false);
     m_pAudioMTAVolume->SetProperty("StepSize", "0.01");
 
     m_pLabelMTAVolumeValue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, "0%"));
-    m_pLabelMTAVolumeValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pLabelMTAVolumeValue->SetPosition(CVector2D(mtaSliderPos.fX + vecSize.fX + kSliderLabelSpacing, mtaSliderPos.fY));
     m_pLabelMTAVolumeValue->GetPosition(vecTemp, false);
     m_pLabelMTAVolumeValue->AutoSize("100%");
     m_pLabelMTAVolumeValue->GetSize(vecSize, false);
+    FinalizeSliderRow(tabPanelSize.fX, m_pAudioMTAVolume, m_pLabelMTAVolumeValue, 160.0f, kSliderLabelSpacing, m_pLabelMTAVolume);
 
     vecTemp.fX = 11;
     m_pLabelVoiceVolume = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Voice volume:")));
@@ -909,16 +1022,18 @@ void CSettings::CreateGUI()
     m_pAudioVoiceVolume = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabAudio));
     m_pAudioVoiceVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioVoiceVolume->GetPosition(vecTemp, false);
-    const float voiceSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D voiceSliderPos = vecTemp;
+    const float voiceSliderWidth = ComputeSliderWidth(tabPanelSize.fX, voiceSliderPos.fX, 160.0f);
     m_pAudioVoiceVolume->SetSize(CVector2D(voiceSliderWidth, 20.0f));
     m_pAudioVoiceVolume->GetSize(vecSize, false);
     m_pAudioVoiceVolume->SetProperty("StepSize", "0.01");
 
     m_pLabelVoiceVolumeValue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, "0%"));
-    m_pLabelVoiceVolumeValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pLabelVoiceVolumeValue->SetPosition(CVector2D(voiceSliderPos.fX + vecSize.fX + kSliderLabelSpacing, voiceSliderPos.fY));
     m_pLabelVoiceVolumeValue->GetPosition(vecTemp, false);
     m_pLabelVoiceVolumeValue->AutoSize("100%");
     m_pLabelVoiceVolumeValue->GetSize(vecSize, false);
+    FinalizeSliderRow(tabPanelSize.fX, m_pAudioVoiceVolume, m_pLabelVoiceVolumeValue, 160.0f, kSliderLabelSpacing, m_pLabelVoiceVolume);
 
     vecTemp.fX = 11;
     m_pAudioRadioLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Radio options")));
@@ -1066,13 +1181,15 @@ void CSettings::CreateGUI()
     m_pFieldOfView = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabVideo));
     m_pFieldOfView->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pFieldOfView->GetPosition(vecTemp, false);
-    const float fovSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D fovSliderPos = vecTemp;
+    const float fovSliderWidth = ComputeSliderWidth(tabPanelSize.fX, fovSliderPos.fX, 160.0f);
     m_pFieldOfView->SetSize(CVector2D(fovSliderWidth, 20.0f));
     m_pFieldOfView->GetSize(vecSize);
 
     m_pFieldOfViewValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, "70"));
-    m_pFieldOfViewValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pFieldOfViewValueLabel->SetPosition(CVector2D(fovSliderPos.fX + vecSize.fX + kSliderLabelSpacing, fovSliderPos.fY));
     m_pFieldOfViewValueLabel->AutoSize("70 ");
+    FinalizeSliderRow(tabPanelSize.fX, m_pFieldOfView, m_pFieldOfViewValueLabel, 160.0f, kSliderLabelSpacing, m_pFieldOfViewLabel);
 
     vecTemp.fX = 11;
     m_pDrawDistanceLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Draw Distance:")));
@@ -1083,14 +1200,16 @@ void CSettings::CreateGUI()
     m_pDrawDistance = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabVideo));
     m_pDrawDistance->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pDrawDistance->GetPosition(vecTemp, false);
-    const float drawDistanceSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D drawDistanceSliderPos = vecTemp;
+    const float drawDistanceSliderWidth = ComputeSliderWidth(tabPanelSize.fX, drawDistanceSliderPos.fX, 160.0f);
     m_pDrawDistance->SetSize(CVector2D(drawDistanceSliderWidth, 20.0f));
     m_pDrawDistance->GetSize(vecSize);
     m_pDrawDistance->SetProperty("StepSize", "0.01");
 
     m_pDrawDistanceValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, "0%"));
-    m_pDrawDistanceValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pDrawDistanceValueLabel->SetPosition(CVector2D(drawDistanceSliderPos.fX + vecSize.fX + kSliderLabelSpacing, drawDistanceSliderPos.fY));
     m_pDrawDistanceValueLabel->AutoSize("100%");
+    FinalizeSliderRow(tabPanelSize.fX, m_pDrawDistance, m_pDrawDistanceValueLabel, 160.0f, kSliderLabelSpacing, m_pDrawDistanceLabel);
 
     vecTemp.fX = 11;
 
@@ -1102,14 +1221,16 @@ void CSettings::CreateGUI()
     m_pBrightness = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabVideo));
     m_pBrightness->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pBrightness->GetPosition(vecTemp, false);
-    const float brightnessSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D brightnessSliderPos = vecTemp;
+    const float brightnessSliderWidth = ComputeSliderWidth(tabPanelSize.fX, brightnessSliderPos.fX, 160.0f);
     m_pBrightness->SetSize(CVector2D(brightnessSliderWidth, 20.0f));
     m_pBrightness->GetSize(vecSize);
     m_pBrightness->SetProperty("StepSize", "0.01");
 
     m_pBrightnessValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, "0%"));
-    m_pBrightnessValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
+    m_pBrightnessValueLabel->SetPosition(CVector2D(brightnessSliderPos.fX + vecSize.fX + kSliderLabelSpacing, brightnessSliderPos.fY));
     m_pBrightnessValueLabel->AutoSize("100%");
+    FinalizeSliderRow(tabPanelSize.fX, m_pBrightness, m_pBrightnessValueLabel, 160.0f, kSliderLabelSpacing, m_pBrightnessLabel);
 
     vecTemp.fX = 11;
 
@@ -1135,14 +1256,23 @@ void CSettings::CreateGUI()
     m_pAnisotropic = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabVideo));
     m_pAnisotropic->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAnisotropic->GetPosition(vecTemp, false);
-    const float anisotropicSliderWidth = computeSliderWidth(vecTemp.fX, 160.0f);
+    const CVector2D anisotropicSliderPos = vecTemp;
+    const float anisotropicSliderWidth = ComputeSliderWidth(tabPanelSize.fX, anisotropicSliderPos.fX, 160.0f);
     m_pAnisotropic->SetSize(CVector2D(anisotropicSliderWidth, 20.0f));
     m_pAnisotropic->GetSize(vecSize);
     m_pAnisotropic->SetProperty("StepSize", SString("%1.2f", 1 / (float)m_iMaxAnisotropic));
 
     m_pAnisotropicValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Off")));
-    m_pAnisotropicValueLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
-    m_pAnisotropicValueLabel->SetSize(CVector2D(100.0f, 20.0f));
+    m_pAnisotropicValueLabel->SetPosition(CVector2D(anisotropicSliderPos.fX + vecSize.fX + kSliderLabelSpacing, anisotropicSliderPos.fY));
+
+    const SString anisotropicOffText = _("Off");
+    const SString anisotropicMaxText = (m_iMaxAnisotropic > 0) ? SString("%ix", 1 << m_iMaxAnisotropic) : anisotropicOffText;
+    const float anisotropicOffExtent = pManager->GetTextExtent(anisotropicOffText);
+    const float anisotropicMaxExtent = pManager->GetTextExtent(anisotropicMaxText);
+    const SString anisotropicSizeHint = (anisotropicMaxExtent > anisotropicOffExtent) ? anisotropicMaxText : anisotropicOffText;
+    const SString anisotropicSizePadding("%s ", anisotropicSizeHint.c_str());
+    m_pAnisotropicValueLabel->AutoSize(anisotropicSizePadding);
+    FinalizeSliderRow(tabPanelSize.fX, m_pAnisotropic, m_pAnisotropicValueLabel, 160.0f, kSliderLabelSpacing, m_pAnisotropicLabel);
 
     if (m_iMaxAnisotropic < 1)
     {
@@ -1287,7 +1417,7 @@ void CSettings::CreateGUI()
         pManager->CGUI_GetMaxTextExtent("default-normal", _("Gamma:"), _("Brightness:"), _("Contrast:"), _("Saturation:")) + 5.0f;
     const float postFxSliderColumnX = postFxLabelColumnX + postFxLabelIndent;
     const float postFxValueColumnReserve = postFxValueColumnPadding + 60.0f;
-    const float postFxSliderWidth = computeSliderWidth(postFxSliderColumnX, 220.0f, postFxValueColumnReserve);
+    const float postFxSliderWidth = ComputeSliderWidth(tabPanelSize.fX, postFxSliderColumnX, 220.0f, postFxValueColumnReserve);
     const float postFxValueColumnX = postFxSliderColumnX + postFxSliderWidth + postFxValueColumnPadding;
 
     m_pBorderlessGammaToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
@@ -1306,6 +1436,7 @@ void CSettings::CreateGUI()
     m_pBorderlessGammaValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
     m_pBorderlessGammaValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
     m_pBorderlessGammaValueLabel->AutoSize("2.00");
+    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessGamma, m_pBorderlessGammaValueLabel, 220.0f, kSliderLabelSpacing, m_pBorderlessGammaLabel);
 
     postFxPos.fY += postFxRowHeight;
 
@@ -1325,6 +1456,7 @@ void CSettings::CreateGUI()
     m_pBorderlessBrightnessValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
     m_pBorderlessBrightnessValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
     m_pBorderlessBrightnessValueLabel->AutoSize("2.00x");
+    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessBrightness, m_pBorderlessBrightnessValueLabel, 220.0f, kSliderLabelSpacing, m_pBorderlessBrightnessLabel);
 
     postFxPos.fY += postFxRowHeight;
 
@@ -1344,6 +1476,7 @@ void CSettings::CreateGUI()
     m_pBorderlessContrastValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
     m_pBorderlessContrastValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
     m_pBorderlessContrastValueLabel->AutoSize("2.00x");
+    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessContrast, m_pBorderlessContrastValueLabel, 220.0f, kSliderLabelSpacing, m_pBorderlessContrastLabel);
 
     postFxPos.fY += postFxRowHeight;
 
@@ -1363,6 +1496,7 @@ void CSettings::CreateGUI()
     m_pBorderlessSaturationValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
     m_pBorderlessSaturationValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
     m_pBorderlessSaturationValueLabel->AutoSize("2.00x");
+    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessSaturation, m_pBorderlessSaturationValueLabel, 220.0f, kSliderLabelSpacing, m_pBorderlessSaturationLabel);
 
     postFxPos.fY += postFxRowHeight + 8.0f;
 
@@ -1635,14 +1769,26 @@ void CSettings::CreateGUI()
     m_pStreamingMemory = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTabAdvanced));
     m_pStreamingMemory->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pStreamingMemory->GetPosition(vecTemp);
-    const float streamingSliderWidth = computeSliderWidth(vecTemp.fX, 130.0f, 65.0f);
+    const float streamingSliderWidth = ComputeSliderWidth(tabPanelSize.fX, vecTemp.fX, 130.0f, 65.0f);
     m_pStreamingMemory->SetSize(CVector2D(streamingSliderWidth, 20.0f));
     m_pStreamingMemory->GetSize(vecSize);
-    m_pStreamingMemory->SetProperty("StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)));
+
+    const unsigned int uiStreamingRange = (uiMaxMemory > uiMinMemory) ? (uiMaxMemory - uiMinMemory) : 0u;
+    if (uiStreamingRange > 0u)
+    {
+        m_pStreamingMemory->SetProperty("StepSize", SString("%.07lf", 1.0 / static_cast<double>(uiStreamingRange)));
+        m_pStreamingMemory->SetEnabled(true);
+    }
+    else
+    {
+        m_pStreamingMemory->SetProperty("StepSize", "1.0");
+        m_pStreamingMemory->SetEnabled(false);
+    }
 
     m_pStreamingMemoryMaxLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Max")));
     m_pStreamingMemoryMaxLabel->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pStreamingMemoryMaxLabel->AutoSize();
+    FinalizeSliderRow(tabPanelSize.fX, m_pStreamingMemory, m_pStreamingMemoryMaxLabel, 130.0f, 5.0f, m_pStreamingMemoryMinLabel);
     vecTemp.fX = 22.f;
     vecTemp.fY += fLineHeight;
 
@@ -4378,9 +4524,17 @@ void CSettings::SaveData()
     CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem();
     if (pItem)
     {
-        const char* szItemText = (const char*)pItem->GetData();
-        CVARS_SET("locale", std::string(szItemText));
-        SetApplicationSetting("locale", szItemText);
+        const char* szItemText = static_cast<const char*>(pItem->GetData());
+        SString     strSelectedLocale = szItemText ? szItemText : "";
+
+        if (!strSelectedLocale.empty())
+        {
+            SString strCurrentLocale;
+            CVARS_GET("locale", strCurrentLocale);
+
+            if (strSelectedLocale != strCurrentLocale)
+                CLocalGUI::GetSingleton().RequestLocaleChange(strSelectedLocale);
+        }
     }
 
     // Chat
@@ -4531,6 +4685,8 @@ void CSettings::AddKeyBindSection(char* szSectionName)
 void CSettings::CreateChatColorTab(eChatColorType eType, const char* szName, CGUITabPanel* pParent)
 {
     CVector2D vecTemp;
+    CVector2D tabPanelSize;
+    pParent->GetSize(tabPanelSize);
 
     // Create the GUI Elements
     CGUI*      pManager = g_pCore->GetGUI();
@@ -4557,70 +4713,99 @@ void CSettings::CreateChatColorTab(eChatColorType eType, const char* szName, CGU
         pLabel->SetFont("default-bold-small");
 
         // Red
-        pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, strRed));
-        pLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
-        pLabel->GetPosition(vecTemp);
-        pLabel->AutoSize();
+        CGUILabel* pLabelRed = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, strRed));
+        pLabelRed->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+        pLabelRed->AutoSize();
+        CVector2D redLabelPos;
+        pLabelRed->GetPosition(redLabelPos);
 
         m_pChatRed[eType] = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTab));
-        m_pChatRed[eType]->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 2.0f));
-        m_pChatRed[eType]->SetSize(CVector2D(175.0f, fLineSizeY));
+        m_pChatRed[eType]->SetPosition(CVector2D(redLabelPos.fX + fIndentX, redLabelPos.fY - 2.0f));
+        CVector2D redSliderPos;
+        m_pChatRed[eType]->GetPosition(redSliderPos);
+        const float chatSliderPreferredWidth = 175.0f;
+        m_pChatRed[eType]->SetSize(CVector2D(ComputeSliderWidth(tabPanelSize.fX, redSliderPos.fX, chatSliderPreferredWidth), fLineSizeY));
+        CVector2D redSliderSize;
+        m_pChatRed[eType]->GetSize(redSliderSize);
         m_pChatRed[eType]->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnChatRedChanged, this));
         m_pChatRed[eType]->SetProperty("StepSize", "0.004");
 
         m_pChatRedValue[eType] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, "0"));
-        m_pChatRedValue[eType]->SetPosition(CVector2D(vecTemp.fX + fIndentX + 185.0f, vecTemp.fY));
+        m_pChatRedValue[eType]->SetPosition(CVector2D(redSliderPos.fX + redSliderSize.fX + kSliderLabelSpacing, redLabelPos.fY));
         m_pChatRedValue[eType]->AutoSize("255 ");
+        FinalizeSliderRow(tabPanelSize.fX, m_pChatRed[eType], m_pChatRedValue[eType], chatSliderPreferredWidth, kSliderLabelSpacing, pLabelRed);
 
         // Green
-        pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, strGreen));
-        pLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY));
-        pLabel->GetPosition(vecTemp);
-        pLabel->AutoSize();
+        CGUILabel* pLabelGreen = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, strGreen));
+        pLabelGreen->SetPosition(CVector2D(redLabelPos.fX, redLabelPos.fY + fLineSizeY + fLineGapY));
+        pLabelGreen->AutoSize();
+        CVector2D greenLabelPos;
+        pLabelGreen->GetPosition(greenLabelPos);
 
         m_pChatGreen[eType] = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTab));
-        m_pChatGreen[eType]->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 2.0f));
-        m_pChatGreen[eType]->SetSize(CVector2D(175.0f, fLineSizeY));
+        m_pChatGreen[eType]->SetPosition(CVector2D(greenLabelPos.fX + fIndentX, greenLabelPos.fY - 2.0f));
+        CVector2D greenSliderPos;
+        m_pChatGreen[eType]->GetPosition(greenSliderPos);
+        m_pChatGreen[eType]->SetSize(CVector2D(ComputeSliderWidth(tabPanelSize.fX, greenSliderPos.fX, chatSliderPreferredWidth), fLineSizeY));
+        CVector2D greenSliderSize;
+        m_pChatGreen[eType]->GetSize(greenSliderSize);
         m_pChatGreen[eType]->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnChatGreenChanged, this));
         m_pChatGreen[eType]->SetProperty("StepSize", "0.004");
 
         m_pChatGreenValue[eType] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, "0"));
-        m_pChatGreenValue[eType]->SetPosition(CVector2D(vecTemp.fX + fIndentX + 185.0f, vecTemp.fY));
+        m_pChatGreenValue[eType]->SetPosition(CVector2D(greenSliderPos.fX + greenSliderSize.fX + kSliderLabelSpacing, greenLabelPos.fY));
         m_pChatGreenValue[eType]->AutoSize("255 ");
+        FinalizeSliderRow(tabPanelSize.fX, m_pChatGreen[eType], m_pChatGreenValue[eType], chatSliderPreferredWidth, kSliderLabelSpacing, pLabelGreen);
 
         // Blue
-        pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, strBlue));
-        pLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY));
-        pLabel->GetPosition(vecTemp);
-        pLabel->AutoSize();
+        CGUILabel* pLabelBlue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, strBlue));
+        pLabelBlue->SetPosition(CVector2D(greenLabelPos.fX, greenLabelPos.fY + fLineSizeY + fLineGapY));
+        pLabelBlue->AutoSize();
+        CVector2D blueLabelPos;
+        pLabelBlue->GetPosition(blueLabelPos);
 
         m_pChatBlue[eType] = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTab));
-        m_pChatBlue[eType]->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 2.0f));
-        m_pChatBlue[eType]->SetSize(CVector2D(175.0f, fLineSizeY));
+        m_pChatBlue[eType]->SetPosition(CVector2D(blueLabelPos.fX + fIndentX, blueLabelPos.fY - 2.0f));
+        CVector2D blueSliderPos;
+        m_pChatBlue[eType]->GetPosition(blueSliderPos);
+        m_pChatBlue[eType]->SetSize(CVector2D(ComputeSliderWidth(tabPanelSize.fX, blueSliderPos.fX, chatSliderPreferredWidth), fLineSizeY));
+        CVector2D blueSliderSize;
+        m_pChatBlue[eType]->GetSize(blueSliderSize);
         m_pChatBlue[eType]->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnChatBlueChanged, this));
         m_pChatBlue[eType]->SetProperty("StepSize", "0.004");
 
         m_pChatBlueValue[eType] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, "0"));
-        m_pChatBlueValue[eType]->SetPosition(CVector2D(vecTemp.fX + fIndentX + 185.0f, vecTemp.fY));
+        m_pChatBlueValue[eType]->SetPosition(CVector2D(blueSliderPos.fX + blueSliderSize.fX + kSliderLabelSpacing, blueLabelPos.fY));
         m_pChatBlueValue[eType]->AutoSize("255 ");
+        FinalizeSliderRow(tabPanelSize.fX, m_pChatBlue[eType], m_pChatBlueValue[eType], chatSliderPreferredWidth, kSliderLabelSpacing, pLabelBlue);
 
         // Transparency
-        pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, strTransparency));
-        pLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY));
-        pLabel->GetPosition(vecTemp);
-        pLabel->AutoSize();
+        CGUILabel* pLabelAlpha = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, strTransparency));
+        pLabelAlpha->SetPosition(CVector2D(blueLabelPos.fX, blueLabelPos.fY + fLineSizeY + fLineGapY));
+        pLabelAlpha->AutoSize();
+        CVector2D alphaLabelPos;
+        pLabelAlpha->GetPosition(alphaLabelPos);
 
         m_pChatAlpha[eType] = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, pTab));
-        m_pChatAlpha[eType]->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 2.0f));
-        m_pChatAlpha[eType]->SetSize(CVector2D(175.0f, fLineSizeY));
+        m_pChatAlpha[eType]->SetPosition(CVector2D(alphaLabelPos.fX + fIndentX, alphaLabelPos.fY - 2.0f));
+        CVector2D alphaSliderPos;
+        m_pChatAlpha[eType]->GetPosition(alphaSliderPos);
+        m_pChatAlpha[eType]->SetSize(CVector2D(ComputeSliderWidth(tabPanelSize.fX, alphaSliderPos.fX, chatSliderPreferredWidth), fLineSizeY));
+        CVector2D alphaSliderSize;
+        m_pChatAlpha[eType]->GetSize(alphaSliderSize);
         m_pChatAlpha[eType]->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnChatAlphaChanged, this));
         m_pChatAlpha[eType]->SetProperty("StepSize", "0.004");
 
         m_pChatAlphaValue[eType] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTab, "0"));
-        m_pChatAlphaValue[eType]->SetPosition(CVector2D(vecTemp.fX + fIndentX + 185.0f, vecTemp.fY));
+        m_pChatAlphaValue[eType]->SetPosition(CVector2D(alphaSliderPos.fX + alphaSliderSize.fX + kSliderLabelSpacing, alphaLabelPos.fY));
         m_pChatAlphaValue[eType]->AutoSize("255 ");
+        FinalizeSliderRow(tabPanelSize.fX, m_pChatAlpha[eType], m_pChatAlphaValue[eType], chatSliderPreferredWidth, kSliderLabelSpacing, pLabelAlpha);
 
-        fMarginX = vecTemp.fX + fIndentX + 185.0f + pManager->GetTextExtent("255") + 30.0f;
+    CVector2D alphaValuePos;
+    m_pChatAlphaValue[eType]->GetPosition(alphaValuePos);
+    CVector2D alphaValueSize;
+    m_pChatAlphaValue[eType]->GetSize(alphaValueSize);
+    fMarginX = alphaValuePos.fX + alphaValueSize.fX + 30.0f;
     }
 
     //

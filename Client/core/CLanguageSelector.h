@@ -30,7 +30,6 @@ public:
     CLanguageSelector(CGUIElement* pMainMenuCanvas);
     ~CLanguageSelector();
     void DoPulse();
-    bool ConsumePendingLocale(SString& outLocale);
 
 protected:
     void           CreateGUI(CGUIElement* pMainMenuCanvas);
@@ -52,5 +51,4 @@ protected:
     CTickCount                 m_LastTickCount;
     bool                       m_bMouseOverButton;
     bool                       m_bListWasVisible;
-    SString                    m_strPendingLocale;
 };
