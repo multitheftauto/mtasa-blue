@@ -3158,7 +3158,17 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     int secureBootStatus = 0;
     const SString secureBootValue =
         GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled", &secureBootStatus);
-    const bool bSecureBootEnabled = (secureBootStatus > 0) ? (secureBootValue.ToInt() != 0) : false;
+    bool bSecureBootEnabled = false;
+    if (secureBootStatus > 0)
+    {
+        // Parse the registry value into a numeric flag
+        char* secureBootEnd = nullptr;
+        const long secureBootNumeric = strtol(secureBootValue.c_str(), &secureBootEnd, 10);
+        if (secureBootEnd != secureBootValue.c_str() && *secureBootEnd == '\0')
+        {
+            bSecureBootEnabled = secureBootNumeric != 0;
+        }
+    }
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);
