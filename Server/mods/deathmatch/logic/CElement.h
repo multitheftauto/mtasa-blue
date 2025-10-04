@@ -145,9 +145,9 @@ public:
     bool           GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const CStringName& name, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData);
-    void           SetCustomData(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
+    bool           SetCustomData(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
                                  bool bTriggerEvent = true);
-    void           DeleteCustomData(const CStringName& name);
+    bool           DeleteCustomData(const CStringName& name);
     void           SendAllCustomData(CPlayer* pPlayer);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
