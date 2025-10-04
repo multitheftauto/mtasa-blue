@@ -3155,8 +3155,10 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
         iReqKB3035131 = IsHotFixInstalled("KB3035131") ? 0 : 1;
     }
 
-    bool bSecureBootEnabled =
-        (GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled") == "\x01");
+    int secureBootStatus = 0;
+    const SString secureBootValue =
+        GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled", &secureBootStatus);
+    const bool bSecureBootEnabled = (secureBootStatus > 0) ? (secureBootValue.ToInt() != 0) : false;
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);
