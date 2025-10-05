@@ -11,6 +11,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <SharedUtil.Misc.h>
 #include <game/CGame.h>
 #include <game/CPools.h>
 #include <game/CRenderWare.h>
@@ -903,11 +904,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     if (hDll != nullptr)
     {
         // Grab the MiniDumpWriteDump proc address
-        auto pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(hDll, "MiniDumpWriteDump"));
-        if (pDump == nullptr)
-            AddReportLog(9202, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump");
-
-        if (pDump != nullptr)
+        if (MINIDUMPWRITEDUMP pDump = nullptr; SharedUtil::TryGetProcAddress(hDll, "MiniDumpWriteDump", pDump))
         {
             // Create the file
             HANDLE hFile = CreateFileA(CalcMTASAPath("mta\\core.dmp"), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -1089,6 +1086,10 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                     }
                 }
             }
+        }
+        else
+        {
+            AddReportLog(9202, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump");
         }
 
         // Free the DLL again

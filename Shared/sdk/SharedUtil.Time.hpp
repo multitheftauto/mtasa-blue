@@ -341,7 +341,6 @@ TIMEUS SharedUtil::GetTimeUs()
 }
 #else
 #include <sys/time.h>                // for gettimeofday()
-using namespace std;
 typedef long long LONGLONG;
 
 TIMEUS SharedUtil::GetTimeUs()

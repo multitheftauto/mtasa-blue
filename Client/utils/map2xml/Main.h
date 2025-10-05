@@ -13,7 +13,6 @@
 
 #include "CConfig.h"
 #include <cstdio>
-using namespace std;
 
 int  main(int iArgumentCount, char* szArgs[]);
 int  Convert(CConfig* pInput, FILE* pOutput);
