@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-05 14:21+0000\n"
-"PO-Revision-Date: 2025-10-05 14:21\n"
+"PO-Revision-Date: 2025-10-05 15:21\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2468,7 +2468,7 @@ msgstr "(Rezervă a listei de servere)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:351
 msgid "Cannot create LAN-broadcast socket"
-msgstr ""
+msgstr "Nu se poate crea socket-ul LAN-broadcast"
 
 #: Client/core/ServerBrowser/CServerList.cpp:361
 msgid "Cannot bind LAN-broadcast socket"
