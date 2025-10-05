@@ -12,15 +12,8 @@
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Time.h"
 #include <cstdint>
-#include <algorithm>
-#include <array>
-#include <cstring>
-#include <string>
 #include <limits>
 #include <map>
-#include <vector>
-#include <memory>
-#include <type_traits>
 
 #if defined(_WIN32) || defined(WIN32)
     #define SHAREDUTIL_PLATFORM_WINDOWS 1
@@ -44,9 +37,6 @@
 #include "CDuplicateLineFilter.h"
 #include "version.h"
 #if defined(SHAREDUTIL_PLATFORM_WINDOWS)
-    #ifndef NOMINMAX
-        #define NOMINMAX
-    #endif
     #include <windows.h>
     #include <ctime>
     #include <direct.h>
@@ -93,12 +83,6 @@ struct SReportLine
     bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
-
-struct HKeyDeleter
-{
-    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
-};
-using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
 
 #ifdef MTA_CLIENT
 
@@ -352,329 +336,35 @@ static void WriteRegistryStringValue(HKEY hkRoot, const char* szSubKey, const ch
 //
 // Read a registry string value
 //
-namespace
-{
-    constexpr DWORD kMaxRegistryValueBytes = 1024 * 1024; // Cap to avoid runaway allocations
-    constexpr DWORD kMinStringAlloc = sizeof(wchar_t);
-    constexpr DWORD kMinBinaryAlloc = static_cast<DWORD>(sizeof(unsigned long long));
-
-    bool ComputeNextAllocation(DWORD current, DWORD requested, DWORD minimum, DWORD& outNext)
-    {
-        const ULONGLONG requestedSize = requested != 0 ? static_cast<ULONGLONG>(requested) : static_cast<ULONGLONG>(current) * 2ULL;
-        const ULONGLONG adjusted = std::max<ULONGLONG>(requestedSize, static_cast<ULONGLONG>(minimum));
-        if (adjusted > kMaxRegistryValueBytes)
-            return false;
-        outNext = static_cast<DWORD>(adjusted);
-        return true;
-    }
-
-    size_t ComputeWideBufferCapacity(DWORD bytes)
-    {
-        const size_t rounded = static_cast<size_t>(bytes) + (sizeof(wchar_t) - 1u);
-        return (rounded / sizeof(wchar_t)) + 1u; // +1 for null terminator
-    }
-
-    WString CollapseMultiSz(const wchar_t* data, size_t wcharCount)
-    {
-        const wchar_t* current = data;
-        const wchar_t* end = current + wcharCount;
-        WString combined;
-        while (current < end && *current != L'\0')
-        {
-            if (!combined.empty())
-                combined.push_back(L'\n');
-            const wchar_t* segmentEnd = current;
-            while (segmentEnd < end && *segmentEnd != L'\0')
-                ++segmentEnd;
-            combined.append(current, static_cast<size_t>(segmentEnd - current));
-            current = segmentEnd;
-            if (current >= end)
-                break;
-            ++current;
-        }
-        return combined;
-    }
-
-    SString ExpandEnvironmentToUtf8(const wchar_t* raw)
-    {
-        const DWORD expandedChars = ExpandEnvironmentStringsW(raw, NULL, 0);
-        const DWORD maxExpandChars = kMaxRegistryValueBytes / sizeof(wchar_t);
-        if (expandedChars > 0 && expandedChars <= maxExpandChars)
-        {
-            std::vector<wchar_t> expanded(expandedChars, L'\0');
-            if (ExpandEnvironmentStringsW(raw, expanded.data(), expandedChars))
-            {
-                WString expandedString;
-                expandedString.assign(expanded.data());
-                return ToUTF8(expandedString);
-            }
-        }
-        WString fallback;
-        fallback.assign(raw);
-        return ToUTF8(fallback);
-    }
-
-    SString BinaryBufferToHex(const unsigned char* data, DWORD size)
-    {
-        if (size == 0)
-            return SString();
-
-        static const char hexDigits[] = "0123456789ABCDEF";
-        std::string hex;
-        hex.reserve(static_cast<size_t>(size) * 2u);
-        for (DWORD i = 0; i < size; ++i)
-        {
-            const unsigned char byte = data[i];
-            hex.push_back(hexDigits[(byte >> 4) & 0x0F]);
-            hex.push_back(hexDigits[byte & 0x0F]);
-        }
-        SString result;
-        result = hex.c_str();
-        return result;
-    }
-
-    bool TryReadStringValue(HKEY key, const wchar_t* valueName, DWORD& dwType, DWORD initialSize, SString& outValue, int& status)
-    {
-        DWORD allocSize = std::max<DWORD>(initialSize, kMinStringAlloc);
-        std::vector<wchar_t> buffer(ComputeWideBufferCapacity(allocSize), L'\0');
-
-        while (true)
-        {
-            DWORD dwTempSize = allocSize;
-            LONG  readResult = RegQueryValueExW(key, valueName, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwTempSize);
-
-            if (readResult == ERROR_MORE_DATA)
-            {
-                if (dwTempSize > kMaxRegistryValueBytes)
-                {
-                    status = -static_cast<int>(ERROR_MORE_DATA);
-                    return false;
-                }
-
-                DWORD newSize = 0;
-                if (!ComputeNextAllocation(allocSize, dwTempSize, kMinStringAlloc, newSize))
-                {
-                    status = -static_cast<int>(ERROR_MORE_DATA);
-                    return false;
-                }
-
-                allocSize = newSize;
-                buffer.assign(ComputeWideBufferCapacity(allocSize), L'\0');
-                continue;
-            }
-
-            if (readResult != ERROR_SUCCESS)
-            {
-                status = -static_cast<int>(readResult);
-                return false;
-            }
-
-            size_t wcharCount = static_cast<size_t>(dwTempSize) / sizeof(wchar_t);
-            if (wcharCount >= buffer.size())
-                wcharCount = buffer.size() - 1u;
-            buffer[wcharCount] = L'\0';
-
-            if (dwType == REG_MULTI_SZ)
-            {
-                outValue = ToUTF8(CollapseMultiSz(buffer.data(), wcharCount));
-            }
-            else if (dwType == REG_EXPAND_SZ)
-            {
-                outValue = ExpandEnvironmentToUtf8(buffer.data());
-            }
-            else
-            {
-                WString direct;
-                direct.assign(buffer.data());
-                outValue = ToUTF8(direct);
-            }
-
-            status = 1;
-            return true;
-        }
-    }
-
-    bool TryReadBinaryValue(HKEY key, const wchar_t* valueName, DWORD& dwType, DWORD initialSize, SString& outValue, int& status)
-    {
-        DWORD allocSize = std::max<DWORD>(initialSize, kMinBinaryAlloc);
-        std::vector<unsigned char> buffer(static_cast<size_t>(allocSize), 0u);
-
-        while (true)
-        {
-            DWORD dwTempSize = allocSize;
-            LONG  readResult = RegQueryValueExW(key, valueName, NULL, &dwType, buffer.data(), &dwTempSize);
-
-            if (readResult == ERROR_MORE_DATA)
-            {
-                if (dwTempSize > kMaxRegistryValueBytes)
-                {
-                    status = -static_cast<int>(ERROR_MORE_DATA);
-                    return false;
-                }
-
-                DWORD newSize = 0;
-                if (!ComputeNextAllocation(allocSize, dwTempSize, kMinBinaryAlloc, newSize))
-                {
-                    status = -static_cast<int>(ERROR_MORE_DATA);
-                    return false;
-                }
-
-                allocSize = newSize;
-                buffer.assign(static_cast<size_t>(allocSize), 0u);
-                continue;
-            }
-
-            if (readResult != ERROR_SUCCESS)
-            {
-                status = -static_cast<int>(readResult);
-                return false;
-            }
-
-            switch (dwType)
-            {
-                case REG_DWORD:
-                {
-                    DWORD value = 0;
-                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, sizeof(DWORD));
-                    for (DWORD i = 0; i < copyBytes; ++i)
-                        value |= static_cast<DWORD>(buffer[i]) << (8u * i);
-                    outValue.Format("%lu", static_cast<unsigned long>(value));
-                    break;
-                }
-                case REG_DWORD_BIG_ENDIAN:
-                {
-                    DWORD value = 0;
-                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, sizeof(DWORD));
-                    for (DWORD i = 0; i < copyBytes; ++i)
-                    {
-                        value <<= 8;
-                        value |= buffer[i];
-                    }
-                    outValue.Format("%lu", static_cast<unsigned long>(value));
-                    break;
-                }
-                case REG_QWORD:
-                {
-                    unsigned long long value = 0ull;
-                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, static_cast<DWORD>(sizeof(value)));
-                    for (DWORD i = 0; i < copyBytes; ++i)
-                        value |= static_cast<unsigned long long>(buffer[i]) << (8ull * i);
-                    outValue.Format("%llu", static_cast<unsigned long long>(value));
-                    break;
-                }
-                case REG_BINARY:
-                case REG_LINK:
-                case REG_RESOURCE_LIST:
-                case REG_FULL_RESOURCE_DESCRIPTOR:
-                case REG_RESOURCE_REQUIREMENTS_LIST:
-                case REG_NONE:
-                default:
-                {
-                    outValue = BinaryBufferToHex(buffer.data(), dwTempSize);
-                    break;
-                }
-            }
-
-            status = 1;
-            return true;
-        }
-    }
-
-    bool PopulateValueFromKey(HKEY key, const wchar_t* valueName, int& status, SString& outValue)
-    {
-        DWORD dwType = REG_NONE;
-        DWORD dwBufferSize = 0;
-        LONG  queryResult = RegQueryValueExW(key, valueName, NULL, &dwType, NULL, &dwBufferSize);
-
-        if (queryResult != ERROR_SUCCESS && queryResult != ERROR_MORE_DATA)
-        {
-            status = -static_cast<int>(queryResult);
-            return false;
-        }
-
-        if (dwBufferSize > kMaxRegistryValueBytes)
-        {
-            status = -static_cast<int>(ERROR_MORE_DATA);
-            return false;
-        }
-
-        int localStatus = 0;
-        const bool isStringType = (dwType == REG_SZ || dwType == REG_EXPAND_SZ || dwType == REG_MULTI_SZ);
-        const bool success = isStringType
-                                 ? TryReadStringValue(key, valueName, dwType, dwBufferSize, outValue, localStatus)
-                                 : TryReadBinaryValue(key, valueName, dwType, dwBufferSize, outValue, localStatus);
-
-        if (localStatus != 0)
-            status = localStatus;
-
-        return success;
-    }
-}
-
 static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
 {
-    SString strOutResult;
-    int     status = 0;
-    bool    success = false;
+    // Clear output
+    SString strOutResult = "";
 
-    const char* szSafeSubKey = szSubKey ? szSubKey : "";
-    const char* szSafeValue = szValue ? szValue : "";
-
-    WString       wstrSubKey;
-    const wchar_t* pSubKey = L"";
-    if (szSafeSubKey[0] != '\0')
+    bool    bResult = false;
+    HKEY    hkTemp = NULL;
+    WString wstrSubKey = FromUTF8(szSubKey);
+    WString wstrValue = FromUTF8(szValue);
+    if (RegOpenKeyExW(hkRoot, wstrSubKey, 0, KEY_READ, &hkTemp) == ERROR_SUCCESS)
     {
-        wstrSubKey = FromUTF8(szSafeSubKey);
-        pSubKey = wstrSubKey.c_str();
-    }
-
-    static constexpr wchar_t kDefaultValueName[] = L"";
-    WString                  wstrValue;
-    const wchar_t*           pValueName = kDefaultValueName;
-    if (szSafeValue[0] != '\0')
-    {
-        wstrValue = FromUTF8(szSafeValue);
-        pValueName = wstrValue.c_str();
-    }
-
-    constexpr size_t kAccessMaskSlots = 3u;
-    std::array<REGSAM, kAccessMaskSlots> accessMasks{};
-    size_t maskCount = 0;
-#ifdef KEY_WOW64_64KEY
-    accessMasks[maskCount++] = KEY_READ | KEY_WOW64_64KEY;
-#endif
-#ifdef KEY_WOW64_32KEY
-    accessMasks[maskCount++] = KEY_READ | KEY_WOW64_32KEY;
-#endif
-    accessMasks[maskCount++] = KEY_READ;
-
-    using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, decltype(&RegCloseKey)>;
-
-    for (size_t maskIndex = 0; maskIndex < maskCount && !success; ++maskIndex)
-    {
-        HKEY hkTemp = nullptr;
-        const LONG openResult = RegOpenKeyExW(hkRoot, pSubKey, 0, accessMasks[maskIndex], &hkTemp);
-        if (openResult != ERROR_SUCCESS)
+        DWORD dwBufferSize;
+        if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS)
         {
-            status = -static_cast<int>(openResult);
-            continue;
-        }
 
-        UniqueHKey keyGuard(hkTemp, &RegCloseKey);
-
-        if (PopulateValueFromKey(hkTemp, pValueName, status, strOutResult))
-        {
-            success = true;
-            break;
+            CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
+            if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
+            {
+                // Ensure null termination - dwBufferSize is in bytes, convert to wchar_t units
+                size_t wcharCount = dwBufferSize / sizeof(wchar_t);
+                szBuffer[wcharCount] = 0;
+                strOutResult = ToUTF8((wchar_t*)szBuffer);
+                bResult = true;
+            }
         }
+        RegCloseKey(hkTemp);
     }
-
     if (iResult)
-        *iResult = status;
-
-    if (!success)
-        strOutResult.clear();
-
+        *iResult = bResult;
     return strOutResult;
 }
 
@@ -697,9 +387,9 @@ SString SharedUtil::GetMajorVersionString()
 //
 // GetSystemRegistryValue
 //
-SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
+SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName)
 {
-    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, iResult);
+    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, NULL);
 }
 
 //
@@ -723,9 +413,9 @@ void SharedUtil::SetRegistryValue(const SString& strPath, const SString& strName
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, strValue, bFlush);
 }
 
-SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
+SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, iResult);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, NULL);
 }
 
 bool SharedUtil::RemoveRegistryKey(const SString& strPath)
@@ -739,9 +429,9 @@ void SharedUtil::SetVersionRegistryValue(const SString& strVersion, const SStrin
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, strValue);
 }
 
-SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
+SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, iResult);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, NULL);
 }
 
 // Get/set registry values for all versions (common)
@@ -750,9 +440,9 @@ void SharedUtil::SetCommonRegistryValue(const SString& strPath, const SString& s
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, strValue);
 }
 
-SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
+SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, iResult);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, NULL);
 }
 
 //

@@ -62,20 +62,20 @@ namespace SharedUtil
     SString GetMajorVersionString();
 
     // Get a system registry value
-    SString GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName, int* iResult = nullptr);
+    SString GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName);
 
     // Get/set registry values for the current version
     void    SetRegistryValue(const SString& strPath, const SString& strName, const SString& strValue, bool bFlush = false);
-    SString GetRegistryValue(const SString& strPath, const SString& strName, int* iResult = nullptr);
+    SString GetRegistryValue(const SString& strPath, const SString& strName);
     bool    RemoveRegistryKey(const SString& strPath);
 
     // Get/set registry values for a particular version
     void    SetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue);
-    SString GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, int* iResult = nullptr);
+    SString GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName);
 
     // Get/set registry values for all versions (Common)
     void    SetCommonRegistryValue(const SString& strPath, const SString& strName, const SString& strValue);
-    SString GetCommonRegistryValue(const SString& strPath, const SString& strName, int* iResult = nullptr);
+    SString GetCommonRegistryValue(const SString& strPath, const SString& strName);
 
     bool ShellExecuteBlocking(const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "",
                               int nShowCmd = 1);
