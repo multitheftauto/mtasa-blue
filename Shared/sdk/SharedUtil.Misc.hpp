@@ -653,8 +653,6 @@ static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const 
 #endif
     accessMasks[maskCount++] = KEY_READ;
 
-    using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, decltype(&RegCloseKey)>;
-
     for (size_t maskIndex = 0; maskIndex < maskCount && !success; ++maskIndex)
     {
         HKEY hkTemp = nullptr;
@@ -665,7 +663,7 @@ static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const 
             continue;
         }
 
-        UniqueHKey keyGuard(hkTemp, &RegCloseKey);
+        UniqueHKey keyGuard(hkTemp);
 
         if (PopulateValueFromKey(hkTemp, pValueName, status, strOutResult))
         {
