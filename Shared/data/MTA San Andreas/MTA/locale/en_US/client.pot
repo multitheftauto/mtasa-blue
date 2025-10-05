@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-05 11:53+0000\n"
+"POT-Creation-Date: 2025-10-05 14:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2526,11 +2526,15 @@ msgstr ""
 msgid "(Backup server list)"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerList.cpp:352
+#: Client/core/ServerBrowser/CServerList.cpp:351
+msgid "Cannot create LAN-broadcast socket"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:361
 msgid "Cannot bind LAN-broadcast socket"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerList.cpp:395
+#: Client/core/ServerBrowser/CServerList.cpp:404
 msgid "Attempting to discover LAN servers"
 msgstr ""
 
