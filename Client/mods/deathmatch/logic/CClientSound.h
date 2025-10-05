@@ -13,6 +13,9 @@ class CBassAudio;
 
 #pragma once
 
+#include <cstdlib>
+#include <memory>
+#include <new>
 #include "CClientSoundManager.h"
 #include "CClientEntity.h"
 #include "CSimulatedPlayPosition.h"
@@ -104,6 +107,37 @@ protected:
     void Destroy();
 
 private:
+    struct AudioBufferDeleter
+    {
+        using DeleterFn = void (*)(void*) noexcept;
+
+        AudioBufferDeleter() noexcept = default;
+        explicit AudioBufferDeleter(DeleterFn fn) noexcept { Set(fn); }
+
+        void operator()(void* ptr) const noexcept
+        {
+            if (ptr)
+                m_Deleter(ptr);
+        }
+
+        void Set(DeleterFn fn) noexcept { m_Deleter = fn ? fn : &DeleteArrayImpl; }
+
+        static AudioBufferDeleter ForNewArray() noexcept { return AudioBufferDeleter(&DeleteArrayImpl); }
+        static AudioBufferDeleter ForMalloc() noexcept { return AudioBufferDeleter(&FreeImpl); }
+        static AudioBufferDeleter ForExternalReference() noexcept { return AudioBufferDeleter(&NoopImpl); }
+
+    private:
+        static void DeleteArrayImpl(void* ptr) noexcept { ::operator delete[](ptr); }
+        static void FreeImpl(void* ptr) noexcept { std::free(ptr); }
+        static void NoopImpl(void*) noexcept {}
+
+        DeleterFn m_Deleter = &DeleteArrayImpl;
+    };
+    using BufferPtr = std::unique_ptr<void, AudioBufferDeleter>;
+
+    void ReleaseBuffer();
+    void AdoptBuffer(void* pMemory, unsigned int uiLength, AudioBufferDeleter deleter = {});
+
     CClientSoundManager*   m_pSoundManager;
     CSimulatedPlayPosition m_SimulatedPlayPosition;
     CBassAudio*            m_pAudio;
@@ -114,7 +148,7 @@ private:
     SString      m_strPath;
     bool         m_bLoop;
     bool         m_bThrottle;
-    void*        m_pBuffer;
+    BufferPtr    m_Buffer;
     unsigned int m_uiBufferLength;
 
     // Info
