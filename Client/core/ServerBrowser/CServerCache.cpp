@@ -220,7 +220,14 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         {
             ms_bIsSaving = true;
             SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
-            ResumeThread(hThread);
+
+            if (ResumeThread(hThread) == static_cast<DWORD>(-1))
+            {
+                CCore::GetSingleton().GetConsole()->Printf("Could not start server cache thread.");
+                ms_bIsSaving = false;
+            }
+
+            CloseHandle(hThread);
         }
     }
 

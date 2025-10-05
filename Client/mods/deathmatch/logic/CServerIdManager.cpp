@@ -197,7 +197,13 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
     {
         ms_bIsSaving = true;
         SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
-        ResumeThread(hThread);
+        if (ResumeThread(hThread) == static_cast<DWORD>(-1))
+        {
+            g_pCore->GetConsole()->Printf("Could not start server-ids save thread.");
+            ms_bIsSaving = false;
+        }
+
+        CloseHandle(hThread);
     }
 
     // Wait for save to complete if required
