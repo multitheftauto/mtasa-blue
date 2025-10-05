@@ -65,6 +65,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) :
     m_pSAGothicFont(nullptr),
     m_pSansFont(nullptr),
     m_pUniFont(nullptr),
+    m_nextRedrawHandle(1),
     m_ulPreviousUnique(0),
     m_eInputMode(INPUTMODE_NO_BINDS_ON_EDIT),
     m_Channel(INPUT_CORE)
@@ -227,10 +228,12 @@ void CGUI_Impl::Draw()
     // Redraw the changed elements
     if (!m_RedrawQueue.empty())
     {
-        list<CGUIElement*>::const_iterator iter = m_RedrawQueue.begin();
-        for (; iter != m_RedrawQueue.end(); iter++)
+        for (const auto handle : m_RedrawQueue)
         {
-            (*iter)->ForceRedraw();
+            if (CGUIElement* pElement = ResolveRedrawHandle(handle))
+            {
+                pElement->ForceRedraw();
+            }
         }
         m_RedrawQueue.clear();
     }
@@ -1458,34 +1461,92 @@ bool CGUI_Impl::Event_FocusLost(const CEGUI::EventArgs& Args)
 
 void CGUI_Impl::AddToRedrawQueue(CGUIElement* pWindow)
 {
+    auto* pImpl = dynamic_cast<CGUIElement_Impl*>(pWindow);
+    if (!pImpl)
+        return;
+
+    const std::uint32_t handle = pImpl->GetRedrawHandle();
+    if (handle == kInvalidRedrawHandle)
+        return;
+
     // Manage the redraw queue, if we redraw the parent of the window passed,
     // we should not add it to the redraw queue, and if the children are queued,
     // remove them.
-    list<CGUIElement*>::const_iterator iter = m_RedrawQueue.begin();
-    for (; iter != m_RedrawQueue.end(); iter++)
+    for (auto iter = m_RedrawQueue.begin(); iter != m_RedrawQueue.end(); )
     {
-        if (pWindow->GetParent() == *iter)
+        CGUIElement* pQueued = ResolveRedrawHandle(*iter);
+        if (!pQueued)
+        {
+            iter = m_RedrawQueue.erase(iter);
+            continue;
+        }
+
+        if (pWindow->GetParent() == pQueued)
         {
             return;
         }
-        else if ((*iter)->GetParent() == pWindow)
+        if (pQueued->GetParent() == pWindow)
         {
-            m_RedrawQueue.remove(*iter);
-            if (m_RedrawQueue.empty())
-                return;
-            iter = m_RedrawQueue.begin();
+            iter = m_RedrawQueue.erase(iter);
+            continue;
         }
-        else if (*iter == pWindow)
+        if (pQueued == pWindow)
         {
             return;
         }
+
+        ++iter;
     }
-    m_RedrawQueue.push_back(pWindow);
+    m_RedrawQueue.push_back(handle);
 }
 
 void CGUI_Impl::RemoveFromRedrawQueue(CGUIElement* pWindow)
 {
-    m_RedrawQueue.remove(pWindow);
+    auto* pImpl = dynamic_cast<CGUIElement_Impl*>(pWindow);
+    if (!pImpl)
+        return;
+
+    const std::uint32_t handle = pImpl->GetRedrawHandle();
+    if (handle == kInvalidRedrawHandle)
+        return;
+
+    m_RedrawQueue.remove(handle);
+}
+
+std::uint32_t CGUI_Impl::RegisterRedrawHandle(CGUIElement_Impl* pElement)
+{
+    if (!pElement)
+        return kInvalidRedrawHandle;
+
+    std::uint32_t handle = kInvalidRedrawHandle;
+    do
+    {
+        handle = m_nextRedrawHandle++;
+    } while (handle == kInvalidRedrawHandle || m_RedrawRegistry.count(handle) != 0);
+
+    m_RedrawRegistry[handle] = pElement;
+    return handle;
+}
+
+void CGUI_Impl::ReleaseRedrawHandle(std::uint32_t handle)
+{
+    if (handle == kInvalidRedrawHandle)
+        return;
+
+    m_RedrawRegistry.erase(handle);
+    m_RedrawQueue.remove(handle);
+}
+
+CGUIElement* CGUI_Impl::ResolveRedrawHandle(std::uint32_t handle) const
+{
+    if (handle == kInvalidRedrawHandle)
+        return nullptr;
+
+    auto iter = m_RedrawRegistry.find(handle);
+    if (iter == m_RedrawRegistry.end())
+        return nullptr;
+
+    return iter->second;
 }
 
 CGUIButton* CGUI_Impl::CreateButton(CGUIElement* pParent, const char* szCaption)

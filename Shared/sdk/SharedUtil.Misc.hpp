@@ -54,6 +54,15 @@
     #include <shellapi.h>
     #include <TlHelp32.h>
     #include <Psapi.h>
+    #ifdef GetModuleBaseName
+        #undef GetModuleBaseName
+    #endif
+    #ifdef GetModuleBaseNameA
+        #undef GetModuleBaseNameA
+    #endif
+    #ifdef GetModuleBaseNameW
+        #undef GetModuleBaseNameW
+    #endif
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
@@ -89,6 +98,12 @@ struct SReportLine
     bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
+
+struct HKeyDeleter
+{
+    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
+};
+using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
 
 #ifdef MTA_CLIENT
 
@@ -638,8 +653,6 @@ static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const 
 #endif
     accessMasks[maskCount++] = KEY_READ;
 
-    using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, decltype(&RegCloseKey)>;
-
     for (size_t maskIndex = 0; maskIndex < maskCount && !success; ++maskIndex)
     {
         HKEY hkTemp = nullptr;
@@ -650,7 +663,7 @@ static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const 
             continue;
         }
 
-        UniqueHKey keyGuard(hkTemp, &RegCloseKey);
+        UniqueHKey keyGuard(hkTemp);
 
         if (PopulateValueFromKey(hkTemp, pValueName, status, strOutResult))
         {
