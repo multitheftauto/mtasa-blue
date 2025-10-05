@@ -14,6 +14,9 @@
 #include <cstdint>
 #include <limits>
 #include <map>
+#include <exception>
+#include <mutex>
+#include <utility>
 
 #if defined(_WIN32) || defined(WIN32)
     #define SHAREDUTIL_PLATFORM_WINDOWS 1
@@ -36,6 +39,18 @@
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
 #include "version.h"
+namespace SharedUtil::Details
+{
+    constexpr size_t kMaxClipboardBytes = 100u * 1024u * 1024u;
+    constexpr size_t kMaxClipboardChars = kMaxClipboardBytes / sizeof(wchar_t);
+
+    inline std::mutex& ClipboardMutex() noexcept
+    {
+        static std::mutex mutex;
+        return mutex;
+    }
+}
+
 #if defined(SHAREDUTIL_PLATFORM_WINDOWS)
     #include <windows.h>
     #include <ctime>
@@ -52,6 +67,45 @@
     #ifdef GetModuleBaseNameW
         #undef GetModuleBaseNameW
     #endif
+
+namespace SharedUtil::Details
+{
+    class UniqueHGlobal
+    {
+    public:
+        UniqueHGlobal() noexcept = default;
+        explicit UniqueHGlobal(HGLOBAL value) noexcept : m_handle(value) {}
+        ~UniqueHGlobal() { reset(); }
+
+        UniqueHGlobal(const UniqueHGlobal&) = delete;
+        UniqueHGlobal& operator=(const UniqueHGlobal&) = delete;
+
+        UniqueHGlobal(UniqueHGlobal&& other) noexcept : m_handle(other.release()) {}
+
+        UniqueHGlobal& operator=(UniqueHGlobal&& other) noexcept
+        {
+            if (this != &other)
+                reset(other.release());
+            return *this;
+        }
+
+        void reset(HGLOBAL value = nullptr) noexcept
+        {
+            if (m_handle)
+                GlobalFree(m_handle);
+            m_handle = value;
+        }
+
+        [[nodiscard]] HGLOBAL get() const noexcept { return m_handle; }
+
+        [[nodiscard]] HGLOBAL release() noexcept { return std::exchange(m_handle, nullptr); }
+
+        [[nodiscard]] explicit operator bool() const noexcept { return m_handle != nullptr; }
+
+    private:
+        HGLOBAL m_handle = nullptr;
+    };
+}
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
@@ -767,51 +821,138 @@ const SString& SharedUtil::GetProductVersion()
 
 void SharedUtil::SetClipboardText(const SString& strText)
 {
-    // If we got something to copy
-    if (!strText.empty())
+    if (strText.empty())
+        return;
+
+    std::lock_guard<std::mutex> clipboardGuard(Details::ClipboardMutex());
+
+    WString wideText;
+    try
     {
-        // Convert it to Unicode
-        WString strUTF = MbUTF8ToUTF16(strText);
+        wideText = MbUTF8ToUTF16(strText);
+    }
+    catch (const std::exception&)
+    {
+        return;
+    }
+    catch (...)
+    {
+        return;
+    }
 
-        // Open and empty the clipboard
-        OpenClipboard(NULL);
-        EmptyClipboard();
+    if (!OpenClipboard(nullptr))
+        return;
 
-        // Allocate the clipboard buffer and copy the data
-        HGLOBAL  hBuf = GlobalAlloc(GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t));
-        wchar_t* buf = reinterpret_cast<wchar_t*>(GlobalLock(hBuf));
-        wcscpy(buf, strUTF);
-        GlobalUnlock(hBuf);
+    struct ClipboardCloser
+    {
+        ~ClipboardCloser() { CloseClipboard(); }
+    } clipboardCloser;
 
-        // Copy the data into the clipboard
-        SetClipboardData(CF_UNICODETEXT, hBuf);
+    if (!EmptyClipboard())
+        return;
 
-        // Close the clipboard
-        CloseClipboard();
+    const size_t length = wideText.length();
+    if (length > (std::numeric_limits<size_t>::max() / sizeof(wchar_t)) - 1)
+        return;
+
+    const size_t charCount = length + 1u;
+    if (charCount > Details::kMaxClipboardChars)
+        return;
+
+    const size_t totalBytes = charCount * sizeof(wchar_t);
+
+    Details::UniqueHGlobal clipboardMemory(GlobalAlloc(GMEM_MOVEABLE, totalBytes));
+    if (!clipboardMemory)
+        return;
+
+    void* rawBuffer = GlobalLock(clipboardMemory.get());
+    if (!rawBuffer)
+        return;
+
+    auto lockGuard = SharedUtil::MakeGlobalUnlockGuard(static_cast<WinHGlobalHandle>(clipboardMemory.get()));
+
+    auto* buffer = static_cast<wchar_t*>(rawBuffer);
+    std::copy_n(wideText.c_str(), charCount, buffer);
+
+    if (!lockGuard.UnlockChecked())
+        return;
+
+    if (const HANDLE placedHandle = SetClipboardData(CF_UNICODETEXT, clipboardMemory.get()))
+    {
+        static_cast<void>(clipboardMemory.release());
     }
 }
 
 SString SharedUtil::GetClipboardText()
 {
-    SString data;
+    SString result;
 
-    if (OpenClipboard(NULL))
+    std::lock_guard<std::mutex> clipboardGuard(Details::ClipboardMutex());
+
+    if (!OpenClipboard(nullptr))
+        return result;
+
+    struct ClipboardCloser
     {
-        // Get the clipboard's data
-        HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
-        if (clipboardData)  // Check if handle is valid
+        ~ClipboardCloser() { CloseClipboard(); }
+    } clipboardCloser;
+
+    if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
+        return result;
+
+    if (const HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT); clipboardData)
+    {
+        void* rawData = GlobalLock(clipboardData);
+        if (!rawData)
+            return result;
+
+        auto lockGuard = SharedUtil::MakeGlobalUnlockGuard(static_cast<WinHGlobalHandle>(clipboardData));
+
+        const SIZE_T rawSizeBytes = GlobalSize(static_cast<HGLOBAL>(clipboardData));
+        if (rawSizeBytes == 0)
+            return result;
+
+        if (rawSizeBytes > Details::kMaxClipboardBytes)
         {
-            void* lockedData = GlobalLock(clipboardData);
-            if (lockedData)
-            {
-                data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
-                GlobalUnlock(clipboardData);
-            }
+            return result;
         }
-        CloseClipboard();
+
+        if ((rawSizeBytes % sizeof(wchar_t)) != 0)
+        {
+            return result;
+        }
+
+        const size_t wcharCount = static_cast<size_t>(rawSizeBytes / sizeof(wchar_t));
+        if (wcharCount == 0)
+            return result;
+
+        const auto* lockedData = static_cast<const wchar_t*>(rawData);
+        const auto* terminator = std::find(lockedData, lockedData + wcharCount, L'\0');
+        if (terminator == lockedData + wcharCount)
+        {
+            return result;
+        }
+
+        try
+        {
+            result = UTF16ToMbUTF8(lockedData);
+        }
+        catch (const std::exception&)
+        {
+            result.clear();
+        }
+        catch (...)
+        {
+            result.clear();
+        }
+
+        if (!lockGuard.UnlockChecked())
+        {
+            // Unlock failure is non-fatal; retain gathered data
+        }
     }
 
-    return data;
+    return result;
 }
 
 //
