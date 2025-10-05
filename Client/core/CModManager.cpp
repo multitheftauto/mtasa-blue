@@ -56,39 +56,30 @@ bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLeng
 
 void CModManager::DoPulsePreFrame()
 {
-    TIMING_GRAPH("+DoPulsePreFrame");
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameStart();            // Prepare FPS limiting for this frame
-
     if (m_client)
     {
         m_client->PreFrameExecutionHandler();
     }
-    TIMING_GRAPH("-DoPulsePreFrame");
 }
 
 void CModManager::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets)
 {
-    TIMING_GRAPH("+DoPulsePreHUDRender");
     if (m_client)
     {
         m_client->PreHUDRenderExecutionHandler(bDidUnminimize, bDidRecreateRenderTargets);
     }
-    TIMING_GRAPH("-DoPulsePreHUDRender");
 }
 
 void CModManager::DoPulsePostFrame()
 {
-    auto handleStateChange = [&]()
+    if (m_state == State::PendingStart)
     {
-        if (m_state == State::PendingStart)
-            Start();
-        else if (m_state == State::PendingStop)
-            Stop();
-    };
-
-    TIMING_GRAPH("+DoPulsePostFrame");
-
-    handleStateChange();            // Handle state changes before pulse
+        Start();
+    }
+    else if (m_state == State::PendingStop)
+    {
+        Stop();
+    }
 
     if (m_client)
     {
@@ -99,15 +90,20 @@ void CModManager::DoPulsePostFrame()
         CCore::GetSingleton().GetNetwork()->DoPulse();
     }
 
-    CCore::GetSingleton().DoReliablePulse();            // Do reliable pulse
+    // Make sure frame rate limit gets applied
+    if (m_client != nullptr)
+        CCore::GetSingleton().EnsureFrameRateLimitApplied();            // Catch missed frames
+    else
+        CCore::GetSingleton().ApplyFrameRateLimit();            // Limit when not connected
 
-    handleStateChange();            // Handle state changes after pulse
-
-    // TODO: ENSURE "CModManager::DoPulsePostFrame" IS THE LAST THING BEFORE THE FRAME ENDS
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();            // Apply FPS limiting
-
-    TIMING_GRAPH("-DoPulsePostFrame");
-    TIMING_GRAPH("");
+    if (m_state == State::PendingStart)
+    {
+        Start();
+    }
+    else if (m_state == State::PendingStop)
+    {
+        Stop();
+    }
 }
 
 bool CModManager::Load(const char* arguments)
@@ -187,7 +183,7 @@ bool CModManager::TryStart()
         return false;
     }
 
-    using InitClientFn = CClientBase* (__cdecl*)();
+    using InitClientFn = CClientBase*(__cdecl*)();
     InitClientFn initClient = nullptr;
     if (!SharedUtil::TryGetProcAddress(library, "InitClient", initClient))
     {
@@ -288,4 +284,3 @@ void CModManager::TryStop()
     CLocalGUI::GetSingleton().GetMainMenu()->SetIsIngame(false);
     CLocalGUI::GetSingleton().GetMainMenu()->SetVisible(true, false);
 }
-
