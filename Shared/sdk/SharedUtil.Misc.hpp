@@ -99,6 +99,12 @@ struct SReportLine
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 
+struct HKeyDeleter
+{
+    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
+};
+using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
+
 #ifdef MTA_CLIENT
 
 #define PRODUCT_REGISTRY_PATH       "Software\\Multi Theft Auto: San Andreas All"       // HKLM
