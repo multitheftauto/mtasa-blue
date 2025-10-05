@@ -35,6 +35,7 @@ struct SReplacementTextures
     struct SPerTxd
     {
         std::vector<RwTexture*> usingTextures;
+        std::vector<RwTexture*> replacedOriginals;
         ushort                  usTxdId;
         bool                    bTexturesAreCopies;
     };
