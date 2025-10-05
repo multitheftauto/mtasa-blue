@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <SharedUtil.Misc.h>
 #include "CModManager.h"
 #define DECLARE_PROFILER_SECTION_CModManager
 #include "profiler/SharedUtil.Profiler.h"
@@ -55,30 +56,39 @@ bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLeng
 
 void CModManager::DoPulsePreFrame()
 {
+    TIMING_GRAPH("+DoPulsePreFrame");
+    CCore::GetSingleton().GetFPSLimiter()->OnFrameStart();            // Prepare FPS limiting for this frame
+
     if (m_client)
     {
         m_client->PreFrameExecutionHandler();
     }
+    TIMING_GRAPH("-DoPulsePreFrame");
 }
 
 void CModManager::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets)
 {
+    TIMING_GRAPH("+DoPulsePreHUDRender");
     if (m_client)
     {
         m_client->PreHUDRenderExecutionHandler(bDidUnminimize, bDidRecreateRenderTargets);
     }
+    TIMING_GRAPH("-DoPulsePreHUDRender");
 }
 
 void CModManager::DoPulsePostFrame()
 {
-    if (m_state == State::PendingStart)
+    auto handleStateChange = [&]()
     {
-        Start();
-    }
-    else if (m_state == State::PendingStop)
-    {
-        Stop();
-    }
+        if (m_state == State::PendingStart)
+            Start();
+        else if (m_state == State::PendingStop)
+            Stop();
+    };
+
+    TIMING_GRAPH("+DoPulsePostFrame");
+
+    handleStateChange();            // Handle state changes before pulse
 
     if (m_client)
     {
@@ -89,20 +99,15 @@ void CModManager::DoPulsePostFrame()
         CCore::GetSingleton().GetNetwork()->DoPulse();
     }
 
-    // Make sure frame rate limit gets applied
-    if (m_client != nullptr)
-        CCore::GetSingleton().EnsureFrameRateLimitApplied();            // Catch missed frames
-    else
-        CCore::GetSingleton().ApplyFrameRateLimit();            // Limit when not connected
+    CCore::GetSingleton().DoReliablePulse();            // Do reliable pulse
 
-    if (m_state == State::PendingStart)
-    {
-        Start();
-    }
-    else if (m_state == State::PendingStop)
-    {
-        Stop();
-    }
+    handleStateChange();            // Handle state changes after pulse
+
+    // TODO: ENSURE "CModManager::DoPulsePostFrame" IS THE LAST THING BEFORE THE FRAME ENDS
+    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();            // Apply FPS limiting
+
+    TIMING_GRAPH("-DoPulsePostFrame");
+    TIMING_GRAPH("");
 }
 
 bool CModManager::Load(const char* arguments)
@@ -182,16 +187,16 @@ bool CModManager::TryStart()
         return false;
     }
 
-    CClientBase*(__cdecl * InitClient)() = reinterpret_cast<decltype(InitClient)>(GetProcAddress(library, "InitClient"));
-
-    if (InitClient == nullptr)
+    using InitClientFn = CClientBase* (__cdecl*)();
+    InitClientFn initClient = nullptr;
+    if (!SharedUtil::TryGetProcAddress(library, "InitClient", initClient))
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to initialize deathmatch's DLL (missing init)");
         FreeLibrary(library);
         return false;
     }
 
-    CClientBase* client = InitClient();
+    CClientBase* client = initClient();
 
     if (client == nullptr || client->ClientInitialize(m_arguments.c_str(), CCore::GetSingletonPtr()) != 0)
     {
@@ -283,3 +288,4 @@ void CModManager::TryStop()
     CLocalGUI::GetSingleton().GetMainMenu()->SetIsIngame(false);
     CLocalGUI::GetSingleton().GetMainMenu()->SetVisible(true, false);
 }
+

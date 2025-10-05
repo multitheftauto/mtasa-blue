@@ -53,6 +53,15 @@
     #include <shellapi.h>
     #include <TlHelp32.h>
     #include <Psapi.h>
+    #ifdef GetModuleBaseName
+        #undef GetModuleBaseName
+    #endif
+    #ifdef GetModuleBaseNameA
+        #undef GetModuleBaseNameA
+    #endif
+    #ifdef GetModuleBaseNameW
+        #undef GetModuleBaseNameW
+    #endif
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
