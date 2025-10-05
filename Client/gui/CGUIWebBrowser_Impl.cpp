@@ -18,7 +18,7 @@ CGUIWebBrowser_Impl::CGUIWebBrowser_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
     m_pImageset = nullptr;
     m_pImage = nullptr;
     m_pGUI = pGUI;
-    m_pManager = pGUI;
+    SetManager(pGUI);
     m_pWebView = nullptr;
 
     // Get an unique identifier for CEGUI

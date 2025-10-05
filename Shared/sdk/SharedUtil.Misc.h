@@ -16,6 +16,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <type_traits>
 
 #include "SString.h"
 #include "WString.h"
@@ -53,6 +54,11 @@ struct HWND__;
     #ifndef _WINDOWS_
 typedef HWND__* HWND;
 typedef unsigned int UINT;
+        #ifndef HINSTANCE__
+struct HINSTANCE__;
+        #endif
+typedef HINSTANCE__* HINSTANCE;
+typedef HINSTANCE HMODULE;
     #endif
 #endif
 
@@ -61,23 +67,40 @@ namespace SharedUtil
     class CArgMap;
 #ifdef WIN32
 
+    namespace Details
+    {
+        inline void* GetProcAddressRaw(HMODULE hModule, const char* functionName) noexcept
+        {
+#ifdef _WINDOWS_
+            if (hModule != nullptr)
+            {
+                return reinterpret_cast<void*>(::GetProcAddress(hModule, functionName));
+            }
+#else
+            (void)hModule;
+            (void)functionName;
+#endif
+            return nullptr;
+        }
+    }
+
     SString GetMajorVersionString();
 
     // Get a system registry value
-    SString GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName);
+    SString GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName, int* iResult = nullptr);
 
     // Get/set registry values for the current version
     void    SetRegistryValue(const SString& strPath, const SString& strName, const SString& strValue, bool bFlush = false);
-    SString GetRegistryValue(const SString& strPath, const SString& strName);
+    SString GetRegistryValue(const SString& strPath, const SString& strName, int* iResult = nullptr);
     bool    RemoveRegistryKey(const SString& strPath);
 
     // Get/set registry values for a particular version
     void    SetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue);
-    SString GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName);
+    SString GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, int* iResult = nullptr);
 
     // Get/set registry values for all versions (Common)
     void    SetCommonRegistryValue(const SString& strPath, const SString& strName, const SString& strValue);
-    SString GetCommonRegistryValue(const SString& strPath, const SString& strName);
+    SString GetCommonRegistryValue(const SString& strPath, const SString& strName, int* iResult = nullptr);
 
     bool ShellExecuteBlocking(const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "",
                               int nShowCmd = 1);
@@ -109,6 +132,33 @@ namespace SharedUtil
 
     // Returns true if current process is GTA (i.e not MTA process)
     bool IsGTAProcess();
+
+    // Returns true if the pointer points to committed, readable memory
+    bool IsReadablePointer(const void* ptr, size_t size);
+
+    template <typename TFunction>
+    [[nodiscard]] inline bool TryGetProcAddress(HMODULE hModule, const char* functionName, TFunction& outExport) noexcept
+    {
+        static_assert(std::is_pointer_v<TFunction>, "TryGetProcAddress expects a pointer type");
+
+        void* address = nullptr;
+
+    #if defined(_WIN32)
+        address = Details::GetProcAddressRaw(hModule, functionName);
+    #else
+        (void)hModule;
+        (void)functionName;
+    #endif
+
+        if (address != nullptr)
+        {
+            outExport = reinterpret_cast<TFunction>(address);
+            return true;
+        }
+
+        outExport = nullptr;
+        return false;
+    }
 
     //
     // Run ShellExecute with these parameters after exit

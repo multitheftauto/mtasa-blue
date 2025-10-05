@@ -11,19 +11,58 @@
 
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Time.h"
+#include <cstdint>
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <string>
+#include <limits>
 #include <map>
+#include <vector>
+#include <memory>
+#include <type_traits>
+
+#if defined(_WIN32) || defined(WIN32)
+    #define SHAREDUTIL_PLATFORM_WINDOWS 1
+#endif
+
+#if defined(__linux__) || defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    #include <fstream>
+    #include <string>
+    #include <sstream>
+    #include <cerrno>
+    #include <cstdlib>
+#endif
+
+#if defined(__APPLE__) || defined(APPLE_x64) || defined(APPLE_arm64)
+    #include <mach/mach.h>
+    #include <mach/mach_vm.h>
+#endif
+
 #include "UTF8.h"
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
 #include "version.h"
 
-#ifdef WIN32
-    #include <ctime>
+#if defined(SHAREDUTIL_PLATFORM_WINDOWS)
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
     #include <windows.h>
+    #include <ctime>
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
     #include <Psapi.h>
+    #ifdef GetModuleBaseName
+        #undef GetModuleBaseName
+    #endif
+    #ifdef GetModuleBaseNameA
+        #undef GetModuleBaseNameA
+    #endif
+    #ifdef GetModuleBaseNameW
+        #undef GetModuleBaseNameW
+    #endif
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
@@ -172,6 +211,121 @@ bool SharedUtil::IsGTAProcess()
     return strLaunchPathFilename.EndsWithI("gta_sa.exe");
 }
 
+bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
+{
+    // Guard against null or overflow before touching platform APIs
+    if (!ptr || size == 0) return false;
+
+    const uintptr_t start = reinterpret_cast<uintptr_t>(ptr);
+    constexpr uintptr_t maxAddress = std::numeric_limits<uintptr_t>::max();
+    if (size > maxAddress - start) return false;
+
+    const uintptr_t end = start + size;
+
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
+    constexpr DWORD readableMask = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+    for (uintptr_t current = start; current < end;)
+    {
+        MEMORY_BASIC_INFORMATION mbi{};
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0) return false;
+
+        const uintptr_t regionStart = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+        const uintptr_t regionSize = static_cast<uintptr_t>(mbi.RegionSize);
+        const uintptr_t regionEnd = regionStart + regionSize;
+        const DWORD protection = mbi.Protect;
+        if (regionSize == 0 || current < regionStart || regionStart > maxAddress - regionSize || regionEnd <= current || mbi.State != MEM_COMMIT ||
+            (protection & PAGE_GUARD) || (protection & readableMask) == 0)
+            return false;
+
+        current = regionEnd;
+    }
+
+    return true;
+#elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long), "Unexpected uintptr_t size");
+
+    std::ifstream maps("/proc/self/maps");
+    if (!maps.is_open())
+        return false;
+
+    const auto parseAddress = [maxAddress](const std::string& token, uintptr_t& out) -> bool {
+        errno = 0;
+        char* endPtr = nullptr;
+        unsigned long long value = std::strtoull(token.c_str(), &endPtr, 16);
+        if (errno != 0 || endPtr == token.c_str() || *endPtr != '\0' || value > maxAddress)
+            return false;
+        out = static_cast<uintptr_t>(value);
+        return true;
+    };
+
+    uintptr_t coverage = start;
+    bool coveringRange = false;
+    for (std::string line; std::getline(maps, line);)
+    {
+        if (line.empty()) continue;
+        std::istringstream iss(line);
+        std::string range, perms;
+        if (!(iss >> range >> perms)) continue;
+        const size_t dashPos = range.find('-');
+        if (dashPos == std::string::npos) continue;
+    uintptr_t regionStart = 0;
+    uintptr_t regionEnd = 0;
+    if (!parseAddress(range.substr(0, dashPos), regionStart) || !parseAddress(range.substr(dashPos + 1), regionEnd)) continue;
+        if (regionEnd <= regionStart || regionEnd <= coverage) continue;
+        if (coveringRange)
+        {
+            if (regionStart > coverage) return false;
+        }
+        else if (regionStart > coverage || coverage >= regionEnd)
+        {
+            continue;
+        }
+        else coveringRange = true;
+
+        if (perms.empty() || perms[0] != 'r') return false;
+        coverage = regionEnd;
+        if (coverage >= end) return true;
+    }
+
+    return false;
+#elif defined(APPLE_x64) || defined(APPLE_arm64)
+    mach_vm_address_t queryAddress = static_cast<mach_vm_address_t>(start);
+    const mach_vm_address_t targetEnd = static_cast<mach_vm_address_t>(end);
+    constexpr mach_vm_address_t maxAddressMac = std::numeric_limits<mach_vm_address_t>::max();
+    vm_region_basic_info_data_64_t info;
+    mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+    mach_port_t objectName = MACH_PORT_NULL;
+
+    while (queryAddress < targetEnd)
+    {
+        mach_vm_size_t regionSize = 0;
+        infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+        mach_vm_address_t regionAddress = queryAddress;
+        kern_return_t kr = mach_vm_region(mach_task_self(), &regionAddress, &regionSize, VM_REGION_BASIC_INFO_64,
+                                          reinterpret_cast<vm_region_info_t>(&info), &infoCount, &objectName);
+        if (objectName != MACH_PORT_NULL)
+        {
+            mach_port_deallocate(mach_task_self(), objectName);
+            objectName = MACH_PORT_NULL;
+        }
+
+        if (kr != KERN_SUCCESS || regionSize == 0 || queryAddress < regionAddress || (info.protection & VM_PROT_READ) == 0 ||
+            regionAddress > maxAddressMac - static_cast<mach_vm_address_t>(regionSize))
+            return false;
+
+        const mach_vm_address_t regionEnd = regionAddress + static_cast<mach_vm_address_t>(regionSize);
+        if (regionEnd <= queryAddress)
+            return false;
+
+        queryAddress = regionEnd;
+    }
+
+    return true;
+#else
+    return false;
+#endif
+}
+
 //
 // Write a registry string value
 //
@@ -197,35 +351,329 @@ static void WriteRegistryStringValue(HKEY hkRoot, const char* szSubKey, const ch
 //
 // Read a registry string value
 //
-static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
+namespace
 {
-    // Clear output
-    SString strOutResult = "";
+    constexpr DWORD kMaxRegistryValueBytes = 1024 * 1024; // Cap to avoid runaway allocations
+    constexpr DWORD kMinStringAlloc = sizeof(wchar_t);
+    constexpr DWORD kMinBinaryAlloc = static_cast<DWORD>(sizeof(unsigned long long));
 
-    bool    bResult = false;
-    HKEY    hkTemp = NULL;
-    WString wstrSubKey = FromUTF8(szSubKey);
-    WString wstrValue = FromUTF8(szValue);
-    if (RegOpenKeyExW(hkRoot, wstrSubKey, 0, KEY_READ, &hkTemp) == ERROR_SUCCESS)
+    bool ComputeNextAllocation(DWORD current, DWORD requested, DWORD minimum, DWORD& outNext)
     {
-        DWORD dwBufferSize;
-        if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS)
-        {
+        const ULONGLONG requestedSize = requested != 0 ? static_cast<ULONGLONG>(requested) : static_cast<ULONGLONG>(current) * 2ULL;
+        const ULONGLONG adjusted = std::max<ULONGLONG>(requestedSize, static_cast<ULONGLONG>(minimum));
+        if (adjusted > kMaxRegistryValueBytes)
+            return false;
+        outNext = static_cast<DWORD>(adjusted);
+        return true;
+    }
 
-            CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
-            if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
+    size_t ComputeWideBufferCapacity(DWORD bytes)
+    {
+        const size_t rounded = static_cast<size_t>(bytes) + (sizeof(wchar_t) - 1u);
+        return (rounded / sizeof(wchar_t)) + 1u; // +1 for null terminator
+    }
+
+    WString CollapseMultiSz(const wchar_t* data, size_t wcharCount)
+    {
+        const wchar_t* current = data;
+        const wchar_t* end = current + wcharCount;
+        WString combined;
+        while (current < end && *current != L'\0')
+        {
+            if (!combined.empty())
+                combined.push_back(L'\n');
+            const wchar_t* segmentEnd = current;
+            while (segmentEnd < end && *segmentEnd != L'\0')
+                ++segmentEnd;
+            combined.append(current, static_cast<size_t>(segmentEnd - current));
+            current = segmentEnd;
+            if (current >= end)
+                break;
+            ++current;
+        }
+        return combined;
+    }
+
+    SString ExpandEnvironmentToUtf8(const wchar_t* raw)
+    {
+        const DWORD expandedChars = ExpandEnvironmentStringsW(raw, NULL, 0);
+        const DWORD maxExpandChars = kMaxRegistryValueBytes / sizeof(wchar_t);
+        if (expandedChars > 0 && expandedChars <= maxExpandChars)
+        {
+            std::vector<wchar_t> expanded(expandedChars, L'\0');
+            if (ExpandEnvironmentStringsW(raw, expanded.data(), expandedChars))
             {
-                // Ensure null termination - dwBufferSize is in bytes, convert to wchar_t units
-                size_t wcharCount = dwBufferSize / sizeof(wchar_t);
-                szBuffer[wcharCount] = 0;
-                strOutResult = ToUTF8((wchar_t*)szBuffer);
-                bResult = true;
+                WString expandedString;
+                expandedString.assign(expanded.data());
+                return ToUTF8(expandedString);
             }
         }
-        RegCloseKey(hkTemp);
+        WString fallback;
+        fallback.assign(raw);
+        return ToUTF8(fallback);
     }
+
+    SString BinaryBufferToHex(const unsigned char* data, DWORD size)
+    {
+        if (size == 0)
+            return SString();
+
+        static const char hexDigits[] = "0123456789ABCDEF";
+        std::string hex;
+        hex.reserve(static_cast<size_t>(size) * 2u);
+        for (DWORD i = 0; i < size; ++i)
+        {
+            const unsigned char byte = data[i];
+            hex.push_back(hexDigits[(byte >> 4) & 0x0F]);
+            hex.push_back(hexDigits[byte & 0x0F]);
+        }
+        SString result;
+        result = hex.c_str();
+        return result;
+    }
+
+    bool TryReadStringValue(HKEY key, const wchar_t* valueName, DWORD& dwType, DWORD initialSize, SString& outValue, int& status)
+    {
+        DWORD allocSize = std::max<DWORD>(initialSize, kMinStringAlloc);
+        std::vector<wchar_t> buffer(ComputeWideBufferCapacity(allocSize), L'\0');
+
+        while (true)
+        {
+            DWORD dwTempSize = allocSize;
+            LONG  readResult = RegQueryValueExW(key, valueName, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwTempSize);
+
+            if (readResult == ERROR_MORE_DATA)
+            {
+                if (dwTempSize > kMaxRegistryValueBytes)
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                DWORD newSize = 0;
+                if (!ComputeNextAllocation(allocSize, dwTempSize, kMinStringAlloc, newSize))
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                allocSize = newSize;
+                buffer.assign(ComputeWideBufferCapacity(allocSize), L'\0');
+                continue;
+            }
+
+            if (readResult != ERROR_SUCCESS)
+            {
+                status = -static_cast<int>(readResult);
+                return false;
+            }
+
+            size_t wcharCount = static_cast<size_t>(dwTempSize) / sizeof(wchar_t);
+            if (wcharCount >= buffer.size())
+                wcharCount = buffer.size() - 1u;
+            buffer[wcharCount] = L'\0';
+
+            if (dwType == REG_MULTI_SZ)
+            {
+                outValue = ToUTF8(CollapseMultiSz(buffer.data(), wcharCount));
+            }
+            else if (dwType == REG_EXPAND_SZ)
+            {
+                outValue = ExpandEnvironmentToUtf8(buffer.data());
+            }
+            else
+            {
+                WString direct;
+                direct.assign(buffer.data());
+                outValue = ToUTF8(direct);
+            }
+
+            status = 1;
+            return true;
+        }
+    }
+
+    bool TryReadBinaryValue(HKEY key, const wchar_t* valueName, DWORD& dwType, DWORD initialSize, SString& outValue, int& status)
+    {
+        DWORD allocSize = std::max<DWORD>(initialSize, kMinBinaryAlloc);
+        std::vector<unsigned char> buffer(static_cast<size_t>(allocSize), 0u);
+
+        while (true)
+        {
+            DWORD dwTempSize = allocSize;
+            LONG  readResult = RegQueryValueExW(key, valueName, NULL, &dwType, buffer.data(), &dwTempSize);
+
+            if (readResult == ERROR_MORE_DATA)
+            {
+                if (dwTempSize > kMaxRegistryValueBytes)
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                DWORD newSize = 0;
+                if (!ComputeNextAllocation(allocSize, dwTempSize, kMinBinaryAlloc, newSize))
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                allocSize = newSize;
+                buffer.assign(static_cast<size_t>(allocSize), 0u);
+                continue;
+            }
+
+            if (readResult != ERROR_SUCCESS)
+            {
+                status = -static_cast<int>(readResult);
+                return false;
+            }
+
+            switch (dwType)
+            {
+                case REG_DWORD:
+                {
+                    DWORD value = 0;
+                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, sizeof(DWORD));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                        value |= static_cast<DWORD>(buffer[i]) << (8u * i);
+                    outValue.Format("%lu", static_cast<unsigned long>(value));
+                    break;
+                }
+                case REG_DWORD_BIG_ENDIAN:
+                {
+                    DWORD value = 0;
+                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, sizeof(DWORD));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                    {
+                        value <<= 8;
+                        value |= buffer[i];
+                    }
+                    outValue.Format("%lu", static_cast<unsigned long>(value));
+                    break;
+                }
+                case REG_QWORD:
+                {
+                    unsigned long long value = 0ull;
+                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, static_cast<DWORD>(sizeof(value)));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                        value |= static_cast<unsigned long long>(buffer[i]) << (8ull * i);
+                    outValue.Format("%llu", static_cast<unsigned long long>(value));
+                    break;
+                }
+                case REG_BINARY:
+                case REG_LINK:
+                case REG_RESOURCE_LIST:
+                case REG_FULL_RESOURCE_DESCRIPTOR:
+                case REG_RESOURCE_REQUIREMENTS_LIST:
+                case REG_NONE:
+                default:
+                {
+                    outValue = BinaryBufferToHex(buffer.data(), dwTempSize);
+                    break;
+                }
+            }
+
+            status = 1;
+            return true;
+        }
+    }
+
+    bool PopulateValueFromKey(HKEY key, const wchar_t* valueName, int& status, SString& outValue)
+    {
+        DWORD dwType = REG_NONE;
+        DWORD dwBufferSize = 0;
+        LONG  queryResult = RegQueryValueExW(key, valueName, NULL, &dwType, NULL, &dwBufferSize);
+
+        if (queryResult != ERROR_SUCCESS && queryResult != ERROR_MORE_DATA)
+        {
+            status = -static_cast<int>(queryResult);
+            return false;
+        }
+
+        if (dwBufferSize > kMaxRegistryValueBytes)
+        {
+            status = -static_cast<int>(ERROR_MORE_DATA);
+            return false;
+        }
+
+        int localStatus = 0;
+        const bool isStringType = (dwType == REG_SZ || dwType == REG_EXPAND_SZ || dwType == REG_MULTI_SZ);
+        const bool success = isStringType
+                                 ? TryReadStringValue(key, valueName, dwType, dwBufferSize, outValue, localStatus)
+                                 : TryReadBinaryValue(key, valueName, dwType, dwBufferSize, outValue, localStatus);
+
+        if (localStatus != 0)
+            status = localStatus;
+
+        return success;
+    }
+}
+
+static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
+{
+    SString strOutResult;
+    int     status = 0;
+    bool    success = false;
+
+    const char* szSafeSubKey = szSubKey ? szSubKey : "";
+    const char* szSafeValue = szValue ? szValue : "";
+
+    WString       wstrSubKey;
+    const wchar_t* pSubKey = L"";
+    if (szSafeSubKey[0] != '\0')
+    {
+        wstrSubKey = FromUTF8(szSafeSubKey);
+        pSubKey = wstrSubKey.c_str();
+    }
+
+    static constexpr wchar_t kDefaultValueName[] = L"";
+    WString                  wstrValue;
+    const wchar_t*           pValueName = kDefaultValueName;
+    if (szSafeValue[0] != '\0')
+    {
+        wstrValue = FromUTF8(szSafeValue);
+        pValueName = wstrValue.c_str();
+    }
+
+    constexpr size_t kAccessMaskSlots = 3u;
+    std::array<REGSAM, kAccessMaskSlots> accessMasks{};
+    size_t maskCount = 0;
+#ifdef KEY_WOW64_64KEY
+    accessMasks[maskCount++] = KEY_READ | KEY_WOW64_64KEY;
+#endif
+#ifdef KEY_WOW64_32KEY
+    accessMasks[maskCount++] = KEY_READ | KEY_WOW64_32KEY;
+#endif
+    accessMasks[maskCount++] = KEY_READ;
+
+    using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, decltype(&RegCloseKey)>;
+
+    for (size_t maskIndex = 0; maskIndex < maskCount && !success; ++maskIndex)
+    {
+        HKEY hkTemp = nullptr;
+        const LONG openResult = RegOpenKeyExW(hkRoot, pSubKey, 0, accessMasks[maskIndex], &hkTemp);
+        if (openResult != ERROR_SUCCESS)
+        {
+            status = -static_cast<int>(openResult);
+            continue;
+        }
+
+        UniqueHKey keyGuard(hkTemp, &RegCloseKey);
+
+        if (PopulateValueFromKey(hkTemp, pValueName, status, strOutResult))
+        {
+            success = true;
+            break;
+        }
+    }
+
     if (iResult)
-        *iResult = bResult;
+        *iResult = status;
+
+    if (!success)
+        strOutResult.clear();
+
     return strOutResult;
 }
 
@@ -248,9 +696,9 @@ SString SharedUtil::GetMajorVersionString()
 //
 // GetSystemRegistryValue
 //
-SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName)
+SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, NULL);
+    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, iResult);
 }
 
 //
@@ -274,9 +722,9 @@ void SharedUtil::SetRegistryValue(const SString& strPath, const SString& strName
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, strValue, bFlush);
 }
 
-SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName)
+SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, iResult);
 }
 
 bool SharedUtil::RemoveRegistryKey(const SString& strPath)
@@ -290,9 +738,9 @@ void SharedUtil::SetVersionRegistryValue(const SString& strVersion, const SStrin
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, strValue);
 }
 
-SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName)
+SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, iResult);
 }
 
 // Get/set registry values for all versions (common)
@@ -301,9 +749,9 @@ void SharedUtil::SetCommonRegistryValue(const SString& strPath, const SString& s
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, strValue);
 }
 
-SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName)
+SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, iResult);
 }
 
 //
@@ -1072,7 +1520,7 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 
 #endif  // MTA_CLIENT
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 #define _WIN32_WINNT_WIN8                   0x0602
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1115,7 +1563,7 @@ bool SharedUtil::IsWindows8OrGreater()
 {
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
 }
-#endif  // WIN32
+#endif  // SHAREDUTIL_PLATFORM_WINDOWS
 
 static uchar ToHexChar(uchar c)
 {
@@ -1176,7 +1624,7 @@ SString SharedUtil::EscapeURLArgument(const SString& strArg)
 //
 // Cross platform critical section
 //
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 
 SharedUtil::CCriticalSection::CCriticalSection()
 {
@@ -1237,7 +1685,7 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
 static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformationClass, PVOID ThreadInformation, ULONG ThreadInformationLength,
                                          PULONG ReturnLength)
 {
@@ -1363,7 +1811,7 @@ DWORD SharedUtil::GetMainThreadId()
 //
 bool SharedUtil::IsMainThread()
 {
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     DWORD mainThreadID = GetMainThreadId();
     DWORD currentThreadID = GetCurrentThreadId();
     return mainThreadID == currentThreadID;
@@ -1376,7 +1824,7 @@ bool SharedUtil::IsMainThread()
 //
 // Expiry stuff
 //
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     #include <time.h>
 
 int SharedUtil::GetBuildAge()
@@ -1654,7 +2102,7 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
     char    cPathSep;
 
     // Handle which path sep char
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     if (!bConvertToUnixPathSep)
     {
         cPathSep = '\\';
@@ -1837,7 +2285,7 @@ namespace SharedUtil
             outList.push_back(iter->first);
     }
 
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
     ///////////////////////////////////////////////////////////////////////////
     //
     // GetCurrentProcessorNumberXP for the current thread, especially for Windows XP
@@ -1873,7 +2321,7 @@ namespace SharedUtil
     ///////////////////////////////////////////////////////////////////////////
     DWORD _GetCurrentProcessorNumber()
     {
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
         using GetCurrentProcessorNumber_t = DWORD(WINAPI*)();
 
@@ -1936,7 +2384,7 @@ namespace SharedUtil
     {
         outUserTime = 0;
         outKernelTime = 0;
-#ifdef WIN32
+#ifdef SHAREDUTIL_PLATFORM_WINDOWS
         FILETIME CreationTime, ExitTime, KernelTime, UserTime;
         if (GetThreadTimes(GetCurrentThread(), &CreationTime, &ExitTime, &KernelTime, &UserTime))
         {
@@ -2016,6 +2464,11 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return;
+
         uint uiLast = uiStart + uiLength - 1;
 
         // Make a hole
@@ -2031,34 +2484,68 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return;
+
         uint uiLast = uiStart + uiLength - 1;
 
         RemoveObscuredRanges(uiStart, uiLast);
-
         IterType iterOverlap;
         if (GetRangeOverlappingPoint(uiStart, iterOverlap))
         {
             uint uiOverlapPrevLast = iterOverlap->second;
 
-            // Modify overlapping range last point
-            uint uiNewLast = uiStart - 1;
-            iterOverlap->second = uiNewLast;
-
-            if (uiOverlapPrevLast > uiLast)
+            // Modify overlapping range last point with underflow check
+            if (uiStart > 0)
             {
-                // Need to add range after hole
-                uint uiNewStart = uiLast + 1;
-                m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                uint uiNewLast = uiStart - 1;
+                iterOverlap->second = uiNewLast;
+
+                if (uiOverlapPrevLast > uiLast)
+                {
+                    // Need to add range after hole
+                    // Check for overflow when calculating uiLast + 1
+                    if (uiLast < UINT_MAX)
+                    {
+                        uint uiNewStart = uiLast + 1;
+                        m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                    }
+                }
+            }
+            else
+            {
+                // Special case: uiStart is 0, remove the range entirely
+                m_StartLastMap.erase(iterOverlap);
+                if (uiOverlapPrevLast > uiLast)
+                {
+                    // Check for overflow when calculating uiLast + 1
+                    if (uiLast < UINT_MAX)
+                    {
+                        uint uiNewStart = uiLast + 1;
+                        m_StartLastMap[uiNewStart] = uiOverlapPrevLast;
+                    }
+                }
             }
         }
 
         if (GetRangeOverlappingPoint(uiLast, iterOverlap))
         {
             // Modify overlapping range start point
-            uint uiNewStart = uiLast + 1;
-            uint uiOldLast = iterOverlap->second;
-            m_StartLastMap.erase(iterOverlap);
-            m_StartLastMap[uiNewStart] = uiOldLast;
+            // Check for overflow when calculating uiLast + 1
+            if (uiLast < UINT_MAX)
+            {
+                uint uiNewStart = uiLast + 1;
+                uint uiOldLast = iterOverlap->second;
+                m_StartLastMap.erase(iterOverlap);
+                m_StartLastMap[uiNewStart] = uiOldLast;
+            }
+            else
+            {
+                // If uiLast == UINT_MAX, we can't create a range after it, just remove the overlapping range
+                m_StartLastMap.erase(iterOverlap);
+            }
         }
     }
 
@@ -2067,6 +2554,11 @@ namespace SharedUtil
     {
         if (uiLength < 1)
             return false;
+
+        // Check for arithmetic overflow
+        if (uiStart + uiLength < uiStart || uiStart + uiLength - 1 < uiStart)
+            return false;
+
         uint uiLast = uiStart + uiLength - 1;
 
         IterType iter = m_StartLastMap.lower_bound(uiStart);

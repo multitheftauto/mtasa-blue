@@ -504,8 +504,9 @@ public:
     bool    IsHighFloatPrecision() const;
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
-    void RestreamModel(unsigned short usModel);
+    bool RestreamModel(std::uint16_t model);
     void RestreamWorld();
+    void Restream(std::optional<RestreamOption> option);
     void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);

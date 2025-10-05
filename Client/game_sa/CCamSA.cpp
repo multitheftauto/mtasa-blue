@@ -13,6 +13,23 @@
 #include "CCamSA.h"
 #include "CGameSA.h"
 #include <cmath>
+#include <cfloat>
+
+namespace
+{
+    constexpr float kPi = 3.14159265358979323846f;
+    constexpr float kTwoPi = 6.28318530717958647692f;
+
+    inline float WrapAngleRad(float angle) noexcept
+    {
+        angle -= kTwoPi * std::floor((angle + kPi) / kTwoPi);
+        if (angle <= -kPi)
+            angle += kTwoPi;
+        else if (angle > kPi)
+            angle -= kTwoPi;
+        return angle;
+    }
+}
 
 extern CGameSA* pGame;
 
@@ -21,12 +38,16 @@ CEntity* CCamSA::GetTargetEntity() const
 
     if (!m_pInterface)
         return nullptr;
+
+    if (!pGame)
+        return nullptr;
         
     CEntitySAInterface* pInterface = m_pInterface->CamTargetEntity;
     if (pInterface)
     {           
         CPools* pPools = pGame->GetPools();
-        return pPools->GetEntity((DWORD*)pInterface);
+        if (pPools)
+            return pPools->GetEntity((DWORD*)pInterface);
     }
     return nullptr;
 }
@@ -59,16 +80,15 @@ void CCamSA::GetDirection(float& fHorizontal, float& fVertical)
         return;
     }
 
-    float fHoriz = m_pInterface->m_fHorizontalAngle;
-    float fVert = m_pInterface->m_fVerticalAngle;
-    
-    if (!std::isfinite(fHoriz) || !std::isfinite(fVert))
+    const float fHoriz = std::isfinite(m_pInterface->m_fHorizontalAngle) ? WrapAngleRad(m_pInterface->m_fHorizontalAngle) : 0.0f;
+    const float fVert = std::isfinite(m_pInterface->m_fVerticalAngle) ? WrapAngleRad(m_pInterface->m_fVerticalAngle) : 0.0f;
+
+    if (!std::isfinite(m_pInterface->m_fHorizontalAngle) || !std::isfinite(m_pInterface->m_fVerticalAngle))
     {
-        fHorizontal = 0.0f;
-        fVertical = 0.0f;
-        return;
+        m_pInterface->m_fHorizontalAngle = fHoriz;
+        m_pInterface->m_fVerticalAngle = fVert;
     }
-    
+
     fHorizontal = fHoriz;
     fVertical = fVert;
 }
@@ -82,15 +102,6 @@ void CCamSA::SetDirection(float fHorizontal, float fVertical)
     if (!std::isfinite(fHorizontal) || !std::isfinite(fVertical))
         return;
         
-    // Clamp angle values to prevent overflow
-    constexpr float MIN_ANGLE = -360.0f;
-    constexpr float MAX_ANGLE = 360.0f;
-    
-    if (fHorizontal < MIN_ANGLE || fHorizontal > MAX_ANGLE ||
-        fVertical < MIN_ANGLE || fVertical > MAX_ANGLE)
-        return;
-
-    // Calculation @ sub 0x50F970
-    m_pInterface->m_fHorizontalAngle = fHorizontal;
-    m_pInterface->m_fVerticalAngle = fVertical;
+    m_pInterface->m_fHorizontalAngle = WrapAngleRad(fHorizontal);
+    m_pInterface->m_fVerticalAngle = WrapAngleRad(fVertical);
 }

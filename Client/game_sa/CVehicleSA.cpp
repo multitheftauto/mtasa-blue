@@ -46,7 +46,7 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
         jle     noglare
         mov     ecx, esi
         mov     eax, FUNC_CVehicle_DoSunGlare
-        jmp     eax
+        call    eax
 
         noglare:
         mov     [esp+0D4h], edi

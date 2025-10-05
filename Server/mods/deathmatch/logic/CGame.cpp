@@ -87,6 +87,7 @@
 #define DEFAULT_AIRCRAFT_MAXHEIGHT   800
 #define DEFAULT_AIRCRAFT_MAXVELOCITY 1.5f
 #define DEFAULT_MINUTE_DURATION      1000
+#define NUM_CLIENT_EVENT_ERROR_GAP   1000
 
 #ifndef WIN32
     #include <limits.h>
@@ -2673,7 +2674,12 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
             }
 
         }
-            else
+        else
+        {
+            // Limit this error to prevent debug / log files being flooded.
+            static std::uint64_t s_lastClientEventErrorLog = 0;
+            auto now = GetTickCount64_();
+            if (now - s_lastClientEventErrorLog > NUM_CLIENT_EVENT_ERROR_GAP)
             {
                 CLuaArguments arguments;
                 arguments.PushString(szName);
@@ -2681,7 +2687,9 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
                 arguments.PushBoolean(false);
                 pCaller->CallEvent("onPlayerTriggerInvalidEvent", arguments);
                 m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName);
+                s_lastClientEventErrorLog = now;
             }
+        }
 
         RegisterClientTriggeredEventUsage(pCaller, szName);
     }
@@ -3409,6 +3417,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 unsigned int occupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 if (pPed == pVehicle->GetOccupant(occupiedSeat))
                                 {
+                                    // Reset the occupant changed flag before calling the event
+                                    pVehicle->m_bOccupantChanged = false;
+                                    
                                     // Call the exiting vehicle event
                                     CLuaArguments Arguments;
                                     Arguments.PushElement(pPed);                       // player / ped
@@ -3417,12 +3428,23 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     Arguments.PushNumber(Packet.GetDoor());            // door being used
                                     if (pVehicle->CallEvent("onVehicleStartExit", Arguments) && pPed->GetOccupiedVehicle() == pVehicle)
                                     {
-                                        // Mark him as exiting the vehicle
-                                        pPed->SetVehicleAction(CPed::VEHICLEACTION_EXITING);
+                                        // Check if the occupant was changed during the event (e.g., by warpPedIntoVehicle)
+                                        if (!pVehicle->m_bOccupantChanged)
+                                        {
+                                            // Mark him as exiting the vehicle
+                                            pPed->SetVehicleAction(CPed::VEHICLEACTION_EXITING);
 
-                                        // Tell everyone he can start exiting the vehicle
-                                        CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_REQUEST_OUT_CONFIRMED, Packet.GetDoor());
-                                        m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                                            // Tell everyone he can start exiting the vehicle
+                                            CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_REQUEST_OUT_CONFIRMED, Packet.GetDoor());
+                                            m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                                        }
+                                        else
+                                        {
+                                            // Script interfered with the exit process
+                                            // Don't proceed with the exit, send failure response
+                                            CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
+                                            pPlayer->Send(Reply);
+                                        }
                                     }
                                     else
                                     {

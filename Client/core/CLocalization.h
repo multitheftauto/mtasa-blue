@@ -44,5 +44,5 @@ public:
 private:
     DictionaryManager             m_DictManager;
     std::map<SString, CLanguage*> m_LanguageMap;
-    CLanguage*                    m_pCurrentLang;
+    CLanguage*                    m_pCurrentLang{};
 };
