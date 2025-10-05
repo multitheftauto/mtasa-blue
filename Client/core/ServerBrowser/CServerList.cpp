@@ -344,11 +344,20 @@ void CServerListLAN::Refresh()
     // Create the LAN-broadcast socket
     if (m_Socket != INVALID_SOCKET)
         closesocket(m_Socket);
+
     m_Socket = socket(AF_INET, SOCK_DGRAM, 0);
-    const int Flags = 1;
-    setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&Flags, sizeof(Flags));
-    if (setsockopt(m_Socket, SOL_SOCKET, SO_BROADCAST, (const char*)&Flags, sizeof(Flags)) != 0)
+    if (m_Socket == INVALID_SOCKET)
     {
+        m_strStatus = _("Cannot create LAN-broadcast socket");
+        return;
+    }
+
+    const int Flags = 1;
+    if (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&Flags, sizeof(Flags)) != 0 ||
+        setsockopt(m_Socket, SOL_SOCKET, SO_BROADCAST, (const char*)&Flags, sizeof(Flags)) != 0)
+    {
+        closesocket(m_Socket);
+        m_Socket = INVALID_SOCKET;
         m_strStatus = _("Cannot bind LAN-broadcast socket");
         return;
     }
