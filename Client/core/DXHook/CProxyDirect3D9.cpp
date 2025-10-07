@@ -137,7 +137,7 @@ CProxyDirect3D9::~CProxyDirect3D9()
 /*** IUnknown methods ***/
 HRESULT CProxyDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
 {
-    if (!m_pDevice || !IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
+    if (!m_pDevice || !IsValidComInterfacePointer(m_pDevice))
     {
         SString message;
         message.Format("CProxyDirect3D9::QueryInterface rejected invalid IDirect3D9 pointer %p", m_pDevice);
@@ -156,7 +156,7 @@ ULONG CProxyDirect3D9::AddRef()
 
     if (m_pDevice)
     {
-        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
+        if (IsValidComInterfacePointer(m_pDevice))
         {
             m_pDevice->AddRef();
         }
@@ -185,7 +185,7 @@ ULONG CProxyDirect3D9::Release()
 
     if (m_pDevice && lNewRefCount > 0)
     {
-        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
+        if (IsValidComInterfacePointer(m_pDevice))
         {
             m_pDevice->Release();
         }
