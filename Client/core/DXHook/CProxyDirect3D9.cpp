@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "ComPtrValidation.h"
 #include <dwmapi.h>
 #include <resource.h>
 
@@ -18,43 +19,27 @@ extern HINSTANCE g_hModule;
 namespace
 {
 template <typename T>
-bool IsValidComInterfacePointer(T* pointer)
-{
-    if (!pointer)
-        return true;
-
-    if (!SharedUtil::IsReadablePointer(pointer, sizeof(void*)))
-        return false;
-
-    void* const* vtablePtr = reinterpret_cast<void* const*>(pointer);
-    if (!vtablePtr)
-        return false;
-
-    void* const vtable = *vtablePtr;
-    if (!vtable)
-        return false;
-
-    constexpr size_t requiredBytes = sizeof(void*) * 3;
-    return SharedUtil::IsReadablePointer(vtable, requiredBytes);
-}
-
-template <typename T>
 void ReleaseInterface(T*& pointer, const char* context = nullptr)
 {
     if (!pointer)
         return;
 
-    if (IsValidComInterfacePointer(pointer))
+    T* heldPointer = pointer;
+
+    const bool valid = IsValidComInterfacePointer(pointer, ComPtrValidation::ValidationMode::ForceRefresh);
+
+    if (valid)
     {
-        pointer->Release();
+        heldPointer->Release();
     }
     else
     {
-    SString label;
-    label = context ? context : "ReleaseInterface";
+        SString label;
+        label = context ? context : "ReleaseInterface";
         SString message;
-        message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), pointer);
+        message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), heldPointer);
         AddReportLog(8752, message, 5);
+        ComPtrValidation::Invalidate(heldPointer);
     }
 
     pointer = nullptr;
@@ -66,10 +51,10 @@ void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
     if (destination == source)
         return;
 
-    if (source && !IsValidComInterfacePointer(source))
+    if (source && !IsValidComInterfacePointer(source, ComPtrValidation::ValidationMode::ForceRefresh))
     {
-    SString label;
-    label = context ? context : "ReplaceInterface";
+        SString label;
+        label = context ? context : "ReplaceInterface";
         SString message;
         message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
         AddReportLog(8753, message, 5);
@@ -87,18 +72,19 @@ IDirect3D9* GetFirstValidTrackedDirect3D(std::vector<IDirect3D9*>& trackedList)
     for (auto iter = trackedList.begin(); iter != trackedList.end();)
     {
         IDirect3D9* candidate = *iter;
-        if (candidate && IsValidComInterfacePointer(candidate))
+        if (candidate && IsValidComInterfacePointer(candidate, ComPtrValidation::ValidationMode::ForceRefresh))
             return candidate;
 
         SString message;
         message.Format("CProxyDirect3D9: removing invalid tracked IDirect3D9 pointer %p", candidate);
         AddReportLog(8756, message, 5);
+        ComPtrValidation::Invalidate(candidate);
         iter = trackedList.erase(iter);
     }
 
     return nullptr;
 }
-}        // namespace
+}  // unnamed namespace
 
 HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
@@ -113,7 +99,7 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 {
     WriteDebugEvent(SString("CProxyDirect3D9::CProxyDirect3D9 %08x", this));
 
-    if (!IsValidComInterfacePointer(pInterface))
+    if (!IsValidComInterfacePointer(pInterface, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("CProxyDirect3D9 ctor: received invalid IDirect3D9 pointer %p", pInterface);
@@ -128,7 +114,7 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 
     if (m_pDevice)
     {
-        if (IsValidComInterfacePointer(m_pDevice))
+    if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             ms_CreatedDirect3D9List.push_back(m_pDevice);
         }
@@ -151,11 +137,11 @@ CProxyDirect3D9::~CProxyDirect3D9()
 /*** IUnknown methods ***/
 HRESULT CProxyDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
 {
-    if (!m_pDevice || !IsValidComInterfacePointer(m_pDevice))
+    if (!m_pDevice || !IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
     {
-    SString message;
-    message.Format("CProxyDirect3D9::QueryInterface rejected invalid IDirect3D9 pointer %p", m_pDevice);
-    AddReportLog(8752, message, 5);
+        SString message;
+        message.Format("CProxyDirect3D9::QueryInterface rejected invalid IDirect3D9 pointer %p", m_pDevice);
+        AddReportLog(8752, message, 5);
         if (ppvObj)
             *ppvObj = nullptr;
         return E_POINTER;
@@ -170,14 +156,14 @@ ULONG CProxyDirect3D9::AddRef()
 
     if (m_pDevice)
     {
-        if (IsValidComInterfacePointer(m_pDevice))
+        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             m_pDevice->AddRef();
         }
         else
         {
             SString message;
-            message.Format("CProxyDirect3D9::AddRef skipped underlying AddRef; invalid pointer %p", m_pDevice);
+            message.Format("CProxyDirect3D9::AddRef rejected invalid IDirect3D9 pointer %p", m_pDevice);
             AddReportLog(8752, message, 5);
         }
     }
@@ -191,22 +177,22 @@ ULONG CProxyDirect3D9::Release()
 
     if (lNewRefCount < 0)
     {
-    SString message;
-    message.Format("CProxyDirect3D9::Release detected reference count underflow for proxy %p", this);
-    AddReportLog(8752, message, 5);
+        SString message;
+        message.Format("CProxyDirect3D9::Release detected reference count underflow for proxy %p", this);
+        AddReportLog(8752, message, 5);
         lNewRefCount = 0;
     }
 
     if (m_pDevice && lNewRefCount > 0)
     {
-        if (IsValidComInterfacePointer(m_pDevice))
+        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             m_pDevice->Release();
         }
         else
         {
             SString message;
-            message.Format("CProxyDirect3D9::Release skipped underlying Release; invalid pointer %p", m_pDevice);
+            message.Format("CProxyDirect3D9::Release rejected invalid IDirect3D9 pointer %p", m_pDevice);
             AddReportLog(8752, message, 5);
         }
     }
@@ -393,7 +379,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
             AddReportLog(8755, SStringX("CProxyDirect3D9::CreateDevice - driver returned nullptr device"), 5);
             hResult = D3DERR_INVALIDDEVICE;
         }
-        else if (!IsValidComInterfacePointer(pCreatedDevice))
+    else if (!IsValidComInterfacePointer(pCreatedDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             SString message;
             message.Format("CProxyDirect3D9::CreateDevice - rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
@@ -428,7 +414,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
         *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(pOriginalDevice);
         if (pOriginalDevice)
         {
-            if (IsValidComInterfacePointer(pOriginalDevice))
+            if (IsValidComInterfacePointer(pOriginalDevice, ComPtrValidation::ValidationMode::ForceRefresh))
             {
                 pOriginalDevice->Release();
             }
@@ -607,7 +593,7 @@ HRESULT CreateDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect3
                 AddReportLog(8755, SStringX("CreateDeviceInsist: driver returned nullptr device"), 5);
                 hResult = D3DERR_INVALIDDEVICE;
             }
-            else if (!IsValidComInterfacePointer(pCreatedDevice))
+            else if (!IsValidComInterfacePointer(pCreatedDevice, ComPtrValidation::ValidationMode::ForceRefresh))
             {
                 SString message;
                 message.Format("CreateDeviceInsist: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
@@ -829,7 +815,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
 {
     HRESULT hr;
 
-    if (!pDirect3D || !IsValidComInterfacePointer(pDirect3D))
+    if (!pDirect3D || !IsValidComInterfacePointer(pDirect3D, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("AddCapsReport: invalid IDirect3D9 pointer %p", pDirect3D);
@@ -837,7 +823,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         return;
     }
 
-    if (!pD3DDevice9 || !IsValidComInterfacePointer(pD3DDevice9))
+    if (!pD3DDevice9 || !IsValidComInterfacePointer(pD3DDevice9, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("AddCapsReport: invalid IDirect3DDevice9 pointer %p", pD3DDevice9);
@@ -857,7 +843,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
     // Check device returns same D3D interface
     IDirect3D9* pDirect3DOther = NULL;
     pD3DDevice9->GetDirect3D(&pDirect3DOther);
-    if (pDirect3DOther && !IsValidComInterfacePointer(pDirect3DOther))
+    if (pDirect3DOther && !IsValidComInterfacePointer(pDirect3DOther, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("AddCapsReport: device returned invalid IDirect3D9 pointer %p", pDirect3DOther);
@@ -1064,7 +1050,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
                 AddReportLog(8755, SStringX("HandleCreateDeviceResult: DoCreateDevice returned nullptr device"), 5);
                 hResult = D3DERR_INVALIDDEVICE;
             }
-            else if (!IsValidComInterfacePointer(pCreatedDevice))
+            else if (!IsValidComInterfacePointer(pCreatedDevice, ComPtrValidation::ValidationMode::ForceRefresh))
             {
                 SString message;
                 message.Format("HandleCreateDeviceResult: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
@@ -1104,7 +1090,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
             *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(pOriginalDevice);
             if (pOriginalDevice)
             {
-                if (IsValidComInterfacePointer(pOriginalDevice))
+                if (IsValidComInterfacePointer(pOriginalDevice, ComPtrValidation::ValidationMode::ForceRefresh))
                 {
                     pOriginalDevice->Release();
                 }
@@ -1264,7 +1250,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         return hResult;
     }
 
-    if (!IsValidComInterfacePointer(*ppReturnedDeviceInterface))
+    if (!IsValidComInterfacePointer(*ppReturnedDeviceInterface, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("CCore::OnPostCreateDevice - invalid IDirect3DDevice9 pointer %p (via %p)", *ppReturnedDeviceInterface, ppReturnedDeviceInterface);
@@ -1327,7 +1313,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
                          "CCore::OnPostCreateDevice: CreateDeviceInsist returned nullptr device", 5);
             hResult = D3DERR_INVALIDDEVICE;
         }
-        else if (!IsValidComInterfacePointer(pCreatedDevice))
+    else if (!IsValidComInterfacePointer(pCreatedDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             AddReportLog(8755,
                          SString("CCore::OnPostCreateDevice: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice), 5);
@@ -1382,7 +1368,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(pOriginalDevice);
         if (pOriginalDevice)
         {
-            if (IsValidComInterfacePointer(pOriginalDevice))
+            if (IsValidComInterfacePointer(pOriginalDevice, ComPtrValidation::ValidationMode::ForceRefresh))
             {
                 pOriginalDevice->Release();
             }
