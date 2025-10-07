@@ -108,7 +108,7 @@ namespace
         STDMETHOD(Close)(LPCVOID pData)
         {
             // Free memory allocated for file contents
-            delete pData;
+            free(const_cast<void*>(pData));
             return S_OK;
         }
     };

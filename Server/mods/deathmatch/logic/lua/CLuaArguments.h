@@ -69,6 +69,7 @@ public:
     CLuaArgument* PushNumber(double dNumber);
     CLuaArgument* PushString(const std::string& string);
     CLuaArgument* PushString(const std::string_view& string);
+    CLuaArgument* PushString(const CStringName& string);
     CLuaArgument* PushString(const char* string);
     CLuaArgument* PushElement(CElement* pElement);
     CLuaArgument* PushBan(CBan* pBan);

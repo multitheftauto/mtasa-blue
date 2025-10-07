@@ -44,6 +44,14 @@ enum class PreloadAreaOption
     ALL
 };
 
+enum class RestreamOption
+{
+    ALL = 0,
+    VEHICLES,
+    PEDS,
+    OBJECTS
+};
+
 struct CStreamingInfo
 {
     uint16_t prevId = (uint16_t)-1;

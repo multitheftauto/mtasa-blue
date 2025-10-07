@@ -1970,7 +1970,7 @@ void CKeyBinds::DoPostFramePulse()
 
             // * Enter Exit
             // * Change View
-            cs.ButtonSquare = (!bEnteringVehicle && g_bcControls[11].bState) ? 255 : 0;            // Jump
+            cs.ButtonSquare = (!bEnteringVehicle && !bAimingWeapon && g_bcControls[11].bState) ? 255 : 0;            // Jump
             cs.ButtonCross = (g_bcControls[12].bState) ? 255 : 0;                                  // Sprint
             cs.ShockButtonR = (g_bcControls[13].bState) ? 255 : 0;                                 // Look Behind
             cs.ShockButtonL = (g_bcControls[14].bState) ? 255 : 0;                                 // Crouch
