@@ -10,62 +10,17 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProxyComHelpers.h"
 #include "ComPtrValidation.h"
 #include <dwmapi.h>
+#include <mutex>
+#include <atomic>
 #include <resource.h>
 
 extern HINSTANCE g_hModule;
 
 namespace
 {
-template <typename T>
-void ReleaseInterface(T*& pointer, const char* context = nullptr)
-{
-    if (!pointer)
-        return;
-
-    T* heldPointer = pointer;
-
-    const bool valid = IsValidComInterfacePointer(pointer, ComPtrValidation::ValidationMode::ForceRefresh);
-
-    if (valid)
-    {
-        heldPointer->Release();
-    }
-    else
-    {
-        SString label;
-        label = context ? context : "ReleaseInterface";
-        SString message;
-        message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), heldPointer);
-        AddReportLog(8752, message, 5);
-        ComPtrValidation::Invalidate(heldPointer);
-    }
-
-    pointer = nullptr;
-}
-
-template <typename T>
-void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
-{
-    if (destination == source)
-        return;
-
-    if (source && !IsValidComInterfacePointer(source, ComPtrValidation::ValidationMode::ForceRefresh))
-    {
-        SString label;
-        label = context ? context : "ReplaceInterface";
-        SString message;
-        message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
-        AddReportLog(8753, message, 5);
-        return;
-    }
-
-    ReleaseInterface(destination, context);
-    destination = source;
-    if (destination)
-        destination->AddRef();
-}
 
 IDirect3D9* GetFirstValidTrackedDirect3D(std::vector<IDirect3D9*>& trackedList)
 {
@@ -88,7 +43,9 @@ IDirect3D9* GetFirstValidTrackedDirect3D(std::vector<IDirect3D9*>& trackedList)
 
 HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
+
 std::vector<IDirect3D9*> ms_CreatedDirect3D9List;
+std::mutex               ms_Direct3D9ListMutex;
 bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
 void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters);
@@ -108,15 +65,15 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
         return;
     }
 
-    // Take ownership of the interface pointer
-    // ReplaceInterface will AddRef(), giving us our own reference
-    // Caller retains their reference
-    ReplaceInterface(m_pDevice, pInterface, "CProxyDirect3D9 ctor");
+    pInterface->AddRef();
+    m_pDevice = pInterface;
 
+    // Track this Direct3D9 instance for StaticGetDirect3D() lookups
     if (m_pDevice)
     {
         if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
+            std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
             ms_CreatedDirect3D9List.push_back(m_pDevice);
         }
         else
@@ -131,8 +88,11 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 CProxyDirect3D9::~CProxyDirect3D9()
 {
     WriteDebugEvent(SString("CProxyDirect3D9::~CProxyDirect3D9 %08x", this));
-    ListRemove(ms_CreatedDirect3D9List, m_pDevice);
-    ReleaseInterface(m_pDevice, "CProxyDirect3D9 dtor");
+    {
+        std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
+        ListRemove(ms_CreatedDirect3D9List, m_pDevice);
+    }
+    ReleaseInterface(m_pDevice, 8752);
 }
 
 /*** IUnknown methods ***/
@@ -150,7 +110,7 @@ HRESULT CProxyDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
 
 ULONG CProxyDirect3D9::AddRef()
 {
-    LONG lNewRefCount = InterlockedIncrement(&m_lRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_add(1, std::memory_order_relaxed) + 1;
 
     if (m_pDevice)
         m_pDevice->AddRef();
@@ -160,7 +120,7 @@ ULONG CProxyDirect3D9::AddRef()
 
 ULONG CProxyDirect3D9::Release()
 {
-    LONG lNewRefCount = InterlockedDecrement(&m_lRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_sub(1, std::memory_order_acq_rel) - 1;
 
     if (lNewRefCount < 0)
     {
@@ -276,6 +236,7 @@ HMONITOR CProxyDirect3D9::GetAdapterMonitor(UINT Adapter)
 
 HMONITOR CProxyDirect3D9::StaticGetAdapterMonitor(UINT Adapter)
 {
+    std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
     IDirect3D9* pDirect3D = GetFirstValidTrackedDirect3D(ms_CreatedDirect3D9List);
     if (!pDirect3D)
         return NULL;
@@ -285,6 +246,7 @@ HMONITOR CProxyDirect3D9::StaticGetAdapterMonitor(UINT Adapter)
 
 IDirect3D9* CProxyDirect3D9::StaticGetDirect3D()
 {
+    std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
     return GetFirstValidTrackedDirect3D(ms_CreatedDirect3D9List);
 }
 
@@ -406,7 +368,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
             SString message;
             message.Format("CProxyDirect3D9::CreateDevice - rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
             AddReportLog(8755, message, 5);
-            ReleaseInterface(pCreatedDevice, "CProxyDirect3D9::CreateDevice invalid return");
+            ReleaseInterface(pCreatedDevice, 8755, "CProxyDirect3D9::CreateDevice invalid return");
             *ppReturnedDeviceInterface = nullptr;
             hResult = D3DERR_INVALIDDEVICE;
         }
@@ -620,7 +582,7 @@ HRESULT CreateDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect3
                 SString message;
                 message.Format("CreateDeviceInsist: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
                 AddReportLog(8755, message, 5);
-                ReleaseInterface(pCreatedDevice, "CreateDeviceInsist invalid return");
+                ReleaseInterface(pCreatedDevice, 8755, "CreateDeviceInsist invalid return");
                 *ppReturnedDeviceInterface = nullptr;
                 hResult = D3DERR_INVALIDDEVICE;
             }
@@ -902,7 +864,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         }
     }
 
-    ReleaseInterface(pDirect3DOther, "AddCapsReport GetDirect3D");
+    ReleaseInterface(pDirect3DOther, 8799, "AddCapsReport GetDirect3D");
 
     // Get caps from D3D
     D3DCAPS9 D3DCaps9;
@@ -936,7 +898,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         VertexElements[0].Type = DeclTypesList[i].VertexType;
     IDirect3DVertexDeclaration9* pD3DVertexDecl = nullptr;
     hr = pD3DDevice9->CreateVertexDeclaration(VertexElements, &pD3DVertexDecl);
-    ReleaseInterface(pD3DVertexDecl, "AddCapsReport CreateVertexDeclaration");
+    ReleaseInterface(pD3DVertexDecl, 8799, "AddCapsReport CreateVertexDeclaration");
 
         // Check against device caps
         bool bCapsSaysOk = (DeviceCaps9.DeclTypes & DeclTypesList[i].CapsType) ? true : false;
@@ -1086,7 +1048,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
                 SString message;
                 message.Format("HandleCreateDeviceResult: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
                 AddReportLog(8755, message, 5);
-                ReleaseInterface(pCreatedDevice, "HandleCreateDeviceResult invalid return");
+                ReleaseInterface(pCreatedDevice, 8755, "HandleCreateDeviceResult invalid return");
                 *ppReturnedDeviceInterface = nullptr;
                 hResult = D3DERR_INVALIDDEVICE;
             }
@@ -1218,7 +1180,7 @@ void CCore::OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
         WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
     IDirect3DDevice9* pReturnedDeviceInterface = NULL;
     HRESULT hResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, &pReturnedDeviceInterface);
-    ReleaseInterface(pReturnedDeviceInterface, "CCore::OnPreCreateDevice temp release");
+    ReleaseInterface(pReturnedDeviceInterface, 8799, "CCore::OnPreCreateDevice temp release");
         WriteDebugEvent(SString("  Unmodified result is: %08x", hResult));
     }
 
@@ -1298,7 +1260,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
 
     AddCapsReport(Adapter, pDirect3D, pDevice, false);
 
-    ReleaseInterface(pDevice, "CCore::OnPostCreateDevice temp release");
+    ReleaseInterface(pDevice, 8799, "CCore::OnPostCreateDevice temp release");
     *ppReturnedDeviceInterface = pDevice;
 
     //
@@ -1341,7 +1303,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         {
             AddReportLog(8755,
                          SString("CCore::OnPostCreateDevice: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice), 5);
-            ReleaseInterface(pCreatedDevice, "CCore::OnPostCreateDevice invalid return");
+            ReleaseInterface(pCreatedDevice, 8755, "CCore::OnPostCreateDevice invalid return");
             *ppReturnedDeviceInterface = nullptr;
             hResult = D3DERR_INVALIDDEVICE;
         }
