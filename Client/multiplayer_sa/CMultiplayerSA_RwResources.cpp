@@ -10,10 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <cstddef>
 
 namespace
 {
     SRwResourceStats ms_Stats;
+
+    constexpr std::size_t kTextureRefsReadableSize = offsetof(RwTexture, refs) + sizeof(int);
+    constexpr std::size_t kGeometryRefsReadableSize = offsetof(RwGeometry, refs) + sizeof(short);
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +32,9 @@ void OnMY_RwTextureCreate_Pre(DWORD calledFrom)
 
 void OnMY_RwTextureCreate_Post(RwTexture* pTexture, DWORD calledFrom)
 {
+    if (!pTexture)
+        return;
+
     ms_Stats.uiTextures++;
 }
 
@@ -70,7 +78,17 @@ inner:
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_RwTextureDestroy(RwTexture* pTexture, DWORD calledFrom)
 {
-    if (pTexture->refs == 1)
+    if (!pTexture)
+        return;
+
+    if (SharedUtil::IsReadablePointer(pTexture, kTextureRefsReadableSize))
+    {
+        if (pTexture->refs == 1 && ms_Stats.uiTextures > 0)
+            ms_Stats.uiTextures--;
+        return;
+    }
+
+    if (ms_Stats.uiTextures > 0)
         ms_Stats.uiTextures--;
 }
 
@@ -166,6 +184,9 @@ void OnMY_RwGeometryCreate_Pre(DWORD calledFrom)
 
 void OnMY_RwGeometryCreate_Post(RwGeometry* pGeometry, DWORD calledFrom)
 {
+    if (!pGeometry)
+        return;
+
     ms_Stats.uiGeometries++;
 }
 
@@ -212,7 +233,17 @@ inner:
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_RwGeometryDestroy(DWORD calledFrom, RwGeometry* pGeometry)
 {
-    if (pGeometry->refs == 1)
+    if (!pGeometry)
+        return;
+
+    if (SharedUtil::IsReadablePointer(pGeometry, kGeometryRefsReadableSize))
+    {
+        if (pGeometry->refs == 1 && ms_Stats.uiGeometries > 0)
+            ms_Stats.uiGeometries--;
+        return;
+    }
+
+    if (ms_Stats.uiGeometries > 0)
         ms_Stats.uiGeometries--;
 }
 
