@@ -200,6 +200,9 @@ void CNewsBrowser::CreateGUI()
 ////////////////////////////////////////////////////
 void CNewsBrowser::DestroyGUI()
 {
+    if (!m_pWindow && !m_pTabPanel && !m_pButtonOK && !m_pButtonNewsLink)
+        return;
+
     // Clean up the main UI elements in reverse order of creation
     SAFE_DELETE(m_pTabPanel);  // This will destroy all tabs and their children
     SAFE_DELETE(m_pButtonOK);

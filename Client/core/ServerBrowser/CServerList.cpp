@@ -48,6 +48,22 @@ void CServerList::Clear()
     m_llLastTickCount = 0;
 }
 
+void CServerList::SuspendActivity()
+{
+    for (CServerListIterator iter = m_Servers.begin(); iter != m_Servers.end(); ++iter)
+    {
+        if (CServerListItem* pServer = *iter)
+            pServer->CancelPendingQuery();
+    }
+
+    m_iPass = 0;
+    m_nScanned = 0;
+    m_nSkipped = 0;
+    m_llLastTickCount = 0;
+    m_strStatus = _("Idle");
+    m_strStatus2.clear();
+}
+
 void CServerList::Pulse()
 {
     // Get QueriesPerSecond setting
@@ -200,8 +216,17 @@ CServerListInternet::CServerListInternet()
 
 CServerListInternet::~CServerListInternet()
 {
+    if (m_pMasterServerManager)
+        m_pMasterServerManager->CancelRefresh();
     delete m_pMasterServerManager;
     m_pMasterServerManager = NULL;
+}
+
+void CServerListInternet::SuspendActivity()
+{
+    CServerList::SuspendActivity();
+    if (m_pMasterServerManager)
+        m_pMasterServerManager->CancelRefresh();
 }
 
 void CServerListInternet::Refresh()
@@ -317,12 +342,22 @@ void CServerListLAN::Refresh()
     m_bUpdated = true;
 
     // Create the LAN-broadcast socket
-    closesocket(m_Socket);
+    if (m_Socket != INVALID_SOCKET)
+        closesocket(m_Socket);
+
     m_Socket = socket(AF_INET, SOCK_DGRAM, 0);
-    const int Flags = 1;
-    setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&Flags, sizeof(Flags));
-    if (setsockopt(m_Socket, SOL_SOCKET, SO_BROADCAST, (const char*)&Flags, sizeof(Flags)) != 0)
+    if (m_Socket == INVALID_SOCKET)
     {
+        m_strStatus = _("Cannot create LAN-broadcast socket");
+        return;
+    }
+
+    const int Flags = 1;
+    if (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&Flags, sizeof(Flags)) != 0 ||
+        setsockopt(m_Socket, SOL_SOCKET, SO_BROADCAST, (const char*)&Flags, sizeof(Flags)) != 0)
+    {
+        closesocket(m_Socket);
+        m_Socket = INVALID_SOCKET;
         m_strStatus = _("Cannot bind LAN-broadcast socket");
         return;
     }
@@ -340,11 +375,38 @@ void CServerListLAN::Refresh()
     Discover();
 }
 
+CServerListLAN::CServerListLAN() : m_Socket(INVALID_SOCKET), m_ulStartTime(0)
+{
+    memset(&m_Remote, 0, sizeof(m_Remote));
+}
+
+CServerListLAN::~CServerListLAN()
+{
+    if (m_Socket != INVALID_SOCKET)
+    {
+        closesocket(m_Socket);
+        m_Socket = INVALID_SOCKET;
+    }
+}
+
+void CServerListLAN::SuspendActivity()
+{
+    CServerList::SuspendActivity();
+    if (m_Socket != INVALID_SOCKET)
+    {
+        closesocket(m_Socket);
+        m_Socket = INVALID_SOCKET;
+    }
+}
+
 void CServerListLAN::Discover()
 {
     m_strStatus = _("Attempting to discover LAN servers");
 
     // Send out the broadcast packet
+    if (m_Socket == INVALID_SOCKET)
+        return;
+
     std::string strQuery = std::string(SERVER_LIST_CLIENT_BROADCAST_STR) + " " + std::string(MTA_DM_ASE_VERSION);
     sendto(m_Socket, strQuery.c_str(), strQuery.length() + 1, 0, (sockaddr*)&m_Remote, sizeof(m_Remote));
 
@@ -696,6 +758,13 @@ void CServerListItem::ResetForRefresh()
     if (m_iDataQuality >= SERVER_INFO_QUERY)
         m_iDataQuality = SERVER_INFO_QUERY - 1;
     bMaybeOffline = false;
+}
+
+void CServerListItem::CancelPendingQuery()
+{
+    queryReceiver.InvalidateSocket();
+    m_bDoneTcpSend = false;
+    m_bDoPostTcpQuery = false;
 }
 
 void CServerListItem::ChangeAddress(in_addr _Address, unsigned short _usGamePort)
