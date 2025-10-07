@@ -836,7 +836,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion)
 {
     // Reset frame stat counters
-    memset(&DeviceState.FrameStats, 0, sizeof(DeviceState.FrameStats));
+    DeviceState.FrameStats = {};
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCoopLevel = D3DERR_INVALIDCALL;
@@ -848,9 +848,11 @@ HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDes
     CDirect3DEvents9::OnPresent(m_pDevice);
 
     // A fog flicker fix for some ATI cards
-    D3DMATRIX projMatrix;
-    m_pData->GetTransform(D3DTS_PROJECTION, &projMatrix);
-    m_pDevice->SetTransform(D3DTS_PROJECTION, &projMatrix);
+    const D3DMATRIX* pCachedProjection = m_pData->GetTransformPtr(D3DTS_PROJECTION);
+    if (pCachedProjection)
+    {
+        m_pDevice->SetTransform(D3DTS_PROJECTION, pCachedProjection);
+    }
 
     TIMING_GRAPH("Present");
     HRESULT hr = CDirect3DEvents9::PresentGuarded(m_pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
@@ -1195,6 +1197,17 @@ HRESULT CProxyDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State, CONST D
 
 HRESULT CProxyDirect3DDevice9::GetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix)
 {
+    // Use cached data if available to avoid expensive device query
+    if (pMatrix)
+    {
+        const D3DMATRIX* pCached = m_pData->GetTransformPtr(State);
+        if (pCached)
+        {
+            *pMatrix = *pCached;
+            return D3D_OK;
+        }
+    }
+    // Fallback to device query for unsupported transform types
     return m_pDevice->GetTransform(State, pMatrix);
 }
 
