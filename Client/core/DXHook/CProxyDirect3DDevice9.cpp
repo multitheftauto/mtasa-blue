@@ -322,26 +322,32 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
         if (pD3D9)
         {
             D3DADAPTER_IDENTIFIER9 adaptIdent;
-            ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
             HRESULT hr = pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
-            if (FAILED(hr))
+            
+            if (SUCCEEDED(hr))
             {
-                // GetAdapterIdentifier failed - continue with defaults
+                // GetAdapterIdentifier succeeded - use adapter info
+                int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
+
+                // Just incase, fallback to using texture memory stats
+                if (iVideoCardMemoryKBTotal < 16)
+                    iVideoCardMemoryKBTotal = m_pDevice->GetAvailableTextureMem() / 1024;
+
+                DeviceState.AdapterState.InstalledMemoryKB = iVideoCardMemoryKBTotal;
+
+                // Get video card name
+                DeviceState.AdapterState.Name = adaptIdent.Description;
+
+                // Clipping is required for some graphic configurations - use direct C-string search to avoid heap allocation
+                DeviceState.AdapterState.bRequiresClipping = (strstr(adaptIdent.Description, "Intel") != nullptr);
             }
-
-            int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
-
-            // Just incase, fallback to using texture memory stats
-            if (iVideoCardMemoryKBTotal < 16)
-                iVideoCardMemoryKBTotal = m_pDevice->GetAvailableTextureMem() / 1024;
-
-            DeviceState.AdapterState.InstalledMemoryKB = iVideoCardMemoryKBTotal;
-
-            // Get video card name
-            DeviceState.AdapterState.Name = adaptIdent.Description;
-
-            // Clipping is required for some graphic configurations
-            DeviceState.AdapterState.bRequiresClipping = SStringX(adaptIdent.Description).Contains("Intel");
+            else
+            {
+                // GetAdapterIdentifier failed - use defaults
+                DeviceState.AdapterState.InstalledMemoryKB = m_pDevice->GetAvailableTextureMem() / 1024;
+                DeviceState.AdapterState.Name = "Unknown";
+                DeviceState.AdapterState.bRequiresClipping = false;
+            }
 
             // Release D3D9 interface if we obtained it via GetDirect3D
             if (bNeedRelease)
