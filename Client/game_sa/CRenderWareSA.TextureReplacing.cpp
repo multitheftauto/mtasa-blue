@@ -19,7 +19,6 @@
 #include <map>
 #include <mutex>
 #include <string>
-#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -29,59 +28,79 @@ extern CGameSA* pGame;
 
 namespace TextureIndex
 {
+    inline std::size_t ComputeLength(const char* value) noexcept
+    {
+        if (!value)
+            return 0;
+
+        std::size_t result = 0;
+        while (result < RW_TEXTURE_NAME_LENGTH && value[result] != '\0')
+            ++result;
+        return result;
+    }
+
     struct Name
     {
         std::array<char, RW_TEXTURE_NAME_LENGTH + 1> data{};
         std::size_t                                  length = 0;
 
-        void Assign(std::string_view value) noexcept
+        void Assign(const char* value, std::size_t valueLength) noexcept
         {
-            const std::size_t copyLength = std::min<std::size_t>(value.size(), RW_TEXTURE_NAME_LENGTH);
-            if (copyLength > 0)
-                std::memmove(data.data(), value.data(), copyLength);
+            const std::size_t copyLength = std::min<std::size_t>(valueLength, RW_TEXTURE_NAME_LENGTH);
+            if (copyLength > 0 && value)
+                std::memmove(data.data(), value, copyLength);
             if (copyLength < data.size())
                 std::fill(data.begin() + copyLength, data.end(), '\0');
             length = copyLength;
         }
 
-        [[nodiscard]] std::string_view View() const noexcept { return std::string_view(data.data(), length); }
+        void Assign(const char* value) noexcept
+        {
+            Assign(value, ComputeLength(value));
+        }
 
-        [[nodiscard]] const char* CStr() const noexcept { return data.data(); }
+        void Assign(const std::string& value) noexcept
+        {
+            Assign(value.c_str(), value.size());
+        }
 
-        [[nodiscard]] bool Empty() const noexcept { return length == 0; }
+        const char* CStr() const noexcept { return data.data(); }
+
+        std::size_t Length() const noexcept { return length; }
+
+        bool Empty() const noexcept { return length == 0; }
     };
 
-    [[nodiscard]] inline char ToLowerAscii(char ch) noexcept
+    inline char ToLowerAscii(char ch) noexcept
     {
         return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
     }
 
-    [[nodiscard]] inline std::string_view ToView(const Name& value) noexcept
+    inline bool IsEqualCanonical(const char* lhs, std::size_t lhsLength, const char* rhs, std::size_t rhsLength) noexcept
     {
-        return value.View();
-    }
-    [[nodiscard]] inline std::string_view ToView(const std::string& value) noexcept
-    {
-        return value;
-    }
-    [[nodiscard]] inline std::string_view ToView(std::string_view value) noexcept
-    {
-        return value;
-    }
-    [[nodiscard]] inline std::string_view ToView(const char* value) noexcept
-    {
-        return value ? std::string_view(value) : std::string_view();
+        if (lhsLength != rhsLength)
+            return false;
+
+        for (std::size_t idx = 0; idx < lhsLength; ++idx)
+        {
+            if (ToLowerAscii(lhs[idx]) != ToLowerAscii(rhs[idx]))
+                return false;
+        }
+        return true;
     }
 
-    [[nodiscard]] inline std::size_t HashCanonical(std::string_view view) noexcept
+    inline std::size_t HashCanonical(const char* data, std::size_t length) noexcept
     {
         constexpr std::size_t kFnvOffset = 2166136261u;
         constexpr std::size_t kFnvPrime = 16777619u;
 
         std::size_t hash = kFnvOffset;
-        for (char ch : view)
+        if (!data)
+            return hash;
+
+        for (std::size_t idx = 0; idx < length; ++idx)
         {
-            hash ^= static_cast<unsigned char>(ToLowerAscii(ch));
+            hash ^= static_cast<unsigned char>(ToLowerAscii(data[idx]));
             hash *= kFnvPrime;
         }
         return hash;
@@ -91,10 +110,19 @@ namespace TextureIndex
     {
         using is_transparent = void;
 
-        template <typename T>
-        std::size_t operator()(const T& value) const noexcept
+        std::size_t operator()(const Name& value) const noexcept
         {
-            return HashCanonical(ToView(value));
+            return HashCanonical(value.CStr(), value.Length());
+        }
+
+        std::size_t operator()(const char* value) const noexcept
+        {
+            return HashCanonical(value, ComputeLength(value));
+        }
+
+        std::size_t operator()(const std::string& value) const noexcept
+        {
+            return HashCanonical(value.c_str(), value.size());
         }
     };
 
@@ -102,21 +130,29 @@ namespace TextureIndex
     {
         using is_transparent = void;
 
-        template <typename LHS, typename RHS>
-        bool operator()(const LHS& lhs, const RHS& rhs) const noexcept
+        bool operator()(const Name& lhs, const Name& rhs) const noexcept
         {
-            const std::string_view lhsView = ToView(lhs);
-            const std::string_view rhsView = ToView(rhs);
+            return IsEqualCanonical(lhs.CStr(), lhs.Length(), rhs.CStr(), rhs.Length());
+        }
 
-            if (lhsView.size() != rhsView.size())
-                return false;
+        bool operator()(const Name& lhs, const char* rhs) const noexcept
+        {
+            return IsEqualCanonical(lhs.CStr(), lhs.Length(), rhs, ComputeLength(rhs));
+        }
 
-            for (std::size_t idx = 0; idx < lhsView.size(); ++idx)
-            {
-                if (ToLowerAscii(lhsView[idx]) != ToLowerAscii(rhsView[idx]))
-                    return false;
-            }
-            return true;
+        bool operator()(const char* lhs, const Name& rhs) const noexcept
+        {
+            return IsEqualCanonical(lhs, ComputeLength(lhs), rhs.CStr(), rhs.Length());
+        }
+
+        bool operator()(const std::string& lhs, const Name& rhs) const noexcept
+        {
+            return IsEqualCanonical(lhs.c_str(), lhs.size(), rhs.CStr(), rhs.Length());
+        }
+
+        bool operator()(const Name& lhs, const std::string& rhs) const noexcept
+        {
+            return IsEqualCanonical(lhs.CStr(), lhs.Length(), rhs.c_str(), rhs.size());
         }
     };
 }            // namespace TextureIndex
@@ -296,9 +332,9 @@ namespace
         perTxdInfo.usTxdId = txdId;
         perTxdInfo.bTexturesAreCopies = (replacementTextures.usedInTxdIdLookup.size() > 1);
 
-        auto [indexInsertIt, indexInserted] = replacementTextures.perTxdIndexLookup.emplace(txdId, newIndex);
-        if (!indexInserted)
-            indexInsertIt->second = newIndex;
+        auto indexInsertResult = replacementTextures.perTxdIndexLookup.emplace(txdId, newIndex);
+        if (!indexInsertResult.second)
+            indexInsertResult.first->second = newIndex;
 
         isNewEntry = true;
         return &perTxdInfo;
@@ -316,8 +352,10 @@ namespace
             dassert(replacementTextures.usedInTxdIdLookup.find(txdId) != replacementTextures.usedInTxdIdLookup.end());
 
         dassert(replacementTextures.perTxdIndexLookup.size() == replacementTextures.perTxdList.size());
-        for (const auto& [txdId, index] : replacementTextures.perTxdIndexLookup)
+        for (const auto& pair : replacementTextures.perTxdIndexLookup)
         {
+            const ushort txdId = pair.first;
+            const std::size_t index = pair.second;
             dassert(index < replacementTextures.perTxdList.size());
             dassert(replacementTextures.perTxdList[index].usTxdId == txdId);
         }
@@ -340,17 +378,17 @@ namespace
         }
     }
 
-    [[nodiscard]] inline bool IsValidTexDictionary(const RwTexDictionary* const pTxd)
+    inline bool IsValidTexDictionary(const RwTexDictionary* const pTxd)
     {
         return pTxd && SharedUtil::IsReadablePointer(pTxd, sizeof(*pTxd));
     }
 
-    [[nodiscard]] inline bool IsValidTexturePtr(const RwTexture* const pTexture)
+    inline bool IsValidTexturePtr(const RwTexture* const pTexture)
     {
         return pTexture && SharedUtil::IsReadablePointer(pTexture, sizeof(*pTexture));
     }
 
-    [[nodiscard]] size_t GetTextureNameLength(const RwTexture* const pTexture)
+    size_t GetTextureNameLength(const RwTexture* const pTexture)
     {
         if (!pTexture)
             return 0;
@@ -361,28 +399,22 @@ namespace
         return length;
     }
 
-    [[nodiscard]] std::string_view GetTextureNameView(const RwTexture* const pTexture)
-    {
-        if (!pTexture)
-            return {};
-
-        const size_t length = GetTextureNameLength(pTexture);
-        return std::string_view(pTexture->name, length);
-    }
-
     TextureIndex::Name ExtractTextureName(const RwTexture* pTexture)
     {
         TextureIndex::Name name;
-        name.Assign(GetTextureNameView(pTexture));
+        if (pTexture)
+            name.Assign(pTexture->name, GetTextureNameLength(pTexture));
         return name;
     }
 
-    RwTexture* LookupOriginalTexture(CModelTexturesInfo& info, std::string_view name)
+    RwTexture* LookupOriginalTexture(CModelTexturesInfo& info, const char* name)
     {
-        if (name.empty())
+        if (!name || name[0] == '\0')
             return nullptr;
 
-        auto it = info.originalTextureIndex.find(name);
+        TextureIndex::Name lookupKey;
+        lookupKey.Assign(name);
+        auto it = info.originalTextureIndex.find(lookupKey);
         if (it == info.originalTextureIndex.end())
             return nullptr;
 
@@ -413,12 +445,12 @@ namespace
         RebuildOriginalLookup(info);
     }
 
-    RwTexture* ResolveOriginalTexture(CModelTexturesInfo& info, RwTexDictionary* pTxd, RwTexture* pCandidate, std::string_view replacementName)
+    RwTexture* ResolveOriginalTexture(CModelTexturesInfo& info, RwTexDictionary* pTxd, RwTexture* pCandidate, const char* replacementName)
     {
         if (IsValidTexturePtr(pCandidate))
             return pCandidate;
 
-        if (replacementName.empty())
+        if (!replacementName || replacementName[0] == '\0')
             return nullptr;
 
         const bool canReload = IsValidTexDictionary(pTxd);
@@ -435,14 +467,17 @@ namespace
             return IsValidTexturePtr(record.texture) ? record.texture : nullptr;
         };
 
-        auto mapIt = info.originalTextureIndex.find(replacementName);
+        TextureIndex::Name replacementKey;
+        replacementKey.Assign(replacementName);
+
+        auto mapIt = info.originalTextureIndex.find(replacementKey);
         if (mapIt != info.originalTextureIndex.end())
         {
             if (RwTexture* resolved = tryResolve(mapIt->second))
                 return resolved;
 
             RebuildOriginalLookup(info);
-            mapIt = info.originalTextureIndex.find(replacementName);
+            mapIt = info.originalTextureIndex.find(replacementKey);
             if (mapIt != info.originalTextureIndex.end())
             {
                 if (RwTexture* resolved = tryResolve(mapIt->second))
@@ -501,7 +536,9 @@ namespace
             if (!IsValidTexturePtr(pReplacementTexture) || !IsValidTexturePtr(pOriginalTexture))
                 continue;
 
-            swapMap.insert_or_assign(pOriginalTexture, pReplacementTexture);
+            auto insertResult = swapMap.insert(std::make_pair(pOriginalTexture, pReplacementTexture));
+            if (!insertResult.second)
+                insertResult.first->second = pReplacementTexture;
         }
 
         return !swapMap.empty();
@@ -518,11 +555,13 @@ namespace
             if (!IsValidTexturePtr(pOldTexture))
                 continue;
 
-            RwTexture*             pOriginalTexture = (idx < perTxdInfo.replacedOriginals.size()) ? perTxdInfo.replacedOriginals[idx] : nullptr;
-            const std::string_view replacementName = GetTextureNameView(pOldTexture);
-            RwTexture*             pResolvedOriginal = ResolveOriginalTexture(info, pTxd, pOriginalTexture, replacementName);
+            RwTexture*     pOriginalTexture = (idx < perTxdInfo.replacedOriginals.size()) ? perTxdInfo.replacedOriginals[idx] : nullptr;
+            const char*    replacementName = pOldTexture ? pOldTexture->name : nullptr;
+            RwTexture*     pResolvedOriginal = ResolveOriginalTexture(info, pTxd, pOriginalTexture, replacementName);
 
-            swapMap.insert_or_assign(pOldTexture, pResolvedOriginal);
+            auto insertResult = swapMap.insert(std::make_pair(pOldTexture, pResolvedOriginal));
+            if (!insertResult.second)
+                insertResult.first->second = pResolvedOriginal;
 
             if (pResolvedOriginal && !CRenderWareSA::RwTexDictionaryContainsTexture(pTxd, pResolvedOriginal))
             {
@@ -669,8 +708,8 @@ ModelTexturesInfoGuard AcquireModelTexturesInfo(ushort usModelId)
         }
     }
 
-    auto [insertIt, inserted] = ms_ModelTexturesInfoMap.emplace(usTxdId, CModelTexturesInfo());
-    guard.info = &insertIt->second;
+    auto insertResult = ms_ModelTexturesInfoMap.emplace(usTxdId, CModelTexturesInfo());
+    guard.info = &insertResult.first->second;
 
     guard.info->usTxdId = usTxdId;
     guard.info->pTxd = pTxd;
@@ -845,10 +884,10 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     dassert(bHasValidTxd);
     for (RwTexture* pNewTexture : pPerTxdInfo->usingTextures)
     {
-        const std::string_view replacementName = GetTextureNameView(pNewTexture);
+        const char* replacementName = pNewTexture ? pNewTexture->name : nullptr;
 
         RwTexture* pExistingTexture = LookupOriginalTexture(*pInfo, replacementName);
-        if (!pExistingTexture && bHasValidTxd && !replacementName.empty())
+        if (!pExistingTexture && bHasValidTxd && replacementName && replacementName[0] != '\0')
             pExistingTexture = RwTexDictionaryFindNamedTexture(pInfo->pTxd, pNewTexture->name);
 
         if (pExistingTexture && bHasValidTxd)

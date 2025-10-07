@@ -38,7 +38,7 @@ struct RpClump;
 typedef CShaderItem CSHADERDUMMY;
 
 extern int (__cdecl* RwTextureDestroy)(RwTexture* texture);
-inline int (__cdecl*& gRwTextureDestroy)(RwTexture* texture) = RwTextureDestroy;
+#define gRwTextureDestroy RwTextureDestroy
 
 // A list of custom textures to add to a model's txd
 struct SReplacementTextures
