@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProxyComHelpers.h"
 #include "ComPtrValidation.h"
 #include <algorithm>
 #include <atomic>
@@ -24,54 +25,6 @@ void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3
 
 namespace
 {
-template <typename T>
-void ReleaseInterface(T*& pointer, const char* context = nullptr)
-{
-    if (!pointer)
-        return;
-
-    T* heldPointer = pointer;
-
-    const bool valid = IsValidComInterfacePointer(pointer, ComPtrValidation::ValidationMode::ForceRefresh);
-
-    if (valid)
-    {
-        heldPointer->Release();
-    }
-    else
-    {
-        SString label;
-        label = context ? context : "ReleaseInterface";
-        SString message;
-        message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), heldPointer);
-        AddReportLog(8750, message, 5);
-        ComPtrValidation::Invalidate(heldPointer);
-    }
-
-    pointer = nullptr;
-}
-
-template <typename T>
-void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
-{
-    if (destination == source)
-        return;
-
-    if (source && !IsValidComInterfacePointer(source, ComPtrValidation::ValidationMode::ForceRefresh))
-    {
-        SString label;
-        label = context ? context : "ReplaceInterface";
-        SString message;
-        message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
-        AddReportLog(8751, message, 5);
-        return;
-    }
-
-    ReleaseInterface(destination, context);
-    destination = source;
-    if (destination)
-        destination->AddRef();
-}
 
 constexpr const char* kSetTextureContexts[] = {
     "SetTexture stage 0",
@@ -326,7 +279,7 @@ void ResetGTASceneState()
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
     : m_pDevice(pDevice)
     , m_pData(nullptr)
-    , m_ulRefCount(1)
+    , m_lRefCount(1)
     , m_registrationToken(0)
     , m_lastTestCooperativeLevelResult(D3D_OK)
 {
@@ -393,7 +346,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
             // Release D3D9 interface if we obtained it via GetDirect3D
             if (bNeedRelease)
             {
-                SAFE_RELEASE(pD3D9);
+                ReleaseInterface(pD3D9, 8799, "CProxyDirect3DDevice9 ctor GetDirect3D");
             }
         }
         else
@@ -496,8 +449,7 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 
     // Release our reference to the wrapped device
     // Note: We don't check m_ulRefCount here because destructor is only called
-    // when Release() determined the count reached 0
-    if (m_pDevice)
+    // when Release() determined the count reached 0    if (m_pDevice)
     {
         m_pDevice->Release();
         m_pDevice = nullptr;
@@ -528,17 +480,18 @@ HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
 
 ULONG CProxyDirect3DDevice9::AddRef()
 {
-    // Only increment proxy reference count
+	// Only increment proxy reference count
     // We keep a single reference to the underlying device throughout the lifetime
-    return InterlockedIncrement(&m_ulRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_add(1, std::memory_order_relaxed) + 1;
+    return static_cast<ULONG>(lNewRefCount);
 }
 
 ULONG CProxyDirect3DDevice9::Release()
-{
+{  
     // Only decrement proxy reference count  
-    ULONG ulNewRefCount = InterlockedDecrement(&m_ulRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_sub(1, std::memory_order_acq_rel) - 1;
     
-    if (ulNewRefCount == 0)
+    if (lNewRefCount == 0)
     {
         WriteDebugEvent("Releasing IDirect3DDevice9 Proxy...");
         // Call event handler
@@ -547,7 +500,7 @@ ULONG CProxyDirect3DDevice9::Release()
         return 0;
     }
 
-    return ulNewRefCount;
+    return static_cast<ULONG>(lNewRefCount);
 }
 
 /*** IDirect3DDevice9 methods ***/
@@ -863,7 +816,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         }
 
         // Always release the swap chain if it was obtained, regardless of success/failure
-        ReleaseInterface(pSwapChain);
+        ReleaseInterface(pSwapChain, 8799, "CProxyDirect3DDevice9::Reset GetSwapChain");
 
         if (FAILED(hrCreationParams))
         {
@@ -1735,21 +1688,21 @@ void CProxyDirect3DDevice9::ReleaseCachedResources()
 {
     for (uint i = 0; i < NUMELMS(DeviceState.TextureState); ++i)
     {
-        ReleaseInterface(DeviceState.TextureState[i].Texture);
+        ReleaseInterface(DeviceState.TextureState[i].Texture, 8799, "ReleaseCachedResources Texture");
     }
 
     for (uint i = 0; i < NUMELMS(DeviceState.VertexStreams); ++i)
     {
-        ReleaseInterface(DeviceState.VertexStreams[i].StreamData);
+        ReleaseInterface(DeviceState.VertexStreams[i].StreamData, 8799, "ReleaseCachedResources VertexStream");
         DeviceState.VertexStreams[i].StreamOffset = 0;
         DeviceState.VertexStreams[i].StreamStride = 0;
     }
 
-    ReleaseInterface(DeviceState.VertexDeclaration);
-    ReleaseInterface(DeviceState.VertexShader);
-    ReleaseInterface(DeviceState.PixelShader);
-    ReleaseInterface(DeviceState.IndexBufferData);
-    ReleaseInterface(DeviceState.MainSceneState.DepthBuffer);
+    ReleaseInterface(DeviceState.VertexDeclaration, 8799, "ReleaseCachedResources VertexDecl");
+    ReleaseInterface(DeviceState.VertexShader, 8799, "ReleaseCachedResources VertexShader");
+    ReleaseInterface(DeviceState.PixelShader, 8799, "ReleaseCachedResources PixelShader");
+    ReleaseInterface(DeviceState.IndexBufferData, 8799, "ReleaseCachedResources IndexBuffer");
+    ReleaseInterface(DeviceState.MainSceneState.DepthBuffer, 8799, "ReleaseCachedResources DepthBuffer");
 }
 
 // For debugging
