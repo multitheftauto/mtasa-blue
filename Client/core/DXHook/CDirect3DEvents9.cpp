@@ -219,9 +219,17 @@ bool BorderlessToneMapPass::EnsureStateBlock(IDirect3DDevice9* device)
     if (m_restoreStateBlock)
         return true;
 
+    // Create and capture state block once on initialization
     IDirect3DStateBlock9* stateBlock = nullptr;
     if (FAILED(device->CreateStateBlock(D3DSBT_ALL, &stateBlock)) || !stateBlock)
         return false;
+
+    // Capture current state immediately after creation
+    if (FAILED(stateBlock->Capture()))
+    {
+        stateBlock->Release();
+        return false;
+    }
 
     m_restoreStateBlock = stateBlock;
     return true;
@@ -296,8 +304,7 @@ bool BorderlessToneMapPass::Apply(IDirect3DDevice9* device, float gammaPower, fl
         return false;
     }
 
-    m_restoreStateBlock->Capture();
-
+    // State block is already captured during creation, just apply before drawing
     device->SetRenderState(D3DRS_ZENABLE, FALSE);
     device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
     device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
