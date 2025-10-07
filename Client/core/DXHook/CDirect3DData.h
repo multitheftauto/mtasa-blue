@@ -22,6 +22,7 @@ public:
 
     void StoreTransform(D3DTRANSFORMSTATETYPE dwMatrixToStore, const D3DMATRIX* pMatrix);
     void GetTransform(D3DTRANSFORMSTATETYPE dwRequestedMatrix, D3DMATRIX* pMatrixOut);
+    const D3DMATRIX* GetTransformPtr(D3DTRANSFORMSTATETYPE dwRequestedMatrix) const;
 
     HWND GetDeviceWindow() { return m_hDeviceWindow; };
     void StoreDeviceWindow(HWND hDeviceWindow) { m_hDeviceWindow = hDeviceWindow; };
