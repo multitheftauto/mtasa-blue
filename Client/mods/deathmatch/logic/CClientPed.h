@@ -35,6 +35,7 @@ class CClientPlayerClothes;
 class CClientProjectile;
 class CClientVehicle;
 class CTask;
+class CTaskSimpleSwim;
 
 enum eDelayedSyncData
 {
@@ -565,6 +566,9 @@ public:
     bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; }
 
     void RunClimbingTask();
+
+    CTaskSimpleSwim* GetSwimmingTask() const;
+    void RunSwimTask() const;
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.

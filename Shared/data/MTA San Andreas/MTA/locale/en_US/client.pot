@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-07 18:25+0000\n"
+"POT-Creation-Date: 2025-10-07 19:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1897,7 +1897,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4414 Client/core/CCore.cpp:698
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1098
-#: Client/mods/deathmatch/logic/CResource.cpp:368
+#: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
 msgstr ""
 
