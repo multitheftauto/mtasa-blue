@@ -28,6 +28,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
     SetTypeName("building");
     m_pBuildingManager->AddToList(this);
     Create();
+    UpdateSpatialData();
 }
 
 CClientBuilding::~CClientBuilding()
@@ -57,6 +58,7 @@ void CClientBuilding::SetPosition(const CVector& vecPosition)
         return;
     m_vPos = vecPosition;
     Recreate();
+    UpdateSpatialData();
 }
 
 void CClientBuilding::SetRotationRadians(const CVector& vecRadians)
