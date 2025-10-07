@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "ComPtrValidation.h"
 #include <algorithm>
 #include <atomic>
 #include <cmath>
@@ -24,42 +25,30 @@ void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3
 namespace
 {
 template <typename T>
-bool IsValidComInterfacePointer(T* pointer)
-{
-    if (!pointer)
-        return true;
-
-    if (!SharedUtil::IsReadablePointer(pointer, sizeof(void*)))
-        return false;
-
-    void* const* vtablePtr = reinterpret_cast<void* const*>(pointer);
-    void* const  vtable = *vtablePtr;
-    if (!vtable)
-        return false;
-
-    constexpr size_t requiredBytes = sizeof(void*) * 3;  // QueryInterface, AddRef, Release
-    return SharedUtil::IsReadablePointer(vtable, requiredBytes);
-}
-
-template <typename T>
 void ReleaseInterface(T*& pointer, const char* context = nullptr)
 {
-    if (pointer)
+    if (!pointer)
+        return;
+
+    T* heldPointer = pointer;
+
+    const bool valid = IsValidComInterfacePointer(pointer, ComPtrValidation::ValidationMode::ForceRefresh);
+
+    if (valid)
     {
-        if (IsValidComInterfacePointer(pointer))
-        {
-            pointer->Release();
-        }
-        else
-        {
+        heldPointer->Release();
+    }
+    else
+    {
         SString label;
         label = context ? context : "ReleaseInterface";
-            SString message;
-            message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), pointer);
-            AddReportLog(8750, message, 5);
-        }
-        pointer = nullptr;
+        SString message;
+        message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), heldPointer);
+        AddReportLog(8750, message, 5);
+        ComPtrValidation::Invalidate(heldPointer);
     }
+
+    pointer = nullptr;
 }
 
 template <typename T>
@@ -68,10 +57,10 @@ void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
     if (destination == source)
         return;
 
-    if (source && !IsValidComInterfacePointer(source))
+    if (source && !IsValidComInterfacePointer(source, ComPtrValidation::ValidationMode::ForceRefresh))
     {
-    SString label;
-    label = context ? context : "ReplaceInterface";
+        SString label;
+        label = context ? context : "ReplaceInterface";
         SString message;
         message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
         AddReportLog(8751, message, 5);
@@ -82,6 +71,25 @@ void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
     destination = source;
     if (destination)
         destination->AddRef();
+}
+
+constexpr const char* kSetTextureContexts[] = {
+    "SetTexture stage 0",
+    "SetTexture stage 1",
+    "SetTexture stage 2",
+    "SetTexture stage 3",
+    "SetTexture stage 4",
+    "SetTexture stage 5",
+    "SetTexture stage 6",
+    "SetTexture stage 7",
+};
+
+const char* GetSetTextureContextString(size_t stage)
+{
+    constexpr auto count = std::size(kSetTextureContexts);
+    if (stage < count)
+        return kSetTextureContexts[stage];
+    return "SetTexture";
 }
 
 } // unnamed namespace
@@ -1420,9 +1428,8 @@ HRESULT CProxyDirect3DDevice9::SetTexture(DWORD Stage, IDirect3DBaseTexture9* pT
     CDirect3DEvents9::CloseActiveShader();
     if (Stage < NUMELMS(DeviceState.TextureState))
     {
-        SString context;
-        context.Format("SetTexture stage %u", Stage);
-        ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture, context.c_str());
+        const char* context = GetSetTextureContextString(Stage);
+        ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture, context);
     }
     return m_pDevice->SetTexture(Stage, CDirect3DEvents9::GetRealTexture(pTexture));
 }
